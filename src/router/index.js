@@ -5,12 +5,16 @@ import BPMNE from "../views/BPMNEngine.vue";
 import Login from "../views/Login.vue";
 import { routeMiddleware } from './middleware.js';
 import PageNotFound from './../views/PageNotFound.vue';
-import MultiGuard from  'vue-router-multiguard';
+import MultiGuard from 'vue-router-multiguard';
 
 Vue.use(VueRouter);
 /**
  * Mặc định nếu không xét meta trong các item của route thì layout có đủ sidebar và header,
  * Nếu muốn để layout không có side và header thì dùng: meta: { layout: 'content-only' } như route trỏ đển login
+ * 
+ * Nếu muốn thêm các middleware thì thêm key beforeEnter vào trong mỗi route, 
+ * value là mảng của các function có đầu vào là (to, from, next) (Tham khảo các sự kiện của vue-router)
+ * 
  */
 const routes = [
     {
@@ -37,18 +41,24 @@ const routes = [
         component: PageNotFound, //Vue component,
         meta: { layout: 'content-only' }
     },
-    { path: '*',
+    {
+        path: '*',
         name: 'page',
-        redirect: '/page-not-found' 
+        redirect: '/page-not-found'
     }
 ];
 
+/**
+ * Thêm các middleware vào cho các route
+ */
 let commonGuards = Object.values(routeMiddleware.common);
-for(let r of routes){
+for (let r of routes) {
     let guards = r.beforeEnter ? r.beforeEnter : [];
     guards = commonGuards.concat(guards);
     r.beforeEnter = MultiGuard(guards);
 }
+
+
 const router = new VueRouter({
     routes
 });

@@ -17,10 +17,18 @@ export const authUtil = {
 
         let loginInfo = window.localStorage.getItem('symper-login-info'); 
         if(loginInfo){
-            debugger
             return JSON.parse(loginInfo).token;
         }else{
             return false;
         }
+    },
+
+    checkLogin(){
+        if(this.getToken()){
+            return true;
+        }else{
+            return false;
+        }
     }
+
 }
