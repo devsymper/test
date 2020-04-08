@@ -1,4 +1,7 @@
+import { authUtil } from './utilModules/auth';
+
 let cloneDeep = require("lodash.clonedeep");
-export default {
-  cloneDeep: cloneDeep
+export const util = {
+    cloneDeep: cloneDeep,
+    auth: authUtil
 };

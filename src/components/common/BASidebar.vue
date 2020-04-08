@@ -14,15 +14,15 @@
                 </v-list-item-avatar>
 
                 <v-list-item-content>
-                    <v-list-item-title>{{ sapp.userName }}</v-list-item-title>
+                    <v-list-item-title>{{ sapp.endUserInfo.name }}</v-list-item-title>
                     <v-list-item-subtitle>
                         <v-menu bottom left>
                             <template v-slot:activator="{ on }">
-                                <v-btn x-small v-on="on" depressed>{{ sapp.currentRole.title }}</v-btn>
+                                <v-btn x-small v-on="on" depressed>{{ sapp.endUserInfo.currentRole.title }}</v-btn>
                             </template>
 
                             <v-list dense>
-                                <v-list-item v-for="(item, i) in sapp.roles" :key="i">
+                                <v-list-item v-for="(item, i) in sapp.endUserInfo.roles" :key="i">
                                     <v-list-item-title>{{ item.title }}</v-list-item-title>
                                 </v-list-item>
                             </v-list>

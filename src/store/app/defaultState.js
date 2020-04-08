@@ -1,20 +1,26 @@
 const defaultState = {
     accountType: 'ba', // loại tài khoản đang đăng nhập: ba hoặc enduser
-    baEmail: '', // email của BA
-    baName: '', // tên của BA
-    collapseSideBar: true, // trạng thái của sidebar: true là đang nhỏ, false là đang mở rộng
-    userName: "Nguyễn Quốc Tân", // tên của enduser đang đăng nhập
-    currentRole: { // Vai trò hiện tại của enduser đang đóng
-        id: 0,
-        title: "Trưởng phòng nhân sự"
+    baInfo: {
+        email: '', // email của BA
+        name: '', // tên của BA,
+        id: 0
     },
-    unreadNotification: 1, // số lượng các thông báo chưa đọc
-    roles: [ // các vai trò của enduser có thể có
-        {
+    endUserInfo:{
+        name: 'Nguyễn Quốc Tân',
+        id: 0,
+        currentRole: { // Vai trò hiện tại của enduser đang đóng
             id: 0,
             title: "Trưởng phòng nhân sự"
-        }
-    ],
+        },
+        roles: [ // các vai trò của enduser có thể có
+            {
+                id: 0,
+                title: "Trưởng phòng nhân sự"
+            }
+        ],
+    },
+    collapseSideBar: true, // trạng thái của sidebar: true là đang nhỏ, false là đang mở rộng
+    unreadNotification: 1, // số lượng các thông báo chưa đọc
     items: [ // các menu mà ba hoặc enduser được phân quyền 
         { title: "Reports", icon: "mdi-view-dashboard", link: "/reports" },
         { title: "Workflows", icon: "mdi-sitemap", link: "/bpmne" },
