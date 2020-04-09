@@ -2,17 +2,26 @@
     <v-flex xs12 sm8 md4>
         <v-card class="elevation-6">
             <v-toolbar flat>
-                <v-toolbar-title class="w-100 text-center">
-                    <img height="30px" :src="require('./../assets/image/symper-full-logo.png')" />
+                <v-toolbar-title class="w-100 text-center mt-6">
+                    <img height="40px" :src="require('./../assets/image/symper-full-logo.png')" />
                 </v-toolbar-title>
                 <v-spacer></v-spacer>
             </v-toolbar>
             <v-card-text>
-                <v-form>
-                    <v-text-field color="orange darken" label="Account" name="login" type="text">
+                <v-form ref="form" v-model="valid">
+                    <v-text-field
+                        :rules="emailRules"
+                        v-model="email"
+                        color="orange darken"
+                        label="Account"
+                        name="login"
+                        type="text"
+                    >
                         <v-icon slot="prepend">mdi-account-outline</v-icon>
                     </v-text-field>
                     <v-text-field
+                        v-model="password"
+                        :rules="passwordRules"
                         color="orange darken"
                         id="password"
                         label="Password"
@@ -26,14 +35,93 @@
             </v-card-text>
             <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn text class="symper-bg-orange w-100" dark>Login</v-btn>
+                <v-btn
+                    :loading="checkingUser"
+                    @click="login()"
+                    text
+                    class="symper-bg-orange w-100"
+                    dark
+                >Login</v-btn>
             </v-card-actions>
         </v-card>
     </v-flex>
 </template>
 
 <script>
-export default {};
+import { userApi } from "./../api/user.js";
+import { util } from "./../plugins/util.js";
+
+export default {
+    methods: {
+        login() {
+            this.$refs.form.validate();
+            let thisCpn = this;
+            if (this.valid) {
+                thisCpn.checkingUser = true;
+                userApi
+                    .login(this.email, this.password)
+                    .then(res => {
+                        if (res.status == 200) {
+                            thisCpn.setUserInfo(res.data);
+                            thisCpn.$router.push('/');
+                        } else {
+                            alert("Tài khoản hoặc mật khẩu không đúng!");
+                        }
+                    })
+                    .catch(err => {
+                        console.log("error from login api!!!", res);
+                    })
+                    .always(() => {
+                        thisCpn.checkingUser = false;
+                    });
+            } else {
+                console.log("Login info is not valide!!!!");
+            }
+        },
+
+        setUserInfo(data) {
+            let userData = data.supporter
+                ? {
+                      accType: "ba",
+                      info: data.supporter
+                  }
+                : data.user
+                ? {
+                      accType: "enduser",
+                      info: data.user
+                  }
+                : false;
+            if (userData) {
+                let info = userData.info;
+                util.auth.saveLoginInfo({
+                    token: data.token,
+                    baId: info.id,
+                    endUserId: info.id
+                });
+                this.$store.commit("app/changeCurrentBAInfo", {
+                    id: info.id,
+                    name: info.name,
+                    email: info.email
+                });
+            } else {
+                alert("Không xác định loại tài khoản!");
+            }
+        }
+    },
+    data() {
+        return {
+            checkingUser: false,
+            valid: true,
+            email: "supporter@symper.vn",
+            password: "As123!@#symper",
+            emailRules: [
+                v => !!v || "E-mail is required",
+                v => /.+@.+\..+/.test(v) || "E-mail must be valid"
+            ],
+            passwordRules: [v => !!v || "Password is required"]
+        };
+    }
+};
 </script>
 
 <style>

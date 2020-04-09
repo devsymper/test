@@ -14,6 +14,9 @@ Vue.component('end-user-view', EndUserView);
 Vue.component('content-only-view', ContentOnlyView);
 
 Vue.config.productionTip = false;
+global.jQuery = require('jquery');
+var $ = global.jQuery;
+window.$ = $;
 
 new Vue({
   router,
