@@ -49,6 +49,7 @@
                     :settings="tableSettings"
                     :data="data"
                     :columns="tableColumns"
+                    :contextMenu="itemContextMenu"
                     :colHeaders="colHeaders"
                 ></hot-table>
             </v-col>
@@ -68,7 +69,7 @@
                     style="width:200px"
                     class="sym-small-size ml-10"
                     v-model="page"
-                    :length="total"
+                    :length="totalPage"
                     next-icon="mdi-chevron-right"
                     prev-icon="mdi-chevron-left"
                     :page="page"
@@ -76,6 +77,19 @@
                 ></v-pagination>
             </v-col>
         </v-row>
+
+        <v-navigation-drawer
+            :width="rightPanelWidth"
+            v-model="rightPanel"
+            class="pa-3"
+            absolute
+            right
+            temporary
+        >
+            <slot name="right-panel-content">
+                <item-detail></item-detail>
+            </slot>
+        </v-navigation-drawer>
     </div>
 </template>
 
@@ -83,6 +97,7 @@
 import { HotTable } from "@handsontable/vue";
 require("@/assets/css/handsontable.min.css");
 import { util } from "./../../plugins/util.js";
+import ItemDetail from "./ItemDetail.vue";
 export default {
     watch: {
         page(newVl) {
@@ -97,8 +112,8 @@ export default {
             type: String,
             default: "Danh sách"
         },
-        // Tổng số bản ghi của danh sách này
-        total: {
+        // Tổng số trang của danh sách này
+        totalPage: {
             type: Number,
             default: 0
         },
@@ -150,10 +165,83 @@ export default {
             default() {
                 return [];
             }
+        },
+        /**
+         * * Các contextmenu cho các item trong list, có dạng:
+         * [
+         *      {
+         *          name: 'action1' // Tên của context menu để phân biệt với các context menu khác.
+         *          text: ' Action 1' // Text hiển thị lên .
+         *      }
+         * ]
+         * Khi một menu item được click,
+         * nó sẽ emit sự kiện tên là: context-selection-tên của menu item
+         */
+        tableContextMenu: {
+            type: Array,
+            default() {
+                return [];
+            }
+        },
+        /**
+         * Mặc định context menu chứa các options: remove, view, edit
+         */
+        useDefaultContext: {
+            type: Boolean,
+            default: true
+        },
+        // Chiều rộng của pannel bên phải
+        rightPanelWidth: {
+            default: 400
         }
     },
     mounted() {},
     computed: {
+        itemContextMenu() {
+            let thisCpn = this;
+            let contextMenu = {
+                callback: function(key, selection, clickEvent) {
+                    let col = selection[0].start.col;
+                    let row = selection[0].start.row;
+                    let rowData = thisCpn.data[row];
+                    let colName = Object.keys(rowData)[col];
+
+                    /**
+                     * Phát sự kiện khi có một hành động đối với một row, hoặc cell.
+                     * tham số thứ nhất: row ( index của row đang được chọn)
+                     * tham số thứ hai: colName ( Tên của cột (key trong một row) )
+                     */
+                    thisCpn.$emit("context-selection-" + key, row, colName);
+
+                    if (key == "remove") {
+                    } else if (key == "edit" || key == "view") {
+                        thisCpn.rightPanel = true;
+                    }
+                },
+                items: {}
+            };
+
+            if (this.useDefaultContext) {
+                contextMenu.items = {
+                    remove: {
+                        name: "Xóa"
+                    },
+                    edit: {
+                        name: "Sửa"
+                    },
+                    view: {
+                        name: "Chi tiết"
+                    }
+                };
+            }
+            for (let item of this.tableContextMenu) {
+                contextMenu[item.name] = {
+                    name: item.text
+                };
+            }
+
+            return contextMenu;
+        },
         tableHeight() {
             let ref = this.$refs;
             let tbHeight = this.containerHeight;
@@ -185,6 +273,12 @@ export default {
         }
     },
     methods: {
+        closeRightPanel(){
+            this.rightPanel = false;
+        },
+        openRightPanel(){
+            this.rightPanel = true;
+        },
         addItem() {
             // Phát sự kiện khi click vào nút thêm mới
             this.$emit("add-item", {});
@@ -212,6 +306,7 @@ export default {
     },
     data: function() {
         return {
+            rightPanel: false,
             pageSizeOptions: [20, 50, 100],
             loadingExportExcel: false,
             loadingRefresh: false,
@@ -229,10 +324,18 @@ export default {
         };
     },
     components: {
-        HotTable
+        HotTable,
+        'item-detail': ItemDetail
     }
 };
 </script>
 
 <style>
+.ht_clone_top.handsontable {
+    z-index: 3;
+}
+
+.handsontable .wtBorder.current {
+    z-index: 5;
+}
 </style>
