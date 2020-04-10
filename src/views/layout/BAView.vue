@@ -5,9 +5,7 @@
             <v-content>
                 <v-container fluid fill-height class="body-2">
                     <v-layout justify-center >
-                        <v-flex >
                             <slot/>
-                        </v-flex>
                     </v-layout>
                 </v-container>
             </v-content>
