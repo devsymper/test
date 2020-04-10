@@ -273,6 +273,12 @@ export default {
         }
     },
     methods: {
+        closeRightPanel(){
+            this.rightPanel = false;
+        },
+        openRightPanel(){
+            this.rightPanel = true;
+        },
         addItem() {
             // Phát sự kiện khi click vào nút thêm mới
             this.$emit("add-item", {});
