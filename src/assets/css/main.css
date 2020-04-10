@@ -20,3 +20,37 @@
 .w-100{
     width: 100%;
 }
+
+.sym-small-size {
+    font-size: 13px!important;
+}
+
+.sym-small-size .v-text-field__details{
+    display: none;
+}
+
+.sym-small-size .v-input__slot{
+    margin-bottom: 0px!important;
+    min-height: 25px!important;
+}
+
+.sym-small-size .v-text-field__slot input{
+    max-height: 25px!important;
+}
+
+.sym-small-size .v-input__append-inner{
+    margin-top: 0px!important;
+}
+
+.sym-small-size .v-input__icon .mdi{
+    font-size: 17px!important;
+    position: relative!important;
+    margin-top: 0px!important;
+}
+
+.sym-small-size .v-pagination__item,.sym-small-size .v-pagination__navigation{
+    font-size: 13px!important;
+    box-shadow: none!important;
+    height: 28px!important;
+    min-width: 28px!important;
+}

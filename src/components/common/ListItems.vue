@@ -1,0 +1,238 @@
+<template>
+    <div class="ml-2 w-100">
+        <v-row no-gutters class="pb-2" ref="topBar">
+            <v-col>
+                <span class="title float-left">{{pageTitle}}</span>
+                <div class="float-right overline">
+                    <v-text-field
+                        class="d-inline-block mr-2 sym-small-size"
+                        single-line
+                        append-icon="mdi-magnify"
+                        outlined
+                        dense
+                        label="Search"
+                        placeholder="Tìm kiếm"
+                    ></v-text-field>
+                    <v-btn
+                        depressed
+                        small
+                        :loading="loadingRefresh"
+                        :disabled="loadingRefresh"
+                        class="mr-2"
+                    >
+                        <v-icon left dark>mdi-plus</v-icon>Thêm
+                    </v-btn>
+                    <v-btn
+                        depressed
+                        small
+                        :loading="loadingRefresh"
+                        :disabled="loadingRefresh"
+                        class="mr-2"
+                    >
+                        <v-icon left dark>mdi-refresh</v-icon>Làm mới
+                    </v-btn>
+                    <v-btn
+                        depressed
+                        small
+                        :loading="loadingExportExcel"
+                        :disabled="loadingExportExcel"
+                    >
+                        <v-icon left dark>mdi-microsoft-excel</v-icon>Xuất Excel
+                    </v-btn>
+                </div>
+            </v-col>
+        </v-row>
+        <v-row no-gutters>
+            <v-col class="fs-13">
+                <hot-table
+                    :height="tableHeight"
+                    :settings="tableSettings"
+                    :data="data"
+                    :columns="tableColumns"
+                    :colHeaders="colHeaders"
+                ></hot-table>
+            </v-col>
+        </v-row>
+        <v-row no-gutters ref="bottomBar" class="pt-5">
+            <v-col>
+                <v-select
+                    class="d-inline-block mr-5"
+                    style="width:70px"
+                    v-model="pageSize"
+                    :items="pageSizeOptions"
+                    label="Số bản ghi mỗi trang"
+                    dense
+                    flat
+                ></v-select>
+                <v-pagination
+                    style="width:200px"
+                    class="sym-small-size ml-10"
+                    v-model="page"
+                    :length="total"
+                    next-icon="mdi-chevron-right"
+                    prev-icon="mdi-chevron-left"
+                    :page="page"
+                    :total-visible="6"
+                ></v-pagination>
+            </v-col>
+        </v-row>
+    </div>
+</template>
+
+<script>
+import { HotTable } from "@handsontable/vue";
+require("@/assets/css/handsontable.min.css");
+import { util } from "./../../plugins/util.js";
+export default {
+    watch: {
+        page(newVl) {
+            // Phát sự kiện thay đổi trang đang xem
+            this.$emit("change-page", newVl);
+        }
+    },
+
+    props: {
+        // Tiêu đề của trang: Danh sách văn bản, danh sách người dùng ...
+        pageTitle: {
+            type: String,
+            default: "Danh sách"
+        },
+        // Tổng số bản ghi của danh sách này
+        total: {
+            type: Number,
+            default: 0
+        },
+        // Chiều cao của khung chứa danh sách
+        containerHeight: {
+            type: Number,
+            default: 200
+        },
+        /**
+         * Cấu hình các cột của bảng danh sách, có dạng
+         * [
+         *    {
+         *        name: 'A1', ứng với một key của data
+         *        type: 'B1', Loại dữ liệu của cột này
+         *        title: 'C1', Tiêu đề hiển thị lên bảng
+         *    },
+         *    {
+         *        name: 'A2', ứng với một key của data
+         *        type: 'B2', Loại dữ liệu của cột này
+         *        title: 'C2', Tiêu đề hiển thị lên bảng
+         *    }
+         * ]
+         */
+        columns: {
+            type: Array,
+            default() {
+                return [];
+            }
+        },
+        /**
+         * Dữ liệu để hiển thị trong bảng, có dạng
+         * [
+         *    {
+         *        A1: "vl1",
+         *        A2: 'V2',
+         *        A3: 'vl3',
+         *        ...
+         *    },
+         *    {
+         *        A1: "vl4",
+         *        A2: 'V5',
+         *        A3: 'vl6',
+         *        ...
+         *    },
+         * ]
+         */
+        data: {
+            type: Array,
+            default() {
+                return [];
+            }
+        }
+    },
+    mounted() {},
+    computed: {
+        tableHeight() {
+            let ref = this.$refs;
+            let tbHeight = this.containerHeight;
+            if (tbHeight <= 250) {
+                tbHeight = util.getComponentSize(this).h;
+            }
+            if (ref.topBar) {
+                tbHeight -=
+                    util.getComponentSize(ref.topBar).h +
+                    util.getComponentSize(ref.bottomBar).h;
+            }
+            return tbHeight - 10;
+        },
+        tableColumns() {
+            return this.columns.reduce((columns, item) => {
+                columns.push({
+                    data: item.name,
+                    type: item.type,
+                    editor: false
+                });
+                return columns;
+            }, []);
+        },
+        colHeaders() {
+            return this.columns.reduce((headers, item) => {
+                headers.push(item.title);
+                return headers;
+            }, []);
+        }
+    },
+    methods: {
+        addItem() {
+            // Phát sự kiện khi click vào nút thêm mới
+            this.$emit("add-item", {});
+        },
+        removeItem() {
+            // Phát sự kiện khi xóa danh sách các item trong list
+            this.$emit("remove-item", []);
+        },
+        refreshList() {
+            // Phát sự kiện khi click vào refresh dữ liệu
+            this.$emit("refresh-list", {});
+        },
+        filterList() {
+            // Phát sự kiện khi có filter danh sách
+            this.$emit("filter-list", {});
+        },
+        searchAll() {
+            // Phát sự kiện khi người dùng gõ vào ô tìm kiếm
+            this.$emit("search-all", {});
+        },
+        changePageSize() {
+            // Phát sự kiện khi người dùng thay đổi số bản ghi ở mỗi page
+            this.$emit("change-page-size");
+        }
+    },
+    data: function() {
+        return {
+            pageSizeOptions: [20, 50, 100],
+            loadingExportExcel: false,
+            loadingRefresh: false,
+            page: 1,
+            pageSize: 50,
+            tableSettings: {
+                dropdownMenu: true,
+                filters: true,
+                manualColumnMove: true,
+                manualColumnResize: true,
+                manualRowResize: true,
+                stretchH: "all",
+                licenseKey: "non-commercial-and-evaluation"
+            }
+        };
+    },
+    components: {
+        HotTable
+    }
+};
+</script>
+
+<style>
+</style>
