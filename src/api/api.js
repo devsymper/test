@@ -1,3 +1,4 @@
+import { util } from "./../plugins/util.js";
 export default class Api {
     /**
      * Khởi tạo một class Api với base url
@@ -84,6 +85,8 @@ export default class Api {
      */
     callApi(method, url, data, headers, options) {
         headers = Object.assign({
+            Authorization: `Bearer ${util.auth.getToken()}`,
+            'Content-Type': 'application/x-www-form-urlencoded',
         }, headers);
         let defaultOptions = {
             method: method,

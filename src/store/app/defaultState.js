@@ -5,7 +5,7 @@ const defaultState = {
         name: '', // tên của BA,
         id: 0
     },
-    endUserInfo:{
+    endUserInfo: {
         name: 'Nguyễn Quốc Tân',
         id: 0,
         currentRole: { // Vai trò hiện tại của enduser đang đóng
@@ -42,7 +42,15 @@ const defaultState = {
             icon: "mdi-microsoft-xbox-controller-menu",
             link: "/menu"
         },
-        { title: "Users", icon: "mdi-account-settings", link: "/users" }
+        {
+            title: "Users",
+            icon: "mdi-account-settings",
+            link: "/users",
+            group: [
+                { title: "Thêm mới", icon: "mdi-account-plus", link: "/users/add" },
+                { title: "Danh sách", icon: "mdi-format-list-bulleted-square", link: "/users" }
+            ]
+        }
     ]
 };
 

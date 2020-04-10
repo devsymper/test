@@ -7,6 +7,9 @@ import { routeMiddleware } from './middleware.js';
 import PageNotFound from './../views/PageNotFound.vue';
 import MultiGuard from 'vue-router-multiguard';
 
+import ShowListUser from "../views/users/ShowList.vue";
+import AddUser from "../views/users/Add.vue";
+import EditUser from "../views/users/Edit.vue";
 Vue.use(VueRouter);
 /**
  * Mặc định nếu không xét meta trong các item của route thì layout có đủ sidebar và header,
@@ -16,8 +19,7 @@ Vue.use(VueRouter);
  * value là mảng của các function có đầu vào là (to, from, next) (Tham khảo các sự kiện của vue-router)
  * 
  */
-const routes = [
-    {
+const routes = [{
         path: "/",
         name: "home",
         component: Home
@@ -32,6 +34,25 @@ const routes = [
         name: "login",
         meta: { layout: 'content-only' },
         component: Login,
+    },
+
+    //users
+
+    {
+        path: "/users",
+        name: "processListUser",
+        component: ShowListUser,
+    },
+
+    {
+        path: "/users/add",
+        name: "addUser",
+        component: AddUser,
+    },
+    {
+        path: "/users/:id",
+        name: "editUser",
+        component: EditUser,
     },
 
     // Luôn để 2 item này ở cuối cùng của array này để nó có thể redirect đến được trang 404 khi ko tìm thấy route

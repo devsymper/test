@@ -13,6 +13,12 @@ Vue.component('ba-view', BaView);
 Vue.component('end-user-view', EndUserView);
 Vue.component('content-only-view', ContentOnlyView);
 
+/**
+ * $evtBus : component chuyên chở các sự kiện giữa tất cả các component
+ */
+Vue.prototype.$evtBus = new Vue({});
+
+
 Vue.config.productionTip = false;
 global.jQuery = require('jquery');
 var $ = global.jQuery;

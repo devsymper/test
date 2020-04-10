@@ -3,9 +3,9 @@
         <v-app id="symper-platform-app">
             <ba-sidebar />
             <v-content>
-                <v-container fluid fill-height>
-                    <v-layout justify-center align-center>
-                        <v-flex shrink>
+                <v-container fluid fill-height class="body-2">
+                    <v-layout justify-center >
+                        <v-flex >
                             <slot/>
                         </v-flex>
                     </v-layout>
