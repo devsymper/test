@@ -69,7 +69,7 @@ export default {
                         }
                     })
                     .catch(err => {
-                        console.log("error from login api!!!", res);
+                        console.log("error from login api!!!", err);
                     })
                     .always(() => {
                         thisCpn.checkingUser = false;

@@ -10,8 +10,10 @@
     "watch": "vue-cli-service build --watch --mode development"
   },
   "dependencies": {
+    "@handsontable/vue": "^4.1.1",
     "core-js": "^3.6.4",
     "firebase": "^7.13.2",
+    "handsontable": "^7.4.2",
     "jquery": "^3.4.1",
     "jquery-ajax": "^2.1.4",
     "lodash.clonedeep": "^4.5.0",

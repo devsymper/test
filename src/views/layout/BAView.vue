@@ -4,10 +4,8 @@
             <ba-sidebar />
             <v-content>
                 <v-container fluid fill-height>
-                    <v-layout justify-center align-center>
-                        <v-flex shrink>
-                            <slot/>
-                        </v-flex>
+                    <v-layout justify-center >
+                        <slot/>
                     </v-layout>
                 </v-container>
             </v-content>
