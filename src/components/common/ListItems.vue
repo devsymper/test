@@ -18,6 +18,7 @@
                         small
                         :loading="loadingRefresh"
                         :disabled="loadingRefresh"
+                        @click="addItem()"
                         class="mr-2"
                     >
                         <v-icon left dark>mdi-plus</v-icon>Thêm
@@ -338,4 +339,11 @@ export default {
 .handsontable .wtBorder.current {
     z-index: 5;
 }
+
+/* .v-overlay--active .v-overlay__scrim{
+    opacity: 1 !important;
+    background-color: unset !important;
+    border-color: unset !important;
+    backdrop-filter: blur(3px);
+  } */
 </style>

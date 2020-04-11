@@ -45,11 +45,7 @@ const defaultState = {
         {
             title: "Users",
             icon: "mdi-account-settings",
-            link: "/users",
-            group: [
-                { title: "Thêm mới", icon: "mdi-account-plus", link: "/users/add" },
-                { title: "Danh sách", icon: "mdi-format-list-bulleted-square", link: "/users" }
-            ]
+            link: "/users"
         }
     ]
 };

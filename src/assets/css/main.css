@@ -1,54 +1,67 @@
-.symper-bg-orange{
+.symper-bg-orange {
     background-color: #f58634!important;
 }
 
-.symper-text-orange{
+.symper-text-orange {
     color: #f58634!important;
 }
-.symper-bg-black{
+
+.symper-bg-black {
     background-color: #344750!important;
 }
 
-.symper-text-black{
+.symper-text-black {
     color: #344750!important;
 }
 
-.fs-13{
+.fs-13 {
     font-size: 13px;
 }
 
-.w-100{
+.w-100 {
     width: 100%;
+}
+
+.h-100 {
+    height: 100%;
 }
 
 .sym-small-size {
     font-size: 13px!important;
 }
 
-.sym-small-size .v-text-field__details{
+.sym-small-size .v-text-field__details {
     display: none;
 }
 
-.sym-small-size .v-input__slot{
+.sym-small-size .v-input__slot {
     margin-bottom: 0px!important;
     min-height: 25px!important;
 }
 
-.sym-small-size .v-text-field__slot input{
+.sym-small-size .v-text-field__slot input {
     max-height: 25px!important;
 }
 
-.sym-small-size .v-input__append-inner{
+.sym-small-size .v-input__append-inner {
     margin-top: 0px!important;
 }
 
-.sym-small-size .v-input__icon .mdi{
+.sym-small-size .v-input__icon .mdi {
     font-size: 17px!important;
     position: relative!important;
     margin-top: 0px!important;
 }
 
-.sym-small-size .v-pagination__item,.sym-small-size .v-pagination__navigation{
+
+/*Label*/
+
+.sym-small-size .v-label {
+    font-size: 14px !important;
+}
+
+.sym-small-size .v-pagination__item,
+.sym-small-size .v-pagination__navigation {
     font-size: 13px!important;
     box-shadow: none!important;
     height: 28px!important;

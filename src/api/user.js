@@ -15,8 +15,8 @@ export const userApi = {
         };
         return api.post("login", data);
     },
-    getListUser() {
-        return coreApi.get("users");
+    getListUser(page, pageSize) {
+        return coreApi.get("users?page=" + page + "&pageSize=" + pageSize);
     },
     getGroupUser() {
         return coreApi.get("user-group");

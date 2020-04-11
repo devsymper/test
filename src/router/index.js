@@ -8,9 +8,7 @@ import PageNotFound from './../views/PageNotFound.vue';
 import MultiGuard from 'vue-router-multiguard';
 
 import ShowListUser from "../views/users/ShowList.vue";
-import AddUser from "../views/users/Add.vue";
-import EditUser from "../views/users/Edit.vue";
-import PermissionPackage from "../views/users/PermissionPackage.vue";
+import ActionPanel from "../views/users/ActionPanel.vue";
 Vue.use(VueRouter);
 /**
  * Mặc định nếu không xét meta trong các item của route thì layout có đủ sidebar và header,
@@ -48,18 +46,18 @@ const routes = [{
     {
         path: "/users/add",
         name: "addUser",
-        component: AddUser,
+        component: ActionPanel,
     },
     {
         path: "/users/edit/:id",
         name: "editUser",
-        component: EditUser,
+        component: ActionPanel,
     },
-    {
-        path: "/users/permission-package/:id",
-        name: "permissionPackage",
-        component: PermissionPackage,
-    },
+    // {
+    //     path: "/users/permission-package/:id",
+    //     name: "permissionPackage",
+    //     component: PermissionPackage,
+    // },
 
     // Luôn để 2 item này ở cuối cùng của array này để nó có thể redirect đến được trang 404 khi ko tìm thấy route
     {

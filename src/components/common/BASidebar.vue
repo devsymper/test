@@ -31,7 +31,7 @@
                 </v-list-item-content>
             </v-list-item>
 
-            <!-- <v-list-item
+            <v-list-item
                 v-for="item in sapp.items"
                 :key="item.title"
                 link
@@ -51,9 +51,9 @@
                 <v-list-item-content>
                     <v-list-item-title>{{ item.title }}</v-list-item-title>
                 </v-list-item-content>
-            </v-list-item> -->
+            </v-list-item>
 
-
+<!-- 
             <v-list-group
                 no-action
                 v-for="item in sapp.items"
@@ -91,7 +91,7 @@
                 </v-list-item>
 
                 
-            </v-list-group>
+            </v-list-group> -->
 
 
 
