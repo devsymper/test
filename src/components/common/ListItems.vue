@@ -1,6 +1,6 @@
 <template>
     <div class="ml-2 w-100">
-        <v-row no-gutters class="pb-2" ref="topBar">
+        <v-row no-gutters class="pb-2" :style="{width:contentWidth}" ref="topBar">
             <v-col>
                 <span class="title float-left">{{pageTitle}}</span>
                 <div class="float-right overline">
@@ -42,7 +42,7 @@
                 </div>
             </v-col>
         </v-row>
-        <v-row no-gutters>
+        <v-row :style="{width:contentWidth}" no-gutters>
             <v-col class="fs-13">
                 <hot-table
                     :height="tableHeight"
@@ -54,7 +54,7 @@
                 ></hot-table>
             </v-col>
         </v-row>
-        <v-row no-gutters ref="bottomBar" class="pt-5">
+        <v-row :style="{width:contentWidth}" no-gutters ref="bottomBar" class="pt-5">
             <v-col>
                 <v-select
                     class="d-inline-block mr-5"
@@ -78,18 +78,34 @@
             </v-col>
         </v-row>
 
-        <v-navigation-drawer
-            :width="rightPanelWidth"
-            v-model="rightPanel"
+        <component
+            :is="actionPanelWrapper"
+            :width="actionPanelWidth"
+            :max-width="actionPanelWidth"
+            v-model="actionPanel"
             class="pa-3"
             absolute
             right
-            temporary
+            :temporary="actionPanelType == 'temporary'"
         >
             <slot name="right-panel-content">
-                <item-detail></item-detail>
+                <v-card>
+                    <v-card-title class="headline grey lighten-2" primary-title>Privacy Policy</v-card-title>
+
+                    <v-card-text>
+                        <item-detail></item-detail>
+                    </v-card-text>
+
+                    <v-divider></v-divider>
+
+                    <v-card-actions>
+                        <v-spacer></v-spacer>
+                        <v-btn text @click="closeactionPanel()" class="mr-2">Thoát</v-btn>
+                        <v-btn color="primary" text @click="saveDataAction()">Lưu</v-btn>
+                    </v-card-actions>
+                </v-card>
             </slot>
-        </v-navigation-drawer>
+        </component>
     </div>
 </template>
 
@@ -98,6 +114,8 @@ import { HotTable } from "@handsontable/vue";
 require("@/assets/css/handsontable.min.css");
 import { util } from "./../../plugins/util.js";
 import ItemDetail from "./ItemDetail.vue";
+import { VDialog, VNavigationDrawer } from "vuetify/lib";
+
 export default {
     watch: {
         page(newVl) {
@@ -191,12 +209,44 @@ export default {
             default: true
         },
         // Chiều rộng của pannel bên phải
-        rightPanelWidth: {
+        actionPanelWidth: {
+            type: Number,
             default: 400
+        },
+        // Loại hiển thị cho actionPanel - một trong ba loại: modal, temporary, elastic
+        actionPanelType: {
+            type: String,
+            default: "temporary"
         }
     },
     mounted() {},
+    data: function() {
+        return {
+            actionPanel: false,
+            pageSizeOptions: [20, 50, 100],
+            loadingExportExcel: false,
+            loadingRefresh: false,
+            page: 1,
+            pageSize: 50,
+            tableSettings: {
+                dropdownMenu: true,
+                filters: true,
+                manualColumnMove: true,
+                manualColumnResize: true,
+                manualRowResize: true,
+                stretchH: "all",
+                licenseKey: "non-commercial-and-evaluation"
+            }
+        };
+    },
     computed: {
+        contentWidth() {
+            if (this.actionPanel && this.actionPanelType == "elastic") {
+                return "calc(100% - " + this.actionPanelWidth + "px)";
+            } else {
+                return "";
+            }
+        },
         itemContextMenu() {
             let thisCpn = this;
             let contextMenu = {
@@ -215,7 +265,7 @@ export default {
 
                     if (key == "remove") {
                     } else if (key == "edit" || key == "view") {
-                        thisCpn.rightPanel = true;
+                        thisCpn.actionPanel = true;
                     }
                 },
                 items: {}
@@ -270,14 +320,28 @@ export default {
                 headers.push(item.title);
                 return headers;
             }, []);
+        },
+        actionPanelWrapper() {
+            let mapType = {
+                modal: "v-dialog",
+                temporary: "v-navigation-drawer",
+                elastic: "v-navigation-drawer"
+            };
+            return mapType[this.actionPanelType]
+                ? mapType[this.actionPanelType]
+                : mapType["temporary"];
         }
     },
     methods: {
-        closeRightPanel(){
-            this.rightPanel = false;
+        saveDataAction() {
+            this.closeactionPanel();
+            this.$emit("save-item", {});
         },
-        openRightPanel(){
-            this.rightPanel = true;
+        closeactionPanel() {
+            this.actionPanel = false;
+        },
+        openactionPanel() {
+            this.actionPanel = true;
         },
         addItem() {
             // Phát sự kiện khi click vào nút thêm mới
@@ -304,35 +368,19 @@ export default {
             this.$emit("change-page-size");
         }
     },
-    data: function() {
-        return {
-            rightPanel: false,
-            pageSizeOptions: [20, 50, 100],
-            loadingExportExcel: false,
-            loadingRefresh: false,
-            page: 1,
-            pageSize: 50,
-            tableSettings: {
-                dropdownMenu: true,
-                filters: true,
-                manualColumnMove: true,
-                manualColumnResize: true,
-                manualRowResize: true,
-                stretchH: "all",
-                licenseKey: "non-commercial-and-evaluation"
-            }
-        };
-    },
+
     components: {
         HotTable,
-        'item-detail': ItemDetail
+        "item-detail": ItemDetail,
+        VDialog,
+        VNavigationDrawer
     }
 };
 </script>
 
 <style>
 .ht_clone_top.handsontable {
-    z-index: 3;
+    z-index: 6;
 }
 
 .handsontable .wtBorder.current {
