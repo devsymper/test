@@ -1,10 +1,10 @@
 <template>
   <div class="h-100">
     <h2 class="header-title">Tạo User</h2>
-    <v-stepper v-model="e1" class="d-flex stepper-create-user">
+    <v-stepper v-model="stepper" class="d-flex stepper-create-user">
       <v-stepper-header class="stepper-header">
-        <v-stepper-step editable :complete="e1 > 1" step="1">Thông tin chung</v-stepper-step>
-        <v-stepper-step editable :complete="e1 > 2" step="2">Phân quyền</v-stepper-step>
+        <v-stepper-step editable :complete="stepper > 1" step="1">Thông tin chung</v-stepper-step>
+        <v-stepper-step editable :complete="stepper > 2" step="2">Phân quyền</v-stepper-step>
         <v-stepper-step editable step="3">Cài đặt thêm</v-stepper-step>
       </v-stepper-header>
 
@@ -17,6 +17,7 @@
               </v-col>
               <v-col cols="4">
                 <v-text-field
+                v-model="user.firstName"
                 dense
                 ></v-text-field>
               </v-col>
@@ -25,6 +26,7 @@
               </v-col>
               <v-col cols="4">
                 <v-text-field
+                v-model="user.lastName"
                 dense
                 ></v-text-field>
               </v-col>
@@ -36,6 +38,7 @@
               </v-col>
               <v-col cols="9">
                 <v-text-field
+                  v-model="user.displayName"
                   dense
                 ></v-text-field>
               </v-col>
@@ -47,6 +50,7 @@
               </v-col>
               <v-col cols="9">
                 <v-text-field
+                v-model="user.userName"
                 dense
                 ></v-text-field>
               </v-col>
@@ -58,6 +62,18 @@
               </v-col>
               <v-col cols="9">
                 <v-text-field
+                  v-model="user.email"
+                  dense
+                ></v-text-field>
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col cols="3">
+                <v-subheader>Số điện thoại</v-subheader>
+              </v-col>
+              <v-col cols="9">
+                <v-text-field
+                  v-model="user.phone"
                   dense
                 ></v-text-field>
               </v-col>
@@ -84,7 +100,7 @@
 
             
           <v-btn class="btn-next-step"
-            @click="e1 = 2"
+            @click="stepper = 2"
           >
             Tiếp theo
           </v-btn>
@@ -150,7 +166,7 @@
           </v-tabs-items>
 
           <v-btn class="btn-next-step"
-            @click="e1 = 3"
+            @click="stepper = 3"
           >
             Tiếp theo
           </v-btn>
@@ -185,7 +201,8 @@ export default {
   },
   data(){
     return {
-        e1: 1,
+        user:{id:'',firstName:'',lastName:'',displayName:'',userName:'',email:'',phone:''},
+        stepper: 1,
         enabledPassword:false,
         autoRenPassword:true,
         tabIndex:0,
@@ -202,7 +219,9 @@ export default {
   created(){
   },
   methods:{
-    
+    setUser(user){
+      this.user = user;
+    },
     done(){
       alert('ok');
     },
@@ -267,7 +286,7 @@ export default {
   }
   .stepper-create-user{
     box-shadow: none;
-    height: calc(100% - 20px);
+    height: calc(100% - 50px);
   }
   .header-title{
     padding: 12px 0;

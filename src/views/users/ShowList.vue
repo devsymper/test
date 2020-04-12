@@ -8,11 +8,12 @@
         :containerHeight="containerHeight"
         :columns="columns"
         :data="data"
-        :rightPanelWidth="rightPanelWidth"
+        :actionPanelWidth="actionPanelWidth"
         :totalPage="totalPage"
     >
       <div slot="right-panel-content" class="h-100">
             <action-panel
+            ref="panel"
             :actionDone="action"
             />
         </div>
@@ -30,7 +31,7 @@ export default {
   },
   data(){
     return {
-      rightPanelWidth:800,
+      actionPanelWidth:800,
       containerHeight: 200,
       columns: [{"name":"id","title":"Id","type":"numeric"}],
       data: [],
@@ -50,12 +51,15 @@ export default {
     },
     addUser(){
       this.action = "Tạo User";
-      this.$refs.listUser.openRightPanel();
+      this.$refs.listUser.openactionPanel();
       // chỗ này, muốn sửa giá trị của no chỗ này
       // this.$router.push('/users/add');
     },
-    editUser(){
+    editUser(row,colName){
       this.action = "Cập nhật User";
+      console.log(this.data[row]);
+      
+      this.$refs.panel.setUser(this.data[row]);
     },
     getListUser(){
       let thisCpn = this;
@@ -64,8 +68,6 @@ export default {
         .then(res => {
             if (res.status == 200) {
                 thisCpn.setListUser(res.data);
-                console.log(res.data);
-                
             }
         })
         .catch(err => {
