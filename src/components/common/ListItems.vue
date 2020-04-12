@@ -28,6 +28,7 @@
                         small
                         :loading="loadingRefresh"
                         :disabled="loadingRefresh"
+                        @click="refreshList()"
                         class="mr-2"
                     >
                         <v-icon left dark>mdi-refresh</v-icon>Làm mới

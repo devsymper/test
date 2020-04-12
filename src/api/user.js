@@ -26,5 +26,11 @@ export const userApi = {
     },
     getDetailUser(id) {
         return coreApi.get("user/detail/" + id);
+    },
+    getListUserPackage(id) {
+        return coreApi.get('user/permission/package/' + id);
+    },
+    deleteUserPackage(data) {
+        return coreApi.delete('user/permission/package', data);
     }
 };

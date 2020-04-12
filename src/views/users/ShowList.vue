@@ -4,6 +4,7 @@
         @change-page="changePage"
         @add-item="addUser"
         @context-selection-edit="editUser"
+        @refresh-list="getListUser"
         :pageTitle="'Danh sách User'"
         :containerHeight="containerHeight"
         :columns="columns"
@@ -14,7 +15,9 @@
       <div slot="right-panel-content" class="h-100">
             <action-panel
             ref="panel"
-            :actionDone="action"
+            @refresh-new-user="setNewUserItem"
+            @close-panel="closePanel"
+            :actionType="actionType"
             />
         </div>
     </list-items>
@@ -36,7 +39,7 @@ export default {
       columns: [{"name":"id","title":"Id","type":"numeric"}],
       data: [],
       totalPage: 6,
-      action : ''
+      actionType:''
     }
   },
   mounted() {
@@ -49,16 +52,17 @@ export default {
     changePage(page){
       alert('ok');
     },
+    closePanel(){
+      this.$refs.listUser.closeactionPanel();
+    },
     addUser(){
-      this.action = "Tạo User";
+      this.actionType = 'add';
       this.$refs.listUser.openactionPanel();
       // chỗ này, muốn sửa giá trị của no chỗ này
       // this.$router.push('/users/add');
     },
     editUser(row,colName){
-      this.action = "Cập nhật User";
-      console.log(this.data[row]);
-      
+      this.actionType = 'edit';
       this.$refs.panel.setUser(this.data[row]);
     },
     getListUser(){
@@ -80,6 +84,9 @@ export default {
       this.columns = listUser.columns;
       this.data = listUser.listObject;
       this.totalPage = listUser.totalPage;
+    },
+    setNewUserItem(user){
+      this.data.unshift(user);
     },
     calcContainerHeight() {
         this.containerHeight = util.getComponentSize(this).h;
