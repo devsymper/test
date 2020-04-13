@@ -1,7 +1,9 @@
 <template>
     <div id="symper-app">
         <component :is="layout">
-            <router-view />
+            <keep-alive>
+                <router-view />
+            </keep-alive>
         </component>
     </div>
 </template>
@@ -55,7 +57,7 @@ export default {
                         err
                     );
                 });
-                
+
             messaging.onTokenRefresh(() => {
                 messaging
                     .getToken()
