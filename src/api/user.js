@@ -24,13 +24,30 @@ export const userApi = {
     addUser(data) {
         return coreApi.post('user', data);
     },
+
+    updateUser(data) {
+        return coreApi.put('user', data);
+    },
     getDetailUser(id) {
         return coreApi.get("user/detail/" + id);
     },
     getListUserPackage(id) {
         return coreApi.get('user/permission/package/' + id);
     },
+    getListUserPosition(id) {
+        return coreApi.get('user/permission/position-orgchart/' + id);
+    },
     deleteUserPackage(data) {
         return coreApi.delete('user/permission/package', data);
+    },
+    deleteUserPosition(data) {
+        return coreApi.delete('user/permission/position-orgchart', data);
+    },
+    uploadAvatar(data) {
+        return coreApi.post('https://kh.symper.vn/publicapi/uploadFile/', data, {}, {
+            cache: false,
+            contentType: false,
+            processData: false
+        });
     }
 };

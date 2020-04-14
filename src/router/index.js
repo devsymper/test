@@ -9,6 +9,7 @@ import MultiGuard from 'vue-router-multiguard';
 
 import ShowListUser from "../views/users/ShowList.vue";
 import ActionPanel from "../views/users/ActionPanel.vue";
+import Editor from "../views/document/Editor.vue";
 Vue.use(VueRouter);
 /**
  * Mặc định nếu không xét meta trong các item của route thì layout có đủ sidebar và header,
@@ -52,6 +53,15 @@ const routes = [{
         path: "/users/edit/:id",
         name: "editUser",
         component: ActionPanel,
+    },
+
+    //document
+
+    {
+        path: "/document/editor",
+        name: "documentEditor",
+        component: Editor,
+        meta: { layout: 'content-only' }
     },
     // {
     //     path: "/users/permission-package/:id",

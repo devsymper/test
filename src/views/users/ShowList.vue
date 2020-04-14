@@ -5,7 +5,10 @@
         @add-item="addUser"
         @context-selection-edit="editUser"
         @refresh-list="getListUser"
+        @open-panel="openPanel"
+        :useDefaultContext="false"
         :pageTitle="'Danh sách User'"
+        :tableContextMenu="tableContextMenu"
         :containerHeight="containerHeight"
         :columns="columns"
         :data="data"
@@ -16,6 +19,7 @@
             <action-panel
             ref="panel"
             @refresh-new-user="setNewUserItem"
+            @refresh-data="getListUser"
             @close-panel="closePanel"
             :actionType="actionType"
             />
@@ -26,16 +30,18 @@
 import { userApi } from "./../../api/user.js";
 import ListItems from "./../../components/common/ListItems.vue";
 import ActionPanel from "./../../views/users/ActionPanel.vue";
+import ChangePassPanel from "./../../views/users/ChangePass.vue";
 import { util } from "./../../plugins/util.js";
 export default {
   components: {
       "list-items": ListItems,
-      "action-panel": ActionPanel
+      "action-panel": ActionPanel,
   },
   data(){
     return {
       actionPanelWidth:800,
       containerHeight: 200,
+      tableContextMenu:[{name:"changePass",text:"Đổi mật khẩu"},{name:"edit",text:"Sửa"}],
       columns: [{"name":"id","title":"Id","type":"numeric"}],
       data: [],
       totalPage: 6,
@@ -49,6 +55,13 @@ export default {
     this.getListUser();
   },
   methods:{
+    openPanel(){
+      this.$refs.panel.setStepper(1);
+      this.$refs.panel.resetPermissionPosittionOrgChart();
+    },
+    showViewChangePassword(){
+      this.$refs.changepasspanel.openactionPanel();
+    },
     changePage(page){
       alert('ok');
     },

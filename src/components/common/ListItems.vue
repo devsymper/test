@@ -287,7 +287,7 @@ export default {
                 };
             }
             for (let item of this.tableContextMenu) {
-                contextMenu[item.name] = {
+                contextMenu.items[item.name] = {
                     name: item.text
                 };
             }
@@ -332,6 +332,13 @@ export default {
             return mapType[this.actionPanelType]
                 ? mapType[this.actionPanelType]
                 : mapType["temporary"];
+        }
+    },
+    watch:{
+        actionPanel(){
+            if(this.actionPanel == true){
+                this.$emit("open-panel");
+            }
         }
     },
     methods: {

@@ -85,8 +85,7 @@ export default class Api {
      */
     callApi(method, url, data, headers, options) {
         headers = Object.assign({
-            Authorization: `Bearer ${util.auth.getToken()}`,
-            'Content-Type': 'application/x-www-form-urlencoded',
+            Authorization: `Bearer ${util.auth.getToken()}`
         }, headers);
         let defaultOptions = {
             method: method,
