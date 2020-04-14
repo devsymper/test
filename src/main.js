@@ -4,6 +4,7 @@ import router from "./router";
 import store from "./store";
 import "./assets/css/main.css";
 import vuetify from "./plugins/vuetify";
+import i18n from './lang/i18n'
 
 import BaView from "./views/layout/BAView";
 import EndUserView from "./views/layout/EndUserView";
@@ -41,6 +42,7 @@ window.Vue = Vue;
 new Vue({
     router,
     store,
+    i18n,
     vuetify,
     render: h => h(App)
 }).$mount("#app");

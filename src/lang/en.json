@@ -1,0 +1,34 @@
+{
+    "common": {
+        "select_lang": "Select language",
+        "reports": "Reports",
+        "workflows": "Workflows",
+        "documents": "Documents",
+        "orgchart": "Organization chart",
+        "methods": "Method",
+        "virtual_doc": "Virtual document",
+        "service": "Service",
+        "menu": "Menu",
+        "users": "Users",
+        "add": "Add",
+        "edit": "Edit",
+        "refresh": "Refresh",
+        "export_excel": "Export Excel",
+        "list": "List",
+        "search": "Search"
+    },
+    "login": {
+        "title": "Login system",
+        "buttons": {
+            "login": "Login"
+        },
+        "input_text": {
+            "email": "Email address",
+            "password": "Password"
+        },
+        "messages": {
+            "none_account": "Create new account",
+            "register": "Register"
+        }
+    }
+}

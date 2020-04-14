@@ -11,7 +11,7 @@
                         outlined
                         dense
                         label="Search"
-                        placeholder="Tìm kiếm"
+                        :placeholder="$t('common.search')"
                     ></v-text-field>
                     <v-btn
                         depressed
@@ -20,7 +20,7 @@
                         :disabled="loadingRefresh"
                         class="mr-2"
                     >
-                        <v-icon left dark>mdi-plus</v-icon>Thêm
+                        <v-icon left dark>mdi-plus</v-icon>{{$t('common.add')}}
                     </v-btn>
                     <v-btn
                         depressed
@@ -29,7 +29,7 @@
                         :disabled="loadingRefresh"
                         class="mr-2"
                     >
-                        <v-icon left dark>mdi-refresh</v-icon>Làm mới
+                        <v-icon left dark>mdi-refresh</v-icon>{{$t('common.refresh')}}
                     </v-btn>
                     <v-btn
                         depressed
@@ -37,7 +37,7 @@
                         :loading="loadingExportExcel"
                         :disabled="loadingExportExcel"
                     >
-                        <v-icon left dark>mdi-microsoft-excel</v-icon>Xuất Excel
+                        <v-icon left dark>mdi-microsoft-excel</v-icon>{{$t('common.export_excel')}}
                     </v-btn>
                 </div>
             </v-col>

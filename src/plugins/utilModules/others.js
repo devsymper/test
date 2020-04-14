@@ -33,6 +33,7 @@ export const others = {
         let vm
         while (dom) {
             if (dom.__vue__) {
+                console.log(dom);
                 vm = dom.__vue__;
                 if (name) {
                     if (vm.$options.name === name) {

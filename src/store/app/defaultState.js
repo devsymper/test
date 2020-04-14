@@ -22,30 +22,37 @@ const defaultState = {
     collapseSideBar: true, // trạng thái của sidebar: true là đang nhỏ, false là đang mở rộng
     unreadNotification: 1, // số lượng các thông báo chưa đọc
     items: [ // các menu mà ba hoặc enduser được phân quyền 
-        { title: "Reports", icon: "mdi-view-dashboard", link: "/reports" },
-        { title: "Workflows", icon: "mdi-sitemap", link: "/bpmne" },
+        { title: "reports", icon: "mdi-view-dashboard", link: "/reports" },
+        { title: "workflows", icon: "mdi-sitemap", link: "/bpmne" },
         {
-            title: "Documents",
+            title: "documents",
             icon: "mdi-file-document-outline",
             link: "/documents"
         },
         {
-            title: "Org Chart",
+            title: "orgchart",
             icon: "mdi-account-group-outline",
             link: "/orgchart"
         },
-        { title: "Methods", icon: "mdi-function", link: "/methods" },
-        { title: "Virtual Doc", icon: "mdi-table-sync", link: "/virtual-doc" },
-        { title: "Service", icon: "mdi-cogs", link: "/service" },
+        { title: "methods", icon: "mdi-function", link: "/methods" },
+        { title: "virtual_doc", icon: "mdi-table-sync", link: "/virtual-doc" },
+        { title: "service", icon: "mdi-cogs", link: "/service" },
         {
-            title: "Menu",
+            title: "menu",
             icon: "mdi-microsoft-xbox-controller-menu",
             link: "/menu"
         },
-        { title: "Users", icon: "mdi-account-settings", link: "/users" }
+        { title: "users", icon: "mdi-account-settings", link: "/users" }
     ],
     urlToTabTitleMap: {}, // map giữa url với title của tab,
-    currentTabIndex: 0 // index cuả tab hiện tại đang mở
+    currentTabIndex: 0, // index cuả tab hiện tại đang mở,
+    supportedLanguages: [{
+        key: 'vn',
+        title: "Tiếng Việt"
+    }, {
+        key: 'en',
+        title: "English"
+    }]
 };
 
 export default defaultState;
