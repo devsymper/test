@@ -5,7 +5,7 @@ const defaultState = {
         name: '', // tên của BA,
         id: 0
     },
-    endUserInfo:{
+    endUserInfo: {
         name: 'Nguyễn Quốc Tân',
         id: 0,
         currentRole: { // Vai trò hiện tại của enduser đang đóng
@@ -43,7 +43,9 @@ const defaultState = {
             link: "/menu"
         },
         { title: "Users", icon: "mdi-account-settings", link: "/users" }
-    ]
+    ],
+    urlToTabTitleMap: {}, // map giữa url với title của tab,
+    currentTabIndex: 0 // index cuả tab hiện tại đang mở
 };
 
 export default defaultState;

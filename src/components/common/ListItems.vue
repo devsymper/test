@@ -15,7 +15,7 @@
                     ></v-text-field>
                     <v-btn
                         depressed
-                        x-small
+                        small
                         :loading="loadingRefresh"
                         :disabled="loadingRefresh"
                         class="mr-2"
@@ -24,7 +24,7 @@
                     </v-btn>
                     <v-btn
                         depressed
-                        x-small
+                        small
                         :loading="loadingRefresh"
                         :disabled="loadingRefresh"
                         class="mr-2"
@@ -33,7 +33,7 @@
                     </v-btn>
                     <v-btn
                         depressed
-                        x-small
+                        small
                         :loading="loadingExportExcel"
                         :disabled="loadingExportExcel"
                     >
@@ -340,7 +340,7 @@ export default {
                     util.getComponentSize(ref.topBar).h +
                     util.getComponentSize(ref.bottomBar).h;
             }
-            return tbHeight - 10;
+            return tbHeight - 50;
         },
         tableColumns() {
             return this.columns.reduce((columns, item) => {

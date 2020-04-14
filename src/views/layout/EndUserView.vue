@@ -2,9 +2,47 @@
     <v-app id="symper-platform-app">
         <ba-sidebar />
         <v-content>
-            <v-container fluid fill-height>
-                <v-layout justify-center >
-                    <slot/>
+            <v-container fluid fill-height class="pt-0">
+                <div class="w-100 pb-3">
+                    <div style="width:calc(100% - 200px)" class="float-left">
+                        <v-tabs
+                            @change="handleChangeTab"
+                            v-model="currentTabIndex"
+                            class="sym-small-size"
+                            color="orange accent-4"
+                        >
+                            <v-tab class="symper-app-tab" v-for="(title, idx) in tabTitles" :key="idx">
+                                {{ title }} 
+                                <i class="mdi mdi-close float-right close-tab-btn" @click.stop="closeTab(idx)"></i>
+                            </v-tab>
+                        </v-tabs>
+                    </div>
+                    <div
+                        class="float-right"
+                        style="height:35px; line-height:35px;"
+                    >
+                        <v-btn icon>
+                            <v-icon>mdi-magnify</v-icon>
+                        </v-btn>
+                        <v-btn icon v-if="sapp.unreadNotification > 0">
+                            <v-badge
+                                class="sym-small-size"
+                                
+                                :content="sapp.unreadNotification"
+                                :value="sapp.unreadNotification"
+                                color="red"
+                                overlap
+                            >
+                                <v-icon>mdi-bell-outline</v-icon>
+                            </v-badge>
+                        </v-btn>
+                        <v-btn icon v-else>
+                            <v-icon>mdi-bell-outline</v-icon>
+                        </v-btn>
+                    </div>
+                </div>
+                <v-layout justify-center>
+                    <slot />
                 </v-layout>
             </v-container>
         </v-content>
@@ -14,10 +52,44 @@
 <script>
 import BASidebar from "@/components/common/BASidebar.vue";
 export default {
-    components: {
-        "ba-sidebar": BASidebar,
+    methods: {
+        /**
+         * Xử lý các tab
+         */
+        handleChangeTab(index) {
+            if(index !== undefined){
+                let url = Object.keys(this.$store.state.app.urlToTabTitleMap)[index];
+                if(url != this.$route.fullPath){
+                    this.$router.push(url);
+                }
+            }
+        },
+        closeTab(idx){
+            let urlMap = this.$store.state.app.urlToTabTitleMap;
+            let url = Object.keys(urlMap)[idx];
+            this.$store.commit("app/removeTab", url);
+        }
     },
-    created() {}
+    components: {
+        "ba-sidebar": BASidebar
+    },
+    created() {},
+    computed: {
+        sapp() {
+            return this.$store.state.app;
+        },
+        currentTabIndex: {
+            get() {
+                return this.$store.state.app.currentTabIndex;
+            },
+            set(value) {
+                this.$store.commit("app/updateCurrentTabIndex", value);
+            }
+        },
+        tabTitles() {
+            return Object.values(this.$store.state.app.urlToTabTitleMap);
+        }
+    }
 };
 </script>
 

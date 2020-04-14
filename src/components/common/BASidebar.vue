@@ -2,10 +2,10 @@
     <v-navigation-drawer :mini-variant="sapp.collapseSideBar" :v-model="true" app>
         <v-list dense nav class="py-0">
             <v-list-item :class="{ 'px-0': sapp.collapseSideBar }" v-show="!sapp.collapseSideBar">
-                <img height="30px" :src="require('./../../assets/image/symper-full-logo.png')" />
+                <img @click="goToHome()" height="30px" :src="require('./../../assets/image/symper-full-logo.png')" />
             </v-list-item>
             <v-list-item class="px-0" v-show="sapp.collapseSideBar">
-                <img height="30px" :src="require('./../../assets/image/symper-short-logo.png')" />
+                <img @click="goToHome()" height="30px" :src="require('./../../assets/image/symper-short-logo.png')" />
             </v-list-item>
 
             <v-list-item two-line :class="{ 'px-0': sapp.collapseSideBar }">
@@ -18,7 +18,11 @@
                     <v-list-item-subtitle>
                         <v-menu bottom left>
                             <template v-slot:activator="{ on }">
-                                <v-btn x-small v-on="on" depressed>{{ sapp.endUserInfo.currentRole.title }}</v-btn>
+                                <v-btn
+                                    x-small
+                                    v-on="on"
+                                    depressed
+                                >{{ sapp.endUserInfo.currentRole.title }}</v-btn>
                             </template>
 
                             <v-list dense>
@@ -35,7 +39,7 @@
                 v-for="item in sapp.items"
                 :key="item.title"
                 link
-                @click="gotoPage(item.link)"
+                @click="gotoPage(item.link, item.title)"
             >
                 <v-list-item-icon>
                     <v-tooltip right>
@@ -53,34 +57,9 @@
         </v-list>
         <template v-slot:append>
             <v-list dense>
-                <v-list-item v-show="sapp.collapseSideBar">
-                    <v-list-item-icon>
-                        <v-badge
-                            v-if="sapp.unreadNotification > 0"
-                            :content="sapp.unreadNotification"
-                            :value="sapp.unreadNotification"
-                            color="red"
-                            overlap
-                        >
-                            <v-icon>mdi-bell-outline</v-icon>
-                        </v-badge>
-                        <v-icon v-else>mdi-bell-outline</v-icon>
-                    </v-list-item-icon>
-                </v-list-item>
                 <v-list-item>
                     <v-list-item-icon>
                         <v-icon @click.stop="invertSidebarShow()">mdi-menu</v-icon>
-                        <v-badge
-                            :content="sapp.unreadNotification"
-                            v-show="!sapp.collapseSideBar"
-                            :value="sapp.unreadNotification"
-                            color="red"
-                            v-if="sapp.unreadNotification > 0"
-                            overlap
-                        >
-                            <v-icon class="ml-3">mdi-bell-outline</v-icon>
-                        </v-badge>
-                        <v-icon v-else class="ml-3">mdi-bell-outline</v-icon>
                     </v-list-item-icon>
                 </v-list-item>
             </v-list>
@@ -101,16 +80,17 @@ export default {
         }
     },
     methods: {
+        goToHome(){
+            this.$goToPage('/',"Trang chủ");
+        },
         invertSidebarShow() {
             this.$store.commit(
                 "app/changeCollapseSidebar",
                 !this.sapp.collapseSideBar
             );
         },
-        gotoPage(uri) {
-            this.$router.push({
-                path: uri
-            });
+        gotoPage(uri, title) {
+            this.$goToPage(uri, title);
         }
     },
     data() {

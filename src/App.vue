@@ -79,7 +79,8 @@ export default {
             if (contentOnly) {
                 return "content-only-view";
             } else {
-                return isBA ? "ba-view" : "end-user-view";
+                // return isBA ? "ba-view" : "end-user-view";
+                return "end-user-view";
             }
         }
     }
