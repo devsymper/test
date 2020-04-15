@@ -1,7 +1,8 @@
 /**
  * Các hàm phục vụ cho việc xác thực, lưu trữ dữ liệu đăng nhập cho người dùng
  */
-export const others = {
+import { cookie } from "./cookie.js";
+export const store = {
     getComponentSize(comp) {
         let dom = false;
         if (comp._isVue) {
@@ -50,5 +51,14 @@ export const others = {
         }
 
         return false;
+    },
+
+    getSavedLocale() {
+        let savedLocale = cookie.get('user-locale');
+        return savedLocale ? savedLocale : 'vn';
+    },
+
+    setSavedLocale(locale) {
+        cookie.set('user-locale', locale);
     }
 }

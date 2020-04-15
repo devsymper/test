@@ -101,6 +101,7 @@
 
 <script>
 import { util } from "./../../plugins/util.js";
+import { userApi } from "./../../api/user.js";
 export default {
     computed: {
         sapp() {
@@ -113,9 +114,15 @@ export default {
         }
     },
     methods: {
-        changeLocale(item){
-            this.$i18n.locale = item.key;
-            util.auth.setSavedLocale(item.key);
+        changeLocale(item) {
+            let locale = item.key;
+            let currentLocale = util.getSavedLocale();
+            if (currentLocale != locale) {
+                this.$i18n.locale = locale;
+                util.setSavedLocale(locale);
+                userApi.setUserLocale(locale);
+                this.$evtBus.$emit("change-user-locale", locale);
+            }
         },
         goToHome() {
             this.$goToPage("/", "Trang chủ");

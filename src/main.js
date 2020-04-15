@@ -5,7 +5,7 @@ import store from "./store";
 import "./assets/css/main.css";
 import vuetify from "./plugins/vuetify";
 import i18n from './lang/i18n'
-
+import { util } from "./plugins/util.js";
 import BaView from "./views/layout/BAView";
 import EndUserView from "./views/layout/EndUserView";
 import ContentOnlyView from "./views/layout/ContentOnlyView";
@@ -38,6 +38,7 @@ global.jQuery = require('jquery');
 var $ = global.jQuery;
 window.$ = $;
 window.Vue = Vue;
+util.serviceWorker.register();
 
 new Vue({
     router,

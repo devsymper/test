@@ -13,5 +13,8 @@ export const userApi = {
             password: password
         };
         return api.post("login", data);
+    },
+    setUserLocale(locale) {
+        return api.post("user/locale", { locale: locale });
     }
 };

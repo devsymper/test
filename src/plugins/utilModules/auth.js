@@ -45,13 +45,4 @@ export const authUtil = {
         this.saveLoginInfo(loginInfo);
     },
 
-    getSavedLocale() {
-        let savedLocale = window.localStorage.getItem('symper-user-locale');
-        return savedLocale ? savedLocale : 'vn';
-    },
-
-    setSavedLocale(locale) {
-        window.localStorage.setItem('symper-user-locale', locale);
-    }
-
 }
