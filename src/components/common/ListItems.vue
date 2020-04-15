@@ -263,6 +263,7 @@ export default {
                      * tham số thứ nhất: row ( index của row đang được chọn)
                      * tham số thứ hai: colName ( Tên của cột (key trong một row) )
                      */
+                    
                     thisCpn.$emit("context-selection-" + key, row, colName);
 
                     if (key == "remove") {

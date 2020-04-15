@@ -1,33 +1,222 @@
 <template>
-    <v-flex class="d-flex">
-        <div class="side-bar-left">
-            <h4 class="m-2">Control</h4>
+    <div class="h-100">
+        <h2 class="header-title" >Cài đặt mật khẩu</h2>
+        
+        <div class=" ml-3 content-edit-pass">
+			<v-checkbox dense class="sym-small-size" v-model="checkChangePassword" @click="changePassword = !changePassword" :label="`Thay đổi mật khẩu`"></v-checkbox>
+            <h3 class="mt-2">Đổi mật khẩu</h3>
+            <v-row>
+                <v-col cols="3">
+                    <v-subheader>Mật khẩu mới</v-subheader>
+                </v-col>
+                <v-col cols="5">
+                    <v-text-field
+                    v-model="newPassword"
+                    ref="newPass"
+                    dense
+                    :disabled="!changePassword"
+                    :append-icon="showPass ? 'mdi-eye' : 'mdi-eye-off'"
+                    :rules="[rules.required, rules.min, rules.max]"
+                    :type="showPass ? 'text' : 'password'"
+                    @click:append="showPass = !showPass"
+                    ></v-text-field>
+                </v-col>
+            </v-row>
+            <v-row>
+                <v-col cols="3">
+                    <v-subheader>Nhập lại mật khẩu</v-subheader>
+                </v-col>
+                <v-col cols="5">
+                    <v-text-field
+                    v-model="reNewPassword"
+                    ref="reNewPass"
+                    dense
+                    :disabled="!changePassword"
+                    :append-icon="showPass ? 'mdi-eye' : 'mdi-eye-off'"
+                    :rules="[rules.required, rules.min, rules.max, rules.match]"
+                    :type="showPass ? 'text' : 'password'"
+                    @click:append="showPass = !showPass"
+                    ></v-text-field>
+                </v-col>
+            </v-row>
+
+            <h3 class="mt-2 mb-4">Cấu hình thay đổi</h3>
+			<v-checkbox dense class="sym-small-size mt-2 pl-3" v-model="checkChangeDuedate" @click="changeDuedate = !changeDuedate" :label="`Kích hoạt thay đổi định kì`"></v-checkbox>
+            <label class="title__a">Chọn thời gian yêu cầu thay đổi mật khẩu định kì sau: </label>
+                
+                <v-text-field
+                    ref="dueDate"
+                    class="dueDate"
+                    v-model="dueDate"
+                    type="number"
+                    :disabled="!changeDuedate"
+                    :rules="[rules.required]"
+                    dense
+                ></v-text-field>
+                <v-select
+                    v-model="typeDueDate"
+                    return-object
+                    hide-details
+                    dense
+                    item-text="name"
+                    item-value="type"
+                    class="select-type-due-date"
+                    :items="[{name:'tháng',type:'month'},{name:'năm',type:'year'}]"
+                ></v-select>
         </div>
-        <div class="side-bar-right">
-            <h4 class="m-2">Thuộc tính</h4>
-        </div>
-    </v-flex>
+        <v-btn
+                class="float-right btn-update"
+                :loading="loading"
+                :disabled="loading"
+                @click="loader = 'loading'"
+            >
+                Cập nhật
+            </v-btn>
+    </div>
 </template>
 <script>
-//
+import { userApi } from "./../../api/user.js";
+
 export default {
-  
+    props:{
+        user:{
+            type: Object,
+            default : {id:0}
+        }
+    },
+    data(){
+        return {
+            changePassword:false,
+            changeDuedate:false,
+            checkChangePassword:false,
+            checkChangeDuedate:false,
+            newPassword:"",
+            reNewPassword:"",
+            loading:false,
+            loader:"",
+            showPass:false,
+            rules: {
+				required: value => !!value || 'Không được bỏ trống.',
+				min: v => (typeof v != 'undefined' && v != undefined && v.length >= 8) || 'Yêu cầu mật khẩu lớn hơn 8 kí tự',
+                max: v => (typeof v != 'undefined' && v != undefined && v.length < 25) || 'Yêu cầu mật khẩu ít hơn 24 kí tự',
+                match: v => (v == this.reNewPassword) || "Mật khẩu không khớp",
+            },
+            typeDueDate:{name:'tháng',type:'month'},
+            dueDate:'',
+            passProps:{}
+        }
+    },
+    created(){
+        this.getTypeDueData();
+    },
+    computed:{
+       
+    },
+    methods:{
+        getTypeDueData(){
+            let props = this.user.passwordProps;
+            let passwordProps = JSON.parse(props);
+            this.dueDate = passwordProps.dueDate.value;
+            this.passProps = passwordProps;
+            this.checkChangeDuedate = (passwordProps.dueDate.active == 1) ? true : false;
+            this.changeDuedate = this.checkChangeDuedate;
+        },
+        submit(){
+            let data = {id:this.user.id};
+            this.passProps.dueDate.active = (this.checkChangeDuedate) ? 1 : 0;
+            this.passProps.dueDate.value = this.dueDate;
+            this.passProps.dueDate.type = this.typeDueDate.type;
+            let passwordProps = JSON.stringify(this.passProps);
+            data.passwordProps = passwordProps
+            if(this.newPassword != ''){
+                data.password = this.newPassword
+            }
+            userApi.updateUser(data).then(res => {
+				if (res.status == 200) {
+                    this.loader = "";
+                    this.loading = false;
+				}
+			})
+			.catch(err => {
+				console.log("error from change pass user api!!!", err);
+			})
+			.always(() => {
+
+			});
+        },
+        validateForm(){
+            let isValid = true;
+            if(this.checkChangePassword){
+                let validNewPass = this.$refs.newPass.validate(true);
+                let validReNewPass = this.$refs.reNewPass.validate(true);
+                if(!validNewPass && !validReNewPass){
+                    isValid = false;
+                }
+            }
+            if(this.checkChangeDuedate){
+                if(!this.$refs.dueDate.validate(true)){
+                    isValid = false;
+                }
+            }
+            if(!isValid){
+                this.loader = "";
+                this.loading = false;
+            }
+            else {
+                this.submit();
+            }
+            
+        },
+    },
+    watch:{
+        loader () {
+            if(this.loader == 'loading'){
+                this.loading = true;
+                this.validateForm();
+            }
+            
+        },
+        user(){
+            this.getTypeDueData();
+        }
+    }
+   
 }
 </script>
-<style>
-    .d-flex{
-        display: flex;
+<style scoped>
+    .header-title{
+		padding: 0 0 12px 0;
+		border-bottom: 1px solid #eaeaea;
     }
-    .side-bar-right,.side-bar-left{
-        height: 100%;
-        width: 240px;
-        background: #f2f2f2;
+    .content-edit-pass{
+        height: calc(100% - 100px);
     }
-    .tox-tinymce{
-        height: 100%;
-        width: calc(100% - 480px);
+    .btn-update{
+        height: 36px;
+        min-width: 64px;
+        padding: 0 16px;
+        margin-right: 20px;
+        box-shadow: none;
+        background: white;
+        color: green;
     }
-    .container {
-        padding: 0;
+    .dueDate{
+        width: 40px;
+        margin-right: 8px;
+        display: inline-flex;
+    }
+    .select-type-due-date{
+        width: 80px;
+        display: inline-flex;
+    }
+    .content-edit-pass label{
+        color: #a4a4a4;
+    }
+    .title__a{
+        padding-left: 16px;
+        padding-right: 4px;
+    }
+    .title__b{
+        padding-left: 4px;
     }
 </style>
