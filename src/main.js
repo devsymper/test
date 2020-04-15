@@ -53,6 +53,7 @@ Vue.prototype.$snotify = function(option, group = false) {
             type: option.type,
             title: option.title,
             text: option.text,
+            actionBtns: option.actionBtns
         }
     };
     option = Object.assign(defaultOptions, option);

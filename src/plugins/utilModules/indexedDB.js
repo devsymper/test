@@ -40,15 +40,16 @@ export const IndexedDB = class {
         }
     }
 
-    readAll(callback) {
+    readAll(handleEachItem, loopDone) {
         let objectStore = this.db.transaction(this.objName).objectStore(this.objName);
         objectStore.openCursor().onsuccess = function(event) {
             let cursor = event.target.result;
             if (cursor) {
-                callback(cursor);
+                handleEachItem(cursor);
                 cursor.continue();
             } else {
                 console.log("No more entries!");
+                loopDone();
             }
         };
     }
