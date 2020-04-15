@@ -4,8 +4,12 @@
             <keep-alive>
                 <router-view />
             </keep-alive>
+            <notifications group="symper-general-notification">
+            <template slot="body" slot-scope="props">
+                <general-notification :props="props" @close-notification="closeNotification(props)"></general-notification>
+            </template>
+        </notifications>
         </component>
-        
     </div>
 </template>
 
@@ -16,6 +20,7 @@
 import AppSidebar from "./components/common/AppSidebar.vue";
 import Content from "./components/common/Content.vue";
 import appWorker from "@/worker";
+import GeneralNotification from "./components/common/GeneralNotification.vue";
 import { appConfigs } from "./configs.js";
 var firebase = require("firebase/app");
 import { IndexedDB } from "./plugins/utilModules/indexedDB.js";
@@ -29,10 +34,16 @@ export default {
     created() {
         this.initFirebase();
     },
+    components: {
+        'general-notification':GeneralNotification
+    },
     mounted() {
         this.checkBacklogRequest();
     },
     methods: {
+        closeNotification(props){
+            props.close();
+        },
         /**
          * Kiểm tra các request còn tồn đọng trong indexed db để thông báo cho người dùng
          */
@@ -41,7 +52,6 @@ export default {
             idb.open(STORE_REQUEST_NAME, false, false, () => {
                 idb.readAll(item => {
                     console.log(item, "Các request đang còn tồn đọng");
-
                 });
             });
         },

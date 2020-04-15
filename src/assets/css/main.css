@@ -202,3 +202,20 @@
     background-color: #d4d4d4;
     color: white;
 }
+
+.top-right {
+    position: absolute;
+    right: 5px;
+    top: 5px;
+}
+
+.close-btn {
+    cursor: pointer;
+    line-height: 16px;
+    padding: 2px 3px;
+    border-radius: 50%;
+}
+
+.close-btn:hover {
+    background-color: #f1f1f1;
+}
