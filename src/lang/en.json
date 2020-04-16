@@ -95,6 +95,20 @@
                 "month": "month",
                 "year": "year"
             }
+        },
+        "table": {
+            "id": "Id",
+            "firstName": "First name",
+            "displayName": "Display name",
+            "email": "email",
+            "phoneNumber": "Phone number",
+            "status": "Status",
+            "createAt": "Create at",
+            "updateAt": "Update at",
+            "contextMenu": {
+                "passwordSetting": "Password setting",
+                "edit": "Edit"
+            }
         }
     }
 }

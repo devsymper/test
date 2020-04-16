@@ -43,8 +43,11 @@ export default {
         return {
             actionPanelWidth:800,
             containerHeight: 200,
-            tableContextMenu:[{name:"passwordsetting",text:"Tùy chọn mật khẩu"},{name:"edit",text:"Sửa"}],
-            columns: [{"name":"id","title":"Id","type":"numeric"}],
+            tableContextMenu:[
+                {name:"passwordsetting",text:this.$t('user.table.contextMenu.passwordSetting')},
+                {name:"edit",text:this.$t('user.table.contextMenu.edit')}
+            ],
+            columns: [],
             data: [],
             totalPage: 6,
             actionType:'',
@@ -56,6 +59,14 @@ export default {
     },
     created(){
         this.getListUser();
+        let thisCpn = this;
+        this.$evtBus.$on('change-user-locale',(locale)=>{
+             thisCpn.tableContextMenu = [
+                {name:"passwordsetting",text:this.$t('user.table.contextMenu.passwordSetting')},
+                {name:"edit",text:this.$t('user.table.contextMenu.edit')}
+            ]
+
+        });
     },
     watch:{
         

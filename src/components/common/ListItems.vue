@@ -47,6 +47,7 @@
         <v-row :style="{width:contentWidth}" no-gutters>
             <v-col class="fs-13">
                 <hot-table
+                    ref="dataTable"
                     class="symper-custom-table"
                     :height="tableHeight"
                     :settings="tableSettings"
@@ -133,7 +134,12 @@ export default {
             this.$emit("change-page", newVl);
         }
     },
-
+    created(){
+        let thisCpn = this;
+        this.$evtBus.$on('change-user-locale',(locale)=>{
+            thisCpn.$refs.dataTable.hotInstance.render();
+        });
+    },
     props: {
         // Tiêu đề của trang: Danh sách văn bản, danh sách người dùng ...
         pageTitle: {
@@ -356,6 +362,8 @@ export default {
             }, []);
         },
         colHeaders() {
+            let thisCpn = this;
+
             let colNames = [];
             let colTitles = this.columns.reduce((headers, item) => {
                 colNames.push(item.name);
@@ -366,7 +374,7 @@ export default {
             return function(col) {
                 return `<span>
                             <span>
-                                ${colTitles[col]}
+                                ${thisCpn.$t(colTitles[col])}
                             </span>
                             <span class="float-right symper-filter-button">
                                 <i col-name="${colNames[col]}" onclick="tableDropdownClickHandle(this, event)" class="grey-hover mdi mdi-filter-variant symper-table-dropdown-button"></i>

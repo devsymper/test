@@ -95,6 +95,20 @@
                 "month": "tháng",
                 "year": "năm"
             }
+        },
+        "table": {
+            "id": "Id",
+            "firstName": "Tên",
+            "displayName": "Tên hiển thị",
+            "email": "Địa chỉ email",
+            "phoneNumber": "Số điện thoại",
+            "status": "Trạng thái",
+            "createAt": "Thời gian tạo",
+            "updateAt": "Thời gian cập nhật",
+            "contextMenu": {
+                "passwordSetting": "Tùy chọn mật khẩu",
+                "edit": "Sửa"
+            }
         }
     }
 }

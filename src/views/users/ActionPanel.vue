@@ -263,34 +263,7 @@
 								</v-row> -->
 								
 								
-								<vue-resizable class="content-orgchart-resize mt-2" 
-									@mount="resizeOrgChartView" 
-									@resize:end="afterResizeOrgChartView" 
-									@resize:start="beforeResizeOrgChartView" 
-									:height="`auto`" :min-height="50" :max-height="200" :width="500" :active="['b']" :fit-parent="true">
-									<div class="content-orgchart-selected">
-										<v-list dense>
-											<v-list-item
-												class="permission-item"
-												v-for="org in positionOrgchartSelected"
-												:key="org.id"
-												>
-												<v-list-item-content>
-													<v-list-item-title>{{ org.name }}</v-list-item-title>
-													<v-list-item-subtitle>{{ org.source }}</v-list-item-subtitle>
-												</v-list-item-content>
-												<v-list-item-icon @click="deletePosition(org)">
-													<v-tooltip top>
-														<template v-slot:activator="{ on }">
-															<v-icon v-on="on" small>mdi-delete</v-icon>
-														</template>
-														<span>{{$t('common.delete')}}</span>
-													</v-tooltip>
-												</v-list-item-icon>
-											</v-list-item>
-										</v-list>
-									</div>
-								</vue-resizable>
+								
 								<div class="tree-orgchart-content">
 									<v-autocomplete
 										class="mt-2"
@@ -331,6 +304,35 @@
 										</template>
 									</v-treeview>
 								</div>
+								<vue-resizable class="content-orgchart-resize mt-2" 
+									:min-height="100" 
+									:height="100"
+									:max-height="400" 
+									:width="530" 
+									:active="['t']">
+									<div class="content-orgchart-selected">
+										<v-list dense>
+											<v-list-item
+												class="permission-item"
+												v-for="org in positionOrgchartSelected"
+												:key="org.id"
+												>
+												<v-list-item-content>
+													<v-list-item-title>{{ org.name }}</v-list-item-title>
+													<v-list-item-subtitle>{{ org.source }}</v-list-item-subtitle>
+												</v-list-item-content>
+												<v-list-item-icon @click="deletePosition(org)">
+													<v-tooltip top>
+														<template v-slot:activator="{ on }">
+															<v-icon v-on="on" small>mdi-delete</v-icon>
+														</template>
+														<span>{{$t('common.delete')}}</span>
+													</v-tooltip>
+												</v-list-item-icon>
+											</v-list-item>
+										</v-list>
+									</div>
+								</vue-resizable>
 							</template>
 						</v-tab-item>
 						
@@ -724,6 +726,8 @@ export default {
 		 * Hàm thêm user vào vị trí của org chart để phân quyền
 		 */
 		addOrgchartPosition(org,from){
+			console.log(this.user);
+			
 			if(from == 'autocomplete'){
 				org.selected = true;
 			}
@@ -971,6 +975,8 @@ export default {
 		afterResizeOrgChartView(data){
 			var h = $('.tree-orgchart-content').height();
 			var pH = $('.v-tabs-items').height();
+			console.log(data.height);
+			
 			$('.tree-orgchart-content').css({height:pH - data.height - 60});
 		},
 		
@@ -1077,6 +1083,7 @@ export default {
 		padding-top: 0;
 	}
 	.content-orgchart-selected{
+		background: white;
 		height: 100%;
 		overflow-x: hidden;
 		overflow-y: auto;
@@ -1084,14 +1091,14 @@ export default {
 	}
 	.content-orgchart-resize{
 		overflow: hidden;
-		border-bottom: 2px solid #888;
+		border-top: 2px solid #888;
 		margin: 8px 0;
 	}
 	.tree-orgchart-content{
 	    height: 100%;
 	}
 	.tree-orgchart-content .sym-small-size{
-	    height: 100%;
+	    height: calc(100% - 50px);
 		overflow: auto;
 	}
 	.label-root-org{
