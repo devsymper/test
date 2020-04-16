@@ -11,7 +11,7 @@
                         outlined
                         dense
                         label="Search"
-                        placeholder="Tìm kiếm"
+                        :placeholder="$t('common.search')"
                     ></v-text-field>
                     <v-btn
                         depressed
@@ -21,7 +21,7 @@
                         @click="addItem()"
                         class="mr-2"
                     >
-                        <v-icon left dark>mdi-plus</v-icon>Thêm
+                        <v-icon left dark>mdi-plus</v-icon>{{$t('common.add')}}
                     </v-btn>
                     <v-btn
                         depressed
@@ -31,7 +31,7 @@
                         @click="refreshList()"
                         class="mr-2"
                     >
-                        <v-icon left dark>mdi-refresh</v-icon>Làm mới
+                        <v-icon left dark>mdi-refresh</v-icon>{{$t('common.refresh')}}
                     </v-btn>
                     <v-btn
                         depressed
@@ -39,7 +39,7 @@
                         :loading="loadingExportExcel"
                         :disabled="loadingExportExcel"
                     >
-                        <v-icon left dark>mdi-microsoft-excel</v-icon>Xuất Excel
+                        <v-icon left dark>mdi-microsoft-excel</v-icon>{{$t('common.export_excel')}}
                     </v-btn>
                 </div>
             </v-col>
@@ -47,6 +47,7 @@
         <v-row :style="{width:contentWidth}" no-gutters>
             <v-col class="fs-13">
                 <hot-table
+                    class="symper-custom-table"
                     :height="tableHeight"
                     :settings="tableSettings"
                     :data="data"
@@ -91,23 +92,17 @@
             :temporary="actionPanelType == 'temporary'"
         >
             <slot name="right-panel-content">
-                <v-card>
-                    <v-card-title class="headline grey lighten-2" primary-title>Privacy Policy</v-card-title>
-
+                <v-card flat>
+                    <v-card-title class="pa-0 pl-2" primary-title>{{itemActionTitle}}</v-card-title>
                     <v-card-text>
-                        <item-detail></item-detail>
+                        <form-tpl :allInputs="itemInputs"></form-tpl>
                     </v-card-text>
 
                     <v-divider></v-divider>
-
-                    <v-card-actions>
-                        <v-spacer></v-spacer>
-                        <v-btn text @click="closeactionPanel()" class="mr-2">Thoát</v-btn>
-                        <v-btn color="primary" text @click="saveDataAction()">Lưu</v-btn>
-                    </v-card-actions>
                 </v-card>
             </slot>
         </component>
+        <table-filter ref="tableFilter"></table-filter>
     </div>
 </template>
 
@@ -115,10 +110,23 @@
 import { HotTable } from "@handsontable/vue";
 require("@/assets/css/handsontable.min.css");
 import { util } from "./../../plugins/util.js";
-import ItemDetail from "./ItemDetail.vue";
+import FormTpl from "./FormTpl.vue";
 import { VDialog, VNavigationDrawer } from "vuetify/lib";
+import TableFilter from "./customTable/TableFilter.vue";
+
+window.tableDropdownClickHandle = function(el, event) {
+    event.preventDefault();
+    event.stopPropagation();
+    let thisListItem = util.getClosestVueInstanceFromDom(el, "SymperListItem");
+    thisListItem.showTableDropdownMenu(
+        event.pageX,
+        event.pageY,
+        $(el).attr("col-name")
+    );
+};
 
 export default {
+    name: "SymperListItem",
     watch: {
         page(newVl) {
             // Phát sự kiện thay đổi trang đang xem
@@ -219,29 +227,58 @@ export default {
         actionPanelType: {
             type: String,
             default: "temporary"
+        },
+        // Các input khi edit hoặc thêm hoặc xem chi tiết một item trong danh sách
+        itemInputs: {
+            type: Object,
+            default() {
+                return {};
+            }
+        },
+        itemActionTitle: {
+            type: String,
+            default: ""
+        },
+        listItemName: {
+            type: String,
+            default: "item"
         }
     },
     mounted() {},
-    data: function() {
+    data() {
         return {
-            actionPanel: false,
-            pageSizeOptions: [20, 50, 100],
-            loadingExportExcel: false,
-            loadingRefresh: false,
-            page: 1,
+            actionPanel: false, // có hiển thị action pannel (create, detail, edit) hay không
+            pageSizeOptions: [20, 50, 100], // các lựa chọn cho số lượng bản ghi hiển thị cho mỗi trang
+            loadingExportExcel: false, // có đang chạy export hay ko
+            loadingRefresh: false, // có đang chạy refresh dữ liệu hay ko
+            loadingData: false, // có đang loading data cho danh sách hay ko
+            page: 1, // trang hiện tại
+            currentAction: {
+                // hành động hiện tại đang thực thi trong listitem (edit, remove, create ...)
+                key: ""
+            },
             pageSize: 50,
-            tableSettings: {
-                dropdownMenu: true,
+            tableSettings: { // các setting cho handsontable
                 filters: true,
                 manualColumnMove: true,
                 manualColumnResize: true,
                 manualRowResize: true,
                 stretchH: "all",
-                licenseKey: "non-commercial-and-evaluation"
+                licenseKey: "non-commercial-and-evaluation",
+                beforeDropdownMenuShow: function(dropdownMenu) {
+                    console.log(dropdownMenu, "beforeDropdownMenuShow");
+                }
+            },
+            filterConfigs: {
+                filteringColumnName: '', // Tên cột đang được chọn để 
+                columnFilterConfigs: { // cấu hình filter cho tất cả các cột trong danh sách
+                    
+                }
             }
         };
     },
     computed: {
+        actionTitle() {},
         contentWidth() {
             if (this.actionPanel && this.actionPanelType == "elastic") {
                 return "calc(100% - " + this.actionPanelWidth + "px)";
@@ -306,7 +343,7 @@ export default {
                     util.getComponentSize(ref.topBar).h +
                     util.getComponentSize(ref.bottomBar).h;
             }
-            return tbHeight - 10;
+            return tbHeight - 50;
         },
         tableColumns() {
             return this.columns.reduce((columns, item) => {
@@ -319,10 +356,24 @@ export default {
             }, []);
         },
         colHeaders() {
-            return this.columns.reduce((headers, item) => {
+            let colNames = [];
+            let colTitles = this.columns.reduce((headers, item) => {
+                colNames.push(item.name);
                 headers.push(item.title);
                 return headers;
             }, []);
+
+            return function(col) {
+                return `<span>
+                            <span>
+                                ${colTitles[col]}
+                            </span>
+                            <span class="float-right symper-filter-button">
+                                <i col-name="${colNames[col]}" onclick="tableDropdownClickHandle(this, event)" class="grey-hover mdi mdi-filter-variant symper-table-dropdown-button"></i>
+                            </span>
+                        </span>`;
+                //.replace(/\n|\r\n/g,'')
+            };
         },
         actionPanelWrapper() {
             let mapType = {
@@ -343,6 +394,12 @@ export default {
         }
     },
     methods: {
+        showTableDropdownMenu(x, y, colName) {
+            let filterDom = $(this.$refs.tableFilter.$el);
+            filterDom.css('left',x+'px').css('top',(y+10)+'px');
+            this.$refs.tableFilter.show();
+            $('#symper-platform-app').append(filterDom[0]);
+        },
         saveDataAction() {
             this.closeactionPanel();
             this.$emit("save-item", {});
@@ -381,9 +438,10 @@ export default {
 
     components: {
         HotTable,
-        "item-detail": ItemDetail,
+        "form-tpl": FormTpl,
         VDialog,
-        VNavigationDrawer
+        VNavigationDrawer,
+        TableFilter
     }
 };
 </script>

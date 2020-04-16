@@ -2,25 +2,25 @@
 	<div class="h-100">
 		<div class="h-100" v-if="!isSettingPasswordView">
 			<div class="h-100">
-				<h2 class="header-title" v-if="actionType == 'add'">Tạo User</h2>
-				<h2 class="header-title" v-if="actionType == 'edit'">Cập nhật User</h2>
+				<h3 class="header-title" v-if="actionType == 'add'">{{ $t('user.other.createUser')}}</h3>
+				<h3 class="header-title" v-if="actionType == 'edit'">{{ $t('user.other.updateUser')}}</h3>
 				<v-stepper v-model="stepper" class="d-flex stepper-create-user">
 				<v-stepper-header class="stepper-header">
-					<v-stepper-step  editable step="1">Thông tin chung</v-stepper-step>
-					<v-stepper-step :editable="editStep" @click="loadPermission()" step="2">Phân quyền</v-stepper-step>
+					<v-stepper-step  editable step="1">{{ $t('user.general.title')}}</v-stepper-step>
+					<v-stepper-step :editable="editStep" @click="loadPermission()" step="2">{{ $t('user.permission.title')}}</v-stepper-step>
 				</v-stepper-header>
 
 				<v-stepper-items class="stepper-items">
 					<v-stepper-content step="1">
-					<h2>Thông tin cá nhân</h2>
+					<h4>{{ $t('user.general.personalInfo.title')}}</h4>
 
 						<v-row class="mt-2">
 						<v-col cols="3">
 							<div>
-								<v-subheader>Tên tài khoản</v-subheader>
+								<v-subheader>{{ $t('user.general.personalInfo.userName')}}</v-subheader>
 							</div>
 							<div>
-								<v-subheader>Email</v-subheader>
+								<v-subheader>{{ $t('user.general.personalInfo.email')}}</v-subheader>
 							</div>
 
 						</v-col>
@@ -29,6 +29,7 @@
 							<v-row>
 									<v-col cols="9">
 										<v-text-field
+										class="fs-13"
 											ref="userName"
 											required
 											:rules="[rules.required]"
@@ -40,6 +41,7 @@
 								<v-row>
 									<v-col cols="9">
 										<v-text-field
+										class="fs-13"
 										ref="email"
 										v-model="user.email"
 										:rules="[rules.required, rules.email]"
@@ -56,31 +58,34 @@
 						</v-col>
 						</v-row>
 						<v-row >
-						<v-col cols="3">
-							<v-subheader>Tên</v-subheader>
-						</v-col>
-						<v-col cols="4">
-							<v-text-field
-							v-model="user.firstName"
-							dense
-							></v-text-field>
-						</v-col>
-						<v-col cols="1">
-							<v-subheader>Họ</v-subheader>
-						</v-col>
-						<v-col cols="4">
-							<v-text-field
-							v-model="user.lastName"
-							dense
-							></v-text-field>
-						</v-col>
+							<v-col cols="3">
+								<v-subheader>{{ $t('user.general.personalInfo.firstName')}}</v-subheader>
+							</v-col>
+							<v-col cols="3">
+								<v-text-field
+								class="fs-13"
+								v-model="user.firstName"
+								dense
+								></v-text-field>
+							</v-col>
+							<v-col cols="2 text-center">
+								<v-subheader class="lb-last-name">{{ $t('user.general.personalInfo.lastName')}}</v-subheader>
+							</v-col>	
+							<v-col cols="4">
+								<v-text-field
+								class="fs-13"
+								v-model="user.lastName"
+								dense
+								></v-text-field>
+							</v-col>
 						</v-row>
 						<v-row>
 						<v-col cols="3">
-								<v-subheader>Tên hiển thị</v-subheader>
+								<v-subheader>{{ $t('user.general.personalInfo.displayName')}}</v-subheader>
 							</v-col>
 							<v-col cols="9">
 								<v-text-field
+								class="fs-13"
 									v-model="user.displayName"
 									dense
 								></v-text-field>
@@ -88,10 +93,11 @@
 						</v-row>
 						<v-row>
 							<v-col cols="3">
-								<v-subheader>Số điện thoại</v-subheader>
+								<v-subheader>{{ $t('user.general.personalInfo.phoneNumber')}}</v-subheader>
 							</v-col>
 							<v-col cols="9">
 								<v-text-field
+								class="fs-13"
 								v-model="user.phone"
 								dense
 								></v-text-field>
@@ -99,14 +105,15 @@
 						</v-row>
 
 						<div v-if="actionType == 'add'">
-							<h2 class="setting-password">Tùy chọn mật khẩu</h2>
-							<v-checkbox dense class="sym-small-size" v-model="autoRenPassword" @click="enabledPassword = !enabledPassword" :label="`Tạo mật khẩu tự động`"></v-checkbox>
+							<h4 class="setting-password">{{ $t('user.general.passwordSetting.title')}}</h4>
+							<v-checkbox dense class="sym-small-size" v-model="autoRenPassword" @click="enabledPassword = !enabledPassword" :label="$t('user.general.passwordSetting.autoGeneratePassword')"></v-checkbox>
 							<v-row>
 								<v-col cols="4">
-									<v-checkbox dense class="sym-small-size" v-model="enabledPassword" @click="autoRenPassword = !autoRenPassword" :label="`Mật khẩu của bạn`"></v-checkbox>
+									<v-checkbox dense class="sym-small-size" v-model="enabledPassword" @click="autoRenPassword = !autoRenPassword" :label="$t('user.general.passwordSetting.yourPassword')"></v-checkbox>
 								</v-col>
-								<v-col cols="8">
+								<v-col cols="8 input-password">
 									<v-text-field
+									class="fs-13"
 									ref="password"
 									v-model="user.password"
 									:disabled="!enabledPassword"
@@ -119,9 +126,9 @@
 									></v-text-field>
 								</v-col>
 							</v-row>
-							<v-checkbox dense class="sym-small-size" v-model="needChangePassword" :label="`Yêu cầu người dùng này thay đổi mật khẩu khi họ đăng nhập lần đầu`"></v-checkbox>
-							<v-checkbox dense class="sym-small-size" v-model="sendMailAfterChange" :label="`Gửi mật khẩu trong email sau khi hoàn thành`"></v-checkbox>
-							<v-checkbox dense class="sym-small-size" v-model="user.active" :label="`Kích hoạt tài khoản`"></v-checkbox>
+							<v-checkbox dense class="sym-small-size" v-model="needChangePassword" :label="$t('user.general.passwordSetting.requireChangePassFirstLogin')"></v-checkbox>
+							<v-checkbox dense class="sym-small-size" v-model="sendMailAfterChange" :label="$t('user.general.passwordSetting.sendEmailAfterDone')"></v-checkbox>
+							<v-checkbox dense class="sym-small-size" v-model="user.active" :label="$t('user.general.passwordSetting.activeAccount')"></v-checkbox>
 						</div>
 
 						
@@ -142,22 +149,21 @@
 						background-color="transparent"
 						color="basil"
 						:grow="true"
-						
 					>
 						<v-tab
-						:key="userRole.title"
+							:key="userRole.title"
 						>
-						{{ userRole.title }}
+						{{$t('user.permission.userType.title')}}
 						</v-tab>
 						<v-tab
-						:key="permissionPackage.title"
+							:key="permissionPackage.title"
 						>
-						{{ permissionPackage.title }}
+							{{$t('user.permission.packagePermission.title')}}
 						</v-tab>
 						<v-tab
-						:key="permissionPosittionOrgChart.title"
+							:key="permissionPosittionOrgChart.title"
 						>
-						{{ permissionPosittionOrgChart.title }}
+							{{$t('user.permission.orgChartPositionPermission.title')}}
 						</v-tab>
 						
 					</v-tabs>
@@ -169,11 +175,11 @@
 							<template>
 								<v-combobox
 									class="mt-4"
-									:items="userRole.listUserRole"
 									v-model="userRole.userRoleSelected"
-									multiple
-									label="Chọn loại user"
+									:items="userRole.listUserRole"
+									:label="$t('user.permission.userType.selected')"
 									outlined
+									multiple
 									dense
 									hide-selected
 									chips
@@ -204,7 +210,7 @@
 							{{dataPackage.item.packName}}
 							</template> -->
 							<template v-slot:item="dataPackage">
-							<v-list-item-content @click="selectPermissionPackage(dataPackage.item)">
+							<v-list-item-content class="autocomplete-package-item" @click="selectPermissionPackage(dataPackage.item)">
 								<v-list-item-title >{{ dataPackage.item.packName }}</v-list-item-title>
 							</v-list-item-content>
 							</template>
@@ -223,9 +229,9 @@
 									<v-list-item-icon @click="deletePackage(permission.id)">
 										<v-tooltip top>
 											<template v-slot:activator="{ on }">
-												<v-icon v-on="on">mdi-delete</v-icon>
+												<v-icon v-on="on" small>mdi-delete</v-icon>
 											</template>
-											<span>Xóa</span>
+											<span>{{$t('common.delete')}}</span>
 										</v-tooltip>
 									</v-list-item-icon>
 
@@ -276,9 +282,9 @@
 												<v-list-item-icon @click="deletePosition(org)">
 													<v-tooltip top>
 														<template v-slot:activator="{ on }">
-															<v-icon v-on="on">mdi-delete</v-icon>
+															<v-icon v-on="on" small>mdi-delete</v-icon>
 														</template>
-														<span>Xóa</span>
+														<span>{{$t('common.delete')}}</span>
 													</v-tooltip>
 												</v-list-item-icon>
 											</v-list-item>
@@ -293,9 +299,11 @@
 										:items="listNodesOrgChart"
 										item-value="name"
 										item-text="name"
+										return-object
 										outlined
 										hide-details
 										clearable
+										@input="addOrgchartPosition(search,'input')"
 									>
 										<template v-slot:item="position">
 											<v-list-item-content @click="addOrgchartPosition(position.item,'autocomplete')">
@@ -308,7 +316,7 @@
 									:items="permissionPosittionOrgChart.listNode" 
 									dense
 									open-all
-									:search="search"
+									:search="search.name"
 									class="sym-small-size mt-2">
 										<template v-slot:label="props">
 											<div class="treeCheckBox" @click="addOrgchartPosition(props.item,'treeview')">
@@ -377,6 +385,11 @@ export default {
 		}
 
 	},
+	computed: {
+        sapp() {
+            return this.$store.state.app;
+        }
+    },
 	data(){
 		return {
 			user:{id:'', firstName:'', lastName:'', displayName:'', userName:' ', email:' ', password:null, phone:'', active:true},
@@ -385,7 +398,7 @@ export default {
 			editStep: false,
 			loader: null,
 			loading: false,
-			actionPanel : 'Tạo User',
+			actionPanel : this.$t('user.other.createUser'),
 			enabledPassword:false,
 			autoRenPassword:true,
 			needChangePassword : true,
@@ -399,16 +412,17 @@ export default {
 			userRole : {title:'Loại User',listUserRole:['User','Business'],userRoleSelected:''},
 			showPass: false,
 			rules: {
-				required: value => !!value || 'Không được bỏ trống.',
-				min: v => (typeof v != 'undefined' && v != undefined && v.length >= 8) || 'Yêu cầu mật khẩu lớn hơn 8 kí tự',
-				max: v => (typeof v != 'undefined' && v != undefined && v.length < 25) || 'Yêu cầu mật khẩu ít hơn 24 kí tự',
+				required: value => !!value || this.$t('validate.required'),
+				min: v => (typeof v != 'undefined' && v != undefined && v.length >= 8) || this.$t('validate.min_8'),
+				max: v => (typeof v != 'undefined' && v != undefined && v.length < 25) || this.$t('validate.max_24'),
 				email: value => {
 					const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-					return pattern.test(value) || 'Email không hợp lệ';
+					return pattern.test(value) || this.$t('validate.email');
 				},
 			},
 			formHasErr : true,
-			search: null,
+			search: {name:''},
+			isAddingToPosition : false
 		}
  	},
   	watch: {
@@ -430,12 +444,12 @@ export default {
 			if(this.actionType == 'add') {
 				this.resetData();
 				this.editStep = false;
-				this.actionPanel = "Tạo User";
+				this.actionPanel = this.$t('user.other.createUser');
 			}
 			if(this.actionType == 'edit') {
 				this.formHasErr = false;
 				this.editStep = true;
-				this.actionPanel = "Cập nhật User";
+				this.actionPanel = this.$t('user.other.updateUser');
 			}
 		}
   	},
@@ -552,7 +566,7 @@ export default {
 			const cpn = this;
 			let passProps = {
 				needChange:this.needChangePassword,
-				dueDate:""
+				dueDate:{active:0,type:"month",value:0}
 			}
 			let password = (this.autoRenPassword) ? this.generatePassword() : this.user.password;
 			let avatar = (this.url != avatarDefault) ? this.url : '';
@@ -576,7 +590,9 @@ export default {
 					cpn.user.id = res.data.id;
 					//phat lai sự kiện thêm item vào list
 					cpn.$emit("refresh-new-user", {
-						id:res.data.id,firstName:data.firstName,displayName:data.displayName,email:data.email,phone:data.phone,status:status,createAt:str.formatDate(date),updateAt:str.formatDate(date)
+						id:res.data.id,firstName:data.firstName,displayName:data.displayName,
+						email:data.email,phone:data.phone,status:status,passwordProps:JSON.stringify(passProps),
+						createAt:str.formatDate(date),updateAt:str.formatDate(date)
 					});
 				}
 				else{
@@ -662,18 +678,23 @@ export default {
 		 * Hàm lấy các package hiện tại của user
 		 */
 		getUserPackage(){
-			userApi.getListUserPackage(this.user.id).then(res => {
-				if (res.status == 200) {
-					this.permissionPackage.permissionSelected = res.data;
-					this.permissionSelected = res.data;
-				}
-			})
-			.catch(err => {
-				console.log("error from get pack api!!!", err);
-			})
-			.always(() => {
+			console.log(this.actionType);
+			
+			if(this.actionType != 'add'){
+				userApi.getListUserPackage(this.user.id).then(res => {
+					if (res.status == 200) {
+						this.permissionPackage.permissionSelected = res.data;
+						this.permissionSelected = res.data;
+					}
+				})
+				.catch(err => {
+					console.log("error from get pack api!!!", err);
+				})
+				.always(() => {
 
-			});
+				});
+			}
+			
 		},
 		/**
 		 * hoangnd:14/4/2020
@@ -706,17 +727,29 @@ export default {
 			if(from == 'autocomplete'){
 				org.selected = true;
 			}
-			if(org.selected == true){
-				permissionPositionOrgchartApi.addUserToPosition({userId:this.user.id,positionId:org.id_node}).then(res => {
-					if (res.status == 200) {
-						this.positionOrgchartSelected.push(org);
-					}
-				})
-				.catch(err => {
-					console.log("error from add user api!!!", err);
-				})
-				.always(() => {
-				});
+			if(from == 'input'){
+				org.selected = true;
+			}
+			if(org.selected == true ){
+				console.log(this.isAddingToPosition);
+				
+				if(this.isAddingToPosition == false){
+					this.isAddingToPosition = true;
+					permissionPositionOrgchartApi.addUserToPosition({userId:this.user.id,positionId:org.id_node}).then(res => {
+						if (res.status == 200) {
+							this.isAddingToPosition = false;
+							this.positionOrgchartSelected.push(org);
+						}
+					})
+					.catch(err => {
+						console.log("error from add user api!!!", err);
+					})
+					.always(() => {
+					});
+				}
+				else{
+					this.isAddingToPosition = false;
+				}
 			}
 			else{
 				this.deletePosition(org);
@@ -729,6 +762,7 @@ export default {
 		 * @param Array listNodes: danh sách các orgchart
 		 */
 		setDataOrgchartTotreeView(listNodes,listPosition){
+			this.listNodesOrgChart = [];
 			for (let index = 0; index < listNodes.length; index++) {
 				let orgName = listNodes[index].name;
 				let listChild = listNodes[index].children;
@@ -752,6 +786,8 @@ export default {
 				}
 				this.permissionPosittionOrgChart.listNode[index].children = roots;
 			}
+			console.log(this.listNodesOrgChart);
+			
 			
 		},
 		checkSelectedPosition(listPosition,position){
@@ -878,10 +914,14 @@ export default {
 			this.tabIndex = 0,
 			this.permissionPackage = {title:'Phân quyền theo package',listPermission:[],permissionSelected:[]},
 			this.permissionPosittionOrgChart = {title:'Phân quyền theo vị trí',listNode:[],noteSelected:[]},
+			this.listNodesOrgChart = [],
+			this.permissionSelected = [],
+			this.positionOrgchartSelected = [],
 			this.userRole = {title:'Loại User',listUserRole:['User','Business'],userRoleSelected:''},
+			
 			this.showPass = false,
 			this.formHasErr = true,
-			this.search = null
+			this.search = {name:''}
 		},
 
 		closePanel(){
@@ -941,14 +981,14 @@ export default {
 </script>
 <style scoped>
 	.stepper-header{
-		width: 230px;
+		width: 200px;
 		height: auto;
 		display: block;
 		border-right: 1px solid #eaeaea;
 		box-shadow: none;
 	}
 	.stepper-items{
-		width: calc(100% - 230px);
+		width: calc(100% - 200px);
 	}
 	.stepper-items .row .col{
 		padding: 0 12px;
@@ -957,6 +997,7 @@ export default {
 		height: 30px;
 		margin: 10px;
 		padding: 20px;
+		font-size: 14px;
 	}
 	.stepper-header .v-stepper__step--active{
 		background: #f2f2f2;
@@ -1017,7 +1058,7 @@ export default {
 		justify-content: center;
 		align-items: center;
 		width: 80px;
-		height: 80px;
+		height: 75px;
 	}
 
   #preview img {
@@ -1058,5 +1099,16 @@ export default {
 		color: #797979;
 		font-weight: 600;
 	}
-	
+	.lb-last-name{
+		display: inline-flex;
+	}
+	.input-password{
+		height: 30px;
+		margin-top: -8px;
+	}
+
+	.autocomplete-package-item{
+		padding: 0;
+		min-height: 40px;
+	}
 </style>

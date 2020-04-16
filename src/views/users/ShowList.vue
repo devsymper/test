@@ -8,7 +8,7 @@
         @refresh-list="getListUser"
         @open-panel="openPanel"
         :useDefaultContext="false"
-        :pageTitle="'Danh sách User'"
+        :pageTitle="$t('user.title')"
         :tableContextMenu="tableContextMenu"
         :containerHeight="containerHeight"
         :columns="columns"
@@ -87,6 +87,7 @@ export default {
         editUser(row,colName){
             this.isSettingPasswordView = false;
             this.actionType = 'edit';
+            this.$refs.panel.resetData();
             this.$refs.panel.setUser(this.data[row]);
         },
         getListUser(){

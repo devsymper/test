@@ -19,8 +19,8 @@ export const routeMiddleware = {
             };
             if (noNeedLoginPages.hasOwnProperty(to.name) || util.auth.checkLogin()) {
                 next();
-            } else { 
-                next({name:'login'});
+            } else {
+                next({ name: 'login' });
             }
         }
     }

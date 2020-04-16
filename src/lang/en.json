@@ -1,0 +1,100 @@
+{
+    "common": {
+        "select_lang": "Select language",
+        "reports": "Reports",
+        "workflows": "Workflows",
+        "documents": "Documents",
+        "orgchart": "Organization chart",
+        "methods": "Method",
+        "virtual_doc": "Virtual document",
+        "service": "Service",
+        "menu": "Menu",
+        "users": "Users",
+        "add": "Add",
+        "edit": "Edit",
+        "update": "Update",
+        "delete": "Delete",
+        "refresh": "Refresh",
+        "export_excel": "Export Excel",
+        "list": "List",
+        "search": "Search"
+    },
+    "validate": {
+        "required": "Not be empty",
+        "min_8": "Password required is greater than 8 characters",
+        "max_24": "Password required for less than 24 characters",
+        "email": "Invalid email"
+    },
+    "login": {
+        "title": "Login system",
+        "buttons": {
+            "login": "Login"
+        },
+        "input_text": {
+            "email": "Email address",
+            "password": "Password"
+        },
+        "messages": {
+            "none_account": "Create new account",
+            "register": "Register"
+        }
+    },
+
+    "user": {
+        "title": "User list",
+        "general": {
+            "title": "Basic info",
+            "personalInfo": {
+                "title": "personal information",
+                "userName": "User name",
+                "email": "Email",
+                "firstName": "First name",
+                "lastName": "Last name",
+                "displayName": "Display name",
+                "phoneNumber": "Phone number"
+            },
+            "passwordSetting": {
+                "title": "Password setting",
+                "autoGeneratePassword": "Auto Generate Password",
+                "yourPassword": "Your password",
+                "requireChangePassFirstLogin": "Require this user to change their password when they first sign in",
+                "sendEmailAfterDone": "Send password in email upon completation",
+                "activeAccount": "Active account"
+            }
+        },
+        "permission": {
+            "title": "Permission",
+            "userType": {
+                "title": "User role",
+                "selected": "Select user role"
+            },
+            "packagePermission": {
+                "title": "Permision by package"
+            },
+            "orgChartPositionPermission": {
+                "title": "by position orgchart"
+            }
+        },
+        "other": {
+            "createUser": "Create account",
+            "updateUser": "Update account",
+            "nextStep": "Next",
+            "done": "Done"
+        },
+        "passwordSetting": {
+            "title": "Setting password",
+            "changePassword": {
+                "title": "Change password",
+                "newPass": "New password",
+                "reNewPass": "Confirm password"
+            },
+            "configChange": {
+                "title": "Config change",
+                "checkChange": "Activate recurring changes",
+                "lblSelectTime": "Select the time required to change periodically later: ",
+                "month": "month",
+                "year": "year"
+            }
+        }
+    }
+}

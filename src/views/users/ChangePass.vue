@@ -1,52 +1,55 @@
 <template>
     <div class="h-100">
-        <h2 class="header-title" >Cài đặt mật khẩu</h2>
+        <h3 class="header-title" >{{$t('user.passwordSetting.title')}}</h3>
         
         <div class=" ml-3 content-edit-pass">
-			<v-checkbox dense class="sym-small-size" v-model="checkChangePassword" @click="changePassword = !changePassword" :label="`Thay đổi mật khẩu`"></v-checkbox>
-            <h3 class="mt-2">Đổi mật khẩu</h3>
+            <h4 class="mt-2">{{$t('user.passwordSetting.changePassword.title')}}</h4>
+			<v-checkbox dense class="sym-small-size mt-2 pl-3" v-model="checkChangePassword" @click="changePassword = !changePassword" :label="$t('user.passwordSetting.changePassword.title')"></v-checkbox>
+
             <v-row>
                 <v-col cols="3">
-                    <v-subheader>Mật khẩu mới</v-subheader>
+                    <v-subheader class="fs-13">{{$t('user.passwordSetting.changePassword.newPass')}}</v-subheader>
                 </v-col>
                 <v-col cols="5">
                     <v-text-field
-                    v-model="newPassword"
-                    ref="newPass"
-                    dense
-                    :disabled="!changePassword"
-                    :append-icon="showPass ? 'mdi-eye' : 'mdi-eye-off'"
-                    :rules="[rules.required, rules.min, rules.max]"
-                    :type="showPass ? 'text' : 'password'"
-                    @click:append="showPass = !showPass"
+                        class="fs-13"
+                        v-model="newPassword"
+                        ref="newPass"
+                        dense
+                        :disabled="!changePassword"
+                        :append-icon="showPass ? 'mdi-eye' : 'mdi-eye-off'"
+                        :rules="[rules.required, rules.min, rules.max]"
+                        :type="showPass ? 'text' : 'password'"
+                        @click:append="showPass = !showPass"
                     ></v-text-field>
                 </v-col>
             </v-row>
             <v-row>
                 <v-col cols="3">
-                    <v-subheader>Nhập lại mật khẩu</v-subheader>
+                    <v-subheader class="fs-13">{{$t('user.passwordSetting.changePassword.reNewPass')}}</v-subheader>
                 </v-col>
                 <v-col cols="5">
                     <v-text-field
-                    v-model="reNewPassword"
-                    ref="reNewPass"
-                    dense
-                    :disabled="!changePassword"
-                    :append-icon="showPass ? 'mdi-eye' : 'mdi-eye-off'"
-                    :rules="[rules.required, rules.min, rules.max, rules.match]"
-                    :type="showPass ? 'text' : 'password'"
-                    @click:append="showPass = !showPass"
+                        class="fs-13"
+                        v-model="reNewPassword"
+                        ref="reNewPass"
+                        dense
+                        :disabled="!changePassword"
+                        :append-icon="showPass ? 'mdi-eye' : 'mdi-eye-off'"
+                        :rules="[rules.required, rules.min, rules.max, rules.match]"
+                        :type="showPass ? 'text' : 'password'"
+                        @click:append="showPass = !showPass"
                     ></v-text-field>
                 </v-col>
             </v-row>
 
-            <h3 class="mt-2 mb-4">Cấu hình thay đổi</h3>
-			<v-checkbox dense class="sym-small-size mt-2 pl-3" v-model="checkChangeDuedate" @click="changeDuedate = !changeDuedate" :label="`Kích hoạt thay đổi định kì`"></v-checkbox>
-            <label class="title__a">Chọn thời gian yêu cầu thay đổi mật khẩu định kì sau: </label>
+            <h4 class="mt-2 mb-4">{{$t('user.passwordSetting.configChange.title')}}</h4>
+			<v-checkbox dense class="sym-small-size mt-2 pl-3" v-model="checkChangeDuedate" @click="changeDuedate = !changeDuedate" :label="$t('user.passwordSetting.configChange.checkChange')"></v-checkbox>
+            <label class="title__a">{{$t('user.passwordSetting.configChange.lblSelectTime')}}</label>
                 
                 <v-text-field
                     ref="dueDate"
-                    class="dueDate"
+                    class="dueDate fs-13"
                     v-model="dueDate"
                     type="number"
                     :disabled="!changeDuedate"
@@ -60,8 +63,12 @@
                     dense
                     item-text="name"
                     item-value="type"
-                    class="select-type-due-date"
-                    :items="[{name:'tháng',type:'month'},{name:'năm',type:'year'}]"
+                    class="select-type-due-date fs-13"
+                    :disabled="!changeDuedate"
+                    :items="[
+                        {name:$t('user.passwordSetting.configChange.month'),type:'month'},
+                        {name:$t('user.passwordSetting.configChange.year'),type:'year'}
+                        ]"
                 ></v-select>
         </div>
         <v-btn
@@ -70,13 +77,12 @@
                 :disabled="loading"
                 @click="loader = 'loading'"
             >
-                Cập nhật
+                {{$t('common.update')}}
             </v-btn>
     </div>
 </template>
 <script>
 import { userApi } from "./../../api/user.js";
-
 export default {
     props:{
         user:{
@@ -210,11 +216,12 @@ export default {
         display: inline-flex;
     }
     .content-edit-pass label{
-        color: #a4a4a4;
+        color: rgba(0, 0, 0, 0.6);
     }
     .title__a{
         padding-left: 16px;
         padding-right: 4px;
+        font-size: 13px;
     }
     .title__b{
         padding-left: 4px;

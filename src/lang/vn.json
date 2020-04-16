@@ -1,0 +1,100 @@
+{
+    "common": {
+        "select_lang": "Thay đổi ngôn ngữ",
+        "reports": "Báo cáo",
+        "workflows": "Quy trình",
+        "documents": "Văn bản",
+        "orgchart": "Sơ đồ tổ chức",
+        "methods": "Method",
+        "virtual_doc": "Văn bản ảo",
+        "service": "Dịch vụ hệ thống",
+        "menu": "Menu",
+        "users": "Tài khoản người dùng",
+        "add": "Thêm",
+        "edit": "Sửa",
+        "update": "Cập nhật",
+        "delete": "Xóa",
+        "refresh": "Làm mới",
+        "export_excel": "Xuất excel",
+        "list": "Danh sách",
+        "search": "Tìm kiếm"
+
+    },
+    "login": {
+        "title": "Đăng nhập hệ thống",
+        "buttons": {
+            "login": "Đăng nhập"
+        },
+        "input_text": {
+            "email": "Địa chỉ email",
+            "password": "Mật khẩu"
+        },
+        "messages": {
+            "none_account": "Tạo tài khoản mới",
+            "register": "Đăng ký"
+        }
+    },
+    "validate": {
+        "required": "Không được bỏ trống",
+        "min_8": "Yêu cầu mật khẩu lớn hơn 8 kí tự",
+        "max_24": "Yêu cầu mật khẩu ít hơn 24 kí tự",
+        "email": "Email không hợp lệ"
+    },
+    "user": {
+        "title": "Danh sách User",
+        "general": {
+            "title": "Thông tin cơ bản",
+            "personalInfo": {
+                "title": "Thông tin cá nhân",
+                "userName": "Tên tài khoản",
+                "email": "Email",
+                "firstName": "Tên",
+                "lastName": "Họ",
+                "displayName": "Tên hiển thị",
+                "phoneNumber": "Số điện thoại"
+            },
+            "passwordSetting": {
+                "title": "Tùy chọn mật khẩu",
+                "autoGeneratePassword": "Tạo mật khẩu tự động",
+                "yourPassword": "Mật khẩu của bạn",
+                "requireChangePassFirstLogin": "Yêu cầu người dùng này thay đổi mật khẩu khi họ đăng nhập lần đầu",
+                "sendEmailAfterDone": "Gửi mật khẩu trong email sau khi hoàn thành",
+                "activeAccount": "Kích hoạt tài khoản"
+            }
+        },
+        "permission": {
+            "title": "Phân quyền",
+            "userType": {
+                "title": "Loại user",
+                "selected": "Chọn loại user"
+            },
+            "packagePermission": {
+                "title": "Phân quyền theo package"
+            },
+            "orgChartPositionPermission": {
+                "title": "Vị trí orgchart"
+            }
+        },
+        "other": {
+            "createUser": "Tạo tài khoản",
+            "updateUser": "Cập nhật tài khoản",
+            "nextStep": "Tiếp theo",
+            "done": "Hoàn thành"
+        },
+        "passwordSetting": {
+            "title": "Cài đặt mật khẩu",
+            "changePassword": {
+                "title": "Thay đổi mật khẩu",
+                "newPass": "Mật khẩu mới",
+                "reNewPass": "Nhập lại mật khẩu mới"
+            },
+            "configChange": {
+                "title": "Cấu hình thay đổi",
+                "checkChange": "Kích hoạt thay đổi định kì",
+                "lblSelectTime": "Chọn thời gian yêu cầu thay đổi định kì sau: ",
+                "month": "tháng",
+                "year": "năm"
+            }
+        }
+    }
+}
