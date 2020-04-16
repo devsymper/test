@@ -10,7 +10,7 @@ const messages = {
     en: enMessage,
 }
 
-let locale = util.auth.getSavedLocale();
+let locale = util.getSavedLocale();
 const i18n = new VueI18n({
     locale: locale, // set locale
     messages,

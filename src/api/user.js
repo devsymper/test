@@ -49,5 +49,8 @@ export const userApi = {
             contentType: false,
             processData: false
         });
+    },
+    setUserLocale(locale) {
+        return api.post("user/locale", { locale: locale });
     }
 };
