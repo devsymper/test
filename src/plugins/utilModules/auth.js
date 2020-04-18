@@ -10,25 +10,39 @@ export const authUtil = {
          *      endUserId: "zzzz"
          * }
          */
-        window.localStorage.setItem('symper-login-info',JSON.stringify(data));
+        window.localStorage.setItem('symper-login-info', JSON.stringify(data));
     },
 
     getToken() {
-
-        let loginInfo = window.localStorage.getItem('symper-login-info'); 
-        if(loginInfo){
+        let loginInfo = window.localStorage.getItem('symper-login-info');
+        if (loginInfo) {
             return JSON.parse(loginInfo).token;
-        }else{
+        } else {
             return false;
         }
     },
 
-    checkLogin(){
-        if(this.getToken()){
+    checkLogin() {
+        if (this.getToken()) {
             return true;
-        }else{
+        } else {
             return false;
         }
-    }
+    },
+
+    getSavedUserInfo() {
+        let loginInfo = window.localStorage.getItem('symper-login-info');
+        if (loginInfo) {
+            return JSON.parse(loginInfo);
+        } else {
+            return {};
+        }
+    },
+
+    setSavedUserInfo(data) {
+        let loginInfo = this.getSavedUserInfo();
+        loginInfo = Object.assign(loginInfo, data);
+        this.saveLoginInfo(loginInfo);
+    },
 
 }

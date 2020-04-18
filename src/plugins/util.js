@@ -1,8 +1,13 @@
 import { authUtil } from './utilModules/auth';
-import { others } from './utilModules/others';
+import { store } from './utilModules/store';
+import { cookie } from "./utilModules/cookie.js";
+import { serviceWorker } from "./utilModules/serviceWorker.js";
+
 
 let cloneDeep = require("lodash.clonedeep");
-export const util = Object.assign(others, {
+export const util = Object.assign(store, {
     cloneDeep: cloneDeep,
-    auth: authUtil
+    auth: authUtil,
+    cookie: cookie,
+    serviceWorker: serviceWorker
 });

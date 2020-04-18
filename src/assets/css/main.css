@@ -1,56 +1,221 @@
-.symper-bg-orange{
+.symper-bg-orange {
     background-color: #f58634!important;
 }
 
-.symper-text-orange{
+.symper-text-orange {
     color: #f58634!important;
 }
-.symper-bg-black{
+
+.symper-bg-black {
     background-color: #344750!important;
 }
 
-.symper-text-black{
+.symper-text-black {
     color: #344750!important;
 }
 
-.fs-13{
+.fs-13 {
     font-size: 13px;
 }
 
-.w-100{
+.fs-10 {
+    font-size: 10px;
+}
+
+.w-100 {
     width: 100%;
 }
 
 .sym-small-size {
     font-size: 13px!important;
+    margin-top: 0px;
 }
 
-.sym-small-size .v-text-field__details{
+.sym-small-size .v-text-field__details {
     display: none;
 }
 
-.sym-small-size .v-input__slot{
+.sym-small-size .v-input__slot {
     margin-bottom: 0px!important;
-    min-height: 25px!important;
+    min-height: 28px!important;
 }
 
-.sym-small-size .v-text-field__slot input{
-    max-height: 25px!important;
+.sym-small-size .v-text-field__slot input {
+    max-height: 28px!important;
+    padding: 3px 0px 3px!important;
+    font-size: 13px!important;
 }
 
-.sym-small-size .v-input__append-inner{
+.sym-small-size .v-text-field__slot .v-label {
+    font-size: 13px!important;
+}
+
+.sym-small-size.v-input--switch .v-label,
+.sym-small-size.v-input--checkbox .v-label {
+    font-size: 13px!important;
+}
+
+.sym-small-size.v-input--checkbox .v-icon {
+    font-size: 15px!important;
+}
+
+.sym-small-size.v-input--checkbox .v-input--selection-controls__input {
+    margin-right: 4px!important;
+}
+
+.sym-small-size.v-input--switch .v-messages,
+.sym-small-size.v-input--checkbox .v-messages {
+    display: none;
+}
+
+.sym-small-size .v-input--switch__track {
+    height: 9px!important;
+    width: 28px!important;
+}
+
+.sym-small-size .v-input--switch__thumb {
+    height: 14px!important;
+    width: 14px!important;
+    top: calc(50% - 10px)!important;
+}
+
+.sym-small-size.v-input--is-label-active .v-input--switch__thumb {
+    transform: translate(18px, 0)!important;
+}
+
+.sym-small-size.v-input--switch .v-input--selection-controls__ripple {
+    left: -12px!important;
+    top: calc(50% - 21px)!important;
+}
+
+.sym-small-size .v-input--selection-controls__ripple {
+    height: 25px!important;
+    width: 25px!important;
+    display: none;
+}
+
+.v-btn {
+    text-transform: initial!important;
+}
+
+
+/****/
+
+.sym-small-size .v-input__append-inner {
     margin-top: 0px!important;
 }
 
-.sym-small-size .v-input__icon .mdi{
+.sym-small-size .v-input__icon .mdi {
     font-size: 17px!important;
     position: relative!important;
     margin-top: 0px!important;
 }
 
-.sym-small-size .v-pagination__item,.sym-small-size .v-pagination__navigation{
+.sym-small-size .v-pagination__item,
+.sym-small-size .v-pagination__navigation {
     font-size: 13px!important;
     box-shadow: none!important;
     height: 28px!important;
     min-width: 28px!important;
+}
+
+.sym-small-size .v-tabs-bar {
+    height: 35px!important;
+}
+
+.sym-small-size .v-tabs-bar .v-tab {
+    text-transform: unset!important;
+    max-width: 200px;
+    font-weight: 400;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    justify-content: left;
+    letter-spacing: 0.02em;
+    font-size: 13px;
+}
+
+.sym-small-size .v-badge__badge {
+    font-size: 11px;
+    height: 15px;
+    letter-spacing: 0;
+    line-height: 1;
+    min-width: 15px;
+    padding: 2px 4px;
+}
+
+.symper-custom-table span.colHeader {
+    width: 100%;
+}
+
+.grey-hover:hover {
+    background-color: #c7c7c7;
+    cursor: pointer;
+}
+
+.mdi.symper-table-dropdown-button {
+    padding-left: 2px;
+    padding-right: 2px;
+    border-radius: 2px;
+}
+
+.symper-table-filter-container {
+    position: fixed;
+    z-index: 8;
+    background-color: white;
+    padding: 5px;
+    font-size: 13px;
+    font-family: "Roboto", sans-serif;
+}
+
+.symper-app-bar {
+    height: 35px!important;
+    background-color: white!important;
+}
+
+.symper-app-content {
+    padding-top: 35px!important;
+    max-height: calc(100% - 35px)!important;
+}
+
+.symper-app-sidebar {
+    top: 35px!important;
+}
+
+.close-tab-btn {
+    position: absolute;
+    right: 2px;
+    padding: 0px 1px;
+    top: 11px;
+    border-radius: 50%;
+    text-align: center;
+    cursor: pointer;
+    font-size: 12px;
+    display: none;
+}
+
+.symper-app-tab:hover .close-tab-btn {
+    display: inline-block;
+}
+
+.close-tab-btn:hover {
+    background-color: #d4d4d4;
+    color: white;
+}
+
+.top-right {
+    position: absolute;
+    right: 5px;
+    top: 5px;
+}
+
+.close-btn {
+    cursor: pointer;
+    line-height: 16px;
+    padding: 2px 3px;
+    border-radius: 50%;
+}
+
+.close-btn:hover {
+    background-color: #f1f1f1;
 }

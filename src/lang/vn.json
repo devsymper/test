@@ -1,0 +1,35 @@
+{
+    "common": {
+        "select_lang": "Thay đổi ngôn ngữ",
+        "reports": "Báo cáo",
+        "workflows": "Quy trình",
+        "documents": "Văn bản",
+        "orgchart": "Sơ đồ tổ chức",
+        "methods": "Method",
+        "virtual_doc": "Văn bản ảo",
+        "service": "Dịch vụ hệ thống",
+        "menu": "Menu",
+        "users": "Tài khoản người dùng",
+        "add": "Thêm",
+        "edit": "Sửa",
+        "refresh": "Làm mới",
+        "export_excel": "Xuất excel",
+        "list": "Danh sách",
+        "search": "Tìm kiếm"
+
+    },
+    "login": {
+        "title": "Đăng nhập hệ thống",
+        "buttons": {
+            "login": "Đăng nhập"
+        },
+        "input_text": {
+            "email": "Địa chỉ email",
+            "password": "Mật khẩu"
+        },
+        "messages": {
+            "none_account": "Tạo tài khoản mới",
+            "register": "Đăng ký"
+        }
+    }
+}

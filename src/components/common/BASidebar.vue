@@ -2,10 +2,18 @@
     <v-navigation-drawer :mini-variant="sapp.collapseSideBar" :v-model="true" app>
         <v-list dense nav class="py-0">
             <v-list-item :class="{ 'px-0': sapp.collapseSideBar }" v-show="!sapp.collapseSideBar">
-                <img height="30px" :src="require('./../../assets/image/symper-full-logo.png')" />
+                <img
+                    @click="goToHome()"
+                    height="30px"
+                    :src="require('./../../assets/image/symper-full-logo.png')"
+                />
             </v-list-item>
             <v-list-item class="px-0" v-show="sapp.collapseSideBar">
-                <img height="30px" :src="require('./../../assets/image/symper-short-logo.png')" />
+                <img
+                    @click="goToHome()"
+                    height="30px"
+                    :src="require('./../../assets/image/symper-short-logo.png')"
+                />
             </v-list-item>
 
             <v-list-item two-line :class="{ 'px-0': sapp.collapseSideBar }">
@@ -18,12 +26,18 @@
                     <v-list-item-subtitle>
                         <v-menu bottom left>
                             <template v-slot:activator="{ on }">
-                                <v-btn x-small v-on="on" depressed>{{ sapp.endUserInfo.currentRole.title }}</v-btn>
+                                <v-btn
+                                    x-small
+                                    v-on="on"
+                                    depressed
+                                >{{ sapp.endUserInfo.currentRole.title }}</v-btn>
                             </template>
 
                             <v-list dense>
                                 <v-list-item v-for="(item, i) in sapp.endUserInfo.roles" :key="i">
-                                    <v-list-item-title>{{ item.title }}</v-list-item-title>
+                                    <v-list-item-content>
+                                        <v-list-item-title>{{ item.title }}</v-list-item-title>
+                                    </v-list-item-content>
                                 </v-list-item>
                             </v-list>
                         </v-menu>
@@ -35,53 +49,50 @@
                 v-for="item in sapp.items"
                 :key="item.title"
                 link
-                @click="gotoPage(item.link)"
+                @click="gotoPage(item.link, item.title)"
             >
                 <v-list-item-icon>
                     <v-tooltip right>
                         <template v-slot:activator="{ on }">
                             <v-icon v-on="on">{{ item.icon }}</v-icon>
                         </template>
-                        <span>{{ item.title }}</span>
+                        <span>{{ $t('common.'+item.title) }}</span>
                     </v-tooltip>
                 </v-list-item-icon>
 
                 <v-list-item-content>
-                    <v-list-item-title>{{ item.title }}</v-list-item-title>
+                    <v-list-item-title>{{ $t('common.'+item.title) }}</v-list-item-title>
                 </v-list-item-content>
             </v-list-item>
         </v-list>
         <template v-slot:append>
             <v-list dense>
-                <v-list-item v-show="sapp.collapseSideBar">
-                    <v-list-item-icon>
-                        <v-badge
-                            v-if="sapp.unreadNotification > 0"
-                            :content="sapp.unreadNotification"
-                            :value="sapp.unreadNotification"
-                            color="red"
-                            overlap
-                        >
-                            <v-icon>mdi-bell-outline</v-icon>
-                        </v-badge>
-                        <v-icon v-else>mdi-bell-outline</v-icon>
-                    </v-list-item-icon>
-                </v-list-item>
                 <v-list-item>
-                    <v-list-item-icon>
+                    <v-list-item-icon class="mr-2">
                         <v-icon @click.stop="invertSidebarShow()">mdi-menu</v-icon>
-                        <v-badge
-                            :content="sapp.unreadNotification"
-                            v-show="!sapp.collapseSideBar"
-                            :value="sapp.unreadNotification"
-                            color="red"
-                            v-if="sapp.unreadNotification > 0"
-                            overlap
-                        >
-                            <v-icon class="ml-3">mdi-bell-outline</v-icon>
-                        </v-badge>
-                        <v-icon v-else class="ml-3">mdi-bell-outline</v-icon>
                     </v-list-item-icon>
+                    <v-menu>
+                        <template v-slot:activator="{ on: menu }">
+                            <v-tooltip top>
+                                <template v-slot:activator="{ on: tooltip }">
+                                    <v-btn icon v-on="{ ...tooltip, ...menu }">
+                                        <v-icon>mdi-earth</v-icon>
+                                    </v-btn>
+                                </template>
+                                <span>{{$t('common.select_lang')}}</span>
+                            </v-tooltip>
+                        </template>
+                        <v-list>
+                            <v-list-item
+                                class="v-list-item--link"
+                                v-for="item in sapp.supportedLanguages"
+                                :key="item.key"
+                                @click="changeLocale(item)"
+                            >
+                                <v-list-item-title>{{ item.title }}</v-list-item-title>
+                            </v-list-item>
+                        </v-list>
+                    </v-menu>
                 </v-list-item>
             </v-list>
         </template>
@@ -89,6 +100,8 @@
 </template>
 
 <script>
+import { util } from "./../../plugins/util.js";
+import { userApi } from "./../../api/user.js";
 export default {
     computed: {
         sapp() {
@@ -101,16 +114,27 @@ export default {
         }
     },
     methods: {
+        changeLocale(item) {
+            let locale = item.key;
+            let currentLocale = util.getSavedLocale();
+            if (currentLocale != locale) {
+                this.$i18n.locale = locale;
+                util.setSavedLocale(locale);
+                userApi.setUserLocale(locale);
+                this.$evtBus.$emit("change-user-locale", locale);
+            }
+        },
+        goToHome() {
+            this.$goToPage("/", "Trang chủ");
+        },
         invertSidebarShow() {
             this.$store.commit(
                 "app/changeCollapseSidebar",
                 !this.sapp.collapseSideBar
             );
         },
-        gotoPage(uri) {
-            this.$router.push({
-                path: uri
-            });
+        gotoPage(uri, title) {
+            this.$goToPage(uri, title);
         }
     },
     data() {

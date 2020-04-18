@@ -1,6 +1,5 @@
 importScripts('https://www.gstatic.com/firebasejs/7.13.2/firebase-app.js');
 importScripts('https://www.gstatic.com/firebasejs/7.13.2/firebase-messaging.js');
-
 firebase.initializeApp({
     apiKey: "AIzaSyCWalwPSvfi8GbdofE_whZMHLi_Fc0l7DE",
     authDomain: "symper-f0ede.firebaseapp.com",
@@ -12,7 +11,7 @@ firebase.initializeApp({
 });
 
 const messaging = firebase.messaging();
-messaging.setBackgroundMessageHandler(function (payload) {
+messaging.setBackgroundMessageHandler(function(payload) {
     console.log('[firebase-messaging-sw.js] Received background message ', payload);
     // Customize notification
     const notificationTitle = 'Background Message Title';

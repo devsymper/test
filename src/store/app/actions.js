@@ -1,5 +1,7 @@
-const action1 = (state, data) => {
-  state.data = data;
+const handleUrlChanges = (context, data) => {
+    console.log(context, data, 'xxx');
+    context.commit('changeUrlsToTabs', data);
+    // urlToTabTitleMap
 };
 
-export { action1 };
+export { handleUrlChanges };
