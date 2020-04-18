@@ -278,7 +278,10 @@ export default {
                 for (let index = 0; index < this.listBaSnippet.length; index++) {
                     const snippet = this.listBaSnippet[index];
                     if (snippet.id == this.currentSnippet.id) {
-                        this.listBaSnippet[index] = {...this.currentSnippet};
+                        this.listBaSnippet[index].name = this.currentSnippet.name;
+                        this.listBaSnippet[index].value = this.currentSnippet.value;
+                        this.listBaSnippet[index].description = this.currentSnippet.description;
+                        this.listBaSnippet[index].snippet = this.currentSnippet.value;
                         let methodDes = `<b>Mô tả:</b> ${this.currentSnippet.description}</br><b>Nội dung:</b> ${this.currentSnippet.value}`;
                         this.listWordsCompletes.push({
                             caption: this.currentSnippet.name,
