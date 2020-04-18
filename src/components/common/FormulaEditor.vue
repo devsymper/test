@@ -1,7 +1,7 @@
 <template>
     <div class="w-100">
         <div class="bkerp-widget">
-            <v-tabs v-model="tab" @change="changeTabEditor">
+            <v-tabs v-model="tab">
                 <v-tab>Soạn công thức</v-tab>
                 <v-tab>Snippets</v-tab>
             </v-tabs>
@@ -12,18 +12,103 @@
                     </div>
                 </v-tab-item>
                 <v-tab-item>
-                    <div class="bkerp-widget-body">
-                        <div id="snippet-editor"></div>
-                    </div>
+                    <v-card>
+                        <v-data-table
+                            :headers="headersForListSnippet"
+                            :items="listBaSnippet"
+                            :search="searchKey"
+                            sort-by="id"
+                            class="elevation-1"
+                        >   
+                            <template v-slot:top>
+                                <v-container fluid="">
+                                    <v-row>
+                                        <v-col cols="6">
+                                            <v-btn color="orange darken-1" text @click="showAddModal">
+                                                Thêm snippet
+                                            </v-btn>
+                                        </v-col>
+                                        <v-col cols="6">
+                                            <v-text-field
+                                                v-model="searchKey"
+                                                append-icon="mdi-magnify"
+                                                label="Tìm kiếm"
+                                                single-line
+                                                hide-details
+                                            ></v-text-field>
+                                        </v-col>
+                                    </v-row>
+                                </v-container>
+                            </template>
+                            <template v-slot:item.actions="{ item }">
+                                <v-icon small class="mr-2" @click="showEditSnippetFrom(item)">
+                                    mdi-pencil
+                                </v-icon>
+                                <v-icon small @click="deleteSnippet(item)">
+                                    mdi-delete
+                                </v-icon>
+                            </template>
+                        </v-data-table>
+                    </v-card>
                 </v-tab-item>
             </v-tabs-items>
         </div>
+        <v-dialog v-model="isShowAddModal" max-width="500">
+            <v-card>
+                <v-card-title class="headline">{{!!!isEdit ? "Add new snippet" : "Edit snippet"}}</v-card-title>
+                <v-card-text>
+                    <v-container fluid>
+                        <v-row>
+                            <v-col cols="12" sm="5">
+                                <v-text-field
+                                    v-model="currentSnippet.name"
+                                    label="Tên"
+                                    hint="Chỉ chứa các chữ cái không dấu, chữ số và gạch dưới"
+                                    :rules="[
+                                        () => !!currentSnippet.name || 'Trường này bắt buộc',
+                                        () => !!currentSnippet.name && /^[a-zA-Z\d_]{3,20}$/.test(currentSnippet.name) || 'Tên không hợp lệ, vui lòng chỉ nhập chữ cái không dấu, chữ số và gạch dưới, dài từ 3 - 20 ký tự',
+                                    ]"
+                                    required
+                                ></v-text-field>
+                            </v-col>
+                            <v-col cols="12" sm="7">
+                                <v-text-field
+                                    v-model="currentSnippet.description"
+                                    label="Mô tả"
+                                ></v-text-field>
+                            </v-col>
+                            <v-col cols="12">
+                                <v-textarea 
+                                    v-model="currentSnippet.value"
+                                    :rules="[
+                                        () => !!currentSnippet.value || 'Trường này bắt buộc',
+                                    ]"
+                                    required>
+                                    <template v-slot:label>
+                                        <div>Nội dung</div>
+                                    </template>
+                                </v-textarea>
+                            </v-col>
+                        </v-row>
+                    </v-container>
+                </v-card-text>
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn color="darken-1" text @click="isShowAddModal = false">
+                        Hủy
+                    </v-btn>
+                    <v-btn color="orange darken-1" text @click="addSnippet" :disabled="!isAllowToSubmit">
+                        {{isEdit ? "Cập nhật" : "Thêm"}}
+                    </v-btn>
+                </v-card-actions>
+            </v-card>
+            </v-dialog>
     </div>
 </template>
 
 <script>
 import Api from "../../api/api.js";
-import ace from "ace-builds";
+import ace from "ace-builds";``
 export default {
     name: "FormulaEditor",
     components: {},
@@ -32,6 +117,7 @@ export default {
         return {
             tab: 0,
             value: ``,
+            searchKey: ``,
             options: {
                 useWorker: true,
                 enableBasicAutocompletion: true,
@@ -41,8 +127,14 @@ export default {
                 indentedSoftWrap: false,
                 showGutter: true,
             },
+            headersForListSnippet: [
+                {text: "Id", value: "id"},
+                {text: "Tên", value: "name"},
+                {text: "Mô tả", value: "description"},
+                {text: "Công thức", value: "snippet"},
+                {text: "Hành động", value: "actions"},
+            ],
             formulaEditor: null,
-            snippetEditor: null,
             langTools: null,
             snippetManager: null,
             listWordsCompletes: [],
@@ -87,98 +179,150 @@ export default {
                 unlogged|until|update|user|using|uuid|vacuum|valid|validate|validator|value|values|varbit|
                 varchar|variadic|varying|verbose|version|view|void|volatile|when|where|whitespace|window|
                 with|without|work|wrapper|write|xid|xml|xmlattributes|xmlconcat|xmlelement|xmlexists|
-                xmlforest|xmlparse|xmlpi|xmlroot|xmlserialize|year|yes|zone`.split("|"),
-            functionName: ["abs","cbrt","ceil","ceiling","degrees","div","exp","floor","ln","log","log","mod","pi",
-                "power","power","radians","round","round","sign","sqrt","trunc","trunc","width_bucket",
-                "width_bucket","random","setseed","acos","asin","atan","atan2","cos","cot","sin","tan",
-                "bit_length","char_length","lower","octet_length","overlay","position","substring","substring",
-                "substring","trim","upper","ascii","btrim","chr","concat","concat_ws","convert","convert_from",
-                "convert_to","decode","encode","format","initcap","left","length","length","lpad","ltrim","md5",
-                "pg_client_encoding","quote_ident","quote_literal","quote_literal","quote_nullable",
-                "quote_nullable","regexp_matches","regexp_replace","regexp_split_to_array","regexp_split_to_table",
-                "repeat","replace","reverse","right","rpad","rtrim","split_part","strpos","substr","to_ascii",
-                "to_hex","translate","age","age","clock_timestamp","current_date","current_time","current_timestamp",
-                "date_part","date_part","date_trunc","extract","isfinite","isfinite","isfinite",
-                "justify_days","justify_hours","justify_interval","localtime","localtimestamp","now",
-                "statement_timestamp","timeofday","transaction_timestamp"]
+                xmlforest|xmlparse|xmlpi|xmlroot|xmlserialize|year|yes|zone`.split(
+                "|"
+            ),
+            functionName: `abs|cbrt|ceil|ceiling|degrees|div|exp|floor|ln|log|log|mod|pi|power|power|radians|
+                round|round|sign|sqrt|trunc|trunc|width_bucket|width_bucket|random|setseed|acos|asin|atan|
+                atan2|cos|cot|sin|tan|bit_length|char_length|lower|octet_length|overlay|position|substring|
+                substring|substring|trim|upper|ascii|btrim|chr|concat|concat_ws|convert|convert_from|
+                convert_to|decode|encode|format|initcap|left|length|length|lpad|ltrim|md5|pg_client_encoding|
+                quote_ident|quote_literal|quote_literal|quote_nullable|quote_nullable|regexp_matches|
+                regexp_replace|regexp_split_to_array|regexp_split_to_table|repeat|replace|reverse|right|
+                rpad|rtrim|split_part|strpos|substr|to_ascii|to_hex|translate|age|age|clock_timestamp|
+                current_date|current_time|current_timestamp|date_part|date_part|date_trunc|extract|
+                isfinite|isfinite|isfinite|justify_days|justify_hours|justify_interval|localtime|
+                localtimestamp|now|statement_timestamp|timeofday|transaction_timestamp`.split("|"),
+            listBaSnippet: [],
+            isCalledApiToGetListBaSnippet: false,
+            currentSnippet: {
+                name: "",
+                description: "",
+                value: ""
+            },
+            isShowAddModal: false,
+            isEdit: false,
         };
     },
+    computed: {
+        isAllowToSubmit: function () {
+            return (
+                this.currentSnippet.value.trim().length > 0 && 
+                this.currentSnippet.name.trim().length > 0 && 
+                /^[a-zA-Z\d_]{3,20}$/.test(this.currentSnippet.name)
+            ) ? true : false;
+        },
+    },
     mounted() {
-        ace.config.set('basePath', 'ace-builds/src-min-noconflict');
+        ace.config.set("basePath", "ace-builds/src-min-noconflict");
         this.initEditor();
         this.getListAutoComplete();
         this.setupTooltip();
+        this.setupBaSnippet();
     },
     methods: {
-        changeTabEditor(tab) {
-            if (this.snippetEditor == null) {
-                let that = this;
-                setTimeout(() => {
-                    that.snippetEditor = ace.edit("snippet-editor");
-                    that.snippetEditor.session.setMode("ace/mode/json");
-                    that.snippetEditor.setOptions({
-                        useWorker: false,
-                        enableBasicAutocompletion: true,
-                        showPrintMargin: false,
-                        enableLiveAutocompletion: true,
-                        indentedSoftWrap: false,
-                        showGutter: true,
-                    });
-                    that.snippetEditor.getSession().setUseWrapMode(true);
-                    /**
-                     * Update BA snippet
-                     */
-                    that.snippetEditor.session.on("change", (e) => {
-                        try {
-                            let listSnippets = JSON.parse(
-                                that.snippetEditor.getValue()
-                            );
-                            let listMethods = [];
-                            for (
-                                let index = 0;
-                                index < listSnippets.length;
-                                index++
-                            ) {
-                                const method = listSnippets[index];
-                                let methodDes = `<b>Mô tả:</b> ${method.description}</br><b>Nội dung:</b> ${method.value}`;
-                                if (that.listWordsCompletes.filter(word => {
-                                    return word.meta == "BA snippet" && word.caption == method.name;
-                                }).length) {
-                                    for (let i = 0; i < that.formulaEditor.session.$mode.$highlightRules.$keywordList.length; i++) {
-                                        const word = that.formulaEditor.session.$mode.$highlightRules.$keywordList[i];
-                                        if (word.meta == "BA snippet" && word.caption == method.name) {
-                                            that.formulaEditor.session.$mode.$highlightRules.$keywordList[i].value = method.value;
-                                            that.formulaEditor.session.$mode.$highlightRules.$keywordList[i].description = methodDes;
-                                            break;
-                                        }
-                                    }
-                                } else {
-                                    that.formulaEditor.session.$mode.$highlightRules.$keywordList[
-                                        method.name
-                                    ] = "BA snippet";
-                                    that.listWordsCompletes.push({
-                                        caption: method.name,
-                                        value: method.value,
-                                        meta: "BA snippet",
-                                        description: methodDes,
-                                    });
-                                }
-                                listMethods.push({
-                                    content: method.value,
-                                    name: method.name,
-                                    tabTrigger: method.name,
-                                });
-                            }
-                            that.snippetManager.register(listMethods, "pgsql");
-                            that.setupUpdateAutocomplete(that.listWordsCompletes);
-                        } catch (error) {}
-                    });
-                }, 500);
+        showEditSnippetFrom(snippet) {
+            this.currentSnippet = {...snippet, value: snippet.snippet}
+            this.isEdit = true;
+            this.isShowAddModal = true;
+        },
+        addSnippet() {
+            if (this.isEdit) {
+                this.updateSnippet();
+            } else {
+                this.createSnippet()
             }
         },
-        updateBASnippet(newValue) {
-            // let req = new Api("https://v2datnt.dev.symper.vn/");
-            // let res = req.put("formulas/ba-snippets");
+        deleteSnippet(snippet) {
+            let req = new Api("https://v2hoangnd.dev.symper.vn/");
+            let res = req.delete("ba-snippet/" + snippet.id);
+            res.then((result) => {
+                for (let index = 0; index < this.listBaSnippet.length; index++) {
+                    const item = this.listBaSnippet[index];
+                    if (snippet.id === item.id) {
+                        this.listBaSnippet.splice(index, 1);
+                        break;
+                    }
+                }
+            }).catch((err) => {
+                console.log(err);
+            });
+        },
+        createSnippet() {
+            let req = new Api("https://v2hoangnd.dev.symper.vn/");
+            let res = req.post("ba-snippet", this.currentSnippet);
+            res.then((result) => {
+                this.listBaSnippet.push({
+                    id: result.data,
+                    snippet: this.currentSnippet.value,
+                    name: this.currentSnippet.name,
+                    description: this.currentSnippet.description,
+                });
+                this.isShowAddModal = false;
+                let methodDes = `<b>Mô tả:</b> ${this.currentSnippet.description}</br><b>Nội dung:</b> ${this.currentSnippet.value}`;
+                this.listWordsCompletes.push({
+                    caption: this.currentSnippet.name,
+                    value: this.currentSnippet.value,
+                    meta: "BA snippet",
+                    description: methodDes,
+                });
+                this.setupUpdateAutocomplete(this.listWordsCompletes);
+            }).catch((err) => {
+                console.log(err);
+            });
+        },
+        updateSnippet() {
+            let req = new Api("https://v2hoangnd.dev.symper.vn/");
+            let res = req.put("ba-snippet", this.currentSnippet);
+            res.then((result) => {
+                for (let index = 0; index < this.listBaSnippet.length; index++) {
+                    const snippet = this.listBaSnippet[index];
+                    if (snippet.id == this.currentSnippet.id) {
+                        this.listBaSnippet[index] = {...this.currentSnippet};
+                        let methodDes = `<b>Mô tả:</b> ${this.currentSnippet.description}</br><b>Nội dung:</b> ${this.currentSnippet.value}`;
+                        this.listWordsCompletes.push({
+                            caption: this.currentSnippet.name,
+                            value: this.currentSnippet.value,
+                            meta: "BA snippet",
+                            description: methodDes,
+                        });
+                        this.setupUpdateAutocomplete(this.listWordsCompletes);
+                        break;
+                    }
+                }
+                this.isShowAddModal = false;
+            }).catch((err) => {
+                console.log(err);
+            });
+        },
+        showAddModal() {
+            this.isShowAddModal = true;
+            this.isEdit = false;
+            this.currentSnippet = {
+                name: "",
+                description: "",
+                value: ""
+            };
+        },
+        setupBaSnippet() {
+            let req = new Api("https://v2hoangnd.dev.symper.vn/");
+            let res = req.get("ba-snippet");
+            res.then( result => {
+                this.listBaSnippet = result.data;
+                for (let index = 0; index < this.listBaSnippet.length; index++) {
+                    const method = this.listBaSnippet[index];
+                    let methodDes = `<b>Mô tả:</b> ${method.description}</br><b>Nội dung:</b> ${method.snippet}`;
+                    this.listWordsCompletes.push({
+                        caption: method.name,
+                        value: method.snippet,
+                        meta: "BA snippet",
+                        description: methodDes,
+                    });
+                }
+                this.setupUpdateAutocomplete(this.listWordsCompletes);
+            }).catch( err => {
+                console.log(err);
+            })
         },
         setDefaultKeyword() {
             let listwords = [];
@@ -188,7 +332,7 @@ export default {
                     value: kw,
                     meta: "Keyword",
                     description: kw,
-                })
+                });
             }
             for (const fn of this.keywordName) {
                 listwords.push({
@@ -196,7 +340,7 @@ export default {
                     value: fn,
                     meta: "function",
                     description: fn,
-                })
+                });
             }
             this.setupUpdateAutocomplete(listwords);
         },
@@ -227,7 +371,7 @@ export default {
                         value: kw,
                         meta: "Keyword",
                         description: kw,
-                    })
+                    });
                 }
                 for (const fn of this.keywordName) {
                     listDocsCompletes.push({
@@ -235,7 +379,7 @@ export default {
                         value: fn,
                         meta: "function",
                         description: fn,
-                    })
+                    });
                 }
                 for (let index = 0; index < docs.length; index++) {
                     const doc = docs[index];
@@ -346,15 +490,30 @@ export default {
 </script>
 
 <style>
+.v-text-field{
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+}
+.v-label{
+    font-size: 14px !important;
+}
+.v-data-table td {
+    font-size: 12px !important;
+    height: unset !important;
+}
+.v-data-table td,
+.v-data-table th {
+    padding: 5px 10px !important;
+}
 .v-window.v-item-group.theme--light.v-tabs-items,
 .v-window-item.v-window-item--active {
     height: 100%;
 }
 .v-tab {
-    font-size: 12px;
-    text-transform: inherit;
-    font-weight: normal;
-    text-shadow: 0 0 0;
+    font-size: 12px !important;
+    text-transform: inherit !important;
+    font-weight: normal !important;
+    text-shadow: 0 0 0 !important;
 }
 .bkerp-widget {
     min-width: 700px;
