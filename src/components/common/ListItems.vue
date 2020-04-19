@@ -335,6 +335,12 @@ export default {
             }
         };
     },
+    created(){
+        let thisCpn = this;
+        this.$evtBus.$on('change-user-locale',(locale)=>{
+            thisCpn.$refs.dataTable.hotInstance.render();
+        });
+    },
     props: {
         // Tiêu đề của trang: Danh sách văn bản, danh sách người dùng ...
         pageTitle: {
@@ -471,6 +477,7 @@ export default {
                      * tham số thứ nhất: row ( index của row đang được chọn)
                      * tham số thứ hai: colName ( Tên của cột (key trong một row) )
                      */
+                    
                     thisCpn.$emit("context-selection-" + key, row, colName);
 
                     if (key == "remove") {
@@ -516,6 +523,8 @@ export default {
             return tbHeight - 50;
         },
         colHeaders() {
+            let thisCpn = this;
+
             let colNames = [];
             let colTitles = this.tableColumns.reduce((headers, item) => {
                 colNames.push(item.data);
@@ -526,7 +535,7 @@ export default {
             return function(col) {
                 return `<span>
                             <span>
-                                ${colTitles[col]}
+                                ${thisCpn.$t(colTitles[col])}
                             </span>
                             <span class="float-right symper-filter-button">
                                 <i col-name="${colNames[col]}" onclick="tableDropdownClickHandle(this, event)" class="grey-hover mdi mdi-filter-variant symper-table-dropdown-button"></i>
@@ -544,6 +553,13 @@ export default {
             return mapType[this.actionPanelType]
                 ? mapType[this.actionPanelType]
                 : mapType["temporary"];
+        }
+    },
+    watch:{
+        actionPanel(){
+            if(this.actionPanel == true){
+                this.$emit("open-panel");
+            }
         }
     },
     methods: {
