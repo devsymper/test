@@ -95,6 +95,7 @@
                         label="Số bản ghi mỗi trang"
                         dense
                         flat
+                        @change="changePageSize"
                     ></v-select>
                     <v-pagination
                         style="width:200px"
@@ -817,9 +818,10 @@ export default {
             // Phát sự kiện khi người dùng gõ vào ô tìm kiếm
             this.$emit("search-all", {});
         },
-        changePageSize() {
+        changePageSize(vl) {
+            this.getData();
             // Phát sự kiện khi người dùng thay đổi số bản ghi ở mỗi page
-            this.$emit("change-page-size");
+            this.$emit("change-page-size", vl);
         }
     },
 
