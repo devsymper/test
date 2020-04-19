@@ -15,7 +15,9 @@
         "refresh": "Refresh",
         "export_excel": "Export Excel",
         "list": "List",
-        "search": "Search"
+        "search": "Search",
+        "list_config": "List config",
+        "save": "Save"
     },
     "login": {
         "title": "Login system",
@@ -29,6 +31,24 @@
         "messages": {
             "none_account": "Create new account",
             "register": "Register"
+        }
+    },
+    "table": {
+        "wrap_text_mode": "Wrap text mode",
+        "display_density": "Row display density",
+        "column_config": "Column configs",
+        "freeze_column": "Freeze this column",
+        "unfreeze_column": "Don't freeze this column",
+        "hide_column": "Hide this column",
+        "show_column": "Show this column",
+        "wrap_tex_mode": {
+            "wrap": "Wrap",
+            "clip": "Clip"
+        },
+        "display_density_mode": {
+            "loosen": "Loosen",
+            "medium": "Medium",
+            "compact": "Compact"
         }
     }
 }

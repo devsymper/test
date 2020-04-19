@@ -15,8 +15,9 @@
         "refresh": "Làm mới",
         "export_excel": "Xuất excel",
         "list": "Danh sách",
-        "search": "Tìm kiếm"
-
+        "search": "Tìm kiếm",
+        "list_config": "Cấu hình danh sách",
+        "save": "Lưu"
     },
     "login": {
         "title": "Đăng nhập hệ thống",
@@ -30,6 +31,24 @@
         "messages": {
             "none_account": "Tạo tài khoản mới",
             "register": "Đăng ký"
+        }
+    },
+    "table": {
+        "wrap_text_mode": "Chế độ xuống dòng",
+        "display_density": "Mật độ hiển thị dòng",
+        "column_config": "Cấu hình cột",
+        "freeze_column": "Cố định cột này",
+        "unfreeze_column": "Bỏ cố định cột này",
+        "hide_column": "Ẩn cột này",
+        "show_column": "Hiện cột này",
+        "wrap_tex_mode": {
+            "wrap": "Xuống dòng",
+            "clip": "Cắt bớt"
+        },
+        "display_density_mode": {
+            "loosen": "Rộng",
+            "medium": "Trung bình",
+            "compact": "Gần nhau"
         }
     }
 }

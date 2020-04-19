@@ -31,6 +31,22 @@
     margin-top: 0px;
 }
 
+.sym-small-size.v-input--radio-group .v-icon {
+    font-size: 16px!important;
+}
+
+.sym-small-size.v-input--radio-group .v-messages {
+    display: none;
+}
+
+.sym-small-size.v-input--radio-group .v-label {
+    font-size: 13px!important;
+}
+
+.sym-small-size.v-input--radio-group .v-input--selection-controls__input {
+    margin-right: 0px;
+}
+
 .sym-small-size .v-text-field__details {
     display: none;
 }
@@ -163,7 +179,7 @@
     position: fixed;
     z-index: 8;
     background-color: white;
-    padding: 5px;
+    padding: 5px 10px 5px 10px;
     font-size: 13px;
     font-family: "Roboto", sans-serif;
 }
@@ -218,4 +234,8 @@
 
 .close-btn:hover {
     background-color: #f1f1f1;
+}
+
+.fw-400 {
+    font-weight: 400;
 }

@@ -1,13 +1,15 @@
 <template>
-    <list-items
-        :pageTitle="'Danh sách document'"
-        :containerHeight="containerHeight"
-        :columns="columns"
-        :data="data"
-        :totalPage="totalPage"
-        :actionPanelType="actionPanelType"
-        :itemInputs="itemInputs"
-    ></list-items>
+    <div class="w-100">
+        <list-items
+            :pageTitle="'Danh sách document'"
+            :containerHeight="containerHeight"
+            :columns="columns"
+            :data="data"
+            :totalPage="totalPage"
+            :actionPanelType="actionPanelType"
+            :itemInputs="itemInputs"
+        ></list-items>
+    </div>
 </template>
 <script>
 import ListItems from "./../components/common/ListItems.vue";
@@ -671,7 +673,7 @@ export default {
                 }
             ],
             totalPage: 6,
-            actionPanelType: "temporary",
+            actionPanelType: "modal",
             itemInputs: {
                 phone: {
                     title: "Số điện thoại",

@@ -1,5 +1,5 @@
 <template>
-    <div id="symper-app">
+    <div id="symper-app" @click="handleClickApp">
         <component :is="layout">
             <keep-alive>
                 <router-view />
@@ -66,31 +66,39 @@ export default {
         this.checkBacklogRequest();
     },
     methods: {
-        removeBacklogRequest(){
+        handleClickApp(evt) {
+            this.$evtBus.$emit("symper-app-wrapper-clicked", evt);
+        },
+        removeBacklogRequest() {
             let needResolve = this.backlogRequests.needResolve;
 
-             for(let i in needResolve){
-                if(needResolve[i].selected){
-                    this.$delete(this.backlogRequests.needResolve,i);
+            for (let i in needResolve) {
+                if (needResolve[i].selected) {
+                    this.$delete(this.backlogRequests.needResolve, i);
                 }
             }
         },
-        syncBacklogRequest(){
+        syncBacklogRequest() {
             let needResolve = this.backlogRequests.needResolve;
-            for(let i in needResolve){
-                if(needResolve[i].selected){
-                    this.$set(this.backlogRequests.resolving,i,true);
+            for (let i in needResolve) {
+                if (needResolve[i].selected) {
+                    this.$set(this.backlogRequests.resolving, i, true);
                 }
             }
 
-            setTimeout((thisCpn) => {
-                for(let i in thisCpn.backlogRequests.resolving){
-                    thisCpn.$set(thisCpn.backlogRequests.resolved,i,true);
-                }
-            }, 2000, this);
+            setTimeout(
+                thisCpn => {
+                    for (let i in thisCpn.backlogRequests.resolving) {
+                        thisCpn.$set(thisCpn.backlogRequests.resolved, i, true);
+                    }
+                },
+                2000,
+                this
+            );
         },
-        handleChangeSelectItem(key){
-            this.backlogRequests.needResolve[key].selected = !this.backlogRequests.needResolve[key].selected;
+        handleChangeSelectItem(key) {
+            this.backlogRequests.needResolve[key].selected = !this
+                .backlogRequests.needResolve[key].selected;
         },
         closeDialog() {
             this.activeResolveBaclog = false;
@@ -110,7 +118,9 @@ export default {
                     item => {
                         activeBacklogs[item.key] = item.value;
                         activeBacklogs[item.key].selected = false;
-                        activeBacklogs[item.key].create_time = new Date(activeBacklogs[item.key].create_time).toLocaleString();
+                        activeBacklogs[item.key].create_time = new Date(
+                            activeBacklogs[item.key].create_time
+                        ).toLocaleString();
                         console.log(item, "Các request đang còn tồn đọng");
                     },
                     () => {

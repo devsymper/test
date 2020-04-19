@@ -1,9 +1,16 @@
 export const appConfigs = {
+    dataTypeIcon: { // icon cho các kiểu dữ liệu: numeric, text, date, datetime, time, 
+        numeric: 'mdi-numeric',
+        text: 'mdi-alphabetical-variant',
+        date: 'mdi-calendar-month-outline',
+        datetime: 'mdi-calendar-clock',
+        time: 'mdi-timer-outline',
+    },
     apiDomain: {
         user: 'https://v2hoangnd.dev.symper.vn/api/',
         bpmne: ''
     },
-    notificationTimeout:{
+    notificationTimeout: {
         success: 10000,
         warning: 10000,
         info: 10000,
