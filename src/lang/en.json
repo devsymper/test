@@ -127,6 +127,9 @@
             "contextMenu": {
                 "passwordSetting": "Password setting",
                 "edit": "Edit"
+            },
+            "error": {
+                "cannot_get_data": "Can not get data from server"
             }
         }
     }

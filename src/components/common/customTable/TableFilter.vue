@@ -29,7 +29,7 @@
             ></i>
         </div>
 
-        <div ref="it3" class="pb-1 dropdown-item grey-hover">
+        <div ref="it3" class="pb-1 dropdown-item grey-hover" @click="clearFilter">
             <i class="pl-2 mdi body-1 mdi-filter-remove-outline mr-2"></i>
             <span>Xóa bộ lọc</span>
         </div>
@@ -174,6 +174,16 @@ export default {
         });
     },
     methods: {
+        clearFilter(){
+            this.$emit("apply-filter-value", getDefaultFilterConfig(), 'clear-filter');
+            setTimeout(
+                thisCpn => {
+                    thisCpn.hide();
+                },
+                300,
+                this
+            );
+        },
         applyFilter() {
             this.$emit("apply-filter-value", this.filterConfigs);
             setTimeout(
@@ -285,13 +295,13 @@ export default {
             listConditionType: {
                 none: "Không chọn",
                 empty: "Rỗng",
-                notEmpty: "Không rỗng",
+                not_empty: "Không rỗng",
                 equal: "Bằng",
-                notEqual: "Không bằng",
-                begin: "Bắt đầu với",
-                end: "Kết thúc với",
-                contain: "Chứa",
-                notContain: "Không chứa"
+                not_equal: "Không bằng",
+                begins_with: "Bắt đầu với",
+                ends_with: "Kết thúc với",
+                contains: "Chứa",
+                not_contain: "Không chứa"
             }
         };
     },

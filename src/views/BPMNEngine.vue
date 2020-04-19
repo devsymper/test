@@ -1,6 +1,7 @@
 <template>
     <div class="w-100">
         <list-items
+            :getDataUrl="'https://v2hoangnd.dev.symper.vn/users'"
             :pageTitle="'Danh sách document'"
             :containerHeight="containerHeight"
             :columns="columns"

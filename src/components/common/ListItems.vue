@@ -6,6 +6,7 @@
                     <span class="title float-left">{{pageTitle}}</span>
                     <div class="float-right overline">
                         <v-text-field
+                            v-model="searchKey"
                             class="d-inline-block mr-2 sym-small-size"
                             single-line
                             append-icon="mdi-magnify"
@@ -30,6 +31,7 @@
                             :loading="loadingRefresh"
                             :disabled="loadingRefresh"
                             class="mr-2"
+                            @click="refreshList"
                         >
                             <v-icon left dark>mdi-refresh</v-icon>
                             {{$t('common.refresh')}}
@@ -251,7 +253,11 @@
                 </div>
             </template>
         </v-navigation-drawer>
-        <table-filter ref="tableFilter" :columnFilter="tableFilter.currentColumn"></table-filter>
+        <table-filter
+            ref="tableFilter"
+            :columnFilter="tableFilter.currentColumn.colFilter"
+            @apply-filter-value="applyFilter"
+        ></table-filter>
     </div>
 </template>
 
@@ -265,6 +271,8 @@ import TableFilter from "./customTable/TableFilter.vue";
 import { appConfigs } from "./../../configs.js";
 import draggable from "vuedraggable";
 import { getDefaultFilterConfig } from "./../common/customTable/defaultFilterConfig.js";
+import Api from "./../../api/api.js";
+var apiObj = new Api("");
 
 window.tableDropdownClickHandle = function(el, event) {
     event.preventDefault();
@@ -282,6 +290,7 @@ export default {
     watch: {
         page(newVl) {
             // Phát sự kiện thay đổi trang đang xem
+            this.getData();
             this.$emit("change-page", newVl);
         }
     },
@@ -302,7 +311,7 @@ export default {
                 },
                 drag: false
             },
-            tableColumns: this.getTableColumns(),
+            tableColumns: [],
             actionPanel: false, // có hiển thị action pannel (create, detail, edit) hay không
             pageSizeOptions: [20, 50, 100], // các lựa chọn cho số lượng bản ghi hiển thị cho mỗi trang
             loadingExportExcel: false, // có đang chạy export hay ko
@@ -331,75 +340,71 @@ export default {
                 allColumn: {
                     // cấu hình filter của tất cả các cột trong bảng này dạng {tên cột : cấu hình filter}
                 },
-                currentColumn: getDefaultFilterConfig()
-            }
+                currentColumn: {
+                    colFilter: getDefaultFilterConfig(),
+                    name: ""
+                }
+            },
+            searchKey: "", //Từ khóa cần tìm kiếm trên tất cả các cột,
+            // Tổng số trang của danh sách này
+            totalPage: 0,
+            /**
+             * Cấu hình các cột của bảng danh sách, có dạng
+             * [
+             *    {
+             *        name: 'A1', ứng với một key của data
+             *        type: 'B1', Loại dữ liệu của cột này
+             *        title: 'C1', Tiêu đề hiển thị lên bảng
+             *    },
+             *    {
+             *        name: 'A2', ứng với một key của data
+             *        type: 'B2', Loại dữ liệu của cột này
+             *        title: 'C2', Tiêu đề hiển thị lên bảng
+             *    }
+             * ]
+             */
+            /**
+             * Dữ liệu để hiển thị trong bảng, có dạng
+             * [
+             *    {
+             *        A1: "vl1",
+             *        A2: 'V2',
+             *        A3: 'vl3',
+             *        ...
+             *    },
+             *    {
+             *        A1: "vl4",
+             *        A2: 'V5',
+             *        A3: 'vl6',
+             *        ...
+             *    },
+             * ]
+             */
+            data: [],
+            filteredColumns: {} // tên các cột đã có filter, dạng {tên cột : true}
         };
     },
-    created(){
+    created() {
         let thisCpn = this;
-        this.$evtBus.$on('change-user-locale',(locale)=>{
+        this.$evtBus.$on("change-user-locale", locale => {
             thisCpn.$refs.dataTable.hotInstance.render();
         });
+        this.getData();
     },
     props: {
+        getDataUrl: {
+            type: String,
+            default: ""
+        },
         // Tiêu đề của trang: Danh sách văn bản, danh sách người dùng ...
         pageTitle: {
             type: String,
             default: "Danh sách"
         },
-        // Tổng số trang của danh sách này
-        totalPage: {
-            type: Number,
-            default: 0
-        },
         // Chiều cao của khung chứa danh sách
         containerHeight: {
             type: Number,
             default: 200
-        },
-        /**
-         * Cấu hình các cột của bảng danh sách, có dạng
-         * [
-         *    {
-         *        name: 'A1', ứng với một key của data
-         *        type: 'B1', Loại dữ liệu của cột này
-         *        title: 'C1', Tiêu đề hiển thị lên bảng
-         *    },
-         *    {
-         *        name: 'A2', ứng với một key của data
-         *        type: 'B2', Loại dữ liệu của cột này
-         *        title: 'C2', Tiêu đề hiển thị lên bảng
-         *    }
-         * ]
-         */
-        columns: {
-            type: Array,
-            default() {
-                return [];
-            }
-        },
-        /**
-         * Dữ liệu để hiển thị trong bảng, có dạng
-         * [
-         *    {
-         *        A1: "vl1",
-         *        A2: 'V2',
-         *        A3: 'vl3',
-         *        ...
-         *    },
-         *    {
-         *        A1: "vl4",
-         *        A2: 'V5',
-         *        A3: 'vl6',
-         *        ...
-         *    },
-         * ]
-         */
-        data: {
-            type: Array,
-            default() {
-                return [];
-            }
         },
         /**
          * * Các contextmenu cho các item trong list, có dạng:
@@ -477,7 +482,7 @@ export default {
                      * tham số thứ nhất: row ( index của row đang được chọn)
                      * tham số thứ hai: colName ( Tên của cột (key trong một row) )
                      */
-                    
+
                     thisCpn.$emit("context-selection-" + key, row, colName);
 
                     if (key == "remove") {
@@ -533,12 +538,19 @@ export default {
             }, []);
 
             return function(col) {
+                let colName = colNames[col];
+                let markFilter = '';
+                if(thisCpn.filteredColumns[colName]){
+                    markFilter = "applied-filter";
+                }
                 return `<span>
                             <span>
                                 ${thisCpn.$t(colTitles[col])}
                             </span>
                             <span class="float-right symper-filter-button">
-                                <i col-name="${colNames[col]}" onclick="tableDropdownClickHandle(this, event)" class="grey-hover mdi mdi-filter-variant symper-table-dropdown-button"></i>
+                                <i col-name="${
+                                    colName
+                                }" onclick="tableDropdownClickHandle(this, event)" class="grey-hover mdi mdi-filter-variant symper-table-dropdown-button ${markFilter}"></i>
                             </span>
                         </span>`;
                 //.replace(/\n|\r\n/g,'')
@@ -555,14 +567,165 @@ export default {
                 : mapType["temporary"];
         }
     },
-    watch:{
-        actionPanel(){
-            if(this.actionPanel == true){
+    watch: {
+        actionPanel() {
+            if (this.actionPanel == true) {
                 this.$emit("open-panel");
             }
         }
     },
     methods: {
+        /**
+         * Kiểm tra xem một cột trong table có đang áp dụng filter hay ko
+         */
+        checkColumnHasFilter(colName, filter = false) {
+            if(!filter){
+                filter = this.tableFilter.allColumn[colName];
+            }
+            
+            if (!filter) {
+                return false;
+            } else {
+                if (
+                    filter.sort == "" &&
+                    $.isEmptyObject(filter.valuesIn) &&
+                    $.isEmptyObject(filter.valuesNotIn) &&
+                    filter.conditionFilter.items[0].type == 'none'
+                ) {
+                    return false
+                }else{
+                    return true;
+                }
+            }
+        },
+        /**
+         * Thực hiện filter khi người dùng click vào nút apply của filter
+         */
+        applyFilter(filter, source = 'filter') {
+            let colName = this.tableFilter.currentColumn.name;
+            this.$set(
+                this.tableFilter.allColumn,
+                colName,
+                filter
+            );
+            let hasFilter = this.checkColumnHasFilter(
+                colName, filter
+            );
+
+            this.filteredColumns[colName] = hasFilter;
+            let icon = $(this.$el).find('.symper-table-dropdown-button[col-name='+colName+']');
+            if(hasFilter || source == 'clear-filter'){
+                this.getData();
+                if(source != 'clear-filter'){
+                    icon.addClass('applied-filter');
+                }
+            }else{
+                this.$delete(this.tableFilter.allColumn,colName);
+                icon.removeClass('applied-filter');
+            }
+        },
+        /**
+         * Lấy data từ server
+         * @param {Array} columns chứa thông tin của các cột cần trả về.
+         * @param {Boolean} cache có ưu tiên dữ liệu từ cache hay ko
+         *
+         */
+        getData(columns = false, cache = false) {
+            let url = this.getDataUrl;
+            if (url != "") {
+                let thisCpn = this;
+                thisCpn.loadingData = true;
+                let options = {
+                    filter: this.getFilterConfigs(),
+                    sort: this.getSortConfigs(),
+                    search: this.searchKey,
+                    page: this.page,
+                    pageSize: this.pageSize,
+                    columns: columns ? columns : []
+                };
+                apiObj
+                    .callApi("GET", url, options, {}, {})
+                    .then(data => {
+                        data = data.data;
+                        let total = data.total ? data.total : 0;
+                        let pageSize = thisCpn.pageSize;
+                        thisCpn.totalPage =
+                            total % pageSize > 0
+                                ? Math.floor(total / pageSize) + 1
+                                : Math.floor(total / pageSize);
+                        if (thisCpn.page > thisCpn.totalPage) {
+                            thisCpn.page = 1;
+                        }
+                        thisCpn.loadingData = false;
+                        thisCpn.tableColumns = thisCpn.getTableColumns(
+                            data.columns
+                        );
+                        thisCpn.data = data.listObject;
+                    })
+                    .catch(err => {
+                        console.warn(err);
+                        thisCpn.$snotify({
+                            type: "error",
+                            title: thisCpn.$t("table.error.cannot_get_data"),
+                            text: ""
+                        });
+                    });
+            }
+        },
+        /**
+         * Lấy ra cấu hình cho việc sort
+         */
+        getSortConfigs() {
+            let columnMap = this.tableColumns.reduce((map, item) => {
+                map[item.data] = item;
+                return map;
+            }, {});
+            let sort = [];
+            for (let colName in this.tableFilter.allColumn) {
+                let filter = this.tableFilter.allColumn[colName];
+                if (filter.sort != "") {
+                    sort.push({
+                        column: {
+                            name: columnMap[colName].data,
+                            title: columnMap[colName].columnTitle,
+                            type: columnMap[colName].type
+                        },
+                        type: filter.sort
+                    });
+                }
+            }
+            return sort;
+        },
+        /**
+         * Chuyển đổi cấu hình filter của component này sang dạng api hiểu được
+         */
+        getFilterConfigs() {
+            let configs = [];
+            for (let colName in this.tableFilter.allColumn) {
+                let filter = this.tableFilter.allColumn[colName];
+                let condition = filter.conditionFilter;
+                if (condition.items[0].type != "none") {
+                    let option = {
+                        column: colName, // tên cột cần filter
+                        operation: condition.conjunction,
+                        conditions: [
+                            {
+                                name: condition.items[0].type,
+                                args: [condition.items[0].value]
+                            }
+                        ]
+                    };
+                    if (condition.items[1].type != "none") {
+                        option.conditions.push({
+                            name: condition.items[1].type,
+                            args: [condition.items[1].value]
+                        });
+                    }
+                    configs.push(option);
+                }
+            }
+            return configs;
+        },
         handleStopDragColumn() {
             this.tableDisplayConfig.drag = false;
             this.resetHiddenColumns();
@@ -580,8 +743,8 @@ export default {
             }, []);
             this.$set(this.tableDisplayConfig, "hiddenColumns", hiddenColumns);
         },
-        getTableColumns() {
-            return this.columns.reduce((columns, item) => {
+        getTableColumns(columns) {
+            return columns.reduce((columns, item) => {
                 columns.push({
                     data: item.name,
                     type: item.type,
@@ -617,7 +780,10 @@ export default {
                 colFilter = getDefaultFilterConfig();
                 this.$set(this.tableFilter.allColumn, colName, colFilter);
             }
-            this.$set(this.tableFilter, 'currentColumn', colFilter);
+            this.$set(this.tableFilter, "currentColumn", {
+                name: colName,
+                colFilter: colFilter
+            });
             $("#symper-platform-app").append(filterDom[0]);
         },
         saveDataAction() {
@@ -640,6 +806,7 @@ export default {
         },
         refreshList() {
             // Phát sự kiện khi click vào refresh dữ liệu
+            this.getData();
             this.$emit("refresh-list", {});
         },
         filterList() {
@@ -699,5 +866,10 @@ export default {
 
 .column-drag-pos {
     cursor: move;
+}
+
+i.applied-filter{
+    color: #f58634;
+    background-color: #ffdfc8;
 }
 </style>

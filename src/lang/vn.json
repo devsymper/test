@@ -51,6 +51,9 @@
             "loosen": "Rộng",
             "medium": "Trung bình",
             "compact": "Gần nhau"
+        },
+        "error": {
+            "cannot_get_data": "Không thể lấy dữ liệu từ máy chủ"
         }
     },
     "validate": {
