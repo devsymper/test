@@ -12,10 +12,20 @@
         "users": "Users",
         "add": "Add",
         "edit": "Edit",
+        "update": "Update",
+        "delete": "Delete",
         "refresh": "Refresh",
         "export_excel": "Export Excel",
         "list": "List",
-        "search": "Search"
+        "search": "Search",
+        "list_config": "List config",
+        "save": "Save"
+    },
+    "validate": {
+        "required": "Not be empty",
+        "min_8": "Password required is greater than 8 characters",
+        "max_24": "Password required for less than 24 characters",
+        "email": "Invalid email"
     },
     "login": {
         "title": "Login system",
@@ -29,6 +39,98 @@
         "messages": {
             "none_account": "Create new account",
             "register": "Register"
+        }
+    },
+    "table": {
+        "wrap_text_mode": "Wrap text mode",
+        "display_density": "Row display density",
+        "column_config": "Column configs",
+        "freeze_column": "Freeze this column",
+        "unfreeze_column": "Don't freeze this column",
+        "hide_column": "Hide this column",
+        "show_column": "Show this column",
+        "wrap_tex_mode": {
+            "wrap": "Wrap",
+            "clip": "Clip"
+        },
+        "display_density_mode": {
+            "loosen": "Loosen",
+            "medium": "Medium",
+            "compact": "Compact"
+        }
+    },
+    "user": {
+        "title": "User list",
+        "general": {
+            "title": "Basic info",
+            "personalInfo": {
+                "title": "personal information",
+                "userName": "User name",
+                "email": "Email",
+                "firstName": "First name",
+                "lastName": "Last name",
+                "displayName": "Display name",
+                "phoneNumber": "Phone number"
+            },
+            "passwordSetting": {
+                "title": "Password setting",
+                "autoGeneratePassword": "Auto Generate Password",
+                "yourPassword": "Your password",
+                "requireChangePassFirstLogin": "Require this user to change their password when they first sign in",
+                "sendEmailAfterDone": "Send password in email upon completation",
+                "activeAccount": "Active account"
+            }
+        },
+        "permission": {
+            "title": "Permission",
+            "userType": {
+                "title": "User role",
+                "selected": "Select user role"
+            },
+            "packagePermission": {
+                "title": "Permision by package"
+            },
+            "orgChartPositionPermission": {
+                "title": "by position orgchart"
+            }
+        },
+        "other": {
+            "createUser": "Create account",
+            "updateUser": "Update account",
+            "nextStep": "Next",
+            "done": "Done"
+        },
+        "passwordSetting": {
+            "title": "Setting password",
+            "changePassword": {
+                "title": "Change password",
+                "newPass": "New password",
+                "reNewPass": "Confirm password"
+            },
+            "configChange": {
+                "title": "Config change",
+                "checkChange": "Activate recurring changes",
+                "lblSelectTime": "Select the time required to change periodically later: ",
+                "month": "month",
+                "year": "year"
+            }
+        },
+        "table": {
+            "id": "Id",
+            "firstName": "First name",
+            "displayName": "Display name",
+            "email": "email",
+            "phoneNumber": "Phone number",
+            "status": "Status",
+            "createAt": "Create at",
+            "updateAt": "Update at",
+            "contextMenu": {
+                "passwordSetting": "Password setting",
+                "edit": "Edit"
+            },
+            "error": {
+                "cannot_get_data": "Can not get data from server"
+            }
         }
     }
 }

@@ -47,10 +47,11 @@
 
             <v-list-item
                 v-for="item in sapp.items"
-                :key="item.title"
+                :key="item.title" 
                 link
                 @click="gotoPage(item.link, item.title)"
             >
+            
                 <v-list-item-icon>
                     <v-tooltip right>
                         <template v-slot:activator="{ on }">

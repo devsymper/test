@@ -12,11 +12,14 @@
         "users": "Tài khoản người dùng",
         "add": "Thêm",
         "edit": "Sửa",
+        "update": "Cập nhật",
+        "delete": "Xóa",
         "refresh": "Làm mới",
         "export_excel": "Xuất excel",
         "list": "Danh sách",
-        "search": "Tìm kiếm"
-
+        "search": "Tìm kiếm",
+        "list_config": "Cấu hình danh sách",
+        "save": "Lưu"
     },
     "login": {
         "title": "Đăng nhập hệ thống",
@@ -30,6 +33,104 @@
         "messages": {
             "none_account": "Tạo tài khoản mới",
             "register": "Đăng ký"
+        }
+    },
+    "table": {
+        "wrap_text_mode": "Chế độ xuống dòng",
+        "display_density": "Mật độ hiển thị dòng",
+        "column_config": "Cấu hình cột",
+        "freeze_column": "Cố định cột này",
+        "unfreeze_column": "Bỏ cố định cột này",
+        "hide_column": "Ẩn cột này",
+        "show_column": "Hiện cột này",
+        "wrap_tex_mode": {
+            "wrap": "Xuống dòng",
+            "clip": "Cắt bớt"
+        },
+        "display_density_mode": {
+            "loosen": "Rộng",
+            "medium": "Trung bình",
+            "compact": "Gần nhau"
+        },
+        "error": {
+            "cannot_get_data": "Không thể lấy dữ liệu từ máy chủ"
+        }
+    },
+    "validate": {
+        "required": "Không được bỏ trống",
+        "min_8": "Yêu cầu mật khẩu lớn hơn 8 kí tự",
+        "max_24": "Yêu cầu mật khẩu ít hơn 24 kí tự",
+        "email": "Email không hợp lệ"
+    },
+    "user": {
+        "title": "Danh sách User",
+        "general": {
+            "title": "Thông tin cơ bản",
+            "personalInfo": {
+                "title": "Thông tin cá nhân",
+                "userName": "Tên tài khoản",
+                "email": "Email",
+                "firstName": "Tên",
+                "lastName": "Họ",
+                "displayName": "Tên hiển thị",
+                "phoneNumber": "Số điện thoại"
+            },
+            "passwordSetting": {
+                "title": "Tùy chọn mật khẩu",
+                "autoGeneratePassword": "Tạo mật khẩu tự động",
+                "yourPassword": "Mật khẩu của bạn",
+                "requireChangePassFirstLogin": "Yêu cầu người dùng này thay đổi mật khẩu khi họ đăng nhập lần đầu",
+                "sendEmailAfterDone": "Gửi mật khẩu trong email sau khi hoàn thành",
+                "activeAccount": "Kích hoạt tài khoản"
+            }
+        },
+        "permission": {
+            "title": "Phân quyền",
+            "userType": {
+                "title": "Loại user",
+                "selected": "Chọn loại user"
+            },
+            "packagePermission": {
+                "title": "Phân quyền theo package"
+            },
+            "orgChartPositionPermission": {
+                "title": "Vị trí orgchart"
+            }
+        },
+        "other": {
+            "createUser": "Tạo tài khoản",
+            "updateUser": "Cập nhật tài khoản",
+            "nextStep": "Tiếp theo",
+            "done": "Hoàn thành"
+        },
+        "passwordSetting": {
+            "title": "Cài đặt mật khẩu",
+            "changePassword": {
+                "title": "Thay đổi mật khẩu",
+                "newPass": "Mật khẩu mới",
+                "reNewPass": "Nhập lại mật khẩu mới"
+            },
+            "configChange": {
+                "title": "Cấu hình thay đổi",
+                "checkChange": "Kích hoạt thay đổi định kì",
+                "lblSelectTime": "Chọn thời gian yêu cầu thay đổi định kì sau: ",
+                "month": "tháng",
+                "year": "năm"
+            }
+        },
+        "table": {
+            "id": "Id",
+            "firstName": "Tên",
+            "displayName": "Tên hiển thị",
+            "email": "Địa chỉ email",
+            "phoneNumber": "Số điện thoại",
+            "status": "Trạng thái",
+            "createAt": "Thời gian tạo",
+            "updateAt": "Thời gian cập nhật",
+            "contextMenu": {
+                "passwordSetting": "Tùy chọn mật khẩu",
+                "edit": "Sửa"
+            }
         }
     }
 }

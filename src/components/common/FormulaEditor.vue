@@ -17,7 +17,6 @@
                             :headers="headersForListSnippet"
                             :items="listBaSnippet"
                             :search="searchKey"
-                            sort-by="id"
                             class="elevation-1"
                         >   
                             <template v-slot:top>
@@ -57,40 +56,38 @@
             <v-card>
                 <v-card-title class="headline">{{!!!isEdit ? "Add new snippet" : "Edit snippet"}}</v-card-title>
                 <v-card-text>
-                    <v-container fluid>
-                        <v-row>
-                            <v-col cols="12" sm="5">
-                                <v-text-field
-                                    v-model="currentSnippet.name"
-                                    label="Tên"
-                                    hint="Chỉ chứa các chữ cái không dấu, chữ số và gạch dưới"
-                                    :rules="[
-                                        () => !!currentSnippet.name || 'Trường này bắt buộc',
-                                        () => !!currentSnippet.name && /^[a-zA-Z\d_]{3,20}$/.test(currentSnippet.name) || 'Tên không hợp lệ, vui lòng chỉ nhập chữ cái không dấu, chữ số và gạch dưới, dài từ 3 - 20 ký tự',
-                                    ]"
-                                    required
-                                ></v-text-field>
-                            </v-col>
-                            <v-col cols="12" sm="7">
-                                <v-text-field
-                                    v-model="currentSnippet.description"
-                                    label="Mô tả"
-                                ></v-text-field>
-                            </v-col>
-                            <v-col cols="12">
-                                <v-textarea 
-                                    v-model="currentSnippet.value"
-                                    :rules="[
-                                        () => !!currentSnippet.value || 'Trường này bắt buộc',
-                                    ]"
-                                    required>
-                                    <template v-slot:label>
-                                        <div>Nội dung</div>
-                                    </template>
-                                </v-textarea>
-                            </v-col>
-                        </v-row>
-                    </v-container>
+                    <v-row>
+                        <v-col cols="12" sm="5">
+                            <v-text-field
+                                v-model="currentSnippet.name"
+                                label="Tên"
+                                hint="Chỉ chứa các chữ cái không dấu, chữ số và gạch dưới"
+                                :rules="[
+                                    () => !!currentSnippet.name || 'Trường này bắt buộc',
+                                    () => !!currentSnippet.name && /^[a-zA-Z\d_]{3,20}$/.test(currentSnippet.name) || 'Tên không hợp lệ, vui lòng chỉ nhập chữ cái không dấu, chữ số và gạch dưới, dài từ 3 - 20 ký tự',
+                                ]"
+                                required
+                            ></v-text-field>
+                        </v-col>
+                        <v-col cols="12" sm="7">
+                            <v-text-field
+                                v-model="currentSnippet.description"
+                                label="Mô tả"
+                            ></v-text-field>
+                        </v-col>
+                        <v-col cols="12">
+                            <v-textarea 
+                                v-model="currentSnippet.value"
+                                :rules="[
+                                    () => !!currentSnippet.value || 'Trường này bắt buộc',
+                                ]"
+                                required>
+                                <template v-slot:label>
+                                    <div>Nội dung</div>
+                                </template>
+                            </v-textarea>
+                        </v-col>
+                    </v-row>
                 </v-card-text>
                 <v-card-actions>
                     <v-spacer></v-spacer>
@@ -108,11 +105,10 @@
 
 <script>
 import Api from "../../api/api.js";
-import ace from "ace-builds";``
+import ace from "ace-builds";
 export default {
     name: "FormulaEditor",
     components: {},
-
     data: function() {
         return {
             tab: 0,
@@ -221,6 +217,18 @@ export default {
         this.setupBaSnippet();
     },
     methods: {
+        /**
+         * Set công thức cho editor
+         */
+        setValue(formula) {
+            this.editor.session.setValue(formula);
+        },
+        /**
+         * Lấy giá  trị của công thức
+         */
+        getValue() {
+            return this.editor.session.getValue();
+        },
         showEditSnippetFrom(snippet) {
             this.currentSnippet = {...snippet, value: snippet.snippet}
             this.isEdit = true;
@@ -327,26 +335,6 @@ export default {
                 console.log(err);
             })
         },
-        setDefaultKeyword() {
-            let listwords = [];
-            for (const kw of this.keywordName) {
-                listwords.push({
-                    caption: kw,
-                    value: kw,
-                    meta: "Keyword",
-                    description: kw,
-                });
-            }
-            for (const fn of this.keywordName) {
-                listwords.push({
-                    caption: fn,
-                    value: fn,
-                    meta: "function",
-                    description: fn,
-                });
-            }
-            this.setupUpdateAutocomplete(listwords);
-        },
         initEditor() {
             this.langTools = require("ace-builds/src-min-noconflict/ext-language_tools");
             this.snippetManager = ace.require("ace/snippets").snippetManager;
@@ -356,7 +344,6 @@ export default {
             this.formulaEditor.session.setMode(new pgsqlMode());
             this.formulaEditor.setOptions(this.options);
             this.formulaEditor.getSession().setUseWrapMode(true);
-            // this.setDefaultKeyword();
             this.setupAutocomplete();
         },
         getListAutoComplete() {
@@ -370,39 +357,39 @@ export default {
                 );
                 for (const kw of this.keywordName) {
                     listDocsCompletes.push({
-                        caption: kw,
-                        value: kw,
+                        caption: kw.toUpperCase(),
+                        value: kw.toUpperCase(),
                         meta: "Keyword",
-                        description: kw,
+                        description: kw.toUpperCase(),
                     });
                 }
-                for (const fn of this.keywordName) {
+                for (const fn of this.functionName) {
                     listDocsCompletes.push({
-                        caption: fn,
-                        value: fn,
+                        caption: fn.toUpperCase(),
+                        value: fn.toUpperCase(),
                         meta: "function",
-                        description: fn,
+                        description: fn.toUpperCase(),
                     });
                 }
                 for (let index = 0; index < docs.length; index++) {
                     const doc = docs[index];
                     this.formulaEditor.session.$mode.$highlightRules.$keywordList[
                         doc.name
-                    ] = "document";
+                    ] = "support.tables";
                     listDocsCompletes.push({
                         caption: doc.name,
                         value: doc.name,
-                        meta: "document",
+                        meta: "tables",
                         description: doc.title,
                     });
                     for (let item of doc.fields) {
                         this.formulaEditor.session.$mode.$highlightRules.$keywordList[
                             item.name
-                        ] = "control";
+                        ] = "support.fields";
                         listDocsCompletes.push({
                             caption: doc.name + "." + item.name,
                             value: doc.name + "." + item.name,
-                            meta: "control",
+                            meta: "fields",
                             description: item.title,
                         });
                     }
@@ -415,7 +402,7 @@ export default {
                     const method = result.data.method[index];
                     this.formulaEditor.session.$mode.$highlightRules.$keywordList[
                         method.name
-                    ] = "method";
+                    ] = "support.function";
                     let paramStr = "";
                     try {
                         let listParams = JSON.parse(method.parameter);
@@ -447,9 +434,12 @@ export default {
             });
         },
         setupAutocomplete() {
+            console.log(this.formulaEditor);
+            
             if (this.formulaEditor !== null) {
                 let that = this;
                 this.formulaEditor.on("keyup", function(e) {
+                    console.log(e);
                     if (e.key == "." || e.key.match(/^[\d\w+]$/i)) {
                         that.editor.execCommand("autocomplete");
                     }
@@ -497,6 +487,10 @@ export default {
     padding-top: 0 !important;
     margin-top: 0 !important;
 }
+.v-input input {
+    max-height: 25px !important;
+    font-size: 12px;
+}
 .v-label{
     font-size: 14px !important;
 }
@@ -506,17 +500,34 @@ export default {
 }
 .v-data-table td,
 .v-data-table th {
+    height: unset !important;
     padding: 5px 10px !important;
 }
 .v-window.v-item-group.theme--light.v-tabs-items,
 .v-window-item.v-window-item--active {
     height: 100%;
 }
+.v-tabs-bar {
+    height: 25px !important;
+}
 .v-tab {
     font-size: 12px !important;
     text-transform: inherit !important;
     font-weight: normal !important;
     text-shadow: 0 0 0 !important;
+}
+.v-dialog > .v-card > .v-card__title {
+    padding-bottom: 5px;
+    font-size: 18px !important;
+    font-weight: normal;
+    text-shadow: 0 0 0;
+}
+.v-dialog > .v-card > .v-card__text {
+    padding-bottom: 0;
+}
+.v-dialog .col-12 {
+    padding-top: 0px;
+    padding-bottom: 0px;
 }
 .bkerp-widget {
     min-width: 700px;

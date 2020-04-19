@@ -41,7 +41,7 @@
                         </v-btn>
                     </div>
                 </div>
-                <v-layout justify-center>
+                <v-layout style="height:calc(100% - 50px)" justify-center>
                     <slot />
                 </v-layout>
             </v-container>

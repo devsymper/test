@@ -1,83 +1,115 @@
 <template>
     <div class="ml-2 w-100">
-        <v-row no-gutters class="pb-2" :style="{width:contentWidth}" ref="topBar">
-            <v-col>
-                <span class="title float-left">{{pageTitle}}</span>
-                <div class="float-right overline">
-                    <v-text-field
-                        class="d-inline-block mr-2 sym-small-size"
-                        single-line
-                        append-icon="mdi-magnify"
-                        outlined
+        <div :style="{width:contentWidth, display: 'inline-block'}">
+            <v-row no-gutters class="pb-2" ref="topBar">
+                <v-col>
+                    <span class="title float-left">{{pageTitle}}</span>
+                    <div class="float-right overline">
+                        <v-text-field
+                            v-model="searchKey"
+                            class="d-inline-block mr-2 sym-small-size"
+                            single-line
+                            append-icon="mdi-magnify"
+                            outlined
+                            dense
+                            label="Search"
+                            :placeholder="$t('common.search')"
+                        ></v-text-field>
+                        <v-btn
+                            depressed
+                            small
+                            :loading="loadingRefresh"
+                            :disabled="loadingRefresh"
+                            class="mr-2"
+                        >
+                            <v-icon left dark>mdi-plus</v-icon>
+                            {{$t('common.add')}}
+                        </v-btn>
+                        <v-btn
+                            depressed
+                            small
+                            :loading="loadingRefresh"
+                            :disabled="loadingRefresh"
+                            class="mr-2"
+                            @click="refreshList"
+                        >
+                            <v-icon left dark>mdi-refresh</v-icon>
+                            {{$t('common.refresh')}}
+                        </v-btn>
+                        <v-btn
+                            depressed
+                            small
+                            :loading="loadingExportExcel"
+                            class="mr-2"
+                            :disabled="loadingExportExcel"
+                        >
+                            <v-icon left dark>mdi-microsoft-excel</v-icon>
+                            {{$t('common.export_excel')}}
+                        </v-btn>
+                        <v-tooltip top>
+                            <template v-slot:activator="{ on }">
+                                <v-btn
+                                    @click="openTableDisplayConfigPanel"
+                                    depressed
+                                    small
+                                    v-on="on"
+                                >
+                                    <v-icon left dark class="ml-1 mr-0">mdi-table-cog</v-icon>
+                                </v-btn>
+                            </template>
+                            <span>{{ $t('common.list_config') }}</span>
+                        </v-tooltip>
+                    </div>
+                </v-col>
+            </v-row>
+            <v-row no-gutters>
+                <v-col
+                    :class="{
+                            'fs-13 symper-custom-table': true,
+                            'clip-text' : tableDisplayConfig.wrapTextMode == 1,
+                            'loosen-row':  tableDisplayConfig.densityMode == 0,
+                            'medium-row':  tableDisplayConfig.densityMode == 1,
+                            'compact-row':  tableDisplayConfig.densityMode == 2,
+                        }"
+                >
+                    <hot-table
+                        :height="tableHeight"
+                        :settings="tableSettings"
+                        :data="data"
+                        :columns="tableColumns"
+                        :contextMenu="itemContextMenu"
+                        :colHeaders="colHeaders"
+                        :hiddenColumns="{
+                            columns: tableDisplayConfig.hiddenColumns
+                        }"
+                    ></hot-table>
+                </v-col>
+            </v-row>
+            <v-row no-gutters ref="bottomBar" class="pt-5">
+                <v-col>
+                    <v-select
+                        class="d-inline-block mr-5"
+                        style="width:70px"
+                        v-model="pageSize"
+                        :items="pageSizeOptions"
+                        label="Số bản ghi mỗi trang"
                         dense
-                        label="Search"
-                        :placeholder="$t('common.search')"
-                    ></v-text-field>
-                    <v-btn
-                        depressed
-                        small
-                        :loading="loadingRefresh"
-                        :disabled="loadingRefresh"
-                        class="mr-2"
-                    >
-                        <v-icon left dark>mdi-plus</v-icon>{{$t('common.add')}}
-                    </v-btn>
-                    <v-btn
-                        depressed
-                        small
-                        :loading="loadingRefresh"
-                        :disabled="loadingRefresh"
-                        class="mr-2"
-                    >
-                        <v-icon left dark>mdi-refresh</v-icon>{{$t('common.refresh')}}
-                    </v-btn>
-                    <v-btn
-                        depressed
-                        small
-                        :loading="loadingExportExcel"
-                        :disabled="loadingExportExcel"
-                    >
-                        <v-icon left dark>mdi-microsoft-excel</v-icon>{{$t('common.export_excel')}}
-                    </v-btn>
-                </div>
-            </v-col>
-        </v-row>
-        <v-row :style="{width:contentWidth}" no-gutters>
-            <v-col class="fs-13">
-                <hot-table
-                    class="symper-custom-table"
-                    :height="tableHeight"
-                    :settings="tableSettings"
-                    :data="data"
-                    :columns="tableColumns"
-                    :contextMenu="itemContextMenu"
-                    :colHeaders="colHeaders"
-                ></hot-table>
-            </v-col>
-        </v-row>
-        <v-row :style="{width:contentWidth}" no-gutters ref="bottomBar" class="pt-5">
-            <v-col>
-                <v-select
-                    class="d-inline-block mr-5"
-                    style="width:70px"
-                    v-model="pageSize"
-                    :items="pageSizeOptions"
-                    label="Số bản ghi mỗi trang"
-                    dense
-                    flat
-                ></v-select>
-                <v-pagination
-                    style="width:200px"
-                    class="sym-small-size ml-10"
-                    v-model="page"
-                    :length="totalPage"
-                    next-icon="mdi-chevron-right"
-                    prev-icon="mdi-chevron-left"
-                    :page="page"
-                    :total-visible="6"
-                ></v-pagination>
-            </v-col>
-        </v-row>
+                        flat
+                        @change="changePageSize"
+                    ></v-select>
+                    <v-pagination
+                        style="width:200px"
+                        class="sym-small-size ml-10"
+                        v-model="page"
+                        :length="totalPage"
+                        next-icon="mdi-chevron-right"
+                        prev-icon="mdi-chevron-left"
+                        :page="page"
+                        :total-visible="6"
+                    ></v-pagination>
+                </v-col>
+            </v-row>
+        </div>
 
         <component
             :is="actionPanelWrapper"
@@ -100,17 +132,148 @@
                 </v-card>
             </slot>
         </component>
-        <table-filter ref="tableFilter"></table-filter>
+
+        <v-navigation-drawer
+            v-model="tableDisplayConfig.show"
+            absolute
+            class="pa-2 pl-4"
+            right
+            :style="{width: tableDisplayConfig.width+'px'}"
+        >
+            <div class="title">
+                <div>
+                    {{$t('common.list_config')}}
+                    <v-icon
+                        class="close-btn float-right"
+                        @click="tableDisplayConfig.show = false"
+                    >mdi-close</v-icon>
+                </div>
+                <div class="pb-2">
+                    <div class="subtitle-2">{{$t('table.wrap_text_mode')}}</div>
+                    <div>
+                        <v-btn-toggle
+                            dense
+                            v-model="tableDisplayConfig.wrapTextMode"
+                            mandatory
+                            tile
+                            color="amber darken-4"
+                            group
+                        >
+                            <v-btn small>{{$t('table.wrap_tex_mode.clip')}}</v-btn>
+                            <v-btn small>{{$t('table.wrap_tex_mode.wrap')}}</v-btn>
+                        </v-btn-toggle>
+                    </div>
+                </div>
+                <div class="pb-2">
+                    <div class="subtitle-2">{{$t('table.display_density')}}</div>
+                    <div>
+                        <v-btn-toggle
+                            dense
+                            v-model="tableDisplayConfig.densityMode"
+                            mandatory
+                            tile
+                            color="amber darken-4"
+                            group
+                        >
+                            <v-btn small>{{$t('table.display_density_mode.loosen')}}</v-btn>
+                            <v-btn small>{{$t('table.display_density_mode.medium')}}</v-btn>
+                            <v-btn small>{{$t('table.display_density_mode.compact')}}</v-btn>
+                        </v-btn-toggle>
+                    </div>
+                </div>
+                <div class="pb-2">
+                    <div class="subtitle-2">{{$t('table.column_config')}}</div>
+                    <draggable
+                        class="list-group"
+                        tag="div"
+                        v-model="tableColumns"
+                        v-bind="tableDisplayConfig.dragOptions"
+                        @start="tableDisplayConfig.drag = true"
+                        @end="handleStopDragColumn"
+                    >
+                        <transition-group
+                            type="transition"
+                            :name="!tableDisplayConfig.drag ? 'flip-list' : null"
+                        >
+                            <div
+                                class="fs-13 column-drag-pos"
+                                v-for="(column,idx) in tableColumns"
+                                :key="column.data"
+                            >
+                                <v-icon size="18" class="mr-2">{{getDataTypeIcon(column.type)}}</v-icon>
+                                <span class="fw-400">{{column.columnTitle}}</span>
+                                <v-tooltip top>
+                                    <template v-slot:activator="{ on }">
+                                        <v-btn
+                                            @click="configColumnDisplay('symperFixed',column,idx)"
+                                            class="float-right"
+                                            small
+                                            color="grey"
+                                            text
+                                            v-on="on"
+                                            icon
+                                        >
+                                            <v-icon
+                                                size="18"
+                                            >{{column.symperFixed ? 'mdi-roller-skate-off': 'mdi-roller-skate'}}</v-icon>
+                                        </v-btn>
+                                    </template>
+                                    <span>{{ column.symperFixed ? $t('table.unfreeze_column') : $t('table.freeze_column') }}</span>
+                                </v-tooltip>
+                                <v-tooltip top>
+                                    <template v-slot:activator="{ on }">
+                                        <v-btn
+                                            v-on="on"
+                                            class="float-right"
+                                            small
+                                            text
+                                            icon
+                                            color="grey"
+                                            @click="configColumnDisplay('symperHide',column, idx)"
+                                        >
+                                            <v-icon
+                                                size="18"
+                                            >{{column.symperHide ? 'mdi-eye-off-outline': 'mdi-eye-outline'}}</v-icon>
+                                        </v-btn>
+                                    </template>
+                                    <span
+                                        class="fw-400"
+                                    >{{ column.symperHide ? $t('table.show_column') : $t('table.hide_column') }}</span>
+                                </v-tooltip>
+                            </div>
+                        </transition-group>
+                    </draggable>
+                </div>
+            </div>
+            <template v-slot:append>
+                <div class="w-100 pt-2">
+                    <v-btn small color="primary" class="float-right">
+                        <v-icon class="mr-2">mdi-content-save-outline</v-icon>
+                        {{$t('common.save')}}
+                    </v-btn>
+                </div>
+            </template>
+        </v-navigation-drawer>
+        <table-filter
+            ref="tableFilter"
+            :columnFilter="tableFilter.currentColumn.colFilter"
+            @apply-filter-value="applyFilter"
+        ></table-filter>
     </div>
 </template>
 
 <script>
-import { HotTable } from "@handsontable/vue";
 require("@/assets/css/handsontable.min.css");
+import { HotTable } from "@handsontable/vue";
 import { util } from "./../../plugins/util.js";
 import FormTpl from "./FormTpl.vue";
 import { VDialog, VNavigationDrawer } from "vuetify/lib";
 import TableFilter from "./customTable/TableFilter.vue";
+import { appConfigs } from "./../../configs.js";
+import draggable from "vuedraggable";
+import { getDefaultFilterConfig } from "./../common/customTable/defaultFilterConfig.js";
+import Api from "./../../api/api.js";
+var apiObj = new Api("");
 
 window.tableDropdownClickHandle = function(el, event) {
     event.preventDefault();
@@ -128,69 +291,121 @@ export default {
     watch: {
         page(newVl) {
             // Phát sự kiện thay đổi trang đang xem
+            this.getData();
             this.$emit("change-page", newVl);
         }
     },
-
+    data() {
+        return {
+            // các cấu hình cho việc hiển thị và giá trị của panel cấu hình hiển thị của bảng
+            tableDisplayConfig: {
+                show: true, // có hiển thị panel cấu hình ko
+                width: 300, // Chiều rộng của panel cấu hình,
+                wrapTextMode: 0,
+                densityMode: 2,
+                hiddenColumns: [],
+                dragOptions: {
+                    animation: 200,
+                    group: "display-column-drag",
+                    disabled: false,
+                    ghostClass: "ghost-item"
+                },
+                drag: false
+            },
+            tableColumns: [],
+            actionPanel: false, // có hiển thị action pannel (create, detail, edit) hay không
+            pageSizeOptions: [20, 50, 100], // các lựa chọn cho số lượng bản ghi hiển thị cho mỗi trang
+            loadingExportExcel: false, // có đang chạy export hay ko
+            loadingRefresh: false, // có đang chạy refresh dữ liệu hay ko
+            loadingData: false, // có đang loading data cho danh sách hay ko
+            page: 1, // trang hiện tại
+            currentAction: {
+                // hành động hiện tại đang thực thi trong listitem (edit, remove, create ...)
+                key: ""
+            },
+            pageSize: 50,
+            tableSettings: {
+                // các setting cho handsontable
+                filters: true,
+                manualColumnMove: true,
+                manualColumnResize: true,
+                manualRowResize: true,
+                stretchH: "all",
+                licenseKey: "non-commercial-and-evaluation",
+                beforeDropdownMenuShow: function(dropdownMenu) {
+                    console.log(dropdownMenu, "beforeDropdownMenuShow");
+                }
+            },
+            tableFilter: {
+                // cấu hình filter của danh sách này
+                allColumn: {
+                    // cấu hình filter của tất cả các cột trong bảng này dạng {tên cột : cấu hình filter}
+                },
+                currentColumn: {
+                    colFilter: getDefaultFilterConfig(),
+                    name: ""
+                }
+            },
+            searchKey: "", //Từ khóa cần tìm kiếm trên tất cả các cột,
+            // Tổng số trang của danh sách này
+            totalPage: 0,
+            /**
+             * Cấu hình các cột của bảng danh sách, có dạng
+             * [
+             *    {
+             *        name: 'A1', ứng với một key của data
+             *        type: 'B1', Loại dữ liệu của cột này
+             *        title: 'C1', Tiêu đề hiển thị lên bảng
+             *    },
+             *    {
+             *        name: 'A2', ứng với một key của data
+             *        type: 'B2', Loại dữ liệu của cột này
+             *        title: 'C2', Tiêu đề hiển thị lên bảng
+             *    }
+             * ]
+             */
+            /**
+             * Dữ liệu để hiển thị trong bảng, có dạng
+             * [
+             *    {
+             *        A1: "vl1",
+             *        A2: 'V2',
+             *        A3: 'vl3',
+             *        ...
+             *    },
+             *    {
+             *        A1: "vl4",
+             *        A2: 'V5',
+             *        A3: 'vl6',
+             *        ...
+             *    },
+             * ]
+             */
+            data: [],
+            filteredColumns: {} // tên các cột đã có filter, dạng {tên cột : true}
+        };
+    },
+    created() {
+        let thisCpn = this;
+        this.$evtBus.$on("change-user-locale", locale => {
+            thisCpn.$refs.dataTable.hotInstance.render();
+        });
+        this.getData();
+    },
     props: {
+        getDataUrl: {
+            type: String,
+            default: ""
+        },
         // Tiêu đề của trang: Danh sách văn bản, danh sách người dùng ...
         pageTitle: {
             type: String,
             default: "Danh sách"
         },
-        // Tổng số trang của danh sách này
-        totalPage: {
-            type: Number,
-            default: 0
-        },
         // Chiều cao của khung chứa danh sách
         containerHeight: {
             type: Number,
             default: 200
-        },
-        /**
-         * Cấu hình các cột của bảng danh sách, có dạng
-         * [
-         *    {
-         *        name: 'A1', ứng với một key của data
-         *        type: 'B1', Loại dữ liệu của cột này
-         *        title: 'C1', Tiêu đề hiển thị lên bảng
-         *    },
-         *    {
-         *        name: 'A2', ứng với một key của data
-         *        type: 'B2', Loại dữ liệu của cột này
-         *        title: 'C2', Tiêu đề hiển thị lên bảng
-         *    }
-         * ]
-         */
-        columns: {
-            type: Array,
-            default() {
-                return [];
-            }
-        },
-        /**
-         * Dữ liệu để hiển thị trong bảng, có dạng
-         * [
-         *    {
-         *        A1: "vl1",
-         *        A2: 'V2',
-         *        A3: 'vl3',
-         *        ...
-         *    },
-         *    {
-         *        A1: "vl4",
-         *        A2: 'V5',
-         *        A3: 'vl6',
-         *        ...
-         *    },
-         * ]
-         */
-        data: {
-            type: Array,
-            default() {
-                return [];
-            }
         },
         /**
          * * Các contextmenu cho các item trong list, có dạng:
@@ -243,45 +458,15 @@ export default {
         }
     },
     mounted() {},
-    data() {
-        return {
-            actionPanel: false, // có hiển thị action pannel (create, detail, edit) hay không
-            pageSizeOptions: [20, 50, 100], // các lựa chọn cho số lượng bản ghi hiển thị cho mỗi trang
-            loadingExportExcel: false, // có đang chạy export hay ko
-            loadingRefresh: false, // có đang chạy refresh dữ liệu hay ko
-            loadingData: false, // có đang loading data cho danh sách hay ko
-            page: 1, // trang hiện tại
-            currentAction: {
-                // hành động hiện tại đang thực thi trong listitem (edit, remove, create ...)
-                key: ""
-            },
-            pageSize: 50,
-            tableSettings: { // các setting cho handsontable
-                filters: true,
-                manualColumnMove: true,
-                manualColumnResize: true,
-                manualRowResize: true,
-                stretchH: "all",
-                licenseKey: "non-commercial-and-evaluation",
-                beforeDropdownMenuShow: function(dropdownMenu) {
-                    console.log(dropdownMenu, "beforeDropdownMenuShow");
-                }
-            },
-            filterConfigs: {
-                filteringColumnName: '', // Tên cột đang được chọn để 
-                columnFilterConfigs: { // cấu hình filter cho tất cả các cột trong danh sách
-                    
-                }
-            }
-        };
-    },
     computed: {
         actionTitle() {},
         contentWidth() {
             if (this.actionPanel && this.actionPanelType == "elastic") {
                 return "calc(100% - " + this.actionPanelWidth + "px)";
+            } else if (this.tableDisplayConfig.show) {
+                return "calc(100% - " + this.tableDisplayConfig.width + "px)";
             } else {
-                return "";
+                return "100%";
             }
         },
         itemContextMenu() {
@@ -298,6 +483,7 @@ export default {
                      * tham số thứ nhất: row ( index của row đang được chọn)
                      * tham số thứ hai: colName ( Tên của cột (key trong một row) )
                      */
+
                     thisCpn.$emit("context-selection-" + key, row, colName);
 
                     if (key == "remove") {
@@ -342,31 +528,30 @@ export default {
             }
             return tbHeight - 50;
         },
-        tableColumns() {
-            return this.columns.reduce((columns, item) => {
-                columns.push({
-                    data: item.name,
-                    type: item.type,
-                    editor: false
-                });
-                return columns;
-            }, []);
-        },
         colHeaders() {
+            let thisCpn = this;
+
             let colNames = [];
-            let colTitles = this.columns.reduce((headers, item) => {
-                colNames.push(item.name);
-                headers.push(item.title);
+            let colTitles = this.tableColumns.reduce((headers, item) => {
+                colNames.push(item.data);
+                headers.push(item.columnTitle);
                 return headers;
             }, []);
 
             return function(col) {
+                let colName = colNames[col];
+                let markFilter = '';
+                if(thisCpn.filteredColumns[colName]){
+                    markFilter = "applied-filter";
+                }
                 return `<span>
                             <span>
-                                ${colTitles[col]}
+                                ${thisCpn.$t(colTitles[col])}
                             </span>
                             <span class="float-right symper-filter-button">
-                                <i col-name="${colNames[col]}" onclick="tableDropdownClickHandle(this, event)" class="grey-hover mdi mdi-filter-variant symper-table-dropdown-button"></i>
+                                <i col-name="${
+                                    colName
+                                }" onclick="tableDropdownClickHandle(this, event)" class="grey-hover mdi mdi-filter-variant symper-table-dropdown-button ${markFilter}"></i>
                             </span>
                         </span>`;
                 //.replace(/\n|\r\n/g,'')
@@ -383,12 +568,224 @@ export default {
                 : mapType["temporary"];
         }
     },
+    watch: {
+        actionPanel() {
+            if (this.actionPanel == true) {
+                this.$emit("open-panel");
+            }
+        }
+    },
     methods: {
+        /**
+         * Kiểm tra xem một cột trong table có đang áp dụng filter hay ko
+         */
+        checkColumnHasFilter(colName, filter = false) {
+            if(!filter){
+                filter = this.tableFilter.allColumn[colName];
+            }
+            
+            if (!filter) {
+                return false;
+            } else {
+                if (
+                    filter.sort == "" &&
+                    $.isEmptyObject(filter.valuesIn) &&
+                    $.isEmptyObject(filter.valuesNotIn) &&
+                    filter.conditionFilter.items[0].type == 'none'
+                ) {
+                    return false
+                }else{
+                    return true;
+                }
+            }
+        },
+        /**
+         * Thực hiện filter khi người dùng click vào nút apply của filter
+         */
+        applyFilter(filter, source = 'filter') {
+            let colName = this.tableFilter.currentColumn.name;
+            this.$set(
+                this.tableFilter.allColumn,
+                colName,
+                filter
+            );
+            let hasFilter = this.checkColumnHasFilter(
+                colName, filter
+            );
+
+            this.filteredColumns[colName] = hasFilter;
+            let icon = $(this.$el).find('.symper-table-dropdown-button[col-name='+colName+']');
+            if(hasFilter || source == 'clear-filter'){
+                this.getData();
+                if(source != 'clear-filter'){
+                    icon.addClass('applied-filter');
+                }
+            }else{
+                this.$delete(this.tableFilter.allColumn,colName);
+                icon.removeClass('applied-filter');
+            }
+        },
+        /**
+         * Lấy data từ server
+         * @param {Array} columns chứa thông tin của các cột cần trả về.
+         * @param {Boolean} cache có ưu tiên dữ liệu từ cache hay ko
+         *
+         */
+        getData(columns = false, cache = false) {
+            let url = this.getDataUrl;
+            if (url != "") {
+                let thisCpn = this;
+                thisCpn.loadingData = true;
+                let options = {
+                    filter: this.getFilterConfigs(),
+                    sort: this.getSortConfigs(),
+                    search: this.searchKey,
+                    page: this.page,
+                    pageSize: this.pageSize,
+                    columns: columns ? columns : []
+                };
+                apiObj
+                    .callApi("GET", url, options, {}, {})
+                    .then(data => {
+                        data = data.data;
+                        let total = data.total ? data.total : 0;
+                        let pageSize = thisCpn.pageSize;
+                        thisCpn.totalPage =
+                            total % pageSize > 0
+                                ? Math.floor(total / pageSize) + 1
+                                : Math.floor(total / pageSize);
+                        if (thisCpn.page > thisCpn.totalPage) {
+                            thisCpn.page = 1;
+                        }
+                        thisCpn.loadingData = false;
+                        thisCpn.tableColumns = thisCpn.getTableColumns(
+                            data.columns
+                        );
+                        thisCpn.data = data.listObject;
+                    })
+                    .catch(err => {
+                        console.warn(err);
+                        thisCpn.$snotify({
+                            type: "error",
+                            title: thisCpn.$t("table.error.cannot_get_data"),
+                            text: ""
+                        });
+                    });
+            }
+        },
+        /**
+         * Lấy ra cấu hình cho việc sort
+         */
+        getSortConfigs() {
+            let columnMap = this.tableColumns.reduce((map, item) => {
+                map[item.data] = item;
+                return map;
+            }, {});
+            let sort = [];
+            for (let colName in this.tableFilter.allColumn) {
+                let filter = this.tableFilter.allColumn[colName];
+                if (filter.sort != "") {
+                    sort.push({
+                        column: {
+                            name: columnMap[colName].data,
+                            title: columnMap[colName].columnTitle,
+                            type: columnMap[colName].type
+                        },
+                        type: filter.sort
+                    });
+                }
+            }
+            return sort;
+        },
+        /**
+         * Chuyển đổi cấu hình filter của component này sang dạng api hiểu được
+         */
+        getFilterConfigs() {
+            let configs = [];
+            for (let colName in this.tableFilter.allColumn) {
+                let filter = this.tableFilter.allColumn[colName];
+                let condition = filter.conditionFilter;
+                if (condition.items[0].type != "none") {
+                    let option = {
+                        column: colName, // tên cột cần filter
+                        operation: condition.conjunction,
+                        conditions: [
+                            {
+                                name: condition.items[0].type,
+                                args: [condition.items[0].value]
+                            }
+                        ]
+                    };
+                    if (condition.items[1].type != "none") {
+                        option.conditions.push({
+                            name: condition.items[1].type,
+                            args: [condition.items[1].value]
+                        });
+                    }
+                    configs.push(option);
+                }
+            }
+            return configs;
+        },
+        handleStopDragColumn() {
+            this.tableDisplayConfig.drag = false;
+            this.resetHiddenColumns();
+        },
+        resetHiddenColumns() {
+            let hiddenColumns = {};
+            this.tableColumns.forEach((col, idx) => {
+                if (col.symperHide) {
+                    hiddenColumns[idx] = true;
+                }
+            });
+            hiddenColumns = Object.keys(hiddenColumns).reduce((newArr, el) => {
+                newArr.push(Number(el));
+                return newArr;
+            }, []);
+            this.$set(this.tableDisplayConfig, "hiddenColumns", hiddenColumns);
+        },
+        getTableColumns(columns) {
+            return columns.reduce((columns, item) => {
+                columns.push({
+                    data: item.name,
+                    type: item.type,
+                    editor: false,
+                    symperFixed: false,
+                    symperHide: false,
+                    columnTitle: item.title
+                });
+                return columns;
+            }, []);
+        },
+        configColumnDisplay(type, column, idx) {
+            column[type] = !column[type];
+            let isValue = column[type];
+            if (type == "symperHide") {
+                this.resetHiddenColumns();
+            } else {
+            }
+        },
+        getDataTypeIcon(type) {
+            return appConfigs.dataTypeIcon[type];
+        },
+        openTableDisplayConfigPanel() {
+            this.tableDisplayConfig.show = !this.tableDisplayConfig.show;
+        },
         showTableDropdownMenu(x, y, colName) {
             let filterDom = $(this.$refs.tableFilter.$el);
-            filterDom.css('left',x+'px').css('top',(y+10)+'px');
+            filterDom.css("left", x + "px").css("top", y + 10 + "px");
             this.$refs.tableFilter.show();
-            $('#symper-platform-app').append(filterDom[0]);
+
+            let colFilter = this.tableFilter.allColumn[colName];
+            if (!colFilter) {
+                colFilter = getDefaultFilterConfig();
+                this.$set(this.tableFilter.allColumn, colName, colFilter);
+            }
+            this.$set(this.tableFilter, "currentColumn", {
+                name: colName,
+                colFilter: colFilter
+            });
+            $("#symper-platform-app").append(filterDom[0]);
         },
         saveDataAction() {
             this.closeactionPanel();
@@ -410,6 +807,7 @@ export default {
         },
         refreshList() {
             // Phát sự kiện khi click vào refresh dữ liệu
+            this.getData();
             this.$emit("refresh-list", {});
         },
         filterList() {
@@ -420,9 +818,10 @@ export default {
             // Phát sự kiện khi người dùng gõ vào ô tìm kiếm
             this.$emit("search-all", {});
         },
-        changePageSize() {
+        changePageSize(vl) {
+            this.getData();
             // Phát sự kiện khi người dùng thay đổi số bản ghi ở mỗi page
-            this.$emit("change-page-size");
+            this.$emit("change-page-size", vl);
         }
     },
 
@@ -431,7 +830,8 @@ export default {
         "form-tpl": FormTpl,
         VDialog,
         VNavigationDrawer,
-        TableFilter
+        TableFilter,
+        draggable
     }
 };
 </script>
@@ -443,5 +843,35 @@ export default {
 
 .handsontable .wtBorder.current {
     z-index: 5;
+}
+
+.symper-custom-table.clip-text .ht_master.handsontable .htCore td {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.symper-custom-table.loosen-row .ht_master.handsontable .htCore td {
+    height: 40px;
+    line-height: 40px;
+}
+
+.symper-custom-table.medium-row .ht_master.handsontable .htCore td {
+    height: 30px;
+    line-height: 30px;
+}
+
+.symper-custom-table.compact-row .ht_master.handsontable .htCore td {
+    height: 20px;
+    line-height: 20px;
+    font-size: 12px;
+}
+
+.column-drag-pos {
+    cursor: move;
+}
+
+i.applied-filter{
+    color: #f58634;
+    background-color: #ffdfc8;
 }
 </style>

@@ -1,68 +1,115 @@
 <template>
     <div
         :class="{'symper-table-filter-container elevation-8':true, 'd-none':!showTableFilter}"
-        @click="handleFocusFilter"
-        style="height:400px"
+        style="height:450px"
     >
         <div
+            ref="it1"
             @click="selectSortType('asc')"
-            :class="{'pa-1 dropdown-item grey-hover': true, 'symper-text-orange' : filterConfigs.sort== 'asc'}"
+            :class="{'pb-1 dropdown-item grey-hover': true, 'symper-text-orange' : filterConfigs.sort== 'asc'}"
         >
-            <i class="mdi body-1 mdi-sort-alphabetical-descending mr-2"></i>
+            <i class="pl-2 mdi body-1 mdi-sort-alphabetical-descending mr-2"></i>
             <span>Sắp xếp tăng dần</span>
             <i
                 class="mdi body-1 mdi-check float-right"
                 :class="{'d-none': filterConfigs.sort != 'asc'}"
             ></i>
         </div>
+
         <div
+            ref="it2"
             @click="selectSortType('desc')"
-            :class="{'pa-1 dropdown-item grey-hover': true, 'symper-text-orange' : filterConfigs.sort== 'desc'}"
+            :class="{' pb-1 dropdown-item grey-hover': true, 'symper-text-orange' : filterConfigs.sort== 'desc'}"
         >
-            <i class="mdi body-1 mdi-sort-alphabetical-ascending mr-2"></i>
+            <i class="pl-2 mdi body-1 mdi-sort-alphabetical-ascending mr-2"></i>
             <span>Sắp xếp giảm dần</span>
             <i
-                class="mdi body-1 mdi-check float-right"
+                class="pl-2 mdi body-1 mdi-check float-right"
                 :class="{'d-none': filterConfigs.sort != 'desc'}"
             ></i>
         </div>
-        <div class="pa-1 dropdown-item grey-hover">
-            <i class="mdi body-1 mdi-filter-remove-outline mr-2"></i>
+
+        <div ref="it3" class="pb-1 dropdown-item grey-hover" @click="clearFilter">
+            <i class="pl-2 mdi body-1 mdi-filter-remove-outline mr-2"></i>
             <span>Xóa bộ lọc</span>
         </div>
-        <div class="pa-1 dropdown-item grey-hover">
-            <span class="mb-2">Lọc bởi điều kiện</span>
-            <v-menu offset-y>
+
+        <div ref="it4" class="pb-1 dropdown-item">
+            <div class="font-weight-medium">Lọc bởi điều kiện</div>
+            <v-menu offset-y class="w-100" v-model="typeSelect1">
                 <template v-slot:activator="{ on }">
                     <v-btn
-                        dark
+                        class="w-100"
+                        depressed
+                        small
                         v-on="on"
                     >{{listConditionType[filterConfigs.conditionFilter.items[0].type]}}</v-btn>
                 </template>
-                <v-list>
-                    <v-list-item v-for="(text, key) in listConditionType" :key="key">
-                        <v-list-item-title>{{ text }}</v-list-item-title>
+                <v-list dense class="symper-list-condition-type">
+                    <v-list-item
+                        class="v-list-item--link"
+                        v-for="(text, key) in listConditionType"
+                        :key="key"
+                    >
+                        <v-list-item-title @click.stop="selectFilterCondition(0,key)">{{ text }}</v-list-item-title>
                     </v-list-item>
                 </v-list>
             </v-menu>
-            <v-text-field class="sym-small-size" single-line outlined dense></v-text-field>
-
-            <v-menu offset-y>
+            <v-text-field
+                class="sym-small-size mt-2"
+                v-show="checkDisplayCondition('input1')"
+                single-line
+                outlined
+                dense
+            ></v-text-field>
+            <v-radio-group
+                class="sym-small-size pt-0"
+                row
+                v-show="checkDisplayCondition('conjungtion')"
+                v-model="filterConfigs.conditionFilter.conjunction"
+            >
+                <v-radio value="and" class="mb-0">
+                    <template v-slot:label>
+                        <strong>AND</strong>
+                    </template>
+                </v-radio>
+                <v-radio value="or">
+                    <template v-slot:label>
+                        <strong>OR</strong>
+                    </template>
+                </v-radio>
+            </v-radio-group>
+            <v-menu offset-y class="w-100" v-model="typeSelect2">
                 <template v-slot:activator="{ on }">
                     <v-btn
-                        dark
+                        v-show="checkDisplayCondition('type2')"
+                        class="w-100"
+                        depressed
+                        small
                         v-on="on"
                     >{{listConditionType[filterConfigs.conditionFilter.items[1].type]}}</v-btn>
                 </template>
-                <v-list>
-                    <v-list-item v-for="(text, key) in listConditionType" :key="key">
-                        <v-list-item-title>{{ text }}</v-list-item-title>
+                <v-list dense class="symper-list-condition-type">
+                    <v-list-item
+                        class="v-list-item--link"
+                        v-for="(text, key) in listConditionType"
+                        :key="key"
+                    >
+                        <v-list-item-title @click.stop="selectFilterCondition(1,key)">{{ text }}</v-list-item-title>
                     </v-list-item>
                 </v-list>
             </v-menu>
-            <v-text-field class="sym-small-size" single-line outlined dense></v-text-field>
+            <v-text-field
+                v-show="checkDisplayCondition('input2')"
+                class="sym-small-size mt-2"
+                single-line
+                outlined
+                dense
+            ></v-text-field>
         </div>
-        <div class="pa-1 dropdown-item">
+
+        <div ref="it5" class="pt-2 font-weight-medium">Lọc bởi giá trị</div>
+        <div ref="it6" class="pb-1 dropdown-item">
             <v-text-field
                 class="sym-small-size"
                 single-line
@@ -71,14 +118,14 @@
                 dense
                 label="Search"
                 ref="filterSearchBox"
-                @blur="handleBlurFilter"
                 placeholder="Tìm kiếm"
             ></v-text-field>
         </div>
-        <div class="pa-1 dropdown-item" :style="{height:'calc(100% - 160px)'}">
+
+        <div class="pb-1 dropdown-item" :style="{height:listSelectItemHeight, overflow: 'auto'}">
             <!-- <perfect-scrollbar> -->
             <v-checkbox
-                x-small
+                small
                 class="sym-small-size pa-0"
                 v-model="filterConfigs.selectAll"
                 label="Chọn tất cả"
@@ -93,9 +140,16 @@
             ></v-checkbox>
             <!-- </perfect-scrollbar> -->
         </div>
-        <div class="pa-1 dropdown-item">
-            <v-btn depressed x-small class="float-right" @click="applyFilter()">Áp dụng</v-btn>
-            <v-btn depressed x-small text class="mr-2 float-right" @click="hide()">Thoát</v-btn>
+
+        <div class="mt-2 dropdown-item">
+            <v-btn
+                depressed
+                small
+                color="primary"
+                class="float-right"
+                @click="applyFilter()"
+            >Áp dụng</v-btn>
+            <v-btn depressed small text class="mr-2 float-right" @click="hide()">Thoát</v-btn>
         </div>
     </div>
 </template>
@@ -103,8 +157,33 @@
 <script>
 import PerfectScrollbar from "vue2-perfect-scrollbar";
 import { util } from "./../../../plugins/util.js";
+import { getDefaultFilterConfig } from "./defaultFilterConfig.js";
+
 export default {
+    created() {
+        let thisCpn = this;
+        this.$evtBus.$on("symper-app-wrapper-clicked", evt => {
+            if (
+                !$(evt.target).hasClass("symper-filter-button") &&
+                $(evt.target).parents(".symper-table-filter-container")
+                    .length == 0 &&
+                $(evt.target).parents(".symper-list-condition-type").length == 0
+            ) {
+                thisCpn.hide();
+            }
+        });
+    },
     methods: {
+        clearFilter(){
+            this.$emit("apply-filter-value", getDefaultFilterConfig(), 'clear-filter');
+            setTimeout(
+                thisCpn => {
+                    thisCpn.hide();
+                },
+                300,
+                this
+            );
+        },
         applyFilter() {
             this.$emit("apply-filter-value", this.filterConfigs);
             setTimeout(
@@ -129,6 +208,14 @@ export default {
                 this
             );
             this.focusing = true;
+            this.listSelectItemHeight = "0px";
+            setTimeout(
+                thisCpn => {
+                    thisCpn.recalcListSelectItemHeight();
+                },
+                100,
+                this
+            );
         },
         focusSearchBox() {
             $(this.$refs.filterSearchBox.$el)
@@ -139,37 +226,82 @@ export default {
             this.filterConfigs.sort = type;
             this.applyFilter();
         },
-        handleFocusFilter() {
-            this.focusSearchBox();
-            this.focusing = true;
-        },
-        handleBlurFilter(evt) {
-            this.focusing = false;
+        selectFilterCondition(index, type) {
+            this.columnFilter.conditionFilter.items[index].type = type;
+            this["typeSelect" + (index + 1)] = false;
+            this.listSelectItemHeight = "0px";
             setTimeout(
                 thisCpn => {
-                    if (!thisCpn.focusing) {
-                        thisCpn.hide();
-                    }
+                    thisCpn.recalcListSelectItemHeight();
                 },
-                300,
+                600,
                 this
             );
+        },
+        recalcListSelectItemHeight() {
+            let refs = this.$refs;
+            let h = util.getComponentSize(this).h;
+            for (let i = 1; i <= 6; i++) {
+                console.log(
+                    refs["it" + i],
+                    util.getComponentSize(refs["it" + i]).h
+                );
+                h -= util.getComponentSize(refs["it" + i]).h;
+            }
+            this.listSelectItemHeight = h - 50 + "px";
+        },
+        /**
+         * input1, conjungtion, type2, input2
+         */
+        checkDisplayCondition(type) {
+            let showInputType = {
+                equal: true,
+                notEqual: true,
+                begin: true,
+                end: true,
+                contain: true,
+                notContain: true
+            };
+            if (
+                this.columnFilter.conditionFilter &&
+                this.columnFilter.conditionFilter.items &&
+                this.columnFilter.conditionFilter.items[0]
+            ) {
+                let items = this.columnFilter.conditionFilter.items;
+                if (type == "input1") {
+                    return showInputType[items[0].type];
+                } else if (type == "input2") {
+                    return (
+                        items[0].type != "none" && showInputType[items[1].type]
+                    );
+                } else if (type == "type2") {
+                    console.log(items[0].type);
+                    return items[0].type != "none";
+                } else if (type == "conjungtion") {
+                    return items[0].type != "none";
+                }
+            } else {
+                return false;
+            }
         }
     },
     data() {
         return {
+            listSelectItemHeight: "100px",
+            typeSelect2: false,
+            typeSelect1: false,
             showTableFilter: false,
             focusing: true,
             listConditionType: {
                 none: "Không chọn",
                 empty: "Rỗng",
-                notEmpty: "Không rỗng",
+                not_empty: "Không rỗng",
                 equal: "Bằng",
-                notEqual: "Không bằng",
-                begin: "Bắt đầu với",
-                end: "Kết thúc với",
-                contain: "Chứa",
-                notContain: "Không chứa"
+                not_equal: "Không bằng",
+                begins_with: "Bắt đầu với",
+                ends_with: "Kết thúc với",
+                contains: "Chứa",
+                not_contain: "Không chứa"
             }
         };
     },
@@ -179,29 +311,7 @@ export default {
     props: {
         columnFilter: {
             default() {
-                return {
-                    sort: "",
-                    searchKey: "",
-                    selectAll: true,
-                    total: 0,
-                    valuesIn: {},
-                    valuesNotIn: {},
-                    clickedSelectAll: true,
-                    conditionFilter: {
-                        // Các giá trị của lọc theo điều kiện
-                        conjunction: "and",
-                        items: [
-                            {
-                                type: "none",
-                                value: ""
-                            },
-                            {
-                                type: "none",
-                                value: ""
-                            }
-                        ]
-                    }
-                };
+                return getDefaultFilterConfig();
             }
         },
         listOptions: {
