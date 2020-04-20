@@ -249,13 +249,13 @@
             </div>
             <template v-slot:append>
                 <div class="w-100 pt-2">
-                    <v-btn small color="primary" @click="saveTableDisplayConfig()" class="float-right">
+                    <v-btn :loading="savingConfigs" small color="primary" @click="saveTableDisplayConfig()" class="float-right">
                         <v-icon class="mr-2">mdi-content-save-outline</v-icon>
                         {{$t('common.save')}}
                     </v-btn>
                 </div>
             </template>
-        </v-navigation-drawer>
+        </v-navigation-drawer> 
         <table-filter
             ref="tableFilter"
             :columnFilter="tableFilter.currentColumn.colFilter"
@@ -299,6 +299,7 @@ export default {
     },
     data() {
         return {
+            savingConfigs: false, // có đang lưu cấu hình của showlist hay không
             // các cấu hình cho việc hiển thị và giá trị của panel cấu hình hiển thị của bảng
             tableDisplayConfig: {
                 show: true, // có hiển thị panel cấu hình ko
@@ -594,6 +595,8 @@ export default {
          * Lưu lại cấu hình hiển thị của table
          */
         saveTableDisplayConfig(){
+            this.savingConfigs = true;
+            let thisCpn = this;
             let configs = {
                 wrapTextMode: this.tableDisplayConfig.wrapTextMode,
                 densityMode: this.tableDisplayConfig.densityMode,
@@ -625,6 +628,7 @@ export default {
                     this.savedTableDisplayConfig = savedConfigs.columns;
                     if(this.tableColumns.length > 0){
                         this.tableColumns = this.getTableColumns(this.tableColumns, true);
+                        this.handleStopDragColumn();
                     }
                 }
             }
@@ -711,7 +715,7 @@ export default {
                             data.columns
                         );
                         thisCpn.data = data.listObject;
-                        
+                        thisCpn.handleStopDragColumn();
                     })
                     .catch(err => {
                         console.warn(err);
@@ -1011,10 +1015,14 @@ i.applied-filter {
     color: #f58634;
     background-color: #ffdfc8;
 }
-/* 
+
+.ht_clone_left.handsontable table.htCore{
+    border-right: 4px solid #f0f0f0;
+}
+
 .handsontable td, .handsontable th {
     color: #212529 !important;
     border-color: #bbb;
     border-right: 0;
-} */
+}
 </style>
