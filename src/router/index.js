@@ -70,8 +70,8 @@ const routes = [
     //     name: "permissionPackage",
     //     component: PermissionPackage,
     // },
-    //document
-
+    
+    //Snippet
     {
         path: "/snippets",
         name: "snippets",

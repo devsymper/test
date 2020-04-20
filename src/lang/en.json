@@ -133,5 +133,11 @@
                 "cannot_get_data": "Can not get data from server"
             }
         }
+    },
+    "snippet": {
+        "id": "ID",
+        "name": "Name",
+        "description": "Description",
+        "content": "Content"
     }
 }

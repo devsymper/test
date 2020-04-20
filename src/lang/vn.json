@@ -133,5 +133,11 @@
                 "edit": "Sửa"
             }
         }
+    },
+    "snippet": {
+        "id": "ID",
+        "name": "Tên",
+        "description": "Mô tả",
+        "content": "Nội dung"
     }
 }
