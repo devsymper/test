@@ -54,6 +54,21 @@
         },
         "error": {
             "cannot_get_data": "Không thể lấy dữ liệu từ máy chủ"
+        },
+        "filter": {
+            "none": "Không chọn",
+            "empty": "Rỗng",
+            "not_empty": "Không rỗng",
+            "equal": "Bằng",
+            "not_equal": "Không bằng",
+            "begins_with": "Bắt đầu với",
+            "ends_with": "Kết thúc với",
+            "contains": "Chứa",
+            "not_contain": "Không chứa",
+            "gt": "Lớn hơn ( > )",
+            "gte": "Lớn hơn hoặc bằng ( >= )",
+            "lt": "Nhỏ hơn ( < )",
+            "lte": "Nhỏ hơn hoặc bằng ( <= )"
         }
     },
     "validate": {

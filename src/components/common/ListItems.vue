@@ -82,6 +82,7 @@
                         :hiddenColumns="{
                             columns: tableDisplayConfig.hiddenColumns
                         }"
+                        :fixedColumnsLeft="fixedColumnsCount"
                     ></hot-table>
                 </v-col>
             </v-row>
@@ -201,7 +202,7 @@
                                 :key="column.data"
                             >
                                 <v-icon size="18" class="mr-2">{{getDataTypeIcon(column.type)}}</v-icon>
-                                <span class="fw-400">{{column.columnTitle}}</span>
+                                <span class="fw-400">{{$t(column.columnTitle)}}</span>
                                 <v-tooltip top>
                                     <template v-slot:activator="{ on }">
                                         <v-btn
@@ -247,7 +248,7 @@
             </div>
             <template v-slot:append>
                 <div class="w-100 pt-2">
-                    <v-btn small color="primary" class="float-right">
+                    <v-btn small color="primary" @click="saveTableDisplayConfig()" class="float-right">
                         <v-icon class="mr-2">mdi-content-save-outline</v-icon>
                         {{$t('common.save')}}
                     </v-btn>
@@ -312,6 +313,7 @@ export default {
                 },
                 drag: false
             },
+            fixedColumnsCount: 0, // Số lượng cột fix ở bên trái
             tableColumns: [],
             actionPanel: false, // có hiển thị action pannel (create, detail, edit) hay không
             pageSizeOptions: [20, 50, 100], // các lựa chọn cho số lượng bản ghi hiển thị cho mỗi trang
@@ -382,7 +384,8 @@ export default {
              * ]
              */
             data: [],
-            filteredColumns: {} // tên các cột đã có filter, dạng {tên cột : true}
+            filteredColumns: {}, // tên các cột đã có filter, dạng {tên cột : true},
+            savedTableDisplayConfig: [] // cấu hình hiển thị của table đã được lueu trong db
         };
     },
     created() {
@@ -391,8 +394,16 @@ export default {
             thisCpn.$refs.dataTable.hotInstance.render();
         });
         this.getData();
+        this.restoreTableDisplayConfig();
     },
     props: {
+        /**
+         * Prefix cho keypath trong file đa ngôn ngữ để hiển thị header của table
+         */
+        prefixKeyHeader: {
+            type: String,
+            default: ""
+        },
         getDataUrl: {
             type: String,
             default: ""
@@ -530,6 +541,8 @@ export default {
         },
         colHeaders() {
             let thisCpn = this;
+            let prefix = this.prefixKeyHeader;
+            prefix = (prefix[prefix.length - 1] == '.' || prefix == '') ? prefix : (prefix+'.');
 
             let colNames = [];
             let colTitles = this.tableColumns.reduce((headers, item) => {
@@ -540,18 +553,16 @@ export default {
 
             return function(col) {
                 let colName = colNames[col];
-                let markFilter = '';
-                if(thisCpn.filteredColumns[colName]){
+                let markFilter = "";
+                if (thisCpn.filteredColumns[colName]) {
                     markFilter = "applied-filter";
                 }
                 return `<span>
-                            <span>
-                                ${thisCpn.$t(colTitles[col])}
+                            <span class="font-weight-medium">
+                                ${thisCpn.$t(prefix+colTitles[col])}
                             </span>
                             <span class="float-right symper-filter-button">
-                                <i col-name="${
-                                    colName
-                                }" onclick="tableDropdownClickHandle(this, event)" class="grey-hover mdi mdi-filter-variant symper-table-dropdown-button ${markFilter}"></i>
+                                <i col-name="${colName}" onclick="tableDropdownClickHandle(this, event)" class="grey-hover mdi mdi-filter-variant symper-table-dropdown-button ${markFilter}"></i>
                             </span>
                         </span>`;
                 //.replace(/\n|\r\n/g,'')
@@ -577,13 +588,52 @@ export default {
     },
     methods: {
         /**
+         * Lưu lại cấu hình hiển thị của table
+         */
+        saveTableDisplayConfig(){
+            let configs = {
+                wrapTextMode: this.tableDisplayConfig.wrapTextMode,
+                densityMode: this.tableDisplayConfig.densityMode,
+                columns: []
+            }
+            for(let col of this.tableColumns){
+                configs.columns.push( {
+                    data: col.data,
+                    symperFixed: col.symperFixed,
+                    symperHide: col.symperHide,
+                });
+            }
+            let saveInfo = {
+                showListConfig: {}
+            };
+            saveInfo.showListConfig[this.$route.name] = configs;
+            util.auth.setSavedUserInfo(saveInfo);
+        },
+        /**
+         * Khôi phục lại cấu hình của hiển thị của table từ dữ liệu được lưu
+         */
+        restoreTableDisplayConfig(){
+            let savedInfo = util.auth.getSavedUserInfo();
+            if(savedInfo.showListConfig){
+                let savedConfigs = savedInfo.showListConfig[this.$route.name];
+                if(savedConfigs){
+                    this.tableDisplayConfig.wrapTextMode =  savedConfigs.wrapTextMode;
+                    this.tableDisplayConfig.densityMode =  savedConfigs.densityMode;
+                    this.savedTableDisplayConfig = savedConfigs.columns;
+                    if(this.tableColumns.length > 0){
+                        this.tableColumns = this.getTableColumns(this.tableColumns, true);
+                    }
+                }
+            }
+        },
+        /**
          * Kiểm tra xem một cột trong table có đang áp dụng filter hay ko
          */
         checkColumnHasFilter(colName, filter = false) {
-            if(!filter){
+            if (!filter) {
                 filter = this.tableFilter.allColumn[colName];
             }
-            
+
             if (!filter) {
                 return false;
             } else {
@@ -591,10 +641,10 @@ export default {
                     filter.sort == "" &&
                     $.isEmptyObject(filter.valuesIn) &&
                     $.isEmptyObject(filter.valuesNotIn) &&
-                    filter.conditionFilter.items[0].type == 'none'
+                    filter.conditionFilter.items[0].type == "none"
                 ) {
-                    return false
-                }else{
+                    return false;
+                } else {
                     return true;
                 }
             }
@@ -602,27 +652,23 @@ export default {
         /**
          * Thực hiện filter khi người dùng click vào nút apply của filter
          */
-        applyFilter(filter, source = 'filter') {
+        applyFilter(filter, source = "filter") {
             let colName = this.tableFilter.currentColumn.name;
-            this.$set(
-                this.tableFilter.allColumn,
-                colName,
-                filter
-            );
-            let hasFilter = this.checkColumnHasFilter(
-                colName, filter
-            );
+            this.$set(this.tableFilter.allColumn, colName, filter);
+            let hasFilter = this.checkColumnHasFilter(colName, filter);
 
             this.filteredColumns[colName] = hasFilter;
-            let icon = $(this.$el).find('.symper-table-dropdown-button[col-name='+colName+']');
-            if(hasFilter || source == 'clear-filter'){
+            let icon = $(this.$el).find(
+                ".symper-table-dropdown-button[col-name=" + colName + "]"
+            );
+            if (hasFilter || source == "clear-filter") {
                 this.getData();
-                if(source != 'clear-filter'){
-                    icon.addClass('applied-filter');
+                if (source != "clear-filter") {
+                    icon.addClass("applied-filter");
                 }
-            }else{
-                this.$delete(this.tableFilter.allColumn,colName);
-                icon.removeClass('applied-filter');
+            } else {
+                this.$delete(this.tableFilter.allColumn, colName);
+                icon.removeClass("applied-filter");
             }
         },
         /**
@@ -662,6 +708,7 @@ export default {
                             data.columns
                         );
                         thisCpn.data = data.listObject;
+                        
                     })
                     .catch(err => {
                         console.warn(err);
@@ -730,6 +777,7 @@ export default {
         handleStopDragColumn() {
             this.tableDisplayConfig.drag = false;
             this.resetHiddenColumns();
+            this.reOrderFixedCols();
         },
         resetHiddenColumns() {
             let hiddenColumns = {};
@@ -744,18 +792,50 @@ export default {
             }, []);
             this.$set(this.tableDisplayConfig, "hiddenColumns", hiddenColumns);
         },
-        getTableColumns(columns) {
-            return columns.reduce((columns, item) => {
-                columns.push({
-                    data: item.name,
-                    type: item.type,
-                    editor: false,
-                    symperFixed: false,
-                    symperHide: false,
-                    columnTitle: item.title
-                });
-                return columns;
-            }, []);
+        /**
+         * Lấy cấu hình các cột của table
+         * @param {array} columns mảng các cột ban đầu 
+         * @param {Boolean} forcedReOrder có phải bắt buộc sắp xếp lại thứ tự các cột hay ko 
+         */
+        getTableColumns(columns, forcedReOrder = false) {
+            
+            let savedOrderCols = this.savedTableDisplayConfig;
+            let colMap = {};
+
+            if(forcedReOrder){
+                for(let item of columns){
+                    colMap[item.data] = item;
+                }
+            }else{    
+                for(let item of columns){
+                    colMap[item.name] = {
+                        data: item.name,
+                        type: item.type,
+                        editor: false,
+                        symperFixed: false,
+                        symperHide: false,
+                        columnTitle: item.title
+                    };
+                }
+            }
+
+            if(savedOrderCols.length > 0){
+                let orderedCols = [];
+                let noneOrderedCols = [];
+                for(let col of savedOrderCols){
+                    if(colMap[col.data]){
+                        colMap[col.data].symperFixed = col.symperFixed;
+                        colMap[col.data].symperHide = col.symperHide;
+                        orderedCols.push(colMap[col.data]);
+                    }else{
+                        noneOrderedCols.push(colMap[col.data]);
+                    }
+                }
+                return orderedCols.concat(noneOrderedCols);
+            }else{
+                return Object.values(colMap);
+            }
+
         },
         configColumnDisplay(type, column, idx) {
             column[type] = !column[type];
@@ -763,7 +843,27 @@ export default {
             if (type == "symperHide") {
                 this.resetHiddenColumns();
             } else {
+                this.reOrderFixedCols();
             }
+        },
+        reOrderFixedCols() {
+            let fixedCols = [];
+            let noneFixedCols = [];
+            for (let col of this.tableColumns) {
+                if (col.symperFixed) {
+                    fixedCols.push(col);
+                } else {
+                    noneFixedCols.push(col);
+                }
+            }
+            if(fixedCols.length > 0){
+                this.tableColumns = fixedCols.concat(noneFixedCols);
+            }
+            this.fixedColumnsCount = fixedCols.length;
+
+            setTimeout((thisCpn) => {
+                thisCpn.savedTableDisplayConfig = thisCpn.tableColumns;
+            }, 1000, this);
         },
         getDataTypeIcon(type) {
             return appConfigs.dataTypeIcon[type];
@@ -780,6 +880,12 @@ export default {
             if (!colFilter) {
                 colFilter = getDefaultFilterConfig();
                 this.$set(this.tableFilter.allColumn, colName, colFilter);
+            }
+            for(let col of this.tableColumns){
+                if(col.data == colName){
+                    colFilter.dataType = col.type;
+                    break;
+                }
             }
             this.$set(this.tableFilter, "currentColumn", {
                 name: colName,
@@ -845,33 +951,67 @@ export default {
     z-index: 5;
 }
 
-.symper-custom-table.clip-text .ht_master.handsontable .htCore td {
-    text-overflow: ellipsis;
-    white-space: nowrap;
+.symper-custom-table.clip-text .ht_master.handsontable .htCore td,
+.symper-custom-table.clip-text .ht_clone_left.handsontable .htCore td {
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
 }
 
-.symper-custom-table.loosen-row .ht_master.handsontable .htCore td {
-    height: 40px;
-    line-height: 40px;
+.symper-custom-table.loosen-row .ht_master.handsontable .htCore td,
+.symper-custom-table.loosen-row .ht_clone_left.handsontable .htCore td {
+    height: 40px !important;
+    line-height: 40px !important;
 }
 
-.symper-custom-table.medium-row .ht_master.handsontable .htCore td {
-    height: 30px;
-    line-height: 30px;
+.symper-custom-table.medium-row .ht_master.handsontable .htCore td,
+.symper-custom-table.medium-row .ht_clone_left.handsontable .htCore td {
+    height: 30px !important;
+    line-height: 30px !important;
 }
 
-.symper-custom-table.compact-row .ht_master.handsontable .htCore td {
-    height: 20px;
-    line-height: 20px;
-    font-size: 12px;
+.symper-custom-table.compact-row .ht_master.handsontable .htCore td,
+.symper-custom-table.compact-row .ht_clone_left.handsontable .htCore td {
+    height: 20px !important;
+    line-height: 20px !important;
+    font-size: 12px !important;
+}
+
+.ghost {
+    opacity: 0.5;
+    background: #c8ebfb;
+}
+
+.flip-list-move {
+    transition: transform 0.5s;
+}
+.no-move {
+    transition: transform 0s;
 }
 
 .column-drag-pos {
     cursor: move;
+    border-bottom: 1px solid #d0d0d0;
+    background-color: white;
+    padding-left: 8px;
 }
 
-i.applied-filter{
+.column-drag-pos[draggable="true"] {
+    background-color: #ffe6d2;
+}
+
+.list-group {
+    border: 1px solid #d0d0d0;
+    border-radius: 3px;
+}
+
+i.applied-filter {
     color: #f58634;
     background-color: #ffdfc8;
 }
+/* 
+.handsontable td, .handsontable th {
+    color: #212529 !important;
+    border-color: #bbb;
+    border-right: 0;
+} */
 </style>

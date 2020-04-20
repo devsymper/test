@@ -43,12 +43,12 @@
                         depressed
                         small
                         v-on="on"
-                    >{{listConditionType[filterConfigs.conditionFilter.items[0].type]}}</v-btn>
+                    >{{listConditionType[colType][filterConfigs.conditionFilter.items[0].type]}}</v-btn>
                 </template>
                 <v-list dense class="symper-list-condition-type">
                     <v-list-item
                         class="v-list-item--link"
-                        v-for="(text, key) in listConditionType"
+                        v-for="(text, key) in listConditionType[colType]"
                         :key="key"
                     >
                         <v-list-item-title @click.stop="selectFilterCondition(0,key)">{{ text }}</v-list-item-title>
@@ -61,6 +61,7 @@
                 single-line
                 outlined
                 dense
+                v-model="filterConfigs.conditionFilter.items[0].value"
             ></v-text-field>
             <v-radio-group
                 class="sym-small-size pt-0"
@@ -87,12 +88,12 @@
                         depressed
                         small
                         v-on="on"
-                    >{{listConditionType[filterConfigs.conditionFilter.items[1].type]}}</v-btn>
+                    >{{listConditionType[colType][filterConfigs.conditionFilter.items[1].type]}}</v-btn>
                 </template>
                 <v-list dense class="symper-list-condition-type">
                     <v-list-item
                         class="v-list-item--link"
-                        v-for="(text, key) in listConditionType"
+                        v-for="(text, key) in listConditionType[colType]"
                         :key="key"
                     >
                         <v-list-item-title @click.stop="selectFilterCondition(1,key)">{{ text }}</v-list-item-title>
@@ -105,6 +106,7 @@
                 single-line
                 outlined
                 dense
+                v-model="filterConfigs.conditionFilter.items[1].value"
             ></v-text-field>
         </div>
 
@@ -158,6 +160,17 @@
 import PerfectScrollbar from "vue2-perfect-scrollbar";
 import { util } from "./../../../plugins/util.js";
 import { getDefaultFilterConfig } from "./defaultFilterConfig.js";
+import Vue from "vue";
+
+const textConditions = ["none","empty","not_empty","equal","not_equal","begins_with","ends_with","contains","not_contain","gt","gte","lt","lte"];
+const numberConditions = ["none","empty","not_empty","equal","not_equal"];
+
+let conditionMap = {
+    text: ["none","empty","not_empty","equal","not_equal","begins_with","ends_with","contains","not_contain"],
+    numeric: ["none","empty","not_empty","equal","not_equal","gt","gte","lt","lte"],
+    date:["none","empty","not_empty","equal","not_equal","begins_with","ends_with","contains","not_contain","gt","gte","lt","lte"],
+    datetime:["none","empty","not_empty","equal","not_equal","begins_with","ends_with","contains","not_contain","gt","gte","lt","lte"]
+};
 
 export default {
     created() {
@@ -174,8 +187,23 @@ export default {
         });
     },
     methods: {
-        clearFilter(){
-            this.$emit("apply-filter-value", getDefaultFilterConfig(), 'clear-filter');
+        // Lấy về các item condition tương ứng với từng loại kiểu dữ liệu
+        getConditionType() {
+            let rsl = {};
+            for(let type in conditionMap){
+                rsl[type] = {};
+                for(let item of conditionMap[type]){
+                    rsl[type][item] = this.$t("table.filter."+item);
+                }
+            }
+            return rsl;
+        },
+        clearFilter() {
+            this.$emit(
+                "apply-filter-value",
+                getDefaultFilterConfig(),
+                "clear-filter"
+            );
             setTimeout(
                 thisCpn => {
                     thisCpn.hide();
@@ -242,10 +270,6 @@ export default {
             let refs = this.$refs;
             let h = util.getComponentSize(this).h;
             for (let i = 1; i <= 6; i++) {
-                console.log(
-                    refs["it" + i],
-                    util.getComponentSize(refs["it" + i]).h
-                );
                 h -= util.getComponentSize(refs["it" + i]).h;
             }
             this.listSelectItemHeight = h - 50 + "px";
@@ -256,11 +280,15 @@ export default {
         checkDisplayCondition(type) {
             let showInputType = {
                 equal: true,
-                notEqual: true,
-                begin: true,
-                end: true,
-                contain: true,
-                notContain: true
+                not_equal: true,
+                begins_with: true,
+                ends_with: true,
+                contains: true,
+                not_contain: true,
+                gt: true,
+                lt: true,
+                gte: true,
+                lte: true
             };
             if (
                 this.columnFilter.conditionFilter &&
@@ -292,17 +320,7 @@ export default {
             typeSelect1: false,
             showTableFilter: false,
             focusing: true,
-            listConditionType: {
-                none: "Không chọn",
-                empty: "Rỗng",
-                not_empty: "Không rỗng",
-                equal: "Bằng",
-                not_equal: "Không bằng",
-                begins_with: "Bắt đầu với",
-                ends_with: "Kết thúc với",
-                contains: "Chứa",
-                not_contain: "Không chứa"
-            }
+            listConditionType: this.getConditionType()
         };
     },
     components: {
@@ -316,42 +334,17 @@ export default {
         },
         listOptions: {
             default() {
-                return [
-                    {
-                        value: "xx",
-                        checked: true
-                    },
-                    {
-                        value: "xxc",
-                        checked: true
-                    },
-                    {
-                        value: "xxd",
-                        checked: true
-                    },
-                    {
-                        value: "xxe",
-                        checked: true
-                    },
-                    {
-                        value: "xxeg",
-                        checked: true
-                    },
-                    {
-                        value: "xxee",
-                        checked: true
-                    },
-                    {
-                        value: "xxee",
-                        checked: true
-                    }
-                ];
+                return [];
             }
         }
     },
     computed: {
         filterConfigs() {
             return util.cloneDeep(this.columnFilter);
+        },
+        // kiểu dữ liệu của cột hiện tại đang được filter
+        colType(){
+            return this.columnFilter.dataType;
         }
     }
 };

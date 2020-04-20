@@ -2,6 +2,7 @@ import { util } from "./../../../plugins/util.js";
 
 const defaultConfig = {
     sort: "",
+    dataType: "text", // Loại dữ liệu của cột này
     searchKey: "",
     selectAll: true,
     total: 0,

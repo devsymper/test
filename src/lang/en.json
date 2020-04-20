@@ -57,6 +57,24 @@
             "loosen": "Loosen",
             "medium": "Medium",
             "compact": "Compact"
+        },
+        "error": {
+            "cannot_get_data": "Can not get data from server"
+        },
+        "filter": {
+            "none": "None",
+            "empty": "Empty",
+            "not_empty": "Not Empty",
+            "equal": "Equal",
+            "not_equal": "Not equal",
+            "begins_with": "Begins with",
+            "ends_with": "Ends with",
+            "contains": "Contains",
+            "not_contain": "Not contains",
+            "gt": "Greater than ( > )",
+            "gte": "Greater than or equal ( >= )",
+            "lt": "Less than ( < )",
+            "lte": "Less than or equal ( <= )"
         }
     },
     "user": {
@@ -127,9 +145,6 @@
             "contextMenu": {
                 "passwordSetting": "Password setting",
                 "edit": "Edit"
-            },
-            "error": {
-                "cannot_get_data": "Can not get data from server"
             }
         }
     }
