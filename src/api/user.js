@@ -52,5 +52,15 @@ export const userApi = {
     },
     setUserLocale(locale) {
         return api.post("user/locale", { locale: locale });
+    },
+    saveUserViewConfig(configType, viewName, configs) {
+        return coreApi.put('https://v2khadm.dev.symper.vn/user/view-configs', {
+            configType: configType,
+            viewName: viewName,
+            configs: configs,
+        });
+    },
+    getUserViewConfig(viewName, configType) {
+        return coreApi.get(`https://v2khadm.dev.symper.vn/user/view-configs/${viewName}/${configType}`);
     }
 };

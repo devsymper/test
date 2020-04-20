@@ -674,7 +674,7 @@ export default {
                 }
             ],
             totalPage: 6,
-            actionPanelType: "modal",
+            actionPanelType: "drag",
             itemInputs: {
                 phone: {
                     title: "Số điện thoại",
