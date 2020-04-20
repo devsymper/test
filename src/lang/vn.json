@@ -19,7 +19,8 @@
         "list": "Danh sách",
         "search": "Tìm kiếm",
         "list_config": "Cấu hình danh sách",
-        "save": "Lưu"
+        "save": "Lưu",
+        "snippets": "Snippets"
     },
     "login": {
         "title": "Đăng nhập hệ thống",

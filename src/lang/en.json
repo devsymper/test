@@ -19,7 +19,8 @@
         "list": "List",
         "search": "Search",
         "list_config": "List config",
-        "save": "Save"
+        "save": "Save",
+        "snippets": "Snippets"
     },
     "validate": {
         "required": "Not be empty",
