@@ -76,7 +76,7 @@ const routes = [
         path: "/snippets",
         name: "snippets",
         component: Snippet,
-        meta: { layout: "content-only" },
+        // meta: { layout: "content-only" },
     },
 
     // Luôn để 2 item này ở cuối cùng của array này để nó có thể redirect đến được trang 404 khi ko tìm thấy route

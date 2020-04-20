@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <v-container fluid>
         <v-dialog v-model="isShowAddModal" max-width="500">
             <v-card>
                 <v-card-title class="headline">{{
@@ -71,8 +71,12 @@
         </v-dialog>
         <ListItems
             :getDataUrl="baseUrl"
+            :headerPrefixKeypath="'snippet.header'"
+            :pageTitle="$t('snippet.title')"
+            :containerHeight="500"
+            :tableContextMenu="tableContextMenu"
         ></ListItems>
-    </div>
+    </v-container>
 </template>
 
 <script>
@@ -103,7 +107,28 @@ export default {
             },
             isShowAddModal: false,
             isEdit: false,
-            baseUrl: "https://v2hoangnd.dev.symper.vn/ba-snippet"
+            baseUrl: "https://v2hoangnd.dev.symper.vn/ba-snippet",
+            editCallback: null,
+            removeCallback: null,
+            addCallback: null,
+            tableContextMenu: [
+                {
+                    name: "edit",
+                    text: this.$t("snippet.contextMenu.edit"),
+                    callback: (snippet, callback) => {
+                        this.editCallback = callback;
+                        this.showEditSnippetFrom(snippet)
+                    }
+                },
+                {
+                    name: "remove",
+                    text: this.$t("snippet.contextMenu.remove"),
+                    callback: (snippet, callback) => {
+                        this.removeCallback = callback;
+                        this.deleteSnippet = snippet;
+                    }
+                }
+            ],
         };
     },
     methods: {
@@ -124,6 +149,7 @@ export default {
             let res = req.delete("/" + snippet.id);
             res.then((result) => {
                 // callback here
+                this.removeCallback(result)
             }).catch((err) => {
                 console.log(err);
             });
@@ -132,14 +158,9 @@ export default {
             let req = new Api("https://v2hoangnd.dev.symper.vn/");
             let res = req.post("", this.currentSnippet);
             res.then((result) => {
-                this.listBaSnippet.push({
-                    id: result.data,
-                    snippet: this.currentSnippet.value,
-                    name: this.currentSnippet.name,
-                    description: this.currentSnippet.description,
-                });
                 this.isShowAddModal = false;
                 // callback come here
+                this.addCallback({...this.currentSnippet, id: result.data, snippet: this.currentSnippet.value})
             }).catch((err) => {
                 console.log(err);
             });
@@ -149,6 +170,7 @@ export default {
             let res = req.put("", this.currentSnippet);
             res.then((result) => {
                 // callback come here
+                this.editCallback({...this.currentSnippet, snippet: this.currentSnippet.value})
                 this.isShowAddModal = false;
             }).catch((err) => {
                 console.log(err);

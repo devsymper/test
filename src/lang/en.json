@@ -155,9 +155,17 @@
         }
     },
     "snippet": {
-        "id": "ID",
-        "name": "Name",
-        "description": "Description",
-        "content": "Content"
+        "header": {
+            "id": "ID",
+            "name": "Name",
+            "description": "Description",
+            "snippet": "Content"
+        },
+        "title": "List BA Snippets",
+        "contextMenu": {
+            "edit": "Edit",
+            "add": "add",
+            "remove": "remove"
+        }
     }
 }

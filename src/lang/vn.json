@@ -155,9 +155,17 @@
         }
     },
     "snippet": {
-        "id": "ID",
-        "name": "Tên",
-        "description": "Mô tả",
-        "content": "Nội dung"
+        "header": {
+            "id": "ID",
+            "name": "Tên",
+            "description": "Mô tả",
+            "snippet": "Nội dung"
+        },
+        "title": "Danh sách BA Snippets",
+        "contextMenu": {
+            "edit": "Sửa",
+            "add": "Thêm mới",
+            "remove": "Xóa"
+        }
     }
 }
