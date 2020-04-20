@@ -74,7 +74,12 @@
             "gt": "Greater than ( > )",
             "gte": "Greater than or equal ( >= )",
             "lt": "Less than ( < )",
-            "lte": "Less than or equal ( <= )"
+            "lte": "Less than or equal ( <= )",
+            "sort_asc": "Sort ASC",
+            "sort_desc": "Sort DESC",
+            "clear_filter": "Clear filter",
+            "filter_by_value": "Filter by value",
+            "filter_by_condition": "Filter by condition"
         }
     },
     "user": {

@@ -1,5 +1,5 @@
 <template>
-    <div class="ml-2 w-100">
+    <div class="ml-2 w-100 pr-3">
         <div :style="{width:contentWidth, display: 'inline-block'}">
             <v-row no-gutters class="pb-2" ref="topBar">
                 <v-col>
@@ -82,6 +82,7 @@
                         :hiddenColumns="{
                             columns: tableDisplayConfig.hiddenColumns
                         }"
+                        ref="dataTable"
                         :fixedColumnsLeft="fixedColumnsCount"
                     ></hot-table>
                 </v-col>
@@ -391,7 +392,9 @@ export default {
     created() {
         let thisCpn = this;
         this.$evtBus.$on("change-user-locale", locale => {
-            thisCpn.$refs.dataTable.hotInstance.render();
+            if(thisCpn.$refs.dataTable){
+                thisCpn.$refs.dataTable.hotInstance.render();
+            }
         });
         this.getData();
         this.restoreTableDisplayConfig();
@@ -400,7 +403,7 @@ export default {
         /**
          * Prefix cho keypath trong file đa ngôn ngữ để hiển thị header của table
          */
-        prefixKeyHeader: {
+        headerPrefixKeypath: {
             type: String,
             default: ""
         },
@@ -541,7 +544,7 @@ export default {
         },
         colHeaders() {
             let thisCpn = this;
-            let prefix = this.prefixKeyHeader;
+            let prefix = this.headerPrefixKeypath;
             prefix = (prefix[prefix.length - 1] == '.' || prefix == '') ? prefix : (prefix+'.');
 
             let colNames = [];

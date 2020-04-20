@@ -9,7 +9,7 @@
             :class="{'pb-1 dropdown-item grey-hover': true, 'symper-text-orange' : filterConfigs.sort== 'asc'}"
         >
             <i class="pl-2 mdi body-1 mdi-sort-alphabetical-descending mr-2"></i>
-            <span>Sắp xếp tăng dần</span>
+            <span>{{$t('table.filter.sort_asc')}}</span>
             <i
                 class="mdi body-1 mdi-check float-right"
                 :class="{'d-none': filterConfigs.sort != 'asc'}"
@@ -22,7 +22,7 @@
             :class="{' pb-1 dropdown-item grey-hover': true, 'symper-text-orange' : filterConfigs.sort== 'desc'}"
         >
             <i class="pl-2 mdi body-1 mdi-sort-alphabetical-ascending mr-2"></i>
-            <span>Sắp xếp giảm dần</span>
+            <span>{{$t('table.filter.sort_desc')}}</span>
             <i
                 class="pl-2 mdi body-1 mdi-check float-right"
                 :class="{'d-none': filterConfigs.sort != 'desc'}"
@@ -31,11 +31,11 @@
 
         <div ref="it3" class="pb-1 dropdown-item grey-hover" @click="clearFilter">
             <i class="pl-2 mdi body-1 mdi-filter-remove-outline mr-2"></i>
-            <span>Xóa bộ lọc</span>
+            <span>{{$t('table.filter.clear_filter')}}</span>
         </div>
 
         <div ref="it4" class="pb-1 dropdown-item">
-            <div class="font-weight-medium">Lọc bởi điều kiện</div>
+            <div class="font-weight-medium">{{$t('table.filter.filter_by_condition')}}</div>
             <v-menu offset-y class="w-100" v-model="typeSelect1">
                 <template v-slot:activator="{ on }">
                     <v-btn
@@ -110,7 +110,7 @@
             ></v-text-field>
         </div>
 
-        <div ref="it5" class="pt-2 font-weight-medium">Lọc bởi giá trị</div>
+        <div ref="it5" class="pt-2 font-weight-medium">{{$t('table.filter.filter_by_value')}}</div>
         <div ref="it6" class="pb-1 dropdown-item">
             <v-text-field
                 class="sym-small-size"
@@ -183,6 +183,12 @@ export default {
                 $(evt.target).parents(".symper-list-condition-type").length == 0
             ) {
                 thisCpn.hide();
+            }
+        });
+        this.$evtBus.$on("change-user-locale", evt => {
+            let conds = thisCpn.getConditionType();
+            for(let name in conds){
+                thisCpn.$set(thisCpn.listConditionType,name,conds[name]);
             }
         });
     },

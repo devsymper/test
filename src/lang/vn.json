@@ -68,7 +68,12 @@
             "gt": "Lớn hơn ( > )",
             "gte": "Lớn hơn hoặc bằng ( >= )",
             "lt": "Nhỏ hơn ( < )",
-            "lte": "Nhỏ hơn hoặc bằng ( <= )"
+            "lte": "Nhỏ hơn hoặc bằng ( <= )",
+            "sort_asc": "Sắp xếp tăng dần",
+            "sort_desc": "Sắp xếp giảm dần",
+            "clear_filter": "Xóa bộ lọc",
+            "filter_by_value": "Lọc bởi giá trị",
+            "filter_by_condition": "Lọc bởi điều kiện"
         }
     },
     "validate": {
