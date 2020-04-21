@@ -21,6 +21,7 @@
                             :loading="loadingRefresh"
                             :disabled="loadingRefresh"
                             class="mr-2"
+                            @click="addItem"
                         >
                             <v-icon left dark>mdi-plus</v-icon>
                             {{$t('common.add')}}
@@ -203,7 +204,8 @@
                                 :key="column.data"
                             >
                                 <v-icon size="18" class="mr-2">{{getDataTypeIcon(column.type)}}</v-icon>
-                                <span class="fw-400">{{$t(column.columnTitle)}}</span>
+                                <!-- Datnt thêm headerPrefixKeypath -->
+                                <span class="fw-400">{{$t(headerPrefixKeypath + "." + column.columnTitle)}}</span>
                                 <v-tooltip top>
                                     <template v-slot:activator="{ on }">
                                         <v-btn
@@ -497,12 +499,23 @@ export default {
                      * tham số thứ nhất: row ( index của row đang được chọn)
                      * tham số thứ hai: colName ( Tên của cột (key trong một row) )
                      */
-
                     thisCpn.$emit("context-selection-" + key, row, colName);
-
-                    if (key == "remove") {
-                    } else if (key == "edit" || key == "view") {
-                        thisCpn.actionPanel = true;
+                    // Datnt
+                    // Callback for context menu item
+                    let menuItem = thisCpn.tableContextMenu.filter(menu => {
+                        return menu.name == key;
+                    });
+                    if (menuItem.length && menuItem[0].hasOwnProperty("callback")) {
+                        menuItem[0].callback(rowData, (res) => {
+                            if (res.status === 200) {
+                                thisCpn.getData();
+                            }
+                        })
+                    } else {
+                        if (key == "remove") {
+                        } else if (key == "edit" || key == "view") {
+                            thisCpn.actionPanel = true;
+                        }
                     }
                 },
                 items: {}

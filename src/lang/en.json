@@ -20,7 +20,8 @@
         "search": "Search",
         "list_config": "List config",
         "save": "Save",
-        "snippets": "Snippets"
+        "snippets": "Snippets",
+        "permissions": "Permissions"
     },
     "validate": {
         "required": "Not be empty",
@@ -162,6 +163,19 @@
             "snippet": "Content"
         },
         "title": "List BA Snippets",
+        "contextMenu": {
+            "edit": "Edit",
+            "add": "Add",
+            "remove": "Remove"
+        }
+    },
+    "permissions": {
+        "header": {
+            "id": "ID",
+            "pack_name": "Name",
+            "date_created": "Date"
+        },
+        "title": "List permissions packages",
         "contextMenu": {
             "edit": "Edit",
             "add": "add",
