@@ -177,8 +177,8 @@
         },
         "title": "Danh sách các nhóm quyền hạn",
         "contextMenu": {
-            "edit": "Thêm",
-            "add": "Sửa",
+            "edit": "Sửa",
+            "grantPermission": "Phân quyền",
             "remove": "Xóa"
         }
     }

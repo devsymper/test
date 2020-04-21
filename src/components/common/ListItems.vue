@@ -21,7 +21,7 @@
                             :loading="loadingRefresh"
                             :disabled="loadingRefresh"
                             class="mr-2"
-                            @click="addItem"
+                            @click="actionPanel = true"
                         >
                             <v-icon left dark>mdi-plus</v-icon>
                             {{$t('common.add')}}
@@ -124,7 +124,7 @@
             right
             :temporary="actionPanelType == 'temporary'"
         >
-            <slot name="right-panel-content">
+            <slot name="right-panel-content" :itemData="currentItemData">
                 <v-card flat>
                     <v-card-title class="pa-0 pl-2" primary-title>{{itemActionTitle}}</v-card-title>
                     <v-card-text>
@@ -402,6 +402,12 @@ export default {
         this.restoreTableDisplayConfig();
     },
     props: {
+        currentItemData:{
+            type: Object,
+            default(){
+                return {}
+            }
+        },
         /**
          * Prefix cho keypath trong file đa ngôn ngữ để hiển thị header của table
          */

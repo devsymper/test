@@ -178,8 +178,8 @@
         "title": "List permissions packages",
         "contextMenu": {
             "edit": "Edit",
-            "add": "add",
-            "remove": "remove"
+            "grantPermission": "Grant Permission",
+            "remove": "Remove"
         }
     }
 }
