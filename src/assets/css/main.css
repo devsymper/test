@@ -27,7 +27,11 @@
 }
 
 .p-0 {
-    padding: 0;
+    padding: 0 !important;
+}
+
+.m-0 {
+    margin: 0px !important;
 }
 
 .p-2 {
@@ -263,10 +267,18 @@
     min-height: 30px !important;
 }
 
+.list-control-autocomplete .tf-search-control .v-input__slot {
+    min-height: 30px !important;
+}
+
 .tox-notifications-container {
     display: none !important;
 }
 
 .tox-tinymce-inline {
     display: block !important;
+}
+
+.v-dialog__content {
+    z-index: 9999 !important;
 }

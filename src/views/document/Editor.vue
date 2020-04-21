@@ -5,14 +5,16 @@
         </div>
         <div class="sym-document-body">
             <div class="sym-document-action">
-                <editor-action/>
+                <editor-action @document-action-save-document="saveDocument"/>
             </div>
             <div class="sym-document-editor">
                 
                 <editor id="editor" api-key="APIKEY"
                 ref="editor"
+                @onKeyUp="detectKeyEvent"
+                @onClick="detectClickEvent"
                 :init="{
-                    forced_root_block:false,
+                    forced_root_block:'p',
                     menubar: false,
                     plugins: [
                     'advlist autolink lists link image charmap table print preview anchor',
@@ -25,19 +27,17 @@
                     alignleft aligncenter alignright alignjustify | \
                     bullist numlist outdent indent | removeformat emoticons | table |  preview',
                     fontsize_formats: '8pt 10pt 11pt 12pt 13pt 14pt 15pt 16pt 17pt 18pt 19pt 20pt 21pt 22pt 23pt 24pt 25pt 26pt 27pt 28pt 29pt 30pt 32pt 34pt 36pt',
-                     font_formats: 'Roboto = Roboto,sans-serif; Andale Mono=andale mono,times;'+ 'Arial=arial,helvetica,sans-serif;'+ 'Arial Black=arial black,avant garde;'+ 'Book Antiqua=book antiqua,palatino;'+ 'Comic Sans MS=comic sans ms,sans-serif;'+ 'Courier New=courier new,courier;'+ 'Georgia=georgia,palatino;'+ 'Helvetica=helvetica;'+ 'Impact=impact,chicago;'+ 'Symbol=symbol;'+ 'Tahoma=tahoma,arial,helvetica,sans-serif;'+ 'Terminal=terminal,monaco;'+ 'Times New Roman=times new roman,times;'+ 'Trebuchet MS=trebuchet ms,geneva;'+ 'Verdana=verdana,geneva;'+ 'Webdings=webdings;'+ 'Wingdings=wingdings,zapf dingbats',
+                    font_formats: 'Roboto = Roboto,sans-serif; Andale Mono=andale mono,times;'+ 'Arial=arial,helvetica,sans-serif;'+ 'Arial Black=arial black,avant garde;'+ 'Book Antiqua=book antiqua,palatino;'+ 'Comic Sans MS=comic sans ms,sans-serif;'+ 'Courier New=courier new,courier;'+ 'Georgia=georgia,palatino;'+ 'Helvetica=helvetica;'+ 'Impact=impact,chicago;'+ 'Symbol=symbol;'+ 'Tahoma=tahoma,arial,helvetica,sans-serif;'+ 'Terminal=terminal,monaco;'+ 'Times New Roman=times new roman,times;'+ 'Trebuchet MS=trebuchet ms,geneva;'+ 'Verdana=verdana,geneva;'+ 'Webdings=webdings;'+ 'Wingdings=wingdings,zapf dingbats',
+                    valid_elements: '*[*]',
                     setup: function(ed){
-                         ed.ui.registry.addMenuItem('settingtable', {
+                        ed.ui.registry.addMenuItem('settingtable', {
                             text: 'Setting table',
-                            disabled : toggleState,
+                            disabled : false,
                             onAction: function(e) {
                                 showControlTable(e);
-                            },
-                            onSetup: (api) => {
-                                toggleState = !toggleState;
-                                return () => {};
                             }
                         });
+                        
                     }
                 }"
                 ></editor>
@@ -46,6 +46,12 @@
         <div class="sym-document__side-bar-right">
             <sidebar-right />
         </div>
+        
+        <s-table-setting  ref="tableSetting" @add-columns-table="addColumnTable"/>
+        <auto-complete-control ref="autocompleteControl" @add-control="insertControl"/>
+        <save-doc-panel ref="saveDocPanel"
+        
+        />
     </v-flex>
 </template>
 <script>
@@ -55,109 +61,177 @@ import Editor from '@tinymce/tinymce-vue'
 import EditerAction from './items/Action.vue'
 import SideBarLeft from './sideleft/SideBarLeft.vue'
 import SideBarRight from './sideright/SideBarRight.vue'
+import TableSetting from './items/TableSetting.vue'
+import AutoCompleteControl from './items/AutoCompleteControl.vue'
 import controlCss from  "./../../assets/css/document/control/control.css";
+import SaveDocPanel from "./../../views/document/items/SaveDocPanel.vue";
 import { GetControlProps } from "./../../components/document/controlPropsFactory.js";
+let isShowAutocompleteControl = false;
 export default { 
     computed: {
-        
+      editorStore(){ 
+          return this.$store.state.document.editor;
+      }
     },
     components: {
         'editor': Editor,
         'sidebar-left' : SideBarLeft,
         'sidebar-right' : SideBarRight,
-        'editor-action' : EditerAction
+        'editor-action' : EditerAction,
+        's-table-setting' : TableSetting,
+        'auto-complete-control' : AutoCompleteControl,
+        'save-doc-panel': SaveDocPanel,
     },
     data(){
-        return {
-            toggleState : false
+        return{
+            isAutocompleteControl:false
         }
     },
     methods:{
+        saveDocument(){
+            console.log('k');
+            
+            this.$refs.saveDocPanel.showDialog()
+        },
+        addColumnTable(listRowData){
+            let elements = $('#editor_ifr').contents().find('[data-mce-selected="1"]');
+            let thead = ``;
+            let tbody = ``;
+            for(let i = 0; i < listRowData.length; i++ ){
+                let row = listRowData[i];
+                let type = row.type;
+                let control = GetControlProps(type);
+                control.properties.name.value = row.name;
+                control.properties.title.value = row.title;
+                let controlEl = $(control.html);
+                
+                controlEl.attr('id', row.key);
+                console.log(controlEl);
+                thead += `<th>`+row.columnName+`</th>`
+                tbody += `<td>`+controlEl[0].outerHTML+`</td>`
+                this.addToAllControlInDoc(row.key,{properties: control.properties, formulas : control.formulas})
+            }
+            console.log(listRowData);
+            // chua xoa duoc cot khi luu
+            elements.attr('data-table',JSON.stringify(listRowData))
+            elements.find('thead tr th').slice(1,elements.find('thead tr th').length - 1).detach()
+            elements.find('tbody tr td').slice(1,elements.find('tbody tr td').length - 1).detach()
+            elements.find('thead tr th:first-child').after(thead);
+            elements.find('tbody tr td:first-child').after(tbody);
+        },
         showControlTable(e) {
                 let elements = $('#editor_ifr').contents().find('[data-mce-selected="1"]');
-                if(elements.hasClass('s-control-table')){
-                    let idControl = element.attr('id');
-                    var data_class = idControl;
-                    var table = $('#editor_ifr').contents().find("#"+idControl).find('table');
-                    var th = table.find('thead tr th')
-                    var td = table.find('tbody tr td')
-                    var tr = ""
-                    $('#setting-control-table').show();
-                    $('.tbl-setting-control-table').attr('data-stt','0').attr('data-class',data_class);
-                    $('.tbl-setting-control-table').find('tbody').html('')
-                    if (th.length > 3) {
-                        th.each(function(key,val) {
-                        if (key>0 && key<th.length-1) {
-                            let id_column = "cl" +Math.floor(Math.random() * 10000001) + '-' + time_now
-                            let id_btn = "btn"+Math.floor(Math.random() * 10000001) + '-' + time_now
-                            let id_list_dropdown_control = "btn"+Math.floor(Math.random() * 10000001) + '-' + time_now
-                            let cl_name = $(val).html()
-                            let data_element = td.eq(key).find('.bkerp-input').attr('bkerp-type')
-                            let data_class = td.eq(key).find('.control-editor').attr('data-class')
-                            var control_e = arr_e.find(control => control.type === data_element)
-                            let control = td.eq(key).html();
-                            var title_button = ""
-                            title_button = data_element != undefined ? control_e.value : 'Chọn control';
-                            let property = $(control).length > 0 && $(control).attr('data-property') ? JSON.parse($(control).attr('data-property')) : {};
-                            let name_control = property.Name ? property.Name : ""
-                            let title_control = property.Title ? property.Title : ""
-                            let id_control = $(control).attr('id') && $(control).attr('id') !="undefined" ? $(control).attr('id') : 'bkerp-input-'+Math.floor(Math.random() * 10000001) + '-' + time_now;
-                            let type = $(control).attr('bkerp-type');
-                            var type_control = arr_control.find(control => control.type === type) ? arr_control.find(control => control.type === type).label : '';
-                            var image_control = arr_control.find(control => control.type === type) ? arr_control.find(control => control.type === type).image : '';
+                if(elements.hasClass('s-control-table') || elements.parent().hasClass('s-control-table')){
+                    let thead = elements.find('thead tr th');
+                    let tbody = elements.find('tbody tr td');
+                  
+                    
+                    let listData = [];
+                    if($(tbody[1].innerHTML).length > 0){
+                        for(let i = 1; i< thead.length - 1; i++){
+                            let idControl = $(tbody[i].innerHTML).first().attr('id');
+                            let typeControl = $(tbody[i].innerHTML).first().attr('s-control-type');
+                            console.log(this.editorStore.allControl[idControl].properties);
                             
-                            
-                            input_autocomplete = '<input value="'+type_control+'" data-id="'+id_control+'" data-type="'+type+'" class="autocomplete-choose-control" placeholder="Chọn loại control">'
-                                
-                            tr = '<tr id="'+id_column+'">\
-                                <td class="width-50">'+key+'</td>\
-                                <td class="width-100">\
-                                    <input data-type="name-column" class="name-column" type="text" value="'+cl_name+'" placeholder="Nhập tên cột" >\
-                                </td>\
-                                <td class="width-150">\
-                                        <div class="dropdown-controls">\
-                                            <span class="name-control-choose">'+image_control+'</span>\
-                                        '+input_autocomplete+'\
-                                        </div>\
-                                    </div>\
-                                </td>\
-                                <td class="width-150">\
-                                    <input data-type="name-control-in-table" data-class="'+data_class+'" class="name-control-in-table change-property-control-in-table" onkeyup="changeNameControlInTable(this)" type="text" value="'+name_control+'" placeholder="Nhập tên control">\
-                                </td>\
-                                <td class="width-150">\
-                                    <input data-type="title-control-in-table" data-class="'+data_class+'" class="title-control-in-table change-property-control-in-table" type="text" value="'+title_control+'" onchange="changeTitleControlInTable(this)" placeholder="Nhập tiêu đề control">\
-                                </td>\
-                                <td class="width-100" style="text-align:end;">\
-                                <button class="btn btn-dragg-colomn btn-column"><i class="material-icons">menu</i></button>\
-                                <button class="btn btn-column"><i class="material-icons" onclick="removeColumnTable(\'' + id_column + '\')">close</i></button>\
-                                </td>\
-                                </tr>'
-                            $('.tbl-setting-control-table').find('tbody').append(tr);
-                            $("#"+id_column).find('.autocomplete-choose-control').attr('data-property',JSON.stringify(property));
+                            let name = this.editorStore.allControl[idControl].properties.name.value;
+                            let title = this.editorStore.allControl[idControl].properties.title.value;
+                            let row = {columnName: $(thead[i]).text(),name: name,title:title, type: typeControl,key:idControl}
+                            listData.push(row)
                         }
-                        })
-                        chooseControlInTable()
+                        
                     }
+                    
+                    this.$refs.tableSetting.showDialog();
+                    this.$refs.tableSetting.setListRow(listData);
                 }
-
-                
             },
         addToAllControlInDoc(controlId,control){
+            console.log(control);
+            
             this.$store.commit(
-                "document/addControl",
-                controlId,
-                control
+                "document/addControl",{id:controlId,props:control}
             );  
         },
         selectControl(properties,formulas){
-            console.log(formulas);
-            
             this.$store.commit(
                 "document/addCurrentControl",
                 {properties:properties,
                 formulas:formulas}
             );
         },
+        hideAutocompletaControl(){
+            $('.list-control-autocomplete').css({
+                'display': 'none',
+            })
+        },
+        insertControl(type){
+            this.hideAutocompletaControl();
+            $(this.$refs.editor.editor.selection.getNode()).html($(this.$refs.editor.editor.selection.getNode())[0].innerHTML.slice(0, -1))
+            let control =  GetControlProps(type);
+            var checkDiv = $(control.html);
+            var inputid = 's-control-id-' + Date.now();
+            checkDiv.attr('id', inputid);
+            if (checkDiv.attr('s-control-type') != 'table') {
+                checkDiv.attr('contenteditable', false);
+            }
+            // $(this.$refs.editor.editor.selection.getNode()).after()
+            this.$refs.editor.editor.execCommand('mceInsertContent', false, checkDiv[0].outerHTML + '&nbsp;');
+            this.selectControl(control.properties, control.formulas);
+            this.addToAllControlInDoc(inputid,{properties: control.properties, formulas : control.formulas});
+            
+        },
+        detectKeyEvent(event){
+            let thisCpn = this;
+            switch (event.keyCode) {
+                case 191:
+                    var scroll_top = $("#editor_ifr").contents().scrollTop();
+                    var nodePosition = $(thisCpn.$refs.editor.editor.selection.getNode()).position();
+                    var off = $(thisCpn.$refs.editor.editor.selection.getNode()).offset();
+                    var top = nodePosition.top;
+                    var left = nodePosition.left;
+                    var width_toolbox = $('.sym-document__side-bar-left').width();
+                    let marginDoc = $('.tox-sidebar-wrap').css('marginLeft').replace('px', '');
+                    $('.list-control-autocomplete')
+                    .css({
+                        'top': top + 150 - scroll_top,
+                        'left': left + width_toolbox + parseInt(marginDoc),
+                    })
+                    setTimeout(function(){
+                        $('.list-control-autocomplete')
+                        .css({
+                            'display': 'block',
+                        })
+                    },10)
+                    break;
+                case 38:
+                   
+                    break;
+                case 40:
+                    
+                    break;
+                case 13:
+                    
+                    break;
+                case 9:
+                   
+                    break;
+                case 8:
+                    // if(this.isShowAutocompleteControl == true && $("#editor_ifr").contents().find('body').html().indexOf("/") < 0){
+                    //     $('.list-control-autocomplete').css({
+                    //         'display': 'none',
+                    //     })
+                    // }
+                    break;
+            }
+        },
+        //su kiện click vào editor
+        detectClickEvent(event){
+        // kiểm tra nếu click ngoài khung autocomplete control thì đóng lại
+            if (event.target.id != 'list-control-autocomplete' && $(event.target).parents('#list-control-autocomplete').length == 0) {
+                this.hideAutocompletaControl();
+            }
+        }
+        
      
     },
     mounted(){
@@ -246,11 +320,11 @@ export default {
                         }
                         insertionPoint.remove();
                         thisCpn.selectControl(control.properties, control.formulas);
-                        thisCpn.addToAllControlInDoc(inputid,{properties: control.properties, formulas : control.formulasControl});
+                        thisCpn.addToAllControlInDoc(inputid,{properties: control.properties, formulas : control.formulas});
                         // set_window_property(inputid, objecttype);
                     } catch (e) {}
                 });
-                    var DragDropFunctions = {
+                var DragDropFunctions = {
                     dragoverqueue: [],
                     GetMouseBearingsPercentage: function($element, elementRect, mousePos) {
                         if (!elementRect)
@@ -650,11 +724,13 @@ export default {
                     styles += '.drop-marker{pointer-events:none;}.drop-marker.horizontal{background:#00adff;position:absolute;height:2px;list-style:none;visibility:visible!important;box-shadow:0 1px 2px rgba(255,255,255,.4),0 -1px 2px rgba(255,255,255,.4);z-index:123456789;text-align:center}.drop-marker.horizontal.topside{margin-top:0}.drop-marker.horizontal.bottomside{margin-top:2px}.drop-marker.horizontal:before{content:"";width:8px;height:8px;background:#00adff;border-radius:8px;margin-top:-3px;float:left;box-shadow:0 1px 2px rgba(255,255,255,.4),0 -1px 2px rgba(255,255,255,.4)}.drop-marker.horizontal:after{content:"";width:8px;height:8px;background:#00adff;border-radius:8px;margin-top:-3px;float:right;box-shadow:0 1px 2px rgba(255,255,255,.4),0 -1px 2px rgba(255,255,255,.4)}.drop-marker.vertical{height:50px;list-style:none;border:1px solid #00ADFF;position:absolute;margin-left:3px;display:inline;box-shadow:1px 0 2px rgba(255,255,255,.4),-1px 0 2px rgba(255,255,255,.4)}.drop-marker.vertical.leftside{margin-left:0}.drop-marker.vertical.rightside{margin-left:3px}.drop-marker.vertical:before{content:"";width:8px;height:8px;background:#00adff;border-radius:8px;margin-top:-4px;top:0;position:absolute;margin-left:-4px;box-shadow:1px 0 2px rgba(255,255,255,.4),-1px 0 2px rgba(255,255,255,.4)}.drop-marker.vertical:after{content:"";width:8px;height:8px;background:#00adff;border-radius:8px;margin-left:-4px;bottom:-4px;position:absolute;box-shadow:1px 0 2px rgba(255,255,255,.4),-1px 0 2px rgba(255,255,255,.4)}';
                     styles += 'table,tr,td{border:none;} ';
                     styles += 'body{background:white !important;} ';
+                    styles += 'p{margin:0 !important;} ';
                     styles += '@page { margin: 0; }';
                     styles += '.s-control-table thead,.s-control-table tbody{border-bottom:1px solid #aaaaaa;}';
                     styles += '.on-selected{border:1px dashed #2196f3 !important;cursor: pointer !important;}';
-                    styles += '.s-control-text,.s-control-select,.s-control-document,.s-control-phone,.s-control-email,.s-control-currency,.s-control-radio,.s-control-color,.s-control-percent,.s-control-hidden,.s-control-user,.s-control-filter,.s-control-date,.s-control-datetime,.s-control-month,.s-control-time,.s-control-number{width: auto;height: 25px;border-radius: 3px;font-size: 13px;padding: 0 5px;outline: 0!important;}'
+                    styles += '.s-control-reset,.s-control-draf,.s-control-submit,.s-control-text,.s-control-select,.s-control-document,.s-control-phone,.s-control-email,.s-control-currency,.s-control-radio,.s-control-color,.s-control-percent,.s-control-hidden,.s-control-user,.s-control-filter,.s-control-date,.s-control-datetime,.s-control-month,.s-control-time,.s-control-number{width: auto;height: 25px;border-radius: 3px;font-size: 13px;padding: 0 5px;outline: 0!important;}'
                     styles += '.s-control {background: rgb(233, 236, 239);min-width: 50px;outline: none !important;margin:1px;border:none}';
+                    styles += '.s-control-reset,.s-control-draf,.s-control-submit{padding: 4px 8px;}';
                     return styles;
                 }
             }
@@ -673,7 +749,7 @@ export default {
         width: 240px;
     }
     .sym-document__side-bar-right{
-        background: #f2f2f2;
+        background: #ffffff;
 
     }
     .sym-document__side-bar-left .v-tab,.sym-document__side-bar-right .v-tab{

@@ -80,8 +80,8 @@ export default {
             return rsl;
         },
         getInputTag(inputType) {
-                console.log(inputType,'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx');
-
+            console.log(inputType);
+            
             if(!inputTypeConfigs[inputType]){
                 
             }

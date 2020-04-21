@@ -5,132 +5,158 @@ const commonProps = {
     name: {
         title: "Tên",
         type: "text",
+        value: "",
         groupType: "name"
     },
-    tilte: {
+    title: {
         title: "Tiêu đề",
         type: "text",
+        value: "",
         groupType: "name"
     },
     otherInfo: {
         title: "Thông tin thêm",
         type: "text",
+        value: "",
         groupType: "name"
     },
     //hiên thi
     width: {
         title: "Chiều rộng",
         type: "text",
+        value: "",
         groupType: "display"
     },
     height: {
         title: "Chiều cao",
         type: "text",
+        value: "",
         groupType: "display"
     },
     fontSize: {
         title: "Cỡ chữ",
         type: "select",
+        value: "",
         groupType: "display"
     },
     color: {
         title: "Màu chữ",
         type: "text",
+        value: "",
         groupType: "display"
     },
     css: {
         title: "Thuộc tính css",
         type: "textarea",
+        value: "",
         groupType: "display"
     },
     mobileProps: {
         title: "Thuộc tính mobile",
         type: "textarea",
+        value: "",
         groupType: "display"
     },
     formatNumber: {
         title: "Định dạng số",
         type: "text",
+        value: "",
         groupType: "display"
     },
     formatDateTime: {
         title: "Định dạng thời gian",
         type: "text",
+        value: "",
         groupType: "display"
     },
     isImportant: {
         title: "Quan trọng",
         type: "checkbox",
+        value: "",
         groupType: "display"
     },
     isMobile: {
         title: "Mobile",
         type: "checkbox",
+        value: "",
         groupType: "display"
     },
     isSumTable: {
         title: "Tính tổng trong bảng",
         type: "checkbox",
+        value: "",
         groupType: "display"
     },
     isRequired: {
         title: "Required",
         type: "checkbox",
+        value: "",
         groupType: "display"
     },
     isDBOnly: {
         title: "Duy nhất trong DB",
         type: "checkbox",
+        value: "",
         groupType: "display"
     },
     isTableOnly: {
         title: "Duy nhất trong table",
         type: "checkbox",
+        value: "",
         groupType: "display"
     },
     isHidden: {
         title: "Ẩn",
         type: "checkbox",
+        value: "",
         groupType: "display"
     },
     isAllowUpdate: {
         title: "Cho phép update",
         type: "checkbox",
+        value: "",
         groupType: "display"
     },
     isReadOnly: {
         title: "Chỉ Xem",
         type: "checkbox",
+        value: "",
         groupType: "display"
     },
     isMultipleValue: {
         title: "Lấy nhiều giá trị như mảng",
         type: "checkbox",
+        value: "",
         groupType: "display"
     },
     isDisplayCompact: {
         title: "Hiển thị rút gọn",
         type: "checkbox",
+        value: "",
         groupType: "display"
     },
     isAllowPrint: {
         title: "Cho phép in",
         type: "checkbox",
+        value: "",
         groupType: "print"
     },
     isBorderSubmit: {
         title: "Border submit",
         type: "checkbox",
+        value: "",
         groupType: "print"
     },
     isBorderView: {
         title: "Border view",
         type: "checkbox",
+        value: "",
         groupType: "print"
     },
     isBorderPrint: {
         title: "Border view",
         type: "checkbox",
+        value: "",
         groupType: "print"
     },
 }
@@ -343,7 +369,7 @@ const controlTypes = {
         icon: "mdi mdi-account-outline",
         html: `<select class="s-control s-control-user" contenteditable="false" s-control-type="user"></select>`,
         title: "User",
-        notInProps: ['formatNumber', 'isSumTable', 'isDBOnly', 'isDBTable', 'isAllowUpdate', 'isDisplayCompact', 'isMultipleValue'],
+        notInProps: ['formatNumber', 'isSumTable', 'isDBOnly', 'isTableOnly', 'isAllowUpdate', 'isDisplayCompact', 'isMultipleValue'],
         formulas: ['hidden', 'readOnly']
     },
     inputFilter: {
@@ -362,20 +388,20 @@ const controlTypes = {
     },
     table: {
         icon: "mdi mdi-table",
-        html: `<div style="overflow-y: auto;position: relative;" contenteditable="false" class="s-control s-control-table" s-control-type="table">
-                <table class=" table-stripped">
-                    <thead>
+        html: `<div style="overflow-y: auto;position: relative;font-size: 13px;" contenteditable="true" class="s-control s-control-table" s-control-type="table">
+                <table style="width:100%;text-align: center;" >
+                    <thead >
                         <tr>
                             <th class="column-function">Chọn</th>
                             <th class="column-item">Tiêu đề</th>
                             <th class="column-function">Chức năng</th>
                         </tr>
                     </thead>
-                <tbody>
+                <tbody style="background: white;">
                     <tr class="s-control-table-row-template">
                         <td class="column-function"><input type="checkbox" class="s-control-check-table-row"></td>
                         <td class="column-item"></td>
-                        <td class="column-function"><a class="btn btn-primary s-control-table-remove-row" style="margin: 5px;">Xoá</a></td>
+                        <td class="column-function"><button class="btn btn-primary s-control-table-remove-row" style="margin: 5px;">Xoá</button></td>
                     </tr>
                 </tbody>
                 </table>
@@ -384,26 +410,27 @@ const controlTypes = {
                     <a class="btn btn-primary s-control-table-remove-select">Xoá dòng đã chọn </a>
                     <a class="btn btn-primary s-control-table-remove-unselect">Xoá dòng không chọn </a>
                 </div>
-                </div>`,
+                </div>
+                <br>`,
         title: "Table",
-        notInProps: ['width', 'height', 'isImportant', 'formatNumber', 'isSumTable', 'isRequired', 'isDBOnly', 'isDBTable', 'isAllowUpdate', 'isDisplayCompact', 'isMultipleValue', 'isAllowPrint', 'isBorderSubmit', 'isBorderView', 'isBorderPrint'],
+        notInProps: ['width', 'height', 'isImportant', 'formatNumber', 'isSumTable', 'isRequired', 'isDBOnly', 'isTableOnly', 'isAllowUpdate', 'isDisplayCompact', 'isMultipleValue', 'isAllowPrint', 'isBorderSubmit', 'isBorderView', 'isBorderPrint'],
         formulas: ['formulas', 'hidden', 'readOnly', 'headerTable', 'filterOptions']
     },
     panel: {
         icon: "mdi mdi-collage",
-        html: `<div class="s-control s-control-panel" contenteditable="false" s-control-type="panel" style="width: 100%;display: inline-block" >
+        html: `<div class="s-control s-control-panel" contenteditable="false" s-control-type="panel" style="width: 100%;display: inline-block;font-size: 13px;" >
                     <span class="panel-title2" style="background: #dadada;color: #6e6e6e;border-bottom: 0.5px solid #ddd;height: 30px;font-weight: bold;width: 100%;padding:7px;display: inline-block!important;">Tiêu đề panel</span>
                     <div style="padding:7px;display: block;">
                     
                     </div>
-                </div>`,
+                </div><br>`,
         title: "Panel",
-        notInProps: ['fontSize', 'formatNumber', 'isImportant', 'isSumTable', 'isRequired', 'isDBOnly', 'isDBTable', 'isAllowUpdate', 'isReadOnly', 'isDisplayCompact', 'isMultipleValue', 'isAllowPrint', 'isBorderSubmit', 'isBorderView', 'isBorderPrint'],
+        notInProps: ['fontSize', 'formatNumber', 'isImportant', 'isSumTable', 'isRequired', 'isDBOnly', 'isTableOnly', 'isAllowUpdate', 'isReadOnly', 'isDisplayCompact', 'isMultipleValue', 'isAllowPrint', 'isBorderSubmit', 'isBorderView', 'isBorderPrint'],
         formulas: ['hidden']
     },
     fileUpload: {
         icon: "mdi mdi-attachment",
-        html: `<div class="s-control s-control-file-upload " style="display: inline-block;width: auto;border-radius: 10px;height: auto;padding: 5px!important;border: 1px solid #c5c5c5!important;    " s-control-type="fileUpload" contenteditable="false">
+        html: `<div class="s-control s-control-file-upload " style="display: inline-block;width: auto;border-radius: 10px;font-size: 13px;height: auto;padding: 5px!important;border: 1px solid #c5c5c5!important;    " s-control-type="fileUpload" contenteditable="false">
                 <input type="hidden" name="FileUpload">
                 <span class="cmd-file-list"></span>
                 <span class="btn " style="padding: 0;text-transform: capitalize!important;">
@@ -413,62 +440,58 @@ const controlTypes = {
                 
                 </span>
                 </span>
-                </div>`,
+                </div><br>`,
         title: "File upload",
-        notInProps: ['width', 'height', 'fontSize', 'color', 'mobileProps', 'isImportant', 'formatNumber', 'isMobile', 'isSumTable', 'isDBOnly', 'isDBTable', 'isAllowUpdate', 'isReadOnly', 'isDisplayCompact', 'isMultipleValue'],
+        notInProps: ['width', 'height', 'fontSize', 'color', 'mobileProps', 'isImportant', 'formatNumber', 'isMobile', 'isSumTable', 'isDBOnly', 'isTableOnly', 'isAllowUpdate', 'isReadOnly', 'isDisplayCompact', 'isMultipleValue'],
         formulas: ['hidden']
     },
     report: {
         icon: "mdi mdi-chart-bar-stacked",
-        html: `<div class="s-control-report s-control" s-control-type="report" style="min-height: 50px;width:100px;box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);display: inline-block;"contenteditable="false">
+        html: `<div class="s-control-report s-control" s-control-type="report" style="min-height: 50px;width:100px;font-size: 13px;;box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);display: inline-block;"contenteditable="false">
                 <h5 style="margin:5px;font-family: 'Roboto', sans-serif!important;font-weight:normal">Report</h5>
-                </div>`,
+                </div><br>`,
         title: "Report",
-        notInProps: ['fontSize', 'mobileProps', 'isImportant', 'formatNumber', 'isMobile', 'isSumTable', 'isRequired', 'isDBOnly', 'isDBTable', 'isHidden', 'isAllowUpdate', 'isReadOnly', 'isDisplayCompact', 'isMultipleValue', 'isBorderSubmit', 'isBorderView', 'isBorderPrint'],
+        notInProps: ['fontSize', 'mobileProps', 'isImportant', 'formatNumber', 'isMobile', 'isSumTable', 'isRequired', 'isDBOnly', 'isTableOnly', 'isHidden', 'isAllowUpdate', 'isReadOnly', 'isDisplayCompact', 'isMultipleValue', 'isBorderSubmit', 'isBorderView', 'isBorderPrint'],
         formulas: ['hidden', 'report']
     },
     approvalHistory: {
         icon: "mdi mdi-chart-timeline",
-        html: `<div class="s-control-approval-history s-control" s-control-type="approvalHistory" style="min-height: 50px;width: 100%;display: inline-block" contenteditable="false">
+        html: `<div class="s-control-approval-history s-control" s-control-type="approvalHistory" style="min-height: 50px;font-size: 13px;width: 100%;display: inline-block" contenteditable="false">
                 <h5 style="margin:5px;font-family: 'Roboto', sans-serif!important;font-weight:normal">Lịch sử phê duyệt</h5>
                 <div class="list-approval-history"></div>
-                </div>`,
+                </div><br>`,
         title: "Approval history",
         inProps: ['isAllowPrint', 'isBorderSubmit', 'isBorderView', 'isBorderPrint'],
         formulas: ['hidden']
     },
     trackingValue: {
         icon: "mdi mdi-chart-timeline",
-        html: `<div class="s-control-tracking-value s-control" s-control-type="trackingValue" style="min-height: 50px;width: 100%;display: inline-block;" contenteditable="false" readonly="readonly">
+        html: `<div class="s-control-tracking-value s-control" s-control-type="trackingValue" style="min-height: 50px;font-size: 13px;width: 100%;display: inline-block;" contenteditable="false" readonly="readonly">
                 <h5 style="margin:5px;font-family: 'Roboto', sans-serif!important;font-weight:normal">Tracking giá trị của control</h5>
-                </div>`,
+                </div><br>`,
         title: "Tracking value",
         inProps: ['name', 'isAllowPrint', 'isBorderSubmit', 'isBorderView', 'isBorderPrint'],
         formulas: ['hidden']
     },
     submit: {
         icon: "mdi mdi-archive",
-        html: `<span type="button" class="btn btn-primary s-control-submit" contenteditable="false" s-control-type="submit" value="Submit" style="display: inline;">Submit</span>`,
+        html: `<span type="button" class="s-control s-control-submit" contenteditable="false" s-control-type="submit" value="Submit" style="display: inline;font-size: 13px;">Submit</span>`,
         title: "Submit",
-        inProps: ['mobileProps', 'isImportant', 'formatNumber', 'isMobile', 'isSumTable', 'isRequired', 'isDBOnly', 'isDBTable', 'isHidden', 'isAllowUpdate', 'isReadOnly', 'isDisplayCompact', 'isMultipleValue'],
+        inProps: ['mobileProps', 'isImportant', 'formatNumber', 'isMobile', 'isSumTable', 'isRequired', 'isDBOnly', 'isTableOnly', 'isHidden', 'isAllowUpdate', 'isReadOnly', 'isDisplayCompact', 'isMultipleValue'],
         formulas: ['hidden']
     },
     reset: {
         icon: "mdi mdi-archive",
-        html: `<div class="s-control-reset  s-control" s-control-type="reset" style="min-height: 50px;width: 100%;display: inline-block;" contenteditable="false" readonly="readonly">
-                <h5 style="margin:5px;font-family: 'Roboto', sans-serif!important;font-weight:normal">Tracking giá trị của control</h5>
-                </div>`,
+        html: `<span type="button" class="s-control s-control-reset" contenteditable="false" s-control-type="reset" value="Reset" style="display: inline;font-size: 13px;">Reset</span>`,
         title: "Reset",
-        inProps: ['otherInfo', 'mobileProps', 'isImportant', 'formatNumber', 'isMobile', 'isSumTable', 'isRequired', 'isDBOnly', 'isDBTable', 'isHidden', 'isAllowUpdate', 'isReadOnly', 'isDisplayCompact', 'isMultipleValue'],
+        inProps: ['otherInfo', 'mobileProps', 'isImportant', 'formatNumber', 'isMobile', 'isSumTable', 'isRequired', 'isDBOnly', 'isTableOnly', 'isHidden', 'isAllowUpdate', 'isReadOnly', 'isDisplayCompact', 'isMultipleValue'],
         formulas: ['hidden']
     },
     draf: {
         icon: "mdi mdi-archive",
-        html: `<div class="s-control-draf  s-control" s-control-type="draf" style="min-height: 50px;width: 100%;display: inline-block;" contenteditable="false" readonly="readonly">
-                <h5 style="margin:5px;font-family: 'Roboto', sans-serif!important;font-weight:normal">Tracking giá trị của control</h5>
-                </div>`,
+        html: `<span type="button" class="s-control s-control-draf" contenteditable="false" s-control-type="draf" value="Draf" style="display: inline;font-size: 13px;">Draf</span>`,
         title: "Draf",
-        inProps: ['otherInfo', 'mobileProps', 'isImportant', 'formatNumber', 'isMobile', 'isSumTable', 'isRequired', 'isDBOnly', 'isDBTable', 'isHidden', 'isAllowUpdate', 'isReadOnly', 'isDisplayCompact', 'isMultipleValue'],
+        inProps: ['otherInfo', 'mobileProps', 'isImportant', 'formatNumber', 'isMobile', 'isSumTable', 'isRequired', 'isDBOnly', 'isTableOnly', 'isHidden', 'isAllowUpdate', 'isReadOnly', 'isDisplayCompact', 'isMultipleValue'],
         formulas: ['hidden']
     },
 
@@ -479,6 +502,7 @@ const controlTypes = {
 export const GetControlProps = function(type) {
     let control = util.cloneDeep(controlTypes[type]);
 
+    console.log(type);
     console.log(control);
 
     let allProperties = util.cloneDeep(commonProps);
@@ -508,6 +532,23 @@ export const GetControlProps = function(type) {
     return control;
 
 }
+export const getAllTypeControl = function() {
+    let allControl = util.cloneDeep(controlTypes);
+    let result = Object.keys(allControl).map(function(key) {
+        return { type: key, prop: allControl[key] };
+    });
+    return result;
+}
 export const getControlElement = function(type) {
-    return controlTypes[type];
+    return util.cloneDeep(controlTypes[type]);
+}
+export const getGroupProps = function(group) {
+    return util.cloneDeep(groupType[group]);
+}
+export const getControlElementForTableSetting = function(type) {
+    let control = util.cloneDeep(controlTypes[type]);
+    let result = Object.keys(control).map(function(key) {
+        return { type: key, prop: control[key] };
+    });
+    return result
 }

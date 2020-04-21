@@ -4,6 +4,7 @@
         <v-list-item
             v-for="(item, i) in items"
             :key="i"
+            @click="action(item.action)"
         >
             <v-list-item-icon class="sym-action__icon">
                 <v-icon small >{{item.icon}}</v-icon>
@@ -14,20 +15,24 @@
     </v-list>
 </template>
 <script>
-import iconCloneControl from "./../../../icon/document/Clone_control.png"
-import iconDeleteControl from "./../../../icon/document/Delete_control.png"
-import iconSaveControl from "./../../../icon/document/Save_control.png"
 export default {
     data(){
         return {
             items: [
-                { text: 'Lưu control', icon: 'mdi-content-save' },
-                { text: 'Xóa control', icon: 'mdi-delete-forever' },
-                { text: 'Clone control', icon: 'mdi-content-copy' },
-                { text: 'Scan control', icon: 'mdi-file-find' },
-                { text: 'Xóa bộ đệm', icon: 'mdi-delete-circle' },
-                { text: 'Lưu doc', icon: 'mdi-file-document' },
+                { text: 'Lưu control', icon: 'mdi-content-save' ,action:'save-control'},
+                { text: 'Xóa control', icon: 'mdi-delete-forever' ,action:'delete-control'},
+                { text: 'Clone control', icon: 'mdi-content-copy' ,action:'clone-control'},
+                { text: 'Scan control', icon: 'mdi-file-find' ,action:'scan-control'},
+                { text: 'Xóa bộ đệm', icon: 'mdi-delete-circle' ,action:'delete-cache-control'},
+                { text: 'Lưu doc', icon: 'mdi-file-document' ,action:'save-document'},
             ],
+        }
+    },
+    methods:{
+        action(type){
+            console.log('ok');
+            
+            this.$emit('document-action-'+type)
         }
     }
 }

@@ -1,4 +1,8 @@
-const addControl = (state, id, prop) => {
+const addControl = (state, params) => {
+    console.log(params);
+    let id = params.id
+    let prop = params.props
+
     state.editor.allControl[id] = prop;
 };
 const addCurrentControl = (state, control) => {
