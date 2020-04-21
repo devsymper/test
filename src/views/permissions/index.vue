@@ -1,44 +1,5 @@
 <template>
     <v-container fluid>
-        <!-- <v-dialog v-model="isShowAddModal" max-width="300">
-            <v-card>
-                <v-card-title class="headline">{{
-                    !!!isEdit ? "Add new Permission Packge" : "Edit Packge"
-                }}</v-card-title>
-                <v-card-text>
-                    <v-row>
-                        <v-col cols="12" sm="12">
-                            <v-text-field
-                                v-model="currentPack.packName"
-                                label="Tên pack"
-                                :rules="[
-                                    () => !!currentPack.packName || 'Trường này bắt buộc',
-                                ]"
-                                required
-                            ></v-text-field>
-                        </v-col>
-                    </v-row>
-                </v-card-text>
-                <v-card-actions>
-                    <v-spacer></v-spacer>
-                    <v-btn
-                        color="darken-1"
-                        text
-                        @click="isShowAddModal = false"
-                    >
-                        Hủy
-                    </v-btn>
-                    <v-btn
-                        color="orange darken-1"
-                        text
-                        @click="addPack"
-                        :disabled="!!!currentPack.packName"
-                    >
-                        {{ isEdit ? "Cập nhật" : "Thêm" }}
-                    </v-btn>
-                </v-card-actions>
-            </v-card>
-        </v-dialog> -->
         <ListItems
             ref="listPack"
             :getDataUrl="baseUrl"
@@ -48,7 +9,6 @@
             :tableContextMenu="tableContextMenu"
             :useDefaultContext="false"
             :currentItemData="currentPack"
-            @add-item="showAddModal"
         >
             <template slot="right-panel-content" slot-scope="{ itemData }">
                 <v-card-title class="headline">{{
@@ -111,7 +71,7 @@ export default {
             },
             isShowAddModal: false,
             tableContextMenu: [
-                {
+               {
                     name: "edit",
                     text: this.$t("permissions.contextMenu.edit"),
                     callback: (pack, callback) => {

@@ -1,7 +1,18 @@
 <template>
     <v-container fluid>
-        <v-dialog v-model="isShowAddModal" max-width="500">
-            <v-card>
+        <ListItems
+            ref="listSnippet"
+            :getDataUrl="baseUrl"
+            :headerPrefixKeypath="'snippet.header'"
+            :pageTitle="$t('snippet.title')"
+            :containerHeight="tableHeight"
+            :tableContextMenu="tableContextMenu"
+            :useDefaultContext="false"
+            :actionPanelType="'modal'"
+            :currentItemData="currentSnippet"
+            @add-item="showAddModal"
+        >
+            <template slot="right-panel-content" slot-scope="{itemData}">
                 <v-card-title class="headline">{{
                     !!!isEdit ? "Add new snippet" : "Edit snippet"
                 }}</v-card-title>
@@ -9,17 +20,17 @@
                     <v-row>
                         <v-col cols="12" sm="5">
                             <v-text-field
-                                v-model="currentSnippet.name"
+                                v-model="itemData.name"
                                 label="Tên"
                                 hint="Chỉ chứa các chữ cái không dấu, chữ số và gạch dưới"
                                 :rules="[
                                     () =>
-                                        !!currentSnippet.name ||
+                                        !!itemData.name ||
                                         'Trường này bắt buộc',
                                     () =>
-                                        (!!currentSnippet.name &&
+                                        (!!itemData.name &&
                                             /^[a-zA-Z\d_]{3,20}$/.test(
-                                                currentSnippet.name
+                                                itemData.name
                                             )) ||
                                         'Tên không hợp lệ, vui lòng chỉ nhập chữ cái không dấu, chữ số và gạch dưới, dài từ 3 - 20 ký tự',
                                 ]"
@@ -28,16 +39,16 @@
                         </v-col>
                         <v-col cols="12" sm="7">
                             <v-text-field
-                                v-model="currentSnippet.description"
+                                v-model="itemData.description"
                                 label="Mô tả"
                             ></v-text-field>
                         </v-col>
                         <v-col cols="12">
                             <v-textarea
-                                v-model="currentSnippet.value"
+                                v-model="itemData.value"
                                 :rules="[
                                     () =>
-                                        !!currentSnippet.value ||
+                                        !!itemData.value ||
                                         'Trường này bắt buộc',
                                 ]"
                                 required
@@ -50,14 +61,6 @@
                     </v-row>
                 </v-card-text>
                 <v-card-actions>
-                    <v-spacer></v-spacer>
-                    <v-btn
-                        color="darken-1"
-                        text
-                        @click="isShowAddModal = false"
-                    >
-                        Hủy
-                    </v-btn>
                     <v-btn
                         color="orange darken-1"
                         text
@@ -67,19 +70,8 @@
                         {{ isEdit ? "Cập nhật" : "Thêm" }}
                     </v-btn>
                 </v-card-actions>
-            </v-card>
-        </v-dialog>
-        <ListItems
-            ref="listSnippet"
-            :getDataUrl="baseUrl"
-            :headerPrefixKeypath="'snippet.header'"
-            :pageTitle="$t('snippet.title')"
-            :containerHeight="tableHeight"
-            :tableContextMenu="tableContextMenu"
-            :useDefaultContext="false"
-            :actionPanelType="'modal'"
-            @add-item="showAddModal"
-        ></ListItems>
+            </template>
+        </ListItems>
     </v-container>
 </template>
 

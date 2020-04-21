@@ -517,11 +517,10 @@ export default {
                                 thisCpn.getData();
                             }
                         })
-                    } else {
-                        if (key == "remove") {
-                        } else if (key == "edit" || key == "view") {
-                            thisCpn.actionPanel = true;
-                        }
+                    }
+                    if (key == "remove") {
+                    } else if (key == "edit" || key == "view") {
+                        thisCpn.actionPanel = true;
                     }
                 },
                 items: {}
