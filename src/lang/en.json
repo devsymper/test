@@ -175,7 +175,8 @@
             "pack_name": "Name",
             "date_created": "Date"
         },
-        "title": "List permissions packages",
+        "title": "Permissions packages",
+        "listObject": "List objects",
         "contextMenu": {
             "edit": "Edit",
             "grantPermission": "Grant Permission",

@@ -175,7 +175,8 @@
             "pack_name": "Tên package",
             "date_created": "Ngày tạo"
         },
-        "title": "Danh sách các nhóm quyền hạn",
+        "title": "Nhóm quyền",
+        "listObject": "Đối tượng",
         "contextMenu": {
             "edit": "Sửa",
             "grantPermission": "Phân quyền",

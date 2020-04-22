@@ -8,7 +8,6 @@
             :containerHeight="tableHeight"
             :tableContextMenu="tableContextMenu"
             :useDefaultContext="false"
-            :actionPanelType="'modal'"
             :currentItemData="currentSnippet"
             @add-item="showAddModal"
         >
