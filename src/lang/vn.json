@@ -19,7 +19,8 @@
         "list": "Danh sách",
         "search": "Tìm kiếm",
         "list_config": "Cấu hình danh sách",
-        "save": "Lưu"
+        "save": "Lưu",
+        "snippets": "Snippets"
     },
     "login": {
         "title": "Đăng nhập hệ thống",
@@ -151,6 +152,20 @@
                 "passwordSetting": "Tùy chọn mật khẩu",
                 "edit": "Sửa"
             }
+        }
+    },
+    "snippet": {
+        "header": {
+            "id": "ID",
+            "name": "Tên",
+            "description": "Mô tả",
+            "snippet": "Nội dung"
+        },
+        "title": "Danh sách BA Snippets",
+        "contextMenu": {
+            "edit": "Sửa",
+            "add": "Thêm mới",
+            "remove": "Xóa"
         }
     }
 }
