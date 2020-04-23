@@ -21,6 +21,7 @@
                             :loading="loadingRefresh"
                             :disabled="loadingRefresh"
                             class="mr-2"
+                            @click="actionPanel = true"
                         >
                             <v-icon left dark>mdi-plus</v-icon>
                             {{$t('common.add')}}
@@ -123,7 +124,7 @@
             right
             :temporary="actionPanelType == 'temporary'"
         >
-            <slot name="right-panel-content">
+            <slot name="right-panel-content" :itemData="currentItemData">
                 <v-card flat>
                     <v-card-title class="pa-0 pl-2" primary-title>{{itemActionTitle}}</v-card-title>
                     <v-card-text>
@@ -203,7 +204,8 @@
                                 :key="column.data"
                             >
                                 <v-icon size="18" class="mr-2">{{getDataTypeIcon(column.type)}}</v-icon>
-                                <span class="fw-400">{{$t(column.columnTitle)}}</span>
+                                <!-- Datnt thêm headerPrefixKeypath -->
+                                <span class="fw-400">{{$t(headerPrefixKeypath + "." + column.columnTitle)}}</span>
                                 <v-tooltip top>
                                     <template v-slot:activator="{ on }">
                                         <v-btn
@@ -400,6 +402,12 @@ export default {
         this.restoreTableDisplayConfig();
     },
     props: {
+        currentItemData:{
+            type: Object,
+            default(){
+                return {}
+            }
+        },
         /**
          * Prefix cho keypath trong file đa ngôn ngữ để hiển thị header của table
          */
@@ -497,9 +505,19 @@ export default {
                      * tham số thứ nhất: row ( index của row đang được chọn)
                      * tham số thứ hai: colName ( Tên của cột (key trong một row) )
                      */
-
                     thisCpn.$emit("context-selection-" + key, row, colName);
-
+                    // Datnt
+                    // Callback for context menu item
+                    let menuItem = thisCpn.tableContextMenu.filter(menu => {
+                        return menu.name == key;
+                    });
+                    if (menuItem.length && menuItem[0].hasOwnProperty("callback")) {
+                        menuItem[0].callback(rowData, (res) => {
+                            if (res.status === 200) {
+                                thisCpn.getData();
+                            }
+                        })
+                    }
                     if (key == "remove") {
                     } else if (key == "edit" || key == "view") {
                         thisCpn.actionPanel = true;

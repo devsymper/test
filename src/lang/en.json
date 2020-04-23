@@ -20,7 +20,8 @@
         "search": "Search",
         "list_config": "List config",
         "save": "Save",
-        "snippets": "Snippets"
+        "snippets": "Snippets",
+        "permissions": "Permissions"
     },
     "validate": {
         "required": "Not be empty",
@@ -164,8 +165,22 @@
         "title": "List BA Snippets",
         "contextMenu": {
             "edit": "Edit",
-            "add": "add",
-            "remove": "remove"
+            "add": "Add",
+            "remove": "Remove"
+        }
+    },
+    "permissions": {
+        "header": {
+            "id": "ID",
+            "pack_name": "Name",
+            "date_created": "Date"
+        },
+        "title": "Permissions packages",
+        "listObject": "List objects",
+        "contextMenu": {
+            "edit": "Edit",
+            "grantPermission": "Grant Permission",
+            "remove": "Remove"
         }
     }
 }

@@ -44,6 +44,7 @@ const defaultState = {
         },
         { title: "users", icon: "mdi-account-settings", link: "/users" },
         { title: "snippets", icon: "mdi-contain", link: "/snippets" },
+        { title: "permissions", icon: "mdi-folder-account", link: "/permissions" },
     ],
     urlToTabTitleMap: {}, // map giữa url với title của tab,
     currentTabIndex: 0, // index cuả tab hiện tại đang mở,

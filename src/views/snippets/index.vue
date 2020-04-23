@@ -1,7 +1,17 @@
 <template>
     <v-container fluid>
-        <v-dialog v-model="isShowAddModal" max-width="500">
-            <v-card>
+        <ListItems
+            ref="listSnippet"
+            :getDataUrl="baseUrl"
+            :headerPrefixKeypath="'snippet.header'"
+            :pageTitle="$t('snippet.title')"
+            :containerHeight="tableHeight"
+            :tableContextMenu="tableContextMenu"
+            :useDefaultContext="false"
+            :currentItemData="currentSnippet"
+            @add-item="showAddModal"
+        >
+            <template slot="right-panel-content" slot-scope="{itemData}">
                 <v-card-title class="headline">{{
                     !!!isEdit ? "Add new snippet" : "Edit snippet"
                 }}</v-card-title>
@@ -9,17 +19,17 @@
                     <v-row>
                         <v-col cols="12" sm="5">
                             <v-text-field
-                                v-model="currentSnippet.name"
+                                v-model="itemData.name"
                                 label="Tên"
                                 hint="Chỉ chứa các chữ cái không dấu, chữ số và gạch dưới"
                                 :rules="[
                                     () =>
-                                        !!currentSnippet.name ||
+                                        !!itemData.name ||
                                         'Trường này bắt buộc',
                                     () =>
-                                        (!!currentSnippet.name &&
+                                        (!!itemData.name &&
                                             /^[a-zA-Z\d_]{3,20}$/.test(
-                                                currentSnippet.name
+                                                itemData.name
                                             )) ||
                                         'Tên không hợp lệ, vui lòng chỉ nhập chữ cái không dấu, chữ số và gạch dưới, dài từ 3 - 20 ký tự',
                                 ]"
@@ -28,16 +38,16 @@
                         </v-col>
                         <v-col cols="12" sm="7">
                             <v-text-field
-                                v-model="currentSnippet.description"
+                                v-model="itemData.description"
                                 label="Mô tả"
                             ></v-text-field>
                         </v-col>
                         <v-col cols="12">
                             <v-textarea
-                                v-model="currentSnippet.value"
+                                v-model="itemData.value"
                                 :rules="[
                                     () =>
-                                        !!currentSnippet.value ||
+                                        !!itemData.value ||
                                         'Trường này bắt buộc',
                                 ]"
                                 required
@@ -50,14 +60,6 @@
                     </v-row>
                 </v-card-text>
                 <v-card-actions>
-                    <v-spacer></v-spacer>
-                    <v-btn
-                        color="darken-1"
-                        text
-                        @click="isShowAddModal = false"
-                    >
-                        Hủy
-                    </v-btn>
                     <v-btn
                         color="orange darken-1"
                         text
@@ -67,21 +69,15 @@
                         {{ isEdit ? "Cập nhật" : "Thêm" }}
                     </v-btn>
                 </v-card-actions>
-            </v-card>
-        </v-dialog>
-        <ListItems
-            :getDataUrl="baseUrl"
-            :headerPrefixKeypath="'snippet.header'"
-            :pageTitle="$t('snippet.title')"
-            :containerHeight="500"
-            :tableContextMenu="tableContextMenu"
-        ></ListItems>
+            </template>
+        </ListItems>
     </v-container>
 </template>
 
 <script>
 import FormulaEditor from "../../components/common/FormulaEditor";
 import ListItems from "../../components/common/ListItems";
+import Api from "./../../api/api.js";
 export default {
     name: "ListSnippets",
     components: {
@@ -96,6 +92,12 @@ export default {
                 ? true
                 : false;
         },
+        baseUrl: function(){
+            return this.apiUrl + this.snippetUrl;
+        }
+    },
+    mounted() {
+        this.tableHeight = document.body.clientHeight - 0;
     },
     data: function() {
         return {
@@ -107,10 +109,12 @@ export default {
             },
             isShowAddModal: false,
             isEdit: false,
-            baseUrl: "https://v2hoangnd.dev.symper.vn/ba-snippet",
+            apiUrl: "https://v2hoangnd.dev.symper.vn/",
+            snippetUrl: "ba-snippet",
             editCallback: null,
             removeCallback: null,
             addCallback: null,
+            tableHeight: 0,
             tableContextMenu: [
                 {
                     name: "edit",
@@ -125,7 +129,7 @@ export default {
                     text: this.$t("snippet.contextMenu.remove"),
                     callback: (snippet, callback) => {
                         this.removeCallback = callback;
-                        this.deleteSnippet = snippet;
+                        this.deleteSnippet(snippet);
                     }
                 }
             ],
@@ -137,6 +141,15 @@ export default {
             this.isEdit = true;
             this.isShowAddModal = true;
         },
+        showAddModal() {
+            this.isShowAddModal = true;
+            this.isEdit = false;
+            this.currentSnippet = {
+                name: "",
+                description: "",
+                value: ""
+            };
+        },
         addSnippet() {
             if (this.isEdit) {
                 this.updateSnippet();
@@ -145,8 +158,8 @@ export default {
             }
         },
         deleteSnippet(snippet) {
-            let req = new Api("https://v2hoangnd.dev.symper.vn/");
-            let res = req.delete("/" + snippet.id);
+            let req = new Api(this.apiUrl);
+            let res = req.delete(this.snippetUrl + "/" + snippet.id);
             res.then((result) => {
                 // callback here
                 this.removeCallback(result)
@@ -155,22 +168,25 @@ export default {
             });
         },
         createSnippet() {
-            let req = new Api("https://v2hoangnd.dev.symper.vn/");
-            let res = req.post("", this.currentSnippet);
+            let req = new Api(this.apiUrl);
+            let res = req.post(this.snippetUrl, this.currentSnippet);
             res.then((result) => {
                 this.isShowAddModal = false;
                 // callback come here
-                this.addCallback({...this.currentSnippet, id: result.data, snippet: this.currentSnippet.value})
+                this.$refs.listSnippet.getData();
             }).catch((err) => {
                 console.log(err);
             });
         },
         updateSnippet() {
-            let req = new Api("https://v2hoangnd.dev.symper.vn/");
-            let res = req.put("", this.currentSnippet);
+            let req = new Api(this.apiUrl);
+            let res = req.put(this.snippetUrl, this.currentSnippet);
             res.then((result) => {
                 // callback come here
-                this.editCallback({...this.currentSnippet, snippet: this.currentSnippet.value})
+                this.editCallback({
+                    ...result,
+                    data: {...this.currentSnippet, snippet: this.currentSnippet.value}
+                })
                 this.isShowAddModal = false;
             }).catch((err) => {
                 console.log(err);
