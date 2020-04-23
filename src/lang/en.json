@@ -19,7 +19,8 @@
         "list": "List",
         "search": "Search",
         "list_config": "List config",
-        "save": "Save"
+        "save": "Save",
+        "snippets": "Snippets"
     },
     "validate": {
         "required": "Not be empty",
@@ -151,6 +152,20 @@
                 "passwordSetting": "Password setting",
                 "edit": "Edit"
             }
+        }
+    },
+    "snippet": {
+        "header": {
+            "id": "ID",
+            "name": "Name",
+            "description": "Description",
+            "snippet": "Content"
+        },
+        "title": "List BA Snippets",
+        "contextMenu": {
+            "edit": "Edit",
+            "add": "add",
+            "remove": "remove"
         }
     }
 }
