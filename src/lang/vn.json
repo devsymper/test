@@ -20,7 +20,8 @@
         "search": "Tìm kiếm",
         "list_config": "Cấu hình danh sách",
         "save": "Lưu",
-        "snippets": "Snippets"
+        "snippets": "Snippets",
+        "permissions": "Phân quyền"
     },
     "login": {
         "title": "Đăng nhập hệ thống",
@@ -165,6 +166,20 @@
         "contextMenu": {
             "edit": "Sửa",
             "add": "Thêm mới",
+            "remove": "Xóa"
+        }
+    },
+    "permissions": {
+        "header": {
+            "id": "ID",
+            "pack_name": "Tên package",
+            "date_created": "Ngày tạo"
+        },
+        "title": "Nhóm quyền",
+        "listObject": "Đối tượng",
+        "contextMenu": {
+            "edit": "Sửa",
+            "grantPermission": "Phân quyền",
             "remove": "Xóa"
         }
     }
