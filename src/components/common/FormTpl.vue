@@ -12,6 +12,7 @@
 </template>
 <script>
 import { VTextField, VSelect, VCheckbox, VRadio, VSwitch,VTextarea } from "vuetify/lib";
+import TreeValidate from "./../../views/document/sideright/items/FormValidateTpl.vue"
 const inputTypeConfigs = {
     numeric: {
         tag: "v-text-field",
@@ -69,6 +70,14 @@ const inputTypeConfigs = {
                 label: config.title,
                 rows: config.rows ? config.rows: 2,
                 'auto-grow': config.autoGrow ? config.autoGrow : true
+            };
+        }
+    },
+    treeValidate: {
+        tag: "v-tree-validate",
+        props(config) {
+            return {
+                label: config.title,
             };
         }
     }
@@ -131,7 +140,8 @@ export default {
         VCheckbox,
         VRadio,
         VSwitch,
-        VTextarea
+        VTextarea,
+        "v-tree-validate":TreeValidate
     }
 };
 </script>

@@ -184,7 +184,7 @@ let commonFormulas = {
     },
     validate: {
         title: "Công thức xác thực",
-        type: "textarea",
+        type: "treeValidate",
     },
     readOnly: {
         title: "Công thức readonly",
@@ -227,16 +227,16 @@ let groupType = {
 
 const controlTypes = {
     label: {
-        icon: "mdi mdi-format-color-text",
-        html: `<span class="s-control s-control-label" contenteditable="false" s-control-type="label" style="font-size:13px;padding:2px 8px;border-radius:4px;">Label</span>`,
+        icon: `/icon/ic_label.png`,
+        html: `<span class="s-control s-control-label" contenteditable="false" s-control-type="label"  title="Label" style="font-size:18px;padding:2px 8px;border-radius:4px;"><span class="mdi mdi-format-letter-case"></span></span>`,
         title: "Label",
         notInProps: ['formatNumber', 'isSumTable', 'isReadOnly'],
         formulas: ['link', 'formulas', 'hidden']
     },
     qrCode: {
-        icon: "mdi mdi-qrcode",
-        html: `<span class="s-control s-control-qrcode" contenteditable="false" style="cursor: pointer;display: inline-block;width: 100px;height: 100px;border:none;" s-control-type="qrCode" data-mce-selected="1">
-                    <img style="width: 100%;height: 100%;" src="/qrcode/?code=">
+        icon: "/icon/ic_qrcode.png",
+        html: `<span class="s-control s-control-qrcode" contenteditable="false"  title="Qr code" style="cursor: pointer;text-align: center;display: inline-block;width: 25px;height: 25px;border:none;" s-control-type="qrCode" data-mce-selected="1">
+                    <span class="mdi mdi-qrcode-scan" style="font-size: 22px;color: #757575;"></span>
                     <input type="hidden">
                 </span>`,
         title: "QrCode",
@@ -244,9 +244,9 @@ const controlTypes = {
         formulas: ['link', 'formulas', 'hidden']
     },
     image: {
-        icon: "mdi mdi-image",
-        html: `<span class="s-control s-control-image" contenteditable="false" style="cursor: pointer;display: inline-block;width: 100px;height: 100px;border:none;" s-control-type="image">
-                    <img style="width: 100%;height: 100%;" src="/view/themes/img/image.png">
+        icon: "/icon/ic_image.png",
+        html: `<span class="s-control s-control-image" contenteditable="false"  title="Image" style="cursor: pointer;text-align: center;display: inline-block;width: 25px;height: 25px;border:none;" s-control-type="image">
+                    <span class="mdi mdi-image-area" style="font-size: 22px;color: #757575;"></span>
                     <input type="hidden" >
                 </span>`,
         title: "Image",
@@ -254,152 +254,152 @@ const controlTypes = {
         formulas: ['link', 'formulas', 'hidden']
     },
     textInput: {
-        icon: "mdi mdi-sign-text",
-        html: `<input class="s-control s-control-text" contenteditable="false" s-control-type="textInput" type="text" style="border:none">`,
+        icon: "/icon/ic_textinput.png",
+        html: `<input class="s-control s-control-text mdi" contenteditable="false" s-control-type="textInput" type="text" title="Text Input" style="border:none">`,
         title: "Text input",
         notInProps: ['formatNumber', 'isSumTable', 'isAllowUpdate'],
         formulas: ['link', 'formulas', 'hidden', 'readOnly', 'autocomplete', 'require', 'validate']
     },
     richText: {
-        icon: "mdi mdi-format-paragraph",
-        html: `<textarea class="s-control S-control-rich-text" contenteditable="false" s-control-type="richText" type="text" style="border:none"></textarea>`,
+        icon: "/icon/ic_richtext.png",
+        html: `<textarea class="s-control S-control-rich-text" contenteditable="false"  title="Rich-text" s-control-type="richText" type="text" style="border:none"></textarea>`,
         title: "Rich text",
         notInProps: ['formatNumber', 'isSumTable', 'isAllowUpdate', 'isDisplayCompact', 'isMultipleValue'],
         formulas: ['link', 'formulas', 'hidden', 'readOnly', 'require']
     },
     number: {
-        icon: "mdi mdi-numeric",
-        html: `<input class="s-control s-control-number" contenteditable="false" s-control-type="number" type="number" style="border:none">`,
+        icon: "/icon/ic_number.png",
+        html: `<input class="s-control s-control-number" contenteditable="false"  title="Number" s-control-type="number" type="number" style="border:none">`,
         title: "Number",
         notInProps: ['isDisplayCompact', 'isMultipleValue'],
         formulas: ['link', 'formulas', 'hidden', 'readOnly', 'require', 'validate']
     },
     date: {
-        icon: "mdi mdi-calendar",
-        html: `<input class="s-control s-control-date" contenteditable="false" s-control-type="date" type="date" style="border:none">`,
+        icon: "/icon/ic_date.png",
+        html: `<input class="s-control s-control-date" contenteditable="false"  title="Date" s-control-type="date" type="date" style="border:none">`,
         title: "Date",
         notInProps: ['otherInfo', 'formatNumber', 'isSumTable', 'isAllowUpdate', 'isDisplayCompact', 'isMultipleValue'],
         formulas: ['formulas', 'hidden', 'readOnly', 'require', 'validate']
     },
     dateTime: {
-        icon: "mdi mdi-calendar-clock",
-        html: `<input class="s-control s-control-datetime" contenteditable="false" s-control-type="dateTime" type="datetime-local" style="border:none">`,
+        icon: "/icon/ic_date.png",
+        html: `<input class="s-control s-control-datetime" contenteditable="false"  title="Date time" s-control-type="dateTime" type="datetime-local" style="border:none">`,
         title: "Date time",
         notInProps: ['otherInfo', 'formatNumber', 'isSumTable', 'isAllowUpdate', 'isDisplayCompact', 'isMultipleValue'],
         formulas: ['formulas', 'hidden', 'readOnly', 'require', 'validate']
     },
     time: {
-        icon: "mdi mdi-calendar-clock",
-        html: `<input class="s-control s-control-time" contenteditable="false" s-control-type="time" type="time" style="border:none">`,
+        icon: "/icon/ic_date.png",
+        html: `<input class="s-control s-control-time" contenteditable="false"  title="Time" s-control-type="time" type="time" style="border:none;width: 150px;">`,
         title: "Time",
         notInProps: ['otherInfo', 'formatNumber', 'isSumTable', 'isAllowUpdate', 'isDisplayCompact', 'isMultipleValue'],
         formulas: ['formulas', 'hidden', 'readOnly', 'require', 'validate']
     },
     month: {
-        icon: "mdi mdi-calendar-multiple",
-        html: `<input class="s-control s-control-month" contenteditable="false" s-control-type="month" type="month" style="border:none">`,
+        icon: "/icon/ic_date.png",
+        html: `<input class="s-control s-control-month" contenteditable="false" title="Month" s-control-type="month" type="month" style="border:none">`,
         title: "Month",
         notInProps: ['otherInfo', 'formatNumber', 'isSumTable', 'isAllowUpdate', 'isDisplayCompact', 'isMultipleValue'],
         formulas: ['formulas', 'hidden', 'readOnly', 'require', 'validate']
     },
     select: {
-        icon: "mdi mdi-select",
-        html: `<select class="s-control s-control-select" contenteditable="false" s-control-type="select" type="select" style="border:none"></select>`,
+        icon: "/icon/ic_select.png",
+        html: `<select class="s-control s-control-select" contenteditable="false" title="Select" s-control-type="select" type="select" style="border:none"></select>`,
         title: "Select",
         notInProps: ['formatNumber', 'isSumTable', 'isAllowUpdate', 'isDisplayCompact', 'isMultipleValue'],
         formulas: ['formulas', 'hidden', 'readOnly', 'link', 'require']
     },
     documentSelect: {
-        icon: "mdi mdi-file-document",
-        html: `<select class="s-control s-control-document" contenteditable="false" s-control-type="documentSelect" type="select"></select>`,
+        icon: "/icon/ic_document_select.png",
+        html: `<select class="s-control s-control-document" contenteditable="false" title="Document Select" s-control-type="documentSelect" type="select"></select>`,
         title: "Document select",
         notInProps: ['formatNumber', 'isSumTable', 'isAllowUpdate', 'isDisplayCompact', 'isMultipleValue'],
         formulas: ['formulas', 'hidden', 'readOnly', 'require']
     },
     phone: {
-        icon: "mdi mdi-cellphone",
-        html: `<input class="s-control s-control-phone" contenteditable="false" s-control-type="phone" type="tel">`,
+        icon: "/icon/ic_phone.png",
+        html: `<input class="s-control s-control-phone" contenteditable="false" title="Phone" s-control-type="phone" type="tel">`,
         title: "Phone",
         notInProps: ['formatNumber', 'isSumTable', 'isAllowUpdate', 'isDisplayCompact', 'isMultipleValue'],
         formulas: ['formulas', 'hidden', 'readOnly', 'require', 'validate']
     },
     email: {
-        icon: "mdi mdi-email-variant",
-        html: `<input class="s-control s-control-email" contenteditable="false" s-control-type="email" type="email">`,
+        icon: "/icon/ic_mail.png",
+        html: `<input class="s-control s-control-email" contenteditable="false" title="Email" s-control-type="email" type="email">`,
         title: "Email",
         notInProps: ['formatNumber', 'isSumTable', 'isAllowUpdate', 'isDisplayCompact', 'isMultipleValue'],
         formulas: ['formulas', 'hidden', 'readOnly', 'require', 'validate']
     },
     currency: {
-        icon: "mdi mdi-currency-usd",
-        html: `<input class="s-control s-control-currency" contenteditable="false" s-control-type="currency" type="number" step="0.01">`,
+        icon: "/icon/ic_currency.png",
+        html: `<input class="s-control s-control-currency" contenteditable="false" title="Currency" s-control-type="currency" type="number" step="0.01">`,
         title: "Currency",
         inProps: ['isHidden'],
         formulas: ['formulas', 'hidden', 'readOnly', 'require', 'validate']
     },
     radio: {
-        icon: "mdi mdi-radiobox-marked",
-        html: `<div class="s-control s-control-radio" contenteditable="false" style="width: auto;" s-control-type="radio"><label><input type="radio" > </label></div>`,
+        icon: "/icon/ic_radio.png",
+        html: `<div class="s-control s-control-radio" contenteditable="false" title="Radio" style="width: 40px;min-width: 20px;" s-control-type="radio"><label><input type="radio" style="margin-top: 7px;"> </label></div>`,
         title: "Radio",
         notInProps: ['mobileProps', 'formatNumber', 'isImportant', 'isMobile', 'isSumTable', 'isDBOnly', 'isRequired', 'isTableOnly', 'isTableOnly', 'isAllowUpdate', 'isReadOnly', 'isDisplayCompact', 'isMultipleValue'],
         formulas: ['formulas', 'hidden', 'readOnly', 'require']
     },
     checkbox: {
-        icon: "mdi mdi-checkbox-marked-outline",
-        html: `<input type="checkbox" value="false" class="s-control s-control-checkbox" s-control-type="checkbox" contenteditable="false">`,
+        icon: "/icon/ic_checkbox.png",
+        html: `<input type="checkbox" value="false" class="s-control s-control-checkbox" title="Checkbox" s-control-type="checkbox" contenteditable="false">`,
         title: "Checkbox",
         notInProps: ['otherInfo', 'fontSize', 'formatNumber', 'isSumTable', 'isDBOnly', 'isRequired', 'isTableOnly', 'isAllowUpdate', 'isDisplayCompact', 'isMultipleValue', 'isBorderSubmit', 'isBorderView', 'isBorderPrint'],
         formulas: ['formulas', 'hidden', 'readOnly', 'require']
     },
     color: {
-        icon: "mdi mdi-format-paint",
-        html: `<input class="s-control s-control-color" contenteditable="false" s-control-type="color" type="text">`,
+        icon: "/icon/ic_date.png",
+        html: `<input class="s-control s-control-color" contenteditable="false" title="Color" s-control-type="color" type="text">`,
         title: "Color",
         inProps: ['isHidden'],
         formulas: ['hidden']
     },
     percent: {
-        icon: "mdi mdi-percent",
-        html: `<input class="s-control s-control-percent" contenteditable="false" s-control-type="percent" type="number" step="0.01">`,
+        icon: "/icon/ic_percent.png",
+        html: `<input class="s-control s-control-percent" contenteditable="false" title="Percent" s-control-type="percent" type="number" step="0.01">`,
         title: "Percent",
         notInProps: ['formatNumber', 'isSumTable', 'isAllowUpdate', 'isDisplayCompact', 'isMultipleValue'],
         formulas: ['formulas', 'hidden', 'readOnly']
     },
     user: {
-        icon: "mdi mdi-account-outline",
-        html: `<select class="s-control s-control-user" contenteditable="false" s-control-type="user"></select>`,
+        icon: "/icon/ic_user.png",
+        html: `<select class="s-control s-control-user" contenteditable="false" title="User" s-control-type="user"></select>`,
         title: "User",
         notInProps: ['formatNumber', 'isSumTable', 'isDBOnly', 'isTableOnly', 'isAllowUpdate', 'isDisplayCompact', 'isMultipleValue'],
         formulas: ['hidden', 'readOnly']
     },
     inputFilter: {
-        icon: "mdi mdi-filter-outline",
-        html: `<input class="s-control s-control-filter" contenteditable="false" type="text" s-control-type="inputFilter">`,
+        icon: "/icon/ic_input_filter.png",
+        html: `<input class="s-control s-control-filter" contenteditable="false" title="Input filter" type="text" s-control-type="inputFilter">`,
         title: "Input filter",
         notInProps: ['formatNumber', 'isSumTable', 'isTableOnly', 'isAllowUpdate', 'isDisplayCompact', 'isMultipleValue'],
         formulas: ['formulas', 'hidden', 'readOnly', 'link', 'require', 'validate']
     },
     hidden: {
-        icon: "mdi mdi-eye-off-outline",
-        html: `<input class="s-control s-control-hidden" contenteditable="false" type="text" s-control-type="hidden" placeholder="hidden control">`,
+        icon: "/icon/ic_hidden.png",
+        html: `<input class="s-control s-control-hidden" contenteditable="false" title="Hidden" type="text" s-control-type="hidden" placeholder="Hidden control">`,
         title: "Hidden",
         notInProps: ['formatNumber', 'isSumTable', 'isAllowUpdate'],
         formulas: ['formulas', 'hidden', 'readOnly', 'require', 'validate']
     },
     table: {
-        icon: "mdi mdi-table",
+        icon: "/icon/ic_table.png",
         html: `<div style="overflow-y: auto;position: relative;font-size: 13px;" contenteditable="true" class="s-control s-control-table" s-control-type="table">
                 <table style="width:100%;text-align: center;" >
-                    <thead >
+                    <thead style="    background: #f2f2f2;">
                         <tr>
                             <th class="column-function">Chọn</th>
                             <th class="column-item">Tiêu đề</th>
-                            <th class="column-function">Chức năng</th>
+                            <th class="column-function" >Chức năng</th>
                         </tr>
                     </thead>
                 <tbody style="background: white;">
                     <tr class="s-control-table-row-template">
-                        <td class="column-function"><input type="checkbox" class="s-control-check-table-row"></td>
+                        <td class="column-function" ><input type="checkbox" class="s-control-check-table-row"></td>
                         <td class="column-item"></td>
                         <td class="column-function"><button class="btn btn-primary s-control-table-remove-row" style="margin: 5px;">Xoá</button></td>
                     </tr>
@@ -410,87 +410,80 @@ const controlTypes = {
                     <a class="btn btn-primary s-control-table-remove-select">Xoá dòng đã chọn </a>
                     <a class="btn btn-primary s-control-table-remove-unselect">Xoá dòng không chọn </a>
                 </div>
-                </div>
-                <br>`,
+                </div> &nbsp<br><p>&nbsp</p>;
+                `,
         title: "Table",
         notInProps: ['width', 'height', 'isImportant', 'formatNumber', 'isSumTable', 'isRequired', 'isDBOnly', 'isTableOnly', 'isAllowUpdate', 'isDisplayCompact', 'isMultipleValue', 'isAllowPrint', 'isBorderSubmit', 'isBorderView', 'isBorderPrint'],
         formulas: ['formulas', 'hidden', 'readOnly', 'headerTable', 'filterOptions']
     },
     panel: {
-        icon: "mdi mdi-collage",
-        html: `<div class="s-control s-control-panel" contenteditable="false" s-control-type="panel" style="width: 100%;display: inline-block;font-size: 13px;" >
-                    <span class="panel-title2" style="background: #dadada;color: #6e6e6e;border-bottom: 0.5px solid #ddd;height: 30px;font-weight: bold;width: 100%;padding:7px;display: inline-block!important;">Tiêu đề panel</span>
+        icon: "/icon/ic_panel.png",
+        html: `<div class="s-control s-control-panel" contenteditable="false" title="Panel" s-control-type="panel" style="display: inline-block;font-size: 13px;width: 150px;" >
+                    <span class="panel-title2" style="background: #dadada;color: #6e6e6e;border-bottom: 0.5px solid #ddd;height: 30px;font-weight: bold;width: 100%;padding:7px 0 0 0;text-align: center;;display: inline-block!important;">Tiêu đề panel</span>
                     <div style="padding:7px;display: block;">
                     
                     </div>
-                </div><br>`,
+                </div>`,
         title: "Panel",
         notInProps: ['fontSize', 'formatNumber', 'isImportant', 'isSumTable', 'isRequired', 'isDBOnly', 'isTableOnly', 'isAllowUpdate', 'isReadOnly', 'isDisplayCompact', 'isMultipleValue', 'isAllowPrint', 'isBorderSubmit', 'isBorderView', 'isBorderPrint'],
         formulas: ['hidden']
     },
     fileUpload: {
-        icon: "mdi mdi-attachment",
-        html: `<div class="s-control s-control-file-upload " style="display: inline-block;width: auto;border-radius: 10px;font-size: 13px;height: auto;padding: 5px!important;border: 1px solid #c5c5c5!important;    " s-control-type="fileUpload" contenteditable="false">
+        icon: "/icon/ic_file_upload.png",
+        html: `<div class="s-control s-control-file-upload " title="File upload" s-control-type="fileUpload" contenteditable="false">
+                <span class="mdi mdi-attachment" style="font-size: 22px;color: #757575;"></span>
                 <input type="hidden" name="FileUpload">
-                <span class="cmd-file-list"></span>
-                <span class="btn " style="padding: 0;text-transform: capitalize!important;">
-                <!-- <img src="/view/themes/icon/upload.png" width="50px">  -->
-                <span class="btn-upload-file-input">
-                <img src="/view/themes/icon/upload.png" width="20px"> Attach
-                
-                </span>
-                </span>
-                </div><br>`,
+                </div>`,
         title: "File upload",
         notInProps: ['width', 'height', 'fontSize', 'color', 'mobileProps', 'isImportant', 'formatNumber', 'isMobile', 'isSumTable', 'isDBOnly', 'isTableOnly', 'isAllowUpdate', 'isReadOnly', 'isDisplayCompact', 'isMultipleValue'],
         formulas: ['hidden']
     },
     report: {
-        icon: "mdi mdi-chart-bar-stacked",
-        html: `<div class="s-control-report s-control" s-control-type="report" style="min-height: 50px;width:100px;font-size: 13px;;box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);display: inline-block;"contenteditable="false">
-                <h5 style="margin:5px;font-family: 'Roboto', sans-serif!important;font-weight:normal">Report</h5>
-                </div><br>`,
+        icon: "/icon/ic_report.png",
+        html: `<div class="s-control-report s-control" title="Report" s-control-type="report" style="width:150px" contenteditable="false">
+                <h5 style="margin:0;height: 100%;padding-top: 5px;font-size: 12px;font-family: 'Roboto', sans-serif!important;font-weight:normal">Report</h5>
+                </div>`,
         title: "Report",
         notInProps: ['fontSize', 'mobileProps', 'isImportant', 'formatNumber', 'isMobile', 'isSumTable', 'isRequired', 'isDBOnly', 'isTableOnly', 'isHidden', 'isAllowUpdate', 'isReadOnly', 'isDisplayCompact', 'isMultipleValue', 'isBorderSubmit', 'isBorderView', 'isBorderPrint'],
         formulas: ['hidden', 'report']
     },
     approvalHistory: {
-        icon: "mdi mdi-chart-timeline",
-        html: `<div class="s-control-approval-history s-control" s-control-type="approvalHistory" style="min-height: 50px;font-size: 13px;width: 100%;display: inline-block" contenteditable="false">
-                <h5 style="margin:5px;font-family: 'Roboto', sans-serif!important;font-weight:normal">Lịch sử phê duyệt</h5>
+        icon: "/icon/ic_approval_history.png",
+        html: `<div class="s-control-approval-history s-control" title="Approval history" s-control-type="approvalHistory" style="width:150px" contenteditable="false">
+                <h5 style="margin:0;height: 100%;padding-top: 5px;font-size: 12px;font-family: 'Roboto', sans-serif!important;font-weight:normal">Lịch sử phê duyệt</h5>
                 <div class="list-approval-history"></div>
-                </div><br>`,
+                </div>`,
         title: "Approval history",
         inProps: ['isAllowPrint', 'isBorderSubmit', 'isBorderView', 'isBorderPrint'],
         formulas: ['hidden']
     },
     trackingValue: {
-        icon: "mdi mdi-chart-timeline",
-        html: `<div class="s-control-tracking-value s-control" s-control-type="trackingValue" style="min-height: 50px;font-size: 13px;width: 100%;display: inline-block;" contenteditable="false" readonly="readonly">
-                <h5 style="margin:5px;font-family: 'Roboto', sans-serif!important;font-weight:normal">Tracking giá trị của control</h5>
-                </div><br>`,
+        icon: "/icon/ic_tracking_value.png",
+        html: `<div class="s-control-tracking-value s-control" title="Tracking value" s-control-type="trackingValue" style="width:150px" contenteditable="false" readonly="readonly">
+                <h5 style="margin:0;height: 100%;padding-top: 5px;font-size: 12px;font-family: 'Roboto', sans-serif!important;font-weight:normal">Tracking giá trị của control</h5>
+                </div>`,
         title: "Tracking value",
         inProps: ['name', 'isAllowPrint', 'isBorderSubmit', 'isBorderView', 'isBorderPrint'],
         formulas: ['hidden']
     },
     submit: {
-        icon: "mdi mdi-archive",
-        html: `<span type="button" class="s-control s-control-submit" contenteditable="false" s-control-type="submit" value="Submit" style="display: inline;font-size: 13px;">Submit</span>`,
+        icon: "/icon/ic_submit.png",
+        html: `<span type="button" class="s-control s-control-submit" contenteditable="false" s-control-type="submit" value="Submit" style="display: inline;font-size: 13px;color:green;">Submit</span>`,
         title: "Submit",
         inProps: ['mobileProps', 'isImportant', 'formatNumber', 'isMobile', 'isSumTable', 'isRequired', 'isDBOnly', 'isTableOnly', 'isHidden', 'isAllowUpdate', 'isReadOnly', 'isDisplayCompact', 'isMultipleValue'],
         formulas: ['hidden']
     },
     reset: {
-        icon: "mdi mdi-archive",
-        html: `<span type="button" class="s-control s-control-reset" contenteditable="false" s-control-type="reset" value="Reset" style="display: inline;font-size: 13px;">Reset</span>`,
+        icon: "/icon/ic_reset.png",
+        html: `<span type="button" class="s-control s-control-reset" contenteditable="false" s-control-type="reset" value="Reset" style="display: inline;font-size: 13px;color:red;">Reset</span>`,
         title: "Reset",
         inProps: ['otherInfo', 'mobileProps', 'isImportant', 'formatNumber', 'isMobile', 'isSumTable', 'isRequired', 'isDBOnly', 'isTableOnly', 'isHidden', 'isAllowUpdate', 'isReadOnly', 'isDisplayCompact', 'isMultipleValue'],
         formulas: ['hidden']
     },
     draf: {
-        icon: "mdi mdi-archive",
-        html: `<span type="button" class="s-control s-control-draf" contenteditable="false" s-control-type="draf" value="Draf" style="display: inline;font-size: 13px;">Draf</span>`,
-        title: "Draf",
+        icon: "/icon/ic_draft.png",
+        html: `<span type="button" class="s-control s-control-draft" contenteditable="false" s-control-type="draft" value="Draf" style="display: inline;font-size: 13px;">Draft</span>`,
+        title: "Draft",
         inProps: ['otherInfo', 'mobileProps', 'isImportant', 'formatNumber', 'isMobile', 'isSumTable', 'isRequired', 'isDBOnly', 'isTableOnly', 'isHidden', 'isAllowUpdate', 'isReadOnly', 'isDisplayCompact', 'isMultipleValue'],
         formulas: ['hidden']
     },
@@ -499,11 +492,11 @@ const controlTypes = {
 }
 
 
+// hàm lấy tất cac thuoc tinh và các trường công thức của control
+// input : type của control
+// output : data control  : {icon,html,title,formulas,properties}
 export const GetControlProps = function(type) {
     let control = util.cloneDeep(controlTypes[type]);
-
-    console.log(type);
-    console.log(control);
 
     let allProperties = util.cloneDeep(commonProps);
     let notInProps = control.notInProps;
@@ -532,19 +525,37 @@ export const GetControlProps = function(type) {
     return control;
 
 }
+
+// hàm lấy tất cả thông tin các control
 export const getAllTypeControl = function() {
-    let allControl = util.cloneDeep(controlTypes);
-    let result = Object.keys(allControl).map(function(key) {
-        return { type: key, prop: allControl[key] };
-    });
-    return result;
-}
+        let allControl = util.cloneDeep(controlTypes);
+        let result = Object.keys(allControl).map(function(key) {
+            return { type: key, prop: allControl[key] };
+        });
+        return result;
+    }
+    // hàm lấy tất cả thông tin các control trong tablesetting
+export const getAllControlForTableSetting = function(inType) {
+
+        let allControl = util.cloneDeep(controlTypes);
+
+        let result = Object.keys(allControl).map(function(key) {
+            return { type: key, prop: allControl[key] };
+        });
+        let controlInTableSetting = result.filter(control => {
+            return $.inArray(control.type, inType) != -1;
+        })
+        return controlInTableSetting;
+    }
+    //hàm trả về 1 control
 export const getControlElement = function(type) {
     return util.cloneDeep(controlTypes[type]);
 }
 export const getGroupProps = function(group) {
     return util.cloneDeep(groupType[group]);
 }
+
+// hàm lấy thông tin control cho tablesetting của control tabele trong doc editor
 export const getControlElementForTableSetting = function(type) {
     let control = util.cloneDeep(controlTypes[type]);
     let result = Object.keys(control).map(function(key) {

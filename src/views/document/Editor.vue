@@ -1,5 +1,5 @@
 <template>
-    <v-flex class="d-flex sym-document">
+    <v-flex class="d-flex sym-document" style="height:calc(100%);">
         <div class="sym-document__side-bar-left">
             <sidebar-left/>
         </div>
@@ -29,6 +29,7 @@
                     fontsize_formats: '8pt 10pt 11pt 12pt 13pt 14pt 15pt 16pt 17pt 18pt 19pt 20pt 21pt 22pt 23pt 24pt 25pt 26pt 27pt 28pt 29pt 30pt 32pt 34pt 36pt',
                     font_formats: 'Roboto = Roboto,sans-serif; Andale Mono=andale mono,times;'+ 'Arial=arial,helvetica,sans-serif;'+ 'Arial Black=arial black,avant garde;'+ 'Book Antiqua=book antiqua,palatino;'+ 'Comic Sans MS=comic sans ms,sans-serif;'+ 'Courier New=courier new,courier;'+ 'Georgia=georgia,palatino;'+ 'Helvetica=helvetica;'+ 'Impact=impact,chicago;'+ 'Symbol=symbol;'+ 'Tahoma=tahoma,arial,helvetica,sans-serif;'+ 'Terminal=terminal,monaco;'+ 'Times New Roman=times new roman,times;'+ 'Trebuchet MS=trebuchet ms,geneva;'+ 'Verdana=verdana,geneva;'+ 'Webdings=webdings;'+ 'Wingdings=wingdings,zapf dingbats',
                     valid_elements: '*[*]',
+                    content_css:['https://cdn.jsdelivr.net/npm/@mdi/font@latest/css/materialdesignicons.min.css'],
                     setup: function(ed){
                         ed.ui.registry.addMenuItem('settingtable', {
                             text: 'Setting table',
@@ -259,7 +260,7 @@ export default {
                 var clientFrameWindow = $('#editor_ifr').get(0).contentWindow;
                 $(clientFrameWindow.document.head).append(style);
                 var htmlBody = $(clientFrameWindow.document).find('body,html');
-                htmlBody.css({height:"800px"})
+                htmlBody.css({height:"calc(100% - 10px)"})
                 htmlBody.find('*').on('dragenter', function(event) {
                     event.stopPropagation();
                     currentElement = $(event.target);
@@ -286,7 +287,9 @@ export default {
                         DragDropFunctions.AddEntryToDragOverQueue(currentElement, elementRectangle, mousePosition);
                     }
                 })
-                $(clientFrameWindow.document).on('click','.s-control',function(){
+                $(clientFrameWindow.document).on('click','.s-control',function(e){
+                    e.stopPropagation();
+                    e.preventDefault();
                     $(clientFrameWindow.document).find('.on-selected').removeClass('on-selected')
                     if(!$(this).hasClass('on-selected')){
                         $(this).addClass('on-selected');
@@ -726,11 +729,11 @@ export default {
                     styles += 'body{background:white !important;} ';
                     styles += 'p{margin:0 !important;} ';
                     styles += '@page { margin: 0; }';
-                    styles += '.s-control-table thead,.s-control-table tbody{border-bottom:1px solid #aaaaaa;}';
+                    styles += 'table td, table th{ border: 1px solid #ccc !important;padding: .4rem !important;}';
                     styles += '.on-selected{border:1px dashed #2196f3 !important;cursor: pointer !important;}';
-                    styles += '.s-control-reset,.s-control-draf,.s-control-submit,.s-control-text,.s-control-select,.s-control-document,.s-control-phone,.s-control-email,.s-control-currency,.s-control-radio,.s-control-color,.s-control-percent,.s-control-hidden,.s-control-user,.s-control-filter,.s-control-date,.s-control-datetime,.s-control-month,.s-control-time,.s-control-number{width: auto;height: 25px;border-radius: 3px;font-size: 13px;padding: 0 5px;outline: 0!important;}'
-                    styles += '.s-control {background: rgb(233, 236, 239);min-width: 50px;outline: none !important;margin:1px;border:none}';
-                    styles += '.s-control-reset,.s-control-draf,.s-control-submit{padding: 4px 8px;}';
+                    styles += '.s-control-tracking-value,.s-control-approval-history,.s-control-report,.s-control-file-upload,.s-control-reset,.s-control-draf,.s-control-submit,.s-control-text,.s-control-select,.s-control-document,.s-control-phone,.s-control-email,.s-control-currency,.s-control-radio,.s-control-color,.s-control-percent,.s-control-hidden,.s-control-user,.s-control-filter,.s-control-date,.s-control-datetime,.s-control-month,.s-control-time,.s-control-number{width: auto;height: 25px;border-radius: 3px;font-size: 13px;padding: 0 5px;outline: 0!important;}'
+                    styles += '.s-control:not(.s-control-table) {background: rgb(233, 236, 239);min-width: 50px;max-width:150px;outline: none !important;margin:1px;border:none}';
+                    styles += '.s-control-reset,.s-control-draf,.s-control-submit{padding: 5px 8px;}';
                     return styles;
                 }
             }
@@ -776,6 +779,7 @@ export default {
     /* body */
     .sym-document-body{
         width: calc(100% - 480px);
+        height: calc(100% - 78px);
     }
 
 

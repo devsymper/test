@@ -22,6 +22,10 @@
     font-size: 10px;
 }
 
+.fs-11 {
+    font-size: 11px;
+}
+
 .w-100 {
     width: 100%;
 }
@@ -264,7 +268,7 @@
 }
 
 .sym-document-tab-control .tf-search-control .v-input__slot {
-    min-height: 30px !important;
+    min-height: 25px !important;
 }
 
 .list-control-autocomplete .tf-search-control .v-input__slot {
@@ -281,4 +285,35 @@
 
 .v-dialog__content {
     z-index: 9999 !important;
+}
+
+.mh-15 {
+    min-height: 15px;
+}
+
+#rowDrag input:focus {
+    outline: auto;
+    padding: 0 4px;
+}
+
+::-webkit-input-placeholder {
+    /* Edge */
+    color: #797979 !important;
+}
+
+:-ms-input-placeholder {
+    /* Internet Explorer */
+    color: #797979 !important;
+}
+
+::placeholder {
+    color: #797979 !important;
+}
+
+.sym-small-size .v-treeview-node__root {
+    min-height: 25px !important;
+}
+
+.sym-document__side-bar-left .v-expansion-panel::before {
+    box-shadow: none;
 }

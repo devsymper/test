@@ -114,11 +114,11 @@ export default {
         font-size: 13px;
         font-weight: bold;
         min-height: unset;
-        padding: 6px 16px;
+        padding: 4px 16px;
         background: #f2f2f2;
     }
     .tf-search-control{
-        margin: 12px 6px;
+        margin: 6px 0px;
     }
     
     .sym-document-tab-control .v-expansion-panel{
@@ -129,5 +129,8 @@ export default {
 <style>
     .sym-v-expand-content .v-expansion-panel-content__wrap{
         padding: 0;
+    }
+    .sym-v-expand-content .v-list{
+        padding: 0 !important;
     }
 </style>

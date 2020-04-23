@@ -40,15 +40,13 @@
                     </v-expansion-panel-content>
                 </v-expansion-panel>
             </v-expansion-panels> -->
-            <control-props-config :allInputs="controlProps.properties"/>
+            <control-props-config :allInputs="sCurrentDocument.properties"/>
 
         </v-tab-item>
         <v-tab-item
             class="p-2"
         >
-        <control-props-config :allInputs="controlProps.formulas"/>
-
-            
+        <control-props-config :allInputs="sCurrentDocument.formulas"/>
         </v-tab-item>
 
         
@@ -58,12 +56,13 @@
 import FormTpl from "./../../../components/common/FormTpl.vue"
 export default {
     components:{
-        'control-props-config' : FormTpl
+        'control-props-config' : FormTpl,
     },
     computed: {
-        controlProps(){
+        sCurrentDocument(){
             return this.$store.state.document.editor.currentSelectedControl;
         },
+
         controlPropsGroup(){
             let allProps = this.$store.state.document.editor.currentSelectedControl.properties;
             let result = Object.keys(allProps).map(function(key) {

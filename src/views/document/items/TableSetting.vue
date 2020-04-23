@@ -18,7 +18,7 @@
                                 <thead>
                                     <tr>
                                         <th class="text-left">Thông tin cột</th>
-                                        <th class="text-left">Loại control</th>
+                                        <th class="text-center">Loại control</th>
                                         <th class="text-left">Tên control</th>
                                         <th class="text-left">Tiêu đề control</th>
                                         <th></th>
@@ -108,6 +108,8 @@ export default {
             this.listRows.splice(this.listRows.findIndex(v => v.key === row.key), 1);
             
         },
+
+        //call lại sự kiện cho editor để them cột vào control bảng
         saveTable(){
             this.filterRowNotExistType();
             if(this.listRows.length > 0){
@@ -116,15 +118,18 @@ export default {
             this.listRows = [];
             this.hideDialog()
         },
+        // hàm nào chưa set type thì xóa khỏi list
         filterRowNotExistType(){
             this.listRows = this.listRows.filter(row=>{
                 return row.type != ''
             })
         },
+        //update lại listrow khi drop
         dragReorder (oldIndex, newIndex) {
             const movedItem = this.listRows.splice(oldIndex, 1)[0]
             this.listRows.splice(newIndex, 0, movedItem)
         },
+        // drag row
         setOnDrag(){
             let thisCpn = this;
             var el = document.getElementById('tableDrag');

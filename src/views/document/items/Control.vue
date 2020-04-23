@@ -1,10 +1,10 @@
 <template>
 <v-list-item draggable class="sym-control" :control-type="type">
         <v-list-item-icon class="icon-control">
-          <v-icon small>{{dataControl.icon}}</v-icon>
+          <img :src="`https://hoangnd.dev.symper.vn/`+dataControl.icon">
         </v-list-item-icon>
 
-        <v-list-item-title class="fs-13">{{dataControl.title}}</v-list-item-title>
+        <v-list-item-title class="fs-11">{{dataControl.title}}</v-list-item-title>
       </v-list-item>
 </template>
 <script>
@@ -25,16 +25,22 @@ export default {
     },
     mounted(){
         this.dataControl = getControlElement(this.type);
+        console.log(this.dataControl);
+        
     },
     methods:{
-       
+        
     }
     
 }
 </script>
 <style scoped>
     .icon-control{
-        margin: 8px 16px 8px 4px !important;
+        margin: 4px 0px 4px 0px !important;
+    }
+    .icon-control img{
+        height: 14px;
+        width: 14px;
     }
     .sym-control{
         min-height: unset;
@@ -43,4 +49,5 @@ export default {
         background: #fafafa;
         cursor: pointer;
     }
+    
 </style>
