@@ -86,8 +86,8 @@ export default class Api {
     callApi(method, url, data, headers, options) {
         headers = Object.assign({
             Authorization: `Bearer ${util.auth.getToken()}`,
-            'Symper-Request-Name': 'test custom header',
-            'Symper-Cache-Strategy': 'cache-first' // hoặc network-first
+            'Symper-Request-Name': headers.sname ? headers.sname : `${method}: ${url}`,
+            'Symper-Cache-Strategy': headers.scache ? 'cache-first' : 'network-first' // hoặc network-first
         }, headers);
         let defaultOptions = {
             method: method,

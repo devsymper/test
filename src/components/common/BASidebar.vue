@@ -65,50 +65,6 @@
                     <v-list-item-title>{{ $t('common.'+item.title) }}</v-list-item-title>
                 </v-list-item-content>
             </v-list-item>
-
-<!-- 
-            <v-list-group
-                no-action
-                v-for="item in sapp.items"
-                :key="item.title"
-            >
-                <template v-slot:activator>
-                    <v-list-item-icon>
-                        <v-tooltip right>
-                            <template v-slot:activator="{ on }">
-                                <v-icon v-on="on">{{ item.icon }}</v-icon>
-                            </template>
-                            <span>{{ item.title }}</span>
-                        </v-tooltip>
-                    </v-list-item-icon>
-                    <v-list-item-title>{{ item.title }}</v-list-item-title>
-                </template>
-                <v-list-item
-                    v-for="item in item.group"
-                    :key="item.title"
-                    link
-                    @click="gotoPage(item.link)"
-                >
-                    <v-list-item-icon>
-                    <v-tooltip right>
-                        <template v-slot:activator="{ on }">
-                            <v-icon v-on="on">{{ item.icon }}</v-icon>
-                        </template>
-                        <span>{{ item.title }}</span>
-                    </v-tooltip>
-                    </v-list-item-icon>
-
-                    <v-list-item-content>
-                        <v-list-item-title>{{ item.title }}</v-list-item-title>
-                    </v-list-item-content>
-                </v-list-item>
-
-                
-            </v-list-group> -->
-
-
-
-
         </v-list>
         <template v-slot:append>
             <v-list dense>

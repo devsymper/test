@@ -17,8 +17,10 @@
         "refresh": "Làm mới",
         "export_excel": "Xuất excel",
         "list": "Danh sách",
-        "search": "Tìm kiếm"
-
+        "search": "Tìm kiếm",
+        "list_config": "Cấu hình danh sách",
+        "save": "Lưu",
+        "snippets": "Snippets"
     },
     "login": {
         "title": "Đăng nhập hệ thống",
@@ -32,6 +34,47 @@
         "messages": {
             "none_account": "Tạo tài khoản mới",
             "register": "Đăng ký"
+        }
+    },
+    "table": {
+        "wrap_text_mode": "Chế độ xuống dòng",
+        "display_density": "Mật độ hiển thị dòng",
+        "column_config": "Cấu hình cột",
+        "freeze_column": "Cố định cột này",
+        "unfreeze_column": "Bỏ cố định cột này",
+        "hide_column": "Ẩn cột này",
+        "show_column": "Hiện cột này",
+        "wrap_tex_mode": {
+            "wrap": "Xuống dòng",
+            "clip": "Cắt bớt"
+        },
+        "display_density_mode": {
+            "loosen": "Rộng",
+            "medium": "Trung bình",
+            "compact": "Gần nhau"
+        },
+        "error": {
+            "cannot_get_data": "Không thể lấy dữ liệu từ máy chủ"
+        },
+        "filter": {
+            "none": "Không chọn",
+            "empty": "Rỗng",
+            "not_empty": "Không rỗng",
+            "equal": "Bằng",
+            "not_equal": "Không bằng",
+            "begins_with": "Bắt đầu với",
+            "ends_with": "Kết thúc với",
+            "contains": "Chứa",
+            "not_contain": "Không chứa",
+            "gt": "Lớn hơn ( > )",
+            "gte": "Lớn hơn hoặc bằng ( >= )",
+            "lt": "Nhỏ hơn ( < )",
+            "lte": "Nhỏ hơn hoặc bằng ( <= )",
+            "sort_asc": "Sắp xếp tăng dần",
+            "sort_desc": "Sắp xếp giảm dần",
+            "clear_filter": "Xóa bộ lọc",
+            "filter_by_value": "Lọc bởi giá trị",
+            "filter_by_condition": "Lọc bởi điều kiện"
         }
     },
     "validate": {
@@ -109,6 +152,20 @@
                 "passwordSetting": "Tùy chọn mật khẩu",
                 "edit": "Sửa"
             }
+        }
+    },
+    "snippet": {
+        "header": {
+            "id": "ID",
+            "name": "Tên",
+            "description": "Mô tả",
+            "snippet": "Nội dung"
+        },
+        "title": "Danh sách BA Snippets",
+        "contextMenu": {
+            "edit": "Sửa",
+            "add": "Thêm mới",
+            "remove": "Xóa"
         }
     }
 }

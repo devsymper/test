@@ -9,6 +9,7 @@ import MultiGuard from 'vue-router-multiguard';
 
 import ShowListUser from "../views/users/ShowList.vue";
 import ActionPanel from "../views/users/ActionPanel.vue";
+import Snippet from "../views/snippets/index.vue";
 import Editor from "../views/document/Editor.vue";
 Vue.use(VueRouter);
 /**
@@ -22,7 +23,7 @@ Vue.use(VueRouter);
 const routes = [{
         path: "/",
         name: "home",
-        component: Home
+        component: Home,
     },
     {
         path: "/bpmne",
@@ -32,7 +33,7 @@ const routes = [{
     {
         path: "/login",
         name: "login",
-        meta: { layout: 'content-only' },
+        meta: { layout: "content-only" },
         component: Login,
     },
 
@@ -68,18 +69,26 @@ const routes = [{
     //     component: PermissionPackage,
     // },
 
+    //Snippet
+    {
+        path: "/snippets",
+        name: "snippets",
+        component: Snippet,
+        // meta: { layout: "content-only" },
+    },
+
     // Luôn để 2 item này ở cuối cùng của array này để nó có thể redirect đến được trang 404 khi ko tìm thấy route
     {
-        path: '/page-not-found',
-        name: 'pageNotFound',
+        path: "/page-not-found",
+        name: "pageNotFound",
         component: PageNotFound, //Vue component,
-        meta: { layout: 'content-only' }
+        meta: { layout: "content-only" },
     },
     {
-        path: '*',
-        name: 'page',
-        redirect: '/page-not-found'
-    }
+        path: "*",
+        name: "page",
+        redirect: "/page-not-found",
+    },
 ];
 
 /**

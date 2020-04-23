@@ -17,7 +17,10 @@
         "refresh": "Refresh",
         "export_excel": "Export Excel",
         "list": "List",
-        "search": "Search"
+        "search": "Search",
+        "list_config": "List config",
+        "save": "Save",
+        "snippets": "Snippets"
     },
     "validate": {
         "required": "Not be empty",
@@ -39,7 +42,47 @@
             "register": "Register"
         }
     },
-
+    "table": {
+        "wrap_text_mode": "Wrap text mode",
+        "display_density": "Row display density",
+        "column_config": "Column configs",
+        "freeze_column": "Freeze this column",
+        "unfreeze_column": "Don't freeze this column",
+        "hide_column": "Hide this column",
+        "show_column": "Show this column",
+        "wrap_tex_mode": {
+            "wrap": "Wrap",
+            "clip": "Clip"
+        },
+        "display_density_mode": {
+            "loosen": "Loosen",
+            "medium": "Medium",
+            "compact": "Compact"
+        },
+        "error": {
+            "cannot_get_data": "Can not get data from server"
+        },
+        "filter": {
+            "none": "None",
+            "empty": "Empty",
+            "not_empty": "Not Empty",
+            "equal": "Equal",
+            "not_equal": "Not equal",
+            "begins_with": "Begins with",
+            "ends_with": "Ends with",
+            "contains": "Contains",
+            "not_contain": "Not contains",
+            "gt": "Greater than ( > )",
+            "gte": "Greater than or equal ( >= )",
+            "lt": "Less than ( < )",
+            "lte": "Less than or equal ( <= )",
+            "sort_asc": "Sort ASC",
+            "sort_desc": "Sort DESC",
+            "clear_filter": "Clear filter",
+            "filter_by_value": "Filter by value",
+            "filter_by_condition": "Filter by condition"
+        }
+    },
     "user": {
         "title": "User list",
         "general": {
@@ -109,6 +152,20 @@
                 "passwordSetting": "Password setting",
                 "edit": "Edit"
             }
+        }
+    },
+    "snippet": {
+        "header": {
+            "id": "ID",
+            "name": "Name",
+            "description": "Description",
+            "snippet": "Content"
+        },
+        "title": "List BA Snippets",
+        "contextMenu": {
+            "edit": "Edit",
+            "add": "add",
+            "remove": "remove"
         }
     }
 }
