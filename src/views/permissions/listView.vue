@@ -346,30 +346,10 @@ export default {
 </script>
 
 <style>
-.v-text-field.v-text-field--enclosed .v-text-field__details {
-    display: none;
-}
-.v-text-field.v-text-field--solo .v-input__control {
-    min-height: 32px !important;
-}
+
 .col-title {
     padding: 0 10px;
     line-height: 30px;
-}
-.v-list-item.theme--light {
-    min-height: 25px !important;
-    transition: all 0.3s;
-    padding: 5px 0;
-    cursor: pointer;
-}
-.v-list-item:hover {
-    background-color: #dedede;
-}
-.v-list-item__action {
-    margin: 5px 0 !important;
-}
-.v-list-item__action:last-of-type:not(:only-child) {
-    margin-left: 15px !important;
 }
 .vsg_area .col {
     padding-top: 5px;

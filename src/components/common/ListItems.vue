@@ -21,7 +21,7 @@
                             :loading="loadingRefresh"
                             :disabled="loadingRefresh"
                             class="mr-2"
-                            @click="actionPanel = true"
+                            @click="addItem"
                         >
                             <v-icon left dark>mdi-plus</v-icon>
                             {{$t('common.add')}}
@@ -1042,8 +1042,9 @@ export default {
             this.actionPanel = true;
         },
         addItem() {
+            this.actionPanel = true;
             // Phát sự kiện khi click vào nút thêm mới
-            this.$emit("add-item", {});
+            this.$emit("after-open-add-panel", {});
         },
         removeItem() {
             // Phát sự kiện khi xóa danh sách các item trong list
