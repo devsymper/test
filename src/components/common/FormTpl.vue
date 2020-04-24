@@ -13,7 +13,7 @@
                     'vertical-align': 'middle',
                     'margin-right': space
                 }"
-                v-if="inputInfo.type == 'numeric' || inputInfo.type == 'text' || inputInfo.type == 'select'"
+                v-if="inputInfo.type == 'numeric' || inputInfo.type == 'text'|| inputInfo.type == 'textarea' || inputInfo.type == 'select'"
             >{{inputInfo.title}}</div>
             <component
                 solo
