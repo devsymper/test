@@ -1,13 +1,50 @@
 <template>
     <div>
-        <component
-            class="sym-small-size mt-2"
-            v-for="(inputInfo, name) in allInputs"
-            :key="name"
-            v-bind="getInputProps(inputInfo)"
-            v-model="inputInfo.value"
-            :is="getInputTag(inputInfo.type)"
-        ></component>
+        <div v-for="(inputInfo, name) in allInputs" :key="name" :class="{
+            'pb-2': singleLine ? true : false,
+            'pb-1': !singleLine ? true : false,
+        }">
+            <div
+                class="d-inline-block font-weight-medium fs-13 "
+                :style="{
+                    'min-width': labelMinwidth,
+                    'width': compLabelWidth,
+                    'line-height': '13px',
+                    'vertical-align': 'middle',
+                    'margin-right': space
+                }"
+                v-if="inputInfo.type == 'numeric' || inputInfo.type == 'text'|| inputInfo.type == 'textarea' || inputInfo.type == 'select'"
+            >{{inputInfo.title}}</div>
+            <component
+                solo
+                :items="inputInfo.options"
+                flat
+                hide-details
+                :style="{
+                    'min-width': inputMinwidth,
+                    'width': inputWidth,
+                }"
+                class="sym-small-size sym-style-input d-inline-block"
+                :key="name"
+                single-line
+                v-bind="getInputProps(inputInfo)"
+                v-model="inputInfo.value"
+                :is="getInputTag(inputInfo.type)"
+            >
+                <template slot="item" slot-scope="data">
+                    <template >
+                        <div>
+                            <v-icon v-if="data.item.icon">
+                                {{data.item.icon}}
+                            </v-icon>
+                            <span>
+                                {{data.item.text}}
+                            </span>
+                        </div>
+                    </template>
+                </template>
+            </component>
+        </div>
     </div>
 </template>
 <script>
@@ -17,7 +54,7 @@ const inputTypeConfigs = {
         tag: "v-text-field",
         props(config) {
             return {
-                label: config.title,
+                placeholder: config.title,
                 type: "number"
             };
         }
@@ -26,7 +63,7 @@ const inputTypeConfigs = {
         tag: "v-text-field",
         props(config) {
             return {
-                label: config.title,
+                placeholder: config.title
             };
         }
     },
@@ -35,6 +72,7 @@ const inputTypeConfigs = {
         props(config) {
             return {
                 label: config.title,
+                placeholder: config.title,
                 type: "number"
             };
         }
@@ -85,13 +123,11 @@ export default {
          *          title: "Số điện thoại",
          *          type: "numeric",
          *          value: 12365,
-         *          validate: ['empty','phone']
          *      },
          *      sex: {
          *          title: "Giới tính",
          *          type: "select",
          *          value: male,
-         *          validate: [],
          *          options: [
          *              {
          *                  text: "Nam",
@@ -110,7 +146,38 @@ export default {
         allInputs: {
             type: Object,
             default: {}
+        },
+        /**
+         * Label và input có nằm trên cùng một dòng không
+         */
+        singleLine: {
+            type: Boolean,
+            default: false
+        },
+        labelWidth: {
+            type: String,
+            default: '50px'
+        },
+        space: {
+            type: String,
+            default: '8px'
         }
+    },
+    computed: {
+        labelMinwidth(){
+            return this.singleLine ? this.labelWidth : '100%';
+        },
+        compLabelWidth(){
+            return this.singleLine ? this.labelWidth : '100%';
+        },
+        inputWidth(){
+            let w = this.labelWidth;
+            return this.singleLine ?  `calc(100% - ${w} - 8px)` : '100%';
+        },
+        inputMinwidth(){
+            let w = this.labelWidth;
+            return this.singleLine ?  `calc(100% - ${w} - 8px)` : '100%';
+        },
     },
     components: {
         VTextField,

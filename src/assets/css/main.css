@@ -59,7 +59,8 @@
     display: none;
 }
 
-.sym-small-size .v-input__slot {
+.sym-small-size .v-input__slot,
+.sym-small-size .v-input__control {
     margin-bottom: 0px!important;
     min-height: 28px!important;
 }
@@ -273,4 +274,17 @@
 
 .fw-400 {
     font-weight: 400;
+}
+
+
+/** Custom hiển thị của input theo phong cách Symper **/
+
+.sym-style-input .v-input__slot {
+    border: 1px solid #efefef!important;
+    background-color: #fbfbfb!important;
+}
+
+.sym-global-small-item .v-application>.v-menu__content .v-list-item {
+    min-height: 30px!important;
+    padding: 0px 8px!important;
 }
