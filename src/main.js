@@ -67,6 +67,7 @@ window.$ = $;
 window.Vue = Vue;
 util.serviceWorker.register();
 
+
 new Vue({
     router,
     store,

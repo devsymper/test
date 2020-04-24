@@ -111,7 +111,7 @@ export default {
             let parentNode = this.bfs(this.items, parentId)
             for(let i = 0; i < parentNode.children.length; i++){
                 if(parentNode.children[i].id == item.id ){
-                    parentNode.children.slice(i,1);
+                    parentNode.children.splice(i,1);
                 }
             }
        

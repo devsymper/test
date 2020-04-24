@@ -3,7 +3,11 @@
         <div class="sym-document__side-bar-left">
             <sidebar-left/>
         </div>
-            <vue-resizable :active="['r']" width="calc(100% - 480px)" @resize:move="resizeEditor" height="100%" class="sym-document-editor">
+            <vue-resizable 
+            :active="['r']" 
+            width="calc(100% - 480px)" 
+            @resize:move="resizeEditor" 
+            height="100%" class="sym-document-editor">
 
             <div class="sym-document-body">
                 <div class="sym-document-action">

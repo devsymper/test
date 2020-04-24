@@ -21,7 +21,7 @@
                             :loading="loadingRefresh"
                             :disabled="loadingRefresh"
                             class="mr-2"
-                            @click="actionPanel = true"
+                            @click="addItem"
                         >
                             <v-icon left dark>mdi-plus</v-icon>
                             {{$t('common.add')}}
@@ -122,6 +122,7 @@
             class="pa-3"
             absolute
             right
+            v-if="actionPanelType != 'drag'"
             :temporary="actionPanelType == 'temporary'"
         >
             <slot name="right-panel-content" :itemData="currentItemData">
@@ -135,6 +136,37 @@
                 </v-card>
             </slot>
         </component>
+        <div
+            ref="symperDragPanel"
+            v-else
+            v-show="actionPanel"
+            class="symper-drag-panel elevation-12"
+            :style="{
+                width:actionPanelWidth+'px',
+                'max-width':actionPanelWidth,
+                height: '400px'
+            }"
+        >
+            <div class="pa-2 symper-drag-panel-header" style="height:30px">
+                <v-icon
+                    @click="actionPanel = false"
+                    class="close-btn float-right"
+                    style="font-size:16px;position: relative;top: -3px;"
+                >mdi-close</v-icon>
+            </div>
+            <div class="symper-drag-panel-body px-2 pb-2">
+                <slot name="right-panel-content">
+                    <v-card flat>
+                        <v-card-title class="pa-0 pl-2" primary-title>{{itemActionTitle}}</v-card-title>
+                        <v-card-text>
+                            <form-tpl :allInputs="itemInputs"></form-tpl>
+                        </v-card-text>
+
+                        <v-divider></v-divider>
+                    </v-card>
+                </slot>
+            </div>
+        </div>
 
         <v-navigation-drawer
             v-model="tableDisplayConfig.show"
@@ -205,7 +237,7 @@
                             >
                                 <v-icon size="18" class="mr-2">{{getDataTypeIcon(column.type)}}</v-icon>
                                 <!-- Datnt thêm headerPrefixKeypath -->
-                                <span class="fw-400">{{$t(headerPrefixKeypath + "." + column.columnTitle)}}</span>
+                                <span class="fw-400">{{$t(headerPrefixKeypath ? (headerPrefixKeypath + "." + column.columnTitle) : column.columnTitle)}}</span>
                                 <v-tooltip top>
                                     <template v-slot:activator="{ on }">
                                         <v-btn
@@ -251,7 +283,13 @@
             </div>
             <template v-slot:append>
                 <div class="w-100 pt-2">
-                    <v-btn small color="primary" @click="saveTableDisplayConfig()" class="float-right">
+                    <v-btn
+                        :loading="savingConfigs"
+                        small
+                        color="primary"
+                        @click="saveTableDisplayConfig()"
+                        class="float-right"
+                    >
                         <v-icon class="mr-2">mdi-content-save-outline</v-icon>
                         {{$t('common.save')}}
                     </v-btn>
@@ -277,6 +315,8 @@ import { appConfigs } from "./../../configs.js";
 import draggable from "vuedraggable";
 import { getDefaultFilterConfig } from "./../common/customTable/defaultFilterConfig.js";
 import Api from "./../../api/api.js";
+import { userApi } from "./../../api/user.js";
+
 var apiObj = new Api("");
 
 window.tableDropdownClickHandle = function(el, event) {
@@ -290,6 +330,55 @@ window.tableDropdownClickHandle = function(el, event) {
     );
 };
 
+
+window.dragElement = function(elmnt) {
+    var pos1 = 0,
+        pos2 = 0,
+        pos3 = 0,
+        pos4 = 0;
+    if (document.getElementById(elmnt.id + "header")) {
+        // if present, the header is where you move the DIV from:
+        document.getElementById(
+            elmnt.id + "header"
+        ).onmousedown = dragMouseDown;
+    } else {
+        // otherwise, move the DIV from anywhere inside the DIV:
+        elmnt.onmousedown = dragMouseDown;
+    }
+
+    function dragMouseDown(e) {
+        if($(e.target).hasClass('symper-drag-panel-header') || $(e.target).parents('.symper-drag-panel-header').length > 0){
+            e = e || window.event;
+            e.preventDefault();
+            // get the mouse cursor position at startup:
+            pos3 = e.clientX;
+            pos4 = e.clientY;
+            document.onmouseup = closeDragElement;
+            // call a function whenever the cursor moves:
+            document.onmousemove = elementDrag;
+        }
+    }
+
+    function elementDrag(e) {
+        e = e || window.event;
+        e.preventDefault();
+        // calculate the new cursor position:
+        pos1 = pos3 - e.clientX;
+        pos2 = pos4 - e.clientY;
+        pos3 = e.clientX;
+        pos4 = e.clientY;
+        // set the element's new position:
+        elmnt.style.top = elmnt.offsetTop - pos2 + "px";
+        elmnt.style.left = elmnt.offsetLeft - pos1 + "px";
+    }
+
+    function closeDragElement() {
+        // stop moving when mouse button is released:
+        document.onmouseup = null;
+        document.onmousemove = null;
+    }
+}
+
 export default {
     name: "SymperListItem",
     watch: {
@@ -297,10 +386,21 @@ export default {
             // Phát sự kiện thay đổi trang đang xem
             this.getData();
             this.$emit("change-page", newVl);
+        },
+        actionPanel() {
+            if (this.actionPanel == true) {
+                this.$emit("open-panel");
+                if(this.actionPanelType == 'drag'){
+                    setTimeout((thisCpn) => {
+                        dragElement(thisCpn.$refs.symperDragPanel);
+                    }, 500, this);
+                }
+            }
         }
     },
     data() {
         return {
+            savingConfigs: false, // có đang lưu cấu hình của showlist hay không
             // các cấu hình cho việc hiển thị và giá trị của panel cấu hình hiển thị của bảng
             tableDisplayConfig: {
                 show: true, // có hiển thị panel cấu hình ko
@@ -394,7 +494,7 @@ export default {
     created() {
         let thisCpn = this;
         this.$evtBus.$on("change-user-locale", locale => {
-            if(thisCpn.$refs.dataTable){
+            if (thisCpn.$refs.dataTable) {
                 thisCpn.$refs.dataTable.hotInstance.render();
             }
         });
@@ -458,7 +558,7 @@ export default {
             type: Number,
             default: 400
         },
-        // Loại hiển thị cho actionPanel - một trong ba loại: modal, temporary, elastic
+        // Loại hiển thị cho actionPanel - một trong ba loại: modal, temporary, elastic, drag
         actionPanelType: {
             type: String,
             default: "temporary"
@@ -563,7 +663,10 @@ export default {
         colHeaders() {
             let thisCpn = this;
             let prefix = this.headerPrefixKeypath;
-            prefix = (prefix[prefix.length - 1] == '.' || prefix == '') ? prefix : (prefix+'.');
+            prefix =
+                prefix[prefix.length - 1] == "." || prefix == ""
+                    ? prefix
+                    : prefix + ".";
 
             let colNames = [];
             let colTitles = this.tableColumns.reduce((headers, item) => {
@@ -580,7 +683,7 @@ export default {
                 }
                 return `<span>
                             <span class="font-weight-medium">
-                                ${thisCpn.$t(prefix+colTitles[col])}
+                                ${thisCpn.$t(prefix + colTitles[col])}
                             </span>
                             <span class="float-right symper-filter-button">
                                 <i col-name="${colName}" onclick="tableDropdownClickHandle(this, event)" class="grey-hover mdi mdi-filter-variant symper-table-dropdown-button ${markFilter}"></i>
@@ -600,53 +703,65 @@ export default {
                 : mapType["temporary"];
         }
     },
-    watch: {
-        actionPanel() {
-            if (this.actionPanel == true) {
-                this.$emit("open-panel");
-            }
-        }
-    },
     methods: {
         /**
          * Lưu lại cấu hình hiển thị của table
          */
-        saveTableDisplayConfig(){
+        saveTableDisplayConfig() {
+            this.savingConfigs = true;
+            let thisCpn = this;
             let configs = {
                 wrapTextMode: this.tableDisplayConfig.wrapTextMode,
                 densityMode: this.tableDisplayConfig.densityMode,
                 columns: []
-            }
-            for(let col of this.tableColumns){
-                configs.columns.push( {
+            };
+            for (let col of this.tableColumns) {
+                configs.columns.push({
                     data: col.data,
                     symperFixed: col.symperFixed,
-                    symperHide: col.symperHide,
+                    symperHide: col.symperHide
                 });
             }
-            let saveInfo = {
-                showListConfig: {}
-            };
-            saveInfo.showListConfig[this.$route.name] = configs;
-            util.auth.setSavedUserInfo(saveInfo);
+
+            configs = JSON.stringify(configs);
+            userApi
+                .saveUserViewConfig("showList", this.$route.name, configs)
+                .then(() => {
+                    thisCpn.savingConfigs = false;
+                    thisCpn.$snotify({
+                        type: "success",
+                        title: thisCpn.$t("table.success.save_config")
+                    });
+                })
+                .catch(err => {
+                    console.warn(err, "error when save config");
+                    thisCpn.$snotify({
+                        type: "error",
+                        title: thisCpn.$t("table.error.save_config")
+                    });
+                });
         },
         /**
          * Khôi phục lại cấu hình của hiển thị của table từ dữ liệu được lưu
          */
-        restoreTableDisplayConfig(){
-            let savedInfo = util.auth.getSavedUserInfo();
-            if(savedInfo.showListConfig){
-                let savedConfigs = savedInfo.showListConfig[this.$route.name];
-                if(savedConfigs){
-                    this.tableDisplayConfig.wrapTextMode =  savedConfigs.wrapTextMode;
-                    this.tableDisplayConfig.densityMode =  savedConfigs.densityMode;
-                    this.savedTableDisplayConfig = savedConfigs.columns;
-                    if(this.tableColumns.length > 0){
-                        this.tableColumns = this.getTableColumns(this.tableColumns, true);
-                    }
-                }
-            }
+        restoreTableDisplayConfig() {
+            // userApi.getUserViewConfig(this.$route.name, 'showList').then(()=>{
+            //     this.tableDisplayConfig.wrapTextMode =  savedConfigs.wrapTextMode;
+            //     this.tableDisplayConfig.densityMode =  savedConfigs.densityMode;
+            //     this.savedTableDisplayConfig = savedConfigs.columns;
+            //     if(this.tableColumns.length > 0){
+            //         this.tableColumns = this.getTableColumns(this.tableColumns, true);
+            //         this.handleStopDragColumn();
+            //     }
+            // }).catch((err) => {
+            //     console.warn(err, 'error when get user view config');
+            //     thisCpn.$snotify({
+            //         type: 'error',
+            //         'title': thisCpn.$t('table.error.get_config'),
+            //     });
+            // });
         },
+
         /**
          * Kiểm tra xem một cột trong table có đang áp dụng filter hay ko
          */
@@ -729,7 +844,7 @@ export default {
                             data.columns
                         );
                         thisCpn.data = data.listObject;
-                        
+                        thisCpn.handleStopDragColumn();
                     })
                     .catch(err => {
                         console.warn(err);
@@ -815,20 +930,19 @@ export default {
         },
         /**
          * Lấy cấu hình các cột của table
-         * @param {array} columns mảng các cột ban đầu 
-         * @param {Boolean} forcedReOrder có phải bắt buộc sắp xếp lại thứ tự các cột hay ko 
+         * @param {array} columns mảng các cột ban đầu
+         * @param {Boolean} forcedReOrder có phải bắt buộc sắp xếp lại thứ tự các cột hay ko
          */
         getTableColumns(columns, forcedReOrder = false) {
-            
             let savedOrderCols = this.savedTableDisplayConfig;
             let colMap = {};
 
-            if(forcedReOrder){
-                for(let item of columns){
+            if (forcedReOrder) {
+                for (let item of columns) {
                     colMap[item.data] = item;
                 }
-            }else{    
-                for(let item of columns){
+            } else {
+                for (let item of columns) {
                     colMap[item.name] = {
                         data: item.name,
                         type: item.type,
@@ -840,23 +954,22 @@ export default {
                 }
             }
 
-            if(savedOrderCols.length > 0){
+            if (savedOrderCols.length > 0) {
                 let orderedCols = [];
                 let noneOrderedCols = [];
-                for(let col of savedOrderCols){
-                    if(colMap[col.data]){
+                for (let col of savedOrderCols) {
+                    if (colMap[col.data]) {
                         colMap[col.data].symperFixed = col.symperFixed;
                         colMap[col.data].symperHide = col.symperHide;
                         orderedCols.push(colMap[col.data]);
-                    }else{
+                    } else {
                         noneOrderedCols.push(colMap[col.data]);
                     }
                 }
                 return orderedCols.concat(noneOrderedCols);
-            }else{
+            } else {
                 return Object.values(colMap);
             }
-
         },
         configColumnDisplay(type, column, idx) {
             column[type] = !column[type];
@@ -877,14 +990,18 @@ export default {
                     noneFixedCols.push(col);
                 }
             }
-            if(fixedCols.length > 0){
+            if (fixedCols.length > 0) {
                 this.tableColumns = fixedCols.concat(noneFixedCols);
             }
             this.fixedColumnsCount = fixedCols.length;
 
-            setTimeout((thisCpn) => {
-                thisCpn.savedTableDisplayConfig = thisCpn.tableColumns;
-            }, 1000, this);
+            setTimeout(
+                thisCpn => {
+                    thisCpn.savedTableDisplayConfig = thisCpn.tableColumns;
+                },
+                1000,
+                this
+            );
         },
         getDataTypeIcon(type) {
             return appConfigs.dataTypeIcon[type];
@@ -902,8 +1019,8 @@ export default {
                 colFilter = getDefaultFilterConfig();
                 this.$set(this.tableFilter.allColumn, colName, colFilter);
             }
-            for(let col of this.tableColumns){
-                if(col.data == colName){
+            for (let col of this.tableColumns) {
+                if (col.data == colName) {
                     colFilter.dataType = col.type;
                     break;
                 }
@@ -925,8 +1042,9 @@ export default {
             this.actionPanel = true;
         },
         addItem() {
+            this.actionPanel = true;
             // Phát sự kiện khi click vào nút thêm mới
-            this.$emit("add-item", {});
+            this.$emit("after-open-add-panel", {});
         },
         removeItem() {
             // Phát sự kiện khi xóa danh sách các item trong list
@@ -1029,10 +1147,29 @@ i.applied-filter {
     color: #f58634;
     background-color: #ffdfc8;
 }
-/* 
-.handsontable td, .handsontable th {
+
+.ht_clone_left.handsontable table.htCore {
+    border-right: 4px solid #f0f0f0;
+}
+
+.handsontable td,
+.handsontable th {
     color: #212529 !important;
     border-color: #bbb;
     border-right: 0;
-} */
+}
+
+.symper-drag-panel {
+    position: fixed;
+    top: 100px;
+    left: 300px;
+    z-index: 500;
+    background-color: white;
+    border-radius: 3px;
+}
+
+.symper-drag-panel .symper-drag-panel-header {
+    cursor: move;
+    background-color: #efefef;
+}
 </style>

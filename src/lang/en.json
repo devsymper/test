@@ -182,5 +182,19 @@
             "grantPermission": "Grant Permission",
             "remove": "Remove"
         }
+    },
+    "document": {
+        "title": "List Document",
+        "table": {
+            "id": "Id",
+            "name": "Name",
+            "title": "Title",
+            "menu": "menu",
+            "countobject": "Count object",
+            "workflow": "Workflow",
+            "createAt": "Create at",
+            "updateAt": "Update at"
+
+        }
     }
 }

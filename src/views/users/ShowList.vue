@@ -7,14 +7,14 @@
         @context-selection-passwordsetting="showViewSetingPassword"
         @refresh-list="getListUser"
         @open-panel="openPanel"
+
+
+        :getDataUrl="'https://v2hoangnd.dev.symper.vn/users'"   
         :useDefaultContext="false"
         :pageTitle="$t('user.title')"
         :tableContextMenu="tableContextMenu"
         :containerHeight="containerHeight"
-        :columns="columns"
-        :data="data"
         :actionPanelWidth="actionPanelWidth"
-        :totalPage="totalPage"
     >
         <div slot="right-panel-content" class="h-100">
             <action-panel
@@ -58,7 +58,6 @@ export default {
         this.calcContainerHeight();
     },
     created(){
-        this.getListUser();
         let thisCpn = this;
         this.$evtBus.$on('change-user-locale',(locale)=>{
              thisCpn.tableContextMenu = [
@@ -101,26 +100,7 @@ export default {
             this.$refs.panel.resetData();
             this.$refs.panel.setUser(this.data[row]);
         },
-        getListUser(){
-            let thisCpn = this;
-            userApi
-                .getListUser(1,50)
-                .then(res => {
-                    if (res.status == 200) {
-                        thisCpn.setListUser(res.data);
-                    }
-                })
-                .catch(err => {
-                    console.log("error from show list user api!!!", err);
-                })
-                .always(() => {
-            });
-        },
-        setListUser(listUser){
-            this.columns = listUser.columns;
-            this.data = listUser.listObject;
-            this.totalPage = listUser.totalPage;
-        },
+       
         setNewUserItem(user){
             this.data.unshift(user);
         },

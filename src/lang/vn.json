@@ -182,5 +182,19 @@
             "grantPermission": "Phân quyền",
             "remove": "Xóa"
         }
+    },
+    "document": {
+        "title": "Danh sách Document",
+        "table": {
+            "id": "Id",
+            "name": "Tên",
+            "title": "Tiêu đề",
+            "menu": "menu",
+            "countobject": "Số lượng bản gi",
+            "workflow": "Quy trình",
+            "createAt": "Thời gian tạo",
+            "updateAt": "Thời gian update"
+
+        }
     }
 }

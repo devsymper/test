@@ -8,6 +8,7 @@ import PageNotFound from './../views/PageNotFound.vue';
 import MultiGuard from 'vue-router-multiguard';
 
 import ShowListUser from "../views/users/ShowList.vue";
+import ShowListDocument from "../views/document/ShowList.vue";
 import ActionPanel from "../views/users/ActionPanel.vue";
 import Snippet from "../views/snippets/index.vue";
 import Permissions from "../views/permissions/index.vue";
@@ -60,6 +61,11 @@ const routes = [{
 
     //document
 
+    {
+        path: "/documents",
+        name: "processListDocument",
+        component: ShowListDocument,
+    },
     {
         path: "/document/editor",
         name: "documentEditor",
