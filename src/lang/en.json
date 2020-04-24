@@ -18,6 +18,7 @@
         "export_excel": "Export Excel",
         "list": "List",
         "search": "Search",
+        "quickSearch": "Quick search",
         "list_config": "List config",
         "save": "Save",
         "snippets": "Snippets",
@@ -176,7 +177,8 @@
             "date_created": "Date"
         },
         "title": "Permissions packages",
-        "listObject": "List objects",
+        "actionControlSummary": "Action Control Summary",
+        "apps": "Apps",
         "contextMenu": {
             "edit": "Edit",
             "grantPermission": "Grant Permission",

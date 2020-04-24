@@ -9,38 +9,44 @@
             :tableContextMenu="tableContextMenu"
             :useDefaultContext="false"
             :currentItemData="currentPack"
+            :actionPanelWidth="800"
         >
             <template slot="right-panel-content" slot-scope="{ itemData }">
-                <v-card-title class="headline">{{
-                    !!!isEdit ? "Add new Permission Packge" : "Edit Packge"
-                }}</v-card-title>
-                <v-card-text>
-                    <v-row>
-                        <v-col cols="12" sm="12">
-                            <v-text-field
-                                v-model="itemData.packName"
-                                label="Tên pack"
-                                :rules="[
-                                    () =>
-                                        !!itemData.packName ||
-                                        'Trường này bắt buộc',
-                                ]"
-                                required
-                            ></v-text-field>
-                        </v-col>
-                    </v-row>
-                </v-card-text>
-                <v-card-actions>
-                    <v-spacer></v-spacer>
-                    <v-btn
-                        color="orange darken-1"
-                        text
-                        @click="addPack"
-                        :disabled="!!!itemData.packName"
-                    >
-                        {{ isEdit ? "Cập nhật" : "Thêm" }}
-                    </v-btn>
-                </v-card-actions>
+                <div v-if="!!!isGrandPermissionMode">
+                    <v-card-title class="headline">{{
+                        !!!isEdit ? "Add new Permission Packge" : "Edit Packge"
+                    }}</v-card-title>
+                    <v-card-text>
+                        <v-row>
+                            <v-col cols="12" sm="12">
+                                <v-text-field
+                                    v-model="itemData.packName"
+                                    label="Tên pack"
+                                    :rules="[
+                                        () =>
+                                            !!itemData.packName ||
+                                            'Trường này bắt buộc',
+                                    ]"
+                                    required
+                                ></v-text-field>
+                            </v-col>
+                        </v-row>
+                    </v-card-text>
+                    <v-card-actions>
+                        <v-spacer></v-spacer>
+                        <v-btn
+                            color="orange darken-1"
+                            text
+                            @click="addPack"
+                            :disabled="!!!itemData.packName"
+                        >
+                            {{ isEdit ? "Cập nhật" : "Thêm" }}
+                        </v-btn>
+                    </v-card-actions>
+                </div>
+                <div v-else>
+                    <grandPermission :package="itemData"></grandPermission>
+                </div>
             </template>
         </ListItems>
     </v-container>
@@ -48,11 +54,13 @@
 
 <script>
 import ListItems from "../../components/common/ListItems";
+import grandPermission from "./grandPermission";
 import Api from "./../../api/api.js";
 export default {
     name: "ListPermissions",
     components: {
-        ListItems: ListItems,
+        ListItems,
+        grandPermission,
     },
     computed: {
         baseUrl: function() {
@@ -65,6 +73,7 @@ export default {
             permissiontUrl: "permission-packages",
             removeCallback: null,
             isEdit: false,
+            isGrandPermissionMode: false,
             editCallback: null,
             currentPack: {
                 packName: "",
@@ -75,19 +84,19 @@ export default {
                     name: "edit",
                     text: this.$t("permissions.contextMenu.edit"),
                     callback: (pack, callback) => {
-                        console.log(pack);
-                        this.editCallback = callback;
-                        this.showEditPackFrom(pack);
+                        this.currentPack = { ...pack, packName: pack.pack_name };
+                        this.isEdit = true;
+                        this.isGrandPermissionMode = false;
                     },
                 },
                 {
                     name: "grantPermission",
                     text: this.$t("permissions.contextMenu.grantPermission"),
-                    callback: (permission, callback) => {
-                        this.$router.push({
-                            name: "editPermissions",
-                            params: { id: permission.id },
-                        });
+                    callback: (pack, callback) => {
+                        this.currentPack = { ...pack, packName: pack.pack_name };
+                        this.isEdit = false;
+                        this.isGrandPermissionMode = true;
+                        this.$refs.listPack.actionPanel = true;
                     },
                 },
                 {
@@ -106,11 +115,6 @@ export default {
         this.tableHeight = document.body.clientHeight - 0;
     },
     methods: {
-        showEditPackFrom(pack) {
-            this.currentPack = { ...pack, packName: pack.pack_name };
-            this.isEdit = true;
-            this.isShowAddModal = true;
-        },
         showAddModal() {
             this.isShowAddModal = true;
             this.isEdit = false;

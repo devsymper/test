@@ -11,7 +11,6 @@ import ShowListUser from "../views/users/ShowList.vue";
 import ActionPanel from "../views/users/ActionPanel.vue";
 import Snippet from "../views/snippets/index.vue";
 import Permissions from "../views/permissions/index.vue";
-import PermissionsInListView from "../views/permissions/listView.vue";
 import Editor from "../views/document/Editor.vue";
 Vue.use(VueRouter);
 /**
@@ -83,26 +82,6 @@ const routes = [
     {
         path: "/permissions",
         name: "permissions",
-        component: Permissions,
-    },
-    {
-        path: "/permissions2",
-        name: "permissions2",
-        component: PermissionsInListView,
-    },
-    {
-        path: "/permissions/add",
-        name: "addPermissions",
-        component: Permissions,
-    },
-    {
-        path: "/permissions/:id",
-        name: "detailPermissions",
-        component: Permissions,
-    },
-    {
-        path: "/permissions/edit/:id",
-        name: "editPermissions",
         component: Permissions,
     },
 

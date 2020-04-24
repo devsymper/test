@@ -18,6 +18,7 @@
         "export_excel": "Xuất excel",
         "list": "Danh sách",
         "search": "Tìm kiếm",
+        "quickSearch": "Tìm nhanh",
         "list_config": "Cấu hình danh sách",
         "save": "Lưu",
         "snippets": "Snippets",
@@ -176,7 +177,8 @@
             "date_created": "Ngày tạo"
         },
         "title": "Nhóm quyền",
-        "listObject": "Đối tượng",
+        "actionControlSummary": "Action Control Summary",
+        "apps": "Apps",
         "contextMenu": {
             "edit": "Sửa",
             "grantPermission": "Phân quyền",
