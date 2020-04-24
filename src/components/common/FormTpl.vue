@@ -48,7 +48,8 @@
     </div>
 </template>
 <script>
-import { VTextField, VSelect, VCheckbox, VRadio, VSwitch } from "vuetify/lib";
+import { VTextField, VSelect, VCheckbox, VRadio, VSwitch,VTextarea } from "vuetify/lib";
+import TreeValidate from "./../../views/document/sideright/items/FormValidateTpl.vue"
 const inputTypeConfigs = {
     numeric: {
         tag: "v-text-field",
@@ -72,8 +73,6 @@ const inputTypeConfigs = {
         props(config) {
             return {
                 label: config.title,
-                placeholder: config.title,
-                type: "number"
             };
         }
     },
@@ -82,7 +81,6 @@ const inputTypeConfigs = {
         props(config) {
             return {
                 label: config.title,
-                type: "number"
             };
         }
     },
@@ -91,7 +89,6 @@ const inputTypeConfigs = {
         props(config) {
             return {
                 label: config.title,
-                type: "number"
             };
         }
     },
@@ -100,7 +97,24 @@ const inputTypeConfigs = {
         props(config) {
             return {
                 label: config.title,
-                type: "number"
+            };
+        }
+    },
+    textarea: {
+        tag: "v-textarea",
+        props(config) {
+            return {
+                label: config.title,
+                rows: config.rows ? config.rows: 2,
+                'auto-grow': config.autoGrow ? config.autoGrow : true
+            };
+        }
+    },
+    treeValidate: {
+        tag: "v-tree-validate",
+        props(config) {
+            return {
+                label: config.title,
             };
         }
     }
@@ -112,6 +126,11 @@ export default {
             return rsl;
         },
         getInputTag(inputType) {
+            console.log(inputType);
+            
+            if(!inputTypeConfigs[inputType]){
+                
+            }
             return inputTypeConfigs[inputType].tag;
         }
     },
@@ -184,7 +203,9 @@ export default {
         VSelect,
         VCheckbox,
         VRadio,
-        VSwitch
+        VSwitch,
+        VTextarea,
+        "v-tree-validate":TreeValidate
     }
 };
 </script>

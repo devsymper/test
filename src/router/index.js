@@ -72,7 +72,6 @@ const routes = [{
         path: "/document/editor",
         name: "documentEditor",
         component: Editor,
-        meta: { layout: "content-only" },
     },
     // {
     //     path: "/users/permission-package/:id",
