@@ -118,7 +118,7 @@ export default {
         background: #f2f2f2;
     }
     .tf-search-control{
-        margin: 6px 0px;
+        margin: 6px 0px !important;
     }
     
     .sym-document-tab-control .v-expansion-panel{

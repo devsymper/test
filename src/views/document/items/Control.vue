@@ -1,10 +1,10 @@
 <template>
-<v-list-item draggable class="sym-control" :control-type="type">
+<v-list-item  draggable class="sym-control" :control-type="type">
         <v-list-item-icon class="icon-control">
           <img :src="`https://hoangnd.dev.symper.vn/`+dataControl.icon">
         </v-list-item-icon>
 
-        <v-list-item-title class="fs-11">{{dataControl.title}}</v-list-item-title>
+        <v-list-item-title @click="clickItem(type)" class="fs-11">{{dataControl.title}}</v-list-item-title>
       </v-list-item>
 </template>
 <script>
@@ -26,10 +26,11 @@ export default {
     mounted(){
         this.dataControl = getControlElement(this.type);
         console.log(this.dataControl);
-        
     },
     methods:{
-        
+        clickItem(type){
+            this.$emit('click-item',type);
+        }
     }
     
 }

@@ -288,7 +288,7 @@
 }
 
 .list-control-autocomplete .tf-search-control .v-input__slot {
-    min-height: 30px !important;
+    min-height: 25px !important;
 }
 
 .tox-notifications-container {

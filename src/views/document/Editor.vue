@@ -3,51 +3,55 @@
         <div class="sym-document__side-bar-left">
             <sidebar-left/>
         </div>
-        <div class="sym-document-body">
-            <div class="sym-document-action">
-                <editor-action @document-action-save-document="saveDocument"/>
+            <vue-resizable :active="['r']" width="calc(100% - 480px)" @resize:move="resizeEditor" height="100%" class="sym-document-editor">
+
+            <div class="sym-document-body">
+                <div class="sym-document-action">
+                    <editor-action @document-action-save-document="saveDocument"/>
+                </div>
+                    
+                    <editor id="editor" api-key="APIKEY"
+                    ref="editor"
+                    @onKeyUp="detectKeyEvent"
+                    @onClick="detectClickEvent"
+                    :init="{
+                        forced_root_block:'p',
+                        menubar: false,
+                        plugins: [
+                        'advlist autolink lists link image charmap table print preview anchor',
+                        'searchreplace visualblocks code fullscreen',
+                        'insertdatetime media table paste code help wordcount emoticons'
+                        ],
+                        contextmenu: 'inserttable table | settingtable',
+                        toolbar:
+                        'undo redo | fontselect fontsizeselect formatselect | bold italic forecolor backcolor | \
+                        alignleft aligncenter alignright alignjustify | \
+                        bullist numlist outdent indent | removeformat emoticons | table |  preview',
+                        fontsize_formats: '8pt 10pt 11pt 12pt 13pt 14pt 15pt 16pt 17pt 18pt 19pt 20pt 21pt 22pt 23pt 24pt 25pt 26pt 27pt 28pt 29pt 30pt 32pt 34pt 36pt',
+                        font_formats: 'Roboto = Roboto,sans-serif; Andale Mono=andale mono,times;'+ 'Arial=arial,helvetica,sans-serif;'+ 'Arial Black=arial black,avant garde;'+ 'Book Antiqua=book antiqua,palatino;'+ 'Comic Sans MS=comic sans ms,sans-serif;'+ 'Courier New=courier new,courier;'+ 'Georgia=georgia,palatino;'+ 'Helvetica=helvetica;'+ 'Impact=impact,chicago;'+ 'Symbol=symbol;'+ 'Tahoma=tahoma,arial,helvetica,sans-serif;'+ 'Terminal=terminal,monaco;'+ 'Times New Roman=times new roman,times;'+ 'Trebuchet MS=trebuchet ms,geneva;'+ 'Verdana=verdana,geneva;'+ 'Webdings=webdings;'+ 'Wingdings=wingdings,zapf dingbats',
+                        valid_elements: '*[*]',
+                        content_css:['https://cdn.jsdelivr.net/npm/@mdi/font@latest/css/materialdesignicons.min.css'],
+                        setup: function(ed){
+                            ed.ui.registry.addMenuItem('settingtable', {
+                                text: 'Setting table',
+                                disabled : false,
+                                onAction: function(e) {
+                                    showControlTable(e);
+                                }
+                            });
+                            
+                        }
+                    }"
+                    ></editor>
             </div>
-            <div class="sym-document-editor">
-                
-                <editor id="editor" api-key="APIKEY"
-                ref="editor"
-                @onKeyUp="detectKeyEvent"
-                @onClick="detectClickEvent"
-                :init="{
-                    forced_root_block:'p',
-                    menubar: false,
-                    plugins: [
-                    'advlist autolink lists link image charmap table print preview anchor',
-                    'searchreplace visualblocks code fullscreen',
-                    'insertdatetime media table paste code help wordcount emoticons'
-                    ],
-                    contextmenu: 'inserttable table | settingtable',
-                    toolbar:
-                    'undo redo | fontselect fontsizeselect formatselect | bold italic forecolor backcolor | \
-                    alignleft aligncenter alignright alignjustify | \
-                    bullist numlist outdent indent | removeformat emoticons | table |  preview',
-                    fontsize_formats: '8pt 10pt 11pt 12pt 13pt 14pt 15pt 16pt 17pt 18pt 19pt 20pt 21pt 22pt 23pt 24pt 25pt 26pt 27pt 28pt 29pt 30pt 32pt 34pt 36pt',
-                    font_formats: 'Roboto = Roboto,sans-serif; Andale Mono=andale mono,times;'+ 'Arial=arial,helvetica,sans-serif;'+ 'Arial Black=arial black,avant garde;'+ 'Book Antiqua=book antiqua,palatino;'+ 'Comic Sans MS=comic sans ms,sans-serif;'+ 'Courier New=courier new,courier;'+ 'Georgia=georgia,palatino;'+ 'Helvetica=helvetica;'+ 'Impact=impact,chicago;'+ 'Symbol=symbol;'+ 'Tahoma=tahoma,arial,helvetica,sans-serif;'+ 'Terminal=terminal,monaco;'+ 'Times New Roman=times new roman,times;'+ 'Trebuchet MS=trebuchet ms,geneva;'+ 'Verdana=verdana,geneva;'+ 'Webdings=webdings;'+ 'Wingdings=wingdings,zapf dingbats',
-                    valid_elements: '*[*]',
-                    content_css:['https://cdn.jsdelivr.net/npm/@mdi/font@latest/css/materialdesignicons.min.css'],
-                    setup: function(ed){
-                        ed.ui.registry.addMenuItem('settingtable', {
-                            text: 'Setting table',
-                            disabled : false,
-                            onAction: function(e) {
-                                showControlTable(e);
-                            }
-                        });
-                        
-                    }
-                }"
-                ></editor>
-            </div>
+            </vue-resizable>
+
+        <div  class="sym-document__side-bar-right">
+           
+                <sidebar-right />
+            
         </div>
-        <div class="sym-document__side-bar-right">
-            <sidebar-right />
-        </div>
-        
+       
         <s-table-setting  ref="tableSetting" @add-columns-table="addColumnTable"/>
         <auto-complete-control ref="autocompleteControl" @add-control="insertControl"/>
         <save-doc-panel ref="saveDocPanel"
@@ -67,7 +71,10 @@ import AutoCompleteControl from './items/AutoCompleteControl.vue'
 import controlCss from  "./../../assets/css/document/control/control.css";
 import SaveDocPanel from "./../../views/document/items/SaveDocPanel.vue";
 import { GetControlProps } from "./../../components/document/controlPropsFactory.js";
+import VueResizable from 'vue-resizable'
 let isShowAutocompleteControl = false;
+// biến lưu chiều rộng editor trước khi resize 
+let editorWidth = 0;
 export default { 
     computed: {
       editorStore(){ 
@@ -82,6 +89,7 @@ export default {
         's-table-setting' : TableSetting,
         'auto-complete-control' : AutoCompleteControl,
         'save-doc-panel': SaveDocPanel,
+        "vue-resizable":VueResizable,
     },
     data(){
         return{
@@ -231,7 +239,13 @@ export default {
             if (event.target.id != 'list-control-autocomplete' && $(event.target).parents('#list-control-autocomplete').length == 0) {
                 this.hideAutocompletaControl();
             }
-        }
+        },
+        // resize been phair editor thi set lại chiều rộng cho size bar right
+        resizeEditor(e){
+            let documentW = $(document).width();
+            $('.sym-document__side-bar-right').css({width:documentW - $('.v-navigation-drawer').width() - $('.sym-document__side-bar-left').width() - $('.sym-document-editor').width() +'px'})
+        },
+   
         
      
     },
@@ -778,15 +792,15 @@ export default {
     }
     /* body */
     .sym-document-body{
-        width: calc(100% - 480px);
-        height: calc(100% - 78px);
+        height: calc(100%);
     }
 
 
     /* editor  */
 
     .sym-document-editor{
-        height: 100%;
+        min-width: 21cm !important;
+        max-width: calc(100% - 480px) !important;
         overflow: auto;
         background: #c5c5c5;
     }
