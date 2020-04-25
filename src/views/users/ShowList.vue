@@ -11,8 +11,7 @@
         :pageTitle="$t('user.title')"
         :tableContextMenu="tableContextMenu"
         :containerHeight="containerHeight"
-        :columns="columns"
-        :data="data"
+        :getDataUrl="'https://v2hoangnd.dev.symper.vn/users?page=1&pageSize=50'"
         :actionPanelWidth="actionPanelWidth"
         :totalPage="totalPage"
     >

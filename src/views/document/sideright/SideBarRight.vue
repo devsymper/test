@@ -40,7 +40,7 @@
                     </v-expansion-panel-content>
                 </v-expansion-panel>
             </v-expansion-panels> -->
-            <control-props-config :allInputs="sCurrentDocument.properties"/>
+            <control-props-config :singleLine="true" :labelWidth="'100px'" :allInputs="sCurrentDocument.properties"/>
 
         </v-tab-item>
         <v-tab-item

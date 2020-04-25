@@ -236,8 +236,7 @@
                                 :key="column.data"
                             >
                                 <v-icon size="18" class="mr-2">{{getDataTypeIcon(column.type)}}</v-icon>
-                                <!-- Datnt thêm headerPrefixKeypath -->
-                                <span class="fw-400">{{$t(headerPrefixKeypath + "." + column.columnTitle)}}</span>
+                                <span class="fw-400">{{$t(joinPrefixAndTile(column.columnTitle))}}</span>
                                 <v-tooltip top>
                                     <template v-slot:activator="{ on }">
                                         <v-btn
@@ -330,7 +329,6 @@ window.tableDropdownClickHandle = function(el, event) {
     );
 };
 
-
 window.dragElement = function(elmnt) {
     var pos1 = 0,
         pos2 = 0,
@@ -347,7 +345,10 @@ window.dragElement = function(elmnt) {
     }
 
     function dragMouseDown(e) {
-        if($(e.target).hasClass('symper-drag-panel-header') || $(e.target).parents('.symper-drag-panel-header').length > 0){
+        if (
+            $(e.target).hasClass("symper-drag-panel-header") ||
+            $(e.target).parents(".symper-drag-panel-header").length > 0
+        ) {
             e = e || window.event;
             e.preventDefault();
             // get the mouse cursor position at startup:
@@ -377,7 +378,7 @@ window.dragElement = function(elmnt) {
         document.onmouseup = null;
         document.onmousemove = null;
     }
-}
+};
 
 export default {
     name: "SymperListItem",
@@ -390,10 +391,14 @@ export default {
         actionPanel() {
             if (this.actionPanel == true) {
                 this.$emit("open-panel");
-                if(this.actionPanelType == 'drag'){
-                    setTimeout((thisCpn) => {
-                        dragElement(thisCpn.$refs.symperDragPanel);
-                    }, 500, this);
+                if (this.actionPanelType == "drag") {
+                    setTimeout(
+                        thisCpn => {
+                            dragElement(thisCpn.$refs.symperDragPanel);
+                        },
+                        500,
+                        this
+                    );
                 }
             }
         }
@@ -502,10 +507,10 @@ export default {
         this.restoreTableDisplayConfig();
     },
     props: {
-        currentItemData:{
+        currentItemData: {
             type: Object,
-            default(){
-                return {}
+            default() {
+                return {};
             }
         },
         /**
@@ -611,12 +616,15 @@ export default {
                     let menuItem = thisCpn.tableContextMenu.filter(menu => {
                         return menu.name == key;
                     });
-                    if (menuItem.length && menuItem[0].hasOwnProperty("callback")) {
-                        menuItem[0].callback(rowData, (res) => {
+                    if (
+                        menuItem.length &&
+                        menuItem[0].hasOwnProperty("callback")
+                    ) {
+                        menuItem[0].callback(rowData, res => {
                             if (res.status === 200) {
                                 thisCpn.getData();
                             }
-                        })
+                        });
                     }
                     if (key == "remove") {
                     } else if (key == "edit" || key == "view") {
@@ -704,6 +712,14 @@ export default {
         }
     },
     methods: {
+        joinPrefixAndTile(title) {
+            let prefix = this.headerPrefixKeypath;
+            prefix =
+                prefix[prefix.length - 1] == "." || prefix == ""
+                    ? prefix
+                    : prefix + ".";
+            return prefix + title;
+        },
         /**
          * Lưu lại cấu hình hiển thị của table
          */
