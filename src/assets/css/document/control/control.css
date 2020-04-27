@@ -1,0 +1,25 @@
+.s-control-input-text {
+    width: auto;
+    height: 25px;
+    border-radius: 3px;
+    border-color: #ddd;
+    padding: 0 5px;
+    outline: 0!important;
+}
+
+.s-control {
+    background: rgb(233, 236, 239);
+    min-width: 50px;
+    border: 1px solid #aaaaaa;
+    font-size: 13px;
+}
+
+.s-control-label {
+    padding: 2px 8px;
+    border: none !important;
+    border-radius: 4px;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    -ms-border-radius: 4px;
+    -o-border-radius: 4px;
+}

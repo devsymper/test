@@ -22,12 +22,24 @@
     font-size: 10px;
 }
 
+.fs-11 {
+    font-size: 11px;
+}
+
 .w-100 {
     width: 100%;
 }
 
 .p-0 {
-    padding: 0;
+    padding: 0 !important;
+}
+
+.m-0 {
+    margin: 0px !important;
+}
+
+.p-2 {
+    padding: 0.5rem !important;
 }
 
 .h-100 {
@@ -172,7 +184,7 @@
 }
 
 .sym-small-size .v-tabs-bar {
-    height: 35px!important;
+    height: 40px!important;
 }
 
 .sym-small-size .v-tabs-bar .v-tab {
@@ -220,20 +232,6 @@
     font-family: "Roboto", sans-serif;
 }
 
-.symper-app-bar {
-    height: 35px!important;
-    background-color: white!important;
-}
-
-.symper-app-content {
-    padding-top: 35px!important;
-    max-height: calc(100% - 35px)!important;
-}
-
-.symper-app-sidebar {
-    top: 35px!important;
-}
-
 .close-tab-btn {
     position: absolute;
     right: 2px;
@@ -272,6 +270,57 @@
     background-color: #f1f1f1;
 }
 
+.sym-document-tab-control .tf-search-control .v-input__slot {
+    min-height: 25px !important;
+}
+
+.list-control-autocomplete .tf-search-control .v-input__slot {
+    min-height: 25px !important;
+}
+
+.tox-notifications-container {
+    display: none !important;
+}
+
+.tox-tinymce-inline {
+    display: block !important;
+}
+
+.v-dialog__content {
+    z-index: 9999 !important;
+}
+
+.mh-15 {
+    min-height: 15px;
+}
+
+#rowDrag input:focus {
+    outline: auto;
+    padding: 0 4px;
+}
+
+::-webkit-input-placeholder {
+    /* Edge */
+    color: #797979 !important;
+}
+
+:-ms-input-placeholder {
+    /* Internet Explorer */
+    color: #797979 !important;
+}
+
+::placeholder {
+    color: #797979 !important;
+}
+
+.sym-small-size .v-treeview-node__root {
+    min-height: 25px !important;
+}
+
+.sym-document__side-bar-left .v-expansion-panel::before {
+    box-shadow: none;
+}
+
 .fw-400 {
     font-weight: 400;
 }
@@ -279,9 +328,13 @@
 
 /** Custom hiển thị của input theo phong cách Symper **/
 
-.sym-style-input .v-input__slot {
+.sym-style-input:not(.v-input--checkbox) .v-input__slot {
     border: 1px solid #efefef!important;
     background-color: #fbfbfb!important;
+}
+
+.sym-style-input.v-input--selection-controls {
+    padding-top: 0px!important;
 }
 
 .sym-global-small-item .v-application>.v-menu__content .v-list-item {
