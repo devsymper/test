@@ -39,7 +39,9 @@ import { appConfigs } from "./configs.js";
 var firebase = require("firebase/app");
 import { IndexedDB } from "./plugins/utilModules/indexedDB.js";
 import ResolveBacklogRequest from "./components/app/ResolveBacklogRequest";
+require("@/assets/css/handsontable.min.css");
 require("firebase/messaging");
+
 const firebaseConfig = appConfigs.firebaseConfig;
 
 var SYM_IDB_NAME = "SYMPER-IDB-STORE";

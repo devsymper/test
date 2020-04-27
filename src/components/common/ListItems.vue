@@ -304,7 +304,6 @@
 </template>
 
 <script>
-require("@/assets/css/handsontable.min.css");
 import { HotTable } from "@handsontable/vue";
 import { util } from "./../../plugins/util.js";
 import FormTpl from "./FormTpl.vue";
@@ -442,9 +441,6 @@ export default {
                 manualRowResize: true,
                 stretchH: "all",
                 licenseKey: "non-commercial-and-evaluation",
-                beforeDropdownMenuShow: function(dropdownMenu) {
-                    console.log(dropdownMenu, "beforeDropdownMenuShow");
-                }
             },
             tableFilter: {
                 // cấu hình filter của danh sách này
