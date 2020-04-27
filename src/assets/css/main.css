@@ -335,6 +335,10 @@
     box-shadow: none;
 }
 
+.sym-document__side-bar-right .v-expansion-panel::before {
+    box-shadow: none;
+}
+
 .fw-400 {
     font-weight: 400;
 }

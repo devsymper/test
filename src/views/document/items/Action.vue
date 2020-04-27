@@ -30,8 +30,6 @@ export default {
     },
     methods:{
         action(type){
-            console.log('ok');
-            
             this.$emit('document-action-'+type)
         }
     }

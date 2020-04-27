@@ -13,10 +13,11 @@
             class="v-tab-control"
             v-for="tab in sideLeftTabs"
             :key="tab.id"
+            style="margin-bottom: 4px;"
         >
             <v-tooltip right>
                 <template v-slot:activator="{ on }">
-                    <v-icon v-on="on">{{ tab.icon }}</v-icon>
+                    <v-icon style="font-size:18px;" v-on="on">{{ tab.icon }}</v-icon>
                 </template>
                 <span>{{ tab.content }}</span>
             </v-tooltip>

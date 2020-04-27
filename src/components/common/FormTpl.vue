@@ -13,7 +13,7 @@
                     'vertical-align': 'middle',
                     'margin-right': space
                 }"
-                v-if="inputInfo.type == 'numeric' || inputInfo.type == 'text' || inputInfo.type == 'select'"
+                v-if="inputInfo.type == 'numeric' || inputInfo.type == 'text'|| inputInfo.type == 'textarea' || inputInfo.type == 'select'"
             >{{inputInfo.title}}</div>
             <component
                 solo
@@ -28,6 +28,7 @@
                 :key="name"
                 single-line
                 v-bind="getInputProps(inputInfo)"
+                v-on:change="handleBlurEvent($event,name)"
                 v-model="inputInfo.value"
                 :is="getInputTag(inputInfo.type)"
             >
@@ -126,12 +127,13 @@ export default {
             return rsl;
         },
         getInputTag(inputType) {
-            console.log(inputType);
-            
             if(!inputTypeConfigs[inputType]){
                 
             }
             return inputTypeConfigs[inputType].tag;
+        },
+        handleBlurEvent(event,name){
+            this.$evtBus.$emit('blur-input',{name:name,value:event});
         }
     },
     props: {

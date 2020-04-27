@@ -47,8 +47,6 @@ export default {
     },
     methods:{
         addDocument(){
-            console.log('ok');
-            
             this.$router.push('/document/editor');
         },
         calcContainerHeight() {

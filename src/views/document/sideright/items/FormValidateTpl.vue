@@ -92,10 +92,6 @@ export default {
     }),
     methods:{
         addNode(node,item,i){
-            console.log(node);
-             console.log(item);
-                console.log(i);
-                
             if(node.type == 'item'){
                 item.children.push({id:Date.now(),condition:false,name:'',parent:item.id});
             }

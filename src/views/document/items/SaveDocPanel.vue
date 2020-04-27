@@ -55,6 +55,11 @@ export default {
         's-row-table-setting' : TableSettingRow,
         'form-save-doc' : FormTpl
     },
+    computed: {
+      editorStore(){ 
+          return this.$store.state.document.editor;
+      }
+    },
     
     data(){
         return {
@@ -122,8 +127,9 @@ export default {
         },
         
         saveDocument(){
-            
-            this.hideDialog()
+            let documentProperties = JSON.stringify(this.listInput);
+            this.$emit("save-doc-action",documentProperties);
+            this.hideDialog();
         },
         
     },
@@ -132,6 +138,6 @@ export default {
     }
 }
 </script>
-<style  scoped>
+<style scoped>
     
 </style>

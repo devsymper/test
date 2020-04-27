@@ -16,6 +16,10 @@ const defaultState = {
             //     },
             //     formulas: {
 
+            //     },
+            //     type:"",
+            //     listFields:{ // truowng hop table thi co cac control
+
             //     }
             // }
         },
@@ -26,7 +30,8 @@ const defaultState = {
             },
             formulas: {
 
-            }
+            },
+            type: ""
         }
     }
 };

@@ -101,8 +101,15 @@ export default {
     methods:{
         onSearch(event){
             $('.sym-control').removeClass('d-none');
-            $('.sym-control:not(:contains("' + event + '"))').addClass('d-none');
+            $('.sym-control:not(:Contains("' + event + '"))').addClass('d-none');
         }
+    },
+    mounted(){
+        $.expr[":"].Contains = jQuery.expr.createPseudo(function(arg) {
+            return function( elem ) {
+                return jQuery(elem).text().toUpperCase().indexOf(arg.toUpperCase()) >= 0;
+            };
+        });
     }
 }
 </script>

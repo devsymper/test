@@ -25,7 +25,6 @@ export default {
     },
     mounted(){
         this.dataControl = getControlElement(this.type);
-        console.log(this.dataControl);
     },
     methods:{
         clickItem(type){

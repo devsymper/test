@@ -28,24 +28,16 @@
 <script>
 import Control from './../items/Control.vue';
 export default {
-    props:{
-        allType :{
-            type : Array,
-            default: ['label','image','qrCode','textInput','richText','number','date','dateTime','time','month','select','documentSelect','phone','email','currency','radio','checkbox','color','percent','user','inputFilter','hidden','table','panel','fileUpload','report','approvalHistory','trackingValue','submit','reset','draf']
-        }
-    },
+  
     components:{
         'control' : Control,
     },
     data(){
         return {
-            listControl:[]
+            listControl:['label','image','qrCode','textInput','richText','number','date','dateTime','time','month','select','documentSelect','phone','email','currency','radio','checkbox','color','percent','user','inputFilter','hidden','table','panel','fileUpload','report','approvalHistory','trackingValue','submit','reset','draf']
         }
     },
-    mounted(){
-        this.listControl = this.allType;
 
-    },
     methods:{
         handleKeyUp(event){
             if(event.keyCode == 38){    //up

@@ -7,6 +7,8 @@ import { routeMiddleware } from './middleware.js';
 import PageNotFound from './../views/PageNotFound.vue';
 import MultiGuard from 'vue-router-multiguard';
 
+import CreateProcess from "../views/process/CreateProcess.vue";
+
 import ShowListUser from "../views/users/ShowList.vue";
 import ShowListDocument from "../views/document/ShowList.vue";
 import ActionPanel from "../views/users/ActionPanel.vue";
@@ -14,6 +16,7 @@ import Snippet from "../views/snippets/index.vue";
 import Permissions from "../views/permissions/index.vue";
 import PermissionsInListView from "../views/permissions/listView.vue";
 import Editor from "../views/document/Editor.vue";
+
 Vue.use(VueRouter);
 /**
  * Mặc định nếu không xét meta trong các item của route thì layout có đủ sidebar và header,
@@ -32,6 +35,11 @@ const routes = [{
         path: "/bpmne",
         name: "processList",
         component: BPMNE,
+    },
+    {
+        path: "/bpmne/create",
+        name: "createProcess",
+        component: CreateProcess,
     },
     {
         path: "/login",

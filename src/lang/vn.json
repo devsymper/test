@@ -194,7 +194,19 @@
             "workflow": "Quy trình",
             "createAt": "Thời gian tạo",
             "updateAt": "Thời gian update"
-
+        },
+        "process": {
+            "header_bar": {
+                "undo": "Undo ",
+                "redo": "Redo ",
+                "zoom_in": " Thu nhỏ",
+                "zoom_out": "Phóng to ",
+                "focus": "Vào giữa",
+                "save_svg": "Tải ảnh",
+                "save_bpmn": "Tải dưới dạng .bpmn",
+                "validate": "Kiểm tra dữ liệu ",
+                "save": "Lưu process"
+            }
         }
     }
 }

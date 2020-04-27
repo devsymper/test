@@ -194,7 +194,19 @@
             "workflow": "Workflow",
             "createAt": "Create at",
             "updateAt": "Update at"
-
+        },
+        "process": {
+            "header_bar": {
+                "undo": "Undo ",
+                "redo": "Redo ",
+                "zoom_in": " Zoom in",
+                "zoom_out": "Zoom out ",
+                "focus": "Focus",
+                "save_svg": "Download as SVG",
+                "save_bpmn": "Download as .bpmn",
+                "validate": "Validate",
+                "save": "Save process"
+            }
         }
     }
 }
