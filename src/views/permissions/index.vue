@@ -10,6 +10,7 @@
             :useDefaultContext="false"
             :currentItemData="currentPack"
             :actionPanelWidth="800"
+            @after-open-add-panel="showAddModal"
         >
             <template slot="right-panel-content" slot-scope="{ itemData }">
                 <div v-if="!!!isGrandPermissionMode">
@@ -118,6 +119,7 @@ export default {
         showAddModal() {
             this.isShowAddModal = true;
             this.isEdit = false;
+            this.isGrandPermissionMode = false
             this.currentPack = { name: "" };
         },
         deletepermission(permission) {

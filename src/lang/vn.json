@@ -177,7 +177,9 @@
             "date_created": "Ngày tạo"
         },
         "title": "Nhóm quyền",
-        "actionControlSummary": "Action Control Summary",
+        "actionControlSummary": "Action pack Summary",
+        "actionPack": "Action packs",
+        "grandPermission": "Thêm nhóm phân quyền",
         "apps": "Apps",
         "contextMenu": {
             "edit": "Sửa",

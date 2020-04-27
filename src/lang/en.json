@@ -177,7 +177,9 @@
             "date_created": "Date"
         },
         "title": "Permissions packages",
-        "actionControlSummary": "Action Control Summary",
+        "actionControlSummary": "Action pack Summary",
+        "actionPack": "Action packs",
+        "grandPermission": "Grand permissions",
         "apps": "Apps",
         "contextMenu": {
             "edit": "Edit",
