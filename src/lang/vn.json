@@ -199,5 +199,21 @@
             "validate": "Kiểm tra dữ liệu ",
             "save": "Lưu process"
         }
+    },
+    "apps": {
+        "header": {
+            "id": "ID",
+            "name": "Tên",
+            "note": "Chú thích",
+            "created_at": "Ngày tạo",
+            "updated_at": "Cập nhật lần cuối"
+        },
+        "title": "App",
+        "apps": "Apps",
+        "contextMenu": {
+            "edit": "Sửa",
+            "grantPermission": "Phân quyền",
+            "remove": "Xóa"
+        }
     }
 }
