@@ -1,16 +1,21 @@
 <template>
     <div class="w-100">
-        <div class="bkerp-widget" :style="{
+        <div
+            :class="{'sym-formula-editor': true, 'simple-mode':simpleMode}"
+            :style="{
             width: width,
             height: height
-        }">
+        }"
+        >
             <v-tabs v-model="tab" v-show="!simpleMode">
                 <v-tab>Soạn công thức</v-tab>
                 <v-tab>Snippets</v-tab>
             </v-tabs>
-            <v-tabs-items v-model="tab">
+            <v-tabs-items v-model="tab" class="h-100">
                 <v-tab-item>
-                    <div class="bkerp-widget-body">
+                    <div
+                        class="sym-formula-editor-body"
+                    >
                         <div ref="formulaEditor" class="symper-fomular-editor"></div>
                     </div>
                 </v-tab-item>
@@ -21,14 +26,16 @@
                             :items="listBaSnippet"
                             :search="searchKey"
                             class="elevation-1"
-                        >   
+                        >
                             <template v-slot:top>
-                                <v-container fluid="">
+                                <v-container fluid>
                                     <v-row>
                                         <v-col cols="6">
-                                            <v-btn color="orange darken-1" text @click="showAddModal">
-                                                Thêm snippet
-                                            </v-btn>
+                                            <v-btn
+                                                color="orange darken-1"
+                                                text
+                                                @click="showAddModal"
+                                            >Thêm snippet</v-btn>
                                         </v-col>
                                         <v-col cols="6">
                                             <v-text-field
@@ -43,12 +50,12 @@
                                 </v-container>
                             </template>
                             <template v-slot:item.actions="{ item }">
-                                <v-icon small class="mr-2" @click="showEditSnippetFrom(item)">
-                                    mdi-pencil
-                                </v-icon>
-                                <v-icon small @click="deleteSnippet(item)">
-                                    mdi-delete
-                                </v-icon>
+                                <v-icon
+                                    small
+                                    class="mr-2"
+                                    @click="showEditSnippetFrom(item)"
+                                >mdi-pencil</v-icon>
+                                <v-icon small @click="deleteSnippet(item)">mdi-delete</v-icon>
                             </template>
                         </v-data-table>
                     </v-card>
@@ -73,18 +80,16 @@
                             ></v-text-field>
                         </v-col>
                         <v-col cols="12" sm="7">
-                            <v-text-field
-                                v-model="currentSnippet.description"
-                                label="Mô tả"
-                            ></v-text-field>
+                            <v-text-field v-model="currentSnippet.description" label="Mô tả"></v-text-field>
                         </v-col>
                         <v-col cols="12">
-                            <v-textarea 
+                            <v-textarea
                                 v-model="currentSnippet.value"
                                 :rules="[
                                     () => !!currentSnippet.value || 'Trường này bắt buộc',
                                 ]"
-                                required>
+                                required
+                            >
                                 <template v-slot:label>
                                     <div>Nội dung</div>
                                 </template>
@@ -94,15 +99,16 @@
                 </v-card-text>
                 <v-card-actions>
                     <v-spacer></v-spacer>
-                    <v-btn color="darken-1" text @click="isShowAddModal = false">
-                        Hủy
-                    </v-btn>
-                    <v-btn color="orange darken-1" text @click="addSnippet" :disabled="!isAllowToSubmit">
-                        {{isEdit ? "Cập nhật" : "Thêm"}}
-                    </v-btn>
+                    <v-btn color="darken-1" text @click="isShowAddModal = false">Hủy</v-btn>
+                    <v-btn
+                        color="orange darken-1"
+                        text
+                        @click="addSnippet"
+                        :disabled="!isAllowToSubmit"
+                    >{{isEdit ? "Cập nhật" : "Thêm"}}</v-btn>
                 </v-card-actions>
             </v-card>
-            </v-dialog>
+        </v-dialog>
     </div>
 </template>
 
@@ -112,6 +118,14 @@ import ace from "ace-builds";
 export default {
     name: "FormulaEditor",
     components: {},
+    watch: {
+        formulaValue(vl){
+            if(!this.innerChangeValue){
+                this.formulaEditor.setValue(vl);
+            }
+            this.innerChangeValue = false;
+        }
+    },
     props: {
         // Khadm: Thêm option để hiển thị công thức ở chế độ đơn giản: không chứa header (snippest, soạn công thức )
         simpleMode: {
@@ -120,15 +134,14 @@ export default {
         },
         width: {
             type: String,
-            default: '700px'
+            default: "700px"
         },
         height: {
             type: String,
-            default: '500px'
+            default: "500px"
         },
         formulaValue: {
-            type: String,
-            default: ''
+            default: ""
         }
     },
     data: function() {
@@ -143,14 +156,14 @@ export default {
                 showPrintMargin: false,
                 enableLiveAutocompletion: true,
                 indentedSoftWrap: false,
-                showGutter: true,
+                showGutter: true
             },
             headersForListSnippet: [
-                {text: "Id", value: "id"},
-                {text: "Tên", value: "name"},
-                {text: "Mô tả", value: "description"},
-                {text: "Công thức", value: "snippet"},
-                {text: "Hành động", value: "actions"},
+                { text: "Id", value: "id" },
+                { text: "Tên", value: "name" },
+                { text: "Mô tả", value: "description" },
+                { text: "Công thức", value: "snippet" },
+                { text: "Hành động", value: "actions" }
             ],
             formulaEditor: null,
             langTools: null,
@@ -210,7 +223,9 @@ export default {
                 rpad|rtrim|split_part|strpos|substr|to_ascii|to_hex|translate|age|age|clock_timestamp|
                 current_date|current_time|current_timestamp|date_part|date_part|date_trunc|extract|
                 isfinite|isfinite|isfinite|justify_days|justify_hours|justify_interval|localtime|
-                localtimestamp|now|statement_timestamp|timeofday|transaction_timestamp`.split("|"),
+                localtimestamp|now|statement_timestamp|timeofday|transaction_timestamp`.split(
+                "|"
+            ),
             listBaSnippet: [],
             isCalledApiToGetListBaSnippet: false,
             currentSnippet: {
@@ -219,17 +234,17 @@ export default {
                 value: ""
             },
             isShowAddModal: false,
-            isEdit: false,
+            isEdit: false
         };
     },
     computed: {
-        isAllowToSubmit: function () {
-            return (
-                this.currentSnippet.value.trim().length > 0 && 
-                this.currentSnippet.name.trim().length > 0 && 
+        isAllowToSubmit: function() {
+            return this.currentSnippet.value.trim().length > 0 &&
+                this.currentSnippet.name.trim().length > 0 &&
                 /^[a-zA-Z\d_]{3,20}$/.test(this.currentSnippet.name)
-            ) ? true : false;
-        },
+                ? true
+                : false;
+        }
     },
     mounted() {
         ace.config.set("basePath", "ace-builds/src-min-noconflict");
@@ -252,7 +267,7 @@ export default {
             return this.formulaEditor.session.getValue();
         },
         showEditSnippetFrom(snippet) {
-            this.currentSnippet = {...snippet, value: snippet.snippet}
+            this.currentSnippet = { ...snippet, value: snippet.snippet };
             this.isEdit = true;
             this.isShowAddModal = true;
         },
@@ -260,33 +275,37 @@ export default {
             if (this.isEdit) {
                 this.updateSnippet();
             } else {
-                this.createSnippet()
+                this.createSnippet();
             }
         },
         deleteSnippet(snippet) {
             let req = new Api("https://v2hoangnd.dev.symper.vn/");
             let res = req.delete("ba-snippet/" + snippet.id);
-            res.then((result) => {
-                for (let index = 0; index < this.listBaSnippet.length; index++) {
+            res.then(result => {
+                for (
+                    let index = 0;
+                    index < this.listBaSnippet.length;
+                    index++
+                ) {
                     const item = this.listBaSnippet[index];
                     if (snippet.id === item.id) {
                         this.listBaSnippet.splice(index, 1);
                         break;
                     }
                 }
-            }).catch((err) => {
+            }).catch(err => {
                 console.log(err);
             });
         },
         createSnippet() {
             let req = new Api("https://v2hoangnd.dev.symper.vn/");
             let res = req.post("ba-snippet", this.currentSnippet);
-            res.then((result) => {
+            res.then(result => {
                 this.listBaSnippet.push({
                     id: result.data,
                     snippet: this.currentSnippet.value,
                     name: this.currentSnippet.name,
-                    description: this.currentSnippet.description,
+                    description: this.currentSnippet.description
                 });
                 this.isShowAddModal = false;
                 let methodDes = `<b>Mô tả:</b> ${this.currentSnippet.description}</br><b>Nội dung:</b> ${this.currentSnippet.value}`;
@@ -294,37 +313,49 @@ export default {
                     caption: this.currentSnippet.name,
                     value: this.currentSnippet.value,
                     meta: "BA snippet",
-                    description: methodDes,
+                    description: methodDes
                 });
                 this.setupUpdateAutocomplete(this.listWordsCompletes);
-            }).catch((err) => {
+            }).catch(err => {
                 console.log(err);
             });
         },
         updateSnippet() {
             let req = new Api("https://v2hoangnd.dev.symper.vn/");
             let res = req.put("ba-snippet", this.currentSnippet);
-            res.then((result) => {
-                for (let index = 0; index < this.listBaSnippet.length; index++) {
+            res.then(result => {
+                for (
+                    let index = 0;
+                    index < this.listBaSnippet.length;
+                    index++
+                ) {
                     const snippet = this.listBaSnippet[index];
                     if (snippet.id == this.currentSnippet.id) {
-                        this.listBaSnippet[index].name = this.currentSnippet.name;
-                        this.listBaSnippet[index].value = this.currentSnippet.value;
-                        this.listBaSnippet[index].description = this.currentSnippet.description;
-                        this.listBaSnippet[index].snippet = this.currentSnippet.value;
+                        this.listBaSnippet[
+                            index
+                        ].name = this.currentSnippet.name;
+                        this.listBaSnippet[
+                            index
+                        ].value = this.currentSnippet.value;
+                        this.listBaSnippet[
+                            index
+                        ].description = this.currentSnippet.description;
+                        this.listBaSnippet[
+                            index
+                        ].snippet = this.currentSnippet.value;
                         let methodDes = `<b>Mô tả:</b> ${this.currentSnippet.description}</br><b>Nội dung:</b> ${this.currentSnippet.value}`;
                         this.listWordsCompletes.push({
                             caption: this.currentSnippet.name,
                             value: this.currentSnippet.value,
                             meta: "BA snippet",
-                            description: methodDes,
+                            description: methodDes
                         });
                         this.setupUpdateAutocomplete(this.listWordsCompletes);
                         break;
                     }
                 }
                 this.isShowAddModal = false;
-            }).catch((err) => {
+            }).catch(err => {
                 console.log(err);
             });
         },
@@ -340,22 +371,26 @@ export default {
         setupBaSnippet() {
             let req = new Api("https://v2hoangnd.dev.symper.vn/");
             let res = req.get("ba-snippet");
-            res.then( result => {
+            res.then(result => {
                 this.listBaSnippet = result.data;
-                for (let index = 0; index < this.listBaSnippet.length; index++) {
+                for (
+                    let index = 0;
+                    index < this.listBaSnippet.length;
+                    index++
+                ) {
                     const method = this.listBaSnippet[index];
                     let methodDes = `<b>Mô tả:</b> ${method.description}</br><b>Nội dung:</b> ${method.snippet}`;
                     this.listWordsCompletes.push({
                         caption: method.name,
                         value: method.snippet,
                         meta: "BA snippet",
-                        description: methodDes,
+                        description: methodDes
                     });
                 }
                 this.setupUpdateAutocomplete(this.listWordsCompletes);
-            }).catch( err => {
+            }).catch(err => {
                 console.log(err);
-            })
+            });
         },
         initEditor() {
             this.langTools = require("ace-builds/src-min-noconflict/ext-language_tools");
@@ -367,34 +402,34 @@ export default {
             this.formulaEditor.setOptions(this.options);
             this.formulaEditor.getSession().setUseWrapMode(true);
             this.setupAutocomplete();
-            if(this.formulaValue != ''){
+            if (this.formulaValue != "") {
                 this.setValue(this.formulaValue);
             }
             this.listenChangeEvt();
         },
-        
+
         // khadm: Phát sự kiện khi thay đổi giá trị formula
-        listenChangeEvt(){
+        listenChangeEvt() {
             let self = this;
-            this.formulaEditor.on('change',(e) => {
-                if(self.debounceAutoSave){
+            this.formulaEditor.on("change", e => {
+                if (self.debounceAutoSave) {
                     clearTimeout(self.debounceAutoSave);
                 }
                 self.debounceAutoSave = setTimeout(() => {
-                    self.$emit('input',self.getValue());
-                }, 500);
+                    self.innerChangeValue = true; // đánh dấu sự thay đổi của công thức là do người dùng gõ phím
+                    self.$emit("input", self.getValue());
+                }, 300);
             });
 
-            this.formulaEditor.on('blur',(e) => {
+            this.formulaEditor.on("blur", e => {
                 console.log(e);
-                self.$emit('change',self.getValue());
+                self.$emit("change", self.getValue());
             });
-            
         },
         getListAutoComplete() {
             let req = new Api("https://v2hoangnd.dev.symper.vn/");
             let res = req.get("formula-services/list-autocompletes");
-            res.then((result) => {
+            res.then(result => {
                 let docs = result.data.document;
                 let listDocsCompletes = [];
                 let listMethods = this.snippetManager.parseSnippetFile(
@@ -405,7 +440,7 @@ export default {
                         caption: kw.toUpperCase(),
                         value: kw.toUpperCase(),
                         meta: "Keyword",
-                        description: kw.toUpperCase(),
+                        description: kw.toUpperCase()
                     });
                 }
                 for (const fn of this.functionName) {
@@ -413,7 +448,7 @@ export default {
                         caption: fn.toUpperCase(),
                         value: fn.toUpperCase(),
                         meta: "function",
-                        description: fn.toUpperCase(),
+                        description: fn.toUpperCase()
                     });
                 }
                 for (let index = 0; index < docs.length; index++) {
@@ -425,7 +460,7 @@ export default {
                         caption: doc.name,
                         value: doc.name,
                         meta: "tables",
-                        description: doc.title,
+                        description: doc.title
                     });
                     for (let item of doc.fields) {
                         this.formulaEditor.session.$mode.$highlightRules.$keywordList[
@@ -435,7 +470,7 @@ export default {
                             caption: doc.name + "." + item.name,
                             value: doc.name + "." + item.name,
                             meta: "fields",
-                            description: item.title,
+                            description: item.title
                         });
                     }
                 }
@@ -461,26 +496,26 @@ export default {
                         caption: method.name,
                         value: method.name + "(" + paramStr + ")",
                         meta: "BA Method",
-                        description: method.description,
+                        description: method.description
                     });
 
                     listMethods.push({
                         content: method.name + "(" + paramStr + ")",
                         name: method.name,
-                        tabTrigger: method.name,
+                        tabTrigger: method.name
                     });
                 }
                 this.formulaEditor.session.bgTokenizer.start(0);
                 this.snippetManager.register(listMethods, "pgsql");
                 this.setupUpdateAutocomplete(listDocsCompletes);
                 this.listWordsCompletes = listDocsCompletes;
-            }).catch((err) => {
+            }).catch(err => {
                 console.log("catch", err);
             });
         },
         setupAutocomplete() {
             console.log(this.formulaEditor);
-            
+
             if (this.formulaEditor !== null) {
                 let that = this;
                 this.formulaEditor.on("keyup", function(e) {
@@ -503,9 +538,9 @@ export default {
                 ) {
                     callback(null, this.listWordsCompletes);
                 },
-                getDocTooltip: (item) => {
+                getDocTooltip: item => {
                     item.docHTML = item.description;
-                },
+                }
             };
             this.langTools.setCompleters([staticWordCompleter]);
         },
@@ -519,16 +554,16 @@ export default {
                     callback
                 ) {
                     callback(null, listDocsCompletes);
-                },
+                }
             };
             this.formulaEditor.completers.push(fieldsToComplete);
-        },
-    },
+        }
+    }
 };
 </script>
 
 <style>
-.v-text-field{
+.v-text-field {
     padding-top: 0 !important;
     margin-top: 0 !important;
 }
@@ -536,7 +571,7 @@ export default {
     max-height: 25px !important;
     font-size: 12px;
 }
-.v-label{
+.v-label {
     font-size: 14px !important;
 }
 .v-data-table td {
@@ -548,10 +583,19 @@ export default {
     height: unset !important;
     padding: 5px 10px !important;
 }
-.v-window.v-item-group.theme--light.v-tabs-items,
-.v-window-item.v-window-item--active {
+.sym-formula-editor.simple-mode .v-window.v-item-group.v-tabs-items,
+.sym-formula-editor .v-window-item.v-window-item--active {
     height: 100%;
 }
+
+.sym-formula-editor .v-window.v-item-group.v-tabs-items{
+    height: calc(100% - 50px);
+}
+
+.sym-formula-editor .v-window__container{
+    height: 100%;
+}
+
 .v-tabs-bar {
     height: 25px !important;
 }
@@ -574,7 +618,7 @@ export default {
     padding-top: 0px;
     padding-bottom: 0px;
 }
-.bkerp-widget {
+.sym-formula-editor {
     background: #ffffff;
     z-index: 2;
 }
@@ -583,7 +627,7 @@ div.symper-snippet-editor {
     width: 100%;
     height: 100%;
 }
-.bkerp-widget-body {
+.sym-formula-editor-body {
     width: 100%;
     height: 100%;
 }
@@ -628,7 +672,7 @@ span.ace_completion-meta {
 .ace_editor.ace_autocomplete.ace-tm {
     min-width: 400px;
 }
-input[id="toggle-script-editor"]:checked + .bkerp-widget {
+input[id="toggle-script-editor"]:checked + .sym-formula-editor {
     top: calc(100% - 30px);
 }
 .ace-tm .ace_comment {

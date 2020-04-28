@@ -9,7 +9,7 @@
             height: dragPanelHeight+'px'
         }">
         <div class="pa-2 symper-drag-panel-header" style="height:30px">
-            <span class="float-left title pl-2 pt-2">
+            <span class="float-left pl-2 drag-panel-title">
                 {{actionTitle}}
             </span>
             <v-icon
@@ -138,6 +138,18 @@ export default {
 
 .symper-drag-panel .symper-drag-panel-header {
     cursor: move;
-    background-color: #efefef;
+    border-bottom: 1px solid #ededed;
+}
+
+.symper-drag-panel .symper-drag-panel-body {
+    height: calc(100% - 30px);
+}
+
+.drag-panel-title {
+    font-size: 15px;
+    font-weight: 500;
+    position: relative;
+    top: -5px;
+
 }
 </style>
