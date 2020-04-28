@@ -17,13 +17,23 @@
                     'vertical-align': 'middle',
                     'margin-right': space
                 }"
-                v-if="inputInfo.type == 'numeric' || inputInfo.type == 'text'|| inputInfo.type == 'textarea' || inputInfo.type == 'select' || inputInfo.type == 'textarea' "
-            >{{inputInfo.title}}</div>
+                v-if="!inputInfo.hidden && (inputInfo.type != 'checkbox' && inputInfo.type != 'switch' )"
+            >
+                {{inputInfo.title}}
+                <i
+                    class="mdi mdi-dock-window float-right large-formula-editor"
+                    @click="openLargeFormulaEditor(inputInfo, name)"
+                    v-if="inputInfo.type == 'script'"
+                ></i>
+            </div>
             <component
+                @change="handleChangeInputValue(inputInfo, name)"
+                :ref="'inputItem_'+name"
                 solo
                 :items="inputInfo.options"
                 flat
                 hide-details
+                v-if="!inputInfo.hidden"
                 :style="{
                     'min-width': inputMinwidth,
                     'width': inputWidth,
@@ -33,6 +43,7 @@
                 single-line
                 v-bind="getInputProps(inputInfo)"
                 v-model="inputInfo.value"
+                :formulaValue="inputInfo.value"
                 :is="getInputTag(inputInfo.type)"
             >
                 <template slot="item" slot-scope="data">
@@ -45,6 +56,22 @@
                 </template>
             </component>
         </div>
+
+        <symper-drag-panel
+            @before-close="closeLargeFormulaEditor()"
+            :showPanel="largeFormulaEditor.open"
+            :actionTitle="largeFormulaEditor.data.title"
+            :panelData="largeFormulaEditor.data"
+        >
+            <template slot="drag-panel-content" slot-scope="{panelData}">
+                <formula-editor
+                    v-model="panelData.value"
+                    :formulaValue="panelData.value"
+                    :width="'100%'"
+                    :height="'370px'"
+                ></formula-editor>
+            </template>
+        </symper-drag-panel>
     </div>
 </template>
 <script>
@@ -57,6 +84,9 @@ import {
     VTextarea
 } from "vuetify/lib";
 import TreeValidate from "./../../views/document/sideright/items/FormValidateTpl.vue";
+import FormulaEditor from "./../common/FormulaEditor";
+import DataTable from "./../common/customTable/DataTable";
+import SymperDragPanel from "./SymperDragPanel";
 const inputTypeConfigs = {
     numeric: {
         tag: "v-text-field",
@@ -124,10 +154,66 @@ const inputTypeConfigs = {
                 label: config.title
             };
         }
+    },
+    script: {
+        tag: "formula-editor",
+        props(config) {
+            return {
+                simpleMode: true,
+                width: "100%",
+                height: "80px",
+                formulaValue: config.value
+            };
+        }
+    },
+    table: {
+        tag: "data-table",
+        props(config) {
+            return {
+                columns: config.columns,
+                data: config.value
+            };
+        }
+    },
+    selectDoc: {
+        tag: "v-select",
+        props(config) {
+            return {
+                columns: config.columns,
+                data: config.value
+            };
+        }
     }
 };
 export default {
+    data() {
+        return {
+            largeFormulaEditor: {
+                name: '', // tên của input
+                open: false, // có mở largeFormulaEditor hay ko
+                data: {} // Dữ liệu của input cần mở lên để edit trong khung lớn
+            }
+        };
+    },
     methods: {
+        closeLargeFormulaEditor(){
+            this.largeFormulaEditor.open = false;
+            let info = this.largeFormulaEditor;
+            this.$refs['inputItem_'+info.name][0].setValue(info.data.value); 
+        },
+        openLargeFormulaEditor(inputInfo, name) {
+            this.largeFormulaEditor.open = true;
+            this.largeFormulaEditor.name = name;
+            this.$set(this.largeFormulaEditor,'data',inputInfo);
+        },
+        handleChangeInputValue(inputInfo, name) {
+            /**
+             * emit sự kiện thay đổi giá trị của một input trong form
+             * name: tên của input này
+             * inputInfo: chứa các thông tin về input
+             */
+            this.$emit("input-value-changed", name, inputInfo);
+        },
         getInputProps(inputConfigs) {
             let rsl = inputTypeConfigs[inputConfigs.type].props(inputConfigs);
             return rsl;
@@ -211,10 +297,17 @@ export default {
         VRadio,
         VSwitch,
         VTextarea,
-        "v-tree-validate": TreeValidate
+        "v-tree-validate": TreeValidate,
+        FormulaEditor,
+        DataTable,
+        SymperDragPanel
     }
 };
 </script>
 
 <style>
+.large-formula-editor {
+    cursor: pointer;
+    font-size: 15px;
+}
 </style>

@@ -341,3 +341,23 @@
     min-height: 30px!important;
     padding: 0px 8px!important;
 }
+
+.sym-small-size.v-expansion-panels .v-expansion-panel-header {
+    max-height: 30px;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 8px;
+    min-height: 30px;
+}
+
+.sym-small-size.v-expansion-panels .v-expansion-panel-header.active {
+    max-height: 35px;
+    padding: 8px;
+    min-height: 35px;
+}
+
+.sym-small-size.v-expansion-panels .v-expansion-panel-content__wrap {
+    padding-left: 12px;
+    padding-right: 8px;
+    padding-bottom: 0px;
+}

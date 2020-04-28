@@ -123,8 +123,7 @@
             absolute
             right
             v-if="actionPanelType != 'drag'"
-            :temporary="actionPanelType == 'temporary'"
-        >
+            :temporary="actionPanelType == 'temporary'">
             <slot name="right-panel-content" :itemData="currentItemData">
                 <v-card flat>
                     <v-card-title class="pa-0 pl-2" primary-title>{{itemActionTitle}}</v-card-title>
@@ -136,45 +135,31 @@
                 </v-card>
             </slot>
         </component>
-        <div
-            ref="symperDragPanel"
-            v-else
-            v-show="actionPanel"
-            class="symper-drag-panel elevation-12"
-            :style="{
-                width:actionPanelWidth+'px',
-                'max-width':actionPanelWidth,
-                height: '400px'
-            }"
-        >
-            <div class="pa-2 symper-drag-panel-header" style="height:30px">
-                <v-icon
-                    @click="actionPanel = false"
-                    class="close-btn float-right"
-                    style="font-size:16px;position: relative;top: -3px;"
-                >mdi-close</v-icon>
-            </div>
-            <div class="symper-drag-panel-body px-2 pb-2">
-                <slot name="right-panel-content">
+        <symper-drag-panel 
+            v-else 
+            @before-close="handleCloseDragPanel"
+            :showPanel="actionPanel"
+            :panelData="currentItemData"
+            :actionTitle="itemActionTitle"
+            :dragPanelWidth="actionPanelWidth">
+            <template slot="drag-panel-content" slot-scope="{panelData}">
+                <slot name="right-panel-content" :itemData="panelData" >
                     <v-card flat>
-                        <v-card-title class="pa-0 pl-2" primary-title>{{itemActionTitle}}</v-card-title>
                         <v-card-text>
                             <form-tpl :allInputs="itemInputs"></form-tpl>
                         </v-card-text>
-
                         <v-divider></v-divider>
                     </v-card>
                 </slot>
-            </div>
-        </div>
+            </template>
+        </symper-drag-panel>
 
         <v-navigation-drawer
             v-model="tableDisplayConfig.show"
             absolute
             class="pa-2 pl-4"
             right
-            :style="{width: tableDisplayConfig.width+'px'}"
-        >
+            :style="{width: tableDisplayConfig.width+'px'}">
             <div class="title">
                 <div>
                     {{$t('common.list_config')}}
@@ -304,7 +289,6 @@
 </template>
 
 <script>
-require("@/assets/css/handsontable.min.css");
 import { HotTable } from "@handsontable/vue";
 import { util } from "./../../plugins/util.js";
 import FormTpl from "./FormTpl.vue";
@@ -315,6 +299,7 @@ import draggable from "vuedraggable";
 import { getDefaultFilterConfig } from "./../common/customTable/defaultFilterConfig.js";
 import Api from "./../../api/api.js";
 import { userApi } from "./../../api/user.js";
+import SymperDragPanel from "./SymperDragPanel.vue";
 
 var apiObj = new Api("");
 
@@ -329,57 +314,6 @@ window.tableDropdownClickHandle = function(el, event) {
     );
 };
 
-window.dragElement = function(elmnt) {
-    var pos1 = 0,
-        pos2 = 0,
-        pos3 = 0,
-        pos4 = 0;
-    if (document.getElementById(elmnt.id + "header")) {
-        // if present, the header is where you move the DIV from:
-        document.getElementById(
-            elmnt.id + "header"
-        ).onmousedown = dragMouseDown;
-    } else {
-        // otherwise, move the DIV from anywhere inside the DIV:
-        elmnt.onmousedown = dragMouseDown;
-    }
-
-    function dragMouseDown(e) {
-        if (
-            $(e.target).hasClass("symper-drag-panel-header") ||
-            $(e.target).parents(".symper-drag-panel-header").length > 0
-        ) {
-            e = e || window.event;
-            e.preventDefault();
-            // get the mouse cursor position at startup:
-            pos3 = e.clientX;
-            pos4 = e.clientY;
-            document.onmouseup = closeDragElement;
-            // call a function whenever the cursor moves:
-            document.onmousemove = elementDrag;
-        }
-    }
-
-    function elementDrag(e) {
-        e = e || window.event;
-        e.preventDefault();
-        // calculate the new cursor position:
-        pos1 = pos3 - e.clientX;
-        pos2 = pos4 - e.clientY;
-        pos3 = e.clientX;
-        pos4 = e.clientY;
-        // set the element's new position:
-        elmnt.style.top = elmnt.offsetTop - pos2 + "px";
-        elmnt.style.left = elmnt.offsetLeft - pos1 + "px";
-    }
-
-    function closeDragElement() {
-        // stop moving when mouse button is released:
-        document.onmouseup = null;
-        document.onmousemove = null;
-    }
-};
-
 export default {
     name: "SymperListItem",
     watch: {
@@ -391,15 +325,6 @@ export default {
         actionPanel() {
             if (this.actionPanel == true) {
                 this.$emit("open-panel");
-                if (this.actionPanelType == "drag") {
-                    setTimeout(
-                        thisCpn => {
-                            dragElement(thisCpn.$refs.symperDragPanel);
-                        },
-                        500,
-                        this
-                    );
-                }
             }
         }
     },
@@ -441,10 +366,7 @@ export default {
                 manualColumnResize: true,
                 manualRowResize: true,
                 stretchH: "all",
-                licenseKey: "non-commercial-and-evaluation",
-                beforeDropdownMenuShow: function(dropdownMenu) {
-                    console.log(dropdownMenu, "beforeDropdownMenuShow");
-                }
+                licenseKey: "non-commercial-and-evaluation"
             },
             tableFilter: {
                 // cấu hình filter của danh sách này
@@ -712,6 +634,9 @@ export default {
         }
     },
     methods: {
+        handleCloseDragPanel(){
+            this.actionPanel = false;
+        },
         joinPrefixAndTile(title) {
             let prefix = this.headerPrefixKeypath;
             prefix =
@@ -1092,7 +1017,8 @@ export default {
         VDialog,
         VNavigationDrawer,
         TableFilter,
-        draggable
+        draggable,
+        "symper-drag-panel": SymperDragPanel
     }
 };
 </script>
@@ -1173,19 +1099,5 @@ i.applied-filter {
     color: #212529 !important;
     border-color: #bbb;
     border-right: 0;
-}
-
-.symper-drag-panel {
-    position: fixed;
-    top: 100px;
-    left: 300px;
-    z-index: 500;
-    background-color: white;
-    border-radius: 3px;
-}
-
-.symper-drag-panel .symper-drag-panel-header {
-    cursor: move;
-    background-color: #efefef;
 }
 </style>
