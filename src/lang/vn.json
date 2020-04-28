@@ -204,12 +204,19 @@
         "header": {
             "id": "ID",
             "name": "Tên",
-            "note": "Chú thích",
+            "note": "Ghi chú",
+            "icon": "Icon",
+            "status": "Kích hoạt",
             "created_at": "Ngày tạo",
             "updated_at": "Cập nhật lần cuối"
         },
-        "title": "App",
-        "apps": "Apps",
+        "title": "Applications",
+        "pickIcon": "Chọn icon",
+        "apps": "Applications",
+        "commonInfo": "Thông tin chung của application",
+        "listObjects": "Các chức năng trong application",
+        "addObject": "Thêm tính năng",
+        "objectSummary": "Tổng hợp các chức năng",
         "contextMenu": {
             "edit": "Sửa",
             "grantPermission": "Phân quyền",
