@@ -35,6 +35,7 @@
                 single-line
                 v-bind="getInputProps(inputInfo)"
                 v-model="inputInfo.value"
+                :formulaValue="inputInfo.value"
                 :is="getInputTag(inputInfo.type)">
                 <template slot="item" slot-scope="data">
                     <template>
@@ -44,7 +45,7 @@
                         </div>
                     </template>
                 </template>
-            </component>
+            </component> 
         </div>
     </div>
 </template>
@@ -132,6 +133,10 @@ const inputTypeConfigs = {
         tag: "formula-editor",
         props(config) {
             return {
+                'simpleMode':true,
+                'width': '100%',
+                height: '80px',
+                formulaValue: config.value
             };
         }
     },

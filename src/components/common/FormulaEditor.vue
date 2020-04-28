@@ -1,14 +1,17 @@
 <template>
     <div class="w-100">
-        <div class="bkerp-widget">
-            <v-tabs v-model="tab">
+        <div class="bkerp-widget" :style="{
+            width: width,
+            height: height
+        }">
+            <v-tabs v-model="tab" v-show="!simpleMode">
                 <v-tab>Soạn công thức</v-tab>
                 <v-tab>Snippets</v-tab>
             </v-tabs>
             <v-tabs-items v-model="tab">
                 <v-tab-item>
                     <div class="bkerp-widget-body">
-                        <div id="fomular-editor"></div>
+                        <div ref="formulaEditor" class="symper-fomular-editor"></div>
                     </div>
                 </v-tab-item>
                 <v-tab-item>
@@ -109,6 +112,25 @@ import ace from "ace-builds";
 export default {
     name: "FormulaEditor",
     components: {},
+    props: {
+        // Khadm: Thêm option để hiển thị công thức ở chế độ đơn giản: không chứa header (snippest, soạn công thức )
+        simpleMode: {
+            type: Boolean,
+            default: false
+        },
+        width: {
+            type: String,
+            default: '700px'
+        },
+        height: {
+            type: String,
+            default: '500px'
+        },
+        formulaValue: {
+            type: String,
+            default: ''
+        }
+    },
     data: function() {
         return {
             tab: 0,
@@ -221,13 +243,13 @@ export default {
          * Set công thức cho editor
          */
         setValue(formula) {
-            this.editor.session.setValue(formula);
+            this.formulaEditor.session.setValue(formula);
         },
         /**
          * Lấy giá  trị của công thức
          */
         getValue() {
-            return this.editor.session.getValue();
+            return this.formulaEditor.session.getValue();
         },
         showEditSnippetFrom(snippet) {
             this.currentSnippet = {...snippet, value: snippet.snippet}
@@ -338,13 +360,36 @@ export default {
         initEditor() {
             this.langTools = require("ace-builds/src-min-noconflict/ext-language_tools");
             this.snippetManager = ace.require("ace/snippets").snippetManager;
-            this.formulaEditor = ace.edit("fomular-editor");
+            this.formulaEditor = ace.edit(this.$refs.formulaEditor);
             let pgsqlMode = require("ace-builds/src-min-noconflict/mode-pgsql")
                 .Mode;
             this.formulaEditor.session.setMode(new pgsqlMode());
             this.formulaEditor.setOptions(this.options);
             this.formulaEditor.getSession().setUseWrapMode(true);
             this.setupAutocomplete();
+            if(this.formulaValue != ''){
+                this.setValue(this.formulaValue);
+            }
+            this.listenChangeEvt();
+        },
+        
+        // khadm: Phát sự kiện khi thay đổi giá trị formula
+        listenChangeEvt(){
+            let self = this;
+            this.formulaEditor.on('change',(e) => {
+                if(self.debounceAutoSave){
+                    clearTimeout(self.debounceAutoSave);
+                }
+                self.debounceAutoSave = setTimeout(() => {
+                    self.$emit('input',self.getValue());
+                }, 500);
+            });
+
+            this.formulaEditor.on('blur',(e) => {
+                console.log(e);
+                self.$emit('change',self.getValue());
+            });
+            
         },
         getListAutoComplete() {
             let req = new Api("https://v2hoangnd.dev.symper.vn/");
@@ -530,22 +575,17 @@ export default {
     padding-bottom: 0px;
 }
 .bkerp-widget {
-    min-width: 700px;
-    width: 60%;
-    height: 500px;
-    border: 1px solid #bfbfbf;
-    right: 150px;
     background: #ffffff;
     z-index: 2;
 }
-div#fomular-editor,
-div#snippet-editor {
+div.symper-fomular-editor,
+div.symper-snippet-editor {
     width: 100%;
     height: 100%;
 }
 .bkerp-widget-body {
     width: 100%;
-    height: calc(100% - 50px);
+    height: 100%;
 }
 .ace_tooltip.ace_doc-tooltip {
     border-color: #eee;
