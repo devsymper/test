@@ -1,5 +1,5 @@
 <template>
-<v-list-item  draggable class="sym-control" :control-type="type">
+<v-list-item class="sym-control" :control-type="type">
         <v-list-item-icon class="icon-control">
           <img :src="`https://hoangnd.dev.symper.vn/`+dataControl.icon">
         </v-list-item-icon>

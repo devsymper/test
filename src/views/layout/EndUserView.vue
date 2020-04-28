@@ -3,12 +3,12 @@
         <ba-sidebar />
         <v-content>
             <v-container fluid fill-height class="pt-0">
-                <div class="w-100 pb-3">
+                <div class="w-100 app-header-bg-color" style="border-bottom:1px solid #cccccc">
                     <div style="width:calc(100% - 200px)" class="float-left">
                         <v-tabs
                             @change="handleChangeTab"
                             v-model="currentTabIndex"
-                            class="sym-small-size"
+                            class="sym-small-size "
                             color="orange accent-4"
                         >
                             <v-tab class="symper-app-tab" v-for="(title, idx) in tabTitles" :key="idx">
@@ -18,8 +18,8 @@
                         </v-tabs>
                     </div>
                     <div
-                        class="float-right"
-                        style="height:35px; line-height:35px;"
+                        class="float-right app-header-bg-color"
+                        style="height:40px; line-height:40px;"
                     >
                         <v-btn icon>
                             <v-icon>mdi-magnify</v-icon>
@@ -41,7 +41,7 @@
                         </v-btn>
                     </div>
                 </div>
-                <v-layout style="height:calc(100% - 50px)" justify-center>
+                <v-layout style="height:calc(100% - 40px)" justify-center>
                     <slot />
                 </v-layout>
             </v-container>
@@ -93,4 +93,9 @@ export default {
 };
 </script>
 
-<style></style>
+
+<style>
+.app-header-bg-color,.app-header-bg-color .v-item-group {
+    background-color: white!important;
+}
+</style>

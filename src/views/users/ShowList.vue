@@ -9,11 +9,11 @@
         @open-panel="openPanel"
 
 
-        :getDataUrl="'https://v2hoangnd.dev.symper.vn/users'"   
         :useDefaultContext="false"
         :pageTitle="$t('user.title')"
         :tableContextMenu="tableContextMenu"
         :containerHeight="containerHeight"
+        :getDataUrl="'https://v2hoangnd.dev.symper.vn/users?page=1&pageSize=50'"
         :actionPanelWidth="actionPanelWidth"
     >
         <div slot="right-panel-content" class="h-100">

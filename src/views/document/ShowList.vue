@@ -2,7 +2,8 @@
     <list-items
         ref="listDocument"
         :getDataUrl="'https://v2hoangnd.dev.symper.vn/document'"   
-        :useDefaultContext="true"
+        :useDefaultContext="false"
+        :tableContextMenu="tableContextMenu"
         :pageTitle="$t('document.title')"
         :containerHeight="containerHeight"
         :actionPanelWidth="actionPanelWidth"
@@ -28,6 +29,16 @@ export default {
         return {
             actionPanelWidth:800,
             containerHeight: 200,
+            tableContextMenu:[
+                {name:"delete",text:'Xóa'},
+                {
+                    name: "edit",
+                    text: "Sửa",
+                    callback: (document, callback) => {
+                        this.$router.push('/document/editor/'+document.id);
+                    },
+                },
+            ],
         }
     },
     mounted() {
@@ -49,6 +60,7 @@ export default {
         addDocument(){
             this.$router.push('/document/editor');
         },
+     
         calcContainerHeight() {
             this.containerHeight = util.getComponentSize(this).h;
         }

@@ -215,19 +215,23 @@ export default {
         this.getListAutoComplete();
         this.setupTooltip();
         this.setupBaSnippet();
+        let thisCpn = this;
+        $('#fomular-editor').on('change',function(e){
+            thisCpn.$evtBus.$emit('on-change-script-editor',thisCpn.getValue())
+        })
     },
     methods: {
         /**
          * Set công thức cho editor
          */
         setValue(formula) {
-            this.editor.session.setValue(formula);
+            this.formulaEditor.session.setValue(formula);
         },
         /**
          * Lấy giá  trị của công thức
          */
         getValue() {
-            return this.editor.session.getValue();
+            return this.formulaEditor.session.getValue();
         },
         showEditSnippetFrom(snippet) {
             this.currentSnippet = {...snippet, value: snippet.snippet}
@@ -478,6 +482,10 @@ export default {
             };
             this.formulaEditor.completers.push(fieldsToComplete);
         },
+        handleBlurEvent(event){
+            console.log(event);
+            
+        }
     },
 };
 </script>

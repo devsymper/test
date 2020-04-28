@@ -4,7 +4,7 @@
             <div class="process-header-bar py-1" style="height: 40px">
                 <v-tooltip bottom v-for="(item, key) in headerActions" :key="key">
                     <template v-slot:activator="{ on }">
-                        <v-btn icon class="mr-2" style="position:relative; top: -3px">
+                        <v-btn @click="handleHeaderAction(key)" icon class="mr-2" style="position:relative; top: -3px">
                             <v-icon size="21" v-on="on">{{item.icon}}</v-icon>
                         </v-btn>
                     </template>
@@ -16,7 +16,7 @@
                     {{$t('process.header_bar.save')}}
                 </v-btn>
             </div>
-            <symper-bpmn :diagramXML="diagramXML"></symper-bpmn>
+            <symper-bpmn ref="symperBpmn" :diagramXML="diagramXML"></symper-bpmn>
         </div>
         <div class="sym-bpm-attributes h-100" style="width:250px">
 
@@ -38,23 +38,23 @@ export default {
                     icon: "mdi-redo",
                     text: "process.header_bar.redo"
                 },
-                zoomin: {
-                    icon: "mdi-plus-circle-outline",
+                zoomIn: {
+                    icon: "mdi-minus-circle-outline",
                     text: "process.header_bar.zoom_in"
                 },
-                zoomout: {
-                    icon: "mdi-minus-circle-outline",
+                zoomOut: {
+                    icon: "mdi-plus-circle-outline",
                     text: "process.header_bar.zoom_out"
                 },
                 focus: {
                     icon: "mdi-image-filter-center-focus",
                     text: "process.header_bar.focus"
                 },
-                saveSvg: {
+                saveSVG: {
                     icon: "mdi-image-outline",
                     text: "process.header_bar.save_svg"
                 },
-                saveBpmn: {
+                saveXML: {
                     icon: "mdi-xml",
                     text: "process.header_bar.save_bpmn"
                 },
@@ -69,19 +69,26 @@ export default {
     },
     components: {
         "symper-bpmn": SymperBpmn
+    },
+    methods: {
+        handleHeaderAction(ac){
+            if(ac == 'validate'){
+
+            }else{
+                this.$refs.symperBpmn[ac]();
+            }
+        }
     }
 };
 </script>
 
 <style>
 .process-header-bar{
-    border-top: 1px solid #e6e5e5;
     border-bottom: 1px solid #e6e5e5;
     padding-left: 10px;
 }
 
 .sym-bpm-attributes{
-    border-top: 1px solid #e6e5e5;
     border-left: 1px solid #e6e5e5;
     display: inline-block;
 }

@@ -184,7 +184,7 @@
 }
 
 .sym-small-size .v-tabs-bar {
-    height: 35px!important;
+    height: 40px!important;
 }
 
 .sym-small-size .v-tabs-bar .v-tab {
@@ -230,20 +230,6 @@
     padding: 5px 10px 5px 10px;
     font-size: 13px;
     font-family: "Roboto", sans-serif;
-}
-
-.symper-app-bar {
-    height: 35px!important;
-    background-color: white!important;
-}
-
-.symper-app-content {
-    padding-top: 35px!important;
-    max-height: calc(100% - 35px)!important;
-}
-
-.symper-app-sidebar {
-    top: 35px!important;
 }
 
 .close-tab-btn {
@@ -346,9 +332,13 @@
 
 /** Custom hiển thị của input theo phong cách Symper **/
 
-.sym-style-input .v-input__slot {
+.sym-style-input:not(.v-input--checkbox) .v-input__slot {
     border: 1px solid #efefef!important;
     background-color: #fbfbfb!important;
+}
+
+.sym-style-input.v-input--selection-controls {
+    padding-top: 0px!important;
 }
 
 .sym-global-small-item .v-application>.v-menu__content .v-list-item {

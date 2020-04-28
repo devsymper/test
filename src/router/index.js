@@ -65,6 +65,7 @@ const routes = [{
         path: "/users/edit/:id",
         name: "editUser",
         component: ActionPanel,
+
     },
 
     //document
@@ -78,6 +79,14 @@ const routes = [{
         path: "/document/editor",
         name: "documentEditor",
         component: Editor,
+    },
+    {
+        path: "/document/editor/:id?",
+        name: "documentEditor",
+        component: Editor,
+        meta: {
+            reload: true,
+        },
     },
     // {
     //     path: "/users/permission-package/:id",

@@ -1,11 +1,15 @@
 <template>
     <div>
-        <div v-for="(inputInfo, name) in allInputs" :key="name" :class="{
+        <div
+            v-for="(inputInfo, name) in allInputs"
+            :key="name"
+            :class="{
             'pb-2': singleLine ? true : false,
-            'pb-1': !singleLine ? true : false,
-        }">
+            'pb-1': (!singleLine && inputInfo.type != 'checkbox' && inputInfo.type != 'radio') ? true : false,
+        }"
+        >
             <div
-                class="d-inline-block font-weight-medium fs-13 "
+                class="d-inline-block font-weight-medium fs-13"
                 :style="{
                     'min-width': labelMinwidth,
                     'width': compLabelWidth,
@@ -13,7 +17,7 @@
                     'vertical-align': 'middle',
                     'margin-right': space
                 }"
-                v-if="inputInfo.type == 'numeric' || inputInfo.type == 'text'|| inputInfo.type == 'textarea' || inputInfo.type == 'select'"
+                v-if="inputInfo.type == 'numeric' || inputInfo.type == 'text'|| inputInfo.type == 'textarea' || inputInfo.type == 'select' || inputInfo.type == 'textarea' "
             >{{inputInfo.title}}</div>
             <component
                 solo
@@ -29,18 +33,15 @@
                 single-line
                 v-bind="getInputProps(inputInfo)"
                 v-on:change="handleBlurEvent($event,name)"
+                v-on:click="handleClickInput($event,inputInfo)"
                 v-model="inputInfo.value"
                 :is="getInputTag(inputInfo.type)"
             >
                 <template slot="item" slot-scope="data">
-                    <template >
+                    <template>
                         <div>
-                            <v-icon v-if="data.item.icon">
-                                {{data.item.icon}}
-                            </v-icon>
-                            <span>
-                                {{data.item.text}}
-                            </span>
+                            <v-icon v-if="data.item.icon">{{data.item.icon}}</v-icon>
+                            <span>{{data.item.text}}</span>
                         </div>
                     </template>
                 </template>
@@ -49,8 +50,15 @@
     </div>
 </template>
 <script>
-import { VTextField, VSelect, VCheckbox, VRadio, VSwitch,VTextarea } from "vuetify/lib";
-import TreeValidate from "./../../views/document/sideright/items/FormValidateTpl.vue"
+import {
+    VTextField,
+    VSelect,
+    VCheckbox,
+    VRadio,
+    VSwitch,
+    VTextarea
+} from "vuetify/lib";
+import TreeValidate from "./../../views/document/sideright/items/FormValidateTpl.vue";
 const inputTypeConfigs = {
     numeric: {
         tag: "v-text-field",
@@ -81,7 +89,7 @@ const inputTypeConfigs = {
         tag: "v-checkbox",
         props(config) {
             return {
-                label: config.title,
+                label: config.title
             };
         }
     },
@@ -89,7 +97,7 @@ const inputTypeConfigs = {
         tag: "v-radio-group",
         props(config) {
             return {
-                label: config.title,
+                label: config.title
             };
         }
     },
@@ -97,7 +105,7 @@ const inputTypeConfigs = {
         tag: "v-switch",
         props(config) {
             return {
-                label: config.title,
+                label: config.title
             };
         }
     },
@@ -106,8 +114,8 @@ const inputTypeConfigs = {
         props(config) {
             return {
                 label: config.title,
-                rows: config.rows ? config.rows: 2,
-                'auto-grow': config.autoGrow ? config.autoGrow : true
+                rows: config.rows ? config.rows : 2,
+                "auto-grow": config.autoGrow ? config.autoGrow : true
             };
         }
     },
@@ -115,7 +123,7 @@ const inputTypeConfigs = {
         tag: "v-tree-validate",
         props(config) {
             return {
-                label: config.title,
+                label: config.title
             };
         }
     }
@@ -134,6 +142,10 @@ export default {
         },
         handleBlurEvent(event,name){
             this.$evtBus.$emit('blur-input',{name:name,value:event});
+        },
+        handleClickInput(event,inputInfo){
+            this.$evtBus.$emit('click-input',inputInfo);
+            
         }
     },
     props: {
@@ -177,7 +189,7 @@ export default {
         },
         labelWidth: {
             type: String,
-            default: '50px'
+            default: "50px"
         },
         space: {
             type: String,
@@ -185,20 +197,20 @@ export default {
         }
     },
     computed: {
-        labelMinwidth(){
-            return this.singleLine ? this.labelWidth : '100%';
+        labelMinwidth() {
+            return this.singleLine ? this.labelWidth : "100%";
         },
-        compLabelWidth(){
-            return this.singleLine ? this.labelWidth : '100%';
+        compLabelWidth() {
+            return this.singleLine ? this.labelWidth : "100%";
         },
-        inputWidth(){
+        inputWidth() {
             let w = this.labelWidth;
-            return this.singleLine ?  `calc(100% - ${w} - 8px)` : '100%';
+            return this.singleLine ? `calc(100% - ${w} - 8px)` : "100%";
         },
-        inputMinwidth(){
+        inputMinwidth() {
             let w = this.labelWidth;
-            return this.singleLine ?  `calc(100% - ${w} - 8px)` : '100%';
-        },
+            return this.singleLine ? `calc(100% - ${w} - 8px)` : "100%";
+        }
     },
     components: {
         VTextField,
@@ -207,7 +219,7 @@ export default {
         VRadio,
         VSwitch,
         VTextarea,
-        "v-tree-validate":TreeValidate
+        "v-tree-validate": TreeValidate
     }
 };
 </script>

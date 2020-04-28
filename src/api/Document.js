@@ -9,4 +9,7 @@ export const documentApi = {
     editDocument(data) {
         return coreApi.put("document", data);
     },
+    detailDocument(id) {
+        return coreApi.get("document/detail/" + id);
+    },
 };
