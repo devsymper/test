@@ -67,19 +67,9 @@
                             <v-row>
                                 <v-col class="pt-0 pb-2" cols="4">
                                 </v-col>
-                                <v-col class="pt-0 pb-2" cols="8">
-                                    <v-text-field
-                                        v-model="itemData.icon"
-                                        class="sym-small-size"
-                                        :append-icon="itemData.icon"
-                                        dense
-                                        solo
-                                        flat
-                                        required
-                                    ></v-text-field>
-                                    <div class="pt-2 text-shadow">
-                                        {{$t("apps.pickIcon")}}
-                                    </div>
+                                <v-col class="pt-0 pb-2 text-center" cols="8">
+                                    <v-icon class="display-3 pt-0">{{currentApp.icon}}</v-icon>
+                                    <pickIcon @selected="pickIcon"></pickIcon>
                                 </v-col>
                             </v-row>
                         </v-col>
@@ -103,7 +93,6 @@
                         flat
                         @focus="showResult = true"
                         @input="searchObjectToimport"
-                        required
                     ></v-text-field>
                     <div class="search-results" v-show="showResult">
                         <v-list nav dense class="">
@@ -127,17 +116,13 @@
                                     :key="obj.type+item.id"
                                     :prepend-icon="item.icon"
                                 >
-                                    <v-list-item-title>
-                                        <v-icon class="subtitle-1 pr-1">{{item.icon}}</v-icon> 
+                                    <v-list-item-title @click="toggleObject(item, obj.type)">
+                                        <img v-if="!item.icon.includes('mdi-')" :src="item.icon" style="width:100px" />
+                                        <v-icon v-if="item.icon.includes('mdi-')" class="subtitle-1 pr-1">{{item.icon}}</v-icon> 
                                         {{item.title !== undefined && !!item.title ? item.title : item.name}}
                                     </v-list-item-title>
                                     <v-list-item-action>
-                                        <v-checkbox 
-                                            v-model="item.checked" 
-                                            :checked="item.checked == 'true'" dense 
-                                            color="success" hide-details
-                                            @change="toggleObject(item, obj.type)"
-                                        ></v-checkbox>
+                                        <v-icon class="subtitle-1" color="success" v-if="item.checked == 1">mdi-check</v-icon>
                                     </v-list-item-action>
                                 </v-list-item>
                             </v-list-group>
@@ -150,7 +135,6 @@
                 <div class="list-app-object">
                     <v-list nav dense class="">
                         <v-list-group
-                        no-action
                         sub-group
                         nav dense
                         value="true"
@@ -169,17 +153,12 @@
                                 :key="obj.type+item.id"
                                 :prepend-icon="item.icon"
                             >
-                                <v-list-item-title>
+                                <v-list-item-title @click="toggleObject(item, obj.type)">
                                     <v-icon class="subtitle-1 pr-1">{{item.icon}}</v-icon> 
                                     {{item.title !== undefined && !!item.title ? item.title : item.name}}
                                 </v-list-item-title>
                                 <v-list-item-action>
-                                    <v-checkbox 
-                                        v-model="item.checked" 
-                                        checked dense
-                                        color="success" hide-details
-                                        @change="toggleObject(item, obj.type)"
-                                    ></v-checkbox>
+                                    <v-icon class="subtitle-1" v-if="item.checked == 1">mdi-delete</v-icon>
                                 </v-list-item-action>
                             </v-list-item>
                         </v-list-group>
@@ -203,13 +182,20 @@
 <script>
 import Api from "./../../api/api.js";
 import ListItems from "../../components/common/ListItems";
+import pickIcon from "../../components/common/pickIcon";
 import vClickOutside from 'v-click-outside'
 export default {
     name: "listApps",
     components: {
         ListItems,
+        pickIcon,
     },
     watch: {
+        currentApp(val) {
+            if (val.id !== undefined && !!val.id) {
+                this.getAllObjectInApp(val.id);
+            }
+        }
     },
     computed: {
         baseUrl: function() {
@@ -265,7 +251,37 @@ export default {
         this.getAllObjectToImport();
     },
     methods: {
+        getAllObjectInApp(id) {
+            let req = new Api(this.apiUrl);
+            req.get(this.appUrl + "/" + id + "/objects")
+            .then(res => {
+                // callback here
+                if (res.status == 200) {
+                    let objs = {};
+                    res.data.forEach(item => {
+                        if (!(item.type in objs)) {
+                            objs[item.type] = [];
+                        }
+                        objs[item.type].push(item.id)
+                    });
+                    this.allObjectToImport.forEach((obj, appIndex) => {
+                        if (objs[obj.type] != undefined) {
+                            obj.objects.forEach((item, itemIndex) => {
+                                this.allObjectToImport[appIndex].objects[itemIndex].checked = objs[obj.type].indexOf(item.id) > -1 ? 1 : 0;
+                            });
+                        }
+                    });
+                    this.resetResult();
+                }
+            }).catch((err) => {
+                console.log(err);
+            });
+        },
+        pickIcon(data) {
+            this.currentApp.icon = data.icon;
+        },
         toggleObject(item, type) {
+            item.checked = item.checked == 0 ? 1: 0;
             for (const index in this.allObjectToImport) {
                 let list = this.allObjectToImport[index];
                 if (list.type == type) {
@@ -288,7 +304,7 @@ export default {
                     objects: []
                 };
                 for (const item of obj.objects) {
-                    if(item.checked == true) {
+                    if(item.checked == 1) {
                         group.objects.push(item);
                     }
                 }
@@ -368,9 +384,19 @@ export default {
                 this.createapp();
             }
         },
+        getListObjsInShort() {
+            let objs = [];
+            this.listObjectToShows.forEach(obj => {
+                objs.push({
+                    type: obj.type,
+                    ids: obj.objects.map(item => { return item.id })
+                })
+            })
+            return objs;
+        },
         createapp() {
             let req = new Api(this.apiUrl);
-            let res = req.post(this.appUrl, this.currentApp);
+            let res = req.post(this.appUrl, {...this.currentApp, objects: this.getListObjsInShort()});
             res.then((result) => {
                 // callback come here
                 this.$refs.listApp.getData();
@@ -380,7 +406,7 @@ export default {
         },
         updateapp() {
             let req = new Api(this.apiUrl);
-            req.put(this.appUrl, {...this.currentApp})
+            req.put(this.appUrl, {...this.currentApp, objects: this.getListObjsInShort()})
             .then((result) => {
                 // callback come here
                 this.editCallback({
@@ -461,5 +487,11 @@ export default {
 .search-results >>> .v-list-item__content {
     padding-top: 0;
     padding-bottom: 0;
+}
+.list-app-object >>> .v-list-group__items .v-list-item .v-list-item__action{
+    display: none;
+}
+.list-app-object >>> .v-list-group__items .v-list-item:hover .v-list-item__action{
+    display: block;
 }
 </style>

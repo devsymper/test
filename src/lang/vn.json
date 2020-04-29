@@ -83,7 +83,8 @@
         "required": "Không được bỏ trống",
         "min_8": "Yêu cầu mật khẩu lớn hơn 8 kí tự",
         "max_24": "Yêu cầu mật khẩu ít hơn 24 kí tự",
-        "email": "Email không hợp lệ"
+        "email": "Email không hợp lệ",
+        "notValid": "Trường này không hợp lệ"
     },
     "user": {
         "title": "Danh sách User",
@@ -221,6 +222,15 @@
             "edit": "Sửa",
             "grantPermission": "Phân quyền",
             "remove": "Xóa"
+        }
+    },
+    "iconPicker": {
+        "header": "Chọn icon",
+        "selectImage": "Chọn ảnh",
+        "tabs": {
+            "icon": "Icon",
+            "url": "Link",
+            "upload": "Tải lên"
         }
     }
 }
