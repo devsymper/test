@@ -205,7 +205,7 @@
                 "save_svg": "Download as SVG",
                 "save_bpmn": "Download as .bpmn",
                 "validate": "Validate",
-                "save": "Save process"
+                "save": "Save"
             }
         }
     }

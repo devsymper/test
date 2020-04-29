@@ -13,7 +13,7 @@
             
                 <div id="setting-control-table" class="setting-control-table">
                     <div class="content-setting-control-table">
-                        <form-save-doc :allInputs="listInput"/>
+                        <form-save-doc :allInputs="documentProps"/>
                         
                     </div>
                 </div>
@@ -51,22 +51,11 @@ import FormTpl from "./../../../components/common/FormTpl.vue"
 import Sortable from 'sortablejs';
 let sortable = null;
 export default {
-    components:{
-        's-row-table-setting' : TableSettingRow,
-        'form-save-doc' : FormTpl
-    },
-    computed: {
-      editorStore(){ 
-          return this.$store.state.document.editor;
-      }
-    },
-    
-    data(){
-        return {
-            listRows:[],
-            isShowModelSaveDoc:false,
-            listInput:{
-                name: {
+    props:{
+        documentProps:{
+            type:Object,
+            default(){
+                return {name: {
                     title: "Tên document",
                     type: "text",
                     value: "",
@@ -110,8 +99,29 @@ export default {
                     title: "Ghi chú",
                     type: "textarea",
                     value: "",
-                },
+                },}
             }
+        }
+    },
+    components:{
+        's-row-table-setting' : TableSettingRow,
+        'form-save-doc' : FormTpl
+    },
+    computed: {
+        editorStore(){ 
+            return this.$store.state.document.editor;
+        },
+        
+        
+        
+    },
+  
+    
+    data(){
+        return {
+            listRows:[],
+            isShowModelSaveDoc:false,
+           
         }
     },
    

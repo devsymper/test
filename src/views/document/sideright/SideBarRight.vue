@@ -72,17 +72,20 @@ export default {
 
         controlPropsGroup(){
             let allProps = this.sCurrentDocument.properties;
-            Object.filter = (obj, predicate) => 
-            Object.keys(obj)
-                .filter( key => predicate(obj[key]) )
-                .reduce( (res, key) => Object.assign(res, { [key]: obj[key] }), {} );
-            let propsTypeIsName = Object.filter(allProps,prop=>prop.groupType == 'name')
-            let propsTypeIsDisplay = Object.filter(allProps,prop=>prop.groupType == 'display')
-            let propsTypeIsPrint = Object.filter(allProps,prop=>prop.groupType == 'print')
-
-            return {name:propsTypeIsName,display:propsTypeIsDisplay,print:propsTypeIsPrint}
+            let groups = {name:{},display:{},print:{}};
+            if(allProps != undefined && typeof allProps != 'undefined'){
+                Object.filter = (obj, predicate) => 
+                Object.keys(obj)
+                    .filter( key => predicate(obj[key]) )
+                    .reduce( (res, key) => Object.assign(res, { [key]: obj[key] }), {} );
+                let propsTypeIsName = Object.filter(allProps,prop=>prop.groupType == 'name')
+                let propsTypeIsDisplay = Object.filter(allProps,prop=>prop.groupType == 'display')
+                let propsTypeIsPrint = Object.filter(allProps,prop=>prop.groupType == 'print')
+                groups = {name:propsTypeIsName,display:propsTypeIsDisplay,print:propsTypeIsPrint};
+            }
+            console.log(groups);
             
-            
+            return groups;
         }
     },
     data () {

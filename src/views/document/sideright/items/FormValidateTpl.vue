@@ -1,6 +1,5 @@
 <template>
     <div>
-        <v-subheader class="p-0">{{label}}</v-subheader>
         <v-treeview
         dense
         hoverable

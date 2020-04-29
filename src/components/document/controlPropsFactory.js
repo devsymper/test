@@ -166,7 +166,7 @@ let commonFormulas = {
         title: "Công thức require",
         value: "",
         formulasId: 0,
-        type: "textarea",
+        type: "script",
     },
     hidden: {
         title: "Công thức ẩn hiện",
@@ -178,19 +178,19 @@ let commonFormulas = {
         title: "Công thức link",
         value: "",
         formulasId: 0,
-        type: "textarea",
+        type: "script",
     },
     formulas: {
         title: "Công thức giá trị",
         value: "",
         formulasId: 0,
-        type: "textarea",
+        type: "script",
     },
     autocomplete: {
         title: "Công thức autocomplete",
         value: "",
         formulasId: 0,
-        type: "textarea",
+        type: "script",
     },
     validate: {
         title: "Công thức xác thực",
@@ -208,31 +208,31 @@ let commonFormulas = {
         title: "Nội dung thông báo khi bị trùng dữ liệu DB",
         value: "",
         formulasId: 0,
-        type: "textarea",
+        type: "script",
     },
     uniqueTable: {
         title: "Nội dung thông báo khi bị trùng dữ liệu trong bảng",
         value: "",
         formulasId: 0,
-        type: "textarea",
+        type: "script",
     },
     report: {
         title: "Công thức lấy dữ liệu báo cáo",
         value: "",
         formulasId: 0,
-        type: "textarea"
+        type: "script"
     },
     headerTable: {
         title: "Cấu hình tiêu đề cho bảng",
         value: "",
         formulasId: 0,
-        type: "textarea"
+        type: "script"
     },
     filterOptions: {
         title: "Bộ lọc tùy chọn",
         value: "",
         formulasId: 0,
-        type: "textarea"
+        type: "script"
     }
 }
 
@@ -577,6 +577,10 @@ export const getControlElement = function(type) {
 }
 export const getGroupProps = function(group) {
     return util.cloneDeep(groupType[group]);
+}
+export const getIconFromType = function(type) {
+    let control = util.cloneDeep(controlTypes[type]);
+    return control.icon;
 }
 
 // hàm lấy thông tin control cho tablesetting của control tabele trong doc editor

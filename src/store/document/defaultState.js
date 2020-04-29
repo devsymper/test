@@ -2,7 +2,7 @@ const defaultState = {
     editor: {
         allControl: {
             // tất cả control đã kéo vào {key:tên control, value : [properties control]}
-            // sct: {
+            // s-control-243564534: {
             //     properties: {
             //         name: {
 
@@ -32,7 +32,8 @@ const defaultState = {
 
             },
             type: ""
-        }
+        },
+        listControlTreeData: []
     }
 };
 

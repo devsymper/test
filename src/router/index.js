@@ -77,16 +77,14 @@ const routes = [{
     },
     {
         path: "/document/editor",
-        name: "documentEditor",
+        name: "createDocument",
         component: Editor,
     },
     {
         path: "/document/editor/:id?",
-        name: "documentEditor",
+        name: "editDocument",
         component: Editor,
-        meta: {
-            reload: true,
-        },
+
     },
     // {
     //     path: "/users/permission-package/:id",

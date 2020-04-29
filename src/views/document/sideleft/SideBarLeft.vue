@@ -29,6 +29,9 @@
             <control-tab v-if="tab.id == 'control'">
 
             </control-tab>
+            <list-control-tab v-if="tab.id == 'listControl'">
+
+            </list-control-tab>
 
             
         </v-tab-item>
@@ -38,10 +41,12 @@
 </template>
 <script>
 import ControlTab from './items/ControlTab'
+import ListControlTab from './items/ListControlTab.vue'
 
 export default {
     components: {
         'control-tab' : ControlTab,
+        'list-control-tab' : ListControlTab,
     },
     data () {
       return {
