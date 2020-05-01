@@ -3,9 +3,9 @@
         <v-menu offset-x
             :close-on-content-click="false"
             light
-            min-width="300"
-            max-width="300"
-            max-height="400"
+            :min-width="minWidth"
+            :max-width="maxWidth"
+            :max-height="maxHeight"
             left
         >
             <template v-slot:activator="{ on }">
@@ -23,6 +23,7 @@
             </v-tabs>
 
             <v-tabs-items v-model="tab">
+                <!-- tab Chọn icon -->
                 <v-tab-item>
                     <v-card flat>
                         <v-container>
@@ -57,20 +58,26 @@
                         </div>
                     </v-card>
                 </v-tab-item>
+                <!-- Tab chèn link -->
                 <v-tab-item class="text-center">
                     <v-text-field
-                        v-model="link"
+                        :value="link"
                         solo
                         :label="$t('common.quickSearch')"
                         flat
                         dense
                         append-icon="mdi-link-variant"
                         class="sym-small-size bg-grey pl-4 pr-4 mt-3"
+                        @change="value => this.link = value"
                     ></v-text-field>
-                    <div class="w-100">
+                    <div v-if="!!link" class="w-100">
                         <img :src="link" width="150" max-height="150" class="mt-3" style="max-width:150px">
                     </div>
                     <v-btn small color="primary" class="ml-4 mt-3 mb-3" :disabled="!!!link" @click="selectIcon(link)">{{$t("iconPicker.selectImage")}}</v-btn>
+                </v-tab-item>
+                <!-- Tab upload ảnh -->
+                <v-tab-item>
+                    <Upload ref="fileUpload" @selectFile="selectIcon"></Upload>
                 </v-tab-item>
             </v-tabs-items>
         </v-menu>
@@ -78,8 +85,30 @@
 </template>
 
 <script>
+import Upload from "./Upload";
 export default {
     name: "pickIcon",
+    components: {
+        Upload
+    },
+    props: {
+        defaultIcon: {
+            type: String,
+            default: "",
+        },
+        minWidth: {
+            type: Number,
+            default: 300,
+        },
+        maxWidth: {
+            type: Number,
+            default: 300,
+        },
+        maxHeight: {
+            type: Number,
+            default: 400,
+        }
+    },
     data: function() {
         return {
             listIcon: `
@@ -247,24 +276,34 @@ export default {
         }
     },
     mounted() {
-        this.listIconToShow = this.listIcon.split(",");
+        this.listIconToShow = this.listIcon.split(",").slice(0, 150);
+        this.link = this.defaultIcon;
     },
     methods: {
         reset() {
-            this.listIconToShow = this.listIcon.split(",");
+            this.listIconToShow = this.listIcon.split(",").slice(0, 150);
             this.searchIconKeyword = "";
+            this.$refs.fileUpload.reset();
         },
         searchIcon() {
-            this.listIconToShow = this.listIcon.split(",");
+            let listIcons = this.listIcon.split(",");
             if (!!this.searchIconKeyword) {
                 let str = this.searchIconKeyword.trim().toLocaleLowerCase();
-                this.listIconToShow = this.listIconToShow.filter(icon => {
-                    return icon.includes(str);
-                });
+                let count = 0;
+                this.listIconToShow = [];
+                for (const icon of listIcons) {
+                    if (icon.includes(str)) {
+                        this.listIconToShow.push(icon);
+                        if (count++ > 150) {
+                            break;
+                        }
+                    }
+                }
+            } else {
+                this.listIconToShow = listIcons.slice(0, 150);
             }
         },
         selectIcon(icon) {
-            console.log(icon);
             this.$emit("selected", {icon: icon});
         }
     }
@@ -281,5 +320,8 @@ export default {
     }
     .single-icon:hover{
         background-color: #f5f5f5;
+    }
+    .v-menu__content {
+        background: #fff;
     }
 </style>

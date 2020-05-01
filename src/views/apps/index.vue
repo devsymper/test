@@ -29,8 +29,8 @@
                                 </v-col>
                                 <v-col class="pt-0 pb-2" cols="9">
                                     <v-text-field
-                                        v-model="itemData.name"
-                                        class="sym-small-size bg-gray"
+                                        v-model.lazy="itemData.name"
+                                        class="sym-small-size bg-grey"
                                         dense
                                         solo
                                         flat
@@ -44,12 +44,12 @@
                                 </v-col>
                                 <v-col class="pt-0 pb-2" cols="9">
                                     <v-textarea
-                                        v-model="itemData.note"
+                                        v-model.lazy="itemData.note"
                                         dense
                                         solo
                                         flat
                                         rows="2"
-                                        class="caption"
+                                        class="caption bg-grey"
                                         hide-details="true"
                                     ></v-textarea>
                                 </v-col>
@@ -59,7 +59,7 @@
                                     {{$t("apps.header.status")}}
                                 </v-col>
                                 <v-col class="pt-0 pb-0" cols="9">
-                                    <v-checkbox v-model="itemData.status" :checked="itemData.status == 1" dense class="mt-2 ml-0" color="success" value="1" hide-details></v-checkbox>
+                                    <v-checkbox v-model.lazy="itemData.status" :checked="itemData.status == 1" dense class="mt-2 ml-0" color="success" value="1" hide-details></v-checkbox>
                                 </v-col>
                             </v-row>
                         </v-col>
@@ -68,13 +68,13 @@
                                 <v-col class="pt-0 pb-2" cols="4">
                                 </v-col>
                                 <v-col class="pt-0 pb-2 text-center" cols="8">
-                                    <v-icon class="display-3 pt-0">{{currentApp.icon}}</v-icon>
-                                    <pickIcon @selected="pickIcon"></pickIcon>
+                                    <v-icon v-if="currentApp.icon.indexOf('mdi-') > -1" class="display-3 pt-0">{{currentApp.icon}}</v-icon>
+                                    <img v-else :src="currentApp.icon" width="90">
+                                    <iconPicker ref="iconPicker" :icon="currentApp.icon" @selected="pickIcon"></iconPicker>
                                 </v-col>
                             </v-row>
                         </v-col>
                     </v-row>
-                    
                 </v-card-text>
                 <v-divider></v-divider>
 
@@ -84,8 +84,8 @@
                 </v-card-title>
                 <v-col cols="12" class="pt-0 pb-0 search-wrap" v-click-outside="() => {showResult = false}">
                     <v-text-field
-                        v-model="searchStr"
-                        class="sym-small-size bg-gray"
+                        v-model.lazy="searchStr"
+                        class="sym-small-size bg-grey"
                         append-icon="mdi-magnify"
                         dense
                         solo
@@ -117,8 +117,7 @@
                                     :prepend-icon="item.icon"
                                 >
                                     <v-list-item-title @click="toggleObject(item, obj.type)">
-                                        <img v-if="!item.icon.includes('mdi-')" :src="item.icon" style="width:100px" />
-                                        <v-icon v-if="item.icon.includes('mdi-')" class="subtitle-1 pr-1">{{item.icon}}</v-icon> 
+                                        <v-icon>{{item.icon}}</v-icon> 
                                         {{item.title !== undefined && !!item.title ? item.title : item.name}}
                                     </v-list-item-title>
                                     <v-list-item-action>
@@ -138,7 +137,7 @@
                         sub-group
                         nav dense
                         value="true"
-                        v-for="(obj) in appObjects"
+                        v-for="obj in appObjects"
                         :key="obj.type"
                         v-show="obj.objects.length"
                         >
@@ -168,7 +167,7 @@
                     small
                     color="primary"
                     class="float-right btn-fixed"
-                    @click="addapp"
+                    @click="addApp"
                     :disabled="!!!itemData.name"
                 >
                     <v-icon class="mr-2">mdi-content-save-outline</v-icon>
@@ -182,16 +181,18 @@
 <script>
 import Api from "./../../api/api.js";
 import ListItems from "../../components/common/ListItems";
-import pickIcon from "../../components/common/pickIcon";
+import iconPicker from "../../components/common/pickIcon";
 import vClickOutside from 'v-click-outside'
 export default {
     name: "listApps",
     components: {
         ListItems,
-        pickIcon,
+        iconPicker,
     },
     watch: {
         currentApp(val) {
+            this.searchStr = "";
+            this.resetResult();
             if (val.id !== undefined && !!val.id) {
                 this.getAllObjectInApp(val.id);
             }
@@ -269,12 +270,16 @@ export default {
                             obj.objects.forEach((item, itemIndex) => {
                                 this.allObjectToImport[appIndex].objects[itemIndex].checked = objs[obj.type].indexOf(item.id) > -1 ? 1 : 0;
                             });
+                        } else {
+                            obj.objects.forEach((item, itemIndex) => {
+                                this.allObjectToImport[appIndex].objects[itemIndex].checked = 0;
+                            });
                         }
                     });
-                    this.resetResult();
+                    this.resetAppObject()
+                    this.$refs.iconPicker.reset();
                 }
             }).catch((err) => {
-                console.log(err);
             });
         },
         pickIcon(data) {
@@ -377,16 +382,19 @@ export default {
                 console.log(err);
             });
         },
-        addapp() {
+        addApp() {
             if (this.isEdit) {
-                this.updateapp();
+                this.updateApp();
             } else {
-                this.createapp();
+                this.createApp();
             }
+        },
+        closeSidebar() {
+            this.$refs.listApp.actionPanel = false;
         },
         getListObjsInShort() {
             let objs = [];
-            this.listObjectToShows.forEach(obj => {
+            this.appObjects.forEach(obj => {
                 objs.push({
                     type: obj.type,
                     ids: obj.objects.map(item => { return item.id })
@@ -394,17 +402,18 @@ export default {
             })
             return objs;
         },
-        createapp() {
+        createApp() {
             let req = new Api(this.apiUrl);
             let res = req.post(this.appUrl, {...this.currentApp, objects: this.getListObjsInShort()});
             res.then((result) => {
                 // callback come here
                 this.$refs.listApp.getData();
+                this.closeSidebar();
             }).catch((err) => {
                 console.log(err);
             });
         },
-        updateapp() {
+        updateApp() {
             let req = new Api(this.apiUrl);
             req.put(this.appUrl, {...this.currentApp, objects: this.getListObjsInShort()})
             .then((result) => {
@@ -415,6 +424,7 @@ export default {
                         ...this.currentApp,
                     },
                 });
+                this.closeSidebar();
             }).catch((err) => {
                 console.log(err);
             });
@@ -439,11 +449,9 @@ export default {
     font-size: 13px;
     text-shadow:  0 0 0;
 }
-.sym-small-size >>> .v-input__slot,
-.v-input.v-textarea >>> .v-input__control,
-.v-input.v-textarea >>> .v-input__control .v-input__slot,
-.sym-small-size >>> .v-input__control{
-    background: #f5f5f5 !important;
+
+.v-input.v-textarea >>> .v-input__control .v-input__slot textarea{
+    line-height: 18px;
 }
 .search-wrap {
     position: relative;
@@ -471,6 +479,7 @@ export default {
     padding-left: 30px !important;
     padding-right: 0;
     margin-bottom: 0 !important;
+    cursor: pointer;
 }
 .list-app-object >>> .v-list-group__items .v-list-item .v-list-item__action,
 .search-results >>> .v-list-group__items .v-list-item .v-list-item__action,
@@ -493,5 +502,11 @@ export default {
 }
 .list-app-object >>> .v-list-group__items .v-list-item:hover .v-list-item__action{
     display: block;
+}
+.v-menu__content {
+    background: #fff;
+}
+.v-list-item:hover {
+    background: #f5f5f5;
 }
 </style>

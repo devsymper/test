@@ -7,11 +7,11 @@
             height: height
         }"
         >
-            <v-tabs v-model="tab" v-show="!simpleMode">
+            <v-tabs v-model.lazy="tab" v-show="!simpleMode">
                 <v-tab>Soạn công thức</v-tab>
                 <v-tab>Snippets</v-tab>
             </v-tabs>
-            <v-tabs-items v-model="tab" class="h-100">
+            <v-tabs-items v-model.lazy="tab" class="h-100">
                 <v-tab-item>
                     <div
                         class="sym-formula-editor-body"
@@ -19,7 +19,7 @@
                         <div ref="formulaEditor" class="symper-fomular-editor"></div>
                     </div>
                 </v-tab-item>
-                <v-tab-item>
+                <v-tab-item v-if="!simpleMode">
                     <v-card>
                         <v-data-table
                             :headers="headersForListSnippet"
@@ -39,7 +39,7 @@
                                         </v-col>
                                         <v-col cols="6">
                                             <v-text-field
-                                                v-model="searchKey"
+                                                v-model.lazy="searchKey"
                                                 append-icon="mdi-magnify"
                                                 label="Tìm kiếm"
                                                 single-line
@@ -62,14 +62,14 @@
                 </v-tab-item>
             </v-tabs-items>
         </div>
-        <v-dialog v-model="isShowAddModal" max-width="500">
+        <v-dialog v-model.lazy="isShowAddModal" v-if="!simpleMode" max-width="500">
             <v-card>
                 <v-card-title class="headline">{{!!!isEdit ? "Add new snippet" : "Edit snippet"}}</v-card-title>
                 <v-card-text>
                     <v-row>
                         <v-col cols="12" sm="5">
                             <v-text-field
-                                v-model="currentSnippet.name"
+                                v-model.lazy="currentSnippet.name"
                                 label="Tên"
                                 hint="Chỉ chứa các chữ cái không dấu, chữ số và gạch dưới"
                                 :rules="[
@@ -80,11 +80,11 @@
                             ></v-text-field>
                         </v-col>
                         <v-col cols="12" sm="7">
-                            <v-text-field v-model="currentSnippet.description" label="Mô tả"></v-text-field>
+                            <v-text-field v-model.lazy="currentSnippet.description" label="Mô tả"></v-text-field>
                         </v-col>
                         <v-col cols="12">
                             <v-textarea
-                                v-model="currentSnippet.value"
+                                v-model.lazy="currentSnippet.value"
                                 :rules="[
                                     () => !!currentSnippet.value || 'Trường này bắt buộc',
                                 ]"
@@ -118,6 +118,11 @@ import ace from "ace-builds";
 export default {
     name: "FormulaEditor",
     components: {},
+    prop: ['value'],
+    model: {
+        prop: 'value',
+        event: 'input'
+    },
     watch: {
         formulaValue(vl){
             if(!this.innerChangeValue){
@@ -248,6 +253,7 @@ export default {
     },
     mounted() {
         ace.config.set("basePath", "ace-builds/src-min-noconflict");
+        console.log("tesst", this.value);
         this.initEditor();
         this.getListAutoComplete();
         this.setupTooltip();
@@ -404,6 +410,9 @@ export default {
             this.setupAutocomplete();
             if (this.formulaValue != "") {
                 this.setValue(this.formulaValue);
+            }
+            if (this.value != "") {
+                this.setValue(this.value);
             }
             this.listenChangeEvt();
         },

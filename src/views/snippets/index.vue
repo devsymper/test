@@ -12,15 +12,18 @@
             @add-item="showAddModal"
         >
             <template slot="right-panel-content" slot-scope="{itemData}">
-                <v-card-title class="headline">{{
-                    !!!isEdit ? "Add new snippet" : "Edit snippet"
-                }}</v-card-title>
+                <v-card-title class="pt-0 pb-2 subtitle-1 font-weight-bold">
+                    <v-icon class="pr-4">mdi-contain</v-icon> {{!!!isEdit ? "Thêm mới snippet" : "Cập nhật snippet"}}
+                </v-card-title>
+                <v-divider></v-divider>
                 <v-card-text>
                     <v-row>
-                        <v-col cols="12" sm="5">
+                        <v-col cols="2" class="subtitle-2">
+                            Tên
+                        </v-col>
+                        <v-col cols="10">
                             <v-text-field
-                                v-model="itemData.name"
-                                label="Tên"
+                                v-model.lazy="itemData.name"
                                 hint="Chỉ chứa các chữ cái không dấu, chữ số và gạch dưới"
                                 :rules="[
                                     () =>
@@ -33,39 +36,46 @@
                                             )) ||
                                         'Tên không hợp lệ, vui lòng chỉ nhập chữ cái không dấu, chữ số và gạch dưới, dài từ 3 - 20 ký tự',
                                 ]"
+                                class="sym-small-size bg-grey"
+                                dense
+                                solo
+                                flat
                                 required
                             ></v-text-field>
                         </v-col>
-                        <v-col cols="12" sm="7">
+                        <v-col cols="2" class="subtitle-2">
+                            Mô tả
+                        </v-col>
+                        <v-col cols="10">
                             <v-text-field
-                                v-model="itemData.description"
-                                label="Mô tả"
+                                v-model.lazy="itemData.description"
+                                class="sym-small-size bg-grey"
+                                dense
+                                solo
+                                flat
                             ></v-text-field>
                         </v-col>
                         <v-col cols="12">
-                            <v-textarea
-                                v-model="itemData.value"
-                                :rules="[
-                                    () =>
-                                        !!itemData.value ||
-                                        'Trường này bắt buộc',
-                                ]"
-                                required
-                            >
-                                <template v-slot:label>
-                                    <div>Nội dung</div>
-                                </template>
-                            </v-textarea>
+                            <div class="subtitle-2">Nội dung</div>
+                            <FormulaEditor 
+                                :formulaValue="itemData.value"
+                                :height="'300px'"
+                                :simpleMode="true"
+                                @change="setValue"
+                                @input="setValue"
+                            ></FormulaEditor>
                         </v-col>
                     </v-row>
                 </v-card-text>
                 <v-card-actions>
                     <v-btn
-                        color="orange darken-1"
-                        text
+                        small
+                        color="primary"
+                        class="float-right btn-fixed"
                         @click="addSnippet"
                         :disabled="!isAllowToSubmit"
                     >
+                        <v-icon class="mr-2">mdi-content-save-outline</v-icon>
                         {{ isEdit ? "Cập nhật" : "Thêm" }}
                     </v-btn>
                 </v-card-actions>
@@ -136,6 +146,9 @@ export default {
         };
     },
     methods: {
+        setValue(data) {
+            this.currentSnippet.value = data;
+        },
         showEditSnippetFrom(snippet) {
             this.currentSnippet = { ...snippet, value: snippet.snippet };
             this.isEdit = true;
@@ -196,6 +209,14 @@ export default {
 }
 </script>
 
-<style>
-
+<style scoped>
+    .btn-fixed {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 1000;
+    }
+    .col {
+        padding-top: 0;
+    }
 </style>

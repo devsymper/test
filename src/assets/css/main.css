@@ -103,6 +103,12 @@
 .sym-small-size.v-input--checkbox .v-input--selection-controls__input {
     margin-right: 4px!important;
 }
+.bg-grey .v-input__slot,
+.bg-grey.v-input.v-textarea .v-input__control,
+.bg-grey.v-input.v-textarea .v-input__control .v-input__slot,
+.bg-grey .v-input__control {
+    background: #f5f5f5 !important;
+}
 
 .sym-small-size.v-input--switch .v-messages,
 .sym-small-size.v-input--checkbox .v-messages {
