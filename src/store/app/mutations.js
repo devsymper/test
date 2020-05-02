@@ -27,6 +27,26 @@ const removeTab = (state, url) => {
     Vue.delete(state.urlToTabTitleMap, url);
 }
 
+/**
+ * 
+ * @param {Object} state state của app
+ * @param {Object} orgchartNodes chứa danh sách các node của các orgchart, dạng: {idOrgchart: [danh sách node]}
+ */
+const setOrgchartNodes = (state, orgchartNodes) => {
+
+    for (let id in orgchartNodes) {
+        for (let i = 0; i < orgchartNodes[id].children.length; i++) {
+            orgchartNodes[id].children[i].orgchartName = orgchartNodes[id].name;
+        }
+    }
+    let nodes = state.orgchartNodes;
+    nodes = Object.assign(nodes, orgchartNodes);
+    state.orgchartNodes = nodes;
+    Vue.set(state, 'orgchartNodes', nodes);
+    console.log(state, 'orgchartNodesorgchartNodesorgchartNodes');
+
+}
+
 export {
     changeCollapseSidebar,
     increaseUnreadNotification,
@@ -34,5 +54,6 @@ export {
     changeCurrentBAInfo,
     changeUrlsToTabs,
     updateCurrentTabIndex,
-    removeTab
+    removeTab,
+    setOrgchartNodes
 };

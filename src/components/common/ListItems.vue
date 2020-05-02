@@ -6,7 +6,7 @@
                     <span class="title float-left">{{pageTitle}}</span>
                     <div class="float-right overline">
                         <v-text-field
-                            v-model="searchKey"
+                            @input="bindToSearchkey"
                             class="d-inline-block mr-2 sym-small-size"
                             single-line
                             append-icon="mdi-magnify"
@@ -32,8 +32,7 @@
                             :loading="loadingRefresh"
                             :disabled="loadingRefresh"
                             class="mr-2"
-                            @click="refreshList"
-                        >
+                            @click="refreshList">
                             <v-icon left dark>mdi-refresh</v-icon>
                             {{$t('common.refresh')}}
                         </v-btn>
@@ -124,7 +123,7 @@
             right
             v-if="actionPanelType != 'drag'"
             :temporary="actionPanelType == 'temporary'">
-            <slot name="right-panel-content" :itemData="currentItemData">
+            <slot name="right-panel-content" :itemData="currentItemDataClone">
                 <v-card flat>
                     <v-card-title class="pa-0 pl-2" primary-title>{{itemActionTitle}}</v-card-title>
                     <v-card-text>
@@ -135,11 +134,12 @@
                 </v-card>
             </slot>
         </component>
+
         <symper-drag-panel 
             v-else 
             @before-close="handleCloseDragPanel"
             :showPanel="actionPanel"
-            :panelData="currentItemData"
+            :panelData="currentItemDataClone"
             :actionTitle="itemActionTitle"
             :dragPanelWidth="actionPanelWidth">
             <template slot="drag-panel-content" slot-scope="{panelData}">
@@ -280,6 +280,7 @@
                 </div>
             </template>
         </v-navigation-drawer>
+
         <table-filter
             ref="tableFilter"
             :columnFilter="tableFilter.currentColumn.colFilter"
@@ -366,7 +367,11 @@ export default {
                 manualColumnResize: true,
                 manualRowResize: true,
                 stretchH: "all",
-                licenseKey: "non-commercial-and-evaluation"
+                licenseKey: "non-commercial-and-evaluation",
+                afterRender: (isForced)=>{
+                    console.log('after render handsontablelllllllllllllllllllllllllll');
+                    
+                }
             },
             tableFilter: {
                 // cấu hình filter của danh sách này
@@ -508,6 +513,9 @@ export default {
     },
     mounted() {},
     computed: {
+        currentItemDataClone(){
+            return util.cloneDeep(this.currentItemData);
+        },
         actionTitle() {},
         contentWidth() {
             if (this.actionPanel && this.actionPanelType == "elastic") {
@@ -590,6 +598,9 @@ export default {
             }
             return tbHeight - 50;
         },
+        /**
+         * Tạo cấu hình cho hiển thị header của table
+         */
         colHeaders() {
             let thisCpn = this;
             let prefix = this.headerPrefixKeypath;
@@ -605,6 +616,8 @@ export default {
                 return headers;
             }, []);
 
+            console.log('render column header handsontable');
+            
             return function(col) {
                 let colName = colNames[col];
                 let markFilter = "";
@@ -634,6 +647,9 @@ export default {
         }
     },
     methods: {
+        bindToSearchkey(vl){
+            this.searchKey = vl;
+        },
         handleCloseDragPanel(){
             this.actionPanel = false;
         },
@@ -851,6 +867,9 @@ export default {
             }
             return configs;
         },
+        /**
+         * Xử lý việc sau khi kết thúc kéo thả các cột ở thanh cấu hình hiển thị danh sách
+         */
         handleStopDragColumn() {
             this.tableDisplayConfig.drag = false;
             this.resetHiddenColumns();
@@ -886,7 +905,7 @@ export default {
                 for (let item of columns) {
                     colMap[item.name] = {
                         data: item.name,
-                        type: item.type,
+                        type: item.type, // lưu ý khi loại dữ liệu của cột là number (cần format) và dạng html
                         editor: false,
                         symperFixed: false,
                         symperHide: false,
