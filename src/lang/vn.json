@@ -207,6 +207,7 @@
             "name": "Tên",
             "note": "Ghi chú",
             "icon": "Icon",
+            "price": "Giá",
             "status": "Kích hoạt",
             "created_at": "Ngày tạo",
             "updated_at": "Cập nhật lần cuối"

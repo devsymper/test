@@ -8,11 +8,10 @@
             :containerHeight="tableHeight"
             :tableContextMenu="tableContextMenu"
             :useDefaultContext="false"
-            :currentItemData="currentApp"
             :actionPanelWidth="600"
             @after-open-add-panel="showAddModal"
         >
-            <div slot="right-panel-content" slot-scope="{ itemData }">
+            <div slot="right-panel-content" >
                 <v-card-title class="pt-0 pb-2 subtitle-1 font-weight-bold">
                     <v-icon class="pr-4">mdi-apps</v-icon> {{ !!!isEdit ? "Thêm Applications" : "Cập nhật Applications" }}
                 </v-card-title>
@@ -29,7 +28,7 @@
                                 </v-col>
                                 <v-col class="pt-0 pb-2" cols="9">
                                     <v-text-field
-                                        v-model.lazy="itemData.name"
+                                        v-model.lazy="currentApp.name"
                                         class="sym-small-size bg-grey"
                                         dense
                                         solo
@@ -46,7 +45,7 @@
                                 </v-col>
                                 <v-col class="pt-0 pb-2" cols="9">
                                     <v-textarea
-                                        v-model.lazy="itemData.note"
+                                        v-model.lazy="currentApp.note"
                                         dense
                                         solo
                                         flat
@@ -61,7 +60,7 @@
                                     {{$t("apps.header.status")}}
                                 </v-col>
                                 <v-col class="pt-0 pb-0" cols="9">
-                                    <v-checkbox v-model.lazy="itemData.status" :checked="itemData.status == 1" dense class="mt-2 ml-0" color="success" value="1" hide-details></v-checkbox>
+                                    <v-checkbox v-model.lazy="currentApp.status" :checked="currentApp.status == 1" dense class="mt-2 ml-0" color="success" value="1" hide-details></v-checkbox>
                                 </v-col>
                             </v-row>
                         </v-col>
@@ -170,7 +169,7 @@
                     color="primary"
                     class="float-right btn-fixed"
                     @click="addApp"
-                    :disabled="!!!itemData.name"
+                    :disabled="!!!currentApp.name"
                 >
                     <v-icon class="mr-2">mdi-content-save-outline</v-icon>
                     {{ isEdit ? $t('common.save') : $t('common.add') }}

@@ -681,6 +681,24 @@ export default {
             td.appendChild(icon);
             return td;
         },
+        dateRenderer (instance, td, row, col, prop, value, cellProperties) {
+            let format = "";
+            for (const col of this.tableColumns) {
+                if (col.data == prop) {
+                    format = col.dateFormat;
+                    break;
+                }
+            }
+            if (!!format) {
+                value = this.$moment(value).format(format)
+            }
+            let span = document.createElement('SPAN');
+            span.innerHTML = value;
+            span.style.color = 'blue';
+            Handsontable.dom.empty(td);
+            td.appendChild(span);
+            return td;
+        },
         handleCloseDragPanel(){
             this.actionPanel = false;
         },
@@ -946,6 +964,14 @@ export default {
                     } else if (item.type === 'status') {
                         colMap[item.name].type = 'handsontable';
                         colMap[item.name].renderer = this.statusRenderer;
+                    } else if(item.type === 'numeric' && item.hasFormat != undefined) {
+                        colMap[item.name].numericFormat = {
+                            pattern: item.pattern != undefined && !!item.pattern ? item.pattern : "0,0"
+                        };
+                    } else if((item.type === 'date' || item.type === 'datetime') && item.hasFormat != undefined) {
+                        colMap[item.name].dateFormat = item.pattern != undefined && !!item.pattern ? item.pattern : "MM/DD/YYYY";
+                        colMap[item.name].correctFormat = true;
+                        colMap[item.name].renderer = this.dateRenderer;
                     }
                 }
             }
