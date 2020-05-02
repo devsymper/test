@@ -291,6 +291,7 @@
 <script>
 import { HotTable } from "@handsontable/vue";
 import { util } from "./../../plugins/util.js";
+import Handsontable from 'handsontable';
 import FormTpl from "./FormTpl.vue";
 import { VDialog, VNavigationDrawer } from "vuetify/lib";
 import TableFilter from "./customTable/TableFilter.vue";
@@ -634,6 +635,52 @@ export default {
         }
     },
     methods: {
+        // Datnt render image/icon
+        imgRenderer (instance, td, row, col, prop, value, cellProperties) {
+            let escaped = Handsontable.helper.stringify(value), img;
+            if (escaped.indexOf('mdi-') < 0) {
+                img = document.createElement('IMG');
+                img.src = value;
+                img.width = 40;
+            }
+            else {
+                img = document.createElement('I');
+                img.classList.add('v-icon');
+                img.classList.add('mdi');
+                img.classList.add('theme--light');
+                img.classList.add('title');
+                img.classList.add(escaped);
+                img.style.lineHeight = "15px";
+            }
+            Handsontable.dom.addEvent(img, 'mousedown', function (e){
+                e.preventDefault(); // prevent selection quirk
+            });
+            Handsontable.dom.empty(td);
+            td.appendChild(img);
+            return td;
+        },
+        statusRenderer (instance, td, row, col, prop, value, cellProperties) {
+            let escaped = Handsontable.helper.stringify(value), icon;
+            icon = document.createElement('I');
+            icon.classList.add('v-icon');
+            icon.classList.add('mdi');
+            icon.classList.add('theme--light');
+            icon.classList.add('subtitle-1');
+            icon.style.lineHeight = "15px";
+            if (escaped == 'true' || escaped == '1') {
+                icon.classList.add('mdi-check');
+                icon.classList.add('success--text');
+            }
+            else {
+                icon.classList.add('mdi-delete');
+            }
+            Handsontable.dom.addEvent(icon, 'mousedown', function (e){
+                e.preventDefault(); // prevent selection quirk
+            });
+            Handsontable.dom.empty(td);
+            td.appendChild(icon);
+            return td;
+        },
         handleCloseDragPanel(){
             this.actionPanel = false;
         },
@@ -890,8 +937,16 @@ export default {
                         editor: false,
                         symperFixed: false,
                         symperHide: false,
-                        columnTitle: item.title
+                        columnTitle: item.title,
                     };
+                    // Render image - icon
+                    if (item.type === 'image') {
+                        colMap[item.name].type = 'handsontable';
+                        colMap[item.name].renderer = this.imgRenderer;
+                    } else if (item.type === 'status') {
+                        colMap[item.name].type = 'handsontable';
+                        colMap[item.name].renderer = this.statusRenderer;
+                    }
                 }
             }
 

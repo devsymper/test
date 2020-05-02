@@ -12,7 +12,7 @@
             :actionPanelWidth="600"
             @after-open-add-panel="showAddModal"
         >
-            <template slot="right-panel-content" slot-scope="{ itemData }">
+            <div slot="right-panel-content" slot-scope="{ itemData }">
                 <v-card-title class="pt-0 pb-2 subtitle-1 font-weight-bold">
                     <v-icon class="pr-4">mdi-apps</v-icon> {{ !!!isEdit ? "Thêm Applications" : "Cập nhật Applications" }}
                 </v-card-title>
@@ -33,6 +33,8 @@
                                         class="sym-small-size bg-grey"
                                         dense
                                         solo
+                                        @input.native.stop=""
+                                        @change.native.stop=""
                                         flat
                                         required
                                     ></v-text-field>
@@ -173,7 +175,7 @@
                     <v-icon class="mr-2">mdi-content-save-outline</v-icon>
                     {{ isEdit ? $t('common.save') : $t('common.add') }}
                 </v-btn>
-            </template>
+            </div>
         </ListItems>
     </v-container>
 </template>

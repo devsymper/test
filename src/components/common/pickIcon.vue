@@ -283,7 +283,7 @@ export default {
         reset() {
             this.listIconToShow = this.listIcon.split(",").slice(0, 150);
             this.searchIconKeyword = "";
-            this.$refs.fileUpload.reset();
+            this.$refs.fileUpload && this.$refs.fileUpload.reset();
         },
         searchIcon() {
             let listIcons = this.listIcon.split(",");

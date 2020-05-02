@@ -166,6 +166,8 @@ const textConditions = ["none","empty","not_empty","equal","not_equal","begins_w
 const numberConditions = ["none","empty","not_empty","equal","not_equal"];
 
 let conditionMap = {
+    // Định nghĩa column handsontable như kiểu text cho các trường custom như image, icon
+    handsontable: ["none","empty","not_empty","equal","not_equal","begins_with","ends_with","contains","not_contain"],
     text: ["none","empty","not_empty","equal","not_equal","begins_with","ends_with","contains","not_contain"],
     numeric: ["none","empty","not_empty","equal","not_equal","gt","gte","lt","lte"],
     date:["none","empty","not_empty","equal","not_equal","begins_with","ends_with","contains","not_contain","gt","gte","lt","lte"],
