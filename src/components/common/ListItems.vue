@@ -32,7 +32,8 @@
                             :loading="loadingRefresh"
                             :disabled="loadingRefresh"
                             class="mr-2"
-                            @click="refreshList">
+                            @click="refreshList"
+                        >
                             <v-icon left dark>mdi-refresh</v-icon>
                             {{$t('common.refresh')}}
                         </v-btn>
@@ -122,7 +123,8 @@
             absolute
             right
             v-if="actionPanelType != 'drag'"
-            :temporary="actionPanelType == 'temporary'">
+            :temporary="actionPanelType == 'temporary'"
+        >
             <slot name="right-panel-content" :itemData="currentItemDataClone">
                 <v-card flat>
                     <v-card-title class="pa-0 pl-2" primary-title>{{itemActionTitle}}</v-card-title>
@@ -135,15 +137,16 @@
             </slot>
         </component>
 
-        <symper-drag-panel 
-            v-else 
+        <symper-drag-panel
+            v-else
             @before-close="handleCloseDragPanel"
             :showPanel="actionPanel"
             :panelData="currentItemDataClone"
             :actionTitle="itemActionTitle"
-            :dragPanelWidth="actionPanelWidth">
+            :dragPanelWidth="actionPanelWidth"
+        >
             <template slot="drag-panel-content" slot-scope="{panelData}">
-                <slot name="right-panel-content" :itemData="panelData" >
+                <slot name="right-panel-content" :itemData="panelData">
                     <v-card flat>
                         <v-card-text>
                             <form-tpl :allInputs="itemInputs"></form-tpl>
@@ -154,132 +157,14 @@
             </template>
         </symper-drag-panel>
 
-        <v-navigation-drawer
-            v-model="tableDisplayConfig.show"
-            absolute
-            class="pa-2 pl-4"
-            right
-            :style="{width: tableDisplayConfig.width+'px'}">
-            <div class="title">
-                <div>
-                    {{$t('common.list_config')}}
-                    <v-icon
-                        class="close-btn float-right"
-                        @click="tableDisplayConfig.show = false"
-                    >mdi-close</v-icon>
-                </div>
-                <div class="pb-2">
-                    <div class="subtitle-2">{{$t('table.wrap_text_mode')}}</div>
-                    <div>
-                        <v-btn-toggle
-                            dense
-                            v-model="tableDisplayConfig.wrapTextMode"
-                            mandatory
-                            tile
-                            color="amber darken-4"
-                            group
-                        >
-                            <v-btn small>{{$t('table.wrap_tex_mode.clip')}}</v-btn>
-                            <v-btn small>{{$t('table.wrap_tex_mode.wrap')}}</v-btn>
-                        </v-btn-toggle>
-                    </div>
-                </div>
-                <div class="pb-2">
-                    <div class="subtitle-2">{{$t('table.display_density')}}</div>
-                    <div>
-                        <v-btn-toggle
-                            dense
-                            v-model="tableDisplayConfig.densityMode"
-                            mandatory
-                            tile
-                            color="amber darken-4"
-                            group
-                        >
-                            <v-btn small>{{$t('table.display_density_mode.loosen')}}</v-btn>
-                            <v-btn small>{{$t('table.display_density_mode.medium')}}</v-btn>
-                            <v-btn small>{{$t('table.display_density_mode.compact')}}</v-btn>
-                        </v-btn-toggle>
-                    </div>
-                </div>
-                <div class="pb-2">
-                    <div class="subtitle-2">{{$t('table.column_config')}}</div>
-                    <draggable
-                        class="list-group"
-                        tag="div"
-                        v-model="tableColumns"
-                        v-bind="tableDisplayConfig.dragOptions"
-                        @start="tableDisplayConfig.drag = true"
-                        @end="handleStopDragColumn"
-                    >
-                        <transition-group
-                            type="transition"
-                            :name="!tableDisplayConfig.drag ? 'flip-list' : null"
-                        >
-                            <div
-                                class="fs-13 column-drag-pos"
-                                v-for="(column,idx) in tableColumns"
-                                :key="column.data"
-                            >
-                                <v-icon size="18" class="mr-2">{{getDataTypeIcon(column.type)}}</v-icon>
-                                <span class="fw-400">{{$t(joinPrefixAndTile(column.columnTitle))}}</span>
-                                <v-tooltip top>
-                                    <template v-slot:activator="{ on }">
-                                        <v-btn
-                                            @click="configColumnDisplay('symperFixed',column,idx)"
-                                            class="float-right"
-                                            small
-                                            color="grey"
-                                            text
-                                            v-on="on"
-                                            icon
-                                        >
-                                            <v-icon
-                                                size="18"
-                                            >{{column.symperFixed ? 'mdi-roller-skate-off': 'mdi-roller-skate'}}</v-icon>
-                                        </v-btn>
-                                    </template>
-                                    <span>{{ column.symperFixed ? $t('table.unfreeze_column') : $t('table.freeze_column') }}</span>
-                                </v-tooltip>
-                                <v-tooltip top>
-                                    <template v-slot:activator="{ on }">
-                                        <v-btn
-                                            v-on="on"
-                                            class="float-right"
-                                            small
-                                            text
-                                            icon
-                                            color="grey"
-                                            @click="configColumnDisplay('symperHide',column, idx)"
-                                        >
-                                            <v-icon
-                                                size="18"
-                                            >{{column.symperHide ? 'mdi-eye-off-outline': 'mdi-eye-outline'}}</v-icon>
-                                        </v-btn>
-                                    </template>
-                                    <span
-                                        class="fw-400"
-                                    >{{ column.symperHide ? $t('table.show_column') : $t('table.hide_column') }}</span>
-                                </v-tooltip>
-                            </div>
-                        </transition-group>
-                    </draggable>
-                </div>
-            </div>
-            <template v-slot:append>
-                <div class="w-100 pt-2">
-                    <v-btn
-                        :loading="savingConfigs"
-                        small
-                        color="primary"
-                        @click="saveTableDisplayConfig()"
-                        class="float-right"
-                    >
-                        <v-icon class="mr-2">mdi-content-save-outline</v-icon>
-                        {{$t('common.save')}}
-                    </v-btn>
-                </div>
-            </template>
-        </v-navigation-drawer>
+        <display-config
+            ref="tableDisplayConfig"
+            @drag-columns-stopped="handleStopDragColumn"
+            @change-colmn-display-config="configColumnDisplay"
+            :tableDisplayConfig="tableDisplayConfig"
+            :tableColumns="tableColumns"
+            :headerPrefixKeypath="headerPrefixKeypath"
+        ></display-config>
 
         <table-filter
             ref="tableFilter"
@@ -295,12 +180,11 @@ import { util } from "./../../plugins/util.js";
 import FormTpl from "./FormTpl.vue";
 import { VDialog, VNavigationDrawer } from "vuetify/lib";
 import TableFilter from "./customTable/TableFilter.vue";
-import { appConfigs } from "./../../configs.js";
-import draggable from "vuedraggable";
 import { getDefaultFilterConfig } from "./../common/customTable/defaultFilterConfig.js";
 import Api from "./../../api/api.js";
 import { userApi } from "./../../api/user.js";
 import SymperDragPanel from "./SymperDragPanel.vue";
+import DisplayConfig from "./../common/listItemComponents/DisplayConfig";
 
 var apiObj = new Api("");
 
@@ -368,9 +252,10 @@ export default {
                 manualRowResize: true,
                 stretchH: "all",
                 licenseKey: "non-commercial-and-evaluation",
-                afterRender: (isForced)=>{
-                    console.log('after render handsontablelllllllllllllllllllllllllll');
-                    
+                afterRender: isForced => {
+                    console.log(
+                        "after render handsontablelllllllllllllllllllllllllll"
+                    );
                 }
             },
             tableFilter: {
@@ -513,7 +398,7 @@ export default {
     },
     mounted() {},
     computed: {
-        currentItemDataClone(){
+        currentItemDataClone() {
             return util.cloneDeep(this.currentItemData);
         },
         actionTitle() {},
@@ -616,8 +501,8 @@ export default {
                 return headers;
             }, []);
 
-            console.log('render column header handsontable');
-            
+            console.log("render column header handsontable");
+
             return function(col) {
                 let colName = colNames[col];
                 let markFilter = "";
@@ -647,19 +532,11 @@ export default {
         }
     },
     methods: {
-        bindToSearchkey(vl){
+        bindToSearchkey(vl) {
             this.searchKey = vl;
         },
-        handleCloseDragPanel(){
+        handleCloseDragPanel() {
             this.actionPanel = false;
-        },
-        joinPrefixAndTile(title) {
-            let prefix = this.headerPrefixKeypath;
-            prefix =
-                prefix[prefix.length - 1] == "." || prefix == ""
-                    ? prefix
-                    : prefix + ".";
-            return prefix + title;
         },
         /**
          * Lưu lại cấu hình hiển thị của table
@@ -870,10 +747,14 @@ export default {
         /**
          * Xử lý việc sau khi kết thúc kéo thả các cột ở thanh cấu hình hiển thị danh sách
          */
-        handleStopDragColumn() {
+        handleStopDragColumn(tbCols) {
             this.tableDisplayConfig.drag = false;
+            if(tbCols){
+                this.tableColumns = tbCols;
+            }
             this.resetHiddenColumns();
             this.reOrderFixedCols();
+            this.$refs.tableDisplayConfig.resetTableColumnsData();
         },
         resetHiddenColumns() {
             let hiddenColumns = {};
@@ -931,7 +812,8 @@ export default {
                 return Object.values(colMap);
             }
         },
-        configColumnDisplay(type, column, idx) {
+        configColumnDisplay(type, idx) {
+            let column = this.tableColumns[idx];
             column[type] = !column[type];
             let isValue = column[type];
             if (type == "symperHide") {
@@ -962,9 +844,6 @@ export default {
                 1000,
                 this
             );
-        },
-        getDataTypeIcon(type) {
-            return appConfigs.dataTypeIcon[type];
         },
         openTableDisplayConfigPanel() {
             this.tableDisplayConfig.show = !this.tableDisplayConfig.show;
@@ -1036,8 +915,8 @@ export default {
         VDialog,
         VNavigationDrawer,
         TableFilter,
-        draggable,
-        "symper-drag-panel": SymperDragPanel
+        "symper-drag-panel": SymperDragPanel,
+        "display-config": DisplayConfig
     }
 };
 </script>
@@ -1095,9 +974,6 @@ export default {
     padding-left: 8px;
 }
 
-.column-drag-pos[draggable="true"] {
-    background-color: #ffe6d2;
-}
 
 .list-group {
     border: 1px solid #d0d0d0;

@@ -52,7 +52,7 @@
                 <draggable
                     class="list-group"
                     tag="div"
-                    v-model="tableColumns"
+                    v-model="tableColumnsClone"
                     v-bind="tableDisplayConfig.dragOptions"
                     @start="tableDisplayConfig.drag = true"
                     @end="handleStopDragColumn"
@@ -63,7 +63,7 @@
                     >
                         <div
                             class="fs-13 column-drag-pos"
-                            v-for="(column,idx) in tableColumns"
+                            v-for="(column,idx) in tableColumnsClone"
                             :key="column.data"
                         >
                             <v-icon size="18" class="mr-2">{{getDataTypeIcon(column.type)}}</v-icon>
@@ -129,7 +129,29 @@
 </template>
 
 <script>
+import { appConfigs } from "./../../../configs.js";
+import draggable from "vuedraggable";
+import { util } from '../../../plugins/util';
 export default {
+    components: {
+        draggable,
+    },
+    watch: {
+        tableColumns: {
+            deep: true,
+            handler(){
+                console.log(this.tableColumns,'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx');
+                this.tableColumnsClone = util.cloneDeep(this.tableColumns);
+            }
+        }
+    },
+    data(){
+        return {
+            savingConfigs: false,
+            tableColumnsClone: []
+        }
+    },
+    computed: {},
     props: {
         tableDisplayConfig: {
             type: Object,
@@ -138,15 +160,46 @@ export default {
             }
         },
         tableColumns: {
-            type: Object,
+            type: Array,
             default(){
-                return {}
+                return []
             }
+        },
+        headerPrefixKeypath: {
+            type: String,
+            default: ''
         }
     },
+    methods: {
+        resetTableColumnsData(){
+            // this.tableColumnsClone = util.cloneDeep(this.tableColumns);
+        },
+        handleStopDragColumn(){
+            this.$emit('drag-columns-stopped', this.tableColumnsClone);
+        },
+        configColumnDisplay(type,idx){
+            this.$emit('change-colmn-display-config',type,idx);
+        },
+        getDataTypeIcon(type) {
+            return appConfigs.dataTypeIcon[type];
+        },
+        
+        joinPrefixAndTile(title) {
+            let prefix = this.headerPrefixKeypath;
+            prefix =
+                prefix[prefix.length - 1] == "." || prefix == ""
+                    ? prefix
+                    : prefix + ".";
+            return prefix + title;
+        },
+    }
     
 };
 </script>
 
 <style>
+
+.column-drag-pos[draggable="true"] {
+    background-color: #ffe6d2;
+}
 </style>
