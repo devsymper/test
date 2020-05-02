@@ -1,6 +1,6 @@
 <template>
     <div class="home">
-        <orgchart-selector>
+        <orgchart-selector v-model="testModel">
 
         </orgchart-selector>
     </div>
@@ -18,6 +18,7 @@ export default {
     },
     data() {
         return {
+            testModel: [{"idNode":"14bcc081-771e-490a-8254-bced2d7acab2","idOrgchart":"689"},{"idNode":"919ba806-73e5-4cb6-bbd8-6c7e3c44455a","idOrgchart":"689"}],
             num: 0,
             allInputs: {
                 numeric: {

@@ -43,10 +43,9 @@ const removeTab = (state, url) => {
  * }
  */
 const setOrgchartNodes = (state, orgchartNodes) => {
-    let nodes = state.orgchartNodes;
-    nodes = Object.assign(nodes, orgchartNodes);
-    state.orgchartNodes = nodes;
-    Vue.set(state, 'orgchartNodes', nodes);
+    for (let idOrgchart in orgchartNodes) {
+        Vue.set(state.orgchartNodes, 'orgcid' + idOrgchart, orgchartNodes[idOrgchart]);
+    }
 }
 
 export {
