@@ -30,21 +30,23 @@ const removeTab = (state, url) => {
 /**
  * 
  * @param {Object} state state của app
- * @param {Object} orgchartNodes chứa danh sách các node của các orgchart, dạng: {idOrgchart: [danh sách node]}
+ * @param {Object} orgchartNodes chứa danh sách các node của các orgchart, dạng: 
+ * {
+ *      idOrgchart: {
+ *          ... Thông tin orgchart,
+ *          children: { // thông tin các node trong orgchart này
+ *              idNode: {
+ *                  ... thông tin node
+ *              }
+ *          }
+ *      }
+ * }
  */
 const setOrgchartNodes = (state, orgchartNodes) => {
-
-    for (let id in orgchartNodes) {
-        for (let i = 0; i < orgchartNodes[id].children.length; i++) {
-            orgchartNodes[id].children[i].orgchartName = orgchartNodes[id].name;
-        }
-    }
     let nodes = state.orgchartNodes;
     nodes = Object.assign(nodes, orgchartNodes);
     state.orgchartNodes = nodes;
     Vue.set(state, 'orgchartNodes', nodes);
-    console.log(state, 'orgchartNodesorgchartNodesorgchartNodes');
-
 }
 
 export {

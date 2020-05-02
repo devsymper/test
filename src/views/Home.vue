@@ -1,11 +1,14 @@
 <template>
     <div class="home">
-        <form-tpl :allInputs="allInputs"></form-tpl>
+        <orgchart-selector>
+
+        </orgchart-selector>
     </div>
 </template>
 
 <script>
 import FormTpl from "./../components/common/FormTpl.vue";
+import OrgchartSelector from "./../components/user/OrgchartSelector.vue";
 export default {
     name: "Home",
     methods: {
@@ -51,7 +54,8 @@ export default {
         };
     },
     components: {
-        "form-tpl": FormTpl
+        "form-tpl": FormTpl,
+        'orgchart-selector': OrgchartSelector
     }
 };
 </script>

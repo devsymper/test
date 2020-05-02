@@ -85,8 +85,11 @@ import { orgChartApi } from "./../../api/OrgChart.js";
 import { userApi } from "./../../api/user.js";
 
 export default {
+    computed: {
+
+    },
     created() {
-        this.getAllOrgChart();
+        this.getAllOrgChartData();
     },
     components: {
         'vue-resizable': VueResizable
@@ -105,213 +108,94 @@ export default {
     },
     methods: {
         /**
-         * hoangnd: 14/4/2020
-         * Hàm thêm user vào vị trí của org chart để phân quyền
+         * Lấy đường dẫn từ root trong orgchart (orgc) xuống tới node (node)
          */
-        addOrgchartPosition(org, from) {
-            console.log(this.user);
-
-            if (from == "autocomplete") {
-                org.selected = true;
-            }
-            if (from == "input") {
-                org.selected = true;
-            }
-            if (org.selected == true) {
-                console.log(this.isAddingToPosition);
-
-                if (this.isAddingToPosition == false) {
-                    this.isAddingToPosition = true;
-                    permissionPositionOrgchartApi
-                        .addUserToPosition({
-                            userId: this.user.id,
-                            positionId: org.id_node
-                        })
-                        .then(res => {
-                            if (res.status == 200) {
-                                this.isAddingToPosition = false;
-                                this.positionOrgchartSelected.push(org);
-                            }
-                        })
-                        .catch(err => {
-                            console.log("error from add user api!!!", err);
-                        })
-                        .always(() => {});
-                } else {
-                    this.isAddingToPosition = false;
-                }
-            } else {
-                this.deletePosition(org);
-            }
-        },
-        getAllOrgChart() {
-            if (this.permissionPosittionOrgChart.listNode.length == 0) {
-                orgChartApi
-                    .getAllNodes()
-                    .then(res => {
-                        if (res.status == 200) {
-                            let treeData = res.data;
-                            this.permissionPosittionOrgChart.listNode = treeData;
-                            this.getUserPositionOrgchart();
-                        }
-                    })
-                    .catch(err => {
-                        console.log("error from get orgchart api!!!", err);
-                    })
-                    .always(() => {});
-            }
-        },
-
-        getUserPositionOrgchart() {
-            if (this.user.id != "" && this.user.id != null) {
-                userApi
-                    .getListUserPosition(this.user.id)
-                    .then(res => {
-                        if (res.status == 200) {
-                            let listNode = this.permissionPosittionOrgChart
-                                .listNode;
-                            // lặp check các root
-                            // this.setPositionOrgchartSelected(res.data);
-                            for (
-                                let index = 0;
-                                index < listNode.length;
-                                index++
-                            ) {
-                                let node = listNode[index];
-                                let newA = res.data.filter(n => {
-                                    return (
-                                        n.id == node.id &&
-                                        n.root_id == node.root_id &&
-                                        n.id_orgchart == node.id_orgchart &&
-                                        n.id_node == node.id_node
-                                    );
-                                });
-                                this.permissionPosittionOrgChart.listNode[
-                                    index
-                                ].selected = false;
-                                if (newA.length > 0) {
-                                    this.permissionPosittionOrgChart.listNode[
-                                        index
-                                    ].selected = true;
-                                }
-                                let children = node.children;
-                                // lặp check các children
-                                for (let i = 0; i < children.length; i++) {
-                                    let childNode = children[i];
-                                    let newArr = res.data.filter(n => {
-                                        return (
-                                            n.id == childNode.id &&
-                                            n.root_id == childNode.root_id &&
-                                            n.id_node == childNode.id_node
-                                        );
-                                    });
-                                    this.permissionPosittionOrgChart.listNode[
-                                        index
-                                    ].children[i].source = "";
-                                    this.permissionPosittionOrgChart.listNode[
-                                        index
-                                    ].children[i].selected = false;
-                                    if (newArr.length > 0) {
-                                        this.permissionPosittionOrgChart.listNode[
-                                            index
-                                        ].children[i].selected = true;
-                                    }
-                                }
-                            }
-                            this.setDataOrgchartTotreeView(
-                                this.permissionPosittionOrgChart.listNode,
-                                res.data
-                            );
-                        }
-                    })
-                    .catch(err => {
-                        console.log("error from get pack api!!!", err);
-                    })
-                    .always(() => {});
-            }
-        },
-
-        /**
-         * Hoangnd: 14/4/2020
-         * hàm đưa danh sách các node của orgchart về dạng hiển thị cho treeview
-         * @param Array listNodes: danh sách các orgchart
-         */
-        setDataOrgchartTotreeView(listNodes, listPosition) {
-            this.listNodesOrgChart = [];
-            for (let index = 0; index < listNodes.length; index++) {
-                let orgName = listNodes[index].name;
-                let listChild = listNodes[index].children;
-                this.listNodesOrgChart = this.listNodesOrgChart.concat(
-                    listChild
-                );
-                this.checkSelectedPosition(listPosition, listNodes[index]);
-                var map = {},
-                    node,
-                    roots = [],
-                    i;
-                for (i = 0; i < listChild.length; i++) {
-                    map[listChild[i].id_node] = i; // initialize the map
-                    listChild[i].children = []; // initialize the children
-                }
-                for (i = 0; i < listChild.length; i++) {
-                    node = listChild[i];
-                    if (node.id_parent_node !== "general") {
-                        node.source =
-                            listChild[map[node.id_parent_node]].source +
-                            " / " +
-                            listChild[map[node.id_parent_node]].name;
-                        listChild[map[node.id_parent_node]].children.push(node);
-                    } else {
-                        node.source = orgName;
-                        roots.push(node);
+        addPathInfoForANode(orgc, node){
+            if(!node.path){
+                if(node.id_parent_node == 'general'){
+                    node.path = `${orgc.name} / ${node.name}`;
+                }else{
+                    let parentId = node.id_parent_node;
+                    let parentNode = orgc.children[parentId];
+                    if(parentNode.path){
+                        node.path = `${parentNode.path} / ${node.name}`;
+                    }else{
+                        this.addPathInfoForANode(orgc, parentNode);
                     }
-                    this.checkSelectedPosition(listPosition, node);
                 }
-                this.permissionPosittionOrgChart.listNode[
-                    index
-                ].children = roots;
             }
-            console.log(this.listNodesOrgChart);
         },
-        checkSelectedPosition(listPosition, position) {
-            let newList = listPosition.filter(node => {
-                return (
-                    node.root_id == position.root_id &&
-                    node.id_parent_node == position.id_parent_node &&
-                    node.id_node == position.id_node
-                );
-            });
-            if (newList.length > 0)
-                this.positionOrgchartSelected = this.positionOrgchartSelected.concat(
-                    position
-                );
+        // Thêm đường dẫn (breadscrum) từ root đến node
+        addPathInfoForAllNodes(orgchartNodes){
+            for(let idOrgc in orgchartNodes){
+                let orgc = orgchartNodes[idOrgc];
+                for(let nodeId in orgc.children){
+                    this.addPathInfoForANode(orgc, orgc.children[nodeId]);
+                }
+            }
+            return orgchartNodes;
         },
-        
-		/**
-		 * Hàm xóa user ra khỏi vị trí của org chart
-		 * @param Object org : org cần xóa
-		 */
-		deletePosition(org){
-			userApi.deleteUserPosition({userId:this.user.id,positionId:org.id_node}).then(res => {
-				if (res.status == 200) {
-					let currentPosition = this.positionOrgchartSelected.find(x => x.id === org.id);
-					var index = this.positionOrgchartSelected.indexOf(currentPosition);
-					this.positionOrgchartSelected.splice(index,1);
-				}
-			})
-			.catch(err => {
-				console.log("error from add delete api!!!", err);
-			})
-			.always(() => {
+        // Chuyển data của orchart từ dạng phẳng sang dạng map key-value
+        makeNodesMap(orgchartNodes){
+            let rsl = {};
+            for(let orgc of orgchartNodes){
+                let newOrgc = {
+                    id: orgc['id'],
+                    id_node: orgc['id_node'],
+                    id_node: orgc['id_node'],
+                    id_parent_node: orgc['id_parent_node'],
+                    name: orgc['name'],
+                    root_id: orgc['root_id'],
+                    children: {}
+                };
 
-			});
-		},
+                for(let node of orgc.children){
+                    node.orgchartId = orgc['id'];
+                    newOrgc.children[node.id_node] = node;
+                }
+                rsl[orgc.id] = newOrgc;
+            }
+            return rsl;
+        },
+        /**
+         * Lấy data của tất cả orgchart ở server
+         */
+        getAllOrgChartData() {
+            let self = this;
+            orgChartApi.getAllNodes()
+            .then(res => {
+                if (res.status == 200) {
+                    let orgchartNodes = self.makeNodesMap(res.data);
+                    orgchartNodes = self.addPathInfoForAllNodes(orgchartNodes);
+                    console.log(orgchartNodes);
+                    self.$store.commit('app/setOrgchartNodes',orgchartNodes);
+                }
+            })
+            .catch(err => {
+                console.warn(err);
+                self.$snotify({
+                    type:'error',
+                    title: 'Error!',
+                    text: 'Error when get and prepare data for orchart selector component',
+                });
+            });
+        }
     },
     props: {
-        user: {
+        /** 
+         * Danh sách các node được tích chọn trong orgchar, có dạng:
+         * {
+         *      id orgchart 1: [ idNode1, idNode2, ....],
+         *      id orgchart 2: [ idNode1, idNode2, ....],
+         * }
+         * 
+         **/ 
+        value: {
             type: Object,
             default(){
-                return {}
+                return {
+
+                }
             }
         }
     }

@@ -1,5 +1,5 @@
 <template>
-    <div class="ml-2 w-100 pr-3">
+    <div class="ml-2 w-100 pr-3 pt-3">
         <div :style="{width:contentWidth, display: 'inline-block'}">
             <v-row no-gutters class="pb-2" ref="topBar">
                 <v-col>

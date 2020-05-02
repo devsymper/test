@@ -59,8 +59,8 @@ const defaultState = {
     /**
      * Danh sách các node của các orgchart
      * dạng: {
-     *      idOrgchart : [] // tất cả các node của từng orgchart ở dạng phẳng , có quan hệ cha-con ở từng node
-     *      
+     *      idOrgchart : {} // tất cả các node của từng orgchart ở dạng phẳng , có id của node cha ở từng node, 
+     *      dạng {id của node: thuộc tính của node đó}
      * }
      */
     orgchartNodes: {
