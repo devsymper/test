@@ -5,21 +5,25 @@
         class="symper-drag-panel elevation-12"
         :style="{
             width:dragPanelWidth+'px',
-            'max-width':dragPanelWidth+'px',
             height: dragPanelHeight+'px'
         }">
-        <div class="pa-2 symper-drag-panel-header" style="height:30px">
-            <span class="float-left pl-2 drag-panel-title">
-                {{actionTitle}}
-            </span>
-            <v-icon
-                @click="handleClosePanel"
-                class="close-btn float-right"
-                style="font-size:16px;position: relative;top: -3px;"
-            >mdi-close</v-icon>
-        </div>
-        <div class="symper-drag-panel-body px-2 pb-2">
-            <slot name="drag-panel-content" :panelData="panelData"></slot>
+        <div class="position-relative w-100 h-100">
+            <div class="pa-2 symper-drag-panel-header" style="height:30px">
+                <span class="float-left pl-2 drag-panel-title">
+                    {{actionTitle}}
+                </span>
+                <v-icon
+                    @click="handleClosePanel"
+                    class="close-btn float-right"
+                    style="font-size:16px;position: relative;top: -3px;"
+                >mdi-close</v-icon>
+            </div>
+            <div class="symper-drag-panel-body px-2 pb-2">
+                <slot name="drag-panel-content" :panelData="panelData"></slot>
+            </div>
+            <div ref="resizer" class="symper-drag-panel-resizer">
+                <i class="mdi mdi-resize-bottom-right"></i>
+            </div>
         </div>
     </div>
 </template>
@@ -120,7 +124,23 @@ export default {
         handleClosePanel() {
             this.$emit('before-close',{});
             this.selfShowPanel = false;
+        },
+        initResize(e) {
+            window.addEventListener('mousemove', this.resize, false);
+            window.addEventListener('mouseup', this.stopResize, false);
+        },
+        resize(e) {
+            let element = this.$refs.symperDragPanel;
+            element.style.width = (e.clientX - element.offsetLeft) + 'px';
+            element.style.height = (e.clientY - element.offsetTop) + 'px';
+        },
+        stopResize(e) {
+            window.removeEventListener('mousemove', this.resize, false);
+            window.removeEventListener('mouseup', this.stopResize, false);
         }
+    },
+    mounted(){
+        this.$refs.resizer.addEventListener('mousedown', this.initResize, false);
     }
 };
 </script>
@@ -129,6 +149,7 @@ export default {
 
 .symper-drag-panel {
     position: fixed;
+    overflow: hidden;
     top: 100px;
     left: 300px;
     z-index: 500;
@@ -151,5 +172,22 @@ export default {
     position: relative;
     top: -5px;
 
+}
+
+.symper-drag-panel-resizer {
+    position: absolute;
+    right: 0px;
+    bottom: 0px;
+    display: inline-block;
+    height: 20px;
+    width: 20px;
+    z-index: 9999999;
+    cursor: se-resize;
+}
+
+.symper-drag-panel-resizer i{
+    font-size: 18px;
+    line-height: 18px;
+    position: absolute;
 }
 </style>

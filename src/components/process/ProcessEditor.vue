@@ -56,7 +56,7 @@
                             :key="groupName"
                         >
                             <v-expansion-panel-header>{{groupData.title}}</v-expansion-panel-header>
-                            <v-expansion-panel-content class="pt-2">
+                            <v-expansion-panel-content>
                                 <form-tpl
                                     @input-value-changed="handleAttrValueChanged"
                                     :allInputs="groupData.items"
@@ -193,6 +193,7 @@ export default {
          * Xử lý sự kiện khi người dùng click vào một node
          */
         handleNodeSelected(node) {
+            console.log(node);
             let type = node.$type.replace('bpmn:','');
             let nodeData = this.getNodeData(node.id, type);
             this.$store.commit("process/changeSelectingNode", nodeData);
@@ -214,6 +215,9 @@ export default {
             type: String,
             default: "create"
         }
+    },
+    created(){
+        this.$store.dispatch('app/getAllOrgchartNodes');
     },
     computed: {
         selectingNode(){

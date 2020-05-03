@@ -1,13 +1,11 @@
 <template>
-    <div>
+    <div class="mt-1">
         <div
             v-for="(inputInfo, name) in allInputs"
             :key="name"
             :class="{
             'pb-2': singleLine ? true : false,
-            'pb-1': (!singleLine && inputInfo.type != 'checkbox' && inputInfo.type != 'radio') ? true : false,
-        }"
-        >
+            'pb-1': (!singleLine && inputInfo.type != 'checkbox' && inputInfo.type != 'radio') ? true : false,}">
             <div
                 class="d-inline-block font-weight-medium fs-13"
                 :style="{
@@ -17,13 +15,23 @@
                     'vertical-align': 'middle',
                     'margin-right': space
                 }"
-                v-if="!inputInfo.hidden && (inputInfo.type != 'checkbox' && inputInfo.type != 'switch' )"
-            >
+                v-if="!inputInfo.hidden && (inputInfo.type != 'checkbox' && inputInfo.type != 'switch' )">
                 {{inputInfo.title}}
                 <i
-                    class="mdi mdi-dock-window float-right large-formula-editor"
+                    class="mdi mdi-dock-window float-right input-item-func ml-1"
                     @click="openLargeFormulaEditor(inputInfo, name)"
-                    v-if="inputInfo.type == 'script'"
+                    v-if="inputInfo.type == 'script' || inputInfo.type == 'userAssignment'"
+                ></i>
+                <i
+                    :class="{'mdi mdi-function float-right input-item-func': true, 'active':inputInfo.activeTab == 'script'}"
+                    @click="changeAssignmentType(inputInfo, name, 'script')"
+                    style="border-right: 1px solid #cccccc; "
+                    v-if="inputInfo.type == 'userAssignment'"
+                ></i>
+                <i
+                    :class="{'mdi mdi-sitemap float-right input-item-func': true, 'active':inputInfo.activeTab == 'orgchart'}"
+                    @click="changeAssignmentType(inputInfo, name, 'orgchart')"
+                    v-if="inputInfo.type == 'userAssignment'"
                 ></i>
             </div>
             <component
@@ -38,14 +46,14 @@
                     'min-width': inputMinwidth,
                     'width': inputWidth,
                 }"
-                class="sym-small-size sym-style-input d-inline-block"
+                :id="inputInfo.id ? inputInfo.id : ''"
+                :class="'sym-small-size sym-style-input d-inline-block '+(inputInfo.classes ? inputInfo.classes : '') "
                 :key="name"
                 single-line
                 v-bind="getInputProps(inputInfo)"
                 v-model="inputInfo.value"
                 :formulaValue="inputInfo.value"
-                :is="getInputTag(inputInfo.type)"
-            >
+                :is="getInputTag(inputInfo.type)">
                 <template slot="item" slot-scope="data">
                     <template>
                         <div>
@@ -61,8 +69,7 @@
             @before-close="closeLargeFormulaEditor()"
             :showPanel="largeFormulaEditor.open"
             :actionTitle="largeFormulaEditor.data.title"
-            :panelData="largeFormulaEditor.data"
-        >
+            :panelData="largeFormulaEditor.data">
             <template slot="drag-panel-content" slot-scope="{panelData}">
                 <formula-editor
                     v-model="panelData.value"
@@ -87,6 +94,8 @@ import TreeValidate from "./../../views/document/sideright/items/FormValidateTpl
 import FormulaEditor from "./../common/FormulaEditor";
 import DataTable from "./../common/customTable/DataTable";
 import SymperDragPanel from "./SymperDragPanel";
+import SymperUserAssignment from "./SymperUserAssignment";
+
 const inputTypeConfigs = {
     numeric: {
         tag: "v-text-field",
@@ -183,28 +192,40 @@ const inputTypeConfigs = {
                 data: config.value
             };
         }
+    },
+    userAssignment: {
+        tag: "symper-user-assginment",
+        props(config) {
+            return {
+                activeTab: config.activeTab
+            };
+        }
     }
 };
 export default {
     data() {
         return {
             largeFormulaEditor: {
-                name: '', // tên của input
+                name: "", // tên của input
                 open: false, // có mở largeFormulaEditor hay ko
                 data: {} // Dữ liệu của input cần mở lên để edit trong khung lớn
             }
         };
     },
     methods: {
-        closeLargeFormulaEditor(){
+        changeAssignmentType(inputInfo, name, type) {
+            this.$refs["inputItem_" + name][0].switchToTab(type);
+            inputInfo.activeTab = type;
+        },
+        closeLargeFormulaEditor() {
             this.largeFormulaEditor.open = false;
             let info = this.largeFormulaEditor;
-            this.$refs['inputItem_'+info.name][0].setValue(info.data.value); 
+            this.$refs["inputItem_" + info.name][0].setValue(info.data.value);
         },
         openLargeFormulaEditor(inputInfo, name) {
             this.largeFormulaEditor.open = true;
             this.largeFormulaEditor.name = name;
-            this.$set(this.largeFormulaEditor,'data',inputInfo);
+            this.$set(this.largeFormulaEditor, "data", inputInfo);
         },
         handleChangeInputValue(inputInfo, name) {
             /**
@@ -219,10 +240,6 @@ export default {
             return rsl;
         },
         getInputTag(inputType) {
-            console.log(inputType);
-
-            if (!inputTypeConfigs[inputType]) {
-            }
             return inputTypeConfigs[inputType].tag;
         }
     },
@@ -265,14 +282,16 @@ export default {
             type: Boolean,
             default: false
         },
+        // độ rộng của lable (tác dụng trong trường hợp singleLine là true)
         labelWidth: {
             type: String,
             default: "50px"
         },
+        // Khoảng cách giữa label và input (tác dụng trong trường hợp singleLine là true)
         space: {
             type: String,
             default: "8px"
-        }
+        },
     },
     computed: {
         labelMinwidth() {
@@ -300,14 +319,20 @@ export default {
         "v-tree-validate": TreeValidate,
         FormulaEditor,
         DataTable,
-        SymperDragPanel
+        SymperDragPanel,
+        "symper-user-assginment": SymperUserAssignment
     }
 };
 </script>
 
 <style>
-.large-formula-editor {
+.input-item-func {
     cursor: pointer;
     font-size: 15px;
+    padding: 3px;
+    margin-bottom: 3px;
+}
+.input-item-func.active{
+    color: #f58634;
 }
 </style>

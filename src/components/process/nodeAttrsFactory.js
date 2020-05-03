@@ -12,7 +12,8 @@ const commonAttrs = ['id', 'name', 'documentation'];
  * Các thuộc tính trong group ko được trùng với các thuộc tính của  commonAttrs
  */
 const groupsAttrs = {
-    task: ['asynchronous', 'exclusive', 'cardinality', 'elementVariable', 'completionCondition']
+    task: ['asynchronous', 'exclusive', 'cardinality', 'elementVariable', 'completionCondition'],
+    gateway: ['asynchronous', 'exclusive', 'cardinality', 'elementVariable', 'completionCondition']
 }
 
 
@@ -20,7 +21,7 @@ const groupsAttrs = {
 export const nodeAttrsDefinition = {
     'UserTask': {
         group: 'task', // nhóm thuộc tính mà node này thuộc về, giá trị là một hoặc nhiều key trong "groupsAttrs"
-        attrs: ['taskAction', 'formReference', 'formKey', 'assignee', 'candidateUsers', 'validateFormFields', 'dueDate', 'priority', 'taskListeners', 'skipExpression', 'category', 'approvalActions'],
+        attrs: ['taskAction', 'formReference', 'formKey', 'taskOwner', 'assignee', 'candidateUsers', 'validateFormFields', 'priority', 'taskListeners', 'skipExpression', 'category', 'approvalActions', 'dueDate'],
         exclude: ['asynchronous', 'exclusive'],
         validate: function(attrs) {
 
@@ -38,13 +39,69 @@ export const nodeAttrsDefinition = {
     },
     'ScriptTask': {
         group: 'task', // nhóm thuộc tính mà node này thuộc về, giá trị là một hoặc nhiều key trong "groupsAttrs"
+        attrs: ['script'],
         validate: function(attrs) {
 
         },
         checkShowOrHideInput: function(attrs) {
 
         }
-    }
+    },
+    'ServiceTask': {
+        group: 'task', // nhóm thuộc tính mà node này thuộc về, giá trị là một hoặc nhiều key trong "groupsAttrs",
+        attrs: ['skipExpression', 'triggerable', 'delegateExpression', 'classFields', 'exceptions', 'resultvariableName', 'failedJobRetryTimeCycle'],
+        validate: function(attrs) {
+
+        },
+        checkShowOrHideInput: function(attrs) {
+
+        }
+    },
+    'ReceiveTask': {
+        group: 'task', // nhóm thuộc tính mà node này thuộc về, giá trị là một hoặc nhiều key trong "groupsAttrs"
+        validate: function(attrs) {
+
+        },
+        checkShowOrHideInput: function(attrs) {
+
+        }
+    },
+    'SendTask': {
+        group: 'task', // nhóm thuộc tính mà node này thuộc về, giá trị là một hoặc nhiều key trong "groupsAttrs"
+        validate: function(attrs) {
+
+        },
+        checkShowOrHideInput: function(attrs) {
+
+        }
+    },
+    'ExclusiveGateway': {
+        group: 'gateway',
+        validate: function(attrs) {
+
+        },
+        checkShowOrHideInput: function(attrs) {
+
+        }
+    },
+    'ParallelGateway': {
+        group: 'gateway',
+        validate: function(attrs) {
+
+        },
+        checkShowOrHideInput: function(attrs) {
+
+        }
+    },
+    'ComplexGateway': {
+        group: 'gateway',
+        validate: function(attrs) {
+
+        },
+        checkShowOrHideInput: function(attrs) {
+
+        }
+    },
 };
 
 

@@ -414,6 +414,9 @@ export default {
                 this.setValue(this.value);
             }
             this.listenChangeEvt();
+            if(this.simpleMode){
+                this.formulaEditor.setOption('showGutter', false);
+            }
         },
 
         // khadm: Phát sự kiện khi thay đổi giá trị formula
