@@ -5,6 +5,7 @@
                 class="mt-2"
                 v-model="searchNode"
                 @change="handleNodeSelectedOnInput"
+                @update:search-input="searchOrgchartNodes"
                 dense
                 :items="listNodeAsFlat"
                 item-value="gid"
@@ -23,6 +24,7 @@
             </v-autocomplete>
             <v-treeview
                 :items="listNodeAsTree"
+                :search="searchKey"
                 dense
                 open-all
                 class="sym-small-size mt-2">
@@ -86,6 +88,7 @@ import { util } from '../../plugins/util';
 
 export default {
     computed: {
+        // Tổ chức các node dưới dạng treeview
         listNodeAsTree(){
             let orcharts = util.cloneDeep(this.$store.state.app.orgchartNodes);
             let treeData = [];
@@ -122,6 +125,7 @@ export default {
             }
             return treeData;
         },  
+        // Tổ chức các node dưới dạng phẳng (danh sách)
         listNodeAsFlat(){
             let nodes = [];
             let orcharts = this.$store.state.app.orgchartNodes;
@@ -130,11 +134,16 @@ export default {
             }
             return nodes;
         },
+        // Data của các node được tick chọn trong orgchart
         selectedNodesData(){
             let orcharts = this.$store.state.app.orgchartNodes;
             let nodes = [];
+            
             for(let node of this.value){
-                nodes.push(orcharts['orgcid'+node.idOrgchart].children[node.idNode]);
+                let orgchart = orcharts['orgcid'+node.idOrgchart];
+                if(orgchart){
+                    nodes.push(orgchart.children[node.idNode]);                            
+                }
             }
             return nodes;
         }
@@ -147,6 +156,7 @@ export default {
     },
     data() {
         return {
+            searchKey: '',
             searchNode: {name: '', gid: ''},
             listNodesOrgChart: [],
             permissionPosittionOrgChart: {
@@ -158,8 +168,16 @@ export default {
         };
     },
     methods: {
+        searchOrgchartNodes(value){
+            if(this.debounceSearchTree){
+                clearTimeout(this.debounceSearchTree);
+            }
+            this.debounceSearchTree = setTimeout((self) => {
+                self.searchKey = value;
+            }, 500, this);
+        },
+        // Xử lý khi user tick vào chọn hay không chọn một node trong orgchart ở dạng treeview
         handleNodeSelectedOnTree(node, selected){
-            console.log(node, selected, 'xxxxxxxx');
             if(selected){
                 this.handleNodeSelectedOnInput(node);
             }else{
@@ -178,10 +196,12 @@ export default {
          * Xử lý khi người dùng chọn được một node bất kỳ từ danh sách autocomplete
          */
         handleNodeSelectedOnInput(node){
-            this.$emit('input',this.value.concat({
-                idNode: node.id_node,
-                idOrgchart: node.gid.split('-')[0]
-            }));
+            if(node){
+                this.$emit('input',this.value.concat({
+                    idNode: node.id_node,
+                    idOrgchart: node.gid.split('-')[0]
+                }));
+            }
         },
         /**
          * Lấy đường dẫn từ root trong orgchart (orgc) xuống tới node (node)
