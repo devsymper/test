@@ -32,8 +32,6 @@
                                         class="sym-small-size bg-grey"
                                         dense
                                         solo
-                                        @input.native.stop=""
-                                        @change.native.stop=""
                                         flat
                                         required
                                     ></v-text-field>
@@ -230,8 +228,7 @@ export default {
                     text: this.$t("apps.contextMenu.edit"),
                     callback: (app, callback) => {
                         this.editCallback = callback;
-                        this.currentApp = { ...app };
-                        this.isEdit = true;
+                        this.showEditAppPanel(app);
                     },
                 },
                 {
@@ -253,6 +250,10 @@ export default {
         this.getAllObjectToImport();
     },
     methods: {
+        showEditAppPanel(app) {
+            this.currentApp = JSON.parse(JSON.stringify(app));
+            this.isEdit = true;
+        },
         getAllObjectInApp(id) {
             let req = new Api(this.apiUrl);
             req.get(this.appUrl + "/" + id + "/objects")
@@ -346,7 +347,7 @@ export default {
             }
         },
         resetResult() {
-            this.listObjectToShows = this.allObjectToImport;
+            this.listObjectToShows = JSON.parse(JSON.stringify(this.allObjectToImport));
             for (const index in this.listObjectToShows) {
                 this.listObjectToShows[index].objects = this.listObjectToShows[index].objects.slice(0, 10);
             }

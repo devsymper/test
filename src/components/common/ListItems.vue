@@ -421,11 +421,11 @@ export default {
     },
     created() {
         let thisCpn = this;
-        this.$evtBus.$on("change-user-locale", locale => {
-            if (thisCpn.$refs.dataTable) {
-                thisCpn.$refs.dataTable.hotInstance.render();
-            }
-        });
+        // this.$evtBus.$on("change-user-locale", locale => {
+        //     if (thisCpn.$refs.dataTable) {
+        //         thisCpn.$refs.dataTable.hotInstance.render();
+        //     }
+        // });
         this.getData();
         this.restoreTableDisplayConfig();
     },
@@ -543,7 +543,7 @@ export default {
                         menuItem.length &&
                         menuItem[0].hasOwnProperty("callback")
                     ) {
-                        menuItem[0].callback(rowData, res => {
+                        menuItem[0].callback(JSON.parse(JSON.stringify(rowData)), res => {
                             if (res.status === 200) {
                                 thisCpn.getData();
                             }
@@ -635,7 +635,7 @@ export default {
         }
     },
     methods: {
-        // Datnt render image/icon
+        // Datnt render image/icon, custom status, date
         imgRenderer (instance, td, row, col, prop, value, cellProperties) {
             let escaped = Handsontable.helper.stringify(value), img;
             if (escaped.indexOf('mdi-') < 0) {
@@ -685,7 +685,7 @@ export default {
             let format = "";
             for (const col of this.tableColumns) {
                 if (col.data == prop) {
-                    format = col.dateFormat;
+                    format = col.dateFormat != undefined ? col.dateFormat : "";
                     break;
                 }
             }
@@ -968,9 +968,11 @@ export default {
                         colMap[item.name].numericFormat = {
                             pattern: item.pattern != undefined && !!item.pattern ? item.pattern : "0,0"
                         };
-                    } else if((item.type === 'date' || item.type === 'datetime') && item.hasFormat != undefined) {
-                        colMap[item.name].dateFormat = item.pattern != undefined && !!item.pattern ? item.pattern : "MM/DD/YYYY";
-                        colMap[item.name].correctFormat = true;
+                    } else if((item.type.indexOf('date') === 0)) {
+                        if (item.hasFormat != undefined) {
+                            colMap[item.name].dateFormat = item.pattern != undefined && !!item.pattern ? item.pattern : "MM/DD/YYYY";
+                            colMap[item.name].correctFormat = true;
+                        }
                         colMap[item.name].renderer = this.dateRenderer;
                     }
                 }

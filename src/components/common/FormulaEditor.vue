@@ -253,7 +253,6 @@ export default {
     },
     mounted() {
         ace.config.set("basePath", "ace-builds/src-min-noconflict");
-        console.log("tesst", this.value);
         this.initEditor();
         this.getListAutoComplete();
         this.setupTooltip();
