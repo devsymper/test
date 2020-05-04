@@ -149,7 +149,7 @@ export default {
         }
     },
     created() {
-        this.getAllOrgChartData();
+        this.$store.dispatch('app/getAllOrgChartData');
     },
     components: {
         'vue-resizable': VueResizable
@@ -189,7 +189,7 @@ export default {
                         break;
                     }
                 }
-                this.value.splice(idx,1);
+                this.deleteSelectedNode(idx);
             }
         },
         /**
@@ -204,92 +204,20 @@ export default {
             }
         },
         /**
-         * Lấy đường dẫn từ root trong orgchart (orgc) xuống tới node (node)
-         */
-        addPathInfoForANode(orgc, node){
-            if(!node.path){
-                if(node.id_parent_node == 'general'){
-                    node.path = `${orgc.name} / ${node.name}`;
-                }else{
-                    let parentId = node.id_parent_node;
-                    let parentNode = orgc.children[parentId];
-                    if(parentNode.path){
-                        node.path = `${parentNode.path} / ${node.name}`;
-                    }else{
-                        this.addPathInfoForANode(orgc, parentNode);
-                    }
-                }
-            }
-        },
-        // Thêm đường đi (breadscrum) từ root đến node
-        addPathInfoForAllNodes(orgchartNodes){
-            for(let idOrgc in orgchartNodes){
-                let orgc = orgchartNodes[idOrgc];
-                for(let nodeId in orgc.children){
-                    this.addPathInfoForANode(orgc, orgc.children[nodeId]);
-                }
-            }
-            return orgchartNodes;
-        },
-        // Chuyển data của orchart từ dạng phẳng sang dạng map key-value
-        makeNodesMap(orgchartNodes){
-            let rsl = {};
-            for(let orgc of orgchartNodes){
-                let newOrgc = {
-                    id: orgc['id'], // thêm _ ở đầu để có thể khởi động reactive của vue
-                    id_node: orgc['id_node'],
-                    id_node: orgc['id_node'],
-                    id_parent_node: orgc['id_parent_node'],
-                    name: orgc['name'],
-                    root_id: orgc['root_id'],
-                    children: {}
-                };
-
-                for(let node of orgc.children){
-                    node.gid = orgc['id']+'-'+node.id_node; // gid là general id là kết hợp giữa id orgchart và id node tạo thành key duy nhất để xác định một node bất kỳ giữa tất cả các orgchart 
-                    newOrgc.children[node.id_node] = node;
-                }
-                rsl[orgc.id] = newOrgc;
-            }
-            return rsl;
-        },
-        /**
-         * Lấy data của tất cả orgchart ở server
-         */
-        getAllOrgChartData() {
-            let self = this;
-            orgChartApi.getAllNodes()
-            .then(res => {
-                if (res.status == 200) {
-                    let orgchartNodes = self.makeNodesMap(res.data);
-                    orgchartNodes = self.addPathInfoForAllNodes(orgchartNodes);
-                    self.$store.commit('app/setOrgchartNodes',orgchartNodes);
-                }
-            })
-            .catch(err => {
-                console.warn(err);
-                self.$snotify({
-                    type:'error',
-                    title: 'Error!',
-                    text: 'Error when get and prepare data for orchart selector component',
-                });
-            });
-        },
-        /**
          * Xóa một node khỏi danh sách được chọn
          */
         deleteSelectedNode(idx){
             this.value.splice(idx,1);
+            this.$emit('input',this.value);
         }
     },
     props: {
         /** 
          * Danh sách các node được tích chọn trong orgchar, có dạng:
-         * {
-         *      id orgchart 1: [ idNode1, idNode2, ....],
-         *      id orgchart 2: [ idNode1, idNode2, ....],
-         * }
-         * 
+         * [
+         *      {"idNode":"14bcc081-771e-490a-8254-bced2d7acab2","idOrgchart":"689"},
+         *      {"idNode":"919ba806-73e5-4cb6-bbd8-6c7e3c44455a","idOrgchart":"689"}
+         * ]
          **/ 
         value: {
             type: Array,

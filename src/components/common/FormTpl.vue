@@ -18,8 +18,8 @@
                 v-if="!inputInfo.hidden && (inputInfo.type != 'checkbox' && inputInfo.type != 'switch' )">
                 {{inputInfo.title}}
                 <i
-                    class="mdi mdi-dock-window float-right input-item-func ml-1"
-                    @click="openLargeFormulaEditor(inputInfo, name)"
+                    :class="{'mdi mdi-dock-window float-right input-item-func ml-1': true,'active': inputInfo.title == largeFormulaEditor.name}"
+                    @click="openLargeValueEditor(inputInfo, name)"
                     v-if="inputInfo.type == 'script' || inputInfo.type == 'userAssignment'"
                 ></i>
                 <i
@@ -73,7 +73,20 @@
             :actionTitle="largeFormulaEditor.data.title"
             :panelData="largeFormulaEditor.data">
             <template slot="drag-panel-content" slot-scope="{panelData}">
+                <orgchart-selector
+                    @input="translateOrgchartValuesToTags"
+                    v-if="getDragPanelContent(panelData) == 'orgchart-selector'"
+                    v-model="panelData.value.orgchartSelectorValue"
+                ></orgchart-selector>
                 <formula-editor
+                    v-else-if="panelData.type == 'userAssignment'"
+                    v-model="panelData.value.formula"
+                    :formulaValue="panelData.value.formula"
+                    :width="'100%'"
+                    :height="'370px'"
+                ></formula-editor>
+                <formula-editor
+                    v-else
                     v-model="panelData.value"
                     :formulaValue="panelData.value"
                     :width="'100%'"
@@ -97,6 +110,7 @@ import FormulaEditor from "./../common/FormulaEditor";
 import DataTable from "./../common/customTable/DataTable";
 import SymperDragPanel from "./SymperDragPanel";
 import SymperUserAssignment from "./SymperUserAssignment";
+import OrgchartSelector from "./../user/OrgchartSelector";
 
 const inputTypeConfigs = {
     numeric: {
@@ -210,11 +224,60 @@ export default {
             largeFormulaEditor: {
                 name: "", // tên của input
                 open: false, // có mở largeFormulaEditor hay ko
-                data: {} // Dữ liệu của input cần mở lên để edit trong khung lớn
+                data: {}, // Dữ liệu của input cần mở lên để edit trong khung lớn,
             }
         };
     },
     methods: {
+        translateOrgchartValuesToTags(){
+            if(this.translateOrgchartValuesToTagsDebounce){
+                clearTimeout(this.translateOrgchartValuesToTagsDebounce);
+            }
+            this.translateOrgchartValuesToTagsDebounce = setTimeout((self) => {
+                // chuyển lại định dạng để hiển thị ở dạng tags
+                let vls = [];
+                for(let item of self.largeFormulaEditor.data.value.orgchartSelectorValue){
+                    let node = self.$store.state.app.orgchartNodes['orgcid'+item.idOrgchart].children[item.idNode];
+                    vls.push({
+                        text: node.name,
+                        id: node.gid,
+                        type: 'department'
+                    });
+                }
+
+                for(let item of self.largeFormulaEditor.data.value.orgChart){
+                    if(item.type == 'user'){
+                        vls.push(item);
+                    }
+                }
+
+                self.largeFormulaEditor.data.value.orgChart = vls;
+            }, 500, this);
+        },
+        translateTagsToOrgchartValues(){
+            let vls = [];
+            for(let item of this.largeFormulaEditor.data.value.orgChart){
+                if(item.type == 'department'){
+                    let bridgeIndex = item.id.indexOf('-');
+                    vls.push({
+                        idNode: item.id.slice(bridgeIndex + 1),
+                        idOrgchart: item.id.slice(0, bridgeIndex)
+                    });
+                }
+            }
+            this.largeFormulaEditor.data.value.orgchartSelectorValue = vls;  
+        },
+        getDragPanelContent(panelData){
+            if(panelData.type == 'userAssignment'){
+                if(panelData.activeTab == 'orgchart'){
+                    return 'orgchart-selector';
+                }else{
+                    return 'formula-editor';
+                }
+            }else{
+                return 'formula-editor';
+            }
+        },
         changeAssignmentType(inputInfo, name, type) {
             this.$refs["inputItem_" + name][0].switchToTab(type);
             inputInfo.activeTab = type;
@@ -223,11 +286,15 @@ export default {
             this.largeFormulaEditor.open = false;
             let info = this.largeFormulaEditor;
             this.$refs["inputItem_" + info.name][0].setValue(info.data.value);
+            this.largeFormulaEditor.name = '';
         },
-        openLargeFormulaEditor(inputInfo, name) {
+        openLargeValueEditor(inputInfo, name) {
             this.largeFormulaEditor.open = true;
             this.largeFormulaEditor.name = name;
             this.$set(this.largeFormulaEditor, "data", inputInfo);
+            if(this.getDragPanelContent(inputInfo) == 'orgchart-selector'){
+                this.translateTagsToOrgchartValues()
+            }
         },
         handleChangeInputValue(inputInfo, name) {
             /**
@@ -316,7 +383,7 @@ export default {
         inputMinwidth() {
             let w = this.labelWidth;
             return this.singleLine ? `calc(100% - ${w} - 8px)` : "100%";
-        }
+        },
     },
     components: {
         VTextField,
@@ -329,7 +396,8 @@ export default {
         FormulaEditor,
         DataTable,
         SymperDragPanel,
-        "symper-user-assginment": SymperUserAssignment
+        "symper-user-assginment": SymperUserAssignment,
+        "orgchart-selector": OrgchartSelector
     }
 };
 </script>

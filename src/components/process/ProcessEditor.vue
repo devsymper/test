@@ -217,7 +217,7 @@ export default {
         }
     },
     created(){
-        this.$store.dispatch('app/getAllOrgchartNodes');
+        this.$store.dispatch('app/getAllOrgChartData');
     },
     computed: {
         selectingNode(){
