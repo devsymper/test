@@ -180,13 +180,18 @@
         "title": "Nhóm quyền",
         "actionControlSummary": "Action pack Summary",
         "actionPack": "Action packs",
-        "grandPermission": "Thêm nhóm phân quyền",
+        "addPermissionPack": "Thêm mới nhóm quyền",
+        "editPermissionPack": "Chỉnh sửa nhóm quyền",
+        "grandPermission": "Phân quyền chi tiết",
         "apps": "Apps",
         "contextMenu": {
             "edit": "Sửa",
             "grantPermission": "Phân quyền",
             "remove": "Xóa"
-        }
+        },
+        "created": "Đã tạo mới nhóm quyền",
+        "deleted": "Đã xóa nhóm quyền",
+        "updated": "Đã cập nhật nhóm quyền"
     },
     "process": {
         "header_bar": {
@@ -223,7 +228,10 @@
             "edit": "Sửa",
             "grantPermission": "Phân quyền",
             "remove": "Xóa"
-        }
+        },
+        "updated": "Đã cập nhật application",
+        "added": "Đã thêm mới application",
+        "deleted": "Đã xóa application"
     },
     "iconPicker": {
         "header": "Chọn icon",
@@ -233,5 +241,10 @@
             "url": "Link",
             "upload": "Tải lên"
         }
+    },
+    "notification": {
+        "error": "Đã có lỗi xảy ra. Vui lòng thử lại sau",
+        "errorTitle": "Lỗi",
+        "successTitle": "Thành công"
     }
 }

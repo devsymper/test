@@ -28,7 +28,8 @@
         "required": "Not be empty",
         "min_8": "Password required is greater than 8 characters",
         "max_24": "Password required for less than 24 characters",
-        "email": "Invalid email"
+        "email": "Invalid email",
+        "notValid": "This field is not valid"
     },
     "login": {
         "title": "Login system",
@@ -180,12 +181,17 @@
         "actionControlSummary": "Action pack Summary",
         "actionPack": "Action packs",
         "grandPermission": "Grand permissions",
+        "addPermissionPack": "Add new permission packge",
+        "editPermissionPack": "Edit permission packge",
         "apps": "Apps",
         "contextMenu": {
             "edit": "Edit",
             "grantPermission": "Grant Permission",
             "remove": "Remove"
-        }
+        },
+        "created": "Permission package created",
+        "deleted": "Permission package deleted",
+        "updated": "Permission package updated"
     },
     "process": {
         "header_bar": {
@@ -199,5 +205,46 @@
             "validate": "Validate",
             "save": "Save"
         }
+    },
+    "apps": {
+        "header": {
+            "id": "ID",
+            "name": "Name",
+            "note": "Note",
+            "icon": "Icon",
+            "price": "Price",
+            "status": "Status",
+            "created_at": "Date create",
+            "updated_at": "Last update"
+        },
+        "title": "Applications",
+        "pickIcon": "Pick icon",
+        "apps": "Applications",
+        "commonInfo": "General",
+        "listObjects": "Objects",
+        "addObject": "Add object",
+        "objectSummary": "Objects summary",
+        "contextMenu": {
+            "edit": "Edit",
+            "grantPermission": "Grant permission",
+            "remove": "Delete"
+        },
+        "updated": "Permission package updated",
+        "added": "Permission package created",
+        "deleted": "Permission package deleted"
+    },
+    "iconPicker": {
+        "header": "Pick icon",
+        "selectImage": "Select image",
+        "tabs": {
+            "icon": "Icon",
+            "url": "Link",
+            "upload": "Upload"
+        }
+    },
+    "notification": {
+        "error": "Error occurred. Please try again later",
+        "errorTitle": "Error",
+        "successTitle": "Success"
     }
 }

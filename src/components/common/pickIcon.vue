@@ -61,14 +61,13 @@
                 <!-- Tab chèn link -->
                 <v-tab-item class="text-center">
                     <v-text-field
-                        :value="link"
+                        v-model="link"
                         solo
                         :label="$t('common.quickSearch')"
                         flat
                         dense
                         append-icon="mdi-link-variant"
                         class="sym-small-size bg-grey pl-4 pr-4 mt-3"
-                        @change="value => this.link = value"
                     ></v-text-field>
                     <div v-if="!!link" class="w-100">
                         <img :src="link" width="150" max-height="150" class="mt-3" style="max-width:150px">
@@ -304,7 +303,7 @@ export default {
             }
         },
         selectIcon(icon) {
-            this.$emit("selected", {icon: icon});
+            this.$emit("selected", {icon: icon.trim()});
         }
     }
 }

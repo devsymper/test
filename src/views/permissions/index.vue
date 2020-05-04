@@ -8,45 +8,21 @@
             :containerHeight="tableHeight"
             :tableContextMenu="tableContextMenu"
             :useDefaultContext="false"
-            :currentItemData="currentPack"
             :actionPanelWidth="800"
             @after-open-add-panel="showAddModal"
         >
-            <template slot="right-panel-content" slot-scope="{ itemData }">
+            <template slot="right-panel-content">
                 <div v-if="!!!isGrandPermissionMode">
-                    <v-card-title class="headline">{{
-                        !!!isEdit ? "Add new Permission Packge" : "Edit Packge"
-                    }}</v-card-title>
-                    <v-card-text>
-                        <v-row>
-                            <v-col cols="12" sm="12">
-                                <v-text-field
-                                    v-model="itemData.packName"
-                                    label="Tên pack"
-                                    :rules="[
-                                        () =>
-                                            !!itemData.packName ||
-                                            'Trường này bắt buộc',
-                                    ]"
-                                    required
-                                ></v-text-field>
-                            </v-col>
-                        </v-row>
-                    </v-card-text>
-                    <v-card-actions>
-                        <v-spacer></v-spacer>
-                        <v-btn
-                            color="orange darken-1"
-                            text
-                            @click="addPack"
-                            :disabled="!!!itemData.packName"
-                        >
-                            {{ isEdit ? "Cập nhật" : "Thêm" }}
-                        </v-btn>
-                    </v-card-actions>
+                    <UpdatePermission 
+                        :isEdit="isEdit"
+                        :pack="currentPack"
+                        v-model="currentPack"
+                        @create-pack="createPack"
+                        @update-pack="createPack"
+                    ></UpdatePermission>
                 </div>
                 <div v-else>
-                    <grandPermission :package="itemData"></grandPermission>
+                    <grandPermission :package="currentPack"></grandPermission>
                 </div>
             </template>
         </ListItems>
@@ -56,12 +32,14 @@
 <script>
 import ListItems from "../../components/common/ListItems";
 import grandPermission from "./grandPermission";
+import UpdatePermission from "./Update";
 import Api from "./../../api/api.js";
 export default {
     name: "ListPermissions",
     components: {
         ListItems,
         grandPermission,
+        UpdatePermission,
     },
     computed: {
         baseUrl: function() {
@@ -77,15 +55,15 @@ export default {
             isGrandPermissionMode: false,
             editCallback: null,
             currentPack: {
-                packName: "",
+                pack_name: "",
             },
-            isShowAddModal: false,
             tableContextMenu: [
                {
                     name: "edit",
                     text: this.$t("permissions.contextMenu.edit"),
                     callback: (pack, callback) => {
-                        this.currentPack = { ...pack, packName: pack.pack_name };
+                        this.editCallback = callback;
+                        this.currentPack = { ...pack };
                         this.isEdit = true;
                         this.isGrandPermissionMode = false;
                     },
@@ -94,7 +72,7 @@ export default {
                     name: "grantPermission",
                     text: this.$t("permissions.contextMenu.grantPermission"),
                     callback: (pack, callback) => {
-                        this.currentPack = { ...pack, packName: pack.pack_name };
+                        this.currentPack = { ...pack };
                         this.isEdit = false;
                         this.isGrandPermissionMode = true;
                         this.$refs.listPack.actionPanel = true;
@@ -117,58 +95,69 @@ export default {
     },
     methods: {
         showAddModal() {
-            this.isShowAddModal = true;
             this.isEdit = false;
             this.isGrandPermissionMode = false
             this.currentPack = { name: "" };
         },
         deletepermission(permission) {
             let req = new Api(this.apiUrl);
-            let res = req.delete(this.permissiontUrl + "/" + permission.id);
-            res.then((result) => {
-                // callback here
-                this.removeCallback(result);
+            req.delete(this.permissiontUrl + "/" + permission.id)
+            .then(res => {
+                if (res.status === 200) {
+                    this.removeCallback(result);
+                    this.closeSidebar();
+                    this.$snotify({
+                        type: 'success',
+                        title: this.$t('notification.successTitle'),
+                        text: this.$t('permissions.deleted')
+                    })
+                } else {
+                    this.showError();
+                }
             }).catch((err) => {
+                this.showError();
                 console.log(err);
             });
         },
-        addPack() {
-            if (this.isEdit) {
-                this.updatePack();
-            } else {
-                this.createPack();
+        createPack(res) {
+            if (res.status === 200) {
+                this.$refs.listPack.getData();
+                this.closeSidebar();
+                this.$snotify({
+                    type: 'success',
+                    title: this.$t('notification.successTitle'),
+                    text: this.$t('permissions.created')
+                })
             }
         },
-        createPack() {
-            let req = new Api(this.apiUrl);
-            let res = req.post(this.permissiontUrl, this.currentPack);
-            res.then((result) => {
-                this.isShowAddModal = false;
-                // callback come here
-                this.$refs.listPack.getData();
-            }).catch((err) => {
-                console.log(err);
-            });
+        closeSidebar() {
+            this.$refs.listPack.actionPanel = false;
+        },
+        showError(){
+            this.$snotify({
+                type: 'success',
+                title: this.$t('notification.errorTitle'),
+                text: this.$t('notification.error')
+            })
         },
         updatePack() {
-            let req = new Api(this.apiUrl);
-            let res = req.put(this.permissiontUrl, {
-                packId: this.currentPack.id,
-                packName: this.currentPack.packName,
-            });
-            res.then((result) => {
+            if (res.status === 200) {
                 // callback come here
                 this.editCallback({
-                    ...result,
+                    ...res,
                     data: {
                         ...this.currentPack,
-                        pack_name: this.currentPack.packName,
                     },
                 });
-                this.isShowAddModal = false;
-            }).catch((err) => {
-                console.log(err);
-            });
+                this.closeSidebar();
+                this.$snotify({
+                    type: 'success',
+                    title: this.$t('notification.successTitle'),
+                    text: this.$t('permissions.updated')
+                })
+            } else {
+                this.showError();
+            }
         },
     },
 };
