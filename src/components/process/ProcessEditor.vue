@@ -76,6 +76,7 @@ import { getNodeAttrs, nodeAttrsDefinition } from "./nodeAttrsFactory";
 import { allAttrDisplayGroup } from "./allAttrDisplayGroup";
 import FormTpl from "./../common/FormTpl.vue";
 
+
 export default {
     data() {
         return {
@@ -123,10 +124,21 @@ export default {
         "form-tpl": FormTpl
     },
     methods: {
+        getNodeType(nodeData){
+            let nodeType = nodeData.$type.replace('bpmn:','');
+            if(nodeType.includes('Event') && nodeData.eventDefinitions){
+                let evtType = nodeData.eventDefinitions[0].$type.replace('bpmn:','');
+                evtType = evtType.replace('EventDefinition','');
+                nodeType = evtType+nodeType;
+            }
+            return nodeType;
+        },
         handleNodeChangeProps(nodeData){
             let nodeId = nodeData.id;
             let nodeState = this.$store.state.process.allNodes[nodeId];
-            let newType = nodeData.$type.replace('bpmn:','');
+            let newType =  this.getNodeType(nodeData);
+            console.log(newType);
+            
             if(nodeState){
                 if(newType != nodeState.type){
                     this.changeNodeType(nodeState, newType);
@@ -135,8 +147,6 @@ export default {
                 if(nodeId == this.selectingNode.id){
                     this.$store.commit("process/changeSelectingNode", this.$store.state.process.allNodes[nodeId]);
                 }
-                console.log(this.$store.state.process,this, 'this.$store.state.processthis.$store.state.process');
-                
             }
         },
 
@@ -193,8 +203,9 @@ export default {
          * Xử lý sự kiện khi người dùng click vào một node
          */
         handleNodeSelected(node) {
-            console.log(node);
-            let type = node.$type.replace('bpmn:','');
+            let type = this.getNodeType(node);
+            console.log(type);
+
             let nodeData = this.getNodeData(node.id, type);
             this.$store.commit("process/changeSelectingNode", nodeData);
         },

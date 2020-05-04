@@ -303,5 +303,16 @@ export const allNodesAttrs = {
         value: 1,
         info: '',
         dg: 'detail',
-    }
+    },
+    initiator: {
+        title: 'Initiator',
+        type: 'userAssignment', // trong user assignment có hai tab: select qua orgchart và viết script
+        value: {
+            orgChart: [],
+            formula: '',
+            orgchartSelectorValue: [] // dạng value của orgchartselector để hiển thị lên
+        },
+        activeTab: 'orgchart', // tab nào sẽ mở: orgchart hoặc script
+        dg: 'assignment'
+    },
 }

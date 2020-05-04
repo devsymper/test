@@ -84,6 +84,15 @@ export const nodeAttrsDefinition = {
 
         }
     },
+    'InclusiveGateway': {
+        group: 'gateway',
+        validate: function(attrs) {
+
+        },
+        checkShowOrHideInput: function(attrs) {
+
+        }
+    },
     'ParallelGateway': {
         group: 'gateway',
         validate: function(attrs) {
@@ -102,6 +111,183 @@ export const nodeAttrsDefinition = {
 
         }
     },
+    'StartEvent': {
+        attrs: ['initiator', 'formReference', 'formKey', 'validateFormFields'],
+        validate: function(attrs) {
+
+        },
+        checkShowOrHideInput: function(attrs) {
+
+        }
+    },
+    'StartConditionalEvent': {
+        validate: function(attrs) {
+
+        },
+        checkShowOrHideInput: function(attrs) {
+
+        }
+    },
+    'StartTimerEvent': {
+        validate: function(attrs) {
+
+        },
+        checkShowOrHideInput: function(attrs) {
+
+        }
+    },
+    'StartSignalEvent': {
+        validate: function(attrs) {
+
+        },
+        checkShowOrHideInput: function(attrs) {
+
+        }
+    },
+    'StartMessageEvent': {
+        validate: function(attrs) {
+
+        },
+        checkShowOrHideInput: function(attrs) {
+
+        }
+    },
+    'IntermediateThrowEvent': {
+        validate: function(attrs) {
+
+        },
+        checkShowOrHideInput: function(attrs) {
+
+        }
+    },
+    'MessageIntermediateCatchEvent': {
+        validate: function(attrs) {
+
+        },
+        checkShowOrHideInput: function(attrs) {
+
+        }
+    },
+    'TimerIntermediateCatchEvent': {
+        validate: function(attrs) {
+
+        },
+        checkShowOrHideInput: function(attrs) {
+
+        }
+    },
+    'EscalationIntermediateThrowEvent': {
+        validate: function(attrs) {
+
+        },
+        checkShowOrHideInput: function(attrs) {
+
+        }
+    },
+    'ConditionalIntermediateCatchEvent': {
+        validate: function(attrs) {
+
+        },
+        checkShowOrHideInput: function(attrs) {
+
+        }
+    },
+    'LinkIntermediateCatchEvent': {
+        validate: function(attrs) {
+
+        },
+        checkShowOrHideInput: function(attrs) {
+
+        }
+    },
+    'LinkIntermediateThrowEvent': {
+        validate: function(attrs) {
+
+        },
+        checkShowOrHideInput: function(attrs) {
+
+        }
+    },
+    'CompensateIntermediateThrowEvent': {
+        validate: function(attrs) {
+
+        },
+        checkShowOrHideInput: function(attrs) {
+
+        }
+    },
+    'SignalIntermediateCatchEvent': {
+        validate: function(attrs) {
+
+        },
+        checkShowOrHideInput: function(attrs) {
+
+        }
+    },
+    'SignalIntermediateThrowEvent': {
+        validate: function(attrs) {
+
+        },
+        checkShowOrHideInput: function(attrs) {
+
+        }
+    },
+    'EndEvent': {
+        validate: function(attrs) {
+
+        },
+        checkShowOrHideInput: function(attrs) {
+
+        }
+    },
+    'MessageEndEvent': {
+        validate: function(attrs) {
+
+        },
+        checkShowOrHideInput: function(attrs) {
+
+        }
+    },
+    'EscalationEndEvent': {
+        validate: function(attrs) {
+
+        },
+        checkShowOrHideInput: function(attrs) {
+
+        }
+    },
+    'ErrorEndEvent': {
+        validate: function(attrs) {
+
+        },
+        checkShowOrHideInput: function(attrs) {
+
+        }
+    },
+    'CompensateEndEvent': {
+        validate: function(attrs) {
+
+        },
+        checkShowOrHideInput: function(attrs) {
+
+        }
+    },
+    'SignalEndEvent': {
+        validate: function(attrs) {
+
+        },
+        checkShowOrHideInput: function(attrs) {
+
+        }
+    },
+    'TerminateEndEvent': {
+        validate: function(attrs) {
+
+        },
+        checkShowOrHideInput: function(attrs) {
+
+        }
+    }
 };
 
 
