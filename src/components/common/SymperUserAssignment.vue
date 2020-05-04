@@ -71,14 +71,14 @@ export default {
             let nodes = [];
             let orgCharts = this.$store.state.app.orgchartNodes;
             for (let id in orgCharts) {
-                // dpms = dpms.concat(orgCharts[id].children);
-                orgCharts[id].children.forEach(element => {
+                for(let nodeid in orgCharts[id].children){
+                    let element = orgCharts[id].children[nodeid];
                     nodes.push({
                         text: element.name,
-                        id: 'department-'+element.id,
+                        id: element.gid,
                         type: 'department'
                     });
-                });
+                }
             }
 
             this.$store.state.app.allUsers.forEach(element => {

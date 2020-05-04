@@ -189,7 +189,7 @@ export default {
                         break;
                     }
                 }
-                this.value.splice(idx,1);
+                this.deleteSelectedNode(idx);
             }
         },
         /**
@@ -208,6 +208,7 @@ export default {
          */
         deleteSelectedNode(idx){
             this.value.splice(idx,1);
+            this.$emit('input',this.value);
         }
     },
     props: {

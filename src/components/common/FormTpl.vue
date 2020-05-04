@@ -72,8 +72,9 @@
             :panelData="largeFormulaEditor.data">
             <template slot="drag-panel-content" slot-scope="{panelData}">
                 <orgchart-selector
+                    @input="translateOrgchartValuesToTags"
                     v-if="getDragPanelContent(panelData) == 'orgchart-selector'"
-                    v-model="panelData.value.orgChart"
+                    v-model="panelData.value.orgchartSelectorValue"
                 ></orgchart-selector>
                 <formula-editor
                     v-else
@@ -214,11 +215,49 @@ export default {
             largeFormulaEditor: {
                 name: "", // tên của input
                 open: false, // có mở largeFormulaEditor hay ko
-                data: {} // Dữ liệu của input cần mở lên để edit trong khung lớn
+                data: {}, // Dữ liệu của input cần mở lên để edit trong khung lớn,
             }
         };
     },
     methods: {
+        translateOrgchartValuesToTags(){
+            if(this.translateOrgchartValuesToTagsDebounce){
+                clearTimeout(this.translateOrgchartValuesToTagsDebounce);
+            }
+            this.translateOrgchartValuesToTagsDebounce = setTimeout((self) => {
+                // chuyển lại định dạng để hiển thị ở dạng tags
+                let vls = [];
+                for(let item of self.largeFormulaEditor.data.value.orgchartSelectorValue){
+                    let node = self.$store.state.app.orgchartNodes['orgcid'+item.idOrgchart].children[item.idNode];
+                    vls.push({
+                        text: node.name,
+                        id: node.gid,
+                        type: 'department'
+                    });
+                }
+
+                for(let item of self.largeFormulaEditor.data.value.orgChart){
+                    if(item.type == 'user'){
+                        vls.push(item);
+                    }
+                }
+
+                self.largeFormulaEditor.data.value.orgChart = vls;
+            }, 500, this);
+        },
+        translateTagsToOrgchartValues(){
+            let vls = [];
+            for(let item of this.largeFormulaEditor.data.value.orgChart){
+                if(item.type == 'department'){
+                    let bridgeIndex = item.id.indexOf('-');
+                    vls.push({
+                        idNode: item.id.slice(bridgeIndex + 1),
+                        idOrgchart: item.id.slice(0, bridgeIndex)
+                    });
+                }
+            }
+            this.largeFormulaEditor.data.value.orgchartSelectorValue = vls;  
+        },
         getDragPanelContent(panelData){
             if(panelData.type == 'userAssignment'){
                 if(panelData.activeTab == 'orgchart'){
@@ -243,6 +282,9 @@ export default {
             this.largeFormulaEditor.open = true;
             this.largeFormulaEditor.name = name;
             this.$set(this.largeFormulaEditor, "data", inputInfo);
+            if(this.getDragPanelContent(inputInfo) == 'orgchart-selector'){
+                this.translateTagsToOrgchartValues()
+            }
         },
         handleChangeInputValue(inputInfo, name) {
             /**
@@ -324,7 +366,7 @@ export default {
         inputMinwidth() {
             let w = this.labelWidth;
             return this.singleLine ? `calc(100% - ${w} - 8px)` : "100%";
-        }
+        },
     },
     components: {
         VTextField,
