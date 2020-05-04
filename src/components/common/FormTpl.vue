@@ -71,7 +71,12 @@
             :actionTitle="largeFormulaEditor.data.title"
             :panelData="largeFormulaEditor.data">
             <template slot="drag-panel-content" slot-scope="{panelData}">
+                <orgchart-selector
+                    v-if="getDragPanelContent(panelData) == 'orgchart-selector'"
+                    v-model="panelData.value.orgChart"
+                ></orgchart-selector>
                 <formula-editor
+                    v-else
                     v-model="panelData.value"
                     :formulaValue="panelData.value"
                     :width="'100%'"
@@ -95,6 +100,7 @@ import FormulaEditor from "./../common/FormulaEditor";
 import DataTable from "./../common/customTable/DataTable";
 import SymperDragPanel from "./SymperDragPanel";
 import SymperUserAssignment from "./SymperUserAssignment";
+import OrgchartSelector from "./../user/OrgchartSelector";
 
 const inputTypeConfigs = {
     numeric: {
@@ -213,6 +219,17 @@ export default {
         };
     },
     methods: {
+        getDragPanelContent(panelData){
+            if(panelData.type == 'userAssignment'){
+                if(panelData.activeTab == 'orgchart'){
+                    return 'orgchart-selector';
+                }else{
+                    return 'formula-editor';
+                }
+            }else{
+                return 'formula-editor';
+            }
+        },
         changeAssignmentType(inputInfo, name, type) {
             this.$refs["inputItem_" + name][0].switchToTab(type);
             inputInfo.activeTab = type;
@@ -320,7 +337,8 @@ export default {
         FormulaEditor,
         DataTable,
         SymperDragPanel,
-        "symper-user-assginment": SymperUserAssignment
+        "symper-user-assginment": SymperUserAssignment,
+        "orgchart-selector": OrgchartSelector
     }
 };
 </script>
