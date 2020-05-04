@@ -252,7 +252,7 @@ let groupType = {
 const controlTypes = {
     label: {
         icon: `/icon/ic_label.png`,
-        html: `<span class="s-control s-control-label" contenteditable="false" s-control-type="label"  title="Label" style="font-size:18px;padding:2px 8px;border-radius:4px;"><span class="mdi mdi-format-letter-case"></span></span>&nbsp;`,
+        html: `<span class="s-control s-control-label" contenteditable="false" s-control-type="label"  title="Label">Aa</span>&nbsp;`,
         title: "Label",
         notInProps: ['formatNumber', 'isSumTable', 'isReadOnly'],
         formulas: ['link', 'formulas', 'hidden']
@@ -413,15 +413,15 @@ const controlTypes = {
     table: {
         icon: "/icon/ic_table.png",
         html: `<div style="overflow-y: auto;position: relative;font-size: 13px;" contenteditable="true" class="s-control s-control-table" s-control-type="table">
-                <table style="width:100%;text-align: center;" >
-                    <thead style="    background: #f2f2f2;">
+                <table>
+                    <thead>
                         <tr>
                             <th class="column-function">Chọn</th>
                             <th class="column-item">Tiêu đề</th>
                             <th class="column-function" >Chức năng</th>
                         </tr>
                     </thead>
-                <tbody style="background: white;">
+                <tbody>
                     <tr class="s-control-table-row-template">
                         <td class="column-function" ><input type="checkbox" class="s-control-check-table-row"></td>
                         <td class="column-item"></td>
@@ -434,6 +434,11 @@ const controlTypes = {
                     <a class="btn btn-primary s-control-table-remove-select">Xoá dòng đã chọn </a>
                     <a class="btn btn-primary s-control-table-remove-unselect">Xoá dòng không chọn </a>
                 </div>
+                <style>
+                .s-control-table table{width:100%;text-align: center;}
+                .s-control-table table thead{background: #f2f2f2;}
+                .s-control-table table tbody{background: white;}
+                <style/>
                 </div> &nbsp;;
                 `,
         title: "Table",
@@ -504,7 +509,7 @@ const controlTypes = {
         inProps: ['otherInfo', 'mobileProps', 'isPrimary', 'formatNumber', 'isMobile', 'isSumTable', 'isRequired', 'isDBOnly', 'isTableOnly', 'isHidden', 'isAllowUpdate', 'isReadOnly', 'isDisplayCompact', 'isMultipleValue'],
         formulas: ['hidden']
     },
-    draf: {
+    draft: {
         icon: "/icon/ic_draft.png",
         html: `<span type="button" class="s-control s-control-draft" contenteditable="false" s-control-type="draft" value="Draf" style="display: inline;font-size: 13px;">Draft</span>&nbsp;`,
         title: "Draft",
@@ -637,4 +642,11 @@ export const getControlElementForTableSetting = function(type) {
         return { type: key, prop: control[key] };
     });
     return result
+}
+
+export const getAllPropsControl = function() {
+    let allProp = util.cloneDeep(commonProps);
+    let allFormulas = util.cloneDeep(commonFormulas);
+    let data = Object.assign(allProp, allFormulas);
+    return data;
 }

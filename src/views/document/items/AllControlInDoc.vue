@@ -9,7 +9,7 @@
             <v-card-title class="headline">Bảng tổng hợp control</v-card-title>
             <v-divider></v-divider>
             <v-card-text style="height: calc(100% - 112px);    overflow: auto;">
-                
+                <data-table />
             </v-card-text>
                 <v-divider></v-divider>
 
@@ -31,14 +31,20 @@
    
 </template>
 <script>
-
+import DataTable from "./../../../components/common/customTable/DataTable.vue"
+import {getAllPropsControl} from "./../../../components/document/controlPropsFactory.js"
 export default {
-    props:{
-       
+    components:{
+        'data-table' : DataTable
     },
     computed:{
-        sAllControl(){ 
+        sAllControl(){
             return this.$store.state.document.editor.allControl;
+        },
+        allColumns(){
+            let x = getAllPropsControl();
+            return x
+            
         }
     },
     data(){
@@ -49,12 +55,17 @@ export default {
     methods:{
         
         showDialog(){
+            
             this.isShow = true
         },
         hideDialog(){
             this.isShow = false
         },
        
+        
+    },
+    mounted(){
+        console.log(this.allColumns);
         
     }
 }

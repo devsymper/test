@@ -60,6 +60,13 @@ export const allNodesAttrs = {
         info: '',
         dg: 'multiInstance'
     },
+    script: {
+        title: 'Script',
+        type: 'script',
+        value: '',
+        info: '',
+        dg: 'formula'
+    },
     formKey: {
         title: 'Form key',
         type: 'text',
@@ -87,7 +94,7 @@ export const allNodesAttrs = {
         type: 'script',
         value: '',
         info: '',
-        dg: 'formula'
+        dg: 'detail'
     },
     priority: {
         title: 'Priority',
@@ -154,19 +161,47 @@ export const allNodesAttrs = {
         value: [{
                 text: 'Approval',
                 value: 'approval',
-                color: ''
+                color: 'green'
             },
             {
                 text: 'Disapproval',
                 value: 'disapproval',
-                color: ''
+                color: 'red'
             }
         ],
         info: '',
         columns: [{
                 title: 'Text',
                 dataKey: 'text',
-                type: 'text'
+                type: 'text',
+                renderer: function(instance, td, row, col, prop, value, cellProperties) {
+                    let bgColor = instance.getDataAtProp('color')[row];
+                    bgColor = bgColor == '' ? 'green' : bgColor;
+                    let textColor = bgColor == 'white' ? '#212121' : 'white'
+                    let bgColorMap = {
+                        "yellow": "#FFD60",
+                        "red": "#F44336",
+                        "orange": "#FF9800",
+                        "green": "#4CAF50",
+                        "blue": "#2196F3",
+                        "purple": "#9C27B0",
+                        "gray": "#9E9E9E",
+                        "pink": "#E91E63",
+                        "black": "#000000",
+                        "white": "#FFFFFF"
+                    }
+                    let btn = '';
+                    if (value) {
+                        bgColor = bgColorMap[bgColor];
+                        btn = `
+                        <button type="button" class="v-btn v-btn--depressed v-size--x-small my-1" style="background-color: ${bgColor};border-color: ${bgColor}">
+                            <span class="v-btn__content" style="color:${textColor}">${value}</span>
+                        </button>`;
+                        btn = btn.replace(/\n/g, '');
+                    }
+                    $(td).html(btn);
+                    return td;
+                }
             },
             {
                 title: 'Value',
@@ -176,21 +211,95 @@ export const allNodesAttrs = {
             {
                 title: 'Color',
                 dataKey: 'color',
-                type: 'text'
+                type: 'autocomplete',
+                source: ["yellow", "red", "orange", "green", "blue", "gray", "black", "white"]
             },
         ],
         dg: 'taskAction'
     },
     assignee: {
         title: 'Assignee',
-        type: 'script',
-        value: '',
+        type: 'userAssignment', // trong user assignment có hai tab: select qua orgchart và viết script
+        value: {
+            orgChart: [],
+            formula: ''
+        },
+        activeTab: 'orgchart', // tab nào sẽ mở: orgchart hoặc script
+        dg: 'assignment'
+    },
+    taskOwner: {
+        title: 'Task owner',
+        type: 'userAssignment', // trong user assignment có hai tab: select qua orgchart và viết script
+        value: {
+            orgChart: [],
+            formula: ''
+        },
+        activeTab: 'orgchart', // tab nào sẽ mở: orgchart hoặc script
         dg: 'assignment'
     },
     candidateUsers: {
         title: 'Candidate users',
-        type: 'script',
-        value: '',
+        type: 'userAssignment',
+        value: {
+            orgChart: [],
+            formula: ''
+        },
+        activeTab: 'orgchart', // tab nào sẽ mở: orgchart hoặc script
         dg: 'assignment'
+    },
+    useLocalScopeForResultVariable: {
+        title: 'Use local scope for result variable',
+        type: 'checkbox',
+        value: false,
+        info: '',
+        dg: 'detail',
+        hidden: true,
+    },
+    triggerable: {
+        title: 'Set service task to be triggerable',
+        type: 'checkbox',
+        value: true,
+        info: '',
+        dg: 'detail',
+        hidden: true,
+    },
+    delegateExpression: {
+        title: 'Delegate expression',
+        type: 'text',
+        value: '',
+        info: '',
+        dg: 'detail',
+        hidden: true,
+    },
+    classFields: {
+        title: 'Class fields',
+        type: 'text',
+        value: '',
+        info: '',
+        dg: 'detail',
+        hidden: true,
+    },
+    exceptions: {
+        title: 'Exceptions',
+        type: 'text',
+        value: '',
+        info: '',
+        dg: 'detail',
+        hidden: true,
+    },
+    resultvariableName: {
+        title: 'Result variable name',
+        type: 'text',
+        value: '',
+        info: '',
+        dg: 'detail',
+        hidden: true,
+    },
+    failedJobRetryTimeCycle: {
+        title: 'Failed job retry time cycle',
+        type: 'numeric',
+        value: 1,
+        info: '',
+        dg: 'detail',
     }
 }

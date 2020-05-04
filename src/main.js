@@ -68,7 +68,7 @@ window.Vue = Vue;
 util.serviceWorker.register();
 
 
-new Vue({
+export const SYMPER_APP = new Vue({
     router,
     store,
     i18n,

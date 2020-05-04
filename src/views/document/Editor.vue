@@ -517,6 +517,91 @@ export default {
             $('.sym-document__side-bar-right').css({width:documentW - $('.v-navigation-drawer').width() - $('.sym-document__side-bar-left').width() - $('.sym-document-editor').width() +'px'})
         },
 
+        setContentForDocumentV1(dataDocument){
+            let thisCpn = this;
+            $("#editor_ifr").contents().find('.bkerp-input').addClass('s-control').removeClass('bkerp-input');
+            $("#editor_ifr").contents().find('head link').remove()
+            $("#editor_ifr").contents().find('body link').remove()
+            $("#editor_ifr").contents().find('body meta').remove()
+            $("#editor_ifr").contents().find('body style').remove()
+            let allControl = $("#editor_ifr").contents().find('.s-control:not(.bkerp-input-table .s-control)');
+            console.log(allControl);
+            
+            $.each(allControl,function(item,value){
+                let controlProps = $(value).attr('data-property');
+                let type = $(value).attr('bkerp-type');
+                let style = $(value).attr('style');
+                if(type == 'text') type = 'textInput'
+                if(type == 'persent') type = 'percent'
+                let controlV2 = GetControlProps(type);
+                let controlEl = $(controlV2.html); 
+                var inputid = 's-control-id-' + Date.now();
+                controlEl.attr('id', inputid).attr('style',style);
+                controlEl.replaceAll($(value))
+                try {
+                    
+                    controlProps = JSON.parse(controlProps);
+                    let controlProp = {};
+                    let controlFormulas = {};
+                    $.each(controlProps,function(k,v){
+                        if(mappingOldVersionControlProps[k] != undefined && controlV2.properties[mappingOldVersionControlProps[k]] != undefined){
+                            controlV2.properties[mappingOldVersionControlProps[k]].value = v;
+                        }
+                        if(mappingOldVersionControlFormulas[k] != undefined && controlV2.formulas[mappingOldVersionControlProps[k]] != undefined){
+                            controlV2.formulas[mappingOldVersionControlProps[k]].value = v;
+                        }
+                        
+                    });
+                    thisCpn.addToAllControlInDoc(inputid,{properties: controlV2.properties, formulas : controlV2.formulas,type:type});
+                } catch (error) {   
+                    console.log(error);
+                }
+                
+                if(type == 'table'){
+                    let tableId = inputid;
+                    let tableEl = controlEl;
+                    let bodyTable = $(value).find('table');
+                    tableEl.find('table').remove();
+                    tableEl.append(bodyTable);
+                    let allControlInTable = tableEl.find('.s-control');
+                    $.each(allControlInTable,function(item,value){
+                        let childControlProps = $(value).attr('data-property');
+                        let type = $(value).attr('bkerp-type');
+                        let style = $(value).attr('style');
+                        if(type == 'text') type = 'textInput'
+                        if(type == 'persent') type = 'percent'
+                        let childControlV2 = GetControlProps(type);
+                        let controlEl = $(childControlV2.html); 
+                        var inputid = 's-control-id-' + Date.now();
+                        controlEl.attr('id', inputid).attr('style',style);
+                        controlEl.replaceAll($(value))
+                        try {
+                            
+                            childControlProps = JSON.parse(childControlProps);
+                            let controlProp = {};
+                            let controlFormulas = {};
+                            $.each(childControlProps,function(k,v){
+                                if(mappingOldVersionControlProps[k] != undefined && childControlV2.properties[mappingOldVersionControlProps[k]] != undefined){
+                                    childControlV2.properties[mappingOldVersionControlProps[k]].value = v;
+                                }
+                                if(mappingOldVersionControlFormulas[k] != undefined && childControlV2.formulas[mappingOldVersionControlProps[k]] != undefined){
+                                    childControlV2.formulas[mappingOldVersionControlProps[k]].value = v;
+                                }
+                                
+                            });
+                            thisCpn.addToAllControlInTable(inputid,{properties: childControlV2.properties, formulas : childControlV2.formulas,type:type},tableId);
+                        } catch (error) {   
+                            console.log(error);
+                        }
+                        
+                        
+                    })
+                    
+                }
+                
+                
+            })
+        },
         // hàm gọi request lấy thông tin của document khi vào edit doc
         getContentDocument(){
             let thisCpn = this;
@@ -526,55 +611,10 @@ export default {
                         thisCpn.setDocumentProperties(res.data.document);
                         let content = res.data.document.content;
                         thisCpn.$refs.editor.editor.setContent(content);
-                        $("#editor_ifr").contents().find('body div').remove()
-                        $("#editor_ifr").contents().find('body meta').remove()
-                        $("#editor_ifr").contents().find('body style').remove()
-                        $("#editor_ifr").contents().find('.bkerp-input').addClass('s-control').removeClass('bkerp-input');
+                        if(res.data.document.version == 1){
+                            thisCpn.setContentForDocumentV1(res.data.document);
+                        }
                         
-                        let allControl = $("#editor_ifr").contents().find('.s-control');
-                        $.each(allControl,function(item,value){
-                            let controlProps = $(value).attr('data-property');
-                            let type = $(value).attr('bkerp-type');
-                            let id = $(value).attr('id');
-                            $(value).attr('s-control-type',type).removeAttr('bkerp-type');
-                            try {
-                                controlProps = JSON.parse(controlProps);
-                                let controlProp = {};
-                                let controlFormulas = {};
-                                let controlId = "s-control-id"+id.replace('bkerp-input','');
-                                
-                                $.each(controlProps,function(k,v){
-                                    if(mappingOldVersionControlProps[k] != undefined){
-                                        controlProp[mappingOldVersionControlProps[k]] = getAPropsControl(mappingOldVersionControlProps[k],v);
-                                    }
-                                    if(mappingOldVersionControlFormulas[k] != undefined){
-                                        // controlFormulas[mappingOldVersionControlFormulas[k]] = getAPropsControl(mappingOldVersionControlProps[k],v);
-                                    }
-                                    
-                                });
-                                console.log(controlProp);
-                                
-                                type = (type == 'text') ? 'textInput' : type;
-                                thisCpn.addToAllControlInDoc(controlId,{properties: controlProp, formulas : controlFormulas,type:type});
-                                // if(type == 'table'){
-                                //     thisCpn.addToAllControlInDoc(controlId,{properties: controlProp, formulas : controlFormulas,type:type,listFields:{}});
-                                // }
-                                // else{
-                                //     if($(value).closest('.s-control-table').length>0){
-                                       
-                                //     }
-                                //     else{
-                                //         thisCpn.addToAllControlInDoc(controlId,{properties: controlProp, formulas : controlFormulas,type:type});
-                                //     }
-                                // }
-
-                            } catch (error) {   
-                                console.log(error);
-                            }
-                            
-                        })
-                        
-                        // $("#editor_ifr").contents().find('head').remove()
                         let fields = res.data.fields;
                         thisCpn.setDataForPropsControl(fields);
                     }
@@ -1142,7 +1182,6 @@ export default {
                 thisCpn.currentSelectedControlId = controlId;
                 let table = $(this).closest('.s-control-table');
                 if(table.length > 0 && controlId != table.attr('id')){
-                    controlId = "s-control-id"+controlId.replace('bkerp-input','');
                     let tableId = table.attr('id');
                     let control = thisCpn.editorStore.allControl[tableId]['listFields'][controlId];
                     thisCpn.selectControl(control.properties, control.formulas);
@@ -1207,8 +1246,9 @@ export default {
                 styles += '.on-selected{border:1px dashed #2196f3 !important;cursor: pointer !important;}';
                 styles += '.s-control-tracking-value,.s-control-approval-history,.s-control-report,.s-control-file-upload,.s-control-reset,.s-control-draf,.s-control-submit,.s-control-text,.s-control-select,.s-control-document,.s-control-phone,.s-control-email,.s-control-currency,.s-control-radio,.s-control-color,.s-control-percent,.s-control-hidden,.s-control-user,.s-control-filter,.s-control-date,.s-control-datetime,.s-control-month,.s-control-time,.s-control-number{width: auto;height: 25px;border-radius: 3px;font-size: 13px;padding: 0 5px;outline: 0!important;}'
                 styles += '.s-control:not(.s-control-table) {background: rgb(233, 236, 239);min-width: 50px;max-width:150px;outline: none !important;margin:1px;border:none}';
-                styles += '.s-control-reset,.s-control-draf,.s-control-submit{padding: 5px 8px;}';
+                styles += '.s-control-reset,.s-control-draft,.s-control-submit{padding: 5px 8px;}';
                 styles += '.s-control-error{border: 1px solid red !important;}';
+                styles += '.s-control-label{font-size:13px;padding:5px 8px;border-radius:4px;}';
                 styles += '.mce-input-padding{width: 100px !important;left: 120px !important;padding:0 4px}';
                 return styles;
             }

@@ -365,3 +365,16 @@
     padding-right: 8px;
     padding-bottom: 0px;
 }
+
+.htMenu.htContextMenu.handsontable * {
+    font-family: Roboto, sans-serif;
+    font-size: 13px;
+}
+
+.v-size--x-small .v-chip__close {
+    font-size: 13px!important;
+}
+
+.v-overlay .v-overlay--absolute {
+    z-index: 200!important;
+}

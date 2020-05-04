@@ -63,8 +63,6 @@ const addControlToTable = (state, params) => {
     setTreeListControlInDoc(state);
 };
 const addCurrentControl = (state, control) => {
-    console.log(control);
-
     state.editor.currentSelectedControl['formulas'] = control.formulas
     let groups = { name: {}, display: {}, print: {} };
     if (control.properties != undefined && typeof control.properties != 'undefined') {
