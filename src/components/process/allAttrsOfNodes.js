@@ -172,7 +172,7 @@ export const allNodesAttrs = {
         info: '',
         columns: [{
                 title: 'Text',
-                dataKey: 'text',
+                name: 'text',
                 type: 'text',
                 renderer: function(instance, td, row, col, prop, value, cellProperties) {
                     let bgColor = instance.getDataAtProp('color')[row];
@@ -205,12 +205,12 @@ export const allNodesAttrs = {
             },
             {
                 title: 'Value',
-                dataKey: 'value',
+                name: 'value',
                 type: 'text'
             },
             {
                 title: 'Color',
-                dataKey: 'color',
+                name: 'color',
                 type: 'autocomplete',
                 source: ["yellow", "red", "orange", "green", "blue", "gray", "black", "white"]
             },
