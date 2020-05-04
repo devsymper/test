@@ -214,11 +214,10 @@ export default {
     props: {
         /** 
          * Danh sách các node được tích chọn trong orgchar, có dạng:
-         * {
-         *      id orgchart 1: [ idNode1, idNode2, ....],
-         *      id orgchart 2: [ idNode1, idNode2, ....],
-         * }
-         * 
+         * [
+         *      {"idNode":"14bcc081-771e-490a-8254-bced2d7acab2","idOrgchart":"689"},
+         *      {"idNode":"919ba806-73e5-4cb6-bbd8-6c7e3c44455a","idOrgchart":"689"}
+         * ]
          **/ 
         value: {
             type: Array,
