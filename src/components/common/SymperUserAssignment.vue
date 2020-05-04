@@ -33,8 +33,9 @@
                 :simpleMode="true"
                 :width="'100%'"
                 :height="'80px'"
-                :formulaValue="value.value"
-                v-model="value.value"
+                ref="formulaEditor"
+                :formulaValue="value.formula"
+                v-model="value.formula"
             ></formula-editor>
         </div>
     </div>
@@ -92,6 +93,9 @@ export default {
         }
     },
     methods: {
+        setValue(value){
+            this.$refs.formulaEditor.setValue(value.formula);
+        },
         removeItem(node){
             let idx = 0;
             for(let i = 0; i < this.value.orgChart.length ; i++){

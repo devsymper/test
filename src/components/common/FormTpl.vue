@@ -18,8 +18,8 @@
                 v-if="!inputInfo.hidden && (inputInfo.type != 'checkbox' && inputInfo.type != 'switch' )">
                 {{inputInfo.title}}
                 <i
-                    class="mdi mdi-dock-window float-right input-item-func ml-1"
-                    @click="openLargeFormulaEditor(inputInfo, name)"
+                    :class="{'mdi mdi-dock-window float-right input-item-func ml-1': true,'active': inputInfo.title == largeFormulaEditor.name}"
+                    @click="openLargeValueEditor(inputInfo, name)"
                     v-if="inputInfo.type == 'script' || inputInfo.type == 'userAssignment'"
                 ></i>
                 <i
@@ -76,6 +76,13 @@
                     v-if="getDragPanelContent(panelData) == 'orgchart-selector'"
                     v-model="panelData.value.orgchartSelectorValue"
                 ></orgchart-selector>
+                <formula-editor
+                    v-else-if="panelData.type == 'userAssignment'"
+                    v-model="panelData.value.formula"
+                    :formulaValue="panelData.value.formula"
+                    :width="'100%'"
+                    :height="'370px'"
+                ></formula-editor>
                 <formula-editor
                     v-else
                     v-model="panelData.value"
@@ -277,8 +284,9 @@ export default {
             this.largeFormulaEditor.open = false;
             let info = this.largeFormulaEditor;
             this.$refs["inputItem_" + info.name][0].setValue(info.data.value);
+            this.largeFormulaEditor.name = '';
         },
-        openLargeFormulaEditor(inputInfo, name) {
+        openLargeValueEditor(inputInfo, name) {
             this.largeFormulaEditor.open = true;
             this.largeFormulaEditor.name = name;
             this.$set(this.largeFormulaEditor, "data", inputInfo);
