@@ -22,7 +22,7 @@
                     @onBlur="detectBlurEditorEvent"
                     @onInit="initEditor"
                     :init="{
-                        forced_root_block:'p',
+                        forced_root_block:'div',
                         toolbar_items_size : 'small',
                         menubar: false,
                         plugins: [
@@ -34,7 +34,7 @@
                         toolbar:
                         'undo redo | fontselect fontsizeselect formatselect | bold italic forecolor backcolor | \
                         alignleft aligncenter alignright alignjustify | \
-                        bullist numlist outdent indent | removeformat emoticons | table |  preview',
+                        bullist numlist outdent indent | removeformat emoticons | table |  preview allControl margin',
                         fontsize_formats: '8pt 10pt 11pt 12pt 13pt 14pt 15pt 16pt 17pt 18pt 19pt 20pt 21pt 22pt 23pt 24pt 25pt 26pt 27pt 28pt 29pt 30pt 32pt 34pt 36pt',
                         font_formats: 'Roboto = Roboto,sans-serif; Andale Mono=andale mono,times;'+ 'Arial=arial,helvetica,sans-serif;'+ 'Arial Black=arial black,avant garde;'+ 'Book Antiqua=book antiqua,palatino;'+ 'Comic Sans MS=comic sans ms,sans-serif;'+ 'Courier New=courier new,courier;'+ 'Georgia=georgia,palatino;'+ 'Helvetica=helvetica;'+ 'Impact=impact,chicago;'+ 'Symbol=symbol;'+ 'Tahoma=tahoma,arial,helvetica,sans-serif;'+ 'Terminal=terminal,monaco;'+ 'Times New Roman=times new roman,times;'+ 'Trebuchet MS=trebuchet ms,geneva;'+ 'Verdana=verdana,geneva;'+ 'Webdings=webdings;'+ 'Wingdings=wingdings,zapf dingbats',
                         valid_elements: '*[*]',
@@ -47,6 +47,20 @@
                                     showSettingControlTable(e);
                                 }
                             });
+                            ed.ui.registry.addButton('allControl', {
+                            icon:'preferences',
+                            tooltip:'Bảng tổng hợp control',
+                                onAction: function (_) {
+                                    setShowAllControlOption();
+                                }
+                            }); 
+                            ed.ui.registry.addButton('margin', {
+                            icon:'indent',
+                            tooltip:'Margin',
+                                onAction: function (_) {
+                                    showPaddingPageConfig(ed);
+                                }
+                            }); 
                             
                         }
                     }"
@@ -64,23 +78,23 @@
         <auto-complete-control ref="autocompleteControl" @add-control="insertControl"/>
         <save-doc-panel :documentProps="documentProps" ref="saveDocPanel" @save-doc-action="validateControl"/>
         <err-message :listErr="listMessageErr" ref="errMessage"/>
-        <formulas-script-editor ref="scriptEditor" :formulas="currentFormulasInput"/>
+        <all-control-option ref="allControlOption"/>
     </v-flex>
 </template>
 <script>
 
 //
 import Editor from '@tinymce/tinymce-vue'
-import EditerAction from './items/Action.vue'
+import EditorAction from './items/Action.vue'
 import SideBarLeft from './sideleft/SideBarLeft.vue'
 import SideBarRight from './sideright/SideBarRight.vue'
 import TableSetting from './items/TableSetting.vue'
 import AutoCompleteControl from './items/AutoCompleteControl.vue'
 import controlCss from  "./../../assets/css/document/control/control.css";
 import SaveDocPanel from "./../../views/document/items/SaveDocPanel.vue";
-import FormulasEditorModal from "./../../views/document/items/FormulasEditorModal.vue";
 import ErrMessagePanel from "./../../views/document/items/ErrMessagePanel.vue";
-import { GetControlProps } from "./../../components/document/controlPropsFactory.js";
+import AllControlInDoc from "./../../views/document/items/AllControlInDoc.vue";
+import { GetControlProps,mappingOldVersionControlProps,mappingOldVersionControlFormulas,getAPropsControl } from "./../../components/document/controlPropsFactory.js";
 import { documentApi } from "./../../api/Document.js";
 
 import VueResizable from 'vue-resizable'
@@ -97,13 +111,13 @@ export default {
         'editor': Editor,
         'sidebar-left' : SideBarLeft,
         'sidebar-right' : SideBarRight,
-        'editor-action' : EditerAction,
+        'editor-action' : EditorAction,
         's-table-setting' : TableSetting,
         'auto-complete-control' : AutoCompleteControl,
-        'formulas-script-editor' : FormulasEditorModal,
         'save-doc-panel': SaveDocPanel,
         'err-message': ErrMessagePanel,
         "vue-resizable":VueResizable,
+        "all-control-option":AllControlInDoc,
     },
     created() {
         let thisCpn = this;
@@ -127,20 +141,7 @@ export default {
             }
            
         });
-        // hàm nhận sự kiện khi click vào ô nhập công thức control=> mở script editor
-        this.$evtBus.$on("click-input", locale => {
-            let inputInfo = locale
-            thisCpn.currentSelectedInputProps = inputInfo
-            if(inputInfo.formulasId != undefined && typeof inputInfo.formulasId != 'undefined'){
-                thisCpn.currentFormulasInput = inputInfo.value;
-                thisCpn.$refs.scriptEditor.show();
-            }
-            
-        });
-        //nhận sự kiện thay đổi từ script editor lúc gõ công thưc cho control
-        this.$evtBus.$on("on-change-script-editor", locale => {
-            thisCpn.currentSelectedInputProps.value = locale
-        });
+        
         this.documentId = this.$route.params.id;
 
     },
@@ -156,6 +157,7 @@ export default {
         }
     },
     watch:{
+        // kiểm tra xem route thay đổi khi vào editor là edit doc hay create doc
         '$route' (to) {
             this.$store.commit("document/restoreState");
             this.documentId = Date.now();
@@ -164,16 +166,90 @@ export default {
             }
             if(to.name == 'createDocument'){
                 this.documentId = 0;
-                this.initEditor()
             }            
         }
     },
     methods:{
+        px2cm(px) {
+            return (Math.round((px / 37.7952) * 100) / 100).toFixed(1);
+        },
+        // ham tạo dialog của tinymce để cấu hình padding doc
+        showPaddingPageConfig(ed){
+                var left = $("#editor_ifr").contents().find('body').css('padding-left').slice(0, -2);
+                var right = $("#editor_ifr").contents().find('body').css('padding-right').slice(0, -2);
+                var top = $("#editor_ifr").contents().find('body').css('padding-top').slice(0, -2);
+                var bottom = $("#editor_ifr").contents().find('body').css('padding-bottom').slice(0, -2);
+                left = this.px2cm(left);
+                right = this.px2cm(right);
+                top = this.px2cm(top);
+                bottom = this.px2cm(bottom);
+                ed.windowManager.open({
+                    title: 'Căn lề trang',
+                    body: {
+                        type: 'panel',
+                        items: [
+                        {
+                            type: 'input',
+                            name: 'top',
+                            placeholder:'cm',
+                            label: 'Lề trên'
+                        },
+                        {
+                            type: 'input',
+                            name: 'right',
+                            placeholder:'cm',
+                            label: 'Lề phải'
+                        },
+                        {
+                            type: 'input',
+                            name: 'bottom',
+                            placeholder:'cm',
+                            label: 'Lề dưới'
+                        },
+                        {
+                            type: 'input',
+                            name: 'left',
+                            placeholder:'cm',
+                            label: 'Lề trái'
+                        },
+                        ]
+                    },
+                    buttons: [
+                        {
+                        type: 'submit',
+                        name: 'submitButton',
+                        text: 'Đặt',
+                        primary: true
+                        }
+                    ],
+                    
+                    onSubmit: function (e) {
+                        let data = e.getData();
+                        var left = data.left;
+                        var right = data.right;
+                        var top = data.top;
+                        var bottom = data.bottom;
+                        $("#editor_ifr").contents().find('body').css({
+                            'padding-left': left + 'cm',
+                            'padding-right': right + 'cm',
+                            'padding-top': top + 'cm',
+                            'padding-bottom': bottom + 'cm',
+                            'margin':'0',
+                        });
+                    }
+                }
+                );
+        },
+        setShowAllControlOption(){
+            this.$refs.allControlOption.showDialog();
+        },
+        // mở modal lưu , edit doc
         openPanelSaveDocument(){
             $('#editor_ifr').contents().find('.on-selected').removeClass('on-selected');
             this.selectControl({},{});
             this.$refs.saveDocPanel.showDialog()
         },
+        // hoangnd: hàm gửi request lưu doc
         saveDocument(){
             let thisCpn = this;
             let htmlContent = this.$refs.editor.editor.getContent()
@@ -202,9 +278,9 @@ export default {
                 .always(() => {
                 });
             }
-            
         },
-        hasHistory () { return window.history?.length > 2 },
+        //hoangnd: hàm xác thưc các control trước khi lưu
+        // xac thực tên control và các formulas liên quan
         validateControl(){
             let thisCpn = this;
             let allControl = this.editorStore.allControl;
@@ -214,61 +290,68 @@ export default {
             //check trung ten control
             for(let controlId in allControl){
                 let control = allControl[controlId];
-                if(control.properties.name.value == ''){
-                    let controlEl = $('#editor_ifr').contents().find('#'+controlId);
-                    controlEl.addClass('s-control-error');
-                    if(this.listMessageErr.indexOf('Không được bỏ trống tên control') === -1){
-                        this.listMessageErr.push('Không được bỏ trống tên control');
-                    }
-                }
-                else{
-                    if(listControlName.indexOf(control.properties.name.value) === -1){
-                        listControlName.push(control.properties.name.value);
-                    }
-                    else{
-                        let controlEl = $('#editor_ifr').contents().find('#'+controlId);
-                        controlEl.addClass('s-control-error');
-                        if(this.listMessageErr.indexOf('Trùng tên control '+control.properties.name.value) === -1){
-                            this.listMessageErr.push('Trùng tên control '+control.properties.name.value);
-                        }
-                    }
-                }
-
-                // check control Name trong cong thức
-                for(let f in control.formulas){
-                    if(control.formulas[f].value != ""){
-                        let formula = control.formulas[f].value;
-                        let controlName = formula.match(/(?<=f.)(\w+)/g);
-                        if(controlName != null)
-                            for(let i = 0; i< controlName.length; i++){
-                                if(listControlName.indexOf(controlName[i]) === -1){
-                                    let message = "Không tồn tại control "+controlName[i]+" trong công thức "+f+" của control "+control.properties.name.value;
-                                    if(this.listMessageErr.indexOf(message) === -1){
-                                        this.listMessageErr.push(message);
-                                    }
-                                }
-                            }
-                    }
-                    
-                }
-
+                this.checkNameControl(control,listControlName);
+                this.validateFormulasInControl(control)
             }
-            
-
-
             if(this.listMessageErr.length == 0 && $('#editor_ifr').contents().find('.s-control-error').length == 0){
                 this.saveDocument();
-                
             }
             else{
                 this.$refs.saveDocPanel.hideDialog();
                 setTimeout(function(){
-                thisCpn.$refs.errMessage.showDialog();
-
+                    thisCpn.$refs.errMessage.showDialog();
                 },300)
             }
-            
         },
+        // hàm kiểm tra xác thực tên control 
+        checkNameControl(control,listControlName){
+            if(control.properties.name.value == ''){
+                let controlEl = $('#editor_ifr').contents().find('#'+controlId);
+                controlEl.addClass('s-control-error');
+                let message = 'Không được bỏ trống tên control'
+                if(this.listMessageErr.indexOf(message) === -1){
+                    this.listMessageErr.push(message);
+                }
+            }
+            else{
+                this.checkDupliucateNameControl(listControlName,control);
+            }
+        },
+      
+        // hàm kiểm tra xem co control nào trùng tên hay ko
+        checkDupliucateNameControl(listControlName,control){
+            if(listControlName.indexOf(control.properties.name.value) === -1){
+                listControlName.push(control.properties.name.value);
+            }
+            else{
+                let controlEl = $('#editor_ifr').contents().find('#'+controlId);
+                controlEl.addClass('s-control-error');
+                if(this.listMessageErr.indexOf('Trùng tên control '+control.properties.name.value) === -1){
+                    this.listMessageErr.push('Trùng tên control '+control.properties.name.value);
+                }
+            }
+        },
+        // hàm kiểm tra xem trong công thức có trỏ đến control ko tồn tại hay ko
+        validateFormulasInControl(control){
+            // check control Name trong cong thức
+            for(let f in control.formulas){
+                if(control.formulas[f].value != ""){
+                    let formula = control.formulas[f].value;
+                    let controlName = formula.match(/(?<=f.)(\w+)/g);
+                    if(controlName != null)
+                        for(let i = 0; i< controlName.length; i++){
+                            if(listControlName.indexOf(controlName[i]) === -1){
+                                let message = "Không tồn tại control "+controlName[i]+" trong công thức "+f+" của control "+control.properties.name.value;
+                                if(this.listMessageErr.indexOf(message) === -1){
+                                    this.listMessageErr.push(message);
+                                }
+                            }
+                        }
+                }
+                
+            }
+        },
+        // hàm xử lí thêm các cột vào trong control table khi lưu ở tablesetting
         addColumnTable(listRowData){
             let elements = $('#editor_ifr').contents().find('[data-mce-selected="1"]');
             let thead = ``;
@@ -284,7 +367,6 @@ export default {
                 let controlEl = $(control.html);
                 
                 controlEl.attr('id', row.key);
-                console.log(controlEl);
                 thead += `<th>`+row.columnName+`</th>`
                 tbody += `<td>`+controlEl[0].outerHTML+`</td>`
                 this.addToAllControlInTable(row.key,{properties: control.properties, formulas : control.formulas,type:type},tableId)
@@ -295,34 +377,31 @@ export default {
             elements.find('tbody tr td:first-child').after(tbody);
         },
 
+        //hoangnd: hàm mở modal tablesetting của control table
         showSettingControlTable(e) {
-                let elements = $('#editor_ifr').contents().find('[data-mce-selected="1"]');
-                if(elements.hasClass('s-control-table') || elements.parent().hasClass('s-control-table')){
-                    let thead = elements.find('thead tr th');
-                    let tbody = elements.find('tbody tr td');
-                    let table = (elements.hasClass('s-control-table')) ? element : elements.parent();
-                    let tableId = table.attr('id');
-
-                    
-                    let listData = [];
-                    if($(tbody[1].innerHTML).length > 0){
-                        for(let i = 1; i< thead.length - 1; i++){
-                            let idControl = $(tbody[i].innerHTML).first().attr('id');
-                            let typeControl = $(tbody[i].innerHTML).first().attr('s-control-type');
-                            let name = this.editorStore.allControl[tableId]['listFields'][idControl].properties.name.value;
-                            let title = this.editorStore.allControl[tableId]['listFields'][idControl].properties.title.value;
-                            let row = {columnName: $(thead[i]).text(),name: name,title:title, type: typeControl,key:idControl}
-                            listData.push(row)
-                        }
-                        
+            let elements = $('#editor_ifr').contents().find('[data-mce-selected="1"]');
+            if(elements.hasClass('s-control-table') || elements.parent().hasClass('s-control-table')){
+                let thead = elements.find('thead tr th');
+                let tbody = elements.find('tbody tr td');
+                let table = (elements.hasClass('s-control-table')) ? element : elements.parent();
+                let tableId = table.attr('id');
+                let listData = [];
+                if($(tbody[1].innerHTML).length > 0){
+                    for(let i = 1; i< thead.length - 1; i++){
+                        let idControl = $(tbody[i].innerHTML).first().attr('id');
+                        let typeControl = $(tbody[i].innerHTML).first().attr('s-control-type');
+                        let name = this.editorStore.allControl[tableId]['listFields'][idControl].properties.name.value;
+                        let title = this.editorStore.allControl[tableId]['listFields'][idControl].properties.title.value;
+                        let row = {columnName: $(thead[i]).text(),name: name,title:title, type: typeControl,key:idControl}
+                        listData.push(row)
                     }
-                    
-                    this.$refs.tableSetting.showDialog();
-                    this.$refs.tableSetting.setListRow(listData);
                 }
-            },
+                this.$refs.tableSetting.showDialog();
+                this.$refs.tableSetting.setListRow(listData);
+            }
+        },
 
-            // hàm add các thuộc tính và formulas của control vào danh sách các control trong doc được lưu trong state
+        // hàm add các thuộc tính và formulas của control vào danh sách các control trong doc được lưu trong state
         addToAllControlInDoc(controlId,control){
             this.$store.commit(
                 "document/addControl",{id:controlId,props:control}
@@ -347,6 +426,7 @@ export default {
                 'display': 'none',
             })
         },
+        //hoangnd : hàm được gọi từ AutoCompleteControl component để insert 1 control
         insertControl(type){
             this.hideAutocompletaControl();
             $(this.$refs.editor.editor.selection.getNode()).html($(this.$refs.editor.editor.selection.getNode())[0].innerHTML.slice(0, -1))
@@ -363,6 +443,8 @@ export default {
             this.addToAllControlInDoc(inputid,{properties: control.properties, formulas : control.formulas,type:type});
             
         },
+        // hoangnd: hàm nhận sự kiện keyup của editor 
+        // 191: / để thêm control
         detectKeyEvent(event){
             let thisCpn = this;
             switch (event.keyCode) {
@@ -414,6 +496,7 @@ export default {
                 this.hideAutocompletaControl();
             }
         },
+        // hàm click ra ngoài editor thì cập nhật lại dữ liệu của store
         detectBlurEditorEvent(event){
             let allControlEl = $('#editor_ifr').contents().find('.s-control');
             let listId = []
@@ -433,13 +516,65 @@ export default {
             let documentW = $(document).width();
             $('.sym-document__side-bar-right').css({width:documentW - $('.v-navigation-drawer').width() - $('.sym-document__side-bar-left').width() - $('.sym-document-editor').width() +'px'})
         },
+
+        // hàm gọi request lấy thông tin của document khi vào edit doc
         getContentDocument(){
             let thisCpn = this;
             if(this.documentId != 0){
                 documentApi.detailDocument(this.documentId).then(res => {
                     if (res.status == 200) {
                         thisCpn.setDocumentProperties(res.data.document);
-                        thisCpn.$refs.editor.editor.setContent(res.data.document.content);
+                        let content = res.data.document.content;
+                        thisCpn.$refs.editor.editor.setContent(content);
+                        $("#editor_ifr").contents().find('body div').remove()
+                        $("#editor_ifr").contents().find('body meta').remove()
+                        $("#editor_ifr").contents().find('body style').remove()
+                        $("#editor_ifr").contents().find('.bkerp-input').addClass('s-control').removeClass('bkerp-input');
+                        
+                        let allControl = $("#editor_ifr").contents().find('.s-control');
+                        $.each(allControl,function(item,value){
+                            let controlProps = $(value).attr('data-property');
+                            let type = $(value).attr('bkerp-type');
+                            let id = $(value).attr('id');
+                            $(value).attr('s-control-type',type).removeAttr('bkerp-type');
+                            try {
+                                controlProps = JSON.parse(controlProps);
+                                let controlProp = {};
+                                let controlFormulas = {};
+                                let controlId = "s-control-id"+id.replace('bkerp-input','');
+                                
+                                $.each(controlProps,function(k,v){
+                                    if(mappingOldVersionControlProps[k] != undefined){
+                                        controlProp[mappingOldVersionControlProps[k]] = getAPropsControl(mappingOldVersionControlProps[k],v);
+                                    }
+                                    if(mappingOldVersionControlFormulas[k] != undefined){
+                                        // controlFormulas[mappingOldVersionControlFormulas[k]] = getAPropsControl(mappingOldVersionControlProps[k],v);
+                                    }
+                                    
+                                });
+                                console.log(controlProp);
+                                
+                                type = (type == 'text') ? 'textInput' : type;
+                                thisCpn.addToAllControlInDoc(controlId,{properties: controlProp, formulas : controlFormulas,type:type});
+                                // if(type == 'table'){
+                                //     thisCpn.addToAllControlInDoc(controlId,{properties: controlProp, formulas : controlFormulas,type:type,listFields:{}});
+                                // }
+                                // else{
+                                //     if($(value).closest('.s-control-table').length>0){
+                                       
+                                //     }
+                                //     else{
+                                //         thisCpn.addToAllControlInDoc(controlId,{properties: controlProp, formulas : controlFormulas,type:type});
+                                //     }
+                                // }
+
+                            } catch (error) {   
+                                console.log(error);
+                            }
+                            
+                        })
+                        
+                        // $("#editor_ifr").contents().find('head').remove()
                         let fields = res.data.fields;
                         thisCpn.setDataForPropsControl(fields);
                     }
@@ -451,6 +586,7 @@ export default {
                 });
             }
         },
+
         setDocumentProperties(documentProp){
             this.documentProps = {
                 name : { 
@@ -541,12 +677,15 @@ export default {
                 
             }
         },
+
+        // sự kiện xảy ra khi khởi tạo xong editor , sự kiện do tinymce cung cấp
         initEditor(){
             let thisCpn = this;
             thisCpn.setDocumentProperties({})
             if(this.documentId != 0)    // trường họp edit doc thì gọi api lấy dữ liệu
             thisCpn.getContentDocument();
             var currentElement, currentElementChangeFlag, elementRectangle, countdown, dragoverqueue_processtimer;
+            // object xử lí các vấn đề với kéo thả control vào document
             var DragDropFunctions = {
                 dragoverqueue: [],
                 GetMouseBearingsPercentage: function($element, elementRect, mousePos) {
@@ -940,6 +1079,7 @@ export default {
                 }
             };
             $(".sym-document-tab-control .sym-control").attr('draggable', 'true');
+            
             $(".sym-control").on('dragstart', function(event) {
                 dragoverqueue_processtimer = setInterval(function() {
                     DragDropFunctions.ProcessDragOverQueue();
@@ -948,6 +1088,7 @@ export default {
                 let control = GetControlProps(controlType);
                 event.originalEvent.dataTransfer.setData("control", JSON.stringify(control));
             });
+
             $(".sym-control").on('dragend', function() {
                 clearInterval(dragoverqueue_processtimer);
                 DragDropFunctions.removePlaceholder();
@@ -956,8 +1097,11 @@ export default {
             var style = $("<style data-reserved-styletag></style>").html(GetInsertionCSS());
             var clientFrameWindow = $('#editor_ifr').get(0).contentWindow;
             $(clientFrameWindow.document.head).append(style);
+
             var htmlBody = $(clientFrameWindow.document).find('body,html');
             htmlBody.css({height:"calc(100% - 10px)"})
+
+
             htmlBody.find('*').on('dragenter', function(event) {
                 event.stopPropagation();
                 currentElement = $(event.target);
@@ -984,7 +1128,8 @@ export default {
                     DragDropFunctions.AddEntryToDragOverQueue(currentElement, elementRectangle, mousePosition);
                 }
             })
-            //click vào 1 control trong doc thì lấy từ store ra
+            //click vào 1 control trong doc thì lấy từ store để set giá trị cho currentSelected control trong store
+            // mục đích đê cập nhật lại view nhập các thuộc tính
             $("#editor_ifr").contents().find('body').on('click','.s-control',function(e){
                 e.stopPropagation();
                 e.preventDefault();
@@ -997,19 +1142,21 @@ export default {
                 thisCpn.currentSelectedControlId = controlId;
                 let table = $(this).closest('.s-control-table');
                 if(table.length > 0 && controlId != table.attr('id')){
+                    controlId = "s-control-id"+controlId.replace('bkerp-input','');
                     let tableId = table.attr('id');
                     let control = thisCpn.editorStore.allControl[tableId]['listFields'][controlId];
                     thisCpn.selectControl(control.properties, control.formulas);
                 }
                 else{
                     let control = thisCpn.editorStore.allControl[controlId];
+                    console.log(control);
                     thisCpn.selectControl(control.properties, control.formulas);
                 }
             })
 
-            
+            // sự kiện thả control vào doc
+            // xử lí thêm props của control vào store
             $(clientFrameWindow.document).find('body,html').on('drop', function(event) {
-
                 event.preventDefault();
                 event.stopPropagation();
                 var e;
@@ -1029,9 +1176,6 @@ export default {
                     insertionPoint.after(checkDiv);
                     let table = insertionPoint.closest('.s-control-table'); // nếu kéo control vào table thì lưu prop của control đó vào table trong allControl của state
                     let idTable = '';
-                    console.log(table);
-                    
-                    
                     checkDiv.prop('readonly', false);
                     if (checkDiv.attr('s-control-type') != 'table') {
                         checkDiv.attr('contenteditable', false);
@@ -1065,6 +1209,7 @@ export default {
                 styles += '.s-control:not(.s-control-table) {background: rgb(233, 236, 239);min-width: 50px;max-width:150px;outline: none !important;margin:1px;border:none}';
                 styles += '.s-control-reset,.s-control-draf,.s-control-submit{padding: 5px 8px;}';
                 styles += '.s-control-error{border: 1px solid red !important;}';
+                styles += '.mce-input-padding{width: 100px !important;left: 120px !important;padding:0 4px}';
                 return styles;
             }
         }

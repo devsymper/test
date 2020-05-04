@@ -434,7 +434,7 @@ const controlTypes = {
                     <a class="btn btn-primary s-control-table-remove-select">Xoá dòng đã chọn </a>
                     <a class="btn btn-primary s-control-table-remove-unselect">Xoá dòng không chọn </a>
                 </div>
-                </div> &nbsp;<br><p>&nbsp;</p>;
+                </div> &nbsp;;
                 `,
         title: "Table",
         notInProps: ['width', 'height', 'isPrimary', 'formatNumber', 'isSumTable', 'isRequired', 'isDBOnly', 'isTableOnly', 'isAllowUpdate', 'isDisplayCompact', 'isMultipleValue', 'isAllowPrint', 'isBorderSubmit', 'isBorderView', 'isBorderPrint'],
@@ -447,7 +447,7 @@ const controlTypes = {
                     <div style="padding:7px;display: block;">
                     
                     </div>
-                </div>&nbsp;<br><p>&nbsp;</p>`,
+                </div>&nbsp;<br>`,
         title: "Panel",
         notInProps: ['fontSize', 'formatNumber', 'isPrimary', 'isSumTable', 'isRequired', 'isDBOnly', 'isTableOnly', 'isAllowUpdate', 'isReadOnly', 'isDisplayCompact', 'isMultipleValue', 'isAllowPrint', 'isBorderSubmit', 'isBorderView', 'isBorderPrint'],
         formulas: ['hidden']
@@ -515,6 +515,47 @@ const controlTypes = {
 
 }
 
+export const mappingOldVersionControlProps = {
+
+
+    "Name": "name",
+    "Title": "title",
+    "PlaceHolder": "otherInfo",
+    "Width": "width",
+    "Height": "height",
+    "FontSize": "fontSize",
+    "Color": "color",
+    "Css": "css",
+    "Format-Number": "formatNumber",
+    "IsPrimary": "isPrimary",
+    "Mobile": "isMobile",
+    "CalSum": "isSumTable",
+    "Required": "isRequired",
+    "IsUniqueInDB": "isDBOnly",
+    "IsUniqueInTable": "isTableOnly",
+    "IsHidden": "isHidden",
+    "AllowUpdate": "isAllowUpdate",
+    "AllowReadOnly": "isReadOnly",
+    "MultipleValue": "isMultipleValue",
+    "mobileProps": "mobileProps",
+    "AllowPrint": "isAllowPrint",
+    "BorderSubmit": "isBorderSubmit",
+    "BorderView": "isBorderView",
+    "BorderPrint": "isBorderPrint",
+
+
+
+}
+export const mappingOldVersionControlFormulas = {
+    "LinkFormulas": "link",
+    "RequireDataFormulas": "require",
+    "DataFormulas": "formulas",
+    "AutoCompleteFormulas": "autocomplete",
+    "VisibleFormulas": "hidden",
+    "Validate": "validate",
+    "MessageUniqueDB": "uniqueDB",
+    "ReadonlyDataFormulas": "uniqueTable"
+}
 
 // hàm lấy tất cac thuoc tinh và các trường công thức của control
 // input : type của control
@@ -582,6 +623,12 @@ export const getIconFromType = function(type) {
     let control = util.cloneDeep(controlTypes[type]);
     return control.icon;
 }
+export const getAPropsControl = function(type, value) {
+    let prop = util.cloneDeep(commonProps[type]);
+    prop.value = value;
+    return prop;
+}
+
 
 // hàm lấy thông tin control cho tablesetting của control tabele trong doc editor
 export const getControlElementForTableSetting = function(type) {

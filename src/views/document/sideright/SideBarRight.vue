@@ -27,6 +27,7 @@
             <v-expansion-panels
                 v-model="panel"
                 multiple
+                v-if="controlPropsGroup.name"
                 >
                 <v-expansion-panel class="m-0" >
                     <v-expansion-panel-header class="v-expand-header">Tên</v-expansion-panel-header>
@@ -71,21 +72,8 @@ export default {
         },
 
         controlPropsGroup(){
-            let allProps = this.sCurrentDocument.properties;
-            let groups = {name:{},display:{},print:{}};
-            if(allProps != undefined && typeof allProps != 'undefined'){
-                Object.filter = (obj, predicate) => 
-                Object.keys(obj)
-                    .filter( key => predicate(obj[key]) )
-                    .reduce( (res, key) => Object.assign(res, { [key]: obj[key] }), {} );
-                let propsTypeIsName = Object.filter(allProps,prop=>prop.groupType == 'name')
-                let propsTypeIsDisplay = Object.filter(allProps,prop=>prop.groupType == 'display')
-                let propsTypeIsPrint = Object.filter(allProps,prop=>prop.groupType == 'print')
-                groups = {name:propsTypeIsName,display:propsTypeIsDisplay,print:propsTypeIsPrint};
-            }
-            console.log(groups);
+            return this.sCurrentDocument.properties;
             
-            return groups;
         }
     },
     data () {
