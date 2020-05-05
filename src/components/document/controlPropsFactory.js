@@ -59,16 +59,28 @@ const commonProps = {
     },
     formatNumber: {
         title: "Định dạng số",
-        type: "text",
+        type: "numberFormat",
         value: "",
         groupType: "display"
     },
-    formatDateTime: {
+    // formatDateTime: {
+    //     title: "Định dạng thời gian",
+    //     type: "text",
+    //     value: "",
+    //     groupType: "display"
+    // },
+    formatDate: {
         title: "Định dạng thời gian",
-        type: "text",
+        type: "dateFormat",
         value: "",
         groupType: "display"
     },
+    // formatTime: {
+    //     title: "Định dạng thời gian",
+    //     type: "text",
+    //     value: "",
+    //     groupType: "display"
+    // },
     isPrimary: {
         title: "Quan trọng",
         type: "checkbox",
@@ -295,7 +307,7 @@ const controlTypes = {
         icon: "/icon/ic_number.png",
         html: `<input class="s-control s-control-number" contenteditable="false"  title="Number" s-control-type="number" type="number" style="border:none">&nbsp;&nbsp;`,
         title: "Number",
-        notInProps: ['isDisplayCompact', 'isMultipleValue'],
+        notInProps: ['formatDate', 'isDisplayCompact', 'isMultipleValue'],
         formulas: ['link', 'formulas', 'hidden', 'readOnly', 'require', 'validate']
     },
     date: {
@@ -435,7 +447,7 @@ const controlTypes = {
                     <a class="btn btn-primary s-control-table-remove-unselect">Xoá dòng không chọn </a>
                 </div>
                 <style>
-                .s-control-table table{width:100%;text-align: center;}
+                .s-control-table table{width:100%;text-align: center;    border-collapse: collapse;}
                 .s-control-table table thead{background: #f2f2f2;}
                 .s-control-table table tbody{background: white;}
                 <style/>
@@ -648,5 +660,15 @@ export const getAllPropsControl = function() {
     let allProp = util.cloneDeep(commonProps);
     let allFormulas = util.cloneDeep(commonFormulas);
     let data = Object.assign(allProp, allFormulas);
-    return data;
+    let result = Object.keys(data).map(function(key) {
+        let type = data[key].type;
+        (type == 'script') ? type = 'text': type;
+        (type == 'textarea') ? type = 'text': type;
+        (type == 'treeValidate') ? type = 'text': type;
+        (type == 'select') ? type = 'autocomplete': type;
+        (type == 'numberFormat') ? type = 'numeric': type;
+        (type == 'dateFormat') ? type = 'date': type;
+        return { title: data[key].title, type: type, name: key };
+    });
+    return result;
 }

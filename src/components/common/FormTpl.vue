@@ -107,6 +107,8 @@ import {
 } from "vuetify/lib";
 import TreeValidate from "./../../views/document/sideright/items/FormValidateTpl.vue";
 import FormulaEditor from "./../common/FormulaEditor";
+import DateFormat from "./../common/DateFormat";
+import NumberFormat from "./../common/NumberFormat";
 import DataTable from "./../common/customTable/DataTable";
 import SymperDragPanel from "./SymperDragPanel";
 import SymperUserAssignment from "./SymperUserAssignment";
@@ -215,6 +217,22 @@ const inputTypeConfigs = {
             return {
                 activeTab: config.activeTab
             };
+        }
+    },
+    dateFormat:{
+        tag:"date-format",
+        props(config){
+            return{
+                value:config.value
+            }
+        }
+    },
+    numberFormat:{
+        tag:"number-format",
+        props(config){
+            return{
+                value:config.value
+            }
         }
     }
 };
@@ -395,6 +413,8 @@ export default {
         "v-tree-validate": TreeValidate,
         FormulaEditor,
         DataTable,
+        "date-format":DateFormat,
+        "number-format":NumberFormat,
         SymperDragPanel,
         "symper-user-assginment": SymperUserAssignment,
         "orgchart-selector": OrgchartSelector

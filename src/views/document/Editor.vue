@@ -125,7 +125,7 @@ export default {
         // ham nhan sự kiện từ formtpl
         this.$evtBus.$on("blur-input", locale => {
             if(this.currentSelectedControlId != undefined && this.currentSelectedControlId != ''){
-                 let name = locale.name
+                let name = locale.name
                 let value = locale.value
                 let elements = $('#editor_ifr').contents().find('#'+this.currentSelectedControlId);
                 let table = elements.closest('.s-control-table');
@@ -414,11 +414,11 @@ export default {
             );  
         },
         // set config cho phần sidebar phải các thuộc tính control đang được click
-        selectControl(properties,formulas){
+        selectControl(properties,formulas,id){
             this.$store.commit(
                 "document/addCurrentControl",
                 {properties:properties,
-                formulas:formulas}
+                formulas:formulas,id:id}
             );
         },
         hideAutocompletaControl(){
@@ -439,7 +439,7 @@ export default {
             }
             // $(this.$refs.editor.editor.selection.getNode()).after()
             this.$refs.editor.editor.execCommand('mceInsertContent', false, checkDiv[0].outerHTML + '&nbsp;');
-            this.selectControl(control.properties, control.formulas);
+            this.selectControl(control.properties, control.formulas,inputid);
             this.addToAllControlInDoc(inputid,{properties: control.properties, formulas : control.formulas,type:type});
             
         },
@@ -525,8 +525,6 @@ export default {
             $("#editor_ifr").contents().find('body meta').remove()
             $("#editor_ifr").contents().find('body style').remove()
             let allControl = $("#editor_ifr").contents().find('.s-control:not(.bkerp-input-table .s-control)');
-            console.log(allControl);
-            
             $.each(allControl,function(item,value){
                 let controlProps = $(value).attr('data-property');
                 let type = $(value).attr('bkerp-type');
@@ -563,6 +561,7 @@ export default {
                     let bodyTable = $(value).find('table');
                     tableEl.find('table').remove();
                     tableEl.append(bodyTable);
+                    tableEl.find('table thead').attr('contenteditable',true);
                     let allControlInTable = tableEl.find('.s-control');
                     $.each(allControlInTable,function(item,value){
                         let childControlProps = $(value).attr('data-property');
@@ -614,9 +613,12 @@ export default {
                         if(res.data.document.version == 1){
                             thisCpn.setContentForDocumentV1(res.data.document);
                         }
+                        else{
+                            let fields = res.data.fields;
+                            thisCpn.setDataForPropsControl(fields);
+                        }
                         
-                        let fields = res.data.fields;
-                        thisCpn.setDataForPropsControl(fields);
+                        
                     }
                 })
                 .catch(err => {
@@ -697,6 +699,8 @@ export default {
                 else{
                     let listField = fields[controlId].listFields
                     let listChildField = {};
+                    console.log(listField);
+                    
                     for(let childFieldId in listField){
                         let childControl = GetControlProps(listField[childFieldId].type)
                         let childProperties = childControl.properties
@@ -1184,12 +1188,11 @@ export default {
                 if(table.length > 0 && controlId != table.attr('id')){
                     let tableId = table.attr('id');
                     let control = thisCpn.editorStore.allControl[tableId]['listFields'][controlId];
-                    thisCpn.selectControl(control.properties, control.formulas);
+                    thisCpn.selectControl(control.properties, control.formulas,tableId);
                 }
                 else{
                     let control = thisCpn.editorStore.allControl[controlId];
-                    console.log(control);
-                    thisCpn.selectControl(control.properties, control.formulas);
+                    thisCpn.selectControl(control.properties, control.formulas,controlId);
                 }
             })
 
@@ -1220,7 +1223,7 @@ export default {
                         checkDiv.attr('contenteditable', false);
                     }
                     insertionPoint.remove();
-                    thisCpn.selectControl(control.properties, control.formulas);
+                    thisCpn.selectControl(control.properties, control.formulas,inputid);
                     if(table.length > 0){   // nếu keo control vào trong table thì update dữ liệu trong table của state
                         idTable = table.attr('id');
                         thisCpn.addToAllControlInTable(inputid,{properties: control.properties, formulas : control.formulas,type:typeControl},idTable);
@@ -1250,6 +1253,10 @@ export default {
                 styles += '.s-control-error{border: 1px solid red !important;}';
                 styles += '.s-control-label{font-size:13px;padding:5px 8px;border-radius:4px;}';
                 styles += '.mce-input-padding{width: 100px !important;left: 120px !important;padding:0 4px}';
+                styles += '.mce-offscreen-selection{display:none !important;}';
+                styles += '.ephox-snooker-resizer-rows {cursor: row-resize}';
+                styles += '.ephox-snooker-resizer-cols {cursor: col-resize}';
+                styles += '.ephox-snooker-resizer-bar {background-color: #b4d7ff;opacity: 0;-webkit-user-select: none;-moz-user-select: none;-ms-user-select: none;user-select: none;}';
                 return styles;
             }
         }

@@ -31,9 +31,11 @@ const defaultState = {
             formulas: {
 
             },
-            type: ""
+            type: "",
+            id: ""
         },
-        listControlTreeData: []
+        listControlTreeData: [],
+        allControlForTableOption: []
     }
 };
 

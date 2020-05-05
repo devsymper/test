@@ -34,7 +34,7 @@ export default {
     },
     data(){
         return {
-            listControl:['label','image','qrCode','textInput','richText','number','date','dateTime','time','month','select','documentSelect','phone','email','currency','radio','checkbox','color','percent','user','inputFilter','hidden','table','panel','fileUpload','report','approvalHistory','trackingValue','submit','reset','draf']
+            listControl:['label','image','qrCode','textInput','richText','number','date','dateTime','time','month','select','documentSelect','phone','email','currency','radio','checkbox','color','percent','user','inputFilter','hidden','table','panel','fileUpload','report','approvalHistory','trackingValue','submit','reset','draft']
         }
     },
 

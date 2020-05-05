@@ -1,10 +1,13 @@
 import { getIconFromType } from './../../components/document/controlPropsFactory.js';
 import { defaultState } from "./defaultState";
+import Vue from "vue";
+
 const addControl = (state, params) => {
     console.log(state.editor.allControl);
     let id = params.id
     let prop = params.props
-    state.editor.allControl[id] = prop;
+        // state.editor.allControl[id] = prop;
+    Vue.set(state.editor.allControl, id, prop);
     setTreeListControlInDoc(state);
 };
 
@@ -63,7 +66,10 @@ const addControlToTable = (state, params) => {
     setTreeListControlInDoc(state);
 };
 const addCurrentControl = (state, control) => {
-    state.editor.currentSelectedControl['formulas'] = control.formulas
+    Vue.set(state.editor.currentSelectedControl, 'formulas', control.formulas);
+    Vue.set(state.editor.currentSelectedControl, 'id', control.id);
+
+    // state.editor.currentSelectedControl['formulas'] = control.formulas
     let groups = { name: {}, display: {}, print: {} };
     if (control.properties != undefined && typeof control.properties != 'undefined') {
         Object.filter = (obj, predicate) =>
@@ -77,7 +83,8 @@ const addCurrentControl = (state, control) => {
         let propsTypeIsPrint = Object.filter(control.properties, prop => prop.groupType == 'print')
         groups = { name: propsTypeIsName, display: propsTypeIsDisplay, print: propsTypeIsPrint };
     }
-    state.editor.currentSelectedControl['properties'] = groups
+    // state.editor.currentSelectedControl['properties'] = groups
+    Vue.set(state.editor.currentSelectedControl, 'properties', groups);
 
 };
 
@@ -122,6 +129,12 @@ const minimizeControl = (state, params) => {
 
 }
 
+const setAllControlForTableOption = (state, params) => {
+    // console.log(state.editor.allControl);
+    // let id = params.id
+    // let prop = params.props
+    // state.editor.allControlForTableOption;
+};
 export {
     addControl,
     addCurrentControl,
