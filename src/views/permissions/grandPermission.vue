@@ -16,99 +16,97 @@
                                 {{ $t("permissions.apps") }}
                             </div>
                         </v-col>
-                        <v-col cols="12" class="pr-6 ">
-                            <v-menu
-                                max-height="600"
-                                v-model="isShowSearchBox"
-                                :close-on-content-click="false"
-                                offset-y
-                            >
-                                <template v-slot:activator="{ on }">
-                                    <v-text-field
-                                        v-model="keyword"
-                                        solo
-                                        :label="$t('common.quickSearch')"
-                                        flat
-                                        dense
-                                        v-on="on"
-                                        append-icon="mdi-magnify"
-                                        class="sym-small-size bg-grey"
-                                    ></v-text-field>
-                                </template>
-                                <v-card outlined >
-                                    <v-list nav dense class="pl-0">
-                                        <v-list-group
-                                            v-for="(app, index) in listApp"
-                                            :key="index"
-                                            :prepend-icon="app.icon"
-                                            nav dense
-                                            value="true"
-                                        >
+                        <v-col cols="12" class="pr-6 search-wrap" v-click-outside="() => {isShowSearchBox = false}">
+                            <v-text-field
+                                v-model="keyword"
+                                class="sym-small-size bg-grey"
+                                append-icon="mdi-magnify"
+                                dense
+                                solo
+                                :placeholder="$t('common.quickSearch')"
+                                flat
+                                @focus="isShowSearchBox = true"
+                                @input="searchObject"
+                            ></v-text-field>
+                            <div class="search-results" v-show="isShowSearchBox">
+                                <v-list nav dense class="pl-0">
+                                    <v-list-group
+                                        v-for="(app, appIndex) in listResultApp"
+                                        :key="appIndex"
+                                        nav dense
+                                        value="true"
+                                    >
+                                        <template v-slot:activator>
+                                            <!-- Tên app -->
+                                            <v-list-item-title>
+                                                <v-icon v-if="!!app.icon && app.icon.includes('mdi-')">{{app.icon}}</v-icon>
+                                                <img v-else :src="app.icon" width="18">
+                                                {{app.name}}
+                                            </v-list-item-title>
+                                        </template>
+                                        <v-list-group sub-group value="true" v-for="(listObjs, objectIndex) in app.objects" :key="listObjs.type">
                                             <template v-slot:activator>
-                                                <!-- Tên app -->
-                                                <v-list-item-title>{{app.name}}</v-list-item-title>
+                                                <v-list-item-content>
+                                                    <!-- Tên các nhóm object trong app -->
+                                                    <v-list-item-title class="text-capitalize">{{listObjs.type}}</v-list-item-title>
+                                                </v-list-item-content>
                                             </template>
-                                            <v-list-group sub-group value="true" v-for="(listObjs) in app.objects" :key="listObjs.type">
-                                                <template v-slot:activator>
-                                                    <v-list-item-content>
-                                                        <!-- Tên các nhóm object trong app -->
-                                                        <v-list-item-title>{{listObjs.type}}</v-list-item-title>
-                                                    </v-list-item-content>
-                                                </template>
-                                                <v-list-item
-                                                    v-for="(item) in listObjs.data"
-                                                    :key="listObjs.type+item.id"
-                                                    :prepend-icon="item.icon"
+                                            <v-list-item
+                                                v-for="(item, itemIndex) in listObjs.data"
+                                                :key="listObjs.type+item.id"
+                                            >
+                                                <v-list-item-title
+                                                    @click="toggleObject(item, listObjs.type, [appIndex, objectIndex, itemIndex], app.id)"
                                                 >
-                                                    <v-list-item-title
-                                                        v-text="item.title != undefined && !!item.title ? item.title : item.name" 
-                                                    >
-                                                    </v-list-item-title>
-                                                    <v-list-item-action>
-                                                        <v-checkbox v-model="item.checked" color="success" hide-details></v-checkbox>
-                                                    </v-list-item-action>
-                                                </v-list-item>
-                                            </v-list-group>
+                                                    <icon :icon="item.icon"></icon>
+                                                    {{item.title != undefined && !!item.title ? item.title : item.name}}
+                                                </v-list-item-title>
+                                                <v-list-item-action>
+                                                    <v-icon color="success" v-if="item.checked == 1">mdi-check</v-icon>
+                                                </v-list-item-action>
+                                            </v-list-item>
                                         </v-list-group>
-                                    </v-list>
-                                </v-card>
-                            </v-menu>
+                                    </v-list-group>
+                                </v-list>
+                            </div>
                         </v-col>
-                        <v-col cols="12">
+                        <v-col cols="12" class="list-app-object">
                             <v-list nav dense class="pl-0">
                                 <v-list-group
-                                    v-for="(obj, index) in listApp"
-                                    :key="index"
-                                    :prepend-icon="obj.icon"
+                                    v-for="(obj, appIndex) in listAppSelected"
+                                    :key="appIndex"
                                     nav dense
                                     value="true"
                                 >
                                     <template v-slot:activator>
-                                        <v-list-item-title>{{obj.name}}</v-list-item-title>
+                                        <v-list-item-title>
+                                            <icon :icon="obj.icon" :size="18"></icon>
+                                            {{obj.name}}
+                                        </v-list-item-title>
                                     </template>
                                     <v-list-group 
                                         sub-group 
                                         value="true" 
-                                        v-for="(listObjs) in obj.objects" 
+                                        v-for="(listObjs, objectIndex) in obj.objects" 
                                         :key="listObjs.type">
                                         <template v-slot:activator>
                                             <v-list-item-content>
-                                                <v-list-item-title>{{listObjs.type}}</v-list-item-title>
+                                                <v-list-item-title class="text-capitalize">{{listObjs.type}}</v-list-item-title>
                                             </v-list-item-content>
                                         </template>
                                         <v-list-item
-                                            v-for="(item) in listObjs.data"
+                                            v-for="(item, itemIndex) in listObjs.data"
                                             :key="listObjs.type+item.id"
-                                            :prepend-icon="item.icon"
                                             v-show="(item.checked != undefined && !!item.checked)"
-                                            @click="selectItem(item, listObjs.type, null)"
                                             active-class="pink"
                                         >
-                                            <v-list-item-title
-                                                v-text="item.title != undefined && !!item.title ? item.title : item.name" 
-                                                class="pl-4"
-                                            >
+                                            <v-list-item-title>
+                                                <icon :icon="item.icon"></icon>
+                                                {{item.title != undefined && !!item.title ? item.title : item.name}}
                                             </v-list-item-title>
+                                            <v-list-item-action>
+                                                <v-icon @click.stop="toggleObject(item, listObjs.type, [appIndex, objectIndex, itemIndex], obj.id)">mdi-delete</v-icon>
+                                            </v-list-item-action>
                                         </v-list-item>
                                     </v-list-group>
                                 </v-list-group>
@@ -230,7 +228,7 @@
                 </SplitGridArea>
             </SplitGrid>
         </SplitGrid>
-        <v-btn
+        <!-- <v-btn
             small
             color="primary"
             @click="saveTableDisplayConfig()"
@@ -238,17 +236,34 @@
         >
             <v-icon class="mr-2">mdi-content-save-outline</v-icon>
             {{$t('common.save')}}
-        </v-btn>
+        </v-btn> -->
     </v-container>
 </template>
 
 <style type="text/css" scoped>
-    /* .v-text-field.v-text-field--enclosed .v-text-field__details {
+    .search-wrap {
+        position: relative;
+    }
+    .search-results {
+        position: absolute;
+        top: 35px;
+        left: 13px;
+        border-radius: 2px;
+        background-color: #fff;
+        z-index: 100;
+        border: 1px solid #dedede;
+        width: calc(100% - 37px);
+        max-height: 400px;
+        overflow: auto;
+    }
+    .list-app-object >>> .v-list-group__items .v-list-item .v-list-item__action{
         display: none;
     }
-    .v-text-field.v-text-field--solo .v-input__control {
-        min-height: 32px !important;
-    } */
+    .list-app-object >>> .v-list-group__items .v-list-item:hover .v-list-item__action{
+        display: block;
+        height: 18px;
+        line-height: 0px;
+    }
     .pos-abs {
         position: fixed;
         bottom: 20px;
@@ -295,15 +310,14 @@
     .vsg_gutter:hover {
         width: 5px;
     }
-    .sym-small-size >>> .v-input__slot,
-    .sym-small-size >>> .v-input__control{
-        background: #f5f5f5 !important;
-    }
     .v-list-item >>> .v-list-item__icon,
     .v-list-group >>> .v-list-item__icon:first-child {
         margin-top: 3px;
         margin-right: 8px !important;
         margin-bottom: 3px;
+    }
+    .v-list-group >>> .v-list-group--sub-group >>> .v-list-group__items >>> .v-list-item {
+        padding-left: 35px;
     }
     .v-menu__content >>> .v-list-item__content,
     .v-list-group >>> .v-list-item__content {
@@ -336,10 +350,13 @@
         margin-bottom: 0 !important;
         margin-top: 0 !important;
     }
+    .v-menu__content >>> .v-list-item__action,
+    .vsg_split-grid >>> .v-list-item__action,
     .vsg_split-grid.sb_split-grid .vsg_split-grid .vsg_area:nth-child(3) .v-list .v-list-item__action {
         margin-bottom: 0 !important;
         margin-top: 0 !important;
     }
+    .vsg_split-grid.sb_split-grid .vsg_split-grid .vsg_area:nth-child(2) .v-list .v-list-item,
     .vsg_split-grid.sb_split-grid .vsg_split-grid .vsg_area:nth-child(3) .v-list .v-list-item {
         padding-top: 0;
         padding-bottom: 0;
@@ -349,12 +366,15 @@
 <script>
 import { SplitGrid, SplitGridArea, SplitGridGutter } from "vue-split-grid";
 import Api from "./../../api/api.js";
+import vClickOutside from 'v-click-outside'
+import icon from "../../components/common/SymperIcon";
 export default {
     name: "grandPermission",
     components: {
         SplitGrid,
         SplitGridArea,
         SplitGridGutter,
+        icon,
     },
     props: {
         package: {
@@ -363,6 +383,9 @@ export default {
         },
     },
     computed: {},
+    directives: {
+        clickOutside: vClickOutside.directive
+    },
     data: function() {
         return {
             apiUrl: "https://v2hoangnd.dev.symper.vn/",
@@ -375,22 +398,17 @@ export default {
             keyword: "",
             searchPackKeyword: "",
             listApp: [],
-            listObjectInPackage: [],
-            listObjectInPackageToShow: [],
-            listObjectInPackageName: [],
             listResultApp: [],
             listSelecteditemOptions: [],
             listActionPacks: [],
             selectedObj: null,
             listActions: [],
+            listAppSelected: []
         };
     },
     watch: {
         package: function (pack) {
             this.getAllObjectOfPack(pack);
-        },
-        keyword: function (value) {
-            this.searchObject(value);
         },
         listActionPacks: function(actionPacks) {
             let listSelectedPack = actionPacks.filter(item => { return item.checked });
@@ -420,34 +438,117 @@ export default {
         closeBoxSearch() {
             this.isShowSearchBox = false;
         },
-        searchObject(value) {
+        searchObject() {
+            let value = this.keyword;
+            this.listResultApp = JSON.parse(JSON.stringify(this.listApp));
             if (value != null && value.trim().length > 0) {
                 let searchStr = value.toLocaleLowerCase().trim();
-                this.listResultApp = Object.assign([], this.listApp);
                 for (let index = 0; index < this.listResultApp.length; index++) {
                     for (let i = 0; i < this.listResultApp[index].objects.length; i++) {
-                        console.log(this.listResultApp[index].objects[i].data, this.listResultApp[index].objects[i].type);
-                        this.listResultApp[index].objects[i].data = this.listResultApp[index].objects[i].data.filter(item => {
-                            return 
+                        let objects = JSON.parse(JSON.stringify(this.listResultApp[index].objects[i].data)),
+                            count = 0;
+                        this.listResultApp[index].objects[i].data = [];
+                        for (let item of objects) {
+                            if (
                                 item.name.toLocaleLowerCase().includes(searchStr) || (
                                     item.title != undefined && 
                                     item.title.toLocaleLowerCase().includes(searchStr)
-                                );
-                        });
+                                )
+                            ) {
+                                this.listResultApp[index].objects[i].data.push(item);
+                                if (++count >= 10) {
+                                    break;
+                                }
+                            }
+                        }
                     }
                 }
             } else {
-                this.listResultApp = Object.assign([], this.listApp);
+                this.resetResult();
             }
         },
-        selectItem(item, type, appId) {
-            this.listSelecteditemOptions = this.listActions.filter(obj => {
-                return obj.type == type;
-            })[0].actions;
-            this.selectedObj = item;
-            if (this.selectedObj.permission == undefined) {
-                this.selectedObj.permission = {};
+        resetResult() {
+            this.listResultApp = JSON.parse(JSON.stringify(this.listApp));
+            // this.listResultApp = this.listResultApp.slice(0, 2);
+            for (let index = 0; index < this.listResultApp.length; index++) {
+                for (let i = 0; i < this.listResultApp[index].objects.length; i++) {
+                    this.listResultApp[index].objects[i].data = this.listResultApp[index].objects[i].data.slice(0, 10);
+                }
             }
+        },
+        toggleObject(item, type, indexes, appId = null) {
+            if (appId != null) {
+                this.selectApp(item, type, indexes, appId);
+            }
+        },
+        selectApp(item, type, index, appId) {
+            item.checked = item.checked == 0 ? 1: 0;
+            this.listResultApp[index[0]].objects[index[1]].data[index[2]].checked = item.checked;
+            for (let appIndex = 0; appIndex < this.listApp.length; ++appIndex) {
+                const app = this.listApp[appIndex];
+                let object = app.objects.filter(item => {return item.type == type})[0];
+                for (let typeIndex = 0; typeIndex < app.objects.length; typeIndex++) {
+                    const obj = app.objects[typeIndex];
+                    if (obj.type == type) {
+                        for (let itemIndex = 0; itemIndex < object.data.length; itemIndex++) {
+                            const obj = object.data[itemIndex];
+                            if (obj.id == item.id) {
+                                this.listApp[appIndex].objects[typeIndex].data[itemIndex].checked = item.checked;
+                                this.saveToggleObjectInApp(item, type, appId);
+                                this.resetAppToShow();
+                            }
+                        }
+                        break;
+                    }    
+                }
+            }
+        },
+        showError(){
+            this.$snotify({
+                type: 'success',
+                title: this.$t('notification.errorTitle'),
+                text: this.$t('notification.error')
+            })
+        },
+        saveToggleObjectInApp(item, type, appId) {
+            let req = new Api(this.apiUrl);
+            req.post(this.packPath + `/${this.package.id}/objects`, {
+                appId: appId,
+                objectType: type,
+                objectId: item.id
+            })
+            .then(res => {
+                console.log(res);
+                if (res.status !== 200) {
+                    this.showError()
+                }
+            })
+        },
+        resetAppToShow() {
+            this.listAppSelected = [];
+            this.listApp.forEach(app => {
+                let hasObjectToShow = false;
+                let appToAdd = JSON.parse(JSON.stringify(app));
+                appToAdd.objects = [];
+                app.objects.forEach(obj => {
+                    let objs = [];
+                    obj.data.forEach(item => {
+                        if (item.checked == 1) {
+                            objs.push(item);
+                        }
+                    });
+                    if (objs.length) {
+                        appToAdd.objects.push({
+                            type: obj.type,
+                            data: objs
+                        });
+                        hasObjectToShow = true;
+                    }
+                });
+                if (hasObjectToShow) {
+                    this.listAppSelected.push(appToAdd);
+                }
+            });
         },
         getAllObject() {
             let req = new Api(this.apiUrl);
@@ -465,12 +566,6 @@ export default {
                                 type: objs.type,
                                 data: objs.objects
                             });
-                            this.listActions.push(
-                                {
-                                    type: objs.type,
-                                    actions: objs.actions,
-                                }
-                            );
                         }
                         this.listApp = [...[app], ...this.listApp];
                     }
@@ -508,8 +603,33 @@ export default {
             req.get(this.packPath + "/" + pack.id + "/objects")
                 .then((res) => {
                     if (res.status === 200) {
-                        this.listObjectInPackage = res.data.listObject;
-                        this.listObjectInPackageToShow = res.data.listObject;
+                        let app = {};
+                        res.data.forEach(item => {
+                            if (!(item.app in app)) {
+                                app[item.app] = {}
+                            }
+                            if (!(item.type in app[item.app])) {
+                                app[item.app][item.type] = [];
+                            }
+                            app[item.app][item.type].push(item.id)
+                        });
+                        for (let appIndex = 0; appIndex < this.listApp.length; appIndex++) {
+                            const appInstance = this.listApp[appIndex];
+                            for (let objectIndex = 0; objectIndex < appInstance.objects.length; objectIndex++) {
+                                const objects = appInstance.objects[objectIndex];
+                                if (app[appInstance.id] != undefined && app[appInstance.id][objects.type] !== undefined) {
+                                    objects.data.forEach((item, itemIndex) => {
+                                        this.listApp[appIndex].objects[objectIndex].data[itemIndex].checked = app[appInstance.id][objects.type].indexOf(item.id) > -1 ? 1 : 0;
+                                    });
+                                } else {
+                                    objects.data.forEach((item, itemIndex) => {
+                                        this.listApp[appIndex].objects[objectIndex].data[itemIndex].checked = 0;
+                                    });
+                                }
+                            }
+                        }
+                        this.resetAppToShow();
+                        this.resetResult();
                     }
                 })
                 .catch((err) => {

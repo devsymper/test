@@ -191,7 +191,26 @@
         },
         "created": "Permission package created",
         "deleted": "Permission package deleted",
-        "updated": "Permission package updated"
+        "updated": "Permission package updated",
+        "listPermission": {
+            "1": "View detaIL",
+            "2": "View list",
+            "4": "Create/submit",
+            "8": "Edit",
+            "16": "Execute",
+            "32": "Delete",
+            "64": "Clone",
+            "128": "Export",
+            "256": "Import",
+            "512": "Import chunk",
+            "1024": "Lock user",
+            "2048": "Grant permission",
+            "4096": "Grant permisison in group",
+            "8192": "Deny",
+            "16384": "Printer configuration",
+            "32768": "View all controls",
+            "65536": "View allowed controls"
+        }
     },
     "process": {
         "header_bar": {
@@ -227,6 +246,37 @@
         "contextMenu": {
             "edit": "Edit",
             "grantPermission": "Grant permission",
+            "remove": "Delete"
+        },
+        "updated": "Permission package updated",
+        "added": "Permission package created",
+        "deleted": "Permission package deleted"
+    },
+    "actions": {
+        "header": {
+            "id": "ID",
+            "name": "Name",
+            "note": "Note",
+            "icon": "Icon",
+            "price": "Price",
+            "status": "Status",
+            "is_default": "Default Package",
+            "created_at": "Date create",
+            "updated_at": "Last update"
+        },
+        "title": "Applications",
+        "addAction": "Add Actions Package",
+        "editAction": "Edit Actions Package",
+        "pickIcon": "Pick icon",
+        "apps": "Applications",
+        "defaultPack": "Default pack",
+        "commonInfo": "General",
+        "listObjects": "Objects",
+        "addObject": "Add object",
+        "objectTypes": "Object type",
+        "objectSummary": "Objects summary",
+        "contextMenu": {
+            "edit": "Edit",
             "remove": "Delete"
         },
         "updated": "Permission package updated",

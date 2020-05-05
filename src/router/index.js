@@ -14,6 +14,7 @@ import ActionPanel from "../views/users/ActionPanel.vue";
 import Snippet from "../views/snippets/index.vue";
 import Permissions from "../views/permissions/index.vue";
 import apps from "../views/apps/index.vue";
+import actions from "../views/actions/index.vue";
 import Editor from "../views/document/Editor.vue";
 
 Vue.use(VueRouter);
@@ -95,6 +96,11 @@ const routes = [{
         path: "/apps",
         name: "apps",
         component: apps,
+    },
+    {
+        path: "/actions",
+        name: "actions",
+        component: actions,
     },
 
     // Luôn để 2 item này ở cuối cùng của array này để nó có thể redirect đến được trang 404 khi ko tìm thấy route

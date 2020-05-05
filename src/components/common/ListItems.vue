@@ -864,6 +864,9 @@ export default {
                     } else if (item.type === 'status') {
                         colMap[item.name].type = 'handsontable';
                         colMap[item.name].renderer = this.statusRenderer;
+                    } else if (item.type === 'checkbox') {
+                        colMap[item.name].checkedTemplate = item.checkedValue != undefined ? item.checkedValue : 1;
+                        colMap[item.name].uncheckedTemplate = item.uncheckedValue != undefined ? item.uncheckedValue : 0;
                     } else if(item.type === 'numeric' && item.hasFormat != undefined) {
                         colMap[item.name].numericFormat = {
                             pattern: item.pattern != undefined && !!item.pattern ? item.pattern : "0,0"

@@ -191,7 +191,26 @@
         },
         "created": "Đã tạo mới nhóm quyền",
         "deleted": "Đã xóa nhóm quyền",
-        "updated": "Đã cập nhật nhóm quyền"
+        "updated": "Đã cập nhật nhóm quyền",
+        "listPermission": {
+            "1": "Xem chi tiết",
+            "2": "Xem danh sách",
+            "4": "Tạo mới",
+            "8": "Sửa",
+            "16": "Thực thi",
+            "32": "Xóa",
+            "64": "Clone",
+            "128": "Xuất excel",
+            "256": "Import",
+            "512": "Import nhiều bản ghi",
+            "1024": "Khóa người dùng",
+            "2048": "Phân quyền",
+            "4096": "Phân quyền trong nhóm",
+            "8192": "Deny",
+            "16384": "Cấu hình printer",
+            "32768": "Xem toàn bộ control",
+            "65536": "Xem những control được cho phép"
+        }
     },
     "process": {
         "header_bar": {
@@ -232,6 +251,36 @@
         "updated": "Đã cập nhật application",
         "added": "Đã thêm mới application",
         "deleted": "Đã xóa application"
+    },
+    "actions": {
+        "header": {
+            "id": "ID",
+            "name": "Tên",
+            "icon": "Icon",
+            "price": "Giá",
+            "note": "Ghi chú",
+            "status": "Trạng thái",
+            "created_at": "Ngày tạo",
+            "is_default": "Mặc định",
+            "updated_at": "Cập nhật lần cuối"
+        },
+        "title": "Actions Package",
+        "addAction": "Thêm Actions Package",
+        "editAction": "Chỉnh sửa Actions Package",
+        "pickIcon": "Chọn icon",
+        "defaultPack": "Mặc định",
+        "objectTypes": "Loại object",
+        "commonInfo": "Thông tin chung của actions package",
+        "listObjects": "Các chức năng trong actions package",
+        "addObject": "Thêm tính năng",
+        "objectSummary": "Tổng hợp các chức năng",
+        "contextMenu": {
+            "edit": "Sửa",
+            "remove": "Xóa"
+        },
+        "updated": "Đã cập nhật actions package",
+        "added": "Đã thêm mới actions package",
+        "deleted": "Đã xóa actions package"
     },
     "iconPicker": {
         "header": "Chọn icon",
