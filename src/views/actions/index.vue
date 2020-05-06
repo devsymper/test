@@ -79,7 +79,8 @@ export default {
                 name: "",
                 note: "",
                 icon: "",
-                status: false
+                status: false,
+                is_default: false,
             });
         },
         closeSidebar() {

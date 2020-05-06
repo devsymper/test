@@ -188,23 +188,16 @@ export default {
         currentAction(val) {
             this.searchStr = "";
             this.resetResult();
+            this.listObjectInActionPack = {};
+            this.resetListPermission();
+            this.resetAppObject();
+            this.selectedType = this.allObjectType[0] != undefined ? this.allObjectType[0] : null;
             if (val.id !== undefined && !!val.id) {
                 this.getAllObjectInApp(val.id);
             }
         },
-        selectedType(val) {
-            this.listPermissionToShow = [];
-            if (val in this.listObjectInActionPack) {
-                this.listPermissionToShow = JSON.parse(JSON.stringify(this.listObjectInActionPack[val]));
-            }
-            let listValues = [];
-            this.listPermissionToShow.forEach(permit => {
-                listValues.push(permit.value);
-            });
-            this.listPermission.forEach((permit, index) => {
-                this.listPermission[index].checked = listValues.indexOf(permit.value) > -1 ? 1 : 0;
-            });
-            this.searchObjectToimport();
+        selectedType(type) {
+            this.setListObjectForType(type);
         }
     },
     computed: {
@@ -243,6 +236,33 @@ export default {
         this.getAllObjectType();
     },
     methods: {
+        setListObjectForType(type) {
+            if (type == null) {
+                return;
+            }
+            this.listPermissionToShow = [];
+            if (type in this.listObjectInActionPack) {
+                this.listPermissionToShow = JSON.parse(JSON.stringify(this.listObjectInActionPack[type]));
+            }
+            let listValues = [];
+            this.listPermissionToShow.forEach(permit => {
+                listValues.push(permit.value);
+            });
+            this.listPermission.forEach((permit, index) => {
+                this.listPermission[index].checked = listValues.indexOf(permit.value) > -1 ? 1 : 0;
+            });
+            this.searchObjectToimport();
+        },
+        resetListPermission() {
+            for (const index in this.listPermission) {
+                this.listPermission[index].checked = 0;
+                this.listPermission[index].setted = 0;
+            }
+            for (const index in this.listPermissionResult) {
+                this.listPermissionResult[index].checked = 0;
+                this.listPermissionResult[index].setted = 0;
+            }
+        },
         setAppObject(app) {
             this.currentAction = JSON.parse(JSON.stringify(app));
             this.currentAction.isDefault = this.currentAction.is_default;
@@ -253,28 +273,23 @@ export default {
             .then(res => {
                 // callback here
                 if (res.status == 200) {
-                    this.listObjectInActionPack = res.data.objects != null ? JSON.parse(JSON.stringify(res.data.objects)) : {};
-                    console.log(this.listObjectInActionPack);
-                    // let objs = {};
-                    // res.data.forEach(item => {
-                    //     if (!(item.type in objs)) {
-                    //         objs[item.type] = [];
-                    //     }
-                    //     objs[item.type].push(item.id)
-                    // });
-                    // this.allObjectType.forEach((obj, appIndex) => {
-                    //     if (objs[obj.type] != undefined) {
-                    //         obj.objects.forEach((item, itemIndex) => {
-                    //             this.allObjectType[appIndex].objects[itemIndex].checked = objs[obj.type].indexOf(item.id) > -1 ? 1 : 0;
-                    //         });
-                    //     } else {
-                    //         obj.objects.forEach((item, itemIndex) => {
-                    //             this.allObjectType[appIndex].objects[itemIndex].checked = 0;
-                    //         });
-                    //     }
-                    // });
-                    // this.resetAppObject()
+                    this.listObjectInActionPack = {};
+                    let objs = res.data.objects != null ? JSON.parse(res.data.objects) : {};
+                    let permission = res.data.permission != null ? JSON.parse(res.data.permission) : {};
+                    this.allObjectType.forEach(type => {
+                        this.listObjectInActionPack[type] = [];
+                        objs[type] = parseInt(objs[type]);
+                        this.listPermission.forEach(permit => {
+                            if(!!(objs[type] & parseInt(permit.value)) ) {
+                                if (type in permission) {
+                                    permit.setted = !!( parseInt(permission[type]) & parseInt(permit.value) ) ? 1 : 0;
+                                }
+                                this.listObjectInActionPack[type].push(permit);
+                            }
+                        });
+                    });
                     this.$refs.iconPicker.reset();
+                    this.setListObjectForType(this.selectedType);
                 }
             }).catch((err) => {
             });
@@ -343,9 +358,6 @@ export default {
         },
         resetResult() {
             this.listPermissionResult = JSON.parse(JSON.stringify(this.listPermission));
-            // for (const index in this.listPermissionResult) {
-            //     this.listPermissionResult[index].checked = 0;
-            // }
         },
         getAllObjectType() {
             let req = new Api(this.apiUrl);
@@ -396,9 +408,27 @@ export default {
             })
             return objs;
         },
+        getListPermissionInShort() {
+            let objs = {};
+            this.allObjectType.forEach(type => {
+                if (!(type in objs)) {
+                    objs[type] = 0;
+                }
+                if (this.listObjectInActionPack[type] != undefined) {
+                    this.listObjectInActionPack[type].forEach(permit => {
+                        objs[type] += !!permit.setted ? parseInt(permit.value) : 0;
+                    })
+                }
+            })
+            return objs;
+        },
         createApp() {
             let req = new Api(this.apiUrl);
-            req.post(this.actionUrl, {...this.currentAction, objects: this.getListObjsInShort()})
+            req.post(this.actionUrl, {
+                ...this.currentAction, 
+                objects: this.getListObjsInShort(),
+                permission: this.getListPermissionInShort()
+            })
             .then((res) => {
                 this.$emit("add-app", res)
             }).catch((err) => {
@@ -407,7 +437,11 @@ export default {
         },
         updateApp() {
             let req = new Api(this.apiUrl);
-            req.put(this.actionUrl, {...this.currentAction, objects: this.getListObjsInShort()})
+            req.put(this.actionUrl, {
+                ...this.currentAction, 
+                objects: this.getListObjsInShort(),
+                permission: this.getListPermissionInShort()
+            })
             .then((res) => {
                 this.$emit("update-app", res)
             }).catch((err) => {
