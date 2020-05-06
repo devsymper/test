@@ -104,7 +104,7 @@ export default {
             req.delete(this.permissiontUrl + "/" + permission.id)
             .then(res => {
                 if (res.status === 200) {
-                    this.removeCallback(result);
+                    this.removeCallback(res);
                     this.closeSidebar();
                     this.$snotify({
                         type: 'success',
