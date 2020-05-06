@@ -76,7 +76,6 @@ import { getNodeAttrs, nodeAttrsDefinition } from "./nodeAttrsFactory";
 import { allAttrDisplayGroup } from "./allAttrDisplayGroup";
 import FormTpl from "./../common/FormTpl.vue";
 
-
 export default {
     data() {
         return {
@@ -124,28 +123,39 @@ export default {
         "form-tpl": FormTpl
     },
     methods: {
-        getNodeType(nodeData){
-            let nodeType = nodeData.$type.replace('bpmn:','');
-            if(nodeType.includes('Event') && nodeData.eventDefinitions){
-                let evtType = nodeData.eventDefinitions[0].$type.replace('bpmn:','');
-                evtType = evtType.replace('EventDefinition','');
-                nodeType = evtType+nodeType;
+        getNodeType(nodeData) {
+            let nodeType = nodeData.$type.replace("bpmn:", "");
+            if (nodeType.includes("Event") && nodeData.eventDefinitions) {
+                let evtType = nodeData.eventDefinitions[0].$type.replace(
+                    "bpmn:",
+                    ""
+                );
+                evtType = evtType.replace("EventDefinition", "");
+                nodeType = evtType + nodeType;
+            } else if (
+                nodeType == "bpmn:SubProcess" &&
+                nodeData.triggeredByEvent
+            ) {
+                nodeType = "EventSubProcess";
             }
             return nodeType;
         },
-        handleNodeChangeProps(nodeData){
+        handleNodeChangeProps(nodeData) {
             let nodeId = nodeData.id;
             let nodeState = this.$store.state.process.allNodes[nodeId];
-            let newType =  this.getNodeType(nodeData);
-            console.log(newType);
-            
-            if(nodeState){
-                if(newType != nodeState.type){
+            let newType = this.getNodeType(nodeData);
+            console.log(newType, nodeData);
+
+            if (nodeState) {
+                if (newType != nodeState.type) {
                     this.changeNodeType(nodeState, newType);
                 }
 
-                if(nodeId == this.selectingNode.id){
-                    this.$store.commit("process/changeSelectingNode", this.$store.state.process.allNodes[nodeId]);
+                if (nodeId == this.selectingNode.id) {
+                    this.$store.commit(
+                        "process/changeSelectingNode",
+                        this.$store.state.process.allNodes[nodeId]
+                    );
                 }
             }
         },
@@ -155,11 +165,12 @@ export default {
          * @param {Object} nodeState Object chứa state của node cần thay đổi (data của node cũ)
          * @param {String} newType Loại node mới cần đổi
          */
-        changeNodeType(nodeState, newType){
+        changeNodeType(nodeState, newType) {
             let newNodeData = this.createNodeData(nodeState.id, newType);
-            for(let attrName in newNodeData.attrs){
-                if(nodeState.attrs[attrName]){
-                    newNodeData.attrs[attrName].value = nodeState.attrs[attrName].value;
+            for (let attrName in newNodeData.attrs) {
+                if (nodeState.attrs[attrName]) {
+                    newNodeData.attrs[attrName].value =
+                        nodeState.attrs[attrName].value;
                 }
             }
             this.$store.commit("process/addNewNode", newNodeData);
@@ -169,13 +180,18 @@ export default {
             let type = this.selectingNode.type;
             let typeData = nodeAttrsDefinition[type];
 
-
-            if(typeData.checkShowOrHideInput){
+            if (typeData.checkShowOrHideInput) {
                 typeData.checkShowOrHideInput(this.selectingNode.attrs);
             }
 
-            if(typeData.validate){
+            if (typeData.validate) {
                 typeData.validate(this.selectingNode.attrs);
+            }
+            if (name == "name") {
+                this.$refs.symperBpmn.updateElementProperties(
+                    this.$store.state.process.selectingNode.id,
+                    { name: inputInfo.value }
+                );
             }
         },
         /**
@@ -196,6 +212,7 @@ export default {
                 type: nodeType,
                 attrs: getNodeAttrs(nodeType)
             };
+            nodeData.attrs.id.value = nodeId;
             this.$store.commit("process/addNewNode", nodeData);
             return nodeData;
         },
@@ -204,7 +221,7 @@ export default {
          */
         handleNodeSelected(node) {
             let type = this.getNodeType(node);
-            console.log(type);
+            console.log(type, node);
 
             let nodeData = this.getNodeData(node.id, type);
             this.$store.commit("process/changeSelectingNode", nodeData);
@@ -227,11 +244,11 @@ export default {
             default: "create"
         }
     },
-    created(){
-        this.$store.dispatch('app/getAllOrgChartData');
+    created() {
+        this.$store.dispatch("app/getAllOrgChartData");
     },
     computed: {
-        selectingNode(){
+        selectingNode() {
             return this.$store.state.process.selectingNode;
         },
         /** Chuyển dạng danh sách attr từ dạng phẳng sang dạng nhóm thành các group để hiển thị **/

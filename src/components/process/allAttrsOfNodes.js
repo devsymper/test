@@ -60,6 +60,13 @@ export const allNodesAttrs = {
         info: '',
         dg: 'multiInstance'
     },
+    conditionScript: {
+        title: 'condition Script',
+        type: 'script',
+        value: '',
+        info: '',
+        dg: 'formula'
+    },
     script: {
         title: 'Script',
         type: 'script',
@@ -315,4 +322,202 @@ export const allNodesAttrs = {
         activeTab: 'orgchart', // tab nào sẽ mở: orgchart hoặc script
         dg: 'assignment'
     },
+    interrupting: {
+        title: 'Interrupting',
+        type: 'checkbox',
+        value: false,
+        info: '',
+        dg: 'detail'
+    },
+    timeCycle: {
+        title: 'Time cycle',
+        type: 'script',
+        value: '',
+        info: '',
+        dg: 'detail'
+    },
+    startDate: {
+        title: 'Start date',
+        type: 'script',
+        value: '',
+        info: '',
+        dg: 'detail'
+    },
+    timeDuration: {
+        title: 'Time duration',
+        type: 'script',
+        value: '',
+        info: '',
+        dg: 'detail'
+    },
+    signalReference: {
+        title: 'Signal reference',
+        type: 'select',
+        value: '',
+        info: '',
+        options: [],
+        dg: 'detail'
+    },
+    messageReference: {
+        title: 'Message reference',
+        type: 'select',
+        value: '',
+        info: '',
+        options: [],
+        dg: 'detail'
+    },
+    escalationReference: {
+        title: 'Escalation reference',
+        type: 'select',
+        value: '',
+        info: '',
+        options: [],
+        dg: 'detail'
+    },
+    errorReference: {
+        title: 'Error reference',
+        type: 'select',
+        value: '',
+        info: '',
+        options: [],
+        dg: 'detail'
+    },
+    terminateAll: {
+        title: 'Terminate All',
+        type: 'checkbox',
+        value: '',
+        info: '',
+        dg: 'detail'
+    },
+    completeAsynchronously: {
+        title: 'Complete asynchronously',
+        type: 'checkbox',
+        value: '',
+        info: '',
+        dg: 'detail'
+    },
+    calledElement: {
+        title: 'Called element',
+        type: 'select',
+        value: '',
+        info: '',
+        options: [],
+        dg: 'detail'
+    },
+    inParameters: {
+        title: 'In parameters',
+        type: 'table',
+        value: [],
+        columns: [],
+        info: '',
+        dg: 'detail'
+    },
+    outParameters: {
+        title: 'Out parameters',
+        type: 'table',
+        value: [],
+        columns: [],
+        info: '',
+        dg: 'detail'
+    },
+    inheritVariables: {
+        title: 'Inherit variables in sub process',
+        type: 'checkbox',
+        value: false,
+        info: '',
+        dg: 'detail'
+    },
+    sameDeployment: {
+        title: 'Start the referenced process from the same deployment',
+        type: 'checkbox',
+        value: false,
+        info: '',
+        dg: 'detail'
+    },
+    processInstanceName: {
+        title: 'Process instance name',
+        type: 'text',
+        value: '',
+        info: '',
+        dg: 'detail'
+    },
+    inheritBusinessKey: {
+        title: 'Inherit businessKey',
+        type: 'checkbox',
+        value: false,
+        info: '',
+        dg: 'detail'
+    },
+    businessKey: {
+        title: 'Business key expression',
+        type: 'script',
+        value: '',
+        info: '',
+        dg: 'detail'
+    },
+    useLocalScopeForOutParameters: {
+        title: 'Use local scope for out parameters',
+        type: 'checkbox',
+        value: false,
+        info: '',
+        dg: 'detail'
+    },
+    notificationTitle: {
+        title: 'Notification title',
+        type: 'script',
+        value: '',
+        info: '',
+        dg: 'formula'
+    },
+    notificationContent: {
+        title: 'Notification content',
+        type: 'script',
+        value: '',
+        info: '',
+        dg: 'formula'
+    },
+    approvalForElement: {
+        title: 'Approval for element',
+        type: 'select',
+        value: '',
+        info: '',
+        options: [],
+        dg: 'taskAction'
+    },
+    dataObject: {
+        title: 'Data object',
+        type: 'table',
+        value: [{}],
+        info: '',
+        columns: [{
+                title: 'Id',
+                name: 'id',
+                type: 'text',
+            },
+            {
+                title: 'Name',
+                name: 'name',
+                type: 'text'
+            },
+            {
+                title: 'Type',
+                name: 'type',
+                type: 'autocomplete',
+                source: ["string", "boolean", "datetime", "int", "long"]
+            },
+            {
+                title: 'Default value',
+                name: 'defaultValue',
+                type: 'text'
+            },
+        ],
+        dg: 'taskAction'
+    },
+    cancelRemainingInstances: {
+        title: 'Cancel remaining instances',
+        type: 'checkbox',
+        value: true,
+        info: '',
+        dg: 'detail'
+    }
 }

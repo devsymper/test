@@ -174,6 +174,18 @@ export default {
                     link[0].click();
                 }, 200);
             }
+        },
+        /**
+         * Update thuộc tính của một element trong bpmn 
+         * @param {String} eleId Id của element cần update
+         * @param {Object} attrs Các thuộc tính cần update, dạng key-value
+         */
+        updateElementProperties(eleId, props){
+            let ele = this.bpmnModeler.get('elementRegistry').get(eleId);
+            this.modeling.updateProperties(
+                ele,
+                props
+            );
         }
     }
 };

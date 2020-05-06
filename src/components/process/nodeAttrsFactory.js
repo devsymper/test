@@ -21,7 +21,7 @@ const groupsAttrs = {
 export const nodeAttrsDefinition = {
     'UserTask': {
         group: 'task', // nhóm thuộc tính mà node này thuộc về, giá trị là một hoặc nhiều key trong "groupsAttrs"
-        attrs: ['taskAction', 'formReference', 'formKey', 'taskOwner', 'assignee', 'candidateUsers', 'validateFormFields', 'priority', 'taskListeners', 'skipExpression', 'category', 'approvalActions', 'dueDate'],
+        attrs: ['taskAction', 'formReference', 'formKey', 'taskOwner', 'assignee', 'candidateUsers', 'notificationTitle', 'notificationContent', 'validateFormFields', 'priority', 'taskListeners', 'skipExpression', 'category', 'approvalActions', 'approvalForElement', 'dueDate'],
         exclude: ['asynchronous', 'exclusive'],
         validate: function(attrs) {
 
@@ -31,9 +31,11 @@ export const nodeAttrsDefinition = {
             if (taskAction.value == 'submit') {
                 attrs.approvalActions.hidden = true;
                 attrs.formReference.hidden = false;
+                attrs.approvalForElement.hidden = true;
             } else if (taskAction.value == 'approval') {
                 attrs.approvalActions.hidden = false;
                 attrs.formReference.hidden = true;
+                attrs.approvalForElement.hidden = false;
             }
         }
     },
@@ -120,7 +122,8 @@ export const nodeAttrsDefinition = {
 
         }
     },
-    'StartConditionalEvent': {
+    'ConditionalStartEvent': {
+        attrs: ['conditionScript', 'interrupting'],
         validate: function(attrs) {
 
         },
@@ -128,7 +131,8 @@ export const nodeAttrsDefinition = {
 
         }
     },
-    'StartTimerEvent': {
+    'TimerStartEvent': {
+        attrs: ['startDate', 'timeCycle', 'timeDuration'],
         validate: function(attrs) {
 
         },
@@ -136,7 +140,8 @@ export const nodeAttrsDefinition = {
 
         }
     },
-    'StartSignalEvent': {
+    'SignalStartEvent': {
+        attrs: ['signalReference', 'interrupting'],
         validate: function(attrs) {
 
         },
@@ -144,7 +149,8 @@ export const nodeAttrsDefinition = {
 
         }
     },
-    'StartMessageEvent': {
+    'MessageStartEvent': {
+        attrs: ['messageReference', 'interrupting'],
         validate: function(attrs) {
 
         },
@@ -153,6 +159,7 @@ export const nodeAttrsDefinition = {
         }
     },
     'IntermediateThrowEvent': {
+        attrs: ['asynchronous'],
         validate: function(attrs) {
 
         },
@@ -161,6 +168,7 @@ export const nodeAttrsDefinition = {
         }
     },
     'MessageIntermediateCatchEvent': {
+        attrs: ['messageReference'],
         validate: function(attrs) {
 
         },
@@ -169,6 +177,7 @@ export const nodeAttrsDefinition = {
         }
     },
     'TimerIntermediateCatchEvent': {
+        attrs: ['startDate', 'timeCycle', 'timeDuration'],
         validate: function(attrs) {
 
         },
@@ -177,6 +186,7 @@ export const nodeAttrsDefinition = {
         }
     },
     'EscalationIntermediateThrowEvent': {
+        attrs: ['escalationReference', 'asynchronous'],
         validate: function(attrs) {
 
         },
@@ -185,6 +195,7 @@ export const nodeAttrsDefinition = {
         }
     },
     'ConditionalIntermediateCatchEvent': {
+        attrs: ['conditionScript'],
         validate: function(attrs) {
 
         },
@@ -217,6 +228,7 @@ export const nodeAttrsDefinition = {
         }
     },
     'SignalIntermediateCatchEvent': {
+        attrs: ['signalReference'],
         validate: function(attrs) {
 
         },
@@ -225,6 +237,7 @@ export const nodeAttrsDefinition = {
         }
     },
     'SignalIntermediateThrowEvent': {
+        attrs: ['signalReference', 'asynchronous'],
         validate: function(attrs) {
 
         },
@@ -233,6 +246,7 @@ export const nodeAttrsDefinition = {
         }
     },
     'EndEvent': {
+
         validate: function(attrs) {
 
         },
@@ -249,6 +263,7 @@ export const nodeAttrsDefinition = {
         }
     },
     'EscalationEndEvent': {
+        attrs: ['escalationReference'],
         validate: function(attrs) {
 
         },
@@ -257,6 +272,7 @@ export const nodeAttrsDefinition = {
         }
     },
     'ErrorEndEvent': {
+        attrs: ['errorReference'],
         validate: function(attrs) {
 
         },
@@ -281,13 +297,68 @@ export const nodeAttrsDefinition = {
         }
     },
     'TerminateEndEvent': {
+        attrs: ['terminateAll'],
         validate: function(attrs) {
 
         },
         checkShowOrHideInput: function(attrs) {
 
         }
-    }
+    },
+    'TerminateEndEvent': {
+        attrs: ['terminateAll'],
+        validate: function(attrs) {
+
+        },
+        checkShowOrHideInput: function(attrs) {
+
+        }
+    },
+    'CallActivity': {
+        attrs: ['asynchronous', 'exclusive', 'cardinality', 'elementVariable', 'completionCondition', "completeAsynchronously", "calledElement", "inParameters", "outParameters", "inheritVariables", "sameDeployment", "processInstanceName", "inheritBusinessKey", "businessKey", "useLocalScopeForOutParameters"],
+        validate: function(attrs) {
+
+        },
+        checkShowOrHideInput: function(attrs) {
+
+        }
+    },
+    'SubProcess': {
+        attrs: ['asynchronous', 'exclusive', 'dataObject', 'completionCondition', 'cardinality', 'elementVariable', ],
+        validate: function(attrs) {
+
+        },
+        checkShowOrHideInput: function(attrs) {
+
+        }
+    },
+    'AdHocSubProcess': {
+        attrs: ['cancelRemainingInstances', 'completionCondition'],
+        validate: function(attrs) {
+
+        },
+        checkShowOrHideInput: function(attrs) {
+
+        }
+    },
+    'TransactionSubProcess': {
+        attrs: ['asynchronous', 'exclusive', 'dataObject', 'completionCondition', 'cardinality', 'elementVariable', ],
+        validate: function(attrs) {
+
+        },
+        checkShowOrHideInput: function(attrs) {
+
+        }
+    },
+    'EventSubProcess': {
+        attrs: ['asynchronous', 'exclusive'],
+        validate: function(attrs) {
+
+        },
+        checkShowOrHideInput: function(attrs) {
+
+        }
+    },
 };
 
 
