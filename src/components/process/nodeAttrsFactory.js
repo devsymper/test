@@ -21,7 +21,7 @@ const groupsAttrs = {
 export const nodeAttrsDefinition = {
     'UserTask': {
         group: 'task', // nhóm thuộc tính mà node này thuộc về, giá trị là một hoặc nhiều key trong "groupsAttrs"
-        attrs: ['taskAction', 'formReference', 'formKey', 'taskOwner', 'assignee', 'candidateUsers', 'validateFormFields', 'priority', 'taskListeners', 'skipExpression', 'category', 'approvalActions', 'dueDate'],
+        attrs: ['taskAction', 'formReference', 'formKey', 'taskOwner', 'assignee', 'candidateUsers', 'notificationTitle', 'notificationContent', 'validateFormFields', 'priority', 'taskListeners', 'skipExpression', 'category', 'approvalActions', 'approvalForElement', 'dueDate'],
         exclude: ['asynchronous', 'exclusive'],
         validate: function(attrs) {
 
@@ -31,9 +31,11 @@ export const nodeAttrsDefinition = {
             if (taskAction.value == 'submit') {
                 attrs.approvalActions.hidden = true;
                 attrs.formReference.hidden = false;
+                attrs.approvalForElement.hidden = true;
             } else if (taskAction.value == 'approval') {
                 attrs.approvalActions.hidden = false;
                 attrs.formReference.hidden = true;
+                attrs.approvalForElement.hidden = false;
             }
         }
     },
@@ -84,6 +86,15 @@ export const nodeAttrsDefinition = {
 
         }
     },
+    'InclusiveGateway': {
+        group: 'gateway',
+        validate: function(attrs) {
+
+        },
+        checkShowOrHideInput: function(attrs) {
+
+        }
+    },
     'ParallelGateway': {
         group: 'gateway',
         validate: function(attrs) {
@@ -95,6 +106,252 @@ export const nodeAttrsDefinition = {
     },
     'ComplexGateway': {
         group: 'gateway',
+        validate: function(attrs) {
+
+        },
+        checkShowOrHideInput: function(attrs) {
+
+        }
+    },
+    'StartEvent': {
+        attrs: ['initiator', 'formReference', 'formKey', 'validateFormFields'],
+        validate: function(attrs) {
+
+        },
+        checkShowOrHideInput: function(attrs) {
+
+        }
+    },
+    'ConditionalStartEvent': {
+        attrs: ['conditionScript', 'interrupting'],
+        validate: function(attrs) {
+
+        },
+        checkShowOrHideInput: function(attrs) {
+
+        }
+    },
+    'TimerStartEvent': {
+        attrs: ['startDate', 'timeCycle', 'timeDuration'],
+        validate: function(attrs) {
+
+        },
+        checkShowOrHideInput: function(attrs) {
+
+        }
+    },
+    'SignalStartEvent': {
+        attrs: ['signalReference', 'interrupting'],
+        validate: function(attrs) {
+
+        },
+        checkShowOrHideInput: function(attrs) {
+
+        }
+    },
+    'MessageStartEvent': {
+        attrs: ['messageReference', 'interrupting'],
+        validate: function(attrs) {
+
+        },
+        checkShowOrHideInput: function(attrs) {
+
+        }
+    },
+    'IntermediateThrowEvent': {
+        attrs: ['asynchronous'],
+        validate: function(attrs) {
+
+        },
+        checkShowOrHideInput: function(attrs) {
+
+        }
+    },
+    'MessageIntermediateCatchEvent': {
+        attrs: ['messageReference'],
+        validate: function(attrs) {
+
+        },
+        checkShowOrHideInput: function(attrs) {
+
+        }
+    },
+    'TimerIntermediateCatchEvent': {
+        attrs: ['startDate', 'timeCycle', 'timeDuration'],
+        validate: function(attrs) {
+
+        },
+        checkShowOrHideInput: function(attrs) {
+
+        }
+    },
+    'EscalationIntermediateThrowEvent': {
+        attrs: ['escalationReference', 'asynchronous'],
+        validate: function(attrs) {
+
+        },
+        checkShowOrHideInput: function(attrs) {
+
+        }
+    },
+    'ConditionalIntermediateCatchEvent': {
+        attrs: ['conditionScript'],
+        validate: function(attrs) {
+
+        },
+        checkShowOrHideInput: function(attrs) {
+
+        }
+    },
+    'LinkIntermediateCatchEvent': {
+        validate: function(attrs) {
+
+        },
+        checkShowOrHideInput: function(attrs) {
+
+        }
+    },
+    'LinkIntermediateThrowEvent': {
+        validate: function(attrs) {
+
+        },
+        checkShowOrHideInput: function(attrs) {
+
+        }
+    },
+    'CompensateIntermediateThrowEvent': {
+        validate: function(attrs) {
+
+        },
+        checkShowOrHideInput: function(attrs) {
+
+        }
+    },
+    'SignalIntermediateCatchEvent': {
+        attrs: ['signalReference'],
+        validate: function(attrs) {
+
+        },
+        checkShowOrHideInput: function(attrs) {
+
+        }
+    },
+    'SignalIntermediateThrowEvent': {
+        attrs: ['signalReference', 'asynchronous'],
+        validate: function(attrs) {
+
+        },
+        checkShowOrHideInput: function(attrs) {
+
+        }
+    },
+    'EndEvent': {
+
+        validate: function(attrs) {
+
+        },
+        checkShowOrHideInput: function(attrs) {
+
+        }
+    },
+    'MessageEndEvent': {
+        validate: function(attrs) {
+
+        },
+        checkShowOrHideInput: function(attrs) {
+
+        }
+    },
+    'EscalationEndEvent': {
+        attrs: ['escalationReference'],
+        validate: function(attrs) {
+
+        },
+        checkShowOrHideInput: function(attrs) {
+
+        }
+    },
+    'ErrorEndEvent': {
+        attrs: ['errorReference'],
+        validate: function(attrs) {
+
+        },
+        checkShowOrHideInput: function(attrs) {
+
+        }
+    },
+    'CompensateEndEvent': {
+        validate: function(attrs) {
+
+        },
+        checkShowOrHideInput: function(attrs) {
+
+        }
+    },
+    'SignalEndEvent': {
+        validate: function(attrs) {
+
+        },
+        checkShowOrHideInput: function(attrs) {
+
+        }
+    },
+    'TerminateEndEvent': {
+        attrs: ['terminateAll'],
+        validate: function(attrs) {
+
+        },
+        checkShowOrHideInput: function(attrs) {
+
+        }
+    },
+    'TerminateEndEvent': {
+        attrs: ['terminateAll'],
+        validate: function(attrs) {
+
+        },
+        checkShowOrHideInput: function(attrs) {
+
+        }
+    },
+    'CallActivity': {
+        attrs: ['asynchronous', 'exclusive', 'cardinality', 'elementVariable', 'completionCondition', "completeAsynchronously", "calledElement", "inParameters", "outParameters", "inheritVariables", "sameDeployment", "processInstanceName", "inheritBusinessKey", "businessKey", "useLocalScopeForOutParameters"],
+        validate: function(attrs) {
+
+        },
+        checkShowOrHideInput: function(attrs) {
+
+        }
+    },
+    'SubProcess': {
+        attrs: ['asynchronous', 'exclusive', 'dataObject', 'completionCondition', 'cardinality', 'elementVariable', ],
+        validate: function(attrs) {
+
+        },
+        checkShowOrHideInput: function(attrs) {
+
+        }
+    },
+    'AdHocSubProcess': {
+        attrs: ['cancelRemainingInstances', 'completionCondition'],
+        validate: function(attrs) {
+
+        },
+        checkShowOrHideInput: function(attrs) {
+
+        }
+    },
+    'TransactionSubProcess': {
+        attrs: ['asynchronous', 'exclusive', 'dataObject', 'completionCondition', 'cardinality', 'elementVariable', ],
+        validate: function(attrs) {
+
+        },
+        checkShowOrHideInput: function(attrs) {
+
+        }
+    },
+    'EventSubProcess': {
+        attrs: ['asynchronous', 'exclusive'],
         validate: function(attrs) {
 
         },
