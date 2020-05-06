@@ -122,42 +122,33 @@
                         {{$t('permissions.actionPack')}}
                     </v-card-title>
                     <v-row class="pl-3 pr-3 pt-0">
-                        <v-col cols="12">
-                            <v-menu
-                                max-height="600"
-                                v-model="isShowActionPackSearchBox"
-                                :close-on-content-click="false"
-                                offset-y
-                            >
-                                <template v-slot:activator="{ on }">
-                                    <v-text-field
-                                        v-model="searchPackKeyword"
-                                        solo
-                                        :label="$t('common.quickSearch')"
-                                        flat
-                                        dense
-                                        v-on="on"
-                                        append-icon="mdi-magnify"
-                                        class="sym-small-size bg-grey"
-                                    ></v-text-field>
-                                </template>
-                                <v-card outlined >
-                                    <v-list nav dense>
-                                        <v-list-item
-                                            v-for="(actionPack, index) in listActionPacks"
-                                            :key="index"
-                                            :prepend-icon="actionPack.icon"
-                                        >
-                                            <v-list-item-title v-text="actionPack.name" ></v-list-item-title>
-                                            <v-list-item-action>
-                                                <v-checkbox v-model="actionPack.checked" color="success" hide-details></v-checkbox>
-                                            </v-list-item-action>
-                                        </v-list-item>
-                                    </v-list>
-                                </v-card>
-                            </v-menu>
+                        <v-col cols="12" class="search-wrap" v-click-outside="() => {isShowActionPackSearchBox = false}">
+                            <v-text-field
+                                v-model="searchPackKeyword"
+                                solo
+                                :label="$t('common.quickSearch')"
+                                flat
+                                dense
+                                @focus="isShowActionPackSearchBox = true"
+                                append-icon="mdi-magnify"
+                                class="sym-small-size bg-grey"
+                            ></v-text-field>
+                            <div class="search-results" v-show="isShowActionPackSearchBox">
+                                <v-list nav dense>
+                                    <v-list-item
+                                        v-for="(actionPack, index) in listActionPacks"
+                                        :key="index"
+                                        :prepend-icon="actionPack.icon"
+                                    >
+                                        <v-list-item-title v-text="actionPack.name" ></v-list-item-title>
+                                        <v-list-item-action>
+                                            <v-checkbox v-model="actionPack.checked" color="success" hide-details></v-checkbox>
+                                        </v-list-item-action>
+                                    </v-list-item>
+                                </v-list>
+                            </div>
                         </v-col>
-                        <v-col>
+                        <v-col cols="12">
                             <v-list nav dense class="">
                                 <v-list-item
                                     v-for="(actionPack, index) in listActionPacks"
@@ -184,59 +175,19 @@
                             value="true"
                             v-for="(actionPack, index) in listActionPacks"
                             :key="index"
-                            v-show="actionPack.checked && selectedObj.permission[actionPack.id] !== undefined"
+                            v-show="actionPack.checked"
                         >
                             <template v-slot:activator>
                                 <v-list-item-content>
                                     <v-list-item-title>{{actionPack.name}}</v-list-item-title>
                                 </v-list-item-content>
                             </template>
-                            <v-list-item
-                                v-for="(item) in listSelecteditemOptions"
-                                :key="index+item.key"
-                                :prepend-icon="item.icon"
-                            >
-                                <v-list-item-title>
-                                    <v-icon class="subtitle-1 pr-1">{{item.icon}}</v-icon> {{item.label}}
-                                </v-list-item-title>
-                                <v-list-item-action>
-                                    <label :for="'check-permission-' + index + item.key" 
-                                        @click.prevent="selectedObj.permission[actionPack.id][item.key] = !selectedObj.permission[actionPack.id][item.key]">
-                                        <span 
-                                            v-if="selectedObj.permission[actionPack.id] !== undefined && !!!selectedObj.permission[actionPack.id][item.key]"
-                                            class="caption red--text">
-                                            Not set
-                                        </span>
-                                        <span 
-                                            v-if="selectedObj.permission[actionPack.id] !== undefined && !!selectedObj.permission[actionPack.id][item.key]"
-                                            class="caption green--text" >
-                                            Allowed
-                                        </span>
-                                        <!-- <input 
-                                            :id="'check-permission-' + index + item.key"
-                                            type="checkbox" 
-                                            class="hidden" 
-                                            style="display:none"
-                                            value="true"
-                                            v-model="selectedObj.permission[actionPack.id][item.key]"
-                                        /> -->
-                                    </label>
-                                </v-list-item-action>
-                            </v-list-item>
+                            <ListPermission :type="'document'" :action="actionPack"></ListPermission>
                         </v-list-group>
                     </v-list>
                 </SplitGridArea>
             </SplitGrid>
         </SplitGrid>
-        <!-- <v-btn
-            small
-            color="primary"
-            @click="saveTableDisplayConfig()"
-            class="float-right pos-abs"
-        >
-            <v-icon class="mr-2">mdi-content-save-outline</v-icon>
-            {{$t('common.save')}}
-        </v-btn> -->
     </v-container>
 </template>
 
@@ -330,7 +281,8 @@
     }
     .v-menu__content >>> .v-icon,
     .vsg_split-grid >>> .v-icon {
-        font-size: 18px;
+        font-size: 18px !important;
+        line-height: 15px;
     }
     .v-menu__content >>> .v-list-item,
     .vsg_split-grid >>> .v-list-item {
@@ -368,6 +320,7 @@ import { SplitGrid, SplitGridArea, SplitGridGutter } from "vue-split-grid";
 import Api from "./../../api/api.js";
 import vClickOutside from 'v-click-outside'
 import icon from "../../components/common/SymperIcon";
+import ListPermission from "../../components/common/ListPermission";
 export default {
     name: "grandPermission",
     components: {
@@ -375,6 +328,7 @@ export default {
         SplitGridArea,
         SplitGridGutter,
         icon,
+        ListPermission,
     },
     props: {
         package: {
@@ -410,22 +364,6 @@ export default {
         package: function (pack) {
             this.getAllObjectOfPack(pack);
         },
-        listActionPacks: function(actionPacks) {
-            let listSelectedPack = actionPacks.filter(item => { return item.checked });
-            if (this.selectedObj === null) {
-                return;
-            }
-            this.selectedObj.permission = {};
-            if (listSelectedPack.length) {
-                for (const pack of listSelectedPack) {
-                    let permission = {};
-                    for (const action of this.listSelecteditemOptions) {
-                        permission[action.key] = false;
-                    }
-                    this.selectedObj.permission[pack.id] = permission;
-                }
-            }
-        }
     },
     mounted() {
         this.getAllObject();
