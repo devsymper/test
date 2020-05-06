@@ -6,8 +6,9 @@
         hide-details
         label="#.##"
         append-icon="mdi-format-color-highlight"
-        v-model="value"
+        v-model="dataPattern"
         @click:append="showFormatDateForm"
+        @change="handleChangeInput"
         >
         </v-text-field>
         <div class="form-format-date" style="display:none;">
@@ -58,22 +59,26 @@ export default {
        
         setFormat(){
             this.hideForm();
-            this.$store.commit(
-                "document/updateProp",{id:this.sCurrentControl.id,name:'formatNumber',value:this.customFormat,tableId:"0"}
-            );
+            this.dataPattern = this.customFormat;
+            this.$evtBus.$emit('blur-input',{name:'formatNumber',value:this.customFormat});
         },
         changePattern(){
-            let match = this.customFormat.match(/[.\[\]0#,]+/g);
+            let match = this.customFormat.match(/[.\[\]\(\)0#,]+/g);
             var number = numbro(12345);
             let numberFormat = number.format(match[0]);
             this.result = this.customFormat.replace(match[0],numberFormat);
+        },
+        handleChangeInput(){
+            this.$evtBus.$emit('blur-input',{name:'formatNumber',value:this.dataPattern});
         }
+      
     },
 
     data(){
         return{
             customFormat:'0,0[.]00',
-            result:''
+            result:'12,345',
+            dataPattern:this.value
         }
     },
     mounted(){

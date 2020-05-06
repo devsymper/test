@@ -6,8 +6,9 @@
         hide-details
         label="yyyy/MM/dd"
         append-icon="mdi-format-color-highlight"
-        v-model="value"
+        v-model="dataPattern"
         @click:append="showFormatDateForm"
+        @change="handleChangeInput"
         >
         </v-text-field>
         <div class="form-format-date" style="display:none;">
@@ -67,9 +68,8 @@ export default {
         },
         setFormat(){
             this.hideForm();
-            this.$store.commit(
-                "document/updateProp",{id:this.sCurrentControl.id,name:'formatDate',value:this.customFormat,tableId:"0"}
-            );
+            this.dataPattern = this.customFormat;
+            this.$evtBus.$emit('blur-input',{name:'formatDate',value:this.customFormat});
         },
         selectItem(event,type){
             this.customFormat = type
@@ -81,7 +81,9 @@ export default {
                 $(event.target).closest('.suggest-item').addClass('active');
             }
         },
-        
+        handleChangeInput(){
+            this.$evtBus.$emit('blur-input',{name:'formatNumber',value:this.dataPattern});
+        }
         
     },
 
@@ -96,6 +98,7 @@ export default {
                 {title:"DD/MM/YYYY",type:"DD/MM/YYYY"},
             ],
             customFormat:'MM/DD/YYYY',
+            dataPattern:this.value
         }
     },
     mounted(){

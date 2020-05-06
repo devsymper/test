@@ -96,7 +96,7 @@ import ErrMessagePanel from "./../../views/document/items/ErrMessagePanel.vue";
 import AllControlInDoc from "./../../views/document/items/AllControlInDoc.vue";
 import { GetControlProps,mappingOldVersionControlProps,mappingOldVersionControlFormulas,getAPropsControl } from "./../../components/document/controlPropsFactory.js";
 import { documentApi } from "./../../api/Document.js";
-
+import { util } from "./../../plugins/util.js";
 import VueResizable from 'vue-resizable'
 let isShowAutocompleteControl = false;
 // biến lưu chiều rộng editor trước khi resize 
@@ -128,6 +128,9 @@ export default {
                 let name = locale.name
                 let value = locale.value
                 let elements = $('#editor_ifr').contents().find('#'+this.currentSelectedControlId);
+                if(name == "width"){
+                    elements.css({width:value});
+                }
                 let table = elements.closest('.s-control-table');
                 let tableId = '0'
                 if(table.length > 0 && this.currentSelectedControlId != table.attr('id')){
@@ -245,8 +248,6 @@ export default {
         },
         // mở modal lưu , edit doc
         openPanelSaveDocument(){
-            $('#editor_ifr').contents().find('.on-selected').removeClass('on-selected');
-            this.selectControl({},{});
             this.$refs.saveDocPanel.showDialog()
         },
         // hoangnd: hàm gửi request lưu doc
@@ -283,14 +284,18 @@ export default {
         // xac thực tên control và các formulas liên quan
         validateControl(){
             let thisCpn = this;
-            let allControl = this.editorStore.allControl;
+            let allControl = util.cloneDeep(this.editorStore.allControl);
             let listControlName = [];
             this.listMessageErr = [];
             $('#editor_ifr').contents().find('.s-control-error').removeClass('s-control-error');
             //check trung ten control
             for(let controlId in allControl){
                 let control = allControl[controlId];
-                this.checkNameControl(control,listControlName);
+                console.log(control);
+                if(control['listFields'] != undefined){
+                    // Object.assign
+                }
+                this.checkNameControl(controlId,control,listControlName);
                 this.validateFormulasInControl(control)
             }
             if(this.listMessageErr.length == 0 && $('#editor_ifr').contents().find('.s-control-error').length == 0){
@@ -304,7 +309,7 @@ export default {
             }
         },
         // hàm kiểm tra xác thực tên control 
-        checkNameControl(control,listControlName){
+        checkNameControl(controlId,control,listControlName){
             if(control.properties.name.value == ''){
                 let controlEl = $('#editor_ifr').contents().find('#'+controlId);
                 controlEl.addClass('s-control-error');
@@ -548,6 +553,7 @@ export default {
                         if(mappingOldVersionControlFormulas[k] != undefined && controlV2.formulas[mappingOldVersionControlProps[k]] != undefined){
                             controlV2.formulas[mappingOldVersionControlProps[k]].value = v;
                         }
+                        
                         
                     });
                     thisCpn.addToAllControlInDoc(inputid,{properties: controlV2.properties, formulas : controlV2.formulas,type:type});

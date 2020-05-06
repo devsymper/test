@@ -1,12 +1,12 @@
 <template>
-  <v-treeview
+<v-treeview
     v-model="tree"
     :items="allControl"
     dense
     hoverable
     open-all
-    class="sym-small-size mt-2"
-  >
+    class="sym-small-size mt-2 sym-list-control-in-doc"
+>
     <template v-slot:prepend="{ item }">
         <img :src="`https://hoangnd.dev.symper.vn/`+item.icon" height="14" width="14" style="margin-top:3px;">
 
@@ -14,18 +14,24 @@
     <template v-slot:label="{ item }">
         <label :title="item.name">{{item.name}}</label>
     </template>
-  </v-treeview>
+</v-treeview>
 </template>
 <script>
-  export default {
+export default {
     computed: {
         allControl(){
-          return this.$store.state.document.editor.listControlTreeData;
+        return this.$store.state.document.editor.listControlTreeData;
         }
     },
- 
+
     data: () => ({
         tree: [],
     })
-  }
+}
 </script>
+<style scoped>
+.sym-list-control-in-doc{
+    overflow: auto;
+    height: calc(100vh - 80px);
+}
+</style>

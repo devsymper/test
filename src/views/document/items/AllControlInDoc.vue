@@ -48,13 +48,11 @@ export default {
         allColumns(){
             return getAllPropsControl();
         },
-        allData(){
+        allData(){  // phần này nên xử lí lúc bấm hiển thị lên, xử lí ở đây cứ thay đổi control là sẽ chạy
             let allControl = util.cloneDeep(this.sAllControl);
             let allDataControl = [];
             for (let id in allControl) {
                 let props = allControl[id].properties;
-                console.log(props);
-                
                 let formulas = allControl[id].formulas;
                 let row = {};
                 for (let propType in props){

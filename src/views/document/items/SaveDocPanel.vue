@@ -55,51 +55,53 @@ export default {
         documentProps:{
             type:Object,
             default(){
-                return {name: {
-                    title: "Tên document",
-                    type: "text",
-                    value: "",
-                },
-                title: {
-                    title: "Tiêu đề document",
-                    type: "text",
-                    value: "",
-                },
-                recentName: {
-                    title: "Tên trường hiển thị thông tin trong mục gần đây",
-                    type: "text",
-                    value: "",
-                },
-                editObjectValidate: {
-                    title: "Điều kiện Edit Object",
-                    type: "textarea",
-                    value: "",
-                },
-                public: {
-                    title: "Public",
-                    type: "checkbox",
-                    value: "",
-                },
-                mobile: {
-                    title: "Mobile",
-                    type: "checkbox",
-                    value: "",
-                },
-                editAfterSubmit: {
-                    title: "Sửa dữ liệu sau submit",
-                    type: "checkbox",
-                    value: "",
-                },
-                submitOutsideWorkflow: {
-                    title: "Submit ngoài workflow",
-                    type: "checkbox",
-                    value: "",
-                },
-                note: {
-                    title: "Ghi chú",
-                    type: "textarea",
-                    value: "",
-                },}
+                return {
+                    documentName: {
+                        title: "Tên document",
+                        type: "text",
+                        value: "",
+                    },
+                    documentTitle: {
+                        title: "Tiêu đề document",
+                        type: "text",
+                        value: "",
+                    },
+                    recentName: {
+                        title: "Tên trường hiển thị thông tin trong mục gần đây",
+                        type: "text",
+                        value: "",
+                    },
+                    editObjectValidate: {
+                        title: "Điều kiện Edit Object",
+                        type: "textarea",
+                        value: "",
+                    },
+                    public: {
+                        title: "Public",
+                        type: "checkbox",
+                        value: "",
+                    },
+                    mobile: {
+                        title: "Mobile",
+                        type: "checkbox",
+                        value: "",
+                    },
+                    editAfterSubmit: {
+                        title: "Sửa dữ liệu sau submit",
+                        type: "checkbox",
+                        value: "",
+                    },
+                    submitOutsideWorkflow: {
+                        title: "Submit ngoài workflow",
+                        type: "checkbox",
+                        value: "",
+                    },
+                    note: {
+                        title: "Ghi chú",
+                        type: "textarea",
+                        value: "",
+                    },
+                }
             }
         }
     },

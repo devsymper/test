@@ -52,9 +52,9 @@
 
         </v-tab-item>
         <v-tab-item
-            class="p-2 h-100"
+            class="p-2 h-100 formulas-control-tab"
         >
-        <control-props-config :singleLine="false" :allInputs="sCurrentDocument.formulas"/>
+            <control-props-config :singleLine="false" :allInputs="sCurrentDocument.formulas"/>
         </v-tab-item>
 
         
@@ -108,5 +108,9 @@ export default {
     
     .properties-control-tab .v-expansion-panel{
         margin: 0;
+    }
+    .properties-control-tab,.formulas-control-tab{
+        overflow: auto;
+        height: calc(100vh - 65px);
     }
 </style>

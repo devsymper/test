@@ -37,6 +37,7 @@ const commonProps = {
         title: "Cỡ chữ",
         type: "select",
         value: "",
+        items: `['Foo', 'Bar', 'Fizz', 'Buzz']`,
         groupType: "display"
     },
     color: {

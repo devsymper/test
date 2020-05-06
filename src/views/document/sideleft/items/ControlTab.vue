@@ -15,6 +15,7 @@
             <v-expansion-panels
             v-model="panel"
             multiple
+            class="sym-list-control"
             >
                 <v-expansion-panel>
                     <v-expansion-panel-header class="v-expand-header">Hiển thị</v-expansion-panel-header>
@@ -130,6 +131,10 @@ export default {
     
     .sym-document-tab-control .v-expansion-panel{
         margin: 0;
+    }
+    .sym-list-control{
+        overflow: auto;
+        height: calc(100vh - 110px);
     }
     
 </style>

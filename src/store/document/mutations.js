@@ -3,7 +3,6 @@ import { defaultState } from "./defaultState";
 import Vue from "vue";
 
 const addControl = (state, params) => {
-    console.log(state.editor.allControl);
     let id = params.id
     let prop = params.props
         // state.editor.allControl[id] = prop;
@@ -27,30 +26,39 @@ function setTreeListControlInDoc(state) {
         ],
     }];
     let allControl = state.editor.allControl;
-    // for (let controlId in allControl) {
-    //     let control = allControl[controlId];
-    //     let type = control.type;
-    //     let props = control.properties;
-    //     let title = props.title.value;
-    //     let name = props.name.value;
-    //     if (type == 'table') {
-    //         let listFields = control.listFields;
-    //         let children = [];
-    //         for (let childControlId in listFields) {
-    //             let childControl = listFields[childControlId];
-    //             let childProps = childControl.properties;
-    //             let childType = childControl.type;
-    //             let childTitle = childProps.title.value;
-    //             let childName = childProps.name.value;
-    //             let item = { name: childName + " - " + childTitle, icon: getIconFromType(childType) }
-    //             children.push(item)
-    //         }
-    //         treeData[0].children.push({ name: name + " - " + title, icon: getIconFromType(type), children: children })
-    //     } else {
-    //         treeData[0].children.push({ name: name + " - " + title, icon: getIconFromType(type) })
-    //     }
-    // }
-    // state.editor.listControlTreeData = treeData;
+    for (let controlId in allControl) {
+        let control = allControl[controlId];
+        let type = control.type;
+        let props = control.properties;
+        let name = "";
+        let title = "";
+        if (type == 'submit' || type == 'draft') {
+            name = type
+            title = type
+        } else {
+            title = props.title.value;
+            name = props.name.value;
+        }
+
+
+        if (type == 'table') {
+            let listFields = control.listFields;
+            let children = [];
+            for (let childControlId in listFields) {
+                let childControl = listFields[childControlId];
+                let childProps = childControl.properties;
+                let childType = childControl.type;
+                let childTitle = childProps.title.value;
+                let childName = childProps.name.value;
+                let item = { name: childName + " - " + childTitle, icon: getIconFromType(childType) }
+                children.push(item)
+            }
+            treeData[0].children.push({ name: name + " - " + title, icon: getIconFromType(type), children: children })
+        } else {
+            treeData[0].children.push({ name: name + " - " + title, icon: getIconFromType(type) })
+        }
+    }
+    state.editor.listControlTreeData = treeData;
 }
 
 const addControlToTable = (state, params) => {
@@ -109,6 +117,8 @@ const updateProp = (state, params) => {
             state.editor.allControl[id]['formulas'][name]['value'] = value
         }
     }
+    console.log(params);
+
     setTreeListControlInDoc(state);
 }
 const minimizeControl = (state, params) => {
