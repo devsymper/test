@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="pl-4">
         <v-list-item
             nav dense
             v-for="(item, index) in listPermissionToShow"
@@ -40,12 +40,18 @@ export default {
         let permission = 0;
         let objects = 0;
         if (this.action.objects != null) {
-            this.action.objects = JSON.parse(this.action.objects);
+            try {
+                this.action.objects = JSON.parse(this.action.objects);
+            } catch (error) {
+            }
         }
         if (this.action.permission != null) {
-            this.action.permission = JSON.parse(this.action.permission);
+            try {
+                this.action.permission = JSON.parse(this.action.permission);
+            } catch (error) {
+            }
         }
-        if (this.type in this.action.objects) {
+        if (this.action.objects[this.type] != undefined) {
             objects = this.action.objects[this.type];
             if (this.type in this.action.permission) {
                 permission = this.action.permission[this.type];

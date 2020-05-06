@@ -56,7 +56,7 @@
                                                 :key="listObjs.type+item.id"
                                             >
                                                 <v-list-item-title
-                                                    @click="toggleObject(item, listObjs.type, [appIndex, objectIndex, itemIndex], app.id)"
+                                                    @click="selectApp(item, listObjs.type, [appIndex, objectIndex, itemIndex], app.id)"
                                                 >
                                                     <icon :icon="item.icon"></icon>
                                                     {{item.title != undefined && !!item.title ? item.title : item.name}}
@@ -98,14 +98,20 @@
                                             v-for="(item, itemIndex) in listObjs.data"
                                             :key="listObjs.type+item.id"
                                             v-show="(item.checked != undefined && !!item.checked)"
-                                            active-class="pink"
+                                            :class="{
+                                                'light-blue': selectedObj != null && 
+                                                              selectedObj.id == item.id && 
+                                                              selectedType == listObjs.type &&
+                                                              selectedAppId == obj.id
+                                            }"
+                                            class="lighten-4"
                                         >
-                                            <v-list-item-title>
+                                            <v-list-item-title @click="selectObject(item, listObjs.type, obj.id)">
                                                 <icon :icon="item.icon"></icon>
                                                 {{item.title != undefined && !!item.title ? item.title : item.name}}
                                             </v-list-item-title>
                                             <v-list-item-action>
-                                                <v-icon @click.stop="toggleObject(item, listObjs.type, [appIndex, objectIndex, itemIndex], obj.id)">mdi-delete</v-icon>
+                                                <v-icon @click.stop="selectApp(item, listObjs.type, [appIndex, objectIndex, itemIndex], obj.id)">mdi-delete</v-icon>
                                             </v-list-item-action>
                                         </v-list-item>
                                     </v-list-group>
@@ -115,8 +121,8 @@
                     </v-row>
                 </SplitGridArea>
                 <!-- Cột chứa các quyền -->
-                <SplitGridGutter :gutterSize=1 />
-                <SplitGridArea>
+                <SplitGridGutter :gutterSize=1 v-if="selectedObj != null"/>
+                <SplitGridArea v-if="selectedObj != null">
                     <v-card-title class="body-2 font-weight-bold pl-3 pb-1">
                         <v-icon class="subtitle-1 pr-1">mdi-settings</v-icon>
                         {{$t('permissions.actionPack')}}
@@ -130,19 +136,23 @@
                                 flat
                                 dense
                                 @focus="isShowActionPackSearchBox = true"
+                                @input="searchActions"
                                 append-icon="mdi-magnify"
                                 class="sym-small-size bg-grey"
                             ></v-text-field>
                             <div class="search-results" v-show="isShowActionPackSearchBox">
                                 <v-list nav dense>
                                     <v-list-item
-                                        v-for="(actionPack, index) in listActionPacks"
+                                        v-for="(actionPack, index) in listActionPackToShow"
                                         :key="index"
                                         :prepend-icon="actionPack.icon"
                                     >
-                                        <v-list-item-title v-text="actionPack.name" ></v-list-item-title>
+                                        <v-list-item-title @click="toggleActionPack(actionPack)">
+                                            <icon :icon="actionPack.icon"></icon>
+                                            {{actionPack.name}}
+                                        </v-list-item-title>
                                         <v-list-item-action>
-                                            <v-checkbox v-model="actionPack.checked" color="success" hide-details></v-checkbox>
+                                            <v-icon color="success" v-if="actionPack.checked">mdi-check</v-icon>
                                         </v-list-item-action>
                                     </v-list-item>
                                 </v-list>
@@ -151,40 +161,47 @@
                         <v-col cols="12">
                             <v-list nav dense class="">
                                 <v-list-item
-                                    v-for="(actionPack, index) in listActionPacks"
+                                    v-for="(actionPack, index) in listActionSelected"
                                     :key="index"
                                     v-show="actionPack.checked"
                                 >
-                                    <v-list-item-title v-text="actionPack.name" ></v-list-item-title>
+                                    <v-list-item-title  @click="toggleActionPack(actionPack)">
+                                        <icon :icon="actionPack.icon"></icon>
+                                        {{actionPack.name}}
+                                    </v-list-item-title>
                                     <v-list-item-action>
-                                        <v-checkbox v-model="actionPack.checked" color="success" hide-details></v-checkbox>
+                                        <v-icon>mdi-delete</v-icon>
                                     </v-list-item-action>
                                 </v-list-item>
                             </v-list>
                         </v-col>
                     </v-row>
                     <v-divider></v-divider>
-                    <v-card-title class="body-2 font-weight-bold pl-3 pb-0">
-                        <v-icon class="subtitle-1 pr-1">mdi-menu</v-icon>
-                        {{$t('permissions.actionControlSummary')}}
-                    </v-card-title>
-                    <v-list nav dense class="pl-0">
-                        <v-list-group
-                            no-action
-                            sub-group
-                            value="true"
-                            v-for="(actionPack, index) in listActionPacks"
-                            :key="index"
-                            v-show="actionPack.checked"
-                        >
-                            <template v-slot:activator>
-                                <v-list-item-content>
-                                    <v-list-item-title>{{actionPack.name}}</v-list-item-title>
-                                </v-list-item-content>
-                            </template>
-                            <ListPermission :type="'document'" :action="actionPack"></ListPermission>
-                        </v-list-group>
-                    </v-list>
+                    <v-row>
+                        <v-col cols="12">
+                            <v-card-title class="body-2 font-weight-bold pl-4 pb-0">
+                                <v-icon class="subtitle-1 pr-1">mdi-menu</v-icon>
+                                {{$t('permissions.actionControlSummary')}}
+                            </v-card-title>
+                            <v-list nav dense class="">
+                                <v-list-group
+                                    value="true"
+                                    v-for="(actionPack, index) in listActionSelected"
+                                    :key="index"
+                                >
+                                    <template v-slot:activator>
+                                        <v-list-item-content>
+                                            <v-list-item-title>
+                                                <icon :icon="actionPack.icon"></icon>
+                                                {{actionPack.name}}
+                                            </v-list-item-title>
+                                        </v-list-item-content>
+                                    </template>
+                                    <ListPermission :type="selectedType" :action="actionPack"></ListPermission>
+                                </v-list-group>
+                            </v-list>
+                        </v-col>
+                    </v-row>
                 </SplitGridArea>
             </SplitGrid>
         </SplitGrid>
@@ -236,7 +253,7 @@
         padding-bottom: 0;
     }
     .v-list-item:hover {
-        background-color: #dedede;
+        background-color: #dedede !important;
     }
     .v-list-item__action {
         margin: 5px 0 !important;
@@ -286,7 +303,7 @@
     }
     .v-menu__content >>> .v-list-item,
     .vsg_split-grid >>> .v-list-item {
-        min-height: 15px !important;
+        min-height: 25px !important;
         margin-bottom: 0 !important;
     }
     .v-application--is-ltr .v-list--dense.v-list--nav .v-list-group--no-action.v-list-group--sub-group > .v-list-group__items > .v-list-item {
@@ -355,15 +372,21 @@ export default {
             listResultApp: [],
             listSelecteditemOptions: [],
             listActionPacks: [],
+            listActionPackToShow: [],
             selectedObj: null,
-            listActions: [],
-            listAppSelected: []
+            selectedType: null,
+            selectedAppId: null,
+            listAppSelected: [],
+            listActionSelected: [],
         };
     },
     watch: {
-        package: function (pack) {
+        package(pack) {
             this.getAllObjectOfPack(pack);
         },
+        selectedObj(obj) {
+            // this.
+        }
     },
     mounted() {
         this.getAllObject();
@@ -372,9 +395,107 @@ export default {
         this.getAllObjectOfPack(this.package);
     },
     methods: {
-        saveTableDisplayConfig() {},
+        searchActions(){
+            if (!!this.searchPackKeyword) {
+                this.searchPackKeyword = this.searchPackKeyword.trim().toLocaleLowerCase();
+                this.listActionPackToShow = [];
+                this.listActionPacks.forEach(action => {
+                    if (action.name.toLocaleLowerCase().includes(this.searchPackKeyword)) {
+                        this.listActionPackToShow.push(action);
+                    }
+                });
+            } else {
+                this.resetActionResult();
+            }
+        },
+        toggleActionPack(actionPack) {
+            actionPack.checked = !!! actionPack.checked;
+            for (const index in this.listActionPacks) {
+                if (this.listActionPacks[index].id == actionPack.id) {
+                    this.listActionPacks[index].checked = actionPack.checked;
+                    this.ressetSelectedActionPack();
+                    this.saveToggleObjectInApp(this.selectedObj, this.selectedType, this.selectedAppId, this.getListActionIds())
+                    break;
+                }
+            }
+            for (const index in this.listActionPackToShow) {
+                if (this.listActionPackToShow[index].id == actionPack.id) {
+                    this.listActionPackToShow[index].checked = actionPack.checked;
+                    break;
+                }
+            }
+        },
+        ressetSelectedActionPack() {
+            this.listActionSelected = [];
+            this.listActionPacks.forEach(action => {
+                if (action.checked) {
+                    this.listActionSelected.push(action);
+                }
+            });
+        },
+        getListActionIds() {
+            let ids = [];
+            this.listActionPacks.forEach(action => {
+                if (action.checked) {
+                    ids.push(action.id);
+                }
+            });
+            return ids;
+        },
+        resetActionResult() {
+            this.listActionPackToShow = JSON.parse(JSON.stringify(this.listActionPacks));
+            this.listActionPackToShow = this.listActionPackToShow.slice(0, 10);
+        },
         closeBoxSearch() {
             this.isShowSearchBox = false;
+        },
+        selectObject(item, type, appId) {
+            this.selectedObj = item;
+            this.selectedType = type;
+            this.selectedAppId = appId;
+            this.resetAction();
+            this.resetActionResult();
+            this.listActionSelected = [];
+            this.getDetailObjectActions();
+        },
+        getDetailObjectActions() {
+            let req = new Api(this.apiUrl);
+            req.get(this.packPath + `/${this.package.id}/objects/${this.selectedAppId}/${this.selectedObj.id}/${this.selectedType}`)
+            .then(res => {
+                if (res.status !== 200) {
+                    this.showError()
+                } else {
+                    let obj = res.data;
+                    if (obj.length > 0) {
+                        obj = obj[0];
+                        try {
+                            if (obj['action_pack'] != null) {
+                                obj = obj['action_pack'];
+                                let ids = obj.replace("{", "").replace("}", "").split(",");
+                                
+                                for (const index in this.listActionPacks) {
+                                    if (ids.indexOf(this.listActionPacks[index].id) > -1) {
+                                        this.listActionPacks[index].checked = 1;
+                                    }
+                                }
+                                this.ressetSelectedActionPack();
+                                this.resetActionResult();
+                            }
+                        } catch (err) {
+                            console.log(err);
+                            
+                        }
+                    }
+                }
+            })
+            .catch(err => {
+                this.showError();
+            })
+        },
+        resetAction() {
+            for (const index in this.listActionPacks) {
+                this.listActionPacks[index].checked = 0
+            }
         },
         searchObject() {
             let value = this.keyword;
@@ -414,11 +535,6 @@ export default {
                 }
             }
         },
-        toggleObject(item, type, indexes, appId = null) {
-            if (appId != null) {
-                this.selectApp(item, type, indexes, appId);
-            }
-        },
         selectApp(item, type, index, appId) {
             item.checked = item.checked == 0 ? 1: 0;
             this.listResultApp[index[0]].objects[index[1]].data[index[2]].checked = item.checked;
@@ -448,18 +564,21 @@ export default {
                 text: this.$t('notification.error')
             })
         },
-        saveToggleObjectInApp(item, type, appId) {
+        saveToggleObjectInApp(item, type, appId, actionPack = []) {
             let req = new Api(this.apiUrl);
             req.post(this.packPath + `/${this.package.id}/objects`, {
                 appId: appId,
                 objectType: type,
-                objectId: item.id
+                objectId: item.id,
+                actionPack: actionPack
             })
             .then(res => {
-                console.log(res);
                 if (res.status !== 200) {
                     this.showError()
                 }
+            })
+            .catch(err => {
+                this.showError();
             })
         },
         resetAppToShow() {
@@ -530,6 +649,7 @@ export default {
                 .then((res) => {
                     if (res.status === 200) {
                         this.listActionPacks = res.data;
+                        this.resetActionResult();
                     }
                 })
                 .catch((err) => {

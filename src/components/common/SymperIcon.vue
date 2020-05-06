@@ -1,7 +1,7 @@
 <template>
     <span>
         <v-icon v-if="!!icon && icon.includes('mdi-')">{{icon}}</v-icon>
-        <img v-else :src="icon" :width="size">
+        <img v-else :src="icon" :width="size" :height="size">
     </span>
 </template>
 

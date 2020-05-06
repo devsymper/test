@@ -22,7 +22,9 @@
         "list_config": "Cấu hình danh sách",
         "save": "Lưu",
         "snippets": "Snippets",
-        "permissions": "Phân quyền"
+        "permissions": "Phân quyền",
+        "actions": "Actions package",
+        "apps": "Application"
     },
     "login": {
         "title": "Đăng nhập hệ thống",
@@ -271,9 +273,9 @@
         "defaultPack": "Mặc định",
         "objectTypes": "Loại object",
         "commonInfo": "Thông tin chung của actions package",
-        "listObjects": "Các chức năng trong actions package",
-        "addObject": "Thêm tính năng",
-        "objectSummary": "Tổng hợp các chức năng",
+        "listObjects": "Các action trong actions package",
+        "addObject": "Thêm action",
+        "objectSummary": "Tổng hợp các action",
         "contextMenu": {
             "edit": "Sửa",
             "remove": "Xóa"

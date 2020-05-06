@@ -22,7 +22,9 @@
         "list_config": "List config",
         "save": "Save",
         "snippets": "Snippets",
-        "permissions": "Permissions"
+        "permissions": "Permissions",
+        "actions": "Actions package",
+        "apps": "Application"
     },
     "validate": {
         "required": "Not be empty",
@@ -272,9 +274,9 @@
         "defaultPack": "Default pack",
         "commonInfo": "General",
         "listObjects": "Objects",
-        "addObject": "Add object",
+        "addObject": "Add action",
         "objectTypes": "Object type",
-        "objectSummary": "Objects summary",
+        "objectSummary": "Action summary",
         "contextMenu": {
             "edit": "Edit",
             "remove": "Delete"
