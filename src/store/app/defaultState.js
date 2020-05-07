@@ -25,6 +25,7 @@ const defaultState = {
     unreadNotification: 1, // số lượng các thông báo chưa đọc
     items: [
         // các menu mà ba hoặc enduser được phân quyền
+        { title: "application", icon: "mdi-application", link: "/application" },
         { title: "reports", icon: "mdi-view-dashboard", link: "/reports" },
         { title: "workflows", icon: "mdi-sitemap", link: "/bpmne/create" },
         {

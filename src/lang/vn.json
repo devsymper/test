@@ -24,7 +24,9 @@
         "snippets": "Snippets",
         "permissions": "Phân quyền",
         "actions": "Actions package",
-        "apps": "Application"
+        "apps": "Cài đặt Application",
+        "application": "Application",
+        "favorite": "Yêu thích"
     },
     "login": {
         "title": "Đăng nhập hệ thống",
@@ -282,7 +284,27 @@
         },
         "updated": "Đã cập nhật actions package",
         "added": "Đã thêm mới actions package",
-        "deleted": "Đã xóa actions package"
+        "deleted": "Đã xóa actions package",
+        "listActions": {
+            "document": {
+                "submit": "Submit",
+                "list": "Danh sách",
+                "import": "Import",
+                "favorite": "Thêm vào yêu thích"
+            },
+            "dataflow": {
+                "detail": "Chi tiết",
+                "execute": "Khởi tạo",
+                "list": "Danh sách",
+                "favorite": "Thêm vào yêu thích"
+            },
+            "orgchart": {
+                "detail": "Chi tiết",
+                "edit": "Chỉnh sửa",
+                "query": "Truy vấn",
+                "favorite": "Thêm vào yêu thích"
+            }
+        }
     },
     "iconPicker": {
         "header": "Chọn icon",

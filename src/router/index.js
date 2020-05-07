@@ -15,6 +15,7 @@ import Snippet from "../views/snippets/index.vue";
 import Permissions from "../views/permissions/index.vue";
 import apps from "../views/apps/index.vue";
 import actions from "../views/actions/index.vue";
+import application from "../views/apps/yourApp.vue";
 import Editor from "../views/document/Editor.vue";
 
 Vue.use(VueRouter);
@@ -96,6 +97,11 @@ const routes = [{
         path: "/apps",
         name: "apps",
         component: apps,
+    },
+    {
+        path: "/application",
+        name: "application",
+        component: application,
     },
     {
         path: "/actions",

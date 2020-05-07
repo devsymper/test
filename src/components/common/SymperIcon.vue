@@ -1,6 +1,6 @@
 <template>
     <span>
-        <v-icon v-if="!!icon && icon.includes('mdi-')">{{icon}}</v-icon>
+        <v-icon v-if="!!icon && icon.includes('mdi-')" :size="size">{{icon}}</v-icon>
         <img v-else :src="icon" :width="size" :height="size">
     </span>
 </template>
@@ -15,7 +15,7 @@ export default {
         },
         size: {
             type: Number,
-            default: 20
+            default: 18
         },
     },
     methods: {},
