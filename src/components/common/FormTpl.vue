@@ -109,6 +109,7 @@ import DataTable from "./../common/customTable/DataTable";
 import SymperDragPanel from "./SymperDragPanel";
 import SymperUserAssignment from "./SymperUserAssignment";
 import OrgchartSelector from "./../user/OrgchartSelector";
+import SymperListOrdering from "./../common/symperInputs/SymperListOrdering";
 
 const inputTypeConfigs = {
     numeric: {
@@ -198,12 +199,19 @@ const inputTypeConfigs = {
             };
         }
     },
-    selectDoc: {
+    autocomplete: {
         tag: "v-select",
         props(config) {
             return {
                 columns: config.columns,
                 data: config.value
+            };
+        }
+    },
+    ordering: {
+        tag: "symper-list-ordering",
+        props(config) {
+            return {
             };
         }
     },
@@ -388,7 +396,8 @@ export default {
         DataTable,
         SymperDragPanel,
         "symper-user-assginment": SymperUserAssignment,
-        "orgchart-selector": OrgchartSelector
+        "orgchart-selector": OrgchartSelector,
+        SymperListOrdering: SymperListOrdering
     }
 };
 </script>
