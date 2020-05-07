@@ -120,38 +120,11 @@ export default {
         "all-control-option":AllControlInDoc,
     },
     created() {
-        let thisCpn = this;
-
-        // ham nhan sự kiện từ formtpl
-        this.$evtBus.$on("blur-input", locale => {
-            if(this.currentSelectedControlId != undefined && this.currentSelectedControlId != ''){
-                let name = locale.name
-                let value = locale.value
-                let elements = $('#editor_ifr').contents().find('#'+this.currentSelectedControlId);
-                if(name == "width"){
-                    elements.css({width:value});
-                }
-                let table = elements.closest('.s-control-table');
-                let tableId = '0'
-                if(table.length > 0 && this.currentSelectedControlId != table.attr('id')){
-                    let id = table.attr('id');
-                    tableId = id
-                }
-                this.$store.commit(
-                    "document/updateProp",{id:this.currentSelectedControlId,name:name,value:value,tableId:tableId}
-                );
-                
-            }
-           
-        });
-        
         this.documentId = this.$route.params.id;
-
     },
     data(){
         return{
             isAutocompleteControl:false,
-            currentSelectedControlId:'',
             listMessageErr:[],
             documentId:0,
             currentFormulasInput:'',
@@ -256,7 +229,7 @@ export default {
             let htmlContent = this.$refs.editor.editor.getContent()
             let allControl = JSON.stringify(this.editorStore.allControl);
             if(this.documentId != 0 && this.documentId != undefined && typeof this.documentId != 'undefined'){   //update doc
-                documentApi.editDocument({documentProperty:JSON.stringify(thisCpn.documentProps),fields:allControl,content:htmlContent,name:this.documentId}).then(res => {
+                documentApi.editDocument({documentProperty:JSON.stringify(thisCpn.documentProps),fields:allControl,content:htmlContent,id:this.documentId}).then(res => {
                     if (res.status == 200) {
                         thisCpn.$router.push('/documents');
                     }
@@ -705,8 +678,6 @@ export default {
                 else{
                     let listField = fields[controlId].listFields
                     let listChildField = {};
-                    console.log(listField);
-                    
                     for(let childFieldId in listField){
                         let childControl = GetControlProps(listField[childFieldId].type)
                         let childProperties = childControl.properties
@@ -1189,7 +1160,6 @@ export default {
                 }
                 let type = $(this).attr('s-control-type');
                 let controlId = $(this).attr('id');
-                thisCpn.currentSelectedControlId = controlId;
                 let table = $(this).closest('.s-control-table');
                 if(table.length > 0 && controlId != table.attr('id')){
                     let tableId = table.attr('id');
@@ -1219,7 +1189,6 @@ export default {
                     var checkDiv = $(control.html);
                     let typeControl = checkDiv.attr('s-control-type');
                     var inputid = 's-control-id-' + Date.now();
-                    thisCpn.currentSelectedControlId = inputid;
                     checkDiv.attr('id', inputid);
                     insertionPoint.after(checkDiv);
                     let table = insertionPoint.closest('.s-control-table'); // nếu kéo control vào table thì lưu prop của control đó vào table trong allControl của state
@@ -1260,6 +1229,7 @@ export default {
                 styles += '.s-control-label{font-size:13px;padding:5px 8px;border-radius:4px;}';
                 styles += '.mce-input-padding{width: 100px !important;left: 120px !important;padding:0 4px}';
                 styles += '.mce-offscreen-selection{display:none !important;}';
+                styles += '.s-control-table table{width:100%;text-align: center;border-collapse: collapse;}.s-control-table table thead{background: #f2f2f2;}.s-control-table table tbody{background: white;}';
                 styles += '.ephox-snooker-resizer-rows {cursor: row-resize}';
                 styles += '.ephox-snooker-resizer-cols {cursor: col-resize}';
                 styles += '.ephox-snooker-resizer-bar {background-color: #b4d7ff;opacity: 0;-webkit-user-select: none;-moz-user-select: none;-ms-user-select: none;user-select: none;}';

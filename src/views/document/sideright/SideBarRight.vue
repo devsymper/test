@@ -27,24 +27,23 @@
             <v-expansion-panels
                 v-model="panel"
                 multiple
-                v-if="controlPropsGroup.name"
                 >
                 <v-expansion-panel class="m-0" >
                     <v-expansion-panel-header class="v-expand-header">Tên</v-expansion-panel-header>
                     <v-expansion-panel-content class="sym-v-expand-content">
-                        <control-props-config :singleLine="true" :labelWidth="`100px`"  :allInputs="controlPropsGroup.name"/>
+                        <control-props-config @input-value-changed="handleChangeInput" :singleLine="true" :labelWidth="`100px`"  :allInputs="controlPropsGroup.name"/>
                     </v-expansion-panel-content>
                 </v-expansion-panel>
                 <v-expansion-panel class="m-0" >
                     <v-expansion-panel-header class="v-expand-header">Hiển thị</v-expansion-panel-header>
                     <v-expansion-panel-content class="sym-v-expand-content">
-                        <control-props-config :singleLine="true" :labelWidth="`100px`" :allInputs="controlPropsGroup.display"/>
+                        <control-props-config @input-value-changed="handleChangeInput" :singleLine="true" :labelWidth="`100px`" :allInputs="controlPropsGroup.display"/>
                     </v-expansion-panel-content>
                 </v-expansion-panel>
                 <v-expansion-panel class="m-0" >
                     <v-expansion-panel-header class="v-expand-header">In</v-expansion-panel-header>
                     <v-expansion-panel-content class="sym-v-expand-content">
-                        <control-props-config :singleLine="true" :labelWidth="`100px`" :allInputs="controlPropsGroup.print"/>
+                        <control-props-config @input-value-changed="handleChangeInput" :singleLine="true" :labelWidth="`100px`" :allInputs="controlPropsGroup.print"/>
                     </v-expansion-panel-content>
                 </v-expansion-panel>
             </v-expansion-panels>
@@ -88,6 +87,24 @@ export default {
         
         }
     },
+    methods:{
+        handleChangeInput(name,input){
+            let value = input.value
+            let elements = $('#editor_ifr').contents().find('#'+this.sCurrentDocument.id);
+            if(name == "width"){
+                elements.css({width:value});
+            }
+            let table = elements.closest('.s-control-table');
+            let tableId = '0'
+            if(table.length > 0 && this.sCurrentDocument.id != table.attr('id')){
+                let id = table.attr('id');
+                tableId = id
+            }
+            this.$store.commit(
+                "document/updateProp",{id:this.sCurrentDocument.id,name:name,value:value,tableId:tableId}
+            );   
+        }
+    }
 }
 </script>
 <style scoped>
@@ -111,6 +128,6 @@ export default {
     }
     .properties-control-tab,.formulas-control-tab{
         overflow: auto;
-        height: calc(100vh - 65px);
+        max-height: calc(100vh - 65px);
     }
 </style>

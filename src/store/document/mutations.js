@@ -139,12 +139,7 @@ const minimizeControl = (state, params) => {
 
 }
 
-const setAllControlForTableOption = (state, params) => {
-    // console.log(state.editor.allControl);
-    // let id = params.id
-    // let prop = params.props
-    // state.editor.allControlForTableOption;
-};
+
 export {
     addControl,
     addCurrentControl,

@@ -6,7 +6,7 @@ const commonProps = {
         title: "Tên",
         type: "text",
         value: "",
-        groupType: "name"
+        groupType: "name",
     },
     title: {
         title: "Tiêu đề",
@@ -37,7 +37,7 @@ const commonProps = {
         title: "Cỡ chữ",
         type: "select",
         value: "",
-        items: `['Foo', 'Bar', 'Fizz', 'Buzz']`,
+        items: "8pt",
         groupType: "display"
     },
     color: {
@@ -180,72 +180,84 @@ let commonFormulas = {
         value: "",
         formulasId: 0,
         type: "script",
+        groupType: "formulas"
     },
     hidden: {
         title: "Công thức ẩn hiện",
         value: "",
         formulasId: 0,
         type: "treeValidate",
+        groupType: "formulas"
     },
     link: {
         title: "Công thức link",
         value: "",
         formulasId: 0,
         type: "script",
+        groupType: "formulas"
     },
     formulas: {
         title: "Công thức giá trị",
         value: "",
         formulasId: 0,
         type: "script",
+        groupType: "formulas"
     },
     autocomplete: {
         title: "Công thức autocomplete",
         value: "",
         formulasId: 0,
         type: "script",
+        groupType: "formulas"
     },
     validate: {
         title: "Công thức xác thực",
         value: "",
         formulasId: 0,
         type: "treeValidate",
+        groupType: "formulas"
     },
     readOnly: {
         title: "Công thức readonly",
         value: "",
         formulasId: 0,
         type: "treeValidate",
+        groupType: "formulas"
     },
     uniqueDB: {
         title: "Nội dung thông báo khi bị trùng dữ liệu DB",
         value: "",
         formulasId: 0,
         type: "script",
+        groupType: "formulas"
     },
     uniqueTable: {
         title: "Nội dung thông báo khi bị trùng dữ liệu trong bảng",
         value: "",
         formulasId: 0,
         type: "script",
+        groupType: "formulas"
     },
     report: {
         title: "Công thức lấy dữ liệu báo cáo",
         value: "",
         formulasId: 0,
-        type: "script"
+        type: "script",
+        groupType: "formulas"
     },
     headerTable: {
         title: "Cấu hình tiêu đề cho bảng",
         value: "",
         formulasId: 0,
-        type: "script"
+        type: "script",
+        groupType: "formulas"
     },
     filterOptions: {
         title: "Bộ lọc tùy chọn",
         value: "",
         formulasId: 0,
-        type: "script"
+        type: "script",
+        groupType: "formulas"
     }
 }
 
@@ -259,6 +271,9 @@ let groupType = {
     },
     print: {
         title: 'In'
+    },
+    formulas: {
+        title: 'Công thức'
     }
 }
 
@@ -447,11 +462,6 @@ const controlTypes = {
                     <a class="btn btn-primary s-control-table-remove-select">Xoá dòng đã chọn </a>
                     <a class="btn btn-primary s-control-table-remove-unselect">Xoá dòng không chọn </a>
                 </div>
-                <style>
-                .s-control-table table{width:100%;text-align: center;    border-collapse: collapse;}
-                .s-control-table table thead{background: #f2f2f2;}
-                .s-control-table table tbody{background: white;}
-                <style/>
                 </div> &nbsp;;
                 `,
         title: "Table",
@@ -586,11 +596,10 @@ export const GetControlProps = function(type) {
     let inProps = control.inProps;
 
     if (inProps != undefined && typeof inProps != 'undefined' && inProps.length > 0) {
-        let propertiesControl = [];
+        let propertiesControl = {};
         for (let i = 0; i < inProps.length; i++) {
-            propertiesControl.push(allProperties[inProps[i]]);
+            propertiesControl = Object.assign(propertiesControl, allProperties[inProps[i]]);
         }
-        propertiesControl = Object.assign({}, propertiesControl);
         control['properties'] = propertiesControl;
     }
     if (notInProps != undefined && typeof notInProps != 'undefined' && notInProps.length > 0) {
@@ -657,19 +666,30 @@ export const getControlElementForTableSetting = function(type) {
     return result
 }
 
+// hàm lấy tất cả thuộc tính control nhóm theo grouptype
 export const getAllPropsControl = function() {
     let allProp = util.cloneDeep(commonProps);
     let allFormulas = util.cloneDeep(commonFormulas);
     let data = Object.assign(allProp, allFormulas);
     let result = Object.keys(data).map(function(key) {
         let type = data[key].type;
-        (type == 'script') ? type = 'text': type;
-        (type == 'textarea') ? type = 'text': type;
-        (type == 'treeValidate') ? type = 'text': type;
-        (type == 'select') ? type = 'autocomplete': type;
-        (type == 'numberFormat') ? type = 'numeric': type;
-        (type == 'dateFormat') ? type = 'date': type;
-        return { title: data[key].title, type: type, name: key };
+        let width = (type == 'checkbox') ? 50 : 150
+        let xx = { headerName: data[key].title, field: key, groupType: data[key].groupType, width: width }
+        if (type == 'checkbox') {
+            xx = { headerName: data[key].title, field: key, cellRenderer: checkboxRenderer, groupType: data[key].groupType, width: width }
+        }
+        return xx;
     });
-    return result;
+    let groups = util.cloneDeep(groupType);
+    Object.filter = (obj, predicate) =>
+        Object.fromEntries(Object.entries(obj).filter(predicate));
+    let dataPropsResult = []
+    for (let group in groups) {
+        let propsOfGroup = Object.filter(result, ([name, prop]) => prop.groupType == group);
+        groups[group]['listFields'] = Object.values(propsOfGroup);
+        groups[group]['name'] = group;
+        dataPropsResult.push(groups[group]);
+    }
+    console.log(dataPropsResult);
+    return dataPropsResult;
 }

@@ -51,8 +51,6 @@
                 :key="name"
                 single-line
                 v-bind="getInputProps(inputInfo)"
-                v-on:change="handleBlurEvent($event,name)"
-                v-on:click="handleClickInput($event,inputInfo)"
                 v-model="inputInfo.value"
                 :formulaValue="inputInfo.value"
                 :is="getInputTag(inputInfo.type)">
@@ -329,13 +327,7 @@ export default {
         getInputTag(inputType) {
             return inputTypeConfigs[inputType].tag;
         },
-        handleBlurEvent(event,name){
-            this.$evtBus.$emit('blur-input',{name:name,value:event});
-        },
-        handleClickInput(event,inputInfo){
-            this.$evtBus.$emit('click-input',inputInfo);
-            
-        }
+        
     },
     props: {
         /**

@@ -32,6 +32,6 @@ export default {
 <style scoped>
 .sym-list-control-in-doc{
     overflow: auto;
-    height: calc(100vh - 80px);
+    max-height: calc(100vh - 80px);
 }
 </style>

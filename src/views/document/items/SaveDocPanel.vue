@@ -56,12 +56,12 @@ export default {
             type:Object,
             default(){
                 return {
-                    documentName: {
+                    name: {
                         title: "Tên document",
                         type: "text",
                         value: "",
                     },
-                    documentTitle: {
+                    title: {
                         title: "Tiêu đề document",
                         type: "text",
                         value: "",
@@ -142,7 +142,7 @@ export default {
             let documentProperties = JSON.stringify(this.listInput);
             this.$emit("save-doc-action",documentProperties);
             this.hideDialog();
-        },
+        }
         
     },
     mounted(){

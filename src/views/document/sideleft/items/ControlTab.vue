@@ -134,7 +134,7 @@ export default {
     }
     .sym-list-control{
         overflow: auto;
-        height: calc(100vh - 110px);
+        max-height: calc(100vh - 110px);
     }
     
 </style>

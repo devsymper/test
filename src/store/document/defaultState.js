@@ -26,6 +26,9 @@ const defaultState = {
         currentSelectedControl: {
             // control đang được click bởi người dùng
             properties: {
+                name: {},
+                display: {},
+                print: {},
 
             },
             formulas: {
