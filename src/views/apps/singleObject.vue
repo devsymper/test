@@ -27,7 +27,7 @@
                                 class="subtitle-2"
                             >
                                 <v-icon class="pr-2" size="17">{{action.icon}}</v-icon>
-                                {{action.name}}
+                                {{action.type != 'favorite' || item.favorite == 0 ? action.name : $t('actions.listActions.document.unfavorite')}}
                             </v-list-item>
                         </v-list>
                     </v-menu>

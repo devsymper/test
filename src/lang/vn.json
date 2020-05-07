@@ -290,19 +290,22 @@
                 "submit": "Submit",
                 "list": "Danh sách",
                 "import": "Import",
-                "favorite": "Thêm vào yêu thích"
+                "favorite": "Thêm vào yêu thích",
+                "unfavorite": "Loại bỏ yêu thích"
             },
             "dataflow": {
                 "detail": "Chi tiết",
                 "execute": "Khởi tạo",
                 "list": "Danh sách",
-                "favorite": "Thêm vào yêu thích"
+                "favorite": "Thêm vào yêu thích",
+                "unfavorite": "Loại bỏ yêu thích"
             },
             "orgchart": {
                 "detail": "Chi tiết",
                 "edit": "Chỉnh sửa",
                 "query": "Truy vấn",
-                "favorite": "Thêm vào yêu thích"
+                "favorite": "Thêm vào yêu thích",
+                "unfavorite": "Loại bỏ yêu thích"
             }
         }
     },

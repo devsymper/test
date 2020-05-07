@@ -260,19 +260,22 @@
                 "submit": "Submit",
                 "list": "View list",
                 "import": "Import",
-                "favorite": "Add to favorite"
+                "favorite": "Add to favorite",
+                "unfavorite": "Remove from favorite"
             },
             "dataflow": {
                 "detail": "Detail",
                 "execute": "Execute",
                 "list": "View list",
-                "favorite": "Add to favorite"
+                "favorite": "Add to favorite",
+                "unfavorite": "Remove from favorite"
             },
             "orgchart": {
                 "detail": "Detail",
                 "edit": "Edit",
                 "query": "Query",
-                "favorite": "Add to favorite"
+                "favorite": "Add to favorite",
+                "unfavorite": "Remove from favorite"
             }
         }
     },
