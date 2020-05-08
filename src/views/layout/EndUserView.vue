@@ -41,18 +41,12 @@
                                         {{$t('common.navigator')}}
                                     </v-toolbar-title>
                                     <v-spacer></v-spacer>
-                                    <v-btn icon @click="showObjectType=6">
-                                        <v-icon>mdi-view-module</v-icon>
-                                    </v-btn>
-                                    <v-btn icon @click="showObjectType=12">
-                                        <v-icon>mdi-view-headline</v-icon>
-                                    </v-btn>
                                     <v-btn icon>
                                         <v-icon @click="isShowDialog = false">mdi-close</v-icon>
                                     </v-btn>
                                 </v-app-bar>
                                 <v-divider></v-divider>
-                                <list-app :gridSize='showObjectType'></list-app>
+                                <list-app></list-app>
                             </v-card>
                         </v-menu>
                         <v-btn icon>
@@ -129,7 +123,6 @@ export default {
     data: function() {
         return {
             isShowDialog: false,
-            showObjectType: 6,
         };
     }
 };

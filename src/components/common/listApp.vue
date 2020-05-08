@@ -12,7 +12,7 @@
                 </span>
             </div>
             <v-row v-if="!overlay">
-                <v-col :cols="gridSize" 
+                <v-col cols="6" 
                     v-for="(object, index) in app.objects"
                     :key="index" class="pt-1 pb-1"
                     v-show="object.objects.length"
@@ -40,12 +40,6 @@ export default {
     components: {
         icon,
         listObject
-    },
-    props: {
-        gridSize: {
-            type: Number,
-            default: 6
-        }
     },
     data: function() {
         return {
