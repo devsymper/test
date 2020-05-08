@@ -5,7 +5,9 @@
                  :defaultColDef="defaultColDef"
                  :autoGroupColumnDef="autoGroupColumnDef"
                  :columnDefs="columns"
-                 @on-first-data-rendered="firstDataRendered"
+                 @first-data-rendered="firstDataRendered"
+                 @cell-editing-started="cellEditingStarted"
+                 @cell-value-changed="cellValueChanged"
                  :rowData="rowDataTable"
                  :treeData="true"
                 :animateRows="true"
@@ -21,6 +23,7 @@ import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-mod
 import { RowGroupingModule } from '@ag-grid-enterprise/row-grouping';
 import '@ag-grid-community/core/dist/styles/ag-grid.css';
 import '@ag-grid-community/core/dist/styles/ag-theme-balham.css';
+import { util } from '../../plugins/util';
     export default {
         props:{
             allColumns:{
@@ -60,16 +63,28 @@ import '@ag-grid-community/core/dist/styles/ag-theme-balham.css';
                 filter: true,
                 sortable: true,
                 resizable: true,
-                };
+            };
             this.autoGroupColumnDef = { minWidth: 100 };
             this.gridOptions = {};
             this.columns = this.allColumns;
             this.rowDataTable = this.rowData;
             this.autoGroupColumnDef = {
+                editable:true,
+                field:'name',
                 headerName: 'Tên',
                 minWidth: 200,
-                cellRendererParams: { suppressCount: true },
-                // cellRenderer: renderImage,
+                cellRendererParams: { innerRenderer:renderImage },
+                valueSetter: function(params){
+                    let x = util.cloneDeep(params.newValue)
+                    let y = util.cloneDeep(params.oldValue);
+                    if(params.data['name'].length > 1){
+                        params.data['name'][1] = x
+                    }
+                    else{
+                        params.data['name'][0] = x
+                    }
+                    params.oldValue = y
+                }
             };
             this.groupDefaultExpanded = -1;
             this.getDataPath = data => {
@@ -80,9 +95,16 @@ import '@ag-grid-community/core/dist/styles/ag-theme-balham.css';
             // this.gridOptions.api.sizeColumnsToFit();
         },  
         methods:{
-            refreshData(data){
-                this.columns = data;
+            refreshData(columns){
+                this.gridOptions.api.clearFocusedCell()
+                this.columns = columns;
                 this.gridOptions.api.refreshCells();
+                this.autoSizeAll(false);
+            },
+            refreshCell(rowNode,key,value){
+                this.gridOptions.api.clearFocusedCell()
+                rowNode.setDataValue(key,value);
+                this.gridOptions.api.refreshCells({columns:[key]});
             },
             autoSizeAll(skipHeader) {
                 var allColumnIds = [];
@@ -92,9 +114,30 @@ import '@ag-grid-community/core/dist/styles/ag-theme-balham.css';
                 this.gridOptions.columnApi.autoSizeColumns(allColumnIds, skipHeader);
             },
             firstDataRendered(params){
-                console.log(params);
+                // this.autoSizeAll(false)
+            },
+            cellEditingStarted(params){
+                let rowNode = params.node;
+                this.$emit('on-cell-click',{rowNode:rowNode,col:params.colDef,rowData:params.data,controlName:params.data.name[params.data.name.length - 1],curValue:params.value}); 
+            },
+            cellValueChanged(params){
+                let controlName = null;
+                let table = '';
+                let value = params.newValue;
+                if(params.colDef.field == 'name'){  // truowng hop thay doi ten control, cần gán lại tên control cũ để tìm trong store
+                    controlName = params.oldValue[params.oldValue.length - 1];
+                    table = (params.oldValue.length > 1) ? params.oldValue[0] : ''
+                    value = (params.oldValue.length > 1) ? value[1] : value;
+                }
+                if(controlName == null){
+                    controlName = params.data.name[params.data.name.length - 1];
+                }
+                let dataEmit = {propName :params.colDef.field,controlName: controlName,value:value}
+                if(table != ''){
+                    dataEmit['tableName'] = table;
+                }
+                this.$emit('update-props',dataEmit)
                 
-                params.api.sizeColumnsToFit()
             }
         },
     }
@@ -103,21 +146,30 @@ import '@ag-grid-community/core/dist/styles/ag-theme-balham.css';
         var element = document.createElement("span");
         imageElement.src = "https://hoangnd.dev.symper.vn"+params.data.icon;
         imageElement.height = "14";
-        // element.appendChild(imageElement);
-        element.appendChild(document.createTextNode(params.value));
-        // this.eGui.appendChild(imageElement);
+        imageElement.style = "margin-right:8px;"
+        element.appendChild(imageElement);
+        let value = (params.value.length == 1) ? params.value[0] : params.value[1]
+        element.appendChild(document.createTextNode(value));
         return element
-
-
     };
+
     window.checkboxRenderer = function checkboxRenderer(params) {
-        console.log(params);
         
         var checkbox = document.createElement("input");
         checkbox.type = "checkbox"; 
         checkbox.checked = params.value
+        checkbox.addEventListener('click', function (event) {
+            params.value=!params.value;
+            let colName = params.colDef.field;
+            params.node.data[colName] = params.value;
+        });
         return checkbox
-
-
     };
+    window.fontSizeCellRenderer = function fontSizeCellRenderer(params) {
+        let el = document.createElement('span');
+        if (params.value !== "" || params.value !== undefined || params.value !== null) {
+            el.innerHTML = params.value;
+        }
+        return el
+    }
 </script>

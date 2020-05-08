@@ -673,13 +673,22 @@ export const getAllPropsControl = function() {
     let data = Object.assign(allProp, allFormulas);
     let result = Object.keys(data).map(function(key) {
         let type = data[key].type;
-        let width = (type == 'checkbox') ? 50 : 150
-        let xx = { headerName: data[key].title, field: key, groupType: data[key].groupType, width: width }
+        let width = (type == 'checkbox') ? 40 : 100
+        let colDefine = { headerName: data[key].title, field: key, groupType: data[key].groupType, width: width, editable: true, colId: key }
         if (type == 'checkbox') {
-            xx = { headerName: data[key].title, field: key, cellRenderer: checkboxRenderer, groupType: data[key].groupType, width: width }
+            colDefine = { headerName: data[key].title, field: key, cellRenderer: checkboxRenderer, editable: true, groupType: data[key].groupType, width: width, colId: key }
         }
-        return xx;
+        if (type == 'select') {
+            colDefine['cellEditor'] = 'agSelectCellEditor'
+            colDefine['cellRenderer'] = fontSizeCellRenderer
+            colDefine['cellEditorParams'] = {
+                values: ['8pt', '10pt', '12pt', '14pt', '16pt', '18pt']
+            }
+        }
+        return colDefine;
     });
+    console.log(result);
+
     let groups = util.cloneDeep(groupType);
     Object.filter = (obj, predicate) =>
         Object.fromEntries(Object.entries(obj).filter(predicate));
@@ -692,4 +701,9 @@ export const getAllPropsControl = function() {
     }
     console.log(dataPropsResult);
     return dataPropsResult;
+}
+
+export const getAllFormulasName = function() {
+    let allFormulas = util.cloneDeep(commonFormulas);
+    return Object.keys(allFormulas);
 }

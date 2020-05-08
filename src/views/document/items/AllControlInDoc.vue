@@ -1,48 +1,75 @@
 <template>
-     <v-dialog
-        :key="Date.now()"
-        v-model="isShow"
-        width="90%"
-        fullscreen
-        >
-        <v-card
-        height="800px"
-        >
-            <v-card-title class="headline">Bảng tổng hợp control</v-card-title>
-            <v-divider></v-divider>
-            <v-card-text  style="height: calc(100% - 112px);overflow-y: auto;">
-                <v-tabs @change="changeTab">
-                    <v-tab v-for="column in allColumns" :key="column.name">
-                        {{column.title}}
-                    </v-tab>
-                   
-                    <!--  -->
-                </v-tabs>
-                <data-table ref="table" class="mt-2" :allColumns="columns" :rowData="allData"/>
-            </v-card-text>
-            <v-divider></v-divider>
-            <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn
-                color="green darken-1"
-                text
-                right
-                @click="hideDialog"
+    <div>
+        <v-dialog
+            v-model="isShow"
+            width="90%"
+            fullscreen
             >
-                Đóng
-            </v-btn>
-            </v-card-actions>
-        </v-card>
-    </v-dialog>
+            <v-card
+            height="800px"
+            >
+                <v-card-title class="headline">Bảng tổng hợp control</v-card-title>
+                <v-divider></v-divider>
+                <v-card-text  style="height: calc(100% - 112px);overflow-y: auto;">
+                    <v-tabs @change="changeTab">
+                        <v-tab v-for="column in allColumns" :key="column.name">
+                            {{column.title}}
+                        </v-tab>
+                    </v-tabs>
+                    <data-table 
+                    ref="table" 
+                    class="mt-2" 
+                    @on-cell-click="clickCellAgTable"
+                    @update-props="updatePropsControl"
+                    :allColumns="columns" 
+                    :rowData="allData"/>
+                </v-card-text>
+                <v-divider></v-divider>
+                <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn
+                    color="green darken-1"
+                    text
+                    right
+                    @click="hideDialog"
+                >
+                    Đóng
+                </v-btn>
+                </v-card-actions>
+                 
+            </v-card>
+            
+        </v-dialog>
+        <symper-drag-panel
+                @before-close="closeLargeFormulaEditor()"
+                :showPanel="largeFormulaEditor.open"
+                :actionTitle="largeFormulaEditor.data.title"
+                :panelData="largeFormulaEditor.data">
+                <template slot="drag-panel-content" slot-scope="{panelData}">
+                    
+                    <formula-editor
+                        v-model="panelData.valueChange"
+                        :formulaValue="panelData.valueChange"
+                        :width="'100%'"
+                        :height="'370px'"
+                    ></formula-editor>
+                </template>
+            </symper-drag-panel>
+       
+    </div>
    
 </template>
 <script>
 import AgDataTable from "./../../../components/common/AgDataTable.vue"
-import {getAllPropsControl,getIconFromType} from "./../../../components/document/controlPropsFactory.js"
+import SymperDragPanel from "./../../../components/common/SymperDragPanel";
+import FormulaEditor from "./../../../components/common/FormulaEditor";
+import {getAllPropsControl,getIconFromType,getAllFormulasName} from "./../../../components/document/controlPropsFactory.js"
 import { util } from "./../../../plugins/util.js";
 export default {
     components:{
-        'data-table' : AgDataTable
+        'data-table' : AgDataTable,
+        'formula-editor':FormulaEditor,
+        'symper-drag-panel':SymperDragPanel
     },
     computed:{
         sAllControl(){
@@ -55,6 +82,7 @@ export default {
             return listColumnGroup;
 
         },
+        
         // hàm lấy dữ liệu cho ag-grid
         allData(){ 
             let allControl = util.cloneDeep(this.sAllControl);
@@ -78,6 +106,7 @@ export default {
                     row['name'] = [type];
                     row['title'] = [type];
                 }
+                this.mapNameToControlId[row['name'][0]] = id;
                 row['icon'] = getIconFromType(type);
                 for (let f in formulas){
                     row[f] = formulas[f].value
@@ -100,12 +129,14 @@ export default {
                                 childRow[childPropType] = cValue
                                 if(childPropType == 'name'){
                                     childRow[childPropType] = [tableName,cValue]
+                                    this.mapNameToControlId[cValue] = childId;
                                 }
                             }
                             for (let f in childFormulas){
                                 childRow[f] = childFormulas[f].value
                             }
-                            row['icon'] = getIconFromType(cType);
+                            
+                            childRow['icon'] = getIconFromType(cType);
                             allDataControl.push(childRow);
                         }
                     }
@@ -113,12 +144,21 @@ export default {
             }
             
             return allDataControl;
+        },
+        allColumnFormulas(){
+            return getAllFormulasName();
         }
     },
     data(){
         return{
             isShow:false,
             columns:[],
+            largeFormulaEditor: {
+                name: "", // tên của input
+                open: false, // có mở largeFormulaEditor hay ko
+                data: {}, // Dữ liệu của input cần mở lên để edit trong khung lớn,
+            },
+            mapNameToControlId:{}
         }
     },
     methods:{
@@ -134,8 +174,36 @@ export default {
         changeTab(e){
             if(this.$refs.table != undefined)
             this.$refs.table.refreshData(this.allColumns[e].listFields)
+        },
+        openLargeValueEditor(dataInput) {
+            this.largeFormulaEditor.open = true;
+            let inputInfo = {rowNode:dataInput.rowNode,field:dataInput.col.field,headerName:dataInput.col.headerName,valueChange:dataInput.curValue}
+            this.$set(this.largeFormulaEditor, "data", inputInfo);
+        },
+        closeLargeFormulaEditor() {
+            this.largeFormulaEditor.open = false;
+            this.$refs.table.refreshCell(this.largeFormulaEditor.data.rowNode,this.largeFormulaEditor.data.field,this.largeFormulaEditor.data.valueChange);
+        },
+        clickCellAgTable(params){
+            let colKey = params.col.field;
+            if(this.allColumnFormulas.indexOf(colKey) !== -1){
+                this.openLargeValueEditor(params)
+            }
+        },
+        updatePropsControl(params){
+            let controlName = params.controlName;
+            let propName = params.propName;
+            let value = params.value;
+            let controlId = this.mapNameToControlId[controlName];
+            let tableId = 0;
+            if(params.tableName != undefined && params.tableName !=null && params.tableName != ""){
+                tableId = this.mapNameToControlId[params.tableName];
+            }
+            this.$store.commit(
+                "document/updateProp",{id:controlId,name:propName,value:value,tableId:tableId}
+            );   
+            
         }
-        
        
         
     },

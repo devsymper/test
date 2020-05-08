@@ -101,6 +101,7 @@ const updateProp = (state, params) => {
     let name = params.name
     let value = params.value
     let tableId = params.tableId
+    console.log(tableId);
 
     if (tableId != '0') {
         if (state.editor.allControl[tableId]['listFields'][id]['properties'][name]) {

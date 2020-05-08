@@ -152,7 +152,7 @@ export default {
     overflow: hidden;
     top: 100px;
     left: 300px;
-    z-index: 500;
+    z-index: 99999;
     background-color: white;
     border-radius: 3px;
 }
