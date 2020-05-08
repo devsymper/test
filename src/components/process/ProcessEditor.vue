@@ -76,6 +76,16 @@ import { getNodeAttrs, nodeAttrsDefinition } from "./nodeAttrsFactory";
 import { allAttrDisplayGroup } from "./allAttrDisplayGroup";
 import FormTpl from "./../common/FormTpl.vue";
 
+//Do có một số khác biệt giữa tên gọi các node giữa thư viện đang dùng và  Map giữa tên các node của thư viện sang tên các node của flowable
+const mapLibNameToFlowableName = {
+    EventBasedGateway: 'EventGateway',
+    StartEvent: 'StartNoneEvent',
+    ThrowEvent: 'ThrowNoneEvent',
+    EndEvent: 'EndNoneEvent',
+    AdHocSubProcess: 'AdhocSubProcess',
+    Process: 'BPMNDiagram'
+};
+
 export default {
     data() {
         return {
@@ -123,20 +133,62 @@ export default {
         "form-tpl": FormTpl
     },
     methods: {
-        handleNodeChangeProps(nodeData){
+        /**
+         * Lấy dữ liệu của tất cả các node dưới dạng json để gửi về server lưu
+         * @returns {Object} chứa data của process và thông tin của tất cả các node trong nó
+         */
+        getModellerDataToSave(){
+            
+        },
+        /**
+         * Khôi phục lại dữ liệu được lưu ở server thành dữ liệu có thể sử dụng trong state để thao tác
+         * @param {Object} processData data của process và thông tin của tất cả các node trong nó mà đã được lưu ở server
+         */
+        restoreSavedData(processData){
+
+        },
+        /**
+         *  Lấy ra tên của node dựa vào dữ liệu của node đó trong  bpmn modeller
+         * @param {Object} nodeData data của node trong thư viện bpmn-js
+         * @returns {String} tên của node sau khi đã tính toán
+         */
+        getNodeType(nodeData) {
+            let nodeType = nodeData.$type.replace("bpmn:", "").replace("Intermediate", "");
+            if (nodeType.includes("Event") && nodeData.eventDefinitions) {
+                let evtType = nodeData.eventDefinitions[0].$type.replace(
+                    "bpmn:",
+                    ""
+                );
+                evtType = evtType.replace("Definition", "");
+                nodeType = nodeType.replace('Event', '');
+                nodeType = nodeType+evtType;
+            } else if (
+                nodeType == "bpmn:SubProcess" &&
+                nodeData.triggeredByEvent
+            ) {
+                nodeType = "EventSubProcess";
+            }
+
+            nodeType = mapLibNameToFlowableName[nodeType] ? mapLibNameToFlowableName[nodeType] : nodeType;
+            return nodeType;
+        },
+        handleNodeChangeProps(nodeData) {
             let nodeId = nodeData.id;
             let nodeState = this.$store.state.process.allNodes[nodeId];
-            let newType = nodeData.$type.replace('bpmn:','');
-            if(nodeState){
-                if(newType != nodeState.type){
+            let newType = this.getNodeType(nodeData);
+            console.log(newType, nodeData);
+
+            if (nodeState) {
+                if (newType != nodeState.type) {
                     this.changeNodeType(nodeState, newType);
                 }
 
-                if(nodeId == this.selectingNode.id){
-                    this.$store.commit("process/changeSelectingNode", this.$store.state.process.allNodes[nodeId]);
+                if (nodeId == this.selectingNode.id) {
+                    this.$store.commit(
+                        "process/changeSelectingNode",
+                        this.$store.state.process.allNodes[nodeId]
+                    );
                 }
-                console.log(this.$store.state.process,this, 'this.$store.state.processthis.$store.state.process');
-                
             }
         },
 
@@ -145,11 +197,12 @@ export default {
          * @param {Object} nodeState Object chứa state của node cần thay đổi (data của node cũ)
          * @param {String} newType Loại node mới cần đổi
          */
-        changeNodeType(nodeState, newType){
+        changeNodeType(nodeState, newType) {
             let newNodeData = this.createNodeData(nodeState.id, newType);
-            for(let attrName in newNodeData.attrs){
-                if(nodeState.attrs[attrName]){
-                    newNodeData.attrs[attrName].value = nodeState.attrs[attrName].value;
+            for (let attrName in newNodeData.attrs) {
+                if (nodeState.attrs[attrName]) {
+                    newNodeData.attrs[attrName].value =
+                        nodeState.attrs[attrName].value;
                 }
             }
             this.$store.commit("process/addNewNode", newNodeData);
@@ -159,13 +212,18 @@ export default {
             let type = this.selectingNode.type;
             let typeData = nodeAttrsDefinition[type];
 
-
-            if(typeData.checkShowOrHideInput){
+            if (typeData.checkShowOrHideInput) {
                 typeData.checkShowOrHideInput(this.selectingNode.attrs);
             }
 
-            if(typeData.validate){
+            if (typeData.validate) {
                 typeData.validate(this.selectingNode.attrs);
+            }
+            if (name == "name") {
+                this.$refs.symperBpmn.updateElementProperties(
+                    this.$store.state.process.selectingNode.id,
+                    { name: inputInfo.value }
+                );
             }
         },
         /**
@@ -186,6 +244,7 @@ export default {
                 type: nodeType,
                 attrs: getNodeAttrs(nodeType)
             };
+            nodeData.attrs.overrideid.value = nodeId;
             this.$store.commit("process/addNewNode", nodeData);
             return nodeData;
         },
@@ -193,9 +252,12 @@ export default {
          * Xử lý sự kiện khi người dùng click vào một node
          */
         handleNodeSelected(node) {
-            console.log(node);
-            let type = node.$type.replace('bpmn:','');
+            let type = this.getNodeType(node);
+            console.log(type, node);
+
             let nodeData = this.getNodeData(node.id, type);
+            nodeData.name = node.name;
+            nodeData.attrs.name.value = node.name;
             this.$store.commit("process/changeSelectingNode", nodeData);
         },
         /**
@@ -216,11 +278,11 @@ export default {
             default: "create"
         }
     },
-    created(){
-        this.$store.dispatch('app/getAllOrgchartNodes');
+    created() {
+        this.$store.dispatch("app/getAllOrgChartData");
     },
     computed: {
-        selectingNode(){
+        selectingNode() {
             return this.$store.state.process.selectingNode;
         },
         /** Chuyển dạng danh sách attr từ dạng phẳng sang dạng nhóm thành các group để hiển thị **/

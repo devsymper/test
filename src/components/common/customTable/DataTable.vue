@@ -55,7 +55,7 @@ export default {
         tableColumns() {
             return this.columns.reduce((cols, col, idx) => {
                 col = util.cloneDeep(col);
-                col.data = col.dataKey;
+                col.data = col.name;
                 cols.push(col);
                 return cols;
             }, []);
