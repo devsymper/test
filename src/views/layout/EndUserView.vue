@@ -21,6 +21,40 @@
                         class="float-right app-header-bg-color"
                         style="height:40px; line-height:40px;"
                     >
+                        <v-menu
+                            v-model="isShowDialog"
+                            :close-on-content-click="false"
+                            :max-width="500"
+                            :min-width="500"
+                            :max-height="700"
+                            offset-y
+                            >
+                            <template v-slot:activator="{ on }">
+                                <v-btn icon v-on="on">
+                                    <v-icon>mdi-apps</v-icon>
+                                </v-btn>
+                            </template>
+                            <v-card>
+                                <v-app-bar dense flat color="white">
+                                    <v-toolbar-title>
+                                        <v-icon>mdi-apps</v-icon>
+                                        {{$t('common.navigator')}}
+                                    </v-toolbar-title>
+                                    <v-spacer></v-spacer>
+                                    <v-btn icon @click="showObjectType=6">
+                                        <v-icon>mdi-view-module</v-icon>
+                                    </v-btn>
+                                    <v-btn icon @click="showObjectType=12">
+                                        <v-icon>mdi-view-headline</v-icon>
+                                    </v-btn>
+                                    <v-btn icon>
+                                        <v-icon @click="isShowDialog = false">mdi-close</v-icon>
+                                    </v-btn>
+                                </v-app-bar>
+                                <v-divider></v-divider>
+                                <list-app :gridSize='showObjectType'></list-app>
+                            </v-card>
+                        </v-menu>
                         <v-btn icon>
                             <v-icon>mdi-magnify</v-icon>
                         </v-btn>
@@ -51,6 +85,7 @@
 
 <script>
 import BASidebar from "@/components/common/BASidebar.vue";
+import listApp from "@/components/common/listApp";
 export default {
     methods: {
         /**
@@ -71,7 +106,8 @@ export default {
         }
     },
     components: {
-        "ba-sidebar": BASidebar
+        "ba-sidebar": BASidebar,
+        "list-app": listApp
     },
     created() {},
     computed: {
@@ -89,6 +125,12 @@ export default {
         tabTitles() {
             return Object.values(this.$store.state.app.urlToTabTitleMap);
         }
+    },
+    data: function() {
+        return {
+            isShowDialog: false,
+            showObjectType: 6,
+        };
     }
 };
 </script>

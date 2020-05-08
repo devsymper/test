@@ -26,7 +26,8 @@
         "actions": "Actions package",
         "apps": "Application Configuration",
         "favorite": "Favorite",
-        "application": "Application"
+        "application": "Application",
+        "navigator": "Navigator"
     },
     "validate": {
         "required": "Not be empty",

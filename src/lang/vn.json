@@ -26,7 +26,8 @@
         "actions": "Actions package",
         "apps": "Cài đặt Application",
         "application": "Application",
-        "favorite": "Yêu thích"
+        "favorite": "Yêu thích",
+        "navigator": "Điều hướng"
     },
     "login": {
         "title": "Đăng nhập hệ thống",

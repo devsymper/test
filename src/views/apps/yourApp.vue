@@ -192,14 +192,14 @@ export default {
                 })
             }
             for (; typeIndex < this.listFavorite.length && this.listFavorite[typeIndex].type != type; ++typeIndex) {}
-            if (item.favorite == 0) {
-                for (const objIndex in this.listFavorite[typeIndex].objects) {
-                    if (this.listFavorite[typeIndex].objects[objIndex].id == item.id) {
-                        this.listFavorite[typeIndex].objects.splice(objIndex, 1);
-                        break;
-                    }
+            let existInArray = false;
+            for (const objIndex in this.listFavorite[typeIndex].objects) {
+                if (this.listFavorite[typeIndex].objects[objIndex].id == item.id) {
+                    existInArray = true;
+                    this.listFavorite[typeIndex].objects.splice(objIndex, 1);
                 }
-            } else {
+            }
+            if (!existInArray) {
                 this.listFavorite[typeIndex].objects.push(item);
             }
             for (let objIndex = 0; objIndex < this.selectedAppObjects.length; objIndex++) {
@@ -208,7 +208,8 @@ export default {
                     for (let itemIndex = 0; itemIndex < objs.objects.length; itemIndex++) {
                         const loopItem = objs.objects[itemIndex];
                         if (loopItem.id == item.id) {
-                            this.selectedAppObjects[objIndex].objects[itemIndex].favorite = item.favorite;
+                            this.selectedAppObjects[objIndex].objects[itemIndex].favorite = item.favorite ? 1 : 0;
+                            break;
                         }
                     }
                     break;

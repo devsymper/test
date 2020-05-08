@@ -175,13 +175,14 @@ export default {
     },
     methods: {
         toggleFavorite(item) {
+            item.favorite = parseInt(item.favorite);
+            item.favorite = !item.favorite;
             for (const index in this.objects) {
                 if (this.objects[index].id == item.id) {
-                    this.objects[index].favorite = !!!item.favorite ? 1 : 0;
+                    this.objects[index].favorite = item.favorite ? 1 : 0;
                     break;
                 }
             }
-            item.favorite = !!!item.favorite ? 1 : 0;
             this.$emit("toggle-favorite", {
                 item: item,
                 type: this.type,
