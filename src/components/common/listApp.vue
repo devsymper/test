@@ -157,7 +157,7 @@ export default {
                     if (objs.type == type) {
                         objs.objects.forEach((loopItem, itemIndex) => {
                             if (loopItem.id == item.id) {
-                                this.listApp[appIndex].objects[objIndex].objects[itemIndex].favorite = 1;
+                                this.listApp[appIndex].objects[objIndex].objects[itemIndex].favorite = item.favorite;
                             }
                         });
                     }
