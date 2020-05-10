@@ -15,6 +15,7 @@ import Snippet from "../views/snippets/index.vue";
 import Permissions from "../views/permissions/index.vue";
 import apps from "../views/apps/index.vue";
 import actions from "../views/actions/index.vue";
+import virtualdocs from "../views/virtualdocs/index.vue";
 import application from "../views/apps/yourApp.vue";
 import Editor from "../views/document/Editor.vue";
 
@@ -75,12 +76,6 @@ const routes = [{
         name: "documentEditor",
         component: Editor,
     },
-    // {
-    //     path: "/users/permission-package/:id",
-    //     name: "permissionPackage",
-    //     component: PermissionPackage,
-    // },
-
     //Snippet
     {
         path: "/snippets",
@@ -107,6 +102,11 @@ const routes = [{
         path: "/actions",
         name: "actions",
         component: actions,
+    },
+    {
+        path: "/virtualdocs",
+        name: "virtualdocs",
+        component: virtualdocs,
     },
 
     // Luôn để 2 item này ở cuối cùng của array này để nó có thể redirect đến được trang 404 khi ko tìm thấy route

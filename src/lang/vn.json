@@ -27,7 +27,9 @@
         "apps": "Cài đặt Application",
         "application": "Application",
         "favorite": "Yêu thích",
-        "navigator": "Điều hướng"
+        "navigator": "Điều hướng",
+        "close": "Đóng",
+        "virtualdocs": "Virtualdocs"
     },
     "login": {
         "title": "Đăng nhập hệ thống",
@@ -323,5 +325,32 @@
         "error": "Đã có lỗi xảy ra. Vui lòng thử lại sau",
         "errorTitle": "Lỗi",
         "successTitle": "Thành công"
+    },
+    "virtualdoc": {
+        "header": {
+            "id": "ID",
+            "name": "Tên",
+            "description": "Mô tả",
+            "updatetime": "Sửa lần cuối",
+            "lastestruntime": "Thời gian chạy (s)",
+            "lastestrunat": "Lần chạy cuối lúc",
+            "formula": "Công thức",
+            "columnsorder": "Thứ tự các cột"
+        },
+        "title": "Danh sách Virtualdocs",
+        "contextMenu": {
+            "edit": "Sửa",
+            "add": "Thêm mới",
+            "export": "Xuất excel",
+            "execute": "Thực thi",
+            "detail": "Xem chi tiết",
+            "remove": "Xóa"
+        },
+        "updated": "Virtualdoc đã được cập nhật",
+        "added": "Virtualdoc đã được tạo mới",
+        "deleted": "Virtualdoc đã xóa",
+        "loadingData": "Vui lòng đợi trong giây lát. Dữ liệu đang được chuẩn bị.",
+        "noData": "Virtualdoc chưa có dữ liệu",
+        "detailTitle": "Danh sách dữ liệu"
     }
 }

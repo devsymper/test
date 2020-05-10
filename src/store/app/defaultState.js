@@ -55,6 +55,7 @@ const defaultState = {
         },
         { title: "actions", icon: "mdi-package", link: "/actions" },
         { title: "apps", icon: "mdi-apps", link: "/apps" },
+        { title: "virtualdocs", icon: "mdi-table", link: "/virtualdocs" },
     ],
     urlToTabTitleMap: {}, // map giữa url với title của tab,
     currentTabIndex: 0, // index cuả tab hiện tại đang mở,

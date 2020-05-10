@@ -27,7 +27,9 @@
         "apps": "Application Configuration",
         "favorite": "Favorite",
         "application": "Application",
-        "navigator": "Navigator"
+        "navigator": "Navigator",
+        "close": "Close",
+        "virtualdocs": "Virtualdocs"
     },
     "validate": {
         "required": "Not be empty",
@@ -324,5 +326,32 @@
         "error": "Error occurred. Please try again later",
         "errorTitle": "Error",
         "successTitle": "Success"
+    },
+    "virtualdoc": {
+        "header": {
+            "id": "ID",
+            "name": "Name",
+            "description": "Description",
+            "updatetime": "Update at",
+            "lastestruntime": "Lastest run time (s)",
+            "lastestrunat": "Last run at",
+            "formula": "Formula",
+            "columnsorder": "Column Order"
+        },
+        "title": "List Virtualdocs",
+        "contextMenu": {
+            "edit": "Edit",
+            "add": "Add new",
+            "export": "Export data",
+            "execute": "Execute",
+            "Detail": "Detail",
+            "remove": "Remove"
+        },
+        "updated": "Virtualdoc updated",
+        "added": "Virtualdoc created",
+        "deleted": "Virtualdoc deleted",
+        "loadingData": "Please be patient. Your data is preparing.",
+        "noData": "This virtualdoc has no data yet",
+        "detailTitle": "List virtualdoc data"
     }
 }
