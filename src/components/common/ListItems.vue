@@ -22,6 +22,7 @@
                             :disabled="loadingRefresh"
                             class="mr-2"
                             @click="addItem"
+                            v-if="!isCompactMode"
                         >
                             <v-icon left dark>mdi-plus</v-icon>
                             {{$t('common.add')}}
@@ -32,6 +33,7 @@
                             :loading="loadingRefresh"
                             :disabled="loadingRefresh"
                             class="mr-2"
+                            v-if="!isCompactMode"
                             @click="refreshList"
                         >
                             <v-icon left dark>mdi-refresh</v-icon>
@@ -43,10 +45,16 @@
                             :loading="loadingExportExcel"
                             class="mr-2"
                             :disabled="loadingExportExcel"
+                            v-if="!isCompactMode"
                         >
                             <v-icon left dark>mdi-microsoft-excel</v-icon>
                             {{$t('common.export_excel')}}
                         </v-btn>
+                        <component
+                            :is="'span'"
+                        >
+                            <slot name="extra-button"></slot>
+                        </component>
                         <v-tooltip top>
                             <template v-slot:activator="{ on }">
                                 <v-btn
@@ -395,6 +403,10 @@ export default {
         listItemName: {
             type: String,
             default: "item"
+        },
+        isCompactMode: {
+            type: Boolean,
+            default: false
         }
     },
     mounted() {},

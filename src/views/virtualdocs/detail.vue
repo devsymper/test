@@ -1,18 +1,37 @@
 <template>
     <v-container fluid>
         <tblViews
-            ref="listvirtualdoc"
+            ref="listData"
             :getDataUrl="baseUrl"
             :pageTitle="$t('virtualdoc.detailTitle')"
-            :containerHeight="tableHeight - 70"
+            :containerHeight="tableHeight - 100"
             :useDefaultContext="false"
+            :isCompactMode="true"
         >
+            <template slot="extra-button">
+                <v-btn
+                    depressed
+                    small
+                    class="mr-2"
+                    @click="openSidebar"
+                >
+                    <v-icon left dark>mdi-eye</v-icon>
+                    {{$t('virtualdoc.common')}}
+                </v-btn>
+            </template>
+            <template slot="right-panel-content">
+                <detail-virtualdoc 
+                    :isEdit="true"
+                    :readonly="true"
+                    ref="actionPanel"
+                    @close-sidebar="closeSidebar"
+                ></detail-virtualdoc>
+            </template>
         </tblViews>
         <v-card-actions>
             <v-btn
                 small
-                color="primary"
-                class="float-right btn-fixed-bottom"
+                class="btn-fixed-bottom right-100"
                 @click="closeSidebar"
             >
                 {{ $t("common.close") }}
@@ -23,6 +42,7 @@
 
 <script>
 import tblViews from "../../components/common/ListItems";
+import detail from "./update";
 export default {
     name: "detailVirtualdoc",
     props: {
@@ -36,6 +56,7 @@ export default {
         }
     },
     components: {
+        "detail-virtualdoc": detail,
         tblViews
     },
     data: function() {
@@ -45,7 +66,7 @@ export default {
         }
     },
     mounted() {
-        
+        this.$refs.actionPanel.setVirtualdocObject(this.virtualdoc);
     },
     computed: {
         baseUrl: function(){
@@ -55,6 +76,9 @@ export default {
     methods: {
         closeSidebar() {
             this.$emit("close-sidebar", {});
+        },
+        openSidebar() {
+            this.$refs.listData.actionPanel = true;
         }
     }
 }

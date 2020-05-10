@@ -1,7 +1,8 @@
 <template>
     <div>
         <v-card-title class="pt-0 pb-2 subtitle-1 font-weight-bold">
-            <v-icon class="pr-4">mdi-contain</v-icon> {{!!!isEdit ? "Thêm mới virtualdoc" : "Cập nhật virtualdoc"}}
+            <v-icon class="pr-4">mdi-contain</v-icon> 
+                {{ readonly ? $t('virtualdoc.common'): !!!isEdit ? "Thêm mới virtualdoc" : "Cập nhật virtualdoc" }}
         </v-card-title>
         <v-divider></v-divider>
         <v-card-text>
@@ -16,6 +17,7 @@
                         dense
                         solo
                         flat
+                        :readonly="readonly"
                     ></v-text-field>
                 </v-col>
                 <v-col cols="2" class="subtitle-2">
@@ -23,11 +25,12 @@
                 </v-col>
                 <v-col cols="10">
                     <v-text-field
-                        v-model.lazy="currentVirtualdoc.description"
+                        v-model="currentVirtualdoc.description"
                         class="sym-small-size bg-grey"
                         dense
                         solo
                         flat
+                        :readonly="readonly"
                     ></v-text-field>
                 </v-col>
                 <v-col cols="12" class="subtitle-2 pb-0">
@@ -35,11 +38,12 @@
                 </v-col>
                 <v-col cols="12">
                     <v-text-field
-                        v-model.lazy="currentVirtualdoc.columnsOrder"
+                        v-model="currentVirtualdoc.columnsOrder"
                         class="sym-small-size bg-grey"
                         dense
                         solo
                         flat
+                        :readonly="readonly"
                     ></v-text-field>
                 </v-col>
                 <v-col cols="12">
@@ -49,6 +53,7 @@
                         v-model="currentVirtualdoc.formula"
                         :formulaValue="currentVirtualdoc.formula"
                         :height="'150px'"
+                        :readonly="readonly"
                         :simpleMode="true"
                         @change="setValue"
                         @input="setValue"
@@ -56,18 +61,6 @@
                 </v-col>
             </v-row>
         </v-card-text>
-        <v-card-actions>
-            <v-btn
-                small
-                color="primary"
-                class="float-right btn-fixed-bottom"
-                @click="addvirtualdoc"
-                :disabled="!/^[a-zA-Z\d_]{3,}$/.test(this.currentVirtualdoc.name)"
-            >
-                <v-icon class="mr-2">mdi-content-save-outline</v-icon>
-                {{ isEdit ? "Cập nhật" : "Thêm" }}
-            </v-btn>
-        </v-card-actions>
     </div>
 </template>
 
@@ -81,6 +74,10 @@ export default {
     },
     props: {
         isEdit: {
+            type: Boolean,
+            default: false
+        },
+        readonly: {
             type: Boolean,
             default: false
         }
@@ -103,7 +100,11 @@ export default {
         }
     },
     methods: {
+        closeSidebar() {
+            this.$emit("close-sidebar", {});
+        },
         setVirtualdocObject(obj) {
+            console.log(obj);
             this.currentVirtualdoc = JSON.parse(JSON.stringify(obj));
             if (obj.id !== undefined && !!obj.id) {
                 this.getDetailVirtualdoc(obj.id);

@@ -352,6 +352,7 @@
         "deleted": "Virtualdoc deleted",
         "loadingData": "Please be patient. Your data is preparing.",
         "noData": "This virtualdoc has no data yet",
-        "detailTitle": "List virtualdoc data"
+        "detailTitle": "List virtualdoc data",
+        "common": "Summary Info"
     }
 }

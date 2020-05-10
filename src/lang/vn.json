@@ -351,6 +351,7 @@
         "deleted": "Virtualdoc đã xóa",
         "loadingData": "Vui lòng đợi trong giây lát. Dữ liệu đang được chuẩn bị.",
         "noData": "Virtualdoc chưa có dữ liệu",
-        "detailTitle": "Danh sách dữ liệu"
+        "detailTitle": "Danh sách dữ liệu",
+        "common": "Thông tin chung"
     }
 }
