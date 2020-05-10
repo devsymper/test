@@ -31,7 +31,8 @@
         <v-card-actions>
             <v-btn
                 small
-                class="btn-fixed-bottom right-100"
+                class="btn-fixed-bottom"
+                :class="{'right-100': $refs.listData != undefined && ($refs.listData.actionPanel || $refs.listData.tableDisplayConfig.show)}"
                 @click="closeSidebar"
             >
                 {{ $t("common.close") }}
