@@ -360,8 +360,19 @@ export const nodeAttrsDefinition = {
         },
         checkShowOrHideInput: function(attrs) {
 
-        }
+        },
+        exclude: ['overrideid'],
+
     },
+    'SequenceFlow': {
+        attrs: ["conditionsequenceflow", "executionlisteners", "defaultflow", "skipexpression"],
+        validate: function(attrs) {
+
+        },
+        checkShowOrHideInput: function(attrs) {
+
+        }
+    }
 };
 
 

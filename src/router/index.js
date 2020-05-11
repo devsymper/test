@@ -1,14 +1,12 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
 import Home from "../views/Home.vue";
-import BPMNE from "../views/BPMNEngine.vue";
+import BPMNE from "../views/process/ProcessList.vue";
 import Login from "../views/Login.vue";
 import { routeMiddleware } from './middleware.js';
 import PageNotFound from './../views/PageNotFound.vue';
 import MultiGuard from 'vue-router-multiguard';
-
 import CreateProcess from "../views/process/CreateProcess.vue";
-
 import ShowListUser from "../views/users/ShowList.vue";
 import ActionPanel from "../views/users/ActionPanel.vue";
 import Snippet from "../views/snippets/index.vue";
@@ -34,6 +32,16 @@ const routes = [{
         path: "/bpmne",
         name: "processList",
         component: BPMNE,
+    },
+    {
+        path: "/bpmne/:id/edit",
+        name: "editProcess",
+        component: CreateProcess,
+    },
+    {
+        path: "/bpmne/:id/clone",
+        name: "cloneProcess",
+        component: CreateProcess,
     },
     {
         path: "/bpmne/create",

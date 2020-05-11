@@ -33,7 +33,7 @@ export default {
             bpmnModeler: null,
             modeling: null,
             canvasScale: 1,
-            debounceNodeChanged: {}, // debounce cho việc thay đổi trạng thái của các node, dạng {id node : setimeout func }
+            debounceNodeChanged: {} // debounce cho việc thay đổi trạng thái của các node, dạng {id node : setimeout func }
         };
     },
     mounted: function() {
@@ -59,6 +59,17 @@ export default {
         }
     },
     methods: {
+        getAllNodes() {
+            let allNododes = this.bpmnModeler
+                .get("elementRegistry")
+                .filter(function(element) {
+                    return true;
+                });
+            return allNododes.reduce((nodes, ele) => {
+                nodes.push(ele.businessObject);
+                return nodes;
+            }, []);
+        },
         handleClickOnModeller(event) {},
         /**
          * Lắng nghe và xử lý các sự kiện trong modeller
@@ -68,27 +79,31 @@ export default {
             this.bpmnModeler.on("element.click", 10, event => {
                 self.handleClickOnModeller(event);
             });
-            this.bpmnModeler.on('element.click', (evt) => {
-                this.$emit('node-clicked',getBusinessObject(evt.element));
+            this.bpmnModeler.on("element.click", evt => {
+                this.$emit("node-clicked", getBusinessObject(evt.element));
             });
 
-            this.bpmnModeler.on('element.changed', (evt) => {
+            this.bpmnModeler.on("element.changed", evt => {
                 let nodeId = evt.element.id;
                 let bizObj = getBusinessObject(evt.element);
-                if($(`g[data-element-id=${nodeId}]`).length == 0){
-                    self.$emit('node-removed',bizObj);
-                }else{
+                if ($(`g[data-element-id=${nodeId}]`).length == 0) {
+                    self.$emit("node-removed", bizObj);
+                } else {
                     /**
                      * Do thư viện bpmn-js không cung cấp rõ ràng các sự kiện nên phải dồn hết vào một sự kiện là "node-changed"
                      * sự kiện này có thể là một trong các sự kiện: thêm node mới, thay đổi loại node, thay đổi marker của node
                      */
-                    if(self.debounceNodeChanged[bizObj.id]){
+                    if (self.debounceNodeChanged[bizObj.id]) {
                         clearTimeout(self.debounceNodeChanged[bizObj.id]);
                     }
 
-                    self.debounceNodeChanged[bizObj.id] = setTimeout((bizObj) => {
-                        self.$emit('node-changed',bizObj);
-                    }, 50, bizObj);
+                    self.debounceNodeChanged[bizObj.id] = setTimeout(
+                        bizObj => {
+                            self.$emit("node-changed", bizObj);
+                        },
+                        50,
+                        bizObj
+                    );
                 }
             });
         },
@@ -176,16 +191,13 @@ export default {
             }
         },
         /**
-         * Update thuộc tính của một element trong bpmn 
+         * Update thuộc tính của một element trong bpmn
          * @param {String} eleId Id của element cần update
          * @param {Object} attrs Các thuộc tính cần update, dạng key-value
          */
-        updateElementProperties(eleId, props){
-            let ele = this.bpmnModeler.get('elementRegistry').get(eleId);
-            this.modeling.updateProperties(
-                ele,
-                props
-            );
+        updateElementProperties(eleId, props) {
+            let ele = this.bpmnModeler.get("elementRegistry").get(eleId);
+            this.modeling.updateProperties(ele, props);
         }
     }
 };

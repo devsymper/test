@@ -184,6 +184,18 @@
         }
     },
     "process": {
+        "list": {
+            "title": "Process list"
+        },
+        "action": {
+            "create": "Create new process"
+        },
+        "editror": {
+            "err": {
+                "get_data": "Can not get model data!",
+                "get_xml": "Can not get XML for process"
+            }
+        },
         "header_bar": {
             "undo": "Undo ",
             "redo": "Redo ",

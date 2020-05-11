@@ -184,6 +184,18 @@
         }
     },
     "process": {
+        "list": {
+            "title": "Danh sách quy trình"
+        },
+        "action": {
+            "create": "Tạo quy trình mới"
+        },
+        "editror": {
+            "err": {
+                "get_data": "Không thể lấy dữ liệu cho soạn thảo quy trình",
+                "get_xml": "Không thể lấy XML cho soạn thảo quy trình"
+            }
+        },
         "header_bar": {
             "undo": "Undo ",
             "redo": "Redo ",
