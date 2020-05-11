@@ -29,7 +29,8 @@
         "application": "Application",
         "navigator": "Navigator",
         "close": "Close",
-        "virtualdocs": "Virtualdocs"
+        "virtualdocs": "Virtualdocs",
+        "tasks": "Tasks"
     },
     "validate": {
         "required": "Not be empty",
@@ -354,5 +355,27 @@
         "noData": "This virtualdoc has no data yet",
         "detailTitle": "List virtualdoc data",
         "common": "Summary Info"
+    },
+    "sortBy": "Sort by",
+    "orderBy": "Order by",
+    "order": {
+        "ascending": "Ascending",
+        "descending": "Descending"
+    },
+    "tasks": {
+        "header": {
+            "date": "Date",
+            "dueDate": "Due Date",
+            "description": "Task description",
+            "owner": "Task Owner",
+            "name": "Task name",
+            "assignee": "Assignee"
+        },
+        "filterOptions": {
+            "all": "All task",
+            "myTask": "My task",
+            "myStaff": "My staff",
+            "assigned": "Assigned"
+        }
     }
 }

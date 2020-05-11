@@ -16,6 +16,7 @@ import Permissions from "../views/permissions/index.vue";
 import apps from "../views/apps/index.vue";
 import actions from "../views/actions/index.vue";
 import virtualdocs from "../views/virtualdocs/index.vue";
+import tasks from "../views/tasks/index.vue";
 import application from "../views/apps/yourApp.vue";
 import Editor from "../views/document/Editor.vue";
 
@@ -107,6 +108,11 @@ const routes = [{
         path: "/virtualdocs",
         name: "virtualdocs",
         component: virtualdocs,
+    },
+    {
+        path: "/tasks",
+        name: "tasks",
+        component: tasks,
     },
 
     // Luôn để 2 item này ở cuối cùng của array này để nó có thể redirect đến được trang 404 khi ko tìm thấy route

@@ -29,7 +29,8 @@
         "favorite": "Yêu thích",
         "navigator": "Điều hướng",
         "close": "Đóng",
-        "virtualdocs": "Virtualdocs"
+        "virtualdocs": "Virtualdocs",
+        "tasks": "Tasks"
     },
     "login": {
         "title": "Đăng nhập hệ thống",
@@ -353,5 +354,27 @@
         "noData": "Virtualdoc chưa có dữ liệu",
         "detailTitle": "Danh sách dữ liệu",
         "common": "Thông tin chung"
+    },
+    "sortBy": "Sắp xếp",
+    "orderBy": "Thứ tự",
+    "order": {
+        "ascending": "Tăng dần",
+        "descending": "Giảm dần"
+    },
+    "tasks": {
+        "header": {
+            "date": "Ngày tạo",
+            "dueDate": "Ngày đến hạn",
+            "description": "Mô tả",
+            "owner": "Người tạo",
+            "name": "Tên công việc",
+            "assignee": "Người được giao"
+        },
+        "filterOptions": {
+            "all": "Toàn bộ task",
+            "myTask": "Task của tôi",
+            "myStaff": "Task của nhân viên",
+            "assigned": "Task đã được giao"
+        }
     }
 }
