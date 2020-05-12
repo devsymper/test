@@ -1,17 +1,15 @@
 <template>
     <v-row class="ml-0 mr-0">
-        <v-col cols="8" class="pb-0">
-            <div class="subtitle-2 pl-2">
-                <icon :icon="'mdi-apps'" class="mr-1"></icon>
+        <v-col cols="8" class="pb-0 pt-0">
+            <div class="body-2 pl-2">
                 App name
                 /
-                <icon :icon="'mdi-arrow-down-bold-hexagon-outline'" class="mr-1"></icon>
                 Object name
                 / 
                 task id
             </div>
         </v-col>
-        <v-col cols="4" class="text-right pb-0">
+        <v-col cols="4" class="text-right pb-0 pt-0">
             <v-btn small color="primary" disabled="" class="mr-2">
                 <v-icon small class="mr-2">mdi-content-save</v-icon> 
                 {{$t("common.save")}}
@@ -33,6 +31,7 @@
                     <v-tab
                         v-for="item in items"
                         :key="item.tab"
+                        class="body-2"
                     >
                         <v-icon small class="mr-2">{{item.icon}}</v-icon>
                         {{ item.title }}
@@ -95,11 +94,11 @@ export default {
                     icon: 'mdi-format-list-bulleted',
                     title: "Subtask",
                     content: subtask
-                }, {
-                    tab: 'flow',
-                    icon: 'mdi-cogs',
-                    title: "Flow",
-                    content: flow
+                // }, {
+                //     tab: 'flow',
+                //     icon: 'mdi-cogs',
+                //     title: "Flow",
+                //     content: flow
                 }, {
                     tab: 'attachment',
                     icon: 'mdi-paperclip',

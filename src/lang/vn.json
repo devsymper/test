@@ -365,16 +365,21 @@
         "header": {
             "date": "Ngày tạo",
             "dueDate": "Ngày đến hạn",
+            "createDate": "Ngày khởi tạo",
             "description": "Mô tả",
             "owner": "Người tạo",
             "name": "Tên công việc",
-            "assignee": "Người được giao"
+            "assignee": "Người được giao",
+            "watcher": "Người theo dõi",
+            "participant": "Người tham gia"
         },
         "filterOptions": {
             "all": "Toàn bộ task",
             "myTask": "Task của tôi",
             "myStaff": "Task của nhân viên",
             "assigned": "Task đã được giao"
-        }
+        },
+        "taskTitle": "Tiêu đề",
+        "addSubtaskTitle": "Thêm mới subtask"
     }
 }

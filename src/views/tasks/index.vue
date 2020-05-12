@@ -1,6 +1,6 @@
 <template>
     <v-container fluid>
-       <list-task></list-task>
+       <list-task :height="height" @change-height="changeHeight"></list-task>
     </v-container>
 </template>
 
@@ -21,9 +21,13 @@ export default {
         return {
             apiUrl: "https://v2hoangnd.dev.symper.vn/",
             virtualdocUrl: "virtualdocs",
+            height: "calc(100vh - 120px)"
         };
     },
     methods: {
+        changeHeight(newHeight) {
+            this.height = newHeight
+        }
     }
 }
 </script>

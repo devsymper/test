@@ -1,7 +1,9 @@
 <template>
-    <div>
-        <h4>tesst task</h4>
-    </div>
+    <v-container class="pt-6">
+        <v-row>
+            <v-col></v-col>
+        </v-row>
+    </v-container>
 </template>
 
 <script>

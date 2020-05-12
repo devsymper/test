@@ -366,16 +366,21 @@
         "header": {
             "date": "Date",
             "dueDate": "Due Date",
+            "createDate": "Create date",
             "description": "Task description",
             "owner": "Task Owner",
             "name": "Task name",
-            "assignee": "Assignee"
+            "assignee": "Assignee",
+            "watcher": "Watcher",
+            "participant": "Participant"
         },
         "filterOptions": {
             "all": "All task",
             "myTask": "My task",
             "myStaff": "My staff",
             "assigned": "Assigned"
-        }
+        },
+        "taskTitle": "Task title",
+        "addSubtaskTitle": "Create new subtask"
     }
 }
