@@ -16,7 +16,13 @@
                     <span>{{$t(item.text) }}</span>
                 </v-tooltip>
 
-                <v-btn class="float-right mr-1" @click="saveProcess" small depressed color="primary">
+                <v-btn
+                    class="float-right mr-1"
+                    @click="saveProcess"
+                    small
+                    depressed
+                    color="primary"
+                >
                     <v-icon class="mr-2" primary>mdi-content-save</v-icon>
                     {{$t('process.header_bar.save')}}
                 </v-btn>
@@ -75,41 +81,39 @@ import SymperBpmn from "./../../components/common/SymperBpmn.vue";
 import { getNodeAttrs, nodeAttrsDefinition } from "./nodeAttrsFactory";
 import { allAttrDisplayGroup } from "./allAttrDisplayGroup";
 import FormTpl from "./../common/FormTpl.vue";
-import { util } from '../../plugins/util';
+import { util } from "../../plugins/util";
 import bpmnApi from "./../../api/BPMNEngine.js";
 import { defaultXML } from "./../../components/process/reformatGetListData";
 import { allNodesAttrs } from "./../process/allAttrsOfNodes";
 
 // Khung data của từng node cần lưu vào db
 const nodeDataTpl = {
-    resourceId:"",
-    bounds:{
-        lowerRight:{
-            x:1200,
-            y:1050
+    bounds: {
+        lowerRight: {
+            x: 1200,
+            y: 1050
         },
-        upperLeft:{
-            x:0,
-            y:0
+        upperLeft: {
+            x: 0,
+            y: 0
         }
     },
-    properties:{},
-    childShapes:[],
-    stencil:{
-        id:""
+    properties: {},
+    childShapes: [],
+    stencil: {
+        id: ""
     },
-    dockers:[]
 };
 
 //Do có một số khác biệt giữa tên gọi các node giữa thư viện đang dùng và  Map giữa tên các node của thư viện sang tên các node của flowable
 const mapLibNameToFlowableName = {
-    EventBasedGateway: 'EventGateway',
-    StartEvent: 'StartNoneEvent',
-    ThrowEvent: 'ThrowNoneEvent',
-    EndEvent: 'EndNoneEvent',
-    AdHocSubProcess: 'AdhocSubProcess',
-    Process: 'BPMNDiagram',
-    Collaboration: 'BPMNDiagram'
+    EventBasedGateway: "EventGateway",
+    StartEvent: "StartNoneEvent",
+    ThrowEvent: "ThrowNoneEvent",
+    EndEvent: "EndNoneEvent",
+    AdHocSubProcess: "AdhocSubProcess",
+    Process: "BPMNDiagram",
+    Collaboration: "BPMNDiagram"
 };
 
 export default {
@@ -119,176 +123,203 @@ export default {
          * @param {Function} success hành động khi validate và ko phát hiện ra lỗi
          * @param {Function} fail hành động khi có lỗi xảy ra
          */
-        validateModel(success, fail){
+        validateModel(success, fail) {
             let self = this;
-            let checkArr = [
-                this.checkModelName(),
-            ];
-            Promise.all(checkArr).then(rsl => {
-                if(typeof success == 'function'){
-                    success();
-                }
-            }).catch(err => {
-                console.warn(err, 'err on validating model!!');
-                self.$snotify({
-                    type: "error",
-                    title: err.title,
-                    message: err.message ? err.message : '',
-                });
+            let checkArr = [this.checkModelName()];
+            Promise.all(checkArr)
+                .then(rsl => {
+                    if (typeof success == "function") {
+                        success();
+                    }
+                })
+                .catch(err => {
+                    console.warn(err, "err on validating model!!");
+                    self.$snotify({
+                        type: "error",
+                        title: err.title,
+                        message: err.message ? err.message : ""
+                    });
 
-                if(typeof fail == 'function'){
-                    fail();
-                }
-            });
+                    if (typeof fail == "function") {
+                        fail();
+                    }
+                });
         },
         /**
          * Kiểm tra định danh của model: đã có hay chưa? có bị trùng định danh ko
          */
-        checkModelName(){
+        checkModelName() {
             let self = this;
             return new Promise((resolve, reject) => {
                 let modelAttr = self.getModelData();
-                if(!modelAttr.key){
+                if (!modelAttr.key) {
                     reject({
-                        type: 'emptyModelKey',
-                        title: 'Process identifier shoud not empty!'
+                        type: "emptyModelKey",
+                        title: "Process identifier shoud not empty!"
                     });
-                }else{
+                } else {
                     resolve();
                 }
             });
         },
         // Lấy thông tin cấu hình của model
-        getModelData(){
+        getModelData() {
             let modelAttr;
             let allNodes = this.$store.state.process.allNodes;
-            for(let id in allNodes){
-                if(allNodes[id].type == 'BPMNDiagram'){
-                    modelAttr = allNodes[id]; 
+            for (let id in allNodes) {
+                if (allNodes[id].type == "BPMNDiagram") {
+                    modelAttr = allNodes[id];
                     break;
                 }
             }
             modelAttr = modelAttr.attrs;
-            if(!modelAttr.name.value){
+            if (!modelAttr.name.value) {
                 modelAttr.name.value = modelAttr.process_id.value;
             }
             return {
-                    name: modelAttr.name.value,
-                    key: modelAttr.process_id.value,
-                    description: modelAttr.documentation.value,
-                    modelType: 0
-                };
+                name: modelAttr.name.value,
+                key: modelAttr.process_id.value,
+                description: modelAttr.documentation.value,
+                modelType: 0
+            };
         },
         /**
          * Thêm data trong state cho các node chưa có state
          * do không bắt được sự kiện khi tạo mới một element của thư viện nên khi click vào một node thì mới tạo data cho node đó trong state
-         * 
+         *
          */
-        fillNodeData(){
+        fillNodeData() {
             let allBNodes = this.$refs.symperBpmn.getAllNodes();
-            let nodeType = '';
+            let nodeType = "";
             // Dựng thuộc tính cho từng node
-            for(let bnode of allBNodes){ // bnode là viết tắt của businessObject node data
+            for (let bnode of allBNodes) {
+                // bnode là viết tắt của businessObject node data
                 nodeType = this.getNodeType(bnode);
-                if(!this.$store.state.process.allNodes[bnode.id]){
+                if (!this.$store.state.process.allNodes[bnode.id]) {
                     this.createNodeData(bnode.id, nodeType);
+                }
+                let nodeData = this.$store.state.process.allNodes[bnode.id];
+                if (!nodeData.attrs.name.value) {
+                    if(nodeData.attrs.overrideid){
+                        nodeData.attrs.name.value = nodeData.attrs.overrideid.value;
+                    }else if(nodeData.attrs.process_id){
+                        nodeData.attrs.name.value = nodeData.attrs.process_id.value;
+                    }
                 }
             }
         },
         // Lưu lại data của process model hiện tại
-        saveProcess(){
+        saveProcess() {
             let self = this;
             this.fillNodeData();
-            this.validateModel(()=>{
+            this.validateModel(() => {
                 let action = self.modelAction;
                 let idModel = self.modelId;
-                if(action == 'create' || action == 'clone'){
+                if (action == "create" || action == "clone") {
                     let modelData = this.getModelData();
-                    bpmnApi.createModel(modelData)
-                    .then((res)=> {
-                        if(res.messageKey && res.messageKey.includes( 'GENERAL.ERROR')){
-                            self.$snotify({
-                                type: "error",
-                                title: res.message
-                            });
-                        }else {
-                            self.modelAction = 'edit',
-                            self.modelId = res.id,
-                            self.updateModel(res.id);
-                        }
-                    })
-                    .catch((err) => {
-                        self.$snotify({
-                            type: "error",
-                            title: 'Can not create new process model'
+                    bpmnApi
+                        .createModel(modelData)
+                        .then(res => {
+                            if (
+                                res.messageKey &&
+                                res.messageKey.includes("GENERAL.ERROR")
+                            ) {
+                                self.$snotifyError({}, res.message);
+                            } else {
+                                self.lastUpdated = res.lastUpdated;
+                                (self.modelAction = "edit"),
+                                    (self.modelId = res.id),
+                                    self.updateModel(res.id);
+                            }
+                        })
+                        .catch(err => {
+                            self.$snotifyError(
+                                err,
+                                "Can not create new process model"
+                            );
                         });
-                    });
-                }else{
+                } else {
                     self.updateModel(idModel);
                 }
             });
         },
 
         // update data của model và data của tất cả các element trong model lên server
-        updateModel(idModel){
+        updateModel(idModel) {
             let allEleData = this.getAllElementData();
-            console.log(allEleData,'allEleData', this.$store.state.process.allNodes);
-            
+            console.log(
+                allEleData,
+                "allEleData",
+                this.$store.state.process.allNodes
+            );
+            let self = this;
             allEleData.modelId = idModel;
             let diData = {
-                modeltype: 'model',
+                modeltype: "model",
                 json_xml: JSON.stringify(allEleData),
                 name: allEleData.properties.name,
                 key: allEleData.properties.process_id,
                 description: allEleData.properties.documentation,
-                newversion: true,
-                comment: '',
-                lastUpdated:  (new Date()).toISOString().replace('Z','+0000')
+                newversion: false,
+                comment: "",
+                // lastUpdated: new Date().toISOString().replace("Z", "+0000")
+                lastUpdated: self.lastUpdated ? self.lastUpdated : new Date().toISOString().replace("Z", "+0000")// chỗ này đang lách qua việc validate của backend. cần xem lại
             };
-            bpmnApi.updateModel(diData, idModel);
+            bpmnApi
+                .updateModel(diData, idModel)
+                .then((res) => {
+                    self.$snotifySuccess("Process model saved");
+                    self.lastUpdated = res.lastUpdated;
+                })
+                .catch(err => {
+                    self.$snotifyError(err, "Can not save process model");
+                });
         },
         /**
          * Lấy dữ liệu của tất cả các node dưới dạng json để gửi về server lưu
          * @returns {Object} chứa data của process và thông tin của tất cả các node trong nó
          */
-        getAllElementData(){
+        getAllElementData() {
             /**
              * Một số quy tắc lưu của flowable:
              * 1. Tất cả các mũi tên (sequence flow) đều thuộc childShapes của BPMNDiagram chứ ko thuộc về thằng cha của mũi tên đó
              */
             let allBNodes = this.$refs.symperBpmn.getAllNodes();
-            
-            let di ; // object chứa thông tin của diagram
-            let nodeType = '';
+
+            let di; // object chứa thông tin của diagram
+            let nodeType = "";
             let mapSaveNodes = {};
 
             // Dựng thuộc tính cho từng node
-            for(let bnode of allBNodes){ // bnode là viết tắt của businessObject node data
+            for (let bnode of allBNodes) {
+                // bnode là viết tắt của businessObject node data
                 nodeType = this.getNodeType(bnode);
                 let nodeData;
-                if(nodeType == 'BPMNDiagram'){
+                if (nodeType == "BPMNDiagram") {
                     nodeData = util.cloneDeep(nodeDataTpl);
                     di = nodeData;
                     di.stencilset = {
-                        namespace:"https://symper.org/stencilset/bpmn2.0#",
-                        url:"../editor/stencilsets/bpmn2.0/bpmn2.0.json"
+                        namespace: "https://symper.org/stencilset/bpmn2.0#",
+                        url: "../editor/stencilsets/bpmn2.0/bpmn2.0.json"
                     };
-                }else{
-                    if(nodeType == 'SequenceFlow'){ 
+                } else {
+                    if (nodeType == "SequenceFlow") {
                         nodeData = this.getSaveDataForSequenceFlow(bnode);
-                    }else{
+                    } else {
                         nodeData = util.cloneDeep(nodeDataTpl);
 
-                        if(bnode.id == 'Collaboration'){
-                            debugger
+                        if (bnode.id == "Collaboration") {
+                            debugger;
                         }
                         nodeData.bounds = this.getNodeBounds(bnode);
 
-                        if(bnode.sourceRef){
+                        if (bnode.sourceRef) {
                             mapSaveNodes[bnode.sourceRef.id].outgoing = [];
 
-                            if(bnode.outgoing){
-                                mapSaveNodes[bnode.sourceRef.id].outgoing = [{ "resourceId": bnode.outgoing}];
+                            if (bnode.outgoing) {
+                                mapSaveNodes[bnode.sourceRef.id].outgoing = [
+                                    { resourceId: bnode.outgoing }
+                                ];
                             }
                         }
                     }
@@ -296,19 +327,18 @@ export default {
                 }
                 nodeData.properties = this.getNodeProperties(bnode.id);
                 nodeData.stencil.id = nodeType; // flowable quy định loại node nằm trong nodeData.stencil.id
-                nodeData.lastUpdated = (new Date()).toISOString().replace('Z','+0000');
                 mapSaveNodes[bnode.id] = nodeData;
             }
 
             // đẩy các node vào dạng cây:
-            for(let bnode of allBNodes){
+            for (let bnode of allBNodes) {
                 let saveNode = mapSaveNodes[bnode.id];
-                if(saveNode.stencil.id == 'SequenceFlow'){
+                if (saveNode.stencil.id == "SequenceFlow") {
                     di.childShapes.push(saveNode); // theo quy tắc 1 của flowable về lưu SequenceFlow
-                }else if(bnode.$parent.id) {
+                } else if (bnode.$parent.id) {
                     let pId = bnode.$parent.id;
 
-                    if(mapSaveNodes[pId]){
+                    if (mapSaveNodes[pId]) {
                         mapSaveNodes[pId].childShapes.push(saveNode);
                     }
                 }
@@ -317,11 +347,11 @@ export default {
             return di;
         },
         // Lấy các dữ liệu của sequence flow
-        getSaveDataForSequenceFlow(bnode){
+        getSaveDataForSequenceFlow(bnode) {
             let nodeData = util.cloneDeep(nodeDataTpl);
-            nodeData.stencil.id = 'SequenceFlow';
+            nodeData.stencil.id = "SequenceFlow";
             nodeData.resourceId = bnode.id;
-            
+
             nodeData.outgoing = [
                 {
                     resourceId: bnode.sourceRef.id
@@ -336,56 +366,72 @@ export default {
             nodeData.bounds = this.getNodeBounds(bnode);
             nodeData.dockers = [
                 {
-                    "x":0,
-                    "y":0
+                    x: 0,
+                    y: 0
                 },
                 {
-                    "x":0,
-                    "y":0
+                    x: 0,
+                    y: 0
                 }
             ];
             return nodeData;
         },
-        getNodeBounds(bnode){
+        getNodeBounds(bnode) {
             let wp = bnode.di.waypoint;
 
-            if(!wp){
+            if (!wp) {
+                let bounds = bnode.di.bounds;
                 wp = [
                     {
-                        x: bnode.di.x + bnode.di.width,
-                        y: bnode.di.y + bnode.di.height
+                        x: bounds.x + bounds.width,
+                        y: bounds.y + bounds.height
                     },
                     {
-                        x: bnode.di.x,
-                        y: bnode.di.y
+                        x: bounds.x,
+                        y: bounds.y
                     }
-                ]
+                ];
             }
 
             return {
-                lowerRight:{
-                    x:wp[0].x,
-                    y:wp[0].y
+                lowerRight: {
+                    x: wp[0].x,
+                    y: wp[0].y
                 },
-                upperLeft:{
-                    x:wp[1].x,
-                    y:wp[1].y
+                upperLeft: {
+                    x: wp[1].x,
+                    y: wp[1].y
                 }
-            }
+            };
         },
-        getNodeProperties(idNode){
+        getNodeProperties(idNode) {
             let props = {};
             let sNodeAttrs = this.$store.state.process.allNodes[idNode];
-            for(let key in sNodeAttrs.attrs){
+
+            
+            for (let key in sNodeAttrs.attrs) {
                 let attr = sNodeAttrs.attrs[key];
-                if(attr){
-                    if(allNodesAttrs[key].hasOwnProperty('getValue')){
-                        props[key] = allNodesAttrs[key].getValue(attr.value);
+                if (attr) {
+                    if(allNodesAttrs[key]){
+                        if (allNodesAttrs[key].hasOwnProperty("getValue")) {
+                            props[key] = allNodesAttrs[key].getValue(attr.value);
+                        } else {
+                            props[key] = attr.value;
+                        }
                     }else{
-                        props[key] = attr.value;
+                        
+                        console.warn(
+                            key + " not found in allNodesAttrs",
+                            key,
+                            allNodesAttrs
+                        );
                     }
-                }else{
-                    console.warn(key + ' not found in attrs', key, sNodeAttrs.attrs);
+                } else {
+                    console.warn(
+                        key + " not found in attrs",
+                        key,
+                        sNodeAttrs.attrs
+                    );
                 }
             }
             return props;
@@ -394,24 +440,24 @@ export default {
          * Khôi phục lại dữ liệu được lưu ở server thành dữ liệu có thể sử dụng trong state để thao tác
          * @param {Object} processData data của process và thông tin của tất cả các node trong nó mà đã được lưu ở server
          */
-        restoreSavedData(processData){
-
-        },
+        restoreSavedData(processData) {},
         /**
          *  Lấy ra tên của node dựa vào dữ liệu của node đó trong  bpmn modeller
          * @param {Object} nodeData data của node trong thư viện bpmn-js
          * @returns {String} tên của node sau khi đã tính toán
          */
         getNodeType(nodeData) {
-            let nodeType = nodeData.$type.replace("bpmn:", "").replace("Intermediate", "");
+            let nodeType = nodeData.$type
+                .replace("bpmn:", "")
+                .replace("Intermediate", "");
             if (nodeType.includes("Event") && nodeData.eventDefinitions) {
                 let evtType = nodeData.eventDefinitions[0].$type.replace(
                     "bpmn:",
                     ""
                 );
                 evtType = evtType.replace("Definition", "");
-                nodeType = nodeType.replace('Event', '');
-                nodeType = nodeType+evtType;
+                nodeType = nodeType.replace("Event", "");
+                nodeType = nodeType + evtType;
             } else if (
                 nodeType == "bpmn:SubProcess" &&
                 nodeData.triggeredByEvent
@@ -419,7 +465,9 @@ export default {
                 nodeType = "EventSubProcess";
             }
 
-            nodeType = mapLibNameToFlowableName[nodeType] ? mapLibNameToFlowableName[nodeType] : nodeType;
+            nodeType = mapLibNameToFlowableName[nodeType]
+                ? mapLibNameToFlowableName[nodeType]
+                : nodeType;
             return nodeType;
         },
         handleNodeChangeProps(nodeData) {
@@ -502,7 +550,7 @@ export default {
                 attrs: getNodeAttrs(nodeType)
             };
 
-            if(nodeData.attrs.overrideid){
+            if (nodeData.attrs.overrideid) {
                 nodeData.attrs.overrideid.value = nodeId;
             }
             this.$store.commit("process/addNewNode", nodeData);
@@ -528,11 +576,8 @@ export default {
             if (ac == "validate") {
                 let self = this;
                 this.fillNodeData();
-                this.validateModel(()=>{
-                    self.$snotify({
-                        type: 'success',
-                        title: 'Validation passed'
-                    });
+                this.validateModel(() => {
+                    self.$snotifySuccess("Validation passed");
                 });
             } else {
                 this.$refs.symperBpmn[ac]();
@@ -541,83 +586,97 @@ export default {
         /**
          * Lấy data từ server và áp dụng data này để hiển thị lên process
          */
-        applySavedData(idProcess){
+        applySavedData(idProcess) {
             let self = this;
-            bpmnApi.getModelData(idProcess)
-            .then((res)=> { 
-                let allElements = {}; // khôi phục lại state của tất cả các phần tử trong diagram
-                self.restoreSavedEle(res.model, allElements);
-            }).catch((err)=> {
-                console.warn(err);
-                self.$snotify({
-                    type: "error",
-                    title: self.$t('process.editror.err.get_data'),
+            bpmnApi
+                .getModelData(idProcess)
+                .then(res => {
+                    let allElements = {}; // khôi phục lại state của tất cả các phần tử trong diagram
+                    self.lastUpdated = res.lastUpdated;
+                    self.restoreSavedEle(res.model, allElements);
+                })
+                .catch(err => {
+                    self.$snotifyError(err, "process.editror.err.get_data");
                 });
-            });
 
-            bpmnApi.getModelXML(idProcess)
-            .then((res)=> {
-                self.diagramXML = res;
-            }).catch((err)=> {
-                console.warn(err);
-                self.$snotify({
-                    type: "error",
-                    title: self.$t('process.editror.err.get_xml'),
+            bpmnApi
+                .getModelXML(idProcess)
+                .then(res => {
+                    self.diagramXML = res;
+                })
+                .catch(err => {
+                    self.$snotifyError(
+                        err,
+                        self.$t("process.editror.err.get_xml")
+                    );
                 });
-            });
         },
         /**
          * Khôi phục lại data của model từ server vào trong state
          * @param {Object} ele data của phần tử được lưu ở server
          */
-        restoreSavedEle(ele, rsl){
+        restoreSavedEle(ele, rsl) {
             let idEle = ele.resourceId;
-            if(ele.modelId){ // Nếu đây là phần tử root của cây
-                idEle = 'Collaboration';
+            if (ele.modelId) {
+                // Nếu đây là phần tử root của cây
+                idEle = "Collaboration";
             }
-            let nodeData =  this.createNodeData(idEle, ele.stencil.id);
+            let eleType = ele.stencil ? ele.stencil.id : "BPMNDiagram";
+            let nodeData = this.createNodeData(idEle, eleType);
 
             // Khôi phục giá trị cho các thuộc tính của ele này
-            for(let key in nodeData.attrs){
-                if(ele.properties.hasOwnProperty(key)){
-                    if(allNodesAttrs[key].hasOwnProperty('restoreData')){
-                        nodeData.attrs.value = allNodesAttrs[key].restoreData(ele.properties[key]);
-                    }else{
-                        nodeData.attrs.value = ele.properties[key];
+            if (ele.properties) {
+                for (let key in nodeData.attrs) {
+                    if (ele.properties.hasOwnProperty(key)) {
+                        if (allNodesAttrs[key].hasOwnProperty("restoreData")) {
+                            nodeData.attrs.value = allNodesAttrs[
+                                key
+                            ].restoreData(ele.properties[key]);
+                        } else {
+                            nodeData.attrs.value = ele.properties[key];
+                        }
+                    } else {
+                        console.warn(
+                            "Not found " +
+                                key +
+                                " in attrs of saved data ele.properties",
+                            ele,
+                            key
+                        );
                     }
-                }else{
-                    console.warn('Not found '+ key + ' in attrs of saved data ele.properties',ele, key);
                 }
             }
-            
+
             rsl[idEle] = nodeData;
             // Khôi phục các thuộc tính cho các ele con của ele này
-            if(ele.hasOwnProperty('childShapes')){
-                for(let childEle of ele.childShapes){
+            if (ele.hasOwnProperty("childShapes")) {
+                for (let childEle of ele.childShapes) {
                     this.restoreSavedEle(childEle, rsl);
                 }
             }
         }
     },
-    
+
     created() {
         this.$store.dispatch("app/getAllOrgChartData");
-        if(this.$route.name == 'editProcess'){
-            this.modelAction = 'edit';
+        if (this.$route.name == "editProcess") {
+            this.modelAction = "edit";
             this.modelId = this.$route.params.id;
-        }else if(this.$route.name == 'cloneProcess'){
-            this.modelAction = 'clone';
+        } else if (this.$route.name == "cloneProcess") {
+            this.modelAction = "clone";
         }
 
-        if(this.$route.name == 'editProcess' || this.$route.name == 'cloneProcess'){
+        if (
+            this.$route.name == "editProcess" ||
+            this.$route.name == "cloneProcess"
+        ) {
             this.applySavedData(this.$route.params.id);
         }
-
     },
     data() {
         return {
-            modelAction: 'create', // hành động đối với model này là gì: create | clone | edit
-            modelId: '', // Id của model này trong DB
+            modelAction: "create", // hành động đối với model này là gì: create | clone | edit
+            modelId: "", // Id của model này trong DB
             searchAttrKey: "",
             headerActions: {
                 undo: {
@@ -679,8 +738,11 @@ export default {
             for (let attrName in currentAtts) {
                 let attr = currentAtts[attrName];
 
-                if(!attr){
-                    console.warn(`can not get attr of "${attrName}" in currentAtts`, {currentAtts,attrName});
+                if (!attr) {
+                    console.warn(
+                        `can not get attr of "${attrName}" in currentAtts`,
+                        { currentAtts, attrName }
+                    );
                     continue;
                 }
 
@@ -696,7 +758,7 @@ export default {
                             'không tìm thấy định nghĩa của group "' +
                                 groupName +
                                 '" trong allAttrDisplayGroup',
-                            allAttrDisplayGroup
+                            currentAtts, attrName
                         );
                     }
                 }

@@ -156,6 +156,20 @@ export const allNodesAttrs = {
                 type: 'text'
             },
         ],
+        getValue(value) {
+            if ($.isArray(value)) {
+                if (!value.length || $.isEmptyObject(value[0])) {
+                    return '';
+                } else {
+                    return value;
+                }
+            } else {
+                return '';
+            }
+        },
+        restoreData(value) {
+            return value == '' ? [{}] : value;
+        }
     },
     "exclusivedefinition": {
         "title": "Exclusive",
@@ -204,8 +218,21 @@ export const allNodesAttrs = {
         "info": "BPMN.PROPERTYPACKAGES.FORMPROPERTIESPACKAGE.FORMPROPERTIES.DESCRIPTION",
         "dg": "detail",
         "columns": [],
-        hidden: true
-
+        hidden: true,
+        getValue(value) {
+            if ($.isArray(value)) {
+                if (!value.length || $.isEmptyObject(value[0])) {
+                    return '';
+                } else {
+                    return value;
+                }
+            } else {
+                return '';
+            }
+        },
+        restoreData(value) {
+            return value == '' ? [] : value;
+        }
     },
     "formkeydefinition": {
         "title": "Form key",
@@ -218,7 +245,7 @@ export const allNodesAttrs = {
     "formfieldvalidation": {
         "title": "Validate form fields",
         "type": "script",
-        "value": '',
+        "value": "true",
         "info": "BPMN.PROPERTYPACKAGES.FORMFIELDVALIDATIONPACKAGE.FORMFIELDVALIDATION.DESCRIPTION",
         "dg": "formula"
     },
@@ -1096,21 +1123,63 @@ export const allNodesAttrs = {
         "type": "table",
         "value": [],
         "info": "BPMN.PROPERTYPACKAGES.SIGNALDEFINITIONSPACKAGE.SIGNALDEFINITIONS.DESCRIPTION",
-        "dg": "detail"
+        "dg": "detail",
+        getValue(value) {
+            if ($.isArray(value)) {
+                if (!value.length || $.isEmptyObject(value[0])) {
+                    return '';
+                } else {
+                    return value;
+                }
+            } else {
+                return '';
+            }
+        },
+        restoreData(value) {
+            return value == '' ? [] : value;
+        }
     },
     "messagedefinitions": {
         "title": "Message definitions",
         "type": "table",
         "value": [],
         "info": "BPMN.PROPERTYPACKAGES.MESSAGEDEFINITIONSPACKAGE.MESSAGEDEFINITIONS.DESCRIPTION",
-        "dg": "detail"
+        "dg": "detail",
+        getValue(value) {
+            if ($.isArray(value)) {
+                if (!value.length || $.isEmptyObject(value[0])) {
+                    return '';
+                } else {
+                    return value;
+                }
+            } else {
+                return '';
+            }
+        },
+        restoreData(value) {
+            return value == '' ? [] : value;
+        }
     },
     "escalationdefinitions": {
         "title": "Escalation definitions",
         "type": "table",
         "value": [],
         "info": "BPMN.PROPERTYPACKAGES.ESCALATIONDEFINITIONSPACKAGE.ESCALATIONDEFINITIONS.DESCRIPTION",
-        "dg": "detail"
+        "dg": "detail",
+        getValue(value) {
+            if ($.isArray(value)) {
+                if (!value.length || $.isEmptyObject(value[0])) {
+                    return '';
+                } else {
+                    return value;
+                }
+            } else {
+                return '';
+            }
+        },
+        restoreData(value) {
+            return value == '' ? [] : value;
+        }
     },
     "istransaction": {
         "title": "Is a transaction sub process",
@@ -1122,7 +1191,7 @@ export const allNodesAttrs = {
     "formreference": {
         "title": "Form reference",
         "type": "autocomplete",
-        "value": [],
+        "value": '',
         "info": "BPMN.PROPERTYPACKAGES.FORMREFERENCEPACKAGE.FORMREFERENCE.DESCRIPTION",
         "dg": "taskAction",
     },
@@ -1319,3 +1388,5 @@ export const allNodesAttrs = {
         dg: 'taskAction'
     },
 }
+
+console.log(allNodesAttrs, 'allNodesAttrsallNodesAttrsallNodesAttrs');

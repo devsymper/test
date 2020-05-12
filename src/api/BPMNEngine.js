@@ -34,9 +34,9 @@ export default {
         return bpmneApi.post(`${idModel}/editor/json`, data, testHeader, testOptions);
     },
     getModelData(modelId) {
-        return bpmneApi.get(`${modelId}/editor/json?version=` + Date.now(), {}, testHeader);
+        return bpmneApi.get(`${modelId}/editor/json`, {}, testHeader);
     },
     getModelXML(modelId) {
-        return bpmneApi.get(`${modelId}/bpmn20?version=` + Date.now(), {}, testHeader, { dataType: 'text' });
+        return bpmneApi.get(`${modelId}/editor/bpmn20`, {}, testHeader, { dataType: 'text' });
     },
 };
