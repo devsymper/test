@@ -30,7 +30,8 @@
         "created_by": "Created by",
         "version": "Version",
         "last_updated": "Last updated",
-        "last_updated_by": "Last updated by"
+        "last_updated_by": "Last updated by",
+        "statistics": "Statistics"
     },
     "validate": {
         "required": "Not be empty",
@@ -194,10 +195,20 @@
     },
     "process": {
         "list": {
-            "title": "Process list"
+            "title": "Process list",
+            "deploy_history": "Deploy history",
+            "start": "Start process",
+            "instances": "List instances"
         },
         "action": {
             "create": "Create new process"
+        },
+        "deployment": {
+            "list": "List deployments",
+            "run": "Run this version",
+            "name": "Name",
+            "deployment_time": "Deployment time",
+            "category": "Category"
         },
         "editror": {
             "err": {

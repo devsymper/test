@@ -9,8 +9,11 @@ export const appConfigs = {
     apiDomain: {
         user: 'https://v2hoangnd.dev.symper.vn/api/',
         core: 'https://v2hoangnd.dev.symper.vn/',
-        // bpmne: 'https://v2.symper.vn:8443/flowable-modeler/app/rest/models'
-        bpmne: 'https://v2.symper.vn:8443/symper-modeler/api/editor/models'
+        bpmne: {
+            models: 'https://v2.symper.vn:8443/symper-modeler/api/editor/models',
+            deployments: "https://v2.symper.vn:8443/symper-rest/service/repository/deployments",
+        },
+
     },
     notificationTimeout: {
         success: 10000,

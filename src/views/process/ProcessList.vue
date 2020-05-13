@@ -14,7 +14,7 @@
 </template>
 <script>
 import { util } from "./../../plugins/util.js";
-import { reformatGetListData } from "./../../components/process/reformatGetListData.js";
+import { reformatGetListProcess } from "./../../components/process/reformatGetListData.js";
 import { appConfigs } from "./../../configs.js";
 import ListItems from "./../../components/common/ListItems.vue";
 import bpmnApi from "./../../api/BPMNEngine.js";
@@ -27,9 +27,9 @@ export default {
             containerHeight: 300,
             listItemOptions: {},
             customAPIResult: {
-                reformatData: reformatGetListData
+                reformatData: reformatGetListProcess
             },
-            getListUrl: appConfigs.apiDomain.bpmne,
+            getListUrl: appConfigs.apiDomain.bpmne.models,
             tableContextMenu: [
                 {
                     name: "edit",
@@ -59,13 +59,41 @@ export default {
                                 deploymentKey: row.key,
                                 deploymentName: row.name,
                                 tenantId: row.tenantId,
-                            }, file);
+                            }, file).then((res) => {
+                                self.$snotifySuccess('Deploy process successfully');
+                            }).catch((err) => {
+                                self.$snotifyError(
+                                    err,
+                                    "Deploy process failed!"
+                                );
+                            });
                         }).catch(err => {
                             self.$snotifyError(
                                 err,
                                 self.$t("process.editror.err.get_xml")
                             );
                         });
+                    }
+                },
+                {
+                    name: "deployHistory",
+                    text: this.$t("process.list.deploy_history"),
+                    callback: (row, callback) => {
+                        self.$goToPage(`/bpmne/${row.name}/deploy-history`);
+                    }
+                },
+                {
+                    name: "start",
+                    text: this.$t("process.list.start"),
+                    callback: (row, callback) => {
+                        
+                    }
+                },
+                {
+                    name: "instances",
+                    text: this.$t("process.list.instances"),
+                    callback: (row, callback) => {
+
                     }
                 },
             ]

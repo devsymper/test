@@ -13,6 +13,7 @@ import Snippet from "../views/snippets/index.vue";
 import Permissions from "../views/permissions/index.vue";
 import PermissionsInListView from "../views/permissions/listView.vue";
 import Editor from "../views/document/Editor.vue";
+import DeployHistory from "../views/process/DeployHistory.vue";
 
 Vue.use(VueRouter);
 /**
@@ -42,6 +43,11 @@ const routes = [{
         path: "/bpmne/:id/clone",
         name: "cloneProcess",
         component: CreateProcess,
+    },
+    {
+        path: "/bpmne/:name/deploy-history",
+        name: "deployHistory",
+        component: DeployHistory,
     },
     {
         path: "/bpmne/create",

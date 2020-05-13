@@ -1,7 +1,7 @@
 import Api from "./api"; // import class api vào để sử dụng
 import { appConfigs } from "./../configs.js"; // trong trường hợp này ta cần sử dụng domain của từng module nghiệp vụ được định nghĩa trong file config
 
-var bpmneApi = new Api(appConfigs.apiDomain.bpmne); // Khởi tạo một đối tượng api với domain của service BPMNE
+var bpmneApi = new Api(appConfigs.apiDomain.bpmne.models); // Khởi tạo một đối tượng api với domain của service BPMNE
 
 // Phục vụ cho việc test
 let fullCookieTest = "__cfduid=d7930d57921d3b5a2ec601b154400395a1571850128;FLOWABLE_REMEMBER_ME=UzY2S1JCNlp3VE1WSnZHb1ZSTndwZyUzRCUzRDpKWkVudjRxZHVyOWJDVEJDJTJCRThGa2clM0QlM0Q";
@@ -18,7 +18,7 @@ let testOptions = {
 
 }
 
-let runTimeUrl = "https://v2.symper.vn:8443/symper-rest/service/repository/deployments";
+
 export default {
     /** 
      * Lấy danh sách các process đã được tạo ra
@@ -51,7 +51,7 @@ export default {
         delete testHeader['Content-Type'];
         var fd = new FormData();
         fd.append('file', file);
-        return bpmneApi.post(runTimeUrl + subfix, fd, testHeader, {
+        return bpmneApi.post(appConfigs.apiDomain.bpmne.deployments + subfix, fd, testHeader, {
             processData: false,
             contentType: false,
         });

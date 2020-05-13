@@ -30,7 +30,8 @@
         "created_by": "Người tạo",
         "version": "Phiên bản",
         "last_updated": "Cập nhật lúc",
-        "last_updated_by": "Người cập nhật"
+        "last_updated_by": "Người cập nhật",
+        "statistics": "Thống kê"
     },
     "login": {
         "title": "Đăng nhập hệ thống",
@@ -194,10 +195,20 @@
     },
     "process": {
         "list": {
-            "title": "Danh sách quy trình"
+            "title": "Danh sách quy trình",
+            "deploy_history": "Lịch sử deploy",
+            "start": "Bắt đầu quy trình",
+            "instances": "Các bản đã chạy"
         },
         "action": {
             "create": "Tạo quy trình mới"
+        },
+        "deployment": {
+            "list": "Danh sách deploy",
+            "run": "Chạy phiên bản này",
+            "name": "Tên",
+            "deployment_time": "Thời gian deploy",
+            "category": "Loại"
         },
         "editror": {
             "err": {
