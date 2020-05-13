@@ -44,6 +44,35 @@ export const reformatGetListProcess = function(res) {
 
 
 export const reformatGetListDeployments = function(res) {
+    let rsl = {
+        total: res.total,
+        columns: [{
+                name: "key",
+                title: "key",
+                type: "text"
+            },
+            {
+                name: "name",
+                title: "name",
+                type: "text"
+            },
+            {
+                name: "description",
+                title: "description",
+                type: "text"
+            },
+            {
+                name: "version",
+                title: "version",
+                type: "text"
+            }
+        ],
+        listObject: res.data
+    };
+    return rsl;
+}
+
+export const reformatGetListInstances = function(res) {
         let rsl = {
             total: res.total,
             columns: [{
@@ -52,13 +81,28 @@ export const reformatGetListDeployments = function(res) {
                     type: "text"
                 },
                 {
-                    name: "deploymentTime",
-                    title: "deployment_time",
+                    name: "processDefinitionName",
+                    title: "process_definition_name",
                     type: "text"
                 },
                 {
-                    name: "category",
-                    title: "category",
+                    name: "businessKey",
+                    title: "business_key",
+                    type: "text"
+                },
+                {
+                    name: "ended",
+                    title: "ended",
+                    type: "text"
+                },
+                {
+                    name: "startUserId",
+                    title: "start_user_id",
+                    type: "text"
+                },
+                {
+                    name: "startTime",
+                    title: "start_time",
                     type: "text"
                 },
             ],

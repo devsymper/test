@@ -8,7 +8,7 @@
         :getDataUrl="getListUrl"
         :customAPIResult="customAPIResult"
         :useActionPanel="false"
-        :headerPrefixKeypath="'process.deployment'"
+        :headerPrefixKeypath="'common'"
     ></list-items>
 </template>
 <script>
@@ -17,6 +17,9 @@ import { reformatGetListDeployments } from "./../../components/process/reformatG
 import { appConfigs } from "./../../configs.js";
 import ListItems from "./../../components/common/ListItems.vue";
 import bpmnApi from "./../../api/BPMNEngine.js";
+import { deployProcess } from "./../../components/process/processAction.js";
+import { runProcessDefinition } from "./../../components/process/processAction.js";
+
 
 export default {
     components: {},
@@ -33,14 +36,28 @@ export default {
                     name: "start",
                     text: this.$t("process.deployment.run"),
                     callback: (row, callback) => {
-                        
+                        runProcessDefinition(self, row);
                     }
                 },
-                {
+                { 
                     name: "statistics",
                     text: this.$t("common.statistics"),
                     callback: (row, callback) => {
                         
+                    }
+                },
+                {
+                    name: "viewDetail",
+                    text: this.$t("common.detail"),
+                    callback: (row, callback) => {
+                        
+                    }
+                },
+                {
+                    name: "processInstance",
+                    text: this.$t("process.instance.list"),
+                    callback: (row, callback) => {
+                        self.$goToPage(`/bpmne/process-definition/${row.id}/instances`);
                     }
                 },
             ]
@@ -54,7 +71,7 @@ export default {
     methods: {
         getDeploymentUrl(){
             let processName = this.$route.params.name;
-            return appConfigs.apiDomain.bpmne.deployments+'?name='+processName;
+            return appConfigs.apiDomain.bpmne.definitions+'?name='+processName;
         },
         calcContainerHeight(){
             this.containerHeight = util.getComponentSize(this).h;

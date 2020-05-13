@@ -55,5 +55,12 @@ export default {
             processData: false,
             contentType: false,
         });
+    },
+    createProcessInstance(data) {
+        data = JSON.stringify(data);
+        return bpmneApi.post(appConfigs.apiDomain.bpmne.instances, data, testHeader);
+    },
+    getDefinitionModel(id) {
+        return bpmneApi.get(appConfigs.apiDomain.bpmne.definitions + '/' + id + '/model', {}, testHeader);
     }
 };

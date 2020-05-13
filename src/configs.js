@@ -12,6 +12,8 @@ export const appConfigs = {
         bpmne: {
             models: 'https://v2.symper.vn:8443/symper-modeler/api/editor/models',
             deployments: "https://v2.symper.vn:8443/symper-rest/service/repository/deployments",
+            definitions: "https://v2.symper.vn:8443/symper-rest/service/repository/process-definitions",
+            instances: "https://v2.symper.vn:8443/symper-rest/service/runtime/process-instances",
         },
 
     },

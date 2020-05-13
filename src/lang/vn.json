@@ -31,7 +31,8 @@
         "version": "Phiên bản",
         "last_updated": "Cập nhật lúc",
         "last_updated_by": "Người cập nhật",
-        "statistics": "Thống kê"
+        "statistics": "Thống kê",
+        "detail": "Chi tiết"
     },
     "login": {
         "title": "Đăng nhập hệ thống",
@@ -202,6 +203,15 @@
         },
         "action": {
             "create": "Tạo quy trình mới"
+        },
+        "instance": {
+            "list": "Danh sách các bản đã chạy",
+            "name": "Tên bản chạy",
+            "process_definition_name": "Tên định nghĩa của quy trình",
+            "business_key": "Khóa nghiệp vụ",
+            "ended": "Đã kết thúc",
+            "start_user_id": "Id người khởi tạo",
+            "start_time": "Thời gian bắt đầu"
         },
         "deployment": {
             "list": "Danh sách deploy",

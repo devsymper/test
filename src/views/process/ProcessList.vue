@@ -18,9 +18,9 @@ import { reformatGetListProcess } from "./../../components/process/reformatGetLi
 import { appConfigs } from "./../../configs.js";
 import ListItems from "./../../components/common/ListItems.vue";
 import bpmnApi from "./../../api/BPMNEngine.js";
+import { deployProcess } from "./../../components/process/processAction.js";
 
 export default {
-    components: {},
     data() {
         let self = this;
         return {
@@ -53,33 +53,14 @@ export default {
                     name: "deploy",
                     text: this.$t("common.deploy"),
                     callback: (row, callback) => {
-                        bpmnApi.getModelXML(row.id).then(res => {
-                            let file = util.makeStringAsFile(res, "process_draft.bpmn");
-                            bpmnApi.deployProcess({
-                                deploymentKey: row.key,
-                                deploymentName: row.name,
-                                tenantId: row.tenantId,
-                            }, file).then((res) => {
-                                self.$snotifySuccess('Deploy process successfully');
-                            }).catch((err) => {
-                                self.$snotifyError(
-                                    err,
-                                    "Deploy process failed!"
-                                );
-                            });
-                        }).catch(err => {
-                            self.$snotifyError(
-                                err,
-                                self.$t("process.editror.err.get_xml")
-                            );
-                        });
+                        deployProcess(this, row);
                     }
                 },
                 {
                     name: "deployHistory",
                     text: this.$t("process.list.deploy_history"),
                     callback: (row, callback) => {
-                        self.$goToPage(`/bpmne/${row.name}/deploy-history`);
+                        self.$goToPage(`/bpmne/${row.name}/deploy-history`,self.$t('process.deployment.list'));
                     }
                 },
                 {

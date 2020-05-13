@@ -684,7 +684,7 @@ export default {
                 };
 
                 let header = {};
-                if(thisCpn.$route.name == "processList" || thisCpn.$route.name == "deployHistory"){
+                if(thisCpn.$route.name == "processList" || thisCpn.$route.name == "deployHistory" || thisCpn.$route.name == "listProcessInstances"){
                     header = {
                         Authorization: 'Basic cmVzdC1hZG1pbjp0ZXN0'
                     };
