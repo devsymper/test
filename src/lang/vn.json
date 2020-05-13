@@ -21,7 +21,16 @@
         "list_config": "Cấu hình danh sách",
         "save": "Lưu",
         "snippets": "Snippets",
-        "permissions": "Phân quyền"
+        "permissions": "Phân quyền",
+        "deploy": "Deploy",
+        "start": "Bắt đầu",
+        "name": "Tên",
+        "key": "Định danh",
+        "description": "Mô tả",
+        "created_by": "Người tạo",
+        "version": "Phiên bản",
+        "last_updated": "Cập nhật lúc",
+        "last_updated_by": "Người cập nhật"
     },
     "login": {
         "title": "Đăng nhập hệ thống",

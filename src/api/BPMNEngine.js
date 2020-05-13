@@ -17,6 +17,8 @@ let testHeader = {
 let testOptions = {
 
 }
+
+let runTimeUrl = "https://v2.symper.vn:8443/symper-rest/service/repository/deployments";
 export default {
     /** 
      * Lấy danh sách các process đã được tạo ra
@@ -39,4 +41,19 @@ export default {
     getModelXML(modelId) {
         return bpmneApi.get(`${modelId}/editor/bpmn20`, {}, testHeader, { dataType: 'text' });
     },
+    deployProcess(params, file) {
+        let subfix = [];
+        for (let key in params) {
+            subfix.push(`${key}=${params[key]}`);
+        }
+        subfix = "?" + subfix.join('&');
+        // testHeader['Content-Type'] = 'multipart/form-data; boundary=----WebKitFormBoundaryCmEOFynKduiu8wVL';
+        delete testHeader['Content-Type'];
+        var fd = new FormData();
+        fd.append('file', file);
+        return bpmneApi.post(runTimeUrl + subfix, fd, testHeader, {
+            processData: false,
+            contentType: false,
+        });
+    }
 };

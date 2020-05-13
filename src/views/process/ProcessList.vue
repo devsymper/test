@@ -8,6 +8,7 @@
         :getDataUrl="getListUrl"
         :customAPIResult="customAPIResult"
         :useActionPanel="false"
+        :headerPrefixKeypath="'common'"
         @on-add-item-clicked="goToCreatePage()"
     ></list-items>
 </template>
@@ -16,6 +17,8 @@ import { util } from "./../../plugins/util.js";
 import { reformatGetListData } from "./../../components/process/reformatGetListData.js";
 import { appConfigs } from "./../../configs.js";
 import ListItems from "./../../components/common/ListItems.vue";
+import bpmnApi from "./../../api/BPMNEngine.js";
+
 export default {
     components: {},
     data() {
@@ -41,11 +44,30 @@ export default {
                 {
                     name: "remove",
                     text: this.$t("common.delete"),
-                    callback: (snippet, callback) => {
+                    callback: (row, callback) => {
                         this.removeCallback = callback;
-                        this.deleteSnippet(snippet);
+                        this.deleteSnippet(row);
                     }
-                }
+                },
+                {
+                    name: "deploy",
+                    text: this.$t("common.deploy"),
+                    callback: (row, callback) => {
+                        bpmnApi.getModelXML(row.id).then(res => {
+                            let file = util.makeStringAsFile(res, "process_draft.bpmn");
+                            bpmnApi.deployProcess({
+                                deploymentKey: row.key,
+                                deploymentName: row.name,
+                                tenantId: row.tenantId,
+                            }, file);
+                        }).catch(err => {
+                            self.$snotifyError(
+                                err,
+                                self.$t("process.editror.err.get_xml")
+                            );
+                        });
+                    }
+                },
             ]
         };
     },
@@ -60,7 +82,11 @@ export default {
         },
         calcContainerHeight() {
             this.containerHeight = util.getComponentSize(this).h;
-        }
+        },
+        getDataAnddeploy(processId){
+          
+        },
+
     },
     components: {
         ListItems: ListItems

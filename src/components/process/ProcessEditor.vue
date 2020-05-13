@@ -307,27 +307,28 @@ export default {
                         nodeData = this.getSaveDataForSequenceFlow(bnode);
                     } else {
                         nodeData = util.cloneDeep(nodeDataTpl);
-
-                        if (bnode.id == "Collaboration") {
-                            debugger;
-                        }
                         nodeData.bounds = this.getNodeBounds(bnode);
-
-                        if (bnode.sourceRef) {
-                            mapSaveNodes[bnode.sourceRef.id].outgoing = [];
-
-                            if (bnode.outgoing) {
-                                mapSaveNodes[bnode.sourceRef.id].outgoing = [
-                                    { resourceId: bnode.outgoing }
-                                ];
-                            }
-                        }
+                        nodeData.dockers = [];
+                        nodeData.outgoing = [];
                     }
                     nodeData.resourceId = bnode.id;
                 }
                 nodeData.properties = this.getNodeProperties(bnode.id);
                 nodeData.stencil.id = nodeType; // flowable quy định loại node nằm trong nodeData.stencil.id
                 mapSaveNodes[bnode.id] = nodeData;
+            }
+
+            // tạo outgoing cho các node là  gốc của mũi tên
+            for(let bnode of allBNodes){
+                if (bnode.sourceRef) {
+                    let nodeData = mapSaveNodes[bnode.sourceRef.id];
+                    if(!nodeData.outgoing){
+                        nodeData.outgoing = [];
+                    }
+                    nodeData.outgoing.push(
+                        { resourceId: bnode.id }
+                    );
+                }
             }
 
             // đẩy các node vào dạng cây:
@@ -354,14 +355,12 @@ export default {
 
             nodeData.outgoing = [
                 {
-                    resourceId: bnode.sourceRef.id
-                }
-            ];
-            nodeData.target = [
-                {
                     resourceId: bnode.targetRef.id
                 }
             ];
+            nodeData.target = {
+                resourceId: bnode.targetRef.id
+            };
             nodeData.properties = this.getNodeProperties(bnode.id);
             nodeData.bounds = this.getNodeBounds(bnode);
             nodeData.dockers = [
@@ -553,6 +552,7 @@ export default {
             if (nodeData.attrs.overrideid) {
                 nodeData.attrs.overrideid.value = nodeId;
             }
+            
             this.$store.commit("process/addNewNode", nodeData);
             return nodeData;
         },
@@ -566,6 +566,13 @@ export default {
             let nodeData = this.getNodeData(node.id, type);
             nodeData.name = node.name;
             nodeData.attrs.name.value = node.name;
+            if(nodeData.attrs.process_id){
+                nodeData.attrs.process_id.value = node.id;
+            }
+
+            if(nodeData.attrs.overrideid){
+                nodeData.attrs.overrideid.value = node.id;
+            }
             this.$store.commit("process/changeSelectingNode", nodeData);
         },
         /**
@@ -629,11 +636,11 @@ export default {
                 for (let key in nodeData.attrs) {
                     if (ele.properties.hasOwnProperty(key)) {
                         if (allNodesAttrs[key].hasOwnProperty("restoreData")) {
-                            nodeData.attrs.value = allNodesAttrs[
+                            nodeData.attrs[key].value = allNodesAttrs[
                                 key
                             ].restoreData(ele.properties[key]);
                         } else {
-                            nodeData.attrs.value = ele.properties[key];
+                            nodeData.attrs[key].value = ele.properties[key];
                         }
                     } else {
                         console.warn(

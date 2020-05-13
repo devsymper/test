@@ -59,5 +59,15 @@ export const store = {
 
     setSavedLocale(locale) {
         cookie.set('user-locale', locale);
+    },
+    /**
+     * Biến mội chuỗi thành  một đối tượng File để có thể gửi đi trong request
+     * @param {String} content Nội dung cần tạo thành file
+     * @param {String} fileName Tên file cần tạo
+     */
+    makeStringAsFile(contents, fileName = 'file.txt') {
+        var blob = new Blob([contents], { type: 'text/plain' });
+        var file = new File([blob], fileName, { type: "text/plain" });
+        return file;
     }
 }

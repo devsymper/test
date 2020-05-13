@@ -3,37 +3,37 @@ export const reformatGetListData = function(res) {
         total: res.total,
         columns: [{
                 name: "key",
-                title: "Key",
+                title: "key",
                 type: "text"
             },
             {
                 name: "name",
-                title: "Name",
+                title: "name",
                 type: "text"
             },
             {
                 name: "description",
-                title: "Description",
+                title: "description",
                 type: "text"
             },
             {
                 name: "createdBy",
-                title: "Created by",
+                title: "created_by",
                 type: "text"
             },
             {
                 name: "version",
-                title: "Version",
+                title: "version",
                 type: "text"
             },
             {
                 name: "lastUpdated",
-                title: "Last updated",
+                title: "last_updated",
                 type: "text"
             },
             {
                 name: "LastUpdatedBy",
-                title: "Last updated by",
+                title: "last_updated_by",
                 type: "text"
             },
         ],
