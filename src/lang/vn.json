@@ -31,7 +31,18 @@
         "close": "Đóng",
         "virtualdocs": "Virtualdocs",
         "tasks": "Tasks",
-        "other": "Khác"
+        "other": "Khác",
+        "deploy": "Deploy",
+        "start": "Bắt đầu",
+        "name": "Tên",
+        "key": "Định danh",
+        "description": "Mô tả",
+        "created_by": "Người tạo",
+        "version": "Phiên bản",
+        "last_updated": "Cập nhật lúc",
+        "last_updated_by": "Người cập nhật",
+        "statistics": "Thống kê",
+        "detail": "Chi tiết"
     },
     "login": {
         "title": "Đăng nhập hệ thống",
@@ -222,6 +233,37 @@
         }
     },
     "process": {
+        "list": {
+            "title": "Danh sách quy trình",
+            "deploy_history": "Lịch sử deploy",
+            "start": "Bắt đầu quy trình",
+            "instances": "Các bản đã chạy"
+        },
+        "action": {
+            "create": "Tạo quy trình mới"
+        },
+        "instance": {
+            "list": "Danh sách các bản đã chạy",
+            "name": "Tên bản chạy",
+            "process_definition_name": "Tên định nghĩa của quy trình",
+            "business_key": "Khóa nghiệp vụ",
+            "ended": "Đã kết thúc",
+            "start_user_id": "Id người khởi tạo",
+            "start_time": "Thời gian bắt đầu"
+        },
+        "deployment": {
+            "list": "Danh sách deploy",
+            "run": "Chạy phiên bản này",
+            "name": "Tên",
+            "deployment_time": "Thời gian deploy",
+            "category": "Loại"
+        },
+        "editror": {
+            "err": {
+                "get_data": "Không thể lấy dữ liệu cho soạn thảo quy trình",
+                "get_xml": "Không thể lấy XML cho soạn thảo quy trình"
+            }
+        },
         "header_bar": {
             "undo": "Undo ",
             "redo": "Redo ",

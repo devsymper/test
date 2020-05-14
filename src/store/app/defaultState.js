@@ -27,7 +27,7 @@ const defaultState = {
         // các menu mà ba hoặc enduser được phân quyền
         { title: "application", icon: "mdi-application", link: "/application" },
         { title: "reports", icon: "mdi-view-dashboard", link: "/reports" },
-        { title: "workflows", icon: "mdi-sitemap", link: "/bpmne/create" },
+        { title: "workflows", icon: "mdi-sitemap", link: "/bpmne" },
         {
             title: "documents",
             icon: "mdi-file-document-outline",

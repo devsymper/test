@@ -2,6 +2,11 @@
  * Danh sách tất cả các thuộc tính có thể có của process
  * trong các item, có thuộc tính "dg" là viết tắt của "display group" tức: 
  *      thuộc tính này thuộc về nhóm hiển thị nào ở thanh panel cấu hình bên phải
+ * 
+ * Trong mỗi thuộc tính sẽ có hai phuowng thức là 
+ *      1. lấy giá trị để gửi về server: getValue(value) // value là giá trị cấu hình của thuộc tính đó
+ *      2. khởi tạo lại giá trị từ server vào cấu trúc tương ứng của thuộc tính đó: restoreData(value) // value là giá trị lấy được từ server của thuộc tính đó
+ * Mặc định nếu ko có hai phương thức trên thì giá trị lưu ở server sẽ giống với giá trị được dùng trên client
  */
 export const allNodesAttrs = {
     "process_id": {
@@ -9,7 +14,7 @@ export const allNodesAttrs = {
         "type": "text",
         "value": "process",
         "info": "BPMN.PROPERTYPACKAGES.PROCESS_IDPACKAGE.PROCESS_ID.DESCRIPTION",
-        "dg": "detail"
+        "dg": "general"
     },
     "overrideid": {
         "title": "Id",
@@ -47,7 +52,7 @@ export const allNodesAttrs = {
         "dg": "detail"
     },
     "process_version": {
-        "title": "Process version string (documentation only)",
+        "title": "Process version (documentation only)",
         "type": "text",
         "value": "",
         "info": "BPMN.PROPERTYPACKAGES.PROCESS_VERSIONPACKAGE.PROCESS_VERSION.DESCRIPTION",
@@ -151,6 +156,20 @@ export const allNodesAttrs = {
                 type: 'text'
             },
         ],
+        getValue(value) {
+            if ($.isArray(value)) {
+                if (!value.length || $.isEmptyObject(value[0])) {
+                    return '';
+                } else {
+                    return value;
+                }
+            } else {
+                return '';
+            }
+        },
+        restoreData(value) {
+            return value == '' ? [{}] : value;
+        }
     },
     "exclusivedefinition": {
         "title": "Exclusive",
@@ -199,8 +218,21 @@ export const allNodesAttrs = {
         "info": "BPMN.PROPERTYPACKAGES.FORMPROPERTIESPACKAGE.FORMPROPERTIES.DESCRIPTION",
         "dg": "detail",
         "columns": [],
-        hidden: true
-
+        hidden: true,
+        getValue(value) {
+            if ($.isArray(value)) {
+                if (!value.length || $.isEmptyObject(value[0])) {
+                    return '';
+                } else {
+                    return value;
+                }
+            } else {
+                return '';
+            }
+        },
+        restoreData(value) {
+            return value == '' ? [] : value;
+        }
     },
     "formkeydefinition": {
         "title": "Form key",
@@ -213,7 +245,7 @@ export const allNodesAttrs = {
     "formfieldvalidation": {
         "title": "Validate form fields",
         "type": "script",
-        "value": '',
+        "value": "true",
         "info": "BPMN.PROPERTYPACKAGES.FORMFIELDVALIDATIONPACKAGE.FORMFIELDVALIDATION.DESCRIPTION",
         "dg": "formula"
     },
@@ -1033,14 +1065,14 @@ export const allNodesAttrs = {
         hidden: true
     },
     "multiinstance_cardinality": {
-        "title": "Cardinality (Multi-instance)",
+        "title": "Cardinality ",
         "type": "numeric",
         "value": "",
         "info": "BPMN.PROPERTYPACKAGES.MULTIINSTANCE_CARDINALITYPACKAGE.MULTIINSTANCE_CARDINALITY.DESCRIPTION",
         "dg": "multiInstance"
     },
     "multiinstance_collection": {
-        "title": "Collection (Multi-instance)",
+        "title": "Collection ",
         "type": "text",
         "value": "",
         "info": "BPMN.PROPERTYPACKAGES.MULTIINSTANCE_COLLECTIONPACKAGE.MULTIINSTANCE_COLLECTION.DESCRIPTION",
@@ -1048,7 +1080,7 @@ export const allNodesAttrs = {
         hidden: true
     },
     "multiinstance_variable": {
-        "title": "Element variable (Multi-instance)",
+        "title": "Element variable ",
         "type": "text",
         "value": "",
         "info": "BPMN.PROPERTYPACKAGES.MULTIINSTANCE_VARIABLEPACKAGE.MULTIINSTANCE_VARIABLE.DESCRIPTION",
@@ -1056,7 +1088,7 @@ export const allNodesAttrs = {
         hidden: true
     },
     "multiinstance_condition": {
-        "title": "Completion condition (Multi-instance)",
+        "title": "Completion condition ",
         "type": "script",
         "value": "",
         "info": "BPMN.PROPERTYPACKAGES.MULTIINSTANCE_CONDITIONPACKAGE.MULTIINSTANCE_CONDITION.DESCRIPTION",
@@ -1091,21 +1123,63 @@ export const allNodesAttrs = {
         "type": "table",
         "value": [],
         "info": "BPMN.PROPERTYPACKAGES.SIGNALDEFINITIONSPACKAGE.SIGNALDEFINITIONS.DESCRIPTION",
-        "dg": "detail"
+        "dg": "detail",
+        getValue(value) {
+            if ($.isArray(value)) {
+                if (!value.length || $.isEmptyObject(value[0])) {
+                    return '';
+                } else {
+                    return value;
+                }
+            } else {
+                return '';
+            }
+        },
+        restoreData(value) {
+            return value == '' ? [] : value;
+        }
     },
     "messagedefinitions": {
         "title": "Message definitions",
         "type": "table",
         "value": [],
         "info": "BPMN.PROPERTYPACKAGES.MESSAGEDEFINITIONSPACKAGE.MESSAGEDEFINITIONS.DESCRIPTION",
-        "dg": "detail"
+        "dg": "detail",
+        getValue(value) {
+            if ($.isArray(value)) {
+                if (!value.length || $.isEmptyObject(value[0])) {
+                    return '';
+                } else {
+                    return value;
+                }
+            } else {
+                return '';
+            }
+        },
+        restoreData(value) {
+            return value == '' ? [] : value;
+        }
     },
     "escalationdefinitions": {
         "title": "Escalation definitions",
         "type": "table",
         "value": [],
         "info": "BPMN.PROPERTYPACKAGES.ESCALATIONDEFINITIONSPACKAGE.ESCALATIONDEFINITIONS.DESCRIPTION",
-        "dg": "detail"
+        "dg": "detail",
+        getValue(value) {
+            if ($.isArray(value)) {
+                if (!value.length || $.isEmptyObject(value[0])) {
+                    return '';
+                } else {
+                    return value;
+                }
+            } else {
+                return '';
+            }
+        },
+        restoreData(value) {
+            return value == '' ? [] : value;
+        }
     },
     "istransaction": {
         "title": "Is a transaction sub process",
@@ -1117,7 +1191,7 @@ export const allNodesAttrs = {
     "formreference": {
         "title": "Form reference",
         "type": "autocomplete",
-        "value": [],
+        "value": '',
         "info": "BPMN.PROPERTYPACKAGES.FORMREFERENCEPACKAGE.FORMREFERENCE.DESCRIPTION",
         "dg": "taskAction",
     },
@@ -1314,3 +1388,5 @@ export const allNodesAttrs = {
         dg: 'taskAction'
     },
 }
+
+console.log(allNodesAttrs, 'allNodesAttrsallNodesAttrsallNodesAttrs');

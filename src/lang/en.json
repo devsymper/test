@@ -31,7 +31,18 @@
         "close": "Close",
         "virtualdocs": "Virtualdocs",
         "tasks": "Tasks",
-        "other": "Other"
+        "other": "Other",
+        "deploy": "Deploy",
+        "start": "Start",
+        "name": "Name",
+        "key": "Key",
+        "description": "Description",
+        "created_by": "Created by",
+        "version": "Version",
+        "last_updated": "Last updated",
+        "last_updated_by": "Last updated by",
+        "statistics": "Statistics",
+        "detail": "Detail"
     },
     "validate": {
         "required": "Not be empty",
@@ -222,6 +233,37 @@
         }
     },
     "process": {
+        "list": {
+            "title": "Process list",
+            "deploy_history": "Deploy history",
+            "start": "Start process",
+            "instances": "List instances"
+        },
+        "action": {
+            "create": "Create new process"
+        },
+        "instance": {
+            "list": "List process instance",
+            "name": "name",
+            "process_definition_name": "Process definition Name",
+            "business_key": "Business key",
+            "ended": "Ended",
+            "start_user_id": "Start user id",
+            "start_time": "Start time"
+        },
+        "deployment": {
+            "list": "List deployments",
+            "run": "Run this version",
+            "name": "Name",
+            "deployment_time": "Deployment time",
+            "category": "Category"
+        },
+        "editror": {
+            "err": {
+                "get_data": "Can not get model data!",
+                "get_xml": "Can not get XML for process"
+            }
+        },
         "header_bar": {
             "undo": "Undo ",
             "redo": "Redo ",
