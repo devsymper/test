@@ -20,7 +20,7 @@
             dense
             flat
             :disable-pagination="true"
-            class="table-attachment">
+            class="table-attachment tbl-no-border">
             <template v-slot:item.owner="{ item }">
                 <user :user="item.owner"></user>
             </template>

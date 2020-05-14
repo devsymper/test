@@ -52,8 +52,9 @@
                     <userSelector 
                         :isMulti="false" 
                         :compactChip="true"
-                        :color="'#f5f5f5'"
+                        :color="'transparent'"
                         :textColor="''"
+                        :flat="true"
                         :values="[task.owner.id]"
                     ></userSelector>
                 </v-col>
@@ -65,7 +66,7 @@
                 <v-col cols="9" class="task-content">
                     <v-textarea
                         dense solo text flat
-                        class="sym-small-size bg-grey"
+                        class="sym-small-size bg-grey sym-small-lineheight"
                         v-model="currTask.description"
                     ></v-textarea>
                 </v-col>
@@ -88,6 +89,30 @@
                 </v-col>
                 <v-col cols="6" class="task-content grey--text body-2">
                     {{currTask.dueDate}}
+                    <v-menu
+                        ref="menu"
+                        v-model="menu"
+                        :close-on-content-click="false"
+                        :return-value.sync="date"
+                        transition="scale-transition"
+                        offset-y
+                        min-width="290px"
+                    >
+                        <template v-slot:activator="{ on }">
+                            <v-text-field
+                                class="sym-small-size bg-grey"
+                                dense
+                                solo
+                                v-on="on"
+                                flat
+                                v-model="date"
+                            ></v-text-field>
+                        </template>
+                        <v-date-picker v-model="date" no-title scrollable>
+                            <v-btn text color="primary" @click="menu = false">Cancel</v-btn>
+                            <v-btn text color="primary" @click="$refs.menu.save(date)">OK</v-btn>
+                        </v-date-picker>
+                    </v-menu>
                 </v-col>
             </v-row>
         </v-col>

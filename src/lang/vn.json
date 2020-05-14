@@ -30,7 +30,8 @@
         "navigator": "Điều hướng",
         "close": "Đóng",
         "virtualdocs": "Virtualdocs",
-        "tasks": "Tasks"
+        "tasks": "Tasks",
+        "other": "Khác"
     },
     "login": {
         "title": "Đăng nhập hệ thống",
@@ -380,6 +381,10 @@
             "assigned": "Task đã được giao"
         },
         "taskTitle": "Tiêu đề",
-        "addSubtaskTitle": "Thêm mới subtask"
+        "addSubtaskTitle": "Thêm mới subtask",
+        "createTask": {
+            "title": "Tạo task"
+        },
+        "claim": "Claim"
     }
 }

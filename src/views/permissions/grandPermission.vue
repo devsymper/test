@@ -35,6 +35,7 @@
                                         :key="appIndex"
                                         nav dense
                                         value="true"
+                                        v-show="app.objects.length > 0"
                                     >
                                         <template v-slot:activator>
                                             <!-- Tên app -->
@@ -44,7 +45,12 @@
                                                 {{app.name}}
                                             </v-list-item-title>
                                         </template>
-                                        <v-list-group sub-group value="true" v-for="(listObjs, objectIndex) in app.objects" :key="listObjs.type">
+                                        <v-list-group 
+                                            sub-group value="true" 
+                                            v-for="(listObjs, objectIndex) in app.objects" 
+                                            :key="listObjs.type"
+                                            v-show="listObjs.data.length > 0"
+                                        >
                                             <template v-slot:activator>
                                                 <v-list-item-content>
                                                     <!-- Tên các nhóm object trong app -->
@@ -77,6 +83,7 @@
                                     :key="appIndex"
                                     nav dense
                                     value="true"
+                                    v-show="obj.objects.length > 0"
                                 >
                                     <template v-slot:activator>
                                         <v-list-item-title>
@@ -88,7 +95,9 @@
                                         sub-group 
                                         value="true" 
                                         v-for="(listObjs, objectIndex) in obj.objects" 
-                                        :key="listObjs.type">
+                                        :key="listObjs.type"
+                                        v-show="listObjs.data.length > 0"
+                                    >
                                         <template v-slot:activator>
                                             <v-list-item-content>
                                                 <v-list-item-title class="text-capitalize">{{listObjs.type}}</v-list-item-title>
@@ -497,27 +506,67 @@ export default {
                 this.listActionPacks[index].checked = 0
             }
         },
+        findObject(listObjects, searchStr) {
+            let returnObj = [];
+            for (let i = 0; i < listObjects.length; ++i) {
+                let objects = JSON.parse(JSON.stringify(listObjects[i].data)),
+                    count   = 0,
+                    resData = [];
+                for (let item of objects) {
+                    if (
+                        item.name.toLocaleLowerCase().includes(searchStr) || (
+                            item.title != undefined && 
+                            item.title.toLocaleLowerCase().includes(searchStr)
+                        )
+                    ) {
+                        resData.push(item);
+                        if (++count >= 10) {
+                            break;
+                        }
+                    }
+                }
+                if (resData.length > 0) {
+                    listObjects.push({
+                        type: listObjects[i].type,
+                        data: resData
+                    });
+                }
+            }
+            return listObjects;
+        },
         searchObject() {
             let value = this.keyword;
             this.listResultApp = JSON.parse(JSON.stringify(this.listApp));
             if (value != null && value.trim().length > 0) {
                 let searchStr = value.toLocaleLowerCase().trim();
                 for (let index = 0; index < this.listResultApp.length; index++) {
-                    for (let i = 0; i < this.listResultApp[index].objects.length; i++) {
-                        let objects = JSON.parse(JSON.stringify(this.listResultApp[index].objects[i].data)),
-                            count = 0;
-                        this.listResultApp[index].objects[i].data = [];
-                        for (let item of objects) {
-                            if (
-                                item.name.toLocaleLowerCase().includes(searchStr) || (
-                                    item.title != undefined && 
-                                    item.title.toLocaleLowerCase().includes(searchStr)
-                                )
-                            ) {
-                                this.listResultApp[index].objects[i].data.push(item);
-                                if (++count >= 10) {
-                                    break;
+                    if (this.listResultApp[index].name.toLocaleLowerCase().includes(searchStr)) {
+                        continue;
+                    } else {
+                        let listObjects = JSON.parse(JSON.stringify(this.listResultApp[index].objects));
+                        this.listResultApp[index].objects = [];
+                        for (let i = 0; i < listObjects.length; ++i) {
+                            let objects = listObjects[i].data,
+                                count   = 0,
+                                resData = [];
+                            for (let item of objects) {
+                                if (
+                                    item.name.toLocaleLowerCase().includes(searchStr) || (
+                                        item.title != undefined && 
+                                        item.title.toLocaleLowerCase().includes(searchStr)
+                                    )
+                                ) {
+                                    resData.push(item);
+                                    if (++count >= 10) {
+                                        break;
+                                    }
                                 }
+                            }
+                            if (resData.length > 0) {
+                                this.listResultApp[index].objects.push({
+                                    type: listObjects[i].type,
+                                    data: resData
+                                });
                             }
                         }
                     }

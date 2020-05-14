@@ -3,120 +3,20 @@
         <v-row class="mr-0 ml-0">
             <v-col 
                 :cols="!sideBySideMode ? 12 : 4"
-                :xl="!sideBySideMode ? 12 : 3"
+                :md="!sideBySideMode ? 12 : 3"
                 class="pt-0 pl-0 pr-0 pb-0"
             >
-                <v-row class="ml-0 mr-0">
-                    <v-col 
-                        cols="2" 
-                        class="pt-2 pb-2"
-                        v-if="!compackMde"
-                    >
-                        <v-btn
-                            small
-                            color="success"
-                        >
-                            {{$t("common.add")}} 
-                            <v-icon small>mdi-plus</v-icon>
-                        </v-btn>
-                    </v-col>
-                    <v-col :cols="compackMde ? 12: 10" class="text-right pt-2 pb-2 pr-0">
-                        <v-text-field dense
-                            class="bg-grey sym-small-size d-inline-block mr-2"
-                            append-icon="mdi-magnify"
-                            flat
-                            solo
-                            :placeholder="$t('common.search')"
-                        ></v-text-field>
-                        <v-select
-                            v-if="!compackMde"
-                            :items="listFilterTask"
-                            solo
-                            flat
-                            dense
-                            v-model="filterTask"
-                            single-line
-                            :hide-details="true"
-                            style="min-width: 50px; max-width: 120px;"
-                            light
-                            class="mr-2 bg-grey sym-small-size sym-style-input d-inline-block"
-                        >
-                        </v-select>
-                        <v-menu offset-y light
-                            :close-on-content-click="false"
-                            :min-width="200"
-                            v-if="!compackMde"
-                        >
-                            <template v-slot:activator="{ on }">
-                                <v-btn
-                                    v-on="on"
-                                    class="bg-grey mr-2"
-                                    solo
-                                    text
-                                    small
-                                >
-                                    <v-icon>mdi-swap-vertical</v-icon>
-                                </v-btn>
-                            </template>
-                            <v-list dense light nav>
-                                <v-subheader class="font-weight-bold orange--text" style="height: 25px">
-                                    {{this.$t("sortBy")}}
-                                </v-subheader>
-                                <v-list-item-group 
-                                    v-model="sortBy" 
-                                    multiple
-                                >
-                                    <v-list-item dense flat
-                                        v-for="(item, i) in sortOption"
-                                        :key="i"
-                                    >
-                                        <template v-slot:default="{ active }">
-                                            <v-list-item-content class="pt-0 pb-0">
-                                                <v-list-item-title class="font-weight-regular" v-text="item.label"></v-list-item-title>
-                                            </v-list-item-content>
-                                            <v-list-item-action class="mt-0 mb-0">
-                                                <v-icon v-if="active" color="success" small>mdi-check</v-icon>
-                                            </v-list-item-action>
-                                        </template>
-                                    </v-list-item>
-                                </v-list-item-group>
-                                <v-subheader class="font-weight-bold orange--text" style="height: 25px">
-                                    {{this.$t("orderBy")}}
-                                </v-subheader>
-                                <v-list-item-group v-model="orderBy">
-                                    <v-list-item
-                                        v-for="(item, i) in orderOption"
-                                        :key="i"
-                                    >
-                                        <template v-slot:default="{ active }">
-                                            <v-list-item-content class="pt-0 pb-0">
-                                                <v-list-item-title class="font-weight-regular" v-text="item.label"></v-list-item-title>
-                                            </v-list-item-content>
-                                            <v-list-item-action class="mt-0 mb-0">
-                                                <v-icon v-if="active" color="success" small>mdi-check</v-icon>
-                                            </v-list-item-action>
-                                        </template>
-                                    </v-list-item>
-                                </v-list-item-group>
-                            </v-list>
-                        </v-menu>
-                        <v-btn 
-                            icon small 
-                            solo
-                            class="bg-grey"
-                            text
-                            @click="isSmallRow = !isSmallRow"
-                            v-if="sideBySideMode || compackMde"
-                        >
-                            <v-icon>{{isSmallRow ? 'mdi-view-stream' : 'mdi-view-headline'}}</v-icon>
-                        </v-btn>
-                    </v-col>
-                </v-row>
+                <listHeader
+                    :isSmallRow="isSmallRow"
+                    :sideBySideMode="sideBySideMode"
+                    :compackMode="compackMode"
+                    @change-density="isSmallRow = !isSmallRow"
+                ></listHeader>
                 <v-divider v-if="!sideBySideMode"></v-divider>
                 <v-row class="ml-0 mr-0" v-if="!sideBySideMode">
                     <v-col cols="12" class="list-tasks pt-0 pb-0">
                         <v-row>
-                            <v-col :cols="sideBySideMode ? 12 : compackMde ? 6 : 4" class="pl-8 subtitle-2">
+                            <v-col :cols="sideBySideMode ? 12 : compackMode ? 6 : 4" class="pl-8 subtitle-2">
                                 {{$t("tasks.header.name")}}
                             </v-col>
                             <v-col cols="2" v-if="!sideBySideMode" class="subtitle-2">
@@ -128,11 +28,11 @@
                             <v-col cols="2" v-if="!sideBySideMode" class="subtitle-2">
                                 {{$t("tasks.header.owner")}}
                             </v-col>
-                            <v-col cols="2" v-if="!sideBySideMode && !compackMde" class="text-right subtitle-2">
+                            <v-col cols="2" v-if="!sideBySideMode && !compackMode" class="text-right subtitle-2">
                                 <v-btn 
-                                    icon small 
-                                    :style="{height: '20px', width: '20px'}"
+                                    text x-small 
                                     @click="isSmallRow = !isSmallRow"
+                                    class="pr-0 pl-0"
                                 >
                                     <v-icon>{{isSmallRow ? 'mdi-view-stream' : 'mdi-view-headline'}}</v-icon>
                                 </v-btn>
@@ -155,7 +55,7 @@
                             v-model="openPanel"
                         >
                             <v-expansion-panel
-                                v-for="(i) in 5"
+                                v-for="(i) in 4"
                                 :key="i"
                                 class="mt-0 pl-0 pr-0"
                             >
@@ -169,7 +69,10 @@
                                     </div>
                                 </v-expansion-panel-header>
                                 <v-expansion-panel-content class="pl-0 pr-0">
-                                    <div class="subtitle-2 pl-8">
+                                    <div 
+                                        class="subtitle-2 pl-8"
+                                        :class="{'pt-2': !isSmallRow}"
+                                    >
                                         Objects name
                                     </div>
                                     <v-row 
@@ -178,23 +81,27 @@
                                         @click="selectObject(obj)"
                                     >
                                         <v-col 
-                                            :cols="sideBySideMode ? 12 : compackMde ? 6: 4" 
+                                            :cols="sideBySideMode ? 12 : compackMode ? 6: 4" 
                                             class="pl-7 pr-1"
                                             :class="{'pt-0': isSmallRow, 'pb-0': isSmallRow}"
                                         >
-                                            <icon :icon="obj.icon" class="mr-2"></icon>
-                                            <span class="body-2">
-                                                {{obj.name}}
-                                            </span>
-                                            <v-row class="pt-0 pb-0 grey--text lighten-2">
-                                                <v-col cols="6" class="text-left caption pt-0 pb-0 pl-10">
-                                                    <small>Số đơn: SSS1291</small>
+                                            <div style="width: 25px" class="d-inline-block h-100 pt-1">
+                                                <icon :icon="obj.icon" class="mr-2 float-left"></icon>
+                                            </div>
+                                            <div style="width: calc(100% - 25px)" class="d-inline-block">
+                                                <div class="fz-13 text-truncate d-inline-block float-left">
+                                                    {{obj.name}}
+                                                </div>
+                                                <v-col cols="12" class="pt-0 pb-0 pr-0 pl-0 grey--text lighten-2 float-left">
+                                                    <v-col cols="6" class="text-left caption pt-0 pb-0 float-left pl-0 pr-0">
+                                                        <small>Số đơn: SSS1291</small>
+                                                    </v-col>
+                                                    <v-col cols="6" class="text-left caption pt-0 pb-0 float-left pl-0 pr-0">
+                                                        <v-icon class="grey--text lighten-2 mr-1" x-small>mdi-clock</v-icon>
+                                                        <small>12:15</small>
+                                                    </v-col>
                                                 </v-col>
-                                                <v-col cols="6" class="text-left caption pt-0 pb-0">
-                                                    <v-icon class="grey--text lighten-2 mr-1" x-small>mdi-clock</v-icon>
-                                                    <small>12:15</small>
-                                                </v-col>
-                                            </v-row>
+                                            </div>
                                         </v-col>
                                         <v-col 
                                             v-if="!sideBySideMode"
@@ -202,24 +109,31 @@
                                             class="caption pl-1 pr-1"
                                             :class="{'pt-0': isSmallRow, 'pb-0': isSmallRow}"
                                         >
-                                            <v-avatar size="25" class="mr-2">
-                                                <img 
-                                                    :src="obj.assignee.avatar" alt=""
-                                                    v-if="!!obj.assignee.avatar"
-                                                >
-                                                <v-icon
-                                                    v-else
-                                                    v-text="obj.assignee.avatar"
-                                                ></v-icon>
-                                            </v-avatar>
-                                            <span class="mt-2 d-inline-block">{{obj.assignee.name}}</span>
+                                            <v-chip
+                                                color="transparent"
+                                                small
+                                                class="mt-0 pl-1 pr-0 d-inline-block text-truncate"
+                                                label
+                                            >
+                                                <v-avatar size="25" class="mr-2">
+                                                    <img 
+                                                        :src="obj.assignee.avatar" alt=""
+                                                        v-if="!!obj.assignee.avatar"
+                                                    >
+                                                    <v-icon
+                                                        v-else
+                                                        v-text="obj.assignee.avatar"
+                                                    ></v-icon>
+                                                </v-avatar>
+                                                {{obj.assignee.name}}
+                                            </v-chip>
                                         </v-col>
                                         <v-col 
                                             v-if="!sideBySideMode"
                                             cols="2" class="caption pl-1 pr-1"
                                             :class="{'pt-0': isSmallRow, 'pb-0': isSmallRow}"
                                         >
-                                            <span class="mt-2 d-inline-block">{{obj.dueDate}}</span>
+                                            <span class="mt-1 d-inline-block">{{obj.dueDate}}</span>
                                         </v-col>
                                         <v-col 
                                             v-if="!sideBySideMode"
@@ -227,19 +141,26 @@
                                             class="caption pl-1 pr-1"
                                             :class="{'pt-0': isSmallRow, 'pb-0': isSmallRow}"
                                         >
-                                            <v-avatar size="25" class="mr-2">
-                                                <img 
-                                                    :src="obj.assignee.avatar" alt=""
-                                                    v-if="!!obj.assignee.avatar"
-                                                >
-                                                <v-icon
-                                                    v-else
-                                                    v-text="obj.assignee.avatar"
-                                                ></v-icon>
-                                            </v-avatar>
-                                            <span class="mt-2 d-inline-block">{{obj.owner.name}}</span>
+                                            <v-chip
+                                                color="transparent"
+                                                class="mt-0 pl-1 pr-0 d-inline-block text-truncate"
+                                                small
+                                                label
+                                            >
+                                                <v-avatar size="25" class="mr-2">
+                                                    <img 
+                                                        :src="obj.assignee.avatar" alt=""
+                                                        v-if="!!obj.assignee.avatar"
+                                                    >
+                                                    <v-icon
+                                                        v-else
+                                                        v-text="obj.assignee.avatar"
+                                                    ></v-icon>
+                                                </v-avatar>
+                                                {{obj.owner.name}}
+                                            </v-chip>
                                         </v-col>
-                                        <v-col cols="2" v-if="!sideBySideMode && !compackMde"></v-col>
+                                        <v-col cols="2" v-if="!sideBySideMode && !compackMode"></v-col>
                                     </v-row>
                                 </v-expansion-panel-content>
                             </v-expansion-panel>
@@ -249,8 +170,9 @@
             </v-col>
             <v-col 
                 :cols="!sideBySideMode ? 0 : 8"
-                :xl="!sideBySideMode ? 0 : 9"
+                :md="!sideBySideMode ? 0 : 9"
                 v-if="sideBySideMode"
+                class="pt-0"
                 style="border-left: 1px solid #e0e0e0;"
             >
                 <taskDetail
@@ -263,16 +185,19 @@
 </template>
 
 <script>
+import Api from "./../../api/api.js";
 import icon from "../../components/common/SymperIcon";
 import taskDetail from "./taskDetail";
+import listHeader from "./listHeader";
 export default {
     name: "listTask",
     components: {
         icon: icon,
         taskDetail: taskDetail,
+        listHeader: listHeader,
     },
     props: {
-        compackMde: {
+        compackMode: {
             type: Boolean,
             default: false
         },
@@ -283,63 +208,11 @@ export default {
     },
     data: function() {
         return {
-            sortBy: null,
-            orderBy: null,
-            filterTask: null,
+            apiUrl: "https://v2hoangnd.dev.symper.vn/",
             selectedTask: {},
-            isSmallRow: 0,
+            isSmallRow: false,
             sideBySideMode: false,
             openPanel: [0, 1, 2, 3, 4],
-            sortOption: [
-                {
-                    label: this.$t("tasks.header.date"),
-                    callback: e => {}
-                },
-                {
-                    label: this.$t("tasks.header.dueDate"),
-                    callback: e => {}
-                },
-                {
-                    label: this.$t("tasks.header.description"),
-                    callback: e => {}
-                },
-                {
-                    label: this.$t("tasks.header.owner"),
-                    callback: e => {}
-                },
-                {
-                    label: this.$t("tasks.header.assignee"),
-                    callback: e => {}
-                }
-            ],
-            orderOption: [
-                {
-                    label: this.$t("order.ascending"),
-                    callback: e => {}
-                },
-                {
-                    label: this.$t("order.descending"),
-                    callback: e => {}
-                }
-            ],
-            listFilterTask: [
-                {
-                    text: this.$t("tasks.filterOptions.all"),
-                    value: "all"
-                },
-                {
-                    text: this.$t("tasks.filterOptions.myTask"),
-                    value: "my-task"
-                },
-                {
-                    text: this.$t("tasks.filterOptions.myStaff"),
-                    value: "my-staff"
-                },
-                {
-                    text: this.$t("tasks.filterOptions.assigned"),
-                    value: "assigned"
-                }
-            ],
             testObjs: [
                 {
                     name: "Đề nghị lập phiếu xuất điều chuyển kho",
@@ -347,13 +220,13 @@ export default {
                     date: "02-03-2020",
                     dueDate: "02-03-2020",
                     owner: {
-                        name: "Nguyễn Quốc Tân",
+                        name: "Nguyễn Quốc Tân 1",
                         id: "",
                         role: "BA",
                         avatar: "https://cdn3.iconfinder.com/data/icons/avatars-round-flat/33/avat-01-512.png"
                     },
                     assignee: {
-                        name: "Nguyễn Tiến Đạt",
+                        name: "Nguyễn Tiến Đạt 1",
                         id: "",
                         role: "Dev",
                         avatar: "https://cdn3.iconfinder.com/data/icons/avatars-round-flat/33/avat-01-512.png"
@@ -381,7 +254,7 @@ export default {
     },
     methods: {
         selectObject(obj) {
-            if (!this.compackMde) {
+            if (!this.compackMode) {
                 this.sideBySideMode = true;
                 this.selectedTask = obj;
                 this.$emit('change-height', "calc(100vh - 88px)")
@@ -390,7 +263,7 @@ export default {
         closeDetail() {
             this.sideBySideMode = false;
             this.$emit('change-height', "calc(100vh - 120px)")
-        }
+        },
     }
 }
 </script>
@@ -438,4 +311,11 @@ export default {
     padding-left: 5px !important;
     padding-right: 5px !important;
 }
+    .v-list-item >>> .v-list-item__icon,
+    .v-list-group >>> .v-list-item__icon:first-child
+    .v-list-group >>> .v-list-item--dense >>> .v-list-item__icon,
+    .v-list-group >>> .v-list--dense >>> .v-list-item >>> .v-list-item__icon {
+        margin-top: 3px;
+        margin-bottom: 3px;
+    }
 </style>

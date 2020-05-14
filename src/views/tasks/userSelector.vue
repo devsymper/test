@@ -12,7 +12,8 @@
         :background-color="'white'"
         :height="30"
         :placeholder="$t('common.search')"
-        class="sym-small-size bg-grey"
+        class="sym-small-size sym-pad-0"
+        :class="{'bg-grey': !flat}"
         :multiple="isMulti"
     >
         <template v-slot:selection="data">
@@ -34,14 +35,14 @@
         <template v-slot:item="data">
             <template>
                 <v-list-item-avatar size="30" class="mt-1 mb-1">
-                    <img :src="data.item.avatar">
+                    <v-img :src="data.item.avatar"></v-img>
                 </v-list-item-avatar>
                 <v-list-item-content class="pt-0 pb-0">
                     <v-list-item-title v-html="data.item.name"></v-list-item-title>
                     <v-list-item-subtitle class="caption" style="font-size:10px !important" v-html="data.item.role"></v-list-item-subtitle>
                 </v-list-item-content>
                 <v-list-item-action class="mt-0 mb-0">
-                    <v-icon v-if="selected.indexOf(data.item.id) >= 0" color="success" small>mdi-check</v-icon>
+                    <v-icon v-if="selected.indexOf != undefined && selected.indexOf(data.item.id) >= 0" color="success" small>mdi-check</v-icon>
                 </v-list-item-action>
             </template>
         </template>
@@ -71,6 +72,10 @@ export default {
         compactChip: {
             type: Boolean,
             default: false,
+        },
+        flat: {
+            type: Boolean,
+            default: false,
         }
     },
     watch: {
@@ -80,8 +85,7 @@ export default {
         }
     },
     mounted() {
-        this.selected = this.values
-        console.log(this.selected, this.values);
+        this.selected = this.values;
     },
     data: function() {
         const srcs = {
@@ -108,14 +112,14 @@ export default {
         }
     },
     methods: {
-        // remove (item) {
+        remove (item) {
         //     const index = this.selected.indexOf(item.id)
         //     if (index >= 0) {
         //         this.selected.splice(index, 1)
         //         this.$emit("change", this.selected);
         //         this.$emit("input", this.selected);
         //     }
-        // },
+        },
         getUser(id) {
             return this.people.filter(user => {
                 return user.id == id

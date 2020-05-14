@@ -30,7 +30,8 @@
         "navigator": "Navigator",
         "close": "Close",
         "virtualdocs": "Virtualdocs",
-        "tasks": "Tasks"
+        "tasks": "Tasks",
+        "other": "Other"
     },
     "validate": {
         "required": "Not be empty",
@@ -381,6 +382,10 @@
             "assigned": "Assigned"
         },
         "taskTitle": "Task title",
-        "addSubtaskTitle": "Create new subtask"
+        "addSubtaskTitle": "Create new subtask",
+        "createTask": {
+            "title": "Create task"
+        },
+        "claim": "Claim"
     }
 }

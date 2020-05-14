@@ -2,10 +2,10 @@
     <div>
         <div class="d-inline-block float-left" style="width: 50px;">
             <v-avatar size="30">
-                <img 
+                <v-img 
                     :src="user.avatar" alt=""
                     v-if="!!user.avatar"
-                >
+                ></v-img>
                 <v-icon
                     v-else
                     v-text="user.avatar"

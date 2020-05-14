@@ -1,56 +1,63 @@
 <template>
-    <v-row class="ml-0 mr-0">
-        <v-col cols="8" class="pb-0 pt-0">
-            <div class="body-2 pl-2">
-                App name
-                /
-                Object name
-                / 
-                task id
-            </div>
-        </v-col>
-        <v-col cols="4" class="text-right pb-0 pt-0">
-            <v-btn small color="primary" disabled="" class="mr-2">
-                <v-icon small class="mr-2">mdi-content-save</v-icon> 
-                {{$t("common.save")}}
-            </v-btn>
-            <v-btn small text @click="closeDetail">
-                <v-icon small>mdi-close</v-icon>
-            </v-btn>
-        </v-col>
-        <v-divider color="orange"></v-divider>
-        <v-col cols="12">
-            <v-card flat>
-                <v-tabs
-                    v-model="tab"
-                    background-color="transparent"
-                    color="grey"
-                    light
-                    flat
-                >
-                    <v-tab
-                        v-for="item in items"
-                        :key="item.tab"
-                        class="body-2"
+    <v-container fluid>
+        <v-row class="ml-0 mr-0">
+            <v-col cols="8" class="pb-1">
+                <div class="body-2 pl-2">
+                    App name
+                    /
+                    Object name
+                    / 
+                    task id
+                </div>
+            </v-col>
+            <v-col cols="4" class="text-right pt-2 pb-2">
+                <v-btn small text color="warning" class="mr-2">
+                    {{$t("tasks.claim")}}
+                </v-btn>
+                <v-btn small color="primary" disabled="" class="mr-2">
+                    <v-icon small class="mr-2">mdi-content-save</v-icon> 
+                    {{$t("common.save")}}
+                </v-btn>
+                <v-btn small text @click="closeDetail">
+                    <v-icon small>mdi-close</v-icon>
+                </v-btn>
+            </v-col>
+        </v-row>
+        <v-divider style="border-width: 2px; border-color: #ff7400;"></v-divider>
+        <v-row>
+            <v-col cols="12">
+                <v-card flat>
+                    <v-tabs
+                        v-model="tab"
+                        background-color="transparent"
+                        color="grey"
+                        light
+                        flat
                     >
-                        <v-icon small class="mr-2">{{item.icon}}</v-icon>
-                        {{ item.title }}
-                    </v-tab>
-                </v-tabs>
+                        <v-tab
+                            v-for="item in items"
+                            :key="item.tab"
+                            class="body-2"
+                        >
+                            <v-icon small class="mr-2">{{item.icon}}</v-icon>
+                            {{ item.title }}
+                        </v-tab>
+                    </v-tabs>
 
-                <v-tabs-items v-model="tab">
-                    <v-tab-item
-                        v-for="item in items"
-                        :key="item.tab"
-                    >
-                        <v-card flat class="pl-4 pr-4">
-                            <component :is="item.content" :task="task"></component>
-                        </v-card>
-                    </v-tab-item>
-                </v-tabs-items>
-            </v-card>
-        </v-col>
-    </v-row>
+                    <v-tabs-items v-model="tab">
+                        <v-tab-item
+                            v-for="item in items"
+                            :key="item.tab"
+                        >
+                            <v-card flat class="pl-4 pr-4">
+                                <component :is="item.content" :task="task"></component>
+                            </v-card>
+                        </v-tab-item>
+                    </v-tabs-items>
+                </v-card>
+            </v-col>
+        </v-row>
+    </v-container>
 </template>
 
 <script>
