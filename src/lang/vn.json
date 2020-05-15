@@ -414,7 +414,8 @@
             "name": "Tên công việc",
             "assignee": "Người được giao",
             "watcher": "Người theo dõi",
-            "participant": "Người tham gia"
+            "participant": "Người tham gia",
+            "id": "Số đơn"
         },
         "filterOptions": {
             "all": "Toàn bộ task",
@@ -427,6 +428,7 @@
         "createTask": {
             "title": "Tạo task"
         },
-        "claim": "Claim"
+        "claim": "Claim",
+        "created": "Đã tạo mới task"
     }
 }

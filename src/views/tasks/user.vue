@@ -13,8 +13,8 @@
             </v-avatar>
         </div>
         <div class="d-inline-block">
-            <div class="subtitle-2 font-weight-medium">{{user.name}}</div>
-            <div class="grey--text" style="font-size:10px !important">{{user.role}}</div>
+            <div class="fs-13 font-weight-medium">{{user.name}}</div>
+            <div class="grey--text fs-11">{{user.role}}</div>
         </div>
     </div>
 </template>

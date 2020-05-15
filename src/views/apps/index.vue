@@ -87,7 +87,7 @@ export default {
         },
         showError(){
             this.$snotify({
-                type: 'success',
+                type: 'error',
                 title: this.$t('notification.errorTitle'),
                 text: this.$t('notification.error')
             })

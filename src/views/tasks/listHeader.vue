@@ -2,7 +2,7 @@
     <v-row class="ml-0 mr-0">
         <v-col 
             cols="2" 
-            class="pt-2 pb-2"
+            class="pt-1 pb-1"
             v-if="!compackMode"
         >
             <!-- Nút thêm mới task -->
@@ -15,65 +15,53 @@
                     <v-btn
                         v-on="on"
                         small
-                        color="success"
+                        text
+                        class="success white--text"
+                        style="margin-top: 1px"
                     >
                         {{$t("common.add")}} 
                         <v-icon small>mdi-plus</v-icon>
                     </v-btn>
                 </template>
                 <v-list dense light nav>
-                    <v-btn text small class="ml-4 pt-0 pb-0"
-                        @click="openCreateTaskDialog"
+                    <v-btn text small class="pt-0 pb-0"
+                        @click="selectProcess(null)"
                     >
                         {{$t("common.other")}}
                     </v-btn>
-                    <v-list nav dense class="pl-0">
+                    <v-list nav dense class="pl-0 mb-0">
                         <v-list-group
-                            v-for="(app, appIndex) in listProrcessInstances"
-                            :key="appIndex"
+                            v-for="app in listProrcessInstances"
+                            :key="app.processDefinitionId"
                             nav dense
                             value="true"
-                            v-show="app.objects.length > 0"
+                            class="mb-0"
                         >
                             <template v-slot:activator>
                                 <!-- Tên app -->
                                 <v-list-item-title>
-                                    <icon :size="18" :icon="app.icon"></icon>
-                                    {{app.name}}
+                                    {{app.processDefinitionName}}
                                 </v-list-item-title>
                             </template>
-                            <v-list-group 
-                                sub-group value="true" 
-                                v-for="(listObjs, objectIndex) in app.objects" 
-                                :key="listObjs.type"
-                                v-show="listObjs.data.length > 0"
-                            >
-                                <template v-slot:activator>
-                                    <v-list-item-content class="pt-0 pb-0">
-                                        <!-- Tên các nhóm object trong app -->
-                                        <v-list-item-title class="text-capitalize">
-                                            {{listObjs.type}}
-                                        </v-list-item-title>
-                                    </v-list-item-content>
-                                </template>
+                            <v-list nav dense class="pt-0 pb-0">
+                                <!-- Tên các nhóm object trong app -->
                                 <v-list-item
-                                    v-for="(item, itemIndex) in listObjs.data"
-                                    :key="listObjs.type+item.id"
+                                    v-for="item in app.objects"
+                                    :key="item.id"
                                 >
                                     <v-list-item-title
-                                        @click="selectApp(item, listObjs.type, [appIndex, objectIndex, itemIndex], app.id)"
+                                        @click="selectProcess(item)"
                                     >
-                                        <icon :icon="item.icon"></icon>
-                                        {{item.title != undefined && !!item.title ? item.title : item.name}}
+                                        {{item.name}}
                                     </v-list-item-title>
                                 </v-list-item>
-                            </v-list-group>
+                            </v-list>
                         </v-list-group>
                     </v-list>
                 </v-list>
             </v-menu>
         </v-col>
-        <v-col :cols="compackMode ? 12: 10" class="text-right pt-2 pb-2 pr-0">
+        <v-col :cols="compackMode ? 12: 10" class="text-right pt-1 pb-1 pr-0">
             <!-- Tìm kiếm -->
             <v-text-field dense
                 class="bg-grey sym-small-pad sym-small-size d-inline-block mr-2"
@@ -113,7 +101,7 @@
                         text
                         x-small
                     >
-                        <v-icon>mdi-swap-vertical</v-icon>
+                        <v-icon size="18">mdi-swap-vertical</v-icon>
                     </v-btn>
                 </template>
                 <v-list dense light nav>
@@ -167,7 +155,7 @@
                 @click="changeDensity"
                 v-if="sideBySideMode || compackMode"
             >
-                <v-icon>{{isSmallRow ? 'mdi-view-stream' : 'mdi-view-headline'}}</v-icon>
+                <v-icon size="18">{{isSmallRow ? 'mdi-view-stream' : 'mdi-view-headline'}}</v-icon>
             </v-btn>
         </v-col>
         <v-dialog
@@ -188,6 +176,7 @@
                             dense
                             solo
                             flat
+                            v-model="taskObject.name"
                         ></v-text-field>
                     </v-col>
                     <v-col cols="12" class="label pt-2 pb-2">
@@ -195,41 +184,22 @@
                     </v-col>
                     <v-col cols="12">
                         <userSelector 
+                            ref="userSelector"
                             :isMulti="false" 
                             :compactChip="true"
                             :color="'transparent'"
                             :textColor="''"
                             :flat="true"
+                            v-model="taskObject.assignee"
                         ></userSelector>
                     </v-col>
                     <v-col cols="12" class="label pt-2 pb-2">
                         {{$t("tasks.header.dueDate")}}
                     </v-col>
                     <v-col cols="12">
-                        <v-menu
-                            ref="menu"
-                            v-model="menu"
-                            :close-on-content-click="false"
-                            :return-value.sync="date"
-                            transition="scale-transition"
-                            offset-y
-                            min-width="290px"
-                        >
-                            <template v-slot:activator="{ on }">
-                                <v-text-field
-                                    class="sym-small-size bg-grey"
-                                    dense
-                                    solo
-                                    v-on="on"
-                                    flat
-                                    v-model="date"
-                                ></v-text-field>
-                            </template>
-                            <v-date-picker v-model="date" no-title scrollable>
-                                <v-btn text color="primary" @click="menu = false">Cancel</v-btn>
-                                <v-btn text color="primary" @click="$refs.menu.save(date)">OK</v-btn>
-                            </v-date-picker>
-                        </v-menu>
+                        <datePicker 
+                            v-model="taskObject.dueDate"
+                        ></datePicker>
                     </v-col>
                     <v-col cols="12" class="label pt-2 pb-2">
                         {{$t("tasks.header.description")}}
@@ -240,20 +210,24 @@
                             dense
                             solo
                             flat
+                            v-model="taskObject.description"
                         ></v-textarea>
                     </v-col>
                 </v-row>
-                <v-card-actions>
+                <v-card-actions class="pt-4">
                     <v-spacer></v-spacer>
                     <v-btn
                         color="primary"
                         text
                         small
-                        @click="dialog = false"
+                        :disabled="taskObject.name.length == 0 ||
+                                    taskObject.dueDate.length == 0 ||
+                                    taskObject.assignee.length == 0"
+                        @click="saveTask"
                     >
                         {{$t('common.add')}}
                     </v-btn>
-                    <v-btn text small @click="dialog = false">
+                    <v-btn text small @click="dialog = false" class="mr-2">
                         {{$t('common.close')}}
                     </v-btn>
                 </v-card-actions>
@@ -263,8 +237,9 @@
 </template>
 
 <script>
-import Api from "./../../api/api.js";
+import BPMNEngine from "./../../api/BPMNEngine";
 import icon from "../../components/common/SymperIcon";
+import datePicker from "../../components/common/datePicker";
 import vClickOutside from 'v-click-outside';
 import userSelector from "./userSelector";
 export default {
@@ -272,6 +247,7 @@ export default {
     components: {
         icon: icon,
         userSelector: userSelector,
+        datePicker: datePicker,
     },
     props: {
         isSmallRow: {
@@ -289,8 +265,6 @@ export default {
     },
     data: function() {
         return {
-            menu: false,
-            date: "",
             sortOption: [
                 {
                     label: this.$t("tasks.header.date"),
@@ -344,17 +318,24 @@ export default {
             sortBy: null,
             orderBy: null,
             filterTask: null,
-            apiUrl: "http://v2.symper.vn:8443/symper-rest/service/",
-            queryProcessInstance: "query/process-instances",
+            apiUrl: "https://v2.symper.vn:8443/symper-rest/service/",
+            queryProcessInstance: "runtime/process-instances",
             listProrcessInstances: [],
-            dialog: false
+            dialog: false,
+            selectedProcess:  null,
+            taskObject: {
+                name: "",
+                assignee: [],
+                dueDate: "",
+                description: ""
+            }
         }
     },
     directives: {
         clickOutside: vClickOutside.directive
     },
     mounted() {
-        this.getAllApp();
+        this.getProcessInstance();
     },
     methods: {
         openCreateTaskDialog(){
@@ -363,40 +344,83 @@ export default {
         changeDensity() {
             this.$emit("change-density");
         },
-        getAllApp() {
-            var data = JSON.stringify({});
-            var xhr = new XMLHttpRequest();
-            xhr.withCredentials = true;
-
-            xhr.addEventListener("readystatechange", function() {
-                console.log(this);
-                if(this.readyState === 4) {
+        getProcessInstance() {
+            BPMNEngine.getProcessInstance()
+            .then((res) => {
+                if (res.total > 0) {
+                    let listProccess = [];
+                    let objects = [];
+                    res.data.forEach(item => {
+                        if (listProccess.indexOf(item.processDefinitionId) < 0) {
+                            listProccess.push(item.processDefinitionId);
+                        }
+                        let index = listProccess.indexOf(item.processDefinitionId);
+                        item.tasks = [];
+                        if (objects[index] != undefined) {
+                            objects[index].objects.push(item);
+                        } else {
+                            objects.push({
+                                processDefinitionId: item.processDefinitionId,
+                                processDefinitionName: item.processDefinitionName,
+                                objects: [item]
+                            });
+                        }
+                    });
+                    this.listProrcessInstances = objects;
+                    this.$emit("get-list-process-instance", objects);
                 }
+            })
+            .catch((err) => {
+                
             });
-
-            xhr.open("POST", "https://v2.symper.vn:8443/symper-rest/service/query/process-instances");
-            xhr.setRequestHeader("Authorization", "Basic cmVzdC1hZG1pbjp0ZXN0");
-            xhr.setRequestHeader("Content-Type", "application/json");
-
-            xhr.send(data);
-            // let req = new Api(this.apiUrl);
-            // req.post(this.queryProcessInstance, {}, {Authorization: "Basic cmVzdC1hZG1pbjp0ZXN0"}, {}, true)
-            // .then((res) => {
-            //     if (res.status === 200) {
-            //         this.listProrcessInstances = [...res.data, ...this.listProrcessInstances];
-            //     }
-            // })
-            // .catch((err) => {
-            //     console.log(err);
-            // });
         },
-        selectApp(app) {
-            console.log(app);
+        selectProcess(process) {
+            this.selectedProcess = process;
+            this.openCreateTaskDialog();
+        },
+        showError(){
+            this.$snotify({
+                type: 'error',
+                title: this.$t('notification.errorTitle'),
+                text: this.$t('notification.error')
+            })
+        },
+        saveTask() {
+            let data = {
+                ...this.taskObject,
+                assignee           : this.taskObject.assignee[0],
+                processInstanceId  : "",
+                processDefinitionId: "",
+            };
+            if (this.selectedProcess != null) {
+                data.processInstanceId   = this.selectedProcess.id;
+                data.processDefinitionId = this.selectedProcess.processDefinitionId;
+            }
+            BPMNEngine.addTask(JSON.stringify(data))
+            .then(res => {
+                if (res.id != undefined) {
+                    this.selectedProcess = null;
+                    this.dialog          = false;
+                    this.$emit("create-task", res);
+                    this.$snotify({
+                        type : 'success',
+                        title: this.$t('notification.successTitle'),
+                        text : this.$t('tasks.created')
+                    });
+                } else {
+                    this.showError();
+                }
+            })
         }
     }
 }
 </script>
 
-<style>
-
+<style scoped>
+    .v-list-item {
+        cursor: pointer;
+    }
+    .v-list-item:hover {
+        background-color: #f5f5f5 !important                                                                                ;
+    }
 </style>

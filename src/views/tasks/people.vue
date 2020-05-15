@@ -40,7 +40,7 @@
                             </v-list-item-avatar>
                             <v-list-item-content class="pt-0 pb-0">
                                 <v-list-item-title v-html="data.item.name"></v-list-item-title>
-                                <v-list-item-subtitle class="caption" style="font-size:10px !important" v-html="data.item.role"></v-list-item-subtitle>
+                                <v-list-item-subtitle class="fs-11" v-html="data.item.role"></v-list-item-subtitle>
                             </v-list-item-content>
                             <v-list-item-action class="mt-0 mb-0">
                                 <v-icon v-if="friends.indexOf(data.item.id) >= 0" color="success" small>mdi-check</v-icon>
@@ -52,7 +52,7 @@
         </v-row>
         <v-row id="listUser">
             <v-col cols="12" class="pt-0">
-                <div class="subtitle-2 font-weight-bold">
+                <div class="fs-13 font-weight-bold">
                     <v-icon class="mr-3">mdi-account</v-icon> {{$t("tasks.header.owner")}}
                 </div>
                 <div class="pl-10 pt-2">
@@ -60,7 +60,7 @@
                 </div>
             </v-col>
             <v-col cols="12" class="pt-0">
-                <div class="subtitle-2 font-weight-bold">
+                <div class="fs-13 font-weight-bold">
                     <v-icon class="mr-3">mdi-account</v-icon> {{$t("tasks.header.assignee")}}
                 </div>
                 <div class="pl-10 pt-2">
@@ -68,7 +68,7 @@
                 </div>
             </v-col>
             <v-col cols="12" class="pt-0">
-                <div class="subtitle-2 font-weight-bold">
+                <div class="fs-13 font-weight-bold">
                     <v-icon class="mr-3">mdi-account</v-icon> {{$t("tasks.header.watcher")}}
                 </div>
                 <div class="pl-10 pt-2">
@@ -79,7 +79,7 @@
                 </div>
             </v-col>
             <v-col cols="12" class="pt-0">
-                <div class="subtitle-2 font-weight-bold">
+                <div class="fs-13 font-weight-bold">
                     <v-icon class="mr-3">mdi-account</v-icon> {{$t("tasks.header.participant")}}
                 </div>
                 <div 

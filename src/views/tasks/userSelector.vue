@@ -42,7 +42,7 @@
                     <v-list-item-subtitle class="caption" style="font-size:10px !important" v-html="data.item.role"></v-list-item-subtitle>
                 </v-list-item-content>
                 <v-list-item-action class="mt-0 mb-0">
-                    <v-icon v-if="selected.indexOf != undefined && selected.indexOf(data.item.id) >= 0" color="success" small>mdi-check</v-icon>
+                    <v-icon v-if="typeof(selected.indexOf) != 'undefined' && selected.indexOf(data.item.id) >= 0" color="success" small>mdi-check</v-icon>
                 </v-list-item-action>
             </template>
         </template>
@@ -61,7 +61,7 @@ export default {
             type: String,
             default: "blue-grey--text"
         },
-        values: {
+        value: {
             type: Array,
             default: () => []
         },
@@ -80,12 +80,16 @@ export default {
     },
     watch: {
         selected(items){
-            this.$emit("change", items);
-            this.$emit("input", items);
+            let userToInput = items;
+            if (!Array.isArray(items)) {
+                userToInput = [items]
+            }
+            this.$emit("change", userToInput);
+            this.$emit("input", userToInput);
         }
     },
     mounted() {
-        this.selected = this.values;
+        this.selected = this.value;
     },
     data: function() {
         const srcs = {
@@ -109,21 +113,32 @@ export default {
                 { id: 7, name: 'John Smith', role: 'BA', avatar: srcs[1] },
                 { id: 8, name: 'Sandra Williams', role: 'BA', avatar: srcs[3] },
             ],
+            users: {
+                1: { name: 'Sandra Adams', role: 'BA', avatar: srcs[1] },
+                2: { name: 'Ali Connors', role: 'BA', avatar: srcs[2] },
+                3: { name: 'Trevor Hansen', role: 'BA', avatar: srcs[3] },
+                4: { name: 'Tucker Smith', role: 'BA', avatar: srcs[2] },
+                5: { name: 'Britta Holt', role: 'BA', avatar: srcs[4] },
+                6: { name: 'Jane Smith ', role: 'BA', avatar: srcs[5] },
+                7: { name: 'John Smith', role: 'BA', avatar: srcs[1] },
+                8: { name: 'Sandra Williams', role: 'BA', avatar: srcs[3] },
+            }
         }
     },
     methods: {
         remove (item) {
-        //     const index = this.selected.indexOf(item.id)
-        //     if (index >= 0) {
-        //         this.selected.splice(index, 1)
-        //         this.$emit("change", this.selected);
-        //         this.$emit("input", this.selected);
-        //     }
+            const index = this.selected.indexOf(item.id)
+            if (index >= 0) {
+                this.selected.splice(index, 1)
+                this.$emit("change", this.selected);
+                this.$emit("input", this.selected);
+            }
         },
         getUser(id) {
-            return this.people.filter(user => {
-                return user.id == id
-            })[0];
+            if (id == null || id == NaN) {
+                return null;
+            }
+            return this.users[id];
         }
     },
 }

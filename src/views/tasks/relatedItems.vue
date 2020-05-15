@@ -1,6 +1,9 @@
 <template>
     <div class="pt-6">
-        <listTask :compackMde="true" :height="'calc(100vh - 220px)'"></listTask>
+        <listTask 
+            :compackMode="true" 
+            :height="'calc(100vh - 220px)'"
+        ></listTask>
     </div>
 </template>
 

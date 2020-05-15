@@ -11,7 +11,6 @@
                     :sideBySideMode="sideBySideMode"
                     :compackMode="compackMode"
                     @change-density="isSmallRow = !isSmallRow"
-                    @get-list-process-instance="listProrcessInstances = $event"
                 ></listHeader>
                 <v-divider v-if="!sideBySideMode"></v-divider>
                 <v-row class="ml-0 mr-0" v-if="!sideBySideMode">
@@ -75,8 +74,8 @@
                                     v-for="(instance, instanceIndex) in process.objects"
                                     :key="instanceIndex"
                                     :index="instanceIndex"
+                                    v-show="instance.tasks.length > 0"
                                 >
-                                    <!-- v-show="instance.tasks.length > 0" -->
                                     <div
                                         class="fs-13 font-weight-bold pl-8"
                                         :class="{'pt-2': !isSmallRow}"
@@ -100,37 +99,35 @@
                                                 'pt-1': !isSmallRow,
                                             }"
                                         >
-                                            <!-- <div style="width: 25px" class="d-inline-block h-100 pt-1">
+                                            <div style="width: 25px" class="d-inline-block h-100 pt-1">
                                                 <icon :icon="obj.icon" class="mr-2 float-left"></icon>
-                                            </div> -->
-                                            <div class="pl-1">
+                                            </div>
+                                            <div style="width: calc(100% - 25px)" class="d-inline-block">
                                                 <div class="fz-13 text-truncate d-inline-block float-left">
                                                     {{obj.name}}
                                                 </div>
                                                 <v-col cols="12" class="pt-0 pb-0 pr-0 pl-0 grey--text lighten-2 float-left">
                                                     <v-col cols="6" class="text-left fs-11 pt-0 pb-0 float-left pl-0 pr-0">
-                                                        {{$t("tasks.header.id")}}: {{obj.id}}
+                                                        Số đơn: SSS1291
                                                     </v-col>
                                                     <v-col cols="6" class="text-left fs-11 pt-0 pb-0 float-left pl-0 pr-0">
                                                         <v-icon class="grey--text lighten-2 mr-1" x-small>mdi-clock</v-icon>
-                                                        {{$moment(obj.createTime).fromNow()}}
+                                                        12:15
                                                     </v-col>
                                                 </v-col>
                                             </div>
                                         </v-col>
-                                        <v-col 
+                                        <!-- <v-col 
                                             v-if="!sideBySideMode"
                                             cols="2" 
                                             class="fs-13 pl-1 pr-1"
                                             :class="{'pt-0': isSmallRow, 'pb-0': isSmallRow}"
                                         >
-                                            {{obj.assignee}}
                                             <v-chip
                                                 color="transparent"
                                                 small
                                                 class="mt-0 pl-1 pr-0 d-inline-block text-truncate"
                                                 label
-                                                v-if="obj.assignee != null"
                                             >
                                                 <v-avatar size="25" class="mr-2">
                                                     <img 
@@ -150,7 +147,7 @@
                                             cols="2" class="fs-13 pl-1 pr-1"
                                             :class="{'pt-0': isSmallRow, 'pb-0': isSmallRow}"
                                         >
-                                            <span class="mt-1 d-inline-block">{{$moment(obj.dueDate).fromNow()}}</span>
+                                            <span class="mt-1 d-inline-block">{{obj.dueDate}}</span>
                                         </v-col>
                                         <v-col 
                                             v-if="!sideBySideMode"
@@ -163,21 +160,20 @@
                                                 class="mt-0 pl-1 pr-0 d-inline-block text-truncate"
                                                 small
                                                 label
-                                                v-if="obj.owner != null"
                                             >
                                                 <v-avatar size="25" class="mr-2">
                                                     <img 
-                                                        :src="obj.owner.avatar" alt=""
-                                                        v-if="!!obj.owner.avatar"
+                                                        :src="obj.assignee.avatar" alt=""
+                                                        v-if="!!obj.assignee.avatar"
                                                     >
                                                     <v-icon
                                                         v-else
-                                                        v-text="obj.owner.avatar"
+                                                        v-text="obj.assignee.avatar"
                                                     ></v-icon>
                                                 </v-avatar>
                                                 {{obj.owner.name}}
                                             </v-chip>
-                                        </v-col>
+                                        </v-col> -->
                                         <v-col cols="2" v-if="!sideBySideMode && !compackMode"></v-col>
                                     </v-row>
                                 </v-expansion-panel-content>
@@ -198,7 +194,6 @@
                     @close-detail="closeDetail"
                 ></taskDetail>
             </v-col>
-            <userSelector ref="user" class="d-none"></userSelector>
         </v-row>
     </div>
 </template>
@@ -208,14 +203,12 @@ import BPMNEngine from "./../../api/BPMNEngine";
 import icon from "../../components/common/SymperIcon";
 import taskDetail from "./taskDetail";
 import listHeader from "./listHeader";
-import userSelector from "./userSelector";
 export default {
     name: "listTask",
     components: {
         icon: icon,
         taskDetail: taskDetail,
         listHeader: listHeader,
-        userSelector: userSelector,
     },
     props: {
         compackMode: {
@@ -234,15 +227,49 @@ export default {
             isSmallRow: false,
             sideBySideMode: false,
             openPanel: [0, 1, 2, 3, 4],
+            testObjs: [
+                {
+                    name: "Đề nghị lập phiếu xuất điều chuyển kho",
+                    icon: "mdi-arrow-down-bold-hexagon-outline",
+                    date: "02-03-2020",
+                    dueDate: "02-03-2020",
+                    owner: {
+                        name: "Nguyễn Quốc Tân 1",
+                        id: "",
+                        role: "BA",
+                        avatar: "https://cdn3.iconfinder.com/data/icons/avatars-round-flat/33/avat-01-512.png"
+                    },
+                    assignee: {
+                        name: "Nguyễn Tiến Đạt 1",
+                        id: "",
+                        role: "Dev",
+                        avatar: "https://cdn3.iconfinder.com/data/icons/avatars-round-flat/33/avat-01-512.png"
+                    },
+                }, {
+                    name: "Đề nghị lập phiếu xuất điều chuyển kho",
+                    icon: "mdi-arrow-down-bold-hexagon-outline",
+                    date: "02-03-2020",
+                    dueDate: "02-03-2020",
+                    owner: {
+                        name: "Nguyễn Quốc Tân",
+                        id: "",
+                        role: "BA",
+                        avatar: "https://cdn3.iconfinder.com/data/icons/avatars-round-flat/33/avat-01-512.png"
+                    },
+                    assignee: {
+                        name: "Nguyễn Trọng Thắng",
+                        id: "",
+                        role: "BA",
+                        avatar: "https://cdn3.iconfinder.com/data/icons/avatars-round-flat/33/avat-01-512.png"
+                    },
+                }
+            ]
         }
     },
     mounted() {
-        this.getTasks();
+        this.getProcessInstance();
     },
     methods: {
-        getUser(id) {
-            this.$refs.user.getUser(id);
-        },
         selectObject(obj) {
             if (!this.compackMode) {
                 this.sideBySideMode = true;
@@ -254,6 +281,37 @@ export default {
             this.sideBySideMode = false;
             this.$emit('change-height', "calc(100vh - 120px)")
         },
+        getProcessInstance() {
+            BPMNEngine.getProcessInstance()
+            .then((res) => {
+                if (res.total > 0) {
+                    let listProccess = [];
+                    let objects = [];
+                    res.data.forEach(item => {
+                        if (listProccess.indexOf(item.processDefinitionId) < 0) {
+                            listProccess.push(item.processDefinitionId);
+                        }
+                        let index = listProccess.indexOf(item.processDefinitionId);
+                        item.tasks = [];
+                        if (objects[index] != undefined) {
+                            objects[index].objects.push(item);
+                        } else {
+                            objects.push({
+                                processDefinitionId: item.processDefinitionId,
+                                processDefinitionName: item.processDefinitionName,
+                                objects: [item]
+                            });
+                        }
+                    });
+                    this.listProrcessInstances = objects;
+                    this.addOtherProcess();
+                    this.getTasks();
+                }
+            })
+            .catch((err) => {
+                
+            });
+        },
         getTasks() {
             BPMNEngine.getTask()
             .then(res => {
@@ -262,34 +320,26 @@ export default {
                     this.listProrcessInstances.forEach((process, processIndex) => {
                         process.objects.forEach((instance, instanceIndex) => {
                             this.listProrcessInstances[processIndex].objects[instanceIndex].tasks = [];
-                            // let index = 0;
-                            for (const index in listTasks) {
-                                listTasks[index].assignee = this.getUser(parseInt(listTasks[index].assignee));
-                                listTasks[index].owner = this.getUser(parseInt(listTasks[index].owner));
-                                if(listTasks[index].processInstanceId == instance.id) {
-                                    this.listProrcessInstances[processIndex].objects[instanceIndex].tasks.push(listTasks[index]);
-                                    listTasks.splice(index, 1);
+                            let index = 0;
+                            listTasks.forEach(item => {
+                                if(item.processInstanceId == instance.id) {
+                                    this.listProrcessInstances[processIndex].objects[instanceIndex].tasks.push(item);
                                 }
-                            }
+                            });
                         });
                     });
-                    this.addOtherProcess(listTasks);
                 }
             });
         },
-        addOtherProcess(listTasks) {
-            for (const index in listTasks) {
-                listTasks[index].assignee = this.getUser(parseInt(listTasks[index].assignee));
-                listTasks[index].owner = this.getUser(parseInt(listTasks[index].owner));
-            }
+        addOtherProcess() {
             this.listProrcessInstances.push({
-                processDefinitionId: null,
-                processDefinitionName: this.$t("common.other"),
+                processDefinitionId: this.$t("common.other"),
+                processDefinitionName: "",
                 objects: [
                     {
                         id: null,
                         name: null,
-                        tasks: listTasks
+
                     }
                 ]
             })

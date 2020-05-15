@@ -62,5 +62,14 @@ export default {
     },
     getDefinitionModel(id) {
         return bpmneApi.get(appConfigs.apiDomain.bpmne.definitions + '/' + id + '/model', {}, testHeader);
+    },
+    getProcessInstance() {
+        return bpmneApi.get(appConfigs.apiDomain.bpmne.instances, {}, testHeader);
+    },
+    addTask(data) {
+        return bpmneApi.post(appConfigs.apiDomain.bpmne.tasks, data, testHeader);
+    },
+    getTask() {
+        return bpmneApi.get(appConfigs.apiDomain.bpmne.tasks, {}, testHeader);
     }
 };

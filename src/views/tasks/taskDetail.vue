@@ -1,8 +1,8 @@
 <template>
     <v-container fluid>
         <v-row class="ml-0 mr-0">
-            <v-col cols="8" class="pb-1">
-                <div class="body-2 pl-2">
+            <v-col cols="8" class="pb-1 pt-1">
+                <div class="fs-13 pl-2 pt-1">
                     App name
                     /
                     Object name
@@ -10,7 +10,7 @@
                     task id
                 </div>
             </v-col>
-            <v-col cols="4" class="text-right pt-2 pb-2">
+            <v-col cols="4" class="text-right pt-1 pb-1">
                 <v-btn small text color="warning" class="mr-2">
                     {{$t("tasks.claim")}}
                 </v-btn>
@@ -37,7 +37,7 @@
                         <v-tab
                             v-for="item in items"
                             :key="item.tab"
-                            class="body-2"
+                            class="fs-13"
                         >
                             <v-icon small class="mr-2">{{item.icon}}</v-icon>
                             {{ item.title }}

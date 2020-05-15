@@ -415,7 +415,8 @@
             "name": "Task name",
             "assignee": "Assignee",
             "watcher": "Watcher",
-            "participant": "Participant"
+            "participant": "Participant",
+            "id": "Seri"
         },
         "filterOptions": {
             "all": "All task",
@@ -428,6 +429,7 @@
         "createTask": {
             "title": "Create task"
         },
-        "claim": "Claim"
+        "claim": "Claim",
+        "created": "Task created"
     }
 }

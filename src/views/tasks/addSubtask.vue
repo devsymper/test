@@ -89,30 +89,7 @@
                 </v-col>
                 <v-col cols="6" class="task-content grey--text body-2">
                     {{currTask.dueDate}}
-                    <v-menu
-                        ref="menu"
-                        v-model="menu"
-                        :close-on-content-click="false"
-                        :return-value.sync="date"
-                        transition="scale-transition"
-                        offset-y
-                        min-width="290px"
-                    >
-                        <template v-slot:activator="{ on }">
-                            <v-text-field
-                                class="sym-small-size bg-grey"
-                                dense
-                                solo
-                                v-on="on"
-                                flat
-                                v-model="date"
-                            ></v-text-field>
-                        </template>
-                        <v-date-picker v-model="date" no-title scrollable>
-                            <v-btn text color="primary" @click="menu = false">Cancel</v-btn>
-                            <v-btn text color="primary" @click="$refs.menu.save(date)">OK</v-btn>
-                        </v-date-picker>
-                    </v-menu>
+                    <datePicker></datePicker>
                 </v-col>
             </v-row>
         </v-col>
@@ -120,11 +97,13 @@
 </template>
 
 <script>
+import datePicker from "../../components/common/datePicker";
 import userSelector from "./userSelector"
 export default {
     name: "addSubtask",
     components: {
-        userSelector
+        userSelector,
+        datePicker
     },
     props: {
         task: {
