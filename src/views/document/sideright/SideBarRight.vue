@@ -7,7 +7,7 @@
         show-arrows
         class="h-100"
         >
-        <v-tabs-slider color="teal lighten-3"></v-tabs-slider>
+        <v-tabs-slider color="sym-tab-slider"></v-tabs-slider>
 
         <v-tab
             v-for="tab in sideRightTabs"
@@ -16,7 +16,7 @@
         >
              <v-tooltip right>
                 <template v-slot:activator="{ on }">
-                    <v-icon style="font-size:18px;" v-on="on">{{ tab.icon }}</v-icon>
+                    <v-icon style="font-size:16px;color:gray;" v-on="on">{{ tab.icon }}</v-icon>
                 </template>
                 <span>{{ tab.tab }}</span>
             </v-tooltip>
@@ -113,9 +113,9 @@ export default {
     }
     .v-expand-header{
         font-size: 13px;
-        font-weight: bold;
+        font-weight: 500;
         min-height: unset;
-        padding: 4px 16px;
+        padding: 4px 8px;
         background: #f2f2f2;
         margin-bottom: 8px;
     }
@@ -129,5 +129,8 @@ export default {
     .properties-control-tab,.formulas-control-tab{
         overflow: auto;
         max-height: calc(100vh - 65px);
+    }
+    .sym-v-expand-content{
+        padding-left: 8px;
     }
 </style>

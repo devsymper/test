@@ -12,6 +12,7 @@
                  :treeData="true"
                 :animateRows="true"
                 :groupDefaultExpanded="groupDefaultExpanded"
+                :frameworkComponents="frameworkComponents"
                 :modules="modules"
                  :getDataPath="getDataPath"
                  >
@@ -23,7 +24,11 @@ import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-mod
 import { RowGroupingModule } from '@ag-grid-enterprise/row-grouping';
 import '@ag-grid-community/core/dist/styles/ag-grid.css';
 import '@ag-grid-community/core/dist/styles/ag-theme-balham.css';
-import { util } from '../../plugins/util';
+import { util } from '../../../plugins/util';
+import ImageRenderer from './ImageRenderer';
+import CheckBoxRenderer from './CheckBoxRenderer';
+import Vue from "vue";
+
     export default {
         props:{
             allColumns:{
@@ -48,10 +53,12 @@ import { util } from '../../plugins/util';
                 defaultColDef: null,
                 autoGroupColumnDef: null,
                 columns:[],
+                rowDataTable:[],
                 modules: [ClientSideRowModelModule, RowGroupingModule],
                 autoGroupColumnDef: null,
                 groupDefaultExpanded: null,
                 getDataPath: null,
+                frameworkComponents: null,
             }
         },
         components: {
@@ -73,7 +80,7 @@ import { util } from '../../plugins/util';
                 field:'name',
                 headerName: 'Tên',
                 minWidth: 200,
-                cellRendererParams: { innerRenderer:renderImage },
+                cellRendererParams: { innerRenderer:'image' },
                 valueSetter: function(params){
                     let x = util.cloneDeep(params.newValue)
                     let y = util.cloneDeep(params.oldValue);
@@ -90,7 +97,13 @@ import { util } from '../../plugins/util';
             this.getDataPath = data => {
                 return data.name;
             };
+            this.frameworkComponents = {
+                image : Vue.extend(ImageRenderer),
+                checkBoxRenderer : Vue.extend(CheckBoxRenderer)
+            };
+          
         },
+     
         mounted(){
             // this.gridOptions.api.sizeColumnsToFit();
         },  
@@ -138,38 +151,10 @@ import { util } from '../../plugins/util';
                 }
                 this.$emit('update-props',dataEmit)
                 
-            }
+            },
+           
         },
     }
-    window.renderImage = function renderImage(params) {
-        var imageElement = document.createElement("img");
-        var element = document.createElement("span");
-        imageElement.src = "https://hoangnd.dev.symper.vn"+params.data.icon;
-        imageElement.height = "14";
-        imageElement.style = "margin-right:8px;"
-        element.appendChild(imageElement);
-        let value = (params.value.length == 1) ? params.value[0] : params.value[1]
-        element.appendChild(document.createTextNode(value));
-        return element
-    };
-
-    window.checkboxRenderer = function checkboxRenderer(params) {
-        
-        var checkbox = document.createElement("input");
-        checkbox.type = "checkbox"; 
-        checkbox.checked = params.value
-        checkbox.addEventListener('click', function (event) {
-            params.value=!params.value;
-            let colName = params.colDef.field;
-            params.node.data[colName] = params.value;
-        });
-        return checkbox
-    };
-    window.fontSizeCellRenderer = function fontSizeCellRenderer(params) {
-        let el = document.createElement('span');
-        if (params.value !== "" || params.value !== undefined || params.value !== null) {
-            el.innerHTML = params.value;
-        }
-        return el
-    }
+    
+    
 </script>

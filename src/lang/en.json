@@ -208,5 +208,20 @@
                 "save": "Save"
             }
         }
+    },
+    "service": {
+        "title": "List service",
+        "table": {
+            "id": "Id",
+            "name": "name",
+            "description": "description",
+            "ifCondition": "Condition running",
+            "runStatus": "Run status",
+            "status": "Status",
+            "createAt": "Create at",
+            "updateAt": "Update at",
+            "lastestRunAt": "Lastest run at",
+            "userCreate": "User create"
+        }
     }
 }

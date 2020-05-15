@@ -7,16 +7,30 @@
             'pb-2': singleLine ? true : false,
             'pb-1': (!singleLine && inputInfo.type != 'checkbox' && inputInfo.type != 'radio') ? true : false,}">
             <div
-                class="d-inline-block font-weight-medium fs-13"
+                class="d-inline-block"
                 :style="{
                     'min-width': labelMinwidth,
                     'width': compLabelWidth,
                     'line-height': '13px',
-                    'vertical-align': 'middle',
-                    'margin-right': space
+                    'vertical-align': (singleLine && (inputInfo.type == 'text' || inputInfo.type == 'select')) ? 'middle' : 'top' ,
+                    'margin-right': space,
+                    'margin-top' : (singleLine && inputInfo.type == 'textarea') ? '8px' : '0' ,
+                    'position' : 'relative',
+                    'font-size':'11px',
                 }"
                 v-if="!inputInfo.hidden && (inputInfo.type != 'checkbox' && inputInfo.type != 'switch' )">
                 {{inputInfo.title}}
+                <i
+                    :class="{'mdi mdi-calendar float-right input-item-func ml-1': true}"
+                    :style="{
+                        'right' : '0',
+                        'top'   : '25px',
+                        'color' : '#5e5e5e',
+                        'position' : 'absolute'
+                    }"
+                    @click="openDateTimePicker($event,inputInfo)"
+                    v-if="inputInfo.isDateTime"
+                ></i>
                 <i
                     :class="{'mdi mdi-dock-window float-right input-item-func ml-1': true,'active': inputInfo.title == largeFormulaEditor.name}"
                     @click="openLargeValueEditor(inputInfo, name)"
@@ -92,6 +106,10 @@
                 ></formula-editor>
             </template>
         </symper-drag-panel>
+
+        <datetime-picker ref="dateTimePicker" @apply-datetime="appendValueToSciptEditor" :position="currentPointer"></datetime-picker>
+        
+        
     </div>
 </template>
 <script>
@@ -111,7 +129,7 @@ import DataTable from "./../common/customTable/DataTable";
 import SymperDragPanel from "./SymperDragPanel";
 import SymperUserAssignment from "./SymperUserAssignment";
 import OrgchartSelector from "./../user/OrgchartSelector";
-
+import DateTimePicker from './../common/DateTimePicker.vue';
 const inputTypeConfigs = {
     numeric: {
         tag: "v-text-field",
@@ -241,7 +259,8 @@ export default {
                 name: "", // tên của input
                 open: false, // có mở largeFormulaEditor hay ko
                 data: {}, // Dữ liệu của input cần mở lên để edit trong khung lớn,
-            }
+            },
+            currentPointer:{left:'35px',top:'0'}
         };
     },
     methods: {
@@ -312,6 +331,10 @@ export default {
                 this.translateTagsToOrgchartValues()
             }
         },
+        openDateTimePicker(event,inputInfo){
+            this.currentPointer = {top:event.clientY+'px',left:'35px'};
+            this.$refs.dateTimePicker.openPicker();
+        },
         handleChangeInputValue(inputInfo, name) {
             /**
              * emit sự kiện thay đổi giá trị của một input trong form
@@ -327,7 +350,12 @@ export default {
         getInputTag(inputType) {
             return inputTypeConfigs[inputType].tag;
         },
-        
+
+        appendValueToSciptEditor(dateTime){
+            console.log(dateTime);
+            
+            this.$refs.basicFormulaEditor.setValue(dateTime);
+        }
     },
     props: {
         /**
@@ -394,6 +422,7 @@ export default {
             let w = this.labelWidth;
             return this.singleLine ? `calc(100% - ${w} - 8px)` : "100%";
         },
+     
     },
     components: {
         VTextField,
@@ -409,7 +438,8 @@ export default {
         "number-format":NumberFormat,
         SymperDragPanel,
         "symper-user-assginment": SymperUserAssignment,
-        "orgchart-selector": OrgchartSelector
+        "orgchart-selector": OrgchartSelector,
+        "datetime-picker" : DateTimePicker
     }
 };
 </script>

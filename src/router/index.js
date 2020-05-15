@@ -11,6 +11,7 @@ import CreateProcess from "../views/process/CreateProcess.vue";
 
 import ShowListUser from "../views/users/ShowList.vue";
 import ShowListDocument from "../views/document/ShowList.vue";
+import ShowListService from "../views/service/ShowList.vue";
 import ActionPanel from "../views/users/ActionPanel.vue";
 import Snippet from "../views/snippets/index.vue";
 import Permissions from "../views/permissions/index.vue";
@@ -86,6 +87,14 @@ const routes = [{
         component: Editor,
 
     },
+    //service
+
+    {
+        path: "/service",
+        name: "processListService",
+        component: ShowListService,
+    },
+
     // {
     //     path: "/users/permission-package/:id",
     //     name: "permissionPackage",

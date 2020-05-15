@@ -7,9 +7,9 @@
         <v-card
         height="550"
         >
-            <v-card-title class="headline">Lưu Document</v-card-title>
+            <h4 class="headline">Lưu Document</h4>
             <v-divider></v-divider>
-            <v-card-text style="height: calc(100% - 112px);    overflow: auto;">
+            <v-card-text style="height: calc(100% - 84px);    overflow: auto;">
             
                 <div id="setting-control-table" class="setting-control-table">
                     <div class="content-setting-control-table">
@@ -20,7 +20,7 @@
             </v-card-text>
                 <v-divider></v-divider>
 
-            <v-card-actions>
+            <v-card-actions class="action">
             <v-spacer></v-spacer>
             <v-btn
                 color="green darken-1"
@@ -151,5 +151,12 @@ export default {
 }
 </script>
 <style scoped>
-    
+    .headline{
+        font-size: 16px !important;
+        font-weight: 500;
+        padding: 4px 24px;
+    }
+    .action{
+        height: 41px;
+    }
 </style>

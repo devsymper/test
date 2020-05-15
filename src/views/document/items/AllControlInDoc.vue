@@ -60,7 +60,7 @@
    
 </template>
 <script>
-import AgDataTable from "./../../../components/common/AgDataTable.vue"
+import AgDataTable from "./../../../components/common/agDataTable/AgDataTable.vue"
 import SymperDragPanel from "./../../../components/common/SymperDragPanel";
 import FormulaEditor from "./../../../components/common/FormulaEditor";
 import {getAllPropsControl,getIconFromType,getAllFormulasName} from "./../../../components/document/controlPropsFactory.js"

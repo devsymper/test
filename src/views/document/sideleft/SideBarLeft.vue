@@ -7,7 +7,7 @@
         light
         show-arrows
         >
-        <v-tabs-slider color="teal lighten-3"></v-tabs-slider>
+        <v-tabs-slider color="sym-tab-slider"></v-tabs-slider>
 
         <v-tab
             class="v-tab-control"
@@ -17,7 +17,7 @@
         >
             <v-tooltip right>
                 <template v-slot:activator="{ on }">
-                    <v-icon style="font-size:18px;" v-on="on">{{ tab.icon }}</v-icon>
+                    <v-icon style="font-size:16px;color:gray;" v-on="on">{{ tab.icon }}</v-icon>
                 </template>
                 <span>{{ tab.content }}</span>
             </v-tooltip>

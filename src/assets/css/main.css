@@ -2,6 +2,13 @@
     background-color: #f58634!important;
 }
 
+.sym-tab-slider {
+    height: 100%;
+    width: 100%;
+    color: #f58634;
+    background-color: #f58634;
+}
+
 .symper-text-orange {
     color: #f58634!important;
 }
@@ -16,6 +23,10 @@
 
 .fs-13 {
     font-size: 13px;
+}
+
+.d-inline-block {
+    display: inline-block;
 }
 
 .fs-10 {
@@ -80,16 +91,16 @@
 .sym-small-size .v-text-field__slot input {
     max-height: 28px!important;
     padding: 3px 0px 3px!important;
-    font-size: 13px!important;
+    font-size: 11px!important;
 }
 
 .sym-small-size .v-text-field__slot .v-label {
-    font-size: 13px!important;
+    font-size: 11px!important;
 }
 
 .sym-small-size.v-input--switch .v-label,
 .sym-small-size.v-input--checkbox .v-label {
-    font-size: 13px!important;
+    font-size: 11px!important;
 }
 
 .sym-small-size .v-text-field__slot input {
@@ -156,7 +167,7 @@
 /*Label*/
 
 .sym-small-size .v-label {
-    font-size: 13px !important;
+    font-size: 11px !important;
 }
 
 .sym-small-size .v-pagination__item,
@@ -333,12 +344,19 @@
 /** Custom hiển thị của input theo phong cách Symper **/
 
 .sym-style-input:not(.v-input--checkbox) .v-input__slot {
-    border: 1px solid #efefef!important;
     background-color: #fbfbfb!important;
+}
+
+.sym-style-input.v-input--checkbox .v-label {
+    color: rgba(0, 0, 0, 0.87) !important;
 }
 
 .sym-style-input.v-input--selection-controls {
     padding-top: 0px!important;
+}
+
+.sym-style-input:not(.v-input--checkbox) {
+    border: 1px solid #efefef!important;
 }
 
 .sym-global-small-item .v-application>.v-menu__content .v-list-item {

@@ -116,13 +116,13 @@ export default {
 </script>
 <style  scoped>
     .sym-document-tab-control .v-list-item{
-        min-height : unset;
+        min-height : 25px !important;
     }
     .v-expand-header{
         font-size: 13px;
-        font-weight: bold;
+        font-weight: 500;
         min-height: unset;
-        padding: 4px 16px;
+        padding: 4px 8px;
         background: #f2f2f2;
     }
     .tf-search-control{
@@ -141,6 +141,7 @@ export default {
 <style>
     .sym-v-expand-content .v-expansion-panel-content__wrap{
         padding: 0;
+        
     }
     .sym-v-expand-content .v-list{
         padding: 0 !important;

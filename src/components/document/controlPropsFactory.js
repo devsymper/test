@@ -37,7 +37,7 @@ const commonProps = {
         title: "Cỡ chữ",
         type: "select",
         value: "",
-        items: "8pt",
+        options: ['8px', '10px', '11px', '12px', '13px', '14px', '15px'],
         groupType: "display"
     },
     color: {
@@ -307,35 +307,35 @@ const controlTypes = {
     },
     textInput: {
         icon: "/icon/ic_textinput.png",
-        html: `<input class="s-control s-control-text mdi" contenteditable="false" s-control-type="textInput" type="text" title="Text Input" style="border:none">&nbsp;&nbsp;`,
+        html: `<input class="s-control s-control-text mdi" contenteditable="false" s-control-type="textInput" type="text" title="Text Input">&nbsp;&nbsp;`,
         title: "Text input",
         notInProps: ['formatNumber', 'isSumTable', 'isAllowUpdate'],
         formulas: ['link', 'formulas', 'hidden', 'readOnly', 'autocomplete', 'require', 'validate']
     },
     richText: {
         icon: "/icon/ic_richtext.png",
-        html: `<textarea class="s-control S-control-rich-text" contenteditable="false"  title="Rich-text" s-control-type="richText" type="text" style="border:none"></textarea>&nbsp;&nbsp;`,
+        html: `<textarea class="s-control S-control-rich-text" contenteditable="false"  title="Rich-text" s-control-type="richText" type="text"></textarea>&nbsp;&nbsp;`,
         title: "Rich text",
         notInProps: ['formatNumber', 'isSumTable', 'isAllowUpdate', 'isDisplayCompact', 'isMultipleValue'],
         formulas: ['link', 'formulas', 'hidden', 'readOnly', 'require']
     },
     number: {
         icon: "/icon/ic_number.png",
-        html: `<input class="s-control s-control-number" contenteditable="false"  title="Number" s-control-type="number" type="number" style="border:none">&nbsp;&nbsp;`,
+        html: `<input class="s-control s-control-number" contenteditable="false"  title="Number" s-control-type="number" type="number">&nbsp;&nbsp;`,
         title: "Number",
         notInProps: ['formatDate', 'isDisplayCompact', 'isMultipleValue'],
         formulas: ['link', 'formulas', 'hidden', 'readOnly', 'require', 'validate']
     },
     date: {
         icon: "/icon/ic_date.png",
-        html: `<input class="s-control s-control-date" contenteditable="false"  title="Date" s-control-type="date" type="date" style="border:none">&nbsp;&nbsp;`,
+        html: `<input class="s-control s-control-date" contenteditable="false"  title="Date" s-control-type="date" type="date">&nbsp;&nbsp;`,
         title: "Date",
         notInProps: ['otherInfo', 'formatNumber', 'isSumTable', 'isAllowUpdate', 'isDisplayCompact', 'isMultipleValue'],
         formulas: ['formulas', 'hidden', 'readOnly', 'require', 'validate']
     },
     dateTime: {
         icon: "/icon/ic_date.png",
-        html: `<input class="s-control s-control-datetime" contenteditable="false"  title="Date time" s-control-type="dateTime" type="datetime-local" style="border:none">&nbsp;&nbsp;`,
+        html: `<input class="s-control s-control-datetime" contenteditable="false"  title="Date time" s-control-type="dateTime" type="datetime-local">&nbsp;&nbsp;`,
         title: "Date time",
         notInProps: ['otherInfo', 'formatNumber', 'isSumTable', 'isAllowUpdate', 'isDisplayCompact', 'isMultipleValue'],
         formulas: ['formulas', 'hidden', 'readOnly', 'require', 'validate']
@@ -349,14 +349,14 @@ const controlTypes = {
     },
     month: {
         icon: "/icon/ic_date.png",
-        html: `<input class="s-control s-control-month" contenteditable="false" title="Month" s-control-type="month" type="month" style="border:none">&nbsp;&nbsp;`,
+        html: `<input class="s-control s-control-month" contenteditable="false" title="Month" s-control-type="month" type="month">&nbsp;&nbsp;`,
         title: "Month",
         notInProps: ['otherInfo', 'formatNumber', 'isSumTable', 'isAllowUpdate', 'isDisplayCompact', 'isMultipleValue'],
         formulas: ['formulas', 'hidden', 'readOnly', 'require', 'validate']
     },
     select: {
         icon: "/icon/ic_select.png",
-        html: `<select class="s-control s-control-select" contenteditable="false" title="Select" s-control-type="select" type="select" style="border:none"></select>&nbsp;&nbsp;`,
+        html: `<select class="s-control s-control-select" contenteditable="false" title="Select" s-control-type="select" type="select"></select>&nbsp;&nbsp;`,
         title: "Select",
         notInProps: ['formatNumber', 'isSumTable', 'isAllowUpdate', 'isDisplayCompact', 'isMultipleValue'],
         formulas: ['formulas', 'hidden', 'readOnly', 'link', 'require']
@@ -386,7 +386,7 @@ const controlTypes = {
         icon: "/icon/ic_currency.png",
         html: `<input class="s-control s-control-currency" contenteditable="false" title="Currency" s-control-type="currency" type="number" step="0.01">&nbsp;`,
         title: "Currency",
-        inProps: ['isHidden'],
+        notInProps: ['formatDate', 'isDisplayCompact', 'isMultipleValue'],
         formulas: ['formulas', 'hidden', 'readOnly', 'require', 'validate']
     },
     radio: {
@@ -440,29 +440,26 @@ const controlTypes = {
     },
     table: {
         icon: "/icon/ic_table.png",
-        html: `<div style="overflow-y: auto;position: relative;font-size: 13px;" contenteditable="true" class="s-control s-control-table" s-control-type="table">
-                <table>
-                    <thead>
+        html: `<table contenteditable="true" class="s-control s-control-table" s-control-type="table">
+                    <thead style="font-size: 11px;background:#f2f2f2">
                         <tr>
-                            <th class="column-function">Chọn</th>
-                            <th class="column-item">Tiêu đề</th>
-                            <th class="column-function" >Chức năng</th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
                         </tr>
                     </thead>
-                <tbody>
+                    <tbody>
                     <tr class="s-control-table-row-template">
-                        <td class="column-function" ><input type="checkbox" class="s-control-check-table-row"></td>
-                        <td class="column-item"></td>
-                        <td class="column-function"><button class="btn btn-primary s-control-table-remove-row" style="margin: 5px;">Xoá</button></td>
+                        <td style="width:20%;"></td>
+                        <td style="width:20%;"></td>
+                        <td style="width:20%;"></td>
+                        <td style="width:20%;"></td>
+                        <td style="width:20%;"></td>
                     </tr>
                 </tbody>
-                </table>
-                <div class="row text-center" style="margin-top: 20px; display: none;">
-                    <a class="btn btn-primary s-control-table-add-row">Thêm dòng </a>
-                    <a class="btn btn-primary s-control-table-remove-select">Xoá dòng đã chọn </a>
-                    <a class="btn btn-primary s-control-table-remove-unselect">Xoá dòng không chọn </a>
-                </div>
-                </div> &nbsp;;
+                </table> &nbsp;
                 `,
         title: "Table",
         notInProps: ['width', 'height', 'isPrimary', 'formatNumber', 'isSumTable', 'isRequired', 'isDBOnly', 'isTableOnly', 'isAllowUpdate', 'isDisplayCompact', 'isMultipleValue', 'isAllowPrint', 'isBorderSubmit', 'isBorderView', 'isBorderPrint'],
@@ -470,12 +467,12 @@ const controlTypes = {
     },
     panel: {
         icon: "/icon/ic_panel.png",
-        html: `<div class="s-control s-control-panel" contenteditable="false" title="Panel" s-control-type="panel" style="display: inline-block;font-size: 13px;width: 150px;" >
+        html: `<div class="s-control s-control-panel" contenteditable="false" title="Panel" s-control-type="panel" style="display: inline-block;font-size: 11px;width: 150px;" >
                     <span class="panel-title2" style="background: #dadada;color: #6e6e6e;border-bottom: 0.5px solid #ddd;height: 30px;font-weight: bold;width: 100%;padding:7px 0 0 0;text-align: center;;display: inline-block!important;">Tiêu đề panel</span>
                     <div style="padding:7px;display: block;">
                     
                     </div>
-                </div>&nbsp;<br>`,
+                </div>&nbsp;`,
         title: "Panel",
         notInProps: ['fontSize', 'formatNumber', 'isPrimary', 'isSumTable', 'isRequired', 'isDBOnly', 'isTableOnly', 'isAllowUpdate', 'isReadOnly', 'isDisplayCompact', 'isMultipleValue', 'isAllowPrint', 'isBorderSubmit', 'isBorderView', 'isBorderPrint'],
         formulas: ['hidden']
@@ -676,11 +673,36 @@ export const getAllPropsControl = function() {
         let width = (type == 'checkbox') ? 40 : 100
         let colDefine = { headerName: data[key].title, field: key, groupType: data[key].groupType, width: width, editable: true, colId: key }
         if (type == 'checkbox') {
-            colDefine = { headerName: data[key].title, field: key, cellRenderer: checkboxRenderer, editable: true, groupType: data[key].groupType, width: width, colId: key }
+            colDefine = {
+                headerName: data[key].title,
+                field: key,
+                cellRenderer: 'checkBoxRenderer',
+                editable: true,
+                groupType: data[key].groupType,
+                width: width,
+                colId: key
+            }
         }
+        // function(params) {
+        //     var checkbox = document.createElement("input");
+        //     checkbox.type = "checkbox";
+        //     checkbox.checked = params.value
+        //     checkbox.addEventListener('click', function(event) {
+        //         params.value = !params.value;
+        //         let colName = params.colDef.field;
+        //         params.node.data[colName] = params.value;
+        //     });
+        //     return checkbox
+        // },
         if (type == 'select') {
             colDefine['cellEditor'] = 'agSelectCellEditor'
-            colDefine['cellRenderer'] = fontSizeCellRenderer
+            colDefine['cellRenderer'] = function(params) {
+                let el = document.createElement('span');
+                if (params.value !== "" || params.value !== undefined || params.value !== null) {
+                    el.innerHTML = params.value;
+                }
+                return el
+            }
             colDefine['cellEditorParams'] = {
                 values: ['8pt', '10pt', '12pt', '14pt', '16pt', '18pt']
             }

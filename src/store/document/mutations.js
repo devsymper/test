@@ -21,6 +21,7 @@ function setTreeListControlInDoc(state) {
     let treeData = [{
         name: 'Control',
         icon: 'icon/ic_image.png',
+        root: true,
         children: [
 
         ],
@@ -50,12 +51,12 @@ function setTreeListControlInDoc(state) {
                 let childType = childControl.type;
                 let childTitle = childProps.title.value;
                 let childName = childProps.name.value;
-                let item = { name: childName + " - " + childTitle, icon: getIconFromType(childType) }
+                let item = { name: childName + " - " + childTitle, icon: getIconFromType(childType), id: childControlId }
                 children.push(item)
             }
-            treeData[0].children.push({ name: name + " - " + title, icon: getIconFromType(type), children: children })
+            treeData[0].children.push({ name: name + " - " + title, icon: getIconFromType(type), id: controlId, children: children })
         } else {
-            treeData[0].children.push({ name: name + " - " + title, icon: getIconFromType(type) })
+            treeData[0].children.push({ name: name + " - " + title, icon: getIconFromType(type), id: controlId })
         }
     }
     state.editor.listControlTreeData = treeData;

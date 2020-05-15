@@ -36,7 +36,11 @@ export default {
 </script>
 <style scoped>
     .icon-control{
-        margin: 4px 0px 4px 0px !important;
+        height: 25px;
+        margin: 0 !important;
+        display: inline-block;
+        align-self: center;
+        vertical-align: middle;
     }
     .icon-control img{
         height: 14px;

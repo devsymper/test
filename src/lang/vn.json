@@ -208,5 +208,30 @@
                 "save": "Lưu"
             }
         }
+    },
+    "service": {
+        "title": "Danh sách dịch vụ hệ thống",
+        "table": {
+            "id": "Id",
+            "name": "Tên",
+            "description": "Mô tả",
+            "ifCondition": "Điều kiện chạy",
+            "runStatus": "Hoạt động",
+            "status": "Trạng thái",
+            "workflow": "Quy trình",
+            "createAt": "Thời gian tạo",
+            "updateAt": "Thời gian update",
+            "lastestRunAt": "Lần chạy gần nhât",
+            "userCreate": "Người tạo"
+        },
+        "panel": {
+            "add": {
+                "title": "Thêm dịch vụ hệ thống"
+            },
+            "edit": {
+                "title": "Sửa dịch vụ hệ thống"
+            }
+        }
+
     }
 }

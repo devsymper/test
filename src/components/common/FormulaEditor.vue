@@ -604,7 +604,7 @@ export default {
 }
 
 .v-tabs-bar {
-    height: 25px !important;
+    height: 31px !important;
 }
 .v-tab {
     font-size: 12px !important;

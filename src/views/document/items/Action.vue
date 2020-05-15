@@ -36,9 +36,7 @@ export default {
 }
 </script>
 <style scoped>
-    .sym-action__icon{
-        margin: 3px 0px 3px 0px !important;
-    }
+   
     .sym-document-list-action .v-list-item{
         cursor: pointer;
         padding: 0 8px;
@@ -46,5 +44,27 @@ export default {
     }
     .sym-document-list-action .v-list-item:hover{
         background: #fafafa;
+    }
+    /* action */
+    .sym-document-list-action{
+        padding: 0;
+        height: 30px;
+        display: flex;
+    }
+  
+    .sym-document-list-action .v-list-item{
+        min-height: unset;
+        flex: unset;
+        padding: 0;
+    }
+    .sym-document-list-action .v-list-item:last-child{
+        margin-left: auto;
+        margin-right: 8px;
+    }
+    .sym-document-list-action .v-list-item .v-list-item__icon{
+        margin: 3px 0px 3px 16px !important;
+    }
+    .sym-document-list-action .v-list-item .v-list-item__title{
+        font-size: 11px;
     }
 </style>
