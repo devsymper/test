@@ -5,12 +5,14 @@
         class="symper-drag-panel elevation-12"
         :style="{
             width:dragPanelWidth+'px',
-            height: dragPanelHeight+'px'
+            height: dragPanelHeight+'px',
+            top: topPosition+'px',
+            left: leftPosition+'px'
         }">
         <div class="position-relative w-100 h-100">
             <div class="pa-2 symper-drag-panel-header" style="height:30px">
                 <span class="float-left pl-2 drag-panel-title">
-                    {{actionTitle}}
+                    <i :class="'mr-2 mdi '+titleIcon" v-if="titleIcon != ''"></i>{{actionTitle}}
                 </span>
                 <v-icon
                     @click="handleClosePanel"
@@ -100,6 +102,18 @@ export default {
         panelData: {
             type: Object,
             default: {}
+        },
+        topPosition: {
+            type: Number,
+            default: 100
+        },
+        leftPosition: {
+            type: Number,
+            default: 300
+        },
+        titleIcon: {
+            type: String,
+            default: ''
         }
     },
     watch: {
@@ -150,8 +164,6 @@ export default {
 .symper-drag-panel {
     position: fixed;
     overflow: hidden;
-    top: 100px;
-    left: 300px;
     z-index: 500;
     background-color: white;
     border-radius: 3px;

@@ -1,18 +1,33 @@
 <template>
-    <symper-bpmn
-        @node-clicked="handleNodeSelected"
-        ref="symperBpmn"
-        :diagramXML="diagramXML"
-        :customModules="customRender"
-    ></symper-bpmn>
+    <div class="h-100 w-100">
+        <symper-bpmn
+            @node-clicked="handleNodeSelected"
+            ref="symperBpmn"
+            :diagramXML="diagramXML"
+            :customModules="customRender"
+        ></symper-bpmn>
+        <symper-drag-panel 
+            @before-close="closeDetailPanel()"
+            :showPanel="nodeDetailPanel.show"
+            :actionTitle="nodeDetailPanel.title"
+            :panelData="nodeDetailPanel.data"
+            :titleIcon="nodeDetailPanel.titleIcon"
+
+            :topPosition="nodeDetailPanel.position.top"
+            :leftPosition="nodeDetailPanel.position.left"
+
+            :dragPanelWidth="300"
+            :dragPanelHeight="400">
+        </symper-drag-panel>
+    </div>
 </template>
 
 <script>
 import SymperBpmn from "./../../components/common/SymperBpmn.vue";
 import { defaultXML } from "./../../components/process/reformatGetListData";
 import bpmneApi from "./../../api/BPMNEngine";
-
 import CustomRenderInstance from "./../../components/process/CustomRenderInstance";
+import SymperDragPanel from '../../components/common/SymperDragPanel.vue';
 
 const nodeStatusColors = {
     failed: {
@@ -47,13 +62,26 @@ export default {
                     __init__: ["customRenderer"],
                     customRenderer: ["type", CustomRenderInstance]
                 }
-            ]
+            ],
+            nodeDetailPanel: {
+                title: '',
+                show: false,
+                position: {
+                    left: 0,
+                    top: 0
+                },
+                data: {}
+            }
         };
     },
     components: {
-        "symper-bpmn": SymperBpmn
+        "symper-bpmn": SymperBpmn,
+        "symper-drag-panel": SymperDragPanel
     },
     methods: {
+        closeDetailPanel(){
+            this.nodeDetailPanel.show = false;
+        },
         // Lấy ra thông tin chạy của các node của instance
         getInstanceRuntimeData() {
             let self = this;
@@ -225,7 +253,14 @@ export default {
                     });
             });
         },
-        handleNodeSelected() {}
+        handleNodeSelected(bizNode, evt) {
+            console.log(bizNode, evt);
+            this.nodeDetailPanel.position.left = evt.originalEvent.clientX + 10;
+            this.nodeDetailPanel.position.top = evt.originalEvent.clientY + 10;
+            this.nodeDetailPanel.title = bizNode.name;
+            this.nodeDetailPanel.titleIcon = 'mdi-account';
+            this.nodeDetailPanel.show = true;
+        }
     }
 };
 </script>

@@ -92,7 +92,7 @@ export default {
                 self.handleClickOnModeller(event);
             });
             this.bpmnModeler.on("element.click", evt => {
-                this.$emit("node-clicked", getBusinessObject(evt.element));
+                this.$emit("node-clicked", getBusinessObject(evt.element), evt);
             });
 
             this.bpmnModeler.on("element.changed", evt => {
