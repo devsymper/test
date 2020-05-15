@@ -217,6 +217,10 @@
     cursor: pointer;
 }
 
+.cursor-pointer {
+    cursor: pointer;
+}
+
 .mdi.symper-table-dropdown-button {
     padding-left: 2px;
     padding-right: 2px;
