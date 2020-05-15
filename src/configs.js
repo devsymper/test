@@ -14,7 +14,8 @@ export const appConfigs = {
             deployments: "https://v2.symper.vn:8443/symper-rest/service/repository/deployments",
             definitions: "https://v2.symper.vn:8443/symper-rest/service/repository/process-definitions",
             instances: "https://v2.symper.vn:8443/symper-rest/service/runtime/process-instances",
-            history: "https://v2.symper.vn:8443/symper-rest/service/history"
+            history: "https://v2.symper.vn:8443/symper-rest/service/history",
+            tasks: "https://v2.symper.vn:8443/symper-rest/service/runtime/tasks"
         },
 
     },

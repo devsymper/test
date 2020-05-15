@@ -11,7 +11,11 @@ import ShowListUser from "../views/users/ShowList.vue";
 import ActionPanel from "../views/users/ActionPanel.vue";
 import Snippet from "../views/snippets/index.vue";
 import Permissions from "../views/permissions/index.vue";
-import PermissionsInListView from "../views/permissions/listView.vue";
+import apps from "../views/apps/index.vue";
+import actions from "../views/actions/index.vue";
+import virtualdocs from "../views/virtualdocs/index.vue";
+import tasks from "../views/tasks/index.vue";
+import application from "../views/apps/yourApp.vue";
 import Editor from "../views/document/Editor.vue";
 import DeployHistory from "../views/process/DeployHistory.vue";
 import ProcessInstances from "../views/process/ProcessInstances.vue";
@@ -99,12 +103,6 @@ const routes = [{
         name: "documentEditor",
         component: Editor,
     },
-    // {
-    //     path: "/users/permission-package/:id",
-    //     name: "permissionPackage",
-    //     component: PermissionPackage,
-    // },
-
     //Snippet
     {
         path: "/snippets",
@@ -118,24 +116,29 @@ const routes = [{
         component: Permissions,
     },
     {
-        path: "/permissions2",
-        name: "permissions2",
-        component: PermissionsInListView,
+        path: "/apps",
+        name: "apps",
+        component: apps,
     },
     {
-        path: "/permissions/add",
-        name: "addPermissions",
-        component: Permissions,
+        path: "/application",
+        name: "application",
+        component: application,
     },
     {
-        path: "/permissions/:id",
-        name: "detailPermissions",
-        component: Permissions,
+        path: "/actions",
+        name: "actions",
+        component: actions,
     },
     {
-        path: "/permissions/edit/:id",
-        name: "editPermissions",
-        component: Permissions,
+        path: "/virtualdocs",
+        name: "virtualdocs",
+        component: virtualdocs,
+    },
+    {
+        path: "/tasks",
+        name: "tasks",
+        component: tasks,
     },
 
     // Luôn để 2 item này ở cuối cùng của array này để nó có thể redirect đến được trang 404 khi ko tìm thấy route
