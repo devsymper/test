@@ -59,6 +59,12 @@ export default {
         }
     },
     methods: {
+        changeElementColor(ele,data){
+            if(typeof ele == 'string'){ // Nếu truyền vào id
+                ele = this.bpmnModeler.get("elementRegistry").get(ele);
+            }
+            this.modeling.setColor(ele, data);
+        },
         getAllNodes() {
             let allNododes = this.bpmnModeler
                 .get("elementRegistry")

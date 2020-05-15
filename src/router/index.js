@@ -15,6 +15,7 @@ import PermissionsInListView from "../views/permissions/listView.vue";
 import Editor from "../views/document/Editor.vue";
 import DeployHistory from "../views/process/DeployHistory.vue";
 import ProcessInstances from "../views/process/ProcessInstances.vue";
+import TrackingProcessInstance from "../views/process/TrackingProcessInstance.vue";
 
 Vue.use(VueRouter);
 /**
@@ -54,6 +55,11 @@ const routes = [{
         path: "/bpmne/process-definition/:idProcessDef/instances",
         name: "listProcessInstances",
         component: ProcessInstances,
+    },
+    {
+        path: "/bpmne/process-instances/:idInstance/tracking",
+        name: "trackingProcessInstance",
+        component: TrackingProcessInstance,
     },
     {
         path: "/bpmne/create",

@@ -60,7 +60,24 @@ export default {
         data = JSON.stringify(data);
         return bpmneApi.post(appConfigs.apiDomain.bpmne.instances, data, testHeader);
     },
+    // Lấy data model của process definition 
     getDefinitionModel(id) {
         return bpmneApi.get(appConfigs.apiDomain.bpmne.definitions + '/' + id + '/model', {}, testHeader);
-    }
+    },
+    // Lấy data của process definition
+    getDefinitionXML(url) {
+        return bpmneApi.get(url, {}, testHeader, { dataType: 'text' });
+    },
+    // Lấy data của process definition
+    getDefinitionData(id) {
+        return bpmneApi.get(appConfigs.apiDomain.bpmne.definitions + '/' + id, {}, testHeader);
+    },
+    // Lấy data của một process instance
+    getProcessInstanceData(id) {
+        return bpmneApi.get(appConfigs.apiDomain.bpmne.instances + '/' + id, {}, testHeader);
+    },
+    // Lấy lịch sử chạy các node trong process instance
+    getProcessInstanceRuntimeHistory(id) {
+        return bpmneApi.get(appConfigs.apiDomain.bpmne.history + '/historic-activity-instances?processInstanceId=' + id, {}, testHeader);
+    },
 };

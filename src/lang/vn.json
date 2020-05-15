@@ -32,7 +32,8 @@
         "last_updated": "Cập nhật lúc",
         "last_updated_by": "Người cập nhật",
         "statistics": "Thống kê",
-        "detail": "Chi tiết"
+        "detail": "Chi tiết",
+        "tracking": "Theo dấu"
     },
     "login": {
         "title": "Đăng nhập hệ thống",
@@ -211,7 +212,8 @@
             "business_key": "Khóa nghiệp vụ",
             "ended": "Đã kết thúc",
             "start_user_id": "Id người khởi tạo",
-            "start_time": "Thời gian bắt đầu"
+            "start_time": "Thời gian bắt đầu",
+            "tracking": "Theo dấu quy trình"
         },
         "deployment": {
             "list": "Danh sách deploy",

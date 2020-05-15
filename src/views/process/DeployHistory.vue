@@ -57,7 +57,7 @@ export default {
                     name: "processInstance",
                     text: this.$t("process.instance.list"),
                     callback: (row, callback) => {
-                        self.$goToPage(`/bpmne/process-definition/${row.id}/instances`);
+                        self.$goToPage(`/bpmne/process-definition/${row.id}/instances`, self.$t('process.instance.tracking'));
                     }
                 },
             ]

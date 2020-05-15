@@ -32,7 +32,8 @@
         "last_updated": "Last updated",
         "last_updated_by": "Last updated by",
         "statistics": "Statistics",
-        "detail": "Detail"
+        "detail": "Detail",
+        "tracking": "Tracking"
     },
     "validate": {
         "required": "Not be empty",
@@ -211,7 +212,8 @@
             "business_key": "Business key",
             "ended": "Ended",
             "start_user_id": "Start user id",
-            "start_time": "Start time"
+            "start_time": "Start time",
+            "tracking": "Process instance tracking"
         },
         "deployment": {
             "list": "List deployments",
