@@ -13,7 +13,11 @@
 
             <div class="sym-document-body">
                 <div class="sym-document-action">
-                    <editor-action @document-action-save-document="openPanelSaveDocument"/>
+                    <editor-action 
+                    @document-action-save-document="openPanelSaveDocument"
+                    @document-action-list-control-option="setShowAllControlOption"
+                    
+                    />
                 </div>
                     <editor id="editor" api-key="APIKEY"
                     ref="editor"
@@ -35,7 +39,7 @@
                         toolbar:
                         'undo redo | fontselect fontsizeselect formatselect | bold italic forecolor backcolor | \
                         alignleft aligncenter alignright alignjustify | \
-                        bullist numlist outdent indent | removeformat emoticons | table |  preview allControl margin',
+                        bullist numlist indent | removeformat  table |  preview margin',
                         fontsize_formats: '8px 10px 11px 12px 13px 14px 15px 16px 17px 18px 19px 20px 21px 22px 23px 24px 25px 26px 27px 28px 29px 30px 32px 34px 36px',
                         font_formats: 'Roboto = Roboto,sans-serif; Andale Mono=andale mono,times;'+ 'Arial=arial,helvetica,sans-serif;'+ 'Arial Black=arial black,avant garde;'+ 'Book Antiqua=book antiqua,palatino;'+ 'Comic Sans MS=comic sans ms,sans-serif;'+ 'Courier New=courier new,courier;'+ 'Georgia=georgia,palatino;'+ 'Helvetica=helvetica;'+ 'Impact=impact,chicago;'+ 'Symbol=symbol;'+ 'Tahoma=tahoma,arial,helvetica,sans-serif;'+ 'Terminal=terminal,monaco;'+ 'Times New Roman=times new roman,times;'+ 'Trebuchet MS=trebuchet ms,geneva;'+ 'Verdana=verdana,geneva;'+ 'Webdings=webdings;'+ 'Wingdings=wingdings,zapf dingbats',
                         valid_elements: '*[*]',
@@ -48,21 +52,17 @@
                                     showSettingControlTable(e);
                                 }
                             });
-                            ed.ui.registry.addButton('allControl', {
-                            icon:'preferences',
-                            tooltip:'Bảng tổng hợp control',
-                                onAction: function (_) {
-                                    setShowAllControlOption();
-                                }
-                            }); 
+                          
                             ed.ui.registry.addButton('margin', {
-                            icon:'indent',
+                            icon:'margin',
                             tooltip:'Margin',
                                 onAction: function (_) {
                                     showPaddingPageConfig(ed);
                                 }
                             }); 
-                            
+                            for(let i = 0;i < listIconToolbar.length;i++){
+                                ed.ui.registry.addIcon(listIconToolbar[i].name,`<i class='mdi `+listIconToolbar[i].icon+`' style='font-size:18px;rgba(0, 0, 0, 0.54);'></i>`)
+                            }
                         }
                     }"
                     ></editor>
@@ -149,8 +149,34 @@ export default {
             currentSelectedInputProps:'',
             documentProps:{},
             delta : 500,
-            lastKeypressTime : 0
+            lastKeypressTime : 0,
+            listIconToolbar:null
         }
+    },
+    beforeMount(){
+        this.listIconToolbar = [
+            {name:'bold',icon:'mdi-format-bold'},
+            {name:'italic',icon:'mdi-format-italic'},
+            {name:'remove-formatting',icon:'mdi-format-clear'},
+            {name:'text-color',icon:'mdi-format-color-highlight'},
+            {name:'highlight-bg-color',icon:'mdi-format-color-fill'},
+            {name:'align-left',icon:'mdi-format-align-left'},
+            {name:'align-center',icon:'mdi-format-align-center'},
+            {name:'align-right',icon:'mdi-format-align-right'},
+            {name:'align-justify',icon:'mdi-format-align-justify'},
+            {name:'unordered-list',icon:'mdi-format-list-bulleted-square'},
+            {name:'ordered-list',icon:'mdi-format-list-numbered'},
+            {name:'outdent',icon:'mdi-format-indent-decrease'},
+            {name:'indent',icon:'mdi-format-indent-increase'},
+            {name:'table',icon:'mdi-table'},
+            {name:'preview',icon:'mdi-monitor-eye'},
+            {name:'margin',icon:'mdi-margin'},
+            {name:'more-drawer',icon:'mdi-dots-horizontal'},
+            {name:'image-options',icon:'mdi-dots-horizontal'},
+            {name:'undo',icon:'mdi-undo'},
+            {name:'redo',icon:'mdi-redo'},
+            
+        ]
     },
     watch:{
         // kiểm tra xem route thay đổi khi vào editor là edit doc hay create doc
@@ -1131,6 +1157,8 @@ export default {
                     return $element.prop('tagName');
                 }
             };
+
+
             $(".sym-document-tab-control .sym-control").attr('draggable', 'true');
             
             $(".sym-control").on('dragstart', function(event) {
@@ -1250,13 +1278,13 @@ export default {
                 styles += "[data-dragcontext-marker],[data-sh-parent-marker]{outline:#19cd9d solid 2px;text-align:center;position:absolute;z-index:123456781;pointer-events:none;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif}[data-dragcontext-marker] [data-dragcontext-marker-text],[data-sh-parent-marker] [data-sh-parent-marker-text]{background:#19cd9d;color:#fff;padding:2px 10px;display:inline-block;font-size:14px;position:relative;top:-24px;min-width:121px;font-weight:700;pointer-events:none;z-index:123456782}[data-dragcontext-marker].invalid{outline:#dc044f solid 2px}[data-dragcontext-marker].invalid [data-dragcontext-marker-text]{background:#dc044f}[data-dragcontext-marker=body]{outline-offset:-2px}[data-dragcontext-marker=body] [data-dragcontext-marker-text]{top:0;position:fixed}";
                 styles += '.drop-marker{pointer-events:none;}.drop-marker.horizontal{background:#00adff;position:absolute;height:2px;list-style:none;visibility:visible!important;box-shadow:0 1px 2px rgba(255,255,255,.4),0 -1px 2px rgba(255,255,255,.4);z-index:123456789;text-align:center}.drop-marker.horizontal.topside{margin-top:0}.drop-marker.horizontal.bottomside{margin-top:2px}.drop-marker.horizontal:before{content:"";width:8px;height:8px;background:#00adff;border-radius:8px;margin-top:-3px;float:left;box-shadow:0 1px 2px rgba(255,255,255,.4),0 -1px 2px rgba(255,255,255,.4)}.drop-marker.horizontal:after{content:"";width:8px;height:8px;background:#00adff;border-radius:8px;margin-top:-3px;float:right;box-shadow:0 1px 2px rgba(255,255,255,.4),0 -1px 2px rgba(255,255,255,.4)}.drop-marker.vertical{height:50px;list-style:none;border:1px solid #00ADFF;position:absolute;margin-left:3px;display:inline;box-shadow:1px 0 2px rgba(255,255,255,.4),-1px 0 2px rgba(255,255,255,.4)}.drop-marker.vertical.leftside{margin-left:0}.drop-marker.vertical.rightside{margin-left:3px}.drop-marker.vertical:before{content:"";width:8px;height:8px;background:#00adff;border-radius:8px;margin-top:-4px;top:0;position:absolute;margin-left:-4px;box-shadow:1px 0 2px rgba(255,255,255,.4),-1px 0 2px rgba(255,255,255,.4)}.drop-marker.vertical:after{content:"";width:8px;height:8px;background:#00adff;border-radius:8px;margin-left:-4px;bottom:-4px;position:absolute;box-shadow:1px 0 2px rgba(255,255,255,.4),-1px 0 2px rgba(255,255,255,.4)}';
                 styles += 'body{background:white !important;font-size:11px;font-family:Roboto,sans-serif;} ';
-                styles += 'body > div:not(.mce-resizehandle){min-height:30px;} ';
+                // styles += 'body > div:not(.mce-resizehandle){min-height:30px;} ';
                 styles += 'p{margin:0 !important;} ';
                 styles += '@page { margin: 0; }';
                 styles += 'table td, table th{ border: 1px dotted #ccc !important;padding: 2px !important;height:25px !important}';
                 styles += '.on-selected{border:1px dashed #2196f3 !important;cursor: pointer !important;}';
                 styles += '.s-control-tracking-value,.s-control-approval-history,.s-control-report,.s-control-file-upload,.s-control-reset,.s-control-draf,.s-control-submit,.s-control-text,.s-control-select,.s-control-document,.s-control-phone,.s-control-email,.s-control-currency,.s-control-radio,.s-control-color,.s-control-percent,.s-control-hidden,.s-control-user,.s-control-filter,.s-control-date,.s-control-datetime,.s-control-month,.s-control-time,.s-control-number{width: auto;height: 25px;border-radius: 3px;font-size: 11px;border:1px solid #e9ecef;font-family:Roboto,sans-serif;color:gray;padding: 0 5px;outline: 0!important;}'
-                styles += '.s-control:not(.s-control-table) {background: rgb(233, 236, 239);min-width: 50px;max-width:120px;outline: none !important;margin:1px}';
+                styles += '.s-control:not(.s-control-table) {display: inline-block;background: rgb(233, 236, 239);min-width: 50px;max-width:120px;outline: none !important;margin:1px}';
                 styles += '.s-control-reset,.s-control-draft,.s-control-submit{padding: 5px 8px;}';
                 styles += '.s-control-user,.s-control-select,.s-control-document{width: 120px;}';
                 styles += '.s-control-error{border: 1px solid red !important;}';
@@ -1318,8 +1346,27 @@ export default {
         min-width: 21cm !important;
         max-width: calc(100% - 480px) !important;
         /* overflow: auto; */
-        background: #c5c5c5;
-        /* overflow: hidden; */
+        /* background: #c5c5c5; */
+        background-color: #DFDBE5;
+         background:
+            linear-gradient(-90deg, rgba(0,0,0,.05) 1px, transparent 1px),
+            linear-gradient(rgba(0,0,0,.05) 1px, transparent 1px), 
+            linear-gradient(-90deg, rgba(0, 0, 0, .04) 1px, transparent 1px),
+            linear-gradient(rgba(0,0,0,.04) 1px, transparent 1px),
+            linear-gradient(transparent 3px, #f2f2f2 3px, #f2f2f2 78px, transparent 78px),
+            linear-gradient(-90deg, #aaa 1px, transparent 1px),
+            linear-gradient(-90deg, transparent 3px, #f2f2f2 3px, #f2f2f2 78px, transparent 78px),
+            linear-gradient(#aaa 1px, transparent 1px),
+            #f2f2f2;
+        background-size:
+            4px 4px,
+            4px 4px,
+            80px 80px,
+            80px 80px,
+            80px 80px,
+            80px 80px,
+            80px 80px,
+            80px 80px;
     }
     /* end editor */
 
@@ -1334,4 +1381,8 @@ export default {
     .sym-document-editor .tox-editor-header{
         border-bottom: 1px solid #d1d1d1;
     }
+    .tox-toolbar__group .tox-tbtn__select-label{
+        font-size: 11px !important;
+    }
+
 </style>

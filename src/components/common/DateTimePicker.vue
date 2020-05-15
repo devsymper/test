@@ -11,7 +11,6 @@
         <button v-on:click="applyDateTime" class="apply-time">
             Áp dụng
         </button>
-       
     </v-card>
 </template>
 <script>
