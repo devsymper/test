@@ -9,7 +9,14 @@ export const appConfigs = {
     apiDomain: {
         user: 'https://v2hoangnd.dev.symper.vn/api/',
         core: 'https://v2hoangnd.dev.symper.vn/',
-        bpmne: ''
+        bpmne: {
+            models: 'https://v2.symper.vn:8443/symper-modeler/api/editor/models',
+            deployments: "https://v2.symper.vn:8443/symper-rest/service/repository/deployments",
+            definitions: "https://v2.symper.vn:8443/symper-rest/service/repository/process-definitions",
+            instances: "https://v2.symper.vn:8443/symper-rest/service/runtime/process-instances",
+            history: "https://v2.symper.vn:8443/symper-rest/service/history"
+        },
+
     },
     notificationTimeout: {
         success: 10000,

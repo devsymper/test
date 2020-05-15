@@ -2,7 +2,7 @@ import { allAttrDisplayGroup } from "./allAttrDisplayGroup";
 import { allNodesAttrs } from "./allAttrsOfNodes";
 import { util } from "./../../plugins/util";
 // Thuộc tính chung cho tất cả các node của process, thuộc tính mà tất cả các node đều phải có
-const commonAttrs = ['id', 'name', 'documentation'];
+const commonAttrs = ['overrideid', 'name', 'documentation'];
 
 
 
@@ -12,8 +12,8 @@ const commonAttrs = ['id', 'name', 'documentation'];
  * Các thuộc tính trong group ko được trùng với các thuộc tính của  commonAttrs
  */
 const groupsAttrs = {
-    task: ['asynchronous', 'exclusive', 'cardinality', 'elementVariable', 'completionCondition'],
-    gateway: ['asynchronous', 'exclusive', 'cardinality', 'elementVariable', 'completionCondition']
+    task: ["asynchronousdefinition", "exclusivedefinition", "executionlisteners", "multiinstance_type", "multiinstance_cardinality", "multiinstance_collection", "multiinstance_variable", "multiinstance_condition", "isforcompensation"],
+    gateway: ["asynchronousdefinition", "exclusivedefinition", "sequencefloworder"]
 }
 
 
@@ -21,8 +21,9 @@ const groupsAttrs = {
 export const nodeAttrsDefinition = {
     'UserTask': {
         group: 'task', // nhóm thuộc tính mà node này thuộc về, giá trị là một hoặc nhiều key trong "groupsAttrs"
-        attrs: ['taskAction', 'formReference', 'formKey', 'taskOwner', 'assignee', 'candidateUsers', 'notificationTitle', 'notificationContent', 'validateFormFields', 'priority', 'taskListeners', 'skipExpression', 'category', 'approvalActions', 'approvalForElement', 'dueDate'],
-        exclude: ['asynchronous', 'exclusive'],
+        // attrs: ['taskAction', 'formReference', 'formkeydefinition', 'taskOwner', 'assignee', 'candidateUsers', 'notificationTitle', 'notificationContent', 'formfieldvalidation', 'prioritydefinition', 'taskListeners', 'skipexpression', 'category', 'approvalActions', 'approvalForElement', 'duedatedefinition'],
+        attrs: ['taskAction', "usertaskassignment", 'taskOwner', 'assignee', 'candidateUsers', 'notificationTitle', 'notificationContent', "formkeydefinition", "formreference", "formfieldvalidation", "duedatedefinition", "prioritydefinition", 'approvalActions', 'approvalForElement', "formproperties", "tasklisteners", "skipexpression", "categorydefinition"],
+        exclude: ['asynchronousdefinition', 'exclusivedefinition'],
         validate: function(attrs) {
 
         },
@@ -30,18 +31,18 @@ export const nodeAttrsDefinition = {
             let taskAction = attrs.taskAction;
             if (taskAction.value == 'submit') {
                 attrs.approvalActions.hidden = true;
-                attrs.formReference.hidden = false;
+                attrs.formreference.hidden = false;
                 attrs.approvalForElement.hidden = true;
             } else if (taskAction.value == 'approval') {
                 attrs.approvalActions.hidden = false;
-                attrs.formReference.hidden = true;
+                attrs.formreference.hidden = true;
                 attrs.approvalForElement.hidden = false;
             }
         }
     },
     'ScriptTask': {
         group: 'task', // nhóm thuộc tính mà node này thuộc về, giá trị là một hoặc nhiều key trong "groupsAttrs"
-        attrs: ['script'],
+        attrs: ["scriptformat", "scripttext", , "scriptautostorevariables"],
         validate: function(attrs) {
 
         },
@@ -51,7 +52,7 @@ export const nodeAttrsDefinition = {
     },
     'ServiceTask': {
         group: 'task', // nhóm thuộc tính mà node này thuộc về, giá trị là một hoặc nhiều key trong "groupsAttrs",
-        attrs: ['skipExpression', 'triggerable', 'delegateExpression', 'classFields', 'exceptions', 'resultvariableName', 'failedJobRetryTimeCycle'],
+        attrs: ["servicetasktriggerable", "servicetaskclass", "servicetaskexpression", "servicetaskdelegateexpression", "servicetaskfields", "servicetaskexceptions", "servicetaskresultvariable", "servicetaskresultvariableUseLocalScope", "skipexpression", "servicetaskfailedjobretrytimecycle", "servicetaskstoreresultvariabletransient"],
         validate: function(attrs) {
 
         },
@@ -95,6 +96,15 @@ export const nodeAttrsDefinition = {
 
         }
     },
+    'EventGateway': {
+        group: 'gateway',
+        validate: function(attrs) {
+
+        },
+        checkShowOrHideInput: function(attrs) {
+
+        }
+    },
     'ParallelGateway': {
         group: 'gateway',
         validate: function(attrs) {
@@ -104,8 +114,8 @@ export const nodeAttrsDefinition = {
 
         }
     },
-    'ComplexGateway': {
-        group: 'gateway',
+    'StartNoneEvent': {
+        attrs: ["executionlisteners", "initiator", "formkeydefinition", "formreference", "formfieldvalidation", "formproperties"],
         validate: function(attrs) {
 
         },
@@ -113,8 +123,8 @@ export const nodeAttrsDefinition = {
 
         }
     },
-    'StartEvent': {
-        attrs: ['initiator', 'formReference', 'formKey', 'validateFormFields'],
+    'StartConditionalEvent': {
+        attrs: ["executionlisteners", "conditionalevent", "interrupting"],
         validate: function(attrs) {
 
         },
@@ -122,8 +132,8 @@ export const nodeAttrsDefinition = {
 
         }
     },
-    'ConditionalStartEvent': {
-        attrs: ['conditionScript', 'interrupting'],
+    'StartTimerEvent': {
+        attrs: ["executionlisteners", "timercycledefinition", "timerdatedefinition", "timerdurationdefinition"],
         validate: function(attrs) {
 
         },
@@ -131,8 +141,8 @@ export const nodeAttrsDefinition = {
 
         }
     },
-    'TimerStartEvent': {
-        attrs: ['startDate', 'timeCycle', 'timeDuration'],
+    'StartSignalEvent': {
+        attrs: ["executionlisteners", "signalref", "interrupting"],
         validate: function(attrs) {
 
         },
@@ -140,8 +150,8 @@ export const nodeAttrsDefinition = {
 
         }
     },
-    'SignalStartEvent': {
-        attrs: ['signalReference', 'interrupting'],
+    'StartMessageEvent': {
+        attrs: ["executionlisteners", "messageref", "interrupting"],
         validate: function(attrs) {
 
         },
@@ -149,8 +159,8 @@ export const nodeAttrsDefinition = {
 
         }
     },
-    'MessageStartEvent': {
-        attrs: ['messageReference', 'interrupting'],
+    'ThrowNoneEvent': {
+        attrs: ["executionlisteners", "asynchronousdefinition"],
         validate: function(attrs) {
 
         },
@@ -158,8 +168,8 @@ export const nodeAttrsDefinition = {
 
         }
     },
-    'IntermediateThrowEvent': {
-        attrs: ['asynchronous'],
+    'CatchMessageEvent': {
+        attrs: ["executionlisteners", "messageref"],
         validate: function(attrs) {
 
         },
@@ -167,8 +177,8 @@ export const nodeAttrsDefinition = {
 
         }
     },
-    'MessageIntermediateCatchEvent': {
-        attrs: ['messageReference'],
+    'CatchTimerEvent': {
+        attrs: ["executionlisteners", "timercycledefinition", "timerdatedefinition", "timerdurationdefinition"],
         validate: function(attrs) {
 
         },
@@ -176,8 +186,8 @@ export const nodeAttrsDefinition = {
 
         }
     },
-    'TimerIntermediateCatchEvent': {
-        attrs: ['startDate', 'timeCycle', 'timeDuration'],
+    'ThrowEscalationEvent': {
+        attrs: ["executionlisteners", "escalationref", "asynchronousdefinition"],
         validate: function(attrs) {
 
         },
@@ -185,8 +195,8 @@ export const nodeAttrsDefinition = {
 
         }
     },
-    'EscalationIntermediateThrowEvent': {
-        attrs: ['escalationReference', 'asynchronous'],
+    'CatchConditionalEvent': {
+        attrs: ["executionlisteners", "conditionalevent"],
         validate: function(attrs) {
 
         },
@@ -194,8 +204,7 @@ export const nodeAttrsDefinition = {
 
         }
     },
-    'ConditionalIntermediateCatchEvent': {
-        attrs: ['conditionScript'],
+    'CatchLinkEvent': {
         validate: function(attrs) {
 
         },
@@ -203,7 +212,7 @@ export const nodeAttrsDefinition = {
 
         }
     },
-    'LinkIntermediateCatchEvent': {
+    'ThrowLinkEvent': {
         validate: function(attrs) {
 
         },
@@ -211,7 +220,7 @@ export const nodeAttrsDefinition = {
 
         }
     },
-    'LinkIntermediateThrowEvent': {
+    'ThrowCompensateEvent': {
         validate: function(attrs) {
 
         },
@@ -219,7 +228,8 @@ export const nodeAttrsDefinition = {
 
         }
     },
-    'CompensateIntermediateThrowEvent': {
+    'CatchSignalEvent': {
+        attrs: ["executionlisteners", "signalref"],
         validate: function(attrs) {
 
         },
@@ -227,8 +237,8 @@ export const nodeAttrsDefinition = {
 
         }
     },
-    'SignalIntermediateCatchEvent': {
-        attrs: ['signalReference'],
+    'ThrowSignalEvent': {
+        attrs: ["executionlisteners", "signalref", "asynchronousdefinition"],
         validate: function(attrs) {
 
         },
@@ -236,8 +246,8 @@ export const nodeAttrsDefinition = {
 
         }
     },
-    'SignalIntermediateThrowEvent': {
-        attrs: ['signalReference', 'asynchronous'],
+    'EndNoneEvent': {
+        attrs: ["executionlisteners"],
         validate: function(attrs) {
 
         },
@@ -245,7 +255,8 @@ export const nodeAttrsDefinition = {
 
         }
     },
-    'EndEvent': {
+    'EndMessageEvent': {
+        attrs: ["executionlisteners"],
 
         validate: function(attrs) {
 
@@ -254,7 +265,8 @@ export const nodeAttrsDefinition = {
 
         }
     },
-    'MessageEndEvent': {
+    'EndEscalationEvent': {
+        attrs: ["executionlisteners", "escalationref"],
         validate: function(attrs) {
 
         },
@@ -262,8 +274,8 @@ export const nodeAttrsDefinition = {
 
         }
     },
-    'EscalationEndEvent': {
-        attrs: ['escalationReference'],
+    'EndErrorEvent': {
+        attrs: ["executionlisteners", "errorref"],
         validate: function(attrs) {
 
         },
@@ -271,8 +283,7 @@ export const nodeAttrsDefinition = {
 
         }
     },
-    'ErrorEndEvent': {
-        attrs: ['errorReference'],
+    'EndCompensateEvent': {
         validate: function(attrs) {
 
         },
@@ -280,7 +291,7 @@ export const nodeAttrsDefinition = {
 
         }
     },
-    'CompensateEndEvent': {
+    'EndSignalEvent': {
         validate: function(attrs) {
 
         },
@@ -288,25 +299,8 @@ export const nodeAttrsDefinition = {
 
         }
     },
-    'SignalEndEvent': {
-        validate: function(attrs) {
-
-        },
-        checkShowOrHideInput: function(attrs) {
-
-        }
-    },
-    'TerminateEndEvent': {
-        attrs: ['terminateAll'],
-        validate: function(attrs) {
-
-        },
-        checkShowOrHideInput: function(attrs) {
-
-        }
-    },
-    'TerminateEndEvent': {
-        attrs: ['terminateAll'],
+    'EndTerminateEvent': {
+        attrs: ["executionlisteners", "terminateAll"],
         validate: function(attrs) {
 
         },
@@ -315,7 +309,7 @@ export const nodeAttrsDefinition = {
         }
     },
     'CallActivity': {
-        attrs: ['asynchronous', 'exclusive', 'cardinality', 'elementVariable', 'completionCondition', "completeAsynchronously", "calledElement", "inParameters", "outParameters", "inheritVariables", "sameDeployment", "processInstanceName", "inheritBusinessKey", "businessKey", "useLocalScopeForOutParameters"],
+        attrs: ["asynchronousdefinition", "exclusivedefinition", "callactivitycompleteasync", "executionlisteners", "callactivitycalledelement", "callactivitycalledelementtype", "callactivityinparameters", "callactivityoutparameters", "callactivityinheritvariables", "callactivitysamedeployment", "callactivityfallbacktodefaulttenant", "callactivityidvariablename", "callactivityprocessinstancename", "callactivityinheritbusinesskey", "callactivitybusinesskey", "callactivityuselocalscopeforoutparameters", "multiinstance_type", "multiinstance_cardinality", "multiinstance_collection", "multiinstance_variable", "multiinstance_condition", "isforcompensation"],
         validate: function(attrs) {
 
         },
@@ -324,7 +318,7 @@ export const nodeAttrsDefinition = {
         }
     },
     'SubProcess': {
-        attrs: ['asynchronous', 'exclusive', 'dataObject', 'completionCondition', 'cardinality', 'elementVariable', ],
+        attrs: ["asynchronousdefinition", "exclusivedefinition", "dataproperties", "executionlisteners", "multiinstance_type", "multiinstance_cardinality", "multiinstance_collection", "multiinstance_variable", "multiinstance_condition", "istransaction"],
         validate: function(attrs) {
 
         },
@@ -332,8 +326,8 @@ export const nodeAttrsDefinition = {
 
         }
     },
-    'AdHocSubProcess': {
-        attrs: ['cancelRemainingInstances', 'completionCondition'],
+    'AdhocSubProcess': {
+        attrs: ["completioncondition", "ordering", "cancelremaininginstances"],
         validate: function(attrs) {
 
         },
@@ -342,7 +336,7 @@ export const nodeAttrsDefinition = {
         }
     },
     'TransactionSubProcess': {
-        attrs: ['asynchronous', 'exclusive', 'dataObject', 'completionCondition', 'cardinality', 'elementVariable', ],
+        attrs: ["asynchronousdefinition", "exclusivedefinition", "dataproperties", "executionlisteners", "multiinstance_type", "multiinstance_cardinality", "multiinstance_collection", "multiinstance_variable", "multiinstance_condition", "istransaction"],
         validate: function(attrs) {
 
         },
@@ -351,7 +345,7 @@ export const nodeAttrsDefinition = {
         }
     },
     'EventSubProcess': {
-        attrs: ['asynchronous', 'exclusive'],
+        attrs: ["asynchronousdefinition", "exclusivedefinition", "executionlisteners"],
         validate: function(attrs) {
 
         },
@@ -359,6 +353,26 @@ export const nodeAttrsDefinition = {
 
         }
     },
+    'BPMNDiagram': {
+        attrs: ["process_id", "name", "documentation", "process_author", "process_version", "process_namespace", "process_historylevel", "isexecutable", "dataproperties", "executionlisteners", "eventlisteners", "signaldefinitions", "messagedefinitions", "escalationdefinitions", "process_potentialstarteruser", "process_potentialstartergroup", "iseagerexecutionfetch"],
+        validate: function(attrs) {
+
+        },
+        checkShowOrHideInput: function(attrs) {
+
+        },
+        exclude: ['overrideid'],
+
+    },
+    'SequenceFlow': {
+        attrs: ["conditionsequenceflow", "executionlisteners", "defaultflow", "skipexpression"],
+        validate: function(attrs) {
+
+        },
+        checkShowOrHideInput: function(attrs) {
+
+        }
+    }
 };
 
 

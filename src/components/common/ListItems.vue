@@ -394,6 +394,28 @@ export default {
         listItemName: {
             type: String,
             default: "item"
+        },
+        /**
+         * Dùng Trong trường hợp mà gọi đến một API mà không thể thay đổi định dạng trả về của API đó  theo đúng với định dạng chung của ListItem 
+         * định dạng: 
+         * {
+         *     reformatData(res){} // Lấy ra các cột cần hiển thị
+         * }
+         **/
+        customAPIResult: {
+            type: Object,
+            default(){
+                return {}
+            }
+        },
+        /**
+         * Có sử dụng action panel để add, edit, clone hay ko. 
+         * Nếu có thì mở action panel( ở bên phải hoặc modal ...)
+         * Nếu không thì dev cần xử lý bằng cách: các action dẫn sang một page mới
+         */
+        useActionPanel: {
+            type: Boolean,
+            default: true
         }
     },
     mounted() {},
@@ -660,10 +682,24 @@ export default {
                     pageSize: this.pageSize,
                     columns: columns ? columns : []
                 };
+
+                let header = {};
+                if(thisCpn.$route.name == "processList" || thisCpn.$route.name == "deployHistory" || thisCpn.$route.name == "listProcessInstances"){
+                    header = {
+                        Authorization: 'Basic cmVzdC1hZG1pbjp0ZXN0'
+                    };
+                    options = {};
+                }
                 apiObj
-                    .callApi("GET", url, options, {}, {})
+                    .callApi("GET", url, options, header, {})
                     .then(data => {
-                        data = data.data;
+
+                        if(thisCpn.customAPIResult.reformatData){
+                            data = thisCpn.customAPIResult.reformatData(data);
+                        }else{
+                            data = data.data;
+                        }
+                        
                         let total = data.total ? data.total : 0;
                         let pageSize = thisCpn.pageSize;
                         thisCpn.totalPage =
@@ -881,9 +917,12 @@ export default {
             this.actionPanel = true;
         },
         addItem() {
-            this.actionPanel = true;
-            // Phát sự kiện khi click vào nút thêm mới
-            this.$emit("after-open-add-panel", {});
+            if(this.useActionPanel){
+                this.actionPanel = true;
+                // Phát sự kiện khi click vào nút thêm mới
+                this.$emit("after-open-add-panel", {});
+            }
+            this.$emit('on-add-item-clicked', {});
         },
         removeItem() {
             // Phát sự kiện khi xóa danh sách các item trong list

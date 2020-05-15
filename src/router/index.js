@@ -1,14 +1,12 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
 import Home from "../views/Home.vue";
-import BPMNE from "../views/BPMNEngine.vue";
+import BPMNE from "../views/process/ProcessList.vue";
 import Login from "../views/Login.vue";
 import { routeMiddleware } from './middleware.js';
 import PageNotFound from './../views/PageNotFound.vue';
 import MultiGuard from 'vue-router-multiguard';
-
 import CreateProcess from "../views/process/CreateProcess.vue";
-
 import ShowListUser from "../views/users/ShowList.vue";
 import ShowListDocument from "../views/document/ShowList.vue";
 import ShowListService from "../views/service/ShowList.vue";
@@ -17,6 +15,9 @@ import Snippet from "../views/snippets/index.vue";
 import Permissions from "../views/permissions/index.vue";
 import PermissionsInListView from "../views/permissions/listView.vue";
 import Editor from "../views/document/Editor.vue";
+import DeployHistory from "../views/process/DeployHistory.vue";
+import ProcessInstances from "../views/process/ProcessInstances.vue";
+import TrackingProcessInstance from "../views/process/TrackingProcessInstance.vue";
 
 Vue.use(VueRouter);
 /**
@@ -36,6 +37,31 @@ const routes = [{
         path: "/bpmne",
         name: "processList",
         component: BPMNE,
+    },
+    {
+        path: "/bpmne/:id/edit",
+        name: "editProcess",
+        component: CreateProcess,
+    },
+    {
+        path: "/bpmne/:id/clone",
+        name: "cloneProcess",
+        component: CreateProcess,
+    },
+    {
+        path: "/bpmne/:name/deploy-history",
+        name: "deployHistory",
+        component: DeployHistory,
+    },
+    {
+        path: "/bpmne/process-definition/:idProcessDef/instances",
+        name: "listProcessInstances",
+        component: ProcessInstances,
+    },
+    {
+        path: "/bpmne/process-instances/:idInstance/tracking",
+        name: "trackingProcessInstance",
+        component: TrackingProcessInstance,
     },
     {
         path: "/bpmne/create",

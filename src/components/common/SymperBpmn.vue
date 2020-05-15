@@ -22,6 +22,12 @@ export default {
             type: String,
             default:
                 '<?xml version="1.0" encoding="UTF-8"?><bpmn:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" id="Definitions_1ruudo1" targetNamespace="http://bpmn.io/schema/bpmn" exporter="bpmn-js (https://demo.bpmn.io)" exporterVersion="6.4.2"> <bpmn:process id="Process_1vqep31" isExecutable="false"> <bpmn:startEvent id="StartEvent_00pu0uj" /> </bpmn:process> <bpmndi:BPMNDiagram id="BPMNDiagram_1"> <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_1vqep31"> <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_00pu0uj"> <dc:Bounds x="156" y="81" width="36" height="36" /> </bpmndi:BPMNShape> </bpmndi:BPMNPlane> </bpmndi:BPMNDiagram></bpmn:definitions>'
+        },
+        customModules: {
+            type: Array,
+            default(){
+                return [];
+            }
         }
     },
     data: function() {
@@ -30,7 +36,7 @@ export default {
             bpmnModeler: null,
             modeling: null,
             canvasScale: 1,
-            debounceNodeChanged: {}, // debounce cho việc thay đổi trạng thái của các node, dạng {id node : setimeout func }
+            debounceNodeChanged: {} // debounce cho việc thay đổi trạng thái của các node, dạng {id node : setimeout func }
         };
     },
     mounted: function() {
@@ -56,6 +62,23 @@ export default {
         }
     },
     methods: {
+        changeElementColor(ele,data){
+            if(typeof ele == 'string'){ // Nếu truyền vào id
+                ele = this.bpmnModeler.get("elementRegistry").get(ele);
+            }
+            this.modeling.setColor(ele, data);
+        },
+        getAllNodes() {
+            let allNododes = this.bpmnModeler
+                .get("elementRegistry")
+                .filter(function(element) {
+                    return true;
+                });
+            return allNododes.reduce((nodes, ele) => {
+                nodes.push(ele.businessObject);
+                return nodes;
+            }, []);
+        },
         handleClickOnModeller(event) {},
         /**
          * Lắng nghe và xử lý các sự kiện trong modeller
@@ -65,27 +88,31 @@ export default {
             this.bpmnModeler.on("element.click", 10, event => {
                 self.handleClickOnModeller(event);
             });
-            this.bpmnModeler.on('element.click', (evt) => {
-                this.$emit('node-clicked',getBusinessObject(evt.element));
+            this.bpmnModeler.on("element.click", evt => {
+                this.$emit("node-clicked", getBusinessObject(evt.element));
             });
 
-            this.bpmnModeler.on('element.changed', (evt) => {
+            this.bpmnModeler.on("element.changed", evt => {
                 let nodeId = evt.element.id;
                 let bizObj = getBusinessObject(evt.element);
-                if($(`g[data-element-id=${nodeId}]`).length == 0){
-                    self.$emit('node-removed',bizObj);
-                }else{
+                if ($(`g[data-element-id=${nodeId}]`).length == 0) {
+                    self.$emit("node-removed", bizObj);
+                } else {
                     /**
                      * Do thư viện bpmn-js không cung cấp rõ ràng các sự kiện nên phải dồn hết vào một sự kiện là "node-changed"
                      * sự kiện này có thể là một trong các sự kiện: thêm node mới, thay đổi loại node, thay đổi marker của node
                      */
-                    if(self.debounceNodeChanged[bizObj.id]){
+                    if (self.debounceNodeChanged[bizObj.id]) {
                         clearTimeout(self.debounceNodeChanged[bizObj.id]);
                     }
 
-                    self.debounceNodeChanged[bizObj.id] = setTimeout((bizObj) => {
-                        self.$emit('node-changed',bizObj);
-                    }, 50, bizObj);
+                    self.debounceNodeChanged[bizObj.id] = setTimeout(
+                        bizObj => {
+                            self.$emit("node-changed", bizObj);
+                        },
+                        50,
+                        bizObj
+                    );
                 }
             });
         },
@@ -115,7 +142,8 @@ export default {
                 keyboard: { bindTo: document },
                 moddleExtensions: {
                     qa: qaExtension
-                }
+                },
+                additionalModules: this.customModules,
             });
             this.bpmnModeler.importXML(this.diagramXML, function(err) {
                 if (err) {
@@ -173,16 +201,13 @@ export default {
             }
         },
         /**
-         * Update thuộc tính của một element trong bpmn 
+         * Update thuộc tính của một element trong bpmn
          * @param {String} eleId Id của element cần update
          * @param {Object} attrs Các thuộc tính cần update, dạng key-value
          */
-        updateElementProperties(eleId, props){
-            let ele = this.bpmnModeler.get('elementRegistry').get(eleId);
-            this.modeling.updateProperties(
-                ele,
-                props
-            );
+        updateElementProperties(eleId, props) {
+            let ele = this.bpmnModeler.get("elementRegistry").get(eleId);
+            this.modeling.updateProperties(ele, props);
         }
     }
 };

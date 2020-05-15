@@ -21,7 +21,19 @@
         "list_config": "Cấu hình danh sách",
         "save": "Lưu",
         "snippets": "Snippets",
-        "permissions": "Phân quyền"
+        "permissions": "Phân quyền",
+        "deploy": "Deploy",
+        "start": "Bắt đầu",
+        "name": "Tên",
+        "key": "Định danh",
+        "description": "Mô tả",
+        "created_by": "Người tạo",
+        "version": "Phiên bản",
+        "last_updated": "Cập nhật lúc",
+        "last_updated_by": "Người cập nhật",
+        "statistics": "Thống kê",
+        "detail": "Chi tiết",
+        "tracking": "Theo dấu"
     },
     "login": {
         "title": "Đăng nhập hệ thống",
@@ -223,14 +235,59 @@
             "updateAt": "Thời gian update",
             "lastestRunAt": "Lần chạy gần nhât",
             "userCreate": "Người tạo"
+        }
+    },
+    "panel": {
+        "add": {
+            "title": "Thêm dịch vụ hệ thống"
         },
-        "panel": {
-            "add": {
-                "title": "Thêm dịch vụ hệ thống"
-            },
-            "edit": {
-                "title": "Sửa dịch vụ hệ thống"
+        "edit": {
+            "title": "Sửa dịch vụ hệ thống"
+        }
+    },
+    "process": {
+        "list": {
+            "title": "Danh sách quy trình",
+            "deploy_history": "Lịch sử deploy",
+            "start": "Bắt đầu quy trình",
+            "instances": "Các bản đã chạy"
+        },
+        "action": {
+            "create": "Tạo quy trình mới"
+        },
+        "instance": {
+            "list": "Danh sách các bản đã chạy",
+            "name": "Tên bản chạy",
+            "process_definition_name": "Tên định nghĩa của quy trình",
+            "business_key": "Khóa nghiệp vụ",
+            "ended": "Đã kết thúc",
+            "start_user_id": "Id người khởi tạo",
+            "start_time": "Thời gian bắt đầu",
+            "tracking": "Theo dấu quy trình"
+        },
+        "deployment": {
+            "list": "Danh sách deploy",
+            "run": "Chạy phiên bản này",
+            "name": "Tên",
+            "deployment_time": "Thời gian deploy",
+            "category": "Loại"
+        },
+        "editror": {
+            "err": {
+                "get_data": "Không thể lấy dữ liệu cho soạn thảo quy trình",
+                "get_xml": "Không thể lấy XML cho soạn thảo quy trình"
             }
+        },
+        "header_bar": {
+            "undo": "Undo ",
+            "redo": "Redo ",
+            "zoom_in": " Thu nhỏ",
+            "zoom_out": "Phóng to ",
+            "focus": "Vào giữa",
+            "save_svg": "Tải ảnh",
+            "save_bpmn": "Tải dưới dạng .bpmn",
+            "validate": "Kiểm tra dữ liệu ",
+            "save": "Lưu"
         }
 
     }

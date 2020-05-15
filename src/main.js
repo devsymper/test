@@ -60,6 +60,38 @@ Vue.prototype.$snotify = function(option, group = false) {
     this.$notify(option);
 }
 
+Vue.prototype.$snotifyError = function(err = {}, title = 'ERROR', detail = '') {
+    console.warn(err);
+    this.$snotify({
+        type: 'error',
+        title: title,
+        text: detail
+    });
+}
+Vue.prototype.$snotifyInfo = function(title = 'INFORMATION', detail = '') {
+    this.$snotify({
+        type: 'info',
+        title: title,
+        text: detail
+    });
+}
+Vue.prototype.$snotifyWarning = function(err, title = 'WARNING', detail = '') {
+    console.warn(err);
+    this.$snotify({
+        type: 'warning',
+        title: title,
+        text: detail
+    });
+}
+Vue.prototype.$snotifySuccess = function(title = 'SUCCESS', detail = '') {
+    this.$snotify({
+        type: 'success',
+        title: title,
+        text: detail
+    });
+}
+
+
 Vue.config.productionTip = false;
 global.jQuery = require('jquery');
 var $ = global.jQuery;

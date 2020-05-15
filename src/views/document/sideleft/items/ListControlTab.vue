@@ -5,6 +5,7 @@
     dense
     hoverable
     open-all
+    
     transition
     class="sym-small-size mt-2 sym-list-control-in-doc"
      :style="{'font-size':'11px !important'}"
@@ -50,7 +51,7 @@ export default {
     color: transparent;
 }
 .sym-small-size >>> .v-treeview-node__toggle:first-child{
-    display: none !important;
+    width: 0 !important;
 }
 .sym-small-size >>> .v-treeview-node__children .v-treeview-node__level:first-child{
     width: 0 !important;

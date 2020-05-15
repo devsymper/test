@@ -130,6 +130,8 @@ import SymperDragPanel from "./SymperDragPanel";
 import SymperUserAssignment from "./SymperUserAssignment";
 import OrgchartSelector from "./../user/OrgchartSelector";
 import DateTimePicker from './../common/DateTimePicker.vue';
+import SymperListOrdering from "./../common/symperInputs/SymperListOrdering";
+
 const inputTypeConfigs = {
     numeric: {
         tag: "v-text-field",
@@ -218,12 +220,19 @@ const inputTypeConfigs = {
             };
         }
     },
-    selectDoc: {
+    autocomplete: {
         tag: "v-select",
         props(config) {
             return {
                 columns: config.columns,
                 data: config.value
+            };
+        }
+    },
+    ordering: {
+        tag: "symper-list-ordering",
+        props(config) {
+            return {
             };
         }
     },
@@ -439,7 +448,8 @@ export default {
         SymperDragPanel,
         "symper-user-assginment": SymperUserAssignment,
         "orgchart-selector": OrgchartSelector,
-        "datetime-picker" : DateTimePicker
+        "datetime-picker" : DateTimePicker,
+        SymperListOrdering: SymperListOrdering
     }
 };
 </script>

@@ -467,9 +467,9 @@ const controlTypes = {
     },
     panel: {
         icon: "/icon/ic_panel.png",
-        html: `<div class="s-control s-control-panel" contenteditable="false" title="Panel" s-control-type="panel" style="display: inline-block;font-size: 11px;width: 150px;" >
-                    <span class="panel-title2" style="background: #dadada;color: #6e6e6e;border-bottom: 0.5px solid #ddd;height: 30px;font-weight: bold;width: 100%;padding:7px 0 0 0;text-align: center;;display: inline-block!important;">Tiêu đề panel</span>
-                    <div style="padding:7px;display: block;">
+        html: `<div class="s-control s-control-panel" contenteditable="false" title="Panel" s-control-type="panel" style="display: inline-block;font-size: 11px;width: 100%;max-width: 100%;" >
+                    <span class="panel-title2" style="background: #f2f2f2;color: gray;height: 30px;font-weight: bold;width: 100%;text-align: center;display: inline-block;line-height: 2.5;">Tiêu đề panel</span>
+                    <div style="height: 30px;display: block;background: white;border: 1px solid #f2f2f2;border-top: none;">
                     
                     </div>
                 </div>&nbsp;`,

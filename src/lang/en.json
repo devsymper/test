@@ -21,7 +21,19 @@
         "list_config": "List config",
         "save": "Save",
         "snippets": "Snippets",
-        "permissions": "Permissions"
+        "permissions": "Permissions",
+        "deploy": "Deploy",
+        "start": "Start",
+        "name": "Name",
+        "key": "Key",
+        "description": "Description",
+        "created_by": "Created by",
+        "version": "Version",
+        "last_updated": "Last updated",
+        "last_updated_by": "Last updated by",
+        "statistics": "Statistics",
+        "detail": "Detail",
+        "tracking": "Tracking"
     },
     "validate": {
         "required": "Not be empty",
@@ -222,6 +234,51 @@
             "updateAt": "Update at",
             "lastestRunAt": "Lastest run at",
             "userCreate": "User create"
+        }
+    },
+    "process": {
+        "list": {
+            "title": "Process list",
+            "deploy_history": "Deploy history",
+            "start": "Start process",
+            "instances": "List instances"
+        },
+        "action": {
+            "create": "Create new process"
+        },
+        "instance": {
+            "list": "List process instance",
+            "name": "name",
+            "process_definition_name": "Process definition Name",
+            "business_key": "Business key",
+            "ended": "Ended",
+            "start_user_id": "Start user id",
+            "start_time": "Start time",
+            "tracking": "Process instance tracking"
+        },
+        "deployment": {
+            "list": "List deployments",
+            "run": "Run this version",
+            "name": "Name",
+            "deployment_time": "Deployment time",
+            "category": "Category"
+        },
+        "editror": {
+            "err": {
+                "get_data": "Can not get model data!",
+                "get_xml": "Can not get XML for process"
+            }
+        },
+        "header_bar": {
+            "undo": "Undo ",
+            "redo": "Redo ",
+            "zoom_in": " Zoom in",
+            "zoom_out": "Zoom out ",
+            "focus": "Focus",
+            "save_svg": "Download as SVG",
+            "save_bpmn": "Download as .bpmn",
+            "validate": "Validate",
+            "save": "Save"
         }
     }
 }
