@@ -5,7 +5,7 @@
         width="800"
         >
         <v-card
-        height="550"
+        height="575"
         >
             <h4 class="headline">Lưu Document</h4>
             <v-divider></v-divider>
@@ -51,60 +51,7 @@ import FormTpl from "./../../../components/common/FormTpl.vue"
 import Sortable from 'sortablejs';
 let sortable = null;
 export default {
-    props:{
-        documentProps:{
-            type:Object,
-            default(){
-                return {
-                    name: {
-                        title: "Tên document",
-                        type: "text",
-                        value: "",
-                    },
-                    title: {
-                        title: "Tiêu đề document",
-                        type: "text",
-                        value: "",
-                    },
-                    recentName: {
-                        title: "Tên trường hiển thị thông tin trong mục gần đây",
-                        type: "text",
-                        value: "",
-                    },
-                    editObjectValidate: {
-                        title: "Điều kiện Edit Object",
-                        type: "textarea",
-                        value: "",
-                    },
-                    public: {
-                        title: "Public",
-                        type: "checkbox",
-                        value: "",
-                    },
-                    mobile: {
-                        title: "Mobile",
-                        type: "checkbox",
-                        value: "",
-                    },
-                    editAfterSubmit: {
-                        title: "Sửa dữ liệu sau submit",
-                        type: "checkbox",
-                        value: "",
-                    },
-                    submitOutsideWorkflow: {
-                        title: "Submit ngoài workflow",
-                        type: "checkbox",
-                        value: "",
-                    },
-                    note: {
-                        title: "Ghi chú",
-                        type: "textarea",
-                        value: "",
-                    },
-                }
-            }
-        }
-    },
+    
     components:{
         's-row-table-setting' : TableSettingRow,
         'form-save-doc' : FormTpl
@@ -118,11 +65,14 @@ export default {
         
     },
   
-    
+    beforeMount(){
+        this.setPropsOfDoc({})
+    },
     data(){
         return {
             listRows:[],
             isShowModelSaveDoc:false,
+            documentProps:null
            
         }
     },
@@ -142,6 +92,55 @@ export default {
             let documentProperties = JSON.stringify(this.listInput);
             this.$emit("save-doc-action",documentProperties);
             this.hideDialog();
+        },
+        setPropsOfDoc(props){
+            this.documentProps = {
+                name : { 
+                    title: "Tên document",
+                    type: "text",
+                    value: (props.name != undefined) ? props.name : '',
+                },
+                title : {
+                    title: "Tiêu đề document",
+                    type: "text",
+                    value: (props.title != undefined) ? props.title : '',
+                },
+                recentName : {
+                    title: "Tên trường hiển thị thông tin trong mục gần đây",
+                    type: "text",
+                    value: (props.title_for_rencent != undefined) ? props.title_for_rencent : '',
+                },
+                editObjectValidate : {
+                    title: "Điều kiện Edit Object",
+                    type: "script",
+                    value: (props.edit_condition != undefined) ? props.edit_condition : '',
+                },
+                public : {
+                    title: "Public",
+                    type: "checkbox",
+                    value: (props.allow_public == '0') ? false : true,
+                },
+                mobile : {
+                    title: "Mobile",
+                    type: "checkbox",
+                    value: (props.mobile == '0') ? false : true,
+                },
+                editAfterSubmit : {
+                    title: "Sửa dữ liệu sau submit",
+                    type: "checkbox",
+                    value: (props.edit_able == '0') ? false : true,
+                },
+                submitOutsideWorkflow : {
+                    title: "Submit ngoài workflow",
+                    type: "checkbox",
+                    value: (props.add_outside_wf == '0') ? false : true,
+                },
+                note : {
+                    title: "Ghi chú",
+                    type: "textarea",
+                    value: (props.note != undefined) ? props.note : '',
+                }
+            }
         }
         
     },

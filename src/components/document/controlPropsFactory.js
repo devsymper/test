@@ -595,8 +595,11 @@ export const GetControlProps = function(type) {
     if (inProps != undefined && typeof inProps != 'undefined' && inProps.length > 0) {
         let propertiesControl = {};
         for (let i = 0; i < inProps.length; i++) {
-            propertiesControl = Object.assign(propertiesControl, allProperties[inProps[i]]);
+            console.log(inProps[i]);
+
+            propertiesControl[inProps[i]] = allProperties[inProps[i]];
         }
+
         control['properties'] = propertiesControl;
     }
     if (notInProps != undefined && typeof notInProps != 'undefined' && notInProps.length > 0) {

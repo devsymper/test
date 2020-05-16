@@ -94,6 +94,10 @@ export default {
             if(name == "width"){
                 elements.css({width:value});
             }
+            if(name == "height"){
+                elements.css({name:value});
+            }
+          
             let table = elements.closest('.s-control-table');
             let tableId = '0'
             if(table.length > 0 && this.sCurrentDocument.id != table.attr('id')){

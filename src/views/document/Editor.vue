@@ -96,6 +96,7 @@ import AllControlInDoc from "./../../views/document/items/AllControlInDoc.vue";
 import { GetControlProps,mappingOldVersionControlProps,mappingOldVersionControlFormulas,getAPropsControl } from "./../../components/document/controlPropsFactory.js";
 import { documentApi } from "./../../api/Document.js";
 import { util } from "./../../plugins/util.js";
+import { getInsertionCSS } from "./../../components/document/documentUtil.js";
 import VueResizable from 'vue-resizable'
 let isShowAutocompleteControl = false;
 // biến lưu chiều rộng editor trước khi resize 
@@ -338,12 +339,12 @@ export default {
                 }
             }
             else{
-                this.checkDupliucateNameControl(listControlName,control);
+                this.checkDupliucateNameControl(listControlName,control,controlId);
             }
         },
       
         // hàm kiểm tra xem co control nào trùng tên hay ko
-        checkDupliucateNameControl(listControlName,control){
+        checkDupliucateNameControl(listControlName,control,controlId){
             if(listControlName.indexOf(control.properties.name.value) === -1){
                 listControlName.push(control.properties.name.value);
             }
@@ -409,7 +410,7 @@ export default {
             if(elements.hasClass('s-control-table') || elements.parent().hasClass('s-control-table')){
                 let thead = elements.find('thead tr th');
                 let tbody = elements.find('tbody tr td');
-                let table = (elements.hasClass('s-control-table')) ? element : elements.parent();
+                let table = (elements.hasClass('s-control-table')) ? elements : elements.parent();
                 let tableId = table.attr('id');
                 let listData = [];
                 if($(tbody[1].innerHTML).length > 0){
@@ -584,8 +585,6 @@ export default {
                         if(mappingOldVersionControlFormulas[k] != undefined && controlV2.formulas[mappingOldVersionControlProps[k]] != undefined){
                             controlV2.formulas[mappingOldVersionControlProps[k]].value = v;
                         }
-                        
-                        
                     });
                     thisCpn.addToAllControlInDoc(inputid,{properties: controlV2.properties, formulas : controlV2.formulas,type:type});
                 } catch (error) {   
@@ -612,7 +611,6 @@ export default {
                         controlEl.attr('id', inputid).attr('style',style);
                         controlEl.replaceAll($(value))
                         try {
-                            
                             childControlProps = JSON.parse(childControlProps);
                             let controlProp = {};
                             let controlFormulas = {};
@@ -623,19 +621,13 @@ export default {
                                 if(mappingOldVersionControlFormulas[k] != undefined && childControlV2.formulas[mappingOldVersionControlProps[k]] != undefined){
                                     childControlV2.formulas[mappingOldVersionControlProps[k]].value = v;
                                 }
-                                
                             });
                             thisCpn.addToAllControlInTable(inputid,{properties: childControlV2.properties, formulas : childControlV2.formulas,type:type},tableId);
                         } catch (error) {   
                             console.log(error);
                         }
-                        
-                        
                     })
-                    
                 }
-                
-                
             })
         },
         // hàm gọi request lấy thông tin của document khi vào edit doc
@@ -654,8 +646,6 @@ export default {
                             let fields = res.data.fields;
                             thisCpn.setDataForPropsControl(fields);
                         }
-                        
-                        
                     }
                 })
                 .catch(err => {
@@ -667,53 +657,7 @@ export default {
         },
 
         setDocumentProperties(documentProp){
-            this.documentProps = {
-                name : { 
-                    title: "Tên document",
-                    type: "text",
-                    value: documentProp.name,
-                },
-                title : {
-                    title: "Tiêu đề document",
-                    type: "text",
-                    value: documentProp.title,
-                },
-                recentName : {
-                    title: "Tên trường hiển thị thông tin trong mục gần đây",
-                    type: "text",
-                    value: documentProp.title_for_rencent,
-                },
-                editObjectValidate : {
-                    title: "Điều kiện Edit Object",
-                    type: "textarea",
-                    value: documentProp.edit_condition,
-                },
-                public : {
-                    title: "Public",
-                    type: "checkbox",
-                    value: (documentProp.allow_public == '0') ? false : true,
-                },
-                mobile : {
-                    title: "Mobile",
-                    type: "checkbox",
-                    value: (documentProp.mobile == '0') ? false : true,
-                },
-                editAfterSubmit : {
-                    title: "Sửa dữ liệu sau submit",
-                    type: "checkbox",
-                    value: (documentProp.edit_able == '0') ? false : true,
-                },
-                submitOutsideWorkflow : {
-                    title: "Submit ngoài workflow",
-                    type: "checkbox",
-                    value: (documentProp.add_outside_wf == '0') ? false : true,
-                },
-                note : {
-                    title: "Ghi chú",
-                    type: "textarea",
-                    value: documentProp.note,
-                }
-            } 
+            this.$refs.saveDocPanel.setPropsOfDoc(documentProp);
         },
         //hoangnd: hàm set các giá trị của thuộc tính và formulas vào từng contrl trong doc lúc load dữ liệu và đưa vào state
         setDataForPropsControl(fields){
@@ -760,7 +704,6 @@ export default {
         // sự kiện xảy ra khi khởi tạo xong editor , sự kiện do tinymce cung cấp
         initEditor(){
             let thisCpn = this;
-            thisCpn.setDocumentProperties({})
             if(this.documentId != 0)    // trường họp edit doc thì gọi api lấy dữ liệu
             thisCpn.getContentDocument();
             var currentElement, currentElementChangeFlag, elementRectangle, countdown, dragoverqueue_processtimer;
@@ -1177,7 +1120,7 @@ export default {
                 DragDropFunctions.removePlaceholder();
                 DragDropFunctions.ClearContainerContext();
             });
-            var style = $("<style data-reserved-styletag></style>").html(GetInsertionCSS());
+            var style = $("<style data-reserved-styletag></style>").html(getInsertionCSS());
             var clientFrameWindow = $('#editor_ifr').get(0).contentWindow;
             $(clientFrameWindow.document.head).append(style);
 
@@ -1216,17 +1159,17 @@ export default {
             $("#editor_ifr").contents().find('body').on('click','.s-control',function(e){
                 e.stopPropagation();
                 e.preventDefault();
-                $(clientFrameWindow.document).find('.on-selected').removeClass('on-selected')
-                if(!$(this).hasClass('on-selected')){
-                    $(this).addClass('on-selected');
-                }
+                $(clientFrameWindow.document).find('.on-selected').removeClass('on-selected');
+                $(this).addClass('on-selected');
+                console.log($(this));
+                
                 let type = $(this).attr('s-control-type');
                 let controlId = $(this).attr('id');
                 let table = $(this).closest('.s-control-table');
                 if(table.length > 0 && controlId != table.attr('id')){
                     let tableId = table.attr('id');
                     let control = thisCpn.editorStore.allControl[tableId]['listFields'][controlId];
-                    thisCpn.selectControl(control.properties, control.formulas,tableId);
+                    thisCpn.selectControl(control.properties, control.formulas,controlId);
                 }
                 else{
                     let control = thisCpn.editorStore.allControl[controlId];
@@ -1273,30 +1216,6 @@ export default {
             });
             
 
-            function GetInsertionCSS() {
-                var styles = ".reserved-drop-marker{width:100%;height:2px;background:#00a8ff;position:absolute}.reserved-drop-marker::after,.reserved-drop-marker::before{content:'';background:#00a8ff;height:7px;width:7px;position:absolute;border-radius:50%;top:-2px}.reserved-drop-marker::before{left:0}.reserved-drop-marker::after{right:0}";
-                styles += "[data-dragcontext-marker],[data-sh-parent-marker]{outline:#19cd9d solid 2px;text-align:center;position:absolute;z-index:123456781;pointer-events:none;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif}[data-dragcontext-marker] [data-dragcontext-marker-text],[data-sh-parent-marker] [data-sh-parent-marker-text]{background:#19cd9d;color:#fff;padding:2px 10px;display:inline-block;font-size:14px;position:relative;top:-24px;min-width:121px;font-weight:700;pointer-events:none;z-index:123456782}[data-dragcontext-marker].invalid{outline:#dc044f solid 2px}[data-dragcontext-marker].invalid [data-dragcontext-marker-text]{background:#dc044f}[data-dragcontext-marker=body]{outline-offset:-2px}[data-dragcontext-marker=body] [data-dragcontext-marker-text]{top:0;position:fixed}";
-                styles += '.drop-marker{pointer-events:none;}.drop-marker.horizontal{background:#00adff;position:absolute;height:2px;list-style:none;visibility:visible!important;box-shadow:0 1px 2px rgba(255,255,255,.4),0 -1px 2px rgba(255,255,255,.4);z-index:123456789;text-align:center}.drop-marker.horizontal.topside{margin-top:0}.drop-marker.horizontal.bottomside{margin-top:2px}.drop-marker.horizontal:before{content:"";width:8px;height:8px;background:#00adff;border-radius:8px;margin-top:-3px;float:left;box-shadow:0 1px 2px rgba(255,255,255,.4),0 -1px 2px rgba(255,255,255,.4)}.drop-marker.horizontal:after{content:"";width:8px;height:8px;background:#00adff;border-radius:8px;margin-top:-3px;float:right;box-shadow:0 1px 2px rgba(255,255,255,.4),0 -1px 2px rgba(255,255,255,.4)}.drop-marker.vertical{height:50px;list-style:none;border:1px solid #00ADFF;position:absolute;margin-left:3px;display:inline;box-shadow:1px 0 2px rgba(255,255,255,.4),-1px 0 2px rgba(255,255,255,.4)}.drop-marker.vertical.leftside{margin-left:0}.drop-marker.vertical.rightside{margin-left:3px}.drop-marker.vertical:before{content:"";width:8px;height:8px;background:#00adff;border-radius:8px;margin-top:-4px;top:0;position:absolute;margin-left:-4px;box-shadow:1px 0 2px rgba(255,255,255,.4),-1px 0 2px rgba(255,255,255,.4)}.drop-marker.vertical:after{content:"";width:8px;height:8px;background:#00adff;border-radius:8px;margin-left:-4px;bottom:-4px;position:absolute;box-shadow:1px 0 2px rgba(255,255,255,.4),-1px 0 2px rgba(255,255,255,.4)}';
-                styles += 'body{background:white !important;font-size:11px;font-family:Roboto,sans-serif;} ';
-                // styles += 'body > div:not(.mce-resizehandle){min-height:30px;} ';
-                styles += 'p{margin:0 !important;} ';
-                styles += '@page { margin: 0; }';
-                styles += 'table td, table th{ border: 1px dotted #ccc !important;padding: 2px !important;height:25px !important}';
-                styles += '.on-selected{border:1px dashed #2196f3 !important;cursor: pointer !important;}';
-                styles += '.s-control-tracking-value,.s-control-approval-history,.s-control-report,.s-control-file-upload,.s-control-reset,.s-control-draf,.s-control-submit,.s-control-text,.s-control-select,.s-control-document,.s-control-phone,.s-control-email,.s-control-currency,.s-control-radio,.s-control-color,.s-control-percent,.s-control-hidden,.s-control-user,.s-control-filter,.s-control-date,.s-control-datetime,.s-control-month,.s-control-time,.s-control-number{width: auto;height: 25px;border-radius: 3px;font-size: 11px;border:1px solid #e9ecef;font-family:Roboto,sans-serif;color:gray;padding: 0 5px;outline: 0!important;}'
-                styles += '.s-control:not(.s-control-table) {display: inline-block;background: rgb(233, 236, 239);min-width: 50px;max-width:120px;outline: none !important;margin:1px}';
-                styles += '.s-control-reset,.s-control-draft,.s-control-submit{padding: 5px 8px;}';
-                styles += '.s-control-user,.s-control-select,.s-control-document{width: 120px;}';
-                styles += '.s-control-error{border: 1px solid red !important;}';
-                styles += '.s-control-label{font-size:11px;color:gray;border:1px solid #e9ecef;padding:7px 8px 6px 7px;border-radius:4px;}';
-                styles += '.mce-input-padding{width: 100px !important;left: 120px !important;padding:0 4px}';
-                styles += '.mce-offscreen-selection{display:none !important;}';
-                styles += '.s-control-table{width:100%;text-align: left;border-collapse: collapse;font-size: 11px;}';
-                styles += '.ephox-snooker-resizer-rows {cursor: row-resize}';
-                styles += '.ephox-snooker-resizer-cols {cursor: col-resize}';
-                styles += '.ephox-snooker-resizer-bar {background-color: #b4d7ff;opacity: 0;-webkit-user-select: none;-moz-user-select: none;-ms-user-select: none;user-select: none;}';
-                return styles;
-            }
         }
     },
 }
