@@ -1,14 +1,18 @@
 <template>
     <div class="home">
-        <orgchart-selector v-model="testModel">
-
-        </orgchart-selector>
+        <TimelineTreeview>
+            <template slot="tree-item-content" slot-scope="{itemData}">
+                <i :class="'mdi mr-2 ' +itemData.icon"></i>
+                <span>{{itemData.name}}</span>
+            </template>
+        </TimelineTreeview>
     </div>
 </template>
 
 <script>
 import FormTpl from "./../components/common/FormTpl.vue";
 import OrgchartSelector from "./../components/user/OrgchartSelector.vue";
+import TimelineTreeview from "./../components/common/TimelineTreeview";
 export default {
     name: "Home",
     methods: {
@@ -56,7 +60,8 @@ export default {
     },
     components: {
         "form-tpl": FormTpl,
-        'orgchart-selector': OrgchartSelector
+        'orgchart-selector': OrgchartSelector,
+        TimelineTreeview
     }
 };
 </script>
