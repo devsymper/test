@@ -20,6 +20,7 @@ import Editor from "../views/document/Editor.vue";
 import DeployHistory from "../views/process/DeployHistory.vue";
 import ProcessInstances from "../views/process/ProcessInstances.vue";
 import TrackingProcessInstance from "../views/process/TrackingProcessInstance.vue";
+import WorkList from "../views/works/WorkList.vue";
 
 Vue.use(VueRouter);
 /**
@@ -139,6 +140,11 @@ const routes = [{
         path: "/tasks",
         name: "tasks",
         component: tasks,
+    },
+    {
+        path: "/works",
+        name: "workList",
+        component: WorkList,
     },
 
     // Luôn để 2 item này ở cuối cùng của array này để nó có thể redirect đến được trang 404 khi ko tìm thấy route

@@ -8,7 +8,7 @@
 import Api from "./../../api/api.js";
 import list from "./list";
 export default {
-    name: "Listvirtualdocs",
+    name: "ListTaskContainer",
     components: {
         "list-task": list,
     },

@@ -43,7 +43,8 @@
         "last_updated_by": "Người cập nhật",
         "statistics": "Thống kê",
         "detail": "Chi tiết",
-        "tracking": "Theo dấu"
+        "tracking": "Theo dấu",
+        "works": "Công việc"
     },
     "login": {
         "title": "Đăng nhập hệ thống",

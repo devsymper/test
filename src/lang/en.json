@@ -43,7 +43,8 @@
         "last_updated_by": "Last updated by",
         "statistics": "Statistics",
         "detail": "Detail",
-        "tracking": "Tracking"
+        "tracking": "Tracking",
+        "works": "Works"
     },
     "validate": {
         "required": "Not be empty",

@@ -57,11 +57,11 @@ const defaultState = {
         { title: "apps", icon: "mdi-apps", link: "/apps" },
         { title: "virtualdocs", icon: "mdi-table", link: "/virtualdocs" },
         { title: "tasks", icon: "mdi-check-all", link: "/tasks" },
+        { title: "works", icon: "mdi-briefcase-check-outline", link: "/works" },
     ],
     urlToTabTitleMap: {}, // map giữa url với title của tab,
     currentTabIndex: 0, // index cuả tab hiện tại đang mở,
-    supportedLanguages: [
-        {
+    supportedLanguages: [{
             key: "vn",
             title: "Tiếng Việt",
         },
@@ -80,8 +80,7 @@ const defaultState = {
      */
     orgchartNodes: {},
     // Danh sách tất cả các user trong hệ thống
-    allUsers: [
-        {
+    allUsers: [{
             id: "850",
             firstName: "Hoang1",
             lastName: null,
@@ -89,8 +88,7 @@ const defaultState = {
             displayName: "hoangn",
             email: "hoangn@gmail.com",
             password: null,
-            passwordProps:
-                '{"needChange":1,"dueDate":{"active":1,"type":"month","value":1}}',
+            passwordProps: '{"needChange":1,"dueDate":{"active":1,"type":"month","value":1}}',
             phone: "1234764542",
             status: "Đang mở",
             avatar: null,
@@ -106,8 +104,7 @@ const defaultState = {
             displayName: "Hoàng symper",
             email: "hoang11a111@gmail.com",
             password: null,
-            passwordProps:
-                '{"needChange":1,"dueDate":{"active":1,"type":"month","value":1}}',
+            passwordProps: '{"needChange":1,"dueDate":{"active":1,"type":"month","value":1}}',
             phone: "0373848398",
             status: "Đang mở",
             avatar: null,
@@ -123,8 +120,7 @@ const defaultState = {
             displayName: "Nguyễn Việt Dinh",
             email: "nvdinh@symper.vn",
             password: null,
-            passwordProps:
-                '{"needChange":1,"dueDate":{"active":1,"type":"month","value":1}}',
+            passwordProps: '{"needChange":1,"dueDate":{"active":1,"type":"month","value":1}}',
             phone: "1234567890",
             status: "Đang mở",
             avatar: null,
@@ -140,8 +136,7 @@ const defaultState = {
             displayName: "Mạnh Khá",
             email: "khadm@symper.vn",
             password: null,
-            passwordProps:
-                '{"needChange":1,"dueDate":{"active":1,"type":"month","value":1}}',
+            passwordProps: '{"needChange":1,"dueDate":{"active":1,"type":"month","value":1}}',
             phone: "1234567890",
             status: "Đang mở",
             avatar: null,
@@ -157,8 +152,7 @@ const defaultState = {
             displayName: "Hoàng symper",
             email: "hoang11111@gmail.com",
             password: null,
-            passwordProps:
-                '{"needChange":1,"dueDate":{"active":1,"type":"month","value":1}}',
+            passwordProps: '{"needChange":1,"dueDate":{"active":1,"type":"month","value":1}}',
             phone: "0373848398",
             status: "Đang mở",
             avatar: null,
@@ -174,8 +168,7 @@ const defaultState = {
             displayName: "Hoàng symper",
             email: "hoang1111@gmail.com",
             password: null,
-            passwordProps:
-                '{"needChange":1,"dueDate":{"active":1,"type":"month","value":1}}',
+            passwordProps: '{"needChange":1,"dueDate":{"active":1,"type":"month","value":1}}',
             phone: "0373848398",
             status: "Đang mở",
             avatar: null,
@@ -191,8 +184,7 @@ const defaultState = {
             displayName: "Hoàng symper",
             email: "hoang111@gmail.com",
             password: null,
-            passwordProps:
-                '{"needChange":1,"dueDate":{"active":1,"type":"month","value":1}}',
+            passwordProps: '{"needChange":1,"dueDate":{"active":1,"type":"month","value":1}}',
             phone: "0373848398",
             status: "Đang mở",
             avatar: null,
@@ -208,8 +200,7 @@ const defaultState = {
             displayName: "Hoàng symper",
             email: "hoang11@gmail.com",
             password: null,
-            passwordProps:
-                '{"needChange":1,"dueDate":{"active":1,"type":"month","value":1}}',
+            passwordProps: '{"needChange":1,"dueDate":{"active":1,"type":"month","value":1}}',
             phone: "0373848398",
             status: "Đang mở",
             avatar: null,
@@ -225,8 +216,7 @@ const defaultState = {
             displayName: "Hoàng symper",
             email: "hoang1@gmail.com",
             password: null,
-            passwordProps:
-                '{"needChange":1,"dueDate":{"active":1,"type":"month","value":1}}',
+            passwordProps: '{"needChange":1,"dueDate":{"active":1,"type":"month","value":1}}',
             phone: "0373848398",
             status: "Đang mở",
             avatar: null,
@@ -242,8 +232,7 @@ const defaultState = {
             displayName: "Hoàng symper",
             email: "hoang@gmail.com",
             password: null,
-            passwordProps:
-                '{"needChange":1,"dueDate":{"active":1,"type":"month","value":1}}',
+            passwordProps: '{"needChange":1,"dueDate":{"active":1,"type":"month","value":1}}',
             phone: "0373848398",
             status: "Đang mở",
             avatar: null,

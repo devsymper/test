@@ -792,6 +792,7 @@ export default {
                         );
                         thisCpn.data = data.listObject;
                         thisCpn.handleStopDragColumn();
+                        thisCpn.$emit('data-get', data.listObject);
                     })
                     .catch(err => {
                         console.warn(err);

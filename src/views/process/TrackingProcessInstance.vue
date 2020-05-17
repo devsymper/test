@@ -49,6 +49,18 @@ const nodeStatusColors = {
 };
 
 export default {
+    props: {
+        instanceId: {
+            type: String,
+            default: ''
+        }
+    },
+    watch:{
+        instanceId(){
+            this.setInstanceXML();
+            this.getInstanceRuntimeData();
+        }
+    },
     created() {
         this.setInstanceXML();
         this.getInstanceRuntimeData();
@@ -204,10 +216,11 @@ export default {
         },
         // Lấy data của instance
         getInstanceData() {
+            let instanceId = this.instanceId ? this.instanceId : self.$route.params.idInstance;
             let self = this;
             return new Promise((resolve, reject) => {
                 bpmneApi
-                    .getProcessInstanceData(self.$route.params.idInstance)
+                    .getProcessInstanceData(instanceId)
                     .then(res => {
                         resolve(res);
                     })
@@ -260,8 +273,9 @@ export default {
             this.nodeDetailPanel.title = bizNode.name;
             this.nodeDetailPanel.titleIcon = 'mdi-account';
             this.nodeDetailPanel.show = true;
-        }
+        },
     }
+
 };
 </script>
 
