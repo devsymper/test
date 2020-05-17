@@ -3,14 +3,13 @@
         <div class="sym-document__side-bar-left">
             <sidebar-left/>
         </div>
-            <vue-resizable :active="['r']" width="calc(100% - 480px)" @resize:move="resizeEditor" height="100%" class="sym-document-editor">
-
+        <vue-resizable :active="['r']" width="calc(100% - 480px)" @resize:move="resizeEditor" height="100%" class="sym-document-editor">
             <div class="sym-document-body">
                 <div class="sym-document-action">
                     <editor-action @document-action-save-document="saveDocument"/>
                 </div>
                     
-                    <editor id="editor" api-key="APIKEY"
+                <editor id="editor" api-key="APIKEY"
                     ref="editor"
                     @onKeyUp="detectKeyEvent"
                     @onClick="detectClickEvent"
@@ -41,22 +40,16 @@
                             });
                             
                         }
-                    }"
-                    ></editor>
+                    }">
+                </editor>
             </div>
-            </vue-resizable>
-
+        </vue-resizable>
         <div  class="sym-document__side-bar-right">
-           
-                <sidebar-right />
-            
+            <sidebar-right />
         </div>
-       
         <s-table-setting  ref="tableSetting" @add-columns-table="addColumnTable"/>
         <auto-complete-control ref="autocompleteControl" @add-control="insertControl"/>
-        <save-doc-panel ref="saveDocPanel"
-        
-        />
+        <save-doc-panel ref="saveDocPanel"/>
     </v-flex>
 </template>
 <script>
@@ -243,7 +236,7 @@ export default {
         // resize been phair editor thi set lại chiều rộng cho size bar right
         resizeEditor(e){
             let documentW = $(document).width();
-            $('.sym-document__side-bar-right').css({width:documentW - $('.v-navigation-drawer').width() - $('.sym-document__side-bar-left').width() - $('.sym-document-editor').width() +'px'})
+            $('.sym-document__side-bar-right').css({width: documentW - $('.v-navigation-drawer').width() - $('.sym-document__side-bar-left').width() - $('.sym-document-editor').width() +'px'})
         },
    
         

@@ -1,6 +1,6 @@
 <template>
     <v-container fluid>
-        <v-row class="ml-0 mr-0">
+        <v-row class="ml-0 mr-0 ">
             <v-col cols="8" class="pb-1 pt-1">
                 <div class="fs-13 pl-2 pt-1">
                     App name
@@ -40,13 +40,17 @@
                         </v-tab>
                     </v-tabs>
 
-                    <v-tabs-items v-model="tab">
+                    <v-tabs-items v-model="tab" >
                         <v-tab-item
                             v-for="item in items"
                             :key="item.tab"
+                      
                         >
-                            <v-card flat class="pl-4 pr-4">
-                                <component :is="item.content" :task="task"></component>
+                            <v-card flat       
+                            :style="{
+                                height: mainContentHeight
+                            }">
+                                <component :instanceId="instanceId" :is="item.content" class="h-100" ></component>
                             </v-card>
                         </v-tab-item>
                     </v-tabs-items>
@@ -67,15 +71,20 @@ import History from "./instanceDetail/History";
 import People from "./instanceDetail/People";
 
 export default {
-    name: "taskDetail",
+    name: "ProcessIntanceDetail",
     props: {
-        task: {
-            type: Object,
-            default: () => {}
-        },
         instanceId: {
             type: String,
             default: ''
+        },
+        componentHeight: {
+            type: Number,
+            default: 400
+        }
+    },
+    computed: {
+        mainContentHeight(){
+            return (this.componentHeight - 80)+'px';
         }
     },
     components: {
@@ -121,6 +130,9 @@ export default {
         }
     },
     methods: {
+        getMainContentHeight(){
+            return this.$
+        },
         closeDetail() {
             this.$emit("close-detail", {});
         }

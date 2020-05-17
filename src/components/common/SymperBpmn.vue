@@ -1,6 +1,9 @@
 <template>
     <!--Symper Vue componet cho việc sử dụng thư viện bpmn.io -->
-    <div class="containers h-100 w-100" ref="content">
+    <div :class="{
+            'containers h-100 w-100': true,
+            'hide-process-palette': readOnly 
+        }" ref="content">
         <div class="symper-bpm-canvas h-100" ref="canvas"></div>
         <a ref="downloadLinkXML" href></a>
         <a ref="downloadLinkSVG" href></a>
@@ -31,7 +34,13 @@ export default {
             default(){
                 return [];
             }
-        }
+        },
+        readOnly: {
+            type: Boolean,
+            default(){
+                return false;
+            }
+        }, 
     },
     data: function() {
         return {

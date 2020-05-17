@@ -3,6 +3,7 @@
         <symper-bpmn
             @node-clicked="handleNodeSelected"
             ref="symperBpmn"
+            :readOnly="true"
             :diagramXML="diagramXML"
             :customModules="customRender"
         ></symper-bpmn>
@@ -216,7 +217,7 @@ export default {
         },
         // Lấy data của instance
         getInstanceData() {
-            let instanceId = this.instanceId ? this.instanceId : self.$route.params.idInstance;
+            let instanceId = this.instanceId ? this.instanceId : this.$route.params.idInstance;
             let self = this;
             return new Promise((resolve, reject) => {
                 bpmneApi

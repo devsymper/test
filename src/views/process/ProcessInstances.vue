@@ -14,7 +14,7 @@
             @on-add-item-clicked="goToCreatePage()"
             @data-get="handleAfterChangeData"
         ></list-items>
-        <v-row class="mr-0 ml-0" v-show="sideBySideMode">
+        <v-row class="mr-0 ml-0 h-100" v-show="sideBySideMode">
             <v-col 
                 :cols="!sideBySideMode ? 12 : 4"
                 :md="!sideBySideMode ? 12 : 3"
@@ -56,7 +56,7 @@
                 </v-row>
                 <v-divider></v-divider>
                 <v-row class="ml-0 mr-0 list-instances">
-                    <div class="instance-item" v-for="(item, idx) in listInstances" :key="idx">
+                    <div class="instance-item" v-for="(item, idx) in listInstances" :key="idx" @click="selectProcessInstance(item)">
                         <div class="instance-item-title w-100 lh-initial" >
                             <span class="fs-13">{{item.processDefinitionName}}</span>
                         </div>
@@ -77,7 +77,7 @@
                 style="border-left: 1px solid #e0e0e0;"
             >
                 <processInstanceDetail
-                    :task="selectedTask"
+                    :componentHeight="containerHeight"
                     :instanceId="this.selectedInstance.id"
                     @close-detail="closeDetail"
                 ></processInstanceDetail>
@@ -103,7 +103,6 @@ export default {
     data() {
         let self = this;
         return {
-            selectedTask: {},
             listProrcessInstances: [],
             isSmallRow: false,
             sideBySideMode: true,
@@ -151,6 +150,11 @@ export default {
     created() {},
     watch: {},
     methods: {
+        selectProcessInstance(instance){
+            for(let key in instance){
+                this.$set(this.selectedInstance, key, instance[key]);
+            }
+        },
         handleAfterChangeData(items){
             this.listInstances = items;
         },
