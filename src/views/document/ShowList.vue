@@ -38,6 +38,13 @@ export default {
                         this.$router.push('/document/editor/'+document.id);
                     },
                 },
+                {
+                    name: "submit",
+                    text: "Nhập liệu",
+                    callback: (document, callback) => {
+                        this.$router.push('/document/submit/'+document.id);
+                    },
+                },
             ],
         }
     },

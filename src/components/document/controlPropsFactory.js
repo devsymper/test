@@ -287,7 +287,7 @@ const controlTypes = {
     },
     qrCode: {
         icon: "/icon/ic_qrcode.png",
-        html: `<span class="s-control s-control-qrcode" contenteditable="false"  title="Qr code" style="cursor: pointer;text-align: center;display: inline-block;width: 25px;height: 25px;border:none;" s-control-type="qrCode" data-mce-selected="1">
+        html: `<span class="s-control s-control-qrcode" contenteditable="false"  title="Qr code" style="cursor: pointer;text-align: center;display: inline-block;width: 25px;height: 25px;" s-control-type="qrCode" data-mce-selected="1">
                     <span class="mdi mdi-qrcode-scan" style="font-size: 22px;color: #757575;"></span>
                     <input type="hidden">
                 </span>&nbsp;`,
@@ -297,7 +297,7 @@ const controlTypes = {
     },
     image: {
         icon: "/icon/ic_image.png",
-        html: `<span class="s-control s-control-image" contenteditable="false"  title="Image" style="cursor: pointer;text-align: center;display: inline-block;width: 25px;height: 25px;border:none;" s-control-type="image">
+        html: `<span class="s-control s-control-image" contenteditable="false"  title="Image" style="cursor: pointer;text-align: center;display: inline-block;width: 25px;height: 25px;" s-control-type="image">
                     <span class="mdi mdi-image-area" style="font-size: 22px;color: #757575;"></span>
                     <input type="hidden" >
                 </span>&nbsp;`,
@@ -342,7 +342,7 @@ const controlTypes = {
     },
     time: {
         icon: "/icon/ic_date.png",
-        html: `<input class="s-control s-control-time" contenteditable="false"  title="Time" s-control-type="time" type="time" style="border:none;width: 150px;">&nbsp;&nbsp;`,
+        html: `<input class="s-control s-control-time" contenteditable="false"  title="Time" s-control-type="time" type="time" style="width: 150px;">&nbsp;&nbsp;`,
         title: "Time",
         notInProps: ['otherInfo', 'formatNumber', 'isSumTable', 'isAllowUpdate', 'isDisplayCompact', 'isMultipleValue'],
         formulas: ['formulas', 'hidden', 'readOnly', 'require', 'validate']

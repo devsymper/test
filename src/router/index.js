@@ -15,6 +15,7 @@ import Snippet from "../views/snippets/index.vue";
 import Permissions from "../views/permissions/index.vue";
 import PermissionsInListView from "../views/permissions/listView.vue";
 import Editor from "../views/document/Editor.vue";
+import SubmitDocument from "../views/document/submit/Submit.vue";
 import DeployHistory from "../views/process/DeployHistory.vue";
 import ProcessInstances from "../views/process/ProcessInstances.vue";
 import TrackingProcessInstance from "../views/process/TrackingProcessInstance.vue";
@@ -111,6 +112,12 @@ const routes = [{
         path: "/document/editor/:id?",
         name: "editDocument",
         component: Editor,
+
+    },
+    {
+        path: "/document/submit/:id?",
+        name: "submitDocument",
+        component: SubmitDocument,
 
     },
     //service

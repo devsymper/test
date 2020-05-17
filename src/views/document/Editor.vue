@@ -271,12 +271,12 @@ export default {
             this.$refs.saveDocPanel.showDialog()
         },
         // hoangnd: hàm gửi request lưu doc
-        saveDocument(){
+        saveDocument(documentProperties){
             let thisCpn = this;
             let htmlContent = this.$refs.editor.editor.getContent()
             let allControl = JSON.stringify(this.editorStore.allControl);
             if(this.documentId != 0 && this.documentId != undefined && typeof this.documentId != 'undefined'){   //update doc
-                documentApi.editDocument({documentProperty:JSON.stringify(thisCpn.documentProps),fields:allControl,content:htmlContent,id:this.documentId}).then(res => {
+                documentApi.editDocument({documentProperty:documentProperties,fields:allControl,content:htmlContent,id:this.documentId}).then(res => {
                     if (res.status == 200) {
                         thisCpn.$router.push('/documents');
                     }
@@ -288,7 +288,7 @@ export default {
                 });
             }
             else{
-                documentApi.saveDocument({documentProperty:JSON.stringify(thisCpn.documentProps),fields:allControl,content:htmlContent}).then(res => {
+                documentApi.saveDocument({documentProperty:documentProperties,fields:allControl,content:htmlContent}).then(res => {
                     if (res.status == 200) {
                         thisCpn.$router.push('/documents');
                     }
@@ -302,7 +302,7 @@ export default {
         },
         //hoangnd: hàm xác thưc các control trước khi lưu
         // xac thực tên control và các formulas liên quan
-        validateControl(){
+        validateControl(documentProperties){
             let thisCpn = this;
             let allControl = util.cloneDeep(this.editorStore.allControl);
             let listControlName = [];
@@ -319,7 +319,7 @@ export default {
                 this.validateFormulasInControl(control)
             }
             if(this.listMessageErr.length == 0 && $('#editor_ifr').contents().find('.s-control-error').length == 0){
-                this.saveDocument();
+                this.saveDocument(documentProperties);
             }
             else{
                 this.$refs.saveDocPanel.hideDialog();
@@ -512,7 +512,10 @@ export default {
                             'display': 'block',
                         })
                     },10)
-                    $('.list-control-autocomplete .tf-search-control').focus();
+                    setTimeout(() => {
+                        $('.list-control-autocomplete .tf-search-control').focus();
+                    }, 100);
+                    
                     thisKeypressTime = 0;
                 }
                 this.lastKeypressTime = thisKeypressTime;

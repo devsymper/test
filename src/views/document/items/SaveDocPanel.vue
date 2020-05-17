@@ -89,7 +89,7 @@ export default {
         },
         
         saveDocument(){
-            let documentProperties = JSON.stringify(this.listInput);
+            let documentProperties = JSON.stringify(this.documentProps);
             this.$emit("save-doc-action",documentProperties);
             this.hideDialog();
         },
