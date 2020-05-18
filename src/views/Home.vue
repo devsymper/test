@@ -13,6 +13,11 @@
 import FormTpl from "./../components/common/FormTpl.vue";
 import OrgchartSelector from "./../components/user/OrgchartSelector.vue";
 import TimelineTreeview from "./../components/common/TimelineTreeview";
+import Handsontable from 'handsontable';
+
+
+console.log(Handsontable);
+
 export default {
     name: "Home",
     methods: {

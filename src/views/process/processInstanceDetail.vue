@@ -1,7 +1,7 @@
 <template>
     <v-container fluid>
         <v-row class="ml-0 mr-0 ">
-            <v-col cols="8" class="pb-1 pt-1">
+            <v-col cols="8" class="pb-1 pt-1 pl-0">
                 <div class="fs-13 pl-2 pt-1">
                     App name
                     /
@@ -10,23 +10,24 @@
                     business key
                 </div>
             </v-col>
-            <v-col cols="4" class="text-right pt-1 pb-1">
-                <v-btn small  class="mr-2">
-                    <v-icon small class="mr-2">mdi-open-in-new</v-icon> 
+            <v-col cols="4" class="text-right pt-1 pb-1 pr-0">
+                <v-btn small icon>
+                    <v-icon small >mdi-open-in-new</v-icon> 
                 </v-btn>
-                <v-btn small text @click="closeDetail">
+                <v-btn small icon @click="closeDetail">
                     <v-icon small>mdi-close</v-icon>
                 </v-btn>
             </v-col>
         </v-row>
         <v-divider style="border-width: 2px; border-color: #ff7400;"></v-divider>
         <v-row>
-            <v-col cols="12">
+            <v-col cols="12 pt-0">
                 <v-card flat>
                     <v-tabs
                         v-model="tab"
                         background-color="transparent"
-                        color="grey"
+                        class="sym-small-size "
+                        color="orange accent-4"
                         light
                         flat
                     >

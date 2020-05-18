@@ -44,7 +44,9 @@
         "statistics": "Statistics",
         "detail": "Detail",
         "tracking": "Tracking",
-        "works": "Works"
+        "works": "Works",
+        "all_task": "All tasks",
+        "pendding_task": "Pendding tasks"
     },
     "validate": {
         "required": "Not be empty",

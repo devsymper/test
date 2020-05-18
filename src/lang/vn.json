@@ -44,7 +44,9 @@
         "statistics": "Thống kê",
         "detail": "Chi tiết",
         "tracking": "Theo dấu",
-        "works": "Công việc"
+        "works": "Công việc",
+        "all_task": "Tất cả công việc",
+        "pendding_task": "Việc chưa làm"
     },
     "login": {
         "title": "Đăng nhập hệ thống",
