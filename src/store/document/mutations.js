@@ -9,6 +9,13 @@ const addControl = (state, params) => {
     Vue.set(state.editor.allControl, id, prop);
     setTreeListControlInDoc(state);
 };
+const addToListInputInDocument = (state, params) => {
+    let name = params.name
+    let control = params.control
+
+    // state.editor.allControl[id] = prop;
+    Vue.set(state.submit.listInputInDocument, name, control);
+};
 
 const restoreState = (state) => {
     state.editor.allControl = {};
@@ -148,5 +155,6 @@ export {
     addControlToTable,
     updateProp,
     minimizeControl,
-    restoreState
+    restoreState,
+    addToListInputInDocument
 };

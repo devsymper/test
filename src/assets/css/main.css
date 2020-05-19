@@ -345,6 +345,18 @@
 }
 
 
+/* kệ khá nhé */
+
+.v-navigation-drawer__content .mdi {
+    background: -webkit-linear-gradient(#eee, #333);
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+
+/* are you ok? */
+
+
 /** Custom hiển thị của input theo phong cách Symper **/
 
 .sym-style-input:not(.v-input--checkbox) .v-input__slot {

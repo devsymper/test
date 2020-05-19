@@ -39,6 +39,17 @@ const defaultState = {
         },
         listControlTreeData: [],
         allControlForTableOption: []
+    },
+    submit: {
+        listInputInDocument: {
+
+        },
+        dataInputCache: {
+
+        },
+        docStatus: 'init',
+        isDetailView: false,
+
     }
 };
 
