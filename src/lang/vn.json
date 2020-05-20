@@ -253,6 +253,7 @@
             "business_key": "Khóa nghiệp vụ",
             "ended": "Đã kết thúc",
             "start_user_id": "Id người khởi tạo",
+            "user_start": "Người bắt đầu",
             "start_time": "Thời gian bắt đầu",
             "tracking": "Theo dấu quy trình"
         },

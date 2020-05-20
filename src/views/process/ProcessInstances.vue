@@ -73,7 +73,7 @@
                 :cols="!sideBySideMode ? 0 : 8"
                 :md="!sideBySideMode ? 0 : 9"
                 v-if="sideBySideMode"
-                class="pt-0"
+                class="pt-0 px-0"
                 style="border-left: 1px solid #e0e0e0;"
             >
                 <processInstanceDetail

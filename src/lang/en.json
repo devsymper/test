@@ -38,6 +38,7 @@
         "key": "Key",
         "description": "Description",
         "created_by": "Created by",
+        "created_time": "Create time",
         "version": "Version",
         "last_updated": "Last updated",
         "last_updated_by": "Last updated by",
@@ -248,11 +249,12 @@
         },
         "instance": {
             "list": "List process instance",
-            "name": "name",
+            "name": "Process instance name",
             "process_definition_name": "Process definition Name",
             "business_key": "Business key",
             "ended": "Ended",
             "start_user_id": "Start user id",
+            "user_start": "User start",
             "start_time": "Start time",
             "tracking": "Process instance tracking"
         },

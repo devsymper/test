@@ -86,7 +86,7 @@ export default {
     addTask(data) {
         return bpmneApi.post(appConfigs.apiDomain.bpmne.tasks, data, testHeader);
     },
-    getTask() {
-        return bpmneApi.get(appConfigs.apiDomain.bpmne.tasks, {}, testHeader);
+    getTask(filter) {
+        return bpmneApi.get(appConfigs.apiDomain.bpmne.tasks, filter, testHeader);
     }
 };

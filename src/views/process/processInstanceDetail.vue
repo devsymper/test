@@ -19,43 +19,44 @@
                 </v-btn>
             </v-col>
         </v-row>
-        <v-divider style="border-width: 2px; border-color: #ff7400;"></v-divider>
+        <v-divider style="border-width: 1px; border-color: #ff7400;"></v-divider>
         <v-row>
-            <v-col cols="12 pt-0">
-                <v-card flat>
-                    <v-tabs
-                        v-model="tab"
-                        background-color="transparent"
-                        class="sym-small-size "
-                        color="orange accent-4"
-                        light
-                        flat
+            <v-col cols="12 pt-0 ">
+                <v-tabs
+                    v-model="tab"
+                    background-color="white"
+                    color="white"
+                    active-class="symper-active-tab-item"
+                    :height="'40px'">
+                    <v-tab
+                        v-for="item in items"
+                        :key="item.tab"
+                        class="fs-13"
                     >
-                        <v-tab
-                            v-for="item in items"
-                            :key="item.tab"
-                            class="fs-13"
-                        >
-                            <v-icon small class="mr-2">{{item.icon}}</v-icon>
-                            {{ item.title }}
-                        </v-tab>
-                    </v-tabs>
+                        <v-icon small class="mr-2">{{item.icon}}</v-icon>
+                        {{ item.title }}
+                    </v-tab>
+                </v-tabs>
 
-                    <v-tabs-items v-model="tab" >
+                <div class="h-100 w-100 d-flex border-top-1">
+                    <vue-resizable :active="['r']" class="h-100" width="400px" style="border-right: 1px solid #e0e0e0;background-color: white">
+                        <TrackingProcessInstance
+                            :instanceId="instanceId">
+                        </TrackingProcessInstance>
+                    </vue-resizable>
+                    <v-tabs-items v-model="tab" style="flex-grow: 1;">
                         <v-tab-item
                             v-for="item in items"
-                            :key="item.tab"
-                      
-                        >
-                            <v-card flat       
+                            :key="item.tab">
+                            <div       
                             :style="{
                                 height: mainContentHeight
                             }">
                                 <component :instanceId="instanceId" :is="item.content" class="h-100" ></component>
-                            </v-card>
+                            </div>
                         </v-tab-item>
                     </v-tabs-items>
-                </v-card>
+                </div>
             </v-col>
         </v-row>
     </v-container>
@@ -70,6 +71,8 @@ import Comments from "./instanceDetail/Comments";
 import FlowAndTask from "./instanceDetail/FlowAndTask";
 import History from "./instanceDetail/History";
 import People from "./instanceDetail/People";
+import TrackingProcessInstance from "./../../views/process/TrackingProcessInstance";
+import VueResizable from 'vue-resizable'
 
 export default {
     name: "ProcessIntanceDetail",
@@ -90,7 +93,8 @@ export default {
     },
     components: {
         icon: icon,
-        Attachments, Auditrail, Comments, FlowAndTask, History, People
+        VueResizable,
+        Attachments, Auditrail, Comments, FlowAndTask, History, People, TrackingProcessInstance
     },
     data: function() {
         return {
@@ -99,7 +103,7 @@ export default {
                 { 
                     tab: 'flowAndTask',
                     icon: 'mdi-cog',
-                    title: "Flow and task",
+                    title: "Tasks",
                     content: FlowAndTask
                 }, {
                     tab: 'people',
@@ -142,5 +146,10 @@ export default {
 </script>
 
 <style>
+.symper-active-tab-item {
+    background-color: white;
+    color: rgb(255, 116, 0)!important;
+    font-weight: 500!important;
+}
 
 </style>
