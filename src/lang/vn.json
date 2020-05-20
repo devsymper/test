@@ -18,10 +18,20 @@
         "export_excel": "Xuất excel",
         "list": "Danh sách",
         "search": "Tìm kiếm",
+        "quickSearch": "Tìm nhanh",
         "list_config": "Cấu hình danh sách",
         "save": "Lưu",
         "snippets": "Snippets",
         "permissions": "Phân quyền",
+        "actions": "Actions package",
+        "apps": "Cài đặt Application",
+        "application": "Application",
+        "favorite": "Yêu thích",
+        "navigator": "Điều hướng",
+        "close": "Đóng",
+        "virtualdocs": "Virtualdocs",
+        "tasks": "Tasks",
+        "other": "Khác",
         "deploy": "Deploy",
         "start": "Bắt đầu",
         "name": "Tên",
@@ -33,7 +43,10 @@
         "last_updated_by": "Người cập nhật",
         "statistics": "Thống kê",
         "detail": "Chi tiết",
-        "tracking": "Theo dấu"
+        "tracking": "Theo dấu",
+        "works": "Công việc",
+        "all_task": "Tất cả công việc",
+        "pendding_task": "Việc chưa làm"
     },
     "login": {
         "title": "Đăng nhập hệ thống",
@@ -94,7 +107,8 @@
         "required": "Không được bỏ trống",
         "min_8": "Yêu cầu mật khẩu lớn hơn 8 kí tự",
         "max_24": "Yêu cầu mật khẩu ít hơn 24 kí tự",
-        "email": "Email không hợp lệ"
+        "email": "Email không hợp lệ",
+        "notValid": "Trường này không hợp lệ"
     },
     "user": {
         "title": "Danh sách User",
@@ -188,11 +202,38 @@
             "date_created": "Ngày tạo"
         },
         "title": "Nhóm quyền",
-        "listObject": "Đối tượng",
+        "actionControlSummary": "Action pack Summary",
+        "actionPack": "Action packs",
+        "addPermissionPack": "Thêm mới nhóm quyền",
+        "editPermissionPack": "Chỉnh sửa nhóm quyền",
+        "grandPermission": "Phân quyền chi tiết",
+        "apps": "Apps",
         "contextMenu": {
             "edit": "Sửa",
             "grantPermission": "Phân quyền",
             "remove": "Xóa"
+        },
+        "created": "Đã tạo mới nhóm quyền",
+        "deleted": "Đã xóa nhóm quyền",
+        "updated": "Đã cập nhật nhóm quyền",
+        "listPermission": {
+            "1": "Xem chi tiết",
+            "2": "Xem danh sách",
+            "4": "Tạo mới",
+            "8": "Sửa",
+            "16": "Thực thi",
+            "32": "Xóa",
+            "64": "Clone",
+            "128": "Xuất excel",
+            "256": "Import",
+            "512": "Import nhiều bản ghi",
+            "1024": "Khóa người dùng",
+            "2048": "Phân quyền",
+            "4096": "Phân quyền trong nhóm",
+            "8192": "Deny",
+            "16384": "Cấu hình printer",
+            "32768": "Xem toàn bộ control",
+            "65536": "Xem những control được cho phép"
         }
     },
     "document": {
@@ -289,6 +330,160 @@
             "validate": "Kiểm tra dữ liệu ",
             "save": "Lưu"
         }
-
+    },
+    "apps": {
+        "header": {
+            "id": "ID",
+            "name": "Tên",
+            "note": "Ghi chú",
+            "icon": "Icon",
+            "price": "Giá",
+            "status": "Kích hoạt",
+            "created_at": "Ngày tạo",
+            "updated_at": "Cập nhật lần cuối"
+        },
+        "title": "Applications",
+        "pickIcon": "Chọn icon",
+        "apps": "Applications",
+        "commonInfo": "Thông tin chung của application",
+        "listObjects": "Các chức năng trong application",
+        "addObject": "Thêm tính năng",
+        "objectSummary": "Tổng hợp các chức năng",
+        "contextMenu": {
+            "edit": "Sửa",
+            "grantPermission": "Phân quyền",
+            "remove": "Xóa"
+        },
+        "updated": "Đã cập nhật application",
+        "added": "Đã thêm mới application",
+        "deleted": "Đã xóa application"
+    },
+    "actions": {
+        "header": {
+            "id": "ID",
+            "name": "Tên",
+            "icon": "Icon",
+            "price": "Giá",
+            "note": "Ghi chú",
+            "status": "Trạng thái",
+            "created_at": "Ngày tạo",
+            "is_default": "Mặc định",
+            "updated_at": "Cập nhật lần cuối"
+        },
+        "title": "Actions Package",
+        "addAction": "Thêm Actions Package",
+        "editAction": "Chỉnh sửa Actions Package",
+        "pickIcon": "Chọn icon",
+        "defaultPack": "Mặc định",
+        "objectTypes": "Loại object",
+        "commonInfo": "Thông tin chung của actions package",
+        "listObjects": "Các action trong actions package",
+        "addObject": "Thêm action",
+        "objectSummary": "Tổng hợp các action",
+        "contextMenu": {
+            "edit": "Sửa",
+            "remove": "Xóa"
+        },
+        "updated": "Đã cập nhật actions package",
+        "added": "Đã thêm mới actions package",
+        "deleted": "Đã xóa actions package",
+        "listActions": {
+            "document": {
+                "submit": "Submit",
+                "list": "Danh sách",
+                "import": "Import",
+                "favorite": "Thêm vào yêu thích",
+                "unfavorite": "Loại bỏ yêu thích"
+            },
+            "dataflow": {
+                "detail": "Chi tiết",
+                "execute": "Khởi tạo",
+                "list": "Danh sách",
+                "favorite": "Thêm vào yêu thích",
+                "unfavorite": "Loại bỏ yêu thích"
+            },
+            "orgchart": {
+                "detail": "Chi tiết",
+                "edit": "Chỉnh sửa",
+                "query": "Truy vấn",
+                "favorite": "Thêm vào yêu thích",
+                "unfavorite": "Loại bỏ yêu thích"
+            }
+        }
+    },
+    "iconPicker": {
+        "header": "Chọn icon",
+        "selectImage": "Chọn ảnh",
+        "tabs": {
+            "icon": "Icon",
+            "url": "Link",
+            "upload": "Tải lên"
+        }
+    },
+    "notification": {
+        "error": "Đã có lỗi xảy ra. Vui lòng thử lại sau",
+        "errorTitle": "Lỗi",
+        "successTitle": "Thành công"
+    },
+    "virtualdoc": {
+        "header": {
+            "id": "ID",
+            "name": "Tên",
+            "description": "Mô tả",
+            "updatetime": "Sửa lần cuối",
+            "lastestruntime": "Thời gian chạy (s)",
+            "lastestrunat": "Lần chạy cuối lúc",
+            "formula": "Công thức",
+            "columnsorder": "Thứ tự các cột"
+        },
+        "title": "Danh sách Virtualdocs",
+        "contextMenu": {
+            "edit": "Sửa",
+            "add": "Thêm mới",
+            "export": "Xuất excel",
+            "execute": "Thực thi",
+            "detail": "Xem chi tiết",
+            "remove": "Xóa"
+        },
+        "updated": "Virtualdoc đã được cập nhật",
+        "added": "Virtualdoc đã được tạo mới",
+        "deleted": "Virtualdoc đã xóa",
+        "loadingData": "Vui lòng đợi trong giây lát. Dữ liệu đang được chuẩn bị.",
+        "noData": "Virtualdoc chưa có dữ liệu",
+        "detailTitle": "Danh sách dữ liệu",
+        "common": "Thông tin chung"
+    },
+    "sortBy": "Sắp xếp",
+    "orderBy": "Thứ tự",
+    "order": {
+        "ascending": "Tăng dần",
+        "descending": "Giảm dần"
+    },
+    "tasks": {
+        "header": {
+            "date": "Ngày tạo",
+            "dueDate": "Ngày đến hạn",
+            "createDate": "Ngày khởi tạo",
+            "description": "Mô tả",
+            "owner": "Người tạo",
+            "name": "Tên công việc",
+            "assignee": "Người được giao",
+            "watcher": "Người theo dõi",
+            "participant": "Người tham gia",
+            "id": "Số đơn"
+        },
+        "filterOptions": {
+            "all": "Toàn bộ task",
+            "myTask": "Task của tôi",
+            "myStaff": "Task của nhân viên",
+            "assigned": "Task đã được giao"
+        },
+        "taskTitle": "Tiêu đề",
+        "addSubtaskTitle": "Thêm mới subtask",
+        "createTask": {
+            "title": "Tạo task"
+        },
+        "claim": "Claim",
+        "created": "Đã tạo mới task"
     }
 }

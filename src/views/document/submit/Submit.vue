@@ -1,16 +1,19 @@
 <template>
-    <div class="sym-form-submit" :style="{'width':docSize}">
+    <div class="sym-form-submit" :id="'sym-submit-'+keyInstance" :style="{'width':docSize}">
         <div v-html="contentDocument">
 
         </div>
-        <button v-on:click="togglePageSize" id="toggle-doc-size">
+        <button v-on:click="togglePageSize" v-show="!isQickSubmit" id="toggle-doc-size">
             <span class="mdi mdi-arrow-horizontal-lock"></span>
         </button>
         <autocomplete-input ref="autocompleteInput" 
         @open-sub-form="openSubFormSubmit" 
         @before-close="isShowSubFormSubmit = false" />
-        <date-picker ref="datePicker" />
-        <sym-drag-panel ref="symDragPanel" :showPanel="isShowSubFormSubmit" />
+        <sym-drag-panel ref="symDragPanel" :dragPanelWidth="840" :dragPanelHeight="600" v-if="!isQickSubmit" >
+            <template slot="drag-panel-content" >
+                <submitDocument :isQickSubmit="true" :docId="340"/>
+            </template>
+        </sym-drag-panel>
 
     </div>
 </template>
@@ -20,16 +23,25 @@ import { getInsertionCSS } from "./../../../components/document/documentUtil.js"
 import './../../../components/document/documentContent.css';
 import {setDataForPropsControl} from './../../../components/document/dataControl';
 import AutocompleteInput from './controlvalue/AutocompleteInput.vue'
-import DatePicker from './../../../components/common/DatePicker.vue'
 import Control from './control.js';
 import Table from './table.js';
-import SymperDragPanel from './../../../components/common/SymperDragPanel.vue'
+import SymperDragPanel from './../../../components/common/SymperDragPanel.vue';
+import {util} from './../../../plugins/util.js'
 export default {
+    props:{
+        isQickSubmit:{
+            type:Boolean,
+            default: false,
+        },
+        docId:{
+            type:Number,
+            default:0
+        }
+    },
     name:'submitDocument',
     components:{
         'control':Control,
         'autocomplete-input': AutocompleteInput,
-        'date-picker': DatePicker,
         'sym-drag-panel': SymperDragPanel
     },
     computed: {
@@ -46,7 +58,8 @@ export default {
             documentId:null,
             docSize:null,
             editorDoc:null,
-            isShowSubFormSubmit:false
+            isShowSubFormSubmit:false,
+            keyInstance:Date.now()
         }
     },
     beforeMount(){
@@ -56,13 +69,14 @@ export default {
         this.editorDoc = $('.sym-form-submit');
         
     },
-    watch:{
-        '$route' (to) {
-            this.documentId = to.params.id;
-        }
-    },
+    
     created(){
-        this.documentId = this.$route.params.id;
+        if(this.docId != 0){
+            this.documentId = this.docId
+        }
+        else{
+            this.documentId = this.$route.params.id;
+        }
         let thisCpn = this;
         documentApi.detailDocument(this.documentId).then(res => {
             if (res.status == 200) {
@@ -115,7 +129,7 @@ export default {
         },
         
         processHtml (content) {
-            var allInputControl = $('.sym-form-submit').find('.s-control:not(.bkerp-input-table .s-control)');
+            var allInputControl = $('#sym-submit-'+this.keyInstance).find('.s-control:not(.bkerp-input-table .s-control)');
             let thisCpn = this;
             for (let index = 0; index < allInputControl.length; index++) {
                 let id = $(allInputControl[index]).attr('id');
@@ -149,7 +163,8 @@ export default {
             }
         },
         openSubFormSubmit(){
-            this.isShowSubFormSubmit = true;
+            this.$refs.symDragPanel.$children[1].$refs.autocompleteInput.hide()
+            this.$refs.symDragPanel.show();
         }
     }
 }

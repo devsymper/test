@@ -80,4 +80,13 @@ export default {
     getProcessInstanceRuntimeHistory(id) {
         return bpmneApi.get(appConfigs.apiDomain.bpmne.history + '/historic-activity-instances?processInstanceId=' + id, {}, testHeader);
     },
+    getProcessInstance() {
+        return bpmneApi.get(appConfigs.apiDomain.bpmne.instances, {}, testHeader);
+    },
+    addTask(data) {
+        return bpmneApi.post(appConfigs.apiDomain.bpmne.tasks, data, testHeader);
+    },
+    getTask() {
+        return bpmneApi.get(appConfigs.apiDomain.bpmne.tasks, {}, testHeader);
+    }
 };

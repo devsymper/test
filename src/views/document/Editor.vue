@@ -64,17 +64,13 @@
                                 ed.ui.registry.addIcon(listIconToolbar[i].name,`<i class='mdi `+listIconToolbar[i].icon+`' style='font-size:18px;rgba(0, 0, 0, 0.54);'></i>`)
                             }
                         }
-                    }"
-                    ></editor>
+                    }">
+                </editor>
             </div>
-            </vue-resizable>
-
+        </vue-resizable>
         <div  class="sym-document__side-bar-right">
-           
-                <sidebar-right />
-            
+            <sidebar-right />
         </div>
-       
         <s-table-setting  ref="tableSetting" @add-columns-table="addColumnTable"/>
         <auto-complete-control ref="autocompleteControl" @add-control="insertControl"/>
         <save-doc-panel :documentProps="documentProps" ref="saveDocPanel" @save-doc-action="validateControl"/>
@@ -547,7 +543,7 @@ export default {
         // resize been phair editor thi set lại chiều rộng cho size bar right
         resizeEditor(e){
             let documentW = $(document).width();
-            $('.sym-document__side-bar-right').css({width:documentW - $('.v-navigation-drawer').width() - $('.sym-document__side-bar-left').width() - $('.sym-document-editor').width() +'px'})
+            $('.sym-document__side-bar-right').css({width: documentW - $('.v-navigation-drawer').width() - $('.sym-document__side-bar-left').width() - $('.sym-document-editor').width() +'px'})
         },
         resizeEditorStart(e){
             var $div = $('<div />').appendTo('.sym-document-body');

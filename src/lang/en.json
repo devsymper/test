@@ -18,10 +18,20 @@
         "export_excel": "Export Excel",
         "list": "List",
         "search": "Search",
+        "quickSearch": "Quick search",
         "list_config": "List config",
         "save": "Save",
         "snippets": "Snippets",
         "permissions": "Permissions",
+        "actions": "Actions package",
+        "apps": "Application Configuration",
+        "favorite": "Favorite",
+        "application": "Application",
+        "navigator": "Navigator",
+        "close": "Close",
+        "virtualdocs": "Virtualdocs",
+        "tasks": "Tasks",
+        "other": "Other",
         "deploy": "Deploy",
         "start": "Start",
         "name": "Name",
@@ -33,13 +43,17 @@
         "last_updated_by": "Last updated by",
         "statistics": "Statistics",
         "detail": "Detail",
-        "tracking": "Tracking"
+        "tracking": "Tracking",
+        "works": "Works",
+        "all_task": "All tasks",
+        "pendding_task": "Pendding tasks"
     },
     "validate": {
         "required": "Not be empty",
         "min_8": "Password required is greater than 8 characters",
         "max_24": "Password required for less than 24 characters",
-        "email": "Invalid email"
+        "email": "Invalid email",
+        "notValid": "This field is not valid"
     },
     "login": {
         "title": "Login system",
@@ -188,11 +202,38 @@
             "date_created": "Date"
         },
         "title": "Permissions packages",
-        "listObject": "List objects",
+        "actionControlSummary": "Action pack Summary",
+        "actionPack": "Action packs",
+        "grandPermission": "Grand permissions",
+        "addPermissionPack": "Add new permission packge",
+        "editPermissionPack": "Edit permission packge",
+        "apps": "Apps",
         "contextMenu": {
             "edit": "Edit",
             "grantPermission": "Grant Permission",
             "remove": "Remove"
+        },
+        "created": "Permission package created",
+        "deleted": "Permission package deleted",
+        "updated": "Permission package updated",
+        "listPermission": {
+            "1": "View detaIL",
+            "2": "View list",
+            "4": "Create/submit",
+            "8": "Edit",
+            "16": "Execute",
+            "32": "Delete",
+            "64": "Clone",
+            "128": "Export",
+            "256": "Import",
+            "512": "Import chunk",
+            "1024": "Lock user",
+            "2048": "Grant permission",
+            "4096": "Grant permisison in group",
+            "8192": "Deny",
+            "16384": "Printer configuration",
+            "32768": "View all controls",
+            "65536": "View allowed controls"
         }
     },
     "document": {
@@ -280,5 +321,161 @@
             "validate": "Validate",
             "save": "Save"
         }
+    },
+    "apps": {
+        "header": {
+            "id": "ID",
+            "name": "Name",
+            "note": "Note",
+            "icon": "Icon",
+            "price": "Price",
+            "status": "Status",
+            "created_at": "Date create",
+            "updated_at": "Last update"
+        },
+        "title": "Applications",
+        "pickIcon": "Pick icon",
+        "apps": "Applications",
+        "commonInfo": "General",
+        "listObjects": "Objects",
+        "addObject": "Add object",
+        "objectSummary": "Objects summary",
+        "contextMenu": {
+            "edit": "Edit",
+            "grantPermission": "Grant permission",
+            "remove": "Delete"
+        },
+        "updated": "Permission package updated",
+        "added": "Permission package created",
+        "deleted": "Permission package deleted",
+        "listActions": {
+            "document": {
+                "submit": "Submit",
+                "list": "View list",
+                "import": "Import",
+                "favorite": "Add to favorite",
+                "unfavorite": "Remove from favorite"
+            },
+            "dataflow": {
+                "detail": "Detail",
+                "execute": "Execute",
+                "list": "View list",
+                "favorite": "Add to favorite",
+                "unfavorite": "Remove from favorite"
+            },
+            "orgchart": {
+                "detail": "Detail",
+                "edit": "Edit",
+                "query": "Query",
+                "favorite": "Add to favorite",
+                "unfavorite": "Remove from favorite"
+            }
+        }
+    },
+    "actions": {
+        "header": {
+            "id": "ID",
+            "name": "Name",
+            "note": "Note",
+            "icon": "Icon",
+            "price": "Price",
+            "status": "Status",
+            "is_default": "Default Package",
+            "created_at": "Date create",
+            "updated_at": "Last update"
+        },
+        "title": "Applications",
+        "addAction": "Add Actions Package",
+        "editAction": "Edit Actions Package",
+        "pickIcon": "Pick icon",
+        "apps": "Applications",
+        "defaultPack": "Default pack",
+        "commonInfo": "General",
+        "listObjects": "Objects",
+        "addObject": "Add action",
+        "objectTypes": "Object type",
+        "objectSummary": "Action summary",
+        "contextMenu": {
+            "edit": "Edit",
+            "remove": "Delete"
+        },
+        "updated": "Permission package updated",
+        "added": "Permission package created",
+        "deleted": "Permission package deleted"
+    },
+    "iconPicker": {
+        "header": "Pick icon",
+        "selectImage": "Select image",
+        "tabs": {
+            "icon": "Icon",
+            "url": "Link",
+            "upload": "Upload"
+        }
+    },
+    "notification": {
+        "error": "Error occurred. Please try again later",
+        "errorTitle": "Error",
+        "successTitle": "Success"
+    },
+    "virtualdoc": {
+        "header": {
+            "id": "ID",
+            "name": "Name",
+            "description": "Description",
+            "updatetime": "Update at",
+            "lastestruntime": "Lastest run time (s)",
+            "lastestrunat": "Last run at",
+            "formula": "Formula",
+            "columnsorder": "Column Order"
+        },
+        "title": "List Virtualdocs",
+        "contextMenu": {
+            "edit": "Edit",
+            "add": "Add new",
+            "export": "Export data",
+            "execute": "Execute",
+            "Detail": "Detail",
+            "remove": "Remove"
+        },
+        "updated": "Virtualdoc updated",
+        "added": "Virtualdoc created",
+        "deleted": "Virtualdoc deleted",
+        "loadingData": "Please be patient. Your data is preparing.",
+        "noData": "This virtualdoc has no data yet",
+        "detailTitle": "List virtualdoc data",
+        "common": "Summary Info"
+    },
+    "sortBy": "Sort by",
+    "orderBy": "Order by",
+    "order": {
+        "ascending": "Ascending",
+        "descending": "Descending"
+    },
+    "tasks": {
+        "header": {
+            "date": "Date",
+            "dueDate": "Due Date",
+            "createDate": "Create date",
+            "description": "Task description",
+            "owner": "Task Owner",
+            "name": "Task name",
+            "assignee": "Assignee",
+            "watcher": "Watcher",
+            "participant": "Participant",
+            "id": "Seri"
+        },
+        "filterOptions": {
+            "all": "All task",
+            "myTask": "My task",
+            "myStaff": "My staff",
+            "assigned": "Assigned"
+        },
+        "taskTitle": "Task title",
+        "addSubtaskTitle": "Create new subtask",
+        "createTask": {
+            "title": "Create task"
+        },
+        "claim": "Claim",
+        "created": "Task created"
     }
 }

@@ -10,11 +10,16 @@ import BaView from "./views/layout/BAView";
 import EndUserView from "./views/layout/EndUserView";
 import ContentOnlyView from "./views/layout/ContentOnlyView";
 import Notifications from 'vue-notification'
+import VueMoment from "vue-moment";
+import moment from "moment-timezone";
 
 Vue.component('ba-view', BaView);
 Vue.component('end-user-view', EndUserView);
 Vue.component('content-only-view', ContentOnlyView);
 Vue.use(Notifications);
+Vue.use(VueMoment, {
+    moment,
+});
 /**
  * $evtBus : component chuyên chở các sự kiện giữa tất cả các component
  */

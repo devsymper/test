@@ -22,6 +22,7 @@
                             :disabled="loadingRefresh"
                             class="mr-2"
                             @click="addItem"
+                            v-if="!isCompactMode"
                         >
                             <v-icon left dark>mdi-plus</v-icon>
                             {{$t('common.add')}}
@@ -32,6 +33,7 @@
                             :loading="loadingRefresh"
                             :disabled="loadingRefresh"
                             class="mr-2"
+                            v-if="!isCompactMode"
                             @click="refreshList"
                         >
                             <v-icon left dark>mdi-refresh</v-icon>
@@ -43,10 +45,16 @@
                             :loading="loadingExportExcel"
                             class="mr-2"
                             :disabled="loadingExportExcel"
+                            v-if="!isCompactMode"
                         >
                             <v-icon left dark>mdi-microsoft-excel</v-icon>
                             {{$t('common.export_excel')}}
                         </v-btn>
+                        <component
+                            :is="'span'"
+                        >
+                            <slot name="extra-button"></slot>
+                        </component>
                         <v-tooltip top>
                             <template v-slot:activator="{ on }">
                                 <v-btn
@@ -177,6 +185,7 @@
 <script>
 import { HotTable } from "@handsontable/vue";
 import { util } from "./../../plugins/util.js";
+import Handsontable from 'handsontable';
 import FormTpl from "./FormTpl.vue";
 import { VDialog, VNavigationDrawer } from "vuetify/lib";
 import TableFilter from "./customTable/TableFilter.vue";
@@ -310,11 +319,11 @@ export default {
     },
     created() {
         let thisCpn = this;
-        this.$evtBus.$on("change-user-locale", locale => {
-            if (thisCpn.$refs.dataTable) {
-                thisCpn.$refs.dataTable.hotInstance.render();
-            }
-        });
+        // this.$evtBus.$on("change-user-locale", locale => {
+        //     if (thisCpn.$refs.dataTable) {
+        //         thisCpn.$refs.dataTable.hotInstance.render();
+        //     }
+        // });
         this.getData();
         this.restoreTableDisplayConfig();
     },
@@ -395,6 +404,10 @@ export default {
             type: String,
             default: "item"
         },
+        isCompactMode: {
+            type: Boolean,
+            default: false
+        },
         /**
          * Dùng Trong trường hợp mà gọi đến một API mà không thể thay đổi định dạng trả về của API đó  theo đúng với định dạng chung của ListItem 
          * định dạng: 
@@ -457,7 +470,7 @@ export default {
                         menuItem.length &&
                         menuItem[0].hasOwnProperty("callback")
                     ) {
-                        menuItem[0].callback(rowData, res => {
+                        menuItem[0].callback(JSON.parse(JSON.stringify(rowData)), res => {
                             if (res.status === 200) {
                                 thisCpn.getData();
                             }
@@ -554,6 +567,70 @@ export default {
         }
     },
     methods: {
+        // Datnt render image/icon, custom status, date
+        imgRenderer (instance, td, row, col, prop, value, cellProperties) {
+            let escaped = Handsontable.helper.stringify(value), img;
+            if (escaped.indexOf('mdi-') < 0) {
+                img = document.createElement('IMG');
+                img.src = value;
+                img.width = 40;
+            }
+            else {
+                img = document.createElement('I');
+                img.classList.add('v-icon');
+                img.classList.add('mdi');
+                img.classList.add('theme--light');
+                img.classList.add('title');
+                img.classList.add(escaped);
+                img.style.lineHeight = "15px";
+            }
+            Handsontable.dom.addEvent(img, 'mousedown', function (e){
+                e.preventDefault(); // prevent selection quirk
+            });
+            Handsontable.dom.empty(td);
+            td.appendChild(img);
+            return td;
+        },
+        statusRenderer (instance, td, row, col, prop, value, cellProperties) {
+            let escaped = Handsontable.helper.stringify(value), icon;
+            icon = document.createElement('I');
+            icon.classList.add('v-icon');
+            icon.classList.add('mdi');
+            icon.classList.add('theme--light');
+            icon.classList.add('subtitle-1');
+            icon.style.lineHeight = "15px";
+            if (escaped == 'true' || escaped == '1') {
+                icon.classList.add('mdi-check');
+                icon.classList.add('success--text');
+            }
+            else {
+                icon.classList.add('mdi-delete');
+            }
+            Handsontable.dom.addEvent(icon, 'mousedown', function (e){
+                e.preventDefault(); // prevent selection quirk
+            });
+            Handsontable.dom.empty(td);
+            td.appendChild(icon);
+            return td;
+        },
+        dateRenderer (instance, td, row, col, prop, value, cellProperties) {
+            let format = "";
+            for (const col of this.tableColumns) {
+                if (col.data == prop) {
+                    format = col.dateFormat != undefined ? col.dateFormat : "";
+                    break;
+                }
+            }
+            if (!!format) {
+                value = this.$moment(value).format(format)
+            }
+            let span = document.createElement('SPAN');
+            span.innerHTML = value;
+            span.style.color = 'blue';
+            Handsontable.dom.empty(td);
+            td.appendChild(span);
+            return td;
+        },
         bindToSearchkey(vl) {
             this.searchKey = vl;
         },
@@ -715,6 +792,7 @@ export default {
                         );
                         thisCpn.data = data.listObject;
                         thisCpn.handleStopDragColumn();
+                        thisCpn.$emit('data-get', data.listObject);
                     })
                     .catch(err => {
                         console.warn(err);
@@ -826,8 +904,29 @@ export default {
                         editor: false,
                         symperFixed: false,
                         symperHide: false,
-                        columnTitle: item.title
+                        columnTitle: item.title,
                     };
+                    // Render image - icon
+                    if (item.type === 'image') {
+                        colMap[item.name].type = 'handsontable';
+                        colMap[item.name].renderer = this.imgRenderer;
+                    } else if (item.type === 'status') {
+                        colMap[item.name].type = 'handsontable';
+                        colMap[item.name].renderer = this.statusRenderer;
+                    } else if (item.type === 'checkbox') {
+                        colMap[item.name].checkedTemplate = item.checkedValue != undefined ? item.checkedValue : 1;
+                        colMap[item.name].uncheckedTemplate = item.uncheckedValue != undefined ? item.uncheckedValue : 0;
+                    } else if(item.type === 'numeric' && item.hasFormat != undefined) {
+                        colMap[item.name].numericFormat = {
+                            pattern: item.pattern != undefined && !!item.pattern ? item.pattern : "0,0"
+                        };
+                    } else if((item.type.indexOf('date') === 0)) {
+                        if (item.hasFormat != undefined) {
+                            colMap[item.name].dateFormat = item.pattern != undefined && !!item.pattern ? item.pattern : "MM/DD/YYYY";
+                            colMap[item.name].correctFormat = true;
+                        }
+                        colMap[item.name].renderer = this.dateRenderer;
+                    }
                 }
             }
 

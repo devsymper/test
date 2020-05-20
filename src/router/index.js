@@ -13,12 +13,17 @@ import ShowListService from "../views/service/ShowList.vue";
 import ActionPanel from "../views/users/ActionPanel.vue";
 import Snippet from "../views/snippets/index.vue";
 import Permissions from "../views/permissions/index.vue";
-import PermissionsInListView from "../views/permissions/listView.vue";
+import apps from "../views/apps/index.vue";
+import actions from "../views/actions/index.vue";
+import virtualdocs from "../views/virtualdocs/index.vue";
+import tasks from "../views/tasks/index.vue";
+import application from "../views/apps/yourApp.vue";
 import Editor from "../views/document/Editor.vue";
 import SubmitDocument from "../views/document/submit/Submit.vue";
 import DeployHistory from "../views/process/DeployHistory.vue";
 import ProcessInstances from "../views/process/ProcessInstances.vue";
 import TrackingProcessInstance from "../views/process/TrackingProcessInstance.vue";
+import WorkList from "../views/works/WorkList.vue";
 
 Vue.use(VueRouter);
 /**
@@ -147,24 +152,34 @@ const routes = [{
         component: Permissions,
     },
     {
-        path: "/permissions2",
-        name: "permissions2",
-        component: PermissionsInListView,
+        path: "/apps",
+        name: "apps",
+        component: apps,
     },
     {
-        path: "/permissions/add",
-        name: "addPermissions",
-        component: Permissions,
+        path: "/application",
+        name: "application",
+        component: application,
     },
     {
-        path: "/permissions/:id",
-        name: "detailPermissions",
-        component: Permissions,
+        path: "/actions",
+        name: "actions",
+        component: actions,
     },
     {
-        path: "/permissions/edit/:id",
-        name: "editPermissions",
-        component: Permissions,
+        path: "/virtualdocs",
+        name: "virtualdocs",
+        component: virtualdocs,
+    },
+    {
+        path: "/tasks",
+        name: "tasks",
+        component: tasks,
+    },
+    {
+        path: "/works",
+        name: "workList",
+        component: WorkList,
     },
 
     // Luôn để 2 item này ở cuối cùng của array này để nó có thể redirect đến được trang 404 khi ko tìm thấy route

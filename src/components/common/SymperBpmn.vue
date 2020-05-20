@@ -1,6 +1,9 @@
 <template>
     <!--Symper Vue componet cho việc sử dụng thư viện bpmn.io -->
-    <div class="containers h-100 w-100" ref="content">
+    <div :class="{
+            'containers h-100 w-100': true,
+            'hide-process-palette': readOnly 
+        }" ref="content">
         <div class="symper-bpm-canvas h-100" ref="canvas"></div>
         <a ref="downloadLinkXML" href></a>
         <a ref="downloadLinkSVG" href></a>
@@ -28,7 +31,13 @@ export default {
             default(){
                 return [];
             }
-        }
+        },
+        readOnly: {
+            type: Boolean,
+            default(){
+                return false;
+            }
+        }, 
     },
     data: function() {
         return {
@@ -89,7 +98,7 @@ export default {
                 self.handleClickOnModeller(event);
             });
             this.bpmnModeler.on("element.click", evt => {
-                this.$emit("node-clicked", getBusinessObject(evt.element));
+                this.$emit("node-clicked", getBusinessObject(evt.element), evt);
             });
 
             this.bpmnModeler.on("element.changed", evt => {

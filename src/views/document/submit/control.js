@@ -157,6 +157,7 @@ export default class Control {
         if (isDetailView) return;
         this.ele.attr('autocomplete', "off");
         this.ele.attr('type', 'text');
+        this.ele.addClass('mdi mdi-car-arrow-left')
         this.ele.on('click', function(e) {
             SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-input', e)
             $(this).addClass('autocompleting')

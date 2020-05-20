@@ -1,5 +1,8 @@
 <template>
-    <v-card v-show="isShowAutoComplete" class="card-autocomplete" :style="positionBox">
+    <v-card 
+    :id="'autocomplete-control-'+key"
+    v-show="isShowAutoComplete" 
+    class="card-autocomplete" :style="positionBox">
         <v-data-table
         :headers="headers"
         :items="dataTable"
@@ -29,6 +32,7 @@
 export default {
     data () { 
         return {
+            key:Date.now(),
             isShowAutoComplete:false,
             positionBox:{'top':0,'left':0},
             search: '',
@@ -100,56 +104,54 @@ export default {
     created(){
         let thisCpn = this;
         this.$evtBus.$on('document-submit-autocomplete-input-change',e=>{
-            console.log(e.keyCode);
+            console.log('sssssssssssssssssssssssssss');
             
-            if(e.keyCode == 38){    //len
-                let rowActive = thisCpn.dataTable.filter(row=>{
-                    return row.active === true
-                });
-                if(rowActive.length>0){
-                    let index = thisCpn.dataTable.indexOf(rowActive[0]);
-                    if(index == 0){
-                        return false;
-                    }
-                    rowActive[0].active = false;
-                    if(index > 0){
-                        Vue.set(thisCpn.dataTable[index - 1], 'active', true);
+            // if(e.keyCode == 38){    //len
 
-                    }
-                }
-            }   
-            else if(e.keyCode == 40){
-                let rowActive = thisCpn.dataTable.filter(row=>{
-                    return row.active === true
-                });
-                if(rowActive.length>0){
-                    let index = thisCpn.dataTable.indexOf(rowActive[0]);
-                    if(index == thisCpn.dataTable.length - 1){
-                        return false;
-                    }
-                    rowActive[0].active = false;
+            //     let rowActive = thisCpn.dataTable.filter(row=>{
+            //         return row.active === true
+            //     });
+            //     if(rowActive.length>0){
+            //         let index = thisCpn.dataTable.indexOf(rowActive[0]);
+            //         if(index == 0){
+            //             return false;
+            //         }
+            //         rowActive[0].active = false;
+            //         if(index > 0){
+            //             Vue.set(thisCpn.dataTable[index - 1], 'active', true);
+
+            //         }
+            //     }
+            // }   
+            // else if(e.keyCode == 40){
+            //     console.log($('#autocomplete-control-'+this.key+' .active-row'));
+                
+            //     let rowActive = thisCpn.dataTable.filter(row=>{
+            //         return row.active === true
+            //     });
+            //     if(rowActive.length>0){
+            //         let index = thisCpn.dataTable.indexOf(rowActive[0]);
+            //         if(index == thisCpn.dataTable.length - 1){
+            //             return false;
+            //         }
+            //         rowActive[0].active = false;
                     
-                    if(index < thisCpn.dataTable.length){
-                        Vue.set(thisCpn.dataTable[index + 1], 'active', true);
-                    }
-                }
-            }
-            else if(e.keyCode == 13){
-                let rowActive = thisCpn.dataTable.filter(row=>{
-                    return row.active === true
-                });
-                thisCpn.handleClickRow(rowActive[0])
-            }
+            //         if(index < thisCpn.dataTable.length){
+            //             Vue.set(thisCpn.dataTable[index + 1], 'active', true);
+            //         }
+            //     }
+            // }
+            // else if(e.keyCode == 13){
+            //     let rowActive = thisCpn.dataTable.filter(row=>{
+            //         return row.active === true
+            //     });
+            //     thisCpn.handleClickRow(rowActive[0])
+            // }
             
             
         });
     },
-    mounted(){
-        $('.card-autocomplete').on('keyup',function(){
-            console.log('sssssssssssss');
-            
-        })
-    },
+    
     methods:{
         show(e){
             this.isShowAutoComplete = true;
@@ -174,14 +176,17 @@ export default {
             rowActive[0].active = false;
             item.active = true;
             $('.autocompleting').val(name);
-            $('.autocompleting').removeClass('autocompleting')
-            this.hide()
+            $('.autocompleting').removeClass('autocompleting');
+            this.hide();
             
             
         },
        
         openSubForm(){
+            this.hide();
+            $('.autocompleting').removeClass('autocompleting');
             this.$emit('open-sub-form');
+
         }
     }
 }

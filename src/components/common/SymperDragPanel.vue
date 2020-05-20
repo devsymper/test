@@ -1,19 +1,21 @@
 <template>
     <div
         ref="symperDragPanel"
-        v-show="showPanel"
+        v-show="selfShowPanel"
         class="symper-drag-panel elevation-12"
         :style="{
             width:dragPanelWidth+'px',
-            height: dragPanelHeight+'px'
+            height: dragPanelHeight+'px',
+            top: topPosition+'px',
+            left: leftPosition+'px'
         }">
         <div class="position-relative w-100 h-100">
             <div class="pa-2 symper-drag-panel-header" style="height:30px">
                 <span class="float-left pl-2 drag-panel-title">
-                    {{actionTitle}}
+                    <i :class="'mr-2 mdi '+titleIcon" v-if="titleIcon != ''"></i>{{actionTitle}}
                 </span>
                 <v-icon
-                    @click="handleClosePanel"
+                    @click="hide"
                     class="close-btn float-right"
                     style="font-size:16px;position: relative;top: -3px;"
                 >mdi-close</v-icon>
@@ -35,11 +37,14 @@ window.dragElement = function(elmnt) {
         pos3 = 0,
         pos4 = 0;
     if (document.getElementById(elmnt.id + "header")) {
+        console.log('keo');
+        
         // if present, the header is where you move the DIV from:
         document.getElementById(
             elmnt.id + "header"
         ).onmousedown = dragMouseDown;
     } else {
+         console.log('keo');
         // otherwise, move the DIV from anywhere inside the DIV:
         elmnt.onmousedown = dragMouseDown;
     }
@@ -99,29 +104,42 @@ export default {
         },
         panelData: {
             type: Object,
-            default: {}
-        }
-    },
-    watch: {
-        showPanel() {
-            if (this.showPanel) {
-                setTimeout(
-                    self => {
-                        dragElement(self.$refs.symperDragPanel);
-                    },
-                    200,
-                    this
-                );
+            default(){
+                return {}
             }
+        },
+        topPosition: {
+            type: Number,
+            default: 100
+        },
+        leftPosition: {
+            type: Number,
+            default: 300
+        },
+        titleIcon: {
+            type: String,
+            default: ''
         }
     },
+    
     data(){
         return {
-            selfShowPanel: false
+            selfShowPanel: null
         }
     },
+    beforeMount(){
+        this.selfShowPanel = false;
+    },
+    mounted(){
+        setTimeout(() => {
+            dragElement(self.$refs.symperDragPanel);
+        }, 200);
+    },
     methods: {
-        handleClosePanel() {
+        show(){
+            this.selfShowPanel = true;
+        },
+        hide() {
             this.$emit('before-close',{});
             this.selfShowPanel = false;
         },
@@ -150,9 +168,7 @@ export default {
 .symper-drag-panel {
     position: fixed;
     overflow: hidden;
-    top: 100px;
-    left: 300px;
-    z-index: 99999;
+    z-index: 500;
     background-color: white;
     border-radius: 3px;
 }
@@ -164,6 +180,7 @@ export default {
 
 .symper-drag-panel .symper-drag-panel-body {
     height: calc(100% - 30px);
+    overflow: auto;
 }
 
 .drag-panel-title {

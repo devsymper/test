@@ -1,3 +1,11 @@
+html {
+    overflow-x: hidden;
+    overflow-y: hidden;
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+}
+
 .symper-bg-orange {
     background-color: #f58634!important;
 }
@@ -29,8 +37,24 @@
     display: inline-block;
 }
 
+.fs-14 {
+    font-size: 14px;
+}
+
+.fs-15 {
+    font-size: 15px;
+}
+
 .fs-10 {
     font-size: 10px;
+}
+
+.lh-initial {
+    line-height: initial;
+}
+
+.fs-12 {
+    font-size: 12px;
 }
 
 .fs-11 {
@@ -115,6 +139,13 @@
     margin-right: 4px!important;
 }
 
+.bg-grey .v-input__slot,
+.bg-grey.v-input.v-textarea .v-input__control,
+.bg-grey.v-input.v-textarea .v-input__control .v-input__slot,
+.bg-grey .v-input__control {
+    background: #f5f5f5 !important;
+}
+
 .sym-small-size.v-input--switch .v-messages,
 .sym-small-size.v-input--checkbox .v-messages {
     display: none;
@@ -161,6 +192,102 @@
     font-size: 17px!important;
     position: relative!important;
     margin-top: 0px!important;
+}
+
+.compact-input .v-input__control .v-input__slot {
+    position: relative;
+}
+
+.compact-input .v-input__control .v-input__slot .v-text-field__slot {
+    position: absolute;
+    left: -110px;
+    background: #f5f5f5;
+    height: 28px;
+    top: 0;
+    border-radius: 3px;
+}
+
+.tbl-no-border table tr td {
+    border-bottom: 0 !important;
+    padding-top: 2px !important;
+    padding-bottom: 2px !important;
+}
+
+.tbl-no-border .v-data-footer {
+    border-top: 0 !important;
+}
+
+.tbl-no-border table tr td,
+.tbl-no-border table tr,
+.tbl-no-border table tbody,
+.tbl-no-border table {
+    border-bottom: 0 !important;
+}
+
+.tbl-no-border table thead th {
+    color: #333 !important;
+}
+
+.compact-input .v-input__control .v-input__slot .v-text-field__slot input:not(:focus) {
+    width: 0;
+    opacity: 0;
+}
+
+.compact-input .v-input__control .v-input__slot .v-text-field__slot input:focus {
+    padding-left: 5px !important;
+    opacity: 1;
+}
+
+.sym-small-pad .v-input__control .v-input__slot,
+.sym-small-pad .v-input__control .v-input__slot {
+    padding-left: 5px !important;
+    padding-right: 5px !important;
+}
+
+.fz-13 {
+    font-size: 13px !important;
+}
+
+.h-30 {
+    height: 30px !important;
+}
+
+.v-chip.text-truncate .v-chip__content {
+    display: inline-block;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    margin-top: 2px;
+    font-size: 13px;
+}
+
+.compact-input.sym-small-pad {
+    min-width: 25px;
+    position: relative;
+}
+
+.compact-input.sym-small-pad .v-input__control {
+    position: absolute;
+    top: -18px;
+}
+
+.sym-small-pad .v-input__control .v-input__slot .v-select__selections input {
+    padding: 0 !important;
+    width: 0;
+    opacity: 0;
+}
+
+.sym-small-pad .v-input__control .v-input__slot .v-select__selection--comma {
+    margin-right: 0;
+}
+
+.sym-small-pad .v-input__control .v-input__slot .v-input__append-inner {
+    padding-left: 0;
+}
+
+.sym-small-pad .v-input__control .v-input__slot .v-input__icon {
+    min-width: 10px;
+    width: 10px;
 }
 
 
@@ -411,4 +538,33 @@
 
 .v-overlay .v-overlay--absolute {
     z-index: 200!important;
+}
+
+.btn-fixed-bottom {
+    position: fixed;
+    bottom: 10px;
+    right: 20px;
+    z-index: 1000;
+}
+
+.right-100 {
+    right: 230px;
+}
+
+.label {
+    font-size: 13px;
+    text-shadow: 0 0 0;
+}
+
+.sym-small-lineheight .v-input__control .v-input__slot .v-text-field__slot textarea {
+    line-height: 18px !important;
+}
+
+.sym-pad-0 .v-input__slot {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+
+.hide-process-palette .djs-palette {
+    display: none!important;
 }
