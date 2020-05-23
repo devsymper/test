@@ -47,7 +47,8 @@
         "tracking": "Tracking",
         "works": "Works",
         "all_task": "All tasks",
-        "pendding_task": "Pendding tasks"
+        "pendding_task": "Pendding tasks",
+        "have_no_data": "Have no data"
     },
     "validate": {
         "required": "Not be empty",

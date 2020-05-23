@@ -35,7 +35,9 @@
                 ></i>
             </div>
             <component
-                @change="handleChangeInputValue(inputInfo, name)"
+                @change="(data) => {
+                    handleChangeInputValue(inputInfo, name,data);
+                }"
                 :ref="'inputItem_'+name"
                 solo
                 :items="inputInfo.options"
@@ -110,6 +112,7 @@ import SymperDragPanel from "./SymperDragPanel";
 import SymperUserAssignment from "./SymperUserAssignment";
 import OrgchartSelector from "./../user/OrgchartSelector";
 import SymperListOrdering from "./../common/symperInputs/SymperListOrdering";
+import SymperListAutocomplete from "./../common/symperInputs/SymperListAutocomplete";
 
 const inputTypeConfigs = {
     numeric: {
@@ -200,12 +203,16 @@ const inputTypeConfigs = {
         }
     },
     autocomplete: {
-        tag: "v-select",
+        tag: "SymperListAutocomplete",
         props(config) {
-            return {
+            let props = {
                 columns: config.columns,
-                data: config.value
+                data: config.value,
             };
+            if(config.onSearch){
+                props.onSearch  = config.onSearch;
+            }
+            return props;
         }
     },
     ordering: {
@@ -302,13 +309,13 @@ export default {
                 this.translateTagsToOrgchartValues()
             }
         },
-        handleChangeInputValue(inputInfo, name) {
+        handleChangeInputValue(inputInfo, name, data) {
             /**
              * emit sự kiện thay đổi giá trị của một input trong form
              * name: tên của input này
              * inputInfo: chứa các thông tin về input
              */
-            this.$emit("input-value-changed", name, inputInfo);
+            this.$emit("input-value-changed", name, inputInfo, data);
         },
         getInputProps(inputConfigs) {
             let rsl = inputTypeConfigs[inputConfigs.type].props(inputConfigs);
@@ -397,7 +404,8 @@ export default {
         SymperDragPanel,
         "symper-user-assginment": SymperUserAssignment,
         "orgchart-selector": OrgchartSelector,
-        SymperListOrdering: SymperListOrdering
+        SymperListOrdering: SymperListOrdering,
+        SymperListAutocomplete
     }
 };
 </script>

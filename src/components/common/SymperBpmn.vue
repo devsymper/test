@@ -59,6 +59,7 @@ export default {
     },
     watch: {
         diagramXML: function(val) {
+            debugger
             let self = this;
             if (this.delayLoadView) {
                 clearTimeout(this.delayLoadView);

@@ -1,66 +1,133 @@
 <template>
-    <draggable
-        class="list-group"
-        tag="div"
-        v-model="value"
-        v-bind="dragOptions"
-        @start="dragging = true"
-        @end="handleStopDragItem"
+    <v-autocomplete
+        v-model="myValue"
+        :items="myItems"
+        :loading="isLoading"
+        :search-input.sync="search"
+        chips
+        clearable
+        hide-details
+        hide-selected
+        :item-text="textKey"
+        dense
+        :item-value="valueKey"
+        solo
+        @change="applyChangeValue"
     >
-        <transition-group type="transition" :name="!dragging ? 'flip-list' : null">
-            <div class="fs-13 p-2" v-for="(item,idx) in value" :key="idx">
-                <v-icon size="18" class="mr-2" v-if="item.preIcon">{{item.preIcon}}</v-icon>
-                <span class="fs-13" X>{{item.text}}</span>
-                <v-icon size="18" class="mr-2 float-right" v-if="item.subIcon">{{item.subIcon}}</v-icon>
+        <template v-slot:no-data>
+            <div>{{$t('common.have_no_data')}}</div>
+        </template>
+
+        <!-- Kiểu 1: mainAndSub -->
+        <template v-slot:selection="{ attr, on, item, selected }">
+            <v-chip
+                v-bind="attr"
+                :input-value="selected"
+                color="grey lighten-3"
+                class="fs-13"
+                v-on="on"
+            >
+                <span v-text="item.id " class="mr-2 font-weight-medium"></span>
+                <span v-text="item.title ? item.title : item.name"></span>
+            </v-chip>
+        </template>
+        <template v-slot:item="{ item }">
+            <div class="pa-2 font-weight-medium">
+                <div class="d-flex fs-13">
+                    <span v-text="item.id" class="mr-2"></span>
+                    <span v-text="item.name"></span>
+                </div>
+                <div class="w-100 fs-12 text--grey">
+                    <span v-text="item.title"></span>
+                </div>
             </div>
-        </transition-group>
-    </draggable>
+        </template>
+    </v-autocomplete>
 </template>
 
 <script>
+import { util } from "../../../plugins/util";
 export default {
     props: {
-        /**
-         * mảng cần sắp xếp, có dạng
-         * [
-         *      {
-         *          text: '',
-         *          preIcon: '',
-         *          subIcon: ''
-         *      }
-         * ]
-         */
         value: {
+            type: String,
+            default: ""
+        },
+        items: {
             type: Array,
-            default() {
-                return [];
+            default(){
+                return []
             }
+        },
+        textKey: {
+            // key trong object chứa text để hiển thị lên ô input sau khi chọn được giá trị
+            type: String,
+            default: "title"
+        },
+        valueKey: {
+            // key trong object chứa text để giá trị gán cho component
+            type: String,
+            default: "id"
+        },
+        onSearch: {
+            // hàm xử lý khi input
+            default: false
         }
     },
     computed: {
-        valueClone: {
-            get() {
-                return this.value;
-            },
-            set(vl) {
-                this.$emit("input", vl);
+        itemClone() {
+            return util.cloneDeep(this.items);
+        },
+    },
+    watch: {
+        items: {
+            deep: true,
+            immediate: true,
+            handler: function(after, before){
+                this.myItems = util.cloneDeep(after);
+            }
+        },
+        value: {
+            deep: true,
+            immediate: true,
+            handler: function(after, before){
+                this.myValue = after;
+            }
+        },
+
+        search(){
+            let val = this.search;
+            if(!this.onSearch){
+                this.myItems = this.myItems.filter((el, idx) => {
+                    if (
+                        String(el.id).includes(val) ||
+                        String(el.name).includes(val) ||
+                        String(el.title).includes(val)
+                    ) {
+                        return true;
+                    }
+                    return false;
+                });
+            }else{
+                this.onSearch(val, this);
             }
         }
     },
     data() {
         return {
-            dragging: false,
-            dragOptions: {
-                animation: 200,
-                group: "list-item-orderring",
-                disabled: false,
-                ghostClass: "ghost-item"
-            }
+            isLoading: false,
+            search: '',
+            myItems: [],
+            myValue: ''
         };
     },
     methods: {
-        handleStopDragItem() {
-            this.dragging = false;
+        applyChangeValue(vl){
+            this.$emit('input', vl);
+            this.$emit('change', { // có thêm items là để set lại danh sách các option trong trường hợp load data từ server
+                value: vl,
+                items: this.myItems
+            });
         }
     }
 };

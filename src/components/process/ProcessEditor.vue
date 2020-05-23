@@ -102,7 +102,7 @@ const nodeDataTpl = {
     childShapes: [],
     stencil: {
         id: ""
-    },
+    }
 };
 
 //Do có một số khác biệt giữa tên gọi các node giữa thư viện đang dùng và  Map giữa tên các node của thư viện sang tên các node của flowable
@@ -113,7 +113,8 @@ const mapLibNameToFlowableName = {
     EndEvent: "EndNoneEvent",
     AdHocSubProcess: "AdhocSubProcess",
     Process: "BPMNDiagram",
-    Collaboration: "BPMNDiagram"
+    Collaboration: "BPMNDiagram",
+    Task: "UserTask"
 };
 
 export default {
@@ -199,11 +200,14 @@ export default {
                     this.createNodeData(bnode.id, nodeType);
                 }
                 let nodeData = this.$store.state.process.allNodes[bnode.id];
-                if (!nodeData.attrs.name.value) {
-                    if(nodeData.attrs.overrideid){
-                        nodeData.attrs.name.value = nodeData.attrs.overrideid.value;
-                    }else if(nodeData.attrs.process_id){
-                        nodeData.attrs.name.value = nodeData.attrs.process_id.value;
+                if (!nodeData.attrs.name.value && nodeType == "UserTask") {
+                    // Nếu user task chưa có name thì tự động thêm name vào cho node đó
+                    if (nodeData.attrs.overrideid) {
+                        nodeData.attrs.name.value =
+                            nodeData.attrs.overrideid.value;
+                    } else if (nodeData.attrs.process_id) {
+                        nodeData.attrs.name.value =
+                            nodeData.attrs.process_id.value;
                     }
                 }
             }
@@ -263,11 +267,13 @@ export default {
                 newversion: false,
                 comment: "",
                 // lastUpdated: new Date().toISOString().replace("Z", "+0000")
-                lastUpdated: self.lastUpdated ? self.lastUpdated : new Date().toISOString().replace("Z", "+0000")// chỗ này đang lách qua việc validate của backend. cần xem lại
+                lastUpdated: self.lastUpdated
+                    ? self.lastUpdated
+                    : new Date().toISOString().replace("Z", "+0000") // chỗ này đang lách qua việc validate của backend. cần xem lại
             };
             bpmnApi
                 .updateModel(diData, idModel)
-                .then((res) => {
+                .then(res => {
                     self.$snotifySuccess("Process model saved");
                     self.lastUpdated = res.lastUpdated;
                 })
@@ -319,15 +325,13 @@ export default {
             }
 
             // tạo outgoing cho các node là  gốc của mũi tên
-            for(let bnode of allBNodes){
+            for (let bnode of allBNodes) {
                 if (bnode.sourceRef) {
                     let nodeData = mapSaveNodes[bnode.sourceRef.id];
-                    if(!nodeData.outgoing){
+                    if (!nodeData.outgoing) {
                         nodeData.outgoing = [];
                     }
-                    nodeData.outgoing.push(
-                        { resourceId: bnode.id }
-                    );
+                    nodeData.outgoing.push({ resourceId: bnode.id });
                 }
             }
 
@@ -347,9 +351,20 @@ export default {
 
             return di;
         },
+        getDefaultDocker(bnode) {
+            let allNodes = this.$store.state.process.allNodes;
+            let startNode = allNodes[bnode.sourceRef.id];
+            let endNode = allNodes[bnode.targetRef.id];
+
+            return [
+                nodeAttrsDefinition[startNode.type].docker,
+                nodeAttrsDefinition[endNode.type].docker
+            ];
+        },
         // Lấy các dữ liệu của sequence flow
         getSaveDataForSequenceFlow(bnode) {
             let nodeData = util.cloneDeep(nodeDataTpl);
+            let defaultDockers = this.getDefaultDocker(bnode);
             nodeData.stencil.id = "SequenceFlow";
             nodeData.resourceId = bnode.id;
 
@@ -363,16 +378,16 @@ export default {
             };
             nodeData.properties = this.getNodeProperties(bnode.id);
             nodeData.bounds = this.getNodeBounds(bnode);
-            nodeData.dockers = [
-                {
-                    x: 0,
-                    y: 0
-                },
-                {
-                    x: 0,
-                    y: 0
-                }
-            ];
+
+            nodeData.dockers = defaultDockers;
+            if (bnode.di.waypoint.length > 2) {
+                let dockers = bnode.di.waypoint.filter((ele, idx, arr) => {
+                    return idx > 0 && idx < arr.length - 1;
+                });
+                dockers.unshift(defaultDockers[0]);
+                dockers.push(defaultDockers[1]);
+                nodeData.dockers = dockers;
+            }
             return nodeData;
         },
         getNodeBounds(bnode) {
@@ -407,18 +422,18 @@ export default {
             let props = {};
             let sNodeAttrs = this.$store.state.process.allNodes[idNode];
 
-            
             for (let key in sNodeAttrs.attrs) {
                 let attr = sNodeAttrs.attrs[key];
                 if (attr) {
-                    if(allNodesAttrs[key]){
+                    if (allNodesAttrs[key]) {
                         if (allNodesAttrs[key].hasOwnProperty("getValue")) {
-                            props[key] = allNodesAttrs[key].getValue(attr.value);
+                            props[key] = allNodesAttrs[key].getValue(
+                                attr.value
+                            );
                         } else {
                             props[key] = attr.value;
                         }
-                    }else{
-                        
+                    } else {
                         console.warn(
                             key + " not found in allNodesAttrs",
                             key,
@@ -504,22 +519,43 @@ export default {
             }
             this.$store.commit("process/addNewNode", newNodeData);
         },
-        /** Xử lý các sự kiện khi có sự thay đổi giá trị của các input trong panel cấu hình bên phải **/
-        handleAttrValueChanged(name, inputInfo) {
+        /** Xử lý các sự kiện khi có sự thay đổi giá trị của các input trong panel cấu hình bên phải
+         * data là giá trị sau thay đổi của một input trong formtpl
+         *  **/
+        handleAttrValueChanged(name, inputInfo, data) {
             let type = this.selectingNode.type;
             let typeData = nodeAttrsDefinition[type];
+            let attrs = this.selectingNode.attrs;
+            let reApplyToView = {
+                name: "name",
+                process_id: "id",
+                overrideid: "id"
+            };
+
+            if (name == "overrideid" || name == "process_id") {
+                attrs[name].value = util.str.nonAccentVietnamese(
+                    attrs[name].value
+                );
+            }
 
             if (typeData.checkShowOrHideInput) {
-                typeData.checkShowOrHideInput(this.selectingNode.attrs);
+                typeData.checkShowOrHideInput(attrs);
             }
 
             if (typeData.validate) {
-                typeData.validate(this.selectingNode.attrs);
+                typeData.validate(attrs);
             }
-            if (name == "name") {
+
+            if (typeData.specificHandler) {
+                typeData.specificHandler(attrs, data);
+            }
+
+            if (reApplyToView[name]) {
+                let applyValue = {};
+                applyValue[reApplyToView[name]] = inputInfo.value;
                 this.$refs.symperBpmn.updateElementProperties(
                     this.$store.state.process.selectingNode.id,
-                    { name: inputInfo.value }
+                    applyValue
                 );
             }
         },
@@ -552,7 +588,7 @@ export default {
             if (nodeData.attrs.overrideid) {
                 nodeData.attrs.overrideid.value = nodeId;
             }
-            
+
             this.$store.commit("process/addNewNode", nodeData);
             return nodeData;
         },
@@ -566,11 +602,11 @@ export default {
             let nodeData = this.getNodeData(node.id, type);
             nodeData.name = node.name;
             nodeData.attrs.name.value = node.name;
-            if(nodeData.attrs.process_id){
+            if (nodeData.attrs.process_id) {
                 nodeData.attrs.process_id.value = node.id;
             }
 
-            if(nodeData.attrs.overrideid){
+            if (nodeData.attrs.overrideid) {
                 nodeData.attrs.overrideid.value = node.id;
             }
             this.$store.commit("process/changeSelectingNode", nodeData);
@@ -626,7 +662,7 @@ export default {
             let idEle = ele.resourceId;
             if (ele.modelId) {
                 // Nếu đây là phần tử root của cây
-                idEle = "Collaboration";
+                idEle = ele.properties.process_id;
             }
             let eleType = ele.stencil ? ele.stencil.id : "BPMNDiagram";
             let nodeData = this.createNodeData(idEle, eleType);
@@ -652,6 +688,9 @@ export default {
                         );
                     }
                 }
+                nodeAttrsDefinition[eleType].checkShowOrHideInput(
+                    nodeData.attrs
+                );
             }
 
             rsl[idEle] = nodeData;
@@ -719,7 +758,7 @@ export default {
                     text: "process.header_bar.validate"
                 }
             },
-            diagramXML: defaultXML
+            diagramXML: defaultXML.replace(/\n/g, "")
         };
     },
     components: {
@@ -765,7 +804,8 @@ export default {
                             'không tìm thấy định nghĩa của group "' +
                                 groupName +
                                 '" trong allAttrDisplayGroup',
-                            currentAtts, attrName
+                            currentAtts,
+                            attrName
                         );
                     }
                 }

@@ -16,16 +16,36 @@ const groupsAttrs = {
     gateway: ["asynchronousdefinition", "exclusivedefinition", "sequencefloworder"]
 }
 
+const dockerGroups = {
+    task: {
+        x: 50,
+        y: 40
+    },
+    event: {
+        x: 15,
+        y: 15
+    },
+    subProcess: {
+        x: 148,
+        y: 92.5
+    },
+    gateway: {
+        x: 20.5,
+        y: 20.5
+    },
+};
 
 // Định nghĩa danh sách các thuộc tính của node
 export const nodeAttrsDefinition = {
     'UserTask': {
         group: 'task', // nhóm thuộc tính mà node này thuộc về, giá trị là một hoặc nhiều key trong "groupsAttrs"
-        // attrs: ['taskAction', 'formReference', 'formkeydefinition', 'taskOwner', 'assignee', 'candidateUsers', 'notificationTitle', 'notificationContent', 'formfieldvalidation', 'prioritydefinition', 'taskListeners', 'skipexpression', 'category', 'approvalActions', 'approvalForElement', 'duedatedefinition'],
         attrs: ['taskAction', "usertaskassignment", 'taskOwner', 'assignee', 'candidateUsers', 'notificationTitle', 'notificationContent', "formkeydefinition", "formreference", "formfieldvalidation", "duedatedefinition", "prioritydefinition", 'approvalActions', 'approvalForElement', "formproperties", "tasklisteners", "skipexpression", "categorydefinition"],
         exclude: ['asynchronousdefinition', 'exclusivedefinition'],
         validate: function(attrs) {
 
+        },
+        specificHandler(attrs, data) {
+            attrs.formreference.options = data.items;
         },
         checkShowOrHideInput: function(attrs) {
             let taskAction = attrs.taskAction;
@@ -38,7 +58,8 @@ export const nodeAttrsDefinition = {
                 attrs.formreference.hidden = true;
                 attrs.approvalForElement.hidden = false;
             }
-        }
+        },
+        docker: dockerGroups.task
     },
     'ScriptTask': {
         group: 'task', // nhóm thuộc tính mà node này thuộc về, giá trị là một hoặc nhiều key trong "groupsAttrs"
@@ -48,7 +69,8 @@ export const nodeAttrsDefinition = {
         },
         checkShowOrHideInput: function(attrs) {
 
-        }
+        },
+        docker: dockerGroups.task
     },
     'ServiceTask': {
         group: 'task', // nhóm thuộc tính mà node này thuộc về, giá trị là một hoặc nhiều key trong "groupsAttrs",
@@ -58,7 +80,9 @@ export const nodeAttrsDefinition = {
         },
         checkShowOrHideInput: function(attrs) {
 
-        }
+        },
+        docker: dockerGroups.task
+
     },
     'ReceiveTask': {
         group: 'task', // nhóm thuộc tính mà node này thuộc về, giá trị là một hoặc nhiều key trong "groupsAttrs"
@@ -67,7 +91,9 @@ export const nodeAttrsDefinition = {
         },
         checkShowOrHideInput: function(attrs) {
 
-        }
+        },
+        docker: dockerGroups.task
+
     },
     'SendTask': {
         group: 'task', // nhóm thuộc tính mà node này thuộc về, giá trị là một hoặc nhiều key trong "groupsAttrs"
@@ -76,7 +102,8 @@ export const nodeAttrsDefinition = {
         },
         checkShowOrHideInput: function(attrs) {
 
-        }
+        },
+        docker: dockerGroups.task
     },
     'ExclusiveGateway': {
         group: 'gateway',
@@ -85,7 +112,8 @@ export const nodeAttrsDefinition = {
         },
         checkShowOrHideInput: function(attrs) {
 
-        }
+        },
+        docker: dockerGroups.gateway
     },
     'InclusiveGateway': {
         group: 'gateway',
@@ -94,7 +122,9 @@ export const nodeAttrsDefinition = {
         },
         checkShowOrHideInput: function(attrs) {
 
-        }
+        },
+        docker: dockerGroups.gateway
+
     },
     'EventGateway': {
         group: 'gateway',
@@ -103,7 +133,9 @@ export const nodeAttrsDefinition = {
         },
         checkShowOrHideInput: function(attrs) {
 
-        }
+        },
+        docker: dockerGroups.gateway
+
     },
     'ParallelGateway': {
         group: 'gateway',
@@ -112,7 +144,9 @@ export const nodeAttrsDefinition = {
         },
         checkShowOrHideInput: function(attrs) {
 
-        }
+        },
+        docker: dockerGroups.gateway
+
     },
     'StartNoneEvent': {
         attrs: ["executionlisteners", "initiator", "formkeydefinition", "formreference", "formfieldvalidation", "formproperties"],
@@ -121,7 +155,11 @@ export const nodeAttrsDefinition = {
         },
         checkShowOrHideInput: function(attrs) {
 
-        }
+        },
+        docker: dockerGroups.event,
+        specificHandler(attrs, data) {
+            attrs.formreference.options = data.items;
+        },
     },
     'StartConditionalEvent': {
         attrs: ["executionlisteners", "conditionalevent", "interrupting"],
@@ -130,7 +168,9 @@ export const nodeAttrsDefinition = {
         },
         checkShowOrHideInput: function(attrs) {
 
-        }
+        },
+        docker: dockerGroups.event
+
     },
     'StartTimerEvent': {
         attrs: ["executionlisteners", "timercycledefinition", "timerdatedefinition", "timerdurationdefinition"],
@@ -139,7 +179,9 @@ export const nodeAttrsDefinition = {
         },
         checkShowOrHideInput: function(attrs) {
 
-        }
+        },
+        docker: dockerGroups.event
+
     },
     'StartSignalEvent': {
         attrs: ["executionlisteners", "signalref", "interrupting"],
@@ -148,7 +190,9 @@ export const nodeAttrsDefinition = {
         },
         checkShowOrHideInput: function(attrs) {
 
-        }
+        },
+        docker: dockerGroups.event
+
     },
     'StartMessageEvent': {
         attrs: ["executionlisteners", "messageref", "interrupting"],
@@ -157,7 +201,9 @@ export const nodeAttrsDefinition = {
         },
         checkShowOrHideInput: function(attrs) {
 
-        }
+        },
+        docker: dockerGroups.event
+
     },
     'ThrowNoneEvent': {
         attrs: ["executionlisteners", "asynchronousdefinition"],
@@ -166,7 +212,9 @@ export const nodeAttrsDefinition = {
         },
         checkShowOrHideInput: function(attrs) {
 
-        }
+        },
+        docker: dockerGroups.event
+
     },
     'CatchMessageEvent': {
         attrs: ["executionlisteners", "messageref"],
@@ -175,7 +223,9 @@ export const nodeAttrsDefinition = {
         },
         checkShowOrHideInput: function(attrs) {
 
-        }
+        },
+        docker: dockerGroups.event
+
     },
     'CatchTimerEvent': {
         attrs: ["executionlisteners", "timercycledefinition", "timerdatedefinition", "timerdurationdefinition"],
@@ -184,7 +234,9 @@ export const nodeAttrsDefinition = {
         },
         checkShowOrHideInput: function(attrs) {
 
-        }
+        },
+        docker: dockerGroups.event
+
     },
     'ThrowEscalationEvent': {
         attrs: ["executionlisteners", "escalationref", "asynchronousdefinition"],
@@ -193,7 +245,9 @@ export const nodeAttrsDefinition = {
         },
         checkShowOrHideInput: function(attrs) {
 
-        }
+        },
+        docker: dockerGroups.event
+
     },
     'CatchConditionalEvent': {
         attrs: ["executionlisteners", "conditionalevent"],
@@ -202,7 +256,9 @@ export const nodeAttrsDefinition = {
         },
         checkShowOrHideInput: function(attrs) {
 
-        }
+        },
+        docker: dockerGroups.event
+
     },
     'CatchLinkEvent': {
         validate: function(attrs) {
@@ -210,7 +266,9 @@ export const nodeAttrsDefinition = {
         },
         checkShowOrHideInput: function(attrs) {
 
-        }
+        },
+        docker: dockerGroups.event
+
     },
     'ThrowLinkEvent': {
         validate: function(attrs) {
@@ -218,7 +276,9 @@ export const nodeAttrsDefinition = {
         },
         checkShowOrHideInput: function(attrs) {
 
-        }
+        },
+        docker: dockerGroups.event
+
     },
     'ThrowCompensateEvent': {
         validate: function(attrs) {
@@ -226,7 +286,8 @@ export const nodeAttrsDefinition = {
         },
         checkShowOrHideInput: function(attrs) {
 
-        }
+        },
+        docker: dockerGroups.event
     },
     'CatchSignalEvent': {
         attrs: ["executionlisteners", "signalref"],
@@ -235,7 +296,8 @@ export const nodeAttrsDefinition = {
         },
         checkShowOrHideInput: function(attrs) {
 
-        }
+        },
+        docker: dockerGroups.event
     },
     'ThrowSignalEvent': {
         attrs: ["executionlisteners", "signalref", "asynchronousdefinition"],
@@ -244,7 +306,8 @@ export const nodeAttrsDefinition = {
         },
         checkShowOrHideInput: function(attrs) {
 
-        }
+        },
+        docker: dockerGroups.event
     },
     'EndNoneEvent': {
         attrs: ["executionlisteners"],
@@ -253,6 +316,10 @@ export const nodeAttrsDefinition = {
         },
         checkShowOrHideInput: function(attrs) {
 
+        },
+        docker: {
+            x: 14,
+            y: 14
         }
     },
     'EndMessageEvent': {
@@ -263,7 +330,8 @@ export const nodeAttrsDefinition = {
         },
         checkShowOrHideInput: function(attrs) {
 
-        }
+        },
+        docker: dockerGroups.event
     },
     'EndEscalationEvent': {
         attrs: ["executionlisteners", "escalationref"],
@@ -272,7 +340,8 @@ export const nodeAttrsDefinition = {
         },
         checkShowOrHideInput: function(attrs) {
 
-        }
+        },
+        docker: dockerGroups.event
     },
     'EndErrorEvent': {
         attrs: ["executionlisteners", "errorref"],
@@ -281,7 +350,8 @@ export const nodeAttrsDefinition = {
         },
         checkShowOrHideInput: function(attrs) {
 
-        }
+        },
+        docker: dockerGroups.event
     },
     'EndCompensateEvent': {
         validate: function(attrs) {
@@ -289,7 +359,8 @@ export const nodeAttrsDefinition = {
         },
         checkShowOrHideInput: function(attrs) {
 
-        }
+        },
+        docker: dockerGroups.event
     },
     'EndSignalEvent': {
         validate: function(attrs) {
@@ -297,7 +368,8 @@ export const nodeAttrsDefinition = {
         },
         checkShowOrHideInput: function(attrs) {
 
-        }
+        },
+        docker: dockerGroups.event
     },
     'EndTerminateEvent': {
         attrs: ["executionlisteners", "terminateAll"],
@@ -306,7 +378,8 @@ export const nodeAttrsDefinition = {
         },
         checkShowOrHideInput: function(attrs) {
 
-        }
+        },
+        docker: dockerGroups.event
     },
     'CallActivity': {
         attrs: ["asynchronousdefinition", "exclusivedefinition", "callactivitycompleteasync", "executionlisteners", "callactivitycalledelement", "callactivitycalledelementtype", "callactivityinparameters", "callactivityoutparameters", "callactivityinheritvariables", "callactivitysamedeployment", "callactivityfallbacktodefaulttenant", "callactivityidvariablename", "callactivityprocessinstancename", "callactivityinheritbusinesskey", "callactivitybusinesskey", "callactivityuselocalscopeforoutparameters", "multiinstance_type", "multiinstance_cardinality", "multiinstance_collection", "multiinstance_variable", "multiinstance_condition", "isforcompensation"],
@@ -315,7 +388,8 @@ export const nodeAttrsDefinition = {
         },
         checkShowOrHideInput: function(attrs) {
 
-        }
+        },
+        docker: dockerGroups.task
     },
     'SubProcess': {
         attrs: ["asynchronousdefinition", "exclusivedefinition", "dataproperties", "executionlisteners", "multiinstance_type", "multiinstance_cardinality", "multiinstance_collection", "multiinstance_variable", "multiinstance_condition", "istransaction"],
@@ -324,7 +398,9 @@ export const nodeAttrsDefinition = {
         },
         checkShowOrHideInput: function(attrs) {
 
-        }
+        },
+        docker: dockerGroups.subProcess
+
     },
     'AdhocSubProcess': {
         attrs: ["completioncondition", "ordering", "cancelremaininginstances"],
@@ -333,7 +409,9 @@ export const nodeAttrsDefinition = {
         },
         checkShowOrHideInput: function(attrs) {
 
-        }
+        },
+        docker: dockerGroups.subProcess
+
     },
     'TransactionSubProcess': {
         attrs: ["asynchronousdefinition", "exclusivedefinition", "dataproperties", "executionlisteners", "multiinstance_type", "multiinstance_cardinality", "multiinstance_collection", "multiinstance_variable", "multiinstance_condition", "istransaction"],
@@ -342,7 +420,9 @@ export const nodeAttrsDefinition = {
         },
         checkShowOrHideInput: function(attrs) {
 
-        }
+        },
+        docker: dockerGroups.subProcess
+
     },
     'EventSubProcess': {
         attrs: ["asynchronousdefinition", "exclusivedefinition", "executionlisteners"],
@@ -351,7 +431,8 @@ export const nodeAttrsDefinition = {
         },
         checkShowOrHideInput: function(attrs) {
 
-        }
+        },
+        docker: dockerGroups.subProcess
     },
     'BPMNDiagram': {
         attrs: ["process_id", "name", "documentation", "process_author", "process_version", "process_namespace", "process_historylevel", "isexecutable", "dataproperties", "executionlisteners", "eventlisteners", "signaldefinitions", "messagedefinitions", "escalationdefinitions", "process_potentialstarteruser", "process_potentialstartergroup", "iseagerexecutionfetch"],
@@ -362,7 +443,6 @@ export const nodeAttrsDefinition = {
 
         },
         exclude: ['overrideid'],
-
     },
     'SequenceFlow': {
         attrs: ["conditionsequenceflow", "executionlisteners", "defaultflow", "skipexpression"],
@@ -383,6 +463,7 @@ export const nodeAttrsDefinition = {
 export const getNodeAttrs = function(nodeType) {
     let allAttrKeys = util.cloneDeep(commonAttrs);
     let nodeAttrs = {};
+    nodeAttrsDefinition.Task = nodeAttrsDefinition.UserTask; // Nếu là task bình thường thì lấy thuộc tính của userTask luôn
     let nodeDef = nodeAttrsDefinition[nodeType];
     if (nodeDef) {
         if (nodeDef.attrs) {

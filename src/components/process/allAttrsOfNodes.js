@@ -1,3 +1,6 @@
+import Api from "./../../api/api.js";
+import { appConfigs } from "./../../configs.js"; // trong trường hợp này ta cần sử dụng domain của từng module nghiệp vụ được định nghĩa trong file config
+const apiCaller = new Api('');
 /**
  * Danh sách tất cả các thuộc tính có thể có của process
  * trong các item, có thuộc tính "dg" là viết tắt của "display group" tức: 
@@ -1191,9 +1194,14 @@ export const allNodesAttrs = {
     "formreference": {
         "title": "Form reference",
         "type": "autocomplete",
-        "value": '',
+        "value": undefined,
         "info": "BPMN.PROPERTYPACKAGES.FORMREFERENCEPACKAGE.FORMREFERENCE.DESCRIPTION",
         "dg": "taskAction",
+        onSearch: async function(val) { // val là giá trị đang nhập trên ô input, lúc này this sẽ trỏ đến autocomplete instance
+            let docs = await apiCaller.get(appConfigs.apiDomain.documents + '?name=' + val);
+            this.myItems = docs.data.listObject;
+        },
+        options: [{ id: '    ', name: '', title: '' }]
     },
     "terminateAll": {
         "title": "Terminate all",
