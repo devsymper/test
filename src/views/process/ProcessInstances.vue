@@ -92,7 +92,6 @@ import { reformatGetListInstances } from "./../../components/process/reformatGet
 import { appConfigs } from "./../../configs.js";
 import ListItems from "./../../components/common/ListItems.vue";
 import bpmnApi from "./../../api/BPMNEngine.js";
-import { deployProcess } from "./../../components/process/processAction.js";
 import listHeader from "./../../views/tasks/listHeader";
 import userSelector from "./../../views/tasks/userSelector";
 import SymperIcon from "./../../components/common/SymperIcon";

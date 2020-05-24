@@ -26,6 +26,9 @@ export default {
     getListModels() {
         return bpmneApi.get("models", {}, testHeader);
     },
+    deleteModel(id) {
+        return bpmneApi.delete(id + "?cascade=true", {}, testHeader);
+    },
     createModel(data) {
         data = JSON.stringify(data);
         return bpmneApi.post('', data, testHeader, testOptions);
@@ -56,6 +59,9 @@ export default {
             contentType: false,
         });
     },
+    getDeployments(filter) {
+        return bpmneApi.get(appConfigs.apiDomain.bpmne.deployments, filter, testHeader);
+    },
     createProcessInstance(data) {
         data = JSON.stringify(data);
         return bpmneApi.post(appConfigs.apiDomain.bpmne.instances, data, testHeader);
@@ -63,6 +69,10 @@ export default {
     // Lấy data model của process definition 
     getDefinitionModel(id) {
         return bpmneApi.get(appConfigs.apiDomain.bpmne.definitions + '/' + id + '/model', {}, testHeader);
+    },
+    // Lấy danh sách của process definition 
+    getDefinitions(filter = {}) {
+        return bpmneApi.get(appConfigs.apiDomain.bpmne.definitions, filter, testHeader);
     },
     // Lấy data của process definition
     getDefinitionXML(url) {

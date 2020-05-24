@@ -18,6 +18,7 @@ import tasks from "../views/tasks/index.vue";
 import application from "../views/apps/yourApp.vue";
 import Editor from "../views/document/Editor.vue";
 import DeployHistory from "../views/process/DeployHistory.vue";
+import RunInstance from "../views/process/RunInstance.vue";
 import ProcessInstances from "../views/process/ProcessInstances.vue";
 import TrackingProcessInstance from "../views/process/TrackingProcessInstance.vue";
 import WorkList from "../views/works/WorkList.vue";
@@ -70,6 +71,11 @@ const routes = [{
         path: "/bpmne/create",
         name: "createProcess",
         component: CreateProcess,
+    },
+    {
+        path: "/bpmne/process-definition/:id/run",
+        name: "RunInstance",
+        component: RunInstance,
     },
     {
         path: "/login",

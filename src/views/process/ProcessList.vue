@@ -44,9 +44,18 @@ export default {
                 {
                     name: "remove",
                     text: this.$t("common.delete"),
-                    callback: (row, callback) => {
-                        this.removeCallback = callback;
-                        this.deleteSnippet(row);
+                    callback: (rows, refreshList) => {
+                        let removeArrPromise = [];
+                        for(let item of rows){
+                            removeArrPromise.push(bpmnApi.deleteModel(item.id));
+                        }
+                        Promise.all(removeArrPromise).then((res)=>{
+                            self.$snotifySuccess(self.$t('common.remove_msg_success',{count: rows.length}));
+                            refreshList();
+                        }).catch((err)=>{
+                            self.$snotifyError(err, self.$t('common.remove_msg_err'));
+                            refreshList();
+                        });
                     }
                 },
                 {
@@ -66,8 +75,35 @@ export default {
                 {
                     name: "start",
                     text: this.$t("process.list.start"),
-                    callback: (row, callback) => {
-                        
+                    callback: async function (row, callback){
+                        let lastestDeployment = await bpmnApi.getDeployments({
+                            name: row.name,
+                            sort: 'deployTime',
+                            size: 1,
+                            order: 'desc'
+                        });
+                        let deploymentId = '';
+                        if(lastestDeployment.data.length > 0){
+                            lastestDeployment = lastestDeployment.data[0];
+                            deploymentId = lastestDeployment.id;
+                            if(lastestDeployment.deploymentTime < row.lastUpdated){
+                               let deploymentData = await deployProcess(this, row);
+                               deploymentId = deploymentData.id;
+                            }
+                        }else{
+                            let deploymentData = await deployProcess(this, row);
+                            deploymentId = deploymentData.id;
+                        }
+
+                        let defData = await bpmnApi.getDefinitions({
+                            deploymentId: deploymentId
+                        });
+
+                        if(defData.data[0]){
+                            self.$goToPage(`/bpmne/process-definition/${defData.data[0].id}/run`,'Start process instance');
+                        }else {
+                            self.$snotifyError({},"Can not find process definition having deployment id "+deploymentId);
+                        }
                     }
                 },
                 {

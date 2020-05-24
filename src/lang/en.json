@@ -48,7 +48,11 @@
         "works": "Works",
         "all_task": "All tasks",
         "pendding_task": "Pendding tasks",
-        "have_no_data": "Have no data"
+        "have_no_data": "Have no data",
+        "remove_confirm_title": "Are you sure to delete?",
+        "remove_confirm_message": "You are about to delete {count} item",
+        "remove_msg_success": "Deleted {count} items",
+        "remove_msg_err": "Can not delete selected items!"
     },
     "validate": {
         "required": "Not be empty",
@@ -242,7 +246,7 @@
         "list": {
             "title": "Process list",
             "deploy_history": "Deploy history",
-            "start": "Start process",
+            "start": "Deploy and start process",
             "instances": "List instances"
         },
         "action": {

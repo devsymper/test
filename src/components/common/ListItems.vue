@@ -151,8 +151,7 @@
             :showPanel="actionPanel"
             :panelData="currentItemDataClone"
             :actionTitle="itemActionTitle"
-            :dragPanelWidth="actionPanelWidth"
-        >
+            :dragPanelWidth="actionPanelWidth">
             <template slot="drag-panel-content" slot-scope="{panelData}">
                 <slot name="right-panel-content" :itemData="panelData">
                     <v-card flat>
@@ -179,6 +178,36 @@
             :columnFilter="tableFilter.currentColumn.colFilter"
             @apply-filter-value="applyFilter"
         ></table-filter>
+
+        <v-dialog
+            v-model="deleteDialogShow"
+            max-width="290">
+            <v-card>
+                <v-card-title class="headline">{{$t('common.remove_confirm_title')}}</v-card-title>
+                <v-card-text>
+                {{$t('common.remove_confirm_message', {count: deleteItems.length})}}
+                </v-card-text>
+
+                <v-card-actions>
+                <v-spacer></v-spacer>
+
+                <v-btn
+                    color="green darken-1"
+                    text
+                    @click="deleteDialogShow = false"
+                >
+                    {{$t('common.close')}}
+                </v-btn>
+
+                <v-btn
+                    color="red"
+                    text
+                    @click="confirmDeleteItems()">
+                    {{$t('common.delete')}}
+                </v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
     </div>
 </template>
 
@@ -224,6 +253,8 @@ export default {
     },
     data() {
         return {
+            deleteDialogShow: false, // có hiển thị cảnh báo xóa hay không
+            deleteItems: [], // danh sách các row cần xóa
             savingConfigs: false, // có đang lưu cấu hình của showlist hay không
             // các cấu hình cho việc hiển thị và giá trị của panel cấu hình hiển thị của bảng
             tableDisplayConfig: {
@@ -466,15 +497,26 @@ export default {
                     let menuItem = thisCpn.tableContextMenu.filter(menu => {
                         return menu.name == key;
                     });
+                    thisCpn.selectedContextItem = menuItem;
                     if (
                         menuItem.length &&
                         menuItem[0].hasOwnProperty("callback")
                     ) {
-                        menuItem[0].callback(JSON.parse(JSON.stringify(rowData)), res => {
-                            if (res.status === 200) {
-                                thisCpn.getData();
+                        if(key == 'remove' || key == 'delete'){
+                            thisCpn.deleteItems = [];
+                            let deletedIndexs = {};
+                            for(let item of selection ){
+                                for(let idx = item.start.row ; idx <= item.end.row; idx++){
+                                    if(!deletedIndexs[idx]){
+                                        thisCpn.deleteItems.push(thisCpn.data[idx]);
+                                        deletedIndexs[idx] = true;
+                                    }
+                                }
                             }
-                        });
+                            thisCpn.deleteDialogShow = true;
+                        }else{
+                            thisCpn.exeCallbackOnContextMenu(rowData);
+                        }
                     }
                     if (key == "remove") {
                     } else if (key == "edit" || key == "view") {
@@ -567,6 +609,20 @@ export default {
         }
     },
     methods: {
+        confirmDeleteItems(){
+            this.deleteDialogShow = false;
+            this.exeCallbackOnContextMenu(this.deleteItems);
+            setTimeout((self) => {
+                self.deleteItems = [];
+            }, 200, this);
+        },
+        exeCallbackOnContextMenu(rowData){
+            let thisCpn = this;
+            let menuItem = this.selectedContextItem;
+            menuItem[0].callback(util.cloneDeep(rowData), () => {
+                thisCpn.getData();
+            });
+        },
         // Datnt render image/icon, custom status, date
         imgRenderer (instance, td, row, col, prop, value, cellProperties) {
             let escaped = Handsontable.helper.stringify(value), img;

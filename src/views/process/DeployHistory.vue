@@ -17,7 +17,6 @@ import { reformatGetListDeployments } from "./../../components/process/reformatG
 import { appConfigs } from "./../../configs.js";
 import ListItems from "./../../components/common/ListItems.vue";
 import bpmnApi from "./../../api/BPMNEngine.js";
-import { deployProcess } from "./../../components/process/processAction.js";
 import { runProcessDefinition } from "./../../components/process/processAction.js";
 
 
