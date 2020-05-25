@@ -47,7 +47,8 @@
                     :placeholder="$t('common.search')"
                 ></v-text-field>
             </div>
-            <div class="list-node-attrs">
+            <!-- <div class="list-node-attrs" :style="{height: 'calc(100% - 40px)', overflow: 'auto'}"> -->
+            <VuePerfectScrollbar :style="{height: attrPannelHeight}">
                 <template>
                     <v-expansion-panels
                         :multiple="true"
@@ -71,7 +72,8 @@
                         </v-expansion-panel>
                     </v-expansion-panels>
                 </template>
-            </div>
+            </VuePerfectScrollbar>
+            <!-- </div> -->
         </div>
     </div>
 </template>
@@ -85,6 +87,7 @@ import { util } from "../../plugins/util";
 import bpmnApi from "./../../api/BPMNEngine.js";
 import { defaultXML } from "./../../components/process/reformatGetListData";
 import { allNodesAttrs } from "./../process/allAttrsOfNodes";
+import VuePerfectScrollbar from "vue-perfect-scrollbar";
 
 // Khung data của từng node cần lưu vào db
 const nodeDataTpl = {
@@ -119,6 +122,9 @@ const mapLibNameToFlowableName = {
 
 export default {
     methods: {
+        resetAttrPanelHeight(){
+            this.attrPannelHeight = (util.getComponentSize(this).h - 50)+'px';
+        },
         /**
          * Validate toàn bộ data của model
          * @param {Function} success hành động khi validate và ko phát hiện ra lỗi
@@ -724,8 +730,12 @@ export default {
             this.applySavedData(this.$route.params.id);
         }
     },
+    mounted(){
+        this.resetAttrPanelHeight();
+    },
     data() {
         return {
+            attrPannelHeight: "300px", // chiều cao của
             modelAction: "create", // hành động đối với model này là gì: create | clone | edit
             modelId: "", // Id của model này trong DB
             searchAttrKey: "",
@@ -768,7 +778,8 @@ export default {
     },
     components: {
         "symper-bpmn": SymperBpmn,
-        "form-tpl": FormTpl
+        "form-tpl": FormTpl,
+        VuePerfectScrollbar
     },
     props: {
         // Hành động cho editor này, nhận một trong các giá trị: create, edit, view, clone

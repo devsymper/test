@@ -544,3 +544,8 @@ html {
     overflow: hidden;
     text-overflow: ellipsis;
 }
+
+.ps-container .ps__rail-y,
+.ps-container .ps__rail-x {
+    z-index: 1;
+}
