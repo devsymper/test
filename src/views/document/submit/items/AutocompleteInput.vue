@@ -35,6 +35,7 @@ export default {
             key:Date.now(),
             isShowAutoComplete:false,
             positionBox:{'top':0,'left':0},
+            indexActive:0,
             search: '',
             headers: [
             {
@@ -104,51 +105,28 @@ export default {
     created(){
         let thisCpn = this;
         this.$evtBus.$on('document-submit-autocomplete-input-change',e=>{
-            console.log('sssssssssssssssssssssssssss');
-            
-            // if(e.keyCode == 38){    //len
-
-            //     let rowActive = thisCpn.dataTable.filter(row=>{
-            //         return row.active === true
-            //     });
-            //     if(rowActive.length>0){
-            //         let index = thisCpn.dataTable.indexOf(rowActive[0]);
-            //         if(index == 0){
-            //             return false;
-            //         }
-            //         rowActive[0].active = false;
-            //         if(index > 0){
-            //             Vue.set(thisCpn.dataTable[index - 1], 'active', true);
-
-            //         }
-            //     }
-            // }   
-            // else if(e.keyCode == 40){
-            //     console.log($('#autocomplete-control-'+this.key+' .active-row'));
+            if(e.keyCode == 38){    //len
                 
-            //     let rowActive = thisCpn.dataTable.filter(row=>{
-            //         return row.active === true
-            //     });
-            //     if(rowActive.length>0){
-            //         let index = thisCpn.dataTable.indexOf(rowActive[0]);
-            //         if(index == thisCpn.dataTable.length - 1){
-            //             return false;
-            //         }
-            //         rowActive[0].active = false;
-                    
-            //         if(index < thisCpn.dataTable.length){
-            //             Vue.set(thisCpn.dataTable[index + 1], 'active', true);
-            //         }
-            //     }
-            // }
-            // else if(e.keyCode == 13){
-            //     let rowActive = thisCpn.dataTable.filter(row=>{
-            //         return row.active === true
-            //     });
-            //     thisCpn.handleClickRow(rowActive[0])
-            // }
-            
-            
+                if(thisCpn.indexActive == 0){
+                    return false;
+                }
+                Vue.set(thisCpn.dataTable[thisCpn.indexActive], 'active', false);
+                thisCpn.indexActive--;
+                Vue.set(thisCpn.dataTable[thisCpn.indexActive], 'active', true);
+                
+            }   
+            else if(e.keyCode == 40){
+                if(thisCpn.indexActive == thisCpn.dataTable.length - 1){
+                    return false;
+                }
+                Vue.set(thisCpn.dataTable[thisCpn.indexActive], 'active', false);
+                thisCpn.indexActive++;
+                Vue.set(thisCpn.dataTable[thisCpn.indexActive], 'active', true);
+            }
+            else if(e.keyCode == 13){
+                let rowActive = thisCpn.dataTable[thisCpn.indexActive];
+                thisCpn.handleClickRow(rowActive)
+            }
         });
     },
     

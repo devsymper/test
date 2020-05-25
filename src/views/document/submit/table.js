@@ -68,6 +68,8 @@ export default class Table {
         thisObj.controlObj.ele.before(tableContainer);
         thisObj.tableContainer = $(tableContainer);
         let columnsInfo = this.getColumnsInfo();
+        console.log(columnsInfo);
+
         thisObj.controlObj.ele.detach().hide();
         let colHeaders = columnsInfo.headerNames;
         thisObj.colHeaders = colHeaders;
@@ -215,7 +217,6 @@ export default class Table {
         console.log(thisObj.controlObj);
 
         let ths = thisObj.controlObj.ele.find('th');
-        console.log(thisObj.controlObj.listInsideControls);
 
         for (let controlName in thisObj.controlObj.listInsideControls) {
             headerName.push($(ths[num]).text());

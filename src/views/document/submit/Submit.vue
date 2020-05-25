@@ -6,15 +6,19 @@
         <button v-on:click="togglePageSize" v-show="!isQickSubmit" id="toggle-doc-size">
             <span class="mdi mdi-arrow-horizontal-lock"></span>
         </button>
-        <autocomplete-input ref="autocompleteInput" 
+        <autocomplete-input  ref="autocompleteInput" 
         @open-sub-form="openSubFormSubmit" 
         @before-close="isShowSubFormSubmit = false" />
-        <sym-drag-panel ref="symDragPanel" :dragPanelWidth="840" :dragPanelHeight="600" v-if="!isQickSubmit" >
-            <template slot="drag-panel-content" >
-                <submitDocument :isQickSubmit="true" :docId="340"/>
+        <sym-drag-panel ref="symDragPanel" :dragPanelWidth="840" :dragPanelHeight="600" :actionTitle="titleDragPanel" :titleIcon="titleDragPanelIcon">
+            <template slot="drag-panel-content"  >
+                <!-- <submitDocument :isQickSubmit="true" :docId="340" v-if="!isQickSubmit"/> -->
+                <filter-input></filter-input>
             </template>
+       
         </sym-drag-panel>
-
+        <input type="file" :id="'file-upload-alter-'+keyInstance" class="hidden d-none">
+        <user-select :keyInstance="keyInstance" ref="userInput"/>
+        <validate :keyInstance="keyInstance" ref="validate"/>
     </div>
 </template>
 <script>
@@ -22,11 +26,16 @@ import { documentApi } from "./../../../api/Document.js";
 import { getInsertionCSS } from "./../../../components/document/documentUtil.js";
 import './../../../components/document/documentContent.css';
 import {setDataForPropsControl} from './../../../components/document/dataControl';
-import AutocompleteInput from './controlvalue/AutocompleteInput.vue'
-import Control from './control.js';
+import BasicControl from './basicControl';
+import TableControl from './tableControl';
 import Table from './table.js';
 import SymperDragPanel from './../../../components/common/SymperDragPanel.vue';
 import {util} from './../../../plugins/util.js'
+import AutocompleteInput from './items/AutocompleteInput.vue'
+import User from './items/User.vue'
+import Filter from './items/Filter.vue'
+import Validate from './items/Validate.vue'
+
 export default {
     props:{
         isQickSubmit:{
@@ -40,7 +49,9 @@ export default {
     },
     name:'submitDocument',
     components:{
-        'control':Control,
+        'validate':Validate,
+        'user-select':User,
+        'filter-input':Filter,
         'autocomplete-input': AutocompleteInput,
         'sym-drag-panel': SymperDragPanel
     },
@@ -50,7 +61,7 @@ export default {
         },
         sDocumentSubmit(){
             return this.$store.state.document.submit;
-        }
+        },
     },
     data(){
         return {
@@ -59,7 +70,9 @@ export default {
             docSize:null,
             editorDoc:null,
             isShowSubFormSubmit:false,
-            keyInstance:Date.now()
+            keyInstance:Date.now(),
+            titleDragPanel:null,
+            titleDragPanelIcon:null,
         }
     },
     beforeMount(){
@@ -67,7 +80,15 @@ export default {
     },
     mounted() {
         this.editorDoc = $('.sym-form-submit');
-        
+        let thisCpn = this;
+        $('#file-upload-alter-'+this.keyInstance).on('change',function(e){
+            console.log($(this).prop('files')[0]);
+            let name = $(this).attr('data-control-name');
+            thisCpn.$store.commit("document/changeControlSubmitProps",{name:name,key:'value',value:$(this).prop('files')[0].name});
+            console.log(thisCpn.sDocumentSubmit.listInputInDocument[name]);
+            thisCpn.sDocumentSubmit.listInputInDocument[name].addFile($(this).prop('files')[0].name)
+            
+        })
     },
     
     created(){
@@ -99,6 +120,16 @@ export default {
             thisCpn.$refs.autocompleteInput.show(e);
             
         });
+        this.$evtBus.$on('document-submit-open-validate',e=>{
+            thisCpn.$refs.validate.show(e);
+            
+        });
+        this.$evtBus.$on('document-submit-filter-input-click',e=>{
+            thisCpn.$refs.symDragPanel.show();
+            thisCpn.titleDragPanel = 'Tìm kiếm thông tin'
+            thisCpn.titleDragPanelIcon = 'mdi-file-search'
+
+        });
         this.$evtBus.$on('document-submit-autocomplete-input-change',e=>{
             thisCpn.$refs.autocompleteInput.setSearch($(e.target).val());
             
@@ -111,6 +142,20 @@ export default {
             ) {
                 thisCpn.$refs.autocompleteInput.hide();
             }
+            if (
+                !$(evt.target).hasClass("s-control-user") && 
+                !$(evt.target).hasClass("card-list-user") &&
+                $(evt.target).closest(".card-list-user").length == 0
+            ) {
+                thisCpn.$refs.userInput.hide();
+            }
+            if (
+                !$(evt.target).hasClass("validate-icon") && 
+                !$(evt.target).hasClass("card-validate") &&
+                $(evt.target).closest(".card-validate").length == 0
+            ) {
+                thisCpn.$refs.validate.hide();
+            }
             
         });
     },
@@ -121,45 +166,43 @@ export default {
         togglePageSize(){
             this.docSize = (this.docSize == '21cm') ? '100%' : '21cm';
         },
-        presetTable() {
-            // editorDoc.find('.s-control-table').each(function() {
-            //     let tableControl = new Table(tableControl, listInputInDocument, dataInputCache, tableName);
-            //     tableControl.render();
-            // });
-        },
-        
         processHtml (content) {
             var allInputControl = $('#sym-submit-'+this.keyInstance).find('.s-control:not(.bkerp-input-table .s-control)');
             let thisCpn = this;
             for (let index = 0; index < allInputControl.length; index++) {
                 let id = $(allInputControl[index]).attr('id');
-                if(this.sDocumentEditor.allControl[id] != undefined){
-                    let control = new Control($(allInputControl[index]),this.sDocumentEditor.allControl[id]);
+                if(this.sDocumentEditor.allControl[id] != undefined){   // ton tai id trong store
                     let controlName = this.sDocumentEditor.allControl[id].properties.name.value;
-                    control.init();
-                    this.$store.commit("document/addToListInputInDocument",{name:controlName,control:control});
+                    if($(allInputControl[index]).attr('s-control-type') != 'table'){
+                        let control = new BasicControl($(allInputControl[index]),this.sDocumentEditor.allControl[id],thisCpn.keyInstance);
+                        control.init();
+                        this.$store.commit("document/addToListInputInDocument",{name:controlName,control:control});
+                        control.render();
+                    }
+                    //truong hop la control table
+                    else{
+                        let listInsideControls = {};
+                        let tableControl = new TableControl($(allInputControl[index]),this.sDocumentEditor.allControl[id],thisCpn.keyInstance);
+                        tableControl.initTableControl();
+                        this.$store.commit("document/addToListInputInDocument",{name:controlName,control:tableControl});
 
-
-                    control.listInsideControls = {};
-                    if($(allInputControl[index]).attr('s-control-type') == 'table'){
-                        control.tableInstance = new Table(control,controlName)
+                        tableControl.tableInstance = new Table(tableControl,controlName)
                         let tableEle = $(allInputControl[index]);
                         tableEle.find('.s-control').each(function() {
                             let childControlId = $(this).attr('id')
-                            let childControl = new Control($(this),thisCpn.sDocumentEditor.allControl[id].listFields[childControlId]);
+                            let childControl = new BasicControl($(this),thisCpn.sDocumentEditor.allControl[id].listFields[childControlId],thisCpn.keyInstance);
                             childControl.init();
                             let childControlName = thisCpn.sDocumentEditor.allControl[id].listFields[childControlId].properties.name.value;
-                            control.inTable = controlName;
+                            childControl.inTable = controlName;
                             thisCpn.$store.commit("document/addToListInputInDocument",{name:childControlName,control:childControl});
-
-                            control.listInsideControls[childControlName] = true;
+                            listInsideControls[childControlName] = true;
 
                         });
-                    }   
-                    control.render();
+                        tableControl.listInsideControls = listInsideControls;
+                        tableControl.renderTable();
+                    }
+                    
                 }
-                
-
             }
         },
         openSubFormSubmit(){
@@ -177,10 +220,16 @@ export default {
     .sym-form-submit >>> .on-selected{
         border: none !important;
     }
-    .sym-form-submit >>> table:not(.s-control-table) td,
-    .sym-form-submit >>> table:not(.s-control-table),
-    .sym-form-submit >>> table:not(.s-control-table) th{
+    .sym-form-submit >>> table:not(.htCore) td,
+    .sym-form-submit >>> table:not(.htCore),
+    .sym-form-submit >>> table:not(.htCore) th{
         border: none !important;
+    }
+    .sym-form-submit >>> .htCore td:last-child{
+        border-right: 1px solid #ccc !important;
+    }
+    .sym-form-submit >>> .ht_clone_left.handsontable table.htCore{
+        border-right: none;
     }
 
     #toggle-doc-size{
@@ -201,4 +250,5 @@ export default {
     #toggle-doc-size:focus{
         outline: none;
     }
+ 
 </style>

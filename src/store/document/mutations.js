@@ -16,6 +16,14 @@ const addToListInputInDocument = (state, params) => {
     // state.editor.allControl[id] = prop;
     Vue.set(state.submit.listInputInDocument, name, control);
 };
+const changeControlSubmitProps = (state, params) => {
+    let name = params.name
+    let key = params.key
+    let value = params.value
+        // state.editor.allControl[id] = prop;
+    Vue.set(state.submit.listInputInDocument[name], key, value);
+};
+
 
 const restoreState = (state) => {
     state.editor.allControl = {};
@@ -156,5 +164,6 @@ export {
     updateProp,
     minimizeControl,
     restoreState,
-    addToListInputInDocument
+    addToListInputInDocument,
+    changeControlSubmitProps
 };

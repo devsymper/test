@@ -235,4 +235,9 @@ export default class Util {
         }
         return rsl.join(',');
     }
+    static getFileExtension = function(filename) {
+        var ext = /^.+\.([^.]+)$/.exec(filename);
+        return ext == null ? "" : ext[1];
+    }
+
 }

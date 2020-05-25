@@ -419,7 +419,7 @@ const controlTypes = {
     },
     user: {
         icon: "/icon/ic_user.png",
-        html: `<select class="s-control s-control-user" contenteditable="false" title="User" s-control-type="user"></select>&nbsp;`,
+        html: `<input class="s-control s-control-user" contenteditable="false" title="Color" s-control-type="user" type="text">&nbsp;`,
         title: "User",
         notInProps: ['formatNumber', 'isSumTable', 'isDBOnly', 'isTableOnly', 'isAllowUpdate', 'isDisplayCompact', 'isMultipleValue'],
         formulas: ['hidden', 'readOnly']
