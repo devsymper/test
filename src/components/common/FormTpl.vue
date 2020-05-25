@@ -347,15 +347,11 @@ export default {
                 this.translateTagsToOrgchartValues()
             }
         },
-<<<<<<< HEAD
-        handleChangeInputValue(inputInfo, name, data) {
-=======
         openDateTimePicker(event,inputInfo){
             this.currentPointer = {top:event.clientY+'px',left:'35px'};
             this.$refs.dateTimePicker.openPicker();
         },
         handleChangeInputValue(inputInfo, name) {
->>>>>>> f3ce342c8944d2545a1a798e068fa4ebca322c98
             /**
              * emit sự kiện thay đổi giá trị của một input trong form
              * name: tên của input này
