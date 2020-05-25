@@ -1,7 +1,7 @@
 <template>
     <div
         ref="symperDragPanel"
-        v-show="showPanel"
+        v-show="selfShowPanel"
         class="symper-drag-panel elevation-12"
         :style="{
             width:dragPanelWidth+'px',
@@ -15,7 +15,7 @@
                     <i :class="'mr-2 mdi '+titleIcon" v-if="titleIcon != ''"></i>{{actionTitle}}
                 </span>
                 <v-icon
-                    @click="handleClosePanel"
+                    @click="hide"
                     class="close-btn float-right"
                     style="font-size:16px;position: relative;top: -3px;"
                 >mdi-close</v-icon>
@@ -37,11 +37,14 @@ window.dragElement = function(elmnt) {
         pos3 = 0,
         pos4 = 0;
     if (document.getElementById(elmnt.id + "header")) {
+        console.log('keo');
+        
         // if present, the header is where you move the DIV from:
         document.getElementById(
             elmnt.id + "header"
         ).onmousedown = dragMouseDown;
     } else {
+         console.log('keo');
         // otherwise, move the DIV from anywhere inside the DIV:
         elmnt.onmousedown = dragMouseDown;
     }
@@ -101,7 +104,9 @@ export default {
         },
         panelData: {
             type: Object,
-            default: {}
+            default(){
+                return {}
+            }
         },
         topPosition: {
             type: Number,
@@ -116,26 +121,25 @@ export default {
             default: ''
         }
     },
-    watch: {
-        showPanel() {
-            if (this.showPanel) {
-                setTimeout(
-                    self => {
-                        dragElement(self.$refs.symperDragPanel);
-                    },
-                    200,
-                    this
-                );
-            }
-        }
-    },
+    
     data(){
         return {
-            selfShowPanel: false
+            selfShowPanel: null
         }
     },
+    beforeMount(){
+        this.selfShowPanel = false;
+    },
+    mounted(){
+        setTimeout(() => {
+            dragElement(self.$refs.symperDragPanel);
+        }, 200);
+    },
     methods: {
-        handleClosePanel() {
+        show(){
+            this.selfShowPanel = true;
+        },
+        hide() {
             this.$emit('before-close',{});
             this.selfShowPanel = false;
         },
@@ -176,6 +180,7 @@ export default {
 
 .symper-drag-panel .symper-drag-panel-body {
     height: calc(100% - 30px);
+    overflow: auto;
 }
 
 .drag-panel-title {

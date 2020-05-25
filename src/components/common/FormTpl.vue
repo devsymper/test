@@ -7,16 +7,30 @@
             'pb-2': singleLine ? true : false,
             'pb-1': (!singleLine && inputInfo.type != 'checkbox' && inputInfo.type != 'radio') ? true : false,}">
             <div
-                class="d-inline-block font-weight-medium fs-13"
+                class="d-inline-block"
                 :style="{
                     'min-width': labelMinwidth,
                     'width': compLabelWidth,
                     'line-height': '13px',
-                    'vertical-align': 'middle',
-                    'margin-right': space
+                    'vertical-align': (singleLine && (inputInfo.type == 'text' || inputInfo.type == 'select')) ? 'middle' : 'top' ,
+                    'margin-right': space,
+                    'margin-top' : (singleLine && inputInfo.type == 'textarea') ? '8px' : '0' ,
+                    'position' : 'relative',
+                    'font-size':'11px',
                 }"
                 v-if="!inputInfo.hidden && (inputInfo.type != 'checkbox' && inputInfo.type != 'switch' )">
                 {{inputInfo.title}}
+                <i
+                    :class="{'mdi mdi-calendar float-right input-item-func ml-1': true}"
+                    :style="{
+                        'right' : '0',
+                        'top'   : '25px',
+                        'color' : '#5e5e5e',
+                        'position' : 'absolute'
+                    }"
+                    @click="openDateTimePicker($event,inputInfo)"
+                    v-if="inputInfo.isDateTime"
+                ></i>
                 <i
                     :class="{'mdi mdi-dock-window float-right input-item-func ml-1': true,'active': inputInfo.title == largeFormulaEditor.name}"
                     @click="openLargeValueEditor(inputInfo, name)"
@@ -94,6 +108,10 @@
                 ></formula-editor>
             </template>
         </symper-drag-panel>
+
+        <datetime-picker ref="dateTimePicker" @apply-datetime="appendValueToSciptEditor" :position="currentPointer"></datetime-picker>
+        
+        
     </div>
 </template>
 <script>
@@ -107,10 +125,13 @@ import {
 } from "vuetify/lib";
 import TreeValidate from "./../../views/document/sideright/items/FormValidateTpl.vue";
 import FormulaEditor from "./../common/FormulaEditor";
+import DateFormat from "./../common/DateFormat";
+import NumberFormat from "./../common/NumberFormat";
 import DataTable from "./../common/customTable/DataTable";
 import SymperDragPanel from "./SymperDragPanel";
 import SymperUserAssignment from "./SymperUserAssignment";
 import OrgchartSelector from "./../user/OrgchartSelector";
+import DateTimePicker from './../common/DateTimePicker.vue';
 import SymperListOrdering from "./../common/symperInputs/SymperListOrdering";
 import SymperListAutocomplete from "./../common/symperInputs/SymperListAutocomplete";
 
@@ -136,7 +157,7 @@ const inputTypeConfigs = {
         tag: "v-select",
         props(config) {
             return {
-                label: config.title
+                label: config.title,
             };
         }
     },
@@ -229,6 +250,22 @@ const inputTypeConfigs = {
                 activeTab: config.activeTab
             };
         }
+    },
+    dateFormat:{
+        tag:"date-format",
+        props(config){
+            return{
+                value:config.value
+            }
+        }
+    },
+    numberFormat:{
+        tag:"number-format",
+        props(config){
+            return{
+                value:config.value
+            }
+        }
     }
 };
 export default {
@@ -238,7 +275,8 @@ export default {
                 name: "", // tên của input
                 open: false, // có mở largeFormulaEditor hay ko
                 data: {}, // Dữ liệu của input cần mở lên để edit trong khung lớn,
-            }
+            },
+            currentPointer:{left:'35px',top:'0'}
         };
     },
     methods: {
@@ -309,7 +347,15 @@ export default {
                 this.translateTagsToOrgchartValues()
             }
         },
+<<<<<<< HEAD
         handleChangeInputValue(inputInfo, name, data) {
+=======
+        openDateTimePicker(event,inputInfo){
+            this.currentPointer = {top:event.clientY+'px',left:'35px'};
+            this.$refs.dateTimePicker.openPicker();
+        },
+        handleChangeInputValue(inputInfo, name) {
+>>>>>>> f3ce342c8944d2545a1a798e068fa4ebca322c98
             /**
              * emit sự kiện thay đổi giá trị của một input trong form
              * name: tên của input này
@@ -323,6 +369,12 @@ export default {
         },
         getInputTag(inputType) {
             return inputTypeConfigs[inputType].tag;
+        },
+
+        appendValueToSciptEditor(dateTime){
+            console.log(dateTime);
+            
+            this.$refs.basicFormulaEditor.setValue(dateTime);
         }
     },
     props: {
@@ -390,6 +442,7 @@ export default {
             let w = this.labelWidth;
             return this.singleLine ? `calc(100% - ${w} - 8px)` : "100%";
         },
+     
     },
     components: {
         VTextField,
@@ -401,11 +454,14 @@ export default {
         "v-tree-validate": TreeValidate,
         FormulaEditor,
         DataTable,
+        "date-format":DateFormat,
+        "number-format":NumberFormat,
         SymperDragPanel,
         "symper-user-assginment": SymperUserAssignment,
         "orgchart-selector": OrgchartSelector,
         SymperListOrdering: SymperListOrdering,
-        SymperListAutocomplete
+        SymperListAutocomplete,
+        "datetime-picker" : DateTimePicker,
     }
 };
 </script>

@@ -7,16 +7,17 @@
         light
         show-arrows
         >
-        <v-tabs-slider color="teal lighten-3"></v-tabs-slider>
+        <v-tabs-slider color="sym-tab-slider"></v-tabs-slider>
 
         <v-tab
             class="v-tab-control"
             v-for="tab in sideLeftTabs"
             :key="tab.id"
+            style="margin-bottom: 4px;"
         >
             <v-tooltip right>
                 <template v-slot:activator="{ on }">
-                    <v-icon v-on="on">{{ tab.icon }}</v-icon>
+                    <v-icon style="font-size:16px;color:gray;" v-on="on">{{ tab.icon }}</v-icon>
                 </template>
                 <span>{{ tab.content }}</span>
             </v-tooltip>
@@ -28,6 +29,9 @@
             <control-tab v-if="tab.id == 'control'">
 
             </control-tab>
+            <list-control-tab v-if="tab.id == 'listControl'">
+
+            </list-control-tab>
 
             
         </v-tab-item>
@@ -37,10 +41,12 @@
 </template>
 <script>
 import ControlTab from './items/ControlTab'
+import ListControlTab from './items/ListControlTab.vue'
 
 export default {
     components: {
         'control-tab' : ControlTab,
+        'list-control-tab' : ListControlTab,
     },
     data () {
       return {

@@ -242,6 +242,47 @@
             "65536": "View allowed controls"
         }
     },
+    "document": {
+        "title": "List Document",
+        "table": {
+            "id": "Id",
+            "name": "Name",
+            "title": "Title",
+            "menu": "menu",
+            "countobject": "Count object",
+            "workflow": "Workflow",
+            "createAt": "Create at",
+            "updateAt": "Update at"
+        },
+        "process": {
+            "header_bar": {
+                "undo": "Undo ",
+                "redo": "Redo ",
+                "zoom_in": " Zoom in",
+                "zoom_out": "Zoom out ",
+                "focus": "Focus",
+                "save_svg": "Download as SVG",
+                "save_bpmn": "Download as .bpmn",
+                "validate": "Validate",
+                "save": "Save"
+            }
+        }
+    },
+    "service": {
+        "title": "List service",
+        "table": {
+            "id": "Id",
+            "name": "name",
+            "description": "description",
+            "ifCondition": "Condition running",
+            "runStatus": "Run status",
+            "status": "Status",
+            "createAt": "Create at",
+            "updateAt": "Update at",
+            "lastestRunAt": "Lastest run at",
+            "userCreate": "User create"
+        }
+    },
     "process": {
         "list": {
             "title": "Process list",

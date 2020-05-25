@@ -15,6 +15,7 @@
             <v-expansion-panels
             v-model="panel"
             multiple
+            class="sym-list-control"
             >
                 <v-expansion-panel>
                     <v-expansion-panel-header class="v-expand-header">Hiển thị</v-expansion-panel-header>
@@ -96,25 +97,32 @@ export default {
         listControlInput:   ['textInput','richText','number','date','dateTime','time','month','select','documentSelect','phone','email','currency','radio','checkbox','color','percent','user','inputFilter','hidden'],
         listControlLayout:  ['table','panel','fileUpload'],
         listControlReport:  ['report','approvalHistory','trackingValue'],
-        listControlAction:  ['submit','reset','draf']
+        listControlAction:  ['submit','reset','draft']
     }),
     methods:{
         onSearch(event){
             $('.sym-control').removeClass('d-none');
-            $('.sym-control:not(:contains("' + event + '"))').addClass('d-none');
+            $('.sym-control:not(:Contains("' + event + '"))').addClass('d-none');
         }
+    },
+    mounted(){
+        $.expr[":"].Contains = jQuery.expr.createPseudo(function(arg) {
+            return function( elem ) {
+                return jQuery(elem).text().toUpperCase().indexOf(arg.toUpperCase()) >= 0;
+            };
+        });
     }
 }
 </script>
 <style  scoped>
     .sym-document-tab-control .v-list-item{
-        min-height : unset;
+        min-height : 25px !important;
     }
     .v-expand-header{
         font-size: 13px;
-        font-weight: bold;
+        font-weight: 500;
         min-height: unset;
-        padding: 4px 16px;
+        padding: 4px 8px;
         background: #f2f2f2;
     }
     .tf-search-control{
@@ -124,11 +132,16 @@ export default {
     .sym-document-tab-control .v-expansion-panel{
         margin: 0;
     }
+    .sym-list-control{
+        overflow: auto;
+        max-height: calc(100vh - 110px);
+    }
     
 </style>
 <style>
     .sym-v-expand-content .v-expansion-panel-content__wrap{
         padding: 0;
+        
     }
     .sym-v-expand-content .v-list{
         padding: 0 !important;

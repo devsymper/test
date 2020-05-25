@@ -8,6 +8,8 @@ import PageNotFound from './../views/PageNotFound.vue';
 import MultiGuard from 'vue-router-multiguard';
 import CreateProcess from "../views/process/CreateProcess.vue";
 import ShowListUser from "../views/users/ShowList.vue";
+import ShowListDocument from "../views/document/ShowList.vue";
+import ShowListService from "../views/service/ShowList.vue";
 import ActionPanel from "../views/users/ActionPanel.vue";
 import Snippet from "../views/snippets/index.vue";
 import Permissions from "../views/permissions/index.vue";
@@ -17,6 +19,7 @@ import virtualdocs from "../views/virtualdocs/index.vue";
 import tasks from "../views/tasks/index.vue";
 import application from "../views/apps/yourApp.vue";
 import Editor from "../views/document/Editor.vue";
+import SubmitDocument from "../views/document/submit/Submit.vue";
 import DeployHistory from "../views/process/DeployHistory.vue";
 import RunInstance from "../views/process/RunInstance.vue";
 import ProcessInstances from "../views/process/ProcessInstances.vue";
@@ -101,15 +104,47 @@ const routes = [{
         path: "/users/edit/:id",
         name: "editUser",
         component: ActionPanel,
+
     },
 
     //document
 
     {
+        path: "/documents",
+        name: "processListDocument",
+        component: ShowListDocument,
+    },
+    {
         path: "/document/editor",
-        name: "documentEditor",
+        name: "createDocument",
         component: Editor,
     },
+    {
+        path: "/document/editor/:id?",
+        name: "editDocument",
+        component: Editor,
+
+    },
+    {
+        path: "/document/submit/:id?",
+        name: "submitDocument",
+        component: SubmitDocument,
+
+    },
+    //service
+
+    {
+        path: "/service",
+        name: "processListService",
+        component: ShowListService,
+    },
+
+    // {
+    //     path: "/users/permission-package/:id",
+    //     name: "permissionPackage",
+    //     component: PermissionPackage,
+    // },
+
     //Snippet
     {
         path: "/snippets",

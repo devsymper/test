@@ -257,6 +257,10 @@ export default {
         this.getListAutoComplete();
         this.setupTooltip();
         this.setupBaSnippet();
+        let thisCpn = this;
+        $('#fomular-editor').on('change',function(e){
+            thisCpn.$evtBus.$emit('on-change-script-editor',thisCpn.getValue())
+        })
     },
     methods: {
         /**
@@ -608,7 +612,7 @@ export default {
 }
 
 .v-tabs-bar {
-    height: 25px !important;
+    height: 31px !important;
 }
 .v-tab {
     font-size: 12px !important;

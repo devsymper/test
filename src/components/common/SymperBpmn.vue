@@ -11,14 +11,11 @@
 </template>
 
 <script>
-import BpmnModeler from "bpmn-js/lib/Modeler";
-import { Moddle } from "moddle/dist";
-import { getBusinessObject } from "bpmn-js/lib/util/ModelUtil";
-
-import "bpmn-js/dist/assets/diagram-js.css";
-import "bpmn-js/dist/assets/bpmn-font/css/bpmn.css";
-import "bpmn-js/dist/assets/bpmn-font/css/bpmn-codes.css";
-import "bpmn-js/dist/assets/bpmn-font/css/bpmn-embedded.css";
+// import BpmnModeler from "bpmn-js/lib/Modeler";
+// import 'bpmn-js/dist/assets/diagram-js.css';
+// import 'bpmn-js/dist/assets/bpmn-font/css/bpmn.css';
+// import 'bpmn-js/dist/assets/bpmn-font/css/bpmn-codes.css';
+// import 'bpmn-js/dist/assets/bpmn-font/css/bpmn-embedded.css';
 
 import qaExtension from "./../common/customBPMNAttrs/test.json";
 export default {

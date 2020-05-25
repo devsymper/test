@@ -490,7 +490,6 @@ export default {
 		/**
 		 * Hoangnd: 14/4/2020
 		 * Hàm check validate các trường input   (password, email, user name)
-		 
 		 */
 		validateForm(){
 			this.formHasErr = false;
@@ -587,15 +586,8 @@ export default {
 					cpn.loading = false;
 					cpn.editStep = true;
 					cpn.loader = null;
-					let status = (data.status == 1 || data.status == true) ? 'Đang mở' : 'đã khóa'
-					let date = new Date();
 					cpn.user.id = res.data.id;
-					//phat lai sự kiện thêm item vào list
-					cpn.$emit("refresh-new-user", {
-						id:res.data.id,firstName:data.firstName,displayName:data.displayName,
-						email:data.email,phone:data.phone,status:status,passwordProps:JSON.stringify(passProps),
-						createAt:str.formatDate(date),updateAt:str.formatDate(date)
-					});
+					cpn.$emit("refresh-data");
 				}
 				else{
 					cpn.loading = false;
@@ -634,7 +626,6 @@ export default {
 				if (res.status == 200) {
 					cpn.loading = false;
 					cpn.loader = null;
-					let status = (data.status == 1 || data.status == true) ? 'Đang mở' : 'đã khóa'
 					cpn.$emit("refresh-data");
 				}
 			})
@@ -726,17 +717,10 @@ export default {
 		 * Hàm thêm user vào vị trí của org chart để phân quyền
 		 */
 		addOrgchartPosition(org,from){
-			console.log(this.user);
-			
-			if(from == 'autocomplete'){
-				org.selected = true;
-			}
-			if(from == 'input'){
+			if(from == 'autocomplete' || from == 'input'){
 				org.selected = true;
 			}
 			if(org.selected == true ){
-				console.log(this.isAddingToPosition);
-				
 				if(this.isAddingToPosition == false){
 					this.isAddingToPosition = true;
 					permissionPositionOrgchartApi.addUserToPosition({userId:this.user.id,positionId:org.id_node}).then(res => {
@@ -780,7 +764,9 @@ export default {
 				for (i = 0; i < listChild.length; i ++ ) {
 					node = listChild[i];
 					if (node.id_parent_node !== "general") {
-						node.source = listChild[map[node.id_parent_node]].source + " / " +listChild[map[node.id_parent_node]].name;
+						
+						//node.source = listChild[map[node.id_parent_node]].source + " / " +listChild[map[node.id_parent_node]].name;
+
 						listChild[map[node.id_parent_node]].children.push(node);
 					} else {
 						node.source = orgName;
