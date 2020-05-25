@@ -50,5 +50,8 @@ export default class Control {
             data: {}
         };
     }
+    initFormulas() {
+
+    }
 
 }
