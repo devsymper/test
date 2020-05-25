@@ -92,6 +92,7 @@ export default {
     },
     
     created(){
+        let thisCpn = this;
         if(this.docId != 0){
             this.documentId = this.docId
         }

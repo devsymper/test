@@ -1,5 +1,5 @@
 <template>
-    <div class="h-100 w-100"> 
+    <div class="h-100 w-100 d-flex justify-center"> 
         <DocumentSubmit :docId="taskInfo.docId">
 
         </DocumentSubmit>

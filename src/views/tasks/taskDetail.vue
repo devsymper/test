@@ -25,7 +25,7 @@
         </v-row>
         <v-divider style="border-width: 2px; border-color: #ff7400;"></v-divider>
         <v-row>
-            <v-col cols="12">
+            <v-col cols="12" class="pt-0">
                 <v-card flat>
                     <v-tabs
                         v-model="tab"
