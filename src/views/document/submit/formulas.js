@@ -9,8 +9,8 @@ export default class Formulas {
         this.type = type;
     }
     init() {
-        this.effectedControl =
-            this.inputControl = this.getInputControl();;
+        this.effectedControl = null;
+        this.inputControl = this.getInputControl();;
     }
     run(dataInput) {
 
