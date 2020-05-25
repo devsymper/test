@@ -29,7 +29,7 @@ export default {
             customAPIResult: {
                 reformatData: reformatGetListProcess
             },
-            getListUrl: appConfigs.apiDomain.bpmne.models,
+            getListUrl: appConfigs.apiDomain.bpmne.models+'?filter=processes&modelType=0&sort=modifiedDesc',
             tableContextMenu: [
                 {
                     name: "edit",
@@ -62,7 +62,7 @@ export default {
                     name: "deploy",
                     text: this.$t("common.deploy"),
                     callback: (row, callback) => {
-                        deployProcess(this, row);
+                        deployProcess(self, row);
                     }
                 },
                 {
@@ -87,11 +87,11 @@ export default {
                             lastestDeployment = lastestDeployment.data[0];
                             deploymentId = lastestDeployment.id;
                             if(lastestDeployment.deploymentTime < row.lastUpdated){
-                               let deploymentData = await deployProcess(this, row);
+                               let deploymentData = await deployProcess(self, row);
                                deploymentId = deploymentData.id;
                             }
                         }else{
-                            let deploymentData = await deployProcess(this, row);
+                            let deploymentData = await deployProcess(self, row);
                             deploymentId = deploymentData.id;
                         }
 

@@ -34,28 +34,35 @@ export const deployProcess = function(self, processData) {
  * @param {String} id 
  */
 export const runProcessDefinition = (self, processDef) => {
-    bpmnApi.getDefinitionModel(processDef.id).then((res) => {
-        let dataToRun = {
-            "processDefinitionId": processDef.id,
-            "name": processDef.name + " instance",
-            // "businessKey": processDef.key, // tạm bỏ
-            "variables": getVariables(res.mainProcess.dataObjects),
-            // "outcome": "string", // chưa biết là cái gì, tạm bỏ
-            // "tenantId": processDef.tenantId, //"TenantId can only be used with either processDefinitionKey or message."
-            "returnVariables": true
-        };
-        bpmnApi.createProcessInstance(dataToRun).then((res) => {}).catch((err) => {
+    return new Promise((runResolve, runReject) => {
+        bpmnApi.getDefinitionModel(processDef.id).then((res) => {
+            let dataToRun = {
+                "processDefinitionId": processDef.id,
+                "name": processDef.name + " instance",
+                // "businessKey": processDef.key, // tạm bỏ
+                "variables": getVariables(res.mainProcess.dataObjects),
+                // "outcome": "string", // chưa biết là cái gì, tạm bỏ
+                // "tenantId": processDef.tenantId, //"TenantId can only be used with either processDefinitionKey or message."
+                "returnVariables": true
+            };
+            bpmnApi.createProcessInstance(dataToRun).then((res) => {
+                runResolve(res);
+            }).catch((err) => {
+                self.$snotifyError(
+                    err,
+                    "Can not get process definition model!"
+                );
+                runReject(err);
+            });;
+        }).catch((err) => {
             self.$snotifyError(
                 err,
                 "Can not get process definition model!"
             );
-        });;
-    }).catch((err) => {
-        self.$snotifyError(
-            err,
-            "Can not get process definition model!"
-        );
+            runReject(err);
+        });
     });
+
 }
 
 function getVariables(dataObjects) {

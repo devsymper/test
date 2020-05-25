@@ -1,4 +1,9 @@
+import { SYMPER_APP } from "../../main";
+
 export const reformatGetListProcess = function(res) {
+    for (let item of res.data) {
+        item.lastUpdated = SYMPER_APP.$moment(item.lastUpdated).fromNow();
+    }
     let rsl = {
         total: res.total,
         columns: [{

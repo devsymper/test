@@ -558,6 +558,11 @@ export default {
                     applyValue
                 );
             }
+
+            
+            if (name == "overrideid" || name == "process_id") {
+                this.selectingNode.id = attrs[name].value;
+            }
         },
         /**
          * Lấy dữ liệu của một node dựa theo nodeId.

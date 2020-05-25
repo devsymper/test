@@ -267,15 +267,15 @@ export const allNodesAttrs = {
         "dg": "detail",
         options: [{
                 text: 'Low',
-                value: 'low'
+                value: '1'
             },
             {
                 text: 'Medium',
-                value: 'medium'
+                value: '2'
             },
             {
                 text: 'Low',
-                value: 'low'
+                value: '3'
             },
         ],
     },

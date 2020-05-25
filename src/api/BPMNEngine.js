@@ -23,8 +23,8 @@ export default {
     /** 
      * Lấy danh sách các process đã được tạo ra
      */
-    getListModels() {
-        return bpmneApi.get("models", {}, testHeader);
+    getListModels(filter = {}) {
+        return bpmneApi.get("models", filter, testHeader);
     },
     deleteModel(id) {
         return bpmneApi.delete(id + "?cascade=true", {}, testHeader);

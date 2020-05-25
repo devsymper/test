@@ -14,7 +14,7 @@
                 <v-btn small text color="warning" class="mr-2">
                     {{$t("tasks.claim")}}
                 </v-btn>
-                <v-btn small color="primary" disabled="" class="mr-2">
+                <v-btn small color="primary" @click="saveTaskOutcome" class="mr-2">
                     <v-icon small class="mr-2">mdi-content-save</v-icon> 
                     {{$t("common.save")}}
                 </v-btn>
@@ -133,6 +133,9 @@ export default {
     methods: {
         closeDetail() {
             this.$emit("close-detail", {});
+        },
+        saveTaskOutcome(){ // hành động khi người dùng submit task của họ
+            this.$emit('save-task-outcome');
         }
     }
 }
