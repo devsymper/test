@@ -11,13 +11,15 @@
 </template>
 
 <script>
-// import BpmnModeler from "bpmn-js/lib/Modeler";
-// import 'bpmn-js/dist/assets/diagram-js.css';
-// import 'bpmn-js/dist/assets/bpmn-font/css/bpmn.css';
-// import 'bpmn-js/dist/assets/bpmn-font/css/bpmn-codes.css';
-// import 'bpmn-js/dist/assets/bpmn-font/css/bpmn-embedded.css';
+import BpmnModeler from "bpmn-js/lib/Modeler";
+import { Moddle } from "moddle/dist";
+import { getBusinessObject } from "bpmn-js/lib/util/ModelUtil";
 
-import qaExtension from "./../common/customBPMNAttrs/test.json";
+import "bpmn-js/dist/assets/diagram-js.css";
+import "bpmn-js/dist/assets/bpmn-font/css/bpmn.css";
+import "bpmn-js/dist/assets/bpmn-font/css/bpmn-codes.css";
+import "bpmn-js/dist/assets/bpmn-font/css/bpmn-embedded.css";
+
 export default {
     name: "symper-bpmn",
     props: {
@@ -150,7 +152,6 @@ export default {
                 container: canvas,
                 keyboard: { bindTo: document },
                 moddleExtensions: {
-                    qa: qaExtension
                 },
                 additionalModules: this.customModules,
             });

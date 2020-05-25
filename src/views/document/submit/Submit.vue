@@ -95,26 +95,10 @@ export default {
         if(this.docId != 0){
             this.documentId = this.docId
         }
-        else{
+        else if(this.$route.name == 'submitDocument'){
             this.documentId = this.$route.params.id;
         }
-        let thisCpn = this;
-        documentApi.detailDocument(this.documentId).then(res => {
-            if (res.status == 200) {
-                let content = res.data.document.content;
-                thisCpn.contentDocument = content;
-                setDataForPropsControl(res.data.fields);    // ddang chay bat dong bo
-                setTimeout(() => {
-                thisCpn.processHtml(content);
-
-                }, 100);                
-            }
-        })
-        .catch(err => {
-            console.log("error from detail document api!!!", err);
-        })
-        .always(() => {
-        });
+        this.loadDocumentData();
 
         this.$evtBus.$on('document-submit-autocomplete-input',e=>{
             thisCpn.$refs.autocompleteInput.show(e);
@@ -160,9 +144,34 @@ export default {
         });
     },
     watch:{
-        
+        docId(after){
+            this.documentId = after;
+            this.loadDocumentData();
+        }        
     },
     methods:{
+        // Khadm: load data của document lên để hiển thị và xử lý
+        loadDocumentData(){
+            if(this.documentId){
+                let thisCpn = this;
+                documentApi.detailDocument(this.documentId).then(res => {
+                    if (res.status == 200) {
+                        let content = res.data.document.content;
+                        thisCpn.contentDocument = content;
+                        setDataForPropsControl(res.data.fields);    // ddang chay bat dong bo
+                        setTimeout(() => {
+                        thisCpn.processHtml(content);
+
+                        }, 100);                
+                    }
+                })
+                .catch(err => {
+                    console.log("error from detail document api!!!", err);
+                })
+                .always(() => {
+                });
+            }
+        },
         togglePageSize(){
             this.docSize = (this.docSize == '21cm') ? '100%' : '21cm';
         },

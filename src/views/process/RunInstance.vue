@@ -1,6 +1,6 @@
 <template>
     <div class="h-100 w-100">
-        <taskDetail @save-task-outcome="saveTaskOutcome">
+        <taskDetail :taskInfo="taskInfo" @save-task-outcome="saveTaskOutcome">
 
         </taskDetail>
     </div>
@@ -17,8 +17,10 @@ export default {
     },
     data(){
         return {
+            taskInfo: {
+                docId: 0// Nếu là submit cần biết document id là gì để load form
+            },
             startType: 'submit', // các loại bắt đầu quy trình khác nhau: hiện tại chỉ có 1 loại là submit
-            documentId: 0, // Nếu là submit cần biết document id là gì để load form
         }
     },
     created(){
@@ -28,7 +30,7 @@ export default {
         async getFirstNodeData(){
             let idDefinition = this.$route.params.id;
             let definitionModel = await BPMNEApi.getDefinitionModel(idDefinition);
-            this.documentId = definitionModel.mainProcess.initialFlowElement.formKey;
+            this.taskInfo.docId = Number(definitionModel.mainProcess.initialFlowElement.formKey);
         },
         async saveTaskOutcome(){
             let processDef = await BPMNEApi.getDefinitionData(this.$route.params.id);

@@ -553,7 +553,7 @@ export default {
             }
 
             if (typeData.specificHandler) {
-                typeData.specificHandler(attrs, data);
+                typeData.specificHandler(attrs, data, name);
             }
 
             if (reApplyToView[name]) {

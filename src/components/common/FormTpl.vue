@@ -351,7 +351,7 @@ export default {
             this.currentPointer = {top:event.clientY+'px',left:'35px'};
             this.$refs.dateTimePicker.openPicker();
         },
-        handleChangeInputValue(inputInfo, name) {
+        handleChangeInputValue(inputInfo, name, data) {
             /**
              * emit sự kiện thay đổi giá trị của một input trong form
              * name: tên của input này

@@ -44,8 +44,11 @@ export const nodeAttrsDefinition = {
         validate: function(attrs) {
 
         },
-        specificHandler(attrs, data) {
-            attrs.formreference.options = data.items;
+        specificHandler(attrs, data, attrName) {
+            if (attrName == 'formreference') {
+                attrs.formreference.options = data.items;
+                attrs.formkeydefinition.value = attrs.formreference.value;
+            }
         },
         checkShowOrHideInput: function(attrs) {
             let taskAction = attrs.taskAction;
@@ -157,8 +160,11 @@ export const nodeAttrsDefinition = {
 
         },
         docker: dockerGroups.event,
-        specificHandler(attrs, data) {
-            attrs.formreference.options = data.items;
+        specificHandler(attrs, data, attrName) {
+            if (attrName == 'formreference') {
+                attrs.formreference.options = data.items;
+                attrs.formkeydefinition.value = attrs.formreference.value;
+            }
         },
     },
     'StartConditionalEvent': {

@@ -50,7 +50,7 @@
                             :key="item.tab"
                         >
                             <v-card flat class="pl-4 pr-4">
-                                <component :is="item.content" :task="task"></component>
+                                <component :is="item.content" :taskInfo="taskInfo"></component>
                             </v-card>
                         </v-tab-item>
                     </v-tabs-items>
@@ -70,12 +70,15 @@ import people from "./people";
 import relatedItems from "./relatedItems";
 import subtask from "./subtask";
 import task from "./task";
+
 export default {
     name: "taskDetail",
     props: {
-        task: {
+        taskInfo: {
             type: Object,
-            default: () => {}
+            default: () => {
+                return {}
+            }
         }
     },
     components: {
