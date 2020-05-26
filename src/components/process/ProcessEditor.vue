@@ -117,7 +117,8 @@ const mapLibNameToFlowableName = {
     AdHocSubProcess: "AdhocSubProcess",
     Process: "BPMNDiagram",
     Collaboration: "BPMNDiagram",
-    Task: "UserTask"
+    Task: "UserTask",
+    Participant: "Pool"
 };
 
 export default {
@@ -198,14 +199,17 @@ export default {
         fillNodeData() {
             let allBNodes = this.$refs.symperBpmn.getAllNodes();
             let nodeType = "";
+            let allBNodesMap = {};
+            let allNodes = this.$store.state.process.allNodes;
             // Dựng thuộc tính cho từng node
             for (let bnode of allBNodes) {
                 // bnode là viết tắt của businessObject node data
+                allBNodesMap[bnode.id] = bnode;
                 nodeType = this.getNodeType(bnode);
-                if (!this.$store.state.process.allNodes[bnode.id]) {
+                if (!allNodes[bnode.id]) {
                     this.createNodeData(bnode.id, nodeType);
                 }
-                let nodeData = this.$store.state.process.allNodes[bnode.id];
+                let nodeData = allNodes[bnode.id];
                 if (!nodeData.attrs.name.value && nodeType == "UserTask") {
                     // Nếu user task chưa có name thì tự động thêm name vào cho node đó
                     if (nodeData.attrs.overrideid) {
@@ -215,6 +219,13 @@ export default {
                         nodeData.attrs.name.value =
                             nodeData.attrs.process_id.value;
                     }
+                }
+            }
+
+            // Loại bỏ data của các node mà ko có trong diagram
+            for(let id in allNodes){
+                if(!allBNodesMap[id]){
+                    this.$delete(allNodes, id);
                 }
             }
         },
@@ -340,22 +351,60 @@ export default {
                     nodeData.outgoing.push({ resourceId: bnode.id });
                 }
             }
-
-            // đẩy các node vào dạng cây:
-            for (let bnode of allBNodes) {
-                let saveNode = mapSaveNodes[bnode.id];
-                if (saveNode.stencil.id == "SequenceFlow") {
-                    di.childShapes.push(saveNode); // theo quy tắc 1 của flowable về lưu SequenceFlow
-                } else if (bnode.$parent.id) {
-                    let pId = bnode.$parent.id;
-
-                    if (mapSaveNodes[pId]) {
-                        mapSaveNodes[pId].childShapes.push(saveNode);
-                    }
+            this.translateToTreeData(di, allBNodes, mapSaveNodes);
+            return di;
+        },
+        translateToTreeData(di, allBNodes, mapSaveNodes){
+            let bnodeRoot = {};
+            for(let bnode of allBNodes){
+                let nodeType = this.getNodeType(bnode);
+                if (nodeType == "BPMNDiagram") {
+                    bnodeRoot = bnode;
+                }else if(nodeType == "SequenceFlow"){
+                    di.childShapes.push(mapSaveNodes[bnode.id]); // theo quy tắc 1 của flowable về lưu SequenceFlow
                 }
             }
 
-            return di;
+            if(bnodeRoot.$type == 'bpmn:Collaboration'){
+                for(let pool of bnodeRoot.participants){
+                    let poolToSave = mapSaveNodes[pool.id];
+                    di.childShapes.push(poolToSave);
+                    poolToSave.properties.process_id = poolToSave.properties.process_id ? poolToSave.properties.process_id : poolToSave.properties.overrideid;
+                    if(pool.processRef.laneSets){
+                        // thêm các con cho các lane
+                        for(let lane of pool.processRef.laneSets[0].lanes){
+                            poolToSave.childShapes.push(mapSaveNodes[lane.id]);
+                            this.addChildrenForProcess(mapSaveNodes[lane.id], lane.flowNodeRef, mapSaveNodes);
+                        }
+                    }else{
+                        //tự Tạo một đối tượng lane mới do thư viện ko tạo trước
+                        let newId = "symper_auto_lane_"+Date.now();
+                        let laneState = this.createNodeData(newId, 'Lane');
+                        let laneToSave = util.cloneDeep(nodeDataTpl);
+                        laneToSave.stencil.id = "Lane";
+                        laneToSave.resourceId = newId;
+                        laneToSave.dockers = [];
+                        laneToSave.outgoing = [];
+                        laneToSave.properties = this.getNodeProperties(laneState);
+                        laneToSave.bounds = this.getNodeBounds(pool);
+                        laneToSave.bounds.upperLeft.x += 30;
+                        mapSaveNodes[pool.id].childShapes.push(laneToSave);
+                        this.addChildrenForProcess(laneToSave, pool.processRef.flowElements, mapSaveNodes);
+                    }
+                }
+            }else if(bnodeRoot.$type == 'bpmn:Process'){
+                this.addChildrenForProcess(di, bnodeRoot.flowElements, mapSaveNodes);
+            }
+        },
+        addChildrenForProcess(di, bEls, mapSaveNodes){
+            for(let bel of bEls){
+                if(bel.$type != 'bpmn:SequenceFlow'){
+                    di.childShapes.push(mapSaveNodes[bel.id]);
+                    if(bel.$type == 'bpmn:SubProcess'){
+                        this.addChildrenForProcess(mapSaveNodes[bel.id], bel.flowElements, mapSaveNodes);
+                    }
+                }
+            }
         },
         getDefaultDocker(bnode) {
             let allNodes = this.$store.state.process.allNodes;
@@ -424,9 +473,16 @@ export default {
                 }
             };
         },
-        getNodeProperties(idNode) {
+        getNodeProperties(nodeInfo) {
             let props = {};
-            let sNodeAttrs = this.$store.state.process.allNodes[idNode];
+            let sNodeAttrs = {};
+            if(typeof nodeInfo == 'string'){
+                sNodeAttrs = this.$store.state.process.allNodes[nodeInfo];
+            }else if(typeof nodeInfo == 'object' && nodeInfo.attrs){
+                sNodeAttrs = nodeInfo
+            }else {
+                console.error("node info not match type Object or String", nodeInfo)
+            }
 
             for (let key in sNodeAttrs.attrs) {
                 let attr = sNodeAttrs.attrs[key];
@@ -437,7 +493,7 @@ export default {
                                 attr.value
                             );
                         } else {
-                            props[key] = attr.value;
+                            props[key] = attr.value ? attr.value : '';
                         }
                     } else {
                         console.warn(
@@ -567,7 +623,12 @@ export default {
 
             
             if (name == "overrideid" || name == "process_id") {
-                this.selectingNode.id = attrs[name].value;
+                let oldId = this.$store.state.process.selectingNode.id;
+                let newId = attrs[name].value;
+                this.$store.state.process.selectingNode.id = newId; // đặt lại id cho thông tin của node
+                // Thay key của node cũ trong state bằng id của node mới
+                this.$delete(this.$store.state.process.allNodes, oldId);
+                this.$set(this.$store.state.process.allNodes, newId, this.$store.state.process.selectingNode);
             }
         },
         /**

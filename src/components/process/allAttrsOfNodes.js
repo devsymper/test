@@ -1261,6 +1261,14 @@ export const allNodesAttrs = {
         "info": "BPMN.PROPERTYPACKAGES.CANCELREMAININGINSTANCESPACKAGE.CANCELREMAININGINSTANCES.DESCRIPTION",
         "dg": "detail"
     },
+    "showcaption": {
+        "title": "Cancel remaining instances",
+        "type": "checkbox",
+        "value": false,
+        "info": "BPMN.PROPERTYPACKAGES.CANCELREMAININGINSTANCESPACKAGE.CANCELREMAININGINSTANCES.DESCRIPTION",
+        "dg": "detail",
+        hidden: true,
+    },
     taskAction: { // loại task: submit hoặc approval
         title: 'Task action',
         type: 'select',

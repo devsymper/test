@@ -474,11 +474,15 @@ html {
 
 /* kệ khá nhé */
 
-.v-navigation-drawer__content .mdi {
+
+/* Khá không thích điều này nên đã comment lại */
+
+
+/* .v-navigation-drawer__content .mdi {
     background: -webkit-linear-gradient(#eee, #333);
     background-clip: text;
     -webkit-text-fill-color: transparent;
-}
+} */
 
 
 /* are you ok? */

@@ -12,6 +12,8 @@ import ContentOnlyView from "./views/layout/ContentOnlyView";
 import Notifications from 'vue-notification'
 import VueMoment from "vue-moment";
 import moment from "moment-timezone";
+import { appConfigs } from "./configs";
+
 
 Vue.component('ba-view', BaView);
 Vue.component('end-user-view', EndUserView);
@@ -20,6 +22,7 @@ Vue.use(Notifications);
 Vue.use(VueMoment, {
     moment,
 });
+
 /**
  * $evtBus : component chuyên chở các sự kiện giữa tất cả các component
  */
@@ -52,7 +55,7 @@ Vue.prototype.$snotify = function(option, group = false) {
         group: group,
         width: 400,
         classes: 'symper-general-notification',
-        duration: 10000,
+        duration: appConfigs.notificationTimeout[option.type],
         speed: 500,
         data: {
             type: option.type,
@@ -67,6 +70,9 @@ Vue.prototype.$snotify = function(option, group = false) {
 
 Vue.prototype.$snotifyError = function(err = {}, title = 'ERROR', detail = '') {
     console.warn(err);
+    if (!detail && err.responseJSON && err.responseJSON.message) {
+        detail = err.responseJSON.message;
+    }
     this.$snotify({
         type: 'error',
         title: title,

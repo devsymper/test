@@ -21,9 +21,9 @@ export const appConfigs = {
     },
     notificationTimeout: {
         success: 10000,
-        warning: 10000,
-        info: 10000,
-        error: -1,
+        warning: 20000,
+        info: 20000,
+        error: 30000,
     },
     firebaseConfig: {
         apiKey: "AIzaSyCWalwPSvfi8GbdofE_whZMHLi_Fc0l7DE",

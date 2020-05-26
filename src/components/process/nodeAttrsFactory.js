@@ -458,7 +458,25 @@ export const nodeAttrsDefinition = {
         checkShowOrHideInput: function(attrs) {
 
         }
-    }
+    },
+    'Pool': {
+        attrs: ["isexecutable", "process_id"],
+        validate: function(attrs) {
+
+        },
+        checkShowOrHideInput: function(attrs) {
+
+        }
+    },
+    'Lane': {
+        attrs: ["showcaption"],
+        validate: function(attrs) {
+
+        },
+        checkShowOrHideInput: function(attrs) {
+
+        }
+    },
 };
 
 
