@@ -2,7 +2,7 @@
     <div id="symper-app" @click="handleClickApp">
         <component :is="layout">
             <keep-alive>
-                <router-view />
+                <router-view :key="$route.path" />
             </keep-alive>
             <notifications group="symper-general-notification">
                 <template slot="body" slot-scope="props">
