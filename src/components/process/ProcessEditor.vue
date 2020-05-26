@@ -173,7 +173,7 @@ export default {
         // Lấy thông tin cấu hình của model
         getModelData() {
             let modelAttr;
-            let allNodes = this.$store.state.process.allNodes;
+            let allNodes = this.stateAllElements;
             for (let id in allNodes) {
                 if (allNodes[id].type == "BPMNDiagram") {
                     modelAttr = allNodes[id];
@@ -200,7 +200,7 @@ export default {
             let allBNodes = this.$refs.symperBpmn.getAllNodes();
             let nodeType = "";
             let allBNodesMap = {};
-            let allNodes = this.$store.state.process.allNodes;
+            let allNodes = this.stateAllElements;
             // Dựng thuộc tính cho từng node
             for (let bnode of allBNodes) {
                 // bnode là viết tắt của businessObject node data
@@ -271,7 +271,7 @@ export default {
             console.log(
                 allEleData,
                 "allEleData",
-                this.$store.state.process.allNodes
+                this.stateAllElements
             );
             let self = this;
             allEleData.modelId = idModel;
@@ -407,7 +407,7 @@ export default {
             }
         },
         getDefaultDocker(bnode) {
-            let allNodes = this.$store.state.process.allNodes;
+            let allNodes = this.stateAllElements;
             let startNode = allNodes[bnode.sourceRef.id];
             let endNode = allNodes[bnode.targetRef.id];
 
@@ -477,7 +477,7 @@ export default {
             let props = {};
             let sNodeAttrs = {};
             if(typeof nodeInfo == 'string'){
-                sNodeAttrs = this.$store.state.process.allNodes[nodeInfo];
+                sNodeAttrs = this.stateAllElements[nodeInfo];
             }else if(typeof nodeInfo == 'object' && nodeInfo.attrs){
                 sNodeAttrs = nodeInfo
             }else {
@@ -548,7 +548,7 @@ export default {
         },
         handleNodeChangeProps(nodeData) {
             let nodeId = nodeData.id;
-            let nodeState = this.$store.state.process.allNodes[nodeId];
+            let nodeState = this.stateAllElements[nodeId];
             let newType = this.getNodeType(nodeData);
             console.log(newType, nodeData);
 
@@ -560,7 +560,10 @@ export default {
                 if (nodeId == this.selectingNode.id) {
                     this.$store.commit(
                         "process/changeSelectingNode",
-                        this.$store.state.process.allNodes[nodeId]
+                        {
+                            instanceKey: this.instanceKey,
+                            data: this.stateAllElements[nodeId]
+                        }
                     );
                 }
             }
@@ -579,7 +582,10 @@ export default {
                         nodeState.attrs[attrName].value;
                 }
             }
-            this.$store.commit("process/addNewNode", newNodeData);
+            this.$store.commit("process/addNewNode",{
+                            instanceKey: this.instanceKey,
+                            data: newNodeData
+                        } );
         },
         /** Xử lý các sự kiện khi có sự thay đổi giá trị của các input trong panel cấu hình bên phải
          * data là giá trị sau thay đổi của một input trong formtpl
@@ -616,19 +622,19 @@ export default {
                 let applyValue = {};
                 applyValue[reApplyToView[name]] = inputInfo.value;
                 this.$refs.symperBpmn.updateElementProperties(
-                    this.$store.state.process.selectingNode.id,
+                    this.selectingNode.id,
                     applyValue
                 );
             }
 
             
             if (name == "overrideid" || name == "process_id") {
-                let oldId = this.$store.state.process.selectingNode.id;
+                let oldId = this.selectingNode.id;
                 let newId = attrs[name].value;
-                this.$store.state.process.selectingNode.id = newId; // đặt lại id cho thông tin của node
+                this.selectingNode.id = newId; // đặt lại id cho thông tin của node
                 // Thay key của node cũ trong state bằng id của node mới
-                this.$delete(this.$store.state.process.allNodes, oldId);
-                this.$set(this.$store.state.process.allNodes, newId, this.$store.state.process.selectingNode);
+                this.$delete(this.stateAllElements, oldId);
+                this.$set(this.stateAllElements, newId, this.selectingNode);
             }
         },
         /**
@@ -636,7 +642,7 @@ export default {
          * Nếu không tìm thấy nodeId này trong state thì tạo các thuộc tính dựa theo loại node (nodeType)
          */
         getNodeData(nodeId, nodeType) {
-            let nodeData = this.$store.state.process.allNodes[nodeId];
+            let nodeData = this.stateAllElements[nodeId];
             if (!nodeData) {
                 nodeData = this.createNodeData(nodeId, nodeType);
             }
@@ -661,7 +667,10 @@ export default {
                 nodeData.attrs.overrideid.value = nodeId;
             }
 
-            this.$store.commit("process/addNewNode", nodeData);
+            this.$store.commit("process/addNewNode", {
+                instanceKey: this.instanceKey,
+                data: nodeData
+            });
             return nodeData;
         },
         /**
@@ -681,7 +690,10 @@ export default {
             if (nodeData.attrs.overrideid) {
                 nodeData.attrs.overrideid.value = node.id;
             }
-            this.$store.commit("process/changeSelectingNode", nodeData);
+            this.$store.commit("process/changeSelectingNode", {
+                instanceKey: this.instanceKey,
+                data: nodeData
+            });
         },
         /**
          * Xử lý các hành động khi người dùng click vào các nút ở header của editor (zoom, focus, validate ... )
@@ -776,6 +788,11 @@ export default {
     },
 
     created() {
+        this.instanceKey = Date.now();
+        this.$store.commit(
+            "process/initInstance",
+            this.instanceKey
+        );
         this.$store.dispatch("app/getAllOrgChartData");
         if (this.$route.name == "editProcess") {
             this.modelAction = "edit";
@@ -796,7 +813,8 @@ export default {
     },
     data() {
         return {
-            attrPannelHeight: "300px", // chiều cao của
+            instanceKey: null, // key của instance hiện tại
+            attrPannelHeight: "300px", // chiều cao của panel cấu hình các element
             modelAction: "create", // hành động đối với model này là gì: create | clone | edit
             modelId: "", // Id của model này trong DB
             searchAttrKey: "",
@@ -851,11 +869,14 @@ export default {
     },
     computed: {
         selectingNode() {
-            return this.$store.state.process.selectingNode;
+            return this.$store.state.process.editor[this.instanceKey].selectingNode;
+        },
+        stateAllElements() {
+            return this.$store.state.process.editor[this.instanceKey].allNodes;
         },
         /** Chuyển dạng danh sách attr từ dạng phẳng sang dạng nhóm thành các group để hiển thị **/
         attrGroupView() {
-            let currentAtts = this.$store.state.process.selectingNode.attrs;
+            let currentAtts = this.selectingNode.attrs;
             let groups = {};
 
             for (let attrName in currentAtts) {
@@ -889,7 +910,8 @@ export default {
                 groups[groupName].items[attrName] = currentAtts[attrName];
             }
             return groups;
-        }
+        },
+
     }
 };
 </script>

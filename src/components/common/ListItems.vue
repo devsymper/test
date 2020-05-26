@@ -294,7 +294,8 @@ export default {
                 licenseKey: "non-commercial-and-evaluation",
                 afterRender: isForced => {
                     console.log(
-                        "after render handsontablelllllllllllllllllllllllllll"
+                        "after render handsontablelllllllllllllllllllllllllll",
+                        Date.now()
                     );
                 }
             },
@@ -463,6 +464,10 @@ export default {
         }
     },
     mounted() {},
+    activated() {
+        console.log('activatedactivatedactivatedactivatedactivatedactivatedactivatedactivated');
+        
+    },
     computed: {
         currentItemDataClone() {
             return util.cloneDeep(this.currentItemData);
