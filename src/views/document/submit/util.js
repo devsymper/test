@@ -240,4 +240,26 @@ export default class Util {
         return ext == null ? "" : ext[1];
     }
 
+    static makeErrNoti = function(msg, sign) {
+        return `<i
+                data-sign="` + sign + `"
+                onclick="parent.processUIErr(event)"
+                class="fa fa-info-circle text-danger bkerp-icon-error"
+                aria-hidden="true" >
+            </i>
+            <div
+                data-sign="` + sign + `"
+                class="notification p-2 rounded hideNoti box-error-mess">
+                <div class="header pb-1">
+                    <i
+                        class="fa fa-info-circle text-danger mr-2"
+                        aria-hidden="true">
+                    </i>
+                    Lỗi
+                </div>
+                <div class="content pt-1"> ` + msg + `
+                </div>
+            </div> `;
+    }
+
 }

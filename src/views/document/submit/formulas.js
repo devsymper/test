@@ -1,5 +1,6 @@
 import sDocument from './../../../store/document'
 let dataSubmitStore = sDocument.state.submit
+
 export default class Formulas {
     constructor(formulas, type) {
         this.formulas = formulas;
@@ -7,11 +8,9 @@ export default class Formulas {
          * Loại của công thức: validate, data, require, readonly..f
          */
         this.type = type;
+        this.inputControl = this.getInputControl();
     }
-    init() {
-        this.effectedControl = null;
-        this.inputControl = this.getInputControl();;
-    }
+
     run(dataInput) {
 
     }
@@ -28,12 +27,14 @@ export default class Formulas {
      * Đồng thời đẩy vào thông tin về việc control nào thay đổi dẫn đến các control khác thay đổi theo
      */
     getInputControl() {
-        let fml = thisObj.formula;
+        let fml = this.formulas;
         if (!fml) {
             return {};
         }
         let alterFml = fml.replace(/as\s+f\.([A-Za-z0-9_]+)/gi, '');
         let allRelateName = alterFml.match(/f\.([A-Za-z0-9_]+)/gi);
+        console.log(allRelateName);
+
         if (!allRelateName) {
             return {};
         }

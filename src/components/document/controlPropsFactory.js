@@ -441,7 +441,7 @@ const controlTypes = {
     table: {
         icon: "/icon/ic_table.png",
         html: `<table contenteditable="true" class="s-control s-control-table" s-control-type="table">
-                    <thead style="font-size: 11px;background:#f2f2f2">
+                    <thead>
                         <tr>
                             <th></th>
                             <th></th>
@@ -451,12 +451,12 @@ const controlTypes = {
                         </tr>
                     </thead>
                     <tbody>
-                    <tr class="s-control-table-row-template">
-                        <td style="width:20%;"></td>
-                        <td style="width:20%;"></td>
-                        <td style="width:20%;"></td>
-                        <td style="width:20%;"></td>
-                        <td style="width:20%;"></td>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
                     </tr>
                 </tbody>
                 </table> &nbsp;

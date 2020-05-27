@@ -568,3 +568,7 @@ html {
 .hide-process-palette .djs-palette {
     display: none!important;
 }
+
+.editor-tree-active {
+    background: #f2f2f2;
+}

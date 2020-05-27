@@ -349,8 +349,9 @@ export default {
              * emit sự kiện thay đổi giá trị của một input trong form
              * name: tên của input này
              * inputInfo: chứa các thông tin về input
-             */
+             */ 
             this.$emit("input-value-changed", name, inputInfo);
+            this.$evtBus.$emit("form-tpl-input-value-changed", {name:name,inputInfo:inputInfo} );
         },
         getInputProps(inputConfigs) {
             let rsl = inputTypeConfigs[inputConfigs.type].props(inputConfigs);

@@ -28,6 +28,18 @@ const changeControlSubmitProps = (state, params) => {
 const restoreState = (state) => {
     state.editor.allControl = {};
     state.editor.currentSelectedControl = { formulas: {}, properties: { name: {}, display: {}, print: {} }, type: '' };
+    state.submit = {
+        listInputInDocument: {
+
+        },
+        dataInputCache: {
+
+        },
+        docStatus: 'init',
+        isDetailView: false,
+        SQLLiteDB: {}
+
+    }
     setTreeListControlInDoc(state)
 }
 
@@ -69,24 +81,23 @@ function setTreeListControlInDoc(state) {
                 let item = { name: childName + " - " + childTitle, icon: getIconFromType(childType), id: childControlId }
                 children.push(item)
             }
-            treeData[0].children.push({ name: name + " - " + title, icon: getIconFromType(type), id: controlId, children: children })
+            treeData[0].children.push({ name: name + " - " + title, active: false, icon: getIconFromType(type), id: controlId, children: children })
         } else {
-            treeData[0].children.push({ name: name + " - " + title, icon: getIconFromType(type), id: controlId })
+            treeData[0].children.push({ name: name + " - " + title, active: false, icon: getIconFromType(type), id: controlId })
         }
     }
     state.editor.listControlTreeData = treeData;
+    // Vue.set(state.editor, listControlTreeData, treeData)
 }
 
 const addControlToTable = (state, params) => {
     let id = params.id
     let prop = params.props
     let tableId = params.tableId
-    if (state.editor.allControl[tableId]['listFields']) {
-        state.editor.allControl[tableId]['listFields'][id] = prop
-    } else {
+    if (state.editor.allControl[tableId]['listFields']) {} else {
         state.editor.allControl[tableId]['listFields'] = {};
-        state.editor.allControl[tableId]['listFields'][id] = prop
     }
+    Vue.set(state.editor.allControl[tableId]['listFields'], id, prop);
     setTreeListControlInDoc(state);
 };
 const addCurrentControl = (state, control) => {
@@ -156,6 +167,30 @@ const minimizeControl = (state, params) => {
 
 }
 
+/**
+ * hàm thêm instance SQLLite vào store
+ */
+
+const addInstanceSubmitDB = (state, params) => {
+    let instance = params.instance
+    let sqlLite = params.sqlLite
+        // state.editor.allControl[id] = prop;
+    Vue.set(state.submit.SQLLiteDB, instance, sqlLite);
+}
+
+/**
+ * hàm thêm các giá trị cho listInputInDocument -- submit store
+ */
+
+const updateListInputInDocument = (state, params) => {
+    let key = params.key
+    let controlName = params.controlName;
+    let value = params.value
+    if (state.submit.listInputInDocument.hasOwnProperty(controlName)) {
+        Vue.set(state.submit.listInputInDocument[controlName], key, value);
+    }
+}
+
 
 export {
     addControl,
@@ -165,5 +200,7 @@ export {
     minimizeControl,
     restoreState,
     addToListInputInDocument,
-    changeControlSubmitProps
+    changeControlSubmitProps,
+    addInstanceSubmitDB,
+    updateListInputInDocument
 };

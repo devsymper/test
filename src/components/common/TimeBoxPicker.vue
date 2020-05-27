@@ -1,14 +1,12 @@
 <template>
-    <v-card class="card-datetime-picker"
+    <v-card class="card-time-picker"
     
     :style="position"
     v-show="isShow" ref="symperDateTimePicker">
         <h4 class="heading">{{title}}</h4>
         <v-divider></v-divider>
-        <v-date-picker class="date-picker" @click:date="dateSelected" v-model="date" no-title></v-date-picker>
-       
         <sym-time-picker v-if="isTime"></sym-time-picker>
-        <button v-if="isTime" v-on:click="applyDateTime" class="apply-time">
+        <button v-if="isTime" v-on:click="applyTime" class="apply-time">
             Áp dụng
         </button>
     </v-card>
@@ -22,7 +20,7 @@ export default {
     props:{
         title:{
             type:String,
-            default:"Chọn ngày giờ"
+            default:"Chọn giờ"
         },
         isTime:{
             type:Boolean,
@@ -34,25 +32,10 @@ export default {
         }
         
     },
-    created() {
-        let thisCpn = this;
-        this.$evtBus.$on("symper-app-wrapper-clicked", evt => {
-            if (this.keyInstance == 0 && !$(evt.target).hasClass("input-item-func") && 
-
-                (!$(evt.target).hasClass("card-datetime-picker") &&
-                $(evt.target).closest(".card-datetime-picker").length == 0) &&
-                (!$(evt.target).hasClass("v-list-item") &&
-                $(evt.target).closest(".v-list-item").length == 0)
-            ) {
-                thisCpn.closePicker();
-            }
-        });
-    },
     data(){
         return {
-            date:null,
             isShow:false,
-             position:null,
+            position:null,
         }
     },
     beforeMount(){
@@ -63,10 +46,10 @@ export default {
     },
   
     methods:{
-        closePicker() {
+        hide() {
             this.isShow = false;
         },
-        openPicker(e){
+        show(e){
             this.isShow = true;
             this.calPosition(e);
         },
@@ -74,14 +57,8 @@ export default {
             this.position = {'top':$(e.target).offset().top + 30 +'px','left':$(e.target).offset().left - $(e.target).width()/2+'px'};
         },
        
-        applyDateTime(){
-            let dateTime = this.date + " " + this.time;
-            this.$emit('apply-datetime',dateTime)
-        },
-        dateSelected(e){
-            console.log(e);
-            this.$emit('clickDateCell',e);
-            
+        applyTime(){
+            this.$emit('document-submit-apply-time-picker',this.time);
         }
     }
 }
@@ -106,7 +83,7 @@ export default {
     .apply-time:hover{
         background: #fafafa;
     }
-    .card-datetime-picker{
+    .card-time-picker{
         position: absolute;
         z-index: 9999;
     }

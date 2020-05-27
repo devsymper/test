@@ -49,6 +49,7 @@ const defaultState = {
         },
         docStatus: 'init',
         isDetailView: false,
+        SQLLiteDB: {}
 
     }
 };
