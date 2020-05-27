@@ -1,9 +1,14 @@
+import Formulas from "./formulas";
+
 export default class Control {
     constructor(ele, controlProps, curParentInstance) {
         /**
-         * Gía trị gốc của control, được set bởi BA
+         * object các thuộc tính về hiển thị của control
          */
         this.controlProperties = controlProps.properties
+            /**
+             * Object các thuộc tính về công thức của control
+             */
         this.controlFormulas = controlProps.formulas
             /**
              * jQueryObject tham chiếu tới DOM của control
@@ -16,6 +21,11 @@ export default class Control {
 
     }
     init() {
+        /**
+         * mảng luu giá trị các control bị ảnh hưởng, chỉ ra control này thay đổi giá trị thì sẽ thay đổi theo các control nào
+         */
+        this.effectedControl = [];
+
         this.value = '';
 
         /**
@@ -49,9 +59,21 @@ export default class Control {
             require: {},
             data: {}
         };
+        this.initFormulas();
+
     }
+
+    /**
+     * Khởi tạo các formulas của từng control
+     */
     initFormulas() {
+        for (let key in this.controlFormulas) {
+            if (this.type == "date") {
+                this.controlFormulas[key].value = "SELECT NOW()"; // tesst formulas
+            }
+            this.controlFormulas[key]['instance'] = new Formulas(this.controlFormulas[key].value, key);
+        }
+        console.log(this.controlFormulas);
 
     }
-
 }

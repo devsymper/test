@@ -1,7 +1,7 @@
 <template>
 <v-treeview
     v-model="tree"
-    :items="allControl"
+    :items="listControlTreeData"
     dense
     hoverable
     open-all
@@ -11,7 +11,7 @@
      :style="{'font-size':'11px !important'}"
 >
     <template v-slot:label="{ item }">
-        <div v-on:click="clickItem(item)">
+        <div v-on:click="clickItem(item)" :class="`tree-`+item.id">
             <img :src="`https://hoangnd.dev.symper.vn/`+item.icon" height="14" width="14" style="margin-top:3px;margin-right:8px;margin-bottom: -2px;">
             <label  :title="item.name">{{item.name}}</label>
         </div>
@@ -22,7 +22,7 @@
 <script>
 export default {
     computed: {
-        allControl(){
+        listControlTreeData(){
             return this.$store.state.document.editor.listControlTreeData;
         },
     },

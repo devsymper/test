@@ -603,3 +603,7 @@ html {
 .ps-container .ps__rail-x {
     z-index: 1;
 }
+
+.editor-tree-active {
+    background: #f2f2f2;
+}

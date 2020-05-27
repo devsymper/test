@@ -118,6 +118,9 @@ export default {
     created() {
         this.documentId = this.$route.params.id;
         let thisCpn = this;
+        /**
+         * Nhận sự kiên từ click treeview danh sách các control trong doc thì highlight control và selected control
+         */
         this.$evtBus.$on("document-editor-click-treeview-list-control", locale => {
             let elControl = $("#editor_ifr").contents().find('body #'+locale.id);
             $("#editor_ifr").contents().find('.on-selected').removeClass('on-selected');
@@ -136,6 +139,15 @@ export default {
             }
             
         });
+        /**
+         * Nhận sự kiện phát ra từ formTpl lúc on change để check trùng tên control
+         */
+        this.$evtBus.$on("form-tpl-input-value-changed", locale =>{
+            $('#editor_ifr').contents().find('.s-control-error').removeClass('s-control-error');
+            thisCpn.checkNameAfterChange()
+            
+        })
+            
     },
     data(){
         return{
@@ -276,9 +288,17 @@ export default {
                     if (res.status == 200) {
                         thisCpn.$router.push('/documents');
                     }
+                    thisCpn.$snotify({
+                        type: "success",
+                        title: "Save document success!"
+                    });
                 })
                 .catch(err => {
                     console.log("error from edit document api!!!", err);
+                    thisCpn.$snotify({
+                        type: "error",
+                        title: "error from edit document api"
+                    });
                 })
                 .always(() => {
                 });
@@ -287,6 +307,10 @@ export default {
                 documentApi.saveDocument({documentProperty:documentProperties,fields:allControl,content:htmlContent}).then(res => {
                     if (res.status == 200) {
                         thisCpn.$router.push('/documents');
+                        thisCpn.$snotify({
+                            type: "success",
+                            title: "Save document success!"
+                        });
                     }
                 })
                 .catch(err => {
@@ -298,6 +322,14 @@ export default {
         },
         //hoangnd: hàm xác thưc các control trước khi lưu
         // xac thực tên control và các formulas liên quan
+        checkNameAfterChange(){
+            let allControl = util.cloneDeep(this.editorStore.allControl);
+            let listControlName = [];
+            for(let controlId in allControl){
+                let control = allControl[controlId];
+                this.checkDupliucateNameControl(listControlName,control,controlId)
+            }
+        },
         validateControl(documentProperties){
             let thisCpn = this;
             let allControl = util.cloneDeep(this.editorStore.allControl);
@@ -312,7 +344,7 @@ export default {
                     // Object.assign
                 }
                 this.checkNameControl(controlId,control,listControlName);
-                this.validateFormulasInControl(control)
+                this.validateFormulasInControl(control,listControlName)
             }
             if(this.listMessageErr.length == 0 && $('#editor_ifr').contents().find('.s-control-error').length == 0){
                 this.saveDocument(documentProperties);
@@ -326,17 +358,21 @@ export default {
         },
         // hàm kiểm tra xác thực tên control 
         checkNameControl(controlId,control,listControlName){
-            if(control.properties.name.value == ''){
-                let controlEl = $('#editor_ifr').contents().find('#'+controlId);
-                controlEl.addClass('s-control-error');
-                let message = 'Không được bỏ trống tên control'
-                if(this.listMessageErr.indexOf(message) === -1){
-                    this.listMessageErr.push(message);
+            if(control.type != "submit" && control.type != "draf" && control.type != "reset"){
+                if(control.properties.name.value == ''){
+                    let controlEl = $('#editor_ifr').contents().find('#'+controlId);
+                    controlEl.addClass('s-control-error');
+                    let message = 'Không được bỏ trống tên control'
+                    if(this.listMessageErr.indexOf(message) === -1){
+                        this.listMessageErr.push(message);
+                    }
                 }
+                else{
+                    this.checkDupliucateNameControl(listControlName,control,controlId);
+                }
+                
             }
-            else{
-                this.checkDupliucateNameControl(listControlName,control,controlId);
-            }
+            
         },
       
         // hàm kiểm tra xem co control nào trùng tên hay ko
@@ -353,7 +389,7 @@ export default {
             }
         },
         // hàm kiểm tra xem trong công thức có trỏ đến control ko tồn tại hay ko
-        validateFormulasInControl(control){
+        validateFormulasInControl(control,listControlName){
             // check control Name trong cong thức
             for(let f in control.formulas){
                 if(control.formulas[f].value != ""){
@@ -381,12 +417,8 @@ export default {
             let tbody = '';
             for(let i = 0; i < listRowData.length; i++ ){
                 let row = listRowData[i];
-                console.log(row);
-                
                 let type = row.type;
                 let control = GetControlProps(type);
-                console.log(control.properties.name);
-                
                 control.properties.name.value = row.name;
                 control.properties.title.value = row.title;
                 let controlEl = $(control.html);
@@ -462,9 +494,15 @@ export default {
             }
 
             let newContent = contentNode.replace(/\/{2}/, checkDiv[0].outerHTML);
-            $(this.$refs.editor.editor.selection.getNode()).html(newContent+"&nbsp;")
+            
+            $(this.$refs.editor.editor.selection.getNode()).html(newContent+'&nbsp;<span id = "caret_pose_holder"> </ span>')
             let table = $(this.$refs.editor.editor.selection.getNode()).closest('.s-control-table');
             this.selectControl(control.properties, control.formulas,inputid);
+            let ed  = this.$refs.editor.editor;
+            ed.focus(); 
+            ed.selection.select(ed.dom.select('#caret_pose_holder')[0]); 
+            ed.selection.collapse(0); 
+             $(this.$refs.editor.editor.selection.getNode()).find('#caret_pose_holder').remove();
             if(table.length > 0 && inputid != table.attr('id')){
                 let tableId = table.attr('id');
                 this.addToAllControlInTable(inputid,{properties: control.properties, formulas : control.formulas,type:type},tableId);
@@ -474,9 +512,7 @@ export default {
             }
 
 
-            
-            
-            
+         
             
         },
         // hoangnd: hàm nhận sự kiện keyup của editor 
@@ -593,10 +629,17 @@ export default {
                 if(type == 'table'){
                     let tableId = inputid;
                     let tableEl = controlEl;
+                    
                     let bodyTable = $(value).find('table');
-                    tableEl.find('table').remove();
-                    tableEl.append(bodyTable);
-                    tableEl.find('table thead').attr('contenteditable',true);
+                    console.log(tableEl.find('thead'));
+                    console.log(tableEl.find('tbody'));
+
+                    // tableEl.find('table thead').remove();
+                    tableEl.find('thead').remove();
+                    tableEl.find('tbody').remove();
+                    tableEl.append(bodyTable.find('thead')[0].outerHTML);
+                    tableEl.append(bodyTable.find('tbody')[0].outerHTML);
+                    tableEl.find('thead').attr('contenteditable',true);
                     let allControlInTable = tableEl.find('.s-control');
                     $.each(allControlInTable,function(item,value){
                         let childControlProps = $(value).attr('data-property');
@@ -1160,10 +1203,12 @@ export default {
                 e.preventDefault();
                 $(clientFrameWindow.document).find('.on-selected').removeClass('on-selected');
                 $(this).addClass('on-selected');
-                console.log($(this));
-                
+
                 let type = $(this).attr('s-control-type');
                 let controlId = $(this).attr('id');
+                $('.editor-tree-active').removeClass('editor-tree-active')
+                $('.tree-'+controlId).addClass('editor-tree-active')
+                
                 let table = $(this).closest('.s-control-table');
                 if(table.length > 0 && controlId != table.attr('id')){
                     let tableId = table.attr('id');

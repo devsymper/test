@@ -1,5 +1,5 @@
 <template>
-    <div class="sym-form-submit" :id="'sym-submit-'+keyInstance" :style="{'width':docSize}">
+    <div :key="keyInstance" class="sym-form-submit" :id="'sym-submit-'+keyInstance" :style="{'width':docSize}">
         <div v-html="contentDocument">
 
         </div>
@@ -19,6 +19,8 @@
         <input type="file" :id="'file-upload-alter-'+keyInstance" class="hidden d-none">
         <user-select :keyInstance="keyInstance" ref="userInput"/>
         <validate :keyInstance="keyInstance" ref="validate"/>
+        <date-picker :keyInstance="keyInstance" @clickDateCell="selectedDate" :title="'Chọn ngày'" :isTime="false" ref="datePicker"/>
+        <time-picker :keyInstance="keyInstance" :title="'Chọn giờ'"  ref="timePicker"/>
     </div>
 </template>
 <script>
@@ -28,6 +30,8 @@ import './../../../components/document/documentContent.css';
 import {setDataForPropsControl} from './../../../components/document/dataControl';
 import BasicControl from './basicControl';
 import TableControl from './tableControl';
+import DatePicker from './../../../components/common/DateTimePicker'
+import TimeBoxPicker from './../../../components/common/TimeBoxPicker'
 import Table from './table.js';
 import SymperDragPanel from './../../../components/common/SymperDragPanel.vue';
 import {util} from './../../../plugins/util.js'
@@ -35,7 +39,7 @@ import AutocompleteInput from './items/AutocompleteInput.vue'
 import User from './items/User.vue'
 import Filter from './items/Filter.vue'
 import Validate from './items/Validate.vue'
-
+import ClientSQLManager from "./clientSQLManager.js"
 export default {
     props:{
         isQickSubmit:{
@@ -48,9 +52,17 @@ export default {
         }
     },
     name:'submitDocument',
+    watch:{
+        '$route' (to) {
+            console.log(to);
+            
+        }
+    },
     components:{
         'validate':Validate,
         'user-select':User,
+        'date-picker':DatePicker,
+        'time-picker':TimeBoxPicker,
         'filter-input':Filter,
         'autocomplete-input': AutocompleteInput,
         'sym-drag-panel': SymperDragPanel
@@ -82,10 +94,8 @@ export default {
         this.editorDoc = $('.sym-form-submit');
         let thisCpn = this;
         $('#file-upload-alter-'+this.keyInstance).on('change',function(e){
-            console.log($(this).prop('files')[0]);
             let name = $(this).attr('data-control-name');
             thisCpn.$store.commit("document/changeControlSubmitProps",{name:name,key:'value',value:$(this).prop('files')[0].name});
-            console.log(thisCpn.sDocumentSubmit.listInputInDocument[name]);
             thisCpn.sDocumentSubmit.listInputInDocument[name].addFile($(this).prop('files')[0].name)
             
         })
@@ -93,6 +103,7 @@ export default {
     
     created(){
         let thisCpn = this;
+        this.createSQLLiteDB();
         if(this.docId != 0){
             this.documentId = this.docId
         }
@@ -109,6 +120,14 @@ export default {
             thisCpn.$refs.validate.show(e);
             
         });
+        this.$evtBus.$on('document-submit-date-input-click',e=>{
+            thisCpn.$refs.datePicker.openPicker(e);
+            
+        });
+        this.$evtBus.$on('document-submit-time-input-click',e=>{
+            thisCpn.$refs.timePicker.show(e);
+            
+        });
         this.$evtBus.$on('document-submit-filter-input-click',e=>{
             thisCpn.$refs.symDragPanel.show();
             thisCpn.titleDragPanel = 'Tìm kiếm thông tin'
@@ -121,7 +140,7 @@ export default {
         });
         this.$evtBus.$on('symper-app-wrapper-clicked',evt=>{
             if (
-                !$(evt.target).hasClass("s-control-date") && 
+                !$(evt.target).hasClass("autocompleting") && 
                 !$(evt.target).hasClass("v-data-table") &&
                 $(evt.target).closest(".v-data-table").length == 0
             ) {
@@ -133,6 +152,20 @@ export default {
                 $(evt.target).closest(".card-list-user").length == 0
             ) {
                 thisCpn.$refs.userInput.hide();
+            }
+            if (
+                !$(evt.target).hasClass("s-control-date") && 
+                !$(evt.target).hasClass("card-datetime-picker") &&
+                $(evt.target).closest(".card-datetime-picker").length == 0
+            ) {
+                thisCpn.$refs.datePicker.closePicker();
+            }
+            if (
+                !$(evt.target).hasClass("s-control-time") && 
+                !$(evt.target).hasClass("card-time-picker") &&
+                $(evt.target).closest(".card-time-picker").length == 0
+            ) {
+                thisCpn.$refs.timePicker.hide();
             }
             if (
                 !$(evt.target).hasClass("validate-icon") && 
@@ -181,9 +214,10 @@ export default {
             let thisCpn = this;
             for (let index = 0; index < allInputControl.length; index++) {
                 let id = $(allInputControl[index]).attr('id');
-                if(this.sDocumentEditor.allControl[id] != undefined){   // ton tai id trong store
+                let controlType = $(allInputControl[index]).attr('s-control-type');
+                if(this.sDocumentEditor.allControl[id] != undefined && controlType != 'submit' && controlType != "reset"){   // ton tai id trong store
                     let controlName = this.sDocumentEditor.allControl[id].properties.name.value;
-                    if($(allInputControl[index]).attr('s-control-type') != 'table'){
+                    if(controlType != 'table'){
                         let control = new BasicControl($(allInputControl[index]),this.sDocumentEditor.allControl[id],thisCpn.keyInstance);
                         control.init();
                         this.$store.commit("document/addToListInputInDocument",{name:controlName,control:control});
@@ -195,29 +229,91 @@ export default {
                         let tableControl = new TableControl($(allInputControl[index]),this.sDocumentEditor.allControl[id],thisCpn.keyInstance);
                         tableControl.initTableControl();
                         this.$store.commit("document/addToListInputInDocument",{name:controlName,control:tableControl});
-
                         tableControl.tableInstance = new Table(tableControl,controlName)
                         let tableEle = $(allInputControl[index]);
                         tableEle.find('.s-control').each(function() {
-                            let childControlId = $(this).attr('id')
-                            let childControl = new BasicControl($(this),thisCpn.sDocumentEditor.allControl[id].listFields[childControlId],thisCpn.keyInstance);
+                            let childControlId = $(this).attr('id');
+                            let childControl = new BasicControl($(this), thisCpn.sDocumentEditor.allControl[id].listFields[childControlId], thisCpn.keyInstance);
                             childControl.init();
                             let childControlName = thisCpn.sDocumentEditor.allControl[id].listFields[childControlId].properties.name.value;
                             childControl.inTable = controlName;
                             thisCpn.$store.commit("document/addToListInputInDocument",{name:childControlName,control:childControl});
                             listInsideControls[childControlName] = true;
-
                         });
                         tableControl.listInsideControls = listInsideControls;
                         tableControl.renderTable();
                     }
-                    
                 }
             }
+            console.log(this.sDocumentSubmit);
+            console.log(this.sDocumentEditor);
+            this.getEffectedControl();
         },
+        /**
+         * Sự kiện phát ra khi click vào date của date picker
+         */
+        selectedDate(e){
+            console.log(e);
+            this.$refs.datePicker.closePicker();
+        },
+        
+        /**
+         * Hàm mở sub-form submit
+         */
         openSubFormSubmit(){
             this.$refs.symDragPanel.$children[1].$refs.autocompleteInput.hide()
             this.$refs.symDragPanel.show();
+        },
+
+        /**
+         * Hàm tạo csql
+         */
+        async createSQLLiteDB(){
+            ClientSQLManager.createDB(this.keyInstance);
+        },
+
+        /**
+         * Hàm lấy ra các control bị ảnh hưởng từ 1 control và set vao store
+         */
+        getEffectedControl(){
+            let mapControlEffected = {};
+            let allControl =  this.sDocumentEditor.allControl;
+            for(let controlId in allControl){
+                let type = allControl[controlId].type;
+                if(type != "submit" && type != "reset" && type != "draf"){
+                    let name = allControl[controlId].properties.name.value;
+                    console.log(name);
+                    console.log(type);
+                    
+                    let formulas = allControl[controlId].formulas;
+                    for(let formulasType in formulas){
+                        let inputControl = formulas[formulasType].instance.inputControl;
+                        for(let controlEffect in inputControl){
+                            if(mapControlEffected[controlEffect]  == undefined){
+                                mapControlEffected[controlEffect] = [];
+                            }
+                            mapControlEffected[controlEffect].push(name);
+                        }
+                    }
+                }
+            }
+            this.updateEffectedControlToStore(mapControlEffected);
+        },
+        
+        updateEffectedControlToStore(mapControlEffected){
+            for(let controlName in mapControlEffected){
+                this.updateListInputInDocument(controlName,"effectedControl",mapControlEffected[controlName]);
+            }
+        },
+        updateListInputInDocument(controlName, key, value){
+            this.$store.commit(
+                "document/updateListInputInDocument",{controlName:controlName, key:key, value:value}
+            );  
+        },
+        addSQLInstanceDBToStore(SQLDBInstance){
+            this.$store.commit(
+                "document/addInstanceSubmitDB",{instance:this.keyInstance,sqlLite:SQLDBInstance}
+            );  
         }
     }
 }

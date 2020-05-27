@@ -44,8 +44,14 @@ export default class BasicControl extends Control {
     }
 
     render() {
+        if (this.controlFormulas['require'] != undefined && this.controlFormulas.require.formulasId != 0) {
+            this.renderValidateIcon();
+        }
+        if (this.controlFormulas['autocomplete'] != undefined && this.controlFormulas.autocomplete.formulasId != 0) {
+            this.addAutoCompleteEvent();
+        }
+
         this.ele.wrap('<span>');
-        this.ele.attr('autocomplete', "off");
         this.ele.attr('key-instance', this.curParentInstance);
 
         if (this.ele.hasClass('s-control-number')) {
@@ -68,13 +74,13 @@ export default class BasicControl extends Control {
 
         } else if (this.ele.hasClass('s-control-time')) {
             this.ele.attr('type', 'text');
+            this.renderTimeControl();
 
         } else if (this.ele.hasClass('s-control-persent')) {
             this.ele.css('min-width', 'unset');
 
         } else if (this.ele.hasClass('s-control-date')) {
             this.renderDateControl();
-            this.renderValidateIcon();
 
         } else if (this.ele.hasClass('s-control-datetime')) {
             this.renderDateTimeControl();
@@ -140,7 +146,6 @@ export default class BasicControl extends Control {
 
     renderFilterControl() {
         if (isDetailView) return;
-        this.ele.attr('autocomplete', "off");
         this.ele.attr('type', 'text');
         this.ele.on('click', function(e) {
             SYMPER_APP.$evtBus.$emit('document-submit-filter-input-click', e)
@@ -149,7 +154,6 @@ export default class BasicControl extends Control {
     }
     renderUserControl() {
         if (isDetailView) return;
-        this.ele.attr('autocomplete', "off");
         this.ele.attr('type', 'text');
         this.ele.on('click', function(e) {
             SYMPER_APP.$evtBus.$emit('document-submit-user-select-input', e)
@@ -160,23 +164,21 @@ export default class BasicControl extends Control {
     }
     renderDateTimeControl() {
         if (isDetailView) return;
-        this.ele.attr('autocomplete', "off");
         this.ele.attr('type', 'text');
-        this.ele.on('focus', function() {
 
-        })
     }
     renderDateControl() {
         if (isDetailView) return;
-        this.ele.attr('autocomplete', "off");
         this.ele.attr('type', 'text');
         this.ele.on('click', function(e) {
-            SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-input', e)
-            $(this).addClass('autocompleting')
+            SYMPER_APP.$evtBus.$emit('document-submit-date-input-click', e)
         })
-        let thisCpn = this.ele
-        this.ele.on('keyup', function(e) {
-            SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-input-change', e)
+    }
+    renderTimeControl() {
+        if (isDetailView) return;
+        this.ele.attr('type', 'text');
+        this.ele.on('click', function(e) {
+            SYMPER_APP.$evtBus.$emit('document-submit-time-input-click', e)
         })
     }
     getDefaultValue() {
@@ -187,6 +189,15 @@ export default class BasicControl extends Control {
         } else {
             return '';
         }
+    }
+    addAutoCompleteEvent() {
+        this.ele.on('click', function(e) {
+            $(this).addClass('autocompleting');
+            SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-input', e)
+        })
+        this.ele.on('keyup', function(e) {
+            SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-input-change', e)
+        })
     }
     inputCacheSet(value, rowId = null, rawUserFormula = '') {
         let fieldName = this.name;

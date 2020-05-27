@@ -249,7 +249,7 @@ export default class Table {
         let rsl = {
             data: name,
             type: type,
-            // renderer: validateRender
+            // renderer: this.validateRender
         }
         if (type == 'number') {
             rsl.numericFormat = {
@@ -257,16 +257,48 @@ export default class Table {
             };
         } else if (type == 'label' || ctrl.controlProperties.isReadOnly == 1) {
             rsl.readOnly = true;
-        } else if (type == 'select' && ctrl.fmlData.exeType == 'math') {
+        } else if (type == 'select') {
             rsl.editor = 'select';
-            rsl.selectOptions = ctrl.fmlData.formula.replace(/\'/g, '').split('|');
+            // rsl.selectOptions = ctrl.fmlData.formula.replace(/\'/g, '').split('|');
         } else if (type == 'time') {
             rsl.timeFormat = 'HH:mm:ss',
                 rsl.correctFormat = true;
         }
-        console.log(type);
-
         rsl.type = Util.toLowerCaseFirstCharacter(supportCellsType[type].replace('Renderer', ''));
         return rsl;
+    }
+    validateRender(hotInstance, td, row, column, prop, value, cellProperties) {
+        if (row + 1 == hotInstance.countRenderedRows()) {
+            if (value === null) {
+                arguments[5] = this.sampleRowValues[prop];
+            }
+        }
+        Handsontable.renderers[supportCellsType[listInputInDocument[prop].type]].apply(this, arguments);
+        if (listInputInDocument[prop].isCheckbox) {
+            td.style.textAlign = "center";
+        }
+        console.log(this);
+
+        let map = this.validateValueMap[row + '_' + column];
+        if (map) {
+            let sign = prop + '____' + row;
+            let ele = $(td);
+            if (map.vld === false) {
+                ele.append(Util.makeErrNoti(map.msg, sign));
+            }
+            if ((map.require === false || listInputInDocument[prop].originProp.Required == 1) && value === '') {
+                ele.css('position', 'relative').append(Util.requireRedDot(sign));
+            }
+        }
+
+        if (isDetailView) {
+            let indx = prop + '_' + row;
+            if (changedVlCtrlCoord[indx]) {
+                td.classList.add('changed-input');
+                for (let typeChange in changedVlCtrlCoord[indx]) {
+                    td.setAttribute(typeChange, 'yes');
+                }
+            }
+        }
     }
 }
