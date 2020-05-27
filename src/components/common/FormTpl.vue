@@ -60,7 +60,7 @@
                 v-if="!inputInfo.hidden"
                 :style="{
                     'min-width': inputMinwidth,
-                    'width': inputWidth,
+                    'width': alwaysSingleLine[inputInfo.type] ? '100%' : inputWidth,
                 }"
                 :id="inputInfo.id ? inputInfo.id : ''"
                 :class="'sym-small-size sym-style-input d-inline-block '+(inputInfo.classes ? inputInfo.classes : '') "
@@ -272,6 +272,11 @@ const inputTypeConfigs = {
 export default {
     data() {
         return {
+            alwaysSingleLine: {
+                checkbox: true,
+                switch: true,
+                radio: true
+            },
             largeFormulaEditor: {
                 name: "", // tên của input
                 open: false, // có mở largeFormulaEditor hay ko
