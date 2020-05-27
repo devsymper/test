@@ -229,6 +229,7 @@ const inputTypeConfigs = {
             let props = {
                 columns: config.columns,
                 data: config.value,
+                showId: config.hasOwnProperty('showId') ? config.showId : true
             };
             if(config.onSearch){
                 props.onSearch  = config.onSearch;

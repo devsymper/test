@@ -1,14 +1,18 @@
 <template>
     <v-navigation-drawer :mini-variant="sapp.collapseSideBar" :v-model="true" app>
-        <v-list dense nav class="py-0">
-            <v-list-item :class="{ 'px-0': sapp.collapseSideBar }" v-show="!sapp.collapseSideBar">
+        <v-list dense nav class="py-0 pr-0">
+            <v-list-item :class="{ 
+                    'px-0': sapp.collapseSideBar,
+                    'ma-0 pt-2 pb-1': true 
+                }" 
+                v-show="!sapp.collapseSideBar">
                 <img
                     @click="goToHome()"
                     height="30px"
                     :src="require('./../../assets/image/symper-full-logo.png')"
                 />
             </v-list-item>
-            <v-list-item class="px-0" v-show="sapp.collapseSideBar">
+            <v-list-item class=" pt-2 px-0 ma-0 pb-1" v-show="sapp.collapseSideBar">
                 <img
                     @click="goToHome()"
                     height="30px"
@@ -16,7 +20,10 @@
                 />
             </v-list-item>
 
-            <v-list-item two-line :class="{ 'px-0': sapp.collapseSideBar }">
+            <v-list-item two-line :class="{ 
+                    'px-0': sapp.collapseSideBar,
+                    'ma-0 pb-1': true 
+                }">
                 <v-list-item-avatar>
                     <img src="https://randomuser.me/api/portraits/men/81.jpg" />
                 </v-list-item-avatar>
@@ -45,31 +52,35 @@
                 </v-list-item-content>
             </v-list-item>
 
-            <v-list-item
-                v-for="item in sapp.items"
-                :key="item.title" 
-                link
-                @click="gotoPage(item.link, item.title)"
-            >
-            
-                <v-list-item-icon>
-                    <v-tooltip right>
-                        <template v-slot:activator="{ on }">
-                            <v-icon v-on="on">{{ item.icon }}</v-icon>
-                        </template>
-                        <span>{{ $t('common.'+item.title) }}</span>
-                    </v-tooltip>
-                </v-list-item-icon>
 
-                <v-list-item-content>
-                    <v-list-item-title>{{ $t('common.'+item.title) }}</v-list-item-title>
-                </v-list-item-content>
-            </v-list-item>
+            <VuePerfectScrollbar :style="{height: menuItemsHeight}">
+                <div class="pr-2">
+                    <v-list-item
+                        v-for="item in sapp.items"
+                        :key="item.title" 
+                        link
+                        @click="gotoPage(item.link, item.title)"
+                    >
+                        <v-list-item-icon>
+                            <v-tooltip right>
+                                <template v-slot:activator="{ on }">
+                                    <v-icon v-on="on">{{ item.icon }}</v-icon>
+                                </template>
+                                <span>{{ $t('common.'+item.title) }}</span>
+                            </v-tooltip>
+                        </v-list-item-icon>
+
+                        <v-list-item-content>
+                            <v-list-item-title>{{ $t('common.'+item.title) }}</v-list-item-title>
+                        </v-list-item-content>
+                    </v-list-item>
+                </div>
+            </VuePerfectScrollbar>
         </v-list>
         <template v-slot:append>
             <v-list dense>
                 <v-list-item>
-                    <v-list-item-icon class="mr-2">
+                    <v-list-item-icon class="mx-2">
                         <v-icon @click.stop="invertSidebarShow()">mdi-menu</v-icon>
                     </v-list-item-icon>
                     <v-menu>
@@ -103,7 +114,12 @@
 <script>
 import { util } from "./../../plugins/util.js";
 import { userApi } from "./../../api/user.js";
+import VuePerfectScrollbar from "vue-perfect-scrollbar";
+
 export default {
+    components: {
+        VuePerfectScrollbar
+    },
     computed: {
         sapp() {
             return this.$store.state.app;
@@ -113,6 +129,9 @@ export default {
         "sapp.collapseSideBar": function(newVl) {
             console.log("collapseSideBar app changed", newVl);
         }
+    },
+    mounted(){
+        this.menuItemsHeight = (util.getComponentSize(this).h - 178)+'px';
     },
     methods: {
         changeLocale(item) {
@@ -139,7 +158,9 @@ export default {
         }
     },
     data() {
-        return {};
+        return {
+            menuItemsHeight: '200px'
+        };
     }
 };
 </script>

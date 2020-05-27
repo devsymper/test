@@ -218,6 +218,10 @@ export default {
         updateElementProperties(eleId, props) {
             let ele = this.bpmnModeler.get("elementRegistry").get(eleId);
             this.modeling.updateProperties(ele, props);
+        },
+        // Lấy data theo id của diagram
+        getElData(id){
+            return this.bpmnModeler.get("elementRegistry").get(id);
         }
     }
 };

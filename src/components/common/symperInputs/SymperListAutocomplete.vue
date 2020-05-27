@@ -7,12 +7,12 @@
         chips
         clearable
         hide-details
-        hide-selected
         :item-text="textKey"
         dense
         :item-value="valueKey"
         solo
         @change="applyChangeValue"
+        @click="reAssignItems()"
     >
         <template v-slot:no-data>
             <div>{{$t('common.have_no_data')}}</div>
@@ -27,14 +27,14 @@
                 class="fs-13"
                 v-on="on"
             >
-                <span v-text="item.id " class="mr-2 font-weight-medium"></span>
+                <span v-text="item.id " v-if="showId" class="mr-2 font-weight-medium"></span>
                 <span v-text="item.title ? item.title : item.name"></span>
             </v-chip>
         </template>
         <template v-slot:item="{ item }">
             <div class="pa-2 font-weight-medium">
                 <div class="d-flex fs-13">
-                    <span v-text="item.id" class="mr-2"></span>
+                    <span v-text="item.id" class="mr-2" v-if="showId"></span>
                     <span v-text="item.name"></span>
                 </div>
                 <div class="w-100 fs-12 text--grey">
@@ -72,7 +72,16 @@ export default {
         onSearch: {
             // hàm xử lý khi input
             default: false
+        },
+        showId:{
+            default: true
         }
+    },
+    created(){
+        this.reAssignItems();
+    },
+    activated(){
+        this.reAssignItems();
     },
     computed: {
         itemClone() {
@@ -128,6 +137,13 @@ export default {
                 value: vl,
                 items: this.myItems
             });
+        },
+        reAssignItems(){
+            setTimeout((self) => {
+                if(self.myItems.length == 0){
+                    self.myItems = self.items;
+                }
+            }, 100, this);
         }
     }
 };

@@ -1397,11 +1397,12 @@ export const allNodesAttrs = {
 
     approvalForElement: {
         title: 'Approval for element',
-        type: 'select',
+        type: 'autocomplete',
         value: '',
         info: '',
         options: [],
-        dg: 'taskAction'
+        dg: 'taskAction',
+        showId: false
     },
 }
 

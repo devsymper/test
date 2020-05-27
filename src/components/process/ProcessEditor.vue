@@ -682,18 +682,70 @@ export default {
 
             let nodeData = this.getNodeData(node.id, type);
             nodeData.name = node.name;
-            nodeData.attrs.name.value = node.name;
-            if (nodeData.attrs.process_id) {
+            nodeData.attrs.name.value = node.name; // gán lại name từ di node
+            if (nodeData.attrs.process_id) { // gán lại id từ di node
                 nodeData.attrs.process_id.value = node.id;
             }
 
-            if (nodeData.attrs.overrideid) {
+            if (nodeData.attrs.overrideid) { // gán lại id từ di node
                 nodeData.attrs.overrideid.value = node.id;
             }
             this.$store.commit("process/changeSelectingNode", {
                 instanceKey: this.instanceKey,
                 data: nodeData
             });
+
+            if(nodeData.type == 'UserTask' && nodeData.attrs.taskAction.value == 'approval'){
+                this.setApprovalableNodes(nodeData);
+            }
+            
+        },
+        /**
+         * Tìm các node ở trước node hiện tại để có thể duyệt, phục vụ cho việc select node cần duyệt: approvalForElement
+         */
+        setApprovalableNodes(nodeData){
+            let allEls = this.$refs.symperBpmn.getAllNodes();
+            let currBizNode = {};
+            let submitTasks = [];
+
+            allEls.filter((el, idx) => {
+                if(el.$type == 'bpmn:SequenceFlow'){
+                    return true;
+                }else{
+                    el.symper_link_next = {}; // danh sách các id các node tiếp theo mà node này được linh tới
+                    el.symper_link_prev = {}; // danh sách các id các node link tới node này
+                    if(el.id == nodeData.id){
+                        currBizNode = el;
+                    }
+                    return false;
+                }
+            }).forEach(el => {
+                el.sourceRef.symper_link_next[el.targetRef.id] = true;
+                el.targetRef.symper_link_prev[el.sourceRef.id] = true;
+            });
+            this.findSubmitTasksFromNode(submitTasks, currBizNode);
+            nodeData.attrs.approvalForElement.options = submitTasks;
+            
+            if(submitTasks.length == 0){ // nếu ko có node nào là ứng cử viên thì đặt giá trị về rỗng
+                nodeData.attrs.approvalForElement.value = '';
+            }else if(!nodeData.attrs.approvalForElement.value ){ // Tự động chọn phần tử đầu tiên làm giá trị
+                nodeData.attrs.approvalForElement.value = submitTasks[0].id;
+            }
+        },
+        // Tìm từ node hiện tại về node đầu để ra các node là submit task 
+        findSubmitTasksFromNode(result, currBizNode){
+            let nodeData = this.stateAllElements[currBizNode.id];
+            if(nodeData.type == 'UserTask' && nodeData.attrs.taskAction.value == 'submit'){
+                result.push({
+                    id: nodeData.id,
+                    title: currBizNode.name
+                });
+            }else{
+                for(let id in currBizNode.symper_link_prev){
+                    let prevNode = this.$refs.symperBpmn.getElData(id);
+                    this.findSubmitTasksFromNode(result, prevNode.businessObject);
+                }
+            }
         },
         /**
          * Xử lý các hành động khi người dùng click vào các nút ở header của editor (zoom, focus, validate ... )
@@ -880,8 +932,11 @@ export default {
             let groups = {};
 
             for (let attrName in currentAtts) {
+                
                 let attr = currentAtts[attrName];
-
+                if(attr.hidden){
+                    continue;
+                }
                 if (!attr) {
                     console.warn(
                         `can not get attr of "${attrName}" in currentAtts`,
