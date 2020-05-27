@@ -695,7 +695,7 @@ export default {
                 data: nodeData
             });
 
-            if(nodeData.type == 'UserTask' && nodeData.attrs.taskAction.value == 'approval'){
+            if(nodeData.type == 'UserTask'){
                 this.setApprovalableNodes(nodeData);
             }
             
@@ -735,7 +735,9 @@ export default {
         // Tìm từ node hiện tại về node đầu để ra các node là submit task 
         findSubmitTasksFromNode(result, currBizNode){
             let nodeData = this.stateAllElements[currBizNode.id];
-            if(nodeData.type == 'UserTask' && nodeData.attrs.taskAction.value == 'submit'){
+            // Nếu là UserTask và là submit hoặc là node bắt đầu quy trình và có form submit
+            if((nodeData.type == 'UserTask' && nodeData.attrs.taskAction.value == 'submit') ||
+                (nodeData.type == 'StartNoneEvent' && nodeData.attrs.formreference.value)){
                 result.push({
                     id: nodeData.id,
                     title: currBizNode.name
