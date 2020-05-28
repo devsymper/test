@@ -12,4 +12,7 @@ export const documentApi = {
     detailDocument(id) {
         return coreApi.get("document/detail/" + id);
     },
+    submitDocument(data) {
+        return coreApi.post("document/objects/submit", data);
+    }
 };

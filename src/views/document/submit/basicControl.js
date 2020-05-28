@@ -39,8 +39,8 @@ const fileTypes = {
 };
 
 export default class BasicControl extends Control {
-    constructor(ele, controlProps, curParentInstance) {
-        super(ele, controlProps, curParentInstance);
+    constructor(idField, ele, controlProps, curParentInstance) {
+        super(idField, ele, controlProps, curParentInstance);
     }
 
     render() {
@@ -50,10 +50,12 @@ export default class BasicControl extends Control {
         if (this.controlFormulas['autocomplete'] != undefined && this.controlFormulas.autocomplete.formulasId != 0) {
             this.addAutoCompleteEvent();
         }
-
+        let thisCpn = this;
         this.ele.wrap('<span>');
         this.ele.attr('key-instance', this.curParentInstance);
-
+        this.ele.on('change', function(e) {
+            SYMPER_APP.$evtBus.$emit('document-submit-input-change', { controlName: thisCpn.controlProperties.name.value, val: $(e.target).val() })
+        })
         if (this.ele.hasClass('s-control-number')) {
             this.ele.css('text-align', 'right');
 
@@ -161,7 +163,10 @@ export default class BasicControl extends Control {
         this.ele.on('keyup', function(e) {
             SYMPER_APP.$evtBus.$emit('document-submit-user-input-change', e)
         })
+
     }
+
+
     renderDateTimeControl() {
         if (isDetailView) return;
         this.ele.attr('type', 'text');

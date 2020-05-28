@@ -20,7 +20,8 @@ const defaultState = {
             //     type:"",
             //     listFields:{ // truowng hop table thi co cac control
 
-            //     }
+            //     },
+            //      id:0
             // }
         },
         currentSelectedControl: {

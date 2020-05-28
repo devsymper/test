@@ -112,7 +112,7 @@ export default class Table {
             autoColSize: false,
             width: '100%',
             minSpareRows: 1,
-            height: MAX_TABLE_HEIGHT,
+            height: 'auto',
             // afterRender: function(isForced) {
             //     let tbHeight = this.container.getElementsByClassName('htCore')[0].getBoundingClientRect().height;
             //     console.log(tbHeight);

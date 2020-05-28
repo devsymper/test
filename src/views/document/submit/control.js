@@ -1,7 +1,7 @@
 import Formulas from "./formulas";
 
 export default class Control {
-    constructor(ele, controlProps, curParentInstance) {
+    constructor(idField, ele, controlProps, curParentInstance) {
         /**
          * object các thuộc tính về hiển thị của control
          */
@@ -18,6 +18,10 @@ export default class Control {
          * instance của submit hiện tại
          */
         this.curParentInstance = curParentInstance;
+        /**
+         * id của dòng dữ liệu trong bảng field, phục vụ cho việc lấy datapost submit
+         */
+        this.idField = idField;
 
     }
     init() {
@@ -31,7 +35,7 @@ export default class Control {
         /**
          * Tên của control
          */
-        this.name = this.controlProperties.name.value;
+        this.name = (this.controlProperties.hasOwnProperty(name)) ? this.controlProperties.name.value : "";
 
         /**
          * id của control
@@ -73,7 +77,6 @@ export default class Control {
             }
             this.controlFormulas[key]['instance'] = new Formulas(this.controlFormulas[key].value, key);
         }
-        console.log(this.controlFormulas);
 
     }
 }
