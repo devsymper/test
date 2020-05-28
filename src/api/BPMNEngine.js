@@ -52,11 +52,11 @@ export default {
             subfix.push(`${key}=${params[key]}`);
         }
         subfix = "?" + subfix.join('&');
-        // testHeader['Content-Type'] = 'multipart/form-data; boundary=----WebKitFormBoundaryCmEOFynKduiu8wVL';
-        delete testHeader['Content-Type'];
+        let testHeaderClone = util.cloneDeep(testHeader);
+        delete testHeaderClone['Content-Type'];
         var fd = new FormData();
         fd.append('file', file);
-        return bpmneApi.post(appConfigs.apiDomain.bpmne.deployments + subfix, fd, testHeader, {
+        return bpmneApi.post(appConfigs.apiDomain.bpmne.deployments + subfix, fd, testHeaderClone, {
             processData: false,
             contentType: false,
         });

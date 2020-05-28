@@ -116,6 +116,9 @@ export const nodeAttrsDefinition = {
         checkShowOrHideInput: function(attrs) {
 
         },
+        specificHandler() {
+
+        },
         docker: dockerGroups.gateway
     },
     'InclusiveGateway': {
@@ -124,6 +127,9 @@ export const nodeAttrsDefinition = {
 
         },
         checkShowOrHideInput: function(attrs) {
+
+        },
+        specificHandler() {
 
         },
         docker: dockerGroups.gateway
@@ -137,12 +143,18 @@ export const nodeAttrsDefinition = {
         checkShowOrHideInput: function(attrs) {
 
         },
+        specificHandler() {
+
+        },
         docker: dockerGroups.gateway
 
     },
     'ParallelGateway': {
         group: 'gateway',
         validate: function(attrs) {
+
+        },
+        specificHandler() {
 
         },
         checkShowOrHideInput: function(attrs) {
@@ -164,6 +176,7 @@ export const nodeAttrsDefinition = {
             if (attrName == 'formreference') {
                 attrs.formreference.options = data.items;
                 attrs.formkeydefinition.value = attrs.formreference.value;
+
             }
         },
     },
@@ -441,14 +454,14 @@ export const nodeAttrsDefinition = {
         docker: dockerGroups.subProcess
     },
     'BPMNDiagram': {
-        attrs: ["process_id", "name", "documentation", "process_author", "process_version", "process_namespace", "process_historylevel", "isexecutable", "dataproperties", "executionlisteners", "eventlisteners", "signaldefinitions", "messagedefinitions", "escalationdefinitions", "process_potentialstarteruser", "process_potentialstartergroup", "iseagerexecutionfetch"],
+        attrs: ["controlsForBizKey", "process_id", "instanceDisplayText", "name", "documentation", "process_author", "process_version", "process_namespace", "process_historylevel", "isexecutable", "dataproperties", "executionlisteners", "eventlisteners", "signaldefinitions", "messagedefinitions", "escalationdefinitions", "process_potentialstarteruser", "process_potentialstartergroup", "iseagerexecutionfetch"],
         validate: function(attrs) {
 
         },
         checkShowOrHideInput: function(attrs) {
 
         },
-        exclude: ['overrideid'],
+        exclude: ['overrideid']
     },
     'SequenceFlow': {
         attrs: ["conditionsequenceflow", "executionlisteners", "defaultflow", "skipexpression"],

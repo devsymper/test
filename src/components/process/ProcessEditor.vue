@@ -88,6 +88,7 @@ import bpmnApi from "./../../api/BPMNEngine.js";
 import { defaultXML } from "./../../components/process/reformatGetListData";
 import { allNodesAttrs } from "./../process/allAttrsOfNodes";
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
+import { documentApi } from '../../api/Document';
 
 // Khung data của từng node cần lưu vào db
 const nodeDataTpl = {
@@ -636,6 +637,26 @@ export default {
                 this.$delete(this.stateAllElements, oldId);
                 this.$set(this.stateAllElements, newId, this.selectingNode);
             }
+
+            // Nếu set formreference cho StartNoneEvent thì đặt các lựa chọn control để làm business key
+            if(this.selectingNode.type == 'StartNoneEvent' && name == 'formreference'){
+                this.setControlsForBizKey(inputInfo.value);
+            }
+        },
+        async setControlsForBizKey(docId){
+            try {
+                let docDetail = await documentApi.detailDocument(docId);
+                let controls = Object.values(docDetail.data.fields).reduce((arr, el, idx)=>{
+                    arr.push({
+                        id: el.name,
+                        title: el.title
+                    });
+                    return arr;
+                }, []);
+                this.controlsForBizKey = controls;
+            } catch (error) {
+                this.$snotifyError(error, "Cannot get detail data of document id "+ docId);
+            } 
         },
         /**
          * Lấy dữ liệu của một node dựa theo nodeId.
@@ -697,8 +718,50 @@ export default {
 
             if(nodeData.type == 'UserTask'){
                 this.setApprovalableNodes(nodeData);
+            }else if(nodeData.type == 'BPMNDiagram'){
+                nodeData.attrs.controlsForBizKey.options = this.controlsForBizKey;
+            }else if(nodeData.type.includes('Gateway')){
+                this.setFlowsOrderForGateway(nodeData);
             }
-            
+        },
+        setFlowsOrderForGateway(nodeData){
+            let outFlows = [];
+            let bizNodeData = this.$refs.symperBpmn.getElData(nodeData.id).businessObject;
+            let diOutFlowsMap = {};
+            let needUpdate = false;
+            let dataFlows = nodeData.attrs.sequencefloworder.value;
+            for(let flow of bizNodeData.outgoing){
+                let newItem = {
+                    text: flow.name ? flow.name : flow.id,
+                    idFlow: flow.id
+                };
+                outFlows.push(newItem);
+                diOutFlowsMap[flow.id] = newItem;
+            }
+
+            // Nếu độ dài trước và sau khác nhau thì chắc chắn cần update
+            if(dataFlows.length != outFlows.length){
+                needUpdate = true;
+            }else{
+                // Nếu độ dài khác nhau, xét xem các id có trùng hết ko, nếu ko trùng hết thì cần update lại
+                for(let flow of dataFlows){
+                    if(!diOutFlowsMap[flow.idFlow]){
+                        needUpdate = true;
+                        break;
+                    }
+                }
+            }
+
+            // Nếu ko cần update thì sửa lại text hiển thị của các flow
+            if(!needUpdate){
+                 for(let flow of dataFlows){
+                    flow.text = diOutFlowsMap[flow.idFlow].text;
+                }
+            }
+
+            if(needUpdate){
+                nodeData.attrs.sequencefloworder.value = outFlows;
+            }
         },
         /**
          * Tìm các node ở trước node hiện tại để có thể duyệt, phục vụ cho việc select node cần duyệt: approvalForElement

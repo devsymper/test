@@ -8,7 +8,7 @@
         @end="handleStopDragItem"
     >
         <transition-group type="transition" :name="!dragging ? 'flip-list' : null">
-            <div class="fs-13 px-2 py-1 column-drag-pos" v-for="(item,idx) in items" :key="item.text">
+            <div class="fs-13 px-2 py-1 column-drag-pos" v-for="item in items" :key="item.text">
                 <v-icon size="18" class="mr-2" v-if="item.preIcon">{{item.preIcon}}</v-icon>
                 <span class="fs-13" X>{{item.text}}</span>
                 <v-icon size="18" class="mr-2 float-right" v-if="item.subIcon">{{item.subIcon}}</v-icon>

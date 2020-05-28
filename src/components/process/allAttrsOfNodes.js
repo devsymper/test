@@ -262,7 +262,7 @@ export const allNodesAttrs = {
     "prioritydefinition": {
         "title": "Priority",
         "type": "select",
-        "value": "medium",
+        "value": "1",
         "info": "BPMN.PROPERTYPACKAGES.PRIORITYDEFINITIONPACKAGE.PRIORITYDEFINITION.DESCRIPTION",
         "dg": "detail",
         options: [{
@@ -1107,24 +1107,37 @@ export const allNodesAttrs = {
     "sequencefloworder": {
         "title": "Flow order",
         "type": "ordering",
-        "value": [{
-                text: 'xxxx',
-                preIcon: '',
-                subIcon: '',
-            },
-            {
-                text: 'yyy',
-                preIcon: '',
-                subIcon: '',
-            },
-        ],
+        "value": [],
         "info": "BPMN.PROPERTYPACKAGES.SEQUENCEFLOWORDERPACKAGE.SEQUENCEFLOWORDER.DESCRIPTION",
         "dg": "detail",
+        getValue(value) {
+            return value.reduce((ids, el) => {
+                ids.push(el.text);
+                return ids;
+            }, []);
+        }
     },
     "signaldefinitions": {
         "title": "Signal definitions",
         "type": "table",
-        "value": [],
+        "value": [{}],
+        "columns": [{
+                title: 'Id',
+                name: 'id',
+                type: 'text',
+            },
+            {
+                title: 'Name',
+                name: 'name',
+                type: 'text'
+            },
+            {
+                title: 'Scope',
+                name: 'scope',
+                type: 'autocomplete',
+                source: ["Global", "Process instance"]
+            },
+        ],
         "info": "BPMN.PROPERTYPACKAGES.SIGNALDEFINITIONSPACKAGE.SIGNALDEFINITIONS.DESCRIPTION",
         "dg": "detail",
         getValue(value) {
@@ -1145,7 +1158,18 @@ export const allNodesAttrs = {
     "messagedefinitions": {
         "title": "Message definitions",
         "type": "table",
-        "value": [],
+        "value": [{}],
+        "columns": [{
+                title: 'Id',
+                name: 'id',
+                type: 'text',
+            },
+            {
+                title: 'Name',
+                name: 'name',
+                type: 'text'
+            }
+        ],
         "info": "BPMN.PROPERTYPACKAGES.MESSAGEDEFINITIONSPACKAGE.MESSAGEDEFINITIONS.DESCRIPTION",
         "dg": "detail",
         getValue(value) {
@@ -1166,7 +1190,18 @@ export const allNodesAttrs = {
     "escalationdefinitions": {
         "title": "Escalation definitions",
         "type": "table",
-        "value": [],
+        "value": [{}],
+        "columns": [{
+                title: 'Id',
+                name: 'id',
+                type: 'text',
+            },
+            {
+                title: 'Name',
+                name: 'name',
+                type: 'text'
+            }
+        ],
         "info": "BPMN.PROPERTYPACKAGES.ESCALATIONDEFINITIONSPACKAGE.ESCALATIONDEFINITIONS.DESCRIPTION",
         "dg": "detail",
         getValue(value) {
@@ -1286,7 +1321,7 @@ export const allNodesAttrs = {
         dg: 'taskAction'
     },
     approvalActions: { // BA tự cấu hình các hành động cho việc duyệt
-        title: 'Approval actions',
+        title: 'Outcomes',
         type: 'table',
         value: [{
                 text: 'Approval',
@@ -1404,6 +1439,21 @@ export const allNodesAttrs = {
         dg: 'taskAction',
         showId: false
     },
-}
+    controlsForBizKey: {
+        title: 'Select control for business key',
+        type: 'autocomplete',
+        value: '',
+        info: '',
+        options: [],
+        dg: 'detail',
 
-console.log(allNodesAttrs, 'allNodesAttrsallNodesAttrsallNodesAttrs');
+    },
+    instanceDisplayText: {
+        title: 'Display text for process instance',
+        type: "script",
+        value: '',
+        info: '',
+        dg: 'detail',
+
+    },
+}
