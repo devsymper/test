@@ -7,6 +7,9 @@
         chips
         clearable
         hide-details
+        flat
+        small-chips
+        height="28"
         :item-text="textKey"
         dense
         :item-value="valueKey"
@@ -21,14 +24,17 @@
         <!-- Kiểu 1: mainAndSub -->
         <template v-slot:selection="{ attr, on, item, selected }">
             <v-chip
+                style="height: 22px"
                 v-bind="attr"
                 :input-value="selected"
                 color="grey lighten-3"
                 class="fs-13"
                 v-on="on"
             >
-                <span v-text="item.id " v-if="showId" class="mr-2 font-weight-medium"></span>
-                <span v-text="item.title ? item.title : item.name"></span>
+                <div class="d-inline-block text-ellipsis" style="width: calc(100% - 4px)">
+                    <span v-text="item.id " v-if="showId" class="mr-2 font-weight-medium fs-12"></span>
+                    <span v-text="item.title ? item.title : item.name" class="fs-12"></span>
+                </div>
             </v-chip>
         </template>
         <template v-slot:item="{ item }">
