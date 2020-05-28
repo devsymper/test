@@ -1,5 +1,5 @@
 <template>
-    <div :key="keyInstance" class="sym-form-submit" :id="'sym-submit-'+keyInstance" :style="{'width':docSize}">
+    <div :key="keyInstance" class="sym-form-submit" :id="'sym-submit-'+keyInstance" :style="{'width':docSize, 'height':'100%'}">
         <div v-html="contentDocument">
 
         </div>
@@ -21,6 +21,58 @@
         <validate :keyInstance="keyInstance" ref="validate"/>
         <date-picker :keyInstance="keyInstance" @clickDateCell="selectedDate" :title="'Chọn ngày'" :isTime="false" ref="datePicker"/>
         <time-picker :keyInstance="keyInstance" :title="'Chọn giờ'"  ref="timePicker"/>
+        <v-speed-dial
+            v-model="fab"
+            :top="top"
+            :bottom="bottom"
+            :right="right"
+            :left="left"
+            :direction="direction"
+            :open-on-hover="hover"
+            :transition="transition"
+            >
+      <template v-slot:activator>
+        <v-btn
+          v-model="fab"
+          color="blue darken-2"
+          dark
+          fab
+        >
+          <v-icon v-if="fab">mdi-close</v-icon>
+          <v-icon v-if="!fab && !isSubmitting">mdi-menu</v-icon>
+          <v-progress-circular
+            indeterminate
+            v-show="isSubmitting"
+            color="red"
+            ></v-progress-circular>
+        </v-btn>
+      </template>
+      <v-btn
+        fab
+        dark
+        small
+        color="green"
+        @click="submitDocument"
+      >
+        <v-icon>mdi-content-save</v-icon>
+      </v-btn>
+      <!-- <v-btn
+        fab
+        dark
+        small
+        color="indigo"
+      >
+        <v-icon>mdi-plus</v-icon>
+      </v-btn>
+      <v-btn
+        fab
+        dark
+        small
+        color="red"
+      >
+        <v-icon>mdi-delete</v-icon>
+      </v-btn> -->
+    </v-speed-dial>
     </div>
 </template>
 <script>
@@ -30,6 +82,7 @@ import './../../../components/document/documentContent.css';
 import {setDataForPropsControl} from './../../../components/document/dataControl';
 import BasicControl from './basicControl';
 import TableControl from './tableControl';
+import ActionControl from './actionControl';
 import DatePicker from './../../../components/common/DateTimePicker'
 import TimeBoxPicker from './../../../components/common/TimeBoxPicker'
 import Table from './table.js';
@@ -85,6 +138,19 @@ export default {
             keyInstance:Date.now(),
             titleDragPanel:null,
             titleDragPanelIcon:null,
+
+            //
+            direction: 'top',
+            fab: false,
+            fling: false,
+            hover: false,
+            tabs: null,
+            top: false,
+            right: true,
+            bottom: true,
+            left: false,
+            transition: 'slide-y-reverse-transition',
+            isSubmitting:false,
         }
     },
     beforeMount(){
@@ -103,7 +169,7 @@ export default {
     
     created(){
         let thisCpn = this;
-        this.createSQLLiteDB();
+        this.createSQLLiteDB(); 
         if(this.docId != 0){
             this.documentId = this.docId
         }
@@ -114,6 +180,11 @@ export default {
 
         this.$evtBus.$on('document-submit-autocomplete-input',e=>{
             thisCpn.$refs.autocompleteInput.show(e);
+            
+        });
+       
+        this.$evtBus.$on('document-submit-input-change',locale=>{
+            thisCpn.updateListInputInDocument(locale.controlName,"value",locale.val);
             
         });
         this.$evtBus.$on('document-submit-open-validate',e=>{
@@ -215,34 +286,48 @@ export default {
             for (let index = 0; index < allInputControl.length; index++) {
                 let id = $(allInputControl[index]).attr('id');
                 let controlType = $(allInputControl[index]).attr('s-control-type');
-                if(this.sDocumentEditor.allControl[id] != undefined && controlType != 'submit' && controlType != "reset"){   // ton tai id trong store
-                    let controlName = this.sDocumentEditor.allControl[id].properties.name.value;
-                    if(controlType != 'table'){
-                        let control = new BasicControl($(allInputControl[index]),this.sDocumentEditor.allControl[id],thisCpn.keyInstance);
+                if(this.sDocumentEditor.allControl[id] != undefined){   // ton tai id trong store
+                    let idField = this.sDocumentEditor.allControl[id].id;
+                    if(controlType == 'submit' || controlType == "reset"){
+                        let control = new ActionControl(idField, $(allInputControl[index]),this.sDocumentEditor.allControl[id],thisCpn.keyInstance);
                         control.init();
-                        this.$store.commit("document/addToListInputInDocument",{name:controlName,control:control});
                         control.render();
-                    }
-                    //truong hop la control table
+                        this.$store.commit("document/addToListInputInDocument",{name:"submit",control:control});
+                    }   
                     else{
-                        let listInsideControls = {};
-                        let tableControl = new TableControl($(allInputControl[index]),this.sDocumentEditor.allControl[id],thisCpn.keyInstance);
-                        tableControl.initTableControl();
-                        this.$store.commit("document/addToListInputInDocument",{name:controlName,control:tableControl});
-                        tableControl.tableInstance = new Table(tableControl,controlName)
-                        let tableEle = $(allInputControl[index]);
-                        tableEle.find('.s-control').each(function() {
-                            let childControlId = $(this).attr('id');
-                            let childControl = new BasicControl($(this), thisCpn.sDocumentEditor.allControl[id].listFields[childControlId], thisCpn.keyInstance);
-                            childControl.init();
-                            let childControlName = thisCpn.sDocumentEditor.allControl[id].listFields[childControlId].properties.name.value;
-                            childControl.inTable = controlName;
-                            thisCpn.$store.commit("document/addToListInputInDocument",{name:childControlName,control:childControl});
-                            listInsideControls[childControlName] = true;
-                        });
-                        tableControl.listInsideControls = listInsideControls;
-                        tableControl.renderTable();
+                        let controlName = this.sDocumentEditor.allControl[id].properties.name.value;
+                        if(controlType != 'table'){
+                            let control = new BasicControl(idField, $(allInputControl[index]),this.sDocumentEditor.allControl[id],thisCpn.keyInstance);
+                            control.init();
+                            this.$store.commit("document/addToListInputInDocument",{name:controlName,control:control});
+                            control.render();
+                        }
+                        //truong hop la control table
+                        else{
+                            let listInsideControls = {};
+                            let tableControl = new TableControl(idField, $(allInputControl[index]),this.sDocumentEditor.allControl[id],thisCpn.keyInstance);
+                            tableControl.initTableControl();
+                            tableControl.tableInstance = new Table(tableControl,controlName)
+                            let tableEle = $(allInputControl[index]);
+                            tableEle.find('.s-control').each(function() {
+                                let childControlId = $(this).attr('id');
+                                let idFieldChild = thisCpn.sDocumentEditor.allControl[id].listFields[childControlId].id;
+                                console.log(thisCpn.sDocumentEditor.allControl[id]);
+                                
+                                let childControl = new BasicControl(idFieldChild, $(this), thisCpn.sDocumentEditor.allControl[id].listFields[childControlId], thisCpn.keyInstance);
+                                childControl.init();
+                                let childControlName = thisCpn.sDocumentEditor.allControl[id].listFields[childControlId].properties.name.value;
+                                childControl.inTable = controlName;
+                                thisCpn.$store.commit("document/addToListInputInDocument",{name:childControlName,control:childControl});
+                                listInsideControls[childControlName] = true;
+                            });
+                            tableControl.listInsideControls = listInsideControls;
+                            tableControl.renderTable();
+                            this.$store.commit("document/addToListInputInDocument",{name:controlName,control:tableControl});
+
+                        }
                     }
+                    
                 }
             }
             console.log(this.sDocumentSubmit);
@@ -277,29 +362,102 @@ export default {
          */
         getEffectedControl(){
             let mapControlEffected = {};
-            let allControl =  this.sDocumentEditor.allControl;
-            for(let controlId in allControl){
-                let type = allControl[controlId].type;
+            let allControl = this.sDocumentSubmit.listInputInDocument;
+            for(let name in allControl){
+                let type = allControl[name].type;
+                console.log(name);
+                console.log(allControl[name]);
+                
                 if(type != "submit" && type != "reset" && type != "draf"){
-                    let name = allControl[controlId].properties.name.value;
-                    console.log(name);
-                    console.log(type);
                     
-                    let formulas = allControl[controlId].formulas;
+                    
+                    let formulas = allControl[name].controlFormulas;
                     for(let formulasType in formulas){
                         let inputControl = formulas[formulasType].instance.inputControl;
-                        for(let controlEffect in inputControl){
-                            if(mapControlEffected[controlEffect]  == undefined){
-                                mapControlEffected[controlEffect] = [];
+                            for(let controlEffect in inputControl){
+                                if(mapControlEffected[controlEffect]  == undefined){
+                                    mapControlEffected[controlEffect] = [];
+                                }
+                                mapControlEffected[controlEffect].push(name);
                             }
-                            mapControlEffected[controlEffect].push(name);
-                        }
+                        
                     }
                 }
             }
             this.updateEffectedControlToStore(mapControlEffected);
         },
-        
+
+        /**
+         * Hàm gọi api submit document
+         */
+        submitDocument(){
+            this.isSubmitting = true;
+            let thisCpn = this;
+            let dataPost = this.getDataPostSubmit();
+            dataPost['id'] = this.documentId;
+            documentApi.submitDocument(dataPost).then(res => {
+                thisCpn.isSubmitting = false;
+                if (res.status == 200) {
+                    thisCpn.$snotify({
+                        type: "success",
+                        title: "Submit document success!"
+                    });        
+                }
+                else{
+                    thisCpn.$snotify({
+                        type: "error",
+                        title: res.message
+                    });
+                }
+            })
+            .catch(err => {
+                thisCpn.$snotify({
+                        type: "error",
+                        title: "error from submit document api!!!"
+                    });
+            })
+            .always(() => {
+            });
+        },
+
+        /**
+         * Hàm lấy tất cả giá trị của doc cho submit dạng {field_${id}:value}
+         */
+        getDataPostSubmit(){
+            let listInput = this.sDocumentSubmit.listInputInDocument;
+            let dataPost = {};
+            for(let controlName in listInput){
+                let id = "field_"+listInput[controlName].idField;
+                if(listInput[controlName].type == "table"){
+                    let value = this.getDataTableInput(listInput[controlName]);
+                    console.log(value);
+                    
+                    Object.assign(dataPost,value);
+                }
+                else{
+                    if(listInput[controlName].type != "submit"){
+                        let value = listInput[controlName].value;
+                        dataPost[id] = [value];
+                    }
+                    
+                }
+            }
+            return dataPost;
+        },
+        /**
+         * Hàm lấy dữ liệu của table dạng colName : ['a',"b","c"]
+         */
+        getDataTableInput(table){
+            let listInput = this.sDocumentSubmit.listInputInDocument;
+            let indexCol = table.tableInstance.colName2Idx;
+            let dataTable = {}
+            for(let i in indexCol){
+                let id = "field_"+listInput[i].idField;
+                let dataCol = table.tableInstance.tableInstance.getDataAtCol(indexCol[i]);
+                dataTable[id] = dataCol;
+            }
+            return dataTable;
+        },
         updateEffectedControlToStore(mapControlEffected){
             for(let controlName in mapControlEffected){
                 this.updateListInputInDocument(controlName,"effectedControl",mapControlEffected[controlName]);
@@ -356,5 +514,15 @@ export default {
     #toggle-doc-size:focus{
         outline: none;
     }
+     /* This is for documentation purposes and will not be needed in your application */
+    .sym-form-submit >>> .v-speed-dial {
+        position: absolute;
+    }
+
+    .sym-form-submit >>> .v-btn--floating {
+        position: relative;
+    }
  
 </style>
+
+

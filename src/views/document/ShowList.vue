@@ -35,14 +35,16 @@ export default {
                     name: "edit",
                     text: "Sửa",
                     callback: (document, callback) => {
-                        this.$router.push('/document/editor/'+document.id);
+                        this.$goToPage('/document/editor/'+document.id);
+                        // this.$router.push('/document/editor/'+document.id);
                     },
                 },
                 {
                     name: "submit",
                     text: "Nhập liệu",
                     callback: (document, callback) => {
-                        this.$router.push('/document/submit/'+document.id);
+                        this.$goToPage('/document/submit/'+document.id);
+                        // this.$router.push('/document/submit/'+document.id);
                     },
                 },
             ],
