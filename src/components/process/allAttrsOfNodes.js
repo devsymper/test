@@ -1416,14 +1416,14 @@ export const allNodesAttrs = {
     },
 
     notificationTitle: {
-        title: 'Notification title',
+        title: 'Notification and task title',
         type: 'script',
         value: '',
         info: '',
         dg: 'formula'
     },
     notificationContent: {
-        title: 'Notification content',
+        title: 'Notification and task content',
         type: 'script',
         value: '',
         info: '',

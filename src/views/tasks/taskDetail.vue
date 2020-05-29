@@ -23,7 +23,7 @@
                 </v-btn>
             </v-col>
         </v-row>
-        <v-divider style="border-width: 2px; border-color: #ff7400;"></v-divider>
+        <v-divider style="border-width: 0.5px; border-color: #ff7400;"></v-divider>
         <v-row>
             <v-col cols="12" class="pt-0">
                 <v-card flat>
@@ -50,7 +50,12 @@
                             :key="item.tab"
                         >
                             <v-card flat class="pl-4 pr-4">
-                                <component :is="item.content" :taskInfo="taskInfo"></component>
+                                <component 
+                                    @task-submited="handleTaskSubmited" 
+                                    :is="item.content"
+                                    :taskInfo="taskInfo"
+                                    :ref="item.tab">
+                                </component>
                             </v-card>
                         </v-tab-item>
                     </v-tabs-items>
@@ -138,7 +143,11 @@ export default {
             this.$emit("close-detail", {});
         },
         saveTaskOutcome(){ // hành động khi người dùng submit task của họ
-            this.$emit('save-task-outcome');
+            // this.$emit('save-task-outcome');
+            this.$refs.task[0].submitForm();
+        },
+        handleTaskSubmited(data){
+            this.$emit('task-submited', data);
         }
     }
 }

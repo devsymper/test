@@ -1,6 +1,11 @@
 <template>
     <div class="h-100 w-100 d-flex justify-center"> 
-        <DocumentSubmit :docId="taskInfo.docId">
+        <DocumentSubmit 
+            ref="submitComponent"
+            :docId="taskInfo.docId"
+            :showSubmitButton="false"
+            @submit-document-success="onSubmitDone"
+        >
 
         </DocumentSubmit>
     </div>
@@ -20,6 +25,14 @@ export default {
                     docId: 0
                 }
             }
+        }
+    },
+    methods: {
+        onSubmitDone(data){
+            this.$emit('task-submited', data);
+        },
+        submitForm(){
+            this.$refs.submitComponent.submitDocument();
         }
     },
     name: "task"

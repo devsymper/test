@@ -33,7 +33,7 @@ export const deployProcess = function(self, processData) {
  * Tạo một process instance theo process definition id được truyền vào
  * @param {String} id 
  */
-export const runProcessDefinition = (self, processDef) => {
+export const runProcessDefinition = (self, processDef, vars = []) => {
     return new Promise((runResolve, runReject) => {
         bpmnApi.getDefinitionModel(processDef.id).then((res) => {
             let dataToRun = {
@@ -43,7 +43,8 @@ export const runProcessDefinition = (self, processDef) => {
                 "variables": getVariables(res.mainProcess.dataObjects),
                 // "outcome": "string", // chưa biết là cái gì, tạm bỏ
                 // "tenantId": processDef.tenantId, //"TenantId can only be used with either processDefinitionKey or message."
-                "returnVariables": true
+                "returnVariables": true,
+                variables: vars
             };
             bpmnApi.createProcessInstance(dataToRun).then((res) => {
                 runResolve(res);
