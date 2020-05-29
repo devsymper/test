@@ -68,7 +68,6 @@
                 single-line
                 v-bind="getInputProps(inputInfo)"
                 v-model="inputInfo.value"
-                :formulaValue="inputInfo.value"
                 :is="getInputTag(inputInfo.type)">
                 <template slot="item" slot-scope="data">
                     <template>
