@@ -120,6 +120,7 @@ const addCurrentControl = (state, control) => {
     }
     // state.editor.currentSelectedControl['properties'] = groups
     Vue.set(state.editor.currentSelectedControl, 'properties', groups);
+    console.log(state.editor.currentSelectedControl);
 
 };
 
@@ -146,6 +147,8 @@ const updateProp = (state, params) => {
         }
     }
     console.log(params);
+    console.log(state.editor.allControl);
+
 
     setTreeListControlInDoc(state);
 }

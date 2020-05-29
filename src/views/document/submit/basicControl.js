@@ -176,6 +176,7 @@ export default class BasicControl extends Control {
         if (isDetailView) return;
         this.ele.attr('type', 'text');
         this.ele.on('click', function(e) {
+            $(e.target).addClass('date-picker-access');
             SYMPER_APP.$evtBus.$emit('document-submit-date-input-click', e)
         })
     }

@@ -283,12 +283,16 @@ export default {
         processHtml (content) {
             var allInputControl = $('#sym-submit-'+this.keyInstance).find('.s-control:not(.bkerp-input-table .s-control)');
             let thisCpn = this;
+            
             for (let index = 0; index < allInputControl.length; index++) {
                 let id = $(allInputControl[index]).attr('id');
                 let controlType = $(allInputControl[index]).attr('s-control-type');
+                
                 if(this.sDocumentEditor.allControl[id] != undefined){   // ton tai id trong store
                     let idField = this.sDocumentEditor.allControl[id].id;
-                    if(controlType == 'submit' || controlType == "reset"){
+                    console.log(controlType);
+                    if(controlType == "submit" || controlType == "reset"){
+                        
                         let control = new ActionControl(idField, $(allInputControl[index]),this.sDocumentEditor.allControl[id],thisCpn.keyInstance);
                         control.init();
                         control.render();
@@ -338,8 +342,9 @@ export default {
          * Sự kiện phát ra khi click vào date của date picker
          */
         selectedDate(e){
-            console.log(e);
             this.$refs.datePicker.closePicker();
+            $('.date-picker-access').val(e);
+            $('.date-picker-access').removeClass('date-picker-access')
         },
         
         /**
@@ -391,33 +396,35 @@ export default {
          * Hàm gọi api submit document
          */
         submitDocument(){
+            console.log(this.sDocumentSubmit);
+            
             this.isSubmitting = true;
             let thisCpn = this;
             let dataPost = this.getDataPostSubmit();
             dataPost['id'] = this.documentId;
-            documentApi.submitDocument(dataPost).then(res => {
-                thisCpn.isSubmitting = false;
-                if (res.status == 200) {
-                    thisCpn.$snotify({
-                        type: "success",
-                        title: "Submit document success!"
-                    });        
-                }
-                else{
-                    thisCpn.$snotify({
-                        type: "error",
-                        title: res.message
-                    });
-                }
-            })
-            .catch(err => {
-                thisCpn.$snotify({
-                        type: "error",
-                        title: "error from submit document api!!!"
-                    });
-            })
-            .always(() => {
-            });
+            // documentApi.submitDocument(dataPost).then(res => {
+            //     thisCpn.isSubmitting = false;
+            //     if (res.status == 200) {
+            //         thisCpn.$snotify({
+            //             type: "success",
+            //             title: "Submit document success!"
+            //         });        
+            //     }
+            //     else{
+            //         thisCpn.$snotify({
+            //             type: "error",
+            //             title: res.message
+            //         });
+            //     }
+            // })
+            // .catch(err => {
+            //     thisCpn.$snotify({
+            //             type: "error",
+            //             title: "error from submit document api!!!"
+            //         });
+            // })
+            // .always(() => {
+            // });
         },
 
         /**

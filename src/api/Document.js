@@ -2,6 +2,7 @@ import Api from "./api";
 import { appConfigs } from "./../configs.js";
 
 var coreApi = new Api(appConfigs.apiDomain.core);
+var formulasApi = new Api(appConfigs.apiDomain.formulasService)
 export const documentApi = {
     saveDocument(data) {
         return coreApi.post("document", data);
@@ -14,5 +15,8 @@ export const documentApi = {
     },
     submitDocument(data) {
         return coreApi.post("document/objects/submit", data);
+    },
+    saveMultiFormulas(data) {
+        return formulasApi.post('/formulas/batch', data);
     }
 };

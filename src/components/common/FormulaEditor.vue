@@ -412,6 +412,10 @@ export default {
             this.formulaEditor.getSession().setUseWrapMode(true);
             this.setupAutocomplete();
             if (this.formulaValue != "") {
+                console.log("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+                
+                console.log(formulaValue);
+                
                 this.setValue(this.formulaValue);
             }
             if (this.value != "") {

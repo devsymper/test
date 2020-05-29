@@ -33,13 +33,13 @@
                         plugins: [
                         'advlist autolink lists link image charmap table print preview anchor',
                         'searchreplace visualblocks code fullscreen',
-                        'insertdatetime media table paste code help wordcount emoticons'
+                        'insertdatetime media table paste code help wordcount emoticons hr'
                         ],
                         contextmenu: 'inserttable table | settingtable',
                         toolbar:
                         'undo redo | fontselect fontsizeselect formatselect | bold italic forecolor backcolor | \
                         alignleft aligncenter alignright alignjustify | \
-                        bullist numlist indent | removeformat  table |  preview margin',
+                        bullist numlist indent hr | removeformat  table |  preview margin',
                         fontsize_formats: '8px 10px 11px 12px 13px 14px 15px 16px 17px 18px 19px 20px 21px 22px 23px 24px 25px 26px 27px 28px 29px 30px 32px 34px 36px',
                         font_formats: 'Roboto = Roboto,sans-serif; Andale Mono=andale mono,times;'+ 'Arial=arial,helvetica,sans-serif;'+ 'Arial Black=arial black,avant garde;'+ 'Book Antiqua=book antiqua,palatino;'+ 'Comic Sans MS=comic sans ms,sans-serif;'+ 'Courier New=courier new,courier;'+ 'Georgia=georgia,palatino;'+ 'Helvetica=helvetica;'+ 'Impact=impact,chicago;'+ 'Symbol=symbol;'+ 'Tahoma=tahoma,arial,helvetica,sans-serif;'+ 'Terminal=terminal,monaco;'+ 'Times New Roman=times new roman,times;'+ 'Trebuchet MS=trebuchet ms,geneva;'+ 'Verdana=verdana,geneva;'+ 'Webdings=webdings;'+ 'Wingdings=wingdings,zapf dingbats',
                         valid_elements: '*[*]',
@@ -91,6 +91,7 @@ import ErrMessagePanel from "./../../views/document/items/ErrMessagePanel.vue";
 import AllControlInDoc from "./../../views/document/items/AllControlInDoc.vue";
 import { GetControlProps,mappingOldVersionControlProps,mappingOldVersionControlFormulas,getAPropsControl } from "./../../components/document/controlPropsFactory.js";
 import { documentApi } from "./../../api/Document.js";
+import { formulasApi } from "./../../api/Formulas.js";
 import { util } from "./../../plugins/util.js";
 import { getInsertionCSS } from "./../../components/document/documentUtil.js";
 import VueResizable from 'vue-resizable'
@@ -272,53 +273,100 @@ export default {
                 );
         },
         setShowAllControlOption(){
+            this.$refs.allControlOption.getData();
             this.$refs.allControlOption.showDialog();
         },
         // mở modal lưu , edit doc
         openPanelSaveDocument(){
             this.$refs.saveDocPanel.showDialog()
         },
+        /**
+         * Hàm xử lí lưu lại hết formulas về formulas service trước khi save document
+         */
+        handleSaveMultiFormulas(){
+            let allControl = this.editorStore.allControl;
+            let listControlFormulas = {};
+            for(let controlId in allControl){
+                let control = allControl[controlId];
+                let listFormulas = {};
+                let formulas = allControl[controlId].formulas;
+                for (let f in formulas){
+                    if(formulas[f].value != "")
+                    listFormulas[f] = formulas[f].value;
+                }
+                
+                if(Object.keys(listFormulas).length > 0)
+                listControlFormulas[controlId] = listFormulas;
+
+            }
+            this.callApiSaveMultipleFormulas(listControlFormulas);
+            
+        },
+        /**
+         * Hàm gọi api lưu hết formulas trước khi lưu doc
+         */
+        callApiSaveMultipleFormulas(dataPost){
+            console.log(JSON.stringify(dataPost));
+            
+            formulasApi.saveMultiFormulas({formulas:JSON.stringify(dataPost)}).then(res => {
+                console.log(res);
+                
+            })  
+            .catch(err=>{
+
+            }).
+            always(()=>{
+
+            })
+        },
+        setDataFormulasId(){
+            
+        },
         // hoangnd: hàm gửi request lưu doc
         saveDocument(documentProperties){
+            this.handleSaveMultiFormulas();
             let thisCpn = this;
-            let htmlContent = this.$refs.editor.editor.getContent()
-            let allControl = JSON.stringify(this.editorStore.allControl);
-            if(this.documentId != 0 && this.documentId != undefined && typeof this.documentId != 'undefined'){   //update doc
-                documentApi.editDocument({documentProperty:documentProperties,fields:allControl,content:htmlContent,id:this.documentId}).then(res => {
-                    if (res.status == 200) {
-                        thisCpn.$router.push('/documents');
-                    }
-                    thisCpn.$snotify({
-                        type: "success",
-                        title: "Save document success!"
-                    });
-                })
-                .catch(err => {
-                    console.log("error from edit document api!!!", err);
-                    thisCpn.$snotify({
-                        type: "error",
-                        title: "error from edit document api"
-                    });
-                })
-                .always(() => {
-                });
-            }
-            else{
-                documentApi.saveDocument({documentProperty:documentProperties,fields:allControl,content:htmlContent}).then(res => {
-                    if (res.status == 200) {
-                        thisCpn.$router.push('/documents');
-                        thisCpn.$snotify({
-                            type: "success",
-                            title: "Save document success!"
-                        });
-                    }
-                })
-                .catch(err => {
-                    console.log("error from add document api!!!", err);
-                })
-                .always(() => {
-                });
-            }
+            // let htmlContent = this.$refs.editor.editor.getContent()
+            // console.log(this.editorStore.allControl);
+            
+            // let allControl = JSON.stringify(this.editorStore.allControl);
+            // if(this.documentId != 0 && this.documentId != undefined && typeof this.documentId != 'undefined'){   //update doc
+            //     documentApi.editDocument({documentProperty:documentProperties,fields:allControl,content:htmlContent,id:this.documentId}).then(res => {
+            //         if (res.status == 200) {
+            //             thisCpn.$router.push('/documents');
+            //             thisCpn.$snotify({
+            //                 type: "success",
+            //                 title: "Save document success!"
+            //             });
+            //         }
+                    
+            //     })
+            //     .catch(err => {
+            //         console.log("error from edit document api!!!", err);
+            //         thisCpn.$snotify({
+            //             type: "error",
+            //             title: "error from edit document api"
+            //         });
+            //     })
+            //     .always(() => {
+            //     });
+            // }
+            // else{
+            //     documentApi.saveDocument({documentProperty:documentProperties,fields:allControl,content:htmlContent}).then(res => {
+            //         if (res.status == 200) {
+            //             thisCpn.$router.push('/documents');
+            //             thisCpn.$snotify({
+            //                 type: "success",
+            //                 title: "Save document success!"
+            //             });
+            //         }
+            //     })
+            //     .catch(err => {
+            //         console.log("error from add document api!!!", err);
+            //     })
+            //     .always(() => {
+            //     });
+            // }
         },
         //hoangnd: hàm xác thưc các control trước khi lưu
         // xac thực tên control và các formulas liên quan
@@ -344,7 +392,7 @@ export default {
                     // Object.assign
                 }
                 this.checkNameControl(controlId,control,listControlName);
-                this.validateFormulasInControl(control,listControlName)
+                // this.validateFormulasInControl(control,listControlName)
             }
             if(this.listMessageErr.length == 0 && $('#editor_ifr').contents().find('.s-control-error').length == 0){
                 this.saveDocument(documentProperties);
@@ -682,7 +730,7 @@ export default {
                         let content = res.data.document.content;
                         thisCpn.$refs.editor.editor.setContent(content);
                         if(res.data.document.version == 1){
-                            thisCpn.setContentForDocumentV1(res.data.document);
+                            // thisCpn.setContentForDocumentV1(res.data.document);
                         }
                         else{
                             let fields = res.data.fields;
@@ -717,6 +765,8 @@ export default {
                     }
                 })
                 if(fields[controlId].type != "table"){
+                    
+                    
                     this.addToAllControlInDoc(controlId,{properties: properties, formulas : formulas,type:fields[controlId].type});
                 }
                 else{

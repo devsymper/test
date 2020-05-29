@@ -589,8 +589,8 @@ export const GetControlProps = function(type) {
     let control = util.cloneDeep(controlTypes[type]);
 
     let allProperties = util.cloneDeep(commonProps);
-    let notInProps = control.notInProps;
-    let inProps = control.inProps;
+    let notInProps = control.notInProps
+    let inProps = control.inProps
 
     if (inProps != undefined && typeof inProps != 'undefined' && inProps.length > 0) {
         let propertiesControl = {};

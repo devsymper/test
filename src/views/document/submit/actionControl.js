@@ -8,6 +8,7 @@ export default class ActionControl extends Control {
         super(idField, ele, controlProps, curParentInstance);
     }
     render() {
+        alert('ok');
         this.ele.addClass('d-none');
     }
 

@@ -1,7 +1,6 @@
 <template>
     <list-items
-        ref="listDocument"
-        :getDataUrl="'https://v2hoangnd.dev.symper.vn/document'"   
+        :getDataUrl="'https://v2hoangnd.dev.symper.vn/document/'+documentName+'/objects'"   
         :useDefaultContext="false"
         :tableContextMenu="tableContextMenu"
         :pageTitle="$t('document.title')"
@@ -15,11 +14,9 @@
     </list-items>
 </template>
 <script>
-import { userApi } from "./../../api/user.js";
-import ListItems from "./../../components/common/ListItems.vue";
-import ActionPanel from "./../../views/users/ActionPanel.vue";
-import ChangePassPanel from "./../../views/users/ChangePass.vue";
-import { util } from "./../../plugins/util.js";
+import ListItems from "./../../../components/common/ListItems.vue";
+import ActionPanel from "./../../../views/users/ActionPanel.vue";
+import { util } from "./../../../plugins/util.js";
 export default {
     components: {
         "list-items": ListItems,
@@ -27,29 +24,23 @@ export default {
     },
     data(){
         return {
+            documentName:this.$route.params.name,
             actionPanelWidth:800,
             containerHeight: 200,
             tableContextMenu:[
                 {name:"delete",text:'Xóa'},
                 {
+                    name: "detail",
+                    text: "Xem chi tiết",
+                    callback: (document, callback) => {
+                            
+                    },
+                },
+                {
                     name: "edit",
                     text: "Sửa",
                     callback: (document, callback) => {
-                        this.$goToPage('/document/editor/'+document.id,document.title);
-                    },
-                },
-                {
-                    name: "submit",
-                    text: "Nhập liệu",
-                    callback: (document, callback) => {
-                        this.$goToPage('/document/submit/'+document.id,document.title);
-                    },
-                },
-                {
-                    name: "listObject",
-                    text: "Danh sách bản ghi",
-                    callback: (document, callback) => {
-                        this.$goToPage('/document/'+document.name+'/object',"Danh sách bản ghi");
+                       
                     },
                 },
             ],
@@ -61,10 +52,7 @@ export default {
     created(){
         let thisCpn = this;
         this.$evtBus.$on('change-user-locale',(locale)=>{
-            thisCpn.tableContextMenu = [
-                {name:"passwordsetting",text:this.$t('user.table.contextMenu.passwordSetting')},
-                {name:"edit",text:this.$t('user.table.contextMenu.edit')}
-            ]
+            
         });
     },
     watch:{
