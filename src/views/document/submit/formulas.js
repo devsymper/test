@@ -8,7 +8,7 @@ export default class Formulas {
          * Loại của công thức: validate, data, require, readonly..f
          */
         this.type = type;
-        this.inputControl = this.getInputControl();
+        // this.inputControl = this.getInputControl();
     }
 
     run(dataInput) {

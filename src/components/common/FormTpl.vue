@@ -68,7 +68,6 @@
                 single-line
                 v-bind="getInputProps(inputInfo)"
                 v-model="inputInfo.value"
-                :formulaValue="inputInfo.value"
                 :is="getInputTag(inputInfo.type)">
                 <template slot="item" slot-scope="data">
                     <template>
@@ -85,7 +84,8 @@
             @before-close="closeLargeFormulaEditor()"
             :showPanel="largeFormulaEditor.open"
             :actionTitle="largeFormulaEditor.data.title"
-            :panelData="largeFormulaEditor.data">
+            :panelData="largeFormulaEditor.data"
+            ref="dragPanel">
             <template slot="drag-panel-content" slot-scope="{panelData}">
                 <orgchart-selector
                     @input="translateOrgchartValuesToTags"
@@ -95,14 +95,12 @@
                 <formula-editor
                     v-else-if="panelData.type == 'userAssignment'"
                     v-model="panelData.value.formula"
-                    :formulaValue="panelData.value.formula"
                     :width="'100%'"
                     :height="'370px'"
                 ></formula-editor>
                 <formula-editor
                     v-else
                     v-model="panelData.value"
-                    :formulaValue="panelData.value"
                     :width="'100%'"
                     :height="'370px'"
                 ></formula-editor>
@@ -340,13 +338,12 @@ export default {
             inputInfo.activeTab = type;
         },
         closeLargeFormulaEditor() {
-            this.largeFormulaEditor.open = false;
             let info = this.largeFormulaEditor;
             this.$refs["inputItem_" + info.name][0].setValue(info.data.value);
             this.largeFormulaEditor.name = '';
         },
         openLargeValueEditor(inputInfo, name) {
-            this.largeFormulaEditor.open = true;
+            this.$refs.dragPanel.show();
             this.largeFormulaEditor.name = name;
             this.$set(this.largeFormulaEditor, "data", inputInfo);
             if(this.getDragPanelContent(inputInfo) == 'orgchart-selector'){

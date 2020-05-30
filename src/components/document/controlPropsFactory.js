@@ -186,7 +186,7 @@ let commonFormulas = {
         title: "Công thức ẩn hiện",
         value: "",
         formulasId: 0,
-        type: "treeValidate",
+        type: "script", // muoons treevalidate thi thay script ow day
         groupType: "formulas"
     },
     link: {
@@ -214,14 +214,14 @@ let commonFormulas = {
         title: "Công thức xác thực",
         value: "",
         formulasId: 0,
-        type: "treeValidate",
+        type: "script",
         groupType: "formulas"
     },
     readOnly: {
         title: "Công thức readonly",
         value: "",
         formulasId: 0,
-        type: "treeValidate",
+        type: "script",
         groupType: "formulas"
     },
     uniqueDB: {

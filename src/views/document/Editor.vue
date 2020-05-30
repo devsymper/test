@@ -281,35 +281,59 @@ export default {
             this.$refs.saveDocPanel.showDialog()
         },
         /**
-         * Hàm xử lí lưu lại hết formulas về formulas service trước khi save document
+         * Hàm xử lí lấy dữ liệu các công thức để insert vào formulas service trước khi lưu
          */
-        handleSaveMultiFormulas(){
-            let allControl = this.editorStore.allControl;
+        getDataToSaveMultiFormulas(listControl){
             let listControlFormulas = {};
-            for(let controlId in allControl){
-                let control = allControl[controlId];
-                let listFormulas = {};
-                let formulas = allControl[controlId].formulas;
-                for (let f in formulas){
-                    if(formulas[f].value != "")
-                    listFormulas[f] = formulas[f].value;
+            for(let controlId in listControl){
+                let control = listControl[controlId];
+                let listFormulas = [];
+                let formulas = listControl[controlId].formulas;
+                if(control.type == "table"){
+                    let listField = control.listFields;
+                    let listFormulasControlInTable = this.getDataToSaveMultiFormulas(listField);
+                    listControlFormulas = {...listFormulasControlInTable,...listControlFormulas}
                 }
-                
+                for (let f in formulas){
+                    if(formulas[f].value != ""){
+                        let item = {};
+                        item[f] = formulas[f].value;
+                        listFormulas.push(item);
+                    }
+                }
                 if(Object.keys(listFormulas).length > 0)
                 listControlFormulas[controlId] = listFormulas;
-
             }
-            this.callApiSaveMultipleFormulas(listControlFormulas);
+           return listControlFormulas;
             
         },
-        /**
-         * Hàm gọi api lưu hết formulas trước khi lưu doc
-         */
-        callApiSaveMultipleFormulas(dataPost){
-            console.log(JSON.stringify(dataPost));
+       
+        setDataFormulasId(){
             
-            formulasApi.saveMultiFormulas({formulas:JSON.stringify(dataPost)}).then(res => {
-                console.log(res);
+        },
+        // hoangnd: hàm gửi request lưu doc
+        async saveDocument(documentProperties){
+            let allControl = this.editorStore.allControl;
+
+            let dataPost = this.getDataToSaveMultiFormulas(allControl);
+            let thisCpn = this;
+            let res = await formulasApi.saveMultiFormulas({formulas:JSON.stringify(dataPost)}).then(res => {
+                if(res.status == 200){
+                    let data = res.data;
+                    for(let controlId in data){
+                        for(let i = 0; i < data[controlId].length; i++){
+                            let key = Object.keys(data[controlId][i])[0];
+                            let controlEl = $("#editor_ifr").contents().find('#'+controlId);
+                            let tableId = 0;
+                            if(controlEl.closest(".s-control-table").length > 0){
+                                tableId = controlEl.closest(".s-control-table").attr('id');
+                            }
+                            thisCpn.$store.commit(
+                                "document/updateFormulasId",{id:controlId,name:key,value:data[controlId][i][key],tableId:tableId}
+                            );   
+                        }
+                    }
+                }
                 
             })  
             .catch(err=>{
@@ -318,55 +342,59 @@ export default {
             always(()=>{
 
             })
-        },
-        setDataFormulasId(){
             
+            let htmlContent = this.$refs.editor.editor.getContent();
+            if(this.documentId != 0 && this.documentId != undefined && typeof this.documentId != 'undefined'){   //update doc
+                this.editDocument({documentProperty:documentProperties,fields:JSON.stringify(allControl),content:htmlContent,id:this.documentId})
+            }
+            else{
+                this.createDocument({documentProperty:documentProperties,fields:allControl,content:htmlContent});
+            }
         },
-        // hoangnd: hàm gửi request lưu doc
-        saveDocument(documentProperties){
-            this.handleSaveMultiFormulas();
+        /**
+         * Hàm gọi Api tạo mới ducument
+         */
+        createDocument(dataPost){
             let thisCpn = this;
-            // let htmlContent = this.$refs.editor.editor.getContent()
-            // console.log(this.editorStore.allControl);
-            
-            // let allControl = JSON.stringify(this.editorStore.allControl);
-            // if(this.documentId != 0 && this.documentId != undefined && typeof this.documentId != 'undefined'){   //update doc
-            //     documentApi.editDocument({documentProperty:documentProperties,fields:allControl,content:htmlContent,id:this.documentId}).then(res => {
-            //         if (res.status == 200) {
-            //             thisCpn.$router.push('/documents');
-            //             thisCpn.$snotify({
-            //                 type: "success",
-            //                 title: "Save document success!"
-            //             });
-            //         }
-                    
-            //     })
-            //     .catch(err => {
-            //         console.log("error from edit document api!!!", err);
-            //         thisCpn.$snotify({
-            //             type: "error",
-            //             title: "error from edit document api"
-            //         });
-            //     })
-            //     .always(() => {
-            //     });
-            // }
-            // else{
-            //     documentApi.saveDocument({documentProperty:documentProperties,fields:allControl,content:htmlContent}).then(res => {
-            //         if (res.status == 200) {
-            //             thisCpn.$router.push('/documents');
-            //             thisCpn.$snotify({
-            //                 type: "success",
-            //                 title: "Save document success!"
-            //             });
-            //         }
-            //     })
-            //     .catch(err => {
-            //         console.log("error from add document api!!!", err);
-            //     })
-            //     .always(() => {
-            //     });
-            // }
+            documentApi.saveDocument(dataPost).then(res => {
+                if (res.status == 200) {
+                    thisCpn.$router.push('/documents');
+                    thisCpn.$snotify({
+                        type: "success",
+                        title: "Save document success!"
+                    });
+                }
+            })
+            .catch(err => {
+                console.log("error from add document api!!!", err);
+            })
+            .always(() => {
+            });
+        },
+        /**
+         * Hàm gọi api edit document
+         */
+        editDocument(dataPost){
+            let thisCpn = this;
+            documentApi.editDocument(dataPost).then(res => {
+                if (res.status == 200) {
+                    thisCpn.$router.push('/documents');
+                    thisCpn.$snotify({
+                        type: "success",
+                        title: "Save document success!"
+                    });
+                }
+                
+            })
+            .catch(err => {
+                console.log("error from edit document api!!!", err);
+                thisCpn.$snotify({
+                    type: "error",
+                    title: "error from edit document api"
+                });
+            })
+            .always(() => {
+            });
         },
         //hoangnd: hàm xác thưc các control trước khi lưu
         // xac thực tên control và các formulas liên quan
@@ -730,7 +758,7 @@ export default {
                         let content = res.data.document.content;
                         thisCpn.$refs.editor.editor.setContent(content);
                         if(res.data.document.version == 1){
-                            // thisCpn.setContentForDocumentV1(res.data.document);
+                            thisCpn.setContentForDocumentV1(res.data.document);
                         }
                         else{
                             let fields = res.data.fields;
@@ -756,17 +784,23 @@ export default {
                 let properties = control.properties
                 let formulas = control.formulas
                 let type = fields[controlId].type
+                console.log(fields[controlId]);
+                
                 $.each(properties,function(k,v){
                     if(properties[k].type == 'checkbox'){
-                        properties[k].value = (fields[controlId][k] == 0 || fields[controlId][k] == '0' || fields[controlId][k] == '') ? false : true
+                        properties[k].value = (fields[controlId]['properties'][k] == 0 || fields[controlId]['properties'][k] == '0' || fields[controlId]['properties'][k] == '') ? false : true
                     }
                     else{
-                        properties[k].value = fields[controlId][k]
+                        properties[k].value = fields[controlId]['properties'][k]
                     }
-                })
+                }) 
+                if(fields[controlId]['formulas'] != false){
+                    $.each(formulas,function(k,v){
+                        formulas[k].value = fields[controlId]['formulas'][k]
+                    })
+                }
+                
                 if(fields[controlId].type != "table"){
-                    
-                    
                     this.addToAllControlInDoc(controlId,{properties: properties, formulas : formulas,type:fields[controlId].type});
                 }
                 else{
@@ -777,19 +811,25 @@ export default {
                         let childProperties = childControl.properties
                         let childFormulas = childControl.formulas
                         let childType = listField[childFieldId].type
+                        console.log(listField[childFieldId]);
+                        
                         $.each(childProperties,function(k,v){
                             if(childProperties[k].type == 'checkbox'){
-                                childProperties[k].value = (listField[childFieldId][k] == 0 || listField[childFieldId][k] == '0' || listField[childFieldId][k] == '') ? false : true
+                                childProperties[k].value = (listField[childFieldId]['properties'][k] == 0 || listField[childFieldId]['properties'][k] == '0' || listField[childFieldId]['properties'][k] == '') ? false : true
                             }
                             else{
-                                childProperties[k].value = listField[childFieldId][k]
+                                childProperties[k].value = listField[childFieldId]['properties'][k]
                             }
                         })
+                        if(listField[childFieldId]['formulas'] != false){
+                            $.each(childFormulas,function(k,v){
+                                childFormulas[k].value = listField[childFieldId]['formulas'][k]
+                            })
+                        }
                         listChildField[childFieldId] = {properties: childProperties, formulas : childFormulas,type:childType}
                         }
                     this.addToAllControlInDoc(controlId,{properties: properties, formulas : formulas,type:fields[controlId].type,listFields:listChildField});
                 }
-                
             }
         },
 

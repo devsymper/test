@@ -146,12 +146,28 @@ const updateProp = (state, params) => {
             state.editor.allControl[id]['formulas'][name]['value'] = value
         }
     }
+    setTreeListControlInDoc(state);
+}
+const updateFormulasId = (state, params) => {
+    let id = params.id
+    let name = params.name
+    let value = params.value
+    let tableId = params.tableId
     console.log(params);
     console.log(state.editor.allControl);
 
+    if (tableId != 0 && tableId != '0') {
+        if (state.editor.allControl[tableId]['listFields'][id]['formulas'][name]) {
+            state.editor.allControl[tableId]['listFields'][id]['formulas'][name]['formulasId'] = value
+        }
 
-    setTreeListControlInDoc(state);
+    } else {
+        if (state.editor.allControl[id]['formulas'][name]) {
+            state.editor.allControl[id]['formulas'][name]['formulasId'] = value
+        }
+    }
 }
+
 const minimizeControl = (state, params) => {
     for (let i of Object.keys(state.editor.allControl)) {
         if (state.editor.allControl[i]['listFields']) {
@@ -205,5 +221,6 @@ export {
     addToListInputInDocument,
     changeControlSubmitProps,
     addInstanceSubmitDB,
-    updateListInputInDocument
+    updateListInputInDocument,
+    updateFormulasId
 };

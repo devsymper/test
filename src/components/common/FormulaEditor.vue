@@ -118,18 +118,13 @@ import ace from "ace-builds";
 export default {
     name: "FormulaEditor",
     components: {},
-    prop: ['value'],
-    model: {
-        prop: 'value',
-        event: 'input'
-    },
     watch: {
-        formulaValue(vl){
+        value(vl){
             if(!this.innerChangeValue){
-                this.formulaEditor.setValue(vl);
+                this.setValue(vl);
             }
             this.innerChangeValue = false;
-        }
+        },
     },
     props: {
         // Khadm: Thêm option để hiển thị công thức ở chế độ đơn giản: không chứa header (snippest, soạn công thức )
@@ -145,14 +140,13 @@ export default {
             type: String,
             default: "500px"
         },
-        formulaValue: {
+        value: {
             default: ""
-        }
+        },
     },
     data: function() {
         return {
             tab: 0,
-            value: ``,
             searchKey: ``,
             options: {
                 useWorker: true,
@@ -258,15 +252,13 @@ export default {
         this.setupTooltip();
         this.setupBaSnippet();
         let thisCpn = this;
-        $('#fomular-editor').on('change',function(e){
-            thisCpn.$evtBus.$emit('on-change-script-editor',thisCpn.getValue())
-        })
     },
     methods: {
         /**
          * Set công thức cho editor
          */
         setValue(formula) {
+            this.manualChangeValue = false;
             this.formulaEditor.session.setValue(formula);
         },
         /**
@@ -411,16 +403,7 @@ export default {
             this.formulaEditor.setOptions(this.options);
             this.formulaEditor.getSession().setUseWrapMode(true);
             this.setupAutocomplete();
-            if (this.formulaValue != "") {
-                console.log("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
-                
-                console.log(formulaValue);
-                
-                this.setValue(this.formulaValue);
-            }
-            if (this.value != "") {
-                this.setValue(this.value);
-            }
+            this.setValue(this.value);
             this.listenChangeEvt();
             if(this.simpleMode){
                 this.formulaEditor.setOption('showGutter', false);
@@ -430,14 +413,21 @@ export default {
         // khadm: Phát sự kiện khi thay đổi giá trị formula
         listenChangeEvt() {
             let self = this;
+            
             this.formulaEditor.on("change", e => {
                 if (self.debounceAutoSave) {
                     clearTimeout(self.debounceAutoSave);
                 }
+                
                 self.debounceAutoSave = setTimeout(() => {
-                    self.innerChangeValue = true; // đánh dấu sự thay đổi của công thức là do người dùng gõ phím
+                    if(self.manualChangeValue){
+                        self.innerChangeValue = true; // đánh dấu sự thay đổi của công thức là do người dùng gõ phím
+                    }else{
+                        self.manualChangeValue = true;
+                    }
                     self.$emit("input", self.getValue());
                 }, 300);
+                
             });
 
             this.formulaEditor.on("blur", e => {
@@ -533,12 +523,9 @@ export default {
             });
         },
         setupAutocomplete() {
-            console.log(this.formulaEditor);
-
             if (this.formulaEditor !== null) {
                 let that = this;
                 this.formulaEditor.on("keyup", function(e) {
-                    console.log(e);
                     if (e.key == "." || e.key.match(/^[\d\w+]$/i)) {
                         that.editor.execCommand("autocomplete");
                     }

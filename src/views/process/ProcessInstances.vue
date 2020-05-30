@@ -96,7 +96,7 @@ import listHeader from "./../../views/tasks/listHeader";
 import userSelector from "./../../views/tasks/userSelector";
 import SymperIcon from "./../../components/common/SymperIcon";
 import processInstanceDetail from "./processInstanceDetail.vue";
-
+ 
 
 export default {
     data() {
@@ -104,7 +104,7 @@ export default {
         return {
             listProrcessInstances: [],
             isSmallRow: false,
-            sideBySideMode: true,
+            sideBySideMode: false,
             openPanel: [0, 1, 2, 3, 4],
             compackMode: false,
             selectedInstance: {},

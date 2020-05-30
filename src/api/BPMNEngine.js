@@ -1,5 +1,6 @@
 import Api from "./api"; // import class api vào để sử dụng
 import { appConfigs } from "./../configs.js"; // trong trường hợp này ta cần sử dụng domain của từng module nghiệp vụ được định nghĩa trong file config
+import { util } from "../plugins/util";
 
 var bpmneApi = new Api(appConfigs.apiDomain.bpmne.models); // Khởi tạo một đối tượng api với domain của service BPMNE
 
@@ -35,8 +36,9 @@ export default {
     },
     updateModel(data, idModel) {
         // data = JSON.stringify(data);
-        delete testHeader['Content-Type'];
-        return bpmneApi.post(`${idModel}/editor/json`, data, testHeader, testOptions);
+        let testHeaderClone = util.cloneDeep(testHeader);
+        delete testHeaderClone['Content-Type'];
+        return bpmneApi.post(`${idModel}/editor/json`, data, testHeaderClone, testOptions);
     },
     getModelData(modelId) {
         return bpmneApi.get(`${modelId}/editor/json`, {}, testHeader);
@@ -50,11 +52,11 @@ export default {
             subfix.push(`${key}=${params[key]}`);
         }
         subfix = "?" + subfix.join('&');
-        // testHeader['Content-Type'] = 'multipart/form-data; boundary=----WebKitFormBoundaryCmEOFynKduiu8wVL';
-        delete testHeader['Content-Type'];
+        let testHeaderClone = util.cloneDeep(testHeader);
+        delete testHeaderClone['Content-Type'];
         var fd = new FormData();
         fd.append('file', file);
-        return bpmneApi.post(appConfigs.apiDomain.bpmne.deployments + subfix, fd, testHeader, {
+        return bpmneApi.post(appConfigs.apiDomain.bpmne.deployments + subfix, fd, testHeaderClone, {
             processData: false,
             contentType: false,
         });
