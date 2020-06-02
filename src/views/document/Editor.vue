@@ -317,7 +317,8 @@ export default {
 
             let dataPost = this.getDataToSaveMultiFormulas(allControl);
             let thisCpn = this;
-            let res = await formulasApi.saveMultiFormulas({formulas:JSON.stringify(dataPost)}).then(res => {
+            try {
+                let res = await formulasApi.saveMultiFormulas({formulas:JSON.stringify(dataPost)})
                 if(res.status == 200){
                     let data = res.data;
                     for(let controlId in data){
@@ -332,24 +333,33 @@ export default {
                                 "document/updateFormulasId",{id:controlId,name:key,value:data[controlId][i][key],tableId:tableId}
                             );   
                         }
+                    } 
+                    let htmlContent = this.$refs.editor.editor.getContent();
+                    if(this.documentId != 0 && this.documentId != undefined && typeof this.documentId != 'undefined'){   //update doc
+                        this.editDocument({documentProperty:documentProperties,fields:JSON.stringify(allControl),content:htmlContent,id:this.documentId})
+                    }
+                    else{
+                        this.createDocument({documentProperty:documentProperties,fields:JSON.stringify(allControl),content:htmlContent});
                     }
                 }
-                
-            })  
-            .catch(err=>{
-
-            }).
-            always(()=>{
-
-            })
+                else{
+                    this.$snotify({
+                            type: "error",
+                            title: "error from formulas serice!!!",
+                            text: res.message
+                        });
+                }
+            } catch (error) {
+                this.$snotify({
+                            type: "error",
+                            title: "error from formulas serice!!!",
+                            text: error
+                        });
+            }
             
-            let htmlContent = this.$refs.editor.editor.getContent();
-            if(this.documentId != 0 && this.documentId != undefined && typeof this.documentId != 'undefined'){   //update doc
-                this.editDocument({documentProperty:documentProperties,fields:JSON.stringify(allControl),content:htmlContent,id:this.documentId})
-            }
-            else{
-                this.createDocument({documentProperty:documentProperties,fields:allControl,content:htmlContent});
-            }
+                
+
+           
         },
         /**
          * Hàm gọi Api tạo mới ducument
@@ -358,6 +368,7 @@ export default {
             let thisCpn = this;
             documentApi.saveDocument(dataPost).then(res => {
                 if (res.status == 200) {
+                    thisCpn.$refs.editor.editor.remove();
                     thisCpn.$router.push('/documents');
                     thisCpn.$snotify({
                         type: "success",
@@ -378,6 +389,7 @@ export default {
             let thisCpn = this;
             documentApi.editDocument(dataPost).then(res => {
                 if (res.status == 200) {
+                    thisCpn.$refs.editor.editor.remove();
                     thisCpn.$router.push('/documents');
                     thisCpn.$snotify({
                         type: "success",

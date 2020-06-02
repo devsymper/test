@@ -214,14 +214,13 @@ export default class Table {
         let columns = [];
         let hiddenColumns = [];
         let num = 0;
-        console.log(thisObj.controlObj);
 
         let ths = thisObj.controlObj.ele.find('th');
-
         for (let controlName in thisObj.controlObj.listInsideControls) {
             headerName.push($(ths[num]).text());
             // Lấy celltype
             let cellType = thisObj.getCellType(controlName, listInputInDocument[controlName]);
+
             thisObj.listCellType[controlName] = cellType;
             columns.push(cellType);
             //Khởi tạo giá trị cho dòng mới

@@ -209,6 +209,11 @@ const updateListInputInDocument = (state, params) => {
         Vue.set(state.submit.listInputInDocument[controlName], key, value);
     }
 }
+const addToRootControl = (state, params) => {
+    let key = params.key
+    let value = params.value
+    Vue.set(state.submit.rootControl, key, value);
+}
 
 
 export {
@@ -222,5 +227,6 @@ export {
     changeControlSubmitProps,
     addInstanceSubmitDB,
     updateListInputInDocument,
-    updateFormulasId
+    updateFormulasId,
+    addToRootControl,
 };
