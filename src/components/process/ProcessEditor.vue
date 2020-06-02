@@ -699,7 +699,10 @@ export default {
          */
         handleNodeSelected(node) {
             let type = this.getNodeType(node);
-            console.log(type, node);
+            let wp = node.di.waypoint;
+            if(wp){
+                console.log(type, node, wp[0], wp[wp.length -1]);
+            }
 
             let nodeData = this.getNodeData(node.id, type);
             nodeData.name = node.name;

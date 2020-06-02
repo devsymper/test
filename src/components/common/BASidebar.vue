@@ -29,11 +29,22 @@
                 </v-list-item-avatar>
 
                 <v-list-item-content>
-                    <v-list-item-title>{{ sapp.endUserInfo.name }}</v-list-item-title>
+                    <v-list-item-title>
+                        <span class="mt-1 position-relative" style="top: 5px; position: relative;">{{ sapp.endUserInfo.name }}</span> 
+                        <v-tooltip top>
+                            <template v-slot:activator="{ on }">
+                                
+                                <i @click="logout" v-on="on" class="float-right py-1 pl-1 cursor-pointer mdi mdi-exit-to-app fs-15"></i>
+                            </template>
+                            <span>{{$t('common.logout')}}</span>
+                        </v-tooltip>
+                    </v-list-item-title>
+
                     <v-list-item-subtitle>
                         <v-menu bottom left>
                             <template v-slot:activator="{ on }">
                                 <v-btn
+                                    class="w-100"
                                     x-small
                                     v-on="on"
                                     depressed
@@ -134,6 +145,10 @@ export default {
         this.menuItemsHeight = (util.getComponentSize(this).h - 178)+'px';
     },
     methods: {
+        logout(){
+            util.auth.logout();
+            location.reload();
+        },
         changeLocale(item) {
             let locale = item.key;
             let currentLocale = util.getSavedLocale();

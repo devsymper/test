@@ -52,7 +52,8 @@
         "remove_confirm_title": "Are you sure to delete?",
         "remove_confirm_message": "You are about to delete {count} item",
         "remove_msg_success": "Deleted {count} items",
-        "remove_msg_err": "Can not delete selected items!"
+        "remove_msg_err": "Can not delete selected items!",
+        "logout": "Log out"
     },
     "validate": {
         "required": "Not be empty",
