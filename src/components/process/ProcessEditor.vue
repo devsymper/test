@@ -922,6 +922,8 @@ export default {
             this.instanceKey
         );
         this.$store.dispatch("app/getAllOrgChartData");
+        this.$store.dispatch("app/getAllUsers");
+        
         if (this.$route.name == "editProcess") {
             this.modelAction = "edit";
             this.modelId = this.$route.params.id;
@@ -935,6 +937,8 @@ export default {
         ) {
             this.applySavedData(this.$route.params.id);
         }
+
+
     },
     mounted(){
         this.resetAttrPanelHeight();

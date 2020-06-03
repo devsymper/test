@@ -48,6 +48,10 @@ const setOrgchartNodes = (state, orgchartNodes) => {
     }
 }
 
+const setAllUsers = (state, allUsers) => {
+    Vue.set(state, 'allUsers', allUsers);
+}
+
 export {
     changeCollapseSidebar,
     increaseUnreadNotification,
@@ -56,5 +60,6 @@ export {
     changeUrlsToTabs,
     updateCurrentTabIndex,
     removeTab,
-    setOrgchartNodes
+    setOrgchartNodes,
+    setAllUsers
 };

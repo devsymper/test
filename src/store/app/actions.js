@@ -1,5 +1,6 @@
 import { SYMPER_APP } from "./../../main.js";
 import { orgChartApi } from "./../../api/OrgChart";
+import { userApi } from "../../api/user.js";
 
 const handleUrlChanges = (context, data) => {
     console.log(context, data, 'xxx');
@@ -65,7 +66,7 @@ function makeNodesMap(orgchartNodes) {
  * Lấy data của tất cả orgchart ở server
  */
 const getAllOrgChartData = (context) => {
-    if ($.isEmptyObject(context.orgchartNodes)) {
+    if ($.isEmptyObject(context.state.orgchartNodes)) {
         orgChartApi.getAllNodes()
             .then(res => {
                 if (res.status == 200) {
@@ -84,4 +85,23 @@ const getAllOrgChartData = (context) => {
             });
     }
 }
-export { getAllOrgChartData };
+
+/**
+ * Lấy data của tất cả user trong hệ thống
+ */
+
+const getAllUsers = async(context) => {
+    if (context.state.allUsers.length == 0) {
+        try {
+            let res = await userApi.getListUser(1, 2000);
+            if (res.status == 200) {
+                context.commit('setAllUsers', res.data.listObject);
+            } else {
+                SYMPER_APP.$snotifyError(error, "Can not get all user!");
+            }
+        } catch (error) {
+            SYMPER_APP.$snotifyError(error, "Can not get all user!");
+        }
+    }
+}
+export { getAllOrgChartData, getAllUsers };
