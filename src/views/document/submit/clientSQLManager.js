@@ -17,12 +17,16 @@ export default class ClientSQLManager {
      * @param {String} keyInstance 
      */
     static async createDB(keyInstance) {
+            console.log('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx');
+
             const SQL = await initSqlJs({
                 locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.3.0/dist/sql-wasm.wasm`
             });
             let db = new SQL.Database();
             this.addSQLInstanceDBToStore(keyInstance, db);
             console.log(db);
+            console.log('qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq');
+
 
         }
         /**
@@ -42,8 +46,6 @@ export default class ClientSQLManager {
          * @param {String} keyInstance 
          */
     static getInstanceDB(keyInstance) {
-            console.log(util.cloneDeep(dataSubmitStore.SQLLiteDB));
-
             return dataSubmitStore.SQLLiteDB[keyInstance]
         }
         /**
@@ -73,13 +75,17 @@ export default class ClientSQLManager {
         col += " )";
         let sql = `CREATE TABLE ${tableName} ${col};`;
         console.log(sql);
-        console.log(keyInstance);
-
         // sql += "INSERT INTO this_document VALUES ('a', 'hello');"
         this.run(keyInstance, sql, true);
 
         // console.log(this.run(keyInstance, 'select * from this_document', false));
 
+    }
+    static closeDB(keyInstance) {
+        let db = this.getInstanceDB(keyInstance);
+        if (db != undefined) {
+            db.close();
+        }
     }
 
 }

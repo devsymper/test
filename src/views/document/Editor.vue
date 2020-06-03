@@ -316,50 +316,57 @@ export default {
             let allControl = this.editorStore.allControl;
 
             let dataPost = this.getDataToSaveMultiFormulas(allControl);
-            let thisCpn = this;
-            try {
-                let res = await formulasApi.saveMultiFormulas({formulas:JSON.stringify(dataPost)})
-                if(res.status == 200){
-                    let data = res.data;
-                    for(let controlId in data){
-                        for(let i = 0; i < data[controlId].length; i++){
-                            let key = Object.keys(data[controlId][i])[0];
-                            let controlEl = $("#editor_ifr").contents().find('#'+controlId);
-                            let tableId = 0;
-                            if(controlEl.closest(".s-control-table").length > 0){
-                                tableId = controlEl.closest(".s-control-table").attr('id');
+            if(Object.keys(dataPost).length > 0){
+                let thisCpn = this;
+                try {
+                    let res = await formulasApi.saveMultiFormulas({formulas:JSON.stringify(dataPost)})
+                    if(res.status == 200){
+                        let data = res.data;
+                        for(let controlId in data){
+                            for(let i = 0; i < data[controlId].length; i++){
+                                let key = Object.keys(data[controlId][i])[0];
+                                let controlEl = $("#editor_ifr").contents().find('#'+controlId);
+                                let tableId = 0;
+                                if(controlEl.closest(".s-control-table").length > 0){
+                                    tableId = controlEl.closest(".s-control-table").attr('id');
+                                }
+                                thisCpn.$store.commit(
+                                    "document/updateFormulasId",{id:controlId,name:key,value:data[controlId][i][key],tableId:tableId}
+                                );   
                             }
-                            thisCpn.$store.commit(
-                                "document/updateFormulasId",{id:controlId,name:key,value:data[controlId][i][key],tableId:tableId}
-                            );   
+                        } 
+                        let htmlContent = this.$refs.editor.editor.getContent();
+                        if(this.documentId != 0 && this.documentId != undefined && typeof this.documentId != 'undefined'){   //update doc
+                            this.editDocument({documentProperty:documentProperties,fields:JSON.stringify(allControl),content:htmlContent,id:this.documentId})
                         }
-                    } 
-                    let htmlContent = this.$refs.editor.editor.getContent();
-                    if(this.documentId != 0 && this.documentId != undefined && typeof this.documentId != 'undefined'){   //update doc
-                        this.editDocument({documentProperty:documentProperties,fields:JSON.stringify(allControl),content:htmlContent,id:this.documentId})
+                        else{
+                            this.createDocument({documentProperty:documentProperties,fields:JSON.stringify(allControl),content:htmlContent});
+                        }
                     }
                     else{
-                        this.createDocument({documentProperty:documentProperties,fields:JSON.stringify(allControl),content:htmlContent});
+                        this.$snotify({
+                                type: "error",
+                                title: "error from formulas serice!!!",
+                                text: res.message
+                            });
                     }
+                } catch (error) {
+                    this.$snotify({
+                                type: "error",
+                                title: "error from formulas serice!!!",
+                                text: error
+                            });
+                }
+            }     
+            else{
+                let htmlContent = this.$refs.editor.editor.getContent();
+                if(this.documentId != 0 && this.documentId != undefined && typeof this.documentId != 'undefined'){   //update doc
+                    this.editDocument({documentProperty:documentProperties,fields:JSON.stringify(allControl),content:htmlContent,id:this.documentId})
                 }
                 else{
-                    this.$snotify({
-                            type: "error",
-                            title: "error from formulas serice!!!",
-                            text: res.message
-                        });
+                    this.createDocument({documentProperty:documentProperties,fields:JSON.stringify(allControl),content:htmlContent});
                 }
-            } catch (error) {
-                this.$snotify({
-                            type: "error",
-                            title: "error from formulas serice!!!",
-                            text: error
-                        });
-            }
-            
-                
-
-           
+            }  
         },
         /**
          * Hàm gọi Api tạo mới ducument

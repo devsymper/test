@@ -1,6 +1,8 @@
 import sDocument from './../../../store/document'
 let dataSubmitStore = sDocument.state.submit
 import ClientSQLManager from "./clientSQLManager.js";
+import { documentServiceApi } from "./../../../api/DocumentService";
+
 export default class Formulas {
     constructor(keyInstance, formulas, type) {
             /**
@@ -19,22 +21,86 @@ export default class Formulas {
          * @param {} dataInput 
          */
     checkExistFormulas() {
-        if (this.formulas == "" && this.formulas == false && this.formulas == undefined) {
-            return false;
-        } else return true;
-    }
-    handleBeforeRunFormulas(dataInput) {
-            let formulas = this.formulas;
-            for (let controlName in dataInput) {
-                let regex = new RegExp("{" + controlName + "}", "g");
-                formulas = formulas.replace(regex, "'" + dataInput[controlName] + "'");
+            if (this.formulas == "" && this.formulas == false && this.formulas == undefined) {
+                return false;
+            } else return true;
+        }
+        /**
+         * Hàm xử lí việc thay các giá trị vào {control} và tách công thức server để chạy trước nếu có
+         * @param {Object} dataInput 
+         */
+    async handleBeforeRunFormulas(dataInput) {
+        let listSyql = this.formulas.match(/(?<=ref\().*?(?=\))/gi);
+        if (listSyql != null && listSyql.length > 0) {
+            for (let i = 0; i < listSyql.length; i++) {
+                let res = await this.runSyql(listSyql[i]);
+                return { server: true, data: res.data };
             }
-            return this.run(formulas);
+        } else {
+            let formulas = this.replaceParamsToData(dataInput, this.formulas);
+            return { server: false, data: this.runSQLLiteFormulas(formulas) };
+        }
+
+    }
+
+    replaceParamsToData(dataInput, formulas) {
+        for (let controlName in dataInput) {
+            let regex = new RegExp("{" + controlName + "}", "g");
+            formulas = formulas.replace(regex, "'" + dataInput[controlName] + "'");
+        }
+        return formulas;
+    }
+    handleRunAutoCompleteFormulas(search) {
+        let listSyql = this.getSyqlFormulas();
+        let fieldSelect = this.detectFieldSelect();
+        let where = " WHERE ";
+        for (let i = 0; i < fieldSelect.length; i++) {
+            let element = fieldSelect[i];
+            element = element.replace(/(?=as ).*/gi, '');
+
+            if (i == fieldSelect.length - 1) {
+                where += element + " LIKE '%" + search + "%'";
+            } else {
+                where += element + " LIKE '%" + search + "%' OR";
+            }
+        }
+        if (listSyql != null && listSyql.length > 0) {
+            let sql = listSyql[0] + where;
+            return this.runSyql(sql);
+        }
+    }
+    autocompleteDetectAliasControl() {
+        let control = this.formulas.match(/(?=as ).*?(?=,)/gi);
+        let controlName = control[0].replace('as ', '');
+        return controlName.trim();
+    }
+    detectFieldSelect() {
+        let listField = this.formulas.match(/(?<=select ).*?(?= from)/gi);
+        let fields = [];
+        if (listField != null && listField.length > 0) {
+            fields = listField[0];
+            fields = fields.trim();
+            fields = fields.split(',');
+        }
+        return fields;
+    }
+    getSyqlFormulas() {
+        let listSyql = this.formulas.match(/(?<=ref\().*?(?=\))/gi);
+        return listSyql;
+    }
+
+    runSyql(formulas) {
+            console.log(formulas);
+
+            let syql = this.replaceParamsToData(this.getDataInputFormulas(), formulas);
+            console.log(syql);
+
+            return documentServiceApi.query({ query: syql });
         }
         /**
          * Hàm chạy công thức
          */
-    run(sql) {
+    runSQLLiteFormulas(sql) {
         let rs = ClientSQLManager.run(this.keyInstance, sql, false);
         return rs;
 
@@ -42,9 +108,6 @@ export default class Formulas {
 
     getDataSubmitInStore() {
         return dataSubmitStore.listInputInDocument;
-    }
-    getDataInput() {
-
     }
 
     /**
@@ -67,9 +130,21 @@ export default class Formulas {
         return {}
     }
     getInputControl() {
-        return this.inputControl;
+            return this.inputControl;
+        }
+        /**
+         * Hàm lấy dữ liệu của các control trong store để chuân bị cho việc run formulas
+         * dataInput : {controlName : value}
+         */
+    getDataInputFormulas() {
+        let inputControl = this.getInputControl();
+        let dataInput = {};
+        for (let inputControlName in inputControl) {
+            let valueInputControlItem = dataSubmitStore.listInputInDocument[inputControlName].value;
+            dataInput[inputControlName] = valueInputControlItem;
+        }
+        return dataInput;
     }
-
     getFormulas() {
         return this.formulas;
     }

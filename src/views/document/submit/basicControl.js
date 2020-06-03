@@ -47,7 +47,8 @@ export default class BasicControl extends Control {
         if (this.controlFormulas['require'] != undefined && this.controlFormulas.require.formulasId != 0) {
             this.renderValidateIcon();
         }
-        if (this.controlFormulas['autocomplete'] != undefined && this.controlFormulas.autocomplete.formulasId != 0) {
+
+        if (this.controlFormulas.hasOwnProperty('autocomplete') && this.controlFormulas.autocomplete.instance != undefined) {
             this.addAutoCompleteEvent();
         }
         let thisCpn = this;
@@ -197,12 +198,13 @@ export default class BasicControl extends Control {
         }
     }
     addAutoCompleteEvent() {
-        this.ele.on('click', function(e) {
+        let thisCpn = this;
+        this.ele.on('input', function(e) {
             $(this).addClass('autocompleting');
             SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-input', e)
         })
         this.ele.on('keyup', function(e) {
-            SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-input-change', e)
+            SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-input-change', { e: e, autocompleteFormulasInstance: thisCpn.controlFormulas.autocomplete.instance })
         })
     }
     inputCacheSet(value, rowId = null, rawUserFormula = '') {

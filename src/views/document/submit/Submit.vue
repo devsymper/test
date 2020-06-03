@@ -95,6 +95,10 @@ import User from "./items/User.vue";
 import Filter from "./items/Filter.vue";
 import Validate from "./items/Validate.vue";
 import ClientSQLManager from "./clientSQLManager.js";
+let impactedFieldsList = {};
+let impactedFieldsArr = {};
+var impactedFieldsListWhenStart = {};
+
 export default {
     props: {
         isQickSubmit: {
@@ -199,9 +203,6 @@ export default {
                 locale.val
             );
             thisCpn.handleControlInputChange(locale);
-            console.log(locale);
-            
-            
         });
         this.$evtBus.$on("document-submit-open-validate", e => {
             thisCpn.$refs.validate.show(e);
@@ -218,7 +219,16 @@ export default {
             thisCpn.titleDragPanelIcon = "mdi-file-search";
         });
         this.$evtBus.$on("document-submit-autocomplete-input-change", e => {
-            thisCpn.$refs.autocompleteInput.setSearch($(e.target).val());
+            if(e.e.keyCode != 38 && e.e.keyCode != 40 && e.e.keyCode != 13){
+                let aliasControl = e.autocompleteFormulasInstance.autocompleteDetectAliasControl();
+                let dataAutocomplete = e.autocompleteFormulasInstance.handleRunAutoCompleteFormulas($(e.e.target).val()).then(res=>{
+                    if(res.status == 200 && res.data != false){
+                        let dataTable = thisCpn.handleDataAutoComplete(res.data);
+                        thisCpn.$refs.autocompleteInput.setAliasControl(aliasControl);
+                        thisCpn.$refs.autocompleteInput.setData(dataTable);
+                    }
+                });
+            }
         });
         this.$evtBus.$on("symper-app-wrapper-clicked", evt => {
             if (
@@ -264,7 +274,16 @@ export default {
             this.loadDocumentData();
         }
     },
+    
     methods: {
+        handleDataAutoComplete(data){
+            let headers = [];
+            for(let controlName in data[0]){
+                headers.push({value:controlName,text : controlName});
+            }
+            data[0]['active'] = true;
+            return {headers:headers,dataBody:data}
+        },
         // Khadm: load data của document lên để hiển thị và xử lý
         loadDocumentData() {
             if (this.documentId) {
@@ -383,8 +402,11 @@ export default {
             console.log(this.sDocumentSubmit);
             console.log(this.sDocumentEditor);
             this.getEffectedControl();
-            this.createDocumentSQLLiteTable();
-            this.findRootControl();
+            
+            setTimeout(() => {
+                thisCpn.createDocumentSQLLiteTable(); 
+                thisCpn.findRootControl();
+            }, 800);
         },
         /**
          * Sự kiện phát ra khi click vào date của date picker
@@ -413,6 +435,7 @@ export default {
         createDocumentSQLLiteTable(){
             ClientSQLManager.createTable(this.keyInstance, 'this_document', this.columnsSQLLiteDocument);
         },
+        
 
         /**
          * Hàm chuyển type control sang type của sql để tạo bảng sql cho document
@@ -449,9 +472,9 @@ export default {
                                 if (
                                     mapControlEffected[controlEffect] == undefined
                                 ) {
-                                    mapControlEffected[controlEffect] = [];
+                                    mapControlEffected[controlEffect] = {};
                                 }
-                                mapControlEffected[controlEffect].push(name);
+                                mapControlEffected[controlEffect][name] = true;
                             }
                         }
                         
@@ -571,9 +594,11 @@ export default {
          * Hàm xử lí duyêt các control bị ảnh hưởng trong 1 công thức bởi 1 control nào đó và thực hiện chạy các công thức của control đó
          */
         runFormulasControlEffected(controlEffected){
-            if(controlEffected.length > 0){
-                for(let i = 0; i < controlEffected.length; i++){
-                    let controlEffectedInstance = this.sDocumentSubmit.listInputInDocument[controlEffected[i]];
+            if(Object.keys(controlEffected).length > 0){
+                for(let i in controlEffected){
+                    let controlEffectedInstance = this.sDocumentSubmit.listInputInDocument[i];
+                    console.log(controlEffectedInstance);
+                    
                     let controlId = controlEffectedInstance.id
                     let allFormulas = controlEffectedInstance.controlFormulas;
                     for(let formulasType in allFormulas){
@@ -631,9 +656,24 @@ export default {
          * Hàm xử lí chạy công thức giá trị của control, kết quả trả về được gán lại dữ liệu cho input
          */
         handleRunFormulasValue(dataInput,formulasInstance,controlId){
-            let rs = formulasInstance.handleBeforeRunFormulas(dataInput);
-            $('#'+controlId).val(rs[0].values[0][0]);
-            $('#'+controlId).trigger('change');
+            formulasInstance.handleBeforeRunFormulas(dataInput).then(rs=>{
+                if(!rs.server){
+                    let data = rs.data;
+                    $('#'+controlId).val(data[0].values[0][0]);
+                    $('#'+controlId).trigger('change');
+                }
+                else{
+                    let data = rs.data;
+                    if(data.length > 0){
+                        $('#'+controlId).val(data[0][Object.keys(data[0])[0]]);
+                        $('#'+controlId).text(data[0][Object.keys(data[0])[0]]);
+                        $('#'+controlId).trigger('change');
+                    }
+                   
+                }
+            });
+            
+            
         },
 
         /**
@@ -649,6 +689,7 @@ export default {
                         let formulasObj = controlFormulas['formulas'];
                         let formulasInstance = formulasObj.instance;
                         let inputControl = formulasInstance.inputControl;
+                        this.setAllImpactedFieldsList(controlName);
                         if(Object.keys(inputControl).length == 0){
                             let dataInput = this.getDataInputFormulas(formulasInstance);  
                             this.handleRunFormulasValue(dataInput,formulasInstance,controlInstance.id);
@@ -656,7 +697,31 @@ export default {
                     }
                 }
             }
+            console.log(impactedFieldsList);
+            
         },
+        /**
+         * Lấy tất cả các control bị ảnh hưởng khi mà một control thay đổi giá trị
+         */
+        setAllImpactedFieldsList(fieldName) {
+            impactedFieldsList[fieldName] = {};
+            impactedFieldsArr = this.getAllImpactedInput(fieldName);
+            for (var i = 0; i < impactedFieldsArr.length; i++) {
+                impactedFieldsList[fieldName][impactedFieldsArr[i]] = false;
+            }
+            impactedFieldsListWhenStart[fieldName] = false;
+        },
+        getAllImpactedInput(sourceName) {
+             let listInput = this.sDocumentSubmit.listInputInDocument;
+            var arr = [];
+            if (listInput.hasOwnProperty(sourceName)) {
+                for (var i in listInput[sourceName]['effectedControl']) {
+                    arr.push(i);
+                    arr = arr.concat(this.getAllImpactedInput(i));
+                }
+            }
+            return arr;
+        }
         
         /**
          * Hàm tìm control là root của 1 công thức

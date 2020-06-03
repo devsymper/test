@@ -18,7 +18,8 @@ export const appConfigs = {
             tasks: "https://v2.symper.vn:8443/symper-rest/service/runtime/tasks"
         },
         documents: 'https://v2hoangnd.dev.symper.vn/document',
-        formulasService: 'https://v2datnt.dev.symper.vn/'
+        formulasService: 'https://v2datnt.dev.symper.vn/',
+        documentService: 'https://sdocument.symper.vn/'
     },
     notificationTimeout: {
         success: 10000,
