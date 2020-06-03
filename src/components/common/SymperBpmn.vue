@@ -196,6 +196,14 @@ export default {
                 done(err, xml);
             });
         },
+        getXML(){
+            let self = this;
+            let result = '';
+            self.bpmnModeler.saveXML({ format: false }, function(err, xml) {
+                result = xml;
+            });
+            return result;
+        },
         setEncoded(link, name, data) {
             var encodedData = encodeURIComponent(data);
             if (data) {

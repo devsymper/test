@@ -10,7 +10,7 @@ export const appConfigs = {
         user: 'https://v2hoangnd.dev.symper.vn/api/',
         core: 'https://v2hoangnd.dev.symper.vn/',
         bpmne: {
-            models: 'https://v2.symper.vn:8443/symper-modeler/api/editor/models',
+            models: 'https://v2khadm.dev.symper.vn/process-modeler',
             deployments: "https://v2.symper.vn:8443/symper-rest/service/repository/deployments",
             definitions: "https://v2.symper.vn:8443/symper-rest/service/repository/process-definitions",
             instances: "https://v2.symper.vn:8443/symper-rest/service/runtime/process-instances",

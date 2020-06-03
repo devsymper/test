@@ -9,7 +9,7 @@
                             icon
                             class="mr-2"
                             style="position:relative; top: -3px"
-                        >
+                        > 
                             <v-icon size="21" v-on="on">{{item.icon}}</v-icon>
                         </v-btn>
                     </template>
@@ -230,6 +230,16 @@ export default {
                 }
             }
         },
+        getModelDataForSymperService(){
+            let xml = this.$refs.symperBpmn.getXML();
+            let modelDataAsFlowable = this.getModelData();
+            return {
+                name: modelDataAsFlowable.name,
+                content: xml,
+                description: modelDataAsFlowable.description,
+                version: 1,
+            };
+        },
         // Lưu lại data của process model hiện tại
         saveProcess() {
             let self = this;
@@ -238,20 +248,17 @@ export default {
                 let action = self.modelAction;
                 let idModel = self.modelId;
                 if (action == "create" || action == "clone") {
-                    let modelData = this.getModelData();
+                    // let modelData = this.getModelData(); // data này giành cho backend của flowable
+                    let modelData = this.getModelDataForSymperService();
                     bpmnApi
                         .createModel(modelData)
                         .then(res => {
-                            if (
-                                res.messageKey &&
-                                res.messageKey.includes("GENERAL.ERROR")
-                            ) {
-                                self.$snotifyError({}, res.message);
-                            } else {
-                                self.lastUpdated = res.lastUpdated;
-                                (self.modelAction = "edit"),
-                                    (self.modelId = res.id),
-                                    self.updateModel(res.id);
+                            if(res.status == 200){
+                                self.modelAction = 'edit';
+                                self.modelId = res.data.id;
+                                self.$snotifySuccess('Create process successfully');
+                            }else {
+                                self.$snotifyError(res, res.message);
                             }
                         })
                         .catch(err => {
@@ -261,12 +268,24 @@ export default {
                             );
                         });
                 } else {
-                    self.updateModel(idModel);
+                    self.updateModelToSymperService(idModel);
                 }
             });
         },
-
-        // update data của model và data của tất cả các element trong model lên server
+        async updateModelToSymperService(){
+            let modelData = this.getModelDataForSymperService();
+            try {
+                let res = await bpmnApi.updateModel(modelData, this.modelId);
+                if(res.status == 200){
+                    this.$snotifySuccess("Update model sucessfully");
+                }else{
+                    this.$snotifyError(res, "Can not update process model!");            
+                }
+            } catch (error) {
+                this.$snotifyError(error, "Can not update process model!");            
+            }
+        },
+        // update data của model và data của tất cả các element trong model lên server (backend flowable)
         updateModel(idModel) {
             let allEleData = this.getAllElementData();
             console.log(
@@ -833,30 +852,19 @@ export default {
         /**
          * Lấy data từ server và áp dụng data này để hiển thị lên process
          */
-        applySavedData(idProcess) {
-            let self = this;
-            bpmnApi
-                .getModelData(idProcess)
-                .then(res => {
-                    let allElements = {}; // khôi phục lại state của tất cả các phần tử trong diagram
-                    self.lastUpdated = res.lastUpdated;
-                    self.restoreSavedEle(res.model, allElements);
-                })
-                .catch(err => {
-                    self.$snotifyError(err, "process.editror.err.get_data");
-                });
-
-            bpmnApi
-                .getModelXML(idProcess)
-                .then(res => {
-                    self.diagramXML = res;
-                })
-                .catch(err => {
-                    self.$snotifyError(
-                        err,
-                        self.$t("process.editror.err.get_xml")
-                    );
-                });
+        async applySavedData(idProcess) {
+            try {
+                let modelData = await bpmnApi.getModelData(idProcess);
+                this.diagramXML = modelData.data.content;
+                setTimeout((self) => {
+                    // self.restoreSavedEle();
+                }, 300, this);
+            } catch (error) {
+                self.$snotifyError(
+                    err,
+                    self.$t("process.editror.err.get_xml")
+                );
+            }
         },
         /**
          * Khôi phục lại data của model từ server vào trong state

@@ -14,6 +14,9 @@ export default class Api {
      */
     getFullUrl(uri) {
         uri = uri.trim();
+        if (uri == '') {
+            return this.baseUrl.substr(0, this.baseUrl.length - 1);
+        }
         if (uri.indexOf("http://") === 0 || uri.indexOf("https://") === 0) {
             return uri;
         } else {

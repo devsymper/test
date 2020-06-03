@@ -1,5 +1,6 @@
 {
     "common": {
+        "id": "Id",
         "select_lang": "Select language",
         "reports": "Reports",
         "workflows": "Workflows",
@@ -53,7 +54,9 @@
         "remove_confirm_message": "You are about to delete {count} item",
         "remove_msg_success": "Deleted {count} items",
         "remove_msg_err": "Can not delete selected items!",
-        "logout": "Log out"
+        "logout": "Log out",
+        "last_update_at": "Last updated at",
+        "create_at": "Created at"
     },
     "validate": {
         "required": "Not be empty",
