@@ -1,12 +1,27 @@
 import bpmnApi from "./../../api/BPMNEngine";
 import { util } from "../../plugins/util";
 
+function cleanContent(content) {
+    let ns = `<bpmn:definitions xmlns:symper="http://symper/schema/bpmn/custom-extension" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:flowable="http://flowable.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.flowable.org/processdef">`;
+    return content.replace(/\<bpmn:definitions (.*?)+\>/, ns)
+        .replace(/↵+/, '')
+        .replace(/<symper:+/g, '<')
+        .replace(/<\/symper:+/g, '</')
+        .replace(/\bbpmn:/g, '')
+        .replace(/<di:/g, '<omgdi:')
+        .replace(/<dc:/g, '<omgdc:')
+        .replace(/symper_prefix_chars_/g, 'symper:');
+}
+
 export const deployProcess = function(self, processData) {
     return new Promise((deployResolve, deployReject) => {
-        bpmnApi.getModelXML(processData.id).then(res => {
-            let file = util.makeStringAsFile(res, "process_draft.bpmn");
+        bpmnApi.getModelData(processData.id).then(res => {
+            let content = cleanContent(res.data.content);
+            console.log(content, 'contentcontentcontentcontentcontentcontent');
+
+            let file = util.makeStringAsFile(content, "process_draft.bpmn");
             bpmnApi.deployProcess({
-                deploymentKey: processData.key,
+                deploymentKey: processData.id,
                 deploymentName: processData.name,
                 tenantId: processData.tenantId,
             }, file).then((res) => {

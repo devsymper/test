@@ -32,6 +32,7 @@
                 @node-changed="handleNodeChangeProps"
                 ref="symperBpmn"
                 :diagramXML="diagramXML"
+                :customExtension="customExtension"
             ></symper-bpmn>
         </div>
         <div class="sym-bpm-attributes h-100" style="width:250px">
@@ -89,7 +90,8 @@ import { defaultXML } from "./../../components/process/reformatGetListData";
 import { allNodesAttrs } from "./../process/allAttrsOfNodes";
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import { documentApi } from '../../api/Document';
-
+import customExtension from "./elementDefinitions/customExtension";
+import { pushCustomElementsToModel } from "./elementDefinitions/customExtToModel";
 // Khung data của từng node cần lưu vào db
 const nodeDataTpl = {
     bounds: {
@@ -181,6 +183,11 @@ export default {
                     break;
                 }
             }
+
+            // update thuộc tính của panel setting cho phần hiển thị
+            let vizBizEl = this.$refs.symperBpmn.updateElementProperties(modelAttr.id, {
+                isExecutable: modelAttr.attrs.isexecutable.value
+            });
             modelAttr = modelAttr.attrs;
             if (!modelAttr.name.value) {
                 modelAttr.name.value = modelAttr.process_id.value;
@@ -231,7 +238,14 @@ export default {
             }
         },
         getModelDataForSymperService(){
+            let allVizEls = this.$refs.symperBpmn.getAllNodes(false);
+            let allSymEls = this.stateAllElements;
+            let bpmnModeler = this.$refs.symperBpmn.bpmnModeler;
+            pushCustomElementsToModel(allVizEls, allSymEls,  bpmnModeler);
+
             let xml = this.$refs.symperBpmn.getXML();
+            console.log(xml,'xmlxmlxmlxmlxmlxmlxml');
+            
             let modelDataAsFlowable = this.getModelData();
             return {
                 name: modelDataAsFlowable.name,
@@ -984,7 +998,13 @@ export default {
                     text: "process.header_bar.validate"
                 }
             },
-            diagramXML: defaultXML.replace(/\n/g, "")
+            diagramXML: defaultXML.replace(/\n/g, ""),
+            customExtension: [
+                {
+                    name: 'symper',
+                    data: customExtension
+                }
+            ]
         };
     },
     components: {
