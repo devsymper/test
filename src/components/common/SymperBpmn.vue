@@ -215,6 +215,9 @@ export default {
             let result = '';
             self.bpmnModeler.saveXML({ format: format }, function(err, xml) {
                 result = xml;
+                if(err){
+                    self.$snotifyError(err, "Can not get XML for this model");
+                }
             });
             return result;
         },

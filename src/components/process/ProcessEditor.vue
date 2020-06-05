@@ -243,15 +243,23 @@ export default {
             let bpmnModeler = this.$refs.symperBpmn.bpmnModeler;
             pushCustomElementsToModel(allVizEls, allSymEls,  bpmnModeler);
 
+
             let xml = this.$refs.symperBpmn.getXML();
             console.log(xml,'xmlxmlxmlxmlxmlxmlxml');
-            
+            let jsonConfig = {};
+            for(let elName in allSymEls){
+                jsonConfig[elName] = {};
+                for(let attrName in allSymEls[elName].attrs){
+                    jsonConfig[elName][attrName] = allSymEls[elName].attrs[attrName].value;
+                }
+            }
             let modelDataAsFlowable = this.getModelData();
             return {
                 name: modelDataAsFlowable.name,
                 content: xml,
                 description: modelDataAsFlowable.description,
                 version: 1,
+                configValue: JSON.stringify(jsonConfig)
             };
         },
         // Lưu lại data của process model hiện tại
@@ -733,9 +741,7 @@ export default {
         handleNodeSelected(node) {
             let type = this.getNodeType(node);
             let wp = node.di.waypoint;
-            if(wp){
-                console.log(type, node, wp[0], wp[wp.length -1]);
-            }
+            console.log(type, node);
 
             let nodeData = this.getNodeData(node.id, type);
             nodeData.name = node.name;
@@ -869,15 +875,29 @@ export default {
         async applySavedData(idProcess) {
             try {
                 let modelData = await bpmnApi.getModelData(idProcess);
-                this.diagramXML = modelData.data.content;
+                modelData = modelData.data;
+                this.diagramXML = modelData.content;
                 setTimeout((self) => {
-                    // self.restoreSavedEle();
+                    if(modelData.configValue){
+                        self.restoreAttrValueFromJsonConfig(modelData.configValue);
+                    }
                 }, 300, this);
             } catch (error) {
                 self.$snotifyError(
                     err,
                     self.$t("process.editror.err.get_xml")
                 );
+            }
+        },
+        restoreAttrValueFromJsonConfig(jsonStr){
+            let configValue = JSON.parse(jsonStr);
+            this.fillNodeData();
+            for(let elName in this.stateAllElements){
+                for(let attrName in this.stateAllElements[elName].attrs){
+                    if(configValue[elName].hasOwnProperty(attrName)){
+                        this.stateAllElements[elName].attrs[attrName].value = configValue[elName][attrName];
+                    }
+                }
             }
         },
         /**
