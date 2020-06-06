@@ -1,5 +1,5 @@
 <template>
-    <v-navigation-drawer mobile-break-point="0" :mini-variant="sapp.collapseSideBar" :v-model="true" app>
+    <v-navigation-drawer v-resize="reCalcSidebarHeight" mobile-break-point="0" :mini-variant="sapp.collapseSideBar" :v-model="true" app>
         <v-list dense nav class="py-0 pr-0">
             <v-list-item :class="{ 
                     'px-0': sapp.collapseSideBar,
@@ -142,9 +142,14 @@ export default {
         }
     },
     mounted(){
-        this.menuItemsHeight = (util.getComponentSize(this).h - 178)+'px';
+        this.reCalcSidebarHeight();
     },
     methods: {
+        reCalcSidebarHeight(){
+            console.log('xxxxxxxxxxxxxx');
+            
+            this.menuItemsHeight = (util.getComponentSize(this).h - 178)+'px';
+        },
         logout(){
             util.auth.logout();
             location.reload();
