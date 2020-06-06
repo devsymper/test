@@ -28,7 +28,7 @@ export default {
         return bpmneApi.get("models", filter, testHeader);
     },
     deleteModels(ids) {
-        return bpmneApi.delete(ids.join(','), {}, testHeader);
+        return bpmneApi.delete(ids.join(','));
     },
     createModel(data) {
         return bpmneApi.post('', data);

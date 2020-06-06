@@ -1,5 +1,5 @@
 <template>
-    <v-navigation-drawer :mini-variant="sapp.collapseSideBar" :v-model="true" app>
+    <v-navigation-drawer mobile-break-point="0" :mini-variant="sapp.collapseSideBar" :v-model="true" app>
         <v-list dense nav class="py-0 pr-0">
             <v-list-item :class="{ 
                     'px-0': sapp.collapseSideBar,
