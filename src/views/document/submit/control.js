@@ -73,11 +73,9 @@ export default class Control {
     initFormulas() {
         if (Object.keys(this.controlFormulas).length > 0) {
             for (let key in this.controlFormulas) {
-                if (this.controlFormulas[key].value != "") {
+                if (this.controlFormulas[key].value != "" && this.controlFormulas[key].value != undefined) {
                     this.controlFormulas[key]['instance'] = new Formulas(this.curParentInstance, this.controlFormulas[key].value, key);
-                    // if (key == "formulas") {
-                    //     this.controlFormulas[key]['instance'].findRootControl(this);
-                    // }
+
                 }
             }
         }

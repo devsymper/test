@@ -94,6 +94,8 @@ export default {
         },
         handleClickRow(item){
             let name = item[this.alias];
+            console.log(this.alias);
+            
             $('.autocompleting').val(name);
             $('.autocompleting').trigger('change');
             $('.autocompleting').removeClass('autocompleting');
@@ -101,7 +103,7 @@ export default {
             
             
         },
-       
+        
         openSubForm(){
             this.hide();
             $('.autocompleting').removeClass('autocompleting');

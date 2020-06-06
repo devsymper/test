@@ -7,6 +7,8 @@ import store from './../../store'
  */
 export const setDataForPropsControl = function(fields) {
     for (let controlId in fields) {
+        console.log(fields[controlId]);
+
         let control = GetControlProps(fields[controlId].type)
         let properties = control.properties
         let formulas = control.formulas
@@ -19,7 +21,9 @@ export const setDataForPropsControl = function(fields) {
                 properties[k].value = fields[controlId]['properties'][k]
             }
         })
-        if (fields[controlId]['formulas'] != false) {
+        if (fields[controlId]['formulas'] != false && fields[controlId]['formulas'] != "[]") {
+            console.log(fields[controlId]['formulas']);
+
             $.each(formulas, function(k, v) {
                 if (fields[controlId]['formulas'][k] == "") {
                     delete control.formulas[k];
@@ -46,7 +50,7 @@ export const setDataForPropsControl = function(fields) {
                         childProperties[k].value = listField[childFieldId]['properties'][k]
                     }
                 })
-                if (listField[childFieldId]['formulas'] != false) {
+                if (listField[childFieldId]['formulas'] != false && listField[childFieldId]['formulas'] != "[]") {
                     $.each(childFormulas, function(k, v) {
                         if (listField[childFieldId]['formulas'][k] == "") {
                             delete childControl.formulas[k];

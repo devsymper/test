@@ -79,7 +79,7 @@ export default class BasicControl extends Control {
             this.ele.attr('type', 'text');
             this.renderTimeControl();
 
-        } else if (this.ele.hasClass('s-control-persent')) {
+        } else if (this.ele.hasClass('s-control-percent')) {
             this.ele.css('min-width', 'unset');
 
         } else if (this.ele.hasClass('s-control-date')) {
@@ -92,6 +92,9 @@ export default class BasicControl extends Control {
 
         } else if (this.ele.hasClass('s-control-user')) {
             this.renderUserControl();
+
+        } else if (this.ele.hasClass('s-control-select')) {
+            this.renderSelectControl();
         }
     }
     renderFileControl = function(rowId) {
@@ -166,6 +169,14 @@ export default class BasicControl extends Control {
         })
 
     }
+    renderSelectControl() {
+        let id = this.ele.attr('id');
+        let keyinstance = this.ele.attr('key-instance');
+        this.ele.replaceWith('<input class="s-control s-control-select" s-control-type="select" type="text" title="Select" id="' + id + '" key-instance="' + keyinstance + '">');
+        this.ele = $('#' + id);
+
+        this.addAutoCompleteEvent(true);
+    }
 
 
     renderDateTimeControl() {
@@ -191,20 +202,23 @@ export default class BasicControl extends Control {
     getDefaultValue() {
         if (this.isCheckbox) {
             return false;
-        } else if (this.isNumber || this.isPersent) {
+        } else if (this.isNumber || this.isPercent) {
             return 0;
         } else {
             return '';
         }
     }
-    addAutoCompleteEvent() {
+    addAutoCompleteEvent(fromSelect = false) {
         let thisCpn = this;
         this.ele.on('input', function(e) {
             $(this).addClass('autocompleting');
             SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-input', e)
         })
         this.ele.on('keyup', function(e) {
-            SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-input-change', { e: e, autocompleteFormulasInstance: thisCpn.controlFormulas.autocomplete.instance })
+            console.log(thisCpn.controlFormulas);
+
+            let formulasInstance = (fromSelect) ? thisCpn.controlFormulas.formulas.instance : thisCpn.controlFormulas.autocomplete.instance;
+            SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-input-change', { e: e, autocompleteFormulasInstance: formulasInstance })
         })
     }
     inputCacheSet(value, rowId = null, rawUserFormula = '') {
@@ -226,7 +240,7 @@ export default class BasicControl extends Control {
         }
     }
     standardlizeValue(value, rowId = null) {
-        if ((!value || value === NaN) && (this.type == 'number' || this.type == 'persent')) {
+        if ((!value || value === NaN) && (this.type == 'number' || this.type == 'percent')) {
             value = 0;
         } else if (this.type == 'date' && /((0[1-9]|[12]\d|3[01])\/(0[1-9]|1[0-2])\/[12]\d{3})/.test(value)) {
             value = value.split('/');
@@ -270,7 +284,7 @@ export default class BasicControl extends Control {
         }
 
         if (!vl) {
-            if (thisObj.type == 'number' || thisObj.type == 'persent') {
+            if (thisObj.type == 'number' || thisObj.type == 'percent') {
                 return 0;
             } else {
                 return '';

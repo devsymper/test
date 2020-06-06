@@ -327,7 +327,9 @@ export default {
                                 let key = Object.keys(data[controlId][i])[0];
                                 let controlEl = $("#editor_ifr").contents().find('#'+controlId);
                                 let tableId = 0;
-                                if(controlEl.closest(".s-control-table").length > 0){
+                                if(!controlEl.is('.s-control-table') && controlEl.closest(".s-control-table").length > 0){
+                                    console.log(controlId);
+                                    
                                     tableId = controlEl.closest(".s-control-table").attr('id');
                                 }
                                 thisCpn.$store.commit(
@@ -453,7 +455,7 @@ export default {
         },
         // hàm kiểm tra xác thực tên control 
         checkNameControl(controlId,control,listControlName){
-            if(control.type != "submit" && control.type != "draf" && control.type != "reset"){
+            if(control.type != "submit" && control.type != "draft" && control.type != "reset"){
                 if(control.properties.name.value == ''){
                     let controlEl = $('#editor_ifr').contents().find('#'+controlId);
                     controlEl.addClass('s-control-error');
@@ -536,7 +538,7 @@ export default {
                 let table = (elements.hasClass('s-control-table')) ? elements : elements.parent();
                 let tableId = table.attr('id');
                 let listData = [];
-                if($(tbody[1].innerHTML).length > 0){
+                if($(tbody[0].innerHTML).length > 0){
                     for(let i = 0; i< thead.length; i++){
                         let idControl = $(tbody[i].innerHTML).first().attr('id');
                         let typeControl = $(tbody[i].innerHTML).first().attr('s-control-type');
@@ -698,6 +700,8 @@ export default {
                 let style = $(value).attr('style');
                 if(type == 'text') type = 'textInput'
                 if(type == 'persent') type = 'percent'
+                console.log(type);
+                
                 let controlV2 = GetControlProps(type);
                 let controlEl = $(controlV2.html); 
                 var inputid = 's-control-id-' + Date.now();
@@ -1319,6 +1323,7 @@ export default {
                 $('.tree-'+controlId).addClass('editor-tree-active')
                 
                 let table = $(this).closest('.s-control-table');
+                
                 if(table.length > 0 && controlId != table.attr('id')){
                     let tableId = table.attr('id');
                     let control = thisCpn.editorStore.allControl[tableId]['listFields'][controlId];
@@ -1326,6 +1331,8 @@ export default {
                 }
                 else{
                     let control = thisCpn.editorStore.allControl[controlId];
+                console.log(thisCpn.editorStore);
+
                     thisCpn.selectControl(control.properties, control.formulas,controlId);
                 }
             })

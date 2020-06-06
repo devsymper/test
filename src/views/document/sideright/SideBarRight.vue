@@ -97,7 +97,7 @@ export default {
                 elements.css({width:value});
             }
             if(name == "height"){
-                elements.css({name:value});
+                elements.css({height:value});
             }
           
             let table = elements.closest('.s-control-table');
