@@ -30,6 +30,11 @@ export const authUtil = {
         }
     },
 
+
+    logout() {
+        window.localStorage.removeItem('symper-login-info');
+    },
+
     getSavedUserInfo() {
         let loginInfo = window.localStorage.getItem('symper-login-info');
         if (loginInfo) {

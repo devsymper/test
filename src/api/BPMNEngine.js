@@ -27,21 +27,17 @@ export default {
     getListModels(filter = {}) {
         return bpmneApi.get("models", filter, testHeader);
     },
-    deleteModel(id) {
-        return bpmneApi.delete(id + "?cascade=true", {}, testHeader);
+    deleteModels(ids) {
+        return bpmneApi.delete(ids.join(','), {}, testHeader);
     },
     createModel(data) {
-        data = JSON.stringify(data);
-        return bpmneApi.post('', data, testHeader, testOptions);
+        return bpmneApi.post('', data);
     },
     updateModel(data, idModel) {
-        // data = JSON.stringify(data);
-        let testHeaderClone = util.cloneDeep(testHeader);
-        delete testHeaderClone['Content-Type'];
-        return bpmneApi.post(`${idModel}/editor/json`, data, testHeaderClone, testOptions);
+        return bpmneApi.put(`${idModel}`, data);
     },
     getModelData(modelId) {
-        return bpmneApi.get(`${modelId}/editor/json`, {}, testHeader);
+        return bpmneApi.get(modelId);
     },
     getModelXML(modelId) {
         return bpmneApi.get(`${modelId}/editor/bpmn20`, {}, testHeader, { dataType: 'text' });

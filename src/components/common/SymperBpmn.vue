@@ -34,6 +34,12 @@ export default {
                 return [];
             }
         },
+        customExtension: {
+            type: Array,
+            default(){
+                return [];
+            }
+        },
         readOnly: {
             type: Boolean,
             default(){
@@ -79,16 +85,20 @@ export default {
             }
             this.modeling.setColor(ele, data);
         },
-        getAllNodes() {
+        getAllNodes(bizObj = true) {
             let allNododes = this.bpmnModeler
                 .get("elementRegistry")
                 .filter(function(element) {
                     return true;
                 });
-            return allNododes.reduce((nodes, ele) => {
-                nodes.push(ele.businessObject);
-                return nodes;
-            }, []);
+            if(bizObj){
+                return allNododes.reduce((nodes, ele) => {
+                    nodes.push(ele.businessObject);
+                    return nodes;
+                }, []);
+            }else{
+                return allNododes;
+            }
         },
         handleClickOnModeller(event) {},
         /**
@@ -148,11 +158,15 @@ export default {
             this.container = this.$refs.content;
             const canvas = this.$refs.canvas;
 
+            let moddleExtensions = {};
+            for(let ext of this.customExtension){
+                moddleExtensions[ext.name] = ext.data;
+            }
+
             this.bpmnModeler = new BpmnModeler({
                 container: canvas,
                 keyboard: { bindTo: document },
-                moddleExtensions: {
-                },
+                moddleExtensions: moddleExtensions,
                 additionalModules: this.customModules,
             });
             this.bpmnModeler.importXML(this.diagramXML, function(err) {
@@ -195,6 +209,17 @@ export default {
             this.bpmnModeler.saveXML({ format: true }, function(err, xml) {
                 done(err, xml);
             });
+        },
+        getXML(format = true){
+            let self = this;
+            let result = '';
+            self.bpmnModeler.saveXML({ format: format }, function(err, xml) {
+                result = xml;
+                if(err){
+                    self.$snotifyError(err, "Can not get XML for this model");
+                }
+            });
+            return result;
         },
         setEncoded(link, name, data) {
             var encodedData = encodeURIComponent(data);

@@ -1,5 +1,6 @@
 {
     "common": {
+        "id": "Id",
         "select_lang": "Thay đổi ngôn ngữ",
         "reports": "Báo cáo",
         "workflows": "Quy trình",
@@ -51,7 +52,10 @@
         "remove_confirm_title": "Bạn có chắc chắn muốn xóa",
         "remove_confirm_message": "Bạn sẽ xóa {count} mục",
         "remove_msg_success": "Xóa thành công {count} mục",
-        "remove_msg_err": "Không thể xóa các mục đã chọn!"
+        "remove_msg_err": "Không thể xóa các mục đã chọn!",
+        "logout": "Đăng xuất",
+        "last_update_at": "Cập nhật lần cuối",
+        "create_at": "Tạo lúc"
     },
     "login": {
         "title": "Đăng nhập hệ thống",

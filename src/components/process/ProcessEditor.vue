@@ -9,7 +9,7 @@
                             icon
                             class="mr-2"
                             style="position:relative; top: -3px"
-                        >
+                        > 
                             <v-icon size="21" v-on="on">{{item.icon}}</v-icon>
                         </v-btn>
                     </template>
@@ -32,6 +32,7 @@
                 @node-changed="handleNodeChangeProps"
                 ref="symperBpmn"
                 :diagramXML="diagramXML"
+                :customExtension="customExtension"
             ></symper-bpmn>
         </div>
         <div class="sym-bpm-attributes h-100" style="width:250px">
@@ -89,7 +90,8 @@ import { defaultXML } from "./../../components/process/reformatGetListData";
 import { allNodesAttrs } from "./../process/allAttrsOfNodes";
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import { documentApi } from '../../api/Document';
-
+import customExtension from "./elementDefinitions/customExtension";
+import { pushCustomElementsToModel } from "./elementDefinitions/customExtToModel";
 // Khung data của từng node cần lưu vào db
 const nodeDataTpl = {
     bounds: {
@@ -181,6 +183,11 @@ export default {
                     break;
                 }
             }
+
+            // update thuộc tính của panel setting cho phần hiển thị
+            let vizBizEl = this.$refs.symperBpmn.updateElementProperties(modelAttr.id, {
+                isExecutable: modelAttr.attrs.isexecutable.value
+            });
             modelAttr = modelAttr.attrs;
             if (!modelAttr.name.value) {
                 modelAttr.name.value = modelAttr.process_id.value;
@@ -230,6 +237,31 @@ export default {
                 }
             }
         },
+        getModelDataForSymperService(){
+            let allVizEls = this.$refs.symperBpmn.getAllNodes(false);
+            let allSymEls = this.stateAllElements;
+            let bpmnModeler = this.$refs.symperBpmn.bpmnModeler;
+            pushCustomElementsToModel(allVizEls, allSymEls,  bpmnModeler);
+
+
+            let xml = this.$refs.symperBpmn.getXML();
+            console.log(xml,'xmlxmlxmlxmlxmlxmlxml');
+            let jsonConfig = {};
+            for(let elName in allSymEls){
+                jsonConfig[elName] = {};
+                for(let attrName in allSymEls[elName].attrs){
+                    jsonConfig[elName][attrName] = allSymEls[elName].attrs[attrName].value;
+                }
+            }
+            let modelDataAsFlowable = this.getModelData();
+            return {
+                name: modelDataAsFlowable.name,
+                content: xml,
+                description: modelDataAsFlowable.description,
+                version: 1,
+                configValue: JSON.stringify(jsonConfig)
+            };
+        },
         // Lưu lại data của process model hiện tại
         saveProcess() {
             let self = this;
@@ -238,20 +270,17 @@ export default {
                 let action = self.modelAction;
                 let idModel = self.modelId;
                 if (action == "create" || action == "clone") {
-                    let modelData = this.getModelData();
+                    // let modelData = this.getModelData(); // data này giành cho backend của flowable
+                    let modelData = this.getModelDataForSymperService();
                     bpmnApi
                         .createModel(modelData)
                         .then(res => {
-                            if (
-                                res.messageKey &&
-                                res.messageKey.includes("GENERAL.ERROR")
-                            ) {
-                                self.$snotifyError({}, res.message);
-                            } else {
-                                self.lastUpdated = res.lastUpdated;
-                                (self.modelAction = "edit"),
-                                    (self.modelId = res.id),
-                                    self.updateModel(res.id);
+                            if(res.status == 200){
+                                self.modelAction = 'edit';
+                                self.modelId = res.data.id;
+                                self.$snotifySuccess('Create process successfully');
+                            }else {
+                                self.$snotifyError(res, res.message);
                             }
                         })
                         .catch(err => {
@@ -261,12 +290,24 @@ export default {
                             );
                         });
                 } else {
-                    self.updateModel(idModel);
+                    self.updateModelToSymperService(idModel);
                 }
             });
         },
-
-        // update data của model và data của tất cả các element trong model lên server
+        async updateModelToSymperService(){
+            let modelData = this.getModelDataForSymperService();
+            try {
+                let res = await bpmnApi.updateModel(modelData, this.modelId);
+                if(res.status == 200){
+                    this.$snotifySuccess("Update model sucessfully");
+                }else{
+                    this.$snotifyError(res, "Can not update process model!");            
+                }
+            } catch (error) {
+                this.$snotifyError(error, "Can not update process model!");            
+            }
+        },
+        // update data của model và data của tất cả các element trong model lên server (backend flowable)
         updateModel(idModel) {
             let allEleData = this.getAllElementData();
             console.log(
@@ -557,13 +598,15 @@ export default {
                 if (newType != nodeState.type) {
                     this.changeNodeType(nodeState, newType);
                 }
+                nodeState.name = nodeData.name;
+                nodeState.attrs.name.value = nodeData.name;
 
                 if (nodeId == this.selectingNode.id) {
                     this.$store.commit(
                         "process/changeSelectingNode",
                         {
                             instanceKey: this.instanceKey,
-                            data: this.stateAllElements[nodeId]
+                            data: nodeState
                         }
                     );
                 }
@@ -699,6 +742,7 @@ export default {
          */
         handleNodeSelected(node) {
             let type = this.getNodeType(node);
+            let wp = node.di.waypoint;
             console.log(type, node);
 
             let nodeData = this.getNodeData(node.id, type);
@@ -830,30 +874,35 @@ export default {
         /**
          * Lấy data từ server và áp dụng data này để hiển thị lên process
          */
-        applySavedData(idProcess) {
-            let self = this;
-            bpmnApi
-                .getModelData(idProcess)
-                .then(res => {
-                    let allElements = {}; // khôi phục lại state của tất cả các phần tử trong diagram
-                    self.lastUpdated = res.lastUpdated;
-                    self.restoreSavedEle(res.model, allElements);
-                })
-                .catch(err => {
-                    self.$snotifyError(err, "process.editror.err.get_data");
-                });
-
-            bpmnApi
-                .getModelXML(idProcess)
-                .then(res => {
-                    self.diagramXML = res;
-                })
-                .catch(err => {
-                    self.$snotifyError(
-                        err,
-                        self.$t("process.editror.err.get_xml")
-                    );
-                });
+        async applySavedData(idProcess) {
+            try {
+                let modelData = await bpmnApi.getModelData(idProcess);
+                modelData = modelData.data;
+                this.diagramXML = modelData.content;
+                setTimeout((self) => {
+                    if(modelData.configValue){
+                        self.restoreAttrValueFromJsonConfig(modelData.configValue);
+                    }
+                }, 300, this);
+            } catch (error) {
+                self.$snotifyError(
+                    err,
+                    self.$t("process.editror.err.get_xml")
+                );
+            }
+        },
+        restoreAttrValueFromJsonConfig(jsonStr){
+            let configValue = JSON.parse(jsonStr);
+            this.fillNodeData();
+            for(let elName in this.stateAllElements){
+                for(let attrName in this.stateAllElements[elName].attrs){
+                    if(configValue[elName]){
+                        if(configValue[elName].hasOwnProperty(attrName)){
+                            this.stateAllElements[elName].attrs[attrName].value = configValue[elName][attrName];
+                        }
+                    }
+                }
+            }
         },
         /**
          * Khôi phục lại data của model từ server vào trong state
@@ -911,6 +960,8 @@ export default {
             this.instanceKey
         );
         this.$store.dispatch("app/getAllOrgChartData");
+        this.$store.dispatch("app/getAllUsers");
+        
         if (this.$route.name == "editProcess") {
             this.modelAction = "edit";
             this.modelId = this.$route.params.id;
@@ -924,6 +975,8 @@ export default {
         ) {
             this.applySavedData(this.$route.params.id);
         }
+
+
     },
     mounted(){
         this.resetAttrPanelHeight();
@@ -969,7 +1022,13 @@ export default {
                     text: "process.header_bar.validate"
                 }
             },
-            diagramXML: defaultXML.replace(/\n/g, "")
+            diagramXML: defaultXML.replace(/\n/g, ""),
+            customExtension: [
+                {
+                    name: 'symper',
+                    data: customExtension
+                }
+            ]
         };
     },
     components: {
