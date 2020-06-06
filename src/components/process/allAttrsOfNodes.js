@@ -83,7 +83,7 @@ let allAttrs = {
                 "type": "String"
             }]
         },
-
+        pushToXML: attrToXMLMethods.documentationMethod
     },
     "categorydefinition": {
         "title": "Category",
@@ -1349,9 +1349,9 @@ let allAttrs = {
         "title": "Signal definitions",
         "type": "table",
         "value": [{
-            id: 'xx',
-            name: 'yy',
-            symper_prefix_chars_scope: 'Global'
+            // id: 'xx',
+            // name: 'yy',
+            // symper_prefix_chars_scope: 'Global'
         }],
         "columns": [{
                 title: 'Id',
@@ -1418,8 +1418,8 @@ let allAttrs = {
         "title": "Message definitions",
         "type": "table",
         "value": [{
-            id: 'msg01',
-            name: 'msg name'
+            //     id: 'msg01',
+            //     name: 'msg name'
         }],
         "columns": [{
                 title: 'Id',
@@ -1480,8 +1480,8 @@ let allAttrs = {
         "title": "Escalation definitions",
         "type": "table",
         "value": [{
-            id: 'esca01',
-            name: 'esca01 name'
+            //     id: 'esca01',
+            //     name: 'esca01 name'
         }],
         "columns": [{
                 title: 'Id',

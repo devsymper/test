@@ -13,6 +13,8 @@ export const pushCustomElementsToModel = function(allVizEls, allSymEls, bpmnMode
         if (bizVizEl.$type == 'bpmn:Process' || bizVizEl.$type == 'bpmn:Collaboration') {
             elKey = 'rootElements';
             vizEl = bizVizEl.$parent;
+        } else if (bizVizEl) {
+
         }
 
         if (elKey) {

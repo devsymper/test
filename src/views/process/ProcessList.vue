@@ -17,13 +17,14 @@ import { reformatGetListProcess } from "./../../components/process/reformatGetLi
 import { appConfigs } from "./../../configs.js";
 import ListItems from "./../../components/common/ListItems.vue";
 import bpmnApi from "./../../api/BPMNEngine.js";
-import { deployProcess } from "./../../components/process/processAction.js";
+import { deployProcess, deployProcessFromXML } from "./../../components/process/processAction.js";
 
 export default {
     data() {
         let self = this;
         return {
             containerHeight: 300,
+            deployProcessFromXML: deployProcessFromXML,
             listItemOptions: {},
             getListUrl: appConfigs.apiDomain.bpmne.models,
             tableContextMenu: [

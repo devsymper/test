@@ -2,15 +2,19 @@ import bpmnApi from "./../../api/BPMNEngine";
 import { util } from "../../plugins/util";
 
 function cleanContent(content) {
-    let ns = `<bpmn:definitions xmlns:symper="http://symper/schema/bpmn/custom-extension" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:flowable="http://flowable.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.flowable.org/processdef">`;
-    return content.replace(/\<bpmn:definitions (.*?)+\>/, ns)
-        .replace(/↵+/, '')
+    let ns = `definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:symper="http://symper.org/bpmn"
+    xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.symper.org/processdef">`;
+    return content
+        .replace(/↵+/, ' ')
         .replace(/<symper:+/g, '<')
         .replace(/<\/symper:+/g, '</')
         .replace(/\bbpmn:/g, '')
         .replace(/<di:/g, '<omgdi:')
         .replace(/<dc:/g, '<omgdc:')
-        .replace(/symper_prefix_chars_/g, 'symper:');
+        .replace(/symper_prefix_chars_/g, 'symper:')
+        .replace(/definitions (.*?)+\>/, ns);
 }
 
 export const deployProcess = function(self, processData) {
@@ -42,6 +46,17 @@ export const deployProcess = function(self, processData) {
             deployReject(err);
         });
     });
+}
+
+
+export const deployProcessFromXML = function(xml, key = 14, name = 'test', tenantId = '111') {
+    let content = xml;
+    let file = util.makeStringAsFile(content, "process_draft.bpmn");
+    bpmnApi.deployProcess({
+        deploymentKey: key,
+        deploymentName: name,
+        tenantId: tenantId,
+    }, file);
 }
 
 /**

@@ -4,7 +4,21 @@ const noNeedPrefix = {
     id: true,
     escalationCode: true
 };
-const PREFIX = 'symper:'
+const PREFIX = 'symper:';
+
+function clearEmptyAttr(bizObj) {
+    for (let key in bizObj) {
+        if (bizObj[key] === '') {
+            delete bizObj[key];
+        }
+    }
+
+    for (let key in bizObj.$attrs) {
+        if (bizObj.$attrs[key] === '') {
+            delete bizObj.$attrs[key];
+        }
+    }
+}
 export default {
     // Tạo ra các thẻ mới và chèn vào element cha
     pushNewEqualEls(el, elKey, attr, bpmnModeler, attrName) {
@@ -41,15 +55,20 @@ export default {
     setValueAsAttr(el, elKey, attr, bpmnModeler, attrName) {
         let modeling = bpmnModeler.get("modeling");
         let value = allNodesAttrs[attrName].getValue(attr.value);
-        let objToUpdate = {};
-        if (typeof value != 'number' && typeof value != 'string') {
-            value = JSON.stringify(value);
-        }
-        let toXMLname = allNodesAttrs[attrName].toXML.name;
-        objToUpdate[toXMLname] = value;
-        if (el.businessObject) {
-            // el.businessObject.$attrs[attrName] = value;
-            modeling.updateProperties(el, objToUpdate);
+        console.log(attrName, value, value !== '');
+
+        if (value !== '' && attrName != 'overrideid') {
+            let objToUpdate = {};
+            if (typeof value != 'number' && typeof value != 'string') {
+                value = JSON.stringify(value);
+            }
+            let toXMLname = allNodesAttrs[attrName].toXML.name;
+            objToUpdate[toXMLname] = value;
+            if (el.businessObject) {
+                clearEmptyAttr(el.businessObject);
+                // el.businessObject.$attrs[attrName] = value;
+                modeling.updateProperties(el, objToUpdate);
+            }
         }
     },
 
@@ -72,5 +91,15 @@ export default {
 
     notPushToXML(el, elKey, attr, bpmnModeler, attrName) {
 
+    },
+
+    documentationMethod(el, elKey, attr, bpmnModeler, attrName) {
+        if (el.businessObject && attr.value != '') {
+            let moddle = bpmnModeler.get('moddle');
+            let bizObj = el.businessObject;
+            let newEl = moddle.create("symper:documentation");
+            newEl.text = attr.value;
+            bizObj.documentation = [newEl];
+        }
     }
 }

@@ -598,13 +598,15 @@ export default {
                 if (newType != nodeState.type) {
                     this.changeNodeType(nodeState, newType);
                 }
+                nodeState.name = nodeData.name;
+                nodeState.attrs.name.value = nodeData.name;
 
                 if (nodeId == this.selectingNode.id) {
                     this.$store.commit(
                         "process/changeSelectingNode",
                         {
                             instanceKey: this.instanceKey,
-                            data: this.stateAllElements[nodeId]
+                            data: nodeState
                         }
                     );
                 }
@@ -894,8 +896,10 @@ export default {
             this.fillNodeData();
             for(let elName in this.stateAllElements){
                 for(let attrName in this.stateAllElements[elName].attrs){
-                    if(configValue[elName].hasOwnProperty(attrName)){
-                        this.stateAllElements[elName].attrs[attrName].value = configValue[elName][attrName];
+                    if(configValue[elName]){
+                        if(configValue[elName].hasOwnProperty(attrName)){
+                            this.stateAllElements[elName].attrs[attrName].value = configValue[elName][attrName];
+                        }
                     }
                 }
             }
