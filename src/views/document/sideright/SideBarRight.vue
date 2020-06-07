@@ -53,7 +53,7 @@
         <v-tab-item
             class="p-2 h-100 formulas-control-tab"
         >
-            <control-props-config :singleLine="false" :allInputs="sCurrentDocument.formulas"/>
+            <control-props-config :singleLine="false" @input-value-changed="handleChangeInput" :allInputs="sCurrentDocument.formulas"/>
         </v-tab-item>
 
         
@@ -67,6 +67,8 @@ export default {
     },
     computed: {
         sCurrentDocument(){
+            console.log( this.$store.state.document.editor.currentSelectedControl);
+            
             return this.$store.state.document.editor.currentSelectedControl;
         },
 
@@ -88,14 +90,14 @@ export default {
         }
     },
     methods:{
-        handleChangeInput(name,input){
+        handleChangeInput(name, input, data){
             let value = input.value
             let elements = $('#editor_ifr').contents().find('#'+this.sCurrentDocument.id);
             if(name == "width"){
                 elements.css({width:value});
             }
             if(name == "height"){
-                elements.css({name:value});
+                elements.css({height:value});
             }
           
             let table = elements.closest('.s-control-table');

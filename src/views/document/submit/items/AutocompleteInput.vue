@@ -6,14 +6,13 @@
         <v-data-table
         :headers="headers"
         :items="dataTable"
-        :search="search"
         disable-pagination
         fixed-header
         hide-default-footer
         
         >
         <template v-slot:item="{ item }">
-            <tr v-on:click="handleClickRow(item)" class="active-row" v-if="item.active">
+            <tr v-on:click="handleClickRow(item)" class="active-row" v-if="item.active" style="background: #f0f0f0">
                 <td v-for="(key,value) in item" :key="key+value" :class="{'d-none':(value == 'active')}">{{ (value != 'active') ? key : '' }}</td>
             </tr>
             <tr v-on:click="handleClickRow(item)" v-else>
@@ -37,75 +36,15 @@ export default {
             positionBox:{'top':0,'left':0},
             indexActive:0,
             search: '',
-            headers: [
-            {
-                text: 'Dessert (100g serving)',
-                align: 'start',
-                sortable: false,
-                value: 'name',
-            },
-            { text: 'Calories', value: 'calories' },
-            { text: 'Fat (g)', value: 'fat' },
-            ],
-            dataTable: [
-            {
-                name: 'Frozen Yogurt',
-                calories: 159,
-                fat: 6.0,
-                active:true
-            },
-            {
-                name: 'Ice cream sandwich',
-                calories: 237,
-                fat: 9.0,
-            },
-            {
-                name: 'Eclair',
-                calories: 262,
-                fat: 16.0,
-            },
-            {
-                name: 'Cupcake',
-                calories: 305,
-                fat: 3.7,
-            },
-            {
-                name: 'Gingerbread',
-                calories: 356,
-                fat: 16.0,
-            },
-            {
-                name: 'Jelly bean',
-                calories: 375,
-                fat: 0.0,
-            },
-            {
-                name: 'Lollipop',
-                calories: 392,
-                fat: 0.2,
-            },
-            {
-                name: 'Honeycomb',
-                calories: 408,
-                fat: 3.2,
-            },
-            {
-                name: 'Donut',
-                calories: 452,
-                fat: 25.0,
-            },
-            {
-                name: 'KitKat',
-                calories: 518,
-                fat: 26.0,
-            },
-            ],
+            headers: [],
+            dataTable: [],
+            alias:''
         }
     },
     created(){
         let thisCpn = this;
         this.$evtBus.$on('document-submit-autocomplete-input-change',e=>{
-            if(e.keyCode == 38){    //len
+            if(e.e.keyCode == 38){    //len
                 
                 if(thisCpn.indexActive == 0){
                     return false;
@@ -115,7 +54,7 @@ export default {
                 Vue.set(thisCpn.dataTable[thisCpn.indexActive], 'active', true);
                 
             }   
-            else if(e.keyCode == 40){
+            else if(e.e.keyCode == 40){
                 if(thisCpn.indexActive == thisCpn.dataTable.length - 1){
                     return false;
                 }
@@ -123,7 +62,7 @@ export default {
                 thisCpn.indexActive++;
                 Vue.set(thisCpn.dataTable[thisCpn.indexActive], 'active', true);
             }
-            else if(e.keyCode == 13){
+            else if(e.e.keyCode == 13){
                 let rowActive = thisCpn.dataTable[thisCpn.indexActive];
                 thisCpn.handleClickRow(rowActive)
             }
@@ -139,6 +78,10 @@ export default {
         hide(){
             this.isShowAutoComplete = false;
         },
+        setData(data){
+            this.headers = data.headers;
+            this.dataTable = data.dataBody;
+        },
         calculatorPositionBox(e){   
             this.positionBox = {'top':$(e.target).offset().top + 30 +'px','left':$(e.target).offset().left - $(e.target).width()/2+'px'};
             
@@ -146,20 +89,21 @@ export default {
         setSearch(query){
             this.search = query;
         },
+        setAliasControl(aliasControl){
+            this.alias = aliasControl;
+        },
         handleClickRow(item){
-            let name = item.name
-            let rowActive = this.dataTable.filter(row=>{
-                return row.active === true
-            });
-            rowActive[0].active = false;
-            item.active = true;
+            let name = item[this.alias];
+            console.log(this.alias);
+            
             $('.autocompleting').val(name);
+            $('.autocompleting').trigger('change');
             $('.autocompleting').removeClass('autocompleting');
             this.hide();
             
             
         },
-       
+        
         openSubForm(){
             this.hide();
             $('.autocompleting').removeClass('autocompleting');

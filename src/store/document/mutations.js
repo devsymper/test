@@ -120,6 +120,7 @@ const addCurrentControl = (state, control) => {
     }
     // state.editor.currentSelectedControl['properties'] = groups
     Vue.set(state.editor.currentSelectedControl, 'properties', groups);
+    console.log(state.editor.currentSelectedControl);
 
 };
 
@@ -145,10 +146,28 @@ const updateProp = (state, params) => {
             state.editor.allControl[id]['formulas'][name]['value'] = value
         }
     }
-    console.log(params);
-
     setTreeListControlInDoc(state);
 }
+const updateFormulasId = (state, params) => {
+    let id = params.id
+    let name = params.name
+    let value = params.value
+    let tableId = params.tableId
+    console.log(params);
+    console.log(state.editor.allControl);
+
+    if (tableId != 0 && tableId != '0') {
+        if (state.editor.allControl[tableId]['listFields'][id]['formulas'][name]) {
+            state.editor.allControl[tableId]['listFields'][id]['formulas'][name]['formulasId'] = value
+        }
+
+    } else {
+        if (state.editor.allControl[id]['formulas'][name]) {
+            state.editor.allControl[id]['formulas'][name]['formulasId'] = value
+        }
+    }
+}
+
 const minimizeControl = (state, params) => {
     for (let i of Object.keys(state.editor.allControl)) {
         if (state.editor.allControl[i]['listFields']) {
@@ -190,6 +209,11 @@ const updateListInputInDocument = (state, params) => {
         Vue.set(state.submit.listInputInDocument[controlName], key, value);
     }
 }
+const addToRootControl = (state, params) => {
+    let key = params.key
+    let value = params.value
+    Vue.set(state.submit.rootControl, key, value);
+}
 
 
 export {
@@ -202,5 +226,7 @@ export {
     addToListInputInDocument,
     changeControlSubmitProps,
     addInstanceSubmitDB,
-    updateListInputInDocument
+    updateListInputInDocument,
+    updateFormulasId,
+    addToRootControl,
 };

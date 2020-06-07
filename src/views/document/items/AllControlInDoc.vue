@@ -22,7 +22,7 @@
                     @on-cell-click="clickCellAgTable"
                     @update-props="updatePropsControl"
                     :allColumns="columns" 
-                    :rowData="allData"/>
+                    :rowData="dataTable"/>
                 </v-card-text>
                 <v-divider></v-divider>
                 <v-card-actions>
@@ -83,68 +83,7 @@ export default {
 
         },
         
-        // hàm lấy dữ liệu cho ag-grid
-        allData(){ 
-            let allControl = util.cloneDeep(this.sAllControl);
-            let allDataControl = [];
-            for (let id in allControl) {
-                let props = allControl[id].properties;
-                let formulas = allControl[id].formulas;
-                let type = allControl[id].type;
-                let row = {};
-                for (let propType in props){
-                    let value = props[propType].value;
-                    if(props[propType].type == 'checkbox'){
-                        value = (value === 1) ? true : false;
-                    }
-                    row[propType] = value
-                    if(propType == 'name'){
-                        row[propType] = [value];
-                    }
-                }
-                if(type == "submit" || type == "reset" || type == "draft"){
-                    row['name'] = [type];
-                    row['title'] = [type];
-                }
-                this.mapNameToControlId[row['name'][0]] = id;
-                row['icon'] = getIconFromType(type);
-                for (let f in formulas){
-                    row[f] = formulas[f].value
-                }
-
-
-                if(type == "table"){
-                        let tableName = props.name.value;
-                        let listFields = allControl[id].listFields
-                        for (let childId in listFields){
-                            let childRow = {};
-                            let childProps = listFields[childId].properties;
-                            let childFormulas = listFields[childId].formulas;
-                            let cType = listFields[childId].type;
-                            for (let childPropType in childProps){
-                                let cValue = childProps[childPropType].value;
-                                if(childProps[childPropType].type == 'checkbox'){
-                                    cValue = (cValue === 1) ? true : false;
-                                }
-                                childRow[childPropType] = cValue
-                                if(childPropType == 'name'){
-                                    childRow[childPropType] = [tableName,cValue]
-                                    this.mapNameToControlId[cValue] = childId;
-                                }
-                            }
-                            for (let f in childFormulas){
-                                childRow[f] = childFormulas[f].value
-                            }
-                            
-                            childRow['icon'] = getIconFromType(cType);
-                            allDataControl.push(childRow);
-                        }
-                    }
-                allDataControl.push(row);
-            }
-            
-            return allDataControl;
-        },
+        
         allColumnFormulas(){
             return getAllFormulasName();
         }
@@ -158,7 +97,8 @@ export default {
                 open: false, // có mở largeFormulaEditor hay ko
                 data: {}, // Dữ liệu của input cần mở lên để edit trong khung lớn,
             },
-            mapNameToControlId:{}
+            mapNameToControlId:{},
+            dataTable : null,
         }
     },
     methods:{
@@ -203,7 +143,72 @@ export default {
                 "document/updateProp",{id:controlId,name:propName,value:value,tableId:tableId}
             );   
             
-        }
+        },
+        // hàm lấy dữ liệu cho ag-grid
+        getData(){ 
+            let allControl = util.cloneDeep(this.sAllControl);
+            let allDataControl = [];
+            for (let id in allControl) {
+                let props = allControl[id].properties;
+                let formulas = allControl[id].formulas;
+                let type = allControl[id].type;
+                let row = {};
+                console.log(allControl[id]);
+                
+                for (let propType in props){
+                    let value = props[propType].value;
+                    if(props[propType].type == 'checkbox'){
+                        value = (value === 1) ? true : false;
+                    }
+                    row[propType] = value
+                    if(propType == 'name'){
+                        row[propType] = [value];
+                    }
+                }
+                if(type == "submit" || type == "reset" || type == "draft"){
+                    row['name'] = [type];
+                    row['title'] = [type];
+                }
+                console.log(row);
+                
+                this.mapNameToControlId[row['name'][0]] = id;
+                row['icon'] = getIconFromType(type);
+                for (let f in formulas){
+                    row[f] = formulas[f].value
+                }
+
+
+                if(type == "table"){
+                        let tableName = props.name.value;
+                        let listFields = allControl[id].listFields
+                        for (let childId in listFields){
+                            let childRow = {};
+                            let childProps = listFields[childId].properties;
+                            let childFormulas = listFields[childId].formulas;
+                            let cType = listFields[childId].type;
+                            for (let childPropType in childProps){
+                                let cValue = childProps[childPropType].value;
+                                if(childProps[childPropType].type == 'checkbox'){
+                                    cValue = (cValue === 1) ? true : false;
+                                }
+                                childRow[childPropType] = cValue
+                                if(childPropType == 'name'){
+                                    childRow[childPropType] = [tableName,cValue]
+                                    this.mapNameToControlId[cValue] = childId;
+                                }
+                            }
+                            for (let f in childFormulas){
+                                childRow[f] = childFormulas[f].value
+                            }
+                            
+                            childRow['icon'] = getIconFromType(cType);
+                            allDataControl.push(childRow);
+                        }
+                    }
+                allDataControl.push(row);
+            }
+            this.dataTable = allDataControl
+        },
        
         
     },

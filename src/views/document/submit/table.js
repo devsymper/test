@@ -2,6 +2,18 @@ import Util from './util'
 import Handsontable from 'handsontable';
 import store from './../../../store/document'
 
+/**
+ * Custom render cho control percent( phần trăm) cho table
+ */
+Handsontable.renderers.PercentRenderer = function(instance, td, row, col, prop, value, cellProperties) {
+    Handsontable.renderers.NumericRenderer.apply(this, arguments);
+    td.textContent = td.textContent + " %";
+}
+Handsontable.cellTypes.registerCellType('percent', {
+    editor: Handsontable.editors.TextEditor.prototype.extend(),
+    renderer: Handsontable.renderers.PercentRenderer
+});
+
 let listInputInDocument = store.state.submit.listInputInDocument;
 
 const MAX_TABLE_HEIGHT = 300;
@@ -18,7 +30,7 @@ const supportCellsType = {
     image: 'ImageRenderer',
     'file-upload': 'FileRenderer',
     label: 'TextRenderer',
-    persent: 'PercentRenderer',
+    percent: 'PercentRenderer',
     user: 'TextRenderer',
     select: 'DropdownRenderer',
     checkbox: 'CheckboxRenderer'
@@ -61,10 +73,20 @@ export default class Table {
 
         /**Danh sách các celltpye trong table */
         this.listCellType = {};
+        this.event = {
+            afterSelection: (row, column, row2, column2, preventScrolling, selectionLayerLevel) => {},
+            afterBeginEditing: function(row, column) {
+                console.log(row);
+                console.log(column);
+                console.log(this.listCellType);
+
+
+            }
+        }
     }
     render() {
         let thisObj = this;
-        let tableContainer = $('<div id="' + thisObj.controlObj.id + '"></div>')[0];
+        let tableContainer = $('<div id="' + thisObj.controlObj.id + '" s-control-type="table"></div>')[0];
         thisObj.controlObj.ele.before(tableContainer);
         thisObj.tableContainer = $(tableContainer);
         let columnsInfo = this.getColumnsInfo();
@@ -214,14 +236,13 @@ export default class Table {
         let columns = [];
         let hiddenColumns = [];
         let num = 0;
-        console.log(thisObj.controlObj);
 
         let ths = thisObj.controlObj.ele.find('th');
-
         for (let controlName in thisObj.controlObj.listInsideControls) {
             headerName.push($(ths[num]).text());
             // Lấy celltype
             let cellType = thisObj.getCellType(controlName, listInputInDocument[controlName]);
+
             thisObj.listCellType[controlName] = cellType;
             columns.push(cellType);
             //Khởi tạo giá trị cho dòng mới
@@ -264,7 +285,14 @@ export default class Table {
             rsl.timeFormat = 'HH:mm:ss',
                 rsl.correctFormat = true;
         }
+        console.log(name);
+        console.log(control);
+
+        console.log(supportCellsType[type]);
+
         rsl.type = Util.toLowerCaseFirstCharacter(supportCellsType[type].replace('Renderer', ''));
+        console.log(rsl);
+
         return rsl;
     }
     validateRender(hotInstance, td, row, column, prop, value, cellProperties) {
