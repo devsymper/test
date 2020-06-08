@@ -73,11 +73,59 @@ export default class ClientSQLManager {
         // console.log(this.run(keyInstance, 'select * from this_document', false));
 
     }
+    static insertRowToTable(keyInstance, tableName, column, value, where) {
+        let tbColumn = column.join();
+        let tbValue = value.join()
+        let sql = `INSERT INTO ${tableName} (${tbColumn}) VALUES(${value})`;
+    }
+    static insertMultiple(keyInstance, tableName, columns, columnstype, values) {
+        let tbColumns = columns.join();
+        let tbValues = "";
+        for (let i = 0; i < values.length; i++) {
+            for (let j = 0; j < columnstype.length; j++) {
+                if (columnstype[j] == 'numeric') {
+                    if (typeof values[i][j] != 'number')
+                        values[i][j] = 0;
+                } else {
+                    if (values[i][j] == null) {
+                        values[i][j] = `""`;
+                    } else {
+                        values[i][j] = `"${values[i][j]}"`
+                    }
+                }
+            }
+            values[i].push(i);
+
+            tbValues += ` (${values[i].join()}),`;
+        }
+        tbValues = tbValues.substring(0, tbValues.length - 1);
+        let sql = `INSERT INTO ${tableName} (${tbColumns},s_id_sql_lite_9999) VALUES ${tbValues}`;
+        console.log(sql);
+
+        this.run(keyInstance, sql, true);
+
+    }
+    static delete(keyInstance, tableName, where) {
+        let w = "";
+        if (where != false) {
+            w = ` WHERE ${where}`;
+        }
+        let sql = `DELETE FROM ${tableName} ${w}`;
+        this.run(keyInstance, sql, true);
+    }
+    static get(keyInstance, sql) {
+        return this.run(keyInstance, sql, false);
+    }
     static closeDB(keyInstance) {
         let db = this.getInstanceDB(keyInstance);
         if (db != undefined) {
             db.close();
         }
     }
+    static getAllTableName(keyInstance) {
+        let sql = `SELECT name FROM sqlite_master WHERE type='table' ORDER BY name;`
+        return this.run(keyInstance, sql, false)
+    }
+
 
 }

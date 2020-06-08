@@ -7,8 +7,6 @@ import store from './../../store'
  */
 export const setDataForPropsControl = function(fields) {
     for (let controlId in fields) {
-        console.log(fields[controlId]);
-
         let control = GetControlProps(fields[controlId].type)
         let properties = control.properties
         let formulas = control.formulas
@@ -22,7 +20,6 @@ export const setDataForPropsControl = function(fields) {
             }
         })
         if (fields[controlId]['formulas'] != false && fields[controlId]['formulas'] != "[]") {
-            console.log(fields[controlId]['formulas']);
 
             $.each(formulas, function(k, v) {
                 if (fields[controlId]['formulas'][k] == "") {
@@ -42,7 +39,7 @@ export const setDataForPropsControl = function(fields) {
                 let childProperties = childControl.properties
                 let childFormulas = childControl.formulas
                 let childType = listField[childFieldId].type
-                let childId = listField[childFieldId].id
+                let childId = listField[childFieldId]['properties'].id
                 $.each(childProperties, function(k, v) {
                     if (childType == 'checkbox') {
                         childProperties[k].value = (listField[childFieldId]['properties'][k] == 0 || listField[childFieldId]['properties'][k] == '0' || listField[childFieldId]['properties'][k] == '') ? false : true
@@ -61,12 +58,14 @@ export const setDataForPropsControl = function(fields) {
                     })
                 }
                 listChildField[childFieldId] = { id: childId, properties: childProperties, formulas: childFormulas, type: childType }
+
             }
+            console.log(listChildField);
+
             addToAllControlInDoc(controlId, { id: id, properties: properties, formulas: formulas, type: fields[controlId].type, listFields: listChildField });
         }
 
     }
-    console.log(store.state.document.editor);
 
 }
 

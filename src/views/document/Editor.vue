@@ -708,7 +708,7 @@ export default {
                 controlEl.attr('id', inputid).attr('style',style);
                 controlEl.replaceAll($(value))
                 try {
-                    
+                    //loi parse ở đây
                     controlProps = JSON.parse(controlProps);
                     let controlProp = {};
                     let controlFormulas = {};
@@ -724,15 +724,11 @@ export default {
                 } catch (error) {   
                     console.log(error);
                 }
-                
                 if(type == 'table'){
                     let tableId = inputid;
                     let tableEl = controlEl;
                     
                     let bodyTable = $(value).find('table');
-                    console.log(tableEl.find('thead'));
-                    console.log(tableEl.find('tbody'));
-
                     // tableEl.find('table thead').remove();
                     tableEl.find('thead').remove();
                     tableEl.find('tbody').remove();
@@ -740,12 +736,17 @@ export default {
                     tableEl.append(bodyTable.find('tbody')[0].outerHTML);
                     tableEl.find('thead').attr('contenteditable',true);
                     let allControlInTable = tableEl.find('.s-control');
+                    console.log(allControlInTable);
+                    
                     $.each(allControlInTable,function(item,value){
                         let childControlProps = $(value).attr('data-property');
                         let type = $(value).attr('bkerp-type');
                         let style = $(value).attr('style');
                         if(type == 'text') type = 'textInput'
                         if(type == 'persent') type = 'percent'
+                        if(type == 'file-upload') type = 'fileUpload'
+                        console.log(type);
+                        
                         let childControlV2 = GetControlProps(type);
                         let controlEl = $(childControlV2.html); 
                         var inputid = 's-control-id-' + Date.now();

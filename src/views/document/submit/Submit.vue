@@ -197,12 +197,18 @@ export default {
         });
 
         this.$evtBus.$on("document-submit-input-change", locale => {
+            console.log(locale.controlName);
+            
             thisCpn.updateListInputInDocument(
                 locale.controlName,
                 "value",
                 locale.val
             );
-            thisCpn.handleControlInputChange(locale);
+            thisCpn.handleControlInputChange(locale.controlName);
+        });
+        this.$evtBus.$on("run-effected-control-when-table-change", e => {
+            thisCpn.handleControlInputChange(e.tableName);
+            thisCpn.handleControlInputChange(e.controlName,true);
         });
         this.$evtBus.$on("document-submit-open-validate", e => {
             thisCpn.$refs.validate.show(e);
@@ -223,7 +229,6 @@ export default {
                 let aliasControl = e.autocompleteFormulasInstance.autocompleteDetectAliasControl();
                 let dataInput = thisCpn.getDataInputFormulas(e.autocompleteFormulasInstance);  
                 let dataAutocomplete = e.autocompleteFormulasInstance.handleRunAutoCompleteFormulas($(e.e.target).val(),dataInput).then(res=>{
-                    console.log(res);
                     
                     if(res.status == 200 && res.data != false){
                         let dataTable = thisCpn.handleDataAutoComplete(res.data);
@@ -367,8 +372,10 @@ export default {
                             tableControl.initTableControl();
                             tableControl.tableInstance = new Table(
                                 tableControl,
-                                controlName
+                                controlName,
+                                thisCpn.keyInstance
                             );
+                            let columnsTableSqlLite = {};
                             let tableEle = $(allInputControl[index]);
                             tableEle.find(".s-control").each(function() {
                                 let childControlId = $(this).attr("id");
@@ -382,6 +389,7 @@ export default {
                                 );
                                 childControl.init();
                                 let childControlName = childControlProp.properties.name.value;
+                                columnsTableSqlLite[childControlName] = thisCpn.mapTypeControlToTypeSQLLite(childControlProp.type)
                                 childControl.inTable = controlName;
                                 thisCpn.$store.commit(
                                     "document/addToListInputInDocument",
@@ -394,6 +402,8 @@ export default {
                             });
                             tableControl.listInsideControls = listInsideControls;
                             tableControl.renderTable();
+                            columnsTableSqlLite['s_id_sql_lite_9999'] = 'INTEGER'
+                            ClientSQLManager.createTable(this.keyInstance,controlName,columnsTableSqlLite);
                             this.$store.commit(
                                 "document/addToListInputInDocument",
                                 { name: controlName, control: tableControl }
@@ -451,10 +461,10 @@ export default {
                 return "NUMERIC";
             }
             else if(controlType == "date" || controlType == "datetime" || controlType == "time" || controlType == "month"){
-                return "NUMERIC";
+                return "TEXT";
             }
             else{
-                return false;
+                return "TEXT";
             }
         },
         /**
@@ -478,22 +488,43 @@ export default {
                                 }
                                 mapControlEffected[controlEffect][name] = true;
                             }
+                            this.detectControlEffectedFromTableInDoc(mapControlEffected, name,formulas[formulasType].instance);
+                            this.detectControlEffectedInTableInDoc(mapControlEffected, name,formulas[formulasType].instance);
                         }
                         
                     }
                 }
             }
+
             console.log(mapControlEffected);
-            
             this.updateEffectedControlToStore(mapControlEffected);
+        },
+        /**
+         * Hàm detect công thức của 1 control có liên quan đến table hay ko, nếu có thì đưa vào mối quan hệ mapControlEffected
+         * 
+         */
+        detectControlEffectedFromTableInDoc(mapControlEffected, controlName, formulasInstance){
+            let listTableName = ClientSQLManager.getAllTableName(this.keyInstance);
+            let listTableSource = formulasInstance.detectTableSQLLite(formulasInstance.formulas,listTableName[0]['values'][0]);
+            if(listTableSource != false){
+                for(let i = 0; i< listTableSource.length; i++){
+                    if (
+                        mapControlEffected[listTableSource[i]] == undefined
+                    ) {
+                        mapControlEffected[listTableSource[i]] = {};
+                    }
+                    mapControlEffected[listTableSource[i]][controlName] = true 
+                }
+            }
+        },
+        detectControlEffectedInTableInDoc(mapControlEffected,name,formulasInstance){
+            formulasInstance.detectControlInTable(mapControlEffected,name,formulasInstance.formulas,this.sDocumentSubmit.listInputInDocument)  
         },
 
         /**
          * Hàm gọi api submit document
          */
         submitDocument(){
-            console.log(this.sDocumentSubmit);
-            
             this.isSubmitting = true;
             let thisCpn = this;
             let dataPost = this.getDataPostSubmit();
@@ -586,34 +617,33 @@ export default {
         },
         /**
          * hàm được gọi khi input change, lấy ra các instance của control bị ảnh hưởng và chạy công thức cho các control đó
+         * nếu có insideTableInDoc thì công thức từ nội bộ của bảng
          */
-        handleControlInputChange(inputInfo){
-            let controlName = inputInfo.controlName;
-            let value = inputInfo.val;
+        handleControlInputChange(controlName,insideTableInDoc = false){
             let controlInstance = this.sDocumentSubmit.listInputInDocument[controlName];
             let controlEffected = controlInstance.getEffectedControl();
-            this.runFormulasControlEffected(controlEffected);
-            
+            this.runFormulasControlEffected(controlName,controlEffected,insideTableInDoc);
         },
         /**
          * Hàm xử lí duyêt các control bị ảnh hưởng trong 1 công thức bởi 1 control nào đó và thực hiện chạy các công thức của control đó
          */
-        runFormulasControlEffected(controlEffected){
+        runFormulasControlEffected(controlName, controlEffected,insideTableInDoc = false){
             if(Object.keys(controlEffected).length > 0){
                 for(let i in controlEffected){
                     let controlEffectedInstance = this.sDocumentSubmit.listInputInDocument[i];
-                    console.log(controlEffectedInstance);
-                    
                     let controlId = controlEffectedInstance.id
                     let allFormulas = controlEffectedInstance.controlFormulas;
                     for(let formulasType in allFormulas){
                         if(allFormulas[formulasType].hasOwnProperty('instance')){
                             let formulasInstance = allFormulas[formulasType].instance;
                             if(formulasInstance.getFormulas() != ""){
+                                // if(insideTableInDoc != false){
+                                //     formulasInstance.setFormulas(formulasInstance.getFormulas() + " WHERE s_id_sql_lite_9999 = "+insideTableInDoc);
+                                // }
                                 let dataInput = this.getDataInputFormulas(formulasInstance);    
                                 switch (formulasType) {
                                     case "formulas":
-                                        this.handleRunFormulasValue(dataInput,formulasInstance,controlId);
+                                        this.handleRunFormulasValue(dataInput,formulasInstance,controlId,controlName,insideTableInDoc);
                                         break;
                                     case "link":
                                         break;
@@ -660,26 +690,35 @@ export default {
         /**
          * Hàm xử lí chạy công thức giá trị của control, kết quả trả về được gán lại dữ liệu cho input
          */
-        handleRunFormulasValue(dataInput,formulasInstance,controlId){
+        handleRunFormulasValue(dataInput,formulasInstance,controlId,controlName="",insideTableInDoc = false){
+            
             formulasInstance.handleBeforeRunFormulas(dataInput).then(rs=>{
-                if($('#'+controlId).attr('s-control-type') == 'table'){
-                    this.setDataToTable(controlId,rs.data)
-                }
-                else{
-                    if(!rs.server){
-                        let data = rs.data; 
-                        if(data.length > 0){
-                            this.setDataToControl($('#'+controlId),$('#'+controlId).attr('s-control-type'), data[0].values[0][0])
-                        }
+                if($('#'+controlId).length > 0){
+                    if($('#'+controlId).attr('s-control-type') == 'table'){
+                        this.setDataToTable(controlId,rs.data)
                     }
                     else{
-                        let data = rs.data;
-                        if(data.length > 0){
-                            this.setDataToControl($('#'+controlId),$('#'+controlId).attr('s-control-type'), data[0][Object.keys(data[0])[0]])
+                        if(!rs.server){
+                            let data = rs.data; 
+                            if(data.length > 0){
+                                this.setDataToControl($('#'+controlId),$('#'+controlId).attr('s-control-type'), data[0].values[0][0])
+                            }
                         }
+                        else{
+                            let data = rs.data;
+                            if(data.length > 0){
+                                this.setDataToControl($('#'+controlId),$('#'+controlId).attr('s-control-type'), data[0][Object.keys(data[0])[0]])
+                            }
+                        }
+                        $('#'+controlId).trigger('change');
                     }
-                    $('#'+controlId).trigger('change');
                 }
+                else{
+                    if(insideTableInDoc){
+                        // this.sDocumentSubmit.listInputInDocument[controlName].tableInstance.setColValues(rs.data[0].columns[0],rs.data[0].values);
+                    }
+                }
+                
                 
             });
             
@@ -707,8 +746,6 @@ export default {
                 }
                 dataTable.push(row);
             }
-            console.log(dataTable);
-            
             this.sDocumentSubmit.listInputInDocument[tableName].tableInstance.tableInstance.loadData(dataTable)
             
         },

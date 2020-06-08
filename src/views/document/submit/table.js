@@ -1,7 +1,9 @@
 import Util from './util'
 import Handsontable from 'handsontable';
 import store from './../../../store/document'
+import ClientSQLManager from './clientSQLManager';
 
+import { SYMPER_APP } from './../../../main.js'
 /**
  * Custom render cho control percent( phần trăm) cho table
  */
@@ -11,6 +13,19 @@ Handsontable.renderers.PercentRenderer = function(instance, td, row, col, prop, 
 }
 Handsontable.cellTypes.registerCellType('percent', {
     editor: Handsontable.editors.TextEditor.prototype.extend(),
+    renderer: Handsontable.renderers.PercentRenderer
+});
+Handsontable.renderers.FileRenderer = function(instance, td, row, col, prop, value, cellProperties) {
+    Handsontable.renderers.NumericRenderer.apply(this, arguments);
+    td.innerHTML = listInputInDocument[prop].genFileView(row);
+    td.classList.add("upload-file-wrapper-inTb");
+    if (isDetailView && !rerenderCtrlFlag[instance.tableName]) {
+        let tb = listInputInDocument[prop].inTable;
+        listInputInDocument[tb].tableInstance.reRender(tb);
+        rerenderCtrlFlag[instance.tableName] = true;
+    }
+}
+Handsontable.cellTypes.registerCellType('file', {
     renderer: Handsontable.renderers.PercentRenderer
 });
 
@@ -28,7 +43,7 @@ const supportCellsType = {
     datetime: 'DatetimeRenderer',
     time: 'TimeRenderer',
     image: 'ImageRenderer',
-    'file-upload': 'FileRenderer',
+    fileUpload: 'FileRenderer',
     label: 'TextRenderer',
     percent: 'PercentRenderer',
     user: 'TextRenderer',
@@ -41,7 +56,7 @@ const AUTO_SET = 'auto_set';
 const INIT_NEW_LINE = 'init_new_line';
 let docStatus = 'init';
 export default class Table {
-    constructor(control, tableName) {
+    constructor(control, tableName, keyInstance) {
         /**
          * Chứa object của Control tương ứng
          */
@@ -66,21 +81,35 @@ export default class Table {
          *      "row_column":{vld:true|false,msg:' thông báo lỗi'} //Chỉ cần quan tâm tới false, các trường hợp còn lại hiển thị bình thường
          * }
          */
+        let thisObj = this;
+
         this.validateValueMap = {};
 
         /**Tổng số dòng trong table */
         this.rowCount = 0;
-
+        this.tableInstance = null;
+        this.columnsInfo = null;
+        this.keyInstance = keyInstance;
         /**Danh sách các celltpye trong table */
         this.listCellType = {};
         this.event = {
             afterSelection: (row, column, row2, column2, preventScrolling, selectionLayerLevel) => {},
-            afterBeginEditing: function(row, column) {
-                console.log(row);
-                console.log(column);
-                console.log(this.listCellType);
+            afterBeginEditing: function(row, column) {},
+            afterCreateRow: function(index, amount, source) {
 
-
+            },
+            afterChange: function(changes, source) {
+                let columns = thisObj.columnsInfo.columns;
+                let columnstype = columns.map(function(c) {
+                    return c.type;
+                })
+                columns = columns.map(function(c) {
+                    return c.data;
+                });
+                ClientSQLManager.delete(thisObj.keyInstance, thisObj.tableName, false);
+                ClientSQLManager.insertMultiple(thisObj.keyInstance, thisObj.tableName, columns, columnstype, thisObj.tableInstance.getData());
+                let controlName = changes[0][1];
+                SYMPER_APP.$evtBus.$emit('run-effected-control-when-table-change', { controlName: controlName, tableName: thisObj.tableName, insideTableInDoc: true })
             }
         }
     }
@@ -89,14 +118,14 @@ export default class Table {
         let tableContainer = $('<div id="' + thisObj.controlObj.id + '" s-control-type="table"></div>')[0];
         thisObj.controlObj.ele.before(tableContainer);
         thisObj.tableContainer = $(tableContainer);
-        let columnsInfo = this.getColumnsInfo();
-        console.log(columnsInfo);
+        thisObj.columnsInfo = this.getColumnsInfo();
+        console.log(thisObj.columnsInfo);
 
         thisObj.controlObj.ele.detach().hide();
-        let colHeaders = columnsInfo.headerNames;
+        let colHeaders = thisObj.columnsInfo.headerNames;
         thisObj.colHeaders = colHeaders;
 
-        let tableInstance = new Handsontable(tableContainer, {
+        this.tableInstance = new Handsontable(tableContainer, {
             rowHeaders: true,
             dataSchema: Object.assign({}, thisObj.sampleRowValues),
             filters: true,
@@ -105,7 +134,7 @@ export default class Table {
             manualColumnResize: true,
             manualRowResize: true,
             hiddenColumns: {
-                columns: columnsInfo.hiddenColumns,
+                columns: thisObj.columnsInfo.hiddenColumns,
                 indicators: false
             },
             // rowHeights:30,   
@@ -120,7 +149,7 @@ export default class Table {
             readOnly: false,
             viewportColumnRenderingOffset: 50,
             // manualColumnFreeze: true,
-            columns: columnsInfo.columns,
+            columns: thisObj.columnsInfo.columns,
             allowInsertColumn: false,
             allowRemoveColumn: false,
             columnHeaderHeight: 30,
@@ -135,25 +164,23 @@ export default class Table {
             width: '100%',
             minSpareRows: 1,
             height: 'auto',
-            // afterRender: function(isForced) {
-            //     let tbHeight = this.container.getElementsByClassName('htCore')[0].getBoundingClientRect().height;
-            //     console.log(tbHeight);
-
-            //     if (tbHeight < MAX_TABLE_HEIGHT) {
-            //         $(this.rootElement).css('height', tbHeight + 20);
-            //     } else {
-            //         $(this.rootElement).css('height', MAX_TABLE_HEIGHT);
-            //     }
-            //     if (!this.reRendered) {
-            //         this.reRendered = true;
-            //         setTimeout((hotTb) => {
-            //             hotTb.render();
-            //         }, 500, this);
-            //     }
-            // },
+            afterRender: function(isForced) {
+                let tbHeight = this.container.getElementsByClassName('htCore')[0].getBoundingClientRect().height;
+                if (tbHeight < MAX_TABLE_HEIGHT) {
+                    $(this.rootElement).css('height', tbHeight + 20);
+                } else {
+                    $(this.rootElement).css('height', MAX_TABLE_HEIGHT);
+                }
+                if (!this.reRendered) {
+                    this.reRendered = true;
+                    setTimeout((hotTb) => {
+                        hotTb.render();
+                    }, 500, this);
+                }
+            },
 
             // beforeCreateRow: function(index, amount, source) {
-            //     let tableCtrl = listInputInDocument[this.SymperTableName].tableInstance;
+            //     let tableCtrl = listInputInDocument[this.tableName].tableInstance;
             //     console.log(tableCtrl);
             //     let ctrlName = '';
             //     if (docStatus == 'init') {
@@ -223,11 +250,9 @@ export default class Table {
             //     }
             // },
         });
-        this.tableInstance = tableInstance;
         for (let evtName in thisObj.event) {
-            Handsontable.hooks.add(evtName, thisObj.event[evtName], tableInstance);
+            Handsontable.hooks.add(evtName, thisObj.event[evtName], this.tableInstance);
         }
-        tableInstance.SymperTableName = thisObj.controlObj.name;
     }
     getColumnsInfo() {
 
@@ -285,8 +310,7 @@ export default class Table {
             rsl.timeFormat = 'HH:mm:ss',
                 rsl.correctFormat = true;
         }
-        console.log(name);
-        console.log(control);
+        console.log(type);
 
         console.log(supportCellsType[type]);
 
@@ -296,37 +320,52 @@ export default class Table {
         return rsl;
     }
     validateRender(hotInstance, td, row, column, prop, value, cellProperties) {
-        if (row + 1 == hotInstance.countRenderedRows()) {
-            if (value === null) {
-                arguments[5] = this.sampleRowValues[prop];
+            if (row + 1 == hotInstance.countRenderedRows()) {
+                if (value === null) {
+                    arguments[5] = this.sampleRowValues[prop];
+                }
             }
-        }
-        Handsontable.renderers[supportCellsType[listInputInDocument[prop].type]].apply(this, arguments);
-        if (listInputInDocument[prop].isCheckbox) {
-            td.style.textAlign = "center";
-        }
-        console.log(this);
+            Handsontable.renderers[supportCellsType[listInputInDocument[prop].type]].apply(this, arguments);
+            if (listInputInDocument[prop].isCheckbox) {
+                td.style.textAlign = "center";
+            }
+            console.log(this);
 
-        let map = this.validateValueMap[row + '_' + column];
-        if (map) {
-            let sign = prop + '____' + row;
-            let ele = $(td);
-            if (map.vld === false) {
-                ele.append(Util.makeErrNoti(map.msg, sign));
+            let map = this.validateValueMap[row + '_' + column];
+            if (map) {
+                let sign = prop + '____' + row;
+                let ele = $(td);
+                if (map.vld === false) {
+                    ele.append(Util.makeErrNoti(map.msg, sign));
+                }
+                if ((map.require === false || listInputInDocument[prop].originProp.Required == 1) && value === '') {
+                    ele.css('position', 'relative').append(Util.requireRedDot(sign));
+                }
             }
-            if ((map.require === false || listInputInDocument[prop].originProp.Required == 1) && value === '') {
-                ele.css('position', 'relative').append(Util.requireRedDot(sign));
-            }
-        }
 
-        if (isDetailView) {
-            let indx = prop + '_' + row;
-            if (changedVlCtrlCoord[indx]) {
-                td.classList.add('changed-input');
-                for (let typeChange in changedVlCtrlCoord[indx]) {
-                    td.setAttribute(typeChange, 'yes');
+            if (isDetailView) {
+                let indx = prop + '_' + row;
+                if (changedVlCtrlCoord[indx]) {
+                    td.classList.add('changed-input');
+                    for (let typeChange in changedVlCtrlCoord[indx]) {
+                        td.setAttribute(typeChange, 'yes');
+                    }
                 }
             }
         }
+        /**
+         * set giá trị cho một cột tương ứng với các rowId
+         * @param {string} name tên control
+         * @param {Object} values {
+         *                              "rowId":"value"
+         *                          }
+         */
+    setColValues(name, values, tbName) {
+        let vls = [];
+        for (let i = 0; i < values.length; i++) {
+            vls.push([i, name, values[i]]);
+        }
+        this.tableInstance.setDataAtRowProp(vls, null, null, AUTO_SET);
+        // listInputInDocument[tbName].reCaclSumAndAvg();
     }
 }

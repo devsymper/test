@@ -229,6 +229,42 @@ export default class Formulas {
     getFormulas() {
         return this.formulas;
     }
+    setFormulas(formulas) {
+        this.formulas = formulas
+    }
+
+
+    /**
+     * hàm detect và xóa công thức ref
+     * Hàm sử dụng trong việc phát hiện các control trong table ảnh hưởng đến các control ngoài table
+     */
+    detectTableSQLLite(script, listTableName) {
+        let s = script.replace(/ref\((?:[^)(]+|\((?:[^)(]+|\([^)(]*\))*\))*\)/gm, "");
+        let wordArr = s.split(' ');
+        let listTableSource = [];
+        for (let i = 0; i < listTableName.length; i++) {
+            if (wordArr.indexOf(listTableName[i]) != -1) {
+                listTableSource.push(listTableName[i]);
+            }
+        }
+        return (listTableSource.length > 0) ? listTableSource : false;
+    }
+    detectControlInTable(mapControlEffected, name, script, listInputInDocument) {
+        let s = script.replace(/ref\((?:[^)(]+|\((?:[^)(]+|\([^)(]*\))*\))*\)/gm, "");
+        s = s.replace(/{.}/gm, "");
+        let listWord = s.match(/[A-Za-z0-9_]+/g);
+        for (let controlName in listInputInDocument) {
+            if (listWord.indexOf(controlName) != -1) {
+                if (
+                    mapControlEffected[controlName] == undefined
+                ) {
+                    mapControlEffected[controlName] = {};
+                }
+                mapControlEffected[controlName][name] = true
+            }
+        }
+
+    }
 
 
 
