@@ -30,7 +30,7 @@ export default class Formulas {
          * Hàm xử lí việc thay các giá trị vào {control} và tách công thức server để chạy trước nếu có
          * @param {Object} dataInput 
          */
-    async handleBeforeRunFormulas(dataInput) {
+    async handleBeforeRunFormulas(dataInput, inject = "") {
             let listSyql = this.getReferenceFormulas();
             let script = this.formulas;
             if (listSyql != null && listSyql.length > 0) {
@@ -55,7 +55,7 @@ export default class Formulas {
                 }
             } else {
                 let formulas = this.replaceParamsToData(dataInput, this.formulas);
-                return { server: false, data: this.runSQLLiteFormulas(formulas) };
+                return { server: false, data: this.runSQLLiteFormulas(formulas, false, inject) };
             }
 
         }
@@ -143,7 +143,7 @@ export default class Formulas {
         } else {
             let formulas = this.replaceParamsToData(dataInput, this.formulas);
 
-            return this.runSQLLiteFormulas(formulas);
+            return this.runSQLLiteFormulas(formulas, true);
         }
     }
     autocompleteDetectAliasControl() {
@@ -179,9 +179,25 @@ export default class Formulas {
         /**
          * Hàm chạy công thức
          */
-    runSQLLiteFormulas(sql) {
-        return ClientSQLManager.run(this.keyInstance, sql, false);
+    runSQLLiteFormulas(sql, returnPromise = false, inject = false) {
 
+        if (inject != false) {
+            sql = sql.replace('SELECT ', 'SELECT ' + inject + ',');
+            sql = sql.replace('select ', 'select ' + inject + ',');
+        }
+
+        if (returnPromise) {
+            return new Promise((resolve, reject) => {
+                try {
+                    let data = ClientSQLManager.run(this.keyInstance, sql, false);
+                    resolve(data);
+                } catch (error) {
+                    reject(error);
+                }
+            });
+        } else {
+            return ClientSQLManager.run(this.keyInstance, sql, false);
+        }
     }
 
     getDataSubmitInStore() {
@@ -194,9 +210,6 @@ export default class Formulas {
      */
     setInputControl() {
         if (this.checkExistFormulas()) {
-            console.log('nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn');
-            console.log(this.formulas);
-            console.log('bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb');
             let allRelateName = this.formulas.match(/{[A-Za-z0-9_]+}/gi);
             if (!allRelateName) {
                 return {};
@@ -239,28 +252,34 @@ export default class Formulas {
      * Hàm sử dụng trong việc phát hiện các control trong table ảnh hưởng đến các control ngoài table
      */
     detectTableSQLLite(script, listTableName) {
-        let s = script.replace(/ref\((?:[^)(]+|\((?:[^)(]+|\([^)(]*\))*\))*\)/gm, "");
-        let wordArr = s.split(' ');
-        let listTableSource = [];
-        for (let i = 0; i < listTableName.length; i++) {
-            if (wordArr.indexOf(listTableName[i]) != -1) {
-                listTableSource.push(listTableName[i]);
+            let s = script.replace(/ref\((?:[^)(]+|\((?:[^)(]+|\([^)(]*\))*\))*\)/gm, "");
+            let wordArr = s.split(' ');
+            let listTableSource = [];
+            for (let i = 0; i < listTableName.length; i++) {
+                if (wordArr.indexOf(listTableName[i]) != -1) {
+                    listTableSource.push(listTableName[i]);
+                }
             }
+            return (listTableSource.length > 0) ? listTableSource : false;
         }
-        return (listTableSource.length > 0) ? listTableSource : false;
-    }
+        /**
+         * Hàm phát hiện công thức của control trong table ảnh hưởng đến control nào khác trong table
+         * @param {*} mapControlEffected 
+         * @param {*} name 
+         * @param {*} script 
+         * @param {*} listInputInDocument 
+         */
     detectControlInTable(mapControlEffected, name, script, listInputInDocument) {
         let s = script.replace(/ref\((?:[^)(]+|\((?:[^)(]+|\([^)(]*\))*\))*\)/gm, "");
         s = s.replace(/{.}/gm, "");
         let listWord = s.match(/[A-Za-z0-9_]+/g);
         for (let controlName in listInputInDocument) {
             if (listWord != null && listWord.indexOf(controlName) != -1) {
-                if (
-                    mapControlEffected[controlName] == undefined
-                ) {
+                if (mapControlEffected[controlName] == undefined) {
                     mapControlEffected[controlName] = {};
                 }
                 mapControlEffected[controlName][name] = true
+
             }
         }
 

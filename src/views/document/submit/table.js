@@ -4,6 +4,7 @@ import store from './../../../store/document'
 import ClientSQLManager from './clientSQLManager';
 
 import { SYMPER_APP } from './../../../main.js'
+import { Date } from 'core-js';
 /**
  * Custom render cho control percent( phần trăm) cho table
  */
@@ -30,7 +31,8 @@ Handsontable.cellTypes.registerCellType('file', {
 });
 
 let listInputInDocument = store.state.submit.listInputInDocument;
-
+//object để lưu thông tin các control ngoài table chờ để chạy công thức
+let controlOutsideWaitingRun = {}
 const MAX_TABLE_HEIGHT = 300;
 /**
  * Các loại cell mà handsontable hỗ trợ hiển thị
@@ -57,62 +59,165 @@ const INIT_NEW_LINE = 'init_new_line';
 let docStatus = 'init';
 export default class Table {
     constructor(control, tableName, keyInstance) {
-        /**
-         * Chứa object của Control tương ứng
-         */
-        this.controlObj = control;
-        /**
-         * Tên table tương ứng
-         */
-        this.tableName = tableName;
+            /**
+             * Chứa object của Control tương ứng
+             */
+            this.controlObj = control;
+            /**
+             * Tên table tương ứng
+             */
+            this.tableName = tableName;
 
 
-        /**
-         * Lưu tên cột tương ứng với số thứ tự của cột trong bảng
-         */
-        this.colName2Idx = {};
+            /**
+             * Lưu tên cột tương ứng với số thứ tự của cột trong bảng
+             */
+            this.colName2Idx = {};
 
-        /**Mẫu giá trị cho các dòng của bảng khi được thêm mới */
-        this.sampleRowValues = {};
+            /**Mẫu giá trị cho các dòng của bảng khi được thêm mới */
+            this.sampleRowValues = {};
 
-        /**
-         * object chứa tọa độ của cell và giá trị validate của cell đó, phải có cái này do handsontable chỉ có render toàn bộ bảng, chứ không render cho từng cell
-         * cấu trúc {
-         *      "row_column":{vld:true|false,msg:' thông báo lỗi'} //Chỉ cần quan tâm tới false, các trường hợp còn lại hiển thị bình thường
-         * }
-         */
-        let thisObj = this;
+            /**
+             * object chứa tọa độ của cell và giá trị validate của cell đó, phải có cái này do handsontable chỉ có render toàn bộ bảng, chứ không render cho từng cell
+             * cấu trúc {
+             *      "row_column":{vld:true|false,msg:' thông báo lỗi'} //Chỉ cần quan tâm tới false, các trường hợp còn lại hiển thị bình thường
+             * }
+             */
+            let thisObj = this;
 
-        this.validateValueMap = {};
+            this.validateValueMap = {};
 
-        /**Tổng số dòng trong table */
-        this.rowCount = 0;
-        this.tableInstance = null;
-        this.columnsInfo = null;
-        this.keyInstance = keyInstance;
-        /**Danh sách các celltpye trong table */
-        this.listCellType = {};
-        this.event = {
-            afterSelection: (row, column, row2, column2, preventScrolling, selectionLayerLevel) => {},
-            afterBeginEditing: function(row, column) {},
-            afterCreateRow: function(index, amount, source) {
+            /**Tổng số dòng trong table */
+            this.rowCount = 0;
+            this.tableInstance = null;
+            this.columnsInfo = null;
+            this.keyInstance = keyInstance;
+            /**Danh sách các celltpye trong table */
+            this.listCellType = {};
+            this.currentSelectedCell = {};
+            this.event = {
+                afterSelection: (row, column, row2, column2, preventScrolling, selectionLayerLevel) => {
+                    thisObj.currentSelectedCell['row'] = row;
+                    thisObj.currentSelectedCell['column'] = column;
 
-            },
-            afterChange: function(changes, source) {
-                let columns = thisObj.columnsInfo.columns;
-                let columnstype = columns.map(function(c) {
-                    return c.type;
-                })
-                columns = columns.map(function(c) {
-                    return c.data;
-                });
-                ClientSQLManager.delete(thisObj.keyInstance, thisObj.tableName, false);
-                ClientSQLManager.insertMultiple(thisObj.keyInstance, thisObj.tableName, columns, columnstype, thisObj.tableInstance.getData());
-                let controlName = changes[0][1];
-                SYMPER_APP.$evtBus.$emit('run-effected-control-when-table-change', { controlName: controlName, tableName: thisObj.tableName, insideTableInDoc: true })
+
+                    // ClientSQLManager.editRow(thisObj.keyInstance, )
+                },
+                afterBeginEditing: function(row, column) {
+                    thisObj.currentSelectedCell['row'] = row;
+                    thisObj.currentSelectedCell['column'] = column;
+
+                },
+                afterCreateRow: function(index, amount, source) {
+
+                },
+                afterChange: function(changes, source) {
+                    let controlName = changes[0][1];
+                    if (controlName != 's_table_id_sql_lite') {
+                        let columns = thisObj.columnsInfo.columns;
+                        columns = columns.map(function(c) {
+                            return c.data;
+                        });
+                        let currentRowData = thisObj.tableInstance.getDataAtRow(thisObj.currentSelectedCell['row']);
+                        for (let index = 0; index < currentRowData.length; index++) {
+                            let cell = currentRowData[index];
+                            if (cell == "" || cell == null) {
+                                currentRowData[index] = 'NULL';
+                            } else {
+                                currentRowData[index] = '"' + currentRowData[index] + '"'
+                            }
+                        }
+                        if (currentRowData[currentRowData.length - 1] == 'NULL') {
+                            let id = Date.now();
+                            currentRowData[currentRowData.length - 1] = id;
+                            thisObj.tableInstance.setDataAtCell(thisObj.currentSelectedCell['row'], currentRowData.length - 1, id);
+                            ClientSQLManager.insertRow(thisObj.keyInstance, thisObj.tableName, columns, currentRowData, true).then(res => {
+                                let s = ClientSQLManager.get(thisObj.keyInstance, "select * from " + thisObj.tableName);
+                                console.log(s);
+
+                                thisObj.handlerCheckEffectedControlInTable(controlName);
+                            });
+                        } else {
+                            console.log(changes);
+
+                            ClientSQLManager.editRow(thisObj.keyInstance, thisObj.tableName, controlName, changes[changes.length - 1][3],
+                                'WHERE s_table_id_sql_lite = ' + currentRowData[currentRowData.length - 1]).then(res => {
+                                let s = ClientSQLManager.get(thisObj.keyInstance, "select * from " + thisObj.tableName);
+                                console.log(s);
+                                thisObj.handlerCheckEffectedControlInTable(controlName);
+                            });
+                        }
+
+                    }
+                }
             }
         }
+        /**
+         * Hàm xử lí tìm các control bị ảnh hưởng sau khi  change 1 control trong table và chạy công thức cho các control bị ảnh hưởng đó
+         * @param {String} controlName Control bị thay đổi dữ liệu
+         */
+    handlerCheckEffectedControlInTable(controlName) {
+            let controlInstance = listInputInDocument[controlName];
+            if (controlInstance == null || controlInstance == undefined) {
+                return;
+            }
+            let controlEffected = controlInstance.getEffectedControl();
+            if (Object.keys(controlEffected).length > 0) {
+                for (let i in controlEffected) {
+                    let controlEffectedInstance = listInputInDocument[i];
+                    let formulasInstance = controlEffectedInstance.controlFormulas['formulas'].instance;
+                    let inputControl = formulasInstance.getInputControl();
+                    let dataInput = {};
+                    for (let inputControlName in inputControl) {
+                        let valueInputControlItem = listInputInDocument[inputControlName].value;
+                        dataInput[inputControlName] = valueInputControlItem;
+                    }
+                    if (controlEffectedInstance.hasOwnProperty('inTable')) {
+                        if (controlEffectedInstance.inTable == this.tableName) {
+                            this.handlerRunFormulasForControlInTable(controlEffectedInstance.name, dataInput, formulasInstance);
+                        } else {
+
+                        }
+                    } else {
+                        controlOutsideWaitingRun[i] = controlEffectedInstance;
+                    }
+                }
+            }
+
+        }
+        /**
+         * Hàm xử lí query dữ liệu  từ bảng sqllite
+         * @param {*} controlEffectedInstance   Object của 1 control bị ảnh hưởng
+         * @param {*} dataInput    dữ liệu đầu vào cho công  thức
+         * @param {*} formulasInstance  Object cua formulas giá trị của control bị ảnh hưởng
+         */
+    handlerRunFormulasForControlInTable(controlEffectedName, dataInput, formulasInstance) {
+            let thisObj = this;
+            setTimeout(() => {
+                formulasInstance.handleBeforeRunFormulas(dataInput, "s_table_id_sql_lite").then(res => {
+                    // console.log(controlEffectedName, res);
+
+                    thisObj.handlerSetDataToColumnAfterRunFormulas(res.data, controlEffectedName);
+                })
+            }, 20);
+        }
+        /**
+         * Hàm lấy dữ liệu hiện tại của table và insert vào sql lite table
+         */
+    handlerSetDataToColumnAfterRunFormulas(data, controlEffectedName) {
+        let values = data[0].values;
+        let vls = [];
+        for (let index = 0; index < values.length; index++) {
+            let row = values[index];
+            vls.push([index, controlEffectedName, row[1]]);
+
+        }
+        this.tableInstance.setDataAtRowProp(vls, null, null, AUTO_SET);
+        for (let control in controlOutsideWaitingRun) {
+            SYMPER_APP.$evtBus.$emit('run-effected-control-when-table-change', { control: controlOutsideWaitingRun[control] })
+        }
     }
+
     render() {
         let thisObj = this;
         let tableContainer = $('<div id="' + thisObj.controlObj.id + '" s-control-type="table"></div>')[0];
@@ -254,14 +359,16 @@ export default class Table {
             Handsontable.hooks.add(evtName, thisObj.event[evtName], this.tableInstance);
         }
     }
-    getColumnsInfo() {
 
+    /**
+     * Hàm lấy thông tin của các cột
+     */
+    getColumnsInfo() {
         let thisObj = this
         let headerName = [];
         let columns = [];
         let hiddenColumns = [];
         let num = 0;
-
         let ths = thisObj.controlObj.ele.find('th');
         for (let controlName in thisObj.controlObj.listInsideControls) {
             headerName.push($(ths[num]).text());
@@ -282,7 +389,9 @@ export default class Table {
             num += 1;
 
         }
-
+        // thêm cột ẩn là id của sqllite
+        columns.push({ data: 's_table_id_sql_lite', type: 'numeric' });
+        hiddenColumns.push(columns.length - 1);
         return {
             headerNames: headerName,
             columns: columns,
@@ -310,10 +419,6 @@ export default class Table {
             rsl.timeFormat = 'HH:mm:ss',
                 rsl.correctFormat = true;
         }
-        console.log(type);
-
-        console.log(supportCellsType[type]);
-
         rsl.type = Util.toLowerCaseFirstCharacter(supportCellsType[type].replace('Renderer', ''));
         console.log(rsl);
 
