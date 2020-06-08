@@ -35,31 +35,48 @@ export default {
             this.definitionModel = definitionModel;
             this.taskInfo.docId = Number(definitionModel.mainProcess.initialFlowElement.formKey);
         },
+        getValueForVariable(value, type){
+            if(type == 'string'){
+                return String(value);
+            }else if(type == 'integer'){
+                return isNaN(Number(value)) ? 0 : Number(value);
+            }else{
+                return value;
+            }
+        },
         async saveTaskOutcome(outcomeData){
             let processDef = await BPMNEApi.getDefinitionData(this.$route.params.id);
             let vars = []; // các biến cần đưa vào process instance
-            let startNode =  definitionModel.mainProcess.initialFlowElement;
+            let startNode =  this.definitionModel.mainProcess.initialFlowElement;
             let startNodeId = startNode.id;
             try {
-                let ctrls = await documentApi.detailDocument(startNode.formKey).data.fields;
+                let ctrls = await documentApi.detailDocument(startNode.formKey);
+                ctrls = ctrls.data.fields;
                 let ctrlsMap = Object.values(ctrls).reduce((map, el, idx)=>{
-                    map[el.name] = el;
+                    map[el.properties.name] = el;
                     return map;
                 }, {});
 
                 for(let ctrlName in outcomeData ){
                     if(typeof outcomeData[ctrlName] != 'object'){
+                        let ctrlType = 'string';
+                        if(ctrlsMap[ctrlName]){
+                            ctrlType = this.getVarType(ctrlsMap[ctrlName].type)
+                        }
+
+                        let value = this.getValueForVariable(outcomeData[ctrlName], ctrlType);
                         vars.push({
                             name: startNodeId+'.'+ctrlName,
-                            type: this.getVarType(ctrlsMap[ctrlName].type),
-                            value: outcomeData[ctrlName]
+                            type: ctrlType,
+                            value: value
                         });    
                     }
                 }
-                let newProcessInstance = await runProcessDefinition(this, processDef, vars);
+                // let newProcessInstance = await runProcessDefinition(this, processDef, vars);
+                let newProcessInstance = await runProcessDefinition(this, processDef, []);
                 this.$snotifySuccess("Task submited successfully");
             } catch (error) {
-                
+                this.$snotifyError(error ,"Error on run process definition ");
             }
         },
         getVarType(originType){
@@ -67,7 +84,9 @@ export default {
                 number: true,
                 percent: true,
             };
-            return numberTypes[originType] ? 'number' : 'string';
+            console.log(originType, numberTypes[originType] ? 'integer' : 'string');
+            
+            return numberTypes[originType] ? 'integer' : 'string'; // hoặc date
         },
         handleTaskSubmited(outcomeData){
             this.saveTaskOutcome(outcomeData);
