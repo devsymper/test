@@ -530,6 +530,7 @@ export default {
             let dataPost = this.getDataPostSubmit();
             dataPost['id'] = this.documentId;
             documentApi.submitDocument(dataPost).then(res => {
+                thisCpn.$emit('submit-document-success',res.data);
                 thisCpn.isSubmitting = false;
                 if (res.status == 200) {
                     thisCpn.$snotify({
