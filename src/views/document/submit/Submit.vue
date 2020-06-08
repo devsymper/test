@@ -114,11 +114,7 @@ export default {
         }
     },
     name: "submitDocument",
-    watch: {
-        $route(to) {
-            console.log(to);
-        }
-    },
+
     components: {
         validate: Validate,
         "user-select": User,
@@ -184,14 +180,13 @@ export default {
 
     created() {
         let thisCpn = this;
-        this.createSQLLiteDB();
         if (this.docId != 0) {
             this.documentId = this.docId;
         } else if (this.$route.name == "submitDocument") {
             this.documentId = this.$route.params.id;
         }
-        
-
+        if(this.documentId != null)
+        this.loadDocumentData();
         this.$evtBus.$on("document-submit-autocomplete-input", e => {
             thisCpn.$refs.autocompleteInput.show(e);
         });
@@ -208,7 +203,7 @@ export default {
         });
         this.$evtBus.$on("run-effected-control-when-table-change", e => {
             thisCpn.handleControlInputChange(e.tableName);
-            thisCpn.handleControlInputChange(e.controlName,true);
+            // thisCpn.handleControlInputChange(e.controlName,true);
         });
         this.$evtBus.$on("document-submit-open-validate", e => {
             thisCpn.$refs.validate.show(e);
@@ -296,7 +291,8 @@ export default {
             return {headers:headers,dataBody:data}
         },
         // Khadm: load data của document lên để hiển thị và xử lý
-        loadDocumentData() {
+        async loadDocumentData() {
+            await ClientSQLManager.createDB(this.keyInstance);
             if (this.documentId) {
                 let thisCpn = this;
                 documentApi
@@ -440,10 +436,10 @@ export default {
         /**
          * Hàm tạo csql
          */
-        async createSQLLiteDB() {
-            await ClientSQLManager.createDB(this.keyInstance);
-            this.loadDocumentData();
-        },
+        // async createSQLLiteDB() {
+            
+        //     this.loadDocumentData();
+        // },
         createDocumentSQLLiteTable(){
             ClientSQLManager.createTable(this.keyInstance, 'this_document', this.columnsSQLLiteDocument);
         },
@@ -488,8 +484,12 @@ export default {
                                 }
                                 mapControlEffected[controlEffect][name] = true;
                             }
-                            this.detectControlEffectedFromTableInDoc(mapControlEffected, name,formulas[formulasType].instance);
-                            this.detectControlEffectedInTableInDoc(mapControlEffected, name,formulas[formulasType].instance);
+                            // if(allControl[name].hasOwnProperty('inTable') && allControl[name].inTable != undefined){
+                            //     console.log(name,'xxxxx');
+                                
+                            //     // this.detectControlEffectedFromTableInDoc(mapControlEffected, name, formulas[formulasType].instance);
+                            // }
+                            this.detectControlEffectedInTableInDoc(mapControlEffected, name, formulas[formulasType].instance);
                         }
                         
                     }
@@ -620,15 +620,15 @@ export default {
          * hàm được gọi khi input change, lấy ra các instance của control bị ảnh hưởng và chạy công thức cho các control đó
          * nếu có insideTableInDoc thì công thức từ nội bộ của bảng
          */
-        handleControlInputChange(controlName,insideTableInDoc = false){
+        handleControlInputChange(controlName){
             let controlInstance = this.sDocumentSubmit.listInputInDocument[controlName];
             let controlEffected = controlInstance.getEffectedControl();
-            this.runFormulasControlEffected(controlName,controlEffected,insideTableInDoc);
+            this.runFormulasControlEffected(controlName,controlEffected);
         },
         /**
          * Hàm xử lí duyêt các control bị ảnh hưởng trong 1 công thức bởi 1 control nào đó và thực hiện chạy các công thức của control đó
          */
-        runFormulasControlEffected(controlName, controlEffected,insideTableInDoc = false){
+        runFormulasControlEffected(controlName, controlEffected){
             if(Object.keys(controlEffected).length > 0){
                 for(let i in controlEffected){
                     let controlEffectedInstance = this.sDocumentSubmit.listInputInDocument[i];
@@ -644,7 +644,7 @@ export default {
                                 let dataInput = this.getDataInputFormulas(formulasInstance);    
                                 switch (formulasType) {
                                     case "formulas":
-                                        this.handleRunFormulasValue(dataInput,formulasInstance,controlId,controlName,insideTableInDoc);
+                                        this.handleRunFormulasValue(dataInput,formulasInstance,controlId,controlName);
                                         break;
                                     case "link":
                                         break;
@@ -691,7 +691,7 @@ export default {
         /**
          * Hàm xử lí chạy công thức giá trị của control, kết quả trả về được gán lại dữ liệu cho input
          */
-        handleRunFormulasValue(dataInput,formulasInstance,controlId,controlName="",insideTableInDoc = false){
+        handleRunFormulasValue(dataInput,formulasInstance,controlId,controlName=""){
             
             formulasInstance.handleBeforeRunFormulas(dataInput).then(rs=>{
                 if($('#'+controlId).length > 0){
@@ -715,9 +715,7 @@ export default {
                     }
                 }
                 else{
-                    if(insideTableInDoc){
-                        // this.sDocumentSubmit.listInputInDocument[controlName].tableInstance.setColValues(rs.data[0].columns[0],rs.data[0].values);
-                    }
+                
                 }
                 
                 
