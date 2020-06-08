@@ -254,7 +254,7 @@ export default class Formulas {
         s = s.replace(/{.}/gm, "");
         let listWord = s.match(/[A-Za-z0-9_]+/g);
         for (let controlName in listInputInDocument) {
-            if (listWord.indexOf(controlName) != -1) {
+            if (listWord != null && listWord.indexOf(controlName) != -1) {
                 if (
                     mapControlEffected[controlName] == undefined
                 ) {
