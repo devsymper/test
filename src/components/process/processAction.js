@@ -6,15 +6,27 @@ function cleanContent(content) {
     xmlns:xsd="http://www.w3.org/2001/XMLSchema"
     xmlns:symper="http://symper.org/bpmn"
     xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.symper.org/processdef">`;
-    return content
+    let rsl = content
         .replace(/↵+/, ' ')
-        .replace(/<symper:+/g, '<')
-        .replace(/<\/symper:+/g, '</')
         .replace(/\bbpmn:/g, '')
         .replace(/<di:/g, '<omgdi:')
         .replace(/<dc:/g, '<omgdc:')
         .replace(/symper_prefix_chars_/g, 'symper:')
         .replace(/definitions (.*?)+\>/, ns);
+
+    let symperMatches = rsl.match(/<symper:([a-zA-Z0-9_]+)/g);
+    symperMatches.forEach(element => {
+        if (element != '<symper:formProperty') {
+            rsl = rsl.replace(element, "<" + element.split(':')[1]);
+        }
+    });
+    symperMatches = rsl.match(/<\/symper:([a-zA-Z0-9_]+)/g);
+    symperMatches.forEach(element => {
+        if (element != '</symper:formProperty') {
+            rsl = rsl.replace(element, "</" + element.split(':')[1]);
+        }
+    });
+    return rsl;
 }
 
 export const deployProcess = function(self, processData) {

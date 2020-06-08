@@ -250,7 +250,8 @@ export default {
             for(let elName in allSymEls){
                 jsonConfig[elName] = {};
                 for(let attrName in allSymEls[elName].attrs){
-                    jsonConfig[elName][attrName] = allSymEls[elName].attrs[attrName].value;
+                    let attr = allSymEls[elName].attrs[attrName];
+                    jsonConfig[elName][attrName] = attr.getValue(attr.value);
                 }
             }
             let modelDataAsFlowable = this.getModelData();

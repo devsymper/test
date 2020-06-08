@@ -384,21 +384,29 @@ let allAttrs = {
     "formproperties": {
         "title": "Form properties",
         "type": "table",
-        "value": [],
+        "value": [{
+            id: 'form_id',
+            name: 'form_id',
+            type: 'string',
+            variable: 'symper_form_id_alter',
+            expression: '',
+            default: '',
+            text: ''
+        }],
         "info": "BPMN.PROPERTYPACKAGES.FORMPROPERTIESPACKAGE.FORMPROPERTIES.DESCRIPTION",
         "dg": "detail",
         "columns": [],
         hidden: true,
         getValue(value) {
-            if ($.isArray(value)) {
-                if (!value.length || $.isEmptyObject(value[0])) {
-                    return '';
-                } else {
-                    return value;
-                }
-            } else {
-                return '';
-            }
+            return [{
+                id: 'form_id',
+                name: 'form_id',
+                type: 'string',
+                variable: 'symper_form_id_alter',
+                expression: '',
+                default: '',
+                text: ''
+            }]
         },
         restoreData(value) {
             return value == '' ? [] : value;
@@ -409,37 +417,42 @@ let allAttrs = {
             "superClass": ["Element"],
             "properties": [{
                     "name": "id",
-                    "isBody": true,
+                    "isAttr": true,
                     "type": "String"
                 },
                 {
                     "name": "name",
-                    "isBody": true,
+                    "isAttr": true,
                     "type": "String"
                 },
                 {
                     "name": "type",
-                    "isBody": true,
+                    "isAttr": true,
                     "type": "String"
                 },
                 {
                     "name": "expression",
-                    "isBody": true,
+                    "isAttr": true,
                     "type": "String"
                 },
                 {
                     "name": "variable",
-                    "isBody": true,
+                    "isAttr": true,
                     "type": "String"
                 },
                 {
                     "name": "default",
+                    "isAttr": true,
+                    "type": "String"
+                },
+                {
+                    "name": "text",
                     "isBody": true,
                     "type": "String"
                 },
             ]
         },
-        pushToXML: attrToXMLMethods.notPushToXML
+        pushToXML: attrToXMLMethods.formPropertyMethod
     },
     "formkeydefinition": {
         "title": "Form key",
@@ -1564,7 +1577,8 @@ let allAttrs = {
             "name": "formreference",
             "isAttr": true,
             "type": "String"
-        }
+        },
+        pushToXML: attrToXMLMethods.notPushToXML
     },
     "terminateAll": {
         "title": "Terminate all",

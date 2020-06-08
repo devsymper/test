@@ -73,19 +73,25 @@ export default {
     },
 
     formPropertyMethod(el, elKey, attr, bpmnModeler, attrName) {
+
         let moddle = bpmnModeler.get('moddle');
         let modeling = bpmnModeler.get('modeling');
         let extensionElements = moddle.create('bpmn:ExtensionElements');
-
-        for (let row of attr.value) {
+        extensionElements.values = [];
+        for (let row of attr.getValue()) {
             let subEl = moddle.create('symper:formProperty');
             for (let key in row) {
-                subEl[key] = row[key];
+                let vl = row[key];
+                if (key != 'type') {
+                    vl = vl == '' ? '' : (vl + Date.now());
+                }
+                subEl[key] = vl;
             }
-            extensionElements.get('values').push(subEl);
+            extensionElements.values.push(subEl);
         }
+        console.log(el, extensionElements, attrName, 'formPropertyMethodformPropertyMethodformPropertyMethod');
         modeling.updateProperties(el, {
-            extensionElements,
+            extensionElements
         });
     },
 
