@@ -21,6 +21,8 @@ export const pushCustomElementsToModel = function(allVizEls, allSymEls, bpmnMode
             vizEl[elKey] = removeOldSymperExts(vizEl[elKey]);
         }
 
+        addCustomPropsToForm(allSymEls[bizVizEl.id]);
+
         for (let attrName in attrs) {
             let attrDef = allNodesAttrs[attrName];
             if (typeof attrDef.pushToXML == 'function') {
@@ -30,6 +32,29 @@ export const pushCustomElementsToModel = function(allVizEls, allSymEls, bpmnMode
     }
 }
 
+/**
+ * 
+ * @param {Object} symEl object chứa thông tin của element do Symper quy định
+ */
+function addCustomPropsToForm(symEl) {
+    debugger
+    if (symEl.type == 'StartNoneEvent' || symEl.type == 'UserTask') {
+        for (let attrName in symEl.attrs) {
+            let attr = symEl.attrs[attrName];
+            if (attr.isSymperProp) {
+                symEl.attrs.formproperties.value.push({
+                    id: symEl.id + '___' + attrName,
+                    name: symEl.id + '___' + attrName,
+                    type: 'string',
+                    variable: symEl.id + '___' + attrName,
+                    expression: '',
+                    default: typeof attr.value == 'object' ? JSON.stringify(attr.value) : attr.value,
+                    text: ''
+                });
+            }
+        }
+    }
+}
 
 function removeOldSymperExts(els) {
     let newArr = [];

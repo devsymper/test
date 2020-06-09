@@ -287,8 +287,6 @@ export default {
             let allSymEls = this.stateAllElements;
             let bpmnModeler = this.$refs.symperBpmn.bpmnModeler;
             pushCustomElementsToModel(allVizEls, allSymEls,  bpmnModeler);
-
-
             let xml = this.$refs.symperBpmn.getXML();
             console.log(xml,'xmlxmlxmlxmlxmlxmlxml');
             let jsonConfig = {};

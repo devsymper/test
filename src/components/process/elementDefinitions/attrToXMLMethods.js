@@ -78,7 +78,7 @@ export default {
         let modeling = bpmnModeler.get('modeling');
         let extensionElements = moddle.create('bpmn:ExtensionElements');
         extensionElements.values = [];
-        for (let row of attr.getValue()) {
+        for (let row of attr.getValue(attr.value)) {
             let subEl = moddle.create('symper:formProperty');
             for (let key in row) {
                 let vl = row[key];

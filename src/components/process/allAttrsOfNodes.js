@@ -384,30 +384,11 @@ let allAttrs = {
     "formproperties": {
         "title": "Form properties",
         "type": "table",
-        "value": [{
-            id: 'form_id',
-            name: 'form_id',
-            type: 'string',
-            variable: 'symper_form_id_alter',
-            expression: '',
-            default: '',
-            text: ''
-        }],
+        "value": [],
         "info": "BPMN.PROPERTYPACKAGES.FORMPROPERTIESPACKAGE.FORMPROPERTIES.DESCRIPTION",
         "dg": "detail",
         "columns": [],
         hidden: true,
-        getValue(value) {
-            return [{
-                id: 'form_id',
-                name: 'form_id',
-                type: 'string',
-                variable: 'symper_form_id_alter',
-                expression: '',
-                default: '',
-                text: ''
-            }]
-        },
         restoreData(value) {
             return value == '' ? [] : value;
         },
@@ -1673,7 +1654,8 @@ let allAttrs = {
             },
         ],
         dg: 'taskAction',
-
+        isSymperProp: true,
+        pushToXML: attrToXMLMethods.notPushToXML
     },
     approvalActions: { // BA tự cấu hình các hành động cho việc duyệt
         title: 'Outcomes',
@@ -1735,7 +1717,9 @@ let allAttrs = {
                 source: ["yellow", "red", "orange", "green", "blue", "gray", "black", "white"]
             },
         ],
-        dg: 'taskAction'
+        dg: 'taskAction',
+        isSymperProp: true,
+        pushToXML: attrToXMLMethods.notPushToXML
     },
     assignee: {
         title: 'Assignee',
@@ -1752,7 +1736,10 @@ let allAttrs = {
             "name": "sym_assignee",
             "isAttr": true,
             "type": "String"
-        }
+        },
+        isSymperProp: true,
+        pushToXML: attrToXMLMethods.notPushToXML
+
     },
     taskOwner: {
         title: 'Task owner',
@@ -1763,7 +1750,10 @@ let allAttrs = {
             orgchartSelectorValue: [] // dạng value của orgchartselector để hiển thị lên
         },
         activeTab: 'orgchart', // tab nào sẽ mở: orgchart hoặc script
-        dg: 'assignment'
+        dg: 'assignment',
+        isSymperProp: true,
+        pushToXML: attrToXMLMethods.notPushToXML
+
     },
     candidateUsers: {
         title: 'Candidate users',
@@ -1773,7 +1763,10 @@ let allAttrs = {
             formula: ''
         },
         activeTab: 'orgchart', // tab nào sẽ mở: orgchart hoặc script
-        dg: 'assignment'
+        dg: 'assignment',
+        isSymperProp: true,
+        pushToXML: attrToXMLMethods.notPushToXML
+
     },
 
     notificationTitle: {
@@ -1781,14 +1774,20 @@ let allAttrs = {
         type: 'script',
         value: '',
         info: '',
-        dg: 'formula'
+        dg: 'formula',
+        isSymperProp: true,
+        pushToXML: attrToXMLMethods.notPushToXML
+
     },
     notificationContent: {
         title: 'Notification and task content',
         type: 'script',
         value: '',
         info: '',
-        dg: 'formula'
+        dg: 'formula',
+        isSymperProp: true,
+        pushToXML: attrToXMLMethods.notPushToXML
+
     },
 
     approvalForElement: {
@@ -1798,7 +1797,10 @@ let allAttrs = {
         info: '',
         options: [],
         dg: 'taskAction',
-        showId: false
+        showId: false,
+        isSymperProp: true,
+        pushToXML: attrToXMLMethods.notPushToXML
+
     },
     controlsForBizKey: {
         title: 'Select control for business key',
@@ -1807,7 +1809,8 @@ let allAttrs = {
         info: '',
         options: [],
         dg: 'detail',
-
+        isSymperProp: true,
+        pushToXML: attrToXMLMethods.notPushToXML
     },
     instanceDisplayText: {
         title: 'Display text for process instance',
@@ -1815,7 +1818,8 @@ let allAttrs = {
         value: '',
         info: '',
         dg: 'detail',
-
+        isSymperProp: true,
+        pushToXML: attrToXMLMethods.notPushToXML
     },
 }
 
