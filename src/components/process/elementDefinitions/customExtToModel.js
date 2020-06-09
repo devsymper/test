@@ -37,7 +37,6 @@ export const pushCustomElementsToModel = function(allVizEls, allSymEls, bpmnMode
  * @param {Object} symEl object chứa thông tin của element do Symper quy định
  */
 function addCustomPropsToForm(symEl) {
-    debugger
     if (symEl.type == 'StartNoneEvent' || symEl.type == 'UserTask') {
         for (let attrName in symEl.attrs) {
             let attr = symEl.attrs[attrName];

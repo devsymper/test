@@ -735,8 +735,8 @@ export default {
                 let docDetail = await documentApi.detailDocument(docId);
                 let controls = Object.values(docDetail.data.fields).reduce((arr, el, idx)=>{
                     arr.push({
-                        id: el.name,
-                        title: el.title
+                        id: el.properties.name,
+                        title: el.properties.title
                     });
                     return arr;
                 }, []);
