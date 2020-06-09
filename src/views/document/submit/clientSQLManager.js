@@ -76,7 +76,7 @@ export default class ClientSQLManager {
 
     }
     static async editRow(keyInstance, tableName, column, value, where, returnPromise = false) {
-        let sql = `UPDATE ${tableName} SET ${column} = ${value} ${where}`;
+        let sql = `UPDATE ${tableName} SET ${column} = "${value}" ${where}`;
         if (returnPromise) {
             return new Promise((resolve, reject) => {
                 try {

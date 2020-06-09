@@ -1,6 +1,7 @@
 import Util from './util'
 import Handsontable from 'handsontable';
 import store from './../../../store/document'
+import s from './../../../store'
 import ClientSQLManager from './clientSQLManager';
 
 import { SYMPER_APP } from './../../../main.js'
@@ -97,10 +98,8 @@ export default class Table {
             this.currentSelectedCell = {};
             this.event = {
                 afterSelection: (row, column, row2, column2, preventScrolling, selectionLayerLevel) => {
-                    thisObj.currentSelectedCell['row'] = row;
-                    thisObj.currentSelectedCell['column'] = column;
-
-
+                    // thisObj.currentSelectedCell['row'] = row;
+                    // thisObj.currentSelectedCell['column'] = column;
                     // ClientSQLManager.editRow(thisObj.keyInstance, )
                 },
                 afterBeginEditing: function(row, column) {
@@ -127,23 +126,25 @@ export default class Table {
                                 currentRowData[index] = '"' + currentRowData[index] + '"'
                             }
                         }
+                        s.commit("document/updateListInputInDocument", {
+                            controlName: controlName,
+                            key: 'value',
+                            value: changes[changes.length - 1][3]
+                        });
                         if (currentRowData[currentRowData.length - 1] == 'NULL') {
                             let id = Date.now();
                             currentRowData[currentRowData.length - 1] = id;
+
                             thisObj.tableInstance.setDataAtCell(thisObj.currentSelectedCell['row'], currentRowData.length - 1, id);
                             ClientSQLManager.insertRow(thisObj.keyInstance, thisObj.tableName, columns, currentRowData, true).then(res => {
                                 let s = ClientSQLManager.get(thisObj.keyInstance, "select * from " + thisObj.tableName);
-                                console.log(s);
 
                                 thisObj.handlerCheckEffectedControlInTable(controlName);
                             });
                         } else {
-                            console.log(changes);
-
-                            ClientSQLManager.editRow(thisObj.keyInstance, thisObj.tableName, controlName, changes[changes.length - 1][3],
+                            ClientSQLManager.editRow(thisObj.keyInstance, thisObj.tableName, controlName, changes[thisObj.currentSelectedCell['row']][3],
                                 'WHERE s_table_id_sql_lite = ' + currentRowData[currentRowData.length - 1]).then(res => {
                                 let s = ClientSQLManager.get(thisObj.keyInstance, "select * from " + thisObj.tableName);
-                                console.log(s);
                                 thisObj.handlerCheckEffectedControlInTable(controlName);
                             });
                         }
@@ -194,9 +195,7 @@ export default class Table {
     handlerRunFormulasForControlInTable(controlEffectedName, dataInput, formulasInstance) {
             let thisObj = this;
             setTimeout(() => {
-                formulasInstance.handleBeforeRunFormulas(dataInput, "s_table_id_sql_lite").then(res => {
-                    // console.log(controlEffectedName, res);
-
+                formulasInstance.handleBeforeRunFormulas(dataInput).then(res => {
                     thisObj.handlerSetDataToColumnAfterRunFormulas(res.data, controlEffectedName);
                 })
             }, 20);
@@ -206,12 +205,16 @@ export default class Table {
          */
     handlerSetDataToColumnAfterRunFormulas(data, controlEffectedName) {
         let values = data[0].values;
+        console.log(values);
+
         let vls = [];
         for (let index = 0; index < values.length; index++) {
             let row = values[index];
-            vls.push([index, controlEffectedName, row[1]]);
+            vls.push([index, controlEffectedName, row[0]]);
 
         }
+        console.log(vls);
+
         this.tableInstance.setDataAtRowProp(vls, null, null, AUTO_SET);
         for (let control in controlOutsideWaitingRun) {
             SYMPER_APP.$evtBus.$emit('run-effected-control-when-table-change', { control: controlOutsideWaitingRun[control] })
