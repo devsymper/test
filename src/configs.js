@@ -15,7 +15,8 @@ export const appConfigs = {
             definitions: "https://v2.symper.vn:8443/symper-rest/service/repository/process-definitions",
             instances: "https://v2.symper.vn:8443/symper-rest/service/runtime/process-instances",
             history: "https://v2.symper.vn:8443/symper-rest/service/history",
-            tasks: "https://v2.symper.vn:8443/symper-rest/service/runtime/tasks"
+            tasks: "https://v2.symper.vn:8443/symper-rest/service/runtime/tasks",
+            validateModel: "https://v2.symper.vn:8443/symper-modeler/api/editor/validate-model"
         },
         documents: 'https://v2hoangnd.dev.symper.vn/document',
         formulasService: 'https://v2datnt.dev.symper.vn/',

@@ -130,13 +130,58 @@ export default {
             this.attrPannelHeight = (util.getComponentSize(this).h - 50)+'px';
         },
         /**
+         * Validate 
+         */
+        async validateDeployData(){
+            let self = this;
+            return new Promise((resolve, reject) => {
+                let validateData = self.getAllElementData();
+                // validateData = JSON.parse();
+                bpmnApi.validateModel(JSON.stringify(validateData)).then((validateResult) => {
+                    if(validateResult.length == 0){
+                        resolve();
+                    }else{
+                        for(let err of validateResult){
+                            self.$snotify({
+                                title: "Validate failed",
+                                type: 'warn',
+                                duration: 120000,
+                                text: err.defaultDescription,
+                                actionBtns: [
+                                    {
+                                        text: "Go to element",
+                                        icon: "mdi-send-check",
+                                        action: (close) => {
+                                            let symperBpmn = self.$refs.symperBpmn;
+                                            let errEl = symperBpmn.getElData(err.activityId)
+                                            symperBpmn.bpmnModeler.get('selection').select(errEl);
+                                            self.handleNodeSelected(errEl.businessObject);
+                                            close();
+                                        }
+                                    }
+                                ]
+                            });
+                        }
+                        reject({
+                            title: "Validate failed wwhen checking for deployment"
+                        });
+                    }
+                }).catch((err) => {
+                    self.$snotifyError(err, "Error on validate deploy data!" );
+                });
+            });
+        },
+        /**
          * Validate toàn bộ data của model
          * @param {Function} success hành động khi validate và ko phát hiện ra lỗi
          * @param {Function} fail hành động khi có lỗi xảy ra
          */
         validateModel(success, fail) {
             let self = this;
-            let checkArr = [this.checkModelName()];
+            let checkArr = [
+                this.checkModelName(),
+                this.validateDeployData()
+            ];
             Promise.all(checkArr)
                 .then(rsl => {
                     if (typeof success == "function") {

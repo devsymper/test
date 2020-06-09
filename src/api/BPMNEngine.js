@@ -5,7 +5,7 @@ import { util } from "../plugins/util";
 var bpmneApi = new Api(appConfigs.apiDomain.bpmne.models); // Khởi tạo một đối tượng api với domain của service BPMNE
 
 // Phục vụ cho việc test
-let fullCookieTest = "__cfduid=d7930d57921d3b5a2ec601b154400395a1571850128;FLOWABLE_REMEMBER_ME=UzY2S1JCNlp3VE1WSnZHb1ZSTndwZyUzRCUzRDpKWkVudjRxZHVyOWJDVEJDJTJCRThGa2clM0QlM0Q";
+let fullCookieTest = "abc=xyz;FLOWABLE_REMEMBER_ME=YWNLNEUwTHlxbGNoQThEcUV4RTlpQSUzRCUzRDpsZUJRVTlTOSUyQnF5YzBCblNFZzdLQ3clM0QlM0Q";
 fullCookieTest.split(';').forEach((el) => {
     document.cookie = el.trim();
 });
@@ -35,6 +35,9 @@ export default {
     },
     updateModel(data, idModel) {
         return bpmneApi.put(`${idModel}`, data);
+    },
+    validateModel(data) {
+        return bpmneApi.post(appConfigs.apiDomain.bpmne.validateModel, data, testHeader);
     },
     getModelData(modelId) {
         return bpmneApi.get(modelId);
