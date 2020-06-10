@@ -10,6 +10,9 @@ export const documentApi = {
     editDocument(data) {
         return coreApi.put("document", data);
     },
+    deleteDocument(name) {
+        return coreApi.delete("/document/drop/" + name);
+    },
     detailDocument(id) {
         return coreApi.get("document/detail/" + id);
     },

@@ -185,7 +185,6 @@ export default class Formulas {
             sql = sql.replace('SELECT ', 'SELECT ' + inject + ',');
             sql = sql.replace('select ', 'select ' + inject + ',');
         }
-
         if (returnPromise) {
             return new Promise((resolve, reject) => {
                 try {
