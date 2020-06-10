@@ -273,15 +273,7 @@ let allAttrs = {
             },
         ],
         getValue(value) {
-            if ($.isArray(value)) {
-                if (!value.length || $.isEmptyObject(value[0])) {
-                    return '';
-                } else {
-                    return value;
-                }
-            } else {
-                return '';
-            }
+            return $.isArray(value) ? value : [];
         },
         restoreData(value) {
             return value == '' ? [{}] : value;
@@ -1367,15 +1359,7 @@ let allAttrs = {
         "info": "BPMN.PROPERTYPACKAGES.SIGNALDEFINITIONSPACKAGE.SIGNALDEFINITIONS.DESCRIPTION",
         "dg": "detail",
         getValue(value) {
-            if ($.isArray(value)) {
-                if (!value.length || $.isEmptyObject(value[0])) {
-                    return '';
-                } else {
-                    return value;
-                }
-            } else {
-                return '';
-            }
+            return $.isArray(value) ? value : [];
         },
         restoreData(value) {
             return value == '' ? [] : value;
@@ -1429,15 +1413,7 @@ let allAttrs = {
         "info": "BPMN.PROPERTYPACKAGES.MESSAGEDEFINITIONSPACKAGE.MESSAGEDEFINITIONS.DESCRIPTION",
         "dg": "detail",
         getValue(value) {
-            if ($.isArray(value)) {
-                if (!value.length || $.isEmptyObject(value[0])) {
-                    return '';
-                } else {
-                    return value;
-                }
-            } else {
-                return '';
-            }
+            return $.isArray(value) ? value : [];
         },
         restoreData(value) {
             return value == '' ? [] : value;
@@ -1491,18 +1467,7 @@ let allAttrs = {
         "info": "BPMN.PROPERTYPACKAGES.ESCALATIONDEFINITIONSPACKAGE.ESCALATIONDEFINITIONS.DESCRIPTION",
         "dg": "detail",
         getValue(value) {
-            if ($.isArray(value)) {
-                if (!value.length || $.isEmptyObject(value[0])) {
-                    return '';
-                } else {
-                    for (let row of value) {
-                        row.escalationCode = row.id;
-                    }
-                    return value;
-                }
-            } else {
-                return '';
-            }
+            return $.isArray(value) ? value : [];
         },
         restoreData(value) {
             return value == '' ? [] : value;

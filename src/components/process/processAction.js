@@ -39,7 +39,7 @@ export const deployProcess = function(self, processData) {
             bpmnApi.deployProcess({
                 deploymentKey: processData.id,
                 deploymentName: processData.name,
-                tenantId: processData.tenantId,
+                tenantId: processData.tenantId ? processData.tenantId : '1',
             }, file).then((res) => {
                 self.$snotifySuccess('Deploy process successfully');
                 deployResolve(res);

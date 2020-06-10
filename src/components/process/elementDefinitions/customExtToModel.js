@@ -52,6 +52,7 @@ function addCustomPropsToForm(symEl) {
                 });
             }
         }
+        console.log(symEl, 'xxxxxxxxxxxxxxxxx');
     }
 }
 
