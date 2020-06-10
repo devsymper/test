@@ -30,7 +30,6 @@ export default class Control {
          */
         this.effectedControl = [];
 
-        this.value = '';
 
         /**
          * Tên của control
@@ -46,6 +45,8 @@ export default class Control {
          * Loại control
          */
         this.type = this.ele.attr('s-control-type');
+        this.value = (this.type == 'number') ? 0 : '';
+
 
 
         /**

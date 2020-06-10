@@ -16,7 +16,11 @@ export const setDataForPropsControl = function(fields) {
             if (type == 'checkbox') {
                 properties[k].value = (fields[controlId]['properties'][k] == 0 || fields[controlId]['properties'][k] == '0' || fields[controlId]['properties'][k] == '') ? false : true
             } else {
-                properties[k].value = fields[controlId]['properties'][k]
+                let valueControl = fields[controlId]['properties'][k];
+                if (type == "number" && valueControl == "") {
+                    valueControl = 0;
+                }
+                properties[k].value = valueControl;
             }
         })
         if (fields[controlId]['formulas'] != false && fields[controlId]['formulas'] != "[]") {
@@ -44,7 +48,11 @@ export const setDataForPropsControl = function(fields) {
                     if (childType == 'checkbox') {
                         childProperties[k].value = (listField[childFieldId]['properties'][k] == 0 || listField[childFieldId]['properties'][k] == '0' || listField[childFieldId]['properties'][k] == '') ? false : true
                     } else {
-                        childProperties[k].value = listField[childFieldId]['properties'][k]
+                        let valueChildControl = listField[childFieldId]['properties'][k];
+                        if (childType == "number" && valueChildControl == "") {
+                            valueChildControl = 0;
+                        }
+                        childProperties[k].value = valueChildControl;
                     }
                 })
                 if (listField[childFieldId]['formulas'] != false && listField[childFieldId]['formulas'] != "[]") {

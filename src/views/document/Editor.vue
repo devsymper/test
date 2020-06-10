@@ -835,13 +835,15 @@ export default {
                         let childProperties = childControl.properties
                         let childFormulas = childControl.formulas
                         let childType = listField[childFieldId].type
-                        console.log(listField[childFieldId]);
                         
                         $.each(childProperties,function(k,v){
                             if(childProperties[k].type == 'checkbox'){
                                 childProperties[k].value = (listField[childFieldId]['properties'][k] == 0 || listField[childFieldId]['properties'][k] == '0' || listField[childFieldId]['properties'][k] == '') ? false : true
                             }
                             else{
+                                
+                                
+                                
                                 childProperties[k].value = listField[childFieldId]['properties'][k]
                             }
                         })

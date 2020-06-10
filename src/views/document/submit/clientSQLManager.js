@@ -1,6 +1,7 @@
 import sDocument from './../../../store/document'
 import store from './../../../store'
 import { util } from "./../../../plugins/util.js";
+import { Column } from 'ag-grid-community';
 
 const dataSubmitStore = sDocument.state.submit
 const initSqlJs = require('sql.js');
@@ -51,12 +52,14 @@ export default class ClientSQLManager {
          */
     static run(keyInstance, sql, isWithoutReturn = false) {
         let db = this.getInstanceDB(keyInstance);
+
         if (isWithoutReturn) {
             return db.run(sql);
         } else {
             return db.exec(sql);
         }
     }
+
     static createTable(keyInstance, tableName, columns, temporary = "") {
         let col = "(";
         for (let c in columns) {
@@ -65,18 +68,49 @@ export default class ClientSQLManager {
         col = col.trim();
         col = col.substring(0, col.length - 1);
         col += " )";
-        let sql = `CREATE ${temporary} TABLE ${tableName} ${col};`;
-        console.log(sql);
+        let sql = `CREATE ${temporary} TABLE IF NOT EXISTS ${tableName} ${col};`;
         // sql += "INSERT INTO this_document VALUES ('a', 'hello');"
         this.run(keyInstance, sql, true);
 
         // console.log(this.run(keyInstance, 'select * from this_document', false));
 
     }
-    static insertRowToTable(keyInstance, tableName, column, value, where) {
+    static async editRow(keyInstance, tableName, column, value, where, returnPromise = false) {
+        let sql = `UPDATE ${tableName} SET ${column} = "${value}" ${where}`;
+        if (returnPromise) {
+            return new Promise((resolve, reject) => {
+                try {
+                    let data = this.run(keyInstance, sql, true);
+                    resolve(data);
+                } catch (error) {
+                    reject(error);
+                }
+            });
+        } else {
+            return this.run(keyInstance, sql, true);
+        }
+    }
+    static deleteRow(keyInstance, tableName, where) {
+        let sql = `DELETE FROM ${tableName} ${where}`;
+        this.run(keyInstance, sql, true);
+    }
+    static async insertRow(keyInstance, tableName, column, value, returnPromise = false) {
         let tbColumn = column.join();
         let tbValue = value.join()
-        let sql = `INSERT INTO ${tableName} (${tbColumn}) VALUES(${value})`;
+        let sql = `INSERT INTO ${tableName} (${tbColumn}) VALUES(${tbValue})`;
+        if (returnPromise) {
+            return new Promise((resolve, reject) => {
+                try {
+                    let data = this.run(keyInstance, sql, true);
+                    resolve(data);
+                } catch (error) {
+                    reject(error);
+                }
+            });
+        } else {
+            return this.run(keyInstance, sql, true);
+        }
+
     }
     static insertMultiple(keyInstance, tableName, columns, columnstype, values) {
         let tbColumns = columns.join();
@@ -99,8 +133,7 @@ export default class ClientSQLManager {
             tbValues += ` (${values[i].join()}),`;
         }
         tbValues = tbValues.substring(0, tbValues.length - 1);
-        let sql = `INSERT INTO ${tableName} (${tbColumns},s_id_sql_lite_9999) VALUES ${tbValues}`;
-        console.log(sql);
+        let sql = `INSERT INTO ${tableName} (${tbColumns},s_table_id_sql_lite) VALUES ${tbValues}`;
 
         this.run(keyInstance, sql, true);
 
