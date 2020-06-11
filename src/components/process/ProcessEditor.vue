@@ -86,13 +86,15 @@ import { allAttrDisplayGroup } from "./allAttrDisplayGroup";
 import FormTpl from "./../common/FormTpl.vue";
 import { util } from "../../plugins/util";
 import bpmnApi from "./../../api/BPMNEngine.js";
-import { defaultXML } from "./../../components/process/reformatGetListData";
+import { defaultXML, reformatValueToStr } from "./../../components/process/reformatGetListData";
 import { allNodesAttrs } from "./../process/allAttrsOfNodes";
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import { documentApi } from '../../api/Document';
 import customExtension from "./elementDefinitions/customExtension";
 import { pushCustomElementsToModel } from "./elementDefinitions/customExtToModel";
 // Khung data của từng node cần lưu vào db
+console.log(bpmnApi, 'bpmnApibpmnApibpmnApi');
+
 const nodeDataTpl = {
     bounds: {
         lowerRight: {
@@ -578,6 +580,9 @@ export default {
                             props[key] = allNodesAttrs[key].getValue(
                                 attr.value
                             );
+                            if(allNodesAttrs[key].needReformatValue){
+                               props[key] = reformatValueToStr(attr.value);
+                            }
                         } else {
                             props[key] = attr.value ? attr.value : '';
                         }

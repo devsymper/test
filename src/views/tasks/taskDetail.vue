@@ -79,6 +79,7 @@ import task from "./task";
 export default {
     name: "taskDetail",
     props: {
+        // Thông tin của một task, cấu trúc giống như một item khi lấy danh sách task
         taskInfo: {
             type: Object,
             default: () => {

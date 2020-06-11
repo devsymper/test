@@ -66,14 +66,19 @@ export default {
 
                         let value = this.getValueForVariable(outcomeData[ctrlName], ctrlType);
                         vars.push({
-                            name: startNodeId+'.'+ctrlName,
+                            name: startNodeId+'_'+ctrlName,
                             type: ctrlType,
                             value: value
                         });    
+                    }else{
+                        vars.push({
+                            name: startNodeId+'_'+ctrlName,
+                            type: 'string',
+                            value: JSON.stringify(outcomeData[ctrlName])
+                        });
                     }
                 }
-                // let newProcessInstance = await runProcessDefinition(this, processDef, vars);
-                let newProcessInstance = await runProcessDefinition(this, processDef, []);
+                let newProcessInstance = await runProcessDefinition(this, processDef, vars);
                 this.$snotifySuccess("Task submited successfully");
             } catch (error) {
                 this.$snotifyError(error ,"Error on run process definition ");

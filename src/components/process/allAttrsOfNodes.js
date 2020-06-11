@@ -278,6 +278,7 @@ let allAttrs = {
         restoreData(value) {
             return value == '' ? [{}] : value;
         },
+        needReformatValue: true,
         toXML: {
             "symper_position": "el",
             "name": "dataObject",
@@ -1364,6 +1365,7 @@ let allAttrs = {
         restoreData(value) {
             return value == '' ? [] : value;
         },
+        needReformatValue: true,
         toXML: {
             "symper_position": "el",
             "name": "Signal",
@@ -1412,6 +1414,7 @@ let allAttrs = {
         ],
         "info": "BPMN.PROPERTYPACKAGES.MESSAGEDEFINITIONSPACKAGE.MESSAGEDEFINITIONS.DESCRIPTION",
         "dg": "detail",
+        needReformatValue: true,
         getValue(value) {
             return $.isArray(value) ? value : [];
         },
@@ -1498,6 +1501,7 @@ let allAttrs = {
                 }
             ]
         },
+        needReformatValue: true,
         pushToXML: attrToXMLMethods.pushNewEqualEls
     },
     "istransaction": {

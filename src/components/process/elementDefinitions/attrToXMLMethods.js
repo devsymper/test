@@ -82,9 +82,6 @@ export default {
             let subEl = moddle.create('symper:formProperty');
             for (let key in row) {
                 let vl = row[key];
-                if (key != 'type') {
-                    vl = vl == '' ? '' : (vl + Date.now());
-                }
                 subEl[key] = vl;
             }
             extensionElements.values.push(subEl);
