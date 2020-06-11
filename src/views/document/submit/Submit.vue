@@ -505,7 +505,6 @@ export default {
                 }
             }
 
-            console.log(mapControlEffected);
             this.updateEffectedControlToStore(mapControlEffected);
         },
         /**
@@ -701,8 +700,10 @@ export default {
          * Hàm xử lí chạy công thức giá trị của control, kết quả trả về được gán lại dữ liệu cho input
          */
         handleRunFormulasValue(dataInput,formulasInstance,controlId,controlName=""){
-            
             formulasInstance.handleBeforeRunFormulas(dataInput).then(rs=>{
+                console.log(formulasInstance);
+                console.log(rs);
+                
                 if($('#'+controlId).length > 0){
                     if($('#'+controlId).attr('s-control-type') == 'table'){
                         this.setDataToTable(controlId,rs.data)
@@ -759,6 +760,7 @@ export default {
         findRootControl(){ 
             let listInput = this.sDocumentSubmit.listInputInDocument;
             for(let controlName in listInput){
+                this.setAllImpactedFieldsList(controlName);
                 let controlInstance = listInput[controlName];
                 if(Object.keys(controlInstance.controlFormulas).length > 0){
                     let controlFormulas = controlInstance.controlFormulas;
@@ -767,7 +769,6 @@ export default {
                         if(formulasObj.hasOwnProperty('instance')){
                             let formulasInstance = formulasObj.instance;
                             let inputControl = formulasInstance.inputControl;
-                            this.setAllImpactedFieldsList(controlName);
                             if(Object.keys(inputControl).length == 0){
                                 let dataInput = this.getDataInputFormulas(formulasInstance);  
                                 this.handleRunFormulasValue(dataInput,formulasInstance,controlInstance.id);
@@ -777,6 +778,10 @@ export default {
                 }
                 
             }
+            this.$store.commit("document/addToDocumentSubmitStore", {
+                key: 'impactedFieldsList',
+                value: impactedFieldsList
+            });
             
         },
         /**
@@ -791,7 +796,7 @@ export default {
             impactedFieldsListWhenStart[fieldName] = false;
         },
         getAllImpactedInput(sourceName) {
-             let listInput = this.sDocumentSubmit.listInputInDocument;
+            let listInput = this.sDocumentSubmit.listInputInDocument;
             var arr = [];
             if (listInput.hasOwnProperty(sourceName)) {
                 for (var i in listInput[sourceName]['effectedControl']) {

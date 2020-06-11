@@ -3,9 +3,9 @@ import Handsontable from 'handsontable';
 import store from './../../../store/document'
 import s from './../../../store'
 import ClientSQLManager from './clientSQLManager';
-
 import { SYMPER_APP } from './../../../main.js'
 import { Date } from 'core-js';
+import { checkCanBeBind, resetImpactedFieldsList, markBinedField } from './handlerCheckRunFormulas';
 /**
  * Custom render cho control percent( phần trăm) cho table
  */
@@ -110,45 +110,95 @@ export default class Table {
                 afterCreateRow: function(index, amount, source) {
 
                 },
+                afterSelectionEnd: function(row, col) {
+                    s.commit("document/addToDocumentSubmitStore", {
+                        key: 'docStatus',
+                        value: 'input'
+                    });
+                },
+                beforeOnCellMouseDown: function(event, coords, td, controller) {
+
+                },
                 afterChange: function(changes, source) {
+
                     let controlName = changes[0][1];
+                    let columns = thisObj.columnsInfo.columns;
+                    let currentRowData = thisObj.tableInstance.getDataAtRow(thisObj.currentSelectedCell['row']);
+                    if (columns[thisObj.currentSelectedCell['column']].type == 'time' &&
+                        !thisObj.checkCellIsTime(currentRowData[thisObj.currentSelectedCell['column']])) {
+                        return;
+                    }
                     if (controlName != 's_table_id_sql_lite') {
-                        let columns = thisObj.columnsInfo.columns;
+
+                        if (source != AUTO_SET) {
+                            s.commit("document/addToDocumentSubmitStore", {
+                                key: 'rootChangeFieldName',
+                                value: controlName
+                            });
+                            resetImpactedFieldsList();
+                        }
                         columns = columns.map(function(c) {
                             return c.data;
                         });
-                        let currentRowData = thisObj.tableInstance.getDataAtRow(thisObj.currentSelectedCell['row']);
-                        for (let index = 0; index < currentRowData.length; index++) {
-                            let cell = currentRowData[index];
-                            if (cell == "" || cell == null) {
-                                currentRowData[index] = 'NULL';
-                            } else {
-                                currentRowData[index] = '"' + currentRowData[index] + '"'
-                            }
-                        }
+
+                        let currentColData = thisObj.tableInstance.getDataAtCol(thisObj.currentSelectedCell['column']);
+                        currentColData.pop();
                         s.commit("document/updateListInputInDocument", {
                             controlName: controlName,
                             key: 'value',
-                            value: changes[changes.length - 1][3]
+                            value: currentColData
                         });
-                        if (currentRowData[currentRowData.length - 1] == 'NULL') {
-                            let id = Date.now();
-                            currentRowData[currentRowData.length - 1] = id;
 
-                            thisObj.tableInstance.setDataAtCell(thisObj.currentSelectedCell['row'], currentRowData.length - 1, id);
-                            ClientSQLManager.insertRow(thisObj.keyInstance, thisObj.tableName, columns, currentRowData, true).then(res => {
-                                let s = ClientSQLManager.get(thisObj.keyInstance, "select * from " + thisObj.tableName);
+                        if (source != AUTO_SET) {
+                            for (let index = 0; index < currentRowData.length; index++) {
+                                let cell = currentRowData[index];
+                                if (cell == "" || cell == null) {
+                                    currentRowData[index] = 'NULL';
+                                } else {
+                                    currentRowData[index] = '"' + currentRowData[index] + '"'
+                                }
+                            }
+                            if (currentRowData[currentRowData.length - 1] == 'NULL') {
+                                let id = Date.now();
+                                currentRowData[currentRowData.length - 1] = id;
+                                thisObj.tableInstance.setDataAtCell(thisObj.currentSelectedCell['row'], currentRowData.length - 1, id);
+                                ClientSQLManager.insertRow(thisObj.keyInstance, thisObj.tableName, columns, currentRowData, true).then(res => {
+                                    thisObj.handlerCheckEffectedControlInTable(controlName);
+                                });
+                            } else {
+                                ClientSQLManager.editRow(thisObj.keyInstance, thisObj.tableName, controlName, changes[0][3],
+                                    'WHERE s_table_id_sql_lite = ' + currentRowData[currentRowData.length - 1], true).then(res => {
+                                    thisObj.handlerCheckEffectedControlInTable(controlName);
 
-                                thisObj.handlerCheckEffectedControlInTable(controlName);
-                            });
+                                });
+                            }
                         } else {
-                            ClientSQLManager.editRow(thisObj.keyInstance, thisObj.tableName, controlName, changes[thisObj.currentSelectedCell['row']][3],
-                                'WHERE s_table_id_sql_lite = ' + currentRowData[currentRowData.length - 1]).then(res => {
-                                let s = ClientSQLManager.get(thisObj.keyInstance, "select * from " + thisObj.tableName);
-                                thisObj.handlerCheckEffectedControlInTable(controlName);
-                            });
+                            for (let index = 0; index < changes.length; index++) {
+                                let colChange = changes[index];
+                                let rowData = thisObj.tableInstance.getDataAtRow(colChange[0]);
+                                for (let index = 0; index < rowData.length; index++) {
+                                    let cell = rowData[index];
+                                    if (cell == "" || cell == null) {
+                                        rowData[index] = 'NULL';
+                                    } else {
+                                        rowData[index] = '"' + rowData[index] + '"'
+                                    }
+                                }
+                                if (rowData[rowData.length - 1] == 'NULL') {
+                                    let id = Date.now();
+                                    rowData[rowData.length - 1] = id;
+                                    thisObj.tableInstance.setDataAtCell(colChange[0], rowData.length - 1, id);
+                                    ClientSQLManager.insertRow(thisObj.keyInstance, thisObj.tableName, colChange[1], rowData, true).then(res => {
+                                        thisObj.handlerCheckEffectedControlInTable(controlName);
+                                    });
+                                } else {
+                                    ClientSQLManager.editRow(thisObj.keyInstance, thisObj.tableName, colChange[1], colChange[3],
+                                        'WHERE s_table_id_sql_lite = ' + rowData[rowData.length - 1], true).then(res => {
+                                        thisObj.handlerCheckEffectedControlInTable(controlName);
+                                    });
+                                }
+                            }
                         }
-
                     }
                 }
             }
@@ -158,33 +208,34 @@ export default class Table {
          * @param {String} controlName Control bị thay đổi dữ liệu
          */
     handlerCheckEffectedControlInTable(controlName) {
+            let thisCpn = this;
             let controlInstance = listInputInDocument[controlName];
             if (controlInstance == null || controlInstance == undefined) {
                 return;
             }
             let controlEffected = controlInstance.getEffectedControl();
+            // console.log(controlEffected);
             if (Object.keys(controlEffected).length > 0) {
                 for (let i in controlEffected) {
-                    let controlEffectedInstance = listInputInDocument[i];
-                    let formulasInstance = controlEffectedInstance.controlFormulas['formulas'].instance;
-                    let inputControl = formulasInstance.getInputControl();
-                    let dataInput = {};
-                    for (let inputControlName in inputControl) {
-                        let valueInputControlItem = listInputInDocument[inputControlName].value;
-                        dataInput[inputControlName] = valueInputControlItem;
-                    }
-                    if (controlEffectedInstance.hasOwnProperty('inTable')) {
-                        if (controlEffectedInstance.inTable == this.tableName) {
-                            this.handlerRunFormulasForControlInTable(controlEffectedInstance.name, dataInput, formulasInstance);
-                        } else {
-
+                    if (checkCanBeBind(i)) {
+                        let controlEffectedInstance = listInputInDocument[i];
+                        let formulasInstance = controlEffectedInstance.controlFormulas['formulas'].instance;
+                        let inputControl = formulasInstance.getInputControl();
+                        let dataInput = {};
+                        for (let inputControlName in inputControl) {
+                            let valueInputControlItem = this.getColumnIndexFromControlName(inputControlName);
+                            valueInputControlItem = this.tableInstance.getDataAtCol(valueInputControlItem);
+                            valueInputControlItem.pop();
+                            dataInput[inputControlName] = valueInputControlItem;
                         }
-                    } else {
-                        controlOutsideWaitingRun[i] = controlEffectedInstance;
+                        if (controlEffectedInstance.hasOwnProperty('inTable')) {
+                            if (controlEffectedInstance.inTable == this.tableName) {
+                                thisCpn.handlerRunFormulasForControlInTable(controlEffectedInstance.name, dataInput, formulasInstance);
+                            }
+                        }
                     }
                 }
             }
-
         }
         /**
          * Hàm xử lí query dữ liệu  từ bảng sqllite
@@ -192,43 +243,70 @@ export default class Table {
          * @param {*} dataInput    dữ liệu đầu vào cho công  thức
          * @param {*} formulasInstance  Object cua formulas giá trị của control bị ảnh hưởng
          */
-    handlerRunFormulasForControlInTable(controlEffectedName, dataInput, formulasInstance) {
-            let thisObj = this;
-            setTimeout(() => {
-                formulasInstance.handleBeforeRunFormulas(dataInput).then(res => {
-                    thisObj.handlerSetDataToColumnAfterRunFormulas(res.data, controlEffectedName);
+    async handlerRunFormulasForControlInTable(controlEffectedName, dataInput, formulasInstance) {
+            let dataColumnAfterRunFOrmulas = [];
+            if (Object.keys(dataInput).length > 0) {
+                let allRowDataInput = [];
+                for (let control in dataInput) {
+                    let dataRow = dataInput[control];
+                    for (let i = 0; i < dataRow.length; i++) {
+                        if (allRowDataInput.length <= i) {
+                            allRowDataInput[i] = {};
+                        }
+                        allRowDataInput[i][control] = dataRow[i];
+                    }
+                }
+                for (let index = 0; index < allRowDataInput.length; index++) {
+                    let rowInput = allRowDataInput[index];
+                    await formulasInstance.handleBeforeRunFormulas(rowInput).then(res => {
+                        dataColumnAfterRunFOrmulas.push(res.data[0].values[0][0]);
+                    })
+                }
+            } else {
+                await formulasInstance.handleBeforeRunFormulas(dataInput).then(res => {
+                    dataColumnAfterRunFOrmulas.push(res.data[0].values[0][0]);
                 })
-            }, 20);
+            }
+            s.commit("document/updateListInputInDocument", {
+                controlName: controlEffectedName,
+                key: 'value',
+                value: dataColumnAfterRunFOrmulas
+            });
+            this.handlerSetDataToColumnAfterRunFormulas(dataColumnAfterRunFOrmulas, controlEffectedName)
         }
         /**
          * Hàm lấy dữ liệu hiện tại của table và insert vào sql lite table
          */
     handlerSetDataToColumnAfterRunFormulas(data, controlEffectedName) {
-        let values = data[0].values;
-        console.log(values);
-
-        let vls = [];
-        for (let index = 0; index < values.length; index++) {
-            let row = values[index];
-            vls.push([index, controlEffectedName, row[0]]);
+            let values = data;
+            let vls = [];
+            for (let index = 0; index < values.length; index++) {
+                let row = values[index];
+                if (row == null || row == 'null')
+                    row = '';
+                vls.push([index, controlEffectedName, row]);
+            }
+            this.tableInstance.setDataAtRowProp(vls, null, null, AUTO_SET);
+            markBinedField(controlEffectedName);
+            setTimeout(() => {
+                let controlInstance = listInputInDocument[controlEffectedName];
+                if (controlInstance != null && controlInstance != undefined) {
+                    let controlEffected = controlInstance.getEffectedControl();
+                    for (let control in controlEffected) {
+                        if (!listInputInDocument[control].hasOwnProperty('inTable'))
+                            SYMPER_APP.$evtBus.$emit('run-effected-control-when-table-change', { control: listInputInDocument[control] })
+                    }
+                }
+            }, 100);
 
         }
-        console.log(vls);
-
-        this.tableInstance.setDataAtRowProp(vls, null, null, AUTO_SET);
-        for (let control in controlOutsideWaitingRun) {
-            SYMPER_APP.$evtBus.$emit('run-effected-control-when-table-change', { control: controlOutsideWaitingRun[control] })
-        }
-    }
-
+        // chú mô tả lại ngắn gọn vấn đề
     render() {
         let thisObj = this;
         let tableContainer = $('<div id="' + thisObj.controlObj.id + '" s-control-type="table"></div>')[0];
         thisObj.controlObj.ele.before(tableContainer);
         thisObj.tableContainer = $(tableContainer);
         thisObj.columnsInfo = this.getColumnsInfo();
-        console.log(thisObj.columnsInfo);
-
         thisObj.controlObj.ele.detach().hide();
         let colHeaders = thisObj.columnsInfo.headerNames;
         thisObj.colHeaders = colHeaders;
@@ -423,7 +501,6 @@ export default class Table {
                 rsl.correctFormat = true;
         }
         rsl.type = Util.toLowerCaseFirstCharacter(supportCellsType[type].replace('Renderer', ''));
-        console.log(rsl);
 
         return rsl;
     }
@@ -437,7 +514,6 @@ export default class Table {
             if (listInputInDocument[prop].isCheckbox) {
                 td.style.textAlign = "center";
             }
-            console.log(this);
 
             let map = this.validateValueMap[row + '_' + column];
             if (map) {
@@ -475,5 +551,21 @@ export default class Table {
         }
         this.tableInstance.setDataAtRowProp(vls, null, null, AUTO_SET);
         // listInputInDocument[tbName].reCaclSumAndAvg();
+    }
+    checkCellIsTime(str) {
+        var patt = new RegExp("^([0-1]?[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$", "g");
+        return patt.test(str)
+    }
+    getColumnIndexFromControlName(name) {
+        let column = this.columnsInfo.columns.filter(col => {
+            return col.data == name;
+        })
+
+        if (column.length > 0) {
+            return this.columnsInfo.columns.indexOf(column[0]);
+        } else {
+            return false
+        }
+
     }
 }

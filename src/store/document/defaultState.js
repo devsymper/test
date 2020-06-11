@@ -51,7 +51,10 @@ const defaultState = {
         docStatus: 'init',
         isDetailView: false,
         SQLLiteDB: {},
-        rootControl: {}
+        rootControl: {},
+        impactedFieldsList: {},
+        impactedFieldsListWhenStart: {},
+        rootChangeFieldName: null
 
     }
 };

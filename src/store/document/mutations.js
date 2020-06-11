@@ -214,6 +214,16 @@ const addToRootControl = (state, params) => {
     let value = params.value
     Vue.set(state.submit.rootControl, key, value);
 }
+const addToImpactedFieldsList = (state, params) => {
+    let value = params.value
+    Vue.set(state.submit, 'impactedFieldsList', value);
+}
+
+const addToDocumentSubmitStore = (state, params) => {
+    let key = params.key
+    let value = params.value
+    Vue.set(state.submit, key, value);
+}
 
 
 export {
@@ -229,4 +239,7 @@ export {
     updateListInputInDocument,
     updateFormulasId,
     addToRootControl,
+    addToImpactedFieldsList,
+    addToDocumentSubmitStore,
+
 };

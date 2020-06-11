@@ -15,7 +15,7 @@
     </list-items>
 </template>
 <script>
-import { userApi } from "./../../api/user.js";
+import { documentApi } from "./../../api/Document.js";
 import ListItems from "./../../components/common/ListItems.vue";
 import ActionPanel from "./../../views/users/ActionPanel.vue";
 import ChangePassPanel from "./../../views/users/ChangePass.vue";
@@ -30,7 +30,32 @@ export default {
             actionPanelWidth:800,
             containerHeight: 200,
             tableContextMenu:[
-                {name:"delete",text:'Xóa'},
+                {name:"delete",text:'Xóa',
+                    callback: (document, callback) => {
+                        let thisCpn = this;
+                        documentApi
+                        .deleteDocument(document[0].name)
+                        .then(res => {
+                            if (res.status == 200) {
+                                thisCpn.$snotify({
+                                    type: "success",
+                                    title: "Delete document success!"
+                                });  
+                                thisCpn.$refs.listDocument.refreshList();
+                            }
+                            else{
+                                thisCpn.$snotify({
+                                    type: "error",
+                                    title: res.messagr
+                                });  
+                            }
+                        })
+                        .catch(err => {
+                            console.log("error from detail document api!!!", err);
+                        })
+                        .always(() => {});
+                    },
+                },
                 {
                     name: "edit",
                     text: "Sửa",

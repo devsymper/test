@@ -54,8 +54,11 @@ export default class ClientSQLManager {
         let db = this.getInstanceDB(keyInstance);
 
         if (isWithoutReturn) {
+
             return db.run(sql);
         } else {
+            console.log(sql);
+
             return db.exec(sql);
         }
     }
@@ -81,13 +84,20 @@ export default class ClientSQLManager {
             return new Promise((resolve, reject) => {
                 try {
                     let data = this.run(keyInstance, sql, true);
+                    console.log(sql);
+
+                    console.log('mmmm', data);
+
                     resolve(data);
                 } catch (error) {
                     reject(error);
                 }
             });
         } else {
-            return this.run(keyInstance, sql, true);
+            let x = this.run(keyInstance, sql, true);
+            console.log('nnnnn', x);
+
+            return x
         }
     }
     static deleteRow(keyInstance, tableName, where) {
@@ -102,6 +112,10 @@ export default class ClientSQLManager {
             return new Promise((resolve, reject) => {
                 try {
                     let data = this.run(keyInstance, sql, true);
+                    console.log(sql);
+
+                    console.log('xxxxxxxxxxx', data);
+
                     resolve(data);
                 } catch (error) {
                     reject(error);
