@@ -137,6 +137,8 @@ export default {
         async validateDeployData(){
             let self = this;
             return new Promise((resolve, reject) => {
+                // resolve();
+                // return;
                 let validateData = self.getAllElementData();
                 // validateData = JSON.parse();
                 bpmnApi.validateModel(JSON.stringify(validateData)).then((validateResult) => {

@@ -1779,7 +1779,17 @@ let allAttrs = {
         options: [],
         dg: 'detail',
         isSymperProp: true,
-        pushToXML: attrToXMLMethods.notPushToXML
+        pushToXML: attrToXMLMethods.addStringValueAsTag,
+        toXML: {
+            "symper_position": "el",
+            "name": "BusinessKeyControl",
+            "superClass": ["Element"],
+            "properties": [{
+                "name": "text",
+                "isBody": true,
+                "type": "String"
+            }]
+        },
     },
     instanceDisplayText: {
         title: 'Display text for process instance',
@@ -1788,7 +1798,17 @@ let allAttrs = {
         info: '',
         dg: 'detail',
         isSymperProp: true,
-        pushToXML: attrToXMLMethods.notPushToXML
+        pushToXML: attrToXMLMethods.addStringValueAsTag,
+        toXML: {
+            "symper_position": "el",
+            "name": "InstanceDisplayText",
+            "superClass": ["Element"],
+            "properties": [{
+                "name": "text",
+                "isBody": true,
+                "type": "String"
+            }]
+        },
     },
 }
 

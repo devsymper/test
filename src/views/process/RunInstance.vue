@@ -11,6 +11,7 @@ import BPMNEApi from "./../../api/BPMNEngine";
 import taskDetail from "./../../views/tasks/taskDetail.vue";
 import { runProcessDefinition } from '../../components/process/processAction';
 import { documentApi } from '../../api/Document';
+import { formulasApi } from '../../api/Formulas';
 
 export default {
     components: {
@@ -49,6 +50,9 @@ export default {
             let vars = []; // các biến cần đưa vào process instance
             let startNode =  this.definitionModel.mainProcess.initialFlowElement;
             let startNodeId = startNode.id;
+            let instanceName = '';
+            let dataInputForFormula = {};
+
             try {
                 let ctrls = await documentApi.detailDocument(startNode.formKey);
                 ctrls = ctrls.data.fields;
@@ -69,7 +73,8 @@ export default {
                             name: startNodeId+'_'+ctrlName,
                             type: ctrlType,
                             value: value
-                        });    
+                        });   
+                        dataInputForFormula[ctrlName] =  value;
                     }else{
                         vars.push({
                             name: startNodeId+'_'+ctrlName,
@@ -78,7 +83,10 @@ export default {
                         });
                     }
                 }
-                let newProcessInstance = await runProcessDefinition(this, processDef, vars);
+                
+                // let formulaName = '';
+                // nameFromFormula = formulasApi.execute();
+                let newProcessInstance = await runProcessDefinition(this, processDef, vars, instanceName);
                 this.$snotifySuccess("Task submited successfully");
             } catch (error) {
                 this.$snotifyError(error ,"Error on run process definition ");

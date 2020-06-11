@@ -20,6 +20,12 @@ function clearEmptyAttr(bizObj) {
     }
 }
 export default {
+    addStringValueAsTag(el, elKey, attr, bpmnModeler, attrName) {
+        let moddle = bpmnModeler.get('moddle');
+        let newEl = moddle.create('symper:' + attr.toXML.name);
+        newEl.text = attr.value;
+        el[elKey].unshift(newEl);
+    },
     // Tạo ra các thẻ mới và chèn vào element cha
     pushNewEqualEls(el, elKey, attr, bpmnModeler, attrName) {
         let moddle = bpmnModeler.get('moddle');

@@ -75,12 +75,12 @@ export const deployProcessFromXML = function(xml, key = 14, name = 'test', tenan
  * Tạo một process instance theo process definition id được truyền vào
  * @param {String} id 
  */
-export const runProcessDefinition = (self, processDef, vars = []) => {
+export const runProcessDefinition = (self, processDef, vars = [], instanceName = '') => {
     return new Promise((runResolve, runReject) => {
         bpmnApi.getDefinitionModel(processDef.id).then((res) => {
             let dataToRun = {
                 "processDefinitionId": processDef.id,
-                "name": processDef.name + " instance",
+                "name": instanceName ? instanceName : (processDef.name + " instance"),
                 // "businessKey": processDef.key, // tạm bỏ
                 "variables": getVariables(res.mainProcess.dataObjects),
                 // "outcome": "string", // chưa biết là cái gì, tạm bỏ
