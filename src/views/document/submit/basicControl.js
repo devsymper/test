@@ -52,7 +52,7 @@ export default class BasicControl extends Control {
             this.addAutoCompleteEvent();
         }
         let thisCpn = this;
-        this.ele.wrap('<span>');
+        this.ele.wrap('<span style="position:relative;">');
         this.ele.attr('key-instance', this.curParentInstance);
         this.ele.on('change', function(e) {
             SYMPER_APP.$evtBus.$emit('document-submit-input-change', { controlName: thisCpn.controlProperties.name.value, val: $(e.target).val() })
@@ -215,7 +215,7 @@ export default class BasicControl extends Control {
             SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-input', e)
         })
         this.ele.on('keyup', function(e) {
-            console.log(thisCpn.controlFormulas);
+            console.log(e);
 
             let formulasInstance = (fromSelect) ? thisCpn.controlFormulas.formulas.instance : thisCpn.controlFormulas.autocomplete.instance;
             SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-input-change', { e: e, autocompleteFormulasInstance: formulasInstance })

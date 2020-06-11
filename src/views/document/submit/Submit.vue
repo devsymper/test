@@ -11,6 +11,7 @@
         </button>
         <autocomplete-input
             ref="autocompleteInput"
+            @after-select-row="afterSelectRowAutoComplete"
             @open-sub-form="openSubFormSubmit"
             @before-close="isShowSubFormSubmit = false"
         />
@@ -289,6 +290,27 @@ export default {
     },
     
     methods: {
+        /**
+         * Hàm xử lí nhận dữ liệu component autocomplete khi chọn 1 dòng
+         */
+        afterSelectRowAutoComplete(data){
+            console.log(data);
+            if(data.cell == undefined){
+                $('.autocompleting').val(data.value);
+                $('.autocompleting').trigger('change');
+                $('.autocompleting').removeClass('autocompleting');
+            }
+            else{
+                data.tableInstance.tableInstance.setDataAtCell(data.cell.row,data.cell.column,data.value)
+                data.tableInstance.isAutoCompleting = false;
+            }
+            
+            
+        },
+        /**
+         * Hàm  xử lí data sau khi query công thức autocomplete,
+         * xử lí data về dạng object cho DataTable của vuetify
+         */
         handleDataAutoComplete(data, isFromSQLLite){
             let headers = [];
             let bodyTable = [];
@@ -712,7 +734,7 @@ export default {
                         if(!rs.server){
                             let data = rs.data; 
                             if(data.length > 0){
-                                this.setDataToControl($('#'+controlId),$('#'+controlId).attr('s-control-type'), data[0].values[0][0])
+                                this.setDataToControl($('#'+controlId),$('#'+controlId).attr('s-control-type'), data[0].values)
                             }
                         }
                         else{
@@ -731,10 +753,17 @@ export default {
         },
         setDataToControl(control, type, result){
             if(type == 'label'){
-                control.text(result);
+                control.text(result[0][0]);
+            }
+            else if(type == 'select'){
+                // console.log(result);
+                // let data = this.handleDataAutoComplete(result,true);
+                // thisCpn.$refs.autocompleteInput.setAliasControl('column1');
+                // thisCpn.$refs.autocompleteInput.setData(data);
+                
             }
             else{
-                control.val(result);
+                control.val(result[0][0]);
             }
         },
         /**
@@ -743,7 +772,6 @@ export default {
         setDataToTable(tableControlId,data){
             let tableName = this.sDocumentEditor.allControl[tableControlId].properties.name.value;
             let dataTable = []
-            // x.push({tb1_pnc:"aa",tb1_mh:"aa",tb1_th:"aa",tb1_tskt:"aa",tb1_dvt:"aa",tb1_sl:"aa",tb1_gia:"aa",tb1_thanh_tien:"aa",tb1cbmh:"a",tb1_gc:"bv"});
             for(let i = 0; i < data.length; i++){
                 let row = {};
                 for(let controlName in data[i]){
