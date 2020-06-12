@@ -50,7 +50,6 @@ export default {
             let vars = []; // các biến cần đưa vào process instance
             let startNode =  this.definitionModel.mainProcess.initialFlowElement;
             let startNodeId = startNode.id;
-            let instanceName = '';
             let dataInputForFormula = {};
 
             try {
@@ -84,13 +83,46 @@ export default {
                     }
                 }
                 
-                // let formulaName = '';
-                // nameFromFormula = formulasApi.execute();
+                let instanceName = await this.getInstanceName(dataInputForFormula);
                 let newProcessInstance = await runProcessDefinition(this, processDef, vars, instanceName);
                 this.$snotifySuccess("Task submited successfully");
             } catch (error) {
                 this.$snotifyError(error ,"Error on run process definition ");
             }
+        },
+        async getInstanceName(dataInput){
+            let self = this;
+            return new Promise((resolve, reject) => {
+                
+                let dataObjs = self.definitionModel.processes[0].dataObjects;
+                let dataObjsMap = {};
+
+                for(let obj of dataObjs){
+                    let objKey = obj.id.replace(self.definitionModel.mainProcess.id+'_','');
+                    dataObjsMap[objKey] = obj;
+                }
+
+                if(dataObjsMap.instanceDisplayText){
+                    formulasApi.execute({
+                        data_input: JSON.stringify(dataInput),
+                        formula: dataObjsMap.instanceDisplayText.value
+                    }).then((formulaData) => {
+                        if( formulaData.status == 200){
+                            formulaData = formulaData.data.data;
+                            if(formulaData.length > 0){
+                                formulaData = formulaData[0];
+                                resolve(Object.values(formulaData)[0]);
+                            }
+                        }else{
+                            resolve('');
+                        }
+                    }).catch(err=>{
+                        reject(err);
+                    });                    
+                }else{
+                    resolve('');
+                }
+            })
         },
         getVarType(originType){
             let numberTypes = {

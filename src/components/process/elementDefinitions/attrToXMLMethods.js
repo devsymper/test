@@ -124,7 +124,6 @@ export default {
             });
             el[elKey].push(dataObject);
         }
-        debugger
     },
 
     notPushToXML(el, elKey, attr, bpmnModeler, attrName) {

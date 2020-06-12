@@ -426,7 +426,7 @@ export default {
                     }
                     nodeData.resourceId = bnode.id;
                 }
-                nodeData.properties = this.getNodeProperties(bnode.id);
+                nodeData.properties = this.getNodeProperties(bnode.id, false);
                 nodeData.stencil.id = nodeType; // flowable quy định loại node nằm trong nodeData.stencil.id
                 mapSaveNodes[bnode.id] = nodeData;
             }
@@ -563,7 +563,7 @@ export default {
                 }
             };
         },
-        getNodeProperties(nodeInfo) {
+        getNodeProperties(nodeInfo, includeSymperAttr = false) {
             let props = {};
             let sNodeAttrs = {};
             if(typeof nodeInfo == 'string'){
@@ -575,6 +575,11 @@ export default {
             }
 
             for (let key in sNodeAttrs.attrs) {
+                if(!includeSymperAttr){
+                    if(allNodesAttrs[key].isSymperProp){
+                        continue;
+                    }
+                }
                 let attr = sNodeAttrs.attrs[key];
                 if (attr) {
                     if (allNodesAttrs[key]) {
