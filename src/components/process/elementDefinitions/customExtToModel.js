@@ -1,4 +1,6 @@
 import { allNodesAttrs } from "./../allAttrsOfNodes";
+import attrToXMLMethods from "./attrToXMLMethods";
+
 /**
  * 
  * @param {Array} allVizEls mảng chứa các đối tượng do thư viện quản lý
@@ -29,6 +31,23 @@ export const pushCustomElementsToModel = function(allVizEls, allSymEls, bpmnMode
                 attrDef.pushToXML(vizEl, elKey, attrs[attrName], bpmnModeler, attrName);
             }
         }
+        if (bizVizEl.$type == 'bpmn:Process') {
+            addCustomAttrToDataObject(bizVizEl, attrs);
+            attrToXMLMethods.dataObjectMethod(bizVizEl, 'flowElements', attrs.dataproperties, bpmnModeler, '');
+            removeCustomAttrToDataObject(bizVizEl, attrs);
+        }
+    }
+}
+
+function addCustomAttrToDataObject(vizEl, attrs) {
+    let keys = ['instanceDisplayText', 'controlsForBizKey'];
+    for (let k of keys) {
+        attrs.dataproperties.value.push({
+            id: vizEl.id + "_" + k,
+            name: vizEl.id + "_" + k,
+            type: "string",
+            defaultValue: attrs[k].value
+        });
     }
 }
 
@@ -64,4 +83,21 @@ function removeOldSymperExts(els) {
         }
     }
     return newArr;
+}
+
+function removeCustomAttrToDataObject(vizEl, attrs) {
+    let keys = {
+        instanceDisplayText: true,
+        controlsForBizKey: true
+    };
+    for (let idx in attrs.dataproperties.value) {
+        let item = attrs.dataproperties.value[idx];
+        if (item.id) {
+            let checkType = item.id.replace(vizEl.id + '_', '');
+            if (keys[checkType]) {
+                delete attrs.dataproperties.value[idx];
+            }
+        }
+    }
+    attrs.dataproperties.value = Object.values(attrs.dataproperties.value);
 }

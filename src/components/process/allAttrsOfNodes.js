@@ -319,7 +319,9 @@ let allAttrs = {
                     }]
                 },
             ]
-        }
+        },
+        pushToXML: attrToXMLMethods.notPushToXML // đã xử lý ở customExtToModel nên ko cần push vào xml nữa
+
     },
     "exclusivedefinition": {
         "title": "Exclusive",
@@ -1779,7 +1781,7 @@ let allAttrs = {
         options: [],
         dg: 'detail',
         isSymperProp: true,
-        pushToXML: attrToXMLMethods.addStringValueAsTag,
+        pushToXML: attrToXMLMethods.notPushToXML,
         toXML: {
             "symper_position": "el",
             "name": "BusinessKeyControl",
@@ -1798,7 +1800,7 @@ let allAttrs = {
         info: '',
         dg: 'detail',
         isSymperProp: true,
-        pushToXML: attrToXMLMethods.addStringValueAsTag,
+        pushToXML: attrToXMLMethods.notPushToXML,
         toXML: {
             "symper_position": "el",
             "name": "InstanceDisplayText",
@@ -1809,6 +1811,25 @@ let allAttrs = {
                 "type": "String"
             }]
         },
+    },
+    valueTag: {
+        "title": "",
+        "type": "text",
+        "value": "",
+        "info": "BPMN.PROPERTYPACKAGES.DOCUMENTATIONPACKAGE.DOCUMENTATION.DESCRIPTION",
+        "dg": "general",
+        hidden: true,
+        toXML: {
+            "symper_position": "el",
+            "name": "symper_symper_value_tag",
+            "superClass": ["Element"],
+            "properties": [{
+                "name": "text",
+                "isBody": true,
+                "type": "String"
+            }]
+        },
+        pushToXML: attrToXMLMethods.documentationMethod
     },
 }
 

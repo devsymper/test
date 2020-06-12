@@ -92,10 +92,39 @@ export default {
             }
             extensionElements.values.push(subEl);
         }
-        console.log(el, extensionElements, attrName, 'formPropertyMethodformPropertyMethodformPropertyMethod');
         modeling.updateProperties(el, {
             extensionElements
         });
+    },
+
+
+    dataObjectMethod(el, elKey, attr, bpmnModeler, attrName) {
+
+        let moddle = bpmnModeler.get('moddle');
+        let modeling = bpmnModeler.get('modeling');
+
+        for (let item of attr.value) {
+            if (!item.id || !item.name) {
+                continue;
+            }
+            let dataObject = moddle.create('symper:dataObject');
+            dataObject.id = item.id;
+            dataObject.name = item.name;
+            dataObject.itemSubjectRef = "xsd:string"
+
+            let extensionElement = moddle.create('bpmn:ExtensionElements');
+            let valueTag = moddle.create("symper:symper_symper_value_tag");
+            valueTag.text = item.defaultValue;
+            extensionElement.values = [valueTag];
+
+            modeling.updateProperties({
+                businessObject: dataObject
+            }, {
+                extensionElements: extensionElement
+            });
+            el[elKey].push(dataObject);
+        }
+        debugger
     },
 
     notPushToXML(el, elKey, attr, bpmnModeler, attrName) {

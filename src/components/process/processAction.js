@@ -1,18 +1,48 @@
 import bpmnApi from "./../../api/BPMNEngine";
 import { util } from "../../plugins/util";
 
+function moveTaskTitleToNameAttr(content) {
+    let taskTagMatches = content.match(/<bpmn:task(.*?).*id="([A-Za-z0-9_]+)notificationTitle.*<\/bpmn:task>/gs);
+    let taskNameAndName = '';
+
+    if (taskTagMatches) {
+        let newTaskName = '';
+
+        for (let tag of taskTagMatches) {
+            let propTag = tag.match(/.*id="([A-Za-z0-9_]+)notificationTitle.*\n/g);
+            propTag = propTag[0];
+            let newNameRegex = propTag.match(/default="(.*?)"/g);
+            newNameRegex = newNameRegex[0];
+            newTaskName = newNameRegex.substring(9, newNameRegex.length - 1);
+
+            let nameTagMatches = tag.match(/<bpmn:task(.*?)name="(.*?)"/g);
+            if (nameTagMatches) {
+                nameTagMatches = nameTagMatches[0];
+                let newNameTagMatches = nameTagMatches.replace(/name="(.*?)"/, `name="${newTaskName}"`)
+                let newTag = tag.replace(nameTagMatches, newNameTagMatches);
+                content = content.replace(tag, newTag);
+            }
+        }
+    }
+
+    return content;
+}
+
 function cleanContent(content) {
     let ns = `definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:xsd="http://www.w3.org/2001/XMLSchema"
     xmlns:symper="http://symper.org/bpmn"
     xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.symper.org/processdef">`;
+    content = moveTaskTitleToNameAttr(content);
     let rsl = content
         .replace(/↵+/, ' ')
         .replace(/\bbpmn:/g, '')
         .replace(/<di:/g, '<omgdi:')
         .replace(/<dc:/g, '<omgdc:')
         .replace(/symper_prefix_chars_/g, 'symper:')
-        .replace(/definitions (.*?)+\>/, ns);
+        .replace(/definitions (.*?)+\>/, ns)
+        .replace(/&#10;/g, ' ')
+        .replace(/symper_symper_value_tag/g, 'symper:value');
 
     let symperMatches = rsl.match(/<symper:([a-zA-Z0-9_]+)/g);
     symperMatches.forEach(element => {
