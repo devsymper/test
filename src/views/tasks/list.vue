@@ -218,7 +218,10 @@ export default {
     },
     mounted() {
         if(!this.smallComponentMode){
-            this.getTasks();
+            this.getTasks({
+                size: 100,
+                order: 'desc'
+            });
         }
     },
     methods: {

@@ -2,29 +2,40 @@ import bpmnApi from "./../../api/BPMNEngine";
 import { util } from "../../plugins/util";
 
 function moveTaskTitleToNameAttr(content) {
-    let taskTagMatches = content.match(/<bpmn:task(.*?).*id="([A-Za-z0-9_]+)notificationTitle.*<\/bpmn:task>/gs);
-    let taskNameAndName = '';
+    let patterns = [
+        [
+            /<bpmn:task(.*?).*id="([A-Za-z0-9_]+)notificationTitle.*<\/bpmn:task>/gs,
+            /<bpmn:task(.*?)name="(.*?)"/g
+        ],
+        [
+            /<bpmn:userTask(.*?).*id="([A-Za-z0-9_]+)notificationTitle.*<\/bpmn:userTask>/gs,
+            /<bpmn:userTask(.*?)name="(.*?)"/g
+        ],
 
-    if (taskTagMatches) {
-        let newTaskName = '';
+    ];
+    debugger
+    for (let pattern of patterns) {
+        let taskTagMatches = content.match(pattern[0]);
+        if (taskTagMatches) {
+            let newTaskName = '';
 
-        for (let tag of taskTagMatches) {
-            let propTag = tag.match(/.*id="([A-Za-z0-9_]+)notificationTitle.*\n/g);
-            propTag = propTag[0];
-            let newNameRegex = propTag.match(/default="(.*?)"/g);
-            newNameRegex = newNameRegex[0];
-            newTaskName = newNameRegex.substring(9, newNameRegex.length - 1);
+            for (let tag of taskTagMatches) {
+                let propTag = tag.match(/.*id="([A-Za-z0-9_]+)notificationTitle.*\n/g);
+                propTag = propTag[0];
+                let newNameRegex = propTag.match(/default="(.*?)"/g);
+                newNameRegex = newNameRegex[0];
+                newTaskName = newNameRegex.substring(9, newNameRegex.length - 1);
 
-            let nameTagMatches = tag.match(/<bpmn:task(.*?)name="(.*?)"/g);
-            if (nameTagMatches) {
-                nameTagMatches = nameTagMatches[0];
-                let newNameTagMatches = nameTagMatches.replace(/name="(.*?)"/, `name="${newTaskName}"`)
-                let newTag = tag.replace(nameTagMatches, newNameTagMatches);
-                content = content.replace(tag, newTag);
+                let nameTagMatches = tag.match(pattern[1]);
+                if (nameTagMatches) {
+                    nameTagMatches = nameTagMatches[0];
+                    let newNameTagMatches = nameTagMatches.replace(/name="(.*?)"/, `name="${newTaskName}"`)
+                    let newTag = tag.replace(nameTagMatches, newNameTagMatches);
+                    content = content.replace(tag, newTag);
+                }
             }
         }
     }
-
     return content;
 }
 
