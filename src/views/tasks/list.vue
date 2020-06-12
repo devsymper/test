@@ -77,7 +77,7 @@
                                                 <icon :icon="obj.icon" class="mr-2 float-left"></icon>
                         </div>-->
                         <div class="pl-1">
-                            <div class="fz-13 text-truncate d-inline-block float-left">{{obj.name}}</div>
+                            <div class="fz-13 text-truncate d-inline-block float-left text-ellipsis w-100">{{obj.name}}</div>
                             <v-col
                                 cols="12"
                                 class="pt-0 pb-0 pr-0 pl-0 grey--text lighten-2 float-left d-flex">
