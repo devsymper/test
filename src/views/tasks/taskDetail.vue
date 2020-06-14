@@ -10,13 +10,13 @@
                     task id
                 </div>
             </v-col>
-            <v-col cols="4" class="text-right pt-1 pb-1">
-                <v-btn small text color="warning" class="mr-2">
+            <v-col cols="4" class="text-right pt-1 pb-1 pr-0">
+                <!-- <v-btn small text color="warning" class="mr-2">
                     {{$t("tasks.claim")}}
-                </v-btn>
-                <v-btn small color="primary" @click="saveTaskOutcome" class="mr-2">
-                    <v-icon small class="mr-2">mdi-content-save</v-icon> 
-                    {{$t("common.save")}}
+                </v-btn> -->
+                <v-btn small v-for="(action, idx) in taskActionBtns" dark :key="idx" :color="action.color" @click="saveTaskOutcome(action.value)" class="mr-2">
+                    <!-- <v-icon small class="mr-2">mdi-content-save</v-icon>  -->
+                    {{action.text}}
                 </v-btn>
                 <v-btn small text @click="closeDetail">
                     <v-icon small>mdi-close</v-icon>
@@ -75,6 +75,7 @@ import people from "./people";
 import relatedItems from "./relatedItems";
 import subtask from "./subtask";
 import task from "./task";
+import BPMNEngine from '../../api/BPMNEngine';
 
 export default {
     name: "taskDetail",
@@ -87,12 +88,29 @@ export default {
             }
         }
     },
+    watch: {
+        taskInfo: {
+            deep: true,
+            immediate:true,
+            handler(valueAfter){
+                this.changeTaskDetail();
+            }
+        }
+    },
     components: {
         icon: icon,
         attachment, comment, flow, info, people, relatedItems, subtask, task
     },
     data: function() {
         return {
+            taskActionBtns: [
+                {
+                    text:"Submit",
+                    value:"submit",
+                    color:"blue"
+                },
+            ],
+            taskAction: 'submit',
             tab: null,
             items: [
                 { 
@@ -143,12 +161,76 @@ export default {
         closeDetail() {
             this.$emit("close-detail", {});
         },
-        saveTaskOutcome(){ // hành động khi người dùng submit task của họ
+        async saveTaskOutcome(value){ // hành động khi người dùng submit task của họ
             // this.$emit('save-task-outcome');
-            this.$refs.task[0].submitForm();
+            if(this.taskAction == 'submit'){
+                this.$refs.task[0].submitForm(value);
+            }else if(this.taskAction == 'approval'){
+                if(this.taskInfo.id){
+                    let taskData = {
+                        // action nhận 1 trong 4 giá trị: complete, claim, resolve, delegate
+                        "action": "complete",
+                        "assignee": "1",
+                        // "formDefinitionId": "12345",
+                        "outcome": value,
+                        // "variables": [],
+                        // "transientVariables": []
+                    }
+                    try {
+                        let result = await BPMNEngine.actionOnTask(this.taskInfo.id, taskData);   
+                        this.$snotifyError("Task completed!")
+                    } catch (error) {
+                        this.$snotifyError(error, "Can not submit task!")
+                    }
+                }
+            }
         },
         handleTaskSubmited(data){
             this.$emit('task-submited', data);
+        },
+        showApprovalOutcomes(approvalActions){
+            if(typeof approvalActions == 'string'){
+                approvalActions = JSON.parse(approvalActions);
+            }
+            approvalActions = approvalActions.filter(el => {
+                return Boolean(el.value)
+            });
+
+            this.taskActionBtns = approvalActions;
+        },
+        async changeTaskDetail(){
+            if(!this.taskInfo.processDefinitionId){
+                return;
+            }
+            let taskNodeId = this.taskInfo.taskDefinitionKey;
+            let varsMap = {};
+
+            // Lấy ra data model của process definition
+            let processModel = await BPMNEngine.getDefinitionModel(this.taskInfo.processDefinitionId);
+            let taskNode = processModel.processes[0].flowElementMap[taskNodeId];
+            let symperTaskPropsMap = {};
+            for(let item of taskNode.formProperties){
+                let propKey = item.id.replace(taskNodeId+'___', '');
+                symperTaskPropsMap[propKey] = item;
+            }
+
+            this.taskAction = symperTaskPropsMap.taskAction.defaultExpression;
+
+            // tạo ra map theo tên của variables
+            if(this.taskAction == 'approval'){
+                this.showApprovalOutcomes(symperTaskPropsMap.approvalActions.defaultExpression);
+                let vars = await BPMNEngine.getProcessInstanceVars(this.taskInfo.processInstanceId);
+                varsMap = vars.reduce((map, el) => {
+                    map[el.name] = el;
+                    return map;
+                }, {});
+                // lấy ra document object id của node được duyệt để hiển thị.
+                let approvaledElId = symperTaskPropsMap.approvalForElement.defaultExpression;
+                let docObjId = varsMap[approvaledElId+'_document_object_id'];
+
+                // Chuyển thông tin của document object id cho phần hiển thị chi tiết document
+                // ...
+            }
         }
     }
 }

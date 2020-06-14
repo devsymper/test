@@ -13,7 +13,7 @@ function moveTaskTitleToNameAttr(content) {
         ],
 
     ];
-    debugger
+
     for (let pattern of patterns) {
         let taskTagMatches = content.match(pattern[0]);
         if (taskTagMatches) {

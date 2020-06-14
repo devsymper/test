@@ -934,15 +934,14 @@ export default {
             try {
                 let modelData = await bpmnApi.getModelData(idProcess);
                 modelData = modelData.data;
-                this.diagramXML = modelData.content;
-                setTimeout((self) => {
-                    if(modelData.configValue){
-                        self.restoreAttrValueFromJsonConfig(modelData.configValue);
-                    }
-                }, 300, this);
+                
+                let afterRender = await this.$refs.symperBpmn.renderFromXML(modelData.content);
+                if(modelData.configValue){
+                    this.restoreAttrValueFromJsonConfig(modelData.configValue);
+                }
             } catch (error) {
                 self.$snotifyError(
-                    err,
+                    error,
                     self.$t("process.editror.err.get_xml")
                 );
             }

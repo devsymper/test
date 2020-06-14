@@ -72,6 +72,7 @@ export default {
                 val = val.replace(/\n/g, "");
                 self.bpmnModeler.importXML(val, function(err) {
                     if (err) {
+                        self.$emit('after-render-diagram-from-xml', {})
                         console.error(err, "errror on import XML");
                     }
                 });
@@ -79,6 +80,19 @@ export default {
         }
     },
     methods: {
+        renderFromXML(xml){
+            let self = this;
+            return new Promise((resolve, reject) => {
+                self.bpmnModeler.importXML(xml, function(err) {
+                    if (err) {
+                        self.$snotifyError(err, " Can not render diagram from XML!");
+                        reject(err);
+                    }else{
+                        resolve({});
+                    }
+                });
+            });
+        },
         changeElementColor(ele,data){
             if(typeof ele == 'string'){ // Nếu truyền vào id
                 ele = this.bpmnModeler.get("elementRegistry").get(ele);

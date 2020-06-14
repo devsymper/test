@@ -87,6 +87,10 @@ export default {
     getProcessInstanceData(id) {
         return bpmneApi.get(appConfigs.apiDomain.bpmne.instances + '/' + id, {}, testHeader);
     },
+    // Lấy các viriable của một process instance
+    getProcessInstanceVars(id) {
+        return bpmneApi.get(appConfigs.apiDomain.bpmne.instances + '/' + id + '/variables', {}, testHeader);
+    },
     // Lấy lịch sử chạy các node trong process instance
     getProcessInstanceRuntimeHistory(id) {
         return bpmneApi.get(appConfigs.apiDomain.bpmne.history + '/historic-activity-instances?processInstanceId=' + id, {}, testHeader);
@@ -99,5 +103,9 @@ export default {
     },
     getTask(filter) {
         return bpmneApi.get(appConfigs.apiDomain.bpmne.tasks, filter, testHeader);
-    }
+    },
+    actionOnTask(id, data) {
+        data = JSON.stringify(data);
+        return bpmneApi.post(appConfigs.apiDomain.bpmne.tasks + '/' + id, data, testHeader);
+    },
 };

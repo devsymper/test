@@ -32,6 +32,7 @@ export default {
     methods: {
         async getFirstNodeData(){
             let idDefinition = this.$route.params.id;
+            
             let definitionModel = await BPMNEApi.getDefinitionModel(idDefinition);
             this.definitionModel = definitionModel;
             this.taskInfo.docId = Number(definitionModel.mainProcess.initialFlowElement.formKey);

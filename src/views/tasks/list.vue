@@ -220,6 +220,7 @@ export default {
         if(!this.smallComponentMode){
             this.getTasks({
                 size: 100,
+                sort: 'createTime',
                 order: 'desc'
             });
         }
