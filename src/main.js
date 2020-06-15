@@ -110,7 +110,6 @@ window.$ = $;
 window.Vue = Vue;
 util.serviceWorker.register();
 
-
 export const SYMPER_APP = new Vue({
     router,
     store,
