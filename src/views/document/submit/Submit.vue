@@ -222,15 +222,19 @@ export default {
             thisCpn.titleDragPanelIcon = "mdi-file-search";
         }); 
         // hàm nhận sự thay đổi của input autocomplete gọi api để chạy công thức lấy dữ liệu
-        this.$evtBus.$on("document-submit-autocomplete-input-change", e => {
+        this.$evtBus.$on("document-submit-autocomplete-key-event", e => {
             if(e.e.keyCode != 38 && e.e.keyCode != 40 && e.e.keyCode != 13){
-                thisCpn.getDataForAutocomplete(e,'autocomplete');
+                if(e.isSelect == false){
+                    thisCpn.getDataForAutocomplete(e,'autocomplete');
+                }
             }
         });
         // hàm nhận sự thay đổi của input select gọi api để chạy công thức lấy dữ liệu
           this.$evtBus.$on("document-submit-select-input", e => {
+              console.log(e.alias);
+              
             thisCpn.$refs.autocompleteInput.show(e.e);
-            thisCpn.getDataForAutocomplete(e,'select');
+            thisCpn.getDataForAutocomplete(e,'select',e.alias);
         });
         // click outside
         this.$evtBus.$on("symper-app-wrapper-clicked", evt => {
@@ -282,10 +286,11 @@ export default {
         /**
          * Hàm chạy công thức autocomplete để đổ dữ liệu vào box autucomplete, control select cũng dùng trường hợp này
          */
-        getDataForAutocomplete(e,type){
+        getDataForAutocomplete(e,type,aliasControl=""){
+            console.log(type);
+            
             let thisCpn = this
             if(type == 'select'){
-                let aliasControl = e.selectFormulasInstance.autocompleteDetectAliasControl();
                 let dataInput = this.getDataInputFormulas(e.selectFormulasInstance);  
                 let dataAutocomplete = e.selectFormulasInstance.handleRunAutoCompleteFormulas('',dataInput).then(res=>{
                     thisCpn.setDataForControlAutocomplete(res,aliasControl)
@@ -333,9 +338,20 @@ export default {
             else{
                 let currentTableInteractive = this.sDocumentSubmit.currentTableInteractive
                 currentTableInteractive.tableInstance.setDataAtCell(this.sDocumentSubmit.currentCellSelected.row,this.sDocumentSubmit.currentCellSelected.column,time)
-                currentTableInteractive.isAutoCompleting = false;
                 
             }
+            /**
+             * TH control select ở ngoài table
+             * reset biến chỉ ra là đang tương tác với table và cell nào
+             */
+            this.$store.commit("document/addToDocumentSubmitStore", {
+                key: 'currentCellSelected',
+                value: null
+            });
+            this.$store.commit("document/addToDocumentSubmitStore", {
+                key: 'currentTableInteractive',
+                value: null
+            });
             this.$refs.timePicker.hide();
         },
         /**
@@ -343,8 +359,6 @@ export default {
          */
         afterSelectRowAutoComplete(data){
             // th này không phải trong table       
-            console.log(this.sDocumentSubmit.currentCellSelected);
-            
             if(this.sDocumentSubmit.currentCellSelected == null){
                 $('.autocompleting').val(data.value);
                 $('.autocompleting').trigger('change');
@@ -352,6 +366,8 @@ export default {
             }
             else{
                 let currentTableInteractive = this.sDocumentSubmit.currentTableInteractive
+                console.log(data);
+                
                 currentTableInteractive.tableInstance.setDataAtCell(this.sDocumentSubmit.currentCellSelected.row,this.sDocumentSubmit.currentCellSelected.column,data.value)
                 currentTableInteractive.isAutoCompleting = false;
                 

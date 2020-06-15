@@ -1,7 +1,7 @@
 import Util from './util'
 import Handsontable from 'handsontable';
-import store from './../../../store/document'
-import s from './../../../store'
+import sDocument from './../../../store/document'
+import store from './../../../store'
 import ClientSQLManager from './clientSQLManager';
 import { SYMPER_APP } from './../../../main.js'
 import { Date } from 'core-js';
@@ -31,7 +31,7 @@ Handsontable.cellTypes.registerCellType('file', {
     renderer: Handsontable.renderers.PercentRenderer
 });
 
-let listInputInDocument = store.state.submit.listInputInDocument;
+let listInputInDocument = sDocument.state.submit.listInputInDocument;
 //object để lưu thông tin các control ngoài table chờ để chạy công thức
 let controlOutsideWaitingRun = {}
 const MAX_TABLE_HEIGHT = 300;
@@ -101,27 +101,28 @@ export default class Table {
             this.currentControlSelected = null
             this.event = {
                 afterSelection: (row, column, row2, column2, preventScrolling, selectionLayerLevel) => {
-                    let columns = thisObj.columnsInfo.columns;
-                    thisObj.currentControlSelected = columns[column].data
-                    console.log(event);
-
-                },
-                afterBeginEditing: function(row, column) {
-                    console.log(event);
-
                     thisObj.currentSelectedCell['row'] = row;
                     thisObj.currentSelectedCell['column'] = column;
-                    s.commit("document/addToDocumentSubmitStore", {
-                        key: 'currentCellSelected',
-                        value: thisObj.currentSelectedCell
-                    });
-                    s.commit("document/addToDocumentSubmitStore", {
+                    store.commit("document/addToDocumentSubmitStore", {
                         key: 'currentTableInteractive',
                         value: thisObj
                     });
-                    thisObj.checkAutoCompleteControl(thisObj.keyEvent);
+                    store.commit("document/addToDocumentSubmitStore", {
+                        key: 'currentCellSelected',
+                        value: thisObj.currentSelectedCell
+                    });
+                    let columns = thisObj.columnsInfo.columns;
+                    thisObj.currentControlSelected = columns[column].data;
+                    // nếu type cell là time thì emit qua submit mở timepicker
                     if (thisObj.getCellSelectedType(column) == 'time') {
-                        // SYMPER_APP.$evtBus.$emit('document-submit-show-time-picker', { event: thisObj.keyEvent });
+                        SYMPER_APP.$evtBus.$emit('document-submit-show-time-picker', { event: event });
+                    };
+                },
+                afterBeginEditing: function(row, column) {
+                    thisObj.checkAutoCompleteControl(thisObj.keyEvent);
+                    // nêu cell click là control select
+                    if (thisObj.getCellSelectedType(column) == 'dropdown') {
+                        thisObj.setSelectCell(event);
                     };
                 },
                 beforeKeyDown: function(event) {
@@ -131,9 +132,10 @@ export default class Table {
                         if (formulasInstance != false) {
                             event.stopImmediatePropagation();
 
-                            SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-input-change', {
+                            SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-key-event', {
                                 e: event,
                                 autocompleteFormulasInstance: formulasInstance,
+                                isSelect: false
                             })
                         }
                     }
@@ -145,7 +147,7 @@ export default class Table {
 
                 },
                 afterSelectionEnd: function(row, col) {
-                    s.commit("document/addToDocumentSubmitStore", {
+                    store.commit("document/addToDocumentSubmitStore", {
                         key: 'docStatus',
                         value: 'input'
                     });
@@ -158,15 +160,17 @@ export default class Table {
                     let controlName = changes[0][1];
                     let columns = thisObj.columnsInfo.columns;
                     let currentRowData = thisObj.tableInstance.getDataAtRow(thisObj.currentSelectedCell['row']);
-                    if (thisObj.currentSelectedCell.hasOwnProperty('column') && columns[thisObj.currentSelectedCell['column']].hasOwnProperty('type') &&
+                    // trường hợp cell type là time khi người dùng gõ ko đúng định dạng thì return
+                    if (thisObj.currentSelectedCell.hasOwnProperty('column') &&
+                        columns[thisObj.currentSelectedCell['column']].hasOwnProperty('type') &&
                         columns[thisObj.currentSelectedCell['column']].type == 'time' &&
                         !thisObj.checkCellIsTime(currentRowData[thisObj.currentSelectedCell['column']])) {
                         return;
                     }
+                    // nếu có sự thay đổi cell mà là id của row sqlite thì ko thực hiện update
                     if (controlName != 's_table_id_sql_lite') {
-
                         if (source != AUTO_SET) {
-                            s.commit("document/addToDocumentSubmitStore", {
+                            store.commit("document/addToDocumentSubmitStore", {
                                 key: 'rootChangeFieldName',
                                 value: controlName
                             });
@@ -178,69 +182,84 @@ export default class Table {
 
                         let currentColData = thisObj.tableInstance.getDataAtCol(thisObj.currentSelectedCell['column']);
                         currentColData.pop();
-                        s.commit("document/updateListInputInDocument", {
+                        store.commit("document/updateListInputInDocument", {
                             controlName: controlName,
                             key: 'value',
                             value: currentColData
                         });
                         if (source != AUTO_SET) {
-                            for (let index = 0; index < currentRowData.length; index++) {
-                                let cell = currentRowData[index];
-                                if (cell == "" || cell == null) {
-                                    currentRowData[index] = 'NULL';
-                                } else {
-                                    currentRowData[index] = '"' + currentRowData[index] + '"'
-                                }
-                            }
-                            if (currentRowData[currentRowData.length - 1] == 'NULL') {
-                                let id = Date.now();
-                                currentRowData[currentRowData.length - 1] = id;
-                                thisObj.tableInstance.setDataAtCell(thisObj.currentSelectedCell['row'], currentRowData.length - 1, id);
-
-                                ClientSQLManager.insertRow(thisObj.keyInstance, thisObj.tableName, columns, currentRowData, true).then(res => {
-                                    thisObj.handlerCheckEffectedControlInTable(controlName);
-                                });
-                            } else {
-                                ClientSQLManager.editRow(thisObj.keyInstance, thisObj.tableName, controlName, changes[0][3],
-                                    'WHERE s_table_id_sql_lite = ' + currentRowData[currentRowData.length - 1], true).then(res => {
-                                    thisObj.handlerCheckEffectedControlInTable(controlName);
-                                });
-                            }
+                            thisObj.handlerAfterChangeCellByUser(changes, currentRowData, columns, controlName);
                         } else {
-                            for (let index = 0; index < changes.length; index++) {
-                                let colChange = changes[index];
-                                let rowData = thisObj.tableInstance.getDataAtRow(colChange[0]);
-                                for (let index = 0; index < rowData.length; index++) {
-                                    let cell = rowData[index];
-                                    if (cell == "" || cell == null) {
-                                        rowData[index] = 'NULL';
-                                    } else {
-                                        rowData[index] = '"' + rowData[index] + '"'
-                                    }
-                                }
-                                if (rowData[rowData.length - 1] == 'NULL') {
-                                    let id = Date.now();
-                                    rowData[rowData.length - 1] = id;
-                                    thisObj.tableInstance.setDataAtCell(colChange[0], rowData.length - 1, id);
-                                    ClientSQLManager.insertRow(thisObj.keyInstance, thisObj.tableName, columns, rowData, true).then(res => {
-                                        thisObj.handlerCheckEffectedControlInTable(controlName);
-                                    });
-                                } else {
-                                    ClientSQLManager.editRow(thisObj.keyInstance, thisObj.tableName, colChange[1], colChange[3],
-                                        'WHERE s_table_id_sql_lite = ' + rowData[rowData.length - 1], true).then(res => {
-                                        thisObj.handlerCheckEffectedControlInTable(controlName);
-                                    });
-                                }
-                            }
+                            thisObj.handlerAfterChangeCellByAutoSet(changes, columns, controlName);
                         }
                     }
                 }
             }
         }
         /**
+         * Hàm xử lí dữ liệu thay đổi ở cell bởi hệ thống (hàm set data của handson)
+         */
+    handlerAfterChangeCellByAutoSet(changes, columns, controlName) {
+            let thisObj = this;
+            for (let index = 0; index < changes.length; index++) {
+                let colChange = changes[index];
+                let rowData = thisObj.tableInstance.getDataAtRow(colChange[0]);
+                for (let index = 0; index < rowData.length; index++) {
+                    let cell = rowData[index];
+                    if (cell == "" || cell == null) {
+                        rowData[index] = 'NULL';
+                    } else {
+                        rowData[index] = '"' + rowData[index] + '"'
+                    }
+                }
+                if (rowData[rowData.length - 1] == 'NULL') {
+                    let id = Date.now();
+                    rowData[rowData.length - 1] = id;
+                    thisObj.tableInstance.setDataAtCell(colChange[0], rowData.length - 1, id);
+                    ClientSQLManager.insertRow(thisObj.keyInstance, thisObj.tableName, columns, rowData, true).then(res => {
+                        thisObj.handlerCheckEffectedControlInTable(controlName);
+                    });
+                } else {
+                    ClientSQLManager.editRow(thisObj.keyInstance, thisObj.tableName, colChange[1], colChange[3],
+                        'WHERE s_table_id_sql_lite = ' + rowData[rowData.length - 1], true).then(res => {
+                        thisObj.handlerCheckEffectedControlInTable(controlName);
+                    });
+                }
+            }
+        }
+        /**
+         * Hàm xử lí dữ liệu thay đổi ở cell bởi User edit (hàm set data của handson)
+         */
+    handlerAfterChangeCellByUser(changes, currentRowData, columns, controlName) {
+            let thisObj = this;
+            for (let index = 0; index < currentRowData.length; index++) {
+                let cell = currentRowData[index];
+                if (cell == "" || cell == null) {
+                    currentRowData[index] = 'NULL';
+                } else {
+                    currentRowData[index] = '"' + currentRowData[index] + '"'
+                }
+            }
+            if (currentRowData[currentRowData.length - 1] == 'NULL') {
+                let id = Date.now();
+                currentRowData[currentRowData.length - 1] = id;
+                thisObj.tableInstance.setDataAtCell(thisObj.currentSelectedCell['row'], currentRowData.length - 1, id);
+
+                ClientSQLManager.insertRow(thisObj.keyInstance, thisObj.tableName, columns, currentRowData, true).then(res => {
+                    thisObj.handlerCheckEffectedControlInTable(controlName);
+                });
+            } else {
+                ClientSQLManager.editRow(thisObj.keyInstance, thisObj.tableName, controlName, changes[0][3],
+                    'WHERE s_table_id_sql_lite = ' + currentRowData[currentRowData.length - 1], true).then(res => {
+                    thisObj.handlerCheckEffectedControlInTable(controlName);
+                });
+            }
+        }
+        /**
          * Hàm kiểm tra xem cell có công thức autocomplete hay không
          * @param {String} controlName 
          */
+
     checkIsAutocompleteCell(controlName) {
             let controlInstance = listInputInDocument[controlName];
             if (controlInstance != null && controlInstance != undefined) {
@@ -335,7 +354,7 @@ export default class Table {
                     dataColumnAfterRunFOrmulas.push(thisObj.getDataResponseQuery(res));
                 })
             }
-            s.commit("document/updateListInputInDocument", {
+            store.commit("document/updateListInputInDocument", {
                 controlName: controlEffectedName,
                 key: 'value',
                 value: dataColumnAfterRunFOrmulas
@@ -390,16 +409,41 @@ export default class Table {
 
     }
     checkAutoCompleteControl(event) {
-        let autocompleteFormulasInstance = this.checkIsAutocompleteCell(this.currentControlSelected);
-        if (autocompleteFormulasInstance == false) {
-            this.isAutoCompleting = false;
-        } else {
-            this.isAutoCompleting = true;
-            SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-input', event);
-            SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-input-change', {
-                e: event,
-                autocompleteFormulasInstance: autocompleteFormulasInstance,
-            })
+            let autocompleteFormulasInstance = this.checkIsAutocompleteCell(this.currentControlSelected);
+            if (autocompleteFormulasInstance == false) {
+                this.isAutoCompleting = false;
+            } else {
+                this.isAutoCompleting = true;
+                SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-input', event);
+                SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-key-event', {
+                    e: event,
+                    autocompleteFormulasInstance: autocompleteFormulasInstance,
+                    isSelect: false
+                })
+            }
+        }
+        /**
+         * Hàm lấy formulas của cell select -> chạy -> gán lại data cho autocomplete component
+         */
+    setSelectCell(event) {
+
+        let controlInstance = listInputInDocument[this.currentControlSelected];
+        if (controlInstance != null && controlInstance != undefined) {
+            let controlFormulas = controlInstance.controlFormulas;
+            if (controlFormulas.hasOwnProperty('formulas')) {
+                let formulasInstance = controlFormulas['formulas'].instance;
+                console.log(formulasInstance);
+                SYMPER_APP.$evtBus.$emit('document-submit-select-input', {
+                    e: event,
+                    selectFormulasInstance: formulasInstance,
+                    alias: this.currentControlSelected
+                })
+                SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-key-event', {
+                    e: event,
+                    selectFormulasInstance: formulasInstance,
+                    isSelect: true
+                })
+            }
         }
     }
     getCellSelectedType(col) {

@@ -1,11 +1,11 @@
 import Control from "./control";
-import s from './../../../store'
-import store from './../../../store/document'
+import store from './../../../store'
+import sDocument from './../../../store/document'
 import { SYMPER_APP } from './../../../main.js'
 
 import Util from './util'
-let isDetailView = store.state.submit.isDetailView;
-let dataInputCache = store.state.submit.dataInputCache;
+let isDetailView = sDocument.state.submit.isDetailView;
+let dataInputCache = sDocument.state.submit.dataInputCache;
 const fileTypes = {
     'xlsx': 'mdi-microsoft-excel',
     'txt': 'file-text-o',
@@ -177,9 +177,21 @@ export default class BasicControl extends Control {
         this.ele = $('#' + id);
         let thisCpn = this;
         this.ele.on('click', function(e) {
+            /**
+             * TH control select ở ngoài table
+             * reset biến chỉ ra là đang tương tác với table và cell nào
+             */
+            store.commit("document/addToDocumentSubmitStore", {
+                key: 'currentCellSelected',
+                value: null
+            });
+            store.commit("document/addToDocumentSubmitStore", {
+                key: 'currentTableInteractive',
+                value: null
+            });
             $(this).addClass('autocompleting');
             let formulasInstance = thisCpn.controlFormulas.formulas.instance;
-            SYMPER_APP.$evtBus.$emit('document-submit-select-input', { e: e, selectFormulasInstance: formulasInstance })
+            SYMPER_APP.$evtBus.$emit('document-submit-select-input', { e: e, selectFormulasInstance: formulasInstance, alias: thisCpn.name })
         })
 
     }
@@ -220,11 +232,11 @@ export default class BasicControl extends Control {
         this.ele.on('input', function(e) {
             $(this).addClass('autocompleting');
 
-            s.commit("document/addToDocumentSubmitStore", {
+            store.commit("document/addToDocumentSubmitStore", {
                 key: 'currentCellSelected',
                 value: null
             });
-            s.commit("document/addToDocumentSubmitStore", {
+            store.commit("document/addToDocumentSubmitStore", {
                 key: 'currentTableInteractive',
                 value: null
             });
@@ -232,7 +244,7 @@ export default class BasicControl extends Control {
         })
         this.ele.on('keyup', function(e) {
             let formulasInstance = (fromSelect) ? thisCpn.controlFormulas.formulas.instance : thisCpn.controlFormulas.autocomplete.instance;
-            SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-input-change', { e: e, autocompleteFormulasInstance: formulasInstance })
+            SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-key-event', { e: e, autocompleteFormulasInstance: formulasInstance, isSelect: false })
         })
     }
     inputCacheSet(value, rowId = null, rawUserFormula = '') {
