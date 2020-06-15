@@ -62,6 +62,7 @@ export default {
                 }, {});
 
                 for(let ctrlName in outcomeData ){
+                    let itemKey = startNodeId+'_'+ctrlName;
                     if(typeof outcomeData[ctrlName] != 'object'){
                         let ctrlType = 'string';
                         if(ctrlsMap[ctrlName]){
@@ -70,14 +71,14 @@ export default {
 
                         let value = this.getValueForVariable(outcomeData[ctrlName], ctrlType);
                         vars.push({
-                            name: startNodeId+'_'+ctrlName,
+                            name: itemKey,
                             type: ctrlType,
                             value: value
                         });   
-                        dataInputForFormula[ctrlName] =  value;
+                        dataInputForFormula[itemKey] =  value;
                     }else{
                         vars.push({
-                            name: startNodeId+'_'+ctrlName,
+                            name: itemKey,
                             type: 'string',
                             value: JSON.stringify(outcomeData[ctrlName])
                         });

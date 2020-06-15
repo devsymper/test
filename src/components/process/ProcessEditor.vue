@@ -310,10 +310,23 @@ export default {
                 configValue: JSON.stringify(jsonConfig)
             };
         },
+        /**
+         * Lưu lại các thuộc tính được set qua việc tương tác trực tiếp với các thành phần trong diagram vào trong store
+         * Do khi tương tác qua diagram thì có một số thuộc tính chạy theo không được update lại nên cần bước này để khớp được data hiển thị và data bên dưới
+         */
+        updateViewDataToState(){
+            for(let elName in this.stateAllElements){
+                let el = this.stateAllElements[elName];
+                if(el.type.includes('Gateway')){
+                    this.setFlowsOrderForGateway(el);
+                }
+            }
+        },
         // Lưu lại data của process model hiện tại
         saveProcess() {
             let self = this;
             this.fillNodeData();
+            this.updateViewDataToState();
             this.validateModel(() => {
                 let action = self.modelAction;
                 let idModel = self.modelId;
@@ -451,6 +464,9 @@ export default {
                 if (nodeType == "BPMNDiagram") {
                     bnodeRoot = bnode;
                 }else if(nodeType == "SequenceFlow"){
+                    if(!mapSaveNodes[bnode.id]){
+                        debugger;
+                    }
                     di.childShapes.push(mapSaveNodes[bnode.id]); // theo quy tắc 1 của flowable về lưu SequenceFlow
                 }
             }
@@ -458,11 +474,17 @@ export default {
             if(bnodeRoot.$type == 'bpmn:Collaboration'){
                 for(let pool of bnodeRoot.participants){
                     let poolToSave = mapSaveNodes[pool.id];
+                    if(!poolToSave){
+                        debugger;
+                    }
                     di.childShapes.push(poolToSave);
                     poolToSave.properties.process_id = poolToSave.properties.process_id ? poolToSave.properties.process_id : poolToSave.properties.overrideid;
                     if(pool.processRef.laneSets){
                         // thêm các con cho các lane
                         for(let lane of pool.processRef.laneSets[0].lanes){
+                            if(!mapSaveNodes[lane.id]){
+                                debugger;
+                            }
                             poolToSave.childShapes.push(mapSaveNodes[lane.id]);
                             this.addChildrenForProcess(mapSaveNodes[lane.id], lane.flowNodeRef, mapSaveNodes);
                         }
@@ -488,7 +510,7 @@ export default {
         },
         addChildrenForProcess(di, bEls, mapSaveNodes){
             for(let bel of bEls){
-                if(bel.$type != 'bpmn:SequenceFlow'){
+                if(bel.$type != 'bpmn:SequenceFlow' && mapSaveNodes[bel.id]){
                     di.childShapes.push(mapSaveNodes[bel.id]);
                     if(bel.$type == 'bpmn:SubProcess'){
                         this.addChildrenForProcess(mapSaveNodes[bel.id], bel.flowElements, mapSaveNodes);
@@ -949,13 +971,23 @@ export default {
         restoreAttrValueFromJsonConfig(jsonStr){
             let configValue = JSON.parse(jsonStr);
             this.fillNodeData();
+            let gatewayEls = [];
             for(let elName in this.stateAllElements){
-                for(let attrName in this.stateAllElements[elName].attrs){
+                let el = this.stateAllElements[elName];
+                for(let attrName in el.attrs){
                     if(configValue[elName]){
                         if(configValue[elName].hasOwnProperty(attrName)){
-                            this.stateAllElements[elName].attrs[attrName].value = configValue[elName][attrName];
+                            if (allNodesAttrs[attrName].hasOwnProperty("restoreData")) {
+                                el.attrs[attrName].value = allNodesAttrs[attrName].restoreData(configValue[elName][attrName]);
+                            } else {
+                                el.attrs[attrName].value = configValue[elName][attrName];
+                            }
                         }
                     }
+                }
+
+                if(el.type.includes('Gateway')){
+                    this.setFlowsOrderForGateway(el);
                 }
             }
         },

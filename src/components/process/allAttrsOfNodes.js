@@ -1329,8 +1329,17 @@ let allAttrs = {
         "dg": "detail",
         getValue(value) {
             return value.reduce((ids, el) => {
-                ids.push(el.text);
+                ids.push(el.idFlow);
                 return ids;
+            }, []);
+        },
+        restoreData(value) {
+            return value.reduce((arr, el) => {
+                arr.push({
+                    idFlow: el,
+                    text: ''
+                });
+                return arr;
             }, []);
         }
     },
