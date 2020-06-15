@@ -1,5 +1,6 @@
 import bpmnApi from "./../../api/BPMNEngine";
 import { util } from "../../plugins/util";
+import { documentApi } from "../../api/Document";
 
 function moveTaskTitleToNameAttr(content) {
     let patterns = [
@@ -160,4 +161,72 @@ function getVariables(dataObjects) {
         });
         return arr;
     }, []);
+}
+
+
+
+/**
+ * Chuyển giá trị của các control trong doc thành biến tương ứng của 
+ * @param {String} id 
+ */
+export const getVarsFromSubmitedDoc = async(docData, elId, docId) => {
+    return new Promise((resolve, reject) => {
+        let vars = [];
+        let dataInputForFormula = {};
+        documentApi.detailDocument(docId).then(ctrls => {
+            ctrls = ctrls.data.fields;
+            let ctrlsMap = Object.values(ctrls).reduce((map, el, idx) => {
+                map[el.properties.name] = el;
+                return map;
+            }, {});
+
+            for (let ctrlName in docData) {
+                let itemKey = elId + '_' + ctrlName;
+                if (typeof docData[ctrlName] != 'object') {
+                    let ctrlType = 'string';
+                    if (ctrlsMap[ctrlName]) {
+                        ctrlType = getVarType(ctrlsMap[ctrlName].type)
+                    }
+
+                    let value = getValueForVariable(docData[ctrlName], ctrlType);
+                    vars.push({
+                        name: itemKey,
+                        type: ctrlType,
+                        value: value
+                    });
+                    dataInputForFormula[itemKey] = value;
+                } else {
+                    vars.push({
+                        name: itemKey,
+                        type: 'string',
+                        value: JSON.stringify(docData[ctrlName])
+                    });
+                }
+            }
+            resolve({
+                vars: vars,
+                nameAndValueMap: dataInputForFormula
+            });
+        }).catch(err => {
+            reject(err);
+        });
+    });
+}
+
+function getVarType(originType) {
+    let numberTypes = {
+        number: true,
+        percent: true,
+    };
+    return numberTypes[originType] ? 'integer' : 'string'; // hoặc date
+}
+
+function getValueForVariable(value, type) {
+    if (type == 'string') {
+        return String(value);
+    } else if (type == 'integer') {
+        return isNaN(Number(value)) ? 0 : Number(value);
+    } else {
+        return value;
+    }
 }

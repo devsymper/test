@@ -76,6 +76,7 @@ import relatedItems from "./relatedItems";
 import subtask from "./subtask";
 import task from "./task";
 import BPMNEngine from '../../api/BPMNEngine';
+import { getVarsFromSubmitedDoc } from '../../components/process/processAction';
 
 export default {
     name: "taskDetail",
@@ -86,6 +87,10 @@ export default {
             default: () => {
                 return {}
             }
+        },
+        isInitInstance: {
+            type: Boolean,
+            default: false
         }
     },
     watch: {
@@ -176,17 +181,32 @@ export default {
                         // "variables": [],
                         // "transientVariables": []
                     }
-                    try {
-                        let result = await BPMNEngine.actionOnTask(this.taskInfo.id, taskData);   
-                        this.$snotifyError("Task completed!")
-                    } catch (error) {
-                        this.$snotifyError(error, "Can not submit task!")
-                    }
+                    this.submitTask(taskData);
                 }
             }
         },
-        handleTaskSubmited(data){
-            this.$emit('task-submited', data);
+        async submitTask(taskData){
+            try {
+                let result = await BPMNEngine.actionOnTask(this.taskInfo.id, taskData);   
+                this.$snotifySuccess("Task completed!");
+            } catch (error) {
+                this.$snotifyError(error, "Can not submit task!")
+            }
+        },
+        async handleTaskSubmited(data){
+            if(this.isInitInstance){
+                this.$emit('task-submited', data);            
+            }else{
+                let varsForBackend = await getVarsFromSubmitedDoc(data, this.taskInfo.taskDefinitionKey, this.taskInfo.formKey);
+                let taskData = {
+                    // action nhận 1 trong 4 giá trị: complete, claim, resolve, delegate
+                    "action": "complete",
+                    "assignee": "1",
+                    "outcome": 'submit',
+                    "variables": varsForBackend.vars,
+                }
+                this.submitTask(taskData);
+            }
         },
         showApprovalOutcomes(approvalActions){
             if(typeof approvalActions == 'string'){

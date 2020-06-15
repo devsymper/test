@@ -84,13 +84,14 @@ export default {
                             order: 'desc'
                         });
                         let deploymentId = '';
+                        
                         if(lastestDeployment.data.length > 0){
                             lastestDeployment = lastestDeployment.data[0];
                             deploymentId = lastestDeployment.id;
-                            if(lastestDeployment.deploymentTime < row.lastUpdated){
-                               let deploymentData = await deployProcess(self, row);
-                               deploymentId = deploymentData.id;
-                            }
+                            // if(lastestDeployment.deploymentTime < row.lastUpdated){
+                            let deploymentData = await deployProcess(self, row);
+                            deploymentId = deploymentData.id;
+                            // }
                         }else{
                             let deploymentData = await deployProcess(self, row);
                             deploymentId = deploymentData.id;

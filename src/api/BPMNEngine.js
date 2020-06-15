@@ -106,6 +106,6 @@ export default {
     },
     actionOnTask(id, data) {
         data = JSON.stringify(data);
-        return bpmneApi.post(appConfigs.apiDomain.bpmne.tasks + '/' + id, data, testHeader);
+        return bpmneApi.post(appConfigs.apiDomain.bpmne.tasks + '/' + id, data, testHeader, { dataType: 'text' });
     },
 };

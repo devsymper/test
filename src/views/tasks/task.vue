@@ -2,7 +2,7 @@
     <div class="h-100 w-100 d-flex justify-center"> 
         <DocumentSubmit 
             ref="submitComponent"
-            :docId="docId"
+            :docId="Number(docId)"
             :showSubmitButton="false"
             @submit-document-success="onSubmitDone"
         >
@@ -41,7 +41,7 @@ export default {
                 console.log(after, before, "after taskInfo change");
                 this.handleTaskDetailChange(after.processDefinitionId, after.taskDefinitionKey);
                 if(after.docId){
-                    this.docId = after.docId;
+                    this.docId = Number(after.docId);
                 }
             }
         }

@@ -1,6 +1,6 @@
 <template>
     <div class="h-100 w-100">
-        <taskDetail @task-submited="handleTaskSubmited" :taskInfo="taskInfo">
+        <taskDetail :isInitInstance="true" @task-submited="handleTaskSubmited" :taskInfo="taskInfo">
 
         </taskDetail>
     </div>
@@ -9,7 +9,7 @@
 <script>
 import BPMNEApi from "./../../api/BPMNEngine";
 import taskDetail from "./../../views/tasks/taskDetail.vue";
-import { runProcessDefinition } from '../../components/process/processAction';
+import { runProcessDefinition, getVarsFromSubmitedDoc } from '../../components/process/processAction';
 import { documentApi } from '../../api/Document';
 import { formulasApi } from '../../api/Formulas';
 
@@ -37,15 +37,15 @@ export default {
             this.definitionModel = definitionModel;
             this.taskInfo.docId = Number(definitionModel.mainProcess.initialFlowElement.formKey);
         },
-        getValueForVariable(value, type){
-            if(type == 'string'){
-                return String(value);
-            }else if(type == 'integer'){
-                return isNaN(Number(value)) ? 0 : Number(value);
-            }else{
-                return value;
-            }
-        },
+        // getValueForVariable(value, type){
+        //     if(type == 'string'){
+        //         return String(value);
+        //     }else if(type == 'integer'){
+        //         return isNaN(Number(value)) ? 0 : Number(value);
+        //     }else{
+        //         return value;
+        //     }
+        // },
         async saveTaskOutcome(outcomeData){
             let processDef = await BPMNEApi.getDefinitionData(this.$route.params.id);
             let vars = []; // các biến cần đưa vào process instance
@@ -54,37 +54,11 @@ export default {
             let dataInputForFormula = {};
 
             try {
-                let ctrls = await documentApi.detailDocument(startNode.formKey);
-                ctrls = ctrls.data.fields;
-                let ctrlsMap = Object.values(ctrls).reduce((map, el, idx)=>{
-                    map[el.properties.name] = el;
-                    return map;
-                }, {});
-
-                for(let ctrlName in outcomeData ){
-                    let itemKey = startNodeId+'_'+ctrlName;
-                    if(typeof outcomeData[ctrlName] != 'object'){
-                        let ctrlType = 'string';
-                        if(ctrlsMap[ctrlName]){
-                            ctrlType = this.getVarType(ctrlsMap[ctrlName].type)
-                        }
-
-                        let value = this.getValueForVariable(outcomeData[ctrlName], ctrlType);
-                        vars.push({
-                            name: itemKey,
-                            type: ctrlType,
-                            value: value
-                        });   
-                        dataInputForFormula[itemKey] =  value;
-                    }else{
-                        vars.push({
-                            name: itemKey,
-                            type: 'string',
-                            value: JSON.stringify(outcomeData[ctrlName])
-                        });
-                    }
-                }
                 
+                let varsForBackend = await getVarsFromSubmitedDoc(outcomeData, startNodeId, startNode.formKey);
+                vars = varsForBackend.vars;
+                dataInputForFormula = varsForBackend.nameAndValueMap;
+
                 let instanceName = await this.getInstanceName(dataInputForFormula);
                 // let newProcessInstance = await runProcessDefinition(this, processDef, [], instanceName);
                 let newProcessInstance = await runProcessDefinition(this, processDef, vars, instanceName);
@@ -126,15 +100,6 @@ export default {
                     resolve('');
                 }
             })
-        },
-        getVarType(originType){
-            let numberTypes = {
-                number: true,
-                percent: true,
-            };
-            console.log(originType, numberTypes[originType] ? 'integer' : 'string');
-            
-            return numberTypes[originType] ? 'integer' : 'string'; // hoặc date
         },
         handleTaskSubmited(outcomeData){
             this.saveTaskOutcome(outcomeData);
