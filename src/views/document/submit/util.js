@@ -261,5 +261,28 @@ export default class Util {
                 </div>
             </div> `;
     }
-
+    static generateString = function(length) {
+            var result = '';
+            var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            var charactersLength = characters.length;
+            for (var i = 0; i < length; i++) {
+                result += characters.charAt(Math.floor(Math.random() * charactersLength));
+            }
+            return result;
+        }
+        /**
+         * Hàm chuyển type control sang type của sql để tạo bảng sql cho document
+         */
+    static mapTypeControlToTypeSQLLite(controlType) {
+        if (controlType == "textInput" || controlType == "label" || controlType == "richText" ||
+            controlType == "select" || controlType == "email" || controlType == "hidden") {
+            return "TEXT";
+        } else if (controlType == "number" || controlType == "percent") {
+            return "NUMERIC";
+        } else if (controlType == "date" || controlType == "datetime" || controlType == "time" || controlType == "month") {
+            return "TEXT";
+        } else {
+            return "TEXT";
+        }
+    }
 }

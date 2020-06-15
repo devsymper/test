@@ -10,7 +10,7 @@
         overflow:hidden;padding-bottom:8px"
     >
             <template v-slot:append="{ item }">
-                <input v-model="item.formulas" v-on:focus="openLargeValueEditor($event,item,'Cong thuc')" class="input-validate" v-if="!item.condition" type="text">
+                <input v-model="item.formulas" v-on:change="handleChangeInput" v-on:focus="openLargeValueEditor($event,item,'Cong thuc')" class="input-validate" v-if="!item.condition" type="text">
                 <div v-else type="text">
                 
                     <v-btn
@@ -117,6 +117,9 @@ export default {
         currentForcusInput:null
     }),
     methods:{
+        /**
+         * Mở drag panel nhập công thức
+         */
         openLargeValueEditor(event,inputInfo, name) {
             this.currentForcusInput = inputInfo;
             this.largeFormulaEditor.open = true;
@@ -137,9 +140,18 @@ export default {
                 item.children.push({id:Date.now(),condition:true,name:'AND',parent:item.id,children:[]});
             }
         },
+        setValueForNode(){
+            
+        },
+        /**
+         * Thay đổi điều kiện
+         */
         swapCondition(item){
             item.name = (item.name == 'OR') ? 'AND' : 'OR'
         },
+        /**
+         * Xóa node
+         */
         deleteCondition(item){
             let parentId = item.parent;
             let parentNode = this.bfs(this.items, parentId)
@@ -150,6 +162,7 @@ export default {
             }
        
         },
+        
         bfs(tree, id) {
             var queue = []
             
@@ -169,6 +182,36 @@ export default {
                 }
             }
             return null
+        },
+        /**
+         * Hàm lấy công thức từ tree validate
+         */
+
+        getData(){
+            console.log(this.items);
+            let root = this.items[0];
+            let rootCondition = this.items[0].name;
+            let firstChildren = this.items[0].children;
+            for(let child in firstChildren){
+
+            }
+        },
+        getDataChildRen(children,data,currentCondition){
+            let dataCondition = "";
+            for(let i = 0; i < children.length; i++){
+                let child = children[i];
+                if(child.condition){
+                    if(child.children.length > 0){
+                        this.getDataChildRen(child.children,dataCondition,)
+                    }
+                }
+                else{
+                    dataCondition += child.formulas + " " + currentCondition;
+                }
+            }
+        },
+        handleChangeInput(){
+            this.getData();
         }
     }
 };

@@ -1,6 +1,6 @@
 <template>
     <div class="h-100 w-100">
-        <taskDetail @task-submited="handleTaskSubmited" :taskInfo="taskInfo">
+        <taskDetail :isInitInstance="true" @task-submited="handleTaskSubmited" :taskInfo="taskInfo">
 
         </taskDetail>
     </div>
@@ -9,8 +9,9 @@
 <script>
 import BPMNEApi from "./../../api/BPMNEngine";
 import taskDetail from "./../../views/tasks/taskDetail.vue";
-import { runProcessDefinition } from '../../components/process/processAction';
+import { runProcessDefinition, getVarsFromSubmitedDoc } from '../../components/process/processAction';
 import { documentApi } from '../../api/Document';
+import { formulasApi } from '../../api/Formulas';
 
 export default {
     components: {
@@ -31,43 +32,74 @@ export default {
     methods: {
         async getFirstNodeData(){
             let idDefinition = this.$route.params.id;
+            
             let definitionModel = await BPMNEApi.getDefinitionModel(idDefinition);
             this.definitionModel = definitionModel;
             this.taskInfo.docId = Number(definitionModel.mainProcess.initialFlowElement.formKey);
         },
+        // getValueForVariable(value, type){
+        //     if(type == 'string'){
+        //         return String(value);
+        //     }else if(type == 'integer'){
+        //         return isNaN(Number(value)) ? 0 : Number(value);
+        //     }else{
+        //         return value;
+        //     }
+        // },
         async saveTaskOutcome(outcomeData){
             let processDef = await BPMNEApi.getDefinitionData(this.$route.params.id);
             let vars = []; // các biến cần đưa vào process instance
-            let startNode =  definitionModel.mainProcess.initialFlowElement;
+            let startNode =  this.definitionModel.mainProcess.initialFlowElement;
             let startNodeId = startNode.id;
-            try {
-                let ctrls = await documentApi.detailDocument(startNode.formKey).data.fields;
-                let ctrlsMap = Object.values(ctrls).reduce((map, el, idx)=>{
-                    map[el.name] = el;
-                    return map;
-                }, {});
+            let dataInputForFormula = {};
 
-                for(let ctrlName in outcomeData ){
-                    if(typeof outcomeData[ctrlName] != 'object'){
-                        vars.push({
-                            name: startNodeId+'.'+ctrlName,
-                            type: this.getVarType(ctrlsMap[ctrlName].type),
-                            value: outcomeData[ctrlName]
-                        });    
-                    }
-                }
-                let newProcessInstance = await runProcessDefinition(this, processDef, vars);
+            try {
+                
+                let varsForBackend = await getVarsFromSubmitedDoc(outcomeData, startNodeId, startNode.formKey);
+                vars = varsForBackend.vars;
+                dataInputForFormula = varsForBackend.nameAndValueMap;
+
+                let instanceName = await this.getInstanceName(dataInputForFormula);
+                // let newProcessInstance = await runProcessDefinition(this, processDef, [], instanceName);
+                let newProcessInstance = await runProcessDefinition(this, processDef, vars, instanceName);
                 this.$snotifySuccess("Task submited successfully");
             } catch (error) {
-                
+                this.$snotifyError(error ,"Error on run process definition ");
             }
         },
-        getVarType(originType){
-            let numberTypes = {
-                number: true,
-                percent: true,
-            };
-            return numberTypes[originType] ? 'number' : 'string';
+        async getInstanceName(dataInput){
+            let self = this;
+            return new Promise((resolve, reject) => {
+                
+                let dataObjs = self.definitionModel.processes[0].dataObjects;
+                let dataObjsMap = {};
+
+                for(let obj of dataObjs){
+                    let objKey = obj.id.replace(self.definitionModel.mainProcess.id+'_','');
+                    dataObjsMap[objKey] = obj;
+                }
+
+                if(dataObjsMap.instanceDisplayText){
+                    formulasApi.execute({
+                        data_input: JSON.stringify(dataInput),
+                        formula: dataObjsMap.instanceDisplayText.value
+                    }).then((formulaData) => {
+                        if( formulaData.status == 200){
+                            formulaData = formulaData.data.data;
+                            if(formulaData.length > 0){
+                                formulaData = formulaData[0];
+                                resolve(Object.values(formulaData)[0]);
+                            }
+                        }else{
+                            resolve('');
+                        }
+                    }).catch(err=>{
+                        reject(err);
+                    });                    
+                }else{
+                    resolve('');
+                }
+            })
         },
         handleTaskSubmited(outcomeData){
             this.saveTaskOutcome(outcomeData);

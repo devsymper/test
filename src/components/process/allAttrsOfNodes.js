@@ -1,5 +1,21 @@
 import Api from "./../../api/api.js";
 import { appConfigs } from "./../../configs.js"; // trong trường hợp này ta cần sử dụng domain của từng module nghiệp vụ được định nghĩa trong file config
+import attrToXMLMethods from "./elementDefinitions/attrToXMLMethods";
+
+/**
+ * các biến
+ */
+const commonEleAttrs = [{
+        "name": "id",
+        "isAttr": true,
+        "type": "String"
+    },
+    {
+        "name": "name",
+        "isAttr": true,
+        "type": "String"
+    }
+];
 const apiCaller = new Api('');
 /**
  * Danh sách tất cả các thuộc tính có thể có của process
@@ -11,55 +27,102 @@ const apiCaller = new Api('');
  *      2. khởi tạo lại giá trị từ server vào cấu trúc tương ứng của thuộc tính đó: restoreData(value) // value là giá trị lấy được từ server của thuộc tính đó
  * Mặc định nếu ko có hai phương thức trên thì giá trị lưu ở server sẽ giống với giá trị được dùng trên client
  */
-export const allNodesAttrs = {
+let allAttrs = {
     "process_id": {
         "title": "Process identifier",
         "type": "text",
         "value": "process",
         "info": "BPMN.PROPERTYPACKAGES.PROCESS_IDPACKAGE.PROCESS_ID.DESCRIPTION",
-        "dg": "general"
+        "dg": "general",
+        // toXML: {
+        //     "symper_position": "attr",
+        //     "name": "id",
+        //     "isAttr": true,
+        //     "type": "String"
+        // }
     },
     "overrideid": {
         "title": "Id",
         "type": "text",
         "value": "",
         "info": "BPMN.PROPERTYPACKAGES.OVERRIDEIDPACKAGE.OVERRIDEID.DESCRIPTION",
-        "dg": "general"
+        "dg": "general",
+        // toXML: {
+        //     "symper_position": "attr",
+        //     "name": "id",
+        //     "isAttr": true,
+        //     "type": "String"
+        // }
     },
     "name": {
         "title": "Name",
         "type": "text",
         "value": "",
         "info": "BPMN.PROPERTYPACKAGES.NAMEPACKAGE.NAME.DESCRIPTION",
-        "dg": "general"
+        "dg": "general",
+        // toXML: {
+        //     "symper_position": "attr",
+        //     "name": "name",
+        //     "isAttr": true,
+        //     "type": "String"
+        // }
     },
     "documentation": {
         "title": "Documentation",
         "type": "text",
         "value": "",
         "info": "BPMN.PROPERTYPACKAGES.DOCUMENTATIONPACKAGE.DOCUMENTATION.DESCRIPTION",
-        "dg": "general"
+        "dg": "general",
+        toXML: {
+            "symper_position": "el",
+            "name": "documentation",
+            "superClass": ["Element"],
+            "properties": [{
+                "name": "text",
+                "isBody": true,
+                "type": "String"
+            }]
+        },
+        pushToXML: attrToXMLMethods.documentationMethod
     },
     "categorydefinition": {
         "title": "Category",
         "type": "text",
         "value": "",
         "info": "BPMN.PROPERTYPACKAGES.CATEGORYPACKAGE.CATEGORYDEFINITION.DESCRIPTION",
-        "dg": "detail"
+        "dg": "detail",
+        toXML: {
+            "symper_position": "attr",
+            "name": "category",
+            "isAttr": true,
+            "type": "String"
+        }
     },
     "process_author": {
         "title": "Process author",
         "type": "text",
         "value": "",
         "info": "BPMN.PROPERTYPACKAGES.PROCESS_AUTHORPACKAGE.PROCESS_AUTHOR.DESCRIPTION",
-        "dg": "detail"
+        "dg": "detail",
+        toXML: {
+            "symper_position": "attr",
+            "name": "author",
+            "isAttr": true,
+            "type": "String"
+        }
     },
     "process_version": {
         "title": "Process version (documentation only)",
         "type": "text",
         "value": "",
         "info": "BPMN.PROPERTYPACKAGES.PROCESS_VERSIONPACKAGE.PROCESS_VERSION.DESCRIPTION",
-        "dg": "detail"
+        "dg": "detail",
+        toXML: {
+            "symper_position": "attr",
+            "name": "processVersion",
+            "isAttr": true,
+            "type": "String"
+        }
     },
     "process_historylevel": {
         "title": "Set a specific history level for this process definition",
@@ -87,49 +150,99 @@ export const allNodesAttrs = {
                 text: 'Full',
                 value: 'full'
             },
-        ]
+        ],
+        toXML: {
+            "symper_position": "el",
+            "symper_need_ext_wrap": true,
+            "name": "documentation",
+            "superClass": ["Element"],
+            "properties": [{
+                "name": "text",
+                "isBody": true,
+                "type": "String"
+            }, ]
+        }
     },
     "isexecutable": {
         "title": "Is executable",
         "type": "checkbox",
         "value": true,
         "info": "BPMN.PROPERTYPACKAGES.ISEXECUTABLEPACKAGE.ISEXECUTABLE.DESCRIPTION",
-        "dg": "detail"
+        "dg": "detail",
+        toXML: {
+            "symper_position": "attr",
+            "name": "isExecutable",
+            "isAttr": true,
+            "type": "String"
+        }
     },
     "process_potentialstarteruser": {
         "title": "Potential starter user",
         "type": "text",
         "value": "",
         "info": "BPMN.PROPERTYPACKAGES.PROCESS_POTENTIALSTARTERUSERPACKAGE.PROCESS_POTENTIALSTARTERUSER.DESCRIPTION",
-        "dg": "detail"
+        "dg": "detail",
+        toXML: {
+            "symper_position": "attr",
+            "name": "candidateStarterUsers",
+            "isAttr": true,
+            "type": "String"
+        }
+
     },
     "process_potentialstartergroup": {
         "title": "Potential starter group",
         "type": "text",
         "value": "",
         "info": "BPMN.PROPERTYPACKAGES.PROCESS_POTENTIALSTARTERGROUPPACKAGE.PROCESS_POTENTIALSTARTERGROUP.DESCRIPTION",
-        "dg": "detail"
+        "dg": "detail",
+        toXML: {
+            "symper_position": "attr",
+            "name": "candidateStarterGroups",
+            "isAttr": true,
+            "type": "String"
+        }
     },
     "process_namespace": {
         "title": "Target namespace",
         "type": "text",
         "value": "https://symper.vn",
         "info": "BPMN.PROPERTYPACKAGES.PROCESS_NAMESPACEPACKAGE.PROCESS_NAMESPACE.DESCRIPTION",
-        "dg": "detail"
+        "dg": "detail",
+        toXML: {
+            "symper_position": "attr",
+            "name": "targetNamespace",
+            "isAttr": true,
+            "type": "String"
+        }
+
     },
     "iseagerexecutionfetch": {
         "title": "Eager execution fetching",
         "type": "checkbox",
         "value": false,
         "info": "BPMN.PROPERTYPACKAGES.PROCESS_ISEAGEREXECUTIONFETCHPACKAGE.ISEAGEREXECUTIONFETCH.DESCRIPTION",
-        "dg": "detail"
+        "dg": "detail",
+        toXML: {
+            "symper_position": "attr",
+            "name": "isEagerExecutionFetching",
+            "isAttr": true,
+            "type": "String"
+        }
+
     },
     "asynchronousdefinition": {
         "title": "Asynchronous",
         "type": "checkbox",
         "value": false,
         "info": "BPMN.PROPERTYPACKAGES.ASYNCHRONOUSDEFINITIONPACKAGE.ASYNCHRONOUSDEFINITION.DESCRIPTION",
-        "dg": "detail"
+        "dg": "detail",
+        toXML: {
+            "symper_position": "attr",
+            "name": "async",
+            "isAttr": true,
+            "type": "String"
+        }
     },
     "dataproperties": {
         "title": "Data Objects",
@@ -160,26 +273,68 @@ export const allNodesAttrs = {
             },
         ],
         getValue(value) {
-            if ($.isArray(value)) {
-                if (!value.length || $.isEmptyObject(value[0])) {
-                    return '';
-                } else {
-                    return value;
-                }
-            } else {
-                return '';
-            }
+            return $.isArray(value) ? value : [];
         },
         restoreData(value) {
             return value == '' ? [{}] : value;
-        }
+        },
+        needReformatValue: true,
+        toXML: {
+            "symper_position": "el",
+            "name": "dataObject",
+            "superClass": ["Element"],
+            "properties": [{
+                    "name": "id",
+                    "isAttr": true,
+                    "type": "String"
+                },
+                {
+                    "name": "name",
+                    "isAttr": true,
+                    "type": "String"
+                },
+                {
+                    "name": "itemSubjectRef",
+                    "isAttr": true,
+                    "type": "String"
+                },
+                {
+                    "name": "extensionElements",
+                    "type": "ExtensionElements"
+                }
+            ],
+            "extraElements": [{
+                    "name": "ExtensionElements",
+                    "properties": [{
+                        "name": "value",
+                        "type": "Value"
+                    }]
+                },
+                {
+                    "name": "Value",
+                    "properties": [{
+                        "name": "text",
+                        "isBody": true,
+                        "type": "String"
+                    }]
+                },
+            ]
+        },
+        pushToXML: attrToXMLMethods.notPushToXML // đã xử lý ở customExtToModel nên ko cần push vào xml nữa
+
     },
     "exclusivedefinition": {
         "title": "Exclusive",
         "type": "checkbox",
         "value": false,
         "info": "BPMN.PROPERTYPACKAGES.EXCLUSIVEDEFINITIONPACKAGE.EXCLUSIVEDEFINITION.DESCRIPTION",
-        "dg": "detail"
+        "dg": "detail",
+        toXML: {
+            "symper_position": "attr",
+            "name": "exclusive",
+            "isAttr": true,
+            "type": "String"
+        }
     },
     "executionlisteners": {
         "title": "Execution listeners",
@@ -212,7 +367,14 @@ export const allNodesAttrs = {
         "info": "BPMN.PROPERTYPACKAGES.USERTASKASSIGNMENTPACKAGE.USERTASKASSIGNMENT.DESCRIPTION",
         "dg": "detail",
         "columns": [],
-        hidden: true
+        hidden: true,
+        toXML: {
+            "symper_position": "attr",
+            "name": "assignee",
+            "isAttr": true,
+            "type": "String"
+        },
+        pushToXML: attrToXMLMethods.notPushToXML
     },
     "formproperties": {
         "title": "Form properties",
@@ -222,20 +384,51 @@ export const allNodesAttrs = {
         "dg": "detail",
         "columns": [],
         hidden: true,
-        getValue(value) {
-            if ($.isArray(value)) {
-                if (!value.length || $.isEmptyObject(value[0])) {
-                    return '';
-                } else {
-                    return value;
-                }
-            } else {
-                return '';
-            }
-        },
         restoreData(value) {
             return value == '' ? [] : value;
-        }
+        },
+        toXML: {
+            "symper_position": "el",
+            "name": "formProperty",
+            "superClass": ["Element"],
+            "properties": [{
+                    "name": "id",
+                    "isAttr": true,
+                    "type": "String"
+                },
+                {
+                    "name": "name",
+                    "isAttr": true,
+                    "type": "String"
+                },
+                {
+                    "name": "type",
+                    "isAttr": true,
+                    "type": "String"
+                },
+                {
+                    "name": "expression",
+                    "isAttr": true,
+                    "type": "String"
+                },
+                {
+                    "name": "variable",
+                    "isAttr": true,
+                    "type": "String"
+                },
+                {
+                    "name": "default",
+                    "isAttr": true,
+                    "type": "String"
+                },
+                {
+                    "name": "text",
+                    "isBody": true,
+                    "type": "String"
+                },
+            ]
+        },
+        pushToXML: attrToXMLMethods.formPropertyMethod
     },
     "formkeydefinition": {
         "title": "Form key",
@@ -243,21 +436,39 @@ export const allNodesAttrs = {
         "value": "",
         "info": "BPMN.PROPERTYPACKAGES.FORMKEYDEFINITIONPACKAGE.FORMKEYDEFINITION.DESCRIPTION",
         "dg": "taskAction",
-        hidden: true
+        hidden: true,
+        toXML: {
+            "symper_position": "attr",
+            "name": "formKey",
+            "isAttr": true,
+            "type": "String"
+        }
     },
     "formfieldvalidation": {
         "title": "Validate form fields",
         "type": "script",
         "value": "true",
         "info": "BPMN.PROPERTYPACKAGES.FORMFIELDVALIDATIONPACKAGE.FORMFIELDVALIDATION.DESCRIPTION",
-        "dg": "formula"
+        "dg": "formula",
+        toXML: {
+            "symper_position": "attr",
+            "name": "formFieldValidation",
+            "isAttr": true,
+            "type": "String"
+        }
     },
     "duedatedefinition": {
         "title": "Due date",
         "type": "script",
         "value": "",
         "info": "BPMN.PROPERTYPACKAGES.DUEDATEDEFINITIONPACKAGE.DUEDATEDEFINITION.DESCRIPTION",
-        "dg": "detail"
+        "dg": "detail",
+        toXML: {
+            "symper_position": "attr",
+            "name": "dueDate",
+            "isAttr": true,
+            "type": "String"
+        }
     },
     "prioritydefinition": {
         "title": "Priority",
@@ -278,6 +489,12 @@ export const allNodesAttrs = {
                 value: '3'
             },
         ],
+        toXML: {
+            "symper_position": "attr",
+            "name": "priority",
+            "isAttr": true,
+            "type": "String"
+        }
     },
     "servicetaskclass": {
         "title": "Class",
@@ -365,7 +582,7 @@ export const allNodesAttrs = {
         "value": "SYMPER_SCRIPT",
         "info": "BPMN.PROPERTYPACKAGES.SCRIPTFORMATPACKAGE.SCRIPTFORMAT.DESCRIPTION",
         "dg": "detail",
-        hidden: true
+        hidden: true,
     },
     "scripttext": {
         "title": "Script",
@@ -1112,15 +1329,28 @@ export const allNodesAttrs = {
         "dg": "detail",
         getValue(value) {
             return value.reduce((ids, el) => {
-                ids.push(el.text);
+                ids.push(el.idFlow);
                 return ids;
+            }, []);
+        },
+        restoreData(value) {
+            return value.reduce((arr, el) => {
+                arr.push({
+                    idFlow: el,
+                    text: ''
+                });
+                return arr;
             }, []);
         }
     },
     "signaldefinitions": {
         "title": "Signal definitions",
         "type": "table",
-        "value": [{}],
+        "value": [{
+            // id: 'xx',
+            // name: 'yy',
+            // symper_prefix_chars_scope: 'Global'
+        }],
         "columns": [{
                 title: 'Id',
                 name: 'id',
@@ -1133,7 +1363,7 @@ export const allNodesAttrs = {
             },
             {
                 title: 'Scope',
-                name: 'scope',
+                name: 'symper_prefix_chars_scope',
                 type: 'autocomplete',
                 source: ["Global", "Process instance"]
             },
@@ -1141,24 +1371,47 @@ export const allNodesAttrs = {
         "info": "BPMN.PROPERTYPACKAGES.SIGNALDEFINITIONSPACKAGE.SIGNALDEFINITIONS.DESCRIPTION",
         "dg": "detail",
         getValue(value) {
-            if ($.isArray(value)) {
-                if (!value.length || $.isEmptyObject(value[0])) {
-                    return '';
-                } else {
-                    return value;
-                }
-            } else {
-                return '';
-            }
+            return $.isArray(value) ? value : [];
         },
         restoreData(value) {
             return value == '' ? [] : value;
-        }
+        },
+        needReformatValue: true,
+        toXML: {
+            "symper_position": "el",
+            "name": "Signal",
+            "superClass": ["Element"],
+            "properties": [{
+                    "name": "id",
+                    "isAttr": true,
+                    "type": "String"
+                },
+                {
+                    "name": "name",
+                    "isAttr": true,
+                    "type": "String"
+                },
+                {
+                    "name": "symper_prefix_chars_scope",
+                    "isAttr": true,
+                    "type": "String"
+                },
+                {
+                    "name": "text",
+                    "isBody": true,
+                    "type": "String"
+                }
+            ]
+        },
+        pushToXML: attrToXMLMethods.pushNewEqualEls
     },
     "messagedefinitions": {
         "title": "Message definitions",
         "type": "table",
-        "value": [{}],
+        "value": [{
+            //     id: 'msg01',
+            //     name: 'msg name'
+        }],
         "columns": [{
                 title: 'Id',
                 name: 'id',
@@ -1172,25 +1425,48 @@ export const allNodesAttrs = {
         ],
         "info": "BPMN.PROPERTYPACKAGES.MESSAGEDEFINITIONSPACKAGE.MESSAGEDEFINITIONS.DESCRIPTION",
         "dg": "detail",
+        needReformatValue: true,
         getValue(value) {
-            if ($.isArray(value)) {
-                if (!value.length || $.isEmptyObject(value[0])) {
-                    return '';
-                } else {
-                    return value;
-                }
-            } else {
-                return '';
-            }
+            return $.isArray(value) ? value : [];
         },
         restoreData(value) {
             return value == '' ? [] : value;
-        }
+        },
+        toXML: {
+            "symper_position": "el",
+            "name": "Message",
+            "superClass": ["Element"],
+            "properties": [{
+                    "name": "id",
+                    "isAttr": true,
+                    "type": "String"
+                },
+                {
+                    "name": "name",
+                    "isAttr": true,
+                    "type": "String"
+                },
+                {
+                    "name": "scope",
+                    "isAttr": true,
+                    "type": "String"
+                },
+                {
+                    "name": "text",
+                    "isBody": true,
+                    "type": "String"
+                }
+            ]
+        },
+        pushToXML: attrToXMLMethods.pushNewEqualEls
     },
     "escalationdefinitions": {
         "title": "Escalation definitions",
         "type": "table",
-        "value": [{}],
+        "value": [{
+            //     id: 'esca01',
+            //     name: 'esca01 name'
+        }],
         "columns": [{
                 title: 'Id',
                 name: 'id',
@@ -1205,19 +1481,39 @@ export const allNodesAttrs = {
         "info": "BPMN.PROPERTYPACKAGES.ESCALATIONDEFINITIONSPACKAGE.ESCALATIONDEFINITIONS.DESCRIPTION",
         "dg": "detail",
         getValue(value) {
-            if ($.isArray(value)) {
-                if (!value.length || $.isEmptyObject(value[0])) {
-                    return '';
-                } else {
-                    return value;
-                }
-            } else {
-                return '';
-            }
+            return $.isArray(value) ? value : [];
         },
         restoreData(value) {
             return value == '' ? [] : value;
-        }
+        },
+        toXML: {
+            "symper_position": "el",
+            "name": "Escalation",
+            "superClass": ["Element"],
+            "properties": [{
+                    "name": "id",
+                    "isAttr": true,
+                    "type": "String"
+                },
+                {
+                    "name": "name",
+                    "isAttr": true,
+                    "type": "String"
+                },
+                {
+                    "name": "scope",
+                    "isAttr": true,
+                    "type": "String"
+                },
+                {
+                    "name": "text",
+                    "isBody": true,
+                    "type": "String"
+                }
+            ]
+        },
+        needReformatValue: true,
+        pushToXML: attrToXMLMethods.pushNewEqualEls
     },
     "istransaction": {
         "title": "Is a transaction sub process",
@@ -1236,14 +1532,27 @@ export const allNodesAttrs = {
             let docs = await apiCaller.get(appConfigs.apiDomain.documents + '?name=' + val);
             this.myItems = docs.data.listObject;
         },
-        options: [{ id: '    ', name: '', title: '' }]
+        options: [{ id: '    ', name: '', title: '' }],
+        toXML: {
+            "symper_position": "attr",
+            "name": "formreference",
+            "isAttr": true,
+            "type": "String"
+        },
+        pushToXML: attrToXMLMethods.notPushToXML
     },
     "terminateAll": {
         "title": "Terminate all",
         "type": "checkbox",
         "value": false,
         "info": "BPMN.PROPERTYPACKAGES.TERMINATEALLPACKAGE.TERMINATEALL.DESCRIPTION",
-        "dg": "detail"
+        "dg": "detail",
+        toXML: {
+            "symper_position": "attr",
+            "name": "terminateAll",
+            "isAttr": true,
+            "type": "String"
+        }
     },
     "decisiontaskdecisiontablereference": {
         "title": "Decision table reference",
@@ -1279,7 +1588,13 @@ export const allNodesAttrs = {
         "type": "script",
         "value": "",
         "info": "BPMN.PROPERTYPACKAGES.COMPLETIONCONDITIONPACKAGE.COMPLETIONCONDITION.DESCRIPTION",
-        "dg": "formula"
+        "dg": "formula",
+        toXML: {
+            "symper_position": "attr",
+            "name": "terminateAll",
+            "isAttr": true,
+            "type": "String"
+        }
     },
     "ordering": {
         "title": "Ordering",
@@ -1318,7 +1633,9 @@ export const allNodesAttrs = {
                 value: 'approval'
             },
         ],
-        dg: 'taskAction'
+        dg: 'taskAction',
+        isSymperProp: true,
+        pushToXML: attrToXMLMethods.notPushToXML
     },
     approvalActions: { // BA tự cấu hình các hành động cho việc duyệt
         title: 'Outcomes',
@@ -1380,7 +1697,9 @@ export const allNodesAttrs = {
                 source: ["yellow", "red", "orange", "green", "blue", "gray", "black", "white"]
             },
         ],
-        dg: 'taskAction'
+        dg: 'taskAction',
+        isSymperProp: true,
+        pushToXML: attrToXMLMethods.notPushToXML
     },
     assignee: {
         title: 'Assignee',
@@ -1391,7 +1710,16 @@ export const allNodesAttrs = {
             orgchartSelectorValue: [] // dạng value của orgchartselector để hiển thị lên
         },
         activeTab: 'orgchart', // tab nào sẽ mở: orgchart hoặc script
-        dg: 'assignment'
+        dg: 'assignment',
+        toXML: {
+            "symper_position": "attr",
+            "name": "sym_assignee",
+            "isAttr": true,
+            "type": "String"
+        },
+        isSymperProp: true,
+        pushToXML: attrToXMLMethods.notPushToXML
+
     },
     taskOwner: {
         title: 'Task owner',
@@ -1402,7 +1730,10 @@ export const allNodesAttrs = {
             orgchartSelectorValue: [] // dạng value của orgchartselector để hiển thị lên
         },
         activeTab: 'orgchart', // tab nào sẽ mở: orgchart hoặc script
-        dg: 'assignment'
+        dg: 'assignment',
+        isSymperProp: true,
+        pushToXML: attrToXMLMethods.notPushToXML
+
     },
     candidateUsers: {
         title: 'Candidate users',
@@ -1412,7 +1743,10 @@ export const allNodesAttrs = {
             formula: ''
         },
         activeTab: 'orgchart', // tab nào sẽ mở: orgchart hoặc script
-        dg: 'assignment'
+        dg: 'assignment',
+        isSymperProp: true,
+        pushToXML: attrToXMLMethods.notPushToXML
+
     },
 
     notificationTitle: {
@@ -1420,14 +1754,20 @@ export const allNodesAttrs = {
         type: 'script',
         value: '',
         info: '',
-        dg: 'formula'
+        dg: 'formula',
+        isSymperProp: true,
+        pushToXML: attrToXMLMethods.notPushToXML
+
     },
     notificationContent: {
         title: 'Notification and task content',
         type: 'script',
         value: '',
         info: '',
-        dg: 'formula'
+        dg: 'formula',
+        isSymperProp: true,
+        pushToXML: attrToXMLMethods.notPushToXML
+
     },
 
     approvalForElement: {
@@ -1437,7 +1777,10 @@ export const allNodesAttrs = {
         info: '',
         options: [],
         dg: 'taskAction',
-        showId: false
+        showId: false,
+        isSymperProp: true,
+        pushToXML: attrToXMLMethods.notPushToXML
+
     },
     controlsForBizKey: {
         title: 'Select control for business key',
@@ -1446,7 +1789,18 @@ export const allNodesAttrs = {
         info: '',
         options: [],
         dg: 'detail',
-
+        isSymperProp: true,
+        pushToXML: attrToXMLMethods.notPushToXML,
+        toXML: {
+            "symper_position": "el",
+            "name": "BusinessKeyControl",
+            "superClass": ["Element"],
+            "properties": [{
+                "name": "text",
+                "isBody": true,
+                "type": "String"
+            }]
+        },
     },
     instanceDisplayText: {
         title: 'Display text for process instance',
@@ -1454,6 +1808,60 @@ export const allNodesAttrs = {
         value: '',
         info: '',
         dg: 'detail',
-
+        isSymperProp: true,
+        pushToXML: attrToXMLMethods.notPushToXML,
+        toXML: {
+            "symper_position": "el",
+            "name": "InstanceDisplayText",
+            "superClass": ["Element"],
+            "properties": [{
+                "name": "text",
+                "isBody": true,
+                "type": "String"
+            }]
+        },
+    },
+    valueTag: {
+        "title": "",
+        "type": "text",
+        "value": "",
+        "info": "BPMN.PROPERTYPACKAGES.DOCUMENTATIONPACKAGE.DOCUMENTATION.DESCRIPTION",
+        "dg": "general",
+        hidden: true,
+        toXML: {
+            "symper_position": "el",
+            "name": "symper_symper_value_tag",
+            "superClass": ["Element"],
+            "properties": [{
+                "name": "text",
+                "isBody": true,
+                "type": "String"
+            }]
+        },
+        pushToXML: attrToXMLMethods.documentationMethod
     },
 }
+
+for (let name in allAttrs) {
+    let attr = allAttrs[name];
+    if (typeof attr.pushToXML != 'function') {
+        attr.pushToXML = attrToXMLMethods.setValueAsAttr;
+    }
+
+    if (typeof attr.getValue != 'function') {
+        attr.getValue = function(value) {
+            return value;
+        }
+    }
+
+    if (!attr.toXML) {
+        attr.toXML = {
+            "symper_position": "attr",
+            "name": name,
+            "isAttr": true,
+            "type": "String"
+        }
+    }
+}
+
+export const allNodesAttrs = allAttrs;

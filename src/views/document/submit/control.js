@@ -30,12 +30,11 @@ export default class Control {
          */
         this.effectedControl = [];
 
-        this.value = '';
 
         /**
          * Tên của control
          */
-        this.name = (this.controlProperties.hasOwnProperty(name)) ? this.controlProperties.name.value : "";
+        this.name = (this.controlProperties.hasOwnProperty('name')) ? this.controlProperties.name.value : "";
 
         /**
          * id của control
@@ -46,6 +45,8 @@ export default class Control {
          * Loại control
          */
         this.type = this.ele.attr('s-control-type');
+        this.value = (this.type == 'number') ? 0 : '';
+
 
 
         /**
@@ -71,12 +72,18 @@ export default class Control {
      * Khởi tạo các formulas của từng control
      */
     initFormulas() {
-        for (let key in this.controlFormulas) {
-            if (this.type == "date") {
-                this.controlFormulas[key].value = "SELECT NOW()"; // tesst formulas
+        if (Object.keys(this.controlFormulas).length > 0) {
+            for (let key in this.controlFormulas) {
+                if (this.controlFormulas[key].value != "" && this.controlFormulas[key].value != undefined) {
+                    this.controlFormulas[key]['instance'] = new Formulas(this.curParentInstance, this.controlFormulas[key].value, key);
+
+                }
             }
-            this.controlFormulas[key]['instance'] = new Formulas(this.controlFormulas[key].value, key);
         }
 
+
+    }
+    getEffectedControl() {
+        return this.effectedControl;
     }
 }

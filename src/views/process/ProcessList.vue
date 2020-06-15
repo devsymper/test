@@ -6,7 +6,6 @@
         :tableContextMenu="tableContextMenu"
         :containerHeight="containerHeight"
         :getDataUrl="getListUrl"
-        :customAPIResult="customAPIResult"
         :useActionPanel="false"
         :headerPrefixKeypath="'common'"
         @on-add-item-clicked="goToCreatePage()"
@@ -18,18 +17,16 @@ import { reformatGetListProcess } from "./../../components/process/reformatGetLi
 import { appConfigs } from "./../../configs.js";
 import ListItems from "./../../components/common/ListItems.vue";
 import bpmnApi from "./../../api/BPMNEngine.js";
-import { deployProcess } from "./../../components/process/processAction.js";
+import { deployProcess, deployProcessFromXML } from "./../../components/process/processAction.js";
 
 export default {
     data() {
         let self = this;
         return {
             containerHeight: 300,
+            deployProcessFromXML: deployProcessFromXML,
             listItemOptions: {},
-            customAPIResult: {
-                reformatData: reformatGetListProcess
-            },
-            getListUrl: appConfigs.apiDomain.bpmne.models+'?filter=processes&modelType=0&sort=modifiedDesc',
+            getListUrl: appConfigs.apiDomain.bpmne.models,
             tableContextMenu: [
                 {
                     name: "edit",
@@ -44,18 +41,22 @@ export default {
                 {
                     name: "remove",
                     text: this.$t("common.delete"),
-                    callback: (rows, refreshList) => {
-                        let removeArrPromise = [];
+                    callback: async (rows, refreshList) => {
+                        let ids = [];
                         for(let item of rows){
-                            removeArrPromise.push(bpmnApi.deleteModel(item.id));
+                            ids.push(item.id);
                         }
-                        Promise.all(removeArrPromise).then((res)=>{
-                            self.$snotifySuccess(self.$t('common.remove_msg_success',{count: rows.length}));
-                            refreshList();
-                        }).catch((err)=>{
-                            self.$snotifyError(err, self.$t('common.remove_msg_err'));
-                            refreshList();
-                        });
+                        try {
+                            let res = await bpmnApi.deleteModels(ids);
+                            if(res.status == 200){
+                                self.$snotifySuccess("Deleted "+ids.length+' items');
+                            }else{
+                                self.$snotifyError(res, "Can not delete selected items");
+                            }
+                        } catch (error) {
+                            self.$snotifyError(error, "Can not delete selected items");
+                        }
+                        refreshList();
                     }
                 },
                 {
@@ -83,13 +84,14 @@ export default {
                             order: 'desc'
                         });
                         let deploymentId = '';
+                        
                         if(lastestDeployment.data.length > 0){
                             lastestDeployment = lastestDeployment.data[0];
                             deploymentId = lastestDeployment.id;
-                            if(lastestDeployment.deploymentTime < row.lastUpdated){
-                               let deploymentData = await deployProcess(self, row);
-                               deploymentId = deploymentData.id;
-                            }
+                            // if(lastestDeployment.deploymentTime < row.lastUpdated){
+                            let deploymentData = await deployProcess(self, row);
+                            deploymentId = deploymentData.id;
+                            // }
                         }else{
                             let deploymentData = await deployProcess(self, row);
                             deploymentId = deploymentData.id;

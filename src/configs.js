@@ -10,15 +10,18 @@ export const appConfigs = {
         user: 'https://v2hoangnd.dev.symper.vn/api/',
         core: 'https://v2hoangnd.dev.symper.vn/',
         bpmne: {
-            models: 'https://v2.symper.vn:8443/symper-modeler/api/editor/models',
-            deployments: "https://v2.symper.vn:8443/symper-rest/service/repository/deployments",
-            definitions: "https://v2.symper.vn:8443/symper-rest/service/repository/process-definitions",
-            instances: "https://v2.symper.vn:8443/symper-rest/service/runtime/process-instances",
-            history: "https://v2.symper.vn:8443/symper-rest/service/history",
-            tasks: "https://v2.symper.vn:8443/symper-rest/service/runtime/tasks"
+            models: 'https://v2khadm.dev.symper.vn/process-modeler',
+            deployments: "https://workflow.symper.vn:8443/symper-rest/service/repository/deployments",
+            definitions: "https://workflow.symper.vn:8443/symper-rest/service/repository/process-definitions",
+            instances: "https://workflow.symper.vn:8443/symper-rest/service/runtime/process-instances",
+            history: "https://workflow.symper.vn:8443/symper-rest/service/history",
+            tasks: "https://workflow.symper.vn:8443/symper-rest/service/runtime/tasks",
+            validateModel: "https://workflow.symper.vn:8443/symper-modeler/api/editor/validate-model"
         },
         documents: 'https://v2hoangnd.dev.symper.vn/document',
-        nofitication: 'https://notifi.symper.vn/'
+        nofitication: 'https://notifi.symper.vn/',
+        formulasService: 'https://v2datnt.dev.symper.vn/',
+        documentService: 'https://sdocument.symper.vn/'
     },
     notificationTimeout: {
         success: 10000,

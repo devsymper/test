@@ -186,7 +186,7 @@ let commonFormulas = {
         title: "Công thức ẩn hiện",
         value: "",
         formulasId: 0,
-        type: "treeValidate",
+        type: "script", // muoons treevalidate thi thay script ow day
         groupType: "formulas"
     },
     link: {
@@ -214,14 +214,14 @@ let commonFormulas = {
         title: "Công thức xác thực",
         value: "",
         formulasId: 0,
-        type: "treeValidate",
+        type: "script",
         groupType: "formulas"
     },
     readOnly: {
         title: "Công thức readonly",
         value: "",
         formulasId: 0,
-        type: "treeValidate",
+        type: "script",
         groupType: "formulas"
     },
     uniqueDB: {
@@ -587,10 +587,12 @@ export const mappingOldVersionControlFormulas = {
 // output : data control  : {icon,html,title,formulas,properties}
 export const GetControlProps = function(type) {
     let control = util.cloneDeep(controlTypes[type]);
+    // console.log(type);
+    // console.log(control);
 
     let allProperties = util.cloneDeep(commonProps);
-    let notInProps = control.notInProps;
-    let inProps = control.inProps;
+    let notInProps = (control.hasOwnProperty('notInProps')) ? control.notInProps : false;
+    let inProps = (control.hasOwnProperty('inProps')) ? control.inProps : false;
 
     if (inProps != undefined && typeof inProps != 'undefined' && inProps.length > 0) {
         let propertiesControl = {};

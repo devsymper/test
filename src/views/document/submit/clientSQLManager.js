@@ -1,5 +1,8 @@
 import sDocument from './../../../store/document'
 import store from './../../../store'
+import { util } from "./../../../plugins/util.js";
+import { Column } from 'ag-grid-community';
+
 const dataSubmitStore = sDocument.state.submit
 const initSqlJs = require('sql.js');
 
@@ -20,8 +23,6 @@ export default class ClientSQLManager {
             });
             let db = new SQL.Database();
             this.addSQLInstanceDBToStore(keyInstance, db);
-            console.log(db);
-
         }
         /**
          * hoangnd:26/5/2020
@@ -39,7 +40,7 @@ export default class ClientSQLManager {
          * Hàm trả về instance của 1 DB dựa vào keyInstance
          * @param {String} keyInstance 
          */
-    getInstanceDB(keyInstance) {
+    static getInstanceDB(keyInstance) {
             return dataSubmitStore.SQLLiteDB[keyInstance]
         }
         /**
@@ -50,14 +51,128 @@ export default class ClientSQLManager {
          * @param {Boolean} isWithoutReturn : biến kiểm tra có trả về kết quả hay ko
          */
     static run(keyInstance, sql, isWithoutReturn = false) {
-        let db = this.getInstanceDB(keyInstance)
-        console.log("runnnnnnnnnnnnnnnnnnnnnnnnnnnnnn");
+        let db = this.getInstanceDB(keyInstance);
 
         if (isWithoutReturn) {
+
             return db.run(sql);
         } else {
+            console.log(sql);
+
             return db.exec(sql);
         }
     }
+
+    static createTable(keyInstance, tableName, columns, temporary = "") {
+        let col = "(";
+        for (let c in columns) {
+            col += c + " " + columns[c] + ", ";
+        }
+        col = col.trim();
+        col = col.substring(0, col.length - 1);
+        col += " )";
+        let sql = `CREATE ${temporary} TABLE IF NOT EXISTS ${tableName} ${col};`;
+        // sql += "INSERT INTO this_document VALUES ('a', 'hello');"
+        this.run(keyInstance, sql, true);
+
+        // console.log(this.run(keyInstance, 'select * from this_document', false));
+
+    }
+    static async editRow(keyInstance, tableName, column, value, where, returnPromise = false) {
+        let sql = `UPDATE ${tableName} SET ${column} = "${value}" ${where}`;
+        if (returnPromise) {
+            return new Promise((resolve, reject) => {
+                try {
+                    let data = this.run(keyInstance, sql, true);
+                    console.log(sql);
+
+                    console.log('mmmm', data);
+
+                    resolve(data);
+                } catch (error) {
+                    reject(error);
+                }
+            });
+        } else {
+            let x = this.run(keyInstance, sql, true);
+            console.log('nnnnn', x);
+
+            return x
+        }
+    }
+    static deleteRow(keyInstance, tableName, where) {
+        let sql = `DELETE FROM ${tableName} ${where}`;
+        this.run(keyInstance, sql, true);
+    }
+    static async insertRow(keyInstance, tableName, column, value, returnPromise = false) {
+        let tbColumn = column.join();
+        let tbValue = value.join()
+        let sql = `INSERT INTO ${tableName} (${tbColumn}) VALUES(${tbValue})`;
+        if (returnPromise) {
+            return new Promise((resolve, reject) => {
+                try {
+                    let data = this.run(keyInstance, sql, true);
+                    console.log(sql);
+
+                    console.log('xxxxxxxxxxx', data);
+
+                    resolve(data);
+                } catch (error) {
+                    reject(error);
+                }
+            });
+        } else {
+            return this.run(keyInstance, sql, true);
+        }
+
+    }
+    static insertMultiple(keyInstance, tableName, columns, columnstype, values) {
+        let tbColumns = columns.join();
+        let tbValues = "";
+        for (let i = 0; i < values.length; i++) {
+            for (let j = 0; j < columnstype.length; j++) {
+                if (columnstype[j] == 'numeric') {
+                    if (typeof values[i][j] != 'number')
+                        values[i][j] = 0;
+                } else {
+                    if (values[i][j] == null) {
+                        values[i][j] = `""`;
+                    } else {
+                        values[i][j] = `"${values[i][j]}"`
+                    }
+                }
+            }
+            values[i].push(i);
+
+            tbValues += ` (${values[i].join()}),`;
+        }
+        tbValues = tbValues.substring(0, tbValues.length - 1);
+        let sql = `INSERT INTO ${tableName} (${tbColumns},s_table_id_sql_lite) VALUES ${tbValues}`;
+
+        this.run(keyInstance, sql, true);
+
+    }
+    static delete(keyInstance, tableName, where) {
+        let w = "";
+        if (where != false) {
+            w = ` WHERE ${where}`;
+        }
+        let sql = `DELETE FROM ${tableName} ${w}`;
+        this.run(keyInstance, sql, true);
+    }
+    static get(keyInstance, sql) {
+        return this.run(keyInstance, sql, false);
+    }
+    static closeDB(keyInstance) {
+        let db = this.getInstanceDB(keyInstance);
+        if (db != undefined) {
+            db.close();
+        }
+    }
+    static getAllTableName(keyInstance) {
+        let sql = `SELECT name FROM sqlite_master WHERE type='table' ORDER BY name;`
+        return this.run(keyInstance, sql, false)
+    }
+
 
 }

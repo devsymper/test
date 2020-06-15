@@ -15,7 +15,7 @@
     </list-items>
 </template>
 <script>
-import { userApi } from "./../../api/user.js";
+import { documentApi } from "./../../api/Document.js";
 import ListItems from "./../../components/common/ListItems.vue";
 import ActionPanel from "./../../views/users/ActionPanel.vue";
 import ChangePassPanel from "./../../views/users/ChangePass.vue";
@@ -30,21 +30,51 @@ export default {
             actionPanelWidth:800,
             containerHeight: 200,
             tableContextMenu:[
-                {name:"delete",text:'Xóa'},
+                {name:"delete",text:'Xóa',
+                    callback: (document, callback) => {
+                        let thisCpn = this;
+                        documentApi
+                        .deleteDocument(document[0].name)
+                        .then(res => {
+                            if (res.status == 200) {
+                                thisCpn.$snotify({
+                                    type: "success",
+                                    title: "Delete document success!"
+                                });  
+                                thisCpn.$refs.listDocument.refreshList();
+                            }
+                            else{
+                                thisCpn.$snotify({
+                                    type: "error",
+                                    title: res.messagr
+                                });  
+                            }
+                        })
+                        .catch(err => {
+                            console.log("error from detail document api!!!", err);
+                        })
+                        .always(() => {});
+                    },
+                },
                 {
                     name: "edit",
                     text: "Sửa",
                     callback: (document, callback) => {
-                        this.$goToPage('/document/editor/'+document.id);
-                        // this.$router.push('/document/editor/'+document.id);
+                        this.$goToPage('/document/editor/'+document.id,document.title);
                     },
                 },
                 {
                     name: "submit",
                     text: "Nhập liệu",
                     callback: (document, callback) => {
-                        this.$goToPage('/document/submit/'+document.id);
-                        // this.$router.push('/document/submit/'+document.id);
+                        this.$goToPage('/document/submit/'+document.id,document.title);
+                    },
+                },
+                {
+                    name: "listObject",
+                    text: "Danh sách bản ghi",
+                    callback: (document, callback) => {
+                        this.$goToPage('/document/'+document.name+'/object',"Danh sách bản ghi");
                     },
                 },
             ],

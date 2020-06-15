@@ -33,13 +33,13 @@
                         plugins: [
                         'advlist autolink lists link image charmap table print preview anchor',
                         'searchreplace visualblocks code fullscreen',
-                        'insertdatetime media table paste code help wordcount emoticons'
+                        'insertdatetime media table paste code help wordcount emoticons hr'
                         ],
                         contextmenu: 'inserttable table | settingtable',
                         toolbar:
                         'undo redo | fontselect fontsizeselect formatselect | bold italic forecolor backcolor | \
                         alignleft aligncenter alignright alignjustify | \
-                        bullist numlist indent | removeformat  table |  preview margin',
+                        bullist numlist indent hr | removeformat  table |  preview margin',
                         fontsize_formats: '8px 10px 11px 12px 13px 14px 15px 16px 17px 18px 19px 20px 21px 22px 23px 24px 25px 26px 27px 28px 29px 30px 32px 34px 36px',
                         font_formats: 'Roboto = Roboto,sans-serif; Andale Mono=andale mono,times;'+ 'Arial=arial,helvetica,sans-serif;'+ 'Arial Black=arial black,avant garde;'+ 'Book Antiqua=book antiqua,palatino;'+ 'Comic Sans MS=comic sans ms,sans-serif;'+ 'Courier New=courier new,courier;'+ 'Georgia=georgia,palatino;'+ 'Helvetica=helvetica;'+ 'Impact=impact,chicago;'+ 'Symbol=symbol;'+ 'Tahoma=tahoma,arial,helvetica,sans-serif;'+ 'Terminal=terminal,monaco;'+ 'Times New Roman=times new roman,times;'+ 'Trebuchet MS=trebuchet ms,geneva;'+ 'Verdana=verdana,geneva;'+ 'Webdings=webdings;'+ 'Wingdings=wingdings,zapf dingbats',
                         valid_elements: '*[*]',
@@ -91,6 +91,7 @@ import ErrMessagePanel from "./../../views/document/items/ErrMessagePanel.vue";
 import AllControlInDoc from "./../../views/document/items/AllControlInDoc.vue";
 import { GetControlProps,mappingOldVersionControlProps,mappingOldVersionControlFormulas,getAPropsControl } from "./../../components/document/controlPropsFactory.js";
 import { documentApi } from "./../../api/Document.js";
+import { formulasApi } from "./../../api/Formulas.js";
 import { util } from "./../../plugins/util.js";
 import { getInsertionCSS } from "./../../components/document/documentUtil.js";
 import VueResizable from 'vue-resizable'
@@ -272,53 +273,149 @@ export default {
                 );
         },
         setShowAllControlOption(){
+            this.$refs.allControlOption.getData();
             this.$refs.allControlOption.showDialog();
         },
         // mở modal lưu , edit doc
         openPanelSaveDocument(){
             this.$refs.saveDocPanel.showDialog()
         },
-        // hoangnd: hàm gửi request lưu doc
-        saveDocument(documentProperties){
-            let thisCpn = this;
-            let htmlContent = this.$refs.editor.editor.getContent()
-            let allControl = JSON.stringify(this.editorStore.allControl);
-            if(this.documentId != 0 && this.documentId != undefined && typeof this.documentId != 'undefined'){   //update doc
-                documentApi.editDocument({documentProperty:documentProperties,fields:allControl,content:htmlContent,id:this.documentId}).then(res => {
-                    if (res.status == 200) {
-                        thisCpn.$router.push('/documents');
+        /**
+         * Hàm xử lí lấy dữ liệu các công thức để insert vào formulas service trước khi lưu
+         */
+        getDataToSaveMultiFormulas(listControl){
+            let listControlFormulas = {};
+            for(let controlId in listControl){
+                let control = listControl[controlId];
+                let listFormulas = [];
+                let formulas = listControl[controlId].formulas;
+                if(control.type == "table"){
+                    let listField = control.listFields;
+                    let listFormulasControlInTable = this.getDataToSaveMultiFormulas(listField);
+                    listControlFormulas = {...listFormulasControlInTable,...listControlFormulas}
+                }
+                for (let f in formulas){
+                    if(formulas[f].value != ""){
+                        let item = {};
+                        item[f] = formulas[f].value;
+                        listFormulas.push(item);
                     }
+                }
+                if(Object.keys(listFormulas).length > 0)
+                listControlFormulas[controlId] = listFormulas;
+            }
+           return listControlFormulas;
+            
+        },
+       
+        setDataFormulasId(){
+            
+        },
+        // hoangnd: hàm gửi request lưu doc
+        async saveDocument(documentProperties){
+            let allControl = this.editorStore.allControl;
+
+            let dataPost = this.getDataToSaveMultiFormulas(allControl);
+            if(Object.keys(dataPost).length > 0){
+                let thisCpn = this;
+                try {
+                    let res = await formulasApi.saveMultiFormulas({formulas:JSON.stringify(dataPost)})
+                    if(res.status == 200){
+                        let data = res.data;
+                        for(let controlId in data){
+                            for(let i = 0; i < data[controlId].length; i++){
+                                let key = Object.keys(data[controlId][i])[0];
+                                let controlEl = $("#editor_ifr").contents().find('#'+controlId);
+                                let tableId = 0;
+                                if(!controlEl.is('.s-control-table') && controlEl.closest(".s-control-table").length > 0){
+                                    console.log(controlId);
+                                    
+                                    tableId = controlEl.closest(".s-control-table").attr('id');
+                                }
+                                thisCpn.$store.commit(
+                                    "document/updateFormulasId",{id:controlId,name:key,value:data[controlId][i][key],tableId:tableId}
+                                );   
+                            }
+                        } 
+                        let htmlContent = this.$refs.editor.editor.getContent();
+                        if(this.documentId != 0 && this.documentId != undefined && typeof this.documentId != 'undefined'){   //update doc
+                            this.editDocument({documentProperty:documentProperties,fields:JSON.stringify(allControl),content:htmlContent,id:this.documentId})
+                        }
+                        else{
+                            this.createDocument({documentProperty:documentProperties,fields:JSON.stringify(allControl),content:htmlContent});
+                        }
+                    }
+                    else{
+                        this.$snotify({
+                                type: "error",
+                                title: "error from formulas serice!!!",
+                                text: res.message
+                            });
+                    }
+                } catch (error) {
+                    this.$snotify({
+                                type: "error",
+                                title: "error from formulas serice!!!",
+                                text: error
+                            });
+                }
+            }     
+            else{
+                let htmlContent = this.$refs.editor.editor.getContent();
+                if(this.documentId != 0 && this.documentId != undefined && typeof this.documentId != 'undefined'){   //update doc
+                    this.editDocument({documentProperty:documentProperties,fields:JSON.stringify(allControl),content:htmlContent,id:this.documentId})
+                }
+                else{
+                    this.createDocument({documentProperty:documentProperties,fields:JSON.stringify(allControl),content:htmlContent});
+                }
+            }  
+        },
+        /**
+         * Hàm gọi Api tạo mới ducument
+         */
+        createDocument(dataPost){
+            let thisCpn = this;
+            documentApi.saveDocument(dataPost).then(res => {
+                if (res.status == 200) {
+                    thisCpn.$refs.editor.editor.remove();
+                    thisCpn.$router.push('/documents');
                     thisCpn.$snotify({
                         type: "success",
                         title: "Save document success!"
                     });
-                })
-                .catch(err => {
-                    console.log("error from edit document api!!!", err);
+                }
+            })
+            .catch(err => {
+                console.log("error from add document api!!!", err);
+            })
+            .always(() => {
+            });
+        },
+        /**
+         * Hàm gọi api edit document
+         */
+        editDocument(dataPost){
+            let thisCpn = this;
+            documentApi.editDocument(dataPost).then(res => {
+                if (res.status == 200) {
+                    thisCpn.$refs.editor.editor.remove();
+                    thisCpn.$router.push('/documents');
                     thisCpn.$snotify({
-                        type: "error",
-                        title: "error from edit document api"
+                        type: "success",
+                        title: "Save document success!"
                     });
-                })
-                .always(() => {
+                }
+                
+            })
+            .catch(err => {
+                console.log("error from edit document api!!!", err);
+                thisCpn.$snotify({
+                    type: "error",
+                    title: "error from edit document api"
                 });
-            }
-            else{
-                documentApi.saveDocument({documentProperty:documentProperties,fields:allControl,content:htmlContent}).then(res => {
-                    if (res.status == 200) {
-                        thisCpn.$router.push('/documents');
-                        thisCpn.$snotify({
-                            type: "success",
-                            title: "Save document success!"
-                        });
-                    }
-                })
-                .catch(err => {
-                    console.log("error from add document api!!!", err);
-                })
-                .always(() => {
-                });
-            }
+            })
+            .always(() => {
+            });
         },
         //hoangnd: hàm xác thưc các control trước khi lưu
         // xac thực tên control và các formulas liên quan
@@ -344,7 +441,7 @@ export default {
                     // Object.assign
                 }
                 this.checkNameControl(controlId,control,listControlName);
-                this.validateFormulasInControl(control,listControlName)
+                // this.validateFormulasInControl(control,listControlName)
             }
             if(this.listMessageErr.length == 0 && $('#editor_ifr').contents().find('.s-control-error').length == 0){
                 this.saveDocument(documentProperties);
@@ -358,7 +455,7 @@ export default {
         },
         // hàm kiểm tra xác thực tên control 
         checkNameControl(controlId,control,listControlName){
-            if(control.type != "submit" && control.type != "draf" && control.type != "reset"){
+            if(control.type != "submit" && control.type != "draft" && control.type != "reset"){
                 if(control.properties.name.value == ''){
                     let controlEl = $('#editor_ifr').contents().find('#'+controlId);
                     controlEl.addClass('s-control-error');
@@ -441,7 +538,7 @@ export default {
                 let table = (elements.hasClass('s-control-table')) ? elements : elements.parent();
                 let tableId = table.attr('id');
                 let listData = [];
-                if($(tbody[1].innerHTML).length > 0){
+                if($(tbody[0].innerHTML).length > 0){
                     for(let i = 0; i< thead.length; i++){
                         let idControl = $(tbody[i].innerHTML).first().attr('id');
                         let typeControl = $(tbody[i].innerHTML).first().attr('s-control-type');
@@ -603,13 +700,15 @@ export default {
                 let style = $(value).attr('style');
                 if(type == 'text') type = 'textInput'
                 if(type == 'persent') type = 'percent'
+                console.log(type);
+                
                 let controlV2 = GetControlProps(type);
                 let controlEl = $(controlV2.html); 
                 var inputid = 's-control-id-' + Date.now();
                 controlEl.attr('id', inputid).attr('style',style);
                 controlEl.replaceAll($(value))
                 try {
-                    
+                    //loi parse ở đây
                     controlProps = JSON.parse(controlProps);
                     let controlProp = {};
                     let controlFormulas = {};
@@ -625,15 +724,11 @@ export default {
                 } catch (error) {   
                     console.log(error);
                 }
-                
                 if(type == 'table'){
                     let tableId = inputid;
                     let tableEl = controlEl;
                     
                     let bodyTable = $(value).find('table');
-                    console.log(tableEl.find('thead'));
-                    console.log(tableEl.find('tbody'));
-
                     // tableEl.find('table thead').remove();
                     tableEl.find('thead').remove();
                     tableEl.find('tbody').remove();
@@ -641,12 +736,17 @@ export default {
                     tableEl.append(bodyTable.find('tbody')[0].outerHTML);
                     tableEl.find('thead').attr('contenteditable',true);
                     let allControlInTable = tableEl.find('.s-control');
+                    console.log(allControlInTable);
+                    
                     $.each(allControlInTable,function(item,value){
                         let childControlProps = $(value).attr('data-property');
                         let type = $(value).attr('bkerp-type');
                         let style = $(value).attr('style');
                         if(type == 'text') type = 'textInput'
                         if(type == 'persent') type = 'percent'
+                        if(type == 'file-upload') type = 'fileUpload'
+                        console.log(type);
+                        
                         let childControlV2 = GetControlProps(type);
                         let controlEl = $(childControlV2.html); 
                         var inputid = 's-control-id-' + Date.now();
@@ -708,14 +808,22 @@ export default {
                 let properties = control.properties
                 let formulas = control.formulas
                 let type = fields[controlId].type
+                console.log(fields[controlId]);
+                
                 $.each(properties,function(k,v){
                     if(properties[k].type == 'checkbox'){
-                        properties[k].value = (fields[controlId][k] == 0 || fields[controlId][k] == '0' || fields[controlId][k] == '') ? false : true
+                        properties[k].value = (fields[controlId]['properties'][k] == 0 || fields[controlId]['properties'][k] == '0' || fields[controlId]['properties'][k] == '') ? false : true
                     }
                     else{
-                        properties[k].value = fields[controlId][k]
+                        properties[k].value = fields[controlId]['properties'][k]
                     }
-                })
+                }) 
+                if(fields[controlId]['formulas'] != false){
+                    $.each(formulas,function(k,v){
+                        formulas[k].value = fields[controlId]['formulas'][k]
+                    })
+                }
+                
                 if(fields[controlId].type != "table"){
                     this.addToAllControlInDoc(controlId,{properties: properties, formulas : formulas,type:fields[controlId].type});
                 }
@@ -727,19 +835,27 @@ export default {
                         let childProperties = childControl.properties
                         let childFormulas = childControl.formulas
                         let childType = listField[childFieldId].type
+                        
                         $.each(childProperties,function(k,v){
                             if(childProperties[k].type == 'checkbox'){
-                                childProperties[k].value = (listField[childFieldId][k] == 0 || listField[childFieldId][k] == '0' || listField[childFieldId][k] == '') ? false : true
+                                childProperties[k].value = (listField[childFieldId]['properties'][k] == 0 || listField[childFieldId]['properties'][k] == '0' || listField[childFieldId]['properties'][k] == '') ? false : true
                             }
                             else{
-                                childProperties[k].value = listField[childFieldId][k]
+                                
+                                
+                                
+                                childProperties[k].value = listField[childFieldId]['properties'][k]
                             }
                         })
+                        if(listField[childFieldId]['formulas'] != false){
+                            $.each(childFormulas,function(k,v){
+                                childFormulas[k].value = listField[childFieldId]['formulas'][k]
+                            })
+                        }
                         listChildField[childFieldId] = {properties: childProperties, formulas : childFormulas,type:childType}
                         }
                     this.addToAllControlInDoc(controlId,{properties: properties, formulas : formulas,type:fields[controlId].type,listFields:listChildField});
                 }
-                
             }
         },
 
@@ -1210,6 +1326,7 @@ export default {
                 $('.tree-'+controlId).addClass('editor-tree-active')
                 
                 let table = $(this).closest('.s-control-table');
+                
                 if(table.length > 0 && controlId != table.attr('id')){
                     let tableId = table.attr('id');
                     let control = thisCpn.editorStore.allControl[tableId]['listFields'][controlId];
@@ -1217,6 +1334,8 @@ export default {
                 }
                 else{
                     let control = thisCpn.editorStore.allControl[controlId];
+                console.log(thisCpn.editorStore);
+
                     thisCpn.selectControl(control.properties, control.formulas,controlId);
                 }
             })

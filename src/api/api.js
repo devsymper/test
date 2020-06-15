@@ -14,6 +14,9 @@ export default class Api {
      */
     getFullUrl(uri) {
         uri = uri.trim();
+        if (uri == '') {
+            return this.baseUrl.substr(0, this.baseUrl.length - 1);
+        }
         if (uri.indexOf("http://") === 0 || uri.indexOf("https://") === 0) {
             return uri;
         } else {
@@ -84,6 +87,8 @@ export default class Api {
      * @returns {Object} Đối tượng có thể sử dụng như của promise
      */
     callApi(method, url, data, headers, options) {
+        console.log(method, url, data, headers, options);
+
         headers = Object.assign({
             Authorization: `Bearer ${util.auth.getToken()}`,
             // 'Symper-Request-Name': headers.sname ? headers.sname : `${method}: ${url}`,

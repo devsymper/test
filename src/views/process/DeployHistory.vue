@@ -35,7 +35,8 @@ export default {
                     name: "start",
                     text: this.$t("process.deployment.run"),
                     callback: (row, callback) => {
-                        runProcessDefinition(self, row);
+                        // runProcessDefinition(self, row);
+                        self.$goToPage(`/bpmne/process-definition/${row.id}/run`,'Start process instance');
                     }
                 },
                 { 
