@@ -9,6 +9,8 @@
         disable-pagination
         fixed-header
         hide-default-footer
+        dense
+        calculate-widths
         
         >
         <template v-slot:item="{ item }">
@@ -44,8 +46,7 @@ export default {
     created(){
         let thisCpn = this;
         this.$evtBus.$on('document-submit-autocomplete-input-change',e=>{
-            console.log(e);
-            if(thisCpn.dataTable.length > 0){
+            if(thisCpn.dataTable != undefined && thisCpn.dataTable.length > 0){
                 if(e.e.keyCode == 38){    //len
                 
                     if(thisCpn.indexActive == 0){
@@ -66,7 +67,7 @@ export default {
                 }
                 else if(e.e.keyCode == 13){
                     let rowActive = thisCpn.dataTable[thisCpn.indexActive];
-                    thisCpn.handleClickRow(rowActive,e.cell, e.tableInstance);
+                    thisCpn.handleClickRow(rowActive);
                 }
             }
             
@@ -77,7 +78,7 @@ export default {
         show(e){
             this.isShowAutoComplete = true;
             this.calculatorPositionBox(e);
-            this.search = $(e.target).val();
+            // this.search = $(e.target).val();
         },
         hide(){
             this.isShowAutoComplete = false;
@@ -89,11 +90,16 @@ export default {
         calculatorPositionBox(e){
             // nếu autocomplete từ cell của handsontable  
             if($(e.target).is('.handsontableInput')){
-                this.positionBox = {'top':$(e.target).offset().top + 25 +'px','left':$(e.target).offset().left - $(e.target).width()+'px'};
+                let autoEL = $(this.$el).detach();
+                $(e.target).closest('.wrap-table').append(autoEL);
+                let edtos = $(e.target).offset();
+                let tbcos = $(e.target).closest('.wrap-table').find('[s-control-type="table"]').offset();
+                this.positionBox = {'top':edtos.top - tbcos.top + $(e.target).height() +'px','left':edtos.left - tbcos.left+'px'};
             }
             //nêu là ngoài bảng
             else{
-                $(e.target).parent().append(this.$el);
+                let autoEL = $(this.$el).detach();
+                $(e.target).parent().append(autoEL);
                 this.positionBox = {'top':'20px','left':'0px'};
             }
             
@@ -105,9 +111,9 @@ export default {
         setAliasControl(aliasControl){
             this.alias = aliasControl;
         },
-        handleClickRow(item, cellTable, tableInstance){
+        handleClickRow(item){
             let value = item[this.alias];
-            this.$emit('after-select-row',{value:value,cell:cellTable, tableInstance:tableInstance});
+            this.$emit('after-select-row',{value:value});
             this.hide();
         },
         openSubForm(){
@@ -124,9 +130,11 @@ export default {
         position: absolute;
         top: 0;
         left: 100px;
-        z-index: 9999;
+        z-index: 99999;
+        max-width: unset !important;
     }
     .active-row{
         background: #f0f0f0;
     }
+
 </style>

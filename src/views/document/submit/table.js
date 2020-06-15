@@ -60,179 +60,187 @@ const INIT_NEW_LINE = 'init_new_line';
 let docStatus = 'init';
 export default class Table {
     constructor(control, tableName, keyInstance) {
-        /**
-         * Chứa object của Control tương ứng
-         */
-        this.controlObj = control;
-        /**
-         * Tên table tương ứng
-         */
-        this.tableName = tableName;
+            /**
+             * Chứa object của Control tương ứng
+             */
+            this.controlObj = control;
+            /**
+             * Tên table tương ứng
+             */
+            this.tableName = tableName;
 
 
-        /**
-         * Lưu tên cột tương ứng với số thứ tự của cột trong bảng
-         */
-        this.colName2Idx = {};
+            /**
+             * Lưu tên cột tương ứng với số thứ tự của cột trong bảng
+             */
+            this.colName2Idx = {};
 
-        /**Mẫu giá trị cho các dòng của bảng khi được thêm mới */
-        this.sampleRowValues = {};
+            /**Mẫu giá trị cho các dòng của bảng khi được thêm mới */
+            this.sampleRowValues = {};
 
-        /**
-         * object chứa tọa độ của cell và giá trị validate của cell đó, phải có cái này do handsontable chỉ có render toàn bộ bảng, chứ không render cho từng cell
-         * cấu trúc {
-         *      "row_column":{vld:true|false,msg:' thông báo lỗi'} //Chỉ cần quan tâm tới false, các trường hợp còn lại hiển thị bình thường
-         * }
-         */
-        let thisObj = this;
+            /**
+             * object chứa tọa độ của cell và giá trị validate của cell đó, phải có cái này do handsontable chỉ có render toàn bộ bảng, chứ không render cho từng cell
+             * cấu trúc {
+             *      "row_column":{vld:true|false,msg:' thông báo lỗi'} //Chỉ cần quan tâm tới false, các trường hợp còn lại hiển thị bình thường
+             * }
+             */
+            let thisObj = this;
 
-        this.validateValueMap = {};
+            this.validateValueMap = {};
 
-        /**Tổng số dòng trong table */
-        this.rowCount = 0;
-        this.tableInstance = null;
-        this.columnsInfo = null;
-        this.keyInstance = keyInstance;
-        /**Danh sách các celltpye trong table */
-        this.listCellType = {};
-        this.currentSelectedCell = {};
-        this.keyEvent = null;
-        this.isAutoCompleting = false;
-        this.currentControlSelected = null
-        this.event = {
-            afterSelection: (row, column, row2, column2, preventScrolling, selectionLayerLevel) => {
-                // thisObj.currentSelectedCell['row'] = row;
-                // thisObj.currentSelectedCell['column'] = column;
-                // ClientSQLManager.editRow(thisObj.keyInstance, )
-                let columns = thisObj.columnsInfo.columns;
-                thisObj.currentControlSelected = columns[column].data
-            },
-            afterBeginEditing: function(row, column) {
+            /**Tổng số dòng trong table */
+            this.rowCount = 0;
+            this.tableInstance = null;
+            this.columnsInfo = null;
+            this.keyInstance = keyInstance;
+            /**Danh sách các celltpye trong table */
+            this.listCellType = {};
+            this.currentSelectedCell = {};
+            this.keyEvent = null;
+            this.isAutoCompleting = false;
+            this.currentControlSelected = null
+            this.event = {
+                afterSelection: (row, column, row2, column2, preventScrolling, selectionLayerLevel) => {
+                    let columns = thisObj.columnsInfo.columns;
+                    thisObj.currentControlSelected = columns[column].data
+                    console.log(event);
 
-                thisObj.currentSelectedCell['row'] = row;
-                thisObj.currentSelectedCell['column'] = column;
-                thisObj.checkAutoCompleteControl(thisObj.keyEvent);
+                },
+                afterBeginEditing: function(row, column) {
+                    console.log(event);
 
-            },
-            beforeKeyDown: function(event) {
-                thisObj.keyEvent = event;
-                if (thisObj.isAutoCompleting) {
-                    let formulasInstance = thisObj.checkIsAutocompleteCell(thisObj.currentControlSelected);
-                    if (formulasInstance != false) {
-                        event.stopImmediatePropagation();
-                        SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-input-change', { e: event, autocompleteFormulasInstance: formulasInstance, cell: thisObj.currentSelectedCell, tableInstance: thisObj })
+                    thisObj.currentSelectedCell['row'] = row;
+                    thisObj.currentSelectedCell['column'] = column;
+                    s.commit("document/addToDocumentSubmitStore", {
+                        key: 'currentCellSelected',
+                        value: thisObj.currentSelectedCell
+                    });
+                    s.commit("document/addToDocumentSubmitStore", {
+                        key: 'currentTableInteractive',
+                        value: thisObj
+                    });
+                    thisObj.checkAutoCompleteControl(thisObj.keyEvent);
+                    if (thisObj.getCellSelectedType(column) == 'time') {
+                        // SYMPER_APP.$evtBus.$emit('document-submit-show-time-picker', { event: thisObj.keyEvent });
+                    };
+                },
+                beforeKeyDown: function(event) {
+                    thisObj.keyEvent = event;
+                    if (thisObj.isAutoCompleting) {
+                        let formulasInstance = thisObj.checkIsAutocompleteCell(thisObj.currentControlSelected);
+                        if (formulasInstance != false) {
+                            event.stopImmediatePropagation();
 
+                            SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-input-change', {
+                                e: event,
+                                autocompleteFormulasInstance: formulasInstance,
+                            })
+                        }
                     }
+                },
+                afterDocumentKeyDown: function(event) {
 
-                }
+                },
+                afterCreateRow: function(index, amount, source) {
 
-            },
-            afterDocumentKeyDown: function(event) {
+                },
+                afterSelectionEnd: function(row, col) {
+                    s.commit("document/addToDocumentSubmitStore", {
+                        key: 'docStatus',
+                        value: 'input'
+                    });
+                },
+                beforeOnCellMouseDown: function(event, coords, td, controller) {
 
-                // setTimeout(() => {
-                //     thisObj.checkAutoCompleteControl(event);
-                // }, 1000);
+                },
+                afterChange: function(changes, source) {
 
-            },
-            afterCreateRow: function(index, amount, source) {
+                    let controlName = changes[0][1];
+                    let columns = thisObj.columnsInfo.columns;
+                    let currentRowData = thisObj.tableInstance.getDataAtRow(thisObj.currentSelectedCell['row']);
+                    if (thisObj.currentSelectedCell.hasOwnProperty('column') && columns[thisObj.currentSelectedCell['column']].hasOwnProperty('type') &&
+                        columns[thisObj.currentSelectedCell['column']].type == 'time' &&
+                        !thisObj.checkCellIsTime(currentRowData[thisObj.currentSelectedCell['column']])) {
+                        return;
+                    }
+                    if (controlName != 's_table_id_sql_lite') {
 
-            },
-            afterSelectionEnd: function(row, col) {
-                s.commit("document/addToDocumentSubmitStore", {
-                    key: 'docStatus',
-                    value: 'input'
-                });
-            },
-            beforeOnCellMouseDown: function(event, coords, td, controller) {
-
-            },
-            afterChange: function(changes, source) {
-
-                let controlName = changes[0][1];
-                let columns = thisObj.columnsInfo.columns;
-                let currentRowData = thisObj.tableInstance.getDataAtRow(thisObj.currentSelectedCell['row']);
-                if (columns[thisObj.currentSelectedCell['column']].hasOwnProperty('type') &&
-                    columns[thisObj.currentSelectedCell['column']].type == 'time' &&
-                    !thisObj.checkCellIsTime(currentRowData[thisObj.currentSelectedCell['column']])) {
-                    return;
-                }
-                if (controlName != 's_table_id_sql_lite') {
-
-                    if (source != AUTO_SET) {
-                        s.commit("document/addToDocumentSubmitStore", {
-                            key: 'rootChangeFieldName',
-                            value: controlName
+                        if (source != AUTO_SET) {
+                            s.commit("document/addToDocumentSubmitStore", {
+                                key: 'rootChangeFieldName',
+                                value: controlName
+                            });
+                            resetImpactedFieldsList();
+                        }
+                        columns = columns.map(function(c) {
+                            return c.data;
                         });
-                        resetImpactedFieldsList();
-                    }
-                    columns = columns.map(function(c) {
-                        return c.data;
-                    });
 
-                    let currentColData = thisObj.tableInstance.getDataAtCol(thisObj.currentSelectedCell['column']);
-                    currentColData.pop();
-                    s.commit("document/updateListInputInDocument", {
-                        controlName: controlName,
-                        key: 'value',
-                        value: currentColData
-                    });
-
-                    if (source != AUTO_SET) {
-                        for (let index = 0; index < currentRowData.length; index++) {
-                            let cell = currentRowData[index];
-                            if (cell == "" || cell == null) {
-                                currentRowData[index] = 'NULL';
-                            } else {
-                                currentRowData[index] = '"' + currentRowData[index] + '"'
-                            }
-                        }
-                        if (currentRowData[currentRowData.length - 1] == 'NULL') {
-                            let id = Date.now();
-                            currentRowData[currentRowData.length - 1] = id;
-                            thisObj.tableInstance.setDataAtCell(thisObj.currentSelectedCell['row'], currentRowData.length - 1, id);
-                            ClientSQLManager.insertRow(thisObj.keyInstance, thisObj.tableName, columns, currentRowData, true).then(res => {
-                                thisObj.handlerCheckEffectedControlInTable(controlName);
-                            });
-                        } else {
-                            ClientSQLManager.editRow(thisObj.keyInstance, thisObj.tableName, controlName, changes[0][3],
-                                'WHERE s_table_id_sql_lite = ' + currentRowData[currentRowData.length - 1], true).then(res => {
-                                thisObj.handlerCheckEffectedControlInTable(controlName);
-
-                            });
-                        }
-                    } else {
-                        console.log('nnnnnnnn', changes);
-
-                        for (let index = 0; index < changes.length; index++) {
-                            let colChange = changes[index];
-                            let rowData = thisObj.tableInstance.getDataAtRow(colChange[0]);
-                            for (let index = 0; index < rowData.length; index++) {
-                                let cell = rowData[index];
+                        let currentColData = thisObj.tableInstance.getDataAtCol(thisObj.currentSelectedCell['column']);
+                        currentColData.pop();
+                        s.commit("document/updateListInputInDocument", {
+                            controlName: controlName,
+                            key: 'value',
+                            value: currentColData
+                        });
+                        if (source != AUTO_SET) {
+                            for (let index = 0; index < currentRowData.length; index++) {
+                                let cell = currentRowData[index];
                                 if (cell == "" || cell == null) {
-                                    rowData[index] = 'NULL';
+                                    currentRowData[index] = 'NULL';
                                 } else {
-                                    rowData[index] = '"' + rowData[index] + '"'
+                                    currentRowData[index] = '"' + currentRowData[index] + '"'
                                 }
                             }
-                            if (rowData[rowData.length - 1] == 'NULL') {
+                            if (currentRowData[currentRowData.length - 1] == 'NULL') {
                                 let id = Date.now();
-                                rowData[rowData.length - 1] = id;
-                                thisObj.tableInstance.setDataAtCell(colChange[0], rowData.length - 1, id);
-                                ClientSQLManager.insertRow(thisObj.keyInstance, thisObj.tableName, colChange[1], rowData, true).then(res => {
+                                currentRowData[currentRowData.length - 1] = id;
+                                thisObj.tableInstance.setDataAtCell(thisObj.currentSelectedCell['row'], currentRowData.length - 1, id);
+
+                                ClientSQLManager.insertRow(thisObj.keyInstance, thisObj.tableName, columns, currentRowData, true).then(res => {
                                     thisObj.handlerCheckEffectedControlInTable(controlName);
                                 });
                             } else {
-                                ClientSQLManager.editRow(thisObj.keyInstance, thisObj.tableName, colChange[1], colChange[3],
-                                    'WHERE s_table_id_sql_lite = ' + rowData[rowData.length - 1], true).then(res => {
+                                ClientSQLManager.editRow(thisObj.keyInstance, thisObj.tableName, controlName, changes[0][3],
+                                    'WHERE s_table_id_sql_lite = ' + currentRowData[currentRowData.length - 1], true).then(res => {
                                     thisObj.handlerCheckEffectedControlInTable(controlName);
                                 });
+                            }
+                        } else {
+                            for (let index = 0; index < changes.length; index++) {
+                                let colChange = changes[index];
+                                let rowData = thisObj.tableInstance.getDataAtRow(colChange[0]);
+                                for (let index = 0; index < rowData.length; index++) {
+                                    let cell = rowData[index];
+                                    if (cell == "" || cell == null) {
+                                        rowData[index] = 'NULL';
+                                    } else {
+                                        rowData[index] = '"' + rowData[index] + '"'
+                                    }
+                                }
+                                if (rowData[rowData.length - 1] == 'NULL') {
+                                    let id = Date.now();
+                                    rowData[rowData.length - 1] = id;
+                                    thisObj.tableInstance.setDataAtCell(colChange[0], rowData.length - 1, id);
+                                    ClientSQLManager.insertRow(thisObj.keyInstance, thisObj.tableName, columns, rowData, true).then(res => {
+                                        thisObj.handlerCheckEffectedControlInTable(controlName);
+                                    });
+                                } else {
+                                    ClientSQLManager.editRow(thisObj.keyInstance, thisObj.tableName, colChange[1], colChange[3],
+                                        'WHERE s_table_id_sql_lite = ' + rowData[rowData.length - 1], true).then(res => {
+                                        thisObj.handlerCheckEffectedControlInTable(controlName);
+                                    });
+                                }
                             }
                         }
                     }
                 }
             }
         }
-    }
+        /**
+         * Hàm kiểm tra xem cell có công thức autocomplete hay không
+         * @param {String} controlName 
+         */
     checkIsAutocompleteCell(controlName) {
             let controlInstance = listInputInDocument[controlName];
             if (controlInstance != null && controlInstance != undefined) {
@@ -249,44 +257,55 @@ export default class Table {
          * @param {String} controlName Control bị thay đổi dữ liệu
          */
     handlerCheckEffectedControlInTable(controlName) {
-        let controlInstance = listInputInDocument[controlName];
-        if (controlInstance == null || controlInstance == undefined) {
-            return;
-        }
-        let controlEffected = controlInstance.getEffectedControl();
-        console.log('nnnnnnnn', controlName, controlEffected);
-
-        // console.log(controlEffected);
-        if (Object.keys(controlEffected).length > 0) {
-            for (let i in controlEffected) {
-                this.handlerCheckCanBeRunFormulas(i);
+            let controlInstance = listInputInDocument[controlName];
+            if (controlInstance == null || controlInstance == undefined) {
+                return;
             }
-        }
-    }
-    handlerCheckCanBeRunFormulas(control) {
-            if (checkCanBeBind(control)) {
-                let controlEffectedInstance = listInputInDocument[control];
-                if (controlEffectedInstance.controlFormulas.hasOwnProperty('formulas')) {
-                    let formulasInstance = controlEffectedInstance.controlFormulas['formulas'].instance;
-                    let inputControl = formulasInstance.getInputControl();
-                    let dataInput = {};
-                    for (let inputControlName in inputControl) {
-                        let valueInputControlItem = this.getColumnIndexFromControlName(inputControlName);
-                        valueInputControlItem = this.tableInstance.getDataAtCol(valueInputControlItem);
-                        valueInputControlItem.pop();
-                        dataInput[inputControlName] = valueInputControlItem;
-                    }
-                    if (controlEffectedInstance.hasOwnProperty('inTable')) {
-                        if (controlEffectedInstance.inTable == this.tableName) {
-                            this.handlerRunFormulasForControlInTable(controlEffectedInstance.name, dataInput, formulasInstance);
-                        }
-                    }
-                }
+            let controlEffected = controlInstance.getEffectedControl();
+            console.log('nnnnnnnn', controlName, controlEffected);
 
+            // console.log(controlEffected);
+            if (Object.keys(controlEffected).length > 0) {
+                for (let i in controlEffected) {
+                    this.handlerCheckCanBeRunFormulas(i);
+                }
             }
         }
         /**
-         * Hàm xử lí query dữ liệu  từ bảng sqllite
+         * Hàm xử lí kiểm tra control đủ điều kiện chạy công thức hay chưa (checkCanBeBind) và lấy ra formulasInstance để chạy
+         * @param {String} control 
+         */
+    handlerCheckCanBeRunFormulas(control) {
+            if (checkCanBeBind(control)) {
+                let controlInstance = listInputInDocument[control];
+                if (controlInstance.controlFormulas.hasOwnProperty('formulas')) {
+                    let formulasInstance = controlInstance.controlFormulas['formulas'].instance;
+                    let dataInput = this.getDataInputForFormulas(formulasInstance);
+                    if (controlInstance.hasOwnProperty('inTable')) {
+                        if (controlInstance.inTable == this.tableName) {
+                            this.handlerRunFormulasForControlInTable(controlInstance.name, dataInput, formulasInstance);
+                        }
+                    }
+                }
+            }
+        }
+        /**
+         * Hàm lấy các data input cho 1 công thức
+         * @param {Object} formulasInstance đối tượng của công thức 
+         */
+    getDataInputForFormulas(formulasInstance) {
+            let inputControl = formulasInstance.getInputControl();
+            let dataInput = {};
+            for (let inputControlName in inputControl) {
+                let valueInputControlItem = this.getColumnIndexFromControlName(inputControlName);
+                valueInputControlItem = this.tableInstance.getDataAtCol(valueInputControlItem);
+                valueInputControlItem.pop();
+                dataInput[inputControlName] = valueInputControlItem;
+            }
+            return dataInput;
+        }
+        /**
+         * Hàm xử lí query dữ liệu từ bảng sqllite
          * @param {*} controlEffectedInstance   Object của 1 control bị ảnh hưởng
          * @param {*} dataInput    dữ liệu đầu vào cho công  thức
          * @param {*} formulasInstance  Object cua formulas giá trị của control bị ảnh hưởng
@@ -305,13 +324,9 @@ export default class Table {
                         allRowDataInput[i][control] = dataRow[i];
                     }
                 }
-                // console.log('mbv', allRowDataInput);
-
                 for (let index = 0; index < allRowDataInput.length; index++) {
                     let rowInput = allRowDataInput[index];
-                    // console.log('mbv', rowInput);
                     await formulasInstance.handleBeforeRunFormulas(rowInput).then(res => {
-                        // console.log('mbv', res);
                         dataColumnAfterRunFOrmulas.push(thisObj.getDataResponseQuery(res));
                     });
                 }
@@ -325,28 +340,33 @@ export default class Table {
                 key: 'value',
                 value: dataColumnAfterRunFOrmulas
             });
-            this.handlerSetDataToColumnAfterRunFormulas(dataColumnAfterRunFOrmulas, controlEffectedName)
+            this.handlerDataAfterRunFormulas(dataColumnAfterRunFOrmulas, controlEffectedName)
         }
         /**
          * Hàm lấy dữ liệu hiện tại của table và insert vào sql lite table
          */
 
     getDataResponseQuery(rs) {
-        let result = ""
-        if (!rs.server) {
-            let data = rs.data;
-            if (data.length > 0) {
-                result = data[0].values[0][0]
+            let result = ""
+            if (!rs.server) {
+                let data = rs.data;
+                if (data.length > 0) {
+                    result = data[0].values[0][0]
+                }
+            } else {
+                let data = rs.data;
+                if (data.length > 0) {
+                    result = data[0][Object.keys(data[0])[0]]
+                }
             }
-        } else {
-            let data = rs.data;
-            if (data.length > 0) {
-                result = data[0][Object.keys(data[0])[0]]
-            }
+            return result;
         }
-        return result;
-    }
-    handlerSetDataToColumnAfterRunFormulas(data, controlEffectedName) {
+        /**
+         * Hàm xử lí dữ liệu sau khi chạy xong công thức của 1 cột, -> set data cho cột đó -> chạy công thức cho các control ngoài bảng bị ảnh hưởng
+         * @param {Object} data 
+         * @param {String} controlEffectedName 
+         */
+    handlerDataAfterRunFormulas(data, controlEffectedName) {
         let values = data;
         let vls = [];
         for (let index = 0; index < values.length; index++) {
@@ -355,9 +375,6 @@ export default class Table {
                 row = '';
             vls.push([index, controlEffectedName, row]);
         }
-        console.log('mbv', data);
-        console.log('mbv', vls);
-
         this.tableInstance.setDataAtRowProp(vls, null, null, AUTO_SET);
         markBinedField(controlEffectedName);
         setTimeout(() => {
@@ -378,8 +395,18 @@ export default class Table {
             this.isAutoCompleting = false;
         } else {
             this.isAutoCompleting = true;
-            SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-input', event)
+            SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-input', event);
+            SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-input-change', {
+                e: event,
+                autocompleteFormulasInstance: autocompleteFormulasInstance,
+            })
         }
+    }
+    getCellSelectedType(col) {
+        let columns = this.columnsInfo.columns;
+        let column = columns[col];
+        return column.type;
+
     }
     render() {
         let thisObj = this;
@@ -575,8 +602,15 @@ export default class Table {
             rsl.readOnly = true;
         } else if (type == 'select') {
             rsl.editor = 'select';
-            this.handlerCheckCanBeRunFormulas(name);
-            // rsl.selectOptions = ctrl.fmlData.formula.replace(/\'/g, '').split('|');
+            // this.handlerCheckCanBeRunFormulas(name);
+            // let formulasInstance = ctrl.controlFormulas.formulas.instance
+            // let dataInput = this.getDataInputForFormulas(formulasInstance);
+            // if (controlEffectedInstance.hasOwnProperty('inTable')) {
+            //     if (controlEffectedInstance.inTable == this.tableName) {
+            //         this.handlerRunFormulasForControlInTable(controlEffectedInstance.name, dataInput, formulasInstance);
+            //     }
+            // }
+            // rsl.selectOptions = ctrl.fmlData.formula.replace(/\'/g, '').split('|');  
         } else if (type == 'time') {
             rsl.timeFormat = 'HH:mm:ss',
                 rsl.correctFormat = true;

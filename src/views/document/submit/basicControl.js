@@ -1,4 +1,5 @@
 import Control from "./control";
+import s from './../../../store'
 import store from './../../../store/document'
 import { SYMPER_APP } from './../../../main.js'
 
@@ -174,8 +175,13 @@ export default class BasicControl extends Control {
         let keyinstance = this.ele.attr('key-instance');
         this.ele.replaceWith('<input class="s-control s-control-select" s-control-type="select" type="text" title="Select" id="' + id + '" key-instance="' + keyinstance + '">');
         this.ele = $('#' + id);
+        let thisCpn = this;
+        this.ele.on('click', function(e) {
+            $(this).addClass('autocompleting');
+            let formulasInstance = thisCpn.controlFormulas.formulas.instance;
+            SYMPER_APP.$evtBus.$emit('document-submit-select-input', { e: e, selectFormulasInstance: formulasInstance })
+        })
 
-        this.addAutoCompleteEvent(true);
     }
 
 
@@ -196,6 +202,7 @@ export default class BasicControl extends Control {
         if (isDetailView) return;
         this.ele.attr('type', 'text');
         this.ele.on('click', function(e) {
+            $(this).addClass('time-picker')
             SYMPER_APP.$evtBus.$emit('document-submit-time-input-click', e)
         })
     }
@@ -212,11 +219,18 @@ export default class BasicControl extends Control {
         let thisCpn = this;
         this.ele.on('input', function(e) {
             $(this).addClass('autocompleting');
+
+            s.commit("document/addToDocumentSubmitStore", {
+                key: 'currentCellSelected',
+                value: null
+            });
+            s.commit("document/addToDocumentSubmitStore", {
+                key: 'currentTableInteractive',
+                value: null
+            });
             SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-input', e)
         })
         this.ele.on('keyup', function(e) {
-            console.log(e);
-
             let formulasInstance = (fromSelect) ? thisCpn.controlFormulas.formulas.instance : thisCpn.controlFormulas.autocomplete.instance;
             SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-input-change', { e: e, autocompleteFormulasInstance: formulasInstance })
         })

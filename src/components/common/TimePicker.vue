@@ -21,7 +21,7 @@ export default {
             time:null,
             rules: {
                 match: v =>{
-                    const pattern = /(1[012]|[1-9]):[0-5][0-9](\\s)?( |)(am|pm)/
+                    const pattern = /(1[012]|[1-9]):[0-5][0-9](\\s)?( |)(AM|PM)/
                     return pattern.test(v) || "Sai định dạng thời gian"} ,
             },
         }
@@ -51,8 +51,25 @@ export default {
             var strTime = hours + ':' + minutes + ' ' + ampm;
             return strTime;
         },
-        getTime(){
-            return this.time;
+        getTime(isAmPm = true){
+            let time = this.time
+            if(!isAmPm){
+                time = this.convertTimeTo24Hour(this.time);
+            }
+
+            return time;
+        },
+        convertTimeTo24Hour(time){
+            var hours = Number(time.match(/^(\d+)/)[1]);
+            var minutes = Number(time.match(/:(\d+)/)[1]);
+            var AMPM = time.match(/\s(.*)$/)[1];
+            if(AMPM == "PM" && hours<12) hours = hours+12;
+            if(AMPM == "AM" && hours==12) hours = hours-12;
+            var sHours = hours.toString();
+            var sMinutes = minutes.toString();
+            if(hours<10) sHours = "0" + sHours;
+            if(minutes<10) sMinutes = "0" + sMinutes;
+            return sHours + ":" + sMinutes
         }
     }
 }

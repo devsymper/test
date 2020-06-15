@@ -37,7 +37,7 @@
             :isTime="false"
             ref="datePicker"
         />
-        <time-picker :keyInstance="keyInstance" :title="'Chọn giờ'" ref="timePicker" />
+        <time-picker :keyInstance="keyInstance" :title="'Chọn giờ'" @apply-time-picker="applyTimePicker" ref="timePicker" />
         <v-speed-dial
             v-show="showSubmitButton"
             v-model="fab"
@@ -207,6 +207,9 @@ export default {
         this.$evtBus.$on("document-submit-open-validate", e => {
             thisCpn.$refs.validate.show(e);
         });
+        this.$evtBus.$on("document-submit-show-time-picker", e => {
+            thisCpn.$refs.timePicker.show(e.event);
+        });
         this.$evtBus.$on("document-submit-date-input-click", e => {
             thisCpn.$refs.datePicker.openPicker(e);
         });
@@ -218,32 +221,18 @@ export default {
             thisCpn.titleDragPanel = "Tìm kiếm thông tin";
             thisCpn.titleDragPanelIcon = "mdi-file-search";
         }); 
+        // hàm nhận sự thay đổi của input autocomplete gọi api để chạy công thức lấy dữ liệu
         this.$evtBus.$on("document-submit-autocomplete-input-change", e => {
             if(e.e.keyCode != 38 && e.e.keyCode != 40 && e.e.keyCode != 13){
-                let aliasControl = e.autocompleteFormulasInstance.autocompleteDetectAliasControl();
-                let dataInput = thisCpn.getDataInputFormulas(e.autocompleteFormulasInstance);  
-                let dataAutocomplete = e.autocompleteFormulasInstance.handleRunAutoCompleteFormulas($(e.e.target).val(),dataInput).then(res=>{
-                    console.log(res);
-                    if(res.data != undefined){
-                        if(res.status == 200 && res.data != false){
-                            let dataTable = thisCpn.handleDataAutoComplete(res.data,false);
-                            thisCpn.$refs.autocompleteInput.setAliasControl(aliasControl);
-                            thisCpn.$refs.autocompleteInput.setData(dataTable);
-                        }
-                        else{
-                            thisCpn.$refs.autocompleteInput.setData([]);
-                        }
-                    }
-                    else{
-                        let data =  res[0];
-                        let dataTable = thisCpn.handleDataAutoComplete(data,true);
-                        thisCpn.$refs.autocompleteInput.setAliasControl(aliasControl);
-                        thisCpn.$refs.autocompleteInput.setData(dataTable);
-                    }
-                    
-                });
+                thisCpn.getDataForAutocomplete(e,'autocomplete');
             }
         });
+        // hàm nhận sự thay đổi của input select gọi api để chạy công thức lấy dữ liệu
+          this.$evtBus.$on("document-submit-select-input", e => {
+            thisCpn.$refs.autocompleteInput.show(e.e);
+            thisCpn.getDataForAutocomplete(e,'select');
+        });
+        // click outside
         this.$evtBus.$on("symper-app-wrapper-clicked", evt => {
             if (
                 !$(evt.target).hasClass("autocompleting") &&
@@ -291,18 +280,81 @@ export default {
     
     methods: {
         /**
+         * Hàm chạy công thức autocomplete để đổ dữ liệu vào box autucomplete, control select cũng dùng trường hợp này
+         */
+        getDataForAutocomplete(e,type){
+            let thisCpn = this
+            if(type == 'select'){
+                let aliasControl = e.selectFormulasInstance.autocompleteDetectAliasControl();
+                let dataInput = this.getDataInputFormulas(e.selectFormulasInstance);  
+                let dataAutocomplete = e.selectFormulasInstance.handleRunAutoCompleteFormulas('',dataInput).then(res=>{
+                    thisCpn.setDataForControlAutocomplete(res,aliasControl)
+                });
+            }
+            else{
+                let aliasControl = e.autocompleteFormulasInstance.autocompleteDetectAliasControl();
+                let dataInput = this.getDataInputFormulas(e.autocompleteFormulasInstance);  
+                let dataAutocomplete = e.autocompleteFormulasInstance.handleRunAutoCompleteFormulas('',dataInput).then(res=>{
+                    thisCpn.setDataForControlAutocomplete(res,aliasControl)
+                });
+            }
+            
+        },
+        /**
+         * Hàm bind dữ liệu cho box autocomplete, cho component autocompleteInput
+         */
+        setDataForControlAutocomplete(res,aliasControl){
+            if(res.data != undefined){
+                    if(res.status == 200 && res.data != false){
+                        let dataTable = this.handleDataAutoComplete(res.data,false);
+                        this.$refs.autocompleteInput.setAliasControl(aliasControl);
+                        this.$refs.autocompleteInput.setData(dataTable);
+                    }
+                    else{
+                        this.$refs.autocompleteInput.setData([]);
+                    }
+                }
+                else{
+                    let data =  res[0];
+                    let dataTable = this.handleDataAutoComplete(data,true);
+                    this.$refs.autocompleteInput.setAliasControl(aliasControl);
+                    this.$refs.autocompleteInput.setData(dataTable);
+                }
+        },
+        /**
+         * Hàm bind dữ liệu cho control, và control trong bảng khi chọn apply trên timepicker
+         */
+        applyTimePicker(time){
+            if(this.sDocumentSubmit.currentTableInteractive == null){
+                $('.time-picker').val(time);
+                $('.time-picker').trigger('change');
+                $('.time-picker').removeClass('time-picker');
+            }
+            else{
+                let currentTableInteractive = this.sDocumentSubmit.currentTableInteractive
+                currentTableInteractive.tableInstance.setDataAtCell(this.sDocumentSubmit.currentCellSelected.row,this.sDocumentSubmit.currentCellSelected.column,time)
+                currentTableInteractive.isAutoCompleting = false;
+                
+            }
+            this.$refs.timePicker.hide();
+        },
+        /**
          * Hàm xử lí nhận dữ liệu component autocomplete khi chọn 1 dòng
          */
         afterSelectRowAutoComplete(data){
-            console.log(data);
-            if(data.cell == undefined){
+            // th này không phải trong table       
+            console.log(this.sDocumentSubmit.currentCellSelected);
+            
+            if(this.sDocumentSubmit.currentCellSelected == null){
                 $('.autocompleting').val(data.value);
                 $('.autocompleting').trigger('change');
                 $('.autocompleting').removeClass('autocompleting');
             }
             else{
-                data.tableInstance.tableInstance.setDataAtCell(data.cell.row,data.cell.column,data.value)
-                data.tableInstance.isAutoCompleting = false;
+                let currentTableInteractive = this.sDocumentSubmit.currentTableInteractive
+                currentTableInteractive.tableInstance.setDataAtCell(this.sDocumentSubmit.currentCellSelected.row,this.sDocumentSubmit.currentCellSelected.column,data.value)
+                currentTableInteractive.isAutoCompleting = false;
+                
             }
             
             
@@ -723,9 +775,6 @@ export default {
          */
         handleRunFormulasValue(dataInput,formulasInstance,controlId,controlName=""){
             formulasInstance.handleBeforeRunFormulas(dataInput).then(rs=>{
-                console.log(formulasInstance);
-                console.log(rs);
-                
                 if($('#'+controlId).length > 0){
                     if($('#'+controlId).attr('s-control-type') == 'table'){
                         this.setDataToTable(controlId,rs.data)
@@ -753,7 +802,9 @@ export default {
         },
         setDataToControl(control, type, result){
             if(type == 'label'){
-                control.text(result[0][0]);
+                console.log(result);
+                
+                control.text(result);
             }
             else if(type == 'select'){
                 // console.log(result);
@@ -763,7 +814,7 @@ export default {
                 
             }
             else{
-                control.val(result[0][0]);
+                control.val(result);
             }
         },
         /**
