@@ -3,7 +3,7 @@ import { appConfigs } from "./../configs.js";
 console.log(appConfigs);
 
 var api = new Api(appConfigs.apiDomain.user);
-var coreApi = new Api(appConfigs.apiDomain.core);
+var coreApi = new Api(appConfigs.apiDomain.user);
 export const userApi = {
     /** 
      * Kiểm tra username và password của user
@@ -16,32 +16,32 @@ export const userApi = {
         return api.post(appConfigs.apiDomain.account + "auth/login", data);
     },
     getListUser(page, pageSize) {
-        return coreApi.get("users?page=" + page + "&pageSize=" + pageSize);
+        return api.get("users?page=" + page + "&pageSize=" + pageSize);
     },
     getGroupUser() {
-        return coreApi.get("user-group");
+        return api.get("user-group");
     },
     addUser(data) {
-        return coreApi.post('user', data);
+        return api.post('users', data);
     },
 
     updateUser(data) {
-        return coreApi.put('user', data);
+        return api.put('users', data);
     },
     getDetailUser(id) {
-        return coreApi.get("user/detail/" + id);
+        return api.get("users/detail/" + id);
     },
     getListUserPackage(id) {
-        return coreApi.get('user/permission/package/' + id);
+        return api.get('users/permission/package/' + id);
     },
     getListUserPosition(id) {
-        return coreApi.get('user/permission/position-orgchart/' + id);
+        return api.get('users/permission/position-orgchart/' + id);
     },
     deleteUserPackage(data) {
-        return coreApi.delete('user/permission/package', data);
+        return api.delete('users/permission/package', data);
     },
     deleteUserPosition(data) {
-        return coreApi.delete('user/permission/position-orgchart', data);
+        return api.delete('users/permission/position-orgchart', data);
     },
     uploadAvatar(data) {
         return coreApi.post('https://kh.symper.vn/publicapi/uploadFile/', data, {}, {
@@ -51,7 +51,7 @@ export const userApi = {
         });
     },
     setUserLocale(locale) {
-        return api.post("user/locale", { locale: locale });
+        return api.post("users/locale", { locale: locale });
     },
     saveUserViewConfig(configType, viewName, configs) {
         return coreApi.put('https://v2khadm.dev.symper.vn/user/view-configs', {
@@ -62,5 +62,8 @@ export const userApi = {
     },
     getUserViewConfig(viewName, configType) {
         return coreApi.get(`https://v2khadm.dev.symper.vn/user/view-configs/${viewName}/${configType}`);
+    },
+    changeDelegate(userInfo) {
+        return api.post('auth/change-delagate', { user_id: userInfo.id })
     }
 };

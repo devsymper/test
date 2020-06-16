@@ -42,12 +42,63 @@
                         </v-tooltip>
                     </v-list-item-title>
                     <div class="w-100 mb-1 ">
-                        <div class="w-100 d-flex" style="color: rgba(0, 0, 0, 0.54)">
+                        <div class="w-100 d-flex"  style="color: rgba(0, 0, 0, 0.54)">
+                            
                             <v-tooltip top>
                                 <template v-slot:activator="{ on }">
                                     <i v-on="on" class="mdi mdi-account-check-outline fs-16 mr-1" style="position: relative;top: 2px;"></i> 
                                 </template>
                                 <span>User</span>
+                            </v-tooltip>
+                            <v-menu 
+                                :offset-y="true"
+                                :close-on-content-click="false">
+                                <template v-slot:activator="{ on: menu, attrs }">
+                                    <v-tooltip bottom>
+                                    <template v-slot:activator="{ on: tooltip }">
+                                        <v-btn
+                                            x-small
+                                            text
+                                            v-bind="attrs"
+                                            @click="openSelectUserPanel"
+                                            depressed
+                                            v-on="{ ...tooltip, ...menu }">
+                                            {{sapp.endUserInfo.displayName}}
+                                        </v-btn>
+                                    </template>
+                                    <span>Switch user</span>
+
+                                    </v-tooltip>
+                                </template>
+                                 <v-card>
+                                    <v-autocomplete
+                                        ref="selectDelegateUser"
+                                        return-object
+                                        :items="sapp.allUsers"
+                                        chips
+                                        dense
+                                        color="blue-grey lighten-2"
+                                        label="Select"
+                                        item-text="name"
+                                        @change="delegateUser"
+                                        item-value="name"
+                                        :filter="filterUser">
+                        
+                                        <template v-slot:item="data">
+                                            <i class="mdi mdi-account mr-2 fs-16"> </i> <span> {{data.item.displayName}}</span>
+                                        </template>
+
+                                    </v-autocomplete>
+
+                                 </v-card>
+                            </v-menu>
+                        </div>
+                        <div class="w-100 d-flex" style="color: rgba(0, 0, 0, 0.54)">
+                            <v-tooltip top>
+                                <template v-slot:activator="{ on }">
+                                    <i class="mdi mdi-account-circle-outline fs-16 mr-1" v-on="on" style="position: relative;top: 2px;"></i>                            
+                                </template>
+                                <span>Role</span>
                             </v-tooltip>
                             <v-tooltip top>
                                 <template v-slot:activator="{ on }">
@@ -56,40 +107,11 @@
                                         text
                                         v-on="on"
                                         depressed>
-                                        {{sapp.endUserInfo.displayName}}
+                                        {{sapp.endUserInfo.currentRole.title}}
                                     </v-btn>
                                 </template>
-                                <span>Switch user</span>
+                                <span>Switch role</span>
                             </v-tooltip>
-                        </div>
-                        <div class="w-100 d-flex"  style="color: rgba(0, 0, 0, 0.54)">
-                            <v-tooltip top>
-                                <template v-slot:activator="{ on }">
-                                    <i class="mdi mdi-account-circle-outline fs-16 mr-1" v-on="on" style="position: relative;top: 2px;"></i>                            
-                                </template>
-                                <span>Role</span>
-                            </v-tooltip>
-                            <v-menu :offset-y="true">
-                                <template v-slot:activator="{ on: menu, attrs }">
-                                    <v-tooltip bottom>
-                                    <template v-slot:activator="{ on: tooltip }">
-                                        <v-btn
-                                            x-small
-                                            text
-                                            v-bind="attrs"
-                                            depressed
-                                            v-on="{ ...tooltip, ...menu }">
-                                            {{sapp.endUserInfo.currentRole.title}}
-                                        </v-btn>
-                                    </template>
-                                    <span>Switch role</span>
-
-                                    </v-tooltip>
-                                </template>
-                                 <v-card>
-                                     di
-                                 </v-card>
-                            </v-menu>
                         </div>
                     </div>
 
@@ -175,6 +197,7 @@ export default {
     created(){
         let savedUserInfo = util.auth.getSavedUserInfo();
         this.setUserInfo(savedUserInfo);
+        this.$store.dispatch("app/getAllUsers");
     },
     components: {
         VuePerfectScrollbar
@@ -193,7 +216,22 @@ export default {
         this.reCalcSidebarHeight();
     },
     methods: {
-        setUserInfo(data) { // đang trùng với hàm cùng tên ở component login.vue
+        filterUser(item, queryText, itemText){
+            let lowcaseText = queryText.toLowerCase();
+            return item.displayName.toLowerCase().includes(lowcaseText);
+        },
+        async delegateUser(user){
+            let delegatedUser = await userApi.changeDelegate(user);
+            this.setUserInfo(delegatedUser.data);
+            location.reload();
+        },
+        openSelectUserPanel(){
+            this.delegatedUser = {};
+            setTimeout((self) => {
+                $(self.$refs.selectDelegateUser.$el).find('.v-select__slot').click();
+            }, 400, this);
+        },
+        setUserInfo(data) {// đang trùng với hàm cùng tên ở component BAsidebar.vue
             let accData = {
                 accType: data.profile.type,
                 info: data.profile
@@ -210,9 +248,11 @@ export default {
                 accInfo.baId = data.profile.id;
                 this.$store.commit("app/changeCurrentBAInfo", data.profile);
                 endUserInfo = endUserInfo.userDelegate;
+                accInfo.endUserId = data.profile.userDelegate.id;
+            }else{
+                accInfo.endUserId = data.profile.id;
             }
             this.$store.commit("app/changeCurrentUserInfo", endUserInfo);
-            accInfo.endUserId = data.profile.userDelegate.id;
             util.auth.saveLoginInfo(accInfo);
         },
         reCalcSidebarHeight(){
@@ -249,6 +289,9 @@ export default {
     },
     data() {
         return {
+            delegatedUser: {},
+            searchUserDeligate: '',
+            listUserForDelegate: [],
             menuItemsHeight: '200px'
         };
     }
