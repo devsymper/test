@@ -64,6 +64,7 @@ export default class BasicControl extends Control {
         })
         if (this.ele.hasClass('s-control-number')) {
             this.ele.css('text-align', 'right');
+            this.ele.attr('type', 'text');
 
         } else if (this.ele.hasClass('s-control-table')) {
 
@@ -85,6 +86,7 @@ export default class BasicControl extends Control {
             this.renderTimeControl();
 
         } else if (this.ele.hasClass('s-control-percent')) {
+            this.ele.attr('type', 'text');
             this.ele.css('min-width', 'unset');
 
         } else if (this.ele.hasClass('s-control-date')) {

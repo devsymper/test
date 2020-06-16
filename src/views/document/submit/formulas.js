@@ -33,10 +33,6 @@ export default class Formulas {
     async handleBeforeRunFormulas(dataInput, inject = "") {
             let listSyql = this.getReferenceFormulas();
             let script = this.formulas;
-            console.log('scv', script);
-            console.log('scv', dataInput);
-
-
             if (listSyql != null && listSyql.length > 0) {
                 for (let i = 0; i < listSyql.length; i++) {
                     let syql = listSyql[i].trim();
@@ -120,11 +116,15 @@ export default class Formulas {
          * @param {String} formulas 
          */
     replaceParamsToData(dataInput, formulas) {
+        let listControlInDoc = this.getDataSubmitInStore()
         for (let controlName in dataInput) {
             let regex = new RegExp("{" + controlName + "}", "g");
             let value = dataInput[controlName];
             if (value == undefined || typeof value == 'undefined' || value == null) {
                 value = ""
+                if (listControlInDoc[controlName].type == 'number' || listControlInDoc[controlName].type == 'percent') {
+                    value = 0;
+                }
             }
             formulas = formulas.replace(regex, value);
         }

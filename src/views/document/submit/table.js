@@ -125,7 +125,9 @@ export default class Table {
                     };
                 },
                 beforeKeyDown: function(event) {
-                    if (thisObj.isAutoCompleting == false) {
+                    if (event.keyCode != 40 && event.keyCode != 38 &&
+                        event.keyCode != 37 && event.keyCode != 39 &&
+                        thisObj.isAutoCompleting == false) {
                         var formulasInstance = thisObj.checkIsAutocompleteCell(thisObj.currentControlSelected);
                         if (formulasInstance != false) {
                             SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-input', event);
