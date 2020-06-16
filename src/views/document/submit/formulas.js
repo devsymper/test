@@ -33,6 +33,10 @@ export default class Formulas {
     async handleBeforeRunFormulas(dataInput, inject = "") {
             let listSyql = this.getReferenceFormulas();
             let script = this.formulas;
+            console.log('scv', script);
+            console.log('scv', dataInput);
+
+
             if (listSyql != null && listSyql.length > 0) {
                 for (let i = 0; i < listSyql.length; i++) {
                     let syql = listSyql[i].trim();
@@ -98,34 +102,37 @@ export default class Formulas {
          * else => value
          */
     checkBeforeReferenceFormulas(script, refScript) {
-        let s = script.replace("(", "\\(");
-        s = s.replace(")", "\\)");
-        let reg = new RegExp("([a-zA-Z_0-9]+)\\s+" + s, "gm")
-        let textBefore = refScript.match(reg);
-        if (textBefore != null && textBefore.length > 0) {
-            textBefore = textBefore[0].replace(script, "")
-            return textBefore;
-        } else {
-            return false;
+            let s = script.replace("(", "\\(");
+            s = s.replace(")", "\\)");
+            let reg = new RegExp("([a-zA-Z_0-9]+)\\s+" + s, "gm")
+            let textBefore = refScript.match(reg);
+            if (textBefore != null && textBefore.length > 0) {
+                textBefore = textBefore[0].replace(script, "")
+                return textBefore;
+            } else {
+                return false;
+            }
+
         }
-
-    }
-
+        /**
+         * Hàm thay thế các giá trị input đầu vào trong công thức (thay thế vào chuỗi {controlName})
+         * @param {Object} dataInput 
+         * @param {String} formulas 
+         */
     replaceParamsToData(dataInput, formulas) {
-        console.log('mnv', dataInput);
-
         for (let controlName in dataInput) {
             let regex = new RegExp("{" + controlName + "}", "g");
-            formulas = formulas.replace(regex, dataInput[controlName]);
+            let value = dataInput[controlName];
+            if (value == undefined || typeof value == 'undefined' || value == null) {
+                value = ""
+            }
+            formulas = formulas.replace(regex, value);
         }
-        console.log('mnv', formulas);
-
         return formulas;
     }
     handleRunAutoCompleteFormulas(search, dataInput = false) {
         let listSyql = this.getReferenceFormulas();
         let fieldSelect = this.detectFieldSelect();
-
         let where = " WHERE ";
         for (let i = 0; i < fieldSelect.length; i++) {
             let element = fieldSelect[i];
@@ -159,7 +166,7 @@ export default class Formulas {
     }
 
     detectFieldSelect() {
-            let listField = this.formulas.match(/(?<=select ).*?(?= from)/gi);
+            let listField = this.formulas.match(/(?<=select|SELECT ).*(?= from|FROM)/gi);
             let fields = [];
             if (listField != null && listField.length > 0) {
                 fields = listField[0];

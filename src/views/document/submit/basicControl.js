@@ -100,7 +100,10 @@ export default class BasicControl extends Control {
 
         } else if (this.ele.hasClass('s-control-select')) {
             this.renderSelectControl();
+        } else if (this.ele.hasClass('s-control-label')) {
+            this.renderLabelControl();
         }
+
     }
     renderFileControl = function(rowId) {
         let fileHtml = this.genFileView(rowId);
@@ -174,10 +177,20 @@ export default class BasicControl extends Control {
         })
 
     }
+    renderLabelControl() {
+        let id = this.ele.attr('id');
+        let thisCpn = this;
+        let keyinstance = this.ele.attr('key-instance');
+        this.ele.replaceWith('<input class="s-control s-control-label" s-control-type="label" type="text" disabled title="Label" id="' + id + '" placeholder="Aa" key-instance="' + keyinstance + '">');
+        this.ele = $('#' + id);
+        this.ele.on('change', function(e) {
+            SYMPER_APP.$evtBus.$emit('document-submit-input-change', { controlName: thisCpn.controlProperties.name.value, val: $(e.target).val() })
+        })
+    }
     renderSelectControl() {
         let id = this.ele.attr('id');
         let keyinstance = this.ele.attr('key-instance');
-        this.ele.replaceWith('<input class="s-control s-control-select" s-control-type="select" type="text" title="Select" id="' + id + '" key-instance="' + keyinstance + '">');
+        this.ele.replaceWith('<input class="s-control s-control-select" s-control-type="select" type="text" title="Select" readonly="readonly" id="' + id + '" key-instance="' + keyinstance + '">');
         this.ele = $('#' + id);
         let thisCpn = this;
         this.ele.on('click', function(e) {
@@ -196,6 +209,9 @@ export default class BasicControl extends Control {
             $(this).addClass('autocompleting');
             let formulasInstance = thisCpn.controlFormulas.formulas.instance;
             SYMPER_APP.$evtBus.$emit('document-submit-select-input', { e: e, selectFormulasInstance: formulasInstance, alias: thisCpn.name })
+        })
+        this.ele.on('change', function(e) {
+            SYMPER_APP.$evtBus.$emit('document-submit-input-change', { controlName: thisCpn.controlProperties.name.value, val: $(e.target).val() })
         })
 
     }
@@ -244,7 +260,9 @@ export default class BasicControl extends Control {
                 key: 'currentTableInteractive',
                 value: null
             });
-            SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-input', e)
+            let event = e;
+            event['controlName'] = thisCpn.name;
+            SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-input', event)
         })
         this.ele.on('keyup', function(e) {
             let formulasInstance = (fromSelect) ? thisCpn.controlFormulas.formulas.instance : thisCpn.controlFormulas.autocomplete.instance;
