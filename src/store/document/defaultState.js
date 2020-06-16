@@ -58,7 +58,11 @@ const defaultState = {
         //biến phục vụ cho autocomplete trong table
         currentTableInteractive: null, //chỉ ra table đang được tương tác
         currentCellSelected: null, // chỉ ra cell đang nhập
-    }
+    },
+    detail: {
+        allData: null
+    },
+    isDetailView: false
 };
 
 export default defaultState;

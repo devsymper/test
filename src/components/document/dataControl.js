@@ -1,5 +1,9 @@
 import { GetControlProps } from "./../../components/document/controlPropsFactory.js";
 import store from './../../store'
+import sDocument from './../../store/document'
+import { util } from "./../../plugins/util.js";
+
+
 /**
  * Hàm xử lí việc bóc tách dữ liệu của các field từ server để đưa vào store
  * dữ liệu là các thuộc tính và các công thức của các control trong doc
@@ -33,11 +37,19 @@ export const setDataForPropsControl = function(fields) {
                 }
             })
         }
-        if (fields[controlId].type != "table") {
-            addToAllControlInDoc(controlId, { id: id, properties: properties, formulas: formulas, type: type });
+        if (fields[controlId].type != "table" && sDocument.state.detail.allData != null) {
+            let value = ""
+            if (properties.hasOwnProperty('name')) {
+                let controlName = properties['name'].value;
+                let allData = util.cloneDeep(sDocument.state.detail.allData);
+                value = allData[controlName];
+            }
+            addToAllControlInDoc(controlId, { id: id, properties: properties, formulas: formulas, type: type, value: value });
         } else {
             let listField = fields[controlId].listFields
             let listChildField = {};
+            let i = 0;
+            let colValue = {}
             for (let childFieldId in listField) {
                 let childControl = GetControlProps(listField[childFieldId].type)
                 let childProperties = childControl.properties
@@ -65,12 +77,26 @@ export const setDataForPropsControl = function(fields) {
 
                     })
                 }
+                if (childProperties.hasOwnProperty('name') && sDocument.state.detail.allData != null) {
+                    let controlName = childProperties['name'].value;
+                    let allData = util.cloneDeep(sDocument.state.detail.allData[properties['name'].value]);
+                    if (allData != null && allData != undefined) {
+                        let countRow = allData.length;
+                        for (let j = 0; j < countRow; j++) {
+                            let rowData = allData[j];
+                            if (!colValue.hasOwnProperty(controlName)) {
+                                colValue[controlName] = []
+                            }
+                            colValue[controlName].push(rowData[controlName])
+                        }
+                    }
+
+
+                }
                 listChildField[childFieldId] = { id: childId, properties: childProperties, formulas: childFormulas, type: childType }
-
+                i++;
             }
-            console.log(listChildField);
-
-            addToAllControlInDoc(controlId, { id: id, properties: properties, formulas: formulas, type: fields[controlId].type, listFields: listChildField });
+            addToAllControlInDoc(controlId, { id: id, properties: properties, formulas: formulas, type: fields[controlId].type, listFields: listChildField, value: colValue });
         }
 
     }

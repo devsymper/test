@@ -4,7 +4,6 @@ import sDocument from './../../../store/document'
 import { SYMPER_APP } from './../../../main.js'
 
 import Util from './util'
-let isDetailView = sDocument.state.submit.isDetailView;
 let dataInputCache = sDocument.state.submit.dataInputCache;
 const fileTypes = {
     'xlsx': 'mdi-microsoft-excel',
@@ -40,8 +39,8 @@ const fileTypes = {
 };
 
 export default class BasicControl extends Control {
-    constructor(idField, ele, controlProps, curParentInstance) {
-        super(idField, ele, controlProps, curParentInstance);
+    constructor(idField, ele, controlProps, curParentInstance, value) {
+        super(idField, ele, controlProps, curParentInstance, value);
     }
 
     render() {
@@ -52,7 +51,12 @@ export default class BasicControl extends Control {
         if (this.controlFormulas.hasOwnProperty('autocomplete') && this.controlFormulas.autocomplete.instance != undefined) {
             this.addAutoCompleteEvent();
         }
+        if (this.checkDetailView()) {
+            this.ele.addClass('detail-view')
+        }
         let thisCpn = this;
+        console.log('nbm', this.value);
+        this.ele.val(this.value)
         this.ele.wrap('<span style="position:relative;">');
         this.ele.attr('key-instance', this.curParentInstance);
         this.ele.on('change', function(e) {
@@ -113,7 +117,7 @@ export default class BasicControl extends Control {
     genFileView = function(rowId = null) {
         let ctrlName = this.name;
         let addTpl = '';
-        if (!isDetailView) {
+        if (!this.checkDetailView()) {
             addTpl = `
                 <div data-control-name="${ctrlName}" class="file-add" title="Thêm file" data-rowid="${rowId}" data-ctrlname="${ctrlName}">
                     <span class="text-show"><span class="mdi mdi-plus"></span></span>
@@ -152,7 +156,7 @@ export default class BasicControl extends Control {
 
 
     renderFilterControl() {
-        if (isDetailView) return;
+        if (this.checkDetailView()) return;
         this.ele.attr('type', 'text');
         this.ele.on('click', function(e) {
             SYMPER_APP.$evtBus.$emit('document-submit-filter-input-click', e)
@@ -160,7 +164,7 @@ export default class BasicControl extends Control {
 
     }
     renderUserControl() {
-        if (isDetailView) return;
+        if (this.checkDetailView()) return;
         this.ele.attr('type', 'text');
         this.ele.on('click', function(e) {
             SYMPER_APP.$evtBus.$emit('document-submit-user-select-input', e)
@@ -198,12 +202,12 @@ export default class BasicControl extends Control {
 
 
     renderDateTimeControl() {
-        if (isDetailView) return;
+        if (this.checkDetailView()) return;
         this.ele.attr('type', 'text');
 
     }
     renderDateControl() {
-        if (isDetailView) return;
+        if (this.checkDetailView()) return;
         this.ele.attr('type', 'text');
         this.ele.on('click', function(e) {
             $(e.target).addClass('date-picker-access');
@@ -211,7 +215,7 @@ export default class BasicControl extends Control {
         })
     }
     renderTimeControl() {
-        if (isDetailView) return;
+        if (this.checkDetailView()) return;
         this.ele.attr('type', 'text');
         this.ele.on('click', function(e) {
             $(this).addClass('time-picker')
@@ -328,5 +332,7 @@ export default class BasicControl extends Control {
             SYMPER_APP.$evtBus.$emit('document-submit-open-validate', e)
         })
     }
-
+    checkDetailView() {
+        return sDocument.state.isDetailView;
+    }
 }

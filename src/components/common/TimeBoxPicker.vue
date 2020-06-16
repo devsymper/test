@@ -54,33 +54,24 @@ export default {
             this.calPosition(e);
         },
         calPosition(e){
-            console.log(e);
-            
-            if($(e.target).is('.handsontableInput')){
+            if($(e.target).closest('.handsontable').length > 0){
                 let autoEL = $(this.$el).detach();
                 $(e.target).closest('.wrap-table').append(autoEL);
                 let edtos = $(e.target).offset();
                 let tbcos = $(e.target).closest('.wrap-table').find('[s-control-type="table"]').offset();
-                this.position = {'top':edtos.top - tbcos.top + $(e.target).height() +'px','left':edtos.left - tbcos.left+'px'};
+                this.positionBox = {'top':edtos.top - tbcos.top + $(e.target).height() + 'px', 'left':edtos.left - tbcos.left + 'px'};
             }
             //nêu là ngoài bảng
             else{
                 let autoEL = $(this.$el).detach();
                 $(e.target).parent().append(autoEL);
-                this.position = {'top':'20px','left':'0px'};
+                this.position = {'top':'20px', 'left':'0px'};
             }
-            this.$store.commit("document/addToDocumentSubmitStore", {
-                key: 'currentCellSelected',
-                value: null
-            });
-            this.$store.commit("document/addToDocumentSubmitStore", {
-                key: 'currentTableInteractive',
-                value: null
-            });
+            
         },
        
         applyTime(){
-            this.$emit('apply-time-picker',this.$refs.timePicker.getTime(false));
+            this.$emit('apply-time-picker', this.$refs.timePicker.getTime(false));
         }
     }
 }
@@ -113,5 +104,8 @@ export default {
     }
     .heading{
         padding: 6px 12px;
+    }
+    .card-time-picker >>> .text-start {
+        display: flex !important;
     }
 </style>

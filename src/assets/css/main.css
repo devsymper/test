@@ -575,6 +575,10 @@ html {
     right: 230px;
 }
 
+.detail-view {
+    border: none !important;
+}
+
 .label {
     font-size: 13px;
     text-shadow: 0 0 0;

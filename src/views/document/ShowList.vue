@@ -74,7 +74,7 @@ export default {
                     name: "listObject",
                     text: "Danh sách bản ghi",
                     callback: (document, callback) => {
-                        this.$goToPage('/document/'+document.name+'/object',"Danh sách bản ghi");
+                        this.$goToPage('/document/'+document.name+'/objects',"Danh sách bản ghi");
                     },
                 },
             ],

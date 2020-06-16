@@ -18,7 +18,20 @@ export default class TableControl extends Control {
         this.ele.wrap('<span style="position:relative;" class="wrap-table">');
 
     }
-    renderTable() {
-        this.tableInstance.render();
+    renderTable(data) {
+        console.log('ooo', data);
+        this.tableInstance.render([]);
+        for (let controlName in data) {
+            let dataControl = data[controlName];
+            let vls = [];
+            for (let index = 0; index < dataControl.length; index++) {
+                let row = dataControl[index];
+                if (row == null || row == 'null')
+                    row = '';
+                vls.push([index, controlName, row]);
+            }
+            this.tableInstance.tableInstance.setDataAtRowProp(vls, null, null, 'auto_set');
+        }
     }
+
 }
