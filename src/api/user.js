@@ -13,7 +13,7 @@ export const userApi = {
             email: userName,
             password: password
         };
-        return api.post("login", data);
+        return api.post(appConfigs.apiDomain.account + "auth/login", data);
     },
     getListUser(page, pageSize) {
         return coreApi.get("users?page=" + page + "&pageSize=" + pageSize);

@@ -79,41 +79,35 @@ export default {
             }
         },
 
-        setUserInfo(data) {
-            let userData = data.supporter
-                ? {
-                      accType: "ba",
-                      info: data.supporter
-                  }
-                : data.user
-                ? {
-                      accType: "enduser",
-                      info: data.user
-                  }
-                : false;
-            if (userData) {
-                let info = userData.info;
-                util.auth.saveLoginInfo({
-                    token: data.token,
-                    baId: info.id,
-                    endUserId: info.id
-                });
-                this.$store.commit("app/changeCurrentBAInfo", {
-                    id: info.id,
-                    name: info.name,
-                    email: info.email
-                });
-            } else {
-                alert("Không xác định loại tài khoản!");
+        setUserInfo(data) {// đang trùng với hàm cùng tên ở component BAsidebar.vue
+            let accData = {
+                accType: data.profile.type,
+                info: data.profile
+            };
+            let endUserInfo = data.profile;
+            let accInfo = {
+                token: data.token,
+                baId: 0,
+                endUserId: 0,
+                profile:data.profile
             }
+
+            if(data.profile.type == 'ba'){
+                accInfo.baId = data.profile.id;
+                this.$store.commit("app/changeCurrentBAInfo", data.profile);
+                endUserInfo = endUserInfo.userDelegate;
+            }
+            this.$store.commit("app/changeCurrentUserInfo", endUserInfo);
+            accInfo.endUserId = data.profile.userDelegate.id;
+            util.auth.saveLoginInfo(accInfo);
         }
     },
     data() {
         return {
             checkingUser: false,
             valid: true,
-            email: "supporter@symper.vn",
-            password: "As123!@#symper",
+            email: "dinhnv@symper.vn",
+            password: "Damthatbai@2010",
             emailRules: [
                 v => !!v || "E-mail is required",
                 v => /.+@.+\..+/.test(v) || "E-mail must be valid"
