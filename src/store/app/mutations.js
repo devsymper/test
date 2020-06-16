@@ -9,14 +9,12 @@ const increaseUnreadNotification = (state, delta = 1) => {
 };
 
 const changeCurrentBAInfo = (state, data) => {
-    debugger
     for (let name in data) {
         Vue.set(state.baInfo, name, data[name]);
     }
 };
 
 const changeCurrentUserInfo = (state, data) => {
-    debugger
     for (let name in data) {
         Vue.set(state.endUserInfo, name, data[name]);
     }
