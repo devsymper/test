@@ -45,9 +45,11 @@ export default {
     },
     created(){
         let thisCpn = this;
-        this.$evtBus.$on('document-submit-autocomplete-input-change',e=>{
+        $(document).on('keyup',function(e){
             if(thisCpn.dataTable != undefined && thisCpn.dataTable.length > 0){
-                if(e.e.keyCode == 38){    //len
+                console.log(e.keyCode);
+                
+                if(e.keyCode == 38){    //len
                 
                     if(thisCpn.indexActive == 0){
                         return false;
@@ -57,7 +59,7 @@ export default {
                     Vue.set(thisCpn.dataTable[thisCpn.indexActive], 'active', true);
                     
                 }   
-                else if(e.e.keyCode == 40){
+                else if(e.keyCode == 40){
                     if(thisCpn.indexActive == thisCpn.dataTable.length - 1){
                         return false;
                     }
@@ -65,13 +67,14 @@ export default {
                     thisCpn.indexActive++;
                     Vue.set(thisCpn.dataTable[thisCpn.indexActive], 'active', true);
                 }
-                else if(e.e.keyCode == 13){
+                else if(e.keyCode == 13){
                     let rowActive = thisCpn.dataTable[thisCpn.indexActive];
                     thisCpn.handleClickRow(rowActive);
                 }
             }
             
-        });
+        })
+    
     },
     
     methods:{
@@ -89,10 +92,14 @@ export default {
         },
         calculatorPositionBox(e){
             // nếu autocomplete từ cell của handsontable  
-            if($(e.target).is('.handsontableInput')){
+            if($(e.target).closest('.handsontable').length > 0){
                 let autoEL = $(this.$el).detach();
                 $(e.target).closest('.wrap-table').append(autoEL);
                 let edtos = $(e.target).offset();
+                if(!$(e.target).is('.handsontableInput')){
+                    edtos = $(e.target).closest('td.htAutocomplete.current.highlight').offset();
+                }
+                
                 let tbcos = $(e.target).closest('.wrap-table').find('[s-control-type="table"]').offset();
                 this.positionBox = {'top':edtos.top - tbcos.top + $(e.target).height() +'px','left':edtos.left - tbcos.left+'px'};
             }
@@ -102,6 +109,8 @@ export default {
                 $(e.target).parent().append(autoEL);
                 this.positionBox = {'top':'20px','left':'0px'};
             }
+            console.log(e);
+            
             
             
         },
@@ -112,7 +121,16 @@ export default {
             this.alias = aliasControl;
         },
         handleClickRow(item){
-            let value = item[this.alias];
+            console.log(this.alias);
+            console.log(item);
+            
+            let value = ""
+            if(item.hasOwnProperty(this.alias)){
+                value = item[this.alias];
+            }
+            else if(item.hasOwnProperty('column1')){
+                value = item['column1'];
+            }
             this.$emit('after-select-row',{value:value});
             this.hide();
         },
@@ -135,6 +153,9 @@ export default {
     }
     .active-row{
         background: #f0f0f0;
+    } 
+    .card-autocomplete >>> .text-start.sortable{
+        display: flex!important;
     }
 
 </style>

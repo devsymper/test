@@ -32,6 +32,7 @@ Handsontable.cellTypes.registerCellType('file', {
 });
 
 let listInputInDocument = sDocument.state.submit.listInputInDocument;
+let isDetailView = sDocument.state.isDetailView;
 //object để lưu thông tin các control ngoài table chờ để chạy công thức
 let controlOutsideWaitingRun = {}
 const MAX_TABLE_HEIGHT = 300;
@@ -115,7 +116,7 @@ export default class Table {
                     thisObj.currentControlSelected = columns[column].data;
                     // nếu type cell là time thì emit qua submit mở timepicker
                     if (thisObj.getCellSelectedType(column) == 'time') {
-                        SYMPER_APP.$evtBus.$emit('document-submit-show-time-picker', { event: event });
+                        // SYMPER_APP.$evtBus.$emit('document-submit-show-time-picker', { event: event });
                     };
                 },
                 afterBeginEditing: function(row, column) {
@@ -452,7 +453,10 @@ export default class Table {
         return column.type;
 
     }
-    render() {
+
+    render(dataTable) {
+        console.log(dataTable);
+
         let thisObj = this;
         let tableContainer = $('<div id="' + thisObj.controlObj.id + '" s-control-type="table"></div>')[0];
         thisObj.controlObj.ele.before(tableContainer);
@@ -476,9 +480,7 @@ export default class Table {
             },
             // rowHeights:30,   
             // minSpareRows: 1,
-            data: [
-                []
-            ],
+            data: dataTable,
             manualColumnMove: true,
             // manualRowMove: true,
             contextMenu: true,
@@ -587,14 +589,21 @@ export default class Table {
             //     }
             // },
         });
-        for (let evtName in thisObj.event) {
-            Handsontable.hooks.add(evtName, thisObj.event[evtName], this.tableInstance);
+
+        if (!this.checkDetailView()) {
+            for (let evtName in thisObj.event) {
+                Handsontable.hooks.add(evtName, thisObj.event[evtName], this.tableInstance);
+            }
         }
+
     }
 
-    /**
-     * Hàm lấy thông tin của các cột
-     */
+    checkDetailView() {
+            return sDocument.state.isDetailView;
+        }
+        /**
+         * Hàm lấy thông tin của các cột
+         */
     getColumnsInfo() {
         let thisObj = this
         let headerName = [];
@@ -602,6 +611,8 @@ export default class Table {
         let hiddenColumns = [];
         let num = 0;
         let ths = thisObj.controlObj.ele.find('th');
+        console.log('nnj', thisObj.controlObj.listInsideControls);
+
         for (let controlName in thisObj.controlObj.listInsideControls) {
             headerName.push($(ths[num]).text());
             // Lấy celltype
@@ -631,6 +642,11 @@ export default class Table {
         }
     }
     getCellType(name, control) {
+        console.log(listInputInDocument);
+        console.log(name);
+
+        console.log(control);
+
         let type = control.type;
         let ctrl = listInputInDocument[name];
         let rsl = {

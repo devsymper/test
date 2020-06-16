@@ -80,8 +80,8 @@
 </template>
 <script>
 import { documentApi } from "./../../../api/Document.js";
-import { getInsertionCSS } from "./../../../components/document/documentUtil.js";
-import "./../../../components/document/documentContent.css";
+// import { getInsertionCSS } from "./../../../components/document/documentUtil.js";
+// import "./../../../components/document/documentContent.css";
 import { setDataForPropsControl } from "./../../../components/document/dataControl";
 import BasicControl from "./basicControl";
 import TableControl from "./tableControl";
@@ -366,14 +366,17 @@ export default {
             }
             else{
                 let currentTableInteractive = this.sDocumentSubmit.currentTableInteractive
-                console.log(data);
-                
                 currentTableInteractive.tableInstance.setDataAtCell(this.sDocumentSubmit.currentCellSelected.row,this.sDocumentSubmit.currentCellSelected.column,data.value)
                 currentTableInteractive.isAutoCompleting = false;
                 
             }
+            console.log(data);
             
-            
+            // thisCpn.updateListInputInDocument(
+            //     locale.controlName,
+            //     "value",
+            //     data.value
+            // );
         },
         /**
          * Hàm  xử lí data sau khi query công thức autocomplete,

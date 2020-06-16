@@ -112,10 +112,14 @@ export default class Formulas {
     }
 
     replaceParamsToData(dataInput, formulas) {
+        console.log('mnv', dataInput);
+
         for (let controlName in dataInput) {
             let regex = new RegExp("{" + controlName + "}", "g");
             formulas = formulas.replace(regex, dataInput[controlName]);
         }
+        console.log('mnv', formulas);
+
         return formulas;
     }
     handleRunAutoCompleteFormulas(search, dataInput = false) {
@@ -235,15 +239,11 @@ export default class Formulas {
          */
     getDataInputFormulas() {
         let inputControl = this.getInputControl();
-        console.log('mbv', inputControl);
-
         let dataInput = {};
         for (let inputControlName in inputControl) {
             let valueInputControlItem = dataSubmitStore.listInputInDocument[inputControlName].value;
             dataInput[inputControlName] = valueInputControlItem;
         }
-        console.log('mbv', dataInput);
-
         return dataInput;
     }
     getFormulas() {

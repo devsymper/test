@@ -134,13 +134,13 @@ const routes = [{
 
     },
     {
-        path: "/document/detail/:id?",
+        path: "/document/:name?/object/:id?",
         name: "detailDocument",
         component: DetailDocument,
 
     },
     {
-        path: "/document/:name?/object",
+        path: "/document/:name?/objects",
         name: "listDocumentObject",
         component: ListObject,
 

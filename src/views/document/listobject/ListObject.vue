@@ -32,8 +32,8 @@ export default {
                 {
                     name: "detail",
                     text: "Xem chi tiết",
-                    callback: (document, callback) => {
-                            
+                    callback: (documentObject, callback) => {
+                        this.$goToPage('/document/'+this.documentName+'/object/'+documentObject.document_object_id,"Danh sách bản ghi");
                     },
                 },
                 {
@@ -45,6 +45,9 @@ export default {
                 },
             ],
         }
+    },
+    computed:{
+      
     },
     mounted() {
         this.calcContainerHeight();
