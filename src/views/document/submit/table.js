@@ -97,7 +97,6 @@ export default class Table {
             /**Danh sách các celltpye trong table */
             this.listCellType = {};
             this.currentSelectedCell = {};
-            this.keyEvent = null;
             this.isAutoCompleting = false;
             this.currentControlSelected = null
             this.event = {
@@ -120,43 +119,48 @@ export default class Table {
                     };
                 },
                 afterBeginEditing: function(row, column) {
-                    thisObj.checkAutoCompleteControl(thisObj.keyEvent);
                     // nêu cell click là control select
                     if (thisObj.getCellSelectedType(column) == 'dropdown') {
                         thisObj.setSelectCell(event);
                     };
                 },
                 beforeKeyDown: function(event) {
-                    thisObj.keyEvent = event;
-                    if (thisObj.isAutoCompleting) {
-                        let formulasInstance = thisObj.checkIsAutocompleteCell(thisObj.currentControlSelected);
+                    if (event.keyCode != 40 && event.keyCode != 38 &&
+                        event.keyCode != 37 && event.keyCode != 39 &&
+                        thisObj.isAutoCompleting == false) {
+                        var formulasInstance = thisObj.checkIsAutocompleteCell(thisObj.currentControlSelected);
                         if (formulasInstance != false) {
-                            event.stopImmediatePropagation();
-
-                            SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-key-event', {
-                                e: event,
-                                autocompleteFormulasInstance: formulasInstance,
-                                isSelect: false
-                            })
+                            SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-input', event);
+                            thisObj.isAutoCompleting = formulasInstance;
                         }
+
                     }
-                },
-                afterDocumentKeyDown: function(event) {
+                    // hoangnd: cần set timeout ở đây tại vì cần thực hiện đoạn này sau khi keydown hoàn tất thì input mới có dữ liệu
+                    setTimeout(() => {
+                        if (thisObj.isAutoCompleting != false) {
+                            let formulasInstance = thisObj.isAutoCompleting
+                            if (formulasInstance != false) {
+
+                                SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-key-event', {
+                                    e: event,
+                                    autocompleteFormulasInstance: formulasInstance,
+                                    isSelect: false
+                                })
+                            }
+                        }
+                    }, 10);
 
                 },
-                afterCreateRow: function(index, amount, source) {
 
-                },
                 afterSelectionEnd: function(row, col) {
                     store.commit("document/addToDocumentSubmitStore", {
                         key: 'docStatus',
                         value: 'input'
                     });
                 },
-                beforeOnCellMouseDown: function(event, coords, td, controller) {
 
-                },
                 afterChange: function(changes, source) {
+
 
                     let controlName = changes[0][1];
                     let columns = thisObj.columnsInfo.columns;
@@ -218,12 +222,16 @@ export default class Table {
                     rowData[rowData.length - 1] = id;
                     thisObj.tableInstance.setDataAtCell(colChange[0], rowData.length - 1, id);
                     ClientSQLManager.insertRow(thisObj.keyInstance, thisObj.tableName, columns, rowData, true).then(res => {
-                        thisObj.handlerCheckEffectedControlInTable(controlName);
+                        if (index == changes.length - 1) {
+                            thisObj.handlerCheckEffectedControlInTable(controlName);
+                        }
                     });
                 } else {
                     ClientSQLManager.editRow(thisObj.keyInstance, thisObj.tableName, colChange[1], colChange[3],
                         'WHERE s_table_id_sql_lite = ' + rowData[rowData.length - 1], true).then(res => {
-                        thisObj.handlerCheckEffectedControlInTable(controlName);
+                        if (index == changes.length - 1) {
+                            thisObj.handlerCheckEffectedControlInTable(controlName);
+                        }
                     });
                 }
             }
@@ -282,8 +290,6 @@ export default class Table {
                 return;
             }
             let controlEffected = controlInstance.getEffectedControl();
-            console.log('nnnnnnnn', controlName, controlEffected);
-
             // console.log(controlEffected);
             if (Object.keys(controlEffected).length > 0) {
                 for (let i in controlEffected) {
@@ -409,23 +415,10 @@ export default class Table {
         }, 100);
 
     }
-    checkAutoCompleteControl(event) {
-            let autocompleteFormulasInstance = this.checkIsAutocompleteCell(this.currentControlSelected);
-            if (autocompleteFormulasInstance == false) {
-                this.isAutoCompleting = false;
-            } else {
-                this.isAutoCompleting = true;
-                SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-input', event);
-                SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-key-event', {
-                    e: event,
-                    autocompleteFormulasInstance: autocompleteFormulasInstance,
-                    isSelect: false
-                })
-            }
-        }
-        /**
-         * Hàm lấy formulas của cell select -> chạy -> gán lại data cho autocomplete component
-         */
+
+    /**
+     * Hàm lấy formulas của cell select -> chạy -> gán lại data cho autocomplete component
+     */
     setSelectCell(event) {
 
         let controlInstance = listInputInDocument[this.currentControlSelected];
@@ -501,7 +494,7 @@ export default class Table {
             autoRowSize: false,
             autoColSize: false,
             width: '100%',
-            minSpareRows: 1,
+            minSpareRows: (thisObj.checkDetailView()) ? 0 : 1,
             height: 'auto',
             afterRender: function(isForced) {
                 let tbHeight = this.container.getElementsByClassName('htCore')[0].getBoundingClientRect().height;

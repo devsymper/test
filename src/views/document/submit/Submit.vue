@@ -97,6 +97,8 @@ import Filter from "./items/Filter.vue";
 import Validate from "./items/Validate.vue";
 import ClientSQLManager from "./clientSQLManager.js";
 import Util from './util';
+import { checkCanBeBind, resetImpactedFieldsList, markBinedField } from './handlerCheckRunFormulas';
+
 let impactedFieldsList = {};
 let impactedFieldsArr = {};
 var impactedFieldsListWhenStart = {};
@@ -181,6 +183,12 @@ export default {
     },
 
     created() {
+
+        // đặt trang thái của view là submit => isDetailView = false
+        this.$store.commit("document/addToDocumentStore", {
+            key: 'isDetailView',
+            value: false
+        });
         let thisCpn = this;
         if (this.docId != 0) {
             this.documentId = this.docId;
@@ -191,15 +199,30 @@ export default {
         this.loadDocumentData();
         this.$evtBus.$on("document-submit-autocomplete-input", e => {
             thisCpn.$refs.autocompleteInput.show(e);
+            thisCpn.$store.commit("document/addToDocumentSubmitStore", {
+                key: 'currentControlAutoComplete',
+                value: e.controlName
+            });
         });
 
+        // hàm nhận sự kiện thay đổi của input
         this.$evtBus.$on("document-submit-input-change", locale => {
+            thisCpn.$store.commit("document/addToDocumentSubmitStore", {
+                key: 'docStatus',
+                value: 'input'
+            });
             thisCpn.updateListInputInDocument(
                 locale.controlName,
                 "value",
                 locale.val
             );
+            thisCpn.$store.commit("document/addToDocumentSubmitStore", {
+                key: 'rootChangeFieldName',
+                value: locale.controlName
+            });
+            resetImpactedFieldsList();
             thisCpn.handleControlInputChange(locale.controlName);
+            
         });
         this.$evtBus.$on("run-effected-control-when-table-change", e => {
             thisCpn.handlerBeforeRunFormulasValue(e.control.controlFormulas.formulas.instance,e.control.id,e.control.name,'formulas');
@@ -231,8 +254,6 @@ export default {
         });
         // hàm nhận sự thay đổi của input select gọi api để chạy công thức lấy dữ liệu
           this.$evtBus.$on("document-submit-select-input", e => {
-              console.log(e.alias);
-              
             thisCpn.$refs.autocompleteInput.show(e.e);
             thisCpn.getDataForAutocomplete(e,'select',e.alias);
         });
@@ -244,6 +265,10 @@ export default {
                 $(evt.target).closest(".v-data-table").length == 0
             ) {
                 thisCpn.$refs.autocompleteInput.hide();
+                let currentTableInteractive = thisCpn.sDocumentSubmit.currentTableInteractive
+                if(currentTableInteractive != null)
+                    currentTableInteractive.isAutoCompleting = false;
+                    console.log(currentTableInteractive);
             }
             if (
                 !$(evt.target).hasClass("s-control-user") &&
@@ -286,9 +311,7 @@ export default {
         /**
          * Hàm chạy công thức autocomplete để đổ dữ liệu vào box autucomplete, control select cũng dùng trường hợp này
          */
-        getDataForAutocomplete(e,type,aliasControl=""){
-            console.log(type);
-            
+        getDataForAutocomplete(e,type,aliasControl=""){ 
             let thisCpn = this
             if(type == 'select'){
                 let dataInput = this.getDataInputFormulas(e.selectFormulasInstance);  
@@ -299,7 +322,7 @@ export default {
             else{
                 let aliasControl = e.autocompleteFormulasInstance.autocompleteDetectAliasControl();
                 let dataInput = this.getDataInputFormulas(e.autocompleteFormulasInstance);  
-                let dataAutocomplete = e.autocompleteFormulasInstance.handleRunAutoCompleteFormulas('',dataInput).then(res=>{
+                let dataAutocomplete = e.autocompleteFormulasInstance.handleRunAutoCompleteFormulas($(e.e.target).val(),dataInput).then(res=>{
                     thisCpn.setDataForControlAutocomplete(res,aliasControl)
                 });
             }
@@ -361,17 +384,18 @@ export default {
             // th này không phải trong table       
             if(this.sDocumentSubmit.currentCellSelected == null){
                 $('.autocompleting').val(data.value);
+                markBinedField(this.sDocumentSubmit.currentControlAutoComplete);
                 $('.autocompleting').trigger('change');
                 $('.autocompleting').removeClass('autocompleting');
             }
             else{
                 let currentTableInteractive = this.sDocumentSubmit.currentTableInteractive
                 currentTableInteractive.tableInstance.setDataAtCell(this.sDocumentSubmit.currentCellSelected.row,this.sDocumentSubmit.currentCellSelected.column,data.value)
-                currentTableInteractive.isAutoCompleting = false;
+                setTimeout(() => {
+                    currentTableInteractive.isAutoCompleting = false;
+                }, 100);
                 
             }
-            console.log(data);
-            
             // thisCpn.updateListInputInDocument(
             //     locale.controlName,
             //     "value",
@@ -691,9 +715,14 @@ export default {
                 let dataCol = table.tableInstance.tableInstance.getDataAtCol(
                     indexCol[i]
                 );
+
+                // cần xóa phần tử dòng cuối dùng là row enter mặc định ko có dữ liệu
+                dataCol.pop();
                 dataCol = (listInput[i].type == 'number' && dataCol == "" ) ? [0] : dataCol;
                 dataTable[id] = dataCol;
             }
+            console.log(dataTable);
+            
             return dataTable;
         },
         updateEffectedControlToStore(mapControlEffected) {
@@ -733,19 +762,24 @@ export default {
         runFormulasControlEffected(controlName, controlEffected){
             if(Object.keys(controlEffected).length > 0){
                 for(let i in controlEffected){
-                    let controlEffectedInstance = this.sDocumentSubmit.listInputInDocument[i];
-                    let controlId = controlEffectedInstance.id
-                    let allFormulas = controlEffectedInstance.controlFormulas;
-                    for(let formulasType in allFormulas){
-                        if(allFormulas[formulasType].hasOwnProperty('instance')){
-                            let formulasInstance = allFormulas[formulasType].instance;
-                            if(formulasInstance.getFormulas() != ""){
-                                this.handlerBeforeRunFormulasValue(formulasInstance,controlId,controlName,formulasType)
+                    console.log(checkCanBeBind(i));
+                    
+                    if (checkCanBeBind(i)){
+                        let controlEffectedInstance = this.sDocumentSubmit.listInputInDocument[i];
+                        let controlId = controlEffectedInstance.id
+                        let allFormulas = controlEffectedInstance.controlFormulas;
+                        for(let formulasType in allFormulas){
+                            if(allFormulas[formulasType].hasOwnProperty('instance')){
+                                let formulasInstance = allFormulas[formulasType].instance;
+                                if(formulasInstance.getFormulas() != ""){
+                                    this.handlerBeforeRunFormulasValue(formulasInstance,controlId,controlName,formulasType)
+                                }
                             }
+                            
+                            
                         }
-                        
-                        
                     }
+                    
                 }
             }
             
@@ -783,6 +817,8 @@ export default {
         getDataInputFormulas(formulasInstance){
             let inputControl = formulasInstance.getInputControl();
             let dataInput = {};
+            console.log(this.sDocumentSubmit.listInputInDocument);
+            
             for(let inputControlName in inputControl){
                 let valueInputControlItem = this.sDocumentSubmit.listInputInDocument[inputControlName].value;
                 dataInput[inputControlName] = valueInputControlItem;
@@ -811,8 +847,9 @@ export default {
                                 this.setDataToControl($('#'+controlId),$('#'+controlId).attr('s-control-type'), data[0][Object.keys(data[0])[0]])
                             }
                         }
-                        $('#'+controlId).trigger('change');
                     }
+                    markBinedField(controlName);
+
                 }
                 else{
                 
@@ -821,9 +858,7 @@ export default {
         },
         setDataToControl(control, type, result){
             if(type == 'label'){
-                console.log(result);
-                
-                control.text(result);
+                control.val(result);
             }
             else if(type == 'select'){
                 // console.log(result);
@@ -835,6 +870,8 @@ export default {
             else{
                 control.val(result);
             }
+                control.trigger('change')
+
         },
         /**
          * Hàm set data cho bảng trong doc sau khi chạy công thức có dữ liệu

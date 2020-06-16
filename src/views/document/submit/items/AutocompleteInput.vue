@@ -40,40 +40,12 @@ export default {
             search: '',
             headers: [],
             dataTable: [],
-            alias:''
+            alias:'',
+            curInput:null
         }
     },
     created(){
-        let thisCpn = this;
-        $(document).on('keyup',function(e){
-            if(thisCpn.dataTable != undefined && thisCpn.dataTable.length > 0){
-                console.log(e.keyCode);
-                
-                if(e.keyCode == 38){    //len
-                
-                    if(thisCpn.indexActive == 0){
-                        return false;
-                    }
-                    Vue.set(thisCpn.dataTable[thisCpn.indexActive], 'active', false);
-                    thisCpn.indexActive--;
-                    Vue.set(thisCpn.dataTable[thisCpn.indexActive], 'active', true);
-                    
-                }   
-                else if(e.keyCode == 40){
-                    if(thisCpn.indexActive == thisCpn.dataTable.length - 1){
-                        return false;
-                    }
-                    Vue.set(thisCpn.dataTable[thisCpn.indexActive], 'active', false);
-                    thisCpn.indexActive++;
-                    Vue.set(thisCpn.dataTable[thisCpn.indexActive], 'active', true);
-                }
-                else if(e.keyCode == 13){
-                    let rowActive = thisCpn.dataTable[thisCpn.indexActive];
-                    thisCpn.handleClickRow(rowActive);
-                }
-            }
-            
-        })
+        
     
     },
     
@@ -81,6 +53,36 @@ export default {
         show(e){
             this.isShowAutoComplete = true;
             this.calculatorPositionBox(e);
+            let thisCpn = this;
+            this.curInput = $(e.target);
+            this.curInput.off('keydown');
+            this.curInput.on('keydown',function(e){
+                if(thisCpn.dataTable != undefined && thisCpn.dataTable.length > 0){
+                    if(e.keyCode == 38){    //len
+                    
+                        if(thisCpn.indexActive == 0){
+                            return false;
+                        }
+                        Vue.set(thisCpn.dataTable[thisCpn.indexActive], 'active', false);
+                        thisCpn.indexActive--;
+                        Vue.set(thisCpn.dataTable[thisCpn.indexActive], 'active', true);
+                        
+                    }   
+                    else if(e.keyCode == 40){
+                        if(thisCpn.indexActive == thisCpn.dataTable.length - 1){
+                            return false;
+                        }
+                        Vue.set(thisCpn.dataTable[thisCpn.indexActive], 'active', false);
+                        thisCpn.indexActive++;
+                        Vue.set(thisCpn.dataTable[thisCpn.indexActive], 'active', true);
+                    }
+                    else if(e.keyCode == 13){
+                        let rowActive = thisCpn.dataTable[thisCpn.indexActive];
+                        thisCpn.handleClickRow(rowActive);
+                    }
+                }
+                
+        })
             // this.search = $(e.target).val();
         },
         hide(){
@@ -121,9 +123,7 @@ export default {
             this.alias = aliasControl;
         },
         handleClickRow(item){
-            console.log(this.alias);
-            console.log(item);
-            
+            this.curInput.off('keydown');
             let value = ""
             if(item.hasOwnProperty(this.alias)){
                 value = item[this.alias];
@@ -154,8 +154,14 @@ export default {
     .active-row{
         background: #f0f0f0;
     } 
-    .card-autocomplete >>> .text-start.sortable{
-        display: flex!important;
+ 
+    .card-autocomplete >>> td{
+        /* display: flex!important; */
+        white-space: nowrap;
+    }
+    .card-autocomplete >>> th{
+        /* display: flex!important; */
+        white-space: nowrap;
     }
 
 </style>
