@@ -8,7 +8,7 @@
         :pageTitle="$t('user.title')"
         :tableContextMenu="tableContextMenu"
         :containerHeight="containerHeight"
-        :getDataUrl="'https://v2hoangnd.dev.symper.vn/users?page=1&pageSize=50'"
+        :getDataUrl="getListUrl+'users?page=1&pageSize=50'"
         :actionPanelWidth="actionPanelWidth"
     >
         <div slot="right-panel-content" class="h-100">
@@ -28,6 +28,9 @@ import ListItems from "./../../components/common/ListItems.vue";
 import ActionPanel from "./../../views/users/ActionPanel.vue";
 import ChangePassPanel from "./../../views/users/ChangePass.vue";
 import { util } from "./../../plugins/util.js";
+import { appConfigs } from '../../configs';
+
+
 export default {
     components: {
         "list-items": ListItems,
@@ -35,6 +38,7 @@ export default {
     },
     data(){
         return {
+            getListUrl: appConfigs.apiDomain.user,
             actionPanelWidth:800,
             containerHeight: 200,
             tableContextMenu:[
