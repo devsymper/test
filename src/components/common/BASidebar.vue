@@ -51,46 +51,51 @@
                                 <span>User</span>
                             </v-tooltip>
                             <v-menu 
+                                v-model="showDelegatedUser"
                                 :offset-y="true"
                                 :close-on-content-click="false">
                                 <template v-slot:activator="{ on: menu, attrs }">
                                     <v-tooltip bottom>
-                                    <template v-slot:activator="{ on: tooltip }">
-                                        <v-btn
-                                            x-small
-                                            text
-                                            v-bind="attrs"
-                                            @click="openSelectUserPanel"
-                                            depressed
-                                            v-on="{ ...tooltip, ...menu }">
-                                            {{sapp.endUserInfo.displayName}}
-                                        </v-btn>
-                                    </template>
-                                    <span>Switch user</span>
-
+                                        <template v-slot:activator="{ on: tooltip }">
+                                            <v-btn
+                                                x-small
+                                                text
+                                                v-bind="attrs"
+                                                @click="openSelectUserPanel"
+                                                depressed
+                                                v-on="{ ...tooltip, ...menu }">
+                                                {{sapp.endUserInfo.displayName}}
+                                            </v-btn>
+                                        </template>
+                                        <span>Switch user</span>
                                     </v-tooltip>
                                 </template>
-                                 <v-card>
+                                 <div class="bg-white" style="width: 200px">
                                     <v-autocomplete
                                         ref="selectDelegateUser"
                                         return-object
+                                        full-width
+                                        solo
+                                        append-icon=""
                                         :items="sapp.allUsers"
-                                        chips
+                                        flat
                                         dense
                                         color="blue-grey lighten-2"
                                         label="Select"
-                                        item-text="name"
+                                        item-text="displayName"
                                         @change="delegateUser"
                                         item-value="name"
                                         :filter="filterUser">
                         
                                         <template v-slot:item="data">
-                                            <i class="mdi mdi-account mr-2 fs-16"> </i> <span> {{data.item.displayName}}</span>
+                                            <div class="fs-13 py-1">
+                                                <i class="mdi mdi-account mr-2 fs-16"> </i> <span> {{data.item.displayName}}</span>
+                                            </div>
                                         </template>
 
                                     </v-autocomplete>
 
-                                 </v-card>
+                                 </div>
                             </v-menu>
                         </div>
                         <div class="w-100 d-flex" style="color: rgba(0, 0, 0, 0.54)">
@@ -222,6 +227,7 @@ export default {
         },
         async delegateUser(user){
             let delegatedUser = await userApi.changeDelegate(user);
+            this.showDelegatedUser = false;
             this.setUserInfo(delegatedUser.data);
             location.reload();
         },
@@ -289,6 +295,7 @@ export default {
     },
     data() {
         return {
+            showDelegatedUser: false,
             delegatedUser: {},
             searchUserDeligate: '',
             listUserForDelegate: [],

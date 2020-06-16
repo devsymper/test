@@ -615,3 +615,7 @@ html {
 .editor-tree-active {
     background: #f2f2f2;
 }
+
+.bg-white {
+    background-color: white;
+}
