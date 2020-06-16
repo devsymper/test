@@ -18,9 +18,11 @@ export default class TableControl extends Control {
         this.ele.wrap('<span style="position:relative;" class="wrap-table">');
 
     }
-    renderTable(data) {
-        console.log('ooo', data);
-        this.tableInstance.render([]);
+    renderTable() {
+        this.tableInstance.render();
+
+    }
+    setData(data) {
         for (let controlName in data) {
             let dataControl = data[controlName];
             let vls = [];

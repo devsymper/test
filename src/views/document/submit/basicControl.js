@@ -53,9 +53,9 @@ export default class BasicControl extends Control {
         }
         if (this.checkDetailView()) {
             this.ele.addClass('detail-view')
+            this.ele.attr('disabled', 'disabled')
         }
         let thisCpn = this;
-        console.log('nbm', this.value);
         this.ele.val(this.value)
         this.ele.wrap('<span style="position:relative;">');
         this.ele.attr('key-instance', this.curParentInstance);
@@ -207,8 +207,8 @@ export default class BasicControl extends Control {
 
     }
     renderDateControl() {
-        if (this.checkDetailView()) return;
         this.ele.attr('type', 'text');
+        if (this.checkDetailView()) return;
         this.ele.on('click', function(e) {
             $(e.target).addClass('date-picker-access');
             SYMPER_APP.$evtBus.$emit('document-submit-date-input-click', e)

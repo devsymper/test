@@ -124,10 +124,20 @@ p {
     overflow-y: auto !important;
 }
 
-.s-control:focus {
+.s-control:not(.detail-view):focus {
     background: rgb(233, 236, 239) !important;
 }
 
-input.s-control:not(.s-control-panel):hover {
+input.s-control:not(.s-control-panel):not(.detail-view):hover {
     background: rgb(233, 236, 239) !important;
+}
+
+.handsontable td,
+.handsontable th {
+    color: #212529 !important;
+    font-size: 12px;
+    border-color: #bbb;
+    border-right: 0;
+    background: #fff;
+    text-align: left;
 }

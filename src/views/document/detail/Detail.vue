@@ -13,7 +13,6 @@
 </template>
 <script>
 import { documentApi } from "./../../../api/Document.js";
-import { getInsertionCSS } from "./../../../components/document/documentUtil.js";
 import "./../../../components/document/documentContent.css";
 import { setDataForPropsControl } from "./../../../components/document/dataControl";
 import BasicControl from "./../submit/basicControl";
@@ -193,7 +192,8 @@ export default {
                                 "document/addToListInputInDocument",
                                 { name: controlName, control: tableControl }
                             );
-                            tableControl.renderTable(valueInput);
+                            tableControl.renderTable();
+                            tableControl.setData(valueInput);
                         }
                     }
                 }

@@ -454,8 +454,7 @@ export default class Table {
 
     }
 
-    render(dataTable) {
-        console.log(dataTable);
+    render() {
 
         let thisObj = this;
         let tableContainer = $('<div id="' + thisObj.controlObj.id + '" s-control-type="table"></div>')[0];
@@ -480,12 +479,13 @@ export default class Table {
             },
             // rowHeights:30,   
             // minSpareRows: 1,
-            data: dataTable,
-            manualColumnMove: true,
+            data: [
+                []
+            ],
+            manualColumnMove: !thisObj.checkDetailView(),
             // manualRowMove: true,
-            contextMenu: true,
             colHeaders: colHeaders,
-            readOnly: false,
+            readOnly: thisObj.checkDetailView(),
             viewportColumnRenderingOffset: 50,
             // manualColumnFreeze: true,
             columns: thisObj.columnsInfo.columns,
@@ -494,7 +494,7 @@ export default class Table {
             columnHeaderHeight: 30,
             viewportRowRenderingOffset: 20,
             viewportColRenderingOffset: 20,
-            contextMenu: ['row_above', 'row_below', 'remove_row', 'freeze_column', 'unfreeze_column'],
+            contextMenu: (thisObj.checkDetailView()) ? false : ['row_above', 'row_below', 'remove_row', 'freeze_column', 'unfreeze_column'],
             dragToScroll: false,
             stretchH: 'all',
             formulas: true,
