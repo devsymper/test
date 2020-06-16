@@ -11,6 +11,7 @@
         </button>
         <autocomplete-input
             ref="autocompleteInput"
+            @after-select-row="afterSelectRowAutoComplete"
             @open-sub-form="openSubFormSubmit"
             @before-close="isShowSubFormSubmit = false"
         />
@@ -36,7 +37,7 @@
             :isTime="false"
             ref="datePicker"
         />
-        <time-picker :keyInstance="keyInstance" :title="'Chọn giờ'" ref="timePicker" />
+        <time-picker :keyInstance="keyInstance" :title="'Chọn giờ'" @apply-time-picker="applyTimePicker" ref="timePicker" />
         <v-speed-dial
             v-show="showSubmitButton"
             v-model="fab"
@@ -206,6 +207,9 @@ export default {
         this.$evtBus.$on("document-submit-open-validate", e => {
             thisCpn.$refs.validate.show(e);
         });
+        this.$evtBus.$on("document-submit-show-time-picker", e => {
+            thisCpn.$refs.timePicker.show(e.event);
+        });
         this.$evtBus.$on("document-submit-date-input-click", e => {
             thisCpn.$refs.datePicker.openPicker(e);
         });
@@ -217,32 +221,22 @@ export default {
             thisCpn.titleDragPanel = "Tìm kiếm thông tin";
             thisCpn.titleDragPanelIcon = "mdi-file-search";
         }); 
-        this.$evtBus.$on("document-submit-autocomplete-input-change", e => {
+        // hàm nhận sự thay đổi của input autocomplete gọi api để chạy công thức lấy dữ liệu
+        this.$evtBus.$on("document-submit-autocomplete-key-event", e => {
             if(e.e.keyCode != 38 && e.e.keyCode != 40 && e.e.keyCode != 13){
-                let aliasControl = e.autocompleteFormulasInstance.autocompleteDetectAliasControl();
-                let dataInput = thisCpn.getDataInputFormulas(e.autocompleteFormulasInstance);  
-                let dataAutocomplete = e.autocompleteFormulasInstance.handleRunAutoCompleteFormulas($(e.e.target).val(),dataInput).then(res=>{
-                    console.log(res);
-                    if(res.data != undefined){
-                        if(res.status == 200 && res.data != false){
-                            let dataTable = thisCpn.handleDataAutoComplete(res.data,false);
-                            thisCpn.$refs.autocompleteInput.setAliasControl(aliasControl);
-                            thisCpn.$refs.autocompleteInput.setData(dataTable);
-                        }
-                        else{
-                            thisCpn.$refs.autocompleteInput.setData([]);
-                        }
-                    }
-                    else{
-                        let data =  res[0];
-                        let dataTable = thisCpn.handleDataAutoComplete(data,true);
-                        thisCpn.$refs.autocompleteInput.setAliasControl(aliasControl);
-                        thisCpn.$refs.autocompleteInput.setData(dataTable);
-                    }
-                    
-                });
+                if(e.isSelect == false){
+                    thisCpn.getDataForAutocomplete(e,'autocomplete');
+                }
             }
         });
+        // hàm nhận sự thay đổi của input select gọi api để chạy công thức lấy dữ liệu
+          this.$evtBus.$on("document-submit-select-input", e => {
+              console.log(e.alias);
+              
+            thisCpn.$refs.autocompleteInput.show(e.e);
+            thisCpn.getDataForAutocomplete(e,'select',e.alias);
+        });
+        // click outside
         this.$evtBus.$on("symper-app-wrapper-clicked", evt => {
             if (
                 !$(evt.target).hasClass("autocompleting") &&
@@ -289,6 +283,102 @@ export default {
     },
     
     methods: {
+        /**
+         * Hàm chạy công thức autocomplete để đổ dữ liệu vào box autucomplete, control select cũng dùng trường hợp này
+         */
+        getDataForAutocomplete(e,type,aliasControl=""){
+            console.log(type);
+            
+            let thisCpn = this
+            if(type == 'select'){
+                let dataInput = this.getDataInputFormulas(e.selectFormulasInstance);  
+                let dataAutocomplete = e.selectFormulasInstance.handleRunAutoCompleteFormulas('',dataInput).then(res=>{
+                    thisCpn.setDataForControlAutocomplete(res,aliasControl)
+                });
+            }
+            else{
+                let aliasControl = e.autocompleteFormulasInstance.autocompleteDetectAliasControl();
+                let dataInput = this.getDataInputFormulas(e.autocompleteFormulasInstance);  
+                let dataAutocomplete = e.autocompleteFormulasInstance.handleRunAutoCompleteFormulas('',dataInput).then(res=>{
+                    thisCpn.setDataForControlAutocomplete(res,aliasControl)
+                });
+            }
+            
+        },
+        /**
+         * Hàm bind dữ liệu cho box autocomplete, cho component autocompleteInput
+         */
+        setDataForControlAutocomplete(res,aliasControl){
+            if(res.data != undefined){
+                    if(res.status == 200 && res.data != false){
+                        let dataTable = this.handleDataAutoComplete(res.data,false);
+                        this.$refs.autocompleteInput.setAliasControl(aliasControl);
+                        this.$refs.autocompleteInput.setData(dataTable);
+                    }
+                    else{
+                        this.$refs.autocompleteInput.setData([]);
+                    }
+                }
+                else{
+                    let data =  res[0];
+                    let dataTable = this.handleDataAutoComplete(data,true);
+                    this.$refs.autocompleteInput.setAliasControl(aliasControl);
+                    this.$refs.autocompleteInput.setData(dataTable);
+                }
+        },
+        /**
+         * Hàm bind dữ liệu cho control, và control trong bảng khi chọn apply trên timepicker
+         */
+        applyTimePicker(time){
+            if(this.sDocumentSubmit.currentTableInteractive == null){
+                $('.time-picker').val(time);
+                $('.time-picker').trigger('change');
+                $('.time-picker').removeClass('time-picker');
+            }
+            else{
+                let currentTableInteractive = this.sDocumentSubmit.currentTableInteractive
+                currentTableInteractive.tableInstance.setDataAtCell(this.sDocumentSubmit.currentCellSelected.row,this.sDocumentSubmit.currentCellSelected.column,time)
+                
+            }
+            /**
+             * TH control select ở ngoài table
+             * reset biến chỉ ra là đang tương tác với table và cell nào
+             */
+            this.$store.commit("document/addToDocumentSubmitStore", {
+                key: 'currentCellSelected',
+                value: null
+            });
+            this.$store.commit("document/addToDocumentSubmitStore", {
+                key: 'currentTableInteractive',
+                value: null
+            });
+            this.$refs.timePicker.hide();
+        },
+        /**
+         * Hàm xử lí nhận dữ liệu component autocomplete khi chọn 1 dòng
+         */
+        afterSelectRowAutoComplete(data){
+            // th này không phải trong table       
+            if(this.sDocumentSubmit.currentCellSelected == null){
+                $('.autocompleting').val(data.value);
+                $('.autocompleting').trigger('change');
+                $('.autocompleting').removeClass('autocompleting');
+            }
+            else{
+                let currentTableInteractive = this.sDocumentSubmit.currentTableInteractive
+                console.log(data);
+                
+                currentTableInteractive.tableInstance.setDataAtCell(this.sDocumentSubmit.currentCellSelected.row,this.sDocumentSubmit.currentCellSelected.column,data.value)
+                currentTableInteractive.isAutoCompleting = false;
+                
+            }
+            
+            
+        },
+        /**
+         * Hàm  xử lí data sau khi query công thức autocomplete,
+         * xử lí data về dạng object cho DataTable của vuetify
+         */
         handleDataAutoComplete(data, isFromSQLLite){
             let headers = [];
             let bodyTable = [];
@@ -701,9 +791,6 @@ export default {
          */
         handleRunFormulasValue(dataInput,formulasInstance,controlId,controlName=""){
             formulasInstance.handleBeforeRunFormulas(dataInput).then(rs=>{
-                console.log(formulasInstance);
-                console.log(rs);
-                
                 if($('#'+controlId).length > 0){
                     if($('#'+controlId).attr('s-control-type') == 'table'){
                         this.setDataToTable(controlId,rs.data)
@@ -712,7 +799,7 @@ export default {
                         if(!rs.server){
                             let data = rs.data; 
                             if(data.length > 0){
-                                this.setDataToControl($('#'+controlId),$('#'+controlId).attr('s-control-type'), data[0].values[0][0])
+                                this.setDataToControl($('#'+controlId),$('#'+controlId).attr('s-control-type'), data[0].values)
                             }
                         }
                         else{
@@ -731,7 +818,16 @@ export default {
         },
         setDataToControl(control, type, result){
             if(type == 'label'){
+                console.log(result);
+                
                 control.text(result);
+            }
+            else if(type == 'select'){
+                // console.log(result);
+                // let data = this.handleDataAutoComplete(result,true);
+                // thisCpn.$refs.autocompleteInput.setAliasControl('column1');
+                // thisCpn.$refs.autocompleteInput.setData(data);
+                
             }
             else{
                 control.val(result);
@@ -743,7 +839,6 @@ export default {
         setDataToTable(tableControlId,data){
             let tableName = this.sDocumentEditor.allControl[tableControlId].properties.name.value;
             let dataTable = []
-            // x.push({tb1_pnc:"aa",tb1_mh:"aa",tb1_th:"aa",tb1_tskt:"aa",tb1_dvt:"aa",tb1_sl:"aa",tb1_gia:"aa",tb1_thanh_tien:"aa",tb1cbmh:"a",tb1_gc:"bv"});
             for(let i = 0; i < data.length; i++){
                 let row = {};
                 for(let controlName in data[i]){

@@ -9,6 +9,8 @@
         disable-pagination
         fixed-header
         hide-default-footer
+        dense
+        calculate-widths
         
         >
         <template v-slot:item="{ item }">
@@ -44,28 +46,31 @@ export default {
     created(){
         let thisCpn = this;
         this.$evtBus.$on('document-submit-autocomplete-input-change',e=>{
-            if(e.e.keyCode == 38){    //len
+            if(thisCpn.dataTable != undefined && thisCpn.dataTable.length > 0){
+                if(e.e.keyCode == 38){    //len
                 
-                if(thisCpn.indexActive == 0){
-                    return false;
+                    if(thisCpn.indexActive == 0){
+                        return false;
+                    }
+                    Vue.set(thisCpn.dataTable[thisCpn.indexActive], 'active', false);
+                    thisCpn.indexActive--;
+                    Vue.set(thisCpn.dataTable[thisCpn.indexActive], 'active', true);
+                    
+                }   
+                else if(e.e.keyCode == 40){
+                    if(thisCpn.indexActive == thisCpn.dataTable.length - 1){
+                        return false;
+                    }
+                    Vue.set(thisCpn.dataTable[thisCpn.indexActive], 'active', false);
+                    thisCpn.indexActive++;
+                    Vue.set(thisCpn.dataTable[thisCpn.indexActive], 'active', true);
                 }
-                Vue.set(thisCpn.dataTable[thisCpn.indexActive], 'active', false);
-                thisCpn.indexActive--;
-                Vue.set(thisCpn.dataTable[thisCpn.indexActive], 'active', true);
-                
-            }   
-            else if(e.e.keyCode == 40){
-                if(thisCpn.indexActive == thisCpn.dataTable.length - 1){
-                    return false;
+                else if(e.e.keyCode == 13){
+                    let rowActive = thisCpn.dataTable[thisCpn.indexActive];
+                    thisCpn.handleClickRow(rowActive);
                 }
-                Vue.set(thisCpn.dataTable[thisCpn.indexActive], 'active', false);
-                thisCpn.indexActive++;
-                Vue.set(thisCpn.dataTable[thisCpn.indexActive], 'active', true);
             }
-            else if(e.e.keyCode == 13){
-                let rowActive = thisCpn.dataTable[thisCpn.indexActive];
-                thisCpn.handleClickRow(rowActive)
-            }
+            
         });
     },
     
@@ -73,7 +78,7 @@ export default {
         show(e){
             this.isShowAutoComplete = true;
             this.calculatorPositionBox(e);
-            this.search = $(e.target).val();
+            // this.search = $(e.target).val();
         },
         hide(){
             this.isShowAutoComplete = false;
@@ -82,8 +87,22 @@ export default {
             this.headers = data.headers;
             this.dataTable = data.dataBody;
         },
-        calculatorPositionBox(e){   
-            this.positionBox = {'top':$(e.target).offset().top + 30 +'px','left':$(e.target).offset().left - $(e.target).width()/2+'px'};
+        calculatorPositionBox(e){
+            // nếu autocomplete từ cell của handsontable  
+            if($(e.target).is('.handsontableInput')){
+                let autoEL = $(this.$el).detach();
+                $(e.target).closest('.wrap-table').append(autoEL);
+                let edtos = $(e.target).offset();
+                let tbcos = $(e.target).closest('.wrap-table').find('[s-control-type="table"]').offset();
+                this.positionBox = {'top':edtos.top - tbcos.top + $(e.target).height() +'px','left':edtos.left - tbcos.left+'px'};
+            }
+            //nêu là ngoài bảng
+            else{
+                let autoEL = $(this.$el).detach();
+                $(e.target).parent().append(autoEL);
+                this.positionBox = {'top':'20px','left':'0px'};
+            }
+            
             
         },
         setSearch(query){
@@ -93,17 +112,10 @@ export default {
             this.alias = aliasControl;
         },
         handleClickRow(item){
-            let name = item[this.alias];
-            console.log(this.alias);
-            
-            $('.autocompleting').val(name);
-            $('.autocompleting').trigger('change');
-            $('.autocompleting').removeClass('autocompleting');
+            let value = item[this.alias];
+            this.$emit('after-select-row',{value:value});
             this.hide();
-            
-            
         },
-        
         openSubForm(){
             this.hide();
             $('.autocompleting').removeClass('autocompleting');
@@ -118,9 +130,11 @@ export default {
         position: absolute;
         top: 0;
         left: 100px;
-        z-index: 9999;
+        z-index: 99999;
+        max-width: unset !important;
     }
     .active-row{
         background: #f0f0f0;
     }
+
 </style>

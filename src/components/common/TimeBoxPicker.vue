@@ -5,7 +5,7 @@
     v-show="isShow" ref="symperDateTimePicker">
         <h4 class="heading">{{title}}</h4>
         <v-divider></v-divider>
-        <sym-time-picker v-if="isTime"></sym-time-picker>
+        <sym-time-picker v-if="isTime" ref="timePicker"></sym-time-picker>
         <button v-if="isTime" v-on:click="applyTime" class="apply-time">
             Áp dụng
         </button>
@@ -54,11 +54,33 @@ export default {
             this.calPosition(e);
         },
         calPosition(e){
-            this.position = {'top':$(e.target).offset().top + 30 +'px','left':$(e.target).offset().left - $(e.target).width()/2+'px'};
+            console.log(e);
+            
+            if($(e.target).is('.handsontableInput')){
+                let autoEL = $(this.$el).detach();
+                $(e.target).closest('.wrap-table').append(autoEL);
+                let edtos = $(e.target).offset();
+                let tbcos = $(e.target).closest('.wrap-table').find('[s-control-type="table"]').offset();
+                this.position = {'top':edtos.top - tbcos.top + $(e.target).height() +'px','left':edtos.left - tbcos.left+'px'};
+            }
+            //nêu là ngoài bảng
+            else{
+                let autoEL = $(this.$el).detach();
+                $(e.target).parent().append(autoEL);
+                this.position = {'top':'20px','left':'0px'};
+            }
+            this.$store.commit("document/addToDocumentSubmitStore", {
+                key: 'currentCellSelected',
+                value: null
+            });
+            this.$store.commit("document/addToDocumentSubmitStore", {
+                key: 'currentTableInteractive',
+                value: null
+            });
         },
        
         applyTime(){
-            this.$emit('document-submit-apply-time-picker',this.time);
+            this.$emit('apply-time-picker',this.$refs.timePicker.getTime(false));
         }
     }
 }
@@ -86,6 +108,8 @@ export default {
     .card-time-picker{
         position: absolute;
         z-index: 9999;
+        max-width: unset !important;
+        min-width: 230px;
     }
     .heading{
         padding: 6px 12px;

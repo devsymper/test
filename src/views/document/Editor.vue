@@ -73,7 +73,7 @@
         </div>
         <s-table-setting  ref="tableSetting" @add-columns-table="addColumnTable"/>
         <auto-complete-control ref="autocompleteControl" @add-control="insertControl"/>
-        <save-doc-panel :documentProps="documentProps" ref="saveDocPanel" @save-doc-action="validateControl"/>
+        <save-doc-panel ref="saveDocPanel" @save-doc-action="validateControl"/>
         <err-message :listErr="listMessageErr" ref="errMessage"/>
         <all-control-option ref="allControlOption"/>
     </v-flex>
@@ -799,6 +799,7 @@ export default {
         },
 
         setDocumentProperties(documentProp){
+             console.log('3322',documentProp);
             this.$refs.saveDocPanel.setPropsOfDoc(documentProp);
         },
         //hoangnd: hàm set các giá trị của thuộc tính và formulas vào từng contrl trong doc lúc load dữ liệu và đưa vào state

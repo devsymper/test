@@ -54,8 +54,10 @@ const defaultState = {
         rootControl: {},
         impactedFieldsList: {},
         impactedFieldsListWhenStart: {},
-        rootChangeFieldName: null
-
+        rootChangeFieldName: null,
+        //biến phục vụ cho autocomplete trong table
+        currentTableInteractive: null, //chỉ ra table đang được tương tác
+        currentCellSelected: null, // chỉ ra cell đang nhập
     }
 };
 

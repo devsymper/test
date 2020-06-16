@@ -20,6 +20,7 @@ import tasks from "../views/tasks/index.vue";
 import application from "../views/apps/yourApp.vue";
 import Editor from "../views/document/Editor.vue";
 import SubmitDocument from "../views/document/submit/Submit.vue";
+import DetailDocument from "../views/document/detail/Detail.vue";
 import ListObject from "../views/document/listobject/ListObject.vue";
 import DeployHistory from "../views/process/DeployHistory.vue";
 import RunInstance from "../views/process/RunInstance.vue";
@@ -130,6 +131,12 @@ const routes = [{
         path: "/document/submit/:id?",
         name: "submitDocument",
         component: SubmitDocument,
+
+    },
+    {
+        path: "/document/detail/:id?",
+        name: "detailDocument",
+        component: DetailDocument,
 
     },
     {

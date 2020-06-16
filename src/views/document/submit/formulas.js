@@ -39,7 +39,7 @@ export default class Formulas {
                     syql = syql.replace('ref(', '');
                     syql = syql.substring(0, syql.length - 1);
 
-                    let res = await this.runSyql(syql);
+                    let res = await this.runSyql(syql, dataInput);
 
                     let beforeStr = this.checkBeforeReferenceFormulas(script, listSyql[i].trim());
                     if (!beforeStr) {
@@ -172,8 +172,12 @@ export default class Formulas {
         return listSyql;
     }
 
-    runSyql(formulas) {
+    runSyql(formulas, dataInput = false) {
             let syql = this.replaceParamsToData(this.getDataInputFormulas(), formulas);
+            if (dataInput != false) {
+                syql = this.replaceParamsToData(dataInput, formulas);
+            }
+
             return documentServiceApi.query({ query: syql });
         }
         /**
@@ -231,11 +235,15 @@ export default class Formulas {
          */
     getDataInputFormulas() {
         let inputControl = this.getInputControl();
+        console.log('mbv', inputControl);
+
         let dataInput = {};
         for (let inputControlName in inputControl) {
             let valueInputControlItem = dataSubmitStore.listInputInDocument[inputControlName].value;
             dataInput[inputControlName] = valueInputControlItem;
         }
+        console.log('mbv', dataInput);
+
         return dataInput;
     }
     getFormulas() {
