@@ -122,16 +122,17 @@ export default {
         getTypeDueData(){
             let props = this.user.passwordProps;
             let passwordProps = JSON.parse(props);
-            this.dueDate = passwordProps.dueDate.value;
+            this.dueDate = (passwordProps.dueDate.hasOwnProperty('value')) ? passwordProps.dueDate.value : "";
             this.passProps = passwordProps;
             this.checkChangeDuedate = (passwordProps.dueDate.active == 1) ? true : false;
             this.changeDuedate = this.checkChangeDuedate;
         },
         submit(){
             let data = {id:this.user.id};
-            this.passProps.dueDate.active = (this.checkChangeDuedate) ? 1 : 0;
-            this.passProps.dueDate.value = this.dueDate;
-            this.passProps.dueDate.type = this.typeDueDate.type;
+            this.passProps.dueDate = {};
+            this.passProps.dueDate['active'] = (this.checkChangeDuedate) ? 1 : 0;
+            this.passProps.dueDate['value'] = this.dueDate;
+            this.passProps.dueDate['type'] = this.typeDueDate.type;
             let passwordProps = JSON.stringify(this.passProps);
             data.passwordProps = passwordProps
             if(this.newPassword != ''){
