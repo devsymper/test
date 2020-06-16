@@ -52,34 +52,77 @@
                         <v-btn icon>
                             <v-icon>mdi-magnify</v-icon>
                         </v-btn>
-                        <v-btn icon v-if="sapp.unreadNotification > 0">
-                            <v-badge
-                                class="sym-small-size"
-                                
-                                :content="sapp.unreadNotification"
-                                :value="sapp.unreadNotification"
-                                color="red"
-                                overlap
-                            >
+                        <v-menu  v-model="isShowDialogNotification"
+                            :close-on-content-click="false"
+                            :max-width="452"
+                            :min-width="452"
+                            :max-height="700"
+                            offset-y>
+                            <template v-slot:activator="{ on }">
+                            <v-btn v-on="on" icon v-if="unreadNotification > 0">
+                                <v-badge
+                                    class="sym-small-size"
+                                    
+                                    :content="unreadNotification"
+                                    :value="unreadNotification"
+                                    color="red"
+                                    overlap
+                                >
+                                    <v-icon>mdi-bell-outline</v-icon>
+                                </v-badge>
+                            </v-btn>
+                            <v-btn v-on="on" icon v-else>
                                 <v-icon>mdi-bell-outline</v-icon>
-                            </v-badge>
-                        </v-btn>
-                        <v-btn icon v-else>
-                            <v-icon>mdi-bell-outline</v-icon>
-                        </v-btn>
+                            </v-btn>
+                            </template>
+                            
+                                <v-app-bar dense flat color="white" class="notification-list-bar" fixed>
+                                    <v-toolbar-title class="nofitication-title-bar">
+                                        Notification
+                                    </v-toolbar-title>
+                                    <v-col :cols="10" class="text-right pt-1 pb-1 pr-0">
+                                        <!-- Tìm kiếm -->
+                                        <v-text-field dense
+                                            class="bg-grey sym-small-pad sym-small-size d-inline-block mr-2"
+                                            append-icon="mdi-magnify"
+                                            flat
+                                            solo
+                                            
+                                            :placeholder="$t('common.search')"
+                                        ></v-text-field>
+                                        <v-btn 
+                                            x-small 
+                                            solo
+                                            class="bg-grey h-30"
+                                            text
+                                            
+                                        >
+                                            <v-icon size="18">mdi-dots-horizontal</v-icon>
+                                        </v-btn>
+                                    </v-col>
+                                    
+                                </v-app-bar>
+                                
+                                <list-notification></list-notification>
+                            
+                        </v-menu>
                     </div>
                 </div>
                 <v-layout style="height:calc(100% - 41px)" justify-center>
                     <slot />
                 </v-layout>
+                
             </v-container>
         </v-content>
     </v-app>
 </template>
 
 <script>
+import Api from "../../api/api.js";
+import { appConfigs } from '../../configs';
 import BASidebar from "@/components/common/BASidebar.vue";
 import listApp from "@/components/common/listApp";
+import NotificationBar from "@/components/common/NotificationBar.vue";
 export default {
     methods: {
         /**
@@ -97,16 +140,37 @@ export default {
             let urlMap = this.$store.state.app.urlToTabTitleMap;
             let url = Object.keys(urlMap)[idx];
             this.$store.commit("app/removeTab", url);
+        },
+        updateCountUnreadNotification(){
+            let req = new Api(appConfigs.apiDomain.nofitication);
+            req.get("/notifications/count-unread")
+            .then(res => {
+                console.log(res);
+                if (res.status == 200) {
+                    this.$store.state.app.unreadNotification = res.data;
+                }
+            });
         }
+        
     },
     components: {
         "ba-sidebar": BASidebar,
-        "list-app": listApp
+        "list-app": listApp,
+        "list-notification": NotificationBar
     },
-    created() {},
+    created() {
+        this.$evtBus.$on("app-receive-remote-msg", data => {
+            this.$store.state.app.unreadNotification += 1;
+            this.$store.state.app.needReloadNotification = true;
+        });
+        this.updateCountUnreadNotification();
+    },
     computed: {
         sapp() {
             return this.$store.state.app;
+        },
+        unreadNotification(){
+            return this.$store.state.app.unreadNotification;
         },
         currentTabIndex: {
             get() {
@@ -123,6 +187,7 @@ export default {
     data: function() {
         return {
             isShowDialog: false,
+            isShowDialogNotification: false,
         };
     }
 };
@@ -132,5 +197,15 @@ export default {
 <style>
 .app-header-bg-color,.app-header-bg-color .v-item-group {
     background-color: white!important;
+}
+.nofitication-title-bar{
+    font-size: 13px;
+    font-weight: bold;
+}
+.notification-list-bar {
+    position: sticky!important;
+}
+.notification-list-bar .v-toolbar__content{
+    border-bottom: 1px solid #dddddd;
 }
 </style>

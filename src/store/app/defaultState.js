@@ -22,7 +22,8 @@ const defaultState = {
         ],
     },
     collapseSideBar: true, // trạng thái của sidebar: true là đang nhỏ, false là đang mở rộng
-    unreadNotification: 1, // số lượng các thông báo chưa đọc
+    unreadNotification: 2, // số lượng các thông báo chưa đọc
+    needReloadNotification: false,
     items: [
         // các menu mà ba hoặc enduser được phân quyền
         { title: "application", icon: "mdi-application", link: "/application" },
