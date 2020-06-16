@@ -13,7 +13,7 @@
         <i class="mdi mdi-close top-right close-btn" @click="handleClose()"></i>
         <div class="mt-2 float-right" v-if="actionBtns.length > 0">
             <v-btn
-                @click="btn.action"
+                @click="btn.action(handleClose)"
                 class="mr-2"
                 depressed
                 small

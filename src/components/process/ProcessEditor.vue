@@ -86,13 +86,15 @@ import { allAttrDisplayGroup } from "./allAttrDisplayGroup";
 import FormTpl from "./../common/FormTpl.vue";
 import { util } from "../../plugins/util";
 import bpmnApi from "./../../api/BPMNEngine.js";
-import { defaultXML } from "./../../components/process/reformatGetListData";
+import { defaultXML, reformatValueToStr } from "./../../components/process/reformatGetListData";
 import { allNodesAttrs } from "./../process/allAttrsOfNodes";
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import { documentApi } from '../../api/Document';
 import customExtension from "./elementDefinitions/customExtension";
 import { pushCustomElementsToModel } from "./elementDefinitions/customExtToModel";
 // Khung data của từng node cần lưu vào db
+console.log(bpmnApi, 'bpmnApibpmnApibpmnApi');
+
 const nodeDataTpl = {
     bounds: {
         lowerRight: {
@@ -130,13 +132,60 @@ export default {
             this.attrPannelHeight = (util.getComponentSize(this).h - 50)+'px';
         },
         /**
+         * Validate 
+         */
+        async validateDeployData(){
+            let self = this;
+            return new Promise((resolve, reject) => {
+                // resolve();
+                // return;
+                let validateData = self.getAllElementData();
+                // validateData = JSON.parse();
+                bpmnApi.validateModel(JSON.stringify(validateData)).then((validateResult) => {
+                    if(validateResult.length == 0){
+                        resolve();
+                    }else{
+                        for(let err of validateResult){
+                            self.$snotify({
+                                title: "Validate failed",
+                                type: 'warn',
+                                duration: 120000,
+                                text: err.defaultDescription,
+                                actionBtns: [
+                                    {
+                                        text: "Go to element",
+                                        icon: "mdi-send-check",
+                                        action: (close) => {
+                                            let symperBpmn = self.$refs.symperBpmn;
+                                            let errEl = symperBpmn.getElData(err.activityId)
+                                            symperBpmn.bpmnModeler.get('selection').select(errEl);
+                                            self.handleNodeSelected(errEl.businessObject);
+                                            close();
+                                        }
+                                    }
+                                ]
+                            });
+                        }
+                        reject({
+                            title: "Validate failed wwhen checking for deployment"
+                        });
+                    }
+                }).catch((err) => {
+                    self.$snotifyError(err, "Error on validate deploy data!" );
+                });
+            });
+        },
+        /**
          * Validate toàn bộ data của model
          * @param {Function} success hành động khi validate và ko phát hiện ra lỗi
          * @param {Function} fail hành động khi có lỗi xảy ra
          */
         validateModel(success, fail) {
             let self = this;
-            let checkArr = [this.checkModelName()];
+            let checkArr = [
+                this.checkModelName(),
+                this.validateDeployData()
+            ];
             Promise.all(checkArr)
                 .then(rsl => {
                     if (typeof success == "function") {
@@ -242,15 +291,14 @@ export default {
             let allSymEls = this.stateAllElements;
             let bpmnModeler = this.$refs.symperBpmn.bpmnModeler;
             pushCustomElementsToModel(allVizEls, allSymEls,  bpmnModeler);
-
-
             let xml = this.$refs.symperBpmn.getXML();
             console.log(xml,'xmlxmlxmlxmlxmlxmlxml');
             let jsonConfig = {};
             for(let elName in allSymEls){
                 jsonConfig[elName] = {};
                 for(let attrName in allSymEls[elName].attrs){
-                    jsonConfig[elName][attrName] = allSymEls[elName].attrs[attrName].value;
+                    let attr = allSymEls[elName].attrs[attrName];
+                    jsonConfig[elName][attrName] = attr.getValue(attr.value);
                 }
             }
             let modelDataAsFlowable = this.getModelData();
@@ -262,10 +310,23 @@ export default {
                 configValue: JSON.stringify(jsonConfig)
             };
         },
+        /**
+         * Lưu lại các thuộc tính được set qua việc tương tác trực tiếp với các thành phần trong diagram vào trong store
+         * Do khi tương tác qua diagram thì có một số thuộc tính chạy theo không được update lại nên cần bước này để khớp được data hiển thị và data bên dưới
+         */
+        updateViewDataToState(){
+            for(let elName in this.stateAllElements){
+                let el = this.stateAllElements[elName];
+                if(el.type.includes('Gateway')){
+                    this.setFlowsOrderForGateway(el);
+                }
+            }
+        },
         // Lưu lại data của process model hiện tại
         saveProcess() {
             let self = this;
             this.fillNodeData();
+            this.updateViewDataToState();
             this.validateModel(() => {
                 let action = self.modelAction;
                 let idModel = self.modelId;
@@ -378,7 +439,7 @@ export default {
                     }
                     nodeData.resourceId = bnode.id;
                 }
-                nodeData.properties = this.getNodeProperties(bnode.id);
+                nodeData.properties = this.getNodeProperties(bnode.id, false);
                 nodeData.stencil.id = nodeType; // flowable quy định loại node nằm trong nodeData.stencil.id
                 mapSaveNodes[bnode.id] = nodeData;
             }
@@ -403,6 +464,9 @@ export default {
                 if (nodeType == "BPMNDiagram") {
                     bnodeRoot = bnode;
                 }else if(nodeType == "SequenceFlow"){
+                    if(!mapSaveNodes[bnode.id]){
+                        debugger;
+                    }
                     di.childShapes.push(mapSaveNodes[bnode.id]); // theo quy tắc 1 của flowable về lưu SequenceFlow
                 }
             }
@@ -410,11 +474,17 @@ export default {
             if(bnodeRoot.$type == 'bpmn:Collaboration'){
                 for(let pool of bnodeRoot.participants){
                     let poolToSave = mapSaveNodes[pool.id];
+                    if(!poolToSave){
+                        debugger;
+                    }
                     di.childShapes.push(poolToSave);
                     poolToSave.properties.process_id = poolToSave.properties.process_id ? poolToSave.properties.process_id : poolToSave.properties.overrideid;
                     if(pool.processRef.laneSets){
                         // thêm các con cho các lane
                         for(let lane of pool.processRef.laneSets[0].lanes){
+                            if(!mapSaveNodes[lane.id]){
+                                debugger;
+                            }
                             poolToSave.childShapes.push(mapSaveNodes[lane.id]);
                             this.addChildrenForProcess(mapSaveNodes[lane.id], lane.flowNodeRef, mapSaveNodes);
                         }
@@ -440,7 +510,7 @@ export default {
         },
         addChildrenForProcess(di, bEls, mapSaveNodes){
             for(let bel of bEls){
-                if(bel.$type != 'bpmn:SequenceFlow'){
+                if(bel.$type != 'bpmn:SequenceFlow' && mapSaveNodes[bel.id]){
                     di.childShapes.push(mapSaveNodes[bel.id]);
                     if(bel.$type == 'bpmn:SubProcess'){
                         this.addChildrenForProcess(mapSaveNodes[bel.id], bel.flowElements, mapSaveNodes);
@@ -515,7 +585,7 @@ export default {
                 }
             };
         },
-        getNodeProperties(nodeInfo) {
+        getNodeProperties(nodeInfo, includeSymperAttr = false) {
             let props = {};
             let sNodeAttrs = {};
             if(typeof nodeInfo == 'string'){
@@ -527,6 +597,11 @@ export default {
             }
 
             for (let key in sNodeAttrs.attrs) {
+                if(!includeSymperAttr){
+                    if(allNodesAttrs[key].isSymperProp){
+                        continue;
+                    }
+                }
                 let attr = sNodeAttrs.attrs[key];
                 if (attr) {
                     if (allNodesAttrs[key]) {
@@ -534,6 +609,9 @@ export default {
                             props[key] = allNodesAttrs[key].getValue(
                                 attr.value
                             );
+                            if(allNodesAttrs[key].needReformatValue){
+                               props[key] = reformatValueToStr(attr.value);
+                            }
                         } else {
                             props[key] = attr.value ? attr.value : '';
                         }
@@ -691,8 +769,8 @@ export default {
                 let docDetail = await documentApi.detailDocument(docId);
                 let controls = Object.values(docDetail.data.fields).reduce((arr, el, idx)=>{
                     arr.push({
-                        id: el.name,
-                        title: el.title
+                        id: el.properties.name,
+                        title: el.properties.title
                     });
                     return arr;
                 }, []);
@@ -878,15 +956,14 @@ export default {
             try {
                 let modelData = await bpmnApi.getModelData(idProcess);
                 modelData = modelData.data;
-                this.diagramXML = modelData.content;
-                setTimeout((self) => {
-                    if(modelData.configValue){
-                        self.restoreAttrValueFromJsonConfig(modelData.configValue);
-                    }
-                }, 300, this);
+                
+                let afterRender = await this.$refs.symperBpmn.renderFromXML(modelData.content);
+                if(modelData.configValue){
+                    this.restoreAttrValueFromJsonConfig(modelData.configValue);
+                }
             } catch (error) {
                 self.$snotifyError(
-                    err,
+                    error,
                     self.$t("process.editror.err.get_xml")
                 );
             }
@@ -894,13 +971,23 @@ export default {
         restoreAttrValueFromJsonConfig(jsonStr){
             let configValue = JSON.parse(jsonStr);
             this.fillNodeData();
+            let gatewayEls = [];
             for(let elName in this.stateAllElements){
-                for(let attrName in this.stateAllElements[elName].attrs){
+                let el = this.stateAllElements[elName];
+                for(let attrName in el.attrs){
                     if(configValue[elName]){
                         if(configValue[elName].hasOwnProperty(attrName)){
-                            this.stateAllElements[elName].attrs[attrName].value = configValue[elName][attrName];
+                            if (allNodesAttrs[attrName].hasOwnProperty("restoreData")) {
+                                el.attrs[attrName].value = allNodesAttrs[attrName].restoreData(configValue[elName][attrName]);
+                            } else {
+                                el.attrs[attrName].value = configValue[elName][attrName];
+                            }
                         }
                     }
+                }
+
+                if(el.type.includes('Gateway')){
+                    this.setFlowsOrderForGateway(el);
                 }
             }
         },

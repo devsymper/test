@@ -31,6 +31,7 @@
 /**
  * Cách tổ chức layout học theo: https://itnext.io/anyway-heres-how-to-create-a-multiple-layout-system-with-vue-and-vue-router-b379baa91a05
  */
+import Api from "./api/api.js";
 import AppSidebar from "./components/common/AppSidebar.vue";
 import Content from "./components/common/Content.vue";
 import appWorker from "@/worker";
@@ -155,21 +156,22 @@ export default {
             var app = firebase.initializeApp(firebaseConfig);
             var messaging = firebase.messaging();
             messaging.usePublicVapidKey(
-                "BDDoFdEPGfIDi9fLXTJrCpiIBhok5xZmEKt0GHSVB7MrQz2xRCYWD6yu75dqRhxoXPQYFFfXdbzbhy0pp7E5YOI"
+                "BNnZfegBztDE4pakIBFZa6GGqcy56WBZhrZ7nUP4R7JPGVyR77zEGFdKwcq4N15NlcamOxNMZKwIMSMQml5KTro"
             );
-
             messaging.onMessage(payload => {
+                console.log(payload)
+                this.$snotify({"title":payload.data.title,"text":payload.data.body});
                 this.$evtBus.$emit(
                     "app-receive-remote-msg",
-                    payload.data,
-                    payload.notification
+                    payload
                 );
             });
-
             messaging
                 .getToken()
                 .then(currentToken => {
                     if (currentToken) {
+                        this.setTokenFireBase(currentToken);
+                        console.log("Token create: ", currentToken);
                     } else {
                         console.log(
                             "No Instance ID token available. Request permission to generate one."
@@ -187,11 +189,22 @@ export default {
                 messaging
                     .getToken()
                     .then(refreshedToken => {
-                        console.log("Token refreshed.", refreshedToken);
+                        this.setTokenFireBase(currentToken);
+                        console.log("Token refreshed: ", refreshedToken);
                     })
                     .catch(err => {
                         console.log("Unable to retrieve refreshed token ", err);
                     });
+            });
+        },
+        setTokenFireBase(token){
+            let req = new Api(appConfigs.apiDomain.nofitication);
+            req.post("/users/set-token",{"token":token})
+            .then(res => {
+                console.log(res);
+                if (res.status == 200) {
+                    
+                }
             });
         }
     },

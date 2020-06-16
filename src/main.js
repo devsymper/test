@@ -55,7 +55,7 @@ Vue.prototype.$snotify = function(option, group = false) {
         group: group,
         width: 400,
         classes: 'symper-general-notification',
-        duration: appConfigs.notificationTimeout[option.type],
+        duration: option.duration ? option.duration : appConfigs.notificationTimeout[option.type],
         speed: 500,
         data: {
             type: option.type,
@@ -89,7 +89,7 @@ Vue.prototype.$snotifyInfo = function(title = 'INFORMATION', detail = '') {
 Vue.prototype.$snotifyWarning = function(err, title = 'WARNING', detail = '') {
     console.warn(err);
     this.$snotify({
-        type: 'warning',
+        type: 'warn',
         title: title,
         text: detail
     });
@@ -109,7 +109,6 @@ var $ = global.jQuery;
 window.$ = $;
 window.Vue = Vue;
 util.serviceWorker.register();
-
 
 export const SYMPER_APP = new Vue({
     router,

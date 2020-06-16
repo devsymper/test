@@ -57,7 +57,7 @@
                 <v-divider></v-divider>
 
                 <v-row
-                    v-for="(obj) in flatTasks"
+                    v-for="(obj) in allFlatTasks"
                     :key="obj.id"
                     :index="obj.id"
                     class="mr-0 ml-0 single-row"
@@ -67,17 +67,17 @@
                         :cols="sideBySideMode ? 12 : compackMode ? 6: 4"
                         class="pl-3 pr-1"
                         :class="{
-                                                'pt-0': isSmallRow,
-                                                'pb-0': isSmallRow,
-                                                'pb-1': !isSmallRow,
-                                                'pt-1': !isSmallRow,
-                                            }"
+                                    'pt-0': isSmallRow,
+                                    'pb-0': isSmallRow,
+                                    'pb-1': !isSmallRow,
+                                    'pt-1': !isSmallRow,
+                                }"
                     >
                         <!-- <div style="width: 25px" class="d-inline-block h-100 pt-1">
                                                 <icon :icon="obj.icon" class="mr-2 float-left"></icon>
                         </div>-->
                         <div class="pl-1">
-                            <div class="fz-13 text-truncate d-inline-block float-left">{{obj.name}}</div>
+                            <div class="fz-13 text-truncate d-inline-block float-left text-ellipsis w-100">{{obj.name}}</div>
                             <v-col
                                 cols="12"
                                 class="pt-0 pb-0 pr-0 pl-0 grey--text lighten-2 float-left d-flex">
@@ -153,7 +153,7 @@
                 class="pt-0"
                 style="border-left: 1px solid #e0e0e0;"
             >
-                <taskDetail :task="selectedTask" @close-detail="closeDetail"></taskDetail>
+                <taskDetail  :taskInfo="selectedTask.taskInfo" @close-detail="closeDetail"></taskDetail>
             </v-col>
             <userSelector ref="user" class="d-none"></userSelector>
         </v-row>
@@ -171,10 +171,12 @@ export default {
         // Liệt kê danh sách các task dưới dạng phẳng - ko phân cấp
         flatTasks(){
             let tasks = [];
-            for(let instance of this.listProrcessInstances){
-                for(let task of instance.objects){
-                    task.bizKey = ''; // Business key của process instance
-                    tasks.push(task);
+            for(let def of this.listProrcessInstances){
+                for(let instances of def.objects){
+                    for(let task of instances.tasks){
+                        task.bizKey = ''; // Business key của process instance
+                        tasks.push(task);
+                    }
                 }
             }
             return tasks;
@@ -204,16 +206,23 @@ export default {
     },
     data: function() {
         return {
-            selectedTask: {},
+            selectedTask: {
+                taskInfo: {}
+            },
             listProrcessInstances: [],
             isSmallRow: false,
             sideBySideMode: false,
-            openPanel: [0, 1, 2, 3, 4]
+            openPanel: [0, 1, 2, 3, 4],
+            allFlatTasks: []
         };
     },
     mounted() {
         if(!this.smallComponentMode){
-            this.getTasks();
+            this.getTasks({
+                size: 100,
+                sort: 'createTime',
+                order: 'desc'
+            });
         }
     },
     methods: {
@@ -223,7 +232,7 @@ export default {
         selectObject(obj) {
             if (!this.compackMode) {
                 this.sideBySideMode = true;
-                this.selectedTask = obj;
+                this.$set(this.selectedTask, 'taskInfo', obj);
                 this.$emit("change-height", "calc(100vh - 88px)");
             }
         },
@@ -232,10 +241,15 @@ export default {
             this.$emit("change-height", "calc(100vh - 120px)");
         },
         getTasks(filter = {}) {
+            let self = this;
             this.listProrcessInstances = [];
             BPMNEngine.getTask(filter).then(res => {
                 if (res.data != undefined && res.data.length) {
                     let listTasks = res.data;
+                    self.allFlatTasks = [];
+                    for(let task of listTasks){
+                        self.allFlatTasks.push(task);
+                    }
                     this.listProrcessInstances.forEach(
                         (process, processIndex) => {
                             process.objects.forEach(
@@ -244,7 +258,7 @@ export default {
                                         processIndex
                                     ].objects[instanceIndex].tasks = [];
                                     // let index = 0;
-                                    for (const index in listTasks) {
+                                    for (let index in listTasks) {
                                         listTasks[
                                             index
                                         ].assignee = this.getUser(
@@ -275,7 +289,7 @@ export default {
             });
         },
         addOtherProcess(listTasks) {
-            for (const index in listTasks) {
+            for (let index in listTasks) {
                 listTasks[index].assignee = this.getUser(
                     parseInt(listTasks[index].assignee)
                 );

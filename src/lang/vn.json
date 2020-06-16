@@ -469,6 +469,14 @@
         "ascending": "Tăng dần",
         "descending": "Giảm dần"
     },
+    "notificationItem":{
+        "action": {
+            "read": "đánh dấu đã xem",
+            "delete": "xoá",
+            "unsubscribe": "Bỏ theo dõi"
+        }
+    }
+    ,
     "tasks": {
         "header": {
             "date": "Ngày tạo",

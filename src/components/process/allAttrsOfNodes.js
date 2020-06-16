@@ -273,19 +273,12 @@ let allAttrs = {
             },
         ],
         getValue(value) {
-            if ($.isArray(value)) {
-                if (!value.length || $.isEmptyObject(value[0])) {
-                    return '';
-                } else {
-                    return value;
-                }
-            } else {
-                return '';
-            }
+            return $.isArray(value) ? value : [];
         },
         restoreData(value) {
             return value == '' ? [{}] : value;
         },
+        needReformatValue: true,
         toXML: {
             "symper_position": "el",
             "name": "dataObject",
@@ -326,7 +319,9 @@ let allAttrs = {
                     }]
                 },
             ]
-        }
+        },
+        pushToXML: attrToXMLMethods.notPushToXML // đã xử lý ở customExtToModel nên ko cần push vào xml nữa
+
     },
     "exclusivedefinition": {
         "title": "Exclusive",
@@ -389,17 +384,6 @@ let allAttrs = {
         "dg": "detail",
         "columns": [],
         hidden: true,
-        getValue(value) {
-            if ($.isArray(value)) {
-                if (!value.length || $.isEmptyObject(value[0])) {
-                    return '';
-                } else {
-                    return value;
-                }
-            } else {
-                return '';
-            }
-        },
         restoreData(value) {
             return value == '' ? [] : value;
         },
@@ -409,37 +393,42 @@ let allAttrs = {
             "superClass": ["Element"],
             "properties": [{
                     "name": "id",
-                    "isBody": true,
+                    "isAttr": true,
                     "type": "String"
                 },
                 {
                     "name": "name",
-                    "isBody": true,
+                    "isAttr": true,
                     "type": "String"
                 },
                 {
                     "name": "type",
-                    "isBody": true,
+                    "isAttr": true,
                     "type": "String"
                 },
                 {
                     "name": "expression",
-                    "isBody": true,
+                    "isAttr": true,
                     "type": "String"
                 },
                 {
                     "name": "variable",
-                    "isBody": true,
+                    "isAttr": true,
                     "type": "String"
                 },
                 {
                     "name": "default",
+                    "isAttr": true,
+                    "type": "String"
+                },
+                {
+                    "name": "text",
                     "isBody": true,
                     "type": "String"
                 },
             ]
         },
-        pushToXML: attrToXMLMethods.notPushToXML
+        pushToXML: attrToXMLMethods.formPropertyMethod
     },
     "formkeydefinition": {
         "title": "Form key",
@@ -1340,8 +1329,17 @@ let allAttrs = {
         "dg": "detail",
         getValue(value) {
             return value.reduce((ids, el) => {
-                ids.push(el.text);
+                ids.push(el.idFlow);
                 return ids;
+            }, []);
+        },
+        restoreData(value) {
+            return value.reduce((arr, el) => {
+                arr.push({
+                    idFlow: el,
+                    text: ''
+                });
+                return arr;
             }, []);
         }
     },
@@ -1373,19 +1371,12 @@ let allAttrs = {
         "info": "BPMN.PROPERTYPACKAGES.SIGNALDEFINITIONSPACKAGE.SIGNALDEFINITIONS.DESCRIPTION",
         "dg": "detail",
         getValue(value) {
-            if ($.isArray(value)) {
-                if (!value.length || $.isEmptyObject(value[0])) {
-                    return '';
-                } else {
-                    return value;
-                }
-            } else {
-                return '';
-            }
+            return $.isArray(value) ? value : [];
         },
         restoreData(value) {
             return value == '' ? [] : value;
         },
+        needReformatValue: true,
         toXML: {
             "symper_position": "el",
             "name": "Signal",
@@ -1434,16 +1425,9 @@ let allAttrs = {
         ],
         "info": "BPMN.PROPERTYPACKAGES.MESSAGEDEFINITIONSPACKAGE.MESSAGEDEFINITIONS.DESCRIPTION",
         "dg": "detail",
+        needReformatValue: true,
         getValue(value) {
-            if ($.isArray(value)) {
-                if (!value.length || $.isEmptyObject(value[0])) {
-                    return '';
-                } else {
-                    return value;
-                }
-            } else {
-                return '';
-            }
+            return $.isArray(value) ? value : [];
         },
         restoreData(value) {
             return value == '' ? [] : value;
@@ -1497,18 +1481,7 @@ let allAttrs = {
         "info": "BPMN.PROPERTYPACKAGES.ESCALATIONDEFINITIONSPACKAGE.ESCALATIONDEFINITIONS.DESCRIPTION",
         "dg": "detail",
         getValue(value) {
-            if ($.isArray(value)) {
-                if (!value.length || $.isEmptyObject(value[0])) {
-                    return '';
-                } else {
-                    for (let row of value) {
-                        row.escalationCode = row.id;
-                    }
-                    return value;
-                }
-            } else {
-                return '';
-            }
+            return $.isArray(value) ? value : [];
         },
         restoreData(value) {
             return value == '' ? [] : value;
@@ -1539,6 +1512,7 @@ let allAttrs = {
                 }
             ]
         },
+        needReformatValue: true,
         pushToXML: attrToXMLMethods.pushNewEqualEls
     },
     "istransaction": {
@@ -1555,7 +1529,7 @@ let allAttrs = {
         "info": "BPMN.PROPERTYPACKAGES.FORMREFERENCEPACKAGE.FORMREFERENCE.DESCRIPTION",
         "dg": "taskAction",
         onSearch: async function(val) { // val là giá trị đang nhập trên ô input, lúc này this sẽ trỏ đến autocomplete instance
-            let docs = await apiCaller.get(appConfigs.apiDomain.documents + '?name=' + val);
+            let docs = await apiCaller.get(appConfigs.apiDomain.documents + '?search=' + val);
             this.myItems = docs.data.listObject;
         },
         options: [{ id: '    ', name: '', title: '' }],
@@ -1564,7 +1538,8 @@ let allAttrs = {
             "name": "formreference",
             "isAttr": true,
             "type": "String"
-        }
+        },
+        pushToXML: attrToXMLMethods.notPushToXML
     },
     "terminateAll": {
         "title": "Terminate all",
@@ -1659,7 +1634,8 @@ let allAttrs = {
             },
         ],
         dg: 'taskAction',
-
+        isSymperProp: true,
+        pushToXML: attrToXMLMethods.notPushToXML
     },
     approvalActions: { // BA tự cấu hình các hành động cho việc duyệt
         title: 'Outcomes',
@@ -1721,7 +1697,9 @@ let allAttrs = {
                 source: ["yellow", "red", "orange", "green", "blue", "gray", "black", "white"]
             },
         ],
-        dg: 'taskAction'
+        dg: 'taskAction',
+        isSymperProp: true,
+        pushToXML: attrToXMLMethods.notPushToXML
     },
     assignee: {
         title: 'Assignee',
@@ -1738,7 +1716,10 @@ let allAttrs = {
             "name": "sym_assignee",
             "isAttr": true,
             "type": "String"
-        }
+        },
+        isSymperProp: true,
+        pushToXML: attrToXMLMethods.notPushToXML
+
     },
     taskOwner: {
         title: 'Task owner',
@@ -1749,7 +1730,10 @@ let allAttrs = {
             orgchartSelectorValue: [] // dạng value của orgchartselector để hiển thị lên
         },
         activeTab: 'orgchart', // tab nào sẽ mở: orgchart hoặc script
-        dg: 'assignment'
+        dg: 'assignment',
+        isSymperProp: true,
+        pushToXML: attrToXMLMethods.notPushToXML
+
     },
     candidateUsers: {
         title: 'Candidate users',
@@ -1759,7 +1743,10 @@ let allAttrs = {
             formula: ''
         },
         activeTab: 'orgchart', // tab nào sẽ mở: orgchart hoặc script
-        dg: 'assignment'
+        dg: 'assignment',
+        isSymperProp: true,
+        pushToXML: attrToXMLMethods.notPushToXML
+
     },
 
     notificationTitle: {
@@ -1767,14 +1754,20 @@ let allAttrs = {
         type: 'script',
         value: '',
         info: '',
-        dg: 'formula'
+        dg: 'formula',
+        isSymperProp: true,
+        pushToXML: attrToXMLMethods.notPushToXML
+
     },
     notificationContent: {
         title: 'Notification and task content',
         type: 'script',
         value: '',
         info: '',
-        dg: 'formula'
+        dg: 'formula',
+        isSymperProp: true,
+        pushToXML: attrToXMLMethods.notPushToXML
+
     },
 
     approvalForElement: {
@@ -1784,7 +1777,10 @@ let allAttrs = {
         info: '',
         options: [],
         dg: 'taskAction',
-        showId: false
+        showId: false,
+        isSymperProp: true,
+        pushToXML: attrToXMLMethods.notPushToXML
+
     },
     controlsForBizKey: {
         title: 'Select control for business key',
@@ -1793,7 +1789,18 @@ let allAttrs = {
         info: '',
         options: [],
         dg: 'detail',
-
+        isSymperProp: true,
+        pushToXML: attrToXMLMethods.notPushToXML,
+        toXML: {
+            "symper_position": "el",
+            "name": "BusinessKeyControl",
+            "superClass": ["Element"],
+            "properties": [{
+                "name": "text",
+                "isBody": true,
+                "type": "String"
+            }]
+        },
     },
     instanceDisplayText: {
         title: 'Display text for process instance',
@@ -1801,7 +1808,37 @@ let allAttrs = {
         value: '',
         info: '',
         dg: 'detail',
-
+        isSymperProp: true,
+        pushToXML: attrToXMLMethods.notPushToXML,
+        toXML: {
+            "symper_position": "el",
+            "name": "InstanceDisplayText",
+            "superClass": ["Element"],
+            "properties": [{
+                "name": "text",
+                "isBody": true,
+                "type": "String"
+            }]
+        },
+    },
+    valueTag: {
+        "title": "",
+        "type": "text",
+        "value": "",
+        "info": "BPMN.PROPERTYPACKAGES.DOCUMENTATIONPACKAGE.DOCUMENTATION.DESCRIPTION",
+        "dg": "general",
+        hidden: true,
+        toXML: {
+            "symper_position": "el",
+            "name": "symper_symper_value_tag",
+            "superClass": ["Element"],
+            "properties": [{
+                "name": "text",
+                "isBody": true,
+                "type": "String"
+            }]
+        },
+        pushToXML: attrToXMLMethods.documentationMethod
     },
 }
 

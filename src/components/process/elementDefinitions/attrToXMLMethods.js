@@ -20,6 +20,12 @@ function clearEmptyAttr(bizObj) {
     }
 }
 export default {
+    addStringValueAsTag(el, elKey, attr, bpmnModeler, attrName) {
+        let moddle = bpmnModeler.get('moddle');
+        let newEl = moddle.create('symper:' + attr.toXML.name);
+        newEl.text = attr.value;
+        el[elKey].unshift(newEl);
+    },
     // Tạo ra các thẻ mới và chèn vào element cha
     pushNewEqualEls(el, elKey, attr, bpmnModeler, attrName) {
         let moddle = bpmnModeler.get('moddle');
@@ -73,20 +79,51 @@ export default {
     },
 
     formPropertyMethod(el, elKey, attr, bpmnModeler, attrName) {
+
         let moddle = bpmnModeler.get('moddle');
         let modeling = bpmnModeler.get('modeling');
         let extensionElements = moddle.create('bpmn:ExtensionElements');
-
-        for (let row of attr.value) {
+        extensionElements.values = [];
+        for (let row of attr.getValue(attr.value)) {
             let subEl = moddle.create('symper:formProperty');
             for (let key in row) {
-                subEl[key] = row[key];
+                let vl = row[key];
+                subEl[key] = vl;
             }
-            extensionElements.get('values').push(subEl);
+            extensionElements.values.push(subEl);
         }
         modeling.updateProperties(el, {
-            extensionElements,
+            extensionElements
         });
+    },
+
+
+    dataObjectMethod(el, elKey, attr, bpmnModeler, attrName) {
+
+        let moddle = bpmnModeler.get('moddle');
+        let modeling = bpmnModeler.get('modeling');
+
+        for (let item of attr.value) {
+            if (!item.id || !item.name) {
+                continue;
+            }
+            let dataObject = moddle.create('symper:dataObject');
+            dataObject.id = item.id;
+            dataObject.name = item.name;
+            dataObject.itemSubjectRef = "xsd:string"
+
+            let extensionElement = moddle.create('bpmn:ExtensionElements');
+            let valueTag = moddle.create("symper:symper_symper_value_tag");
+            valueTag.text = item.defaultValue;
+            extensionElement.values = [valueTag];
+
+            modeling.updateProperties({
+                businessObject: dataObject
+            }, {
+                extensionElements: extensionElement
+            });
+            el[elKey].push(dataObject);
+        }
     },
 
     notPushToXML(el, elKey, attr, bpmnModeler, attrName) {
