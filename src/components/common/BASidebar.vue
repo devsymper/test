@@ -45,7 +45,7 @@
                         <div class="w-100 d-flex" style="color: rgba(0, 0, 0, 0.54)">
                             <v-tooltip top>
                                 <template v-slot:activator="{ on }">
-                                    <i v-on="on" class="mdi mdi-account-check-outline fs-16 mr-1"></i> 
+                                    <i v-on="on" class="mdi mdi-account-check-outline fs-16 mr-1" style="position: relative;top: 2px;"></i> 
                                 </template>
                                 <span>User</span>
                             </v-tooltip>
@@ -65,22 +65,31 @@
                         <div class="w-100 d-flex"  style="color: rgba(0, 0, 0, 0.54)">
                             <v-tooltip top>
                                 <template v-slot:activator="{ on }">
-                                    <i class="mdi mdi-account-circle-outline fs-16 mr-1" v-on="on"></i>                            
+                                    <i class="mdi mdi-account-circle-outline fs-16 mr-1" v-on="on" style="position: relative;top: 2px;"></i>                            
                                 </template>
                                 <span>Role</span>
                             </v-tooltip>
-                            <v-tooltip top>
-                                <template v-slot:activator="{ on }">
-                                    <v-btn
-                                        x-small
-                                        text
-                                        v-on="on"
-                                        depressed>
-                                        {{sapp.endUserInfo.currentRole.title}}
-                                    </v-btn>
+                            <v-menu :offset-y="true">
+                                <template v-slot:activator="{ on: menu, attrs }">
+                                    <v-tooltip bottom>
+                                    <template v-slot:activator="{ on: tooltip }">
+                                        <v-btn
+                                            x-small
+                                            text
+                                            v-bind="attrs"
+                                            depressed
+                                            v-on="{ ...tooltip, ...menu }">
+                                            {{sapp.endUserInfo.currentRole.title}}
+                                        </v-btn>
+                                    </template>
+                                    <span>Switch role</span>
+
+                                    </v-tooltip>
                                 </template>
-                                <span>Switch role</span>
-                            </v-tooltip>
+                                 <v-card>
+                                     di
+                                 </v-card>
+                            </v-menu>
                         </div>
                     </div>
 
