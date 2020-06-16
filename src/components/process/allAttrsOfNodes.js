@@ -1529,7 +1529,7 @@ let allAttrs = {
         "info": "BPMN.PROPERTYPACKAGES.FORMREFERENCEPACKAGE.FORMREFERENCE.DESCRIPTION",
         "dg": "taskAction",
         onSearch: async function(val) { // val là giá trị đang nhập trên ô input, lúc này this sẽ trỏ đến autocomplete instance
-            let docs = await apiCaller.get(appConfigs.apiDomain.documents + '?name=' + val);
+            let docs = await apiCaller.get(appConfigs.apiDomain.documents + '?search=' + val);
             this.myItems = docs.data.listObject;
         },
         options: [{ id: '    ', name: '', title: '' }],
