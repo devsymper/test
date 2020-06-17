@@ -10,7 +10,13 @@ const increaseUnreadNotification = (state, delta = 1) => {
 
 const changeCurrentBAInfo = (state, data) => {
     for (let name in data) {
-        state.baInfo[name] = data[name];
+        Vue.set(state.baInfo, name, data[name]);
+    }
+};
+
+const changeCurrentUserInfo = (state, data) => {
+    for (let name in data) {
+        Vue.set(state.endUserInfo, name, data[name]);
     }
 };
 
@@ -57,6 +63,7 @@ export {
     increaseUnreadNotification,
     decreaseUnreadNotification,
     changeCurrentBAInfo,
+    changeCurrentUserInfo,
     changeUrlsToTabs,
     updateCurrentTabIndex,
     removeTab,

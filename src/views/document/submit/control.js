@@ -1,7 +1,7 @@
 import Formulas from "./formulas";
 
 export default class Control {
-    constructor(idField, ele, controlProps, curParentInstance) {
+    constructor(idField, ele, controlProps, curParentInstance, value) {
         /**
          * object các thuộc tính về hiển thị của control
          */
@@ -22,6 +22,8 @@ export default class Control {
          * id của dòng dữ liệu trong bảng field, phục vụ cho việc lấy datapost submit
          */
         this.idField = idField;
+        this.value = value;
+
 
     }
     init() {
@@ -45,7 +47,6 @@ export default class Control {
          * Loại control
          */
         this.type = this.ele.attr('s-control-type');
-        this.value = (this.type == 'number') ? 0 : '';
 
 
 

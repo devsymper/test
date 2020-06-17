@@ -39,7 +39,7 @@ export default class Formulas {
                     syql = syql.replace('ref(', '');
                     syql = syql.substring(0, syql.length - 1);
 
-                    let res = await this.runSyql(syql);
+                    let res = await this.runSyql(syql, dataInput);
 
                     let beforeStr = this.checkBeforeReferenceFormulas(script, listSyql[i].trim());
                     if (!beforeStr) {
@@ -98,30 +98,41 @@ export default class Formulas {
          * else => value
          */
     checkBeforeReferenceFormulas(script, refScript) {
-        let s = script.replace("(", "\\(");
-        s = s.replace(")", "\\)");
-        let reg = new RegExp("([a-zA-Z_0-9]+)\\s+" + s, "gm")
-        let textBefore = refScript.match(reg);
-        if (textBefore != null && textBefore.length > 0) {
-            textBefore = textBefore[0].replace(script, "")
-            return textBefore;
-        } else {
-            return false;
+            let s = script.replace("(", "\\(");
+            s = s.replace(")", "\\)");
+            let reg = new RegExp("([a-zA-Z_0-9]+)\\s+" + s, "gm")
+            let textBefore = refScript.match(reg);
+            if (textBefore != null && textBefore.length > 0) {
+                textBefore = textBefore[0].replace(script, "")
+                return textBefore;
+            } else {
+                return false;
+            }
+
         }
-
-    }
-
+        /**
+         * Hàm thay thế các giá trị input đầu vào trong công thức (thay thế vào chuỗi {controlName})
+         * @param {Object} dataInput 
+         * @param {String} formulas 
+         */
     replaceParamsToData(dataInput, formulas) {
+        let listControlInDoc = this.getDataSubmitInStore()
         for (let controlName in dataInput) {
             let regex = new RegExp("{" + controlName + "}", "g");
-            formulas = formulas.replace(regex, dataInput[controlName]);
+            let value = dataInput[controlName];
+            if (value == undefined || typeof value == 'undefined' || value == null) {
+                value = ""
+                if (listControlInDoc[controlName].type == 'number' || listControlInDoc[controlName].type == 'percent') {
+                    value = 0;
+                }
+            }
+            formulas = formulas.replace(regex, value);
         }
         return formulas;
     }
     handleRunAutoCompleteFormulas(search, dataInput = false) {
         let listSyql = this.getReferenceFormulas();
         let fieldSelect = this.detectFieldSelect();
-
         let where = " WHERE ";
         for (let i = 0; i < fieldSelect.length; i++) {
             let element = fieldSelect[i];
@@ -155,7 +166,7 @@ export default class Formulas {
     }
 
     detectFieldSelect() {
-            let listField = this.formulas.match(/(?<=select ).*?(?= from)/gi);
+            let listField = this.formulas.match(/(?<=select|SELECT ).*(?= from|FROM)/gi);
             let fields = [];
             if (listField != null && listField.length > 0) {
                 fields = listField[0];
@@ -172,8 +183,12 @@ export default class Formulas {
         return listSyql;
     }
 
-    runSyql(formulas) {
+    runSyql(formulas, dataInput = false) {
             let syql = this.replaceParamsToData(this.getDataInputFormulas(), formulas);
+            if (dataInput != false) {
+                syql = this.replaceParamsToData(dataInput, formulas);
+            }
+
             return documentServiceApi.query({ query: syql });
         }
         /**

@@ -7,7 +7,8 @@ export const appConfigs = {
         time: 'mdi-timer-outline',
     },
     apiDomain: {
-        user: 'https://v2hoangnd.dev.symper.vn/api/',
+        account: 'https://account.symper.vn/',
+        user: 'https://account.symper.vn/',
         core: 'https://v2hoangnd.dev.symper.vn/',
         bpmne: {
             models: 'https://v2khadm.dev.symper.vn/process-modeler',

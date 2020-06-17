@@ -1529,7 +1529,7 @@ let allAttrs = {
         "info": "BPMN.PROPERTYPACKAGES.FORMREFERENCEPACKAGE.FORMREFERENCE.DESCRIPTION",
         "dg": "taskAction",
         onSearch: async function(val) { // val là giá trị đang nhập trên ô input, lúc này this sẽ trỏ đến autocomplete instance
-            let docs = await apiCaller.get(appConfigs.apiDomain.documents + '?name=' + val);
+            let docs = await apiCaller.get(appConfigs.apiDomain.documents + '?search=' + val);
             this.myItems = docs.data.listObject;
         },
         options: [{ id: '    ', name: '', title: '' }],
@@ -1632,6 +1632,10 @@ let allAttrs = {
                 text: 'Approval',
                 value: 'approval'
             },
+            {
+                text: 'Update document',
+                value: 'update'
+            },
         ],
         dg: 'taskAction',
         isSymperProp: true,
@@ -1709,17 +1713,24 @@ let allAttrs = {
             formula: '',
             orgchartSelectorValue: [] // dạng value của orgchartselector để hiển thị lên
         },
+        getValueForXML(value) {
+            let userIds = [];
+            for (let item of value.orgChart) {
+                if (item.id.includes('user-')) {
+                    userIds.push(item.id.replace('user-', ''));
+                }
+            }
+            return userIds.join(',');
+        },
         activeTab: 'orgchart', // tab nào sẽ mở: orgchart hoặc script
         dg: 'assignment',
         toXML: {
             "symper_position": "attr",
-            "name": "sym_assignee",
+            "name": "symper_prefix_chars_assignee",
             "isAttr": true,
             "type": "String"
         },
         isSymperProp: true,
-        pushToXML: attrToXMLMethods.notPushToXML
-
     },
     taskOwner: {
         title: 'Task owner',
@@ -1731,9 +1742,14 @@ let allAttrs = {
         },
         activeTab: 'orgchart', // tab nào sẽ mở: orgchart hoặc script
         dg: 'assignment',
+        // toXML: {
+        //     "symper_position": "attr",
+        //     "name": "candidateUsers",
+        //     "isAttr": true,
+        //     "type": "String"
+        // },
         isSymperProp: true,
         pushToXML: attrToXMLMethods.notPushToXML
-
     },
     candidateUsers: {
         title: 'Candidate users',
@@ -1745,8 +1761,21 @@ let allAttrs = {
         activeTab: 'orgchart', // tab nào sẽ mở: orgchart hoặc script
         dg: 'assignment',
         isSymperProp: true,
-        pushToXML: attrToXMLMethods.notPushToXML
-
+        getValueForXML(value) {
+            let userIds = [];
+            for (let item of value.orgChart) {
+                if (item.id.includes('user-')) {
+                    userIds.push(item.id.replace('user-', ''));
+                }
+            }
+            return userIds.join(',');
+        },
+        toXML: {
+            "symper_position": "attr",
+            "name": "candidateUsers",
+            "isAttr": true,
+            "type": "String"
+        }
     },
 
     notificationTitle: {
@@ -1780,7 +1809,6 @@ let allAttrs = {
         showId: false,
         isSymperProp: true,
         pushToXML: attrToXMLMethods.notPushToXML
-
     },
     controlsForBizKey: {
         title: 'Select control for business key',
@@ -1794,6 +1822,25 @@ let allAttrs = {
         toXML: {
             "symper_position": "el",
             "name": "BusinessKeyControl",
+            "superClass": ["Element"],
+            "properties": [{
+                "name": "text",
+                "isBody": true,
+                "type": "String"
+            }]
+        },
+    },
+    documentObjectIdForUpdate: {
+        title: 'Script for select document object id (ex: Select {IDNODE_document_object_id})',
+        type: "script",
+        value: '',
+        info: '',
+        dg: 'taskAction',
+        isSymperProp: true,
+        pushToXML: attrToXMLMethods.notPushToXML,
+        toXML: {
+            "symper_position": "el",
+            "name": "documentObjectIdForUpdate",
             "superClass": ["Element"],
             "properties": [{
                 "name": "text",

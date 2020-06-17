@@ -16,6 +16,12 @@ export const documentApi = {
     detailDocument(id) {
         return coreApi.get("document/detail/" + id);
     },
+    detailDocumentByName(name) {
+        return coreApi.get("document/struct/" + name);
+    },
+    getDocumentObject(name, id) {
+        return coreApi.get("document/" + name + "/objects/" + id);
+    },
     submitDocument(data) {
         return coreApi.post("document/objects/submit", data);
     },

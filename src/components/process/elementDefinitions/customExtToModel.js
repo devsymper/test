@@ -57,6 +57,7 @@ function addCustomAttrToDataObject(vizEl, attrs) {
  */
 function addCustomPropsToForm(symEl) {
     if (symEl.type == 'StartNoneEvent' || symEl.type == 'UserTask') {
+        symEl.attrs.formproperties.value = [];
         for (let attrName in symEl.attrs) {
             let attr = symEl.attrs[attrName];
             if (attr.isSymperProp) {

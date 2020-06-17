@@ -465,7 +465,7 @@ export default {
                     bnodeRoot = bnode;
                 }else if(nodeType == "SequenceFlow"){
                     if(!mapSaveNodes[bnode.id]){
-                        debugger;
+                        // debugger;
                     }
                     di.childShapes.push(mapSaveNodes[bnode.id]); // theo quy tắc 1 của flowable về lưu SequenceFlow
                 }
@@ -475,7 +475,7 @@ export default {
                 for(let pool of bnodeRoot.participants){
                     let poolToSave = mapSaveNodes[pool.id];
                     if(!poolToSave){
-                        debugger;
+                        // debugger;
                     }
                     di.childShapes.push(poolToSave);
                     poolToSave.properties.process_id = poolToSave.properties.process_id ? poolToSave.properties.process_id : poolToSave.properties.overrideid;
@@ -483,7 +483,7 @@ export default {
                         // thêm các con cho các lane
                         for(let lane of pool.processRef.laneSets[0].lanes){
                             if(!mapSaveNodes[lane.id]){
-                                debugger;
+                                // debugger;
                             }
                             poolToSave.childShapes.push(mapSaveNodes[lane.id]);
                             this.addChildrenForProcess(mapSaveNodes[lane.id], lane.flowNodeRef, mapSaveNodes);
@@ -949,6 +949,10 @@ export default {
                 this.$refs.symperBpmn[ac]();
             }
         },
+        cleanXMLBeforeRender(xml){
+            xml = xml.replace(/<symper:(.*?)<\/symper:(.*?)>/g,''); // Loại bỏ toàn bộ các thẻ của symper
+            return xml;
+        },
         /**
          * Lấy data từ server và áp dụng data này để hiển thị lên process
          */
@@ -956,15 +960,16 @@ export default {
             try {
                 let modelData = await bpmnApi.getModelData(idProcess);
                 modelData = modelData.data;
-                
-                let afterRender = await this.$refs.symperBpmn.renderFromXML(modelData.content);
+                let xml = this.cleanXMLBeforeRender(modelData.content);
+                console.log(xml);
+                let afterRender = await this.$refs.symperBpmn.renderFromXML(xml);
                 if(modelData.configValue){
                     this.restoreAttrValueFromJsonConfig(modelData.configValue);
                 }
             } catch (error) {
-                self.$snotifyError(
+                this.$snotifyError(
                     error,
-                    self.$t("process.editror.err.get_xml")
+                    this.$t("process.editror.err.get_xml")
                 );
             }
         },
@@ -974,20 +979,30 @@ export default {
             let gatewayEls = [];
             for(let elName in this.stateAllElements){
                 let el = this.stateAllElements[elName];
-                for(let attrName in el.attrs){
-                    if(configValue[elName]){
+                if(configValue[elName]){
+                    for(let attrName in el.attrs){
                         if(configValue[elName].hasOwnProperty(attrName)){
+                            console.log('attrNameattrName', attrName, allNodesAttrs[attrName]);
+                            
                             if (allNodesAttrs[attrName].hasOwnProperty("restoreData")) {
                                 el.attrs[attrName].value = allNodesAttrs[attrName].restoreData(configValue[elName][attrName]);
                             } else {
                                 el.attrs[attrName].value = configValue[elName][attrName];
                             }
+                        }else{
+                            debugger
                         }
                     }
+                }else{
+                    debugger
                 }
 
                 if(el.type.includes('Gateway')){
                     this.setFlowsOrderForGateway(el);
+                }
+
+                if (nodeAttrsDefinition[el.type].checkShowOrHideInput) {
+                    nodeAttrsDefinition[el.type].checkShowOrHideInput(el.attrs);
                 }
             }
         },

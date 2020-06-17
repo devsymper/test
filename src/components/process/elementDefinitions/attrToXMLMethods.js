@@ -61,6 +61,9 @@ export default {
     setValueAsAttr(el, elKey, attr, bpmnModeler, attrName) {
         let modeling = bpmnModeler.get("modeling");
         let value = allNodesAttrs[attrName].getValue(attr.value);
+        if (allNodesAttrs[attrName].hasOwnProperty('getValueForXML')) {
+            value = allNodesAttrs[attrName].getValueForXML(attr.value);
+        }
         console.log(attrName, value, value !== '');
 
         if (value !== '' && attrName != 'overrideid') {

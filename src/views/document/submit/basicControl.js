@@ -1,10 +1,10 @@
 import Control from "./control";
-import store from './../../../store/document'
+import store from './../../../store'
+import sDocument from './../../../store/document'
 import { SYMPER_APP } from './../../../main.js'
 
 import Util from './util'
-let isDetailView = store.state.submit.isDetailView;
-let dataInputCache = store.state.submit.dataInputCache;
+let dataInputCache = sDocument.state.submit.dataInputCache;
 const fileTypes = {
     'xlsx': 'mdi-microsoft-excel',
     'txt': 'file-text-o',
@@ -39,8 +39,8 @@ const fileTypes = {
 };
 
 export default class BasicControl extends Control {
-    constructor(idField, ele, controlProps, curParentInstance) {
-        super(idField, ele, controlProps, curParentInstance);
+    constructor(idField, ele, controlProps, curParentInstance, value) {
+        super(idField, ele, controlProps, curParentInstance, value);
     }
 
     render() {
@@ -51,14 +51,20 @@ export default class BasicControl extends Control {
         if (this.controlFormulas.hasOwnProperty('autocomplete') && this.controlFormulas.autocomplete.instance != undefined) {
             this.addAutoCompleteEvent();
         }
+        if (this.checkDetailView()) {
+            this.ele.addClass('detail-view')
+            this.ele.attr('disabled', 'disabled')
+        }
         let thisCpn = this;
-        this.ele.wrap('<span>');
+        this.ele.val(this.value)
+        this.ele.wrap('<span style="position:relative;">');
         this.ele.attr('key-instance', this.curParentInstance);
         this.ele.on('change', function(e) {
             SYMPER_APP.$evtBus.$emit('document-submit-input-change', { controlName: thisCpn.controlProperties.name.value, val: $(e.target).val() })
         })
         if (this.ele.hasClass('s-control-number')) {
             this.ele.css('text-align', 'right');
+            this.ele.attr('type', 'text');
 
         } else if (this.ele.hasClass('s-control-table')) {
 
@@ -80,6 +86,7 @@ export default class BasicControl extends Control {
             this.renderTimeControl();
 
         } else if (this.ele.hasClass('s-control-percent')) {
+            this.ele.attr('type', 'text');
             this.ele.css('min-width', 'unset');
 
         } else if (this.ele.hasClass('s-control-date')) {
@@ -95,7 +102,10 @@ export default class BasicControl extends Control {
 
         } else if (this.ele.hasClass('s-control-select')) {
             this.renderSelectControl();
+        } else if (this.ele.hasClass('s-control-label')) {
+            this.renderLabelControl();
         }
+
     }
     renderFileControl = function(rowId) {
         let fileHtml = this.genFileView(rowId);
@@ -112,7 +122,7 @@ export default class BasicControl extends Control {
     genFileView = function(rowId = null) {
         let ctrlName = this.name;
         let addTpl = '';
-        if (!isDetailView) {
+        if (!this.checkDetailView()) {
             addTpl = `
                 <div data-control-name="${ctrlName}" class="file-add" title="Thêm file" data-rowid="${rowId}" data-ctrlname="${ctrlName}">
                     <span class="text-show"><span class="mdi mdi-plus"></span></span>
@@ -151,7 +161,7 @@ export default class BasicControl extends Control {
 
 
     renderFilterControl() {
-        if (isDetailView) return;
+        if (this.checkDetailView()) return;
         this.ele.attr('type', 'text');
         this.ele.on('click', function(e) {
             SYMPER_APP.$evtBus.$emit('document-submit-filter-input-click', e)
@@ -159,7 +169,7 @@ export default class BasicControl extends Control {
 
     }
     renderUserControl() {
-        if (isDetailView) return;
+        if (this.checkDetailView()) return;
         this.ele.attr('type', 'text');
         this.ele.on('click', function(e) {
             SYMPER_APP.$evtBus.$emit('document-submit-user-select-input', e)
@@ -169,33 +179,64 @@ export default class BasicControl extends Control {
         })
 
     }
+    renderLabelControl() {
+        let id = this.ele.attr('id');
+        let thisCpn = this;
+        let keyinstance = this.ele.attr('key-instance');
+        this.ele.replaceWith('<input class="s-control s-control-label" s-control-type="label" type="text" disabled title="Label" id="' + id + '" placeholder="Aa" key-instance="' + keyinstance + '">');
+        this.ele = $('#' + id);
+        this.ele.on('change', function(e) {
+            SYMPER_APP.$evtBus.$emit('document-submit-input-change', { controlName: thisCpn.controlProperties.name.value, val: $(e.target).val() })
+        })
+    }
     renderSelectControl() {
         let id = this.ele.attr('id');
         let keyinstance = this.ele.attr('key-instance');
-        this.ele.replaceWith('<input class="s-control s-control-select" s-control-type="select" type="text" title="Select" id="' + id + '" key-instance="' + keyinstance + '">');
+        this.ele.replaceWith('<input class="s-control s-control-select" s-control-type="select" type="text" title="Select" readonly="readonly" id="' + id + '" key-instance="' + keyinstance + '">');
         this.ele = $('#' + id);
+        let thisCpn = this;
+        this.ele.on('click', function(e) {
+            /**
+             * TH control select ở ngoài table
+             * reset biến chỉ ra là đang tương tác với table và cell nào
+             */
+            store.commit("document/addToDocumentSubmitStore", {
+                key: 'currentCellSelected',
+                value: null
+            });
+            store.commit("document/addToDocumentSubmitStore", {
+                key: 'currentTableInteractive',
+                value: null
+            });
+            $(this).addClass('autocompleting');
+            let formulasInstance = thisCpn.controlFormulas.formulas.instance;
+            SYMPER_APP.$evtBus.$emit('document-submit-select-input', { e: e, selectFormulasInstance: formulasInstance, alias: thisCpn.name })
+        })
+        this.ele.on('change', function(e) {
+            SYMPER_APP.$evtBus.$emit('document-submit-input-change', { controlName: thisCpn.controlProperties.name.value, val: $(e.target).val() })
+        })
 
-        this.addAutoCompleteEvent(true);
     }
 
 
     renderDateTimeControl() {
-        if (isDetailView) return;
+        if (this.checkDetailView()) return;
         this.ele.attr('type', 'text');
 
     }
     renderDateControl() {
-        if (isDetailView) return;
         this.ele.attr('type', 'text');
+        if (this.checkDetailView()) return;
         this.ele.on('click', function(e) {
             $(e.target).addClass('date-picker-access');
             SYMPER_APP.$evtBus.$emit('document-submit-date-input-click', e)
         })
     }
     renderTimeControl() {
-        if (isDetailView) return;
+        if (this.checkDetailView()) return;
         this.ele.attr('type', 'text');
         this.ele.on('click', function(e) {
+            $(this).addClass('time-picker')
             SYMPER_APP.$evtBus.$emit('document-submit-time-input-click', e)
         })
     }
@@ -212,13 +253,22 @@ export default class BasicControl extends Control {
         let thisCpn = this;
         this.ele.on('input', function(e) {
             $(this).addClass('autocompleting');
-            SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-input', e)
+
+            store.commit("document/addToDocumentSubmitStore", {
+                key: 'currentCellSelected',
+                value: null
+            });
+            store.commit("document/addToDocumentSubmitStore", {
+                key: 'currentTableInteractive',
+                value: null
+            });
+            let event = e;
+            event['controlName'] = thisCpn.name;
+            SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-input', event)
         })
         this.ele.on('keyup', function(e) {
-            console.log(thisCpn.controlFormulas);
-
             let formulasInstance = (fromSelect) ? thisCpn.controlFormulas.formulas.instance : thisCpn.controlFormulas.autocomplete.instance;
-            SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-input-change', { e: e, autocompleteFormulasInstance: formulasInstance })
+            SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-key-event', { e: e, autocompleteFormulasInstance: formulasInstance, isSelect: false })
         })
     }
     inputCacheSet(value, rowId = null, rawUserFormula = '') {
@@ -302,5 +352,7 @@ export default class BasicControl extends Control {
             SYMPER_APP.$evtBus.$emit('document-submit-open-validate', e)
         })
     }
-
+    checkDetailView() {
+        return sDocument.state.isDetailView;
+    }
 }

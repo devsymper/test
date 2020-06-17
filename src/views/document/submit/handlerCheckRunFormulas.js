@@ -57,6 +57,7 @@ const checkCanBeBind = function(fieldName) {
     let impactedFieldsList = sDocument.state.submit.impactedFieldsList;
     let listInputInDocument = sDocument.state.submit.listInputInDocument;
     let rootChangeFieldName = sDocument.state.submit.rootChangeFieldName;
+    let impactedFieldsListWhenStart = sDocument.state.submit.impactedFieldsListWhenStart;
 
     // return true;
     // Nếu đã được bind dữ liệu trước đó rồi thì ko cần bind nữa

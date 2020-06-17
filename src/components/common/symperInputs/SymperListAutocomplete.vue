@@ -9,6 +9,7 @@
         hide-details
         flat
         small-chips
+        :no-filter="true"
         height="28"
         :item-text="textKey"
         dense
@@ -17,10 +18,6 @@
         @change="applyChangeValue"
         @click="reAssignItems()"
     >
-        <template v-slot:no-data>
-            <div>{{$t('common.have_no_data')}}</div>
-        </template>
-
         <!-- Kiểu 1: mainAndSub -->
         <template v-slot:selection="{ attr, on, item, selected }">
             <v-chip
