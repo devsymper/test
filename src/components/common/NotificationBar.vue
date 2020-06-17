@@ -1,5 +1,5 @@
 <template>
-    <v-row class="ml-0 mr-0 pl-5 pr-5 list-notification">
+    <v-row class="ml-0 mr-0 pl-5 pr-5 list-notification" :z-index="99999">
         <v-row
              v-for="item in listNotification" 
             :key="item.id"
