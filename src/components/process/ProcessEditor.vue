@@ -92,6 +92,11 @@ import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import { documentApi } from '../../api/Document';
 import customExtension from "./elementDefinitions/customExtension";
 import { pushCustomElementsToModel } from "./elementDefinitions/customExtToModel";
+import Api from "./../../api/api.js";
+import { appConfigs } from '../../configs';
+
+const apiCaller = new Api('');
+
 // Khung data của từng node cần lưu vào db
 console.log(bpmnApi, 'bpmnApibpmnApibpmnApi');
 
@@ -977,6 +982,7 @@ export default {
             let configValue = JSON.parse(jsonStr);
             this.fillNodeData();
             let gatewayEls = [];
+            let formKeyToNodeIdMap = {};
             for(let elName in this.stateAllElements){
                 let el = this.stateAllElements[elName];
                 if(configValue[elName]){
@@ -990,11 +996,9 @@ export default {
                                 el.attrs[attrName].value = configValue[elName][attrName];
                             }
                         }else{
-                            debugger
                         }
                     }
                 }else{
-                    debugger
                 }
 
                 if(el.type.includes('Gateway')){
@@ -1004,6 +1008,29 @@ export default {
                 if (nodeAttrsDefinition[el.type].checkShowOrHideInput) {
                     nodeAttrsDefinition[el.type].checkShowOrHideInput(el.attrs);
                 }
+
+
+                if(el.attrs.formreference && el.attrs.formreference.value){
+                    let formKey = el.attrs.formreference.value;
+                    if(!formKeyToNodeIdMap[formKey]){
+                        formKeyToNodeIdMap[formKey] = [];
+                    }
+                    formKeyToNodeIdMap[formKey].push(elName);
+                }
+            }
+            this.setInitItemsForFormReferences(formKeyToNodeIdMap);
+        },
+        async setInitItemsForFormReferences(map){
+            let self = this;
+            try {
+                for(let docId in map){
+                    let res = await apiCaller.get(appConfigs.apiDomain.documents + '?search=' + docId);  
+                    for(let nodeId of map[docId]){
+                        this.stateAllElements[nodeId].attrs.formreference.options = res.data.listObject;
+                    }              
+                }
+            } catch (err) {
+                self.$snotifyError(err, "Can not set initial items for form references");
             }
         },
         /**

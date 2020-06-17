@@ -1525,7 +1525,7 @@ let allAttrs = {
     "formreference": {
         "title": "Form reference",
         "type": "autocomplete",
-        "value": undefined,
+        "value": '',
         "info": "BPMN.PROPERTYPACKAGES.FORMREFERENCEPACKAGE.FORMREFERENCE.DESCRIPTION",
         "dg": "taskAction",
         onSearch: async function(val) { // val là giá trị đang nhập trên ô input, lúc này this sẽ trỏ đến autocomplete instance
