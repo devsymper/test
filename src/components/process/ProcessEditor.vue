@@ -949,6 +949,10 @@ export default {
                 this.$refs.symperBpmn[ac]();
             }
         },
+        cleanXMLBeforeRender(xml){
+            xml = xml.replace(/<symper:(.*?)<\/symper:(.*?)>/g,''); // Loại bỏ toàn bộ các thẻ của symper
+            return xml;
+        },
         /**
          * Lấy data từ server và áp dụng data này để hiển thị lên process
          */
@@ -956,8 +960,9 @@ export default {
             try {
                 let modelData = await bpmnApi.getModelData(idProcess);
                 modelData = modelData.data;
-                
-                let afterRender = await this.$refs.symperBpmn.renderFromXML(modelData.content);
+                let xml = this.cleanXMLBeforeRender(modelData.content);
+                console.log(xml);
+                let afterRender = await this.$refs.symperBpmn.renderFromXML(xml);
                 if(modelData.configValue){
                     this.restoreAttrValueFromJsonConfig(modelData.configValue);
                 }

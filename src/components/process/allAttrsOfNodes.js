@@ -1709,17 +1709,24 @@ let allAttrs = {
             formula: '',
             orgchartSelectorValue: [] // dạng value của orgchartselector để hiển thị lên
         },
+        getValueForXML(value) {
+            let userIds = [];
+            for (let item of value.orgChart) {
+                if (item.id.includes('user-')) {
+                    userIds.push(item.id.replace('user-', ''));
+                }
+            }
+            return userIds.join(',');
+        },
         activeTab: 'orgchart', // tab nào sẽ mở: orgchart hoặc script
         dg: 'assignment',
         toXML: {
             "symper_position": "attr",
-            "name": "sym_assignee",
+            "name": "assignee",
             "isAttr": true,
             "type": "String"
         },
         isSymperProp: true,
-        pushToXML: attrToXMLMethods.notPushToXML
-
     },
     taskOwner: {
         title: 'Task owner',
@@ -1731,9 +1738,14 @@ let allAttrs = {
         },
         activeTab: 'orgchart', // tab nào sẽ mở: orgchart hoặc script
         dg: 'assignment',
+        // toXML: {
+        //     "symper_position": "attr",
+        //     "name": "candidateUsers",
+        //     "isAttr": true,
+        //     "type": "String"
+        // },
         isSymperProp: true,
         pushToXML: attrToXMLMethods.notPushToXML
-
     },
     candidateUsers: {
         title: 'Candidate users',
@@ -1745,8 +1757,21 @@ let allAttrs = {
         activeTab: 'orgchart', // tab nào sẽ mở: orgchart hoặc script
         dg: 'assignment',
         isSymperProp: true,
-        pushToXML: attrToXMLMethods.notPushToXML
-
+        getValueForXML(value) {
+            let userIds = [];
+            for (let item of value.orgChart) {
+                if (item.id.includes('user-')) {
+                    userIds.push(item.id.replace('user-', ''));
+                }
+            }
+            return userIds.join(',');
+        },
+        toXML: {
+            "symper_position": "attr",
+            "name": "candidateUsers",
+            "isAttr": true,
+            "type": "String"
+        }
     },
 
     notificationTitle: {

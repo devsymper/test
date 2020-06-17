@@ -64,6 +64,6 @@ export const userApi = {
         return coreApi.get(`https://v2khadm.dev.symper.vn/user/view-configs/${viewName}/${configType}`);
     },
     changeDelegate(userInfo) {
-        return api.post('auth/change-delagate', { user_id: userInfo.id })
+        return api.post('auth/change-delegate', { user_id: userInfo.id })
     }
 };

@@ -24,7 +24,7 @@
                     'px-0': sapp.collapseSideBar,
                     'ma-0 pb-1': true ,
                 }">
-                <v-list-item-avatar style="position: relative; top: -8px">
+                <v-list-item-avatar @click="invertSidebarShow()">
                     <img src="https://randomuser.me/api/portraits/men/81.jpg" />
                 </v-list-item-avatar>
 
@@ -64,7 +64,10 @@
                                                 @click="openSelectUserPanel"
                                                 depressed
                                                 v-on="{ ...tooltip, ...menu }">
-                                                {{sapp.endUserInfo.displayName}}
+                                                
+                                                <span class="fs-11" style="font-weight: 400!important">
+                                                    {{sapp.endUserInfo.displayName}}
+                                                </span>
                                             </v-btn>
                                         </template>
                                         <span>Switch user</span>
@@ -78,10 +81,11 @@
                                         solo
                                         append-icon=""
                                         :items="sapp.allUsers"
+                                        background-color="grey lighten-4"
                                         flat
                                         dense
                                         color="blue-grey lighten-2"
-                                        label="Select"
+                                        :label="$t('common.search')"
                                         item-text="displayName"
                                         @change="delegateUser"
                                         item-value="name"
@@ -112,7 +116,9 @@
                                         text
                                         v-on="on"
                                         depressed>
-                                        {{sapp.endUserInfo.currentRole.title}}
+                                        <span class="fs-11" style="font-weight: 400!important">
+                                            {{sapp.endUserInfo.currentRole.title}}
+                                        </span>
                                     </v-btn>
                                 </template>
                                 <span>Switch role</span>
