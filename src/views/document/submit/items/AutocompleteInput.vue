@@ -91,6 +91,7 @@ export default {
         setData(data){
             this.headers = data.headers;
             this.dataTable = data.dataBody;
+            this.indexActive = 0;
         },
         calculatorPositionBox(e){
             // nếu autocomplete từ cell của handsontable  
