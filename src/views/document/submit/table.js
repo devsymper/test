@@ -11,7 +11,7 @@ import { checkCanBeBind, resetImpactedFieldsList, markBinedField } from './handl
  */
 Handsontable.renderers.PercentRenderer = function(instance, td, row, col, prop, value, cellProperties) {
     Handsontable.renderers.NumericRenderer.apply(this, arguments);
-    td.textContent = td.textContent + " %";
+    td.textContent = (td.textContent == "" || td.textContent == null) ? 0 + " %" : td.textContent + " %";
 }
 Handsontable.cellTypes.registerCellType('percent', {
     editor: Handsontable.editors.TextEditor.prototype.extend(),
@@ -125,6 +125,9 @@ export default class Table {
                     };
                 },
                 beforeKeyDown: function(event) {
+                    // chặn bấm lên xuống trái phải khi có autocomplete
+
+
                     if (event.keyCode != 40 && event.keyCode != 38 &&
                         event.keyCode != 37 && event.keyCode != 39 &&
                         thisObj.isAutoCompleting == false) {
@@ -133,14 +136,16 @@ export default class Table {
                             SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-input', event);
                             thisObj.isAutoCompleting = formulasInstance;
                         }
-
+                    }
+                    if ((event.keyCode == 40 || event.keyCode == 38 ||
+                            event.keyCode == 37 || event.keyCode == 39) && thisObj.isAutoCompleting != false) {
+                        event.stopImmediatePropagation();
                     }
                     // hoangnd: cần set timeout ở đây tại vì cần thực hiện đoạn này sau khi keydown hoàn tất thì input mới có dữ liệu
                     setTimeout(() => {
                         if (thisObj.isAutoCompleting != false) {
                             let formulasInstance = thisObj.isAutoCompleting
                             if (formulasInstance != false) {
-
                                 SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-key-event', {
                                     e: event,
                                     autocompleteFormulasInstance: formulasInstance,
@@ -635,11 +640,6 @@ export default class Table {
         }
     }
     getCellType(name, control) {
-        console.log(listInputInDocument);
-        console.log(name);
-
-        console.log(control);
-
         let type = control.type;
         let ctrl = listInputInDocument[name];
         let rsl = {
@@ -655,15 +655,6 @@ export default class Table {
             rsl.readOnly = true;
         } else if (type == 'select') {
             rsl.editor = 'select';
-            // this.handlerCheckCanBeRunFormulas(name);
-            // let formulasInstance = ctrl.controlFormulas.formulas.instance
-            // let dataInput = this.getDataInputForFormulas(formulasInstance);
-            // if (controlEffectedInstance.hasOwnProperty('inTable')) {
-            //     if (controlEffectedInstance.inTable == this.tableName) {
-            //         this.handlerRunFormulasForControlInTable(controlEffectedInstance.name, dataInput, formulasInstance);
-            //     }
-            // }
-            // rsl.selectOptions = ctrl.fmlData.formula.replace(/\'/g, '').split('|');  
         } else if (type == 'time') {
             rsl.timeFormat = 'HH:mm:ss',
                 rsl.correctFormat = true;
