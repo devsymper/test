@@ -1632,6 +1632,10 @@ let allAttrs = {
                 text: 'Approval',
                 value: 'approval'
             },
+            {
+                text: 'Update document',
+                value: 'update'
+            },
         ],
         dg: 'taskAction',
         isSymperProp: true,
@@ -1805,7 +1809,6 @@ let allAttrs = {
         showId: false,
         isSymperProp: true,
         pushToXML: attrToXMLMethods.notPushToXML
-
     },
     controlsForBizKey: {
         title: 'Select control for business key',
@@ -1819,6 +1822,25 @@ let allAttrs = {
         toXML: {
             "symper_position": "el",
             "name": "BusinessKeyControl",
+            "superClass": ["Element"],
+            "properties": [{
+                "name": "text",
+                "isBody": true,
+                "type": "String"
+            }]
+        },
+    },
+    documentObjectIdForUpdate: {
+        title: 'Script for select document object id (ex: Select {IDNODE_document_object_id})',
+        type: "script",
+        value: '',
+        info: '',
+        dg: 'taskAction',
+        isSymperProp: true,
+        pushToXML: attrToXMLMethods.notPushToXML,
+        toXML: {
+            "symper_position": "el",
+            "name": "documentObjectIdForUpdate",
             "superClass": ["Element"],
             "properties": [{
                 "name": "text",

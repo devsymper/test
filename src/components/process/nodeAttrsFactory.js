@@ -39,7 +39,7 @@ const dockerGroups = {
 export const nodeAttrsDefinition = {
     'UserTask': {
         group: 'task', // nhóm thuộc tính mà node này thuộc về, giá trị là một hoặc nhiều key trong "groupsAttrs"
-        attrs: ['taskAction', "usertaskassignment", 'taskOwner', 'assignee', 'candidateUsers', 'notificationTitle', 'notificationContent', "formkeydefinition", "formreference", "formfieldvalidation", "duedatedefinition", "prioritydefinition", 'approvalActions', 'approvalForElement', "formproperties", "tasklisteners", "skipexpression", "categorydefinition"],
+        attrs: ['taskAction', "usertaskassignment", 'taskOwner', 'assignee', 'candidateUsers', 'notificationTitle', 'notificationContent', "formkeydefinition", "formreference", "formfieldvalidation", "duedatedefinition", "prioritydefinition", 'approvalActions', 'approvalForElement', "formproperties", "tasklisteners", "skipexpression", "categorydefinition", "documentObjectIdForUpdate"],
         exclude: ['asynchronousdefinition', 'exclusivedefinition'],
         validate: function(attrs) {
 
@@ -56,10 +56,17 @@ export const nodeAttrsDefinition = {
                 attrs.approvalActions.hidden = true;
                 attrs.formreference.hidden = false;
                 attrs.approvalForElement.hidden = true;
+                attrs.documentObjectIdForUpdate.hidden = true;
             } else if (taskAction.value == 'approval') {
                 attrs.approvalActions.hidden = false;
                 attrs.formreference.hidden = true;
                 attrs.approvalForElement.hidden = false;
+                attrs.documentObjectIdForUpdate.hidden = true;
+            } else if (taskAction.value == 'update') {
+                attrs.approvalActions.hidden = true;
+                attrs.formreference.hidden = true;
+                attrs.approvalForElement.hidden = true;
+                attrs.documentObjectIdForUpdate.hidden = false;
             }
         },
         docker: dockerGroups.task

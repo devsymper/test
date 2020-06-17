@@ -967,9 +967,9 @@ export default {
                     this.restoreAttrValueFromJsonConfig(modelData.configValue);
                 }
             } catch (error) {
-                self.$snotifyError(
+                this.$snotifyError(
                     error,
-                    self.$t("process.editror.err.get_xml")
+                    this.$t("process.editror.err.get_xml")
                 );
             }
         },
@@ -979,20 +979,30 @@ export default {
             let gatewayEls = [];
             for(let elName in this.stateAllElements){
                 let el = this.stateAllElements[elName];
-                for(let attrName in el.attrs){
-                    if(configValue[elName]){
+                if(configValue[elName]){
+                    for(let attrName in el.attrs){
                         if(configValue[elName].hasOwnProperty(attrName)){
+                            console.log('attrNameattrName', attrName, allNodesAttrs[attrName]);
+                            
                             if (allNodesAttrs[attrName].hasOwnProperty("restoreData")) {
                                 el.attrs[attrName].value = allNodesAttrs[attrName].restoreData(configValue[elName][attrName]);
                             } else {
                                 el.attrs[attrName].value = configValue[elName][attrName];
                             }
+                        }else{
+                            debugger
                         }
                     }
+                }else{
+                    debugger
                 }
 
                 if(el.type.includes('Gateway')){
                     this.setFlowsOrderForGateway(el);
+                }
+
+                if (nodeAttrsDefinition[el.type].checkShowOrHideInput) {
+                    nodeAttrsDefinition[el.type].checkShowOrHideInput(el.attrs);
                 }
             }
         },
