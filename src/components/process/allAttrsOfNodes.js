@@ -1722,7 +1722,7 @@ let allAttrs = {
         dg: 'assignment',
         toXML: {
             "symper_position": "attr",
-            "name": "assignee",
+            "name": "symper_prefix_chars_assignee",
             "isAttr": true,
             "type": "String"
         },

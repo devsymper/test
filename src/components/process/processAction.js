@@ -52,6 +52,7 @@ function cleanContent(content) {
         .replace(/<di:/g, '<omgdi:')
         .replace(/<dc:/g, '<omgdc:')
         .replace(/symper_prefix_chars_/g, 'symper:')
+        .replace(/symper:symper:/g, 'symper:')
         .replace(/definitions (.*?)+\>/, ns)
         .replace(/&#10;/g, ' ')
         .replace(/symper_symper_value_tag/g, 'symper:value');
