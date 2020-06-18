@@ -597,8 +597,6 @@ export const GetControlProps = function(type) {
     if (inProps != undefined && typeof inProps != 'undefined' && inProps.length > 0) {
         let propertiesControl = {};
         for (let i = 0; i < inProps.length; i++) {
-            console.log(inProps[i]);
-
             propertiesControl[inProps[i]] = allProperties[inProps[i]];
         }
 

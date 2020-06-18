@@ -133,6 +133,8 @@ export default {
                 value = item['column1'];
             }
             this.$emit('after-select-row',{value:value});
+
+            this.dataTable = []
             this.hide();
         },
         openSubForm(){

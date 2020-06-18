@@ -338,6 +338,7 @@ export default {
                             }
                         } 
                         let htmlContent = this.$refs.editor.editor.getContent();
+                        
                         if(this.documentId != 0 && this.documentId != undefined && typeof this.documentId != 'undefined'){   //update doc
                             this.editDocument({documentProperty:documentProperties,fields:JSON.stringify(allControl),content:htmlContent,id:this.documentId})
                         }
@@ -433,10 +434,11 @@ export default {
             let listControlName = [];
             this.listMessageErr = [];
             $('#editor_ifr').contents().find('.s-control-error').removeClass('s-control-error');
+            $("#editor_ifr").contents().find('.on-selected').removeClass('on-selected');
+
             //check trung ten control
             for(let controlId in allControl){
                 let control = allControl[controlId];
-                console.log(control);
                 if(control['listFields'] != undefined){
                     // Object.assign
                 }

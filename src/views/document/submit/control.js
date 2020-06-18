@@ -31,6 +31,11 @@ export default class Control {
          * mảng luu giá trị các control bị ảnh hưởng, chỉ ra control này thay đổi giá trị thì sẽ thay đổi theo các control nào
          */
         this.effectedControl = [];
+        this.effectedHiddenControl = [];
+        this.effectedRequireControl = [];
+        this.effectedReadonlyControl = [];
+        this.effectedLinkControl = [];
+        this.effectedValidateControl = [];
 
 
         /**
@@ -86,5 +91,20 @@ export default class Control {
     }
     getEffectedControl() {
         return this.effectedControl;
+    }
+    getEffectedHiddenControl() {
+        return this.effectedHiddenControl;
+    }
+    getEffectedReadonlyControl() {
+        return this.effectedReadonlyControl;
+    }
+    getEffectedRequireControl() {
+        return this.effectedRequireControl;
+    }
+    getEffectedLinkControl() {
+        return this.effectedLinkControl;
+    }
+    getEffectedValidateControl() {
+        return this.effectedValidateControl;
     }
 }

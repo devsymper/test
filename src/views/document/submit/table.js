@@ -125,9 +125,6 @@ export default class Table {
                     };
                 },
                 beforeKeyDown: function(event) {
-                    // chặn bấm lên xuống trái phải khi có autocomplete
-
-
                     if (event.keyCode != 40 && event.keyCode != 38 &&
                         event.keyCode != 37 && event.keyCode != 39 &&
                         thisObj.isAutoCompleting == false) {
@@ -137,6 +134,7 @@ export default class Table {
                             thisObj.isAutoCompleting = formulasInstance;
                         }
                     }
+                    // chặn bấm lên xuống trái phải khi có autocomplete
                     if ((event.keyCode == 40 || event.keyCode == 38 ||
                             event.keyCode == 37 || event.keyCode == 39) && thisObj.isAutoCompleting != false) {
                         event.stopImmediatePropagation();
@@ -165,8 +163,6 @@ export default class Table {
                 },
 
                 afterChange: function(changes, source) {
-
-
                     let controlName = changes[0][1];
                     let columns = thisObj.columnsInfo.columns;
                     let currentRowData = thisObj.tableInstance.getDataAtRow(thisObj.currentSelectedCell['row']);
@@ -686,7 +682,7 @@ export default class Table {
                 }
             }
 
-            if (isDetailView) {
+            if (thisObj.checkDetailView()) {
                 let indx = prop + '_' + row;
                 if (changedVlCtrlCoord[indx]) {
                     td.classList.add('changed-input');
