@@ -605,8 +605,6 @@ export default class Table {
         let hiddenColumns = [];
         let num = 0;
         let ths = thisObj.controlObj.ele.find('th');
-        console.log('nnj', thisObj.controlObj.listInsideControls);
-
         for (let controlName in thisObj.controlObj.listInsideControls) {
             headerName.push($(ths[num]).text());
             // Lấy celltype
@@ -619,7 +617,10 @@ export default class Table {
             //Đánh số thứ tự các cột trong bảng
             thisObj.colName2Idx[controlName] = num;
             //ẩn cột
-            if (listInputInDocument[controlName].controlProperties.isHidden == 1) {
+
+            if (listInputInDocument[controlName].controlProperties.hasOwnProperty('isHidden') &&
+                (listInputInDocument[controlName].controlProperties.isHidden.value == 1 ||
+                    listInputInDocument[controlName].controlProperties.isHidden.value == "1")) {
                 hiddenColumns.push(num);
             }
 
