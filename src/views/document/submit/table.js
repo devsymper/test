@@ -44,7 +44,7 @@ const supportCellsType = {
     currency: 'NumericRenderer',
     number: 'NumericRenderer',
     date: 'DateRenderer',
-    datetime: 'DatetimeRenderer',
+    dateTime: 'DatetimeRenderer',
     time: 'TimeRenderer',
     image: 'ImageRenderer',
     fileUpload: 'FileRenderer',
@@ -656,6 +656,8 @@ export default class Table {
             rsl.timeFormat = 'HH:mm:ss',
                 rsl.correctFormat = true;
         }
+        console.log('gf',type);
+        
         rsl.type = Util.toLowerCaseFirstCharacter(supportCellsType[type].replace('Renderer', ''));
 
         return rsl;
