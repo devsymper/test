@@ -465,7 +465,6 @@ export default {
     },
     mounted() {},
     activated() {
-        console.log('activatedactivatedactivatedactivatedactivatedactivatedactivatedactivated');
         
     },
     computed: {
@@ -582,8 +581,6 @@ export default {
                 headers.push(item.columnTitle);
                 return headers;
             }, []);
-
-            console.log("render column header handsontable");
 
             return function(col) {
                 let colName = colNames[col];

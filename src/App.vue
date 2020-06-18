@@ -124,7 +124,6 @@ export default {
                         activeBacklogs[item.key].create_time = new Date(
                             activeBacklogs[item.key].create_time
                         ).toLocaleString();
-                        console.log(item, "Các request đang còn tồn đọng");
                     },
                     () => {
                         thisCpn.$set(
@@ -159,7 +158,6 @@ export default {
                 "BNnZfegBztDE4pakIBFZa6GGqcy56WBZhrZ7nUP4R7JPGVyR77zEGFdKwcq4N15NlcamOxNMZKwIMSMQml5KTro"
             );
             messaging.onMessage(payload => {
-                console.log(payload)
                 this.$snotify({"title":payload.data.title,"text":payload.data.body});
                 this.$evtBus.$emit(
                     "app-receive-remote-msg",

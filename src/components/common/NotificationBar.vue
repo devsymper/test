@@ -1,5 +1,5 @@
 <template>
-    <v-row class="ml-0 mr-0 pl-5 pr-5 list-notification" :z-index="99999">
+    <v-row class="ml-0 mr-0 pl-5 pr-5 list-notification bg-white" :z-index="99999">
         <v-row
              v-for="item in listNotification" 
             :key="item.id"
@@ -14,7 +14,7 @@
                 <v-row>
                     
                     <span class="notification-item-title">
-                        {{item.title}}
+                        {{item.title}}x
                     </span>
                 </v-row>
                 <v-row class="notification-item-info mt-1">

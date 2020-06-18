@@ -91,7 +91,7 @@ import { allNodesAttrs } from "./../process/allAttrsOfNodes";
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import { documentApi } from '../../api/Document';
 import customExtension from "./elementDefinitions/customExtension";
-import { pushCustomElementsToModel } from "./elementDefinitions/customExtToModel";
+import { pushCustomElementsToModel, collectInfoForTaskDescription } from "./elementDefinitions/customExtToModel";
 import Api from "./../../api/api.js";
 import { appConfigs } from '../../configs';
 
@@ -295,7 +295,13 @@ export default {
             let allVizEls = this.$refs.symperBpmn.getAllNodes(false);
             let allSymEls = this.stateAllElements;
             let bpmnModeler = this.$refs.symperBpmn.bpmnModeler;
+            collectInfoForTaskDescription(allVizEls, allSymEls,  bpmnModeler);
             pushCustomElementsToModel(allVizEls, allSymEls,  bpmnModeler);
+            for(let el of allVizEls){
+                if(el.businessObject.$type == 'bpmn:Task'){
+                    this.$refs.symperBpmn.changeTaskNodeToUserTaskNode(el.id);
+                }
+            }
             let xml = this.$refs.symperBpmn.getXML();
             console.log(xml,'xmlxmlxmlxmlxmlxmlxml');
             let jsonConfig = {};
@@ -771,6 +777,9 @@ export default {
         },
         async setControlsForBizKey(docId){
             try {
+                if(!docId){
+                    return
+                }
                 let docDetail = await documentApi.detailDocument(docId);
                 let controls = Object.values(docDetail.data.fields).reduce((arr, el, idx)=>{
                     arr.push({
@@ -844,7 +853,8 @@ export default {
             });
 
             if(nodeData.type == 'UserTask'){
-                this.setApprovalableNodes(nodeData);
+                this.setTaskActionableNodes(nodeData, 'approvalForElement');
+                this.setTaskActionableNodes(nodeData, 'updateForElement');
             }else if(nodeData.type == 'BPMNDiagram'){
                 nodeData.attrs.controlsForBizKey.options = this.controlsForBizKey;
             }else if(nodeData.type.includes('Gateway')){
@@ -893,7 +903,7 @@ export default {
         /**
          * Tìm các node ở trước node hiện tại để có thể duyệt, phục vụ cho việc select node cần duyệt: approvalForElement
          */
-        setApprovalableNodes(nodeData){
+        setTaskActionableNodes(nodeData, attrName = 'approvalForElement'){
             let allEls = this.$refs.symperBpmn.getAllNodes();
             let currBizNode = {};
             let submitTasks = [];
@@ -913,29 +923,37 @@ export default {
                 el.sourceRef.symper_link_next[el.targetRef.id] = true;
                 el.targetRef.symper_link_prev[el.sourceRef.id] = true;
             });
-            this.findSubmitTasksFromNode(submitTasks, currBizNode);
-            nodeData.attrs.approvalForElement.options = submitTasks;
-            
+            let searchedNodeMap = {};
+            searchedNodeMap[nodeData.id] = true;
+            let nodeToFind = 
+            this.findSubmitTasksFromNode(submitTasks, currBizNode, searchedNodeMap);
+            nodeData.attrs[attrName].options = submitTasks;
             if(submitTasks.length == 0){ // nếu ko có node nào là ứng cử viên thì đặt giá trị về rỗng
-                nodeData.attrs.approvalForElement.value = '';
-            }else if(!nodeData.attrs.approvalForElement.value ){ // Tự động chọn phần tử đầu tiên làm giá trị
-                nodeData.attrs.approvalForElement.value = submitTasks[0].id;
+                nodeData.attrs[attrName].value = '';
+            }else if(!nodeData.attrs[attrName].value ){ // Tự động chọn phần tử đầu tiên làm giá trị
+                nodeData.attrs[attrName].value = submitTasks[0].id;
             }
         },
         // Tìm từ node hiện tại về node đầu để ra các node là submit task 
-        findSubmitTasksFromNode(result, currBizNode){
+        findSubmitTasksFromNode(result, currBizNode, searchedNodeMap){
             let nodeData = this.stateAllElements[currBizNode.id];
+
             // Nếu là UserTask và là submit hoặc là node bắt đầu quy trình và có form submit
-            if((nodeData.type == 'UserTask' && nodeData.attrs.taskAction.value == 'submit') ||
+            if(nodeData && (nodeData.type == 'UserTask' && nodeData.attrs.taskAction.value == 'submit') ||
                 (nodeData.type == 'StartNoneEvent' && nodeData.attrs.formreference.value)){
-                result.push({
-                    id: nodeData.id,
-                    title: currBizNode.name
-                });
-            }else{
-                for(let id in currBizNode.symper_link_prev){
-                    let prevNode = this.$refs.symperBpmn.getElData(id);
-                    this.findSubmitTasksFromNode(result, prevNode.businessObject);
+                    if(!searchedNodeMap[nodeData.id]){
+                        result.push({
+                            id: nodeData.id,
+                            title: currBizNode.name
+                        });
+                        searchedNodeMap[nodeData.id] = true;
+                    }
+            }
+            for(let id in currBizNode.symper_link_prev){
+                let prevNode = this.$refs.symperBpmn.getElData(id);
+                if(!searchedNodeMap[id]){
+                    this.findSubmitTasksFromNode(result, prevNode.businessObject, searchedNodeMap);                
+                    searchedNodeMap[id] = true;
                 }
             }
         },
@@ -988,8 +1006,6 @@ export default {
                 if(configValue[elName]){
                     for(let attrName in el.attrs){
                         if(configValue[elName].hasOwnProperty(attrName)){
-                            console.log('attrNameattrName', attrName, allNodesAttrs[attrName]);
-                            
                             if (allNodesAttrs[attrName].hasOwnProperty("restoreData")) {
                                 el.attrs[attrName].value = allNodesAttrs[attrName].restoreData(configValue[elName][attrName]);
                             } else {

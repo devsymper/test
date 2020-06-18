@@ -89,8 +89,8 @@ export default {
                             lastestDeployment = lastestDeployment.data[0];
                             deploymentId = lastestDeployment.id;
                             // if(lastestDeployment.deploymentTime < row.lastUpdated){
-                            let deploymentData = await deployProcess(self, row);
-                            deploymentId = deploymentData.id;
+                                // let deploymentData = await deployProcess(self, row);
+                                // deploymentId = deploymentData.id;
                             // }
                         }else{
                             let deploymentData = await deployProcess(self, row);

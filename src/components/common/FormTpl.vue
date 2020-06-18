@@ -371,8 +371,6 @@ export default {
         },
 
         appendValueToSciptEditor(dateTime){
-            console.log(dateTime);
-            
             this.$refs.basicFormulaEditor.setValue(dateTime);
         }
     },

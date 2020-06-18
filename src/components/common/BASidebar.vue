@@ -220,7 +220,6 @@ export default {
     },
     watch: {
         "sapp.collapseSideBar": function(newVl) {
-            console.log("collapseSideBar app changed", newVl);
         }
     },
     mounted(){
@@ -268,8 +267,6 @@ export default {
             util.auth.saveLoginInfo(accInfo);
         },
         reCalcSidebarHeight(){
-            console.log('xxxxxxxxxxxxxx');
-            
             this.menuItemsHeight = (util.getComponentSize(this).h - 200)+'px';
         },
         logout(){

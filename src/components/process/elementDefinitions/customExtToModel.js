@@ -23,7 +23,7 @@ export const pushCustomElementsToModel = function(allVizEls, allSymEls, bpmnMode
             vizEl[elKey] = removeOldSymperExts(vizEl[elKey]);
         }
 
-        addCustomPropsToForm(allSymEls[bizVizEl.id]);
+        // addCustomPropsToForm(allSymEls[bizVizEl.id]);
 
         for (let attrName in attrs) {
             let attrDef = allNodesAttrs[attrName];
@@ -63,7 +63,7 @@ function addCustomPropsToForm(symEl) {
             if (attr.isSymperProp) {
                 symEl.attrs.formproperties.value.push({
                     id: symEl.id + '___' + attrName,
-                    name: symEl.id + '___' + attrName,
+                    name: attrName,
                     type: 'string',
                     variable: symEl.id + '___' + attrName,
                     expression: '',
@@ -101,4 +101,38 @@ function removeCustomAttrToDataObject(vizEl, attrs) {
         }
     }
     attrs.dataproperties.value = Object.values(attrs.dataproperties.value);
+}
+
+export const collectInfoForTaskDescription = function(allVizEls, allSymEls, bpmnModeler) {
+    for (let idEl in allSymEls) {
+        let el = allSymEls[idEl];
+        if (el.type == 'UserTask' || el.type == 'Task') {
+            let elDocumentation = {
+                action: {
+                    module: "document",
+                    resource: "document_object",
+                    scope: "workflow",
+                    action: el.attrs.taskAction.value,
+                    parameter: {
+                        activityId: el.id,
+                        documentId: 0
+                    }
+                },
+                content: el.attrs.notificationContent.value,
+                extraLable: el.attrs.extraInfoLabel.value,
+                extraValue: el.attrs.extraInfoValue.value,
+                approvalActions: '',
+                targetElement: '',
+            }
+            if (el.attrs.taskAction.value == 'submit') {
+                elDocumentation.action.parameter.documentId = el.attrs.formreference.value;
+            } else if (el.attrs.taskAction.value == 'approval') {
+                elDocumentation.targetElement = el.attrs.approvalForElement.value;
+                elDocumentation.approvalActions = JSON.stringify(el.attrs.approvalActions.value);
+            } else if (el.attrs.taskAction.value == 'update') {
+                elDocumentation.targetElement = el.attrs.updateForElement.value;
+            }
+            el.attrs.documentation.value = JSON.stringify(elDocumentation);
+        }
+    }
 }

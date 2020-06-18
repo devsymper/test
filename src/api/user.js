@@ -1,6 +1,5 @@
 import Api from "./api";
 import { appConfigs } from "./../configs.js";
-console.log(appConfigs);
 
 var api = new Api(appConfigs.apiDomain.user);
 var coreApi = new Api(appConfigs.apiDomain.user);

@@ -83,7 +83,16 @@ let allAttrs = {
                 "type": "String"
             }]
         },
-        pushToXML: attrToXMLMethods.documentationMethod
+        pushToXML: attrToXMLMethods.documentationMethod,
+        hidden: true
+    },
+    "description": {
+        "title": "Description",
+        "type": "text",
+        "value": "",
+        "info": "",
+        "dg": "general",
+        pushToXML: attrToXMLMethods.notPushToXML,
     },
     "categorydefinition": {
         "title": "Category",
@@ -1529,6 +1538,9 @@ let allAttrs = {
         "info": "BPMN.PROPERTYPACKAGES.FORMREFERENCEPACKAGE.FORMREFERENCE.DESCRIPTION",
         "dg": "taskAction",
         onSearch: async function(val) { // val là giá trị đang nhập trên ô input, lúc này this sẽ trỏ đến autocomplete instance
+            if (!val) {
+                return;
+            }
             let docs = await apiCaller.get(appConfigs.apiDomain.documents + '?search=' + val);
             this.myItems = docs.data.listObject;
         },
@@ -1730,7 +1742,6 @@ let allAttrs = {
             "isAttr": true,
             "type": "String"
         },
-        isSymperProp: true,
     },
     taskOwner: {
         title: 'Task owner',
@@ -1748,7 +1759,6 @@ let allAttrs = {
         //     "isAttr": true,
         //     "type": "String"
         // },
-        isSymperProp: true,
         pushToXML: attrToXMLMethods.notPushToXML
     },
     candidateUsers: {
@@ -1760,7 +1770,6 @@ let allAttrs = {
         },
         activeTab: 'orgchart', // tab nào sẽ mở: orgchart hoặc script
         dg: 'assignment',
-        isSymperProp: true,
         getValueForXML(value) {
             let userIds = [];
             for (let item of value.orgChart) {
@@ -1772,10 +1781,10 @@ let allAttrs = {
         },
         toXML: {
             "symper_position": "attr",
-            "name": "candidateUsers",
+            "name": "symper_prefix_chars_candidateUsers",
             "isAttr": true,
             "type": "String"
-        }
+        },
     },
 
     notificationTitle: {
@@ -1786,7 +1795,22 @@ let allAttrs = {
         dg: 'formula',
         isSymperProp: true,
         pushToXML: attrToXMLMethods.notPushToXML
-
+    },
+    taskExtraInfoLabel: {
+        title: 'Extra info label for task',
+        type: 'script',
+        value: '',
+        info: '',
+        dg: 'formula',
+        pushToXML: attrToXMLMethods.notPushToXML
+    },
+    taskExtraInfoValue: {
+        title: 'Extra info value for task',
+        type: 'script',
+        value: '',
+        info: '',
+        dg: 'formula',
+        pushToXML: attrToXMLMethods.notPushToXML
     },
     notificationContent: {
         title: 'Notification and task content',
@@ -1794,13 +1818,39 @@ let allAttrs = {
         value: '',
         info: '',
         dg: 'formula',
-        isSymperProp: true,
         pushToXML: attrToXMLMethods.notPushToXML
+    },
+    extraInfoLabel: {
+        title: 'extra info label',
+        type: 'script',
+        value: '',
+        info: '',
+        dg: 'formula',
+        pushToXML: attrToXMLMethods.notPushToXML
+    },
 
+    extraInfoValue: {
+        title: 'extra info value',
+        type: 'script',
+        value: '',
+        info: '',
+        dg: 'formula',
+        pushToXML: attrToXMLMethods.notPushToXML
     },
 
     approvalForElement: {
         title: 'Approval for element',
+        type: 'autocomplete',
+        value: '',
+        info: '',
+        options: [],
+        dg: 'taskAction',
+        showId: false,
+        isSymperProp: true,
+        pushToXML: attrToXMLMethods.notPushToXML
+    },
+    updateForElement: {
+        title: 'Update for element',
         type: 'autocomplete',
         value: '',
         info: '',

@@ -59,52 +59,50 @@
                             :max-height="700"
                             offset-y>
                             <template v-slot:activator="{ on }">
-                            <v-btn v-on="on" icon v-if="unreadNotification > 0">
-                                <v-badge
-                                    class="sym-small-size"
-                                    
-                                    :content="unreadNotification"
-                                    :value="unreadNotification"
-                                    color="red"
-                                    overlap
-                                >
+                                <v-btn v-on="on" icon v-if="unreadNotification > 0">
+                                    <v-badge
+                                        class="sym-small-size"
+                                        
+                                        :content="unreadNotification"
+                                        :value="unreadNotification"
+                                        color="red"
+                                        overlap
+                                    >
+                                        <v-icon>mdi-bell-outline</v-icon>
+                                    </v-badge>
+                                </v-btn>
+                                <v-btn v-on="on" icon v-else>
                                     <v-icon>mdi-bell-outline</v-icon>
-                                </v-badge>
-                            </v-btn>
-                            <v-btn v-on="on" icon v-else>
-                                <v-icon>mdi-bell-outline</v-icon>
-                            </v-btn>
+                                </v-btn>
                             </template>
                             
-                                <v-app-bar dense flat color="white" class="notification-list-bar" fixed>
-                                    <v-toolbar-title class="nofitication-title-bar">
-                                        Notification
-                                    </v-toolbar-title>
-                                    <v-col :cols="10" class="text-right pt-1 pb-1 pr-0">
-                                        <!-- Tìm kiếm -->
-                                        <v-text-field dense
-                                            class="bg-grey sym-small-pad sym-small-size d-inline-block mr-2"
-                                            append-icon="mdi-magnify"
-                                            flat
-                                            solo
-                                            
-                                            :placeholder="$t('common.search')"
-                                        ></v-text-field>
-                                        <v-btn 
-                                            x-small 
-                                            solo
-                                            class="bg-grey h-30"
-                                            text
-                                            
-                                        >
-                                            <v-icon size="18">mdi-dots-horizontal</v-icon>
-                                        </v-btn>
-                                    </v-col>
-                                    
-                                </v-app-bar>
-                                
-                                <list-notification></list-notification>
+                            <v-app-bar dense flat color="white" class="notification-list-bar" fixed>
+                                <v-toolbar-title class="nofitication-title-bar">
+                                    Notification
+                                </v-toolbar-title>
+                                <v-col :cols="10" class="text-right pt-1 pb-1 pr-0">
+                                    <!-- Tìm kiếm -->
+                                    <v-text-field dense
+                                        class="bg-grey sym-small-pad sym-small-size d-inline-block mr-2"
+                                        append-icon="mdi-magnify"
+                                        flat
+                                        solo
+                                        
+                                        :placeholder="$t('common.search')"
+                                    ></v-text-field>
+                                    <v-btn 
+                                        x-small 
+                                        solo
+                                        class="bg-grey h-30"
+                                        text
+                                        
+                                    >
+                                        <v-icon size="18">mdi-dots-horizontal</v-icon>
+                                    </v-btn>
+                                </v-col>
+                            </v-app-bar>
                             
+                            <list-notification></list-notification>
                         </v-menu>
                     </div>
                 </div>

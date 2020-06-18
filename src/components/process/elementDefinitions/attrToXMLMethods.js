@@ -105,6 +105,7 @@ export default {
 
         let moddle = bpmnModeler.get('moddle');
         let modeling = bpmnModeler.get('modeling');
+        let mapDataObject = {};
 
         for (let item of attr.value) {
             if (!item.id || !item.name) {
@@ -125,8 +126,21 @@ export default {
             }, {
                 extensionElements: extensionElement
             });
-            el[elKey].push(dataObject);
+            mapDataObject[item.id] = dataObject;
         }
+
+        for (let idx in el[elKey]) {
+            let item = el[elKey][idx];
+            if (mapDataObject[item.id]) {
+                el[elKey][idx] = mapDataObject[item.id];
+                delete mapDataObject[item.id];
+            }
+        }
+
+        for (let objKey in mapDataObject) {
+            el[elKey].push(mapDataObject[objKey]);
+        }
+
     },
 
     notPushToXML(el, elKey, attr, bpmnModeler, attrName) {

@@ -87,7 +87,6 @@ export default class Api {
      * @returns {Object} Đối tượng có thể sử dụng như của promise
      */
     callApi(method, url, data, headers, options) {
-        console.log(method, url, data, headers, options);
 
         headers = Object.assign({
             Authorization: `Bearer ${util.auth.getToken()}`,

@@ -431,7 +431,6 @@ export default {
             });
 
             this.formulaEditor.on("blur", e => {
-                console.log(e);
                 self.$emit("change", self.getValue());
             });
         },

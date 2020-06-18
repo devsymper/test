@@ -97,7 +97,6 @@ export default {
     },
     watch: {
         "sapp.collapseSideBar": function(newVl) {
-            console.log("collapseSideBar app changed", newVl);
         }
     },
     methods: {

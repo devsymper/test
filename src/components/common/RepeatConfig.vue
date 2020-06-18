@@ -680,8 +680,6 @@ export default {
                                         d.setDate(0);
                                         d.setDate(d.getDate() - d.getDay() - (day - 6 ) + 1)
                                         let da = this.lastDayCustomOfMonth(curYear+c,value,day);
-                                        console.log(da);
-                                        
                                     }
                                     else{
                                         if(d.getDay() != day){
