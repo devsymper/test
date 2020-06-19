@@ -13,7 +13,7 @@ import Notifications from 'vue-notification'
 import VueMoment from "vue-moment";
 import moment from "moment-timezone";
 import { appConfigs } from "./configs";
-
+import actionMap from './action/index'
 
 Vue.component('ba-view', BaView);
 Vue.component('end-user-view', EndUserView);
@@ -27,10 +27,20 @@ Vue.use(VueMoment, {
  * $evtBus : component chuyên chở các sự kiện giữa tất cả các component
  */
 Vue.prototype.$evtBus = new Vue({});
-
-/**
- * Di chuyển đến một trang và tạo ra tab tương ứng
- */
+Vue.prototype.$evtBus.$on('symper-app-call-action-handeler', (action, context) => {
+        if (typeof action == 'string') {
+            action = JSON.parse(action);
+        }
+        let key = action.module + '_' + action.resource + '_' + action.scope + '_' + action.action;
+        if (actionMap[key]) {
+            actionMap[key].handler.apply(context, [action.parameter]);
+        } else {
+            console.error('[Symper action find failed]: can not find action with key :' + key, action);
+        }
+    })
+    /**
+     * Di chuyển đến một trang và tạo ra tab tương ứng
+     */
 Vue.prototype.$goToPage = function(url, title) {
     let activeTabIndex = 0;
     let urlMap = this.$store.state.app.urlToTabTitleMap;

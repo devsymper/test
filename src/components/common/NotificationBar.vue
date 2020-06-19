@@ -14,7 +14,7 @@
                 <v-row>
                     
                     <span class="notification-item-title">
-                        {{item.title}}x
+                        {{item.title}}
                     </span>
                 </v-row>
                 <v-row class="notification-item-info mt-1">
@@ -147,9 +147,7 @@ export default {
             }
         },
         openNotification(notificationItem){
-            //
-            //open new tab
-            //
+            this.$evtBus.$emit('symper-app-call-action-handeler', notificationItem.action, this)
             this.markRead(notificationItem);
             
         },

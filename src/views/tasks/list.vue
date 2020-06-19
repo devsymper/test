@@ -73,16 +73,13 @@
                                     'pt-1': !isSmallRow,
                                 }"
                     >
-                        <!-- <div style="width: 25px" class="d-inline-block h-100 pt-1">
-                                                <icon :icon="obj.icon" class="mr-2 float-left"></icon>
-                        </div>-->
                         <div class="pl-1">
                             <div class="fz-13 text-truncate d-inline-block float-left text-ellipsis w-100">{{obj.name}}</div>
                             <v-col
                                 cols="12"
                                 class="pt-0 pb-0 pr-0 pl-0 grey--text lighten-2 float-left d-flex">
                                 <div class="text-left fs-12 pr-6 text-ellipsis">
-                                    {{$t("tasks.header.id")}}: {{obj.id}}
+                                    {{obj.taskData.extraLable}} : {{obj.taskData.extraValue}}
                                 </div>
 
                                 <div class="text-right fs-12 pt-0 pb-0 pr-2 text-ellipsis" style="width: 130px" >
@@ -248,6 +245,19 @@ export default {
                     let listTasks = res.data;
                     self.allFlatTasks = [];
                     for(let task of listTasks){
+                        task.taskData = {
+                            content: '',
+                            extraLable: '',
+                            extraValue: ''
+                        };
+                        try {
+                            let taskData = JSON.parse(task.description);
+                            if(taskData){
+                                task.taskData = taskData;
+                            }
+                        } catch (error) {
+                            task.taskData.content = task.description;
+                        }
                         self.allFlatTasks.push(task);
                     }
                     this.listProrcessInstances.forEach(

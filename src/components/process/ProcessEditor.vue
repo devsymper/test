@@ -924,7 +924,6 @@ export default {
                 el.targetRef.symper_link_prev[el.sourceRef.id] = true;
             });
             let searchedNodeMap = {};
-            searchedNodeMap[nodeData.id] = true;
             let nodeToFind = 
             this.findSubmitTasksFromNode(submitTasks, currBizNode, searchedNodeMap);
             nodeData.attrs[attrName].options = submitTasks;
@@ -937,24 +936,26 @@ export default {
         // Tìm từ node hiện tại về node đầu để ra các node là submit task 
         findSubmitTasksFromNode(result, currBizNode, searchedNodeMap){
             let nodeData = this.stateAllElements[currBizNode.id];
-
+            console.log(currBizNode.id, result, searchedNodeMap);
+            
+            if(searchedNodeMap[currBizNode.id]){
+                return;
+            }
             // Nếu là UserTask và là submit hoặc là node bắt đầu quy trình và có form submit
             if(nodeData && (nodeData.type == 'UserTask' && nodeData.attrs.taskAction.value == 'submit') ||
                 (nodeData.type == 'StartNoneEvent' && nodeData.attrs.formreference.value)){
-                    if(!searchedNodeMap[nodeData.id]){
-                        result.push({
-                            id: nodeData.id,
-                            title: currBizNode.name
-                        });
-                        searchedNodeMap[nodeData.id] = true;
-                    }
+                    result.push({
+                        id: nodeData.id,
+                        title: currBizNode.name
+                    });
+                    searchedNodeMap[nodeData.id] = true;
+            }else{
+                searchedNodeMap[nodeData.id] = true;
             }
             for(let id in currBizNode.symper_link_prev){
                 let prevNode = this.$refs.symperBpmn.getElData(id);
-                if(!searchedNodeMap[id]){
-                    this.findSubmitTasksFromNode(result, prevNode.businessObject, searchedNodeMap);                
-                    searchedNodeMap[id] = true;
-                }
+                this.findSubmitTasksFromNode(result, prevNode.businessObject, searchedNodeMap);                
+                searchedNodeMap[id] = true;
             }
         },
         /**
