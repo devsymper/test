@@ -12,7 +12,6 @@
             </v-col>
             <v-col cols="11" @click="openNotification(item)">
                 <v-row>
-                    
                     <span class="notification-item-title">
                         {{item.title}}
                     </span>
@@ -20,7 +19,7 @@
                 <v-row class="notification-item-info mt-1">
                     <v-col cols="6">
                         <v-icon class="mr-2" size="12">mdi-cog</v-icon>
-                        <span>{{item.relatedObjectTitle}}</span>
+                        <span>{{item.extraLabel}} {{item.extraValue}}</span>
                     </v-col>
                     <v-col cols="6" class="text-right pr-3">
                         <span>{{$moment.unix(item.createTime).fromNow()}}</span>
