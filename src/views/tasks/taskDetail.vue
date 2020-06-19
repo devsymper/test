@@ -76,7 +76,7 @@ import relatedItems from "./relatedItems";
 import subtask from "./subtask";
 import task from "./task";
 import BPMNEngine from '../../api/BPMNEngine';
-import { getVarsFromSubmitedDoc } from '../../components/process/processAction';
+import { getVarsFromSubmitedDoc, getProcessInstanceVarsMap } from '../../components/process/processAction';
 
 export default {
     name: "taskDetail",
@@ -228,17 +228,11 @@ export default {
             
             if(this.taskAction == 'approval'){
                 this.showApprovalOutcomes(JSON.parse(this.taskInfo.approvalActions));
-                let vars = await BPMNEngine.getProcessInstanceVars(this.taskInfo.action.parameter.processInstanceId);
-                varsMap = vars.reduce((map, el) => {
-                    map[el.name] = el;
-                    return map;
-                }, {});
-                // lấy ra document object id của node được duyệt để hiển thị.
-                let approvaledElId = this.taskInfo.targetElement;
-                let docObjId = varsMap[approvaledElId+'_document_object_id'];
-                docObjId = docObjId.value;
-                // Chuyển thông tin của document object id cho phần hiển thị chi tiết document
-                // ...
+                // let varsMap = await getProcessInstanceVarsMap(this.taskInfo.action.parameter.processInstanceId);
+                // // lấy ra document object id của node được duyệt để hiển thị.
+                // let approvaledElId = this.taskInfo.targetElement;
+                // let docObjId = varsMap[approvaledElId+'_document_object_id'];
+                // docObjId = docObjId.value;
             }
         }
     }

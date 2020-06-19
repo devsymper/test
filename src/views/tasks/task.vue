@@ -1,26 +1,41 @@
 <template>
     <div class="h-100 w-100 d-flex justify-center"> 
         <DocumentSubmit 
+            v-if="action == 'submit'"
             ref="submitComponent"
             :docId="Number(docId)"
             :showSubmitButton="false"
-            @submit-document-success="onSubmitDone"
-        >
+            @submit-document-success="onSubmitDone">
 
         </DocumentSubmit>
+        <Detail 
+        v-else-if="action == 'detail'"
+        :docObjInfo="docObjInfo">
+
+        </Detail>
     </div>
 </template>
-
 <script>
 import DocumentSubmit from "./../document/submit/Submit.vue";
 import BPMNEngine from '../../api/BPMNEngine';
+import Detail from "./../document/detail/Detail";
+import { getProcessInstanceVarsMap } from '../../components/process/processAction';
 export default {
     components: {
         DocumentSubmit: DocumentSubmit
     },
+    created(){
+        console.log(this,'thissthissthissthissthissthissthissthiss');
+        
+    },
     data(){
         return {
-            docId: 0
+            docId: 0,
+            docObjInfo: {
+                docObjId: 0,
+                docName: ''
+            },
+            action: 'submit'
         }
     },
     props: {
@@ -37,11 +52,22 @@ export default {
         taskInfo: {
             deep: true,
             immediate: true,
-            handler: function (after, before) {
+            handler: async function (after, before) {
                 console.log(after, before, "after taskInfo change");
-                this.handleTaskDetailChange(after.processDefinitionId, after.taskDefinitionKey);
-                if(after.docId){
-                    this.docId = Number(after.docId);
+                if(this.taskInfo.action){
+                    let action = this.taskInfo.action.action;
+                    this.action = action;
+                    if(action == 'submit'){
+                        this.docId = Number(this.taskInfo.action.parameter.documentId);
+                    }else if(action == 'approval'){
+                        if(!this.taskInfo.action.parameter.documentObjectId){
+                            let varsMap = await getProcessInstanceVarsMap(this.taskInfo.action.parameter.processInstanceId);
+                            let approvaledElId = this.taskInfo.targetElement;
+                            let docObjId = varsMap[approvaledElId+'_document_object_id'];
+                            docObjId = docObjId.value;
+                            
+                        }
+                    }
                 }
             }
         }

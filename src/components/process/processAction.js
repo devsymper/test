@@ -1,6 +1,7 @@
 import bpmnApi from "./../../api/BPMNEngine";
 import { util } from "../../plugins/util";
 import { documentApi } from "../../api/Document";
+import BPMNEngine from "./../../api/BPMNEngine";
 
 function moveTaskTitleToNameAttr(content, configValue) {
     for (let idEl in configValue) {
@@ -186,6 +187,22 @@ export const getVarsFromSubmitedDoc = async(docData, elId, docId) => {
                 vars: vars,
                 nameAndValueMap: dataInputForFormula
             });
+        }).catch(err => {
+            reject(err);
+        });
+    });
+}
+
+
+export const getProcessInstanceVarsMap = async(processInstanceId) => {
+    return new Promise((resolve, reject) => {
+        BPMNEngine.getProcessInstanceVars(processInstanceId).then((res) => {
+            let vars = res;
+            varsMap = vars.reduce((map, el) => {
+                map[el.name] = el;
+                return map;
+            }, {});
+            resolve(varsMap);
         }).catch(err => {
             reject(err);
         });
