@@ -34,7 +34,6 @@ export default {
             default(){
                 return {
                     docObjId: 0,
-                    docName: ''
                 }
             }
         }
@@ -81,9 +80,8 @@ export default {
             deep: true,
             immediate: true,
             handler(after){
-                if(this.docObjId && this.docName){
+                if(after.docObjId){
                     this.docObjId = after.docObjId;
-                    this.documentName = after.docName;
                     this.loadDocumentObject();
                 }
             }

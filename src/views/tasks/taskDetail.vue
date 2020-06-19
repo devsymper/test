@@ -1,27 +1,17 @@
 <template>
     <v-container fluid>
-        <v-row class="ml-0 mr-0">
-            <v-col cols="8" class="pb-1 pt-1">
-                <div class="fs-13 pl-2 pt-1">
-                    App name
-                    /
-                    Object name
-                    / 
-                    task id
-                </div>
-            </v-col>
-            <v-col cols="4" class="text-right pt-1 pb-1 pr-0">
-                <!-- <v-btn small text color="warning" class="mr-2">
-                    {{$t("tasks.claim")}}
-                </v-btn> -->
+        <v-row class="ml-0 mr-0 justify-space-between">
+            <div class="fs-13 pl-2 pt-1 float-left">
+                App name / Object name /  task id
+            </div>
+            <div class="text-right pt-1 pb-1 pr-0 float-right">
                 <v-btn small depressed v-for="(action, idx) in taskActionBtns" dark :key="idx" :color="action.color" @click="saveTaskOutcome(action.value)" class="mr-2">
-                    <!-- <v-icon small class="mr-2">mdi-content-save</v-icon>  -->
                     {{action.text}}
                 </v-btn>
                 <v-btn small text  @click="closeDetail">
                     <v-icon small>mdi-close</v-icon>
                 </v-btn>
-            </v-col>
+            </div>
         </v-row>
         <v-divider style="border-width: 0.5px; border-color: #ff7400;"></v-divider>
         <v-row>

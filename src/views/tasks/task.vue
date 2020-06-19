@@ -9,12 +9,12 @@
 
         </DocumentSubmit>
         <Detail 
-        v-else-if="action == 'detail'"
-        :docObjInfo="docObjInfo">
+            v-else-if="action == 'approval'"
+            :docObjInfo="docObjInfo">
 
         </Detail>
     </div>
-</template>
+</template> 
 <script>
 import DocumentSubmit from "./../document/submit/Submit.vue";
 import BPMNEngine from '../../api/BPMNEngine';
@@ -22,7 +22,8 @@ import Detail from "./../document/detail/Detail";
 import { getProcessInstanceVarsMap } from '../../components/process/processAction';
 export default {
     components: {
-        DocumentSubmit: DocumentSubmit
+        DocumentSubmit: DocumentSubmit,
+        Detail
     },
     created(){
         console.log(this,'thissthissthissthissthissthissthissthiss');
@@ -33,7 +34,6 @@ export default {
             docId: 0,
             docObjInfo: {
                 docObjId: 0,
-                docName: ''
             },
             action: 'submit'
         }
@@ -64,8 +64,9 @@ export default {
                             let varsMap = await getProcessInstanceVarsMap(this.taskInfo.action.parameter.processInstanceId);
                             let approvaledElId = this.taskInfo.targetElement;
                             let docObjId = varsMap[approvaledElId+'_document_object_id'];
-                            docObjId = docObjId.value;
-                            
+                            this.docObjInfo.docObjId = docObjId.value;
+                        }else{
+                            this.docObjInfo.docObjId = this.taskInfo.action.parameter.documentObjectId;
                         }
                     }
                 }
