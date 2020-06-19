@@ -831,6 +831,13 @@ export default {
         
         handlerBeforeRunFormulasValue(formulasInstance,controlId,controlName,formulasType){
             let dataInput = this.getDataInputFormulas(formulasInstance);    
+            let control = this.getControlInstanceFromStore(controlName);
+            if(control.hasOwnProperty('inTable')){
+                let tableName = this.getControlInstanceFromStore(control.inTable);
+                tableName.tableInstance.handlerRunFormulasForControlInTable(controlName,dataInput,formulasInstance);
+
+            }
+            
             formulasInstance.handleBeforeRunFormulas(dataInput).then(rs=>{
                 this.handlerAfterRunFormulas(rs,controlId,controlName,formulasType)
             });
