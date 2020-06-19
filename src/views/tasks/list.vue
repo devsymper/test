@@ -229,7 +229,18 @@ export default {
         selectObject(obj) {
             if (!this.compackMode) {
                 this.sideBySideMode = true;
-                this.$set(this.selectedTask, 'taskInfo', obj);
+                let taskInfo = {};
+                try {
+                    taskInfo = JSON.parse(obj.description);
+                    if(!taskInfo){
+                        this.$snotifyError(error, "Can not parse task info");   
+                        taskInfo = {};
+                    }
+                } catch (error) {
+                    taskInfo = {};
+                    this.$snotifyError(error, "Can not parse task info");   
+                }
+                this.$set(this.selectedTask, 'taskInfo', taskInfo);
                 this.$emit("change-height", "calc(100vh - 88px)");
             }
         },

@@ -27,6 +27,7 @@ import RunInstance from "../views/process/RunInstance.vue";
 import ProcessInstances from "../views/process/ProcessInstances.vue";
 import TrackingProcessInstance from "../views/process/TrackingProcessInstance.vue";
 import WorkList from "../views/works/WorkList.vue";
+import DoTask from "../views/tasks/DoTask.vue";
 
 Vue.use(VueRouter);
 /**
@@ -197,13 +198,18 @@ const routes = [{
         component: tasks,
     },
     {
+        path: "/tasks/:id",
+        name: "tasks",
+        component: DoTask,
+    },
+    {
         path: "/works",
         name: "workList",
         component: WorkList,
     },
+];
 
-    // Luôn để 2 item này ở cuối cùng của array này để nó có thể redirect đến được trang 404 khi ko tìm thấy route
-    {
+routes.concat([{
         path: "/page-not-found",
         name: "pageNotFound",
         component: PageNotFound, //Vue component,
@@ -213,8 +219,8 @@ const routes = [{
         path: "*",
         name: "page",
         redirect: "/page-not-found",
-    },
-];
+    }
+]);
 
 /**
  * Thêm các middleware vào cho các route

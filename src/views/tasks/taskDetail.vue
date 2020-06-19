@@ -14,11 +14,11 @@
                 <!-- <v-btn small text color="warning" class="mr-2">
                     {{$t("tasks.claim")}}
                 </v-btn> -->
-                <v-btn small v-for="(action, idx) in taskActionBtns" dark :key="idx" :color="action.color" @click="saveTaskOutcome(action.value)" class="mr-2">
+                <v-btn small depressed v-for="(action, idx) in taskActionBtns" dark :key="idx" :color="action.color" @click="saveTaskOutcome(action.value)" class="mr-2">
                     <!-- <v-icon small class="mr-2">mdi-content-save</v-icon>  -->
                     {{action.text}}
                 </v-btn>
-                <v-btn small text @click="closeDetail">
+                <v-btn small text  @click="closeDetail">
                     <v-icon small>mdi-close</v-icon>
                 </v-btn>
             </v-col>
@@ -171,23 +171,22 @@ export default {
             if(this.taskAction == 'submit'){
                 this.$refs.task[0].submitForm(value);
             }else if(this.taskAction == 'approval'){
-                if(this.taskInfo.id){
-                    let taskData = {
-                        // action nhận 1 trong 4 giá trị: complete, claim, resolve, delegate
-                        "action": "complete",
-                        "assignee": "1",
-                        // "formDefinitionId": "12345",
-                        "outcome": value,
-                        // "variables": [],
-                        // "transientVariables": []
-                    }
-                    this.submitTask(taskData);
+                let taskData = {
+                    // action nhận 1 trong 4 giá trị: complete, claim, resolve, delegate
+                    "action": "complete",
+                    "assignee": "1",
+                    // "formDefinitionId": "12345",
+                    "outcome": value,
+                    // "variables": [],
+                    // "transientVariables": []
                 }
+                this.submitTask(taskData);
             }
         },
         async submitTask(taskData){
             try {
-                let result = await BPMNEngine.actionOnTask(this.taskInfo.id, taskData);   
+                let taskId = this.taskInfo.action.parameter.taskId;
+                let result = await BPMNEngine.actionOnTask(taskId, taskData);   
                 this.$snotifySuccess("Task completed!");
             } catch (error) {
                 this.$snotifyError(error, "Can not submit task!")
@@ -218,36 +217,26 @@ export default {
 
             this.taskActionBtns = approvalActions;
         },
+
+        // lấy data mới dựa theo data của task
         async changeTaskDetail(){
-            if(!this.taskInfo.processDefinitionId){
-                return;
+            if(!this.taskInfo.action){
+                return
             }
-            let taskNodeId = this.taskInfo.taskDefinitionKey;
             let varsMap = {};
-
-            // Lấy ra data model của process definition
-            let processModel = await BPMNEngine.getDefinitionModel(this.taskInfo.processDefinitionId);
-            let taskNode = processModel.processes[0].flowElementMap[taskNodeId];
-            let symperTaskPropsMap = {};
-            for(let item of taskNode.formProperties){
-                let propKey = item.id.replace(taskNodeId+'___', '');
-                symperTaskPropsMap[propKey] = item;
-            }
-
-            this.taskAction = symperTaskPropsMap.taskAction.defaultExpression;
-
-            // tạo ra map theo tên của variables
+            this.taskAction = this.taskInfo.action.action;
+            
             if(this.taskAction == 'approval'){
-                this.showApprovalOutcomes(symperTaskPropsMap.approvalActions.defaultExpression);
-                let vars = await BPMNEngine.getProcessInstanceVars(this.taskInfo.processInstanceId);
+                this.showApprovalOutcomes(JSON.parse(this.taskInfo.approvalActions));
+                let vars = await BPMNEngine.getProcessInstanceVars(this.taskInfo.action.parameter.processInstanceId);
                 varsMap = vars.reduce((map, el) => {
                     map[el.name] = el;
                     return map;
                 }, {});
                 // lấy ra document object id của node được duyệt để hiển thị.
-                let approvaledElId = symperTaskPropsMap.approvalForElement.defaultExpression;
+                let approvaledElId = this.taskInfo.targetElement;
                 let docObjId = varsMap[approvaledElId+'_document_object_id'];
-
+                docObjId = docObjId.value;
                 // Chuyển thông tin của document object id cho phần hiển thị chi tiết document
                 // ...
             }

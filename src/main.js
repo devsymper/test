@@ -27,20 +27,29 @@ Vue.use(VueMoment, {
  * $evtBus : component chuyên chở các sự kiện giữa tất cả các component
  */
 Vue.prototype.$evtBus = new Vue({});
-Vue.prototype.$evtBus.$on('symper-app-call-action-handeler', (action, context) => {
-        if (typeof action == 'string') {
+Vue.prototype.$evtBus.$on('symper-app-call-action-handeler', (action, context, extraParams) => {
+    if (typeof action == 'string') {
+        try {
             action = JSON.parse(action);
+            if (!action) {
+                action = {};
+            }
+        } catch (error) {
+            action = {};
         }
-        let key = action.module + '_' + action.resource + '_' + action.scope + '_' + action.action;
-        if (actionMap[key]) {
-            actionMap[key].handler.apply(context, [action.parameter]);
-        } else {
-            console.error('[Symper action find failed]: can not find action with key :' + key, action);
-        }
-    })
-    /**
-     * Di chuyển đến một trang và tạo ra tab tương ứng
-     */
+    }
+    action.parameter = Object.assign(action.parameter, extraParams);
+    let key = action.module + '_' + action.resource + '_' + action.scope + '_' + action.action;
+    if (actionMap[key]) {
+        actionMap[key].handler.apply(context, [action.parameter]);
+    } else {
+        console.error('[Symper action find failed]: can not find action with key :' + key, action);
+    }
+})
+
+/**
+ * Di chuyển đến một trang và tạo ra tab tương ứng
+ */
 Vue.prototype.$goToPage = function(url, title) {
     let activeTabIndex = 0;
     let urlMap = this.$store.state.app.urlToTabTitleMap;

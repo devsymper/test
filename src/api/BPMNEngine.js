@@ -104,6 +104,9 @@ export default {
     getTask(filter) {
         return bpmneApi.get(appConfigs.apiDomain.bpmne.tasks, filter, testHeader);
     },
+    getATaskInfo(taskId) {
+        return bpmneApi.get(appConfigs.apiDomain.bpmne.tasks + '/' + taskId, {}, testHeader);
+    },
     actionOnTask(id, data) {
         data = JSON.stringify(data);
         return bpmneApi.post(appConfigs.apiDomain.bpmne.tasks + '/' + id, data, testHeader, { dataType: 'text' });

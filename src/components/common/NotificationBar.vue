@@ -147,7 +147,10 @@ export default {
             }
         },
         openNotification(notificationItem){
-            this.$evtBus.$emit('symper-app-call-action-handeler', notificationItem.action, this)
+            let extraParams = {
+                openInNewTab: true
+            };
+            this.$evtBus.$emit('symper-app-call-action-handeler', notificationItem.action, this, extraParams)
             this.markRead(notificationItem);
             
         },
