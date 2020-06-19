@@ -221,4 +221,7 @@ export default {
 .sym-form-submit >>> .ht_clone_left.handsontable table.htCore {
     border-right: none;
 }
+.s-control-label{
+    background: none !important;
+}
 </style>

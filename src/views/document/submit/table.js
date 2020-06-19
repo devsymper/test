@@ -101,6 +101,7 @@ export default class Table {
             this.currentControlSelected = null
             this.event = {
                 afterSelection: (row, column, row2, column2, preventScrolling, selectionLayerLevel) => {
+                    SYMPER_APP.$evtBus.$emit("symper-app-wrapper-clicked", event);
                     thisObj.currentSelectedCell['row'] = row;
                     thisObj.currentSelectedCell['column'] = column;
                     store.commit("document/addToDocumentSubmitStore", {
@@ -117,6 +118,7 @@ export default class Table {
                     if (thisObj.getCellSelectedType(column) == 'time') {
                         // SYMPER_APP.$evtBus.$emit('document-submit-show-time-picker', { event: event });
                     };
+
                 },
                 afterBeginEditing: function(row, column) {
                     // nêu cell click là control select
@@ -656,8 +658,8 @@ export default class Table {
             rsl.timeFormat = 'HH:mm:ss',
                 rsl.correctFormat = true;
         }
-        console.log('gf',type);
-        
+        console.log('gf', type);
+
         rsl.type = Util.toLowerCaseFirstCharacter(supportCellsType[type].replace('Renderer', ''));
 
         return rsl;
