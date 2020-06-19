@@ -40,4 +40,15 @@
 .mdi-checkbox-blank-circle {
     color: red;
     font-size: 6px;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.link-icon {
+    color: blue;
+    font-size: 13px;
+    position: absolute;
+    top: 0;
+    right: 0;
 }

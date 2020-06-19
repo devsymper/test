@@ -44,7 +44,7 @@ const supportCellsType = {
     currency: 'NumericRenderer',
     number: 'NumericRenderer',
     date: 'DateRenderer',
-    datetime: 'DatetimeRenderer',
+    dateTime: 'DatetimeRenderer',
     time: 'TimeRenderer',
     image: 'ImageRenderer',
     fileUpload: 'FileRenderer',
@@ -125,9 +125,6 @@ export default class Table {
                     };
                 },
                 beforeKeyDown: function(event) {
-                    // chặn bấm lên xuống trái phải khi có autocomplete
-
-
                     if (event.keyCode != 40 && event.keyCode != 38 &&
                         event.keyCode != 37 && event.keyCode != 39 &&
                         thisObj.isAutoCompleting == false) {
@@ -137,6 +134,7 @@ export default class Table {
                             thisObj.isAutoCompleting = formulasInstance;
                         }
                     }
+                    // chặn bấm lên xuống trái phải khi có autocomplete
                     if ((event.keyCode == 40 || event.keyCode == 38 ||
                             event.keyCode == 37 || event.keyCode == 39) && thisObj.isAutoCompleting != false) {
                         event.stopImmediatePropagation();
@@ -165,8 +163,6 @@ export default class Table {
                 },
 
                 afterChange: function(changes, source) {
-
-
                     let controlName = changes[0][1];
                     let columns = thisObj.columnsInfo.columns;
                     let currentRowData = thisObj.tableInstance.getDataAtRow(thisObj.currentSelectedCell['row']);
@@ -609,8 +605,6 @@ export default class Table {
         let hiddenColumns = [];
         let num = 0;
         let ths = thisObj.controlObj.ele.find('th');
-        console.log('nnj', thisObj.controlObj.listInsideControls);
-
         for (let controlName in thisObj.controlObj.listInsideControls) {
             headerName.push($(ths[num]).text());
             // Lấy celltype
@@ -623,7 +617,10 @@ export default class Table {
             //Đánh số thứ tự các cột trong bảng
             thisObj.colName2Idx[controlName] = num;
             //ẩn cột
-            if (listInputInDocument[controlName].controlProperties.isHidden == 1) {
+
+            if (listInputInDocument[controlName].controlProperties.hasOwnProperty('isHidden') &&
+                (listInputInDocument[controlName].controlProperties.isHidden.value == 1 ||
+                    listInputInDocument[controlName].controlProperties.isHidden.value == "1")) {
                 hiddenColumns.push(num);
             }
 
@@ -659,6 +656,8 @@ export default class Table {
             rsl.timeFormat = 'HH:mm:ss',
                 rsl.correctFormat = true;
         }
+        console.log('gf',type);
+        
         rsl.type = Util.toLowerCaseFirstCharacter(supportCellsType[type].replace('Renderer', ''));
 
         return rsl;
@@ -686,7 +685,7 @@ export default class Table {
                 }
             }
 
-            if (isDetailView) {
+            if (thisObj.checkDetailView()) {
                 let indx = prop + '_' + row;
                 if (changedVlCtrlCoord[indx]) {
                     td.classList.add('changed-input');

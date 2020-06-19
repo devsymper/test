@@ -44,8 +44,24 @@ export default class BasicControl extends Control {
     }
 
     render() {
-        if (this.controlFormulas['require'] != undefined && this.controlFormulas.require.formulasId != 0) {
+        let thisCpn = this;
+        this.ele.val(this.value)
+        this.ele.wrap('<span style="position:relative;">');
+        this.ele.attr('key-instance', this.curParentInstance);
+        if (this.controlProperties['isRequired'] != undefined &&
+            (this.controlProperties['isRequired'].value == "1" ||
+                this.controlProperties['isRequired'].value == 1)) {
             this.renderValidateIcon();
+        }
+        if (this.controlProperties['isReadOnly'] != undefined &&
+            (this.controlProperties['isReadOnly'].value == "1" ||
+                this.controlProperties['isReadOnly'].value == 1)) {
+            this.ele.attr('disabled', 'disabled')
+        }
+        if (this.controlProperties['isHidden'] != undefined &&
+            (this.controlProperties['isHidden'].value == "1" ||
+                this.controlProperties['isHidden'].value == 1)) {
+            this.ele.css({ 'display': 'none' })
         }
 
         if (this.controlFormulas.hasOwnProperty('autocomplete') && this.controlFormulas.autocomplete.instance != undefined) {
@@ -55,10 +71,7 @@ export default class BasicControl extends Control {
             this.ele.addClass('detail-view')
             this.ele.attr('disabled', 'disabled')
         }
-        let thisCpn = this;
-        this.ele.val(this.value)
-        this.ele.wrap('<span style="position:relative;">');
-        this.ele.attr('key-instance', this.curParentInstance);
+
         this.ele.on('change', function(e) {
             SYMPER_APP.$evtBus.$emit('document-submit-input-change', { controlName: thisCpn.controlProperties.name.value, val: $(e.target).val() })
         })
@@ -345,14 +358,38 @@ export default class BasicControl extends Control {
         }
         return vl;
     }
-    renderValidateIcon() {
-        let icon = `<span class="mdi mdi-checkbox-blank-circle validate-icon"></span>`
+    renderValidateIcon(message) {
+        let icon = `<span class="mdi mdi-checkbox-blank-circle validate-icon" title="Không được bỏ trống trường này"></span>`
         this.ele.parent().append(icon);
-        $('.mdi-checkbox-blank-circle').on('click', function(e) {
+        this.ele.parent().find('.mdi-checkbox-blank-circle').on('click', function(e) {
+            e.msg = message;
             SYMPER_APP.$evtBus.$emit('document-submit-open-validate', e)
         })
     }
+    removeRequire() {
+        this.ele.parent().find('.validate-icon').remove();
+    }
+    isEmpty() {
+            return this.ele.val() == ""
+        }
+        // hàm kiểm tra là view detail hay submit
     checkDetailView() {
-        return sDocument.state.isDetailView;
+            return sDocument.state.isDetailView;
+        }
+        // hàm kiểm tra control này có thuộc tính require hay không
+    isRequiredControl() {
+        if (this.controlProperties['isRequired'] != undefined &&
+            (this.controlProperties['isRequired'].value == "1" ||
+                this.controlProperties['isRequired'].value == 1)) {
+            return true;
+        }
+        return false;
+    }
+    renderLinkToControl(link) {
+        let icon = `<span class="mdi mdi-information link-icon" title="` + link + `"></span>`
+        this.ele.parent().append(icon);
+        this.ele.parent().find('.link-icon').on('click', function(e) {
+            window.open(link);
+        })
     }
 }
