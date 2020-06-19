@@ -45,15 +45,16 @@ export default class BasicControl extends Control {
 
     render() {
         let thisCpn = this;
-        this.ele.val(this.value)
         this.ele.wrap('<span style="position:relative;">');
         this.ele.attr('key-instance', this.curParentInstance);
-        if (this.controlProperties['isRequired'] != undefined &&
+        if (!this.checkDetailView() &&
+            this.controlProperties['isRequired'] != undefined &&
             (this.controlProperties['isRequired'].value == "1" ||
                 this.controlProperties['isRequired'].value == 1)) {
             this.renderValidateIcon();
         }
-        if (this.controlProperties['isReadOnly'] != undefined &&
+        if (!this.checkDetailView() &&
+            this.controlProperties['isReadOnly'] != undefined &&
             (this.controlProperties['isReadOnly'].value == "1" ||
                 this.controlProperties['isReadOnly'].value == 1)) {
             this.ele.attr('disabled', 'disabled')
@@ -67,10 +68,7 @@ export default class BasicControl extends Control {
         if (this.controlFormulas.hasOwnProperty('autocomplete') && this.controlFormulas.autocomplete.instance != undefined) {
             this.addAutoCompleteEvent();
         }
-        if (this.checkDetailView()) {
-            this.ele.addClass('detail-view')
-            this.ele.attr('disabled', 'disabled')
-        }
+
 
         this.ele.on('change', function(e) {
             SYMPER_APP.$evtBus.$emit('document-submit-input-change', { controlName: thisCpn.controlProperties.name.value, val: $(e.target).val() })
@@ -117,6 +115,11 @@ export default class BasicControl extends Control {
             this.renderSelectControl();
         } else if (this.ele.hasClass('s-control-label')) {
             this.renderLabelControl();
+        }
+        this.ele.val(this.value)
+        if (this.checkDetailView()) {
+            this.ele.addClass('detail-view')
+            this.ele.attr('disabled', 'disabled')
         }
 
     }
