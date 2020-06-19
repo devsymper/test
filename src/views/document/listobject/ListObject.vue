@@ -33,7 +33,7 @@ export default {
                     name: "detail",
                     text: "Xem chi tiết",
                     callback: (documentObject, callback) => {
-                        this.$goToPage('/document/'+this.documentName+'/object/'+documentObject.document_object_id,"Danh sách bản ghi");
+                        this.$goToPage('/document/objects/'+documentObject.document_object_id,"Danh sách bản ghi");
                     },
                 },
                 {

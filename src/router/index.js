@@ -135,7 +135,7 @@ const routes = [{
 
     },
     {
-        path: "/document/:name?/object/:id?",
+        path: "/document/objects/:id?",
         name: "detailDocument",
         component: DetailDocument,
 

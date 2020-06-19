@@ -51,7 +51,6 @@ export default {
         return {
             contentDocument: null,
             docObjId: null,
-            documentName: null,
             docSize: null,
             keyInstance: Date.now(),
         };
@@ -65,12 +64,12 @@ export default {
             value: true
         });
         let thisCpn = this;
+        console.log('ok',this.$route.params);
+        
         if (this.docObjId != 0 && this.docName != "") {
             this.docObjId = this.docObjId;
-            this.documentName = this.docName;
         } else if (this.$route.name == "detailDocument") {
             this.docObjId = this.$route.params.id;
-            this.documentName = this.$route.params.name;
         }
         if(this.docObjId != null)
         this.loadDocumentObject();  
@@ -93,10 +92,10 @@ export default {
     methods: {
         
         // Khadm: load data của document lên để hiển thị và xử lý
-        loadDocumentStruct() {
+        loadDocumentStruct(documentId) {
             let thisCpn = this;
             documentApi
-                .detailDocumentByName(this.documentName)
+                .detailDocument(documentId)
                 .then(res => {
                     if (res.status == 200) {
                         let content = res.data.document.content;
@@ -115,15 +114,14 @@ export default {
         loadDocumentObject() {
             let thisCpn = this;
             documentApi
-                .getDocumentObject(this.documentName,this.docObjId)
+                .getDocumentObject(this.docObjId)
                 .then(res => {
                     if (res.status == 200) {
-                        console.log(res);
                         thisCpn.$store.commit('document/addToDocumentDetailStore',{
                             key: 'allData',
                             value: res.data
                         })
-                        thisCpn.loadDocumentStruct();
+                        thisCpn.loadDocumentStruct(res.data.documentId);
                     }
                 })
                 .catch(err => {
