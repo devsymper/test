@@ -119,7 +119,7 @@ export const collectInfoForTaskDescription = function(allVizEls, allSymEls, bpmn
                     }
                 },
                 content: el.attrs.notificationContent.value,
-                extraLable: el.attrs.extraInfoLabel.value,
+                extraLabel: el.attrs.extraInfoLabel.value,
                 extraValue: el.attrs.extraInfoValue.value,
                 approvalActions: '',
                 targetElement: '',

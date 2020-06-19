@@ -82,7 +82,7 @@
                                 cols="12"
                                 class="pt-0 pb-0 pr-0 pl-0 grey--text lighten-2 float-left d-flex">
                                 <div class="text-left fs-12 pr-6 text-ellipsis">
-                                    {{obj.taskData.extraLable}}   {{obj.taskData.extraValue}}
+                                    {{obj.taskData.extraLabel}}   {{obj.taskData.extraValue}}
                                 </div>
 
                                 <div class="text-right fs-12 pt-0 pb-0 pr-2 text-ellipsis" style="width: 130px" >
@@ -262,7 +262,7 @@ export default {
                     for(let task of listTasks){
                         task.taskData = {
                             content: '',
-                            extraLable: '',
+                            extraLabel: '',
                             extraValue: ''
                         };
                         try {
