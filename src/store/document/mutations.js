@@ -234,6 +234,8 @@ const addToDocumentDetailStore = (state, params) => {
 const addToDocumentStore = (state, params) => {
     let key = params.key
     let value = params.value
+    console.log('kjh', params);
+
     Vue.set(state, key, value);
 }
 

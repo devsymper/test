@@ -801,7 +801,6 @@ export default {
         },
 
         setDocumentProperties(documentProp){
-             console.log('3322',documentProp);
             this.$refs.saveDocPanel.setPropsOfDoc(documentProp);
         },
         //hoangnd: hàm set các giá trị của thuộc tính và formulas vào từng contrl trong doc lúc load dữ liệu và đưa vào state
