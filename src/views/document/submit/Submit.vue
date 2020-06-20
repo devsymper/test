@@ -852,9 +852,11 @@ export default {
             for(let inputControlName in inputControl){
                 console.log(inputControlName);
                 console.log(this.sDocumentSubmit.listInputInDocument[inputControlName]);
+                if(this.sDocumentSubmit.listInputInDocument.hasOwnProperty(inputControlName)){
+                    let valueInputControlItem = this.sDocumentSubmit.listInputInDocument[inputControlName].value;
+                    dataInput[inputControlName] = valueInputControlItem;
+                }
                 
-                let valueInputControlItem = this.sDocumentSubmit.listInputInDocument[inputControlName].value;
-                dataInput[inputControlName] = valueInputControlItem;
             }
             return dataInput;
         },
@@ -993,15 +995,23 @@ export default {
          */
         findRootControl(){ 
             let listInput = this.sDocumentSubmit.listInputInDocument;
+            
             for(let controlName in listInput){
+                console.log('lkjk',controlName);
+
                 this.setAllImpactedFieldsList(controlName);
                 let controlInstance = listInput[controlName];
+                    console.log('lkjk',controlName,controlInstance);
+
                 if(Object.keys(controlInstance.controlFormulas).length > 0){
                     let controlFormulas = controlInstance.controlFormulas;
+                    
                      for(let formulasType in controlFormulas){
                         if(controlFormulas[formulasType].hasOwnProperty('instance')){
                             let formulasInstance = controlFormulas[formulasType].instance;
                             if(formulasInstance.getFormulas() != ""){
+                                console.log('lkjk',controlName);
+                                
                                 this.handlerBeforeRunFormulasValue(formulasInstance,controlInstance.id,controlName,formulasType)
                             }
                         }
