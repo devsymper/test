@@ -1,7 +1,7 @@
 import sDocument from './../../../store/document'
 let dataSubmitStore = sDocument.state.submit
 import ClientSQLManager from "./clientSQLManager.js";
-import { documentServiceApi } from "./../../../api/DocumentService";
+import { formulasApi } from "./../../../api/Formulas";
 import Util from "./util";
 export default class Formulas {
     constructor(keyInstance, formulas, type) {
@@ -32,13 +32,17 @@ export default class Formulas {
          */
     async handleBeforeRunFormulas(dataInput, inject = "") {
             let listSyql = this.getReferenceFormulas();
+
+
             let script = this.formulas;
             if (listSyql != null && listSyql.length > 0) {
                 for (let i = 0; i < listSyql.length; i++) {
                     let syql = listSyql[i].trim();
                     syql = syql.replace('ref(', '');
                     syql = syql.substring(0, syql.length - 1);
-
+                    if (Object.keys(dataInput).length == 0) {
+                        dataInput = false;
+                    }
                     let res = await this.runSyql(syql, dataInput);
 
                     let beforeStr = this.checkBeforeReferenceFormulas(script, listSyql[i].trim());
@@ -184,17 +188,18 @@ export default class Formulas {
     }
 
     runSyql(formulas, dataInput = false) {
-            let syql = this.replaceParamsToData(this.getDataInputFormulas(), formulas);
+            let syql = formulas;
             if (dataInput != false) {
                 syql = this.replaceParamsToData(dataInput, formulas);
             }
 
-            return documentServiceApi.query({ query: syql });
+            return formulasApi.execute({ formula: syql });
         }
         /**
          * Hàm chạy công thức
          */
     runSQLLiteFormulas(sql, returnPromise = false, inject = false) {
+        // console.log('kjhf', sql);
 
         if (inject != false) {
             sql = sql.replace('SELECT ', 'SELECT ' + inject + ',');

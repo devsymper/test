@@ -830,6 +830,7 @@ export default {
         },
         
         handlerBeforeRunFormulasValue(formulasInstance,controlId,controlName,formulasType){
+            
             let dataInput = this.getDataInputFormulas(formulasInstance);    
             let control = this.getControlInstanceFromStore(controlName);
             if(control.hasOwnProperty('inTable')){
@@ -877,7 +878,7 @@ export default {
                         }
                     }
                     else{
-                        let data = rs.data;
+                        let data = rs.data.data;
                         if(data.length > 0){
                             value=data[0][Object.keys(data[0])[0]];
                         }
@@ -997,12 +998,9 @@ export default {
             let listInput = this.sDocumentSubmit.listInputInDocument;
             
             for(let controlName in listInput){
-                console.log('lkjk',controlName);
 
                 this.setAllImpactedFieldsList(controlName);
                 let controlInstance = listInput[controlName];
-                    console.log('lkjk',controlName,controlInstance);
-
                 if(Object.keys(controlInstance.controlFormulas).length > 0){
                     let controlFormulas = controlInstance.controlFormulas;
                     
@@ -1010,8 +1008,6 @@ export default {
                         if(controlFormulas[formulasType].hasOwnProperty('instance')){
                             let formulasInstance = controlFormulas[formulasType].instance;
                             if(formulasInstance.getFormulas() != ""){
-                                console.log('lkjk',controlName);
-                                
                                 this.handlerBeforeRunFormulasValue(formulasInstance,controlInstance.id,controlName,formulasType)
                             }
                         }

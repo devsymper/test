@@ -64,7 +64,9 @@ export default {
             isShowModelSaveDoc:false,
         }
     },
-   
+    created(){
+        this.setPropsOfDoc({});
+    },
     methods:{
         showDialog(){
             this.isShowModelSaveDoc = true
