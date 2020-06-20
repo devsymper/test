@@ -1,11 +1,13 @@
 <template>
     <div class="home">
-        <TimelineTreeview>
+        <!-- <TimelineTreeview>
             <template slot="tree-item-content" slot-scope="{itemData}">
                 <i :class="'mdi mr-2 ' +itemData.icon"></i>
                 <span>{{itemData.name}}</span>
             </template>
-        </TimelineTreeview>
+        </TimelineTreeview> -->
+        <FormulaEditor v-model="formula">
+        </FormulaEditor>
     </div>
 </template>
 
@@ -14,9 +16,8 @@ import FormTpl from "./../components/common/FormTpl.vue";
 import OrgchartSelector from "./../components/user/OrgchartSelector.vue";
 import TimelineTreeview from "./../components/common/TimelineTreeview";
 import Handsontable from 'handsontable';
+import FormulaEditor from "./../components/formula/editor/FormulaEditor";
 
-
-console.log(Handsontable);
 
 export default {
     name: "Home",
@@ -27,6 +28,7 @@ export default {
     },
     data() {
         return {
+            formula: 'SELECT * FROM abc',
             testModel: [{"idNode":"14bcc081-771e-490a-8254-bced2d7acab2","idOrgchart":"689"},{"idNode":"919ba806-73e5-4cb6-bbd8-6c7e3c44455a","idOrgchart":"689"}],
             num: 0,
             allInputs: {
@@ -66,7 +68,8 @@ export default {
     components: {
         "form-tpl": FormTpl,
         'orgchart-selector': OrgchartSelector,
-        TimelineTreeview
+        TimelineTreeview,
+        FormulaEditor: FormulaEditor
     }
 };
 </script>
