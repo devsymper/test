@@ -278,6 +278,8 @@ export default {
         },
         // mở modal lưu , edit doc
         openPanelSaveDocument(){
+            if(this.documentId == undefined || this.documentId == 0)
+            this.setDocumentProperties({})
             this.$refs.saveDocPanel.showDialog()
         },
         /**
