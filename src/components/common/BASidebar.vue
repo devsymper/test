@@ -31,7 +31,7 @@
                 <v-list-item-content>
                     <v-list-item-title>
                         <span class="mt-1 position-relative" style="top: 5px; position: relative;">
-                            {{ sapp.baInfo.name }}
+                            {{ sapp.baInfo.name ? sapp.baInfo.name : sapp.endUserInfo.displayName }}
                         </span> 
                         <v-tooltip top>
                             <template v-slot:activator="{ on }">
@@ -42,7 +42,7 @@
                         </v-tooltip>
                     </v-list-item-title>
                     <div class="w-100 mb-1 ">
-                        <div class="w-100 d-flex"  style="color: rgba(0, 0, 0, 0.54)">
+                        <div class="w-100 d-flex" v-if="sapp.baInfo.name"  style="color: rgba(0, 0, 0, 0.54)">
                             
                             <v-tooltip top>
                                 <template v-slot:activator="{ on }">
