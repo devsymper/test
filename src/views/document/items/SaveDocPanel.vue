@@ -10,11 +10,9 @@
             <h4 class="headline">Lưu Document</h4>
             <v-divider></v-divider>
             <v-card-text style="height: calc(100% - 84px);    overflow: auto;">
-            
                 <div id="setting-control-table" class="setting-control-table">
                     <div class="content-setting-control-table">
                         <form-save-doc :allInputs="documentProps"/>
-                        
                     </div>
                 </div>
             </v-card-text>
@@ -56,24 +54,18 @@ export default {
         editorStore(){ 
             return this.$store.state.document.editor;
         },
-    },
-  
-    beforeMount(){
-        this.setPropsOfDoc({})
+        documentProps(){
+            return this.$store.state.document.documentProps
+        }
     },
     data(){
         return {
             listRows:[],
             isShowModelSaveDoc:false,
-            documentProps:null
-           
         }
     },
    
     methods:{
-        setListRow(listRows){
-            this.listRows = listRows;
-        },
         showDialog(){
             this.isShowModelSaveDoc = true
         },
@@ -87,7 +79,7 @@ export default {
             this.hideDialog();
         },
         setPropsOfDoc(props){
-            this.documentProps = {
+            let docProps = {
                 name : { 
                     title: "Tên document",
                     type: "text",
@@ -134,12 +126,10 @@ export default {
                     value: (props.note != undefined) ? props.note : '',
                 }
             }
+            this.$store.commit('document/addToDocumentStore',{key: 'documentProps',value :docProps})
         }
         
     },
-    mounted(){
-        
-    }
 }
 </script>
 <style scoped>

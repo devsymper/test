@@ -63,7 +63,8 @@ const defaultState = {
     detail: {
         allData: null
     },
-    isDetailView: false
+    isDetailView: false,
+    documentProps: {},
 };
 
 export default defaultState;

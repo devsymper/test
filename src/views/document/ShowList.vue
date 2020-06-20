@@ -1,7 +1,7 @@
 <template>
     <list-items
         ref="listDocument"
-        :getDataUrl="'https://v2hoangnd.dev.symper.vn/document'"   
+        :getDataUrl="'https://sdocument-management.symper.vn/documents'"   
         :useDefaultContext="false"
         :tableContextMenu="tableContextMenu"
         :pageTitle="$t('document.title')"

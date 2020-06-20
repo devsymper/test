@@ -404,7 +404,9 @@ export default {
          */
         allInputs: {
             type: Object,
-            default: {}
+            default() {
+                return {};
+            }
         },
         /**
          * Label và input có nằm trên cùng một dòng không
