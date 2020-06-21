@@ -122,6 +122,7 @@ import {
     VTextarea
 } from "vuetify/lib";
 import TreeValidate from "./../../views/document/sideright/items/FormValidateTpl.vue";
+import FormulaEditor from "./../formula/editor/FormulaEditor";
 // import FormulaEditor from "./../common/FormulaEditor";
 import DateFormat from "./../common/DateFormat";
 import NumberFormat from "./../common/NumberFormat";
@@ -451,7 +452,7 @@ export default {
         VSwitch,
         VTextarea,
         "v-tree-validate": TreeValidate,
-        // FormulaEditor,
+        FormulaEditor,
         DataTable,
         "date-format":DateFormat,
         "number-format":NumberFormat,

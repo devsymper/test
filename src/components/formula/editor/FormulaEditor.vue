@@ -1,6 +1,6 @@
 <template>
-    <div style="width: 400px; height: 300px">
-        <code-editor    
+    <div class="h-100 w-100" :style="{height: height}">
+        <code-editor
             :ref="'edt-script'" 
             v-model="lazyValue" 
             @init="editorInit" 
@@ -8,7 +8,7 @@
             lang="sql" 
             theme="chrome" 
             width="100%" 
-            height="100%">
+            :height="height">
         </code-editor>
     </div>
 </template>
@@ -85,6 +85,14 @@ export default {
                 return [];
             }
         },
+        height: {
+            type: String,
+            default: "500px"
+        },
+        simpleMode: {
+            type: Boolean,
+            default: false
+        }
     },
     methods:{
         async handleEditorInput(formula){
@@ -114,7 +122,7 @@ export default {
                 showPrintMargin: false,
                 enableLiveAutocompletion: true,
                 indentedSoftWrap: false,
-                showGutter: true,
+                showGutter: !this.simpleMode,
             });
             this.customAceEditorSetting(edt);
         },
