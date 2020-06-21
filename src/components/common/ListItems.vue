@@ -349,6 +349,9 @@ export default {
             savedTableDisplayConfig: [] // cấu hình hiển thị của table đã được lueu trong db
         };
     },
+    activated(){
+        this.$refs.dataTable.hotInstance.render();
+    },
     created() {
         let thisCpn = this;
         // this.$evtBus.$on("change-user-locale", locale => {
@@ -464,9 +467,6 @@ export default {
         }
     },
     mounted() {},
-    activated() {
-        
-    },
     computed: {
         currentItemDataClone() {
             return util.cloneDeep(this.currentItemData);
