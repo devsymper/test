@@ -65,6 +65,7 @@ const defaultState = {
     },
     isDetailView: false,
     documentProps: {},
+    listAllDocument: [] // Khadm: danh sách tất cả các document được active, phục vụ cho việc  autocomplete trong script editor
 };
 
 export default defaultState;

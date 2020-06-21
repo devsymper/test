@@ -239,6 +239,19 @@ const addToDocumentStore = (state, params) => {
     Vue.set(state, key, value);
 }
 
+/**
+ * Khadm:
+ * Set tất cả các document để cache lại
+ */
+const setAllDocuments = (state, docs) => {
+    docs = docs.reduce((obj, el) => {
+        obj[el.name] = el;
+        el.allFields = null;
+        return obj;
+    }, {});
+    Vue.set(state, 'listAllDocument', docs);
+}
+
 
 export {
     addControl,
@@ -256,7 +269,8 @@ export {
     addToImpactedFieldsList,
     addToDocumentSubmitStore,
     addToDocumentDetailStore,
-    addToDocumentStore
+    addToDocumentStore,
+    setAllDocuments
 
 
 };
