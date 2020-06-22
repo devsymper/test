@@ -1,6 +1,6 @@
 <template>
     <div class="h-100 w-100">
-        <v-row class="ml-0 mr-0 justify-space-between">
+        <v-row class="ml-0 mr-0 justify-space-between" style="    line-height: 31px;">
             <div class="fs-13 pl-2 pt-1 float-left">
                 App name / Object name /  task id
             </div>
@@ -13,7 +13,7 @@
                 </v-btn>
             </div>
         </v-row>
-        <v-divider style="border-width: 0.5px; border-color: #ff7400;"></v-divider>
+        <v-divider style="border-color: #ff7400;"></v-divider>
         <v-row class="ma-0">
             <v-col cols="12" class="pa-0">
                 <v-card flat>
@@ -44,6 +44,7 @@
                                     @task-submited="handleTaskSubmited" 
                                     :is="item.content"
                                     :taskInfo="taskInfo"
+                                    :tabData="tabsData[item.tab]"
                                     :ref="item.tab">
                                 </component>
                             </VuePerfectScrollbar>
@@ -104,6 +105,20 @@ export default {
     },
     data: function() {
         return {
+            tabsData: {
+                people: {
+                    assignee: [],
+                    owner: [],
+                    participant: [],
+                    watcher: []
+                },
+                task: {},
+                'sub-task': {},
+                attachment: {},
+                comment: {},
+                info: {},
+                'related-items': {}
+            },
             taskActionBtns: [
                 {
                     text:"Submit",
@@ -158,7 +173,28 @@ export default {
             ],
         }
     },
+    computed: {
+        usersMap(){
+            return this.$store.state.app.allUsers.reduce((map, el) => {
+                map[el.id] = el;
+                return map;
+            }, {});
+        }
+    },
     methods: {
+        changeTaskDetailInfo(taskId){
+            let self = this;
+            BPMNEngine.getATaskInfo(taskId).then((res) => {
+                for(let role in self.tabsData.people){
+                    if(res[role]){
+                        self.tabsData.people[role] = res[role].split(',').reduce((arr, el) => {
+                            arr.push(self.usersMap[el]);
+                            return arr;
+                        }, []);
+                    }
+                }
+            });
+        },
         closeDetail() {
             this.$emit("close-detail", {});
         },
@@ -224,12 +260,8 @@ export default {
             
             if(this.taskAction == 'approval'){
                 this.showApprovalOutcomes(JSON.parse(this.taskInfo.approvalActions));
-                // let varsMap = await getProcessInstanceVarsMap(this.taskInfo.action.parameter.processInstanceId);
-                // // lấy ra document object id của node được duyệt để hiển thị.
-                // let approvaledElId = this.taskInfo.targetElement;
-                // let docObjId = varsMap[approvaledElId+'_document_object_id'];
-                // docObjId = docObjId.value;
             }
+            this.changeTaskDetailInfo(this.taskInfo.action.parameter.taskId);
         }
     }
 }

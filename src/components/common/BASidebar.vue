@@ -168,7 +168,7 @@
         <template v-slot:append>
             <v-list dense>
                 <v-list-item>
-                    <v-list-item-icon class="mx-2">
+                    <v-list-item-icon >
                         <v-icon @click.stop="invertSidebarShow()">mdi-menu</v-icon>
                     </v-list-item-icon>
                     <v-menu>

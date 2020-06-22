@@ -34,6 +34,7 @@ import ListItems from "../../components/common/ListItems";
 import grandPermission from "./grandPermission";
 import UpdatePermission from "./Update";
 import Api from "./../../api/api.js";
+import { appConfigs } from '../../configs';
 export default {
     name: "ListPermissions",
     components: {
@@ -44,11 +45,11 @@ export default {
     computed: {
         baseUrl: function() {
             return this.apiUrl + this.permissiontUrl;
-        },
+        }, 
     },
     data: function() {
         return {
-            apiUrl: "https://v2hoangnd.dev.symper.vn/",
+            apiUrl: appConfigs.apiDomain.user,
             permissiontUrl: "permission-packages",
             removeCallback: null,
             isEdit: false,

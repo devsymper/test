@@ -1,97 +1,26 @@
 <template>
-    <v-container fluid>
-        <v-row class="pt-4">
-            <v-col cols="12">
-                <v-autocomplete
-                    v-model="friends"
-                    :disabled="isUpdating"
-                    :items="people"
-                    filled
-                    dense
-                    solo
-                    flat
-                    chips
-                    item-text="name"
-                    :background-color="'white'"
-                    :height="30"
-                    item-value="id"
-                    append-icon="mdi-magnify"
-                    :placeholder="$t('common.search')"
-                    class="sym-small-size bg-grey"
-                    multiple
-                >
-                    <template v-slot:selection="data">
-                        <v-chip
-                            color="green lighten-4"
-                            v-bind="data.attrs"
-                            :input-value="data.selected"
-                            close
-                            small
-                            class="blue-grey--text"
-                            @click:close="remove(data.item)"
-                        >
-                            {{ data.item.name }}
-                        </v-chip>
-                    </template>
-                    <template v-slot:item="data">
-                        <template>
-                            <v-list-item-avatar size="30" class="mt-1 mb-1">
-                                <img :src="data.item.avatar">
-                            </v-list-item-avatar>
-                            <v-list-item-content class="pt-0 pb-0">
-                                <v-list-item-title v-html="data.item.name"></v-list-item-title>
-                                <v-list-item-subtitle class="fs-11" v-html="data.item.role"></v-list-item-subtitle>
-                            </v-list-item-content>
-                            <v-list-item-action class="mt-0 mb-0">
-                                <v-icon v-if="friends.indexOf(data.item.id) >= 0" color="success" small>mdi-check</v-icon>
-                            </v-list-item-action>
-                        </template>
-                    </template>
-                </v-autocomplete>
-            </v-col>
+    <div class="w-100 h-100 ">
+        <v-text-field
+            :label="$t('common.search')"
+            dense
+            hide-details
+            v-model="searchUserKey"
+            append-icon="mdi-magnify"
+            single-line
+            outlined
+            class="mb-4 mt-4"
+        ></v-text-field>
+        <v-row class="list-users-in-task">
+            <div class="w-100 mb-2 pl-3" v-for="(users, role) in tabData" :key="role" >
+                <div class="fs-13 font-weight-bold">
+                    <v-icon class="mr-3">mdi-account</v-icon> {{$t("tasks.header."+role)}}
+                </div>
+                <div class="pl-10 pt-2 " v-for="userItem in tabData[role]" :key="userItem.id">
+                    <user :user="userItem"></user>
+                </div>
+            </div>
         </v-row>
-        <v-row id="listUser">
-            <v-col cols="12" class="pt-0">
-                <div class="fs-13 font-weight-bold">
-                    <v-icon class="mr-3">mdi-account</v-icon> {{$t("tasks.header.owner")}}
-                </div>
-                <div class="pl-10 pt-2">
-                    <user :user="task.owner"></user>
-                </div>
-            </v-col>
-            <v-col cols="12" class="pt-0">
-                <div class="fs-13 font-weight-bold">
-                    <v-icon class="mr-3">mdi-account</v-icon> {{$t("tasks.header.assignee")}}
-                </div>
-                <div class="pl-10 pt-2">
-                    <user :user="task.assignee"></user>
-                </div>
-            </v-col>
-            <v-col cols="12" class="pt-0">
-                <div class="fs-13 font-weight-bold">
-                    <v-icon class="mr-3">mdi-account</v-icon> {{$t("tasks.header.watcher")}}
-                </div>
-                <div class="pl-10 pt-2">
-                    <user :user="task.assignee"></user>
-                </div>
-                <div class="pl-10 pt-2">
-                    <user :user="task.owner"></user>
-                </div>
-            </v-col>
-            <v-col cols="12" class="pt-0">
-                <div class="fs-13 font-weight-bold">
-                    <v-icon class="mr-3">mdi-account</v-icon> {{$t("tasks.header.participant")}}
-                </div>
-                <div 
-                    v-for="id in friends" 
-                    :key="id"
-                    class="pl-10 pt-2"
-                >
-                    <user :user="getUser(id)"></user>
-                </div>
-            </v-col>
-        </v-row>
-    </v-container>
+    </div>
 </template>
 
 <script>
@@ -102,10 +31,10 @@ export default {
         user
     },
     props: {
-        task: {
+        tabData: {
             type: Object,
             default: () => {}
-        }
+        },
     },
     data: function() {
         const srcs = {
@@ -119,6 +48,7 @@ export default {
             autoUpdate: true,
             isUpdating: false,
             friends: [],
+            searchUserKey: '',
             people: [
                 { id: 1, name: 'Sandra Adams', role: 'BA', avatar: srcs[1] },
                 { id: 2, name: 'Ali Connors', role: 'BA', avatar: srcs[2] },

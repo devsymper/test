@@ -27,6 +27,7 @@
 import Api from "./../../api/api.js";
 import ListItems from "../../components/common/ListItems";
 import UpdateAction from "./Update";
+import { appConfigs } from '../../configs';
 export default {
     name: "listActions",
     components: {
@@ -40,7 +41,7 @@ export default {
     },
     data: function() {
         return {
-            apiUrl: "https://v2hoangnd.dev.symper.vn/",
+            apiUrl: appConfigs.apiDomain.user,
             actionPackUrl: "action-packs",
             isEdit: false,
             tableContextMenu: [
