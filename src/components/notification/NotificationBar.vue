@@ -11,21 +11,55 @@
                     append-icon="mdi-magnify"
                     flat
                     solo
-                    
+                    v-on:keyup="searchNotification"
+                    v-model="txtSearch"
                     :placeholder="$t('common.search')"
                 ></v-text-field>
-                <v-btn 
-                    x-small 
-                    solo
-                    class="bg-grey h-30"
-                    text
-                    
-                >
-                    <v-icon size="18">mdi-dots-horizontal</v-icon>
-                </v-btn>
+               
+                <v-menu
+                    :close-on-content-click="true"
+                    :open-on-hover="true"
+                    :max-width="200"
+                    :min-width="200"
+                    :max-height="500"
+                    offset-y
+                    >
+                    <template v-slot:activator="{ on }">
+                         <v-btn 
+                            v-on="on" 
+                            x-small 
+                            solo
+                            class="bg-grey h-30"
+                            text
+                            
+                        >
+                            <v-icon size="18">mdi-dots-horizontal</v-icon>
+                        </v-btn>
+                    </template>
+                    <v-list dense light nav>
+                        <v-list-item dense flat>
+                                <v-list-item-content class="pt-0 pb-0 notification-global-action" @click="markReadAll()">
+                                    <v-chip>
+                                        <v-icon size="15" >mdi-check-all</v-icon>
+                                        <span> Mark all as read</span> 
+                                    </v-chip>
+                                </v-list-item-content>
+                            
+                        </v-list-item>    
+                        <v-list-item dense flat>
+                            <v-list-item-content class="pt-0 pb-0  notification-global-action" @click="showConfig()">
+                                <v-chip>
+                                    <v-icon size="15">mdi-cog</v-icon>
+                                        Config notification
+                                </v-chip>
+                                    
+                                                                    
+                            </v-list-item-content>
+                        </v-list-item>    
+                    </v-list>
+                </v-menu>
             </v-col>
         </v-app-bar>
-            
         <v-row class="ml-0 mr-0 pl-5 pr-5 list-notification bg-white" :z-index="99999">
             <v-row
                 v-for="item in listNotification" 
@@ -87,6 +121,69 @@
                 <v-progress-circular indeterminate size="64"></v-progress-circular>
             </v-overlay>
         </v-row>
+        
+        <v-dialog v-model="dialogConfigNotification" width="600px">
+            <v-app-bar dense flat color="white" class="notification-list-bar" fixed>
+                <v-toolbar-title class="nofitication-title-bar w-100">
+                    <v-icon size="15">mdi-cog</v-icon> Config Notification
+                     <v-icon
+                            class="close-btn float-right"
+                            @click="hideNotificationConfig()"
+                        >mdi-close</v-icon>
+                </v-toolbar-title>
+                
+            </v-app-bar>
+            <v-row class="ml-0 mr-0 pl-5 pr-5 list-notification bg-white" :z-index="99999">
+                <v-row
+                    
+                    class="text-left notification-item"
+                >
+                <v-col cols="1">
+                    <v-row>
+                        <v-icon size="30">mdi-file-document-outline </v-icon>
+                    </v-row>
+                </v-col>
+                <v-col cols="11" @click="openSubcribeConfig('document')">
+                    <v-row>
+                        <span class="notification-subscribe-type-title">
+                            Văn bản
+                        </span>
+                    </v-row>
+                    <v-row class="mt-1">
+                        <span class="notification-subscribe-type-description">
+                            Cấu hình nhận thông báo khi có tác động đến document (bản ghi, sửa, xoá,...)
+                        </span>
+                    </v-row>
+                </v-col>
+                </v-row>
+                
+            </v-row>
+        </v-dialog>
+        <v-dialog v-model="dialogConfigNotificationSubscribe" width="600px">
+            <v-app-bar dense flat color="white" class="notification-list-bar" fixed>
+                <v-toolbar-title class="nofitication-title-bar w-100">
+                    <v-row>
+                        <v-col cols="1">
+                            <v-icon size="15">{{dialogConfigNotificationSubscribeIcon}}</v-icon>
+                        </v-col>
+                        <v-col cols="10">
+                            <v-row>
+                                {{dialogConfigNotificationSubscribeTitle}}
+                            </v-row>
+                            <v-row>
+                                <span>{{dialogConfigNotificationSubscribeDescription}}</span>
+                            </v-row>
+                        </v-col>
+                     <v-icon
+                            class="close-btn float-right"
+                            @click="hideSubcribeConfig()"
+                        >mdi-close</v-icon>
+                        </v-row>
+                </v-toolbar-title>
+                
+            </v-app-bar>
+            
+        </v-dialog>
     </v-row>
 </template>
 
@@ -105,7 +202,13 @@ export default {
     data: function() {
         return {
             overlay: true,
-            listNotification: []
+            listNotification: [],
+            txtSearch: '',
+            dialogConfigNotification: false,
+            dialogConfigNotificationSubscribe: false,
+            dialogConfigNotificationSubscribeTitle: "",
+            dialogConfigNotificationSubscribeDescription: "",
+            dialogConfigNotificationSubscribeIcon: "",
         };
     },
     created() {
@@ -120,30 +223,12 @@ export default {
     methods: {
         getListNoticication() { 
             let req = new Api(appConfigs.apiDomain.nofitication);
-            req.get("/notifications")
+            req.get("/notifications",{'keyword':this.txtSearch})
             .then(res => {
                 if (res.status == 200) {
                     
                     this.overlay = false;
                     let tmp = res.data;
-                    // tmp.forEach(function(item,index0){
-                    //     tmp[index0].actionMenu = [
-                    //         {
-                    //             value: 'delete',
-                    //             text: $t("notificationItem.action.delete"),
-                    //         },
-                    //         {
-                    //             value: 'unsubscribe',
-                    //             text: $t("notificationItem.action.unsubscribe"),
-                    //         }
-                    //     ];
-                    //     if(tmp[index0].state =='0'){
-                    //         tmp[index0].actionMenu.unshift({
-                    //             value: 'read',
-                    //             text: $t("notificationItem.action.read"),
-                    //         });
-                    //     }
-                    // });
                     this.listNotification = tmp;
                 } else {
                     this.showError();
@@ -152,24 +237,6 @@ export default {
             .catch(err => {
                 this.showError();
             })
-        },
-        configActionNotificationItem(notificationItem){
-            notificationItem.actionMenu=[
-                {
-                    value: 'delete',
-                    text: $t("notificationItem.action.delete"),
-                },
-                {
-                    value: 'unsubscribe',
-                    text: $t("notificationItem.action.unsubscribe"),
-                }
-            ];
-            if(notificationItem.state =='0'){
-                notificationItem.actionMenu.unshift({
-                    value: 'read',
-                    text: $t("notificationItem.action.read"),
-                });
-            }
         },
         openNotification(notificationItem){
             let extraParams = {
@@ -203,9 +270,64 @@ export default {
                 })
             }
         },
+        deleteNotificationItem(notificationItem){
+            if(notificationItem.state=='0'){
+                 let req = new Api(appConfigs.apiDomain.nofitication);
+                req.delete("/notifications/"+notificationItem.id)
+                .then(res => {
+                    if (res.status == 200) {
+                        notificationItem.state = '1';
+                        this.$store.state.app.unreadNotification -= 1;
+                    } else {
+                        this.showError();
+                    }
+                })
+                .catch(err => {
+                    this.showError();
+                })
+            }
+        },
         showNotification(data){
             console.log('ok');
             console.log(data)
+        },
+        markReadAll(){
+             let req = new Api(appConfigs.apiDomain.nofitication);
+                req.post("/notifications/read")
+                .then(res => {
+                    
+                    if (res.status == 200) {
+                        this.listNotification.map(function(item){
+                            item.state = '1';
+                            return item;
+                        });
+                        this.$store.state.app.unreadNotification = 0;
+                    } else {
+                        this.showError();
+                    }
+                })
+                .catch(err => {
+                    this.showError();
+                })
+        },
+        searchNotification(event){
+            this.getListNoticication()
+        },
+        showConfig(){
+            this.dialogConfigNotification = true
+        },
+        hideNotificationConfig(){
+            this.dialogConfigNotification = false
+        },
+        openSubcribeConfig(type){
+            // this.dialogConfigNotification = false;
+            // this.dialogConfigNotificationSubscribeTitle = "document" ;
+            // this.dialogConfigNotificationSubscribeDescription = "document" ;
+            // this.dialogConfigNotificationSubscribe = true;
+        },
+        hideSubcribeConfig(){
+            this.dialogConfigNotificationSubscribe = false;
+             this.dialogConfigNotification = true;
         }
         
 
@@ -222,6 +344,8 @@ export default {
 }
 .notification-item-info .col{
     padding: 0;
+    font-size: 11px;
+
 }
 .notification-item-info{
     color: #8E8E8E;
@@ -230,6 +354,7 @@ export default {
     border-bottom: rgba(221,221,221,0.2) 1px solid;
     cursor: pointer;
     width: 100%;
+    padding: 10px;
 }
 .notification-item:hover{
     background: #eeeeee!important;
@@ -246,4 +371,32 @@ export default {
 .v-list-item:hover{
     background: #eeeeee;
 }
+.notification-list-bar {
+    position: sticky!important;
+    padding: 0 5px;
+}
+.notification-list-bar >>> .v-toolbar__content{
+    border-bottom: 1px solid #dddddd!important;
+}
+.notification-global-action{
+    font-size: 12px;
+    cursor: pointer;
+}
+.notification-global-action >>> .v-chip,.notification-global-action >>> .v-chip-content:hover{
+    background: none;
+    cursor: pointer;
+}
+.list-notification{
+    width: 100%;
+}
+.notification-subscribe-type-title{
+    font-size: 12px;
+    font-weight: bold;
+}
+.notification-subscribe-type-description{
+    font-size: 11px;
+    color: #777777;
+}
+
+
 </style>
