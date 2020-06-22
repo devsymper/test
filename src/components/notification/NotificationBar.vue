@@ -1,66 +1,92 @@
 <template>
-    <v-row class="ml-0 mr-0 pl-5 pr-5 list-notification bg-white" :z-index="99999">
-        <v-row
-             v-for="item in listNotification" 
-            :key="item.id"
-            class="text-left notification-item"
-        >
-            <v-col cols="1">
-                <v-row>
-                    <v-icon size="35">mdi-account</v-icon>
-                </v-row>
-            </v-col>
-            <v-col cols="11" @click="openNotification(item)">
-                <v-row>
-                    <span class="notification-item-title">
-                        {{item.title}}
-                    </span>
-                </v-row>
-                <v-row class="notification-item-info mt-1">
-                    <v-col cols="6">
-                        <v-icon class="mr-2" size="12">mdi-cog</v-icon>
-                        <span>{{item.extraLabel}} {{item.extraValue}}</span>
-                    </v-col>
-                    <v-col cols="6" class="text-right pr-3">
-                        <span>{{$moment.unix(item.createTime).fromNow()}}</span>
-                        <v-icon size="9" color="blue" class="ml-1" v-if="item.state=='0'">mdi-circle</v-icon>
-                    </v-col>
-                </v-row>
-            </v-col>
-            <v-menu
+    <v-row>
+        <v-app-bar dense flat color="white" class="notification-list-bar" fixed>
+            <v-toolbar-title class="nofitication-title-bar">
+                Notification
+            </v-toolbar-title>
+            <v-col :cols="10" class="text-right pt-1 pb-1 pr-0">
+                <!-- Tìm kiếm -->
+                <v-text-field dense
+                    class="bg-grey sym-small-pad sym-small-size d-inline-block mr-2"
+                    append-icon="mdi-magnify"
+                    flat
+                    solo
                     
-                :close-on-content-click="true"
-                :open-on-hover="true"
-                :max-width="200"
-                :min-width="200"
-                :max-height="500"
-                offset-y
+                    :placeholder="$t('common.search')"
+                ></v-text-field>
+                <v-btn 
+                    x-small 
+                    solo
+                    class="bg-grey h-30"
+                    text
+                    
                 >
-                <template v-slot:activator="{ on }">
-                    <v-btn depressed icon v-on="on" :absolute="true" :right="true" class="mt-3 notification-item-action">
-                        <v-avatar color="#ffffff" size="30">
-                            <v-icon>mdi-dots-horizontal</v-icon>
-                        </v-avatar> 
-                    </v-btn>
-                </template>
-                <v-list dense light nav>
-                    <v-list-item dense flat
-                        v-for="(actionItem, i) in item.actionMenu"
-                        :key="i"
+                    <v-icon size="18">mdi-dots-horizontal</v-icon>
+                </v-btn>
+            </v-col>
+        </v-app-bar>
+            
+        <v-row class="ml-0 mr-0 pl-5 pr-5 list-notification bg-white" :z-index="99999">
+            <v-row
+                v-for="item in listNotification" 
+                :key="item.id"
+                class="text-left notification-item"
+            >
+                <v-col cols="1">
+                    <v-row>
+                        <v-icon size="35">mdi-account</v-icon>
+                    </v-row>
+                </v-col>
+                <v-col cols="11" @click="openNotification(item)">
+                    <v-row>
+                        <span class="notification-item-title">
+                            {{item.title}}
+                        </span>
+                    </v-row>
+                    <v-row class="notification-item-info mt-1">
+                        <v-col cols="6">
+                            <v-icon class="mr-2" size="12">mdi-cog</v-icon>
+                            <span>{{item.extraLabel}} {{item.extraValue}}</span>
+                        </v-col>
+                        <v-col cols="6" class="text-right pr-3">
+                            <span>{{$moment.unix(item.createTime).fromNow()}}</span>
+                            <v-icon size="9" color="blue" class="ml-1" v-if="item.state=='0'">mdi-circle</v-icon>
+                        </v-col>
+                    </v-row>
+                </v-col>
+                <v-menu
+                    :close-on-content-click="true"
+                    :open-on-hover="true"
+                    :max-width="200"
+                    :min-width="200"
+                    :max-height="500"
+                    offset-y
                     >
-                        <template>
-                            <v-list-item-content class="pt-0 pb-0" @click="actionNotification(item,actionItem.value)">
-                                <v-list-item-title class="font-weight-regular" v-text="actionItem.text"></v-list-item-title>
-                            </v-list-item-content>
-                        </template>
-                    </v-list-item>    
-                </v-list>
-            </v-menu>
-    
+                    <template v-slot:activator="{ on }">
+                        <v-btn depressed icon v-on="on" :absolute="true" :right="true" class="mt-3 notification-item-action">
+                            <v-avatar color="#ffffff" size="30">
+                                <v-icon>mdi-dots-horizontal</v-icon>
+                            </v-avatar> 
+                        </v-btn>
+                    </template>
+                    <v-list dense light nav>
+                        <v-list-item dense flat
+                            v-for="(actionItem, i) in item.actionMenu"
+                            :key="i"
+                        >
+                            <template>
+                                <v-list-item-content class="pt-0 pb-0" @click="actionNotification(item,actionItem.value)">
+                                    <v-list-item-title class="font-weight-regular" v-text="actionItem.text"></v-list-item-title>
+                                </v-list-item-content>
+                            </template>
+                        </v-list-item>    
+                    </v-list>
+                </v-menu>
+            </v-row>
+            <v-overlay :value="overlay">
+                <v-progress-circular indeterminate size="64"></v-progress-circular>
+            </v-overlay>
         </v-row>
-        <v-overlay :value="overlay">
-            <v-progress-circular indeterminate size="64"></v-progress-circular>
-        </v-overlay>
     </v-row>
 </template>
 

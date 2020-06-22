@@ -75,33 +75,6 @@
                                     <v-icon>mdi-bell-outline</v-icon>
                                 </v-btn>
                             </template>
-                            
-                            <v-app-bar dense flat color="white" class="notification-list-bar" fixed>
-                                <v-toolbar-title class="nofitication-title-bar">
-                                    Notification
-                                </v-toolbar-title>
-                                <v-col :cols="10" class="text-right pt-1 pb-1 pr-0">
-                                    <!-- Tìm kiếm -->
-                                    <v-text-field dense
-                                        class="bg-grey sym-small-pad sym-small-size d-inline-block mr-2"
-                                        append-icon="mdi-magnify"
-                                        flat
-                                        solo
-                                        
-                                        :placeholder="$t('common.search')"
-                                    ></v-text-field>
-                                    <v-btn 
-                                        x-small 
-                                        solo
-                                        class="bg-grey h-30"
-                                        text
-                                        
-                                    >
-                                        <v-icon size="18">mdi-dots-horizontal</v-icon>
-                                    </v-btn>
-                                </v-col>
-                            </v-app-bar>
-                            
                             <list-notification></list-notification>
                         </v-menu>
                     </div>
@@ -120,7 +93,7 @@ import Api from "../../api/api.js";
 import { appConfigs } from '../../configs';
 import BASidebar from "@/components/common/BASidebar.vue";
 import listApp from "@/components/common/listApp";
-import NotificationBar from "@/components/common/NotificationBar.vue";
+import NotificationBar from "@/components/notification/NotificationBar.vue";
 export default {
     methods: {
         /**
