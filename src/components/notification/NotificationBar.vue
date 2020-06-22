@@ -92,7 +92,7 @@
 
 <script>
 import Api from "../../api/api.js";
-import icon from "./SymperIcon";
+import icon from "../common/SymperIcon";
 import listObject from "../../views/apps/singleObject";
 import { appConfigs } from '../../configs';
 import Vue from "vue";
