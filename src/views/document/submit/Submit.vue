@@ -56,7 +56,7 @@
                     <v-progress-circular indeterminate v-show="isSubmitting" color="red"></v-progress-circular>
                 </v-btn>
             </template>
-            <v-btn fab dark small color="green" @click="submitDocument">
+            <v-btn fab dark small color="green" @click="handlerSubmitDocumentClick">
                 <v-icon>mdi-content-save</v-icon>
             </v-btn>
             <!-- <v-btn
@@ -134,6 +134,9 @@ export default {
         },
         sDocumentSubmit() {
             return this.$store.state.document.submit;
+        },
+        viewType(){
+            return this.$store.state.document.viewType
         }
     },
     data() {
@@ -160,9 +163,11 @@ export default {
             transition: "slide-y-reverse-transition",
             isSubmitting: false,
             columnsSQLLiteDocument:null,
+            docObjId:null
         };
     },
     beforeMount() {
+
         this.docSize = "21cm";
         this.columnsSQLLiteDocument = {};
     },
@@ -183,20 +188,31 @@ export default {
     },
 
     created() {
-
         // đặt trang thái của view là submit => isDetailView = false
-        this.$store.commit("document/addToDocumentStore", {
-            key: 'isDetailView',
-            value: false
-        });
+        
         let thisCpn = this;
         if (this.docId != 0) {
             this.documentId = this.docId;
         } else if (this.$route.name == "submitDocument") {
+            this.$store.commit("document/addToDocumentStore", {
+                key: 'viewType',
+                value: 'submit'
+            });
             this.documentId = this.$route.params.id;
+        } else if (this.$route.name == "updateDocumentObject") {
+            this.$store.commit("document/addToDocumentStore", {
+                key: 'viewType',
+                value: 'update'
+            });
+            this.docObjId = this.$route.params.id;
         }
-        if(this.documentId != null)
-        this.loadDocumentData();
+        if(this.documentId != null && this.documentId != 0){
+            this.loadDocumentData();
+        }
+        if(this.docObjId != null){
+            this.loadDocumentObject();
+        }
+
         this.$evtBus.$on("document-submit-autocomplete-input", e => {
             thisCpn.$refs.autocompleteInput.show(e);
             thisCpn.$store.commit("document/addToDocumentSubmitStore", {
@@ -344,7 +360,7 @@ export default {
         setDataForControlAutocomplete(res,aliasControl){
             if(res.data != undefined){
                     if(res.status == 200 && res.data != false){
-                        let dataTable = this.handleDataAutoComplete(res.data,false);
+                        let dataTable = this.handleDataAutoComplete(res.data.data,false);
                         this.$refs.autocompleteInput.setAliasControl(aliasControl);
                         this.$refs.autocompleteInput.setData(dataTable);
                     }
@@ -457,12 +473,49 @@ export default {
                                 thisCpn.processHtml(content);
                             }, 100);
                         }
+                        else{
+                            thisCpn.$snotify({
+                                type: "error",
+                                title: res.message
+                            });  
+                        }
                     })
                     .catch(err => {
-                        console.log("error from detail document api!!!", err);
+                        thisCpn.$snotify({
+                            type: "error",
+                            title: "error from detail document api!!!"
+                        }); 
                     })
                     .always(() => {});
             }
+        },
+        loadDocumentObject() {
+            let thisCpn = this;
+            documentApi
+                .getDocumentObject(this.docObjId)
+                .then(res => {
+                    if (res.status == 200) {
+                        thisCpn.$store.commit('document/addToDocumentDetailStore',{
+                            key: 'allData',
+                            value: res.data
+                        })
+                        thisCpn.documentId = res.data.documentId;
+                        thisCpn.loadDocumentData();
+                    }
+                    else{
+                        thisCpn.$snotify({
+                            type: "error",
+                            title: res.message
+                        });  
+                    }
+                })
+                .catch(err => {
+                    thisCpn.$snotify({
+                        type: "error",
+                        title: "error from detail document object api!!!"
+                    });  
+                })
+                .always(() => {});
         },
         togglePageSize() {
             this.docSize = this.docSize == "21cm" ? "100%" : "21cm";
@@ -478,6 +531,10 @@ export default {
                 
                 if(this.sDocumentEditor.allControl[id] != undefined){   // ton tai id trong store
                     let idField = this.sDocumentEditor.allControl[id].id;
+                    let valueInput = this.sDocumentEditor.allControl[id].value
+                    if(valueInput != undefined && valueInput != null && Object.keys(valueInput).length == 0){
+                        valueInput = ""
+                    }
                     if(controlType == "submit" || controlType == "reset"){
                         
                         let control = new ActionControl(idField, $(allInputControl[index]),this.sDocumentEditor.allControl[id],thisCpn.keyInstance);
@@ -494,11 +551,14 @@ export default {
                             this.columnsSQLLiteDocument[controlName] = mapColumnType;
                         }
                         if (controlType != "table") {
+                            console.log('xcz',controlName,idField,valueInput);
+                            
                             let control = new BasicControl(
                                 idField,
                                 $(allInputControl[index]),
                                 this.sDocumentEditor.allControl[id],
-                                thisCpn.keyInstance
+                                thisCpn.keyInstance,
+                                valueInput
                             );
                             control.init();
                             this.$store.commit(
@@ -549,6 +609,7 @@ export default {
                             });
                             tableControl.listInsideControls = listInsideControls;
                             tableControl.renderTable();
+                            tableControl.setData(valueInput);
                             columnsTableSqlLite['s_table_id_sql_lite'] = 'INTEGER'
                             ClientSQLManager.createTable(this.keyInstance,controlName,columnsTableSqlLite);
                             this.$store.commit(
@@ -564,6 +625,7 @@ export default {
             console.log(this.sDocumentEditor);
             this.getEffectedControl();
             thisCpn.createDocumentSQLLiteTable(); 
+            if(this.docObjId == null)
             thisCpn.findRootControl();
         },
         /**
@@ -665,6 +727,16 @@ export default {
             formulasInstance.detectControlInTable(mapControlEffected,name,formulasInstance.formulas,this.sDocumentSubmit.listInputInDocument)  
         },
 
+
+        handlerSubmitDocumentClick(){
+            if(this.viewType == 'submit'){
+                this.submitDocument();
+            }
+            else{
+                this.updateDocumentObject();
+            }
+        },
+
         /**
          * Hàm gọi api submit document
          */
@@ -680,6 +752,36 @@ export default {
                     thisCpn.$snotify({
                         type: "success",
                         title: "Submit document success!"
+                    });        
+                }
+                else{
+                    thisCpn.$snotify({
+                        type: "error",
+                        title: res.message
+                    });
+                }
+            })
+            .catch(err => {
+                thisCpn.$snotify({
+                        type: "error",
+                        title: "error from submit document api!!!"
+                    });
+            })
+            .always(() => {
+            });
+        },
+        updateDocumentObject(){
+            this.isSubmitting = true;
+            let thisCpn = this;
+            let dataPost = this.getDataPostSubmit();
+            dataPost['id'] = this.documentId;
+            documentApi.updateDocument(this.docObjId,dataPost).then(res => {
+                thisCpn.$emit('submit-document-success',res.data);
+                thisCpn.isSubmitting = false;
+                if (res.status == 200) {
+                    thisCpn.$snotify({
+                        type: "success",
+                        title: "update document success!"
                     });        
                 }
                 else{
@@ -838,7 +940,6 @@ export default {
                 tableName.tableInstance.handlerRunFormulasForControlInTable(controlName,dataInput,formulasInstance);
 
             }
-            
             formulasInstance.handleBeforeRunFormulas(dataInput).then(rs=>{
                 this.handlerAfterRunFormulas(rs,controlId,controlName,formulasType)
             });
@@ -1005,12 +1106,15 @@ export default {
                     let controlFormulas = controlInstance.controlFormulas;
                     
                      for(let formulasType in controlFormulas){
-                        if(controlFormulas[formulasType].hasOwnProperty('instance')){
-                            let formulasInstance = controlFormulas[formulasType].instance;
-                            if(formulasInstance.getFormulas() != ""){
-                                this.handlerBeforeRunFormulasValue(formulasInstance,controlInstance.id,controlName,formulasType)
+                        if(formulasType != 'autocomplete'){
+                            if(controlFormulas[formulasType].hasOwnProperty('instance')){
+                                let formulasInstance = controlFormulas[formulasType].instance;
+                                if(formulasInstance.getFormulas() != ""){
+                                    this.handlerBeforeRunFormulasValue(formulasInstance,controlInstance.id,controlName,formulasType)
+                                }
                             }
                         }
+                        
                     }
                 }
                 

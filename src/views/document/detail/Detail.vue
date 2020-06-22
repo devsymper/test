@@ -59,8 +59,8 @@ export default {
     },
     created(){
         this.$store.commit("document/addToDocumentStore", {
-            key: 'isDetailView',
-            value: true
+            key: 'viewType',
+            value: 'detail'
         });
         let thisCpn = this;
         console.log('ok',this.$route.params);

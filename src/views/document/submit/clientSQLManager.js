@@ -57,8 +57,6 @@ export default class ClientSQLManager {
 
             return db.run(sql);
         } else {
-            console.trace(sql);
-
             return db.exec(sql);
         }
     }

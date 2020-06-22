@@ -1,7 +1,7 @@
 <template>
-    <v-container fluid>
+    <div class="w-100 h-100">
        <list-task :height="height" @change-height="changeHeight"></list-task>
-    </v-container>
+    </div>
 </template>
 
 <script>

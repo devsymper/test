@@ -2,7 +2,7 @@
     <v-app id="symper-platform-app">
         <ba-sidebar />
         <v-content>
-            <v-container fluid fill-height class="pt-0">
+            <v-container fluid fill-height class="pa-0">
                 <div class="w-100 app-header-bg-color" style="border-bottom:1px solid #cccccc">
                     <div style="width:calc(100% - 200px)" class="float-left">
                         <v-tabs
