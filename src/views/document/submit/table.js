@@ -165,6 +165,9 @@ export default class Table {
                 },
 
                 afterChange: function(changes, source) {
+                    if (sDocument.state.submit.docStatus == 'init' && sDocument.state.viewType == 'update') {
+                        return;
+                    }
                     let controlName = changes[0][1];
                     let columns = thisObj.columnsInfo.columns;
                     let currentRowData = thisObj.tableInstance.getDataAtRow(thisObj.currentSelectedCell['row']);
@@ -220,6 +223,7 @@ export default class Table {
                         rowData[index] = '"' + rowData[index] + '"'
                     }
                 }
+
                 if (rowData[rowData.length - 1] == 'NULL') {
                     let id = Date.now();
                     rowData[rowData.length - 1] = id;
@@ -293,7 +297,6 @@ export default class Table {
                 return;
             }
             let controlEffected = controlInstance.getEffectedControl();
-            // console.log(controlEffected);
             if (Object.keys(controlEffected).length > 0) {
                 for (let i in controlEffected) {
                     this.handlerCheckCanBeRunFormulas(i);
@@ -383,7 +386,7 @@ export default class Table {
                     result = data[0].values[0][0]
                 }
             } else {
-                let data = rs.data;
+                let data = rs.data.data;
                 if (data.length > 0) {
                     result = data[0][Object.keys(data[0])[0]]
                 }
@@ -595,7 +598,11 @@ export default class Table {
     }
 
     checkDetailView() {
-            return sDocument.state.isDetailView;
+            if (sDocument.state.viewType == 'detail') {
+                return true;
+            } else {
+                return false;
+            }
         }
         /**
          * Hàm lấy thông tin của các cột

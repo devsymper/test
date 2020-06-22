@@ -55,95 +55,96 @@
                 </v-row>
                 <v-divider></v-divider>
 
-                <v-row
-                    v-for="(obj) in allFlatTasks"
-                    :key="obj.id"
-                    :index="obj.id"
-                    class="mr-0 ml-0 single-row"
-                    @click="selectObject(obj)"
-                >
-                    <v-col
-                        :cols="sideBySideMode ? 12 : compackMode ? 6: 4"
-                        class="pl-3 pr-1"
-                        :class="{
-                                    'pt-0': isSmallRow,
-                                    'pb-0': isSmallRow,
-                                    'pb-1': !isSmallRow,
-                                    'pt-1': !isSmallRow,
-                                }"
-                    >
-                        <div class="pl-1">
-                            <div class="fz-13 text-truncate d-inline-block float-left text-ellipsis w-100">{{obj.name}}</div>
-                            <div class="text-left fs-12 pr-6 text-ellipsis w-100">
-                                {{obj.taskData.content}}
-                            </div>
-                            <v-col
-                                cols="12"
-                                class="pt-0 pb-0 pr-0 pl-0 grey--text lighten-2 float-left d-flex">
-                                <div class="text-left fs-12 pr-6 text-ellipsis">
-                                    {{obj.taskData.extraLabel}}   {{obj.taskData.extraValue}}
+                <div class="w-100 xxxx">
+                    <v-row
+                        v-for="(obj) in allFlatTasks"
+                        :key="obj.id"
+                        :index="obj.id"
+                        class="mr-0 ml-0 single-row"
+                        @click="selectObject(obj)">
+                        <v-col
+                            :cols="sideBySideMode ? 12 : compackMode ? 6: 4"
+                            class="pl-3 pr-1"
+                            :class="{
+                                        'pt-0': isSmallRow,
+                                        'pb-0': isSmallRow,
+                                        'pb-1': !isSmallRow,
+                                        'pt-1': !isSmallRow,
+                                    }"
+                        >
+                            <div class="pl-1">
+                                <div class="fz-13 text-truncate d-inline-block float-left text-ellipsis w-100">{{obj.name}}</div>
+                                <div class="text-left fs-12 pr-6 text-ellipsis w-100">
+                                    {{obj.taskData.content}}
                                 </div>
+                                <v-col
+                                    cols="12"
+                                    class="pt-0 pb-0 pr-0 pl-0 grey--text lighten-2 float-left d-flex">
+                                    <div class="text-left fs-12 pr-6 text-ellipsis">
+                                        {{obj.taskData.extraLabel}}   {{obj.taskData.extraValue}}
+                                    </div>
 
-                                <div class="text-right fs-12 pt-0 pb-0 pr-2 text-ellipsis" style="width: 130px" >
-                                    <v-icon class="grey--text lighten-2 mr-1" x-small>mdi-clock-time-nine-outline</v-icon>
-                                    {{$moment(obj.createTime).fromNow()}}
-                                </div>
-                            </v-col>
-                        </div>
-                    </v-col>
-                    <v-col
-                        v-if="!sideBySideMode"
-                        cols="2"
-                        class="fs-13 pl-1 pr-1"
-                        :class="{'pt-0': isSmallRow, 'pb-0': isSmallRow}"
-                    >
-                        {{obj.assignee}}
-                        <v-chip
-                            color="transparent"
-                            small
-                            class="mt-0 pl-1 pr-0 d-inline-block text-truncate"
-                            label
-                            v-if="obj.assignee != null"
+                                    <div class="text-right fs-12 pt-0 pb-0 pr-2 text-ellipsis" style="width: 130px" >
+                                        <v-icon class="grey--text lighten-2 mr-1" x-small>mdi-clock-time-nine-outline</v-icon>
+                                        {{$moment(obj.createTime).fromNow()}}
+                                    </div>
+                                </v-col>
+                            </div>
+                        </v-col>
+                        <v-col
+                            v-if="!sideBySideMode"
+                            cols="2"
+                            class="fs-13 pl-1 pr-1"
+                            :class="{'pt-0': isSmallRow, 'pb-0': isSmallRow}"
                         >
-                            <v-avatar size="25" class="mr-2">
-                                <img :src="obj.assignee.avatar" alt v-if="!!obj.assignee.avatar" />
-                                <v-icon v-else v-text="obj.assignee.avatar"></v-icon>
-                            </v-avatar>
-                            {{obj.assignee.name}}
-                        </v-chip>
-                    </v-col>
-                    <v-col
-                        v-if="!sideBySideMode"
-                        cols="2"
-                        class="fs-13 pl-1 pr-1"
-                        :class="{'pt-0': isSmallRow, 'pb-0': isSmallRow}"
-                    >
-                        <span class="mt-1 d-inline-block">{{$moment(obj.dueDate).fromNow()}}</span>
-                    </v-col>
-                    <v-col
-                        v-if="!sideBySideMode"
-                        cols="2"
-                        class="fs-13 pl-1 pr-1"
-                        :class="{'pt-0': isSmallRow, 'pb-0': isSmallRow}"
-                    >
-                        <v-chip
-                            color="transparent"
-                            class="mt-0 pl-1 pr-0 d-inline-block text-truncate"
-                            small
-                            label
-                            v-if="obj.owner != null"
+                            {{obj.assignee}}
+                            <v-chip
+                                color="transparent"
+                                small
+                                class="mt-0 pl-1 pr-0 d-inline-block text-truncate"
+                                label
+                                v-if="obj.assignee != null"
+                            >
+                                <v-avatar size="25" class="mr-2">
+                                    <img :src="obj.assignee.avatar" alt v-if="!!obj.assignee.avatar" />
+                                    <v-icon v-else v-text="obj.assignee.avatar"></v-icon>
+                                </v-avatar>
+                                {{obj.assignee.name}}
+                            </v-chip>
+                        </v-col>
+                        <v-col
+                            v-if="!sideBySideMode"
+                            cols="2"
+                            class="fs-13 pl-1 pr-1"
+                            :class="{'pt-0': isSmallRow, 'pb-0': isSmallRow}"
                         >
-                            <v-avatar size="25" class="mr-2">
-                                <img :src="obj.owner.avatar" alt v-if="!!obj.owner.avatar" />
-                                <v-icon v-else v-text="obj.owner.avatar"></v-icon>
-                            </v-avatar>
-                            {{obj.owner.name}}
-                        </v-chip>
-                    </v-col>
-                    <v-col cols="2" v-if="!sideBySideMode && !compackMode && !smallComponentMode">
-                        <span class="mt-1 d-inline-block fs-13">{{obj.processDefinitionName}}</span>
-                    </v-col>
-                </v-row>
+                            <span class="mt-1 d-inline-block">{{$moment(obj.dueDate).fromNow()}}</span>
+                        </v-col>
+                        <v-col
+                            v-if="!sideBySideMode"
+                            cols="2"
+                            class="fs-13 pl-1 pr-1"
+                            :class="{'pt-0': isSmallRow, 'pb-0': isSmallRow}"
+                        >
+                            <v-chip
+                                color="transparent"
+                                class="mt-0 pl-1 pr-0 d-inline-block text-truncate"
+                                small
+                                label
+                                v-if="obj.owner != null"
+                            >
+                                <v-avatar size="25" class="mr-2">
+                                    <img :src="obj.owner.avatar" alt v-if="!!obj.owner.avatar" />
+                                    <v-icon v-else v-text="obj.owner.avatar"></v-icon>
+                                </v-avatar>
+                                {{obj.owner.name}}
+                            </v-chip>
+                        </v-col>
+                        <v-col cols="2" v-if="!sideBySideMode && !compackMode && !smallComponentMode">
+                            <span class="mt-1 d-inline-block fs-13">{{obj.processDefinitionName}}</span>
+                        </v-col>
+                    </v-row>
+                </div>
             </v-col>
             <v-col
                 :cols="!sideBySideMode ? 0 : 8"

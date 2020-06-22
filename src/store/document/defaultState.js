@@ -49,7 +49,6 @@ const defaultState = {
 
         },
         docStatus: 'init',
-        isDetailView: false,
         SQLLiteDB: {},
         rootControl: {},
         impactedFieldsList: {},
@@ -63,9 +62,9 @@ const defaultState = {
     detail: {
         allData: null
     },
-    isDetailView: false,
     documentProps: {},
-    listAllDocument: [] // Khadm: danh sách tất cả các document được active, phục vụ cho việc  autocomplete trong script editor
+    listAllDocument: [], // Khadm: danh sách tất cả các document được active, phục vụ cho việc  autocomplete trong script editor
+    viewType: null // chỉ định là submit, detail, hay update
 };
 
 export default defaultState;
