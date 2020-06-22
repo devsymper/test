@@ -55,7 +55,7 @@
                 </v-row>
                 <v-divider></v-divider>
 
-                <div class="w-100 xxxx">
+                <VuePerfectScrollbar :style="{height: listTaskHeight+'px'}">
                     <v-row
                         v-for="(obj) in allFlatTasks"
                         :key="obj.id"
@@ -144,7 +144,7 @@
                             <span class="mt-1 d-inline-block fs-13">{{obj.processDefinitionName}}</span>
                         </v-col>
                     </v-row>
-                </div>
+                </VuePerfectScrollbar>
             </v-col>
             <v-col
                 :cols="!sideBySideMode ? 0 : 8"
@@ -153,7 +153,7 @@
                 class="pa-0 ma-0"
                 height="30"
                 style="border-left: 1px solid #e0e0e0;">
-                <taskDetail  :taskInfo="selectedTask.taskInfo" @close-detail="closeDetail"></taskDetail>
+                <taskDetail :parentHeight="listTaskHeight" :taskInfo="selectedTask.taskInfo" @close-detail="closeDetail"></taskDetail>
             </v-col>
             <userSelector ref="user" class="d-none"></userSelector>
         </v-row>
@@ -166,6 +166,9 @@ import icon from "../../components/common/SymperIcon";
 import taskDetail from "./taskDetail";
 import listHeader from "./listHeader";
 import userSelector from "./userSelector";
+import VuePerfectScrollbar from "vue-perfect-scrollbar";
+import { util } from '../../plugins/util';
+
 export default {
     computed: {
         // Liệt kê danh sách các task dưới dạng phẳng - ko phân cấp
@@ -187,7 +190,8 @@ export default {
         icon: icon,
         taskDetail: taskDetail,
         listHeader: listHeader,
-        userSelector: userSelector
+        userSelector: userSelector,
+        VuePerfectScrollbar: VuePerfectScrollbar
     },
     props: {
         compackMode: {
@@ -206,6 +210,7 @@ export default {
     },
     data: function() {
         return {
+            listTaskHeight: 300,
             selectedTask: {
                 taskInfo: {}
             },
@@ -225,8 +230,12 @@ export default {
                 assignee: this.$store.state.app.endUserInfo.id
             });
         }
+        this.reCalcListTaskHeight();
     },
     methods: {
+        reCalcListTaskHeight(){
+            this.listTaskHeight = util.getComponentSize(this.$el.parentElement).h - 75;            
+        },
         getUser(id) {
             this.$refs.user.getUser(id);
         },

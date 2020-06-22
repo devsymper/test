@@ -1,7 +1,7 @@
 <template>
     <div class="h-100 w-100" :style="{height: height}">
         <code-editor
-            :ref="'edt-script'" 
+            ref="edtScript" 
             v-model="lazyValue" 
             @init="editorInit" 
             @input="handleEditorInput"
@@ -18,6 +18,7 @@ import 'brace/ext/language_tools';
 import customMode from './customFormula';
 import defaultKeywords from "./defaultKeywords";
 import { documentApi } from "./../../../api/Document";
+
 export default {
     created(){
         this.$store.dispatch('document/setListDocuments');
@@ -96,9 +97,11 @@ export default {
     },
     methods:{
         async handleEditorInput(formula){
-            formula = formula.trim();
-            let lastWord = formula.slice(
-                formula.lastIndexOf(' ') + 1
+            let pos = this.$refs.edtScript.editor.getCursorPosition();
+            let range = this.$refs.edtScript.editor.session.getLine(pos.row).slice(0,pos.column);
+
+            let lastWord = range.slice(
+                range.lastIndexOf(' ') + 1
             );
 
             let doc = this.listAllDocs[lastWord];

@@ -173,8 +173,6 @@ const routes = [{
         // component: DetailDocument,
         component: () =>
             import ('../views/document/detail/Detail.vue'),
-
-        component: DetailDocument,
     },
     {
         path: "/document/objects/update/:id?",

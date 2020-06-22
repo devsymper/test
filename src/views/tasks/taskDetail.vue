@@ -38,16 +38,15 @@
                     <v-tabs-items v-model="tab">
                         <v-tab-item
                             v-for="item in items"
-                            :key="item.tab"
-                        >
-                            <v-card flat class="pl-4 pr-4">
+                            :key="item.tab">
+                            <VuePerfectScrollbar :style="{height: parentHeight +'px'}" class="pl-4 pr-4" >
                                 <component 
                                     @task-submited="handleTaskSubmited" 
                                     :is="item.content"
                                     :taskInfo="taskInfo"
                                     :ref="item.tab">
                                 </component>
-                            </v-card>
+                            </VuePerfectScrollbar>
                         </v-tab-item>
                     </v-tabs-items>
                 </v-card>
@@ -68,6 +67,7 @@ import subtask from "./subtask";
 import task from "./task";
 import BPMNEngine from '../../api/BPMNEngine';
 import { getVarsFromSubmitedDoc, getProcessInstanceVarsMap } from '../../components/process/processAction';
+import VuePerfectScrollbar from "vue-perfect-scrollbar";
 
 export default {
     name: "taskDetail",
@@ -82,7 +82,11 @@ export default {
         isInitInstance: {
             type: Boolean,
             default: false
-        }
+        },
+        parentHeight: {
+            type: Number,
+            default: 300
+        },
     },
     watch: {
         taskInfo: {
@@ -95,7 +99,8 @@ export default {
     },
     components: {
         icon: icon,
-        attachment, comment, flow, info, people, relatedItems, subtask, task
+        attachment, comment, flow, info, people, relatedItems, subtask, task,
+        VuePerfectScrollbar
     },
     data: function() {
         return {
