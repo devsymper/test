@@ -49,7 +49,6 @@ const defaultState = {
 
         },
         docStatus: 'init',
-        isDetailView: false,
         SQLLiteDB: {},
         rootControl: {},
         impactedFieldsList: {},
@@ -63,8 +62,8 @@ const defaultState = {
     detail: {
         allData: null
     },
-    isDetailView: false,
     documentProps: {},
+    viewType: null // chỉ định là submit, detail, hay update
 };
 
 export default defaultState;

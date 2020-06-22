@@ -47,7 +47,7 @@ export default class BasicControl extends Control {
         let thisCpn = this;
         this.ele.wrap('<span style="position:relative;">');
         this.ele.attr('key-instance', this.curParentInstance);
-        if (!this.checkDetailView() &&
+        if (!this.checkDetailView() && this.value == "" &&
             this.controlProperties['isRequired'] != undefined &&
             (this.controlProperties['isRequired'].value == "1" ||
                 this.controlProperties['isRequired'].value == 1)) {
@@ -377,7 +377,11 @@ export default class BasicControl extends Control {
         }
         // hàm kiểm tra là view detail hay submit
     checkDetailView() {
-            return sDocument.state.isDetailView;
+            if (sDocument.state.viewType == 'detail') {
+                return true;
+            } else {
+                return false;
+            }
         }
         // hàm kiểm tra control này có thuộc tính require hay không
     isRequiredControl() {

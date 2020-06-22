@@ -22,6 +22,9 @@ export const documentApi = {
     submitDocument(data) {
         return coreApi.post("document/objects/submit", data);
     },
+    updateDocument(objId, data) {
+        return coreApi.put("document/update/objects/" + objId, data);
+    },
     saveMultiFormulas(data) {
         return formulasApi.post('/formulas/batch', data);
     }

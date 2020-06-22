@@ -1,6 +1,6 @@
 <template>
     <list-items
-        :getDataUrl="'https://v2hoangnd.dev.symper.vn/document/'+documentName+'/objects'"   
+        :getDataUrl="'https://sdocument-management.symper.vn/document/'+documentName+'/objects'"   
         :useDefaultContext="false"
         :tableContextMenu="tableContextMenu"
         :pageTitle="$t('document.title')"
@@ -39,8 +39,8 @@ export default {
                 {
                     name: "edit",
                     text: "Sửa",
-                    callback: (document, callback) => {
-                       
+                    callback: (documentObject, callback) => {
+                        this.$goToPage('/document/objects/update/'+documentObject.document_object_id,"Danh sách bản ghi");
                     },
                 },
             ],

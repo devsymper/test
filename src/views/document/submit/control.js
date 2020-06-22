@@ -1,7 +1,7 @@
 import Formulas from "./formulas";
 
 export default class Control {
-    constructor(idField, ele, controlProps, curParentInstance, value) {
+    constructor(idField, ele, controlProps, curParentInstance, value = "") {
         /**
          * object các thuộc tính về hiển thị của control
          */

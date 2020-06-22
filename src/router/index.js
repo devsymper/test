@@ -137,7 +137,11 @@ const routes = [{
         path: "/document/objects/:id?",
         name: "detailDocument",
         component: DetailDocument,
-
+    },
+    {
+        path: "/document/objects/update/:id?",
+        name: "updateDocumentObject",
+        component: SubmitDocument,
     },
     {
         path: "/document/:name?/objects",

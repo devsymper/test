@@ -587,8 +587,6 @@ export const mappingOldVersionControlFormulas = {
 // output : data control  : {icon,html,title,formulas,properties}
 export const GetControlProps = function(type) {
     let control = util.cloneDeep(controlTypes[type]);
-    // console.log(type);
-    // console.log(control);
 
     let allProperties = util.cloneDeep(commonProps);
     let notInProps = (control.hasOwnProperty('notInProps')) ? control.notInProps : false;
