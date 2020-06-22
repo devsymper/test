@@ -1,5 +1,5 @@
 <template>
-    <v-container fluid>
+    <div class="h-100 w-100">
         <v-row class="ml-0 mr-0 justify-space-between">
             <div class="fs-13 pl-2 pt-1 float-left">
                 App name / Object name /  task id
@@ -14,16 +14,17 @@
             </div>
         </v-row>
         <v-divider style="border-width: 0.5px; border-color: #ff7400;"></v-divider>
-        <v-row>
-            <v-col cols="12" class="pt-0">
+        <v-row class="ma-0">
+            <v-col cols="12" class="pa-0">
                 <v-card flat>
                     <v-tabs
                         v-model="tab"
                         background-color="transparent"
                         color="grey"
                         light
+                        height="30"
                         flat
-                    >
+                        grow>
                         <v-tab
                             v-for="item in items"
                             :key="item.tab"
@@ -52,7 +53,7 @@
                 </v-card>
             </v-col>
         </v-row>
-    </v-container>
+    </div>
 </template>
 
 <script>

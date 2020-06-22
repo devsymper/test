@@ -4,8 +4,7 @@
             <v-col
                 :cols="!sideBySideMode ? 12 : 4"
                 :md="!sideBySideMode ? 12 : 3"
-                class="pt-0 pl-0 pr-0 pb-0"
-            >
+                class="pt-0 pl-0 pr-0 pb-0">
                 <listHeader
                     :isSmallRow="isSmallRow"
                     :sideBySideMode="sideBySideMode"
@@ -150,9 +149,9 @@
                 :cols="!sideBySideMode ? 0 : 8"
                 :md="!sideBySideMode ? 0 : 9"
                 v-if="sideBySideMode"
-                class="pt-0"
-                style="border-left: 1px solid #e0e0e0;"
-            >
+                class="pa-0 ma-0"
+                height="30"
+                style="border-left: 1px solid #e0e0e0;">
                 <taskDetail  :taskInfo="selectedTask.taskInfo" @close-detail="closeDetail"></taskDetail>
             </v-col>
             <userSelector ref="user" class="d-none"></userSelector>
