@@ -3,6 +3,7 @@ import Handsontable from 'handsontable';
 import sDocument from './../../../store/document'
 import store from './../../../store'
 import ClientSQLManager from './clientSQLManager';
+import { checkDbOnly, getControlInstanceFromStore } from './../common/common'
 import { SYMPER_APP } from './../../../main.js'
 import { Date } from 'core-js';
 import { checkCanBeBind, resetImpactedFieldsList, markBinedField } from './handlerCheckRunFormulas';
@@ -173,6 +174,7 @@ export default class Table {
                     if (sDocument.state.submit.docStatus == 'init' && sDocument.state.viewType == 'update') {
                         return;
                     }
+
                     let controlName = changes[0][1];
                     let columns = thisObj.columnsInfo.columns;
                     let currentRowData = thisObj.tableInstance.getDataAtRow(thisObj.currentSelectedCell['row']);
@@ -185,6 +187,7 @@ export default class Table {
                     }
                     // nếu có sự thay đổi cell mà là id của row sqlite thì ko thực hiện update
                     if (controlName != 's_table_id_sql_lite') {
+                        thisObj.checkUniqueTable(controlName);
                         if (source != AUTO_SET) {
                             store.commit("document/addToDocumentSubmitStore", {
                                 key: 'rootChangeFieldName',
@@ -208,7 +211,16 @@ export default class Table {
                         } else {
                             thisObj.handlerAfterChangeCellByAutoSet(changes, columns, controlName);
                         }
+                        let controlUnique = checkDbOnly(controlName);
+                        if (controlUnique != false) {
+                            let dataInput = {}
+                            dataInput[controlName] = [changes[0][3]]
+                            thisObj.handlerRunFormulasForControlInTable('uniqueDB', controlUnique, dataInput, controlUnique.controlFormulas.uniqueDB);
+                        }
+
+
                     }
+
                 }
             }
             listTableInstance[this.tableName] = this;
@@ -407,7 +419,7 @@ export default class Table {
                 key: 'value',
                 value: dataColumnAfterRunFOrmulas
             });
-            this.handlerDataAfterRunFormulas(dataColumnAfterRunFOrmulas, controlInstance, formulasType)
+            this.handlerDataAfterRunFormulas(dataColumnAfterRunFOrmulas, controlInstance, formulasType, dataInput)
         }
         /**
          * Hàm lấy dữ liệu hiện tại của table và insert vào sql lite table
@@ -433,7 +445,7 @@ export default class Table {
          * @param {Object} data 
          * @param {String} controlEffectedName 
          */
-    handlerDataAfterRunFormulas(data, controlInstance, formulasType) {
+    handlerDataAfterRunFormulas(data, controlInstance, formulasType, dataInput = false) {
         switch (formulasType) {
             case "formulas":
                 controlInstance.handlerDataAfterRunFormulasValue(data);
@@ -454,6 +466,7 @@ export default class Table {
                 controlInstance.handlerDataAfterRunFormulasReadonly(data);
                 break;
             case "uniqueDB":
+                controlInstance.handlerDataAfterRunFormulasUniqueDB(data, dataInput);
                 break;
             case "uniqueTable":
                 break;
@@ -729,13 +742,13 @@ export default class Table {
             if (map) {
                 let sign = prop + '____' + row;
                 let ele = $(td);
+
                 if (map.vld === true) {
                     ele.append(Util.makeErrNoti(map.msg, sign));
                 }
-
-                // || (listInputInDocument[prop]['controlProperties']['isRequired'] != undefined &&
-                // (listInputInDocument[prop]['controlProperties']['isRequired'].value == "1" ||
-                //     listInputInDocument[prop]['controlProperties']['isRequired'].value == 1)))
+                if (map.uniqueDB === true) {
+                    ele.append(Util.makeErrNoti(map.msg, sign));
+                }
                 if (map.require === true && (value === '' || value == null)) {
                     ele.css('position', 'relative').append(Util.requireRedDot(sign));
                 }
@@ -771,5 +784,23 @@ export default class Table {
             return false
         }
 
+    }
+    checkUniqueTable(controlName) {
+        let indexColumn = this.getColumnIndexFromControlName(controlName);
+        let dataCol = this.tableInstance.getDataAtCol(indexColumn);
+        let uniqueData = {}
+        for (let index = 0; index < dataCol.length - 1; index++) {
+            let row = dataCol[index];
+            if (row == "" || row == null) {
+                continue;
+            }
+            if (uniqueData.hasOwnProperty(row)) {
+                this.validateValueMap[index + "_" + indexColumn] = { vld: true, msg: 'Trùng dữ liệu' }
+            } else {
+                uniqueData[row] = true;
+                this.validateValueMap[index + "_" + indexColumn] = { vld: false, msg: 'Trùng dữ liệu' }
+            }
+        }
+        this.tableInstance.render()
     }
 }

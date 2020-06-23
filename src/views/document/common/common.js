@@ -17,6 +17,26 @@ const handlerRunOtherFormulasControl = function(controlName, controlEffected, fo
         }
     }
 }
+const checkDbOnly = function(controlName) {
+    let control = getControlInstanceFromStore(controlName);
+    if (control.controlProperties['isDBOnly'] != undefined &&
+        (control.controlProperties['isDBOnly'].value == "1" ||
+            control.controlProperties['isDBOnly'].value == true ||
+            control.controlProperties['isDBOnly'].value == 1)) {
+        return control;
+    } else {
+        return false
+    }
+}
+const getControlInstanceFromStore = function(controlName) {
+    if (sDocument.state.submit.listInputInDocument.hasOwnProperty(controlName)) {
+        return sDocument.state.submit.listInputInDocument[controlName]
+    } else {
+        return false
+    }
+}
 export {
     // handlerRunOtherFormulasControl
+    getControlInstanceFromStore,
+    checkDbOnly
 }

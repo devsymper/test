@@ -43,7 +43,8 @@ export default class Control {
         this.effectedReadonlyControl = [];
         this.effectedLinkControl = [];
         this.effectedValidateControl = [];
-        this.inTable = false;
+        this.inTable = (this.controlProperties.inTable != undefined) ? this.controlProperties.inTable : false;
+        this.docName = this.controlProperties.docName;
 
         /**
          * Tên của control
@@ -73,6 +74,7 @@ export default class Control {
         };
         this.initFormulas();
 
+
     }
 
     /**
@@ -86,8 +88,19 @@ export default class Control {
                 }
             }
         }
+        this.checkDBOnly();
 
-
+    }
+    checkDBOnly() {
+        if (!this.checkDetailView() &&
+            this.controlProperties['isDBOnly'] != undefined &&
+            (this.controlProperties['isDBOnly'].value == "1" ||
+                this.controlProperties['isDBOnly'].value == true ||
+                this.controlProperties['isDBOnly'].value == 1)) {
+            let fromTable = (this.inTable == false) ? "document_" + this.docName : "document_child_" + this.docName + "_" + this.inTable;
+            let formulas = "ref(SELECT count(" + this.name + ") > 0 AS " + this.name + " from " + fromTable + " where " + this.name + " = '{" + this.name + "}')"
+            this.controlFormulas.uniqueDB = new Formulas(this.curParentInstance, formulas, 'uniqueDB');
+        }
     }
     getEffectedControl() {
         return this.effectedControl;
@@ -168,7 +181,6 @@ export default class Control {
                 vls.push([index, this.name, row]);
             }
             let tableControl = listInputInDocument[this.inTable];
-            console.log('cxs', tableControl);
 
             tableControl.tableInstance.tableInstance.setDataAtRowProp(vls, null, null, AUTO_SET);
             markBinedField(this.name);
@@ -185,6 +197,52 @@ export default class Control {
                 $('#' + this.id).trigger('change')
                 markBinedField(this.name);
             }
+        }
+    }
+    handlerDataAfterRunFormulasUniqueDB(data, dataInput) {
+        if (this.inTable == false) {
+            if (data == 't' || data === true) {
+                this.renderValidateIcon('Dữ liệu đã tồn tại');
+            } else {
+                this.removeRequire();
+            }
+        } else {
+            let tableControl = listInputInDocument[this.inTable];
+            let colIndex = tableControl.tableInstance.getColumnIndexFromControlName(this.name);
+            let dataAtCol = tableControl.tableInstance.tableInstance.getDataAtCol(colIndex);
+            let rowIndex = dataAtCol.indexOf(dataInput[Object.keys(dataInput)[0]][0])
+            if (data == 't' || data === true) {
+                tableControl.tableInstance.validateValueMap[rowIndex + "_" + colIndex] = { uniqueDB: true, msg: "Dữ liệu đã tồn tại" };
+
+            } else {
+                tableControl.tableInstance.validateValueMap[rowIndex + "_" + colIndex] = { uniqueDB: false, msg: "" };
+            }
+            tableControl.tableInstance.tableInstance.render();
+
+        }
+
+
+    }
+    renderValidateIcon(message) {
+        let icon = `<span class="mdi mdi-checkbox-blank-circle validate-icon" title="` + message + `"></span>`
+        this.ele.parent().append(icon);
+        this.ele.parent().find('.mdi-checkbox-blank-circle').on('click', function(e) {
+            e.msg = message;
+            SYMPER_APP.$evtBus.$emit('document-submit-open-validate', e)
+        })
+    }
+    removeRequire() {
+        this.ele.parent().find('.validate-icon').remove();
+    }
+    isEmpty() {
+            return this.ele.val() == ""
+        }
+        // hàm kiểm tra là view detail hay submit
+    checkDetailView() {
+        if (sDocument.state.viewType == 'detail') {
+            return true;
+        } else {
+            return false;
         }
     }
 }
