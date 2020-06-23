@@ -300,7 +300,7 @@
             "title": "Danh sách quy trình",
             "deploy_history": "Lịch sử deploy",
             "start": "Bắt đầu quy trình",
-            "instances": "Các bản đã chạy"
+            "instances": "Các bản đã chạy gần nhất"
         },
         "action": {
             "create": "Tạo quy trình mới"

@@ -292,7 +292,7 @@
             "title": "Process list",
             "deploy_history": "Deploy history",
             "start": "Start workflow",
-            "instances": "List instances"
+            "instances": "List lastest instances"
         },
         "action": {
             "create": "Create new process"
