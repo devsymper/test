@@ -1,7 +1,7 @@
 <template>
     <list-items
         ref="listModels"
-        :useDefaultContext="true"
+        :useDefaultContext="false"
         :pageTitle="$t('process.list.title')"
         :tableContextMenu="tableContextMenu"
         :containerHeight="containerHeight"
@@ -113,6 +113,17 @@ export default {
                     text: this.$t("process.list.instances"),
                     callback: (row, callback) => {
 
+                    }
+                },
+                {
+                    name: "detail",
+                    text: this.$t("common.detail"),
+                    callback: (row, callback) => {
+                        
+                        self.$goToPage(
+                            "/workflow/"+row.id+"/view",
+                            self.$t("common.detail") + "  " + (row.name ? row.name : row.key)
+                        );
                     }
                 },
             ]
