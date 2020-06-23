@@ -173,10 +173,5 @@ export default {
     font-size: 13px;
     font-weight: bold;
 }
-.notification-list-bar {
-    position: sticky!important;
-}
-.notification-list-bar .v-toolbar__content{
-    border-bottom: 1px solid #dddddd;
-}
+
 </style>
