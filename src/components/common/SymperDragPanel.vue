@@ -5,7 +5,7 @@
         class="symper-drag-panel elevation-12"
         :style="{
             width:dragPanelWidth+'px',
-            height: dragPanelHeight+'px',
+            height: dragPanelHeight,
             top: topPosition+'px',
             left: leftPosition+'px'
         }">
@@ -95,8 +95,8 @@ export default {
             default: 500
         },
         dragPanelHeight: {
-            type: Number,
-            default: 400
+            type: String,
+            default: '400px'
         },
         actionTitle: {
             type: String,

@@ -17,14 +17,14 @@
         />
         <sym-drag-panel
             ref="symDragPanel"
-            :dragPanelWidth="840"
-            :dragPanelHeight="600"
+            :dragPanelWidth="600"
+            :dragPanelHeight="'auto'"
             :actionTitle="titleDragPanel"
             :titleIcon="titleDragPanelIcon"
         >
             <template slot="drag-panel-content">
                 <!-- <submitDocument :isQickSubmit="true" :docId="340" v-if="!isQickSubmit"/> -->
-                <filter-input></filter-input>
+                <filter-input @save-input-filter="saveInputFilter" ref="inputFilter"></filter-input>
             </template>
         </sym-drag-panel>
         <input type="file" :id="'file-upload-alter-'+keyInstance" class="hidden d-none" />
@@ -80,8 +80,6 @@
 </template>
 <script>
 import { documentApi } from "./../../../api/Document.js";
-// import { getInsertionCSS } from "./../../../components/document/documentUtil.js";
-// import "./../../../components/document/documentContent.css";
 import { setDataForPropsControl } from "./../../../components/document/dataControl";
 import BasicControl from "./basicControl";
 import TableControl from "./tableControl";
@@ -251,8 +249,8 @@ export default {
             thisCpn.handleControlInputChange(locale.controlName);
             
         });
-        this.$evtBus.$on("run-effected-control-when-table-change", e => {
-            thisCpn.handlerBeforeRunFormulasValue(e.control.controlFormulas.formulas.instance,e.control.id,e.control.name,'formulas');
+        this.$evtBus.$on("run-effected-control-when-table-change", control => {
+            thisCpn.handlerBeforeRunFormulasValue(control.controlFormulas.formulas.instance,control.id,control.name,'formulas');
         });
         this.$evtBus.$on("document-submit-open-validate", e => {
             thisCpn.$refs.validate.show(e);
@@ -267,7 +265,8 @@ export default {
             thisCpn.$refs.timePicker.show(e);
         });
         this.$evtBus.$on("document-submit-filter-input-click", e => {
-            thisCpn.$refs.symDragPanel.show();
+            // thisCpn.$refs.symDragPanel.show();
+            thisCpn.runInputFilterFormulas(e.controlName);
             thisCpn.titleDragPanel = "Tìm kiếm thông tin";
             thisCpn.titleDragPanelIcon = "mdi-file-search";
         }); 
@@ -334,6 +333,12 @@ export default {
     },
     
     methods: {
+        saveInputFilter(data){
+            let controlId = data.controlId
+            let value = data.value
+            $('#'+controlId).val(value);
+            this.$refs.symDragPanel.hide()
+        },
         /**
          * Hàm chạy công thức autocomplete để đổ dữ liệu vào box autucomplete, control select cũng dùng trường hợp này
          */
@@ -551,8 +556,6 @@ export default {
                             this.columnsSQLLiteDocument[controlName] = mapColumnType;
                         }
                         if (controlType != "table") {
-                            console.log('xcz',controlName,idField,valueInput);
-                            
                             let control = new BasicControl(
                                 idField,
                                 $(allInputControl[index]),
@@ -868,6 +871,23 @@ export default {
                 sqlLite: SQLDBInstance
             });
         },
+
+
+
+
+        runInputFilterFormulas(controlName){
+            let controlInstance = this.sDocumentSubmit.listInputInDocument[controlName];
+            let controlId = controlInstance.id
+            let allFormulas = controlInstance.controlFormulas;
+            if(allFormulas.hasOwnProperty('formulas')){
+                if(allFormulas['formulas'].hasOwnProperty('instance')){
+                    let formulasInstance = allFormulas['formulas'].instance;
+                    if(formulasInstance.getFormulas() != ""){
+                        this.handlerBeforeRunFormulasValue(formulasInstance,controlId,controlName,'formulas')
+                    }
+                }
+            }
+        },
         /**
          * hàm được gọi khi input change, lấy ra các instance của control bị ảnh hưởng và chạy công thức cho các control đó
          * nếu có insideTableInDoc thì công thức từ nội bộ của bảng
@@ -935,10 +955,11 @@ export default {
             
             let dataInput = this.getDataInputFormulas(formulasInstance);    
             let control = this.getControlInstanceFromStore(controlName);
-            if(control.hasOwnProperty('inTable')){
+            if(control.inTable != false){
                 let tableName = this.getControlInstanceFromStore(control.inTable);
-                tableName.tableInstance.handlerRunFormulasForControlInTable(controlName,dataInput,formulasInstance);
-
+                console.log('hgfd',control);
+                
+                tableName.tableInstance.handlerRunFormulasForControlInTable(formulasType,control,dataInput,formulasInstance);
             }
             formulasInstance.handleBeforeRunFormulas(dataInput).then(rs=>{
                 this.handlerAfterRunFormulas(rs,controlId,controlName,formulasType)
@@ -964,9 +985,15 @@ export default {
         },
         
         handlerAfterRunFormulas(rs,controlId,controlName,formulasType){
+            let controlInstance = this.getControlInstanceFromStore(controlName);
             if($('#'+controlId).length > 0){
-                if($('#'+controlId).attr('s-control-type') == 'table'){
-                    if(formulasType=='foemulas'){
+                if($('#'+controlId).attr('s-control-type') == 'inputFilter'){
+                    this.$refs.symDragPanel.show();
+                    this.$refs.inputFilter.setData(controlId,controlName,rs.data.data);
+                    
+                }
+                else if($('#'+controlId).attr('s-control-type') == 'table'){
+                    if(formulasType=='formulas'){
                         this.setDataToTable(controlId,rs.data)
                     }
                 }
@@ -1017,6 +1044,7 @@ export default {
             }
         },
         handlerDataAfterRunFormulasValue(value,controlId,controlName){
+            let controlInstance = this.getControlInstanceFromStore(controlName);
             if($('#'+controlId).length > 0){
                 $('#'+controlId).val(value);
                 $('#'+controlId).trigger('change')
@@ -1097,26 +1125,27 @@ export default {
          */
         findRootControl(){ 
             let listInput = this.sDocumentSubmit.listInputInDocument;
-            
             for(let controlName in listInput){
-
                 this.setAllImpactedFieldsList(controlName);
                 let controlInstance = listInput[controlName];
-                if(Object.keys(controlInstance.controlFormulas).length > 0){
-                    let controlFormulas = controlInstance.controlFormulas;
-                    
-                     for(let formulasType in controlFormulas){
-                        if(formulasType != 'autocomplete'){
-                            if(controlFormulas[formulasType].hasOwnProperty('instance')){
-                                let formulasInstance = controlFormulas[formulasType].instance;
-                                if(formulasInstance.getFormulas() != ""){
-                                    this.handlerBeforeRunFormulasValue(formulasInstance,controlInstance.id,controlName,formulasType)
+                if(controlInstance.type != "inputFilter"){
+                    if(Object.keys(controlInstance.controlFormulas).length > 0){
+                        let controlFormulas = controlInstance.controlFormulas;
+                        
+                        for(let formulasType in controlFormulas){
+                            if(formulasType != 'autocomplete'){
+                                if(controlFormulas[formulasType].hasOwnProperty('instance')){
+                                    let formulasInstance = controlFormulas[formulasType].instance;
+                                    if(formulasInstance.getFormulas() != "" && Object.keys(formulasInstance.getInputControl()).length == 0){
+                                        this.handlerBeforeRunFormulasValue(formulasInstance,controlInstance.id,controlName,formulasType)
+                                    }
                                 }
                             }
+                            
                         }
-                        
                     }
                 }
+                
                 
             }
             this.$store.commit("document/addToDocumentSubmitStore", {

@@ -387,9 +387,19 @@ export default {
                         title: "Save document success!"
                     });
                 }
+                else{
+                    thisCpn.$snotify({
+                        type: "error",
+                        title: res.lastErrorMessage,
+                        text:"can not save document"
+                    });
+                }
             })
             .catch(err => {
-                console.log("error from add document api!!!", err);
+                thisCpn.$snotify({
+                        type: "error",
+                        title: "can not save document",
+                    });
             })
             .always(() => {
             });
@@ -408,13 +418,21 @@ export default {
                         title: "Save document success!"
                     });
                 }
+                else{
+                    thisCpn.$snotify({
+                        type: "error",
+                        title: res.lastErrorMessage,
+                        text:"can not save document"
+                    });
+                }
                 
             })
             .catch(err => {
-                console.log("error from edit document api!!!", err);
                 thisCpn.$snotify({
                     type: "error",
-                    title: "error from edit document api"
+                    title: "error from edit document api",
+                    text:"can not save document"
+
                 });
             })
             .always(() => {
