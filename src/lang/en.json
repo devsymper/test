@@ -473,7 +473,8 @@
             "assignee": "Assignee",
             "watcher": "Watcher",
             "participant": "Participant",
-            "id": "Seri"
+            "id": "Seri",
+            "list": "List task"
         },
         "filterOptions": {
             "all": "All task",

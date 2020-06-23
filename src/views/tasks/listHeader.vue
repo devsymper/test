@@ -7,59 +7,15 @@
             <span class="title ml-2" v-show="!sideBySideMode">
                 {{headerTitle}}
             </span>
-            <v-menu offset-y light
-                :close-on-content-click="false"
-                :min-width="200"
-                v-if="!compackMode">
-                <template v-slot:activator="{ on }">
-                    <v-btn
-                        v-on="on"
-                        small
-                        text
-                        class="success white--text ml-2"
-                        style="margin-top: 1px"
-                    >
-                        {{$t("common.add")}} 
-                        <v-icon small>mdi-plus</v-icon>
-                    </v-btn>
-                </template>
-                <v-list dense light nav>
-                    <v-btn text small class="pt-0 pb-0"
-                        @click="selectProcess(null)"
-                    >
-                        {{$t("common.other")}}
-                    </v-btn>
-                    <v-list nav dense class="pl-0 mb-0">
-                        <v-list-group
-                            v-for="app in listProrcessInstances"
-                            :key="app.processDefinitionId"
-                            nav dense
-                            value="true"
-                            class="mb-0"
-                        >
-                            <template v-slot:activator>
-                                <!-- Tên app -->
-                                <v-list-item-title>
-                                    {{app.processDefinitionName}}
-                                </v-list-item-title>
-                            </template>
-                            <v-list nav dense class="pt-0 pb-0">
-                                <!-- Tên các nhóm object trong app -->
-                                <v-list-item
-                                    v-for="item in app.objects"
-                                    :key="item.id"
-                                >
-                                    <v-list-item-title
-                                        @click="selectProcess(item)"
-                                    >
-                                        {{item.name}}
-                                    </v-list-item-title>
-                                </v-list-item>
-                            </v-list>
-                        </v-list-group>
-                    </v-list>
-                </v-list>
-            </v-menu>
+            <v-btn
+                small
+                text
+                @click="openCreateTaskDialog"
+                class="success white--text ml-2"
+                style="margin-top: 1px">
+                {{$t("common.add")}} 
+                <v-icon small>mdi-plus</v-icon>
+            </v-btn>
         </div>
         <div class="pt-1 pb-1 pr-0">
             <!-- Tìm kiếm -->
@@ -166,11 +122,11 @@
                 <v-card-title>
                     {{$t("tasks.createTask.title")}}
                 </v-card-title>
-                <v-row class="mr-0 ml-0 pl-3 pr-3">
-                    <v-col cols="12" class="label pt-2 pb-2">
+                <div class="mr-0 ml-0 pl-6 pr-6">
+                    <div  class="label pt-2">
                         {{$t("tasks.header.name")}}
-                    </v-col>
-                    <v-col cols="12">
+                    </div>
+                    <div >
                         <v-text-field
                             class="sym-small-size bg-grey"
                             dense
@@ -178,11 +134,11 @@
                             flat
                             v-model="taskObject.name"
                         ></v-text-field>
-                    </v-col>
-                    <v-col cols="12" class="label pt-2 pb-2">
+                    </div>
+                    <div  class="label pt-2">
                         {{$t("tasks.header.assignee")}}
-                    </v-col>
-                    <v-col cols="12">
+                    </div>
+                    <div >
                         <userSelector 
                             ref="userSelector"
                             :isMulti="false" 
@@ -192,19 +148,19 @@
                             :flat="true"
                             v-model="taskObject.assignee"
                         ></userSelector>
-                    </v-col>
-                    <v-col cols="12" class="label pt-2 pb-2">
+                    </div>
+                    <div  class="label pt-2">
                         {{$t("tasks.header.dueDate")}}
-                    </v-col>
-                    <v-col cols="12">
+                    </div>
+                    <div >
                         <datePicker 
                             v-model="taskObject.dueDate"
                         ></datePicker>
-                    </v-col>
-                    <v-col cols="12" class="label pt-2 pb-2">
+                    </div>
+                    <div  class="label pt-2">
                         {{$t("tasks.header.description")}}
-                    </v-col>
-                    <v-col cols="12">
+                    </div>
+                    <div >
                         <v-textarea
                             class="sym-small-size bg-grey sym-small-lineheight"
                             dense
@@ -212,8 +168,8 @@
                             flat
                             v-model="taskObject.description"
                         ></v-textarea>
-                    </v-col>
-                </v-row>
+                    </div>
+                </div>
                 <v-card-actions class="pt-4">
                     <v-spacer></v-spacer>
                     <v-btn
@@ -265,7 +221,11 @@ export default {
         headerTitle: {
             type: String,
             default: 'List tasks'
-        } 
+        },
+        parentTaskId: {
+            type: String,
+            default: ''
+        }
     },
     data: function() {
         return {
@@ -392,14 +352,9 @@ export default {
         saveTask() {
             let data = {
                 ...this.taskObject,
-                assignee           : this.taskObject.assignee[0],
-                processInstanceId  : "",
-                processDefinitionId: "",
+                assignee    : this.taskObject.assignee[0],
+                parentTaskId: this.parentTaskId ? this.parentTaskId : ''
             };
-            if (this.selectedProcess != null) {
-                data.processInstanceId   = this.selectedProcess.id;
-                data.processDefinitionId = this.selectedProcess.processDefinitionId;
-            }
             BPMNEngine.addTask(JSON.stringify(data))
             .then(res => {
                 if (res.id != undefined) {

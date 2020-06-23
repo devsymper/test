@@ -10,6 +10,7 @@
                     :headerTitle="headerTitle"
                     :sideBySideMode="sideBySideMode"
                     :compackMode="compackMode"
+                    :parentTaskId="filterFromParent.parentTaskId"
                     @change-density="isSmallRow = !isSmallRow"
                     @get-list-process-instance="listProrcessInstances = $event"
                 ></listHeader>

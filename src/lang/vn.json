@@ -487,7 +487,8 @@
             "assignee": "Người được giao",
             "watcher": "Người theo dõi",
             "participant": "Người tham gia",
-            "id": "Số đơn"
+            "id": "Số đơn",
+            "list": "Danh sách công việc"
         },
         "filterOptions": {
             "all": "Toàn bộ task",
