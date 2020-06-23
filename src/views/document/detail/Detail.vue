@@ -28,6 +28,14 @@ export default {
         docName:{
             type: String,
             default: ''
+        },
+        docObjInfo: {
+            type: Object,
+            default(){
+                return {
+                    docObjId: 0,
+                }
+            }
         }
     },   
     computed: {
@@ -63,10 +71,21 @@ export default {
             this.docObjId = this.$route.params.id;
         }
         if(this.docObjId != null)
-        this.loadDocumentObject();
-        
+        this.loadDocumentObject();  
     },
     destroyed(){
+    },
+    watch:{
+        docObjInfo:{
+            deep: true,
+            immediate: true,
+            handler(after){
+                if(after.docObjId){
+                    this.docObjId = after.docObjId;
+                    this.loadDocumentObject();
+                }
+            }
+        }
     },
     methods: {
         

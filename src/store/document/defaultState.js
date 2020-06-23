@@ -63,6 +63,7 @@ const defaultState = {
         allData: null
     },
     documentProps: {},
+    listAllDocument: [], // Khadm: danh sách tất cả các document được active, phục vụ cho việc  autocomplete trong script editor
     viewType: null // chỉ định là submit, detail, hay update
 };
 

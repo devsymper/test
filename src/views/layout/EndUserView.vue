@@ -2,7 +2,7 @@
     <v-app id="symper-platform-app">
         <ba-sidebar />
         <v-content>
-            <v-container fluid fill-height class="pt-0">
+            <v-container fluid fill-height class="pa-0">
                 <div class="w-100 app-header-bg-color" style="border-bottom:1px solid #cccccc">
                     <div style="width:calc(100% - 200px)" class="float-left">
                         <v-tabs
@@ -59,52 +59,23 @@
                             :max-height="700"
                             offset-y>
                             <template v-slot:activator="{ on }">
-                            <v-btn v-on="on" icon v-if="unreadNotification > 0">
-                                <v-badge
-                                    class="sym-small-size"
-                                    
-                                    :content="unreadNotification"
-                                    :value="unreadNotification"
-                                    color="red"
-                                    overlap
-                                >
+                                <v-btn v-on="on" icon v-if="unreadNotification > 0">
+                                    <v-badge
+                                        class="sym-small-size"
+                                        
+                                        :content="unreadNotification"
+                                        :value="unreadNotification"
+                                        color="red"
+                                        overlap
+                                    >
+                                        <v-icon>mdi-bell-outline</v-icon>
+                                    </v-badge>
+                                </v-btn>
+                                <v-btn v-on="on" icon v-else>
                                     <v-icon>mdi-bell-outline</v-icon>
-                                </v-badge>
-                            </v-btn>
-                            <v-btn v-on="on" icon v-else>
-                                <v-icon>mdi-bell-outline</v-icon>
-                            </v-btn>
+                                </v-btn>
                             </template>
-                            
-                                <v-app-bar dense flat color="white" class="notification-list-bar" fixed>
-                                    <v-toolbar-title class="nofitication-title-bar">
-                                        Notification
-                                    </v-toolbar-title>
-                                    <v-col :cols="10" class="text-right pt-1 pb-1 pr-0">
-                                        <!-- Tìm kiếm -->
-                                        <v-text-field dense
-                                            class="bg-grey sym-small-pad sym-small-size d-inline-block mr-2"
-                                            append-icon="mdi-magnify"
-                                            flat
-                                            solo
-                                            
-                                            :placeholder="$t('common.search')"
-                                        ></v-text-field>
-                                        <v-btn 
-                                            x-small 
-                                            solo
-                                            class="bg-grey h-30"
-                                            text
-                                            
-                                        >
-                                            <v-icon size="18">mdi-dots-horizontal</v-icon>
-                                        </v-btn>
-                                    </v-col>
-                                    
-                                </v-app-bar>
-                                
-                                <list-notification></list-notification>
-                            
+                            <list-notification></list-notification>
                         </v-menu>
                     </div>
                 </div>
@@ -122,7 +93,7 @@ import Api from "../../api/api.js";
 import { appConfigs } from '../../configs';
 import BASidebar from "@/components/common/BASidebar.vue";
 import listApp from "@/components/common/listApp";
-import NotificationBar from "@/components/common/NotificationBar.vue";
+import NotificationBar from "@/components/notification/NotificationBar.vue";
 export default {
     methods: {
         /**
@@ -202,10 +173,5 @@ export default {
     font-size: 13px;
     font-weight: bold;
 }
-.notification-list-bar {
-    position: sticky!important;
-}
-.notification-list-bar .v-toolbar__content{
-    border-bottom: 1px solid #dddddd;
-}
+
 </style>

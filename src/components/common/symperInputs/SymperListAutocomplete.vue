@@ -96,7 +96,7 @@ export default {
             deep: true,
             immediate: true,
             handler: function(after, before){
-                this.myItems = util.cloneDeep(after);
+                // this.myItems = util.cloneDeep(after);
             }
         },
         value: {
@@ -142,11 +142,12 @@ export default {
             });
         },
         reAssignItems(){
+            let self = this
             setTimeout((self) => {
                 if(self.myItems.length == 0){
                     self.myItems = self.items;
                 }
-            }, 100, this);
+            }, 600, this);
         }
     }
 };

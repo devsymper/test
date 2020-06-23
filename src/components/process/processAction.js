@@ -1,38 +1,17 @@
 import bpmnApi from "./../../api/BPMNEngine";
 import { util } from "../../plugins/util";
 import { documentApi } from "../../api/Document";
+import BPMNEngine from "./../../api/BPMNEngine";
 
-function moveTaskTitleToNameAttr(content) {
-    let patterns = [
-        [
-            /<bpmn:task(.*?).*id="([A-Za-z0-9_]+)notificationTitle.*<\/bpmn:task>/gs,
-            /<bpmn:task(.*?)name="(.*?)"/g
-        ],
-        [
-            /<bpmn:userTask(.*?).*id="([A-Za-z0-9_]+)notificationTitle.*<\/bpmn:userTask>/gs,
-            /<bpmn:userTask(.*?)name="(.*?)"/g
-        ],
-
-    ];
-
-    for (let pattern of patterns) {
-        let taskTagMatches = content.match(pattern[0]);
-        if (taskTagMatches) {
-            let newTaskName = '';
-
-            for (let tag of taskTagMatches) {
-                let propTag = tag.match(/.*id="([A-Za-z0-9_]+)notificationTitle.*\n/g);
-                propTag = propTag[0];
-                let newNameRegex = propTag.match(/default="(.*?)"/g);
-                newNameRegex = newNameRegex[0];
-                newTaskName = newNameRegex.substring(9, newNameRegex.length - 1);
-
-                let nameTagMatches = tag.match(pattern[1]);
-                if (nameTagMatches) {
-                    nameTagMatches = nameTagMatches[0];
-                    let newNameTagMatches = nameTagMatches.replace(/name="(.*?)"/, `name="${newTaskName}"`)
-                    let newTag = tag.replace(nameTagMatches, newNameTagMatches);
-                    content = content.replace(tag, newTag);
+function moveTaskTitleToNameAttr(content, configValue) {
+    for (let idEl in configValue) {
+        if (configValue[idEl].hasOwnProperty('notificationTitle')) {
+            let pattern = new RegExp('bpmn:userTask(.*?)id="' + idEl + '"(.*?)name="(.*?)"', 'g');
+            let matchPatt = content.match(pattern);
+            if (matchPatt) {
+                for (let item of matchPatt) {
+                    let replacedItem = item.replace(/name="(.*?)"/g, 'name="' + configValue[idEl].notificationTitle + '"');
+                    content = content.replace(item, replacedItem);
                 }
             }
         }
@@ -40,18 +19,19 @@ function moveTaskTitleToNameAttr(content) {
     return content;
 }
 
-function cleanContent(content) {
+function cleanContent(content, configValue) {
     let ns = `definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:xsd="http://www.w3.org/2001/XMLSchema"
     xmlns:symper="http://symper.org/bpmn"
     xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.symper.org/processdef">`;
-    content = moveTaskTitleToNameAttr(content);
+    content = moveTaskTitleToNameAttr(content, configValue);
     let rsl = content
         .replace(/↵+/, ' ')
         .replace(/\bbpmn:/g, '')
         .replace(/<di:/g, '<omgdi:')
         .replace(/<dc:/g, '<omgdc:')
         .replace(/symper_prefix_chars_/g, 'symper:')
+        .replace(/symper:symper:/g, 'symper:')
         .replace(/definitions (.*?)+\>/, ns)
         .replace(/&#10;/g, ' ')
         .replace(/symper_symper_value_tag/g, 'symper:value');
@@ -74,7 +54,7 @@ function cleanContent(content) {
 export const deployProcess = function(self, processData) {
     return new Promise((deployResolve, deployReject) => {
         bpmnApi.getModelData(processData.id).then(res => {
-            let content = cleanContent(res.data.content);
+            let content = cleanContent(res.data.content, JSON.parse(res.data.configValue));
             console.log(content, 'contentcontentcontentcontentcontentcontent');
 
             let file = util.makeStringAsFile(content, "process_draft.bpmn");
@@ -207,6 +187,22 @@ export const getVarsFromSubmitedDoc = async(docData, elId, docId) => {
                 vars: vars,
                 nameAndValueMap: dataInputForFormula
             });
+        }).catch(err => {
+            reject(err);
+        });
+    });
+}
+
+
+export const getProcessInstanceVarsMap = async(processInstanceId) => {
+    return new Promise((resolve, reject) => {
+        BPMNEngine.getProcessInstanceVars(processInstanceId).then((res) => {
+            let vars = res;
+            varsMap = vars.reduce((map, el) => {
+                map[el.name] = el;
+                return map;
+            }, {});
+            resolve(varsMap);
         }).catch(err => {
             reject(err);
         });

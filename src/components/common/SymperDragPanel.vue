@@ -37,14 +37,11 @@ window.dragElement = function(elmnt) {
         pos3 = 0,
         pos4 = 0;
     if (document.getElementById(elmnt.id + "header")) {
-        console.log('keo');
-        
         // if present, the header is where you move the DIV from:
         document.getElementById(
             elmnt.id + "header"
         ).onmousedown = dragMouseDown;
     } else {
-         console.log('keo');
         // otherwise, move the DIV from anywhere inside the DIV:
         elmnt.onmousedown = dragMouseDown;
     }

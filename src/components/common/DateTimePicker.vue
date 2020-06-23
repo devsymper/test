@@ -79,7 +79,6 @@ export default {
             this.$emit('apply-datetime',dateTime)
         },
         dateSelected(e){
-            console.log(e);
             this.$emit('clickDateCell',e);
             
         }

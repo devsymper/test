@@ -1,39 +1,30 @@
 <template>
-    <v-container fluid>
-        <v-row class="ml-0 mr-0">
-            <v-col cols="8" class="pb-1 pt-1">
-                <div class="fs-13 pl-2 pt-1">
-                    App name
-                    /
-                    Object name
-                    / 
-                    task id
-                </div>
-            </v-col>
-            <v-col cols="4" class="text-right pt-1 pb-1 pr-0">
-                <!-- <v-btn small text color="warning" class="mr-2">
-                    {{$t("tasks.claim")}}
-                </v-btn> -->
-                <v-btn small v-for="(action, idx) in taskActionBtns" dark :key="idx" :color="action.color" @click="saveTaskOutcome(action.value)" class="mr-2">
-                    <!-- <v-icon small class="mr-2">mdi-content-save</v-icon>  -->
+    <div class="h-100 w-100">
+        <v-row class="ml-0 mr-0 justify-space-between" style="    line-height: 31px;">
+            <div class="fs-13 pl-2 pt-1 float-left">
+                App name / Object name /  task id
+            </div>
+            <div class="text-right pt-1 pb-1 pr-0 float-right">
+                <v-btn small depressed v-for="(action, idx) in taskActionBtns" dark :key="idx" :color="action.color" @click="saveTaskOutcome(action.value)" class="mr-2">
                     {{action.text}}
                 </v-btn>
-                <v-btn small text @click="closeDetail">
+                <v-btn small text  @click="closeDetail">
                     <v-icon small>mdi-close</v-icon>
                 </v-btn>
-            </v-col>
+            </div>
         </v-row>
-        <v-divider style="border-width: 0.5px; border-color: #ff7400;"></v-divider>
-        <v-row>
-            <v-col cols="12" class="pt-0">
+        <v-divider style="border-color: #ff7400;"></v-divider>
+        <v-row class="ma-0">
+            <v-col cols="12" class="pa-0">
                 <v-card flat>
                     <v-tabs
                         v-model="tab"
                         background-color="transparent"
                         color="grey"
                         light
+                        height="30"
                         flat
-                    >
+                        grow>
                         <v-tab
                             v-for="item in items"
                             :key="item.tab"
@@ -47,22 +38,22 @@
                     <v-tabs-items v-model="tab">
                         <v-tab-item
                             v-for="item in items"
-                            :key="item.tab"
-                        >
-                            <v-card flat class="pl-4 pr-4">
+                            :key="item.tab">
+                            <VuePerfectScrollbar :style="{height: parentHeight +'px'}" class=" pr-4" >
                                 <component 
                                     @task-submited="handleTaskSubmited" 
                                     :is="item.content"
                                     :taskInfo="taskInfo"
+                                    :tabData="tabsData[item.tab]"
                                     :ref="item.tab">
                                 </component>
-                            </v-card>
+                            </VuePerfectScrollbar>
                         </v-tab-item>
                     </v-tabs-items>
                 </v-card>
             </v-col>
         </v-row>
-    </v-container>
+    </div>
 </template>
 
 <script>
@@ -76,7 +67,8 @@ import relatedItems from "./relatedItems";
 import subtask from "./subtask";
 import task from "./task";
 import BPMNEngine from '../../api/BPMNEngine';
-import { getVarsFromSubmitedDoc } from '../../components/process/processAction';
+import { getVarsFromSubmitedDoc, getProcessInstanceVarsMap } from '../../components/process/processAction';
+import VuePerfectScrollbar from "vue-perfect-scrollbar";
 
 export default {
     name: "taskDetail",
@@ -91,7 +83,11 @@ export default {
         isInitInstance: {
             type: Boolean,
             default: false
-        }
+        },
+        parentHeight: {
+            type: Number,
+            default: 300
+        },
     },
     watch: {
         taskInfo: {
@@ -104,10 +100,25 @@ export default {
     },
     components: {
         icon: icon,
-        attachment, comment, flow, info, people, relatedItems, subtask, task
+        attachment, comment, flow, info, people, relatedItems, subtask, task,
+        VuePerfectScrollbar
     },
     data: function() {
         return {
+            tabsData: {
+                people: {
+                    assignee: [],
+                    owner: [],
+                    participant: [],
+                    watcher: []
+                },
+                task: {},
+                'sub-task': {},
+                attachment: {},
+                comment: {},
+                info: {},
+                'related-items': {}
+            },
             taskActionBtns: [
                 {
                     text:"Submit",
@@ -162,7 +173,28 @@ export default {
             ],
         }
     },
+    computed: {
+        usersMap(){
+            return this.$store.state.app.allUsers.reduce((map, el) => {
+                map[el.id] = el;
+                return map;
+            }, {});
+        }
+    },
     methods: {
+        changeTaskDetailInfo(taskId){
+            let self = this;
+            BPMNEngine.getATaskInfo(taskId).then((res) => {
+                for(let role in self.tabsData.people){
+                    if(res[role]){
+                        self.tabsData.people[role] = res[role].split(',').reduce((arr, el) => {
+                            arr.push(self.usersMap[el]);
+                            return arr;
+                        }, []);
+                    }
+                }
+            });
+        },
         closeDetail() {
             this.$emit("close-detail", {});
         },
@@ -171,23 +203,22 @@ export default {
             if(this.taskAction == 'submit'){
                 this.$refs.task[0].submitForm(value);
             }else if(this.taskAction == 'approval'){
-                if(this.taskInfo.id){
-                    let taskData = {
-                        // action nhận 1 trong 4 giá trị: complete, claim, resolve, delegate
-                        "action": "complete",
-                        "assignee": "1",
-                        // "formDefinitionId": "12345",
-                        "outcome": value,
-                        // "variables": [],
-                        // "transientVariables": []
-                    }
-                    this.submitTask(taskData);
+                let taskData = {
+                    // action nhận 1 trong 4 giá trị: complete, claim, resolve, delegate
+                    "action": "complete",
+                    "assignee": "1",
+                    // "formDefinitionId": "12345",
+                    "outcome": value,
+                    // "variables": [],
+                    // "transientVariables": []
                 }
+                this.submitTask(taskData);
             }
         },
         async submitTask(taskData){
             try {
-                let result = await BPMNEngine.actionOnTask(this.taskInfo.id, taskData);   
+                let taskId = this.taskInfo.action.parameter.taskId;
+                let result = await BPMNEngine.actionOnTask(taskId, taskData);   
                 this.$snotifySuccess("Task completed!");
             } catch (error) {
                 this.$snotifyError(error, "Can not submit task!")
@@ -218,39 +249,19 @@ export default {
 
             this.taskActionBtns = approvalActions;
         },
+
+        // lấy data mới dựa theo data của task
         async changeTaskDetail(){
-            if(!this.taskInfo.processDefinitionId){
-                return;
+            if(!this.taskInfo.action){
+                return
             }
-            let taskNodeId = this.taskInfo.taskDefinitionKey;
             let varsMap = {};
-
-            // Lấy ra data model của process definition
-            let processModel = await BPMNEngine.getDefinitionModel(this.taskInfo.processDefinitionId);
-            let taskNode = processModel.processes[0].flowElementMap[taskNodeId];
-            let symperTaskPropsMap = {};
-            for(let item of taskNode.formProperties){
-                let propKey = item.id.replace(taskNodeId+'___', '');
-                symperTaskPropsMap[propKey] = item;
-            }
-
-            this.taskAction = symperTaskPropsMap.taskAction.defaultExpression;
-
-            // tạo ra map theo tên của variables
+            this.taskAction = this.taskInfo.action.action;
+            
             if(this.taskAction == 'approval'){
-                this.showApprovalOutcomes(symperTaskPropsMap.approvalActions.defaultExpression);
-                let vars = await BPMNEngine.getProcessInstanceVars(this.taskInfo.processInstanceId);
-                varsMap = vars.reduce((map, el) => {
-                    map[el.name] = el;
-                    return map;
-                }, {});
-                // lấy ra document object id của node được duyệt để hiển thị.
-                let approvaledElId = symperTaskPropsMap.approvalForElement.defaultExpression;
-                let docObjId = varsMap[approvaledElId+'_document_object_id'];
-
-                // Chuyển thông tin của document object id cho phần hiển thị chi tiết document
-                // ...
+                this.showApprovalOutcomes(JSON.parse(this.taskInfo.approvalActions));
             }
+            this.changeTaskDetailInfo(this.taskInfo.action.parameter.taskId);
         }
     }
 }

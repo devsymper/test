@@ -96,9 +96,11 @@ export default {
                 accInfo.baId = data.profile.id;
                 this.$store.commit("app/changeCurrentBAInfo", data.profile);
                 endUserInfo = endUserInfo.userDelegate;
+                accInfo.endUserId = data.profile.userDelegate.id;
+            }else{
+                accInfo.endUserId = data.profile.id;
             }
             this.$store.commit("app/changeCurrentUserInfo", endUserInfo);
-            accInfo.endUserId = data.profile.userDelegate.id;
             util.auth.saveLoginInfo(accInfo);
         }
     },

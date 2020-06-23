@@ -80,6 +80,19 @@ export default {
         }
     },
     methods: {
+        changeTaskNodeToUserTaskNode(id){
+            var element = this.bpmnModeler.get('elementRegistry').get(id);
+            let name = element.businessObject.name;
+            var newElementData =  {
+                type: 'bpmn:UserTask',
+            };
+
+            var replace = this.bpmnModeler.get('replace');
+            var newElement = replace.replaceElement(element, newElementData);
+            this.updateElementProperties(element.businessObject.id, {
+                name: name
+            });
+        },
         renderFromXML(xml){
             let self = this;
             return new Promise((resolve, reject) => {

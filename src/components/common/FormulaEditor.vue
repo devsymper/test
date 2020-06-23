@@ -114,7 +114,7 @@
 
 <script>
 import Api from "../../api/api.js";
-import ace from "ace-builds";
+// import ace from "ace-builds";
 export default {
     name: "FormulaEditor",
     components: {},
@@ -431,7 +431,6 @@ export default {
             });
 
             this.formulaEditor.on("blur", e => {
-                console.log(e);
                 self.$emit("change", self.getValue());
             });
         },

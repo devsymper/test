@@ -1,32 +1,33 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
-import Home from "../views/Home.vue";
-import BPMNE from "../views/process/ProcessList.vue";
-import Login from "../views/Login.vue";
+// import Home from "../views/Home.vue";
+// import workflow from "../views/process/ProcessList.vue";
+// import Login from "../views/Login.vue";
 import { routeMiddleware } from './middleware.js';
 import PageNotFound from './../views/PageNotFound.vue';
 import MultiGuard from 'vue-router-multiguard';
-import CreateProcess from "../views/process/CreateProcess.vue";
-import ShowListUser from "../views/users/ShowList.vue";
-import ShowListDocument from "../views/document/ShowList.vue";
-import ShowListService from "../views/service/ShowList.vue";
-import ActionPanel from "../views/users/ActionPanel.vue";
-import Snippet from "../views/snippets/index.vue";
-import Permissions from "../views/permissions/index.vue";
-import apps from "../views/apps/index.vue";
-import actions from "../views/actions/index.vue";
-import virtualdocs from "../views/virtualdocs/index.vue";
-import tasks from "../views/tasks/index.vue";
-import application from "../views/apps/yourApp.vue";
-import Editor from "../views/document/Editor.vue";
-import SubmitDocument from "../views/document/submit/Submit.vue";
-import DetailDocument from "../views/document/detail/Detail.vue";
-import ListObject from "../views/document/listobject/ListObject.vue";
-import DeployHistory from "../views/process/DeployHistory.vue";
-import RunInstance from "../views/process/RunInstance.vue";
-import ProcessInstances from "../views/process/ProcessInstances.vue";
-import TrackingProcessInstance from "../views/process/TrackingProcessInstance.vue";
-import WorkList from "../views/works/WorkList.vue";
+// import CreateProcess from "../views/process/CreateProcess.vue";
+// import ShowListUser from "../views/users/ShowList.vue";
+// import ShowListDocument from "../views/document/ShowList.vue";
+// import ShowListService from "../views/service/ShowList.vue";
+// import ActionPanel from "../views/users/ActionPanel.vue";
+// import Snippet from "../views/snippets/index.vue";
+// import Permissions from "../views/permissions/index.vue";
+// import apps from "../views/apps/index.vue";
+// import actions from "../views/actions/index.vue";
+// import virtualdocs from "../views/virtualdocs/index.vue";
+// import tasks from "../views/tasks/index.vue";
+// import application from "../views/apps/yourApp.vue";
+// import Editor from "../views/document/Editor.vue";
+// import SubmitDocument from "../views/document/submit/Submit.vue";
+// import DetailDocument from "../views/document/detail/Detail.vue";
+// import ListObject from "../views/document/listobject/ListObject.vue";
+// import DeployHistory from "../views/process/DeployHistory.vue";
+// import RunInstance from "../views/process/RunInstance.vue";
+// import ProcessInstances from "../views/process/ProcessInstances.vue";
+// import TrackingProcessInstance from "../views/process/TrackingProcessInstance.vue";
+// import WorkList from "../views/works/WorkList.vue";
+// import DoTask from "../views/tasks/DoTask.vue";
 
 Vue.use(VueRouter);
 /**
@@ -40,53 +41,72 @@ Vue.use(VueRouter);
 const routes = [{
         path: "/",
         name: "home",
-        component: Home,
+        // component: Home
+        component: () =>
+            import ('../views/Home.vue')
     },
     {
-        path: "/bpmne",
+        path: "/workflow",
         name: "processList",
-        component: BPMNE,
+        // component: workflow,
+        component: () =>
+            import ('../views/process/ProcessList.vue'),
     },
     {
-        path: "/bpmne/:id/edit",
+        path: "/workflow/:id/edit",
         name: "editProcess",
-        component: CreateProcess,
+        component: () =>
+            import ('../views/process/CreateProcess.vue'),
     },
     {
-        path: "/bpmne/:id/clone",
+        path: "/workflow/:id/clone",
         name: "cloneProcess",
-        component: CreateProcess,
+        component: () =>
+            import ('../views/process/CreateProcess.vue'),
+
     },
     {
-        path: "/bpmne/:name/deploy-history",
+        path: "/workflow/:name/deploy-history",
         name: "deployHistory",
-        component: DeployHistory,
+        // component: DeployHistory,
+        component: () =>
+            import ('../views/process/DeployHistory.vue')
     },
     {
-        path: "/bpmne/process-definition/:idProcessDef/instances",
+        path: "/workflow/process-definition/:idProcessDef/instances",
         name: "listProcessInstances",
-        component: ProcessInstances,
+        // component: ProcessInstances,
+        component: () =>
+            import ('../views/process/ProcessInstances.vue')
+
     },
     {
-        path: "/bpmne/process-instances/:idInstance/tracking",
+        path: "/workflow/process-instances/:idInstance/tracking",
         name: "trackingProcessInstance",
-        component: TrackingProcessInstance,
+        // component: TrackingProcessInstance,
+        component: () =>
+            import ('../views/process/TrackingProcessInstance.vue')
     },
     {
-        path: "/bpmne/create",
+        path: "/workflow/create",
         name: "createProcess",
-        component: CreateProcess,
+        component: () =>
+            import ('../views/process/CreateProcess.vue'),
     },
     {
-        path: "/bpmne/process-definition/:id/run",
+        path: "/workflow/process-definition/:id/run",
         name: "RunInstance",
-        component: RunInstance,
+        // component: RunInstance,
+        component: () =>
+            import ('../views/process/RunInstance.vue'),
     },
     {
         path: "/login",
         name: "login",
         meta: { layout: "content-only" },
-        component: Login,
+        // component: Login,
+        component: () =>
+            import ('../views/Login.vue'),
     },
 
     //users
@@ -94,18 +114,24 @@ const routes = [{
     {
         path: "/users",
         name: "processListUser",
-        component: ShowListUser,
+        // component: ShowListUser,
+        component: () =>
+            import ('../views/users/ShowList.vue'),
     },
 
     {
         path: "/users/add",
         name: "addUser",
-        component: ActionPanel,
+        // component: ActionPanel,
+        component: () =>
+            import ('../views/users/ActionPanel.vue'),
     },
     {
         path: "/users/edit/:id",
         name: "editUser",
-        component: ActionPanel,
+        // component: ActionPanel,
+        component: () =>
+            import ('../views/users/ActionPanel.vue'),
 
     },
 
@@ -114,39 +140,53 @@ const routes = [{
     {
         path: "/documents",
         name: "processListDocument",
-        component: ShowListDocument,
+        // component: ShowListDocument,
+        component: () =>
+            import ('../views/document/ShowList.vue'),
     },
     {
         path: "/document/editor",
         name: "createDocument",
-        component: Editor,
+        // component: Editor,
+        component: () =>
+            import ('../views/document/Editor.vue'),
     },
     {
         path: "/document/editor/:id?",
         name: "editDocument",
-        component: Editor,
+        // component: Editor,
+        component: () =>
+            import ('../views/document/Editor.vue'),
 
     },
     {
         path: "/document/submit/:id?",
         name: "submitDocument",
-        component: SubmitDocument,
+        // component: SubmitDocument,
+        component: () =>
+            import ('../views/document/submit/Submit.vue'),
 
     },
     {
         path: "/document/objects/:id?",
         name: "detailDocument",
-        component: DetailDocument,
+        // component: DetailDocument,
+        component: () =>
+            import ('../views/document/detail/Detail.vue'),
     },
     {
         path: "/document/objects/update/:id?",
         name: "updateDocumentObject",
-        component: SubmitDocument,
+        // component: SubmitDocument,
+        component: () =>
+            import ('../views/document/submit/Submit.vue'),
     },
     {
         path: "/document/:name?/objects",
         name: "listDocumentObject",
-        component: ListObject,
+        // component: ListObject,
+        component: () =>
+            import ('../views/document/listobject/ListObject.vue'),
 
     },
     //service
@@ -154,7 +194,9 @@ const routes = [{
     {
         path: "/service",
         name: "processListService",
-        component: ShowListService,
+        // component: ShowListService,
+        component: () =>
+            import ('../views/service/ShowList.vue'),
     },
 
     // {
@@ -167,47 +209,70 @@ const routes = [{
     {
         path: "/snippets",
         name: "snippets",
-        component: Snippet,
+        // component: Snippet,
+        component: () =>
+            import ('../views/snippets/index.vue'),
     },
     //Permissions
     {
         path: "/permissions",
         name: "permissions",
-        component: Permissions,
+        // component: Permissions,
+        component: () =>
+            import ('../views/permissions/index.vue'),
     },
     {
         path: "/apps",
         name: "apps",
-        component: apps,
+        // component: apps,
+        component: () =>
+            import ('../views/apps/index.vue'),
     },
     {
         path: "/application",
         name: "application",
-        component: application,
+        // component: application,
+        component: () =>
+            import ('../views/apps/yourApp.vue'),
     },
     {
         path: "/actions",
         name: "actions",
-        component: actions,
+        // component: actions,
+        component: () =>
+            import ('../views/actions/index.vue'),
     },
     {
         path: "/virtualdocs",
         name: "virtualdocs",
-        component: virtualdocs,
+        // component: virtualdocs,
+        component: () =>
+            import ('../views/virtualdocs/index.vue'),
     },
     {
         path: "/tasks",
         name: "tasks",
-        component: tasks,
+        // component: tasks,
+        component: () =>
+            import ('../views/tasks/index.vue'),
+    },
+    {
+        path: "/tasks/:id",
+        name: "tasks",
+        // component: DoTask
+        component: () =>
+            import ('../views/tasks/DoTask.vue')
     },
     {
         path: "/works",
         name: "workList",
-        component: WorkList,
+        // component: WorkList,
+        component: () =>
+            import ('../views/works/WorkList.vue'),
     },
+];
 
-    // Luôn để 2 item này ở cuối cùng của array này để nó có thể redirect đến được trang 404 khi ko tìm thấy route
-    {
+routes.concat([{
         path: "/page-not-found",
         name: "pageNotFound",
         component: PageNotFound, //Vue component,
@@ -217,8 +282,8 @@ const routes = [{
         path: "*",
         name: "page",
         redirect: "/page-not-found",
-    },
-];
+    }
+]);
 
 /**
  * Thêm các middleware vào cho các route

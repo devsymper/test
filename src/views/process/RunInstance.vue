@@ -20,7 +20,12 @@ export default {
     data(){
         return {
             taskInfo: {
-                docId: 0// Nếu là submit cần biết document id là gì để load form
+                action: {
+                    parameter: {
+                        documentId: 0,
+                    },
+                    action: 'submit',
+                }
             },
             startType: 'submit', // các loại bắt đầu quy trình khác nhau: hiện tại chỉ có 1 loại là submit
             definitionModel: {} // các cấu hình của process definition
@@ -35,7 +40,7 @@ export default {
             
             let definitionModel = await BPMNEApi.getDefinitionModel(idDefinition);
             this.definitionModel = definitionModel;
-            this.taskInfo.docId = Number(definitionModel.mainProcess.initialFlowElement.formKey);
+            this.taskInfo.action.parameter.documentId = Number(definitionModel.mainProcess.initialFlowElement.formKey);
         },
         // getValueForVariable(value, type){
         //     if(type == 'string'){

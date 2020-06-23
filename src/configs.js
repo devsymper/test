@@ -11,7 +11,8 @@ export const appConfigs = {
         user: 'https://account.symper.vn/',
         core: 'https://v2hoangnd.dev.symper.vn/',
         bpmne: {
-            models: 'https://v2khadm.dev.symper.vn/process-modeler',
+            models: 'https://workflow-modeler.symper.vn',
+            // models: 'https://v2khadm.dev.symper.vn/process-modeler',
             deployments: "https://workflow.symper.vn:8443/symper-rest/service/repository/deployments",
             definitions: "https://workflow.symper.vn:8443/symper-rest/service/repository/process-definitions",
             instances: "https://workflow.symper.vn:8443/symper-rest/service/runtime/process-instances",

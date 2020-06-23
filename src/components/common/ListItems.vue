@@ -349,6 +349,9 @@ export default {
             savedTableDisplayConfig: [] // cấu hình hiển thị của table đã được lueu trong db
         };
     },
+    activated(){
+        this.$refs.dataTable.hotInstance.render();
+    },
     created() {
         let thisCpn = this;
         // this.$evtBus.$on("change-user-locale", locale => {
@@ -464,10 +467,6 @@ export default {
         }
     },
     mounted() {},
-    activated() {
-        console.log('activatedactivatedactivatedactivatedactivatedactivatedactivatedactivated');
-        
-    },
     computed: {
         currentItemDataClone() {
             return util.cloneDeep(this.currentItemData);
@@ -582,8 +581,6 @@ export default {
                 headers.push(item.columnTitle);
                 return headers;
             }, []);
-
-            console.log("render column header handsontable");
 
             return function(col) {
                 let colName = colNames[col];

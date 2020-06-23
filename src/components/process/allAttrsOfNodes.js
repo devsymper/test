@@ -83,7 +83,16 @@ let allAttrs = {
                 "type": "String"
             }]
         },
-        pushToXML: attrToXMLMethods.documentationMethod
+        pushToXML: attrToXMLMethods.documentationMethod,
+        hidden: true
+    },
+    "description": {
+        "title": "Description",
+        "type": "text",
+        "value": "",
+        "info": "",
+        "dg": "general",
+        pushToXML: attrToXMLMethods.notPushToXML,
     },
     "categorydefinition": {
         "title": "Category",
@@ -1525,10 +1534,13 @@ let allAttrs = {
     "formreference": {
         "title": "Form reference",
         "type": "autocomplete",
-        "value": undefined,
+        "value": '',
         "info": "BPMN.PROPERTYPACKAGES.FORMREFERENCEPACKAGE.FORMREFERENCE.DESCRIPTION",
         "dg": "taskAction",
         onSearch: async function(val) { // val là giá trị đang nhập trên ô input, lúc này this sẽ trỏ đến autocomplete instance
+            if (!val) {
+                return;
+            }
             let docs = await apiCaller.get(appConfigs.apiDomain.documents + '?search=' + val);
             this.myItems = docs.data.listObject;
         },
@@ -1632,6 +1644,10 @@ let allAttrs = {
                 text: 'Approval',
                 value: 'approval'
             },
+            {
+                text: 'Update document',
+                value: 'update'
+            },
         ],
         dg: 'taskAction',
         isSymperProp: true,
@@ -1709,17 +1725,23 @@ let allAttrs = {
             formula: '',
             orgchartSelectorValue: [] // dạng value của orgchartselector để hiển thị lên
         },
+        getValueForXML(value) {
+            let userIds = [];
+            for (let item of value.orgChart) {
+                if (item.id.includes('user-')) {
+                    userIds.push(item.id.replace('user-', ''));
+                }
+            }
+            return userIds.join(',');
+        },
         activeTab: 'orgchart', // tab nào sẽ mở: orgchart hoặc script
         dg: 'assignment',
         toXML: {
             "symper_position": "attr",
-            "name": "sym_assignee",
+            "name": "symper_prefix_chars_assignee",
             "isAttr": true,
             "type": "String"
         },
-        isSymperProp: true,
-        pushToXML: attrToXMLMethods.notPushToXML
-
     },
     taskOwner: {
         title: 'Task owner',
@@ -1731,9 +1753,13 @@ let allAttrs = {
         },
         activeTab: 'orgchart', // tab nào sẽ mở: orgchart hoặc script
         dg: 'assignment',
-        isSymperProp: true,
+        // toXML: {
+        //     "symper_position": "attr",
+        //     "name": "candidateUsers",
+        //     "isAttr": true,
+        //     "type": "String"
+        // },
         pushToXML: attrToXMLMethods.notPushToXML
-
     },
     candidateUsers: {
         title: 'Candidate users',
@@ -1744,9 +1770,21 @@ let allAttrs = {
         },
         activeTab: 'orgchart', // tab nào sẽ mở: orgchart hoặc script
         dg: 'assignment',
-        isSymperProp: true,
-        pushToXML: attrToXMLMethods.notPushToXML
-
+        getValueForXML(value) {
+            let userIds = [];
+            for (let item of value.orgChart) {
+                if (item.id.includes('user-')) {
+                    userIds.push(item.id.replace('user-', ''));
+                }
+            }
+            return userIds.join(',');
+        },
+        toXML: {
+            "symper_position": "attr",
+            "name": "symper_prefix_chars_candidateUsers",
+            "isAttr": true,
+            "type": "String"
+        },
     },
 
     notificationTitle: {
@@ -1757,7 +1795,22 @@ let allAttrs = {
         dg: 'formula',
         isSymperProp: true,
         pushToXML: attrToXMLMethods.notPushToXML
-
+    },
+    taskExtraInfoLabel: {
+        title: 'Extra info label for task',
+        type: 'script',
+        value: '',
+        info: '',
+        dg: 'formula',
+        pushToXML: attrToXMLMethods.notPushToXML
+    },
+    taskExtraInfoValue: {
+        title: 'Extra info value for task',
+        type: 'script',
+        value: '',
+        info: '',
+        dg: 'formula',
+        pushToXML: attrToXMLMethods.notPushToXML
     },
     notificationContent: {
         title: 'Notification and task content',
@@ -1765,9 +1818,24 @@ let allAttrs = {
         value: '',
         info: '',
         dg: 'formula',
-        isSymperProp: true,
         pushToXML: attrToXMLMethods.notPushToXML
+    },
+    extraInfoLabel: {
+        title: 'extra info label',
+        type: 'script',
+        value: '',
+        info: '',
+        dg: 'formula',
+        pushToXML: attrToXMLMethods.notPushToXML
+    },
 
+    extraInfoValue: {
+        title: 'extra info value',
+        type: 'script',
+        value: '',
+        info: '',
+        dg: 'formula',
+        pushToXML: attrToXMLMethods.notPushToXML
     },
 
     approvalForElement: {
@@ -1780,7 +1848,17 @@ let allAttrs = {
         showId: false,
         isSymperProp: true,
         pushToXML: attrToXMLMethods.notPushToXML
-
+    },
+    updateForElement: {
+        title: 'Update for element',
+        type: 'autocomplete',
+        value: '',
+        info: '',
+        options: [],
+        dg: 'taskAction',
+        showId: false,
+        isSymperProp: true,
+        pushToXML: attrToXMLMethods.notPushToXML
     },
     controlsForBizKey: {
         title: 'Select control for business key',
@@ -1794,6 +1872,25 @@ let allAttrs = {
         toXML: {
             "symper_position": "el",
             "name": "BusinessKeyControl",
+            "superClass": ["Element"],
+            "properties": [{
+                "name": "text",
+                "isBody": true,
+                "type": "String"
+            }]
+        },
+    },
+    documentObjectIdForUpdate: {
+        title: 'Script for select document object id (ex: Select {IDNODE_document_object_id})',
+        type: "script",
+        value: '',
+        info: '',
+        dg: 'taskAction',
+        isSymperProp: true,
+        pushToXML: attrToXMLMethods.notPushToXML,
+        toXML: {
+            "symper_position": "el",
+            "name": "documentObjectIdForUpdate",
             "superClass": ["Element"],
             "properties": [{
                 "name": "text",

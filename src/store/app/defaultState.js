@@ -21,14 +21,14 @@ const defaultState = {
             },
         ],
     },
-    collapseSideBar: true, // trạng thái của sidebar: true là đang nhỏ, false là đang mở rộng
+    collapseSideBar: false, // trạng thái của sidebar: true là đang nhỏ, false là đang mở rộng
     unreadNotification: 2, // số lượng các thông báo chưa đọc
     needReloadNotification: false,
     items: [
         // các menu mà ba hoặc enduser được phân quyền
         { title: "application", icon: "mdi-application", link: "/application" },
         { title: "reports", icon: "mdi-view-dashboard", link: "/reports" },
-        { title: "workflows", icon: "mdi-sitemap", link: "/bpmne" },
+        { title: "workflows", icon: "mdi-sitemap", link: "/workflow" },
         {
             title: "documents",
             icon: "mdi-file-document-outline",

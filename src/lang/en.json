@@ -291,7 +291,7 @@
         "list": {
             "title": "Process list",
             "deploy_history": "Deploy history",
-            "start": "Deploy and start process",
+            "start": "Start workflow",
             "instances": "List instances"
         },
         "action": {

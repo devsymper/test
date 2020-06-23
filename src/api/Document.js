@@ -27,5 +27,8 @@ export const documentApi = {
     },
     saveMultiFormulas(data) {
         return formulasApi.post('/formulas/batch', data);
+    },
+    getListDocuments(data = {}) {
+        return coreApi.get("documents", data);
     }
 };

@@ -24,14 +24,14 @@
                     'px-0': sapp.collapseSideBar,
                     'ma-0 pb-1': true ,
                 }">
-                <v-list-item-avatar style="position: relative; top: -8px">
+                <v-list-item-avatar @click="invertSidebarShow()">
                     <img src="https://randomuser.me/api/portraits/men/81.jpg" />
                 </v-list-item-avatar>
 
                 <v-list-item-content>
                     <v-list-item-title>
                         <span class="mt-1 position-relative" style="top: 5px; position: relative;">
-                            {{ sapp.baInfo.name }}
+                            {{ sapp.baInfo.name ? sapp.baInfo.name : sapp.endUserInfo.displayName }}
                         </span> 
                         <v-tooltip top>
                             <template v-slot:activator="{ on }">
@@ -42,12 +42,72 @@
                         </v-tooltip>
                     </v-list-item-title>
                     <div class="w-100 mb-1 ">
-                        <div class="w-100 d-flex" style="color: rgba(0, 0, 0, 0.54)">
+                        <div class="w-100 d-flex" v-if="sapp.baInfo.name"  style="color: rgba(0, 0, 0, 0.54)">
+                            
                             <v-tooltip top>
                                 <template v-slot:activator="{ on }">
                                     <i v-on="on" class="mdi mdi-account-check-outline fs-16 mr-1" style="position: relative;top: 2px;"></i> 
                                 </template>
                                 <span>User</span>
+                            </v-tooltip>
+                            <v-menu 
+                                v-model="showDelegatedUser"
+                                :offset-y="true"
+                                :close-on-content-click="false">
+                                <template v-slot:activator="{ on: menu, attrs }">
+                                    <v-tooltip bottom>
+                                        <template v-slot:activator="{ on: tooltip }">
+                                            <v-btn
+                                                x-small
+                                                text
+                                                v-bind="attrs"
+                                                @click="openSelectUserPanel"
+                                                depressed
+                                                v-on="{ ...tooltip, ...menu }">
+                                                
+                                                <span class="fs-11" style="font-weight: 400!important">
+                                                    {{sapp.endUserInfo.displayName}}
+                                                </span>
+                                            </v-btn>
+                                        </template>
+                                        <span>Switch user</span>
+                                    </v-tooltip>
+                                </template>
+                                 <div class="bg-white" style="width: 200px">
+                                    <v-autocomplete
+                                        ref="selectDelegateUser"
+                                        return-object
+                                        full-width
+                                        solo
+                                        append-icon=""
+                                        :items="sapp.allUsers"
+                                        background-color="grey lighten-4"
+                                        flat
+                                        dense
+                                        color="blue-grey lighten-2"
+                                        :label="$t('common.search')"
+                                        item-text="displayName"
+                                        @change="delegateUser"
+                                        item-value="name"
+                                        :filter="filterUser">
+                        
+                                        <template v-slot:item="data">
+                                            <div class="fs-13 py-1">
+                                                <i class="mdi mdi-account mr-2 fs-16"> </i> <span> {{data.item.displayName}}</span>
+                                            </div>
+                                        </template>
+
+                                    </v-autocomplete>
+
+                                 </div>
+                            </v-menu>
+                        </div>
+                        <div class="w-100 d-flex" style="color: rgba(0, 0, 0, 0.54)">
+                            <v-tooltip top>
+                                <template v-slot:activator="{ on }">
+                                    <i class="mdi mdi-account-circle-outline fs-16 mr-1" v-on="on" style="position: relative;top: 2px;"></i>                            
+                                </template>
+                                <span>Role</span>
                             </v-tooltip>
                             <v-tooltip top>
                                 <template v-slot:activator="{ on }">
@@ -56,40 +116,13 @@
                                         text
                                         v-on="on"
                                         depressed>
-                                        {{sapp.endUserInfo.displayName}}
+                                        <span class="fs-11" style="font-weight: 400!important">
+                                            {{sapp.endUserInfo.currentRole.title}}
+                                        </span>
                                     </v-btn>
                                 </template>
-                                <span>Switch user</span>
+                                <span>Switch role</span>
                             </v-tooltip>
-                        </div>
-                        <div class="w-100 d-flex"  style="color: rgba(0, 0, 0, 0.54)">
-                            <v-tooltip top>
-                                <template v-slot:activator="{ on }">
-                                    <i class="mdi mdi-account-circle-outline fs-16 mr-1" v-on="on" style="position: relative;top: 2px;"></i>                            
-                                </template>
-                                <span>Role</span>
-                            </v-tooltip>
-                            <v-menu :offset-y="true">
-                                <template v-slot:activator="{ on: menu, attrs }">
-                                    <v-tooltip bottom>
-                                    <template v-slot:activator="{ on: tooltip }">
-                                        <v-btn
-                                            x-small
-                                            text
-                                            v-bind="attrs"
-                                            depressed
-                                            v-on="{ ...tooltip, ...menu }">
-                                            {{sapp.endUserInfo.currentRole.title}}
-                                        </v-btn>
-                                    </template>
-                                    <span>Switch role</span>
-
-                                    </v-tooltip>
-                                </template>
-                                 <v-card>
-                                     di
-                                 </v-card>
-                            </v-menu>
                         </div>
                     </div>
 
@@ -135,7 +168,7 @@
         <template v-slot:append>
             <v-list dense>
                 <v-list-item>
-                    <v-list-item-icon class="mx-2">
+                    <v-list-item-icon >
                         <v-icon @click.stop="invertSidebarShow()">mdi-menu</v-icon>
                     </v-list-item-icon>
                     <v-menu>
@@ -175,6 +208,7 @@ export default {
     created(){
         let savedUserInfo = util.auth.getSavedUserInfo();
         this.setUserInfo(savedUserInfo);
+        this.$store.dispatch("app/getAllUsers");
     },
     components: {
         VuePerfectScrollbar
@@ -186,14 +220,29 @@ export default {
     },
     watch: {
         "sapp.collapseSideBar": function(newVl) {
-            console.log("collapseSideBar app changed", newVl);
         }
     },
     mounted(){
         this.reCalcSidebarHeight();
     },
     methods: {
-        setUserInfo(data) { // đang trùng với hàm cùng tên ở component login.vue
+        filterUser(item, queryText, itemText){
+            let lowcaseText = queryText.toLowerCase();
+            return item.displayName.toLowerCase().includes(lowcaseText);
+        },
+        async delegateUser(user){
+            let delegatedUser = await userApi.changeDelegate(user);
+            this.showDelegatedUser = false;
+            this.setUserInfo(delegatedUser.data);
+            location.reload();
+        },
+        openSelectUserPanel(){
+            this.delegatedUser = {};
+            setTimeout((self) => {
+                $(self.$refs.selectDelegateUser.$el).find('.v-select__slot').click();
+            }, 400, this);
+        },
+        setUserInfo(data) {// đang trùng với hàm cùng tên ở component BAsidebar.vue
             let accData = {
                 accType: data.profile.type,
                 info: data.profile
@@ -210,14 +259,14 @@ export default {
                 accInfo.baId = data.profile.id;
                 this.$store.commit("app/changeCurrentBAInfo", data.profile);
                 endUserInfo = endUserInfo.userDelegate;
+                accInfo.endUserId = data.profile.userDelegate.id;
+            }else{
+                accInfo.endUserId = data.profile.id;
             }
             this.$store.commit("app/changeCurrentUserInfo", endUserInfo);
-            accInfo.endUserId = data.profile.userDelegate.id;
             util.auth.saveLoginInfo(accInfo);
         },
         reCalcSidebarHeight(){
-            console.log('xxxxxxxxxxxxxx');
-            
             this.menuItemsHeight = (util.getComponentSize(this).h - 200)+'px';
         },
         logout(){
@@ -249,6 +298,10 @@ export default {
     },
     data() {
         return {
+            showDelegatedUser: false,
+            delegatedUser: {},
+            searchUserDeligate: '',
+            listUserForDelegate: [],
             menuItemsHeight: '200px'
         };
     }

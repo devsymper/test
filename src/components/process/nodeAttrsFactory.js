@@ -2,7 +2,7 @@ import { allAttrDisplayGroup } from "./allAttrDisplayGroup";
 import { allNodesAttrs } from "./allAttrsOfNodes";
 import { util } from "./../../plugins/util";
 // Thuộc tính chung cho tất cả các node của process, thuộc tính mà tất cả các node đều phải có
-const commonAttrs = ['overrideid', 'name', 'documentation'];
+const commonAttrs = ['overrideid', 'name', 'documentation', 'description'];
 
 
 
@@ -39,7 +39,7 @@ const dockerGroups = {
 export const nodeAttrsDefinition = {
     'UserTask': {
         group: 'task', // nhóm thuộc tính mà node này thuộc về, giá trị là một hoặc nhiều key trong "groupsAttrs"
-        attrs: ['taskAction', "usertaskassignment", 'taskOwner', 'assignee', 'candidateUsers', 'notificationTitle', 'notificationContent', "formkeydefinition", "formreference", "formfieldvalidation", "duedatedefinition", "prioritydefinition", 'approvalActions', 'approvalForElement', "formproperties", "tasklisteners", "skipexpression", "categorydefinition"],
+        attrs: ['taskAction', "usertaskassignment", 'taskOwner', 'assignee', 'candidateUsers', 'notificationTitle', 'notificationContent', "formkeydefinition", "formreference", "formfieldvalidation", "duedatedefinition", "prioritydefinition", 'approvalActions', 'updateForElement', "formproperties", "tasklisteners", "skipexpression", "categorydefinition", "approvalForElement", "extraInfoLabel", "extraInfoValue"],
         exclude: ['asynchronousdefinition', 'exclusivedefinition'],
         validate: function(attrs) {
 
@@ -55,11 +55,18 @@ export const nodeAttrsDefinition = {
             if (taskAction.value == 'submit') {
                 attrs.approvalActions.hidden = true;
                 attrs.formreference.hidden = false;
+                attrs.updateForElement.hidden = true;
                 attrs.approvalForElement.hidden = true;
             } else if (taskAction.value == 'approval') {
                 attrs.approvalActions.hidden = false;
                 attrs.formreference.hidden = true;
+                attrs.updateForElement.hidden = true;
                 attrs.approvalForElement.hidden = false;
+            } else if (taskAction.value == 'update') {
+                attrs.approvalActions.hidden = true;
+                attrs.formreference.hidden = true;
+                attrs.approvalForElement.hidden = true;
+                attrs.updateForElement.hidden = false;
             }
         },
         docker: dockerGroups.task

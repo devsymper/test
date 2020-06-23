@@ -33,7 +33,7 @@ export default {
                     text: this.$t("common.edit"),
                     callback: (row, callback) => {
                         self.$goToPage(
-                            "/bpmne/"+row.id+"/edit",
+                            "/workflow/"+row.id+"/edit",
                             " Edit " + (row.name ? row.name : row.key)
                         );
                     }
@@ -70,7 +70,7 @@ export default {
                     name: "deployHistory",
                     text: this.$t("process.list.deploy_history"),
                     callback: (row, callback) => {
-                        self.$goToPage(`/bpmne/${row.name}/deploy-history`,self.$t('process.deployment.list'));
+                        self.$goToPage(`/workflow/${row.name}/deploy-history`,self.$t('process.deployment.list'));
                     }
                 },
                 {
@@ -89,8 +89,8 @@ export default {
                             lastestDeployment = lastestDeployment.data[0];
                             deploymentId = lastestDeployment.id;
                             // if(lastestDeployment.deploymentTime < row.lastUpdated){
-                            let deploymentData = await deployProcess(self, row);
-                            deploymentId = deploymentData.id;
+                                // let deploymentData = await deployProcess(self, row);
+                                // deploymentId = deploymentData.id;
                             // }
                         }else{
                             let deploymentData = await deployProcess(self, row);
@@ -102,7 +102,7 @@ export default {
                         });
 
                         if(defData.data[0]){
-                            self.$goToPage(`/bpmne/process-definition/${defData.data[0].id}/run`,'Start process instance');
+                            self.$goToPage(`/workflow/process-definition/${defData.data[0].id}/run`,'Start process instance');
                         }else {
                             self.$snotifyError({},"Can not find process definition having deployment id "+deploymentId);
                         }
@@ -125,7 +125,7 @@ export default {
     watch: {},
     methods: {
         goToCreatePage(){
-            this.$goToPage('/bpmne/create',this.$t("process.action.create"));
+            this.$goToPage('/workflow/create',this.$t("process.action.create"));
         },
         calcContainerHeight() {
             this.containerHeight = util.getComponentSize(this).h;
