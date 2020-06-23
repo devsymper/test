@@ -80,6 +80,7 @@
 </template>
 <script>
 import { documentApi } from "./../../../api/Document.js";
+import "./../../../components/document/documentContent.css";
 import { setDataForPropsControl } from "./../../../components/document/dataControl";
 import BasicControl from "./basicControl";
 import TableControl from "./tableControl";
