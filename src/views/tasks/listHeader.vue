@@ -1,22 +1,22 @@
 <template>
-    <v-row class="ml-0 mr-0">
-        <v-col 
+    <div class="w-100 d-flex justify-space-between">
+        <div 
             cols="2" 
             class="pt-1 pb-1"
-            v-if="!compackMode"
-        >
-            <!-- Nút thêm mới task -->
+            v-if="!compackMode">
+            <span class="title ml-2" v-show="!sideBySideMode">
+                {{headerTitle}}
+            </span>
             <v-menu offset-y light
                 :close-on-content-click="false"
                 :min-width="200"
-                v-if="!compackMode"
-            >
+                v-if="!compackMode">
                 <template v-slot:activator="{ on }">
                     <v-btn
                         v-on="on"
                         small
                         text
-                        class="success white--text"
+                        class="success white--text ml-2"
                         style="margin-top: 1px"
                     >
                         {{$t("common.add")}} 
@@ -60,8 +60,8 @@
                     </v-list>
                 </v-list>
             </v-menu>
-        </v-col>
-        <v-col :cols="compackMode ? 12: 10" class="text-right pt-1 pb-1 pr-0">
+        </div>
+        <div class="pt-1 pb-1 pr-0">
             <!-- Tìm kiếm -->
             <v-text-field dense
                 class="bg-grey sym-small-pad sym-small-size d-inline-block mr-2"
@@ -157,7 +157,7 @@
             >
                 <v-icon size="18">{{isSmallRow ? 'mdi-view-stream' : 'mdi-view-headline'}}</v-icon>
             </v-btn>
-        </v-col>
+        </div>
         <v-dialog
             v-model="dialog"
             width="400"
@@ -233,7 +233,7 @@
                 </v-card-actions>
             </v-card>
         </v-dialog>
-    </v-row>
+    </div>
 </template>
 
 <script>
@@ -262,6 +262,10 @@ export default {
             type: Boolean,
             default: true
         },
+        headerTitle: {
+            type: String,
+            default: 'List tasks'
+        } 
     },
     data: function() {
         return {

@@ -7,6 +7,7 @@
                 class="pt-0 pl-0 pr-0 pb-0">
                 <listHeader
                     :isSmallRow="isSmallRow"
+                    :headerTitle="headerTitle"
                     :sideBySideMode="sideBySideMode"
                     :compackMode="compackMode"
                     @change-density="isSmallRow = !isSmallRow"
@@ -207,6 +208,20 @@ export default {
             type: Boolean,
             default: false
         },
+        filterFromParent: {
+            type: Object,
+            default(){
+                return {}
+            }
+        },
+        headerTitle: {
+            type: String,
+            default: 'List tasks'
+        },
+        filterTaskAction: {
+            type: String,
+            default: 'getList'
+        }
     },
     data: function() {
         return {
@@ -231,14 +246,12 @@ export default {
         });
     },
     mounted() {
-        if(!this.smallComponentMode){
-            this.getTasks({
-                size: 100,
-                sort: 'createTime',
-                order: 'desc',
-                assignee: this.$store.state.app.endUserInfo.id
-            });
-        }
+        this.getTasks({
+            size: 100,
+            sort: 'createTime',
+            order: 'desc',
+            assignee: this.$store.state.app.endUserInfo.id
+        });
         this.reCalcListTaskHeight();
     },
     methods: {
@@ -249,22 +262,26 @@ export default {
             this.$refs.user.getUser(id);
         },
         selectObject(obj, idx) {
-            this.selectedTask.idx = idx;
-            if (!this.compackMode) {
-                this.sideBySideMode = true;
-                let taskInfo = {};
-                try {
-                    taskInfo = JSON.parse(obj.description);
-                    if(!taskInfo){
-                        this.$snotifyError(error, "Can not parse task info");   
+            if(this.smallComponentMode){
+                this.$goToPage('/tasks/' + obj.id, 'Do task');
+            }else{
+                this.selectedTask.idx = idx;
+                if (!this.compackMode) {
+                    this.sideBySideMode = true;
+                    let taskInfo = {};
+                    try {
+                        taskInfo = JSON.parse(obj.description);
+                        if(!taskInfo){
+                            this.$snotifyError(error, "Can not parse task info");   
+                            taskInfo = {};
+                        }
+                    } catch (error) {
                         taskInfo = {};
+                        this.$snotifyError(error, "Can not parse task info");   
                     }
-                } catch (error) {
-                    taskInfo = {};
-                    this.$snotifyError(error, "Can not parse task info");   
+                    this.$set(this.selectedTask, 'taskInfo', taskInfo);
+                    this.$emit("change-height", "calc(100vh - 88px)");
                 }
-                this.$set(this.selectedTask, 'taskInfo', taskInfo);
-                this.$emit("change-height", "calc(100vh - 88px)");
             }
         },
         closeDetail() {
@@ -287,54 +304,61 @@ export default {
             }
             return rsl;
         },
-        getTasks(filter = {}) {
+        async getTasks(filter = {}) {
             let self = this;
             this.listProrcessInstances = [];
-            BPMNEngine.getTask(filter).then(res => {
-                if (res.data != undefined && res.data.length) {
-                    let listTasks = res.data;
-                    self.allFlatTasks = [];
-                    for(let task of listTasks){
-                        task.taskData = self.getTaskData(task);
-                        self.allFlatTasks.push(task);
-                    }
-                    this.listProrcessInstances.forEach(
-                        (process, processIndex) => {
-                            process.objects.forEach(
-                                (instance, instanceIndex) => {
-                                    this.listProrcessInstances[
-                                        processIndex
-                                    ].objects[instanceIndex].tasks = [];
-                                    // let index = 0;
-                                    for (let index in listTasks) {
-                                        listTasks[
-                                            index
-                                        ].assignee = this.getUser(
-                                            parseInt(listTasks[index].assignee)
-                                        );
-                                        listTasks[index].owner = this.getUser(
-                                            parseInt(listTasks[index].owner)
-                                        );
-                                        if (
+            filter = Object.assign(filter, this.filterFromParent);
+
+            let res = {};
+            if(this.filterTaskAction == 'subtasks'){
+                res = await BPMNEngine.getSubtasks(this.filterFromParent.parentTaskId, filter);
+            }else {
+                res = await BPMNEngine.getTask(filter);
+            }
+            
+            if (res.data != undefined && res.data.length) {
+                let listTasks = res.data;
+                self.allFlatTasks = [];
+                for(let task of listTasks){
+                    task.taskData = self.getTaskData(task);
+                    self.allFlatTasks.push(task);
+                }
+                this.listProrcessInstances.forEach(
+                    (process, processIndex) => {
+                        process.objects.forEach(
+                            (instance, instanceIndex) => {
+                                this.listProrcessInstances[
+                                    processIndex
+                                ].objects[instanceIndex].tasks = [];
+                                // let index = 0;
+                                for (let index in listTasks) {
+                                    listTasks[
+                                        index
+                                    ].assignee = this.getUser(
+                                        parseInt(listTasks[index].assignee)
+                                    );
+                                    listTasks[index].owner = this.getUser(
+                                        parseInt(listTasks[index].owner)
+                                    );
+                                    if (
+                                        listTasks[index]
+                                            .processInstanceId ==
+                                        instance.id
+                                    ) {
+                                        this.listProrcessInstances[
+                                            processIndex
+                                        ].objects[instanceIndex].tasks.push(
                                             listTasks[index]
-                                                .processInstanceId ==
-                                            instance.id
-                                        ) {
-                                            this.listProrcessInstances[
-                                                processIndex
-                                            ].objects[instanceIndex].tasks.push(
-                                                listTasks[index]
-                                            );
-                                            listTasks.splice(index, 1);
-                                        }
+                                        );
+                                        listTasks.splice(index, 1);
                                     }
                                 }
-                            );
-                        }
-                    );
-                    this.addOtherProcess(listTasks);
-                }
-            });
+                            }
+                        );
+                    }
+                );
+                this.addOtherProcess(listTasks);
+            }
         },
         addOtherProcess(listTasks) {
             for (let index in listTasks) {

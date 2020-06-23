@@ -39,7 +39,7 @@
                         <v-tab-item
                             v-for="item in items"
                             :key="item.tab">
-                            <VuePerfectScrollbar :style="{height: parentHeight +'px'}" class="pl-4 pr-4" >
+                            <VuePerfectScrollbar :style="{height: parentHeight +'px'}" class=" pr-4" >
                                 <component 
                                     @task-submited="handleTaskSubmited" 
                                     :is="item.content"

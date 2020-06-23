@@ -104,6 +104,9 @@ export default {
     getTask(filter) {
         return bpmneApi.get(appConfigs.apiDomain.bpmne.tasks, filter, testHeader);
     },
+    getSubtasks(idParent, filter) {
+        return bpmneApi.get(appConfigs.apiDomain.bpmne.tasks + '/' + idParent + '/subtasks', filter, testHeader);
+    },
     getATaskInfo(taskId) {
         return bpmneApi.get(appConfigs.apiDomain.bpmne.tasks + '/' + taskId, {}, testHeader);
     },
