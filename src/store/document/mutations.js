@@ -25,6 +25,7 @@ const changeControlSubmitProps = (state, params) => {
 };
 
 
+
 const restoreState = (state) => {
     state.editor.allControl = {};
     state.editor.currentSelectedControl = { formulas: {}, properties: { name: {}, display: {}, print: {} }, type: '' };
@@ -123,7 +124,25 @@ const addCurrentControl = (state, control) => {
     console.log(state.editor.currentSelectedControl);
 
 };
+// hàm xóa control đang chọn ra khỏi store
+const resetCurrentControl = (state, control) => {
 
+    let currentSelectedControl = {
+        // control đang được click bởi người dùng
+        properties: {
+            name: {},
+            display: {},
+            print: {},
+
+        },
+        formulas: {
+
+        },
+        type: "",
+        id: ""
+    }
+    Vue.set(state.editor, 'currentSelectedControl', currentSelectedControl);
+}
 const updateProp = (state, params) => {
     let id = params.id
     let name = params.name
@@ -268,7 +287,8 @@ export {
     addToDocumentSubmitStore,
     addToDocumentDetailStore,
     addToDocumentStore,
-    setAllDocuments
+    setAllDocuments,
+    resetCurrentControl
 
 
 };
