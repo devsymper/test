@@ -30,11 +30,16 @@ Handsontable.renderers.FileRenderer = function(instance, td, row, col, prop, val
 Handsontable.cellTypes.registerCellType('file', {
     renderer: Handsontable.renderers.PercentRenderer
 });
-
+var notEmpty = function(value, callback) {
+    if (!value || String(value).length === 0) {
+        callback(false);
+    } else {
+        callback(true);
+    }
+};
+let listTableInstance = {}
 let listInputInDocument = sDocument.state.submit.listInputInDocument;
 let isDetailView = sDocument.state.isDetailView;
-//object để lưu thông tin các control ngoài table chờ để chạy công thức
-let controlOutsideWaitingRun = {}
 const MAX_TABLE_HEIGHT = 300;
 /**
  * Các loại cell mà handsontable hỗ trợ hiển thị
@@ -206,6 +211,7 @@ export default class Table {
                     }
                 }
             }
+            listTableInstance[this.tableName] = this;
         }
         /**
          * Hàm xử lí dữ liệu thay đổi ở cell bởi hệ thống (hàm set data của handson)
@@ -292,14 +298,43 @@ export default class Table {
          * @param {String} controlName Control bị thay đổi dữ liệu
          */
     handlerCheckEffectedControlInTable(controlName) {
-            let controlInstance = listInputInDocument[controlName];
-            if (controlInstance == null || controlInstance == undefined) {
-                return;
+        let controlInstance = listInputInDocument[controlName];
+        if (controlInstance == null || controlInstance == undefined) {
+            return;
+        }
+        let controlEffected = controlInstance.getEffectedControl();
+        let controlHiddenEffected = controlInstance.getEffectedHiddenControl();
+        let controlReadonlyEffected = controlInstance.getEffectedReadonlyControl();
+        let controlRequireEffected = controlInstance.getEffectedRequireControl();
+        let controlLinkEffected = controlInstance.getEffectedLinkControl();
+        let controlValidateEffected = controlInstance.getEffectedValidateControl();
+        this.handlerRunOtherFormulasControl(controlHiddenEffected, 'hidden');
+        this.handlerRunOtherFormulasControl(controlReadonlyEffected, 'readonly');
+        this.handlerRunOtherFormulasControl(controlRequireEffected, 'require');
+        this.handlerRunOtherFormulasControl(controlLinkEffected, 'link');
+        this.handlerRunOtherFormulasControl(controlValidateEffected, 'validate');
+        if (Object.keys(controlEffected).length > 0) {
+            for (let i in controlEffected) {
+                this.handlerCheckCanBeRunFormulas(i);
             }
-            let controlEffected = controlInstance.getEffectedControl();
+        }
+    }
+    handlerRunOtherFormulasControl(controlEffected, formulasType) {
             if (Object.keys(controlEffected).length > 0) {
                 for (let i in controlEffected) {
-                    this.handlerCheckCanBeRunFormulas(i);
+                    let controlEffectedInstance = listInputInDocument[i];
+                    let allFormulas = controlEffectedInstance.controlFormulas;
+                    if (allFormulas.hasOwnProperty(formulasType)) {
+                        if (allFormulas[formulasType].hasOwnProperty('instance')) {
+                            let formulasInstance = allFormulas[formulasType].instance;
+                            let dataInput = this.getDataInputForFormulas(formulasInstance);
+                            if (controlEffectedInstance.hasOwnProperty('inTable')) {
+                                if (controlEffectedInstance.inTable == this.tableName) {
+                                    this.handlerRunFormulasForControlInTable(formulasType, controlEffectedInstance, dataInput, formulasInstance);
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -315,7 +350,7 @@ export default class Table {
                     let dataInput = this.getDataInputForFormulas(formulasInstance);
                     if (controlInstance.hasOwnProperty('inTable')) {
                         if (controlInstance.inTable == this.tableName) {
-                            this.handlerRunFormulasForControlInTable(controlInstance.name, dataInput, formulasInstance);
+                            this.handlerRunFormulasForControlInTable('formulas', controlInstance, dataInput, formulasInstance);
                         }
                     }
                 }
@@ -342,7 +377,7 @@ export default class Table {
          * @param {*} dataInput    dữ liệu đầu vào cho công  thức
          * @param {*} formulasInstance  Object cua formulas giá trị của control bị ảnh hưởng
          */
-    async handlerRunFormulasForControlInTable(controlEffectedName, dataInput, formulasInstance) {
+    async handlerRunFormulasForControlInTable(formulasType, controlInstance, dataInput, formulasInstance) {
             let thisObj = this;
             let dataColumnAfterRunFOrmulas = [];
             if (Object.keys(dataInput).length > 0) {
@@ -368,11 +403,11 @@ export default class Table {
                 })
             }
             store.commit("document/updateListInputInDocument", {
-                controlName: controlEffectedName,
+                controlName: controlInstance.name,
                 key: 'value',
                 value: dataColumnAfterRunFOrmulas
             });
-            this.handlerDataAfterRunFormulas(dataColumnAfterRunFOrmulas, controlEffectedName)
+            this.handlerDataAfterRunFormulas(dataColumnAfterRunFOrmulas, controlInstance, formulasType)
         }
         /**
          * Hàm lấy dữ liệu hiện tại của table và insert vào sql lite table
@@ -398,29 +433,35 @@ export default class Table {
          * @param {Object} data 
          * @param {String} controlEffectedName 
          */
-    handlerDataAfterRunFormulas(data, controlEffectedName) {
-        let values = data;
-        let vls = [];
-        for (let index = 0; index < values.length; index++) {
-            let row = values[index];
-            if (row == null || row == 'null')
-                row = '';
-            vls.push([index, controlEffectedName, row]);
+    handlerDataAfterRunFormulas(data, controlInstance, formulasType) {
+        switch (formulasType) {
+            case "formulas":
+                controlInstance.handlerDataAfterRunFormulasValue(data);
+                break;
+            case "link":
+                controlInstance.handlerDataAfterRunFormulasLink(data);
+                break;
+            case "validate":
+                controlInstance.handlerDataAfterRunFormulasValidate(data);
+                break;
+            case "require":
+                controlInstance.handlerDataAfterRunFormulasRequire(data);
+                break;
+            case "hidden":
+                controlInstance.handlerDataAfterRunFormulasHidden(data);
+                break;
+            case "readOnly":
+                controlInstance.handlerDataAfterRunFormulasReadonly(data);
+                break;
+            case "uniqueDB":
+                break;
+            case "uniqueTable":
+                break;
+            default:
+                break;
         }
-        this.tableInstance.setDataAtRowProp(vls, null, null, AUTO_SET);
-        markBinedField(controlEffectedName);
-        setTimeout(() => {
-            let controlInstance = listInputInDocument[controlEffectedName];
-            if (controlInstance != null && controlInstance != undefined) {
-                let controlEffected = controlInstance.getEffectedControl();
-                for (let control in controlEffected) {
-                    if (!listInputInDocument[control].hasOwnProperty('inTable'))
-                        SYMPER_APP.$evtBus.$emit('run-effected-control-when-table-change', { control: listInputInDocument[control] })
-                }
-            }
-        }, 100);
-
     }
+
 
     /**
      * Hàm lấy formulas của cell select -> chạy -> gán lại data cho autocomplete component
@@ -588,7 +629,8 @@ export default class Table {
             //     }
             // },
         });
-
+        this.tableInstance.symperTable = this;
+        this.tableInstance.setCellMeta(2, 0, 'readOnly', true)
         if (!this.checkDetailView()) {
             for (let evtName in thisObj.event) {
                 Handsontable.hooks.add(evtName, thisObj.event[evtName], this.tableInstance);
@@ -645,13 +687,15 @@ export default class Table {
             hiddenColumns: hiddenColumns
         }
     }
+
     getCellType(name, control) {
         let type = control.type;
         let ctrl = listInputInDocument[name];
         let rsl = {
             data: name,
             type: type,
-            // renderer: this.validateRender
+            allowInvalid: true,
+            renderer: this.validateRender
         }
         if (type == 'number') {
             rsl.numericFormat = {
@@ -665,42 +709,35 @@ export default class Table {
             rsl.timeFormat = 'HH:mm:ss',
                 rsl.correctFormat = true;
         }
-        console.log('gf', type);
-
         rsl.type = Util.toLowerCaseFirstCharacter(supportCellsType[type].replace('Renderer', ''));
 
         return rsl;
     }
     validateRender(hotInstance, td, row, column, prop, value, cellProperties) {
+            let inTable = listInputInDocument[prop].inTable;
+            let thisObj = listTableInstance[inTable];
             if (row + 1 == hotInstance.countRenderedRows()) {
                 if (value === null) {
-                    arguments[5] = this.sampleRowValues[prop];
+                    arguments[5] = thisObj.sampleRowValues[prop];
                 }
             }
             Handsontable.renderers[supportCellsType[listInputInDocument[prop].type]].apply(this, arguments);
             if (listInputInDocument[prop].isCheckbox) {
                 td.style.textAlign = "center";
             }
-
-            let map = this.validateValueMap[row + '_' + column];
+            let map = thisObj.validateValueMap[row + '_' + column];
             if (map) {
                 let sign = prop + '____' + row;
                 let ele = $(td);
-                if (map.vld === false) {
+                if (map.vld === true) {
                     ele.append(Util.makeErrNoti(map.msg, sign));
                 }
-                if ((map.require === false || listInputInDocument[prop].originProp.Required == 1) && value === '') {
-                    ele.css('position', 'relative').append(Util.requireRedDot(sign));
-                }
-            }
 
-            if (thisObj.checkDetailView()) {
-                let indx = prop + '_' + row;
-                if (changedVlCtrlCoord[indx]) {
-                    td.classList.add('changed-input');
-                    for (let typeChange in changedVlCtrlCoord[indx]) {
-                        td.setAttribute(typeChange, 'yes');
-                    }
+                // || (listInputInDocument[prop]['controlProperties']['isRequired'] != undefined &&
+                // (listInputInDocument[prop]['controlProperties']['isRequired'].value == "1" ||
+                //     listInputInDocument[prop]['controlProperties']['isRequired'].value == 1)))
+                if (map.require === true && (value === '' || value == null)) {
+                    ele.css('position', 'relative').append(Util.requireRedDot(sign));
                 }
             }
         }

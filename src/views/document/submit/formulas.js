@@ -79,7 +79,6 @@ export default class Formulas {
                         columns[i] = "TEXT";
                     }
                     ClientSQLManager.createTable(this.keyInstance, Util.generateString(10), columns, "TEMPORARY");
-
                 }
             } else if (beforeStr == 'in') {
                 strReplace = "(";

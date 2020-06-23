@@ -178,8 +178,10 @@ export default class BasicControl extends Control {
 
     renderFilterControl() {
         if (this.checkDetailView()) return;
+        let thisCpn = this;
         this.ele.attr('type', 'text');
         this.ele.on('click', function(e) {
+            e.controlName = thisCpn.name;
             SYMPER_APP.$evtBus.$emit('document-submit-filter-input-click', e)
         })
 

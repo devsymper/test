@@ -16,6 +16,7 @@
                     <editor-action 
                     @document-action-save-document="openPanelSaveDocument"
                     @document-action-list-control-option="setShowAllControlOption"
+                    @document-action-delete-control="deleteControl"
                     
                     />
                 </div>
@@ -205,6 +206,12 @@ export default {
         px2cm(px) {
             return (Math.round((px / 37.7952) * 100) / 100).toFixed(1);
         },
+        deleteControl(){
+            let control = $("#editor_ifr").contents().find('.on-selected');
+            this.resetSelectControl()
+            control.remove();
+            
+        },
         // ham tạo dialog của tinymce để cấu hình padding doc
         showPaddingPageConfig(ed){
                 var left = $("#editor_ifr").contents().find('body').css('padding-left').slice(0, -2);
@@ -387,9 +394,19 @@ export default {
                         title: "Save document success!"
                     });
                 }
+                else{
+                    thisCpn.$snotify({
+                        type: "error",
+                        title: res.lastErrorMessage,
+                        text:"can not save document"
+                    });
+                }
             })
             .catch(err => {
-                console.log("error from add document api!!!", err);
+                thisCpn.$snotify({
+                        type: "error",
+                        title: "can not save document",
+                    });
             })
             .always(() => {
             });
@@ -408,13 +425,21 @@ export default {
                         title: "Save document success!"
                     });
                 }
+                else{
+                    thisCpn.$snotify({
+                        type: "error",
+                        title: res.lastErrorMessage,
+                        text:"can not save document"
+                    });
+                }
                 
             })
             .catch(err => {
-                console.log("error from edit document api!!!", err);
                 thisCpn.$snotify({
                     type: "error",
-                    title: "error from edit document api"
+                    title: "error from edit document api",
+                    text:"can not save document"
+
                 });
             })
             .always(() => {
@@ -575,6 +600,12 @@ export default {
                 "document/addCurrentControl",
                 {properties:properties,
                 formulas:formulas,id:id}
+            );
+        },
+        resetSelectControl(){
+            this.$store.commit(
+                "document/resetCurrentControl",
+                {}
             );
         },
         hideAutocompletaControl(){
@@ -792,6 +823,7 @@ export default {
                             let fields = res.data.fields;
                             thisCpn.setDataForPropsControl(fields);
                         }
+                        thisCpn.wrapTableElement();
                     }
                 })
                 .catch(err => {
@@ -799,6 +831,13 @@ export default {
                 })
                 .always(() => {
                 });
+            }
+        },
+        // wrap div cho table truong hợp trước đây chưa có scroll
+        wrapTableElement(){
+            let listTable = $("#editor_ifr").contents().find('.s-control-table');
+            if(listTable.length > 0 && !listTable.parent().is('.wrap-s-control-table')){
+                listTable.wrap('<div class="wrap-s-control-table" style="overflow:auto;"></div>')
             }
         },
 

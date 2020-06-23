@@ -1,4 +1,11 @@
 import Formulas from "./formulas";
+import sDocument from './../../../store/document'
+import { checkCanBeBind, resetImpactedFieldsList, markBinedField } from './handlerCheckRunFormulas';
+import { SYMPER_APP } from './../../../main.js'
+
+let listInputInDocument = sDocument.state.submit.listInputInDocument;
+
+const AUTO_SET = 'auto_set';
 
 export default class Control {
     constructor(idField, ele, controlProps, curParentInstance, value = "") {
@@ -36,7 +43,7 @@ export default class Control {
         this.effectedReadonlyControl = [];
         this.effectedLinkControl = [];
         this.effectedValidateControl = [];
-
+        this.inTable = false;
 
         /**
          * Tên của control
@@ -53,12 +60,6 @@ export default class Control {
          */
         this.type = this.ele.attr('s-control-type');
 
-
-
-        /**
-         * Danh sách các hàm sẽ thực thi khi kết thúc chuỗi chạy công thức mà bắt đầu từ control này
-         */
-        this.afterChainFormulaEnd = [];
 
         /**
          * Danh sách các control bị thay đổi giá trị, hoặc hiển thị... khi control này thay đổi giá trị
@@ -82,7 +83,6 @@ export default class Control {
             for (let key in this.controlFormulas) {
                 if (this.controlFormulas[key].value != "" && this.controlFormulas[key].value != undefined) {
                     this.controlFormulas[key]['instance'] = new Formulas(this.curParentInstance, this.controlFormulas[key].value, key);
-
                 }
             }
         }
@@ -106,5 +106,85 @@ export default class Control {
     }
     getEffectedValidateControl() {
         return this.effectedValidateControl;
+    }
+
+    handlerDataAfterRunFormulasLink(values) {
+        if (Array.isArray(values)) {
+            values = values[0]
+        }
+        if (this.inTable != false) {
+
+        }
+    }
+    handlerDataAfterRunFormulasValidate(values) {
+        if (this.inTable != false) {
+            let tableControlInstance = listInputInDocument[this.inTable];
+            let colIndex = tableControlInstance.tableInstance.getColumnIndexFromControlName(this.name);
+            for (let index = 0; index < values.length; index++) {
+                let row = values[index];
+                let v = row == 1
+                tableControlInstance.tableInstance.validateValueMap[index + "_" + colIndex] = { vld: v, msg: "" };
+
+            }
+            // tableControlInstance.tableInstance.tableInstance.render()
+
+        }
+    }
+    handlerDataAfterRunFormulasRequire(values) {
+        if (this.inTable != false) {
+            let tableControlInstance = listInputInDocument[this.inTable];
+            let colIndex = tableControlInstance.tableInstance.getColumnIndexFromControlName(this.name);
+            for (let index = 0; index < values.length; index++) {
+                let row = values[index];
+                let v = row == 1
+                tableControlInstance.tableInstance.validateValueMap[index + "_" + colIndex] = { require: v };
+            }
+            // tableControlInstance.tableInstance.render()
+        }
+    }
+    handlerDataAfterRunFormulasHidden(values) {
+        if (this.inTable != false) {
+            let tableControlInstance = listInputInDocument[this.inTable];
+            let colIndex = tableControlInstance.tableInstance.getColumnIndexFromControlName(this.name);
+            for (let index = 0; index < values.length; index++) {
+                let row = values[index];
+                let v = row == 1
+                    // tableControlInstance.tableInstance.validateValueMap[index + "_" + colIndex] = v
+            }
+
+        }
+    }
+    handlerDataAfterRunFormulasReadonly(values) {
+
+    }
+
+    handlerDataAfterRunFormulasValue(values) {
+        if (this.inTable != false) {
+            let vls = [];
+            for (let index = 0; index < values.length; index++) {
+                let row = values[index];
+                if (row == null || row == 'null')
+                    row = '';
+                vls.push([index, this.name, row]);
+            }
+            let tableControl = listInputInDocument[this.inTable];
+            console.log('cxs', tableControl);
+
+            tableControl.tableInstance.tableInstance.setDataAtRowProp(vls, null, null, AUTO_SET);
+            markBinedField(this.name);
+            setTimeout(() => {
+                let controlEffected = this.getEffectedControl();
+                for (let control in controlEffected) {
+                    if (listInputInDocument[control].inTable == false)
+                        SYMPER_APP.$evtBus.$emit('run-effected-control-when-table-change', listInputInDocument[control])
+                }
+            }, 100);
+        } else {
+            if ($('#' + this.id).length > 0) {
+                $('#' + this.id).val(values);
+                $('#' + this.id).trigger('change')
+                markBinedField(this.name);
+            }
+        }
     }
 }
