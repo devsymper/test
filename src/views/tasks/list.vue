@@ -57,11 +57,11 @@
 
                 <VuePerfectScrollbar :style="{height: listTaskHeight+'px'}">
                     <v-row
-                        v-for="(obj) in allFlatTasks"
-                        :key="obj.id"
+                        v-for="(obj, idx) in allFlatTasks"
+                        :key="idx"
                         :index="obj.id"
                         class="mr-0 ml-0 single-row"
-                        @click="selectObject(obj)">
+                        @click="selectObject(obj, idx)">
                         <v-col
                             :cols="sideBySideMode ? 12 : compackMode ? 6: 4"
                             class="pl-3 pr-1"
@@ -212,7 +212,8 @@ export default {
         return {
             listTaskHeight: 300,
             selectedTask: {
-                taskInfo: {}
+                taskInfo: {},
+                idx: -1
             },
             listProrcessInstances: [],
             isSmallRow: false,
@@ -220,6 +221,14 @@ export default {
             openPanel: [0, 1, 2, 3, 4],
             allFlatTasks: []
         };
+    },
+    created(){
+        let self = this;
+        this.$evtBus.$on('symper-update-task-assignment', (updatedTask) => {
+            updatedTask.taskData = self.getTaskData(updatedTask);
+            self.selectObject(updatedTask, self.selectedTask.idx);
+            self.$set(self.allFlatTasks, self.selectedTask.idx, updatedTask);
+        });
     },
     mounted() {
         if(!this.smallComponentMode){
@@ -239,7 +248,8 @@ export default {
         getUser(id) {
             this.$refs.user.getUser(id);
         },
-        selectObject(obj) {
+        selectObject(obj, idx) {
+            this.selectedTask.idx = idx;
             if (!this.compackMode) {
                 this.sideBySideMode = true;
                 let taskInfo = {};
@@ -261,6 +271,22 @@ export default {
             this.sideBySideMode = false;
             this.$emit("change-height", "calc(100vh - 120px)");
         },
+        getTaskData(task){
+            let rsl = {
+                content: '',
+                extraLabel: '',
+                extraValue: ''
+            };
+            try {
+                let taskData = JSON.parse(task.description);
+                if(taskData){
+                     rsl = taskData;
+                }
+            } catch (error) {
+                rsl.content = task.description;
+            }
+            return rsl;
+        },
         getTasks(filter = {}) {
             let self = this;
             this.listProrcessInstances = [];
@@ -269,19 +295,7 @@ export default {
                     let listTasks = res.data;
                     self.allFlatTasks = [];
                     for(let task of listTasks){
-                        task.taskData = {
-                            content: '',
-                            extraLabel: '',
-                            extraValue: ''
-                        };
-                        try {
-                            let taskData = JSON.parse(task.description);
-                            if(taskData){
-                                task.taskData = taskData;
-                            }
-                        } catch (error) {
-                            task.taskData.content = task.description;
-                        }
+                        task.taskData = self.getTaskData(task);
                         self.allFlatTasks.push(task);
                     }
                     this.listProrcessInstances.forEach(
