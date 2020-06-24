@@ -1,7 +1,7 @@
 <template>
     <div class="symper-task-list-filter bg-white py-3">
         <div v-for="(item, key) in listFilter" :key="key" class="pt-2">
-            <div class="fs-14 pl-3 font-weight-medium">
+            <div class="fs-13 pl-3 ">
                 {{item.label}}
             </div>
             <v-combobox
@@ -11,16 +11,25 @@
                 :hide-no-data="!item.searchKey"
                 :search-input.sync="item.searchKey"
                 :item-value="'id'"
+                hide-details
                 @change="handleFilterChange"
                 chips
                 dense
                 flat
-                class="select-orgchart border-all mx-4 my-2" 
+                class="select-orgchart border-all mx-4 mb-2 mt-1 sym-small-size" 
                 style="background-color: "
                 multiple
                 solo>
                 <template v-slot:selection="{ attrs, item, select, selected }">
-                    <v-chip color="blue-grey lighten-5 mt-1" close-icon="mdi-close" v-bind="attrs" :input-value="selected" close x-small @click="select" @click:close="removeItem(item)">
+                    <v-chip 
+                        class="mt-1 ml-0" 
+                        color="blue-grey lighten-5" 
+                        close-icon="mdi-close" 
+                        v-bind="attrs" 
+                        :input-value="selected" 
+                        close x-small 
+                        @click="select" 
+                        @click:close="removeItem(item, key)">
                         {{item.displayName}}
                     </v-chip>
                 </template>
@@ -36,6 +45,16 @@
 <script>
 export default {
     methods: {
+        removeItem(item, key){
+            let idx = 0;
+            for(let i = 0; i < this.listFilter[key].value.length ; i++){
+                if(this.listFilter[key].value[i].id == item.id){
+                    idx = i;
+                    break;
+                }
+            }
+            this.listFilter[key].value.splice(idx, 1);
+        },
         handleFilterChange(){
             let filterData = {};
             for(let key in this.listFilter){

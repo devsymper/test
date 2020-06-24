@@ -551,6 +551,18 @@ html {
     padding-bottom: 0px;
 }
 
+.sym-small-size.v-autocomplete>.v-input__control .v-select__selections {
+    min-height: 22px!important;
+}
+
+.sym-small-size.v-autocomplete>.v-input__control .v-select__selections {
+    padding: 0px!important;
+}
+
+.sym-small-size.v-autocomplete>.v-input__control>.v-input__slot {
+    padding: 3px 5px!important;
+}
+
 .htMenu.htContextMenu.handsontable * {
     font-family: Roboto, sans-serif;
     font-size: 13px;
