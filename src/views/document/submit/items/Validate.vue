@@ -1,9 +1,13 @@
 <template>
     <v-card 
-    class="card-validate p-2"
+    class="card-validate"
     v-show="isShow"
     :style="positionBox">
+        <v-card-title>Lỗi</v-card-title>
+        <v-card-text>
         <span>{{message}}</span>
+
+        </v-card-text>
     </v-card>
 </template>
 <script>
@@ -39,7 +43,26 @@ export default {
             this.isShow = false;
         },
         calPosition(e){
-            this.positionBox = {'top':$(e.target).offset().top +'px','left':e.pageX - 50+ 'px'};
+            console.log('lk',e);
+            
+            console.log('lk',$(e.parentElement));
+            console.log('lk',$(e.parentElement).closest('.handsontable'));
+            
+            if($(e.target).closest('.handsontable').length > 0){
+                let autoEL = $(this.$el).detach();
+                $(e.target).closest('.wrap-table').append(autoEL);
+                let edtos = $(e.delegateTarget).offset();
+                
+                let tbcos = $(e.target).closest('.wrap-table').find('[s-control-type="table"]').offset();
+                this.positionBox = {'top':edtos.top - tbcos.top + $(e.target).height() +'px','left':edtos.left - tbcos.left+'px'};
+            }
+            //nêu là ngoài bảng
+            else{
+                let autoEL = $(this.$el).detach();
+                $(e.target).parent().append(autoEL);
+                this.positionBox = {'top':'20px','left':'0px'};
+            }
+            
         },
         
     }

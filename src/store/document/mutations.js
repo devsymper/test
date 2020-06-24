@@ -241,8 +241,6 @@ const addToImpactedFieldsList = (state, params) => {
 const addToDocumentSubmitStore = (state, params) => {
     let key = params.key
     let value = params.value
-    console.log('nnmm', params);
-
     Vue.set(state.submit, key, value);
 }
 const addToDocumentDetailStore = (state, params) => {

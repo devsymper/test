@@ -97,7 +97,7 @@ import Validate from "./items/Validate.vue";
 import ClientSQLManager from "./clientSQLManager.js";
 import Util from './util';
 import { checkCanBeBind, resetImpactedFieldsList, markBinedField } from './handlerCheckRunFormulas';
-
+import {checkDbOnly,getControlInstanceFromStore} from './../common/common'
 let impactedFieldsList = {};
 let impactedFieldsArr = {};
 var impactedFieldsListWhenStart = {};
@@ -142,6 +142,7 @@ export default {
         return {
             contentDocument: null,
             documentId: null,
+            documentName: null,
             docSize: null,
             editorDoc: null,
             isShowSubFormSubmit: false,
@@ -184,6 +185,12 @@ export default {
                 $(this).prop("files")[0].name
             );
         });
+        $('.sym-form-submit').on('click','.validate-icon',function(e){
+            let msg = $(this).attr('title');
+            e.msg = msg;
+            thisCpn.$refs.validate.show(e);
+
+        })
     },
 
     created() {
@@ -236,7 +243,7 @@ export default {
                 value: locale.controlName
             });
             // sau khi thay đổi giá trị input thì kiểm tra require control nếu có
-            let controlInstance = thisCpn.getControlInstanceFromStore(locale.controlName);
+            let controlInstance = getControlInstanceFromStore(locale.controlName);
             if(controlInstance.isRequiredControl()){
                 if(controlInstance.isEmpty()){
                     controlInstance.renderValidateIcon('Không được bỏ trống trường này!')
@@ -253,9 +260,10 @@ export default {
         this.$evtBus.$on("run-effected-control-when-table-change", control => {
             thisCpn.handlerBeforeRunFormulasValue(control.controlFormulas.formulas.instance,control.id,control.name,'formulas');
         });
-        this.$evtBus.$on("document-submit-open-validate", e => {
+        this.$evtBus.$on("document-submit-open-validate-message", e => {
             thisCpn.$refs.validate.show(e);
         });
+       
         this.$evtBus.$on("document-submit-show-time-picker", e => {
             thisCpn.$refs.timePicker.show(e.event);
         });
@@ -473,6 +481,7 @@ export default {
                     .then(res => {
                         if (res.status == 200) {
                             let content = res.data.document.content;
+                            thisCpn.documentName = res.data.document.name;
                             thisCpn.contentDocument = content;
                             setDataForPropsControl(res.data.fields); // ddang chay bat dong bo
                             setTimeout(() => {
@@ -536,14 +545,15 @@ export default {
                 let controlType = $(allInputControl[index]).attr('s-control-type');
                 
                 if(this.sDocumentEditor.allControl[id] != undefined){   // ton tai id trong store
-                    let idField = this.sDocumentEditor.allControl[id].id;
-                    let valueInput = this.sDocumentEditor.allControl[id].value
+                    let field = this.sDocumentEditor.allControl[id];
+                    let idField = field.id;
+                    let valueInput = field.value
                     if(valueInput != undefined && valueInput != null && Object.keys(valueInput).length == 0){
                         valueInput = ""
                     }
                     if(controlType == "submit" || controlType == "reset"){
                         
-                        let control = new ActionControl(idField, $(allInputControl[index]),this.sDocumentEditor.allControl[id],thisCpn.keyInstance);
+                        let control = new ActionControl(idField, $(allInputControl[index]),field,thisCpn.keyInstance);
                         control.init();
                         control.render();
                         this.$store.commit(
@@ -551,16 +561,17 @@ export default {
                             { name: "submit", control: control }
                         );
                     } else {
-                        let controlName = this.sDocumentEditor.allControl[id].properties.name.value;
+                        let controlName = field.properties.name.value;
                         let mapColumnType = Util.mapTypeControlToTypeSQLLite(controlType); 
                         if(mapColumnType != false){
                             this.columnsSQLLiteDocument[controlName] = mapColumnType;
                         }
+                        field.properties.docName = this.documentName
                         if (controlType != "table") {
                             let control = new BasicControl(
                                 idField,
                                 $(allInputControl[index]),
-                                this.sDocumentEditor.allControl[id],
+                                field,
                                 thisCpn.keyInstance,
                                 valueInput
                             );
@@ -577,7 +588,7 @@ export default {
                             let tableControl = new TableControl(
                                 idField,
                                 $(allInputControl[index]),
-                                this.sDocumentEditor.allControl[id],
+                                field,
                                 thisCpn.keyInstance
                             );
                             tableControl.initTableControl();
@@ -591,6 +602,8 @@ export default {
                             tableEle.find(".s-control").each(function() {
                                 let childControlId = $(this).attr("id");
                                 let childControlProp = thisCpn.sDocumentEditor.allControl[id].listFields[childControlId];
+                                childControlProp.properties.inTable = controlName;
+                                childControlProp.properties.docName = thisCpn.documentName;
                                 let idFieldChild = childControlProp.id;
                                 let childControl = new BasicControl(
                                     idFieldChild,
@@ -601,7 +614,6 @@ export default {
                                 childControl.init();
                                 let childControlName = childControlProp.properties.name.value;
                                 columnsTableSqlLite[childControlName] = Util.mapTypeControlToTypeSQLLite(childControlProp.type);
-                                childControl.inTable = controlName;
                                 thisCpn.$store.commit(
                                     "document/addToListInputInDocument",
                                     {
@@ -894,6 +906,10 @@ export default {
          * nếu có insideTableInDoc thì công thức từ nội bộ của bảng
          */
         handleControlInputChange(controlName){
+            let controlUnique = checkDbOnly(controlName);
+            if(controlUnique != false){
+                this.handlerBeforeRunFormulasValue(controlUnique.controlFormulas.uniqueDB,controlUnique.id,controlUnique.name,'uniqueDB');
+            }
             let controlInstance = this.sDocumentSubmit.listInputInDocument[controlName];
             let controlEffected = controlInstance.getEffectedControl();
             let controlHiddenEffected = controlInstance.getEffectedHiddenControl();
@@ -955,11 +971,9 @@ export default {
         handlerBeforeRunFormulasValue(formulasInstance,controlId,controlName,formulasType){
             
             let dataInput = this.getDataInputFormulas(formulasInstance);    
-            let control = this.getControlInstanceFromStore(controlName);
+            let control = getControlInstanceFromStore(controlName);
             if(control.inTable != false){
-                let tableName = this.getControlInstanceFromStore(control.inTable);
-                console.log('hgfd',control);
-                
+                let tableName = getControlInstanceFromStore(control.inTable);
                 tableName.tableInstance.handlerRunFormulasForControlInTable(formulasType,control,dataInput,formulasInstance);
             }
             formulasInstance.handleBeforeRunFormulas(dataInput).then(rs=>{
@@ -974,8 +988,6 @@ export default {
             let inputControl = formulasInstance.getInputControl();
             let dataInput = {};
             for(let inputControlName in inputControl){
-                console.log(inputControlName);
-                console.log(this.sDocumentSubmit.listInputInDocument[inputControlName]);
                 if(this.sDocumentSubmit.listInputInDocument.hasOwnProperty(inputControlName)){
                     let valueInputControlItem = this.sDocumentSubmit.listInputInDocument[inputControlName].value;
                     dataInput[inputControlName] = valueInputControlItem;
@@ -986,7 +998,7 @@ export default {
         },
         
         handlerAfterRunFormulas(rs,controlId,controlName,formulasType){
-            let controlInstance = this.getControlInstanceFromStore(controlName);
+            let controlInstance = getControlInstanceFromStore(controlName);
             if($('#'+controlId).length > 0){
                 if($('#'+controlId).attr('s-control-type') == 'inputFilter'){
                     this.$refs.symDragPanel.show();
@@ -1012,7 +1024,6 @@ export default {
                             value=data[0][Object.keys(data[0])[0]];
                         }
                     }
-
                     switch (formulasType) {
                         case "formulas":
                             this.handlerDataAfterRunFormulasValue(value,controlId,controlName);
@@ -1033,6 +1044,7 @@ export default {
                             this.handlerDataAfterRunFormulasReadonly(value,controlId);
                             break;
                         case "uniqueDB":
+                            controlInstance.handlerDataAfterRunFormulasUniqueDB(value);
                             break;
                         case "uniqueTable":
                             break;
@@ -1045,7 +1057,7 @@ export default {
             }
         },
         handlerDataAfterRunFormulasValue(value,controlId,controlName){
-            let controlInstance = this.getControlInstanceFromStore(controlName);
+            let controlInstance = getControlInstanceFromStore(controlName);
             if($('#'+controlId).length > 0){
                 $('#'+controlId).val(value);
                 $('#'+controlId).trigger('change')
@@ -1074,14 +1086,14 @@ export default {
          * Hàm bind link vào control sau khi chạy công thức link
          */
         handlerDataAfterRunFormulasLink(link,controlName){
-            let controlInstance = this.getControlInstanceFromStore(controlName);
+            let controlInstance = getControlInstanceFromStore(controlName);
             controlInstance.renderLinkToControl(link);
         },
         handlerDataAfterRunFormulasRequire(isRequire,controlName){
             if(Array.isArray(isRequire)){
                 isRequire=isRequire[0]
             }
-            let controlInstance = this.getControlInstanceFromStore(controlName);
+            let controlInstance = getControlInstanceFromStore(controlName);
             if(controlInstance.isEmpty()&&(isRequire==1||isRequire==true)){
                 controlInstance.renderValidateIcon('Không được bỏ trống trường này!')
             }
@@ -1093,7 +1105,7 @@ export default {
             if(Array.isArray(message)){
                 message=message[0]
             }
-            let controlInstance = this.getControlInstanceFromStore(controlName);
+            let controlInstance = getControlInstanceFromStore(controlName);
             if(controlInstance.isEmpty()){
                 controlInstance.renderValidateIcon(message);
             }
@@ -1105,8 +1117,8 @@ export default {
             if(Array.isArray(isHidden)){
                 isHidden=isHidden[0];
             }
-            let display = (isHidden == 1 || isHidden==true ) ? 'none' : 'block'
-            $('#'+controlId).css({'display':display})
+            let display = (isHidden == 1 || isHidden==true ) ? 'none' : 'inline-block'
+            $('#'+controlId).parent().css({'display':display})
         },
         handlerDataAfterRunFormulasReadonly(isReadonly,controlId){
             if(Array.isArray(isReadonly)){
@@ -1177,14 +1189,7 @@ export default {
             }
             return arr;
         },
-        getControlInstanceFromStore(controlName){
-            if(this.sDocumentSubmit.listInputInDocument.hasOwnProperty(controlName)){
-                return this.sDocumentSubmit.listInputInDocument[controlName]
-            }
-            else{
-                return false
-            }
-        }
+       
 
     }
 };
