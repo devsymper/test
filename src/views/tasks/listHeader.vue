@@ -25,7 +25,6 @@
             <v-btn
                 v-show="!sideBySideMode"
                 small
-                v-on="on"
                 class="mr-2"
                 depressed
                 @click="openCreateTaskDialog">
@@ -47,6 +46,11 @@
                         <span v-if="!sideBySideMode"   class="ml-2">{{$t('common.filter')}}</span>
                     </v-btn>
                 </template>
+                <div>
+                    <TaskListFilter @filter-change-value="handleChangeFilterValue">
+                        
+                    </TaskListFilter>
+                </div>
             </v-menu>
            
             <!-- Sort option -->
@@ -150,7 +154,7 @@
                             :compactChip="true"
                             :color="'transparent'"
                             :textColor="''"
-                            :flat="true"
+                             :flat="true"
                             v-model="taskObject.assignee"
                         ></userSelector>
                     </div>
@@ -203,12 +207,34 @@ import icon from "../../components/common/SymperIcon";
 import datePicker from "../../components/common/datePicker";
 import vClickOutside from 'v-click-outside';
 import userSelector from "./userSelector";
+import TaskListFilter from "@/components/tasks/list/TaskListFilter.vue";
+
 export default {
+    created(){
+        this.$store.dispatch('process/getAllDefinitions');
+    },
     name: "listHeader",
+    watch:{
+        sortBy: {
+            deep: true,
+            immediate: true,
+            handler(after){
+                this.handleChangeFilterValue();
+            }
+        },
+        orderBy: {
+            deep: true,
+            immediate: true,
+            handler(after){
+                this.handleChangeFilterValue();
+            }
+        },
+    },
     components: {
         icon: icon,
         userSelector: userSelector,
         datePicker: datePicker,
+        TaskListFilter: TaskListFilter
     },
     props: {
         isSmallRow: {
@@ -237,32 +263,29 @@ export default {
             sortOption: [
                 {
                     label: this.$t("tasks.header.date"),
+                    value: 'createTime',
                     callback: e => {}
                 },
                 {
                     label: this.$t("tasks.header.dueDate"),
+                    value: 'dueDate',
                     callback: e => {}
                 },
                 {
                     label: this.$t("tasks.header.description"),
-                    callback: e => {}
-                },
-                {
-                    label: this.$t("tasks.header.owner"),
-                    callback: e => {}
-                },
-                {
-                    label: this.$t("tasks.header.assignee"),
+                    value: 'description',
                     callback: e => {}
                 }
             ],
             orderOption: [
                 {
                     label: this.$t("order.ascending"),
+                    value: 'asc',
                     callback: e => {}
                 },
                 {
                     label: this.$t("order.descending"),
+                    value: 'desc',
                     callback: e => {}
                 }
             ],
@@ -286,7 +309,6 @@ export default {
             ],
             sortBy: null,
             orderBy: null,
-            filterTask: null,
             apiUrl: "https://v2.symper.vn:8443/symper-rest/service/",
             queryProcessInstance: "runtime/process-instances",
             listProrcessInstances: [],
@@ -297,7 +319,8 @@ export default {
                 assignee: [],
                 dueDate: "",
                 description: ""
-            }
+            },
+            filterList: {}
         }
     },
     directives: {
@@ -307,6 +330,19 @@ export default {
         this.getProcessInstance();
     },
     methods: {
+        handleChangeFilterValue(data = {}){
+            if($.isEmptyObject(data)){
+                if(this.orderBy !== null){
+                    this.filterList.order = this.orderOption[this.orderBy].value;
+                }
+                if(this.sortBy  !== null){
+                    this.filterList.sort = this.sortOption[this.sortBy].value;
+                }
+            }else{
+                this.filterList = Object.assign(this.filterList, data);
+            }
+            this.$emit('filter-change-value', this.filterList);
+        },
         openCreateTaskDialog(){
             this.dialog = true;
         },
@@ -354,27 +390,21 @@ export default {
                 text: this.$t('notification.error')
             })
         },
-        saveTask() {
+        async saveTask() {
             let data = {
                 ...this.taskObject,
                 assignee    : this.taskObject.assignee[0],
                 parentTaskId: this.parentTaskId ? this.parentTaskId : ''
             };
-            BPMNEngine.addTask(JSON.stringify(data))
-            .then(res => {
-                if (res.id != undefined) {
-                    this.selectedProcess = null;
-                    this.dialog          = false;
-                    this.$emit("create-task", res);
-                    this.$snotify({
-                        type : 'success',
-                        title: this.$t('notification.successTitle'),
-                        text : this.$t('tasks.created')
-                    });
-                } else {
-                    this.showError();
-                }
-            })
+            let res = await BPMNEngine.addTask(JSON.stringify(data));
+            if (res.id != undefined) {
+                this.selectedProcess = null;
+                this.dialog          = false;
+                this.$emit("create-task", res);
+                this.$snotifySuccess(this.$t('tasks.created'));
+            } else {
+                this.showError();
+            }
         }
     }
 }
