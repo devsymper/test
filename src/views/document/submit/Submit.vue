@@ -185,6 +185,12 @@ export default {
                 $(this).prop("files")[0].name
             );
         });
+        $('.sym-form-submit').on('click','.validate-icon',function(e){
+            let msg = $(this).attr('title');
+            e.msg = msg;
+            thisCpn.$refs.validate.show(e);
+
+        })
     },
 
     created() {
@@ -254,9 +260,10 @@ export default {
         this.$evtBus.$on("run-effected-control-when-table-change", control => {
             thisCpn.handlerBeforeRunFormulasValue(control.controlFormulas.formulas.instance,control.id,control.name,'formulas');
         });
-        this.$evtBus.$on("document-submit-open-validate", e => {
+        this.$evtBus.$on("document-submit-open-validate-message", e => {
             thisCpn.$refs.validate.show(e);
         });
+       
         this.$evtBus.$on("document-submit-show-time-picker", e => {
             thisCpn.$refs.timePicker.show(e.event);
         });

@@ -25,7 +25,7 @@ export default class Util {
     }
 
     static requireRedDot = function(sign) {
-        return '<span class="mdi mdi-checkbox-blank-circle validate-icon" title="Không được bỏ trống trường này"></span>'
+        return '<span class="mdi mdi-checkbox-blank-circle  validate-icon" title="Không được bỏ trống trường này"></span>'
             // return '<i data-require-sign="' + sign + '" class="fa fa-circle required-markup" title="Bạn phải nhập vào trường này" aria-hidden="true"></i>';
     };
     /**

@@ -47,7 +47,7 @@ export default class BasicControl extends Control {
 
     render() {
         let thisCpn = this;
-        this.ele.wrap('<span style="position:relative;">');
+        this.ele.wrap('<span style="position:relative;display:block;">');
         this.ele.attr('key-instance', this.curParentInstance);
         if (!this.checkDetailView() && this.value == "" &&
             this.controlProperties['isRequired'] != undefined &&

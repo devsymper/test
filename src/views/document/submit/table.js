@@ -752,6 +752,12 @@ export default class Table {
                 if (map.require === true && (value === '' || value == null)) {
                     ele.css('position', 'relative').append(Util.requireRedDot(sign));
                 }
+                ele.off('click', '.validate-icon')
+                ele.on('click', '.validate-icon', function(e) {
+                    let msg = $(this).attr('title');
+                    e.msg = msg;
+                    SYMPER_APP.$evtBus.$emit('document-submit-open-validate-message', e)
+                })
             }
         }
         /**

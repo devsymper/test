@@ -226,10 +226,6 @@ export default class Control {
     renderValidateIcon(message) {
         let icon = `<span class="mdi mdi-checkbox-blank-circle validate-icon" title="` + message + `"></span>`
         this.ele.parent().append(icon);
-        this.ele.parent().find('.mdi-checkbox-blank-circle').on('click', function(e) {
-            e.msg = message;
-            SYMPER_APP.$evtBus.$emit('document-submit-open-validate', e)
-        })
     }
     removeRequire() {
         this.ele.parent().find('.validate-icon').remove();
