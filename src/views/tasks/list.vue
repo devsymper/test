@@ -22,27 +22,27 @@
                         <v-row>
                             <v-col
                                 :cols="sideBySideMode ? 12 : compackMode ? 6 : 4"
-                                class="pl-3 fs-13 font-weight-bold"
+                                class="pl-3 fs-13 font-weight-medium "
                             >{{$t("tasks.header.name")}}</v-col>
                             <v-col
                                 cols="2"
                                 v-if="!sideBySideMode"
-                                class="fs-13 font-weight-bold"
+                                class="fs-13 font-weight-medium "
                             >{{$t("tasks.header.assignee")}}</v-col>
                             <v-col
                                 cols="2"
                                 v-if="!sideBySideMode"
-                                class="fs-13 font-weight-bold"
+                                class="fs-13 font-weight-medium "
                             >{{$t("tasks.header.dueDate")}}</v-col>
                             <v-col
                                 cols="2"
                                 v-if="!sideBySideMode"
-                                class="fs-13 font-weight-bold"
+                                class="fs-13 font-weight-medium "
                             >{{$t("tasks.header.owner")}}</v-col>
                             <v-col
                                 cols="2"
                                 v-if="!sideBySideMode && !compackMode && !smallComponentMode"
-                                class="fs-13 font-weight-bold">
+                                class="fs-13 font-weight-medium ">
                                 {{$t("common.workflows")}}
                             </v-col>
                         </v-row>
@@ -102,7 +102,7 @@
                             class="fs-13 pl-1 pr-1"
                             :class="{'pt-0': isSmallRow, 'pb-0': isSmallRow}"
                         >
-                            <span class="mt-1 float-right">{{$moment(obj.dueDate).fromNow()}}</span>
+                            <span class="mt-1 ">{{$moment(obj.dueDate).fromNow()}}</span>
                         </v-col>
                         <v-col
                             v-if="!sideBySideMode"
@@ -237,7 +237,6 @@ export default {
     mounted() {
         let self = this;
         this.$store.dispatch('process/getAllDefinitions').then((res) => {
-            debugger
             self.getTasks();
         }).catch((err) => {
 
@@ -317,12 +316,17 @@ export default {
             }
                         
             self.allFlatTasks = [];
+            let mapUser = this.$store.getters['app/mapIdToUser'];
             for(let task of listTasks){
                 task.taskData = self.getTaskData(task);
-                task.assigneeInfo = this.$store.getters['app/mapIdToUser'][task.assignee];
-                
-                if(this.$store.getters['app/mapIdToUser'][task.owner]){
-                    task.ownerInfo = this.$store.getters['app/mapIdToUser'][task.owner];                
+                task.assigneeInfo = {};
+                if(mapUser[task.owner]){
+                    task.assigneeInfo = mapUser[task.assignee];
+                }
+
+                task.ownerInfo = {};
+                if(mapUser[task.owner]){
+                    task.ownerInfo = mapUser[task.owner];                
                 }
 
                 let allDefinitions = this.$store.state.process.allDefinitions;

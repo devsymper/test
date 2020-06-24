@@ -1,7 +1,7 @@
 <template>
     <div class="w-100 d-flex justify-space-between py-2">
         <div 
-            class="pl-3 title"
+            class="pl-3 symper-title"
             v-if="!sideBySideMode">
                 {{headerTitle}}
         </div>
@@ -120,7 +120,7 @@
                 class="mr-2"
                 @click="changeDensity"
                 v-show="!sideBySideMode">
-                <v-icon size="18">{{isSmallRow ? 'mdi-view-stream' : 'mdi-view-headline'}}</v-icon>
+                <v-icon size="18">{{isSmallRow ? 'mdi-view-headline' : 'mdi-menu'}}</v-icon>
             </v-btn>
         </div>
         <v-dialog

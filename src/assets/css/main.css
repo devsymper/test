@@ -635,3 +635,8 @@ html {
 .bg-white {
     background-color: white;
 }
+
+.symper-title {
+    font-size: 17px!important;
+    font-weight: 500!important;
+}
