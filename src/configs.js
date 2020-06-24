@@ -1,4 +1,5 @@
 export const appConfigs = {
+    defaultAvatar: '/img/avatar_default.jpg',
     dataTypeIcon: { // icon cho các kiểu dữ liệu: numeric, text, date, datetime, time, 
         numeric: 'mdi-numeric',
         text: 'mdi-alphabetical-variant',

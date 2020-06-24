@@ -10,4 +10,11 @@ const listOrgcNodeAsFlat = function(state) {
     }
     return nodes;
 }
-export { listOrgcNodeAsFlat };
+
+const mapIdToUser = function(state) {
+    return state.allUsers.reduce((map, el, idx) => {
+        map[el.id] = el;
+        return map;
+    }, {});
+}
+export { listOrgcNodeAsFlat, mapIdToUser };

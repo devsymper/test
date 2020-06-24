@@ -89,22 +89,12 @@
                             v-if="!sideBySideMode"
                             cols="2"
                             class="fs-13 pl-1 pr-1"
-                            :class="{'pt-0': isSmallRow, 'pb-0': isSmallRow}"
-                        >
-                            {{obj.assignee}}
-                            <v-chip
-                                color="transparent"
-                                small
-                                class="mt-0 pl-1 pr-0 d-inline-block text-truncate"
-                                label
-                                v-if="obj.assignee != null"
-                            >
+                            :class="{'pt-0': isSmallRow, 'pb-0': isSmallRow}">
+                            
                                 <v-avatar size="25" class="mr-2">
-                                    <img :src="obj.assignee.avatar" alt v-if="!!obj.assignee.avatar" />
-                                    <v-icon v-else v-text="obj.assignee.avatar"></v-icon>
+                                    <img :src="obj.assigneeInfo.avatar ? obj.assigneeInfo.avatar : require('@/assets/image/avatar_default.jpg')" />
                                 </v-avatar>
-                                {{obj.assignee.name}}
-                            </v-chip>
+                                {{obj.assigneeInfo.displayName}}
                         </v-col>
                         <v-col
                             v-if="!sideBySideMode"
@@ -112,29 +102,27 @@
                             class="fs-13 pl-1 pr-1"
                             :class="{'pt-0': isSmallRow, 'pb-0': isSmallRow}"
                         >
-                            <span class="mt-1 d-inline-block">{{$moment(obj.dueDate).fromNow()}}</span>
+                            <span class="mt-1 float-right">{{$moment(obj.dueDate).fromNow()}}</span>
                         </v-col>
                         <v-col
                             v-if="!sideBySideMode"
                             cols="2"
                             class="fs-13 pl-1 pr-1"
-                            :class="{'pt-0': isSmallRow, 'pb-0': isSmallRow}"
-                        >
+                            :class="{'pt-0': isSmallRow, 'pb-0': isSmallRow}">
                             <v-chip
                                 color="transparent"
                                 class="mt-0 pl-1 pr-0 d-inline-block text-truncate"
                                 small
                                 label
-                                v-if="obj.owner != null"
-                            >
+                                v-if="obj.owner != null">
                                 <v-avatar size="25" class="mr-2">
-                                    <img :src="obj.owner.avatar" alt v-if="!!obj.owner.avatar" />
-                                    <v-icon v-else v-text="obj.owner.avatar"></v-icon>
+                                    <img :src="obj.ownerInfo.avatar" alt v-if="!!obj.ownerInfo.avatar" />
+                                    <v-icon v-else v-text="obj.ownerInfo.avatar"></v-icon>
                                 </v-avatar>
-                                {{obj.owner.name}}
+                                {{obj.ownerInfo.displayName}}
                             </v-chip>
                         </v-col>
-                        <v-col cols="2" v-if="!sideBySideMode && !compackMode && !smallComponentMode">
+                        <v-col cols="2" v-if="!sideBySideMode && !smallComponentMode">xxx
                             <span class="mt-1 d-inline-block fs-13">{{obj.processDefinitionName}}</span>
                         </v-col>
                     </v-row>
@@ -162,6 +150,7 @@ import listHeader from "./listHeader";
 import userSelector from "./userSelector";
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import { util } from '../../plugins/util';
+import { appConfigs } from '../../configs';
 
 export default {
     computed: {
@@ -233,7 +222,8 @@ export default {
                 sort: 'createTime',
                 order: 'desc',
                 assignee: this.$store.state.app.endUserInfo.id
-            }
+            },
+            defaultAvatar: appConfigs.defaultAvatar
         };
     },
     created(){
@@ -245,8 +235,14 @@ export default {
         });
     },
     mounted() {
-        this.getTasks();
-        this.reCalcListTaskHeight();
+        let self = this;
+        this.$store.dispatch('process/getAllDefinitions').then((res) => {
+            debugger
+            self.getTasks();
+        }).catch((err) => {
+
+        });
+        self.reCalcListTaskHeight();
     },
     methods: {
         handleChangeFilterValue(data){
@@ -323,6 +319,16 @@ export default {
             self.allFlatTasks = [];
             for(let task of listTasks){
                 task.taskData = self.getTaskData(task);
+                task.assigneeInfo = this.$store.getters['app/mapIdToUser'][task.assignee];
+                
+                if(this.$store.getters['app/mapIdToUser'][task.owner]){
+                    task.ownerInfo = this.$store.getters['app/mapIdToUser'][task.owner];                
+                }
+
+                let allDefinitions = this.$store.state.process.allDefinitions;
+                if(allDefinitions[task.processDefinitionId]){
+                    task.processDefinitionName = allDefinitions[task.processDefinitionId].name;
+                }
                 self.allFlatTasks.push(task);
             }
             this.listProrcessInstances.forEach(
