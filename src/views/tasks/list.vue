@@ -122,7 +122,7 @@
                                 {{obj.ownerInfo.displayName}}
                             </v-chip>
                         </v-col>
-                        <v-col cols="2" v-if="!sideBySideMode && !smallComponentMode">xxx
+                        <v-col cols="2" v-if="!sideBySideMode && !smallComponentMode">
                             <span class="mt-1 d-inline-block fs-13">{{obj.processDefinitionName}}</span>
                         </v-col>
                     </v-row>
@@ -151,6 +151,30 @@ import userSelector from "./userSelector";
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import { util } from '../../plugins/util';
 import { appConfigs } from '../../configs';
+ 
+function getUndefinedActionTask(task){
+    return {
+        "action": {
+            "module": "document",
+            "resource": "document_object",
+            "scope": "workflow",
+            "action": "undefined",
+            "parameter": {
+                "processDefinitionId": task.processDefinitionId,
+                "processInstanceId": task.processInstanceId,
+                "taskId": task.id,
+                "title": task.name,
+                "description": task.description,
+            }
+        },
+        "content": "",
+        "extraLable": "",
+        "extraValue": "",
+        "approvalActions": "",
+        "targetElement": ""
+    }
+}
+
 
 export default {
     computed: {
@@ -267,13 +291,14 @@ export default {
                     try {
                         taskInfo = JSON.parse(obj.description);
                         if(!taskInfo){
-                            this.$snotifyError(error, "Can not parse task info");   
-                            taskInfo = {};
+                            this.$snotifyWarning(error, "Can not parse task info");   
+                            taskInfo = getUndefinedActionTask(obj);
                         }
                     } catch (error) {
-                        taskInfo = {};
-                        this.$snotifyError(error, "Can not parse task info");   
+                        taskInfo = getUndefinedActionTask(obj);
+                        this.$snotifyWarning(error, "Can not parse task info");   
                     }
+
                     this.$set(this.selectedTask, 'taskInfo', taskInfo);
                     this.$emit("change-height", "calc(100vh - 88px)");
                 }
@@ -320,7 +345,8 @@ export default {
             for(let task of listTasks){
                 task.taskData = self.getTaskData(task);
                 task.assigneeInfo = {};
-                if(mapUser[task.owner]){
+                debugger
+                if(mapUser[task.assignee]){
                     task.assigneeInfo = mapUser[task.assignee];
                 }
 

@@ -942,7 +942,7 @@ export default {
             let nodeData = this.stateAllElements[currBizNode.id];
             console.log(currBizNode.id, result, searchedNodeMap);
             
-            if(searchedNodeMap[currBizNode.id]){
+            if(searchedNodeMap[currBizNode.id] || !nodeData){
                 return;
             }
             // Nếu là UserTask và là submit hoặc là node bắt đầu quy trình và có form submit

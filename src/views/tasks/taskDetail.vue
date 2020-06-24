@@ -213,6 +213,12 @@ export default {
                     // "transientVariables": []
                 }
                 this.submitTask(taskData);
+            }else if(this.taskAction == 'undefined'){
+                let taskData = {
+                    "action": "complete",
+                    "outcome": value,
+                }
+                this.submitTask(taskData);
             }
         },
         async submitTask(taskData){
@@ -260,6 +266,14 @@ export default {
             
             if(this.taskAction == 'approval'){
                 this.showApprovalOutcomes(JSON.parse(this.taskInfo.approvalActions));
+            }else if(this.taskAction == 'undefined'){
+                this.taskActionBtns = [
+                    {
+                        text:"Complete",
+                        value:"complete",
+                        color:"green"
+                    }
+                ]
             }
             this.changeTaskDetailInfo(this.taskInfo.action.parameter.taskId);
         }
