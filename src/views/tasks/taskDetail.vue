@@ -1,6 +1,6 @@
 <template>
     <div class="h-100 w-100">
-        <v-row class="ml-0 mr-0 justify-space-between" style="    line-height: 31px;">
+        <v-row class="ml-0 mr-0 justify-space-between" style="    line-height: 36px;">
             <div class="fs-13 pl-2 pt-1 float-left">
                 App name / Object name /  task id
             </div>

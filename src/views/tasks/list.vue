@@ -79,18 +79,17 @@
                                 <div class="text-left fs-12 pr-6 text-ellipsis w-100">
                                     {{obj.taskData.content}}
                                 </div>
-                                <v-col
-                                    cols="12"
-                                    class="pt-0 pb-0 pr-0 pl-0 grey--text lighten-2 float-left d-flex">
-                                    <div class="text-left fs-12 pr-6 text-ellipsis">
+                                <div
+                                    class="pa-0 grey--text lighten-2 d-flex justify-space-between">
+                                    <div class="fs-12 pr-6 text-ellipsis">
                                         {{obj.taskData.extraLabel}}   {{obj.taskData.extraValue}}
                                     </div>
 
-                                    <div class="text-right fs-12 pt-0 pb-0 pr-2 text-ellipsis" style="width: 130px" >
-                                        <v-icon class="grey--text lighten-2 mr-1" x-small>mdi-clock-time-nine-outline</v-icon>
+                                    <div class="fs-12 py-0 pr-2 text-ellipsis" >
                                         {{$moment(obj.createTime).fromNow()}}
+                                        <v-icon class="grey--text lighten-2 ml-1" x-small>mdi-clock-time-nine-outline</v-icon>
                                     </div>
-                                </v-col>
+                                </div>
                             </div>
                         </v-col>
                         <v-col

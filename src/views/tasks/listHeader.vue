@@ -1,80 +1,85 @@
 <template>
-    <div class="w-100 d-flex justify-space-between">
+    <div class="w-100 d-flex justify-space-between py-2">
         <div 
-            cols="2" 
-            class="pt-1 pb-1"
-            v-if="!compackMode">
-            <span class="title ml-2" v-show="!sideBySideMode">
+            class="pl-3 title"
+            v-if="!sideBySideMode">
                 {{headerTitle}}
-            </span>
-            <v-btn
-                small
-                text
-                @click="openCreateTaskDialog"
-                class="success white--text ml-2"
-                style="margin-top: 1px">
-                {{$t("common.add")}} 
-                <v-icon small>mdi-plus</v-icon>
-            </v-btn>
         </div>
-        <div class="pt-1 pb-1 pr-0">
+        <div :class="{
+            'pr-0 d-flex': true, 
+            'w-100': sideBySideMode
+        } ">
             <!-- Tìm kiếm -->
-            <v-text-field dense
-                class="bg-grey sym-small-pad sym-small-size d-inline-block mr-2"
-                append-icon="mdi-magnify"
-                flat
-                solo
-                :class="{'compact-input': sideBySideMode}"
-                :placeholder="$t('common.search')"
-            ></v-text-field>
-            <!-- Phân loại task -->
-            <v-select
-                v-if="!compackMode"
-                :items="listFilterTask"
-                solo
-                flat
-                dense
-                v-model="filterTask"
+            <v-text-field
+                class="d-inline-block mx-2 sym-small-size"
                 single-line
-                :hide-details="true"
-                style="min-width: 50px;"
-                :style="{'max-width': sideBySideMode ? '100px' : '180px'}"
-                light
-                class="mr-2 bg-grey sym-small-pad sym-small-size sym-style-input d-inline-block"
-            >
-            </v-select>
+                append-icon="mdi-magnify"
+                outlined
+                hide-details
+                dense
+                flat
+                label="Search"
+                :placeholder="$t('common.search')"
+            ></v-text-field> 
+            <!-- Add task -->
+            <v-btn
+                v-show="!sideBySideMode"
+                small
+                v-on="on"
+                class="mr-2"
+                depressed
+                @click="openCreateTaskDialog">
+                <v-icon size="18" >mdi-plus</v-icon>
+                <span   class="ml-2" >{{$t('tasks.createTask.title')}}</span>
+            </v-btn>
+            <!-- Bộ lọc cho  task -->
+            <v-menu offset-y light
+                :close-on-content-click="false"
+                :min-width="300"
+                class="mr-2">
+                <template v-slot:activator="{ on }">
+                    <v-btn
+                        v-on="on"
+                        depressed
+                        class="mr-2"
+                        small>
+                        <v-icon size="18">mdi-filter-menu-outline</v-icon>
+                        <span v-if="!sideBySideMode"   class="ml-2">{{$t('common.filter')}}</span>
+                    </v-btn>
+                </template>
+            </v-menu>
+           
             <!-- Sort option -->
             <v-menu offset-y light
                 :close-on-content-click="false"
                 :min-width="200"
-                v-if="!compackMode"
-            >
+                class="mr-2">
+
                 <template v-slot:activator="{ on }">
                     <v-btn
+                        small
+                        class="mr-2"
                         v-on="on"
-                        class="bg-grey h-30"
-                        solo
-                        text
-                        x-small
-                    >
+                        depressed>
                         <v-icon size="18">mdi-swap-vertical</v-icon>
+                        <span v-show="!sideBySideMode"  class="ml-2">{{$t('common.sort')}}</span>
                     </v-btn>
                 </template>
-                <v-list dense light nav>
-                    <v-subheader class="font-weight-bold orange--text" style="height: 25px">
+                <v-list 
+                    dense 
+                    light 
+                    nav>
+                    <v-subheader class="font-weight-bold fs-14" style="height: 25px">
                         {{this.$t("sortBy")}}
                     </v-subheader>
                     <v-list-item-group 
-                        v-model="sortBy" 
-                        multiple
-                    >
+                        v-model="sortBy">
                         <v-list-item dense flat
                             v-for="(item, i) in sortOption"
-                            :key="i"
-                        >
+                            :key="i">
                             <template v-slot:default="{ active }">
                                 <v-list-item-content class="pt-0 pb-0">
-                                    <v-list-item-title class="font-weight-regular" v-text="item.label"></v-list-item-title>
+                                    <v-list-item-title class="font-weight-regular ml-4 fs-14" v-text="item.label"></v-list-item-title>
                                 </v-list-item-content>
                                 <v-list-item-action class="mt-0 mb-0">
                                     <v-icon v-if="active" color="success" small>mdi-check</v-icon>
@@ -82,7 +87,7 @@
                             </template>
                         </v-list-item>
                     </v-list-item-group>
-                    <v-subheader class="font-weight-bold orange--text" style="height: 25px">
+                    <v-subheader class="font-weight-bold fs-14" style="height: 25px">
                         {{this.$t("orderBy")}}
                     </v-subheader>
                     <v-list-item-group v-model="orderBy">
@@ -92,7 +97,7 @@
                         >
                             <template v-slot:default="{ active }">
                                 <v-list-item-content class="pt-0 pb-0">
-                                    <v-list-item-title class="font-weight-regular" v-text="item.label"></v-list-item-title>
+                                    <v-list-item-title class="font-weight-regular fs-14 ml-4" v-text="item.label"></v-list-item-title>
                                 </v-list-item-content>
                                 <v-list-item-action class="mt-0 mb-0">
                                     <v-icon v-if="active" color="success" small>mdi-check</v-icon>
@@ -102,15 +107,15 @@
                     </v-list-item-group>
                 </v-list>
             </v-menu>
+
             <!-- Dãn nở dòng -->
             <v-btn 
-                x-small 
+                small 
                 solo
-                class="bg-grey h-30"
-                text
+                depressed
+                class="mr-2"
                 @click="changeDensity"
-                v-if="sideBySideMode || compackMode"
-            >
+                v-show="!sideBySideMode">
                 <v-icon size="18">{{isSmallRow ? 'mdi-view-stream' : 'mdi-view-headline'}}</v-icon>
             </v-btn>
         </div>

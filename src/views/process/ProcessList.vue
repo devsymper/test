@@ -136,7 +136,7 @@ export default {
                 {
                     name: "listTask",
                     text: this.$t("tasks.header.list"),
-                    callback: (row, callback) => {
+                    callback: async (row, callback) => {
                         let lastestDefinition = await getLastestDefinition(row, false);
                         if(lastestDefinition.data[0]){
                             self.$goToPage('/tasks?processDefinitionId='+lastestDefinition.data[0].id)

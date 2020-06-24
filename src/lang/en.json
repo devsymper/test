@@ -56,7 +56,9 @@
         "remove_msg_err": "Can not delete selected items!",
         "logout": "Log out",
         "last_update_at": "Last updated at",
-        "create_at": "Created at"
+        "create_at": "Created at",
+        "filter": "Filter",
+        "sort": "Sort"
     },
     "validate": {
         "required": "Not be empty",

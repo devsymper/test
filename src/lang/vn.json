@@ -55,7 +55,9 @@
         "remove_msg_err": "Không thể xóa các mục đã chọn!",
         "logout": "Đăng xuất",
         "last_update_at": "Cập nhật lần cuối",
-        "create_at": "Tạo lúc"
+        "create_at": "Tạo lúc",
+        "filter": "Bộ lọc",
+        "sort": "Sắp xếp"
     },
     "login": {
         "title": "Đăng nhập hệ thống",
