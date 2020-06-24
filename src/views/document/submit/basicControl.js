@@ -47,7 +47,7 @@ export default class BasicControl extends Control {
 
     render() {
         let thisCpn = this;
-        this.ele.wrap('<span style="position:relative;display:block;">');
+        this.ele.wrap('<span style="position:relative;display:inline-block;">');
         this.ele.attr('key-instance', this.curParentInstance);
         if (!this.checkDetailView() && this.value == "" &&
             this.controlProperties['isRequired'] != undefined &&
@@ -122,11 +122,12 @@ export default class BasicControl extends Control {
             this.ele.addClass('detail-view')
             this.ele.attr('disabled', 'disabled')
         }
+        console.log('type', this.type);
 
     }
     renderFileControl = function(rowId) {
         let fileHtml = this.genFileView(rowId);
-        this.ele.css('width', 'unset').css('cursor', 'pointer').css('height', '25px').html(fileHtml);
+        this.ele.css('width', 'unset').css('cursor', 'pointer').css('height', '25px').css('vertical-align', 'middle').html(fileHtml);
         let thisCpn = this;
         $('.file-add').click(function(e) {
             let el = $(e);

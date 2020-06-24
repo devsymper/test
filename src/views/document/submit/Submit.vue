@@ -1117,8 +1117,8 @@ export default {
             if(Array.isArray(isHidden)){
                 isHidden=isHidden[0];
             }
-            let display = (isHidden == 1 || isHidden==true ) ? 'none' : 'block'
-            $('#'+controlId).css({'display':display})
+            let display = (isHidden == 1 || isHidden==true ) ? 'none' : 'inline-block'
+            $('#'+controlId).parent().css({'display':display})
         },
         handlerDataAfterRunFormulasReadonly(isReadonly,controlId){
             if(Array.isArray(isReadonly)){

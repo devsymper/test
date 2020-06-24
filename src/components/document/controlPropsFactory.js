@@ -440,7 +440,7 @@ const controlTypes = {
     },
     table: {
         icon: "/icon/ic_table.png",
-        html: `<div class="wrap-s-control-table" style="overflow:auto;"><table contenteditable="true" class="s-control s-control-table" s-control-type="table">
+        html: `<div class="wrap-s-control-table s-control s-control-table" s-control-type="table" style="overflow:auto;"><table contenteditable="true">
                 <thead>
                     <tr>
                         <th></th>
