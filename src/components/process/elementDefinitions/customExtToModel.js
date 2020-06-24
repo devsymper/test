@@ -1,5 +1,6 @@
 import { allNodesAttrs } from "./../allAttrsOfNodes";
 import attrToXMLMethods from "./attrToXMLMethods";
+import { util } from "../../../plugins/util";
 
 /**
  * 
@@ -103,27 +104,36 @@ function removeCustomAttrToDataObject(vizEl, attrs) {
     attrs.dataproperties.value = Object.values(attrs.dataproperties.value);
 }
 
+export const defaultTaskDescription = {
+    action: {
+        module: "document",
+        resource: "document_object",
+        scope: "workflow",
+        action: '',
+        parameter: {
+            activityId: '',
+            documentId: 0
+        }
+    },
+    content: '',
+    extraLabel: '',
+    extraValue: '',
+    approvalActions: '',
+    targetElement: '',
+}
+
 export const collectInfoForTaskDescription = function(allVizEls, allSymEls, bpmnModeler) {
     for (let idEl in allSymEls) {
         let el = allSymEls[idEl];
         if (el.type == 'UserTask' || el.type == 'Task') {
-            let elDocumentation = {
-                action: {
-                    module: "document",
-                    resource: "document_object",
-                    scope: "workflow",
-                    action: el.attrs.taskAction.value,
-                    parameter: {
-                        activityId: el.id,
-                        documentId: 0
-                    }
-                },
-                content: el.attrs.notificationContent.value,
-                extraLabel: el.attrs.extraInfoLabel.value,
-                extraValue: el.attrs.extraInfoValue.value,
-                approvalActions: '',
-                targetElement: '',
-            }
+            let elDocumentation = util.cloneDeep(defaultTaskDescription);
+            elDocumentation.action.action = el.attrs.taskAction.value;
+            elDocumentation.action.parameter.activityId = el.id;
+
+            elDocumentation.content = el.attrs.notificationContent.value;
+            elDocumentation.extraLabel = el.attrs.extraInfoLabel.value;
+            elDocumentation.extraValue = el.attrs.extraInfoValue.value;
+
             if (el.attrs.taskAction.value == 'submit') {
                 elDocumentation.action.parameter.documentId = el.attrs.formreference.value;
             } else if (el.attrs.taskAction.value == 'approval') {

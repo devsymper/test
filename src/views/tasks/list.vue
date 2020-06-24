@@ -345,7 +345,6 @@ export default {
             for(let task of listTasks){
                 task.taskData = self.getTaskData(task);
                 task.assigneeInfo = {};
-                debugger
                 if(mapUser[task.assignee]){
                     task.assigneeInfo = mapUser[task.assignee];
                 }

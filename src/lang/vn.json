@@ -479,6 +479,10 @@
         }
     },
     "tasks": {
+        "error": {
+            "emptyAssignee": "Người nhận việc không được phép để trống",
+            "canNotCreateTask": "Không thể khởi tạo công việc"
+        },
         "header": {
             "date": "Ngày tạo",
             "dueDate": "Ngày đến hạn",
@@ -490,7 +494,8 @@
             "watcher": "Người theo dõi",
             "participant": "Người tham gia",
             "id": "Số đơn",
-            "list": "Danh sách công việc"
+            "list": "Danh sách công việc",
+            "submitForm": "Form nhập liệu"
         },
         "filterOptions": {
             "all": "Toàn bộ task",

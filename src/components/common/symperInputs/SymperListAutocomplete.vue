@@ -16,8 +16,7 @@
         :item-value="valueKey"
         solo
         @change="applyChangeValue"
-        @click="reAssignItems()"
-    >
+        @click="reAssignItems()">
         <!-- Kiểu 1: mainAndSub -->
         <template v-slot:selection="{ attr, on, item, selected }">
             <v-chip

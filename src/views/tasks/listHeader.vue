@@ -1,14 +1,12 @@
 <template>
     <div class="w-100 d-flex justify-space-between py-2">
-        <div 
-            class="pl-3 symper-title"
-            v-if="!sideBySideMode">
-                {{headerTitle}}
-        </div>
-        <div :class="{
+        <div class="pl-3 symper-title" v-if="!sideBySideMode">{{headerTitle}}</div>
+        <div
+            :class="{
             'pr-0 d-flex': true, 
             'w-100': sideBySideMode
-        } ">
+        } "
+        >
             <!-- Tìm kiếm -->
             <v-text-field
                 class="d-inline-block mx-2 sym-small-size"
@@ -20,70 +18,52 @@
                 flat
                 label="Search"
                 :placeholder="$t('common.search')"
-            ></v-text-field> 
+            ></v-text-field>
             <!-- Add task -->
             <v-btn
                 v-show="!sideBySideMode"
                 small
                 class="mr-2"
                 depressed
-                @click="openCreateTaskDialog">
-                <v-icon size="18" >mdi-plus</v-icon>
-                <span   class="ml-2" >{{$t('tasks.createTask.title')}}</span>
+                @click="openCreateTaskDialog"
+            >
+                <v-icon size="18">mdi-plus</v-icon>
+                <span class="ml-2">{{$t('tasks.createTask.title')}}</span>
             </v-btn>
             <!-- Bộ lọc cho  task -->
-            <v-menu offset-y light
-                :close-on-content-click="false"
-                :min-width="300"
-                class="mr-2">
+            <v-menu offset-y light :close-on-content-click="false" :min-width="300" class="mr-2">
                 <template v-slot:activator="{ on }">
-                    <v-btn
-                        v-on="on"
-                        depressed
-                        class="mr-2"
-                        small>
+                    <v-btn v-on="on" depressed class="mr-2" small>
                         <v-icon size="18">mdi-filter-menu-outline</v-icon>
-                        <span v-if="!sideBySideMode"   class="ml-2">{{$t('common.filter')}}</span>
+                        <span v-if="!sideBySideMode" class="ml-2">{{$t('common.filter')}}</span>
                     </v-btn>
                 </template>
                 <div>
-                    <TaskListFilter @filter-change-value="handleChangeFilterValue">
-                        
-                    </TaskListFilter>
+                    <TaskListFilter @filter-change-value="handleChangeFilterValue"></TaskListFilter>
                 </div>
             </v-menu>
-           
-            <!-- Sort option -->
-            <v-menu offset-y light
-                :close-on-content-click="false"
-                :min-width="200"
-                class="mr-2">
 
+            <!-- Sort option -->
+            <v-menu offset-y light :close-on-content-click="false" :min-width="200" class="mr-2">
                 <template v-slot:activator="{ on }">
-                    <v-btn
-                        small
-                        class="mr-2"
-                        v-on="on"
-                        depressed>
+                    <v-btn small class="mr-2" v-on="on" depressed>
                         <v-icon size="18">mdi-swap-vertical</v-icon>
-                        <span v-show="!sideBySideMode"  class="ml-2">{{$t('common.sort')}}</span>
+                        <span v-show="!sideBySideMode" class="ml-2">{{$t('common.sort')}}</span>
                     </v-btn>
                 </template>
-                <v-list 
-                    dense 
-                    light 
-                    nav>
-                    <v-subheader class="font-weight-bold fs-14" style="height: 25px">
-                        {{this.$t("sortBy")}}
-                    </v-subheader>
-                    <v-list-item-group 
-                        v-model="sortBy">
-                        <v-list-item dense flat
-                            v-for="(item, i) in sortOption"
-                            :key="i">
+                <v-list dense light nav>
+                    <v-subheader
+                        class="font-weight-bold fs-14"
+                        style="height: 25px"
+                    >{{this.$t("sortBy")}}</v-subheader>
+                    <v-list-item-group v-model="sortBy">
+                        <v-list-item dense flat v-for="(item, i) in sortOption" :key="i">
                             <template v-slot:default="{ active }">
                                 <v-list-item-content class="pt-0 pb-0">
-                                    <v-list-item-title class="font-weight-regular ml-4 fs-14" v-text="item.label"></v-list-item-title>
+                                    <v-list-item-title
+                                        class="font-weight-regular ml-4 fs-14"
+                                        v-text="item.label"
+                                    ></v-list-item-title>
                                 </v-list-item-content>
                                 <v-list-item-action class="mt-0 mb-0">
                                     <v-icon v-if="active" color="success" small>mdi-check</v-icon>
@@ -91,17 +71,18 @@
                             </template>
                         </v-list-item>
                     </v-list-item-group>
-                    <v-subheader class="font-weight-bold fs-14" style="height: 25px">
-                        {{this.$t("orderBy")}}
-                    </v-subheader>
+                    <v-subheader
+                        class="font-weight-bold fs-14"
+                        style="height: 25px"
+                    >{{this.$t("orderBy")}}</v-subheader>
                     <v-list-item-group v-model="orderBy">
-                        <v-list-item
-                            v-for="(item, i) in orderOption"
-                            :key="i"
-                        >
+                        <v-list-item v-for="(item, i) in orderOption" :key="i">
                             <template v-slot:default="{ active }">
                                 <v-list-item-content class="pt-0 pb-0">
-                                    <v-list-item-title class="font-weight-regular fs-14 ml-4" v-text="item.label"></v-list-item-title>
+                                    <v-list-item-title
+                                        class="font-weight-regular fs-14 ml-4"
+                                        v-text="item.label"
+                                    ></v-list-item-title>
                                 </v-list-item-content>
                                 <v-list-item-action class="mt-0 mb-0">
                                     <v-icon v-if="active" color="success" small>mdi-check</v-icon>
@@ -113,68 +94,62 @@
             </v-menu>
 
             <!-- Dãn nở dòng -->
-            <v-btn 
-                small 
+            <v-btn
+                small
                 solo
                 depressed
                 class="mr-2"
                 @click="changeDensity"
-                v-show="!sideBySideMode">
+                v-show="!sideBySideMode"
+            >
                 <v-icon size="18">{{isSmallRow ? 'mdi-view-headline' : 'mdi-menu'}}</v-icon>
             </v-btn>
         </div>
-        <v-dialog
-            v-model="dialog"
-            width="400"
-        >
-            <v-card >
-                <v-card-title>
-                    {{$t("tasks.createTask.title")}}
-                </v-card-title>
+        <v-dialog v-model="dialog" width="400">
+            <v-card>
+                <v-card-title>{{$t("tasks.createTask.title")}}</v-card-title>
                 <div class="mr-0 ml-0 pl-6 pr-6">
-                    <div  class="label pt-2">
-                        {{$t("tasks.header.name")}}
-                    </div>
-                    <div >
+                    <div class="label pt-2">{{$t("tasks.header.name")}}</div>
+                    <div>
                         <v-text-field
-                            class="sym-small-size bg-grey"
+                            class="sym-small-size"
                             dense
                             solo
                             flat
+                            background-color=" grey lighten-3"
                             v-model="taskObject.name"
                         ></v-text-field>
                     </div>
-                    <div  class="label pt-2">
-                        {{$t("tasks.header.assignee")}}
-                    </div>
-                    <div >
-                        <userSelector 
+                    <div class="label pt-2">{{$t("tasks.header.assignee")}}</div>
+                    <div>
+                        <userSelector
                             ref="userSelector"
-                            :isMulti="false" 
+                            :isMulti="false"
                             :compactChip="true"
                             :color="'transparent'"
                             :textColor="''"
-                             :flat="true"
+                            :flat="true"
                             v-model="taskObject.assignee"
                         ></userSelector>
                     </div>
-                    <div  class="label pt-2">
-                        {{$t("tasks.header.dueDate")}}
+                    <div class="label pt-2">{{$t("tasks.header.dueDate")}}</div>
+                    <div>
+                        <datePicker  v-model="taskObject.dueDate"></datePicker>
                     </div>
-                    <div >
-                        <datePicker 
-                            v-model="taskObject.dueDate"
-                        ></datePicker>
+
+                    <div class="label pt-2">{{$t("tasks.header.submitForm")}}</div>
+                    <div>
+                        <symper-document-selec v-model="taskObject.docId"></symper-document-selec>
                     </div>
-                    <div  class="label pt-2">
-                        {{$t("tasks.header.description")}}
-                    </div>
-                    <div >
+
+                    <div class="label pt-2">{{$t("tasks.header.description")}}</div>
+                    <div>
                         <v-textarea
-                            class="sym-small-size bg-grey sym-small-lineheight"
+                            class="sym-small-size  sym-small-lineheight"
                             dense
                             solo
                             flat
+                            background-color="grey lighten-3"
                             v-model="taskObject.description"
                         ></v-textarea>
                     </div>
@@ -189,12 +164,8 @@
                                     taskObject.dueDate.length == 0 ||
                                     taskObject.assignee.length == 0"
                         @click="saveTask"
-                    >
-                        {{$t('common.add')}}
-                    </v-btn>
-                    <v-btn text small @click="dialog = false" class="mr-2">
-                        {{$t('common.close')}}
-                    </v-btn>
+                    >{{$t('common.add')}}</v-btn>
+                    <v-btn text small @click="dialog = false" class="mr-2">{{$t('common.close')}}</v-btn>
                 </v-card-actions>
             </v-card>
         </v-dialog>
@@ -205,36 +176,40 @@
 import BPMNEngine from "./../../api/BPMNEngine";
 import icon from "../../components/common/SymperIcon";
 import datePicker from "../../components/common/datePicker";
-import vClickOutside from 'v-click-outside';
+import vClickOutside from "v-click-outside";
 import userSelector from "./userSelector";
 import TaskListFilter from "@/components/tasks/list/TaskListFilter.vue";
+import SymperDocSelect from "@/components/common/symperInputs/SymperDocumentSelect.vue";
+import { defaultTaskDescription } from '../../components/process/elementDefinitions/customExtToModel';
+import { util } from '../../plugins/util';
 
 export default {
-    created(){
-        this.$store.dispatch('process/getAllDefinitions');
+    created() {
+        this.$store.dispatch("process/getAllDefinitions");
     },
     name: "listHeader",
-    watch:{
+    watch: {
         sortBy: {
             deep: true,
             immediate: true,
-            handler(after){
+            handler(after) {
                 this.handleChangeFilterValue();
             }
         },
         orderBy: {
             deep: true,
             immediate: true,
-            handler(after){
+            handler(after) {
                 this.handleChangeFilterValue();
             }
-        },
+        }
     },
     components: {
         icon: icon,
         userSelector: userSelector,
         datePicker: datePicker,
-        TaskListFilter: TaskListFilter
+        TaskListFilter: TaskListFilter,
+        "symper-document-selec": SymperDocSelect
     },
     props: {
         isSmallRow: {
@@ -251,11 +226,11 @@ export default {
         },
         headerTitle: {
             type: String,
-            default: 'List tasks'
+            default: "List tasks"
         },
         parentTaskId: {
             type: String,
-            default: ''
+            default: ""
         }
     },
     data: function() {
@@ -263,29 +238,29 @@ export default {
             sortOption: [
                 {
                     label: this.$t("tasks.header.date"),
-                    value: 'createTime',
+                    value: "createTime",
                     callback: e => {}
                 },
                 {
                     label: this.$t("tasks.header.dueDate"),
-                    value: 'dueDate',
+                    value: "dueDate",
                     callback: e => {}
                 },
                 {
                     label: this.$t("tasks.header.description"),
-                    value: 'description',
+                    value: "description",
                     callback: e => {}
                 }
             ],
             orderOption: [
                 {
                     label: this.$t("order.ascending"),
-                    value: 'asc',
+                    value: "asc",
                     callback: e => {}
                 },
                 {
                     label: this.$t("order.descending"),
-                    value: 'desc',
+                    value: "desc",
                     callback: e => {}
                 }
             ],
@@ -313,15 +288,16 @@ export default {
             queryProcessInstance: "runtime/process-instances",
             listProrcessInstances: [],
             dialog: false,
-            selectedProcess:  null,
+            selectedProcess: null,
             taskObject: {
                 name: "",
                 assignee: [],
                 dueDate: "",
-                description: ""
+                description: "",
+                docId: ''
             },
             filterList: {}
-        }
+        };
     },
     directives: {
         clickOutside: vClickOutside.directive
@@ -330,20 +306,22 @@ export default {
         this.getProcessInstance();
     },
     methods: {
-        handleChangeFilterValue(data = {}){
-            if($.isEmptyObject(data)){
-                if(this.orderBy !== null){
-                    this.filterList.order = this.orderOption[this.orderBy].value;
+        handleChangeFilterValue(data = {}) {
+            if ($.isEmptyObject(data)) {
+                if (this.orderBy !== null) {
+                    this.filterList.order = this.orderOption[
+                        this.orderBy
+                    ].value;
                 }
-                if(this.sortBy  !== null){
+                if (this.sortBy !== null) {
                     this.filterList.sort = this.sortOption[this.sortBy].value;
                 }
-            }else{
+            } else {
                 this.filterList = Object.assign(this.filterList, data);
             }
-            this.$emit('filter-change-value', this.filterList);
+            this.$emit("filter-change-value", this.filterList);
         },
-        openCreateTaskDialog(){
+        openCreateTaskDialog() {
             this.dialog = true;
         },
         changeDensity() {
@@ -351,70 +329,88 @@ export default {
         },
         getProcessInstance() {
             BPMNEngine.getProcessInstance()
-            .then((res) => {
-                if (res.total > 0) {
-                    let listProccess = [];
-                    let objects = [];
-                    res.data.forEach(item => {
-                        if (listProccess.indexOf(item.processDefinitionId) < 0) {
-                            listProccess.push(item.processDefinitionId);
-                        }
-                        let index = listProccess.indexOf(item.processDefinitionId);
-                        item.tasks = [];
-                        if (objects[index] != undefined) {
-                            objects[index].objects.push(item);
-                        } else {
-                            objects.push({
-                                processDefinitionId: item.processDefinitionId,
-                                processDefinitionName: item.processDefinitionName,
-                                objects: [item]
-                            });
-                        }
-                    });
-                    this.listProrcessInstances = objects;
-                    this.$emit("get-list-process-instance", objects);
-                }
-            })
-            .catch((err) => {
-                
-            });
+                .then(res => {
+                    if (res.total > 0) {
+                        let listProccess = [];
+                        let objects = [];
+                        res.data.forEach(item => {
+                            if (
+                                listProccess.indexOf(item.processDefinitionId) <
+                                0
+                            ) {
+                                listProccess.push(item.processDefinitionId);
+                            }
+                            let index = listProccess.indexOf(
+                                item.processDefinitionId
+                            );
+                            item.tasks = [];
+                            if (objects[index] != undefined) {
+                                objects[index].objects.push(item);
+                            } else {
+                                objects.push({
+                                    processDefinitionId:
+                                        item.processDefinitionId,
+                                    processDefinitionName:
+                                        item.processDefinitionName,
+                                    objects: [item]
+                                });
+                            }
+                        });
+                        this.listProrcessInstances = objects;
+                        this.$emit("get-list-process-instance", objects);
+                    }
+                })
+                .catch(err => {});
         },
         selectProcess(process) {
             this.selectedProcess = process;
             this.openCreateTaskDialog();
         },
-        showError(){
+        showError() {
             this.$snotify({
-                type: 'error',
-                title: this.$t('notification.errorTitle'),
-                text: this.$t('notification.error')
-            })
+                type: "error",
+                title: this.$t("notification.errorTitle"),
+                text: this.$t("notification.error")
+            });
         },
         async saveTask() {
+            if(!this.taskObject.assignee){
+                this.$snotifyError({},this.$t('tasks.error.canNotCreateTask'), this.$t('tasks.error.emptyAssignee'));
+                return
+            }
             let data = {
                 ...this.taskObject,
-                assignee    : this.taskObject.assignee[0],
-                parentTaskId: this.parentTaskId ? this.parentTaskId : ''
+                assignee: this.taskObject.assignee[0],
+                parentTaskId: this.parentTaskId ? this.parentTaskId : ""
             };
+
+            if(this.taskObject.docId){
+                let description = util.cloneDeep(defaultTaskDescription);
+                description.action.action = 'submit';
+                description.action.content = this.taskObject.description;
+                description.action.parameter.documentId = this.taskObject.docId;
+
+                data.description = JSON.stringify(description);
+            }
             let res = await BPMNEngine.addTask(JSON.stringify(data));
             if (res.id != undefined) {
                 this.selectedProcess = null;
-                this.dialog          = false;
+                this.dialog = false;
                 this.$emit("create-task", res);
-                this.$snotifySuccess(this.$t('tasks.created'));
+                this.$snotifySuccess(this.$t("tasks.created"));
             } else {
                 this.showError();
             }
         }
     }
-}
+};
 </script>
 
 <style scoped>
-    .v-list-item {
-        cursor: pointer;
-    }
-    .v-list-item:hover {
-        background-color: #f5f5f5 !important                                                                                ;
-    }
+.v-list-item {
+    cursor: pointer;
+}
+.v-list-item:hover {
+    background-color: #f5f5f5 !important                                                                                ;
+}
 </style>

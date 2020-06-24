@@ -9,11 +9,11 @@
         chips
         item-text="displayName"
         item-value="id"
-        :background-color="'white'"
+        background-color="grey lighten-3"
         :height="30"
         :placeholder="$t('common.search')"
-        class="sym-small-size sym-pad-0"
-        :class="{'bg-grey': !flat}"
+        class="sym-small-size sym-pad-0 "
+        :class="{'bg-grey': true}"
         :multiple="isMulti"
     >
         <template v-slot:selection="data">

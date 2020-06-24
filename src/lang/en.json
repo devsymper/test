@@ -465,6 +465,10 @@
         "descending": "Descending"
     },
     "tasks": {
+        "error": {
+            "emptyAssignee": "Assignee can not be empty",
+            "canNotCreateTask": "Can not create task"
+        },
         "header": {
             "date": "Date",
             "dueDate": "Due Date",
@@ -476,7 +480,8 @@
             "watcher": "Watcher",
             "participant": "Participant",
             "id": "Seri",
-            "list": "List task"
+            "list": "List task",
+            "submitForm": "Submit form"
         },
         "filterOptions": {
             "all": "All task",
