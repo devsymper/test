@@ -19,6 +19,7 @@ export const appConfigs = {
             instances: "https://workflow.symper.vn:8443/symper-rest/service/runtime/process-instances",
             history: "https://workflow.symper.vn:8443/symper-rest/service/history",
             tasks: "https://workflow.symper.vn:8443/symper-rest/service/runtime/tasks",
+            tasksHistory: "https://workflow.symper.vn:8443/symper-rest/service/history/historic-task-instances",
             validateModel: "https://workflow.symper.vn:8443/symper-modeler/api/editor/validate-model"
         },
         documents: 'https://v2hoangnd.dev.symper.vn/document',

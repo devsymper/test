@@ -18,7 +18,7 @@
                 flat
                 class="select-orgchart border-all mx-4 mb-2 mt-1 sym-small-size" 
                 style="background-color: "
-                multiple
+                :multiple="!item.singleValue"
                 solo>
                 <template v-slot:selection="{ attrs, item, select, selected }">
                     <v-chip 
@@ -46,24 +46,34 @@
 export default {
     methods: {
         removeItem(item, key){
-            let idx = 0;
-            for(let i = 0; i < this.listFilter[key].value.length ; i++){
-                if(this.listFilter[key].value[i].id == item.id){
-                    idx = i;
-                    break;
+            let vl = this.listFilter[key].value;
+            if($.isArray(vl)){
+                let idx = 0;
+                for(let i = 0; i < vl.length ; i++){
+                    if(vl[i].id == item.id){
+                        idx = i;
+                        break;
+                    }
                 }
+                vl.splice(idx, 1);
+            }else{
+                this.listFilter[key].value = null;
             }
-            this.listFilter[key].value.splice(idx, 1);
         },
         handleFilterChange(){
             let filterData = {};
             for(let key in this.listFilter){
                 if(this.listFilter[key].value){
                     filterData[key] = [];
-                    filterData[key] = this.listFilter[key].value.reduce((arr, ele) => {
-                        arr.push(ele.id);
-                    }, []);
-                    filterData[key] = filterData[key].join(',');
+
+                    if($.isArray(this.listFilter[key].value)){
+                        filterData[key] = this.listFilter[key].value.reduce((arr, ele) => {
+                            arr.push(ele.id);
+                        }, []);
+                        filterData[key] = filterData[key].join(',');
+                    }else {
+                        filterData[key] = this.listFilter[key].value.id;
+                    }
                 }
             }
             this.$emit('filter-change-value', filterData);
@@ -118,6 +128,25 @@ export default {
                     label: this.$t('process.instance.process_definition_name'),
                     items: [],
                     value: null,
+                    searchKey: ''
+                },
+                status: {
+                    label: this.$t('common.status'),
+                    items: [
+                        {
+                            id: 'done',
+                            displayName: this.$t('common.done')
+                        },
+                        {
+                            id: 'notDone',
+                            displayName: this.$t('common.notDone')
+                        },
+                    ],
+                    value: {
+                            id: 'notDone',
+                            displayName: this.$t('common.notDone')
+                        },
+                    singleValue: true,
                     searchKey: ''
                 },
             }

@@ -135,8 +135,12 @@
                 class="pa-0 ma-0"
                 height="30"
                 style="border-left: 1px solid #e0e0e0;">
-                <taskDetail :parentHeight="listTaskHeight" :taskInfo="selectedTask.taskInfo" @close-detail="closeDetail"></taskDetail>
-            </v-col>
+                <taskDetail
+                    :parentHeight="listTaskHeight" 
+                    :taskInfo="selectedTask.taskInfo" 
+                    @close-detail="closeDetail"
+                    @task-submited="handleTaskSubmited"></taskDetail>
+            </v-col> 
             <userSelector ref="user" class="d-none"></userSelector>
         </v-row>
     </div>
@@ -268,6 +272,10 @@ export default {
         self.reCalcListTaskHeight();
     },
     methods: {
+        handleTaskSubmited(){
+            this.sideBySideMode = false;
+            this.getTasks();
+        },
         handleChangeFilterValue(data){
             for(let key in data){
                 this.$set(this.myOwnFilter, key, data[key]);

@@ -16,6 +16,7 @@
                 hide-details
                 dense
                 flat
+                v-model="searchTaskKey"
                 label="Search"
                 :placeholder="$t('common.search')"
             ></v-text-field>
@@ -202,6 +203,9 @@ export default {
             handler(after) {
                 this.handleChangeFilterValue();
             }
+        },
+        searchTaskKey(vl){
+            this.handleChangeFilterValue();
         }
     },
     components: {
@@ -235,6 +239,7 @@ export default {
     },
     data: function() {
         return {
+            searchTaskKey: '',
             sortOption: [
                 {
                     label: this.$t("tasks.header.date"),
@@ -319,6 +324,7 @@ export default {
             } else {
                 this.filterList = Object.assign(this.filterList, data);
             }
+            this.filterList.nameLike = `%${this.searchTaskKey}%`;
             this.$emit("filter-change-value", this.filterList);
         },
         openCreateTaskDialog() {

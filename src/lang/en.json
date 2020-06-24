@@ -58,7 +58,10 @@
         "last_update_at": "Last updated at",
         "create_at": "Created at",
         "filter": "Filter",
-        "sort": "Sort"
+        "sort": "Sort",
+        "status": "Status",
+        "done": "Done",
+        "notDone": "Not done"
     },
     "validate": {
         "required": "Not be empty",
