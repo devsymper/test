@@ -5,9 +5,11 @@
                 App name / Object name /  task id
             </div>
             <div class="text-right pt-1 pb-1 pr-0 float-right">
-                <v-btn small depressed v-for="(action, idx) in taskActionBtns" dark :key="idx" :color="action.color" @click="saveTaskOutcome(action.value)" class="mr-2">
-                    {{action.text}}
-                </v-btn>
+                <span v-if="!originData.endTime">
+                    <v-btn small depressed v-for="(action, idx) in taskActionBtns" dark :key="idx" :color="action.color" @click="saveTaskOutcome(action.value)" class="mr-2">
+                        {{action.text}}
+                    </v-btn>
+                </span>
                 <v-btn small text  @click="closeDetail">
                     <v-icon small>mdi-close</v-icon>
                 </v-btn>
