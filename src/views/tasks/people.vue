@@ -1,5 +1,5 @@
 <template>
-    <div class="w-100 h-100 symper-task-people">
+    <div class="w-100 symper-task-people px-5">
         <v-text-field
             :label="$t('common.search')"
             dense

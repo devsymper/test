@@ -159,31 +159,8 @@ import userSelector from "./userSelector";
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import { util } from '../../plugins/util';
 import { appConfigs } from '../../configs';
+import { extractTaskInfoFromObject, addMoreInfoToTask } from '../../components/process/processAction';
  
-function getUndefinedActionTask(task){
-    return {
-        "action": {
-            "module": "document",
-            "resource": "document_object",
-            "scope": "workflow",
-            "action": "undefined",
-            "parameter": {
-                "processDefinitionId": task.processDefinitionId,
-                "processInstanceId": task.processInstanceId,
-                "taskId": task.id,
-                "title": task.name,
-                "description": task.description,
-            }
-        },
-        "content": "",
-        "extraLable": "",
-        "extraValue": "",
-        "approvalActions": "",
-        "targetElement": ""
-    }
-}
-
-
 export default {
     computed: {
         // Liệt kê danh sách các task dưới dạng phẳng - ko phân cấp
@@ -301,21 +278,7 @@ export default {
                 this.selectedTask.idx = idx;
                 if (!this.compackMode) {
                     this.sideBySideMode = true;
-                    let taskInfo = {};
-                    try {
-                        taskInfo = JSON.parse(obj.description);
-                        if(!taskInfo){
-                            this.$snotifyWarning(error, "Can not parse task info");   
-                            taskInfo = getUndefinedActionTask(obj);
-                        }
-                    } catch (error) {
-                        taskInfo = getUndefinedActionTask(obj);
-                        this.$snotifyWarning(error, "Can not parse task info");   
-                    }
-
-                    if(!taskInfo.action.parameter.taskId){
-                        taskInfo.action.parameter.taskId = obj.id;
-                    }
+                    let taskInfo = extractTaskInfoFromObject(obj);
                     this.$set(this.selectedTask, 'taskInfo', taskInfo);
                     this.$emit("change-height", "calc(100vh - 88px)");
                 }
@@ -362,23 +325,9 @@ export default {
             }
                         
             self.allFlatTasks = [];
-            let mapUser = this.$store.getters['app/mapIdToUser'];
             for(let task of listTasks){
                 task.taskData = self.getTaskData(task);
-                task.assigneeInfo = {};
-                if(mapUser[task.assignee]){
-                    task.assigneeInfo = mapUser[task.assignee];
-                }
-
-                task.ownerInfo = {};
-                if(mapUser[task.owner]){
-                    task.ownerInfo = mapUser[task.owner];                
-                }
-
-                let allDefinitions = this.$store.state.process.allDefinitions;
-                if(allDefinitions[task.processDefinitionId]){
-                    task.processDefinitionName = allDefinitions[task.processDefinitionId].name;
-                }
+                task = addMoreInfoToTask(task);
                 self.allFlatTasks.push(task);
             }
             this.listProrcessInstances.forEach(

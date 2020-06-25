@@ -1,7 +1,9 @@
 <template>
     <div class="w-100">
         <TaskDetail
-            :taskInfo="taskInfo">
+            :taskInfo="data.taskInfo"
+            :originData="data.originData"
+            :parentHeight="taskDetailHeight" >
 
         </TaskDetail>
     </div>
@@ -10,33 +12,46 @@
 <script>
 import TaskDetail from "./taskDetail.vue";
 import BPMNEngine from '../../api/BPMNEngine';
+import { extractTaskInfoFromObject, addMoreInfoToTask } from '../../components/process/processAction';
+import { util } from '../../plugins/util';
+
+
 
 export default {
     data: function(){
         return {
-            taskInfo: {}
+            data: {
+                taskInfo: {},
+                originData: {}
+            },
+            taskDetailHeight: 500
         }
     },
     components: {
         TaskDetail: TaskDetail
     },
+    beforeCreate(){
+    },
     created(){
-        this.setTaskInfo()
+        let self = this;
+        this.$store.dispatch('process/getAllDefinitions').then((res) => {
+            self.setTaskInfo()
+        }).catch((err) => {
+
+        });
+    },
+    mounted(){
+        this.taskDetailHeight = util.getComponentSize(this).h;
     },
     methods: {
         async setTaskInfo(){
             if(this.$route.params.id){
-                let taskInfo = await BPMNEngine.getATaskInfo(this.$route.params.id);
-                try {
-                    taskInfo = JSON.parse(taskInfo.description);
-                    if(taskInfo){
-                        this.taskInfo = taskInfo;
-                    }else{
-                        this.$snotifyError({message: 'nul value'}, 'Can not get data from task description!');
-                    }
-                } catch (error) {
-                    this.$snotifyError(error, 'Can not get data from task description!');
-                }
+                let task = await BPMNEngine.getATaskInfo(this.$route.params.id);
+                
+                let taskInfo = extractTaskInfoFromObject(task);
+                task = addMoreInfoToTask(task);
+                this.$set(this.data, 'taskInfo', taskInfo);
+                this.$set(this.data, 'originData', task);
             }
         }
     }

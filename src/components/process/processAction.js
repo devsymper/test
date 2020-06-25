@@ -2,6 +2,7 @@ import bpmnApi from "./../../api/BPMNEngine";
 import { util } from "../../plugins/util";
 import { documentApi } from "../../api/Document";
 import BPMNEngine from "./../../api/BPMNEngine";
+import { SYMPER_APP } from "@/main.js";
 
 function moveTaskTitleToNameAttr(content, configValue) {
     for (let idEl in configValue) {
@@ -228,4 +229,67 @@ function getValueForVariable(value, type) {
     } else {
         return value;
     }
+}
+
+
+function getUndefinedActionTask(task) {
+    return {
+        "action": {
+            "module": "document",
+            "resource": "document_object",
+            "scope": "workflow",
+            "action": "undefined",
+            "parameter": {
+                "processDefinitionId": task.processDefinitionId,
+                "processInstanceId": task.processInstanceId,
+                "taskId": task.id,
+                "title": task.name,
+                "description": task.description,
+            }
+        },
+        "content": "",
+        "extraLable": "",
+        "extraValue": "",
+        "approvalActions": "",
+        "targetElement": ""
+    }
+}
+
+export const extractTaskInfoFromObject = function(obj) {
+    let taskInfo = {};
+    try {
+        taskInfo = JSON.parse(obj.description);
+        if (!taskInfo) {
+            taskInfo = getUndefinedActionTask(obj);
+        }
+    } catch (error) {
+        taskInfo = getUndefinedActionTask(obj);
+    }
+
+    if (!taskInfo.action.parameter.taskId) {
+        taskInfo.action.parameter.taskId = obj.id;
+    }
+
+    return taskInfo;
+}
+
+
+export const addMoreInfoToTask = function(task) {
+    let mapUser = SYMPER_APP.$store.getters['app/mapIdToUser'];
+
+    task.assigneeInfo = {};
+    if (mapUser[task.assignee]) {
+        task.assigneeInfo = mapUser[task.assignee];
+    }
+
+    task.ownerInfo = {};
+    if (mapUser[task.owner]) {
+        task.ownerInfo = mapUser[task.owner];
+    }
+
+    let allDefinitions = SYMPER_APP.$store.state.process.allDefinitions;
+    if (allDefinitions[task.processDefinitionId]) {
+        task.processDefinitionName = allDefinitions[task.processDefinitionId].name;
+    }
+    return task;
 }

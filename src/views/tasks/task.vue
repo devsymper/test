@@ -1,5 +1,5 @@
 <template>
-    <div class="h-100 w-100 d-flex justify-center"> 
+    <div class="h-100 w-100 d-flex justify-center ml-6"> 
         <DocumentSubmit 
             v-if="action == 'submit'"
             ref="submitComponent"
