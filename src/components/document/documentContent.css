@@ -141,3 +141,35 @@ input.s-control:not(.s-control-panel):not(.detail-view):hover {
     background: #fff;
     text-align: left;
 }
+
+.handsontable .upload-file-wrapper-inTb {
+    display: flex;
+    height: 100%;
+}
+
+.handsontable .upload-file-wrapper-inTb .file-add {
+    width: 20px;
+}
+
+.handsontable .upload-file-wrapper-inTb .file-item {
+    position: relative;
+    margin-right: 8px;
+}
+
+.handsontable .upload-file-wrapper-inTb .file-item:hover .remove-file {
+    display: block;
+}
+
+.handsontable .upload-file-wrapper-inTb .file-item .remove-file {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    background: white;
+    height: 14px;
+    width: 14px;
+    font-size: 12px;
+    border-radius: 50%;
+    color: red;
+    display: none;
+    box-shadow: 0px 3px 1px -2px rgba(0, 0, 0, 0.2), 0px 2px 2px 0px rgba(0, 0, 0, 0.14), 0px 1px 5px 0px rgba(0, 0, 0, 0.12);
+}

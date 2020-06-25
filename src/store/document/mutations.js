@@ -21,6 +21,8 @@ const changeControlSubmitProps = (state, params) => {
     let key = params.key
     let value = params.value
         // state.editor.allControl[id] = prop;
+    console.log(params);
+
     Vue.set(state.submit.listInputInDocument[name], key, value);
 };
 

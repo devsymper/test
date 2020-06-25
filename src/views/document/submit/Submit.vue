@@ -96,6 +96,8 @@ import Filter from "./items/Filter.vue";
 import Validate from "./items/Validate.vue";
 import ClientSQLManager from "./clientSQLManager.js";
 import Util from './util';
+import './customControl.css';
+
 import { checkCanBeBind, resetImpactedFieldsList, markBinedField } from './handlerCheckRunFormulas';
 import {checkDbOnly,getControlInstanceFromStore} from './../common/common'
 let impactedFieldsList = {};
@@ -176,13 +178,8 @@ export default {
         let thisCpn = this;
         $("#file-upload-alter-" + this.keyInstance).on("change", function(e) {
             let name = $(this).attr("data-control-name");
-            thisCpn.$store.commit("document/changeControlSubmitProps", {
-                name: name,
-                key: "value",
-                value: $(this).prop("files")[0].name
-            });
             thisCpn.sDocumentSubmit.listInputInDocument[name].addFile(
-                $(this).prop("files")[0].name
+                $(this).prop("files")[0]
             );
         });
         $('.sym-form-submit').on('click','.validate-icon',function(e){
@@ -602,6 +599,8 @@ export default {
                             tableEle.find(".s-control").each(function() {
                                 let childControlId = $(this).attr("id");
                                 let childControlProp = thisCpn.sDocumentEditor.allControl[id].listFields[childControlId];
+                                console.log('sa',childControlProp);
+                                
                                 childControlProp.properties.inTable = controlName;
                                 childControlProp.properties.docName = thisCpn.documentName;
                                 let idFieldChild = childControlProp.id;

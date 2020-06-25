@@ -905,7 +905,7 @@ export default {
         // sự kiện xảy ra khi khởi tạo xong editor , sự kiện do tinymce cung cấp
         initEditor(){
             let thisCpn = this;
-            if(this.documentId != 0)    // trường họp edit doc thì gọi api lấy dữ liệu
+            if(this.documentId != 0 && this.documentId != undefined)    // trường họp edit doc thì gọi api lấy dữ liệu
             thisCpn.getContentDocument();
             var currentElement, currentElementChangeFlag, elementRectangle, countdown, dragoverqueue_processtimer;
             // object xử lí các vấn đề với kéo thả control vào document

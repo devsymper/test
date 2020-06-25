@@ -22,11 +22,21 @@ Handsontable.renderers.FileRenderer = function(instance, td, row, col, prop, val
     Handsontable.renderers.NumericRenderer.apply(this, arguments);
     td.innerHTML = listInputInDocument[prop].genFileView(row);
     td.classList.add("upload-file-wrapper-inTb");
-    if (isDetailView && !rerenderCtrlFlag[instance.tableName]) {
-        let tb = listInputInDocument[prop].inTable;
-        listInputInDocument[tb].tableInstance.reRender(tb);
-        rerenderCtrlFlag[instance.tableName] = true;
-    }
+    $(td).off('click', '.file-add')
+    $(td).on('click', '.file-add', function(e) {
+        let el = $(e);
+        $("#file-upload-alter").attr('data-rowid', el.attr('data-rowid')).attr('data-ctrlname', el.attr('data-ctrlname'));
+        $("#file-upload-alter-" + instance.keyInstance).click();
+        $("#file-upload-alter-" + instance.keyInstance).attr('data-control-name', $(this).attr('data-control-name'))
+    })
+    $(td).off('click', '.remove-file')
+    listInputInDocument[prop].setDeleteFileEvent($(td), prop)
+        // if (isDetailView && !rerenderCtrlFlag[instance.tableName]) {
+        //     let tb = listInputInDocument[prop].inTable;
+        //     // listInputInDocument[tb].tableInstance.reRender(tb);
+        //     // rerenderCtrlFlag[instance.tableName] = true;
+        // }
+
 }
 Handsontable.cellTypes.registerCellType('file', {
     renderer: Handsontable.renderers.PercentRenderer
@@ -642,7 +652,7 @@ export default class Table {
             //     }
             // },
         });
-        this.tableInstance.symperTable = this;
+        this.tableInstance.keyInstance = this.keyInstance;
         this.tableInstance.setCellMeta(2, 0, 'readOnly', true)
         if (!this.checkDetailView()) {
             for (let evtName in thisObj.event) {

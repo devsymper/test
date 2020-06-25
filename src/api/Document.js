@@ -30,5 +30,8 @@ export const documentApi = {
     },
     getListDocuments(data = {}) {
         return coreApi.get("documents", data);
+    },
+    uploadFile(data) {
+        return coreApi.post("uploadFile", data);
     }
 };
