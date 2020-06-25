@@ -39,11 +39,12 @@
                         <v-tab-item
                             v-for="item in items"
                             :key="item.tab">
-                            <VuePerfectScrollbar :style="{height: parentHeight +'px'}" class=" pr-4" >
+                            <VuePerfectScrollbar :style="{height: parentHeight +'px'}" >
                                 <component 
                                     @task-submited="handleTaskSubmited" 
                                     :is="item.content"
                                     :taskInfo="taskInfo"
+                                    :originData="originData"
                                     :tabData="tabsData[item.tab]"
                                     :ref="item.tab">
                                 </component>
@@ -75,6 +76,12 @@ export default {
     props: {
         // Thông tin của một task, cấu trúc giống như một item khi lấy danh sách task
         taskInfo: {
+            type: Object,
+            default: () => {
+                return {}
+            }
+        },
+        originData: {
             type: Object,
             default: () => {
                 return {}

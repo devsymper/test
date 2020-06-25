@@ -56,6 +56,9 @@
                         :key="idx"
                         :index="obj.id"
                         class="mr-0 ml-0 single-row"
+                        :style="{
+                            minHeight: '50px'
+                        }"
                         @click="selectObject(obj, idx)">
                         <v-col
                             :cols="sideBySideMode ? 12 : compackMode ? 6: 4"
@@ -137,7 +140,8 @@
                 style="border-left: 1px solid #e0e0e0;">
                 <taskDetail
                     :parentHeight="listTaskHeight" 
-                    :taskInfo="selectedTask.taskInfo" 
+                    :taskInfo="selectedTask.taskInfo"
+                    :originData="selectedTask.originData"
                     @close-detail="closeDetail"
                     @task-submited="handleTaskSubmited"></taskDetail>
             </v-col> 
@@ -238,7 +242,8 @@ export default {
             listTaskHeight: 300,
             selectedTask: {
                 taskInfo: {},
-                idx: -1
+                idx: -1,
+                originData: null
             },
             listProrcessInstances: [],
             isSmallRow: false,
@@ -289,6 +294,7 @@ export default {
             this.$refs.user.getUser(id);
         },
         selectObject(obj, idx) {
+            this.$set(this.selectedTask,'originData', obj);
             if(this.smallComponentMode){
                 this.$goToPage('/tasks/' + obj.id, 'Do task');
             }else{

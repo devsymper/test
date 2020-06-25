@@ -54,7 +54,11 @@ export default {
         instanceId: {
             type: String,
             default: ''
-        }
+        },
+        elementId: {
+            type: String,
+            default: ''
+        },
     },
     watch:{
         instanceId(){
@@ -169,6 +173,11 @@ export default {
                         let symBpmn = self.$refs.symperBpmn;
                         let allNode = symBpmn.getAllNodes();
                         let nodeStatus = "";
+                        if(self.elementId){
+                            self.runtimeNodeMap[self.elementId] = {
+                                nodeStatus: 'todo'
+                            };
+                        }
                         for (let node of allNode) {
                             if (node.$type != "bpmn:Process") {
                                 if (self.runtimeNodeMap[node.id]) {

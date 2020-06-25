@@ -102,6 +102,10 @@ export default {
         return bpmneApi.post(appConfigs.apiDomain.bpmne.tasks, data, testHeader);
     },
     getTask(filter) {
+        if (filter.nameLike == '%%') {
+            delete filter.nameLike;
+        }
+        //ss
         if (filter.status == 'done') {
             filter.sort = filter.sort == 'createTime' ? 'startTime' : filter.sort;
             if (filter.assignee) {
