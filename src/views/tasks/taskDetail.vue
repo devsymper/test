@@ -221,29 +221,35 @@ export default {
                     // "variables": [],
                     // "transientVariables": []
                 }
-                this.submitTask(taskData);
+                let res = await this.submitTask(taskData);
             }else if(this.taskAction == 'undefined'){
                 let taskData = {
                     "action": "complete",
                     "outcome": value,
                 }
-                this.submitTask(taskData);
+                let res = await this.submitTask(taskData);
             }
         },
         async submitTask(taskData){
-            try {
-                let taskId = this.taskInfo.action.parameter.taskId;
-                let result = await BPMNEngine.actionOnTask(taskId, taskData);   
-                this.$snotifySuccess("Task completed!");
-            } catch (error) {
-                this.$snotifyError(error, "Can not submit task!")
-            }
+            let self = this;
+            return new Promise(async (resolve, reject) => {
+                try {
+                    let taskId = self.taskInfo.action.parameter.taskId;
+                    let result = await BPMNEngine.actionOnTask(taskId, taskData);   
+                    self.$snotifySuccess("Task completed!");
+                    resolve(result);
+                } catch (error) {
+                    self.$snotifyError(error, "Can not submit task!");
+                    reject(error);
+                }
+            });
+            
         },
         async handleTaskSubmited(data){
             if(this.isInitInstance){
                 this.$emit('task-submited', data);            
             }else{
-                let varsForBackend = await getVarsFromSubmitedDoc(data, this.taskInfo.taskDefinitionKey, this.taskInfo.formKey);
+                let varsForBackend = await getVarsFromSubmitedDoc(data, this.taskInfo.taskDefinitionKey, this.taskInfo.action.parameter.documentId);
                 let taskData = {
                     // action nhận 1 trong 4 giá trị: complete, claim, resolve, delegate
                     "action": "complete",
@@ -251,7 +257,8 @@ export default {
                     "outcome": 'submit',
                     "variables": varsForBackend.vars,
                 }
-                this.submitTask(taskData);
+                let res =  await this.submitTask(taskData);
+                this.$emit('task-submited', res);
             }
         },
         showApprovalOutcomes(approvalActions){

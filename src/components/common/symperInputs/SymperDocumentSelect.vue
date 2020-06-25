@@ -75,6 +75,8 @@ export default {
                 let searchKey = this.search;
                 let docs = [];
                 let allDocMap = this.$store.state.document.listAllDocument;
+                let val = this.search;
+                
                 for (let key in allDocMap) {
                     let doc = allDocMap[key];
                     if (

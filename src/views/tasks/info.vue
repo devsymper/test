@@ -27,7 +27,7 @@
                         {{$t("tasks.header.createDate")}}
                     </v-col>
                     <v-col cols="9">
-                        {{$moment(originData.createTime, "DD-MM-YYYY").fromNow()}}
+                        {{$moment(originData.createTime).fromNow()}}
                     </v-col>
                     <v-col cols="3" class="pb-1">
                         <v-icon small size="18" class="mr-2 mb-1">mdi-account</v-icon>

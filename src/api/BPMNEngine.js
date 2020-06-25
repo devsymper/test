@@ -102,6 +102,11 @@ export default {
         return bpmneApi.post(appConfigs.apiDomain.bpmne.tasks, data, testHeader);
     },
     getTask(filter) {
+        for (let key in filter) {
+            if (!filter[key]) {
+                delete filter[key];
+            }
+        }
         if (filter.nameLike == '%%') {
             delete filter.nameLike;
         }

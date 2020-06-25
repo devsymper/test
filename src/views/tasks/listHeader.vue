@@ -387,7 +387,8 @@ export default {
             let data = {
                 ...this.taskObject,
                 assignee: this.taskObject.assignee[0],
-                parentTaskId: this.parentTaskId ? this.parentTaskId : ""
+                parentTaskId: this.parentTaskId ? this.parentTaskId : "",
+                owner: this.$store.state.app.endUserInfo.id
             };
 
             if(this.taskObject.docId){

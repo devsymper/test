@@ -59,6 +59,7 @@ export default {
             }else{
                 this.listFilter[key].value = null;
             }
+            this.handleFilterChange();
         },
         handleFilterChange(){
             let filterData = {};
@@ -69,6 +70,7 @@ export default {
                     if($.isArray(this.listFilter[key].value)){
                         filterData[key] = this.listFilter[key].value.reduce((arr, ele) => {
                             arr.push(ele.id);
+                            return arr;
                         }, []);
                         filterData[key] = filterData[key].join(',');
                     }else {
@@ -112,7 +114,7 @@ export default {
         return {
             searchCombo: null,
             listFilter: {
-                assginee: {
+                assignee: {
                     label: this.$t('tasks.header.assignee'),
                     items: this.$store.state.app.allUsers,
                     value: null,

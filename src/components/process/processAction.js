@@ -161,7 +161,10 @@ export const getVarsFromSubmitedDoc = async(docData, elId, docId) => {
             }, {});
 
             for (let ctrlName in docData) {
-                let itemKey = elId + '_' + ctrlName;
+                let itemKey = ctrlName;
+                if (elId) {
+                    itemKey = elId + '_' + ctrlName;
+                }
                 if (typeof docData[ctrlName] != 'object') {
                     let ctrlType = 'string';
                     if (ctrlsMap[ctrlName]) {

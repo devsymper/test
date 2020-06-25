@@ -313,6 +313,9 @@ export default {
                         this.$snotifyWarning(error, "Can not parse task info");   
                     }
 
+                    if(!taskInfo.action.parameter.taskId){
+                        taskInfo.action.parameter.taskId = obj.id;
+                    }
                     this.$set(this.selectedTask, 'taskInfo', taskInfo);
                     this.$emit("change-height", "calc(100vh - 88px)");
                 }
@@ -350,6 +353,10 @@ export default {
                 res = await BPMNEngine.getSubtasks(this.filterFromParent.parentTaskId, filter);
                 listTasks = res;
             }else {
+                
+                if(!filter.assignee){
+                    filter.assignee = this.$store.state.app.endUserInfo.id;
+                }
                 res = await BPMNEngine.getTask(filter);
                 listTasks = res.data;
             }
