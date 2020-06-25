@@ -2,7 +2,7 @@
     <div class="h-100 w-100">
         <v-row class="ml-0 mr-0 justify-space-between" style="    line-height: 36px;">
             <div class="fs-13 pl-2 pt-1 float-left">
-                App name / Object name /  task id
+                {{taskBreadcrumb}}
             </div>
             <div class="text-right pt-1 pb-1 pr-0 float-right">
                 <span v-if="!originData.endTime">
@@ -114,6 +114,11 @@ export default {
     },
     data: function() {
         return {
+            breadcrumb: {
+                definitionName: '',
+                instanceName: '',
+                taskName: ''
+            },
             tabsData: {
                 people: {
                     assignee: [],
@@ -153,11 +158,6 @@ export default {
                     icon: 'mdi-format-list-bulleted',
                     title: "Subtask",
                     content: subtask
-                // }, {
-                //     tab: 'flow',
-                //     icon: 'mdi-cogs',
-                //     title: "Flow",
-                //     content: flow
                 }, {
                     tab: 'attachment',
                     icon: 'mdi-paperclip',
@@ -188,7 +188,14 @@ export default {
                 map[el.id] = el;
                 return map;
             }, {});
-        }
+        },
+        taskBreadcrumb(){
+            let bsr = this.breadcrumb.taskName;
+            if(this.breadcrumb.definitionName){
+                bsr = `App name / ${this.breadcrumb.definitionName} / ${this.breadcrumb.instanceName} / ${bsr}`;
+            }
+            return bsr;
+        },
     },
     methods: {
         changeTaskDetailInfo(taskId){
@@ -202,7 +209,19 @@ export default {
                         }, []);
                     }
                 }
+                self.setTaskBreadcrumb(res);
             });
+        },
+        setTaskBreadcrumb(task){
+            this.breadcrumb.taskName = task.name;
+            debugger
+            if(task.processDefinitionId){
+                this.breadcrumb.definitionName = this.$store.state.process.allDefinitions[task.processDefinitionId].name;
+                this.breadcrumb.instanceName = this.taskInfo.extraLabel+' '+this.taskInfo.extraValue;
+            }else{
+                this.breadcrumb.definitionName = '';
+                this.breadcrumb.instanceName = '';
+            }
         },
         closeDetail() {
             this.$emit("close-detail", {});
