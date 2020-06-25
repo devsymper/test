@@ -1,5 +1,5 @@
 <template>
-    <div class="pt-3 d-flex flex-column">
+    <div class="pt-3 d-flex flex-column h-100">
         <VueResizable
             class="mt-2"
             :min-height="100"

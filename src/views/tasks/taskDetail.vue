@@ -193,12 +193,17 @@ export default {
             let bsr = this.breadcrumb.taskName;
             if(this.breadcrumb.definitionName){
                 bsr = `App name / ${this.breadcrumb.definitionName} / ${this.breadcrumb.instanceName} / ${bsr}`;
+            }else if(this.isInitInstance && !$.isEmptyObject(this.$store.state.process.allDefinitions)){
+                bsr = `${this.$store.state.process.allDefinitions[this.$route.params.id].name} / Start workflow`
             }
             return bsr;
         },
     },
     methods: {
         changeTaskDetailInfo(taskId){
+            if(!taskId){
+                return;
+            }
             let self = this;
             BPMNEngine.getATaskInfo(taskId).then((res) => {
                 for(let role in self.tabsData.people){
@@ -214,7 +219,6 @@ export default {
         },
         setTaskBreadcrumb(task){
             this.breadcrumb.taskName = task.name;
-            debugger
             if(task.processDefinitionId){
                 this.breadcrumb.definitionName = this.$store.state.process.allDefinitions[task.processDefinitionId].name;
                 this.breadcrumb.instanceName = this.taskInfo.extraLabel+' '+this.taskInfo.extraValue;
