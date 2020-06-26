@@ -124,65 +124,44 @@
         
         <v-dialog v-model="dialogConfigNotification" width="600px">
             <v-app-bar dense flat color="white" class="notification-list-bar" fixed>
-                <v-toolbar-title class="nofitication-title-bar w-100">
+                <slot name="header">
+                    <v-toolbar-title class="nofitication-title-bar w-100">
                     <v-icon size="15">mdi-cog</v-icon> Config Notification
                      <v-icon
                             class="close-btn float-right"
                             @click="hideNotificationConfig()"
                         >mdi-close</v-icon>
                 </v-toolbar-title>
+                </slot>
+                
                 
             </v-app-bar>
-            <v-row class="ml-0 mr-0 pl-5 pr-5 list-notification bg-white" :z-index="99999">
-                <v-row
-                    
-                    class="text-left notification-item"
-                >
-                <v-col cols="1">
-                    <v-row>
-                        <v-icon size="30">mdi-file-document-outline </v-icon>
-                    </v-row>
-                </v-col>
-                <v-col cols="11" @click="openSubcribeConfig('document')">
-                    <v-row>
-                        <span class="notification-subscribe-type-title">
-                            Văn bản
-                        </span>
-                    </v-row>
-                    <v-row class="mt-1">
-                        <span class="notification-subscribe-type-description">
-                            Cấu hình nhận thông báo khi có tác động đến document (bản ghi, sửa, xoá,...)
-                        </span>
-                    </v-row>
-                </v-col>
-                </v-row>
-                
-            </v-row>
-        </v-dialog>
-        <v-dialog v-model="dialogConfigNotificationSubscribe" width="600px">
-            <v-app-bar dense flat color="white" class="notification-list-bar" fixed>
-                <v-toolbar-title class="nofitication-title-bar w-100">
-                    <v-row>
-                        <v-col cols="1">
-                            <v-icon size="15">{{dialogConfigNotificationSubscribeIcon}}</v-icon>
-                        </v-col>
-                        <v-col cols="10">
-                            <v-row>
-                                {{dialogConfigNotificationSubscribeTitle}}
-                            </v-row>
-                            <v-row>
-                                <span>{{dialogConfigNotificationSubscribeDescription}}</span>
-                            </v-row>
-                        </v-col>
-                     <v-icon
-                            class="close-btn float-right"
-                            @click="hideSubcribeConfig()"
-                        >mdi-close</v-icon>
+            <v-row class="ml-0 mr-0 pl-5 pr-5 list-notification bg-white" :z-index="999">
+                <slot name="body">
+                    <v-row
+                        
+                        class="text-left notification-item"
+                    >
+                    <v-col cols="1">
+                        <v-row>
+                            <v-icon size="30">mdi-file-document-outline </v-icon>
                         </v-row>
-                </v-toolbar-title>
-                
-            </v-app-bar>
-            
+                    </v-col>
+                    <v-col cols="11" @click="openSubcribeConfig('document')">
+                        <v-row>
+                            <span class="notification-subscribe-type-title">
+                                Văn bản
+                            </span>
+                        </v-row>
+                        <v-row class="mt-1">
+                            <span class="notification-subscribe-type-description">
+                                Cấu hình nhận thông báo khi có tác động đến document (bản ghi, sửa, xoá,...)
+                            </span>
+                        </v-row>
+                    </v-col>
+                    </v-row>
+                </slot>
+            </v-row>
         </v-dialog>
     </v-row>
 </template>
