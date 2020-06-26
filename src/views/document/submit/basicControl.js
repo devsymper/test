@@ -124,12 +124,12 @@ export default class BasicControl extends Control {
             this.ele.addClass('detail-view')
             this.ele.attr('disabled', 'disabled')
         }
-        console.log('type', this.type);
-
     }
-    renderFileControl = function(rowId) {
-        let fileHtml = this.genFileView(rowId);
+    renderFileControl = function() {
+        let fileHtml = this.genFileView();
         this.ele.css('width', 'unset').css('cursor', 'pointer').css('height', '25px').css('vertical-align', 'middle').html(fileHtml);
+        console.log('ssafas', fileHtml);
+
         let thisCpn = this;
         $('.file-add').click(function(e) {
             let el = $(e);
@@ -151,11 +151,29 @@ export default class BasicControl extends Control {
         }
 
         if (!this.inTable) {
+            if (this.value != '' && this.value.length > 0) {
+                let valueArr = this.value.replace(/^,/gi, "");
+                valueArr = valueArr.split(',');
+                console.log('sads', valueArr);
+
+                for (let index = 0; index < valueArr.length; index++) {
+
+                    let element = valueArr[index];
+                    let fileExt = Util.getFileExtension(element);
+                    let icon = fileTypes[fileExt];
+                    let file = `<div title="${element}" class="file-item">
+                            <i  onclick="window.open('https://sdocument-management.symper.vn/file/public/` + element + `');" class="mdi ` + icon + ` file-view" ></i>
+                        </div>`
+                    addTpl += file;
+                }
+            }
             return `<div class="upload-file-wrapper-outtb">${addTpl}</div>`;
         }
         if (this.value != '' && this.value.length > 0) {
             let valueArr = this.value.replace(/^,/gi, "");
             valueArr = valueArr.split(',');
+            console.log('klfas', valueArr);
+
             for (let index = 0; index < valueArr.length; index++) {
                 let element = valueArr[index];
                 let fileExt = Util.getFileExtension(element);
