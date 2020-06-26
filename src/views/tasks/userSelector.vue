@@ -1,19 +1,19 @@
 <template>
     <v-autocomplete
         v-model="selected"
-        :items="people"
+        :items="allUser"
         filled
         dense
         solo
         flat
         chips
-        item-text="name"
+        item-text="displayName"
         item-value="id"
-        :background-color="'white'"
+        background-color="grey lighten-3"
         :height="30"
         :placeholder="$t('common.search')"
-        class="sym-small-size sym-pad-0"
-        :class="{'bg-grey': !flat}"
+        class="sym-small-size sym-pad-0 "
+        :class="{'bg-grey': true}"
         :multiple="isMulti"
     >
         <template v-slot:selection="data">
@@ -25,20 +25,20 @@
                 small
                 :class="textColor"
                 @click:close="remove(data.item)"
-            >
+            > 
                 <v-avatar left v-if="compactChip">
-                    <v-img :src="data.item.avatar"></v-img>
+                    <v-img :src="data.item.avatar ? data.item.avatar : 'https://cdn.vuetifyjs.com/images/lists/4.jpg'"></v-img>
                 </v-avatar>
-                {{ data.item.name }}
+                {{ data.item.displayName }}
             </v-chip>
         </template>
         <template v-slot:item="data">
             <template>
                 <v-list-item-avatar size="30" class="mt-1 mb-1">
-                    <v-img :src="data.item.avatar"></v-img>
+                    <v-img :src="data.item.avatar ? data.item.avatar : 'https://cdn.vuetifyjs.com/images/lists/4.jpg'"></v-img>
                 </v-list-item-avatar>
                 <v-list-item-content class="pt-0 pb-0">
-                    <v-list-item-title v-html="data.item.name"></v-list-item-title>
+                    <v-list-item-title v-html="data.item.displayName"></v-list-item-title>
                     <v-list-item-subtitle class="caption" style="font-size:10px !important" v-html="data.item.role"></v-list-item-subtitle>
                 </v-list-item-content>
                 <v-list-item-action class="mt-0 mb-0">
@@ -141,6 +141,11 @@ export default {
             return this.users[id];
         }
     },
+    computed: {
+        allUser(){
+            return this.$store.state.app.allUsers;
+        }
+    }
 }
 </script>
 

@@ -129,7 +129,7 @@ export default {
                     name: "detail",
                     text: this.$t("common.tracking"),
                     callback: (row, callback) => {
-                        self.$goToPage(`/bpmne/process-instances/${row.id}/tracking`);
+                        self.$goToPage(`/workflow/process-instances/${row.id}/tracking`);
                     }
                 },
                 {

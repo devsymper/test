@@ -36,7 +36,7 @@ export default {
                     text: this.$t("process.deployment.run"),
                     callback: (row, callback) => {
                         // runProcessDefinition(self, row);
-                        self.$goToPage(`/bpmne/process-definition/${row.id}/run`,'Start process instance');
+                        self.$goToPage(`/workflow/process-definition/${row.id}/run`,'Start process instance');
                     }
                 },
                 { 
@@ -57,7 +57,7 @@ export default {
                     name: "processInstance",
                     text: this.$t("process.instance.list"),
                     callback: (row, callback) => {
-                        self.$goToPage(`/bpmne/process-definition/${row.id}/instances`, self.$t('process.instance.tracking'));
+                        self.$goToPage(`/workflow/process-definition/${row.id}/instances`, self.$t('process.instance.tracking'));
                     }
                 },
             ]

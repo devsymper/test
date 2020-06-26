@@ -19,6 +19,10 @@ const defaultState = {
         // selectingNode: {
 
         // }
+    },
+    // danh sách tất cả các definition theo dạng id definition: object definition đó
+    allDefinitions: {
+
     }
 };
 

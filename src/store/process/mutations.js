@@ -25,8 +25,19 @@ const changeSelectingNode = (state, info) => {
     Vue.set(state.editor[instanceKey], 'selectingNode', nodeData);
 };
 
+const setAllDefinition = (state, data) => {
+    let info = data.reduce((map, item) => {
+        map[item.id] = item;
+        return map;
+    }, {});
+    Vue.set(state, 'allDefinitions', info);
+};
+
+
+
 export {
     addNewNode,
     changeSelectingNode,
-    initInstance
+    initInstance,
+    setAllDefinition
 };

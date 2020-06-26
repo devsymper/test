@@ -66,6 +66,13 @@ const routes = [{
 
     },
     {
+        path: "/workflow/:id/view",
+        name: "viewProcess",
+        component: () =>
+            import ('../views/process/CreateProcess.vue'),
+
+    },
+    {
         path: "/workflow/:name/deploy-history",
         name: "deployHistory",
         // component: DeployHistory,

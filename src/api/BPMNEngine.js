@@ -102,7 +102,33 @@ export default {
         return bpmneApi.post(appConfigs.apiDomain.bpmne.tasks, data, testHeader);
     },
     getTask(filter) {
-        return bpmneApi.get(appConfigs.apiDomain.bpmne.tasks, filter, testHeader);
+        for (let key in filter) {
+            if (!filter[key]) {
+                delete filter[key];
+            }
+        }
+        if (filter.nameLike == '%%') {
+            delete filter.nameLike;
+        }
+        //ss
+        if (filter.status == 'done') {
+            filter.sort = filter.sort == 'createTime' ? 'startTime' : filter.sort;
+            if (filter.assignee) {
+                filter.taskAssignee = filter.assignee;
+            }
+
+            if (filter.owner) {
+                filter.taskOwner = filter.owner;
+            }
+
+            if (filter.nameLike) {
+                filter.taskNameLike = filter.nameLike;
+            }
+            filter.finished = true
+            return bpmneApi.get(appConfigs.apiDomain.bpmne.tasksHistory, filter, testHeader);
+        } else {
+            return bpmneApi.get(appConfigs.apiDomain.bpmne.tasks, filter, testHeader);
+        }
     },
     getSubtasks(idParent, filter) {
         return bpmneApi.get(appConfigs.apiDomain.bpmne.tasks + '/' + idParent + '/subtasks', filter, testHeader);

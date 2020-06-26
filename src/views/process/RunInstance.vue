@@ -1,6 +1,10 @@
 <template>
     <div class="h-100 w-100">
-        <taskDetail :isInitInstance="true" @task-submited="handleTaskSubmited" :taskInfo="taskInfo">
+        <taskDetail 
+            :isInitInstance="true" 
+            @task-submited="handleTaskSubmited" 
+            :taskInfo="taskInfo"
+            :parentHeight="thisHeight">
 
         </taskDetail>
     </div>
@@ -12,6 +16,7 @@ import taskDetail from "./../../views/tasks/taskDetail.vue";
 import { runProcessDefinition, getVarsFromSubmitedDoc } from '../../components/process/processAction';
 import { documentApi } from '../../api/Document';
 import { formulasApi } from '../../api/Formulas';
+import { util } from '../../plugins/util';
 
 export default {
     components: {
@@ -27,12 +32,21 @@ export default {
                     action: 'submit',
                 }
             },
+            thisHeight: 300,
             startType: 'submit', // các loại bắt đầu quy trình khác nhau: hiện tại chỉ có 1 loại là submit
             definitionModel: {} // các cấu hình của process definition
         }
     },
+    mounted(){
+        this.thisHeight = util.getComponentSize(this).h;
+    },
     created(){
-        this.getFirstNodeData();
+        let self = this;
+        this.$store.dispatch('process/getAllDefinitions').then((res) => {
+            self.getFirstNodeData();
+        }).catch((err) => {
+
+        });
     },
     methods: {
         async getFirstNodeData(){

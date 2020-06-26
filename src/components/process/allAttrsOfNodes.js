@@ -1648,6 +1648,10 @@ let allAttrs = {
                 text: 'Update document',
                 value: 'update'
             },
+            {
+                text: 'Undefined action',
+                value: 'undefined'
+            },
         ],
         dg: 'taskAction',
         isSymperProp: true,
