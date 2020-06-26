@@ -2,7 +2,7 @@ import Control from "./control";
 import store from './../../../store'
 import sDocument from './../../../store/document'
 import { SYMPER_APP } from './../../../main.js'
-
+import Formulas from './formulas'
 import Util from './util'
 let dataInputCache = sDocument.state.submit.dataInputCache;
 const fileTypes = {
@@ -41,11 +41,13 @@ const fileTypes = {
 export default class BasicControl extends Control {
     constructor(idField, ele, controlProps, curParentInstance, value) {
         super(idField, ele, controlProps, curParentInstance, value);
+
     }
+
 
     render() {
         let thisCpn = this;
-        this.ele.wrap('<span style="position:relative;">');
+        this.ele.wrap('<span style="position:relative;display:inline-block;">');
         this.ele.attr('key-instance', this.curParentInstance);
         if (!this.checkDetailView() && this.value == "" &&
             this.controlProperties['isRequired'] != undefined &&
@@ -59,6 +61,7 @@ export default class BasicControl extends Control {
                 this.controlProperties['isReadOnly'].value == 1)) {
             this.ele.attr('disabled', 'disabled')
         }
+
         if (this.controlProperties['isHidden'] != undefined &&
             (this.controlProperties['isHidden'].value == "1" ||
                 this.controlProperties['isHidden'].value == 1)) {
@@ -68,8 +71,6 @@ export default class BasicControl extends Control {
         if (this.controlFormulas.hasOwnProperty('autocomplete') && this.controlFormulas.autocomplete.instance != undefined) {
             this.addAutoCompleteEvent();
         }
-
-
         this.ele.on('change', function(e) {
             SYMPER_APP.$evtBus.$emit('document-submit-input-change', { controlName: thisCpn.controlProperties.name.value, val: $(e.target).val() })
         })
@@ -121,11 +122,12 @@ export default class BasicControl extends Control {
             this.ele.addClass('detail-view')
             this.ele.attr('disabled', 'disabled')
         }
+        console.log('type', this.type);
 
     }
     renderFileControl = function(rowId) {
         let fileHtml = this.genFileView(rowId);
-        this.ele.css('width', 'unset').css('cursor', 'pointer').css('height', '25px').html(fileHtml);
+        this.ele.css('width', 'unset').css('cursor', 'pointer').css('height', '25px').css('vertical-align', 'middle').html(fileHtml);
         let thisCpn = this;
         $('.file-add').click(function(e) {
             let el = $(e);
@@ -178,8 +180,10 @@ export default class BasicControl extends Control {
 
     renderFilterControl() {
         if (this.checkDetailView()) return;
+        let thisCpn = this;
         this.ele.attr('type', 'text');
         this.ele.on('click', function(e) {
+            e.controlName = thisCpn.name;
             SYMPER_APP.$evtBus.$emit('document-submit-filter-input-click', e)
         })
 
@@ -361,29 +365,9 @@ export default class BasicControl extends Control {
         }
         return vl;
     }
-    renderValidateIcon(message) {
-        let icon = `<span class="mdi mdi-checkbox-blank-circle validate-icon" title="Không được bỏ trống trường này"></span>`
-        this.ele.parent().append(icon);
-        this.ele.parent().find('.mdi-checkbox-blank-circle').on('click', function(e) {
-            e.msg = message;
-            SYMPER_APP.$evtBus.$emit('document-submit-open-validate', e)
-        })
-    }
-    removeRequire() {
-        this.ele.parent().find('.validate-icon').remove();
-    }
-    isEmpty() {
-            return this.ele.val() == ""
-        }
-        // hàm kiểm tra là view detail hay submit
-    checkDetailView() {
-            if (sDocument.state.viewType == 'detail') {
-                return true;
-            } else {
-                return false;
-            }
-        }
-        // hàm kiểm tra control này có thuộc tính require hay không
+
+
+    // hàm kiểm tra control này có thuộc tính require hay không
     isRequiredControl() {
         if (this.controlProperties['isRequired'] != undefined &&
             (this.controlProperties['isRequired'].value == "1" ||

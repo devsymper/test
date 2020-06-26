@@ -1,7 +1,7 @@
 <template>
     <list-items
         ref="listModels"
-        :useDefaultContext="true"
+        :useDefaultContext="false"
         :pageTitle="$t('process.list.title')"
         :tableContextMenu="tableContextMenu"
         :containerHeight="containerHeight"
@@ -18,6 +18,33 @@ import { appConfigs } from "./../../configs.js";
 import ListItems from "./../../components/common/ListItems.vue";
 import bpmnApi from "./../../api/BPMNEngine.js";
 import { deployProcess, deployProcessFromXML } from "./../../components/process/processAction.js";
+
+function getLastestDefinition(row, needDeploy = false) {
+    return new Promise(async (resolve, reject) => {
+        let lastestDeployment = await bpmnApi.getDeployments({
+            name: row.name,
+            sort: 'deployTime',
+            size: 1,
+            order: 'desc'
+        });
+        let deploymentId = '';
+        
+        if(lastestDeployment.data.length > 0){
+            lastestDeployment = lastestDeployment.data[0];
+            deploymentId = lastestDeployment.id;
+        }else if(needDeploy){
+            let deploymentData = await deployProcess(self, row);
+            deploymentId = deploymentData.id;
+        }else{
+            reject("this model have no deployment");
+        }
+
+        let defData = await bpmnApi.getDefinitions({
+            deploymentId: deploymentId
+        });
+        resolve(defData);
+    });
+}
 
 export default {
     data() {
@@ -77,30 +104,7 @@ export default {
                     name: "start",
                     text: this.$t("process.list.start"),
                     callback: async function (row, callback){
-                        let lastestDeployment = await bpmnApi.getDeployments({
-                            name: row.name,
-                            sort: 'deployTime',
-                            size: 1,
-                            order: 'desc'
-                        });
-                        let deploymentId = '';
-                        
-                        if(lastestDeployment.data.length > 0){
-                            lastestDeployment = lastestDeployment.data[0];
-                            deploymentId = lastestDeployment.id;
-                            // if(lastestDeployment.deploymentTime < row.lastUpdated){
-                                // let deploymentData = await deployProcess(self, row);
-                                // deploymentId = deploymentData.id;
-                            // }
-                        }else{
-                            let deploymentData = await deployProcess(self, row);
-                            deploymentId = deploymentData.id;
-                        }
-
-                        let defData = await bpmnApi.getDefinitions({
-                            deploymentId: deploymentId
-                        });
-
+                        let defData = await getLastestDefinition(row, true);
                         if(defData.data[0]){
                             self.$goToPage(`/workflow/process-definition/${defData.data[0].id}/run`,'Start process instance');
                         }else {
@@ -111,8 +115,32 @@ export default {
                 {
                     name: "instances",
                     text: this.$t("process.list.instances"),
+                    callback: async function (row, callback) {
+                        let lastestDefinition = await getLastestDefinition(row, false);
+                        if(lastestDefinition.data[0]){
+                            self.$goToPage('/workflow/process-definition/'+lastestDefinition.data[0].id+'/instances')
+                        }
+                    }
+                },
+                {
+                    name: "detail",
+                    text: this.$t("common.detail"),
                     callback: (row, callback) => {
-
+                        
+                        self.$goToPage(
+                            "/workflow/"+row.id+"/view",
+                            self.$t("common.detail") + "  " + (row.name ? row.name : row.key)
+                        );
+                    }
+                },
+                {
+                    name: "listTask",
+                    text: this.$t("tasks.header.list"),
+                    callback: async (row, callback) => {
+                        let lastestDefinition = await getLastestDefinition(row, false);
+                        if(lastestDefinition.data[0]){
+                            self.$goToPage('/tasks?processDefinitionId='+lastestDefinition.data[0].id)
+                        }
                     }
                 },
             ]

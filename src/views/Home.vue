@@ -1,13 +1,16 @@
 <template>
     <div class="home">
+        <h1>
+            Home page
+        </h1>
         <!-- <TimelineTreeview>
             <template slot="tree-item-content" slot-scope="{itemData}">
                 <i :class="'mdi mr-2 ' +itemData.icon"></i>
                 <span>{{itemData.name}}</span>
             </template>
         </TimelineTreeview> -->
-        <FormulaEditor v-model="formula">
-        </FormulaEditor>
+        <!-- <FormulaEditor v-model="formula">
+        </FormulaEditor> -->
     </div>
 </template>
 

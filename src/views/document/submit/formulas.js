@@ -49,7 +49,7 @@ export default class Formulas {
                     if (!beforeStr) {
                         return { server: true, data: res.data };
                     } else {
-                        let reverseData = this.getReverseDataToFormulas(res.data);
+                        let reverseData = this.getReverseDataToFormulas(res.data, beforeStr);
                         script = script.replace(listSyql[i], reverseData);
                     }
                     if (i == listSyql.length - 1) {
@@ -70,16 +70,15 @@ export default class Formulas {
          * @param {Array} data 
          * @param {String} refSyql 
          */
-    getReverseDataToFormulas(data) {
+    getReverseDataToFormulas(data, beforeStr) {
             let strReplace = "";
-            if (beforeStr == 'from' || beforeStr == 'union' || beforeStr == 'join') {
+            if (beforeStr == 'from' || beforeStr == 'union' || beforeStr == 'all' || beforeStr == 'join') {
                 if (data.length > 0) {
                     let columns = {};
                     for (let i in data[0]) {
                         columns[i] = "TEXT";
                     }
                     ClientSQLManager.createTable(this.keyInstance, Util.generateString(10), columns, "TEMPORARY");
-
                 }
             } else if (beforeStr == 'in') {
                 strReplace = "(";
@@ -94,6 +93,7 @@ export default class Formulas {
             } else {
                 strReplace = data[0][Object.keys(data[0])[0]];
             }
+            return strReplace;
         }
         /**
          * Hàm kiểm tra xem trước từ khóa ref() có các kiểu sql nào để reverse lại giá trị tương ứng (from, union, in, join ,...)

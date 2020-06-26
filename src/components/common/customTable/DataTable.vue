@@ -5,7 +5,6 @@
             :settings="tableSettings"
             :data="data"
             :columns="tableColumns"
-            :minSpareRows="1"
         ></hot-table>
     </div>
 </template>
@@ -25,6 +24,12 @@ export default {
             let h = $(tbWrapper).find('.ht_master .htCore').height() + 5;
             $(tbWrapper).height(h);
             $(tbWrapper).find('.ht_master.handsontable .wtHolder').height(h);
+        },
+        getData(){
+            return this.$refs.dataTable.hotInstance.getData();
+        },
+        getColName(name){
+            return this.$refs.dataTable.hotInstance.propToCol(name);
         }
     },
     data() {

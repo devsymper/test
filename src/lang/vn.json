@@ -55,7 +55,12 @@
         "remove_msg_err": "Không thể xóa các mục đã chọn!",
         "logout": "Đăng xuất",
         "last_update_at": "Cập nhật lần cuối",
-        "create_at": "Tạo lúc"
+        "create_at": "Tạo lúc",
+        "filter": "Bộ lọc",
+        "sort": "Sắp xếp",
+        "status": "Trạng thái",
+        "done": "Hoàn thành",
+        "notDone": "Chưa hoàn thành"
     },
     "login": {
         "title": "Đăng nhập hệ thống",
@@ -300,7 +305,7 @@
             "title": "Danh sách quy trình",
             "deploy_history": "Lịch sử deploy",
             "start": "Bắt đầu quy trình",
-            "instances": "Các bản đã chạy"
+            "instances": "Các bản đã chạy gần nhất"
         },
         "action": {
             "create": "Tạo quy trình mới"
@@ -477,6 +482,10 @@
         }
     },
     "tasks": {
+        "error": {
+            "emptyAssignee": "Người nhận việc không được phép để trống",
+            "canNotCreateTask": "Không thể khởi tạo công việc"
+        },
         "header": {
             "date": "Ngày tạo",
             "dueDate": "Ngày đến hạn",
@@ -487,7 +496,9 @@
             "assignee": "Người được giao",
             "watcher": "Người theo dõi",
             "participant": "Người tham gia",
-            "id": "Số đơn"
+            "id": "Số đơn",
+            "list": "Danh sách công việc",
+            "submitForm": "Form nhập liệu"
         },
         "filterOptions": {
             "all": "Toàn bộ task",

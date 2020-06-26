@@ -43,7 +43,6 @@
                     </v-list-item-title>
                     <div class="w-100 mb-1 ">
                         <div class="w-100 d-flex" v-if="sapp.baInfo.name"  style="color: rgba(0, 0, 0, 0.54)">
-                            
                             <v-tooltip top>
                                 <template v-slot:activator="{ on }">
                                     <i v-on="on" class="mdi mdi-account-check-outline fs-16 mr-1" style="position: relative;top: 2px;"></i> 
@@ -64,7 +63,6 @@
                                                 @click="openSelectUserPanel"
                                                 depressed
                                                 v-on="{ ...tooltip, ...menu }">
-                                                
                                                 <span class="fs-11" style="font-weight: 400!important">
                                                     {{sapp.endUserInfo.displayName}}
                                                 </span>
@@ -140,7 +138,6 @@
                 </v-list-item-content>
             </v-list-item>
 
-            <v-divider style="margin-left: -5px"></v-divider>
             <VuePerfectScrollbar :style="{height: menuItemsHeight}">
                 <div class="pr-2">
                     <v-list-item
@@ -168,7 +165,7 @@
         <template v-slot:append>
             <v-list dense>
                 <v-list-item>
-                    <v-list-item-icon class="mx-2">
+                    <v-list-item-icon >
                         <v-icon @click.stop="invertSidebarShow()">mdi-menu</v-icon>
                     </v-list-item-icon>
                     <v-menu>

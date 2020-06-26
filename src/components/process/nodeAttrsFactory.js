@@ -67,7 +67,13 @@ export const nodeAttrsDefinition = {
                 attrs.formreference.hidden = true;
                 attrs.approvalForElement.hidden = true;
                 attrs.updateForElement.hidden = false;
+            } else if (taskAction.value == 'undefined') {
+                attrs.approvalActions.hidden = true;
+                attrs.formreference.hidden = true;
+                attrs.approvalForElement.hidden = true;
+                attrs.updateForElement.hidden = true;
             }
+
         },
         docker: dockerGroups.task
     },

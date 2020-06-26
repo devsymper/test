@@ -10,16 +10,19 @@
     >
         <template v-slot:activator="{ on }">
             <v-text-field
-                class="sym-small-size bg-grey"
+                class="sym-small-size"
                 dense
                 solo
                 v-on="on"
+                background-color="grey lighten-3"
                 flat
+                @change="handleChangeInput"
                 v-model="date"
             ></v-text-field>
         </template>
         <v-date-picker 
-            v-model="date" no-title 
+            v-model="datePickerValue" 
+            no-title 
             scrollable :readonly="readonly"
             :min="currDate"
             @input="selectDate"
@@ -41,6 +44,13 @@ export default {
             default: false
         }
     },
+    watch:{
+        date(val){
+            if(!val){
+                this.datePickerValue = this.$moment(val)._isValid ? val : this.$moment().format("YYYY-MM-DD");
+            }
+        }
+    },
     mounted() {
         this.date = this.value;
     },
@@ -48,15 +58,23 @@ export default {
         return {
             date: "",
             menu: false,
+            datePickerValue: '',
             currDate: this.$moment().format("YYYY-MM-DD")
         }
     },
     methods: {
+        handleChangeInput(val){
+            if(this.$moment(val)._isValid){
+                this.datePickerValue = val;
+                this.selectDate();
+            }
+        },
         selectDate() {
             this.menu = false;
-            this.$refs.menu.save(this.date);
-            this.$emit("change", this.date);
-            this.$emit("input", this.date);
+            this.$refs.menu.save(this.datePickerValue);
+            this.$emit("change", this.datePickerValue);
+            this.$emit("input", this.datePickerValue);
+            this.date = this.datePickerValue;
         }
     }
 }

@@ -7,13 +7,17 @@
                 dense
                 height="30"
                 class="search"
+                label="Tìm kiếm nhanh"
+                hide-details
             ></v-text-field>
         </div>
-        <data-table :columns="columns" :data="data"></data-table>
+        <data-table ref="dataTable" :columns="columns" :data="data"></data-table>
+        <v-btn @click="saveInputFilter" small right class="save-input-filter">Lưu</v-btn>
     </div>
 </template>
 <script>
 import DataTable from './../../../../components/common/customTable/DataTable.vue'
+import { str } from "./../../../../plugins/utilModules/str.js"
 export default {
     components:{
         'data-table':DataTable
@@ -29,26 +33,57 @@ export default {
             columns:null,
             data:null,
             search:null,
+            colActive:null,
+            curControlId:null
         }
     },
     created(){
        
     },
     beforeMount(){
-        this.columns = [
-            {name:'id',title:'Mã bộ phận',type:'text'},
-            {name:'namea',title:'Tên bộ phận',type:'text'},
-            {name:'nameb',title:'Tên bộ phận',type:'text'},
-        ]
-        this.data = [
-            {id:'1',namea:'Bộ phận 1',nameb:'Bộ phận 2'},
-            {id:'2',namea:'Bộ phận 1',nameb:'Bộ phận 2'},
-            {id:'3',namea:'Bộ phận 1',nameb:'Bộ phận 2'},
-            {id:'4',namea:'Bộ phận 1',nameb:'Bộ phận 2'},
-        ]
+        this.columns = []
+        this.data = []
     },
     methods:{
-       
+        setData(controlId,colActive,data){
+            this.colActive = colActive;
+            let dataTable = [];
+            for (let index = 0; index < data.length; index++) {
+                let row = data[index];
+                if(index == 0){
+                    for(let c in row){
+                        let colName = str.nonAccentVietnamese(c);
+                        let item = {name:colName,title:c,type:'text'};
+                        this.columns.push(item)
+                    }
+                    this.columns.push({name:'active',title:'Chọn',type:'checkbox'})
+                }
+                let item1 = {};
+                for(let c in row){
+                    let colName = str.nonAccentVietnamese(c);
+                    item1[colName] = row[c];
+                }
+                item1['active'] = false;
+                dataTable.push(item1)
+            }   
+            this.data = dataTable;
+            this.curControlId = controlId;
+        },
+        saveInputFilter(){
+            let data = this.$refs.dataTable.getData();
+            let data1 = data.filter(d => {
+                return d[d.length - 1] == true;
+            })
+            let index1 = this.$refs.dataTable.getColName(this.colActive);
+            let dataResult = ""
+            for (let index = 0; index < data1.length; index++) {
+                let item = data1[index];
+                dataResult += item[index1] + ","
+            }
+            dataResult = dataResult.substring(0, dataResult.length - 1);
+            this.$emit('save-input-filter',{controlId:this.curControlId,value:dataResult});
+            
+        }
     }
 }
 </script>
@@ -64,5 +99,16 @@ export default {
     }
     .search >>> .mdi{
         font-size: 20px !important;
+    }
+    .search >>> .v-label{
+        top: 6px !important;
+    }
+    .search >>> fieldset{
+        border-color:#c1c1c1 !important;
+    }
+    .save-input-filter{
+        float: right;
+        margin-right: 8px;
+        margin-top: 6px;
     }
 </style>

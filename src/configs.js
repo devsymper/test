@@ -1,4 +1,5 @@
 export const appConfigs = {
+    defaultAvatar: '/img/avatar_default.jpg',
     dataTypeIcon: { // icon cho các kiểu dữ liệu: numeric, text, date, datetime, time, 
         numeric: 'mdi-numeric',
         text: 'mdi-alphabetical-variant',
@@ -18,11 +19,12 @@ export const appConfigs = {
             instances: "https://workflow.symper.vn:8443/symper-rest/service/runtime/process-instances",
             history: "https://workflow.symper.vn:8443/symper-rest/service/history",
             tasks: "https://workflow.symper.vn:8443/symper-rest/service/runtime/tasks",
+            tasksHistory: "https://workflow.symper.vn:8443/symper-rest/service/history/historic-task-instances",
             validateModel: "https://workflow.symper.vn:8443/symper-modeler/api/editor/validate-model"
         },
         documents: 'https://v2hoangnd.dev.symper.vn/document',
         nofitication: 'https://notifi.symper.vn/',
-        formulasService: 'https://v2datnt.dev.symper.vn/',
+        formulasService: 'https://syql.symper.vn/',
         documentService: 'https://sdocument.symper.vn/',
         sdocumentManagement: 'https://sdocument-management.symper.vn/'
     },

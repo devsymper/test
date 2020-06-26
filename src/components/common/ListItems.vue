@@ -3,7 +3,7 @@
         <div :style="{width:contentWidth, display: 'inline-block'}">
             <v-row no-gutters class="pb-2" ref="topBar">
                 <v-col>
-                    <span class="title float-left">{{pageTitle}}</span>
+                    <span class="symper-title float-left">{{pageTitle}}</span>
                     <div class="float-right overline">
                         <v-text-field
                             @input="bindToSearchkey"

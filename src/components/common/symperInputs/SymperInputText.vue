@@ -2,34 +2,39 @@
     <div class="symper-input" :style="{
         width: width
     }">
-        <div class="symper-input-label" :style="{'min-width': labelMinWidth, }">
-            {{label}}
-        </div>
-        <div class="symper-input-field" :style="{'min-width': fieldMinWidth, }">
-            <input type="text" />
-        </div>
+        <input v-model="lazyValue" 
+                class="symper-input-field" 
+                type="text" 
+                :style="{
+                    width: this.icon ? 'calc(100% - 18px)' : '100%'
+                }" />
+        <i :class="'mdi '+ icon " style="fontsize: 16px" v-if="icon"></i>
     </div>
 </template>
 
 <script>
 export default {
+    computed: {
+        lazyValue: {
+            get(){
+                return this.value
+            },
+            set(vl){
+                this.$emit('input', vl);
+            }
+        }
+    },
     props: {
-        label: {
-            type: String,
-            default: ""
-        },
         width:{
             type: String,
             default: "100%"
         },
-        labelMinWidth:{
-            type: String,
-            default: "50px"
+        value: {
+            default: ''
         },
-        fieldMinWidth:{
-            type: String,
-            default: "calc(100% - 50px)"
-        },
+        icon: {
+            default: ''
+        }
     }
 };
 </script>
@@ -37,18 +42,12 @@ export default {
 <style>
 .symper-input {
     display: inline-block;
+    padding: 4px 6px;
+    height: 28px;
 }
 
-.symper-input .symper-input-label {
-    display: inline-block;
-}
-
-.symper-input .symper-input-field {
-    display: inline-block;
-}
-
-.symper-input .symper-input-field input {
-    padding: 4px;
+.symper-input  input{
     border: none;
 }
+
 </style>

@@ -1,147 +1,290 @@
 <template>
-    <v-container fluid>
-        <v-row class="pt-4">
-            <v-col cols="12">
-                <v-autocomplete
-                    v-model="friends"
-                    :disabled="isUpdating"
-                    :items="people"
-                    filled
-                    dense
-                    solo
-                    flat
-                    chips
-                    item-text="name"
-                    :background-color="'white'"
-                    :height="30"
-                    item-value="id"
-                    append-icon="mdi-magnify"
-                    :placeholder="$t('common.search')"
-                    class="sym-small-size bg-grey"
-                    multiple
-                >
-                    <template v-slot:selection="data">
-                        <v-chip
-                            color="green lighten-4"
-                            v-bind="data.attrs"
-                            :input-value="data.selected"
-                            close
-                            small
-                            class="blue-grey--text"
-                            @click:close="remove(data.item)"
-                        >
-                            {{ data.item.name }}
-                        </v-chip>
-                    </template>
-                    <template v-slot:item="data">
-                        <template>
-                            <v-list-item-avatar size="30" class="mt-1 mb-1">
-                                <img :src="data.item.avatar">
-                            </v-list-item-avatar>
-                            <v-list-item-content class="pt-0 pb-0">
-                                <v-list-item-title v-html="data.item.name"></v-list-item-title>
-                                <v-list-item-subtitle class="fs-11" v-html="data.item.role"></v-list-item-subtitle>
-                            </v-list-item-content>
-                            <v-list-item-action class="mt-0 mb-0">
-                                <v-icon v-if="friends.indexOf(data.item.id) >= 0" color="success" small>mdi-check</v-icon>
-                            </v-list-item-action>
-                        </template>
-                    </template>
-                </v-autocomplete>
-            </v-col>
+    <div class="w-100 symper-task-people px-5">
+        <v-text-field
+            :label="$t('common.search')"
+            dense
+            hide-details
+            v-model="searchUserKey"
+            append-icon="mdi-magnify"
+            single-line
+            outlined
+            class="mb-4 mt-4"
+        ></v-text-field>
+        <v-row class="list-users-in-task">
+            <div class="w-100 mb-2 pl-3" v-for="(users, role) in tabData" :key="role" >
+                <div  style="height: 30px" class=" fs-13 font-weight-bold symper-user-role-in-task d-flex">
+                    <span>
+                        <v-icon class="mr-3">mdi-account</v-icon> 
+                        <span mt-1>{{$t("tasks.header."+role)}}</span>
+                    </span>
+                    <v-btn small icon @click="addUserForRole(role)" class="ml-3 symper-add-user-btn" style="display: none" v-if="roleCanAddUser[role]">
+                        <v-icon>mdi-plus</v-icon>
+                    </v-btn>
+                </div>
+                <div class="pl-10 pt-2 d-flex justify-space-between user-show" v-for="userItem in tabData[role]" :key="userItem.id" >
+                    <user :user="userItem" class="float-left"></user>
+                    <div class="float-right action-for-role d-flex" >
+                        <div v-for="(btn, idx) in actionsForRole[role]" :key="idx" class="d-flex">
+                            <v-menu v-if="btn.showUserSelect" 
+                                v-model="showDelegatedUser[role+'_'+idx]"
+                                :offset-y="true"
+                                class="symper-select-user-autocomplete"
+                                :close-on-content-click="false"
+                                :close-on-click="false"
+                                >
+                                <template v-slot:activator="{ on: menu, attrs }">
+                                    <v-tooltip bottom>
+                                        <template v-slot:activator="{ on: tooltip }">
+                                            <v-btn 
+                                                text
+                                                v-bind="attrs"
+                                                depressed
+                                                v-on="{ ...tooltip, ...menu }"
+                                                 class="mr-3" 
+                                                 small 
+                                                 @click="handleAction(btn.name, role, idx)" >
+                                                <v-icon left>{{btn.icon}}</v-icon> {{btn.text}}
+                                            </v-btn>
+                                        </template>
+                                        <span>{{btn.text}}</span>
+                                    </v-tooltip>
+                                </template>
+                                <div class="bg-white" style="width: 200px; z-index: 99999" :ref="'selectUserWrapper_'+role+'_'+idx">
+                                    
+                                </div>
+                            </v-menu>
+
+                            <v-btn v-else depressed class="mr-3" small @click="handleAction(btn.name, role, idx)" >
+                                <v-icon left>{{btn.icon}}</v-icon> {{btn.text}}
+                            </v-btn>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </v-row>
-        <v-row id="listUser">
-            <v-col cols="12" class="pt-0">
-                <div class="fs-13 font-weight-bold">
-                    <v-icon class="mr-3">mdi-account</v-icon> {{$t("tasks.header.owner")}}
-                </div>
-                <div class="pl-10 pt-2">
-                    <user :user="task.owner"></user>
-                </div>
-            </v-col>
-            <v-col cols="12" class="pt-0">
-                <div class="fs-13 font-weight-bold">
-                    <v-icon class="mr-3">mdi-account</v-icon> {{$t("tasks.header.assignee")}}
-                </div>
-                <div class="pl-10 pt-2">
-                    <user :user="task.assignee"></user>
-                </div>
-            </v-col>
-            <v-col cols="12" class="pt-0">
-                <div class="fs-13 font-weight-bold">
-                    <v-icon class="mr-3">mdi-account</v-icon> {{$t("tasks.header.watcher")}}
-                </div>
-                <div class="pl-10 pt-2">
-                    <user :user="task.assignee"></user>
-                </div>
-                <div class="pl-10 pt-2">
-                    <user :user="task.owner"></user>
-                </div>
-            </v-col>
-            <v-col cols="12" class="pt-0">
-                <div class="fs-13 font-weight-bold">
-                    <v-icon class="mr-3">mdi-account</v-icon> {{$t("tasks.header.participant")}}
-                </div>
-                <div 
-                    v-for="id in friends" 
-                    :key="id"
-                    class="pl-10 pt-2"
-                >
-                    <user :user="getUser(id)"></user>
-                </div>
-            </v-col>
-        </v-row>
-    </v-container>
+        <div class="w-100 h-100 symper-select-user-autocomplete" ref="selectUserAutocomplete">
+            <v-autocomplete
+                ref="selectDelegateUser"
+                return-object
+                full-width
+                solo
+                append-icon=""
+                :items="sapp.allUsers"
+                background-color="grey lighten-4"
+                flat
+                v-model="selectedUserForAssignment"
+                dense
+                color="blue-grey lighten-2"
+                :label="$t('common.search')"
+                item-text="displayName"
+                @change="changeUserSelect"
+                item-value="name"
+                :filter="filterUser">
+
+                <template v-slot:item="data">
+                    <div class="fs-13 py-1">
+                        <i class="mdi mdi-account mr-2 fs-16"> </i> <span> {{data.item.displayName}}</span>
+                    </div>
+                </template>
+            </v-autocomplete>
+        </div>
+    </div>
 </template>
 
 <script>
+import OrgchartSelector from "./../../components/user/OrgchartSelector";
 import user from "./user";
+import BPMNEngine from '../../api/BPMNEngine';
 export default {
     name: "people",
     components: {
-        user
+        user,
+        OrgchartSelector: OrgchartSelector
+    },
+    watch:{
+        tabData: {
+            deep: true,
+            immediate: true,
+            handler(after){
+                this.showDelegatedUser = {};
+                for(let role in this.tabData){
+                    for(let idx in this.tabData[role]){
+                        this.$set(this.showDelegatedUser , role+'_'+idx, false);
+                    }
+                }
+            }
+        }
     },
     props: {
-        task: {
+        tabData: {
+            type: Object,
+            default: () => {}
+        },
+        taskInfo:  {
             type: Object,
             default: () => {}
         }
     },
-    data: function() {
-        const srcs = {
-            1: 'https://cdn.vuetifyjs.com/images/lists/1.jpg',
-            2: 'https://cdn.vuetifyjs.com/images/lists/2.jpg',
-            3: 'https://cdn.vuetifyjs.com/images/lists/3.jpg',
-            4: 'https://cdn.vuetifyjs.com/images/lists/4.jpg',
-            5: 'https://cdn.vuetifyjs.com/images/lists/5.jpg',
+    computed: {
+        sapp(){
+            return this.$store.state.app;
+        },
+        roleCanAddUser() {
+            let canAddAssignee = false;
+            let assignee = this.tabData.assignee[0];
+            if(!assignee && this.tabData.owner[0]){
+                canAddAssignee = this.$store.state.app.endUserInfo.id == this.tabData.owner[0].id;
+            }
+            return {
+                participant: true,
+                watcher: true,
+                assignee: canAddAssignee
+            }
         }
+    },
+    data: function() {
         return {
+            selectedUserForAssignment: {},
+            showDelegatedUser: {},
             autoUpdate: true,
             isUpdating: false,
             friends: [],
-            people: [
-                { id: 1, name: 'Sandra Adams', role: 'BA', avatar: srcs[1] },
-                { id: 2, name: 'Ali Connors', role: 'BA', avatar: srcs[2] },
-                { id: 3, name: 'Trevor Hansen', role: 'BA', avatar: srcs[3] },
-                { id: 4, name: 'Tucker Smith', role: 'BA', avatar: srcs[2] },
-                { id: 5, name: 'Britta Holt', role: 'BA', avatar: srcs[4] },
-                { id: 6, name: 'Jane Smith ', role: 'BA', avatar: srcs[5] },
-                { id: 7, name: 'John Smith', role: 'BA', avatar: srcs[1] },
-                { id: 8, name: 'Sandra Williams', role: 'BA', avatar: srcs[3] },
-            ],
+            searchUserKey: '',
+            selectingPosition: {
+                role: '',
+                idx: ''
+            },
+            actionsForRole: {
+                assignee: [
+                    {
+                        icon: 'mdi-account-switch-outline',
+                        name: 'change',
+                        text: 'Change',
+                        showUserSelect: true
+                    },
+                    {
+                        icon: 'mdi-sitemap',
+                        name: 'orgchart',
+                        text: 'Orgchart'
+                    },
+                ],
+                owner: [
+                    {
+                        icon: 'mdi-account-switch-outline',
+                        name: 'change',
+                        text: 'Change',
+                        showUserSelect: true
+                    },
+                    {
+                        icon: 'mdi-sitemap',
+                        name: 'orgchart',
+                        text: 'Orgchart'
+                    },
+                ],
+                participant: [
+                    {
+                        icon: 'mdi-delete-outline',
+                        name: 'delete',
+                        text: 'Remove'
+                    },
+                    {
+                        icon: 'mdi-sitemap',
+                        name: 'orgchart',
+                        text: 'Orgchart'
+                    },
+                ],
+                watcher: [
+                    
+                    {
+                        icon: 'mdi-delete-outline',
+                        name: 'delete',
+                        text: 'Remove'
+                    },
+                    {
+                        icon: 'mdi-sitemap',
+                        name: 'orgchart',
+                        text: 'Orgchart'
+                    },
+                ]
+            }
         }
     },
     methods: {
+        async changeUserSelect(value){
+            
+            let updateData = {};
+            for(let role in this.tabData){
+                let userIds = this.tabData[role].reduce((arr, user) => {
+                    arr.push(user.id);
+                    return arr;
+                }, []);
+
+                if(role == this.selectingPosition.role){
+                    userIds[this.selectingPosition.idx] = value.id;
+                }
+                if(userIds.length > 0){
+                    updateData[role] = userIds.join(',');
+                }
+            }
+            this.selectedUserForAssignment = {};
+            try {
+                let res = await BPMNEngine.updateTask(this.taskInfo.action.parameter.taskId ,updateData);
+                this.$evtBus.$emit('symper-update-task-assignment', res);
+                this.$snotifySuccess("Update task assignment successfully");
+            } catch (error) {
+                this.$snotifyError(error, "Update task assignment failed");
+            }
+        },
+        filterUser(item, queryText, itemText){
+            let lowcaseText = queryText.toLowerCase();
+            return item.displayName.toLowerCase().includes(lowcaseText);
+        },
         remove (item) {
             const index = this.friends.indexOf(item.id)
             if (index >= 0) this.friends.splice(index, 1)
         },
-        getUser(id) {
-            return this.people.filter(user => {
-                return user.id == id
-            })[0];
+        delegateUser(){
+
+        },
+        addUserForRole(role){
+            let users = this.tabData[role].reduce((urs, el) => {
+                urs.push({});
+                return urs;
+            }, []);
+        },
+        handleAction(actionName, role, idx){
+            this.selectingPosition.role  = role;
+            this.selectingPosition.idx  = idx;
+
+            let self = this;
+            let refKey = 'selectUserWrapper_'+role+'_'+idx;
+            if(!this.$refs[refKey]){
+                setTimeout(() => {
+                    self.showSelectUser(role, idx, refKey);
+                }, 200);
+            }else{
+                self.showSelectUser(role, idx, refKey);
+            }
+        },
+        showSelectUser(role, idx, refKey){
+            if(this.actionsForRole[role][idx].showUserSelect){
+                $(this.$refs[refKey]).html('');
+                $(this.$refs[refKey]).append(this.$refs.selectUserAutocomplete);
+                setTimeout((self) => {
+                    $(self.$refs[refKey]).find('.v-select__slot').click();
+                }, 200, this);
+            }
         }
     },
+    created(){
+        this.$evtBus.$on('symper-app-wrapper-clicked', (evt) => {
+            if(!($(evt.target).hasClass('symper-select-user-autocomplete') || $(evt.target).parents('.symper-select-user-autocomplete').length > 0)){
+                for(let key in  this.showDelegatedUser){
+                    this.showDelegatedUser[key] = false;
+                }
+            }
+        });
+    }
 }
 </script>
 
@@ -156,4 +299,22 @@ div#symper-app >>> .v-application >>> .v-list-item--active::before{
     max-height: calc(100vh - 185px);
 }
 
+/* .symper-task-people .symper-user-role-in-task:hover {
+    background-color: antiquewhite;
+} */
+.symper-task-people .symper-user-role-in-task:hover .symper-add-user-btn {
+    display: block!important;
+}
+
+.symper-task-people .action-for-role{
+    visibility: hidden;
+}
+
+.symper-task-people .user-show:hover .action-for-role{
+    visibility: visible;
+}
+
+.symper-task-people .user-show:hover {
+    background-color: #eeeeee;
+}
 </style>

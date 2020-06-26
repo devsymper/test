@@ -56,7 +56,12 @@
         "remove_msg_err": "Can not delete selected items!",
         "logout": "Log out",
         "last_update_at": "Last updated at",
-        "create_at": "Created at"
+        "create_at": "Created at",
+        "filter": "Filter",
+        "sort": "Sort",
+        "status": "Status",
+        "done": "Done",
+        "notDone": "Not done"
     },
     "validate": {
         "required": "Not be empty",
@@ -292,7 +297,7 @@
             "title": "Process list",
             "deploy_history": "Deploy history",
             "start": "Start workflow",
-            "instances": "List instances"
+            "instances": "List lastest instances"
         },
         "action": {
             "create": "Create new process"
@@ -463,6 +468,10 @@
         "descending": "Descending"
     },
     "tasks": {
+        "error": {
+            "emptyAssignee": "Assignee can not be empty",
+            "canNotCreateTask": "Can not create task"
+        },
         "header": {
             "date": "Date",
             "dueDate": "Due Date",
@@ -473,7 +482,9 @@
             "assignee": "Assignee",
             "watcher": "Watcher",
             "participant": "Participant",
-            "id": "Seri"
+            "id": "Seri",
+            "list": "List task",
+            "submitForm": "Submit form"
         },
         "filterOptions": {
             "all": "All task",

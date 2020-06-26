@@ -25,7 +25,8 @@ export default class Util {
     }
 
     static requireRedDot = function(sign) {
-        return '<i data-require-sign="' + sign + '" class="fa fa-circle required-markup" title="Bạn phải nhập vào trường này" aria-hidden="true"></i>';
+        return '<span class="mdi mdi-checkbox-blank-circle  validate-icon" title="Không được bỏ trống trường này"></span>'
+            // return '<i data-require-sign="' + sign + '" class="fa fa-circle required-markup" title="Bạn phải nhập vào trường này" aria-hidden="true"></i>';
     };
     /**
      * Đếm số chữ số tối đa đằng sau dấu phẩy trong dãy các số
@@ -241,25 +242,7 @@ export default class Util {
     }
 
     static makeErrNoti = function(msg, sign) {
-        return `<i
-                data-sign="` + sign + `"
-                onclick="parent.processUIErr(event)"
-                class="fa fa-info-circle text-danger bkerp-icon-error"
-                aria-hidden="true" >
-            </i>
-            <div
-                data-sign="` + sign + `"
-                class="notification p-2 rounded hideNoti box-error-mess">
-                <div class="header pb-1">
-                    <i
-                        class="fa fa-info-circle text-danger mr-2"
-                        aria-hidden="true">
-                    </i>
-                    Lỗi
-                </div>
-                <div class="content pt-1"> ` + msg + `
-                </div>
-            </div> `;
+        return '<span class="mdi mdi-checkbox-blank-circle validate-icon" style="position:relative;" title="' + msg + '"></span>'
     }
     static generateString = function(length) {
             var result = '';

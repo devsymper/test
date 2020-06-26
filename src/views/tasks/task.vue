@@ -1,5 +1,5 @@
 <template>
-    <div class="h-100 w-100 d-flex justify-center"> 
+    <div class="h-100 w-100 d-flex justify-center ml-6"> 
         <DocumentSubmit 
             v-if="action == 'submit'"
             ref="submitComponent"
@@ -11,8 +11,20 @@
         <Detail 
             v-else-if="action == 'approval'"
             :docObjInfo="docObjInfo">
-
         </Detail>
+
+        <div v-else-if="action == 'undefined'">
+            <div class="text-md-center mt-6">
+                <span class="fs-16 font-weight-bold">
+                    {{taskInfo.action.parameter.title}}
+                </span>
+            </div>
+            <div class="text-md-center ">
+                <span class="text--grey fs-14 mt-6">
+                    {{taskInfo.action.parameter.description}}
+                </span>
+            </div>
+        </div>
     </div>
 </template> 
 <script>

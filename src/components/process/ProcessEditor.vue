@@ -17,6 +17,7 @@
                 </v-tooltip>
 
                 <v-btn
+                    v-if="$route.name != 'viewProcess'"
                     class="float-right mr-1"
                     @click="saveProcess"
                     small
@@ -335,6 +336,9 @@ export default {
         },
         // Lưu lại data của process model hiện tại
         saveProcess() {
+            if(this.$route.name == 'viewProcess'){
+                return;
+            }
             let self = this;
             this.fillNodeData();
             this.updateViewDataToState();
@@ -938,7 +942,7 @@ export default {
             let nodeData = this.stateAllElements[currBizNode.id];
             console.log(currBizNode.id, result, searchedNodeMap);
             
-            if(searchedNodeMap[currBizNode.id]){
+            if(searchedNodeMap[currBizNode.id] || !nodeData){
                 return;
             }
             // Nếu là UserTask và là submit hoặc là node bắt đầu quy trình và có form submit
@@ -1117,7 +1121,8 @@ export default {
 
         if (
             this.$route.name == "editProcess" ||
-            this.$route.name == "cloneProcess"
+            this.$route.name == "cloneProcess" ||
+            this.$route.name == "viewProcess"
         ) {
             this.applySavedData(this.$route.params.id);
         }

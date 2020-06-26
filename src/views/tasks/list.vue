@@ -7,9 +7,13 @@
                 class="pt-0 pl-0 pr-0 pb-0">
                 <listHeader
                     :isSmallRow="isSmallRow"
+                    :headerTitle="headerTitle"
                     :sideBySideMode="sideBySideMode"
                     :compackMode="compackMode"
+                    :parentTaskId="filterFromParent.parentTaskId"
                     @change-density="isSmallRow = !isSmallRow"
+                    @filter-change-value="handleChangeFilterValue"
+                    @create-task="getTasks({})"
                     @get-list-process-instance="listProrcessInstances = $event"
                 ></listHeader>
                 <v-divider v-if="!sideBySideMode"></v-divider>
@@ -18,50 +22,44 @@
                         <v-row>
                             <v-col
                                 :cols="sideBySideMode ? 12 : compackMode ? 6 : 4"
-                                class="pl-3 fs-13 font-weight-bold"
+                                class="pl-3 fs-13 font-weight-medium "
                             >{{$t("tasks.header.name")}}</v-col>
                             <v-col
                                 cols="2"
                                 v-if="!sideBySideMode"
-                                class="fs-13 font-weight-bold"
+                                class="fs-13 font-weight-medium "
                             >{{$t("tasks.header.assignee")}}</v-col>
                             <v-col
                                 cols="2"
                                 v-if="!sideBySideMode"
-                                class="fs-13 font-weight-bold"
+                                class="fs-13 font-weight-medium "
                             >{{$t("tasks.header.dueDate")}}</v-col>
                             <v-col
                                 cols="2"
                                 v-if="!sideBySideMode"
-                                class="fs-13 font-weight-bold"
+                                class="fs-13 font-weight-medium "
                             >{{$t("tasks.header.owner")}}</v-col>
                             <v-col
                                 cols="2"
                                 v-if="!sideBySideMode && !compackMode && !smallComponentMode"
-                                class="fs-13 font-weight-bold">
+                                class="fs-13 font-weight-medium ">
                                 {{$t("common.workflows")}}
-                                <v-btn
-                                    icon
-                                    x-small
-                                    @click="isSmallRow = !isSmallRow"
-                                    class="float-right">
-                                    <v-icon
-                                        size="17"
-                                    >{{isSmallRow ? 'mdi-view-stream' : 'mdi-view-headline'}}</v-icon>
-                                </v-btn>
                             </v-col>
                         </v-row>
                     </v-col>
                 </v-row>
                 <v-divider></v-divider>
 
-                <div class="w-100 xxxx">
+                <VuePerfectScrollbar :style="{height: listTaskHeight+'px'}">
                     <v-row
-                        v-for="(obj) in allFlatTasks"
-                        :key="obj.id"
+                        v-for="(obj, idx) in allFlatTasks"
+                        :key="idx"
                         :index="obj.id"
                         class="mr-0 ml-0 single-row"
-                        @click="selectObject(obj)">
+                        :style="{
+                            minHeight: '50px'
+                        }"
+                        @click="selectObject(obj, idx)">
                         <v-col
                             :cols="sideBySideMode ? 12 : compackMode ? 6: 4"
                             class="pl-3 pr-1"
@@ -77,40 +75,29 @@
                                 <div class="text-left fs-12 pr-6 text-ellipsis w-100">
                                     {{obj.taskData.content}}
                                 </div>
-                                <v-col
-                                    cols="12"
-                                    class="pt-0 pb-0 pr-0 pl-0 grey--text lighten-2 float-left d-flex">
-                                    <div class="text-left fs-12 pr-6 text-ellipsis">
+                                <div
+                                    class="pa-0 grey--text lighten-2 d-flex justify-space-between">
+                                    <div class="fs-12 pr-6 text-ellipsis">
                                         {{obj.taskData.extraLabel}}   {{obj.taskData.extraValue}}
                                     </div>
 
-                                    <div class="text-right fs-12 pt-0 pb-0 pr-2 text-ellipsis" style="width: 130px" >
-                                        <v-icon class="grey--text lighten-2 mr-1" x-small>mdi-clock-time-nine-outline</v-icon>
+                                    <div class="fs-12 py-0 pr-2 text-ellipsis" >
                                         {{$moment(obj.createTime).fromNow()}}
+                                        <v-icon class="grey--text lighten-2 ml-1" x-small>mdi-clock-time-nine-outline</v-icon>
                                     </div>
-                                </v-col>
+                                </div>
                             </div>
                         </v-col>
                         <v-col
                             v-if="!sideBySideMode"
                             cols="2"
                             class="fs-13 pl-1 pr-1"
-                            :class="{'pt-0': isSmallRow, 'pb-0': isSmallRow}"
-                        >
-                            {{obj.assignee}}
-                            <v-chip
-                                color="transparent"
-                                small
-                                class="mt-0 pl-1 pr-0 d-inline-block text-truncate"
-                                label
-                                v-if="obj.assignee != null"
-                            >
+                            :class="{'pt-0': isSmallRow, 'pb-0': isSmallRow}">
+                            
                                 <v-avatar size="25" class="mr-2">
-                                    <img :src="obj.assignee.avatar" alt v-if="!!obj.assignee.avatar" />
-                                    <v-icon v-else v-text="obj.assignee.avatar"></v-icon>
+                                    <img :src="obj.assigneeInfo.avatar ? obj.assigneeInfo.avatar : require('@/assets/image/avatar_default.jpg')" />
                                 </v-avatar>
-                                {{obj.assignee.name}}
-                            </v-chip>
+                                {{obj.assigneeInfo.displayName}}
                         </v-col>
                         <v-col
                             v-if="!sideBySideMode"
@@ -118,33 +105,31 @@
                             class="fs-13 pl-1 pr-1"
                             :class="{'pt-0': isSmallRow, 'pb-0': isSmallRow}"
                         >
-                            <span class="mt-1 d-inline-block">{{$moment(obj.dueDate).fromNow()}}</span>
+                            <span class="mt-1 ">{{$moment(obj.dueDate).fromNow()}}</span>
                         </v-col>
                         <v-col
                             v-if="!sideBySideMode"
                             cols="2"
                             class="fs-13 pl-1 pr-1"
-                            :class="{'pt-0': isSmallRow, 'pb-0': isSmallRow}"
-                        >
+                            :class="{'pt-0': isSmallRow, 'pb-0': isSmallRow}">
                             <v-chip
                                 color="transparent"
                                 class="mt-0 pl-1 pr-0 d-inline-block text-truncate"
                                 small
                                 label
-                                v-if="obj.owner != null"
-                            >
+                                v-if="obj.owner != null">
                                 <v-avatar size="25" class="mr-2">
-                                    <img :src="obj.owner.avatar" alt v-if="!!obj.owner.avatar" />
-                                    <v-icon v-else v-text="obj.owner.avatar"></v-icon>
+                                    <img :src="obj.ownerInfo.avatar" alt v-if="!!obj.ownerInfo.avatar" />
+                                    <v-icon v-else v-text="obj.ownerInfo.avatar"></v-icon>
                                 </v-avatar>
-                                {{obj.owner.name}}
+                                {{obj.ownerInfo.displayName}}
                             </v-chip>
                         </v-col>
-                        <v-col cols="2" v-if="!sideBySideMode && !compackMode && !smallComponentMode">
+                        <v-col cols="2" v-if="!sideBySideMode && !smallComponentMode">
                             <span class="mt-1 d-inline-block fs-13">{{obj.processDefinitionName}}</span>
                         </v-col>
                     </v-row>
-                </div>
+                </VuePerfectScrollbar>
             </v-col>
             <v-col
                 :cols="!sideBySideMode ? 0 : 8"
@@ -153,8 +138,13 @@
                 class="pa-0 ma-0"
                 height="30"
                 style="border-left: 1px solid #e0e0e0;">
-                <taskDetail  :taskInfo="selectedTask.taskInfo" @close-detail="closeDetail"></taskDetail>
-            </v-col>
+                <taskDetail
+                    :parentHeight="listTaskHeight" 
+                    :taskInfo="selectedTask.taskInfo"
+                    :originData="selectedTask.originData"
+                    @close-detail="closeDetail"
+                    @task-submited="handleTaskSubmited"></taskDetail>
+            </v-col> 
             <userSelector ref="user" class="d-none"></userSelector>
         </v-row>
     </div>
@@ -166,6 +156,11 @@ import icon from "../../components/common/SymperIcon";
 import taskDetail from "./taskDetail";
 import listHeader from "./listHeader";
 import userSelector from "./userSelector";
+import VuePerfectScrollbar from "vue-perfect-scrollbar";
+import { util } from '../../plugins/util';
+import { appConfigs } from '../../configs';
+import { extractTaskInfoFromObject, addMoreInfoToTask } from '../../components/process/processAction';
+ 
 export default {
     computed: {
         // Liệt kê danh sách các task dưới dạng phẳng - ko phân cấp
@@ -187,7 +182,8 @@ export default {
         icon: icon,
         taskDetail: taskDetail,
         listHeader: listHeader,
-        userSelector: userSelector
+        userSelector: userSelector,
+        VuePerfectScrollbar: VuePerfectScrollbar
     },
     props: {
         compackMode: {
@@ -203,115 +199,172 @@ export default {
             type: Boolean,
             default: false
         },
+        filterFromParent: {
+            type: Object,
+            default(){
+                return {}
+            }
+        },
+        headerTitle: {
+            type: String,
+            default: 'List tasks'
+        },
+        filterTaskAction: {
+            type: String,
+            default: 'getList'
+        }
     },
     data: function() {
         return {
+            listTaskHeight: 300,
             selectedTask: {
-                taskInfo: {}
+                taskInfo: {},
+                idx: -1,
+                originData: null
             },
             listProrcessInstances: [],
             isSmallRow: false,
             sideBySideMode: false,
             openPanel: [0, 1, 2, 3, 4],
-            allFlatTasks: []
-        };
-    },
-    mounted() {
-        if(!this.smallComponentMode){
-            this.getTasks({
+            allFlatTasks: [],
+            myOwnFilter: {
                 size: 100,
                 sort: 'createTime',
                 order: 'desc',
                 assignee: this.$store.state.app.endUserInfo.id
-            });
-        }
+            },
+            defaultAvatar: appConfigs.defaultAvatar
+        };
+    },
+    created(){
+        let self = this;
+        this.$evtBus.$on('symper-update-task-assignment', (updatedTask) => {
+            updatedTask.taskData = self.getTaskData(updatedTask);
+            self.selectObject(updatedTask, self.selectedTask.idx);
+            self.$set(self.allFlatTasks, self.selectedTask.idx, updatedTask);
+        });
+    },
+    mounted() {
+        let self = this;
+        this.$store.dispatch('process/getAllDefinitions').then((res) => {
+            self.getTasks();
+        }).catch((err) => {
+
+        });
+        self.reCalcListTaskHeight();
     },
     methods: {
+        handleTaskSubmited(){
+            this.sideBySideMode = false;
+            this.getTasks();
+        },
+        handleChangeFilterValue(data){
+            for(let key in data){
+                this.$set(this.myOwnFilter, key, data[key]);
+            }
+            this.getTasks();
+        },
+        reCalcListTaskHeight(){
+            this.listTaskHeight = util.getComponentSize(this.$el.parentElement).h - 75;            
+        },
         getUser(id) {
             this.$refs.user.getUser(id);
         },
-        selectObject(obj) {
-            if (!this.compackMode) {
-                this.sideBySideMode = true;
-                let taskInfo = {};
-                try {
-                    taskInfo = JSON.parse(obj.description);
-                    if(!taskInfo){
-                        this.$snotifyError(error, "Can not parse task info");   
-                        taskInfo = {};
-                    }
-                } catch (error) {
-                    taskInfo = {};
-                    this.$snotifyError(error, "Can not parse task info");   
+        selectObject(obj, idx) {
+            this.$set(this.selectedTask,'originData', obj);
+            if(this.smallComponentMode){
+                this.$goToPage('/tasks/' + obj.id, 'Do task');
+            }else{
+                this.selectedTask.idx = idx;
+                if (!this.compackMode) {
+                    this.sideBySideMode = true;
+                    let taskInfo = extractTaskInfoFromObject(obj);
+                    this.$set(this.selectedTask, 'taskInfo', taskInfo);
+                    this.$emit("change-height", "calc(100vh - 88px)");
                 }
-                this.$set(this.selectedTask, 'taskInfo', taskInfo);
-                this.$emit("change-height", "calc(100vh - 88px)");
             }
         },
         closeDetail() {
             this.sideBySideMode = false;
             this.$emit("change-height", "calc(100vh - 120px)");
         },
-        getTasks(filter = {}) {
+        getTaskData(task){
+            let rsl = {
+                content: '',
+                extraLabel: '',
+                extraValue: ''
+            };
+            try {
+                let taskData = JSON.parse(task.description);
+                if(taskData){
+                     rsl = taskData;
+                }
+            } catch (error) {
+                rsl.content = task.description;
+            }
+            return rsl;
+        },
+        async getTasks(filter = {}) {
             let self = this;
             this.listProrcessInstances = [];
-            BPMNEngine.getTask(filter).then(res => {
-                if (res.data != undefined && res.data.length) {
-                    let listTasks = res.data;
-                    self.allFlatTasks = [];
-                    for(let task of listTasks){
-                        task.taskData = {
-                            content: '',
-                            extraLabel: '',
-                            extraValue: ''
-                        };
-                        try {
-                            let taskData = JSON.parse(task.description);
-                            if(taskData){
-                                task.taskData = taskData;
-                            }
-                        } catch (error) {
-                            task.taskData.content = task.description;
-                        }
-                        self.allFlatTasks.push(task);
-                    }
-                    this.listProrcessInstances.forEach(
-                        (process, processIndex) => {
-                            process.objects.forEach(
-                                (instance, instanceIndex) => {
+            filter = Object.assign(filter, this.filterFromParent);
+            filter = Object.assign(filter, this.myOwnFilter);
+            let res = {};
+            let listTasks = [];
+
+            if(this.filterTaskAction == 'subtasks'){
+                res = await BPMNEngine.getSubtasks(this.filterFromParent.parentTaskId, filter);
+                listTasks = res;
+            }else {
+                
+                if(!filter.assignee){
+                    filter.assignee = this.$store.state.app.endUserInfo.id;
+                }
+                res = await BPMNEngine.getTask(filter);
+                listTasks = res.data;
+            }
+                        
+            self.allFlatTasks = [];
+            for(let task of listTasks){
+                task.taskData = self.getTaskData(task);
+                task = addMoreInfoToTask(task);
+                self.allFlatTasks.push(task);
+            }
+            this.listProrcessInstances.forEach(
+                (process, processIndex) => {
+                    process.objects.forEach(
+                        (instance, instanceIndex) => {
+                            this.listProrcessInstances[
+                                processIndex
+                            ].objects[instanceIndex].tasks = [];
+                            // let index = 0;
+                            for (let index in listTasks) {
+                                listTasks[
+                                    index
+                                ].assignee = this.getUser(
+                                    parseInt(listTasks[index].assignee)
+                                );
+                                listTasks[index].owner = this.getUser(
+                                    parseInt(listTasks[index].owner)
+                                );
+                                if (
+                                    listTasks[index]
+                                        .processInstanceId ==
+                                    instance.id
+                                ) {
                                     this.listProrcessInstances[
                                         processIndex
-                                    ].objects[instanceIndex].tasks = [];
-                                    // let index = 0;
-                                    for (let index in listTasks) {
-                                        listTasks[
-                                            index
-                                        ].assignee = this.getUser(
-                                            parseInt(listTasks[index].assignee)
-                                        );
-                                        listTasks[index].owner = this.getUser(
-                                            parseInt(listTasks[index].owner)
-                                        );
-                                        if (
-                                            listTasks[index]
-                                                .processInstanceId ==
-                                            instance.id
-                                        ) {
-                                            this.listProrcessInstances[
-                                                processIndex
-                                            ].objects[instanceIndex].tasks.push(
-                                                listTasks[index]
-                                            );
-                                            listTasks.splice(index, 1);
-                                        }
-                                    }
+                                    ].objects[instanceIndex].tasks.push(
+                                        listTasks[index]
+                                    );
+                                    listTasks.splice(index, 1);
                                 }
-                            );
+                            }
                         }
                     );
-                    this.addOtherProcess(listTasks);
                 }
-            });
+            );
+            this.addOtherProcess(listTasks);
         },
         addOtherProcess(listTasks) {
             for (let index in listTasks) {

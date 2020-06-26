@@ -9,8 +9,7 @@
                             @change="handleChangeTab"
                             v-model="currentTabIndex"
                             class="sym-small-size "
-                            color="orange accent-4"
-                        >
+                            color="orange accent-4">
                             <v-tab class="symper-app-tab" v-for="(title, idx) in tabTitles" :key="idx">
                                 {{ title }} 
                                 <i class="mdi mdi-close float-right close-tab-btn" @click.stop="closeTab(idx)"></i>
@@ -79,7 +78,7 @@
                         </v-menu>
                     </div>
                 </div>
-                <v-layout style="height:calc(100% - 41px)" justify-center>
+                <v-layout style="height:calc(100% - 41px)" class="w-100 h-100" justify-center>
                     <slot />
                 </v-layout>
                 

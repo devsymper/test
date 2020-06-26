@@ -15,7 +15,7 @@ export default class TableControl extends Control {
          * tên các control nằm trong control này, mặc định là null, nếu control là table thì mới có giá trị là {'tên control':true}
          */
         this.listInsideControls = null;
-        this.ele.wrap('<span style="position:relative;" class="wrap-table">');
+        this.ele.wrap('<span style="position:relative;display: block;" class="wrap-table">');
 
     }
     renderTable() {

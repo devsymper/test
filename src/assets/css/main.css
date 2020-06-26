@@ -551,6 +551,18 @@ html {
     padding-bottom: 0px;
 }
 
+.sym-small-size.v-autocomplete>.v-input__control .v-select__selections {
+    min-height: 22px!important;
+}
+
+.sym-small-size.v-autocomplete>.v-input__control .v-select__selections {
+    padding: 0px!important;
+}
+
+.sym-small-size.v-autocomplete>.v-input__control>.v-input__slot {
+    padding: 3px 5px!important;
+}
+
 .htMenu.htContextMenu.handsontable * {
     font-family: Roboto, sans-serif;
     font-size: 13px;
@@ -597,8 +609,16 @@ html {
     display: none!important;
 }
 
+.hide-process-palette .djs-context-pad.open {
+    display: none!important;
+}
+
 .border-top-1 {
     border-top: 1px solid rgb(224, 224, 224);
+}
+
+.border-all {
+    border: 1px solid rgb(224, 224, 224);
 }
 
 .text-ellipsis {
@@ -618,4 +638,9 @@ html {
 
 .bg-white {
     background-color: white;
+}
+
+.symper-title {
+    font-size: 17px!important;
+    font-weight: 500!important;
 }
