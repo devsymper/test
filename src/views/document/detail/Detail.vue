@@ -19,6 +19,8 @@ import BasicControl from "./../submit/basicControl";
 import  TableControl from "./../submit/tableControl.js"
 import  ActionControl from "./../submit/actionControl.js"
 import  Table from "./../submit/table.js"
+import './../submit/customControl.css'
+
 export default {
     props: {
         docId: {

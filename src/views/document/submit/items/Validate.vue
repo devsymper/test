@@ -73,6 +73,7 @@ export default {
     .card-validate{
         position: absolute;
         z-index: 99999;
+        max-width: unset !important;
     }
     
 </style>

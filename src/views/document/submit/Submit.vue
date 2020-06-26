@@ -599,8 +599,6 @@ export default {
                             tableEle.find(".s-control").each(function() {
                                 let childControlId = $(this).attr("id");
                                 let childControlProp = thisCpn.sDocumentEditor.allControl[id].listFields[childControlId];
-                                console.log('sa',childControlProp);
-                                
                                 childControlProp.properties.inTable = controlName;
                                 childControlProp.properties.docName = thisCpn.documentName;
                                 let idFieldChild = childControlProp.id;
@@ -717,7 +715,6 @@ export default {
             if(mapControlEffected.hasOwnProperty('require')){
                 this.updateEffectedControlToStore(mapControlEffected['require'],'effectedRequireControl')
             }
-            console.log('khg',mapControlEffected);
             
         },
         /**
