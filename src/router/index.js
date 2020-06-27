@@ -277,6 +277,14 @@ const routes = [{
         component: () =>
             import ('../views/works/WorkList.vue'),
     },
+
+    // Orgchart
+    {
+        path: "/orgchart",
+        name: "listOrgchart",
+        component: () =>
+            import ('../views/orgchart/OrgchartList.vue'),
+    },
 ];
 
 routes.concat([{
