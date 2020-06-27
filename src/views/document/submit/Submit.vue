@@ -504,7 +504,7 @@ export default {
         loadDocumentObject() {
             let thisCpn = this;
             documentApi
-                .getDocumentObject(this.docObjId)
+                .detailDocumentObject(this.docObjId)
                 .then(res => {
                     if (res.status == 200) {
                         thisCpn.$store.commit('document/addToDocumentDetailStore',{
@@ -637,7 +637,7 @@ export default {
             console.log(this.sDocumentSubmit);
             console.log(this.sDocumentEditor);
             this.getEffectedControl();
-            thisCpn.createDocumentSQLLiteTable(); 
+            // thisCpn.createDocumentSQLLiteTable(); 
             if(this.docObjId == null)
             thisCpn.findRootControl();
         },
@@ -1167,6 +1167,8 @@ export default {
          * Lấy tất cả các control bị ảnh hưởng khi mà một control thay đổi giá trị
          */
         setAllImpactedFieldsList(fieldName) {
+            console.log(fieldName);
+            
             impactedFieldsList[fieldName] = {};
             impactedFieldsArr = this.getAllImpactedInput(fieldName);
             for (var i = 0; i < impactedFieldsArr.length; i++) {
@@ -1175,10 +1177,10 @@ export default {
             impactedFieldsListWhenStart[fieldName] = false;
         },
         getAllImpactedInput(sourceName) {
-            let listInput = this.sDocumentSubmit.listInputInDocument;
+            let sourceControlInstance = getControlInstanceFromStore(sourceName)
             var arr = [];
-            if (listInput.hasOwnProperty(sourceName)) {
-                for (var i in listInput[sourceName]['effectedControl']) {
+            if (sourceControlInstance != false) {
+                for (var i in sourceControlInstance['effectedControl']) {
                     arr.push(i);
                     arr = arr.concat(this.getAllImpactedInput(i));
                 }

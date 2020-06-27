@@ -847,12 +847,13 @@ export default {
         //hoangnd: hàm set các giá trị của thuộc tính và formulas vào từng contrl trong doc lúc load dữ liệu và đưa vào state
         setDataForPropsControl(fields){
             for(let controlId in fields){
+                if(!fields[controlId].hasOwnProperty('type')){
+                    continue;
+                }
                 let control = GetControlProps(fields[controlId].type)
                 let properties = control.properties
                 let formulas = control.formulas
                 let type = fields[controlId].type
-                console.log(fields[controlId]);
-                
                 $.each(properties,function(k,v){
                     if(properties[k].type == 'checkbox'){
                         properties[k].value = (fields[controlId]['properties'][k] == 0 || fields[controlId]['properties'][k] == '0' || fields[controlId]['properties'][k] == '') ? false : true

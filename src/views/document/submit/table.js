@@ -186,7 +186,6 @@ export default class Table {
                     if (sDocument.state.submit.docStatus == 'init' && sDocument.state.viewType == 'update') {
                         return;
                     }
-
                     let controlName = changes[0][1];
                     let columns = thisObj.columnsInfo.columns;
                     let currentRowData = thisObj.tableInstance.getDataAtRow(thisObj.currentSelectedCell['row']);
