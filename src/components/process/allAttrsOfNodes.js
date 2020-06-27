@@ -1541,7 +1541,7 @@ let allAttrs = {
             if (!val) {
                 return;
             }
-            let docs = await apiCaller.get(appConfigs.apiDomain.documents + '?search=' + val);
+            let docs = await apiCaller.get(appConfigs.apiDomain.sdocumentManagement + 'documents?search=' + val);
             this.myItems = docs.data.listObject;
         },
         options: [{ id: '    ', name: '', title: '' }],
