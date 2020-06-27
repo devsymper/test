@@ -1,11 +1,12 @@
 import { getIconFromType } from './../../components/document/controlPropsFactory.js';
 import { defaultState } from "./defaultState";
+import { util } from "./../../plugins/util.js";
+
 import Vue from "vue";
 
 const addControl = (state, params) => {
     let id = params.id
     let prop = params.props
-        // state.editor.allControl[id] = prop;
     Vue.set(state.editor.allControl, id, prop);
     setTreeListControlInDoc(state);
 };
@@ -56,7 +57,7 @@ function setTreeListControlInDoc(state) {
 
         ],
     }];
-    let allControl = state.editor.allControl;
+    let allControl = util.cloneDeep(state.editor.allControl);
     for (let controlId in allControl) {
         let control = allControl[controlId];
         let type = control.type;
@@ -255,6 +256,11 @@ const addToDocumentStore = (state, params) => {
     let value = params.value
     Vue.set(state, key, value);
 }
+const addToDocumentEditorStore = (state, params) => {
+    let key = params.key
+    let value = params.value
+    Vue.set(state.editor, key, value);
+}
 
 /**
  * Khadm:
@@ -287,6 +293,7 @@ export {
     addToDocumentSubmitStore,
     addToDocumentDetailStore,
     addToDocumentStore,
+    addToDocumentEditorStore,
     setAllDocuments,
     resetCurrentControl
 
