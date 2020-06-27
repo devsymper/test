@@ -48,6 +48,7 @@ var notEmpty = function(value, callback) {
         callback(true);
     }
 };
+let listKeyCodeNotChange = [18, 17, 9, 20, 16, 192]
 let listTableInstance = {}
 let columnHasSum = {}
 let listInputInDocument = sDocument.state.submit.listInputInDocument;
@@ -92,7 +93,6 @@ export default class Table {
              * Lưu tên cột tương ứng với số thứ tự của cột trong bảng
              */
             this.colName2Idx = {};
-
             /**Mẫu giá trị cho các dòng của bảng khi được thêm mới */
             this.sampleRowValues = {};
 
@@ -103,7 +103,7 @@ export default class Table {
              * }
              */
             let thisObj = this;
-
+            this.tableHasRowSum = false;
             this.validateValueMap = {};
 
             /**Tổng số dòng trong table */
@@ -145,6 +145,9 @@ export default class Table {
                     };
                 },
                 beforeKeyDown: function(event) {
+                    if (listKeyCodeNotChange.includes(event.keyCode)) {
+                        return;
+                    }
                     if (event.keyCode != 40 && event.keyCode != 38 &&
                         event.keyCode != 37 && event.keyCode != 39 &&
                         thisObj.isAutoCompleting == false) {
@@ -183,6 +186,7 @@ export default class Table {
                 },
 
                 afterChange: function(changes, source) {
+
                     if (sDocument.state.submit.docStatus == 'init' && sDocument.state.viewType == 'update') {
                         return;
                     }
@@ -229,7 +233,10 @@ export default class Table {
                             thisObj.handlerRunFormulasForControlInTable('uniqueDB', controlUnique, dataInput, controlUnique.controlFormulas.uniqueDB);
                         }
                     }
-                    if (event.type == 'keydown' && event.keyCode == 13 && source == 'edit' && thisObj.currentSelectedCell.row + 2 == this.getData().length) {
+                    console.log(event);
+
+                    if (event != undefined && event.type == 'keydown' && event.keyCode == 13 && source == 'edit' &&
+                        thisObj.currentSelectedCell.row + 2 == this.getData().length) {
                         this.alter('insert_row', thisObj.currentSelectedCell.row + 1, 1);
                     }
                 }
@@ -353,7 +360,7 @@ export default class Table {
                     if (allFormulas.hasOwnProperty(formulasType)) {
                         if (allFormulas[formulasType].hasOwnProperty('instance')) {
                             let formulasInstance = allFormulas[formulasType].instance;
-                            let dataInput = this.getDataInputForFormulas(formulasInstance);
+                            let dataInput = this.getDataInputForFormulas(formulasInstancecontrolEffectedInstance.inTable);
                             if (controlEffectedInstance.hasOwnProperty('inTable')) {
                                 if (controlEffectedInstance.inTable == this.tableName) {
                                     this.handlerRunFormulasForControlInTable(formulasType, controlEffectedInstance, dataInput, formulasInstance);
@@ -373,7 +380,7 @@ export default class Table {
                 let controlInstance = listInputInDocument[control];
                 if (controlInstance.controlFormulas.hasOwnProperty('formulas')) {
                     let formulasInstance = controlInstance.controlFormulas['formulas'].instance;
-                    let dataInput = this.getDataInputForFormulas(formulasInstance);
+                    let dataInput = this.getDataInputForFormulas(formulasInstance, controlInstance.inTable);
                     if (controlInstance.hasOwnProperty('inTable')) {
                         if (controlInstance.inTable == this.tableName) {
                             this.handlerRunFormulasForControlInTable('formulas', controlInstance, dataInput, formulasInstance);
@@ -386,13 +393,17 @@ export default class Table {
          * Hàm lấy các data input cho 1 công thức
          * @param {Object} formulasInstance đối tượng của công thức 
          */
-    getDataInputForFormulas(formulasInstance) {
+    getDataInputForFormulas(formulasInstance, tableName = false) {
             let inputControl = formulasInstance.getInputControl();
             let dataInput = {};
             for (let inputControlName in inputControl) {
                 let valueInputControlItem = this.getColumnIndexFromControlName(inputControlName);
                 valueInputControlItem = this.tableInstance.getDataAtCol(valueInputControlItem);
                 valueInputControlItem.pop();
+
+                if (listInputInDocument[tableName].tableInstance.tableHasRowSum) {
+                    valueInputControlItem.pop();
+                }
                 dataInput[inputControlName] = valueInputControlItem;
             }
             return dataInput;
@@ -546,9 +557,11 @@ export default class Table {
             },
             // rowHeights:30,   
             // minSpareRows: 1,
-            data: [
+            data: (thisObj.tableHasRowSum) ? [
                 [''],
                 [''],
+            ] : [
+                []
             ],
             manualColumnMove: !thisObj.checkDetailView(),
             // manualRowMove: true,
@@ -569,7 +582,7 @@ export default class Table {
             autoRowSize: false,
             autoColSize: false,
             width: '100%',
-            fixedRowsBottom: 1,
+            fixedRowsBottom: (thisObj.tableHasRowSum) ? 1 : 0,
             formulas: true,
             // minSpareRows: (thisObj.checkDetailView()) ? 0 : 1,
             height: 'auto',
@@ -589,8 +602,6 @@ export default class Table {
                             hotTb.setDataAtRowProp(hotTb.countRows() - 1, controlName, sumValue, AUTO_SET);
                         }
                         for (let index = 0; index < hotTb.getDataAtRow(0).length; index++) {
-                            console.log(hotTb.countRows(), '-===', index);
-
                             hotTb.setCellMeta(hotTb.countRows() - 1, index, 'readOnly', true);
                         }
                         hotTb.render();
@@ -662,6 +673,7 @@ export default class Table {
                     listInputInDocument[controlName].controlProperties.isSumTable.value === true ||
                     listInputInDocument[controlName].controlProperties.isSumTable.value == "1")) {
                 columnHasSum[controlName] = num;
+                thisObj.tableHasRowSum = true;
             }
             num += 1;
 

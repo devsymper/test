@@ -533,7 +533,7 @@ export default {
         },
         // hàm kiểm tra xác thực tên control 
         checkNameControl(controlId,control,listControlName){
-            if(control.type != "submit" && control.type != "draft" && control.type != "reset"){
+            if(control.type != "submit" && control.type != "draft" && control.type != "reset" && control.type != "approvalHistory"){
                 if(control.properties.name.value == ''){
                     let controlEl = $('#editor_ifr').contents().find('#'+controlId);
                     controlEl.addClass('s-control-error');
@@ -1422,6 +1422,10 @@ export default {
                 
                 if(table.length > 0 && controlId != table.attr('id')){
                     let tableId = table.attr('id');
+                    console.log(tableId);
+                    console.log(controlId);
+                    console.log(thisCpn.editorStore.allControl[tableId]);
+                    
                     let control = thisCpn.editorStore.allControl[tableId]['listFields'][controlId];
                     thisCpn.selectControl(control.properties, control.formulas,controlId);
                 }

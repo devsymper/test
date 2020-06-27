@@ -10,10 +10,11 @@ export default class ActionControl extends Control {
     render() {
         if (this.type == 'approvalHistory') {
             this.renderApprovalEle();
+        } else {
+            this.ele.addClass('d-none');
         }
-        this.ele.addClass('d-none');
     }
     renderApprovalEle() {
-
+        alert('app');
     }
 }

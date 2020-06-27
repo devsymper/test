@@ -81,7 +81,7 @@
 <script>
 import { documentApi } from "./../../../api/Document.js";
 import "./../../../components/document/documentContent.css";
-import { setDataForPropsControl } from "./../../../components/document/dataControl";
+import { setDataForPropsControl,allControlNotSetData } from "./../../../components/document/dataControl";
 import BasicControl from "./basicControl";
 import TableControl from "./tableControl";
 import ActionControl from "./actionControl";
@@ -548,7 +548,7 @@ export default {
                     if(valueInput != undefined && valueInput != null && Object.keys(valueInput).length == 0){
                         valueInput = ""
                     }
-                    if(controlType == "submit" || controlType == "reset"){
+                    if(allControlNotSetData.includes(controlType)){
                         
                         let control = new ActionControl(idField, $(allInputControl[index]),field,thisCpn.keyInstance);
                         control.init();
