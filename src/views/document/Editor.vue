@@ -15,8 +15,11 @@
                 <div class="sym-document-action">
                     <editor-action 
                     @document-action-save-document="openPanelSaveDocument"
+                    @document-action-clone-control="cloneControl"
                     @document-action-list-control-option="setShowAllControlOption"
                     @document-action-delete-control="deleteControl"
+                    @document-action-save-to-local-storage="saveControlToLocalStorage"
+                    @document-action-get-from-local-storage="getFromLocalStorege"
                     
                     />
                 </div>
@@ -205,6 +208,52 @@ export default {
     methods:{
         px2cm(px) {
             return (Math.round((px / 37.7952) * 100) / 100).toFixed(1);
+        },
+
+        // lấy data từ local storage
+        getFromLocalStorege(){
+            let allControl = localStorage.getItem('allControl');
+            allControl = JSON.parse(allControl);
+            let content = localStorage.getItem('content');
+            let documentProperties = localStorage.getItem('documentProperties');
+            this.$refs.editor.editor.setContent(content);
+            this.$store.commit(
+                                    "document/addToDocumentStore",{key:'documentProperties',value:documentProperties}
+                                );  
+            this.$store.commit(
+                                    "document/addToDocumentEditorStore",{key:'allControl',value:allControl}
+                                );  
+        },
+        //set data vào local storage
+        saveControlToLocalStorage(){
+            let allControl = this.editorStore.allControl;
+            let content = this.$refs.editor.editor.getContent();
+            let documentProperties = this.$store.state.document.documentProps;
+            localStorage.setItem('allControl',JSON.stringify(allControl));
+            localStorage.setItem('content',content);
+            localStorage.setItem('documentProperties',JSON.stringify(documentProperties));
+        },
+        // sao chép control và thêm vào sau nó
+        cloneControl(){
+            let currentControl = this.editorStore.currentSelectedControl;
+            let controlInstance = util.cloneDeep(this.editorStore.allControl[currentControl.id])
+            let control = $("#editor_ifr").contents().find('.on-selected');
+            if(control.length > 0){
+                control.removeClass('on-selected')
+                let id = 's-control-id-' + Date.now();
+                let newControl = control.clone().attr('id', id);
+                newControl.insertAfter(control);
+                let typeControl = control.attr('s-control-type');
+                let table = control.closest('.s-control-table');
+                if(table.length > 0){
+                    let tableId = table.attr('id');
+                    this.addToAllControlInTable(id,{properties: controlInstance.properties, formulas : controlInstance.formulas,type:typeControl},tableId);
+                }
+                else{
+                    this.addToAllControlInDoc(id,{properties: controlInstance.properties, formulas : controlInstance.formulas,type:typeControl});
+                }
+            }
+            
         },
         deleteControl(){
             let control = $("#editor_ifr").contents().find('.on-selected');
