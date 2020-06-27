@@ -4,44 +4,46 @@ import sDocument from './../../../store/document'
 import { SYMPER_APP } from './../../../main.js'
 import Formulas from './formulas'
 import Util from './util'
+import { documentApi } from "./../../../api/Document.js";
+let listInputInDocument = sDocument.state.submit.listInputInDocument;
+
 let dataInputCache = sDocument.state.submit.dataInputCache;
 const fileTypes = {
     'xlsx': 'mdi-microsoft-excel',
-    'txt': 'file-text-o',
-    'csv': 'file-text-o',
-    'pdf': 'file-pdf-o',
-    'mp3': 'file-audio-o',
-    'rar': 'file-archive-o',
-    'zip': 'file-archive-o',
+    'txt': 'mdi-file-document-outline',
+    'csv': 'mdi-file-document-outline',
+    'pdf': 'mdi-file-pdf-outline',
+    'mp3': 'mdi-radio',
+    'rar': 'mdi-folder-zip-outline',
+    'zip': 'mdi-folder-zip-outline',
     'docx': 'mdi-file-word-outline',
     'doc': 'mdi-file-word-outline',
     'pptx': 'mdi-microsoft-powerpoint',
 
-    'mp4': 'file-video-o',
-    'webm': 'file-video-o',
-    'flv': 'file-video-o',
-    'mov': 'file-video-o',
-    'mpg': 'file-video-o',
-    'm4v': 'file-video-o',
-    '3gv': 'file-video-o',
+    'mp4': 'mdi-file-video-outline',
+    'webm': 'mdi-file-video-outline',
+    'flv': 'mdi-file-video-outline',
+    'mov': 'mdi-file-video-outline',
+    'mpg': 'mdi-file-video-outline',
+    'm4v': 'mdi-file-video-outline',
+    '3gv': 'mdi-file-video-outline',
 
     'jpg': 'mdi-file-image',
-    'png': 'mdi-file-image',
+    png: 'mdi-file-image',
     'gif': 'mdi-file-image',
     'svg': 'mdi-file-image',
 
-    'js': 'file-code-o',
-    'php': 'file-code-o',
-    'html': 'file-code-o',
-    'py': 'file-code-o',
-    'java': 'file-code-o',
-    'sql': 'file-code-o',
+    'js': 'mdi-file-code-outline',
+    'php': 'mdi-file-code-outline',
+    'html': 'mdi-file-code-outline',
+    'py': 'mdi-file-code-outline',
+    'java': 'mdi-file-code-outline',
+    'sql': 'mdi-file-code-outline',
 };
 
 export default class BasicControl extends Control {
     constructor(idField, ele, controlProps, curParentInstance, value) {
         super(idField, ele, controlProps, curParentInstance, value);
-
     }
 
 
@@ -122,12 +124,12 @@ export default class BasicControl extends Control {
             this.ele.addClass('detail-view')
             this.ele.attr('disabled', 'disabled')
         }
-        console.log('type', this.type);
-
     }
-    renderFileControl = function(rowId) {
-        let fileHtml = this.genFileView(rowId);
+    renderFileControl = function() {
+        let fileHtml = this.genFileView();
         this.ele.css('width', 'unset').css('cursor', 'pointer').css('height', '25px').css('vertical-align', 'middle').html(fileHtml);
+        console.log('ssafas', fileHtml);
+
         let thisCpn = this;
         $('.file-add').click(function(e) {
             let el = $(e);
@@ -149,34 +151,97 @@ export default class BasicControl extends Control {
         }
 
         if (!this.inTable) {
+            if (this.value != '' && this.value.length > 0) {
+                let valueArr = this.value.replace(/^,/gi, "");
+                valueArr = valueArr.split(',');
+                console.log('sads', valueArr);
+
+                for (let index = 0; index < valueArr.length; index++) {
+
+                    let element = valueArr[index];
+                    let fileExt = Util.getFileExtension(element);
+                    let icon = fileTypes[fileExt];
+                    let file = `<div title="${element}" class="file-item">
+                            <i  onclick="window.open('https://sdocument-management.symper.vn/file/public/` + element + `');" class="mdi ` + icon + ` file-view" ></i>
+                        </div>`
+                    addTpl += file;
+                }
+            }
             return `<div class="upload-file-wrapper-outtb">${addTpl}</div>`;
         }
         if (this.value != '' && this.value.length > 0) {
-            for (let index = 0; index < this.value.length; index++) {
-                const element = this.value[index];
-                let type = Util.getFileExtension(element);
-                let icon = this.fileTypes[type];
-                let file = `<div onclick="window.open('/file-download');" class="file-item">
-                                <span onclick="parent.deleteValueInFileCtrl(event)"  title="xóa" class="remove-file"><span class="mdi mdi-close"></span></span>
-                                <i class="mdi ` + icon + ` file-view" ></i>
+            let valueArr = this.value.replace(/^,/gi, "");
+            valueArr = valueArr.split(',');
+            console.log('klfas', valueArr);
+
+            for (let index = 0; index < valueArr.length; index++) {
+                let element = valueArr[index];
+                let fileExt = Util.getFileExtension(element);
+                let icon = fileTypes[fileExt];
+                let file = `<div  class="file-item">
+                                <span  data-file-name="` + element + `" title="xóa" class="remove-file"><span class="mdi mdi-close"></span></span>
+                                <i onclick="window.open('https://sdocument-management.symper.vn/file/public` + element + `');" class="mdi ` + icon + ` file-view" ></i>
                             </div>`
                 addTpl += file;
             }
+
         }
         return addTpl.replace(/\n/g, '');
     }
 
     addFile(item) {
-        let type = Util.getFileExtension(item);
-
+        let type = Util.getFileExtension(item.name);
+        let form = new FormData();
+        form.append('file', item);
         let icon = fileTypes[type];
-        let file = `<div title="${item}" class="file-item">
-                        <span onclick="this.parentNode.remove()"  title="xóa" class="remove-file"><span class="mdi mdi-close"></span></span>
-                        <i class="mdi ` + icon + ` file-view" ></i>
-                    </div>`
-        this.ele.find('.upload-file-wrapper-outtb').append(file)
+        let thisObj = this;
+        $.ajax({
+            url: 'https://sdocument-management.symper.vn/uploadFile',
+            dataType: 'json',
+            processData: false,
+            contentType: false,
+            data: form,
+            type: 'post',
+            success: function(response) {
+                if (response.status == 200) {
+                    let file = `<div title="${response.data.name}" class="file-item">
+                            <span data-file-name="` + response.data.name + `" title="xóa" class="remove-file"><span class="mdi mdi-close"></span></span>
+                            <i  onclick="window.open('https://sdocument-management.symper.vn/file/` + response.data.path + `');" class="mdi ` + icon + ` file-view" ></i>
+                        </div>`
+                    thisObj.setDeleteFileEvent(thisObj.ele, thisObj.name)
+                    thisObj.ele.find('.upload-file-wrapper-outtb').append(file);
+                    let curValue = listInputInDocument[thisObj.name].value;
+                    curValue += "," + response.data.name;
+                    this.value = curValue;
+                    store.commit("document/updateListInputInDocument", {
+                        controlName: thisObj.name,
+                        key: 'value',
+                        value: curValue
+                    });
+                    let tableName = thisObj.inTable;
+                    if (tableName != false)
+                        listInputInDocument[tableName].tableInstance.tableInstance.render();
+                }
+            }
+        });
     }
-
+    setDeleteFileEvent(ele, controlName) {
+        let value = listInputInDocument[controlName].value;
+        ele.off('click', '.remove-file')
+        ele.on('click', '.remove-file', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            let fileName = $(this).attr('data-file-name');
+            let newValue = value.replace(/^,/gi, "");
+            newValue = newValue.replace(fileName, "");
+            $(this).closest('.file-item').remove();
+            store.commit("document/updateListInputInDocument", {
+                controlName: controlName,
+                key: 'value',
+                value: newValue
+            });
+        })
+    }
 
     renderFilterControl() {
         if (this.checkDetailView()) return;

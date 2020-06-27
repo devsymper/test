@@ -9,9 +9,7 @@
         :actionPanelWidth="actionPanelWidth"
         @after-open-add-panel="addDocument"
     >
-        <div slot="right-panel-content" class="h-100">
-           
-        </div>
+      
     </list-items>
 </template>
 <script>
@@ -57,7 +55,7 @@ export default {
                     },
                 },
                 {
-                    name: "edit",
+                    name: "editdoc",
                     text: "Sửa",
                     callback: (document, callback) => {
                         this.$goToPage('/document/editor/'+document.id,document.title);
@@ -74,7 +72,7 @@ export default {
                     name: "listObject",
                     text: "Danh sách bản ghi",
                     callback: (document, callback) => {
-                        this.$goToPage('/document/'+document.name+'/objects',"Danh sách bản ghi");
+                        this.$goToPage('/documents/'+document.id+'/objects',"Danh sách bản ghi");
                     },
                 },
             ],

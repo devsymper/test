@@ -96,6 +96,8 @@ import Filter from "./items/Filter.vue";
 import Validate from "./items/Validate.vue";
 import ClientSQLManager from "./clientSQLManager.js";
 import Util from './util';
+import './customControl.css';
+
 import { checkCanBeBind, resetImpactedFieldsList, markBinedField } from './handlerCheckRunFormulas';
 import {checkDbOnly,getControlInstanceFromStore} from './../common/common'
 let impactedFieldsList = {};
@@ -176,13 +178,8 @@ export default {
         let thisCpn = this;
         $("#file-upload-alter-" + this.keyInstance).on("change", function(e) {
             let name = $(this).attr("data-control-name");
-            thisCpn.$store.commit("document/changeControlSubmitProps", {
-                name: name,
-                key: "value",
-                value: $(this).prop("files")[0].name
-            });
             thisCpn.sDocumentSubmit.listInputInDocument[name].addFile(
-                $(this).prop("files")[0].name
+                $(this).prop("files")[0]
             );
         });
         $('.sym-form-submit').on('click','.validate-icon',function(e){
@@ -507,7 +504,7 @@ export default {
         loadDocumentObject() {
             let thisCpn = this;
             documentApi
-                .getDocumentObject(this.docObjId)
+                .detailDocumentObject(this.docObjId)
                 .then(res => {
                     if (res.status == 200) {
                         thisCpn.$store.commit('document/addToDocumentDetailStore',{
@@ -640,7 +637,7 @@ export default {
             console.log(this.sDocumentSubmit);
             console.log(this.sDocumentEditor);
             this.getEffectedControl();
-            thisCpn.createDocumentSQLLiteTable(); 
+            // thisCpn.createDocumentSQLLiteTable(); 
             if(this.docObjId == null)
             thisCpn.findRootControl();
         },
@@ -718,7 +715,6 @@ export default {
             if(mapControlEffected.hasOwnProperty('require')){
                 this.updateEffectedControlToStore(mapControlEffected['require'],'effectedRequireControl')
             }
-            console.log('khg',mapControlEffected);
             
         },
         /**
@@ -1171,6 +1167,8 @@ export default {
          * Lấy tất cả các control bị ảnh hưởng khi mà một control thay đổi giá trị
          */
         setAllImpactedFieldsList(fieldName) {
+            console.log(fieldName);
+            
             impactedFieldsList[fieldName] = {};
             impactedFieldsArr = this.getAllImpactedInput(fieldName);
             for (var i = 0; i < impactedFieldsArr.length; i++) {
@@ -1179,10 +1177,10 @@ export default {
             impactedFieldsListWhenStart[fieldName] = false;
         },
         getAllImpactedInput(sourceName) {
-            let listInput = this.sDocumentSubmit.listInputInDocument;
+            let sourceControlInstance = getControlInstanceFromStore(sourceName)
             var arr = [];
-            if (listInput.hasOwnProperty(sourceName)) {
-                for (var i in listInput[sourceName]['effectedControl']) {
+            if (sourceControlInstance != false) {
+                for (var i in sourceControlInstance['effectedControl']) {
                     arr.push(i);
                     arr = arr.concat(this.getAllImpactedInput(i));
                 }

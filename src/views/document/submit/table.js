@@ -22,11 +22,21 @@ Handsontable.renderers.FileRenderer = function(instance, td, row, col, prop, val
     Handsontable.renderers.NumericRenderer.apply(this, arguments);
     td.innerHTML = listInputInDocument[prop].genFileView(row);
     td.classList.add("upload-file-wrapper-inTb");
-    if (isDetailView && !rerenderCtrlFlag[instance.tableName]) {
-        let tb = listInputInDocument[prop].inTable;
-        listInputInDocument[tb].tableInstance.reRender(tb);
-        rerenderCtrlFlag[instance.tableName] = true;
-    }
+    $(td).off('click', '.file-add');
+    $(td).on('click', '.file-add', function(e) {
+        let el = $(e);
+        $("#file-upload-alter").attr('data-rowid', el.attr('data-rowid')).attr('data-ctrlname', el.attr('data-ctrlname'));
+        $("#file-upload-alter-" + instance.keyInstance).click();
+        $("#file-upload-alter-" + instance.keyInstance).attr('data-control-name', $(this).attr('data-control-name'))
+    })
+    $(td).off('click', '.remove-file')
+    listInputInDocument[prop].setDeleteFileEvent($(td), prop)
+        // if (isDetailView && !rerenderCtrlFlag[instance.tableName]) {
+        //     let tb = listInputInDocument[prop].inTable;
+        //     // listInputInDocument[tb].tableInstance.reRender(tb);
+        //     // rerenderCtrlFlag[instance.tableName] = true;
+        // }
+
 }
 Handsontable.cellTypes.registerCellType('file', {
     renderer: Handsontable.renderers.PercentRenderer
@@ -39,6 +49,7 @@ var notEmpty = function(value, callback) {
     }
 };
 let listTableInstance = {}
+let columnHasSum = {}
 let listInputInDocument = sDocument.state.submit.listInputInDocument;
 let isDetailView = sDocument.state.isDetailView;
 const MAX_TABLE_HEIGHT = 300;
@@ -119,6 +130,7 @@ export default class Table {
                         value: thisObj.currentSelectedCell
                     });
                     let columns = thisObj.columnsInfo.columns;
+
                     thisObj.currentControlSelected = columns[column].data;
                     // nếu type cell là time thì emit qua submit mở timepicker
                     if (thisObj.getCellSelectedType(column) == 'time') {
@@ -174,7 +186,6 @@ export default class Table {
                     if (sDocument.state.submit.docStatus == 'init' && sDocument.state.viewType == 'update') {
                         return;
                     }
-
                     let controlName = changes[0][1];
                     let columns = thisObj.columnsInfo.columns;
                     let currentRowData = thisObj.tableInstance.getDataAtRow(thisObj.currentSelectedCell['row']);
@@ -217,10 +228,10 @@ export default class Table {
                             dataInput[controlName] = [changes[0][3]]
                             thisObj.handlerRunFormulasForControlInTable('uniqueDB', controlUnique, dataInput, controlUnique.controlFormulas.uniqueDB);
                         }
-
-
                     }
-
+                    if (event.type == 'keydown' && event.keyCode == 13 && source == 'edit' && thisObj.currentSelectedCell.row + 2 == this.getData().length) {
+                        this.alter('insert_row', thisObj.currentSelectedCell.row + 1, 1);
+                    }
                 }
             }
             listTableInstance[this.tableName] = this;
@@ -300,6 +311,9 @@ export default class Table {
                 let controlFormulas = controlInstance.controlFormulas;
                 if (controlFormulas.hasOwnProperty('autocomplete')) {
                     let formulasInstance = controlFormulas['autocomplete'].instance;
+                    if (formulasInstance == undefined) {
+                        return false;
+                    }
                     return formulasInstance;
                 }
             }
@@ -533,7 +547,8 @@ export default class Table {
             // rowHeights:30,   
             // minSpareRows: 1,
             data: [
-                []
+                [''],
+                [''],
             ],
             manualColumnMove: !thisObj.checkDetailView(),
             // manualRowMove: true,
@@ -554,102 +569,56 @@ export default class Table {
             autoRowSize: false,
             autoColSize: false,
             width: '100%',
-            minSpareRows: (thisObj.checkDetailView()) ? 0 : 1,
+            fixedRowsBottom: 1,
+            formulas: true,
+            // minSpareRows: (thisObj.checkDetailView()) ? 0 : 1,
             height: 'auto',
             afterRender: function(isForced) {
                 let tbHeight = this.container.getElementsByClassName('htCore')[0].getBoundingClientRect().height;
-                if (tbHeight < MAX_TABLE_HEIGHT) {
-                    $(this.rootElement).css('height', tbHeight + 20);
-                } else {
+                if (tbHeight < MAX_TABLE_HEIGHT) {} else {
                     $(this.rootElement).css('height', MAX_TABLE_HEIGHT);
                 }
+
+
                 if (!this.reRendered) {
                     this.reRendered = true;
                     setTimeout((hotTb) => {
+                        for (let controlName in columnHasSum) {
+                            let CharAt = String.fromCharCode(65 + columnHasSum[controlName]);
+                            let sumValue = '=SUM(' + CharAt + '1:' + CharAt + '' + (hotTb.countRows() - 1) + ')'
+                            hotTb.setDataAtRowProp(hotTb.countRows() - 1, controlName, sumValue, AUTO_SET);
+                        }
+                        for (let index = 0; index < hotTb.getDataAtRow(0).length; index++) {
+                            console.log(hotTb.countRows(), '-===', index);
+
+                            hotTb.setCellMeta(hotTb.countRows() - 1, index, 'readOnly', true);
+                        }
                         hotTb.render();
                     }, 500, this);
                 }
-            },
 
-            // beforeCreateRow: function(index, amount, source) {
-            //     let tableCtrl = listInputInDocument[this.tableName].tableInstance;
-            //     console.log(tableCtrl);
-            //     let ctrlName = '';
-            //     if (docStatus == 'init') {
-            //         if (source == 'add_row_on_enter') {
-            //             for (ctrlName in tableCtrl.colName2Idx) {
-            //                 listInputInDocument[ctrlName].inputCacheSet('', 0);
-            //                 listInputInDocument[ctrlName].setExtraProp([0]);
-            //             }
-            //         } else {
-            //             for (ctrlName in tableCtrl.colName2Idx) {
-            //                 listInputInDocument[ctrlName].inputCacheSet('', 0);
-            //             }
-            //         }
-            //     } else {
-            //         if (source == 'add_row_on_enter') {
-            //             for (ctrlName in tableCtrl.colName2Idx) {
-            //                 listInputInDocument[ctrlName].inputCacheSet(tableCtrl.sampleRowValues[ctrlName], index);
-            //                 listInputInDocument[ctrlName].setExtraProp([index]);
-            //             }
-            //         } else {
-            //             for (ctrlName in tableCtrl.colName2Idx) {
-            //                 listInputInDocument[ctrlName].inputCacheSet(tableCtrl.sampleRowValues[ctrlName], index);
-            //             }
-            //         }
-            //         tableCtrl.tableInstance.rowCount += amount;
-            //     }
-            //     let totalRows = tableCtrl.tableInstance.countRows();
-            //     if (totalRows > 4) {
-            //         $(tableCtrl.tableInstance.rootElement).parent().addClass('split-span');
-            //         $(tableCtrl.tableInstance.rootElement).on('click', function(e) {
-            //             if (e.target.parentElement.nodeName == 'SPAN') {
-            //                 //do your work here ;)
-            //                 let body = $(e.target).parents('body');
-            //                 if (!body.find('#spliter').length) {
-            //                     body.append('<div id="spliter"></div>');
-            //                 }
-            //                 let split = body.find('#spliter');
-            //                 // clicked on ::before
-            //                 let is_full = false;
-            //                 if ($(e.target).parent().hasClass('full')) {
-            //                     is_full = true;
-            //                 }
-            //                 if (body.find('.split-span').length) {
-            //                     body.find('.split-span').removeClass('full');
-            //                 }
-            //                 if (is_full) {
-            //                     split.hide();
-            //                     split.css({
-            //                         left: "-150%"
-            //                     });
-            //                     body.style('width', '29.7cm');
-            //                     //  body.find('span.split-span > div:nth-child(1)').css('width', 'unset');
-            //                     body.removeClass('split');
-            //                 } else {
-            //                     split.show();
-            //                     split.css({
-            //                         left: "50%"
-            //                     });
-            //                     body.addClass('split');
-            //                     $(e.target).parent().addClass('full');
-            //                     drag_spliter(split, $(e.target));
-            //                 }
-            //             }
-            //         });
-            //     } else {
-            //         $(tableCtrl.tableInstance.rootElement).parent().removeClass('split-span');
-            //     }
-            // },
+
+            },
+            beforeCreateRow: function(i, amount) {},
+            afterCreateRow: function(i, amount) {
+                for (let controlName in columnHasSum) {
+                    let CharAt = String.fromCharCode(65 + columnHasSum[controlName]);
+                    let sumValue = '=SUM(' + CharAt + '1:' + CharAt + '' + (this.countRows() - 1) + ')'
+                    this.setDataAtRowProp(this.countRows() - 1, controlName, sumValue, AUTO_SET);
+                }
+            }
+
+
         });
-        this.tableInstance.symperTable = this;
-        this.tableInstance.setCellMeta(2, 0, 'readOnly', true)
+        this.tableInstance.keyInstance = this.keyInstance;
         if (!this.checkDetailView()) {
             for (let evtName in thisObj.event) {
                 Handsontable.hooks.add(evtName, thisObj.event[evtName], this.tableInstance);
             }
         }
-
+    }
+    setDefaulFotterRowData(value, rowIndex, prop) {
+        this.setDataAtRowProp(rowIndex, prop, value, AUTO_SET);
     }
 
     checkDetailView() {
@@ -684,10 +653,16 @@ export default class Table {
 
             if (listInputInDocument[controlName].controlProperties.hasOwnProperty('isHidden') &&
                 (listInputInDocument[controlName].controlProperties.isHidden.value == 1 ||
+                    listInputInDocument[controlName].controlProperties.isHidden.value === true ||
                     listInputInDocument[controlName].controlProperties.isHidden.value == "1")) {
                 hiddenColumns.push(num);
             }
-
+            if (listInputInDocument[controlName].controlProperties.hasOwnProperty('isSumTable') &&
+                (listInputInDocument[controlName].controlProperties.isSumTable.value == 1 ||
+                    listInputInDocument[controlName].controlProperties.isSumTable.value === true ||
+                    listInputInDocument[controlName].controlProperties.isSumTable.value == "1")) {
+                columnHasSum[controlName] = num;
+            }
             num += 1;
 
         }

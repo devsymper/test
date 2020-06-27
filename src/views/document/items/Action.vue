@@ -19,7 +19,8 @@ export default {
     data(){
         return {
             items: [
-                { text: 'Lưu control', icon: 'mdi-content-save' ,action:'save-control'},
+                { text: 'Lưu cache', icon: 'mdi-content-save' ,action:'save-to-local-storage'},
+                { text: 'From cache', icon: 'mdi-content-save' ,action:'get-from-local-storage'},
                 { text: 'Xóa control', icon: 'mdi-delete-forever' ,action:'delete-control'},
                 { text: 'Clone control', icon: 'mdi-content-copy' ,action:'clone-control'},
                 { text: 'Xóa bộ đệm', icon: 'mdi-delete-circle' ,action:'delete-cache-control'},

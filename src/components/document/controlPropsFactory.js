@@ -440,7 +440,8 @@ const controlTypes = {
     },
     table: {
         icon: "/icon/ic_table.png",
-        html: `<div class="wrap-s-control-table s-control s-control-table" s-control-type="table" style="overflow:auto;"><table contenteditable="true">
+        html: `<div class="wrap-s-control-table s-control s-control-table" s-control-type="table" contenteditable="false" style="overflow:auto;">
+            <table contenteditable="true">
                 <thead>
                     <tr>
                         <th></th>
@@ -459,7 +460,7 @@ const controlTypes = {
                     <td></td>
                 </tr>
             </tbody>
-            </table></div> &nbsp;<div></div>`,
+            </table></div> &nbsp;&nbsp;`,
         title: "Table",
         notInProps: ['width', 'height', 'isPrimary', 'formatNumber', 'isSumTable', 'isRequired', 'isDBOnly', 'isTableOnly', 'isAllowUpdate', 'isDisplayCompact', 'isMultipleValue', 'isAllowPrint', 'isBorderSubmit', 'isBorderView', 'isBorderPrint'],
         formulas: ['formulas', 'hidden', 'readOnly', 'headerTable', 'filterOptions']
@@ -585,6 +586,8 @@ export const mappingOldVersionControlFormulas = {
 // input : type của control
 // output : data control  : {icon,html,title,formulas,properties}
 export const GetControlProps = function(type) {
+    console.log('kjka', type);
+
     let control = util.cloneDeep(controlTypes[type]);
 
     let allProperties = util.cloneDeep(commonProps);

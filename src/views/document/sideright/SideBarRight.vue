@@ -67,8 +67,6 @@ export default {
     },
     computed: {
         sCurrentDocument(){
-            console.log( this.$store.state.document.editor.currentSelectedControl);
-            
             return this.$store.state.document.editor.currentSelectedControl;
         },
 

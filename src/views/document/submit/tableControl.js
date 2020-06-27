@@ -1,5 +1,4 @@
 import Control from "./control";
-import './customControl.css';
 export default class TableControl extends Control {
     constructor(idField, ele, controlProps, curParentInstance) {
         super(idField, ele, controlProps, curParentInstance);

@@ -5,30 +5,37 @@ var coreApi = new Api(appConfigs.apiDomain.sdocumentManagement);
 var formulasApi = new Api(appConfigs.apiDomain.formulasService)
 export const documentApi = {
     saveDocument(data) {
-        return coreApi.post("document", data);
+        return coreApi.post("documents", data);
     },
     editDocument(data) {
-        return coreApi.put("document", data);
+        return coreApi.put("documents", data);
     },
-    deleteDocument(name) {
-        return coreApi.delete("/document/drop/" + name);
+    deleteDocument(id) {
+        return coreApi.delete("documents/" + id);
     },
+
     detailDocument(id) {
-        return coreApi.get("document/detail/" + id);
+        return coreApi.get("documents/" + id);
     },
-    getDocumentObject(id) {
-        return coreApi.get("document/objects/" + id);
+    deleteDocumentObject(objectId) {
+        return coreApi.delete("/documents/objects/" + objectId);
+    },
+    detailDocumentObject(objectId) {
+        return coreApi.get("documents/objects/" + objectId);
     },
     submitDocument(data) {
-        return coreApi.post("document/objects/submit", data);
+        return coreApi.post("documents/objects", data);
     },
     updateDocument(objId, data) {
-        return coreApi.put("document/update/objects/" + objId, data);
+        return coreApi.put("documents/objects/" + objId, data);
     },
     saveMultiFormulas(data) {
         return formulasApi.post('/formulas/batch', data);
     },
     getListDocuments(data = {}) {
         return coreApi.get("documents", data);
+    },
+    uploadFile(data) {
+        return coreApi.post("uploadFile", data);
     }
 };

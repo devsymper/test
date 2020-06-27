@@ -175,7 +175,7 @@ const routes = [{
 
     },
     {
-        path: "/document/objects/:id?",
+        path: "/documents/objects/:id?",
         name: "detailDocument",
         // component: DetailDocument,
         component: () =>
@@ -189,7 +189,7 @@ const routes = [{
             import ('../views/document/submit/Submit.vue'),
     },
     {
-        path: "/document/:name?/objects",
+        path: "/documents/:id?/objects",
         name: "listDocumentObject",
         // component: ListObject,
         component: () =>

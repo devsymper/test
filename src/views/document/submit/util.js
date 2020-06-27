@@ -237,8 +237,8 @@ export default class Util {
         return rsl.join(',');
     }
     static getFileExtension = function(filename) {
-        var ext = /^.+\.([^.]+)$/.exec(filename);
-        return ext == null ? "" : ext[1];
+        var ext = filename.match(/[0-9a-z]+$/i)
+        return ext == null ? "" : ext[0];
     }
 
     static makeErrNoti = function(msg, sign) {

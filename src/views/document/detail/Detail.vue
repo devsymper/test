@@ -2,7 +2,7 @@
     <div
         class="sym-form-submit"
         :id="'sym-submit-'+keyInstance"
-        :style="{'width':docSize, 'height':'100%'}"
+        :style="{'width':documentSize, 'height':'100%'}"
     >
         <div v-html="contentDocument"></div>
         <!-- <button v-on:click="togglePageSize"  id="toggle-doc-size">
@@ -19,21 +19,21 @@ import BasicControl from "./../submit/basicControl";
 import  TableControl from "./../submit/tableControl.js"
 import  ActionControl from "./../submit/actionControl.js"
 import  Table from "./../submit/table.js"
+import './../submit/customControl.css'
+
 export default {
     props: {
-        docId: {
+        docObjectId: {
             type: Number,
             default: 0
         },
-        docName:{
-            type: String,
-            default: ''
-        },
+
         docObjInfo: {
             type: Object,
             default(){
                 return {
                     docObjId: 0,
+                    docSize : '21cm'
                 }
             }
         }
@@ -50,12 +50,12 @@ export default {
         return {
             contentDocument: null,
             docObjId: null,
-            docSize: null,
+            documentSize: null,
             keyInstance: Date.now(),
         };
     },
     beforeMount() {
-        this.docSize = "21cm";
+        this.documentSize = "21cm";
     },
     created(){
         this.$store.commit("document/addToDocumentStore", {
@@ -63,10 +63,8 @@ export default {
             value: 'detail'
         });
         let thisCpn = this;
-        console.log('ok',this.$route.params);
-        
-        if (this.docObjId != 0 && this.docName != "") {
-            this.docObjId = this.docObjId;
+        if (this.docObjectId != 0) {
+            this.docObjId = this.docObjectId;
         } else if (this.$route.name == "detailDocument") {
             this.docObjId = this.$route.params.id;
         }
@@ -82,6 +80,7 @@ export default {
             handler(after){
                 if(after.docObjId){
                     this.docObjId = after.docObjId;
+                    this.documentSize = after.docSize;
                     this.loadDocumentObject();
                 }
             }
@@ -112,7 +111,7 @@ export default {
         loadDocumentObject() {
             let thisCpn = this;
             documentApi
-                .getDocumentObject(this.docObjId)
+                .detailDocumentObject(this.docObjId)
                 .then(res => {
                     if (res.status == 200) {
                         thisCpn.$store.commit('document/addToDocumentDetailStore',{
@@ -128,7 +127,7 @@ export default {
                 .always(() => {});
         },
         togglePageSize() {
-            this.docSize = this.docSize == "21cm" ? "100%" : "21cm";
+            this.documentSize = this.documentSize == "21cm" ? "100%" : "21cm";
         },
         processHtml(content) {
             console.log(this.sDocumentEditor);

@@ -8,7 +8,12 @@ export default class ActionControl extends Control {
         super(idField, ele, controlProps, curParentInstance);
     }
     render() {
+        if (this.type == 'approvalHistory') {
+            this.renderApprovalEle();
+        }
         this.ele.addClass('d-none');
     }
+    renderApprovalEle() {
 
+    }
 }

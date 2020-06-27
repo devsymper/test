@@ -15,8 +15,11 @@
                 <div class="sym-document-action">
                     <editor-action 
                     @document-action-save-document="openPanelSaveDocument"
+                    @document-action-clone-control="cloneControl"
                     @document-action-list-control-option="setShowAllControlOption"
                     @document-action-delete-control="deleteControl"
+                    @document-action-save-to-local-storage="saveControlToLocalStorage"
+                    @document-action-get-from-local-storage="getFromLocalStorege"
                     
                     />
                 </div>
@@ -205,6 +208,52 @@ export default {
     methods:{
         px2cm(px) {
             return (Math.round((px / 37.7952) * 100) / 100).toFixed(1);
+        },
+
+        // lấy data từ local storage
+        getFromLocalStorege(){
+            let allControl = localStorage.getItem('allControl');
+            allControl = JSON.parse(allControl);
+            let content = localStorage.getItem('content');
+            let documentProperties = localStorage.getItem('documentProperties');
+            this.$refs.editor.editor.setContent(content);
+            this.$store.commit(
+                                    "document/addToDocumentStore",{key:'documentProperties',value:documentProperties}
+                                );  
+            this.$store.commit(
+                                    "document/addToDocumentEditorStore",{key:'allControl',value:allControl}
+                                );  
+        },
+        //set data vào local storage
+        saveControlToLocalStorage(){
+            let allControl = this.editorStore.allControl;
+            let content = this.$refs.editor.editor.getContent();
+            let documentProperties = this.$store.state.document.documentProps;
+            localStorage.setItem('allControl',JSON.stringify(allControl));
+            localStorage.setItem('content',content);
+            localStorage.setItem('documentProperties',JSON.stringify(documentProperties));
+        },
+        // sao chép control và thêm vào sau nó
+        cloneControl(){
+            let currentControl = this.editorStore.currentSelectedControl;
+            let controlInstance = util.cloneDeep(this.editorStore.allControl[currentControl.id])
+            let control = $("#editor_ifr").contents().find('.on-selected');
+            if(control.length > 0){
+                control.removeClass('on-selected')
+                let id = 's-control-id-' + Date.now();
+                let newControl = control.clone().attr('id', id);
+                newControl.insertAfter(control);
+                let typeControl = control.attr('s-control-type');
+                let table = control.closest('.s-control-table');
+                if(table.length > 0){
+                    let tableId = table.attr('id');
+                    this.addToAllControlInTable(id,{properties: controlInstance.properties, formulas : controlInstance.formulas,type:typeControl},tableId);
+                }
+                else{
+                    this.addToAllControlInDoc(id,{properties: controlInstance.properties, formulas : controlInstance.formulas,type:typeControl});
+                }
+            }
+            
         },
         deleteControl(){
             let control = $("#editor_ifr").contents().find('.on-selected');
@@ -847,12 +896,13 @@ export default {
         //hoangnd: hàm set các giá trị của thuộc tính và formulas vào từng contrl trong doc lúc load dữ liệu và đưa vào state
         setDataForPropsControl(fields){
             for(let controlId in fields){
+                if(!fields[controlId].hasOwnProperty('type')){
+                    continue;
+                }
                 let control = GetControlProps(fields[controlId].type)
                 let properties = control.properties
                 let formulas = control.formulas
                 let type = fields[controlId].type
-                console.log(fields[controlId]);
-                
                 $.each(properties,function(k,v){
                     if(properties[k].type == 'checkbox'){
                         properties[k].value = (fields[controlId]['properties'][k] == 0 || fields[controlId]['properties'][k] == '0' || fields[controlId]['properties'][k] == '') ? false : true
@@ -905,7 +955,7 @@ export default {
         // sự kiện xảy ra khi khởi tạo xong editor , sự kiện do tinymce cung cấp
         initEditor(){
             let thisCpn = this;
-            if(this.documentId != 0)    // trường họp edit doc thì gọi api lấy dữ liệu
+            if(this.documentId != 0 && this.documentId != undefined)    // trường họp edit doc thì gọi api lấy dữ liệu
             thisCpn.getContentDocument();
             var currentElement, currentElementChangeFlag, elementRectangle, countdown, dragoverqueue_processtimer;
             // object xử lí các vấn đề với kéo thả control vào document
