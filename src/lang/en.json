@@ -499,5 +499,13 @@
         },
         "claim": "Claim",
         "created": "Task created"
+    },
+    "orgchart": {
+        "list": {
+            "title": "List orgchart"
+        },
+        "create": {
+            "title": " Create orgchart"
+        }
     }
 }
