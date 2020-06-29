@@ -520,6 +520,11 @@
         },
         "create": {
             "title": " Tạo sơ đồ tổ chức"
+        },
+        "editor": {
+            "main": "Chung",
+            "customAttributes": "Thuộc tính",
+            "nodeName": "Tên node"
         }
     }
 }

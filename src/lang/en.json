@@ -506,6 +506,11 @@
         },
         "create": {
             "title": " Create orgchart"
+        },
+        "editor": {
+            "main": "Main",
+            "customAttributes": "Custom fields",
+            "nodeName": "Node name"
         }
     }
 }

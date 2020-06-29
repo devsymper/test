@@ -1,9 +1,5 @@
 <template>
-    <div>
-        <h1>
-            ORGCHART  EDITOR
-        </h1>
-    </div>
+  
 </template>
 
 <script>

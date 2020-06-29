@@ -601,9 +601,6 @@ export default {
     height: 100%;
 }
 
-.v-tabs-bar {
-    height: 31px !important;
-}
 .v-tab {
     font-size: 12px !important;
     text-transform: inherit !important;
