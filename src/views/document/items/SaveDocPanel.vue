@@ -76,8 +76,7 @@ export default {
         },
         
         saveDocument(){
-            let documentProperties = JSON.stringify(this.documentProps);
-            this.$emit("save-doc-action",documentProperties);
+            this.$emit("save-doc-action");
             this.hideDialog();
         },
         setPropsOfDoc(props){

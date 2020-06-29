@@ -86,7 +86,7 @@ p {
     font-size: 11px;
 }
 
-.s-control:not(.s-control-label):not(.s-control-submit):not(.s-control-draft):not(.s-control-reset):not(.s-control-file-upload):not(.s-control-table):not(.s-control-panel) {
+.s-control:not(.s-control-approval-history):not(.s-control-label):not(.s-control-submit):not(.s-control-draft):not(.s-control-reset):not(.s-control-file-upload):not(.s-control-table):not(.s-control-panel) {
     /*width: 100% !important;*/
     padding: 0 5px !important;
     background: transparent;
@@ -176,4 +176,15 @@ input.s-control:not(.s-control-panel):not(.detail-view):hover {
 
 .wrap-s-control-table {
     display: contents;
+}
+
+.s-control-approval-history {
+    padding: 0 !important;
+    width: 100% !important;
+    border: none !important;
+}
+
+.s-control-approval-history .approved-item {
+    height: 20px;
+    line-height: 20px;
 }

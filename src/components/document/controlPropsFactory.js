@@ -136,6 +136,12 @@ const commonProps = {
         value: "",
         groupType: "display"
     },
+    isSaveToDB: {
+        title: "Lưu giá trị",
+        type: "checkbox",
+        value: "",
+        groupType: "display"
+    },
     isMultipleValue: {
         title: "Lấy nhiều giá trị như mảng",
         type: "checkbox",
@@ -419,7 +425,7 @@ const controlTypes = {
     },
     user: {
         icon: "/icon/ic_user.png",
-        html: `<input class="s-control s-control-user" contenteditable="false" title="Color" s-control-type="user" type="text">&nbsp;`,
+        html: `<input class="s-control s-control-user" contenteditable="false" title="User" s-control-type="user" type="text">&nbsp;`,
         title: "User",
         notInProps: ['formatNumber', 'isSumTable', 'isDBOnly', 'isTableOnly', 'isAllowUpdate', 'isDisplayCompact', 'isMultipleValue'],
         formulas: ['hidden', 'readOnly']
@@ -586,8 +592,6 @@ export const mappingOldVersionControlFormulas = {
 // input : type của control
 // output : data control  : {icon,html,title,formulas,properties}
 export const GetControlProps = function(type) {
-    console.log('kjka', type);
-
     let control = util.cloneDeep(controlTypes[type]);
 
     let allProperties = util.cloneDeep(commonProps);
