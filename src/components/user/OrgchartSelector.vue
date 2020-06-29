@@ -82,7 +82,7 @@
 <script>
 import VueResizable from 'vue-resizable';
 import { permissionPositionOrgchartApi } from "./../../api/PermissionPositionOrgchart.js";
-import { orgChartApi } from "./../../api/OrgChart.js";
+import { orgchartApi } from "./../../api/orgchart.js";
 import { userApi } from "./../../api/user.js";
 import { util } from '../../plugins/util';
 

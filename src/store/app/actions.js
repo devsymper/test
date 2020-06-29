@@ -1,5 +1,5 @@
 import { SYMPER_APP } from "./../../main.js";
-import { orgChartApi } from "./../../api/OrgChart";
+import { orgchartApi } from "./../../api/orgchart";
 import { userApi } from "../../api/user.js";
 
 const handleUrlChanges = (context, data) => {
@@ -67,7 +67,7 @@ function makeNodesMap(orgchartNodes) {
  */
 const getAllOrgChartData = (context) => {
     if ($.isEmptyObject(context.state.orgchartNodes)) {
-        orgChartApi.getAllNodes()
+        orgchartApi.getAllNodes()
             .then(res => {
                 if (res.status == 200) {
                     let orgchartNodes = makeNodesMap(res.data);

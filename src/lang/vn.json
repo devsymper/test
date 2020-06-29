@@ -513,5 +513,18 @@
         },
         "claim": "Claim",
         "created": "Đã tạo mới task"
+    },
+    "orgchart": {
+        "list": {
+            "title": "Danh sách sơ đồ tổ chức"
+        },
+        "create": {
+            "title": " Tạo sơ đồ tổ chức"
+        },
+        "editor": {
+            "main": "Chung",
+            "customAttributes": "Thuộc tính",
+            "nodeName": "Tên node"
+        }
     }
 }

@@ -366,7 +366,7 @@ import ChangePassword from "./../../views/users/ChangePass.vue";
 import { userApi } from "./../../api/user.js";
 import { permissionPackageApi } from "./../../api/PermissionPackage.js";
 import { permissionPositionOrgchartApi } from "./../../api/PermissionPositionOrgchart.js";
-import { orgChartApi } from "./../../api/OrgChart.js";
+import { orgchartApi } from "./../../api/orgchart.js";
 import { str } from "./../../plugins/utilModules/str.js";
 import avatarDefault from "./../../assets/image/avatar_default.jpg";
 import VueResizable from 'vue-resizable'
@@ -695,7 +695,7 @@ export default {
 		 */
 		getAllOrgChart(){
 			if(this.permissionPosittionOrgChart.listNode.length == 0){
-				orgChartApi.getAllNodes().then(res => {
+				orgchartApi.getAllNodes().then(res => {
 					if (res.status == 200) {
 						let treeData = res.data;
 						this.permissionPosittionOrgChart.listNode = treeData

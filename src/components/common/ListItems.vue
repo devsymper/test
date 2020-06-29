@@ -258,7 +258,7 @@ export default {
             savingConfigs: false, // có đang lưu cấu hình của showlist hay không
             // các cấu hình cho việc hiển thị và giá trị của panel cấu hình hiển thị của bảng
             tableDisplayConfig: {
-                show: true, // có hiển thị panel cấu hình ko
+                show: false, // có hiển thị panel cấu hình ko
                 width: 300, // Chiều rộng của panel cấu hình,
                 wrapTextMode: 0,
                 densityMode: 2,
