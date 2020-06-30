@@ -131,8 +131,10 @@ export default {
         },
         setupGraph(graph, paper, paperScroller){
             let self = this;
+            let nodeName = this.$t('orgchart.editor.department')+' 1';
+            let firstNode = createDepartmentNode(nodeName);
             var members = [
-                createDepartmentNode('Phòng ban 1')
+                firstNode
             ];
 
             var connections = [];
@@ -152,6 +154,11 @@ export default {
                 previewAttrs: {
                     parent: { rx: 10, ry: 10 }
                 }
+            });
+            
+            self.$emit('new-viz-cell-added', {
+                id: firstNode.id,
+                name: nodeName
             });
         },
 		exampleSetupGraph(graph) {

@@ -510,7 +510,8 @@
         "editor": {
             "main": "Main",
             "customAttributes": "Custom fields",
-            "nodeName": "Node name"
+            "nodeName": "Node name",
+            "department": "Department"
         }
     }
 }
