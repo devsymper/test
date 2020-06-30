@@ -511,7 +511,9 @@
             "main": "Main",
             "customAttributes": "Custom fields",
             "nodeName": "Node name",
-            "department": "Department"
+            "department": "Department",
+            "listDynamicAttributes": "Dynamic attributes",
+            "generalAttributes": "General attributes"
         }
     }
 }

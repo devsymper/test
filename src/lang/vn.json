@@ -525,7 +525,9 @@
             "main": "Chung",
             "customAttributes": "Thuộc tính",
             "nodeName": "Tên node",
-            "department": "Phòng ban"
+            "department": "Phòng ban",
+            "listDynamicAttributes": "Thuộc tính động",
+            "generalAttributes": "Thuộc tính chung"
         }
     }
 }

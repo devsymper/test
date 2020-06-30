@@ -113,12 +113,17 @@ Vue.prototype.$snotifyWarning = function(err, title = 'WARNING', detail = '') {
         text: detail
     });
 }
-Vue.prototype.$snotifySuccess = function(title = 'SUCCESS', detail = '') {
-    this.$snotify({
+Vue.prototype.$snotifySuccess = function(title = 'SUCCESS', detail = '', duration = false) {
+    let setting = {
         type: 'success',
         title: title,
         text: detail
-    });
+    };
+
+    if (duration) {
+        setting.duration = duration;
+    }
+    this.$snotify(setting);
 }
 
 
