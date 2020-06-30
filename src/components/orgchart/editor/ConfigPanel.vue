@@ -13,16 +13,13 @@
         </v-tabs>
 
         <v-tabs-items v-model="currentTab">
-            <v-tab-item :key="'main'">
+            <v-tab-item :key="'main'" class="px-2 pt-2">
                 <form-tpl
+                    :singleLine="true"
+                    :labelWidth="'60px'"
                     @input-value-changed="handleAttrValueChanged"
                     :allInputs="selectingNode.commonAttrs"
                 ></form-tpl>
-
-
-                <div>
-
-                </div>
             </v-tab-item>
 
             <v-tab-item :key="'customAttributes'">
@@ -61,7 +58,9 @@ export default {
 
         },
         handleAttrValueChanged(name, inputInfo, data){
-
+            this.$emit('config-value-change', {
+                name, inputInfo, data
+            });
         }
     }
 }

@@ -21,10 +21,11 @@ export const getAllNodeAttrs = function() {
     }
 }
 
-export const getDefaultConfigNodeData = function() {
+export const getDefaultConfigNodeData = function(nodeId) {
     return {
         commonAttrs: getAllNodeAttrs(),
-        customAttributes: []
+        customAttributes: [],
+        id: nodeId
     };
 }
 
