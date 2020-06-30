@@ -101,7 +101,7 @@ import Util from './util';
 import './customControl.css';
 
 import { checkCanBeBind, resetImpactedFieldsList, markBinedField } from './handlerCheckRunFormulas';
-import {checkDbOnly,getControlInstanceFromStore} from './../common/common'
+import {checkDbOnly,getControlInstanceFromStore,getControlTitleFromName} from './../common/common'
 let impactedFieldsList = {};
 let impactedFieldsArr = {};
 var impactedFieldsListWhenStart = {};
@@ -364,14 +364,14 @@ export default {
             if(type == 'select'){
                 let dataInput = this.getDataInputFormulas(e.selectFormulasInstance);  
                 let dataAutocomplete = e.selectFormulasInstance.handleRunAutoCompleteFormulas('',dataInput).then(res=>{
-                    thisCpn.setDataForControlAutocomplete(res,aliasControl)
+                    thisCpn.setDataForControlAutocomplete(res,aliasControl,e.controlTitle)
                 });
             }
             else{
                 let aliasControl = e.autocompleteFormulasInstance.autocompleteDetectAliasControl();
                 let dataInput = this.getDataInputFormulas(e.autocompleteFormulasInstance);  
                 let dataAutocomplete = e.autocompleteFormulasInstance.handleRunAutoCompleteFormulas($(e.e.target).val(),dataInput).then(res=>{
-                    thisCpn.setDataForControlAutocomplete(res,aliasControl)
+                    thisCpn.setDataForControlAutocomplete(res,aliasControl,e.controlTitle)
                 });
             }
             
@@ -379,10 +379,12 @@ export default {
         /**
          * Hàm bind dữ liệu cho box autocomplete, cho component autocompleteInput
          */
-        setDataForControlAutocomplete(res,aliasControl){
+        setDataForControlAutocomplete(res,aliasControl,controlTitle){
+            let controlAs = {};
+            controlAs[aliasControl] = controlTitle;
             if(res.data != undefined){
                     if(res.status == 200 && res.data != false){
-                        let dataTable = this.handleDataAutoComplete(res.data.data,false);
+                        let dataTable = this.handleDataAutoComplete(res.data.data,false,controlAs);
                         this.$refs.autocompleteInput.setAliasControl(aliasControl);
                         this.$refs.autocompleteInput.setData(dataTable);
                     }
@@ -392,7 +394,7 @@ export default {
                 }
                 else{
                     let data =  res[0];
-                    let dataTable = this.handleDataAutoComplete(data,true);
+                    let dataTable = this.handleDataAutoComplete(data,true,controlAs);
                     this.$refs.autocompleteInput.setAliasControl(aliasControl);
                     this.$refs.autocompleteInput.setData(dataTable);
                 }
@@ -454,12 +456,19 @@ export default {
          * Hàm  xử lí data sau khi query công thức autocomplete,
          * xử lí data về dạng object cho DataTable của vuetify
          */
-        handleDataAutoComplete(data, isFromSQLLite){
+        handleDataAutoComplete(data, isFromSQLLite,controlAs){
             let headers = [];
             let bodyTable = [];
             if(isFromSQLLite){
                 for(let i = 0; i < data.columns.length; i++){
-                    headers.push({value:data.columns[i], text:data.columns[i]});
+                    let item = {value:data.columns[i], text:data.columns[i]};
+                    if(controlAs.hasOwnProperty(data.columns[i])){
+                        item.text = controlAs[data.columns[i]]
+                    }
+                    if(data.columns[i] == 'column1'){
+                        item.text = controlAs[Object.keys(controlAs)[0]]
+                    }
+                    headers.push(item);
                 }
                 let values = data.values;
                 for(let i = 0; i < values.length; i++){
@@ -472,7 +481,11 @@ export default {
             }
             else{
                 for(let controlName in data[0]){
-                    headers.push({value:controlName,text : controlName});
+                    let item = {value:controlName,text:controlName};
+                    if(controlAs.hasOwnProperty(controlName)){
+                        item.text = controlAs[controlName]
+                    }
+                    headers.push(item);
                 }
                 data[0]['active'] = true;
                 bodyTable = data;

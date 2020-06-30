@@ -300,7 +300,7 @@ export default class BasicControl extends Control {
             });
             $(this).addClass('autocompleting');
             let formulasInstance = thisCpn.controlFormulas.formulas.instance;
-            SYMPER_APP.$evtBus.$emit('document-submit-select-input', { e: e, selectFormulasInstance: formulasInstance, alias: thisCpn.name })
+            SYMPER_APP.$evtBus.$emit('document-submit-select-input', { e: e, selectFormulasInstance: formulasInstance, alias: thisCpn.name, controlTitle: thisCpn.title })
         })
         this.ele.on('change', function(e) {
             SYMPER_APP.$evtBus.$emit('document-submit-input-change', { controlName: thisCpn.controlProperties.name.value, val: $(e.target).val() })
@@ -358,7 +358,7 @@ export default class BasicControl extends Control {
         })
         this.ele.on('keyup', function(e) {
             let formulasInstance = (fromSelect) ? thisCpn.controlFormulas.formulas.instance : thisCpn.controlFormulas.autocomplete.instance;
-            SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-key-event', { e: e, autocompleteFormulasInstance: formulasInstance, isSelect: false })
+            SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-key-event', { e: e, autocompleteFormulasInstance: formulasInstance, isSelect: false, controlTitle: thisCpn.title })
         })
     }
     inputCacheSet(value, rowId = null, rawUserFormula = '') {
