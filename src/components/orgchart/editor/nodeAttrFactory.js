@@ -1,3 +1,4 @@
+export const SYMPER_HOME_ORGCHART = 'SYMPER_HOME_ORGCHART';
 export const getAllNodeAttrs = function() {
     return {
         name: {
@@ -42,6 +43,7 @@ export const getDynamicAttr = function() {
 export const getOrgchartEditorData = function() {
     return {
         allNode: {},
-        selectingNode: {}
+        selectingNode: {},
+        homeConfig: getDefaultConfigNodeData(SYMPER_HOME_ORGCHART)
     }
 }

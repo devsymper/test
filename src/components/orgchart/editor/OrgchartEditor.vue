@@ -17,12 +17,26 @@
                     </template>
                     <span>{{$t(item.text) }}</span>
                 </v-tooltip>
+
+                <v-btn
+                    v-if="$route.name != 'viewOrgchart'"
+                    class="float-right mr-1"
+                    @click="saveOrgchart"
+                    small
+                    depressed
+                    color="primary"
+                >
+                    <v-icon class="mr-2" primary>mdi-content-save</v-icon>
+                    {{$t('common.save')}}
+                </v-btn>
             </div>
             <EditorWorkspace 
                 class="w-100" 
                 style="height: calc(100% - 41px)"
                 @new-viz-cell-added="handleNewNodeAdded"
+                @blank-paper-clicked="handleBlankPaperClicked"
                 @cell-clicked="selectNode"
+                :instanceKey="instanceKey"
                 ref="editorWorkspace"></EditorWorkspace>
         </div>
 
@@ -41,7 +55,7 @@ import ConfigPanel from './ConfigPanel.vue';
 import EditorWorkspace from './EditorWorkspace.vue';
 import NodeSelector from './NodeSelector.vue';
 import VueResizable from 'vue-resizable';
-import { getOrgchartEditorData, getDefaultConfigNodeData } from './nodeAttrFactory';
+import { getOrgchartEditorData, getDefaultConfigNodeData, SYMPER_HOME_ORGCHART } from './nodeAttrFactory';
 import jointjs from "jointjs";
 
 console.log(jointjs, 'jointjsjointjs');
@@ -95,7 +109,11 @@ export default {
                 validate: {
                     icon: "mdi-check-bold",
                     text: "process.header_bar.validate"
-                }
+                },
+                home: {
+                    icon: "mdi-home-outline",
+                    text: ""
+                },
             },
             instanceKey:null
         }
@@ -107,9 +125,15 @@ export default {
         }
     },
     methods: {
+        saveOrgchart(){
+
+        },
+        handleBlankPaperClicked(){
+            this.showOrgchartConfig();
+        },
         handleConfigValueChange(data){
-            if(data.name == 'name'){
-                let cellId = this.selectingNode.id;
+            let cellId = this.selectingNode.id;
+            if(data.name == 'name' && cellId != SYMPER_HOME_ORGCHART){
                 this.$refs.editorWorkspace.updateCellAttrs(cellId, 'name', data.data);
             }
         },
@@ -118,6 +142,15 @@ export default {
             this.selectNode(nodeData.id);
         },
         handleHeaderAction(action){
+            if(action == 'home'){
+                this.showOrgchartConfig()
+            }
+        },
+        showOrgchartConfig(){
+            this.$store.commit('orgchart/changeSelectingNode', {
+                    instanceKey: this.instanceKey,
+                    nodeId: SYMPER_HOME_ORGCHART,
+                });
         },
         initOrgchartData(){
             let initData = getOrgchartEditorData();
@@ -149,10 +182,12 @@ export default {
          * Chọn một node và hiển thị lên cấu hình ở bên tay phải
          */
         selectNode(nodeId){
+            this.$refs.editorWorkspace.unHighlightCurrentNode();
             this.$store.commit('orgchart/changeSelectingNode', {
                 instanceKey: this.instanceKey,
                 nodeId: nodeId,
             });
+            this.$refs.editorWorkspace.highlightNode();            
         }
     }
 }

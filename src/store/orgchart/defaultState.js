@@ -13,6 +13,9 @@ const defaultState = {
          *      id: '',
          *      name: '',
          *      ...
+         * },
+         * 
+         * homeConfig: {
          * }
          */
     }

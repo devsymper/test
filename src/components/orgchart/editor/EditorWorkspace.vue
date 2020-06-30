@@ -9,7 +9,8 @@
 
 <script>
 import JointPaper from "@/components/common/rappid/JointPaper";
-import { createDepartmentNode, defineDepartment } from "./../nodeDefinition/departmentDefinition";
+import { createDepartmentNode, defineDepartment, DEFAULT_DEPARTMENT_DISPLAY, FOUCUS_DEPARTMENT_DISPLAY } from "./../nodeDefinition/departmentDefinition";
+import { SYMPER_HOME_ORGCHART } from './nodeAttrFactory';
 require('@/plugins/rappid/rappid.css');
 
 // A helper to create an arrow connection
@@ -29,11 +30,21 @@ export default {
     components: {
         JointPaper
     },
+    props: {
+        instanceKey: {
+            default: ''
+        }
+    },
     created(){
         defineDepartment();
     },
     mounted(){
         this.initDiagramView();
+    },
+    computed: {
+        selectingNode(){
+            return this.$store.state.orgchart.editor[this.instanceKey].selectingNode;
+        }
     },
     data(){
         return {
@@ -49,29 +60,26 @@ export default {
 	methods: {
         updateCellAttrs(cellId, attrName, value){
             let mapName = {
-                name: '.name/text'
+                name: '.name/text',
+                border: '.card'
             };
 
             if(mapName[attrName]){
-                this.$refs.jointPaper.graph.getCell(cellId).attr(mapName[attrName], value);
+                if(typeof value == 'object'){
+                    for(let key in value){
+                        this.$refs.jointPaper.graph.getCell(cellId).attr(mapName[attrName]+'/'+key, value[key]);
+                    }
+                }else{
+                    this.$refs.jointPaper.graph.getCell(cellId).attr(mapName[attrName], value);
+                }
             }
         },
-        setupGraph(graph, paper, paperScroller){
+        listenPaperEvent(){
+            let paper = this.$refs.jointPaper.paper;
+            let graph = this.$refs.jointPaper.graph;
+            let treeLayout = this.$refs.jointPaper.treeLayout;
             let self = this;
-            var members = [
-                createDepartmentNode('Phòng ban 1')
-            ];
-
-            var connections = [];
-            var treeLayout = new joint.layout.TreeLayout({
-                graph: graph,
-                direction: 'B'
-            });
-
-                    
-            graph.resetCells(members.concat(connections));
-            treeLayout.layout();
-
+            
             paper.on('element:add', function(elementView, evt) {
                 evt.stopPropagation();
                 let countDepartment = graph.getCells().filter((el) => {
@@ -91,25 +99,53 @@ export default {
 
             paper.on('element:delete', function(elementView, evt, x, y) {
                 evt.stopPropagation();
-                // A member removal
                 elementView.model.remove();
                 treeLayout.layout();
             });
 
-
             paper.on('cell:pointerclick', function(elementView, evt, x, y) {
                 evt.stopPropagation();
-                console.log(elementView, evt, x, y);
+                self.unHighlightCurrentNode();
                 self.$emit('cell-clicked', elementView.model.id);
+                self.highlightNode(elementView.model);               
             });
 
-            // directionPicker.on('option:select', function(option) {
-            //     treeLayout.set('direction', option.value);
-            //     treeLayout.layout();
-            //     paperScroller.centerContent();
-            // });
-            // directionPicker.render().$el.appendTo('#orgchart-direction');
+            paper.on('blank:pointerclick', function(elementView, evt, x, y) {
+                self.unHighlightCurrentNode();    
+                self.$emit('blank-paper-clicked');      
+            });
+        },
+        unHighlightCurrentNode(){
+            if(this.selectingNode && this.selectingNode.id && this.selectingNode.id != SYMPER_HOME_ORGCHART){
+                this.updateCellAttrs(this.selectingNode.id,'border' , DEFAULT_DEPARTMENT_DISPLAY);
+            }
+        },
+        highlightNode(nodeModel = null){
+            if(nodeModel == null){
+                if(this.selectingNode && this.selectingNode.id && this.selectingNode.id != SYMPER_HOME_ORGCHART){
+                    this.updateCellAttrs(this.selectingNode.id,'border', FOUCUS_DEPARTMENT_DISPLAY);
+                }
+            }else{
+                this.updateCellAttrs(nodeModel.id,'border', FOUCUS_DEPARTMENT_DISPLAY);
+            }
+        },
+        setupGraph(graph, paper, paperScroller){
+            let self = this;
+            var members = [
+                createDepartmentNode('Phòng ban 1')
+            ];
 
+            var connections = [];
+            var treeLayout = new joint.layout.TreeLayout({
+                graph: graph,
+                direction: 'B'
+            });
+            this.$refs.jointPaper.treeLayout = treeLayout;
+
+                    
+            graph.resetCells(members.concat(connections));
+            treeLayout.layout();
+            this.listenPaperEvent();
             new joint.ui.TreeLayoutView({
                 paper: paper,
                 model: treeLayout,

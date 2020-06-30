@@ -77,7 +77,6 @@ export default {
             paper: this.paper,
             autoResizePaper: true
         });
-
         
         paperScroller.$el.css({ width: '100%', height: '100%' }).appendTo(this.$refs.jointWrapper);
         paperScroller.zoom(-0.2);

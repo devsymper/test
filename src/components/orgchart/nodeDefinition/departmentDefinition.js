@@ -2,6 +2,10 @@ let shapeSize = {
     width: 200,
     height: 50
 };
+
+export const DEFAULT_DEPARTMENT_DISPLAY = { fill: 'white', 'stroke-width': 1, 'rx': 4, 'ry': 4, stroke: '#585858' };
+export const FOUCUS_DEPARTMENT_DISPLAY = { 'stroke-width': 2, 'rx': 4, 'ry': 4, stroke: '#f58634' };
+
 export const defineDepartment = function() {
     joint.setTheme('modern');
     joint.shapes.org.Member.prototype.markup = [
@@ -25,7 +29,7 @@ export const createDepartmentNode = function(name, textColor) {
     var element = new joint.shapes.org.Member({
         size: { width: shapeSize.width, height: shapeSize.height },
         attrs: {
-            '.card': { fill: 'white', 'stroke-width': 1, 'rx': 4, 'ry': 4, stroke: '#585858' },
+            '.card': DEFAULT_DEPARTMENT_DISPLAY,
             // image: { 'xlink:href': image, 'ref-y': 10, opacity: 0.7 },
             // '.rank': { fill: textColor, text: '', 'font-size': 13, 'text-decoration': 'none', 'ref-x': 0.95, 'ref-y': 0.5, 'y-alignment': 'middle', 'word-spacing': '-1px', 'letter-spacing': 0 },
             // '.btn.edit>text': { fill: textColor, 'font-size': 15, 'font-weight': 500, stroke: '#000', x: 5, y: 15, 'font-family': 'Sans Serif' }
