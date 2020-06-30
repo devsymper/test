@@ -35,8 +35,16 @@ const getControlInstanceFromStore = function(controlName) {
         return false
     }
 }
+const getControlTitleFromName = function(controlName) {
+    if (sDocument.state.submit.listInputInDocument.hasOwnProperty(controlName)) {
+        return sDocument.state.submit.listInputInDocument[controlName].title;
+    } else {
+        return false
+    }
+}
 export {
     // handlerRunOtherFormulasControl
     getControlInstanceFromStore,
-    checkDbOnly
+    checkDbOnly,
+    getControlTitleFromName
 }
