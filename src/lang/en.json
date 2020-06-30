@@ -513,7 +513,8 @@
             "nodeName": "Node name",
             "department": "Department",
             "listDynamicAttributes": "Dynamic attributes",
-            "generalAttributes": "General attributes"
+            "generalAttributes": "General attributes",
+            "position": "Position"
         }
     }
 }

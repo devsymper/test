@@ -527,7 +527,8 @@
             "nodeName": "Tên node",
             "department": "Phòng ban",
             "listDynamicAttributes": "Thuộc tính động",
-            "generalAttributes": "Thuộc tính chung"
+            "generalAttributes": "Thuộc tính chung",
+            "position": "Vị trí"
         }
     }
 }

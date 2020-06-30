@@ -1,3 +1,6 @@
+import { DEPARTMENT_NODE_DATA } from "../nodeDefinition/departmentDefinition";
+import { POSITION_NODE_DATA } from "../nodeDefinition/positionDefinition";
+
 export const SYMPER_HOME_ORGCHART = 'SYMPER_HOME_ORGCHART';
 export const getAllNodeAttrs = function() {
     return {
@@ -22,12 +25,20 @@ export const getAllNodeAttrs = function() {
     }
 }
 
-export const getDefaultConfigNodeData = function(nodeId) {
-    return {
+export const getDefaultConfigNodeData = function(nodeId, isDepartment = false) {
+    let config = {
         commonAttrs: getAllNodeAttrs(),
         customAttributes: [],
-        id: nodeId
+        id: nodeId,
     };
+
+    if (isDepartment) {
+        config.positionDiagramCells = {
+            instanceKey: Date.now(),
+            cells: false,
+        }
+    }
+    return config;
 }
 
 export const getDynamicAttr = function() {
@@ -43,7 +54,14 @@ export const getDynamicAttr = function() {
 export const getOrgchartEditorData = function() {
     return {
         allNode: {},
-        selectingNode: {},
+        selectingNode: {
+            positionDiagramCells: {
+                cells: {
+                    cells: []
+                },
+                instanceKey: ''
+            }
+        },
         homeConfig: getDefaultConfigNodeData(SYMPER_HOME_ORGCHART)
     }
 }
