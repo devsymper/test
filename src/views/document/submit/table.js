@@ -624,7 +624,7 @@ export default class Table {
                             hotTb.setDataAtCell(this.countRows() - 1, colIndex, sumValue, AUTO_SET);
                         }
                         for (let index = 0; index < hotTb.getDataAtRow(0).length; index++) {
-                            // hotTb.setCellMeta(hotTb.countRows() - 1, index, 'readOnly', true);
+                            hotTb.setCellMeta(hotTb.countRows() - 1, index, 'readOnly', true);
                         }
                         hotTb.render();
                     }, 500, this);
