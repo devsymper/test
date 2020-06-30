@@ -37,6 +37,8 @@ export const getDefaultConfigNodeData = function(nodeId, isDepartment = false) {
             instanceKey: Date.now(),
             cells: false,
         }
+    } else {
+        config.users = []
     }
     return config;
 }

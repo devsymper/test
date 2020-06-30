@@ -23,6 +23,19 @@
                     @input-value-changed="handleAttrValueChanged"
                     :allInputs="selectingNode.commonAttrs"
                 ></form-tpl>
+                <div v-if="context == 'position'">
+                    <span class="fs-12">User in position</span>
+                    <UserSelector
+                        ref="userSelector"
+                        :isMulti="true"
+                        :compactChip="true"
+                        :color="'grey lighten-3'"
+                        :textColor="''"
+                        :flat="true"
+                        v-model="selectingNode.users">
+                        
+                    </UserSelector>
+                </div>
             </v-tab-item>
 
             <v-tab-item :key="'customAttributes'">
@@ -101,9 +114,12 @@
 <script>
 import { getDefaultNodeData } from "./nodeAttrFactory";
 import FormTpl from "@/components/common/FormTpl";
+import UserSelector from "@/views/tasks/userSelector.vue";
+
 export default {
     components: {
-        'form-tpl': FormTpl
+        'form-tpl': FormTpl,
+        UserSelector
     },
     computed: {
         selectingNode() {
@@ -113,6 +129,9 @@ export default {
     props: {
         instanceKey: {
             default: ''
+        },
+        context: {
+            default: 'department'
         }
     },
     watch: {

@@ -19,7 +19,7 @@
                 </v-tooltip>
 
                 <v-btn
-                    v-if="$route.name != 'viewOrgchart'"
+                    v-if="$route.name != 'viewOrgchart' && context == 'department'"
                     class="float-right mr-1"
                     @click="saveOrgchart"
                     small
@@ -47,7 +47,8 @@
         }" class="h-100 border-left-1">
             <ConfigPanel 
             @config-value-change="handleConfigValueChange"
-            :instanceKey="instanceKey">
+            :instanceKey="instanceKey"
+            :context="context">
             </ConfigPanel>
         </div>
 

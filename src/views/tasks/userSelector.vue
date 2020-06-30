@@ -9,11 +9,9 @@
         chips
         item-text="displayName"
         item-value="id"
-        background-color="grey lighten-3"
-        :height="30"
+        background-color="#fbfbfb"
         :placeholder="$t('common.search')"
         class="sym-small-size sym-pad-0 "
-        :class="{'bg-grey': true}"
         :multiple="isMulti"
     >
         <template v-slot:selection="data">
@@ -23,13 +21,13 @@
                 :input-value="data.selected"
                 :close="!compactChip"
                 small
-                :class="textColor"
+                :class="textColor+ ' mt-1'"
                 @click:close="remove(data.item)"
             > 
                 <v-avatar left v-if="compactChip">
                     <v-img :src="data.item.avatar ? data.item.avatar : 'https://cdn.vuetifyjs.com/images/lists/4.jpg'"></v-img>
                 </v-avatar>
-                {{ data.item.displayName }}
+                <span class="fs-12">{{ data.item.displayName }}</span>
             </v-chip>
         </template>
         <template v-slot:item="data">
@@ -86,6 +84,13 @@ export default {
             }
             this.$emit("change", userToInput);
             this.$emit("input", userToInput);
+        },
+        value: {
+            deep: true,
+            immediate: true,
+            handler(after){
+                this.selected = after;
+            }
         }
     },
     mounted() {
