@@ -28,7 +28,7 @@ export const userApi = {
         return api.put('users', data);
     },
     getDetailUser(id) {
-        return api.get("users/detail/" + id);
+        return api.get("users/" + id);
     },
     getListUserPackage(id) {
         return api.get('users/permission/package/' + id);

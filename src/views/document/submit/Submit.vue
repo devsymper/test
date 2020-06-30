@@ -849,7 +849,10 @@ export default {
                     let value = this.getDataTableInput(listInput[controlName]);
                     Object.assign(dataPost, value);
                 } else {
-                    if (listInput[controlName].type != "submit") {
+                    if (listInput[controlName].type != "submit" && 
+                    listInput[controlName].type != "reset" && 
+                    listInput[controlName].type != "draft" &&
+                    listInput[controlName].type != "approvalHistory") {
                         let value = (listInput[controlName].type == 'number' && listInput[controlName].value == "" ) ? 0 : listInput[controlName].value;
                         dataPost[id] = [value];
                         if(listInput[controlName].type == 'checkbox'){

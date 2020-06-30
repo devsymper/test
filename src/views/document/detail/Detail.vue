@@ -144,9 +144,21 @@ export default {
                     let idField = this.sDocumentEditor.allControl[id].id;
                     let valueInput = this.sDocumentEditor.allControl[id].value
                     
-                    if(controlType == "submit" || controlType == "reset"){
+                    if(controlType == "submit" || controlType == "reset" || controlType == "draft"){
                         $(allInputControl[index]).remove()
-                    } else {
+                    }
+                    else if(controlType == "approvalHistory"){
+                        let control = new ActionControl(
+                                idField,
+                                $(allInputControl[index]),
+                                this.sDocumentEditor.allControl[id],
+                                thisCpn.keyInstance,
+                                this.docObjId
+                            );
+                            control.init();
+                            control.render();
+                    }
+                    else {
                         let controlName = this.sDocumentEditor.allControl[id].properties.name.value;
                         if (controlType != "table") {
                             let control = new BasicControl(
