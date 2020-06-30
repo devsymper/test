@@ -52,8 +52,16 @@ let listKeyCodeNotChange = [18, 17, 9, 20, 16, 192]
 let listTableInstance = {}
 let columnHasSum = {}
 let listInputInDocument = sDocument.state.submit.listInputInDocument;
-let isDetailView = sDocument.state.isDetailView;
 const MAX_TABLE_HEIGHT = 300;
+
+const makeDelay = function(ms) {
+    var timer = 0;
+    return function(callback) {
+        clearTimeout(timer);
+        timer = setTimeout(callback, ms);
+    };
+};
+var delay = makeDelay(1000);
 /**
  * Các loại cell mà handsontable hỗ trợ hiển thị
  */
@@ -162,15 +170,21 @@ export default class Table {
                             event.keyCode == 37 || event.keyCode == 39) && thisObj.isAutoCompleting != false) {
                         event.stopImmediatePropagation();
                     }
+                    let colHeaders = this.getColHeader();
                     // hoangnd: cần set timeout ở đây tại vì cần thực hiện đoạn này sau khi keydown hoàn tất thì input mới có dữ liệu
+
                     setTimeout(() => {
                         if (thisObj.isAutoCompleting != false) {
+                            let column = thisObj.currentSelectedCell['column'];
+
+                            // let controlName = 
                             let formulasInstance = thisObj.isAutoCompleting
                             if (formulasInstance != false) {
                                 SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-key-event', {
                                     e: event,
                                     autocompleteFormulasInstance: formulasInstance,
-                                    isSelect: false
+                                    isSelect: false,
+                                    controlTitle: colHeaders[column]
                                 })
                             }
                         }
@@ -233,11 +247,18 @@ export default class Table {
                             thisObj.handlerRunFormulasForControlInTable('uniqueDB', controlUnique, dataInput, controlUnique.controlFormulas.uniqueDB);
                         }
                     }
-                    console.log(event);
 
-                    if (event != undefined && event.type == 'keydown' && event.keyCode == 13 && source == 'edit' &&
-                        thisObj.currentSelectedCell.row + 2 == this.getData().length) {
-                        this.alter('insert_row', thisObj.currentSelectedCell.row + 1, 1);
+                    if (event != undefined && event.type == 'keydown' && event.keyCode == 13 && source == 'edit') {
+                        if (thisObj.tableHasRowSum) {
+                            if (thisObj.currentSelectedCell.row + 2 == this.getData().length) {
+                                this.alter('insert_row', thisObj.currentSelectedCell.row + 1, 1);
+                            }
+                        } else {
+                            if (thisObj.currentSelectedCell.row + 1 == this.getData().length) {
+                                this.alter('insert_row', thisObj.currentSelectedCell.row + 1, 1);
+                            }
+                        }
+
                     }
                 }
             }
@@ -593,16 +614,17 @@ export default class Table {
                 }
 
 
-                if (!this.reRendered) {
+                if (!this.reRendered && thisObj.tableHasRowSum) {
                     this.reRendered = true;
                     setTimeout((hotTb) => {
                         for (let controlName in columnHasSum) {
+                            let colIndex = thisObj.getColumnIndexFromControlName(controlName);
                             let CharAt = String.fromCharCode(65 + columnHasSum[controlName]);
                             let sumValue = '=SUM(' + CharAt + '1:' + CharAt + '' + (hotTb.countRows() - 1) + ')'
-                            hotTb.setDataAtRowProp(hotTb.countRows() - 1, controlName, sumValue, AUTO_SET);
+                            hotTb.setDataAtCell(this.countRows() - 1, colIndex, sumValue, AUTO_SET);
                         }
                         for (let index = 0; index < hotTb.getDataAtRow(0).length; index++) {
-                            hotTb.setCellMeta(hotTb.countRows() - 1, index, 'readOnly', true);
+                            // hotTb.setCellMeta(hotTb.countRows() - 1, index, 'readOnly', true);
                         }
                         hotTb.render();
                     }, 500, this);
@@ -612,14 +634,18 @@ export default class Table {
             },
             beforeCreateRow: function(i, amount) {},
             afterCreateRow: function(i, amount) {
-                for (let controlName in columnHasSum) {
-                    let CharAt = String.fromCharCode(65 + columnHasSum[controlName]);
-                    let sumValue = '=SUM(' + CharAt + '1:' + CharAt + '' + (this.countRows() - 1) + ')'
-                    this.setDataAtRowProp(this.countRows() - 1, controlName, sumValue, AUTO_SET);
-                }
+                let hotTb = this;
+                delay(function(e) {
+                    if (thisObj.tableHasRowSum) {
+                        for (let controlName in columnHasSum) {
+                            let colIndex = thisObj.getColumnIndexFromControlName(controlName);
+                            let CharAt = String.fromCharCode(65 + columnHasSum[controlName]);
+                            let sumValue = '=SUM(' + CharAt + '1:' + CharAt + '' + (hotTb.countRows() - 1) + ')'
+                            hotTb.setDataAtCell(hotTb.countRows() - 1, colIndex, sumValue, AUTO_SET);
+                        }
+                    }
+                });
             }
-
-
         });
         this.tableInstance.keyInstance = this.keyInstance;
         if (!this.checkDetailView()) {
@@ -628,6 +654,7 @@ export default class Table {
             }
         }
     }
+
     setDefaulFotterRowData(value, rowIndex, prop) {
         this.setDataAtRowProp(rowIndex, prop, value, AUTO_SET);
     }
@@ -731,13 +758,13 @@ export default class Table {
                 let ele = $(td);
 
                 if (map.vld === true) {
-                    ele.append(Util.makeErrNoti(map.msg, sign));
+                    ele.css({ 'position': 'relative' }).append(Util.makeErrNoti(map.msg, sign));
                 }
                 if (map.uniqueDB === true) {
-                    ele.append(Util.makeErrNoti(map.msg, sign));
+                    ele.css({ 'position': 'relative' }).append(Util.makeErrNoti(map.msg, sign));
                 }
                 if (map.require === true && (value === '' || value == null)) {
-                    ele.css('position', 'relative').append(Util.requireRedDot(sign));
+                    ele.css({ 'position': 'relative' }).append(Util.requireRedDot(sign));
                 }
                 ele.off('click', '.validate-icon')
                 ele.on('click', '.validate-icon', function(e) {
