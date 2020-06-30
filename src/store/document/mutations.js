@@ -7,8 +7,17 @@ import Vue from "vue";
 const addControl = (state, params) => {
     let id = params.id
     let prop = params.props
+    if (params.hasOwnProperty('from')) {
+        if (params.from == 'submit') {
+
+        } else {
+            setTreeListControlInDoc(state);
+        }
+    } else {
+        setTreeListControlInDoc(state);
+    }
     Vue.set(state.editor.allControl, id, prop);
-    setTreeListControlInDoc(state);
+
 };
 const addToListInputInDocument = (state, params) => {
     let name = params.name

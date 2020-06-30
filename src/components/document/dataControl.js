@@ -9,8 +9,12 @@ import { util } from "./../../plugins/util.js";
  * dữ liệu là các thuộc tính và các công thức của các control trong doc
  * @param {} fields 
  */
+export const allControlNotSetData = ['approvalHistory', 'submit', 'draft', 'reset']
 export const setDataForPropsControl = function(fields) {
     for (let controlId in fields) {
+        // if (allControlNotSetData.includes(fields[controlId].type)) {
+        //     continue;
+        // }
         let control = GetControlProps(fields[controlId].type)
         let properties = control.properties
         let formulas = control.formulas
@@ -107,7 +111,9 @@ export const setDataForPropsControl = function(fields) {
 }
 
 function addToAllControlInDoc(controlId, control) {
+    console.log(control);
+
     store.commit(
-        "document/addControl", { id: controlId, props: control }
+        "document/addControl", { id: controlId, props: control, from: 'submit' }
     );
 }

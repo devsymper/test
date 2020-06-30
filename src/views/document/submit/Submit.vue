@@ -19,12 +19,14 @@
             ref="symDragPanel"
             :dragPanelWidth="600"
             :dragPanelHeight="'auto'"
+            :topPosition='topPositionDragPanel'
+            :leftPosition="leftPositionDragPanel"
             :actionTitle="titleDragPanel"
             :titleIcon="titleDragPanelIcon"
         >
             <template slot="drag-panel-content">
                 <!-- <submitDocument :isQickSubmit="true" :docId="340" v-if="!isQickSubmit"/> -->
-                <filter-input @save-input-filter="saveInputFilter" ref="inputFilter"></filter-input>
+                <filter-input @save-input-filter="saveInputFilter" :tableMaxHeight="500" ref="inputFilter"></filter-input>
             </template>
         </sym-drag-panel>
         <input type="file" :id="'file-upload-alter-'+keyInstance" class="hidden d-none" />
@@ -81,7 +83,7 @@
 <script>
 import { documentApi } from "./../../../api/Document.js";
 import "./../../../components/document/documentContent.css";
-import { setDataForPropsControl } from "./../../../components/document/dataControl";
+import { setDataForPropsControl,allControlNotSetData } from "./../../../components/document/dataControl";
 import BasicControl from "./basicControl";
 import TableControl from "./tableControl";
 import ActionControl from "./actionControl";
@@ -165,7 +167,9 @@ export default {
             transition: "slide-y-reverse-transition",
             isSubmitting: false,
             columnsSQLLiteDocument:null,
-            docObjId:null
+            docObjId:null,
+            topPositionDragPanel:100,
+            leftPositionDragPanel:300,
         };
     },
     beforeMount() {
@@ -230,10 +234,15 @@ export default {
                 key: 'docStatus',
                 value: 'input'
             });
+            let valueControl = locale.val;
+            if(thisCpn.sDocumentSubmit.listInputInDocument[locale.controlName].type == 'user'){
+                valueControl = $('#'+thisCpn.sDocumentSubmit.listInputInDocument[locale.controlName].id).attr('user-id');
+                if(valueControl == undefined) valueControl = 0;
+            }
             thisCpn.updateListInputInDocument(
                 locale.controlName,
                 "value",
-                locale.val
+                valueControl
             );
             thisCpn.$store.commit("document/addToDocumentSubmitStore", {
                 key: 'rootChangeFieldName',
@@ -271,7 +280,9 @@ export default {
             thisCpn.$refs.timePicker.show(e);
         });
         this.$evtBus.$on("document-submit-filter-input-click", e => {
-            // thisCpn.$refs.symDragPanel.show();
+            console.log($(e.target).offset());
+            thisCpn.topPositionDragPanel = $(e.target).offset().top + 2 + $(e.target).height();
+            thisCpn.leftPositionDragPanel = e.screenX - e.offsetX;
             thisCpn.runInputFilterFormulas(e.controlName);
             thisCpn.titleDragPanel = "Tìm kiếm thông tin";
             thisCpn.titleDragPanelIcon = "mdi-file-search";
@@ -548,7 +559,7 @@ export default {
                     if(valueInput != undefined && valueInput != null && Object.keys(valueInput).length == 0){
                         valueInput = ""
                     }
-                    if(controlType == "submit" || controlType == "reset"){
+                    if(allControlNotSetData.includes(controlType)){
                         
                         let control = new ActionControl(idField, $(allInputControl[index]),field,thisCpn.keyInstance);
                         control.init();

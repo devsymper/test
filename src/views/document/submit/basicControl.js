@@ -51,6 +51,13 @@ export default class BasicControl extends Control {
         let thisCpn = this;
         this.ele.wrap('<span style="position:relative;display:inline-block;">');
         this.ele.attr('key-instance', this.curParentInstance);
+
+        if (this.checkDetailView() &&
+            this.controlProperties['isSaveToDB'] != undefined &&
+            (this.controlProperties['isSaveToDB'].value != "1" ||
+                this.controlProperties['isSaveToDB'].value != 1)) {
+            this.ele.css({ display: 'none' })
+        }
         if (!this.checkDetailView() && this.value == "" &&
             this.controlProperties['isRequired'] != undefined &&
             (this.controlProperties['isRequired'].value == "1" ||
@@ -256,9 +263,7 @@ export default class BasicControl extends Control {
     renderUserControl() {
         if (this.checkDetailView()) return;
         this.ele.attr('type', 'text');
-        this.ele.on('click', function(e) {
-            SYMPER_APP.$evtBus.$emit('document-submit-user-select-input', e)
-        })
+        this.ele.parent().css({ display: 'block' })
         this.ele.on('keyup', function(e) {
             SYMPER_APP.$evtBus.$emit('document-submit-user-input-change', e)
         })

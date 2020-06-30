@@ -25,7 +25,6 @@
                 </div>
                     <editor id="editor" api-key="APIKEY"
                     ref="editor"
-                    :key="documentId"
                     @onKeyUp="keyHandler"
                     @onClick="detectClickEvent"
                     @onBlur="detectBlurEditorEvent"
@@ -370,9 +369,10 @@ export default {
             
         },
         // hoangnd: hàm gửi request lưu doc
-        async saveDocument(documentProperties){
+        async saveDocument(){
             let allControl = this.editorStore.allControl;
-
+            let documentProperties = util.cloneDeep(this.$store.state.document.documentProps);
+            documentProperties = JSON.stringify(documentProperties);
             let dataPost = this.getDataToSaveMultiFormulas(allControl);
             if(Object.keys(dataPost).length > 0){
                 let thisCpn = this;
@@ -395,8 +395,7 @@ export default {
                                 );   
                             }
                         } 
-                        let htmlContent = this.$refs.editor.editor.getContent();
-                        
+                        let htmlContent = $('#editor_ifr').contents().find('#tinymce').html();
                         if(this.documentId != 0 && this.documentId != undefined && typeof this.documentId != 'undefined'){   //update doc
                             this.editDocument({documentProperty:documentProperties,fields:JSON.stringify(allControl),content:htmlContent,id:this.documentId})
                         }
@@ -407,20 +406,20 @@ export default {
                     else{
                         this.$snotify({
                                 type: "error",
-                                title: "error from formulas serice!!!",
+                                title: "error from formulas serice, can't not save into formulas service!!!",
                                 text: res.message
                             });
                     }
                 } catch (error) {
                     this.$snotify({
                                 type: "error",
-                                title: "error from formulas serice!!!",
+                                title: "error from formulas serice, can't not save into formulas service!!!",
                                 text: error
                             });
                 }
             }     
             else{
-                let htmlContent = this.$refs.editor.editor.getContent();
+                let htmlContent = $('#editor_ifr').contents().find('#tinymce').html();
                 if(this.documentId != 0 && this.documentId != undefined && typeof this.documentId != 'undefined'){   //update doc
                     this.editDocument({documentProperty:documentProperties,fields:JSON.stringify(allControl),content:htmlContent,id:this.documentId})
                 }
@@ -504,7 +503,7 @@ export default {
                 this.checkDupliucateNameControl(listControlName,control,controlId)
             }
         },
-        validateControl(documentProperties){
+        validateControl(){
             let thisCpn = this;
             let allControl = util.cloneDeep(this.editorStore.allControl);
             let listControlName = [];
@@ -519,10 +518,11 @@ export default {
                     // Object.assign
                 }
                 this.checkNameControl(controlId,control,listControlName);
-                // this.validateFormulasInControl(control,listControlName)
+                this.validateFormulasInControl(control,listControlName);
             }
+            
             if(this.listMessageErr.length == 0 && $('#editor_ifr').contents().find('.s-control-error').length == 0){
-                this.saveDocument(documentProperties);
+                this.saveDocument();
             }
             else{
                 this.$refs.saveDocPanel.hideDialog();
@@ -533,7 +533,7 @@ export default {
         },
         // hàm kiểm tra xác thực tên control 
         checkNameControl(controlId,control,listControlName){
-            if(control.type != "submit" && control.type != "draft" && control.type != "reset"){
+            if(control.type != "submit" && control.type != "draft" && control.type != "reset" && control.type != "approvalHistory"){
                 if(control.properties.name.value == ''){
                     let controlEl = $('#editor_ifr').contents().find('#'+controlId);
                     controlEl.addClass('s-control-error');
@@ -1422,6 +1422,10 @@ export default {
                 
                 if(table.length > 0 && controlId != table.attr('id')){
                     let tableId = table.attr('id');
+                    console.log(tableId);
+                    console.log(controlId);
+                    console.log(thisCpn.editorStore.allControl[tableId]);
+                    
                     let control = thisCpn.editorStore.allControl[tableId]['listFields'][controlId];
                     thisCpn.selectControl(control.properties, control.formulas,controlId);
                 }
