@@ -190,7 +190,60 @@ export default {
             this.selectingNode.positionDiagramCells.cells = cells;
         },
         saveOrgchart(){
+            let orgchartData = this.getDataToSave();
+        },
+        getDataToSave(){
+            let orgchartAttr = this.$store.state.orgchart.editor[this.instanceKey].homeConfig;
+            let allVizCell = this.$refs.editorWorkspace.getAllDiagramCells();
+            let data = {
+                content: JSON.stringify(allVizCell),
+                departments: JSON.stringify(this.getAllNodesToSave(allVizCell.cells, this.instanceKey)),
+                description: orgchartAttr.commonAttrs.description.value,
+                dynamicAttrs: JSON.stringify(orgchartAttr.customAttributes),
+                name: orgchartAttr.commonAttrs.name.value
+            };
+        },
+        getAllNodesToSave(allVizCell, instanceKey, type = 'department'){
+            let links = [];
+            let nodeMap = {};
+            console.log(allVizCell);
 
+            for(let cell of allVizCell){
+                if(cell.type == "org.Arrow"){
+                    links.push(cell);
+                }else{
+                    nodeMap[cell.id] = this.getNodeDataToSave(cell.id, instanceKey, type);
+                }
+            }
+
+            for(let link of links){
+                nodeMap[link.source.target].vizParentId = link.source.id;
+            }
+            return Object.values(nodeMap);
+        },
+        getNodeDataToSave(nodeId, instanceKey, type){
+            let node = this.$store.state.orgchart.editor[instanceKey].allNode[nodeId];
+            let attrs = node.commonAttrs;
+            let data = {
+                name: attrs.name.value,
+                code: attrs.code.value,
+                vizId: nodeId,
+                description: attrs.description.value,
+                vizParentId: '',
+                content: node.positionDiagramCells.cells ? JSON.stringify(node.positionDiagramCells.cells) : 'false',
+                dynamicAttrs: node.customAttributes,
+            };
+            
+            if(nodeType == 'department'){
+                if(node.positionDiagramCells.cells){
+                    data.jobs = this.getAllNodesToSave(node.positionDiagramCells.cells.cells, node.positionDiagramCells.instanceKey,  'position');
+                }else{
+                    data.jobs = [];
+                }
+            }else{
+                data.users = node.users;
+            }
+            return data;
         },
         handleBlankPaperClicked(){
             this.showOrgchartConfig();

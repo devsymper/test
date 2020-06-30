@@ -27,7 +27,7 @@
                 <v-avatar left v-if="compactChip">
                     <v-img :src="data.item.avatar ? data.item.avatar : 'https://cdn.vuetifyjs.com/images/lists/4.jpg'"></v-img>
                 </v-avatar>
-                <span class="fs-12">{{ data.item.displayName }}</span>
+                <span class="fs-11">{{ data.item.displayName }}</span>
             </v-chip>
         </template>
         <template v-slot:item="data">
