@@ -39,7 +39,7 @@
             :isTime="false"
             ref="datePicker"
         />
-        <time-picker :keyInstance="keyInstance" :title="'Chọn giờ'" @apply-time-picker="applyTimePicker" ref="timePicker" />
+        <time-input :keyInstance="keyInstance"  @apply-time-selected="applyTimePicker" @after-check-input-time-valid="afterCheckTimeNotValid" ref="timeInput" />
         <v-speed-dial
             v-show="showSubmitButton"
             v-model="fab"
@@ -88,7 +88,7 @@ import BasicControl from "./basicControl";
 import TableControl from "./tableControl";
 import ActionControl from "./actionControl";
 import DatePicker from "./../../../components/common/DateTimePicker";
-import TimeBoxPicker from "./../../../components/common/TimeBoxPicker";
+import TimeInput from "./../../../components/common/TimeInput";
 import Table from "./table.js";
 import SymperDragPanel from "./../../../components/common/SymperDragPanel.vue";
 import { util } from "./../../../plugins/util.js";
@@ -101,7 +101,7 @@ import Util from './util';
 import './customControl.css';
 
 import { checkCanBeBind, resetImpactedFieldsList, markBinedField } from './handlerCheckRunFormulas';
-import {checkDbOnly,getControlInstanceFromStore} from './../common/common'
+import {checkDbOnly,getControlInstanceFromStore,getControlTitleFromName} from './../common/common'
 let impactedFieldsList = {};
 let impactedFieldsArr = {};
 var impactedFieldsListWhenStart = {};
@@ -126,7 +126,7 @@ export default {
         validate: Validate,
         "user-select": User,
         "date-picker": DatePicker,
-        "time-picker": TimeBoxPicker,
+        "time-input": TimeInput,
         "filter-input": Filter,
         "autocomplete-input": AutocompleteInput,
         "sym-drag-panel": SymperDragPanel
@@ -271,13 +271,13 @@ export default {
         });
        
         this.$evtBus.$on("document-submit-show-time-picker", e => {
-            thisCpn.$refs.timePicker.show(e.event);
+            thisCpn.$refs.timeInput.show(e.event);
         });
         this.$evtBus.$on("document-submit-date-input-click", e => {
             thisCpn.$refs.datePicker.openPicker(e);
         });
         this.$evtBus.$on("document-submit-time-input-click", e => {
-            thisCpn.$refs.timePicker.show(e);
+            thisCpn.$refs.timeInput.show(e);
         });
         this.$evtBus.$on("document-submit-filter-input-click", e => {
             console.log($(e.target).offset());
@@ -331,7 +331,7 @@ export default {
                 !$(evt.target).hasClass("card-time-picker") &&
                 $(evt.target).closest(".card-time-picker").length == 0
             ) {
-                thisCpn.$refs.timePicker.hide();
+                thisCpn.$refs.timeInput.hide();
             }
             if (
                 !$(evt.target).hasClass("validate-icon") &&
@@ -364,14 +364,14 @@ export default {
             if(type == 'select'){
                 let dataInput = this.getDataInputFormulas(e.selectFormulasInstance);  
                 let dataAutocomplete = e.selectFormulasInstance.handleRunAutoCompleteFormulas('',dataInput).then(res=>{
-                    thisCpn.setDataForControlAutocomplete(res,aliasControl)
+                    thisCpn.setDataForControlAutocomplete(res,aliasControl,e.controlTitle)
                 });
             }
             else{
                 let aliasControl = e.autocompleteFormulasInstance.autocompleteDetectAliasControl();
                 let dataInput = this.getDataInputFormulas(e.autocompleteFormulasInstance);  
                 let dataAutocomplete = e.autocompleteFormulasInstance.handleRunAutoCompleteFormulas($(e.e.target).val(),dataInput).then(res=>{
-                    thisCpn.setDataForControlAutocomplete(res,aliasControl)
+                    thisCpn.setDataForControlAutocomplete(res,aliasControl,e.controlTitle)
                 });
             }
             
@@ -379,10 +379,12 @@ export default {
         /**
          * Hàm bind dữ liệu cho box autocomplete, cho component autocompleteInput
          */
-        setDataForControlAutocomplete(res,aliasControl){
+        setDataForControlAutocomplete(res,aliasControl,controlTitle){
+            let controlAs = {};
+            controlAs[aliasControl] = controlTitle;
             if(res.data != undefined){
                     if(res.status == 200 && res.data != false){
-                        let dataTable = this.handleDataAutoComplete(res.data.data,false);
+                        let dataTable = this.handleDataAutoComplete(res.data.data,false,controlAs);
                         this.$refs.autocompleteInput.setAliasControl(aliasControl);
                         this.$refs.autocompleteInput.setData(dataTable);
                     }
@@ -392,7 +394,7 @@ export default {
                 }
                 else{
                     let data =  res[0];
-                    let dataTable = this.handleDataAutoComplete(data,true);
+                    let dataTable = this.handleDataAutoComplete(data,true,controlAs);
                     this.$refs.autocompleteInput.setAliasControl(aliasControl);
                     this.$refs.autocompleteInput.setData(dataTable);
                 }
@@ -400,11 +402,12 @@ export default {
         /**
          * Hàm bind dữ liệu cho control, và control trong bảng khi chọn apply trên timepicker
          */
-        applyTimePicker(time){
+        applyTimePicker(data){
+            let time = data.value;
+            let input = data.input;
             if(this.sDocumentSubmit.currentTableInteractive == null){
-                $('.time-picker').val(time);
-                $('.time-picker').trigger('change');
-                $('.time-picker').removeClass('time-picker');
+                input.val(time);
+                input.trigger('change');
             }
             else{
                 let currentTableInteractive = this.sDocumentSubmit.currentTableInteractive
@@ -423,7 +426,17 @@ export default {
                 key: 'currentTableInteractive',
                 value: null
             });
-            this.$refs.timePicker.hide();
+            this.$refs.timeInput.hide();
+        },
+        afterCheckTimeNotValid(data){
+            let isValid = data.isValid;
+            let controlInstance = getControlInstanceFromStore(data.controlName);
+            if(isValid){
+                controlInstance.removeRequire();
+            }
+            else{
+                controlInstance.renderValidateIcon('Định dạng thời gian không đúng');
+            }
         },
         /**
          * Hàm xử lí nhận dữ liệu component autocomplete khi chọn 1 dòng
@@ -454,12 +467,19 @@ export default {
          * Hàm  xử lí data sau khi query công thức autocomplete,
          * xử lí data về dạng object cho DataTable của vuetify
          */
-        handleDataAutoComplete(data, isFromSQLLite){
+        handleDataAutoComplete(data, isFromSQLLite,controlAs){
             let headers = [];
             let bodyTable = [];
             if(isFromSQLLite){
                 for(let i = 0; i < data.columns.length; i++){
-                    headers.push({value:data.columns[i], text:data.columns[i]});
+                    let item = {value:data.columns[i], text:data.columns[i]};
+                    if(controlAs.hasOwnProperty(data.columns[i])){
+                        item.text = controlAs[data.columns[i]]
+                    }
+                    if(data.columns[i] == 'column1'){
+                        item.text = controlAs[Object.keys(controlAs)[0]]
+                    }
+                    headers.push(item);
                 }
                 let values = data.values;
                 for(let i = 0; i < values.length; i++){
@@ -472,7 +492,11 @@ export default {
             }
             else{
                 for(let controlName in data[0]){
-                    headers.push({value:controlName,text : controlName});
+                    let item = {value:controlName,text:controlName};
+                    if(controlAs.hasOwnProperty(controlName)){
+                        item.text = controlAs[controlName]
+                    }
+                    headers.push(item);
                 }
                 data[0]['active'] = true;
                 bodyTable = data;
@@ -836,7 +860,10 @@ export default {
                     let value = this.getDataTableInput(listInput[controlName]);
                     Object.assign(dataPost, value);
                 } else {
-                    if (listInput[controlName].type != "submit") {
+                    if (listInput[controlName].type != "submit" && 
+                    listInput[controlName].type != "reset" && 
+                    listInput[controlName].type != "draft" &&
+                    listInput[controlName].type != "approvalHistory") {
                         let value = (listInput[controlName].type == 'number' && listInput[controlName].value == "" ) ? 0 : listInput[controlName].value;
                         dataPost[id] = [value];
                         if(listInput[controlName].type == 'checkbox'){

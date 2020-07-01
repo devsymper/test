@@ -103,10 +103,10 @@ let isShowAutocompleteControl = false;
 let editorWidth = 0;
 export default { 
     computed: {
-        editorStore(){ 
+        editorStore(){  
             return this.$store.state.document.editor;
         }
-    },
+    }, 
     components: {
         'editor': Editor,
         'sidebar-left' : SideBarLeft,
@@ -395,10 +395,10 @@ export default {
                                 );   
                             }
                         } 
-                        let htmlContent = $('#editor_ifr').contents().find('#tinymce').html();
+                        let htmlContent = this.$refs.editor.editor.getContent();
                         if(this.documentId != 0 && this.documentId != undefined && typeof this.documentId != 'undefined'){   //update doc
                             this.editDocument({documentProperty:documentProperties,fields:JSON.stringify(allControl),content:htmlContent,id:this.documentId})
-                        }
+                        } 
                         else{
                             this.createDocument({documentProperty:documentProperties,fields:JSON.stringify(allControl),content:htmlContent});
                         }
@@ -419,7 +419,7 @@ export default {
                 }
             }     
             else{
-                let htmlContent = $('#editor_ifr').contents().find('#tinymce').html();
+                let htmlContent = this.$refs.editor.editor.getContent();
                 if(this.documentId != 0 && this.documentId != undefined && typeof this.documentId != 'undefined'){   //update doc
                     this.editDocument({documentProperty:documentProperties,fields:JSON.stringify(allControl),content:htmlContent,id:this.documentId})
                 }

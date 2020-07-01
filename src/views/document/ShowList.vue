@@ -32,7 +32,7 @@ export default {
                     callback: (document, callback) => {
                         let thisCpn = this;
                         documentApi
-                        .deleteDocument(document[0].name)
+                        .deleteDocument(document[0].id)
                         .then(res => {
                             if (res.status == 200) {
                                 thisCpn.$snotify({

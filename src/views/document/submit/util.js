@@ -242,7 +242,7 @@ export default class Util {
     }
 
     static makeErrNoti = function(msg, sign) {
-        return '<span class="mdi mdi-checkbox-blank-circle validate-icon" style="position:relative;" title="' + msg + '"></span>'
+        return '<span class="mdi mdi-checkbox-blank-circle validate-icon" title="' + msg + '"></span>'
     }
     static generateString = function(length) {
             var result = '';

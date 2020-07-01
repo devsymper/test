@@ -50,7 +50,7 @@ export default class Control {
          * Tên của control
          */
         this.name = (this.controlProperties.hasOwnProperty('name')) ? this.controlProperties.name.value : "";
-
+        this.title = (this.controlProperties.hasOwnProperty('title')) ? this.controlProperties.title.value : "";
         /**
          * id của control
          */

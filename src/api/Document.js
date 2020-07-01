@@ -37,5 +37,9 @@ export const documentApi = {
     },
     uploadFile(data) {
         return coreApi.post("uploadFile", data);
-    }
+    },
+
+    getListApprovalHistory(objectId) {
+        return coreApi.get("approval-histories/" + objectId);
+    },
 };
