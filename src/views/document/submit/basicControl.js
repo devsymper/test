@@ -139,8 +139,6 @@ export default class BasicControl extends Control {
 
         let thisCpn = this;
         $('.file-add').click(function(e) {
-            let el = $(e);
-            $("#file-upload-alter").attr('data-rowid', el.attr('data-rowid')).attr('data-ctrlname', el.attr('data-ctrlname'));
             $("#file-upload-alter-" + thisCpn.curParentInstance).click();
             $("#file-upload-alter-" + thisCpn.curParentInstance).attr('data-control-name', $(this).attr('data-control-name'))
         })
@@ -149,12 +147,13 @@ export default class BasicControl extends Control {
     genFileView = function(rowId = null) {
         let ctrlName = this.name;
         let addTpl = '';
+
         if (!this.checkDetailView()) {
             addTpl = `
-                <div data-control-name="${ctrlName}" class="file-add" title="Thêm file" data-rowid="${rowId}" data-ctrlname="${ctrlName}">
-                    <span class="text-show"><span class="mdi mdi-plus"></span></span>
-                </div>
-            `;
+                    <div data-control-name="${ctrlName}" class="file-add" title="Thêm file" data-rowid="${rowId}" data-ctrlname="${ctrlName}">
+                        <span class="text-show"><span class="mdi mdi-plus"></span></span>
+                    </div>
+                `;
         }
 
         if (!this.inTable) {
@@ -176,27 +175,27 @@ export default class BasicControl extends Control {
             }
             return `<div class="upload-file-wrapper-outtb">${addTpl}</div>`;
         }
-        if (this.value != '' && this.value.length > 0) {
-            let valueArr = this.value.replace(/^,/gi, "");
-            valueArr = valueArr.split(',');
-            console.log('klfas', valueArr);
-
-            for (let index = 0; index < valueArr.length; index++) {
-                let element = valueArr[index];
-                let fileExt = Util.getFileExtension(element);
-                let icon = fileTypes[fileExt];
-                let file = `<div  class="file-item">
-                                <span  data-file-name="` + element + `" title="xóa" class="remove-file"><span class="mdi mdi-close"></span></span>
-                                <i onclick="window.open('https://sdocument-management.symper.vn/file/public` + element + `');" class="mdi ` + icon + ` file-view" ></i>
-                            </div>`
-                addTpl += file;
-            }
+        let deleteFileIcon = '';
+        if (this.checkDetailView()) {
+            this.value = sDocument.state.editor.allControl[listInputInDocument[this.inTable].id].value[this.name];
+        } else {
+            deleteFileIcon = '<span  data-file-name="` + fileName + `" title="xóa" class="remove-file"><span class="mdi mdi-close"></span></span>';
+        }
+        if (this.value != '' && this.value.hasOwnProperty(rowId)) {
+            let fileName = this.value[rowId];
+            let fileExt = Util.getFileExtension(fileName);
+            let icon = fileTypes[fileExt];
+            let file = `<div  class="file-item">
+                            ` + deleteFileIcon + `
+                            <i onclick="window.open('https://sdocument-management.symper.vn/file/public` + fileName + `');" class="mdi ` + icon + ` file-view" ></i>
+                        </div>`
+            addTpl += file;
 
         }
         return addTpl.replace(/\n/g, '');
     }
 
-    addFile(item) {
+    addFile(item, rowId = "") {
         let type = Util.getFileExtension(item.name);
         let form = new FormData();
         form.append('file', item);
@@ -218,16 +217,25 @@ export default class BasicControl extends Control {
                     thisObj.setDeleteFileEvent(thisObj.ele, thisObj.name)
                     thisObj.ele.find('.upload-file-wrapper-outtb').append(file);
                     let curValue = listInputInDocument[thisObj.name].value;
-                    curValue += "," + response.data.name;
-                    this.value = curValue;
+                    let tableName = thisObj.inTable;
+                    if (tableName != false) {
+                        if (!Array.isArray(curValue)) {
+                            curValue = [];
+                        }
+                        curValue[rowId] = response.data.name
+                    } else {
+                        curValue += "," + response.data.name;
+                        this.value = curValue;
+                    }
                     store.commit("document/updateListInputInDocument", {
                         controlName: thisObj.name,
                         key: 'value',
                         value: curValue
                     });
-                    let tableName = thisObj.inTable;
-                    if (tableName != false)
+                    if (tableName != false) {
                         listInputInDocument[tableName].tableInstance.tableInstance.render();
+                    }
+
                 }
             }
         });

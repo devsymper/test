@@ -716,7 +716,6 @@ export const getAllPropsControl = function() {
         }
         return colDefine;
     });
-    console.log(result);
 
     let groups = util.cloneDeep(groupType);
     Object.filter = (obj, predicate) =>
@@ -728,7 +727,7 @@ export const getAllPropsControl = function() {
         groups[group]['name'] = group;
         dataPropsResult.push(groups[group]);
     }
-    console.log(dataPropsResult);
+    console.log('lkkkk', dataPropsResult);
     return dataPropsResult;
 }
 

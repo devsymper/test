@@ -182,9 +182,12 @@ export default {
         let thisCpn = this;
         $("#file-upload-alter-" + this.keyInstance).on("change", function(e) {
             let name = $(this).attr("data-control-name");
+            let rowId = $(this).attr("data-rowid");
             thisCpn.sDocumentSubmit.listInputInDocument[name].addFile(
-                $(this).prop("files")[0]
+                $(this).prop("files")[0],
+                rowId
             );
+            $(this).val('')
         });
         $('.sym-form-submit').on('click','.validate-icon',function(e){
             let msg = $(this).attr('title');
@@ -877,19 +880,24 @@ export default {
         /**
          * Hàm lấy dữ liệu của table dạng colName : ['a',"b","c"]
          */
-        getDataTableInput(table) {
+        getDataTableInput(tableControl) {
             let listInput = this.sDocumentSubmit.listInputInDocument;
-            let indexCol = table.tableInstance.colName2Idx;
+            let indexCol = tableControl.tableInstance.colName2Idx;
             let dataTable = {};
             for (let i in indexCol) {
                 let id = "field_" + listInput[i].idField;
-                let dataCol = table.tableInstance.tableInstance.getDataAtCol(
+                let dataCol = tableControl.tableInstance.tableInstance.getDataAtCol(
                     indexCol[i]
                 );
-
+                
                 // cần xóa phần tử dòng cuối dùng là row enter mặc định ko có dữ liệu
+                if(tableControl.tableInstance.tableHasRowSum == true)
                 dataCol.pop();
+                if(listInput[i].type == 'fileUpload'){
+                    dataCol = listInput[i].value;
+                }
                 dataCol = (listInput[i].type == 'number' && dataCol == "" ) ? [0] : dataCol;
+                dataCol = (listInput[i].type != 'number' && dataCol == "" ) ? [""] : dataCol;
                 dataTable[id] = dataCol;
             }
             console.log(dataTable);

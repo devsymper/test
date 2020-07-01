@@ -23,31 +23,19 @@ Handsontable.renderers.FileRenderer = function(instance, td, row, col, prop, val
     td.innerHTML = listInputInDocument[prop].genFileView(row);
     td.classList.add("upload-file-wrapper-inTb");
     $(td).off('click', '.file-add');
-    $(td).on('click', '.file-add', function(e) {
-        let el = $(e);
-        $("#file-upload-alter").attr('data-rowid', el.attr('data-rowid')).attr('data-ctrlname', el.attr('data-ctrlname'));
-        $("#file-upload-alter-" + instance.keyInstance).click();
-        $("#file-upload-alter-" + instance.keyInstance).attr('data-control-name', $(this).attr('data-control-name'))
-    })
-    $(td).off('click', '.remove-file')
-    listInputInDocument[prop].setDeleteFileEvent($(td), prop)
-        // if (isDetailView && !rerenderCtrlFlag[instance.tableName]) {
-        //     let tb = listInputInDocument[prop].inTable;
-        //     // listInputInDocument[tb].tableInstance.reRender(tb);
-        //     // rerenderCtrlFlag[instance.tableName] = true;
-        // }
-
+    if (sDocument.state.viewType != 'detail') {
+        $(td).on('click', '.file-add', function(e) {
+            let el = $(e.target).closest('.file-add');
+            $("#file-upload-alter-" + instance.keyInstance).attr('data-rowid', row).attr('data-control-name', el.attr('data-ctrlname'));
+            $("#file-upload-alter-" + instance.keyInstance).click();
+        })
+        $(td).off('click', '.remove-file')
+        listInputInDocument[prop].setDeleteFileEvent($(td), prop)
+    }
 }
 Handsontable.cellTypes.registerCellType('file', {
     renderer: Handsontable.renderers.PercentRenderer
 });
-var notEmpty = function(value, callback) {
-    if (!value || String(value).length === 0) {
-        callback(false);
-    } else {
-        callback(true);
-    }
-};
 let listKeyCodeNotChange = [18, 17, 9, 20, 16, 192]
 let listTableInstance = {}
 let columnHasSum = {}
@@ -612,8 +600,6 @@ export default class Table {
                 if (tbHeight < MAX_TABLE_HEIGHT) {} else {
                     $(this.rootElement).css('height', MAX_TABLE_HEIGHT);
                 }
-
-
                 if (!this.reRendered && thisObj.tableHasRowSum) {
                     this.reRendered = true;
                     setTimeout((hotTb) => {
@@ -629,8 +615,6 @@ export default class Table {
                         hotTb.render();
                     }, 500, this);
                 }
-
-
             },
             beforeCreateRow: function(i, amount) {},
             afterCreateRow: function(i, amount) {
