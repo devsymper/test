@@ -79,7 +79,7 @@ import NodeSelector from './NodeSelector.vue';
 import VueResizable from 'vue-resizable';
 import { getOrgchartEditorData, getDefaultConfigNodeData, SYMPER_HOME_ORGCHART } from './nodeAttrFactory';
 import jointjs from "jointjs";
-
+import { orgchartApi } from "@/api/orgchart.js";
 console.log(jointjs, 'jointjsjointjs');
 
 
@@ -165,12 +165,16 @@ export default {
             if(this.context == 'department'){
                 this.positionEditor = true;
                 this.selectNode(nodeId);
-                this.checkAndCreateOrgchartData();
-                if(this.selectingNode.positionDiagramCells.cells){
-                    this.$refs.positionDiagram.loadDiagramFromJson(this.selectingNode.positionDiagramCells.cells);
-                }else{
-                    this.$refs.positionDiagram.createFirstVizNode();
-                }
+
+                setTimeout((self) => {
+                    self.checkAndCreateOrgchartData();
+                    if(self.selectingNode.positionDiagramCells.cells){
+                        self.$refs.positionDiagram.loadDiagramFromJson(self.selectingNode.positionDiagramCells.cells);
+                    }else{
+                        self.$refs.positionDiagram.createFirstVizNode();
+                    }
+                }, 200, this);
+               
             }
         },
         createFirstVizNode(){
@@ -189,8 +193,36 @@ export default {
             let cells = this.$refs.positionDiagram.$refs.editorWorkspace.getAllDiagramCells();
             this.selectingNode.positionDiagramCells.cells = cells;
         },
-        saveOrgchart(){
+        validateDataBeforeSave(){
+            let orgchartAttr = this.$store.state.orgchart.editor[this.instanceKey].homeConfig;
+            if(orgchartAttr.commonAttrs.name.value){
+                return {
+                    passed: true
+                }
+            }else{
+                return {
+                    passed: false,
+                    message: "Orgchart name can not empty!"
+                }
+            }
+        },
+        async saveOrgchart(){
+            let validate = this.validateDataBeforeSave();
+            if(!validate.passed){
+                this.$snotifyError({}, validate.message);
+                return;
+            }
             let orgchartData = this.getDataToSave();
+            try {
+                let res = await orgchartApi.createOrgchart(orgchartData);      
+                if(res.status == 200){
+                    this.$snotifySuccess("Create orgchart successfully");   
+                }else{
+                    this.$snotifyError(error, "Can not create orgchart!", res.message);   
+                }   
+            } catch (error) {
+                this.$snotifyError(error, "Can not create orgchart!");   
+            }            
         },
         getDataToSave(){
             let orgchartAttr = this.$store.state.orgchart.editor[this.instanceKey].homeConfig;
@@ -202,6 +234,7 @@ export default {
                 dynamicAttrs: JSON.stringify(orgchartAttr.customAttributes),
                 name: orgchartAttr.commonAttrs.name.value
             };
+            return data;
         },
         getAllNodesToSave(allVizCell, instanceKey, type = 'department'){
             let links = [];
@@ -217,11 +250,11 @@ export default {
             }
 
             for(let link of links){
-                nodeMap[link.source.target].vizParentId = link.source.id;
+                nodeMap[link.target.id].vizParentId = link.source.id;
             }
             return Object.values(nodeMap);
         },
-        getNodeDataToSave(nodeId, instanceKey, type){
+        getNodeDataToSave(nodeId, instanceKey, nodeType){
             let node = this.$store.state.orgchart.editor[instanceKey].allNode[nodeId];
             let attrs = node.commonAttrs;
             let data = {
@@ -230,13 +263,19 @@ export default {
                 vizId: nodeId,
                 description: attrs.description.value,
                 vizParentId: '',
-                content: node.positionDiagramCells.cells ? JSON.stringify(node.positionDiagramCells.cells) : 'false',
                 dynamicAttrs: node.customAttributes,
             };
             
             if(nodeType == 'department'){
+                data.content = node.positionDiagramCells.cells ? JSON.stringify(node.positionDiagramCells.cells) : 'false';
                 if(node.positionDiagramCells.cells){
-                    data.jobs = this.getAllNodesToSave(node.positionDiagramCells.cells.cells, node.positionDiagramCells.instanceKey,  'position');
+                    let jobs = this.getAllNodesToSave(node.positionDiagramCells.cells.cells, node.positionDiagramCells.instanceKey,  'position');
+                    for(let j of jobs){
+                        if(!j.vizParentId){
+                            j.vizParentId = nodeId;
+                        }
+                    }
+                    data.jobs = jobs;
                 }else{
                     data.jobs = [];
                 }

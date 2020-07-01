@@ -26,4 +26,7 @@ export const orgchartApi = {
         return orgchart.delete('orgchart/' + ids);
     },
 
+    createOrgchart(data) {
+        return orgchart.post('orgchart', data);
+    }
 };
