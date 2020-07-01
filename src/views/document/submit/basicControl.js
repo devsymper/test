@@ -323,10 +323,11 @@ export default class BasicControl extends Control {
         })
     }
     renderTimeControl() {
+        let thisCpn = this;
         if (this.checkDetailView()) return;
         this.ele.attr('type', 'text');
         this.ele.on('click', function(e) {
-            $(this).addClass('time-picker')
+            e.controlName = thisCpn.name;
             SYMPER_APP.$evtBus.$emit('document-submit-time-input-click', e)
         })
     }

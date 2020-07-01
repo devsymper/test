@@ -39,7 +39,7 @@
             :isTime="false"
             ref="datePicker"
         />
-        <time-picker :keyInstance="keyInstance" :title="'Chọn giờ'" @apply-time-picker="applyTimePicker" ref="timePicker" />
+        <time-input :keyInstance="keyInstance"  @apply-time-selected="applyTimePicker" @after-check-input-time-valid="afterCheckTimeNotValid" ref="timeInput" />
         <v-speed-dial
             v-show="showSubmitButton"
             v-model="fab"
@@ -88,7 +88,7 @@ import BasicControl from "./basicControl";
 import TableControl from "./tableControl";
 import ActionControl from "./actionControl";
 import DatePicker from "./../../../components/common/DateTimePicker";
-import TimeBoxPicker from "./../../../components/common/TimeBoxPicker";
+import TimeInput from "./../../../components/common/TimeInput";
 import Table from "./table.js";
 import SymperDragPanel from "./../../../components/common/SymperDragPanel.vue";
 import { util } from "./../../../plugins/util.js";
@@ -126,7 +126,7 @@ export default {
         validate: Validate,
         "user-select": User,
         "date-picker": DatePicker,
-        "time-picker": TimeBoxPicker,
+        "time-input": TimeInput,
         "filter-input": Filter,
         "autocomplete-input": AutocompleteInput,
         "sym-drag-panel": SymperDragPanel
@@ -271,13 +271,13 @@ export default {
         });
        
         this.$evtBus.$on("document-submit-show-time-picker", e => {
-            thisCpn.$refs.timePicker.show(e.event);
+            thisCpn.$refs.timeInput.show(e.event);
         });
         this.$evtBus.$on("document-submit-date-input-click", e => {
             thisCpn.$refs.datePicker.openPicker(e);
         });
         this.$evtBus.$on("document-submit-time-input-click", e => {
-            thisCpn.$refs.timePicker.show(e);
+            thisCpn.$refs.timeInput.show(e);
         });
         this.$evtBus.$on("document-submit-filter-input-click", e => {
             console.log($(e.target).offset());
@@ -331,7 +331,7 @@ export default {
                 !$(evt.target).hasClass("card-time-picker") &&
                 $(evt.target).closest(".card-time-picker").length == 0
             ) {
-                thisCpn.$refs.timePicker.hide();
+                thisCpn.$refs.timeInput.hide();
             }
             if (
                 !$(evt.target).hasClass("validate-icon") &&
@@ -402,11 +402,12 @@ export default {
         /**
          * Hàm bind dữ liệu cho control, và control trong bảng khi chọn apply trên timepicker
          */
-        applyTimePicker(time){
+        applyTimePicker(data){
+            let time = data.value;
+            let input = data.input;
             if(this.sDocumentSubmit.currentTableInteractive == null){
-                $('.time-picker').val(time);
-                $('.time-picker').trigger('change');
-                $('.time-picker').removeClass('time-picker');
+                input.val(time);
+                input.trigger('change');
             }
             else{
                 let currentTableInteractive = this.sDocumentSubmit.currentTableInteractive
@@ -425,7 +426,17 @@ export default {
                 key: 'currentTableInteractive',
                 value: null
             });
-            this.$refs.timePicker.hide();
+            this.$refs.timeInput.hide();
+        },
+        afterCheckTimeNotValid(data){
+            let isValid = data.isValid;
+            let controlInstance = getControlInstanceFromStore(data.controlName);
+            if(isValid){
+                controlInstance.removeRequire();
+            }
+            else{
+                controlInstance.renderValidateIcon('Định dạng thời gian không đúng');
+            }
         },
         /**
          * Hàm xử lí nhận dữ liệu component autocomplete khi chọn 1 dòng
