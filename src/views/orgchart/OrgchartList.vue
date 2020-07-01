@@ -62,7 +62,7 @@ export default {
                     callback: (row, callback) => {
                         
                         self.$goToPage(
-                            "/workflow/"+row.id+"/view",
+                            "/orgchart/"+row.id+"/view",
                             self.$t("common.detail") + "  " + (row.name ? row.name : row.key)
                         );
                     }

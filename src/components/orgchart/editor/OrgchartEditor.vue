@@ -107,6 +107,9 @@ export default {
         },
         instanceKey: {
             default: Date.now()
+        },
+        id: {
+            default: ''
         }
     },
     data(){
@@ -149,8 +152,9 @@ export default {
         }
     },
     created(){
-        if(this.action == 'create'){
-            this.initOrgchartData();
+        this.initOrgchartData();
+        if(this.action == 'edit' || this.action == 'clone' ){
+            this.restoreOrgchartView(this.id)
         }
     },
     watch: {
@@ -161,6 +165,116 @@ export default {
         }
     },
     methods: {
+        async restoreOrgchartView(id){
+            try {
+                let res = await orgchartApi.getOrgchartDetail(id);
+                if(res.status == 200){
+                    let savedData = res.data;
+                    let departments = JSON.parse(savedData.orgchart.content);
+                    this.$refs.editorWorkspace.loadDiagramFromJson(departments);
+                    let mapIdToDpm = {};
+
+                    
+
+
+                    for(let node of savedData.departments){
+                        let nodeData = {
+                            id: node.vizId,
+                            name: node.name,
+                            description: node.description,
+                            code: node.code,        
+                        };
+
+                        if(node.content && node.content !== 'false'){
+                            nodeData.positionDiagram = {
+                                cells: JSON.parse(node.content)
+                            }         
+                        }
+                        let newDepartment = this.createNodeConfigData('department', nodeData);
+                        mapIdToDpm[node.vizId] = newDepartment;
+                    }
+
+                    this.addUsersToPosition(savedData.positions, savedData.userInPostion);
+
+                    let allPositionInADpm = this.getAllPositionInADpm(savedData.positions);
+                    for(let dpmId in allPositionInADpm){
+                        let dpmInstanceKey = this.$store.state.orgchart.editor[this.instanceKey].allNode[dpmId].positionDiagramCells.instanceKey;
+                        for(let idPosition in allPositionInADpm[dpmId]){
+                            let position = allPositionInADpm[dpmId][idPosition];
+
+                            let nodeData = {
+                                id: position.vizId,
+                                name: position.name,
+                                description: position.description,
+                                code: position.code,
+                                users: position.users ? position.users : []
+                            };
+                            this.createNodeConfigData('position', nodeData, dpmInstanceKey);
+                        }
+                    }
+                }else{
+                    this.$snotifyError(error, "Can not get orgchart data",res.message);
+                }
+            } catch (error) {
+                this.$snotifyError(error, "Can not get orgchart data");
+            }
+        },
+
+        addUsersToPosition(postions, users){
+            let mapPostitions = postions.reduce((map, el)=> {
+                map[el.id] = el;
+                return map;
+            } , {});
+            for(let u of users){
+                let pos = mapPostitions[u.jobNodeId];
+                if(!pos.users){
+                    pos.users = [];
+                }
+                pos.users.push(u.userId);
+            }
+        },
+
+        getAllPositionInADpm(allPosition){
+            let mapIdToPos = allPosition.reduce((obj, el) => {
+                obj[el.vizId] = el;
+                return obj;
+            }, {});
+
+            let posInDpm = {};
+
+            for(let id in mapIdToPos){
+                let pos = mapIdToPos[id];
+                let parentPos = mapIdToPos[pos.vizParentId];
+                if(parentPos){
+                    if(!parentPos.children){
+                        parentPos.children = [];
+                    }
+                    parentPos.children.push(id);
+                }else{
+                    // khi position này là root
+                    posInDpm[id] = {};
+                }
+            }
+
+            for(let id in posInDpm){
+                this.addPosToDpm(posInDpm, mapIdToPos,id, id);
+            }
+            let mapDpmToPos = {};
+            
+            for(let id in posInDpm){
+                let dpmId = mapIdToPos[id].vizParentId;
+                mapDpmToPos[dpmId] = posInDpm[id];
+            }
+            return mapDpmToPos;
+        },
+        addPosToDpm(rsl, map, currentId, rootId){
+            rsl[rootId][currentId] = map[currentId];
+            if(map[currentId].children){
+                for(let childId of map[currentId].children){
+                    this.addPosToDpm(rsl, map, childId, rootId);
+                }
+            }
+        },
         showPositionEditor(nodeId){
             if(this.context == 'department'){
                 this.positionEditor = true;
@@ -174,7 +288,6 @@ export default {
                         self.$refs.positionDiagram.createFirstVizNode();
                     }
                 }, 200, this);
-               
             }
         },
         createFirstVizNode(){
@@ -320,24 +433,36 @@ export default {
          * Tạo node data để cấu hình
          * @param type nhận một trong các giá trị: department hoặc position
          */
-        createNodeConfigData(type = 'department', nodeData){
+        createNodeConfigData(type = 'department', nodeData, instanceKey = false){
+            if(!instanceKey){
+                instanceKey = this.instanceKey;
+            }
             let defaultConfig = getDefaultConfigNodeData(nodeData.id, type == 'department');
             for(let key in nodeData){
                 if(defaultConfig.commonAttrs[key]){
                     defaultConfig.commonAttrs[key].value = nodeData[key];
                 }
             }
+
+            if(nodeData.positionDiagram){
+                defaultConfig.positionDiagramCells.cells = nodeData.positionDiagram.cells;
+            }
+
+            if(type == 'position' && nodeData.users){
+                defaultConfig.users = nodeData.users;
+            }
             
             this.$store.commit('orgchart/setNodeConfig', {
-                instanceKey: this.instanceKey,
+                instanceKey: instanceKey,
                 nodeId: nodeData.id,
                 data: defaultConfig
             });
-
             
             if(type == 'department'){
                 this.initOrgchartData(defaultConfig.positionDiagramCells.instanceKey);
             }
+
+            return defaultConfig;
         },
 
         /**

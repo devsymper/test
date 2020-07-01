@@ -21,6 +21,10 @@ export const orgchartApi = {
         return orgchart.get('orgchart');
     },
 
+    getOrgchartDetail(id) {
+        return orgchart.get('orgchart/' + id);
+    },
+
     deleteOrgcharts(ids) {
         ids = ids.join(',');
         return orgchart.delete('orgchart/' + ids);
@@ -28,5 +32,5 @@ export const orgchartApi = {
 
     createOrgchart(data) {
         return orgchart.post('orgchart', data);
-    }
+    },
 };
