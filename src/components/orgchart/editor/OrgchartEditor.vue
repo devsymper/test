@@ -19,7 +19,7 @@
                 </v-tooltip>
 
                 <v-btn
-                    v-if="$route.name != 'viewOrgchart' && context == 'department'"
+                    v-if="action != 'view' && context == 'department'"
                     class="float-right mr-1"
                     @click="saveOrgchart"
                     small
@@ -99,7 +99,7 @@ export default {
     props: {
         action: {
             type: String,
-            default: 'create' // clone, edit
+            default: 'create' // clone, edit, view
         },
         context: {
             type: String,
@@ -153,7 +153,7 @@ export default {
     },
     created(){
         this.initOrgchartData();
-        if(this.action == 'edit' || this.action == 'clone' ){
+        if(this.action != 'create'){
             this.restoreOrgchartView(this.id)
         }
     },
