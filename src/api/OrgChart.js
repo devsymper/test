@@ -30,6 +30,10 @@ export const orgchartApi = {
         return orgchart.delete('orgchart/' + ids);
     },
 
+    updateOrgchart(id, data) {
+        return orgchart.put('orgchart/' + id, data);
+    },
+
     createOrgchart(data) {
         return orgchart.post('orgchart', data);
     },

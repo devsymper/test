@@ -165,6 +165,11 @@ export default {
         }
     },
     methods: {
+        restoreMainOrgchartConfig(config){
+            let homeConfig = this.$store.state.orgchart.editor[this.instanceKey].homeConfig;
+            homeConfig.commonAttrs.name.value = config.name;
+            homeConfig.commonAttrs.description.value = config.description;
+        },
         async restoreOrgchartView(id){
             try {
                 let res = await orgchartApi.getOrgchartDetail(id);
@@ -172,10 +177,8 @@ export default {
                     let savedData = res.data;
                     let departments = JSON.parse(savedData.orgchart.content);
                     this.$refs.editorWorkspace.loadDiagramFromJson(departments);
+                    this.restoreMainOrgchartConfig(savedData.orgchart);
                     let mapIdToDpm = {};
-
-                    
-
 
                     for(let node of savedData.departments){
                         let nodeData = {
@@ -326,16 +329,7 @@ export default {
                 return;
             }
             let orgchartData = this.getDataToSave();
-            try {
-                let res = await orgchartApi.createOrgchart(orgchartData);      
-                if(res.status == 200){
-                    this.$snotifySuccess("Create orgchart successfully");   
-                }else{
-                    this.$snotifyError(error, "Can not create orgchart!", res.message);   
-                }   
-            } catch (error) {
-                this.$snotifyError(error, "Can not create orgchart!");   
-            }            
+            this.$emit('save-orgchart-data', orgchartData);          
         },
         getDataToSave(){
             let orgchartAttr = this.$store.state.orgchart.editor[this.instanceKey].homeConfig;
