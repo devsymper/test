@@ -17,8 +17,14 @@ export default {
             return this.params.value;
         },
         changeCheckbox(){
+            this.value = !this.value;
+            let checked = this.value;
+            let colId = this.params.column.colId;
+            console.log(colId);
             console.log(this.params);
-            
+            let rowIndex = this.params.rowIndex;
+            this.params.api.getRowNode(rowIndex).setDataValue(colId,checked)
+
         }
     },
     

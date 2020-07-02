@@ -517,8 +517,8 @@ export default {
                 if(control['listFields'] != undefined){
                     // Object.assign
                 }
-                this.checkNameControl(controlId,control,listControlName);
-                this.validateFormulasInControl(control,listControlName);
+                // this.checkNameControl(controlId,control,listControlName);
+                // this.validateFormulasInControl(control,listControlName);
             }
             
             if(this.listMessageErr.length == 0 && $('#editor_ifr').contents().find('.s-control-error').length == 0){

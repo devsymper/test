@@ -687,7 +687,7 @@ export const getAllPropsControl = function() {
                 editable: true,
                 groupType: data[key].groupType,
                 width: width,
-                colId: key
+                colId: key,
             }
         }
         // function(params) {
