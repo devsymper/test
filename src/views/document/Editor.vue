@@ -18,8 +18,9 @@
                     @document-action-clone-control="cloneControl"
                     @document-action-list-control-option="setShowAllControlOption"
                     @document-action-delete-control="deleteControl"
-                    @document-action-save-to-local-storage="saveControlToLocalStorage"
+                    @document-action-save-to-local-storage="saveContentToLocalStorage"
                     @document-action-get-from-local-storage="getFromLocalStorege"
+                    @document-action-delete-cache="deleteLocalStorage"
                     
                     />
                 </div>
@@ -98,9 +99,12 @@ import { formulasApi } from "./../../api/Formulas.js";
 import { util } from "./../../plugins/util.js";
 import { getInsertionCSS } from "./../../components/document/documentUtil.js";
 import VueResizable from 'vue-resizable'
+import { minimizeControl } from '../../store/document/mutations'
 let isShowAutocompleteControl = false;
 // biến lưu chiều rộng editor trước khi resize 
-let editorWidth = 0;
+const ALL_CONTROL = "allControl"
+const HTML_CONTENT = "content"
+const CODUMENT_PROPS = "documentProperties"
 export default { 
     computed: {
         editorStore(){  
@@ -211,26 +215,39 @@ export default {
 
         // lấy data từ local storage
         getFromLocalStorege(){
-            let allControl = localStorage.getItem('allControl');
+            let allControl = localStorage.getItem(ALL_CONTROL);
             allControl = JSON.parse(allControl);
-            let content = localStorage.getItem('content');
-            let documentProperties = localStorage.getItem('documentProperties');
+            let content = localStorage.getItem(HTML_CONTENT);
+            let documentProperties = localStorage.getItem(CODUMENT_PROPS);
             this.$refs.editor.editor.setContent(content);
             this.$store.commit(
-                                    "document/addToDocumentStore",{key:'documentProperties',value:documentProperties}
+                                    "document/addToDocumentStore",{key:CODUMENT_PROPS,value:documentProperties}
                                 );  
             this.$store.commit(
-                                    "document/addToDocumentEditorStore",{key:'allControl',value:allControl}
+                                    "document/addToDocumentEditorStore",{key:ALL_CONTROL,value:allControl}
                                 );  
         },
         //set data vào local storage
-        saveControlToLocalStorage(){
+        saveContentToLocalStorage(){
             let allControl = this.editorStore.allControl;
             let content = this.$refs.editor.editor.getContent();
             let documentProperties = this.$store.state.document.documentProps;
-            localStorage.setItem('allControl',JSON.stringify(allControl));
-            localStorage.setItem('content',content);
-            localStorage.setItem('documentProperties',JSON.stringify(documentProperties));
+            localStorage.setItem(ALL_CONTROL,JSON.stringify(allControl));
+            localStorage.setItem(HTML_CONTENT,content);
+            localStorage.setItem(CODUMENT_PROPS,JSON.stringify(documentProperties));
+            thisCpn.$snotify({
+                                type: "info",
+                                title: "Save to local storage success"
+                            }); 
+        },
+        deleteLocalStorage(){
+            localStorage.removeItem(ALL_CONTROL);
+            localStorage.removeItem(HTML_CONTENT);
+            localStorage.removeItem(CODUMENT_PROPS);
+            thisCpn.$snotify({
+                                type: "info",
+                                title: "Delete control in local storage success"
+                            });  
         },
         // sao chép control và thêm vào sau nó
         cloneControl(){
@@ -368,9 +385,36 @@ export default {
         setDataFormulasId(){
             
         },
+        minimizeControlEL(allControl){
+            var allInputControl = $("#editor_ifr").contents().find('body').find(".s-control");
+            let allId = [];
+            $.each(allInputControl,function(k,v){
+                let id = $(v).attr('id');
+                allId.push(id);
+            });
+            for (let controlId in allControl){
+                if(allId.indexOf(controlId) === -1){
+                    delete allControl[controlId];
+                }
+                else{
+                    if(allControl[controlId].type == 'table'){
+                        if(allId.indexOf(controlId) === -1){
+                            for(let childControlId in allControl[controlId].listFields){
+                                if(allId.indexOf(childControlId) === -1){
+                                    delete allControl[controlId].listFields[childControlId];
+                                }
+                            }
+                        }
+                    }   
+                }
+                
+            }
+            return allControl
+            
+        },
         // hoangnd: hàm gửi request lưu doc
         async saveDocument(){
-            let allControl = this.editorStore.allControl;
+            let allControl = this.minimizeControlEL(this.editorStore.allControl);
             let documentProperties = util.cloneDeep(this.$store.state.document.documentProps);
             documentProperties = JSON.stringify(documentProperties);
             let dataPost = this.getDataToSaveMultiFormulas(allControl);
@@ -633,6 +677,8 @@ export default {
 
         // hàm add các thuộc tính và formulas của control vào danh sách các control trong doc được lưu trong state
         addToAllControlInDoc(controlId,control){
+            console.log(control);
+            
             this.$store.commit(
                 "document/addControl",{id:controlId,props:control}
             );  
@@ -744,6 +790,7 @@ export default {
         },
         // hàm click ra ngoài editor thì cập nhật lại dữ liệu của store
         detectBlurEditorEvent(event){
+            this.saveContentToLocalStorage()
             let allControlEl = $('#editor_ifr').contents().find('.s-control');
             let listId = []
             $.each(allControlEl,function(k,v){
@@ -934,9 +981,6 @@ export default {
                                 childProperties[k].value = (listField[childFieldId]['properties'][k] == 0 || listField[childFieldId]['properties'][k] == '0' || listField[childFieldId]['properties'][k] == '') ? false : true
                             }
                             else{
-                                
-                                
-                                
                                 childProperties[k].value = listField[childFieldId]['properties'][k]
                             }
                         })

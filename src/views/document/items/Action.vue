@@ -23,7 +23,7 @@ export default {
                 { text: 'From cache', icon: 'mdi-content-save' ,action:'get-from-local-storage'},
                 { text: 'Xóa control', icon: 'mdi-delete-forever' ,action:'delete-control'},
                 { text: 'Clone control', icon: 'mdi-content-copy' ,action:'clone-control'},
-                { text: 'Xóa bộ đệm', icon: 'mdi-delete-circle' ,action:'delete-cache-control'},
+                { text: 'Xóa bộ đệm', icon: 'mdi-delete-circle' ,action:'delete-cache'},
                 { text: 'TH control', icon: 'mdi-cog' ,action:'list-control-option'},
                 { text: 'Lưu doc', icon: 'mdi-file-document' ,action:'save-document'},
             ],

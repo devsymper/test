@@ -73,7 +73,7 @@ function setTreeListControlInDoc(state) {
         let props = control.properties;
         let name = "";
         let title = "";
-        if (type == 'submit' || type == 'draft') {
+        if (type == 'submit' || type == 'draft' || type == 'reset' || type == 'approvalHistory') {
             name = type
             title = type
         } else {
