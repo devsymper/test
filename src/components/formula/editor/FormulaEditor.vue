@@ -1,5 +1,5 @@
 <template>
-    <div class="h-100 w-100" :style="{height: height}">
+    <div class="h-100 w-100" :style="{height: height}" >
         <code-editor
             ref="edtScript" 
             v-model="lazyValue" 
