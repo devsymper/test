@@ -63,6 +63,7 @@
             }">
 
             <OrgchartEditor
+                @update-department-name="changeDepartmentName"
                 ref="positionDiagram"
                 :instanceKey="selectingNode.positionDiagramCells.instanceKey"
                 context="position">
@@ -309,6 +310,8 @@ export default {
             if(!this.$store.state.orgchart.editor[subInstanceKey]){
                 this.$refs.positionDiagram.initOrgchartData();
             }
+            this.$set(this.$store.state.orgchart.editor[subInstanceKey].homeConfig, 'commonAttrs', this.selectingNode.commonAttrs);
+            this.$set(this.$store.state.orgchart.editor[subInstanceKey].homeConfig, 'customAttributes', this.selectingNode.customAttributes);
         },
         storeDepartmentPositionCells(){
             let cells = this.$refs.positionDiagram.$refs.editorWorkspace.getAllDiagramCells();
@@ -401,9 +404,19 @@ export default {
         },
         handleConfigValueChange(data){
             let cellId = this.selectingNode.id;
+
             if(data.name == 'name' && cellId != SYMPER_HOME_ORGCHART){
                 this.$refs.editorWorkspace.updateCellAttrs(cellId, 'name', data.data);
+            }else if(cellId == SYMPER_HOME_ORGCHART && this.context == 'position'){
+                this.$emit('update-department-name', data.data);
             }
+        },
+        changeDepartmentName(newName, idDepartment = false){
+            if(!idDepartment){
+                idDepartment = this.selectingNode.id;
+            }
+            debugger
+            this.$refs.editorWorkspace.updateCellAttrs(idDepartment, 'name',newName);
         },
         handleNewNodeAdded(nodeData){
             this.createNodeConfigData(this.context, nodeData);

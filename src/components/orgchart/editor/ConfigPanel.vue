@@ -44,6 +44,7 @@
                         v-model="openAddPanel"
                         :close-on-content-click="false"
                         offset-y
+                        :close-on-click="false"
                         class="float-right">
                         <template v-slot:activator="{ on, attrs }">
                                 <div>
@@ -55,7 +56,7 @@
                                         {{$t('orgchart.editor.listDynamicAttributes')}}
                                     </span>
                                     <v-btn
-                                        class="float-right"
+                                        class="dynamic-attr-form-activator float-right"
                                         color="indigo"
                                         dark
                                         icon
@@ -66,9 +67,10 @@
                                     </v-btn>
                                 </div>
                         </template>
-                        <div style="width: 300px" class="pa-4 bg-white">
+                        <div style="width: 300px" class="pa-4 bg-white symper-dynamic-attr-form" :data-instance-key="instanceKey" >
                             <form-tpl
                                 :singleLine="false"
+                                ref="dynamicAttrForm"
                                 :allInputs="dynamicValueInputs">
                             </form-tpl>
                             <div style="height: 30px">
@@ -124,6 +126,22 @@ import FormTpl from "@/components/common/FormTpl";
 import UserSelector from "@/views/tasks/userSelector.vue";
 
 export default {
+    created(){
+        this.$evtBus.$on('symper-app-wrapper-clicked', (evt) => {
+            if(this.$refs.dynamicAttrForm && 
+                $(evt.target).parents('.dynamic-attr-form-activator').length ==0 &&  
+                $(evt.target).parents('.symper-dynamic-attr-form').length == 0
+            ){
+                // if(this.$refs.dynamicAttrForm.isLargeFormulaEditorOpen()){
+                    if($(evt.target).parents('.symper-drag-panel').length == 0){
+                        this.openAddPanel = false;
+                    }
+                // }else{
+                //     this.openAddPanel = false;
+                // }
+            }
+        });
+    },
     components: {
         'form-tpl': FormTpl,
         UserSelector

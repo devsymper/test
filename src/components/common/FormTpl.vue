@@ -80,7 +80,7 @@
             </component>
         </div>
 
-        <symper-drag-panel
+        <symper-drag-panel 
             @before-close="closeLargeFormulaEditor()"
             :showPanel="largeFormulaEditor.open"
             :actionTitle="largeFormulaEditor.data.title"
@@ -285,6 +285,9 @@ export default {
         };
     },
     methods: {
+        isLargeFormulaEditorOpen(){
+            return this.$refs.dragPanel.selfShowPanel;
+        },
         translateOrgchartValuesToTags(){
             if(this.translateOrgchartValuesToTagsDebounce){
                 clearTimeout(this.translateOrgchartValuesToTagsDebounce);
