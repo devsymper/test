@@ -21,7 +21,10 @@ function jointLinkNode(source, target) {
         target: { id: target.id },
         attrs:{
             '.connection': {
-                'stroke-width': 1
+                'stroke-width': 5
+            },
+            '.marker-arrowheads': {
+                display: 'none'
             }
         },
     });

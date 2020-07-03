@@ -1,6 +1,6 @@
 <template>
     <div class="h-100 w-100">
-    	<div ref="jointWrapper" class="xxxxxxxxx" :style="{
+    	<div ref="jointWrapper" class="symper-orgchart-paper" :style="{
             height: wrapper.height,
             width: wrapper.width
         }"></div>
