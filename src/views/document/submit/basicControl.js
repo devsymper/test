@@ -178,18 +178,25 @@ export default class BasicControl extends Control {
         let deleteFileIcon = '';
         if (this.checkDetailView()) {
             this.value = sDocument.state.editor.allControl[listInputInDocument[this.inTable].id].value[this.name];
-        } else {
-            deleteFileIcon = '<span  data-file-name="` + fileName + `" title="xóa" class="remove-file"><span class="mdi mdi-close"></span></span>';
         }
         if (this.value != '' && this.value.hasOwnProperty(rowId)) {
-            let fileName = this.value[rowId];
-            let fileExt = Util.getFileExtension(fileName);
-            let icon = fileTypes[fileExt];
-            let file = `<div  class="file-item">
-                            ` + deleteFileIcon + `
-                            <i onclick="window.open('https://sdocument-management.symper.vn/file/public` + fileName + `');" class="mdi ` + icon + ` file-view" ></i>
-                        </div>`
-            addTpl += file;
+            console.log('khh', this.value);
+
+            for (let index = 0; index < this.value[rowId].length; index++) {
+                let fileName = this.value[rowId][index];
+                let fileExt = Util.getFileExtension(fileName);
+                let icon = fileTypes[fileExt];
+                if (!this.checkDetailView()) {
+                    deleteFileIcon = `<span data-rowid="` + rowId + `" data-file-name="` + fileName + `" title="xóa" class="remove-file"><span class="mdi mdi-close"></span></span>`;
+
+                }
+                let file = `<div  class="file-item">
+                                ` + deleteFileIcon + `
+                                <i onclick="window.open('https://sdocument-management.symper.vn/file/public` + fileName + `');" class="mdi ` + icon + ` file-view" ></i>
+                            </div>`
+                addTpl += file;
+            }
+
 
         }
         return addTpl.replace(/\n/g, '');
@@ -210,10 +217,10 @@ export default class BasicControl extends Control {
             type: 'post',
             success: function(response) {
                 if (response.status == 200) {
-                    let file = `<div title="${response.data.name}" class="file-item">
-                            <span data-file-name="` + response.data.name + `" title="xóa" class="remove-file"><span class="mdi mdi-close"></span></span>
-                            <i  onclick="window.open('https://sdocument-management.symper.vn/file/` + response.data.path + `');" class="mdi ` + icon + ` file-view" ></i>
-                        </div>`
+                    let file = `<div title="${response.data.path}" class="file-item">
+                                <span data-file-name="${response.data.path}" title="xóa" class="remove-file"><span class="mdi mdi-close"></span></span>
+                                <i  onclick="window.open('https://sdocument-management.symper.vn/file/` + response.data.path + `');" class="mdi ` + icon + ` file-view" ></i>
+                            </div>`
                     thisObj.setDeleteFileEvent(thisObj.ele, thisObj.name)
                     thisObj.ele.find('.upload-file-wrapper-outtb').append(file);
                     let curValue = listInputInDocument[thisObj.name].value;
@@ -222,7 +229,10 @@ export default class BasicControl extends Control {
                         if (!Array.isArray(curValue)) {
                             curValue = [];
                         }
-                        curValue[rowId] = response.data.name
+                        if (!curValue.hasOwnProperty(rowId)) {
+                            curValue[rowId] = []
+                        }
+                        curValue[rowId].push(response.data.name);
                     } else {
                         curValue += "," + response.data.name;
                         this.value = curValue;
@@ -244,12 +254,21 @@ export default class BasicControl extends Control {
         let value = listInputInDocument[controlName].value;
         ele.off('click', '.remove-file')
         ele.on('click', '.remove-file', function(e) {
+            let rowId = $(this).attr('data-rowid');
             e.preventDefault();
             e.stopPropagation();
             let fileName = $(this).attr('data-file-name');
-            let newValue = value.replace(/^,/gi, "");
-            newValue = newValue.replace(fileName, "");
-            $(this).closest('.file-item').remove();
+            let newValue = "";
+            // nếu trong table
+            if (rowId != "" && rowId != undefined) {
+                listInputInDocument[controlName].value.splice(value.indexOf(fileName), 1);
+                newValue = listInputInDocument[controlName].value;
+                $(this).closest('.file-item').remove();
+            } else {
+                newValue = value.replace(/^,/gi, "");
+                newValue = newValue.replace(fileName, "");
+                $(this).closest('.file-item').remove();
+            }
             store.commit("document/updateListInputInDocument", {
                 controlName: controlName,
                 key: 'value',
