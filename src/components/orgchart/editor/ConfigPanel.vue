@@ -205,7 +205,24 @@ export default {
                 item[key] =  this.dynamicValueInputs[key].value;
             }
         },
+        validateBeforeAddDynamicAttr(){
+            let passed = true;
+            if(!this.dynamicValueInputs.name.value){
+                this.$snotifyError({},"Name of attribute can not empty",'', 2000);
+                passed = false;
+            }
+
+            if(!this.dynamicValueInputs.value.value){
+                this.$snotifyError({},"Value of attribute can not empty",'', 2000);
+                passed = false;
+            }
+            return passed;
+        },  
         addDynamicAttr(){
+            let passed = this.validateBeforeAddDynamicAttr();
+            if(!passed){
+                return;
+            }
             if(this.addPanelAction == 'update'){
                 this.updateDynamicAttrItem();
                 this.openAddPanel = false;

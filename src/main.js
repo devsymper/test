@@ -87,16 +87,21 @@ Vue.prototype.$snotify = function(option, group = false) {
     this.$notify(option);
 }
 
-Vue.prototype.$snotifyError = function(err = {}, title = 'ERROR', detail = '') {
+Vue.prototype.$snotifyError = function(err = {}, title = 'ERROR', detail = '', duration = false) {
     console.warn(err);
     if (!detail && err.responseJSON && err.responseJSON.message) {
         detail = err.responseJSON.message;
     }
-    this.$snotify({
+    let setting = {
         type: 'error',
         title: title,
         text: detail
-    });
+    }
+
+    if (duration) {
+        setting.duration = duration;
+    }
+    this.$snotify(setting);
 }
 Vue.prototype.$snotifyInfo = function(title = 'INFORMATION', detail = '') {
     this.$snotify({
