@@ -23,14 +23,14 @@ export default {
                         this.action = 'edit';
                         this.orgchartId = res.data.id;
                     }else{
-                        this.$snotifyError(error, "Can not create orgchart!", res.message);   
+                        this.$snotifyError(res, "Can not create orgchart!", res.message);   
                     }   
                 }else if(this.action == 'edit'){
                     res = await orgchartApi.updateOrgchart(this.orgchartId, orgchartData);   
                     if(res.status == 200){
                         this.$snotifySuccess("Update orgchart successfully");   
                     }else{
-                        this.$snotifyError(error, "Can not update orgchart!", res.message);   
+                        this.$snotifyError(res, "Can not update orgchart!", res.message);   
                     }   
                 }   
             } catch (error) {

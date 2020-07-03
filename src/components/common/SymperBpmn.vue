@@ -19,6 +19,7 @@ import "bpmn-js/dist/assets/diagram-js.css";
 import "bpmn-js/dist/assets/bpmn-font/css/bpmn.css";
 import "bpmn-js/dist/assets/bpmn-font/css/bpmn-codes.css";
 import "bpmn-js/dist/assets/bpmn-font/css/bpmn-embedded.css";
+import { util } from '../../plugins/util';
 
 export default {
     name: "symper-bpmn",
@@ -210,7 +211,7 @@ export default {
                 let self = this;
                 let downloadLink = $(this.$refs.downloadLinkSVG);
                 done = function(err, xml) {
-                    self.setEncoded(
+                    util.setEncoded(
                         downloadLink,
                         "diagram.svg",
                         err ? null : xml
@@ -225,7 +226,7 @@ export default {
                 let self = this;
                 let downloadLink = $(this.$refs.downloadLinkXML);
                 done = function(err, xml) {
-                    self.setEncoded(
+                    util.setEncoded(
                         downloadLink,
                         "diagram.bpmn",
                         err ? null : xml
@@ -247,20 +248,6 @@ export default {
                 }
             });
             return result;
-        },
-        setEncoded(link, name, data) {
-            var encodedData = encodeURIComponent(data);
-            if (data) {
-                link.attr({
-                    href:
-                        "data:application/bpmn20-xml;charset=UTF-8," +
-                        encodedData,
-                    download: name
-                });
-                setTimeout(() => {
-                    link[0].click();
-                }, 200);
-            }
         },
         /**
          * Update thuộc tính của một element trong bpmn

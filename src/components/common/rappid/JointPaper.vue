@@ -1,9 +1,13 @@
 <template>
     <div class="h-100 w-100">
+        <div ref="symperPaperToolbar" class=" d-none">
+
+        </div>
     	<div ref="jointWrapper" class="symper-orgchart-paper" :style="{
             height: wrapper.height,
             width: wrapper.width
         }"></div>
+        <a ref="downloadLinkSVG" href></a>
     </div>
 </template>
 
@@ -82,8 +86,49 @@ export default {
         paperScroller.zoom(-0.2);
         paperScroller.centerContent();
         this.paper.on('blank:pointerdown', paperScroller.startPanning);
+        this.addToolbar(paperScroller);
 		this.$emit('init', this.graph, this.paper, paperScroller);
-	}
+    },
+    methods: {
+        saveSVG(){
+            let self = this;
+            let downloadLink = $(this.$refs.downloadLinkSVG);
+            let done = function(svgString) {
+                util.setEncoded(
+                    downloadLink,
+                    "diagram.svg",
+                    svgString
+                );
+            };
+            this.paper.toSVG(done);
+        },
+        actionOnToolbar(type){
+            // let typeClass = {
+            //     zoom:'zoomSlider',
+            //     zoomin:'zoomIn',
+            //     zoomout:'zoomOut',
+            //     fit:'zoomToFit',
+            //     undo:'undo',
+            //     redo:'redo',
+            // };
+            let ele = $(this.$refs.symperPaperToolbar).find('.joint-widget[data-type='+type+']');
+            ele.mousedown();
+            ele.click();
+        },
+        addToolbar(paperScroller){
+            let commandManager = new joint.dia.CommandManager({
+                graph: this.graph
+            });
+            let toolbar = new joint.ui.Toolbar({
+                tools: ['zoomIn', 'zoomOut', 'zoomToFit', 'undo', 'redo'],
+                references: {
+                    paperScroller: paperScroller,
+                    commandManager: commandManager
+                }
+            });
+            $(this.$refs.symperPaperToolbar).append(toolbar.render().el);
+        }
+    }
 };
 </script>
 

@@ -21,7 +21,7 @@ function jointLinkNode(source, target) {
         target: { id: target.id },
         attrs:{
             '.connection': {
-                'stroke-width': 5
+                'stroke-width': 1
             },
             '.marker-arrowheads': {
                 display: 'none'
@@ -65,6 +65,12 @@ export default {
         }
     },
 	methods: {
+        saveSVG(){
+            this.$refs.jointPaper.saveSVG();
+        },
+        handleHeaderAction(action){
+            this.$refs.jointPaper.actionOnToolbar(action);
+        },
         loadDiagramFromJson(cells){
             this.$refs.jointPaper.graph.fromJSON(cells);
         },

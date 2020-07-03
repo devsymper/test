@@ -116,25 +116,30 @@ export default {
         return {
             positionEditor: false,
             headerActions: {
-                undo: {
-                    icon: "mdi-undo",
-                    text: "process.header_bar.undo"
-                },
-                redo: {
-                    icon: "mdi-redo",
-                    text: "process.header_bar.redo"
-                },
+                // undo: {
+                //     icon: "mdi-undo",
+                //     text: "process.header_bar.undo",
+                //     action: "undo"
+                // },
+                // redo: {
+                //     icon: "mdi-redo",
+                //     text: "process.header_bar.redo",
+                //     action: "redo"
+
+                // },
                 zoomIn: {
-                    icon: "mdi-minus-circle-outline",
-                    text: "process.header_bar.zoom_in"
+                    icon: "mdi-plus-circle-outline",
+                    text: "process.header_bar.zoom_in",
+
                 },
                 zoomOut: {
-                    icon: "mdi-plus-circle-outline",
-                    text: "process.header_bar.zoom_out"
+                    icon: "mdi-minus-circle-outline",
+                    text: "process.header_bar.zoom_out",
+
                 },
-                focus: {
+                zoomToFit: {
                     icon: "mdi-image-filter-center-focus",
-                    text: "process.header_bar.focus"
+                    text: "process.header_bar.focus",
                 },
                 saveSVG: {
                     icon: "mdi-image-outline",
@@ -407,6 +412,17 @@ export default {
         handleHeaderAction(action){
             if(action == 'home'){
                 this.showOrgchartConfig()
+            }else if(action == 'saveSVG'){
+                this.$refs.editorWorkspace.saveSVG();
+            }else if(action == 'validate'){
+                let rsl = this.validateDataBeforeSave();
+                if(rsl.passed){
+                    this.$snotifySuccess("Validate passed!");
+                }else{
+                    this.$snotifyError(rsl,"Validate failed!", rsl.message);
+                }
+            }else{
+                this.$refs.editorWorkspace.handleHeaderAction(action);
             }
         },
         showOrgchartConfig(){
