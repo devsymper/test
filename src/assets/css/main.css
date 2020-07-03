@@ -379,7 +379,7 @@ html {
 }
 
 .close-tab-btn {
-    position: absolute;
+    position: absolute!important;
     right: 2px;
     padding: 0px 1px;
     top: 11px;
@@ -667,4 +667,8 @@ html {
 
 .symper-orgchart-paper .marker-vertex-group {
     display: none!important;
+}
+
+.position-absolute {
+    position: absolute!important;
 }

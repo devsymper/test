@@ -102,6 +102,13 @@
                                 <div class="text-ellipsis grey--text fs-13">
                                     {{item.value}}
                                 </div>
+                                
+                                <v-icon
+                                    @click.stop.prevent="removeDynamicItem(idx)"
+                                    class="close-btn position-absolute float-right"
+                                    size="14"
+                                    style="right: 10px"
+                                >mdi-close</v-icon>
                             </v-list-item-content>
                         </v-list-item>
                     </v-list-item-group>
@@ -172,6 +179,9 @@ export default {
         }
     },
     methods: {
+        removeDynamicItem(index){
+            this.selectingNode.customAttributes.splice(index, 1);
+        },
         actionBeforeAddAttr(){
             this.addPanelAction = 'add'; 
             this.emptyAttrPanel();
