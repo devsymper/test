@@ -554,26 +554,19 @@ export default {
             let allControl = util.cloneDeep(this.editorStore.allControl);
             let listControlName = [];
             this.listMessageErr = [];
-            $('#editor_ifr').contents().find('.s-control-error').removeClass('s-control-error');
-            $("#editor_ifr").contents().find('.on-selected').removeClass('on-selected');
-
             //check trung ten control
-            for(let controlId in allControl){
-                let control = allControl[controlId];
-                if(control['listFields'] != undefined){
-                    // Object.assign
-                }
-                // this.validateFormulasInControl(control,listControlName);
-            }
+            $("#editor_ifr").contents().find('.on-selected').removeClass('on-selected');
             
-            if(this.listMessageErr.length == 0 && $('#editor_ifr').contents().find('.s-control-error').length == 0){
+            
+            if($('#editor_ifr').contents().find('.s-control-error').length == 0){
                 this.saveDocument();
             }
             else{
-                this.$refs.saveDocPanel.hideDialog();
-                setTimeout(function(){
-                    thisCpn.$refs.errMessage.showDialog();
-                },300)
+                this.$snotify({
+                                type: "error",
+                                title: "Thông tin control chưa hợp lệ",
+                                text : "Kiểm tra lại tên các control"
+                            }); 
             }
         },
         // hàm kiểm tra xác thực tên control 
