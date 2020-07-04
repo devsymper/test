@@ -52,6 +52,7 @@
                 @change="(data) => {
                     handleChangeInputValue(inputInfo, name,data);
                 }"
+                @blur="handleInputBlur(inputInfo, name)"
                 :ref="'inputItem_'+name"
                 solo
                 :items="inputInfo.options"
@@ -286,6 +287,9 @@ export default {
         };
     },
     methods: {
+        handleInputBlur(inputInfo, name){
+            this.$emit('blur',inputInfo, name);
+        },
         isLargeFormulaEditorOpen(){
             return this.$refs.dragPanel.selfShowPanel;
         },

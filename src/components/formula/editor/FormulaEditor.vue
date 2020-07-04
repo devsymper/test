@@ -4,7 +4,6 @@
             ref="edtScript" 
             v-model="lazyValue" 
             @init="editorInit" 
-            @input="handleEditorInput"
             lang="sql" 
             theme="chrome" 
             width="100%" 
@@ -28,9 +27,14 @@ export default {
         }
     },
     mounted(){
+        let self = this;
         if(this.disabled){
             this.$refs.edtScript.editor.setReadOnly(true);
         }
+
+        this.$refs.edtScript.editor.on('blur', () => {
+            self.$emit('blur', {});
+        });
     },
     computed: {
         lazyValue:{
