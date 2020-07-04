@@ -4,6 +4,7 @@
         :items="allUser"
         filled
         dense
+        :disabled="disabled"
         solo
         flat
         chips
@@ -72,6 +73,10 @@ export default {
             default: false,
         },
         flat: {
+            type: Boolean,
+            default: false,
+        },
+        disabled: {
             type: Boolean,
             default: false,
         }

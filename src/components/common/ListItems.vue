@@ -350,7 +350,8 @@ export default {
         };
     },
     activated(){
-        this.$refs.dataTable.hotInstance.render();
+        // this.$refs.dataTable.hotInstance.render();
+        this.refreshList();
     },
     created() {
         let thisCpn = this;

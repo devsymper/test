@@ -66,6 +66,7 @@
                 :class="'sym-small-size sym-style-input d-inline-block '+(inputInfo.classes ? inputInfo.classes : '') "
                 :key="name"
                 single-line
+                :disabled="viewOnly"
                 v-bind="getInputProps(inputInfo)"
                 v-model="inputInfo.value"
                 :is="getInputTag(inputInfo.type)">
@@ -429,6 +430,10 @@ export default {
             type: String,
             default: "8px"
         },
+        viewOnly: {
+            type: Boolean,
+            default: false
+        }
     },
     computed: {
         labelMinwidth() {

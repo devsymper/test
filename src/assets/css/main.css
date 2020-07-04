@@ -656,19 +656,3 @@ html {
     font-size: 17px!important;
     font-weight: 500!important;
 }
-
-.symper-orgchart-paper .link-tools {
-    display: none!important;
-}
-
-.symper-orgchart-paper .marker-arrowheads {
-    display: none!important;
-}
-
-.symper-orgchart-paper .marker-vertex-group {
-    display: none!important;
-}
-
-.position-absolute {
-    position: absolute!important;
-}

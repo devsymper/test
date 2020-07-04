@@ -31,7 +31,10 @@
                 </v-btn>
             </div>
             <EditorWorkspace 
-                class="w-100" 
+                :class="{
+                    'w-100': true,
+                    'symper-orgchart-view': action == 'view'
+                }" 
                 style="height: calc(100% - 41px)"
                 @new-viz-cell-added="handleNewNodeAdded"
                 @blank-paper-clicked="handleBlankPaperClicked"
@@ -48,6 +51,7 @@
             <ConfigPanel 
             @config-value-change="handleConfigValueChange"
             :instanceKey="instanceKey"
+            :action="action"
             :context="context">
             </ConfigPanel>
         </div>
@@ -65,6 +69,7 @@
             <OrgchartEditor
                 @update-department-name="changeDepartmentName"
                 ref="positionDiagram"
+                :action="action"
                 :instanceKey="selectingNode.positionDiagramCells ? selectingNode.positionDiagramCells.instanceKey : ''"
                 context="position">
             </OrgchartEditor>
@@ -182,6 +187,9 @@ export default {
             homeConfig.customAttributes = config.dynamicAttributes;
         },
         async restoreOrgchartView(id){
+            if(!id){
+                return
+            }
             try {
                 let res = await orgchartApi.getOrgchartDetail(id);
                 if(res.status == 200){
@@ -235,7 +243,7 @@ export default {
                     }
                     this.showOrgchartConfig();
                 }else{
-                    this.$snotifyError(error, "Can not get orgchart data",res.message);
+                    this.$snotifyError(res, "Can not get orgchart data",res.message);
                 }
             } catch (error) {
                 this.$snotifyError(error, "Can not get orgchart data");
@@ -534,4 +542,14 @@ export default {
 </script>
 
 <style>
+.symper-orgchart-paper .marker-arrowheads, 
+.symper-orgchart-paper .link-tools,
+.symper-orgchart-paper .marker-vertex-group,
+.symper-orgchart-view .symper-orgchart-paper .orgchart-action {
+    display: none!important;
+}
+
+.position-absolute {
+    position: absolute!important;
+}
 </style>

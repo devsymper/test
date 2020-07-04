@@ -18,6 +18,7 @@
                     {{$t('orgchart.editor.generalAttributes')}}
                 </span>
                 <form-tpl
+                    :viewOnly="action == 'view'"
                     :singleLine="true"
                     :labelWidth="'60px'"
                     @input-value-changed="handleAttrValueChanged"
@@ -28,6 +29,7 @@
                     <UserSelector
                         ref="userSelector"
                         :isMulti="true"
+                        :disabled="action == 'view'"
                         :compactChip="true"
                         :color="'grey lighten-3'"
                         :textColor="''"
@@ -59,6 +61,7 @@
                                         class="dynamic-attr-form-activator float-right"
                                         color="indigo"
                                         dark
+                                        v-if="action != 'view'"
                                         icon
                                         v-bind="attrs"
                                         @click="actionBeforeAddAttr"
@@ -69,6 +72,7 @@
                         </template>
                         <div style="width: 300px" class="pa-4 bg-white symper-dynamic-attr-form" :data-instance-key="instanceKey" >
                             <form-tpl
+                                :viewOnly="action == 'view'"
                                 :singleLine="false"
                                 ref="dynamicAttrForm"
                                 :allInputs="dynamicValueInputs">
@@ -78,6 +82,7 @@
                                     class="float-right mr-1 mt-2"
                                     @click="addDynamicAttr"
                                     small
+                                    v-if="action != 'view'"
                                     depressed
                                     color="primary">
                                     <v-icon class="mr-2" primary> {{addPanelAction == 'add' ? 'mdi-plus' : 'mdi-content-save'}}</v-icon>
@@ -106,6 +111,7 @@
                                 </div>
                                 
                                 <v-icon
+                                    v-if="action != 'view'"
                                     @click.stop.prevent="removeDynamicItem(idx)"
                                     class="close-btn position-absolute float-right"
                                     size="14"
@@ -157,6 +163,10 @@ export default {
         },
         context: {
             default: 'department'
+        },
+        action: {
+            type: String,
+            default: 'create'
         }
     },
     watch: {

@@ -27,6 +27,11 @@ export default {
         return {
         }
     },
+    mounted(){
+        if(this.disabled){
+            this.$refs.edtScript.editor.setReadOnly(true);
+        }
+    },
     computed: {
         lazyValue:{
             get(){
@@ -91,6 +96,10 @@ export default {
             default: "500px"
         },
         simpleMode: {
+            type: Boolean,
+            default: false
+        },
+        disabled: {
             type: Boolean,
             default: false
         }

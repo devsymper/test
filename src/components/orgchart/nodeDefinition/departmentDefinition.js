@@ -36,7 +36,7 @@ export const defineDepartment = function() {
         '</g>',
         // '<text class="rank"/>',
         '<text class="name"/>',
-        '<g class="btn add"><circle class="add"/><text class="add">+</text></g>',
+        '<g class="btn add orgchart-action"><circle class="add"/><text class="add">+</text></g>',
         // '<g class="btn del"><circle class="del"/><text class="del">-</text></g>',
         // '<g class="btn edit"><rect class="edit"/><text class="edit">EDIT</text></g>',
         '</g>'
