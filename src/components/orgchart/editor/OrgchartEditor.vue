@@ -163,6 +163,9 @@ export default {
             this.restoreOrgchartView(this.id)
         }
     },
+    activated(){
+        this.centerDiagram();
+    },
     watch: {
         positionEditor(after){
             if(after === false){
@@ -184,6 +187,7 @@ export default {
                     let savedData = res.data;
                     let departments = JSON.parse(savedData.orgchart.content);
                     this.$refs.editorWorkspace.loadDiagramFromJson(departments);
+                    this.centerDiagram();
                     this.restoreMainOrgchartConfig(savedData.orgchart);
                     let mapIdToDpm = {};
 
@@ -249,7 +253,11 @@ export default {
                 pos.users.push(u.userId);
             }
         },
-
+        centerDiagram(){
+            setTimeout((self) => {
+                self.$refs.editorWorkspace.handleHeaderAction('zoomToFit');
+            }, 200, this);
+        },
         getAllPositionInADpm(allPosition){
             let mapIdToPos = allPosition.reduce((obj, el) => {
                 obj[el.vizId] = el;
