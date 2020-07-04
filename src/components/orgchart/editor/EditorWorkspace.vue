@@ -44,6 +44,7 @@ export default {
     },
     created(){
         defineDepartment();
+        definePosition();
     },
     mounted(){
         this.initDiagramView();
@@ -56,7 +57,7 @@ export default {
     data(){
         return {
 			background: {
-				color: 'white'
+				color: '#F3F2F1'
 			},
 			gridSize: 30,
 			drawGrid: {
@@ -98,17 +99,25 @@ export default {
             let graph = this.$refs.jointPaper.graph;
             let treeLayout = this.$refs.jointPaper.treeLayout;
             let self = this;
+
+            
+            paper.on('element:remove', function(elementView, evt, x, y) {
+                evt.stopPropagation();
+                // A member removal
+                elementView.model.remove();
+                treeLayout.layout();
+            });
             
             paper.on('element:add', function(elementView, evt) {
                 evt.stopPropagation();
                 let countDepartment = graph.getCells().filter((el) => {
-                    return el.attributes.type == 'org.Member';
+                    return el.attributes.type != 'org.Arrow';
                 }).length + 1;
                 let name = self.context == 'department' ? self.$t('orgchart.editor.department') : self.$t('orgchart.editor.position');
                 name += (' '+countDepartment);
                 // Adding a new member
                 let newNode ;
-                if(this.context == 'department'){
+                if(self.context == 'department'){
                     newNode = createDepartmentNode(name);
                 }else{
                     newNode = createPositionNode(name);

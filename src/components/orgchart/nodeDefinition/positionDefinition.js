@@ -27,27 +27,29 @@ export const POSITION_NODE_DATA = {
     "name": "Vị trí 1",
     "attrs": DEFAULT_POSITION_ATTRS
 };
+let SymperPosition;
 export const definePosition = function() {
-    joint.setTheme('modern');
-    joint.shapes.org.Member.prototype.markup = [
-        '<g class="rotatable">',
-        '<g class="scalable">',
-        '<rect class="card"/>',
-        '</g>',
-        // '<text class="rank"/>',
-        '<text class="name"/>',
-        '<g class="btn add orgchart-action" ><circle class="add"/><text class="add">+</text></g>',
-        // '<g class="btn del"><circle class="del"/><text class="del">-</text></g>',
-        // '<g class="btn edit"><rect class="edit"/><text class="edit">EDIT</text></g>',
-        '</g>'
-    ].join('');
+    SymperPosition = joint.shapes.org.Member.define('Symper.Position', {
+        size: {
+            width: shapeSize.width,
+            height: shapeSize.height
+        },
+        attrs: DEFAULT_POSITION_ATTRS,
+        markup: `<g class="rotatable">
+                    <g class="scalable">
+                        <rect class="card"/>
+                    </g>
+                    <text class="name"/>
+                    <g class="btn add orgchart-action">
+                        <circle class="add"/>
+                        <text class="add">+</text>
+                    </g>
+                </g>`.replace(/\n/g, '').replace(/\s+/g, ' ')
+    });
 }
 
 export const createPositionNode = function(name) {
-    var element = new joint.shapes.org.Member({
-        size: { width: shapeSize.width, height: shapeSize.height },
-        attrs: DEFAULT_POSITION_ATTRS
-    }).on({
+    var element = new SymperPosition().on({
         'change:name': function(cell, name) {
             cell.attr('.name/text',
                 joint.util.breakText(name, { width: 160, height: 45 },

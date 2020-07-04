@@ -1,17 +1,80 @@
 let shapeSize = {
     width: 200,
-    height: 50
+    height: 70
 };
-
-export const DEFAULT_DEPARTMENT_DISPLAY = { fill: 'white', 'stroke-width': 1, 'rx': 4, 'ry': 4, stroke: '#585858' };
-export const FOUCUS_DEPARTMENT_DISPLAY = { 'stroke-width': 2, 'rx': 4, 'ry': 4, stroke: '#f58634' };
+let avatarSize = shapeSize.height / 2 - 5;
+let borderBottomHeight = 2;
+let SymperDepartment;
+export const DEFAULT_DEPARTMENT_DISPLAY = {
+    fill: 'white',
+    rx: 0,
+    ry: 0,
+    'stroke-width': 0.2,
+    stroke: '#707070'
+};
+export const FOUCUS_DEPARTMENT_DISPLAY = {
+    'stroke-width': 2,
+    stroke: '#f58634'
+};
 export const DEFAULT_DEPARTMENT_ATTRS = {
     '.card': DEFAULT_DEPARTMENT_DISPLAY,
-    '.name': { 'text-anchor': 'middle', fill: '#000', text: '', 'font-family': 'Roboto', 'ref-x': 0.5, 'ref-y': 0.4 },
+    '.name': {
+        'text-anchor': 'middle',
+        fill: '#000',
+        text: '',
+        'font-family': 'Roboto',
+        'ref-x': 0.5,
+        'ref-y': 0.12
+    },
+    image: {
+        'xlink:href': 'https://cdn3.iconfinder.com/data/icons/avatars-round-flat/33/avat-01-512.png',
+        height: avatarSize,
+        width: avatarSize,
+        y: shapeSize.height / 4 + 2,
+    },
+    '.manager-name': {
+        y: shapeSize.height / 2 + avatarSize / 3 + 2,
+        x: 20 + avatarSize,
+        fill: '#a4a4a4',
+        'font-size': 13,
+        stroke: 'white',
+        'stroke-width': 0,
+        'font-weight': 300,
+        'font-family': 'Roboto',
+    },
     '.btn.add': { 'ref-dx': -shapeSize.width / 2, 'ref-y': shapeSize.height, 'ref': '.card', event: 'element:add', cursor: 'pointer' },
-    '.btn>circle': { r: 7, fill: 'green', stroke: 'green', 'stroke-width': 0 },
+    '.btn.add>circle': { r: 7, fill: 'green', stroke: 'green', 'stroke-width': 0 },
     '.btn>rect': { height: 20, width: 45, rx: 2, ry: 2, fill: 'transparent', 'stroke-width': 1 },
     '.btn.add>text': { fill: 'white', 'font-size': 15, 'font-weight': 400, stroke: 'white', x: -4, y: 5, 'font-family': 'Roboto' },
+    '.border-bottom': {
+        height: borderBottomHeight,
+        y: shapeSize.height - borderBottomHeight + 1,
+        x: -0.5,
+        width: shapeSize.width + 1,
+        fill: '#f58634',
+        'stroke-width': 0
+    },
+    '.btn.remove': {
+        'ref-dx': 0,
+        'ref-y': 0,
+        'ref': '.card',
+        event: 'element:remove',
+        cursor: 'pointer'
+    },
+    '.btn.remove>circle': {
+        r: 7,
+        fill: 'red',
+    },
+    '.btn.remove>text': {
+        fill: 'white',
+        'font-size': 11,
+        'font-weight': 500,
+        stroke: 'white',
+        x: -3,
+        y: 4,
+        'font-family': 'Roboto'
+    },
+
 };
 
 export const DEPARTMENT_NODE_DATA = {
@@ -28,26 +91,40 @@ export const DEPARTMENT_NODE_DATA = {
     "attrs": DEFAULT_DEPARTMENT_ATTRS
 };
 export const defineDepartment = function() {
-    joint.setTheme('modern');
-    joint.shapes.org.Member.prototype.markup = [
-        '<g class="rotatable">',
-        '<g class="scalable">',
-        '<rect class="card"/>',
-        '</g>',
-        // '<text class="rank"/>',
-        '<text class="name"/>',
-        '<g class="btn add orgchart-action"><circle class="add"/><text class="add">+</text></g>',
-        // '<g class="btn del"><circle class="del"/><text class="del">-</text></g>',
-        // '<g class="btn edit"><rect class="edit"/><text class="edit">EDIT</text></g>',
-        '</g>'
-    ].join('');
+    SymperDepartment = joint.shapes.org.Member.define('Symper.Department', {
+        size: {
+            width: shapeSize.width,
+            height: shapeSize.height
+        },
+        attrs: DEFAULT_DEPARTMENT_ATTRS,
+        markup: `<g class="rotatable symper-orgchart-node">
+                    <g class="scalable">
+                        <rect class="card"/>
+                    </g>
+                    <image/>
+                    <text class="name"/>
+                    <text class="manager-name">Đào Mạnh Khá</text>
+
+                    <g>
+                        <rect class="border-bottom"/>
+                    </g>
+
+                    <g class="btn add orgchart-action">
+                        <circle class="add"/>
+                        <text class="add">+</text>
+                    </g>
+
+                    <g class="btn remove orgchart-action">
+                        <circle class="remove"/>
+                        <text class="remove">X</text>
+                    </g>
+                   
+                </g>`.replace(/\n/g, '').replace(/\s+/g, ' ')
+    });
 }
 
 export const createDepartmentNode = function(name) {
-    var element = new joint.shapes.org.Member({
-        size: { width: shapeSize.width, height: shapeSize.height },
-        attrs: DEFAULT_DEPARTMENT_ATTRS
-    }).on({
+    var element = new SymperDepartment().on({
         'change:name': function(cell, name) {
             cell.attr('.name/text',
                 joint.util.breakText(name, { width: 160, height: 45 },
@@ -61,6 +138,5 @@ export const createDepartmentNode = function(name) {
         name: name,
         // rank: rank
     });
-
     return element;
 }

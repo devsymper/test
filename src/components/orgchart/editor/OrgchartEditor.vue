@@ -33,7 +33,8 @@
             <EditorWorkspace 
                 :class="{
                     'w-100': true,
-                    'symper-orgchart-view': action == 'view'
+                    'symper-orgchart-view': action == 'view',
+                    'symper-orgchart-active-editor': action != 'view'
                 }" 
                 style="height: calc(100% - 41px)"
                 @new-viz-cell-added="handleNewNodeAdded"
@@ -380,7 +381,7 @@ export default {
         },
         normalizeDiagramNodeDisplay(allVizCell){
             for(let node of allVizCell.cells){
-                if(node.type == 'org.Member'){
+                if(node.type != 'org.Arrow'){
                     node.attrs['.card'].stroke = DEFAULT_DEPARTMENT_DISPLAY.stroke;
                 }
             }
@@ -453,7 +454,6 @@ export default {
             if(!idDepartment){
                 idDepartment = this.selectingNode.id;
             }
-            debugger
             this.$refs.editorWorkspace.updateCellAttrs(idDepartment, 'name',newName);
         },
         handleNewNodeAdded(nodeData){
@@ -549,7 +549,11 @@ export default {
     display: none!important;
 }
 
-.position-absolute {
-    position: absolute!important;
+.symper-orgchart-active-editor .symper-orgchart-paper .orgchart-action {
+    display: none;
+}
+
+.symper-orgchart-active-editor .symper-orgchart-paper .symper-orgchart-node:hover .orgchart-action {
+    display: block!important;
 }
 </style>
