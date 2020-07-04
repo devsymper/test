@@ -89,12 +89,12 @@
                 </div>
 
                 <v-list dense >
-                    <v-list-item-group v-model="selectingAttrIndex" color="primary">
+                    <v-list-item-group  color="primary">
                         <v-list-item
                             v-for="(item, idx) in selectingNode.customAttributes" 
                             :key="idx"
                             class="w-100 pl-2"
-                            @click="selectAttrItem">
+                            @click="selectAttrItem(idx)">
                             <v-list-item-content  class="w-100 pl-2">
                                 <div class="d-flex">
                                     <div class="fs-13">
@@ -205,8 +205,8 @@ export default {
             this.emptyAttrPanel();
             this.openAddPanel = true;
         },
-        selectAttrItem(evt){
-            console.log(evt);
+        selectAttrItem(idx){
+            this.selectingAttrIndex = idx;
             this.addPanelAction = 'update';
             setTimeout((self) => {
                 let idx = self.selectingAttrIndex;
