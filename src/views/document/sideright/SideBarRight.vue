@@ -95,6 +95,8 @@ export default {
         handleKeyupInput(name, input, data){
             let elements = $('#editor_ifr').contents().find('#'+this.sCurrentDocument.id);
             let tableId = checkInTable(elements)
+            if( tableId == this.sCurrentDocument.id)
+            tableId = '0';
             if(name == 'name'){
                 let errValue = ''
                 let listValue = Object.values(this.listNameValueControl);
@@ -104,8 +106,6 @@ export default {
                 }
                 else{
                     elements.removeClass('s-control-error');
-                    console.log(listValue);
-                    
                     if(listValue.indexOf(input.value) !== -1){
                         errValue = 'Trùng tên control';
                         elements.addClass('s-control-error');
@@ -130,7 +130,9 @@ export default {
             if(name == "height"){
                 elements.css({height:value});
             }
-            let tableId = checkInTable(elements)
+            let tableId = checkInTable(elements);
+            if( tableId == this.sCurrentDocument.id)
+            tableId = '0';
             this.$store.commit(
                 "document/updateProp",{id:this.sCurrentDocument.id,name:name,value:value,tableId:tableId,type:"value"}
             );   
