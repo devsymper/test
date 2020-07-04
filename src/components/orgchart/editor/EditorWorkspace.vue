@@ -103,8 +103,12 @@ export default {
             
             paper.on('element:remove', function(elementView, evt, x, y) {
                 evt.stopPropagation();
+                let allChildIds = self.getAllChildOfNode(elementView.model.id);
+                for(let idCell of allChildIds){
+                    let cell = self.$refs.jointPaper.graph.getCell(idCell);
+                    cell.remove();
+                }
                 // A member removal
-                elementView.model.remove();
                 treeLayout.layout();
             });
             
@@ -153,6 +157,39 @@ export default {
             paper.on('cell:contextmenu', function(elementView, evt, x, y) {
                 self.$emit('cell-contextmenu', elementView.model.id);      
             });
+        },
+        getAllChildOfNode(nodeId){
+            let allCell = this.$refs.jointPaper.graph.getCells();
+            let mapNode = {};
+            let links = [];
+            for(let cell of allCell){
+                if(cell.attributes.type == 'org.Arrow'){
+                    links.push({
+                        source: cell.attributes.source.id,
+                        target: cell.attributes.target.id,
+                    });
+                }else{
+                    mapNode[cell.attributes.id] = {
+                        children: {},
+                        parent: {}
+                    } 
+                }
+            }   
+
+            for(let l of links ){
+                mapNode[l.source].children[l.target] = true;
+                mapNode[l.target].parent[l.source] = true;
+            }
+            let childIds = {};
+            this.appendChildToNode(childIds, mapNode, nodeId);
+            return Object.keys(childIds);
+        },
+
+        appendChildToNode(result, mapNode, currentNodeId){
+            result[currentNodeId] = true;
+            for(let childId in mapNode[currentNodeId].children){
+                this.appendChildToNode(result, mapNode, childId);
+            }
         },
         unHighlightCurrentNode(){
             let displayConfig = this.context == 'department' ? DEFAULT_DEPARTMENT_DISPLAY : DEFAULT_POSITION_DISPLAY;
