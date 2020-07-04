@@ -84,9 +84,6 @@ export const setDataForPropsControl = function(fields) {
                 if (childProperties.hasOwnProperty('name') && sDocument.state.detail.allData != null) {
                     let controlName = childProperties['name'].value;
                     let allData = util.cloneDeep(sDocument.state.detail.allData[properties['name'].value]);
-                    console.log('dsad', properties['name'].value);
-                    console.log('dsad', sDocument.state.detail.allData);
-
                     if (allData != null && allData != undefined) {
                         let countRow = allData.length;
                         for (let j = 0; j < countRow; j++) {

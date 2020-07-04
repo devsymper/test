@@ -64,6 +64,11 @@ import Vue from "vue";
         components: {
             AgGridVue
         },
+        watch:{
+            rowData(){
+                this.rowDataTable = this.rowData
+            }
+        },
         beforeMount(){
             this.defaultColDef = {
                 minWidth: 100,
@@ -134,23 +139,7 @@ import Vue from "vue";
                 this.$emit('on-cell-click',{rowNode:rowNode,col:params.colDef,rowData:params.data,controlName:params.data.name[params.data.name.length - 1],curValue:params.value}); 
             },
             cellValueChanged(params){
-                let controlName = null;
-                let table = '';
-                let value = params.newValue;
-                if(params.colDef.field == 'name'){  // truowng hop thay doi ten control, cần gán lại tên control cũ để tìm trong store
-                    controlName = params.oldValue[params.oldValue.length - 1];
-                    table = (params.oldValue.length > 1) ? params.oldValue[0] : ''
-                    value = (params.oldValue.length > 1) ? value[1] : value;
-                }
-                if(controlName == null){
-                    controlName = params.data.name[params.data.name.length - 1];
-                }
-                let dataEmit = {propName :params.colDef.field,controlName: controlName,value:value}
-                if(table != ''){
-                    dataEmit['tableName'] = table;
-                }
-                this.$emit('update-props',dataEmit)
-                
+                this.$emit('on-cell-change',params)
             },
            
         },

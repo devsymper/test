@@ -53,6 +53,9 @@
                     handleChangeInputValue(inputInfo, name,data);
                 }"
                 @blur="handleInputBlur(inputInfo, name)"
+                @keyup="(data) => {
+                    handleKeyUpInputValue(inputInfo, name,data);
+                }"
                 :ref="'inputItem_'+name"
                 solo
                 :items="inputInfo.options"
@@ -80,6 +83,10 @@
                     </template>
                 </template>
             </component>
+
+            <div class="error-message"> 
+                {{inputInfo.errorMessage}}
+            </div>
         </div>
 
         <symper-drag-panel 
@@ -371,6 +378,9 @@ export default {
              */
             this.$emit("input-value-changed", name, inputInfo, data);
         },
+        handleKeyUpInputValue(inputInfo, name, data){
+            this.$emit("input-value-keyup", name, inputInfo, data);
+        },
         getInputProps(inputConfigs) {
             let rsl = inputTypeConfigs[inputConfigs.type].props(inputConfigs);
             return rsl;
@@ -488,4 +498,12 @@ export default {
 .input-item-func.active{
     color: #f58634;
 }
+</style>
+<style scoped>
+    .error-message{
+        font-size: 11px;
+        color: red;
+        text-align: right;
+        margin-top: 2px;
+    }
 </style>

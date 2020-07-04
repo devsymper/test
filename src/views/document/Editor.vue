@@ -18,8 +18,9 @@
                     @document-action-clone-control="cloneControl"
                     @document-action-list-control-option="setShowAllControlOption"
                     @document-action-delete-control="deleteControl"
-                    @document-action-save-to-local-storage="saveControlToLocalStorage"
+                    @document-action-save-to-local-storage="saveContentToLocalStorage"
                     @document-action-get-from-local-storage="getFromLocalStorege"
+                    @document-action-delete-cache="deleteLocalStorage"
                     
                     />
                 </div>
@@ -96,11 +97,15 @@ import { GetControlProps,mappingOldVersionControlProps,mappingOldVersionControlF
 import { documentApi } from "./../../api/Document.js";
 import { formulasApi } from "./../../api/Formulas.js";
 import { util } from "./../../plugins/util.js";
+import {checkInTable} from "./common/common";
 import { getInsertionCSS } from "./../../components/document/documentUtil.js";
 import VueResizable from 'vue-resizable'
+import { minimizeControl } from '../../store/document/mutations'
 let isShowAutocompleteControl = false;
 // biến lưu chiều rộng editor trước khi resize 
-let editorWidth = 0;
+const ALL_CONTROL = "allControl"
+const HTML_CONTENT = "content"
+const CODUMENT_PROPS = "documentProperties"
 export default { 
     computed: {
         editorStore(){  
@@ -163,7 +168,8 @@ export default {
             documentProps:{},
             delta : 500,
             lastKeypressTime : 0,
-            listIconToolbar:null
+            listIconToolbar:null,
+            listNameValueControl:{}
         }
     },
     beforeMount(){
@@ -211,26 +217,39 @@ export default {
 
         // lấy data từ local storage
         getFromLocalStorege(){
-            let allControl = localStorage.getItem('allControl');
+            let allControl = localStorage.getItem(ALL_CONTROL);
             allControl = JSON.parse(allControl);
-            let content = localStorage.getItem('content');
-            let documentProperties = localStorage.getItem('documentProperties');
+            let content = localStorage.getItem(HTML_CONTENT);
+            let documentProperties = localStorage.getItem(CODUMENT_PROPS);
             this.$refs.editor.editor.setContent(content);
             this.$store.commit(
-                                    "document/addToDocumentStore",{key:'documentProperties',value:documentProperties}
+                                    "document/addToDocumentStore",{key:CODUMENT_PROPS,value:documentProperties}
                                 );  
             this.$store.commit(
-                                    "document/addToDocumentEditorStore",{key:'allControl',value:allControl}
+                                    "document/addToDocumentEditorStore",{key:ALL_CONTROL,value:allControl}
                                 );  
         },
         //set data vào local storage
-        saveControlToLocalStorage(){
+        saveContentToLocalStorage(){
             let allControl = this.editorStore.allControl;
             let content = this.$refs.editor.editor.getContent();
             let documentProperties = this.$store.state.document.documentProps;
-            localStorage.setItem('allControl',JSON.stringify(allControl));
-            localStorage.setItem('content',content);
-            localStorage.setItem('documentProperties',JSON.stringify(documentProperties));
+            localStorage.setItem(ALL_CONTROL,JSON.stringify(allControl));
+            localStorage.setItem(HTML_CONTENT,content);
+            localStorage.setItem(CODUMENT_PROPS,JSON.stringify(documentProperties));
+            this.$snotify({
+                                type: "info",
+                                title: "Save to local storage success"
+                            }); 
+        },
+        deleteLocalStorage(){
+            localStorage.removeItem(ALL_CONTROL);
+            localStorage.removeItem(HTML_CONTENT);
+            localStorage.removeItem(CODUMENT_PROPS);
+            this.$snotify({
+                                type: "info",
+                                title: "Delete control in local storage success"
+                            });  
         },
         // sao chép control và thêm vào sau nó
         cloneControl(){
@@ -368,9 +387,36 @@ export default {
         setDataFormulasId(){
             
         },
+        minimizeControlEL(allControl){
+            var allInputControl = $("#editor_ifr").contents().find('body').find(".s-control");
+            let allId = [];
+            $.each(allInputControl,function(k,v){
+                let id = $(v).attr('id');
+                allId.push(id);
+            });
+            for (let controlId in allControl){
+                if(allId.indexOf(controlId) === -1){
+                    delete allControl[controlId];
+                }
+                else{
+                    if(allControl[controlId].type == 'table'){
+                        if(allId.indexOf(controlId) === -1){
+                            for(let childControlId in allControl[controlId].listFields){
+                                if(allId.indexOf(childControlId) === -1){
+                                    delete allControl[controlId].listFields[childControlId];
+                                }
+                            }
+                        }
+                    }   
+                }
+                
+            }
+            return allControl
+            
+        },
         // hoangnd: hàm gửi request lưu doc
         async saveDocument(){
-            let allControl = this.editorStore.allControl;
+            let allControl = this.minimizeControlEL(this.editorStore.allControl);
             let documentProperties = util.cloneDeep(this.$store.state.document.documentProps);
             documentProperties = JSON.stringify(documentProperties);
             let dataPost = this.getDataToSaveMultiFormulas(allControl);
@@ -445,8 +491,8 @@ export default {
                 else{
                     thisCpn.$snotify({
                         type: "error",
-                        title: res.lastErrorMessage,
-                        text:"can not save document"
+                        title: res.message,
+                        text:res.lastErrorMessage
                     });
                 }
             })
@@ -476,8 +522,8 @@ export default {
                 else{
                     thisCpn.$snotify({
                         type: "error",
-                        title: res.lastErrorMessage,
-                        text:"can not save document"
+                        title: res.message,
+                        text:res.lastErrorMessage,
                     });
                 }
                 
@@ -508,60 +554,49 @@ export default {
             let allControl = util.cloneDeep(this.editorStore.allControl);
             let listControlName = [];
             this.listMessageErr = [];
-            $('#editor_ifr').contents().find('.s-control-error').removeClass('s-control-error');
-            $("#editor_ifr").contents().find('.on-selected').removeClass('on-selected');
-
             //check trung ten control
-            for(let controlId in allControl){
-                let control = allControl[controlId];
-                if(control['listFields'] != undefined){
-                    // Object.assign
-                }
-                // this.checkNameControl(controlId,control,listControlName);
-                // this.validateFormulasInControl(control,listControlName);
-            }
+            $("#editor_ifr").contents().find('.on-selected').removeClass('on-selected');
             
-            if(this.listMessageErr.length == 0 && $('#editor_ifr').contents().find('.s-control-error').length == 0){
+            
+            if($('#editor_ifr').contents().find('.s-control-error').length == 0){
                 this.saveDocument();
             }
             else{
-                this.$refs.saveDocPanel.hideDialog();
-                setTimeout(function(){
-                    thisCpn.$refs.errMessage.showDialog();
-                },300)
+                this.$snotify({
+                                type: "error",
+                                title: "Thông tin control chưa hợp lệ",
+                                text : "Kiểm tra lại tên các control"
+                            }); 
             }
         },
         // hàm kiểm tra xác thực tên control 
-        checkNameControl(controlId,control,listControlName){
+        checkValidNameControl(controlId,control){
             if(control.type != "submit" && control.type != "draft" && control.type != "reset" && control.type != "approvalHistory"){
                 if(control.properties.name.value == ''){
                     let controlEl = $('#editor_ifr').contents().find('#'+controlId);
                     controlEl.addClass('s-control-error');
                     let message = 'Không được bỏ trống tên control'
-                    if(this.listMessageErr.indexOf(message) === -1){
-                        this.listMessageErr.push(message);
-                    }
+                    let tableId = checkInTable(controlEl)
+                    this.$store.commit(
+                        "document/updateProp",{id:controlId,name:'name',value:value,tableId:tableId,type:"errorMessage"}
+                    );   
                 }
                 else{
-                    this.checkDupliucateNameControl(listControlName,control,controlId);
+                    this.checkDupliucateNameControl(control,controlId);
                 }
+                
                 
             }
             
         },
-      
+      //updateCurrentControlProps
         // hàm kiểm tra xem co control nào trùng tên hay ko
-        checkDupliucateNameControl(listControlName,control,controlId){
-            if(listControlName.indexOf(control.properties.name.value) === -1){
-                listControlName.push(control.properties.name.value);
-            }
-            else{
-                let controlEl = $('#editor_ifr').contents().find('#'+controlId);
-                controlEl.addClass('s-control-error');
-                if(this.listMessageErr.indexOf('Trùng tên control '+control.properties.name.value) === -1){
-                    this.listMessageErr.push('Trùng tên control '+control.properties.name.value);
-                }
-            }
+        checkDupliucateNameControl(control,controlId){
+            let controlEl = $('#editor_ifr').contents().find('#'+controlId);
+            controlEl.addClass('s-control-error');
+          
+           
+            
         },
         // hàm kiểm tra xem trong công thức có trỏ đến control ko tồn tại hay ko
         validateFormulasInControl(control,listControlName){
@@ -633,6 +668,8 @@ export default {
 
         // hàm add các thuộc tính và formulas của control vào danh sách các control trong doc được lưu trong state
         addToAllControlInDoc(controlId,control){
+            console.log(control);
+            
             this.$store.commit(
                 "document/addControl",{id:controlId,props:control}
             );  
@@ -744,6 +781,7 @@ export default {
         },
         // hàm click ra ngoài editor thì cập nhật lại dữ liệu của store
         detectBlurEditorEvent(event){
+            this.saveContentToLocalStorage()
             let allControlEl = $('#editor_ifr').contents().find('.s-control');
             let listId = []
             $.each(allControlEl,function(k,v){
@@ -934,9 +972,6 @@ export default {
                                 childProperties[k].value = (listField[childFieldId]['properties'][k] == 0 || listField[childFieldId]['properties'][k] == '0' || listField[childFieldId]['properties'][k] == '') ? false : true
                             }
                             else{
-                                
-                                
-                                
                                 childProperties[k].value = listField[childFieldId]['properties'][k]
                             }
                         })

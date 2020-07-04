@@ -139,8 +139,6 @@ export default class BasicControl extends Control {
 
         let thisCpn = this;
         $('.file-add').click(function(e) {
-            let el = $(e);
-            $("#file-upload-alter").attr('data-rowid', el.attr('data-rowid')).attr('data-ctrlname', el.attr('data-ctrlname'));
             $("#file-upload-alter-" + thisCpn.curParentInstance).click();
             $("#file-upload-alter-" + thisCpn.curParentInstance).attr('data-control-name', $(this).attr('data-control-name'))
         })
@@ -149,12 +147,13 @@ export default class BasicControl extends Control {
     genFileView = function(rowId = null) {
         let ctrlName = this.name;
         let addTpl = '';
+
         if (!this.checkDetailView()) {
             addTpl = `
-                <div data-control-name="${ctrlName}" class="file-add" title="Thêm file" data-rowid="${rowId}" data-ctrlname="${ctrlName}">
-                    <span class="text-show"><span class="mdi mdi-plus"></span></span>
-                </div>
-            `;
+                    <div data-control-name="${ctrlName}" class="file-add" title="Thêm file" data-rowid="${rowId}" data-ctrlname="${ctrlName}">
+                        <span class="text-show"><span class="mdi mdi-plus"></span></span>
+                    </div>
+                `;
         }
 
         if (!this.inTable) {
@@ -176,27 +175,34 @@ export default class BasicControl extends Control {
             }
             return `<div class="upload-file-wrapper-outtb">${addTpl}</div>`;
         }
-        if (this.value != '' && this.value.length > 0) {
-            let valueArr = this.value.replace(/^,/gi, "");
-            valueArr = valueArr.split(',');
-            console.log('klfas', valueArr);
+        let deleteFileIcon = '';
+        if (this.checkDetailView()) {
+            this.value = sDocument.state.editor.allControl[listInputInDocument[this.inTable].id].value[this.name];
+        }
+        if (this.value != '' && this.value.hasOwnProperty(rowId)) {
+            console.log('khh', this.value);
 
-            for (let index = 0; index < valueArr.length; index++) {
-                let element = valueArr[index];
-                let fileExt = Util.getFileExtension(element);
+            for (let index = 0; index < this.value[rowId].length; index++) {
+                let fileName = this.value[rowId][index];
+                let fileExt = Util.getFileExtension(fileName);
                 let icon = fileTypes[fileExt];
+                if (!this.checkDetailView()) {
+                    deleteFileIcon = `<span data-rowid="` + rowId + `" data-file-name="` + fileName + `" title="xóa" class="remove-file"><span class="mdi mdi-close"></span></span>`;
+
+                }
                 let file = `<div  class="file-item">
-                                <span  data-file-name="` + element + `" title="xóa" class="remove-file"><span class="mdi mdi-close"></span></span>
-                                <i onclick="window.open('https://sdocument-management.symper.vn/file/public` + element + `');" class="mdi ` + icon + ` file-view" ></i>
+                                ` + deleteFileIcon + `
+                                <i onclick="window.open('https://sdocument-management.symper.vn/file/public` + fileName + `');" class="mdi ` + icon + ` file-view" ></i>
                             </div>`
                 addTpl += file;
             }
+
 
         }
         return addTpl.replace(/\n/g, '');
     }
 
-    addFile(item) {
+    addFile(item, rowId = "") {
         let type = Util.getFileExtension(item.name);
         let form = new FormData();
         form.append('file', item);
@@ -211,23 +217,35 @@ export default class BasicControl extends Control {
             type: 'post',
             success: function(response) {
                 if (response.status == 200) {
-                    let file = `<div title="${response.data.name}" class="file-item">
-                            <span data-file-name="` + response.data.name + `" title="xóa" class="remove-file"><span class="mdi mdi-close"></span></span>
-                            <i  onclick="window.open('https://sdocument-management.symper.vn/file/` + response.data.path + `');" class="mdi ` + icon + ` file-view" ></i>
-                        </div>`
+                    let file = `<div title="${response.data.path}" class="file-item">
+                                <span data-file-name="${response.data.path}" title="xóa" class="remove-file"><span class="mdi mdi-close"></span></span>
+                                <i  onclick="window.open('https://sdocument-management.symper.vn/file/` + response.data.path + `');" class="mdi ` + icon + ` file-view" ></i>
+                            </div>`
                     thisObj.setDeleteFileEvent(thisObj.ele, thisObj.name)
                     thisObj.ele.find('.upload-file-wrapper-outtb').append(file);
                     let curValue = listInputInDocument[thisObj.name].value;
-                    curValue += "," + response.data.name;
-                    this.value = curValue;
+                    let tableName = thisObj.inTable;
+                    if (tableName != false) {
+                        if (!Array.isArray(curValue)) {
+                            curValue = [];
+                        }
+                        if (!curValue.hasOwnProperty(rowId)) {
+                            curValue[rowId] = []
+                        }
+                        curValue[rowId].push(response.data.name);
+                    } else {
+                        curValue += "," + response.data.name;
+                        this.value = curValue;
+                    }
                     store.commit("document/updateListInputInDocument", {
                         controlName: thisObj.name,
                         key: 'value',
                         value: curValue
                     });
-                    let tableName = thisObj.inTable;
-                    if (tableName != false)
+                    if (tableName != false) {
                         listInputInDocument[tableName].tableInstance.tableInstance.render();
+                    }
+
                 }
             }
         });
@@ -236,12 +254,21 @@ export default class BasicControl extends Control {
         let value = listInputInDocument[controlName].value;
         ele.off('click', '.remove-file')
         ele.on('click', '.remove-file', function(e) {
+            let rowId = $(this).attr('data-rowid');
             e.preventDefault();
             e.stopPropagation();
             let fileName = $(this).attr('data-file-name');
-            let newValue = value.replace(/^,/gi, "");
-            newValue = newValue.replace(fileName, "");
-            $(this).closest('.file-item').remove();
+            let newValue = "";
+            // nếu trong table
+            if (rowId != "" && rowId != undefined) {
+                listInputInDocument[controlName].value.splice(value.indexOf(fileName), 1);
+                newValue = listInputInDocument[controlName].value;
+                $(this).closest('.file-item').remove();
+            } else {
+                newValue = value.replace(/^,/gi, "");
+                newValue = newValue.replace(fileName, "");
+                $(this).closest('.file-item').remove();
+            }
             store.commit("document/updateListInputInDocument", {
                 controlName: controlName,
                 key: 'value',

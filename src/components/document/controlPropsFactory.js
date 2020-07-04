@@ -7,6 +7,7 @@ const commonProps = {
         type: "text",
         value: "",
         groupType: "name",
+        errorMessage: ""
     },
     title: {
         title: "Tiêu đề",
@@ -320,7 +321,7 @@ const controlTypes = {
     },
     richText: {
         icon: "/icon/ic_richtext.png",
-        html: `<textarea class="s-control S-control-rich-text" contenteditable="false"  title="Rich-text" s-control-type="richText" type="text"></textarea>&nbsp;&nbsp;`,
+        html: `<textarea class="s-control s-control-rich-text" contenteditable="false"  title="Rich-text" s-control-type="richText" type="text"></textarea>&nbsp;&nbsp;`,
         title: "Rich text",
         notInProps: ['formatNumber', 'isSumTable', 'isAllowUpdate', 'isDisplayCompact', 'isMultipleValue'],
         formulas: ['link', 'formulas', 'hidden', 'readOnly', 'require']
@@ -602,6 +603,7 @@ export const GetControlProps = function(type) {
         let propertiesControl = {};
         for (let i = 0; i < inProps.length; i++) {
             propertiesControl[inProps[i]] = allProperties[inProps[i]];
+
         }
 
         control['properties'] = propertiesControl;
@@ -687,7 +689,7 @@ export const getAllPropsControl = function() {
                 editable: true,
                 groupType: data[key].groupType,
                 width: width,
-                colId: key
+                colId: key,
             }
         }
         // function(params) {
@@ -716,7 +718,6 @@ export const getAllPropsControl = function() {
         }
         return colDefine;
     });
-    console.log(result);
 
     let groups = util.cloneDeep(groupType);
     Object.filter = (obj, predicate) =>
@@ -728,7 +729,7 @@ export const getAllPropsControl = function() {
         groups[group]['name'] = group;
         dataPropsResult.push(groups[group]);
     }
-    console.log(dataPropsResult);
+    console.log('lkkkk', dataPropsResult);
     return dataPropsResult;
 }
 

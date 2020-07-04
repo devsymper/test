@@ -10,6 +10,7 @@ const getInsertionCSS = function() {
     styles += '.on-selected{border:1px dashed #2196f3 !important;cursor: pointer !important;}';
     styles += '.s-control-tracking-value,.s-control-approval-history,.s-control-report,.s-control-file-upload,.s-control-reset,.s-control-draf,.s-control-submit,.s-control-text,.s-control-select,.s-control-document,.s-control-phone,.s-control-email,.s-control-currency,.s-control-radio,.s-control-color,.s-control-percent,.s-control-hidden,.s-control-user,.s-control-filter,.s-control-date,.s-control-datetime,.s-control-month,.s-control-time,.s-control-number{width: auto;height: 25px;border-radius: 3px;font-size: 11px;border:1px solid #e9ecef;font-family:Roboto,sans-serif;color:gray;padding: 0 5px;outline: 0!important;}'
     styles += '.s-control:not(.s-control-table) {display: inline-block;background: rgb(233, 236, 239);min-width: 50px;outline: none !important;margin:1px}';
+    styles += '.s-control-rich-text {border:none;}';
     styles += '.s-control-reset,.s-control-draft,.s-control-submit{padding: 5px 8px;}';
     styles += '.s-control-user,.s-control-select,.s-control-document{width: 120px;}';
     styles += '.s-control-error{border: 1px solid red !important;}';

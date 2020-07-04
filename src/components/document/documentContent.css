@@ -55,6 +55,10 @@ p {
     margin: 1px
 }
 
+.s-control .s-control-rich-text {
+    border: none;
+}
+
 .sym-form-submit .s-control-reset,
 .sym-form-submit .s-control-draft,
 .sym-form-submit .s-control-submit {

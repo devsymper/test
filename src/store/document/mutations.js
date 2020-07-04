@@ -3,6 +3,7 @@ import { defaultState } from "./defaultState";
 import { util } from "./../../plugins/util.js";
 
 import Vue from "vue";
+import { type } from 'jquery';
 
 const addControl = (state, params) => {
     let id = params.id
@@ -19,6 +20,7 @@ const addControl = (state, params) => {
     Vue.set(state.editor.allControl, id, prop);
 
 };
+
 const addToListInputInDocument = (state, params) => {
     let name = params.name
     let control = params.control
@@ -73,7 +75,7 @@ function setTreeListControlInDoc(state) {
         let props = control.properties;
         let name = "";
         let title = "";
-        if (type == 'submit' || type == 'draft') {
+        if (type == 'submit' || type == 'draft' || type == 'reset' || type == 'approvalHistory') {
             name = type
             title = type
         } else {
@@ -136,7 +138,16 @@ const addCurrentControl = (state, control) => {
     console.log(state.editor.currentSelectedControl);
 
 };
-// hàm xóa control đang chọn ra khỏi store
+const updateCurrentControlProps = (state, params) => {
+        let group = params.group;
+        let prop = params.prop;
+        let typeProp = params.typeProp;
+        let value = params.value;
+        console.log('update---', params);
+
+        Vue.set(state.editor.currentSelectedControl.properties[group][prop], typeProp, value);
+    }
+    // hàm xóa control đang chọn ra khỏi store
 const resetCurrentControl = (state, control) => {
 
     let currentSelectedControl = {
@@ -160,21 +171,20 @@ const updateProp = (state, params) => {
     let name = params.name
     let value = params.value
     let tableId = params.tableId
-    console.log(tableId);
-
+    let type = params.type;
     if (tableId != '0') {
         if (state.editor.allControl[tableId]['listFields'][id]['properties'][name]) {
-            state.editor.allControl[tableId]['listFields'][id]['properties'][name]['value'] = value
+            state.editor.allControl[tableId]['listFields'][id]['properties'][name][type] = value
 
         } else if (state.editor.allControl[tableId]['listFields'][id]['formulas'][name]) {
-            state.editor.allControl[tableId]['listFields'][id]['formulas'][name]['value'] = value
+            state.editor.allControl[tableId]['listFields'][id]['formulas'][name][type] = value
         }
 
     } else {
         if (state.editor.allControl[id]['properties'][name]) {
-            state.editor.allControl[id]['properties'][name]['value'] = value
+            state.editor.allControl[id]['properties'][name][type] = value
         } else if (state.editor.allControl[id]['formulas'][name]) {
-            state.editor.allControl[id]['formulas'][name]['value'] = value
+            state.editor.allControl[id]['formulas'][name][type] = value
         }
     }
     setTreeListControlInDoc(state);
@@ -304,7 +314,8 @@ export {
     addToDocumentStore,
     addToDocumentEditorStore,
     setAllDocuments,
-    resetCurrentControl
+    resetCurrentControl,
+    updateCurrentControlProps
 
 
 };
