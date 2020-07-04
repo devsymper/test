@@ -33,7 +33,8 @@
                     <v-expansion-panel-content class="sym-v-expand-content">
                         <control-props-config  
                         @input-value-keyup="handleKeyupInput"
-                        @input-value-changed="handleChangeInput" :singleLine="true" :labelWidth="`100px`"  :allInputs="controlPropsGroup.name"/>
+                        @input-value-changed="handleChangeInput" 
+                        :singleLine="true" :labelWidth="`100px`"  :allInputs="controlPropsGroup.name"/>
                     </v-expansion-panel-content>
                 </v-expansion-panel>
                 <v-expansion-panel class="m-0" >
@@ -55,7 +56,9 @@
         <v-tab-item
             class="p-2 h-100 formulas-control-tab"
         >
-            <control-props-config :singleLine="false" @input-value-changed="handleChangeInput" :allInputs="sCurrentDocument.formulas"/>
+            <control-props-config 
+            @input-blur="handleInputBlur"
+            :singleLine="false" @input-value-changed="handleChangeInput" :allInputs="sCurrentDocument.formulas"/>
         </v-tab-item>
 
         
@@ -64,6 +67,8 @@
 <script>
 import FormTpl from "./../../../components/common/FormTpl.vue"
 import {checkInTable} from "./../common/common";
+import { formulasApi } from "./../../../api/Formulas.js";
+
 export default {
     components:{
         'control-props-config' : FormTpl,
@@ -92,6 +97,23 @@ export default {
         }
     },
     methods:{
+        handleInputBlur(inputInfo, name){
+            let dataPost = {syql:inputInfo.value,objectType:'document',fieldId:this.sCurrentDocument.id}
+            formulasApi.saveFormulas(dataPost).then(res => {
+                if (res.status == 200) {
+                    inputInfo.formulasId = res.data.formulaId;  
+                }
+            })
+            .catch(err => {
+                thisCpn.$snotify({
+                        type: "error",
+                        title: "can not save document",
+                    });
+            })
+            .always(() => {
+            });
+            
+        },
         handleKeyupInput(name, input, data){
             let elements = $('#editor_ifr').contents().find('#'+this.sCurrentDocument.id);
             let tableId = checkInTable(elements)
