@@ -150,10 +150,8 @@ export default {
             if(table != ""){
                 tableId = this.mapNameToControlId[params.tableName];
             }
-            console.log('sada',{id:controlId,name:params.colDef.field,value:value,tableId:tableId});
-            
             this.$store.commit(
-                "document/updateProp",{id:controlId,name:params.colDef.field,value:value,tableId:tableId}
+                "document/updateProp",{id:controlId,name:params.colDef.field,value:value,tableId:tableId,type:"value"}
             );   
             
         },

@@ -7,6 +7,7 @@ const commonProps = {
         type: "text",
         value: "",
         groupType: "name",
+        errorMessage: ""
     },
     title: {
         title: "Tiêu đề",
@@ -602,6 +603,7 @@ export const GetControlProps = function(type) {
         let propertiesControl = {};
         for (let i = 0; i < inProps.length; i++) {
             propertiesControl[inProps[i]] = allProperties[inProps[i]];
+
         }
 
         control['properties'] = propertiesControl;

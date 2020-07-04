@@ -844,7 +844,7 @@ export default {
             .catch(err => {
                 thisCpn.$snotify({
                         type: "error",
-                        title: "error from submit document api!!!"
+                        title: "error from update document api!!!"
                     });
             })
             .always(() => {
@@ -1034,7 +1034,6 @@ export default {
                     let valueInputControlItem = this.sDocumentSubmit.listInputInDocument[inputControlName].value;
                     dataInput[inputControlName] = valueInputControlItem;
                 }
-                
             }
             return dataInput;
         },

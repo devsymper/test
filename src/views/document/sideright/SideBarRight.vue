@@ -31,7 +31,9 @@
                 <v-expansion-panel class="m-0" >
                     <v-expansion-panel-header class="v-expand-header">Tên</v-expansion-panel-header>
                     <v-expansion-panel-content class="sym-v-expand-content">
-                        <control-props-config @input-value-changed="handleChangeInput" :singleLine="true" :labelWidth="`100px`"  :allInputs="controlPropsGroup.name"/>
+                        <control-props-config  
+                        @input-value-keyup="handleKeyupInput"
+                        @input-value-changed="handleChangeInput" :singleLine="true" :labelWidth="`100px`"  :allInputs="controlPropsGroup.name"/>
                     </v-expansion-panel-content>
                 </v-expansion-panel>
                 <v-expansion-panel class="m-0" >
@@ -61,6 +63,7 @@
 </template>
 <script>
 import FormTpl from "./../../../components/common/FormTpl.vue"
+import {checkInTable} from "./../common/common";
 export default {
     components:{
         'control-props-config' : FormTpl,
@@ -84,10 +87,40 @@ export default {
             {id:'formulas', tab: 'Công thức' ,icon:'mdi-function-variant'},
             
             ],
+            listNameValueControl:{}
         
         }
     },
     methods:{
+        handleKeyupInput(name, input, data){
+            let elements = $('#editor_ifr').contents().find('#'+this.sCurrentDocument.id);
+            let tableId = checkInTable(elements)
+            if(name == 'name'){
+                let errValue = ''
+                let listValue = Object.values(this.listNameValueControl);
+                if(input.value == "" && input.value.length == 0){
+                    errValue = "Không được bỏ trống tên control"
+                    elements.addClass('s-control-error');
+                }
+                else{
+                    elements.removeClass('s-control-error');
+                    console.log(listValue);
+                    
+                    if(listValue.indexOf(input.value) !== -1){
+                        errValue = 'Trùng tên control';
+                        elements.addClass('s-control-error');
+                    }
+                    else{
+                        elements.removeClass('s-control-error');
+                    }
+                }
+                this.listNameValueControl[this.sCurrentDocument.id] = input.value;
+
+                this.$store.commit(
+                    "document/updateProp",{id:this.sCurrentDocument.id,name:name,value:errValue,tableId:tableId,type:"errorMessage"}
+                );   
+            }
+        },
         handleChangeInput(name, input, data){
             let value = input.value
             let elements = $('#editor_ifr').contents().find('#'+this.sCurrentDocument.id);
@@ -97,16 +130,11 @@ export default {
             if(name == "height"){
                 elements.css({height:value});
             }
-          
-            let table = elements.closest('.s-control-table');
-            let tableId = '0'
-            if(table.length > 0 && this.sCurrentDocument.id != table.attr('id')){
-                let id = table.attr('id');
-                tableId = id
-            }
+            let tableId = checkInTable(elements)
             this.$store.commit(
-                "document/updateProp",{id:this.sCurrentDocument.id,name:name,value:value,tableId:tableId}
+                "document/updateProp",{id:this.sCurrentDocument.id,name:name,value:value,tableId:tableId,type:"value"}
             );   
+
         }
     }
 }

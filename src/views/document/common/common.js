@@ -42,9 +42,18 @@ const getControlTitleFromName = function(controlName) {
         return false
     }
 }
+const checkInTable = function(element) {
+    let table = element.closest('.s-control-table');
+    let tableId = '0'
+    if (table.length > 0) {
+        tableId = table.attr('id');
+    }
+    return tableId;
+}
 export {
     // handlerRunOtherFormulasControl
     getControlInstanceFromStore,
     checkDbOnly,
+    checkInTable,
     getControlTitleFromName
 }
