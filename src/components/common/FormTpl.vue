@@ -295,7 +295,7 @@ export default {
     },
     methods: {
         handleInputBlur(inputInfo, name){
-            this.$emit('blur',inputInfo, name);
+            this.$emit('input-blur',inputInfo, name);
         },
         isLargeFormulaEditorOpen(){
             return this.$refs.dragPanel.selfShowPanel;
