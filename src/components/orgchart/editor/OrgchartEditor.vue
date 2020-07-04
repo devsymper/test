@@ -65,7 +65,7 @@
             <OrgchartEditor
                 @update-department-name="changeDepartmentName"
                 ref="positionDiagram"
-                :instanceKey="selectingNode.positionDiagramCells.instanceKey"
+                :instanceKey="selectingNode.positionDiagramCells ? selectingNode.positionDiagramCells.instanceKey : ''"
                 context="position">
             </OrgchartEditor>
 
@@ -81,6 +81,7 @@ import VueResizable from 'vue-resizable';
 import { getOrgchartEditorData, getDefaultConfigNodeData, SYMPER_HOME_ORGCHART } from './nodeAttrFactory';
 import jointjs from "jointjs";
 import { orgchartApi } from "@/api/orgchart.js";
+import { FOUCUS_DEPARTMENT_DISPLAY, DEFAULT_DEPARTMENT_DISPLAY } from '../nodeDefinition/departmentDefinition';
 console.log(jointjs, 'jointjsjointjs');
 
 
@@ -232,6 +233,7 @@ export default {
                             }
                         }
                     }
+                    this.showOrgchartConfig();
                 }else{
                     this.$snotifyError(error, "Can not get orgchart data",res.message);
                 }
@@ -311,6 +313,7 @@ export default {
                     }else{
                         self.$refs.positionDiagram.createFirstVizNode();
                     }
+                    self.$refs.positionDiagram.showOrgchartConfig();
                 }, 200, this);
             }
         },
@@ -357,6 +360,7 @@ export default {
         getDataToSave(){
             let orgchartAttr = this.$store.state.orgchart.editor[this.instanceKey].homeConfig;
             let allVizCell = this.$refs.editorWorkspace.getAllDiagramCells();
+            allVizCell = this.normalizeDiagramNodeDisplay(allVizCell);
             let data = {
                 content: JSON.stringify(allVizCell),
                 departments: JSON.stringify(this.getAllNodesToSave(allVizCell.cells, this.instanceKey)),
@@ -365,6 +369,14 @@ export default {
                 name: orgchartAttr.commonAttrs.name.value
             };
             return data;
+        },
+        normalizeDiagramNodeDisplay(allVizCell){
+            for(let node of allVizCell.cells){
+                if(node.type == 'org.Member'){
+                    node.attrs['.card'].stroke = DEFAULT_DEPARTMENT_DISPLAY.stroke;
+                }
+            }
+            return allVizCell;
         },
         getAllNodesToSave(allVizCell, instanceKey, type = 'department'){
             let links = [];
@@ -397,7 +409,10 @@ export default {
             };
             
             if(nodeType == 'department'){
-                data.content = node.positionDiagramCells.cells ? JSON.stringify(node.positionDiagramCells.cells) : 'false';
+                data.content = '';
+                if(node.positionDiagramCells.cells){
+                    data.content = JSON.stringify(this.normalizeDiagramNodeDisplay(node.positionDiagramCells.cells));
+                }
                 if(node.positionDiagramCells.cells){
                     let positions = this.getAllNodesToSave(node.positionDiagramCells.cells.cells, node.positionDiagramCells.instanceKey,  'position');
                     for(let j of positions){
