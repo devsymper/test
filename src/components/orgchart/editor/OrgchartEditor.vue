@@ -175,6 +175,7 @@ export default {
             let homeConfig = this.$store.state.orgchart.editor[this.instanceKey].homeConfig;
             homeConfig.commonAttrs.name.value = config.name;
             homeConfig.commonAttrs.description.value = config.description;
+            homeConfig.customAttributes = config.dynamicAttributes;
         },
         async restoreOrgchartView(id){
             try {
@@ -200,6 +201,9 @@ export default {
                             }         
                         }
                         let newDepartment = this.createNodeConfigData('department', nodeData);
+                        if(node.dynamicAttributes){
+                            newDepartment.customAttributes = node.dynamicAttributes;
+                        }
                         mapIdToDpm[node.vizId] = newDepartment;
                     }
 
@@ -218,7 +222,10 @@ export default {
                                 code: position.code,
                                 users: position.users ? position.users : []
                             };
-                            this.createNodeConfigData('position', nodeData, dpmInstanceKey);
+                            let newPosition = this.createNodeConfigData('position', nodeData, dpmInstanceKey);
+                            if(position.dynamicAttributes){
+                                newPosition.customAttributes = position.dynamicAttributes;
+                            }
                         }
                     }
                 }else{
@@ -235,7 +242,7 @@ export default {
                 return map;
             } , {});
             for(let u of users){
-                let pos = mapPostitions[u.jobNodeId];
+                let pos = mapPostitions[u.positionNodeId];
                 if(!pos.users){
                     pos.users = [];
                 }
@@ -384,15 +391,15 @@ export default {
             if(nodeType == 'department'){
                 data.content = node.positionDiagramCells.cells ? JSON.stringify(node.positionDiagramCells.cells) : 'false';
                 if(node.positionDiagramCells.cells){
-                    let jobs = this.getAllNodesToSave(node.positionDiagramCells.cells.cells, node.positionDiagramCells.instanceKey,  'position');
-                    for(let j of jobs){
+                    let positions = this.getAllNodesToSave(node.positionDiagramCells.cells.cells, node.positionDiagramCells.instanceKey,  'position');
+                    for(let j of positions){
                         if(!j.vizParentId){
                             j.vizParentId = nodeId;
                         }
                     }
-                    data.jobs = jobs;
+                    data.positions = positions;
                 }else{
-                    data.jobs = [];
+                    data.positions = [];
                 }
             }else{
                 data.users = node.users;

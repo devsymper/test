@@ -212,7 +212,9 @@ export default {
                 let idx = self.selectingAttrIndex;
                 let item = self.selectingNode.customAttributes[idx];
                 for(let key in item){
-                    self.dynamicValueInputs[key].value = item[key] ;
+                    if(self.dynamicValueInputs[key]){
+                        self.dynamicValueInputs[key].value = item[key] ;
+                    }
                 }
                 self.openAddPanel = true;
             }, 200, this);
