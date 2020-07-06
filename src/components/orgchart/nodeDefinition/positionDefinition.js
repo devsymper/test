@@ -157,6 +157,22 @@ export const definePosition = function() {
                     </g>
                    
                 </g>`.replace(/\n/g, '').replace(/\s+/g, ' ')
+    }, {
+        isHidden: function() {
+            return !!this.get('hidden');
+        },
+
+        isCollapsed: function() {
+            return !!this.get('collapsed');
+        },
+
+        toggleButtonVisibility: function(visible) {
+
+        },
+
+        toggleButtonSign: function(plus) {
+
+        }
     });
 }
 

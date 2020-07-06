@@ -30,6 +30,7 @@ export const getDefaultConfigNodeData = function(nodeId, isDepartment = false) {
         commonAttrs: getAllNodeAttrs(),
         customAttributes: [],
         id: nodeId,
+        collapseExpandStatus: 'expand' // expand | collapse
     };
 
     if (isDepartment) {

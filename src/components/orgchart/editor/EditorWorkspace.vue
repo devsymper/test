@@ -30,6 +30,13 @@ function jointLinkNode(source, target) {
                 display: 'none'
             }
         },
+    },{
+        isHidden: function() {
+            // If the target element is collapsed, we don't want to
+            // show the link either
+            var targetElement = this.getTargetElement();
+            return !targetElement || targetElement.isHidden();
+        }
     });
 }
 
@@ -172,6 +179,23 @@ export default {
             paper.on('cell:contextmenu', function(elementView, evt, x, y) {
                 self.$emit('cell-contextmenu', elementView.model.id);      
             });
+
+            
+            paper.on('element:collapse', function(view, evt) {
+                evt.stopPropagation();
+                self.toggleBranch(view.model);
+                treeLayout.layout();
+            });
+        },
+        toggleBranch(root){
+            var shouldHide = !root.isCollapsed();
+            root.set({ collapsed: shouldHide });
+            this.$refs.jointPaper.graph.getSuccessors(root).forEach(function(successor) {
+                successor.set({
+                    hidden: shouldHide,
+                    collapsed: false
+                });
+            });
         },
         getAllChildOfNode(nodeId){
             let allCell = this.$refs.jointPaper.graph.getCells();
@@ -261,7 +285,19 @@ export default {
             var treeLayout = new joint.layout.TreeLayout({
                 graph: graph,
                 direction: 'B',
-                parentGap: 40
+                parentGap: 40,
+                filter: function(siblings) {
+                    // Layout will skip elements which have been collapsed
+                    let rsl = siblings.filter(function(sibling) {
+                        return !sibling.isHidden();
+                    });
+                    return rsl;
+                },
+                updateAttributes: function(_, model) {
+                    // Update some presentation attributes during the layout
+                    model.toggleButtonVisibility(!graph.isSink(model));
+                    model.toggleButtonSign(!model.isCollapsed());
+                }
             });
             this.$refs.jointPaper.treeLayout = treeLayout;
             graph.resetCells([firstNode]);

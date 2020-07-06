@@ -73,7 +73,8 @@ export default {
 			// gridSize: this.gridSize,
 			// drawGrid: this.drawGrid,
 			background: this.background,
-			interactive: !this.readonly
+            interactive: !this.readonly,
+            sorting: joint.dia.Paper.sorting.APPROX,
         });
         
         
