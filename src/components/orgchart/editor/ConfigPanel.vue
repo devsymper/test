@@ -21,7 +21,7 @@
                     :viewOnly="action == 'view'"
                     :singleLine="true"
                     :labelWidth="'60px'"
-                    @input-value-changed="handleAttrValueChanged"
+                    @input-value="handleAttrValueInput"
                     :allInputs="selectingNode.commonAttrs"
                 ></form-tpl>
                 <div v-if="!(context == 'department' && selectingNode.id == SYMPER_HOME_ORGCHART)">
@@ -210,11 +210,15 @@ export default {
         }
     },
     methods: {
+        updateDynamicAttrNodeDisplay(){
+            this.$emit('update-dynamic-attr-display');
+        },
         handleChangeUser(newValue){
             this.$emit('change-user-select', newValue);
         },
         removeDynamicItem(index){
             this.selectingNode.customAttributes.splice(index, 1);
+            this.updateDynamicAttrNodeDisplay();
         },
         actionBeforeAddAttr(){
             this.addPanelAction = 'add'; 
@@ -240,6 +244,8 @@ export default {
             for(let key in this.dynamicValueInputs){
                 item[key] =  this.dynamicValueInputs[key].value;
             }
+            this.updateDynamicAttrNodeDisplay();
+
         },
         validateBeforeAddDynamicAttr(){
             let passed = true;
@@ -272,6 +278,8 @@ export default {
             this.selectingNode.customAttributes.push(newItem);
             this.emptyAttrPanel();
             this.$snotifySuccess('New dynamic attribute created', '', 1500 );
+            this.updateDynamicAttrNodeDisplay();
+
         },
         emptyAttrPanel(){
             for(let key in this.dynamicValueInputs){
@@ -281,8 +289,8 @@ export default {
         handleChangeInputValue(value){
 
         },
-        handleAttrValueChanged(name, inputInfo, data){
-            this.$emit('config-value-change', {
+        handleAttrValueInput(name, inputInfo, data){
+            this.$emit('config-value-input', {
                 name, inputInfo, data
             });
         }

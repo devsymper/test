@@ -50,11 +50,12 @@
             width:'250px'
         }" class="h-100 border-left-1">
             <ConfigPanel 
-            @config-value-change="handleConfigValueChange"
-            @change-user-select="handleConfigUserSelectChange"
-            :instanceKey="instanceKey"
-            :action="action"
-            :context="context">
+                @update-dynamic-attr-display="updateDynamicAttrNodeDisplay"
+                @config-value-input="handleConfigValueChange"
+                @change-user-select="handleConfigUserSelectChange"
+                :instanceKey="instanceKey"
+                :action="action"
+                :context="context">
             </ConfigPanel>
         </div>
 
@@ -182,6 +183,14 @@ export default {
         }
     },
     methods: {
+        updateDynamicAttrNodeDisplay(){
+            let atts = this.selectingNode.customAttributes;
+            if(this.context == 'position'){
+                let lastAttr = atts[atts.length - 1];
+                let content = lastAttr.name + ' : ' + lastAttr.value
+                this.$refs.editorWorkspace.updateCellAttrs(this.selectingNode.id, 'lastDynamicAttr', content);
+            }
+        },
         handleConfigUserSelectChange(listUserIds){
             this.$refs.editorWorkspace.changeUserDisplayInNode(listUserIds);
         },
@@ -451,6 +460,9 @@ export default {
                 this.$refs.editorWorkspace.updateCellAttrs(cellId, 'name', data.data);
             }else if(cellId == SYMPER_HOME_ORGCHART && this.context == 'position'){
                 this.$emit('update-department-name', data.data);
+            }else if(this.context == 'position' && data.name == 'code'){
+                let content = data.data ? (this.$t('common.code') + ' : '+ data.data) : '';
+                this.$refs.editorWorkspace.updateCellAttrs(cellId, 'positionCode', content);
             }
         },
         changeDepartmentName(newName, idDepartment = false){

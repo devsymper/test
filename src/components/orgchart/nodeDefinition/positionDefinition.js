@@ -1,18 +1,113 @@
 let shapeSize = {
-    width: 200,
-    height: 50
+    width: 210,
+    height: 70
 };
-
-export const DEFAULT_POSITION_DISPLAY = { fill: 'white', 'stroke-width': 1, 'rx': 4, 'ry': 4, stroke: '#585858' };
-export const FOUCUS_POSITION_DISPLAY = { 'stroke-width': 2, 'rx': 4, 'ry': 4, stroke: '#f58634' };
+let avatarSize = shapeSize.height / 2 - 5;
+let borderBottomHeight = 2;
+export const DEFAULT_POSITION_DISPLAY = {
+    fill: 'white',
+    rx: 0,
+    ry: 0,
+    'stroke-width': 0.2,
+    stroke: '#707070'
+};
+export const FOUCUS_POSITION_DISPLAY = {
+    'stroke-width': 2,
+    stroke: '#f58634'
+};
 export const DEFAULT_POSITION_ATTRS = {
     '.card': DEFAULT_POSITION_DISPLAY,
-    '.name': { 'text-anchor': 'middle', fill: '#000', text: '', 'font-family': 'Roboto', 'ref-x': 0.5, 'ref-y': 0.4 },
+    '.name': {
+        'text-anchor': 'middle',
+        fill: '#000',
+        text: '',
+        'font-family': 'Roboto',
+        'ref-x': 0.5,
+        'ref-y': 0.12,
+        'font-weight': 500,
+    },
+    image: {
+        'xlink:href': '/img/empty_avatar.PNG',
+        height: avatarSize,
+        width: avatarSize,
+        y: shapeSize.height / 3,
+        x: shapeSize.width - avatarSize - 40
+    },
+    '.account-number-plus': {
+        y: shapeSize.height - avatarSize + 7,
+        x: shapeSize.width - avatarSize + 5,
+        fill: '#a4a4a4',
+        'font-size': 14,
+        stroke: 'white',
+        'stroke-width': 0,
+        'font-weight': 500,
+        'font-family': 'Roboto',
+    },
+    '.manager-name': {
+        y: shapeSize.height / 2 + avatarSize / 3 + 2,
+        x: 20 + avatarSize,
+        fill: '#a4a4a4',
+        'font-size': 13,
+        stroke: 'white',
+        'stroke-width': 0,
+        'font-weight': 300,
+        'font-family': 'Roboto',
+    },
+    '.position-code': {
+        y: shapeSize.height / 4 + 20,
+        x: 7,
+        fill: '#a4a4a4',
+        'font-size': 13,
+        stroke: 'white',
+        'stroke-width': 0,
+        'font-weight': 300,
+        'font-family': 'Roboto',
+    },
+    '.dynamic-attr-value': {
+        y: shapeSize.height / 4 + 38,
+        x: 7,
+        fill: '#a4a4a4',
+        'font-size': 13,
+        stroke: 'white',
+        'stroke-width': 0,
+        'font-weight': 300,
+        'font-family': 'Roboto',
+    },
     '.btn.add': { 'ref-dx': -shapeSize.width / 2, 'ref-y': shapeSize.height, 'ref': '.card', event: 'element:add', cursor: 'pointer' },
-    '.btn>circle': { r: 7, fill: 'green', stroke: 'green', 'stroke-width': 0 },
+    '.btn.add>circle': { r: 7, fill: 'green', stroke: 'green', 'stroke-width': 0 },
     '.btn>rect': { height: 20, width: 45, rx: 2, ry: 2, fill: 'transparent', 'stroke-width': 1 },
     '.btn.add>text': { fill: 'white', 'font-size': 15, 'font-weight': 400, stroke: 'white', x: -4, y: 5, 'font-family': 'Roboto' },
+    '.border-bottom': {
+        height: borderBottomHeight,
+        y: shapeSize.height - borderBottomHeight + 1,
+        x: -0.5,
+        width: shapeSize.width + 1,
+        fill: '#f58634',
+        'stroke-width': 0
+    },
+    '.btn.remove': {
+        'ref-dx': 0,
+        'ref-y': 0,
+        'ref': '.card',
+        event: 'element:remove',
+        cursor: 'pointer'
+    },
+    '.btn.remove>circle': {
+        r: 7,
+        fill: 'red',
+    },
+    '.btn.remove>text': {
+        fill: 'white',
+        'font-size': 11,
+        'font-weight': 500,
+        stroke: 'white',
+        x: -3,
+        y: 4,
+        'font-family': 'Roboto'
+    },
+
 };
+
 
 export const POSITION_NODE_DATA = {
     "type": "org.Member",
@@ -35,15 +130,32 @@ export const definePosition = function() {
             height: shapeSize.height
         },
         attrs: DEFAULT_POSITION_ATTRS,
-        markup: `<g class="rotatable">
+        markup: `<g class="rotatable symper-orgchart-node">
                     <g class="scalable">
                         <rect class="card"/>
                     </g>
+                    <image/>
+                    <text class="account-number-plus"/>
                     <text class="name"/>
+                    <text class="position-code"/>
+                    <text class="dynamic-attr-value"/>
+                    <text class="name"/>
+                    <text class="manager-name"/>
+
+                    <g>
+                        <rect class="border-bottom"/>
+                    </g>
+
                     <g class="btn add orgchart-action">
                         <circle class="add"/>
                         <text class="add">+</text>
                     </g>
+
+                    <g class="btn remove orgchart-action">
+                        <circle class="remove"/>
+                        <text class="remove">X</text>
+                    </g>
+                   
                 </g>`.replace(/\n/g, '').replace(/\s+/g, ' ')
     });
 }

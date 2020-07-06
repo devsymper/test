@@ -61,7 +61,8 @@
         "sort": "Sort",
         "status": "Status",
         "done": "Done",
-        "notDone": "Not done"
+        "notDone": "Not done",
+        "code": "Code"
     },
     "validate": {
         "required": "Not be empty",

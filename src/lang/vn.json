@@ -60,7 +60,8 @@
         "sort": "Sắp xếp",
         "status": "Trạng thái",
         "done": "Hoàn thành",
-        "notDone": "Chưa hoàn thành"
+        "notDone": "Chưa hoàn thành",
+        "code": "Mã"
     },
     "login": {
         "title": "Đăng nhập hệ thống",

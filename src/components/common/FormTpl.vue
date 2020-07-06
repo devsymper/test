@@ -52,10 +52,14 @@
                 @change="(data) => {
                     handleChangeInputValue(inputInfo, name,data);
                 }"
+                @input="(data) => {
+                    handleInputValue(inputInfo, name,data);
+                }"
                 @blur="handleInputBlur(inputInfo, name)"
                 @keyup="(data) => {
                     handleKeyUpInputValue(inputInfo, name,data);
                 }"
+
                 :ref="'inputItem_'+name"
                 solo
                 :items="inputInfo.options"
@@ -377,6 +381,14 @@ export default {
              * inputInfo: chứa các thông tin về input
              */
             this.$emit("input-value-changed", name, inputInfo, data);
+        },
+        handleInputValue(inputInfo, name, data) {
+            /**
+             * emit sự kiện thay đổi giá trị của một input trong form
+             * name: tên của input này
+             * inputInfo: chứa các thông tin về input
+             */
+            this.$emit("input-value", name, inputInfo, data);
         },
         handleKeyUpInputValue(inputInfo, name, data){
             this.$emit("input-value-keyup", name, inputInfo, data);

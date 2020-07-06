@@ -92,7 +92,11 @@ export default {
                 name: '.name/text',
                 border: '.card',
                 managerName: '.manager-name/text',
-                managerAvartar: 'image/xlink:href'
+                managerAvartar: 'image/xlink:href',
+                userInPositionAvartar: 'image/xlink:href',
+                accountNumberPlus: '.account-number-plus/text',
+                positionCode: '.position-code/text',
+                lastDynamicAttr: '.dynamic-attr-value/text'
             };
             let cell = this.$refs.jointPaper.graph.getCell(cellId);
             if(cell && mapName[attrName]){
@@ -230,23 +234,22 @@ export default {
             });
         },
         changeUserDisplayInNode(userIdList){
+            let lastUserInfo = this.mapUserById[userIdList[userIdList.length - 1]];
+            
             if(this.context == 'department'){
-                let lastUserInfo = this.mapUserById[userIdList[userIdList.length - 1]];
-                if(lastUserInfo){
-                    this.updateCellAttrs(
-                        this.selectingNode.id,
-                        'managerName',
-                        lastUserInfo.displayName
-                    );
-                    
-                    this.updateCellAttrs(
-                        this.selectingNode.id,
-                        'managerAvartar',
-                        lastUserInfo.avatar ? lastUserInfo.avatar : avatarDefault
-                    );
+                if(!lastUserInfo) return;
+                this.updateCellAttrs(this.selectingNode.id, 'managerName', lastUserInfo.displayName );
+                this.updateCellAttrs( this.selectingNode.id, 'managerAvartar', lastUserInfo.avatar ? lastUserInfo.avatar : avatarDefault );
+            }else if(this.context == 'position' && this.selectingNode.id != 'SYMPER_HOME_ORGCHART' ){
+                if(userIdList.length == 0){
+                    this.updateCellAttrs( this.selectingNode.id, 'userInPositionAvartar', '/img/empty_avatar.PNG');
+                    this.updateCellAttrs( this.selectingNode.id, 'accountNumberPlus', '');
+                }else{
+                    if(!lastUserInfo) return;
+                    this.updateCellAttrs( this.selectingNode.id, 'userInPositionAvartar', lastUserInfo.avatar ? lastUserInfo.avatar : avatarDefault );
+                    let plusUser = userIdList.length == 1 ? '' : ('+' + (userIdList.length - 1));
+                    this.updateCellAttrs( this.selectingNode.id, 'accountNumberPlus', plusUser);
                 }
-            }else if(this.context == 'position'){
-                
             }
         },
         setupGraph(graph, paper, paperScroller){

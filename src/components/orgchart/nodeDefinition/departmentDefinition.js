@@ -24,13 +24,15 @@ export const DEFAULT_DEPARTMENT_ATTRS = {
         text: '',
         'font-family': 'Roboto',
         'ref-x': 0.5,
-        'ref-y': 0.12
+        'ref-y': 0.12,
+        'font-weight': 500,
+        'font-size': 13,
     },
     image: {
         'xlink:href': '/img/empty_avatar.PNG',
         height: avatarSize,
         width: avatarSize,
-        y: shapeSize.height / 4 + 2,
+        y: shapeSize.height / 4 + 7,
     },
     '.manager-name': {
         y: shapeSize.height / 2 + avatarSize / 3 + 2,
