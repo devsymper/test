@@ -140,7 +140,7 @@ const commonProps = {
     isSaveToDB: {
         title: "Lưu giá trị",
         type: "checkbox",
-        value: "",
+        value: true,
         groupType: "display"
     },
     isMultipleValue: {
