@@ -18,7 +18,7 @@ export const documentApi = {
         return coreApi.get("documents/" + id);
     },
     deleteDocumentObject(objectId) {
-        return coreApi.delete("/documents/objects/" + objectId);
+        return coreApi.delete("documents/objects/" + objectId);
     },
     detailDocumentObject(objectId) {
         return coreApi.get("documents/objects/" + objectId);
@@ -42,4 +42,7 @@ export const documentApi = {
     getListApprovalHistory(objectId) {
         return coreApi.get("approval-histories/" + objectId);
     },
+    checkExistDocument(name) {
+        return coreApi.post("documents/check/" + name);
+    }
 };
