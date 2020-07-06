@@ -12,6 +12,9 @@ import JointPaper from "@/components/common/rappid/JointPaper";
 import { createDepartmentNode, defineDepartment, DEFAULT_DEPARTMENT_DISPLAY, FOUCUS_DEPARTMENT_DISPLAY } from "./../nodeDefinition/departmentDefinition";
 import { createPositionNode, definePosition, DEFAULT_POSITION_DISPLAY, FOUCUS_POSITION_DISPLAY } from "./../nodeDefinition/positionDefinition";
 import { SYMPER_HOME_ORGCHART } from './nodeAttrFactory';
+
+import avatarDefault from "@/assets/image/avatar_default.jpg";
+
 require('@/plugins/rappid/rappid.css');
 
 // A helper to create an arrow connection
@@ -52,6 +55,12 @@ export default {
     computed: {
         selectingNode(){
             return this.$store.state.orgchart.editor[this.instanceKey].selectingNode;
+        },
+        mapUserById(){
+            return this.$store.state.app.allUsers.reduce((map, user) => {
+                map[user.id] = user;
+                return map;
+            },{});
         }
     },
     data(){
@@ -81,7 +90,9 @@ export default {
         updateCellAttrs(cellId, attrName, value){
             let mapName = {
                 name: '.name/text',
-                border: '.card'
+                border: '.card',
+                managerName: '.manager-name/text',
+                managerAvartar: 'image/xlink:href'
             };
             let cell = this.$refs.jointPaper.graph.getCell(cellId);
             if(cell && mapName[attrName]){
@@ -214,8 +225,29 @@ export default {
             this.$refs.jointPaper.graph.resetCells([firstNode]);
             this.$emit('new-viz-cell-added', {
                 id: firstNode.id,
-                name: nodeName
+                name: nodeName,
+                autoCreateFirstNode: true
             });
+        },
+        changeUserDisplayInNode(userIdList){
+            if(this.context == 'department'){
+                let lastUserInfo = this.mapUserById[userIdList[userIdList.length - 1]];
+                if(lastUserInfo){
+                    this.updateCellAttrs(
+                        this.selectingNode.id,
+                        'managerName',
+                        lastUserInfo.displayName
+                    );
+                    
+                    this.updateCellAttrs(
+                        this.selectingNode.id,
+                        'managerAvartar',
+                        lastUserInfo.avatar ? lastUserInfo.avatar : avatarDefault
+                    );
+                }
+            }else if(this.context == 'position'){
+                
+            }
         },
         setupGraph(graph, paper, paperScroller){
             let self = this;
@@ -225,7 +257,8 @@ export default {
 
             var treeLayout = new joint.layout.TreeLayout({
                 graph: graph,
-                direction: 'B'
+                direction: 'B',
+                parentGap: 40
             });
             this.$refs.jointPaper.treeLayout = treeLayout;
             graph.resetCells([firstNode]);

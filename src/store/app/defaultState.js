@@ -21,7 +21,7 @@ const defaultState = {
             },
         ],
     },
-    collapseSideBar: false, // trạng thái của sidebar: true là đang nhỏ, false là đang mở rộng
+    collapseSideBar: true, // trạng thái của sidebar: true là đang nhỏ, false là đang mở rộng
     unreadNotification: 2, // số lượng các thông báo chưa đọc
     needReloadNotification: false,
     items: [

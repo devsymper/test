@@ -51,6 +51,7 @@
         }" class="h-100 border-left-1">
             <ConfigPanel 
             @config-value-change="handleConfigValueChange"
+            @change-user-select="handleConfigUserSelectChange"
             :instanceKey="instanceKey"
             :action="action"
             :context="context">
@@ -88,7 +89,7 @@ import { getOrgchartEditorData, getDefaultConfigNodeData, SYMPER_HOME_ORGCHART }
 import jointjs from "jointjs";
 import { orgchartApi } from "@/api/orgchart.js";
 import { FOUCUS_DEPARTMENT_DISPLAY, DEFAULT_DEPARTMENT_DISPLAY } from '../nodeDefinition/departmentDefinition';
-console.log(jointjs, 'jointjsjointjs');
+
 
 
 export default {
@@ -137,12 +138,12 @@ export default {
                 // },
                 zoomIn: {
                     icon: "mdi-plus-circle-outline",
-                    text: "process.header_bar.zoom_in",
+                    text: "process.header_bar.zoom_out",
 
                 },
                 zoomOut: {
                     icon: "mdi-minus-circle-outline",
-                    text: "process.header_bar.zoom_out",
+                    text: "process.header_bar.zoom_in",
 
                 },
                 zoomToFit: {
@@ -181,6 +182,9 @@ export default {
         }
     },
     methods: {
+        handleConfigUserSelectChange(listUserIds){
+            this.$refs.editorWorkspace.changeUserDisplayInNode(listUserIds);
+        },
         restoreMainOrgchartConfig(config){
             let homeConfig = this.$store.state.orgchart.editor[this.instanceKey].homeConfig;
             homeConfig.commonAttrs.name.value = config.name;
@@ -337,8 +341,7 @@ export default {
             if(!this.$store.state.orgchart.editor[subInstanceKey]){
                 this.$refs.positionDiagram.initOrgchartData();
             }
-            this.$set(this.$store.state.orgchart.editor[subInstanceKey].homeConfig, 'commonAttrs', this.selectingNode.commonAttrs);
-            this.$set(this.$store.state.orgchart.editor[subInstanceKey].homeConfig, 'customAttributes', this.selectingNode.customAttributes);
+            this.$store.state.orgchart.editor[subInstanceKey].homeConfig = this.selectingNode;
         },
         storeDepartmentPositionCells(){
             let cells = this.$refs.positionDiagram.$refs.editorWorkspace.getAllDiagramCells();
@@ -458,7 +461,9 @@ export default {
         },
         handleNewNodeAdded(nodeData){
             this.createNodeConfigData(this.context, nodeData);
-            this.selectNode(nodeData.id);
+            if(!nodeData.autoCreateFirstNode){
+                this.selectNode(nodeData.id);
+            }
         },
         handleHeaderAction(action){
             if(action == 'home'){

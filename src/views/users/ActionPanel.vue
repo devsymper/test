@@ -368,7 +368,8 @@ import { permissionPackageApi } from "./../../api/PermissionPackage.js";
 import { permissionPositionOrgchartApi } from "./../../api/PermissionPositionOrgchart.js";
 import { orgchartApi } from "./../../api/orgchart.js";
 import { str } from "./../../plugins/utilModules/str.js";
-import avatarDefault from "./../../assets/image/avatar_default.jpg";
+import avatarDefault from "@/assets/image/avatar_default.jpg";
+
 import VueResizable from 'vue-resizable'
 let heighOrgchart = 0;
 export default {

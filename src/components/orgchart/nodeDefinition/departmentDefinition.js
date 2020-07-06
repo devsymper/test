@@ -27,7 +27,7 @@ export const DEFAULT_DEPARTMENT_ATTRS = {
         'ref-y': 0.12
     },
     image: {
-        'xlink:href': 'https://cdn3.iconfinder.com/data/icons/avatars-round-flat/33/avat-01-512.png',
+        'xlink:href': '/img/empty_avatar.PNG',
         height: avatarSize,
         width: avatarSize,
         y: shapeSize.height / 4 + 2,
@@ -103,7 +103,7 @@ export const defineDepartment = function() {
                     </g>
                     <image/>
                     <text class="name"/>
-                    <text class="manager-name">Đào Mạnh Khá</text>
+                    <text class="manager-name"/>
 
                     <g>
                         <rect class="border-bottom"/>

@@ -24,8 +24,8 @@
                     @input-value-changed="handleAttrValueChanged"
                     :allInputs="selectingNode.commonAttrs"
                 ></form-tpl>
-                <div v-if="context == 'position'">
-                    <span class="fs-12">User in position</span>
+                <div v-if="!(context == 'department' && selectingNode.id == SYMPER_HOME_ORGCHART)">
+                    <span class="fs-12">{{context == 'department' ? 'Select manager' : 'User in position'}}</span>
                     <UserSelector
                         ref="userSelector"
                         :isMulti="true"
@@ -34,6 +34,7 @@
                         :color="'grey lighten-3'"
                         :textColor="''"
                         :flat="true"
+                        @input="handleChangeUser"
                         v-model="selectingNode.users">
                         
                     </UserSelector>
@@ -64,8 +65,7 @@
                                         v-if="action != 'view'"
                                         icon
                                         v-bind="attrs"
-                                        @click="actionBeforeAddAttr"
-                                        >
+                                        @click="actionBeforeAddAttr">
                                         <v-icon size="21" >mdi-plus</v-icon>
                                     </v-btn>
                                 </div>
@@ -127,9 +127,11 @@
 </template>
 
 <script>
-import { getDefaultNodeData } from "./nodeAttrFactory";
+import { getDefaultNodeData, SYMPER_HOME_ORGCHART } from "./nodeAttrFactory";
 import FormTpl from "@/components/common/FormTpl";
 import UserSelector from "@/views/tasks/userSelector.vue";
+
+
 
 export default {
     created(){
@@ -173,6 +175,7 @@ export default {
     },
     data(){
         return {
+            SYMPER_HOME_ORGCHART: SYMPER_HOME_ORGCHART,
             showUpdateAttr: false,
             currentTab: null,
             openAddPanel: false,
@@ -207,6 +210,9 @@ export default {
         }
     },
     methods: {
+        handleChangeUser(newValue){
+            this.$emit('change-user-select', newValue);
+        },
         removeDynamicItem(index){
             this.selectingNode.customAttributes.splice(index, 1);
         },
