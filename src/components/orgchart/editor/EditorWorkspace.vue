@@ -316,11 +316,12 @@ export default {
                 id: firstNode.id,
                 name: nodeName
             });
-
+            self.scrollPaperToTop();
+        },
+        scrollPaperToTop(){
             setTimeout((self) => {
                 let viewPort = $(self.$refs.jointPaper.$el).find('.symper-orgchart-paper>.joint-paper-scroller');
                 let view = $(self.$refs.jointPaper.$el).find('.symper-orgchart-paper>.joint-paper-scroller>.paper-scroller-background>.joint-paper');
-                debugger
                 $(viewPort).scrollTop($(view).position().top);
             }, 1000, this);
         },

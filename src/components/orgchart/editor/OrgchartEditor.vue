@@ -394,7 +394,9 @@ export default {
         normalizeDiagramNodeDisplay(allVizCell){
             for(let node of allVizCell.cells){
                 if(node.type != 'org.Arrow'){
-                    node.attrs['.card'].stroke = DEFAULT_DEPARTMENT_DISPLAY.stroke;
+                    if(node.attrs['.card']){
+                        node.attrs['.card'].stroke = DEFAULT_DEPARTMENT_DISPLAY.stroke;
+                    }
                 }
             }
             return allVizCell;

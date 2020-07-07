@@ -70,8 +70,6 @@ export default {
 			model: this.graph,
 			width: this.width,
 			height: this.height,
-			// gridSize: this.gridSize,
-			// drawGrid: this.drawGrid,
 			background: this.background,
             interactive: !this.readonly,
             sorting: joint.dia.Paper.sorting.APPROX,
