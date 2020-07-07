@@ -53,6 +53,7 @@
                 @update-dynamic-attr-display="updateDynamicAttrNodeDisplay"
                 @config-value-input="handleConfigValueChange"
                 @change-user-select="handleConfigUserSelectChange"
+                @apply-style-for-node="handleStyleChange"
                 :instanceKey="instanceKey"
                 :action="action"
                 :context="context">
@@ -183,6 +184,32 @@ export default {
         }
     },
     methods: {
+        handleStyleChange(info){
+            this.changeNodeBottomColor(info.data.highlight.value, info.type == 'child');
+        },
+        changeNodeBottomColor(color, applyForChild = false){
+            let affectedNodeIds = [];
+            let workspace = this.$refs.editorWorkspace;
+            let currentNodeId = this.selectingNode.id;
+
+            if(!applyForChild){
+                affectedNodeIds = [currentNodeId];
+            }else{
+                if(currentNodeId == SYMPER_HOME_ORGCHART){
+                    affectedNodeIds = workspace.getAllNode().reduce((arr, el) => {
+                        arr.push(el.id);
+                        return arr;
+                    }, []);
+                }else{
+                    affectedNodeIds = workspace.getAllChildIdOfNode(currentNodeId);
+                }
+            }
+
+            for(let id of affectedNodeIds){
+                workspace.updateCellAttrs(id, 'highlight', color);
+                this.$store.state.orgchart.editor[this.instanceKey].allNode[id].style.highlight.value = color;
+            }
+        },
         updateDynamicAttrNodeDisplay(){
             let atts = this.selectingNode.customAttributes;
             if(this.context == 'position'){

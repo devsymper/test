@@ -37,4 +37,14 @@ export const orgchartApi = {
     createOrgchart(data) {
         return orgchart.post('orgchart', data);
     },
+
+    createNodeStyle(data) {
+        return orgchart.post('node-style', data);
+    },
+    getListNodeStyle() {
+        return orgchart.get('node-style', data);
+    },
+    deleteNodeStyle(ids) {
+        return orgchart.delete('node-style/' + ids, data);
+    },
 };

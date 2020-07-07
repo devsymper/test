@@ -8,8 +8,47 @@
             flat
             grow>
 
-            <v-tab :key="'main'" class="fs-13 text-capitalize" >{{$t('orgchart.editor.main')}}</v-tab>
-            <v-tab :key="'customAttributes'" class="fs-13 text-capitalize">{{$t('orgchart.editor.customAttributes')}}</v-tab>
+            <v-tooltip top>
+                <template v-slot:activator="{ on, attrs }">
+                    <v-tab 
+                        v-on="on" 
+                        v-bind="attrs"
+                        :key="'main'" 
+                        style="min-width: 50px!important">
+                        <v-icon size="17">mdi-home</v-icon>
+                    </v-tab>
+                </template>
+                <span>{{$t('orgchart.editor.main')}}</span>
+            </v-tooltip>
+
+
+            <v-tooltip top>
+                <template v-slot:activator="{ on, attrs }">
+                    <v-tab 
+                        v-on="on" 
+                        v-bind="attrs"
+                        :key="'customAttributes'" 
+                        style="min-width: 50px!important">
+                        <v-icon size="17">mdi-cogs</v-icon>
+                    </v-tab>
+                </template>
+                <span>{{$t('orgchart.editor.customAttributes')}}</span>
+            </v-tooltip>
+
+            <v-tooltip top>
+                <template v-slot:activator="{ on, attrs }">
+                    <v-tab 
+                        v-on="on" 
+                        v-bind="attrs"
+                        :key="'style'" 
+                        style="min-width: 50px!important">
+                        <v-icon size="17">mdi-checkbox-multiple-marked-circle-outline</v-icon>
+                    </v-tab>
+                </template>
+                <span>{{$t('orgchart.editor.style')}}</span>
+            </v-tooltip>
+
+
         </v-tabs>
 
         <v-tabs-items v-model="currentTab">
@@ -122,14 +161,106 @@
                     </v-list-item-group>
                 </v-list>
             </v-tab-item>
+
+            
+            <v-tab-item :key="'style'" class="pa-2">
+                <span class="fs-15  font-weight-medium">
+                    {{$t('orgchart.editor.style')}}
+                </span>
+                <form-tpl
+                    :viewOnly="action == 'view'"
+                    :singleLine="false"
+                    :labelWidth="'60px'"
+                    :allInputs="nodeStyleConfig"
+                ></form-tpl>
+
+                <div class="w-100 mt-4">
+                    <v-btn
+                        class="float-left"
+                        @click="prepareForSaveStyle"
+                        small
+                        depressed>
+                        {{$t('common.save')}}
+                    </v-btn>
+                    
+                    
+                    <v-tooltip top>
+                        <template v-slot:activator="{ on, attrs }">
+                            <v-btn
+                                v-on="on" 
+                                v-bind="attrs"
+                                class="float-right"
+                                @click="applyNodeStyle('single')"
+                                small
+                                depressed>
+                                <v-icon size="17">mdi-check-bold</v-icon>
+                            </v-btn>
+                        </template>
+                        <span>{{$t('orgchart.editor.singleApply')}}</span>
+                    </v-tooltip>
+                    
+
+                    <v-tooltip top>
+                        <template v-slot:activator="{ on, attrs }">
+                            <v-btn
+                                v-on="on" 
+                                v-bind="attrs"
+                                class="float-right mr-2"
+                                @click="applyNodeStyle('child')"
+                                small
+                                depressed>
+                                <v-icon size="17">mdi-check-all</v-icon>
+                            </v-btn>
+                        </template>
+                        <span>{{$t('orgchart.editor.applyForChild')}}</span>
+                    </v-tooltip>
+                </div>
+            </v-tab-item>
         </v-tabs-items>
+
+            <v-dialog
+                v-model="showSaveStyleDialog"
+                max-width="300">
+                <v-card>
+                    <v-card-title class="headline">{{$t('orgchart.editor.saveNodeConfigTitle')}}</v-card-title>
+                    <v-card-text>
+
+                        <form-tpl
+                            :singleLine="false"
+                            :allInputs="nodeStyleConfigToSave"
+                        ></form-tpl>
+                    </v-card-text>
+                    <v-card-actions class="mt-4">
+                        <v-spacer></v-spacer>
+                        
+                        <v-btn
+                            text
+                            small
+                            depressed
+                            @click="showSaveStyleDialog = false">
+                            {{$t('common.close')}}
+                        </v-btn>
+
+                        <v-btn
+                            color="primary"
+                            small
+                            depressed
+                            @click="saveNodeStyleConfig">
+                            {{$t('common.save')}}
+                        </v-btn>
+                    </v-card-actions>
+                </v-card>
+            </v-dialog>
   </div>
 </template>
 
 <script>
-import { getDefaultNodeData, SYMPER_HOME_ORGCHART } from "./nodeAttrFactory";
+import { getDefaultNodeData, SYMPER_HOME_ORGCHART, getNodeStyleConfig } from "./nodeAttrFactory";
 import FormTpl from "@/components/common/FormTpl";
 import UserSelector from "@/views/tasks/userSelector.vue";
+import { util } from '../../../plugins/util';
+import { orgchartApi } from '../../../api/orgchart';
+import { elementTools } from 'jointjs';
 
 
 
@@ -140,13 +271,9 @@ export default {
                 $(evt.target).parents('.dynamic-attr-form-activator').length ==0 &&  
                 $(evt.target).parents('.symper-dynamic-attr-form').length == 0
             ){
-                // if(this.$refs.dynamicAttrForm.isLargeFormulaEditorOpen()){
-                    if($(evt.target).parents('.symper-drag-panel').length == 0){
-                        this.openAddPanel = false;
-                    }
-                // }else{
-                //     this.openAddPanel = false;
-                // }
+                if($(evt.target).parents('.symper-drag-panel').length == 0){
+                    this.openAddPanel = false;
+                }
             }
         });
     },
@@ -157,7 +284,7 @@ export default {
     computed: {
         selectingNode() {
             return this.$store.state.orgchart.editor[this.instanceKey].selectingNode;
-        }
+        },
     },
     props: {
         instanceKey: {
@@ -172,9 +299,40 @@ export default {
         }
     },
     watch: {
+        selectingNode: {
+            deep: true,
+            immediate: true,
+            handler(after){
+                for(let key in after.style){
+                    this.$set(this.nodeStyleConfig, key, util.cloneDeep(after.style[key]));
+                }
+            }
+        }
     },
-    data(){
+    data(){ 
         return {
+            showSaveStyleDialog: false,
+            // nodeStyleConfigToSave: {
+            //     name: '',
+            //     description: '',
+            //     shareMode: 1,
+            //     content: ''
+            // },
+            nodeStyleConfigToSave: {
+                name: {
+                    "title": "Name",
+                    "type": "text",
+                    "value": "",
+                    "info": "",
+                },
+                description: {
+                    "title": "Description",
+                    "type": "text",
+                    "value": "",
+                    "info": "",
+                }
+            },
+            nodeStyleConfig: getNodeStyleConfig(),
             SYMPER_HOME_ORGCHART: SYMPER_HOME_ORGCHART,
             showUpdateAttr: false,
             currentTab: null,
@@ -210,6 +368,37 @@ export default {
         }
     },
     methods: {
+        prepareForSaveStyle(){
+            this.showSaveStyleDialog = true;
+            this.nodeStyleConfigToSave.name.value = '';
+            this.nodeStyleConfigToSave.description.value = '';
+        },
+        async saveNodeStyleConfig(){
+            let content = {};
+            for(let key in this.nodeStyleConfig){
+                content[key] = this.nodeStyleConfig[key].value;
+            }
+            delete content.public;
+            let dataToSave = {
+                name: this.nodeStyleConfigToSave.name.value,
+                description: this.nodeStyleConfigToSave.description.value,
+                shareMode: this.nodeStyleConfig.public.value ? 1 : 0,
+                content: JSON.stringify(content)
+            };
+            let res = await orgchartApi.createNodeStyle(dataToSave);
+            if(res.status == 200){
+                this.$snotifySuccess('Save node style successfully!');
+                this.showSaveStyleDialog = false;
+            }else {
+                this.$snotifyError(res, "Can not save node style");
+            }
+        },
+        applyNodeStyle(type){
+            this.$emit('apply-style-for-node', {
+                data: this.nodeStyleConfig,
+                type: type
+            });
+        },
         updateDynamicAttrNodeDisplay(){
             this.$emit('update-dynamic-attr-display');
         },

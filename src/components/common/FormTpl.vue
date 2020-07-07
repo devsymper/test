@@ -146,6 +146,7 @@ import OrgchartSelector from "./../user/OrgchartSelector";
 import DateTimePicker from './../common/DateTimePicker.vue';
 import SymperListOrdering from "./../common/symperInputs/SymperListOrdering";
 import SymperListAutocomplete from "./../common/symperInputs/SymperListAutocomplete";
+import SymperColorPicker from "@/components/common/symperInputs/SymperColorPicker.vue";
 
 const inputTypeConfigs = {
     numeric: {
@@ -279,7 +280,15 @@ const inputTypeConfigs = {
                 value:config.value
             }
         }
-    }
+    },
+    color:{
+        tag:"symper-color-picker",
+        props(config){
+            return{
+                value:config.value
+            }
+        }
+    },
 };
 export default {
     data() {
@@ -496,6 +505,8 @@ export default {
         SymperListOrdering: SymperListOrdering,
         SymperListAutocomplete,
         "datetime-picker" : DateTimePicker,
+        SymperColorPicker: SymperColorPicker
+
     }
 };
 </script>

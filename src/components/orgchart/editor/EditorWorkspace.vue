@@ -103,7 +103,8 @@ export default {
                 userInPositionAvartar: 'image/xlink:href',
                 accountNumberPlus: '.account-number-plus/text',
                 positionCode: '.position-code/text',
-                lastDynamicAttr: '.dynamic-attr-value/text'
+                lastDynamicAttr: '.dynamic-attr-value/text',
+                highlight: '.border-bottom/fill'
             };
             let cell = this.$refs.jointPaper.graph.getCell(cellId);
             if(cell && mapName[attrName]){
@@ -125,7 +126,7 @@ export default {
             
             paper.on('element:remove', function(elementView, evt, x, y) {
                 evt.stopPropagation();
-                let allChildIds = self.getAllChildOfNode(elementView.model.id);
+                let allChildIds = self.getAllChildIdOfNode(elementView.model.id);
                 for(let idCell of allChildIds){
                     let cell = self.$refs.jointPaper.graph.getCell(idCell);
                     cell.remove();
@@ -197,7 +198,20 @@ export default {
                 });
             });
         },
-        getAllChildOfNode(nodeId){
+        getAllElementModel(){
+            return this.$refs.jointPaper.graph.getCells();
+        },
+        getAllNode(){
+            return this.$refs.jointPaper.graph.getCells().filter((el) => {
+                return el.attributes.type != 'org.Arrow';
+            });
+        },
+        getAllLink(){
+            return this.$refs.jointPaper.graph.getCells().filter((el) => {
+                return el.attributes.type == 'org.Arrow';
+            });
+        },
+        getAllChildIdOfNode(nodeId){
             let allCell = this.$refs.jointPaper.graph.getCells();
             let mapNode = {};
             let links = [];
