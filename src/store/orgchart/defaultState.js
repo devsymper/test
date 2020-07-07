@@ -18,7 +18,8 @@ const defaultState = {
          * homeConfig: {
          * }
          */
-    }
+    },
+    allNodeStyle: []
 };
 
 export default defaultState;

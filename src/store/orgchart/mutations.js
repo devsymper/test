@@ -9,6 +9,10 @@ const setNodeConfig = (state, params) => {
     Vue.set(state.editor[params.instanceKey].allNode, params.nodeId, params.data);
 };
 
+const setNodeStyle = (state, nodeStyles) => {
+    Vue.set(state, 'allNodeStyle', nodeStyles);
+};
+
 
 const changeSelectingNode = (state, params) => {
     let selectingNode = null;
@@ -20,8 +24,14 @@ const changeSelectingNode = (state, params) => {
     Vue.set(state.editor[params.instanceKey], 'selectingNode', selectingNode);
 };
 
+const deleteNodeStyle = (state, idx) => {
+    state.allNodeStyle.splice(idx, 1);
+};
+
 export {
     setOrgchartData,
     setNodeConfig,
-    changeSelectingNode
+    changeSelectingNode,
+    setNodeStyle,
+    deleteNodeStyle
 };

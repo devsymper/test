@@ -172,6 +172,8 @@ export default {
         if(this.action != 'create'){
             this.restoreOrgchartView(this.id)
         }
+        this.$store.dispatch('orgchart/getAllStyleNode');
+
     },
     activated(){
         this.centerDiagram();

@@ -42,9 +42,9 @@ export const orgchartApi = {
         return orgchart.post('node-style', data);
     },
     getListNodeStyle() {
-        return orgchart.get('node-style', data);
+        return orgchart.get('node-style');
     },
     deleteNodeStyle(ids) {
-        return orgchart.delete('node-style/' + ids, data);
+        return orgchart.delete('node-style/' + ids);
     },
 };

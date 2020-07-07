@@ -167,6 +167,9 @@
                 <span class="fs-15  font-weight-medium">
                     {{$t('orgchart.editor.style')}}
                 </span>
+                <SearchNodeStyle >
+
+                </SearchNodeStyle>
                 <form-tpl
                     :viewOnly="action == 'view'"
                     :singleLine="false"
@@ -261,8 +264,7 @@ import UserSelector from "@/views/tasks/userSelector.vue";
 import { util } from '../../../plugins/util';
 import { orgchartApi } from '../../../api/orgchart';
 import { elementTools } from 'jointjs';
-
-
+import SearchNodeStyle from "@/components/orgchart/editor/SearchNodeStyle";
 
 export default {
     created(){
@@ -279,7 +281,8 @@ export default {
     },
     components: {
         'form-tpl': FormTpl,
-        UserSelector
+        UserSelector,
+        SearchNodeStyle
     },
     computed: {
         selectingNode() {
