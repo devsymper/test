@@ -83,8 +83,9 @@ export default class Control {
     initFormulas() {
         if (Object.keys(this.controlFormulas).length > 0) {
             for (let key in this.controlFormulas) {
-                if (this.controlFormulas[key].value != "" && this.controlFormulas[key].value != undefined) {
-                    this.controlFormulas[key]['instance'] = new Formulas(this.curParentInstance, this.controlFormulas[key].value, key);
+                if (this.controlFormulas[key].value != "" && this.controlFormulas[key].value != undefined && Object.values(this.controlFormulas[key].value).length > 0) {
+                    let formulas = Object.values(this.controlFormulas[key].value)[0];
+                    this.controlFormulas[key]['instance'] = new Formulas(this.curParentInstance, formulas, key);
                 }
             }
         }
