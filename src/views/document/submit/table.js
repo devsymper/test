@@ -387,6 +387,7 @@ export default class Table {
     handlerCheckCanBeRunFormulas(control) {
             if (checkCanBeBind(control)) {
                 let controlInstance = listInputInDocument[control];
+
                 if (controlInstance.controlFormulas.hasOwnProperty('formulas')) {
                     let formulasInstance = controlInstance.controlFormulas['formulas'].instance;
                     let dataInput = this.getDataInputForFormulas(formulasInstance, controlInstance.inTable);
@@ -408,7 +409,8 @@ export default class Table {
             for (let inputControlName in inputControl) {
                 let valueInputControlItem = this.getColumnIndexFromControlName(inputControlName);
                 valueInputControlItem = this.tableInstance.getDataAtCol(valueInputControlItem);
-                valueInputControlItem.pop();
+                console.log('ksad', valueInputControlItem);
+
 
                 if (listInputInDocument[tableName].tableInstance.tableHasRowSum) {
                     valueInputControlItem.pop();
@@ -424,6 +426,8 @@ export default class Table {
          * @param {*} formulasInstance  Object cua formulas giá trị của control bị ảnh hưởng
          */
     async handlerRunFormulasForControlInTable(formulasType, controlInstance, dataInput, formulasInstance) {
+            console.log('ksad', dataInput);
+
             let thisObj = this;
             let dataColumnAfterRunFOrmulas = [];
             if (Object.keys(dataInput).length > 0) {
