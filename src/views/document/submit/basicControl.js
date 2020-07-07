@@ -85,6 +85,10 @@ export default class BasicControl extends Control {
         this.ele.on('change', function(e) {
             SYMPER_APP.$evtBus.$emit('document-submit-input-change', { controlName: thisObj.controlProperties.name.value, val: $(e.target).val() })
         })
+
+
+
+
         if (this.ele.hasClass('s-control-number')) {
 
             this.renderNumberControl();
@@ -109,8 +113,7 @@ export default class BasicControl extends Control {
             this.renderTimeControl();
 
         } else if (this.ele.hasClass('s-control-percent')) {
-            this.ele.attr('type', 'text');
-            this.ele.css('min-width', 'unset');
+            this.renderPercentControl()
 
         } else if (this.ele.hasClass('s-control-date')) {
             this.renderDateControl();
@@ -128,11 +131,26 @@ export default class BasicControl extends Control {
         } else if (this.ele.hasClass('s-control-label')) {
             this.renderLabelControl();
         }
-        this.ele.val(this.value)
+
         if (this.checkDetailView()) {
-            this.ele.addClass('detail-view')
-            this.ele.attr('disabled', 'disabled')
+            this.ele.addClass('detail-view');
+            this.ele.attr('disabled', 'disabled');
+            this.setValueControl();
         }
+
+    }
+    setValueControl() {
+        let value = this.value
+        if (this.type == 'percent') {
+            value *= 100
+        } else if (this.type == 'number') {
+            value = numbro(value).format(this.numberFormat)
+
+        } else if (this.type == 'date') {
+            value = moment(value).format(this.formatDate)
+        }
+
+        this.ele.val(value)
     }
     renderFileControl = function() {
         let fileHtml = this.genFileView();
@@ -314,7 +332,8 @@ export default class BasicControl extends Control {
         let id = this.ele.attr('id');
         let thisObj = this;
         let keyinstance = this.ele.attr('key-instance');
-        this.ele.replaceWith('<input class="s-control s-control-label" s-control-type="label" type="text" disabled title="Label" id="' + id + '" placeholder="Aa" key-instance="' + keyinstance + '">');
+        this.ele.parent().css({ 'width': '100%' });
+        this.ele.replaceWith('<input class="s-control s-control-label" s-control-type="label" type="text" disabled title="Label" id="' + id + '" style="width:100%;border:none;" key-instance="' + keyinstance + '">');
         this.ele = $('#' + id);
         this.ele.on('change', function(e) {
             SYMPER_APP.$evtBus.$emit('document-submit-input-change', { controlName: thisObj.controlProperties.name.value, val: $(e.target).val() })
@@ -349,7 +368,12 @@ export default class BasicControl extends Control {
 
     }
 
-
+    renderPercentControl() {
+        this.ele.attr('type', 'number');
+        this.ele.css({ 'text-align': 'right' });
+        let icon = `<span class="percent-icon">%</span>`
+        this.ele.parent().append(icon);
+    }
     renderDateTimeControl() {
         if (this.checkDetailView()) return;
         this.ele.attr('type', 'text');
@@ -357,10 +381,9 @@ export default class BasicControl extends Control {
     }
     renderDateControl() {
         this.ele.attr('type', 'text');
+        this.formatDate = (this.controlProperties.hasOwnProperty('formatDate')) ? this.controlProperties.formatDate.value : "";
         if (this.checkDetailView()) return;
         let thisObj = this;
-
-        this.formatDate = (this.controlProperties.hasOwnProperty('formatDate')) ? this.controlProperties.formatDate.value : "";
         this.ele.on('change', function(e) {
             $(this).val(moment($(this).val()).format(thisObj.formatDate))
         })
@@ -408,80 +431,6 @@ export default class BasicControl extends Control {
             let formulasInstance = (fromSelect) ? thisObj.controlFormulas.formulas.instance : thisObj.controlFormulas.autocomplete.instance;
             SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-key-event', { e: e, autocompleteFormulasInstance: formulasInstance, isSelect: false, controlTitle: thisObj.title })
         })
-    }
-    inputCacheSet(value, rowId = null, rawUserFormula = '') {
-        let fieldName = this.name;
-        value = this.standardlizeValue(value);
-
-        if (!this.inTable) {
-            dataInputCache[fieldName] = value;
-            rawFormulaUserInput[fieldName] = rawUserFormula;
-        } else {
-            if (!(dataInputCache.hasOwnProperty(fieldName))) {
-                dataInputCache[fieldName] = [];
-            }
-            dataInputCache[fieldName][rowId] = value;
-            if (!rawFormulaUserInput.hasOwnProperty(fieldName)) {
-                rawFormulaUserInput[fieldName] = [];
-            }
-            rawFormulaUserInput[fieldName][rowId] = rawUserFormula;
-        }
-    }
-    standardlizeValue(value, rowId = null) {
-        if ((!value || value === NaN) && (this.type == 'number' || this.type == 'percent')) {
-            value = 0;
-        } else if (this.type == 'date' && /((0[1-9]|[12]\d|3[01])\/(0[1-9]|1[0-2])\/[12]\d{3})/.test(value)) {
-            value = value.split('/');
-            value = value[2] + '-' + value[1] + '-' + value[0];
-        } else if (this.type == 'checkbox' && typeof value != 'boolean') {
-            value = false;
-        } else if (this.type == 'select') {
-            if (typeof value == 'object' || ((value == this.fmlData.formula || "'" + value + "'" == this.fmlData.formula) && value.includes('|'))) {
-                value = this.inputCacheGet(rowId);
-            }
-        }
-        return value;
-    }
-
-    /**
-     * Lấy giá trị cho control này từ cache
-     *  @param {string|null} rowId  rowId là null trong 2 tường hợp: ngoài bảng hoặc bindData cho toàn bộ các dòng trong một cột của table
-     *  @param {Boolean} rawFormula  true|false để lấy ra công thức tính toán mà user điền
-     *  @return {*} giá trị của control này tương ứng với rowId
-     */
-    inputCacheGet(rowId, rawFormula = false) {
-        fieldName = thisObj.name;
-        let vl = '';
-        if (dataInputCache.hasOwnProperty(fieldName)) {
-            if (thisObj.inTable != '') {
-                if (rawFormula && rawFormulaUserInput.hasOwnProperty(fieldName)) {
-                    vl = rawFormulaUserInput[fieldName][rowId];
-                }
-                if (!rawFormula || vl === '' || vl === undefined) {
-                    vl = dataInputCache[fieldName][rowId];
-                }
-            } else {
-                if (rawFormula) {
-                    // Biến rawFormulaUserInput lấy từ bên file new_submit.js
-                    vl = rawFormulaUserInput[fieldName];
-                }
-                if (!rawFormula || vl === '' || vl === undefined) {
-                    vl = dataInputCache[fieldName];
-                }
-            }
-        }
-
-        if (!vl) {
-            if (thisObj.type == 'number' || thisObj.type == 'percent') {
-                return 0;
-            } else {
-                return '';
-            }
-        }
-        if (typeof vl != 'boolean' && thisObj.type == 'checkbox') {
-            vl = false;
-        }
-        return vl;
     }
 
 

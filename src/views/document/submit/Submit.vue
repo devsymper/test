@@ -118,7 +118,20 @@ export default {
         },
         showSubmitButton: {
             default: true
-        }
+        },
+      
+        documentObjectWorkflowObjectId: {
+            type: Number,
+            default: 0
+        },
+        documentObjectWorkflowId: {
+            type: Number,
+            default: 0
+        },
+        documentObjectTaskId: {
+            type: Number,
+            default: 0
+        },
     },
     name: "submitDocument",
 
@@ -868,13 +881,20 @@ export default {
                     listInput[controlName].type != "draft" &&
                     listInput[controlName].type != "approvalHistory") {
                         let value = (listInput[controlName].type == 'number' && listInput[controlName].value == "" ) ? 0 : listInput[controlName].value;
+                        if(listInput[controlName].type == 'percent'){
+                            value = (listInput[controlName].value == "" ) ? 0 : listInput[controlName].value/100;
+                        }
                         dataPost[id] = [value];
                         if(listInput[controlName].type == 'checkbox'){
                             dataPost[id] = (value) ? [1] : [0];
                         }
+                      
                     }
                 }
             }
+            dataPost['documentObjectWorkflowObjectId'] = this.documentObjectWorkflowObjectId;
+            dataPost['documentObjectWorkflowId'] = this.documentObjectWorkflowId;
+            dataPost['documentObjectTaskId'] = this.documentObjectTaskId;
             return dataPost;
         },
         /**
