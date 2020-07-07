@@ -281,7 +281,7 @@ export default {
             let nodeName = this.context == 'department' ? this.$t('orgchart.editor.department') : this.$t('orgchart.editor.position');
             nodeName += ' 1';
             let firstNode = this.context == 'department' ?  createDepartmentNode(nodeName) : createPositionNode(nodeName);
-
+            
             var treeLayout = new joint.layout.TreeLayout({
                 graph: graph,
                 direction: 'B',
@@ -301,6 +301,7 @@ export default {
             });
             this.$refs.jointPaper.treeLayout = treeLayout;
             graph.resetCells([firstNode]);
+            this.repositionFirstCell(graph, paperScroller);
             treeLayout.layout();
             this.listenPaperEvent();
             new joint.ui.TreeLayoutView({
@@ -315,6 +316,19 @@ export default {
                 id: firstNode.id,
                 name: nodeName
             });
+
+            setTimeout((self) => {
+                let viewPort = $(self.$refs.jointPaper.$el).find('.symper-orgchart-paper>.joint-paper-scroller');
+                let view = $(self.$refs.jointPaper.$el).find('.symper-orgchart-paper>.joint-paper-scroller>.paper-scroller-background>.joint-paper');
+                debugger
+                $(viewPort).scrollTop($(view).position().top);
+            }, 1000, this);
+        },
+        repositionFirstCell(graph, paperScroller){
+            let firstNode = graph.getCells()[0];
+            firstNode.position(300,20);
+            console.log(paperScroller, 'paperScrollerpaperScrollerpaperScrollerpaperScroller');
+            
         },
 		exampleSetupGraph(graph) {
 			
