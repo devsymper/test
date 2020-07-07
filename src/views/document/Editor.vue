@@ -83,24 +83,25 @@
     </v-flex>
 </template>
 <script>
-import Editor from '@tinymce/tinymce-vue'
-import EditorAction from './items/Action.vue'
-import SideBarLeft from './sideleft/SideBarLeft.vue'
-import SideBarRight from './sideright/SideBarRight.vue'
-import TableSetting from './items/TableSetting.vue'
-import AutoCompleteControl from './items/AutoCompleteControl.vue'
+import Editor from '@tinymce/tinymce-vue';
+import EditorAction from './items/Action.vue';
+import SideBarLeft from './sideleft/SideBarLeft.vue';
+import SideBarRight from './sideright/SideBarRight.vue';
+import TableSetting from './items/TableSetting.vue';
+import AutoCompleteControl from './items/AutoCompleteControl.vue';
 import controlCss from  "./../../assets/css/document/control/control.css";
 import SaveDocPanel from "./../../views/document/items/SaveDocPanel.vue";
 import ErrMessagePanel from "./../../views/document/items/ErrMessagePanel.vue";
 import AllControlInDoc from "./../../views/document/items/AllControlInDoc.vue";
-import { GetControlProps,mappingOldVersionControlProps,mappingOldVersionControlFormulas,getAPropsControl } from "./../../components/document/controlPropsFactory.js";
+import { GetControlProps,mappingOldVersionControlProps,
+        mappingOldVersionControlFormulas,getAPropsControl } from "./../../components/document/controlPropsFactory.js";
 import { documentApi } from "./../../api/Document.js";
 import { formulasApi } from "./../../api/Formulas.js";
 import { util } from "./../../plugins/util.js";
 import {checkInTable} from "./common/common";
 import { getInsertionCSS } from "./../../components/document/documentUtil.js";
-import VueResizable from 'vue-resizable'
-import { minimizeControl } from '../../store/document/mutations'
+import VueResizable from 'vue-resizable';
+import { minimizeControl } from '../../store/document/mutations';
 let isShowAutocompleteControl = false;
 // biến lưu chiều rộng editor trước khi resize 
 const ALL_CONTROL = "allControl"
@@ -146,15 +147,13 @@ export default {
                 let control = thisCpn.editorStore.allControl[controlId];
                 thisCpn.selectControl(control.properties, control.formulas,controlId);
             }
-            
         });
         /**
          * Nhận sự kiện phát ra từ formTpl lúc on change để check trùng tên control
          */
         this.$evtBus.$on("form-tpl-input-value-changed", locale =>{
             $('#editor_ifr').contents().find('.s-control-error').removeClass('s-control-error');
-            thisCpn.checkNameAfterChange()
-            
+            thisCpn.checkNameAfterChange();
         })
             
     },
@@ -221,12 +220,8 @@ export default {
             let content = localStorage.getItem(HTML_CONTENT);
             let documentProperties = localStorage.getItem(CODUMENT_PROPS);
             this.$refs.editor.editor.setContent(content);
-            this.$store.commit(
-                                    "document/addToDocumentStore",{key:CODUMENT_PROPS,value:documentProperties}
-                                );  
-            this.$store.commit(
-                                    "document/addToDocumentEditorStore",{key:ALL_CONTROL,value:allControl}
-                                );  
+            this.$store.commit("document/addToDocumentStore",{key:CODUMENT_PROPS,value:documentProperties});  
+            this.$store.commit("document/addToDocumentEditorStore",{key:ALL_CONTROL,value:allControl});  
         },
         //set data vào local storage
         saveContentToLocalStorage(){
@@ -265,14 +260,13 @@ export default {
                 else{
                     this.addToAllControlInDoc(id,{properties: controlInstance.properties, formulas : controlInstance.formulas,type:typeControl});
                 }
-            }
-            
+            }  
         },
         deleteControl(){
             let control = $("#editor_ifr").contents().find('.on-selected');
             this.resetSelectControl()
             control.remove();
-            
+
         },
         // ham tạo dialog của tinymce để cấu hình padding doc
         showPaddingPageConfig(ed){

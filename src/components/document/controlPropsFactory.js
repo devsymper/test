@@ -729,7 +729,6 @@ export const getAllPropsControl = function() {
         groups[group]['name'] = group;
         dataPropsResult.push(groups[group]);
     }
-    console.log('lkkkk', dataPropsResult);
     return dataPropsResult;
 }
 

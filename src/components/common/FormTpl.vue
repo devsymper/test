@@ -400,6 +400,8 @@ export default {
             this.$emit("input-value", name, inputInfo, data);
         },
         handleKeyUpInputValue(inputInfo, name, data){
+            console.log('jj',inputInfo, name, data);
+            
             this.$emit("input-value-keyup", name, inputInfo, data);
         },
         getInputProps(inputConfigs) {

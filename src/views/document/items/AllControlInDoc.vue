@@ -131,8 +131,6 @@ export default {
             }
         },
         updatePropsControl(params){
-            console.log('saad',params);
-            
             let controlName = null;
             let table = '';
             let value = params.newValue;
@@ -225,8 +223,6 @@ export default {
     },
     mounted(){
         this.columns = this.allColumns[1].listFields
-        console.log(this.columns);
-        
     }
 }
 </script>   
