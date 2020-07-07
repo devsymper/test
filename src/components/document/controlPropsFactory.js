@@ -74,7 +74,7 @@ const commonProps = {
     formatDate: {
         title: "Định dạng thời gian",
         type: "dateFormat",
-        value: "",
+        value: "DD/MM/YYYY",
         groupType: "display"
     },
     // formatTime: {
