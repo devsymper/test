@@ -384,9 +384,12 @@ export default class BasicControl extends Control {
         this.formatDate = (this.controlProperties.hasOwnProperty('formatDate')) ? this.controlProperties.formatDate.value : "";
         if (this.checkDetailView()) return;
         let thisObj = this;
-        this.ele.on('change', function(e) {
-            $(this).val(moment($(this).val()).format(thisObj.formatDate))
-        })
+        console.log(this.controlProperties);
+
+        if (this.formatDate != "" && typeof this.formatDate === 'string')
+            this.ele.on('change', function(e) {
+                $(this).val(moment($(this).val()).format(thisObj.formatDate))
+            })
         this.ele.on('click', function(e) {
             $(e.target).addClass('date-picker-access');
             SYMPER_APP.$evtBus.$emit('document-submit-date-input-click', e)

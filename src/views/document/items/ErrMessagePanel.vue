@@ -37,20 +37,7 @@
     
 </template>
 <script>
-import TableSettingRow  from "./TableSettingRow.vue";
-import FormTpl from "./../../../components/common/FormTpl.vue"
-import Sortable from 'sortablejs';
-let sortable = null;
 export default {
-    components:{
-        's-row-table-setting' : TableSettingRow,
-        'form-save-doc' : FormTpl
-    },
-    computed: {
-      editorStore(){ 
-          return this.$store.state.document.editor;
-      }
-    },
     props:{
         listErr:{
             type:Array,

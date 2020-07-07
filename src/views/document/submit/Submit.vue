@@ -78,6 +78,7 @@
                     <v-icon>mdi-delete</v-icon>
             </v-btn>-->
         </v-speed-dial>
+        <err-message :listErr="listMessageErr" ref="errMessage"/>
     </div>
 </template>
 <script>
@@ -99,6 +100,8 @@ import Validate from "./items/Validate.vue";
 import ClientSQLManager from "./clientSQLManager.js";
 import Util from './util';
 import './customControl.css';
+import ErrMessagePanel from "./../../../views/document/items/ErrMessagePanel.vue";
+
 
 import { checkCanBeBind, resetImpactedFieldsList, markBinedField } from './handlerCheckRunFormulas';
 import {checkDbOnly,getControlInstanceFromStore,getControlTitleFromName} from './../common/common'
@@ -142,7 +145,8 @@ export default {
         "time-input": TimeInput,
         "filter-input": Filter,
         "autocomplete-input": AutocompleteInput,
-        "sym-drag-panel": SymperDragPanel
+        "sym-drag-panel": SymperDragPanel,
+        "err-message": ErrMessagePanel,
     },
     computed: {
         sDocumentEditor() {
@@ -183,6 +187,7 @@ export default {
             docObjId:null,
             topPositionDragPanel:100,
             leftPositionDragPanel:300,
+            listMessageErr:['hoang']
         };
     },
     beforeMount() {
@@ -766,7 +771,9 @@ export default {
             if(mapControlEffected.hasOwnProperty('require')){
                 this.updateEffectedControlToStore(mapControlEffected['require'],'effectedRequireControl')
             }
-            
+            if(mapControlEffected.hasOwnProperty('validate')){
+                this.updateEffectedControlToStore(mapControlEffected['validate'],'effectedValidateControl')
+            }
         },
         /**
          * Hàm detect công thức của 1 control có liên quan đến table hay ko, nếu có thì đưa vào mối quan hệ mapControlEffected
@@ -804,6 +811,8 @@ export default {
          * Hàm gọi api submit document
          */
         submitDocument(){
+            // this.$refs.errMessage.showDialog();
+            // return;
             this.isSubmitting = true;
             let thisCpn = this;
             let dataPost = this.getDataPostSubmit();
@@ -1001,7 +1010,7 @@ export default {
                             if(allFormulas['formulas'].hasOwnProperty('instance')){
                                 let formulasInstance = allFormulas['formulas'].instance;
                                 if(formulasInstance.getFormulas() != ""){
-                                    this.handlerBeforeRunFormulasValue(formulasInstance,controlId,controlName,'formulas')
+                                    this.handlerBeforeRunFormulasValue(formulasInstance,controlId,i,'formulas')
                                 }
                             }
                         }
@@ -1022,7 +1031,7 @@ export default {
                         if(allFormulas[formulasType].hasOwnProperty('instance')){
                             let formulasInstance = allFormulas[formulasType].instance;
                             if(formulasInstance.getFormulas() != ""){
-                                this.handlerBeforeRunFormulasValue(formulasInstance,controlId,controlName,formulasType)
+                                this.handlerBeforeRunFormulasValue(formulasInstance,controlId,i,formulasType)
                             }
                         }
                     }
@@ -1059,6 +1068,8 @@ export default {
         },
         
         handlerAfterRunFormulas(rs,controlId,controlName,formulasType){
+            console.log(controlName);
+            
             let controlInstance = getControlInstanceFromStore(controlName);
             if($('#'+controlId).length > 0){
                 if($('#'+controlId).attr('s-control-type') == 'inputFilter'){
@@ -1167,7 +1178,7 @@ export default {
                 message=message[0]
             }
             let controlInstance = getControlInstanceFromStore(controlName);
-            if(controlInstance.isEmpty()){
+            if(message != "" && message != null){
                 controlInstance.renderValidateIcon(message);
             }
             else{
@@ -1232,8 +1243,6 @@ export default {
          * Lấy tất cả các control bị ảnh hưởng khi mà một control thay đổi giá trị
          */
         setAllImpactedFieldsList(fieldName) {
-            console.log(fieldName);
-            
             impactedFieldsList[fieldName] = {};
             impactedFieldsArr = this.getAllImpactedInput(fieldName);
             for (var i = 0; i < impactedFieldsArr.length; i++) {
