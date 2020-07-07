@@ -1017,8 +1017,8 @@ export default {
                         if(listField[childFieldId]['formulas'] != false){
                             $.each(childFormulas,function(k,v){
                                 if(listField[childFieldId]['formulas'][k] != ""){
-                                    childFormulas[k].value = Object.values(listField[childFieldId]['formulas'][k])
-                                    childFormulas[k].formulasId = Object.keys(listField[childFieldId]['formulas'][k])
+                                    childFormulas[k].value = Object.values(listField[childFieldId]['formulas'][k])[0]
+                                    childFormulas[k].formulasId = Object.keys(listField[childFieldId]['formulas'][k])[0]
                                 }
                                 else{
                                     childFormulas[k].formulasId = 0
