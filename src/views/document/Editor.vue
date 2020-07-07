@@ -214,7 +214,6 @@ export default {
         px2cm(px) {
             return (Math.round((px / 37.7952) * 100) / 100).toFixed(1);
         },
-
         // lấy data từ local storage
         getFromLocalStorege(){
             let allControl = localStorage.getItem(ALL_CONTROL);
@@ -237,10 +236,6 @@ export default {
             localStorage.setItem(ALL_CONTROL,JSON.stringify(allControl));
             localStorage.setItem(HTML_CONTENT,content);
             localStorage.setItem(CODUMENT_PROPS,JSON.stringify(documentProperties));
-            this.$snotify({
-                                type: "info",
-                                title: "Save to local storage success"
-                            }); 
         },
         deleteLocalStorage(){
             localStorage.removeItem(ALL_CONTROL);
@@ -352,9 +347,35 @@ export default {
         },
         // mở modal lưu , edit doc
         openPanelSaveDocument(){
-            if(this.documentId == undefined || this.documentId == 0)
-            this.setDocumentProperties({})
-            this.$refs.saveDocPanel.showDialog()
+            if($('#editor_ifr').contents().find('.s-control').length > 0){
+                let allControl = this.editorStore.allControl;
+                this.checkEmptyControl(allControl,'0');
+                if($('#editor_ifr').contents().find('.s-control-error').length == 0){
+                    if(this.documentId == undefined || this.documentId == 0)
+                    this.setDocumentProperties({})
+                    this.$refs.saveDocPanel.showDialog()
+                }
+                else{
+                    this.$snotify({
+                                    type: "error",
+                                    title: "Tên một số control chưa hợp lệ",
+                                });
+                }
+            }
+        },
+        checkEmptyControl(allControl,tableId){
+            for(let controlId in allControl){
+                if(allControl[controlId].hasOwnProperty('listFields')){
+                    this.checkEmptyControl(allControl[controlId]['listFields'],controlId);
+                }
+                if(allControl[controlId].properties.name.value == ""){
+                    let controlEl = $('#editor_ifr').contents().find('#'+controlId);
+                    controlEl.addClass('s-control-error');
+                    this.$store.commit(
+                        "document/updateProp",{id:controlId,name:"name",value:"Không được bỏ trống tên control",tableId:tableId,type:"errorMessage"}
+                    );
+                }
+            }
         },
         /**
          * Hàm xử lí lấy dữ liệu các công thức để insert vào formulas service trước khi lưu
@@ -565,6 +586,7 @@ export default {
             //check trung ten control
             $("#editor_ifr").contents().find('.on-selected').removeClass('on-selected');
             
+            console.log($('#editor_ifr').contents().find('.s-control-error'));
             
             if($('#editor_ifr').contents().find('.s-control-error').length == 0){
                 this.saveDocument();

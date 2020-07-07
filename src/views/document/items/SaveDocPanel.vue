@@ -149,6 +149,9 @@ export default {
             }
         },
         setPropsOfDoc(props){
+            if(props.name != undefined){
+                this.isValid = true
+            }
             let docProps = {
                 name : { 
                     title: "Tên document",
