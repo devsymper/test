@@ -450,8 +450,31 @@ export default {
                 this.$snotifyError({},"Value of attribute can not empty",'', 2000);
                 passed = false;
             }
+
+            if(!this.checkDuplicateFieldName()){
+                passed = false;
+            }
             return passed;
         },  
+        checkDuplicateFieldName(){
+            let dynamicFieldNameMap = {};
+            let allNode = this.$store.state.orgchart.editor[this.instanceKey].allNode;
+
+            let newName = this.dynamicValueInputs.name.value;
+            for(let nodeId in allNode){
+                for(let attr of allNode[nodeId].customAttributes){
+                    dynamicFieldNameMap[attr.name] = true;
+                }
+            }
+
+            
+            if(dynamicFieldNameMap[newName]){
+                this.$snotifyError({},"Provied name existed", "Please enter new name");
+                return false;
+            }else{
+                return true;
+            }
+        },
         addDynamicAttr(){
             let passed = this.validateBeforeAddDynamicAttr();
             if(!passed){
