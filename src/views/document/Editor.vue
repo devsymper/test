@@ -368,7 +368,9 @@ export default {
                 if(allControl[controlId].hasOwnProperty('listFields')){
                     this.checkEmptyControl(allControl[controlId]['listFields'],controlId);
                 }
-                if(allControl[controlId].properties.name.value == ""){
+                if(allControl[controlId].type != 'submit' && allControl[controlId].type != 'draft' 
+                && allControl[controlId].type != 'reset' && allControl[controlId].type != 'approvalHistory'
+                && allControl[controlId].properties.name.value == ""){
                     let controlEl = $('#editor_ifr').contents().find('#'+controlId);
                     controlEl.addClass('s-control-error');
                     this.$store.commit(
@@ -698,8 +700,6 @@ export default {
 
         // hàm add các thuộc tính và formulas của control vào danh sách các control trong doc được lưu trong state
         addToAllControlInDoc(controlId,control){
-            console.log(control);
-            
             this.$store.commit(
                 "document/addControl",{id:controlId,props:control}
             );  
@@ -980,8 +980,17 @@ export default {
                     }
                 }) 
                 if(fields[controlId]['formulas'] != false){
+                    
                     $.each(formulas,function(k,v){
-                        formulas[k].value = fields[controlId]['formulas'][k]
+                            console.log('sss',fields[controlId]['formulas'][k]);
+
+                        if(fields[controlId]['formulas'][k] != ""){
+                            formulas[k].value = Object.values(fields[controlId]['formulas'][k])[0]
+                            formulas[k].formulasId = Object.keys(fields[controlId]['formulas'][k])[0]
+                        }
+                        else{
+                            formulas[k].formulasId = 0
+                        }
                     })
                 }
                 
@@ -1007,7 +1016,14 @@ export default {
                         })
                         if(listField[childFieldId]['formulas'] != false){
                             $.each(childFormulas,function(k,v){
-                                childFormulas[k].value = listField[childFieldId]['formulas'][k]
+                                if(listField[childFieldId]['formulas'][k] != ""){
+                                    childFormulas[k].value = Object.values(listField[childFieldId]['formulas'][k])
+                                    childFormulas[k].formulasId = Object.keys(listField[childFieldId]['formulas'][k])
+                                }
+                                else{
+                                    childFormulas[k].formulasId = 0
+                                }
+                                
                             })
                         }
                         listChildField[childFieldId] = {properties: childProperties, formulas : childFormulas,type:childType}
