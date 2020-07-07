@@ -2,8 +2,10 @@ import Control from "./control";
 import store from './../../../store'
 import sDocument from './../../../store/document'
 import { SYMPER_APP } from './../../../main.js'
-import Formulas from './formulas'
 import Util from './util'
+var numbro = require("numbro");
+import moment from "moment-timezone";
+
 import { documentApi } from "./../../../api/Document.js";
 let listInputInDocument = sDocument.state.submit.listInputInDocument;
 
@@ -48,7 +50,7 @@ export default class BasicControl extends Control {
 
 
     render() {
-        let thisCpn = this;
+        let thisObj = this;
         this.ele.wrap('<span style="position:relative;display:inline-block;">');
         this.ele.attr('key-instance', this.curParentInstance);
 
@@ -81,11 +83,11 @@ export default class BasicControl extends Control {
             this.addAutoCompleteEvent();
         }
         this.ele.on('change', function(e) {
-            SYMPER_APP.$evtBus.$emit('document-submit-input-change', { controlName: thisCpn.controlProperties.name.value, val: $(e.target).val() })
+            SYMPER_APP.$evtBus.$emit('document-submit-input-change', { controlName: thisObj.controlProperties.name.value, val: $(e.target).val() })
         })
         if (this.ele.hasClass('s-control-number')) {
-            this.ele.css('text-align', 'right');
-            this.ele.attr('type', 'text');
+
+            this.renderNumberControl();
 
         } else if (this.ele.hasClass('s-control-table')) {
 
@@ -137,10 +139,10 @@ export default class BasicControl extends Control {
         this.ele.css('width', 'unset').css('cursor', 'pointer').css('height', '25px').css('vertical-align', 'middle').html(fileHtml);
         console.log('ssafas', fileHtml);
 
-        let thisCpn = this;
+        let thisObj = this;
         $('.file-add').click(function(e) {
-            $("#file-upload-alter-" + thisCpn.curParentInstance).click();
-            $("#file-upload-alter-" + thisCpn.curParentInstance).attr('data-control-name', $(this).attr('data-control-name'))
+            $("#file-upload-alter-" + thisObj.curParentInstance).click();
+            $("#file-upload-alter-" + thisObj.curParentInstance).attr('data-control-name', $(this).attr('data-control-name'))
         })
     }
 
@@ -276,13 +278,25 @@ export default class BasicControl extends Control {
             });
         })
     }
+    renderNumberControl() {
+        let thisObj = this;
+        this.ele.css('text-align', 'right');
+        this.ele.attr('type', 'text');
+        this.numberFormat = (this.controlProperties.hasOwnProperty('formatNumber')) ? this.controlProperties.formatNumber.value : "";
+        this.ele.on('blur', function(e) {
+            $(this).val(numbro($(this).val()).format(thisObj.numberFormat))
+        })
+        this.ele.on('focus', function(e) {
+            $(this).val(numbro($(this).val()).format('0'))
+        })
+    }
 
     renderFilterControl() {
         if (this.checkDetailView()) return;
-        let thisCpn = this;
+        let thisObj = this;
         this.ele.attr('type', 'text');
         this.ele.on('click', function(e) {
-            e.controlName = thisCpn.name;
+            e.controlName = thisObj.name;
             SYMPER_APP.$evtBus.$emit('document-submit-filter-input-click', e)
         })
 
@@ -298,12 +312,12 @@ export default class BasicControl extends Control {
     }
     renderLabelControl() {
         let id = this.ele.attr('id');
-        let thisCpn = this;
+        let thisObj = this;
         let keyinstance = this.ele.attr('key-instance');
         this.ele.replaceWith('<input class="s-control s-control-label" s-control-type="label" type="text" disabled title="Label" id="' + id + '" placeholder="Aa" key-instance="' + keyinstance + '">');
         this.ele = $('#' + id);
         this.ele.on('change', function(e) {
-            SYMPER_APP.$evtBus.$emit('document-submit-input-change', { controlName: thisCpn.controlProperties.name.value, val: $(e.target).val() })
+            SYMPER_APP.$evtBus.$emit('document-submit-input-change', { controlName: thisObj.controlProperties.name.value, val: $(e.target).val() })
         })
     }
     renderSelectControl() {
@@ -311,7 +325,7 @@ export default class BasicControl extends Control {
         let keyinstance = this.ele.attr('key-instance');
         this.ele.replaceWith('<input class="s-control s-control-select" s-control-type="select" type="text" title="Select" readonly="readonly" id="' + id + '" key-instance="' + keyinstance + '">');
         this.ele = $('#' + id);
-        let thisCpn = this;
+        let thisObj = this;
         this.ele.on('click', function(e) {
             /**
              * TH control select ở ngoài table
@@ -326,11 +340,11 @@ export default class BasicControl extends Control {
                 value: null
             });
             $(this).addClass('autocompleting');
-            let formulasInstance = thisCpn.controlFormulas.formulas.instance;
-            SYMPER_APP.$evtBus.$emit('document-submit-select-input', { e: e, selectFormulasInstance: formulasInstance, alias: thisCpn.name, controlTitle: thisCpn.title })
+            let formulasInstance = thisObj.controlFormulas.formulas.instance;
+            SYMPER_APP.$evtBus.$emit('document-submit-select-input', { e: e, selectFormulasInstance: formulasInstance, alias: thisObj.name, controlTitle: thisObj.title })
         })
         this.ele.on('change', function(e) {
-            SYMPER_APP.$evtBus.$emit('document-submit-input-change', { controlName: thisCpn.controlProperties.name.value, val: $(e.target).val() })
+            SYMPER_APP.$evtBus.$emit('document-submit-input-change', { controlName: thisObj.controlProperties.name.value, val: $(e.target).val() })
         })
 
     }
@@ -344,17 +358,23 @@ export default class BasicControl extends Control {
     renderDateControl() {
         this.ele.attr('type', 'text');
         if (this.checkDetailView()) return;
+        let thisObj = this;
+
+        this.formatDate = (this.controlProperties.hasOwnProperty('formatDate')) ? this.controlProperties.formatDate.value : "";
+        this.ele.on('change', function(e) {
+            $(this).val(moment($(this).val()).format(thisObj.formatDate))
+        })
         this.ele.on('click', function(e) {
             $(e.target).addClass('date-picker-access');
             SYMPER_APP.$evtBus.$emit('document-submit-date-input-click', e)
         })
     }
     renderTimeControl() {
-        let thisCpn = this;
+        let thisObj = this;
         if (this.checkDetailView()) return;
         this.ele.attr('type', 'text');
         this.ele.on('click', function(e) {
-            e.controlName = thisCpn.name;
+            e.controlName = thisObj.name;
             SYMPER_APP.$evtBus.$emit('document-submit-time-input-click', e)
         })
     }
@@ -368,7 +388,7 @@ export default class BasicControl extends Control {
         }
     }
     addAutoCompleteEvent(fromSelect = false) {
-        let thisCpn = this;
+        let thisObj = this;
         this.ele.on('input', function(e) {
             $(this).addClass('autocompleting');
 
@@ -381,12 +401,12 @@ export default class BasicControl extends Control {
                 value: null
             });
             let event = e;
-            event['controlName'] = thisCpn.name;
+            event['controlName'] = thisObj.name;
             SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-input', event)
         })
         this.ele.on('keyup', function(e) {
-            let formulasInstance = (fromSelect) ? thisCpn.controlFormulas.formulas.instance : thisCpn.controlFormulas.autocomplete.instance;
-            SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-key-event', { e: e, autocompleteFormulasInstance: formulasInstance, isSelect: false, controlTitle: thisCpn.title })
+            let formulasInstance = (fromSelect) ? thisObj.controlFormulas.formulas.instance : thisObj.controlFormulas.autocomplete.instance;
+            SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-key-event', { e: e, autocompleteFormulasInstance: formulasInstance, isSelect: false, controlTitle: thisObj.title })
         })
     }
     inputCacheSet(value, rowId = null, rawUserFormula = '') {

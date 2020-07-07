@@ -12,9 +12,6 @@ import { util } from "./../../plugins/util.js";
 export const allControlNotSetData = ['approvalHistory', 'submit', 'draft', 'reset']
 export const setDataForPropsControl = function(fields) {
     for (let controlId in fields) {
-        // if (allControlNotSetData.includes(fields[controlId].type)) {
-        //     continue;
-        // }
         let control = GetControlProps(fields[controlId].type)
         let properties = control.properties
         let formulas = control.formulas
@@ -108,8 +105,6 @@ export const setDataForPropsControl = function(fields) {
 }
 
 function addToAllControlInDoc(controlId, control) {
-    console.log(control);
-
     store.commit(
         "document/addControl", { id: controlId, props: control, from: 'submit' }
     );

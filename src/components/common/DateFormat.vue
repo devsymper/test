@@ -8,7 +8,7 @@
         append-icon="mdi-format-color-highlight"
         v-model="dataPattern"
         @click:append="showFormatDateForm"
-        @change="handleChangeInput"
+        @keyup="handleChangeInput"
         >
         </v-text-field>
         <div class="form-format-date" style="display:none;">
@@ -47,6 +47,11 @@ export default {
             default:''
         }
     },
+    watch:{
+        value(after){
+            this.dataPattern = after
+        }
+    },
     computed:{
         sCurrentControl(){
             return this.$store.state.document.editor.currentSelectedControl;
@@ -67,7 +72,8 @@ export default {
         setFormat(){
             this.hideForm();
             this.dataPattern = this.customFormat;
-            this.$evtBus.$emit('blur-input',{name:'formatDate',value:this.customFormat});
+            this.$emit('input',this.customFormat);
+            this.$emit('change',this.customFormat);
         },
         selectItem(event,type){
             this.customFormat = type
@@ -80,7 +86,8 @@ export default {
             }
         },
         handleChangeInput(){
-            this.$evtBus.$emit('blur-input',{name:'formatNumber',value:this.dataPattern});
+            this.$emit('input',this.customFormat);
+            this.$emit('change',this.customFormat);
         }
         
     },

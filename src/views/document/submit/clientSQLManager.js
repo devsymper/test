@@ -54,10 +54,11 @@ export default class ClientSQLManager {
         let db = this.getInstanceDB(keyInstance);
 
         if (isWithoutReturn) {
-            console.log('ksad', sql);
 
             return db.run(sql);
         } else {
+            console.log('ksad', sql);
+
             return db.exec(sql);
         }
     }
