@@ -145,6 +145,65 @@ export const DEPARTMENT_NODE_DATA = {
     "name": "Phòng ban 1",
     "attrs": DEFAULT_DEPARTMENT_ATTRS
 };
+
+export const departmentMarkup =
+    `<g class="rotatable ">
+        <g class="symper-orgchart-node">
+            <g class="scalable">
+                <rect class="card"/>
+            </g>
+            <image/>
+            <text class="name"/>
+            <text class="manager-name"/>
+
+            <g>
+                <rect class="border-bottom"/>
+            </g>
+
+            <g class="btn add orgchart-action">
+                <circle class="add"/>
+                <text class="add">+</text>
+            </g>
+
+            <g class="btn remove orgchart-action">
+                <circle class="remove"/>
+                <text class="remove">X</text>
+            </g>
+        </g>
+    </g>`.replace(/\n/g, '').replace(/\s+/g, ' ');
+
+// `<g class="rotatable ">
+
+//             <rect class="stick"/>
+//             <g class="btn-collapse-expand">
+//                 <circle class="collapse-expand-circle"/>
+//             </g>
+//             <text class="expand-text collapse-expand">+</text>
+//             <text class="collapse-text collapse-expand">-</text>
+
+//             <g class="symper-orgchart-node">
+//                 <g class="scalable">
+//                     <rect class="card"/>
+//                 </g>
+//                 <image/>
+//                 <text class="name"/>
+//                 <text class="manager-name"/>
+
+//                 <g>
+//                     <rect class="border-bottom"/>
+//                 </g>
+
+//                 <g class="btn add orgchart-action">
+//                     <circle class="add"/>
+//                     <text class="add">+</text>
+//                 </g>
+
+//                 <g class="btn remove orgchart-action">
+//                     <circle class="remove"/>
+//                     <text class="remove">X</text>
+//                 </g>
+//             </g>
+//         </g>`.replace(/\n/g, '').replace(/\s+/g, ' ')
 export const defineDepartment = function() {
     SymperDepartment = joint.shapes.org.Member.define('Symper.Department', {
         size: {
@@ -153,39 +212,7 @@ export const defineDepartment = function() {
         },
         hidden: false,
         attrs: DEFAULT_DEPARTMENT_ATTRS,
-        markup: `<g class="rotatable ">
-        
-                    <rect class="stick"/>
-                    <g class="btn-collapse-expand">
-                        <circle class="collapse-expand-circle"/>
-                    </g>
-                    <text class="expand-text collapse-expand">+</text>
-                    <text class="collapse-text collapse-expand">-</text>
-
-                    <g class="symper-orgchart-node">
-                        <g class="scalable">
-                            <rect class="card"/>
-                        </g>
-                        <image/>
-                        <text class="name"/>
-                        <text class="manager-name"/>
-
-                        <g>
-                            <rect class="border-bottom"/>
-                        </g>
-
-                        <g class="btn add orgchart-action">
-                            <circle class="add"/>
-                            <text class="add">+</text>
-                        </g>
-
-                        <g class="btn remove orgchart-action">
-                            <circle class="remove"/>
-                            <text class="remove">X</text>
-                        </g>
-                    </g>
-                   
-                </g>`.replace(/\n/g, '').replace(/\s+/g, ' ')
+        markup: departmentMarkup,
     }, {
         hidden: false,
         isHidden: function() {

@@ -123,6 +123,34 @@ export const POSITION_NODE_DATA = {
     "attrs": DEFAULT_POSITION_ATTRS
 };
 let SymperPosition;
+export const positionMarkup = `<g class="rotatable symper-orgchart-node">
+    <g class="scalable">
+        <rect class="card"/>
+    </g>
+    <image/>
+    <text class="account-number-plus"/>
+    <text class="name"/>
+    <text class="position-code"/>
+    <text class="dynamic-attr-value"/>
+    <text class="name"/>
+    <text class="manager-name"/>
+
+    <g>
+        <rect class="border-bottom"/>
+    </g>
+
+    <g class="btn add orgchart-action">
+        <circle class="add"/>
+        <text class="add">+</text>
+    </g>
+
+    <g class="btn remove orgchart-action">
+        <circle class="remove"/>
+        <text class="remove">X</text>
+    </g>
+
+</g>`.replace(/\n/g, '').replace(/\s+/g, ' ');
+
 export const definePosition = function() {
     SymperPosition = joint.shapes.org.Member.define('Symper.Position', {
         size: {
@@ -130,33 +158,7 @@ export const definePosition = function() {
             height: shapeSize.height
         },
         attrs: DEFAULT_POSITION_ATTRS,
-        markup: `<g class="rotatable symper-orgchart-node">
-                    <g class="scalable">
-                        <rect class="card"/>
-                    </g>
-                    <image/>
-                    <text class="account-number-plus"/>
-                    <text class="name"/>
-                    <text class="position-code"/>
-                    <text class="dynamic-attr-value"/>
-                    <text class="name"/>
-                    <text class="manager-name"/>
-
-                    <g>
-                        <rect class="border-bottom"/>
-                    </g>
-
-                    <g class="btn add orgchart-action">
-                        <circle class="add"/>
-                        <text class="add">+</text>
-                    </g>
-
-                    <g class="btn remove orgchart-action">
-                        <circle class="remove"/>
-                        <text class="remove">X</text>
-                    </g>
-                   
-                </g>`.replace(/\n/g, '').replace(/\s+/g, ' ')
+        markup: positionMarkup
     }, {
         isHidden: function() {
             return !!this.get('hidden');

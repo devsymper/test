@@ -90,7 +90,7 @@ import VueResizable from 'vue-resizable';
 import { getOrgchartEditorData, getDefaultConfigNodeData, SYMPER_HOME_ORGCHART, getNodeStyleConfig } from './nodeAttrFactory';
 import jointjs from "jointjs";
 import { orgchartApi } from "@/api/orgchart.js";
-import { FOUCUS_DEPARTMENT_DISPLAY, DEFAULT_DEPARTMENT_DISPLAY } from '../nodeDefinition/departmentDefinition';
+import { FOUCUS_DEPARTMENT_DISPLAY, DEFAULT_DEPARTMENT_DISPLAY, departmentMarkup } from '../nodeDefinition/departmentDefinition';
 
 
 
@@ -229,6 +229,17 @@ export default {
             homeConfig.commonAttrs.description.value = config.description;
             homeConfig.customAttributes = config.dynamicAttributes;
         },
+        correctDiagramDisplay(content){
+            if(typeof content != 'object'){
+                content = JSON.parse(content);
+            }
+            for(let node of content.cells){
+                if(node.type == 'Symper.Department'){
+                    node.markup = departmentMarkup;
+                }
+            }
+            return content;
+        },
         async restoreOrgchartView(id){
             if(!id){
                 return
@@ -236,8 +247,8 @@ export default {
             try {
                 let res = await orgchartApi.getOrgchartDetail(id);
                 if(res.status == 200){
-                    let savedData = res.data;
-                    let departments = JSON.parse(savedData.orgchart.content);
+                    let savedData = res.data;departmentMarkup
+                    let departments = this.correctDiagramDisplay(savedData.orgchart.content);
                     this.$refs.editorWorkspace.loadDiagramFromJson(departments);
                     this.centerDiagram();
                     this.restoreMainOrgchartConfig(savedData.orgchart);

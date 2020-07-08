@@ -108,11 +108,13 @@
                 <formula-editor
                     v-else-if="panelData.type == 'userAssignment'"
                     v-model="panelData.value.formula"
+                    @blur="handleLargeFormulaEditorBlur"
                     :width="'100%'"
                     :height="'370px'"
                 ></formula-editor>
                 <formula-editor
                     v-else
+                    @blur="handleLargeFormulaEditorBlur"
                     v-model="panelData.value"
                     :width="'100%'"
                     :height="'370px'"
@@ -307,6 +309,11 @@ export default {
         };
     },
     methods: {
+        handleLargeFormulaEditorBlur(){
+            let name = this.largeFormulaEditor.name;
+            let inputInfo = this.allInputs[name];
+            this.handleInputBlur(inputInfo, name);
+        },
         handleInputBlur(inputInfo, name){
             this.$emit('input-blur',inputInfo, name);
         },
@@ -368,8 +375,9 @@ export default {
         },
         closeLargeFormulaEditor() {
             let info = this.largeFormulaEditor;
-            this.$refs["inputItem_" + info.name][0].setValue(info.data.value);
-            this.largeFormulaEditor.name = '';
+            setTimeout((self) => {
+                self.largeFormulaEditor.name = '';            
+            }, 500, this);
         },
         openLargeValueEditor(inputInfo, name) {
             this.$refs.dragPanel.show();
