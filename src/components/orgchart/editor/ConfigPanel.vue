@@ -167,7 +167,9 @@
                 <span class="fs-15  font-weight-medium">
                     {{$t('orgchart.editor.style')}}
                 </span>
-                <SearchNodeStyle >
+                <SearchNodeStyle 
+                class="mt-2 mb-4"
+                @change-style-template="changeNodeStyle">
 
                 </SearchNodeStyle>
                 <form-tpl
@@ -371,6 +373,16 @@ export default {
         }
     },
     methods: {
+        changeNodeStyle(styleData){
+            try {
+                let style = styleData.content;
+                for(let key in style){
+                    this.nodeStyleConfig[key].value = style[key];
+                }
+            } catch (error) {
+                console.warn(error, "Error on parsing style data");
+            }
+        },
         prepareForSaveStyle(){
             this.showSaveStyleDialog = true;
             this.nodeStyleConfigToSave.name.value = '';
@@ -392,6 +404,7 @@ export default {
             if(res.status == 200){
                 this.$snotifySuccess('Save node style successfully!');
                 this.showSaveStyleDialog = false;
+                this.$store.commit('orgchart/addNodeStyle', res.data);
             }else {
                 this.$snotifyError(res, "Can not save node style");
             }

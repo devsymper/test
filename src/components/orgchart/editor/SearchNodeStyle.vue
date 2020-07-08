@@ -9,19 +9,28 @@
             item-text="name"
             return-object
             dense
+            class="sym-small-size"
             flat
-            hide-selected
             label="Search node style to apply"
-            solo>
+            solo
+            outlined
+            @change="changeNodeStyleTemplate">
 
             <template v-slot:item="{ index, item }">
-                {{ item.name }}
+                <div class="node-style-example" :style="{
+                    'border-bottom-color': item.content.highlight+'!important'
+                }">
+                    abc
+                </div>
+                <span class="fs-13">
+                    {{ item.name }}
+                </span>
                 <v-spacer></v-spacer>
-                <v-list-item-action @click.stop>
+                <v-list-item-action @click.stop class="ma-0">
                     <v-btn
                         icon
                         @click.stop.prevent="deleteNodeStyle(index, item)">
-                        <v-icon>mdi-close</v-icon>
+                        <v-icon size="16">mdi-close</v-icon>
                     </v-btn>
                 </v-list-item-action>
             </template>
@@ -31,6 +40,7 @@
 
 <script>
 import { SYMPER_APP } from '../../../main'
+import { orgchartApi } from '../../../api/orgchart'
 export default {
     // data(){
     //     return {
@@ -79,26 +89,30 @@ export default {
     },
 
     methods: {
-      filter (item, queryText, itemText) {
-        if (item.header) return false
+        changeNodeStyleTemplate(){
+            this.$emit('change-style-template', this.selectedNodeStyle);
+        },
+        filter (item, queryText, itemText) {
+            if (item.header) return false
 
-        const hasValue = val => val != null ? val : ''
+            const hasValue = val => val != null ? val : ''
 
-        const text = hasValue(itemText)
-        const query = hasValue(queryText)
+            const text = hasValue(itemText)
+            const query = hasValue(queryText)
 
-        return text.toString()
-          .toLowerCase()
-          .indexOf(query.toString().toLowerCase()) > -1
-      },
-      async deleteNodeStyle(index, item){
-          try {
-            //   let res = await orgchartAp
-            //   this.$store.commit('orgchart/deleteNodeStyle');          
-          } catch (error) {
-            SYMPER_APP.$snotifyError(error, "Can not delete selected item");
-          }
-      }
+            return text.toString()
+                .toLowerCase()
+                .indexOf(query.toString().toLowerCase()) > -1
+        },
+        async deleteNodeStyle(index, item){
+            try {
+                let res = await orgchartApi.deleteNodeStyle(item.id);
+                this.$store.commit('orgchart/deleteNodeStyle', index);     
+                this.$snotifySuccess("Deleted node style item");
+            } catch (error) {
+                this.$snotifyError(error, "Can not delete selected item");
+            }
+        }
     },
 
     computed: {
@@ -110,5 +124,15 @@ export default {
 </script>
 
 <style>
-
+    .node-style-example{
+        height: 20px;
+        width: 35px;
+        border: 1px solid #b9b8b8;
+        border-bottom-width: 2px;
+        text-align: center;
+        line-height: 20px;
+        font-size: 13px;
+        font-weight: 500;
+        margin-right: 8px;
+    }
 </style>
