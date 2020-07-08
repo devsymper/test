@@ -60,7 +60,9 @@
         "sort": "Sắp xếp",
         "status": "Trạng thái",
         "done": "Hoàn thành",
-        "notDone": "Chưa hoàn thành"
+        "notDone": "Chưa hoàn thành",
+        "code": "Mã",
+        "apply": "Áp dụng"
     },
     "login": {
         "title": "Đăng nhập hệ thống",
@@ -523,12 +525,18 @@
         },
         "editor": {
             "main": "Chung",
-            "customAttributes": "Thuộc tính",
+            "customAttributes": "Thuộc tính động",
             "nodeName": "Tên node",
             "department": "Phòng ban",
             "listDynamicAttributes": "Thuộc tính động",
             "generalAttributes": "Thuộc tính chung",
-            "position": "Vị trí"
+            "position": "Vị trí",
+            "style": "Hiển thị",
+            "styleConfig": "Cấu hình hiển thị",
+            "applyForChild": "Áp dụng cho các node con",
+            "singleApply": "Áp dụng cho node hiện tại",
+            "saveNodeConfigTitle": "Lưu cấu hình hiển thị cho node"
+
         }
     }
 }

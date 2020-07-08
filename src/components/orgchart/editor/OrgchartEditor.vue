@@ -50,10 +50,13 @@
             width:'250px'
         }" class="h-100 border-left-1">
             <ConfigPanel 
-            @config-value-change="handleConfigValueChange"
-            :instanceKey="instanceKey"
-            :action="action"
-            :context="context">
+                @update-dynamic-attr-display="updateDynamicAttrNodeDisplay"
+                @config-value-input="handleConfigValueChange"
+                @change-user-select="handleConfigUserSelectChange"
+                @apply-style-for-node="handleStyleChange"
+                :instanceKey="instanceKey"
+                :action="action"
+                :context="context">
             </ConfigPanel>
         </div>
 
@@ -84,11 +87,11 @@ import ConfigPanel from './ConfigPanel.vue';
 import EditorWorkspace from './EditorWorkspace.vue';
 import NodeSelector from './NodeSelector.vue';
 import VueResizable from 'vue-resizable';
-import { getOrgchartEditorData, getDefaultConfigNodeData, SYMPER_HOME_ORGCHART } from './nodeAttrFactory';
+import { getOrgchartEditorData, getDefaultConfigNodeData, SYMPER_HOME_ORGCHART, getNodeStyleConfig } from './nodeAttrFactory';
 import jointjs from "jointjs";
 import { orgchartApi } from "@/api/orgchart.js";
-import { FOUCUS_DEPARTMENT_DISPLAY, DEFAULT_DEPARTMENT_DISPLAY } from '../nodeDefinition/departmentDefinition';
-console.log(jointjs, 'jointjsjointjs');
+import { FOUCUS_DEPARTMENT_DISPLAY, DEFAULT_DEPARTMENT_DISPLAY, departmentMarkup } from '../nodeDefinition/departmentDefinition';
+
 
 
 export default {
@@ -137,12 +140,12 @@ export default {
                 // },
                 zoomIn: {
                     icon: "mdi-plus-circle-outline",
-                    text: "process.header_bar.zoom_in",
+                    text: "process.header_bar.zoom_out",
 
                 },
                 zoomOut: {
                     icon: "mdi-minus-circle-outline",
-                    text: "process.header_bar.zoom_out",
+                    text: "process.header_bar.zoom_in",
 
                 },
                 zoomToFit: {
@@ -169,6 +172,8 @@ export default {
         if(this.action != 'create'){
             this.restoreOrgchartView(this.id)
         }
+        this.$store.dispatch('orgchart/getAllStyleNode');
+
     },
     activated(){
         this.centerDiagram();
@@ -181,11 +186,59 @@ export default {
         }
     },
     methods: {
+        handleStyleChange(info){
+            this.changeNodeBottomColor(info.data.highlight.value, info.type == 'child');
+        },
+        changeNodeBottomColor(color, applyForChild = false){
+            let affectedNodeIds = [];
+            let workspace = this.$refs.editorWorkspace;
+            let currentNodeId = this.selectingNode.id;
+
+            if(!applyForChild){
+                affectedNodeIds = [currentNodeId];
+            }else{
+                if(currentNodeId == SYMPER_HOME_ORGCHART){
+                    affectedNodeIds = workspace.getAllNode().reduce((arr, el) => {
+                        arr.push(el.id);
+                        return arr;
+                    }, []);
+                }else{
+                    affectedNodeIds = workspace.getAllChildIdOfNode(currentNodeId);
+                }
+            }
+
+            for(let id of affectedNodeIds){
+                workspace.updateCellAttrs(id, 'highlight', color);
+                this.$store.state.orgchart.editor[this.instanceKey].allNode[id].style.highlight.value = color;
+            }
+        },
+        updateDynamicAttrNodeDisplay(){
+            let atts = this.selectingNode.customAttributes;
+            if(this.context == 'position'){
+                let lastAttr = atts[atts.length - 1];
+                let content = lastAttr.name + ' : ' + lastAttr.value
+                this.$refs.editorWorkspace.updateCellAttrs(this.selectingNode.id, 'lastDynamicAttr', content);
+            }
+        },
+        handleConfigUserSelectChange(listUserIds){
+            this.$refs.editorWorkspace.changeUserDisplayInNode(listUserIds);
+        },
         restoreMainOrgchartConfig(config){
             let homeConfig = this.$store.state.orgchart.editor[this.instanceKey].homeConfig;
             homeConfig.commonAttrs.name.value = config.name;
             homeConfig.commonAttrs.description.value = config.description;
             homeConfig.customAttributes = config.dynamicAttributes;
+        },
+        correctDiagramDisplay(content){
+            if(typeof content != 'object'){
+                content = JSON.parse(content);
+            }
+            for(let node of content.cells){
+                if(node.type == 'Symper.Department'){
+                    node.markup = departmentMarkup;
+                }
+            }
+            return content;
         },
         async restoreOrgchartView(id){
             if(!id){
@@ -194,8 +247,8 @@ export default {
             try {
                 let res = await orgchartApi.getOrgchartDetail(id);
                 if(res.status == 200){
-                    let savedData = res.data;
-                    let departments = JSON.parse(savedData.orgchart.content);
+                    let savedData = res.data;departmentMarkup
+                    let departments = this.correctDiagramDisplay(savedData.orgchart.content);
                     this.$refs.editorWorkspace.loadDiagramFromJson(departments);
                     this.centerDiagram();
                     this.restoreMainOrgchartConfig(savedData.orgchart);
@@ -206,7 +259,7 @@ export default {
                             id: node.vizId,
                             name: node.name,
                             description: node.description,
-                            code: node.code,        
+                            code: node.code,   
                         };
 
                         if(node.content && node.content !== 'false'){
@@ -218,6 +271,7 @@ export default {
                         if(node.dynamicAttributes){
                             newDepartment.customAttributes = node.dynamicAttributes;
                         }
+                        newDepartment.style = this.restoreNodeStyle(node.style);
                         mapIdToDpm[node.vizId] = newDepartment;
                     }
 
@@ -237,6 +291,8 @@ export default {
                                 users: position.users ? position.users : []
                             };
                             let newPosition = this.createNodeConfigData('position', nodeData, dpmInstanceKey);
+                            newPosition.style = this.restoreNodeStyle(position.style);
+
                             if(position.dynamicAttributes){
                                 newPosition.customAttributes = position.dynamicAttributes;
                             }
@@ -249,6 +305,18 @@ export default {
             } catch (error) {
                 this.$snotifyError(error, "Can not get orgchart data");
             }
+        },
+        restoreNodeStyle(savedStyle){
+            if(typeof savedStyle != 'object'){
+                savedStyle = JSON.parse(savedStyle);
+            }
+            let styleConfig = getNodeStyleConfig();
+            for(let key in savedStyle){
+                if(styleConfig[key]){
+                    styleConfig[key].value = savedStyle[key];
+                }
+            }
+            return styleConfig;
         },
 
         addUsersToPosition(postions, users){
@@ -337,8 +405,7 @@ export default {
             if(!this.$store.state.orgchart.editor[subInstanceKey]){
                 this.$refs.positionDiagram.initOrgchartData();
             }
-            this.$set(this.$store.state.orgchart.editor[subInstanceKey].homeConfig, 'commonAttrs', this.selectingNode.commonAttrs);
-            this.$set(this.$store.state.orgchart.editor[subInstanceKey].homeConfig, 'customAttributes', this.selectingNode.customAttributes);
+            this.$store.state.orgchart.editor[subInstanceKey].homeConfig = this.selectingNode;
         },
         storeDepartmentPositionCells(){
             let cells = this.$refs.positionDiagram.$refs.editorWorkspace.getAllDiagramCells();
@@ -382,7 +449,9 @@ export default {
         normalizeDiagramNodeDisplay(allVizCell){
             for(let node of allVizCell.cells){
                 if(node.type != 'org.Arrow'){
-                    node.attrs['.card'].stroke = DEFAULT_DEPARTMENT_DISPLAY.stroke;
+                    if(node.attrs['.card']){
+                        node.attrs['.card'].stroke = DEFAULT_DEPARTMENT_DISPLAY.stroke;
+                    }
                 }
             }
             return allVizCell;
@@ -405,9 +474,18 @@ export default {
             }
             return Object.values(nodeMap);
         },
+        getNodeStyleDataToSave(node){
+            let nodeStyle ={};
+            for(let key in node.style){
+                nodeStyle[key] = node.style[key].value;
+            }
+            return nodeStyle;
+        },
         getNodeDataToSave(nodeId, instanceKey, nodeType){
             let node = this.$store.state.orgchart.editor[instanceKey].allNode[nodeId];
             let attrs = node.commonAttrs;
+            let nodeStyle = this.getNodeStyleDataToSave(node);
+
             let data = {
                 name: attrs.name.value,
                 code: attrs.code.value,
@@ -415,6 +493,7 @@ export default {
                 description: attrs.description.value,
                 vizParentId: '',
                 dynamicAttrs: node.customAttributes,
+                style: JSON.stringify(nodeStyle)
             };
             
             if(nodeType == 'department'){
@@ -448,6 +527,9 @@ export default {
                 this.$refs.editorWorkspace.updateCellAttrs(cellId, 'name', data.data);
             }else if(cellId == SYMPER_HOME_ORGCHART && this.context == 'position'){
                 this.$emit('update-department-name', data.data);
+            }else if(this.context == 'position' && data.name == 'code'){
+                let content = data.data ? (this.$t('common.code') + ' : '+ data.data) : '';
+                this.$refs.editorWorkspace.updateCellAttrs(cellId, 'positionCode', content);
             }
         },
         changeDepartmentName(newName, idDepartment = false){
@@ -458,7 +540,9 @@ export default {
         },
         handleNewNodeAdded(nodeData){
             this.createNodeConfigData(this.context, nodeData);
-            this.selectNode(nodeData.id);
+            if(!nodeData.autoCreateFirstNode){
+                this.selectNode(nodeData.id);
+            }
         },
         handleHeaderAction(action){
             if(action == 'home'){

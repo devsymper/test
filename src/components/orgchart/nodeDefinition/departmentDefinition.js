@@ -2,6 +2,7 @@ let shapeSize = {
     width: 200,
     height: 70
 };
+
 let avatarSize = shapeSize.height / 2 - 5;
 let borderBottomHeight = 2;
 let SymperDepartment;
@@ -16,6 +17,12 @@ export const FOUCUS_DEPARTMENT_DISPLAY = {
     'stroke-width': 2,
     stroke: '#f58634'
 };
+let CEConfig = {
+    stickHeight: 20,
+    stickWidth: 1,
+    radius: 7,
+    fontSize: 12
+};
 export const DEFAULT_DEPARTMENT_ATTRS = {
     '.card': DEFAULT_DEPARTMENT_DISPLAY,
     '.name': {
@@ -24,13 +31,15 @@ export const DEFAULT_DEPARTMENT_ATTRS = {
         text: '',
         'font-family': 'Roboto',
         'ref-x': 0.5,
-        'ref-y': 0.12
+        'ref-y': 0.12,
+        'font-weight': 500,
+        'font-size': 13,
     },
     image: {
-        'xlink:href': 'https://cdn3.iconfinder.com/data/icons/avatars-round-flat/33/avat-01-512.png',
+        'xlink:href': '/img/empty_avatar.PNG',
         height: avatarSize,
         width: avatarSize,
-        y: shapeSize.height / 4 + 2,
+        y: shapeSize.height / 4 + 7,
     },
     '.manager-name': {
         y: shapeSize.height / 2 + avatarSize / 3 + 2,
@@ -46,6 +55,7 @@ export const DEFAULT_DEPARTMENT_ATTRS = {
     '.btn.add>circle': { r: 7, fill: 'green', stroke: 'green', 'stroke-width': 0 },
     '.btn>rect': { height: 20, width: 45, rx: 2, ry: 2, fill: 'transparent', 'stroke-width': 1 },
     '.btn.add>text': { fill: 'white', 'font-size': 15, 'font-weight': 400, stroke: 'white', x: -4, y: 5, 'font-family': 'Roboto' },
+
     '.border-bottom': {
         height: borderBottomHeight,
         y: shapeSize.height - borderBottomHeight + 1,
@@ -75,6 +85,51 @@ export const DEFAULT_DEPARTMENT_ATTRS = {
         'font-family': 'Roboto'
     },
 
+    '.stick': {
+        height: CEConfig.stickHeight,
+        width: CEConfig.stickWidth,
+        'stroke-width': 0,
+        'fill': '#848484',
+        // 'fill': DEFAULT_DEPARTMENT_DISPLAY.stroke,
+        x: shapeSize.width / 2,
+        y: shapeSize.height
+    },
+
+    '.btn-collapse-expand': {
+        'ref-dx': -shapeSize.width / 2,
+        'ref-y': shapeSize.height + CEConfig.stickHeight,
+        'ref': '.card',
+        event: 'element:collapse',
+        cursor: 'pointer'
+    },
+    '.collapse-expand-circle': {
+        r: CEConfig.radius,
+        fill: '#848484',
+        event: 'element:collapse',
+
+        // x: shapeSize.width / 2,
+        // y: shapeSize.height + CEConfig.stickHeight
+    },
+    '.expand-text': {
+        x: shapeSize.width / 2 - CEConfig.fontSize / 2 + 2,
+        y: shapeSize.height + CEConfig.stickHeight + CEConfig.fontSize / 2 - 1,
+        fill: 'white',
+        cursor: 'pointer',
+        'stroke-width': 1,
+        display: 'none',
+        event: 'element:collapse',
+
+    },
+    '.collapse-text': {
+        x: shapeSize.width / 2 - CEConfig.radius / 2,
+        y: shapeSize.height + CEConfig.stickHeight + CEConfig.radius,
+        fill: 'white',
+        'stroke-width': 1,
+        'font-size': CEConfig.fontSize * 2,
+        cursor: 'pointer',
+        event: 'element:collapse',
+
+    },
 };
 
 export const DEPARTMENT_NODE_DATA = {
@@ -90,36 +145,91 @@ export const DEPARTMENT_NODE_DATA = {
     "name": "Phòng ban 1",
     "attrs": DEFAULT_DEPARTMENT_ATTRS
 };
+
+export const departmentMarkup =
+    `<g class="rotatable ">
+        <g class="symper-orgchart-node">
+            <g class="scalable">
+                <rect class="card"/>
+            </g>
+            <image/>
+            <text class="name"/>
+            <text class="manager-name"/>
+
+            <g>
+                <rect class="border-bottom"/>
+            </g>
+
+            <g class="btn add orgchart-action">
+                <circle class="add"/>
+                <text class="add">+</text>
+            </g>
+
+            <g class="btn remove orgchart-action">
+                <circle class="remove"/>
+                <text class="remove">X</text>
+            </g>
+        </g>
+    </g>`.replace(/\n/g, '').replace(/\s+/g, ' ');
+
+// `<g class="rotatable ">
+
+//             <rect class="stick"/>
+//             <g class="btn-collapse-expand">
+//                 <circle class="collapse-expand-circle"/>
+//             </g>
+//             <text class="expand-text collapse-expand">+</text>
+//             <text class="collapse-text collapse-expand">-</text>
+
+//             <g class="symper-orgchart-node">
+//                 <g class="scalable">
+//                     <rect class="card"/>
+//                 </g>
+//                 <image/>
+//                 <text class="name"/>
+//                 <text class="manager-name"/>
+
+//                 <g>
+//                     <rect class="border-bottom"/>
+//                 </g>
+
+//                 <g class="btn add orgchart-action">
+//                     <circle class="add"/>
+//                     <text class="add">+</text>
+//                 </g>
+
+//                 <g class="btn remove orgchart-action">
+//                     <circle class="remove"/>
+//                     <text class="remove">X</text>
+//                 </g>
+//             </g>
+//         </g>`.replace(/\n/g, '').replace(/\s+/g, ' ')
 export const defineDepartment = function() {
     SymperDepartment = joint.shapes.org.Member.define('Symper.Department', {
         size: {
             width: shapeSize.width,
             height: shapeSize.height
         },
+        hidden: false,
         attrs: DEFAULT_DEPARTMENT_ATTRS,
-        markup: `<g class="rotatable symper-orgchart-node">
-                    <g class="scalable">
-                        <rect class="card"/>
-                    </g>
-                    <image/>
-                    <text class="name"/>
-                    <text class="manager-name">Đào Mạnh Khá</text>
+        markup: departmentMarkup,
+    }, {
+        hidden: false,
+        isHidden: function() {
+            return !!this.get('hidden');
+        },
 
-                    <g>
-                        <rect class="border-bottom"/>
-                    </g>
+        isCollapsed: function() {
+            return !!this.get('collapsed');
+        },
 
-                    <g class="btn add orgchart-action">
-                        <circle class="add"/>
-                        <text class="add">+</text>
-                    </g>
+        toggleButtonVisibility: function(visible) {
 
-                    <g class="btn remove orgchart-action">
-                        <circle class="remove"/>
-                        <text class="remove">X</text>
-                    </g>
-                   
-                </g>`.replace(/\n/g, '').replace(/\s+/g, ' ')
+        },
+
+        toggleButtonSign: function(plus) {
+
+        }
     });
 }
 

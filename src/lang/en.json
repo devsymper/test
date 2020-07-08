@@ -61,7 +61,9 @@
         "sort": "Sort",
         "status": "Status",
         "done": "Done",
-        "notDone": "Not done"
+        "notDone": "Not done",
+        "code": "Code",
+        "apply": "Apply"
     },
     "validate": {
         "required": "Not be empty",
@@ -509,12 +511,17 @@
         },
         "editor": {
             "main": "Main",
-            "customAttributes": "Custom fields",
+            "customAttributes": "Dynamic fields",
             "nodeName": "Node name",
             "department": "Department",
             "listDynamicAttributes": "Dynamic attributes",
             "generalAttributes": "General attributes",
-            "position": "Position"
+            "position": "Position",
+            "style": "Style",
+            "styleConfig": "Style configuration",
+            "applyForChild": "Apply for childs",
+            "singleApply": "Apply for this node",
+            "saveNodeConfigTitle": "Save node style config template"
         }
     }
 }

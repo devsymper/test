@@ -52,10 +52,14 @@
                 @change="(data) => {
                     handleChangeInputValue(inputInfo, name,data);
                 }"
+                @input="(data) => {
+                    handleInputValue(inputInfo, name,data);
+                }"
                 @blur="handleInputBlur(inputInfo, name)"
                 @keyup="(data) => {
                     handleKeyUpInputValue(inputInfo, name,data);
                 }"
+
                 :ref="'inputItem_'+name"
                 solo
                 :items="inputInfo.options"
@@ -104,11 +108,13 @@
                 <formula-editor
                     v-else-if="panelData.type == 'userAssignment'"
                     v-model="panelData.value.formula"
+                    @blur="handleLargeFormulaEditorBlur"
                     :width="'100%'"
                     :height="'370px'"
                 ></formula-editor>
                 <formula-editor
                     v-else
+                    @blur="handleLargeFormulaEditorBlur"
                     v-model="panelData.value"
                     :width="'100%'"
                     :height="'370px'"
@@ -142,6 +148,7 @@ import OrgchartSelector from "./../user/OrgchartSelector";
 import DateTimePicker from './../common/DateTimePicker.vue';
 import SymperListOrdering from "./../common/symperInputs/SymperListOrdering";
 import SymperListAutocomplete from "./../common/symperInputs/SymperListAutocomplete";
+import SymperColorPicker from "@/components/common/symperInputs/SymperColorPicker.vue";
 
 const inputTypeConfigs = {
     numeric: {
@@ -275,7 +282,15 @@ const inputTypeConfigs = {
                 value:config.value
             }
         }
-    }
+    },
+    color:{
+        tag:"symper-color-picker",
+        props(config){
+            return{
+                value:config.value
+            }
+        }
+    },
 };
 export default {
     data() {
@@ -294,6 +309,11 @@ export default {
         };
     },
     methods: {
+        handleLargeFormulaEditorBlur(){
+            let name = this.largeFormulaEditor.name;
+            let inputInfo = this.allInputs[name];
+            this.handleInputBlur(inputInfo, name);
+        },
         handleInputBlur(inputInfo, name){
             this.$emit('input-blur',inputInfo, name);
         },
@@ -355,8 +375,9 @@ export default {
         },
         closeLargeFormulaEditor() {
             let info = this.largeFormulaEditor;
-            this.$refs["inputItem_" + info.name][0].setValue(info.data.value);
-            this.largeFormulaEditor.name = '';
+            setTimeout((self) => {
+                self.largeFormulaEditor.name = '';            
+            }, 500, this);
         },
         openLargeValueEditor(inputInfo, name) {
             this.$refs.dragPanel.show();
@@ -377,6 +398,14 @@ export default {
              * inputInfo: chứa các thông tin về input
              */
             this.$emit("input-value-changed", name, inputInfo, data);
+        },
+        handleInputValue(inputInfo, name, data) {
+            /**
+             * emit sự kiện thay đổi giá trị của một input trong form
+             * name: tên của input này
+             * inputInfo: chứa các thông tin về input
+             */
+            this.$emit("input-value", name, inputInfo, data);
         },
         handleKeyUpInputValue(inputInfo, name, data){
             console.log('jj',inputInfo, name, data);
@@ -486,6 +515,8 @@ export default {
         SymperListOrdering: SymperListOrdering,
         SymperListAutocomplete,
         "datetime-picker" : DateTimePicker,
+        SymperColorPicker: SymperColorPicker
+
     }
 };
 </script>

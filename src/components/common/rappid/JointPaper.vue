@@ -70,10 +70,9 @@ export default {
 			model: this.graph,
 			width: this.width,
 			height: this.height,
-			// gridSize: this.gridSize,
-			// drawGrid: this.drawGrid,
 			background: this.background,
-			interactive: !this.readonly
+            interactive: !this.readonly,
+            sorting: joint.dia.Paper.sorting.APPROX,
         });
         
         
@@ -103,24 +102,19 @@ export default {
             this.paper.toSVG(done);
         },
         actionOnToolbar(type){
-            // let typeClass = {
-            //     zoom:'zoomSlider',
-            //     zoomin:'zoomIn',
-            //     zoomout:'zoomOut',
-            //     fit:'zoomToFit',
-            //     undo:'undo',
-            //     redo:'redo',
-            // };
             let ele = $(this.$refs.symperPaperToolbar).find('.joint-widget[data-type='+type+']');
             ele.mousedown();
             ele.click();
+            if(type == 'zoomToFit'){
+                $(this.$refs.symperPaperToolbar).find('.joint-widget[data-type=zoomSlider]').find('input').val(100).change();
+            }
         },
         addToolbar(paperScroller){
             let commandManager = new joint.dia.CommandManager({
                 graph: this.graph
             });
             let toolbar = new joint.ui.Toolbar({
-                tools: ['zoomIn', 'zoomOut', 'zoomToFit', 'undo', 'redo'],
+                tools: ['zoomIn', 'zoomOut', 'zoomToFit', 'undo', 'redo', 'zoomSlider'],
                 references: {
                     paperScroller: paperScroller,
                     commandManager: commandManager

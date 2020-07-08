@@ -2,6 +2,25 @@ import { DEPARTMENT_NODE_DATA } from "../nodeDefinition/departmentDefinition";
 import { POSITION_NODE_DATA } from "../nodeDefinition/positionDefinition";
 
 export const SYMPER_HOME_ORGCHART = 'SYMPER_HOME_ORGCHART';
+
+
+export const getNodeStyleConfig = function() {
+    return {
+        highlight: {
+            "title": "Highlight color",
+            "type": "color",
+            "value": "#f58634",
+            "info": "",
+        },
+        public: {
+            "title": "Public this style",
+            "type": "checkbox",
+            "value": false,
+            "info": "",
+        },
+    }
+}
+
 export const getAllNodeAttrs = function() {
     return {
         name: {
@@ -25,11 +44,17 @@ export const getAllNodeAttrs = function() {
     }
 }
 
+
+
+
+
 export const getDefaultConfigNodeData = function(nodeId, isDepartment = false) {
     let config = {
         commonAttrs: getAllNodeAttrs(),
         customAttributes: [],
         id: nodeId,
+        style: getNodeStyleConfig(),
+        collapseExpandStatus: 'expand' // expand | collapse
     };
 
     if (isDepartment) {
