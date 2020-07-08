@@ -64,7 +64,7 @@ export default class BasicControl extends Control {
             this.controlProperties['isRequired'] != undefined &&
             (this.controlProperties['isRequired'].value == "1" ||
                 this.controlProperties['isRequired'].value == 1)) {
-            this.renderValidateIcon();
+            this.renderValidateIcon("Không được bỏ trống trường thông tin " + this.title);
         }
         if (!this.checkDetailView() &&
             this.controlProperties['isReadOnly'] != undefined &&
@@ -315,6 +315,8 @@ export default class BasicControl extends Control {
         this.ele.attr('type', 'text');
         this.ele.on('click', function(e) {
             e.controlName = thisObj.name;
+            console.log(thisObj);
+            e.formulas = thisObj.controlFormulas.formulas;
             SYMPER_APP.$evtBus.$emit('document-submit-filter-input-click', e)
         })
 

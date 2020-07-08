@@ -187,7 +187,7 @@ export default {
             docObjId:null,
             topPositionDragPanel:100,
             leftPositionDragPanel:300,
-            listMessageErr:['hoang']
+            listMessageErr:[]
         };
     },
     beforeMount() {
@@ -273,10 +273,10 @@ export default {
             let controlInstance = getControlInstanceFromStore(locale.controlName);
             if(controlInstance.isRequiredControl()){
                 if(controlInstance.isEmpty()){
-                    controlInstance.renderValidateIcon('Không được bỏ trống trường này!')
+                    controlInstance.renderValidateIcon('Không được bỏ trống trường thông tin '+locale.controlName)
                 }
                 else{
-                    controlInstance.removeRequire()
+                    controlInstance.removeValidateIcon()
                 }
             }
             
@@ -300,11 +300,15 @@ export default {
         this.$evtBus.$on("document-submit-time-input-click", e => {
             thisCpn.$refs.timeInput.show(e);
         });
+        this.$evtBus.$on("document-submit-search-in-filter-input", e => {
+            thisCpn.runInputFilterFormulas(e.controlName,e.search);
+        }); 
         this.$evtBus.$on("document-submit-filter-input-click", e => {
-            console.log($(e.target).offset());
             thisCpn.topPositionDragPanel = $(e.target).offset().top + 2 + $(e.target).height();
             thisCpn.leftPositionDragPanel = e.screenX - e.offsetX;
             thisCpn.runInputFilterFormulas(e.controlName);
+            thisCpn.$refs.symDragPanel.show();
+            thisCpn.$refs.inputFilter.setFormulas(e.formulas,e.controlName);
             thisCpn.titleDragPanel = "Tìm kiếm thông tin";
             thisCpn.titleDragPanelIcon = "mdi-file-search";
         }); 
@@ -453,10 +457,10 @@ export default {
             let isValid = data.isValid;
             let controlInstance = getControlInstanceFromStore(data.controlName);
             if(isValid){
-                controlInstance.removeRequire();
+                controlInstance.removeValidateIcon();
             }
             else{
-                controlInstance.renderValidateIcon('Định dạng thời gian không đúng');
+                controlInstance.renderValidateIcon('Định dạng thời gian không đúng!');
             }
         },
         /**
@@ -775,44 +779,41 @@ export default {
                 this.updateEffectedControlToStore(mapControlEffected['validate'],'effectedValidateControl')
             }
         },
-        /**
-         * Hàm detect công thức của 1 control có liên quan đến table hay ko, nếu có thì đưa vào mối quan hệ mapControlEffected
-         * 
-         */
-        detectControlEffectedFromTableInDoc(mapControlEffected, controlName, formulasInstance){
-            let listTableName = ClientSQLManager.getAllTableName(this.keyInstance);
-            let listTableSource = formulasInstance.detectTableSQLLite(formulasInstance.formulas,listTableName[0]['values'][0]);
-            if(listTableSource != false){
-                for(let i = 0; i< listTableSource.length; i++){
-                    if (
-                        mapControlEffected[listTableSource[i]] == undefined
-                    ) {
-                        mapControlEffected[listTableSource[i]] = {};
-                    }
-                    mapControlEffected[listTableSource[i]][controlName] = true 
-                }
-            }
-        },
+       
         detectControlEffectedInTableInDoc(mapControlEffected,name,formulasInstance){
             formulasInstance.detectControlInTable(mapControlEffected,name,formulasInstance.formulas,this.sDocumentSubmit.listInputInDocument)  
         },
 
 
         handlerSubmitDocumentClick(){
-            if(this.viewType == 'submit'){
-                this.submitDocument();
+            if($('.validate-icon').length == 0){
+                if(this.viewType == 'submit'){
+                    this.submitDocument();
+                }
+                else{
+                    this.updateDocumentObject();
+                }
             }
             else{
-                this.updateDocumentObject();
+                let controlNotValid = $('.validate-icon');
+                let listErr = []
+                $.each(controlNotValid,function(k,v){
+                    let message = $(v).attr('title');
+                    listErr.push(message);
+                })
+                console.log(listErr);
+                
+                this.listMessageErr = listErr;
+                this.$refs.errMessage.showDialog();
             }
+            
         },
 
         /**
          * Hàm gọi api submit document
          */
         submitDocument(){
-            // this.$refs.errMessage.showDialog();
-            // return;
+            
             this.isSubmitting = true;
             let thisCpn = this;
             let dataPost = this.getDataPostSubmit();
@@ -959,7 +960,7 @@ export default {
 
 
 
-        runInputFilterFormulas(controlName){
+        runInputFilterFormulas(controlName,search=false){
             let controlInstance = this.sDocumentSubmit.listInputInDocument[controlName];
             let controlId = controlInstance.id
             let allFormulas = controlInstance.controlFormulas;
@@ -967,6 +968,14 @@ export default {
                 if(allFormulas['formulas'].hasOwnProperty('instance')){
                     let formulasInstance = allFormulas['formulas'].instance;
                     if(formulasInstance.getFormulas() != ""){
+                        if(search !== false){
+                            if( !formulasInstance.hasOwnProperty('oldFormulas')){
+                                formulasInstance.oldFormulas = formulasInstance.getFormulas();
+                            }
+                            // trường hợp có search trong filter thì wrap lại công thức với biến search
+                            let newFormulas = formulasInstance.wrapSyqlForSearchInputFilter(search);
+                            formulasInstance.setFormulas(newFormulas);
+                        }
                         this.handlerBeforeRunFormulasValue(formulasInstance,controlId,controlName,'formulas')
                     }
                 }
@@ -1068,12 +1077,9 @@ export default {
         },
         
         handlerAfterRunFormulas(rs,controlId,controlName,formulasType){
-            console.log(controlName);
-            
             let controlInstance = getControlInstanceFromStore(controlName);
             if($('#'+controlId).length > 0){
                 if($('#'+controlId).attr('s-control-type') == 'inputFilter'){
-                    this.$refs.symDragPanel.show();
                     this.$refs.inputFilter.setData(controlId,controlName,rs.data.data);
                     
                 }
@@ -1170,7 +1176,7 @@ export default {
                 controlInstance.renderValidateIcon('Không được bỏ trống trường này!')
             }
             else{
-                controlInstance.removeRequire();
+                controlInstance.removeValidateIcon();
             }
         },
         handlerDataAfterRunFormulasValidate(message,controlName){
@@ -1182,7 +1188,7 @@ export default {
                 controlInstance.renderValidateIcon(message);
             }
             else{
-                controlInstance.removeRequire();
+                controlInstance.removeValidateIcon();
             }
         },
         handlerDataAfterRunFormulasHidden(isHidden,controlId){

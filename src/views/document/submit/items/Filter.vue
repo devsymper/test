@@ -8,6 +8,8 @@
                 height="30"
                 class="search"
                 label="Tìm kiếm nhanh"
+                @keyup="handleKeyupSearch"
+                v-model="search"
                 hide-details
             ></v-text-field>
         </div>
@@ -36,9 +38,11 @@ export default {
         return {
             columns:null,
             data:null,
-            search:null,
             colActive:null,
-            curControlId:null
+            curControlId:null,
+            formulas:null,
+            search:null,
+            controlName:null
         }
     },
     created(){
@@ -88,6 +92,13 @@ export default {
             dataResult = dataResult.substring(0, dataResult.length - 1);
             this.$emit('save-input-filter',{controlId:this.curControlId,value:dataResult});
             
+        },
+        setFormulas(formulas,controlName){
+            this.formulas = formulas;
+            this.controlName = controlName;
+        },
+        handleKeyupSearch(data){
+            this.$evtBus.$emit('document-submit-search-in-filter-input',{controlName:this.controlName,search:this.search})
         }
     }
 }
@@ -98,6 +109,9 @@ export default {
         min-height: unset !important;
         margin-top: 8px;
         padding-left: 8px !important;
+    }
+    .search >>> input{
+        font-size: 13px;
     }
     .search >>> .v-input__prepend-inner{
         margin-top: 3px !important;

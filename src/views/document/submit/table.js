@@ -204,7 +204,7 @@ export default class Table {
                     }
                     // nếu có sự thay đổi cell mà là id của row sqlite thì ko thực hiện update
                     if (controlName != 's_table_id_sql_lite') {
-                        thisObj.checkUniqueTable(controlName);
+                        thisObj.checkUniqueTable(controlName, columns);
                         if (source != AUTO_SET) {
                             store.commit("document/addToDocumentSubmitStore", {
                                 key: 'rootChangeFieldName',
@@ -741,18 +741,19 @@ export default class Table {
                 td.style.textAlign = "center";
             }
             let map = thisObj.validateValueMap[row + '_' + column];
+            let controlTitle = (listInputInDocument[prop].title == "") ? listInputInDocument[prop].name : listInputInDocument[prop].title;
             if (map) {
                 let sign = prop + '____' + row;
                 let ele = $(td);
 
                 if (map.vld === true) {
-                    ele.css({ 'position': 'relative' }).append(Util.makeErrNoti(map.msg, sign));
+                    ele.css({ 'position': 'relative' }).append(Util.makeErrNoti(map.msg, sign, controlTitle));
                 }
                 if (map.uniqueDB === true) {
-                    ele.css({ 'position': 'relative' }).append(Util.makeErrNoti(map.msg, sign));
+                    ele.css({ 'position': 'relative' }).append(Util.makeErrNoti(map.msg, sign, controlTitle));
                 }
                 if (map.require === true && (value === '' || value == null)) {
-                    ele.css({ 'position': 'relative' }).append(Util.requireRedDot(sign));
+                    ele.css({ 'position': 'relative' }).append(Util.requireRedDot(sign, controlTitle));
                 }
                 ele.off('click', '.validate-icon')
                 ele.on('click', '.validate-icon', function(e) {
@@ -794,6 +795,9 @@ export default class Table {
 
     }
     checkUniqueTable(controlName) {
+        let controlTitle = (listInputInDocument[controlName].title == "") ? listInputInDocument[controlName].name : listInputInDocument[controlName].title;
+        let tableName = listInputInDocument[controlName].inTable;
+        let tableTitle = (listInputInDocument[tableName].title == "") ? listInputInDocument[tableName].name : listInputInDocument[tableName].title;
         let indexColumn = this.getColumnIndexFromControlName(controlName);
         let dataCol = this.tableInstance.getDataAtCol(indexColumn);
         let uniqueData = {}
@@ -803,10 +807,10 @@ export default class Table {
                 continue;
             }
             if (uniqueData.hasOwnProperty(row)) {
-                this.validateValueMap[index + "_" + indexColumn] = { vld: true, msg: 'Trùng dữ liệu' }
+                this.validateValueMap[index + "_" + indexColumn] = { vld: true, msg: 'Trùng dữ liệu cột ' + controlTitle + " trong table " + tableTitle }
             } else {
                 uniqueData[row] = true;
-                this.validateValueMap[index + "_" + indexColumn] = { vld: false, msg: 'Trùng dữ liệu' }
+                this.validateValueMap[index + "_" + indexColumn] = { vld: false, msg: 'Trùng dữ liệu cột ' + controlTitle + " trong table " + tableTitle }
             }
         }
         this.tableInstance.render()
