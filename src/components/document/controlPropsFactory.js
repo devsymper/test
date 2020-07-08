@@ -86,7 +86,7 @@ const commonProps = {
     isPrimary: {
         title: "Quan trọng",
         type: "checkbox",
-        value: "",
+        value: true,
         groupType: "display"
     },
     isMobile: {

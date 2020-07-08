@@ -183,7 +183,7 @@ export default class Formulas {
          * Hàm tách các công thức reference (công thức chạy trên server)
          */
     getReferenceFormulas() {
-        let listSyql = this.formulas.match(/ref\((?:[^)(]+|\((?:[^)(]+|\([^)(]*\))*\))*\)/gm);
+        let listSyql = this.formulas.match(/ref\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\([^)(]*\))*\))*\))*\))*\))*\))*\))*\))*\))*\)/gm);
         return listSyql;
     }
 
@@ -265,45 +265,69 @@ export default class Formulas {
         this.formulas = formulas
     }
 
-
     /**
-     * hàm detect và xóa công thức ref
-     * Hàm sử dụng trong việc phát hiện các control trong table ảnh hưởng đến các control ngoài table
+     * Hàm phát hiện công thức của control trong table ảnh hưởng đến control nào khác trong table
+     * @param {*} mapControlEffected 
+     * @param {*} name 
+     * @param {*} script 
+     * @param {*} listInputInDocument 
      */
-    detectTableSQLLite(script, listTableName) {
-            let s = script.replace(/ref\((?:[^)(]+|\((?:[^)(]+|\([^)(]*\))*\))*\)/gm, "");
-            let wordArr = s.split(' ');
-            let listTableSource = [];
-            for (let i = 0; i < listTableName.length; i++) {
-                if (wordArr.indexOf(listTableName[i]) != -1) {
-                    listTableSource.push(listTableName[i]);
-                }
-            }
-            return (listTableSource.length > 0) ? listTableSource : false;
-        }
-        /**
-         * Hàm phát hiện công thức của control trong table ảnh hưởng đến control nào khác trong table
-         * @param {*} mapControlEffected 
-         * @param {*} name 
-         * @param {*} script 
-         * @param {*} listInputInDocument 
-         */
     detectControlInTable(mapControlEffected, name, script, listInputInDocument) {
-        let s = script.replace(/ref\((?:[^)(]+|\((?:[^)(]+|\([^)(]*\))*\))*\)/gm, "");
-        s = s.replace(/{.}/gm, "");
-        let listWord = s.match(/[A-Za-z0-9_]+/g);
-        for (let controlName in listInputInDocument) {
-            if (listWord != null && listWord.indexOf(controlName) != -1) {
-                if (mapControlEffected[controlName] == undefined) {
-                    mapControlEffected[controlName] = {};
+            let s = script.replace(/ref\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\([^)(]*\))*\))*\))*\))*\))*\))*\))*\))*\))*\)/gm, "");
+            s = s.replace(/{.}/gm, "");
+            let listWord = s.match(/[A-Za-z0-9_]+/g);
+            for (let controlName in listInputInDocument) {
+                if (listWord != null && listWord.indexOf(controlName) != -1) {
+                    if (mapControlEffected[controlName] == undefined) {
+                        mapControlEffected[controlName] = {};
+                    }
+                    mapControlEffected[controlName][name] = true
+
                 }
-                mapControlEffected[controlName][name] = true
-
             }
+
         }
+        // hàm wrap lại formulas của control inputfilter khi có search
+    wrapSyqlForSearchInputFilter(search) {
+            this.setFormulas(this.oldFormulas);
+            let refFormulas = this.getReferenceFormulas();
+            if (refFormulas.length > 0) {
+                let syql = refFormulas[0].trim();
+                syql = syql.replace('ref(', '');
+                syql = syql.substring(0, syql.length - 1);
+                let columns = this.getColumnsQuery(syql);
+                let where = 'WHERE ';
+                for (let index = 0; index < columns.length; index++) {
+                    const element = columns[index];
+                    if (index == columns.length - 1) {
+                        where += " CAST(" + element + " AS TEXT) LIKE '%" + search + "%'";
+                    } else {
+                        where += " CAST(" + element + " AS TEXT) LIKE '%" + search + "%' AND ";
+                    }
+                }
+                let aliasTable = "symper_" + Date.now();
+                let newSyql = "ref( SELECT * FROM (" + syql + ") " + aliasTable + " " + where + ")";
+                return newSyql;
+            }
+            return false;
+        }
+        // hàm lấy các column được query sau select và trước from
+    getColumnsQuery(syql) {
+        let columns = [];
+        let allColumns = syql.match(/(?<=select)(.*?)(?=from)/gm);
+        for (let index = 0; index < allColumns.length; index++) {
+            let element = allColumns[index];
+            element = element.trim();
+            element = element.split(',')
+            for (let i = 0; i < element.length; i++) {
+                let column = element[i];
+                column = column.replace(/(.*?)(?<=as)/g, "");
+                columns.push(column.trim())
+            }
 
+        }
+        return columns;
     }
-
 
 
 }

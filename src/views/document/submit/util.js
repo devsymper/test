@@ -24,8 +24,8 @@ export default class Util {
         return str.replace(/^\w/, c => c.toLowerCase());
     }
 
-    static requireRedDot = function(sign) {
-        return '<span class="mdi mdi-checkbox-blank-circle  validate-icon" title="Không được bỏ trống trường này"></span>'
+    static requireRedDot = function(sign, controlTitle) {
+        return '<span class="mdi mdi-checkbox-blank-circle  validate-icon" control-title="' + controlTitle + '" title="Không được bỏ trống trường này"></span>'
             // return '<i data-require-sign="' + sign + '" class="fa fa-circle required-markup" title="Bạn phải nhập vào trường này" aria-hidden="true"></i>';
     };
     /**
@@ -241,8 +241,8 @@ export default class Util {
         return ext == null ? "" : ext[0];
     }
 
-    static makeErrNoti = function(msg, sign) {
-        return '<span class="mdi mdi-checkbox-blank-circle validate-icon" title="' + msg + '"></span>'
+    static makeErrNoti = function(msg, sign, controlTitle) {
+        return '<span class="mdi mdi-checkbox-blank-circle validate-icon" control-title="' + controlTitle + '" title="' + msg + '"></span>'
     }
     static generateString = function(length) {
             var result = '';

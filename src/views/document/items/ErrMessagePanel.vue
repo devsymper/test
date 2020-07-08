@@ -10,7 +10,7 @@
             <v-card-title class="headline">Thông báo</v-card-title>
             <v-divider></v-divider>
             <v-card-text style="height: calc(100% - 112px);    overflow: auto;">
-                <v-list-item dense v-for="(err, index) in listErr" :key="index">
+                <v-list-item dense v-for="(err, index) in listError" :key="index">
                     <v-list-item-content>
                         <v-list-item-title>{{err}}</v-list-item-title>
                     </v-list-item-content>
@@ -44,10 +44,16 @@ export default {
             default:[]
         }
     },
+    watch:{
+        listErr(after){
+            this.listError = after
+        }
+    },
     
     data(){
         return {
             isShowModalErr:false,
+            listError:[]
         }
     },
    
@@ -59,7 +65,7 @@ export default {
         hideDialog(){
             this.isShowModalErr = false
         },
-       
+     
         
     },
     mounted(){

@@ -205,7 +205,7 @@ export default class Control {
             if (data == 't' || data === true) {
                 this.renderValidateIcon('Dữ liệu đã tồn tại');
             } else {
-                this.removeRequire();
+                this.removeValidateIcon();
             }
         } else {
             let tableControl = listInputInDocument[this.inTable];
@@ -225,10 +225,11 @@ export default class Control {
 
     }
     renderValidateIcon(message) {
-        let icon = `<span class="mdi mdi-checkbox-blank-circle validate-icon" title="` + message + `"></span>`
+        let controlTitle = (this.title == "") ? this.name : this.title;
+        let icon = `<span class="mdi mdi-checkbox-blank-circle validate-icon" controlTitle="` + controlTitle + `" title="` + message + `"></span>`
         this.ele.parent().append(icon);
     }
-    removeRequire() {
+    removeValidateIcon() {
         this.ele.parent().find('.validate-icon').remove();
     }
     isEmpty() {
