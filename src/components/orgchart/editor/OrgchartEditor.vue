@@ -87,7 +87,7 @@ import ConfigPanel from './ConfigPanel.vue';
 import EditorWorkspace from './EditorWorkspace.vue';
 import NodeSelector from './NodeSelector.vue';
 import VueResizable from 'vue-resizable';
-import { getOrgchartEditorData, getDefaultConfigNodeData, SYMPER_HOME_ORGCHART } from './nodeAttrFactory';
+import { getOrgchartEditorData, getDefaultConfigNodeData, SYMPER_HOME_ORGCHART, getNodeStyleConfig } from './nodeAttrFactory';
 import jointjs from "jointjs";
 import { orgchartApi } from "@/api/orgchart.js";
 import { FOUCUS_DEPARTMENT_DISPLAY, DEFAULT_DEPARTMENT_DISPLAY } from '../nodeDefinition/departmentDefinition';
@@ -248,7 +248,7 @@ export default {
                             id: node.vizId,
                             name: node.name,
                             description: node.description,
-                            code: node.code,        
+                            code: node.code,   
                         };
 
                         if(node.content && node.content !== 'false'){
@@ -260,6 +260,7 @@ export default {
                         if(node.dynamicAttributes){
                             newDepartment.customAttributes = node.dynamicAttributes;
                         }
+                        newDepartment.style = this.restoreNodeStyle(node.style);
                         mapIdToDpm[node.vizId] = newDepartment;
                     }
 
@@ -279,6 +280,8 @@ export default {
                                 users: position.users ? position.users : []
                             };
                             let newPosition = this.createNodeConfigData('position', nodeData, dpmInstanceKey);
+                            newPosition.style = this.restoreNodeStyle(position.style);
+
                             if(position.dynamicAttributes){
                                 newPosition.customAttributes = position.dynamicAttributes;
                             }
@@ -291,6 +294,18 @@ export default {
             } catch (error) {
                 this.$snotifyError(error, "Can not get orgchart data");
             }
+        },
+        restoreNodeStyle(savedStyle){
+            if(typeof savedStyle != 'object'){
+                savedStyle = JSON.parse(savedStyle);
+            }
+            let styleConfig = getNodeStyleConfig();
+            for(let key in savedStyle){
+                if(styleConfig[key]){
+                    styleConfig[key].value = savedStyle[key];
+                }
+            }
+            return styleConfig;
         },
 
         addUsersToPosition(postions, users){
@@ -448,9 +463,18 @@ export default {
             }
             return Object.values(nodeMap);
         },
+        getNodeStyleDataToSave(node){
+            let nodeStyle ={};
+            for(let key in node.style){
+                nodeStyle[key] = node.style[key].value;
+            }
+            return nodeStyle;
+        },
         getNodeDataToSave(nodeId, instanceKey, nodeType){
             let node = this.$store.state.orgchart.editor[instanceKey].allNode[nodeId];
             let attrs = node.commonAttrs;
+            let nodeStyle = this.getNodeStyleDataToSave(node);
+
             let data = {
                 name: attrs.name.value,
                 code: attrs.code.value,
@@ -458,6 +482,7 @@ export default {
                 description: attrs.description.value,
                 vizParentId: '',
                 dynamicAttrs: node.customAttributes,
+                style: JSON.stringify(nodeStyle)
             };
             
             if(nodeType == 'department'){
