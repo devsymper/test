@@ -136,3 +136,26 @@ export const getMapDpmIdToPosition = function(allPosition) {
     }
     return mapDpmToPos;
 };
+
+// A helper to create an arrow connection
+export const jointLinkNode = function(source, target) {
+    return new joint.shapes.org.Arrow({
+        source: { id: source.id },
+        target: { id: target.id },
+        attrs: {
+            '.connection': {
+                'stroke-width': 1
+            },
+            '.marker-arrowheads': {
+                display: 'none'
+            }
+        },
+    }, {
+        isHidden: function() {
+            // If the target element is collapsed, we don't want to
+            // show the link either
+            var targetElement = this.getTargetElement();
+            return !targetElement || targetElement.isHidden();
+        }
+    });
+}

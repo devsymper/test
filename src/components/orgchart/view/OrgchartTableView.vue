@@ -1,15 +1,55 @@
 <template>
-    <AgDataTable
-        ref="displayTable"
-        :allColumns="allColumns"
-        :rowData="dataTable"
-        :editable="false"
-        :customComponents="customAgComponents"
-        :cellRendererParams="{
-            innerRenderer:'nodeName'
-        }">
+    <div class="h-100 w-100">
+        <v-tabs 
+            v-model="currentTab"  
+            background-color="transparent"
+            color="grey"
+            light
+            height="42"
+            flat
+            grow>
+            <v-tab 
+                :key="'tableView'" >
+                <v-icon size="17">mdi-home</v-icon>
+                <span>Table view</span>
+            </v-tab>
+            <v-tab 
+                :key="'diagramView'" >
+                <v-icon size="17">mdi-home</v-icon>
+                <span>Diagram view</span>
+            </v-tab>
+        </v-tabs>
 
-    </AgDataTable>
+        <v-tabs-items v-model="currentTab" class="h-100">
+            <v-tab-item :key="'tableView'" class="px-2 pt-2 h-100">
+                <div class="h-100 symper-orgchart-table-view">
+                    <AgDataTable
+                        ref="displayTable"
+                        :allColumns="allColumns"
+                        :rowData="dataTable"
+                        :editable="false"
+                        :customComponents="customAgComponents"
+                        :cellRendererParams="{
+                            innerRenderer:'nodeName'
+                        }">
+                    </AgDataTable>
+                </div>
+            </v-tab-item>
+
+
+            <v-tab-item :key="'diagramView'" class="px-2 pt-2 h-100">
+                <OrgStructureView
+                ref="orgStructureView"
+                :mapDpmToPos="mapDpmToPos"
+                :allDepartments="allDepartments"
+                :allPositions="allPositions">
+                    
+                </OrgStructureView>
+            </v-tab-item>
+
+        </v-tabs-items>
+
+    </div>
 </template>
 
 <script>
@@ -17,7 +57,7 @@ import AgDataTable from "@/components/common/agDataTable/AgDataTable.vue"
 import { getMapDpmIdToPosition } from '../editor/nodeAttrFactory'
 import NodeNameInTable  from "./NodeNameInTable.vue";
 import UserInNodeView  from "./UserInNodeView.vue";
-
+import OrgStructureView from './OrgStructureView.vue';
 export default {
     props: {
         allDepartments: {
@@ -34,6 +74,7 @@ export default {
     },
     components: {
         'AgDataTable' : AgDataTable,
+        'OrgStructureView': OrgStructureView
     },
     computed: {
         dataTable(){
@@ -41,6 +82,9 @@ export default {
             if(this.allDepartments == null){
                 return []
             }
+            let mapDpmToPos = getMapDpmIdToPosition(this.allPositions);
+            this.mapDpmToPos = null;         
+            this.mapDpmToPos = mapDpmToPos;         
             this.createMapNameToDynamicAttr();
             
 
@@ -51,7 +95,6 @@ export default {
             this.addPathForAllNode(mapDepartments);
 
 
-            let mapDpmToPos = getMapDpmIdToPosition(this.allPositions);
             
             for(let dpmId in mapDpmToPos){
                 let mapIdToPos = mapDpmToPos[dpmId];
@@ -77,7 +120,8 @@ export default {
                 for(let posId in mapPos){
                     let pos = mapPos[posId];
                     let row = {
-                        name: dpm.path.concat(['Positions']).concat(pos.path),
+                        name: dpm.path.concat(pos.path),
+                        // name: dpm.path.concat(['Positions']).concat(pos.path),
                         code: pos.code,
                         users: typeof pos.users == 'string' ? JSON.parse(pos.users) : pos.users,
                         managers: [],
@@ -87,6 +131,10 @@ export default {
                     data.push(row);
                 }
             }
+
+            setTimeout((self) => {
+                self.$refs.orgStructureView.reDrawDiagram();
+            }, 1000, this);
             return data;
         },
         allColumns(){
@@ -124,7 +172,9 @@ export default {
                 });
             }
             setTimeout((self) => {
-                self.$refs.displayTable.refreshData(colDefs);
+                if(self.$refs.displayTable){
+                    self.$refs.displayTable.refreshData(colDefs);
+                }
             }, 0, this);
             return colDefs;
         }
@@ -200,18 +250,23 @@ export default {
     },
     data(){
         return {
+            currentTab: 1,
             customAgComponents: {
                 nodeName: NodeNameInTable,
                 UserInNodeView: UserInNodeView,
             },
-            mapNameToDynamicAttr: null
+            mapNameToDynamicAttr: null,
+            mapDpmToPos: null
         }
     }
 }
 </script>
 
 <style>
-
+.symper-orgchart-table-view .ag-group-child-count{
+    position: absolute;
+    right: 5px;
+}
 </style>
 
 
