@@ -723,6 +723,10 @@ export default class Table {
         } else if (type == 'time') {
             rsl.timeFormat = 'HH:mm:ss',
                 rsl.correctFormat = true;
+
+        } else if (type == 'date') {
+            rsl.dateFormat = 'YYYY-MM-DD',
+                rsl.correctFormat = true;
         }
         rsl.type = Util.toLowerCaseFirstCharacter(supportCellsType[type].replace('Renderer', ''));
 
