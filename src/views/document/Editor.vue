@@ -21,6 +21,7 @@
                     @document-action-save-to-local-storage="saveContentToLocalStorage"
                     @document-action-get-from-local-storage="getFromLocalStorege"
                     @document-action-delete-cache="deleteLocalStorage"
+                    @document-action-check-control="checkBeforeNameChange"
                     
                     />
                 </div>
@@ -79,6 +80,7 @@
         <auto-complete-control ref="autocompleteControl" @add-control="insertControl"/>
         <save-doc-panel ref="saveDocPanel" @save-doc-action="validateControl"/>
         <err-message :listErr="listMessageErr" ref="errMessage"/>
+        <control-name-related :controlCheck="controlCheck" ref="controlNameRelated"/>
         <all-control-option ref="allControlOption"/>
     </v-flex>
 </template>
@@ -92,6 +94,7 @@ import AutoCompleteControl from './items/AutoCompleteControl.vue';
 import controlCss from  "./../../assets/css/document/control/control.css";
 import SaveDocPanel from "./../../views/document/items/SaveDocPanel.vue";
 import ErrMessagePanel from "./../../views/document/items/ErrMessagePanel.vue";
+import ControlNameRelated from "./../../views/document/items/ControlNameRelated.vue";
 import AllControlInDoc from "./../../views/document/items/AllControlInDoc.vue";
 import { GetControlProps,mappingOldVersionControlProps,
         mappingOldVersionControlFormulas,getAPropsControl } from "./../../components/document/controlPropsFactory.js";
@@ -111,6 +114,9 @@ export default {
     computed: {
         editorStore(){  
             return this.$store.state.document.editor;
+        },
+        sDocumentProp(){
+            return this.$store.state.document.documentProps
         }
     }, 
     components: {
@@ -124,6 +130,7 @@ export default {
         'err-message': ErrMessagePanel,
         "vue-resizable":VueResizable,
         "all-control-option":AllControlInDoc,
+        "control-name-related":ControlNameRelated,
     },
     created() {
         this.documentId = this.$route.params.id;
@@ -168,6 +175,7 @@ export default {
             delta : 500,
             lastKeypressTime : 0,
             listIconToolbar:null,
+            controlCheck:"",
             listNameValueControl:{}
         }
     },
@@ -212,6 +220,12 @@ export default {
     methods:{
         px2cm(px) {
             return (Math.round((px / 37.7952) * 100) / 100).toFixed(1);
+        },
+        checkBeforeNameChange(){
+            let currentControl = this.editorStore.currentSelectedControl;
+            this.$refs.controlNameRelated.showDialog();
+            this.controlCheck = currentControl.properties.name.name.value;
+            
         },
         // lấy data từ local storage
         getFromLocalStorege(){
@@ -390,7 +404,11 @@ export default {
                 for (let f in formulas){
                     if(formulas[f].value != ""){
                         let item = {};
-                        item[f] = formulas[f].value;
+                        item[f] = {};
+                        item[f]['formulas'] = formulas[f].value;
+                        item[f]['objectType'] = "field";
+                        item[f]['objectIdentifier'] = control.name;
+                        item[f]['context'] = this.sDocumentProp.name.value
                         listFormulas.push(item);
                     }
                 }
@@ -436,68 +454,66 @@ export default {
             documentProperties = JSON.stringify(documentProperties);
 
             let htmlContent = this.$refs.editor.editor.getContent();
-            if(this.documentId != 0 && this.documentId != undefined && typeof this.documentId != 'undefined'){   //update doc
-                this.editDocument({documentProperty:documentProperties,fields:JSON.stringify(allControl),content:htmlContent,id:this.documentId})
-            }
-            else{
-                this.createDocument({documentProperty:documentProperties,fields:JSON.stringify(allControl),content:htmlContent});
-            }
-
-
-            // let dataPost = this.getDataToSaveMultiFormulas(allControl);
-            // if(Object.keys(dataPost).length > 0){
-            //     let thisCpn = this;
-            //     try {
-            //         let res = await formulasApi.saveMultiFormulas({formulas:JSON.stringify(dataPost)})
-            //         if(res.status == 200){
-            //             let data = res.data;
-            //             for(let controlId in data){
-            //                 for(let i = 0; i < data[controlId].length; i++){
-            //                     let key = Object.keys(data[controlId][i])[0];
-            //                     let controlEl = $("#editor_ifr").contents().find('#'+controlId);
-            //                     let tableId = 0;
-            //                     if(!controlEl.is('.s-control-table') && controlEl.closest(".s-control-table").length > 0){
-            //                         console.log(controlId);
-                                    
-            //                         tableId = controlEl.closest(".s-control-table").attr('id');
-            //                     }
-            //                     thisCpn.$store.commit(
-            //                         "document/updateFormulasId",{id:controlId,name:key,value:data[controlId][i][key],tableId:tableId}
-            //                     );   
-            //                 }
-            //             } 
-            //             let htmlContent = this.$refs.editor.editor.getContent();
-            //             if(this.documentId != 0 && this.documentId != undefined && typeof this.documentId != 'undefined'){   //update doc
-            //                 this.editDocument({documentProperty:documentProperties,fields:JSON.stringify(allControl),content:htmlContent,id:this.documentId})
-            //             } 
-            //             else{
-            //                 this.createDocument({documentProperty:documentProperties,fields:JSON.stringify(allControl),content:htmlContent});
-            //             }
-            //         }
-            //         else{
-            //             this.$snotify({
-            //                     type: "error",
-            //                     title: "error from formulas serice, can't not save into formulas service!!!",
-            //                     text: res.message
-            //                 });
-            //         }
-            //     } catch (error) {
-            //         this.$snotify({
-            //                     type: "error",
-            //                     title: "error from formulas serice, can't not save into formulas service!!!",
-            //                     text: error
-            //                 });
-            //     }
-            // }     
+            // if(this.documentId != 0 && this.documentId != undefined && typeof this.documentId != 'undefined'){   //update doc
+            //     this.editDocument({documentProperty:documentProperties,fields:JSON.stringify(allControl),content:htmlContent,id:this.documentId})
+            // }
             // else{
-            //     let htmlContent = this.$refs.editor.editor.getContent();
-            //     if(this.documentId != 0 && this.documentId != undefined && typeof this.documentId != 'undefined'){   //update doc
-            //         this.editDocument({documentProperty:documentProperties,fields:JSON.stringify(allControl),content:htmlContent,id:this.documentId})
-            //     }
-            //     else{
-            //         this.createDocument({documentProperty:documentProperties,fields:JSON.stringify(allControl),content:htmlContent});
-            //     }
-            // }  
+            //     this.createDocument({documentProperty:documentProperties,fields:JSON.stringify(allControl),content:htmlContent});
+            // }
+
+
+            let dataPost = this.getDataToSaveMultiFormulas(allControl);
+            if(Object.keys(dataPost).length > 0){
+                let thisCpn = this;
+                try {
+                    let res = await formulasApi.saveMultiFormulas({formulas:JSON.stringify(dataPost)})
+                    if(res.status == 200){
+                        let data = res.data;
+                        for(let controlId in data){
+                            for(let i = 0; i < data[controlId].length; i++){
+                                let key = Object.keys(data[controlId][i])[0];
+                                let controlEl = $("#editor_ifr").contents().find('#'+controlId);
+                                let tableId = 0;
+                                if(!controlEl.is('.s-control-table') && controlEl.closest(".s-control-table").length > 0){
+                                    console.log(controlId);
+                                    
+                                    tableId = controlEl.closest(".s-control-table").attr('id');
+                                }
+                                thisCpn.$store.commit(
+                                    "document/updateFormulasId",{id:controlId,name:key,value:data[controlId][i][key],tableId:tableId}
+                                );   
+                            }
+                        } 
+                        if(this.documentId != 0 && this.documentId != undefined && typeof this.documentId != 'undefined'){   //update doc
+                            this.editDocument({documentProperty:documentProperties,fields:JSON.stringify(allControl),content:htmlContent,id:this.documentId})
+                        } 
+                        else{
+                            this.createDocument({documentProperty:documentProperties,fields:JSON.stringify(allControl),content:htmlContent});
+                        }
+                    }
+                    else{
+                        this.$snotify({
+                                type: "error",
+                                title: "error from formulas serice, can't not save into formulas service!!!",
+                                text: res.message
+                            });
+                    }
+                } catch (error) {
+                    this.$snotify({
+                                type: "error",
+                                title: "error from formulas serice, can't not save into formulas service!!!",
+                                text: error
+                            });
+                }
+            }     
+            else{
+                if(this.documentId != 0 && this.documentId != undefined && typeof this.documentId != 'undefined'){   //update doc
+                    this.editDocument({documentProperty:documentProperties,fields:JSON.stringify(allControl),content:htmlContent,id:this.documentId})
+                }
+                else{
+                    this.createDocument({documentProperty:documentProperties,fields:JSON.stringify(allControl),content:htmlContent});
+                }
+            }  
         },
         /**
          * Hàm gọi Api tạo mới ducument
