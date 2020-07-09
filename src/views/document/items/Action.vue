@@ -16,7 +16,13 @@
 </template>
 <script>
 export default {
- 
+    created(){
+        if(this.$route.name == 'editDocument'){
+            let checkControlItem = { text: 'Kiểm tra', icon: 'mdi-cog' ,action:'check-control'};
+            this.items.splice(5,0,checkControlItem);
+        }
+        
+    },
     data(){
         return {
             items: [
@@ -25,7 +31,7 @@ export default {
                 { text: 'Xóa bộ đệm', icon: 'mdi-delete-circle' ,action:'delete-cache'},
                 { text: 'Clone control', icon: 'mdi-content-copy' ,action:'clone-control'},
                 { text: 'Xóa control', icon: 'mdi-delete-forever' ,action:'delete-control'},
-                { text: 'Kiểm tra', icon: 'mdi-cog' ,action:'check-control'},
+               
                 { text: 'TH control', icon: 'mdi-cog' ,action:'list-control-option'},
                 { text: 'Lưu doc', icon: 'mdi-file-document' ,action:'save-document'},
             ],

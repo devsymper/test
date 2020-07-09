@@ -44,5 +44,8 @@ export const documentApi = {
     },
     checkExistDocument(name) {
         return coreApi.post("documents/check/" + name);
+    },
+    getBatchFieldInfoInDoc(data) {
+        return coreApi.post("documents/fields/batch", data);
     }
 };
