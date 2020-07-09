@@ -12,5 +12,8 @@ export const formulasApi = {
     },
     execute(data) {
         return api.post('formulas/get-data', data);
+    },
+    getRelated(data) {
+        return api.post('formulas/query-related', data);
     }
 };

@@ -3,9 +3,10 @@
     class="card-validate"
     v-show="isShow"
     :style="positionBox">
-        <v-card-title>Lỗi</v-card-title>
+        <v-card-title>{{errTitle}}</v-card-title>
         <v-card-text>
-        <span>{{message}}</span>
+            <v-icon>mdi-information-outline</v-icon>
+            <span>{{errMessage}}</span>
 
         </v-card-text>
     </v-card>
@@ -16,13 +17,30 @@ export default {
         keyInstance:{
             type:Number,
             default:0
+        },
+        title:{
+            type:String,
+            default:"Dữ liệu không hợp lệ"
+        },
+        message:{
+            type:String,
+            default:""
+        }
+    },
+    watch:{
+        title(after){
+            this.errTitle = title;
+        },
+        message(after){
+            this.errMessage = after
         }
     },
     data(){
         return {
             isShow:null,
             positionBox:null,
-            message:null,
+            errTitle:this.title,
+            errMessage:this.message,
         }
     },
     created(){
@@ -31,23 +49,16 @@ export default {
     beforeMount(){
         this.isShow = false;
         this.positionBox = {'top':0,'left':0};
-        this.message='Không được bỏ trống trường này';
     },
     methods:{
         show(e){
             this.isShow = true;
             this.calPosition(e);
-            this.message=e.msg
         },
         hide(){
             this.isShow = false;
         },
         calPosition(e){
-            console.log('lk',e);
-            
-            console.log('lk',$(e.parentElement));
-            console.log('lk',$(e.parentElement).closest('.handsontable'));
-            
             if($(e.target).closest('.handsontable').length > 0){
                 let autoEL = $(this.$el).detach();
                 $(e.target).closest('.wrap-table').append(autoEL);
@@ -74,6 +85,19 @@ export default {
         position: absolute;
         z-index: 99999;
         max-width: unset !important;
+        width: max-content;
+    }
+    .card-validate >>> .v-card__title{
+        padding: 12px;
+        font-size: 15px !important;
+    }
+    .card-validate >>> .v-card__text{
+        font-size: 13px !important;
+        padding: 0 8px 8px 8px !important;
+    }
+    .card-validate >>> .mdi-information-outline{
+        font-size: 50px!important;
+        color: red !important;
     }
     
 </style>

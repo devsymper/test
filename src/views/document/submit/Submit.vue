@@ -31,7 +31,7 @@
         </sym-drag-panel>
         <input type="file" :id="'file-upload-alter-'+keyInstance" class="hidden d-none" />
         <user-select :keyInstance="keyInstance" ref="userInput" />
-        <validate :keyInstance="keyInstance" ref="validate" />
+        <validate :keyInstance="keyInstance" :message="messageValidate" ref="validate" />
         <date-picker
             :keyInstance="keyInstance"
             @clickDateCell="selectedDate"
@@ -187,7 +187,9 @@ export default {
             docObjId:null,
             topPositionDragPanel:100,
             leftPositionDragPanel:300,
-            listMessageErr:[]
+            listMessageErr:[],
+            titleValidate:"",
+            messageValidate:"",
         };
     },
     beforeMount() {
@@ -209,7 +211,7 @@ export default {
         });
         $('.sym-form-submit').on('click','.validate-icon',function(e){
             let msg = $(this).attr('title');
-            e.msg = msg;
+            thisCpn.messageValidate = msg;
             thisCpn.$refs.validate.show(e);
 
         })

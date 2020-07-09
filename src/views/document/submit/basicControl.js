@@ -53,7 +53,9 @@ export default class BasicControl extends Control {
         let thisObj = this;
         this.ele.wrap('<span style="position:relative;display:inline-block;">');
         this.ele.attr('key-instance', this.curParentInstance);
-
+        if (!this.checkDetailView()) {
+            this.ele.css({ color: 'blue' })
+        }
         if (this.checkDetailView() &&
             this.controlProperties['isSaveToDB'] != undefined &&
             (this.controlProperties['isSaveToDB'].value != "1" ||

@@ -99,20 +99,20 @@ export default {
     },
     methods:{
         handleInputBlur(inputInfo, name){
-            let dataPost = {syql:inputInfo.value,objectType:'document',fieldId:this.sCurrentDocument.id}
-            formulasApi.saveFormulas(dataPost).then(res => {
-                if (res.status == 200) {
-                    inputInfo.formulasId = res.data.formulaId;  
-                }
-            })
-            .catch(err => {
-                thisCpn.$snotify({
-                        type: "error",
-                        title: "can not save document",
-                    });
-            })
-            .always(() => {
-            });
+            // let dataPost = {syql:inputInfo.value,objectType:'field',objectIdentifier:this.sCurrentDocument.id}
+            // formulasApi.saveFormulas(dataPost).then(res => {
+            //     if (res.status == 200) {
+            //         inputInfo.formulasId = res.data.formulaId;  
+            //     }
+            // })
+            // .catch(err => {
+            //     thisCpn.$snotify({
+            //             type: "error",
+            //             title: "can not save document",
+            //         });
+            // })
+            // .always(() => {
+            // });
             
         },
         handleKeyupInput(name, input, data){
