@@ -63,7 +63,8 @@
         "done": "Done",
         "notDone": "Not done",
         "code": "Code",
-        "apply": "Apply"
+        "apply": "Apply",
+        "manager": "Manager"
     },
     "validate": {
         "required": "Not be empty",
