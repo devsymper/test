@@ -1051,11 +1051,13 @@ export default {
         },
         
         handlerBeforeRunFormulasValue(formulasInstance,controlId,controlName,formulasType){
+            
             let dataInput = this.getDataInputFormulas(formulasInstance);    
             let control = getControlInstanceFromStore(controlName);
             if(control.inTable != false){
-                let tableName = getControlInstanceFromStore(control.inTable);
-                tableName.tableInstance.handlerRunFormulasForControlInTable(formulasType,control,dataInput,formulasInstance);
+                let tableInstance = getControlInstanceFromStore(control.inTable);
+                let dataIn = tableInstance.tableInstance.getDataInputForFormulas(formulasInstance,tableInstance.name)
+                tableInstance.tableInstance.handlerRunFormulasForControlInTable(formulasType,control,dataIn,formulasInstance);
             }
             formulasInstance.handleBeforeRunFormulas(dataInput).then(rs=>{
                 this.handlerAfterRunFormulas(rs,controlId,controlName,formulasType)
@@ -1066,6 +1068,7 @@ export default {
          * dataInput : {controlName : value}
          */
         getDataInputFormulas(formulasInstance){
+           
             let inputControl = formulasInstance.getInputControl();
             let dataInput = {};
             for(let inputControlName in inputControl){
@@ -1152,7 +1155,18 @@ export default {
             let dataTable = []
             data = data.data
             let tableInstance = getControlInstanceFromStore(tableName);
-            tableInstance.tableInstance.tableInstance.loadData(data)
+            console.log('agsd',data);
+            let colData = data.reduce((arr,obj)=>{
+                arr.push(obj.tb1_ma_hang)
+                return arr
+            },[]);
+
+            let vls = [];
+            for (let i = 0; i < colData.length; i++) {
+                vls.push([i, 'tb1_ma_hang', colData[i]]);
+            }
+            tableInstance.tableInstance.tableInstance.setDataAtRowProp(vls, null, null, 'auto_set');
+          
             
         },
 

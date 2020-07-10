@@ -188,7 +188,10 @@ export default class Table {
                 },
 
                 afterChange: function(changes, source) {
-
+                    console.log('ádd', changes);
+                    if (changes == null) {
+                        return
+                    }
                     if (sDocument.state.submit.docStatus == 'init' && sDocument.state.viewType == 'update') {
                         return;
                     }
@@ -408,14 +411,16 @@ export default class Table {
             let dataInput = {};
             for (let inputControlName in inputControl) {
                 let valueInputControlItem = this.getColumnIndexFromControlName(inputControlName);
-                valueInputControlItem = this.tableInstance.getDataAtCol(valueInputControlItem);
-                console.log('ksad', valueInputControlItem);
-
-
-                if (listInputInDocument[tableName].tableInstance.tableHasRowSum) {
-                    valueInputControlItem.pop();
+                if (valueInputControlItem === false) {
+                    dataInput[inputControlName] = listInputInDocument[inputControlName].value
+                } else {
+                    valueInputControlItem = this.tableInstance.getDataAtCol(valueInputControlItem);
+                    if (listInputInDocument[tableName].tableInstance.tableHasRowSum) {
+                        valueInputControlItem.pop();
+                    }
+                    dataInput[inputControlName] = valueInputControlItem;
                 }
-                dataInput[inputControlName] = valueInputControlItem;
+
             }
             return dataInput;
         }
@@ -428,19 +433,30 @@ export default class Table {
     async handlerRunFormulasForControlInTable(formulasType, controlInstance, dataInput, formulasInstance) {
             let thisObj = this;
             let dataColumnAfterRunFOrmulas = [];
+            console.log('sadgf', controlInstance);
+            console.log('sadgf', dataInput);
             if (Object.keys(dataInput).length > 0) {
                 let allRowDataInput = [];
-                console.log('sad', dataInput);
                 for (let control in dataInput) {
                     let dataRow = dataInput[control];
-                    for (let i = 0; i < dataRow.length; i++) {
-                        if (allRowDataInput.length <= i) {
-                            allRowDataInput[i] = {};
+                    if (!Array.isArray(dataRow)) {
+                        for (let index = 0; index < thisObj.tableInstance.countRows(); index++) {
+                            if (allRowDataInput.length <= index) {
+                                allRowDataInput[index] = {};
+                            }
+                            allRowDataInput[index][control] = dataRow;
                         }
-                        allRowDataInput[i][control] = dataRow[i];
+                    } else {
+                        for (let i = 0; i < dataRow.length; i++) {
+                            if (allRowDataInput.length <= i) {
+                                allRowDataInput[i] = {};
+                            }
+                            allRowDataInput[i][control] = dataRow[i];
+                        }
                     }
                 }
-                console.log('sad', allRowDataInput);
+                console.log('ksad', allRowDataInput);
+
                 for (let index = 0; index < allRowDataInput.length; index++) {
                     let rowInput = allRowDataInput[index];
                     await formulasInstance.handleBeforeRunFormulas(rowInput).then(res => {
@@ -486,7 +502,7 @@ export default class Table {
     handlerDataAfterRunFormulas(data, controlInstance, formulasType, dataInput = false) {
         switch (formulasType) {
             case "formulas":
-                // controlInstance.handlerDataAfterRunFormulasValue(data);
+                controlInstance.handlerDataAfterRunFormulasValue(data);
                 break;
             case "link":
                 controlInstance.handlerDataAfterRunFormulasLink(data);
