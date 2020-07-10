@@ -73,29 +73,46 @@ export default {
             // Nối các position root của department con với các leaves của department cha
             let lazyAddLink = [];
             let tmpNode;
+            let connectedNodeIds = {};
+            
+
             for(let dpm of this.allDepartments){
                 if(dpm.vizParentId){
                     let childDpmRoots = rootAndLeavesPosInDpm[dpm.vizId].root;
                     let parentDpmLeaves = rootAndLeavesPosInDpm[dpm.vizParentId].leaves;
 
                     for(let idRoot in childDpmRoots){
-                        let flag = true;
                         for(let idLeave in parentDpmLeaves){
-                           tmpNode = {
-                                    source: allPositions[idLeave],
-                                    target: allPositions[idRoot]
-                                };
-                           if(flag){
+                            tmpNode = {
+                                source: allPositions[idLeave],
+                                target: allPositions[idRoot]
+                            };
+                            if(!connectedNodeIds[idRoot]){
                                 allLinks.push(tmpNode);
-                                flag = false;
-                           }else{
-                               lazyAddLink.push(tmpNode);
-                           }
-                       }
+                                connectedNodeIds[idRoot] = true;
+                            }else{
+                                lazyAddLink.push(tmpNode);
+                            }
+                        }
                     }
+
+                    // for(let idRoot in childDpmRoots){
+                    //     let flag = true;
+                    //     for(let idLeave in parentDpmLeaves){
+                    //         tmpNode = {
+                    //             source: allPositions[idLeave],
+                    //             target: allPositions[idRoot]
+                    //         };
+                    //         if(flag){
+                    //             allLinks.push(tmpNode);
+                    //             flag = false;
+                    //         }else{
+                    //             lazyAddLink.push(tmpNode);
+                    //         }
+                    //     }
+                    // }
                 }
             }
-
 
             // Tạo các đối tượng cho position và link trong jointjs
             let allCells = [];
@@ -119,6 +136,33 @@ export default {
 
             //Dòng dưới chạy nhưng chưa đúng với thiết kế, cần nghĩ ra giải pháp khác để tự vẽ link
             // this.$refs.editorWorkspace.graph.addCells(lazyCells);
+            this.addLazyLink(lazyCells);
+        },
+        addLazyLink(lazyCells){
+            for (let link of lazyCells) {
+                let sAttr = this.getCellSizeAndPosition(link.attributes.source.id);
+                let tAttr = this.getCellSizeAndPosition(link.attributes.target.id);
+                let vertices = [
+                    {
+                        x: sAttr.p.x + sAttr.s.width / 2,
+                        y: tAttr.p.y - 20
+                    },
+                    {
+                        x: tAttr.p.x + tAttr.s.width / 2,
+                        y: tAttr.p.y - 20
+                    },
+                ];
+                link.prop('vertices', vertices);
+            }
+            console.log(lazyCells, 'lazyCellslazyCellslazyCells');
+            this.$refs.editorWorkspace.graph.addCells(lazyCells);
+        },
+        getCellSizeAndPosition(cellId){
+            let cell = this.$refs.editorWorkspace.graph.getCell(cellId);
+            return {
+                s: cell.attributes.size,
+                p: cell.attributes.position
+            }
         },
         filterNodeInListCells(content){
             let rsl = {
