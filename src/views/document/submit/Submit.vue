@@ -1151,14 +1151,9 @@ export default {
         setDataToTable(tableControlId,data){
             let tableName = this.sDocumentEditor.allControl[tableControlId].properties.name.value;
             let dataTable = []
-            for(let i = 0; i < data.length; i++){
-                let row = {};
-                for(let controlName in data[i]){
-                    row[controlName] == data[i][controlName];
-                }
-                dataTable.push(row);
-            }
-            this.sDocumentSubmit.listInputInDocument[tableName].tableInstance.tableInstance.loadData(dataTable)
+            data = data.data
+            // let tableInstance = getControlInstanceFromStore(tableName);
+            // tableInstance.tableInstance.tableInstance.loadData(data)
             
         },
 
@@ -1219,6 +1214,7 @@ export default {
         findRootControl(){ 
             let listInput = this.sDocumentSubmit.listInputInDocument;
             for(let controlName in listInput){
+                // console.log('sad',controlName);
                 this.setAllImpactedFieldsList(controlName);
                 let controlInstance = listInput[controlName];
                 if(controlInstance.type != "inputFilter"){
@@ -1258,6 +1254,7 @@ export default {
             }
             impactedFieldsListWhenStart[fieldName] = false;
         },
+        
         getAllImpactedInput(sourceName) {
             let sourceControlInstance = getControlInstanceFromStore(sourceName)
             var arr = [];

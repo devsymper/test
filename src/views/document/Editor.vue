@@ -1004,15 +1004,14 @@ export default {
                 if(fields[controlId]['formulas'] != false){
                     
                     $.each(formulas,function(k,v){
-                            console.log('sss',fields[controlId]['formulas'][k]);
-
                         if(fields[controlId]['formulas'][k] != ""){
                             formulas[k].value = Object.values(fields[controlId]['formulas'][k])[0]
-                            formulas[k].formulasId = Object.keys(fields[controlId]['formulas'][k])[0]
+                            // formulas[k].formulasId = Object.keys(fields[controlId]['formulas'][k])[0]
                         }
-                        else{
-                            formulas[k].formulasId = 0
-                        }
+                        // else{
+                        //     formulas[k].formulasId = 0
+                        // }
+                        formulas[k].formulasId = 0
                     })
                 }
                 
@@ -1043,12 +1042,9 @@ export default {
                             $.each(childFormulas,function(k,v){
                                 if(listField[childFieldId]['formulas'][k] != ""){
                                     childFormulas[k].value = Object.values(listField[childFieldId]['formulas'][k])[0]
-                                    childFormulas[k].formulasId = Object.keys(listField[childFieldId]['formulas'][k])[0]
+                                    // childFormulas[k].formulasId = Object.keys(listField[childFieldId]['formulas'][k])[0]
                                 }
-                                else{
-                                    childFormulas[k].formulasId = 0
-                                }
-                                
+                                childFormulas[k].formulasId = 0
                             })
                         }
                         listChildField[childFieldId] = {properties: childProperties, formulas : childFormulas,type:childType}
@@ -1056,6 +1052,7 @@ export default {
                     this.addToAllControlInDoc(controlId,{properties: properties, formulas : formulas,type:fields[controlId].type,listFields:listChildField});
                 }
             }
+            console.log(this.editorStore);
         },
 
         // sự kiện xảy ra khi khởi tạo xong editor , sự kiện do tinymce cung cấp
