@@ -80,7 +80,7 @@
         <auto-complete-control ref="autocompleteControl" @add-control="insertControl"/>
         <save-doc-panel ref="saveDocPanel" @save-doc-action="validateControl"/>
         <err-message :listErr="listMessageErr" ref="errMessage"/>
-        <control-name-related :controlCheck="controlCheck" ref="controlNameRelated"/>
+        <control-name-related  ref="controlNameRelated"/>
         <all-control-option ref="allControlOption"/>
     </v-flex>
 </template>
@@ -175,7 +175,6 @@ export default {
             delta : 500,
             lastKeypressTime : 0,
             listIconToolbar:null,
-            controlCheck:"",
             listNameValueControl:{}
         }
     },
@@ -223,8 +222,16 @@ export default {
         },
         checkBeforeNameChange(){
             let currentControl = this.editorStore.currentSelectedControl;
-            this.$refs.controlNameRelated.showDialog();
-            this.controlCheck = currentControl.properties.name.name.value;
+            if(currentControl.properties.name.hasOwnProperty('name')){
+                this.$refs.controlNameRelated.getDataRelated(currentControl.properties.name.name.oldName,currentControl.properties.name.name.value);
+                this.$refs.controlNameRelated.showDialog();
+            }
+            else{
+                 this.$snotify({
+                                type: "info",
+                                title: "Vui lòng chọn control trước khi sử dụng tính năng này"
+                            }); 
+            }
             
         },
         // lấy data từ local storage
@@ -401,13 +408,15 @@ export default {
                     let listFormulasControlInTable = this.getDataToSaveMultiFormulas(listField);
                     listControlFormulas = {...listFormulasControlInTable,...listControlFormulas}
                 }
+                console.log('sa',control);
+                
                 for (let f in formulas){
                     if(formulas[f].value != ""){
                         let item = {};
                         item[f] = {};
                         item[f]['formulas'] = formulas[f].value;
                         item[f]['objectType'] = "field";
-                        item[f]['objectIdentifier'] = control.name;
+                        item[f]['objectIdentifier'] = control.properties.name.value;
                         item[f]['context'] = this.sDocumentProp.name.value
                         listFormulas.push(item);
                     }
@@ -988,19 +997,21 @@ export default {
                     else{
                         properties[k].value = fields[controlId]['properties'][k]
                     }
+                    if(k =='name'){
+                        properties[k].oldName =  properties[k].value
+                    }
                 }) 
                 if(fields[controlId]['formulas'] != false){
                     
                     $.each(formulas,function(k,v){
-                            console.log('sss',fields[controlId]['formulas'][k]);
-
                         if(fields[controlId]['formulas'][k] != ""){
                             formulas[k].value = Object.values(fields[controlId]['formulas'][k])[0]
-                            formulas[k].formulasId = Object.keys(fields[controlId]['formulas'][k])[0]
+                            // formulas[k].formulasId = Object.keys(fields[controlId]['formulas'][k])[0]
                         }
-                        else{
-                            formulas[k].formulasId = 0
-                        }
+                        // else{
+                        //     formulas[k].formulasId = 0
+                        // }
+                        formulas[k].formulasId = 0
                     })
                 }
                 
@@ -1023,17 +1034,17 @@ export default {
                             else{
                                 childProperties[k].value = listField[childFieldId]['properties'][k]
                             }
+                            if(k =='name'){
+                                childProperties[k].oldName =  childProperties[k].value
+                            }
                         })
                         if(listField[childFieldId]['formulas'] != false){
                             $.each(childFormulas,function(k,v){
                                 if(listField[childFieldId]['formulas'][k] != ""){
                                     childFormulas[k].value = Object.values(listField[childFieldId]['formulas'][k])[0]
-                                    childFormulas[k].formulasId = Object.keys(listField[childFieldId]['formulas'][k])[0]
+                                    // childFormulas[k].formulasId = Object.keys(listField[childFieldId]['formulas'][k])[0]
                                 }
-                                else{
-                                    childFormulas[k].formulasId = 0
-                                }
-                                
+                                childFormulas[k].formulasId = 0
                             })
                         }
                         listChildField[childFieldId] = {properties: childProperties, formulas : childFormulas,type:childType}
@@ -1041,6 +1052,7 @@ export default {
                     this.addToAllControlInDoc(controlId,{properties: properties, formulas : formulas,type:fields[controlId].type,listFields:listChildField});
                 }
             }
+            console.log(this.editorStore);
         },
 
         // sự kiện xảy ra khi khởi tạo xong editor , sự kiện do tinymce cung cấp
