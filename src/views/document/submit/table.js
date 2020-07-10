@@ -369,7 +369,7 @@ export default class Table {
                     if (allFormulas.hasOwnProperty(formulasType)) {
                         if (allFormulas[formulasType].hasOwnProperty('instance')) {
                             let formulasInstance = allFormulas[formulasType].instance;
-                            let dataInput = this.getDataInputForFormulas(formulasInstancecontrolEffectedInstance.inTable);
+                            let dataInput = this.getDataInputForFormulas(formulasInstance, controlEffectedInstance.inTable);
                             if (controlEffectedInstance.hasOwnProperty('inTable')) {
                                 if (controlEffectedInstance.inTable == this.tableName) {
                                     this.handlerRunFormulasForControlInTable(formulasType, controlEffectedInstance, dataInput, formulasInstance);
@@ -426,12 +426,11 @@ export default class Table {
          * @param {*} formulasInstance  Object cua formulas giá trị của control bị ảnh hưởng
          */
     async handlerRunFormulasForControlInTable(formulasType, controlInstance, dataInput, formulasInstance) {
-            console.log('ksad', dataInput);
-
             let thisObj = this;
             let dataColumnAfterRunFOrmulas = [];
             if (Object.keys(dataInput).length > 0) {
                 let allRowDataInput = [];
+                console.log('sad', dataInput);
                 for (let control in dataInput) {
                     let dataRow = dataInput[control];
                     for (let i = 0; i < dataRow.length; i++) {
@@ -441,6 +440,7 @@ export default class Table {
                         allRowDataInput[i][control] = dataRow[i];
                     }
                 }
+                console.log('sad', allRowDataInput);
                 for (let index = 0; index < allRowDataInput.length; index++) {
                     let rowInput = allRowDataInput[index];
                     await formulasInstance.handleBeforeRunFormulas(rowInput).then(res => {
@@ -486,7 +486,7 @@ export default class Table {
     handlerDataAfterRunFormulas(data, controlInstance, formulasType, dataInput = false) {
         switch (formulasType) {
             case "formulas":
-                controlInstance.handlerDataAfterRunFormulasValue(data);
+                // controlInstance.handlerDataAfterRunFormulasValue(data);
                 break;
             case "link":
                 controlInstance.handlerDataAfterRunFormulasLink(data);

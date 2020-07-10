@@ -138,31 +138,38 @@ export default {
             documentApi.getBatchFieldInfoInDoc({listObject:JSON.stringify(listDocName)}).then(res=>{
                 if(res.status == 200){
                     let dataRes = res.data;
-                    for (let index = 0; index < data.length; index++) {
-                        const element = data[index];
-                        let curObj = dataRes.filter(c=>{
-                            return c.documentname == element.context && c.fieldname == element.object_identifier;
-                        })
+                    thisCpn.setDataTable(data,dataRes);
                     
-                        if(curObj.length> 0){
-                            Object.assign(data[index],curObj[0])
-                        }
-                        let icon = (thisCpn.mapIcon[data[index].object_type] != undefined) ? thisCpn.mapIcon[data[index].object_type] : "mdi-cog-outline"
-                        let item = {icon:icon,position:{fieldName:data[index].fieldname,fieldTitle:data[index].fieldtitle},
-                            source:{documentTitle:data[index].documenttitle,documentName:data[index].documentname, link: window.location.origin+"#/document/editor/"+ data[index].id},
-                            formulas:data[index].last_content
-                        }
-                        let itemFormulas = {}
-                        let id = data[index].id;
-                        itemFormulas[id] = data[index].last_content
-                        thisCpn.listFormulas.push(itemFormulas);
-                        thisCpn.dataTable.push(item);
-                    }
-                    
+                }
+                else{
+                    thisCpn.setDataTable(data);
                 }
                 
             }).always({}).catch({});
             
+        },
+        setDataTable(data,dataRes=[]){
+             for (let index = 0; index < data.length; index++) {
+                const element = data[index];
+                let curObj = dataRes.filter(c=>{
+                    return c.documentname == element.context && c.fieldname == element.object_identifier;
+                })
+            
+                if(curObj.length> 0){
+                    Object.assign(data[index],curObj[0])
+                }
+                let icon = (this.mapIcon[data[index].object_type] != undefined) ? this.mapIcon[data[index].object_type] : "mdi-cog-outline"
+                let item = {icon:icon,position:{fieldName:data[index].fieldname,fieldTitle:data[index].fieldtitle},
+                    source:{documentTitle:data[index].documenttitle,documentName:data[index].documentname, link: window.location.origin+"#/document/editor/"+ data[index].id},
+                    formulas:data[index].last_content
+                }
+                let itemFormulas = {}
+                let id = data[index].id;
+                itemFormulas[id] = data[index].last_content
+                this.listFormulas.push(itemFormulas);
+                this.dataTable.push(item);
+            }
+            console.log(this.dataTable);
         },
         checkUpdateFormulas(){
             console.log(this.listFormulas);

@@ -410,21 +410,21 @@ export default {
             let controlAs = {};
             controlAs[aliasControl] = controlTitle;
             if(res.data != undefined){
-                    if(res.status == 200 && res.data != false){
-                        let dataTable = this.handleDataAutoComplete(res.data.data,false,controlAs);
-                        this.$refs.autocompleteInput.setAliasControl(aliasControl);
-                        this.$refs.autocompleteInput.setData(dataTable);
-                    }
-                    else{
-                        this.$refs.autocompleteInput.setData([]);
-                    }
-                }
-                else{
-                    let data =  res[0];
-                    let dataTable = this.handleDataAutoComplete(data,true,controlAs);
+                if(res.status == 200 && res.data != false){
+                    let dataTable = this.handleDataAutoComplete(res.data.data,false,controlAs);
                     this.$refs.autocompleteInput.setAliasControl(aliasControl);
                     this.$refs.autocompleteInput.setData(dataTable);
                 }
+                else{
+                    this.$refs.autocompleteInput.setData([]);
+                }
+            }
+            else{
+                let data =  res[0];
+                let dataTable = this.handleDataAutoComplete(data,true,controlAs);
+                this.$refs.autocompleteInput.setAliasControl(aliasControl);
+                this.$refs.autocompleteInput.setData(dataTable);
+            }
         },
         /**
          * Hàm bind dữ liệu cho control, và control trong bảng khi chọn apply trên timepicker
@@ -1051,7 +1051,6 @@ export default {
         },
         
         handlerBeforeRunFormulasValue(formulasInstance,controlId,controlName,formulasType){
-            
             let dataInput = this.getDataInputFormulas(formulasInstance);    
             let control = getControlInstanceFromStore(controlName);
             if(control.inTable != false){
@@ -1152,8 +1151,8 @@ export default {
             let tableName = this.sDocumentEditor.allControl[tableControlId].properties.name.value;
             let dataTable = []
             data = data.data
-            // let tableInstance = getControlInstanceFromStore(tableName);
-            // tableInstance.tableInstance.tableInstance.loadData(data)
+            let tableInstance = getControlInstanceFromStore(tableName);
+            tableInstance.tableInstance.tableInstance.loadData(data)
             
         },
 
