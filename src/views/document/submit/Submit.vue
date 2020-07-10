@@ -1051,11 +1051,13 @@ export default {
         },
         
         handlerBeforeRunFormulasValue(formulasInstance,controlId,controlName,formulasType){
+            
             let dataInput = this.getDataInputFormulas(formulasInstance);    
             let control = getControlInstanceFromStore(controlName);
             if(control.inTable != false){
-                let tableName = getControlInstanceFromStore(control.inTable);
-                tableName.tableInstance.handlerRunFormulasForControlInTable(formulasType,control,dataInput,formulasInstance);
+                let tableInstance = getControlInstanceFromStore(control.inTable);
+                let dataIn = tableInstance.tableInstance.getDataInputForFormulas(formulasInstance,tableInstance.name)
+                tableInstance.tableInstance.handlerRunFormulasForControlInTable(formulasType,control,dataIn,formulasInstance);
             }
             formulasInstance.handleBeforeRunFormulas(dataInput).then(rs=>{
                 this.handlerAfterRunFormulas(rs,controlId,controlName,formulasType)
@@ -1066,6 +1068,7 @@ export default {
          * dataInput : {controlName : value}
          */
         getDataInputFormulas(formulasInstance){
+           
             let inputControl = formulasInstance.getInputControl();
             let dataInput = {};
             for(let inputControlName in inputControl){
@@ -1152,8 +1155,22 @@ export default {
             let dataTable = []
             data = data.data
             let tableInstance = getControlInstanceFromStore(tableName);
-            tableInstance.tableInstance.tableInstance.loadData(data)
-            
+            if(data.length == 0){
+                return;
+            }
+            let allColumnBindData = Object.keys(data[0]);
+            for (let index = 0; index < allColumnBindData.length; index++) {
+                const controlName = allColumnBindData[index];
+                let colData = data.reduce((arr,obj)=>{
+                    arr.push(obj[controlName])
+                    return arr
+                },[]);
+                let vls = [];
+                for (let i = 0; i < colData.length; i++) {
+                    vls.push([i, controlName, colData[i]]);
+                }
+                tableInstance.tableInstance.tableInstance.setDataAtRowProp(vls, null, null, 'auto_set');
+            }
         },
 
         /**
