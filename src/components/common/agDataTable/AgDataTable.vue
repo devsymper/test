@@ -32,26 +32,31 @@ import Vue from "vue";
 
 export default {
     props:{
+        // Danh sách tất cả các column theo định dạng của ag grid
         allColumns:{
             type:Array,
             default: function () { return [] }
         },
+        
+        // Data để đổ vào table: dựa theo định dạng của ag grid
         rowData:{
             type:Array,
             default: function () { return [] }
         },
-        fitColumns:{
-            type:Boolean,
-            default:true
-        },
+        
+        // Có cho phép edit dữ liệu của table hay không
         editable: {
             default: true
         },
+
+        // Đăng ký các component phục vụ việc custom render cell trong table
         customComponents: {
             default(){
                 return {}
             }
         },
+
+        // tìm keyword trong https://www.ag-grid.com/javascript-grid-provided-renderer-group/ để biết thêm thông tin chi tiết
         cellRendererParams: {
             default(){
                 return {}
