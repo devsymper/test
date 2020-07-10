@@ -1155,19 +1155,22 @@ export default {
             let dataTable = []
             data = data.data
             let tableInstance = getControlInstanceFromStore(tableName);
-            console.log('agsd',data);
-            let colData = data.reduce((arr,obj)=>{
-                arr.push(obj.tb1_ma_hang)
-                return arr
-            },[]);
-
-            let vls = [];
-            for (let i = 0; i < colData.length; i++) {
-                vls.push([i, 'tb1_ma_hang', colData[i]]);
+            if(data.length == 0){
+                return;
             }
-            tableInstance.tableInstance.tableInstance.setDataAtRowProp(vls, null, null, 'auto_set');
-          
-            
+            let allColumnBindData = Object.keys(data[0]);
+            for (let index = 0; index < allColumnBindData.length; index++) {
+                const controlName = allColumnBindData[index];
+                let colData = data.reduce((arr,obj)=>{
+                    arr.push(obj[controlName])
+                    return arr
+                },[]);
+                let vls = [];
+                for (let i = 0; i < colData.length; i++) {
+                    vls.push([i, controlName, colData[i]]);
+                }
+                tableInstance.tableInstance.tableInstance.setDataAtRowProp(vls, null, null, 'auto_set');
+            }
         },
 
         /**
