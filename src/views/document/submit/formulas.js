@@ -148,6 +148,7 @@ export default class Formulas {
                 where += element + " ILIKE '%" + search + "%' OR";
             }
         }
+        let formulas = this.replaceParamsToData(dataInput, this.formulas);
         if (listSyql != null && listSyql.length > 0) {
             let syql = listSyql[0].trim();
             syql = syql.replace('ref(', '');
@@ -165,7 +166,6 @@ export default class Formulas {
 
             return this.runSyql(sql);
         } else {
-            let formulas = this.replaceParamsToData(dataInput, this.formulas);
 
             return this.runSQLLiteFormulas(formulas, true);
         }

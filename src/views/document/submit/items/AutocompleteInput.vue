@@ -10,6 +10,7 @@
         fixed-header
         hide-default-footer
         dense
+        no-data-text="Không có dữ liệu"
         calculate-widths
         
         >

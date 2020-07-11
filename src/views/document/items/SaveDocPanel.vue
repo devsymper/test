@@ -3,6 +3,7 @@
     <v-dialog
         v-model="isShowModelSaveDoc"
         width="800"
+        content-class="s-dialog"
         >
         <v-card
         height="575"
@@ -213,5 +214,11 @@ export default {
     }
     .action{
         height: 41px;
+    }
+   
+</style>
+<style>
+    .s-dialog{
+        overflow: hidden;
     }
 </style>
