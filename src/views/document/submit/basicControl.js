@@ -436,7 +436,14 @@ export default class BasicControl extends Control {
         })
         this.ele.on('keyup', function(e) {
             let formulasInstance = (fromSelect) ? thisObj.controlFormulas.formulas.instance : thisObj.controlFormulas.autocomplete.instance;
-            SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-key-event', { e: e, autocompleteFormulasInstance: formulasInstance, isSelect: false, controlTitle: thisObj.title })
+            SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-key-event', {
+                e: e,
+                autocompleteFormulasInstance: formulasInstance,
+                isSelect: false,
+                controlTitle: thisObj.title,
+                controlName: thisObj.controlProperties.name.value,
+                val: $(e.target).val()
+            })
         })
     }
 

@@ -170,8 +170,6 @@ export default class Formulas {
             } else {
                 sql = syql;
             }
-
-
             return this.runSyql(sql);
         } else {
             let formulas = this.replaceParamsToData(dataInput, this.formulas);

@@ -318,6 +318,11 @@ export default {
         this.$evtBus.$on("document-submit-autocomplete-key-event", e => {
             if(e.e.keyCode != 38 && e.e.keyCode != 40 && e.e.keyCode != 13){
                 if(e.isSelect == false){
+                    thisCpn.updateListInputInDocument(
+                        e.controlName,
+                        "value",
+                        e.val
+                    );
                     thisCpn.getDataForAutocomplete(e,'autocomplete');
                 }
             }
@@ -413,7 +418,11 @@ export default {
             controlAs[aliasControl] = controlTitle;
             if(res.data != undefined){
                 if(res.status == 200 && res.data != false){
-                    let dataTable = this.handleDataAutoComplete(res.data.data,false,controlAs);
+                     let dataTable = []
+                    if(res.data.data !== ""){
+                    dataTable = this.handleDataAutoComplete(res.data.data,false,controlAs);
+                    }
+                    console.log('dataInput',dataTable);
                     this.$refs.autocompleteInput.setAliasControl(aliasControl);
                     this.$refs.autocompleteInput.setData(dataTable);
                 }
