@@ -812,7 +812,6 @@ export default class Table {
     }
     checkUniqueTable(controlName) {
         let controlInstance = listInputInDocument[controlName];
-        console.log(controlInstance.controlProperties.isTableOnly);
         if (controlInstance.controlProperties.isTableOnly.value === false) {
             return;
         } else {
