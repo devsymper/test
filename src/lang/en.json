@@ -64,7 +64,8 @@
         "notDone": "Not done",
         "code": "Code",
         "apply": "Apply",
-        "manager": "Manager"
+        "manager": "Manager",
+        "userRoleSetting": "User role setting"
     },
     "validate": {
         "required": "Not be empty",
@@ -523,6 +524,11 @@
             "applyForChild": "Apply for childs",
             "singleApply": "Apply for this node",
             "saveNodeConfigTitle": "Save node style config template"
+        }
+    },
+    "systemRole": {
+        "list": {
+            "title": "List system user roles"
         }
     }
 }

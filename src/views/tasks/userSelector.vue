@@ -26,7 +26,7 @@
                 @click:close="remove(data.item)"
             > 
                 <v-avatar left v-if="compactChip">
-                    <v-img :src="data.item.avatar ? data.item.avatar : 'https://cdn.vuetifyjs.com/images/lists/4.jpg'"></v-img>
+                    <v-img  sizes="20" :src="data.item.avatar ? data.item.avatar : avatarDefault"></v-img>
                 </v-avatar>
                 <span class="fs-11">{{ data.item.displayName }}</span>
             </v-chip>
@@ -34,7 +34,7 @@
         <template v-slot:item="data">
             <template>
                 <v-list-item-avatar size="30" class="mt-1 mb-1">
-                    <v-img :src="data.item.avatar ? data.item.avatar : 'https://cdn.vuetifyjs.com/images/lists/4.jpg'"></v-img>
+                    <v-img sizes="20" :src="data.item.avatar ? data.item.avatar : avatarDefault"></v-img>
                 </v-list-item-avatar>
                 <v-list-item-content class="pt-0 pb-0">
                     <v-list-item-title v-html="data.item.displayName"></v-list-item-title>
@@ -49,6 +49,8 @@
 </template>
 
 <script>
+import avatarDefault from "@/assets/image/avatar_default.jpg";
+
 export default {
     name: "userSelector",
     props: {
@@ -110,6 +112,7 @@ export default {
             5: 'https://cdn.vuetifyjs.com/images/lists/5.jpg',
         }
         return {
+            avatarDefault: avatarDefault,
             autoUpdate: true,
             isUpdating: false,
             selected: [],

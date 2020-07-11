@@ -304,6 +304,15 @@ const routes = [{
         component: () =>
             import ('../views/orgchart/ViewOrgchart.vue'),
     },
+
+
+    // user role setting
+    {
+        path: "/user-role-settings",
+        name: "ListUserRole",
+        component: () =>
+            import ('../views/userRole/ListSystemRole.vue'),
+    },
 ];
 
 routes.concat([{
