@@ -396,7 +396,9 @@ export default {
             }
             else{
                 let aliasControl = e.autocompleteFormulasInstance.autocompleteDetectAliasControl();
-                let dataInput = this.getDataInputFormulas(e.autocompleteFormulasInstance);  
+                console.log('lkjhj',aliasControl);
+                let dataInput = this.getDataInputFormulas(e.autocompleteFormulasInstance);
+                console.log('lkjhj',dataInput);  
                 let dataAutocomplete = e.autocompleteFormulasInstance.handleRunAutoCompleteFormulas($(e.e.target).val(),dataInput).then(res=>{
                     thisCpn.setDataForControlAutocomplete(res,aliasControl,e.controlTitle)
                 });

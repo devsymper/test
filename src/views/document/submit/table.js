@@ -433,8 +433,6 @@ export default class Table {
     async handlerRunFormulasForControlInTable(formulasType, controlInstance, dataInput, formulasInstance) {
             let thisObj = this;
             let dataColumnAfterRunFOrmulas = [];
-            console.log('sadgf', controlInstance);
-            console.log('sadgf', dataInput);
             if (Object.keys(dataInput).length > 0) {
                 let allRowDataInput = [];
                 for (let control in dataInput) {
@@ -455,8 +453,6 @@ export default class Table {
                         }
                     }
                 }
-                console.log('ksad', allRowDataInput);
-
                 for (let index = 0; index < allRowDataInput.length; index++) {
                     let rowInput = allRowDataInput[index];
                     await formulasInstance.handleBeforeRunFormulas(rowInput).then(res => {
@@ -815,24 +811,30 @@ export default class Table {
 
     }
     checkUniqueTable(controlName) {
-        let controlTitle = (listInputInDocument[controlName].title == "") ? listInputInDocument[controlName].name : listInputInDocument[controlName].title;
-        let tableName = listInputInDocument[controlName].inTable;
-        let tableTitle = (listInputInDocument[tableName].title == "") ? listInputInDocument[tableName].name : listInputInDocument[tableName].title;
-        let indexColumn = this.getColumnIndexFromControlName(controlName);
-        let dataCol = this.tableInstance.getDataAtCol(indexColumn);
-        let uniqueData = {}
-        for (let index = 0; index < dataCol.length - 1; index++) {
-            let row = dataCol[index];
-            if (row == "" || row == null) {
-                continue;
+        let controlInstance = listInputInDocument[controlName];
+        console.log(controlInstance.controlProperties.isTableOnly);
+        if (controlInstance.controlProperties.isTableOnly.value === false) {
+            return;
+        } else {
+            let controlTitle = (listInputInDocument[controlName].title == "") ? listInputInDocument[controlName].name : listInputInDocument[controlName].title;
+            let tableName = listInputInDocument[controlName].inTable;
+            let tableTitle = (listInputInDocument[tableName].title == "") ? listInputInDocument[tableName].name : listInputInDocument[tableName].title;
+            let indexColumn = this.getColumnIndexFromControlName(controlName);
+            let dataCol = this.tableInstance.getDataAtCol(indexColumn);
+            let uniqueData = {}
+            for (let index = 0; index < dataCol.length - 1; index++) {
+                let row = dataCol[index];
+                if (row == "" || row == null) {
+                    continue;
+                }
+                if (uniqueData.hasOwnProperty(row)) {
+                    this.validateValueMap[index + "_" + indexColumn] = { vld: true, msg: 'Trùng dữ liệu cột ' + controlTitle + " trong table " + tableTitle }
+                } else {
+                    uniqueData[row] = true;
+                    this.validateValueMap[index + "_" + indexColumn] = { vld: false, msg: 'Trùng dữ liệu cột ' + controlTitle + " trong table " + tableTitle }
+                }
             }
-            if (uniqueData.hasOwnProperty(row)) {
-                this.validateValueMap[index + "_" + indexColumn] = { vld: true, msg: 'Trùng dữ liệu cột ' + controlTitle + " trong table " + tableTitle }
-            } else {
-                uniqueData[row] = true;
-                this.validateValueMap[index + "_" + indexColumn] = { vld: false, msg: 'Trùng dữ liệu cột ' + controlTitle + " trong table " + tableTitle }
-            }
+            this.tableInstance.render()
         }
-        this.tableInstance.render()
     }
 }

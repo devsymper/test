@@ -57,27 +57,27 @@ export default class BasicControl extends Control {
             this.ele.css({ color: 'blue' })
         }
         if (this.checkDetailView() &&
-            this.controlProperties['isSaveToDB'] != undefined &&
-            (this.controlProperties['isSaveToDB'].value != "1" ||
-                this.controlProperties['isSaveToDB'].value != 1)) {
+            this.controlProperties['isSaveToDB'] !== undefined &&
+            (this.controlProperties['isSaveToDB'].value !== "1" ||
+                this.controlProperties['isSaveToDB'].value !== 1)) {
             this.ele.css({ display: 'none' })
         }
-        if (!this.checkDetailView() && this.value == "" &&
-            this.controlProperties['isRequired'] != undefined &&
-            (this.controlProperties['isRequired'].value == "1" ||
-                this.controlProperties['isRequired'].value == 1)) {
+        if (!this.checkDetailView() && this.value === "" &&
+            this.controlProperties['isRequired'] !== undefined &&
+            (this.controlProperties['isRequired'].value === "1" ||
+                this.controlProperties['isRequired'].value === 1)) {
             this.renderValidateIcon("Không được bỏ trống trường thông tin " + this.title);
         }
         if (!this.checkDetailView() &&
             this.controlProperties['isReadOnly'] != undefined &&
-            (this.controlProperties['isReadOnly'].value == "1" ||
-                this.controlProperties['isReadOnly'].value == 1)) {
+            (this.controlProperties['isReadOnly'].value === "1" ||
+                this.controlProperties['isReadOnly'].value === 1)) {
             this.ele.attr('disabled', 'disabled')
         }
 
         if (this.controlProperties['isHidden'] != undefined &&
-            (this.controlProperties['isHidden'].value == "1" ||
-                this.controlProperties['isHidden'].value == 1)) {
+            (this.controlProperties['isHidden'].value === "1" ||
+                this.controlProperties['isHidden'].value === 1)) {
             this.ele.css({ 'display': 'none' })
         }
 
