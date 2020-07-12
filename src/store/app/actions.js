@@ -1,6 +1,9 @@
 import { SYMPER_APP } from "./../../main.js";
 import { orgchartApi } from "./../../api/orgchart";
 import { userApi } from "../../api/user.js";
+import { userRoleApi } from "../../api/userRole.js";
+import { systemRoleApi } from "../../api/systemRole.js";
+import { util } from "../../plugins/util.js";
 
 const handleUrlChanges = (context, data) => {
     console.log(context, data, 'xxx');
@@ -104,4 +107,77 @@ const getAllUsers = async(context) => {
         }
     }
 }
-export { getAllOrgChartData, getAllUsers };
+
+
+function getRolesByType(userInfo, type, apiObj, context) {
+    apiObj.getRolesByUser(userInfo).then((res) => {
+        if (res.status == 200) {
+            if (res.data[0]) {
+                context.commit('setUserRoleByType', {
+                    type: type,
+                    data: res.data[0].roles
+                });
+            }
+        } else {
+            self.$snotifyError(res, "Can not get user role in orgchart");
+        }
+    }).catch((err) => {
+        self.$snotifyError(err, "Can not get user role in orgchart");
+    });
+}
+
+const getAllRoles = async function(context, userId) {
+    let roles = {
+        orchart: [],
+        systemRole: []
+    };
+    getRolesByType([{
+        idUser: userId
+    }], 'orgchart', orgchartApi, context);
+
+    getRolesByType([userId], 'systemRole', systemRoleApi, context);
+}
+
+async function checkAndRefreshCurrentRole(data, context) {
+    // Nếu chưa load thông tin của role hiện tại lên thì lấy thông tin về để hiển thị
+    if (data.profile.userDelegate &&
+        data.profile.userDelegate.role &&
+        data.profile.userDelegate.role != context.state.endUserInfo.currentRole.id) {
+
+        let res = await userRoleApi.getRoleData(data.profile.userDelegate.role);
+        if (res.status == 200) {
+            context.commit("changeCurrentUserInfo", {
+                currentRole: res.data
+            });
+        } else {
+            SYMPER_APP.$snotifyError(res, "Can not get role detail");
+        }
+    }
+}
+
+const setUserInfo = (context, data) => {
+    let accData = {
+        accType: data.profile.type,
+        info: data.profile
+    };
+    let endUserInfo = data.profile;
+    let accInfo = {
+        token: data.token,
+        baId: 0,
+        endUserId: 0,
+        profile: data.profile
+    }
+
+    if (data.profile.type == 'ba') {
+        accInfo.baId = data.profile.id;
+        context.commit("changeCurrentBAInfo", data.profile);
+        endUserInfo = endUserInfo.userDelegate;
+        accInfo.endUserId = data.profile.userDelegate.id;
+    } else {
+        accInfo.endUserId = data.profile.id;
+    }
+    context.commit("changeCurrentUserInfo", endUserInfo);
+    util.auth.saveLoginInfo(accInfo);
+    checkAndRefreshCurrentRole(data, context);
+}
+export { getAllOrgChartData, getAllUsers, getAllRoles, setUserInfo };

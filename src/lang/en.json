@@ -527,8 +527,12 @@
         }
     },
     "systemRole": {
+        "name": "System roles",
         "list": {
             "title": "List system user roles"
         }
+    },
+    "userRole": {
+        "userHasNoRole": "You have no role to select"
     }
 }

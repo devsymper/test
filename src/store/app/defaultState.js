@@ -11,15 +11,12 @@ const defaultState = {
         currentRole: {
             // Vai trò hiện tại của enduser đang đóng
             id: 0,
-            title: "Trưởng phòng nhân sự",
+            name: "Trưởng phòng nhân sự",
         },
-        roles: [
-            // các vai trò của enduser có thể có
-            {
-                id: 0,
-                title: "Trưởng phòng nhân sự",
-            },
-        ],
+        roles: { // các vai trò mà user có thể có trong orgchart hoặc system role
+            orgchart: [],
+            systemRole: []
+        },
     },
     collapseSideBar: true, // trạng thái của sidebar: true là đang nhỏ, false là đang mở rộng
     unreadNotification: 2, // số lượng các thông báo chưa đọc

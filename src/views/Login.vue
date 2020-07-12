@@ -62,7 +62,7 @@ export default {
                     .login(this.email, this.password)
                     .then(res => {
                         if (res.status == 200) {
-                            thisCpn.setUserInfo(res.data);
+                            this.$store.dispatch('app/setUserInfo', res.data);
                             thisCpn.$router.push('/');
                         } else {
                             alert("Tài khoản hoặc mật khẩu không đúng!");
@@ -77,31 +77,6 @@ export default {
             } else {
                 console.log("Login info is not valide!!!!");
             }
-        },
-
-        setUserInfo(data) {// đang trùng với hàm cùng tên ở component BAsidebar.vue
-            let accData = {
-                accType: data.profile.type,
-                info: data.profile
-            };
-            let endUserInfo = data.profile;
-            let accInfo = {
-                token: data.token,
-                baId: 0,
-                endUserId: 0,
-                profile:data.profile
-            }
-
-            if(data.profile.type == 'ba'){
-                accInfo.baId = data.profile.id;
-                this.$store.commit("app/changeCurrentBAInfo", data.profile);
-                endUserInfo = endUserInfo.userDelegate;
-                accInfo.endUserId = data.profile.userDelegate.id;
-            }else{
-                accInfo.endUserId = data.profile.id;
-            }
-            this.$store.commit("app/changeCurrentUserInfo", endUserInfo);
-            util.auth.saveLoginInfo(accInfo);
         }
     },
     data() {

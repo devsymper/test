@@ -541,8 +541,12 @@
         }
     },
     "systemRole": {
+        "name": "Hệ thống",
         "list": {
             "title": "Danh sách vai trò người dùng hệ thống"
         }
+    },
+    "userRole": {
+        "userHasNoRole": "Bạn chưa được phân vai trò trong hệ thống"
     }
 }

@@ -1,5 +1,6 @@
 import Api from "./api";
 import { appConfigs } from "./../configs.js";
+import { util } from "../plugins/util";
 
 var moduleApi = new Api(appConfigs.apiDomain.systemRole);
 export const systemRoleApi = {
@@ -17,5 +18,11 @@ export const systemRoleApi = {
             ids = ids.join(',');
         }
         return moduleApi.delete('system-role/' + ids);
+    },
+    getRolesByUser(idUsers = false) {
+        let queryParam = {
+            items: idUsers
+        };
+        return moduleApi.post('system-role/query/roles-by-users', queryParam);
     },
 };
