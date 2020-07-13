@@ -477,6 +477,10 @@ export default {
                 }
             }else{
                 data.users = typeof node.users == 'string' ? JSON.parse(node.users) : node.users;
+                data.permissions = node.permissions.reduce((arr, el) => {
+                    arr.push(el.id);
+                    return arr;
+                }, []);
             }
             return data;
         },

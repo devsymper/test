@@ -31,6 +31,8 @@ import { systemRoleApi } from "@/api/systemRole.js";
 import ListItems from "@/components/common/ListItems.vue";
 
 import SystemRoleForm from "@/components/systemRole/SystemRoleForm.vue";
+import { permissionPackageApi } from '../../api/PermissionPackage';
+import { permissionApi } from '../../api/permissionPack';
 export default {
     data() {
         let self = this;
@@ -41,7 +43,8 @@ export default {
             currentItemData: {
                 name: '',
                 description: '',
-                users: []
+                users: [],
+                permissions: []
             },
             tableContextMenu: [
                 {
@@ -101,6 +104,13 @@ export default {
                 }
             }else{
                 this.$snotifyError(res, "Can not get item detail");
+            }
+
+            res = await permissionApi.getPermissionOfRole('system:'+id);
+            if(res.status == 200){
+                this.$set(this.currentItemData, 'permissions', res.data);
+            }else{
+                this.$snotifyError(res, "Can not get permission of role");
             }
         },
         handleSavedItem(){

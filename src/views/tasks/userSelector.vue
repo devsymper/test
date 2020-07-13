@@ -12,7 +12,7 @@
         item-value="id"
         background-color="#fbfbfb"
         :placeholder="$t('common.search')"
-        class="sym-small-size sym-pad-0 "
+        class="sym-small-size sym-pad-0 sym-style-input"
         :multiple="isMulti"
     >
         <template v-slot:selection="data">
@@ -25,16 +25,16 @@
                 :class="textColor+ ' mt-1'"
                 @click:close="remove(data.item)"
             > 
-                <v-avatar left v-if="compactChip">
-                    <v-img  sizes="20" :src="data.item.avatar ? data.item.avatar : avatarDefault"></v-img>
+                <v-avatar sizes="23" left v-if="compactChip">
+                    <v-img  sizes="23" :src="data.item.avatar ? data.item.avatar : avatarDefault"></v-img>
                 </v-avatar>
                 <span class="fs-11">{{ data.item.displayName }}</span>
             </v-chip>
         </template>
         <template v-slot:item="data">
             <template>
-                <v-list-item-avatar size="30" class="mt-1 mb-1">
-                    <v-img sizes="20" :src="data.item.avatar ? data.item.avatar : avatarDefault"></v-img>
+                <v-list-item-avatar height="20" width="20" size="20" class="mt-1 mb-1">
+                    <v-img sizes="20" height="20" width="20" :src="data.item.avatar ? data.item.avatar : avatarDefault"></v-img>
                 </v-list-item-avatar>
                 <v-list-item-content class="pt-0 pb-0">
                     <v-list-item-title v-html="data.item.displayName"></v-list-item-title>

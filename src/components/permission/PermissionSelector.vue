@@ -1,0 +1,203 @@
+<template>
+    <div>
+        <div  class="d-flex">
+            <v-text-field
+                style="width: calc(100% - 80px)!important"
+                v-if="actionOnSearchItem == 'search'"
+                class="d-inline-block mr-2 sym-small-size w-100 "
+                outlined
+                single-line
+                append-icon="mdi-magnify"
+                v-model="searchKey"
+                dense
+                label="Search"
+                placeholder="Search selected permission packs"
+            ></v-text-field>
+
+                
+            <v-autocomplete
+                style="width: calc(100% - 80px)!important"
+                v-if="actionOnSearchItem == 'add'"
+                v-model="selectedPermission"
+                :items="allPermission"
+                filled
+                dense
+                solo
+                flat
+                outlined
+                return-object
+                item-text="name"
+                item-value="id"
+                placeholder="Find permission pack to add"
+                class="sym-small-size sym-pad-0 mr-2 "
+                :multiple="false"
+                @change="addPermission">
+
+            </v-autocomplete>
+
+            <v-tooltip top>
+                <template v-slot:activator="{ on }">
+                    <v-btn
+                        depressed
+                        icon
+                        small
+                        v-on="on"
+                        @click="changeSearchAction">
+                        <v-icon size="18" dark>{{ actionOnSearchItem == 'add' ? 'mdi-magnify' : 'mdi-plus'}}</v-icon>
+                    </v-btn>
+                </template>
+                <span>
+                    {{ actionOnSearchItem == 'add' ? 'Search selected permission packs' : 'Add permission to role' }}
+                </span>
+            </v-tooltip>
+        </div>
+        
+        <v-list dense  >
+            <v-list-item-group class="mt-1">
+                <v-list-item
+                    v-for="(item, i) in filterLazyValue"
+                    :key="i"
+                    class="w-100 selected-permission-pack">
+
+                    <span class="fs-13">
+                        {{item.name}}
+                    </span>
+
+                    <v-btn
+                        depressed
+                        icon
+                        small
+                        class="delete-selected-permission">
+
+                        <v-icon size="18" @click="deleteSelectedPermission(item, i)"   >
+                            mdi-trash-can-outline
+                        </v-icon>
+
+                    </v-btn>
+                </v-list-item>
+            </v-list-item-group>
+        </v-list>
+    </div>
+</template>
+
+<script>
+export default {
+    created(){
+        this.$store.dispatch('permission/getAllPermission');
+    },
+    methods: {
+        deleteSelectedPermission(item, i){
+            this.lazyValue.splice(i, 1);
+            this.$emit('input', this.lazyValue);
+        },
+        changeSearchAction(){
+            this.searchKey = '';
+            if(this.actionOnSearchItem == 'add'){
+                this.actionOnSearchItem = 'search';
+            }else{
+                this.actionOnSearchItem = 'add';
+            }
+        },
+        filterSelectedPack(search){
+
+        },
+        addPermission(pk){
+            if(!pk){
+                return;
+            }
+            let selectedPK = false;
+            for(let pack of this.lazyValue){
+                if(pack.id == pk.id){
+                    selectedPK = true;
+                    break;
+                }
+            }
+
+            if(!selectedPK){
+                this.lazyValue.unshift(pk);
+            }
+            this.$emit('input', this.lazyValue);
+        }
+    },
+    computed: {
+        allPermission(){
+            return this.$store.state.permission.allPermissionPack;
+        },
+        filterLazyValue(){
+            let searchKey = this.searchKey;
+            if(!searchKey){
+                return this.lazyValue;
+            }else{
+                return this.lazyValue.filter((el) => {
+                    if(el.name.toLowerCase().includes(searchKey.toLowerCase())){
+                        return true;
+                    }else {
+                        return false;
+                    }
+                });
+            }
+        }
+    },
+    props: {
+        /**
+         * Dạng: [
+         *      {
+         *          id: '',
+         *          name: '',
+         *          description: ''
+         *      }
+         * ]
+         */
+        value: {
+            type: Array,
+            default(){
+                return [
+                    {
+                        id: 'xxx',
+                        name: 'Permission 1',
+                        description: 'Permission 1 description',
+                    },
+                    {
+                        id: 'yyy',
+                        name: 'Permission 1',
+                        description: 'Permission 1 description',
+                    },
+                ]
+            }
+        },
+    },
+    watch: {
+        value: {
+            deep: true,
+            immediate: true,
+            handler: function(after){
+                this.lazyValue = after
+            }
+        }
+    },
+    data(){
+        return {
+            searchKey: '',
+            selectedPermission: null,
+            lazyValue: [],
+            actionOnSearchItem: 'add', // hành động của thanh tìm kiếm: add hoặc search
+        }
+    }
+}
+</script>
+
+<style>
+
+.delete-selected-permission{
+    position: absolute!important;
+    right: 5px;
+}
+
+.selected-permission-pack .delete-selected-permission{
+    display: none;
+}
+
+.selected-permission-pack:hover .delete-selected-permission{
+    display: block;
+}
+</style>

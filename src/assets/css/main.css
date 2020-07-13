@@ -560,7 +560,7 @@ html {
 }
 
 .sym-small-size.v-autocomplete>.v-input__control>.v-input__slot {
-    padding: 3px 5px!important;
+    padding: 0px 12px!important;
 }
 
 .htMenu.htContextMenu.handsontable * {

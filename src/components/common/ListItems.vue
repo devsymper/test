@@ -835,7 +835,6 @@ export default {
                         }else{
                             data = data.data;
                         }
-                        
                         let total = data.total ? data.total : 0;
                         let pageSize = thisCpn.pageSize;
                         thisCpn.totalPage =
@@ -849,7 +848,7 @@ export default {
                         thisCpn.tableColumns = thisCpn.getTableColumns(
                             data.columns
                         );
-                        thisCpn.data = data.listObject;
+                        thisCpn.data = data.listObject ? data.listObject : [];
                         thisCpn.handleStopDragColumn();
                         thisCpn.$emit('data-get', data.listObject);
                     })

@@ -25,6 +25,16 @@
                 v-model="itemData.users"
             ></UserSelector>
         </div>
+        <div class="w-100 mt-3">
+            <span
+                class="fs-12 mb-2 "
+            >Select permissions</span>
+
+            <PermissionSelector 
+            v-model="itemData.permissions">
+
+            </PermissionSelector>
+        </div>
         <div class="mt-2" v-if="action != 'view' ">
             <v-btn
                 class="float-right mr-1"
@@ -44,6 +54,7 @@
 import FormTpl from "@/components/common/FormTpl.vue";
 import UserSelector from "@/views/tasks/userSelector.vue";
 import { systemRoleApi } from "@/api/systemRole.js";
+import PermissionSelector from "@/components/permission/PermissionSelector.vue";
 
 export default {
     methods: {
@@ -51,7 +62,11 @@ export default {
             let dataToSave = {
                 name: this.allInputs.name.value,
                 description: this.allInputs.description.value,
-                users: this.itemData.users
+                users: this.itemData.users,
+                permissions: this.itemData.permissions.reduce((arr, el) => {
+                    arr.push(el.id);
+                    return arr;
+                }, [])
             };
             let res;
             try {
@@ -79,7 +94,8 @@ export default {
     },
     components: {
         FormTpl,
-        UserSelector
+        UserSelector,
+        PermissionSelector
     },
     computed: {
         allInputs(){

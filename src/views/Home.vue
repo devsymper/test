@@ -3,8 +3,10 @@
         <h1>
             Home page
         </h1>
-        <SymperColorPicker
-        v-model="color"></SymperColorPicker>
+        <PermissionSelector
+        v-model="selectedPermission">
+
+        </PermissionSelector>
         <!-- <TimelineTreeview>
             <template slot="tree-item-content" slot-scope="{itemData}">
                 <i :class="'mdi mr-2 ' +itemData.icon"></i>
@@ -23,6 +25,7 @@ import TimelineTreeview from "./../components/common/TimelineTreeview";
 import Handsontable from 'handsontable';
 import FormulaEditor from "./../components/formula/editor/FormulaEditor";
 import SymperColorPicker from "@/components/common/symperInputs/SymperColorPicker.vue";
+import PermissionSelector from "@/components/permission/PermissionSelector.vue";
 
 export default {
     name: "Home",
@@ -33,6 +36,19 @@ export default {
     },
     data() {
         return {
+            selectedPermission: [
+                
+                    {
+                        id: 'xxx',
+                        name: 'Permission 1',
+                        description: 'Permission 1 description',
+                    },
+                    {
+                        id: 'yyy',
+                        name: 'Permission 1',
+                        description: 'Permission 1 description',
+                    },
+            ],
             color: '#000000',
             formula: 'SELECT * FROM abc',
             testModel: [{"idNode":"14bcc081-771e-490a-8254-bced2d7acab2","idOrgchart":"689"},{"idNode":"919ba806-73e5-4cb6-bbd8-6c7e3c44455a","idOrgchart":"689"}],
@@ -76,7 +92,8 @@ export default {
         'orgchart-selector': OrgchartSelector,
         TimelineTreeview,
         FormulaEditor: FormulaEditor,
-        SymperColorPicker: SymperColorPicker
+        SymperColorPicker: SymperColorPicker,
+        PermissionSelector
     }
 };
 </script>
