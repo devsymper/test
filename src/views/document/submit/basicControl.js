@@ -137,8 +137,9 @@ export default class BasicControl extends Control {
         if (this.checkDetailView()) {
             this.ele.addClass('detail-view');
             this.ele.attr('disabled', 'disabled');
-            this.setValueControl();
+
         }
+        this.setValueControl();
 
     }
     setValueControl() {
@@ -151,7 +152,6 @@ export default class BasicControl extends Control {
         } else if (this.type == 'date') {
             value = moment(value).format(this.formatDate)
         }
-
         this.ele.val(value)
     }
     renderFileControl = function() {
