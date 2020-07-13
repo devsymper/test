@@ -56,12 +56,12 @@ export default class BasicControl extends Control {
         if (!this.checkDetailView()) {
             this.ele.css({ color: 'blue' })
         }
-        if (this.checkDetailView() &&
-            this.controlProperties['isSaveToDB'] !== undefined &&
-            (this.controlProperties['isSaveToDB'].value !== "1" ||
-                this.controlProperties['isSaveToDB'].value !== 1)) {
-            this.ele.css({ display: 'none' })
-        }
+        // if (this.checkDetailView() &&
+        //     this.controlProperties['isSaveToDB'] !== undefined &&
+        //     (this.controlProperties['isSaveToDB'].value !== "1" ||
+        //         this.controlProperties['isSaveToDB'].value !== 1)) {
+        //     this.ele.css({ display: 'none' })
+        // }
         if (!this.checkDetailView() && this.value === "" &&
             this.controlProperties['isRequired'] !== undefined &&
             (this.controlProperties['isRequired'].value === "1" ||
@@ -137,9 +137,10 @@ export default class BasicControl extends Control {
         if (this.checkDetailView()) {
             this.ele.addClass('detail-view');
             this.ele.attr('disabled', 'disabled');
-
         }
-        this.setValueControl();
+        if (sDocument.state.viewType != 'submit') {
+            this.setValueControl();
+        }
 
     }
     setValueControl() {
@@ -157,7 +158,6 @@ export default class BasicControl extends Control {
     renderFileControl = function() {
         let fileHtml = this.genFileView();
         this.ele.css('width', 'unset').css('cursor', 'pointer').css('height', '25px').css('vertical-align', 'middle').html(fileHtml);
-        console.log('ssafas', fileHtml);
 
         let thisObj = this;
         $('.file-add').click(function(e) {
@@ -182,7 +182,6 @@ export default class BasicControl extends Control {
             if (this.value != '' && this.value.length > 0) {
                 let valueArr = this.value.replace(/^,/gi, "");
                 valueArr = valueArr.split(',');
-                console.log('sads', valueArr);
 
                 for (let index = 0; index < valueArr.length; index++) {
 
@@ -202,8 +201,6 @@ export default class BasicControl extends Control {
             this.value = sDocument.state.editor.allControl[listInputInDocument[this.inTable].id].value[this.name];
         }
         if (this.value != '' && this.value.hasOwnProperty(rowId)) {
-            console.log('khh', this.value);
-
             for (let index = 0; index < this.value[rowId].length; index++) {
                 let fileName = this.value[rowId][index];
                 let fileExt = Util.getFileExtension(fileName);
@@ -317,7 +314,6 @@ export default class BasicControl extends Control {
         this.ele.attr('type', 'text');
         this.ele.on('click', function(e) {
             e.controlName = thisObj.name;
-            console.log(thisObj);
             e.formulas = thisObj.controlFormulas.formulas;
             SYMPER_APP.$evtBus.$emit('document-submit-filter-input-click', e)
         })
@@ -388,8 +384,6 @@ export default class BasicControl extends Control {
         this.formatDate = (this.controlProperties.hasOwnProperty('formatDate')) ? this.controlProperties.formatDate.value : "";
         if (this.checkDetailView()) return;
         let thisObj = this;
-        console.log(this.controlProperties);
-
         if (this.formatDate != "" && typeof this.formatDate === 'string')
             this.ele.on('change', function(e) {
                 $(this).val(moment($(this).val()).format(thisObj.formatDate))
