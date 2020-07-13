@@ -66,14 +66,14 @@ export default {
 
     },
     methods: {
-        async selectUserRole(role){
-            let res = await userApi.changeRole(role.id);
-            if(res.status == 200){
-                this.$store.dispatch('app/setUserInfo', res.data);
-                location.reload();
-            }else {
-                this.$snotifyError(res, "Can not change user role");
-            }
+        selectUserRole(role){
+            this.$store.dispatch('app/changeUserRole', role);
+
+            /**
+             * Cần xét trường hợp khi chuyển user mà thì cần lựa chọn luôn role cho người đó
+             * Hoặc khi một người mới đăng nhập mà chưa có role, cần chọn default một role cho họ
+             * Hoặc một người bị xóa role thì cần lựa chọn một role khác cho họ
+             */
         }
     }
 }

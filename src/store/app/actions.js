@@ -5,6 +5,7 @@ import { userRoleApi } from "../../api/userRole.js";
 import { systemRoleApi } from "../../api/systemRole.js";
 import { util } from "../../plugins/util.js";
 
+var countGetRoleType = 0;
 const handleUrlChanges = (context, data) => {
     console.log(context, data, 'xxx');
     context.commit('changeUrlsToTabs', data);
@@ -113,9 +114,11 @@ function getRolesByType(userInfo, type, apiObj, context) {
     apiObj.getRolesByUser(userInfo).then((res) => {
         if (res.status == 200) {
             if (res.data[0]) {
+                countGetRoleType += 1;
                 context.commit('setUserRoleByType', {
                     type: type,
-                    data: res.data[0].roles
+                    data: res.data[0].roles,
+                    countGetRoleType: countGetRoleType
                 });
             }
         } else {
@@ -126,17 +129,6 @@ function getRolesByType(userInfo, type, apiObj, context) {
     });
 }
 
-const getAllRoles = async function(context, userId) {
-    let roles = {
-        orchart: [],
-        systemRole: []
-    };
-    getRolesByType([{
-        idUser: userId
-    }], 'orgchart', orgchartApi, context);
-
-    getRolesByType([userId], 'systemRole', systemRoleApi, context);
-}
 
 async function checkAndRefreshCurrentRole(data, context) {
     // Nếu chưa load thông tin của role hiện tại lên thì lấy thông tin về để hiển thị
@@ -180,4 +172,29 @@ const setUserInfo = (context, data) => {
     util.auth.saveLoginInfo(accInfo);
     checkAndRefreshCurrentRole(data, context);
 }
-export { getAllOrgChartData, getAllUsers, getAllRoles, setUserInfo };
+
+
+const getAllRoles = async function(context, userId) {
+    countGetRoleType = 0;
+
+    let roles = {
+        orchart: [],
+        systemRole: []
+    };
+    getRolesByType([{
+        idUser: userId
+    }], 'orgchart', orgchartApi, context);
+
+    getRolesByType([userId], 'systemRole', systemRoleApi, context);
+}
+
+const changeUserRole = async function(context, role) {
+    let res = await userApi.changeRole(role.id);
+    if (res.status == 200) {
+        setUserInfo(res.data);
+        location.reload();
+    } else {
+        SYMPER_APP.$snotifyError(res, "Can not change user role");
+    }
+}
+export { getAllOrgChartData, getAllUsers, getAllRoles, setUserInfo, changeUserRole };

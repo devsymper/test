@@ -217,7 +217,7 @@ export default {
     created(){
         let savedUserInfo = util.auth.getSavedUserInfo();
         this.$store.dispatch('app/setUserInfo', savedUserInfo);
-        this.$store.dispatch("app/getAllUsers");        
+        this.$store.dispatch("app/getAllUsers");
         this.$store.dispatch('app/getAllRoles', this.$store.state.app.endUserInfo.id);
     },
     components: {
@@ -297,3 +297,4 @@ export default {
 </script>
 
 <style></style>
+
