@@ -121,7 +121,7 @@ export default {
     },
     computed: {
         allPermission(){
-            return this.$store.state.permission.allPermissionPack;
+            return Object.values(this.$store.state.permission.allPermissionPack);
         },
         filterLazyValue(){
             let searchKey = this.searchKey;
@@ -151,18 +151,7 @@ export default {
         value: {
             type: Array,
             default(){
-                return [
-                    {
-                        id: 'xxx',
-                        name: 'Permission 1',
-                        description: 'Permission 1 description',
-                    },
-                    {
-                        id: 'yyy',
-                        name: 'Permission 1',
-                        description: 'Permission 1 description',
-                    },
-                ]
+                return []
             }
         },
     },

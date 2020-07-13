@@ -108,7 +108,14 @@ export default {
 
             res = await permissionApi.getPermissionOfRole('system:'+id);
             if(res.status == 200){
-                this.$set(this.currentItemData, 'permissions', res.data);
+                let mapIdToPermission = this.$store.state.permission.allPermissionPack;
+                let permissions = res.data.reduce((arr, el) => {
+                    if(mapIdToPermission[el.permissionPackId]){
+                        arr.push(mapIdToPermission[el.permissionPackId]);
+                    }
+                    return arr;
+                }, []);
+                this.$set(this.currentItemData, 'permissions', permissions);
             }else{
                 this.$snotifyError(res, "Can not get permission of role");
             }

@@ -1,5 +1,9 @@
 const setAllPermissionPack = (state, pks) => {
-    Vue.set(state, 'allPermissionPack', pks);
+    let map = pks.reduce((map, el) => {
+        map[el.id] = el;
+        return map;
+    }, {});
+    Vue.set(state, 'allPermissionPack', map);
 };
 
 export {

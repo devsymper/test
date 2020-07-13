@@ -1,5 +1,5 @@
 const defaultState = {
-    allPermissionPack: []
+    allPermissionPack: {} // tất cả các permission pack có dạng {id : pack}
 };
 
 export default defaultState;
