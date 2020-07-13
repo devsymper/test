@@ -99,6 +99,7 @@ export default {
     },
     methods:{
         handleInputBlur(inputInfo, name){
+            
             // let dataPost = {syql:inputInfo.value,objectType:'field',objectIdentifier:this.sCurrentDocument.id}
             // formulasApi.saveFormulas(dataPost).then(res => {
             //     if (res.status == 200) {

@@ -57,27 +57,27 @@ export default class BasicControl extends Control {
             this.ele.css({ color: 'blue' })
         }
         if (this.checkDetailView() &&
-            this.controlProperties['isSaveToDB'] != undefined &&
-            (this.controlProperties['isSaveToDB'].value != "1" ||
-                this.controlProperties['isSaveToDB'].value != 1)) {
+            this.controlProperties['isSaveToDB'] !== undefined &&
+            (this.controlProperties['isSaveToDB'].value !== "1" ||
+                this.controlProperties['isSaveToDB'].value !== 1)) {
             this.ele.css({ display: 'none' })
         }
-        if (!this.checkDetailView() && this.value == "" &&
-            this.controlProperties['isRequired'] != undefined &&
-            (this.controlProperties['isRequired'].value == "1" ||
-                this.controlProperties['isRequired'].value == 1)) {
+        if (!this.checkDetailView() && this.value === "" &&
+            this.controlProperties['isRequired'] !== undefined &&
+            (this.controlProperties['isRequired'].value === "1" ||
+                this.controlProperties['isRequired'].value === 1)) {
             this.renderValidateIcon("Không được bỏ trống trường thông tin " + this.title);
         }
         if (!this.checkDetailView() &&
             this.controlProperties['isReadOnly'] != undefined &&
-            (this.controlProperties['isReadOnly'].value == "1" ||
-                this.controlProperties['isReadOnly'].value == 1)) {
+            (this.controlProperties['isReadOnly'].value === "1" ||
+                this.controlProperties['isReadOnly'].value === 1)) {
             this.ele.attr('disabled', 'disabled')
         }
 
         if (this.controlProperties['isHidden'] != undefined &&
-            (this.controlProperties['isHidden'].value == "1" ||
-                this.controlProperties['isHidden'].value == 1)) {
+            (this.controlProperties['isHidden'].value === "1" ||
+                this.controlProperties['isHidden'].value === 1)) {
             this.ele.css({ 'display': 'none' })
         }
 
@@ -436,7 +436,14 @@ export default class BasicControl extends Control {
         })
         this.ele.on('keyup', function(e) {
             let formulasInstance = (fromSelect) ? thisObj.controlFormulas.formulas.instance : thisObj.controlFormulas.autocomplete.instance;
-            SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-key-event', { e: e, autocompleteFormulasInstance: formulasInstance, isSelect: false, controlTitle: thisObj.title })
+            SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-key-event', {
+                e: e,
+                autocompleteFormulasInstance: formulasInstance,
+                isSelect: false,
+                controlTitle: thisObj.title,
+                controlName: thisObj.controlProperties.name.value,
+                val: $(e.target).val()
+            })
         })
     }
 

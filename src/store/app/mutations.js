@@ -58,6 +58,11 @@ const setAllUsers = (state, allUsers) => {
     Vue.set(state, 'allUsers', allUsers);
 }
 
+const setUserRoleByType = (state, param) => {
+    let type = param.type;
+    Vue.set(state.endUserInfo.roles, type, param.data);
+}
+
 export {
     changeCollapseSidebar,
     increaseUnreadNotification,
@@ -68,5 +73,6 @@ export {
     updateCurrentTabIndex,
     removeTab,
     setOrgchartNodes,
-    setAllUsers
+    setAllUsers,
+    setUserRoleByType
 };

@@ -1,15 +1,17 @@
 <template>
-    <list-items
-        ref="listOrgchart"
-        :useDefaultContext="false"
-        :pageTitle="$t('orgchart.list.title')"
-        :tableContextMenu="tableContextMenu"
-        :containerHeight="containerHeight"
-        :getDataUrl="getListUrl"
-        :useActionPanel="false"
-        :headerPrefixKeypath="'common'"
-        @on-add-item-clicked="goToCreatePage()"
-    ></list-items>
+    <div class="w-100 h-100">
+        <list-items
+            ref="listOrgchart"
+            :useDefaultContext="false"
+            :pageTitle="$t('orgchart.list.title')"
+            :tableContextMenu="tableContextMenu"
+            :containerHeight="containerHeight"
+            :getDataUrl="getListUrl"
+            :useActionPanel="false"
+            :headerPrefixKeypath="'common'"
+            @on-add-item-clicked="goToCreatePage()"
+        ></list-items>
+    </div>
 </template>
 <script>
 import { util } from "./../../plugins/util.js";

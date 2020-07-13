@@ -64,5 +64,10 @@ export const userApi = {
     },
     changeDelegate(userInfo) {
         return api.post('auth/change-delegate', { user_id: userInfo.id })
+    },
+    changeRole(roleId) {
+        return api.post('auth/set-role', {
+            role: roleId
+        });
     }
 };

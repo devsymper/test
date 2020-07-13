@@ -178,8 +178,8 @@ export const definePosition = function() {
     });
 }
 
-export const createPositionNode = function(name) {
-    var element = new SymperPosition().on({
+export const createPositionNode = function(name, attr = {}) {
+    var element = new SymperPosition(attr).on({
         'change:name': function(cell, name) {
             cell.attr('.name/text',
                 joint.util.breakText(name, { width: 160, height: 45 },

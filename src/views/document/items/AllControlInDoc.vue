@@ -17,12 +17,14 @@
                         </v-tab>
                     </v-tabs>
                     <data-table 
-                    ref="table" 
-                    class="mt-2" 
-                    @on-cell-click="clickCellAgTable"
-                    @on-cell-change="updatePropsControl"
-                    :allColumns="columns" 
-                    :rowData="dataTable"/>
+                        ref="table" 
+                        class="mt-2" 
+                        @on-cell-click="clickCellAgTable"
+                        @on-cell-change="updatePropsControl"
+                        :allColumns="columns" 
+                        :rowData="dataTable"
+                        :customComponents="customAgComponents"
+                        :cellRendererParams="cellRendererParams"/>
                 </v-card-text>
                 <v-divider></v-divider>
                 <v-card-actions>
@@ -65,6 +67,10 @@ import SymperDragPanel from "./../../../components/common/SymperDragPanel";
 import FormulaEditor from "./../../../components/common/FormulaEditor";
 import {getAllPropsControl,getIconFromType,getAllFormulasName} from "./../../../components/document/controlPropsFactory.js"
 import { util } from "./../../../plugins/util.js";
+
+import ImageRenderer from "@/components/common/agDataTable/ImageRenderer.vue";
+import CheckBoxRenderer from "@/components/common/agDataTable/CheckBoxRenderer.vue";
+
 export default {
     components:{
         'data-table' : AgDataTable,
@@ -90,6 +96,11 @@ export default {
     },
     data(){
         return{
+            customAgComponents: {
+                image : ImageRenderer,
+                checkBoxRenderer : CheckBoxRenderer
+            },
+            cellRendererParams: { innerRenderer:'image' },
             isShow:false,
             columns:[],
             largeFormulaEditor: {

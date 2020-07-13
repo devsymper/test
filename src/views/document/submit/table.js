@@ -188,7 +188,10 @@ export default class Table {
                 },
 
                 afterChange: function(changes, source) {
-
+                    console.log('ádd', changes);
+                    if (changes == null) {
+                        return
+                    }
                     if (sDocument.state.submit.docStatus == 'init' && sDocument.state.viewType == 'update') {
                         return;
                     }
@@ -369,7 +372,7 @@ export default class Table {
                     if (allFormulas.hasOwnProperty(formulasType)) {
                         if (allFormulas[formulasType].hasOwnProperty('instance')) {
                             let formulasInstance = allFormulas[formulasType].instance;
-                            let dataInput = this.getDataInputForFormulas(formulasInstancecontrolEffectedInstance.inTable);
+                            let dataInput = this.getDataInputForFormulas(formulasInstance, controlEffectedInstance.inTable);
                             if (controlEffectedInstance.hasOwnProperty('inTable')) {
                                 if (controlEffectedInstance.inTable == this.tableName) {
                                     this.handlerRunFormulasForControlInTable(formulasType, controlEffectedInstance, dataInput, formulasInstance);
@@ -408,14 +411,16 @@ export default class Table {
             let dataInput = {};
             for (let inputControlName in inputControl) {
                 let valueInputControlItem = this.getColumnIndexFromControlName(inputControlName);
-                valueInputControlItem = this.tableInstance.getDataAtCol(valueInputControlItem);
-                console.log('ksad', valueInputControlItem);
-
-
-                if (listInputInDocument[tableName].tableInstance.tableHasRowSum) {
-                    valueInputControlItem.pop();
+                if (valueInputControlItem === false) {
+                    dataInput[inputControlName] = listInputInDocument[inputControlName].value
+                } else {
+                    valueInputControlItem = this.tableInstance.getDataAtCol(valueInputControlItem);
+                    if (listInputInDocument[tableName].tableInstance.tableHasRowSum) {
+                        valueInputControlItem.pop();
+                    }
+                    dataInput[inputControlName] = valueInputControlItem;
                 }
-                dataInput[inputControlName] = valueInputControlItem;
+
             }
             return dataInput;
         }
@@ -426,19 +431,26 @@ export default class Table {
          * @param {*} formulasInstance  Object cua formulas giá trị của control bị ảnh hưởng
          */
     async handlerRunFormulasForControlInTable(formulasType, controlInstance, dataInput, formulasInstance) {
-            console.log('ksad', dataInput);
-
             let thisObj = this;
             let dataColumnAfterRunFOrmulas = [];
             if (Object.keys(dataInput).length > 0) {
                 let allRowDataInput = [];
                 for (let control in dataInput) {
                     let dataRow = dataInput[control];
-                    for (let i = 0; i < dataRow.length; i++) {
-                        if (allRowDataInput.length <= i) {
-                            allRowDataInput[i] = {};
+                    if (!Array.isArray(dataRow)) {
+                        for (let index = 0; index < thisObj.tableInstance.countRows(); index++) {
+                            if (allRowDataInput.length <= index) {
+                                allRowDataInput[index] = {};
+                            }
+                            allRowDataInput[index][control] = dataRow;
                         }
-                        allRowDataInput[i][control] = dataRow[i];
+                    } else {
+                        for (let i = 0; i < dataRow.length; i++) {
+                            if (allRowDataInput.length <= i) {
+                                allRowDataInput[i] = {};
+                            }
+                            allRowDataInput[i][control] = dataRow[i];
+                        }
                     }
                 }
                 for (let index = 0; index < allRowDataInput.length; index++) {
@@ -799,24 +811,29 @@ export default class Table {
 
     }
     checkUniqueTable(controlName) {
-        let controlTitle = (listInputInDocument[controlName].title == "") ? listInputInDocument[controlName].name : listInputInDocument[controlName].title;
-        let tableName = listInputInDocument[controlName].inTable;
-        let tableTitle = (listInputInDocument[tableName].title == "") ? listInputInDocument[tableName].name : listInputInDocument[tableName].title;
-        let indexColumn = this.getColumnIndexFromControlName(controlName);
-        let dataCol = this.tableInstance.getDataAtCol(indexColumn);
-        let uniqueData = {}
-        for (let index = 0; index < dataCol.length - 1; index++) {
-            let row = dataCol[index];
-            if (row == "" || row == null) {
-                continue;
+        let controlInstance = listInputInDocument[controlName];
+        if (controlInstance.controlProperties.isTableOnly.value === false) {
+            return;
+        } else {
+            let controlTitle = (listInputInDocument[controlName].title == "") ? listInputInDocument[controlName].name : listInputInDocument[controlName].title;
+            let tableName = listInputInDocument[controlName].inTable;
+            let tableTitle = (listInputInDocument[tableName].title == "") ? listInputInDocument[tableName].name : listInputInDocument[tableName].title;
+            let indexColumn = this.getColumnIndexFromControlName(controlName);
+            let dataCol = this.tableInstance.getDataAtCol(indexColumn);
+            let uniqueData = {}
+            for (let index = 0; index < dataCol.length - 1; index++) {
+                let row = dataCol[index];
+                if (row == "" || row == null) {
+                    continue;
+                }
+                if (uniqueData.hasOwnProperty(row)) {
+                    this.validateValueMap[index + "_" + indexColumn] = { vld: true, msg: 'Trùng dữ liệu cột ' + controlTitle + " trong table " + tableTitle }
+                } else {
+                    uniqueData[row] = true;
+                    this.validateValueMap[index + "_" + indexColumn] = { vld: false, msg: 'Trùng dữ liệu cột ' + controlTitle + " trong table " + tableTitle }
+                }
             }
-            if (uniqueData.hasOwnProperty(row)) {
-                this.validateValueMap[index + "_" + indexColumn] = { vld: true, msg: 'Trùng dữ liệu cột ' + controlTitle + " trong table " + tableTitle }
-            } else {
-                uniqueData[row] = true;
-                this.validateValueMap[index + "_" + indexColumn] = { vld: false, msg: 'Trùng dữ liệu cột ' + controlTitle + " trong table " + tableTitle }
-            }
+            this.tableInstance.render()
         }
-        this.tableInstance.render()
     }
 }

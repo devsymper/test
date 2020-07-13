@@ -27,7 +27,9 @@ export const appConfigs = {
         formulasService: 'https://syql.symper.vn/',
         documentService: 'https://sdocument.symper.vn/',
         sdocumentManagement: 'https://sdocument-management.symper.vn/',
-        orgchart: 'https://orgchart.symper.vn/'
+        orgchart: 'https://orgchart.symper.vn/',
+        systemRole: "https://orgchart.symper.vn/",
+        userRole: "https://orgchart.symper.vn/"
     },
     notificationTimeout: {
         success: 10000,

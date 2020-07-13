@@ -3,6 +3,8 @@ import { appConfigs } from "./../configs.js";
 
 let orgchart = new Api(appConfigs.apiDomain.orgchart);
 let coreApi = new Api(appConfigs.apiDomain.core);
+import Vue from "vue";
+
 
 export const orgchartApi = {
 
@@ -46,5 +48,11 @@ export const orgchartApi = {
     },
     deleteNodeStyle(ids) {
         return orgchart.delete('node-style/' + ids);
+    },
+    getRolesByUser(queryData) {
+        let queryParam = {
+            items: queryData
+        };
+        return orgchart.post('orgchart-role/query/roles-by-users', queryParam);
     },
 };

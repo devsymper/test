@@ -11,15 +11,12 @@ const defaultState = {
         currentRole: {
             // Vai trò hiện tại của enduser đang đóng
             id: 0,
-            title: "Trưởng phòng nhân sự",
+            name: "Trưởng phòng nhân sự",
         },
-        roles: [
-            // các vai trò của enduser có thể có
-            {
-                id: 0,
-                title: "Trưởng phòng nhân sự",
-            },
-        ],
+        roles: { // các vai trò mà user có thể có trong orgchart hoặc system role
+            orgchart: [],
+            systemRole: []
+        },
     },
     collapseSideBar: true, // trạng thái của sidebar: true là đang nhỏ, false là đang mở rộng
     unreadNotification: 2, // số lượng các thông báo chưa đọc
@@ -59,6 +56,7 @@ const defaultState = {
         { title: "virtualdocs", icon: "mdi-table", link: "/virtualdocs" },
         { title: "tasks", icon: "mdi-check-all", link: "/tasks" },
         { title: "works", icon: "mdi-briefcase-check-outline", link: "/works" },
+        { title: "userRoleSetting", icon: "mdi-access-point-network", link: "/user-role-settings" },
     ],
     urlToTabTitleMap: {}, // map giữa url với title của tab,
     currentTabIndex: 0, // index cuả tab hiện tại đang mở,

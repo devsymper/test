@@ -92,3 +92,70 @@ export const getOrgchartEditorData = function() {
         homeConfig: getDefaultConfigNodeData(SYMPER_HOME_ORGCHART)
     }
 }
+
+
+function addPosToDpm(rsl, map, currentId, rootId, addPosToDpm) {
+    rsl[rootId][currentId] = map[currentId];
+    if (map[currentId].children) {
+        for (let childId of map[currentId].children) {
+            addPosToDpm(rsl, map, childId, rootId, addPosToDpm);
+        }
+    }
+};
+
+export const getMapDpmIdToPosition = function(allPosition) {
+    let mapIdToPos = allPosition.reduce((obj, el) => {
+        obj[el.vizId] = el;
+        return obj;
+    }, {});
+
+    let posInDpm = {};
+
+    for (let id in mapIdToPos) {
+        let pos = mapIdToPos[id];
+        let parentPos = mapIdToPos[pos.vizParentId];
+        if (parentPos) {
+            if (!parentPos.children) {
+                parentPos.children = [];
+            }
+            parentPos.children.push(id);
+        } else {
+            // khi position này là root
+            posInDpm[id] = {};
+        }
+    }
+
+    for (let id in posInDpm) {
+        addPosToDpm(posInDpm, mapIdToPos, id, id, addPosToDpm);
+    }
+    let mapDpmToPos = {};
+
+    for (let id in posInDpm) {
+        let dpmId = mapIdToPos[id].vizParentId;
+        mapDpmToPos[dpmId] = posInDpm[id];
+    }
+    return mapDpmToPos;
+};
+
+// A helper to create an arrow connection
+export const jointLinkNode = function(source, target) {
+    return new joint.shapes.org.Arrow({
+        source: { id: source.id },
+        target: { id: target.id },
+        attrs: {
+            '.connection': {
+                'stroke-width': 1
+            },
+            '.marker-arrowheads': {
+                display: 'none'
+            }
+        },
+    }, {
+        isHidden: function() {
+            // If the target element is collapsed, we don't want to
+            // show the link either
+            var targetElement = this.getTargetElement();
+            return !targetElement || targetElement.isHidden();
+        }
+    });
+}

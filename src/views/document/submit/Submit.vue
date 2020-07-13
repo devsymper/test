@@ -318,6 +318,11 @@ export default {
         this.$evtBus.$on("document-submit-autocomplete-key-event", e => {
             if(e.e.keyCode != 38 && e.e.keyCode != 40 && e.e.keyCode != 13){
                 if(e.isSelect == false){
+                    thisCpn.updateListInputInDocument(
+                        e.controlName,
+                        "value",
+                        e.val
+                    );
                     thisCpn.getDataForAutocomplete(e,'autocomplete');
                 }
             }
@@ -396,7 +401,9 @@ export default {
             }
             else{
                 let aliasControl = e.autocompleteFormulasInstance.autocompleteDetectAliasControl();
-                let dataInput = this.getDataInputFormulas(e.autocompleteFormulasInstance);  
+                let dataInput = this.getDataInputFormulas(e.autocompleteFormulasInstance);
+                console.log('dataInput',dataInput);
+                console.log('dataInput',e.autocompleteFormulasInstance);
                 let dataAutocomplete = e.autocompleteFormulasInstance.handleRunAutoCompleteFormulas($(e.e.target).val(),dataInput).then(res=>{
                     thisCpn.setDataForControlAutocomplete(res,aliasControl,e.controlTitle)
                 });
@@ -410,21 +417,25 @@ export default {
             let controlAs = {};
             controlAs[aliasControl] = controlTitle;
             if(res.data != undefined){
-                    if(res.status == 200 && res.data != false){
-                        let dataTable = this.handleDataAutoComplete(res.data.data,false,controlAs);
-                        this.$refs.autocompleteInput.setAliasControl(aliasControl);
-                        this.$refs.autocompleteInput.setData(dataTable);
+                if(res.status == 200 && res.data != false){
+                     let dataTable = []
+                    if(res.data.data !== ""){
+                    dataTable = this.handleDataAutoComplete(res.data.data,false,controlAs);
                     }
-                    else{
-                        this.$refs.autocompleteInput.setData([]);
-                    }
-                }
-                else{
-                    let data =  res[0];
-                    let dataTable = this.handleDataAutoComplete(data,true,controlAs);
+                    console.log('dataInput',dataTable);
                     this.$refs.autocompleteInput.setAliasControl(aliasControl);
                     this.$refs.autocompleteInput.setData(dataTable);
                 }
+                else{
+                    this.$refs.autocompleteInput.setData([]);
+                }
+            }
+            else{
+                let data =  res[0];
+                let dataTable = this.handleDataAutoComplete(data,true,controlAs);
+                this.$refs.autocompleteInput.setAliasControl(aliasControl);
+                this.$refs.autocompleteInput.setData(dataTable);
+            }
         },
         /**
          * Hàm bind dữ liệu cho control, và control trong bảng khi chọn apply trên timepicker
@@ -1055,8 +1066,9 @@ export default {
             let dataInput = this.getDataInputFormulas(formulasInstance);    
             let control = getControlInstanceFromStore(controlName);
             if(control.inTable != false){
-                let tableName = getControlInstanceFromStore(control.inTable);
-                tableName.tableInstance.handlerRunFormulasForControlInTable(formulasType,control,dataInput,formulasInstance);
+                let tableInstance = getControlInstanceFromStore(control.inTable);
+                let dataIn = tableInstance.tableInstance.getDataInputForFormulas(formulasInstance,tableInstance.name)
+                tableInstance.tableInstance.handlerRunFormulasForControlInTable(formulasType,control,dataIn,formulasInstance);
             }
             formulasInstance.handleBeforeRunFormulas(dataInput).then(rs=>{
                 this.handlerAfterRunFormulas(rs,controlId,controlName,formulasType)
@@ -1067,6 +1079,7 @@ export default {
          * dataInput : {controlName : value}
          */
         getDataInputFormulas(formulasInstance){
+           
             let inputControl = formulasInstance.getInputControl();
             let dataInput = {};
             for(let inputControlName in inputControl){
@@ -1151,15 +1164,24 @@ export default {
         setDataToTable(tableControlId,data){
             let tableName = this.sDocumentEditor.allControl[tableControlId].properties.name.value;
             let dataTable = []
-            for(let i = 0; i < data.length; i++){
-                let row = {};
-                for(let controlName in data[i]){
-                    row[controlName] == data[i][controlName];
-                }
-                dataTable.push(row);
+            data = data.data
+            let tableInstance = getControlInstanceFromStore(tableName);
+            if(data.length == 0){
+                return;
             }
-            this.sDocumentSubmit.listInputInDocument[tableName].tableInstance.tableInstance.loadData(dataTable)
-            
+            let allColumnBindData = Object.keys(data[0]);
+            for (let index = 0; index < allColumnBindData.length; index++) {
+                const controlName = allColumnBindData[index];
+                let colData = data.reduce((arr,obj)=>{
+                    arr.push(obj[controlName])
+                    return arr
+                },[]);
+                let vls = [];
+                for (let i = 0; i < colData.length; i++) {
+                    vls.push([i, controlName, colData[i]]);
+                }
+                tableInstance.tableInstance.tableInstance.setDataAtRowProp(vls, null, null, 'auto_set');
+            }
         },
 
         /**
@@ -1219,6 +1241,7 @@ export default {
         findRootControl(){ 
             let listInput = this.sDocumentSubmit.listInputInDocument;
             for(let controlName in listInput){
+                // console.log('sad',controlName);
                 this.setAllImpactedFieldsList(controlName);
                 let controlInstance = listInput[controlName];
                 if(controlInstance.type != "inputFilter"){
@@ -1258,6 +1281,7 @@ export default {
             }
             impactedFieldsListWhenStart[fieldName] = false;
         },
+        
         getAllImpactedInput(sourceName) {
             let sourceControlInstance = getControlInstanceFromStore(sourceName)
             var arr = [];

@@ -131,33 +131,48 @@ export default class Formulas {
                 }
             }
             formulas = formulas.replace(regex, value);
+
         }
         return formulas;
     }
     handleRunAutoCompleteFormulas(search, dataInput = false) {
         let listSyql = this.getReferenceFormulas();
         let fieldSelect = this.detectFieldSelect();
-        let where = " WHERE ";
+        let where = " WHERE (";
         for (let i = 0; i < fieldSelect.length; i++) {
             let element = fieldSelect[i];
             element = element.replace(/(?=as ).*/gi, '');
 
             if (i == fieldSelect.length - 1) {
-                where += element + " ILIKE '%" + search + "%'";
+                where += element + " ILIKE '%" + search + "%' )";
             } else {
                 where += element + " ILIKE '%" + search + "%' OR";
             }
         }
+        console.log('dsag', dataInput);
         if (listSyql != null && listSyql.length > 0) {
             let syql = listSyql[0].trim();
+            syql = this.replaceParamsToData(dataInput, syql);
+            console.log('dataInput', syql);
             syql = syql.replace('ref(', '');
+            syql = syql.replace(/\r?\n|\r/g, '');
             syql = syql.substring(0, syql.length - 1);
-            let sql = syql + where + "LIMIT 20 OFFSET 0";
+            let sql = ""
+            if (/\$\$/.test(syql) == false) {
+                if (/\bWHERE|where\b/.test(syql)) {
+                    where += " AND "
+                    syql = syql.replace(/\bWHERE|where\b/, where);
+                    sql = syql + " LIMIT 20 OFFSET 0";
 
+                } else {
+                    sql = syql + where + "LIMIT 20 OFFSET 0";
+                }
+            } else {
+                sql = syql;
+            }
             return this.runSyql(sql);
         } else {
             let formulas = this.replaceParamsToData(dataInput, this.formulas);
-
             return this.runSQLLiteFormulas(formulas, true);
         }
     }

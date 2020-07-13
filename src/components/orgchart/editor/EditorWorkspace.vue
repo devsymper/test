@@ -11,34 +11,12 @@
 import JointPaper from "@/components/common/rappid/JointPaper";
 import { createDepartmentNode, defineDepartment, DEFAULT_DEPARTMENT_DISPLAY, FOUCUS_DEPARTMENT_DISPLAY } from "./../nodeDefinition/departmentDefinition";
 import { createPositionNode, definePosition, DEFAULT_POSITION_DISPLAY, FOUCUS_POSITION_DISPLAY } from "./../nodeDefinition/positionDefinition";
-import { SYMPER_HOME_ORGCHART } from './nodeAttrFactory';
+import { SYMPER_HOME_ORGCHART, getDefaultConfigNodeData, jointLinkNode } from './nodeAttrFactory';
 
 import avatarDefault from "@/assets/image/avatar_default.jpg";
 
 require('@/plugins/rappid/rappid.css');
 
-// A helper to create an arrow connection
-function jointLinkNode(source, target) {
-    return new joint.shapes.org.Arrow({
-        source: { id: source.id },
-        target: { id: target.id },
-        attrs:{
-            '.connection': {
-                'stroke-width': 1
-            },
-            '.marker-arrowheads': {
-                display: 'none'
-            }
-        },
-    },{
-        isHidden: function() {
-            // If the target element is collapsed, we don't want to
-            // show the link either
-            var targetElement = this.getTargetElement();
-            return !targetElement || targetElement.isHidden();
-        }
-    });
-}
 
 export default {
     components: {
@@ -61,7 +39,12 @@ export default {
     },
     computed: {
         selectingNode(){
-            return this.$store.state.orgchart.editor[this.instanceKey].selectingNode;
+            let workspace = this.$store.state.orgchart.editor[this.instanceKey];
+            if(workspace){
+                return workspace.selectingNode;
+            }else{
+                return getDefaultConfigNodeData();
+            }
         },
         mapUserById(){
             return this.$store.state.app.allUsers.reduce((map, user) => {
@@ -291,6 +274,7 @@ export default {
             }
         },
         setupGraph(graph, paper, paperScroller){
+            this.graph = graph;
             let self = this;
             let nodeName = this.context == 'department' ? this.$t('orgchart.editor.department') : this.$t('orgchart.editor.position');
             nodeName += ' 1';
@@ -313,6 +297,7 @@ export default {
                     model.toggleButtonSign(!model.isCollapsed());
                 }
             });
+            this.treeLayout = treeLayout;
             this.$refs.jointPaper.treeLayout = treeLayout;
             graph.resetCells([firstNode]);
             this.repositionFirstCell(graph, paperScroller);

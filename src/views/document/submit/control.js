@@ -173,6 +173,7 @@ export default class Control {
     }
 
     handlerDataAfterRunFormulasValue(values) {
+        console.log('sad', values);
         if (this.inTable != false) {
             let vls = [];
             for (let index = 0; index < values.length; index++) {

@@ -62,7 +62,9 @@
         "done": "Hoàn thành",
         "notDone": "Chưa hoàn thành",
         "code": "Mã",
-        "apply": "Áp dụng"
+        "apply": "Áp dụng",
+        "manager": "Quản lý",
+        "userRoleSetting": "Vai trò người dùng"
     },
     "login": {
         "title": "Đăng nhập hệ thống",
@@ -536,7 +538,15 @@
             "applyForChild": "Áp dụng cho các node con",
             "singleApply": "Áp dụng cho node hiện tại",
             "saveNodeConfigTitle": "Lưu cấu hình hiển thị cho node"
-
         }
+    },
+    "systemRole": {
+        "name": "Hệ thống",
+        "list": {
+            "title": "Danh sách vai trò người dùng hệ thống"
+        }
+    },
+    "userRole": {
+        "userHasNoRole": "Bạn chưa được phân vai trò trong hệ thống"
     }
 }

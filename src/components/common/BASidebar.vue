@@ -71,7 +71,7 @@
                                         <span>Switch user</span>
                                     </v-tooltip>
                                 </template>
-                                 <div class="bg-white" style="width: 200px">
+                                <div class="bg-white" style="width: 200px">
                                     <v-autocomplete
                                         ref="selectDelegateUser"
                                         return-object
@@ -107,20 +107,31 @@
                                 </template>
                                 <span>Role</span>
                             </v-tooltip>
-                            <v-tooltip top>
-                                <template v-slot:activator="{ on }">
-                                    <v-btn
-                                        x-small
-                                        text
-                                        v-on="on"
-                                        depressed>
-                                        <span class="fs-11" style="font-weight: 400!important">
-                                            {{sapp.endUserInfo.currentRole.title}}
-                                        </span>
-                                    </v-btn>
+
+                            <v-menu 
+                                v-model="showSwitchRole"
+                                :offset-y="true"
+                                :close-on-content-click="false">
+                                <template v-slot:activator="{ on: menu, attrs }">
+                                     <v-tooltip top>
+                                        <template v-slot:activator="{ on: tooltip }">
+                                            <v-btn
+                                                x-small
+                                                v-bind="attrs"
+                                                text
+                                                depressed
+                                                v-on="{ ...tooltip, ...menu }">
+                                                <span class="fs-11" style="font-weight: 400!important">
+                                                    {{sapp.endUserInfo.currentRole.name}}
+                                                </span>
+                                            </v-btn>
+                                        </template>
+                                        <span>Switch role</span>
+                                    </v-tooltip>
                                 </template>
-                                <span>Switch role</span>
-                            </v-tooltip>
+                                
+                                <UserRoleSelector></UserRoleSelector>
+                            </v-menu>
                         </div>
                     </div>
 
@@ -200,15 +211,18 @@
 import { util } from "./../../plugins/util.js";
 import { userApi } from "./../../api/user.js";
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
+import UserRoleSelector from "@/components/app/UserRoleSelector.vue";
 
 export default {
     created(){
         let savedUserInfo = util.auth.getSavedUserInfo();
-        this.setUserInfo(savedUserInfo);
+        this.$store.dispatch('app/setUserInfo', savedUserInfo);
         this.$store.dispatch("app/getAllUsers");
+        this.$store.dispatch('app/getAllRoles', this.$store.state.app.endUserInfo.id);
     },
     components: {
-        VuePerfectScrollbar
+        VuePerfectScrollbar,
+        UserRoleSelector
     },
     computed: {
         sapp() {
@@ -230,7 +244,7 @@ export default {
         async delegateUser(user){
             let delegatedUser = await userApi.changeDelegate(user);
             this.showDelegatedUser = false;
-            this.setUserInfo(delegatedUser.data);
+            this.$store.dispatch('app/setUserInfo', delegatedUser.data);
             location.reload();
         },
         openSelectUserPanel(){
@@ -238,30 +252,6 @@ export default {
             setTimeout((self) => {
                 $(self.$refs.selectDelegateUser.$el).find('.v-select__slot').click();
             }, 400, this);
-        },
-        setUserInfo(data) {// đang trùng với hàm cùng tên ở component BAsidebar.vue
-            let accData = {
-                accType: data.profile.type,
-                info: data.profile
-            };
-            let endUserInfo = data.profile;
-            let accInfo = {
-                token: data.token,
-                baId: 0,
-                endUserId: 0,
-                profile:data.profile
-            }
-
-            if(data.profile.type == 'ba'){
-                accInfo.baId = data.profile.id;
-                this.$store.commit("app/changeCurrentBAInfo", data.profile);
-                endUserInfo = endUserInfo.userDelegate;
-                accInfo.endUserId = data.profile.userDelegate.id;
-            }else{
-                accInfo.endUserId = data.profile.id;
-            }
-            this.$store.commit("app/changeCurrentUserInfo", endUserInfo);
-            util.auth.saveLoginInfo(accInfo);
         },
         reCalcSidebarHeight(){
             this.menuItemsHeight = (util.getComponentSize(this).h - 200)+'px';
@@ -296,6 +286,7 @@ export default {
     data() {
         return {
             showDelegatedUser: false,
+            showSwitchRole: false,
             delegatedUser: {},
             searchUserDeligate: '',
             listUserForDelegate: [],
@@ -306,3 +297,4 @@ export default {
 </script>
 
 <style></style>
+

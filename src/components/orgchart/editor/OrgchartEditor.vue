@@ -87,7 +87,7 @@ import ConfigPanel from './ConfigPanel.vue';
 import EditorWorkspace from './EditorWorkspace.vue';
 import NodeSelector from './NodeSelector.vue';
 import VueResizable from 'vue-resizable';
-import { getOrgchartEditorData, getDefaultConfigNodeData, SYMPER_HOME_ORGCHART, getNodeStyleConfig } from './nodeAttrFactory';
+import { getOrgchartEditorData, getDefaultConfigNodeData, SYMPER_HOME_ORGCHART, getNodeStyleConfig, getMapDpmIdToPosition } from './nodeAttrFactory';
 import jointjs from "jointjs";
 import { orgchartApi } from "@/api/orgchart.js";
 import { FOUCUS_DEPARTMENT_DISPLAY, DEFAULT_DEPARTMENT_DISPLAY, departmentMarkup } from '../nodeDefinition/departmentDefinition';
@@ -259,7 +259,8 @@ export default {
                             id: node.vizId,
                             name: node.name,
                             description: node.description,
-                            code: node.code,   
+                            code: node.code,
+                            users: JSON.parse(node.users)
                         };
 
                         if(node.content && node.content !== 'false'){
@@ -277,7 +278,7 @@ export default {
 
                     this.addUsersToPosition(savedData.positions, savedData.userInPostion);
 
-                    let allPositionInADpm = this.getAllPositionInADpm(savedData.positions);
+                    let allPositionInADpm = getMapDpmIdToPosition(savedData.positions);
                     for(let dpmId in allPositionInADpm){
                         let dpmInstanceKey = this.$store.state.orgchart.editor[this.instanceKey].allNode[dpmId].positionDiagramCells.instanceKey;
                         for(let idPosition in allPositionInADpm[dpmId]){
@@ -328,6 +329,8 @@ export default {
                 let pos = mapPostitions[u.positionNodeId];
                 if(!pos.users){
                     pos.users = [];
+                }else if(typeof pos.users == 'string'){
+                    pos.users = JSON.parse(pos.users);
                 }
                 pos.users.push(u.userId);
             }
@@ -336,47 +339,6 @@ export default {
             setTimeout((self) => {
                 self.$refs.editorWorkspace.handleHeaderAction('zoomToFit');
             }, 200, this);
-        },
-        getAllPositionInADpm(allPosition){
-            let mapIdToPos = allPosition.reduce((obj, el) => {
-                obj[el.vizId] = el;
-                return obj;
-            }, {});
-
-            let posInDpm = {};
-
-            for(let id in mapIdToPos){
-                let pos = mapIdToPos[id];
-                let parentPos = mapIdToPos[pos.vizParentId];
-                if(parentPos){
-                    if(!parentPos.children){
-                        parentPos.children = [];
-                    }
-                    parentPos.children.push(id);
-                }else{
-                    // khi position này là root
-                    posInDpm[id] = {};
-                }
-            }
-
-            for(let id in posInDpm){
-                this.addPosToDpm(posInDpm, mapIdToPos,id, id);
-            }
-            let mapDpmToPos = {};
-            
-            for(let id in posInDpm){
-                let dpmId = mapIdToPos[id].vizParentId;
-                mapDpmToPos[dpmId] = posInDpm[id];
-            }
-            return mapDpmToPos;
-        },
-        addPosToDpm(rsl, map, currentId, rootId){
-            rsl[rootId][currentId] = map[currentId];
-            if(map[currentId].children){
-                for(let childId of map[currentId].children){
-                    this.addPosToDpm(rsl, map, childId, rootId);
-                }
-            }
         },
         showPositionEditor(nodeId){
             if(this.context == 'department'){
@@ -493,7 +455,8 @@ export default {
                 description: attrs.description.value,
                 vizParentId: '',
                 dynamicAttrs: node.customAttributes,
-                style: JSON.stringify(nodeStyle)
+                style: JSON.stringify(nodeStyle),
+                users: JSON.stringify(node.users)
             };
             
             if(nodeType == 'department'){
@@ -513,7 +476,7 @@ export default {
                     data.positions = [];
                 }
             }else{
-                data.users = node.users;
+                data.users = typeof node.users == 'string' ? JSON.parse(node.users) : node.users;
             }
             return data;
         },
@@ -593,7 +556,7 @@ export default {
                 defaultConfig.positionDiagramCells.cells = nodeData.positionDiagram.cells;
             }
 
-            if(type == 'position' && nodeData.users){
+            if(nodeData.users){
                 defaultConfig.users = nodeData.users;
             }
             

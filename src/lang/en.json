@@ -63,7 +63,9 @@
         "done": "Done",
         "notDone": "Not done",
         "code": "Code",
-        "apply": "Apply"
+        "apply": "Apply",
+        "manager": "Manager",
+        "userRoleSetting": "User role setting"
     },
     "validate": {
         "required": "Not be empty",
@@ -523,5 +525,14 @@
             "singleApply": "Apply for this node",
             "saveNodeConfigTitle": "Save node style config template"
         }
+    },
+    "systemRole": {
+        "name": "System roles",
+        "list": {
+            "title": "List system user roles"
+        }
+    },
+    "userRole": {
+        "userHasNoRole": "You have no role to select"
     }
 }
