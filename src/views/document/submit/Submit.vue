@@ -135,6 +135,12 @@ export default {
             type: Number,
             default: 0
         },
+        workflowVariable:{
+            type:Object,
+            default(){
+                return {}
+            }
+        }
     },
     name: "submitDocument",
 
