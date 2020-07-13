@@ -74,6 +74,7 @@
                 @update-department-name="changeDepartmentName"
                 ref="positionDiagram"
                 :action="action"
+                :id="id"
                 :instanceKey="selectingNode.positionDiagramCells ? selectingNode.positionDiagramCells.instanceKey : ''"
                 context="position">
             </OrgchartEditor>
@@ -91,6 +92,7 @@ import { getOrgchartEditorData, getDefaultConfigNodeData, SYMPER_HOME_ORGCHART, 
 import jointjs from "jointjs";
 import { orgchartApi } from "@/api/orgchart.js";
 import { FOUCUS_DEPARTMENT_DISPLAY, DEFAULT_DEPARTMENT_DISPLAY, departmentMarkup } from '../nodeDefinition/departmentDefinition';
+import { permissionApi } from '../../../api/permissionPack';
 
 
 
@@ -227,6 +229,7 @@ export default {
             let homeConfig = this.$store.state.orgchart.editor[this.instanceKey].homeConfig;
             homeConfig.commonAttrs.name.value = config.name;
             homeConfig.commonAttrs.description.value = config.description;
+            homeConfig.commonAttrs.code.value = config.code;
             homeConfig.customAttributes = config.dynamicAttributes;
         },
         correctDiagramDisplay(content){
@@ -247,7 +250,7 @@ export default {
             try {
                 let res = await orgchartApi.getOrgchartDetail(id);
                 if(res.status == 200){
-                    let savedData = res.data;departmentMarkup
+                    let savedData = res.data;
                     let departments = this.correctDiagramDisplay(savedData.orgchart.content);
                     this.$refs.editorWorkspace.loadDiagramFromJson(departments);
                     this.centerDiagram();
@@ -344,7 +347,6 @@ export default {
             if(this.context == 'department'){
                 this.positionEditor = true;
                 this.selectNode(nodeId);
-
                 setTimeout((self) => {
                     self.checkAndCreateOrgchartData();
                     if(self.selectingNode.positionDiagramCells.cells){
@@ -352,6 +354,8 @@ export default {
                     }else{
                         self.$refs.positionDiagram.createFirstVizNode();
                     }
+                    self.$refs.positionDiagram.centerDiagram();
+                    self.$refs.positionDiagram.$refs.editorWorkspace.scrollPaperToTop(200);
                     self.$refs.positionDiagram.showOrgchartConfig();
                 }, 200, this);
             }
@@ -404,7 +408,8 @@ export default {
                 departments: JSON.stringify(this.getAllNodesToSave(allVizCell.cells, this.instanceKey)),
                 description: orgchartAttr.commonAttrs.description.value,
                 dynamicAttrs: JSON.stringify(orgchartAttr.customAttributes),
-                name: orgchartAttr.commonAttrs.name.value
+                name: orgchartAttr.commonAttrs.name.value,
+                code: orgchartAttr.commonAttrs.code.value
             };
             return data;
         },
@@ -586,7 +591,30 @@ export default {
                 instanceKey: this.instanceKey,
                 nodeId: nodeId,
             });
-            this.$refs.editorWorkspace.highlightNode();            
+            
+            this.$refs.editorWorkspace.highlightNode(); 
+            if(this.context == 'position'){
+                this.showPermissionsOfNode();
+            }       
+        },
+
+        async showPermissionsOfNode(){
+            if(this.selectingNode.permissions.length > 0 || this.action == 'create'){
+                return;
+            }
+            let res = await permissionApi.getPermissionOfRole('orgchart:'+this.id+':'+this.selectingNode.id);
+            if(res.status == 200){
+                let mapIdToPermission = this.$store.state.permission.allPermissionPack;
+                let permissions = res.data.reduce((arr, el) => {
+                    if(mapIdToPermission[el.permissionPackId]){
+                        arr.push(mapIdToPermission[el.permissionPackId]);
+                    }
+                    return arr;
+                }, []);
+                this.$set(this.selectingNode, 'permissions', permissions);
+            }else{
+                this.$snotifyError(res, "Can not get permission of role");
+            }
         }
     }
 }
