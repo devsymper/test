@@ -408,8 +408,6 @@ export default {
                     let listFormulasControlInTable = this.getDataToSaveMultiFormulas(listField);
                     listControlFormulas = {...listFormulasControlInTable,...listControlFormulas}
                 }
-                console.log('sa',control);
-                
                 for (let f in formulas){
                     if(formulas[f].value != ""){
                         let item = {};
@@ -461,16 +459,7 @@ export default {
             let allControl = this.minimizeControlEL(this.editorStore.allControl);
             let documentProperties = util.cloneDeep(this.$store.state.document.documentProps);
             documentProperties = JSON.stringify(documentProperties);
-
             let htmlContent = this.$refs.editor.editor.getContent();
-            // if(this.documentId != 0 && this.documentId != undefined && typeof this.documentId != 'undefined'){   //update doc
-            //     this.editDocument({documentProperty:documentProperties,fields:JSON.stringify(allControl),content:htmlContent,id:this.documentId})
-            // }
-            // else{
-            //     this.createDocument({documentProperty:documentProperties,fields:JSON.stringify(allControl),content:htmlContent});
-            // }
-
-
             let dataPost = this.getDataToSaveMultiFormulas(allControl);
             if(Object.keys(dataPost).length > 0){
                 let thisCpn = this;
@@ -484,8 +473,6 @@ export default {
                                 let controlEl = $("#editor_ifr").contents().find('#'+controlId);
                                 let tableId = 0;
                                 if(!controlEl.is('.s-control-table') && controlEl.closest(".s-control-table").length > 0){
-                                    console.log(controlId);
-                                    
                                     tableId = controlEl.closest(".s-control-table").attr('id');
                                 }
                                 thisCpn.$store.commit(
@@ -606,9 +593,6 @@ export default {
             this.listMessageErr = [];
             //check trung ten control
             $("#editor_ifr").contents().find('.on-selected').removeClass('on-selected');
-            
-            console.log($('#editor_ifr').contents().find('.s-control-error'));
-            
             if($('#editor_ifr').contents().find('.s-control-error').length == 0){
                 this.saveDocument();
             }

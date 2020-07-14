@@ -3,7 +3,7 @@ import Handsontable from 'handsontable';
 import sDocument from './../../../store/document'
 import store from './../../../store'
 import ClientSQLManager from './clientSQLManager';
-import { checkDbOnly, getControlInstanceFromStore } from './../common/common'
+import { checkDbOnly, getControlType } from './../common/common'
 import { SYMPER_APP } from './../../../main.js'
 import { Date } from 'core-js';
 import { checkCanBeBind, resetImpactedFieldsList, markBinedField } from './handlerCheckRunFormulas';
@@ -460,25 +460,35 @@ export default class Table {
             if (Object.keys(dataInput).length > 0) {
                 let allRowDataInput = [];
                 for (let control in dataInput) {
+                    let controlType = getControlType(control);
                     let dataRow = dataInput[control];
                     if (!Array.isArray(dataRow)) {
                         for (let index = 0; index < thisObj.tableInstance.countRows(); index++) {
                             if (allRowDataInput.length <= index) {
                                 allRowDataInput[index] = {};
                             }
+                            if (controlType != false && controlType == 'number' && dataRow === "") {
+                                dataRow = 0
+                            }
                             allRowDataInput[index][control] = dataRow;
+
                         }
                     } else {
                         for (let i = 0; i < dataRow.length; i++) {
                             if (allRowDataInput.length <= i) {
                                 allRowDataInput[i] = {};
                             }
-                            allRowDataInput[i][control] = dataRow[i];
+                            let value = dataRow[i];
+                            if (controlType != false && controlType == 'number' && value === "") {
+                                value = 0
+                            }
+                            allRowDataInput[i][control] = value;
                         }
                     }
                 }
                 for (let index = 0; index < allRowDataInput.length; index++) {
                     let rowInput = allRowDataInput[index];
+                    console.log('rowInput', rowInput);
                     await formulasInstance.handleBeforeRunFormulas(rowInput).then(res => {
                         dataColumnAfterRunFOrmulas.push(thisObj.getDataResponseQuery(res));
                     });
