@@ -498,7 +498,7 @@ const controlTypes = {
     report: {
         icon: "/icon/ic_report.png",
         html: `<div class="s-control-report s-control" title="Report" s-control-type="report" style="width:150px" contenteditable="false">
-                <h5 style="margin:0;height: 100%;padding-top: 5px;font-size: 12px;font-family: 'Roboto', sans-serif!important;font-weight:normal">Report</h5>
+                <h5 style="margin:0;height: 100%;padding-top: 5px;font-size: 12px;font-weight:normal">Report</h5>
                 </div>&nbsp;`,
         title: "Report",
         notInProps: ['fontSize', 'formatDate', 'mobileProps', 'isPrimary', 'formatNumber', 'isMobile', 'isSumTable', 'isRequired', 'isDBOnly', 'isTableOnly', 'isHidden', 'isAllowUpdate', 'isReadOnly', 'isDisplayCompact', 'isMultipleValue', 'isBorderSubmit', 'isBorderView', 'isBorderPrint'],
@@ -507,7 +507,7 @@ const controlTypes = {
     approvalHistory: {
         icon: "/icon/ic_approval_history.png",
         html: `<div class="s-control-approval-history s-control" title="Approval history" s-control-type="approvalHistory" style="width:150px" contenteditable="false">
-                <h5 style="margin:0;height: 100%;padding-top: 5px;font-size: 12px;font-family: 'Roboto', sans-serif!important;font-weight:normal">Lịch sử phê duyệt</h5>
+                <h5 style="margin:0;height: 100%;padding-top: 5px;font-size: 12px;font-weight:normal">Lịch sử phê duyệt</h5>
                 <div class="list-approval-history"></div>
                 </div>&nbsp;`,
         title: "Approval history",
@@ -517,7 +517,7 @@ const controlTypes = {
     trackingValue: {
         icon: "/icon/ic_tracking_value.png",
         html: `<div class="s-control-tracking-value s-control" title="Tracking value" s-control-type="trackingValue" style="width:150px" contenteditable="false" readonly="readonly">
-                <h5 style="margin:0;height: 100%;padding-top: 5px;font-size: 12px;font-family: 'Roboto', sans-serif!important;font-weight:normal">Tracking giá trị của control</h5>
+                <h5 style="margin:0;height: 100%;padding-top: 5px;font-size: 12px;font-weight:normal">Tracking giá trị của control</h5>
                 </div>&nbsp;`,
         title: "Tracking value",
         inProps: ['name', 'isAllowPrint', 'formatDate', 'isBorderSubmit', 'isBorderView', 'isBorderPrint'],
