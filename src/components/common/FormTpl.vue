@@ -234,7 +234,8 @@ const inputTypeConfigs = {
         props(config) {
             return {
                 columns: config.columns,
-                data: config.value
+                data: config.value,
+                minSpareRows: 1
             };
         }
     },
