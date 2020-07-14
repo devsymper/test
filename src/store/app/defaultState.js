@@ -80,6 +80,7 @@ const defaultState = {
     orgchartNodes: {},
     // Danh sách tất cả các user trong hệ thống
     allUsers: [],
+    generalNotificationPosition: 'top right'
 };
 
 export default defaultState;

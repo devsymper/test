@@ -73,6 +73,18 @@
                         v-model="selectingNode.users"
                     ></UserSelector>
                 </div>
+
+                <div class="mt-3" v-if="context == 'position' && selectingNode.id != SYMPER_HOME_ORGCHART">
+                    <span
+                        class="fs-12">
+                    Select permissions
+                    </span>
+
+                    <PermissionSelector
+                        v-model="selectingNode.permissions">
+                        
+                    </PermissionSelector>
+                </div>
             </v-tab-item>
 
             <v-tab-item :key="'customAttributes'">
@@ -257,6 +269,7 @@ import { util } from "../../../plugins/util";
 import { orgchartApi } from "../../../api/orgchart";
 import { elementTools } from "jointjs";
 import SearchNodeStyle from "@/components/orgchart/editor/SearchNodeStyle";
+import PermissionSelector from "@/components/permission/PermissionSelector.vue";
 
 export default {
     created() {
@@ -276,7 +289,8 @@ export default {
     components: {
         "form-tpl": FormTpl,
         UserSelector,
-        SearchNodeStyle
+        SearchNodeStyle,
+        PermissionSelector
     },
     computed: {
         selectingNode() {

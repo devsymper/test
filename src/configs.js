@@ -29,7 +29,8 @@ export const appConfigs = {
         sdocumentManagement: 'https://sdocument-management.symper.vn/',
         orgchart: 'https://orgchart.symper.vn/',
         systemRole: "https://orgchart.symper.vn/",
-        userRole: "https://orgchart.symper.vn/"
+        userRole: "https://orgchart.symper.vn/",
+        permission: "https://accesscontrol.symper.vn/"
     },
     notificationTimeout: {
         success: 10000,

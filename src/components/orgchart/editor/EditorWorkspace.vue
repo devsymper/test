@@ -317,12 +317,12 @@ export default {
             });
             self.scrollPaperToTop();
         },
-        scrollPaperToTop(){
+        scrollPaperToTop(time = 1000){
             setTimeout((self) => {
                 let viewPort = $(self.$refs.jointPaper.$el).find('.symper-orgchart-paper>.joint-paper-scroller');
                 let view = $(self.$refs.jointPaper.$el).find('.symper-orgchart-paper>.joint-paper-scroller>.paper-scroller-background>.joint-paper');
                 $(viewPort).scrollTop($(view).position().top);
-            }, 1000, this);
+            }, time, this);
         },
         repositionFirstCell(graph, paperScroller){
             let firstNode = graph.getCells()[0];

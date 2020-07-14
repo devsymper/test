@@ -63,7 +63,8 @@ export const getDefaultConfigNodeData = function(nodeId, isDepartment = false) {
             cells: false,
         }
     } else {
-        config.users = []
+        config.users = [];
+        config.permissions = [];
     }
     return config;
 }

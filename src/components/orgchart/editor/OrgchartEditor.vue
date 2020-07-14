@@ -74,6 +74,7 @@
                 @update-department-name="changeDepartmentName"
                 ref="positionDiagram"
                 :action="action"
+                :id="id"
                 :instanceKey="selectingNode.positionDiagramCells ? selectingNode.positionDiagramCells.instanceKey : ''"
                 context="position">
             </OrgchartEditor>
@@ -91,8 +92,7 @@ import { getOrgchartEditorData, getDefaultConfigNodeData, SYMPER_HOME_ORGCHART, 
 import jointjs from "jointjs";
 import { orgchartApi } from "@/api/orgchart.js";
 import { FOUCUS_DEPARTMENT_DISPLAY, DEFAULT_DEPARTMENT_DISPLAY, departmentMarkup } from '../nodeDefinition/departmentDefinition';
-
-
+import { permissionApi } from '../../../api/permissionPack';
 
 export default {
     name: 'OrgchartEditor',
@@ -227,6 +227,7 @@ export default {
             let homeConfig = this.$store.state.orgchart.editor[this.instanceKey].homeConfig;
             homeConfig.commonAttrs.name.value = config.name;
             homeConfig.commonAttrs.description.value = config.description;
+            homeConfig.commonAttrs.code.value = config.code;
             homeConfig.customAttributes = config.dynamicAttributes;
         },
         correctDiagramDisplay(content){
@@ -247,7 +248,7 @@ export default {
             try {
                 let res = await orgchartApi.getOrgchartDetail(id);
                 if(res.status == 200){
-                    let savedData = res.data;departmentMarkup
+                    let savedData = res.data;
                     let departments = this.correctDiagramDisplay(savedData.orgchart.content);
                     this.$refs.editorWorkspace.loadDiagramFromJson(departments);
                     this.centerDiagram();
@@ -344,7 +345,6 @@ export default {
             if(this.context == 'department'){
                 this.positionEditor = true;
                 this.selectNode(nodeId);
-
                 setTimeout((self) => {
                     self.checkAndCreateOrgchartData();
                     if(self.selectingNode.positionDiagramCells.cells){
@@ -352,6 +352,8 @@ export default {
                     }else{
                         self.$refs.positionDiagram.createFirstVizNode();
                     }
+                    self.$refs.positionDiagram.centerDiagram();
+                    self.$refs.positionDiagram.$refs.editorWorkspace.scrollPaperToTop(200);
                     self.$refs.positionDiagram.showOrgchartConfig();
                 }, 200, this);
             }
@@ -373,27 +375,161 @@ export default {
             let cells = this.$refs.positionDiagram.$refs.editorWorkspace.getAllDiagramCells();
             this.selectingNode.positionDiagramCells.cells = cells;
         },
+        validateOrgchartNameAndCode(){
+            let self = this;
+            return new Promise((resolve, reject) => {
+                let attr = self.$store.state.orgchart.editor[this.instanceKey].homeConfig.commonAttrs;
+                let passed = true;
+                if(!attr.name.value || !attr.code.value){
+                    passed = false;
+                    self.showWarning("Orgchart name and code can not empty!", function(){
+                        self.selectNode(SYMPER_HOME_ORGCHART);
+                    });
+                    reject(false);
+                }else{
+                    resolve(true);
+                }
+            });
+        },
+        showWarning(title, resolveAction){
+            this.$snotify({
+                type: 'warn',
+                tex: '',
+                duration: 100000,
+                position: 'top left',
+                title: title,
+                actionBtns: [
+                    {
+                        text: "Resolve",
+                        icon: "mdi-send-check",
+                        action: (close) => {
+                            resolveAction();
+                            close();
+                        }
+                    }
+                ]
+            });
+        },
+        validateEmptyNameAndCodeDepartment(){
+            let self = this;
+            return new Promise((resolve, reject) => {
+                let allNode = self.$store.state.orgchart.editor[this.instanceKey].allNode;
+                let passed = true;
+                for(let nodeId in allNode){
+                    let attr = allNode[nodeId].commonAttrs;
+                    if(!attr.name.value || !attr.code.value){
+                        passed = false;
+                        self.showWarning("Name and code of department can not empty", function(){
+                            self.selectNode(nodeId);
+                        });
+                    }
+                }
+
+                if(passed){
+                    resolve();
+                }else{
+                    reject();
+                }
+            });
+        },
+        validateDuplicateCodeDepartment(){
+            let self = this;
+            return new Promise((resolve, reject) => {
+                let allNode = self.$store.state.orgchart.editor[this.instanceKey].allNode;
+                let invalidIds = [];
+                let mapCodeDpms = {};
+                for(let nodeId in allNode){
+                    let attr = allNode[nodeId].commonAttrs;
+                    let code = attr.code.value;
+                    if(!code){
+                        continue
+                    }
+                    if(!mapCodeDpms[code]){
+                        mapCodeDpms[code] = allNode[nodeId];
+                    }else{
+                        invalidIds.push(nodeId);
+                        self.showWarning("Code of department can not be duplicated", function(){
+                            self.selectNode(nodeId);
+                        });
+                    }
+                }
+
+                if(invalidIds.length == 0){
+                    resolve();
+                }else{
+                    reject();
+                }
+            });
+        },
+        validateEmptyNameAndCodePosition(){
+            let self = this;
+            return new Promise((resolve, reject) => {
+                let allDpmns = self.$store.state.orgchart.editor[this.instanceKey].allNode;
+                let invalidIds = [];
+                let mapCodeDpms = {};
+                let passed = true;
+                for(let dpmId in allDpmns){
+                    let dpm = allDpmns[dpmId];
+                    let allPos = self.$store.state.orgchart.editor[dpm.positionDiagramCells.instanceKey].allNode;
+                    for(let posId in allPos){
+                        let attr = allPos[posId].commonAttrs;
+                        if(!attr.name.value || !attr.code.value){
+                            passed = false;
+                            self.showWarning("Name and code of position can not empty", function(){
+                                if(!self.positionEditor){
+                                    self.showPositionEditor(dpmId);
+                                }else{
+                                    if(dpmId != self.selectingNode.id){
+                                        self.positionEditor = false;
+                                    }
+                                }
+
+                                setTimeout(() => {
+                                    self.$refs.positionDiagram.selectNode(posId);
+                                }, 500);
+                                
+                            });
+                        }
+                    }
+                }
+
+                if(passed){
+                    resolve();
+                }else{
+                    reject();
+                }
+            });
+        },
         validateDataBeforeSave(){
-            let orgchartAttr = this.$store.state.orgchart.editor[this.instanceKey].homeConfig;
-            if(orgchartAttr.commonAttrs.name.value){
-                return {
-                    passed: true
-                }
-            }else{
-                return {
-                    passed: false,
-                    message: "Orgchart name can not empty!"
-                }
-            }
+            let self = this;
+            return new Promise((resolve, reject) => {
+                let validateMethods = [
+                    self.validateOrgchartNameAndCode(),
+                    self.validateEmptyNameAndCodeDepartment(),
+                    self.validateDuplicateCodeDepartment(),
+                    self.validateEmptyNameAndCodePosition(),
+                ];
+
+                Promise.all(validateMethods).then(() => {
+                    resolve(true);
+                }).catch((err) => {
+                    reject(err);
+                }); 
+
+            });
         },
         async saveOrgchart(){
-            let validate = this.validateDataBeforeSave();
-            if(!validate.passed){
-                this.$snotifyError({}, validate.message);
-                return;
+            let passed = true;
+            try {    
+                let validate = await this.validateDataBeforeSave();
+            } catch (error) {
+                passed = false;
+            }      
+
+            if(passed){
+                let orgchartData = this.getDataToSave();
+                this.$emit('save-orgchart-data', orgchartData);    
             }
-            let orgchartData = this.getDataToSave();
-            this.$emit('save-orgchart-data', orgchartData);          
         },
         getDataToSave(){
             let orgchartAttr = this.$store.state.orgchart.editor[this.instanceKey].homeConfig;
@@ -404,7 +540,8 @@ export default {
                 departments: JSON.stringify(this.getAllNodesToSave(allVizCell.cells, this.instanceKey)),
                 description: orgchartAttr.commonAttrs.description.value,
                 dynamicAttrs: JSON.stringify(orgchartAttr.customAttributes),
-                name: orgchartAttr.commonAttrs.name.value
+                name: orgchartAttr.commonAttrs.name.value,
+                code: orgchartAttr.commonAttrs.code.value
             };
             return data;
         },
@@ -477,6 +614,10 @@ export default {
                 }
             }else{
                 data.users = typeof node.users == 'string' ? JSON.parse(node.users) : node.users;
+                data.permissions = node.permissions.reduce((arr, el) => {
+                    arr.push(el.id);
+                    return arr;
+                }, []);
             }
             return data;
         },
@@ -582,7 +723,30 @@ export default {
                 instanceKey: this.instanceKey,
                 nodeId: nodeId,
             });
-            this.$refs.editorWorkspace.highlightNode();            
+            
+            this.$refs.editorWorkspace.highlightNode(); 
+            if(this.context == 'position'){
+                this.showPermissionsOfNode();
+            }       
+        },
+
+        async showPermissionsOfNode(){
+            if(this.selectingNode.permissions.length > 0 || this.action == 'create'){
+                return;
+            }
+            let res = await permissionApi.getPermissionOfRole('orgchart:'+this.id+':'+this.selectingNode.id);
+            if(res.status == 200){
+                let mapIdToPermission = this.$store.state.permission.allPermissionPack;
+                let permissions = res.data.reduce((arr, el) => {
+                    if(mapIdToPermission[el.permissionPackId]){
+                        arr.push(mapIdToPermission[el.permissionPackId]);
+                    }
+                    return arr;
+                }, []);
+                this.$set(this.selectingNode, 'permissions', permissions);
+            }else{
+                this.$snotifyError(res, "Can not get permission of role");
+            }
         }
     }
 }
