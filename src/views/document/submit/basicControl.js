@@ -320,7 +320,10 @@ export default class BasicControl extends Control {
 
     }
     renderUserControl() {
-        if (this.checkDetailView()) return;
+        if (this.checkDetailView()) {
+
+            return;
+        }
         this.ele.attr('type', 'text');
         this.ele.parent().css({ display: 'block' })
         this.ele.on('keyup', function(e) {

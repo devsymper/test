@@ -3,6 +3,15 @@ let dataSubmitStore = sDocument.state.submit
 import ClientSQLManager from "./clientSQLManager.js";
 import { formulasApi } from "./../../../api/Formulas";
 import Util from "./util";
+const BUILD_IN_FUNCTION = ['TODAY', 'BEGIN_WEEK', 'END_WEEK', 'BEGIN_MONTH', 'END_MONTH',
+    'BEGIN_YEAR', 'END_YEAR', 'TIMESTAMP', 'PARENT_WORKFLOW', 'CURRENT_WORKFLOW',
+    'CURRENT_USER_ID',
+    'CURRENT_USER',
+    'CURRENT_USER_FULLNAME',
+    'CURRENT_USER_EMAIL',
+    'CURRENT_USER_PHONE',
+    'CURRENT_USER_PHONE_NUMBER'
+]
 export default class Formulas {
     constructor(keyInstance, formulas, type) {
             /**
@@ -130,7 +139,9 @@ export default class Formulas {
                     value = 0;
                 }
             }
-            formulas = formulas.replace(regex, value);
+            if (!BUILD_IN_FUNCTION.includes(controlName)) {
+                formulas = formulas.replace(regex, value);
+            }
 
         }
         return formulas;
@@ -149,7 +160,6 @@ export default class Formulas {
                 where += element + " ILIKE '%" + search + "%' OR";
             }
         }
-        console.log('dsag', dataInput);
         if (listSyql != null && listSyql.length > 0) {
             let syql = listSyql[0].trim();
             syql = this.replaceParamsToData(dataInput, syql);
@@ -250,7 +260,9 @@ export default class Formulas {
             }
             let names = allRelateName.reduce((obj, name) => {
                 let controlName = name.match(/\w+/g);
-                obj[controlName] = true;
+                if (!BUILD_IN_FUNCTION.includes(controlName[0])) {
+                    obj[controlName] = true;
+                }
                 return obj;
             }, {});
             return names;

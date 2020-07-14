@@ -111,6 +111,7 @@ export default class Table {
             this.listCellType = {};
             this.currentSelectedCell = {};
             this.isAutoCompleting = false;
+            this.showPopupUser = false;
             this.currentControlSelected = null
             this.event = {
                 afterSelection: (row, column, row2, column2, preventScrolling, selectionLayerLevel) => {
@@ -140,44 +141,55 @@ export default class Table {
                         thisObj.setSelectCell(event);
                     };
                 },
+
                 beforeKeyDown: function(event) {
                     if (listKeyCodeNotChange.includes(event.keyCode)) {
                         return;
                     }
-                    if (event.keyCode != 40 && event.keyCode != 38 &&
-                        event.keyCode != 37 && event.keyCode != 39 &&
-                        thisObj.isAutoCompleting == false) {
-                        var formulasInstance = thisObj.checkIsAutocompleteCell(thisObj.currentControlSelected);
-                        if (formulasInstance != false) {
-                            SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-input', event);
-                            thisObj.isAutoCompleting = formulasInstance;
-                        }
-                    }
                     // chặn bấm lên xuống trái phải khi có autocomplete
-                    if ((event.keyCode == 40 || event.keyCode == 38 ||
-                            event.keyCode == 37 || event.keyCode == 39) && thisObj.isAutoCompleting != false) {
-                        event.stopImmediatePropagation();
-                    }
-                    let colHeaders = this.getColHeader();
-                    // hoangnd: cần set timeout ở đây tại vì cần thực hiện đoạn này sau khi keydown hoàn tất thì input mới có dữ liệu
 
-                    setTimeout(() => {
-                        if (thisObj.isAutoCompleting != false) {
-                            let column = thisObj.currentSelectedCell['column'];
-
-                            // let controlName = 
-                            let formulasInstance = thisObj.isAutoCompleting
+                    if (thisObj.checkControlType('user')) {
+                        thisObj.showPopupUser = true;
+                        if (event.keyCode == 13) {
+                            thisObj.showPopupUser = false;
+                        }
+                        if ((event.keyCode == 40 || event.keyCode == 38 ||
+                                event.keyCode == 37 || event.keyCode == 39) && thisObj.showPopupUser != false) {
+                            event.stopImmediatePropagation();
+                        }
+                        SYMPER_APP.$evtBus.$emit('document-submit-user-input-change', event)
+                    } else {
+                        thisObj.showPopupUser = false;
+                        if (event.keyCode != 40 && event.keyCode != 38 &&
+                            event.keyCode != 37 && event.keyCode != 39 &&
+                            thisObj.isAutoCompleting == false) {
+                            var formulasInstance = thisObj.checkIsAutocompleteCell(thisObj.currentControlSelected);
                             if (formulasInstance != false) {
-                                SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-key-event', {
-                                    e: event,
-                                    autocompleteFormulasInstance: formulasInstance,
-                                    isSelect: false,
-                                    controlTitle: colHeaders[column]
-                                })
+                                SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-input', event);
+                                thisObj.isAutoCompleting = formulasInstance;
                             }
                         }
-                    }, 10);
 
+                        let colHeaders = this.getColHeader();
+                        // hoangnd: cần set timeout ở đây tại vì cần thực hiện đoạn này sau khi keydown hoàn tất thì input mới có dữ liệu
+
+                        setTimeout(() => {
+                            if (thisObj.isAutoCompleting != false) {
+                                let column = thisObj.currentSelectedCell['column'];
+
+                                // let controlName = 
+                                let formulasInstance = thisObj.isAutoCompleting
+                                if (formulasInstance != false) {
+                                    SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-key-event', {
+                                        e: event,
+                                        autocompleteFormulasInstance: formulasInstance,
+                                        isSelect: false,
+                                        controlTitle: colHeaders[column]
+                                    })
+                                }
+                            }
+                        }, 10);
+                    }
                 },
 
                 afterSelectionEnd: function(row, col) {
@@ -295,28 +307,40 @@ export default class Table {
          * Hàm xử lí dữ liệu thay đổi ở cell bởi User edit (hàm set data của handson)
          */
     handlerAfterChangeCellByUser(changes, currentRowData, columns, controlName) {
-            let thisObj = this;
-            for (let index = 0; index < currentRowData.length; index++) {
-                let cell = currentRowData[index];
-                if (cell == "" || cell == null) {
-                    currentRowData[index] = 'NULL';
-                } else {
-                    currentRowData[index] = '"' + currentRowData[index] + '"'
-                }
-            }
-            if (currentRowData[currentRowData.length - 1] == 'NULL') {
-                let id = Date.now();
-                currentRowData[currentRowData.length - 1] = id;
-                thisObj.tableInstance.setDataAtCell(thisObj.currentSelectedCell['row'], currentRowData.length - 1, id);
-
-                ClientSQLManager.insertRow(thisObj.keyInstance, thisObj.tableName, columns, currentRowData, true).then(res => {
-                    thisObj.handlerCheckEffectedControlInTable(controlName);
-                });
+        let thisObj = this;
+        for (let index = 0; index < currentRowData.length; index++) {
+            let cell = currentRowData[index];
+            if (cell == "" || cell == null) {
+                currentRowData[index] = 'NULL';
             } else {
-                ClientSQLManager.editRow(thisObj.keyInstance, thisObj.tableName, controlName, changes[0][3],
-                    'WHERE s_table_id_sql_lite = ' + currentRowData[currentRowData.length - 1], true).then(res => {
-                    thisObj.handlerCheckEffectedControlInTable(controlName);
-                });
+                currentRowData[index] = '"' + currentRowData[index] + '"'
+            }
+        }
+        if (currentRowData[currentRowData.length - 1] == 'NULL') {
+            let id = Date.now();
+            currentRowData[currentRowData.length - 1] = id;
+            thisObj.tableInstance.setDataAtCell(thisObj.currentSelectedCell['row'], currentRowData.length - 1, id);
+
+            ClientSQLManager.insertRow(thisObj.keyInstance, thisObj.tableName, columns, currentRowData, true).then(res => {
+                thisObj.handlerCheckEffectedControlInTable(controlName);
+            });
+        } else {
+            ClientSQLManager.editRow(thisObj.keyInstance, thisObj.tableName, controlName, changes[0][3],
+                'WHERE s_table_id_sql_lite = ' + currentRowData[currentRowData.length - 1], true).then(res => {
+                thisObj.handlerCheckEffectedControlInTable(controlName);
+            });
+        }
+    }
+
+
+    checkControlType(type) {
+            let columns = this.columnsInfo.columns;
+            let controlName = columns[this.currentSelectedCell['column']].data;
+            let controlInstance = listInputInDocument[controlName];
+            if (controlInstance.type == type) {
+                return true;
+            } else {
+                return false;
             }
         }
         /**
@@ -688,17 +712,17 @@ export default class Table {
             //Đánh số thứ tự các cột trong bảng
             thisObj.colName2Idx[controlName] = num;
             //ẩn cột
-
-            if (listInputInDocument[controlName].controlProperties.hasOwnProperty('isHidden') &&
-                (listInputInDocument[controlName].controlProperties.isHidden.value == 1 ||
-                    listInputInDocument[controlName].controlProperties.isHidden.value === true ||
-                    listInputInDocument[controlName].controlProperties.isHidden.value == "1")) {
+            let comtrolProp = listInputInDocument[controlName].controlProperties;
+            if (comtrolProp.hasOwnProperty('isHidden') &&
+                (comtrolProp.isHidden.value == 1 ||
+                    comtrolProp.isHidden.value === true ||
+                    comtrolProp.isHidden.value == "1")) {
                 hiddenColumns.push(num);
             }
-            if (listInputInDocument[controlName].controlProperties.hasOwnProperty('isSumTable') &&
-                (listInputInDocument[controlName].controlProperties.isSumTable.value == 1 ||
-                    listInputInDocument[controlName].controlProperties.isSumTable.value === true ||
-                    listInputInDocument[controlName].controlProperties.isSumTable.value == "1")) {
+            if (comtrolProp.hasOwnProperty('isSumTable') &&
+                (comtrolProp.isSumTable.value == 1 ||
+                    comtrolProp.isSumTable.value === true ||
+                    comtrolProp.isSumTable.value == "1")) {
                 columnHasSum[controlName] = num;
                 thisObj.tableHasRowSum = true;
             }
@@ -812,7 +836,9 @@ export default class Table {
     }
     checkUniqueTable(controlName) {
         let controlInstance = listInputInDocument[controlName];
-        if (controlInstance.controlProperties.isTableOnly.value === false) {
+        if (!controlInstance.controlProperties.hasOwnProperty('isTableOnly') ||
+            (controlInstance.controlProperties.hasOwnProperty('isTableOnly') &&
+                controlInstance.controlProperties.isTableOnly.value === false)) {
             return;
         } else {
             let controlTitle = (listInputInDocument[controlName].title == "") ? listInputInDocument[controlName].name : listInputInDocument[controlName].title;

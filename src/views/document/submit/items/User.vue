@@ -29,43 +29,42 @@ export default {
             listUser:null,
             listAllUser:null,
             element:null,
-            indexActive:null
+            indexActive:-1
         }
     },
     created(){
         
         let thisCpn = this;
         this.$evtBus.$on('document-submit-user-input-change',e=>{
-            if($(e.target).attr('key-instance') == thisCpn.keyInstance && thisCpn.isShow == false){
+            if( thisCpn.isShow == false){
                 thisCpn.show();
                 thisCpn.calculatorPositionBox(e);
                 thisCpn.element = $(e.target)
             }
-            if($(e.target).attr('key-instance') == thisCpn.keyInstance){
-                if(e.keyCode == 38){    //len
+            if(e.keyCode == 38){    //len
+                if(thisCpn.indexActive <= 0){
+                    return false;
+                }
+                Vue.set(thisCpn.listUser[thisCpn.indexActive], 'active', false);
+                thisCpn.indexActive--;
+                Vue.set(thisCpn.listUser[thisCpn.indexActive], 'active', true);
                 
-                    if(thisCpn.indexActive == 0){
-                        return false;
-                    }
-                    Vue.set(thisCpn.listUser[thisCpn.indexActive], 'active', false);
-                    thisCpn.indexActive--;
-                    Vue.set(thisCpn.listUser[thisCpn.indexActive], 'active', true);
-                    
-                }   
-                else if(e.keyCode == 40){
-                    if(thisCpn.indexActive == thisCpn.listUser.length - 1){
-                        return false;
-                    }
-                    Vue.set(thisCpn.listUser[thisCpn.indexActive], 'active', false);
-                    thisCpn.indexActive++;
-                    Vue.set(thisCpn.listUser[thisCpn.indexActive], 'active', true);
+            }   
+            else if(e.keyCode == 40){
+                if(thisCpn.indexActive >= thisCpn.listUser.length - 1){
+                    return false;
                 }
-                else if(e.keyCode == 13){
-                    let user = thisCpn.listUser[thisCpn.indexActive];
-                    thisCpn.selectItem(user)
-                }
-                thisCpn.filterUser($(e.target).val())
+                if(thisCpn.indexActive != -1)
+                Vue.set(thisCpn.listUser[thisCpn.indexActive], 'active', false);
+                thisCpn.indexActive++;
+                Vue.set(thisCpn.listUser[thisCpn.indexActive], 'active', true);
             }
+            else if(e.keyCode == 13 && thisCpn.indexActive != -1){
+                let user = thisCpn.listUser[thisCpn.indexActive];
+                thisCpn.selectItem(user);
+                thisCpn.indexActive = -1
+            }
+            thisCpn.filterUser($(e.target).val())
         })
 
         userApi.getListUser(1,100000).then(res => {
