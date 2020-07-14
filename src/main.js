@@ -70,6 +70,7 @@ Vue.prototype.$goToPage = function(url, title) {
  */
 Vue.prototype.$snotify = function(option, group = false) {
     group = group ? group : 'symper-general-notification';
+    let position = option.position ? option.position : 'top right';
     let defaultOptions = {
         group: group,
         width: 400,
@@ -84,6 +85,7 @@ Vue.prototype.$snotify = function(option, group = false) {
         }
     };
     option = Object.assign(defaultOptions, option);
+    this.$store.state.app.generalNotificationPosition = position;
     this.$notify(option);
 }
 
