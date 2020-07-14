@@ -191,7 +191,7 @@ const getAllRoles = async function(context, userId) {
 const changeUserRole = async function(context, role) {
     let res = await userApi.changeRole(role.id);
     if (res.status == 200) {
-        setUserInfo(res.data);
+        setUserInfo(context, res.data);
         location.reload();
     } else {
         SYMPER_APP.$snotifyError(res, "Can not change user role");

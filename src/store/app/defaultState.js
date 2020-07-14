@@ -11,7 +11,7 @@ const defaultState = {
         currentRole: {
             // Vai trò hiện tại của enduser đang đóng
             id: 0,
-            name: "Trưởng phòng nhân sự",
+            name: "",
         },
         roles: { // các vai trò mà user có thể có trong orgchart hoặc system role
             orgchart: [],

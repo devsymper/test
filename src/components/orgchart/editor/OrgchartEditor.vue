@@ -412,10 +412,17 @@ export default {
         },
         validateEmptyNameAndCodeDepartment(){
             let self = this;
+            let mapVizNode = this.$refs.editorWorkspace.getAllDiagramCells().cells.reduce((map, el) => {
+                map[el.id] = el;
+                return map;
+            }, {});
             return new Promise((resolve, reject) => {
                 let allNode = self.$store.state.orgchart.editor[this.instanceKey].allNode;
                 let passed = true;
                 for(let nodeId in allNode){
+                    if(!mapVizNode[nodeId]){
+                        continue;
+                    }
                     let attr = allNode[nodeId].commonAttrs;
                     if(!attr.name.value || !attr.code.value){
                         passed = false;
@@ -434,11 +441,18 @@ export default {
         },
         validateDuplicateCodeDepartment(){
             let self = this;
+            let mapVizNode = this.$refs.editorWorkspace.getAllDiagramCells().cells.reduce((map, el) => {
+                map[el.id] = el;
+                return map;
+            }, {});
             return new Promise((resolve, reject) => {
                 let allNode = self.$store.state.orgchart.editor[this.instanceKey].allNode;
                 let invalidIds = [];
                 let mapCodeDpms = {};
                 for(let nodeId in allNode){
+                    if(!mapVizNode[nodeId]){
+                        continue;
+                    }
                     let attr = allNode[nodeId].commonAttrs;
                     let code = attr.code.value;
                     if(!code){
