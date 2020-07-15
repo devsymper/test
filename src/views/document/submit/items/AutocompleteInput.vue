@@ -95,8 +95,6 @@ export default {
             this.indexActive = 0;
         },
         calculatorPositionBox(e){
-            console.log($(e.target));
-            
             // nếu autocomplete từ cell của handsontable  
             if($(e.target).closest('.handsontable').length > 0 ){
                 let autoEL = $(this.$el).detach();
@@ -134,14 +132,12 @@ export default {
             else if(item.hasOwnProperty('column1')){
                 value = item['column1'];
             }
-            this.$emit('after-select-row',{value:value});
-
+            this.$emit('after-select-row',{value:value,input:this.curInput});
             this.dataTable = []
             this.hide();
         },
         openSubForm(){
             this.hide();
-            $('.autocompleting').removeClass('autocompleting');
             this.$emit('open-sub-form');
 
         }

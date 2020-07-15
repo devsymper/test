@@ -417,8 +417,6 @@ export default class BasicControl extends Control {
     addAutoCompleteEvent(fromSelect = false) {
         let thisObj = this;
         this.ele.on('input', function(e) {
-            $(this).addClass('autocompleting');
-
             store.commit("document/addToDocumentSubmitStore", {
                 key: 'currentCellSelected',
                 value: null

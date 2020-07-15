@@ -50,10 +50,19 @@ const checkInTable = function(element) {
     }
     return tableId;
 }
+const getControlType = function(controlName) {
+    let control = getControlInstanceFromStore(controlName);
+    if (control != false) {
+        return control.type;
+    } else {
+        return false
+    }
+}
 export {
     // handlerRunOtherFormulasControl
     getControlInstanceFromStore,
     checkDbOnly,
     checkInTable,
-    getControlTitleFromName
+    getControlTitleFromName,
+    getControlType
 }

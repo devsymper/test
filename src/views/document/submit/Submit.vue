@@ -408,8 +408,6 @@ export default {
             else{
                 let aliasControl = e.autocompleteFormulasInstance.autocompleteDetectAliasControl();
                 let dataInput = this.getDataInputFormulas(e.autocompleteFormulasInstance);
-                console.log('dataInput',dataInput);
-                console.log('dataInput',e.autocompleteFormulasInstance);
                 let dataAutocomplete = e.autocompleteFormulasInstance.handleRunAutoCompleteFormulas($(e.e.target).val(),dataInput).then(res=>{
                     thisCpn.setDataForControlAutocomplete(res,aliasControl,e.controlTitle)
                 });
@@ -428,7 +426,6 @@ export default {
                     if(res.data.data !== ""){
                     dataTable = this.handleDataAutoComplete(res.data.data,false,controlAs);
                     }
-                    console.log('dataInput',dataTable);
                     this.$refs.autocompleteInput.setAliasControl(aliasControl);
                     this.$refs.autocompleteInput.setData(dataTable);
                 }
@@ -488,10 +485,10 @@ export default {
         afterSelectRowAutoComplete(data){
             // th này không phải trong table       
             if(this.sDocumentSubmit.currentCellSelected == null){
-                $('.autocompleting').val(data.value);
+                let input = data.input;
+                input.val(data.value);
                 markBinedField(this.sDocumentSubmit.currentControlAutoComplete);
-                $('.autocompleting').trigger('change');
-                $('.autocompleting').removeClass('autocompleting');
+                input.trigger('change');
             }
             else{
                 let currentTableInteractive = this.sDocumentSubmit.currentTableInteractive
