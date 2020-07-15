@@ -5,6 +5,7 @@
             :settings="tableSettings"
             :data="data"
             :columns="tableColumns"
+            :minSpareRows="minSpareRows"
         ></hot-table>
     </div>
 </template>
@@ -56,6 +57,9 @@ export default {
             default() {
                 return [];
             }
+        },
+        minSpareRows: {
+            default: 0
         }
     },
     computed: {
