@@ -227,26 +227,26 @@ export default {
                 }
 
             }
-            // setTimeout(() => {
-            //     thisCpn.printDiv()
-            // }, 500);
+            setTimeout(() => {
+                thisCpn.printDiv()
+            }, 500);
         },
         
         printDiv(){
-            let css = this.getallcss();
+            // let css = this.getallcss();
             let head = document.head || document.getElementsByTagName('head')[0];
             let style = document.createElement('style');
             
-            style.type = 'text/css';
-            if (style.styleSheet){
-            // This is required for IE8 and below.
-            style.styleSheet.cssText = css;
-            } else {
-            style.appendChild(document.createTextNode(css));
-            }
-			var printContents = document.getElementById('sym-submit-'+this.keyInstance).innerHTML;
+            // style.type = 'text/css';
+            // if (style.styleSheet){
+            // // This is required for IE8 and below.
+            // style.styleSheet.cssText = css;
+            // } else {
+            // style.appendChild(document.createTextNode(css));
+            // }
+			var printContents = $('.layout.justify-center')[0].innerHTML;
 			var originalContents = document.body.innerHTML;
-            head.appendChild(style);
+            // head.appendChild(style);
 
 			document.body.innerHTML = printContents;
 
