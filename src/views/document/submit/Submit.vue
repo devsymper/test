@@ -259,15 +259,16 @@ export default {
 
         // hàm nhận sự kiện thay đổi của input
         this.$evtBus.$on("document-submit-input-change", locale => {
-            thisCpn.$store.commit("document/addToDocumentSubmitStore", {
-                key: 'docStatus',
-                value: 'input'
-            });
+            this.$store.commit("document/addToDocumentSubmitStore", {
+                        key: 'docStatus',
+                        value: 'input'
+                    });
             let valueControl = locale.val;
             if(thisCpn.sDocumentSubmit.listInputInDocument[locale.controlName].type == 'user'){
                 valueControl = $('#'+thisCpn.sDocumentSubmit.listInputInDocument[locale.controlName].id).attr('user-id');
                 if(valueControl == undefined) valueControl = 0;
             }
+            console.log('gfdsa',locale.controlName);
             thisCpn.updateListInputInDocument(
                 locale.controlName,
                 "value",
@@ -287,7 +288,6 @@ export default {
                     controlInstance.removeValidateIcon()
                 }
             }
-            
             resetImpactedFieldsList();
             thisCpn.handleControlInputChange(locale.controlName);
             
@@ -401,14 +401,14 @@ export default {
             let thisCpn = this
             if(type == 'select'){
                 let dataInput = this.getDataInputFormulas(e.selectFormulasInstance);  
-                let dataAutocomplete = e.selectFormulasInstance.handleRunAutoCompleteFormulas('',dataInput).then(res=>{
+                e.selectFormulasInstance.handleRunAutoCompleteFormulas('',dataInput).then(res=>{
                     thisCpn.setDataForControlAutocomplete(res,aliasControl,e.controlTitle)
                 });
             }
             else{
                 let aliasControl = e.autocompleteFormulasInstance.autocompleteDetectAliasControl();
                 let dataInput = this.getDataInputFormulas(e.autocompleteFormulasInstance);
-                let dataAutocomplete = e.autocompleteFormulasInstance.handleRunAutoCompleteFormulas($(e.e.target).val(),dataInput).then(res=>{
+                e.autocompleteFormulasInstance.handleRunAutoCompleteFormulas($(e.e.target).val(),dataInput).then(res=>{
                     thisCpn.setDataForControlAutocomplete(res,aliasControl,e.controlTitle)
                 });
             }
@@ -489,6 +489,7 @@ export default {
                 input.val(data.value);
                 markBinedField(this.sDocumentSubmit.currentControlAutoComplete);
                 input.trigger('change');
+                // input.blur()
             }
             else{
                 let currentTableInteractive = this.sDocumentSubmit.currentTableInteractive
@@ -761,12 +762,11 @@ export default {
                     for (let formulasType in formulas) {
                         if(!mapControlEffected.hasOwnProperty(formulasType)){
                             mapControlEffected[formulasType] = {}
-
                         }
                         if(formulas[formulasType].hasOwnProperty('instance')){
                             let inputControl = formulas[formulasType].instance.inputControl;
                             for (let controlEffect in inputControl) {
-                                if (mapControlEffected[formulasType][controlEffect] == undefined) {
+                                if (!mapControlEffected[formulasType].hasOwnProperty(controlEffect)) {
                                     mapControlEffected[formulasType][controlEffect] = {};
                                 }
                                 mapControlEffected[formulasType][controlEffect][name] = true;
@@ -1027,10 +1027,9 @@ export default {
             if(Object.keys(controlEffected).length > 0){
                 for(let i in controlEffected){
                     if (checkCanBeBind(i)){
-                        let controlEffectedInstance = this.sDocumentSubmit.listInputInDocument[i];
+                        let controlEffectedInstance = getControlInstanceFromStore(i);
                         let controlId = controlEffectedInstance.id
                         let allFormulas = controlEffectedInstance.controlFormulas;
-                        
                         if(allFormulas.hasOwnProperty('formulas')){
                             if(allFormulas['formulas'].hasOwnProperty('instance')){
                                 let formulasInstance = allFormulas['formulas'].instance;
@@ -1064,9 +1063,8 @@ export default {
             }
         },
         
-        handlerBeforeRunFormulasValue(formulasInstance,controlId,controlName,formulasType){
-            
-            let dataInput = this.getDataInputFormulas(formulasInstance);    
+        handlerBeforeRunFormulasValue(formulasInstance,controlId,controlName,formulasType,from=false){
+            let dataInput = this.getDataInputFormulas(formulasInstance);
             let control = getControlInstanceFromStore(controlName);
             if(control.inTable != false){
                 let tableInstance = getControlInstanceFromStore(control.inTable);
@@ -1074,7 +1072,7 @@ export default {
                 tableInstance.tableInstance.handlerRunFormulasForControlInTable(formulasType,control,dataIn,formulasInstance);
             }
             formulasInstance.handleBeforeRunFormulas(dataInput).then(rs=>{
-                this.handlerAfterRunFormulas(rs,controlId,controlName,formulasType)
+                this.handlerAfterRunFormulas(rs,controlId,controlName,formulasType,from)
             });
         },
         /**
@@ -1094,7 +1092,7 @@ export default {
             return dataInput;
         },
         
-        handlerAfterRunFormulas(rs,controlId,controlName,formulasType){
+        handlerAfterRunFormulas(rs,controlId,controlName,formulasType,from){
             let controlInstance = getControlInstanceFromStore(controlName);
             if($('#'+controlId).length > 0){
                 if($('#'+controlId).attr('s-control-type') == 'inputFilter'){
@@ -1111,7 +1109,7 @@ export default {
                     if(!rs.server){
                         let data = rs.data; 
                         if(data.length > 0){
-                            value=data[0].values[0];
+                            value=data[0].values[0][0];
                         }
                     }
                     else{
@@ -1122,7 +1120,7 @@ export default {
                     }
                     switch (formulasType) {
                         case "formulas":
-                            this.handlerDataAfterRunFormulasValue(value,controlId,controlName);
+                            this.handlerDataAfterRunFormulasValue(value,controlId,controlName,from);
                             break;
                         case "link":
                             this.handlerDataAfterRunFormulasLink(value,controlName);
@@ -1152,12 +1150,34 @@ export default {
 
             }
         },
-        handlerDataAfterRunFormulasValue(value,controlId,controlName){
+        handlerDataAfterRunFormulasValue(value,controlId,controlName,from){
             let controlInstance = getControlInstanceFromStore(controlName);
+           
             if($('#'+controlId).length > 0){
-                $('#'+controlId).val(value);
-                $('#'+controlId).trigger('change')
-                markBinedField(controlName);
+                if(from != false && from == 'root'){
+                    this.updateListInputInDocument(
+                        controlName,
+                        "value",
+                        value
+                    );
+                    if($('#'+controlId).attr('s-control-type') == 'label'){
+                        $('#'+controlId).text(value);
+                    }
+                    else{
+                        $('#'+controlId).val(value);
+                    }
+                    markBinedField(controlName);
+                    this.handleControlInputChange(controlName)
+                }else{
+                    if($('#'+controlId).attr('s-control-type') == 'label'){
+                        $('#'+controlId).text(value);
+                    }
+                    else{
+                        $('#'+controlId).val(value);
+                    }
+                    $('#'+controlId).trigger('change')
+                    markBinedField(controlName);
+                }
             }
         },
 
@@ -1168,7 +1188,7 @@ export default {
             let tableName = this.sDocumentEditor.allControl[tableControlId].properties.name.value;
             let dataTable = []
             data = data.data
-            let tableInstance = getControlInstanceFromStore(tableName);
+            let tableControl = getControlInstanceFromStore(tableName);
             if(data.length == 0){
                 return;
             }
@@ -1183,7 +1203,8 @@ export default {
                 for (let i = 0; i < colData.length; i++) {
                     vls.push([i, controlName, colData[i]]);
                 }
-                tableInstance.tableInstance.tableInstance.setDataAtRowProp(vls, null, null, 'auto_set');
+                tableControl.tableInstance.setData(vls)
+               
             }
         },
 
@@ -1255,8 +1276,14 @@ export default {
                             if(formulasType != 'autocomplete'){
                                 if(controlFormulas[formulasType].hasOwnProperty('instance')){
                                     let formulasInstance = controlFormulas[formulasType].instance;
-                                    if(formulasInstance.getFormulas() != "" && Object.keys(formulasInstance.getInputControl()).length == 0){
-                                        this.handlerBeforeRunFormulasValue(formulasInstance,controlInstance.id,controlName,formulasType)
+                                    if(formulasInstance.getFormulas() !== "" && Object.keys(formulasInstance.getInputControl()).length == 0){
+                                        console.log('hgfd',controlName);
+                                        impactedFieldsListWhenStart[controlName] = false;
+                                        this.$store.commit("document/addToDocumentSubmitStore", {
+                                            key: 'impactedFieldsListWhenStart',
+                                            value: impactedFieldsListWhenStart
+                                        });
+                                        this.handlerBeforeRunFormulasValue(formulasInstance,controlInstance.id,controlName,formulasType,'root')
                                     }
                                 }
                             }
@@ -1271,7 +1298,6 @@ export default {
                 key: 'impactedFieldsList',
                 value: impactedFieldsList
             });
-            
         },
         /**
          * Lấy tất cả các control bị ảnh hưởng khi mà một control thay đổi giá trị
@@ -1282,7 +1308,6 @@ export default {
             for (var i = 0; i < impactedFieldsArr.length; i++) {
                 impactedFieldsList[fieldName][impactedFieldsArr[i]] = false;
             }
-            impactedFieldsListWhenStart[fieldName] = false;
         },
         
         getAllImpactedInput(sourceName) {

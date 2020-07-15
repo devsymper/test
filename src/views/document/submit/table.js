@@ -471,7 +471,6 @@ export default class Table {
                                 dataRow = 0
                             }
                             allRowDataInput[index][control] = dataRow;
-
                         }
                     } else {
                         for (let i = 0; i < dataRow.length; i++) {
@@ -614,7 +613,7 @@ export default class Table {
                 columns: thisObj.columnsInfo.hiddenColumns,
                 indicators: false
             },
-            // rowHeights:30,   
+            // rowHeights: 29,
             // minSpareRows: 1,
             data: (thisObj.tableHasRowSum) ? [
                 [''],
@@ -626,20 +625,21 @@ export default class Table {
             // manualRowMove: true,
             colHeaders: colHeaders,
             readOnly: thisObj.checkDetailView(),
-            viewportColumnRenderingOffset: 50,
-            // manualColumnFreeze: true,
+            // viewportColumnRenderingOffset: 50,
+            manualColumnFreeze: true,
             columns: thisObj.columnsInfo.columns,
             allowInsertColumn: false,
             allowRemoveColumn: false,
-            columnHeaderHeight: 30,
-            viewportRowRenderingOffset: 20,
-            viewportColRenderingOffset: 20,
+            // columnHeaderHeight: 30,
+            // viewportRowRenderingOffset: 20,
+            // viewportColRenderingOffset: 20,
             contextMenu: (thisObj.checkDetailView()) ? false : ['row_above', 'row_below', 'remove_row', 'freeze_column', 'unfreeze_column'],
             dragToScroll: false,
             stretchH: 'all',
             formulas: true,
             autoRowSize: false,
             autoColSize: false,
+            // defaultRowHeight: 29,
             width: '100%',
             fixedRowsBottom: (thisObj.tableHasRowSum) ? 1 : 0,
             formulas: true,
@@ -691,6 +691,18 @@ export default class Table {
 
     setDefaulFotterRowData(value, rowIndex, prop) {
         this.setDataAtRowProp(rowIndex, prop, value, AUTO_SET);
+    }
+    setData(vls) {
+        this.tableInstance.updateSettings({
+            data: [
+                ['']
+            ]
+        });
+        let tb = this;
+        setTimeout(() => {
+            tb.tableInstance.setDataAtRowProp(vls, null, null, 'auto_set');
+        }, 20);
+
     }
 
     checkDetailView() {

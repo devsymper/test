@@ -65,7 +65,7 @@ export default {
         let thisCpn = this;
         if (this.docObjectId != 0) {
             this.docObjId = this.docObjectId;
-        } else if (this.$route.name == "detailDocument") {
+        } else if (this.$route.name == "detailDocument" || this.$route.name == "printDocument") {
             this.docObjId = this.$route.params.id;
         }
         if(this.docObjId != null)
@@ -227,8 +227,58 @@ export default {
                 }
 
             }
+            // setTimeout(() => {
+            //     thisCpn.printDiv()
+            // }, 500);
         },
         
+        printDiv(){
+            let css = this.getallcss();
+            let head = document.head || document.getElementsByTagName('head')[0];
+            let style = document.createElement('style');
+            
+            style.type = 'text/css';
+            if (style.styleSheet){
+            // This is required for IE8 and below.
+            style.styleSheet.cssText = css;
+            } else {
+            style.appendChild(document.createTextNode(css));
+            }
+			var printContents = document.getElementById('sym-submit-'+this.keyInstance).innerHTML;
+			var originalContents = document.body.innerHTML;
+            head.appendChild(style);
+
+			document.body.innerHTML = printContents;
+
+			window.print();
+
+			document.body.innerHTML = originalContents;
+
+        },
+        getallcss() {
+            var css = "", //variable to hold all the css that we extract
+                styletags = document.getElementsByTagName("style");
+            for(var i = 0; i < styletags.length; i++)
+            {
+                css += styletags[i].innerHTML; //extract the css in the current style tag
+            }
+
+            // //loop over all the external stylesheets
+//             for(var i = 0; i < document.styleSheets.length; i++)
+//             {
+//                 var currentsheet = document.styleSheets[i];
+//                 if(currentsheet.href == null){
+// //loop over all the styling rules in this external stylesheet
+//                     for(var e = 0; e < currentsheet.cssRules.length; e++)
+//                     {
+//                         css += currentsheet.cssRules[e].cssText; //extract all the styling rules
+//                     }
+//                 }
+                
+//             }
+
+            return css;
+        }
     }
 }
 </script>

@@ -135,7 +135,7 @@ const addCurrentControl = (state, control) => {
     }
     // state.editor.currentSelectedControl['properties'] = groups
     Vue.set(state.editor.currentSelectedControl, 'properties', groups);
-    console.log(state.editor.currentSelectedControl);
+    console.log('currentSelectedControl', state.editor.currentSelectedControl);
 
 };
 const updateCurrentControlProps = (state, params) => {

@@ -17,8 +17,6 @@ export const orgchartApi = {
     getAllNodes() {
         return coreApi.get("org-charts/nodes");
     },
-
-
     getOrgchartList() {
         return orgchart.get('orgchart');
     },

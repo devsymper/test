@@ -300,9 +300,12 @@ export default class Formulas {
      * @param {*} listInputInDocument 
      */
     detectControlInTable(mapControlEffected, name, script, listInputInDocument) {
+            console.log('gdafsda', script);
+
             let s = script.replace(/ref\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\([^)(]*\))*\))*\))*\))*\))*\))*\))*\))*\))*\)/gm, "");
             s = s.replace(/{.}/gm, "");
             let listWord = s.match(/[A-Za-z0-9_]+/g);
+            console.log('gdafsda', listWord);
             for (let controlName in listInputInDocument) {
                 if (listWord != null && listWord.indexOf(controlName) != -1) {
                     if (mapControlEffected[controlName] == undefined) {

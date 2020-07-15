@@ -148,7 +148,8 @@ export default class BasicControl extends Control {
         if (this.type == 'percent') {
             value *= 100
         } else if (this.type == 'number') {
-            value = numbro(value).format(this.numberFormat)
+            if (typeof value == 'number')
+                value = numbro(value).format(this.numberFormat)
 
         } else if (this.type == 'date') {
             value = moment(value).format(this.formatDate)
@@ -335,9 +336,10 @@ export default class BasicControl extends Control {
         let id = this.ele.attr('id');
         let thisObj = this;
         let keyinstance = this.ele.attr('key-instance');
-        this.ele.parent().css({ 'width': '100%' });
-        this.ele.replaceWith('<input class="s-control s-control-label" s-control-type="label" type="text" disabled title="Label" id="' + id + '" style="width:100%;border:none;" key-instance="' + keyinstance + '">');
+        // this.ele.parent().css({ 'width': '60%' });
+        // this.ele.replaceWith('<input class="s-control s-control-label" s-control-type="label" type="text" disabled title="Label" id="' + id + '" style="width:100%;border:none;" key-instance="' + keyinstance + '">');
         this.ele = $('#' + id);
+        this.ele.text('').css({ border: 'none' })
         this.ele.on('change', function(e) {
             SYMPER_APP.$evtBus.$emit('document-submit-input-change', { controlName: thisObj.controlProperties.name.value, val: $(e.target).val() })
         })

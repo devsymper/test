@@ -58,16 +58,12 @@ const checkCanBeBind = function(fieldName) {
     let listInputInDocument = sDocument.state.submit.listInputInDocument;
     let rootChangeFieldName = sDocument.state.submit.rootChangeFieldName;
     let impactedFieldsListWhenStart = sDocument.state.submit.impactedFieldsListWhenStart;
-
     // return true;
     // Nếu đã được bind dữ liệu trước đó rồi thì ko cần bind nữa
     if (impactedFieldsList[rootChangeFieldName] !== undefined && impactedFieldsList[rootChangeFieldName][fieldName] === true) {
         return false;
     }
 
-    if (docStatus == 'init' && impactedFieldsListWhenStart[fieldName] === true) {
-        return false;
-    }
 
     if (docStatus == 'init') {
         // for (var j in listInputInDocument[fieldName]['fmlData']['relateControlNames']) {
@@ -76,6 +72,14 @@ const checkCanBeBind = function(fieldName) {
         //         return false;
         //     }
         // }
+
+        if (listInputInDocument[fieldName]['controlFormulas'].hasOwnProperty('formulas')) {
+            for (var j in listInputInDocument[fieldName]['controlFormulas']['formulas']['instance']['inputControl']) {
+                if (impactedFieldsListWhenStart[j] === false) {
+                    return false;
+                }
+            }
+        }
     } else if (impactedFieldsList.hasOwnProperty(rootChangeFieldName)) {
         if (listInputInDocument[fieldName]['controlFormulas'].hasOwnProperty('formulas')) {
             for (var j in listInputInDocument[fieldName]['controlFormulas']['formulas']['instance']['inputControl']) {

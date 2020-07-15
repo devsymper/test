@@ -655,7 +655,7 @@ export default {
         },
         // hàm xử lí thêm các cột vào trong control table khi lưu ở tablesetting
         addColumnTable(listRowData){
-            let elements = $('#editor_ifr').contents().find('[data-mce-selected="1"]');
+            let elements = $('#editor_ifr').contents().find('.s-control-table.on-selected');
             let table = elements.find('thead').closest('.s-control-table');
             let tableId = table.attr('id');
             let thead = '';
@@ -679,7 +679,7 @@ export default {
 
         //hoangnd: hàm mở modal tablesetting của control table
         showSettingControlTable(e) {
-            let elements = $('#editor_ifr').contents().find('[data-mce-selected="1"]');
+            let elements = $('#editor_ifr').contents().find('.on-selected');
             if(elements.hasClass('s-control-table') || elements.parent().hasClass('s-control-table')){
                 let thead = elements.find('thead tr th');
                 let tbody = elements.find('tbody tr td');
@@ -855,8 +855,6 @@ export default {
                 let style = $(value).attr('style');
                 if(type == 'text') type = 'textInput'
                 if(type == 'persent') type = 'percent'
-                console.log(type);
-                
                 let controlV2 = GetControlProps(type);
                 let controlEl = $(controlV2.html); 
                 var inputid = 's-control-id-' + Date.now();
@@ -877,7 +875,6 @@ export default {
                     });
                     thisCpn.addToAllControlInDoc(inputid,{properties: controlV2.properties, formulas : controlV2.formulas,type:type});
                 } catch (error) {   
-                    console.log(error);
                 }
                 if(type == 'table'){
                     let tableId = inputid;
@@ -1447,8 +1444,6 @@ export default {
                     DragDropFunctions.ProcessDragOverQueue();
                 }, 100);
                 var controlType = $(this).attr('control-type');
-                console.log(controlType);
-                
                 let control = GetControlProps(controlType);
                 event.originalEvent.dataTransfer.setData("control", JSON.stringify(control));
             });
@@ -1494,34 +1489,12 @@ export default {
             })
             //click vào 1 control trong doc thì lấy từ store để set giá trị cho currentSelected control trong store
             // mục đích đê cập nhật lại view nhập các thuộc tính
+            $("#editor_ifr").contents().find('body').on('contextmenu','.s-control',function(e){
+                 thisCpn.setSelectedControlProp(e,$(this),clientFrameWindow);
+            })
             $("#editor_ifr").contents().find('body').on('click','.s-control',function(e){
                 e.stopPropagation();
-                e.preventDefault();
-                $(clientFrameWindow.document).find('.on-selected').removeClass('on-selected');
-                $(this).addClass('on-selected');
-
-                let type = $(this).attr('s-control-type');
-                let controlId = $(this).attr('id');
-                $('.editor-tree-active').removeClass('editor-tree-active')
-                $('.tree-'+controlId).addClass('editor-tree-active')
-                
-                let table = $(this).closest('.s-control-table');
-                
-                if(table.length > 0 && controlId != table.attr('id')){
-                    let tableId = table.attr('id');
-                    console.log(tableId);
-                    console.log(controlId);
-                    console.log(thisCpn.editorStore.allControl[tableId]);
-                    
-                    let control = thisCpn.editorStore.allControl[tableId]['listFields'][controlId];
-                    thisCpn.selectControl(control.properties, control.formulas,controlId);
-                }
-                else{
-                    let control = thisCpn.editorStore.allControl[controlId];
-                console.log(thisCpn.editorStore);
-
-                    thisCpn.selectControl(control.properties, control.formulas,controlId);
-                }
+                thisCpn.setSelectedControlProp(e,$(this),clientFrameWindow);
             })
 
             // sự kiện thả control vào doc
@@ -1563,6 +1536,28 @@ export default {
             });
             
 
+        },
+        setSelectedControlProp(e,el,clientFrameWindow){
+             e.preventDefault();
+            $(clientFrameWindow.document).find('.on-selected').removeClass('on-selected');
+            el.addClass('on-selected');
+
+            let type = el.attr('s-control-type');
+            let controlId = el.attr('id');
+            $('.editor-tree-active').removeClass('editor-tree-active')
+            $('.tree-'+controlId).addClass('editor-tree-active')
+            
+            let table = el.closest('.s-control-table');
+            
+            if(table.length > 0 && controlId != table.attr('id')){
+                let tableId = table.attr('id');
+                let control = this.editorStore.allControl[tableId]['listFields'][controlId];
+                this.selectControl(control.properties, control.formulas,controlId);
+            }
+            else{
+                let control = this.editorStore.allControl[controlId];
+                this.selectControl(control.properties, control.formulas,controlId);
+            }
         }
     },
 }
