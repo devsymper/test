@@ -268,7 +268,7 @@ export default {
                 valueControl = $('#'+thisCpn.sDocumentSubmit.listInputInDocument[locale.controlName].id).attr('user-id');
                 if(valueControl == undefined) valueControl = 0;
             }
-            console.log('gfdsa',locale.controlName);
+            console.log('hgjadks',locale);
             thisCpn.updateListInputInDocument(
                 locale.controlName,
                 "value",
@@ -558,6 +558,7 @@ export default {
                             thisCpn.documentName = res.data.document.name;
                             thisCpn.contentDocument = content;
                             setDataForPropsControl(res.data.fields); // ddang chay bat dong bo
+                            console.log('ág',res.data.fields);
                             setTimeout(() => {
                                 thisCpn.processHtml(content);
                             }, 100);
@@ -626,7 +627,7 @@ export default {
                         valueInput = ""
                     }
                     if(allControlNotSetData.includes(controlType)){
-                        
+                        console.log('jbh',controlType);
                         let control = new ActionControl(idField, $(allInputControl[index]),field,thisCpn.keyInstance);
                         control.init();
                         control.render();
@@ -838,10 +839,17 @@ export default {
                 thisCpn.$emit('submit-document-success',res.data);
                 thisCpn.isSubmitting = false;
                 if (res.status == 200) {
+                    if(thisCpn.sDocumentSubmit.submitFormulas != undefined){
+                        let dataInput = thisCpn.getDataInputFormulas(thisCpn.sDocumentSubmit.submitFormulas);
+                        thisCpn.sDocumentSubmit.submitFormulas.handleBeforeRunFormulas(dataInput).then(rs=>{
+                            thisCpn.handlerAfterRunFormulas(rs,controlId,controlName,formulasType,from)
+                        });
+                    }
                     thisCpn.$snotify({
                         type: "success",
                         title: "Submit document success!"
                     });        
+                    thisCpn.$router.push('/document/submit/'+thisCpn.documentId);
                 }
                 else{
                     thisCpn.$snotify({
@@ -851,6 +859,7 @@ export default {
                 }
             })
             .catch(err => {
+                console.warn(err);
                 thisCpn.$snotify({
                         type: "error",
                         title: "error from submit document api!!!"

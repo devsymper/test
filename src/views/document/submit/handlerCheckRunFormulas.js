@@ -84,6 +84,7 @@ const checkCanBeBind = function(fieldName) {
         if (listInputInDocument[fieldName]['controlFormulas'].hasOwnProperty('formulas')) {
             for (var j in listInputInDocument[fieldName]['controlFormulas']['formulas']['instance']['inputControl']) {
                 if (impactedFieldsList[rootChangeFieldName].hasOwnProperty(j)) {
+
                     if (impactedFieldsList[rootChangeFieldName][j] === false) {
 
                         return false;

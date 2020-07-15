@@ -1,6 +1,7 @@
 import Control from "./control";
 import { documentApi } from './../../../api/Document.js'
 import { userApi } from './../../../api/user.js'
+import store from './../../../store'
 import moment from "moment-timezone";
 export default class ActionControl extends Control {
     constructor(idField, ele, controlProps, curParentInstance, value) {
@@ -10,7 +11,13 @@ export default class ActionControl extends Control {
         if (this.type == 'approvalHistory') {
             this.renderApprovalEle();
         } else {
+            // console.log('sầ', this.controlFormulas.submit.instance);
             this.ele.addClass('d-none');
+            let formulas = this.controlFormulas.submit.instance;
+            store.commit("document/addToDocumentSubmitStore", {
+                key: 'submitFormulas',
+                value: formulas
+            });
         }
     }
     renderApprovalEle() {

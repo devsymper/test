@@ -200,7 +200,6 @@ export default class Table {
                 },
 
                 afterChange: function(changes, source) {
-                    console.log('ádd', changes);
                     if (changes == null) {
                         return
                     }
@@ -413,15 +412,15 @@ export default class Table {
          */
     handlerCheckCanBeRunFormulas(control) {
             if (checkCanBeBind(control)) {
-                let controlInstance = listInputInDocument[control];
 
-                if (controlInstance.controlFormulas.hasOwnProperty('formulas')) {
-                    let formulasInstance = controlInstance.controlFormulas['formulas'].instance;
-                    let dataInput = this.getDataInputForFormulas(formulasInstance, controlInstance.inTable);
-                    if (controlInstance.hasOwnProperty('inTable')) {
-                        if (controlInstance.inTable == this.tableName) {
-                            this.handlerRunFormulasForControlInTable('formulas', controlInstance, dataInput, formulasInstance);
-                        }
+            }
+            let controlInstance = listInputInDocument[control];
+            if (controlInstance.controlFormulas.hasOwnProperty('formulas')) {
+                let formulasInstance = controlInstance.controlFormulas['formulas'].instance;
+                let dataInput = this.getDataInputForFormulas(formulasInstance, controlInstance.inTable);
+                if (controlInstance.hasOwnProperty('inTable')) {
+                    if (controlInstance.inTable == this.tableName) {
+                        this.handlerRunFormulasForControlInTable('formulas', controlInstance, dataInput, formulasInstance);
                     }
                 }
             }
@@ -436,7 +435,9 @@ export default class Table {
             for (let inputControlName in inputControl) {
                 let valueInputControlItem = this.getColumnIndexFromControlName(inputControlName);
                 if (valueInputControlItem === false) {
-                    dataInput[inputControlName] = listInputInDocument[inputControlName].value
+                    console.log('agsd', inputControlName);
+                    console.log('agsd', listInputInDocument);
+                    dataInput[inputControlName] = (listInputInDocument.hasOwnProperty(inputControlName)) ? listInputInDocument[inputControlName].value : []
                 } else {
                     valueInputControlItem = this.tableInstance.getDataAtCol(valueInputControlItem);
                     if (listInputInDocument[tableName].tableInstance.tableHasRowSum) {

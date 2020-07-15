@@ -414,7 +414,7 @@ export default {
                         item[f] = {};
                         item[f]['formulas'] = formulas[f].value;
                         item[f]['objectType'] = "field";
-                        item[f]['objectIdentifier'] = control.properties.name.value;
+                        item[f]['objectIdentifier'] = (control.properties.hasOwnProperty('name')) ? control.properties.name.value : control.name;
                         item[f]['context'] = this.sDocumentProp.name.value
                         listFormulas.push(item);
                     }
@@ -963,6 +963,8 @@ export default {
         },
         //hoangnd: hàm set các giá trị của thuộc tính và formulas vào từng contrl trong doc lúc load dữ liệu và đưa vào state
         setDataForPropsControl(fields){
+                console.log('kafsjd',fields);
+
             for(let controlId in fields){
                 if(!fields[controlId].hasOwnProperty('type')){
                     continue;
@@ -1548,7 +1550,7 @@ export default {
             $('.tree-'+controlId).addClass('editor-tree-active')
             
             let table = el.closest('.s-control-table');
-            
+            console.log('akjsd',this.editorStore.allControl);
             if(table.length > 0 && controlId != table.attr('id')){
                 let tableId = table.attr('id');
                 let control = this.editorStore.allControl[tableId]['listFields'][controlId];
@@ -1556,6 +1558,7 @@ export default {
             }
             else{
                 let control = this.editorStore.allControl[controlId];
+                console.log('control',control);
                 this.selectControl(control.properties, control.formulas,controlId);
             }
         }

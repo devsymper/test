@@ -13,6 +13,7 @@ export const allControlNotSetData = ['approvalHistory', 'submit', 'draft', 'rese
 export const setDataForPropsControl = function(fields) {
     for (let controlId in fields) {
         let control = GetControlProps(fields[controlId].type)
+        console.log('hjkjsda', fields[controlId].type, control);
         let properties = control.properties
         let formulas = control.formulas
         let type = fields[controlId].type

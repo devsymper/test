@@ -266,6 +266,13 @@ let commonFormulas = {
         formulasId: 0,
         type: "script",
         groupType: "formulas"
+    },
+    submit: {
+        title: "Công thức submit",
+        value: "",
+        formulasId: 0,
+        type: "script",
+        groupType: "formulas"
     }
 }
 
@@ -528,7 +535,7 @@ const controlTypes = {
         html: `<span type="button" class="s-control s-control-submit" contenteditable="false" s-control-type="submit" value="Submit" style="display: inline;font-size: 13px;color:green;">Submit</span>&nbsp;`,
         title: "Submit",
         inProps: ['mobileProps', 'isPrimary', 'formatDate', 'formatNumber', 'isMobile', 'isSumTable', 'isRequired', 'isDBOnly', 'isTableOnly', 'isHidden', 'isAllowUpdate', 'isReadOnly', 'isDisplayCompact', 'isMultipleValue'],
-        formulas: ['hidden']
+        formulas: ['submit']
     },
     reset: {
         icon: "/icon/ic_reset.png",

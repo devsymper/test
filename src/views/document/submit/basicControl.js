@@ -154,7 +154,11 @@ export default class BasicControl extends Control {
         } else if (this.type == 'date') {
             value = moment(value).format(this.formatDate)
         }
-        this.ele.val(value)
+        if (this.type == 'label') {
+            this.ele.text(value)
+        } else {
+            this.ele.val(value)
+        }
     }
     renderFileControl = function() {
         let fileHtml = this.genFileView();
@@ -341,7 +345,7 @@ export default class BasicControl extends Control {
         this.ele = $('#' + id);
         this.ele.text('').css({ border: 'none' })
         this.ele.on('change', function(e) {
-            SYMPER_APP.$evtBus.$emit('document-submit-input-change', { controlName: thisObj.controlProperties.name.value, val: $(e.target).val() })
+            SYMPER_APP.$evtBus.$emit('document-submit-input-change', { controlName: thisObj.controlProperties.name.value, val: $(e.target).text() })
         })
     }
     renderSelectControl() {

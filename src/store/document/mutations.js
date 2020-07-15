@@ -33,7 +33,6 @@ const changeControlSubmitProps = (state, params) => {
     let key = params.key
     let value = params.value
         // state.editor.allControl[id] = prop;
-    console.log(params);
 
     Vue.set(state.submit.listInputInDocument[name], key, value);
 };
@@ -143,8 +142,6 @@ const updateCurrentControlProps = (state, params) => {
         let prop = params.prop;
         let typeProp = params.typeProp;
         let value = params.value;
-        console.log('update---', params);
-
         Vue.set(state.editor.currentSelectedControl.properties[group][prop], typeProp, value);
     }
     // hàm xóa control đang chọn ra khỏi store
@@ -172,9 +169,6 @@ const updateProp = (state, params) => {
     let value = params.value
     let tableId = params.tableId
     let type = params.type;
-    console.log('props', params);
-    console.log('props', state.editor.allControl);
-
     if (tableId != '0') {
         if (state.editor.allControl[tableId]['listFields'][id]['properties'][name]) {
             state.editor.allControl[tableId]['listFields'][id]['properties'][name][type] = value
@@ -197,9 +191,6 @@ const updateFormulasId = (state, params) => {
     let name = params.name
     let value = params.value
     let tableId = params.tableId
-    console.log(params);
-    console.log(state.editor.allControl);
-
     if (tableId != 0 && tableId != '0') {
         if (state.editor.allControl[tableId]['listFields'][id]['formulas'][name]) {
             state.editor.allControl[tableId]['listFields'][id]['formulas'][name]['formulasId'] = value
@@ -249,7 +240,6 @@ const updateListInputInDocument = (state, params) => {
     let key = params.key
     let controlName = params.controlName;
     let value = params.value
-    console.log(params);
     if (state.submit.listInputInDocument.hasOwnProperty(controlName)) {
         Vue.set(state.submit.listInputInDocument[controlName], key, value);
     }

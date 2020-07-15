@@ -211,6 +211,10 @@ export default class Formulas {
         let listSyql = this.formulas.match(/ref\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\([^)(]*\))*\))*\))*\))*\))*\))*\))*\))*\))*\)/gm);
         return listSyql;
     }
+    getLocalFormulas() {
+        let listSqlite = this.formulas.match(/local\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\([^)(]*\))*\))*\))*\))*\))*\))*\))*\))*\))*\)/gm);
+        return listSqlite;
+    }
 
     runSyql(formulas, dataInput = false) {
             let syql = formulas;
@@ -300,24 +304,23 @@ export default class Formulas {
      * @param {*} listInputInDocument 
      */
     detectControlInTable(mapControlEffected, name, script, listInputInDocument) {
-            console.log('gdafsda', script);
-
-            let s = script.replace(/ref\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\([^)(]*\))*\))*\))*\))*\))*\))*\))*\))*\))*\)/gm, "");
-            s = s.replace(/{.}/gm, "");
-            let listWord = s.match(/[A-Za-z0-9_]+/g);
-            console.log('gdafsda', listWord);
-            for (let controlName in listInputInDocument) {
-                if (listWord != null && listWord.indexOf(controlName) != -1) {
-                    if (mapControlEffected[controlName] == undefined) {
-                        mapControlEffected[controlName] = {};
-                    }
-                    mapControlEffected[controlName][name] = true
-
+        let s = script.replace(/ref\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\([^)(]*\))*\))*\))*\))*\))*\))*\))*\))*\))*\)/gm, "");
+        s = s.replace(/{.}/gm, "");
+        let listWord = s.match(/[A-Za-z0-9_]+/g);
+        for (let controlName in listInputInDocument) {
+            if (listWord != null && listWord.indexOf(controlName) != -1) {
+                if (mapControlEffected[controlName] == undefined) {
+                    mapControlEffected[controlName] = {};
                 }
-            }
+                mapControlEffected[controlName][name] = true
 
+            }
         }
-        // hàm wrap lại formulas của control inputfilter khi có search
+
+    }
+
+
+    // hàm wrap lại formulas của control inputfilter khi có search
     wrapSyqlForSearchInputFilter(search) {
             this.setFormulas(this.oldFormulas);
             let refFormulas = this.getReferenceFormulas();
