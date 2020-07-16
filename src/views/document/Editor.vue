@@ -969,7 +969,8 @@ export default {
                 if(!fields[controlId].hasOwnProperty('type')){
                     continue;
                 }
-                let control = GetControlProps(fields[controlId].type)
+                console.log('hgf',fields[controlId].type);
+                let control = GetControlProps(fields[controlId].type);
                 let properties = control.properties
                 let formulas = control.formulas
                 let type = fields[controlId].type
@@ -987,8 +988,9 @@ export default {
                 if(fields[controlId]['formulas'] != false){
                     
                     $.each(formulas,function(k,v){
-                        if(fields[controlId]['formulas'][k] != ""){
-                            formulas[k].value = Object.values(fields[controlId]['formulas'][k])[0]
+                        if(fields[controlId]['formulas'][k] !== "" && fields[controlId]['formulas'][k] !== undefined){
+                           
+                            formulas[k].value = Object.values(fields[controlId]['formulas'][k])[0];
                             // formulas[k].formulasId = Object.keys(fields[controlId]['formulas'][k])[0]
                         }
                         // else{
@@ -997,7 +999,6 @@ export default {
                         formulas[k].formulasId = 0
                     })
                 }
-                
                 if(fields[controlId].type != "table"){
                     this.addToAllControlInDoc(controlId,{properties: properties, formulas : formulas,type:fields[controlId].type});
                 }

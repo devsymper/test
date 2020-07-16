@@ -13,6 +13,7 @@
 </template>
 <script>
 import { documentApi } from "./../../../api/Document.js";
+import { userApi } from "./../../../api/user.js";
 import "./../../../components/document/documentContent.css";
 import { setDataForPropsControl } from "./../../../components/document/dataControl";
 import BasicControl from "./../submit/basicControl";
@@ -70,6 +71,23 @@ export default {
         }
         if(this.docObjId != null)
         this.loadDocumentObject();  
+        userApi.getListUser(1,100000).then(res => {
+            if (res.status == 200) {
+                thisCpn.$store.commit("document/addToDocumentSubmitStore", {
+                    key: 'listUser',
+                    value: res.data.listObject
+                });
+            }
+            
+        })
+        .catch(err => {
+            thisCpn.$snotify({
+                    type: "error",
+                    title: "can not save document",
+                });
+        })
+        .always(() => {
+        });
     },
     destroyed(){
     },
@@ -228,7 +246,7 @@ export default {
 
             }
             setTimeout(() => {
-                thisCpn.printDiv()
+                // thisCpn.printDiv()
             }, 500);
         },
         

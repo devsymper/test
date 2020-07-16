@@ -10,14 +10,19 @@ export default class ActionControl extends Control {
     render() {
         if (this.type == 'approvalHistory') {
             this.renderApprovalEle();
+        } else if (this.type == 'submit') {
+            this.ele.addClass('d-none');
+            if (this.controlFormulas.hasOwnProperty('submit')) {
+                let formulas = this.controlFormulas.submit.instance;
+                store.commit("document/addToDocumentSubmitStore", {
+                    key: 'submitFormulas',
+                    value: formulas
+                });
+            }
+
         } else {
             // console.log('sầ', this.controlFormulas.submit.instance);
             this.ele.addClass('d-none');
-            let formulas = this.controlFormulas.submit.instance;
-            store.commit("document/addToDocumentSubmitStore", {
-                key: 'submitFormulas',
-                value: formulas
-            });
         }
     }
     renderApprovalEle() {

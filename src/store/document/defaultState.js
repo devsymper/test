@@ -58,7 +58,8 @@ const defaultState = {
         currentTableInteractive: null, //chỉ ra table đang được tương tác
         currentCellSelected: null, // chỉ ra cell đang nhập
         currentControlAutoComplete: null, // biến chỉ ra control nào đang autocomplete
-        submitFormulas: null
+        submitFormulas: null,
+        listUser: null
     },
     detail: {
         allData: null

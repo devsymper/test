@@ -7,9 +7,25 @@ import { checkDbOnly, getControlType } from './../common/common'
 import { SYMPER_APP } from './../../../main.js'
 import { Date } from 'core-js';
 import { checkCanBeBind, resetImpactedFieldsList, markBinedField } from './handlerCheckRunFormulas';
-/**
- * Custom render cho control percent( phần trăm) cho table
- */
+class UserEditor extends Handsontable.editors.TextEditor {
+        createElements() {
+            super.createElements();
+            this.TEXTAREA = this.hot.rootDocument.createElement('input');
+            this.TEXTAREA.className = 'handsontableInput';
+            this.TEXTAREA.setAttribute('data-hot-input', ''); // Makes the element recognizable by HOT as its own component's element.
+            this.textareaStyle = this.TEXTAREA.style;
+            this.textareaStyle.width = 0;
+            this.textareaStyle.height = 0;
+            Handsontable.dom.empty(this.TEXTAREA_PARENT);
+            this.TEXTAREA_PARENT.appendChild(this.TEXTAREA);
+        }
+        setValue(newValue) {
+            this.TEXTAREA.value = newValue;
+        }
+    }
+    /**
+     * Custom render cho control percent( phần trăm) cho table
+     */
 Handsontable.renderers.PercentRenderer = function(instance, td, row, col, prop, value, cellProperties) {
     Handsontable.renderers.NumericRenderer.apply(this, arguments);
     td.textContent = (td.textContent == "" || td.textContent == null) ? 0 + " %" : td.textContent + " %";
@@ -18,8 +34,27 @@ Handsontable.cellTypes.registerCellType('percent', {
     editor: Handsontable.editors.TextEditor.prototype.extend(),
     renderer: Handsontable.renderers.PercentRenderer
 });
+
+//renderer user
+Handsontable.renderers.UserRenderer = function(instance, td, row, col, prop, value, cellProperties) {
+    Handsontable.renderers.TextRenderer.apply(this, arguments);
+    if (!isNaN(value)) {
+        let listUser = store.state.document.submit.listUser;
+        let user = listUser.filter(user => {
+            return user.id === value
+        })
+        if (user.length > 0) {
+            td.textContent = user[0].displayName
+        }
+
+    }
+}
+Handsontable.cellTypes.registerCellType('user', {
+    editor: UserEditor,
+    renderer: Handsontable.renderers.UserRenderer
+});
 Handsontable.renderers.FileRenderer = function(instance, td, row, col, prop, value, cellProperties) {
-    Handsontable.renderers.NumericRenderer.apply(this, arguments);
+    Handsontable.renderers.TextRenderer.apply(this, arguments);
     td.innerHTML = listInputInDocument[prop].genFileView(row);
     td.classList.add("upload-file-wrapper-inTb");
     $(td).off('click', '.file-add');
@@ -36,9 +71,10 @@ Handsontable.renderers.FileRenderer = function(instance, td, row, col, prop, val
 Handsontable.cellTypes.registerCellType('file', {
     renderer: Handsontable.renderers.PercentRenderer
 });
-let listKeyCodeNotChange = [18, 17, 9, 20, 16, 192]
+let listKeyCodeNotChange = [18, 17, 9, 20, 27, 16, 192]
 let listTableInstance = {}
 let columnHasSum = {}
+let listUserControlData = {}
 let listInputInDocument = sDocument.state.submit.listInputInDocument;
 const MAX_TABLE_HEIGHT = 300;
 
@@ -64,7 +100,7 @@ const supportCellsType = {
     fileUpload: 'FileRenderer',
     label: 'TextRenderer',
     percent: 'PercentRenderer',
-    user: 'TextRenderer',
+    user: 'UserRenderer',
     select: 'DropdownRenderer',
     checkbox: 'CheckboxRenderer'
 };
@@ -146,13 +182,13 @@ export default class Table {
                     if (listKeyCodeNotChange.includes(event.keyCode)) {
                         return;
                     }
-                    // chặn bấm lên xuống trái phải khi có autocomplete
 
                     if (thisObj.checkControlType('user')) {
                         thisObj.showPopupUser = true;
                         if (event.keyCode == 13) {
                             thisObj.showPopupUser = false;
                         }
+                        // chặn bấm lên xuống trái phải khi có autocomplete
                         if ((event.keyCode == 40 || event.keyCode == 38 ||
                                 event.keyCode == 37 || event.keyCode == 39) && thisObj.showPopupUser != false) {
                             event.stopImmediatePropagation();
@@ -160,6 +196,7 @@ export default class Table {
                         SYMPER_APP.$evtBus.$emit('document-submit-user-input-change', event)
                     } else {
                         thisObj.showPopupUser = false;
+
                         if (event.keyCode != 40 && event.keyCode != 38 &&
                             event.keyCode != 37 && event.keyCode != 39 &&
                             thisObj.isAutoCompleting == false) {
@@ -172,7 +209,10 @@ export default class Table {
 
                         let colHeaders = this.getColHeader();
                         // hoangnd: cần set timeout ở đây tại vì cần thực hiện đoạn này sau khi keydown hoàn tất thì input mới có dữ liệu
-
+                        if ((event.keyCode == 40 || event.keyCode == 38 ||
+                                event.keyCode == 37 || event.keyCode == 39) && thisObj.isAutoCompleting != false) {
+                            event.stopImmediatePropagation();
+                        }
                         setTimeout(() => {
                             if (thisObj.isAutoCompleting != false) {
                                 let column = thisObj.currentSelectedCell['column'];
@@ -231,7 +271,10 @@ export default class Table {
                         });
 
                         let currentColData = thisObj.tableInstance.getDataAtCol(thisObj.currentSelectedCell['column']);
-                        currentColData.pop();
+                        if (thisObj.tableHasRowSum) {
+                            currentColData.pop();
+                        }
+                        console.log('gfd', currentColData);
                         store.commit("document/updateListInputInDocument", {
                             controlName: controlName,
                             key: 'value',
@@ -435,8 +478,6 @@ export default class Table {
             for (let inputControlName in inputControl) {
                 let valueInputControlItem = this.getColumnIndexFromControlName(inputControlName);
                 if (valueInputControlItem === false) {
-                    console.log('agsd', inputControlName);
-                    console.log('agsd', listInputInDocument);
                     dataInput[inputControlName] = (listInputInDocument.hasOwnProperty(inputControlName)) ? listInputInDocument[inputControlName].value : []
                 } else {
                     valueInputControlItem = this.tableInstance.getDataAtCol(valueInputControlItem);
@@ -700,9 +741,12 @@ export default class Table {
             ]
         });
         let tb = this;
-        setTimeout(() => {
-            tb.tableInstance.setDataAtRowProp(vls, null, null, 'auto_set');
-        }, 20);
+        if (vls != false) {
+            setTimeout(() => {
+                tb.tableInstance.setDataAtRowProp(vls, null, null, 'auto_set');
+            }, 20);
+        }
+
 
     }
 

@@ -69,8 +69,11 @@ export default {
 
         userApi.getListUser(1,100000).then(res => {
             if (res.status == 200) {
-                thisCpn.listAllUser = res.data.listObject
-                thisCpn.thisCpn = res.data.listObject
+                thisCpn.listAllUser = res.data.listObject;
+                thisCpn.$store.commit("document/addToDocumentSubmitStore", {
+                    key: 'listUser',
+                    value: thisCpn.listAllUser
+                });
             }
             
         })
@@ -132,9 +135,16 @@ export default {
             }
         },
         selectItem(user){
-            this.element.attr('user-id',user.id);
-            this.element.val(user.displayName);
-            this.element.trigger('change');
+            
+            if(this.element.is('.s-control')){
+                this.element.attr('user-id',user.id);
+                this.element.val(user.displayName);
+                this.element.trigger('change');
+            }
+            else{
+                this.element.val(user.id);
+            }
+            
             this.hide();
         }
     }

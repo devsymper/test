@@ -6,7 +6,7 @@ import Util from './util'
 var numbro = require("numbro");
 import moment from "moment-timezone";
 
-import { documentApi } from "./../../../api/Document.js";
+import { userApi } from "./../../../api/user.js";
 let listInputInDocument = sDocument.state.submit.listInputInDocument;
 
 let dataInputCache = sDocument.state.submit.dataInputCache;
@@ -326,15 +326,19 @@ export default class BasicControl extends Control {
     }
     renderUserControl() {
         if (this.checkDetailView()) {
+            let thisObj = this;
+            userApi.getDetailUser(this.value).then(res => {
+                thisObj.value = res.data.user.displayName;
+                thisObj.ele.val(thisObj.value)
+            }).always({}).catch({})
 
-            return;
+        } else {
+            this.ele.attr('type', 'text');
+            this.ele.parent().css({ display: 'block' })
+            this.ele.on('keyup', function(e) {
+                SYMPER_APP.$evtBus.$emit('document-submit-user-input-change', e)
+            })
         }
-        this.ele.attr('type', 'text');
-        this.ele.parent().css({ display: 'block' })
-        this.ele.on('keyup', function(e) {
-            SYMPER_APP.$evtBus.$emit('document-submit-user-input-change', e)
-        })
-
     }
     renderLabelControl() {
         let id = this.ele.attr('id');

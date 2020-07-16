@@ -558,7 +558,6 @@ export default {
                             thisCpn.documentName = res.data.document.name;
                             thisCpn.contentDocument = content;
                             setDataForPropsControl(res.data.fields); // ddang chay bat dong bo
-                            console.log('ág',res.data.fields);
                             setTimeout(() => {
                                 thisCpn.processHtml(content);
                             }, 100);
@@ -1199,22 +1198,28 @@ export default {
             data = data.data
             let tableControl = getControlInstanceFromStore(tableName);
             if(data.length == 0){
+                tableControl.tableInstance.setData(false);
                 return;
             }
             let allColumnBindData = Object.keys(data[0]);
-            for (let index = 0; index < allColumnBindData.length; index++) {
-                const controlName = allColumnBindData[index];
-                let colData = data.reduce((arr,obj)=>{
-                    arr.push(obj[controlName])
-                    return arr
-                },[]);
-                let vls = [];
-                for (let i = 0; i < colData.length; i++) {
-                    vls.push([i, controlName, colData[i]]);
+            if(allColumnBindData.length > 0){
+                for (let index = 0; index < allColumnBindData.length; index++) {
+                    const controlName = allColumnBindData[index];
+                    let colData = data.reduce((arr,obj)=>{
+                        arr.push(obj[controlName])
+                        return arr
+                    },[]);
+                    let vls = [];
+                    for (let i = 0; i < colData.length; i++) {
+                        vls.push([i, controlName, colData[i]]);
+                    }
+                    tableControl.tableInstance.setData(vls);
                 }
-                tableControl.tableInstance.setData(vls)
-               
             }
+            else{
+                 tableControl.tableInstance.setData(false);
+            }
+            
         },
 
         /**
