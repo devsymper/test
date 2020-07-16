@@ -274,6 +274,21 @@ const addToDocumentEditorStore = (state, params) => {
     let value = params.value
     Vue.set(state.editor, key, value);
 }
+const addToRelatedLocalFormulas = (state, params) => {
+    let curListRelate = state.submit.localRelated;
+    let key = params.key
+    let value = params.value
+    for (let index = 0; index < value.length; index++) {
+        let element = value[index];
+        element = element.trim();
+        if (!curListRelate.hasOwnProperty(element)) {
+            curListRelate[element] = [];
+        }
+        curListRelate[element].push(key);
+    }
+
+    Vue.set(state.submit, 'localRelated', curListRelate);
+}
 
 /**
  * Khadm:
@@ -309,7 +324,8 @@ export {
     addToDocumentEditorStore,
     setAllDocuments,
     resetCurrentControl,
-    updateCurrentControlProps
+    updateCurrentControlProps,
+    addToRelatedLocalFormulas
 
 
 };

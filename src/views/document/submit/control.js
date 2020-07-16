@@ -1,7 +1,8 @@
 import Formulas from "./formulas";
 import sDocument from './../../../store/document'
-import { checkCanBeBind, resetImpactedFieldsList, markBinedField } from './handlerCheckRunFormulas';
+import { markBinedField } from './handlerCheckRunFormulas';
 import { SYMPER_APP } from './../../../main.js'
+import store from './../../../store'
 
 let listInputInDocument = sDocument.state.submit.listInputInDocument;
 
@@ -86,6 +87,12 @@ export default class Control {
                 if (this.controlFormulas[key].value != "" && this.controlFormulas[key].value != undefined && Object.values(this.controlFormulas[key].value).length > 0) {
                     let formulas = Object.values(this.controlFormulas[key].value)[0];
                     this.controlFormulas[key]['instance'] = new Formulas(this.curParentInstance, formulas, key);
+                    let table = this.controlFormulas[key]['instance'].detectTableRelateLocalFormulas();
+                    if (table.length > 0)
+                        store.commit("document/addToRelatedLocalFormulas", {
+                            key: this.name,
+                            value: table
+                        });
                 }
             }
         }

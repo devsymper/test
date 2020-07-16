@@ -408,7 +408,20 @@ export default class Table {
          * Hàm xử lí tìm các control bị ảnh hưởng sau khi  change 1 control trong table và chạy công thức cho các control bị ảnh hưởng đó
          * @param {String} controlName Control bị thay đổi dữ liệu
          */
+
+    checkRunLocalSql() {
+        let listRelatedLocal = sDocument.state.submit.localRelated;
+        if (listRelatedLocal.hasOwnProperty(this.tableName)) {
+            listRelatedLocal = listRelatedLocal[this.tableName];
+            for (let index = 0; index < listRelatedLocal.length; index++) {
+                const element = listRelatedLocal[index];
+                this.handlerCheckCanBeRunFormulas(element);
+            }
+        }
+
+    }
     handlerCheckEffectedControlInTable(controlName) {
+        this.checkRunLocalSql();
         let controlInstance = listInputInDocument[controlName];
         if (controlInstance == null || controlInstance == undefined) {
             return;
@@ -460,11 +473,15 @@ export default class Table {
             let controlInstance = listInputInDocument[control];
             if (controlInstance.controlFormulas.hasOwnProperty('formulas')) {
                 let formulasInstance = controlInstance.controlFormulas['formulas'].instance;
-                let dataInput = this.getDataInputForFormulas(formulasInstance, controlInstance.inTable);
-                if (controlInstance.hasOwnProperty('inTable')) {
+
+                if (controlInstance.type != 'table') {
+                    let dataInput = this.getDataInputForFormulas(formulasInstance, controlInstance.inTable);
                     if (controlInstance.inTable == this.tableName) {
                         this.handlerRunFormulasForControlInTable('formulas', controlInstance, dataInput, formulasInstance);
                     }
+                } else {
+                    let dataInput = this.getDataInputForFormulas(formulasInstance, controlInstance.name);
+                    this.handlerRunFormulasForControlInTable('formulas', controlInstance, dataInput, formulasInstance);
                 }
             }
         }
@@ -529,7 +546,6 @@ export default class Table {
                 }
                 for (let index = 0; index < allRowDataInput.length; index++) {
                     let rowInput = allRowDataInput[index];
-                    console.log('rowInput', rowInput);
                     await formulasInstance.handleBeforeRunFormulas(rowInput).then(res => {
                         dataColumnAfterRunFOrmulas.push(thisObj.getDataResponseQuery(res));
                     });

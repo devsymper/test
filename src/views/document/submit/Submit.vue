@@ -626,7 +626,6 @@ export default {
                         valueInput = ""
                     }
                     if(allControlNotSetData.includes(controlType)){
-                        console.log('jbh',controlType);
                         let control = new ActionControl(idField, $(allInputControl[index]),field,thisCpn.keyInstance);
                         control.init();
                         control.render();
