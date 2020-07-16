@@ -348,7 +348,8 @@ export default {
                 if (action == "create" || action == "clone") {
                     // let modelData = this.getModelData(); // data này giành cho backend của flowable
                     let modelData = this.getModelDataForSymperService();
-                    bpmnApi
+                    if(modelData.content){
+                        bpmnApi
                         .createModel(modelData)
                         .then(res => {
                             if(res.status == 200){
@@ -365,6 +366,8 @@ export default {
                                 "Can not create new process model"
                             );
                         });
+               
+                    }
                 } else {
                     self.updateModelToSymperService(idModel);
                 }
@@ -372,15 +375,17 @@ export default {
         },
         async updateModelToSymperService(){
             let modelData = this.getModelDataForSymperService();
-            try {
-                let res = await bpmnApi.updateModel(modelData, this.modelId);
-                if(res.status == 200){
-                    this.$snotifySuccess("Update model sucessfully");
-                }else{
-                    this.$snotifyError(res, "Can not update process model!");            
+            if(modelData.content){
+                try {
+                    let res = await bpmnApi.updateModel(modelData, this.modelId);
+                    if(res.status == 200){
+                        this.$snotifySuccess("Update model sucessfully");
+                    }else{
+                        this.$snotifyError(res, "Can not update process model!");            
+                    }
+                } catch (error) {
+                    this.$snotifyError(error, "Can not update process model!");            
                 }
-            } catch (error) {
-                this.$snotifyError(error, "Can not update process model!");            
             }
         },
         // update data của model và data của tất cả các element trong model lên server (backend flowable)
@@ -600,6 +605,20 @@ export default {
                 }
             };
         },
+        addBPMNLoopAttr(props, idNode){
+            let vizNodeData = this.$refs.symperBpmn.getElData(idNode);
+            if(vizNodeData){
+                let bizData = vizNodeData.businessObject;
+                if(bizData.hasOwnProperty('loopCharacteristics')){
+                    if(bizData.loopCharacteristics.isSequential){
+                        props.multiinstance_type = 'Sequential';
+                    }else{
+                        props.multiinstance_type = 'Parallel';
+                    }
+                }
+            }
+            return props;
+        },
         getNodeProperties(nodeInfo, includeSymperAttr = false) {
             let props = {};
             let sNodeAttrs = {};
@@ -610,6 +629,7 @@ export default {
             }else {
                 console.error("node info not match type Object or String", nodeInfo)
             }
+            
 
             for (let key in sNodeAttrs.attrs) {
                 if(!includeSymperAttr){
@@ -645,6 +665,7 @@ export default {
                     );
                 }
             }
+            props = this.addBPMNLoopAttr(props, sNodeAttrs.id);
             return props;
         },
         /**
