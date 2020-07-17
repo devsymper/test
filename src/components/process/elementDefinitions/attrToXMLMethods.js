@@ -155,5 +155,27 @@ export default {
             newEl.text = attr.value;
             bizObj.documentation = [newEl];
         }
+    },
+    subLoopCharMethod(el, elKey, attr, bpmnModeler, attrName) {
+        if (el.businessObject && el.businessObject.loopCharacteristics) {
+            let moddle = bpmnModeler.get('moddle');
+            let bizObj = el.businessObject;
+            let newEl = moddle.create("bpmn:Expression");
+
+            newEl.text = attr.value;
+            newEl.body = attr.value;
+            // bizObj.loopCharacteristics.completionCondition = newEl;
+            bizObj.loopCharacteristics[attr.toXML.name] = newEl;
+        }
+    },
+
+    collectionMethod(el, elKey, attr, bpmnModeler, attrName) {
+        if (el.businessObject && el.businessObject.loopCharacteristics && attr.value) {
+            let moddle = bpmnModeler.get('moddle');
+            let bizObj = el.businessObject;
+            let newEl = moddle.create("bpmn:Expression");
+
+            bizObj.loopCharacteristics['symper:collection'] = attr.value;
+        }
     }
 }

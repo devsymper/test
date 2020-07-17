@@ -1298,7 +1298,18 @@ let allAttrs = {
         "type": "numeric",
         "value": "",
         "info": "BPMN.PROPERTYPACKAGES.MULTIINSTANCE_CARDINALITYPACKAGE.MULTIINSTANCE_CARDINALITY.DESCRIPTION",
-        "dg": "multiInstance"
+        "dg": "multiInstance",
+        toXML: {
+            "symper_position": "el",
+            "name": "loopCardinality",
+            "superClass": ["Element"],
+            "properties": [{
+                "name": "text",
+                "isBody": true,
+                "type": "String"
+            }]
+        },
+        pushToXML: attrToXMLMethods.subLoopCharMethod,
     },
     "multiinstance_collection": {
         "title": "Collection ",
@@ -1306,7 +1317,14 @@ let allAttrs = {
         "value": "",
         "info": "BPMN.PROPERTYPACKAGES.MULTIINSTANCE_COLLECTIONPACKAGE.MULTIINSTANCE_COLLECTION.DESCRIPTION",
         "dg": "multiInstance",
-        hidden: true
+        hidden: true,
+        toXML: {
+            "symper_position": "attr",
+            "name": "collection",
+            "isAttr": true,
+            "type": "String"
+        },
+        pushToXML: attrToXMLMethods.collectionMethod
     },
     "multiinstance_variable": {
         "title": "Element variable ",
@@ -1321,7 +1339,18 @@ let allAttrs = {
         "type": "script",
         "value": "",
         "info": "BPMN.PROPERTYPACKAGES.MULTIINSTANCE_CONDITIONPACKAGE.MULTIINSTANCE_CONDITION.DESCRIPTION",
-        "dg": "multiInstance"
+        "dg": "multiInstance",
+        toXML: {
+            "symper_position": "el",
+            "name": "completionCondition",
+            "superClass": ["Element"],
+            "properties": [{
+                "name": "text",
+                "isBody": true,
+                "type": "String"
+            }]
+        },
+        pushToXML: attrToXMLMethods.subLoopCharMethod,
     },
     "isforcompensation": {
         "title": "Is for compensation",
