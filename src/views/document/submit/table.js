@@ -332,6 +332,7 @@ export default class Table {
                     thisObj.tableInstance.setDataAtCell(colChange[0], rowData.length - 1, id);
                     ClientSQLManager.insertRow(thisObj.keyInstance, thisObj.tableName, columns, rowData, true).then(res => {
                         if (index == changes.length - 1) {
+
                             thisObj.handlerCheckEffectedControlInTable(controlName);
                         }
                     });
@@ -339,6 +340,8 @@ export default class Table {
                     ClientSQLManager.editRow(thisObj.keyInstance, thisObj.tableName, colChange[1], colChange[3],
                         'WHERE s_table_id_sql_lite = ' + rowData[rowData.length - 1], true).then(res => {
                         if (index == changes.length - 1) {
+
+
                             thisObj.handlerCheckEffectedControlInTable(controlName);
                         }
                     });
@@ -421,6 +424,7 @@ export default class Table {
 
     }
     handlerCheckEffectedControlInTable(controlName) {
+        console.log('hgfadssfds', controlName);
         this.checkRunLocalSql();
         let controlInstance = listInputInDocument[controlName];
         if (controlInstance == null || controlInstance == undefined) {
@@ -547,12 +551,12 @@ export default class Table {
                 for (let index = 0; index < allRowDataInput.length; index++) {
                     let rowInput = allRowDataInput[index];
                     await formulasInstance.handleBeforeRunFormulas(rowInput).then(res => {
-                        dataColumnAfterRunFOrmulas.push(thisObj.getDataResponseQuery(res));
+                        dataColumnAfterRunFOrmulas.push(thisObj.getDataResponseQuery(res, controlInstance.type));
                     });
                 }
             } else {
                 await formulasInstance.handleBeforeRunFormulas(dataInput).then(res => {
-                    dataColumnAfterRunFOrmulas.push(thisObj.getDataResponseQuery(res));
+                    dataColumnAfterRunFOrmulas.push(thisObj.getDataResponseQuery(res, controlInstance.type));
                 })
             }
             store.commit("document/updateListInputInDocument", {
@@ -566,19 +570,32 @@ export default class Table {
          * Hàm lấy dữ liệu hiện tại của table và insert vào sql lite table
          */
 
-    getDataResponseQuery(rs) {
+    getDataResponseQuery(rs, controlType = "") {
             let result = ""
-            if (!rs.server) {
-                let data = rs.data;
-                if (data.length > 0) {
-                    result = data[0].values[0][0]
+            if (controlType == 'table') {
+                if (!rs.server) {
+                    let data = rs.data;
+                    if (data.length > 0) {
+                        result = data[0]
+                    }
+                } else {
+                    result = rs.data.data;
+
                 }
             } else {
-                let data = rs.data.data;
-                if (data.length > 0) {
-                    result = data[0][Object.keys(data[0])[0]]
+                if (!rs.server) {
+                    let data = rs.data;
+                    if (data.length > 0) {
+                        result = data[0].values[0][0]
+                    }
+                } else {
+                    let data = rs.data.data;
+                    if (data.length > 0) {
+                        result = data[0][Object.keys(data[0])[0]]
+                    }
                 }
             }
+
             return result;
         }
         /**
@@ -758,6 +775,7 @@ export default class Table {
         });
         let tb = this;
         if (vls != false) {
+            console.log('hgfasdfsdasd', vls);
             setTimeout(() => {
                 tb.tableInstance.setDataAtRowProp(vls, null, null, 'auto_set');
             }, 20);
