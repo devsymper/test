@@ -148,7 +148,7 @@ export default {
     },
 
     documentationMethod(el, elKey, attr, bpmnModeler, attrName) {
-        if (el.businessObject && attr.value != '') {
+        if (el.businessObject) {
             let moddle = bpmnModeler.get('moddle');
             let bizObj = el.businessObject;
             let newEl = moddle.create("symper:documentation");

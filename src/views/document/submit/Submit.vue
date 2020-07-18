@@ -124,17 +124,18 @@ export default {
         },
       
         documentObjectWorkflowObjectId: {
-            type: Number,
-            default: 0
+            type: String,
+            default: ''
         },
         documentObjectWorkflowId: {
-            type: Number,
-            default: 0
+            type: String,
+            default: ''
         },
         documentObjectTaskId: {
-            type: Number,
-            default: 0
+            type: String,
+            default: ''
         },
+        
         workflowVariable:{
             type:Object,
             default(){
