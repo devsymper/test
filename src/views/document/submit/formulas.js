@@ -60,7 +60,6 @@ export default class Formulas {
 
         let listSyql = this.getReferenceFormulas(script);
 
-        console.log('jkasd', script);
         if (listSyql != null && listSyql.length > 0) {
             for (let i = 0; i < listSyql.length; i++) {
                 let syql = listSyql[i].trim();
@@ -253,7 +252,6 @@ export default class Formulas {
             let syql = listSyql[0].trim();
             syql = this.replaceParamsToData(dataInput, syql);
             syql = syql.replace('ref(', '');
-            syql = syql.replace(/\r?\n|\r/g, '');
             syql = syql.substring(0, syql.length - 1);
             let sql = ""
             if (/\$\$/.test(syql) == false) {
@@ -330,6 +328,7 @@ export default class Formulas {
             if (dataInput != false) {
                 syql = this.replaceParamsToData(dataInput, formulas);
             }
+            syql = syql.replace(/\r?\n|\r/g, '');
 
             return formulasApi.execute({ formula: syql });
         }

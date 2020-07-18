@@ -37,6 +37,10 @@ export default {
                     docSize : '21cm'
                 }
             }
+        },
+        isPrint:{
+            type:Boolean,
+            default:false
         }
     },   
     computed: {
@@ -246,7 +250,9 @@ export default {
 
             }
             setTimeout(() => {
-                // thisCpn.printDiv()
+                if(thisCpn.isPrint){
+                    thisCpn.printDiv();
+                }
             }, 500);
         },
         

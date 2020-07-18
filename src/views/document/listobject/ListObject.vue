@@ -69,6 +69,13 @@ export default {
                     },
                 },
                 {
+                    name: "print",
+                    text: "In",
+                    // callback: (documentObject, callback) => {
+                    //     this.$goToPage('/documents/objects/'+documentObject.document_object_id,"Danh sách bản ghi");
+                    // },
+                },
+                {
                     name: "detailInView",
                     text: "Xem trong trang",
                     callback: (documentObject, callback) => {
@@ -78,7 +85,7 @@ export default {
                 },
                 {
                     name: "edit",
-                    text: "Sửa",
+                    text: "Cập nhật",
                     callback: (documentObject, callback) => {
                         this.$goToPage('/document/objects/update/'+documentObject.document_object_id,"Danh sách bản ghi");
                     },

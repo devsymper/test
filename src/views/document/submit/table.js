@@ -71,7 +71,7 @@ Handsontable.renderers.FileRenderer = function(instance, td, row, col, prop, val
 Handsontable.cellTypes.registerCellType('file', {
     renderer: Handsontable.renderers.PercentRenderer
 });
-let listKeyCodeNotChange = [18, 17, 9, 20, 27, 16, 192]
+let listKeyCodeNotChange = [18, 17, 9, 20, 27, 16, 192, 91]
 let listTableInstance = {}
 let columnHasSum = {}
 let listUserControlData = {}

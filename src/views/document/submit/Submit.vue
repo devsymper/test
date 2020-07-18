@@ -1168,12 +1168,8 @@ export default {
                         "value",
                         value
                     );
-                    if($('#'+controlId).attr('s-control-type') == 'label'){
-                        $('#'+controlId).text(value);
-                    }
-                    else{
-                        $('#'+controlId).val(value);
-                    }
+                   
+                    controlInstance.setValue(value)
                     markBinedField(controlName);
                     this.handleControlInputChange(controlName)
                 }else{
