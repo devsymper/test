@@ -98,26 +98,32 @@ export default {
                     dataObjsMap[objKey] = obj;
                 }
 
-                if(dataObjsMap.instanceDisplayText){
-                    formulasApi.execute({
-                        data_input: JSON.stringify(dataInput),
-                        formula: dataObjsMap.instanceDisplayText.value
-                    }).then((formulaData) => {
-                        if( formulaData.status == 200){
-                            formulaData = formulaData.data.data;
-                            if(formulaData.length > 0){
-                                formulaData = formulaData[0];
-                                resolve(Object.values(formulaData)[0]);
-                            }
-                        }else{
-                            resolve('');
-                        }
-                    }).catch(err=>{
-                        reject(err);
-                    });                    
-                }else{
+                let formula = dataObjsMap.instanceDisplayText.value;
+                if(!formula || String(formula).trim() == ''){
                     resolve('');
+                }else{
+                    if(dataObjsMap.instanceDisplayText){
+                        formulasApi.execute({
+                            data_input: JSON.stringify(dataInput),
+                            formula: dataObjsMap.instanceDisplayText.value
+                        }).then((formulaData) => {
+                            if( formulaData.status == 200){
+                                formulaData = formulaData.data.data;
+                                if(formulaData.length > 0){
+                                    formulaData = formulaData[0];
+                                    resolve(Object.values(formulaData)[0]);
+                                }
+                            }else{
+                                resolve('');
+                            }
+                        }).catch(err=>{
+                            reject(err);
+                        });                    
+                    }else{
+                        resolve('');
+                    }
                 }
+
             })
         },
         handleTaskSubmited(outcomeData){

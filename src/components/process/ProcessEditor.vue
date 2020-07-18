@@ -1230,7 +1230,7 @@ export default {
             for (let attrName in currentAtts) {
                 
                 let attr = currentAtts[attrName];
-                if(attr.hidden){
+                if(!attr || attr.hidden ){
                     continue;
                 }
                 if (!attr) {
