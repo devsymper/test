@@ -215,8 +215,23 @@ import UserRoleSelector from "@/components/app/UserRoleSelector.vue";
 
 export default {
     created(){
+        let self = this;
         let savedUserInfo = util.auth.getSavedUserInfo();
+        let roles = this.$store.state.app.endUserInfo.roles;
+        
         this.$store.dispatch('app/setUserInfo', savedUserInfo);
+        
+        this.$evtBus.$on('symper-user-add-loaded-role-type', function(type){
+            self.loadRoleTypes.push(type);
+            let currentRole = self.$store.state.app.endUserInfo.currentRole;
+            if(self.loadRoleTypes.length == 2 && currentRole.id == 0){
+                if(roles.orgchart.length > 0){
+                    self.$store.dispatch('app/changeUserRole', roles.orgchart[0]);
+                }else if(roles.systemRole.length > 0){
+                    self.$store.dispatch('app/changeUserRole', roles.orgchart[0]);
+                }
+            }
+        });
         this.$store.dispatch("app/getAllUsers");
         this.$store.dispatch('app/getAllRoles', this.$store.state.app.endUserInfo.id);
     },
@@ -285,6 +300,7 @@ export default {
     },
     data() {
         return {
+            loadRoleTypes: [],
             showDelegatedUser: false,
             showSwitchRole: false,
             delegatedUser: {},

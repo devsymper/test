@@ -124,6 +124,13 @@ function getRolesByType(userInfo, type, apiObj, context) {
         } else {
             self.$snotifyError(res, "Can not get user role in orgchart");
         }
+
+        setTimeout(() => {
+
+            SYMPER_APP.$evtBus.$emit('symper-user-add-loaded-role-type', {
+                type: type
+            });
+        }, 0);
     }).catch((err) => {
         self.$snotifyError(err, "Can not get user role in orgchart");
     });

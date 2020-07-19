@@ -34,7 +34,7 @@ import { userApi } from '../../api/user';
 
 export default {
     created(){
-
+        let self = this;
     },
     data(){
         return {
