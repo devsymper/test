@@ -22,7 +22,12 @@ const changeCurrentUserInfo = (state, data) => {
 
 const changeUrlsToTabs = (state, data) => {
     console.log(Vue, state, data);
-    Vue.set(state.urlToTabTitleMap, data.url, data.title);
+
+    let urlKey = data.url + data.pageInstanceKey;
+    if (data.url[data.url.length - 1] != '/') {
+        urlKey = data.url + '/' + data.pageInstanceKey;
+    }
+    Vue.set(state.urlToTabTitleMap, urlKey, data);
 }
 
 const updateCurrentTabIndex = (state, data) => {
