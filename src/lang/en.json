@@ -281,6 +281,9 @@
             }
         }
     },
+    "documentObject": {
+        "title": "List Document Object"
+    },
     "service": {
         "title": "List service",
         "table": {

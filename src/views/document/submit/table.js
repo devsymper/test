@@ -74,7 +74,6 @@ Handsontable.cellTypes.registerCellType('file', {
 let listKeyCodeNotChange = [18, 17, 9, 20, 27, 16, 192, 91]
 let listTableInstance = {}
 let columnHasSum = {}
-let listUserControlData = {}
 let listInputInDocument = sDocument.state.submit.listInputInDocument;
 const MAX_TABLE_HEIGHT = 300;
 
@@ -942,6 +941,8 @@ export default class Table {
                 controlInstance.controlProperties.isTableOnly.value === false)) {
             return;
         } else {
+            console.log('kjhgdas', controlInstance.name);
+            console.log('kjhgdas', controlInstance.controlProperties.isTableOnly.value === false);
             let controlTitle = (listInputInDocument[controlName].title == "") ? listInputInDocument[controlName].name : listInputInDocument[controlName].title;
             let tableName = listInputInDocument[controlName].inTable;
             let tableTitle = (listInputInDocument[tableName].title == "") ? listInputInDocument[tableName].name : listInputInDocument[tableName].title;

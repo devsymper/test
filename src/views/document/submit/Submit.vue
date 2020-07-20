@@ -83,6 +83,7 @@
 </template>
 <script>
 import { documentApi } from "./../../../api/Document.js";
+import { userApi } from "./../../../api/user.js";
 import "./../../../components/document/documentContent.css";
 import { setDataForPropsControl,allControlNotSetData } from "./../../../components/document/dataControl";
 import BasicControl from "./basicControl";
@@ -835,7 +836,11 @@ export default {
             let dataPost = this.getDataPostSubmit();
             dataPost['id'] = this.documentId;
             documentApi.submitDocument(dataPost).then(res => {
-                thisCpn.$emit('submit-document-success',res.data);
+                let dataResponSubmit = res.data;
+                userApi.getDetailUser(res.data.document_object_user_created_id).then(res=>{
+                    dataResponSubmit['current_user_fullname'] = res.data.user.displayName;
+                    thisCpn.$emit('submit-document-success',dataResponSubmit);
+                }).always({}).catch({})
                 thisCpn.isSubmitting = false;
                 if (res.status == 200) {
                     if(thisCpn.sDocumentSubmit.submitFormulas != undefined){
@@ -1168,7 +1173,6 @@ export default {
                         "value",
                         value
                     );
-                   
                     controlInstance.setValue(value)
                     markBinedField(controlName);
                     this.handleControlInputChange(controlName)
