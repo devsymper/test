@@ -1,7 +1,8 @@
 import Formulas from "./formulas";
 import sDocument from './../../../store/document'
-import { checkCanBeBind, resetImpactedFieldsList, markBinedField } from './handlerCheckRunFormulas';
+import { markBinedField } from './handlerCheckRunFormulas';
 import { SYMPER_APP } from './../../../main.js'
+import store from './../../../store'
 
 let listInputInDocument = sDocument.state.submit.listInputInDocument;
 
@@ -86,6 +87,12 @@ export default class Control {
                 if (this.controlFormulas[key].value != "" && this.controlFormulas[key].value != undefined && Object.values(this.controlFormulas[key].value).length > 0) {
                     let formulas = Object.values(this.controlFormulas[key].value)[0];
                     this.controlFormulas[key]['instance'] = new Formulas(this.curParentInstance, formulas, key);
+                    let table = this.controlFormulas[key]['instance'].detectTableRelateLocalFormulas();
+                    if (table.length > 0)
+                        store.commit("document/addToRelatedLocalFormulas", {
+                            key: this.name,
+                            value: table
+                        });
                 }
             }
         }
@@ -173,7 +180,6 @@ export default class Control {
     }
 
     handlerDataAfterRunFormulasValue(values) {
-        console.log('sad', values);
         if (this.inTable != false) {
             let vls = [];
             for (let index = 0; index < values.length; index++) {
@@ -194,12 +200,64 @@ export default class Control {
                 }
             }, 100);
         } else {
-            if ($('#' + this.id).length > 0) {
-                $('#' + this.id).val(values);
-                $('#' + this.id).trigger('change')
-                markBinedField(this.name);
+            if (this.type == 'table') {
+                let vls = [];
+                if (values.columns == undefined) {
+                    // for (let index = 0; index < values.length; index++) {
+                    //     let row = values[index];
+                    //     if (row == null || row == 'null')
+                    //         row = '';
+                    //     vls.push([index, this.name, row]);
+                    // }
+
+                    this.setDataTable(values)
+                } else {
+                    //sqlite
+                }
+
+                console.log('hgfdas', values);
+                // let tableControl = listInputInDocument[this.name];
+                // tableControl.tableInstance.tableInstance.setDataAtRowProp(vls, null, null, AUTO_SET);
+
+                // markBinedField(this.name);
+                // setTimeout(() => {
+                //     let controlEffected = this.getEffectedControl();
+                //     for (let control in controlEffected) {
+                //         if (listInputInDocument[control].inTable == false)
+                //             SYMPER_APP.$evtBus.$emit('run-effected-control-when-table-change', listInputInDocument[control])
+                //     }
+                // }, 100);
+            } else {
+                if ($('#' + this.id).length > 0) {
+                    $('#' + this.id).val(values);
+                    $('#' + this.id).trigger('change')
+                    markBinedField(this.name);
+                }
+            }
+
+        }
+    }
+    setDataTable(data) {
+        if (data.length > 0 && data[0].length > 0) {
+            let allColumnBindData = Object.keys(data[0][0]);
+            if (allColumnBindData.length > 0) {
+                for (let index = 0; index < allColumnBindData.length; index++) {
+                    const controlName = allColumnBindData[index];
+                    let colData = data[0].reduce((arr, obj) => {
+                        arr.push(obj[controlName])
+                        return arr
+                    }, []);
+                    let vls = [];
+                    for (let i = 0; i < colData.length; i++) {
+                        vls.push([i, controlName, colData[i]]);
+                    }
+                    this.tableInstance.setData(vls);
+                }
+            } else {
+                this.tableInstance.setData(false);
             }
         }
+
     }
     handlerDataAfterRunFormulasUniqueDB(data, dataInput) {
         if (this.inTable == false) {

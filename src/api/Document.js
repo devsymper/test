@@ -10,15 +10,15 @@ export const documentApi = {
     editDocument(data) {
         return coreApi.put("documents", data);
     },
-    deleteDocument(id) {
-        return coreApi.delete("documents/" + id);
+    deleteDocument(ids) {
+        return coreApi.delete("documents", ids);
     },
 
     detailDocument(id) {
         return coreApi.get("documents/" + id);
     },
-    deleteDocumentObject(objectId) {
-        return coreApi.delete("documents/objects/" + objectId);
+    deleteDocumentObject(objectIds) {
+        return coreApi.delete("documents/objects", objectIds);
     },
     detailDocumentObject(objectId) {
         return coreApi.get("documents/objects/" + objectId);

@@ -143,6 +143,25 @@ export default class BasicControl extends Control {
         }
 
     }
+
+    setValue(value) {
+        this.value = value;
+        if (this.inTable === false) {
+            if (this.type == 'label') {
+                $('#' + this.id).text(value);
+            } else if (this.type == 'date') {
+                $('#' + this.id).val(moment(value).format(this.formatDate));
+            } else if (this.type == 'number') {
+                if (typeof value == 'number')
+                    $('#' + this.id).val(numbro(value).format(this.numberFormat))
+            } else {
+                $('#' + this.id).val(value);
+            }
+
+        }
+
+    }
+
     setValueControl() {
         let value = this.value
         if (this.type == 'percent') {
@@ -152,6 +171,7 @@ export default class BasicControl extends Control {
                 value = numbro(value).format(this.numberFormat)
 
         } else if (this.type == 'date') {
+            // alert('ok')
             value = moment(value).format(this.formatDate)
         }
         if (this.type == 'label') {
@@ -395,11 +415,13 @@ export default class BasicControl extends Control {
     renderDateControl() {
         this.ele.attr('type', 'text');
         this.formatDate = (this.controlProperties.hasOwnProperty('formatDate')) ? this.controlProperties.formatDate.value : "";
+        this.value = moment(this.value).format(this.formatDate);
         if (this.checkDetailView()) return;
         let thisObj = this;
         if (this.formatDate != "" && typeof this.formatDate === 'string')
             this.ele.on('change', function(e) {
-                $(this).val(moment($(this).val()).format(thisObj.formatDate))
+                thisObj.value = moment($(this).val()).format(thisObj.formatDate);
+                $(this).val(thisObj.value)
             })
         this.ele.on('click', function(e) {
             $(e.target).addClass('date-picker-access');

@@ -78,10 +78,7 @@ export default {
             
         })
         .catch(err => {
-            thisCpn.$snotify({
-                    type: "error",
-                    title: "can not save document",
-                });
+            
         })
         .always(() => {
         });

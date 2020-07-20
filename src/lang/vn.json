@@ -280,6 +280,9 @@
             }
         }
     },
+    "documentObject": {
+        "title": "Danh sách bản ghi"
+    },
     "service": {
         "title": "Danh sách dịch vụ hệ thống",
         "table": {

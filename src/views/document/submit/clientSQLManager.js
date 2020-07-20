@@ -61,7 +61,7 @@ export default class ClientSQLManager {
         }
     }
 
-    static createTable(keyInstance, tableName, columns, temporary = "") {
+    static createTable(keyInstance, tableName, columns, temporary = "", columnInsert, dataInsert = false) {
         let col = "(";
         for (let c in columns) {
             col += c + " " + columns[c] + ", ";
@@ -71,10 +71,29 @@ export default class ClientSQLManager {
         col += " )";
         let sql = `CREATE ${temporary} TABLE IF NOT EXISTS ${tableName} ${col};`;
         // sql += "INSERT INTO this_document VALUES ('a', 'hello');"
+        if (dataInsert != false) {
+            sql += `INSERT INTO ${tableName} (${columnInsert}) VALUES ${dataInsert};`
+        }
+        console.log('sagfad', sql);
         this.run(keyInstance, sql, true);
 
         // console.log(this.run(keyInstance, 'select * from this_document', false));
 
+    }
+    static async insertDataToTable(tableName, columns, data, returnPromise = false) {
+        let sql = `INSERT INTO ${tableName} (${columns}) VALUES ${data}`;
+        if (returnPromise) {
+            return new Promise((resolve, reject) => {
+                try {
+                    let data = this.run(keyInstance, sql, true);
+                    resolve(data);
+                } catch (error) {
+                    reject(error);
+                }
+            });
+        } else {
+            return this.run(keyInstance, sql, true);
+        }
     }
     static async editRow(keyInstance, tableName, column, value, where, returnPromise = false) {
         let sql = `UPDATE ${tableName} SET ${column} = "${value}" ${where}`;
@@ -102,6 +121,7 @@ export default class ClientSQLManager {
         let tbColumn = column.join();
         let tbValue = value.join()
         let sql = `INSERT INTO ${tableName} (${tbColumn}) VALUES(${tbValue})`;
+        console.log('gfsdd', tableName, sql);
         if (returnPromise) {
             return new Promise((resolve, reject) => {
                 try {

@@ -71,10 +71,9 @@ Handsontable.renderers.FileRenderer = function(instance, td, row, col, prop, val
 Handsontable.cellTypes.registerCellType('file', {
     renderer: Handsontable.renderers.PercentRenderer
 });
-let listKeyCodeNotChange = [18, 17, 9, 20, 27, 16, 192]
+let listKeyCodeNotChange = [18, 17, 9, 20, 27, 16, 192, 91]
 let listTableInstance = {}
 let columnHasSum = {}
-let listUserControlData = {}
 let listInputInDocument = sDocument.state.submit.listInputInDocument;
 const MAX_TABLE_HEIGHT = 300;
 
@@ -332,6 +331,7 @@ export default class Table {
                     thisObj.tableInstance.setDataAtCell(colChange[0], rowData.length - 1, id);
                     ClientSQLManager.insertRow(thisObj.keyInstance, thisObj.tableName, columns, rowData, true).then(res => {
                         if (index == changes.length - 1) {
+
                             thisObj.handlerCheckEffectedControlInTable(controlName);
                         }
                     });
@@ -339,6 +339,8 @@ export default class Table {
                     ClientSQLManager.editRow(thisObj.keyInstance, thisObj.tableName, colChange[1], colChange[3],
                         'WHERE s_table_id_sql_lite = ' + rowData[rowData.length - 1], true).then(res => {
                         if (index == changes.length - 1) {
+
+
                             thisObj.handlerCheckEffectedControlInTable(controlName);
                         }
                     });
@@ -408,7 +410,21 @@ export default class Table {
          * Hàm xử lí tìm các control bị ảnh hưởng sau khi  change 1 control trong table và chạy công thức cho các control bị ảnh hưởng đó
          * @param {String} controlName Control bị thay đổi dữ liệu
          */
+
+    checkRunLocalSql() {
+        let listRelatedLocal = sDocument.state.submit.localRelated;
+        if (listRelatedLocal.hasOwnProperty(this.tableName)) {
+            listRelatedLocal = listRelatedLocal[this.tableName];
+            for (let index = 0; index < listRelatedLocal.length; index++) {
+                const element = listRelatedLocal[index];
+                this.handlerCheckCanBeRunFormulas(element);
+            }
+        }
+
+    }
     handlerCheckEffectedControlInTable(controlName) {
+        console.log('hgfadssfds', controlName);
+        this.checkRunLocalSql();
         let controlInstance = listInputInDocument[controlName];
         if (controlInstance == null || controlInstance == undefined) {
             return;
@@ -460,11 +476,15 @@ export default class Table {
             let controlInstance = listInputInDocument[control];
             if (controlInstance.controlFormulas.hasOwnProperty('formulas')) {
                 let formulasInstance = controlInstance.controlFormulas['formulas'].instance;
-                let dataInput = this.getDataInputForFormulas(formulasInstance, controlInstance.inTable);
-                if (controlInstance.hasOwnProperty('inTable')) {
+
+                if (controlInstance.type != 'table') {
+                    let dataInput = this.getDataInputForFormulas(formulasInstance, controlInstance.inTable);
                     if (controlInstance.inTable == this.tableName) {
                         this.handlerRunFormulasForControlInTable('formulas', controlInstance, dataInput, formulasInstance);
                     }
+                } else {
+                    let dataInput = this.getDataInputForFormulas(formulasInstance, controlInstance.name);
+                    this.handlerRunFormulasForControlInTable('formulas', controlInstance, dataInput, formulasInstance);
                 }
             }
         }
@@ -529,14 +549,13 @@ export default class Table {
                 }
                 for (let index = 0; index < allRowDataInput.length; index++) {
                     let rowInput = allRowDataInput[index];
-                    console.log('rowInput', rowInput);
                     await formulasInstance.handleBeforeRunFormulas(rowInput).then(res => {
-                        dataColumnAfterRunFOrmulas.push(thisObj.getDataResponseQuery(res));
+                        dataColumnAfterRunFOrmulas.push(thisObj.getDataResponseQuery(res, controlInstance.type));
                     });
                 }
             } else {
                 await formulasInstance.handleBeforeRunFormulas(dataInput).then(res => {
-                    dataColumnAfterRunFOrmulas.push(thisObj.getDataResponseQuery(res));
+                    dataColumnAfterRunFOrmulas.push(thisObj.getDataResponseQuery(res, controlInstance.type));
                 })
             }
             store.commit("document/updateListInputInDocument", {
@@ -550,19 +569,32 @@ export default class Table {
          * Hàm lấy dữ liệu hiện tại của table và insert vào sql lite table
          */
 
-    getDataResponseQuery(rs) {
+    getDataResponseQuery(rs, controlType = "") {
             let result = ""
-            if (!rs.server) {
-                let data = rs.data;
-                if (data.length > 0) {
-                    result = data[0].values[0][0]
+            if (controlType == 'table') {
+                if (!rs.server) {
+                    let data = rs.data;
+                    if (data.length > 0) {
+                        result = data[0]
+                    }
+                } else {
+                    result = rs.data.data;
+
                 }
             } else {
-                let data = rs.data.data;
-                if (data.length > 0) {
-                    result = data[0][Object.keys(data[0])[0]]
+                if (!rs.server) {
+                    let data = rs.data;
+                    if (data.length > 0) {
+                        result = data[0].values[0][0]
+                    }
+                } else {
+                    let data = rs.data.data;
+                    if (data.length > 0) {
+                        result = data[0][Object.keys(data[0])[0]]
+                    }
                 }
             }
+
             return result;
         }
         /**
@@ -742,6 +774,7 @@ export default class Table {
         });
         let tb = this;
         if (vls != false) {
+            console.log('hgfasdfsdasd', vls);
             setTimeout(() => {
                 tb.tableInstance.setDataAtRowProp(vls, null, null, 'auto_set');
             }, 20);
@@ -908,6 +941,8 @@ export default class Table {
                 controlInstance.controlProperties.isTableOnly.value === false)) {
             return;
         } else {
+            console.log('kjhgdas', controlInstance.name);
+            console.log('kjhgdas', controlInstance.controlProperties.isTableOnly.value === false);
             let controlTitle = (listInputInDocument[controlName].title == "") ? listInputInDocument[controlName].name : listInputInDocument[controlName].title;
             let tableName = listInputInDocument[controlName].inTable;
             let tableTitle = (listInputInDocument[tableName].title == "") ? listInputInDocument[tableName].name : listInputInDocument[tableName].title;

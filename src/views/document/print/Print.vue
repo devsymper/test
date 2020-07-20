@@ -1,5 +1,5 @@
 <template>
-    <detail-view :docObjectId="docObjectId" />
+<detail-view :isPrint="true" :docObjectId="docObjectId" />
 </template>
 
 <script>

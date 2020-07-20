@@ -3,7 +3,7 @@
         :getDataUrl="'https://sdocument-management.symper.vn/documents/'+docId+'/objects'"   
         :useDefaultContext="false"
         :tableContextMenu="tableContextMenu"
-        :pageTitle="$t('document.title')"
+        :pageTitle="$t('documentObject.title')"
         :containerHeight="containerHeight"
         :actionPanelWidth="actionPanelWidth"
         @after-open-add-panel="addDocument"
@@ -35,11 +35,14 @@ export default {
             tableContextMenu:[
                 {name:"delete",text:'Xóa',
                     callback: (documentObject, callback) => {
-                        console.log(documentObject);
-                        
+                        console.log('das',documentObject);
+                        let ids = documentObject.reduce((arr,obj)=>{
+                            arr.push(obj.document_object_id);
+                            return arr;
+                        },[]);
                         let thisCpn = this;
                         documentApi
-                        .deleteDocumentObject(documentObject[0].document_object_id)
+                        .deleteDocumentObject({objectIds:ids.join()})
                         .then(res => {
                             if (res.status == 200) {
                                 thisCpn.$snotify({
@@ -56,7 +59,6 @@ export default {
                             }
                         })
                         .catch(err => {
-                            console.log("error from detail document Object api!!!", err);
                         })
                         .always(() => {});
                     },
@@ -69,6 +71,13 @@ export default {
                     },
                 },
                 {
+                    name: "print",
+                    text: "In",
+                    // callback: (documentObject, callback) => {
+                    //     this.$goToPage('/documents/objects/'+documentObject.document_object_id,"Danh sách bản ghi");
+                    // },
+                },
+                {
                     name: "detailInView",
                     text: "Xem trong trang",
                     callback: (documentObject, callback) => {
@@ -78,7 +87,7 @@ export default {
                 },
                 {
                     name: "edit",
-                    text: "Sửa",
+                    text: "Cập nhật",
                     callback: (documentObject, callback) => {
                         this.$goToPage('/document/objects/update/'+documentObject.document_object_id,"Danh sách bản ghi");
                     },

@@ -30,9 +30,13 @@ export default {
             tableContextMenu:[
                 {name:"delete",text:'Xóa',
                     callback: (document, callback) => {
+                        let ids = document.reduce((arr,obj)=>{
+                            arr.push(obj.id);
+                            return arr;
+                        },[]);
                         let thisCpn = this;
                         documentApi
-                        .deleteDocument(document[0].id)
+                        .deleteDocument({ids:ids.join()})
                         .then(res => {
                             if (res.status == 200) {
                                 thisCpn.$snotify({

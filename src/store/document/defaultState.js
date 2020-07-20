@@ -59,7 +59,8 @@ const defaultState = {
         currentCellSelected: null, // chỉ ra cell đang nhập
         currentControlAutoComplete: null, // biến chỉ ra control nào đang autocomplete
         submitFormulas: null,
-        listUser: null
+        listUser: null,
+        localRelated: {}
     },
     detail: {
         allData: null
