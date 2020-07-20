@@ -273,7 +273,6 @@ export default class Table {
                         if (thisObj.tableHasRowSum) {
                             currentColData.pop();
                         }
-                        console.log('gfd', currentColData);
                         store.commit("document/updateListInputInDocument", {
                             controlName: controlName,
                             key: 'value',
@@ -302,7 +301,6 @@ export default class Table {
                                 this.alter('insert_row', thisObj.currentSelectedCell.row + 1, 1);
                             }
                         }
-
                     }
                 }
             }
@@ -768,9 +766,12 @@ export default class Table {
     }
     setData(vls) {
         this.tableInstance.updateSettings({
-            data: [
-                ['']
-            ]
+            data: (thisObj.tableHasRowSum) ? [
+                [''],
+                [''],
+            ] : [
+                []
+            ],
         });
         let tb = this;
         if (vls != false) {
@@ -812,17 +813,17 @@ export default class Table {
             //Đánh số thứ tự các cột trong bảng
             thisObj.colName2Idx[controlName] = num;
             //ẩn cột
-            let comtrolProp = listInputInDocument[controlName].controlProperties;
-            if (comtrolProp.hasOwnProperty('isHidden') &&
-                (comtrolProp.isHidden.value == 1 ||
-                    comtrolProp.isHidden.value === true ||
-                    comtrolProp.isHidden.value == "1")) {
+            let controlProp = listInputInDocument[controlName].controlProperties;
+            if (controlProp.hasOwnProperty('isHidden') &&
+                (controlProp.isHidden.value == 1 ||
+                    controlProp.isHidden.value === true ||
+                    controlProp.isHidden.value == "1")) {
                 hiddenColumns.push(num);
             }
-            if (comtrolProp.hasOwnProperty('isSumTable') &&
-                (comtrolProp.isSumTable.value == 1 ||
-                    comtrolProp.isSumTable.value === true ||
-                    comtrolProp.isSumTable.value == "1")) {
+            if (controlProp.hasOwnProperty('isSumTable') &&
+                (controlProp.isSumTable.value == 1 ||
+                    controlProp.isSumTable.value === true ||
+                    controlProp.isSumTable.value == "1")) {
                 columnHasSum[controlName] = num;
                 thisObj.tableHasRowSum = true;
             }
@@ -936,13 +937,10 @@ export default class Table {
     }
     checkUniqueTable(controlName) {
         let controlInstance = listInputInDocument[controlName];
-        if (!controlInstance.controlProperties.hasOwnProperty('isTableOnly') ||
-            (controlInstance.controlProperties.hasOwnProperty('isTableOnly') &&
-                controlInstance.controlProperties.isTableOnly.value === false)) {
-            return;
-        } else {
-            console.log('kjhgdas', controlInstance.name);
-            console.log('kjhgdas', controlInstance.controlProperties.isTableOnly.value === false);
+        if (controlInstance.controlProperties.hasOwnProperty('isTableOnly') &&
+            (controlInstance.controlProperties.isTableOnly.value == 1 ||
+                controlInstance.controlProperties.isTableOnly.value === true ||
+                controlInstance.controlProperties.isTableOnly.value == "1")) {
             let controlTitle = (listInputInDocument[controlName].title == "") ? listInputInDocument[controlName].name : listInputInDocument[controlName].title;
             let tableName = listInputInDocument[controlName].inTable;
             let tableTitle = (listInputInDocument[tableName].title == "") ? listInputInDocument[tableName].name : listInputInDocument[tableName].title;

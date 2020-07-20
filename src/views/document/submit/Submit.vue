@@ -1291,7 +1291,6 @@ export default {
                                 if(controlFormulas[formulasType].hasOwnProperty('instance')){
                                     let formulasInstance = controlFormulas[formulasType].instance;
                                     if(formulasInstance.getFormulas() !== "" && Object.keys(formulasInstance.getInputControl()).length == 0){
-                                        console.log('hgfd',controlName);
                                         impactedFieldsListWhenStart[controlName] = false;
                                         this.$store.commit("document/addToDocumentSubmitStore", {
                                             key: 'impactedFieldsListWhenStart',
