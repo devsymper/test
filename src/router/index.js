@@ -28,6 +28,7 @@ import MultiGuard from 'vue-router-multiguard';
 // import TrackingProcessInstance from "../views/process/TrackingProcessInstance.vue";
 // import WorkList from "../views/works/WorkList.vue";
 // import DoTask from "../views/tasks/DoTask.vue";
+import SymperHiddenRedirectComponent from "../views/SymperHiddenRedirectComponent.vue";
 
 Vue.use(VueRouter);
 /**
@@ -312,6 +313,14 @@ const routes = [{
         name: "ListUserRole",
         component: () =>
             import ('../views/userRole/ListSystemRole.vue'),
+    },
+
+
+    // một link để redirect khi chọn một tab mà trùng name với tab hiện tại
+    {
+        path: "/symper-hidden-redirect-component",
+        name: "symperHiddenRedirectComponent",
+        component: SymperHiddenRedirectComponent
     },
 ];
 

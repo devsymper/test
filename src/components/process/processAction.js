@@ -187,6 +187,12 @@ export const getVarsFromSubmitedDoc = async(docData, elId, docId) => {
                     });
                 }
             }
+
+            vars.push({
+                name: elId + '_outcome',
+                type: 'string',
+                value: 'submit'
+            });
             resolve({
                 vars: vars,
                 nameAndValueMap: dataInputForFormula

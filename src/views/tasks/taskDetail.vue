@@ -241,7 +241,13 @@ export default {
                     "assignee": "1",
                     // "formDefinitionId": "12345",
                     "outcome": value,
-                    // "variables": [],
+                    "variables": [
+                        {
+                            name: this.originData.taskDefinitionKey+'_outcome',
+                            type: 'string',
+                            value: value
+                        }
+                    ],
                     // "transientVariables": []
                 }
                 let res = await this.submitTask(taskData);

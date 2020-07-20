@@ -50,19 +50,35 @@ Vue.prototype.$evtBus.$on('symper-app-call-action-handeler', (action, context, e
 /**
  * Di chuyển đến một trang và tạo ra tab tương ứng
  */
-Vue.prototype.$goToPage = function(url, title) {
+Vue.prototype.$goToPage = function(url, title, pageInstanceKey = false) {
     let activeTabIndex = 0;
-    let urlMap = this.$store.state.app.urlToTabTitleMap;
-    if (urlMap.hasOwnProperty(url)) {
-        activeTabIndex = Object.keys(urlMap).indexOf(url);
-    } else {
-        this.$store.commit('app/changeUrlsToTabs', { url: url, title: title });
-        activeTabIndex = Object.keys(urlMap).length - 1;
+    if (!pageInstanceKey) {
+        pageInstanceKey = Date.now();
     }
-    this.$store.commit('app/updateCurrentTabIndex', activeTabIndex);
-    this.$router.push({
-        path: url
+    let routeObj = this.$router.match(url);
+    let params = Object.assign(routeObj.params, {
+        pageInstanceKey: pageInstanceKey
     });
+
+    let urlMap = this.$store.state.app.urlToTabTitleMap;
+    this.$store.commit('app/changeUrlsToTabs', {
+        url: url,
+        routeName: routeObj.name,
+        title: title,
+        pageInstanceKey: pageInstanceKey,
+        routeParams: util.cloneDeep(params)
+    });
+    activeTabIndex = Object.keys(urlMap).length - 1;
+
+    this.$store.commit('app/updateCurrentTabIndex', activeTabIndex);
+    if (routeObj.name) {
+        this.$router.push({
+            name: routeObj.name,
+            params: util.cloneDeep(params)
+        });
+    } else {
+        this.$snotifyError('Url not found');
+    }
 };
 
 /**
