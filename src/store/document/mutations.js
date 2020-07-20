@@ -237,12 +237,16 @@ const addInstanceSubmitDB = (state, params) => {
  */
 
 const updateListInputInDocument = (state, params) => {
+    console.log('jhsd', util.cloneDeep(params));
+
     let key = params.key
     let controlName = params.controlName;
     let value = params.value
     if (state.submit.listInputInDocument.hasOwnProperty(controlName)) {
         Vue.set(state.submit.listInputInDocument[controlName], key, value);
     }
+    console.log('jhsd', state.submit.listInputInDocument[controlName]);
+
 }
 const addToRootControl = (state, params) => {
     let key = params.key
@@ -255,6 +259,7 @@ const addToImpactedFieldsList = (state, params) => {
 }
 
 const addToDocumentSubmitStore = (state, params) => {
+    console.log('jhsd', params);
     let key = params.key
     let value = params.value
     Vue.set(state.submit, key, value);

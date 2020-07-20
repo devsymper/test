@@ -420,8 +420,8 @@ export default class BasicControl extends Control {
         let thisObj = this;
         if (this.formatDate != "" && typeof this.formatDate === 'string')
             this.ele.on('change', function(e) {
-                thisObj.value = moment($(this).val()).format(thisObj.formatDate);
-                $(this).val(thisObj.value)
+                thisObj.value = $(this).val();
+                $(this).val(moment($(this).val()).format(thisObj.formatDate))
             })
         this.ele.on('click', function(e) {
             $(e.target).addClass('date-picker-access');

@@ -270,7 +270,6 @@ export default {
                 valueControl = $('#'+thisCpn.sDocumentSubmit.listInputInDocument[locale.controlName].id).attr('user-id');
                 if(valueControl == undefined) valueControl = 0;
             }
-            console.log('hgjadks',locale);
             thisCpn.updateListInputInDocument(
                 locale.controlName,
                 "value",
@@ -921,11 +920,18 @@ export default {
                     listInput[controlName].type != "approvalHistory") {
                         let value = (listInput[controlName].type == 'number' && listInput[controlName].value == "" ) ? 0 : listInput[controlName].value;
                         if(listInput[controlName].type == 'percent'){
-                            value = (listInput[controlName].value == "" ) ? 0 : listInput[controlName].value/100;
+                            value = (listInput[controlName].value === "" ) ? 0 : listInput[controlName].value/100;
+                            console.log('agsasd',value);
                         }
                         dataPost[id] = [value];
                         if(listInput[controlName].type == 'checkbox'){
                             dataPost[id] = (value) ? [1] : [0];
+                        }
+                        if(listInput[controlName].type == 'user'){
+                            console.log('kjhgfxh',value);
+                            dataPost[id] =  [0];
+                            console.log('kjhgfxh',dataPost[id]);
+
                         }
                       
                     }
@@ -1291,7 +1297,6 @@ export default {
                                 if(controlFormulas[formulasType].hasOwnProperty('instance')){
                                     let formulasInstance = controlFormulas[formulasType].instance;
                                     if(formulasInstance.getFormulas() !== "" && Object.keys(formulasInstance.getInputControl()).length == 0){
-                                        console.log('hgfd',controlName);
                                         impactedFieldsListWhenStart[controlName] = false;
                                         this.$store.commit("document/addToDocumentSubmitStore", {
                                             key: 'impactedFieldsListWhenStart',
