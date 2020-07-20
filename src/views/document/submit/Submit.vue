@@ -852,7 +852,6 @@ export default {
                         type: "success",
                         title: "Submit document success!"
                     });        
-                    thisCpn.$router.push('/document/submit/'+thisCpn.documentId);
                 }
                 else{
                     thisCpn.$snotify({
