@@ -766,7 +766,7 @@ export default class Table {
     }
     setData(vls) {
         this.tableInstance.updateSettings({
-            data: (thisObj.tableHasRowSum) ? [
+            data: (this.tableHasRowSum) ? [
                 [''],
                 [''],
             ] : [
