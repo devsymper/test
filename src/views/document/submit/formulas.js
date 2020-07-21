@@ -232,7 +232,7 @@ export default class Formulas {
                 formulas = formulas.replace(regex, value);
             }
         }
-        this.replaceWorkflowParams(formulas);
+        formulas = this.replaceWorkflowParams(formulas);
         return formulas;
     }
 
@@ -247,6 +247,7 @@ export default class Formulas {
             }
 
         }
+        console.log('gád', formulas);
         return formulas;
     }
 

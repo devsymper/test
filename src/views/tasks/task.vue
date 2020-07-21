@@ -58,7 +58,8 @@ export default {
                 documentObjectWorkflowObjectId: '',
                 documentObjectWorkflowId: '',
                 documentObjectTaskId: ''
-            }
+            },
+            showDoTaskComponent: false
         }
     },
     props: {
@@ -87,7 +88,7 @@ export default {
                     this.workflowInfo.documentObjectTaskId = this.taskInfo.action.parameter.taskId;
                     // cần activityId  của task truyền vào nữa 
                     for(let key in varsMap){
-                        this.$set(this.workflowVariable , 'workflow_'+key, varsMap[key]);
+                        this.$set(this.workflowVariable , 'workflow_'+key, varsMap[key].value);
                     }
 
                     if(action == 'submit'){
