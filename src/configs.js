@@ -26,7 +26,12 @@ export const appConfigs = {
         nofitication: 'https://notifi.symper.vn/',
         formulasService: 'https://syql.symper.vn/',
         documentService: 'https://sdocument.symper.vn/',
-        sdocumentManagement: 'https://sdocument-management.symper.vn/'
+        sdocumentManagement: 'https://sdocument-management.symper.vn/',
+        orgchart: 'https://orgchart.symper.vn/',
+        systemRole: "https://orgchart.symper.vn/",
+        userRole: "https://orgchart.symper.vn/",
+        permission: "https://accesscontrol.symper.vn/",
+        dashboard: "https://bi-service.symper.vn/report-and-dashboard/"
     },
     notificationTimeout: {
         success: 10000,

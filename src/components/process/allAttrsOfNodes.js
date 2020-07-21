@@ -900,11 +900,15 @@ let allAttrs = {
         "type": "autocomplete",
         "value": "",
         "info": "BPMN.PROPERTYPACKAGES.CALLACTIVITYCALLEDELEMENTPACKAGE.CALLACTIVITYCALLEDELEMENT.DESCRIPTION",
-        "dg": "detail"
+        "dg": "detail",
+        "options": [],
+        "textKey": 'modelName',
+        "valueKey": 'definitionId',
+        "showId": false
     },
     "callactivitycalledelementtype": {
         "title": "Called element type",
-        "type": "select",
+        "type": "text",
         "value": "id",
         "info": "BPMN.PROPERTYPACKAGES.CALLACTIVITYCALLEDELEMENTTYPEPACKAGE.CALLACTIVITYCALLEDELEMENTTYPE.DESCRIPTION",
         "dg": "detail",
@@ -1034,7 +1038,18 @@ let allAttrs = {
         "type": "script",
         "value": '',
         "info": "BPMN.PROPERTYPACKAGES.CONDITIONSEQUENCEFLOWPACKAGE.CONDITIONSEQUENCEFLOWPACKAGE.DESCRIPTION",
-        "dg": "formula"
+        "dg": "formula",
+        toXML: {
+            "symper_position": "el",
+            "name": "conditionExpression",
+            "superClass": ["Element"],
+            "properties": [{
+                "name": "text",
+                "isBody": true,
+                "type": "String"
+            }]
+        },
+        pushToXML: attrToXMLMethods.conditionExpressionMethod,
     },
     "defaultflow": {
         "title": "Default flow",
@@ -1298,7 +1313,18 @@ let allAttrs = {
         "type": "numeric",
         "value": "",
         "info": "BPMN.PROPERTYPACKAGES.MULTIINSTANCE_CARDINALITYPACKAGE.MULTIINSTANCE_CARDINALITY.DESCRIPTION",
-        "dg": "multiInstance"
+        "dg": "multiInstance",
+        toXML: {
+            "symper_position": "el",
+            "name": "loopCardinality",
+            "superClass": ["Element"],
+            "properties": [{
+                "name": "text",
+                "isBody": true,
+                "type": "String"
+            }]
+        },
+        pushToXML: attrToXMLMethods.subLoopCharMethod,
     },
     "multiinstance_collection": {
         "title": "Collection ",
@@ -1306,7 +1332,14 @@ let allAttrs = {
         "value": "",
         "info": "BPMN.PROPERTYPACKAGES.MULTIINSTANCE_COLLECTIONPACKAGE.MULTIINSTANCE_COLLECTION.DESCRIPTION",
         "dg": "multiInstance",
-        hidden: true
+        hidden: true,
+        toXML: {
+            "symper_position": "attr",
+            "name": "collection",
+            "isAttr": true,
+            "type": "String"
+        },
+        pushToXML: attrToXMLMethods.collectionMethod
     },
     "multiinstance_variable": {
         "title": "Element variable ",
@@ -1321,7 +1354,18 @@ let allAttrs = {
         "type": "script",
         "value": "",
         "info": "BPMN.PROPERTYPACKAGES.MULTIINSTANCE_CONDITIONPACKAGE.MULTIINSTANCE_CONDITION.DESCRIPTION",
-        "dg": "multiInstance"
+        "dg": "multiInstance",
+        toXML: {
+            "symper_position": "el",
+            "name": "completionCondition",
+            "superClass": ["Element"],
+            "properties": [{
+                "name": "text",
+                "isBody": true,
+                "type": "String"
+            }]
+        },
+        pushToXML: attrToXMLMethods.subLoopCharMethod,
     },
     "isforcompensation": {
         "title": "Is for compensation",
@@ -1541,7 +1585,7 @@ let allAttrs = {
             if (!val) {
                 return;
             }
-            let docs = await apiCaller.get(appConfigs.apiDomain.documents + '?search=' + val);
+            let docs = await apiCaller.get(appConfigs.apiDomain.sdocumentManagement + 'documents?search=' + val);
             this.myItems = docs.data.listObject;
         },
         options: [{ id: '    ', name: '', title: '' }],
@@ -1940,6 +1984,14 @@ let allAttrs = {
             }]
         },
         pushToXML: attrToXMLMethods.documentationMethod
+    },
+    text: {
+        "title": "Text",
+        "type": "text",
+        "value": "",
+        "info": "BPMN.PROPERTYPACKAGES.DOCUMENTATIONPACKAGE.DOCUMENTATION.DESCRIPTION",
+        "dg": "general",
+        pushToXML: attrToXMLMethods.notPushToXML
     },
 }
 

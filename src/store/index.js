@@ -3,6 +3,8 @@ import Vuex from "vuex";
 import appModule from "./app";
 import documentModule from "./document";
 import processModule from "./process";
+import orgchartModule from "./orgchart";
+import permissionModule from "./permission";
 
 Vue.use(Vuex);
 
@@ -10,6 +12,8 @@ export default new Vuex.Store({
     modules: {
         app: appModule,
         document: documentModule,
-        process: processModule
+        process: processModule,
+        orgchart: orgchartModule,
+        permission: permissionModule
     }
 });

@@ -24,10 +24,11 @@ export const pushCustomElementsToModel = function(allVizEls, allSymEls, bpmnMode
             vizEl[elKey] = removeOldSymperExts(vizEl[elKey]);
         }
 
-        // addCustomPropsToForm(allSymEls[bizVizEl.id]);
-
         for (let attrName in attrs) {
             let attrDef = allNodesAttrs[attrName];
+            if (!attrDef) {
+                continue;
+            }
             if (typeof attrDef.pushToXML == 'function') {
                 attrDef.pushToXML(vizEl, elKey, attrs[attrName], bpmnModeler, attrName);
             }
@@ -122,6 +123,25 @@ export const defaultTaskDescription = {
     targetElement: '',
 }
 
+function filterValue(rows) {
+    let rsl = [];
+    for (let r of rows) {
+        let passed = true;
+        for (let key in r) {
+            if (!r[key]) {
+                passed = false;
+                break;
+            }
+        }
+
+        if (passed) {
+            rsl.push(r);
+        }
+    }
+
+    return rsl;
+}
+
 export const collectInfoForTaskDescription = function(allVizEls, allSymEls, bpmnModeler) {
     for (let idEl in allSymEls) {
         let el = allSymEls[idEl];
@@ -138,7 +158,7 @@ export const collectInfoForTaskDescription = function(allVizEls, allSymEls, bpmn
                 elDocumentation.action.parameter.documentId = el.attrs.formreference.value;
             } else if (el.attrs.taskAction.value == 'approval') {
                 elDocumentation.targetElement = el.attrs.approvalForElement.value;
-                elDocumentation.approvalActions = JSON.stringify(el.attrs.approvalActions.value);
+                elDocumentation.approvalActions = JSON.stringify(filterValue(el.attrs.approvalActions.value));
             } else if (el.attrs.taskAction.value == 'update') {
                 elDocumentation.targetElement = el.attrs.updateForElement.value;
             }

@@ -55,6 +55,10 @@ p {
     margin: 1px
 }
 
+.s-control .s-control-rich-text {
+    border: none;
+}
+
 .sym-form-submit .s-control-reset,
 .sym-form-submit .s-control-draft,
 .sym-form-submit .s-control-submit {
@@ -86,7 +90,7 @@ p {
     font-size: 11px;
 }
 
-.s-control:not(.s-control-label):not(.s-control-submit):not(.s-control-draft):not(.s-control-reset):not(.s-control-file-upload):not(.s-control-table):not(.s-control-panel) {
+.s-control:not(.s-control-approval-history):not(.s-control-label):not(.s-control-submit):not(.s-control-draft):not(.s-control-reset):not(.s-control-file-upload):not(.s-control-table):not(.s-control-panel) {
     /*width: 100% !important;*/
     padding: 0 5px !important;
     background: transparent;
@@ -140,4 +144,51 @@ input.s-control:not(.s-control-panel):not(.detail-view):hover {
     border-right: 0;
     background: #fff;
     text-align: left;
+}
+
+.handsontable .upload-file-wrapper-inTb {
+    display: flex;
+    height: 100%;
+}
+
+.handsontable .upload-file-wrapper-inTb .file-add {
+    width: 20px;
+}
+
+.handsontable .upload-file-wrapper-inTb .file-item {
+    position: relative;
+    margin-right: 8px;
+}
+
+.handsontable .upload-file-wrapper-inTb .file-item:hover .remove-file {
+    display: block;
+}
+
+.handsontable .upload-file-wrapper-inTb .file-item .remove-file {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    background: white;
+    height: 14px;
+    width: 14px;
+    font-size: 12px;
+    border-radius: 50%;
+    color: red;
+    display: none;
+    box-shadow: 0px 3px 1px -2px rgba(0, 0, 0, 0.2), 0px 2px 2px 0px rgba(0, 0, 0, 0.14), 0px 1px 5px 0px rgba(0, 0, 0, 0.12);
+}
+
+.wrap-s-control-table {
+    display: contents;
+}
+
+.s-control-approval-history {
+    padding: 0 !important;
+    width: 100% !important;
+    border: none !important;
+}
+
+.s-control-approval-history .approved-item {
+    height: 20px;
+    line-height: 20px;
 }

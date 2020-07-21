@@ -3,6 +3,15 @@ let dataSubmitStore = sDocument.state.submit
 import ClientSQLManager from "./clientSQLManager.js";
 import { formulasApi } from "./../../../api/Formulas";
 import Util from "./util";
+const BUILD_IN_FUNCTION = ['TODAY', 'BEGIN_WEEK', 'END_WEEK', 'BEGIN_MONTH', 'END_MONTH',
+    'BEGIN_YEAR', 'END_YEAR', 'TIMESTAMP', 'PARENT_WORKFLOW', 'CURRENT_WORKFLOW',
+    'CURRENT_USER_ID',
+    'CURRENT_USER',
+    'CURRENT_USER_FULLNAME',
+    'CURRENT_USER_EMAIL',
+    'CURRENT_USER_PHONE',
+    'CURRENT_USER_PHONE_NUMBER'
+]
 export default class Formulas {
     constructor(keyInstance, formulas, type) {
             /**
@@ -31,46 +40,133 @@ export default class Formulas {
          * @param {Object} dataInput 
          */
     async handleBeforeRunFormulas(dataInput, inject = "") {
-            let listSyql = this.getReferenceFormulas();
+        let script = this.formulas;
+        let listLocal = this.getLocalFormulas(script);
+        if (listLocal != null && listLocal.length > 0) {
+            for (let i = 0; i < listLocal.length; i++) {
+                let sql = listLocal[i].trim();
+                sql = sql.replace('local(', '');
+                sql = sql.substring(0, sql.length - 1);
+                if (Object.keys(dataInput).length == 0) {
+                    dataInput = false;
+                }
+                let formulas = this.replaceParamsToData(dataInput, sql);
+                let res = await this.runSQLLiteFormulas(formulas);
+                let strBeforeSql = this.checkBeforeReferenceFormulas(listLocal[i].trim(), script);
+                let reverse = this.reverseSqliteDataToFormulas(res[0], strBeforeSql.trim().toLowerCase());
+                script = script.replace(listLocal[i], reverse);
+            }
+        }
 
+        let listSyql = this.getReferenceFormulas(script);
 
-            let script = this.formulas;
-            if (listSyql != null && listSyql.length > 0) {
-                for (let i = 0; i < listSyql.length; i++) {
-                    let syql = listSyql[i].trim();
-                    syql = syql.replace('ref(', '');
-                    syql = syql.substring(0, syql.length - 1);
-                    if (Object.keys(dataInput).length == 0) {
-                        dataInput = false;
-                    }
-                    let res = await this.runSyql(syql, dataInput);
+        if (listSyql != null && listSyql.length > 0) {
+            for (let i = 0; i < listSyql.length; i++) {
+                let syql = listSyql[i].trim();
+                syql = syql.replace('ref(', '');
+                syql = syql.substring(0, syql.length - 1);
+                if (Object.keys(dataInput).length == 0) {
+                    dataInput = false;
+                }
+                let res = await this.runSyql(syql, dataInput);
 
-                    let beforeStr = this.checkBeforeReferenceFormulas(script, listSyql[i].trim());
-                    if (!beforeStr) {
-                        return { server: true, data: res.data };
+                let beforeStr = this.checkBeforeReferenceFormulas(script, listSyql[i].trim());
+                if (!beforeStr) {
+                    return { server: true, data: res.data };
+                } else {
+                    let reverseData = this.reverseDataToFormulas(res.data, beforeStr.trim().toLowerCase());
+                    script = script.replace(listSyql[i], reverseData);
+                }
+                if (i == listSyql.length - 1) {
+                    let formulas = this.replaceParamsToData(dataInput, script);
+                    return { server: false, data: this.runSQLLiteFormulas(formulas) };
+                }
+            }
+        } else {
+            let formulas = this.replaceParamsToData(dataInput, this.formulas);
+            return { server: false, data: this.runSQLLiteFormulas(formulas, false, inject) };
+        }
+
+    }
+    async runLocalFormulas(script, listLocal, dataInput) {
+        if (listLocal != null && listLocal.length > 0) {
+            for (let i = 0; i < listLocal.length; i++) {
+                let sql = listLocal[i].trim();
+                sql = sql.replace('local(', '');
+                sql = sql.substring(0, sql.length - 1);
+                if (Object.keys(dataInput).length == 0) {
+                    dataInput = false;
+                }
+                let formulas = this.replaceParamsToData(dataInput, sql);
+                let res = await this.runSQLLiteFormulas(formulas);
+                let strBeforeSql = this.checkBeforeReferenceFormulas(listLocal[i].trim(), script);
+                let reverse = this.reverseSqliteDataToFormulas(res[0], strBeforeSql.trim().toLowerCase());
+                script = script.replace(listLocal[i], reverse);
+            }
+            return script;
+        }
+    }
+    reverseSqliteDataToFormulas(data, beforeStr) {
+        if (data == undefined) {
+            return ""
+        }
+        let strReplace = "";
+        if (beforeStr == 'from' || beforeStr == 'union' || beforeStr == 'all' || beforeStr == 'join') {
+            if (data.columns.length > 0) {
+                let columns = {};
+                let columnsInsert = "";
+                let dataInsert = "";
+                for (let index = 0; index < data.columns.length; index++) {
+                    const element = data.columns[index];
+                    columnsInsert += element + ","
+                    columns[element] = "TEXT";
+                }
+                dataInsert = ""
+                for (let index = 0; index < data.values.length; index++) {
+                    const row = data.values[index];
+                    let dataRow = row.join();
+                    dataInsert += "('" + dataRow + "'),"
+                }
+                dataInsert = dataInsert.substring(0, dataInsert.length - 1);
+                columnsInsert = columnsInsert.substring(0, columnsInsert.length - 1);
+                let tableName = Util.generateString(10);
+                strReplace = tableName;
+                ClientSQLManager.createTable(this.keyInstance, Util.generateString(10), columns, "TEMPORARY", columnsInsert, dataInsert);
+                // ClientSQLManager.insertDataToTable(tableName,columnsInsert,dataInsert);
+
+            }
+        } else if (beforeStr === 'in') {
+            if (data.values.length > 0) {
+                strReplace = "(";
+                let curData = data.values.filter(data => {
+                    return data[0] !== "" && data[0] !== null
+                })
+                for (let i = 0; i < curData.length; i++) {
+                    let row = curData[i];
+                    if (i == curData.length - 1) {
+                        strReplace += "'" + row + "')";
                     } else {
-                        let reverseData = this.getReverseDataToFormulas(res.data, beforeStr);
-                        script = script.replace(listSyql[i], reverseData);
-                    }
-                    if (i == listSyql.length - 1) {
-                        let formulas = this.replaceParamsToData(dataInput, script);
-                        return { server: false, data: this.runSQLLiteFormulas(formulas) };
+                        strReplace += "'" + row + "',";
                     }
                 }
-            } else {
-                let formulas = this.replaceParamsToData(dataInput, this.formulas);
-                return { server: false, data: this.runSQLLiteFormulas(formulas, false, inject) };
             }
 
+        } else {
+            strReplace = data.values[0][0];
         }
-        /**
-         * Hàm thưc hiện thay thế lại giá trị ở cong thức reference 
-         * nếu trả về mảng 1 giá trị thì thay thế = giá trị đó
-         * nếu 1 mảng giá trị thì thay thế về dạng ( 1, 'abc', 2, 'aa')
-         * @param {Array} data 
-         * @param {String} refSyql 
-         */
-    getReverseDataToFormulas(data, beforeStr) {
+        return strReplace;
+    }
+
+
+
+    /**
+     * Hàm thưc hiện thay thế lại giá trị ở cong thức reference 
+     * nếu trả về mảng 1 giá trị thì thay thế = giá trị đó
+     * nếu 1 mảng giá trị thì thay thế về dạng ( 1, 'abc', 2, 'aa')
+     * @param {Array} data 
+     * @param {String} refSyql 
+     */
+    reverseDataToFormulas(data, beforeStr) {
             let strReplace = "";
             if (beforeStr == 'from' || beforeStr == 'union' || beforeStr == 'all' || beforeStr == 'join') {
                 if (data.length > 0) {
@@ -78,7 +174,9 @@ export default class Formulas {
                     for (let i in data[0]) {
                         columns[i] = "TEXT";
                     }
-                    ClientSQLManager.createTable(this.keyInstance, Util.generateString(10), columns, "TEMPORARY");
+                    let tableName = Util.generateString(10);
+                    strReplace = tableName;
+                    ClientSQLManager.createTable(this.keyInstance, tableName, columns, "TEMPORARY");
                 }
             } else if (beforeStr == 'in') {
                 strReplace = "(";
@@ -102,9 +200,10 @@ export default class Formulas {
          * else => value
          */
     checkBeforeReferenceFormulas(script, refScript) {
-            let s = script.replace("(", "\\(");
-            s = s.replace(")", "\\)");
+            let s = script.replace(/\(/g, "\\(");
+            s = s.replace(/\)/g, "\\)");
             let reg = new RegExp("([a-zA-Z_0-9]+)\\s+" + s, "gm")
+            let x1 = "([a-zA-Z_0-9]+)\\s+" + s;
             let textBefore = refScript.match(reg);
             if (textBefore != null && textBefore.length > 0) {
                 textBefore = textBefore[0].replace(script, "")
@@ -112,7 +211,6 @@ export default class Formulas {
             } else {
                 return false;
             }
-
         }
         /**
          * Hàm thay thế các giá trị input đầu vào trong công thức (thay thế vào chuỗi {controlName})
@@ -120,7 +218,7 @@ export default class Formulas {
          * @param {String} formulas 
          */
     replaceParamsToData(dataInput, formulas) {
-        let listControlInDoc = this.getDataSubmitInStore()
+        let listControlInDoc = this.getDataSubmitInStore();
         for (let controlName in dataInput) {
             let regex = new RegExp("{" + controlName + "}", "g");
             let value = dataInput[controlName];
@@ -130,34 +228,63 @@ export default class Formulas {
                     value = 0;
                 }
             }
-            formulas = formulas.replace(regex, value);
+            if (!BUILD_IN_FUNCTION.includes(controlName)) {
+                formulas = formulas.replace(regex, value);
+            }
         }
+        formulas = this.replaceWorkflowParams(formulas);
         return formulas;
     }
+
+    replaceWorkflowParams(formulas) {
+        let workflowVariable = dataSubmitStore.workflowVariable;
+        console.log('gád', workflowVariable);
+        for (let param in workflowVariable) {
+            let regex = new RegExp("{" + param + "}", "g");
+            let value = workflowVariable[param];
+            if (!BUILD_IN_FUNCTION.includes(param)) {
+                formulas = formulas.replace(regex, value);
+            }
+
+        }
+        console.log('gád', formulas);
+        return formulas;
+    }
+
     handleRunAutoCompleteFormulas(search, dataInput = false) {
-        let listSyql = this.getReferenceFormulas();
+        let listSyql = this.getReferenceFormulas(this.formulas);
         let fieldSelect = this.detectFieldSelect();
-        let where = " WHERE ";
+        let where = " WHERE (";
         for (let i = 0; i < fieldSelect.length; i++) {
             let element = fieldSelect[i];
             element = element.replace(/(?=as ).*/gi, '');
-
             if (i == fieldSelect.length - 1) {
-                where += element + " ILIKE '%" + search + "%'";
+                where += element + " ILIKE '%" + search + "%' )";
             } else {
                 where += element + " ILIKE '%" + search + "%' OR";
             }
         }
         if (listSyql != null && listSyql.length > 0) {
             let syql = listSyql[0].trim();
+            syql = this.replaceParamsToData(dataInput, syql);
             syql = syql.replace('ref(', '');
             syql = syql.substring(0, syql.length - 1);
-            let sql = syql + where + "LIMIT 20 OFFSET 0";
+            let sql = ""
+            if (/\$\$/.test(syql) == false) {
+                if (/\bWHERE|where\b/.test(syql)) {
+                    where += " AND "
+                    syql = syql.replace(/\bWHERE|where\b/, where);
+                    sql = syql + " LIMIT 20 OFFSET 0";
 
+                } else {
+                    sql = syql + where + "LIMIT 20 OFFSET 0";
+                }
+            } else {
+                sql = syql;
+            }
             return this.runSyql(sql);
         } else {
             let formulas = this.replaceParamsToData(dataInput, this.formulas);
-
             return this.runSQLLiteFormulas(formulas, true);
         }
     }
@@ -169,6 +296,23 @@ export default class Formulas {
         return control[0].trim();
     }
 
+    /**
+     * Hàm chỉ ra các table gây ảnh hưởng đến các công thức khi có lời gọi hàm local trong reference
+     */
+    detectTableRelateLocalFormulas() {
+            let listTable = []
+            let listLocal = this.getLocalFormulas(this.formulas);
+            if (listLocal != null && listLocal.length > 0) {
+                for (let i = 0; i < listLocal.length; i++) {
+                    let sql = listLocal[i];
+                    listTable = sql.match(/(?<=from)(.[a-zA-Z0-9_]*)/gm);
+                }
+            }
+            return listTable;
+        }
+        /**
+         * Hàm check các field của control select
+         */
     detectFieldSelect() {
             let listField = this.formulas.match(/(?<=select|SELECT ).*(?= from|FROM)/gi);
             let fields = [];
@@ -182,9 +326,17 @@ export default class Formulas {
         /**
          * Hàm tách các công thức reference (công thức chạy trên server)
          */
-    getReferenceFormulas() {
-        let listSyql = this.formulas.match(/ref\((?:[^)(]+|\((?:[^)(]+|\([^)(]*\))*\))*\)/gm);
+    getReferenceFormulas(syql) {
+        let listSyql = syql.match(/ref\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\([^)(]*\))*\))*\))*\))*\))*\))*\))*\))*\))*\)/gm);
         return listSyql;
+    }
+
+    /**
+     * Hàm tách các công thức local (công thức chạy owr client)
+     */
+    getLocalFormulas(syql) {
+        let listSqlite = syql.match(/local\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\([^)(]*\))*\))*\))*\))*\))*\))*\))*\))*\))*\)/gm);
+        return listSqlite;
     }
 
     runSyql(formulas, dataInput = false) {
@@ -192,6 +344,7 @@ export default class Formulas {
             if (dataInput != false) {
                 syql = this.replaceParamsToData(dataInput, formulas);
             }
+            syql = syql.replace(/\r?\n|\r/g, ' ');
 
             return formulasApi.execute({ formula: syql });
         }
@@ -235,12 +388,20 @@ export default class Formulas {
             }
             let names = allRelateName.reduce((obj, name) => {
                 let controlName = name.match(/\w+/g);
-                obj[controlName] = true;
+                if (!BUILD_IN_FUNCTION.includes(controlName[0]) && !this.detectWorkflowParams(controlName[0])) {
+                    obj[controlName] = true;
+                }
                 return obj;
             }, {});
             return names;
         }
         return {}
+    }
+    detectWorkflowParams(str) {
+        if (str.includes('workflow_')) {
+            return true;
+        }
+        return false;
     }
     getInputControl() {
             return this.inputControl;
@@ -265,31 +426,15 @@ export default class Formulas {
         this.formulas = formulas
     }
 
-
     /**
-     * hàm detect và xóa công thức ref
-     * Hàm sử dụng trong việc phát hiện các control trong table ảnh hưởng đến các control ngoài table
+     * Hàm phát hiện công thức của control trong table ảnh hưởng đến control nào khác trong table
+     * @param {*} mapControlEffected 
+     * @param {*} name 
+     * @param {*} script 
+     * @param {*} listInputInDocument 
      */
-    detectTableSQLLite(script, listTableName) {
-            let s = script.replace(/ref\((?:[^)(]+|\((?:[^)(]+|\([^)(]*\))*\))*\)/gm, "");
-            let wordArr = s.split(' ');
-            let listTableSource = [];
-            for (let i = 0; i < listTableName.length; i++) {
-                if (wordArr.indexOf(listTableName[i]) != -1) {
-                    listTableSource.push(listTableName[i]);
-                }
-            }
-            return (listTableSource.length > 0) ? listTableSource : false;
-        }
-        /**
-         * Hàm phát hiện công thức của control trong table ảnh hưởng đến control nào khác trong table
-         * @param {*} mapControlEffected 
-         * @param {*} name 
-         * @param {*} script 
-         * @param {*} listInputInDocument 
-         */
     detectControlInTable(mapControlEffected, name, script, listInputInDocument) {
-        let s = script.replace(/ref\((?:[^)(]+|\((?:[^)(]+|\([^)(]*\))*\))*\)/gm, "");
+        let s = script.replace(/ref\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\([^)(]*\))*\))*\))*\))*\))*\))*\))*\))*\))*\)/gm, "");
         s = s.replace(/{.}/gm, "");
         let listWord = s.match(/[A-Za-z0-9_]+/g);
         for (let controlName in listInputInDocument) {
@@ -304,6 +449,48 @@ export default class Formulas {
 
     }
 
+
+    // hàm wrap lại formulas của control inputfilter khi có search
+    wrapSyqlForSearchInputFilter(search) {
+            this.setFormulas(this.oldFormulas);
+            let refFormulas = this.getReferenceFormulas(this.formulas);
+            if (refFormulas.length > 0) {
+                let syql = refFormulas[0].trim();
+                syql = syql.replace('ref(', '');
+                syql = syql.substring(0, syql.length - 1);
+                let columns = this.getColumnsQuery(syql);
+                let where = 'WHERE ';
+                for (let index = 0; index < columns.length; index++) {
+                    const element = columns[index];
+                    if (index == columns.length - 1) {
+                        where += " CAST(" + element + " AS TEXT) LIKE '%" + search + "%'";
+                    } else {
+                        where += " CAST(" + element + " AS TEXT) LIKE '%" + search + "%' AND ";
+                    }
+                }
+                let aliasTable = "symper_" + Date.now();
+                let newSyql = "ref( SELECT * FROM (" + syql + ") " + aliasTable + " " + where + ")";
+                return newSyql;
+            }
+            return false;
+        }
+        // hàm lấy các column được query sau select và trước from
+    getColumnsQuery(syql) {
+        let columns = [];
+        let allColumns = syql.match(/(?<=select)(.*?)(?=from)/gm);
+        for (let index = 0; index < allColumns.length; index++) {
+            let element = allColumns[index];
+            element = element.trim();
+            element = element.split(',')
+            for (let i = 0; i < element.length; i++) {
+                let column = element[i];
+                column = column.replace(/(.*?)(?<=as)/g, "");
+                columns.push(column.trim())
+            }
+
+        }
+        return columns;
+    }
 
 
 }

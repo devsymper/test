@@ -35,8 +35,34 @@ const getControlInstanceFromStore = function(controlName) {
         return false
     }
 }
+const getControlTitleFromName = function(controlName) {
+    if (sDocument.state.submit.listInputInDocument.hasOwnProperty(controlName)) {
+        return sDocument.state.submit.listInputInDocument[controlName].title;
+    } else {
+        return false
+    }
+}
+const checkInTable = function(element) {
+    let table = element.closest('.s-control-table');
+    let tableId = '0'
+    if (table.length > 0) {
+        tableId = table.attr('id');
+    }
+    return tableId;
+}
+const getControlType = function(controlName) {
+    let control = getControlInstanceFromStore(controlName);
+    if (control != false) {
+        return control.type;
+    } else {
+        return false
+    }
+}
 export {
     // handlerRunOtherFormulasControl
     getControlInstanceFromStore,
-    checkDbOnly
+    checkDbOnly,
+    checkInTable,
+    getControlTitleFromName,
+    getControlType
 }

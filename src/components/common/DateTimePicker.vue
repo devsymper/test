@@ -57,8 +57,8 @@ export default {
     },
     beforeMount(){
         this.position = {
-                        top:0,
-                        left:'35px'
+                        top:'26px',
+                        left:'0px'
                     }
     },
   
@@ -71,9 +71,33 @@ export default {
             this.calPosition(e);
         },
         calPosition(e){
-            this.position = {'top':$(e.target).offset().top + 30 +'px','left':$(e.target).offset().left - $(e.target).width()/2+'px'};
+            this.calculatorPositionBox(e)
+            // this.position = {'top':$(e.target).offset().top + 30 +'px','left':$(e.target).offset().left - $(e.target).width()/2+'px'};
         },
        
+        calculatorPositionBox(e){
+            // nếu autocomplete từ cell của handsontable  
+            if($(e.target).closest('.handsontable').length > 0 ){
+                let autoEL = $(this.$el).detach();
+                $(e.target).closest('.wrap-table').append(autoEL);
+                let edtos = $(e.target).offset();
+                if(!$(e.target).is('.handsontableInput')){
+                    edtos = $(e.target).closest('td.htAutocomplete.current.highlight').offset();
+                }
+                if($(e.target).is('div.htAutocompleteArrow')){
+                    edtos = $(e.target).parent().offset();;
+                }
+                
+                let tbcos = $(e.target).closest('.wrap-table').find('[s-control-type="table"]').offset();
+                this.position = {'top':edtos.top - tbcos.top + $(e.target).height() +'px','left':edtos.left - tbcos.left+'px'};
+            }
+            //nêu là ngoài bảng
+            else{
+                let autoEL = $(this.$el).detach();
+                $(e.target).parent().append(autoEL);
+                this.positionBox = {'top':'26px','left':'0px'};
+            }
+        },
         applyDateTime(){
             let dateTime = this.date + " " + this.time;
             this.$emit('apply-datetime',dateTime)
@@ -108,6 +132,7 @@ export default {
     .card-datetime-picker{
         position: absolute;
         z-index: 9999;
+        max-width: unset !important;
     }
     .heading{
         padding: 6px 12px;

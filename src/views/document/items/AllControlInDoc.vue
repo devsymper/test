@@ -17,12 +17,14 @@
                         </v-tab>
                     </v-tabs>
                     <data-table 
-                    ref="table" 
-                    class="mt-2" 
-                    @on-cell-click="clickCellAgTable"
-                    @update-props="updatePropsControl"
-                    :allColumns="columns" 
-                    :rowData="dataTable"/>
+                        ref="table" 
+                        class="mt-2" 
+                        @on-cell-click="clickCellAgTable"
+                        @on-cell-change="updatePropsControl"
+                        :allColumns="columns" 
+                        :rowData="dataTable"
+                        :customComponents="customAgComponents"
+                        :cellRendererParams="cellRendererParams"/>
                 </v-card-text>
                 <v-divider></v-divider>
                 <v-card-actions>
@@ -65,6 +67,10 @@ import SymperDragPanel from "./../../../components/common/SymperDragPanel";
 import FormulaEditor from "./../../../components/common/FormulaEditor";
 import {getAllPropsControl,getIconFromType,getAllFormulasName} from "./../../../components/document/controlPropsFactory.js"
 import { util } from "./../../../plugins/util.js";
+
+import ImageRenderer from "@/components/common/agDataTable/ImageRenderer.vue";
+import CheckBoxRenderer from "@/components/common/agDataTable/CheckBoxRenderer.vue";
+
 export default {
     components:{
         'data-table' : AgDataTable,
@@ -90,6 +96,11 @@ export default {
     },
     data(){
         return{
+            customAgComponents: {
+                image : ImageRenderer,
+                checkBoxRenderer : CheckBoxRenderer
+            },
+            cellRendererParams: { innerRenderer:'image' },
             isShow:false,
             columns:[],
             largeFormulaEditor: {
@@ -131,16 +142,25 @@ export default {
             }
         },
         updatePropsControl(params){
-            let controlName = params.controlName;
-            let propName = params.propName;
-            let value = params.value;
+            let controlName = null;
+            let table = '';
+            let value = params.newValue;
+            if(params.colDef.field == 'name'){  // truowng hop thay doi ten control, cần gán lại tên control cũ để tìm trong store
+                table = (params.oldValue.length > 1) ? params.oldValue[0] : ''
+                value = (params.oldValue.length > 1) ? value[1] : value;
+            }
+            if(controlName == null){
+                controlName = params.node.key;
+            }
+
+            
             let controlId = this.mapNameToControlId[controlName];
             let tableId = 0;
-            if(params.tableName != undefined && params.tableName !=null && params.tableName != ""){
+            if(table != ""){
                 tableId = this.mapNameToControlId[params.tableName];
             }
             this.$store.commit(
-                "document/updateProp",{id:controlId,name:propName,value:value,tableId:tableId}
+                "document/updateProp",{id:controlId,name:params.colDef.field,value:value,tableId:tableId,type:"value"}
             );   
             
         },
@@ -158,7 +178,7 @@ export default {
                 for (let propType in props){
                     let value = props[propType].value;
                     if(props[propType].type == 'checkbox'){
-                        value = (value === 1) ? true : false;
+                        value = (value === true) ? true : false;
                     }
                     row[propType] = value
                     if(propType == 'name'){
@@ -189,7 +209,7 @@ export default {
                             for (let childPropType in childProps){
                                 let cValue = childProps[childPropType].value;
                                 if(childProps[childPropType].type == 'checkbox'){
-                                    cValue = (cValue === 1) ? true : false;
+                                    cValue = (cValue === true) ? true : false;
                                 }
                                 childRow[childPropType] = cValue
                                 if(childPropType == 'name'){
@@ -213,7 +233,7 @@ export default {
         
     },
     mounted(){
-        this.columns = this.allColumns[0].listFields
+        this.columns = this.allColumns[1].listFields
     }
 }
 </script>   

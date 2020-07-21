@@ -8,10 +8,12 @@
                 height="30"
                 class="search"
                 label="Tìm kiếm nhanh"
+                @keyup="handleKeyupSearch"
+                v-model="search"
                 hide-details
             ></v-text-field>
         </div>
-        <data-table ref="dataTable" :columns="columns" :data="data"></data-table>
+        <data-table ref="dataTable" :columns="columns" :data="data" class="hot-table" :style="{'max-height':tableMaxHeight+'px','overflow':'auto'}"></data-table>
         <v-btn @click="saveInputFilter" small right class="save-input-filter">Lưu</v-btn>
     </div>
 </template>
@@ -26,15 +28,21 @@ export default {
         keyInstance:{
             type:Number,
             default:0
+        },
+        tableMaxHeight:{
+            type: Number,
+            default: 450
         }
     },
     data(){
         return {
             columns:null,
             data:null,
-            search:null,
             colActive:null,
-            curControlId:null
+            curControlId:null,
+            formulas:null,
+            search:null,
+            controlName:null
         }
     },
     created(){
@@ -48,12 +56,13 @@ export default {
         setData(controlId,colActive,data){
             this.colActive = colActive;
             let dataTable = [];
+            this.columns = [];
             for (let index = 0; index < data.length; index++) {
                 let row = data[index];
                 if(index == 0){
                     for(let c in row){
                         let colName = str.nonAccentVietnamese(c);
-                        let item = {name:colName,title:c,type:'text'};
+                        let item = {name:colName,title:c,type:'text',readOnly:true};
                         this.columns.push(item)
                     }
                     this.columns.push({name:'active',title:'Chọn',type:'checkbox'})
@@ -83,6 +92,13 @@ export default {
             dataResult = dataResult.substring(0, dataResult.length - 1);
             this.$emit('save-input-filter',{controlId:this.curControlId,value:dataResult});
             
+        },
+        setFormulas(formulas,controlName){
+            this.formulas = formulas;
+            this.controlName = controlName;
+        },
+        handleKeyupSearch(data){
+            this.$evtBus.$emit('document-submit-search-in-filter-input',{controlName:this.controlName,search:this.search})
         }
     }
 }
@@ -94,6 +110,9 @@ export default {
         margin-top: 8px;
         padding-left: 8px !important;
     }
+    .search >>> input{
+        font-size: 13px;
+    }
     .search >>> .v-input__prepend-inner{
         margin-top: 3px !important;
     }
@@ -101,6 +120,7 @@ export default {
         font-size: 20px !important;
     }
     .search >>> .v-label{
+        font-size: 13px;
         top: 6px !important;
     }
     .search >>> fieldset{
@@ -110,5 +130,15 @@ export default {
         float: right;
         margin-right: 8px;
         margin-top: 6px;
+    }
+    .hot-table >>> .handsontable:first-child:not(.ht_master){
+        overflow-x: hidden !important;
+        overflow-y: auto !important;
+    }
+    .hot-table >>> .handsontable .ht_master thead{
+        visibility: visible !important;
+    }
+    .hot-table >>> .handsontable .ht_master .wtHolder{
+        overflow-y: hidden !important;
     }
 </style>

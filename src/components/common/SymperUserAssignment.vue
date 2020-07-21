@@ -43,7 +43,7 @@
 
 <script>
 import FormulaEditor from "./FormulaEditor";
-import { orgChartApi } from "./../../api/OrgChart.js";
+import { orgchartApi } from "./../../api/orgchart.js";
 import { util } from '../../plugins/util';
 
 export default {

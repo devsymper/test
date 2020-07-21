@@ -258,7 +258,7 @@ export default {
             savingConfigs: false, // có đang lưu cấu hình của showlist hay không
             // các cấu hình cho việc hiển thị và giá trị của panel cấu hình hiển thị của bảng
             tableDisplayConfig: {
-                show: true, // có hiển thị panel cấu hình ko
+                show: false, // có hiển thị panel cấu hình ko
                 width: 300, // Chiều rộng của panel cấu hình,
                 wrapTextMode: 0,
                 densityMode: 2,
@@ -350,7 +350,8 @@ export default {
         };
     },
     activated(){
-        this.$refs.dataTable.hotInstance.render();
+        // this.$refs.dataTable.hotInstance.render();
+        this.refreshList();
     },
     created() {
         let thisCpn = this;
@@ -834,7 +835,6 @@ export default {
                         }else{
                             data = data.data;
                         }
-                        
                         let total = data.total ? data.total : 0;
                         let pageSize = thisCpn.pageSize;
                         thisCpn.totalPage =
@@ -848,7 +848,7 @@ export default {
                         thisCpn.tableColumns = thisCpn.getTableColumns(
                             data.columns
                         );
-                        thisCpn.data = data.listObject;
+                        thisCpn.data = data.listObject ? data.listObject : [];
                         thisCpn.handleStopDragColumn();
                         thisCpn.$emit('data-get', data.listObject);
                     })

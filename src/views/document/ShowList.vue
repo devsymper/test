@@ -9,9 +9,7 @@
         :actionPanelWidth="actionPanelWidth"
         @after-open-add-panel="addDocument"
     >
-        <div slot="right-panel-content" class="h-100">
-           
-        </div>
+      
     </list-items>
 </template>
 <script>
@@ -32,9 +30,13 @@ export default {
             tableContextMenu:[
                 {name:"delete",text:'Xóa',
                     callback: (document, callback) => {
+                        let ids = document.reduce((arr,obj)=>{
+                            arr.push(obj.id);
+                            return arr;
+                        },[]);
                         let thisCpn = this;
                         documentApi
-                        .deleteDocument(document[0].name)
+                        .deleteDocument({ids:ids.join()})
                         .then(res => {
                             if (res.status == 200) {
                                 thisCpn.$snotify({
@@ -57,7 +59,7 @@ export default {
                     },
                 },
                 {
-                    name: "edit",
+                    name: "editdoc",
                     text: "Sửa",
                     callback: (document, callback) => {
                         this.$goToPage('/document/editor/'+document.id,document.title);
@@ -74,7 +76,7 @@ export default {
                     name: "listObject",
                     text: "Danh sách bản ghi",
                     callback: (document, callback) => {
-                        this.$goToPage('/document/'+document.name+'/objects',"Danh sách bản ghi");
+                        this.$goToPage('/documents/'+document.id+'/objects',"Danh sách bản ghi");
                     },
                 },
             ],

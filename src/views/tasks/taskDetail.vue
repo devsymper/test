@@ -191,10 +191,15 @@ export default {
         },
         taskBreadcrumb(){
             let bsr = this.breadcrumb.taskName;
+            let allDef = this.$store.state.process.allDefinitions;
             if(this.breadcrumb.definitionName){
                 bsr = `App name / ${this.breadcrumb.definitionName} / ${this.breadcrumb.instanceName} / ${bsr}`;
-            }else if(this.isInitInstance && !$.isEmptyObject(this.$store.state.process.allDefinitions)){
-                bsr = `${this.$store.state.process.allDefinitions[this.$route.params.id].name} / Start workflow`
+            }else if(this.isInitInstance && !$.isEmptyObject(allDef)){
+                if(allDef[this.$route.params.id]){
+                    bsr = `${allDef[this.$route.params.id].name} / Start workflow`;
+                }else{
+                    bsr = `... / Start workflow`;
+                }
             }
             return bsr;
         },
@@ -241,7 +246,13 @@ export default {
                     "assignee": "1",
                     // "formDefinitionId": "12345",
                     "outcome": value,
-                    // "variables": [],
+                    "variables": [
+                        {
+                            name: this.originData.taskDefinitionKey+'_outcome',
+                            type: 'string',
+                            value: value
+                        }
+                    ],
                     // "transientVariables": []
                 }
                 let res = await this.submitTask(taskData);
@@ -272,10 +283,11 @@ export default {
             if(this.isInitInstance){
                 this.$emit('task-submited', data);            
             }else{
-                let varsForBackend = await getVarsFromSubmitedDoc(data, this.taskInfo.taskDefinitionKey, this.taskInfo.action.parameter.documentId);
+                let elId = this.taskInfo.action.parameter.activityId;
+                let varsForBackend = await getVarsFromSubmitedDoc(data, elId, this.taskInfo.action.parameter.documentId);
                 let taskData = {
                     // action nhận 1 trong 4 giá trị: complete, claim, resolve, delegate
-                    "action": "complete",
+                    "action": "complete", 
                     "assignee": "1",
                     "outcome": 'submit',
                     "variables": varsForBackend.vars,

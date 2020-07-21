@@ -1,14 +1,26 @@
 import { getIconFromType } from './../../components/document/controlPropsFactory.js';
 import { defaultState } from "./defaultState";
+import { util } from "./../../plugins/util.js";
+
 import Vue from "vue";
+import { type } from 'jquery';
 
 const addControl = (state, params) => {
     let id = params.id
     let prop = params.props
-        // state.editor.allControl[id] = prop;
+    if (params.hasOwnProperty('from')) {
+        if (params.from == 'submit') {
+
+        } else {
+            setTreeListControlInDoc(state);
+        }
+    } else {
+        setTreeListControlInDoc(state);
+    }
     Vue.set(state.editor.allControl, id, prop);
-    setTreeListControlInDoc(state);
+
 };
+
 const addToListInputInDocument = (state, params) => {
     let name = params.name
     let control = params.control
@@ -21,6 +33,7 @@ const changeControlSubmitProps = (state, params) => {
     let key = params.key
     let value = params.value
         // state.editor.allControl[id] = prop;
+
     Vue.set(state.submit.listInputInDocument[name], key, value);
 };
 
@@ -54,14 +67,14 @@ function setTreeListControlInDoc(state) {
 
         ],
     }];
-    let allControl = state.editor.allControl;
+    let allControl = util.cloneDeep(state.editor.allControl);
     for (let controlId in allControl) {
         let control = allControl[controlId];
         let type = control.type;
         let props = control.properties;
         let name = "";
         let title = "";
-        if (type == 'submit' || type == 'draft') {
+        if (type == 'submit' || type == 'draft' || type == 'reset' || type == 'approvalHistory') {
             name = type
             title = type
         } else {
@@ -121,10 +134,17 @@ const addCurrentControl = (state, control) => {
     }
     // state.editor.currentSelectedControl['properties'] = groups
     Vue.set(state.editor.currentSelectedControl, 'properties', groups);
-    console.log(state.editor.currentSelectedControl);
+    console.log('currentSelectedControl', state.editor.currentSelectedControl);
 
 };
-// hàm xóa control đang chọn ra khỏi store
+const updateCurrentControlProps = (state, params) => {
+        let group = params.group;
+        let prop = params.prop;
+        let typeProp = params.typeProp;
+        let value = params.value;
+        Vue.set(state.editor.currentSelectedControl.properties[group][prop], typeProp, value);
+    }
+    // hàm xóa control đang chọn ra khỏi store
 const resetCurrentControl = (state, control) => {
 
     let currentSelectedControl = {
@@ -148,21 +168,20 @@ const updateProp = (state, params) => {
     let name = params.name
     let value = params.value
     let tableId = params.tableId
-    console.log(tableId);
-
+    let type = params.type;
     if (tableId != '0') {
         if (state.editor.allControl[tableId]['listFields'][id]['properties'][name]) {
-            state.editor.allControl[tableId]['listFields'][id]['properties'][name]['value'] = value
+            state.editor.allControl[tableId]['listFields'][id]['properties'][name][type] = value
 
         } else if (state.editor.allControl[tableId]['listFields'][id]['formulas'][name]) {
-            state.editor.allControl[tableId]['listFields'][id]['formulas'][name]['value'] = value
+            state.editor.allControl[tableId]['listFields'][id]['formulas'][name][type] = value
         }
 
     } else {
         if (state.editor.allControl[id]['properties'][name]) {
-            state.editor.allControl[id]['properties'][name]['value'] = value
+            state.editor.allControl[id]['properties'][name][type] = value
         } else if (state.editor.allControl[id]['formulas'][name]) {
-            state.editor.allControl[id]['formulas'][name]['value'] = value
+            state.editor.allControl[id]['formulas'][name][type] = value
         }
     }
     setTreeListControlInDoc(state);
@@ -172,9 +191,6 @@ const updateFormulasId = (state, params) => {
     let name = params.name
     let value = params.value
     let tableId = params.tableId
-    console.log(params);
-    console.log(state.editor.allControl);
-
     if (tableId != 0 && tableId != '0') {
         if (state.editor.allControl[tableId]['listFields'][id]['formulas'][name]) {
             state.editor.allControl[tableId]['listFields'][id]['formulas'][name]['formulasId'] = value
@@ -221,12 +237,16 @@ const addInstanceSubmitDB = (state, params) => {
  */
 
 const updateListInputInDocument = (state, params) => {
+    console.log('jhsd', util.cloneDeep(params));
+
     let key = params.key
     let controlName = params.controlName;
     let value = params.value
     if (state.submit.listInputInDocument.hasOwnProperty(controlName)) {
         Vue.set(state.submit.listInputInDocument[controlName], key, value);
     }
+    console.log('jhsd', state.submit.listInputInDocument[controlName]);
+
 }
 const addToRootControl = (state, params) => {
     let key = params.key
@@ -239,6 +259,7 @@ const addToImpactedFieldsList = (state, params) => {
 }
 
 const addToDocumentSubmitStore = (state, params) => {
+    console.log('jhsd', params);
     let key = params.key
     let value = params.value
     Vue.set(state.submit, key, value);
@@ -252,6 +273,26 @@ const addToDocumentStore = (state, params) => {
     let key = params.key
     let value = params.value
     Vue.set(state, key, value);
+}
+const addToDocumentEditorStore = (state, params) => {
+    let key = params.key
+    let value = params.value
+    Vue.set(state.editor, key, value);
+}
+const addToRelatedLocalFormulas = (state, params) => {
+    let curListRelate = state.submit.localRelated;
+    let key = params.key
+    let value = params.value
+    for (let index = 0; index < value.length; index++) {
+        let element = value[index];
+        element = element.trim();
+        if (!curListRelate.hasOwnProperty(element)) {
+            curListRelate[element] = [];
+        }
+        curListRelate[element].push(key);
+    }
+
+    Vue.set(state.submit, 'localRelated', curListRelate);
 }
 
 /**
@@ -285,8 +326,11 @@ export {
     addToDocumentSubmitStore,
     addToDocumentDetailStore,
     addToDocumentStore,
+    addToDocumentEditorStore,
     setAllDocuments,
-    resetCurrentControl
+    resetCurrentControl,
+    updateCurrentControlProps,
+    addToRelatedLocalFormulas
 
 
 };

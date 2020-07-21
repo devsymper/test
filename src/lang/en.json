@@ -61,7 +61,11 @@
         "sort": "Sort",
         "status": "Status",
         "done": "Done",
-        "notDone": "Not done"
+        "notDone": "Not done",
+        "code": "Code",
+        "apply": "Apply",
+        "manager": "Manager",
+        "userRoleSetting": "User role setting"
     },
     "validate": {
         "required": "Not be empty",
@@ -276,6 +280,9 @@
                 "save": "Save"
             }
         }
+    },
+    "documentObject": {
+        "title": "List Document Object"
     },
     "service": {
         "title": "List service",
@@ -499,5 +506,36 @@
         },
         "claim": "Claim",
         "created": "Task created"
+    },
+    "orgchart": {
+        "list": {
+            "title": "List orgchart"
+        },
+        "create": {
+            "title": " Create orgchart"
+        },
+        "editor": {
+            "main": "Main",
+            "customAttributes": "Dynamic fields",
+            "nodeName": "Node name",
+            "department": "Department",
+            "listDynamicAttributes": "Dynamic attributes",
+            "generalAttributes": "General attributes",
+            "position": "Position",
+            "style": "Style",
+            "styleConfig": "Style configuration",
+            "applyForChild": "Apply for childs",
+            "singleApply": "Apply for this node",
+            "saveNodeConfigTitle": "Save node style config template"
+        }
+    },
+    "systemRole": {
+        "name": "System roles",
+        "list": {
+            "title": "List system user roles"
+        }
+    },
+    "userRole": {
+        "userHasNoRole": "You have no role to select"
     }
 }

@@ -50,19 +50,46 @@ Vue.prototype.$evtBus.$on('symper-app-call-action-handeler', (action, context, e
 /**
  * Di chuyển đến một trang và tạo ra tab tương ứng
  */
-Vue.prototype.$goToPage = function(url, title) {
+Vue.prototype.$goToPage = function(url, title, pageInstanceKey = false) {
     let activeTabIndex = 0;
-    let urlMap = this.$store.state.app.urlToTabTitleMap;
-    if (urlMap.hasOwnProperty(url)) {
-        activeTabIndex = Object.keys(urlMap).indexOf(url);
-    } else {
-        this.$store.commit('app/changeUrlsToTabs', { url: url, title: title });
-        activeTabIndex = Object.keys(urlMap).length - 1;
+    if (!pageInstanceKey) {
+        pageInstanceKey = Date.now();
     }
-    this.$store.commit('app/updateCurrentTabIndex', activeTabIndex);
-    this.$router.push({
-        path: url
+    let routeObj = this.$router.match(url);
+    let params = Object.assign(routeObj.params, {
+        pageInstanceKey: pageInstanceKey
     });
+
+    let urlMap = this.$store.state.app.urlToTabTitleMap;
+    let urlInfo = {
+        url: url,
+        routeName: routeObj.name,
+        title: title,
+        pageInstanceKey: pageInstanceKey,
+        routeParams: util.cloneDeep(params)
+    };
+    this.$store.commit('app/changeUrlsToTabs', urlInfo);
+    activeTabIndex = Object.keys(urlMap).length - 1;
+
+    this.$store.commit('app/updateCurrentTabIndex', activeTabIndex);
+    if (routeObj.name) {
+        if (routeObj.name == this.$route.name) {
+            this.$router.push({
+                name: 'symperHiddenRedirectComponent',
+                params: {
+                    urlInfo: urlInfo,
+                    pageInstanceKey: Date.now()
+                }
+            });
+        } else {
+            this.$router.push({
+                name: routeObj.name,
+                params: util.cloneDeep(params)
+            });
+        }
+    } else {
+        this.$snotifyError('Url not found');
+    }
 };
 
 /**
@@ -70,6 +97,7 @@ Vue.prototype.$goToPage = function(url, title) {
  */
 Vue.prototype.$snotify = function(option, group = false) {
     group = group ? group : 'symper-general-notification';
+    let position = option.position ? option.position : 'top right';
     let defaultOptions = {
         group: group,
         width: 400,
@@ -84,19 +112,25 @@ Vue.prototype.$snotify = function(option, group = false) {
         }
     };
     option = Object.assign(defaultOptions, option);
+    this.$store.state.app.generalNotificationPosition = position;
     this.$notify(option);
 }
 
-Vue.prototype.$snotifyError = function(err = {}, title = 'ERROR', detail = '') {
+Vue.prototype.$snotifyError = function(err = {}, title = 'ERROR', detail = '', duration = false) {
     console.warn(err);
     if (!detail && err.responseJSON && err.responseJSON.message) {
         detail = err.responseJSON.message;
     }
-    this.$snotify({
+    let setting = {
         type: 'error',
         title: title,
         text: detail
-    });
+    }
+
+    if (duration) {
+        setting.duration = duration;
+    }
+    this.$snotify(setting);
 }
 Vue.prototype.$snotifyInfo = function(title = 'INFORMATION', detail = '') {
     this.$snotify({
@@ -113,12 +147,17 @@ Vue.prototype.$snotifyWarning = function(err, title = 'WARNING', detail = '') {
         text: detail
     });
 }
-Vue.prototype.$snotifySuccess = function(title = 'SUCCESS', detail = '') {
-    this.$snotify({
+Vue.prototype.$snotifySuccess = function(title = 'SUCCESS', detail = '', duration = false) {
+    let setting = {
         type: 'success',
         title: title,
         text: detail
-    });
+    };
+
+    if (duration) {
+        setting.duration = duration;
+    }
+    this.$snotify(setting);
 }
 
 

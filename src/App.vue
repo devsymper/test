@@ -2,9 +2,9 @@
     <div id="symper-app" @click="handleClickApp">
         <component :is="layout">
             <keep-alive>
-                <router-view :key="$route.path" />
+                <router-view :key="$route.params.pageInstanceKey" />
             </keep-alive>
-            <notifications group="symper-general-notification">
+            <notifications group="symper-general-notification" :position="sapp.generalNotificationPosition">
                 <template slot="body" slot-scope="props">
                     <general-notification
                         :props="props"
@@ -218,6 +218,9 @@ export default {
                 // return isBA ? "ba-view" : "end-user-view";
                 return "end-user-view";
             }
+        },
+        sapp(){
+            return this.$store.state.app;
         }
     }
 };

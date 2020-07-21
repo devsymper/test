@@ -128,13 +128,16 @@ export default {
         this.selfShowPanel = false;
     },
     mounted(){
-        setTimeout(() => {
+        setTimeout((self) => {
             dragElement(self.$refs.symperDragPanel);
-        }, 200);
+        }, 200, this);
+        this.$refs.resizer.addEventListener('mousedown', this.initResize, false);
+
     },
     methods: {
         show(){
             this.selfShowPanel = true;
+            $('.v-application:first-child').append(this.$el);
         },
         hide() {
             this.$emit('before-close',{});
@@ -154,9 +157,6 @@ export default {
             window.removeEventListener('mouseup', this.stopResize, false);
         }
     },
-    mounted(){
-        this.$refs.resizer.addEventListener('mousedown', this.initResize, false);
-    }
 };
 </script>
 

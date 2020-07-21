@@ -28,6 +28,7 @@ import MultiGuard from 'vue-router-multiguard';
 // import TrackingProcessInstance from "../views/process/TrackingProcessInstance.vue";
 // import WorkList from "../views/works/WorkList.vue";
 // import DoTask from "../views/tasks/DoTask.vue";
+import SymperHiddenRedirectComponent from "../views/SymperHiddenRedirectComponent.vue";
 
 Vue.use(VueRouter);
 /**
@@ -175,7 +176,7 @@ const routes = [{
 
     },
     {
-        path: "/document/objects/:id?",
+        path: "/documents/objects/:id?",
         name: "detailDocument",
         // component: DetailDocument,
         component: () =>
@@ -189,7 +190,7 @@ const routes = [{
             import ('../views/document/submit/Submit.vue'),
     },
     {
-        path: "/document/:name?/objects",
+        path: "/documents/:id?/objects",
         name: "listDocumentObject",
         // component: ListObject,
         component: () =>
@@ -258,14 +259,14 @@ const routes = [{
     },
     {
         path: "/tasks",
-        name: "tasks",
+        name: "tasksList",
         // component: tasks,
         component: () =>
             import ('../views/tasks/index.vue'),
     },
     {
         path: "/tasks/:id",
-        name: "tasks",
+        name: "doTask",
         // component: DoTask
         component: () =>
             import ('../views/tasks/DoTask.vue')
@@ -276,6 +277,50 @@ const routes = [{
         // component: WorkList,
         component: () =>
             import ('../views/works/WorkList.vue'),
+    },
+
+    // Orgchart
+    {
+        path: "/orgchart",
+        name: "listOrgchart",
+        component: () =>
+            import ('../views/orgchart/OrgchartList.vue'),
+    },
+    {
+        path: "/orgchart/create",
+        name: "createOrgchart",
+        component: () =>
+            import ('../views/orgchart/CreateOrgchart.vue'),
+    },
+    {
+        path: "/orgchart/:id/edit",
+        name: "editOrgchart",
+        component: () =>
+            import ('../views/orgchart/EditOrgchart.vue'),
+    },
+
+    {
+        path: "/orgchart/:id/view",
+        name: "viewOrgchart",
+        component: () =>
+            import ('../views/orgchart/ViewOrgchart.vue'),
+    },
+
+
+    // user role setting
+    {
+        path: "/user-role-settings",
+        name: "ListUserRole",
+        component: () =>
+            import ('../views/userRole/ListSystemRole.vue'),
+    },
+
+
+    // một link để redirect khi chọn một tab mà trùng name với tab hiện tại
+    {
+        path: "/symper-hidden-redirect-component",
+        name: "symperHiddenRedirectComponent",
+        component: SymperHiddenRedirectComponent
     },
 ];
 

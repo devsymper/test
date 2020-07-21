@@ -25,7 +25,7 @@ export default {
      * Lấy danh sách các process đã được tạo ra
      */
     getListModels(filter = {}) {
-        return bpmneApi.get("models", filter, testHeader);
+        return bpmneApi.get("", filter);
     },
     deleteModels(ids) {
         return bpmneApi.delete(ids.join(','));
@@ -144,4 +144,12 @@ export default {
         data = JSON.stringify(data);
         return bpmneApi.post(appConfigs.apiDomain.bpmne.tasks + '/' + id, data, testHeader, { dataType: 'text' });
     },
+
+    saveDeployHistory(data) {
+        return bpmneApi.post('/deploy-history', data);
+    },
+
+    getLastestByModel() {
+        return bpmneApi.get('/deploy-history/lastest-by-model');
+    }
 };

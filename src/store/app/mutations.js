@@ -22,7 +22,12 @@ const changeCurrentUserInfo = (state, data) => {
 
 const changeUrlsToTabs = (state, data) => {
     console.log(Vue, state, data);
-    Vue.set(state.urlToTabTitleMap, data.url, data.title);
+
+    let urlKey = data.url + data.pageInstanceKey;
+    if (data.url[data.url.length - 1] != '/') {
+        urlKey = data.url + '/' + data.pageInstanceKey;
+    }
+    Vue.set(state.urlToTabTitleMap, urlKey, data);
 }
 
 const updateCurrentTabIndex = (state, data) => {
@@ -58,6 +63,11 @@ const setAllUsers = (state, allUsers) => {
     Vue.set(state, 'allUsers', allUsers);
 }
 
+const setUserRoleByType = (state, param) => {
+    let type = param.type;
+    Vue.set(state.endUserInfo.roles, type, param.data);
+}
+
 export {
     changeCollapseSidebar,
     increaseUnreadNotification,
@@ -68,5 +78,6 @@ export {
     updateCurrentTabIndex,
     removeTab,
     setOrgchartNodes,
-    setAllUsers
+    setAllUsers,
+    setUserRoleByType
 };

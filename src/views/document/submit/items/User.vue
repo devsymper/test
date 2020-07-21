@@ -9,11 +9,12 @@
         :style="{'background':(indexActive == index) ? '#f0f0f0' : ''}"
         v-on:click="selectItem(user)" >
             <img :src="user.avatar">
-            <p>{{user.name}}</p>
+            <p>{{user.displayName}}</p>
         </div>
     </v-card>
 </template>
 <script>
+import { userApi } from "./../../../../api/user";
 export default {
     props:{
         keyInstance:{
@@ -26,71 +27,121 @@ export default {
             isShow:null,
             positionBox:null,
             listUser:null,
+            listAllUser:null,
             element:null,
-            indexActive:null
+            indexActive:-1
         }
     },
     created(){
         
         let thisCpn = this;
-        this.$evtBus.$on('document-submit-user-select-input',e=>{
-            if($(e.target).attr('key-instance') == thisCpn.keyInstance){
+        this.$evtBus.$on('document-submit-user-input-change',e=>{
+            if( thisCpn.isShow == false){
                 thisCpn.show();
-                thisCpn.calPosition(e);
+                thisCpn.calculatorPositionBox(e);
                 thisCpn.element = $(e.target)
             }
-        })
-        this.$evtBus.$on('document-submit-user-input-change',e=>{
-            if($(e.target).attr('key-instance') == thisCpn.keyInstance){
-                if(e.keyCode == 38){    //len
+            if(e.keyCode == 38){    //len
+                if(thisCpn.indexActive <= 0){
+                    return false;
+                }
+                Vue.set(thisCpn.listUser[thisCpn.indexActive], 'active', false);
+                thisCpn.indexActive--;
+                Vue.set(thisCpn.listUser[thisCpn.indexActive], 'active', true);
                 
-                    if(thisCpn.indexActive == 0){
-                        return false;
-                    }
-                    Vue.set(thisCpn.listUser[thisCpn.indexActive], 'active', false);
-                    thisCpn.indexActive--;
-                    Vue.set(thisCpn.listUser[thisCpn.indexActive], 'active', true);
-                    
-                }   
-                else if(e.keyCode == 40){
-                    if(thisCpn.indexActive == thisCpn.listUser.length - 1){
-                        return false;
-                    }
-                    Vue.set(thisCpn.listUser[thisCpn.indexActive], 'active', false);
-                    thisCpn.indexActive++;
-                    Vue.set(thisCpn.listUser[thisCpn.indexActive], 'active', true);
+            }   
+            else if(e.keyCode == 40){
+                if(thisCpn.indexActive >= thisCpn.listUser.length - 1){
+                    return false;
                 }
-                else if(e.keyCode == 13){
-                    let user = thisCpn.listUser[thisCpn.indexActive];
-                    thisCpn.selectItem(user)
-                }
+                if(thisCpn.indexActive != -1)
+                Vue.set(thisCpn.listUser[thisCpn.indexActive], 'active', false);
+                thisCpn.indexActive++;
+                Vue.set(thisCpn.listUser[thisCpn.indexActive], 'active', true);
             }
+            else if(e.keyCode == 13 && thisCpn.indexActive != -1){
+                let user = thisCpn.listUser[thisCpn.indexActive];
+                thisCpn.selectItem(user);
+                thisCpn.indexActive = -1
+            }
+            thisCpn.filterUser($(e.target).val())
         })
+
+        userApi.getListUser(1,100000).then(res => {
+            if (res.status == 200) {
+                thisCpn.listAllUser = res.data.listObject;
+                thisCpn.$store.commit("document/addToDocumentSubmitStore", {
+                    key: 'listUser',
+                    value: thisCpn.listAllUser
+                });
+            }
+            
+        })
+        .catch(err => {
+            
+        })
+        .always(() => {
+        });
+        
     },
     beforeMount(){
         this.isShow = false;
         this.positionBox = {'top':0,'left':0};
         this.indexActive = 0;
-        this.listUser = [
-            {id:1,avatar:'https://hoangnd.dev.symper.vn/icon/ic_image.png',name:'Nguyễn Đình Hoàng'},
-            {id:2,avatar:'https://hoangnd.dev.symper.vn/icon/ic_image.png',name:'Nguyễn Đình Hải'},
-            {id:3,avatar:'https://hoangnd.dev.symper.vn/icon/ic_image.png',name:'Nguyễn Đình Hoàn'},
-            {id:4,avatar:'https://hoangnd.dev.symper.vn/icon/ic_image.png',name:'Nguyễn Đình Hoàn'},
-            {id:5,avatar:'https://hoangnd.dev.symper.vn/icon/ic_image.png',name:'Nguyễn Đình Hoàn'},
-            ]
+        this.listUser = []
     },
     methods:{
+        filterUser(val){
+            let list = this.listAllUser.filter(user=>{
+                return user.displayName.toLowerCase().includes(val) || user.id == val
+            })
+            this.listUser = list;
+            
+        },
         show(){
             this.isShow = true;
         },
         hide(){
             this.isShow = false;
         },
-        calPosition(e){
-            this.positionBox = {'top':$(e.target).offset().top + 25 +'px','left':$(e.target).offset().left - $(e.target).width()/2+'px'};
+
+        // calPosition(e){
+        //     this.positionBox = {'top':$(e.target).offset().top + 25 +'px','left':$(e.target).offset().left - $(e.target).width()/2+'px'};
+        // },
+        calculatorPositionBox(e){
+            // nếu autocomplete từ cell của handsontable  
+            if($(e.target).closest('.handsontable').length > 0 ){
+                let autoEL = $(this.$el).detach();
+                $(e.target).closest('.wrap-table').append(autoEL);
+                let edtos = $(e.target).offset();
+                if(!$(e.target).is('.handsontableInput')){
+                    edtos = $(e.target).closest('td.htAutocomplete.current.highlight').offset();
+                }
+                if($(e.target).is('div.htAutocompleteArrow')){
+                    edtos = $(e.target).parent().offset();;
+                }
+                
+                let tbcos = $(e.target).closest('.wrap-table').find('[s-control-type="table"]').offset();
+                this.positionBox = {'top':edtos.top - tbcos.top + $(e.target).height() +'px','left':edtos.left - tbcos.left+'px'};
+            }
+            //nêu là ngoài bảng
+            else{
+                let autoEL = $(this.$el).detach();
+                $(e.target).parent().append(autoEL);
+                this.positionBox = {'top':'28px','left':'0px'};
+            }
         },
         selectItem(user){
-            this.element.val(user.id);
+            
+            if(this.element.is('.s-control')){
+                this.element.attr('user-id',user.id);
+                this.element.val(user.displayName);
+                this.element.trigger('change');
+            }
+            else{
+                this.element.val(user.id);
+            }
+            
             this.hide();
         }
     }
@@ -101,6 +152,7 @@ export default {
     .card-list-user{
         position: absolute;
         z-index: 99999;
+        max-width: unset !important;
     }
     .user-item{
         padding: 4px 8px;

@@ -93,6 +93,7 @@ export default {
     methods:{
         setListRow(listRows){
             this.listRows = listRows;
+            this.setOnDrag();
         },
         showDialog(){
             this.isShowTableSetting = true
@@ -102,7 +103,7 @@ export default {
         },
         addNewRow(){
             this.listRows.push({columnName :'', name:'',type:'',title:'',key:'s-control-id'+Date.now()})
-            this.setOnDrag()
+            this.setOnDrag();
         },
         removeRow(row){
             this.listRows.splice(this.listRows.findIndex(v => v.key === row.key), 1);

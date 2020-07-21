@@ -3,6 +3,7 @@
     <v-dialog
         v-model="isShowModelSaveDoc"
         width="800"
+        content-class="s-dialog"
         >
         <v-card
         height="575"
@@ -12,7 +13,10 @@
             <v-card-text style="height: calc(100% - 84px);    overflow: auto;">
                 <div id="setting-control-table" class="setting-control-table">
                     <div class="content-setting-control-table">
-                        <form-save-doc :allInputs="documentProps"/>
+                        <form-save-doc 
+                        @input-value-keyup="checkValidateNameDocument"
+                        @input-value-changed="handleChangeInput" 
+                         :allInputs="documentProps"/>
                     </div>
                 </div>
             </v-card-text>
@@ -45,6 +49,9 @@
 </template>
 <script>
 import FormTpl from "./../../../components/common/FormTpl.vue"
+import { util } from "./../../../plugins/util.js";
+import { documentApi } from "./../../../api/Document.js";
+
 export default {
     
     components:{
@@ -62,25 +69,90 @@ export default {
         return {
             listRows:[],
             isShowModelSaveDoc:false,
+            isValid :false
         }
     },
     created(){
         this.setPropsOfDoc({});
     },
     methods:{
+        //Hàm kiểm tra tên document đã tồn tai hay chưa
+        handleChangeInput(name, input, data){
+            let thisCpn = this;
+            if(this.isValid)
+            documentApi
+                    .checkExistDocument(input.value)
+                    .then(res => {
+                        if (res.status == 200) {
+                            let message = ""
+                            if(res.data === true){
+                                message = "Tên document đã tồn tại"
+                                thisCpn.isValid = false;
+                            }
+                            else{
+                                thisCpn.isValid = true;
+                            }
+                            let docProps = util.cloneDeep(thisCpn.documentProps);
+                                docProps.name.errorMessage = message;
+                                thisCpn.$store.commit('document/addToDocumentStore',{key: 'documentProps',value :docProps})
+                        }
+                       
+                    })
+                    .catch(err => {
+                        thisCpn.$snotify({
+                            type: "error",
+                            title: "error from check exist document api!!!"
+                        }); 
+                    })
+                    .always(() => {});
+        },
         showDialog(){
             this.isShowModelSaveDoc = true
         },
         hideDialog(){
             this.isShowModelSaveDoc = false
         },
-        
+        // Hàm kiểm tra tên document
+        checkValidateNameDocument(name, input, data){
+            console.log(input);
+            
+            if(name == 'name'){
+                let docProps = util.cloneDeep(this.documentProps);
+                let message = "";
+                if(input.value.length == 0){
+                    message = "Không được bỏ trống";
+                    this.isValid = false;
+                }
+                else{
+                    if(/^[a-zA-Z_$][a-zA-Z_$0-9]*$/.test(input.value) == false){
+                        message = "Tên không hợp lệ";
+                        this.isValid = false;
+                    }
+                    else{
+                        this.isValid = true
+                    }
+                }
+                docProps.name.errorMessage = message;
+                this.$store.commit('document/addToDocumentStore',{key: 'documentProps',value :docProps})
+            }
+            
+        },
         saveDocument(){
-            let documentProperties = JSON.stringify(this.documentProps);
-            this.$emit("save-doc-action",documentProperties);
-            this.hideDialog();
+            if(this.isValid){
+                this.$emit("save-doc-action");
+                this.hideDialog();
+            }
+            else{
+                this.$snotify({
+                                type: "error",
+                                title: "Vui lòng nhập lại tên document"
+                            });  
+            }
         },
         setPropsOfDoc(props){
+            if(props.name != undefined){
+                this.isValid = true
+            }
             let docProps = {
                 name : { 
                     title: "Tên document",
@@ -142,5 +214,11 @@ export default {
     }
     .action{
         height: 41px;
+    }
+   
+</style>
+<style>
+    .s-dialog{
+        overflow: hidden;
     }
 </style>

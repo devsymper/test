@@ -4,16 +4,15 @@
         :items="allUser"
         filled
         dense
+        :disabled="disabled"
         solo
         flat
         chips
         item-text="displayName"
         item-value="id"
-        background-color="grey lighten-3"
-        :height="30"
+        background-color="#fbfbfb"
         :placeholder="$t('common.search')"
-        class="sym-small-size sym-pad-0 "
-        :class="{'bg-grey': true}"
+        class="sym-small-size sym-pad-0 sym-style-input"
         :multiple="isMulti"
     >
         <template v-slot:selection="data">
@@ -23,19 +22,19 @@
                 :input-value="data.selected"
                 :close="!compactChip"
                 small
-                :class="textColor"
+                :class="textColor+ ' mt-1'"
                 @click:close="remove(data.item)"
             > 
-                <v-avatar left v-if="compactChip">
-                    <v-img :src="data.item.avatar ? data.item.avatar : 'https://cdn.vuetifyjs.com/images/lists/4.jpg'"></v-img>
+                <v-avatar sizes="23" left v-if="compactChip">
+                    <v-img  sizes="23" :src="data.item.avatar ? data.item.avatar : avatarDefault"></v-img>
                 </v-avatar>
-                {{ data.item.displayName }}
+                <span class="fs-11">{{ data.item.displayName }}</span>
             </v-chip>
         </template>
         <template v-slot:item="data">
             <template>
-                <v-list-item-avatar size="30" class="mt-1 mb-1">
-                    <v-img :src="data.item.avatar ? data.item.avatar : 'https://cdn.vuetifyjs.com/images/lists/4.jpg'"></v-img>
+                <v-list-item-avatar height="20" width="20" size="20" class="mt-1 mb-1">
+                    <v-img sizes="20" height="20" width="20" :src="data.item.avatar ? data.item.avatar : avatarDefault"></v-img>
                 </v-list-item-avatar>
                 <v-list-item-content class="pt-0 pb-0">
                     <v-list-item-title v-html="data.item.displayName"></v-list-item-title>
@@ -50,6 +49,8 @@
 </template>
 
 <script>
+import avatarDefault from "@/assets/image/avatar_default.jpg";
+
 export default {
     name: "userSelector",
     props: {
@@ -76,6 +77,10 @@ export default {
         flat: {
             type: Boolean,
             default: false,
+        },
+        disabled: {
+            type: Boolean,
+            default: false,
         }
     },
     watch: {
@@ -86,6 +91,13 @@ export default {
             }
             this.$emit("change", userToInput);
             this.$emit("input", userToInput);
+        },
+        value: {
+            deep: true,
+            immediate: true,
+            handler(after){
+                this.selected = after;
+            }
         }
     },
     mounted() {
@@ -100,6 +112,7 @@ export default {
             5: 'https://cdn.vuetifyjs.com/images/lists/5.jpg',
         }
         return {
+            avatarDefault: avatarDefault,
             autoUpdate: true,
             isUpdating: false,
             selected: [],

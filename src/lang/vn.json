@@ -60,7 +60,11 @@
         "sort": "Sắp xếp",
         "status": "Trạng thái",
         "done": "Hoàn thành",
-        "notDone": "Chưa hoàn thành"
+        "notDone": "Chưa hoàn thành",
+        "code": "Mã",
+        "apply": "Áp dụng",
+        "manager": "Quản lý",
+        "userRoleSetting": "Vai trò người dùng"
     },
     "login": {
         "title": "Đăng nhập hệ thống",
@@ -275,6 +279,9 @@
                 "save": "Lưu"
             }
         }
+    },
+    "documentObject": {
+        "title": "Danh sách bản ghi"
     },
     "service": {
         "title": "Danh sách dịch vụ hệ thống",
@@ -513,5 +520,36 @@
         },
         "claim": "Claim",
         "created": "Đã tạo mới task"
+    },
+    "orgchart": {
+        "list": {
+            "title": "Danh sách sơ đồ tổ chức"
+        },
+        "create": {
+            "title": " Tạo sơ đồ tổ chức"
+        },
+        "editor": {
+            "main": "Chung",
+            "customAttributes": "Thuộc tính động",
+            "nodeName": "Tên node",
+            "department": "Phòng ban",
+            "listDynamicAttributes": "Thuộc tính động",
+            "generalAttributes": "Thuộc tính chung",
+            "position": "Vị trí",
+            "style": "Hiển thị",
+            "styleConfig": "Cấu hình hiển thị",
+            "applyForChild": "Áp dụng cho các node con",
+            "singleApply": "Áp dụng cho node hiện tại",
+            "saveNodeConfigTitle": "Lưu cấu hình hiển thị cho node"
+        }
+    },
+    "systemRole": {
+        "name": "Hệ thống",
+        "list": {
+            "title": "Danh sách vai trò người dùng hệ thống"
+        }
+    },
+    "userRole": {
+        "userHasNoRole": "Bạn chưa được phân vai trò trong hệ thống"
     }
 }

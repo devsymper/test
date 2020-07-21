@@ -10,8 +10,8 @@
                             v-model="currentTabIndex"
                             class="sym-small-size "
                             color="orange accent-4">
-                            <v-tab class="symper-app-tab" v-for="(title, idx) in tabTitles" :key="idx">
-                                {{ title }} 
+                            <v-tab class="symper-app-tab" v-for="(item, idx) in tabUrlItems" :key="idx">
+                                {{ item.title }} 
                                 <i class="mdi mdi-close float-right close-tab-btn" @click.stop="closeTab(idx)"></i>
                             </v-tab>
                         </v-tabs>
@@ -100,16 +100,33 @@ export default {
          */
         handleChangeTab(index) {
             if(index !== undefined){
-                let url = Object.keys(this.$store.state.app.urlToTabTitleMap)[index];
-                if(url != this.$route.fullPath){
-                    this.$router.push(url);
+                let urlKey = Object.keys(this.tabUrlItems)[index];
+                let urlInfo = this.tabUrlItems[urlKey];
+
+                if(urlInfo.routeName == this.$route.name){
+                    this.$router.push({
+                        name: 'symperHiddenRedirectComponent',
+                        params: {
+                            urlInfo: urlInfo,
+                            pageInstanceKey: Date.now()
+                        }
+                    });
+                }else{
+                    this.$router.push({
+                        name: urlInfo.routeName,
+                        params: urlInfo.routeParams
+                    });
                 }
             }
         },
-        closeTab(idx){
-            let urlMap = this.$store.state.app.urlToTabTitleMap;
-            let url = Object.keys(urlMap)[idx];
-            this.$store.commit("app/removeTab", url);
+        closeTab(idx){            
+            let urlKey = Object.keys(this.$store.state.app.urlToTabTitleMap)[idx];
+            let urlInfo = this.tabUrlItems[urlKey];
+
+            this.$store.commit("app/removeTab", urlKey);
+            this.$evtBus.$emit('symper-close-app-tab', {
+                pageInstanceKey: urlInfo.pageInstanceKey
+            });
         },
         updateCountUnreadNotification(){
             let req = new Api(appConfigs.apiDomain.nofitication);
@@ -150,7 +167,7 @@ export default {
                 this.$store.commit("app/updateCurrentTabIndex", value);
             }
         },
-        tabTitles() {
+        tabUrlItems() {
             return Object.values(this.$store.state.app.urlToTabTitleMap);
         }
     },

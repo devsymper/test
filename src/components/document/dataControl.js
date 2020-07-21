@@ -9,9 +9,11 @@ import { util } from "./../../plugins/util.js";
  * dữ liệu là các thuộc tính và các công thức của các control trong doc
  * @param {} fields 
  */
+export const allControlNotSetData = ['approvalHistory', 'submit', 'draft', 'reset']
 export const setDataForPropsControl = function(fields) {
     for (let controlId in fields) {
         let control = GetControlProps(fields[controlId].type)
+        console.log('hjkjsda', fields[controlId].type, control);
         let properties = control.properties
         let formulas = control.formulas
         let type = fields[controlId].type
@@ -105,6 +107,6 @@ export const setDataForPropsControl = function(fields) {
 
 function addToAllControlInDoc(controlId, control) {
     store.commit(
-        "document/addControl", { id: controlId, props: control }
+        "document/addControl", { id: controlId, props: control, from: 'submit' }
     );
 }

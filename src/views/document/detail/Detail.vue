@@ -2,7 +2,7 @@
     <div
         class="sym-form-submit"
         :id="'sym-submit-'+keyInstance"
-        :style="{'width':docSize, 'height':'100%'}"
+        :style="{'width':documentSize, 'height':'100%'}"
     >
         <div v-html="contentDocument"></div>
         <!-- <button v-on:click="togglePageSize"  id="toggle-doc-size">
@@ -13,29 +13,34 @@
 </template>
 <script>
 import { documentApi } from "./../../../api/Document.js";
+import { userApi } from "./../../../api/user.js";
 import "./../../../components/document/documentContent.css";
 import { setDataForPropsControl } from "./../../../components/document/dataControl";
 import BasicControl from "./../submit/basicControl";
 import  TableControl from "./../submit/tableControl.js"
 import  ActionControl from "./../submit/actionControl.js"
 import  Table from "./../submit/table.js"
+import './../submit/customControl.css'
+
 export default {
     props: {
-        docId: {
+        docObjectId: {
             type: Number,
             default: 0
         },
-        docName:{
-            type: String,
-            default: ''
-        },
+
         docObjInfo: {
             type: Object,
             default(){
                 return {
                     docObjId: 0,
+                    docSize : '21cm'
                 }
             }
+        },
+        isPrint:{
+            type:Boolean,
+            default:false
         }
     },   
     computed: {
@@ -50,12 +55,12 @@ export default {
         return {
             contentDocument: null,
             docObjId: null,
-            docSize: null,
+            documentSize: null,
             keyInstance: Date.now(),
         };
     },
     beforeMount() {
-        this.docSize = "21cm";
+        this.documentSize = "21cm";
     },
     created(){
         this.$store.commit("document/addToDocumentStore", {
@@ -63,15 +68,30 @@ export default {
             value: 'detail'
         });
         let thisCpn = this;
-        console.log('ok',this.$route.params);
-        
-        if (this.docObjId != 0 && this.docName != "") {
-            this.docObjId = this.docObjId;
-        } else if (this.$route.name == "detailDocument") {
+        if (this.docObjectId != 0) {
+            this.docObjId = this.docObjectId;
+        } else if (this.$route.name == "detailDocument" || this.$route.name == "printDocument") {
             this.docObjId = this.$route.params.id;
         }
         if(this.docObjId != null)
         this.loadDocumentObject();  
+        userApi.getListUser(1,100000).then(res => {
+            if (res.status == 200) {
+                thisCpn.$store.commit("document/addToDocumentSubmitStore", {
+                    key: 'listUser',
+                    value: res.data.listObject
+                });
+            }
+            
+        })
+        .catch(err => {
+            thisCpn.$snotify({
+                    type: "error",
+                    title: "can not save document",
+                });
+        })
+        .always(() => {
+        });
     },
     destroyed(){
     },
@@ -82,6 +102,7 @@ export default {
             handler(after){
                 if(after.docObjId){
                     this.docObjId = after.docObjId;
+                    this.documentSize = after.docSize;
                     this.loadDocumentObject();
                 }
             }
@@ -112,7 +133,7 @@ export default {
         loadDocumentObject() {
             let thisCpn = this;
             documentApi
-                .getDocumentObject(this.docObjId)
+                .detailDocumentObject(this.docObjId)
                 .then(res => {
                     if (res.status == 200) {
                         thisCpn.$store.commit('document/addToDocumentDetailStore',{
@@ -128,7 +149,7 @@ export default {
                 .always(() => {});
         },
         togglePageSize() {
-            this.docSize = this.docSize == "21cm" ? "100%" : "21cm";
+            this.documentSize = this.documentSize == "21cm" ? "100%" : "21cm";
         },
         processHtml(content) {
             console.log(this.sDocumentEditor);
@@ -145,9 +166,21 @@ export default {
                     let idField = this.sDocumentEditor.allControl[id].id;
                     let valueInput = this.sDocumentEditor.allControl[id].value
                     
-                    if(controlType == "submit" || controlType == "reset"){
+                    if(controlType == "submit" || controlType == "reset" || controlType == "draft"){
                         $(allInputControl[index]).remove()
-                    } else {
+                    }
+                    else if(controlType == "approvalHistory"){
+                        let control = new ActionControl(
+                                idField,
+                                $(allInputControl[index]),
+                                this.sDocumentEditor.allControl[id],
+                                thisCpn.keyInstance,
+                                this.docObjId
+                            );
+                            control.init();
+                            control.render();
+                    }
+                    else {
                         let controlName = this.sDocumentEditor.allControl[id].properties.name.value;
                         if (controlType != "table") {
                             let control = new BasicControl(
@@ -216,8 +249,60 @@ export default {
                 }
 
             }
+            setTimeout(() => {
+                if(thisCpn.isPrint){
+                    thisCpn.printDiv();
+                }
+            }, 500);
         },
         
+        printDiv(){
+            // let css = this.getallcss();
+            let head = document.head || document.getElementsByTagName('head')[0];
+            let style = document.createElement('style');
+            
+            // style.type = 'text/css';
+            // if (style.styleSheet){
+            // // This is required for IE8 and below.
+            // style.styleSheet.cssText = css;
+            // } else {
+            // style.appendChild(document.createTextNode(css));
+            // }
+			var printContents = $('.layout.justify-center')[0].innerHTML;
+			var originalContents = document.body.innerHTML;
+            // head.appendChild(style);
+
+			document.body.innerHTML = printContents;
+
+			window.print();
+
+			document.body.innerHTML = originalContents;
+
+        },
+        getallcss() {
+            var css = "", //variable to hold all the css that we extract
+                styletags = document.getElementsByTagName("style");
+            for(var i = 0; i < styletags.length; i++)
+            {
+                css += styletags[i].innerHTML; //extract the css in the current style tag
+            }
+
+            // //loop over all the external stylesheets
+//             for(var i = 0; i < document.styleSheets.length; i++)
+//             {
+//                 var currentsheet = document.styleSheets[i];
+//                 if(currentsheet.href == null){
+// //loop over all the styling rules in this external stylesheet
+//                     for(var e = 0; e < currentsheet.cssRules.length; e++)
+//                     {
+//                         css += currentsheet.cssRules[e].cssText; //extract all the styling rules
+//                     }
+//                 }
+                
+//             }
+
+            return css;
+        }
     }
 }
 </script>

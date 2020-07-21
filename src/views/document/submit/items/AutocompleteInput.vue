@@ -10,6 +10,7 @@
         fixed-header
         hide-default-footer
         dense
+        no-data-text="Không có dữ liệu"
         calculate-widths
         
         >
@@ -95,12 +96,15 @@ export default {
         },
         calculatorPositionBox(e){
             // nếu autocomplete từ cell của handsontable  
-            if($(e.target).closest('.handsontable').length > 0){
+            if($(e.target).closest('.handsontable').length > 0 ){
                 let autoEL = $(this.$el).detach();
                 $(e.target).closest('.wrap-table').append(autoEL);
                 let edtos = $(e.target).offset();
                 if(!$(e.target).is('.handsontableInput')){
                     edtos = $(e.target).closest('td.htAutocomplete.current.highlight').offset();
+                }
+                if($(e.target).is('div.htAutocompleteArrow')){
+                    edtos = $(e.target).parent().offset();;
                 }
                 
                 let tbcos = $(e.target).closest('.wrap-table').find('[s-control-type="table"]').offset();
@@ -112,10 +116,6 @@ export default {
                 $(e.target).parent().append(autoEL);
                 this.positionBox = {'top':'20px','left':'0px'};
             }
-            console.log(e);
-            
-            
-            
         },
         setSearch(query){
             this.search = query;
@@ -132,14 +132,12 @@ export default {
             else if(item.hasOwnProperty('column1')){
                 value = item['column1'];
             }
-            this.$emit('after-select-row',{value:value});
-
+            this.$emit('after-select-row',{value:value,input:this.curInput});
             this.dataTable = []
             this.hide();
         },
         openSubForm(){
             this.hide();
-            $('.autocompleting').removeClass('autocompleting');
             this.$emit('open-sub-form');
 
         }

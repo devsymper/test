@@ -52,6 +52,14 @@
                 @change="(data) => {
                     handleChangeInputValue(inputInfo, name,data);
                 }"
+                @input="(data) => {
+                    handleInputValue(inputInfo, name,data);
+                }"
+                @blur="handleInputBlur(inputInfo, name)"
+                @keyup="(data) => {
+                    handleKeyUpInputValue(inputInfo, name,data);
+                }"
+
                 :ref="'inputItem_'+name"
                 solo
                 :items="inputInfo.options"
@@ -66,6 +74,7 @@
                 :class="'sym-small-size sym-style-input d-inline-block '+(inputInfo.classes ? inputInfo.classes : '') "
                 :key="name"
                 single-line
+                :disabled="viewOnly"
                 v-bind="getInputProps(inputInfo)"
                 v-model="inputInfo.value"
                 :is="getInputTag(inputInfo.type)">
@@ -78,9 +87,13 @@
                     </template>
                 </template>
             </component>
+
+            <div class="error-message"> 
+                {{inputInfo.errorMessage}}
+            </div>
         </div>
 
-        <symper-drag-panel
+        <symper-drag-panel 
             @before-close="closeLargeFormulaEditor()"
             :showPanel="largeFormulaEditor.open"
             :actionTitle="largeFormulaEditor.data.title"
@@ -95,11 +108,13 @@
                 <formula-editor
                     v-else-if="panelData.type == 'userAssignment'"
                     v-model="panelData.value.formula"
+                    @blur="handleLargeFormulaEditorBlur"
                     :width="'100%'"
                     :height="'370px'"
                 ></formula-editor>
                 <formula-editor
                     v-else
+                    @blur="handleLargeFormulaEditorBlur"
                     v-model="panelData.value"
                     :width="'100%'"
                     :height="'370px'"
@@ -133,6 +148,7 @@ import OrgchartSelector from "./../user/OrgchartSelector";
 import DateTimePicker from './../common/DateTimePicker.vue';
 import SymperListOrdering from "./../common/symperInputs/SymperListOrdering";
 import SymperListAutocomplete from "./../common/symperInputs/SymperListAutocomplete";
+import SymperColorPicker from "@/components/common/symperInputs/SymperColorPicker.vue";
 
 const inputTypeConfigs = {
     numeric: {
@@ -218,7 +234,8 @@ const inputTypeConfigs = {
         props(config) {
             return {
                 columns: config.columns,
-                data: config.value
+                data: config.value,
+                minSpareRows: 1
             };
         }
     },
@@ -232,6 +249,14 @@ const inputTypeConfigs = {
             };
             if(config.onSearch){
                 props.onSearch  = config.onSearch;
+            }
+
+            if(config.textKey){
+                props.textKey = config.textKey;
+            }
+
+            if(config.valueKey){
+                props.valueKey = config.valueKey;
             }
             return props;
         }
@@ -266,7 +291,15 @@ const inputTypeConfigs = {
                 value:config.value
             }
         }
-    }
+    },
+    color:{
+        tag:"symper-color-picker",
+        props(config){
+            return{
+                value:config.value
+            }
+        }
+    },
 };
 export default {
     data() {
@@ -285,6 +318,17 @@ export default {
         };
     },
     methods: {
+        handleLargeFormulaEditorBlur(){
+            let name = this.largeFormulaEditor.name;
+            let inputInfo = this.allInputs[name];
+            this.handleInputBlur(inputInfo, name);
+        },
+        handleInputBlur(inputInfo, name){
+            this.$emit('input-blur',inputInfo, name);
+        },
+        isLargeFormulaEditorOpen(){
+            return this.$refs.dragPanel.selfShowPanel;
+        },
         translateOrgchartValuesToTags(){
             if(this.translateOrgchartValuesToTagsDebounce){
                 clearTimeout(this.translateOrgchartValuesToTagsDebounce);
@@ -340,8 +384,9 @@ export default {
         },
         closeLargeFormulaEditor() {
             let info = this.largeFormulaEditor;
-            this.$refs["inputItem_" + info.name][0].setValue(info.data.value);
-            this.largeFormulaEditor.name = '';
+            setTimeout((self) => {
+                self.largeFormulaEditor.name = '';            
+            }, 500, this);
         },
         openLargeValueEditor(inputInfo, name) {
             this.$refs.dragPanel.show();
@@ -362,6 +407,19 @@ export default {
              * inputInfo: chứa các thông tin về input
              */
             this.$emit("input-value-changed", name, inputInfo, data);
+        },
+        handleInputValue(inputInfo, name, data) {
+            /**
+             * emit sự kiện thay đổi giá trị của một input trong form
+             * name: tên của input này
+             * inputInfo: chứa các thông tin về input
+             */
+            this.$emit("input-value", name, inputInfo, data);
+        },
+        handleKeyUpInputValue(inputInfo, name, data){
+            console.log('jj',inputInfo, name, data);
+            
+            this.$emit("input-value-keyup", name, inputInfo, data);
         },
         getInputProps(inputConfigs) {
             let rsl = inputTypeConfigs[inputConfigs.type].props(inputConfigs);
@@ -426,6 +484,10 @@ export default {
             type: String,
             default: "8px"
         },
+        viewOnly: {
+            type: Boolean,
+            default: false
+        }
     },
     computed: {
         labelMinwidth() {
@@ -462,6 +524,8 @@ export default {
         SymperListOrdering: SymperListOrdering,
         SymperListAutocomplete,
         "datetime-picker" : DateTimePicker,
+        SymperColorPicker: SymperColorPicker
+
     }
 };
 </script>
@@ -476,4 +540,12 @@ export default {
 .input-item-func.active{
     color: #f58634;
 }
+</style>
+<style scoped>
+    .error-message{
+        font-size: 11px;
+        color: red;
+        text-align: right;
+        margin-top: 2px;
+    }
 </style>

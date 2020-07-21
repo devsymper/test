@@ -148,12 +148,49 @@ export default {
     },
 
     documentationMethod(el, elKey, attr, bpmnModeler, attrName) {
-        if (el.businessObject && attr.value != '') {
+        if (el.businessObject) {
             let moddle = bpmnModeler.get('moddle');
             let bizObj = el.businessObject;
             let newEl = moddle.create("symper:documentation");
             newEl.text = attr.value;
             bizObj.documentation = [newEl];
+        }
+    },
+    subLoopCharMethod(el, elKey, attr, bpmnModeler, attrName) {
+        if (el.businessObject && el.businessObject.loopCharacteristics) {
+            let moddle = bpmnModeler.get('moddle');
+            let bizObj = el.businessObject;
+            let newEl = moddle.create("bpmn:Expression");
+
+            newEl.text = attr.value;
+            newEl.body = attr.value;
+            // bizObj.loopCharacteristics.completionCondition = newEl;
+            bizObj.loopCharacteristics[attr.toXML.name] = newEl;
+        }
+    },
+
+    collectionMethod(el, elKey, attr, bpmnModeler, attrName) {
+        if (el.businessObject && el.businessObject.loopCharacteristics && attr.value) {
+            let moddle = bpmnModeler.get('moddle');
+            let bizObj = el.businessObject;
+            let newEl = moddle.create("bpmn:Expression");
+
+            bizObj.loopCharacteristics['symper:collection'] = attr.value;
+        }
+    },
+
+    conditionExpressionMethod(el, elKey, attr, bpmnModeler, attrName) {
+
+        if (el.businessObject && attr.value.trim() != '') {
+            let moddle = bpmnModeler.get('moddle');
+            let bizObj = el.businessObject;
+            let elTagName = attr.toXML.name;
+
+            let newEl = moddle.create("bpmn:FormalExpression");
+            newEl['xsi:type'] = "tFormalExpression";
+            newEl.text = "<![CDATA[" + attr.value + "]]>";
+            newEl.body = "<![CDATA[" + attr.value + "]]>";
+            bizObj[elTagName] = newEl;
         }
     }
 }

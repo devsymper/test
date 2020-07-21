@@ -34,10 +34,15 @@ const setAllDefinition = (state, data) => {
 };
 
 
+const setAllWorkflowModel = (state, data) => {
+    Vue.set(state, 'allProcessModel', data);
+}
+
 
 export {
     addNewNode,
     changeSelectingNode,
     initInstance,
-    setAllDefinition
+    setAllDefinition,
+    setAllWorkflowModel
 };

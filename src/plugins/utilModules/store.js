@@ -69,5 +69,19 @@ export const store = {
         var blob = new Blob([contents], { type: 'text/plain' });
         var file = new File([blob], fileName, { type: "text/plain" });
         return file;
-    }
+    },
+
+    setEncoded(link, name, data) {
+        var encodedData = encodeURIComponent(data);
+        if (data) {
+            link.attr({
+                href: "data:application/bpmn20-xml;charset=UTF-8," +
+                    encodedData,
+                download: name
+            });
+            setTimeout(() => {
+                link[0].click();
+            }, 200);
+        }
+    },
 }

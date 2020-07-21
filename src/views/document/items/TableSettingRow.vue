@@ -145,7 +145,7 @@ export default {
             return this.row;
         },
         listControlType(){
-            return getAllControlForTableSetting(['label','textInput','number','date','dateTime','time','month','phone','email','user','currency','percent']);
+            return getAllControlForTableSetting(['label','image','qrCode','textInput','number','date','dateTime','time','month','phone','select','documentSelect','color','hidden','email','user','currency','percent']);
         }
     },
     mounted(){
