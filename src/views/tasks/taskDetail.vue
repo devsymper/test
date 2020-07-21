@@ -283,10 +283,11 @@ export default {
             if(this.isInitInstance){
                 this.$emit('task-submited', data);            
             }else{
-                let varsForBackend = await getVarsFromSubmitedDoc(data, this.taskInfo.taskDefinitionKey, this.taskInfo.action.parameter.documentId);
+                let elId = this.taskInfo.action.parameter.activityId;
+                let varsForBackend = await getVarsFromSubmitedDoc(data, elId, this.taskInfo.action.parameter.documentId);
                 let taskData = {
                     // action nhận 1 trong 4 giá trị: complete, claim, resolve, delegate
-                    "action": "complete",
+                    "action": "complete", 
                     "assignee": "1",
                     "outcome": 'submit',
                     "variables": varsForBackend.vars,

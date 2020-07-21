@@ -9,9 +9,7 @@
             :documentObjectTaskId="workflowInfo.documentObjectTaskId"
             :documentObjectWorkflowId="workflowInfo.documentObjectWorkflowId"
             :documentObjectWorkflowObjectId="workflowInfo.documentObjectWorkflowObjectId"
-
             @submit-document-success="onSubmitDone">
-
         </DocumentSubmit>
         <Detail 
             v-else-if="action == 'approval'"
