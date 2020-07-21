@@ -343,7 +343,7 @@ export default class Formulas {
             if (dataInput != false) {
                 syql = this.replaceParamsToData(dataInput, formulas);
             }
-            syql = syql.replace(/\r?\n|\r/g, '');
+            syql = syql.replace(/\r?\n|\r/g, ' ');
 
             return formulasApi.execute({ formula: syql });
         }
@@ -387,7 +387,7 @@ export default class Formulas {
             }
             let names = allRelateName.reduce((obj, name) => {
                 let controlName = name.match(/\w+/g);
-                if (!BUILD_IN_FUNCTION.includes(controlName[0])) {
+                if (!BUILD_IN_FUNCTION.includes(controlName[0]) && !this.detectWorkflowParams(controlName[0])) {
                     obj[controlName] = true;
                 }
                 return obj;
@@ -395,6 +395,12 @@ export default class Formulas {
             return names;
         }
         return {}
+    }
+    detectWorkflowParams(str) {
+        if (str.includes('workflow_')) {
+            return true;
+        }
+        return false;
     }
     getInputControl() {
             return this.inputControl;
