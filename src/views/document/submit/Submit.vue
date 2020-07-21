@@ -127,7 +127,7 @@ export default {
             type:Number,
             default:0
         },
-        action:{
+        action:{ // submit hoặc update
             type:String,
             default:''
         },

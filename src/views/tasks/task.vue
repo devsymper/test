@@ -1,7 +1,7 @@
 <template>
     <div class="h-100 w-100 d-flex justify-center ml-6"> 
         <DocumentSubmit 
-            v-if="action == 'submit'"
+            v-if="action == 'submit' || action=='update'"
             ref="submitComponent"
             :docId="Number(docId)"
             :workflowVariable="workflowVariable"
@@ -9,6 +9,8 @@
             :documentObjectTaskId="workflowInfo.documentObjectTaskId"
             :documentObjectWorkflowId="workflowInfo.documentObjectWorkflowId"
             :documentObjectWorkflowObjectId="workflowInfo.documentObjectWorkflowObjectId"
+            :action="action"
+            :documentObjectId="documentObjectId"
             @submit-document-success="onSubmitDone">
         </DocumentSubmit>
         <Detail 
@@ -57,7 +59,8 @@ export default {
                 documentObjectWorkflowId: '',
                 documentObjectTaskId: ''
             },
-            showDoTaskComponent: false
+            showDoTaskComponent: false,
+            documentObjectId: 0
         }
     },
     props: {
@@ -91,7 +94,7 @@ export default {
 
                     if(action == 'submit'){
                         this.docId = Number(this.taskInfo.action.parameter.documentId);
-                    }else if(action == 'approval'){
+                    }else if(action == 'approval' || action == 'update'){
                         if(!this.taskInfo.action.parameter.documentObjectId){
                             
                             let approvaledElId = this.taskInfo.targetElement;
@@ -100,6 +103,7 @@ export default {
                         }else{
                             this.docObjInfo.docObjId = this.taskInfo.action.parameter.documentObjectId;
                         }
+                        this.documentObjectId = this.docObjInfo.docObjId;
                     }
                 }
             }
