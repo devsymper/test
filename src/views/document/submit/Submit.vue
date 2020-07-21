@@ -123,7 +123,14 @@ export default {
         showSubmitButton: {
             default: true
         },
-      
+        documentObjectId:{
+            type:Number,
+            default:0
+        },
+        action:{
+            type:String,
+            default:''
+        },
         documentObjectWorkflowObjectId: {
             type: String,
             default: ''
@@ -227,7 +234,10 @@ export default {
 
     created() {
         // đặt trang thái của view là submit => isDetailView = false
-        
+        this.$store.commit("document/addToDocumentStore", {
+                key: 'viewType',
+                value: this.action
+            });
         let thisCpn = this;
         if (this.docId != 0) {
             this.documentId = this.docId;
@@ -244,6 +254,8 @@ export default {
             });
             this.docObjId = this.$route.params.id;
         }
+        
+
         if(this.documentId != null && this.documentId != 0){
             this.loadDocumentData();
         }
@@ -391,7 +403,10 @@ export default {
                     key: 'workflowVariable',
                     value: after
                 });
-        }
+        },
+        documentObjectId(after){
+            this.docObjId = after;
+        },
     },
     
     methods: {
@@ -490,6 +505,7 @@ export default {
          * Hàm xử lí nhận dữ liệu component autocomplete khi chọn 1 dòng
          */
         afterSelectRowAutoComplete(data){
+
             // th này không phải trong table       
             if(this.sDocumentSubmit.currentCellSelected == null){
                 let input = data.input;
