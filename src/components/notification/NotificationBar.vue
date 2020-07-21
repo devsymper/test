@@ -64,7 +64,7 @@
             <v-row
                 v-for="item in listNotification" 
                 :key="item.id"
-                class="text-left notification-item"
+                class="text-left notification-item  pt-0 pb-0"
             >
                 <v-col cols="1">
                     <v-row>
@@ -122,7 +122,7 @@
             </v-overlay>
         </v-row>
         
-        <v-dialog v-model="dialogConfigNotification" width="600px">
+        <v-dialog v-model="dialogConfigNotification" width="600px" hide-overlay>
             <v-app-bar dense flat color="white" class="notification-list-bar" fixed>
                 <slot name="header">
                     <v-toolbar-title class="nofitication-title-bar w-100">
@@ -163,6 +163,52 @@
                 </slot>
             </v-row>
         </v-dialog>
+        <v-dialog v-model="dialogConfigNotificationSubscribe" width="600px" hide-overlay>
+            <v-app-bar dense flat color="white" class="notification-list-bar" fixed>
+                <slot name="header">
+                    <v-toolbar-title class="notification-subscribe-type-title w-100">
+                    {{dialogConfigNotificationSubscribeTitle}}<br/>
+                    <span class="notification-subscribe-type-description">{{dialogConfigNotificationSubscribeDescription}}</span>
+                     <v-icon
+                            class="close-btn float-right"
+                            @click="hideSubcribeConfig()"
+                        >mdi-close</v-icon>
+                </v-toolbar-title>
+                </slot>
+                
+                
+            </v-app-bar>
+            <v-row class="ml-0 mr-0 pl-5 pr-5 list-notification bg-white" :z-index="999">
+                <slot name="body">
+                    <v-row
+                        class="text-left notification-topic"
+                        v-for="item in listTopic" 
+                        :key="item.id"
+                    >
+                        <v-col cols="10">
+                            <v-row>
+                                <span class="notification-topic-title">{{item.name}}</span><br>
+                                
+                            </v-row>
+                            <v-row>
+                                <span class="notification-topic-description">{{item.description}}</span>
+                            </v-row>
+                        </v-col>
+                        <v-col cols="2">
+                            <v-row class="float-right">
+                                <v-switch
+                                class="p-0"
+                                    v-model="item.subscribed"
+                                    @change="changeSubcribedTopic(item.id,item.subscribed)"
+                                    hide-details
+                                    ></v-switch>
+                            </v-row>
+                        </v-col>
+                        
+                    </v-row>
+                </slot>
+            </v-row>
+        </v-dialog>
     </v-row>
 </template>
 
@@ -188,6 +234,7 @@ export default {
             dialogConfigNotificationSubscribeTitle: "",
             dialogConfigNotificationSubscribeDescription: "",
             dialogConfigNotificationSubscribeIcon: "",
+            listTopic: []
         };
     },
     created() {
@@ -299,17 +346,48 @@ export default {
             this.dialogConfigNotification = false
         },
         openSubcribeConfig(type){
-            // this.dialogConfigNotification = false;
-            // this.dialogConfigNotificationSubscribeTitle = "document" ;
-            // this.dialogConfigNotificationSubscribeDescription = "document" ;
-            // this.dialogConfigNotificationSubscribe = true;
+            this.dialogConfigNotification = false;
+            this.dialogConfigNotificationSubscribe = true;
+            if(type=='document'){
+                this.showSubcribesConfigDocument();
+            }            
         },
         hideSubcribeConfig(){
             this.dialogConfigNotificationSubscribe = false;
              this.dialogConfigNotification = true;
+        },
+        showSubcribesConfigDocument() {
+            this.dialogConfigNotificationSubscribeTitle = "Document" ;
+            this.dialogConfigNotificationSubscribeDescription = "Cấu hình nhận thông báo từ việc thay đổi document" ;
+            let req = new Api(appConfigs.apiDomain.nofitication);
+            req.get("/channels",{})
+            .then(res => {
+                if (res.status == 200) {
+                    this.overlay = false;
+                    this.listTopic = res.data;
+                } else {
+                    this.showError();
+                }
+            })
+            .catch(err => {
+                this.showError();
+            })
+        },
+        changeSubcribedTopic(id,state){
+            let req = new Api(appConfigs.apiDomain.nofitication);
+            req.post("/channels/"+id,{'state':state})
+            .then(res => {
+                if (res.status == 200) {
+                    
+                } else {
+                    this.showError();
+                }
+            })
+            .catch(err => {
+                this.showError();
+            })
+            
         }
-        
-
     }
 }
 </script>
@@ -336,6 +414,15 @@ export default {
     padding: 10px;
 }
 .notification-item:hover{
+    background: #eeeeee!important;
+}
+.notification-topic{
+    border-bottom: rgba(221,221,221,0.2) 1px solid;
+    cursor: pointer;
+    width: 100%;
+    padding: 2px;
+}
+.notification-topic:hover{
     background: #eeeeee!important;
 }
 .notification-item-action{
@@ -375,7 +462,14 @@ export default {
 .notification-subscribe-type-description{
     font-size: 11px;
     color: #777777;
+    font-weight: normal;
 }
-
-
+.notification-topic-title{
+     font-size: 13px;
+}
+.notification-topic-description{
+    font-size: 11px;
+    color: #777777;
+    font-weight: normal;
+}
 </style>
