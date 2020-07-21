@@ -60,7 +60,8 @@ const defaultState = {
         currentControlAutoComplete: null, // biến chỉ ra control nào đang autocomplete
         submitFormulas: null,
         listUser: null,
-        localRelated: {}
+        localRelated: {},
+        workflowVariable: {}
     },
     detail: {
         allData: null

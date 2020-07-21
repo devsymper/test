@@ -385,6 +385,12 @@ export default {
         docId(after) {
             this.documentId = after;
             this.loadDocumentData();
+        },
+        workflowVariable(after){
+            this.$store.commit("document/addToDocumentSubmitStore", {
+                    key: 'workflowVariable',
+                    value: after
+                });
         }
     },
     

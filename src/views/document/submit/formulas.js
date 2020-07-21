@@ -218,7 +218,7 @@ export default class Formulas {
          * @param {String} formulas 
          */
     replaceParamsToData(dataInput, formulas) {
-        let listControlInDoc = this.getDataSubmitInStore()
+        let listControlInDoc = this.getDataSubmitInStore();
         for (let controlName in dataInput) {
             let regex = new RegExp("{" + controlName + "}", "g");
             let value = dataInput[controlName];
@@ -231,10 +231,25 @@ export default class Formulas {
             if (!BUILD_IN_FUNCTION.includes(controlName)) {
                 formulas = formulas.replace(regex, value);
             }
+        }
+        this.replaceWorkflowParams(formulas);
+        return formulas;
+    }
+
+    replaceWorkflowParams(formulas) {
+        let workflowVariable = dataSubmitStore.workflowVariable;
+        console.log('gád', workflowVariable);
+        for (let param in workflowVariable) {
+            let regex = new RegExp("{" + param + "}", "g");
+            let value = workflowVariable[param];
+            if (!BUILD_IN_FUNCTION.includes(param)) {
+                formulas = formulas.replace(regex, value);
+            }
 
         }
         return formulas;
     }
+
     handleRunAutoCompleteFormulas(search, dataInput = false) {
         let listSyql = this.getReferenceFormulas(this.formulas);
         let fieldSelect = this.detectFieldSelect();
