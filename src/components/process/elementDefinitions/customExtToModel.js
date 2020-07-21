@@ -24,10 +24,11 @@ export const pushCustomElementsToModel = function(allVizEls, allSymEls, bpmnMode
             vizEl[elKey] = removeOldSymperExts(vizEl[elKey]);
         }
 
-        // addCustomPropsToForm(allSymEls[bizVizEl.id]);
-
         for (let attrName in attrs) {
             let attrDef = allNodesAttrs[attrName];
+            if (!attrDef) {
+                continue;
+            }
             if (typeof attrDef.pushToXML == 'function') {
                 attrDef.pushToXML(vizEl, elKey, attrs[attrName], bpmnModeler, attrName);
             }

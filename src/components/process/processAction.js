@@ -52,6 +52,20 @@ function cleanContent(content, configValue) {
     return rsl;
 }
 
+async function saveDeployHistory(deployData, modelData) {
+    let definition = await bpmnApi.getDefinitions({
+        deploymentId: deployData.id,
+    });
+    definition = definition.data[0];
+    bpmnApi.saveDeployHistory({
+        modelName: modelData.name,
+        modelId: modelData.id,
+        deploymentId: deployData.id,
+        definitionKey: definition.key,
+        definitionId: definition.id
+    });
+}
+
 export const deployProcess = function(self, processData) {
     return new Promise((deployResolve, deployReject) => {
         bpmnApi.getModelData(processData.id).then(res => {
@@ -65,6 +79,7 @@ export const deployProcess = function(self, processData) {
                 tenantId: processData.tenantId ? processData.tenantId : '1',
             }, file).then((res) => {
                 self.$snotifySuccess('Deploy process successfully');
+                saveDeployHistory(res, processData);
                 deployResolve(res);
             }).catch((err) => {
                 self.$snotifyError(
@@ -206,16 +221,20 @@ export const getVarsFromSubmitedDoc = async(docData, elId, docId) => {
 
 export const getProcessInstanceVarsMap = async(processInstanceId) => {
     return new Promise((resolve, reject) => {
-        BPMNEngine.getProcessInstanceVars(processInstanceId).then((res) => {
-            let vars = res;
-            varsMap = vars.reduce((map, el) => {
-                map[el.name] = el;
-                return map;
-            }, {});
-            resolve(varsMap);
-        }).catch(err => {
-            reject(err);
-        });
+        if (processInstanceId) {
+            BPMNEngine.getProcessInstanceVars(processInstanceId).then((res) => {
+                let vars = res;
+                let varsMap = vars.reduce((map, el) => {
+                    map[el.name] = el;
+                    return map;
+                }, {});
+                resolve(varsMap);
+            }).catch(err => {
+                reject(err);
+            });
+        } else {
+            resolve({});
+        }
     });
 }
 

@@ -259,14 +259,14 @@ const routes = [{
     },
     {
         path: "/tasks",
-        name: "tasks",
+        name: "tasksList",
         // component: tasks,
         component: () =>
             import ('../views/tasks/index.vue'),
     },
     {
         path: "/tasks/:id",
-        name: "tasks",
+        name: "doTask",
         // component: DoTask
         component: () =>
             import ('../views/tasks/DoTask.vue')

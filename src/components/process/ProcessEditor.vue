@@ -304,6 +304,7 @@ export default {
                 }
             }
             let xml = this.$refs.symperBpmn.getXML();
+            xml = this.standardXMLToSave(xml);
             console.log(xml,'xmlxmlxmlxmlxmlxmlxml');
             let jsonConfig = {};
             for(let elName in allSymEls){
@@ -321,6 +322,12 @@ export default {
                 version: 1,
                 configValue: JSON.stringify(jsonConfig)
             };
+        },
+        standardXMLToSave(xml){
+            // &lt;![CDATA[pppppppppppppppppppp]]&gt;
+            xml = xml.replace(/\&lt\;\!\[CDATA\[/g, '<![CDATA[');
+            xml = xml.replace(/\]\]\&gt;/g, ']]>');
+            return xml;
         },
         /**
          * Lưu lại các thuộc tính được set qua việc tương tác trực tiếp với các thành phần trong diagram vào trong store
@@ -633,7 +640,7 @@ export default {
 
             for (let key in sNodeAttrs.attrs) {
                 if(!includeSymperAttr){
-                    if(allNodesAttrs[key].isSymperProp){
+                    if(!allNodesAttrs[key] || (allNodesAttrs[key] && allNodesAttrs[key].isSymperProp)){
                         continue;
                     }
                 }
@@ -724,6 +731,10 @@ export default {
                         }
                     );
                 }
+
+                if(nodeData.hasOwnProperty('text')){
+                    nodeState.attrs.text.value = nodeData.text;
+                }
             }
         },
 
@@ -755,7 +766,8 @@ export default {
             let reApplyToView = {
                 name: "name",
                 process_id: "id",
-                overrideid: "id"
+                overrideid: "id",
+                text: 'text'
             };
 
             if (name == "overrideid" || name == "process_id") {
@@ -789,6 +801,7 @@ export default {
             if (name == "overrideid" || name == "process_id") {
                 let oldId = this.selectingNode.id;
                 let newId = attrs[name].value;
+                this.reAssignIdForSelectedNode(oldId, newId);
                 this.selectingNode.id = newId; // đặt lại id cho thông tin của node
                 // Thay key của node cũ trong state bằng id của node mới
                 this.$delete(this.stateAllElements, oldId);
@@ -798,6 +811,25 @@ export default {
             // Nếu set formreference cho StartNoneEvent thì đặt các lựa chọn control để làm business key
             if(this.selectingNode.type == 'StartNoneEvent' && name == 'formreference'){
                 this.setControlsForBizKey(inputInfo.value);
+            }
+        },
+        /**
+         * Thay đổi giá trị của id cho các node có attr cần lựa chọn dùng tới node nào.
+         * VD: approvalForElement, updateForElement ...
+         */
+        reAssignIdForSelectedNode(oldId, newId){
+            let needReassignAttrName = {
+                approvalForElement: true,
+                updateForElement: true,
+            };
+
+            for(let nodeId in this.stateAllElements){
+                let node = this.stateAllElements[nodeId];
+                for(let needCheck in needReassignAttrName){
+                    if(node.attrs[needCheck] && node.attrs[needCheck].value == oldId){
+                        node.attrs[needCheck].value = newId;
+                    }
+                }
             }
         },
         async setControlsForBizKey(docId){
@@ -884,7 +916,13 @@ export default {
                 nodeData.attrs.controlsForBizKey.options = this.controlsForBizKey;
             }else if(nodeData.type.includes('Gateway')){
                 this.setFlowsOrderForGateway(nodeData);
+            }else if(nodeData.type == 'CallActivity'){
+                this.setItemForSelectProcessModel();
             }
+        },
+        setItemForSelectProcessModel(){
+            debugger
+            this.selectingNode.attrs.callactivitycalledelement.options = this.$store.state.process.allProcessModel;
         },
         setFlowsOrderForGateway(nodeData){
             let outFlows = [];
@@ -1047,6 +1085,10 @@ export default {
                     this.setFlowsOrderForGateway(el);
                 }
 
+                if(!nodeAttrsDefinition[el.type]){
+                    debugger
+                }
+
                 if (nodeAttrsDefinition[el.type].checkShowOrHideInput) {
                     nodeAttrsDefinition[el.type].checkShowOrHideInput(el.attrs);
                 }
@@ -1125,6 +1167,7 @@ export default {
     },
 
     created() {
+        let self = this;
         this.instanceKey = Date.now();
         this.$store.commit(
             "process/initInstance",
@@ -1132,6 +1175,9 @@ export default {
         );
         this.$store.dispatch("app/getAllOrgChartData");
         this.$store.dispatch("app/getAllUsers");
+        this.$store.dispatch("process/getLastestProcessDefinition");
+        
+        this.$store.dispatch('process/getAllDefinitions');
         
         if (this.$route.name == "editProcess") {
             this.modelAction = "edit";

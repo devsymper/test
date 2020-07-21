@@ -503,6 +503,15 @@ export const nodeAttrsDefinition = {
 
         }
     },
+    'TextAnnotation': {
+        attrs: ["text"],
+        validate: function(attrs) {
+
+        },
+        checkShowOrHideInput: function(attrs) {
+
+        }
+    }
 };
 
 

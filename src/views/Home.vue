@@ -1,20 +1,6 @@
 <template>
-    <div class="home">
-        <h1>
-            Home page
-        </h1>
-        <PermissionSelector
-        v-model="selectedPermission">
-
-        </PermissionSelector>
-        <!-- <TimelineTreeview>
-            <template slot="tree-item-content" slot-scope="{itemData}">
-                <i :class="'mdi mr-2 ' +itemData.icon"></i>
-                <span>{{itemData.name}}</span>
-            </template>
-        </TimelineTreeview> -->
-        <!-- <FormulaEditor v-model="formula">
-        </FormulaEditor> -->
+    <div class="home h-100 w-100">
+        <Dashboard></Dashboard>
     </div>
 </template>
 
@@ -26,7 +12,7 @@ import Handsontable from 'handsontable';
 import FormulaEditor from "./../components/formula/editor/FormulaEditor";
 import SymperColorPicker from "@/components/common/symperInputs/SymperColorPicker.vue";
 import PermissionSelector from "@/components/permission/PermissionSelector.vue";
-
+import Dashboard from "@/views/dashboard/Dashboard.vue";
 export default {
     name: "Home",
     methods: {
@@ -93,7 +79,8 @@ export default {
         TimelineTreeview,
         FormulaEditor: FormulaEditor,
         SymperColorPicker: SymperColorPicker,
-        PermissionSelector
+        PermissionSelector,
+        Dashboard
     }
 };
 </script>

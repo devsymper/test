@@ -18,29 +18,29 @@
         @change="applyChangeValue"
         @click="reAssignItems()">
         <!-- Kiểu 1: mainAndSub -->
-        <template v-slot:selection="{ attr, on, item, selected }">
+        <template class="w-100" v-slot:selection="{ attr, on, item, selected }">
             <v-chip
                 style="height: 22px"
                 v-bind="attr"
                 :input-value="selected"
                 color="grey lighten-3"
-                class="fs-13"
+                class="fs-13 w-100"
                 v-on="on"
             >
                 <div class="d-inline-block text-ellipsis" style="width: calc(100% - 4px)">
-                    <span v-text="item.id " v-if="showId" class="mr-2 font-weight-medium fs-12"></span>
-                    <span v-text="item.title ? item.title : item.name" class="fs-12"></span>
+                    <span v-text="item[valueKey] " v-if="showId" class="mr-2 font-weight-medium fs-12"></span>
+                    <span v-text="item[textKey] ? item[textKey] : item.name" class="fs-12"></span>
                 </div>
             </v-chip>
         </template>
-        <template v-slot:item="{ item }">
-            <div class="pa-2 font-weight-medium">
-                <div class="d-flex fs-13">
-                    <span v-text="item.id" class="mr-2" v-if="showId"></span>
-                    <span v-text="item.name"></span>
+        <template v-slot:item="{ item }" class="w-100">
+            <div class="pa-2 w-100">
+                <div class="d-flex fs-13 font-weight-medium w-100" >
+                    <span v-text="item[valueKey]" class="mr-2" v-if="showId"></span>
+                    <span v-text="item[nameKey]"></span>
                 </div>
-                <div class="w-100 fs-12 text--grey">
-                    <span v-text="item.title"></span>
+                <div class="w-100 fs-12 text--grey w-100">
+                    <span v-text="item[textKey]"></span>
                 </div>
             </div>
         </template>
@@ -71,6 +71,11 @@ export default {
             type: String,
             default: "id"
         },
+        nameKey: {
+            // key trong object chứa text để giá trị gán cho component
+            type: String,
+            default: "name"
+        },
         onSearch: {
             // hàm xử lý khi input
             default: false
@@ -95,7 +100,7 @@ export default {
             deep: true,
             immediate: true,
             handler: function(after, before){
-                // this.myItems = util.cloneDeep(after);
+                this.myItems = util.cloneDeep(after);
             }
         },
         value: {

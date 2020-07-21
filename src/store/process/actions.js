@@ -1,5 +1,6 @@
 import workflowApi from "@/api/BPMNEngine.js";
 import { SYMPER_APP } from "@/main.js";
+import BPMNEngine from "../../api/BPMNEngine";
 const action1 = (state, data) => {
     state.data = data;
 };
@@ -26,4 +27,17 @@ const getAllDefinitions = async(context) => {
 
 }
 
-export { getAllDefinitions };
+const getLastestProcessDefinition = async function(context) {
+    try {
+        let res = await BPMNEngine.getLastestByModel();
+        if (res.status == 200) {
+            context.commit('setAllWorkflowModel', res.data);
+        } else {
+            SYMPER_APP.$snotifyError(res, "Can not get list workflow models");
+        }
+    } catch (error) {
+        SYMPER_APP.$snotifyError(error, "Can not get list workflow models");
+    }
+}
+
+export { getAllDefinitions, getLastestProcessDefinition };

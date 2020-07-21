@@ -23,7 +23,8 @@ const defaultState = {
     // danh sách tất cả các definition theo dạng id definition: object definition đó
     allDefinitions: {
 
-    }
+    },
+    allProcessModel: [] // danh sách tất cả các workflow modeler 
 };
 
 export default defaultState;

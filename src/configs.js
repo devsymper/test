@@ -30,7 +30,8 @@ export const appConfigs = {
         orgchart: 'https://orgchart.symper.vn/',
         systemRole: "https://orgchart.symper.vn/",
         userRole: "https://orgchart.symper.vn/",
-        permission: "https://accesscontrol.symper.vn/"
+        permission: "https://accesscontrol.symper.vn/",
+        dashboard: "https://bi-service.symper.vn/report-and-dashboard/"
     },
     notificationTimeout: {
         success: 10000,

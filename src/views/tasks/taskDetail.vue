@@ -191,10 +191,15 @@ export default {
         },
         taskBreadcrumb(){
             let bsr = this.breadcrumb.taskName;
+            let allDef = this.$store.state.process.allDefinitions;
             if(this.breadcrumb.definitionName){
                 bsr = `App name / ${this.breadcrumb.definitionName} / ${this.breadcrumb.instanceName} / ${bsr}`;
-            }else if(this.isInitInstance && !$.isEmptyObject(this.$store.state.process.allDefinitions)){
-                bsr = `${this.$store.state.process.allDefinitions[this.$route.params.id].name} / Start workflow`
+            }else if(this.isInitInstance && !$.isEmptyObject(allDef)){
+                if(allDef[this.$route.params.id]){
+                    bsr = `${allDef[this.$route.params.id].name} / Start workflow`;
+                }else{
+                    bsr = `... / Start workflow`;
+                }
             }
             return bsr;
         },

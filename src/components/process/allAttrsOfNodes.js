@@ -900,11 +900,15 @@ let allAttrs = {
         "type": "autocomplete",
         "value": "",
         "info": "BPMN.PROPERTYPACKAGES.CALLACTIVITYCALLEDELEMENTPACKAGE.CALLACTIVITYCALLEDELEMENT.DESCRIPTION",
-        "dg": "detail"
+        "dg": "detail",
+        "options": [],
+        "textKey": 'modelName',
+        "valueKey": 'definitionId',
+        "showId": false
     },
     "callactivitycalledelementtype": {
         "title": "Called element type",
-        "type": "select",
+        "type": "text",
         "value": "id",
         "info": "BPMN.PROPERTYPACKAGES.CALLACTIVITYCALLEDELEMENTTYPEPACKAGE.CALLACTIVITYCALLEDELEMENTTYPE.DESCRIPTION",
         "dg": "detail",
@@ -1034,7 +1038,18 @@ let allAttrs = {
         "type": "script",
         "value": '',
         "info": "BPMN.PROPERTYPACKAGES.CONDITIONSEQUENCEFLOWPACKAGE.CONDITIONSEQUENCEFLOWPACKAGE.DESCRIPTION",
-        "dg": "formula"
+        "dg": "formula",
+        toXML: {
+            "symper_position": "el",
+            "name": "conditionExpression",
+            "superClass": ["Element"],
+            "properties": [{
+                "name": "text",
+                "isBody": true,
+                "type": "String"
+            }]
+        },
+        pushToXML: attrToXMLMethods.conditionExpressionMethod,
     },
     "defaultflow": {
         "title": "Default flow",
@@ -1969,6 +1984,14 @@ let allAttrs = {
             }]
         },
         pushToXML: attrToXMLMethods.documentationMethod
+    },
+    text: {
+        "title": "Text",
+        "type": "text",
+        "value": "",
+        "info": "BPMN.PROPERTYPACKAGES.DOCUMENTATIONPACKAGE.DOCUMENTATION.DESCRIPTION",
+        "dg": "general",
+        pushToXML: attrToXMLMethods.notPushToXML
     },
 }
 

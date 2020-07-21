@@ -61,21 +61,32 @@ Vue.prototype.$goToPage = function(url, title, pageInstanceKey = false) {
     });
 
     let urlMap = this.$store.state.app.urlToTabTitleMap;
-    this.$store.commit('app/changeUrlsToTabs', {
+    let urlInfo = {
         url: url,
         routeName: routeObj.name,
         title: title,
         pageInstanceKey: pageInstanceKey,
         routeParams: util.cloneDeep(params)
-    });
+    };
+    this.$store.commit('app/changeUrlsToTabs', urlInfo);
     activeTabIndex = Object.keys(urlMap).length - 1;
 
     this.$store.commit('app/updateCurrentTabIndex', activeTabIndex);
     if (routeObj.name) {
-        this.$router.push({
-            name: routeObj.name,
-            params: util.cloneDeep(params)
-        });
+        if (routeObj.name == this.$route.name) {
+            this.$router.push({
+                name: 'symperHiddenRedirectComponent',
+                params: {
+                    urlInfo: urlInfo,
+                    pageInstanceKey: Date.now()
+                }
+            });
+        } else {
+            this.$router.push({
+                name: routeObj.name,
+                params: util.cloneDeep(params)
+            });
+        }
     } else {
         this.$snotifyError('Url not found');
     }

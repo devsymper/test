@@ -177,5 +177,20 @@ export default {
 
             bizObj.loopCharacteristics['symper:collection'] = attr.value;
         }
+    },
+
+    conditionExpressionMethod(el, elKey, attr, bpmnModeler, attrName) {
+
+        if (el.businessObject && attr.value.trim() != '') {
+            let moddle = bpmnModeler.get('moddle');
+            let bizObj = el.businessObject;
+            let elTagName = attr.toXML.name;
+
+            let newEl = moddle.create("bpmn:FormalExpression");
+            newEl['xsi:type'] = "tFormalExpression";
+            newEl.text = "<![CDATA[" + attr.value + "]]>";
+            newEl.body = "<![CDATA[" + attr.value + "]]>";
+            bizObj[elTagName] = newEl;
+        }
     }
 }

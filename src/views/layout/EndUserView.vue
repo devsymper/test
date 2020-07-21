@@ -120,7 +120,7 @@ export default {
             }
         },
         closeTab(idx){            
-            let urlKey = Object.keys(this.tabUrlItems)[idx];
+            let urlKey = Object.keys(this.$store.state.app.urlToTabTitleMap)[idx];
             let urlInfo = this.tabUrlItems[urlKey];
 
             this.$store.commit("app/removeTab", urlKey);

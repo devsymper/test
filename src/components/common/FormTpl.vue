@@ -250,6 +250,14 @@ const inputTypeConfigs = {
             if(config.onSearch){
                 props.onSearch  = config.onSearch;
             }
+
+            if(config.textKey){
+                props.textKey = config.textKey;
+            }
+
+            if(config.valueKey){
+                props.valueKey = config.valueKey;
+            }
             return props;
         }
     },
