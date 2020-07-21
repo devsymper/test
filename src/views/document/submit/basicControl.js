@@ -171,8 +171,11 @@ export default class BasicControl extends Control {
                 value = numbro(value).format(this.numberFormat)
 
         } else if (this.type == 'date') {
-            // alert('ok')
-            value = moment(value).format(this.formatDate)
+            console.log('gáde', value);
+            console.log('gáde', this.formatDate);
+            value = moment(value).format(this.formatDate);
+            console.log('gáde', value);
+
         }
         if (this.type == 'label') {
             this.ele.text(value)
@@ -415,8 +418,9 @@ export default class BasicControl extends Control {
     renderDateControl() {
         this.ele.attr('type', 'text');
         this.formatDate = (this.controlProperties.hasOwnProperty('formatDate')) ? this.controlProperties.formatDate.value : "";
-        this.value = moment(this.value).format(this.formatDate);
         if (this.checkDetailView()) return;
+        this.value = moment(this.value).format(this.formatDate);
+
         let thisObj = this;
         if (this.formatDate != "" && typeof this.formatDate === 'string')
             this.ele.on('change', function(e) {
