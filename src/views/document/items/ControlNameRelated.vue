@@ -81,7 +81,13 @@ import {documentApi} from './../../../api/Document'
 export default {
     computed:{
         sDocumentStore(){
-            return this.$store.state.document.documentProps
+            return this.$store.state.document.documentProps[this.instance]
+        }
+    },
+    props:{
+        instance:{
+            type:Number,
+            default:Date.now()
         }
     },
     data(){

@@ -8,57 +8,30 @@ import { type } from 'jquery';
 const addControl = (state, params) => {
     let id = params.id
     let prop = params.props
+    let instance = params.instance
     if (params.hasOwnProperty('from')) {
         if (params.from == 'submit') {
 
         } else {
-            setTreeListControlInDoc(state);
+            setTreeListControlInDoc(state, instance);
         }
     } else {
-        setTreeListControlInDoc(state);
+        setTreeListControlInDoc(state, instance);
     }
-    Vue.set(state.editor.allControl, id, prop);
+    Vue.set(state.editor[instance].allControl, id, prop);
 
 };
 
 const addToListInputInDocument = (state, params) => {
     let name = params.name
     let control = params.control
+    let instance = params.instance
 
     // state.editor.allControl[id] = prop;
-    Vue.set(state.submit.listInputInDocument, name, control);
+    Vue.set(state.submit[instance].listInputInDocument, name, control);
 };
-const changeControlSubmitProps = (state, params) => {
-    let name = params.name
-    let key = params.key
-    let value = params.value
-        // state.editor.allControl[id] = prop;
-
-    Vue.set(state.submit.listInputInDocument[name], key, value);
-};
-
-
-
-const restoreState = (state) => {
-    state.editor.allControl = {};
-    state.editor.currentSelectedControl = { formulas: {}, properties: { name: {}, display: {}, print: {} }, type: '' };
-    state.submit = {
-        listInputInDocument: {
-
-        },
-        dataInputCache: {
-
-        },
-        docStatus: 'init',
-        isDetailView: false,
-        SQLLiteDB: {}
-
-    }
-    setTreeListControlInDoc(state)
-}
-
 // ham xây dựng dữ liệu cho treeview ở bên sidebar trái khi thay đổi thuộc tính control
-function setTreeListControlInDoc(state) {
+function setTreeListControlInDoc(state, instance) {
     let treeData = [{
         name: 'Control',
         icon: 'icon/ic_image.png',
@@ -67,7 +40,7 @@ function setTreeListControlInDoc(state) {
 
         ],
     }];
-    let allControl = util.cloneDeep(state.editor.allControl);
+    let allControl = util.cloneDeep(state.editor[instance].allControl);
     for (let controlId in allControl) {
         let control = allControl[controlId];
         let type = control.type;
@@ -81,8 +54,6 @@ function setTreeListControlInDoc(state) {
             title = props.title.value;
             name = props.name.value;
         }
-
-
         if (type == 'table') {
             let listFields = control.listFields;
             let children = [];
@@ -100,25 +71,26 @@ function setTreeListControlInDoc(state) {
             treeData[0].children.push({ name: name + " - " + title, active: false, icon: getIconFromType(type), id: controlId })
         }
     }
-    state.editor.listControlTreeData = treeData;
-    // Vue.set(state.editor, listControlTreeData, treeData)
+    Vue.set(state.editor[instance], 'listControlTreeData', treeData)
 }
 
 const addControlToTable = (state, params) => {
     let id = params.id
     let prop = params.props
     let tableId = params.tableId
-    if (state.editor.allControl[tableId]['listFields']) {} else {
-        state.editor.allControl[tableId]['listFields'] = {};
+    let instance = params.instance
+
+    if (state.editor[instance].allControl[tableId]['listFields']) {} else {
+        state.editor[instance].allControl[tableId]['listFields'] = {};
     }
-    Vue.set(state.editor.allControl[tableId]['listFields'], id, prop);
-    setTreeListControlInDoc(state);
+    Vue.set(state.editor[instance].allControl[tableId]['listFields'], id, prop);
+    setTreeListControlInDoc(state, instance);
 };
 const addCurrentControl = (state, control) => {
-    Vue.set(state.editor.currentSelectedControl, 'formulas', control.formulas);
-    Vue.set(state.editor.currentSelectedControl, 'id', control.id);
+    let instance = control.instance
+    Vue.set(state.editor[instance].currentSelectedControl, 'formulas', control.formulas);
+    Vue.set(state.editor[instance].currentSelectedControl, 'id', control.id);
 
-    // state.editor.currentSelectedControl['formulas'] = control.formulas
     let groups = { name: {}, display: {}, print: {} };
     if (control.properties != undefined && typeof control.properties != 'undefined') {
         Object.filter = (obj, predicate) =>
@@ -132,9 +104,7 @@ const addCurrentControl = (state, control) => {
         let propsTypeIsPrint = Object.filter(control.properties, prop => prop.groupType == 'print')
         groups = { name: propsTypeIsName, display: propsTypeIsDisplay, print: propsTypeIsPrint };
     }
-    // state.editor.currentSelectedControl['properties'] = groups
-    Vue.set(state.editor.currentSelectedControl, 'properties', groups);
-    console.log('currentSelectedControl', state.editor.currentSelectedControl);
+    Vue.set(state.editor[instance].currentSelectedControl, 'properties', groups);
 
 };
 const updateCurrentControlProps = (state, params) => {
@@ -145,7 +115,7 @@ const updateCurrentControlProps = (state, params) => {
         Vue.set(state.editor.currentSelectedControl.properties[group][prop], typeProp, value);
     }
     // hàm xóa control đang chọn ra khỏi store
-const resetCurrentControl = (state, control) => {
+const resetCurrentControl = (state, params) => {
 
     let currentSelectedControl = {
         // control đang được click bởi người dùng
@@ -161,63 +131,68 @@ const resetCurrentControl = (state, control) => {
         type: "",
         id: ""
     }
-    Vue.set(state.editor, 'currentSelectedControl', currentSelectedControl);
+    let instance = params.instance
+    Vue.set(state.editor[instance], 'currentSelectedControl', currentSelectedControl);
 }
 const updateProp = (state, params) => {
     let id = params.id
     let name = params.name
     let value = params.value
     let tableId = params.tableId
+    let instance = params.instance
     let type = params.type;
     if (tableId != '0') {
-        if (state.editor.allControl[tableId]['listFields'][id]['properties'][name]) {
-            state.editor.allControl[tableId]['listFields'][id]['properties'][name][type] = value
+        if (state.editor[instance].allControl[tableId]['listFields'][id]['properties'][name]) {
+            state.editor[instance].allControl[tableId]['listFields'][id]['properties'][name][type] = value
 
-        } else if (state.editor.allControl[tableId]['listFields'][id]['formulas'][name]) {
-            state.editor.allControl[tableId]['listFields'][id]['formulas'][name][type] = value
+        } else if (state.editor[instance].allControl[tableId]['listFields'][id]['formulas'][name]) {
+            state.editor[instance].allControl[tableId]['listFields'][id]['formulas'][name][type] = value
         }
 
     } else {
-        if (state.editor.allControl[id]['properties'][name]) {
-            state.editor.allControl[id]['properties'][name][type] = value
-        } else if (state.editor.allControl[id]['formulas'][name]) {
-            state.editor.allControl[id]['formulas'][name][type] = value
+        if (state.editor[instance].allControl[id]['properties'][name]) {
+            state.editor[instance].allControl[id]['properties'][name][type] = value
+        } else if (state.editor[instance].allControl[id]['formulas'][name]) {
+            state.editor[instance].allControl[id]['formulas'][name][type] = value
         }
     }
-    setTreeListControlInDoc(state);
+    setTreeListControlInDoc(state, instance);
 }
 const updateFormulasId = (state, params) => {
     let id = params.id
     let name = params.name
     let value = params.value
+    let instance = params.instance
     let tableId = params.tableId
     if (tableId != 0 && tableId != '0') {
-        if (state.editor.allControl[tableId]['listFields'][id]['formulas'][name]) {
-            state.editor.allControl[tableId]['listFields'][id]['formulas'][name]['formulasId'] = value
+        if (state.editor[instance].allControl[tableId]['listFields'][id]['formulas'][name]) {
+            state.editor[instance].allControl[tableId]['listFields'][id]['formulas'][name]['formulasId'] = value
         }
 
     } else {
-        if (state.editor.allControl[id]['formulas'][name]) {
-            state.editor.allControl[id]['formulas'][name]['formulasId'] = value
+        if (state.editor[instance].allControl[id]['formulas'][name]) {
+            state.editor[instance].allControl[id]['formulas'][name]['formulasId'] = value
         }
     }
 }
 
 const minimizeControl = (state, params) => {
-    for (let i of Object.keys(state.editor.allControl)) {
-        if (state.editor.allControl[i]['listFields']) {
-            for (let j of Object.keys(state.editor.allControl[i]['listFields'])) {
+    let instance = params.instance
+    let allControl = state.editor[instance].allControl;
+    for (let i of Object.keys(allControl)) {
+        if (allControl[i]['listFields']) {
+            for (let j of Object.keys(allControl[i]['listFields'])) {
                 if (params.allId.indexOf(j) === -1) {
-                    delete state.editor.allControl[i]['listFields'][j];
+                    delete allControl[i]['listFields'][j];
                 }
             }
         } else {
             if (params.allId.indexOf(i) === -1) {
-                delete state.editor.allControl[i];
+                delete allControl[i];
             }
         }
     }
-    setTreeListControlInDoc(state);
+    setTreeListControlInDoc(state, instance);
 
 }
 
@@ -229,24 +204,22 @@ const addInstanceSubmitDB = (state, params) => {
     let instance = params.instance
     let sqlLite = params.sqlLite
         // state.editor.allControl[id] = prop;
-    Vue.set(state.submit.SQLLiteDB, instance, sqlLite);
+    Vue.set(state.submit[instance].SQLLiteDB, instance, sqlLite);
 }
+
 
 /**
  * hàm thêm các giá trị cho listInputInDocument -- submit store
  */
 
 const updateListInputInDocument = (state, params) => {
-    console.log('jhsd', util.cloneDeep(params));
-
     let key = params.key
     let controlName = params.controlName;
     let value = params.value
-    if (state.submit.listInputInDocument.hasOwnProperty(controlName)) {
-        Vue.set(state.submit.listInputInDocument[controlName], key, value);
+    let instance = params.instance
+    if (state.submit[instance].listInputInDocument.hasOwnProperty(controlName)) {
+        Vue.set(state.submit[instance].listInputInDocument[controlName], key, value);
     }
-    console.log('jhsd', state.submit.listInputInDocument[controlName]);
-
 }
 const addToRootControl = (state, params) => {
     let key = params.key
@@ -259,34 +232,37 @@ const addToImpactedFieldsList = (state, params) => {
 }
 
 const addToDocumentSubmitStore = (state, params) => {
-    console.log('jhsd', params);
     let key = params.key
     let value = params.value
-    Vue.set(state.submit, key, value);
+    let instance = params.instance
+    Vue.set(state.submit[instance], key, value);
 }
 const addToDocumentDetailStore = (state, params) => {
     let key = params.key
     let value = params.value
-    Vue.set(state.detail, key, value);
+    let instance = params.instance
+    Vue.set(state.detail[instance], key, value);
 }
-const addToDocumentStore = (state, params) => {
+const changeViewType = (state, params) => {
     let key = params.key
     let value = params.value
-    Vue.set(state, key, value);
+    Vue.set(state.viewType, key, value);
+}
+const addToDocumentPropsEditor = (state, params) => {
+    let key = params.key
+    let value = params.value
+    Vue.set(state.documentProps, key, value);
 }
 const addToDocumentEditorStore = (state, params) => {
     let key = params.key
+    let instance = params.instance
     let value = params.value
-    Vue.set(state.editor, key, value);
+    Vue.set(state.editor[instance], key, value);
 }
-const resetSubmitStore = (state, params) => {
+const setDefaultSubmitStore = (state, params) => {
     let value = {
-        listInputInDocument: {
-
-        },
-        dataInputCache: {
-
-        },
+        listInputInDocument: {},
+        dataInputCache: {},
         docStatus: 'init',
         SQLLiteDB: {},
         rootControl: {},
@@ -301,7 +277,43 @@ const resetSubmitStore = (state, params) => {
         localRelated: {},
         workflowVariable: {}
     }
-    Vue.set(state, 'submit', value);
+    let instance = params.instance;
+    Vue.set(state.submit, instance, value);
+}
+const setDefaultEditorStore = (state, params) => {
+    let value = {
+        allControl: {
+
+        },
+        currentSelectedControl: {
+            // control đang được click bởi người dùng
+            properties: {
+                name: {},
+                display: {},
+                print: {},
+
+            },
+            formulas: {
+
+            },
+            type: "",
+            id: ""
+        },
+        listControlTreeData: [],
+        allControlForTableOption: []
+    }
+    let instance = params.instance;
+    Vue.set(state.editor, instance, value);
+}
+const setDefaultDetailStore = (state, params) => {
+    let value = {
+        allData: {
+
+        },
+
+    }
+    let instance = params.instance;
+    Vue.set(state.detail, instance, value);
 }
 const addToRelatedLocalFormulas = (state, params) => {
     let curListRelate = state.submit.localRelated;
@@ -339,9 +351,7 @@ export {
     addControlToTable,
     updateProp,
     minimizeControl,
-    restoreState,
     addToListInputInDocument,
-    changeControlSubmitProps,
     addInstanceSubmitDB,
     updateListInputInDocument,
     updateFormulasId,
@@ -349,12 +359,15 @@ export {
     addToImpactedFieldsList,
     addToDocumentSubmitStore,
     addToDocumentDetailStore,
-    addToDocumentStore,
+    changeViewType,
+    addToDocumentPropsEditor,
     addToDocumentEditorStore,
     setAllDocuments,
     resetCurrentControl,
     updateCurrentControlProps,
     addToRelatedLocalFormulas,
-    resetSubmitStore
+    setDefaultSubmitStore,
+    setDefaultEditorStore,
+    setDefaultDetailStore
 
 };

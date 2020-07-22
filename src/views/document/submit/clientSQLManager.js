@@ -41,7 +41,7 @@ export default class ClientSQLManager {
          * @param {String} keyInstance 
          */
     static getInstanceDB(keyInstance) {
-            return dataSubmitStore.SQLLiteDB[keyInstance]
+            return dataSubmitStore[keyInstance].SQLLiteDB[keyInstance]
         }
         /**
          * hoangnd:26/5/2020

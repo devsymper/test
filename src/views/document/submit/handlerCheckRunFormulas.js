@@ -6,22 +6,28 @@ import sDocument from './../../../store/document'
  * Đánh dấu là control này đã được bind giá trị
  * @param {string} fieldName
  */
-const markBinedField = function(fieldName) {
-    let rootChangeFieldName = sDocument.state.submit.rootChangeFieldName;
-    let docStatus = sDocument.state.submit.docStatus;
-    let impactedFieldsList = sDocument.state.submit.impactedFieldsList;
-    let impactedFieldsListWhenStart = sDocument.state.submit.impactedFieldsListWhenStart;
-    if (docStatus == 'init') {
+const markBinedField = function(instance, fieldName) {
+    let sDocumentSubmit = sDocument.state.submit[instance];
+    let rootChangeFieldName = sDocumentSubmit.rootChangeFieldName;
+    let docStatus = sDocumentSubmit.docStatus;
+    let impactedFieldsList = sDocumentSubmit.impactedFieldsList;
+    let impactedFieldsListWhenStart = sDocumentSubmit.impactedFieldsListWhenStart;
+    console.log(sDocumentSubmit);
+    console.log(instance);
+
+    if (docStatus === 'init') {
         impactedFieldsListWhenStart[fieldName] = true;
         store.commit("document/addToDocumentSubmitStore", {
             key: 'impactedFieldsListWhenStart',
-            value: impactedFieldsListWhenStart
+            value: impactedFieldsListWhenStart,
+            instance: instance
         });
     } else if (impactedFieldsList.hasOwnProperty(rootChangeFieldName) && impactedFieldsList[rootChangeFieldName].hasOwnProperty(fieldName)) {
         impactedFieldsList[rootChangeFieldName][fieldName] = true;
         store.commit("document/addToDocumentSubmitStore", {
             key: 'impactedFieldsList',
-            value: impactedFieldsList
+            value: impactedFieldsList,
+            instance: instance
         });
 
     }
@@ -31,9 +37,10 @@ const markBinedField = function(fieldName) {
  * Reset lại bộ theo dõi việc bind giá trị cho các control
  * @param {string} fieldToReset
  */
-const resetImpactedFieldsList = function(fieldToReset = null) {
-    let rootChangeFieldName = sDocument.state.submit.rootChangeFieldName;
-    let impactedFieldsList = sDocument.state.submit.impactedFieldsList;
+const resetImpactedFieldsList = function(instance, fieldToReset = null) {
+    let sDocumentSubmit = sDocument.state.submit[instance];
+    let rootChangeFieldName = sDocumentSubmit.rootChangeFieldName;
+    let impactedFieldsList = sDocumentSubmit.impactedFieldsList;
     fieldToReset = fieldToReset === null ? rootChangeFieldName : fieldToReset;
     if (impactedFieldsList.hasOwnProperty(fieldToReset)) {
         for (var j in impactedFieldsList[fieldToReset]) {
@@ -44,7 +51,8 @@ const resetImpactedFieldsList = function(fieldToReset = null) {
     }
     store.commit("document/addToDocumentSubmitStore", {
         key: 'impactedFieldsList',
-        value: impactedFieldsList
+        value: impactedFieldsList,
+        instance: instance
     });
 }
 
@@ -52,12 +60,13 @@ const resetImpactedFieldsList = function(fieldToReset = null) {
  * Kiểm tra xem control fieldName có thể chạy công thức để bind giá trị hay không
  * @param {string} fieldName
  */
-const checkCanBeBind = function(fieldName) {
-    let docStatus = sDocument.state.submit.docStatus;
-    let impactedFieldsList = sDocument.state.submit.impactedFieldsList;
-    let listInputInDocument = sDocument.state.submit.listInputInDocument;
-    let rootChangeFieldName = sDocument.state.submit.rootChangeFieldName;
-    let impactedFieldsListWhenStart = sDocument.state.submit.impactedFieldsListWhenStart;
+const checkCanBeBind = function(instance, fieldName) {
+    let sDocumentSubmit = sDocument.state.submit[instance];
+    let docStatus = sDocumentSubmit.docStatus;
+    let impactedFieldsList = sDocumentSubmit.impactedFieldsList;
+    let listInputInDocument = sDocumentSubmit.listInputInDocument;
+    let rootChangeFieldName = sDocumentSubmit.rootChangeFieldName;
+    let impactedFieldsListWhenStart = sDocumentSubmit.impactedFieldsListWhenStart;
     // return true;
     // Nếu đã được bind dữ liệu trước đó rồi thì ko cần bind nữa
     if (impactedFieldsList[rootChangeFieldName] !== undefined && impactedFieldsList[rootChangeFieldName][fieldName] === true) {

@@ -57,12 +57,18 @@ export default {
     components:{
         'form-save-doc' : FormTpl
     },
+    props:{
+        instance:{
+            type:Number,
+            default:Date.now()
+        }
+    },
     computed: {
         editorStore(){ 
-            return this.$store.state.document.editor;
+            return this.$store.state.document.editor[this.instance];
         },
         documentProps(){
-            return this.$store.state.document.documentProps
+            return this.$store.state.document.documentProps[this.instance];
         }
     },
     data(){
@@ -94,7 +100,7 @@ export default {
                             }
                             let docProps = util.cloneDeep(thisCpn.documentProps);
                                 docProps.name.errorMessage = message;
-                                thisCpn.$store.commit('document/addToDocumentStore',{key: 'documentProps',value :docProps})
+                                thisCpn.$store.commit('document/addToDocumentPropsEditor',{key: thisCpn.instance,value :docProps})
                         }
                        
                     })
@@ -133,7 +139,7 @@ export default {
                     }
                 }
                 docProps.name.errorMessage = message;
-                this.$store.commit('document/addToDocumentStore',{key: 'documentProps',value :docProps})
+                this.$store.commit('document/addToDocumentPropsEditor',{key: this.instance,value :docProps})
             }
             
         },
@@ -200,7 +206,7 @@ export default {
                     value: (props.note != undefined) ? props.note : '',
                 }
             }
-            this.$store.commit('document/addToDocumentStore',{key: 'documentProps',value :docProps})
+            this.$store.commit('document/addToDocumentPropsEditor',{key: this.instance,value :docProps})
         }
         
     },

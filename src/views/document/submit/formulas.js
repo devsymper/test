@@ -262,7 +262,7 @@ export default class Formulas {
 
 
     // Hàm chạy công thức cho autocomplete
-    handleRunAutoCompleteFormulas(search, dataInput = false) {
+    handleRunAutoCompleteFormulas(dataInput = false) {
         let listSyql = this.getReferenceFormulas(this.formulas);
         // let fieldSelect = this.detectFieldSelect();
         // let where = " WHERE (";
@@ -277,6 +277,7 @@ export default class Formulas {
         // }
         if (listSyql != null && listSyql.length > 0) {
             let syql = listSyql[0].trim();
+            console.log('ág', dataInput);
             syql = this.replaceParamsToData(dataInput, syql);
             syql = syql.replace('ref(', '');
             syql = syql.substring(0, syql.length - 1);
@@ -384,7 +385,7 @@ export default class Formulas {
     }
 
     getDataSubmitInStore() {
-        return dataSubmitStore.listInputInDocument;
+        return dataSubmitStore[this.keyInstance].listInputInDocument;
     }
 
     /**
@@ -418,7 +419,7 @@ export default class Formulas {
     getInputControl() {
             return this.inputControl;
         }
-        /**
+        /** 
          * Hàm lấy dữ liệu của các control trong store để chuân bị cho việc run formulas
          * dataInput : {controlName : value}
          */

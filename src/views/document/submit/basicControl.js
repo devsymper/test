@@ -81,16 +81,6 @@ export default class BasicControl extends Control {
             this.ele.css({ 'display': 'none' })
         }
 
-        if (this.controlFormulas.hasOwnProperty('autocomplete') && this.controlFormulas.autocomplete.instance != undefined) {
-            this.addAutoCompleteEvent();
-        }
-        this.ele.on('change', function(e) {
-            SYMPER_APP.$evtBus.$emit('document-submit-input-change', { controlName: thisObj.controlProperties.name.value, val: $(e.target).val() })
-        })
-
-
-
-
         if (this.ele.hasClass('s-control-number')) {
 
             this.renderNumberControl();
@@ -138,9 +128,65 @@ export default class BasicControl extends Control {
             this.ele.addClass('detail-view');
             this.ele.attr('disabled', 'disabled');
         }
-        if (sDocument.state.viewType != 'submit') {
+        if (sDocument.state.viewType[this.curParentInstance] != 'submit') {
             this.setValueControl();
         }
+        this.setEvent();
+
+    }
+    checkAutoCompleteControl() {
+        if (this.controlFormulas.hasOwnProperty('autocomplete') && this.controlFormulas.autocomplete.instance != undefined) {
+            return true;
+        }
+        return false;
+    }
+    setEvent() {
+
+        let thisObj = this;
+        this.ele.on('change', function(e) {
+            SYMPER_APP.$evtBus.$emit('document-submit-input-change', { controlName: thisObj.controlProperties.name.value, val: $(e.target).val() })
+        })
+        this.ele.on('keyup', function(e) {
+            if (thisObj.type == 'user') {
+                SYMPER_APP.$evtBus.$emit('document-submit-user-input-change', e)
+            }
+            if (thisObj.checkAutoCompleteControl()) {
+                let fromSelect = false;
+                let formulasInstance = (fromSelect) ? thisObj.controlFormulas.formulas.instance : thisObj.controlFormulas.autocomplete.instance;
+                SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-key-event', {
+                    e: e,
+                    autocompleteFormulasInstance: formulasInstance,
+                    isSelect: false,
+                    controlTitle: thisObj.title,
+                    controlName: thisObj.controlProperties.name.value,
+                    val: $(e.target).val()
+                })
+            }
+            // if {
+
+            // }
+
+        })
+        this.ele.on('click', function(e) {
+            store.commit("document/addToDocumentSubmitStore", {
+                key: 'currentCellSelected',
+                value: null,
+                instance: thisObj.curParentInstance
+            });
+            store.commit("document/addToDocumentSubmitStore", {
+                key: 'currentTableInteractive',
+                value: null,
+                instance: thisObj.curParentInstance
+            });
+        })
+        this.ele.on('focus', function(e) {
+            if (thisObj.checkAutoCompleteControl()) {
+                $(this).addClass('autocompleting')
+                let event = e;
+                event['controlName'] = thisObj.name;
+                SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-input', event)
+            }
+        })
 
     }
 
@@ -358,9 +404,7 @@ export default class BasicControl extends Control {
         } else {
             this.ele.attr('type', 'text');
             this.ele.parent().css({ display: 'block' })
-            this.ele.on('keyup', function(e) {
-                SYMPER_APP.$evtBus.$emit('document-submit-user-input-change', e)
-            })
+
         }
     }
     renderLabelControl() {
@@ -388,11 +432,13 @@ export default class BasicControl extends Control {
              */
             store.commit("document/addToDocumentSubmitStore", {
                 key: 'currentCellSelected',
-                value: null
+                value: null,
+                instance: thisObj.curParentInstance
             });
             store.commit("document/addToDocumentSubmitStore", {
                 key: 'currentTableInteractive',
-                value: null
+                value: null,
+                instance: thisObj.curParentInstance
             });
             $(this).addClass('autocompleting');
             let formulasInstance = thisObj.controlFormulas.formulas.instance;
@@ -424,6 +470,8 @@ export default class BasicControl extends Control {
         if (this.formatDate != "" && typeof this.formatDate === 'string')
             this.ele.on('change', function(e) {
                 thisObj.value = $(this).val();
+                console.log('á', thisObj.value);
+                console.log('á', thisObj.formatDate);
                 $(this).val(moment($(this).val()).format(thisObj.formatDate))
             })
         this.ele.on('click', function(e) {
@@ -452,29 +500,12 @@ export default class BasicControl extends Control {
     addAutoCompleteEvent(fromSelect = false) {
         let thisObj = this;
         this.ele.on('input', function(e) {
-            store.commit("document/addToDocumentSubmitStore", {
-                key: 'currentCellSelected',
-                value: null
-            });
-            store.commit("document/addToDocumentSubmitStore", {
-                key: 'currentTableInteractive',
-                value: null
-            });
-            let event = e;
-            event['controlName'] = thisObj.name;
-            SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-input', event)
+
         })
         this.ele.on('keyup', function(e) {
-            let formulasInstance = (fromSelect) ? thisObj.controlFormulas.formulas.instance : thisObj.controlFormulas.autocomplete.instance;
-            SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-key-event', {
-                e: e,
-                autocompleteFormulasInstance: formulasInstance,
-                isSelect: false,
-                controlTitle: thisObj.title,
-                controlName: thisObj.controlProperties.name.value,
-                val: $(e.target).val()
-            })
+
         })
+
     }
 
 

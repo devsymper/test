@@ -45,10 +45,10 @@ export default {
     },   
     computed: {
         sDocumentEditor() {
-            return this.$store.state.document.editor;
+            return this.$store.state.document.editor[this.keyInstance];
         },
         sDocumentSubmit() {
-            return this.$store.state.document.submit;
+            return this.$store.state.document.submit[this.keyInstance];
         }
     },
     data() {
@@ -63,11 +63,15 @@ export default {
         this.documentSize = "21cm";
     },
     created(){
-        this.$store.commit("document/addToDocumentStore", {
-            key: 'viewType',
+        this.$store.commit("document/setDefaultSubmitStore",{instance:this.keyInstance});
+        this.$store.commit("document/setDefaultDetailStore",{instance:this.keyInstance});
+        this.$store.commit("document/setDefaultEditorStore",{instance:this.keyInstance});
+        
+        let thisCpn = this;
+        this.$store.commit("document/changeViewType", {
+            key: thisCpn.keyInstance,
             value: 'detail'
         });
-        let thisCpn = this;
         if (this.docObjectId != 0) {
             this.docObjId = this.docObjectId;
         } else if (this.$route.name == "detailDocument" || this.$route.name == "printDocument") {
@@ -79,16 +83,14 @@ export default {
             if (res.status == 200) {
                 thisCpn.$store.commit("document/addToDocumentSubmitStore", {
                     key: 'listUser',
-                    value: res.data.listObject
+                    value: res.data.listObject,
+                    instance:thisCpn.keyInstance
                 });
             }
             
         })
         .catch(err => {
-            thisCpn.$snotify({
-                    type: "error",
-                    title: "can not save document",
-                });
+           
         })
         .always(() => {
         });
@@ -119,7 +121,7 @@ export default {
                     if (res.status == 200) {
                         let content = res.data.document.content;
                         thisCpn.contentDocument = content;
-                        setDataForPropsControl(res.data.fields); // ddang chay bat dong bo
+                        setDataForPropsControl(res.data.fields, thisCpn.keyInstance,'detail'); // ddang chay bat dong bo
                         setTimeout(() => {
                             thisCpn.processHtml(content);
                         }, 100);
@@ -138,7 +140,8 @@ export default {
                     if (res.status == 200) {
                         thisCpn.$store.commit('document/addToDocumentDetailStore',{
                             key: 'allData',
-                            value: res.data
+                            value: res.data,
+                            instance:thisCpn.keyInstance
                         })
                         thisCpn.loadDocumentStruct(res.data.documentId);
                     }
@@ -151,9 +154,13 @@ export default {
         togglePageSize() {
             this.documentSize = this.documentSize == "21cm" ? "100%" : "21cm";
         },
+        addToListInputInDocument(name,control){
+             this.$store.commit(
+                            "document/addToListInputInDocument",
+                            { name: name, control: control ,instance: this.keyInstance}
+                        );
+        },
         processHtml(content) {
-            console.log(this.sDocumentEditor);
-            
             var allInputControl = $("#sym-submit-" + this.keyInstance).find(
                 ".s-control:not(.bkerp-input-table .s-control)"
             );
@@ -165,7 +172,7 @@ export default {
                 if(this.sDocumentEditor.allControl[id] != undefined){   // ton tai id trong store
                     let idField = this.sDocumentEditor.allControl[id].id;
                     let valueInput = this.sDocumentEditor.allControl[id].value
-                    
+                    console.log('asgasd',valueInput);
                     if(controlType == "submit" || controlType == "reset" || controlType == "draft"){
                         $(allInputControl[index]).remove()
                     }
@@ -191,10 +198,7 @@ export default {
                                 valueInput
                             );
                             control.init();
-                            this.$store.commit(
-                                "document/addToListInputInDocument",
-                                { name: controlName, control: control }
-                            );
+                            this.addToListInputInDocument(controlName,control)
                             control.render();
                         }
                         //truong hop la control table
@@ -228,20 +232,11 @@ export default {
                                 childControl.inTable = controlName;
                                
                                 let childControlName = childControlProp.properties.name.value;
-                                 thisCpn.$store.commit(
-                                    "document/addToListInputInDocument",
-                                    {
-                                        name: childControlName,
-                                        control: childControl
-                                    }
-                                );
+                                thisCpn.addToListInputInDocument(childControlName,childControl)
                                 listInsideControls[childControlName] = true;
                             });
                             tableControl.listInsideControls = listInsideControls;
-                            this.$store.commit(
-                                "document/addToListInputInDocument",
-                                { name: controlName, control: tableControl }
-                            );
+                            this.addToListInputInDocument(controlName,tableControl)
                             tableControl.renderTable();
                             tableControl.setData(valueInput);
                         }

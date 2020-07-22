@@ -29,7 +29,7 @@
             <control-tab v-if="tab.id == 'control'">
 
             </control-tab>
-            <list-control-tab v-if="tab.id == 'listControl'">
+            <list-control-tab :instance="instance" v-if="tab.id == 'listControl'">
 
             </list-control-tab>
 
@@ -47,6 +47,12 @@ export default {
     components: {
         'control-tab' : ControlTab,
         'list-control-tab' : ListControlTab,
+    },
+    props:{
+        instance:{
+            type:Number,
+            default:Date.now()
+        }
     },
     data () {
       return {
