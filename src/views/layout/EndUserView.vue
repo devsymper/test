@@ -52,6 +52,7 @@
                             <v-icon>mdi-magnify</v-icon>
                         </v-btn>
                         <v-menu  v-model="isShowDialogNotification"
+                            z-index="161"
                             :close-on-content-click="false"
                             :max-width="452"
                             :min-width="452"
