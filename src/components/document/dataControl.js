@@ -2,6 +2,7 @@ import { GetControlProps } from "./../../components/document/controlPropsFactory
 import store from './../../store'
 import sDocument from './../../store/document'
 import { util } from "./../../plugins/util.js";
+import { RowComp } from "ag-grid-community";
 
 
 /**
@@ -51,7 +52,8 @@ export const setDataForPropsControl = function(fields) {
             let listField = fields[controlId].listFields
             let listChildField = {};
             let i = 0;
-            let colValue = {}
+            let colValue = {};
+            let childObjectId = [];
             for (let childFieldId in listField) {
                 let childControl = GetControlProps(listField[childFieldId].type)
                 let childProperties = childControl.properties
@@ -76,7 +78,6 @@ export const setDataForPropsControl = function(fields) {
                         } else {
                             childFormulas[k].value = listField[childFieldId]['formulas'][k]
                         }
-
                     })
                 }
                 if (childProperties.hasOwnProperty('name') && sDocument.state.detail.allData != null) {
@@ -86,23 +87,23 @@ export const setDataForPropsControl = function(fields) {
                         let countRow = allData.length;
                         for (let j = 0; j < countRow; j++) {
                             let rowData = allData[j];
+                            if (childObjectId.length < countRow) {
+                                childObjectId.push(rowData['document_object_id']);
+                            }
                             if (!colValue.hasOwnProperty(controlName)) {
                                 colValue[controlName] = []
                             }
-                            colValue[controlName].push(rowData[controlName])
+                            colValue[controlName].push(rowData[controlName]);
                         }
                     }
-
-
                 }
                 listChildField[childFieldId] = { id: childId, properties: childProperties, formulas: childFormulas, type: childType }
                 i++;
             }
+            colValue['childObjectId'] = childObjectId;
             addToAllControlInDoc(controlId, { id: id, properties: properties, formulas: formulas, type: fields[controlId].type, listFields: listChildField, value: colValue });
         }
-
     }
-
 }
 
 function addToAllControlInDoc(controlId, control) {

@@ -723,6 +723,7 @@ export default {
                             tableControl.renderTable();
                             tableControl.setData(valueInput);
                             columnsTableSqlLite['s_table_id_sql_lite'] = 'INTEGER'
+                            columnsTableSqlLite['childObjectId'] = 'INTEGER'
                             ClientSQLManager.createTable(this.keyInstance,controlName,columnsTableSqlLite);
                             this.$store.commit(
                                 "document/addToListInputInDocument",
@@ -970,6 +971,11 @@ export default {
             let listInput = this.sDocumentSubmit.listInputInDocument;
             let indexCol = tableControl.tableInstance.colName2Idx;
             let dataTable = {};
+            let columnObjectIdIndex = tableControl.tableInstance.getColumnIndexFromControlName('childObjectId');
+            let dataColObjectId = tableControl.tableInstance.tableInstance.getDataAtCol(
+                    columnObjectIdIndex
+                );
+            dataTable[tableControl.name] = dataColObjectId;
             for (let i in indexCol) {
                 let id = "field_" + listInput[i].idField;
                 let dataCol = tableControl.tableInstance.tableInstance.getDataAtCol(
@@ -986,7 +992,6 @@ export default {
                 dataCol = (listInput[i].type != 'number' && dataCol == "" ) ? [""] : dataCol;
                 dataTable[id] = dataCol;
             }
-            console.log(dataTable);
             
             return dataTable;
         },

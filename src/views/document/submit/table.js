@@ -831,8 +831,10 @@ export default class Table {
 
         }
         // thêm cột ẩn là id của sqllite
+        columns.push({ data: 'childObjectId', type: 'numeric' });
         columns.push({ data: 's_table_id_sql_lite', type: 'numeric' });
         hiddenColumns.push(columns.length - 1);
+        hiddenColumns.push(columns.length - 2);
         return {
             headerNames: headerName,
             columns: columns,
