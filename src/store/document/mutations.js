@@ -279,6 +279,30 @@ const addToDocumentEditorStore = (state, params) => {
     let value = params.value
     Vue.set(state.editor, key, value);
 }
+const resetSubmitStore = (state, params) => {
+    let value = {
+        listInputInDocument: {
+
+        },
+        dataInputCache: {
+
+        },
+        docStatus: 'init',
+        SQLLiteDB: {},
+        rootControl: {},
+        impactedFieldsList: {},
+        impactedFieldsListWhenStart: {},
+        rootChangeFieldName: null,
+        currentTableInteractive: null,
+        currentCellSelected: null,
+        currentControlAutoComplete: null,
+        submitFormulas: null,
+        listUser: null,
+        localRelated: {},
+        workflowVariable: {}
+    }
+    Vue.set(state, 'submit', value);
+}
 const addToRelatedLocalFormulas = (state, params) => {
     let curListRelate = state.submit.localRelated;
     let key = params.key
@@ -330,7 +354,7 @@ export {
     setAllDocuments,
     resetCurrentControl,
     updateCurrentControlProps,
-    addToRelatedLocalFormulas
-
+    addToRelatedLocalFormulas,
+    resetSubmitStore
 
 };
