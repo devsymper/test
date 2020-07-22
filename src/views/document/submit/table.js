@@ -477,9 +477,14 @@ export default class Table {
                 let formulasInstance = controlInstance.controlFormulas['formulas'].instance;
 
                 if (controlInstance.type != 'table') {
-                    let dataInput = this.getDataInputForFormulas(formulasInstance, controlInstance.inTable);
                     if (controlInstance.inTable == this.tableName) {
+                        let dataInput = this.getDataInputForFormulas(formulasInstance, controlInstance.inTable);
                         this.handlerRunFormulasForControlInTable('formulas', controlInstance, dataInput, formulasInstance);
+                    } else {
+                        SYMPER_APP.$evtBus.$emit('run-formulas-control-outside-table', {
+                            formulasInstance: formulasInstance,
+                            controlName: control
+                        })
                     }
                 } else {
                     let dataInput = this.getDataInputForFormulas(formulasInstance, controlInstance.name);

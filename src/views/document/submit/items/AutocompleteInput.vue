@@ -114,7 +114,7 @@ export default {
             else{
                 let autoEL = $(this.$el).detach();
                 $(e.target).parent().append(autoEL);
-                this.positionBox = {'top':'20px','left':'0px'};
+                this.positionBox = {'top':'26px','left':'0px'};
             }
         },
         setSearch(query){

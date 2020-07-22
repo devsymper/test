@@ -208,7 +208,6 @@ export default {
         };
     },
     beforeMount() {
-
         this.docSize = "21cm";
         this.columnsSQLLiteDocument = {};
     },
@@ -268,6 +267,16 @@ export default {
             thisCpn.$store.commit("document/addToDocumentSubmitStore", {
                 key: 'currentControlAutoComplete',
                 value: e.controlName
+            });
+        });
+        this.$evtBus.$on("run-formulas-control-outside-table", e => {
+            let formulasInstance = e.formulasInstance;
+            let controlName = e.controlName;
+            let controlInstance = thisCpn.sDocumentSubmit.listInputInDocument[controlName];
+            let controlId = controlInstance.id
+            let dataInput = this.getDataInputFormulas(formulasInstance);
+            formulasInstance.handleBeforeRunFormulas(dataInput).then(rs=>{
+                thisCpn.handlerAfterRunFormulas(rs,controlId,controlName,'formulas',false)
             });
         });
 
@@ -427,14 +436,14 @@ export default {
             let thisCpn = this
             if(type == 'select'){
                 let dataInput = this.getDataInputFormulas(e.selectFormulasInstance);  
-                e.selectFormulasInstance.handleRunAutoCompleteFormulas('',dataInput).then(res=>{
+                e.selectFormulasInstance.handleRunAutoCompleteFormulas(dataInput).then(res=>{
                     thisCpn.setDataForControlAutocomplete(res,aliasControl,e.controlTitle)
                 });
             }
             else{
                 let aliasControl = e.autocompleteFormulasInstance.autocompleteDetectAliasControl();
                 let dataInput = this.getDataInputFormulas(e.autocompleteFormulasInstance);
-                e.autocompleteFormulasInstance.handleRunAutoCompleteFormulas($(e.e.target).val(),dataInput).then(res=>{
+                e.autocompleteFormulasInstance.handleRunAutoCompleteFormulas(dataInput).then(res=>{
                     thisCpn.setDataForControlAutocomplete(res,aliasControl,e.controlTitle)
                 });
             }
@@ -481,18 +490,6 @@ export default {
                 currentTableInteractive.tableInstance.setDataAtCell(this.sDocumentSubmit.currentCellSelected.row,this.sDocumentSubmit.currentCellSelected.column,time)
                 
             }
-            /**
-             * TH control select ở ngoài table
-             * reset biến chỉ ra là đang tương tác với table và cell nào
-             */
-            this.$store.commit("document/addToDocumentSubmitStore", {
-                key: 'currentCellSelected',
-                value: null
-            });
-            this.$store.commit("document/addToDocumentSubmitStore", {
-                key: 'currentTableInteractive',
-                value: null
-            });
             this.$refs.timeInput.hide();
         },
         afterCheckTimeNotValid(data){
@@ -872,7 +869,7 @@ export default {
                     if(thisCpn.sDocumentSubmit.submitFormulas != undefined){
                         let dataInput = thisCpn.getDataInputFormulas(thisCpn.sDocumentSubmit.submitFormulas);
                         thisCpn.sDocumentSubmit.submitFormulas.handleBeforeRunFormulas(dataInput).then(rs=>{
-                            thisCpn.handlerAfterRunFormulas(rs,controlId,controlName,formulasType,from)
+                            
                         });
                     }
                     thisCpn.$snotify({
@@ -947,17 +944,13 @@ export default {
                         let value = (listInput[controlName].type == 'number' && listInput[controlName].value == "" ) ? 0 : listInput[controlName].value;
                         if(listInput[controlName].type == 'percent'){
                             value = (listInput[controlName].value === "" ) ? 0 : listInput[controlName].value/100;
-                            console.log('agsasd',value);
                         }
                         dataPost[id] = [value];
                         if(listInput[controlName].type == 'checkbox'){
                             dataPost[id] = (value) ? [1] : [0];
                         }
                         if(listInput[controlName].type == 'user'){
-                            console.log('kjhgfxh',value);
                             dataPost[id] =  [0];
-                            console.log('kjhgfxh',dataPost[id]);
-
                         }
                       
                     }
@@ -1074,6 +1067,8 @@ export default {
          */
         runFormulasControlEffected(controlName, controlEffected){
             if(Object.keys(controlEffected).length > 0){
+            console.log('vaosa---',controlName,"==",controlEffected,"------");
+
                 for(let i in controlEffected){
                     if (checkCanBeBind(i)){
                         let controlEffectedInstance = getControlInstanceFromStore(i);
@@ -1095,7 +1090,10 @@ export default {
          * Hàm xử lí duyêt các control bị ảnh hưởng trong 1 công thức bởi 1 control nào đó và thực hiện chạy các công thức của control đó
          */
         runOtherFormulasEffected(controlName, controlEffected,formulasType){
+
             if(Object.keys(controlEffected).length > 0){
+            console.log('vaosa11--',controlName,"==",controlEffected,"------",formulasType);
+
                 for(let i in controlEffected){
                     let controlEffectedInstance = this.sDocumentSubmit.listInputInDocument[i];
                     let controlId = controlEffectedInstance.id
