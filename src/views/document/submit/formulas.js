@@ -88,6 +88,10 @@ export default class Formulas {
         }
 
     }
+
+
+    // hàm xử lí chạy các công thức có khóa local trong script sau khi chạy xong thay thế lại giá tri cho script
+
     async runLocalFormulas(script, listLocal, dataInput) {
         if (listLocal != null && listLocal.length > 0) {
             for (let i = 0; i < listLocal.length; i++) {
@@ -106,6 +110,11 @@ export default class Formulas {
             return script;
         }
     }
+
+    // Hàm xử lí kiểm tra các từ khóa sql trước công thức local() để thay thế lại giá trị tương ứng sau khi chạy công lức local trong script
+    // nếu là IN -> return (1,1,2,3);
+    // Nếu là union || union all -> return table sqlite
+    // nếu là giá trị bình thường thì trả về chuỗi tương ứng
     reverseSqliteDataToFormulas(data, beforeStr) {
         if (data == undefined) {
             return ""
@@ -236,53 +245,55 @@ export default class Formulas {
         return formulas;
     }
 
+
+    // Hàm kiểm tra các tham số của workflow và thay thế lại giá trị tương ứng
+    // hàm này thực hiện khi chạy quy trình
     replaceWorkflowParams(formulas) {
         let workflowVariable = dataSubmitStore.workflowVariable;
-        console.log('gád', workflowVariable);
         for (let param in workflowVariable) {
             let regex = new RegExp("{" + param + "}", "g");
             let value = workflowVariable[param];
             if (!BUILD_IN_FUNCTION.includes(param)) {
                 formulas = formulas.replace(regex, value);
             }
-
         }
-        console.log('gád', formulas);
         return formulas;
     }
 
+
+    // Hàm chạy công thức cho autocomplete
     handleRunAutoCompleteFormulas(search, dataInput = false) {
         let listSyql = this.getReferenceFormulas(this.formulas);
-        let fieldSelect = this.detectFieldSelect();
-        let where = " WHERE (";
-        for (let i = 0; i < fieldSelect.length; i++) {
-            let element = fieldSelect[i];
-            element = element.replace(/(?=as ).*/gi, '');
-            if (i == fieldSelect.length - 1) {
-                where += element + " ILIKE '%" + search + "%' )";
-            } else {
-                where += element + " ILIKE '%" + search + "%' OR";
-            }
-        }
+        // let fieldSelect = this.detectFieldSelect();
+        // let where = " WHERE (";
+        // for (let i = 0; i < fieldSelect.length; i++) {
+        //     let element = fieldSelect[i];
+        //     element = element.replace(/(?=as ).*/gi, '');
+        //     if (i == fieldSelect.length - 1) {
+        //         where += element + " ILIKE '%" + search + "%' )";
+        //     } else {
+        //         where += element + " ILIKE '%" + search + "%' OR";
+        //     }
+        // }
         if (listSyql != null && listSyql.length > 0) {
             let syql = listSyql[0].trim();
             syql = this.replaceParamsToData(dataInput, syql);
             syql = syql.replace('ref(', '');
             syql = syql.substring(0, syql.length - 1);
-            let sql = ""
-            if (/\$\$/.test(syql) == false) {
-                if (/\bWHERE|where\b/.test(syql)) {
-                    where += " AND "
-                    syql = syql.replace(/\bWHERE|where\b/, where);
-                    sql = syql + " LIMIT 20 OFFSET 0";
+            // let sql = ""
+            // if (/\$\$/.test(syql) == false) {
+            //     if (/\bWHERE|where\b/.test(syql)) {
+            //         where += " AND "
+            //         syql = syql.replace(/\bWHERE|where\b/, where);
+            //         sql = syql + " LIMIT 20 OFFSET 0";
 
-                } else {
-                    sql = syql + where + "LIMIT 20 OFFSET 0";
-                }
-            } else {
-                sql = syql;
-            }
-            return this.runSyql(sql);
+            //     } else {
+            //         sql = syql + where + "LIMIT 20 OFFSET 0";
+            //     }
+            // } else {
+            //     sql = syql;
+            // }
+            return this.runSyql(syql);
         } else {
             let formulas = this.replaceParamsToData(dataInput, this.formulas);
             return this.runSQLLiteFormulas(formulas, true);
@@ -381,22 +392,23 @@ export default class Formulas {
      * Đồng thời đẩy vào thông tin về việc control nào thay đổi dẫn đến các control khác thay đổi theo
      */
     setInputControl() {
-        if (this.checkExistFormulas()) {
-            let allRelateName = this.formulas.match(/{[A-Za-z0-9_]+}/gi);
-            if (!allRelateName) {
-                return {};
-            }
-            let names = allRelateName.reduce((obj, name) => {
-                let controlName = name.match(/\w+/g);
-                if (!BUILD_IN_FUNCTION.includes(controlName[0]) && !this.detectWorkflowParams(controlName[0])) {
-                    obj[controlName] = true;
+            if (this.checkExistFormulas()) {
+                let allRelateName = this.formulas.match(/{[A-Za-z0-9_]+}/gi);
+                if (!allRelateName) {
+                    return {};
                 }
-                return obj;
-            }, {});
-            return names;
+                let names = allRelateName.reduce((obj, name) => {
+                    let controlName = name.match(/\w+/g);
+                    if (!BUILD_IN_FUNCTION.includes(controlName[0]) && !this.detectWorkflowParams(controlName[0])) {
+                        obj[controlName] = true;
+                    }
+                    return obj;
+                }, {});
+                return names;
+            }
+            return {}
         }
-        return {}
-    }
+        // hàm kiểm tra có tham số workflow trong công thức hay k
     detectWorkflowParams(str) {
         if (str.includes('workflow_')) {
             return true;

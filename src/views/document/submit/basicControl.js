@@ -419,7 +419,6 @@ export default class BasicControl extends Control {
         this.ele.attr('type', 'text');
         this.formatDate = (this.controlProperties.hasOwnProperty('formatDate')) ? this.controlProperties.formatDate.value : "";
         if (this.checkDetailView()) return;
-        this.value = moment(this.value).format(this.formatDate);
 
         let thisObj = this;
         if (this.formatDate != "" && typeof this.formatDate === 'string')
