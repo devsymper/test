@@ -1,7 +1,7 @@
 <template>
     <div class="h-100 w-100 d-flex justify-center ml-6"> 
         <DocumentSubmit 
-            v-if="action == 'submit'"
+            v-if="showDoTaskComponent && (action == 'submit' || action=='update')"
             ref="submitComponent"
             :docId="Number(docId)"
             :workflowVariable="workflowVariable"
@@ -9,12 +9,12 @@
             :documentObjectTaskId="workflowInfo.documentObjectTaskId"
             :documentObjectWorkflowId="workflowInfo.documentObjectWorkflowId"
             :documentObjectWorkflowObjectId="workflowInfo.documentObjectWorkflowObjectId"
-
+            :action="action"
+            :documentObjectId="documentObjectId"
             @submit-document-success="onSubmitDone">
-
         </DocumentSubmit>
         <Detail 
-            v-else-if="action == 'approval'"
+            v-else-if="showDoTaskComponent && (action == 'approval')"
             :docObjInfo="docObjInfo">
         </Detail>
 
@@ -59,7 +59,8 @@ export default {
                 documentObjectWorkflowId: '',
                 documentObjectTaskId: ''
             },
-            showDoTaskComponent: false
+            showDoTaskComponent: false,
+            documentObjectId: 0
         }
     },
     props: {
@@ -78,6 +79,7 @@ export default {
             immediate: true,
             handler: async function (after, before) {
                 console.log(after, before, "after taskInfo change");
+                this.showDoTaskComponent = false;
                 if(this.taskInfo.action){
                     let action = this.taskInfo.action.action;
                     this.action = action;
@@ -87,13 +89,18 @@ export default {
                     this.workflowInfo.documentObjectWorkflowObjectId = this.taskInfo.action.parameter.processInstanceId;
                     this.workflowInfo.documentObjectTaskId = this.taskInfo.action.parameter.taskId;
                     // cần activityId  của task truyền vào nữa 
+                    let workflowVariable = {};
                     for(let key in varsMap){
-                        this.$set(this.workflowVariable , 'workflow_'+key, varsMap[key].value);
+                        workflowVariable['workflow_'+key] = varsMap[key].value;
                     }
+
+                    this.workflowVariable = null;
+                    this.workflowVariable = workflowVariable;
+
 
                     if(action == 'submit'){
                         this.docId = Number(this.taskInfo.action.parameter.documentId);
-                    }else if(action == 'approval'){
+                    }else if(action == 'approval' || action == 'update'){
                         if(!this.taskInfo.action.parameter.documentObjectId){
                             
                             let approvaledElId = this.taskInfo.targetElement;
@@ -102,7 +109,11 @@ export default {
                         }else{
                             this.docObjInfo.docObjId = this.taskInfo.action.parameter.documentObjectId;
                         }
+                        this.documentObjectId = this.docObjInfo.docObjId;
                     }
+                    this.showDoTaskComponent = true;                    
+                }else{
+                    this.showDoTaskComponent = true;
                 }
             }
         }

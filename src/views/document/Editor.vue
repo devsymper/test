@@ -27,6 +27,7 @@
                 </div>
                     <editor id="editor" api-key="APIKEY"
                     ref="editor"
+                    :key="documentId"
                     @onKeyUp="keyHandler"
                     @onClick="detectClickEvent"
                     @onBlur="detectBlurEditorEvent"

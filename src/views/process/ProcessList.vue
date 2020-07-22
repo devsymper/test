@@ -63,7 +63,17 @@ export default {
                     callback: (row, callback) => {
                         self.$goToPage(
                             "/workflow/"+row.id+"/edit",
-                            " Edit " + (row.name ? row.name : row.key)
+                            this.$t("common.edit")+" " + (row.name ? row.name : row.key)
+                        );
+                    }
+                },
+                {
+                    name: "clone",
+                    text: this.$t("common.clone"),
+                    callback: (row, callback) => {
+                        self.$goToPage(
+                            "/workflow/"+row.id+"/clone",
+                            this.$t("common.clone")+" " + (row.name ? row.name : row.key)
                         );
                     }
                 },

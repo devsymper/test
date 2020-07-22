@@ -921,7 +921,6 @@ export default {
             }
         },
         setItemForSelectProcessModel(){
-            debugger
             this.selectingNode.attrs.callactivitycalledelement.options = this.$store.state.process.allProcessModel;
         },
         setFlowsOrderForGateway(nodeData){
@@ -1086,7 +1085,6 @@ export default {
                 }
 
                 if(!nodeAttrsDefinition[el.type]){
-                    debugger
                 }
 
                 if (nodeAttrsDefinition[el.type].checkShowOrHideInput) {

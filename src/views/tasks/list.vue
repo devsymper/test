@@ -50,38 +50,35 @@
                 </v-row>
                 <v-divider></v-divider>
 
-                <VuePerfectScrollbar :style="{height: listTaskHeight+'px'}">
+                <VuePerfectScrollbar v-if="!loadingTaskList" :style="{height: listTaskHeight+'px'}">
                     <v-row
                         v-for="(obj, idx) in allFlatTasks"
                         :key="idx"
                         :index="obj.id"
-                        class="mr-0 ml-0 single-row"
+                        :class="{
+                            'mr-0 ml-0 single-row': true ,
+                            'py-1': !isSmallRow,
+                            'py-0': isSmallRow
+                        }"
                         :style="{
                             minHeight: '50px'
                         }"
                         @click="selectObject(obj, idx)">
                         <v-col
                             :cols="sideBySideMode ? 12 : compackMode ? 6: 4"
-                            class="pl-3 pr-1"
-                            :class="{
-                                        'pt-0': isSmallRow,
-                                        'pb-0': isSmallRow,
-                                        'pb-1': !isSmallRow,
-                                        'pt-1': !isSmallRow,
-                                    }"
-                        >
+                            class="pl-3 pr-1 pb-1 pt-2">
                             <div class="pl-1">
-                                <div class="fz-13 text-truncate d-inline-block float-left text-ellipsis w-100">{{obj.name}}</div>
+                                <!-- <div class="fz-13 text-truncate d-inline-block float-left text-ellipsis w-100">{{obj.name}}</div> -->
                                 <div class="text-left fs-12 pr-6 text-ellipsis w-100">
                                     {{obj.taskData.content}}
                                 </div>
                                 <div
-                                    class="pa-0 grey--text lighten-2 d-flex justify-space-between">
-                                    <div class="fs-12 pr-6 text-ellipsis">
+                                    class="pa-0 grey--text mt-1 lighten-2 d-flex justify-space-between">
+                                    <div class="fs-11 pr-6 text-ellipsis">
                                         {{obj.taskData.extraLabel}}   {{obj.taskData.extraValue}}
                                     </div>
 
-                                    <div class="fs-12 py-0 pr-2 text-ellipsis" >
+                                    <div class="fs-11  py-0 pr-2 text-ellipsis" >
                                         {{$moment(obj.createTime).fromNow()}}
                                         <v-icon class="grey--text lighten-2 ml-1" x-small>mdi-clock-time-nine-outline</v-icon>
                                     </div>
@@ -91,8 +88,7 @@
                         <v-col
                             v-if="!sideBySideMode"
                             cols="2"
-                            class="fs-13 pl-1 pr-1"
-                            :class="{'pt-0': isSmallRow, 'pb-0': isSmallRow}">
+                            class="fs-13 px-1 py-0">
                             
                                 <v-avatar size="25" class="mr-2">
                                     <img :src="obj.assigneeInfo.avatar ? obj.assigneeInfo.avatar : require('@/assets/image/avatar_default.jpg')" />
@@ -102,16 +98,14 @@
                         <v-col
                             v-if="!sideBySideMode"
                             cols="2"
-                            class="fs-13 pl-1 pr-1"
-                            :class="{'pt-0': isSmallRow, 'pb-0': isSmallRow}"
+                            class="fs-13 px-1 py-0"
                         >
                             <span class="mt-1 ">{{$moment(obj.dueDate).fromNow()}}</span>
                         </v-col>
                         <v-col
                             v-if="!sideBySideMode"
                             cols="2"
-                            class="fs-13 pl-1 pr-1"
-                            :class="{'pt-0': isSmallRow, 'pb-0': isSmallRow}">
+                            class="fs-13 px-1 py-0">
                             <v-chip
                                 color="transparent"
                                 class="mt-0 pl-1 pr-0 d-inline-block text-truncate"
@@ -125,11 +119,18 @@
                                 {{obj.ownerInfo.displayName}}
                             </v-chip>
                         </v-col>
-                        <v-col cols="2" v-if="!sideBySideMode && !smallComponentMode">
+                        <v-col class="py-0" cols="2" v-if="!sideBySideMode && !smallComponentMode">
                             <span class="mt-1 d-inline-block fs-13">{{obj.processDefinitionName}}</span>
                         </v-col>
                     </v-row>
                 </VuePerfectScrollbar>
+
+                 <v-skeleton-loader
+                    v-else
+                    ref="skeleton"
+                    :type="'table-tbody'"
+                    class="mx-auto"
+                ></v-skeleton-loader>
             </v-col>
             <v-col
                 :cols="!sideBySideMode ? 0 : 8"
@@ -216,6 +217,7 @@ export default {
     },
     data: function() {
         return {
+            loadingTaskList: true,
             listTaskHeight: 300,
             selectedTask: {
                 taskInfo: {},
@@ -306,6 +308,7 @@ export default {
         },
         async getTasks(filter = {}) {
             let self = this;
+            this.loadingTaskList = true;
             this.listProrcessInstances = [];
             filter = Object.assign(filter, this.filterFromParent);
             filter = Object.assign(filter, this.myOwnFilter);
@@ -365,6 +368,8 @@ export default {
                 }
             );
             this.addOtherProcess(listTasks);
+            this.loadingTaskList = false;
+
         },
         addOtherProcess(listTasks) {
             for (let index in listTasks) {

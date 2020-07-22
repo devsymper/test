@@ -128,7 +128,7 @@ export default {
             type:Number,
             default:0
         },
-        action:{
+        action:{ // submit hoặc update
             type:String,
             default:''
         },
@@ -209,6 +209,9 @@ export default {
     beforeMount() {
         this.docSize = "21cm";
         this.columnsSQLLiteDocument = {};
+        this.$store.commit("document/setDefaultSubmitStore",{instance:this.keyInstance});
+        this.$store.commit("document/setDefaultDetailStore",{instance:this.keyInstance});
+        this.$store.commit("document/setDefaultEditorStore",{instance:this.keyInstance});
     },
     mounted() {
         this.editorDoc = $(".sym-form-submit");
@@ -291,6 +294,8 @@ export default {
                         instance: this.keyInstance
                     });
             let valueControl = locale.val;
+            console.log('hdfsas',thisCpn.keyInstance);
+            console.log('hdfsas1',this.keyInstance);
             let controlInstance = getControlInstanceFromStore(thisCpn.keyInstance,locale.controlName);
             if(controlInstance.type == 'user'){
                 valueControl = $('#'+controlInstance.id).attr('user-id');
@@ -307,7 +312,7 @@ export default {
             thisCpn.$store.commit("document/addToDocumentSubmitStore", {
                 key: 'rootChangeFieldName',
                 value: locale.controlName,
-                instance: this.keyInstance
+                instance: thisCpn.keyInstance
             });
             // sau khi thay đổi giá trị input thì kiểm tra require control nếu có
             if(controlInstance.isRequiredControl()){
