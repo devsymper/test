@@ -35,6 +35,8 @@ function cleanContent(content, configValue) {
         .replace(/symper:symper:/g, 'symper:')
         .replace(/definitions (.*?)+\>/, ns)
         .replace(/&#10;/g, ' ')
+        .replace(/symper_symper_in_tag/g, 'symper:in')
+        .replace(/symper_symper_out_tag/g, 'symper:out')
         .replace(/symper_symper_value_tag/g, 'symper:value');
 
     let symperMatches = rsl.match(/<symper:([a-zA-Z0-9_]+)/g);

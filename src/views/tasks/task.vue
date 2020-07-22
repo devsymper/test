@@ -89,12 +89,13 @@ export default {
                     this.workflowInfo.documentObjectWorkflowObjectId = this.taskInfo.action.parameter.processInstanceId;
                     this.workflowInfo.documentObjectTaskId = this.taskInfo.action.parameter.taskId;
                     // cần activityId  của task truyền vào nữa 
-                    // for(let key in varsMap){
-                    //     this.$set(this.workflowVariable , 'workflow_'+key, varsMap[key].value);
-                    // }
+                    let workflowVariable = {};
+                    for(let key in varsMap){
+                        workflowVariable['workflow_'+key] = varsMap[key].value;
+                    }
 
                     this.workflowVariable = null;
-                    this.workflowVariable = varsMap;
+                    this.workflowVariable = workflowVariable;
 
 
                     if(action == 'submit'){

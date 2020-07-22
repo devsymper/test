@@ -60,9 +60,10 @@ export default {
 
     setValueAsAttr(el, elKey, attr, bpmnModeler, attrName) {
         let modeling = bpmnModeler.get("modeling");
-        let value = allNodesAttrs[attrName].getValue(attr.value);
-        if (allNodesAttrs[attrName].hasOwnProperty('getValueForXML')) {
-            value = allNodesAttrs[attrName].getValueForXML(attr.value);
+        let nodeAllAttrs = allNodesAttrs[attrName];
+        let value = nodeAllAttrs.getValue(attr.value);
+        if (nodeAllAttrs.hasOwnProperty('getValueForXML')) {
+            value = nodeAllAttrs.getValueForXML(attr.value);
         }
         console.log(attrName, value, value !== '');
 
@@ -71,7 +72,10 @@ export default {
             if (typeof value != 'number' && typeof value != 'string') {
                 value = JSON.stringify(value);
             }
-            let toXMLname = allNodesAttrs[attrName].toXML.name;
+            let toXMLname = nodeAllAttrs.toXML.name;
+            if (nodeAllAttrs.toXMLExtend) {
+                toXMLname = nodeAllAttrs.toXMLExtend.name;
+            }
             objToUpdate[toXMLname] = value;
             if (el.businessObject) {
                 clearEmptyAttr(el.businessObject);
@@ -192,5 +196,40 @@ export default {
             newEl.body = "<![CDATA[" + attr.value + "]]>";
             bizObj[elTagName] = newEl;
         }
+    },
+    // giống với formPropertyMethod
+    acllActivityIOParamsMethod(el, elKey, attr, bpmnModeler, attrName) {
+        let moddle = bpmnModeler.get('moddle');
+        let modeling = bpmnModeler.get('modeling');
+        let bizEl = el.businessObject;
+        let extensionElements = bizEl.extensionElements;
+
+        if (!extensionElements) {
+            extensionElements = moddle.create('bpmn:ExtensionElements');
+            extensionElements.values = [];
+        } else if (!extensionElements.values) {
+            extensionElements.values = [];
+        }
+        let tagName = attr.toXML.name;
+
+        for (let row of attr.getValue(attr.value)) {
+            let subEl = moddle.create('symper:' + tagName);
+            let valid = false;
+            for (let key in row) {
+                let vl = row[key];
+                if (vl) {
+                    subEl[key] = vl;
+                    valid = true;
+                }
+            }
+
+            if (valid) {
+                extensionElements.values.push(subEl);
+            }
+        }
+
+        modeling.updateProperties(el, {
+            extensionElements
+        });
     }
 }

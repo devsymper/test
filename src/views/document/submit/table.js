@@ -75,6 +75,7 @@ let listKeyCodeNotChange = [18, 17, 9, 20, 27, 16, 192, 91]
 let listTableInstance = {}
 let columnHasSum = {}
 let listInputInDocument = sDocument.state.submit.listInputInDocument;
+console.log(SYMPER_APP.$store.state.document, 'xxxxx');
 const MAX_TABLE_HEIGHT = 300;
 
 const makeDelay = function(ms) {

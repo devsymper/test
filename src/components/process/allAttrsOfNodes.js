@@ -904,7 +904,10 @@ let allAttrs = {
         "options": [],
         "textKey": 'modelName',
         "valueKey": 'definitionId',
-        "showId": false
+        "showId": false,
+        toXMLExtend: { // không định nghĩa lại do thư viện đã định nghĩa sẵn, dùng cho trường hợp tên trong xml khác với tên đẩy về json
+            name: 'calledElement'
+        }
     },
     "callactivitycalledelementtype": {
         "title": "Called element type",
@@ -913,7 +916,13 @@ let allAttrs = {
         "info": "BPMN.PROPERTYPACKAGES.CALLACTIVITYCALLEDELEMENTTYPEPACKAGE.CALLACTIVITYCALLEDELEMENTTYPE.DESCRIPTION",
         "dg": "detail",
         "options": [],
-        hidden: true
+        hidden: true,
+        toXML: {
+            "symper_position": "attr",
+            "name": "calledElementType",
+            "isAttr": true,
+            "type": "String"
+        }
     },
     "callactivityinparameters": {
         "title": "In parameters",
@@ -921,8 +930,53 @@ let allAttrs = {
         "value": [],
         "info": "BPMN.PROPERTYPACKAGES.CALLACTIVITYINPARAMETERSPACKAGE.CALLACTIVITYINPARAMETERS.DESCRIPTION",
         "dg": "detail",
-        "columns": [],
-        hidden: true
+        // hidden: true
+        toXML: {
+            "symper_position": "el",
+            "name": "symper_symper_in_tag",
+            "superClass": ["Element"],
+            "properties": [{
+                    "name": "source",
+                    "isAttr": true,
+                    "type": "String"
+                },
+                {
+                    "name": "target",
+                    "isAttr": true,
+                    "type": "String"
+                },
+            ]
+        },
+        pushToXML: attrToXMLMethods.acllActivityIOParamsMethod,
+        "columns": [{
+                title: 'Source',
+                name: 'source',
+                type: 'text',
+            },
+            {
+                title: 'Source expression',
+                name: 'sourceExpression',
+                type: 'text'
+            },
+            {
+                title: 'Target',
+                name: 'target',
+                type: 'autocomplete',
+                source: ["string", "boolean", "datetime", "int", "long"]
+            },
+            {
+                title: 'Target expression',
+                name: 'targetExpression',
+                type: 'text'
+            },
+        ],
+        "value": [{}],
+        getValue(value) {
+            return $.isArray(value) ? value : [];
+        },
+        restoreData(value) {
+            return value == '' ? [{}] : value;
+        },
     },
     "callactivityoutparameters": {
         "title": "Out parameters",
@@ -930,15 +984,66 @@ let allAttrs = {
         "value": [],
         "info": "BPMN.PROPERTYPACKAGES.CALLACTIVITYOUTPARAMETERSPACKAGE.CALLACTIVITYOUTPARAMETERS.DESCRIPTION",
         "dg": "detail",
-        "columns": [],
-        hidden: true
+        // hidden: true
+        toXML: {
+            "symper_position": "el",
+            "name": "symper_symper_out_tag",
+            "superClass": ["Element"],
+            "properties": [{
+                    "name": "source",
+                    "isAttr": true,
+                    "type": "String"
+                },
+                {
+                    "name": "target",
+                    "isAttr": true,
+                    "type": "String"
+                },
+            ]
+        },
+        pushToXML: attrToXMLMethods.acllActivityIOParamsMethod,
+        "columns": [{
+                title: 'Source',
+                name: 'source',
+                type: 'text',
+            },
+            {
+                title: 'Source expression',
+                name: 'sourceExpression',
+                type: 'text'
+            },
+            {
+                title: 'Target',
+                name: 'target',
+                type: 'autocomplete',
+                source: ["string", "boolean", "datetime", "int", "long"]
+            },
+            {
+                title: 'Target expression',
+                name: 'targetExpression',
+                type: 'text'
+            },
+        ],
+        "value": [{}],
+        getValue(value) {
+            return $.isArray(value) ? value : [];
+        },
+        restoreData(value) {
+            return value == '' ? [{}] : value;
+        },
     },
     "callactivityinheritvariables": {
         "title": "Inherit variables in sub process",
         "type": "checkbox",
         "value": false,
         "info": "BPMN.PROPERTYPACKAGES.CALLACTIVITYINHERITVARIABLESPACKAGE.CALLACTIVITYINHERITVARIABLES.DESCRIPTION",
-        "dg": "detail"
+        "dg": "detail",
+        toXML: {
+            "symper_position": "attr",
+            "name": "inheritVariables",
+            "isAttr": true,
+            "type": "String"
+        }
     },
     "callactivitysamedeployment": {
         "title": "Start the referenced process from the same deployment.",
@@ -946,7 +1051,13 @@ let allAttrs = {
         "value": false,
         "info": "BPMN.PROPERTYPACKAGES.CALLACTIVITYSAMEDEPLOYMENTPACKAGE.CALLACTIVITYSAMEDEPLOYMENT.DESCRIPTION",
         "dg": "detail",
-        hidden: true
+        hidden: true,
+        toXML: {
+            "symper_position": "attr",
+            "name": "sameDeployment",
+            "isAttr": true,
+            "type": "String"
+        }
     },
     "callactivityfallbacktodefaulttenant": {
         "title": "Fallback to default tenant",
@@ -954,49 +1065,91 @@ let allAttrs = {
         "value": false,
         "info": "BPMN.PROPERTYPACKAGES.CALLACTIVITYFALLBACKTODEFAULTTENANTPACKAGE.CALLACTIVITYFALLBACKTODEFAULTTENANT.DESCRIPTION",
         "dg": "detail",
-        hidden: true
+        hidden: true,
+        toXML: {
+            "symper_position": "attr",
+            "name": "fallbackToDefaultTenant",
+            "isAttr": true,
+            "type": "String"
+        }
     },
     "callactivityidvariablename": {
         "title": "ID variable",
         "type": "text",
         "value": "",
         "info": "BPMN.PROPERTYPACKAGES.CALLACTIVITYIDVARIABLENAMEPACKAGE.CALLACTIVITYIDVARIABLENAME.DESCRIPTION",
-        "dg": "detail"
+        "dg": "detail",
+        toXML: {
+            "symper_position": "attr",
+            "name": "idVariableName",
+            "isAttr": true,
+            "type": "String"
+        }
     },
     "callactivityprocessinstancename": {
         "title": "Process instance name",
         "type": "text",
         "value": "",
         "info": "BPMN.PROPERTYPACKAGES.CALLACTIVITYPROCESSINSTANCENAMEPACKAGE.CALLACTIVITYPROCESSINSTANCENAME.DESCRIPTION",
-        "dg": "detail"
+        "dg": "detail",
+        toXML: {
+            "symper_position": "attr",
+            "name": "processInstanceName",
+            "isAttr": true,
+            "type": "String"
+        }
     },
     "callactivityinheritbusinesskey": {
         "title": "Inherit business key",
         "type": "checkbox",
         "value": false,
         "info": "BPMN.PROPERTYPACKAGES.CALLACTIVITYINHERITBUSINESSKEYPACKAGE.CALLACTIVITYINHERITBUSINESSKEY.DESCRIPTION",
-        "dg": "detail"
+        "dg": "detail",
+        toXML: {
+            "symper_position": "attr",
+            "name": "inheritBusinessKey",
+            "isAttr": true,
+            "type": "String"
+        }
     },
     "callactivityuselocalscopeforoutparameters": {
         "title": "Use local scope for out parameters",
         "type": "checkbox",
         "value": false,
         "info": "BPMN.PROPERTYPACKAGES.CALLACTIVITYUSELOCALSCOPEFOROUTPARAMETERSPACKAGE.CALLACTIVITYUSELOCALSCOPEFOROUTPARAMETERS.DESCRIPTION",
-        "dg": "detail"
+        "dg": "detail",
+        toXML: {
+            "symper_position": "attr",
+            "name": "useLocalScopeForOutParameters",
+            "isAttr": true,
+            "type": "String"
+        }
     },
     "callactivitybusinesskey": {
         "title": "Business key expression",
         "type": "script",
         "value": "",
         "info": "BPMN.PROPERTYPACKAGES.CALLACTIVITYBUSINESSKEYPACKAGE.CALLACTIVITYBUSINESSKEY.DESCRIPTION",
-        "dg": "detail"
+        "dg": "detail",
+        toXML: {
+            "symper_position": "attr",
+            "name": "businessKey",
+            "isAttr": true,
+            "type": "String"
+        }
     },
     "callactivitycompleteasync": {
         "title": "Complete asynchronously",
         "type": "checkbox",
         "value": false,
         "info": "BPMN.PROPERTYPACKAGES.CALLACTIVITYCOMPLETEASYNCPACKAGE.CALLACTIVITYCOMPLETEASYNC.DESCRIPTION",
-        "dg": "detail"
+        "dg": "detail",
+        toXML: {
+            "symper_position": "attr",
+            "name": "completeAsync",
+            "isAttr": true,
+            "type": "String"
+        }
     },
     "cameltaskcamelcontext": {
         "title": "Camel context",
@@ -1306,7 +1459,8 @@ let allAttrs = {
         "value": "None",
         "info": "BPMN.PROPERTYPACKAGES.MULTIINSTANCE_TYPEPACKAGE.MULTIINSTANCE_TYPE.DESCRIPTION",
         "dg": "multiInstance",
-        hidden: true
+        hidden: true,
+        pushToXML: attrToXMLMethods.notPushToXML
     },
     "multiinstance_cardinality": {
         "title": "Cardinality ",
