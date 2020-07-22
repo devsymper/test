@@ -65,7 +65,8 @@
         "code": "Code",
         "apply": "Apply",
         "manager": "Manager",
-        "userRoleSetting": "User role setting"
+        "userRoleSetting": "User role setting",
+        "clone": "Clone"
     },
     "validate": {
         "required": "Not be empty",

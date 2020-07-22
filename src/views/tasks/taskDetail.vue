@@ -273,6 +273,7 @@ export default {
                     self.$snotifySuccess("Task completed!");
                     resolve(result);
                 } catch (error) {
+                    error.message = error.exception;
                     self.$snotifyError(error, "Can not submit task!");
                     reject(error);
                 }

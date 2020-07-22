@@ -1,7 +1,7 @@
 <template>
     <div class="h-100 w-100 d-flex justify-center ml-6"> 
         <DocumentSubmit 
-            v-if="action == 'submit' || action=='update'"
+            v-if="showDoTaskComponent && (action == 'submit' || action=='update')"
             ref="submitComponent"
             :docId="Number(docId)"
             :workflowVariable="workflowVariable"
@@ -14,7 +14,7 @@
             @submit-document-success="onSubmitDone">
         </DocumentSubmit>
         <Detail 
-            v-else-if="action == 'approval'"
+            v-else-if="showDoTaskComponent && (action == 'approval')"
             :docObjInfo="docObjInfo">
         </Detail>
 
@@ -79,6 +79,7 @@ export default {
             immediate: true,
             handler: async function (after, before) {
                 console.log(after, before, "after taskInfo change");
+                this.showDoTaskComponent = false;
                 if(this.taskInfo.action){
                     let action = this.taskInfo.action.action;
                     this.action = action;
@@ -88,9 +89,13 @@ export default {
                     this.workflowInfo.documentObjectWorkflowObjectId = this.taskInfo.action.parameter.processInstanceId;
                     this.workflowInfo.documentObjectTaskId = this.taskInfo.action.parameter.taskId;
                     // cần activityId  của task truyền vào nữa 
-                    for(let key in varsMap){
-                        this.$set(this.workflowVariable , 'workflow_'+key, varsMap[key].value);
-                    }
+                    // for(let key in varsMap){
+                    //     this.$set(this.workflowVariable , 'workflow_'+key, varsMap[key].value);
+                    // }
+
+                    this.workflowVariable = null;
+                    this.workflowVariable = varsMap;
+
 
                     if(action == 'submit'){
                         this.docId = Number(this.taskInfo.action.parameter.documentId);
@@ -105,6 +110,9 @@ export default {
                         }
                         this.documentObjectId = this.docObjInfo.docObjId;
                     }
+                    this.showDoTaskComponent = true;                    
+                }else{
+                    this.showDoTaskComponent = true;
                 }
             }
         }

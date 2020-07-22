@@ -64,7 +64,8 @@
         "code": "Mã",
         "apply": "Áp dụng",
         "manager": "Quản lý",
-        "userRoleSetting": "Vai trò người dùng"
+        "userRoleSetting": "Vai trò người dùng",
+        "clone": "Nhân bản"
     },
     "login": {
         "title": "Đăng nhập hệ thống",
