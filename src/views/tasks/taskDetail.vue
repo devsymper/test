@@ -237,7 +237,7 @@ export default {
         },
         async saveTaskOutcome(value){ // hành động khi người dùng submit task của họ
             // this.$emit('save-task-outcome');
-            if(this.taskAction == 'submit'){
+            if(this.taskAction == 'submit' || this.taskAction == 'update' ){
                 this.$refs.task[0].submitForm(value);
             }else if(this.taskAction == 'approval'){
                 let taskData = {
@@ -273,8 +273,13 @@ export default {
                     self.$snotifySuccess("Task completed!");
                     resolve(result);
                 } catch (error) {
-                    error.message = error.exception;
-                    self.$snotifyError(error, "Can not submit task!");
+                    let detail = '';
+                    if(error.responseText){
+                        detail = JSON.parse(error.responseText);
+                        detail = detail.exception;
+                    }
+                    debugger
+                    self.$snotifyError(error, "Can not submit task!", detail);
                     reject(error);
                 }
             });
@@ -285,7 +290,11 @@ export default {
                 this.$emit('task-submited', data);            
             }else{
                 let elId = this.taskInfo.action.parameter.activityId;
-                let varsForBackend = await getVarsFromSubmitedDoc(data, elId, this.taskInfo.action.parameter.documentId);
+                let docId = data.document_id;
+                if(!docId){
+                    docId = this.taskInfo.action.parameter.documentId;
+                }
+                let varsForBackend = await getVarsFromSubmitedDoc(data, elId, docId);
                 let taskData = {
                     // action nhận 1 trong 4 giá trị: complete, claim, resolve, delegate
                     "action": "complete", 

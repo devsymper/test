@@ -1099,6 +1099,11 @@ export default {
                     }
                     formKeyToNodeIdMap[formKey].push(elName);
                 }
+
+                if(el.type.includes('StartNoneEvent') && el.attrs.formreference.value){
+                    
+                    this.setControlsForBizKey(el.attrs.formreference.value);
+                }
             }
             this.setInitItemsForFormReferences(formKeyToNodeIdMap);
         },
@@ -1106,7 +1111,8 @@ export default {
             let self = this;
             try {
                 for(let docId in map){
-                    let res = await apiCaller.get(appConfigs.apiDomain.documents + '?search=' + docId);  
+                    // https://sdocument-management.symper.vn/documents?search=1143
+                    let res = await apiCaller.get(appConfigs.apiDomain.sdocumentManagement + 'documents?search=' + docId);  
                     for(let nodeId of map[docId]){
                         this.stateAllElements[nodeId].attrs.formreference.options = res.data.listObject;
                     }              

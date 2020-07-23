@@ -253,6 +253,11 @@ export default {
             });
             this.docObjId = this.$route.params.id;
         }
+
+        // Nếu truyền vào documentObjectId
+        if(this.documentObjectId){
+            this.docObjId = this.documentObjectId;
+        }
         
 
         if(this.documentId != null && this.documentId != 0){
@@ -419,6 +424,7 @@ export default {
         },
         documentObjectId(after){
             this.docObjId = after;
+            this.loadDocumentObject();
         },
     },
     
