@@ -3,8 +3,7 @@ import sDocument from './../../../store/document'
 import { markBinedField } from './handlerCheckRunFormulas';
 import { SYMPER_APP } from './../../../main.js'
 import store from './../../../store'
-
-let listInputInDocument = sDocument.state.submit.listInputInDocument;
+import { getListInputInDocument } from './../common/common'
 
 const AUTO_SET = 'auto_set';
 
@@ -139,7 +138,7 @@ export default class Control {
     }
     handlerDataAfterRunFormulasValidate(values) {
         if (this.inTable != false) {
-            let tableControlInstance = listInputInDocument[this.inTable];
+            let tableControlInstance = getListInputInDocument(this.curParentInstance)[this.inTable];
             let colIndex = tableControlInstance.tableInstance.getColumnIndexFromControlName(this.name);
             for (let index = 0; index < values.length; index++) {
                 let row = values[index];
@@ -153,7 +152,7 @@ export default class Control {
     }
     handlerDataAfterRunFormulasRequire(values) {
         if (this.inTable != false) {
-            let tableControlInstance = listInputInDocument[this.inTable];
+            let tableControlInstance = getListInputInDocument(this.curParentInstance)[this.inTable];
             let colIndex = tableControlInstance.tableInstance.getColumnIndexFromControlName(this.name);
             for (let index = 0; index < values.length; index++) {
                 let row = values[index];
@@ -165,7 +164,7 @@ export default class Control {
     }
     handlerDataAfterRunFormulasHidden(values) {
         if (this.inTable != false) {
-            let tableControlInstance = listInputInDocument[this.inTable];
+            let tableControlInstance = getListInputInDocument(this.curParentInstance)[this.inTable];
             let colIndex = tableControlInstance.tableInstance.getColumnIndexFromControlName(this.name);
             for (let index = 0; index < values.length; index++) {
                 let row = values[index];
@@ -188,15 +187,15 @@ export default class Control {
                     row = '';
                 vls.push([index, this.name, row]);
             }
-            let tableControl = listInputInDocument[this.inTable];
+            let tableControl = getListInputInDocument(this.curParentInstance)[this.inTable];
 
             tableControl.tableInstance.tableInstance.setDataAtRowProp(vls, null, null, AUTO_SET);
-            markBinedField(this.name);
+            markBinedField(this.curParentInstance, this.name);
             setTimeout(() => {
                 let controlEffected = this.getEffectedControl();
                 for (let control in controlEffected) {
-                    if (listInputInDocument[control].inTable == false)
-                        SYMPER_APP.$evtBus.$emit('run-effected-control-when-table-change', listInputInDocument[control])
+                    if (getListInputInDocument(this.curParentInstance)[control].inTable == false)
+                        SYMPER_APP.$evtBus.$emit('run-effected-control-when-table-change', getListInputInDocument(this.curParentInstance)[control])
                 }
             }, 100);
         } else {
@@ -216,22 +215,22 @@ export default class Control {
                 }
 
                 console.log('hgfdas', values);
-                // let tableControl = listInputInDocument[this.name];
+                // let tableControl = getListInputInDocument(this.curParentInstance)[this.name];
                 // tableControl.tableInstance.tableInstance.setDataAtRowProp(vls, null, null, AUTO_SET);
 
                 // markBinedField(this.name);
                 // setTimeout(() => {
                 //     let controlEffected = this.getEffectedControl();
                 //     for (let control in controlEffected) {
-                //         if (listInputInDocument[control].inTable == false)
-                //             SYMPER_APP.$evtBus.$emit('run-effected-control-when-table-change', listInputInDocument[control])
+                //         if (getListInputInDocument(this.curParentInstance)[control].inTable == false)
+                //             SYMPER_APP.$evtBus.$emit('run-effected-control-when-table-change', getListInputInDocument(this.curParentInstance)[control])
                 //     }
                 // }, 100);
             } else {
                 if ($('#' + this.id).length > 0) {
                     $('#' + this.id).val(values);
                     $('#' + this.id).trigger('change')
-                    markBinedField(this.name);
+                    markBinedField(this.curParentInstance, this.name);
                 }
             }
 
@@ -267,7 +266,7 @@ export default class Control {
                 this.removeValidateIcon();
             }
         } else {
-            let tableControl = listInputInDocument[this.inTable];
+            let tableControl = getListInputInDocument(this.curParentInstance)[this.inTable];
             let colIndex = tableControl.tableInstance.getColumnIndexFromControlName(this.name);
             let dataAtCol = tableControl.tableInstance.tableInstance.getDataAtCol(colIndex);
             let rowIndex = dataAtCol.indexOf(dataInput[Object.keys(dataInput)[0]][0])
@@ -296,7 +295,7 @@ export default class Control {
         }
         // hàm kiểm tra là view detail hay submit
     checkDetailView() {
-        if (sDocument.state.viewType == 'detail') {
+        if (sDocument.state.viewType[this.curParentInstance] == 'detail') {
             return true;
         } else {
             return false;

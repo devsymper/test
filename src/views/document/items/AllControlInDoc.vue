@@ -77,9 +77,15 @@ export default {
         'formula-editor':FormulaEditor,
         'symper-drag-panel':SymperDragPanel
     },
+    props:{
+        instance:{
+            type:Number,
+            default:Date.now()
+        }
+    },
     computed:{
         sAllControl(){
-            let allControl = this.$store.state.document.editor.allControl;
+            let allControl = this.$store.state.document.editor[this.instance].allControl;
             return allControl
         },
         allColumns(){

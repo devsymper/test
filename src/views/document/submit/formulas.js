@@ -257,42 +257,20 @@ export default class Formulas {
                 formulas = formulas.replace(regex, value);
             }
         }
+        let regex = new RegExp("{workflow_.*}", "gm");
+        formulas = formulas.replace(regex, "");
         return formulas;
     }
 
 
     // Hàm chạy công thức cho autocomplete
-    handleRunAutoCompleteFormulas(search, dataInput = false) {
+    handleRunAutoCompleteFormulas(dataInput = false) {
         let listSyql = this.getReferenceFormulas(this.formulas);
-        // let fieldSelect = this.detectFieldSelect();
-        // let where = " WHERE (";
-        // for (let i = 0; i < fieldSelect.length; i++) {
-        //     let element = fieldSelect[i];
-        //     element = element.replace(/(?=as ).*/gi, '');
-        //     if (i == fieldSelect.length - 1) {
-        //         where += element + " ILIKE '%" + search + "%' )";
-        //     } else {
-        //         where += element + " ILIKE '%" + search + "%' OR";
-        //     }
-        // }
         if (listSyql != null && listSyql.length > 0) {
             let syql = listSyql[0].trim();
             syql = this.replaceParamsToData(dataInput, syql);
             syql = syql.replace('ref(', '');
             syql = syql.substring(0, syql.length - 1);
-            // let sql = ""
-            // if (/\$\$/.test(syql) == false) {
-            //     if (/\bWHERE|where\b/.test(syql)) {
-            //         where += " AND "
-            //         syql = syql.replace(/\bWHERE|where\b/, where);
-            //         sql = syql + " LIMIT 20 OFFSET 0";
-
-            //     } else {
-            //         sql = syql + where + "LIMIT 20 OFFSET 0";
-            //     }
-            // } else {
-            //     sql = syql;
-            // }
             return this.runSyql(syql);
         } else {
             let formulas = this.replaceParamsToData(dataInput, this.formulas);
@@ -384,7 +362,7 @@ export default class Formulas {
     }
 
     getDataSubmitInStore() {
-        return dataSubmitStore.listInputInDocument;
+        return dataSubmitStore[this.keyInstance].listInputInDocument;
     }
 
     /**
@@ -418,7 +396,7 @@ export default class Formulas {
     getInputControl() {
             return this.inputControl;
         }
-        /**
+        /** 
          * Hàm lấy dữ liệu của các control trong store để chuân bị cho việc run formulas
          * dataInput : {controlName : value}
          */

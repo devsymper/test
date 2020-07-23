@@ -17,8 +17,8 @@ const handlerRunOtherFormulasControl = function(controlName, controlEffected, fo
         }
     }
 }
-const checkDbOnly = function(controlName) {
-    let control = getControlInstanceFromStore(controlName);
+const checkDbOnly = function(instance, controlName) {
+    let control = getControlInstanceFromStore(instance, controlName);
     if (control.controlProperties['isDBOnly'] != undefined &&
         (control.controlProperties['isDBOnly'].value == "1" ||
             control.controlProperties['isDBOnly'].value == true ||
@@ -28,16 +28,17 @@ const checkDbOnly = function(controlName) {
         return false
     }
 }
-const getControlInstanceFromStore = function(controlName) {
-    if (sDocument.state.submit.listInputInDocument.hasOwnProperty(controlName)) {
-        return sDocument.state.submit.listInputInDocument[controlName]
+const getControlInstanceFromStore = function(instance, controlName) {
+    if (sDocument.state.submit[instance].listInputInDocument.hasOwnProperty(controlName)) {
+        return sDocument.state.submit[instance].listInputInDocument[controlName]
     } else {
         return false
     }
 }
-const getControlTitleFromName = function(controlName) {
-    if (sDocument.state.submit.listInputInDocument.hasOwnProperty(controlName)) {
-        return sDocument.state.submit.listInputInDocument[controlName].title;
+const getControlTitleFromName = function(instance, controlName) {
+    let control = getControlInstanceFromStore(instance, controlName);
+    if (control != false) {
+        return control.title;
     } else {
         return false
     }
@@ -50,13 +51,19 @@ const checkInTable = function(element) {
     }
     return tableId;
 }
-const getControlType = function(controlName) {
-    let control = getControlInstanceFromStore(controlName);
+const getControlType = function(instance, controlName) {
+    let control = getControlInstanceFromStore(instance, controlName);
     if (control != false) {
         return control.type;
     } else {
         return false
     }
+}
+const getSDocumentSubmitStore = function(instance) {
+    return sDocument.state.submit[instance]
+}
+const getListInputInDocument = function(instance) {
+    return getSDocumentSubmitStore(instance).listInputInDocument;
 }
 export {
     // handlerRunOtherFormulasControl
@@ -64,5 +71,7 @@ export {
     checkDbOnly,
     checkInTable,
     getControlTitleFromName,
-    getControlType
+    getControlType,
+    getSDocumentSubmitStore,
+    getListInputInDocument
 }

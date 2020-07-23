@@ -11,10 +11,9 @@ import { RowComp } from "ag-grid-community";
  * @param {} fields 
  */
 export const allControlNotSetData = ['approvalHistory', 'submit', 'draft', 'reset']
-export const setDataForPropsControl = function(fields) {
+export const setDataForPropsControl = function(fields, instance, from) {
     for (let controlId in fields) {
         let control = GetControlProps(fields[controlId].type)
-        console.log('hjkjsda', fields[controlId].type, control);
         let properties = control.properties
         let formulas = control.formulas
         let type = fields[controlId].type
@@ -40,14 +39,14 @@ export const setDataForPropsControl = function(fields) {
                 }
             })
         }
-        if (fields[controlId].type != "table" && sDocument.state.detail.allData != null) {
+        if (fields[controlId].type != "table" && sDocument.state.detail[instance].allData != null) {
             let value = ""
             if (properties.hasOwnProperty('name')) {
                 let controlName = properties['name'].value;
-                let allData = util.cloneDeep(sDocument.state.detail.allData);
+                let allData = util.cloneDeep(sDocument.state.detail[instance].allData);
                 value = allData[controlName];
             }
-            addToAllControlInDoc(controlId, { id: id, properties: properties, formulas: formulas, type: type, value: value });
+            addToAllControlInDoc(controlId, { id: id, properties: properties, formulas: formulas, type: type, value: value }, instance, from);
         } else {
             let listField = fields[controlId].listFields
             let listChildField = {};
@@ -80,9 +79,9 @@ export const setDataForPropsControl = function(fields) {
                         }
                     })
                 }
-                if (childProperties.hasOwnProperty('name') && sDocument.state.detail.allData != null) {
+                if (childProperties.hasOwnProperty('name') && sDocument.state.detail[instance].allData != null) {
                     let controlName = childProperties['name'].value;
-                    let allData = util.cloneDeep(sDocument.state.detail.allData[properties['name'].value]);
+                    let allData = util.cloneDeep(sDocument.state.detail[instance].allData[properties['name'].value]);
                     if (allData != null && allData != undefined) {
                         let countRow = allData.length;
                         for (let j = 0; j < countRow; j++) {
@@ -101,13 +100,14 @@ export const setDataForPropsControl = function(fields) {
                 i++;
             }
             colValue['childObjectId'] = childObjectId;
-            addToAllControlInDoc(controlId, { id: id, properties: properties, formulas: formulas, type: fields[controlId].type, listFields: listChildField, value: colValue });
+            addToAllControlInDoc(controlId, { id: id, properties: properties, formulas: formulas, type: fields[controlId].type, listFields: listChildField, value: colValue }, instance, from);
         }
     }
 }
 
-function addToAllControlInDoc(controlId, control) {
+function addToAllControlInDoc(controlId, control, instance, from) {
+    console.log('asgsad', instance);
     store.commit(
-        "document/addControl", { id: controlId, props: control, from: 'submit' }
+        "document/addControl", { id: controlId, props: control, from: 'submit', instance: instance }
     );
 }

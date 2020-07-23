@@ -71,12 +71,18 @@ import { formulasApi } from "./../../../api/Formulas.js";
 import { util } from '../../../plugins/util';
 
 export default {
+    props:{
+        instance:{
+            type:Number,
+            default:Date.now()
+        }
+    },
     components:{
         'control-props-config' : FormTpl,
     },
     computed: {
         sCurrentDocument(){
-            return this.$store.state.document.editor.currentSelectedControl;
+            return this.$store.state.document.editor[this.instance].currentSelectedControl;
         },
 
         controlPropsGroup(){
@@ -132,7 +138,7 @@ export default {
             if( tableId == this.sCurrentDocument.id)
             tableId = '0';
             this.$store.commit(
-                "document/updateProp",{id:this.sCurrentDocument.id,name:name,value:value,tableId:tableId,type:"value"}
+                "document/updateProp",{id:this.sCurrentDocument.id,name:name,value:value,tableId:tableId,type:"value",instance:this.instance}
             );   
 
             if(name == 'name'){
@@ -203,7 +209,7 @@ export default {
             }
             this.listNameValueControl[this.sCurrentDocument.id] = dataControl;
             this.$store.commit(
-                "document/updateProp",{id:this.sCurrentDocument.id,name:name,value:errValue,tableId:tableId,type:"errorMessage"}
+                "document/updateProp",{id:this.sCurrentDocument.id,name:name,value:errValue,tableId:tableId,type:"errorMessage",instance:this.instance}
             );  
         },
  

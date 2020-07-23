@@ -23,10 +23,15 @@
 export default {
     computed: {
         listControlTreeData(){
-            return this.$store.state.document.editor.listControlTreeData;
+            return this.$store.state.document.editor[this.instance].listControlTreeData;
         },
     },
-
+    props:{
+        instance:{
+            type:Number,
+            default:Date.now()
+        }
+    },
     data: () => ({
         tree: [],
     }),

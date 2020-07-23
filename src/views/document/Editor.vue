@@ -1,7 +1,7 @@
 <template>
     <v-flex class="d-flex sym-document" style="height:calc(100%);">
         <div class="sym-document__side-bar-left">
-            <sidebar-left/>
+            <sidebar-left :instance="keyInstance"/>
         </div>
             <vue-resizable 
             :active="['r']" 
@@ -27,6 +27,7 @@
                 </div>
                     <editor id="editor" api-key="APIKEY"
                     ref="editor"
+                    :key="documentId"
                     @onKeyUp="keyHandler"
                     @onClick="detectClickEvent"
                     @onBlur="detectBlurEditorEvent"
@@ -74,14 +75,14 @@
             </div>
         </vue-resizable>
         <div  class="sym-document__side-bar-right">
-            <sidebar-right />
+            <sidebar-right :instance="keyInstance"/>
         </div>
         <s-table-setting  ref="tableSetting" @add-columns-table="addColumnTable"/>
         <auto-complete-control ref="autocompleteControl" @add-control="insertControl"/>
-        <save-doc-panel ref="saveDocPanel" @save-doc-action="validateControl"/>
+        <save-doc-panel :instance="keyInstance" ref="saveDocPanel" @save-doc-action="validateControl"/>
         <err-message :listErr="listMessageErr" ref="errMessage"/>
-        <control-name-related  ref="controlNameRelated"/>
-        <all-control-option ref="allControlOption"/>
+        <control-name-related :instance="keyInstance"  ref="controlNameRelated"/>
+        <all-control-option :instance="keyInstance" ref="allControlOption"/>
     </v-flex>
 </template>
 <script>
@@ -113,10 +114,10 @@ const CODUMENT_PROPS = "documentProperties"
 export default { 
     computed: {
         editorStore(){  
-            return this.$store.state.document.editor;
+            return this.$store.state.document.editor[this.keyInstance];
         },
         sDocumentProp(){
-            return this.$store.state.document.documentProps
+            return this.$store.state.document.documentProps[this.keyInstance]
         }
     }, 
     components: {
@@ -133,6 +134,7 @@ export default {
         "control-name-related":ControlNameRelated,
     },
     created() {
+        this.$store.commit("document/setDefaultEditorStore",{instance:this.keyInstance});
         this.documentId = this.$route.params.id;
         let thisCpn = this;
         /**
@@ -175,7 +177,8 @@ export default {
             delta : 500,
             lastKeypressTime : 0,
             listIconToolbar:null,
-            listNameValueControl:{}
+            listNameValueControl:{},
+            keyInstance:Date.now()
         }
     },
     beforeMount(){
@@ -206,7 +209,7 @@ export default {
     watch:{
         // kiểm tra xem route thay đổi khi vào editor là edit doc hay create doc
         '$route' (to) {
-            this.$store.commit("document/restoreState");
+            this.$store.commit("document/setDefaultEditorStore",{instance:this.keyInstance});
             this.documentId = Date.now();
             if(to.name =='editDocument'){
                 this.documentId = to.params.id;
@@ -241,14 +244,14 @@ export default {
             let content = localStorage.getItem(HTML_CONTENT);
             let documentProperties = localStorage.getItem(CODUMENT_PROPS);
             this.$refs.editor.editor.setContent(content);
-            this.$store.commit("document/addToDocumentStore",{key:CODUMENT_PROPS,value:documentProperties});  
-            this.$store.commit("document/addToDocumentEditorStore",{key:ALL_CONTROL,value:allControl});  
+            this.$store.commit("document/addTodocumentPropsEditor",{key:this.keyInstance,value:documentProperties});  
+            this.$store.commit("document/addToDocumentEditorStore",{key:ALL_CONTROL,value:allControl,instance:this.keyInstance});  
         },
         //set data vào local storage
         saveContentToLocalStorage(){
             let allControl = this.editorStore.allControl;
             let content = this.$refs.editor.editor.getContent();
-            let documentProperties = this.$store.state.document.documentProps;
+            let documentProperties = this.sDocumentProp;
             localStorage.setItem(ALL_CONTROL,JSON.stringify(allControl));
             localStorage.setItem(HTML_CONTENT,content);
             localStorage.setItem(CODUMENT_PROPS,JSON.stringify(documentProperties));
@@ -389,7 +392,8 @@ export default {
                     let controlEl = $('#editor_ifr').contents().find('#'+controlId);
                     controlEl.addClass('s-control-error');
                     this.$store.commit(
-                        "document/updateProp",{id:controlId,name:"name",value:"Không được bỏ trống tên control",tableId:tableId,type:"errorMessage"}
+                        "document/updateProp",{id:controlId,name:"name",value:"Không được bỏ trống tên control",
+                        tableId:tableId,type:"errorMessage",instance:this.keyInstance}
                     );
                 }
             }
@@ -457,7 +461,7 @@ export default {
         // hoangnd: hàm gửi request lưu doc
         async saveDocument(){
             let allControl = this.minimizeControlEL(this.editorStore.allControl);
-            let documentProperties = util.cloneDeep(this.$store.state.document.documentProps);
+            let documentProperties = util.cloneDeep(this.sDocumentProp);
             documentProperties = JSON.stringify(documentProperties);
             let htmlContent = this.$refs.editor.editor.getContent();
             let dataPost = this.getDataToSaveMultiFormulas(allControl);
@@ -476,7 +480,7 @@ export default {
                                     tableId = controlEl.closest(".s-control-table").attr('id');
                                 }
                                 thisCpn.$store.commit(
-                                    "document/updateFormulasId",{id:controlId,name:key,value:data[controlId][i][key],tableId:tableId}
+                                    "document/updateFormulasId",{id:controlId,name:key,value:data[controlId][i][key],tableId:tableId,instance:this.keyInstance}
                                 );   
                             }
                         } 
@@ -613,7 +617,7 @@ export default {
                     let message = 'Không được bỏ trống tên control'
                     let tableId = checkInTable(controlEl)
                     this.$store.commit(
-                        "document/updateProp",{id:controlId,name:'name',value:value,tableId:tableId,type:"errorMessage"}
+                        "document/updateProp",{id:controlId,name:'name',value:value,tableId:tableId,type:"errorMessage",instance:this.keyInstance}
                     );   
                 }
                 else{
@@ -704,13 +708,13 @@ export default {
         // hàm add các thuộc tính và formulas của control vào danh sách các control trong doc được lưu trong state
         addToAllControlInDoc(controlId,control){
             this.$store.commit(
-                "document/addControl",{id:controlId,props:control}
+                "document/addControl",{id:controlId,props:control,instance:this.keyInstance}
             );  
         },
         // hàm add các thuộc tính và formulas của control vào danh sách các control trong table được lưu trong state
         addToAllControlInTable(controlId,control,tableId){
             this.$store.commit(
-                "document/addControlToTable",{id:controlId,props:control,tableId:tableId}
+                "document/addControlToTable",{id:controlId,props:control,tableId:tableId,instance:this.keyInstance}
             );  
         },
         // set config cho phần sidebar phải các thuộc tính control đang được click
@@ -718,13 +722,13 @@ export default {
             this.$store.commit(
                 "document/addCurrentControl",
                 {properties:properties,
-                formulas:formulas,id:id}
+                formulas:formulas,id:id,instance:this.keyInstance}
             );
         },
         resetSelectControl(){
             this.$store.commit(
                 "document/resetCurrentControl",
-                {}
+                {instance:this.keyInstance}
             );
         },
         hideAutocompletaControl(){

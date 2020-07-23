@@ -72,7 +72,8 @@ export default {
                 thisCpn.listAllUser = res.data.listObject;
                 thisCpn.$store.commit("document/addToDocumentSubmitStore", {
                     key: 'listUser',
-                    value: thisCpn.listAllUser
+                    value: thisCpn.listAllUser,
+                    instance:thisCpn.keyInstance
                 });
             }
             

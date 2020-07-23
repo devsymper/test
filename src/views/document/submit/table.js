@@ -3,7 +3,7 @@ import Handsontable from 'handsontable';
 import sDocument from './../../../store/document'
 import store from './../../../store'
 import ClientSQLManager from './clientSQLManager';
-import { checkDbOnly, getControlType } from './../common/common'
+import { checkDbOnly, getControlType, getSDocumentSubmitStore } from './../common/common'
 import { SYMPER_APP } from './../../../main.js'
 import { Date } from 'core-js';
 import { checkCanBeBind, resetImpactedFieldsList, markBinedField } from './handlerCheckRunFormulas';
@@ -54,19 +54,19 @@ Handsontable.cellTypes.registerCellType('user', {
     renderer: Handsontable.renderers.UserRenderer
 });
 Handsontable.renderers.FileRenderer = function(instance, td, row, col, prop, value, cellProperties) {
-    Handsontable.renderers.TextRenderer.apply(this, arguments);
-    td.innerHTML = listInputInDocument[prop].genFileView(row);
-    td.classList.add("upload-file-wrapper-inTb");
-    $(td).off('click', '.file-add');
-    if (sDocument.state.viewType != 'detail') {
-        $(td).on('click', '.file-add', function(e) {
-            let el = $(e.target).closest('.file-add');
-            $("#file-upload-alter-" + instance.keyInstance).attr('data-rowid', row).attr('data-control-name', el.attr('data-ctrlname'));
-            $("#file-upload-alter-" + instance.keyInstance).click();
-        })
-        $(td).off('click', '.remove-file')
-        listInputInDocument[prop].setDeleteFileEvent($(td), prop)
-    }
+    // Handsontable.renderers.TextRenderer.apply(this, arguments);
+    // td.innerHTML = listInputInDocument[prop].genFileView(row);
+    // td.classList.add("upload-file-wrapper-inTb");
+    // $(td).off('click', '.file-add');
+    // if (sDocument.state.viewType[thisObj.keyInstance] != 'detail') {
+    //     $(td).on('click', '.file-add', function(e) {
+    //         let el = $(e.target).closest('.file-add');
+    //         $("#file-upload-alter-" + instance.keyInstance).attr('data-rowid', row).attr('data-control-name', el.attr('data-ctrlname'));
+    //         $("#file-upload-alter-" + instance.keyInstance).click();
+    //     })
+    //     $(td).off('click', '.remove-file')
+    //     listInputInDocument[prop].setDeleteFileEvent($(td), prop)
+    // }
 }
 Handsontable.cellTypes.registerCellType('file', {
     renderer: Handsontable.renderers.PercentRenderer
@@ -74,8 +74,6 @@ Handsontable.cellTypes.registerCellType('file', {
 let listKeyCodeNotChange = [18, 17, 9, 20, 27, 16, 192, 91]
 let listTableInstance = {}
 let columnHasSum = {}
-let listInputInDocument = sDocument.state.submit.listInputInDocument;
-console.log(SYMPER_APP.$store.state.document, 'xxxxx');
 const MAX_TABLE_HEIGHT = 300;
 
 const makeDelay = function(ms) {
@@ -156,11 +154,13 @@ export default class Table {
                     thisObj.currentSelectedCell['column'] = column;
                     store.commit("document/addToDocumentSubmitStore", {
                         key: 'currentTableInteractive',
-                        value: thisObj
+                        value: thisObj,
+                        instance: thisObj.keyInstance
                     });
                     store.commit("document/addToDocumentSubmitStore", {
                         key: 'currentCellSelected',
-                        value: thisObj.currentSelectedCell
+                        value: thisObj.currentSelectedCell,
+                        instance: thisObj.keyInstance
                     });
                     let columns = thisObj.columnsInfo.columns;
 
@@ -235,7 +235,8 @@ export default class Table {
                 afterSelectionEnd: function(row, col) {
                     store.commit("document/addToDocumentSubmitStore", {
                         key: 'docStatus',
-                        value: 'input'
+                        value: 'input',
+                        instance: thisObj.keyInstance
                     });
                 },
 
@@ -243,7 +244,8 @@ export default class Table {
                     if (changes == null) {
                         return
                     }
-                    if (sDocument.state.submit.docStatus == 'init' && sDocument.state.viewType == 'update') {
+                    if (getSDocumentSubmitStore(thisObj.keyInstance).docStatus == 'init' &&
+                        sDocument.state.viewType[thisObj.keyInstance] == 'update') {
                         return;
                     }
                     let controlName = changes[0][1];
@@ -262,9 +264,10 @@ export default class Table {
                         if (source != AUTO_SET) {
                             store.commit("document/addToDocumentSubmitStore", {
                                 key: 'rootChangeFieldName',
-                                value: controlName
+                                value: controlName,
+                                instance: thisObj.keyInstance
                             });
-                            resetImpactedFieldsList();
+                            resetImpactedFieldsList(thisObj.keyInstance);
                         }
                         columns = columns.map(function(c) {
                             return c.data;
@@ -277,14 +280,15 @@ export default class Table {
                         store.commit("document/updateListInputInDocument", {
                             controlName: controlName,
                             key: 'value',
-                            value: currentColData
+                            value: currentColData,
+                            instance: this.keyInstance
                         });
                         if (source != AUTO_SET) {
                             thisObj.handlerAfterChangeCellByUser(changes, currentRowData, columns, controlName);
                         } else {
                             thisObj.handlerAfterChangeCellByAutoSet(changes, columns, controlName);
                         }
-                        let controlUnique = checkDbOnly(controlName);
+                        let controlUnique = checkDbOnly(thisObj.keyInstance, controlName);
                         if (controlUnique != false) {
                             let dataInput = {}
                             dataInput[controlName] = [changes[0][3]]
@@ -379,7 +383,7 @@ export default class Table {
     checkControlType(type) {
             let columns = this.columnsInfo.columns;
             let controlName = columns[this.currentSelectedCell['column']].data;
-            let controlInstance = listInputInDocument[controlName];
+            let controlInstance = this.getControlInstance(controlName);
             if (controlInstance.type == type) {
                 return true;
             } else {
@@ -392,7 +396,7 @@ export default class Table {
          */
 
     checkIsAutocompleteCell(controlName) {
-            let controlInstance = listInputInDocument[controlName];
+            let controlInstance = this.getControlInstance(controlName);
             if (controlInstance != null && controlInstance != undefined) {
                 let controlFormulas = controlInstance.controlFormulas;
                 if (controlFormulas.hasOwnProperty('autocomplete')) {
@@ -411,7 +415,8 @@ export default class Table {
          */
 
     checkRunLocalSql() {
-        let listRelatedLocal = sDocument.state.submit.localRelated;
+        let currentSubmitStoreData = getSDocumentSubmitStore(this.keyInstance);
+        let listRelatedLocal = currentSubmitStoreData.localRelated;
         if (listRelatedLocal.hasOwnProperty(this.tableName)) {
             listRelatedLocal = listRelatedLocal[this.tableName];
             for (let index = 0; index < listRelatedLocal.length; index++) {
@@ -424,7 +429,7 @@ export default class Table {
     handlerCheckEffectedControlInTable(controlName) {
         console.log('hgfadssfds', controlName);
         this.checkRunLocalSql();
-        let controlInstance = listInputInDocument[controlName];
+        let controlInstance = this.getControlInstance(controlName);
         if (controlInstance == null || controlInstance == undefined) {
             return;
         }
@@ -448,7 +453,7 @@ export default class Table {
     handlerRunOtherFormulasControl(controlEffected, formulasType) {
             if (Object.keys(controlEffected).length > 0) {
                 for (let i in controlEffected) {
-                    let controlEffectedInstance = listInputInDocument[i];
+                    let controlEffectedInstance = this.getControlInstance(i);
                     let allFormulas = controlEffectedInstance.controlFormulas;
                     if (allFormulas.hasOwnProperty(formulasType)) {
                         if (allFormulas[formulasType].hasOwnProperty('instance')) {
@@ -469,10 +474,10 @@ export default class Table {
          * @param {String} control 
          */
     handlerCheckCanBeRunFormulas(control) {
-            if (checkCanBeBind(control)) {
+            if (checkCanBeBind(this.keyInstance, control)) {
 
             }
-            let controlInstance = listInputInDocument[control];
+            let controlInstance = this.getControlInstance(control);
             if (controlInstance.controlFormulas.hasOwnProperty('formulas')) {
                 let formulasInstance = controlInstance.controlFormulas['formulas'].instance;
 
@@ -499,6 +504,7 @@ export default class Table {
     getDataInputForFormulas(formulasInstance, tableName = false) {
             let inputControl = formulasInstance.getInputControl();
             let dataInput = {};
+            let listInputInDocument = this.getListInputInDocument();
             for (let inputControlName in inputControl) {
                 let valueInputControlItem = this.getColumnIndexFromControlName(inputControlName);
                 if (valueInputControlItem === false) {
@@ -526,7 +532,7 @@ export default class Table {
             if (Object.keys(dataInput).length > 0) {
                 let allRowDataInput = [];
                 for (let control in dataInput) {
-                    let controlType = getControlType(control);
+                    let controlType = getControlType(thisObj.keyInstance, control);
                     let dataRow = dataInput[control];
                     if (!Array.isArray(dataRow)) {
                         for (let index = 0; index < thisObj.tableInstance.countRows(); index++) {
@@ -565,7 +571,8 @@ export default class Table {
             store.commit("document/updateListInputInDocument", {
                 controlName: controlInstance.name,
                 key: 'value',
-                value: dataColumnAfterRunFOrmulas
+                value: dataColumnAfterRunFOrmulas,
+                instance: this.keyInstance
             });
             this.handlerDataAfterRunFormulas(dataColumnAfterRunFOrmulas, controlInstance, formulasType, dataInput)
         }
@@ -642,7 +649,7 @@ export default class Table {
      */
     setSelectCell(event) {
 
-        let controlInstance = listInputInDocument[this.currentControlSelected];
+        let controlInstance = this.getControlInstance(this.currentControlSelected);
         if (controlInstance != null && controlInstance != undefined) {
             let controlFormulas = controlInstance.controlFormulas;
             if (controlFormulas.hasOwnProperty('formulas')) {
@@ -791,7 +798,7 @@ export default class Table {
     }
 
     checkDetailView() {
-            if (sDocument.state.viewType == 'detail') {
+            if (sDocument.state.viewType[this.keyInstance] == 'detail') {
                 return true;
             } else {
                 return false;
@@ -810,16 +817,17 @@ export default class Table {
         for (let controlName in thisObj.controlObj.listInsideControls) {
             headerName.push($(ths[num]).text());
             // Lấy celltype
-            let cellType = thisObj.getCellType(controlName, listInputInDocument[controlName]);
+            let controlInstance = this.getControlInstance(controlName)
+            let cellType = thisObj.getCellType(controlName, controlInstance);
 
             thisObj.listCellType[controlName] = cellType;
             columns.push(cellType);
             //Khởi tạo giá trị cho dòng mới
-            thisObj.sampleRowValues[controlName] = listInputInDocument[controlName].getDefaultValue();
+            thisObj.sampleRowValues[controlName] = controlInstance.getDefaultValue();
             //Đánh số thứ tự các cột trong bảng
             thisObj.colName2Idx[controlName] = num;
             //ẩn cột
-            let controlProp = listInputInDocument[controlName].controlProperties;
+            let controlProp = controlInstance.controlProperties;
             if (controlProp.hasOwnProperty('isHidden') &&
                 (controlProp.isHidden.value == 1 ||
                     controlProp.isHidden.value === true ||
@@ -850,16 +858,16 @@ export default class Table {
 
     getCellType(name, control) {
         let type = control.type;
-        let ctrl = listInputInDocument[name];
+        let ctrl = this.getControlInstance(name);
         let rsl = {
             data: name,
             type: type,
             allowInvalid: true,
-            renderer: this.validateRender
+            // renderer: this.validateRender
         }
         if (type == 'number') {
             rsl.numericFormat = {
-                pattern: listInputInDocument[name].numberFormat
+                pattern: ctrl.numberFormat
             };
         } else if (type == 'label' || ctrl.controlProperties.isReadOnly == 1) {
             rsl.readOnly = true;
@@ -943,15 +951,22 @@ export default class Table {
         }
 
     }
+    getListInputInDocument() {
+        return getSDocumentSubmitStore(this.keyInstance).listInputInDocument;
+    }
+    getControlInstance(controlName) {
+        return getSDocumentSubmitStore(this.keyInstance).listInputInDocument[controlName];
+    }
     checkUniqueTable(controlName) {
-        let controlInstance = listInputInDocument[controlName];
+        let controlInstance = this.getControlInstance(controlName);
         if (controlInstance.controlProperties.hasOwnProperty('isTableOnly') &&
             (controlInstance.controlProperties.isTableOnly.value == 1 ||
                 controlInstance.controlProperties.isTableOnly.value === true ||
                 controlInstance.controlProperties.isTableOnly.value == "1")) {
-            let controlTitle = (listInputInDocument[controlName].title == "") ? listInputInDocument[controlName].name : listInputInDocument[controlName].title;
-            let tableName = listInputInDocument[controlName].inTable;
-            let tableTitle = (listInputInDocument[tableName].title == "") ? listInputInDocument[tableName].name : listInputInDocument[tableName].title;
+            let controlTitle = (controlInstance.title == "") ? controlInstance.name : controlInstance.title;
+            let tableName = controlInstance.inTable;
+            let tableInstance = this.getControlInstance(tableName);
+            let tableTitle = (tableInstance.title == "") ? tableInstance.name : tableInstance.title;
             let indexColumn = this.getColumnIndexFromControlName(controlName);
             let dataCol = this.tableInstance.getDataAtCol(indexColumn);
             let uniqueData = {}

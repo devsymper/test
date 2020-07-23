@@ -16,7 +16,8 @@ export default class ActionControl extends Control {
                 let formulas = this.controlFormulas.submit.instance;
                 store.commit("document/addToDocumentSubmitStore", {
                     key: 'submitFormulas',
-                    value: formulas
+                    value: formulas,
+                    instance: this.curParentInstance
                 });
             }
 

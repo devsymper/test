@@ -1,74 +1,84 @@
 const defaultState = {
     editor: {
-        allControl: {
-            // tất cả control đã kéo vào {key:tên control, value : [properties control]}
-            // s-control-243564534: {
-            //     properties: {
-            //         name: {
+        editor_123: {
+            allControl: {
+                // tất cả control đã kéo vào {key:tên control, value : [properties control]}
+                // s-control-243564534: {
+                //     properties: {
+                //         name: {
 
-            //         },
-            //         display: {
+                //         },
+                //         display: {
 
-            //         },
-            //         print: {
+                //         },
+                //         print: {
 
-            //         }
-            //     },
-            //     formulas: {
+                //         }
+                //     },
+                //     formulas: {
 
-            //     },
-            //     type:"",
-            //     listFields:{ // truowng hop table thi co cac control
+                //     },
+                //     type:"",
+                //     listFields:{ // truowng hop table thi co cac control
 
-            //     },
-            //      id:0
-            // }
-        },
-        currentSelectedControl: {
-            // control đang được click bởi người dùng
-            properties: {
-                name: {},
-                display: {},
-                print: {},
-
+                //     },
+                //      id:0
+                // }
             },
-            formulas: {
+            currentSelectedControl: {
+                // control đang được click bởi người dùng
+                properties: {
+                    name: {},
+                    display: {},
+                    print: {},
 
+                },
+                formulas: {
+
+                },
+                type: "",
+                id: ""
             },
-            type: "",
-            id: ""
-        },
-        listControlTreeData: [],
-        allControlForTableOption: []
+            listControlTreeData: [],
+            allControlForTableOption: []
+        }
     },
     submit: {
-        listInputInDocument: {
+        submit_123: {
+            listInputInDocument: {
 
-        },
-        dataInputCache: {
+            },
+            dataInputCache: {
 
-        },
-        docStatus: 'init',
-        SQLLiteDB: {},
-        rootControl: {},
-        impactedFieldsList: {},
-        impactedFieldsListWhenStart: {},
-        rootChangeFieldName: null,
-        //biến phục vụ cho autocomplete trong table
-        currentTableInteractive: null, //chỉ ra table đang được tương tác
-        currentCellSelected: null, // chỉ ra cell đang nhập
-        currentControlAutoComplete: null, // biến chỉ ra control nào đang autocomplete
-        submitFormulas: null,
-        listUser: null,
-        localRelated: {},
-        workflowVariable: {}
+            },
+            docStatus: 'init',
+            SQLLiteDB: {},
+            rootControl: {},
+            impactedFieldsList: {},
+            impactedFieldsListWhenStart: {},
+            rootChangeFieldName: null,
+            //biến phục vụ cho autocomplete trong table
+            currentTableInteractive: null, //chỉ ra table đang được tương tác
+            currentCellSelected: null, // chỉ ra cell đang nhập
+            currentControlAutoComplete: null, // biến chỉ ra control nào đang autocomplete
+            submitFormulas: null,
+            listUser: null,
+            localRelated: {},
+            workflowVariable: {}
+        }
     },
     detail: {
-        allData: null
+        detail_123: {
+            allData: null
+        }
     },
-    documentProps: {},
+    documentProps: {
+        instance: {}
+    },
     listAllDocument: [], // Khadm: danh sách tất cả các document được active, phục vụ cho việc  autocomplete trong script editor
-    viewType: null // chỉ định là submit, detail, hay update
+    viewType: {
+        instance: null
+    } // chỉ định là submit, detail, hay update
 };
 
 export default defaultState;
