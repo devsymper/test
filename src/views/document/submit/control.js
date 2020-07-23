@@ -213,8 +213,6 @@ export default class Control {
                 } else {
                     //sqlite
                 }
-
-                console.log('hgfdas', values);
                 // let tableControl = getListInputInDocument(this.curParentInstance)[this.name];
                 // tableControl.tableInstance.tableInstance.setDataAtRowProp(vls, null, null, AUTO_SET);
 

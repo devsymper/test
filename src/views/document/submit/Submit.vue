@@ -294,8 +294,6 @@ export default {
                         instance: this.keyInstance
                     });
             let valueControl = locale.val;
-            console.log('hdfsas',thisCpn.keyInstance);
-            console.log('hdfsas1',this.keyInstance);
             let controlInstance = getControlInstanceFromStore(thisCpn.keyInstance,locale.controlName);
             if(controlInstance.type == 'user'){
                 valueControl = $('#'+controlInstance.id).attr('user-id');

@@ -145,6 +145,13 @@ export default class BasicControl extends Control {
         let thisObj = this;
         this.ele.on('change', function(e) {
             SYMPER_APP.$evtBus.$emit('document-submit-input-change', { controlName: thisObj.controlProperties.name.value, val: $(e.target).val() })
+            if (thisObj.type == 'date') {
+                if (this.formatDate != "" && typeof this.formatDate === 'string')
+                    this.ele.on('change', function(e) {
+                        thisObj.value = $(this).val();
+                        $(this).val(moment($(this).val()).format(thisObj.formatDate))
+                    })
+            }
         })
         this.ele.on('keyup', function(e) {
             if (thisObj.type == 'user') {
@@ -178,6 +185,14 @@ export default class BasicControl extends Control {
                 value: null,
                 instance: thisObj.curParentInstance
             });
+            if (thisObj.type == 'date') {
+                $(e.target).addClass('date-picker-access');
+                SYMPER_APP.$evtBus.$emit('document-submit-date-input-click', e)
+            } else if (thisObj.type == 'inputFilter') {
+                e.controlName = thisObj.name;
+                e.formulas = thisObj.controlFormulas.formulas;
+                SYMPER_APP.$evtBus.$emit('document-submit-filter-input-click', e)
+            }
         })
         this.ele.on('focus', function(e) {
             if (thisObj.checkAutoCompleteControl()) {
@@ -217,11 +232,7 @@ export default class BasicControl extends Control {
                 value = numbro(value).format(this.numberFormat)
 
         } else if (this.type == 'date') {
-            console.log('gáde', value);
-            console.log('gáde', this.formatDate);
             value = moment(value).format(this.formatDate);
-            console.log('gáde', value);
-
         }
         if (this.type == 'label') {
             this.ele.text(value)
@@ -387,9 +398,7 @@ export default class BasicControl extends Control {
         let thisObj = this;
         this.ele.attr('type', 'text');
         this.ele.on('click', function(e) {
-            e.controlName = thisObj.name;
-            e.formulas = thisObj.controlFormulas.formulas;
-            SYMPER_APP.$evtBus.$emit('document-submit-filter-input-click', e)
+
         })
 
     }
@@ -465,19 +474,6 @@ export default class BasicControl extends Control {
         this.ele.attr('type', 'text');
         this.formatDate = (this.controlProperties.hasOwnProperty('formatDate')) ? this.controlProperties.formatDate.value : "";
         if (this.checkDetailView()) return;
-
-        let thisObj = this;
-        if (this.formatDate != "" && typeof this.formatDate === 'string')
-            this.ele.on('change', function(e) {
-                thisObj.value = $(this).val();
-                console.log('á', thisObj.value);
-                console.log('á', thisObj.formatDate);
-                $(this).val(moment($(this).val()).format(thisObj.formatDate))
-            })
-        this.ele.on('click', function(e) {
-            $(e.target).addClass('date-picker-access');
-            SYMPER_APP.$evtBus.$emit('document-submit-date-input-click', e)
-        })
     }
     renderTimeControl() {
         let thisObj = this;
