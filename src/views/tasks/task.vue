@@ -109,7 +109,7 @@ export default {
                         }else{
                             this.docObjInfo.docObjId = this.taskInfo.action.parameter.documentObjectId;
                         }
-                        this.documentObjectId = this.docObjInfo.docObjId;
+                        this.documentObjectId = Number(this.docObjInfo.docObjId);
                     }
                     this.showDoTaskComponent = true;                    
                 }else{
@@ -142,7 +142,7 @@ export default {
             this.$emit('task-submited', data);
         },
         submitForm(){
-            this.$refs.submitComponent.submitDocument();
+            this.$refs.submitComponent.handlerSubmitDocumentClick();
         }
     },
     name: "task"
