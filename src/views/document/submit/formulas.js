@@ -1,5 +1,4 @@
 import sDocument from './../../../store/document'
-let dataSubmitStore = sDocument.state.submit
 import ClientSQLManager from "./clientSQLManager.js";
 import { formulasApi } from "./../../../api/Formulas";
 import Util from "./util";
@@ -272,7 +271,8 @@ export default class Formulas {
     // Hàm kiểm tra các tham số của workflow và thay thế lại giá trị tương ứng
     // hàm này thực hiện khi chạy quy trình
     replaceWorkflowParams(formulas) {
-        let workflowVariable = dataSubmitStore.workflowVariable;
+        let workflowVariable = sDocument.state.submit[this.keyInstance].workflowVariable;
+        console.log('gádsa', sDocument.state.submit[this.keyInstance]);
         for (let param in workflowVariable) {
             let regex = new RegExp("{" + param + "}", "g");
             let value = workflowVariable[param];
@@ -385,8 +385,9 @@ export default class Formulas {
     }
 
     getDataSubmitInStore() {
-        return dataSubmitStore[this.keyInstance].listInputInDocument;
+        return sDocument.state.submit[this.keyInstance].listInputInDocument;
     }
+
 
     /**
      * Lấy tên các control mà công thức này cần lấy giá trị để thực thi
@@ -427,7 +428,7 @@ export default class Formulas {
         let inputControl = this.getInputControl();
         let dataInput = {};
         for (let inputControlName in inputControl) {
-            let valueInputControlItem = dataSubmitStore.listInputInDocument[inputControlName].value;
+            let valueInputControlItem = sDocument.state.submit[this.keyInstance].listInputInDocument[inputControlName].value;
             dataInput[inputControlName] = valueInputControlItem;
         }
         return dataInput;

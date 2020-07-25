@@ -201,11 +201,11 @@ export default class Table {
                         if (event.keyCode != 40 && event.keyCode != 38 &&
                             event.keyCode != 37 && event.keyCode != 39 &&
                             thisObj.isAutoCompleting == false) {
-                            var formulasInstance = thisObj.checkIsAutocompleteCell(thisObj.currentControlSelected);
-                            if (formulasInstance != false) {
-                                SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-input', event);
-                                thisObj.isAutoCompleting = formulasInstance;
-                            }
+                            thisObj.isAutoCompleting = thisObj.checkIsAutocompleteCell(thisObj.currentControlSelected);
+                            // if (formulasInstance != false) {
+                            //     // SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-input', event);
+                            //     thisObj.isAutoCompleting = formulasInstance;
+                            // }
                         }
 
                         let colHeaders = this.getColHeader();
@@ -216,17 +216,19 @@ export default class Table {
                         }
                         setTimeout(() => {
                             if (thisObj.isAutoCompleting != false) {
-                                let column = thisObj.currentSelectedCell['column'];
-
+                                let columnIndex = thisObj.currentSelectedCell['column'];
+                                let columns = thisObj.columnsInfo.columns;
                                 // let controlName = 
                                 let formulasInstance = thisObj.isAutoCompleting
                                 if (formulasInstance != false) {
                                     event.rowIndex = thisObj.currentSelectedCell['row'];
+                                    // event['controlName'] = thisObj.controlProperties.name.value;
                                     SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-key-event', {
                                         e: event,
                                         autocompleteFormulasInstance: formulasInstance,
                                         isSelect: false,
-                                        controlTitle: colHeaders[column]
+                                        controlTitle: colHeaders[columnIndex],
+                                        controlName: columns[columnIndex].data
                                     })
                                 }
                             }

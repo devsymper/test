@@ -235,7 +235,9 @@ const addToDocumentSubmitStore = (state, params) => {
     let key = params.key
     let value = params.value
     let instance = params.instance
-    Vue.set(state.submit[instance], key, value);
+    if (state.submit.hasOwnProperty(instance)) {
+        Vue.set(state.submit[instance], key, value);
+    }
 }
 const addToDocumentDetailStore = (state, params) => {
     let key = params.key
