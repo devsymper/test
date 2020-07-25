@@ -12,9 +12,6 @@ const markBinedField = function(instance, fieldName) {
     let docStatus = sDocumentSubmit.docStatus;
     let impactedFieldsList = sDocumentSubmit.impactedFieldsList;
     let impactedFieldsListWhenStart = sDocumentSubmit.impactedFieldsListWhenStart;
-    console.log(sDocumentSubmit);
-    console.log(instance);
-
     if (docStatus === 'init') {
         impactedFieldsListWhenStart[fieldName] = true;
         store.commit("document/addToDocumentSubmitStore", {

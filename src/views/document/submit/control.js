@@ -90,7 +90,8 @@ export default class Control {
                     if (table.length > 0)
                         store.commit("document/addToRelatedLocalFormulas", {
                             key: this.name,
-                            value: table
+                            value: table,
+                            instance: this.curParentInstance
                         });
                 }
             }
@@ -213,8 +214,6 @@ export default class Control {
                 } else {
                     //sqlite
                 }
-
-                console.log('hgfdas', values);
                 // let tableControl = getListInputInDocument(this.curParentInstance)[this.name];
                 // tableControl.tableInstance.tableInstance.setDataAtRowProp(vls, null, null, AUTO_SET);
 

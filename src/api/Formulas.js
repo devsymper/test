@@ -16,6 +16,9 @@ export const formulasApi = {
     execute(data) {
         return api.post('formulas/get-data', data);
     },
+    getMultiData(data) {
+        return api.post('formulas/get-data-multi', data);
+    },
     getRelated(data) {
         return api.post('formulas/query-related', data);
     }

@@ -24,6 +24,8 @@ export default class Formulas {
              */
             this.type = type;
             this.inputControl = this.setInputControl();
+            this.refFormulas = this.getReferenceFormulas();
+            this.localFormulas = this.getLocalFormulas();
         }
         /**
          * Hàm xử lí thay các giá trị của input đầu vào để thực hiện truy vấn
@@ -41,7 +43,7 @@ export default class Formulas {
          */
     async handleBeforeRunFormulas(dataInput, inject = "") {
         let script = this.formulas;
-        let listLocal = this.getLocalFormulas(script);
+        let listLocal = this.localFormulas;
         if (listLocal != null && listLocal.length > 0) {
             for (let i = 0; i < listLocal.length; i++) {
                 let sql = listLocal[i].trim();
@@ -58,7 +60,7 @@ export default class Formulas {
             }
         }
 
-        let listSyql = this.getReferenceFormulas(script);
+        let listSyql = this.refFormulas;
 
         if (listSyql != null && listSyql.length > 0) {
             for (let i = 0; i < listSyql.length; i++) {
@@ -88,7 +90,29 @@ export default class Formulas {
         }
 
     }
+    async getDataMultiple(dataInput) {
+        let listSyql = this.refFormulas;
+        if (listSyql != null && listSyql.length > 0) {
+            let syql = listSyql[0];
+            syql = syql.replace('ref(', '');
+            syql = syql.substring(0, syql.length - 1);
+            syql = syql.replace(/\r?\n|\r/g, ' ');
+            let dataPost = { formula: syql, dataInput: JSON.stringify(dataInput) };
+            return formulasApi.getMultiData(dataPost);
+        } else {
+            let script = this.formulas;
+            let dataRespone = {}
+            for (let id in dataInput) {
+                let dataInputRow = dataInput[id];
+                script = script.replace(/\r?\n|\r/g, ' ');
+                let formulas = this.replaceParamsToData(dataInputRow, script);
+                let res = await this.runSQLLiteFormulas(formulas);
+                dataRespone[id] = res[0].values[0][0];
+            }
+            return { data: dataRespone, from: 'local' }
 
+        }
+    }
 
     // hàm xử lí chạy các công thức có khóa local trong script sau khi chạy xong thay thế lại giá tri cho script
 
@@ -212,7 +236,6 @@ export default class Formulas {
             let s = script.replace(/\(/g, "\\(");
             s = s.replace(/\)/g, "\\)");
             let reg = new RegExp("([a-zA-Z_0-9]+)\\s+" + s, "gm")
-            let x1 = "([a-zA-Z_0-9]+)\\s+" + s;
             let textBefore = refScript.match(reg);
             if (textBefore != null && textBefore.length > 0) {
                 textBefore = textBefore[0].replace(script, "")
@@ -265,7 +288,7 @@ export default class Formulas {
 
     // Hàm chạy công thức cho autocomplete
     handleRunAutoCompleteFormulas(dataInput = false) {
-        let listSyql = this.getReferenceFormulas(this.formulas);
+        let listSyql = this.refFormulas;
         if (listSyql != null && listSyql.length > 0) {
             let syql = listSyql[0].trim();
             syql = this.replaceParamsToData(dataInput, syql);
@@ -290,7 +313,7 @@ export default class Formulas {
      */
     detectTableRelateLocalFormulas() {
             let listTable = []
-            let listLocal = this.getLocalFormulas(this.formulas);
+            let listLocal = this.localFormulas;
             if (listLocal != null && listLocal.length > 0) {
                 for (let i = 0; i < listLocal.length; i++) {
                     let sql = listLocal[i];
@@ -315,16 +338,16 @@ export default class Formulas {
         /**
          * Hàm tách các công thức reference (công thức chạy trên server)
          */
-    getReferenceFormulas(syql) {
-        let listSyql = syql.match(/ref\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\([^)(]*\))*\))*\))*\))*\))*\))*\))*\))*\))*\)/gm);
+    getReferenceFormulas() {
+        let listSyql = this.formulas.match(/ref\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\([^)(]*\))*\))*\))*\))*\))*\))*\))*\))*\))*\)/gm);
         return listSyql;
     }
 
     /**
      * Hàm tách các công thức local (công thức chạy owr client)
      */
-    getLocalFormulas(syql) {
-        let listSqlite = syql.match(/local\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\([^)(]*\))*\))*\))*\))*\))*\))*\))*\))*\))*\)/gm);
+    getLocalFormulas() {
+        let listSqlite = this.formulas.match(/local\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\([^)(]*\))*\))*\))*\))*\))*\))*\))*\))*\))*\)/gm);
         return listSqlite;
     }
 
@@ -443,7 +466,7 @@ export default class Formulas {
     // hàm wrap lại formulas của control inputfilter khi có search
     wrapSyqlForSearchInputFilter(search) {
             this.setFormulas(this.oldFormulas);
-            let refFormulas = this.getReferenceFormulas(this.formulas);
+            let refFormulas = this.refFormulas;
             if (refFormulas.length > 0) {
                 let syql = refFormulas[0].trim();
                 syql = syql.replace('ref(', '');

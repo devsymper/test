@@ -121,7 +121,6 @@ export default class ClientSQLManager {
         let tbColumn = column.join();
         let tbValue = value.join()
         let sql = `INSERT INTO ${tableName} (${tbColumn}) VALUES(${tbValue})`;
-        console.log('gfsdd', tableName, sql);
         if (returnPromise) {
             return new Promise((resolve, reject) => {
                 try {
