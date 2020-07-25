@@ -87,12 +87,16 @@ export default class Control {
                     let formulas = Object.values(this.controlFormulas[key].value)[0];
                     this.controlFormulas[key]['instance'] = new Formulas(this.curParentInstance, formulas, key);
                     let table = this.controlFormulas[key]['instance'].detectTableRelateLocalFormulas();
-                    if (table.length > 0)
+                    if (table.length > 0) {
+                        console.log('gadkjda', this.name);
+                        console.log('gadkjda', table);
                         store.commit("document/addToRelatedLocalFormulas", {
                             key: this.name,
                             value: table,
                             instance: this.curParentInstance
                         });
+                    }
+
                 }
             }
         }

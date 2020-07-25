@@ -232,7 +232,7 @@ export default class Table {
                                     })
                                 }
                             }
-                        }, 10);
+                        }, 50);
                     }
                 },
 
@@ -488,7 +488,6 @@ export default class Table {
             let controlInstance = this.getControlInstance(control);
             if (controlInstance.controlFormulas.hasOwnProperty('formulas')) {
                 let formulasInstance = controlInstance.controlFormulas['formulas'].instance;
-
                 if (controlInstance.type != 'table') {
                     if (controlInstance.inTable == this.tableName) {
                         let dataInput = this.getDataInputForFormulas(formulasInstance, controlInstance.inTable);
@@ -497,11 +496,15 @@ export default class Table {
                         SYMPER_APP.$evtBus.$emit('run-formulas-control-outside-table', {
                             formulasInstance: formulasInstance,
                             controlName: control
-                        })
+                        });
                     }
                 } else {
-                    let dataInput = this.getDataInputForFormulas(formulasInstance, controlInstance.name);
-                    this.handlerRunFormulasForControlInTable('formulas', controlInstance, dataInput, formulasInstance);
+                    // let dataInput = this.getDataInputForFormulas(formulasInstance, controlInstance.name);
+                    // this.handlerRunFormulasForControlInTable('formulas', controlInstance, dataInput, formulasInstance);
+                    SYMPER_APP.$evtBus.$emit('run-formulas-control-outside-table', {
+                        formulasInstance: formulasInstance,
+                        controlName: control
+                    });
                 }
             }
         }
@@ -538,9 +541,7 @@ export default class Table {
             let listIdRow = this.tableInstance.getDataAtCol(this.tableInstance.getDataAtRow(0).length - 1);
             let dataPost = {};
             let thisObj = this;
-            let dataColumnAfterRunFOrmulas = [];
             if (Object.keys(dataInput).length > 0) {
-
                 let allRowDataInput = [];
                 for (let control in dataInput) {
                     let controlType = getControlType(thisObj.keyInstance, control);
@@ -568,7 +569,6 @@ export default class Table {
                         }
                     }
                 }
-
                 for (let index = 0; index < allRowDataInput.length; index++) {
                     let rowInput = allRowDataInput[index];
                     dataPost[listIdRow[index]] = rowInput;
@@ -576,7 +576,7 @@ export default class Table {
             }
             let dataForStore = [];
             await formulasInstance.getDataMultiple(dataPost).then(res => {
-                if (res == undefined) {
+                if (res == undefined || !res.hasOwnProperty('data')) {
                     return;
                 }
                 if (formulasType == 'formulas') {

@@ -1190,7 +1190,6 @@ export default {
                         dataInput[inputControlName] = valueInputControlItem;
                     }
                 }
-                
             }
             return dataInput;
         },
