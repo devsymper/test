@@ -89,6 +89,9 @@ export default {
         hide(){
             this.isShowAutoComplete = false;
         },
+        isShow(){
+            return this.isShowAutoComplete;
+        },
         setData(data){
             this.headers = data.headers;
             this.dataTable = data.dataBody;
