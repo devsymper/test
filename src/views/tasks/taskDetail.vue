@@ -251,17 +251,29 @@ export default {
                             name: this.originData.taskDefinitionKey+'_outcome',
                             type: 'string',
                             value: value
-                        }
+                        },
+                        {
+                            name: 'executor_full_name',
+                            type: 'string',
+                            value: this.$store.state.app.endUserInfo.displayName
+                        },
+                        {
+                            name: 'executor_id',
+                            type: 'string',
+                            value: this.$store.state.app.endUserInfo.id
+                        },
                     ],
                     // "transientVariables": []
                 }
                 let res = await this.submitTask(taskData);
+                this.$emit('task-submited', res);
             }else if(this.taskAction == 'undefined'){
                 let taskData = {
                     "action": "complete",
                     "outcome": value,
                 }
                 let res = await this.submitTask(taskData);
+                this.$emit('task-submited', res);
             }
         },
         async submitTask(taskData){
@@ -278,7 +290,6 @@ export default {
                         detail = JSON.parse(error.responseText);
                         detail = detail.exception;
                     }
-                    debugger
                     self.$snotifyError(error, "Can not submit task!", detail);
                     reject(error);
                 }
@@ -295,7 +306,7 @@ export default {
                     docId = this.taskInfo.action.parameter.documentId;
                 }
                 let varsForBackend = await getVarsFromSubmitedDoc(data, elId, docId);
-                let taskData = {
+                let taskData = { 
                     // action nhận 1 trong 4 giá trị: complete, claim, resolve, delegate
                     "action": "complete", 
                     "assignee": "1",

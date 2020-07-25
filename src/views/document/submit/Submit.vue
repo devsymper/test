@@ -234,6 +234,7 @@ export default {
     },
 
     created() {
+        console.log(JSON.stringify(this.workflowVariable), 'workflowVariableworkflowVariableworkflowVariableworkflowVariableworkflowVariable');
         this.$store.commit("document/setDefaultSubmitStore",{instance:this.keyInstance});
         this.$store.commit("document/setDefaultDetailStore",{instance:this.keyInstance});
         this.$store.commit("document/setDefaultEditorStore",{instance:this.keyInstance});

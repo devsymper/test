@@ -8,6 +8,7 @@ const defaultConfig = {
     total: 0,
     valuesIn: {},
     valuesNotIn: {},
+    selectItems: [], // danh sách các item hiển thị cho autocomplete trong  filter, mỗi item có dạng: {value: 'xx', checked: true}
     clickedSelectAll: true,
     conditionFilter: {
         // Các giá trị của lọc theo điều kiện

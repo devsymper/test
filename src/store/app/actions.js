@@ -18,10 +18,10 @@ const handleUrlChanges = (context, data) => {
  */
 function addPathInfoForANode(orgc, node) {
     if (!node.path) {
-        if (node.id_parent_node == 'general') {
+        if (node.vizParentId == '') {
             node.path = `${orgc.name} / ${node.name}`;
         } else {
-            let parentId = node.id_parent_node;
+            let parentId = node.vizParentId;
             let parentNode = orgc.children[parentId];
             if (parentNode.path) {
                 node.path = `${parentNode.path} / ${node.name}`;
@@ -49,17 +49,16 @@ function makeNodesMap(orgchartNodes) {
     for (let orgc of orgchartNodes) {
         let newOrgc = {
             id: orgc['id'], // thêm _ ở đầu để có thể khởi động reactive của vue
-            id_node: orgc['id_node'],
-            id_node: orgc['id_node'],
-            id_parent_node: orgc['id_parent_node'],
+            id_node: 'general',
+            id_parent_node: 'general',
             name: orgc['name'],
-            root_id: orgc['root_id'],
+            root_id: orgc['id'],
             children: {}
         };
 
-        for (let node of orgc.children) {
-            node.gid = orgc['id'] + '-' + node.id_node; // gid là general id là kết hợp giữa id orgchart và id node tạo thành key duy nhất để xác định một node bất kỳ giữa tất cả các orgchart 
-            newOrgc.children[node.id_node] = node;
+        for (let node of orgc.nodes) {
+            node.gid = orgc['id'] + ':' + node.vizId; // gid là general id là kết hợp giữa id orgchart và id node tạo thành key duy nhất để xác định một node bất kỳ giữa tất cả các orgchart 
+            newOrgc.children[node.vizId] = node;
         }
         rsl[orgc.id] = newOrgc;
     }
@@ -154,6 +153,14 @@ async function checkAndRefreshCurrentRole(data, context) {
     }
 }
 
+function setCookie(cname, cvalue, exdays) {
+    var d = new Date();
+    d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+    var expires = "expires=" + d.toUTCString();
+    const domain = "domain=" + (document.domain.match(/[^\.]*\.[^.]*$/)[0]) + ";";
+    document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/;" + domain;
+}
+
 const setUserInfo = (context, data) => {
     let accData = {
         accType: data.profile.type,
@@ -177,6 +184,7 @@ const setUserInfo = (context, data) => {
     }
     context.commit("changeCurrentUserInfo", endUserInfo);
     util.auth.saveLoginInfo(accInfo);
+    setCookie('symper_token', "Bearer " + data.token, 365);
     checkAndRefreshCurrentRole(data, context);
 }
 

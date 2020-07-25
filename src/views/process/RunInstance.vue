@@ -77,8 +77,9 @@ export default {
                 let varsForBackend = await getVarsFromSubmitedDoc(outcomeData, startNodeId, startNode.formKey);
                 vars = varsForBackend.vars;
                 dataInputForFormula = varsForBackend.nameAndValueMap;
-
+                
                 let instanceName = await this.getInstanceName(dataInputForFormula);
+                
                 // let newProcessInstance = await runProcessDefinition(this, processDef, [], instanceName);
                 let newProcessInstance = await runProcessDefinition(this, processDef, vars, instanceName);
                 this.$snotifySuccess("Task submited successfully");
@@ -112,6 +113,8 @@ export default {
                                 if(formulaData.length > 0){
                                     formulaData = formulaData[0];
                                     resolve(Object.values(formulaData)[0]);
+                                }else{
+                                    resolve('');
                                 }
                             }else{
                                 resolve('');

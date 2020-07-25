@@ -199,7 +199,7 @@ export default {
             if(node){
                 this.$emit('input',this.value.concat({
                     idNode: node.id_node,
-                    idOrgchart: node.gid.split('-')[0]
+                    idOrgchart: node.gid.split(':')[0]
                 }));
             }
         },

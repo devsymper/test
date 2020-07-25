@@ -177,6 +177,7 @@
             ref="tableFilter"
             :columnFilter="tableFilter.currentColumn.colFilter"
             @apply-filter-value="applyFilter"
+            @search-autocomplete-items="searchAutocompleteItems"
         ></table-filter>
 
         <v-dialog
@@ -225,7 +226,7 @@ import SymperDragPanel from "./SymperDragPanel.vue";
 import DisplayConfig from "./../common/listItemComponents/DisplayConfig";
 
 var apiObj = new Api("");
-
+var testSelectData = [ ];
 window.tableDropdownClickHandle = function(el, event) {
     event.preventDefault();
     event.stopPropagation();
@@ -378,6 +379,10 @@ export default {
             default: ""
         },
         getDataUrl: {
+            type: String,
+            default: ""
+        },
+        getDataFromFilterUrl: {
             type: String,
             default: ""
         },
@@ -612,6 +617,10 @@ export default {
         }
     },
     methods: {
+        searchAutocompleteItems(vl){
+            this.tableFilter.currentColumn.colFilter.searchKey = vl;
+            this.getItemForValueFilter();
+        },
         confirmDeleteItems(){
             this.deleteDialogShow = false;
             this.exeCallbackOnContextMenu(this.deleteItems);
@@ -769,7 +778,8 @@ export default {
                     filter.sort == "" &&
                     $.isEmptyObject(filter.valuesIn) &&
                     $.isEmptyObject(filter.valuesNotIn) &&
-                    filter.conditionFilter.items[0].type == "none"
+                    filter.conditionFilter.items[0].type == "none" &&
+                    filter.searchKey == ''
                 ) {
                     return false;
                 } else {
@@ -789,12 +799,11 @@ export default {
             let icon = $(this.$el).find(
                 ".symper-table-dropdown-button[col-name=" + colName + "]"
             );
-            if (hasFilter || source == "clear-filter") {
-                this.getData();
-                if (source != "clear-filter") {
-                    icon.addClass("applied-filter");
-                }
-            } else {
+            this.getData(false,false,true);
+
+            if(hasFilter && source != "clear-filter"){
+                icon.addClass("applied-filter");
+            }else{
                 this.$delete(this.tableFilter.allColumn, colName);
                 icon.removeClass("applied-filter");
             }
@@ -805,18 +814,51 @@ export default {
          * @param {Boolean} cache có ưu tiên dữ liệu từ cache hay ko
          *
          */
-        getData(columns = false, cache = false) {
+        getData(columns = false, cache = false, applyFilter = false) {
+            let thisCpn = this;
+            let handler = (data) => {
+                if(thisCpn.customAPIResult.reformatData){
+                    data = thisCpn.customAPIResult.reformatData(data);
+                }else{
+                    data = data.data;
+                }
+                let total = data.total ? data.total : 0;
+                let pageSize = thisCpn.pageSize;
+                thisCpn.totalPage =
+                    total % pageSize > 0
+                        ? Math.floor(total / pageSize) + 1
+                        : Math.floor(total / pageSize);
+                if (thisCpn.page > thisCpn.totalPage) {
+                    thisCpn.page = 1;
+                }
+                thisCpn.loadingData = false;
+                thisCpn.tableColumns = thisCpn.getTableColumns(
+                    data.columns
+                );
+                thisCpn.data = data.listObject ? data.listObject : [];
+                thisCpn.handleStopDragColumn();
+                thisCpn.$emit('data-get', data.listObject);
+            }
+            this.prepareFilterAndCallApi(columns , cache , applyFilter, handler);
+        },
+        /**
+         * Lấy ra cấu hình cho việc sort
+         */
+        prepareFilterAndCallApi(columns = false, cache = false, applyFilter = false, success, configs = {}){
             let url = this.getDataUrl;
+            let method = 'GET';
+
             if (url != "") {
                 let thisCpn = this;
                 thisCpn.loadingData = true;
                 let options = {
-                    filter: this.getFilterConfigs(),
+                    filter: this.getFilterConfigs(configs.getDataMode),
                     sort: this.getSortConfigs(),
                     search: this.searchKey,
                     page: this.page,
-                    pageSize: this.pageSize,
-                    columns: columns ? columns : []
+                    pageSize: configs.pageSize ? configs.pageSize : this.pageSize,
+                    columns: columns ? columns : [],
+                    distinct: configs.distinct ? configs.distinct : false
                 };
 
                 let header = {};
@@ -827,30 +869,9 @@ export default {
                     options = {};
                 }
                 apiObj
-                    .callApi("GET", url, options, header, {})
+                    .callApi(method, url, options, header, {})
                     .then(data => {
-
-                        if(thisCpn.customAPIResult.reformatData){
-                            data = thisCpn.customAPIResult.reformatData(data);
-                        }else{
-                            data = data.data;
-                        }
-                        let total = data.total ? data.total : 0;
-                        let pageSize = thisCpn.pageSize;
-                        thisCpn.totalPage =
-                            total % pageSize > 0
-                                ? Math.floor(total / pageSize) + 1
-                                : Math.floor(total / pageSize);
-                        if (thisCpn.page > thisCpn.totalPage) {
-                            thisCpn.page = 1;
-                        }
-                        thisCpn.loadingData = false;
-                        thisCpn.tableColumns = thisCpn.getTableColumns(
-                            data.columns
-                        );
-                        thisCpn.data = data.listObject ? data.listObject : [];
-                        thisCpn.handleStopDragColumn();
-                        thisCpn.$emit('data-get', data.listObject);
+                        success(data);
                     })
                     .catch(err => {
                         console.warn(err);
@@ -862,9 +883,6 @@ export default {
                     });
             }
         },
-        /**
-         * Lấy ra cấu hình cho việc sort
-         */
         getSortConfigs() {
             let columnMap = this.tableColumns.reduce((map, item) => {
                 map[item.data] = item;
@@ -875,11 +893,7 @@ export default {
                 let filter = this.tableFilter.allColumn[colName];
                 if (filter.sort != "") {
                     sort.push({
-                        column: {
-                            name: columnMap[colName].data,
-                            title: columnMap[colName].columnTitle,
-                            type: columnMap[colName].type
-                        },
+                        column: columnMap[colName].data,
                         type: filter.sort
                     });
                 }
@@ -889,28 +903,64 @@ export default {
         /**
          * Chuyển đổi cấu hình filter của component này sang dạng api hiểu được
          */
-        getFilterConfigs() {
+        getFilterConfigs(getDataMode = '') {
             let configs = [];
             for (let colName in this.tableFilter.allColumn) {
+
                 let filter = this.tableFilter.allColumn[colName];
                 let condition = filter.conditionFilter;
+                let option = {
+                    column: colName, // tên cột cần filter
+                    operation: condition.conjunction,
+                };
+                if(getDataMode == 'autocomplete' && colName == this.tableFilter.currentColumn.name){
+                    option.conditions = [
+                        {
+                            name: 'contains',
+                            value: this.tableFilter.currentColumn.colFilter.searchKey ? this.tableFilter.currentColumn.colFilter.searchKey : ''
+                        }
+                    ];
+                    configs.push(option);
+                    continue;
+                }
+
                 if (condition.items[0].type != "none") {
-                    let option = {
-                        column: colName, // tên cột cần filter
-                        operation: condition.conjunction,
-                        conditions: [
-                            {
-                                name: condition.items[0].type,
-                                args: [condition.items[0].value]
-                            }
-                        ]
-                    };
+                    option.conditions = [
+                        {
+                            name: condition.items[0].type,
+                            value: condition.items[0].value
+                        }
+                    ];
                     if (condition.items[1].type != "none") {
                         option.conditions.push({
                             name: condition.items[1].type,
-                            args: [condition.items[1].value]
+                            value: condition.items[1].value
                         });
                     }
+                }
+
+                if(filter.searchKey != '' && filter.clickedSelectAll){
+                    option.conditions = [
+                        {
+                            name: 'contains',
+                            value: filter.searchKey
+                        }
+                    ];
+                }
+
+                if(filter.selectAll && !$.isEmptyObject(filter.valuesNotIn)){
+                    option.valueFilter = {
+                        'operation': ' NOT IN ',
+                        'values': Object.keys(filter.valuesNotIn)
+                    };
+                }else if(!filter.selectAll && !$.isEmptyObject(filter.valuesIn)){
+                    option.valueFilter = {
+                        'operation': ' IN ',
+                        'values': Object.keys(filter.valuesIn)
+                    };
+                }
+
+                if(!$.isEmptyObject(option)){
                     configs.push(option);
                 }
             }
@@ -1044,6 +1094,7 @@ export default {
         showTableDropdownMenu(x, y, colName) {
             let filterDom = $(this.$refs.tableFilter.$el);
             filterDom.css("left", x + "px").css("top", y + 10 + "px");
+            this.$refs.dataTable.hotInstance.deselectCell();
             this.$refs.tableFilter.show();
 
             let colFilter = this.tableFilter.allColumn[colName];
@@ -1061,7 +1112,81 @@ export default {
                 name: colName,
                 colFilter: colFilter
             });
+
+            this.setSelectItemForFilter();
             $("#symper-platform-app").append(filterDom[0]);
+            this.getItemForValueFilter();
+        },
+
+        /**
+         * Lấy các item phục vụ cho việc lựa chọn trong autocomplete cuar filter
+         */
+        getItemForValueFilter(){
+            let columns = [this.tableFilter.currentColumn.name];
+            let self = this;
+            let options = {
+                pageSize: 300,
+                getDataMode: 'autocomplete',
+                distinct: true
+            };
+            let success = (data) => {
+                if(data.status == 200){
+                    self.tableFilter.currentColumn.colFilter.selectItems = null;
+                    let items = data.data.listObject.reduce((arr, el) => {
+                        arr.push(el[columns[0]]);
+                        return arr;
+                    }, []);
+                    self.tableFilter.currentColumn.colFilter.selectItems = self.createSelectableItems(items);
+                }
+                console.log(self.tableFilter.currentColumn.selectItems, 'datadatadatadatadata');
+
+            }
+            this.prepareFilterAndCallApi(columns , false, true, success, options);
+        },
+
+        /**
+         * Lấy danh sách các giá trị cần đưa vào danh sách lựa chọn autocomplete từ server nếu chưa có danh sách này
+         */
+        async setSelectItemForFilter(){
+            let colFilter = this.tableFilter.currentColumn.colFilter;
+            if(colFilter.selectItems.length == 0){
+                let textItems = testSelectData;
+                colFilter.selectItems = this.createSelectableItems(textItems);
+            }
+        },
+        /**
+         * Tạo ra các item có check box với trạng thái đã check hay chưa 
+         * @param items danh sách các value dạng ['ccc','xxc', ....]
+         */
+        createSelectableItems(items){
+            let colFilter = this.tableFilter.currentColumn.colFilter;
+            let selectableItems = [];
+            if(colFilter.clickedSelectAll){ // chọn tất cả
+                selectableItems = items.reduce((arr, el) => {
+                    arr.push({
+                        value: el,
+                        checked: true
+                    });
+                    return arr;
+                }, []);
+            }else if(colFilter.selectAll){ // not in
+                selectableItems = items.reduce((arr, el) => {
+                    arr.push({
+                        value: el,
+                        checked: colFilter.valuesNotIn[el] ? false : true
+                    });
+                    return arr;
+                }, []);
+            }else{ // in
+                selectableItems = items.reduce((arr, el) => {
+                    arr.push({
+                        value: el,
+                        checked: colFilter.valuesIn[el] ? true : false
+                    });
+                    return arr;
+                }, []);
+            }  
+            return selectableItems;
         },
         saveDataAction() {
             this.closeactionPanel();

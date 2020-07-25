@@ -945,6 +945,16 @@ let allAttrs = {
                     "isAttr": true,
                     "type": "String"
                 },
+                {
+                    "name": "sourceExpression",
+                    "isAttr": true,
+                    "type": "String"
+                },
+                {
+                    "name": "targetExpression",
+                    "isAttr": true,
+                    "type": "String"
+                },
             ]
         },
         pushToXML: attrToXMLMethods.acllActivityIOParamsMethod,
@@ -996,6 +1006,16 @@ let allAttrs = {
                 },
                 {
                     "name": "target",
+                    "isAttr": true,
+                    "type": "String"
+                },
+                {
+                    "name": "sourceExpression",
+                    "isAttr": true,
+                    "type": "String"
+                },
+                {
+                    "name": "targetExpression",
                     "isAttr": true,
                     "type": "String"
                 },
@@ -1928,6 +1948,11 @@ let allAttrs = {
             orgchartSelectorValue: [] // dạng value của orgchartselector để hiển thị lên
         },
         getValueForXML(value) {
+            let result = {
+                formula: '',
+                users: [],
+                roles: []
+            };
             let userIds = [];
             for (let item of value.orgChart) {
                 if (item.id.includes('user-')) {
@@ -1935,6 +1960,36 @@ let allAttrs = {
                 }
             }
             return userIds.join(',');
+            // return userIds.join(',');
+            // let rsl = {
+            //     formula: '',
+            //     users: [
+            //         /**
+            //          * Danh sách các user được chọn, có dạng:
+            //          * {
+            //          *      userId: 100,
+            //          *      orgchartId: 20,
+            //          *      vizPositionId: 'abc-xyz'
+            //          * }
+            //          */
+            //     ],
+            //     orgchartRole: [
+            //         /**
+            //          * danh sách các role trong orgchart, mỗi item có dạng
+            //          * {
+            //          *      orgchartId: 20,
+            //          *      vizPositionId: 'abc-xyz'
+            //          * }
+            //          */
+            //     ],
+            //     systemRole: [
+            //         /**
+            //          * id của các role trong hệ thống: , có dạng:
+            //          * [12, 23, ..]
+            //          */
+            //     ],
+            // };
+
         },
         activeTab: 'orgchart', // tab nào sẽ mở: orgchart hoặc script
         dg: 'assignment',
