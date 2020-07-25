@@ -859,7 +859,8 @@ export default {
             this.isSubmitting = true;
             let thisCpn = this;
             let dataPost = this.getDataPostSubmit();
-            dataPost['id'] = this.documentId;
+            dataPost['documentId'] = this.documentId;
+            
             documentApi.submitDocument(dataPost).then(res => {
                 let dataResponSubmit = res.data;
                 userApi.getDetailUser(res.data.document_object_user_created_id).then(res=>{
@@ -900,7 +901,7 @@ export default {
             this.isSubmitting = true;
             let thisCpn = this;
             let dataPost = this.getDataPostSubmit();
-            dataPost['id'] = this.documentId;
+            dataPost['documentId'] = this.documentId;
             documentApi.updateDocument(this.docObjId,dataPost).then(res => {
                 thisCpn.$emit('submit-document-success',res.data);
                 thisCpn.isSubmitting = false;
@@ -932,12 +933,15 @@ export default {
          */
         getDataPostSubmit() {
             let listInput = this.sDocumentSubmit.listInputInDocument;
-            let dataPost = {};
+            let newDataPost = {};
+            let dataControl = {};
             for (let controlName in listInput) {
-                let id = "field_" + listInput[controlName].idField;
+                if(listInput[controlName].inTable != false){
+                    continue;
+                }
                 if (listInput[controlName].type == "table") {
                     let value = this.getDataTableInput(listInput[controlName]);
-                    Object.assign(dataPost, value);
+                    Object.assign(dataControl, value);
                 } else {
                     if (listInput[controlName].type != "submit" && 
                     listInput[controlName].type != "reset" && 
@@ -947,22 +951,23 @@ export default {
                         if(listInput[controlName].type == 'percent'){
                             value = (listInput[controlName].value === "" ) ? 0 : listInput[controlName].value/100;
                         }
-                        dataPost[id] = [value];
+                        dataControl[controlName] = value;
                         if(listInput[controlName].type == 'checkbox'){
-                            dataPost[id] = (value) ? [1] : [0];
+                            dataControl[controlName] = (value) ? 1 : 0;
                         }
-                        if(listInput[controlName].type == 'user'){
-                            dataPost[id] =  [0];
-                        }
+                        // if(listInput[controlName].type == 'user'){
+                        //     dataPost[id] =  [0];
+                        // }
                         
                     }
                     
                 }
             }
-            dataPost['documentObjectWorkflowObjectId'] = this.documentObjectWorkflowObjectId;
-            dataPost['documentObjectWorkflowId'] = this.documentObjectWorkflowId;
-            dataPost['documentObjectTaskId'] = this.documentObjectTaskId;
-            return dataPost;
+            newDataPost['documentObjectWorkflowObjectId'] = this.documentObjectWorkflowObjectId;
+            newDataPost['documentObjectWorkflowId'] = this.documentObjectWorkflowId;
+            newDataPost['documentObjectTaskId'] = this.documentObjectTaskId;
+            newDataPost['dataControl'] = JSON.stringify(dataControl);
+            return newDataPost;
         },
         /**
          * Hàm lấy dữ liệu của table dạng colName : ['a',"b","c"]
@@ -971,28 +976,33 @@ export default {
             let listInput = this.sDocumentSubmit.listInputInDocument;
             let indexCol = tableControl.tableInstance.colName2Idx;
             let dataTable = {};
+            let dataControlInTable = {};
             let columnObjectIdIndex = tableControl.tableInstance.getColumnIndexFromControlName('childObjectId');
             let dataColObjectId = tableControl.tableInstance.tableInstance.getDataAtCol(
                     columnObjectIdIndex
                 );
-            dataTable[tableControl.name] = dataColObjectId;
+            dataControlInTable['child_object_id'] = dataColObjectId;
             for (let i in indexCol) {
-                let id = "field_" + listInput[i].idField;
                 let dataCol = tableControl.tableInstance.tableInstance.getDataAtCol(
                     indexCol[i]
                 );
-                
                 // cần xóa phần tử dòng cuối dùng là row enter mặc định ko có dữ liệu
                 if(tableControl.tableInstance.tableHasRowSum == true)
                 dataCol.pop();
                 if(listInput[i].type == 'fileUpload'){
                     dataCol = listInput[i].value;
                 }
-                dataCol = (listInput[i].type == 'number' && dataCol == "" ) ? [0] : dataCol;
-                dataCol = (listInput[i].type != 'number' && dataCol == "" ) ? [""] : dataCol;
-                dataTable[id] = dataCol;
+                if(listInput[i].type == 'number'){
+                    for (let index = 0; index < dataCol.length; index++) {
+                        const element = dataCol[index];
+                        if(typeof element !== 'number'){
+                            dataCol[index] = 0;
+                        }
+                    }
+                }
+                dataControlInTable[i] = dataCol;
             }
-            
+            dataTable[tableControl.name] = dataControlInTable
             return dataTable;
         },
         updateEffectedControlToStore(mapControlEffected,key) {
