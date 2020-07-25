@@ -316,8 +316,10 @@ const setDefaultDetailStore = (state, params) => {
     Vue.set(state.detail, instance, value);
 }
 const addToRelatedLocalFormulas = (state, params) => {
-    let curListRelate = state.submit.localRelated;
     let key = params.key
+    let instance = params.instance;
+    let curListRelate = state.submit[instance].localRelated;
+
     let value = params.value
     for (let index = 0; index < value.length; index++) {
         let element = value[index];

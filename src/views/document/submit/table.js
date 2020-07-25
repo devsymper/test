@@ -221,6 +221,7 @@ export default class Table {
                                 // let controlName = 
                                 let formulasInstance = thisObj.isAutoCompleting
                                 if (formulasInstance != false) {
+                                    event.rowIndex = thisObj.currentSelectedCell['row'];
                                     SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-key-event', {
                                         e: event,
                                         autocompleteFormulasInstance: formulasInstance,

@@ -456,7 +456,7 @@ export default {
             }
             else{
                 let aliasControl = e.autocompleteFormulasInstance.autocompleteDetectAliasControl();
-                let dataInput = this.getDataInputFormulas(e.autocompleteFormulasInstance);
+                let dataInput = this.getDataInputFormulas(e.autocompleteFormulasInstance,e.e.rowIndex);
                 e.autocompleteFormulasInstance.handleRunAutoCompleteFormulas(dataInput).then(res=>{
                     thisCpn.setDataForControlAutocomplete(res,aliasControl,e.controlTitle)
                 });
@@ -1134,14 +1134,23 @@ export default {
         /**
          * Hàm lấy dữ liệu của các control trong store để chuân bị cho việc run formulas
          * dataInput : {controlName : value}
+         * rowIndex là lấy cell ở row hiện tại nếu là trong table
          */
-        getDataInputFormulas(formulasInstance){
+        getDataInputFormulas(formulasInstance, rowIndex = false){
            
             let inputControl = formulasInstance.getInputControl();
             let dataInput = {};
             for(let inputControlName in inputControl){
                 if(this.sDocumentSubmit.listInputInDocument.hasOwnProperty(inputControlName)){
                     let valueInputControlItem = this.sDocumentSubmit.listInputInDocument[inputControlName].value;
+                    if(rowIndex != false){
+                        if(valueInputControlItem.length>rowIndex){
+                            valueInputControlItem = valueInputControlItem[rowIndex]
+                        }
+                        else{
+                            valueInputControlItem = ""
+                        }
+                    }   
                     dataInput[inputControlName] = valueInputControlItem;
                 }
             }

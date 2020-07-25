@@ -90,7 +90,8 @@ export default class Control {
                     if (table.length > 0)
                         store.commit("document/addToRelatedLocalFormulas", {
                             key: this.name,
-                            value: table
+                            value: table,
+                            instance: this.curParentInstance
                         });
                 }
             }
