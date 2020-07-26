@@ -2,6 +2,50 @@ import Api from "./../../api/api.js";
 import { appConfigs } from "./../../configs.js"; // trong trường hợp này ta cần sử dụng domain của từng module nghiệp vụ được định nghĩa trong file config
 import attrToXMLMethods from "./elementDefinitions/attrToXMLMethods";
 
+
+
+function userAssignmentToXMLValue(config) {
+    let rsl = {
+        formula: config.formula,
+        users: [
+            /**
+             * Danh sách các user được chọn, có dạng:
+             * {
+             *      userId: 100,
+             *      roleIdentify: 20:abc-xyz
+             * }
+             */
+        ],
+        orgchartRole: [
+            /**
+             * danh sách các role trong orgchart, mỗi item có dạng:['orgchart:20:abc-xyz']
+             */
+        ]
+    };
+    for (let item of config.orgChart) {
+        if (item.type == 'user') {
+            rsl.users.push({
+                userId: item.id.replace('user:', '')
+            });
+        } else if (item.type == 'department') {
+            rsl.orgchartRole.push(
+                'orgchart:' + item.id
+            );
+        }
+    }
+
+    if (rsl.formula != '' || rsl.orgchartRole.length > 0) {
+        return JSON.stringify(rsl);
+    } else {
+        rsl = rsl.users.reduce((arr, el) => {
+            if (el && el.userId) {
+                arr.push(el.userId);
+            }
+            return arr;
+        }, []);
+        return rsl.join(',');
+    }
+}
 /**
  * các biến
  */
@@ -1958,48 +2002,7 @@ let allAttrs = {
             orgchartSelectorValue: [] // dạng value của orgchartselector để hiển thị lên
         },
         getValueForXML(value) {
-            let result = {
-                formula: '',
-                users: [],
-                roles: []
-            };
-            let userIds = [];
-            for (let item of value.orgChart) {
-                if (item.id.includes('user-')) {
-                    userIds.push(item.id.replace('user-', ''));
-                }
-            }
-            return userIds.join(',');
-            // return userIds.join(',');
-            // let rsl = {
-            //     formula: '',
-            //     users: [
-            //         /**
-            //          * Danh sách các user được chọn, có dạng:
-            //          * {
-            //          *      userId: 100,
-            //          *      orgchartId: 20,
-            //          *      vizPositionId: 'abc-xyz'
-            //          * }
-            //          */
-            //     ],
-            //     orgchartRole: [
-            //         /**
-            //          * danh sách các role trong orgchart, mỗi item có dạng
-            //          * {
-            //          *      orgchartId: 20,
-            //          *      vizPositionId: 'abc-xyz'
-            //          * }
-            //          */
-            //     ],
-            //     systemRole: [
-            //         /**
-            //          * id của các role trong hệ thống: , có dạng:
-            //          * [12, 23, ..]
-            //          */
-            //     ],
-            // };
-
+            return userAssignmentToXMLValue(value);
         },
         activeTab: 'orgchart', // tab nào sẽ mở: orgchart hoặc script
         dg: 'assignment',
@@ -2038,13 +2041,7 @@ let allAttrs = {
         activeTab: 'orgchart', // tab nào sẽ mở: orgchart hoặc script
         dg: 'assignment',
         getValueForXML(value) {
-            let userIds = [];
-            for (let item of value.orgChart) {
-                if (item.id.includes('user-')) {
-                    userIds.push(item.id.replace('user-', ''));
-                }
-            }
-            return userIds.join(',');
+            return userAssignmentToXMLValue(value);
         },
         toXML: {
             "symper_position": "attr",
