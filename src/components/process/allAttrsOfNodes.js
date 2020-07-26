@@ -1269,6 +1269,12 @@ let allAttrs = {
         "value": "",
         "info": "BPMN.PROPERTYPACKAGES.TIMERENDDATEDEFINITIONPACKAGE.TIMERENDDATEDEFINITION.DESCRIPTION",
         "dg": "detail",
+        toXML: {
+            "symper_position": "attr",
+            "name": "endDate",
+            "isAttr": true,
+            "type": "String"
+        },
         pushToXML: attrToXMLMethods.notPushToXML
     },
     "messageref": {

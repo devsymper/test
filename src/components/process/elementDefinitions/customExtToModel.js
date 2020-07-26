@@ -72,9 +72,9 @@ function checkAndAddTimeDefifinitonForNode(el, elKey, attrs, bpmnModeler) {
         let timeCycle = moddle.create("bpmn:Expression");
         timeCycle.body = attrs.timercycledefinition.value.trim();
 
-        let enddate = attrs.timerenddatedefinition.value.trim();
-        if (enddate != '') {
-            timeCycle['symper:endDate'] = endate;
+        let endDate = attrs.timerenddatedefinition.value.trim();
+        if (endDate != '') {
+            timeCycle.$attrs['symper:endDate'] = endDate;
         }
         bizObj.eventDefinitions[0].timeCycle = timeCycle;
 
