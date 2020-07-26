@@ -38,7 +38,55 @@ export const pushCustomElementsToModel = function(allVizEls, allSymEls, bpmnMode
             attrToXMLMethods.dataObjectMethod(bizVizEl, 'flowElements', attrs.dataproperties, bpmnModeler, '');
             removeCustomAttrToDataObject(bizVizEl, attrs);
         }
+
+        checkAndAddTimeDefifinitonForNode(vizEl, elKey, attrs, bpmnModeler);
     }
+}
+
+/**
+ * Với các element có set time definition, cần check để đưa vào định dạng cho đúng
+ * @param {*} vizEl 
+ * @param {*} elKey 
+ * @param {*} attrs 
+ * @param {*} bpmnModeler 
+ * @param {*} attrName 
+ */
+function checkAndAddTimeDefifinitonForNode(el, elKey, attrs, bpmnModeler) {
+    let moddle = bpmnModeler.get('moddle');
+    let bizObj = el.businessObject;
+
+    if (bizObj && bizObj.eventDefinitions && bizObj.eventDefinitions[0]) {
+        delete bizObj.eventDefinitions[0].timeDate;
+        delete bizObj.eventDefinitions[0].timeCycle;
+        delete bizObj.eventDefinitions[0].timeDuration;
+    }
+    // timerdatedefinition > timercycledefinition (đi kèm với timerenddatedefinition) > timerdurationdefinition
+    if (attrs.hasOwnProperty('timerdatedefinition') && attrs.timerdatedefinition.value.trim() != '') {
+        console.log(bizObj, 'timer date definition xxxxxxxxxxxx');
+        let timeDate = moddle.create("bpmn:Expression");
+        timeDate.body = attrs.timerdatedefinition.value.trim();
+        bizObj.eventDefinitions[0].timeDate = timeDate;
+
+    } else if (attrs.hasOwnProperty('timercycledefinition') && attrs.timercycledefinition.value.trim() != '') {
+        console.log(bizObj, 'timer cycle definition  xxxxxxxxxxxxxx');
+        let timeCycle = moddle.create("bpmn:Expression");
+        timeCycle.body = attrs.timercycledefinition.value.trim();
+
+        let enddate = attrs.timerenddatedefinition.value.trim();
+        if (enddate != '') {
+            timeCycle['symper:endDate'] = endate;
+        }
+        bizObj.eventDefinitions[0].timeCycle = timeCycle;
+
+    } else if (attrs.hasOwnProperty('timerdurationdefinition') && attrs.timerdurationdefinition.value.trim() != '') {
+        console.log(bizObj, 'timer duration definition  xxxxxxxxxxxxx');
+
+        let timeDuration = moddle.create("bpmn:Expression");
+        timeDuration.body = attrs.timerdurationdefinition.value.trim();
+        bizObj.eventDefinitions[0].timeDuration = timeDuration;
+    }
+
+
 }
 
 function addCustomAttrToDataObject(vizEl, attrs) {

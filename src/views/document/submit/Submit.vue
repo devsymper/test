@@ -234,7 +234,9 @@ export default {
             thisCpn.messageValidate = msg;
             thisCpn.$refs.validate.show(e);
 
-        })
+        });
+        this.isComponentActive = true;
+
     },
 
     created() {

@@ -1244,28 +1244,32 @@ let allAttrs = {
         "type": "script",
         "value": "",
         "info": "BPMN.PROPERTYPACKAGES.TIMERCYCLEDEFINITIONPACKAGE.TIMERCYCLEDEFINITION.DESCRIPTION",
-        "dg": "detail"
+        "dg": "detail",
+        pushToXML: attrToXMLMethods.notPushToXML
     },
     "timerdatedefinition": {
         "title": "Time date in ISO-8601",
         "type": "script",
         "value": "",
         "info": "BPMN.PROPERTYPACKAGES.TIMERDATEDEFINITIONPACKAGE.TIMERDATEDEFINITION.DESCRIPTION",
-        "dg": "detail"
+        "dg": "detail",
+        pushToXML: attrToXMLMethods.notPushToXML
     },
     "timerdurationdefinition": {
         "title": "Time duration (e.g. PT5M)",
         "type": "script",
         "value": "",
         "info": "BPMN.PROPERTYPACKAGES.TIMERDURATIONDEFINITIONPACKAGE.TIMERDURATIONDEFINITION.DESCRIPTION",
-        "dg": "detail"
+        "dg": "detail",
+        pushToXML: attrToXMLMethods.notPushToXML
     },
     "timerenddatedefinition": {
         "title": "Time End Date in ISO-8601",
         "type": "script",
         "value": "",
         "info": "BPMN.PROPERTYPACKAGES.TIMERENDDATEDEFINITIONPACKAGE.TIMERENDDATEDEFINITION.DESCRIPTION",
-        "dg": "detail"
+        "dg": "detail",
+        pushToXML: attrToXMLMethods.notPushToXML
     },
     "messageref": {
         "title": "Message reference",
