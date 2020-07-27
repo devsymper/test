@@ -53,4 +53,7 @@ export const orgchartApi = {
         };
         return orgchart.post('orgchart-role/query/roles-by-users', queryParam);
     },
+    getAllNodes() {
+        return orgchart.get("orgchart/nodes");
+    },
 };

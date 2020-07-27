@@ -62,6 +62,7 @@ export default {
         let modeling = bpmnModeler.get("modeling");
         let nodeAllAttrs = allNodesAttrs[attrName];
         let value = nodeAllAttrs.getValue(attr.value);
+
         if (nodeAllAttrs.hasOwnProperty('getValueForXML')) {
             value = nodeAllAttrs.getValueForXML(attr.value);
         }

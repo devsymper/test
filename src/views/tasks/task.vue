@@ -112,7 +112,7 @@ export default {
                         this.documentObjectId = Number(this.docObjInfo.docObjId);
                     }
                     this.showDoTaskComponent = true;                    
-                }else{
+                }else if((this.docId && Number(this.docId > 0)) || this.documentObjectId){
                     this.showDoTaskComponent = true;
                 }
             }

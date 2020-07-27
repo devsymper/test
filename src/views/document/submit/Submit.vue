@@ -234,11 +234,12 @@ export default {
             thisCpn.messageValidate = msg;
             thisCpn.$refs.validate.show(e);
 
-        })
+        });
+        this.isComponentActive = true;
+
     },
 
     created() {
-
         this.$store.commit("document/setDefaultSubmitStore",{instance:this.keyInstance});
         this.$store.commit("document/setDefaultDetailStore",{instance:this.keyInstance});
         this.$store.commit("document/setDefaultEditorStore",{instance:this.keyInstance});

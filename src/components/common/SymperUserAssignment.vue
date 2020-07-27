@@ -85,7 +85,7 @@ export default {
             this.$store.state.app.allUsers.forEach(element => {
                 nodes.push({
                     text: element.displayName,
-                    id: 'user-'+element.id,
+                    id: 'user:'+element.id,
                     type: 'user' 
                 });
             });

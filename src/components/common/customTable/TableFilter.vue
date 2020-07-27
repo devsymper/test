@@ -120,27 +120,31 @@
                 dense
                 label="Search"
                 ref="filterSearchBox"
+                :v-model="columnFilter.searchKey"
                 placeholder="Tìm kiếm"
+                @input="handleInputSearch"
             ></v-text-field>
         </div>
 
-        <div class="pb-1 dropdown-item" :style="{height:listSelectItemHeight, overflow: 'auto'}">
-            <!-- <perfect-scrollbar> -->
-            <v-checkbox
-                small
-                class="sym-small-size pa-0"
-                v-model="filterConfigs.selectAll"
-                label="Chọn tất cả"
-            ></v-checkbox>
-            <v-checkbox
-                v-for="(item, idx) in listOptions"
-                :key="idx"
-                x-small
-                class="sym-small-size pa-0"
-                v-model="item.checked"
-                :label="item.value"
-            ></v-checkbox>
-            <!-- </perfect-scrollbar> -->
+        <div class="pb-1 dropdown-item" :style="{height:listSelectItemHeight}">
+            <VuePerfectScrollbar :style="{height: listSelectItemHeight}">
+                <v-checkbox
+                    small
+                    class="sym-small-size pa-0"
+                    v-model="filterConfigs.clickedSelectAll"
+                    label="Chọn tất cả"
+                    @click="handleSelectAllChange"
+                ></v-checkbox>
+                <v-checkbox
+                    v-for="(item, idx) in filterConfigs.selectItems"
+                    :key="idx"
+                    x-small
+                    class="sym-small-size pa-0"
+                    v-model="item.checked"
+                    :label="item.value"
+                    @change="handleSelectItemChange(item)"
+                ></v-checkbox>
+            </VuePerfectScrollbar>
         </div>
 
         <div class="mt-2 dropdown-item">
@@ -161,6 +165,7 @@ import PerfectScrollbar from "vue2-perfect-scrollbar";
 import { util } from "./../../../plugins/util.js";
 import { getDefaultFilterConfig } from "./defaultFilterConfig.js";
 import Vue from "vue";
+import VuePerfectScrollbar from "vue-perfect-scrollbar";
 
 const textConditions = ["none","empty","not_empty","equal","not_equal","begins_with","ends_with","contains","not_contain","gt","gte","lt","lte"];
 const numberConditions = ["none","empty","not_empty","equal","not_equal"];
@@ -195,6 +200,33 @@ export default {
         });
     },
     methods: {
+        handleInputSearch(vl){
+            this.$emit('search-autocomplete-items', vl);
+        },
+        handleSelectItemChange(item){
+            if(!item.checked){
+                if(this.filterConfigs.selectAll){
+                    this.filterConfigs.valuesNotIn[item.value] = true;
+                    this.filterConfigs.clickedSelectAll = false;
+                }
+                delete this.filterConfigs.valuesIn[item.value];
+            }else{
+                delete this.filterConfigs.valuesNotIn[item.value];
+                this.filterConfigs.valuesIn[item.value] = true;
+            }
+        },
+        handleSelectAllChange(){
+            let self = this;
+            setTimeout((self) => {
+                let newValue = self.filterConfigs.clickedSelectAll;
+                self.filterConfigs.selectAll = newValue;
+                for(let item of self.filterConfigs.selectItems){
+                    item.checked = newValue;
+                }
+                self.$set(self.filterConfigs, 'valuesIn', {});
+                self.$set(self.filterConfigs, 'valuesNotIn', {});
+            }, 10, this);
+        },
         // Lấy về các item condition tương ứng với từng loại kiểu dữ liệu
         getConditionType() {
             let rsl = {};
@@ -236,22 +268,18 @@ export default {
         },
         show() {
             this.showTableFilter = true;
-            setTimeout(
-                thisCpn => {
-                    thisCpn.focusSearchBox();
-                },
-                300,
-                this
-            );
+            setTimeout(thisCpn => {
+                thisCpn.focusSearchBox();
+            },300,this);
+
             this.focusing = true;
             this.listSelectItemHeight = "0px";
-            setTimeout(
-                thisCpn => {
-                    thisCpn.recalcListSelectItemHeight();
-                },
-                100,
-                this
-            );
+
+            setTimeout(thisCpn => {
+                thisCpn.recalcListSelectItemHeight();
+            },100,this);
+
+
         },
         focusSearchBox() {
             $(this.$refs.filterSearchBox.$el)
@@ -263,7 +291,7 @@ export default {
             this.applyFilter();
         },
         selectFilterCondition(index, type) {
-            this.columnFilter.conditionFilter.items[index].type = type;
+            this.filterConfigs.conditionFilter.items[index].type = type;
             this["typeSelect" + (index + 1)] = false;
             this.listSelectItemHeight = "0px";
             setTimeout(
@@ -299,11 +327,11 @@ export default {
                 lte: true
             };
             if (
-                this.columnFilter.conditionFilter &&
-                this.columnFilter.conditionFilter.items &&
-                this.columnFilter.conditionFilter.items[0]
+                this.filterConfigs.conditionFilter &&
+                this.filterConfigs.conditionFilter.items &&
+                this.filterConfigs.conditionFilter.items[0]
             ) {
-                let items = this.columnFilter.conditionFilter.items;
+                let items = this.filterConfigs.conditionFilter.items;
                 if (type == "input1") {
                     return showInputType[items[0].type];
                 } else if (type == "input2") {
@@ -326,30 +354,35 @@ export default {
             listSelectItemHeight: "100px",
             typeSelect2: false,
             typeSelect1: false,
+            filterConfigs: null,
             showTableFilter: false,
             focusing: true,
             listConditionType: this.getConditionType()
         };
     },
     components: {
-        PerfectScrollbar: PerfectScrollbar
+        // PerfectScrollbar: PerfectScrollbar,
+        VuePerfectScrollbar: VuePerfectScrollbar
     },
     props: {
         columnFilter: {
             default() {
                 return getDefaultFilterConfig();
             }
-        },
-        listOptions: {
-            default() {
-                return [];
-            }
+        }
+    },
+    watch: {
+        columnFilter: {
+            deep: true,
+            immediate: true,
+            handler(newVl) {
+                let rsl = util.cloneDeep(newVl);
+                this.filterConfigs = null;
+                this.filterConfigs = rsl;
+            },
         }
     },
     computed: {
-        filterConfigs() {
-            return util.cloneDeep(this.columnFilter);
-        },
         // kiểu dữ liệu của cột hiện tại đang được filter
         colType(){
             return this.columnFilter.dataType;

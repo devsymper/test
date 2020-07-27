@@ -511,7 +511,17 @@ export const nodeAttrsDefinition = {
         checkShowOrHideInput: function(attrs) {
 
         }
-    }
+    },
+    'BoundaryTimerEvent': {
+        attrs: ["timercycledefinition", "timerdurationdefinition", "timerdatedefinition", "timerenddatedefinition"],
+        validate: function(attrs) {
+
+        },
+        checkShowOrHideInput: function(attrs) {
+
+        },
+        docker: dockerGroups.subProcess
+    },
 };
 
 

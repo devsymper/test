@@ -128,6 +128,7 @@ export const runProcessDefinition = (self, processDef, vars = [], instanceName =
                 "returnVariables": true,
                 variables: vars
             };
+            debugger;
             bpmnApi.createProcessInstance(dataToRun).then((res) => {
                 runResolve(res);
             }).catch((err) => {
@@ -209,6 +210,14 @@ export const getVarsFromSubmitedDoc = async(docData, elId, docId) => {
                 name: elId + '_outcome',
                 type: 'string',
                 value: 'submit'
+            }, {
+                name: elId + '_executor_full_name',
+                type: 'string',
+                value: SYMPER_APP.$store.state.app.endUserInfo.displayName
+            }, {
+                name: elId + '_executor_id',
+                type: 'string',
+                value: SYMPER_APP.$store.state.app.endUserInfo.id
             });
             resolve({
                 vars: vars,
