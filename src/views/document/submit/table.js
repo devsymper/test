@@ -318,11 +318,15 @@ export default class Table {
         /**
          * Hàm xử lí dữ liệu thay đổi ở cell bởi hệ thống (hàm set data của handson)
          */
-    handlerAfterChangeCellByAutoSet(changes, columns, controlName) {
+    async handlerAfterChangeCellByAutoSet(changes, columns, controlName) {
             let thisObj = this;
+            console.log('lkasdlksa==', changes);
+
             for (let index = 0; index < changes.length; index++) {
                 let colChange = changes[index];
                 let rowData = thisObj.tableInstance.getDataAtRow(colChange[0]);
+                console.log('lkasdlksa==', rowData);
+
                 for (let index = 0; index < rowData.length; index++) {
                     let cell = rowData[index];
                     if (cell == "" || cell == null) {
@@ -336,22 +340,28 @@ export default class Table {
                     let id = Date.now();
                     rowData[rowData.length - 1] = id;
                     thisObj.tableInstance.setDataAtCell(colChange[0], rowData.length - 1, id);
-                    ClientSQLManager.insertRow(thisObj.keyInstance, thisObj.tableName, columns, rowData, true).then(res => {
-                        if (index == changes.length - 1) {
-                            setTimeout(() => {
-                                thisObj.handlerCheckEffectedControlInTable(controlName);
-                            }, 50);
-                        }
-                    });
+                    setTimeout(() => {
+                        // let x = thisObj.tableInstance.getDataAtRow(colChange[0]);
+                        // console.log('getDataAtCell vừa set trong handson', , thisObj.tableInstance.getDataAtCell(colChange[0], rowData.length - 1));
+
+                        // console.log('ầd==', colChange[0], x);
+                    }, 350);
+                    await ClientSQLManager.insertRow(thisObj.keyInstance, thisObj.tableName, columns, rowData, true);
+                    if (index == changes.length - 1) {
+                        console.log('sdgfsdinssert', controlName);
+                        thisObj.handlerCheckEffectedControlInTable(controlName);
+
+                    }
                 } else {
-                    ClientSQLManager.editRow(thisObj.keyInstance, thisObj.tableName, colChange[1], colChange[3],
-                        'WHERE s_table_id_sql_lite = ' + rowData[rowData.length - 1], true).then(res => {
-                        if (index == changes.length - 1) {
-                            setTimeout(() => {
-                                thisObj.handlerCheckEffectedControlInTable(controlName);
-                            }, 50);
-                        }
-                    });
+                    await ClientSQLManager.editRow(thisObj.keyInstance, thisObj.tableName, colChange[1], colChange[3],
+                        'WHERE s_table_id_sql_lite = ' + rowData[rowData.length - 1], true);
+                    if (index == changes.length - 1) {
+                        console.log('sdgfsdedit', controlName);
+
+                        setTimeout(() => {
+                            thisObj.handlerCheckEffectedControlInTable(controlName);
+                        }, 250);
+                    }
                 }
             }
         }
@@ -376,7 +386,7 @@ export default class Table {
             ClientSQLManager.insertRow(thisObj.keyInstance, thisObj.tableName, columns, currentRowData, true).then(res => {
                 setTimeout(() => {
                     thisObj.handlerCheckEffectedControlInTable(controlName);
-                }, 50);
+                }, 150);
             });
         } else {
             ClientSQLManager.editRow(thisObj.keyInstance, thisObj.tableName, controlName, changes[0][3],
@@ -436,7 +446,7 @@ export default class Table {
 
     }
     handlerCheckEffectedControlInTable(controlName) {
-        this.checkRunLocalSql();
+        // this.checkRunLocalSql();
         let controlInstance = this.getControlInstance(controlName);
         if (controlInstance == null || controlInstance == undefined) {
             return;
@@ -453,6 +463,7 @@ export default class Table {
         this.handlerRunOtherFormulasControl(controlLinkEffected, 'link');
         this.handlerRunOtherFormulasControl(controlValidateEffected, 'validate');
         if (Object.keys(controlEffected).length > 0) {
+            console.log("controlEffected--", controlName, controlEffected);
             for (let i in controlEffected) {
                 this.handlerCheckCanBeRunFormulas(i);
             }
@@ -499,6 +510,7 @@ export default class Table {
                         });
                     }
                 } else {
+
                     // let dataInput = this.getDataInputForFormulas(formulasInstance, controlInstance.name);
                     // this.handlerRunFormulasForControlInTable('formulas', controlInstance, dataInput, formulasInstance);
                     SYMPER_APP.$evtBus.$emit('run-formulas-control-outside-table', {
@@ -755,6 +767,7 @@ export default class Table {
             // minSpareRows: (thisObj.checkDetailView()) ? 0 : 1,
             height: 'auto',
             afterRender: function(isForced) {
+                console.log('xem render', isForced);
                 let tbHeight = this.container.getElementsByClassName('htCore')[0].getBoundingClientRect().height;
                 if (tbHeight < MAX_TABLE_HEIGHT) {} else {
                     $(this.rootElement).css('height', MAX_TABLE_HEIGHT);
@@ -802,23 +815,16 @@ export default class Table {
         this.setDataAtRowProp(rowIndex, prop, value, AUTO_SET);
     }
     setData(vls) {
-        this.tableInstance.updateSettings({
-            data: (this.tableHasRowSum) ? [
-                [''],
-                [''],
-            ] : [
-                []
-            ],
-        });
-        let tb = this;
         if (vls != false) {
-            console.log('hgfasdfsdasd', vls);
-            setTimeout(() => {
-                tb.tableInstance.setDataAtRowProp(vls, null, null, 'auto_set');
-            }, 20);
+            let data = vls;
+            for (let index = 0; index < data.length; index++) {
+                let rowId = Date.now() + index;
+                data[index]['s_table_id_sql_lite'] = rowId;
+            }
+            ClientSQLManager.delete(this.keyInstance, this.tableName, false)
+            data = (this.tableHasRowSum) ? vls.push({}) : vls;
+            this.tableInstance.loadData(data)
         }
-
-
     }
 
     checkDetailView() {

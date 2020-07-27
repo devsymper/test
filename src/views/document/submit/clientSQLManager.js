@@ -107,10 +107,7 @@ export default class ClientSQLManager {
                 }
             });
         } else {
-            let x = this.run(keyInstance, sql, true);
-            console.log('nnnnn', x);
-
-            return x
+            return this.run(keyInstance, sql, true);
         }
     }
     static deleteRow(keyInstance, tableName, where) {
@@ -119,7 +116,7 @@ export default class ClientSQLManager {
     }
     static async insertRow(keyInstance, tableName, column, value, returnPromise = false) {
         let tbColumn = column.join();
-        let tbValue = value.join()
+        let tbValue = value.join();
         let sql = `INSERT INTO ${tableName} (${tbColumn}) VALUES(${tbValue})`;
         if (returnPromise) {
             return new Promise((resolve, reject) => {

@@ -25,6 +25,7 @@ export default class Formulas {
             this.inputControl = this.setInputControl();
             this.refFormulas = this.getReferenceFormulas();
             this.localFormulas = this.getLocalFormulas();
+            this.inputForLocalFormulas = this.setInputLocal();
         }
         /**
          * Hàm xử lí thay các giá trị của input đầu vào để thực hiện truy vấn
@@ -434,9 +435,34 @@ export default class Formulas {
                     }
                     return obj;
                 }, {});
+
+
                 return names;
             }
             return {}
+        }
+        /**
+         * Hàm lấy các cột được select trong công thức local
+         * mục đích để đưa vào biến effeted của control đó (cột trong table)
+         * lúc nào có sự thay đổi của cột đó thì chạy lại công thức chứa local này
+         */
+    setInputLocal() {
+            let listLocalFormulas = this.localFormulas;
+            let listInputLocal = {}
+            if (listLocalFormulas != null && listLocalFormulas.length > 0) {
+                for (let index = 0; index < listLocalFormulas.length; index++) {
+                    let localFormulas = listLocalFormulas[index];
+                    let columns = this.getColumnsQuery(localFormulas);
+
+                    columns = columns.reduce((obj, name) => {
+                        obj[name] = true;
+                        return obj
+                    }, {});
+                    Object.assign(listInputLocal, columns);
+
+                }
+            }
+            return listInputLocal;
         }
         // hàm kiểm tra có tham số workflow trong công thức hay k
     detectWorkflowParams(str) {
@@ -520,7 +546,7 @@ export default class Formulas {
         // hàm lấy các column được query sau select và trước from
     getColumnsQuery(syql) {
         let columns = [];
-        let allColumns = syql.match(/(?<=select)(.*?)(?=from)/gm);
+        let allColumns = syql.match(/(?<=SELECT|select).*(?=from|from)/gm);
         for (let index = 0; index < allColumns.length; index++) {
             let element = allColumns[index];
             element = element.trim();

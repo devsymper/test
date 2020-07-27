@@ -822,12 +822,21 @@ export default {
                         }
                         if(formulas[formulasType].hasOwnProperty('instance')){
                             let inputControl = formulas[formulasType].instance.inputControl;
+                            let inputLocalFormulas = formulas[formulasType].instance.inputForLocalFormulas;
                             for (let controlEffect in inputControl) {
                                 if (!mapControlEffected[formulasType].hasOwnProperty(controlEffect)) {
                                     mapControlEffected[formulasType][controlEffect] = {};
                                 }
                                 mapControlEffected[formulasType][controlEffect][name] = true;
                             }
+                            console.log('gakjsd',inputLocalFormulas);
+                            for (let controlEffect in inputLocalFormulas) {
+                                if (!mapControlEffected[formulasType].hasOwnProperty(controlEffect)) {
+                                    mapControlEffected[formulasType][controlEffect] = {};
+                                }
+                                mapControlEffected[formulasType][controlEffect][name] = true;
+                            }
+
                             this.detectControlEffectedInTableInDoc(mapControlEffected[formulasType], name, formulas[formulasType].instance);
                         }
                     }
@@ -1284,31 +1293,13 @@ export default {
          */
         setDataToTable(tableControlId,data){
             let tableName = this.sDocumentEditor.allControl[tableControlId].properties.name.value;
-            let dataTable = []
             data = data.data
             let tableControl = getControlInstanceFromStore(this.keyInstance,tableName);
             if(data.length == 0){
-                tableControl.tableInstance.setData(false);
+                tableControl.tableInstance.setData([]);
                 return;
             }
-            let allColumnBindData = Object.keys(data[0]);
-            if(allColumnBindData.length > 0){
-                for (let index = 0; index < allColumnBindData.length; index++) {
-                    const controlName = allColumnBindData[index];
-                    let colData = data.reduce((arr,obj)=>{
-                        arr.push(obj[controlName])
-                        return arr
-                    },[]);
-                    let vls = [];
-                    for (let i = 0; i < colData.length; i++) {
-                        vls.push([i, controlName, colData[i]]);
-                    }
-                    tableControl.tableInstance.setData(vls);
-                }
-            }
-            else{
-                 tableControl.tableInstance.setData(false);
-            }
+            tableControl.tableInstance.setData(data);
             
         },
 
