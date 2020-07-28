@@ -1,14 +1,22 @@
 <template>
-    <div
-        class="sym-form-submit"
-        :id="'sym-submit-'+keyInstance"
-        :style="{'width':documentSize, 'height':'100%'}"
-    >
-        <div v-html="contentDocument"></div>
-        <!-- <button v-on:click="togglePageSize"  id="toggle-doc-size">
-            <span class="mdi mdi-arrow-horizontal-lock"></span>
-        </button> -->
-        
+    <div class="wrap-content-detail">
+        <div
+            class="sym-form-Detail"
+            :id="'sym-Detail-'+keyInstance"
+            :style="{'width':documentSize, 'height':'100%','margin':contentMargin}"
+        >
+            <div v-html="contentDocument"></div>
+            
+            
+        </div>
+            <button v-on:click="togglePageSize"  id="toggle-doc-size-btn" :style="togglePageSizeBtnStyle">
+                <span class="mdi mdi-arrow-horizontal-lock"></span>
+            </button>
+            <button v-on:click="toggleSideBar"  id="side-bar-detail-btn" :style="toggleSideBarBtnStyle">
+                <span class="mdi mdi-chevron-double-left"></span>
+            </button>
+            <side-bar-detail :sidebarWidth="sidebarWidth" :isShowSidebar="isShowSidebar"/>
+
     </div>
 </template>
 <script>
@@ -21,6 +29,8 @@ import  TableControl from "./../submit/tableControl.js"
 import  ActionControl from "./../submit/actionControl.js"
 import  Table from "./../submit/table.js"
 import './../submit/customControl.css'
+import { getSDocumentSubmitStore } from './../common/common'
+import SideBarDetail from './SideBarDetail'
 
 export default {
     props: {
@@ -43,6 +53,9 @@ export default {
             default:false
         }
     },   
+    components:{
+        'side-bar-detail':SideBarDetail
+    },
     computed: {
         sDocumentEditor() {
             return this.$store.state.document.editor[this.keyInstance];
@@ -57,10 +70,17 @@ export default {
             docObjId: null,
             documentSize: null,
             keyInstance: Date.now(),
+            contentMargin:'auto',
+            sidebarWidth:300,
+            toggleSideBarBtnStyle:null,
+            togglePageSizeBtnStyle:null,
+            isShowSidebar:false
         };
     },
     beforeMount() {
         this.documentSize = "21cm";
+        this.toggleSideBarBtnStyle = {right: 20 + 'px'}
+        this.togglePageSizeBtnStyle = {right: 80 + 'px'}
     },
     created(){
         this.$store.commit("document/setDefaultSubmitStore",{instance:this.keyInstance});
@@ -152,7 +172,36 @@ export default {
                 .always(() => {});
         },
         togglePageSize() {
-            this.documentSize = this.documentSize == "21cm" ? "100%" : "21cm";
+            this.contentMargin = this.documentSize == "21cm" ? "" : "auto";
+            this.documentSize = this.documentSize == "21cm" ? "calc(100% - "+this.sidebarWidth+"px)" : "21cm";
+            let listInputInDocument = this.getListInputInDocument();
+            let allControlInstance = Object.values(listInputInDocument);
+            let listTableControlInstance = allControlInstance.filter(control =>{
+                return control.type == 'table'
+            })
+            for (let index = 0; index < listTableControlInstance.length; index++) {
+                let table = listTableControlInstance[index];
+                setTimeout(() => {
+                    table.tableInstance.tableInstance.render();
+                }, 50);
+                
+            }
+        },
+        toggleSideBar(){
+            this.isShowSidebar = !this.isShowSidebar;
+            this.toggleSideBarBtnStyle = {right: 20 + 'px'}
+            this.togglePageSizeBtnStyle = {right: 80 + 'px'}
+            if(this.isShowSidebar){
+                this.toggleSideBarBtnStyle = {right:this.sidebarWidth - 15 + 'px','border-radius':'50%', top: '21px', padding:'0 6px','z-index':9999};
+                this.togglePageSizeBtnStyle = {right:this.sidebarWidth + 35  + 'px'}
+            }
+           
+        },
+        getListInputInDocument() {
+            return getSDocumentSubmitStore(this.keyInstance).listInputInDocument;
+        },
+        getControlInstance(controlName) {
+            return getSDocumentSubmitStore(this.keyInstance).listInputInDocument[controlName];
         },
         addToListInputInDocument(name,control){
              this.$store.commit(
@@ -161,7 +210,7 @@ export default {
                         );
         },
         processHtml(content) {
-            var allInputControl = $("#sym-submit-" + this.keyInstance).find(
+            var allInputControl = $("#sym-Detail-" + this.keyInstance).find(
                 ".s-control:not(.bkerp-input-table .s-control)"
             );
             let thisCpn = this;
@@ -302,25 +351,65 @@ export default {
 }
 </script>
 <style  scoped>
-.sym-form-submit {
+.sym-form-Detail {
     width: 21cm;
     padding: 16px;
+    position: relative;
 }
-.sym-form-submit >>> .on-selected {
+.wrap-content-detail{
+    position: relative;
+    width: 100%;
+}
+.sym-form-Detail >>> .on-selected {
     border: none !important;
 }
-.sym-form-submit >>> table:not(.htCore) td,
-.sym-form-submit >>> table:not(.htCore),
-.sym-form-submit >>> table:not(.htCore) th {
+.sym-form-Detail >>> table:not(.htCore) td,
+.sym-form-Detail >>> table:not(.htCore),
+.sym-form-Detail >>> table:not(.htCore) th {
     border: none !important;
 }
-.sym-form-submit >>> .htCore td:last-child {
+.sym-form-Detail >>> .htCore td:last-child {
     border-right: 1px solid #ccc !important;
 }
-.sym-form-submit >>> .ht_clone_left.handsontable table.htCore {
+.sym-form-Detail >>> .ht_clone_left.handsontable table.htCore {
     border-right: none;
 }
 .s-control-label{
     background: none !important;
+}
+
+#toggle-doc-size-btn {
+    position: absolute;
+    top: 15px;
+    padding: 4px 12px;
+    font-size: 20px;
+    border-radius: 4px;
+    background: #fafafa;
+    opacity: 1;
+    color: #757575;
+    transition:all cubic-bezier(0.4, 0, 0.2, 1) 250ms;
+}
+#toggle-doc-size-btn:hover {
+    background: #dddddd;
+}
+#toggle-doc-size-btn:focus {
+    outline: none;
+}
+#side-bar-detail-btn {
+    position: absolute;
+    top: 15px;
+    padding: 4px 12px;
+    font-size: 20px;
+    border-radius: 4px;
+    background: #fafafa;
+    opacity: 1;
+    color: #757575;
+    transition:all cubic-bezier(0.4, 0, 0.2, 1) 250ms;
+}
+#side-bar-detail-btn:hover {
+    background: #dddddd;
+}
+#side-bar-detail-btn:focus {
+    outline: none;
 }
 </style>

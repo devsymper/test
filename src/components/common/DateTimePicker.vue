@@ -52,7 +52,7 @@ export default {
         return {
             date:null,
             isShow:false,
-             position:null,
+            position:null,
         }
     },
     beforeMount(){

@@ -827,7 +827,7 @@ export default {
             })
             
             this.$store.commit(
-                "document/minimizeControl",{allId:listId}
+                "document/minimizeControl",{allId:listId,instance:this.keyInstance}
             );
         },
       

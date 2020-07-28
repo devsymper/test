@@ -356,6 +356,10 @@ export default {
         this.$evtBus.$on("document-submit-date-input-click", e => {
             if(thisCpn.isComponentActive == false) return;
             thisCpn.$refs.datePicker.openPicker(e);
+            thisCpn.$store.commit("document/updateCurrentControlEditByUser", {
+                currentControl: e.controlName,
+                instance: thisCpn.keyInstance
+            });
         });
         this.$evtBus.$on("document-submit-time-input-click", e => {
             if(thisCpn.isComponentActive == false) return;
@@ -559,7 +563,6 @@ export default {
                 input.val(data.value);
                 markBinedField(this.keyInstance,this.sDocumentSubmit.currentControlAutoComplete);
                 input.trigger('change');
-                // input.blur()
             }
             else{
                 let currentTableInteractive = this.sDocumentSubmit.currentTableInteractive
@@ -780,9 +783,11 @@ export default {
          */
         selectedDate(e){
             this.$refs.datePicker.closePicker();
-            $('.date-picker-access').val(e);
-            $('.date-picker-access').trigger('change');
-            $('.date-picker-access').removeClass('date-picker-access');
+            let currentControl = this.sDocumentSubmit.currentControlEditByUser;
+            let controlInstance = getControlInstanceFromStore(this.keyInstance,currentControl);
+            let value = moment(e,'YYYY-MM-DD').format(controlInstance.formatDate);
+            $('#'+controlInstance.id).val(value);
+            $('#'+controlInstance.id).trigger('change');
         },
 
         /**
@@ -822,12 +827,20 @@ export default {
                         }
                         if(formulas[formulasType].hasOwnProperty('instance')){
                             let inputControl = formulas[formulasType].instance.inputControl;
+                            let inputLocalFormulas = formulas[formulasType].instance.inputForLocalFormulas;
                             for (let controlEffect in inputControl) {
                                 if (!mapControlEffected[formulasType].hasOwnProperty(controlEffect)) {
                                     mapControlEffected[formulasType][controlEffect] = {};
                                 }
                                 mapControlEffected[formulasType][controlEffect][name] = true;
                             }
+                            for (let controlEffect in inputLocalFormulas) {
+                                if (!mapControlEffected[formulasType].hasOwnProperty(controlEffect)) {
+                                    mapControlEffected[formulasType][controlEffect] = {};
+                                }
+                                mapControlEffected[formulasType][controlEffect][name] = true;
+                            }
+
                             this.detectControlEffectedInTableInDoc(mapControlEffected[formulasType], name, formulas[formulasType].instance);
                         }
                     }
@@ -860,7 +873,6 @@ export default {
 
         handlerSubmitDocumentClick(){
             if($('.validate-icon').length == 0){
-                console.log(this.viewType);
                 if(this.viewType == 'submit'){
                     this.submitDocument();
                 }
@@ -875,8 +887,6 @@ export default {
                     let message = $(v).attr('title');
                     listErr.push(message);
                 })
-                console.log(listErr);
-                
                 this.listMessageErr = listErr;
                 this.$refs.errMessage.showDialog();
             }
@@ -975,9 +985,7 @@ export default {
                     let value = this.getDataTableInput(listInput[controlName]);
                     Object.assign(dataControl, value);
                 } else {
-                    if (listInput[controlName].type == "label"){
-                        console.log('gasas',listInput[controlName].value);
-                    }
+            
                     if (listInput[controlName].type != "submit" && 
                     listInput[controlName].type != "reset" && 
                     listInput[controlName].type != "draft" &&
@@ -1121,8 +1129,6 @@ export default {
          */
         runFormulasControlEffected(controlName, controlEffected){
             if(Object.keys(controlEffected).length > 0){
-            console.log('vaosa---',controlName,"==",controlEffected,"------");
-
                 for(let i in controlEffected){
                     if (checkCanBeBind(this.keyInstance,i)){
                         let controlEffectedInstance = getControlInstanceFromStore(this.keyInstance,i);
@@ -1191,7 +1197,6 @@ export default {
                         dataInput[inputControlName] = valueInputControlItem;
                     }
                 }
-                
             }
             return dataInput;
         },
@@ -1285,31 +1290,13 @@ export default {
          */
         setDataToTable(tableControlId,data){
             let tableName = this.sDocumentEditor.allControl[tableControlId].properties.name.value;
-            let dataTable = []
             data = data.data
             let tableControl = getControlInstanceFromStore(this.keyInstance,tableName);
             if(data.length == 0){
-                tableControl.tableInstance.setData(false);
+                tableControl.tableInstance.setData([]);
                 return;
             }
-            let allColumnBindData = Object.keys(data[0]);
-            if(allColumnBindData.length > 0){
-                for (let index = 0; index < allColumnBindData.length; index++) {
-                    const controlName = allColumnBindData[index];
-                    let colData = data.reduce((arr,obj)=>{
-                        arr.push(obj[controlName])
-                        return arr
-                    },[]);
-                    let vls = [];
-                    for (let i = 0; i < colData.length; i++) {
-                        vls.push([i, controlName, colData[i]]);
-                    }
-                    tableControl.tableInstance.setData(vls);
-                }
-            }
-            else{
-                 tableControl.tableInstance.setData(false);
-            }
+            tableControl.tableInstance.setData(data);
             
         },
 

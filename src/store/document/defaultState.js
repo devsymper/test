@@ -64,7 +64,8 @@ const defaultState = {
             submitFormulas: null,
             listUser: null,
             localRelated: {},
-            workflowVariable: {}
+            workflowVariable: {},
+            currentControlEditByUser: null
         }
     },
     detail: {

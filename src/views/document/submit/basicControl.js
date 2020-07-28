@@ -8,8 +8,6 @@ import moment from "moment-timezone";
 
 import { userApi } from "./../../../api/user.js";
 let listInputInDocument = sDocument.state.submit.listInputInDocument;
-
-let dataInputCache = sDocument.state.submit.dataInputCache;
 const fileTypes = {
     'xlsx': 'mdi-microsoft-excel',
     'txt': 'mdi-file-document-outline',
@@ -187,11 +185,10 @@ export default class BasicControl extends Control {
                 value: null,
                 instance: thisObj.curParentInstance
             });
+            e.controlName = thisObj.name;
             if (thisObj.type == 'date') {
-                $(e.target).addClass('date-picker-access');
                 SYMPER_APP.$evtBus.$emit('document-submit-date-input-click', e)
             } else if (thisObj.type == 'inputFilter') {
-                e.controlName = thisObj.name;
                 e.formulas = thisObj.controlFormulas.formulas;
                 SYMPER_APP.$evtBus.$emit('document-submit-filter-input-click', e)
             }
