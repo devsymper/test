@@ -322,6 +322,13 @@ const routes = [{
         name: "symperHiddenRedirectComponent",
         component: SymperHiddenRedirectComponent
     },
+
+    {
+        path: "/action-pack",
+        name: "actionPackList",
+        component: () =>
+            import ('../views/permissions/AcitionPackList.vue'),
+    },
 ];
 
 routes.concat([{

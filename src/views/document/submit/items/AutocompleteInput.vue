@@ -32,6 +32,11 @@
 </template>
 <script>
 export default {
+    props: {
+        tableWrapper: {
+            default: null
+        }
+    },
     data () { 
         return {
             key:Date.now(),
@@ -109,8 +114,12 @@ export default {
                 if($(e.target).is('div.htAutocompleteArrow')){
                     edtos = $(e.target).parent().offset();;
                 }
-                
-                let tbcos = $(e.target).closest('.wrap-table').find('[s-control-type="table"]').offset();
+                let tbcos;
+                if(this.tableWrapper){
+                    tbcos = $(this.tableWrapper).offset();
+                }else{
+                    tbcos = $(e.target).closest('.wrap-table').find('[s-control-type="table"]').offset();
+                }
                 this.positionBox = {'top':edtos.top - tbcos.top + $(e.target).height() +'px','left':edtos.left - tbcos.left+'px'};
             }
             //nêu là ngoài bảng

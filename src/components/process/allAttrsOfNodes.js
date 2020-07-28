@@ -16,7 +16,7 @@ function userAssignmentToXMLValue(config) {
              * }
              */
         ],
-        orgchartRole: [
+        roles: [
             /**
              * danh sách các role trong orgchart, mỗi item có dạng:['orgchart:20:abc-xyz']
              */
@@ -28,13 +28,13 @@ function userAssignmentToXMLValue(config) {
                 userId: item.id.replace('user:', '')
             });
         } else if (item.type == 'department') {
-            rsl.orgchartRole.push(
+            rsl.roles.push(
                 'orgchart:' + item.id
             );
         }
     }
 
-    if (rsl.formula != '' || rsl.orgchartRole.length > 0) {
+    if (rsl.formula != '' || rsl.roles.length > 0) {
         return JSON.stringify(rsl);
     } else {
         rsl = rsl.users.reduce((arr, el) => {

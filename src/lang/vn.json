@@ -222,7 +222,6 @@
         },
         "title": "Nhóm quyền",
         "actionControlSummary": "Action pack Summary",
-        "actionPack": "Action packs",
         "addPermissionPack": "Thêm mới nhóm quyền",
         "editPermissionPack": "Chỉnh sửa nhóm quyền",
         "grandPermission": "Phân quyền chi tiết",
@@ -253,6 +252,10 @@
             "16384": "Cấu hình printer",
             "32768": "Xem toàn bộ control",
             "65536": "Xem những control được cho phép"
+        },
+        "actionPack": {
+            "list": "Danh sách action pack ",
+            "objectType": "Loại đối tượng"
         }
     },
     "document": {
