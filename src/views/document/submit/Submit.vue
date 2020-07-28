@@ -356,6 +356,10 @@ export default {
         this.$evtBus.$on("document-submit-date-input-click", e => {
             if(thisCpn.isComponentActive == false) return;
             thisCpn.$refs.datePicker.openPicker(e);
+            thisCpn.$store.commit("document/updateCurrentControlEditByUser", {
+                currentControl: e.controlName,
+                instance: thisCpn.keyInstance
+            });
         });
         this.$evtBus.$on("document-submit-time-input-click", e => {
             if(thisCpn.isComponentActive == false) return;
@@ -559,7 +563,6 @@ export default {
                 input.val(data.value);
                 markBinedField(this.keyInstance,this.sDocumentSubmit.currentControlAutoComplete);
                 input.trigger('change');
-                // input.blur()
             }
             else{
                 let currentTableInteractive = this.sDocumentSubmit.currentTableInteractive
@@ -780,9 +783,11 @@ export default {
          */
         selectedDate(e){
             this.$refs.datePicker.closePicker();
-            $('.date-picker-access').val(e);
-            $('.date-picker-access').trigger('change');
-            $('.date-picker-access').removeClass('date-picker-access');
+            let currentControl = this.sDocumentSubmit.currentControlEditByUser;
+            let controlInstance = getControlInstanceFromStore(this.keyInstance,currentControl);
+            let value = moment(e,'YYYY-MM-DD').format(controlInstance.formatDate);
+            $('#'+controlInstance.id).val(value);
+            $('#'+controlInstance.id).trigger('change');
         },
 
         /**
@@ -829,7 +834,6 @@ export default {
                                 }
                                 mapControlEffected[formulasType][controlEffect][name] = true;
                             }
-                            console.log('gakjsd',inputLocalFormulas);
                             for (let controlEffect in inputLocalFormulas) {
                                 if (!mapControlEffected[formulasType].hasOwnProperty(controlEffect)) {
                                     mapControlEffected[formulasType][controlEffect] = {};
@@ -869,7 +873,6 @@ export default {
 
         handlerSubmitDocumentClick(){
             if($('.validate-icon').length == 0){
-                console.log(this.viewType);
                 if(this.viewType == 'submit'){
                     this.submitDocument();
                 }
@@ -884,8 +887,6 @@ export default {
                     let message = $(v).attr('title');
                     listErr.push(message);
                 })
-                console.log(listErr);
-                
                 this.listMessageErr = listErr;
                 this.$refs.errMessage.showDialog();
             }
@@ -984,9 +985,7 @@ export default {
                     let value = this.getDataTableInput(listInput[controlName]);
                     Object.assign(dataControl, value);
                 } else {
-                    if (listInput[controlName].type == "label"){
-                        console.log('gasas',listInput[controlName].value);
-                    }
+            
                     if (listInput[controlName].type != "submit" && 
                     listInput[controlName].type != "reset" && 
                     listInput[controlName].type != "draft" &&
@@ -1130,8 +1129,6 @@ export default {
          */
         runFormulasControlEffected(controlName, controlEffected){
             if(Object.keys(controlEffected).length > 0){
-            console.log('vaosa---',controlName,"==",controlEffected,"------");
-
                 for(let i in controlEffected){
                     if (checkCanBeBind(this.keyInstance,i)){
                         let controlEffectedInstance = getControlInstanceFromStore(this.keyInstance,i);

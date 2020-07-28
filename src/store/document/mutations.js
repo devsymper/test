@@ -221,15 +221,7 @@ const updateListInputInDocument = (state, params) => {
         Vue.set(state.submit[instance].listInputInDocument[controlName], key, value);
     }
 }
-const addToRootControl = (state, params) => {
-    let key = params.key
-    let value = params.value
-    Vue.set(state.submit.rootControl, key, value);
-}
-const addToImpactedFieldsList = (state, params) => {
-    let value = params.value
-    Vue.set(state.submit, 'impactedFieldsList', value);
-}
+
 
 const addToDocumentSubmitStore = (state, params) => {
     let key = params.key
@@ -312,10 +304,15 @@ const setDefaultDetailStore = (state, params) => {
         allData: {
 
         },
-
     }
     let instance = params.instance;
     Vue.set(state.detail, instance, value);
+}
+const updateCurrentControlEditByUser = (state, params) => {
+    let currentControl = params.currentControl;
+    let instance = params.instance;
+    console.log(state.submit);
+    Vue.set(state.submit[instance], 'currentControlEditByUser', currentControl);
 }
 const addToRelatedLocalFormulas = (state, params) => {
     let key = params.key
@@ -332,7 +329,7 @@ const addToRelatedLocalFormulas = (state, params) => {
         curListRelate[element].push(key);
     }
 
-    Vue.set(state.submit, 'localRelated', curListRelate);
+    Vue.set(state.submit[instance], 'localRelated', curListRelate);
 }
 
 /**
@@ -359,8 +356,6 @@ export {
     addInstanceSubmitDB,
     updateListInputInDocument,
     updateFormulasId,
-    addToRootControl,
-    addToImpactedFieldsList,
     addToDocumentSubmitStore,
     addToDocumentDetailStore,
     changeViewType,
@@ -372,6 +367,7 @@ export {
     addToRelatedLocalFormulas,
     setDefaultSubmitStore,
     setDefaultEditorStore,
-    setDefaultDetailStore
+    setDefaultDetailStore,
+    updateCurrentControlEditByUser
 
 };

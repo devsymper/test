@@ -321,6 +321,8 @@ export default class Formulas {
             let syql = listSyql[0].trim();
             syql = this.replaceParamsToData(dataInput, syql);
             syql = syql.replace('ref(', '');
+            syql = syql.replace('REF(', '');
+
             syql = syql.substring(0, syql.length - 1);
             return this.runSyql(syql);
         } else {
