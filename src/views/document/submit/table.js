@@ -28,6 +28,7 @@ class UserEditor extends Handsontable.editors.TextEditor {
      */
 Handsontable.renderers.PercentRenderer = function(instance, td, row, col, prop, value, cellProperties) {
     Handsontable.renderers.NumericRenderer.apply(this, arguments);
+    td.style.textAlign = 'left'
     td.textContent = (td.textContent == "" || td.textContent == null) ? 0 + " %" : td.textContent + " %";
 }
 Handsontable.cellTypes.registerCellType('percent', {
@@ -146,6 +147,7 @@ export default class Table {
             this.listCellType = {};
             this.currentSelectedCell = {};
             this.isAutoCompleting = false;
+            this.cellAfterChange = "";
             this.showPopupUser = false;
             this.currentControlSelected = null
             this.event = {
@@ -364,10 +366,8 @@ export default class Table {
         if (currentRowData[currentRowData.length - 1] == 'NULL') {
             let id = Date.now();
             currentRowData[currentRowData.length - 1] = id;
-            thisObj.tableInstance.setDataAtCell(thisObj.currentSelectedCell['row'], currentRowData.length - 1, id);
-
-            await ClientSQLManager.insertRow(thisObj.keyInstance, thisObj.tableName, columns, currentRowData, true)
-            thisObj.handlerCheckEffectedControlInTable(controlName);
+            thisObj.cellAfterChange = controlName
+            thisObj.tableInstance.setDataAtCell(changes[0][0], currentRowData.length - 1, id);
         } else {
             await ClientSQLManager.editRow(thisObj.keyInstance, thisObj.tableName, controlName, changes[0][3],
                 'WHERE s_table_id_sql_lite = ' + currentRowData[currentRowData.length - 1], true)
@@ -375,6 +375,7 @@ export default class Table {
 
         }
     }
+
 
 
     checkControlType(type) {
@@ -441,7 +442,6 @@ export default class Table {
         this.handlerRunOtherFormulasControl(controlLinkEffected, 'link');
         this.handlerRunOtherFormulasControl(controlValidateEffected, 'validate');
         if (Object.keys(controlEffected).length > 0) {
-            console.log("controlEffected--", controlName, controlEffected);
             for (let i in controlEffected) {
                 this.handlerCheckCanBeRunFormulas(i);
             }
@@ -497,6 +497,7 @@ export default class Table {
                 }
             }
 
+
         }
         /**
          * Hàm lấy các data input cho 1 công thức
@@ -529,6 +530,9 @@ export default class Table {
          */
     async handlerRunFormulasForControlInTable(formulasType, controlInstance, dataInput, formulasInstance) {
             let listIdRow = this.tableInstance.getDataAtCol(this.tableInstance.getDataAtRow(0).length - 1);
+            if (this.tableHasRowSum) {
+                listIdRow.pop();
+            }
             let dataPost = {};
             let thisObj = this;
             if (Object.keys(dataInput).length > 0) {
@@ -541,7 +545,10 @@ export default class Table {
                             if (allRowDataInput.length <= index) {
                                 allRowDataInput[index] = {};
                             }
-                            if (controlType == 'number' && (dataRow === "" || dataRow === null)) {
+                            if (controlType == 'number' && typeof dataRow != 'number') {
+                                dataRow = 0
+                            }
+                            if (controlType == 'percent' && typeof dataRow != 'number') {
                                 dataRow = 0
                             }
                             allRowDataInput[index][control] = dataRow;
@@ -552,8 +559,15 @@ export default class Table {
                                 allRowDataInput[i] = {};
                             }
                             let value = dataRow[i];
-                            if (controlType == 'number' && (value === "" || value === null)) {
+                            if (controlType == 'number' && typeof value != 'number') {
                                 value = 0
+                            }
+                            if (controlType == 'percent') {
+                                if (value == null) {
+                                    value = 0
+                                } else {
+                                    value = Number(value);
+                                }
                             }
                             allRowDataInput[i][control] = value;
                         }
@@ -699,7 +713,8 @@ export default class Table {
         thisObj.controlObj.ele.detach().hide();
         let colHeaders = thisObj.columnsInfo.headerNames;
         thisObj.colHeaders = colHeaders;
-
+        let defaultData = this.getDefaultData();
+        console.log(defaultData, 'defaultData');
         this.tableInstance = new Handsontable(tableContainer, {
             rowHeaders: true,
             dataSchema: Object.assign({}, thisObj.sampleRowValues),
@@ -714,12 +729,7 @@ export default class Table {
             },
             // rowHeights: 29,
             // minSpareRows: 1,
-            data: (thisObj.tableHasRowSum) ? [
-                [''],
-                [''],
-            ] : [
-                []
-            ],
+            data: defaultData,
             manualColumnMove: !thisObj.checkDetailView(),
             // manualRowMove: true,
             colHeaders: colHeaders,
@@ -732,7 +742,7 @@ export default class Table {
             // columnHeaderHeight: 30,
             // viewportRowRenderingOffset: 20,
             // viewportColRenderingOffset: 20,
-            contextMenu: (thisObj.checkDetailView()) ? false : ['row_above', 'row_below', 'remove_row', 'freeze_column', 'unfreeze_column'],
+            contextMenu: (thisObj.checkDetailView()) ? false : thisObj.getContextMenu(),
             dragToScroll: false,
             stretchH: 'all',
             formulas: true,
@@ -779,7 +789,27 @@ export default class Table {
                         }
                     }
                 });
-            }
+            },
+            afterSetDataAtRowProp: function(changes, source) {
+                console.log('sksada', changes);
+                console.log('sksada', source);
+            },
+            afterSetDataAtCell: function(changes, source) {
+                if (changes[0][1] == 's_table_id_sql_lite') {
+                    setTimeout(() => {
+                        let currentRowData = thisObj.tableInstance.getDataAtRow(changes[0][0]);
+                        console.log('checkId luc after set', currentRowData);
+                        let columns = thisObj.columnsInfo.columns;
+                        columns = columns.map(function(c) {
+                            return c.data;
+                        });
+                        ClientSQLManager.insertRow(thisObj.keyInstance, thisObj.tableName, columns, currentRowData, true).then(res => {
+                            thisObj.handlerCheckEffectedControlInTable(thisObj.cellAfterChange);
+                        })
+                    }, 10);
+                }
+
+            },
         });
         this.tableInstance.keyInstance = this.keyInstance;
         if (!this.checkDetailView()) {
@@ -788,7 +818,45 @@ export default class Table {
             }
         }
     }
+    getContextMenu() {
+        return {
+            callback: function(key, selection, clickEvent) {
+                // Common callback for all options
 
+                if (key == 'row_below') {
+                    var indexArr = this.getSelected();
+                    var selectedData = this.getDataAtRow(indexArr[0]);
+
+                    this.populateFromArray(indexArr[2] + 1, 0, [selectedData]);
+                } else if (key == 'row_above') {
+                    var indexArr = this.getSelected();
+                    var selectedData = this.getDataAtRow(indexArr[0]);
+
+                    this.populateFromArray(indexArr[2] - 1, 0, [selectedData]);
+                }
+                console.log(key, selection, clickEvent);
+            },
+            items: {
+                "row_above": {
+
+                },
+                "row_below": {
+
+                },
+                'remove_row': {
+                    callback: function(key, selection, clickEvent) { // Callback for specific option
+                        setTimeout(function(hotTb) {
+                            console.log('selection', selection);
+                            hotTb.alter(key, selection[0]['start']['row'], 1);
+                        }, 0, this);
+                    }
+                }
+            }
+        }
+
+        // ['row_above', 'row_below', 'remove_row', 'freeze_column', 'unfreeze_column']
+
+    }
     setDefaulFotterRowData(value, rowIndex, prop) {
         this.setDataAtRowProp(rowIndex, prop, value, AUTO_SET);
     }
@@ -806,11 +874,25 @@ export default class Table {
     }
 
     checkDetailView() {
-            if (sDocument.state.viewType[this.keyInstance] == 'detail') {
-                return true;
-            } else {
-                return false;
+        if (sDocument.state.viewType[this.keyInstance] == 'detail') {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Hàm lấy data default lúc load table
+     */
+    getDefaultData() {
+            let data = [];
+            let firstRow = [];
+            firstRow['s_table_id_sql_lite'] = Date.now();
+            data.push(firstRow);
+            if (this.tableHasRowSum) {
+                data.push([''])
             }
+            return data;
         }
         /**
          * Hàm lấy thông tin của các cột

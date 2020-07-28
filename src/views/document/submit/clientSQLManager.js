@@ -116,8 +116,18 @@ export default class ClientSQLManager {
     }
     static async insertRow(keyInstance, tableName, column, value, returnPromise = false) {
         let tbColumn = column.join();
-        let tbValue = value.join();
+        let tbValue = "";
+        for (let index = 0; index < value.length; index++) {
+            let v = value[index];
+            if (v == null) {
+                v = ""
+            }
+            tbValue += "'" + v + "',"
+        }
+        tbValue = tbValue.trim()
+        tbValue = tbValue.substring(0, tbValue.length - 1);
         let sql = `INSERT INTO ${tableName} (${tbColumn}) VALUES(${tbValue})`;
+        console.log('checkid sql', sql);
         if (returnPromise) {
             return new Promise((resolve, reject) => {
                 try {

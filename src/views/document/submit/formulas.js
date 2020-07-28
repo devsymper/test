@@ -137,8 +137,18 @@ export default class Formulas {
                 let dataPost = { formula: syql, dataInput: JSON.stringify(dataInput) };
                 return formulasApi.getMultiData(dataPost);
             }
+        } else {
+            let dataRes = {}
+            for (let rowId in dataInput) {
+                let formula = this.replaceParamsToData(dataInput[rowId], formulas);
+                let res = await this.runSQLLiteFormulas(formula);
+                console.log('kfsja', res);
+                dataRes[rowId] = res[0].values[0][0];
+            }
+            return { data: dataRes }
 
         }
+
     }
 
     // hàm xử lí chạy các công thức có khóa local trong script sau khi chạy xong thay thế lại giá tri cho script
