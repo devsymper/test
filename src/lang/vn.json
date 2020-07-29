@@ -218,7 +218,10 @@
         "header": {
             "id": "ID",
             "pack_name": "Tên package",
-            "date_created": "Ngày tạo"
+            "date_created": "Ngày tạo",
+            "name": "Name",
+            "description": "Description",
+            "type": "Type"
         },
         "title": "Nhóm quyền",
         "actionControlSummary": "Action pack Summary",

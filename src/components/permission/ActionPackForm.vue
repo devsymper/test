@@ -209,6 +209,12 @@ export default {
                     "value": this.itemData.name,
                     "info": "",
                 },
+                description: {
+                    "title": this.$t('common.description'),
+                    "type": "text",
+                    "value": this.itemData.description,
+                    "info": "",
+                },
                 objectType: {
                     "title": this.$t('permissions.actionPack.objectType'),
                     "type": 'select',

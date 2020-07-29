@@ -4,7 +4,7 @@
             <!-- Cột package -->
             <SplitGrid class="sb_sub-grid">
                 <SplitGridArea>
-                    <v-row>
+                    <v-row> 
                         <v-col cols="4">
                             <div class="col-title">
                                 {{ $t("permissions.title") }}

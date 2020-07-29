@@ -55,12 +55,9 @@ export default class Formulas {
                     let strBeforeSql = this.checkBeforeReferenceFormulas(listLocal[index].trim(), formulas);
                     let reverse = this.reverseSqliteDataToFormulas(res[0], strBeforeSql.trim().toLowerCase());
                     formulas = formulas.replace(listLocal[index], reverse);
-
-
                 }
             }
             let listSyql = this.getReferenceFormulas(formulas);
-
             if (listSyql != null && listSyql.length > 0) {
                 for (let i = 0; i < listSyql.length; i++) {
                     let syql = listSyql[i].trim();
@@ -137,8 +134,18 @@ export default class Formulas {
                 let dataPost = { formula: syql, dataInput: JSON.stringify(dataInput) };
                 return formulasApi.getMultiData(dataPost);
             }
+        } else {
+            let dataRes = {}
+            for (let rowId in dataInput) {
+                let formula = this.replaceParamsToData(dataInput[rowId], formulas);
+                let res = await this.runSQLLiteFormulas(formula);
+                console.log('kfsja', res);
+                dataRes[rowId] = res[0].values[0][0];
+            }
+            return { data: dataRes }
 
         }
+
     }
 
     // hàm xử lí chạy các công thức có khóa local trong script sau khi chạy xong thay thế lại giá tri cho script
@@ -202,12 +209,16 @@ export default class Formulas {
                 let curData = data.values.filter(data => {
                     return data[0] !== "" && data[0] !== null
                 })
-                for (let i = 0; i < curData.length; i++) {
-                    let row = curData[i];
-                    if (i == curData.length - 1) {
-                        strReplace += "'" + row + "')";
-                    } else {
-                        strReplace += "'" + row + "',";
+                if (curData.length == 0) {
+                    strReplace = "('')";
+                } else {
+                    for (let i = 0; i < curData.length; i++) {
+                        let row = curData[i];
+                        if (i == curData.length - 1) {
+                            strReplace += "'" + row + "')";
+                        } else {
+                            strReplace += "'" + row + "',";
+                        }
                     }
                 }
             }
@@ -520,30 +531,13 @@ export default class Formulas {
     }
 
 
-    // hàm wrap lại formulas của control inputfilter khi có search
+    // hàm thay thế tham số search của input filer lúc gõ search
     wrapSyqlForSearchInputFilter(search) {
             this.setFormulas(this.oldFormulas);
-            let refFormulas = this.refFormulas;
-            if (refFormulas.length > 0) {
-                let syql = refFormulas[0].trim();
-                syql = syql.replace('ref(', '');
-                syql = syql.replace('REF(', '');
-                syql = syql.substring(0, syql.length - 1);
-                let columns = this.getColumnsQuery(syql);
-                let where = 'WHERE ';
-                for (let index = 0; index < columns.length; index++) {
-                    const element = columns[index];
-                    if (index == columns.length - 1) {
-                        where += " CAST(" + element + " AS TEXT) LIKE '%" + search + "%'";
-                    } else {
-                        where += " CAST(" + element + " AS TEXT) LIKE '%" + search + "%' AND ";
-                    }
-                }
-                let aliasTable = "symper_" + Date.now();
-                let newSyql = "ref( SELECT * FROM (" + syql + ") " + aliasTable + " " + where + ")";
-                return newSyql;
-            }
-            return false;
+            let refFormulas = this.formulas;
+            let regex = new RegExp("{search_value}", "g");
+            refFormulas = refFormulas.replace(regex, search);
+            return refFormulas;
         }
         // hàm lấy các column được query sau select và trước from
     getColumnsQuery(syql) {

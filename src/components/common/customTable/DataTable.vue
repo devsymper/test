@@ -31,6 +31,9 @@ export default {
         },
         getColName(name){
             return this.$refs.dataTable.hotInstance.propToCol(name);
+        },
+        reRender(){
+            this.$refs.dataTable.hotInstance.render()
         }
     },
     data() {

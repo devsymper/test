@@ -60,7 +60,6 @@ export default {
             this.isShowAutoComplete = true;
             this.calculatorPositionBox(e);
             let thisCpn = this;
-            this.curInput = $(e.target);
             this.curInput.off('keydown');
             this.curInput.on('keydown',function(e){
                 if(thisCpn.dataTable != undefined && thisCpn.dataTable.length > 0){
@@ -104,26 +103,24 @@ export default {
         },
         calculatorPositionBox(e){
             // nếu autocomplete từ cell của handsontable  
-            if($(e.target).closest('.handsontable').length > 0 ){
+            if(e.hasOwnProperty('curTarget')){
+                this.curInput = $(e.curTarget);
                 let autoEL = $(this.$el).detach();
-                $(e.target).closest('.wrap-table').append(autoEL);
-                let edtos = $(e.target).offset();
-                if(!$(e.target).is('.handsontableInput')){
-                    edtos = $(e.target).closest('td.htAutocomplete.current.highlight').offset();
+                $(e.curTarget).closest('.wrap-table').append(autoEL);
+                let edtos = $(e.curTarget).offset();
+                if(!$(e.curTarget).is('.handsontableInput')){
+                    edtos = $(e.curTarget).closest('td.htAutocomplete.current.highlight').offset();
                 }
-                if($(e.target).is('div.htAutocompleteArrow')){
-                    edtos = $(e.target).parent().offset();;
+                if($(e.curTarget).is('div.htAutocompleteArrow')){
+                    edtos = $(e.curTarget).parent().offset();;
                 }
-                let tbcos;
-                if(this.tableWrapper){
-                    tbcos = $(this.tableWrapper).offset();
-                }else{
-                    tbcos = $(e.target).closest('.wrap-table').find('[s-control-type="table"]').offset();
-                }
-                this.positionBox = {'top':edtos.top - tbcos.top + $(e.target).height() +'px','left':edtos.left - tbcos.left+'px'};
+                
+                let tbcos = $(e.curTarget).closest('.wrap-table').find('[s-control-type="table"]').offset();
+                this.positionBox = {'top':edtos.top - tbcos.top + $(e.curTarget).height() +'px','left':edtos.left - tbcos.left+'px'};
             }
             //nêu là ngoài bảng
             else{
+                this.curInput = $(e.target);
                 let autoEL = $(this.$el).detach();
                 $(e.target).parent().append(autoEL);
                 this.positionBox = {'top':'26px','left':'0px'};

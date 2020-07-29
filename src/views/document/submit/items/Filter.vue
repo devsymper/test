@@ -7,7 +7,6 @@
                 dense
                 height="30"
                 class="search"
-                label="Tìm kiếm nhanh"
                 @keyup="handleKeyupSearch"
                 v-model="search"
                 hide-details
@@ -65,7 +64,7 @@ export default {
                         let item = {name:colName,title:c,type:'text',readOnly:true};
                         this.columns.push(item)
                     }
-                    this.columns.push({name:'active',title:'Chọn',type:'checkbox'})
+                    this.columns.unshift({name:'active',title:'Chọn',type:'checkbox'})
                 }
                 let item1 = {};
                 for(let c in row){
@@ -77,6 +76,9 @@ export default {
             }   
             this.data = dataTable;
             this.curControlId = controlId;
+            // setTimeout(() => {
+            //     this.$refs.dataTable.reRender();
+            // }, 1000);
         },
         saveInputFilter(){
             let data = this.$refs.dataTable.getData();
@@ -98,7 +100,7 @@ export default {
             this.controlName = controlName;
         },
         handleKeyupSearch(data){
-            this.$evtBus.$emit('document-submit-search-in-filter-input',{controlName:this.controlName,search:this.search})
+            this.$emit('search-data',{controlName:this.controlName,search:this.search})
         }
     }
 }

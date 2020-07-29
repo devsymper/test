@@ -10,15 +10,14 @@
             :useActionPanel="true"
             :headerPrefixKeypath="'common'"
             :currentItemData="currentItemData"
+            :customAPIResult="customAPIResult"
             :actionPanelWidth="600"
-            @after-open-add-panel="handleAddItem"
-        >
+            @after-open-add-panel="handleAddItem">
             <template slot="right-panel-content" slot-scope="{itemData}">
                 <ActionPackForm
                     @saved-item-data="handleSavedItem"
                     :action="actionOnItem"
                     :itemData="itemData">
-
                 </ActionPackForm>
             </template>
         </list-items>
@@ -38,11 +37,40 @@ export default {
     data() {
         let self = this;
         return {
+            customAPIResult: {
+                reformatData(res) {
+                    if (res.status == 200) {
+                        return {
+                            listObject: res.data,
+                            columns: [
+                                {
+                                    name: "id",
+                                    title: "id",
+                                    type: "numeric"
+                                },
+                                {
+                                    name: "name",
+                                    title: "name",
+                                    type: "text"
+                                },
+                                {
+                                    name: "description",
+                                    title: "description",
+                                    type: "text"
+                                }
+                            ]
+                        };
+                    } else {
+                        this.$snotifyError(res, "Can not get permissions list");
+                    }
+                }
+            },
             containerHeight: 300,
             actionOnItem: 'create',
-            getListUrl: appConfigs.apiDomain.systemRole+'system-role',
+            getListUrl: appConfigs.apiDomain.actionPacks,
             currentItemData: {
                 name: '',
+                description: '',
                 objectType: 'document',
                 mapActionAndObjects: {} // dạng: {workflow: [....], document: [...]]}
             },
@@ -65,7 +93,7 @@ export default {
                             ids.push(item.id);
                         }
                         try {
-                            let res = await systemRoleApi.delete(ids);
+                            let res = await permissionApi.deleteActionPack(ids);
                             if(res.status == 200){
                                 self.$snotifySuccess("Deleted "+ids.length+' items');
                             }else{
@@ -100,28 +128,28 @@ export default {
     watch: {},
     methods: {
         async getDetailActionPack(id){
-            let res = await systemRoleApi.detail(id);
-            if(res.status == 200){
-                for(let key in res.data){
-                    this.$set(this.currentItemData, key, res.data[key]);
-                }
-            }else{
-                this.$snotifyError(res, "Can not get item detail");
-            }
+            // let res = await systemRoleApi.detail(id);
+            // if(res.status == 200){
+            //     for(let key in res.data){
+            //         this.$set(this.currentItemData, key, res.data[key]);
+            //     }
+            // }else{
+            //     this.$snotifyError(res, "Can not get item detail");
+            // }
 
-            res = await permissionApi.getPermissionOfRole('system:'+id);
-            if(res.status == 200){
-                let mapIdToPermission = this.$store.state.permission.allPermissionPack;
-                let permissions = res.data.reduce((arr, el) => {
-                    if(mapIdToPermission[el.permissionPackId]){
-                        arr.push(mapIdToPermission[el.permissionPackId]);
-                    }
-                    return arr;
-                }, []);
-                this.$set(this.currentItemData, 'permissions', permissions);
-            }else{
-                this.$snotifyError(res, "Can not get permission of role");
-            }
+            // res = await permissionApi.getPermissionOfRole('system:'+id);
+            // if(res.status == 200){
+            //     let mapIdToPermission = this.$store.state.permission.allPermissionPack;
+            //     let permissions = res.data.reduce((arr, el) => {
+            //         if(mapIdToPermission[el.permissionPackId]){
+            //             arr.push(mapIdToPermission[el.permissionPackId]);
+            //         }
+            //         return arr;
+            //     }, []);
+            //     this.$set(this.currentItemData, 'permissions', permissions);
+            // }else{
+            //     this.$snotifyError(res, "Can not get permission of role");
+            // }
         },
         handleSavedItem(){
             this.$refs.listSystemRole.refreshList();

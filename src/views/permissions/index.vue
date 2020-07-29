@@ -2,28 +2,24 @@
     <v-container fluid>
         <ListItems
             ref="listPack"
-            :getDataUrl="baseUrl"
+            :getDataUrl="getDataUrl"
             :headerPrefixKeypath="'permissions.header'"
             :pageTitle="$t('permissions.title')"
             :containerHeight="tableHeight"
             :tableContextMenu="tableContextMenu"
             :useDefaultContext="false"
-            :actionPanelWidth="800"
-            @after-open-add-panel="showAddModal"
+            :actionPanelWidth="600"
+            @after-open-add-panel="handleAddItem"
+            :currentItemData="currentItemData"
+            :customAPIResult="customAPIResult"
         >
-            <template slot="right-panel-content">
-                <div v-if="!!!isGrandPermissionMode">
-                    <UpdatePermission 
-                        :isEdit="isEdit"
-                        :pack="currentPack"
-                        v-model="currentPack"
-                        @create-pack="createPack"
-                        @update-pack="createPack"
-                    ></UpdatePermission>
-                </div>
-                <div v-else>
-                    <grandPermission :package="currentPack"></grandPermission>
-                </div>
+            <template slot="right-panel-content" slot-scope="{itemData}">
+                <PermissionForm
+                    @saved-item-data="handleSavedItem"
+                    :action="actionOnItem"
+                    :itemData="itemData">
+
+                </PermissionForm>
             </template>
         </ListItems>
     </v-container>
@@ -34,133 +30,165 @@ import ListItems from "../../components/common/ListItems";
 import grandPermission from "./grandPermission";
 import UpdatePermission from "./Update";
 import Api from "./../../api/api.js";
-import { appConfigs } from '../../configs';
+import { appConfigs } from "../../configs";
+import { permissionApi } from '../../api/permissionPack';
+import PermissionForm from "@/components/permission/PermissionForm.vue";
+import { util } from '../../plugins/util';
+
+let defaultItemData = {
+    id: '',
+    name: '',
+    description: '',
+    actionPacks: []
+};
+
 export default {
     name: "ListPermissions",
     components: {
         ListItems,
         grandPermission,
         UpdatePermission,
+        PermissionForm
     },
     computed: {
-        baseUrl: function() {
-            return this.apiUrl + this.permissiontUrl;
-        }, 
+        getDataUrl: function() {
+            return appConfigs.apiDomain.permissionPacks;
+        }
     },
     data: function() {
+        let self = this;
         return {
-            apiUrl: appConfigs.apiDomain.user,
-            permissiontUrl: "permission-packages",
-            removeCallback: null,
-            isEdit: false,
-            isGrandPermissionMode: false,
-            editCallback: null,
-            currentPack: {
-                pack_name: "",
+            customAPIResult: {
+                reformatData(res) {
+                    if (res.status == 200) {
+                        return {
+                            listObject: res.data,
+                            columns: [
+                                {
+                                    name: "id",
+                                    title: "id",
+                                    type: "numeric"
+                                },
+                                {
+                                    name: "name",
+                                    title: "name",
+                                    type: "text"
+                                },
+                                {
+                                    name: "description",
+                                    title: "description",
+                                    type: "text"
+                                },
+                                {
+                                    name: "type",
+                                    title: "type",
+                                    type: "text"
+                                }
+                            ]
+                        };
+                    } else {
+                        this.$snotifyError(res, "Can not get permissions list");
+                    }
+                }
             },
+            containerHeight: 300,
+            actionOnItem: 'create',
+            currentItemData: util.cloneDeep(defaultItemData),
             tableContextMenu: [
-               {
+                {
                     name: "edit",
                     text: this.$t("permissions.contextMenu.edit"),
-                    callback: (pack, callback) => {
-                        this.editCallback = callback;
-                        this.currentPack = { ...pack };
-                        this.isEdit = true;
-                        this.isGrandPermissionMode = false;
-                    },
-                },
-                {
-                    name: "grantPermission",
-                    text: this.$t("permissions.contextMenu.grantPermission"),
-                    callback: (pack, callback) => {
-                        this.currentPack = { ...pack };
-                        this.isEdit = false;
-                        this.isGrandPermissionMode = true;
-                        this.$refs.listPack.actionPanel = true;
-                    },
+                    callback: async (pack, callback) => {
+
+                        for(let key in pack){
+                            self.$set(self.currentItemData, key, pack[key]);
+                        }
+
+                        self.actionOnItem = 'update';
+                        let res = await permissionApi.getActionPackOfPermission(pack.id);
+                        
+                        if(res.status == 200){
+                            let listActionPacks = res.data;
+                            let mapActionPack = self.$store.state.permission.allActionPack;
+                            self.currentItemData.actionPacks = listActionPacks.reduce((arr, el) => {
+                                arr.push(mapActionPack[el.actionPackId]);
+                                return arr;
+                            }, []);
+                        }else{
+                            self.$snotifyError(res, "Can not get list action pack of permission "+pack.name);
+                        }
+                    }
                 },
                 {
                     name: "remove",
                     text: this.$t("permissions.contextMenu.remove"),
-                    callback: (pack, callback) => {
-                        this.removeCallback = callback;
-                        this.deletepermission(pack);
-                    },
-                },
+                    callback: async (rows, refreshList) => {
+                        let ids = [];
+                        for(let item of rows){
+                            ids.push(item.id);
+                        }
+                        try {
+                            let res = await permissionApi.deletePermissionPack(ids);
+                            if(res.status == 200){
+                                self.$snotifySuccess("Deleted "+ids.length+' items');
+                            }else{
+                                self.$snotifyError(res, "Can not delete selected items");
+                            }
+                        } catch (error) {
+                            self.$snotifyError(error, "Can not delete selected items");
+                        }
+                        refreshList();
+                    }
+                }
             ],
-            tableHeight: 0,
+            tableHeight: 0
         };
     },
     mounted() {
         this.tableHeight = document.body.clientHeight - 0;
     },
     methods: {
-        showAddModal() {
-            this.isEdit = false;
-            this.isGrandPermissionMode = false
-            this.currentPack = { name: "" };
-        },
-        deletepermission(permission) {
-            let req = new Api(this.apiUrl);
-            req.delete(this.permissiontUrl + "/" + permission.id)
-            .then(res => {
-                if (res.status === 200) {
-                    this.removeCallback(res);
-                    this.closeSidebar();
-                    this.$snotify({
-                        type: 'success',
-                        title: this.$t('notification.successTitle'),
-                        text: this.$t('permissions.deleted')
-                    })
-                } else {
-                    this.showError();
+        async getDetailSystemRole(id){
+            let res = await systemRoleApi.detail(id);
+            if(res.status == 200){
+                for(let key in res.data){
+                    this.$set(this.currentItemData, key, res.data[key]);
                 }
-            }).catch((err) => {
-                this.showError();
-                console.log(err);
-            });
-        },
-        createPack(res) {
-            if (res.status === 200) {
-                this.$refs.listPack.getData();
-                this.closeSidebar();
-                this.$snotify({
-                    type: 'success',
-                    title: this.$t('notification.successTitle'),
-                    text: this.$t('permissions.created')
-                })
+            }else{
+                this.$snotifyError(res, "Can not get item detail");
+            }
+
+            res = await permissionApi.getPermissionOfRole('system:'+id);
+            if(res.status == 200){
+                let mapIdToPermission = this.$store.state.permission.allPermissionPack;
+                let permissions = res.data.reduce((arr, el) => {
+                    if(mapIdToPermission[el.permissionPackId]){
+                        arr.push(mapIdToPermission[el.permissionPackId]);
+                    }
+                    return arr;
+                }, []);
+                this.$set(this.currentItemData, 'permissions', permissions);
+            }else{
+                this.$snotifyError(res, "Can not get permission of role");
             }
         },
-        closeSidebar() {
-            this.$refs.listPack.actionPanel = false;
+        handleSavedItem(){
+            this.$refs.listPack.refreshList();
         },
-        showError(){
-            this.$snotify({
-                type: 'success',
-                title: this.$t('notification.errorTitle'),
-                text: this.$t('notification.error')
-            })
+        handleAddItem(){
+            this.actionOnItem = 'create';
+            this.currentItemData = null;
+            this.currentItemData = util.cloneDeep(defaultItemData);
         },
-        updatePack() {
-            if (res.status === 200) {
-                // callback come here
-                this.editCallback({
-                    ...res,
-                    data: {
-                        ...this.currentPack,
-                    },
-                });
-                this.closeSidebar();
-                this.$snotify({
-                    type: 'success',
-                    title: this.$t('notification.successTitle'),
-                    text: this.$t('permissions.updated')
-                })
-            } else {
-                this.showError();
+        calcContainerHeight() {
+            this.containerHeight = util.getComponentSize(this).h;
+        },
+        applyDataToForm(row){
+            for(let key in row){
+                this.$set(this.currentItemData, key, row[key]);
             }
-        },
-    },
+        }
+    }
 };
 </script>
 

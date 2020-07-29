@@ -219,7 +219,10 @@
         "header": {
             "id": "ID",
             "pack_name": "Name",
-            "date_created": "Date"
+            "date_created": "Date",
+            "name": "Name",
+            "description": "Description",
+            "type": "Type"
         },
         "title": "Permissions packages",
         "actionControlSummary": "Action pack Summary",
