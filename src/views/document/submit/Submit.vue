@@ -26,7 +26,7 @@
         >
             <template slot="drag-panel-content">
                 <!-- <submitDocument :isQickSubmit="true" :docId="340" v-if="!isQickSubmit"/> -->
-                <filter-input @save-input-filter="saveInputFilter" :tableMaxHeight="500" ref="inputFilter"></filter-input>
+                <filter-input @save-input-filter="saveInputFilter" @search-data="searchDataFilter" :tableMaxHeight="500" ref="inputFilter"></filter-input>
             </template>
         </sym-drag-panel>
         <input type="file" :id="'file-upload-alter-'+keyInstance" class="hidden d-none" />
@@ -279,15 +279,6 @@ export default {
             this.loadDocumentObject();
         }
 
-        this.$evtBus.$on("document-submit-autocomplete-input", e => {
-            if(thisCpn.isComponentActive == false) return;
-            thisCpn.$refs.autocompleteInput.show(e);
-            thisCpn.$store.commit("document/addToDocumentSubmitStore", {
-                key: 'currentControlAutoComplete',
-                value: e.controlName,
-                instance: this.keyInstance
-            });
-        });
         this.$evtBus.$on("run-formulas-control-outside-table", e => {
             if(thisCpn.isComponentActive == false) return;
             let formulasInstance = e.formulasInstance;
@@ -365,10 +356,10 @@ export default {
             if(thisCpn.isComponentActive == false) return;
             thisCpn.$refs.timeInput.show(e);
         });
-        this.$evtBus.$on("document-submit-search-in-filter-input", e => {
-            if(thisCpn.isComponentActive == false) return;
-            thisCpn.runInputFilterFormulas(e.controlName,e.search);
-        }); 
+        // this.$evtBus.$on("document-submit-search-in-filter-input", e => {
+        //     if(thisCpn.isComponentActive == false) return;
+        //     thisCpn.runInputFilterFormulas(e.controlName,e.search);
+        // }); 
         this.$evtBus.$on("document-submit-filter-input-click", e => {
             if(thisCpn.isComponentActive == false) return;
             thisCpn.topPositionDragPanel = $(e.target).offset().top + 2 + $(e.target).height();
@@ -385,6 +376,9 @@ export default {
             if(e.e.keyCode != 38 && e.e.keyCode != 40 && e.e.keyCode != 13){
                 if(!thisCpn.$refs.autocompleteInput.isShow()){
                     thisCpn.$refs.autocompleteInput.show(e.e);
+                    let currentTableInteractive = this.sDocumentSubmit.currentTableInteractive;
+                    if(currentTableInteractive != null && currentTableInteractive != undefined)
+                    currentTableInteractive.isAutoCompleting = true;
                     thisCpn.$store.commit("document/addToDocumentSubmitStore", {
                         key: 'currentControlAutoComplete',
                         value: e.controlName,
@@ -405,6 +399,9 @@ export default {
         });
         // click outside
         this.$evtBus.$on("symper-app-wrapper-clicked", evt => {
+            if(evt == undefined){
+                return;
+            }
             if(thisCpn.isComponentActive == false) return;
             if (
                 !$(evt.target).hasClass("autocompleting") &&
@@ -478,6 +475,10 @@ export default {
             let value = data.value
             $('#'+controlId).val(value);
             this.$refs.symDragPanel.hide()
+        },
+        searchDataFilter(data){
+            if(this.isComponentActive == false) return;
+            this.runInputFilterFormulas(data.controlName,data.search);
         },
         /**
          * Hàm chạy công thức autocomplete để đổ dữ liệu vào box autucomplete, control select cũng dùng trường hợp này
@@ -556,7 +557,6 @@ export default {
          * Hàm xử lí nhận dữ liệu component autocomplete khi chọn 1 dòng
          */
         afterSelectRowAutoComplete(data){
-
             // th này không phải trong table       
             if(this.sDocumentSubmit.currentCellSelected == null){
                 let input = data.input;
@@ -567,16 +567,8 @@ export default {
             else{
                 let currentTableInteractive = this.sDocumentSubmit.currentTableInteractive
                 currentTableInteractive.tableInstance.setDataAtCell(this.sDocumentSubmit.currentCellSelected.row,this.sDocumentSubmit.currentCellSelected.column,data.value)
-                setTimeout(() => {
-                    currentTableInteractive.isAutoCompleting = false;
-                }, 100);
-                
+                currentTableInteractive.isAutoCompleting = false;
             }
-            // thisCpn.updateListInputInDocument(
-            //     locale.controlName,
-            //     "value",
-            //     data.value
-            // );
         },
         /**
          * Hàm  xử lí data sau khi query công thức autocomplete,
@@ -739,7 +731,6 @@ export default {
                                 controlName,
                                 thisCpn.keyInstance
                             );
-                            let columnsTableSqlLite = {};
                             let tableEle = $(allInputControl[index]);
                             tableEle.find(".s-control").each(function() {
                                 let childControlId = $(this).attr("id");
@@ -755,16 +746,12 @@ export default {
                                 );
                                 childControl.init();
                                 let childControlName = childControlProp.properties.name.value;
-                                columnsTableSqlLite[childControlName] = Util.mapTypeControlToTypeSQLLite(childControlProp.type);
                                 thisCpn.addToListInputInDocument(childControlName,childControl)
                                 listInsideControls[childControlName] = true;
                             });
                             tableControl.listInsideControls = listInsideControls;
                             tableControl.renderTable();
                             tableControl.setData(valueInput);
-                            columnsTableSqlLite['s_table_id_sql_lite'] = 'INTEGER'
-                            columnsTableSqlLite['childObjectId'] = 'INTEGER'
-                            ClientSQLManager.createTable(this.keyInstance,controlName,columnsTableSqlLite);
                             this.addToListInputInDocument(controlName,tableControl)
                         }
                     }
@@ -796,17 +783,6 @@ export default {
         openSubFormSubmit() {
             this.$refs.symDragPanel.$children[1].$refs.autocompleteInput.hide();
             this.$refs.symDragPanel.show();
-        },
-
-        /**
-         * Hàm tạo csql
-         */
-        // async createSQLLiteDB() {
-            
-        //     this.loadDocumentData();
-        // },
-        createDocumentSQLLiteTable(){
-            ClientSQLManager.createTable(this.keyInstance, 'this_document', this.columnsSQLLiteDocument);
         },
         
 
@@ -1080,7 +1056,7 @@ export default {
 
 
 
-        runInputFilterFormulas(controlName,search=false){
+        runInputFilterFormulas(controlName,search=""){
             let controlInstance = this.sDocumentSubmit.listInputInDocument[controlName];
             let controlId = controlInstance.id
             let allFormulas = controlInstance.controlFormulas;
@@ -1088,14 +1064,12 @@ export default {
                 if(allFormulas['formulas'].hasOwnProperty('instance')){
                     let formulasInstance = allFormulas['formulas'].instance;
                     if(formulasInstance.getFormulas() != ""){
-                        if(search !== false){
-                            if( !formulasInstance.hasOwnProperty('oldFormulas')){
-                                formulasInstance.oldFormulas = formulasInstance.getFormulas();
-                            }
-                            // trường hợp có search trong filter thì wrap lại công thức với biến search
-                            let newFormulas = formulasInstance.wrapSyqlForSearchInputFilter(search);
-                            formulasInstance.setFormulas(newFormulas);
+                        if( !formulasInstance.hasOwnProperty('oldFormulas')){
+                            formulasInstance.oldFormulas = formulasInstance.getFormulas();
                         }
+                        // trường hợp có search trong filter thì wrap lại công thức với biến search
+                        let newFormulas = formulasInstance.wrapSyqlForSearchInputFilter(search);
+                        formulasInstance.setFormulas(newFormulas);
                         this.handlerBeforeRunFormulasValue(formulasInstance,controlId,controlName,'formulas')
                     }
                 }

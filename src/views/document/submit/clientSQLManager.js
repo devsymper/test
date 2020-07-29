@@ -52,7 +52,7 @@ export default class ClientSQLManager {
          */
     static run(keyInstance, sql, isWithoutReturn = false) {
         let db = this.getInstanceDB(keyInstance);
-
+        console.log('dbdbdbdbdbdbdb', db);
         if (isWithoutReturn) {
 
             return db.run(sql);
@@ -61,22 +61,24 @@ export default class ClientSQLManager {
         }
     }
 
-    static createTable(keyInstance, tableName, columns, temporary = "", columnInsert, dataInsert = false) {
-        let col = "(";
-        for (let c in columns) {
-            col += c + " " + columns[c] + ", ";
-        }
-        col = col.trim();
-        col = col.substring(0, col.length - 1);
-        col += " )";
-        let sql = `CREATE ${temporary} TABLE IF NOT EXISTS ${tableName} ${col};`;
-        // sql += "INSERT INTO this_document VALUES ('a', 'hello');"
+    static createTable(keyInstance, tableName, columns, temporary = "", columnInsert, dataInsert = false, returnPromise = false) {
+        let sql = `CREATE ${temporary} TABLE IF NOT EXISTS ${tableName} (${columns});`;
         if (dataInsert != false) {
             sql += `INSERT INTO ${tableName} (${columnInsert}) VALUES ${dataInsert};`
         }
-        console.log('sagfad', sql);
-        this.run(keyInstance, sql, true);
-
+        // this.run(keyInstance, sql, true);
+        if (returnPromise) {
+            return new Promise((resolve, reject) => {
+                try {
+                    let data = this.run(keyInstance, sql, true);
+                    resolve(data);
+                } catch (error) {
+                    reject(error);
+                }
+            });
+        } else {
+            return this.run(keyInstance, sql, true);
+        }
         // console.log(this.run(keyInstance, 'select * from this_document', false));
 
     }
