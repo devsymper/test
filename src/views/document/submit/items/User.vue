@@ -1,5 +1,6 @@
 <template>
     <v-card 
+    
     class="card-list-user"
     v-show="isShow"
     :style="positionBox">
@@ -7,7 +8,9 @@
         :key="user.id + user.name" 
         class="user-item" 
         :style="{'background':(indexActive == index) ? '#f0f0f0' : ''}"
-        v-on:click="selectItem(user)" >
+        @mousedown.stop.prevent
+        @mouseup.stop.prevent
+        @click.stop.prevent="selectItem(user)" >
             <img :src="user.avatar">
             <p>{{user.displayName}}</p>
         </div>
@@ -133,6 +136,7 @@ export default {
             }
         },
         selectItem(user){
+            console.log('this.elementthis.element',this.element);
             if(this.element.is('.s-control')){
                 this.element.attr('user-id',user.id);
                 this.element.val(user.displayName);

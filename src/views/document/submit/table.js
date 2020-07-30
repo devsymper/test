@@ -21,7 +21,6 @@ class UserEditor extends Handsontable.editors.TextEditor {
             this.TEXTAREA_PARENT.appendChild(this.TEXTAREA);
         }
         setValue(newValue) {
-            console.log('newValue', newValue);
             this.TEXTAREA.value = newValue;
         }
 
@@ -47,7 +46,6 @@ Handsontable.renderers.UserRenderer = function(instance, td, row, col, prop, val
         let user = listUser.filter(user => {
             return user.id === value
         })
-        console.log('askdsaf', listUser, value);
         if (user.length > 0) {
             td.textContent = user[0].displayName
         }
@@ -872,7 +870,9 @@ export default class Table {
             if (this.tableHasRowSum) {
                 data.push({})
             }
-            this.tableInstance.loadData(data)
+            this.tableInstance.updateSettings({
+                data: data
+            })
         } else {
             let defaultRow = this.getDefaultData(false);
             this.tableInstance.loadData(defaultRow);
