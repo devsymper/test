@@ -9,6 +9,7 @@
         disable-pagination
         fixed-header
         hide-default-footer
+        :hide-default-header="isHideHeader"
         dense
         no-data-text="Không có dữ liệu"
         calculate-widths
@@ -47,7 +48,8 @@ export default {
             headers: [],
             dataTable: [],
             alias:'',
-            curInput:null
+            curInput:null,
+            isHideHeader:false
         }
     },
     created(){
@@ -97,9 +99,16 @@ export default {
             return this.isShowAutoComplete;
         },
         setData(data){
+            this.showHeader();
             this.headers = data.headers;
             this.dataTable = data.dataBody;
             this.indexActive = 0;
+        },
+        showHeader(){
+            this.isHideHeader = false;
+        },
+        hideHeader(){
+            this.isHideHeader = true;
         },
         calculatorPositionBox(e){
             // nếu autocomplete từ cell của handsontable  
