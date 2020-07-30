@@ -74,7 +74,7 @@
             <v-row no-gutters>
                 <v-col
                     :class="{
-                            'fs-13 symper-custom-table': true,
+                            'fs-13 symper-custom-table symper-list-item': true,
                             'clip-text' : tableDisplayConfig.wrapTextMode == 1,
                             'loosen-row':  tableDisplayConfig.densityMode == 0,
                             'medium-row':  tableDisplayConfig.densityMode == 1,
@@ -1306,7 +1306,7 @@ i.applied-filter {
     background-color: #ffdfc8;
 }
 
-.ht_clone_left.handsontable table.htCore {
+.symper-list-item .ht_clone_left.handsontable table.htCore {
     border-right: 4px solid #f0f0f0;
 }
 

@@ -1,12 +1,28 @@
 <template>
     <div class="h-100 w-100">
-        <taskDetail 
-            :isInitInstance="true" 
-            @task-submited="handleTaskSubmited" 
-            :taskInfo="taskInfo"
-            :parentHeight="thisHeight">
+        <div v-if="startWorkflowStatus == 'init'" class="h-100 w-100">
+            
+                 <v-skeleton-loader
+                    ref="skeleton"
+                    :type="'table-thead'"
+                    class="mx-auto"
+                ></v-skeleton-loader>
+        </div>
+        <div v-else class="h-100 w-100">
 
-        </taskDetail>
+            <taskDetail 
+                v-if="taskInfo.action.parameter.documentId > 0"
+                :isInitInstance="true" 
+                @task-submited="handleTaskSubmited" 
+                :taskInfo="taskInfo"
+                :parentHeight="thisHeight">
+
+            </taskDetail>
+            <div v-else style="text-align: center" class="mt-10">
+                <i class="mdi mdi-check mr-2 d-inline-block"  style="color: green; font-size: 25px"></i>
+                <h1 class="d-inline-block">{{$t('process.instance.startSuccessfully')}}</h1>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -24,6 +40,7 @@ export default {
     },
     data(){
         return {
+            startWorkflowStatus: 'init', // init | started
             taskInfo: {
                 action: {
                     parameter: {
@@ -54,7 +71,23 @@ export default {
             
             let definitionModel = await BPMNEApi.getDefinitionModel(idDefinition);
             this.definitionModel = definitionModel;
-            this.taskInfo.action.parameter.documentId = Number(definitionModel.mainProcess.initialFlowElement.formKey);
+            let documentToStart = this.getStartDocId(definitionModel);
+            if(documentToStart && documentToStart != 'null' ){
+                this.taskInfo.action.parameter.documentId = documentToStart;
+            }else{
+                let processDef = await BPMNEApi.getDefinitionData(this.$route.params.id);
+                try {
+                    let instanceName = await this.getInstanceName([]);
+                    let newProcessInstance = await runProcessDefinition(this, processDef, [], instanceName);
+                    this.$snotifySuccess("Workfow started successfully!");
+                } catch (error) {
+                    this.$snotifyError(error ,"Error on run process definition ");
+                }
+            }
+            this.startWorkflowStatus = 'started';
+        },
+        getStartDocId(definitionModel){
+            return Number(definitionModel.mainProcess.initialFlowElement.formKey);
         },
         // getValueForVariable(value, type){
         //     if(type == 'string'){
