@@ -443,7 +443,7 @@ export default class Formulas {
                 }
                 let names = allRelateName.reduce((obj, name) => {
                     let controlName = name.match(/\w+/g);
-                    if (!BUILD_IN_FUNCTION.includes(controlName[0]) && !this.detectWorkflowParams(controlName[0])) {
+                    if (!BUILD_IN_FUNCTION.includes(controlName[0]) && !this.detectWorkflowParams(controlName[0]) && controlName[0] != 'search_value') {
                         obj[controlName] = true;
                     }
                     return obj;

@@ -174,6 +174,15 @@ export default class BasicControl extends Control {
             }
 
         })
+        this.ele.on('focusout', function(e) {
+            if (thisObj.checkAutoCompleteControl()) {
+                e.keyCode = 200;
+                SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-key-event', {
+                    e: e,
+                })
+            }
+
+        })
         this.ele.on('click', function(e) {
             store.commit("document/addToDocumentSubmitStore", {
                 key: 'currentCellSelected',

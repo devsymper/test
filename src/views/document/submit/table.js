@@ -7,6 +7,7 @@ import { checkDbOnly, getControlType, getSDocumentSubmitStore } from './../commo
 import { SYMPER_APP } from './../../../main.js'
 import { Date } from 'core-js';
 import { checkCanBeBind, resetImpactedFieldsList, markBinedField } from './handlerCheckRunFormulas';
+import moment from "moment-timezone";
 class UserEditor extends Handsontable.editors.TextEditor {
         createElements() {
             super.createElements();
@@ -20,8 +21,10 @@ class UserEditor extends Handsontable.editors.TextEditor {
             this.TEXTAREA_PARENT.appendChild(this.TEXTAREA);
         }
         setValue(newValue) {
+            console.log('newValue', newValue);
             this.TEXTAREA.value = newValue;
         }
+
     }
     /**
      * Custom render cho control percent( phần trăm) cho table
@@ -41,16 +44,16 @@ Handsontable.renderers.UserRenderer = function(instance, td, row, col, prop, val
     Handsontable.renderers.TextRenderer.apply(this, arguments);
     if (!isNaN(value) && instance.hasOwnProperty('keyInstance')) {
         let listUser = store.state.document.submit[instance.keyInstance].listUser;
-        console.log('instanceinstanceinstanceinstance', listUser);
-
         let user = listUser.filter(user => {
             return user.id === value
         })
+        console.log('askdsaf', listUser, value);
         if (user.length > 0) {
             td.textContent = user[0].displayName
         }
     }
 }
+
 Handsontable.cellTypes.registerCellType('user', {
     editor: UserEditor,
     renderer: Handsontable.renderers.UserRenderer
@@ -102,7 +105,7 @@ const supportCellsType = {
     percent: 'PercentRenderer',
     user: 'UserRenderer',
     select: 'DropdownRenderer',
-    checkbox: 'CheckboxRenderer'
+    checkbox: 'CheckboxRenderer',
 };
 
 /** Đánh dấu set cell value là tự động điền chứ ko phải do user thay đổi  */
@@ -181,13 +184,10 @@ export default class Table {
                     },
 
                     beforeKeyDown: function(event) {
-                        console.log(this, event, 'hottttttttttttttttttttttt');
                         if (event.ctrlKey || event.altKey || event.shiftKey || event.metaKey) {
                             return;
                         }
-                        if (event.keyCode == 13) {
-                            return;
-                        }
+
                         if (thisObj.checkControlType('user')) {
                             thisObj.showPopupUser = true;
                             if (event.keyCode == 13) {
@@ -200,9 +200,11 @@ export default class Table {
                             }
                             SYMPER_APP.$evtBus.$emit('document-submit-user-input-change', event)
                         } else {
+                            if (event.keyCode == 13) {
+                                return;
+                            }
                             thisObj.showPopupUser = false;
                             if (thisObj.listAutoCompleteColumns[thisObj.currentControlSelected] != false) {
-                                console.log('adsagsda', thisObj.isAutoCompleting);
                                 if ((event.keyCode == 40 || event.keyCode == 38 ||
                                         event.keyCode == 37 || event.keyCode == 39) && thisObj.isAutoCompleting) {
                                     event.stopImmediatePropagation();
@@ -270,14 +272,13 @@ export default class Table {
                                 });
                                 resetImpactedFieldsList(thisObj.keyInstance);
                             }
-                            columns = columns.map(function(c) {
-                                return c.data;
-                            });
-
                             let currentColData = thisObj.tableInstance.getDataAtCol(thisObj.currentSelectedCell['column']);
                             if (thisObj.tableHasRowSum) {
                                 currentColData.pop();
                             }
+                            columns = columns.map(function(c) {
+                                return c.data;
+                            });
                             store.commit("document/updateListInputInDocument", {
                                 controlName: controlName,
                                 key: 'value',
@@ -296,7 +297,6 @@ export default class Table {
                                 thisObj.handlerRunFormulasForControlInTable('uniqueDB', controlUnique, dataInput, controlUnique.controlFormulas.uniqueDB);
                             }
                         }
-
                         if (event != undefined && event.type == 'keydown' && event.keyCode == 13 && source == 'edit') {
                             if (thisObj.tableHasRowSum) {
                                 if (thisObj.currentSelectedCell.row + 2 == this.getData().length) {
@@ -680,16 +680,17 @@ export default class Table {
             let controlFormulas = controlInstance.controlFormulas;
             if (controlFormulas.hasOwnProperty('formulas')) {
                 let formulasInstance = controlFormulas['formulas'].instance;
+                event.curTarget = event.target;
                 SYMPER_APP.$evtBus.$emit('document-submit-select-input', {
-                    e: event,
-                    selectFormulasInstance: formulasInstance,
-                    alias: this.currentControlSelected
-                })
-                SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-key-event', {
-                    e: event,
-                    selectFormulasInstance: formulasInstance,
-                    isSelect: true
-                })
+                        e: event,
+                        selectFormulasInstance: formulasInstance,
+                        alias: this.currentControlSelected
+                    })
+                    // SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-key-event', {
+                    //     e: event,
+                    //     selectFormulasInstance: formulasInstance,
+                    //     isSelect: true
+                    // })
             }
         }
     }
@@ -867,10 +868,14 @@ export default class Table {
             for (let index = 0; index < data.length; index++) {
                 let rowId = Date.now() + index;
                 data[index]['s_table_id_sql_lite'] = rowId;
-
             }
-            data = (this.tableHasRowSum) ? vls.push({}) : vls;
+            if (this.tableHasRowSum) {
+                data.push({})
+            }
             this.tableInstance.loadData(data)
+        } else {
+            let defaultRow = this.getDefaultData(false);
+            this.tableInstance.loadData(defaultRow);
         }
     }
 
@@ -885,10 +890,11 @@ export default class Table {
     /**
      * Hàm lấy data default lúc load table
      */
-    getDefaultData() {
-        this.createSqliteTable();
+    getDefaultData(isCreateSqlTable = true) {
+        if (isCreateSqlTable)
+            this.createSqliteTable();
         let data = [];
-        let firstRow = [];
+        let firstRow = {};
         let id = Date.now();
         firstRow['s_table_id_sql_lite'] = id;
         data.push(firstRow);
@@ -896,7 +902,7 @@ export default class Table {
             data.push([''])
         }
         ClientSQLManager.insertRow(this.keyInstance, this.tableName, ['s_table_id_sql_lite'], [id], false);
-
+        console.log('   ', data);
         return data;
     }
     async createSqliteTable() {
@@ -981,7 +987,7 @@ export default class Table {
         }
         if (type == 'number') {
             rsl.numericFormat = {
-                pattern: ctrl.numberFormat
+                pattern: ctrl.controlProperties.formatNumber.value
             };
         } else if (type == 'label' || ctrl.controlProperties.isReadOnly == 1) {
             rsl.readOnly = true;
@@ -992,8 +998,8 @@ export default class Table {
                 rsl.correctFormat = true;
 
         } else if (type == 'date') {
-            rsl.dateFormat = 'YYYY-MM-DD',
-                rsl.correctFormat = true;
+            rsl.dateFormat = ctrl.controlProperties.formatDate.value;
+            rsl.correctFormat = true;
         }
         rsl.type = Util.toLowerCaseFirstCharacter(supportCellsType[type].replace('Renderer', ''));
 

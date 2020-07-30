@@ -1,84 +1,86 @@
 <template>
-    <div
-        :key="keyInstance"
-        class="sym-form-submit"
-        :id="'sym-submit-'+keyInstance"
-        :style="{'width':docSize, 'height':'100%'}"
-    >
-        <div v-html="contentDocument"></div>
-        <button v-on:click="togglePageSize" v-show="!isQickSubmit" id="toggle-doc-size">
-            <span class="mdi mdi-arrow-horizontal-lock"></span>
-        </button>
-        <autocomplete-input
-            ref="autocompleteInput"
-            @after-select-row="afterSelectRowAutoComplete"
-            @open-sub-form="openSubFormSubmit"
-            @before-close="isShowSubFormSubmit = false"
-        />
-        <sym-drag-panel
-            ref="symDragPanel"
-            :dragPanelWidth="600"
-            :dragPanelHeight="'auto'"
-            :topPosition='topPositionDragPanel'
-            :leftPosition="leftPositionDragPanel"
-            :actionTitle="titleDragPanel"
-            :titleIcon="titleDragPanelIcon"
+    <div class="wrap-content-submit">
+        <div
+            :key="keyInstance"
+            class="sym-form-submit"
+            :id="'sym-submit-'+keyInstance"
+            :style="{'width':docSize, 'height':'100%'}"
         >
-            <template slot="drag-panel-content">
-                <!-- <submitDocument :isQickSubmit="true" :docId="340" v-if="!isQickSubmit"/> -->
-                <filter-input @save-input-filter="saveInputFilter" @search-data="searchDataFilter" :tableMaxHeight="500" ref="inputFilter"></filter-input>
-            </template>
-        </sym-drag-panel>
-        <input type="file" :id="'file-upload-alter-'+keyInstance" class="hidden d-none" />
-        <user-select :keyInstance="keyInstance" ref="userInput" />
-        <validate :keyInstance="keyInstance" :message="messageValidate" ref="validate" />
-        <date-picker
-            :keyInstance="keyInstance"
-            @clickDateCell="selectedDate"
-            :title="'Chọn ngày'"
-            :isTime="false"
-            ref="datePicker"
-        />
-        <time-input :keyInstance="keyInstance"  @apply-time-selected="applyTimePicker" @after-check-input-time-valid="afterCheckTimeNotValid" ref="timeInput" />
-        <v-speed-dial
-            v-show="showSubmitButton"
-            v-model="fab"
-            :top="top"
-            :bottom="bottom"
-            :right="right"
-            :left="left"
-            :direction="direction"
-            :open-on-hover="hover"
-            :transition="transition"
-        >
-            <template v-slot:activator>
-                <v-btn v-model="fab" color="blue darken-2" dark fab>
-                    <v-icon v-if="fab">mdi-close</v-icon>
-                    <v-icon v-if="!fab && !isSubmitting">mdi-menu</v-icon>
-                    <v-progress-circular indeterminate v-show="isSubmitting" color="red"></v-progress-circular>
+            <div v-html="contentDocument"></div>
+            <button v-on:click="togglePageSize" v-show="!isQickSubmit" id="toggle-doc-size">
+                <span class="mdi mdi-arrow-horizontal-lock"></span>
+            </button>
+            <autocomplete-input
+                ref="autocompleteInput"
+                @after-select-row="afterSelectRowAutoComplete"
+                @open-sub-form="openSubFormSubmit"
+                @before-close="isShowSubFormSubmit = false"
+            />
+            <sym-drag-panel
+                ref="symDragPanel"
+                :dragPanelWidth="600"
+                :dragPanelHeight="'auto'"
+                :topPosition='topPositionDragPanel'
+                :leftPosition="leftPositionDragPanel"
+                :actionTitle="titleDragPanel"
+                :titleIcon="titleDragPanelIcon"
+            >
+                <template slot="drag-panel-content">
+                    <!-- <submitDocument :isQickSubmit="true" :docId="340" v-if="!isQickSubmit"/> -->
+                    <filter-input @save-input-filter="saveInputFilter" @search-data="searchDataFilter" :tableMaxHeight="500" ref="inputFilter"></filter-input>
+                </template>
+            </sym-drag-panel>
+            <input type="file" :id="'file-upload-alter-'+keyInstance" class="hidden d-none" />
+            <user-select :keyInstance="keyInstance" ref="userInput" />
+            <validate :keyInstance="keyInstance" :message="messageValidate" ref="validate" />
+            <date-picker
+                :keyInstance="keyInstance"
+                @clickDateCell="selectedDate"
+                :title="'Chọn ngày'"
+                :isTime="false"
+                ref="datePicker"
+            />
+            <time-input :keyInstance="keyInstance"  @apply-time-selected="applyTimePicker" @after-check-input-time-valid="afterCheckTimeNotValid" ref="timeInput" />
+            <v-speed-dial
+                v-show="showSubmitButton"
+                v-model="fab"
+                :top="top"
+                :bottom="bottom"
+                :right="right"
+                :left="left"
+                :direction="direction"
+                :open-on-hover="hover"
+                :transition="transition"
+            >
+                <template v-slot:activator>
+                    <v-btn v-model="fab" color="blue darken-2" dark fab>
+                        <v-icon v-if="fab">mdi-close</v-icon>
+                        <v-icon v-if="!fab && !isSubmitting">mdi-menu</v-icon>
+                        <v-progress-circular indeterminate v-show="isSubmitting" color="red"></v-progress-circular>
+                    </v-btn>
+                </template>
+                <v-btn fab dark small color="green" @click="handlerSubmitDocumentClick">
+                    <v-icon>mdi-content-save</v-icon>
                 </v-btn>
-            </template>
-            <v-btn fab dark small color="green" @click="handlerSubmitDocumentClick">
-                <v-icon>mdi-content-save</v-icon>
-            </v-btn>
-            <!-- <v-btn
-                    fab
-                    dark
-                    small
-                    color="indigo"
-                >
-                    <v-icon>mdi-plus</v-icon>
-                </v-btn>
-                <v-btn
-                    fab
-                    dark
-                    small
-                    color="red"
-                >
-                    <v-icon>mdi-delete</v-icon>
-            </v-btn>-->
-        </v-speed-dial>
-        <err-message :listErr="listMessageErr" ref="errMessage"/>
+                <!-- <v-btn
+                        fab
+                        dark
+                        small
+                        color="indigo"
+                    >
+                        <v-icon>mdi-plus</v-icon>
+                    </v-btn>
+                    <v-btn
+                        fab
+                        dark
+                        small
+                        color="red"
+                    >
+                        <v-icon>mdi-delete</v-icon>
+                </v-btn>-->
+            </v-speed-dial>
+            <err-message :listErr="listMessageErr" ref="errMessage"/>
+        </div>
     </div>
 </template>
 <script>
@@ -373,7 +375,10 @@ export default {
         // hàm nhận sự thay đổi của input autocomplete gọi api để chạy công thức lấy dữ liệu
         this.$evtBus.$on("document-submit-autocomplete-key-event", e => {
             if(thisCpn.isComponentActive == false) return;
-            if(e.e.keyCode != 38 && e.e.keyCode != 40 && e.e.keyCode != 13){
+            console.log('skjadsagf',e.e.keyCode);
+            if((e.e.keyCode >= 97 && e.e.keyCode <= 105) ||
+                (e.e.keyCode >= 48 && e.e.keyCode <= 57) || 
+                (e.e.keyCode >= 65 && e.e.keyCode <= 90) || e.e.keyCode == 8) {
                 if(!thisCpn.$refs.autocompleteInput.isShow()){
                     thisCpn.$refs.autocompleteInput.show(e.e);
                     let currentTableInteractive = this.sDocumentSubmit.currentTableInteractive;
@@ -385,10 +390,12 @@ export default {
                         instance: thisCpn.keyInstance
                     });
                 }
-                
                 if(e.isSelect == false){
                     thisCpn.getDataForAutocomplete(e,'autocomplete');
                 }
+            }
+            else{
+                thisCpn.$refs.autocompleteInput.hide();
             }
         });
         // hàm nhận sự thay đổi của input select gọi api để chạy công thức lấy dữ liệu
@@ -460,6 +467,9 @@ export default {
             this.docObjId = after;
             this.loadDocumentObject();
         },
+        '$route' (to) {
+            this.$refs.symDragPanel.hide();         
+        }
     },
     
     methods: {
@@ -524,6 +534,7 @@ export default {
                 let dataTable = this.handleDataAutoComplete(data,true,controlAs);
                 this.$refs.autocompleteInput.setAliasControl(aliasControl);
                 this.$refs.autocompleteInput.setData(dataTable);
+                this.$refs.autocompleteInput.hideHeader();
             }
         },
         /**
@@ -1019,6 +1030,20 @@ export default {
                         }
                     }
                 }
+                if (listInput[i].type == 'date') {
+                    for (let index = 0; index < dataCol.length; index++) {
+                        let rowValue = dataCol[index];
+                        let newValue = moment(rowValue, listInput[i].controlProperties.formatDate.value).format('YYYY-MM-DD');
+                        dataCol[index] = newValue;
+                    }
+                }
+                if (listInput[i].type == 'user') {
+                    for (let index = 0; index < dataCol.length; index++) {
+                        if(typeof element !== 'number'){
+                            dataCol[index] = 0;
+                        }
+                    }
+                }
                 dataControlInTable[i] = dataCol;
             }
             dataTable[tableControl.name] = dataControlInTable
@@ -1267,7 +1292,7 @@ export default {
             data = data.data
             let tableControl = getControlInstanceFromStore(this.keyInstance,tableName);
             if(data.length == 0){
-                tableControl.tableInstance.setData([]);
+                tableControl.tableInstance.setData(false);
                 return;
             }
             tableControl.tableInstance.setData(data);
@@ -1398,6 +1423,7 @@ export default {
 .sym-form-submit {
     width: 21cm;
     padding: 16px;
+    margin: auto;
 }
 .sym-form-submit >>> .on-selected {
     border: none !important;
@@ -1416,7 +1442,7 @@ export default {
 
 #toggle-doc-size {
     position: absolute;
-    right: 10px;
+    right: 30px;
     top: 50px;
     padding: 4px 12px;
     font-size: 20px;
@@ -1439,6 +1465,11 @@ export default {
 
 .sym-form-submit >>> .v-btn--floating {
     position: relative;
+}
+.wrap-content-submit{
+    width: 100%;
+    height: calc(100vh - 100px);
+    overflow: auto;
 }
 </style>
 

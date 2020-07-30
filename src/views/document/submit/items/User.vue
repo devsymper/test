@@ -133,7 +133,6 @@ export default {
             }
         },
         selectItem(user){
-            
             if(this.element.is('.s-control')){
                 this.element.attr('user-id',user.id);
                 this.element.val(user.displayName);
