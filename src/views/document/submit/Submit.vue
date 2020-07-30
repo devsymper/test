@@ -31,7 +31,7 @@
                 </template>
             </sym-drag-panel>
             <input type="file" :id="'file-upload-alter-'+keyInstance" class="hidden d-none" />
-            <user-select :keyInstance="keyInstance" ref="userInput" />
+            <user-select :keyInstance="keyInstance" @after-select-user="afterSelectUser" ref="userInput" />
             <validate :keyInstance="keyInstance" :message="messageValidate" ref="validate" />
             <date-picker
                 :keyInstance="keyInstance"
@@ -295,42 +295,47 @@ export default {
 
         // hàm nhận sự kiện thay đổi của input
         this.$evtBus.$on("document-submit-input-change", locale => {
-            if(thisCpn.isComponentActive == false) return;
-            this.$store.commit("document/addToDocumentSubmitStore", {
-                        key: 'docStatus',
-                        value: 'input',
-                        instance: this.keyInstance
-                    });
-            let valueControl = locale.val;
-            let controlInstance = getControlInstanceFromStore(thisCpn.keyInstance,locale.controlName);
-            if(controlInstance.type == 'user'){
-                valueControl = $('#'+controlInstance.id).attr('user-id');
-                if(valueControl == undefined) valueControl = 0;
-            }
-            if(controlInstance.type == 'date'){
-                valueControl = moment(valueControl,'DD-MM-YYYY').format('YYYY-MM-DD');
-            }
-            thisCpn.updateListInputInDocument(
-                locale.controlName,
-                "value",
-                valueControl
-            );
-            thisCpn.$store.commit("document/addToDocumentSubmitStore", {
-                key: 'rootChangeFieldName',
-                value: locale.controlName,
-                instance: thisCpn.keyInstance
-            });
-            // sau khi thay đổi giá trị input thì kiểm tra require control nếu có
-            if(controlInstance.isRequiredControl()){
-                if(controlInstance.isEmpty()){
-                    controlInstance.renderValidateIcon('Không được bỏ trống trường thông tin '+locale.controlName)
+            try {
+                if(thisCpn.isComponentActive == false) return;
+                this.$store.commit("document/addToDocumentSubmitStore", {
+                            key: 'docStatus',
+                            value: 'input',
+                            instance: this.keyInstance
+                        });
+                let valueControl = locale.val;
+                let controlInstance = getControlInstanceFromStore(thisCpn.keyInstance,locale.controlName);
+                if(controlInstance.type == 'user'){
+                    valueControl = $('#'+controlInstance.id).attr('user-id');
+                    if(valueControl == undefined) valueControl = 0;
                 }
-                else{
-                    controlInstance.removeValidateIcon()
+                if(controlInstance.type == 'date'){
+                    valueControl = moment(valueControl,'DD-MM-YYYY').format('YYYY-MM-DD');
                 }
+                thisCpn.updateListInputInDocument(
+                    locale.controlName,
+                    "value",
+                    valueControl
+                );
+                thisCpn.$store.commit("document/addToDocumentSubmitStore", {
+                    key: 'rootChangeFieldName',
+                    value: locale.controlName,
+                    instance: thisCpn.keyInstance
+                });
+                // sau khi thay đổi giá trị input thì kiểm tra require control nếu có
+                if(controlInstance.isRequiredControl()){
+                    if(controlInstance.isEmpty()){
+                        controlInstance.renderValidateIcon('Không được bỏ trống trường thông tin '+locale.controlName)
+                    }
+                    else{
+                        controlInstance.removeValidateIcon()
+                    }
+                }
+                resetImpactedFieldsList(thisCpn.keyInstance);
+                thisCpn.handleControlInputChange(locale.controlName);
+            } catch (error) {
+                
             }
-            resetImpactedFieldsList(thisCpn.keyInstance);
-            thisCpn.handleControlInputChange(locale.controlName);
+            
             
         });
         this.$evtBus.$on("run-effected-control-when-table-change", control => {
@@ -401,8 +406,13 @@ export default {
         // hàm nhận sự thay đổi của input select gọi api để chạy công thức lấy dữ liệu
         this.$evtBus.$on("document-submit-select-input", e => {
             if(thisCpn.isComponentActive == false) return;
-            thisCpn.$refs.autocompleteInput.show(e.e);
-            thisCpn.getDataForAutocomplete(e,'select',e.alias);
+            try {
+                thisCpn.$refs.autocompleteInput.show(e.e);
+                thisCpn.getDataForAutocomplete(e,'select',e.alias);
+            } catch (error) {
+                
+            }
+           
         });
         // click outside
         this.$evtBus.$on("symper-app-wrapper-clicked", evt => {
@@ -410,43 +420,48 @@ export default {
                 return;
             }
             if(thisCpn.isComponentActive == false) return;
-            if (
-                !$(evt.target).hasClass("autocompleting") &&
-                !$(evt.target).hasClass("v-data-table") &&
-                $(evt.target).closest(".v-data-table").length == 0
-            ) {
-                thisCpn.$refs.autocompleteInput.hide();
-                let currentTableInteractive = thisCpn.sDocumentSubmit.currentTableInteractive
-                if(currentTableInteractive != null)
-                    currentTableInteractive.isAutoCompleting = false;
-            }
-            if (
-                !$(evt.target).hasClass("s-control-user") &&
-                !$(evt.target).hasClass("card-list-user") &&
-                $(evt.target).closest(".card-list-user").length == 0
-            ) {
-                thisCpn.$refs.userInput.hide();
-            }
-            if (
-                !$(evt.target).hasClass("s-control-date") &&
-                !$(evt.target).hasClass("card-datetime-picker") &&
-                $(evt.target).closest(".card-datetime-picker").length == 0
-            ) {
-                thisCpn.$refs.datePicker.closePicker();
-            }
-            if (
-                !$(evt.target).hasClass("s-control-time") &&
-                !$(evt.target).hasClass("card-time-picker") &&
-                $(evt.target).closest(".card-time-picker").length == 0
-            ) {
-                thisCpn.$refs.timeInput.hide();
-            }
-            if (
-                !$(evt.target).hasClass("validate-icon") &&
-                !$(evt.target).hasClass("card-validate") &&
-                $(evt.target).closest(".card-validate").length == 0
-            ) {
-                thisCpn.$refs.validate.hide();
+            try {
+                
+                if (
+                    !$(evt.target).hasClass("autocompleting") &&
+                    !$(evt.target).hasClass("v-data-table") &&
+                    $(evt.target).closest(".v-data-table").length == 0
+                ) {
+                    thisCpn.$refs.autocompleteInput.hide();
+                    let currentTableInteractive = thisCpn.sDocumentSubmit.currentTableInteractive
+                    if(currentTableInteractive != null)
+                        currentTableInteractive.isAutoCompleting = false;
+                }
+                if (
+                    !$(evt.target).hasClass("s-control-user") &&
+                    !$(evt.target).hasClass("card-list-user") &&
+                    $(evt.target).closest(".card-list-user").length == 0
+                ) {
+                    thisCpn.$refs.userInput.hide();
+                }
+                if (
+                    !$(evt.target).hasClass("s-control-date") &&
+                    !$(evt.target).hasClass("card-datetime-picker") &&
+                    $(evt.target).closest(".card-datetime-picker").length == 0
+                ) {
+                    thisCpn.$refs.datePicker.closePicker();
+                }
+                if (
+                    !$(evt.target).hasClass("s-control-time") &&
+                    !$(evt.target).hasClass("card-time-picker") &&
+                    $(evt.target).closest(".card-time-picker").length == 0
+                ) {
+                    thisCpn.$refs.timeInput.hide();
+                }
+                if (
+                    !$(evt.target).hasClass("validate-icon") &&
+                    !$(evt.target).hasClass("card-validate") &&
+                    $(evt.target).closest(".card-validate").length == 0
+                ) {
+                    thisCpn.$refs.validate.hide();
+                }
+            } catch (error) {
+                
             }
         });
     },
@@ -563,6 +578,11 @@ export default {
             else{
                 controlInstance.renderValidateIcon('Định dạng thời gian không đúng!');
             }
+        },
+
+        afterSelectUser(){
+            let currentTableInteractive = this.sDocumentSubmit.currentTableInteractive.tableInstance;
+            
         },
         /**
          * Hàm xử lí nhận dữ liệu component autocomplete khi chọn 1 dòng
@@ -908,6 +928,9 @@ export default {
                         type: "success",
                         title: "Submit document success!"
                     });        
+                    console.log('assadsasadsadsdasadads',this.$route.name);
+                    if(this.$route.name == 'submitDocument')
+                     thisCpn.$router.push('/documents/'+thisCpn.documentId+"/objects");
                 }
                 else{
                     thisCpn.$snotify({
@@ -984,7 +1007,7 @@ export default {
                         dataControl[controlName] = value;
                         if(listInput[controlName].type == 'checkbox'){
                             dataControl[controlName] = (value) ? 1 : 0;
-                        }
+                        } 
                         // if(listInput[controlName].type == 'user'){
                         //     dataPost[id] =  [0];
                         // }
@@ -1033,8 +1056,10 @@ export default {
                 if (listInput[i].type == 'date') {
                     for (let index = 0; index < dataCol.length; index++) {
                         let rowValue = dataCol[index];
-                        let newValue = moment(rowValue, listInput[i].controlProperties.formatDate.value).format('YYYY-MM-DD');
-                        dataCol[index] = newValue;
+                        if(rowValue != "" && rowValue != null){
+                            let newValue = moment(rowValue, listInput[i].controlProperties.formatDate.value).format('YYYY-MM-DD');
+                            dataCol[index] = newValue;
+                        }
                     }
                 }
                 if (listInput[i].type == 'user') {
@@ -1049,6 +1074,8 @@ export default {
             dataTable[tableControl.name] = dataControlInTable
             return dataTable;
         },
+
+        
         updateEffectedControlToStore(mapControlEffected,key) {
             for (let controlName in mapControlEffected) {
                 this.updateListInputInDocument(
@@ -1468,7 +1495,7 @@ export default {
 }
 .wrap-content-submit{
     width: 100%;
-    height: calc(100vh - 100px);
+    height: calc(100% - 100px);
     overflow: auto;
 }
 </style>
