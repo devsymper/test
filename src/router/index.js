@@ -57,13 +57,13 @@ const routes = [{
         path: "/workflow/:id/edit",
         name: "editProcess",
         component: () =>
-            import ('../views/process/CreateProcess.vue'),
+            import ('../views/process/EditProcess.vue'),
     },
     {
         path: "/workflow/:id/clone",
         name: "cloneProcess",
         component: () =>
-            import ('../views/process/CreateProcess.vue'),
+            import ('../views/process/CloneProcess.vue'),
 
     },
     {

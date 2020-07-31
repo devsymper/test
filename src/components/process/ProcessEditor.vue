@@ -1167,6 +1167,26 @@ export default {
                     this.restoreSavedEle(childEle, rsl);
                 }
             }
+        },
+
+        // tạo id duy nhất cho workflow, và chính là key của workflow
+        createUniqueIdentifyForWorkflow(){
+            setTimeout((self) => {
+                let allEls = self.$refs.symperBpmn.getAllNodes();
+                for(let el of allEls){
+                    if(el.$type == "bpmn:Process"){
+                        let uniqueId = util.str.randomString(6)+'_'+Date.now();
+                        uniqueId = uniqueId.toLowerCase();
+                        console.log(uniqueId, 'uniqueIduniqueIduniqueId');
+                        self.$refs.symperBpmn.updateElementProperties(
+                            el.id,
+                            {
+                                id: uniqueId
+                            }
+                        );
+                    }
+                }
+            }, 500, this);
         }
     },
 
@@ -1202,6 +1222,13 @@ export default {
     },
     mounted(){
         this.resetAttrPanelHeight();
+        
+        let uniqueId = util.str.randomString(6)+'_'+Date.now();
+        console.log(uniqueId.toLowerCase(), 'uniqueIduniqueIduniqueId');
+        
+        if(this.action == 'create' || this.action == 'clone' ){
+            this.createUniqueIdentifyForWorkflow();
+        }
     },
     data() {
         return {

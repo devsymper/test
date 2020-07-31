@@ -78,12 +78,13 @@ let allAttrs = {
         "value": "process",
         "info": "BPMN.PROPERTYPACKAGES.PROCESS_IDPACKAGE.PROCESS_ID.DESCRIPTION",
         "dg": "general",
-        // toXML: {
-        //     "symper_position": "attr",
-        //     "name": "id",
-        //     "isAttr": true,
-        //     "type": "String"
-        // }
+        "hidden": true
+            // toXML: {
+            //     "symper_position": "attr",
+            //     "name": "id",
+            //     "isAttr": true,
+            //     "type": "String"
+            // }
     },
     "overrideid": {
         "title": "Id",
@@ -947,7 +948,7 @@ let allAttrs = {
         "dg": "detail",
         "options": [],
         "textKey": 'modelName',
-        "valueKey": 'definitionId',
+        "valueKey": 'definitionKey',
         "showId": false,
         toXMLExtend: { // không định nghĩa lại do thư viện đã định nghĩa sẵn, dùng cho trường hợp tên trong xml khác với tên đẩy về json
             name: 'calledElement'
@@ -956,7 +957,7 @@ let allAttrs = {
     "callactivitycalledelementtype": {
         "title": "Called element type",
         "type": "text",
-        "value": "id",
+        "value": "key",
         "info": "BPMN.PROPERTYPACKAGES.CALLACTIVITYCALLEDELEMENTTYPEPACKAGE.CALLACTIVITYCALLEDELEMENTTYPE.DESCRIPTION",
         "dg": "detail",
         "options": [],
