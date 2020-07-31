@@ -273,7 +273,8 @@
             "createAt": "Thời gian tạo",
             "updateAt": "Thời gian update",
             "userCreate": "Người tạo",
-            "userUpdate": "Người cập nhật"
+            "userUpdate": "Người cập nhật",
+            "countRecord": "Số lượng bản ghi"
         },
         "process": {
             "header_bar": {

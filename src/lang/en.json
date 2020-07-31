@@ -274,7 +274,8 @@
             "createAt": "Create at",
             "updateAt": "Update at",
             "userCreate": "BA Create",
-            "userUpdate": "BA update"
+            "userUpdate": "BA update",
+            "countRecord": "count record"
         },
         "process": {
             "header_bar": {
