@@ -242,6 +242,8 @@ export default class Table {
                     },
 
                     afterChange: function(changes, source) {
+                        console.log('sakdasdasd', changes);
+
                         if (changes == null) {
                             return
                         }
@@ -249,6 +251,7 @@ export default class Table {
                             sDocument.state.viewType[thisObj.keyInstance] == 'update') {
                             return;
                         }
+
                         let controlName = changes[0][1];
                         let columns = thisObj.columnsInfo.columns;
                         let currentRowData = thisObj.tableInstance.getDataAtRow(thisObj.currentSelectedCell['row']);
@@ -525,6 +528,7 @@ export default class Table {
          * @param {*} formulasInstance  Object cua formulas giá trị của control bị ảnh hưởng
          */
     async handlerRunFormulasForControlInTable(formulasType, controlInstance, dataInput, formulasInstance) {
+
             let listIdRow = this.tableInstance.getDataAtCol(this.tableInstance.getDataAtRow(0).length - 1);
             if (this.tableHasRowSum) {
                 listIdRow.pop();
@@ -537,15 +541,23 @@ export default class Table {
                     let controlType = getControlType(thisObj.keyInstance, control);
                     let dataRow = dataInput[control];
                     if (!Array.isArray(dataRow)) {
-                        for (let index = 0; index < thisObj.tableInstance.countRows(); index++) {
+                        for (let index = 0; index < listIdRow.length; index++) {
                             if (allRowDataInput.length <= index) {
                                 allRowDataInput[index] = {};
                             }
-                            if (controlType == 'number' && typeof dataRow != 'number') {
-                                dataRow = 0
+                            if (controlType == 'number') {
+                                if (dataRow == null) {
+                                    dataRow = 0
+                                } else {
+                                    dataRow = Number(dataRow);
+                                }
                             }
-                            if (controlType == 'percent' && typeof dataRow != 'number') {
-                                dataRow = 0
+                            if (controlType == 'percent') {
+                                if (dataRow == null) {
+                                    dataRow = 0
+                                } else {
+                                    dataRow = Number(dataRow);
+                                }
                             }
                             allRowDataInput[index][control] = dataRow;
                         }
@@ -555,8 +567,12 @@ export default class Table {
                                 allRowDataInput[i] = {};
                             }
                             let value = dataRow[i];
-                            if (controlType == 'number' && typeof value != 'number') {
-                                value = 0
+                            if (controlType == 'number') {
+                                if (value == null) {
+                                    value = 0
+                                } else {
+                                    value = Number(value);
+                                }
                             }
                             if (controlType == 'percent') {
                                 if (value == null) {
@@ -569,6 +585,7 @@ export default class Table {
                         }
                     }
                 }
+
                 for (let index = 0; index < allRowDataInput.length; index++) {
                     let rowInput = allRowDataInput[index];
                     dataPost[listIdRow[index]] = rowInput;
@@ -865,16 +882,24 @@ export default class Table {
         if (vls != false) {
             ClientSQLManager.delete(this.keyInstance, this.tableName, false)
             let data = vls;
+            let controlBinding = Object.keys(data[0]);
             for (let index = 0; index < data.length; index++) {
                 let rowId = Date.now() + index;
                 data[index]['s_table_id_sql_lite'] = rowId;
             }
+
             if (this.tableHasRowSum) {
                 data.push({})
             }
             this.tableInstance.updateSettings({
                 data: data
             })
+            setTimeout((thisObj) => {
+                for (let index = 0; index < controlBinding.length; index++) {
+                    thisObj.handlerCheckEffectedControlInTable(controlBinding[index]);
+                }
+            }, 50, this);
+
         } else {
             let defaultRow = this.getDefaultData(false);
             this.tableInstance.loadData(defaultRow);
