@@ -16,10 +16,10 @@
         
         >
         <template v-slot:item="{ item }">
-            <tr v-on:click="handleClickRow(item)" class="active-row" v-if="item.active" style="background: #f0f0f0">
+            <tr @click="handleClickRow(item)" class="active-row" v-if="item.active" style="background: #f0f0f0">
                 <td v-for="(key,value) in item" :key="key+value" :class="{'d-none':(value == 'active')}">{{ (value != 'active') ? key : '' }}</td>
             </tr>
-            <tr v-on:click="handleClickRow(item)" v-else>
+            <tr @click="handleClickRow(item)" v-else>
                 <td v-for="(key,value) in item" :key="key+value" :class="{'d-none':(value == 'active')}">{{ key }}</td>
             </tr>
         </template>
