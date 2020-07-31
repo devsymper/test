@@ -283,14 +283,19 @@ export default {
 
         this.$evtBus.$on("run-formulas-control-outside-table", e => {
             if(thisCpn.isComponentActive == false) return;
-            let formulasInstance = e.formulasInstance;
-            let controlName = e.controlName;
-            let controlInstance = thisCpn.sDocumentSubmit.listInputInDocument[controlName];
-            let controlId = controlInstance.id
-            let dataInput = this.getDataInputFormulas(formulasInstance);
-            formulasInstance.handleBeforeRunFormulas(dataInput).then(rs=>{
-                thisCpn.handlerAfterRunFormulas(rs,controlId,controlName,'formulas',false)
-            });
+            try {
+                let formulasInstance = e.formulasInstance;
+                let controlName = e.controlName;
+                let controlInstance = thisCpn.sDocumentSubmit.listInputInDocument[controlName];
+                let controlId = controlInstance.id
+                let dataInput = this.getDataInputFormulas(formulasInstance);
+                formulasInstance.handleBeforeRunFormulas(dataInput).then(rs=>{
+                    thisCpn.handlerAfterRunFormulas(rs,controlId,controlName,'formulas',false)
+                });
+            } catch (error) {
+                
+            }
+            
         });
 
         // hàm nhận sự kiện thay đổi của input
@@ -380,28 +385,32 @@ export default {
         // hàm nhận sự thay đổi của input autocomplete gọi api để chạy công thức lấy dữ liệu
         this.$evtBus.$on("document-submit-autocomplete-key-event", e => {
             if(thisCpn.isComponentActive == false) return;
-            console.log('skjadsagf',e.e.keyCode);
-            if((e.e.keyCode >= 97 && e.e.keyCode <= 105) ||
-                (e.e.keyCode >= 48 && e.e.keyCode <= 57) || 
-                (e.e.keyCode >= 65 && e.e.keyCode <= 90) || e.e.keyCode == 8) {
-                if(!thisCpn.$refs.autocompleteInput.isShow()){
-                    thisCpn.$refs.autocompleteInput.show(e.e);
-                    let currentTableInteractive = this.sDocumentSubmit.currentTableInteractive;
-                    if(currentTableInteractive != null && currentTableInteractive != undefined)
-                    currentTableInteractive.isAutoCompleting = true;
-                    thisCpn.$store.commit("document/addToDocumentSubmitStore", {
-                        key: 'currentControlAutoComplete',
-                        value: e.controlName,
-                        instance: thisCpn.keyInstance
-                    });
+            try {
+                if((e.e.keyCode >= 97 && e.e.keyCode <= 105) ||
+                    (e.e.keyCode >= 48 && e.e.keyCode <= 57) ||
+                    (e.e.keyCode >= 65 && e.e.keyCode <= 90) || e.e.keyCode == 8) {
+                    if(!thisCpn.$refs.autocompleteInput.isShow()){
+                        thisCpn.$refs.autocompleteInput.show(e.e);
+                        let currentTableInteractive = this.sDocumentSubmit.currentTableInteractive;
+                        if(currentTableInteractive != null && currentTableInteractive != undefined)
+                        currentTableInteractive.isAutoCompleting = true;
+                        thisCpn.$store.commit("document/addToDocumentSubmitStore", {
+                            key: 'currentControlAutoComplete',
+                            value: e.controlName,
+                            instance: thisCpn.keyInstance
+                        });
+                    }
+                    if(e.isSelect == false){
+                        thisCpn.getDataForAutocomplete(e,'autocomplete');
+                    }
                 }
-                if(e.isSelect == false){
-                    thisCpn.getDataForAutocomplete(e,'autocomplete');
+                else if((e.e.keyCode < 37 && e.e.keyCode > 40)){
+                    thisCpn.$refs.autocompleteInput.hide();
                 }
+            } catch (error) {
+                
             }
-            else{
-                thisCpn.$refs.autocompleteInput.hide();
-            }
+            
         });
         // hàm nhận sự thay đổi của input select gọi api để chạy công thức lấy dữ liệu
         this.$evtBus.$on("document-submit-select-input", e => {
@@ -535,7 +544,7 @@ export default {
                 if(res.status == 200 && res.data != false){
                      let dataTable = []
                     if(res.data.data !== ""){
-                    dataTable = this.handleDataAutoComplete(res.data.data,false,controlAs);
+                        dataTable = this.handleDataAutoComplete(res.data.data,false,controlAs);
                     }
                     this.$refs.autocompleteInput.setAliasControl(aliasControl);
                     this.$refs.autocompleteInput.setData(dataTable);
