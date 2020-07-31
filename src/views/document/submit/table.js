@@ -859,6 +859,8 @@ export default class Table {
     setDefaulFotterRowData(value, rowIndex, prop) {
         this.setDataAtRowProp(rowIndex, prop, value, AUTO_SET);
     }
+
+    // Hàm set data cho table
     setData(vls) {
         if (vls != false) {
             ClientSQLManager.delete(this.keyInstance, this.tableName, false)

@@ -136,13 +136,14 @@ export default {
             }
         },
         selectItem(user){
-            console.log('this.elementthis.element',this.element);
             if(this.element.is('.s-control')){
                 this.element.attr('user-id',user.id);
                 this.element.val(user.displayName);
                 this.element.trigger('change');
             }
             else{
+                // this.element.blur();
+                this.$emit('after-select-user');
                 this.element.val(user.id);
             }
             
