@@ -273,7 +273,9 @@
             "countobject": "Số lượng bản gi",
             "workflow": "Quy trình",
             "createAt": "Thời gian tạo",
-            "updateAt": "Thời gian update"
+            "updateAt": "Thời gian update",
+            "userCreate": "Người tạo",
+            "userUpdate": "Người cập nhật"
         },
         "process": {
             "header_bar": {

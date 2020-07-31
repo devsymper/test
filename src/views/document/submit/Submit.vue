@@ -404,9 +404,10 @@ export default {
                         thisCpn.getDataForAutocomplete(e,'autocomplete');
                     }
                 }
-                else if((e.e.keyCode < 37 && e.e.keyCode > 40)){
+                else if((e.e.keyCode < 37 || e.e.keyCode > 40)){
                     thisCpn.$refs.autocompleteInput.hide();
                 }
+                
             } catch (error) {
                 
             }
