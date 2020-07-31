@@ -790,10 +790,10 @@ export default class Table {
                     }, 500, this);
                 }
             },
-            beforeCreateRow: function(i, amount) {},
-            afterCreateRow: function(i, amount) {
+            beforeCreateRow: function(i, amount) {
                 let hotTb = this;
                 delay(function(e) {
+                    console.log('áddsad');
                     if (thisObj.tableHasRowSum) {
                         for (let controlName in columnHasSum) {
                             let colIndex = thisObj.getColumnIndexFromControlName(controlName);
@@ -804,8 +804,16 @@ export default class Table {
                     }
                 });
             },
+            afterCreateRow: function(i, amount) {
+
+
+            },
             afterSetDataAtRowProp: function(changes, source) {},
             afterSetDataAtCell: function(changes, source) {
+                if (changes.length == 0) {
+                    return
+                }
+                console.log('changesreadOnlyreadOnly', changes);
                 if (changes[0][1] == 's_table_id_sql_lite') {
                     setTimeout(() => {
                         let currentRowData = thisObj.tableInstance.getDataAtRow(changes[0][0]);
