@@ -136,10 +136,12 @@ export default class Formulas {
             }
         } else {
             let dataRes = {}
+            let x = dataInput
+            let formula = formulas
+                // debugger
             for (let rowId in dataInput) {
                 let formula = this.replaceParamsToData(dataInput[rowId], formulas);
                 let res = await this.runSQLLiteFormulas(formula);
-                console.log('kfsja', res);
                 dataRes[rowId] = res[0].values[0][0];
             }
             return { data: dataRes }
