@@ -174,8 +174,9 @@ export default class BasicControl extends Control {
             }
 
         })
-        this.ele.on('focusout', function(e) {
-            if (thisObj.checkAutoCompleteControl()) {
+
+        this.ele.closest('.sym-form-submit').on('keyup', function(e) {
+            if (thisObj.checkAutoCompleteControl() && e.keyCode == 9) {
                 e.keyCode = 200;
                 SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-key-event', {
                     e: e,
