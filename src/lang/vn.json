@@ -258,7 +258,9 @@
         },
         "actionPack": {
             "list": "Danh sách action pack ",
-            "objectType": "Loại đối tượng"
+            "objectType": "Loại đối tượng",
+            "operation": "Thao tác với đối tượng"
+
         }
     },
     "document": {
@@ -333,7 +335,8 @@
             "start_user_id": "Id người khởi tạo",
             "user_start": "Người bắt đầu",
             "start_time": "Thời gian bắt đầu",
-            "tracking": "Theo dấu quy trình"
+            "tracking": "Theo dấu quy trình",
+            "startSuccessfully": "Quy trình khởi tạo thành công"
         },
         "deployment": {
             "list": "Danh sách deploy",

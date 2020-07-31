@@ -259,7 +259,8 @@
         },
         "actionPack": {
             "list": "List action pack ",
-            "objectType": "Object type"
+            "objectType": "Object type",
+            "operation": "Operation"
         }
     },
     "document": {
@@ -325,7 +326,8 @@
             "start_user_id": "Start user id",
             "user_start": "User start",
             "start_time": "Start time",
-            "tracking": "Process instance tracking"
+            "tracking": "Process instance tracking",
+            "startSuccessfully": "Start workflow successfully"
         },
         "deployment": {
             "list": "List deployments",

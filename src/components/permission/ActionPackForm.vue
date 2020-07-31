@@ -1,6 +1,7 @@
 <template>
-    <div class="pa-2">
+    <div class="pa-2 h-100">
         <FormTpl
+            ref="comonAttr"
             :viewOnly="action == 'detail'"
             :singleLine="false"
             :allInputs="allInputs"
@@ -8,22 +9,19 @@
         </FormTpl> 
 
         <div class="w-100">
+            <div class="my-2 fs-12">
+                {{$t('permissions.actionPack.operation')}}
+            </div>
             <hot-table
                 :settings="tableSettings"
-                :data="itemData.mapActionAndObjects[itemData.objectType]"
+                :data="tableData"
+                :height="tableHeight"
+                :columns="tableColumns"
+                :colHeaders="colHeaders"
+                :dataSchema="dataSchema"
+                class="fs-13"
                 ref="dataTable">
 
-                <hot-column :name="'object'" :key="'searchItem'" title="Objects">
-                    <CustomSelect @open-editor="handleEditorShow" hot-editor hot-renderer></CustomSelect>
-                </hot-column>
-                <hot-column 
-                    v-for="col in listAction[itemData.objectType]" 
-                    :key="col.name" 
-                    :type="'checkbox'"
-                    :objectType="itemData.objectType"
-                    :title="col.title">
-
-                </hot-column>
             </hot-table>
         </div>
 
@@ -32,7 +30,8 @@
                 class="float-right mr-1"
                 small
                 depressed
-                color="primary">
+                color="primary"
+                @click="saveActionPack">
 
                 <v-icon class="mr-2" primary>mdi-content-save</v-icon>
                 {{action == 'create' ? $t('common.save') : $t('common.update')}}
@@ -46,15 +45,14 @@ import FormTpl from "@/components/common/FormTpl.vue";
 import { HotTable, HotColumn } from "@handsontable/vue";
 import { util } from '../../plugins/util';
 import CustomSelect from "./HandsonCustomSelect";
+import { permissionApi } from '../../api/permissionPack';
 
-let firstTableColumn = {
-    columnTitle: "Objects",
-    data: "objects",
-    type: "text"
-};
 
 
 export default {
+    mounted(){
+        this.tableHeight = util.getComponentSize(this).h - util.getComponentSize(this.$refs.comonAttr).h - 90;
+    },
     created(){
         let self = this;
         this.$evtBus.$on('symper-cache-set-all-resource', (data) => {
@@ -66,8 +64,90 @@ export default {
         self.setAllItemOfResource();
     },
     methods: {
+
+        createNewOperation(){
+            let self = this;
+
+            return new Promise((resolve, reject) => {
+                let newOperations = this.getNewOperationData();
+                let apiPromises = [];
+                for(let op of newOperations){
+                    apiPromises.push(permissionApi.createOperation(op));
+                }
+
+                Promise.all(apiPromises).then((ress) => {
+                    // tắc rồi , ko lấy được id của operation vừa tạo thì sao insert vào được action pack đây???????
+                }).catch((err) => {
+                    self.$snotifyError(err, "Can not create new operations!");
+                });
+            });
+        },
+        getNewOperationData(){
+            let dataTable = this.$refs.dataTable.hotTable.getData();
+            let newOperations = [];
+            let allResource = this.$store.state.actionPack.allResource;
+
+
+            for(let objectType in this.itemData.mapActionAndObjects){
+
+                for (let row of dataTable) {
+                    let key = row[0];
+                    let id = '';
+                    if(row[0] != ''){
+                        id = key.slice(0, key.indexOf(' -'));
+                    }
+
+                    if(allResource.hasOwnProperty(objectType) && allResource[objectType][id]){
+                        for(let i = 1; i < row.length ; i++){
+                            if(row[i]){
+                                let actionName = this.listAction[objectType][i - 1].name;
+                                newOperations.push({
+                                    action: actionName,
+                                    objectIdentifier: objectType + ':' + id,
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+
+            return newOperations;
+        },
+        async saveActionPack(){
+            let listNewOperations = await createNewOperations();
+
+            let dataToSave = {
+                name: this.allInputs.name.value,
+                type: 'ba',
+                description: this.allInputs.description.value,
+                listActionPacks: JSON.stringify(listActionPacks)
+            };
+
+
+            let res;
+            try {
+                debugger
+                if(this.action == 'update'){
+                    res = await permissionApi.updatePermission(this.itemData.id, dataToSave);
+                    if(res.status == '200'){
+                        this.$snotifySuccess("Updated item successfully");
+                    }else{
+                        this.$snotifyError(res, "Error when update item");
+                    }
+                }else if(this.action == 'create'){
+                    res = await permissionApi.createPermission(dataToSave);
+                    if(res.status == '200'){
+                        this.$snotifySuccess("Create item successfully");
+                    }else{
+                        this.$snotifyError(res, "Error when create item");
+                    }
+                }
+                this.$emit('saved-item-data',res);
+            } catch (error) {
+                this.$snotifyError(error, "Error when save item");
+            }
+        },
         handleEditorShow(data){
-            debugger
             this.isEditingCell = data;
         },
         setAllItemOfResource(data = null){
@@ -114,12 +194,14 @@ export default {
                 console.warn('[SYMPER-ACTIONPACK: object type not found in itemConvertMethods]');
                 return [];
             }
-        }
+        },
     },
     data(){
         let self = this;
         return {
+            tableHeight: 200,
             isEditingCell : false,
+            // các action ứng với object type
             listAction: {
                 document: [
                     {
@@ -132,53 +214,34 @@ export default {
                     },
                 ]
             },
-            tableColumns: [
-                util.cloneDeep(firstTableColumn),
-                {
-                    data: "edit",
-                    type: "checkbox"
-                },
-                {
-                    data: "add",
-                    type: "checkbox"
-                },
-            ],
-            colHeaders: [
-                'Objects',
-                'Edit',
-                'Add'
-            ],
+
             tableSettings: {
                 // các setting cho handsontable
                 filters: true,
                 manualColumnMove: true,
                 manualColumnResize: true,
                 manualRowResize: true,
+                hiddenColumns: {
+                    columns: [0],
+                    indicators: false
+                },
                 stretchH: "all",
-                minSpareRows: 1,
+                rowHeaders: true,
                 licenseKey: "non-commercial-and-evaluation",
-                afterRender: isForced => {
-                    console.log(
-                        "after render handsontablelllllllllllllllllllllllllll",
-                        Date.now()
-                    );
-                },
-                beforeKeyDown: (event)=>{
-                    // chặn bấm lên xuống trái phải khi có autocomplete
-                    if ((event.keyCode == 40 || event.keyCode == 38 ||
-                            event.keyCode == 37 || event.keyCode == 39) && self.isEditingCell ) {
-                        event.stopImmediatePropagation();
+                
+                afterChange: function(changes, source) {
+                    let htIst = this;
+                    console.log(changes, source, htIst);
+                    let lastIndex = htIst.getData().length;
+                    if(changes[0][0] == lastIndex - 1){
+                        this.alter('insert_row', lastIndex + 1, 1, 'add_row_on_enter');
                     }
+                    setTimeout(function() {
+                        htIst.selectCell(lastIndex, htIst.propToCol(changes[0][1]));
+                        self.itemData.mapActionAndObjects[self.itemData.objectType] = htIst.getData();
+                    }, 0);
+
                 },
-                afterBeginEditing(){
-                    self.isEditingCell = true;
-                },
-                afterBeginEditing(){
-                    self.isEditingCell = true;
-                },
-                afterChange(){
-                    self.isEditingCell = false;
-                }
             },
         }
     },
@@ -201,6 +264,70 @@ export default {
         }
     },
     computed: {
+        tableData(){
+            let rows = this.itemData.mapActionAndObjects[this.itemData.objectType];
+            if(rows && rows.length){
+                return rows;
+            }else{
+                return [{}];
+            }
+        },
+        dataSchema(){
+            let objectType = this.allInputs.objectType.value;
+            return this.listAction[objectType].reduce((schema, el) => {
+                schema[el.name] = true;
+                schema.idOperation = 0;
+                return schema;
+            }, {
+                object: ''
+            });
+        },
+        allResourceForSearch(){
+            let rsl = {};
+            let allResource = this.$store.state.actionPack.allResource;
+            for(let name in allResource){
+                rsl[name] = allResource[name].reduce((arr, el) => {
+                    arr.push(`${el.id} - ${el.name} : ${el.title ? el.title : el.name} `);
+                    return arr;
+                }, []);
+            }
+            return rsl;
+        },
+        // Tiêu đề của các cột  cần hiển thị
+        colHeaders() {
+            let objectType = this.allInputs.objectType.value;
+            return ["id","Objects"].concat(this.listAction[objectType].reduce((arr, el) => {
+                arr.push(el.title);
+                return arr;
+            }, []));
+        },
+        tableColumns(){
+            let self = this;
+            let objectType = this.allInputs.objectType.value;
+            let allResource = this.$store.state.actionPack.allResource;
+
+            let cols = [
+                {
+                    data: "idOpertion",
+                    type: "text",
+                },
+                {
+                    data: "object",
+                    type: "autocomplete",
+                    width: 400,
+                    source: function (query, process) {
+                        process(self.allResourceForSearch[objectType]);
+                    }
+                }
+            ];
+            return cols.concat(this.listAction[objectType].reduce((arr, el) => {
+                arr.push({
+                    data: el.name,
+                    type: "checkbox"
+                });
+                return arr;
+            }, []));
+        },
         allInputs(){
             return {
                 name: {
@@ -245,5 +372,4 @@ export default {
 </script>
 
 <style>
-
 </style>

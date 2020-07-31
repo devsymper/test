@@ -100,6 +100,7 @@ export default {
 
                     if(action == 'submit'){
                         this.docId = Number(this.taskInfo.action.parameter.documentId);
+                        this.documentObjectId = 0;
                     }else if(action == 'approval' || action == 'update'){
                         if(!this.taskInfo.action.parameter.documentObjectId){
                             
