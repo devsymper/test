@@ -272,7 +272,9 @@
             "countobject": "Count object",
             "workflow": "Workflow",
             "createAt": "Create at",
-            "updateAt": "Update at"
+            "updateAt": "Update at",
+            "userCreate": "BA Create",
+            "userUpdate": "BA update"
         },
         "process": {
             "header_bar": {
