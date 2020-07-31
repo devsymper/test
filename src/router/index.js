@@ -57,13 +57,13 @@ const routes = [{
         path: "/workflow/:id/edit",
         name: "editProcess",
         component: () =>
-            import ('../views/process/CreateProcess.vue'),
+            import ('../views/process/EditProcess.vue'),
     },
     {
         path: "/workflow/:id/clone",
         name: "cloneProcess",
         component: () =>
-            import ('../views/process/CreateProcess.vue'),
+            import ('../views/process/CloneProcess.vue'),
 
     },
     {
@@ -321,6 +321,13 @@ const routes = [{
         path: "/symper-hidden-redirect-component",
         name: "symperHiddenRedirectComponent",
         component: SymperHiddenRedirectComponent
+    },
+
+    {
+        path: "/action-pack",
+        name: "actionPackList",
+        component: () =>
+            import ('../views/permissions/AcitionPackList.vue'),
     },
 ];
 

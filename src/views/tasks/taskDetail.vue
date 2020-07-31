@@ -240,6 +240,7 @@ export default {
             if(this.taskAction == 'submit' || this.taskAction == 'update' ){
                 this.$refs.task[0].submitForm(value);
             }else if(this.taskAction == 'approval'){
+                let elId = this.originData.taskDefinitionKey;
                 let taskData = {
                     // action nhận 1 trong 4 giá trị: complete, claim, resolve, delegate
                     "action": "complete",
@@ -248,17 +249,17 @@ export default {
                     "outcome": value,
                     "variables": [
                         {
-                            name: this.originData.taskDefinitionKey+'_outcome',
+                            name: elId+'_outcome',
                             type: 'string',
                             value: value
                         },
                         {
-                            name: 'executor_full_name',
+                            name: elId+'_executor_fullname',
                             type: 'string',
                             value: this.$store.state.app.endUserInfo.displayName
                         },
                         {
-                            name: 'executor_id',
+                            name: elId+'_executor_id',
                             type: 'string',
                             value: this.$store.state.app.endUserInfo.id
                         },

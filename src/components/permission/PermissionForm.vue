@@ -11,34 +11,19 @@
             :allInputs="allInputs"
         >
         </FormTpl>
-        <div class="w-100 mt-2">
-            <span
-                class="fs-12"
-            >Select user</span>
-            <UserSelector
-                ref="userSelector"
-                :isMulti="true"
-                :disabled="action == 'detail'"
-                :compactChip="true"
-                :color="'grey lighten-3'"
-                :flat="true"
-                v-model="itemData.users"
-            ></UserSelector>
-        </div>
         <div class="w-100 mt-3">
             <span
                 class="fs-12 mb-2 "
-            >Select permissions</span>
+            >Select action pack</span>
 
-            <PermissionSelector 
-            v-model="itemData.permissions">
-
-            </PermissionSelector>
+            <ActionPackSelector 
+                v-model="itemData.actionPacks">
+            </ActionPackSelector>
         </div>
         <div class="mt-2" v-if="action != 'view' ">
             <v-btn
                 class="float-right mr-1"
-                @click="saveSystemRole"
+                @click="savePermission"
                 small
                 depressed
                 color="primary"
@@ -54,31 +39,37 @@
 import FormTpl from "@/components/common/FormTpl.vue";
 import UserSelector from "@/views/tasks/userSelector.vue";
 import { systemRoleApi } from "@/api/systemRole.js";
-import PermissionSelector from "@/components/permission/PermissionSelector.vue";
+import ActionPackSelector from "@/components/permission/ActionPackSelector.vue";
+import { permissionApi } from '../../api/permissionPack';
 
 export default {
     methods: {
-        async saveSystemRole(){
+        async savePermission(){
+            let listActionPacks = this.itemData.actionPacks.reduce((arr, el) => {
+                arr.push(el.id);
+                return arr;
+            }, []);
+
             let dataToSave = {
                 name: this.allInputs.name.value,
+                type: 'ba',
                 description: this.allInputs.description.value,
-                users: this.itemData.users,
-                permissions: this.itemData.permissions.reduce((arr, el) => {
-                    arr.push(el.id);
-                    return arr;
-                }, [])
+                listActionPacks: JSON.stringify(listActionPacks)
             };
+
+
             let res;
             try {
+                debugger
                 if(this.action == 'update'){
-                    res = await systemRoleApi.update(this.itemData.id, dataToSave);
+                    res = await permissionApi.updatePermission(this.itemData.id, dataToSave);
                     if(res.status == '200'){
                         this.$snotifySuccess("Updated item successfully");
                     }else{
                         this.$snotifyError(res, "Error when update item");
                     }
                 }else if(this.action == 'create'){
-                    res = await systemRoleApi.create(dataToSave);
+                    res = await permissionApi.createPermission(dataToSave);
                     if(res.status == '200'){
                         this.$snotifySuccess("Create item successfully");
                     }else{
@@ -95,7 +86,7 @@ export default {
     components: {
         FormTpl,
         UserSelector,
-        PermissionSelector
+        ActionPackSelector
     },
     computed: {
         allInputs(){
@@ -116,9 +107,9 @@ export default {
         },
         title(){
             let map = {
-                detail : 'Detail',
-                update: 'Update',
-                create: "Create"
+                detail  : 'Detail permission',
+                update  : 'Update permission',
+                create  : 'Create permission'
             };
             return map[this.action];
         }

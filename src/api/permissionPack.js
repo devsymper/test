@@ -2,12 +2,43 @@ import Api from "./api";
 import { appConfigs } from "../configs.js";
 import { util } from "../plugins/util";
 
-var moduleApi = new Api(appConfigs.apiDomain.permission);
+var permissionModuleApi = new Api(appConfigs.apiDomain.permission);
+var actionModuleApi = new Api(appConfigs.apiDomain.actionPacks);
+var permissionPackApi = new Api(appConfigs.apiDomain.permissionPacks);
 export const permissionApi = {
+    createPermission(data) {
+        data.status = 1;
+        return permissionPackApi.post("", data);
+    },
+
+    updatePermission(id, data) {
+        data.status = 1;
+        return permissionPackApi.put(id, data);
+    },
+
     getAllPermission() {
-        return moduleApi.get("permission_packs");
+        return permissionPackApi.get("");
     },
     getPermissionOfRole(roleId) {
-        return moduleApi.get("roles/" + roleId + "/permissions");
+        return permissionModuleApi.get("roles/" + roleId + "/permissions");
+    },
+
+    deletePermissionPack(idPacks) {
+        if ($.isArray(idPacks)) {
+            idPacks = idPacks.join(',');
+        }
+        return permissionPackApi.delete('', idPacks);
+    },
+    getActionPackOfPermission(permissionId) {
+        return permissionPackApi.get(permissionId + '/action_packs');
+    },
+    getAllActionPack() {
+        return actionModuleApi.get("");
+    },
+    deleteActionPack(idPacks) {
+        if ($.isArray(idPacks)) {
+            idPacks = idPacks.join(',');
+        }
+        return actionModuleApi.delete('', idPacks);
     },
 };

@@ -57,6 +57,7 @@ const defaultState = {
         { title: "tasks", icon: "mdi-check-all", link: "/tasks" },
         { title: "works", icon: "mdi-briefcase-check-outline", link: "/works" },
         { title: "userRoleSetting", icon: "mdi-access-point-network", link: "/user-role-settings" },
+        { title: "actionPack", icon: "mdi-access-point", link: "/action-pack" },
     ],
     urlToTabTitleMap: {}, // map giữa url với title và pageInstanceKey của tab,
     currentTabIndex: 0, // index cuả tab hiện tại đang mở,

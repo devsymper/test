@@ -219,11 +219,13 @@
         "header": {
             "id": "ID",
             "pack_name": "Name",
-            "date_created": "Date"
+            "date_created": "Date",
+            "name": "Name",
+            "description": "Description",
+            "type": "Type"
         },
         "title": "Permissions packages",
         "actionControlSummary": "Action pack Summary",
-        "actionPack": "Action packs",
         "grandPermission": "Grand permissions",
         "addPermissionPack": "Add new permission packge",
         "editPermissionPack": "Edit permission packge",
@@ -254,6 +256,10 @@
             "16384": "Printer configuration",
             "32768": "View all controls",
             "65536": "View allowed controls"
+        },
+        "actionPack": {
+            "list": "List action pack ",
+            "objectType": "Object type"
         }
     },
     "document": {

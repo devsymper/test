@@ -5,6 +5,7 @@ import documentModule from "./document";
 import processModule from "./process";
 import orgchartModule from "./orgchart";
 import permissionModule from "./permission";
+import actionPackModule from "./actionPack";
 
 Vue.use(Vuex);
 
@@ -14,6 +15,7 @@ export default new Vuex.Store({
         document: documentModule,
         process: processModule,
         orgchart: orgchartModule,
-        permission: permissionModule
+        permission: permissionModule,
+        actionPack: actionPackModule
     }
 });

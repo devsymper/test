@@ -33,6 +33,11 @@
 </template>
 <script>
 export default {
+    props: {
+        tableWrapper: {
+            default: null
+        }
+    },
     data () { 
         return {
             key:Date.now(),

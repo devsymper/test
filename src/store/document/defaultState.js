@@ -77,6 +77,7 @@ const defaultState = {
         instance: {}
     },
     listAllDocument: [], // Khadm: danh sách tất cả các document được active, phục vụ cho việc  autocomplete trong script editor
+    needGetAllDoc: true, // flag đánh dấu có cần lấy tất cả các doc hay không, thằng đầu tiên muốn lấy sẽ set biến này về false để những thằng sau ko cần lấy nữa
     viewType: {
         instance: null
     } // chỉ định là submit, detail, hay update

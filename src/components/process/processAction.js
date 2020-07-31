@@ -211,7 +211,7 @@ export const getVarsFromSubmitedDoc = async(docData, elId, docId) => {
                 type: 'string',
                 value: 'submit'
             }, {
-                name: elId + '_executor_full_name',
+                name: elId + '_executor_fullname',
                 type: 'string',
                 value: SYMPER_APP.$store.state.app.endUserInfo.displayName
             }, {

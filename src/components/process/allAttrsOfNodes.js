@@ -16,7 +16,7 @@ function userAssignmentToXMLValue(config) {
              * }
              */
         ],
-        orgchartRole: [
+        roles: [
             /**
              * danh sách các role trong orgchart, mỗi item có dạng:['orgchart:20:abc-xyz']
              */
@@ -28,13 +28,13 @@ function userAssignmentToXMLValue(config) {
                 userId: item.id.replace('user:', '')
             });
         } else if (item.type == 'department') {
-            rsl.orgchartRole.push(
+            rsl.roles.push(
                 'orgchart:' + item.id
             );
         }
     }
 
-    if (rsl.formula != '' || rsl.orgchartRole.length > 0) {
+    if (rsl.formula != '' || rsl.roles.length > 0) {
         return JSON.stringify(rsl);
     } else {
         rsl = rsl.users.reduce((arr, el) => {
@@ -78,12 +78,13 @@ let allAttrs = {
         "value": "process",
         "info": "BPMN.PROPERTYPACKAGES.PROCESS_IDPACKAGE.PROCESS_ID.DESCRIPTION",
         "dg": "general",
-        // toXML: {
-        //     "symper_position": "attr",
-        //     "name": "id",
-        //     "isAttr": true,
-        //     "type": "String"
-        // }
+        "hidden": true
+            // toXML: {
+            //     "symper_position": "attr",
+            //     "name": "id",
+            //     "isAttr": true,
+            //     "type": "String"
+            // }
     },
     "overrideid": {
         "title": "Id",
@@ -947,7 +948,7 @@ let allAttrs = {
         "dg": "detail",
         "options": [],
         "textKey": 'modelName',
-        "valueKey": 'definitionId',
+        "valueKey": 'definitionKey',
         "showId": false,
         toXMLExtend: { // không định nghĩa lại do thư viện đã định nghĩa sẵn, dùng cho trường hợp tên trong xml khác với tên đẩy về json
             name: 'calledElement'
@@ -956,7 +957,7 @@ let allAttrs = {
     "callactivitycalledelementtype": {
         "title": "Called element type",
         "type": "text",
-        "value": "id",
+        "value": "key",
         "info": "BPMN.PROPERTYPACKAGES.CALLACTIVITYCALLEDELEMENTTYPEPACKAGE.CALLACTIVITYCALLEDELEMENTTYPE.DESCRIPTION",
         "dg": "detail",
         "options": [],
