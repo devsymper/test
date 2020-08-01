@@ -72,6 +72,7 @@ import task from "./task";
 import BPMNEngine from '../../api/BPMNEngine';
 import { getVarsFromSubmitedDoc, getProcessInstanceVarsMap } from '../../components/process/processAction';
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
+import { documentApi } from '../../api/Document';
 
 export default {
     name: "taskDetail",
@@ -267,6 +268,7 @@ export default {
                     // "transientVariables": []
                 }
                 let res = await this.submitTask(taskData);
+                this.saveApprovalHistory(value);
                 this.$emit('task-submited', res);
             }else if(this.taskAction == 'undefined'){
                 let taskData = {
@@ -276,6 +278,24 @@ export default {
                 let res = await this.submitTask(taskData);
                 this.$emit('task-submited', res);
             }
+        },
+        saveApprovalHistory(value){
+            let title = this.taskActionBtns.reduce((tt, el) => {
+                if(el.value == value){
+                    tt = el.text;
+                }
+                return tt;
+            }, '');
+
+            let dataToSave = {
+                objectId: this.taskInfo.action.parameter.documentObjectId,
+                userId: this.$store.state.app.endUserInfo.ID,
+                actionTitle: title,
+                actionName: value,
+                note: ''
+            };
+
+            documentApi.saveApprovalHistory(dataToSave);
         },
         async submitTask(taskData){
             let self = this;
