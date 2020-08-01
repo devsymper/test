@@ -212,7 +212,8 @@ export default {
             listMessageErr:[],
             titleValidate:"",
             messageValidate:"",
-            isComponentActive:false
+            isComponentActive:false,
+            cacheDataRunFormulas:{}
         };
     },
     beforeMount() {
@@ -519,6 +520,7 @@ export default {
          * Hàm chạy công thức autocomplete để đổ dữ liệu vào box autucomplete, control select cũng dùng trường hợp này
          */
         getDataForAutocomplete(e,type,aliasControl=""){ 
+            console.log('ádsaf',e);
             let thisCpn = this
             if(type == 'select'){
                 let dataInput = this.getDataInputFormulas(e.selectFormulasInstance);  
@@ -950,7 +952,6 @@ export default {
                         type: "success",
                         title: "Submit document success!"
                     });        
-                    console.log('assadsasadsadsdasadads',this.$route.name);
                     if(this.$route.name == 'submitDocument')
                      thisCpn.$router.push('/documents/'+thisCpn.documentId+"/objects");
                 }
@@ -984,6 +985,8 @@ export default {
                         type: "success",
                         title: "update document success!"
                     });        
+                    if(this.$route.name == 'submitDocument')
+                     thisCpn.$router.push('/documents/'+thisCpn.documentId+"/objects");
                 }
                 else{
                     thisCpn.$snotify({

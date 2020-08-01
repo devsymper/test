@@ -7,27 +7,42 @@ import { checkDbOnly, getControlType, getSDocumentSubmitStore } from './../commo
 import { SYMPER_APP } from './../../../main.js'
 import { Date } from 'core-js';
 import { checkCanBeBind, resetImpactedFieldsList, markBinedField } from './handlerCheckRunFormulas';
-import moment from "moment-timezone";
 class UserEditor extends Handsontable.editors.TextEditor {
-        createElements() {
-            super.createElements();
-            this.TEXTAREA = this.hot.rootDocument.createElement('input');
-            this.TEXTAREA.className = 'handsontableInput';
-            this.TEXTAREA.setAttribute('data-hot-input', ''); // Makes the element recognizable by HOT as its own component's element.
-            this.textareaStyle = this.TEXTAREA.style;
-            this.textareaStyle.width = 0;
-            this.textareaStyle.height = 0;
-            Handsontable.dom.empty(this.TEXTAREA_PARENT);
-            this.TEXTAREA_PARENT.appendChild(this.TEXTAREA);
-        }
-        setValue(newValue) {
-            this.TEXTAREA.value = newValue;
-        }
-
+    createElements() {
+        super.createElements();
+        this.TEXTAREA = this.hot.rootDocument.createElement('input');
+        this.TEXTAREA.className = 'handsontableInput';
+        this.TEXTAREA.setAttribute('data-hot-input', ''); // Makes the element recognizable by HOT as its own component's element.
+        this.textareaStyle = this.TEXTAREA.style;
+        this.textareaStyle.width = 0;
+        this.textareaStyle.height = 0;
+        Handsontable.dom.empty(this.TEXTAREA_PARENT);
+        this.TEXTAREA_PARENT.appendChild(this.TEXTAREA);
     }
-    /**
-     * Custom render cho control percent( phần trăm) cho table
-     */
+    setValue(newValue) {
+        this.TEXTAREA.value = newValue;
+    }
+
+}
+class SelectEditor extends Handsontable.editors.TextEditor {
+    createElements() {
+        super.createElements();
+        this.TEXTAREA = this.hot.rootDocument.createElement('input');
+        this.TEXTAREA.className = 'handsontableInput';
+        this.TEXTAREA.setAttribute('data-hot-input', ''); // Makes the element recognizable by HOT as its own component's element.
+        Handsontable.dom.empty(this.TEXTAREA_PARENT);
+        this.TEXTAREA_PARENT.appendChild(this.TEXTAREA);
+    }
+    setValue(newValue) {
+        this.TEXTAREA.value = newValue;
+    }
+
+}
+
+
+/**
+ * Custom render cho control percent( phần trăm) cho table
+ */
 Handsontable.renderers.PercentRenderer = function(instance, td, row, col, prop, value, cellProperties) {
     Handsontable.renderers.NumericRenderer.apply(this, arguments);
     td.style.textAlign = 'left'
@@ -40,17 +55,36 @@ Handsontable.cellTypes.registerCellType('percent', {
 
 //renderer user
 Handsontable.renderers.UserRenderer = function(instance, td, row, col, prop, value, cellProperties) {
-    Handsontable.renderers.TextRenderer.apply(this, arguments);
-    if (!isNaN(value) && instance.hasOwnProperty('keyInstance')) {
-        let listUser = store.state.document.submit[instance.keyInstance].listUser;
-        let user = listUser.filter(user => {
-            return user.id === value
-        })
-        if (user.length > 0) {
-            td.textContent = user[0].displayName
+        Handsontable.renderers.TextRenderer.apply(this, arguments);
+        if (!isNaN(value) && instance.hasOwnProperty('keyInstance')) {
+            let listUser = store.state.document.submit[instance.keyInstance].listUser;
+            let user = listUser.filter(user => {
+                return user.id === value
+            })
+            if (user.length > 0) {
+                td.textContent = user[0].displayName
+            }
         }
     }
+    //renderer user
+Handsontable.renderers.SelectRenderer = function(instance, td, row, col, prop, value, cellProperties) {
+    Handsontable.renderers.TextRenderer.apply(this, arguments);
+    if (value == null) value = ""
+    let div = `<div class="select-cell" style="position:relative;height:24px;width:100%;">` + value + `
+                    <span style="position: absolute;right:8px;top:2px;font-size: 10px;color: #eee;">▼</span>
+                </div>`
+    $(td).off('click')
+    $(td).on('click', function(e) {
+        let tableControl = store.state.document.submit[instance.keyInstance].listInputInDocument[instance.tableName];
+        let tableInstance = tableControl.tableInstance;
+        tableInstance.setSelectCell(e)
+    })
+    td.innerHTML = div;
 }
+Handsontable.cellTypes.registerCellType('select', {
+    renderer: Handsontable.renderers.SelectRenderer,
+    editor: SelectEditor
+});
 
 Handsontable.cellTypes.registerCellType('user', {
     editor: UserEditor,
@@ -102,7 +136,7 @@ const supportCellsType = {
     label: 'TextRenderer',
     percent: 'PercentRenderer',
     user: 'UserRenderer',
-    select: 'DropdownRenderer',
+    select: 'SelectRenderer',
     checkbox: 'CheckboxRenderer',
 };
 
@@ -172,14 +206,12 @@ export default class Table {
                         if (thisObj.getCellSelectedType(column) == 'time') {
                             // SYMPER_APP.$evtBus.$emit('document-submit-show-time-picker', { event: event });
                         };
+                        // if (thisObj.getCellSelectedType(column) == 'select') {
+                        //     thisObj.setSelectCell(event);
+                        // };
 
                     },
-                    afterBeginEditing: function(row, column) {
-                        // nêu cell click là control select
-                        if (thisObj.getCellSelectedType(column) == 'dropdown') {
-                            thisObj.setSelectCell(event);
-                        };
-                    },
+
 
                     beforeKeyDown: function(event) {
                         if (event.ctrlKey || event.altKey || event.shiftKey || event.metaKey) {
@@ -697,15 +729,10 @@ export default class Table {
                 let formulasInstance = controlFormulas['formulas'].instance;
                 event.curTarget = event.target;
                 SYMPER_APP.$evtBus.$emit('document-submit-select-input', {
-                        e: event,
-                        selectFormulasInstance: formulasInstance,
-                        alias: this.currentControlSelected
-                    })
-                    // SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-key-event', {
-                    //     e: event,
-                    //     selectFormulasInstance: formulasInstance,
-                    //     isSelect: true
-                    // })
+                    e: event,
+                    selectFormulasInstance: formulasInstance,
+                    alias: this.currentControlSelected
+                })
             }
         }
     }
@@ -836,6 +863,7 @@ export default class Table {
             }
         });
         this.tableInstance.keyInstance = this.keyInstance;
+        this.tableInstance.tableName = this.tableName;
         if (!this.checkDetailView()) {
             for (let evtName in thisObj.event) {
                 Handsontable.hooks.add(evtName, thisObj.event[evtName], this.tableInstance);
@@ -1026,8 +1054,7 @@ export default class Table {
             };
         } else if (type == 'label' || ctrl.controlProperties.isReadOnly == 1) {
             rsl.readOnly = true;
-        } else if (type == 'select') {
-            rsl.editor = 'select';
+
         } else if (type == 'time') {
             rsl.timeFormat = 'HH:mm:ss',
                 rsl.correctFormat = true;

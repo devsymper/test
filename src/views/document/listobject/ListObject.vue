@@ -6,7 +6,7 @@
         :pageTitle="$t('documentObject.title')"
         :containerHeight="containerHeight"
         :actionPanelWidth="actionPanelWidth"
-        @after-open-add-panel="addDocument"
+        @after-open-add-panel="submitDocument"
         ref="listObject"
     >
         <div slot="right-panel-content" class="h-100">
@@ -111,8 +111,8 @@ export default {
         
     },
     methods:{
-        addDocument(){
-            this.$router.push('/document/editor');
+        submitDocument(){
+            this.$router.push('/document/submit/'+this.docId);
         },
      
         calcContainerHeight() {

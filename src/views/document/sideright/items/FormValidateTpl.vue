@@ -82,7 +82,7 @@
 </template>
 <script>
 import SymperDragPanel from "./../../../../components/common/SymperDragPanel";
-import FormulaEditor from "./../../../../components/common/FormulaEditor";
+import FormulaEditor from "@/components/formula/editor/FormulaEditor";
 
 export default {
     components:{

@@ -120,8 +120,8 @@ export default {
                 if(!$(e.curTarget).is('.handsontableInput')){
                     edtos = $(e.curTarget).closest('td.htAutocomplete.current.highlight').offset();
                 }
-                if($(e.curTarget).is('div.htAutocompleteArrow')){
-                    edtos = $(e.curTarget).parent().offset();;
+                if($(e.curTarget).is('div.select-cell')){
+                    edtos = $(e.curTarget).parent().offset();
                 }
                 
                 let tbcos = $(e.curTarget).closest('.wrap-table').find('[s-control-type="table"]').offset();
