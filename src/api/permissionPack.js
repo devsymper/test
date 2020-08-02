@@ -44,11 +44,27 @@ export const permissionApi = {
         return actionModuleApi.delete('', idPacks);
     },
 
-    createOperation(data) {
-        return operationPackApi.post(data);
+    createMultipleOperation(data) {
+        return operationPackApi.post('save-batch', data);
     },
 
     getOperationOfActionPack(actionId) {
         return operationPackApi.get('/' + actionId + '/operations');
+    },
+
+    getAllActionByObjectType() {
+        return operationPackApi.get('actions');
+    },
+
+    createActionPack(data) {
+        return actionModuleApi.post('', data);
+    },
+
+    updateActionPack(id, data) {
+        return actionModuleApi.put(id, data);
+    },
+
+    getActionPackOperations(actionPackId) {
+        return actionModuleApi.get(actionPackId + '/operations');
     }
 };

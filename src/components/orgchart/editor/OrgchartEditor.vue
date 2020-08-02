@@ -222,6 +222,18 @@ export default {
         },
         handleConfigUserSelectChange(listUserIds){
             this.$refs.editorWorkspace.changeUserDisplayInNode(listUserIds);
+
+            if(this.context == 'department'){
+                this.changeManagerForDepartment(this.selectingNode.id, listUserIds);
+            }
+        },
+        // Kiểm tra xem department hiện tại đã có node Manager hay chưa
+        changeManagerForDepartment(departmentVizId, userIds){
+            this.checkAndCreateOrgchartData();
+            if(!this.selectingNode.positionDiagramCells.cells){
+                this.$refs.positionDiagram.createFirstVizNode();
+                this.storeDepartmentPositionCells();
+            }
         },
         restoreMainOrgchartConfig(config){
             let homeConfig = this.$store.state.orgchart.editor[this.instanceKey].homeConfig;
@@ -482,7 +494,17 @@ export default {
                 let invalidIds = [];
                 let mapCodeDpms = {};
                 let passed = true;
+
+                let mapVizNode = this.$refs.editorWorkspace.getAllDiagramCells().cells.reduce((map, el) => {
+                    map[el.id] = el;
+                    return map;
+                }, {});
+
                 for(let dpmId in allDpmns){
+                    if(!mapVizNode[dpmId]){
+                        continue;
+                    }
+
                     let dpm = allDpmns[dpmId];
                     let allPos = self.$store.state.orgchart.editor[dpm.positionDiagramCells.instanceKey].allNode;
                     for(let posId in allPos){

@@ -138,7 +138,6 @@ import {
 } from "vuetify/lib";
 import TreeValidate from "./../../views/document/sideright/items/FormValidateTpl.vue";
 import FormulaEditor from "./../formula/editor/FormulaEditor";
-// import FormulaEditor from "./../common/FormulaEditor";
 import DateFormat from "./../common/DateFormat";
 import NumberFormat from "./../common/NumberFormat";
 import DataTable from "./../common/customTable/DataTable";

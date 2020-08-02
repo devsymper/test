@@ -80,8 +80,16 @@ const routes = [{
         component: () =>
             import ('../views/process/DeployHistory.vue')
     },
+    // {
+    //     path: "/workflow/process-definition/:idProcessDef/instances",
+    //     name: "listProcessInstances",
+    //     // component: ProcessInstances,
+    //     component: () =>
+    //         import ('../views/process/ProcessInstances.vue')
+
+    // },
     {
-        path: "/workflow/process-definition/:idProcessDef/instances",
+        path: '/workflow/process-key/:processKey/instances',
         name: "listProcessInstances",
         // component: ProcessInstances,
         component: () =>

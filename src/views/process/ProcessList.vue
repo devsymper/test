@@ -128,10 +128,8 @@ export default {
                     name: "instances",
                     text: this.$t("process.list.instances"),
                     callback: async function (row, callback) {
-                        let lastestDefinition = await getLastestDefinition(row, false);
-                        if(lastestDefinition.data[0]){
-                            self.$goToPage('/workflow/process-definition/'+lastestDefinition.data[0].id+'/instances')
-                        }
+                        
+                        self.$goToPage('/workflow/process-key/'+row.processKey+'/instances', self.$t('process.instance.listModelInstance')+row.name)
                     }
                 },
                 {
@@ -151,7 +149,7 @@ export default {
                     callback: async (row, callback) => {
                         let lastestDefinition = await getLastestDefinition(row, false);
                         if(lastestDefinition.data[0]){
-                            self.$goToPage('/tasks?processDefinitionId='+lastestDefinition.data[0].id)
+                            self.$goToPage('/tasks?processDefinitionId='+lastestDefinition.data[0].id, self.$t('process.taskList')+row.name)
                         }
                     }
                 },

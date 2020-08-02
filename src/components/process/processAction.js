@@ -128,7 +128,6 @@ export const runProcessDefinition = (self, processDef, vars = [], instanceName =
                 "returnVariables": true,
                 variables: vars
             };
-            debugger;
             bpmnApi.createProcessInstance(dataToRun).then((res) => {
                 runResolve(res);
             }).catch((err) => {
@@ -137,7 +136,7 @@ export const runProcessDefinition = (self, processDef, vars = [], instanceName =
                     "Can not get process definition model!"
                 );
                 runReject(err);
-            });;
+            });
         }).catch((err) => {
             self.$snotifyError(
                 err,

@@ -47,5 +47,9 @@ export const documentApi = {
     },
     getBatchFieldInfoInDoc(data) {
         return coreApi.post("documents/fields/batch", data);
+    },
+
+    saveApprovalHistory(data) {
+        return coreApi.post("approval-histores", data);
     }
 };

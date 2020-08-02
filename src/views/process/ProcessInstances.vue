@@ -161,8 +161,8 @@ export default {
             this.sideBySideMode = false;
         },
         getListUrl(){
-            let processDefId = this.$route.params.idProcessDef;
-            return appConfigs.apiDomain.bpmne.instances+'?processDefinitionId='+processDefId;
+            let processKey = this.$route.params.processKey;
+            return appConfigs.apiDomain.bpmne.instances+'?processDefinitionKey='+processKey;
         },
         calcContainerHeight() {
             this.containerHeight = util.getComponentSize(this).h;

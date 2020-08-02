@@ -320,7 +320,8 @@ export default {
                 content: xml,
                 description: modelDataAsFlowable.description,
                 version: 1,
-                configValue: JSON.stringify(jsonConfig)
+                configValue: JSON.stringify(jsonConfig),
+                processKey: modelDataAsFlowable.key
             };
         },
         standardXMLToSave(xml){

@@ -65,7 +65,8 @@
         "apply": "Áp dụng",
         "manager": "Quản lý",
         "userRoleSetting": "Vai trò người dùng",
-        "clone": "Nhân bản"
+        "clone": "Nhân bản",
+        "actionPack": "Action pack"
     },
     "login": {
         "title": "Đăng nhập hệ thống",
@@ -259,8 +260,8 @@
         "actionPack": {
             "list": "Danh sách action pack ",
             "objectType": "Loại đối tượng",
-            "operation": "Thao tác với đối tượng"
-
+            "operation": "Thao tác với từng đối tượng",
+            "allOperation": "Thao tác với toàn bộ đối tượng"
         }
     },
     "document": {
@@ -328,6 +329,7 @@
         "action": {
             "create": "Tạo quy trình mới"
         },
+        "taskList": "Danh sách task của ",
         "instance": {
             "list": "Danh sách các bản đã chạy",
             "name": "Tên bản chạy",
@@ -338,7 +340,8 @@
             "user_start": "Người bắt đầu",
             "start_time": "Thời gian bắt đầu",
             "tracking": "Theo dấu quy trình",
-            "startSuccessfully": "Quy trình khởi tạo thành công"
+            "startSuccessfully": "Quy trình khởi tạo thành công",
+            "listModelInstance": "Danh sách bản chạy gần nhất của "
         },
         "deployment": {
             "list": "Danh sách deploy",
