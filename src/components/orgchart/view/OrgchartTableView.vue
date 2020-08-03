@@ -24,7 +24,8 @@
             <v-tab-item :key="'tableView'" class="px-2 pt-2 h-100">
                 <div class="h-100 symper-orgchart-table-view">
                     <AgDataTable
-                        ref="displayTable"
+                        :tableHeight="'calc(100% - 100px)'"
+                        ref="displayTable" 
                         :allColumns="allColumns"
                         :rowData="dataTable"
                         :editable="false"
