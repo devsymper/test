@@ -209,6 +209,7 @@ export default {
     watch:{
         // kiểm tra xem route thay đổi khi vào editor là edit doc hay create doc
         '$route' (to) {
+            console.log("assadasd",to);
             this.$store.commit("document/setDefaultEditorStore",{instance:this.keyInstance});
             this.documentId = Date.now();
             if(to.name =='editDocument'){
@@ -484,7 +485,7 @@ export default {
                                 );   
                             }
                         } 
-                        if(this.documentId != 0 && this.documentId != undefined && typeof this.documentId != 'undefined'){   //update doc
+                        if(this.$route.name == "editDocument"){   //edit doc
                             this.editDocument({documentProperty:documentProperties,fields:JSON.stringify(allControl),content:htmlContent,id:this.documentId})
                         } 
                         else{
@@ -507,7 +508,7 @@ export default {
                 }
             }     
             else{
-                if(this.documentId != 0 && this.documentId != undefined && typeof this.documentId != 'undefined'){   //update doc
+                if(this.$route.name == "editDocument"){   //edit doc
                     this.editDocument({documentProperty:documentProperties,fields:JSON.stringify(allControl),content:htmlContent,id:this.documentId})
                 }
                 else{
@@ -934,7 +935,9 @@ export default {
             if(this.documentId != 0){
                 documentApi.detailDocument(this.documentId).then(res => {
                     if (res.status == 200) {
-                        thisCpn.setDocumentProperties(res.data.document);
+                        if(this.$route.name == "editDocument"){
+                            thisCpn.setDocumentProperties(res.data.document);
+                        }
                         let content = res.data.document.content;
                         thisCpn.$refs.editor.editor.setContent(content);
                         if(res.data.document.version == 1){

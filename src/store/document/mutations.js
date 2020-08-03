@@ -217,7 +217,6 @@ const updateListInputInDocument = (state, params) => {
     let controlName = params.controlName;
     let value = params.value
     let instance = params.instance;
-    console.log('paramsparamsparams', params);
     if (state.submit[instance].listInputInDocument.hasOwnProperty(controlName)) {
         Vue.set(state.submit[instance].listInputInDocument[controlName], key, value);
     }

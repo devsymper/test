@@ -168,6 +168,14 @@ const routes = [{
 
     },
     {
+        path: "/documents/:id?/clone/editor",
+        name: "cloneDocument",
+        // component: Editor,
+        component: () =>
+            import ('../views/document/Editor.vue'),
+
+    },
+    {
         path: "/document/submit/:id?",
         name: "submitDocument",
         // component: SubmitDocument,

@@ -46,8 +46,18 @@ class SelectEditor extends Handsontable.editors.TextEditor {
 Handsontable.renderers.PercentRenderer = function(instance, td, row, col, prop, value, cellProperties) {
     Handsontable.renderers.NumericRenderer.apply(this, arguments);
     td.style.textAlign = 'left'
+    let table = store.state.document.submit[instance.keyInstance];
     td.textContent = (td.textContent == "" || td.textContent == null) ? 0 + " %" : td.textContent + " %";
+    if (row == instance.countRows() - 1 && table != undefined) {
+        let tableControl = table.listInputInDocument[instance.tableName];
+        let tableInstance = tableControl.tableInstance;
+        if (tableInstance.tableHasRowSum) {
+            td.textContent = "";
+        }
+    }
 }
+
+
 Handsontable.cellTypes.registerCellType('percent', {
     editor: Handsontable.editors.TextEditor.prototype.extend(),
     renderer: Handsontable.renderers.PercentRenderer
@@ -79,8 +89,25 @@ Handsontable.renderers.SelectRenderer = function(instance, td, row, col, prop, v
         let tableInstance = tableControl.tableInstance;
         tableInstance.setSelectCell(e)
     })
+    let table = store.state.document.submit[instance.keyInstance];
     td.innerHTML = div;
+    if (row == instance.countRows() - 1 && table != undefined) {
+        let tableControl = table.listInputInDocument[instance.tableName];
+        let tableInstance = tableControl.tableInstance;
+        if (tableInstance.tableHasRowSum) {
+            td.innerHTML = "";
+        }
+    }
 }
+
+Handsontable.renderers.ValidateRenderer = function(instance, td, row, col, prop, value, cellProperties) {
+    Handsontable.renderers.TextRenderer.apply(this, arguments);
+    if (!isNaN(value) && instance.hasOwnProperty('keyInstance')) {
+        let listUser = store.state.document.submit[instance.keyInstance];
+
+    }
+}
+
 Handsontable.cellTypes.registerCellType('select', {
     renderer: Handsontable.renderers.SelectRenderer,
     editor: SelectEditor
@@ -804,14 +831,9 @@ export default class Table {
                 if (!this.reRendered && thisObj.tableHasRowSum) {
                     this.reRendered = true;
                     setTimeout((hotTb) => {
-                        for (let controlName in columnHasSum) {
-                            let colIndex = thisObj.getColumnIndexFromControlName(controlName);
-                            let CharAt = String.fromCharCode(65 + columnHasSum[controlName]);
-                            let sumValue = '=SUM(' + CharAt + '1:' + CharAt + '' + (hotTb.countRows() - 1) + ')'
-                            hotTb.setDataAtCell(this.countRows() - 1, colIndex, sumValue, AUTO_SET);
-                        }
+
                         for (let index = 0; index < hotTb.getDataAtRow(0).length; index++) {
-                            hotTb.setCellMeta(hotTb.countRows() - 1, index, 'readOnly', true);
+                            // hotTb.setCellMeta(hotTb.countRows() - 1, index, 'readOnly', true);
                         }
                         hotTb.render();
                     }, 500, this);
@@ -820,7 +842,6 @@ export default class Table {
             beforeCreateRow: function(i, amount) {
                 let hotTb = this;
                 delay(function(e) {
-                    console.log('áddsad');
                     if (thisObj.tableHasRowSum) {
                         for (let controlName in columnHasSum) {
                             let colIndex = thisObj.getColumnIndexFromControlName(controlName);
@@ -925,14 +946,25 @@ export default class Table {
             }
 
             if (this.tableHasRowSum) {
+
+
                 data.push({})
             }
             this.tableInstance.updateSettings({
-                data: data
-            })
+                    data: data
+                })
+                // sau khi đổ dữ liệu vào table thì ko chạy các sự kiện của table nên cần chạy công thức cho các control liên quan sau khi đỏ dữ liệu
             setTimeout((thisObj) => {
                 for (let index = 0; index < controlBinding.length; index++) {
                     thisObj.handlerCheckEffectedControlInTable(controlBinding[index]);
+                }
+                if (this.tableHasRowSum) {
+                    for (let controlName in columnHasSum) {
+                        let colIndex = thisObj.getColumnIndexFromControlName(controlName);
+                        let CharAt = String.fromCharCode(65 + columnHasSum[controlName]);
+                        let sumValue = '=SUM(' + CharAt + '1:' + CharAt + '' + (this.tableInstance.countRows() - 1) + ')'
+                        this.tableInstance.setDataAtCell(this.tableInstance.countRows() - 1, colIndex, sumValue, AUTO_SET);
+                    }
                 }
             }, 50, this);
 
@@ -1046,7 +1078,7 @@ export default class Table {
             data: name,
             type: type,
             allowInvalid: true,
-            // renderer: this.validateRender
+            renderer: this.validateRender
         }
         if (type == 'number') {
             rsl.numericFormat = {
@@ -1068,48 +1100,58 @@ export default class Table {
         return rsl;
     }
     validateRender(hotInstance, td, row, column, prop, value, cellProperties) {
-            let inTable = listInputInDocument[prop].inTable;
-            let thisObj = listTableInstance[inTable];
-            let control = thisObj.getControlInstance(listInputInDocument[prop]);
-            if (row + 1 == hotInstance.countRenderedRows()) {
-                if (value === null) {
-                    arguments[5] = thisObj.sampleRowValues[prop];
-                }
-            }
-            Handsontable.renderers[supportCellsType[control.type]].apply(this, arguments);
-            if (control.isCheckbox) {
-                td.style.textAlign = "center";
-            }
-            let map = thisObj.validateValueMap[row + '_' + column];
-            let controlTitle = (control.title == "") ? control.name : control.title;
-            if (map) {
-                let sign = prop + '____' + row;
-                let ele = $(td);
-
-                if (map.vld === true) {
-                    ele.css({ 'position': 'relative' }).append(Util.makeErrNoti(map.msg, sign, controlTitle));
-                }
-                if (map.uniqueDB === true) {
-                    ele.css({ 'position': 'relative' }).append(Util.makeErrNoti(map.msg, sign, controlTitle));
-                }
-                if (map.require === true && (value === '' || value == null)) {
-                    ele.css({ 'position': 'relative' }).append(Util.requireRedDot(sign, controlTitle));
-                }
-                ele.off('click', '.validate-icon')
-                ele.on('click', '.validate-icon', function(e) {
-                    let msg = $(this).attr('title');
-                    e.msg = msg;
-                    SYMPER_APP.$evtBus.$emit('document-submit-open-validate-message', e)
-                })
+        let tableName = "";
+        for (let tbName in listTableInstance) {
+            let allColumn = listTableInstance[tbName].colName2Idx;
+            if (allColumn.hasOwnProperty(prop)) {
+                tableName = tbName;
+                break;
             }
         }
-        /**
-         * set giá trị cho một cột tương ứng với các rowId
-         * @param {string} name tên control
-         * @param {Object} values {
-         *                              "rowId":"value"
-         *                          }
-         */
+
+        let thisObj = listTableInstance[tableName];
+        let control = thisObj.getControlInstance(prop);
+        if (row + 1 == hotInstance.countRenderedRows()) {
+            if (value === null) {
+                arguments[5] = thisObj.sampleRowValues[prop];
+            }
+        }
+        Handsontable.renderers[supportCellsType[control.type]].apply(this, arguments);
+        if (control.isCheckbox) {
+            td.style.textAlign = "center";
+        }
+        let map = thisObj.validateValueMap[row + '_' + column];
+        let controlTitle = (control.title == "") ? control.name : control.title;
+        if (map) {
+            let sign = prop + '____' + row;
+            let ele = $(td);
+
+            if (map.vld === true) {
+                ele.css({ 'position': 'relative' }).append(Util.makeErrNoti(map.msg, sign, controlTitle));
+            }
+            if (map.uniqueDB === true) {
+                ele.css({ 'position': 'relative' }).append(Util.makeErrNoti(map.msg, sign, controlTitle));
+            }
+            if (map.require === true && (value === '' || value == null)) {
+                ele.css({ 'position': 'relative' }).append(Util.requireRedDot(sign, controlTitle));
+            }
+            ele.off('click', '.validate-icon')
+            ele.on('click', '.validate-icon', function(e) {
+                let msg = $(this).attr('title');
+                e.msg = msg;
+                SYMPER_APP.$evtBus.$emit('document-submit-open-validate-message', e)
+            })
+        }
+    }
+
+
+    /**
+     * set giá trị cho một cột tương ứng với các rowId
+     * @param {string} name tên control
+     * @param {Object} values {
+     *                              "rowId":"value"
+     *                          }
+     */
     setColValues(name, values, tbName) {
         let vls = [];
         for (let i = 0; i < values.length; i++) {

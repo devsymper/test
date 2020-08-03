@@ -29,6 +29,8 @@ const checkDbOnly = function(instance, controlName) {
     }
 }
 const getControlInstanceFromStore = function(instance, controlName) {
+    console.log('ágsadasd', controlName);
+    console.log('ágsadasd', sDocument.state.submit[instance].listInputInDocument);
     if (sDocument.state.submit[instance].listInputInDocument.hasOwnProperty(controlName)) {
         return sDocument.state.submit[instance].listInputInDocument[controlName]
     } else {
