@@ -107,11 +107,9 @@ export default {
                     }
                 }
             }
-            console.log("kasjdgsad",this.dataSelected);
         },
         saveInputFilter(){
             this.$emit('save-input-filter',{controlId:this.curControlId,value:this.dataSelected.join()});
-            
         },
         setFormulas(formulas,controlName){
             this.formulas = formulas;

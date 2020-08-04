@@ -191,6 +191,13 @@ const routes = [{
             import ('../views/document/detail/Detail.vue'),
     },
     {
+        path: "/documents/objects/:id?/print",
+        name: "printDocument",
+        // component: DetailDocument,
+        component: () =>
+            import ('../views/document/detail/Detail.vue'),
+    },
+    {
         path: "/document/objects/update/:id?",
         name: "updateDocumentObject",
         // component: SubmitDocument,

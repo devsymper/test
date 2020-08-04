@@ -73,9 +73,9 @@ export default {
                 {
                     name: "print",
                     text: "In",
-                    // callback: (documentObject, callback) => {
-                    //     this.$goToPage('/documents/objects/'+documentObject.document_object_id,"Danh sách bản ghi");
-                    // },
+                    callback: (documentObject, callback) => {
+                        this.$goToPage('/documents/objects/'+documentObject.document_object_id+'/print',"Danh sách bản ghi");
+                    },
                 },
                 {
                     name: "detailInView",

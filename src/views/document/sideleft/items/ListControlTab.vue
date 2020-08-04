@@ -1,7 +1,7 @@
 <template>
 <v-treeview
     v-model="tree"
-    :items="listControlTreeData"
+    :items="treeData"
     dense
     hoverable
     open-all
@@ -20,22 +20,76 @@
 </v-treeview>
 </template>
 <script>
+import { getIconFromType } from './../../../../components/document/controlPropsFactory.js';
 export default {
     computed: {
-        listControlTreeData(){
-            return this.$store.state.document.editor[this.instance].listControlTreeData;
+        sDocumentEditor() {
+            return this.$store.state.document.editor[this.instance].allControl;
         },
+    },
+    watch:{
+        sDocumentEditor: {
+            deep: true,
+            immediate: true,
+            handler(after) {
+                this.handleTreeData(after);
+            },
+        }
     },
     props:{
         instance:{
             type:Number,
             default:Date.now()
-        }
+        },
     },
     data: () => ({
         tree: [],
+        treeData:{}
     }),
     methods:{
+        handleTreeData(data){
+            console.log('asfsadasd',data);
+            let treeData = [{
+                name: 'Control',
+                icon: 'icon/ic_image.png',
+                root: true,
+                children: [
+
+                ],
+            }];
+            let allControl = data
+            for (let controlId in allControl) {
+                let control = allControl[controlId];
+                let type = control.type;
+                let props = control.properties;
+                let name = "";
+                let title = "";
+                if (type == 'submit' || type == 'draft' || type == 'reset' || type == 'approvalHistory') {
+                    name = type
+                    title = type
+                } else {
+                    title = props.title.value;
+                    name = props.name.value;
+                }
+                if (type == 'table') {
+                    let listFields = control.listFields;
+                    let children = [];
+                    for (let childControlId in listFields) {
+                        let childControl = listFields[childControlId];
+                        let childProps = childControl.properties;
+                        let childType = childControl.type;
+                        let childTitle = childProps.title.value;
+                        let childName = childProps.name.value;
+                        let item = { name: childName + " - " + childTitle, icon: getIconFromType(childType), id: childControlId }
+                        children.push(item)
+                    }
+                    treeData[0].children.push({ name: name + " - " + title, active: false, icon: getIconFromType(type), id: controlId, children: children })
+                } else {
+                    treeData[0].children.push({ name: name + " - " + title, active: false, icon: getIconFromType(type), id: controlId })
+                }
+            }
+            this.treeData = treeData;
+        },
         clickItem(item){
             if(item.root == undefined && item.root != true)
             this.$evtBus.$emit("document-editor-click-treeview-list-control",item);

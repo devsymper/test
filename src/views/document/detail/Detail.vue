@@ -221,7 +221,6 @@ export default {
                 if(this.sDocumentEditor.allControl[id] != undefined){   // ton tai id trong store
                     let idField = this.sDocumentEditor.allControl[id].id;
                     let valueInput = this.sDocumentEditor.allControl[id].value
-                    console.log('asgasd',valueInput);
                     if(controlType == "submit" || controlType == "reset" || controlType == "draft"){
                         $(allInputControl[index]).remove()
                     }
@@ -273,7 +272,7 @@ export default {
                                 let idFieldChild = childControlProp.id;
                                 let childControl = new BasicControl(
                                     idFieldChild,
-                                    $(this),
+                                    $(this), 
                                     childControlProp,
                                     thisCpn.keyInstance
                                 );
@@ -294,10 +293,10 @@ export default {
 
             }
             setTimeout(() => {
-                if(thisCpn.isPrint){
+                if(thisCpn.$route.name == 'printDocument'){
                     thisCpn.printDiv();
                 }
-            }, 500);
+            }, 1000);
         },
         
         printDiv(){

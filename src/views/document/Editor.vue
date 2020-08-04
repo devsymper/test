@@ -106,7 +106,6 @@ import {checkInTable} from "./common/common";
 import { getInsertionCSS } from "./../../components/document/documentUtil.js";
 import VueResizable from 'vue-resizable';
 import { minimizeControl } from '../../store/document/mutations';
-let isShowAutocompleteControl = false;
 // biến lưu chiều rộng editor trước khi resize 
 const ALL_CONTROL = "allControl"
 const HTML_CONTENT = "content"
@@ -209,7 +208,6 @@ export default {
     watch:{
         // kiểm tra xem route thay đổi khi vào editor là edit doc hay create doc
         '$route' (to) {
-            console.log("assadasd",to);
             this.$store.commit("document/setDefaultEditorStore",{instance:this.keyInstance});
             this.documentId = Date.now();
             if(to.name =='editDocument'){

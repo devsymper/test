@@ -301,7 +301,6 @@ export default class Table {
                     },
 
                     afterChange: function(changes, source) {
-                        console.log('sakdasdasd', changes);
 
                         if (changes == null) {
                             return
@@ -869,8 +868,7 @@ export default class Table {
                 if (changes.length == 0) {
                     return
                 }
-                console.log('changesreadOnlyreadOnly', changes);
-                if (changes[0][1] == 's_table_id_sql_lite') {
+                if (changes[0][1] == 's_table_id_sql_lite' && !thisObj.checkDetailView()) {
                     setTimeout(() => {
                         let currentRowData = thisObj.tableInstance.getDataAtRow(changes[0][0]);
                         let columns = thisObj.columnsInfo.columns;
@@ -954,27 +952,26 @@ export default class Table {
             }
 
             if (this.tableHasRowSum) {
-
-
                 data.push({})
             }
             this.tableInstance.updateSettings({
                     data: data
                 })
                 // sau khi đổ dữ liệu vào table thì ko chạy các sự kiện của table nên cần chạy công thức cho các control liên quan sau khi đỏ dữ liệu
-            setTimeout((thisObj) => {
-                for (let index = 0; index < controlBinding.length; index++) {
-                    thisObj.handlerCheckEffectedControlInTable(controlBinding[index]);
-                }
-                if (this.tableHasRowSum) {
-                    for (let controlName in columnHasSum) {
-                        let colIndex = thisObj.getColumnIndexFromControlName(controlName);
-                        let CharAt = String.fromCharCode(65 + columnHasSum[controlName]);
-                        let sumValue = '=SUM(' + CharAt + '1:' + CharAt + '' + (this.tableInstance.countRows() - 1) + ')'
-                        this.tableInstance.setDataAtCell(this.tableInstance.countRows() - 1, colIndex, sumValue, AUTO_SET);
+            if (!this.checkDetailView())
+                setTimeout((thisObj) => {
+                    for (let index = 0; index < controlBinding.length; index++) {
+                        thisObj.handlerCheckEffectedControlInTable(controlBinding[index]);
                     }
-                }
-            }, 50, this);
+                    if (this.tableHasRowSum) {
+                        for (let controlName in columnHasSum) {
+                            let colIndex = thisObj.getColumnIndexFromControlName(controlName);
+                            let CharAt = String.fromCharCode(65 + columnHasSum[controlName]);
+                            let sumValue = '=SUM(' + CharAt + '1:' + CharAt + '' + (this.tableInstance.countRows() - 1) + ')'
+                            this.tableInstance.setDataAtCell(this.tableInstance.countRows() - 1, colIndex, sumValue, AUTO_SET);
+                        }
+                    }
+                }, 50, this);
 
         } else {
             let defaultRow = this.getDefaultData(false);
@@ -994,7 +991,7 @@ export default class Table {
      * Hàm lấy data default lúc load table
      */
     getDefaultData(isCreateSqlTable = true) {
-        if (isCreateSqlTable)
+        if (isCreateSqlTable && !this.checkDetailView())
             this.createSqliteTable();
         let data = [];
         let firstRow = {};
@@ -1004,8 +1001,9 @@ export default class Table {
         if (this.tableHasRowSum) {
             data.push([''])
         }
-        ClientSQLManager.insertRow(this.keyInstance, this.tableName, ['s_table_id_sql_lite'], [id], false);
-        console.log('   ', data);
+        if (!this.checkDetailView()) {
+            ClientSQLManager.insertRow(this.keyInstance, this.tableName, ['s_table_id_sql_lite'], [id], false);
+        }
         return data;
     }
     async createSqliteTable() {
