@@ -134,6 +134,7 @@ export default {
             if(name == "height"){
                 elements.css({height:value});
             }
+            console.log('asgadasdasdas',name,data);
             let tableId = checkInTable(elements);
             if( tableId == this.sCurrentDocument.id)
             tableId = '0';

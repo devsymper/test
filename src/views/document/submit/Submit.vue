@@ -985,7 +985,7 @@ export default {
                         type: "success",
                         title: "update document success!"
                     });        
-                    if(this.$route.name == 'submitDocument')
+                    if(thisCpn.$route.name == 'updateDocumentObject')
                      thisCpn.$router.push('/documents/'+thisCpn.documentId+"/objects");
                 }
                 else{
@@ -1322,6 +1322,14 @@ export default {
                     );
                     controlInstance.setValue(value)
                     markBinedField(this.keyInstance,controlName);
+                    if(controlInstance.isRequiredControl()){
+                        if(controlInstance.isEmpty()){
+                            controlInstance.renderValidateIcon('Không được bỏ trống trường thông tin '+controlInstance.title)
+                        }
+                        else{
+                            controlInstance.removeValidateIcon()
+                        }
+                    }
                     this.handleControlInputChange(controlName)
                 }else{
                     if($('#'+controlId).attr('s-control-type') == 'label'){
@@ -1416,7 +1424,7 @@ export default {
                         let controlFormulas = controlInstance.controlFormulas;
                         
                         for(let formulasType in controlFormulas){
-                            if(formulasType != 'autocomplete'){
+                            if(formulasType != 'autocomplete' && formulasType != 'list'){
                                 if(controlFormulas[formulasType].hasOwnProperty('instance')){
                                     let formulasInstance = controlFormulas[formulasType].instance;
                                     if(formulasInstance.getFormulas() !== "" && Object.keys(formulasInstance.getInputControl()).length == 0){

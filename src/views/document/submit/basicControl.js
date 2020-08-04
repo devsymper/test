@@ -428,10 +428,6 @@ export default class BasicControl extends Control {
         this.ele.text('').css({ border: 'none' })
     }
     renderSelectControl() {
-        let id = this.ele.attr('id');
-        let keyinstance = this.ele.attr('key-instance');
-        this.ele.replaceWith('<input class="s-control s-control-select" s-control-type="select" type="text" title="Select" readonly="readonly" id="' + id + '" key-instance="' + keyinstance + '">');
-        this.ele = $('#' + id);
         let thisObj = this;
         this.ele.on('click', function(e) {
             /**
@@ -449,7 +445,7 @@ export default class BasicControl extends Control {
                 instance: thisObj.curParentInstance
             });
             $(this).addClass('autocompleting');
-            let formulasInstance = thisObj.controlFormulas.formulas.instance;
+            let formulasInstance = thisObj.controlFormulas.list.instance;
             SYMPER_APP.$evtBus.$emit('document-submit-select-input', { e: e, selectFormulasInstance: formulasInstance, alias: thisObj.name, controlTitle: thisObj.title })
         })
         this.ele.on('change', function(e) {

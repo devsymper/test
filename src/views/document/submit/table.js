@@ -241,7 +241,7 @@ export default class Table {
 
 
                     beforeKeyDown: function(event) {
-                        if (event.ctrlKey || event.altKey || event.shiftKey || event.metaKey) {
+                        if (event.ctrlKey || event.altKey || event.metaKey) {
                             return;
                         }
 
@@ -649,6 +649,10 @@ export default class Table {
                     let rowInput = allRowDataInput[index];
                     dataPost[listIdRow[index]] = rowInput;
                 }
+            } else {
+                for (let index = 0; index < listIdRow.length; index++) {
+                    dataPost[listIdRow[index]] = "";
+                }
             }
             let dataForStore = [];
             await formulasInstance.getDataMultiple(dataPost).then(res => {
@@ -752,8 +756,8 @@ export default class Table {
         let controlInstance = this.getControlInstance(this.currentControlSelected);
         if (controlInstance != null && controlInstance != undefined) {
             let controlFormulas = controlInstance.controlFormulas;
-            if (controlFormulas.hasOwnProperty('formulas')) {
-                let formulasInstance = controlFormulas['formulas'].instance;
+            if (controlFormulas.hasOwnProperty('list')) {
+                let formulasInstance = controlFormulas['list'].instance;
                 event.curTarget = event.target;
                 SYMPER_APP.$evtBus.$emit('document-submit-select-input', {
                     e: event,
@@ -824,6 +828,9 @@ export default class Table {
             // minSpareRows: (thisObj.checkDetailView()) ? 0 : 1,
             height: 'auto',
             afterRender: function(isForced) {
+                if (thisObj.tableHasRowSum)
+                    $('.handsontable  span.rowHeader').last().text('Tổng').css({ 'font-weight': 'bold' })
+
                 let tbHeight = this.container.getElementsByClassName('htCore')[0].getBoundingClientRect().height;
                 if (tbHeight < MAX_TABLE_HEIGHT) {} else {
                     $(this.rootElement).css('height', MAX_TABLE_HEIGHT);
@@ -838,6 +845,7 @@ export default class Table {
                         hotTb.render();
                     }, 500, this);
                 }
+
             },
             beforeCreateRow: function(i, amount) {
                 let hotTb = this;

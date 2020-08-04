@@ -940,6 +940,10 @@ export default {
                         }
                         let content = res.data.document.content;
                         thisCpn.$refs.editor.editor.setContent(content);
+                        $("#editor_ifr").contents().find('body select').each(function(e){
+                            let id = $(this).attr('id')
+                            $(this).replaceWith('<input class="s-control s-control-select" s-control-type="select" type="text" title="Select" readonly="readonly" id="' + id + '"/>');
+                        })
                         if(res.data.document.version == 1){
                             thisCpn.setContentForDocumentV1(res.data.document);
                         }
@@ -1032,6 +1036,7 @@ export default {
                         if(listField[childFieldId]['formulas'] != false){
                             $.each(childFormulas,function(k,v){
                                 if(listField[childFieldId]['formulas'][k] != ""){
+                                    if(listField[childFieldId]['formulas'][k] != undefined)
                                     childFormulas[k].value = Object.values(listField[childFieldId]['formulas'][k])[0]
                                     // childFormulas[k].formulasId = Object.keys(listField[childFieldId]['formulas'][k])[0]
                                 }
