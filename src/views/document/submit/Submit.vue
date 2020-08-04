@@ -19,11 +19,11 @@
             <sym-drag-panel
                 ref="symDragPanel"
                 :dragPanelWidth="600"
-                :dragPanelHeight="'auto'"
                 :topPosition='topPositionDragPanel'
                 :leftPosition="leftPositionDragPanel"
                 :actionTitle="titleDragPanel"
                 :titleIcon="titleDragPanelIcon"
+                :styleBody="{overflow:'hidden',width:'100%'}"
             >
                 <template slot="drag-panel-content">
                     <!-- <submitDocument :isQickSubmit="true" :docId="340" v-if="!isQickSubmit"/> -->

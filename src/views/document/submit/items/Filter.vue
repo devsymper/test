@@ -1,6 +1,6 @@
 <template>
-    <div>
-        <div>
+    <div class="content-filter">
+        <div class="search-filter">
             <v-text-field
                 prepend-inner-icon="mdi-magnify"
                 outlined
@@ -12,8 +12,12 @@
                 hide-details
             ></v-text-field>
         </div>
-        <data-table ref="dataTable" :columns="columns" :data="data" class="hot-table" :style="{'max-height':tableMaxHeight+'px','overflow':'auto'}"></data-table>
-        <v-btn @click="saveInputFilter" small right class="save-input-filter">Lưu</v-btn>
+        <div class="content-table">
+            <!-- :style="{'max-height':tableMaxHeight+'px','overflow':'auto'}" -->
+            <data-table ref="dataTable" :isRenderAllRows="true" :columns="columns" @cell-change="cellChange" :data="data" class="hot-table" ></data-table>
+
+        </div>
+        <v-btn @click="saveInputFilter" small color="primary" right class="save-input-filter">Lưu</v-btn>
     </div>
 </template>
 <script>
@@ -41,7 +45,8 @@ export default {
             curControlId:null,
             formulas:null,
             search:null,
-            controlName:null
+            controlName:null,
+            dataSelected:[]
         }
     },
     created(){
@@ -71,28 +76,41 @@ export default {
                     let colName = str.nonAccentVietnamese(c);
                     item1[colName] = row[c];
                 }
-                item1['active'] = false;
+                if(this.dataSelected.includes(row[this.colActive])){
+                    item1['active'] = true;
+                }
+                else{
+                    item1['active'] = false;
+                }
                 dataTable.push(item1)
             }   
+            this.data = null;
             this.data = dataTable;
             this.curControlId = controlId;
-            // setTimeout(() => {
-            //     this.$refs.dataTable.reRender();
-            // }, 1000);
+        },
+        cellChange(res){
+            let changes = res.changes;
+            let source = res.source;
+            if(source == 'edit' && changes[0][1] == 'active'){
+                let rowIndex = changes[0][0];
+                let tableInstance = this.$refs.dataTable.getTableInstance();
+                let rowData = tableInstance.getDataAtRow(rowIndex);
+                let colHeader = tableInstance.getColHeader();
+                let indexColDataActive = colHeader.indexOf(this.colActive);
+                if(changes[0][3] == true){
+                    this.dataSelected.push(rowData[indexColDataActive]);
+                }
+                else{
+                    const index = this.dataSelected.indexOf(rowData[indexColDataActive]);
+                    if (index > -1) {
+                        this.dataSelected.splice(index, 1);
+                    }
+                }
+            }
+            console.log("kasjdgsad",this.dataSelected);
         },
         saveInputFilter(){
-            let data = this.$refs.dataTable.getData();
-            let data1 = data.filter(d => {
-                return d[d.length - 1] == true;
-            })
-            let index1 = this.$refs.dataTable.getColName(this.colActive);
-            let dataResult = ""
-            for (let index = 0; index < data1.length; index++) {
-                let item = data1[index];
-                dataResult += item[index1] + ","
-            }
-            dataResult = dataResult.substring(0, dataResult.length - 1);
-            this.$emit('save-input-filter',{controlId:this.curControlId,value:dataResult});
+            this.$emit('save-input-filter',{controlId:this.curControlId,value:this.dataSelected.join()});
             
         },
         setFormulas(formulas,controlName){
@@ -142,5 +160,16 @@ export default {
     }
     .hot-table >>> .handsontable .ht_master .wtHolder{
         overflow-y: hidden !important;
+    }
+    .content-table{
+        height: calc(100% - 70px);
+        overflow-x: hidden;
+        overflow-y: scroll;   
+    }
+    .content-filter{
+        height: 100%;
+    }
+    .content-filter .search-filter{
+        margin-right: 17px;
     }
 </style>

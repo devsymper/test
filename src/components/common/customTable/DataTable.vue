@@ -4,8 +4,10 @@
             ref="dataTable"
             :settings="tableSettings"
             :data="data"
+            :renderAllRows="isRenderAllRows"
             :columns="tableColumns"
             :minSpareRows="minSpareRows"
+            
         ></hot-table>
     </div>
 </template>
@@ -34,6 +36,9 @@ export default {
         },
         reRender(){
             this.$refs.dataTable.hotInstance.render()
+        },
+        getTableInstance(){
+            return this.$refs.dataTable.hotInstance
         }
     },
     data() {
@@ -44,6 +49,9 @@ export default {
                 licenseKey: "non-commercial-and-evaluation",
                 afterRender: function (param) {
                     self.resetTbWrapperHeight();
+                },
+                afterChange(changes,source){
+                    self.$emit('cell-change',{changes:changes,source:source})
                 }
             }
         };
@@ -63,6 +71,10 @@ export default {
         },
         minSpareRows: {
             default: 0
+        },
+        isRenderAllRows: {
+            type:Boolean,
+            default: false
         }
     },
     computed: {
