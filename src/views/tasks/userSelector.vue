@@ -106,11 +106,38 @@ export default {
         this.selected = this.value;
     },
     data: function() {
+         const srcs = {
+            1: 'https://cdn.vuetifyjs.com/images/lists/1.jpg',
+            2: 'https://cdn.vuetifyjs.com/images/lists/2.jpg',
+            3: 'https://cdn.vuetifyjs.com/images/lists/3.jpg',
+            4: 'https://cdn.vuetifyjs.com/images/lists/4.jpg',
+            5: 'https://cdn.vuetifyjs.com/images/lists/5.jpg',
+        }
         return {
             avatarDefault: avatarDefault,
             autoUpdate: true,
             isUpdating: false,
             selected: [],
+            people: [
+                { id: 1, name: 'Sandra Adams', role: 'BA', avatar: srcs[1] },
+                { id: 2, name: 'Ali Connors', role: 'BA', avatar: srcs[2] },
+                { id: 3, name: 'Trevor Hansen', role: 'BA', avatar: srcs[3] },
+                { id: 4, name: 'Tucker Smith', role: 'BA', avatar: srcs[2] },
+                { id: 5, name: 'Britta Holt', role: 'BA', avatar: srcs[4] },
+                { id: 6, name: 'Jane Smith ', role: 'BA', avatar: srcs[5] },
+                { id: 7, name: 'John Smith', role: 'BA', avatar: srcs[1] },
+                { id: 8, name: 'Sandra Williams', role: 'BA', avatar: srcs[3] },
+            ],
+            users: {
+                1: { name: 'Sandra Adams', role: 'BA', avatar: srcs[1] },
+                2: { name: 'Ali Connors', role: 'BA', avatar: srcs[2] },
+                3: { name: 'Trevor Hansen', role: 'BA', avatar: srcs[3] },
+                4: { name: 'Tucker Smith', role: 'BA', avatar: srcs[2] },
+                5: { name: 'Britta Holt', role: 'BA', avatar: srcs[4] },
+                6: { name: 'Jane Smith ', role: 'BA', avatar: srcs[5] },
+                7: { name: 'John Smith', role: 'BA', avatar: srcs[1] },
+                8: { name: 'Sandra Williams', role: 'BA', avatar: srcs[3] },
+            }
         }
     },
     methods: {
@@ -124,6 +151,12 @@ export default {
         },
         handleChangeValue(value){
             this.$refs.userSelectAutocomplete.lazySearch= '';
+        },
+        getUser(id) {
+            if (id == null || id == NaN) {
+                return null;
+            }
+            return this.users[id];
         }
     },
     computed: {

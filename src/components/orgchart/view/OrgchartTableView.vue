@@ -39,13 +39,17 @@
 
 
             <v-tab-item :key="'diagramView'" class="px-2 pt-2 h-100">
-                <OrgStructureView
+                <!-- <OrgStructureView
                 ref="orgStructureView"
                 :mapDpmToPos="mapDpmToPos"
                 :allDepartments="allDepartments"
                 :allPositions="allPositions">
                     
-                </OrgStructureView>
+                </OrgStructureView> -->
+                <OrgchartEditor
+                    :action="'view'"
+                    :id="$route.params.id">
+                </OrgchartEditor>
             </v-tab-item>
 
         </v-tabs-items>
@@ -59,6 +63,8 @@ import { getMapDpmIdToPosition } from '../editor/nodeAttrFactory'
 import NodeNameInTable  from "./NodeNameInTable.vue";
 import UserInNodeView  from "./UserInNodeView.vue";
 import OrgStructureView from './OrgStructureView.vue';
+import OrgchartEditor from "@/components/orgchart/editor/OrgchartEditor.vue";
+
 export default {
     props: {
         allDepartments: {
@@ -75,7 +81,8 @@ export default {
     },
     components: {
         'AgDataTable' : AgDataTable,
-        'OrgStructureView': OrgStructureView
+        'OrgStructureView': OrgStructureView,
+        OrgchartEditor
     },
     computed: {
         dataTable(){

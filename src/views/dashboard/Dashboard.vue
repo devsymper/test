@@ -6,7 +6,7 @@
                 v-for="dashboard in listDashboard"
                 :key="dashboard.id"
                 class="w-100 h-100">
-                    <iframe class="w-100 h-100" :src="'https://bi-v1.symper.vn/#/dashboard/'+dashboard.id+'/view'" frameborder="0"></iframe>
+                    <iframe class="w-100 h-100" :src="'https://bi.symper.vn/#/dashboard/'+dashboard.id+'/view'" frameborder="0"></iframe>
             </v-tab-item>
         </v-tabs-items>
 
