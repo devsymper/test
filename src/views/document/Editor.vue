@@ -1,7 +1,7 @@
 <template>
     <v-flex class="d-flex sym-document" style="height:calc(100%);">
         <div class="sym-document__side-bar-left">
-            <sidebar-left :instance="keyInstance"/>
+            <sidebar-left/>
         </div>
             <vue-resizable 
             :active="['r']" 
@@ -13,7 +13,7 @@
 
             <div class="sym-document-body">
                 <div class="sym-document-action">
-                    <editor-action 
+                    <editor-action
                     @document-action-save-document="openPanelSaveDocument"
                     @document-action-clone-control="cloneControl"
                     @document-action-list-control-option="setShowAllControlOption"
@@ -32,6 +32,7 @@
                     @onClick="detectClickEvent"
                     @onBlur="detectBlurEditorEvent"
                     @onInit="initEditor"
+                    @onPaste="onPaste"
                     :init="{
                         forced_root_block:'div',
                         toolbar_items_size : 'small',
@@ -58,7 +59,7 @@
                                     showSettingControlTable(e);
                                 }
                             });
-                          
+                        
                             ed.ui.registry.addButton('margin', {
                             icon:'margin',
                             tooltip:'Margin',
@@ -83,6 +84,17 @@
         <err-message :listErr="listMessageErr" ref="errMessage"/>
         <control-name-related :instance="keyInstance"  ref="controlNameRelated"/>
         <all-control-option :instance="keyInstance" ref="allControlOption"/>
+
+        <v-dialog v-model="dialog" persistent max-width="290">
+            <v-card>
+                <v-card-title class="headline">Chuyển sang định dạng version 2</v-card-title>
+                <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn color="green darken-1" text @click="dialog = false">Hủy bỏ</v-btn>
+                <v-btn color="green darken-1" text @click="handlePasteContent">Đồng ý</v-btn>
+                </v-card-actions>
+            </v-card>
+            </v-dialog>
     </v-flex>
 </template>
 <script>
@@ -111,6 +123,7 @@ const ALL_CONTROL = "allControl"
 const HTML_CONTENT = "content"
 const CODUMENT_PROPS = "documentProperties"
 export default { 
+    name: 'DocumentEditor',
     computed: {
         editorStore(){  
             return this.$store.state.document.editor[this.keyInstance];
@@ -131,6 +144,17 @@ export default {
         "vue-resizable":VueResizable,
         "all-control-option":AllControlInDoc,
         "control-name-related":ControlNameRelated,
+    },
+    mounted(){
+        if($("#editor_ifr")[0]){
+            $("#editor_ifr")[0].symperEditorVueInstance = this;
+        }
+    },
+    activated(){
+        // anh thuwr settimeout o day xem, luc nayy editor chua init xong dau, ok, 
+        if($("#editor_ifr")[0]){
+            $("#editor_ifr")[0].symperEditorVueInstance = this;
+        }
     },
     created() {
         this.$store.commit("document/setDefaultEditorStore",{instance:this.keyInstance});
@@ -177,7 +201,8 @@ export default {
             lastKeypressTime : 0,
             listIconToolbar:null,
             listNameValueControl:{},
-            keyInstance:Date.now()
+            keyInstance:Date.now(),
+            dialog: false,
         }
     },
     beforeMount(){
@@ -208,8 +233,8 @@ export default {
     watch:{
         // kiểm tra xem route thay đổi khi vào editor là edit doc hay create doc
         '$route' (to) {
-            this.$store.commit("document/setDefaultEditorStore",{instance:this.keyInstance});
             this.documentId = Date.now();
+            this.$store.commit("document/setDefaultEditorStore",{instance:this.keyInstance});
             if(to.name =='editDocument'){
                 this.documentId = to.params.id;
             }
@@ -219,6 +244,14 @@ export default {
         }
     },
     methods:{
+        onPaste(event,editor){
+            this.dialog = true;
+            
+        },
+        handlePasteContent(){
+            this.dialog = false;
+            this.setContentForDocumentV1();
+        },
         px2cm(px) {
             return (Math.round((px / 37.7952) * 100) / 100).toFixed(1);
         },
@@ -844,16 +877,20 @@ export default {
         resizeEditorEnd(e){
             $('#bg-over-editor').remove();
         },
-        setContentForDocumentV1(dataDocument){
+        setContentForDocumentV1(){
             let thisCpn = this;
             $("#editor_ifr").contents().find('.bkerp-input').addClass('s-control').removeClass('bkerp-input');
+            $("#editor_ifr").contents().find('.mce-item-table').css({width:'100%'}).attr('data-mce-style','width:100%');
             $("#editor_ifr").contents().find('head link').remove()
             $("#editor_ifr").contents().find('body link').remove()
             $("#editor_ifr").contents().find('body meta').remove()
             $("#editor_ifr").contents().find('body style').remove()
             let allControl = $("#editor_ifr").contents().find('.s-control:not(.bkerp-input-table .s-control)');
+            console.log('safashd',allControl);
             $.each(allControl,function(item,value){
                 let controlProps = $(value).attr('data-property');
+                controlProps = controlProps.replace(/\"\[/gm,"[");
+                controlProps = controlProps.replace(/\]\"/gm,"]");
                 let type = $(value).attr('bkerp-type');
                 let style = $(value).attr('style');
                 if(type == 'text') type = 'textInput'
@@ -864,10 +901,10 @@ export default {
                 controlEl.attr('id', inputid).attr('style',style);
                 controlEl.replaceAll($(value))
                 try {
-                    //loi parse ở đây
                     controlProps = JSON.parse(controlProps);
                     let controlProp = {};
                     let controlFormulas = {};
+                    console.log('safashd',controlProps);
                     $.each(controlProps,function(k,v){
                         if(mappingOldVersionControlProps[k] != undefined && controlV2.properties[mappingOldVersionControlProps[k]] != undefined){
                             controlV2.properties[mappingOldVersionControlProps[k]].value = v;
@@ -943,7 +980,7 @@ export default {
                             $(this).replaceWith('<input class="s-control s-control-select" s-control-type="select" type="text" title="Select" readonly="readonly" id="' + id + '"/>');
                         })
                         if(res.data.document.version == 1){
-                            thisCpn.setContentForDocumentV1(res.data.document);
+                            thisCpn.setContentForDocumentV1();
                         }
                         else{
                             let fields = res.data.fields;
@@ -1009,6 +1046,7 @@ export default {
                     })
                 }
                 if(fields[controlId].type != "table"){
+                    console.log('ạdsajdsad');
                     this.addToAllControlInDoc(controlId,{properties: properties, formulas : formulas,type:fields[controlId].type});
                 }
                 else{
@@ -1051,7 +1089,9 @@ export default {
 
         // sự kiện xảy ra khi khởi tạo xong editor , sự kiện do tinymce cung cấp
         initEditor(){
+
             let thisCpn = this;
+
             if(this.documentId != 0 && this.documentId != undefined)    // trường họp edit doc thì gọi api lấy dữ liệu
             thisCpn.getContentDocument();
             var currentElement, currentElementChangeFlag, elementRectangle, countdown, dragoverqueue_processtimer;
@@ -1506,8 +1546,11 @@ export default {
                  thisCpn.setSelectedControlProp(e,$(this),clientFrameWindow);
             })
             $("#editor_ifr").contents().find('body').on('click','.s-control',function(e){
+                let el = this;
+                let editorInstance = util.getClosestVueInstanceFromDom($("#editor")[0], 'DocumentEditor');
+                editorInstance = $("#editor")[0].__vue__.$parent.$parent;
                 e.stopPropagation();
-                thisCpn.setSelectedControlProp(e,$(this),clientFrameWindow);
+                editorInstance.setSelectedControlProp(e,$(el),clientFrameWindow);
             })
 
             // sự kiện thả control vào doc

@@ -166,7 +166,7 @@ export default {
                 tableId = this.mapNameToControlId[params.tableName];
             }
             this.$store.commit(
-                "document/updateProp",{id:controlId,name:params.colDef.field,value:value,tableId:tableId,type:"value"}
+                "document/updateProp",{id:controlId,name:params.colDef.field,value:value,tableId:tableId,type:"value",instance:this.instance}
             );   
             
         },
@@ -179,8 +179,6 @@ export default {
                 let formulas = allControl[id].formulas;
                 let type = allControl[id].type;
                 let row = {};
-                console.log(allControl[id]);
-                
                 for (let propType in props){
                     let value = props[propType].value;
                     if(props[propType].type == 'checkbox'){
@@ -191,12 +189,10 @@ export default {
                         row[propType] = [value];
                     }
                 }
-                if(type == "submit" || type == "reset" || type == "draft"){
+                if(type == "submit" || type == "reset" || type == "draft" || type == "approvalHistory"){
                     row['name'] = [type];
                     row['title'] = [type];
                 }
-                console.log(row);
-                
                 this.mapNameToControlId[row['name'][0]] = id;
                 row['icon'] = getIconFromType(type);
                 for (let f in formulas){

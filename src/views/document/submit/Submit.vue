@@ -62,22 +62,15 @@
                 <v-btn fab dark small color="green" @click="handlerSubmitDocumentClick">
                     <v-icon>mdi-content-save</v-icon>
                 </v-btn>
-                <!-- <v-btn
+                <v-btn
                         fab
                         dark
                         small
                         color="indigo"
+                        @click="handlerSubmitDocumentClick"
                     >
-                        <v-icon>mdi-plus</v-icon>
+                        <v-icon>mdi-trash-can-outline</v-icon>
                     </v-btn>
-                    <v-btn
-                        fab
-                        dark
-                        small
-                        color="red"
-                    >
-                        <v-icon>mdi-delete</v-icon>
-                </v-btn>-->
             </v-speed-dial>
             <err-message :listErr="listMessageErr" ref="errMessage"/>
         </div>
