@@ -1,17 +1,13 @@
 <template>
     <list-items
-        :getDataUrl="'https://sdocument-management.symper.vn/documents/'+docId+'/objects'"   
+        :getDataUrl="'https://sdocument-management.symper.vn/documents/'+docId+'/draft-objects'"   
         :useDefaultContext="false"
         :tableContextMenu="tableContextMenu"
-        :pageTitle="$t('documentObject.title')"
+        :pageTitle="$t('draft.title')"
         :containerHeight="containerHeight"
         :actionPanelWidth="actionPanelWidth"
-        @after-open-add-panel="submitDocument"
         ref="listObject"
     >
-        <div slot="right-panel-content" class="h-100">
-            <detail-object :docObjInfo="docObjInfo"/>
-        </div>
     </list-items>
 </template>
 <script>
@@ -37,12 +33,12 @@ export default {
                     callback: (documentObject, callback) => {
                         console.log('das',documentObject);
                         let ids = documentObject.reduce((arr,obj)=>{
-                            arr.push(obj.document_object_id);
+                            arr.push(obj.id);
                             return arr;
                         },[]);
                         let thisCpn = this;
                         documentApi
-                        .deleteDocumentObject({objectIds:ids.join()})
+                        .deleteDocumentDraftObject({objectIds:ids.join()})
                         .then(res => {
                             if (res.status == 200) {
                                 thisCpn.$snotify({
@@ -64,34 +60,13 @@ export default {
                     },
                 },
                 {
-                    name: "detail",
-                    text: "Xem chi tiết",
+                    name: "submit",
+                    text: "Nhập liệu",
                     callback: (documentObject, callback) => {
-                        this.$goToPage('/documents/objects/'+documentObject.document_object_id,"Danh sách bản ghi");
+                        this.$goToPage('/document/objects/update/'+documentObject.id,"Cập nhật");
                     },
                 },
-                {
-                    name: "print",
-                    text: "In",
-                    callback: (documentObject, callback) => {
-                        this.$goToPage('/documents/objects/'+documentObject.document_object_id+'/print',"In");
-                    },
-                },
-                {
-                    name: "detailInView",
-                    text: "Xem trong trang",
-                    callback: (documentObject, callback) => {
-                        this.$refs.listObject.openactionPanel();
-                        this.docObjInfo = {docObjId:parseInt(documentObject.document_object_id),docSize:'100%'}
-                    },
-                },
-                {
-                    name: "edit",
-                    text: "Cập nhật",
-                    callback: (documentObject, callback) => {
-                        this.$goToPage('/document/objects/update/'+documentObject.document_object_id,"Cập nhật");
-                    },
-                },
+               
             ],
         }
     },

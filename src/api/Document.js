@@ -20,6 +20,9 @@ export const documentApi = {
     deleteDocumentObject(objectIds) {
         return coreApi.delete("documents/objects", objectIds);
     },
+    deleteDocumentDraftObject(objectIds) {
+        return coreApi.delete("documents/draft-objects", objectIds);
+    },
     detailDocumentObject(objectId) {
         return coreApi.get("documents/objects/" + objectId);
     },
@@ -47,5 +50,11 @@ export const documentApi = {
     },
     getBatchFieldInfoInDoc(data) {
         return coreApi.post("documents/fields/batch", data);
-    }
+    },
+
+
+    //draft
+    submitDraftDocument(data) {
+        return coreApi.post("documents/draft-objects", data);
+    },
 };

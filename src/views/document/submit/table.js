@@ -48,7 +48,7 @@ Handsontable.renderers.PercentRenderer = function(instance, td, row, col, prop, 
     td.style.textAlign = 'left'
     let table = store.state.document.submit[instance.keyInstance];
     td.textContent = (td.textContent == "" || td.textContent == null) ? 0 + " %" : td.textContent + " %";
-    if (row == instance.countRows() - 1 && table != undefined) {
+    if (row == instance.countRows() - 1 && table != undefined && instance.hasOwnProperty('tableName')) {
         let tableControl = table.listInputInDocument[instance.tableName];
         let tableInstance = tableControl.tableInstance;
         if (tableInstance.tableHasRowSum) {

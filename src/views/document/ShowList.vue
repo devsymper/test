@@ -86,6 +86,13 @@ export default {
                         this.$goToPage('/documents/'+document.id+'/objects',"Danh sách bản ghi");
                     },
                 },
+                {
+                    name: "listDraftObject",
+                    text: "Danh sách bản nháp",
+                    callback: (document, callback) => {
+                        this.$goToPage('/documents/'+document.id+'/draft-objects',"Danh sách bản nháp");
+                    },
+                },
             ],
         }
     },

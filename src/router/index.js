@@ -212,6 +212,14 @@ const routes = [{
             import ('../views/document/listobject/ListObject.vue'),
 
     },
+    {
+        path: "/documents/:id?/draft-objects",
+        name: "listDocumentDraftObject",
+        // component: ListObject,
+        component: () =>
+            import ('../views/document/draft/DraftList.vue'),
+
+    },
     //service
 
     {

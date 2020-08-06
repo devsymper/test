@@ -294,6 +294,13 @@
     "documentObject": {
         "title": "List Document Object"
     },
+    "draft": {
+        "title": "List Draft Object",
+        "table": {
+            "id": "Id",
+            "createAt": "Create at"
+        }
+    },
     "service": {
         "title": "List service",
         "table": {

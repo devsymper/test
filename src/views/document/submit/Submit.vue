@@ -63,11 +63,12 @@
                     <v-icon>mdi-content-save</v-icon>
                 </v-btn>
                 <v-btn
+                        v-if="this.isDraft != 1"
                         fab
                         dark
                         small
                         color="indigo"
-                        @click="handlerSubmitDocumentClick"
+                        @click="handlerDraftClick"
                     >
                         <v-icon>mdi-trash-can-outline</v-icon>
                     </v-btn>
@@ -206,7 +207,8 @@ export default {
             titleValidate:"",
             messageValidate:"",
             isComponentActive:false,
-            cacheDataRunFormulas:{}
+            cacheDataRunFormulas:{},
+            isDraft:0
         };
     },
     beforeMount() {
@@ -691,6 +693,7 @@ export default {
                             instance: this.keyInstance
                         })
                         thisCpn.documentId = res.data.documentId;
+                        thisCpn.isDraft = res.data.isDraft;
                         thisCpn.loadDocumentData();
                     }
                     else{
@@ -895,6 +898,37 @@ export default {
         },
 
 
+        handlerDraftClick(){
+            this.isSubmitting = true;
+            let thisCpn = this;
+            let dataPost = this.getDataPostSubmit();
+            dataPost['documentId'] = this.documentId;
+            documentApi.submitDraftDocument(dataPost).then(res => {
+                thisCpn.isSubmitting = false;
+                if (res.status == 200) {
+                    thisCpn.$snotify({
+                        type: "success",
+                        title: "Submit draft success!"
+                    });        
+                    thisCpn.$router.push('/documents/'+thisCpn.documentId+"/draft-objects");
+                }
+                else{
+                    thisCpn.$snotify({
+                        type: "error",
+                        title: res.message
+                    });
+                }
+            })
+            .catch(err => {
+                console.warn(err);
+                thisCpn.$snotify({
+                        type: "error",
+                        title: "error from submit document api!!!"
+                    });
+            })
+            .always(() => {
+            });
+        },
         handlerSubmitDocumentClick(){
             if($('.validate-icon').length == 0){
                 if(this.viewType == 'submit'){
@@ -970,6 +1004,9 @@ export default {
             let thisCpn = this;
             let dataPost = this.getDataPostSubmit();
             dataPost['documentId'] = this.documentId;
+            if(this.isDraft == 1){
+                dataPost['isDraft'] = true;
+            }
             documentApi.updateDocument(this.docObjId,dataPost).then(res => {
                 thisCpn.$emit('submit-document-success',res.data);
                 thisCpn.isSubmitting = false;

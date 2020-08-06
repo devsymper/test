@@ -9,6 +9,7 @@ const addControl = (state, params) => {
     let id = params.id
     let prop = params.props
     let instance = params.instance
+    console.log("ádsafasfsad", params);
     Vue.set(state.editor[instance].allControl, id, prop);
 
 };
