@@ -304,4 +304,78 @@ export default class Control {
             return false;
         }
     }
+
+    /**
+     * Hàm kiểm tra độ dài giá tri nhập vào với control TextInput
+     */
+
+    checkValidValueLength(rowIndex) {
+        let rs = true;
+        if (this.inTable != false) {
+            let table = getListInputInDocument(this.curParentInstance)[this.inTable];
+            let colIndex = table.tableInstance.getColumnIndexFromControlName(this.name);
+            let dataAtCol = table.tableInstance.tableInstance.getDataAtCol(colIndex);
+            if (rowIndex == "all") {
+                for (let index = 0; index < dataAtCol.length; index++) {
+                    table.tableInstance.validateValueMap[rowIndex + "_" + colIndex] = { validate: false }
+                    let row = dataAtCol[index];
+                    if (row == null) {
+                        row = "";
+                    }
+                    if (this.controlProperties.maxValue.value != "") {
+                        if (row.length > this.controlProperties.maxValue.value) {
+                            table.tableInstance.validateValueMap[index + "_" + colIndex] = { validate: true, msg: 'Độ dài kí tự không được vượt quá ' + this.controlProperties.maxValue.value + " kí tự" };
+                            rs = false;
+                        }
+                    }
+                    if (this.controlProperties.minValue.value != "") {
+                        if (row.length < this.controlProperties.minValue.value) {
+                            table.tableInstance.validateValueMap[index + "_" + colIndex] = { validate: true, msg: 'Độ dài kí tự không được ít hơn ' + this.controlProperties.minValue.value + " kí tự" };
+                            rs = false;
+                        }
+                    }
+                }
+            } else {
+                let value = dataAtCol[rowIndex];
+                if (value == null) {
+                    value = "";
+                }
+                if (this.type == "textInput") {
+                    table.tableInstance.validateValueMap[rowIndex + "_" + colIndex] = { validate: false }
+                    if (this.controlProperties.maxValue.value != "") {
+                        if (value.length > this.controlProperties.maxValue.value) {
+                            table.tableInstance.validateValueMap[rowIndex + "_" + colIndex] = { validate: true, msg: 'Độ dài kí tự không được vượt quá ' + this.controlProperties.maxValue.value + " kí tự" };
+                            rs = false;
+                        }
+                    }
+                    if (this.controlProperties.minValue.value != "") {
+                        if (value.length < this.controlProperties.minValue.value) {
+                            table.tableInstance.validateValueMap[rowIndex + "_" + colIndex] = { validate: true, msg: 'Độ dài kí tự không được ít hơn ' + this.controlProperties.minValue.value + " kí tự" };
+                            rs = false;
+                        }
+                    }
+                }
+            }
+            table.tableInstance.tableInstance.render()
+        } else {
+            if (this.type == "textInput") {
+                this.removeValidateIcon()
+                if (this.controlProperties.maxValue.value != "") {
+                    if (this.value.length > this.controlProperties.maxValue.value) {
+                        this.renderValidateIcon('Độ dài kí tự không được vượt quá ' + this.controlProperties.maxValue.value + " kí tự");
+                        rs = false;
+
+                    }
+                }
+                if (this.controlProperties.minValue.value != "") {
+                    if (this.value.length < this.controlProperties.minValue.value) {
+                        this.renderValidateIcon('Độ dài kí tự không được ít hơn ' + this.controlProperties.maxValue.value + " kí tự");
+                        rs = false;
+                    }
+                }
+            }
+        }
+
+        return rs
+    }
 }

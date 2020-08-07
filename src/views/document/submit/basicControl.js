@@ -44,6 +44,8 @@ const fileTypes = {
 export default class BasicControl extends Control {
     constructor(idField, ele, controlProps, curParentInstance, value) {
         super(idField, ele, controlProps, curParentInstance, value);
+        this.minValue = (this.controlProperties.hasOwnProperty('minValue')) ? this.controlProperties.minValue.value : false;
+        this.maxValue = (this.controlProperties.hasOwnProperty('maxValue')) ? this.controlProperties.maxValue.value : false;
     }
 
 
@@ -429,6 +431,7 @@ export default class BasicControl extends Control {
     }
     renderSelectControl() {
         let thisObj = this;
+        this.ele.attr('readonly', 'readonly')
         this.ele.on('click', function(e) {
             /**
              * TH control select ở ngoài table

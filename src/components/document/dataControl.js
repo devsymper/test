@@ -2,7 +2,6 @@ import { GetControlProps } from "./../../components/document/controlPropsFactory
 import store from './../../store'
 import sDocument from './../../store/document'
 import { util } from "./../../plugins/util.js";
-import { RowComp } from "ag-grid-community";
 
 
 /**
@@ -106,7 +105,7 @@ export const setDataForPropsControl = function(fields, instance, from) {
 }
 
 function addToAllControlInDoc(controlId, control, instance, from) {
-    console.log('asgsad', instance);
+    console.log('asgsad', control);
     store.commit(
         "document/addControl", { id: controlId, props: control, from: 'submit', instance: instance }
     );

@@ -345,6 +345,7 @@ export default {
         });
         this.$evtBus.$on("document-submit-open-validate-message", e => {
             if(thisCpn.isComponentActive == false) return;
+            thisCpn.messageValidate = e.msg;
             thisCpn.$refs.validate.show(e);
         });
        
@@ -1182,28 +1183,32 @@ export default {
                 }
             }
         },
+
         /**
          * hàm được gọi khi input change, lấy ra các instance của control bị ảnh hưởng và chạy công thức cho các control đó
          * nếu có insideTableInDoc thì công thức từ nội bộ của bảng
          */
         handleControlInputChange(controlName){
-            let controlUnique = checkDbOnly(this.keyInstance,controlName);
-            if(controlUnique != false){
-                this.handlerBeforeRunFormulasValue(controlUnique.controlFormulas.uniqueDB,controlUnique.id,controlUnique.name,'uniqueDB');
-            }
             let controlInstance = this.sDocumentSubmit.listInputInDocument[controlName];
-            let controlEffected = controlInstance.getEffectedControl();
-            let controlHiddenEffected = controlInstance.getEffectedHiddenControl();
-            let controlReadonlyEffected = controlInstance.getEffectedReadonlyControl();
-            let controlRequireEffected = controlInstance.getEffectedRequireControl();
-            let controlLinkEffected = controlInstance.getEffectedLinkControl();
-            let controlValidateEffected = controlInstance.getEffectedValidateControl();
-            this.runFormulasControlEffected(controlName,controlEffected);
-            this.runOtherFormulasEffected(controlName,controlHiddenEffected,'hidden');
-            this.runOtherFormulasEffected(controlName,controlReadonlyEffected,'readonly');
-            this.runOtherFormulasEffected(controlName,controlRequireEffected,'require');
-            this.runOtherFormulasEffected(controlName,controlLinkEffected,'link');
-            this.runOtherFormulasEffected(controlName,controlValidateEffected,'validate');
+            if(controlInstance.checkValidValueLength()){
+                let controlUnique = checkDbOnly(this.keyInstance,controlName);
+                if(controlUnique != false){
+                    this.handlerBeforeRunFormulasValue(controlUnique.controlFormulas.uniqueDB,controlUnique.id,controlUnique.name,'uniqueDB');
+                }
+                
+                let controlEffected = controlInstance.getEffectedControl();
+                let controlHiddenEffected = controlInstance.getEffectedHiddenControl();
+                let controlReadonlyEffected = controlInstance.getEffectedReadonlyControl();
+                let controlRequireEffected = controlInstance.getEffectedRequireControl();
+                let controlLinkEffected = controlInstance.getEffectedLinkControl();
+                let controlValidateEffected = controlInstance.getEffectedValidateControl();
+                this.runFormulasControlEffected(controlName,controlEffected);
+                this.runOtherFormulasEffected(controlName,controlHiddenEffected,'hidden');
+                this.runOtherFormulasEffected(controlName,controlReadonlyEffected,'readonly');
+                this.runOtherFormulasEffected(controlName,controlRequireEffected,'require');
+                this.runOtherFormulasEffected(controlName,controlLinkEffected,'link');
+                this.runOtherFormulasEffected(controlName,controlValidateEffected,'validate');
+            }
         },
         /**
          * Hàm xử lí duyêt các control bị ảnh hưởng trong 1 công thức bởi 1 control nào đó và thực hiện chạy các công thức của control đó

@@ -137,7 +137,7 @@ export default {
         },
         handleChangeInput(name, input, data){
             let value = input.value
-            let elements = $('#editor_ifr').contents().find('#'+this.sCurrentDocument.id);
+            let elements = $('#document-editor-'+this.instance+'_ifr').contents().find('#'+this.sCurrentDocument.id);
             if(name == "width"){
                 elements.css({width:value});
             }
@@ -160,7 +160,7 @@ export default {
          * Hàm kiểm tra tên 1 control có bị trùng với các control khác hay không, nếu bị trùng thì thông báo lỗi
          */
         checkNameControl(name, input, data){
-            let elements = $('#editor_ifr').contents().find('#'+this.sCurrentDocument.id);
+            let elements = $('#document-editor-'+this.instance+'_ifr').contents().find('#'+this.sCurrentDocument.id);
             let tableId = checkInTable(elements)
             if( tableId == this.sCurrentDocument.id)
             tableId = '0';
@@ -185,7 +185,7 @@ export default {
                                 ...arr,obj.id
                             ],[]);
                             dataControl.match = listContrlIdConflic;
-                            $('#editor_ifr').contents().find('#'+this.sCurrentDocument.id).addClass('s-control-error');
+                            $('#document-editor-'+this.instance+'_ifr').contents().find('#'+this.sCurrentDocument.id).addClass('s-control-error');
                             for (let index = 0; index < controlConflic.length; index++) {
                                 let control = controlConflic[index];
                                 // console.log('sa',this.listNameValueControl[control.id]);
@@ -193,12 +193,12 @@ export default {
                                 newList.splice(newList.indexOf(control.id),1);
                                 newList.push(this.sCurrentDocument.id);
                                 this.listNameValueControl[control.id].match = newList;
-                                $('#editor_ifr').contents().find('#'+control.id).addClass('s-control-error');
+                                $('#document-editor-'+this.instance+'_ifr').contents().find('#'+control.id).addClass('s-control-error');
                             }
                             if(this.listNameValueControl.hasOwnProperty(this.sCurrentDocument.id)){
                                 for (let index = 0; index < this.listNameValueControl[this.sCurrentDocument.id].length; index++) {
                                     const element = this.listNameValueControl[this.sCurrentDocument.id][index];
-                                    $('#editor_ifr').contents().find('#'+element.id).removeClass('s-control-error')
+                                    $('#document-editor-'+this.instance+'_ifr').contents().find('#'+element.id).removeClass('s-control-error')
                                 }
                             }
                         }
@@ -209,10 +209,10 @@ export default {
                                     let control = controlOldConflic[index];
                                     this.listNameValueControl[control].match.splice(this.listNameValueControl[control].match.indexOf(this.sCurrentDocument.id),1);
                                     if(this.listNameValueControl[control].match.length == 0)
-                                    $('#editor_ifr').contents().find('#'+control).removeClass('s-control-error')
+                                    $('#document-editor-'+this.instance+'_ifr').contents().find('#'+control).removeClass('s-control-error')
                                 }
                             }
-                            $('#editor_ifr').contents().find('#'+this.sCurrentDocument.id).removeClass('s-control-error')
+                            $('#document-editor-'+this.instance+'_ifr').contents().find('#'+this.sCurrentDocument.id).removeClass('s-control-error')
                         }
                     }
                 

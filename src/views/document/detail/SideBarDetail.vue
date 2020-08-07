@@ -54,7 +54,19 @@ export default {
         isShowSidebar:{
             type:Boolean,
             default:true
-        }
+        },
+        userId:{
+            type:Number,
+            default:0
+        },
+        taskId:{
+            type:String,
+            default:""
+        },
+        workFlowId:{
+            type:String,
+            default:""
+        },
     },
     watch:{
         isShowSidebar(after){

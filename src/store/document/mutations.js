@@ -93,17 +93,22 @@ const updateProp = (state, params) => {
     let type = params.type;
     if (tableId != '0') {
         if (state.editor[instance].allControl[tableId]['listFields'][id]['properties'][name]) {
-            state.editor[instance].allControl[tableId]['listFields'][id]['properties'][name][type] = value
-
+            if (name == 'name') {
+                Vue.set(state.editor[instance].currentSelectedControl['properties']['name'][name], type, value);
+            }
+            Vue.set(state.editor[instance].allControl[tableId]['listFields'][id]['properties'][name], type, value);
         } else if (state.editor[instance].allControl[tableId]['listFields'][id]['formulas'][name]) {
-            state.editor[instance].allControl[tableId]['listFields'][id]['formulas'][name][type] = value
+            Vue.set(state.editor[instance].allControl[tableId]['listFields'][id]['formulas'][name], type, value);
         }
 
     } else {
         if (state.editor[instance].allControl[id]['properties'][name]) {
-            state.editor[instance].allControl[id]['properties'][name][type] = value
+            if (name == 'name') {
+                Vue.set(state.editor[instance].currentSelectedControl['properties']['name'][name], type, value);
+            }
+            Vue.set(state.editor[instance].allControl[id]['properties'][name], type, value);
         } else if (state.editor[instance].allControl[id]['formulas'][name]) {
-            state.editor[instance].allControl[id]['formulas'][name][type] = value
+            Vue.set(state.editor[instance].allControl[id]['formulas'][name], type, value);
         }
     }
 
