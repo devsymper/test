@@ -344,7 +344,7 @@ export default class Table {
                                 value: currentColData,
                                 instance: this.keyInstance
                             });
-                            if (source != AUTO_SET) {
+                            if (source == "edit") {
                                 thisObj.handlerAfterChangeCellByUser(changes, currentRowData, columns, controlName);
                             } else {
                                 thisObj.handlerAfterChangeCellByAutoSet(changes, columns, controlName);
@@ -393,13 +393,13 @@ export default class Table {
                     thisObj.tableInstance.setDataAtCell(colChange[0], rowData.length - 1, id);
                     await ClientSQLManager.insertRow(thisObj.keyInstance, thisObj.tableName, columns, rowData, true);
                     if (index == changes.length - 1) {
-                        thisObj.handlerCheckEffectedControlInTable(controlName);
+                        thisObj.handlerCheckEffectedControlInTable(controlName, "all");
                     }
                 } else {
                     await ClientSQLManager.editRow(thisObj.keyInstance, thisObj.tableName, colChange[1], colChange[3],
                         'WHERE s_table_id_sql_lite = ' + rowData[rowData.length - 1], true);
                     if (index == changes.length - 1) {
-                        thisObj.handlerCheckEffectedControlInTable(controlName);
+                        thisObj.handlerCheckEffectedControlInTable(controlName, "all");
                     }
                 }
             }
@@ -425,7 +425,7 @@ export default class Table {
         } else {
             await ClientSQLManager.editRow(thisObj.keyInstance, thisObj.tableName, controlName, changes[0][3],
                 'WHERE s_table_id_sql_lite = ' + currentRowData[currentRowData.length - 1], true)
-            thisObj.handlerCheckEffectedControlInTable(controlName);
+            thisObj.handlerCheckEffectedControlInTable(controlName, changes[0][0]);
 
         }
     }
@@ -481,28 +481,33 @@ export default class Table {
         }
 
     }
-    handlerCheckEffectedControlInTable(controlName) {
-        // this.checkRunLocalSql();
-        let controlInstance = this.getControlInstance(controlName);
-        if (controlInstance == null || controlInstance == undefined) {
-            return;
+    handlerCheckEffectedControlInTable(controlName, rowIndex = "") {
+        if (controlName == "") {
+            return
         }
-        let controlEffected = controlInstance.getEffectedControl();
-        let controlHiddenEffected = controlInstance.getEffectedHiddenControl();
-        let controlReadonlyEffected = controlInstance.getEffectedReadonlyControl();
-        let controlRequireEffected = controlInstance.getEffectedRequireControl();
-        let controlLinkEffected = controlInstance.getEffectedLinkControl();
-        let controlValidateEffected = controlInstance.getEffectedValidateControl();
-        this.handlerRunOtherFormulasControl(controlHiddenEffected, 'hidden');
-        this.handlerRunOtherFormulasControl(controlReadonlyEffected, 'readonly');
-        this.handlerRunOtherFormulasControl(controlRequireEffected, 'require');
-        this.handlerRunOtherFormulasControl(controlLinkEffected, 'link');
-        this.handlerRunOtherFormulasControl(controlValidateEffected, 'validate');
-        if (Object.keys(controlEffected).length > 0) {
-            for (let i in controlEffected) {
-                this.handlerCheckCanBeRunFormulas(i);
+        let controlInstance = this.getControlInstance(controlName);
+        if (controlInstance.checkValidValueLength(rowIndex)) {
+            if (controlInstance == null || controlInstance == undefined) {
+                return;
+            }
+            let controlEffected = controlInstance.getEffectedControl();
+            let controlHiddenEffected = controlInstance.getEffectedHiddenControl();
+            let controlReadonlyEffected = controlInstance.getEffectedReadonlyControl();
+            let controlRequireEffected = controlInstance.getEffectedRequireControl();
+            let controlLinkEffected = controlInstance.getEffectedLinkControl();
+            let controlValidateEffected = controlInstance.getEffectedValidateControl();
+            this.handlerRunOtherFormulasControl(controlHiddenEffected, 'hidden');
+            this.handlerRunOtherFormulasControl(controlReadonlyEffected, 'readonly');
+            this.handlerRunOtherFormulasControl(controlRequireEffected, 'require');
+            this.handlerRunOtherFormulasControl(controlLinkEffected, 'link');
+            this.handlerRunOtherFormulasControl(controlValidateEffected, 'validate');
+            if (Object.keys(controlEffected).length > 0) {
+                for (let i in controlEffected) {
+                    this.handlerCheckCanBeRunFormulas(i);
+                }
             }
         }
+
     }
     handlerRunOtherFormulasControl(controlEffected, formulasType) {
             if (Object.keys(controlEffected).length > 0) {
@@ -876,7 +881,7 @@ export default class Table {
                             return c.data;
                         });
                         ClientSQLManager.insertRow(thisObj.keyInstance, thisObj.tableName, columns, currentRowData, true).then(res => {
-                            thisObj.handlerCheckEffectedControlInTable(thisObj.cellAfterChange);
+                            thisObj.handlerCheckEffectedControlInTable(thisObj.cellAfterChange, changes[0][0]);
                         })
                     }, 10);
                 } else {
@@ -961,7 +966,7 @@ export default class Table {
             if (!this.checkDetailView())
                 setTimeout((thisObj) => {
                     for (let index = 0; index < controlBinding.length; index++) {
-                        thisObj.handlerCheckEffectedControlInTable(controlBinding[index]);
+                        thisObj.handlerCheckEffectedControlInTable(controlBinding[index], 'all');
                     }
                     if (this.tableHasRowSum) {
                         for (let controlName in columnHasSum) {
@@ -1135,11 +1140,14 @@ export default class Table {
             if (map.vld === true) {
                 ele.css({ 'position': 'relative' }).append(Util.makeErrNoti(map.msg, sign, controlTitle));
             }
+            if (map.validate === true) {
+                ele.css({ 'position': 'relative' }).append(Util.makeErrNoti(map.msg, sign, controlTitle));
+            }
             if (map.uniqueDB === true) {
                 ele.css({ 'position': 'relative' }).append(Util.makeErrNoti(map.msg, sign, controlTitle));
             }
             if (map.require === true && (value === '' || value == null)) {
-                ele.css({ 'position': 'relative' }).append(Util.requireRedDot(sign, controlTitle));
+                ele.css({ 'position': 'relative' }).append(Util.makeErrNoti("Không được bỏ trống", sign, controlTitle));
             }
             ele.off('click', '.validate-icon')
             ele.on('click', '.validate-icon', function(e) {
