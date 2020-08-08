@@ -19,11 +19,11 @@
             <sym-drag-panel
                 ref="symDragPanel"
                 :dragPanelWidth="600"
-                :dragPanelHeight="'auto'"
                 :topPosition='topPositionDragPanel'
                 :leftPosition="leftPositionDragPanel"
                 :actionTitle="titleDragPanel"
                 :titleIcon="titleDragPanelIcon"
+                :styleBody="{overflow:'hidden',width:'100%'}"
             >
                 <template slot="drag-panel-content">
                     <!-- <submitDocument :isQickSubmit="true" :docId="340" v-if="!isQickSubmit"/> -->
@@ -62,22 +62,16 @@
                 <v-btn fab dark small color="green" @click="handlerSubmitDocumentClick">
                     <v-icon>mdi-content-save</v-icon>
                 </v-btn>
-                <!-- <v-btn
+                <v-btn
+                        v-if="this.isDraft != 1"
                         fab
                         dark
                         small
                         color="indigo"
+                        @click="handlerDraftClick"
                     >
-                        <v-icon>mdi-plus</v-icon>
+                        <v-icon>mdi-trash-can-outline</v-icon>
                     </v-btn>
-                    <v-btn
-                        fab
-                        dark
-                        small
-                        color="red"
-                    >
-                        <v-icon>mdi-delete</v-icon>
-                </v-btn>-->
             </v-speed-dial>
             <err-message :listErr="listMessageErr" ref="errMessage"/>
         </div>
@@ -212,7 +206,9 @@ export default {
             listMessageErr:[],
             titleValidate:"",
             messageValidate:"",
-            isComponentActive:false
+            isComponentActive:false,
+            cacheDataRunFormulas:{},
+            isDraft:0
         };
     },
     beforeMount() {
@@ -519,6 +515,7 @@ export default {
          * Hàm chạy công thức autocomplete để đổ dữ liệu vào box autucomplete, control select cũng dùng trường hợp này
          */
         getDataForAutocomplete(e,type,aliasControl=""){ 
+            console.log('ádsaf',e);
             let thisCpn = this
             if(type == 'select'){
                 let dataInput = this.getDataInputFormulas(e.selectFormulasInstance);  
@@ -696,6 +693,7 @@ export default {
                             instance: this.keyInstance
                         })
                         thisCpn.documentId = res.data.documentId;
+                        thisCpn.isDraft = res.data.isDraft;
                         thisCpn.loadDocumentData();
                     }
                     else{
@@ -900,6 +898,37 @@ export default {
         },
 
 
+        handlerDraftClick(){
+            this.isSubmitting = true;
+            let thisCpn = this;
+            let dataPost = this.getDataPostSubmit();
+            dataPost['documentId'] = this.documentId;
+            documentApi.submitDraftDocument(dataPost).then(res => {
+                thisCpn.isSubmitting = false;
+                if (res.status == 200) {
+                    thisCpn.$snotify({
+                        type: "success",
+                        title: "Submit draft success!"
+                    });        
+                    thisCpn.$router.push('/documents/'+thisCpn.documentId+"/draft-objects");
+                }
+                else{
+                    thisCpn.$snotify({
+                        type: "error",
+                        title: res.message
+                    });
+                }
+            })
+            .catch(err => {
+                console.warn(err);
+                thisCpn.$snotify({
+                        type: "error",
+                        title: "error from submit document api!!!"
+                    });
+            })
+            .always(() => {
+            });
+        },
         handlerSubmitDocumentClick(){
             if($('.validate-icon').length == 0){
                 if(this.viewType == 'submit'){
@@ -950,7 +979,6 @@ export default {
                         type: "success",
                         title: "Submit document success!"
                     });        
-                    console.log('assadsasadsadsdasadads',this.$route.name);
                     if(this.$route.name == 'submitDocument')
                      thisCpn.$router.push('/documents/'+thisCpn.documentId+"/objects");
                 }
@@ -976,6 +1004,9 @@ export default {
             let thisCpn = this;
             let dataPost = this.getDataPostSubmit();
             dataPost['documentId'] = this.documentId;
+            if(this.isDraft == 1){
+                dataPost['isDraft'] = true;
+            }
             documentApi.updateDocument(this.docObjId,dataPost).then(res => {
                 thisCpn.$emit('submit-document-success',res.data);
                 thisCpn.isSubmitting = false;
@@ -984,6 +1015,8 @@ export default {
                         type: "success",
                         title: "update document success!"
                     });        
+                    if(thisCpn.$route.name == 'updateDocumentObject')
+                     thisCpn.$router.push('/documents/'+thisCpn.documentId+"/objects");
                 }
                 else{
                     thisCpn.$snotify({
@@ -1319,6 +1352,14 @@ export default {
                     );
                     controlInstance.setValue(value)
                     markBinedField(this.keyInstance,controlName);
+                    if(controlInstance.isRequiredControl()){
+                        if(controlInstance.isEmpty()){
+                            controlInstance.renderValidateIcon('Không được bỏ trống trường thông tin '+controlInstance.title)
+                        }
+                        else{
+                            controlInstance.removeValidateIcon()
+                        }
+                    }
                     this.handleControlInputChange(controlName)
                 }else{
                     if($('#'+controlId).attr('s-control-type') == 'label'){
@@ -1413,7 +1454,7 @@ export default {
                         let controlFormulas = controlInstance.controlFormulas;
                         
                         for(let formulasType in controlFormulas){
-                            if(formulasType != 'autocomplete'){
+                            if(formulasType != 'autocomplete' && formulasType != 'list'){
                                 if(controlFormulas[formulasType].hasOwnProperty('instance')){
                                     let formulasInstance = controlFormulas[formulasType].instance;
                                     if(formulasInstance.getFormulas() !== "" && Object.keys(formulasInstance.getInputControl()).length == 0){

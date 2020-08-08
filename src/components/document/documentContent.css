@@ -192,3 +192,33 @@ input.s-control:not(.s-control-panel):not(.detail-view):hover {
     height: 20px;
     line-height: 20px;
 }
+
+.ht_clone_top th {
+    font-weight: 500;
+}
+
+.ht_master .wtHolder::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+.ht_master .wtHolder::-webkit-scrollbar-track {
+    background: #fff;
+}
+
+.ht_master .wtHolder::-webkit-scrollbar-thumb {
+    background: #d6d6d6;
+    border-radius: 4px;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    -ms-border-radius: 4px;
+    -o-border-radius: 4px;
+}
+
+.ht_clone_bottom.handsontable {
+    bottom: 6px !important;
+}
+
+.ht_clone_bottom_left_corner.handsontable {
+    bottom: 6px !important;
+}

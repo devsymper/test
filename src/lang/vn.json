@@ -276,7 +276,8 @@
             "createAt": "Thời gian tạo",
             "updateAt": "Thời gian update",
             "userCreate": "Người tạo",
-            "userUpdate": "Người cập nhật"
+            "userUpdate": "Người cập nhật",
+            "countRecord": "Số lượng bản ghi"
         },
         "process": {
             "header_bar": {
@@ -294,6 +295,13 @@
     },
     "documentObject": {
         "title": "Danh sách bản ghi"
+    },
+    "draft": {
+        "title": "Danh sách bản nháp",
+        "table": {
+            "id": "Id",
+            "createAt": "Thời gian tạo"
+        }
     },
     "service": {
         "title": "Danh sách dịch vụ hệ thống",

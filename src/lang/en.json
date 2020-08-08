@@ -277,7 +277,8 @@
             "createAt": "Create at",
             "updateAt": "Update at",
             "userCreate": "BA Create",
-            "userUpdate": "BA update"
+            "userUpdate": "BA update",
+            "countRecord": "count record"
         },
         "process": {
             "header_bar": {
@@ -295,6 +296,13 @@
     },
     "documentObject": {
         "title": "List Document Object"
+    },
+    "draft": {
+        "title": "List Draft Object",
+        "table": {
+            "id": "Id",
+            "createAt": "Create at"
+        }
     },
     "service": {
         "title": "List service",

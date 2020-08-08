@@ -34,19 +34,29 @@
                         <control-props-config  
                         @input-value-keyup="handleKeyupInput"
                         @input-value-changed="handleChangeInput" 
-                        :singleLine="true" :labelWidth="`100px`"  :allInputs="controlPropsGroup.name"/>
+                        :singleLine="true" 
+                        :labelWidth="`100px`"  
+                        :allInputs="controlPropsGroup.name"/>
                     </v-expansion-panel-content>
                 </v-expansion-panel>
                 <v-expansion-panel class="m-0" >
                     <v-expansion-panel-header class="v-expand-header">Hiển thị</v-expansion-panel-header>
                     <v-expansion-panel-content class="sym-v-expand-content">
-                        <control-props-config @input-value-changed="handleChangeInput" :singleLine="true" :labelWidth="`100px`" :allInputs="controlPropsGroup.display"/>
+                        <control-props-config 
+                        @input-value-changed="handleChangeInput" 
+                        :singleLine="true" 
+                        :labelWidth="`100px`" 
+                        :allInputs="controlPropsGroup.display"/>
                     </v-expansion-panel-content>
                 </v-expansion-panel>
                 <v-expansion-panel class="m-0" >
                     <v-expansion-panel-header class="v-expand-header">In</v-expansion-panel-header>
                     <v-expansion-panel-content class="sym-v-expand-content">
-                        <control-props-config @input-value-changed="handleChangeInput" :singleLine="true" :labelWidth="`100px`" :allInputs="controlPropsGroup.print"/>
+                        <control-props-config 
+                        @input-value-changed="handleChangeInput" 
+                        :singleLine="true" 
+                        :labelWidth="`100px`" 
+                        :allInputs="controlPropsGroup.print"/>
                     </v-expansion-panel-content>
                 </v-expansion-panel>
             </v-expansion-panels>
@@ -86,8 +96,8 @@ export default {
         },
 
         controlPropsGroup(){
-            return this.sCurrentDocument.properties;
-            
+            return this.$store.state.document.editor[this.instance].currentSelectedControl.properties;
+            // return this.sCurrentDocument.properties;
         }
     },
     data () {

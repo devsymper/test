@@ -204,6 +204,13 @@ let commonFormulas = {
         type: "script",
         groupType: "formulas"
     },
+    list: {
+        title: "Công thức danh sách",
+        value: "",
+        formulasId: 0,
+        type: "script",
+        groupType: "formulas"
+    },
     formulas: {
         title: "Công thức giá trị",
         value: "",
@@ -371,10 +378,10 @@ const controlTypes = {
     },
     select: {
         icon: "/icon/ic_select.png",
-        html: `<select class="s-control s-control-select" contenteditable="false" title="Select" s-control-type="select" type="select"></select>&nbsp;&nbsp;`,
+        html: `<input class="s-control s-control-select" readonly="readonly" contenteditable="false" title="Select" s-control-type="select" type="select"></input>&nbsp;&nbsp;`,
         title: "Select",
         notInProps: ['formatNumber', 'isSumTable', 'formatDate', 'isAllowUpdate', 'isDisplayCompact', 'isMultipleValue'],
-        formulas: ['formulas', 'hidden', 'readOnly', 'link', 'require']
+        formulas: ['formulas', 'list', 'hidden', 'readOnly', 'link', 'require']
     },
     documentSelect: {
         icon: "/icon/ic_document_select.png",

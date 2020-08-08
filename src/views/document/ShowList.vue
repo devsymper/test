@@ -66,6 +66,13 @@ export default {
                     },
                 },
                 {
+                    name: "cloneDoc",
+                    text: "Nhân bản",
+                    callback: (document, callback) => {
+                        this.$goToPage('/documents/'+document.id+'/clone/editor',"Nhân bản "+document.title);
+                    },
+                },
+                {
                     name: "submit",
                     text: "Nhập liệu",
                     callback: (document, callback) => {
@@ -77,6 +84,13 @@ export default {
                     text: "Danh sách bản ghi",
                     callback: (document, callback) => {
                         this.$goToPage('/documents/'+document.id+'/objects',"Danh sách bản ghi");
+                    },
+                },
+                {
+                    name: "listDraftObject",
+                    text: "Danh sách bản nháp",
+                    callback: (document, callback) => {
+                        this.$goToPage('/documents/'+document.id+'/draft-objects',"Danh sách bản nháp");
                     },
                 },
             ],

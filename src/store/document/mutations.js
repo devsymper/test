@@ -9,15 +9,7 @@ const addControl = (state, params) => {
     let id = params.id
     let prop = params.props
     let instance = params.instance
-    if (params.hasOwnProperty('from')) {
-        if (params.from == 'submit') {
-
-        } else {
-            setTreeListControlInDoc(state, instance);
-        }
-    } else {
-        setTreeListControlInDoc(state, instance);
-    }
+    console.log("ádsafasfsad", params);
     Vue.set(state.editor[instance].allControl, id, prop);
 
 };
@@ -30,49 +22,7 @@ const addToListInputInDocument = (state, params) => {
     // state.editor.allControl[id] = prop;
     Vue.set(state.submit[instance].listInputInDocument, name, control);
 };
-// ham xây dựng dữ liệu cho treeview ở bên sidebar trái khi thay đổi thuộc tính control
-function setTreeListControlInDoc(state, instance) {
-    let treeData = [{
-        name: 'Control',
-        icon: 'icon/ic_image.png',
-        root: true,
-        children: [
 
-        ],
-    }];
-    let allControl = util.cloneDeep(state.editor[instance].allControl);
-    for (let controlId in allControl) {
-        let control = allControl[controlId];
-        let type = control.type;
-        let props = control.properties;
-        let name = "";
-        let title = "";
-        if (type == 'submit' || type == 'draft' || type == 'reset' || type == 'approvalHistory') {
-            name = type
-            title = type
-        } else {
-            title = props.title.value;
-            name = props.name.value;
-        }
-        if (type == 'table') {
-            let listFields = control.listFields;
-            let children = [];
-            for (let childControlId in listFields) {
-                let childControl = listFields[childControlId];
-                let childProps = childControl.properties;
-                let childType = childControl.type;
-                let childTitle = childProps.title.value;
-                let childName = childProps.name.value;
-                let item = { name: childName + " - " + childTitle, icon: getIconFromType(childType), id: childControlId }
-                children.push(item)
-            }
-            treeData[0].children.push({ name: name + " - " + title, active: false, icon: getIconFromType(type), id: controlId, children: children })
-        } else {
-            treeData[0].children.push({ name: name + " - " + title, active: false, icon: getIconFromType(type), id: controlId })
-        }
-    }
-    Vue.set(state.editor[instance], 'listControlTreeData', treeData)
-}
 
 const addControlToTable = (state, params) => {
     let id = params.id
@@ -84,7 +34,7 @@ const addControlToTable = (state, params) => {
         state.editor[instance].allControl[tableId]['listFields'] = {};
     }
     Vue.set(state.editor[instance].allControl[tableId]['listFields'], id, prop);
-    setTreeListControlInDoc(state, instance);
+
 };
 const addCurrentControl = (state, control) => {
     let instance = control.instance
@@ -156,7 +106,7 @@ const updateProp = (state, params) => {
             state.editor[instance].allControl[id]['formulas'][name][type] = value
         }
     }
-    setTreeListControlInDoc(state, instance);
+
 }
 const updateFormulasId = (state, params) => {
     let id = params.id
@@ -178,7 +128,7 @@ const updateFormulasId = (state, params) => {
 
 const minimizeControl = (state, params) => {
     let instance = params.instance
-    let allControl = state.editor[instance].allControl;
+    let allControl = util.cloneDeep(state.editor[instance].allControl);
     for (let i of Object.keys(allControl)) {
         if (allControl[i]['listFields']) {
             for (let j of Object.keys(allControl[i]['listFields'])) {
@@ -192,7 +142,8 @@ const minimizeControl = (state, params) => {
             }
         }
     }
-    setTreeListControlInDoc(state, instance);
+    Vue.set(state.editor[instance], 'allControl', allControl);
+
 
 }
 
@@ -217,7 +168,6 @@ const updateListInputInDocument = (state, params) => {
     let controlName = params.controlName;
     let value = params.value
     let instance = params.instance;
-    console.log('paramsparamsparams', params);
     if (state.submit[instance].listInputInDocument.hasOwnProperty(controlName)) {
         Vue.set(state.submit[instance].listInputInDocument[controlName], key, value);
     }

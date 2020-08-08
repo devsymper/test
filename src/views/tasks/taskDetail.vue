@@ -289,7 +289,7 @@ export default {
 
             let dataToSave = {
                 objectId: this.taskInfo.action.parameter.documentObjectId,
-                userId: this.$store.state.app.endUserInfo.ID,
+                userId: this.$store.state.app.endUserInfo.id,
                 actionTitle: title,
                 actionName: value,
                 note: ''

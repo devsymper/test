@@ -176,6 +176,14 @@ const routes = [{
 
     },
     {
+        path: "/documents/:id?/clone/editor",
+        name: "cloneDocument",
+        // component: Editor,
+        component: () =>
+            import ('../views/document/Editor.vue'),
+
+    },
+    {
         path: "/document/submit/:id?",
         name: "submitDocument",
         // component: SubmitDocument,
@@ -186,6 +194,13 @@ const routes = [{
     {
         path: "/documents/objects/:id?",
         name: "detailDocument",
+        // component: DetailDocument,
+        component: () =>
+            import ('../views/document/detail/Detail.vue'),
+    },
+    {
+        path: "/documents/objects/:id?/print",
+        name: "printDocument",
         // component: DetailDocument,
         component: () =>
             import ('../views/document/detail/Detail.vue'),
@@ -203,6 +218,14 @@ const routes = [{
         // component: ListObject,
         component: () =>
             import ('../views/document/listobject/ListObject.vue'),
+
+    },
+    {
+        path: "/documents/:id?/draft-objects",
+        name: "listDocumentDraftObject",
+        // component: ListObject,
+        component: () =>
+            import ('../views/document/draft/DraftList.vue'),
 
     },
     //service

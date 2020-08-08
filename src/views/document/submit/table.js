@@ -7,32 +7,57 @@ import { checkDbOnly, getControlType, getSDocumentSubmitStore } from './../commo
 import { SYMPER_APP } from './../../../main.js'
 import { Date } from 'core-js';
 import { checkCanBeBind, resetImpactedFieldsList, markBinedField } from './handlerCheckRunFormulas';
-import moment from "moment-timezone";
 class UserEditor extends Handsontable.editors.TextEditor {
-        createElements() {
-            super.createElements();
-            this.TEXTAREA = this.hot.rootDocument.createElement('input');
-            this.TEXTAREA.className = 'handsontableInput';
-            this.TEXTAREA.setAttribute('data-hot-input', ''); // Makes the element recognizable by HOT as its own component's element.
-            this.textareaStyle = this.TEXTAREA.style;
-            this.textareaStyle.width = 0;
-            this.textareaStyle.height = 0;
-            Handsontable.dom.empty(this.TEXTAREA_PARENT);
-            this.TEXTAREA_PARENT.appendChild(this.TEXTAREA);
-        }
-        setValue(newValue) {
-            this.TEXTAREA.value = newValue;
-        }
-
+    createElements() {
+        super.createElements();
+        this.TEXTAREA = this.hot.rootDocument.createElement('input');
+        this.TEXTAREA.className = 'handsontableInput';
+        this.TEXTAREA.setAttribute('data-hot-input', ''); // Makes the element recognizable by HOT as its own component's element.
+        this.textareaStyle = this.TEXTAREA.style;
+        this.textareaStyle.width = 0;
+        this.textareaStyle.height = 0;
+        Handsontable.dom.empty(this.TEXTAREA_PARENT);
+        this.TEXTAREA_PARENT.appendChild(this.TEXTAREA);
     }
-    /**
-     * Custom render cho control percent( phần trăm) cho table
-     */
+    setValue(newValue) {
+        this.TEXTAREA.value = newValue;
+    }
+
+}
+class SelectEditor extends Handsontable.editors.TextEditor {
+    createElements() {
+        super.createElements();
+        this.TEXTAREA = this.hot.rootDocument.createElement('input');
+        this.TEXTAREA.className = 'handsontableInput';
+        this.TEXTAREA.setAttribute('data-hot-input', ''); // Makes the element recognizable by HOT as its own component's element.
+        Handsontable.dom.empty(this.TEXTAREA_PARENT);
+        this.TEXTAREA_PARENT.appendChild(this.TEXTAREA);
+    }
+    setValue(newValue) {
+        this.TEXTAREA.value = newValue;
+    }
+
+}
+
+
+/**
+ * Custom render cho control percent( phần trăm) cho table
+ */
 Handsontable.renderers.PercentRenderer = function(instance, td, row, col, prop, value, cellProperties) {
     Handsontable.renderers.NumericRenderer.apply(this, arguments);
     td.style.textAlign = 'left'
+    let table = store.state.document.submit[instance.keyInstance];
     td.textContent = (td.textContent == "" || td.textContent == null) ? 0 + " %" : td.textContent + " %";
+    if (row == instance.countRows() - 1 && table != undefined && instance.hasOwnProperty('tableName')) {
+        let tableControl = table.listInputInDocument[instance.tableName];
+        let tableInstance = tableControl.tableInstance;
+        if (tableInstance.tableHasRowSum) {
+            td.textContent = "";
+        }
+    }
 }
+
+
 Handsontable.cellTypes.registerCellType('percent', {
     editor: Handsontable.editors.TextEditor.prototype.extend(),
     renderer: Handsontable.renderers.PercentRenderer
@@ -40,17 +65,53 @@ Handsontable.cellTypes.registerCellType('percent', {
 
 //renderer user
 Handsontable.renderers.UserRenderer = function(instance, td, row, col, prop, value, cellProperties) {
+        Handsontable.renderers.TextRenderer.apply(this, arguments);
+        if (!isNaN(value) && instance.hasOwnProperty('keyInstance')) {
+            let listUser = store.state.document.submit[instance.keyInstance].listUser;
+            let user = listUser.filter(user => {
+                return user.id === value
+            })
+            if (user.length > 0) {
+                td.textContent = user[0].displayName
+            }
+        }
+    }
+    //renderer user
+Handsontable.renderers.SelectRenderer = function(instance, td, row, col, prop, value, cellProperties) {
     Handsontable.renderers.TextRenderer.apply(this, arguments);
-    if (!isNaN(value) && instance.hasOwnProperty('keyInstance')) {
-        let listUser = store.state.document.submit[instance.keyInstance].listUser;
-        let user = listUser.filter(user => {
-            return user.id === value
-        })
-        if (user.length > 0) {
-            td.textContent = user[0].displayName
+    if (value == null) value = ""
+    let div = `<div class="select-cell" style="position:relative;height:24px;width:100%;">` + value + `
+                    <span style="position: absolute;right:8px;top:2px;font-size: 10px;color: #eee;">▼</span>
+                </div>`
+    $(td).off('click')
+    $(td).on('click', function(e) {
+        let tableControl = store.state.document.submit[instance.keyInstance].listInputInDocument[instance.tableName];
+        let tableInstance = tableControl.tableInstance;
+        tableInstance.setSelectCell(e)
+    })
+    let table = store.state.document.submit[instance.keyInstance];
+    td.innerHTML = div;
+    if (row == instance.countRows() - 1 && table != undefined) {
+        let tableControl = table.listInputInDocument[instance.tableName];
+        let tableInstance = tableControl.tableInstance;
+        if (tableInstance.tableHasRowSum) {
+            td.innerHTML = "";
         }
     }
 }
+
+Handsontable.renderers.ValidateRenderer = function(instance, td, row, col, prop, value, cellProperties) {
+    Handsontable.renderers.TextRenderer.apply(this, arguments);
+    if (!isNaN(value) && instance.hasOwnProperty('keyInstance')) {
+        let listUser = store.state.document.submit[instance.keyInstance];
+
+    }
+}
+
+Handsontable.cellTypes.registerCellType('select', {
+    renderer: Handsontable.renderers.SelectRenderer,
+    editor: SelectEditor
+});
 
 Handsontable.cellTypes.registerCellType('user', {
     editor: UserEditor,
@@ -102,7 +163,7 @@ const supportCellsType = {
     label: 'TextRenderer',
     percent: 'PercentRenderer',
     user: 'UserRenderer',
-    select: 'DropdownRenderer',
+    select: 'SelectRenderer',
     checkbox: 'CheckboxRenderer',
 };
 
@@ -172,17 +233,15 @@ export default class Table {
                         if (thisObj.getCellSelectedType(column) == 'time') {
                             // SYMPER_APP.$evtBus.$emit('document-submit-show-time-picker', { event: event });
                         };
+                        // if (thisObj.getCellSelectedType(column) == 'select') {
+                        //     thisObj.setSelectCell(event);
+                        // };
 
                     },
-                    afterBeginEditing: function(row, column) {
-                        // nêu cell click là control select
-                        if (thisObj.getCellSelectedType(column) == 'dropdown') {
-                            thisObj.setSelectCell(event);
-                        };
-                    },
+
 
                     beforeKeyDown: function(event) {
-                        if (event.ctrlKey || event.altKey || event.shiftKey || event.metaKey) {
+                        if (event.ctrlKey || event.altKey || event.metaKey) {
                             return;
                         }
 
@@ -242,7 +301,6 @@ export default class Table {
                     },
 
                     afterChange: function(changes, source) {
-                        console.log('sakdasdasd', changes);
 
                         if (changes == null) {
                             return
@@ -590,6 +648,10 @@ export default class Table {
                     let rowInput = allRowDataInput[index];
                     dataPost[listIdRow[index]] = rowInput;
                 }
+            } else {
+                for (let index = 0; index < listIdRow.length; index++) {
+                    dataPost[listIdRow[index]] = "";
+                }
             }
             let dataForStore = [];
             await formulasInstance.getDataMultiple(dataPost).then(res => {
@@ -693,19 +755,14 @@ export default class Table {
         let controlInstance = this.getControlInstance(this.currentControlSelected);
         if (controlInstance != null && controlInstance != undefined) {
             let controlFormulas = controlInstance.controlFormulas;
-            if (controlFormulas.hasOwnProperty('formulas')) {
-                let formulasInstance = controlFormulas['formulas'].instance;
+            if (controlFormulas.hasOwnProperty('list')) {
+                let formulasInstance = controlFormulas['list'].instance;
                 event.curTarget = event.target;
                 SYMPER_APP.$evtBus.$emit('document-submit-select-input', {
-                        e: event,
-                        selectFormulasInstance: formulasInstance,
-                        alias: this.currentControlSelected
-                    })
-                    // SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-key-event', {
-                    //     e: event,
-                    //     selectFormulasInstance: formulasInstance,
-                    //     isSelect: true
-                    // })
+                    e: event,
+                    selectFormulasInstance: formulasInstance,
+                    alias: this.currentControlSelected
+                })
             }
         }
     }
@@ -770,6 +827,9 @@ export default class Table {
             // minSpareRows: (thisObj.checkDetailView()) ? 0 : 1,
             height: 'auto',
             afterRender: function(isForced) {
+                if (thisObj.tableHasRowSum)
+                    $('.handsontable  span.rowHeader').last().text('Tổng').css({ 'font-weight': 'bold' })
+
                 let tbHeight = this.container.getElementsByClassName('htCore')[0].getBoundingClientRect().height;
                 if (tbHeight < MAX_TABLE_HEIGHT) {} else {
                     $(this.rootElement).css('height', MAX_TABLE_HEIGHT);
@@ -777,23 +837,18 @@ export default class Table {
                 if (!this.reRendered && thisObj.tableHasRowSum) {
                     this.reRendered = true;
                     setTimeout((hotTb) => {
-                        for (let controlName in columnHasSum) {
-                            let colIndex = thisObj.getColumnIndexFromControlName(controlName);
-                            let CharAt = String.fromCharCode(65 + columnHasSum[controlName]);
-                            let sumValue = '=SUM(' + CharAt + '1:' + CharAt + '' + (hotTb.countRows() - 1) + ')'
-                            hotTb.setDataAtCell(this.countRows() - 1, colIndex, sumValue, AUTO_SET);
-                        }
+
                         for (let index = 0; index < hotTb.getDataAtRow(0).length; index++) {
-                            hotTb.setCellMeta(hotTb.countRows() - 1, index, 'readOnly', true);
+                            // hotTb.setCellMeta(hotTb.countRows() - 1, index, 'readOnly', true);
                         }
                         hotTb.render();
                     }, 500, this);
                 }
+
             },
             beforeCreateRow: function(i, amount) {
                 let hotTb = this;
                 delay(function(e) {
-                    console.log('áddsad');
                     if (thisObj.tableHasRowSum) {
                         for (let controlName in columnHasSum) {
                             let colIndex = thisObj.getColumnIndexFromControlName(controlName);
@@ -813,8 +868,7 @@ export default class Table {
                 if (changes.length == 0) {
                     return
                 }
-                console.log('changesreadOnlyreadOnly', changes);
-                if (changes[0][1] == 's_table_id_sql_lite') {
+                if (changes[0][1] == 's_table_id_sql_lite' && !thisObj.checkDetailView()) {
                     setTimeout(() => {
                         let currentRowData = thisObj.tableInstance.getDataAtRow(changes[0][0]);
                         let columns = thisObj.columnsInfo.columns;
@@ -836,6 +890,7 @@ export default class Table {
             }
         });
         this.tableInstance.keyInstance = this.keyInstance;
+        this.tableInstance.tableName = this.tableName;
         if (!this.checkDetailView()) {
             for (let evtName in thisObj.event) {
                 Handsontable.hooks.add(evtName, thisObj.event[evtName], this.tableInstance);
@@ -900,13 +955,23 @@ export default class Table {
                 data.push({})
             }
             this.tableInstance.updateSettings({
-                data: data
-            })
-            setTimeout((thisObj) => {
-                for (let index = 0; index < controlBinding.length; index++) {
-                    thisObj.handlerCheckEffectedControlInTable(controlBinding[index]);
-                }
-            }, 50, this);
+                    data: data
+                })
+                // sau khi đổ dữ liệu vào table thì ko chạy các sự kiện của table nên cần chạy công thức cho các control liên quan sau khi đỏ dữ liệu
+            if (!this.checkDetailView())
+                setTimeout((thisObj) => {
+                    for (let index = 0; index < controlBinding.length; index++) {
+                        thisObj.handlerCheckEffectedControlInTable(controlBinding[index]);
+                    }
+                    if (this.tableHasRowSum) {
+                        for (let controlName in columnHasSum) {
+                            let colIndex = thisObj.getColumnIndexFromControlName(controlName);
+                            let CharAt = String.fromCharCode(65 + columnHasSum[controlName]);
+                            let sumValue = '=SUM(' + CharAt + '1:' + CharAt + '' + (this.tableInstance.countRows() - 1) + ')'
+                            this.tableInstance.setDataAtCell(this.tableInstance.countRows() - 1, colIndex, sumValue, AUTO_SET);
+                        }
+                    }
+                }, 50, this);
 
         } else {
             let defaultRow = this.getDefaultData(false);
@@ -926,7 +991,7 @@ export default class Table {
      * Hàm lấy data default lúc load table
      */
     getDefaultData(isCreateSqlTable = true) {
-        if (isCreateSqlTable)
+        if (isCreateSqlTable && !this.checkDetailView())
             this.createSqliteTable();
         let data = [];
         let firstRow = {};
@@ -936,8 +1001,9 @@ export default class Table {
         if (this.tableHasRowSum) {
             data.push([''])
         }
-        ClientSQLManager.insertRow(this.keyInstance, this.tableName, ['s_table_id_sql_lite'], [id], false);
-        console.log('   ', data);
+        if (!this.checkDetailView()) {
+            ClientSQLManager.insertRow(this.keyInstance, this.tableName, ['s_table_id_sql_lite'], [id], false);
+        }
         return data;
     }
     async createSqliteTable() {
@@ -1018,7 +1084,7 @@ export default class Table {
             data: name,
             type: type,
             allowInvalid: true,
-            // renderer: this.validateRender
+            renderer: this.validateRender
         }
         if (type == 'number') {
             rsl.numericFormat = {
@@ -1026,8 +1092,7 @@ export default class Table {
             };
         } else if (type == 'label' || ctrl.controlProperties.isReadOnly == 1) {
             rsl.readOnly = true;
-        } else if (type == 'select') {
-            rsl.editor = 'select';
+
         } else if (type == 'time') {
             rsl.timeFormat = 'HH:mm:ss',
                 rsl.correctFormat = true;
@@ -1041,48 +1106,58 @@ export default class Table {
         return rsl;
     }
     validateRender(hotInstance, td, row, column, prop, value, cellProperties) {
-            let inTable = listInputInDocument[prop].inTable;
-            let thisObj = listTableInstance[inTable];
-            let control = thisObj.getControlInstance(listInputInDocument[prop]);
-            if (row + 1 == hotInstance.countRenderedRows()) {
-                if (value === null) {
-                    arguments[5] = thisObj.sampleRowValues[prop];
-                }
-            }
-            Handsontable.renderers[supportCellsType[control.type]].apply(this, arguments);
-            if (control.isCheckbox) {
-                td.style.textAlign = "center";
-            }
-            let map = thisObj.validateValueMap[row + '_' + column];
-            let controlTitle = (control.title == "") ? control.name : control.title;
-            if (map) {
-                let sign = prop + '____' + row;
-                let ele = $(td);
-
-                if (map.vld === true) {
-                    ele.css({ 'position': 'relative' }).append(Util.makeErrNoti(map.msg, sign, controlTitle));
-                }
-                if (map.uniqueDB === true) {
-                    ele.css({ 'position': 'relative' }).append(Util.makeErrNoti(map.msg, sign, controlTitle));
-                }
-                if (map.require === true && (value === '' || value == null)) {
-                    ele.css({ 'position': 'relative' }).append(Util.requireRedDot(sign, controlTitle));
-                }
-                ele.off('click', '.validate-icon')
-                ele.on('click', '.validate-icon', function(e) {
-                    let msg = $(this).attr('title');
-                    e.msg = msg;
-                    SYMPER_APP.$evtBus.$emit('document-submit-open-validate-message', e)
-                })
+        let tableName = "";
+        for (let tbName in listTableInstance) {
+            let allColumn = listTableInstance[tbName].colName2Idx;
+            if (allColumn.hasOwnProperty(prop)) {
+                tableName = tbName;
+                break;
             }
         }
-        /**
-         * set giá trị cho một cột tương ứng với các rowId
-         * @param {string} name tên control
-         * @param {Object} values {
-         *                              "rowId":"value"
-         *                          }
-         */
+
+        let thisObj = listTableInstance[tableName];
+        let control = thisObj.getControlInstance(prop);
+        if (row + 1 == hotInstance.countRenderedRows()) {
+            if (value === null) {
+                arguments[5] = thisObj.sampleRowValues[prop];
+            }
+        }
+        Handsontable.renderers[supportCellsType[control.type]].apply(this, arguments);
+        if (control.isCheckbox) {
+            td.style.textAlign = "center";
+        }
+        let map = thisObj.validateValueMap[row + '_' + column];
+        let controlTitle = (control.title == "") ? control.name : control.title;
+        if (map) {
+            let sign = prop + '____' + row;
+            let ele = $(td);
+
+            if (map.vld === true) {
+                ele.css({ 'position': 'relative' }).append(Util.makeErrNoti(map.msg, sign, controlTitle));
+            }
+            if (map.uniqueDB === true) {
+                ele.css({ 'position': 'relative' }).append(Util.makeErrNoti(map.msg, sign, controlTitle));
+            }
+            if (map.require === true && (value === '' || value == null)) {
+                ele.css({ 'position': 'relative' }).append(Util.requireRedDot(sign, controlTitle));
+            }
+            ele.off('click', '.validate-icon')
+            ele.on('click', '.validate-icon', function(e) {
+                let msg = $(this).attr('title');
+                e.msg = msg;
+                SYMPER_APP.$evtBus.$emit('document-submit-open-validate-message', e)
+            })
+        }
+    }
+
+
+    /**
+     * set giá trị cho một cột tương ứng với các rowId
+     * @param {string} name tên control
+     * @param {Object} values {
+     *                              "rowId":"value"
+     *                          }
+     */
     setColValues(name, values, tbName) {
         let vls = [];
         for (let i = 0; i < values.length; i++) {

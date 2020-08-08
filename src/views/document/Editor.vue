@@ -13,7 +13,7 @@
 
             <div class="sym-document-body">
                 <div class="sym-document-action">
-                    <editor-action 
+                    <editor-action
                     @document-action-save-document="openPanelSaveDocument"
                     @document-action-clone-control="cloneControl"
                     @document-action-list-control-option="setShowAllControlOption"
@@ -25,13 +25,18 @@
                     
                     />
                 </div>
+                <textarea ref="editorLibWrapper" :id="'document-editor-'+keyInstance">
+
+                </textarea>
+                <!-- </div>
                     <editor id="editor" api-key="APIKEY"
                     ref="editor"
                     :key="documentId"
                     @onKeyUp="keyHandler"
                     @onClick="detectClickEvent"
                     @onBlur="detectBlurEditorEvent"
-                    @onInit="initEditor"
+                    @onInit="init1"
+                    @onPaste="onPaste"
                     :init="{
                         forced_root_block:'div',
                         toolbar_items_size : 'small',
@@ -58,7 +63,7 @@
                                     showSettingControlTable(e);
                                 }
                             });
-                          
+                        
                             ed.ui.registry.addButton('margin', {
                             icon:'margin',
                             tooltip:'Margin',
@@ -71,7 +76,7 @@
                             }
                         }
                     }">
-                </editor>
+                </editor> -->
             </div>
         </vue-resizable>
         <div  class="sym-document__side-bar-right">
@@ -83,10 +88,21 @@
         <err-message :listErr="listMessageErr" ref="errMessage"/>
         <control-name-related :instance="keyInstance"  ref="controlNameRelated"/>
         <all-control-option :instance="keyInstance" ref="allControlOption"/>
+
+        <v-dialog v-model="dialog" persistent max-width="290">
+            <v-card>
+                <v-card-title class="headline">Chuyển sang định dạng version 2</v-card-title>
+                <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn color="green darken-1" text @click="dialog = false">Hủy bỏ</v-btn>
+                <v-btn color="green darken-1" text @click="handlePasteContent">Đồng ý</v-btn>
+                </v-card-actions>
+            </v-card>
+            </v-dialog>
     </v-flex>
 </template>
 <script>
-import Editor from '@tinymce/tinymce-vue';
+// import Editor from '@tinymce/tinymce-vue';
 import EditorAction from './items/Action.vue';
 import SideBarLeft from './sideleft/SideBarLeft.vue';
 import SideBarRight from './sideright/SideBarRight.vue';
@@ -106,12 +122,32 @@ import {checkInTable} from "./common/common";
 import { getInsertionCSS } from "./../../components/document/documentUtil.js";
 import VueResizable from 'vue-resizable';
 import { minimizeControl } from '../../store/document/mutations';
-let isShowAutocompleteControl = false;
+
+import tinymce from 'tinymce/tinymce';
+
+import 'tinymce/icons/default';
+import 'tinymce/themes/silver';
+import 'tinymce/skins/ui/oxide/content.min.css';
+import 'tinymce/skins/ui/oxide/skin.min.css';
+import 'tinymce/plugins/advlist';
+import 'tinymce/plugins/autolink';
+import 'tinymce/plugins/lists';
+import 'tinymce/plugins/link';
+import 'tinymce/plugins/image';
+import 'tinymce/plugins/table';
+import 'tinymce/plugins/print';
+import 'tinymce/plugins/preview';
+import 'tinymce/plugins/code';
+import 'tinymce/plugins/fullscreen';
+import 'tinymce/plugins/paste';
+import 'tinymce/plugins/hr';
+                                
 // biến lưu chiều rộng editor trước khi resize 
 const ALL_CONTROL = "allControl"
 const HTML_CONTENT = "content"
 const CODUMENT_PROPS = "documentProperties"
 export default { 
+    name: 'DocumentEditor',
     computed: {
         editorStore(){  
             return this.$store.state.document.editor[this.keyInstance];
@@ -121,7 +157,6 @@ export default {
         }
     }, 
     components: {
-        'editor': Editor,
         'sidebar-left' : SideBarLeft,
         'sidebar-right' : SideBarRight,
         'editor-action' : EditorAction,
@@ -133,6 +168,75 @@ export default {
         "all-control-option":AllControlInDoc,
         "control-name-related":ControlNameRelated,
     },
+    mounted(){
+        let self = this;
+         tinymce.init({
+                                theme: 'silver',
+                                skin: 'oxide',
+                                selector:  '#document-editor-'+self.keyInstance,
+                                forced_root_block:'div',
+                                toolbar_items_size : 'small',
+                                menubar: false,
+                                plugins: [
+                                'advlist autolink lists link image table print preview',
+                                ' fullscreen',
+                                'table paste code hr'
+                                ],
+                                contextmenu: 'inserttable table | settingtable',
+                                toolbar:
+                                'undo redo | fontselect fontsizeselect formatselect | bold italic forecolor backcolor | \
+                                alignleft aligncenter alignright alignjustify | \
+                                bullist numlist indent hr | removeformat  table |  preview margin',
+                                fontsize_formats: '8px 10px 11px 12px 13px 14px 15px 16px 17px 18px 19px 20px 21px 22px 23px 24px 25px 26px 27px 28px 29px 30px 32px 34px 36px',
+                                font_formats: 'Roboto = Roboto,sans-serif; Andale Mono=andale mono,times;'+ 'Arial=arial,helvetica,sans-serif;'+ 'Arial Black=arial black,avant garde;'+ 'Book Antiqua=book antiqua,palatino;'+ 'Comic Sans MS=comic sans ms,sans-serif;'+ 'Courier New=courier new,courier;'+ 'Georgia=georgia,palatino;'+ 'Helvetica=helvetica;'+ 'Impact=impact,chicago;'+ 'Symbol=symbol;'+ 'Tahoma=tahoma,arial,helvetica,sans-serif;'+ 'Terminal=terminal,monaco;'+ 'Times New Roman=times new roman,times;'+ 'Trebuchet MS=trebuchet ms,geneva;'+ 'Verdana=verdana,geneva;'+ 'Webdings=webdings;'+ 'Wingdings=wingdings,zapf dingbats',
+                                valid_elements: '*[*]',
+                                content_css:['https://cdn.jsdelivr.net/npm/@mdi/font@latest/css/materialdesignicons.min.css'],
+                                setup: function(ed){
+                                    ed.ui.registry.addMenuItem('settingtable', {
+                                        text: 'Setting table',
+                                        disabled : false,
+                                        onAction: function(e) {
+                                            showSettingControlTable(e);
+                                        }
+                                    });
+                                
+                                    ed.ui.registry.addButton('margin', {
+                                    icon:'margin',
+                                    tooltip:'Margin',
+                                        onAction: function (_) {
+                                            showPaddingPageConfig(ed);
+                                        }
+                                    }); 
+                                    for(let i = 0;i < self.listIconToolbar.length;i++){
+                                        ed.ui.registry.addIcon(self.listIconToolbar[i].name,`<i class='mdi `+self.listIconToolbar[i].icon+`' style='font-size:18px;rgba(0, 0, 0, 0.54);'></i>`)
+                                    }
+                                    ed.on('click', function(e) {
+                                        self.detectClickEvent(e)
+                                    });
+                                    ed.on('contextmenu', function(e) {
+                                        self.detectClickEvent(e)
+                                    });
+                                    ed.on('blur', function(e) {
+                                        self.detectBlurEditorEvent(e)
+                                    });
+                                    ed.on('keyup', function(e) {
+                                        self.keyHandler(e)
+                                    });
+                                    ed.on('paste', function(e) {
+                                        self.onPaste(e)
+                                    });
+                                },
+                                init_instance_callback : function(editor) {
+                                    self.editorCore = editor
+                                    self.initEditor()
+                                },
+                            });
+                          
+
+    },
+    activated(){
+        
+    },
     created() {
         this.$store.commit("document/setDefaultEditorStore",{instance:this.keyInstance});
         this.documentId = this.$route.params.id;
@@ -141,8 +245,8 @@ export default {
          * Nhận sự kiên từ click treeview danh sách các control trong doc thì highlight control và selected control
          */
         this.$evtBus.$on("document-editor-click-treeview-list-control", locale => {
-            let elControl = $("#editor_ifr").contents().find('body #'+locale.id);
-            $("#editor_ifr").contents().find('.on-selected').removeClass('on-selected');
+            let elControl = $("#document-editor-"+thisCpn.keyInstance+"_ifr").contents().find('body #'+locale.id);
+            $("#document-editor-"+thisCpn.keyInstance+"_ifr").contents().find('.on-selected').removeClass('on-selected');
             elControl.addClass('on-selected');
             let type = elControl.attr('s-control-type');
             let controlId = elControl.attr('id');
@@ -161,13 +265,14 @@ export default {
          * Nhận sự kiện phát ra từ formTpl lúc on change để check trùng tên control
          */
         this.$evtBus.$on("form-tpl-input-value-changed", locale =>{
-            $('#editor_ifr').contents().find('.s-control-error').removeClass('s-control-error');
+            $('#document-editor'+thisCpn.keyInstance+'_ifr').contents().find('.s-control-error').removeClass('s-control-error');
             thisCpn.checkNameAfterChange();
         })
             
     },
     data(){
         return{
+            editorCore: null,
             isAutocompleteControl:false,
             listMessageErr:[],
             documentId:0,
@@ -178,7 +283,8 @@ export default {
             lastKeypressTime : 0,
             listIconToolbar:null,
             listNameValueControl:{},
-            keyInstance:Date.now()
+            keyInstance:Date.now(),
+            dialog: false,
         }
     },
     beforeMount(){
@@ -209,17 +315,25 @@ export default {
     watch:{
         // kiểm tra xem route thay đổi khi vào editor là edit doc hay create doc
         '$route' (to) {
-            this.$store.commit("document/setDefaultEditorStore",{instance:this.keyInstance});
             this.documentId = Date.now();
+            // this.$store.commit("document/setDefaultEditorStore",{instance:this.keyInstance});
             if(to.name =='editDocument'){
                 this.documentId = to.params.id;
             }
-            if(to.name == 'createDocument'){
+            else if(to.name == 'createDocument'){
                 this.documentId = 0;
             }            
         }
     },
     methods:{
+        onPaste(event){
+            this.dialog = true;
+            
+        },
+        handlePasteContent(){
+            this.dialog = false;
+            this.setContentForDocumentV1();
+        },
         px2cm(px) {
             return (Math.round((px / 37.7952) * 100) / 100).toFixed(1);
         },
@@ -243,14 +357,14 @@ export default {
             allControl = JSON.parse(allControl);
             let content = localStorage.getItem(HTML_CONTENT);
             let documentProperties = localStorage.getItem(CODUMENT_PROPS);
-            this.$refs.editor.editor.setContent(content);
+            this.editorCore.setContent(content);
             this.$store.commit("document/addTodocumentPropsEditor",{key:this.keyInstance,value:documentProperties});  
             this.$store.commit("document/addToDocumentEditorStore",{key:ALL_CONTROL,value:allControl,instance:this.keyInstance});  
         },
         //set data vào local storage
         saveContentToLocalStorage(){
             let allControl = this.editorStore.allControl;
-            let content = this.$refs.editor.editor.getContent();
+            let content = this.editorCore.getContent();
             let documentProperties = this.sDocumentProp;
             localStorage.setItem(ALL_CONTROL,JSON.stringify(allControl));
             localStorage.setItem(HTML_CONTENT,content);
@@ -269,7 +383,7 @@ export default {
         cloneControl(){
             let currentControl = this.editorStore.currentSelectedControl;
             let controlInstance = util.cloneDeep(this.editorStore.allControl[currentControl.id])
-            let control = $("#editor_ifr").contents().find('.on-selected');
+            let control = $("#document-editor-"+this.keyInstance+"_ifr").contents().find('.on-selected');
             if(control.length > 0){
                 control.removeClass('on-selected')
                 let id = 's-control-id-' + Date.now();
@@ -287,17 +401,17 @@ export default {
             }  
         },
         deleteControl(){
-            let control = $("#editor_ifr").contents().find('.on-selected');
+            let control = $("#document-editor-"+this.keyInstance+"_ifr").contents().find('.on-selected');
             this.resetSelectControl()
             control.remove();
 
         },
         // ham tạo dialog của tinymce để cấu hình padding doc
         showPaddingPageConfig(ed){
-                var left = $("#editor_ifr").contents().find('body').css('padding-left').slice(0, -2);
-                var right = $("#editor_ifr").contents().find('body').css('padding-right').slice(0, -2);
-                var top = $("#editor_ifr").contents().find('body').css('padding-top').slice(0, -2);
-                var bottom = $("#editor_ifr").contents().find('body').css('padding-bottom').slice(0, -2);
+                var left = $("#document-editor-"+this.keyInstance+"_ifr").contents().find('body').css('padding-left').slice(0, -2);
+                var right = $("#document-editor-"+this.keyInstance+"_ifr").contents().find('body').css('padding-right').slice(0, -2);
+                var top = $("#document-editor-"+this.keyInstance+"_ifr").contents().find('body').css('padding-top').slice(0, -2);
+                var bottom = $("#document-editor-"+this.keyInstance+"_ifr").contents().find('body').css('padding-bottom').slice(0, -2);
                 left = this.px2cm(left);
                 right = this.px2cm(right);
                 top = this.px2cm(top);
@@ -348,7 +462,7 @@ export default {
                         var right = data.right;
                         var top = data.top;
                         var bottom = data.bottom;
-                        $("#editor_ifr").contents().find('body').css({
+                        $("#document-editor-"+this.keyInstance+"_ifr").contents().find('body').css({
                             'padding-left': left + 'cm',
                             'padding-right': right + 'cm',
                             'padding-top': top + 'cm',
@@ -365,10 +479,10 @@ export default {
         },
         // mở modal lưu , edit doc
         openPanelSaveDocument(){
-            if($('#editor_ifr').contents().find('.s-control').length > 0){
+            if($('#document-editor-'+this.keyInstance+'_ifr').contents().find('.s-control').length > 0){
                 let allControl = this.editorStore.allControl;
                 this.checkEmptyControl(allControl,'0');
-                if($('#editor_ifr').contents().find('.s-control-error').length == 0){
+                if($('#document-editor-'+this.keyInstance+'_ifr').contents().find('.s-control-error').length == 0){
                     if(this.documentId == undefined || this.documentId == 0)
                     this.setDocumentProperties({})
                     this.$refs.saveDocPanel.showDialog()
@@ -389,7 +503,7 @@ export default {
                 if(allControl[controlId].type != 'submit' && allControl[controlId].type != 'draft' 
                 && allControl[controlId].type != 'reset' && allControl[controlId].type != 'approvalHistory'
                 && allControl[controlId].properties.name.value == ""){
-                    let controlEl = $('#editor_ifr').contents().find('#'+controlId);
+                    let controlEl = $('#document-editor-'+this.keyInstance+'_ifr').contents().find('#'+controlId);
                     controlEl.addClass('s-control-error');
                     this.$store.commit(
                         "document/updateProp",{id:controlId,name:"name",value:"Không được bỏ trống tên control",
@@ -432,7 +546,7 @@ export default {
        
 
         minimizeControlEL(allControl){
-            var allInputControl = $("#editor_ifr").contents().find('body').find(".s-control");
+            var allInputControl = $("#document-editor-"+this.keyInstance+"_ifr").contents().find('body').find(".s-control");
             let allId = [];
             $.each(allInputControl,function(k,v){
                 let id = $(v).attr('id');
@@ -463,7 +577,7 @@ export default {
             let allControl = this.minimizeControlEL(this.editorStore.allControl);
             let documentProperties = util.cloneDeep(this.sDocumentProp);
             documentProperties = JSON.stringify(documentProperties);
-            let htmlContent = this.$refs.editor.editor.getContent();
+            let htmlContent = this.editorCore.getContent();
             let dataPost = this.getDataToSaveMultiFormulas(allControl);
             if(Object.keys(dataPost).length > 0){
                 let thisCpn = this;
@@ -474,7 +588,7 @@ export default {
                         for(let controlId in data){
                             for(let i = 0; i < data[controlId].length; i++){
                                 let key = Object.keys(data[controlId][i])[0];
-                                let controlEl = $("#editor_ifr").contents().find('#'+controlId);
+                                let controlEl = $("#document-editor-"+thisCpn.keyInstance+"_ifr").contents().find('#'+controlId);
                                 let tableId = 0;
                                 if(!controlEl.is('.s-control-table') && controlEl.closest(".s-control-table").length > 0){
                                     tableId = controlEl.closest(".s-control-table").attr('id');
@@ -484,7 +598,7 @@ export default {
                                 );   
                             }
                         } 
-                        if(this.documentId != 0 && this.documentId != undefined && typeof this.documentId != 'undefined'){   //update doc
+                        if(this.$route.name == "editDocument"){   //edit doc
                             this.editDocument({documentProperty:documentProperties,fields:JSON.stringify(allControl),content:htmlContent,id:this.documentId})
                         } 
                         else{
@@ -507,7 +621,7 @@ export default {
                 }
             }     
             else{
-                if(this.documentId != 0 && this.documentId != undefined && typeof this.documentId != 'undefined'){   //update doc
+                if(this.$route.name == "editDocument"){   //edit doc
                     this.editDocument({documentProperty:documentProperties,fields:JSON.stringify(allControl),content:htmlContent,id:this.documentId})
                 }
                 else{
@@ -522,7 +636,7 @@ export default {
             let thisCpn = this;
             documentApi.saveDocument(dataPost).then(res => {
                 if (res.status == 200) {
-                    thisCpn.$refs.editor.editor.remove();
+                    thisCpn.editorCore.remove();
                     thisCpn.$router.push('/documents');
                     thisCpn.$snotify({
                         type: "success",
@@ -553,7 +667,7 @@ export default {
             let thisCpn = this;
             documentApi.editDocument(dataPost).then(res => {
                 if (res.status == 200) {
-                    thisCpn.$refs.editor.editor.remove();
+                    thisCpn.editorCore.remove();
                     thisCpn.$router.push('/documents');
                     thisCpn.$snotify({
                         type: "success",
@@ -596,8 +710,8 @@ export default {
             let listControlName = [];
             this.listMessageErr = [];
             //check trung ten control
-            $("#editor_ifr").contents().find('.on-selected').removeClass('on-selected');
-            if($('#editor_ifr').contents().find('.s-control-error').length == 0){
+            $("#document-editor-"+thisCpn.keyInstance+"_ifr").contents().find('.on-selected').removeClass('on-selected');
+            if($('#document-editor-'+thisCpn.keyInstance+'_ifr').contents().find('.s-control-error').length == 0){
                 this.saveDocument();
             }
             else{
@@ -612,7 +726,7 @@ export default {
         checkValidNameControl(controlId,control){
             if(control.type != "submit" && control.type != "draft" && control.type != "reset" && control.type != "approvalHistory"){
                 if(control.properties.name.value == ''){
-                    let controlEl = $('#editor_ifr').contents().find('#'+controlId);
+                    let controlEl = $('#document-editor-'+this.keyInstance+'_ifr').contents().find('#'+controlId);
                     controlEl.addClass('s-control-error');
                     let message = 'Không được bỏ trống tên control'
                     let tableId = checkInTable(controlEl)
@@ -631,7 +745,7 @@ export default {
       //updateCurrentControlProps
         // hàm kiểm tra xem co control nào trùng tên hay ko
         checkDupliucateNameControl(control,controlId){
-            let controlEl = $('#editor_ifr').contents().find('#'+controlId);
+            let controlEl = $('#document-editor-'+this.keyInstance+'_ifr').contents().find('#'+controlId);
             controlEl.addClass('s-control-error');
           
            
@@ -659,7 +773,7 @@ export default {
         },
         // hàm xử lí thêm các cột vào trong control table khi lưu ở tablesetting
         addColumnTable(listRowData){
-            let elements = $('#editor_ifr').contents().find('.s-control-table.on-selected');
+            let elements = $('#document-editor-'+this.keyInstance+'_ifr').contents().find('.s-control-table.on-selected');
             let table = elements.find('thead').closest('.s-control-table');
             let tableId = table.attr('id');
             let thead = '';
@@ -683,7 +797,7 @@ export default {
 
         //hoangnd: hàm mở modal tablesetting của control table
         showSettingControlTable(e) {
-            let elements = $('#editor_ifr').contents().find('.on-selected');
+            let elements = $('#document-editor-'+this.keyInstance+'_ifr').contents().find('.on-selected');
             if(elements.hasClass('s-control-table') || elements.parent().hasClass('s-control-table')){
                 let thead = elements.find('thead tr th');
                 let tbody = elements.find('tbody tr td');
@@ -739,7 +853,7 @@ export default {
         //hoangnd : hàm được gọi từ AutoCompleteControl component để insert 1 control
         insertControl(type){
             this.hideAutocompletaControl();
-            let contentNode = $(this.$refs.editor.editor.selection.getNode())[0].innerHTML
+            let contentNode = $(this.editorCore.selection.getNode())[0].innerHTML
             let control =  GetControlProps(type);
             var checkDiv = $(control.html);
             var inputid = 's-control-id-' + Date.now();
@@ -750,14 +864,14 @@ export default {
 
             let newContent = contentNode.replace(/\/{2}/, checkDiv[0].outerHTML);
             
-            $(this.$refs.editor.editor.selection.getNode()).html(newContent+'&nbsp;<span id = "caret_pose_holder"> </ span>')
-            let table = $(this.$refs.editor.editor.selection.getNode()).closest('.s-control-table');
+            $(this.editorCore.selection.getNode()).html(newContent+'&nbsp;<span id = "caret_pose_holder"> </ span>')
+            let table = $(this.editorCore.selection.getNode()).closest('.s-control-table');
             this.selectControl(control.properties, control.formulas,inputid);
-            let ed  = this.$refs.editor.editor;
+            let ed  = this.editorCore;
             ed.focus(); 
             ed.selection.select(ed.dom.select('#caret_pose_holder')[0]); 
             ed.selection.collapse(0); 
-             $(this.$refs.editor.editor.selection.getNode()).find('#caret_pose_holder').remove();
+             $(this.editorCore.selection.getNode()).find('#caret_pose_holder').remove();
             if(table.length > 0 && inputid != table.attr('id')){
                 let tableId = table.attr('id');
                 this.addToAllControlInTable(inputid,{properties: control.properties, formulas : control.formulas,type:type},tableId);
@@ -781,9 +895,9 @@ export default {
                 var thisKeypressTime = new Date();
                 if ( thisKeypressTime - this.lastKeypressTime <= this.delta )
                 {
-                    var scroll_top = $("#editor_ifr").contents().scrollTop();
-                    var nodePosition = $(thisCpn.$refs.editor.editor.selection.getNode()).position();
-                    var off = $(thisCpn.$refs.editor.editor.selection.getNode()).offset();
+                    var scroll_top = $("#document-editor-"+thisCpn.keyInstance+"_ifr").contents().scrollTop();
+                    var nodePosition = $(thisCpn.editorCore.selection.getNode()).position();
+                    var off = $(thisCpn.editorCore.selection.getNode()).offset();
                     var top = nodePosition.top;
                     var left = nodePosition.left;
                     var width_toolbox = $('.sym-document__side-bar-left').width();
@@ -811,6 +925,9 @@ export default {
         
         //su kiện click vào editor
         detectClickEvent(event){
+            if($(event.target).is('.s-control'))
+            this.setSelectedControlProp(event,$(event.target),$('#document-editor-'+this.keyInstance+'_ifr').get(0).contentWindow);
+
         // kiểm tra nếu click ngoài khung autocomplete control thì đóng lại
             if (event.target.id != 'list-control-autocomplete' && $(event.target).parents('#list-control-autocomplete').length == 0) {
                 this.hideAutocompletaControl();
@@ -819,7 +936,7 @@ export default {
         // hàm click ra ngoài editor thì cập nhật lại dữ liệu của store
         detectBlurEditorEvent(event){
             this.saveContentToLocalStorage()
-            let allControlEl = $('#editor_ifr').contents().find('.s-control');
+            let allControlEl = $('#document-editor-'+this.keyInstance+'_ifr').contents().find('.s-control');
             let listId = []
             $.each(allControlEl,function(k,v){
                 let id = $(v).attr('id');
@@ -845,16 +962,20 @@ export default {
         resizeEditorEnd(e){
             $('#bg-over-editor').remove();
         },
-        setContentForDocumentV1(dataDocument){
+        setContentForDocumentV1(){
             let thisCpn = this;
-            $("#editor_ifr").contents().find('.bkerp-input').addClass('s-control').removeClass('bkerp-input');
-            $("#editor_ifr").contents().find('head link').remove()
-            $("#editor_ifr").contents().find('body link').remove()
-            $("#editor_ifr").contents().find('body meta').remove()
-            $("#editor_ifr").contents().find('body style').remove()
-            let allControl = $("#editor_ifr").contents().find('.s-control:not(.bkerp-input-table .s-control)');
+            $("#document-editor-"+this.keyInstance+"_ifr").contents().find('.bkerp-input').addClass('s-control').removeClass('bkerp-input');
+            $("#document-editor-"+this.keyInstance+"_ifr").contents().find('.mce-item-table').css({width:'100%'}).attr('data-mce-style','width:100%');
+            $("#document-editor-"+this.keyInstance+"_ifr").contents().find('head link').remove()
+            $("#document-editor-"+this.keyInstance+"_ifr").contents().find('body link').remove()
+            $("#document-editor-"+this.keyInstance+"_ifr").contents().find('body meta').remove()
+            $("#document-editor-"+this.keyInstance+"_ifr").contents().find('body style').remove()
+            let allControl = $("#document-editor-"+this.keyInstance+"_ifr").contents().find('.s-control:not(.bkerp-input-table .s-control)');
+            console.log('safashd',allControl);
             $.each(allControl,function(item,value){
                 let controlProps = $(value).attr('data-property');
+                controlProps = controlProps.replace(/\"\[/gm,"[");
+                controlProps = controlProps.replace(/\]\"/gm,"]");
                 let type = $(value).attr('bkerp-type');
                 let style = $(value).attr('style');
                 if(type == 'text') type = 'textInput'
@@ -865,10 +986,10 @@ export default {
                 controlEl.attr('id', inputid).attr('style',style);
                 controlEl.replaceAll($(value))
                 try {
-                    //loi parse ở đây
                     controlProps = JSON.parse(controlProps);
                     let controlProp = {};
                     let controlFormulas = {};
+                    console.log('safashd',controlProps);
                     $.each(controlProps,function(k,v){
                         if(mappingOldVersionControlProps[k] != undefined && controlV2.properties[mappingOldVersionControlProps[k]] != undefined){
                             controlV2.properties[mappingOldVersionControlProps[k]].value = v;
@@ -934,11 +1055,17 @@ export default {
             if(this.documentId != 0){
                 documentApi.detailDocument(this.documentId).then(res => {
                     if (res.status == 200) {
-                        thisCpn.setDocumentProperties(res.data.document);
+                        if(this.$route.name == "editDocument"){
+                            thisCpn.setDocumentProperties(res.data.document);
+                        }
                         let content = res.data.document.content;
-                        thisCpn.$refs.editor.editor.setContent(content);
+                        thisCpn.editorCore.setContent(content);
+                        $("#document-editor-"+thisCpn.keyInstance+"_ifr").contents().find('body select').each(function(e){
+                            let id = $(this).attr('id')
+                            $(this).replaceWith('<input class="s-control s-control-select" s-control-type="select" type="text" title="Select" readonly="readonly" id="' + id + '"/>');
+                        })
                         if(res.data.document.version == 1){
-                            thisCpn.setContentForDocumentV1(res.data.document);
+                            thisCpn.setContentForDocumentV1();
                         }
                         else{
                             let fields = res.data.fields;
@@ -956,7 +1083,7 @@ export default {
         },
         // wrap div cho table truong hợp trước đây chưa có scroll
         wrapTableElement(){
-            let listTable = $("#editor_ifr").contents().find('.s-control-table');
+            let listTable = $("#document-editor-"+this.keyInstance+"_ifr").contents().find('.s-control-table');
             if(listTable.length > 0 && !listTable.parent().is('.wrap-s-control-table')){
                 listTable.wrap('<div class="wrap-s-control-table" style="overflow:auto;"></div>')
             }
@@ -1029,6 +1156,7 @@ export default {
                         if(listField[childFieldId]['formulas'] != false){
                             $.each(childFormulas,function(k,v){
                                 if(listField[childFieldId]['formulas'][k] != ""){
+                                    if(listField[childFieldId]['formulas'][k] != undefined)
                                     childFormulas[k].value = Object.values(listField[childFieldId]['formulas'][k])[0]
                                     // childFormulas[k].formulasId = Object.keys(listField[childFieldId]['formulas'][k])[0]
                                 }
@@ -1042,7 +1170,6 @@ export default {
             }
             console.log(this.editorStore);
         },
-
         // sự kiện xảy ra khi khởi tạo xong editor , sự kiện do tinymce cung cấp
         initEditor(){
             let thisCpn = this;
@@ -1100,7 +1227,7 @@ export default {
                             validElement = this.FindValidParent($element, 'left');
 
                         if (validElement.is("body,html"))
-                            validElement = $("#editor_ifr").contents().find("body").children(":not(.drop-marker,[data-dragcontext-marker])").first();
+                            validElement = $("#document-editor-"+thisCpn.keyInstance+"_ifr").contents().find("body").children(":not(.drop-marker,[data-dragcontext-marker])").first();
                         this.DecideBeforeAfter(validElement, mousePercents, mousePos);
                     } else if ((mousePercents.x >= 100 - breakPointNumber.x) || (mousePercents.y >= 100 - breakPointNumber.y)) {
                         var validElement = null
@@ -1110,7 +1237,7 @@ export default {
                             validElement = this.FindValidParent($element, 'right');
 
                         if (validElement.is("body,html"))
-                            validElement = $("#editor_ifr").contents().find("body").children(":not(.drop-marker,[data-dragcontext-marker])").last();
+                            validElement = $("#document-editor-"+thisCpn.keyInstance+"_ifr").contents().find("body").children(":not(.drop-marker,[data-dragcontext-marker])").last();
                         this.DecideBeforeAfter(validElement, mousePercents, mousePos);
                     }
                 },
@@ -1245,7 +1372,7 @@ export default {
                     }
                 },
                 removePlaceholder: function() {
-                    $("#editor_ifr").contents().find(".drop-marker").remove();
+                    $("#document-editor-"+thisCpn.keyInstance+"_ifr").contents().find(".drop-marker").remove();
                 },
                 getPlaceHolder: function() {
                     return $("<li class='drop-marker'></li>");
@@ -1396,7 +1523,7 @@ export default {
                     this.ClearContainerContext();
                     if ($element.is('html,body')) {
                         position = 'inside';
-                        $element = $("#editor_ifr").contents().find("body");
+                        $element = $("#document-editor-"+thisCpn.keyInstance+"_ifr").contents().find("body");
                     }
                     switch (position) {
                         case "inside":
@@ -1405,10 +1532,10 @@ export default {
                                 $contextMarker.addClass('invalid');
                             var name = this.getElementName($element);
                             $contextMarker.find('[data-dragcontext-marker-text]').html(name);
-                            if ($("#editor_ifr").contents().find("body [data-sh-parent-marker]").length != 0)
-                                $("#editor_ifr").contents().find("body [data-sh-parent-marker]").first().before($contextMarker);
+                            if ($("#document-editor-"+thisCpn.keyInstance+"_ifr").contents().find("body [data-sh-parent-marker]").length != 0)
+                                $("#document-editor-"+thisCpn.keyInstance+"_ifr").contents().find("body [data-sh-parent-marker]").first().before($contextMarker);
                             else
-                                $("#editor_ifr").contents().find("body").append($contextMarker);
+                                $("#document-editor-"+thisCpn.keyInstance+"_ifr").contents().find("body").append($contextMarker);
                             break;
                         case "sibling":
                             this.PositionContextMarker($contextMarker, $element.parent());
@@ -1417,10 +1544,10 @@ export default {
                             var name = this.getElementName($element.parent());
                             $contextMarker.find('[data-dragcontext-marker-text]').html(name);
                             $contextMarker.attr("data-dragcontext-marker", name.toLowerCase());
-                            if ($("#editor_ifr").contents().find("body [data-sh-parent-marker]").length != 0)
-                                $("#editor_ifr").contents().find("body [data-sh-parent-marker]").first().before($contextMarker);
+                            if ($("#document-editor-"+thisCpn.keyInstance+"_ifr").contents().find("body [data-sh-parent-marker]").length != 0)
+                                $("#document-editor-"+thisCpn.keyInstance+"_ifr").contents().find("body [data-sh-parent-marker]").first().before($contextMarker);
                             else
-                                $("#editor_ifr").contents().find("body").append($contextMarker);
+                                $("#document-editor-"+thisCpn.keyInstance+"_ifr").contents().find("body").append($contextMarker);
                             break;
                     }
                 },
@@ -1429,14 +1556,14 @@ export default {
                     $contextMarker.css({
                         height: (rect.height + 4) + "px",
                         width: (rect.width + 4) + "px",
-                        top: (rect.top + $($("#editor_ifr").get(0).contentWindow).scrollTop() - 2) + "px",
-                        left: (rect.left + $($("#editor_ifr").get(0).contentWindow).scrollLeft() - 2) + "px"
+                        top: (rect.top + $($("#document-editor-"+thisCpn.keyInstance+"_ifr").get(0).contentWindow).scrollTop() - 2) + "px",
+                        left: (rect.left + $($("#document-editor-"+thisCpn.keyInstance+"_ifr").get(0).contentWindow).scrollLeft() - 2) + "px"
                     });
-                    if (rect.top + $("#editor_ifr").contents().find("body").scrollTop() < 24)
+                    if (rect.top + $("#document-editor-"+thisCpn.keyInstance+"_ifr").contents().find("body").scrollTop() < 24)
                         $contextMarker.find("[data-dragcontext-marker-text]").css('top', '0px');
                 },
                 ClearContainerContext: function() {
-                    $("#editor_ifr").contents().find('[data-dragcontext-marker]').remove();
+                    $("#document-editor-"+thisCpn.keyInstance+"_ifr").contents().find('[data-dragcontext-marker]').remove();
                 },
                 getElementName: function($element) {
                     return $element.prop('tagName');
@@ -1461,7 +1588,7 @@ export default {
                 DragDropFunctions.ClearContainerContext();
             });
             var style = $("<style data-reserved-styletag></style>").html(getInsertionCSS());
-            var clientFrameWindow = $('#editor_ifr').get(0).contentWindow;
+            var clientFrameWindow = $('#document-editor-'+thisCpn.keyInstance+'_ifr').get(0).contentWindow;
             $(clientFrameWindow.document.head).append(style);
 
             var htmlBody = $(clientFrameWindow.document).find('body,html');
@@ -1494,16 +1621,8 @@ export default {
                     DragDropFunctions.AddEntryToDragOverQueue(currentElement, elementRectangle, mousePosition);
                 }
             })
-            //click vào 1 control trong doc thì lấy từ store để set giá trị cho currentSelected control trong store
-            // mục đích đê cập nhật lại view nhập các thuộc tính
-            $("#editor_ifr").contents().find('body').on('contextmenu','.s-control',function(e){
-                 thisCpn.setSelectedControlProp(e,$(this),clientFrameWindow);
-            })
-            $("#editor_ifr").contents().find('body').on('click','.s-control',function(e){
-                e.stopPropagation();
-                thisCpn.setSelectedControlProp(e,$(this),clientFrameWindow);
-            })
-
+      
+           
             // sự kiện thả control vào doc
             // xử lí thêm props của control vào store
             $(clientFrameWindow.document).find('body,html').on('drop', function(event) {
@@ -1517,7 +1636,7 @@ export default {
                 try {
                     var control = e.dataTransfer.getData('control');
                     control = JSON.parse(control)
-                    var insertionPoint = $("#editor_ifr").contents().find(".drop-marker");
+                    var insertionPoint = $("#document-editor-"+thisCpn.keyInstance+"_ifr").contents().find(".drop-marker");
                     var checkDiv = $(control.html);
                     let typeControl = checkDiv.attr('s-control-type');
                     var inputid = 's-control-id-' + Date.now();
