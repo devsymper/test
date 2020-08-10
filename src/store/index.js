@@ -6,6 +6,7 @@ import processModule from "./process";
 import orgchartModule from "./orgchart";
 import permissionModule from "./permission";
 import actionPackModule from "./actionPack";
+import importExcelModule from './importExcel';
 
 Vue.use(Vuex);
 
@@ -16,6 +17,7 @@ export default new Vuex.Store({
         process: processModule,
         orgchart: orgchartModule,
         permission: permissionModule,
-        actionPack: actionPackModule
+        actionPack: actionPackModule,
+        importExcel: importExcelModule
     }
 });

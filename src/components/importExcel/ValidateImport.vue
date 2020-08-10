@@ -42,7 +42,7 @@
                         Cột: {{errorControl.title}} </span>
                   
                 </v-row>
-                  <v-row style="width:100%; margin-left:0px!important" class="ml-1 mt-5 color-grey">
+                  <v-row style="width:100%; margin-left:-22px!important" class="mt-9 color-grey">
                         {{errorControl.sheet}} {{errorControl.columnName}}
                     </v-row>
                 <div class="mb-1 mt-2" v-for="(error, errorIdx) in errorControl.errors" :key="errorIdx">
@@ -125,7 +125,7 @@
                 <i class="mdi mdi-check ml-4"></i>
             </span>
         </v-row>
-        <v-row class="mr-7" v-if="processing.importing.processed/processing.importing.total<1">
+        <v-row class="mr-6 ml-2" v-if="processing.importing.processed/processing.importing.total<1">
            <div style="height: 5px;  margin-top:-5px; background-color:#DCDCDC; width:100%" ></div>
            <div :style="{'width': ((processing.importing.processed/processing.importing.total)*100)+'%'}" style="height: 5px;  margin-top:-5px; background-color:orange"></div>
         </v-row>
@@ -146,7 +146,6 @@ import {BeatLoader} from '@saeris/vue-spinners'
 export default {
     components: {
         BeatLoader
-
     },
     props:['fileName','setInterval'],
     methods: {
@@ -161,24 +160,9 @@ export default {
         },
         cancel() {
             //xoá data
-            this.fileName='';
+            this.$store.commit('importExcel/setNewImport', true);
             this.$emit('deleteFileName');
             this.$emit('cancel');
-            this.processing={
-                preprocessing: {
-                processed: 0,
-                isDone: false
-                },
-                validating: {
-                    total: 200,
-                    processed: 20,
-                    errors: []
-                },
-                importing: {
-                    total: 0,
-                    processed: 0
-                },      
-        }
         },
         requestGetAPI(){
             const self= this;
@@ -198,21 +182,47 @@ export default {
             })
         }
     },
+    computed: {
+      newImport() {
+        return this.$store.state.importExcel.newImport;
+      }
+    },
     watch: {
+        newImport(val) {
+            if (val) {
+                this.processing = {
+                    preprocessing: {
+                    processed: 0,
+                    isDone: false
+                    },
+                    validating: {
+                        total: 200,
+                        processed: 20,
+                        errors: []
+                    },
+                    importing: {
+                        total: 0,
+                        processed: 0
+                    },      
+                };
+                clearInterval(this.loopCheckProcess);
+            }
+        },
         processing(){
              if(this.processing.importing.total/this.processing.processed==1||this.processing.validating.errors.length>0)
            {
                 clearInterval(this.loopCheckProcess)
            }
-        }
-
-    },
-    created(){
-        let self = this;
-        if(this.setInterval){
-           self.loopCheckProcess = setInterval(()=>{
-                self.requestGetAPI();
-           } ,500);
+        },
+        fileName(val) {
+            if (val) {
+                const self = this;
+                if(this.setInterval){
+                    this.loopCheckProcess = setInterval(()=>{
+                            self.requestGetAPI();
+                    }, 500);
+                }
+            }
         }
     },
     data() {

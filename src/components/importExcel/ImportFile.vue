@@ -12,16 +12,17 @@
         </v-list-item-content>
     </v-list-item>
     <v-divider width="440" class="ml-4"></v-divider>
+    
     <v-list dense>
         <v-row class="ml-5 mt-1 mr-6">
             <span class="font "><b class="color-grey fw-500">
-                Import dữ liệu cho chứng từ: {{nameDocument}}</b></span>
+                    Import dữ liệu cho chứng từ: {{nameDocument}}</b></span>
         </v-row>
         <v-row>
         </v-row>
         <v-row class="ml-2 mt-1">
             <v-col class="col-md-3 font-normal">
-                Chọn file   
+                Chọn file
             </v-col>
             <v-col style="margin-top:-5px">
                 <UploadFile @dataExcel="getDataExcel" />
@@ -36,32 +37,24 @@
     </v-list>
     <!-- Thông tin chung -->
     <v-list class="fs-13 ml-4 mr-0">
-        <div style="margin-bottom:-42px" class="col-flex" v-for="(table, tableIdx) in tables" :key="tableIdx">
+        <div class="col-flex" v-for="(table, tableIdx) in tables" :key="tableIdx">
             <v-row class=" mr-1 mb-4">
-                <v-col class="col-md-5 ml-1 pl-2" style="margin-top: -13px;"    >
+                <v-col class="col-md-5 ml-1 pl-2" style="margin-top: -13px;">
                     <v-icon v-if="tables[tableIdx]==tables[0]" size="18">mdi-file-outline</v-icon>
                     <v-icon v-else size="18" class='ml-3'>mdi-table</v-icon>
-                    <span class="color-grey fs-13 pl-1" >
-                        <b class="fw-500">{{table.name}} 
-                            <span v-if="tables[tableIdx]==tables[0]" style="color:red">* 
-                    </span>
-                        ({{table.controls.filter(p => p.dataColumn!=null).length}}/{{table.controls.filter(p => p.dataType!='table').length+1}})</b></span>
+                    <span class="color-grey fs-13 pl-1">
+                        <b class="fw-500">{{table.name}}
+                            <span v-if="tables[tableIdx]==tables[0]" style="color:red">*
+                            </span>
+                            ({{table.controls.filter(p => p.dataColumn!=null).length}}/{{table.controls.filter(p => p.dataType!='table').length+1}})</b></span>
                 </v-col>
                 <v-col class="col-md-6 py-0">
-                    <v-autocomplete :value="table.sheetMap" 
-                    @input="value => onChangeSheet(tableIdx, value)" 
-                    class="auto-complete color-normal mt-4 mb-3 fs-13 " 
-                    :items="nameSheets" 
-                    item-text="name" 
-                    return-object 
-                    style="width: 217px;padding-left:2px" 
-                    clearable 
-                    :menu-props="{'nudge-top':-10, 'max-width': 300}">
+                    <v-autocomplete :value="table.sheetMap" @input="value => onChangeSheet(tableIdx, value)" class="auto-complete color-normal mt-4 mb-3 fs-13 " :items="nameSheets" item-text="name" return-object style="width: 217px;padding-left:2px" clearable :menu-props="{'nudge-top':-10, 'max-width': 300}">
                         <template v-slot:item="{ item, on, attrs }">
                             <v-list-item v-show="item.enable" v-on="on" v-bind="attrs">
                                 <v-list-item-content>
                                     <v-list-item-title>
-                                        {{item.name}} 
+                                        {{item.name}}
                                     </v-list-item-title>
                                 </v-list-item-content>
                             </v-list-item>
@@ -70,22 +63,13 @@
                 </v-col>
                 <!-- khoá ngoai -->
             </v-row>
-             <v-row class=" mr-1 mb-7" style="margin-top: -27px">
-                 <v-col class="col-md-5 ml-1 pl-4 pb-3 d-flex justify-content">
-                    <v-icon style=" margin-top:-45px; font-size:13px "
-                    class="pr-3" size="18">mdi mdi-key</v-icon>
+            <v-row class=" mr-1 mb-7" style="margin-top: -27px">
+                <v-col class="col-md-5 ml-1 pl-4 pb-3 d-flex justify-content">
+                    <v-icon style=" margin-top:-45px; font-size:13px " class="pr-3" size="18">mdi mdi-key</v-icon>
                     <div class="color-normal" style="float:left; margin-top:-30px">Khoá</div>
                 </v-col>
-                   <v-col class="col-md-6 py-0" style="margin-left:2px">
-                    <v-autocomplete 
-                        class=" color-normal auto-complete" 
-                        style="width: 215px"
-                        :items="nameColumnDetail[table.sheetMap.name] ? nameColumnDetail[table.sheetMap.name] : []" 
-                        item-text="name" 
-                        return-object 
-                        v-model="table.keyColumn" 
-                        clearable 
-                        :menu-props="{'nudge-top':-10, 'max-width': 300}">
+                <v-col class="col-md-6 py-0" style="margin-left:2px">
+                    <v-autocomplete class=" color-normal auto-complete" style="width: 215px" :items="nameColumnDetail[table.sheetMap.name] ? nameColumnDetail[table.sheetMap.name] : []" item-text="name" return-object v-model="table.keyColumn" clearable :menu-props="{'nudge-top':-10, 'max-width': 300}">
                         <template v-slot:item="{ item, on, attrs }">
                             <v-list-item v-show="item.enable" v-on="on" v-bind="attrs">
                                 <v-list-item-content>
@@ -99,27 +83,18 @@
                 </v-col>
             </v-row>
             <v-row class="mr-3 mb-4" v-for="(control, controlIdx) in table.controls" :key="controlIdx" v-if="control.dataType!='table'">
-                <v-col  class="col-md-5 ml-2 pl-3" style=" margin-top:-57px">
+                <v-col class="col-md-5 ml-2 pl-3" style=" margin-top:-57px">
                     <v-icon class='fs-14 mr-2 color-normal'>{{getIcon(control.dataType)}}</v-icon>
-                
-      <v-tooltip right>
-        <template v-slot:activator="{ on, attrs }">
-          <span v-on="on" class="color-normal"> {{formatName(control.title ? control.title : control.name)}}</span>
-        </template>
-                 {{formatName(control.title ? control.title : control.name)}}
-                 </v-tooltip>
+
+                    <v-tooltip right>
+                        <template v-slot:activator="{ on, attrs }">
+                            <span v-on="on" class="color-normal"> {{formatName(control.title ? control.title : control.name)}}</span>
+                        </template>
+                        {{control.title ? control.title : control.name}}
+                    </v-tooltip>
                 </v-col>
                 <v-col class="col-md-6 " style="margin-top:-39px;margin-left:2px">
-                    <v-autocomplete 
-                        style="width: 215px;" 
-                        class="auto-complete color-normal" 
-                        :items="nameColumnDetail[table.sheetMap.name] ? nameColumnDetail[table.sheetMap.name] : []" 
-                        item-text="name" 
-                        return-object 
-                        :value="control.dataColumn" 
-                        @input="value => onChangeDetailInfo(tableIdx, controlIdx, value)" 
-                        clearable 
-                        :menu-props="{'nudge-top':-10, 'max-width': 300}">
+                    <v-autocomplete style="width: 215px;" class="auto-complete color-normal" :items="nameColumnDetail[table.sheetMap.name] ? nameColumnDetail[table.sheetMap.name] : []" item-text="name" return-object :value="control.dataColumn" @input="value => onChangeDetailInfo(tableIdx, controlIdx, value)" clearable :menu-props="{'nudge-top':-10, 'max-width': 300}">
                         <template v-slot:item="{ item, on, attrs }">
                             <v-list-item v-show="item.enable" v-on="on" v-bind="attrs">
                                 <v-list-item-content>
@@ -132,81 +107,84 @@
                     </v-autocomplete>
                 </v-col>
             </v-row>
-    
+
         </div>
- 
-    </v-list>
-<v-row class="ml-3"> <span style="color:red; float:right">{{errorMessage}}</span></v-row>
+        <v-row class="ml-3"> <span style="color:red; float:right">{{errorMessage}}</span></v-row>
         <v-row class="mr-3 ">
             <v-col class="col-md-9 "></v-col>
             <v-col>
-                <v-btn
-                class="ml-1" small 
-                @click="importButton()" 
-                depressed color="info" 
-                style="height:27px; width: 60px; border-radius:2px!important">
+                <v-btn class="ml-1" small @click="importButton()" depressed color="info" style="height:27px; width: 60px; border-radius:2px!important">
                     <span class='fs-13 fw-400'>Import</span>
                 </v-btn>
                 <!-- <button @click="test()">Null</button> -->
             </v-col>
         </v-row>
+    </v-list>
+    
 </div>
 </template>
 
 <script>
 import UploadFile from "./UploadFile";
-import { documentApi} from "./../../api/Document";
+import {
+    documentApi
+} from "./../../api/Document";
 import importApi from "./../../api/ImportExcel";
 
 export default {
     components: {
         UploadFile
     },
-    props: ['deleteFileName','documentId'],
+    props: ['deleteFileName', 'documentId', 'close'],
     data() {
         return {
             drawer: null,
             isSelecting: false,
-         //   documentID:1143,
-           //documentId: 1143,//1785
+            //   documentID:1143,
+            //documentId: 1143,//1785
             propertyDocument: [],
             nameDocument: '',
             nameSheets: [],
             nameColumnDetail: {},
             data: {},
-            fileName:'',
+            fileName: '',
             dataExel: {},
             tables: [],
             showCancelBtn: true,
-           // showImportBtn: true,
+            // showImportBtn: true,
             errorMessage: '',
         };
     },
+    computed: {
+      newImport() {
+        return this.$store.state.importExcel.newImport;
+      }
+    },
     methods: {
         //Chọn key cho bảng
-        selectKeyControl(control, allControls){
-            for(let ctrl of allControls){
+        selectKeyControl(control, allControls) {
+            for (let ctrl of allControls) {
                 ctrl.isKeyControl = false;
             }
             control.isKeyControl = true;
         },
         cancel() {
             this.$emit('cancel');
-             //window.location.reload();
+            this.$store.commit('importExcel/setNewImport', true);
+            this.$emit('reload');
+            //window.location.reload();
         },
         // Lấy dữ liệu từ API
         getDataExcel(data) {
             this.data = data.data;
             this.getSheetAndColumnName();
-           // this.showImportBtn = true;
+            // this.showImportBtn = true;
         },
         //không để tên quá dài
-        formatName(name)
-        {
-            if(name.length>22){
-                return name.slice(0,22)+"...";
-            }
-            else{
+        formatName(name) {
+            if (name.length > 22) {
+                return name.slice(0, 22) + "...";
+            } else {
                 return name
             }
         },
@@ -226,22 +204,21 @@ export default {
                     } : null
                 }))
             }));
-           // console.log(cleanedTables);
-            let general=[];
-              for(let i=0; i<cleanedTables.length; i++)
-              {
-                  if(!cleanedTables[i].sheetMap){
-                      continue;
-                  }
-                  let tb = Object.assign({}, cleanedTables[i]);
-                  tb.controls = [];
-                  for(let j=0; j<cleanedTables[i].controls.length; j++){
-                       if(cleanedTables[i].controls[j].dataColumn!=null && cleanedTables[i].controls[j].dataType != 'table'){
-                            tb.controls.push(cleanedTables[i].controls[j]);
-                       }
-                  }
-                  general.push(tb);
-              }
+            // console.log(cleanedTables);
+            let general = [];
+            for (let i = 0; i < cleanedTables.length; i++) {
+                if (!cleanedTables[i].sheetMap) {
+                    continue;
+                }
+                let tb = Object.assign({}, cleanedTables[i]);
+                tb.controls = [];
+                for (let j = 0; j < cleanedTables[i].controls.length; j++) {
+                    if (cleanedTables[i].controls[j].dataColumn != null && cleanedTables[i].controls[j].dataType != 'table') {
+                        tb.controls.push(cleanedTables[i].controls[j]);
+                    }
+                }
+                general.push(tb);
+            }
             let dataImport = {
                 fileName: this.data.fileName,
                 documentName: this.nameDocument,
@@ -249,27 +226,27 @@ export default {
                 mode: 'full',
                 mapping: {
                     general: general[0],
-                    tables: general[1]?general.slice(1, general.length):[],
+                    tables: general[1] ? general.slice(1, general.length) : [],
                 },
 
             };
-           // console.log(dataImport);
+            // console.log(dataImport);
             importApi.pushDataExcel(dataImport)
-            .then(res => {
-                if (res.status === 200) {
-                    //console.log(res.data)
-                }
-            })
-            .catch(err => {
-                console.log(err)
-            });
+                .then(res => {
+                    if (res.status === 200) {
+                        //console.log(res.data)
+                    }
+                })
+                .catch(err => {
+                    console.log(err)
+                });
             for (let i = 0; i < this.tables.length; i++) {
                 if (this.tables[i].sheetMap == '') {
                     this.errorMessage = '* Điền thiếu trường thông tin';
                 } else {
                     this.errorMessage = '';
                     this.$emit('showValidate');
-                    this.$emit('fileName', this.data.fileName );
+                    this.$emit('fileName', this.data.fileName);
                     this.showCancelBtn = false;
                     this.$emit('setInterval');
                     break;
@@ -359,6 +336,7 @@ export default {
                     controls: this.findControlsForTable(tableNames[i]),
                 })
             }
+            debugger
             this.tables = tables;
         },
 
@@ -406,7 +384,7 @@ export default {
             }));
         },
         // loại những cột được chọn. Được chọn chuyển thành false, nếu xoá chuyển thành true
-       onChangeDetailInfo(tableIdx, controlIdx, value) {
+        onChangeDetailInfo(tableIdx, controlIdx, value) {
             if (value) {
                 value.enable = false;
                 if (this.tables[tableIdx].controls[controlIdx].dataColumn) {
@@ -419,38 +397,51 @@ export default {
             }
         }
     },
-     watch:{
-        documentId(){
+    watch: {
+        newImport(val) {
+            if (val) {
+                this.nameSheets = [];
+                this.nameColumnDetail = {};
+                this.fileName = '';
+                this.showCancelBtn = true;
+            }
+        },
+        close() {
+            if (this.close == false) {
+                // this.cancel();
+                this.showCancelBtn = true;
+            }
+        },
+        documentId(val) {
+            if (val) {
+                documentApi.detailDocument(this.documentId)
+                    .then(res => {
+                        if (res.status === 200) {
+                            this.nameDocument = res.data.document.title;
+                            this.propertyDocument = Object.values(res.data.fields);
+                            //console.log( Object.values(this.document));
+                            // lưu tên của các property từ API document vào mảng  
+                            let tableNames = [];
+                            for (let i = 0; i < this.propertyDocument.length; i++) {
+                                if (this.propertyDocument[i].type === 'table') {
+                                    tableNames.push(this.propertyDocument[i].properties.name);
+                                };
+                            };
+                            // khởi tạo mảng lưu các giá trị của table document
+                            this.createTable(tableNames);
+                            // console.log( this.createTable(tableNames));
+                        }
+                    })
+                    .catch(err => {
+                        console.log(err)
+                    })
+            }
 
-
-                 documentApi.detailDocument(this.documentId)
-            .then(res => {
-                if (res.status === 200) {
-                    this.nameDocument = res.data.document.title;
-                    this.propertyDocument = Object.values(res.data.fields);
-                    //console.log( Object.values(this.document));
-                    // lưu tên của các property từ API document vào mảng  
-                    let tableNames = [];
-                    for (let i = 0; i < this.propertyDocument.length; i++) {
-                        if (this.propertyDocument[i].type === 'table') {
-                            tableNames.push(this.propertyDocument[i].properties.name);
-                        };
-                    };
-                    // khởi tạo mảng lưu các giá trị của table document
-                    this.createTable(tableNames);
-                    // console.log( this.createTable(tableNames));
-                }
-            })
-            .catch(err => {
-                console.log(err)
-            })
-              
         }
     },
     // Lấy API document
     created() {
 
-       
     },
 };
 </script>
@@ -503,23 +494,22 @@ export default {
     padding-top: 15px;
 }
 
-.auto-complete ::v-deep .v-input__icon>button{
-    font-size:14px!important
+.auto-complete ::v-deep .v-input__icon>button {
+    font-size: 14px !important
 }
 
-.color-yellow{
-    color:#daa520;
+.color-yellow {
+    color: #daa520;
     opacity: 0;
 }
-.color-yellow:hover{
-    color:#daa520;
-    opacity: 1;
-}
-.key{
-    color:#daa520;
+
+.color-yellow:hover {
+    color: #daa520;
     opacity: 1;
 }
 
-
-
+.key {
+    color: #daa520;
+    opacity: 1;
+}
 </style>

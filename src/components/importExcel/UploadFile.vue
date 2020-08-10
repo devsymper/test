@@ -10,7 +10,7 @@
             <v-icon>mdi-upload</v-icon>
             <input type="file" name="fields[assetsFieldHandle][]" 
               id="assetsFieldHandle"
-              class="d-none" 
+              class="d-none" :value="model"
               @change="onChange" ref="file" accept=".xls,.xlsx" />
         </v-btn>
         <span @change="e => onFileChanged(e.target.files[0])" class="fs-12 fw-400">
@@ -26,11 +26,26 @@
 <script>
 
   export default {
+    computed: {
+      newImport() {
+        return this.$store.state.importExcel.newImport;
+      }
+    },
+    watch:{
+      newImport(val) {
+        if(val)
+        {
+          this.file=null;
+          this.model=''
+        }
+      }
+    },
     data() {
       return {
         file: null,
         isUploading: false,
         uploadSuccess: false, 
+        model:'',
       }
     },
     methods: {

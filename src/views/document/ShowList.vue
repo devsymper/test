@@ -14,26 +14,29 @@
         v-model="drawer" 
         absolute
         class="d-none d-sm-none d-md-flex"
-        temporary 
+        temporary
+        style="height: 100vh"
         v-bind:class="[showValidate==true?'manage-timesheet-800':'manage-timesheet-500']" 
         right>
         <v-row >
             <v-col class="col-md-7">
                 <ImportFile 
-                :documentId="documentId"
-                :deleteFileName="deleteFileName" 
-                @setInterval='setInterval=true' 
-                @cancel="drawer = !drawer" 
-                @fileName=" getFileName" 
-                @showValidate="showValidate=true"/>
+                    @reload="reload()"
+                    :documentId="documentId"
+                    :deleteFileName="deleteFileName" 
+                    @setInterval='setInterval=true' 
+                    @cancel="cancel()" 
+                    @fileName="getFileName" 
+                    @showValidate="showValidate=true"/>
             </v-col>  
             <!-- <v-col>ádádád{{fileName}}</v-col> -->
-            <v-col v-if="showValidate==true" class="col-md-5">
+            <v-col v-show="showValidate" class="col-md-5">
                 <ValidateImport 
-                @deleteFileName="deleteFileName=true"  
-                @cancel="drawer = !drawer" 
-                :setInterval="setInterval"  
-                :fileName="fileName" />
+                    @deleteFileName="deleteFileName=true"  
+                    @cancel="cancel()" 
+                    @close="close1()"
+                    :setInterval="setInterval"  
+                    :fileName="fileName" />
             </v-col>
         </v-row>
     </v-navigation-drawer>
@@ -56,6 +59,7 @@ export default {
         ImportFile,
         ValidateImport,
     },
+ 
     data(){
         return {
             documentId:0,
@@ -150,9 +154,24 @@ export default {
         });
     },
     watch:{
-        
+        drawer(val) {
+            if (val) {
+                this.$store.commit('importExcel/setNewImport', false);
+            } else {
+                this.$store.commit('importExcel/setNewImport', true);
+                this.fileName = '';
+                this.documentId = 0;
+            }
+            this.showValidate = false;
+        }
     },
     methods:{
+        cancel(){
+            this.drawer = false;
+        },
+        reload(){
+           // window.location.reload()
+        },
         getFileName(data){
             this.fileName = data
         },
