@@ -93,7 +93,7 @@ import { util } from "./../../../plugins/util.js";
 import AutocompleteInput from "./items/AutocompleteInput.vue";
 import User from "./items/User.vue";
 import Filter from "./items/Filter.vue";
-import Validate from "./items/Validate.vue";
+import Validate from "./../common/Validate";
 import ClientSQLManager from "./clientSQLManager.js";
 import Util from './util';
 import './customControl.css';
@@ -151,7 +151,7 @@ export default {
     name: "submitDocument",
 
     components: {
-        validate: Validate,
+        "validate": Validate,
         "user-select": User,
         "date-picker": DatePicker,
         "time-input": TimeInput,

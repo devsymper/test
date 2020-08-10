@@ -359,8 +359,8 @@ export default class Control {
             table.tableInstance.tableInstance.render()
         } else {
             if (this.type == "textInput") {
-                this.removeValidateIcon()
                 if (this.controlProperties.maxValue.value != "") {
+                    this.removeValidateIcon()
                     if (this.value.length > this.controlProperties.maxValue.value) {
                         this.renderValidateIcon('Độ dài kí tự không được vượt quá ' + this.controlProperties.maxValue.value + " kí tự");
                         rs = false;
@@ -368,8 +368,9 @@ export default class Control {
                     }
                 }
                 if (this.controlProperties.minValue.value != "") {
+                    this.removeValidateIcon()
                     if (this.value.length < this.controlProperties.minValue.value) {
-                        this.renderValidateIcon('Độ dài kí tự không được ít hơn ' + this.controlProperties.maxValue.value + " kí tự");
+                        this.renderValidateIcon('Độ dài kí tự không được ít hơn ' + this.controlProperties.minValue.value + " kí tự");
                         rs = false;
                     }
                 }

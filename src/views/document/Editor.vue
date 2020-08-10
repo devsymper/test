@@ -21,62 +21,13 @@
                     @document-action-save-to-local-storage="saveContentToLocalStorage"
                     @document-action-get-from-local-storage="getFromLocalStorege"
                     @document-action-delete-cache="deleteLocalStorage"
-                    @document-action-check-control="checkBeforeNameChange"
-                    
+                    @document-action-check-control="checkBeforeControlNameChange"
                     />
                 </div>
                 <textarea ref="editorLibWrapper" :id="'document-editor-'+keyInstance">
 
                 </textarea>
-                <!-- </div>
-                    <editor id="editor" api-key="APIKEY"
-                    ref="editor"
-                    :key="documentId"
-                    @onKeyUp="keyHandler"
-                    @onClick="detectClickEvent"
-                    @onBlur="detectBlurEditorEvent"
-                    @onInit="init1"
-                    @onPaste="onPaste"
-                    :init="{
-                        forced_root_block:'div',
-                        toolbar_items_size : 'small',
-                        menubar: false,
-                        plugins: [
-                        'advlist autolink lists link image charmap table print preview anchor',
-                        'searchreplace visualblocks code fullscreen',
-                        'insertdatetime media table paste code help wordcount emoticons hr'
-                        ],
-                        contextmenu: 'inserttable table | settingtable',
-                        toolbar:
-                        'undo redo | fontselect fontsizeselect formatselect | bold italic forecolor backcolor | \
-                        alignleft aligncenter alignright alignjustify | \
-                        bullist numlist indent hr | removeformat  table |  preview margin',
-                        fontsize_formats: '8px 10px 11px 12px 13px 14px 15px 16px 17px 18px 19px 20px 21px 22px 23px 24px 25px 26px 27px 28px 29px 30px 32px 34px 36px',
-                        font_formats: 'Roboto = Roboto,sans-serif; Andale Mono=andale mono,times;'+ 'Arial=arial,helvetica,sans-serif;'+ 'Arial Black=arial black,avant garde;'+ 'Book Antiqua=book antiqua,palatino;'+ 'Comic Sans MS=comic sans ms,sans-serif;'+ 'Courier New=courier new,courier;'+ 'Georgia=georgia,palatino;'+ 'Helvetica=helvetica;'+ 'Impact=impact,chicago;'+ 'Symbol=symbol;'+ 'Tahoma=tahoma,arial,helvetica,sans-serif;'+ 'Terminal=terminal,monaco;'+ 'Times New Roman=times new roman,times;'+ 'Trebuchet MS=trebuchet ms,geneva;'+ 'Verdana=verdana,geneva;'+ 'Webdings=webdings;'+ 'Wingdings=wingdings,zapf dingbats',
-                        valid_elements: '*[*]',
-                        content_css:['https://cdn.jsdelivr.net/npm/@mdi/font@latest/css/materialdesignicons.min.css'],
-                        setup: function(ed){
-                            ed.ui.registry.addMenuItem('settingtable', {
-                                text: 'Setting table',
-                                disabled : false,
-                                onAction: function(e) {
-                                    showSettingControlTable(e);
-                                }
-                            });
-                        
-                            ed.ui.registry.addButton('margin', {
-                            icon:'margin',
-                            tooltip:'Margin',
-                                onAction: function (_) {
-                                    showPaddingPageConfig(ed);
-                                }
-                            }); 
-                            for(let i = 0;i < listIconToolbar.length;i++){
-                                ed.ui.registry.addIcon(listIconToolbar[i].name,`<i class='mdi `+listIconToolbar[i].icon+`' style='font-size:18px;rgba(0, 0, 0, 0.54);'></i>`)
-                            }
-                        }
-                    }">
-                </editor> -->
+               
             </div>
         </vue-resizable>
         <div  class="sym-document__side-bar-right">
@@ -84,9 +35,11 @@
         </div>
         <s-table-setting  ref="tableSetting" @add-columns-table="addColumnTable"/>
         <auto-complete-control ref="autocompleteControl" @add-control="insertControl"/>
-        <save-doc-panel :instance="keyInstance" ref="saveDocPanel" @save-doc-action="validateControl"/>
+        <save-doc-panel :instance="keyInstance" ref="saveDocPanel" 
+        @check-name-document="checkBeforeDocumentNameChange"
+        @save-doc-action="validateControl"/>
         <err-message :listErr="listMessageErr" ref="errMessage"/>
-        <control-name-related :instance="keyInstance"  ref="controlNameRelated"/>
+        <control-name-related :instance="keyInstance" @after-close-panel="afterClosePanel"  ref="controlNameRelated"/>
         <all-control-option :instance="keyInstance" ref="allControlOption"/>
 
         <v-dialog v-model="dialog" persistent max-width="290">
@@ -337,9 +290,14 @@ export default {
         px2cm(px) {
             return (Math.round((px / 37.7952) * 100) / 100).toFixed(1);
         },
-        checkBeforeNameChange(){
+        /**
+         * Hàm xử lí kiểm tra xem tên của control hiện tại đang ở trong những công thức của các control nào doc nao
+         */
+        checkBeforeControlNameChange(){
             let currentControl = this.editorStore.currentSelectedControl;
             if(currentControl.properties.name.hasOwnProperty('name')){
+                this.$refs.controlNameRelated.setSubHeadingTitle(this.$t('document.editor.dialog.nameRelated.subTitleControl'))
+                this.$refs.controlNameRelated.setHeadingTitle(this.$t('document.editor.dialog.nameRelated.headingControl'));
                 this.$refs.controlNameRelated.getDataRelated(currentControl.properties.name.name.oldName,currentControl.properties.name.name.value);
                 this.$refs.controlNameRelated.showDialog();
             }
@@ -350,6 +308,24 @@ export default {
                             }); 
             }
             
+        },
+        /**
+         * Kiểm tra xem tên của doc đang được sử dụng ở trong những công thức nào
+         */
+        checkBeforeDocumentNameChange(){
+            this.$refs.saveDocPanel.hideDialog();
+            setTimeout((self) => {
+                self.$refs.controlNameRelated.setSubHeadingTitle(self.$t('document.editor.dialog.nameRelated.subTitleDocument'))
+                self.$refs.controlNameRelated.setHeadingTitle(self.$t('document.editor.dialog.nameRelated.headingDocument'));
+                self.$refs.controlNameRelated.getDocumentRelated();
+                self.$refs.controlNameRelated.showDialog();
+            }, 100,this);
+        },
+        afterClosePanel(from){
+            if(from == "document")
+            setTimeout((self) => {
+                this.$refs.saveDocPanel.showDialog();
+            }, 100,this);
         },
         // lấy data từ local storage
         getFromLocalStorege(){
@@ -516,10 +492,11 @@ export default {
          * Hàm xử lí lấy dữ liệu các công thức để insert vào formulas service trước khi lưu
          */
         getDataToSaveMultiFormulas(listControl){
-            let listControlFormulas = {};
+            let listControlFormulas = {insert:{},update:{}};
             for(let controlId in listControl){
                 let control = listControl[controlId];
                 let listFormulas = [];
+                let listFormulasUpdate = [];
                 let formulas = listControl[controlId].formulas;
                 if(control.type == "table"){
                     let listField = control.listFields;
@@ -528,17 +505,30 @@ export default {
                 }
                 for (let f in formulas){
                     if(formulas[f].value != ""){
-                        let item = {};
-                        item[f] = {};
-                        item[f]['formulas'] = formulas[f].value;
-                        item[f]['objectType'] = "field";
-                        item[f]['objectIdentifier'] = (control.properties.hasOwnProperty('name')) ? control.properties.name.value : control.name;
-                        item[f]['context'] = this.sDocumentProp.name.value
-                        listFormulas.push(item);
+                        if(formulas[f].formulasId != 0){
+                            let item = {};
+                            item[f] = {};
+                            item[f]['syql'] = formulas[f].value;
+                            item[f]['id'] = formulas[f].formulasId;
+                            listFormulasUpdate.push(item);
+                        }
+                        else{
+                            let item = {};
+                            item[f] = {};
+                            item[f]['formulas'] = formulas[f].value;
+                            item[f]['objectType'] = "field";
+                            item[f]['objectIdentifier'] = (control.properties.hasOwnProperty('name')) ? control.properties.name.value : control.name;
+                            item[f]['context'] = this.sDocumentProp.name.value
+                            listFormulas.push(item);
+                        }
                     }
                 }
-                if(Object.keys(listFormulas).length > 0)
-                listControlFormulas[controlId] = listFormulas;
+                if(Object.keys(listFormulas).length > 0){
+                    listControlFormulas['insert'][controlId] = listFormulas;
+                }
+                if(Object.keys(listFormulasUpdate).length > 0){
+                    listControlFormulas['update'][controlId] = listFormulasUpdate;
+                }
             }
            return listControlFormulas;
             
@@ -579,14 +569,16 @@ export default {
             documentProperties = JSON.stringify(documentProperties);
             let htmlContent = this.editorCore.getContent();
             let dataPost = this.getDataToSaveMultiFormulas(allControl);
-            if(Object.keys(dataPost).length > 0){
-                let thisCpn = this;
-                try {
-                    let res = await formulasApi.saveMultiFormulas({formulas:JSON.stringify(dataPost)})
-                    if(res.status == 200){
+            let thisCpn = this;
+            try {
+                if(Object.keys(dataPost.update).length > 0)
+                await formulasApi.updateMultiFormulas({formulas:JSON.stringify(dataPost.update)})
+                if(Object.keys(dataPost.insert).length > 0){
+                    let res = await formulasApi.saveMultiFormulas({formulas:JSON.stringify(dataPost.insert)})
+                    if(res.status == 200){ 
                         let data = res.data;
                         for(let controlId in data){
-                            for(let i = 0; i < data[controlId].length; i++){
+                            for(let i = 0; i < data[controlId].length; i++){ 
                                 let key = Object.keys(data[controlId][i])[0];
                                 let controlEl = $("#document-editor-"+thisCpn.keyInstance+"_ifr").contents().find('#'+controlId);
                                 let tableId = 0;
@@ -612,22 +604,23 @@ export default {
                                 text: res.message
                             });
                     }
-                } catch (error) {
-                    this.$snotify({
-                                type: "error",
-                                title: "error from formulas serice, can't not save into formulas service!!!",
-                                text: error
-                            });
-                }
-            }     
-            else{
-                if(this.$route.name == "editDocument"){   //edit doc
-                    this.editDocument({documentProperty:documentProperties,fields:JSON.stringify(allControl),content:htmlContent,id:this.documentId})
                 }
                 else{
-                    this.createDocument({documentProperty:documentProperties,fields:JSON.stringify(allControl),content:htmlContent});
+                    if(this.$route.name == "editDocument"){   //edit doc
+                        this.editDocument({documentProperty:documentProperties,fields:JSON.stringify(allControl),content:htmlContent,id:this.documentId})
+                    }
+                    else{
+                        this.createDocument({documentProperty:documentProperties,fields:JSON.stringify(allControl),content:htmlContent});
+                    }
                 }
-            }  
+                
+            } catch (error) {
+                this.$snotify({
+                            type: "error",
+                            title: "error from formulas serice, can't not save into formulas service!!!",
+                            text: error
+                        });
+            }     
         },
         /**
          * Hàm gọi Api tạo mới ducument
@@ -1094,13 +1087,10 @@ export default {
         },
         //hoangnd: hàm set các giá trị của thuộc tính và formulas vào từng contrl trong doc lúc load dữ liệu và đưa vào state
         setDataForPropsControl(fields){
-                console.log('kafsjd',fields);
-
             for(let controlId in fields){
                 if(!fields[controlId].hasOwnProperty('type')){
                     continue;
                 }
-                console.log('hgf',fields[controlId].type);
                 let control = GetControlProps(fields[controlId].type);
                 let properties = control.properties
                 let formulas = control.formulas
@@ -1117,17 +1107,11 @@ export default {
                     }
                 }) 
                 if(fields[controlId]['formulas'] != false){
-                    
                     $.each(formulas,function(k,v){
                         if(fields[controlId]['formulas'][k] !== "" && fields[controlId]['formulas'][k] !== undefined){
-                           
                             formulas[k].value = Object.values(fields[controlId]['formulas'][k])[0];
-                            // formulas[k].formulasId = Object.keys(fields[controlId]['formulas'][k])[0]
+                            formulas[k].formulasId = Object.keys(fields[controlId]['formulas'][k])[0]
                         }
-                        // else{
-                        //     formulas[k].formulasId = 0
-                        // }
-                        formulas[k].formulasId = 0
                     })
                 }
                 if(fields[controlId].type != "table"){
@@ -1158,9 +1142,8 @@ export default {
                                 if(listField[childFieldId]['formulas'][k] != ""){
                                     if(listField[childFieldId]['formulas'][k] != undefined)
                                     childFormulas[k].value = Object.values(listField[childFieldId]['formulas'][k])[0]
-                                    // childFormulas[k].formulasId = Object.keys(listField[childFieldId]['formulas'][k])[0]
+                                    childFormulas[k].formulasId = Object.keys(listField[childFieldId]['formulas'][k])[0]
                                 }
-                                childFormulas[k].formulasId = 0
                             })
                         }
                         listChildField[childFieldId] = {properties: childProperties, formulas : childFormulas,type:childType}
@@ -1168,7 +1151,6 @@ export default {
                     this.addToAllControlInDoc(controlId,{properties: properties, formulas : formulas,type:fields[controlId].type,listFields:listChildField});
                 }
             }
-            console.log(this.editorStore);
         },
         // sự kiện xảy ra khi khởi tạo xong editor , sự kiện do tinymce cung cấp
         initEditor(){
@@ -1674,7 +1656,6 @@ export default {
             $('.tree-'+controlId).addClass('editor-tree-active')
             
             let table = el.closest('.s-control-table');
-            console.log('akjsd',this.editorStore.allControl);
             if(table.length > 0 && controlId != table.attr('id')){
                 let tableId = table.attr('id');
                 let control = this.editorStore.allControl[tableId]['listFields'][controlId];
@@ -1682,7 +1663,6 @@ export default {
             }
             else{
                 let control = this.editorStore.allControl[controlId];
-                console.log('control',control);
                 this.selectControl(control.properties, control.formulas,controlId);
             }
         }

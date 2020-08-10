@@ -1,6 +1,7 @@
 <template>
     
-    <v-dialog
+    <div>
+        <v-dialog
         v-model="isShowModelSaveDoc"
         width="800"
         content-class="s-dialog"
@@ -14,6 +15,7 @@
                 <div id="setting-control-table" class="setting-control-table">
                     <div class="content-setting-control-table">
                         <form-save-doc 
+                        @append-icon-click="checkNameDocument"
                         @input-value-keyup="checkValidateNameDocument"
                         @input-value-changed="handleChangeInput" 
                          :allInputs="documentProps"/>
@@ -44,6 +46,8 @@
             </v-card-actions>
         </v-card>
     </v-dialog>
+    <validate :message="messageValidate" ref="validate" />
+    </div>
    
     
 </template>
@@ -51,11 +55,13 @@
 import FormTpl from "./../../../components/common/FormTpl.vue"
 import { util } from "./../../../plugins/util.js";
 import { documentApi } from "./../../../api/Document.js";
+import Validate from "./../common/Validate";
 
 export default {
     
     components:{
-        'form-save-doc' : FormTpl
+        'form-save-doc' : FormTpl,
+        "validate": Validate,
     },
     props:{
         instance:{
@@ -75,15 +81,24 @@ export default {
         return {
             listRows:[],
             isShowModelSaveDoc:false,
-            isValid :false
+            isValid :false,
+            messageValidate:""
         }
     },
     created(){
         this.setPropsOfDoc({});
     },
     methods:{
+        checkNameDocument(){
+            this.$emit('check-name-document');
+        },
         //Hàm kiểm tra tên document đã tồn tai hay chưa
         handleChangeInput(name, input, data){
+            if(this.messageValidate == ""){
+                this.messageValidate = "Tên của văn bản này có thể được sử dụng trong công thức ở các đối tượng trong hệ thống. Chọn kiểm tra để kiểm tra lại các đối tượng";
+                this.$refs.validate.show(false)
+            }
+            
             let thisCpn = this;
             if(this.isValid)
             documentApi
@@ -164,6 +179,8 @@ export default {
                     title: "Tên document",
                     type: "text",
                     value: (props.name != undefined) ? props.name : '',
+                    appendIcon:"mdi-checkbox-multiple-marked-circle-outline",
+                    oldName:(props.name != undefined) ? props.name : ''
                 },
                 title : {
                     title: "Tiêu đề document",

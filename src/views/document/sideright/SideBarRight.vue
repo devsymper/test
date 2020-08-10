@@ -115,22 +115,14 @@ export default {
     },
     methods:{
         handleInputBlur(inputInfo, name){
-            
-            // let dataPost = {syql:inputInfo.value,objectType:'field',objectIdentifier:this.sCurrentDocument.id}
-            // formulasApi.saveFormulas(dataPost).then(res => {
-            //     if (res.status == 200) {
-            //         inputInfo.formulasId = res.data.formulaId;  
-            //     }
-            // })
-            // .catch(err => {
-            //     thisCpn.$snotify({
-            //             type: "error",
-            //             title: "can not save document",
-            //         });
-            // })
-            // .always(() => {
-            // });
-            
+            // let value = inputInfo.value;
+            // let elements = $('#document-editor-'+this.instance+'_ifr').contents().find('#'+this.sCurrentDocument.id);
+            // let tableId = checkInTable(elements);
+            // if( tableId == this.sCurrentDocument.id)
+            // tableId = '0';
+            //  this.$store.commit(
+            //     "document/updateProp",{id:this.sCurrentDocument.id,name:name,value:value,tableId:tableId,type:"value",instance:this.instance}
+            // );   
         },
         handleKeyupInput(name, input, data){
             
