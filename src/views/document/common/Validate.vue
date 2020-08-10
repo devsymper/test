@@ -5,10 +5,13 @@
     :style="positionBox">
         <v-card-title>{{errTitle}}</v-card-title>
         <v-card-text>
-            <v-icon>mdi-information-outline</v-icon>
+            <v-icon class="icon">mdi-information-outline</v-icon>
             <span>{{errMessage}}</span>
 
         </v-card-text>
+        <v-card-actions style="flex-flow: row-reverse;">
+            <v-btn @click="isShow = false" text>{{$t('common.close')}}</v-btn>
+        </v-card-actions>
     </v-card>
 </template>
 <script>
@@ -59,20 +62,26 @@ export default {
             this.isShow = false;
         },
         calPosition(e){
-            if($(e.target).closest('.handsontable').length > 0){
-                let autoEL = $(this.$el).detach();
-                $(e.target).closest('.wrap-table').append(autoEL);
-                let edtos = $(e.delegateTarget).offset();
-                
-                let tbcos = $(e.target).closest('.wrap-table').find('[s-control-type="table"]').offset();
-                this.positionBox = {'top':edtos.top - tbcos.top + $(e.target).height() +'px','left':edtos.left - tbcos.left+'px'};
+            if(e == false){// trường hợp gọi từ panel save document
+                this.positionBox = {'top':'50%','left':'50%',transform: 'translate(-50%, -50%)',position: 'fixed',width:'400px'};
             }
-            //nêu là ngoài bảng
             else{
-                let autoEL = $(this.$el).detach();
-                $(e.target).parent().append(autoEL);
-                this.positionBox = {'top':'20px','left':'0px'};
+                if($(e.target).closest('.handsontable').length > 0){
+                    let autoEL = $(this.$el).detach();
+                    $(e.target).closest('.wrap-table').append(autoEL);
+                    let edtos = $(e.delegateTarget).offset();
+                    
+                    let tbcos = $(e.target).closest('.wrap-table').find('[s-control-type="table"]').offset();
+                    this.positionBox = {'top':edtos.top - tbcos.top + $(e.target).height() +'px','left':edtos.left - tbcos.left+'px'};
+                }
+                //nêu là ngoài bảng
+                else{
+                    let autoEL = $(this.$el).detach();
+                    $(e.target).parent().append(autoEL);
+                    this.positionBox = {'top':'20px','left':'0px'};
+                }
             }
+            
             
         },
         
@@ -99,5 +108,8 @@ export default {
         font-size: 50px!important;
         color: red !important;
     }
-    
+    .icon{
+        float: left;
+        margin-right: 10px;
+    }
 </style>

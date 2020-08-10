@@ -279,6 +279,21 @@
             "userUpdate": "Người cập nhật",
             "countRecord": "Số lượng bản ghi"
         },
+        "editor": {
+            "dialog": {
+                "nameRelated": {
+                    "headingControl": "Kiểm tra control",
+                    "headingDocument": "Kiểm tra tên Document",
+                    "subTitleControl": "Các công thức liên quan đến control ",
+                    "subTitleDocument": "Các công thức liên quan đến document ",
+                    "table": {
+                        "position": "Vị trí",
+                        "source": "Nguồn",
+                        "formulas": "Công thức"
+                    }
+                }
+            }
+        },
         "process": {
             "header_bar": {
                 "undo": "Undo ",

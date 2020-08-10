@@ -24,13 +24,13 @@ const commonProps = {
     },
 
     //hiên thi
-    minValue: {
+    maxValue: {
         title: "Độ dài tối đa",
         type: "text",
         value: "",
         groupType: "display",
     },
-    maxValue: {
+    minValue: {
         title: "Độ dài tối thiểu",
         type: "text",
         value: "",

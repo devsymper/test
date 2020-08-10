@@ -7,9 +7,9 @@
         height="550"
         style="overflow: hidden;"
         >
-            <v-card-title class="headline">Kiểm tra control</v-card-title>
+            <v-card-title class="headline">{{heading}}</v-card-title>
             <v-card-subtitle  class="s-subtitle-control">
-                Các control có công thức liên quan đến control <span class="control-name">{{controlName}}</span>
+                {{subHeadingTitle}}<span class="control-name">{{controlName}}</span>
             </v-card-subtitle>
             <v-card-text style="height: calc(100% - 112px);    overflow: auto;">
                 <!-- <v-list-item dense v-for="(formulas, index) in listFormulas" :key="index+formulas">
@@ -33,13 +33,12 @@
                        </v-icon>
                     </template>
                     <template v-slot:item.source="{ item }">
-                       <div>
+                       <div style="width:100px">
                            <a style="text-decoration: none;" target="_blank" :href="item.source.link">{{ item.source.documentTitle }}</a>
                        </div>
                     </template>
                     <template v-slot:item.position="{ item }">
-                       <div>
-                           
+                       <div style="width:100px">
                            <div>{{ item.position.fieldTitle }}</div>
                            <div style="    opacity: 0.5;">{{ item.position.fieldName }}</div>
                        </div>
@@ -59,7 +58,7 @@
                 right
                 @click="checkUpdateFormulas"
             >
-                Cập nhật
+                {{$t('common.update')}}
             </v-btn>
             <v-btn
                 color="green darken-1"
@@ -67,7 +66,7 @@
                 right
                 @click="hideDialog"
             >
-                Đóng
+                {{$t('common.close')}}
             </v-btn>
             </v-card-actions>
         </v-card>
@@ -88,7 +87,7 @@ export default {
         instance:{
             type:Number,
             default:Date.now()
-        }
+        },
     },
     data(){
         return {
@@ -98,29 +97,55 @@ export default {
             newControlName:"",
             headers:  [
             { text: '', value: 'icon' , width:50},
-            { text: 'Vị trí', value: 'position' },
-            { text: 'Nguồn', value: 'source' },
-            { text: 'Công thức', value: 'formulas' },
+            { text: this.$t('document.editor.dialog.nameRelated.table.position'), value: 'position' },
+            { text: this.$t('document.editor.dialog.nameRelated.table.source'), value: 'source' },
+            { text: this.$t('document.editor.dialog.nameRelated.table.formulas'), value: 'formulas' },
             ],
             dataTable: [],
-            mapIcon:{field:'mdi-file-document-outline'},
-            listFormulas:[]
+            mapIcon:{field:'mdi-flip-horizontal'},
+            listFormulas:[],
+            heading:"",
+            subHeadingTitle:"",
+            type:"",
         }
     },
    
     methods:{
-        
+        setHeadingTitle(str){
+            this.heading = str;
+        },
+        setSubHeadingTitle(str){
+            this.subHeadingTitle = str;
+        },
         showDialog(){
             this.isShow = true
         },
         hideDialog(){
+            this.$emit("after-close-panel",this.type)
             this.isShow = false
         },
         getDataRelated(fieldName,newFieldName){
+            this.type = "control";
             let thisCpn = this;
             this.controlName = fieldName;
             this.newControlName = newFieldName;
             let dataPost = {fieldName:this.controlName,documentName:this.sDocumentStore.name.value};
+            formulasApi.getRelated(dataPost).then(res=>{
+                if(res.status == 200){
+                    thisCpn.dataTable = []
+                    let data = res.data;
+                    if(data != false){
+                        thisCpn.handleData(data)
+                    }
+                }
+            }).always(() => {}).catch({});
+        },
+        getDocumentRelated(){
+            this.controlName = this.sDocumentStore.name.oldName;
+            this.newControlName = this.sDocumentStore.name.value;
+            this.type = "document";
+            let thisCpn = this;
+            let dataPost = {documentName:this.sDocumentStore.name.oldName};
             formulasApi.getRelated(dataPost).then(res=>{
                 if(res.status == 200){
                     thisCpn.dataTable = []
@@ -145,7 +170,6 @@ export default {
                 if(res.status == 200){
                     let dataRes = res.data;
                     thisCpn.setDataTable(data,dataRes);
-                    
                 }
                 else{
                     thisCpn.setDataTable(data);
@@ -160,7 +184,6 @@ export default {
                 let curObj = dataRes.filter(c=>{
                     return c.documentname == element.context && c.fieldname == element.object_identifier;
                 })
-            
                 if(curObj.length> 0){
                     Object.assign(data[index],curObj[0])
                 }
@@ -175,27 +198,25 @@ export default {
                 this.listFormulas.push(itemFormulas);
                 this.dataTable.push(item);
             }
-            console.log(this.dataTable);
         },
         checkUpdateFormulas(){
-            console.log(this.listFormulas);
             let dataUpdate = {};
             for (let index = 0; index < this.listFormulas.length; index++) {
                 const element = this.listFormulas[index];
                 let id = Object.keys(element)[0];
                 let f = Object.values(element)[0];
                 let newFormulas = this.detectControlChangeInFormulas(f);
-                console.log(newFormulas);
                 dataUpdate['s-'+index] = [{"data":{syql:newFormulas,id:id}}]
-                
-                
             }
-            console.log(dataUpdate);
             formulasApi.updateMultiFormulas(JSON.stringify(dataUpdate)).then(res=>{
-
+                this.$snotify({
+                                type: "success",
+                                title: "Update successfull!"
+                            }); 
             }).always({}).catch({})
             
         },
+
         detectControlChangeInFormulas(formulas){
             let regex = new RegExp("\\b(?:"+this.controlName+")\\b","gm");
             let newFormulas = formulas.replace(regex,this.newControlName);

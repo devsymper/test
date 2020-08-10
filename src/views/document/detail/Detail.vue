@@ -15,7 +15,13 @@
             <button v-on:click="toggleSideBar"  id="side-bar-detail-btn" :style="toggleSideBarBtnStyle">
                 <span class="mdi mdi-chevron-double-left"></span>
             </button>
-            <side-bar-detail :sidebarWidth="sidebarWidth" :isShowSidebar="isShowSidebar"/>
+            <side-bar-detail 
+            :sidebarWidth="sidebarWidth"  
+            :isShowSidebar="isShowSidebar"
+            :userId="userId"
+            :taskId="taskId"
+            :workflowId="workflowId"
+            />
 
     </div>
 </template>
@@ -47,7 +53,7 @@ export default {
                     docSize : '21cm'
                 }
             }
-        },
+        }, 
         isPrint:{
             type:Boolean,
             default:false
@@ -74,7 +80,11 @@ export default {
             sidebarWidth:300,
             toggleSideBarBtnStyle:null,
             togglePageSizeBtnStyle:null,
-            isShowSidebar:false
+            isShowSidebar:false,
+            workflowId:"",
+            taskId:"",
+            userId:""
+
         };
     },
     beforeMount() {
@@ -158,11 +168,9 @@ export default {
                 .detailDocumentObject(this.docObjId)
                 .then(res => {
                     if (res.status == 200) {
-                        thisCpn.$store.commit('document/addToDocumentDetailStore',{
-                            key: 'allData',
-                            value: res.data,
-                            instance:thisCpn.keyInstance
-                        })
+                        thisCpn.userId = res.data.document_object_user_created_id;
+                        thisCpn.taskId = res.data.document_object_task_id;
+                        thisCpn.workflowId = res.data.document_object_workflow_id;
                         thisCpn.loadDocumentStruct(res.data.documentId);
                     }
                 })

@@ -280,6 +280,21 @@
             "userUpdate": "BA update",
             "countRecord": "count record"
         },
+        "editor": {
+            "dialog": {
+                "nameRelated": {
+                    "headingControl": "Check control name",
+                    "headingDocument": "Check document name",
+                    "subTitleControl": "Related formulas with ",
+                    "subTitleDocument": "Related formulas with ",
+                    "table": {
+                        "position": "Position",
+                        "source": "Source",
+                        "formulas": "Formulas"
+                    }
+                }
+            }
+        },
         "process": {
             "header_bar": {
                 "undo": "Undo ",

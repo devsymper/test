@@ -77,6 +77,8 @@
                 :disabled="viewOnly"
                 v-bind="getInputProps(inputInfo)"
                 v-model="inputInfo.value"
+                :append-icon="(inputInfo.appendIcon) ? inputInfo.appendIcon : ''"
+                @click:append="handleClickAppend"
                 :is="getInputTag(inputInfo.type)">
                 <template slot="item" slot-scope="data">
                     <template>
@@ -317,6 +319,9 @@ export default {
         };
     },
     methods: {
+        handleClickAppend(){
+            this.$emit('append-icon-click');
+        },
         handleLargeFormulaEditorBlur(){
             let name = this.largeFormulaEditor.name;
             let inputInfo = this.allInputs[name];
