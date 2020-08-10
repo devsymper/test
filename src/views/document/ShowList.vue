@@ -1,4 +1,5 @@
 <template>
+<div style="width:100%">
     <list-items
         ref="listDocument"
         :getDataUrl="'https://sdocument-management.symper.vn/documents'"   
@@ -8,9 +9,36 @@
         :containerHeight="containerHeight"
         :actionPanelWidth="actionPanelWidth"
         @after-open-add-panel="addDocument"
-    >
-      
-    </list-items>
+    >   </list-items>
+    <v-navigation-drawer 
+        v-model="drawer" 
+        absolute
+        class="d-none d-sm-none d-md-flex"
+        temporary 
+        v-bind:class="[showValidate==true?'manage-timesheet-800':'manage-timesheet-500']" 
+        right>
+        <v-row >
+            <v-col class="col-md-7">
+                <ImportFile 
+                :documentId="documentId"
+                :deleteFileName="deleteFileName" 
+                @setInterval='setInterval=true' 
+                @cancel="drawer = !drawer" 
+                @fileName=" getFileName" 
+                @showValidate="showValidate=true"/>
+            </v-col>  
+            <!-- <v-col>ádádád{{fileName}}</v-col> -->
+            <v-col v-if="showValidate==true" class="col-md-5">
+                <ValidateImport 
+                @deleteFileName="deleteFileName=true"  
+                @cancel="drawer = !drawer" 
+                :setInterval="setInterval"  
+                :fileName="fileName" />
+            </v-col>
+        </v-row>
+    </v-navigation-drawer>
+</div>
+  
 </template>
 <script>
 import { documentApi } from "./../../api/Document.js";
@@ -18,13 +46,25 @@ import ListItems from "./../../components/common/ListItems.vue";
 import ActionPanel from "./../../views/users/ActionPanel.vue";
 import ChangePassPanel from "./../../views/users/ChangePass.vue";
 import { util } from "./../../plugins/util.js";
+import ImportFile from "./../../components/importExcel/ImportFile";
+import ValidateImport from "./../../components/importExcel/ValidateImport";
+
 export default {
     components: {
         "list-items": ListItems,
         "action-panel": ActionPanel,
+        ImportFile,
+        ValidateImport,
     },
     data(){
         return {
+            documentId:0,
+            deleteFileName:false,
+            setInterval:false,
+            drawer: null,
+            showValidate:false,
+            showImport:true,
+            fileName:'',
             actionPanelWidth:800,
             containerHeight: 200,
             tableContextMenu:[
@@ -79,12 +119,27 @@ export default {
                         this.$goToPage('/documents/'+document.id+'/objects',"Danh sách bản ghi");
                     },
                 },
+                 {
+                    name: "importExcel",
+                    text: "Import excel",
+                    callback: (document, callback) => {
+                        this.drawer =! this.drawer; 
+                        this.documentId = Number(document.id);
+                        console.log( document.id);
+                    },
+                },
             ],
         }
     },
     mounted() {
         this.calcContainerHeight();
     },
+    // watch:{
+    //     document(){
+    //          this.documentId = document.id;
+    //          console.log(this.document.id)
+    //     }
+    // },
     created(){
         let thisCpn = this;
         this.$evtBus.$on('change-user-locale',(locale)=>{
@@ -98,6 +153,9 @@ export default {
         
     },
     methods:{
+        getFileName(data){
+            this.fileName = data
+        },
         addDocument(){
             this.$router.push('/document/editor');
         },
@@ -108,3 +166,61 @@ export default {
     }
 }
 </script>
+<style lang="scss" scoped>
+.manage-timesheet-500{
+    width: 500px!important;
+}
+.manage-timesheet-800{
+    width: 800px!important  ;
+}
+.manage-timesheet ::v-deep .v-card {
+    box-shadow: none !important;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.manage-timesheet ::v-deep .v-window {
+    display: flex;
+    flex-direction: column;
+}
+
+.manage-timesheet ::v-deep .v-window__container {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+</style>
+<style>
+.v-list-item__title{
+    font-size:13px!important;
+}
+.v-select__slot{
+    padding-left:7px;
+    font-size:13px!important;
+    font-family: Roboto;
+}
+.fw-500 {
+    font-weight: 500;
+}
+.fw-400{
+    font-weight: 400;
+}
+
+.fw-300 {
+    font-weight: 300;
+}
+.font-normal {
+    font-size: 13px!important;
+    font-family: Roboto!important;
+    font-weight: normal!important;
+}
+.font{
+    font-size: 13px!important;
+    font-family: Roboto!important;
+}
+
+.color-normal {
+    color: #707070
+}
+</style>
