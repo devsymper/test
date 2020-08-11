@@ -158,7 +158,10 @@ export default {
                     }
                 })
                 .catch(err => {
-                    console.log("error from detail document api!!!", err);
+                     this.$snotify({
+                                type: "error",
+                                title: "Can not load document struct",
+                            });
                 })
                 .always(() => {});
         },
@@ -171,11 +174,19 @@ export default {
                         thisCpn.userId = res.data.document_object_user_created_id;
                         thisCpn.taskId = res.data.document_object_task_id;
                         thisCpn.workflowId = res.data.document_object_workflow_id;
+                        thisCpn.$store.commit('document/addToDocumentDetailStore',{
+                            key: 'allData',
+                            value: res.data,
+                            instance:thisCpn.keyInstance
+                        }) 
                         thisCpn.loadDocumentStruct(res.data.documentId);
                     }
                 })
                 .catch(err => {
-                    console.log("error from detail document api!!!", err);
+                    this.$snotify({
+                                type: "error",
+                                title: "Can not load document object",
+                            });
                 })
                 .always(() => {});
         },

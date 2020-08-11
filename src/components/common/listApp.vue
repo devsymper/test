@@ -69,24 +69,24 @@ export default {
         },
         getListApps() {
             let req = new Api(this.apiUrl);
-            req.get(this.appUrl + "/lists/detail")
+            req.get(this.appUrl+"-objects")
             .then(res => {
                 if (res.status == 200) {
                     let listIdsFavorite = this.getListFavoriteInShort();
                     let listType = Object.keys(listIdsFavorite);
+                    this.overlay = false;
                     this.listApp = res.data.listObject;
                     this.listApp.forEach((app, appIndex) => {
-                        this.listApp[appIndex].objects.forEach((objs, objIndex) => {
-                            if (listType.indexOf(objs.type) > -1) {
-                                objs.objects.forEach((item, itemIndex) => {
-                                    if (listIdsFavorite[objs.type].indexOf(parseInt(item.id)) > -1) {
-                                        this.listApp[appIndex].objects[objIndex].objects[itemIndex].favorite = 1;
-                                    }
-                                });
-                            }
-                        });
+                        // this.listApp[appIndex].objects.forEach((objs, objIndex) => {
+                        //     if (listType.indexOf(objs.type) > -1) {
+                        //         objs.objects.forEach((item, itemIndex) => {
+                        //             if (listIdsFavorite[objs.type].indexOf(parseInt(item.id)) > -1) {
+                        //                 this.listApp[appIndex].objects[objIndex].objects[itemIndex].favorite = 1;
+                        //             }
+                        //         });
+                        //     }
+                        // });
                     });
-                    this.overlay = false;
                 } else {
                     this.showError();
                 }
@@ -118,6 +118,7 @@ export default {
             })
         },
         showError(){
+            console.trace("sdsad",'sad');
             this.$snotify({
                 type: 'success',
                 title: this.$t('notification.errorTitle'),
