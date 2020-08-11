@@ -360,6 +360,12 @@ const routes = [{
         component: () =>
             import ('../views/permissions/AcitionPackList.vue'),
     },
+    {
+        path: "/ba-account",
+        name: "baAccountList",
+        component: () =>
+            import ('../views/baAccount/BAAccountList.vue'),
+    },
 ];
 
 routes.concat([{

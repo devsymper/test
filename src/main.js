@@ -121,6 +121,10 @@ Vue.prototype.$snotifyError = function(err = {}, title = 'ERROR', detail = '', d
     if (!detail && err.responseJSON && err.responseJSON.message) {
         detail = err.responseJSON.message;
     }
+
+    if (!detail && err.message) {
+        detail = err.message;
+    }
     let setting = {
         type: 'error',
         title: title,

@@ -66,7 +66,11 @@
         "manager": "Quản lý",
         "userRoleSetting": "Vai trò người dùng",
         "clone": "Nhân bản",
-        "actionPack": "Action pack"
+        "actionPack": "Action pack",
+        "baAccount": "Tài khoản BA",
+        "updatePassword": "Cập nhật mật khẩu",
+        "fullName": "Tên đầy đủ",
+        "email": "Email"
     },
     "login": {
         "title": "Đăng nhập hệ thống",
@@ -176,7 +180,8 @@
             "changePassword": {
                 "title": "Thay đổi mật khẩu",
                 "newPass": "Mật khẩu mới",
-                "reNewPass": "Nhập lại mật khẩu mới"
+                "reNewPass": "Nhập lại mật khẩu mới",
+                "oldPassword": "Mật khẩu cũ"
             },
             "configChange": {
                 "title": "Cấu hình thay đổi",

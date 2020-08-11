@@ -69,5 +69,25 @@ export const userApi = {
         return api.post('auth/set-role', {
             role: roleId
         });
-    }
+    },
+
+    createBAAccount(data) {
+        return api.post('supporters', data);
+    },
+
+    updateBAAccountInfo(id, data) {
+        return api.put('supporters/' + id, data);
+    },
+
+    deleteBAAccount(ids) {
+        let deleteArr = [];
+        ids.forEach(id => {
+            deleteArr.push(api.delete('supporters/' + id));
+        });
+        return Promise.all(deleteArr);
+    },
+
+    updateBAAccountPassword(id, data) {
+        return api.put('supporters/' + id + '/password', data);
+    },
 };
