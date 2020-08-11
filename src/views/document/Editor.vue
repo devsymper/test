@@ -497,11 +497,12 @@ export default {
                 let control = listControl[controlId];
                 let listFormulas = [];
                 let listFormulasUpdate = [];
-                let formulas = listControl[controlId].formulas;
+                let formulas = control.formulas;
                 if(control.type == "table"){
                     let listField = control.listFields;
                     let listFormulasControlInTable = this.getDataToSaveMultiFormulas(listField);
-                    listControlFormulas = {...listFormulasControlInTable,...listControlFormulas}
+                    listControlFormulas.insert = Object.assign(listFormulasControlInTable.insert,listControlFormulas.insert);
+                    listControlFormulas.update = Object.assign(listFormulasControlInTable.update,listControlFormulas.update);
                 }
                 for (let f in formulas){
                     if(formulas[f].value != ""){
@@ -920,6 +921,9 @@ export default {
         detectClickEvent(event){
             if($(event.target).is('.s-control'))
             this.setSelectedControlProp(event,$(event.target),$('#document-editor-'+this.keyInstance+'_ifr').get(0).contentWindow);
+            else if($(event.target).closest('.s-control').length > 0){
+                this.setSelectedControlProp(event,$(event.target).closest('.s-control'),$('#document-editor-'+this.keyInstance+'_ifr').get(0).contentWindow);
+            }
 
         // kiểm tra nếu click ngoài khung autocomplete control thì đóng lại
             if (event.target.id != 'list-control-autocomplete' && $(event.target).parents('#list-control-autocomplete').length == 0) {
