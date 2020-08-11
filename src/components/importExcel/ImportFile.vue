@@ -37,9 +37,9 @@
     </v-list>
     <!-- Thông tin chung -->
     <v-list class="fs-13 ml-4 mr-0">
-        <div class="col-flex" v-for="(table, tableIdx) in tables" :key="tableIdx">
+        <div class="col-flex" style= "margin-bottom:-42px" v-for="(table, tableIdx) in tables" :key="tableIdx">
             <v-row class=" mr-1 mb-4">
-                <v-col class="col-md-5 ml-1 pl-2" style="margin-top: -13px;">
+                <v-col class="col-md-5 ml-1 pl-2" style="margin-top: -13px">
                     <v-icon v-if="tables[tableIdx]==tables[0]" size="18">mdi-file-outline</v-icon>
                     <v-icon v-else size="18" class='ml-3'>mdi-table</v-icon>
                     <span class="color-grey fs-13 pl-1">
@@ -336,7 +336,6 @@ export default {
                     controls: this.findControlsForTable(tableNames[i]),
                 })
             }
-            debugger
             this.tables = tables;
         },
 
