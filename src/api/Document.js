@@ -52,6 +52,9 @@ export const documentApi = {
         return coreApi.post("documents/fields/batch", data);
     },
 
+    saveApprovalHistory(data) {
+        return coreApi.post("approval-histores", data);
+    },
 
     //draft
     submitDraftDocument(data) {

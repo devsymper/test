@@ -1,6 +1,7 @@
 <template>
-    <div class="pa-2">
+    <div class="pa-2 h-100">
         <FormTpl
+            ref="comonAttr"
             :viewOnly="action == 'detail'"
             :singleLine="false"
             :allInputs="allInputs"
@@ -8,22 +9,35 @@
         </FormTpl> 
 
         <div class="w-100">
+            <div class="my-2 fs-12">
+                {{$t('permissions.actionPack.allOperation')}}
+            </div>
+            <hot-table
+                :settings="tableSettingsForObjectType"
+                :data="tableDataForObjectType"
+                :height="55"
+                :columns="tableColumnsForObjectType"
+                :colHeaders="colHeadersForObjectType"
+                class="fs-13"
+                ref="dataTableForObjectType">
+
+            </hot-table>
+        </div>
+
+        <div class="w-100">
+            <div class="my-2 fs-12">
+                {{$t('permissions.actionPack.operation')}}
+            </div>
             <hot-table
                 :settings="tableSettings"
-                :data="itemData.mapActionAndObjects[itemData.objectType]"
+                :data="tableData"
+                :height="tableHeight"
+                :columns="tableColumns"
+                :colHeaders="colHeaders"
+                :dataSchema="dataSchema"
+                class="fs-13"
                 ref="dataTable">
 
-                <hot-column :name="'object'" :key="'searchItem'" title="Objects">
-                    <CustomSelect @open-editor="handleEditorShow" hot-editor hot-renderer></CustomSelect>
-                </hot-column>
-                <hot-column 
-                    v-for="col in listAction[itemData.objectType]" 
-                    :key="col.name" 
-                    :type="'checkbox'"
-                    :objectType="itemData.objectType"
-                    :title="col.title">
-
-                </hot-column>
             </hot-table>
         </div>
 
@@ -32,7 +46,8 @@
                 class="float-right mr-1"
                 small
                 depressed
-                color="primary">
+                color="primary"
+                @click="saveActionPack">
 
                 <v-icon class="mr-2" primary>mdi-content-save</v-icon>
                 {{action == 'create' ? $t('common.save') : $t('common.update')}}
@@ -46,15 +61,14 @@ import FormTpl from "@/components/common/FormTpl.vue";
 import { HotTable, HotColumn } from "@handsontable/vue";
 import { util } from '../../plugins/util';
 import CustomSelect from "./HandsonCustomSelect";
+import { permissionApi } from '../../api/permissionPack';
 
-let firstTableColumn = {
-    columnTitle: "Objects",
-    data: "objects",
-    type: "text"
-};
 
 
 export default {
+    mounted(){
+        this.tableHeight = util.getComponentSize(this).h - util.getComponentSize(this.$refs.comonAttr).h - 180;
+    },
     created(){
         let self = this;
         this.$evtBus.$on('symper-cache-set-all-resource', (data) => {
@@ -62,23 +76,121 @@ export default {
                 self.setAllItemOfResource(data);
             }
         });
-        
         self.setAllItemOfResource();
     },
-    methods: {
+    methods: { 
+        createNewOperations(){
+            let self = this;
+            return new Promise(async (resolve, reject) => {
+                let newOperations = this.getNewOperationData();
+                let data = {
+                   operations : JSON.stringify(newOperations)
+                };
+                let res = await permissionApi.createMultipleOperation(data);
+                if(res.status == 200){
+                    resolve(res.data);
+                }else{
+                    self.$snotifyError(res, "Can not create new operation!");
+                    reject(res);
+                }
+            });
+        },
+        getNewOperationData(){
+            let newOperations = [];
+            let allResource = this.$store.state.actionPack.allResource;
+            for(let objectType in this.itemData.mapActionAndObjects){
+                let dataTable = this.itemData.mapActionAndObjects[objectType];
+                for (let row of dataTable) {
+                    let key = row['object'];
+                    let id = '';
+                    if(key){
+                        id = key.slice(0, key.indexOf(' -'));
+                    }
+                    
+                    if(allResource.hasOwnProperty(objectType) && allResource[objectType][id]){
+                        for(let actionName in row){
+                            if(actionName == 'object'){
+                                continue
+                            }
+                            if(row[actionName]){
+                                newOperations.push({
+                                    objectType: objectType,
+                                    action: actionName,
+                                    objectIdentifier: objectType + ':' + id,
+                                    name: actionName.replace(/_/g, ' ') + ' '+ objectType.replace(/_/g, ' ') + ' ' + id
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+
+            for(let objectType in this.itemData.mapActionForAllObjects){
+                let dataTable = this.itemData.mapActionForAllObjects[objectType];
+                let row = dataTable[0];
+                if(allResource.hasOwnProperty(objectType)){
+                    for(let actionName in row){
+                        if(row[actionName]){
+                            newOperations.push({
+                                objectType: objectType,
+                                action: actionName,
+                                objectIdentifier: objectType,
+                                name: actionName.replace(/_/g, ' ') + ' '+ objectType.replace(/_/g, ' ')
+                            });
+                        }
+                    }
+                }
+            }
+            return newOperations;
+        },
+        async saveActionPack(){
+            let listNewOperations = await this.createNewOperations();
+            let operationsIds = listNewOperations.reduce((arr, el) => {
+                arr.push(el.id);
+                return arr;
+            }, []);
+            let dataToSave = {
+                name: this.allInputs.name.value,
+                type: 'ba',
+                description: this.allInputs.description.value,
+                listOperations: JSON.stringify(operationsIds)
+            };
+
+            let res;
+            try {
+                if(this.action == 'update'){
+                    res = await permissionApi.updateActionPack(this.itemData.id, dataToSave);
+                    if(res.status == '200'){
+                        this.$snotifySuccess("Updated item successfully");
+                    }else{
+                        this.$snotifyError(res, "Error when update item");
+                    }
+                }else if(this.action == 'create'){
+                    res = await permissionApi.createActionPack(dataToSave);
+                    if(res.status == '200'){
+                        this.$snotifySuccess("Create item successfully");
+                    }else{
+                        this.$snotifyError(res, "Error when create item");
+                    }
+                }
+                this.$emit('saved-item-data',res);
+            } catch (error) {
+                this.$snotifyError(error, "Error when save item");
+            }
+        },
         handleEditorShow(data){
-            debugger
             this.isEditingCell = data;
         },
         setAllItemOfResource(data = null){
+
             if(data){
                 data.data = this.getItemForCacheResource(data);
-                if(data.data.length > 0){
+                if(!$.isEmptyObject(data.data)){
                     this.$store.commit('actionPack/cacheAllResourceItem', data);
                 }
             }else{
                 let itemsInStoreMap = {
-                    document: this.$store.state.document.listAllDocument,
+                    document_definition: this.$store.state.document.listAllDocument,
                 };
 
                 for(let module in itemsInStoreMap){
@@ -95,15 +207,17 @@ export default {
         },
         getItemForCacheResource(data){
             let itemConvertMethods = {
-                document: (items) => {
-                    return items.reduce((arr, el) => {
-                        arr.push({
-                                id: el.id,
-                                name: el.name,
-                                title: el.title 
-                            });
-                        return arr;
-                    }, []);
+                document_definition: (items) => {
+                    let resources = items.reduce((obj, el) => {
+                        obj[el.id] = {
+                            id: el.id,
+                            name: el.name,
+                            title: el.title,
+                            fullText: `${el.id} - ${el.name} : ${el.title ? el.title : el.name} `
+                        };
+                        return obj; 
+                    }, {});
+                    return resources;
                 }
             }
 
@@ -114,71 +228,89 @@ export default {
                 console.warn('[SYMPER-ACTIONPACK: object type not found in itemConvertMethods]');
                 return [];
             }
+        },
+        getActionAsColumns(){
+            let self = this;
+            let objectType = this.allInputs.objectType.value;
+            let listAction = this.listAction[objectType];
+            let cols = [];
+            if(listAction){
+                for(let actionKey in listAction){
+                    cols.push({
+                        data: actionKey,
+                        type: "checkbox"
+                    });
+                }
+            }
+            return cols;
+        },
+        getColumnHeadersFromAction(){
+            let objectType = this.allInputs.objectType.value;
+            let arr = [];
+            let listAction = this.listAction[objectType];
+
+            if(listAction){
+                for(let actionKey in listAction){
+                    let el = listAction[actionKey];
+                    arr.push(el.title);
+                }
+            }
+            return arr;
+        },
+        getObjectTypeSelections(){
+            let allActionByObjectType = this.$store.state.actionPack.allActionByObjectType;
+            let rsl = [];
+            for(let key in allActionByObjectType){
+                rsl.push({
+                    text: util.str.getCamelSpaceFromPascalText(key),
+                    value: key
+                });
+            }
+            return rsl;
         }
     },
     data(){
         let self = this;
+        let commonTableSetting = {
+            // các setting cho handsontable
+            filters: true,
+            manualColumnMove: true,
+            manualColumnResize: true,
+            manualRowResize: true,
+            stretchH: "all",
+            rowHeaders: true,
+            licenseKey: "non-commercial-and-evaluation",
+        }
         return {
+            tableHeight: 200,
             isEditingCell : false,
-            listAction: {
-                document: [
-                    {
-                        name: 'add',
-                        title: 'Add'  
-                    },
-                    {
-                        name: 'edit',
-                        title: 'Edit'  
-                    },
-                ]
-            },
-            tableColumns: [
-                util.cloneDeep(firstTableColumn),
-                {
-                    data: "edit",
-                    type: "checkbox"
-                },
-                {
-                    data: "add",
-                    type: "checkbox"
-                },
-            ],
-            colHeaders: [
-                'Objects',
-                'Edit',
-                'Add'
-            ],
             tableSettings: {
-                // các setting cho handsontable
-                filters: true,
-                manualColumnMove: true,
-                manualColumnResize: true,
-                manualRowResize: true,
-                stretchH: "all",
-                minSpareRows: 1,
-                licenseKey: "non-commercial-and-evaluation",
-                afterRender: isForced => {
-                    console.log(
-                        "after render handsontablelllllllllllllllllllllllllll",
-                        Date.now()
-                    );
-                },
-                beforeKeyDown: (event)=>{
-                    // chặn bấm lên xuống trái phải khi có autocomplete
-                    if ((event.keyCode == 40 || event.keyCode == 38 ||
-                            event.keyCode == 37 || event.keyCode == 39) && self.isEditingCell ) {
-                        event.stopImmediatePropagation();
+                ...commonTableSetting,
+                afterChange: function(changes, source) {
+                    if(!changes){
+                        return;
                     }
+                    let htIst = this;
+                    console.log(changes, source, htIst);
+                    let lastIndex = htIst.getData().length;
+                    if(changes[0][0] == lastIndex - 1){
+                        this.alter('insert_row', lastIndex + 1, 1, 'add_row_on_enter');
+                    }
+                    setTimeout(function() {
+                        htIst.selectCell(lastIndex, htIst.propToCol(changes[0][1]));
+                        self.itemData.mapActionAndObjects[self.itemData.objectType] = htIst.getSourceData();
+                    }, 0);
+
                 },
-                afterBeginEditing(){
-                    self.isEditingCell = true;
+            },
+            tableSettingsForObjectType: {
+                ...commonTableSetting,
+                afterChange: function(changes, source) {
+                    let htIst = this;
+                    setTimeout(function() {
+                        self.itemData.mapActionForAllObjects[self.itemData.objectType] = htIst.getSourceData();
+                    }, 0);
                 },
-                afterBeginEditing(){
-                    self.isEditingCell = true;
-                },
-                afterChange(){
-                    self.isEditingCell = false;
-                }
             },
         }
     },
@@ -201,6 +333,78 @@ export default {
         }
     },
     computed: {
+        // các action ứng với object type
+        listAction() {
+            return this.$store.getters['actionPack/listActionByObjectType'];
+        },
+        tableData(){
+            let rows = this.itemData.mapActionAndObjects[this.itemData.objectType];
+            if(rows && rows.length){
+                return rows;
+            }else{
+                return [{}];
+            }
+        },
+        tableDataForObjectType(){
+            let rows = this.itemData.mapActionForAllObjects[this.itemData.objectType];
+            if(rows && rows.length){
+                return rows;
+            }else{
+                return [{}];
+            }
+        },
+        dataSchema(){
+            let objectType = this.allInputs.objectType.value;
+            let schema = {
+                object: ''
+            };
+            if(this.listAction[objectType]){
+                for(let actionKey in this.listAction[objectType]){
+                    schema[actionKey] = true;
+                }
+            }
+            return schema;
+        },
+        allResourceForSearch(){
+            let rsl = {};
+            let allResource = this.$store.state.actionPack.allResource;
+            for(let name in allResource){
+                rsl[name] = [];
+                for(let resourceId in allResource[name]){
+                    rsl[name].push(allResource[name][resourceId].fullText);
+                }
+            }
+            return rsl;
+        },
+        // Tiêu đề của các cột  cần hiển thị
+        colHeaders() {
+            return ["Objects"].concat(this.getColumnHeadersFromAction());
+        },
+        colHeadersForObjectType(){
+            return this.getColumnHeadersFromAction();
+        },
+        tableColumnsForObjectType(){
+            return this.getActionAsColumns();
+        },
+        tableColumns(){
+            let self = this;
+            let cols = this.getActionAsColumns();
+            cols.unshift(
+            {
+                data: "object",
+                type: "autocomplete",
+                width: 400,
+                source: function (query, process) {
+                    let objectType = self.allInputs.objectType.value;
+                    if(self.allResourceForSearch[objectType]){
+                        process(self.allResourceForSearch[objectType]);
+                    }else{
+                        process([]);
+                    }
+                }
+            });
+            return cols;
+        },
         allInputs(){
             return {
                 name: {
@@ -220,23 +424,7 @@ export default {
                     "type": 'select',
                     "value": this.itemData.objectType,
                     "info": "",
-                    options: [{
-                            text: 'Document',
-                            value: 'document'
-                        },
-                        {
-                            text: 'Workflow',
-                            value: 'workflow'
-                        },
-                        {
-                            text: 'Orgchart',
-                            value: 'orgchart'
-                        },
-                        {
-                            text: 'Users',
-                            value: 'users'
-                        }
-                    ],
+                    options: this.getObjectTypeSelections()
                 }
             };
         },
@@ -245,5 +433,4 @@ export default {
 </script>
 
 <style>
-
 </style>

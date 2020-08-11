@@ -46,11 +46,17 @@ export const str = {
     },
 
     randomString(length) {
-        var randomChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        var randomChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
         var result = '';
         for (var i = 0; i < length; i++) {
             result += randomChars.charAt(Math.floor(Math.random() * randomChars.length));
         }
         return result;
+    },
+
+    getCamelSpaceFromPascalText(str) {
+        str = str.replace(/_/g, ' ');
+        str = str[0].toUpperCase() + str.slice(1);
+        return str;
     }
 }

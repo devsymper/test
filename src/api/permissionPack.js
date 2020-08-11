@@ -5,6 +5,8 @@ import { util } from "../plugins/util";
 var permissionModuleApi = new Api(appConfigs.apiDomain.permission);
 var actionModuleApi = new Api(appConfigs.apiDomain.actionPacks);
 var permissionPackApi = new Api(appConfigs.apiDomain.permissionPacks);
+var operationPackApi = new Api(appConfigs.apiDomain.operations);
+
 export const permissionApi = {
     createPermission(data) {
         data.status = 1;
@@ -41,4 +43,28 @@ export const permissionApi = {
         }
         return actionModuleApi.delete('', idPacks);
     },
+
+    createMultipleOperation(data) {
+        return operationPackApi.post('save-batch', data);
+    },
+
+    getOperationOfActionPack(actionId) {
+        return operationPackApi.get('/' + actionId + '/operations');
+    },
+
+    getAllActionByObjectType() {
+        return operationPackApi.get('actions');
+    },
+
+    createActionPack(data) {
+        return actionModuleApi.post('', data);
+    },
+
+    updateActionPack(id, data) {
+        return actionModuleApi.put(id, data);
+    },
+
+    getActionPackOperations(actionPackId) {
+        return actionModuleApi.get(actionPackId + '/operations');
+    }
 };

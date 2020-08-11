@@ -60,7 +60,7 @@ export default {
 
             let res;
             try {
-                debugger
+                
                 if(this.action == 'update'){
                     res = await permissionApi.updatePermission(this.itemData.id, dataToSave);
                     if(res.status == '200'){

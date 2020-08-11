@@ -30,6 +30,25 @@
                     {{$t('common.save')}}
                 </v-btn>
             </div>
+            <div v-if="loadingDiagramView" style="
+                position: absolute;
+                width: calc(100% - 267px);
+                height: 100%;
+                background-color: white;
+                z-index: 99;">
+                <v-progress-circular
+                    :size="50"
+                    color="orange"
+                    indeterminate
+                    style="
+                        position: absolute;
+                        top: 45%;
+                        left: 50%;
+                        margin-right: -50%;
+                        transform: translate(-50%, -50%) "      
+                ></v-progress-circular>
+            </div>
+            
             <EditorWorkspace 
                 :class="{
                     'w-100': true,
@@ -43,7 +62,8 @@
                 @cell-clicked="selectNode"
                 :instanceKey="instanceKey"
                 :context="context"
-                ref="editorWorkspace"></EditorWorkspace>
+                ref="editorWorkspace"/>
+
         </div>
 
         <div :style="{
@@ -125,6 +145,7 @@ export default {
     },
     data(){
         return {
+            loadingDiagramView: true,
             positionEditor: false,
             headerActions: {
                 // undo: {
@@ -171,6 +192,10 @@ export default {
         this.initOrgchartData();
         if(this.action != 'create'){
             this.restoreOrgchartView(this.id)
+        }else{
+            setTimeout((self) => {
+                self.loadingDiagramView = false;
+            }, 1500, this);
         }
         this.$store.dispatch('orgchart/getAllStyleNode');
 
@@ -222,6 +247,18 @@ export default {
         },
         handleConfigUserSelectChange(listUserIds){
             this.$refs.editorWorkspace.changeUserDisplayInNode(listUserIds);
+
+            if(this.context == 'department'){
+                this.changeManagerForDepartment(this.selectingNode.id, listUserIds);
+            }
+        },
+        // Kiểm tra xem department hiện tại đã có node Manager hay chưa
+        changeManagerForDepartment(departmentVizId, userIds){
+            this.checkAndCreateOrgchartData();
+            if(!this.selectingNode.positionDiagramCells.cells){
+                this.$refs.positionDiagram.createFirstVizNode();
+                this.storeDepartmentPositionCells(); 
+            }
         },
         restoreMainOrgchartConfig(config){
             let homeConfig = this.$store.state.orgchart.editor[this.instanceKey].homeConfig;
@@ -301,6 +338,9 @@ export default {
                         }
                     }
                     this.showOrgchartConfig();
+                    setTimeout((self) => {
+                        self.loadingDiagramView = false;
+                    }, 1500, this);
                 }else{
                     this.$snotifyError(res, "Can not get orgchart data",res.message);
                 }
@@ -482,7 +522,17 @@ export default {
                 let invalidIds = [];
                 let mapCodeDpms = {};
                 let passed = true;
+
+                let mapVizNode = this.$refs.editorWorkspace.getAllDiagramCells().cells.reduce((map, el) => {
+                    map[el.id] = el;
+                    return map;
+                }, {});
+
                 for(let dpmId in allDpmns){
+                    if(!mapVizNode[dpmId]){
+                        continue;
+                    }
+
                     let dpm = allDpmns[dpmId];
                     let allPos = self.$store.state.orgchart.editor[dpm.positionDiagramCells.instanceKey].allNode;
                     for(let posId in allPos){
@@ -537,6 +587,7 @@ export default {
             try {    
                 let validate = await this.validateDataBeforeSave();
             } catch (error) {
+                console.warn( 'error when validate orgchart before save', error);
                 passed = false;
             }      
 
@@ -637,6 +688,17 @@ export default {
         },
         handleBlankPaperClicked(){
             this.showOrgchartConfig();
+            this.checkAndCreateFirstNode();
+        },
+        checkAndCreateFirstNode(){
+            let allVizCell = this.$refs.editorWorkspace.getAllDiagramCells();
+            if(allVizCell.cells.length == 0){
+                this.createFirstVizNode();
+                this.loadingDiagramView = true;
+                setTimeout((self) => {
+                    self.loadingDiagramView = false;
+                }, 1500, this);
+            }
         },
         handleConfigValueChange(data){
             let cellId = this.selectingNode.id;
@@ -662,17 +724,23 @@ export default {
                 this.selectNode(nodeData.id);
             }
         },
-        handleHeaderAction(action){
+        async handleHeaderAction(action){
             if(action == 'home'){
                 this.showOrgchartConfig()
             }else if(action == 'saveSVG'){
                 this.$refs.editorWorkspace.saveSVG();
             }else if(action == 'validate'){
-                let rsl = this.validateDataBeforeSave();
-                if(rsl.passed){
-                    this.$snotifySuccess("Validate passed!");
-                }else{
+                let passed = true;
+                try {    
+                    let validate = await this.validateDataBeforeSave();
+                } catch (error) {
+                    console.warn( 'error when validate orgchart before save', error);
+                    passed = false;
                     this.$snotifyError(rsl,"Validate failed!", rsl.message);
+                }      
+
+                if(passed){
+                    this.$snotifySuccess("Validate passed!");  
                 }
             }else{
                 this.$refs.editorWorkspace.handleHeaderAction(action);

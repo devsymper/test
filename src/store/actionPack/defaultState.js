@@ -16,7 +16,25 @@ const defaultState = {
      */
     allResource: {
 
-    }
+    },
+    // tất cả các action của các loại object khác nhau, dưới dạng:
+    /**
+     *  "data": {
+        "document_definition": [
+            "create",
+            "edit",
+            "submit",
+            "drop",
+            "restore",
+            "list",
+            "list_trash",
+            "list_instance"
+        ]...}
+     */
+    allActionByObjectType: {
+
+    },
+    flagToGetAllActionByObjectType: true
 };
 
 export default defaultState;
