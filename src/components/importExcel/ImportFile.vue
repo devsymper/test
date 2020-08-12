@@ -185,7 +185,7 @@ export default {
             this.$store.commit('importExcel/setNewImport', true);  
         },
         clearFiles(){
-            // debugger
+            debugger
             this.errorType="";
             this.data=[];
             this.nameSheets=[];
@@ -437,6 +437,9 @@ export default {
         }
     },
     watch: {
+        data(){
+            this.errorType = "";
+        },
         newImport(val) {
             if (val) {
                 this.nameSheets = [];

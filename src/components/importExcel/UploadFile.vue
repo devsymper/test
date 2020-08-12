@@ -1,5 +1,5 @@
 <template>
-<div class="flex items-center justify-center w-full h-screen text-center mr-15 ml-3" id="app">
+<div class="flex items-center justify-center w-full h-screen text-center mr-15 ml-3">
     <div v-show="selectType" class="mt-2">
         <uploader 
           :options="options" 
@@ -59,8 +59,6 @@ export default {
     },
     data() {
         return {
-            file: null,
-            model: '',
             dem:0,
         }
     },
@@ -87,22 +85,26 @@ export default {
         },
         handleFileUploaded(rootFile, file, response, chunk) {
             this.$refs.upload.uploader.resume();
+            debugger
             // console.log(response);
             response = JSON.parse(response);
+            // this.$emit('clearFiles');
             this.$emit('dataExcel', response);
             this.$emit('keyUpload', this.options.query.key);
         },
         handleChange(event) {
+            debugger
             this.$refs.upload.uploader.cancel()
             this.options.query.total = event.currentTarget.files.length;
-            this.dem= event.currentTarget.files.length;
+            this.dem = event.currentTarget.files.length;
             this.options.query.key = uuidv4();
             this.options.query.typeImport = this.selectType;
+            this.$emit('clearFiles');
+
         },
     }
 }
 </script>
-
 <style scoped>
 .upload-file {
     color: white !important
