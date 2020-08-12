@@ -130,7 +130,7 @@ export default {
         },
         getListApps() {
             let req = new Api(this.apiUrl);
-            req.get(this.appUrl + "/lists")
+            req.get(this.appUrl + "-objects")
             .then(res => {
                 if (res.status == 200) {
                     this.listApp = res.data.listObject;

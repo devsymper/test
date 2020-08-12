@@ -35,7 +35,7 @@ export default {
     },
     computed: {
         baseUrl: function() {
-            return this.apiUrl + this.appUrl + "/lists";
+            return this.apiUrl + this.appUrl ;
         },
     },
     data: function() {

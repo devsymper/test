@@ -1069,7 +1069,6 @@ export default class Table {
             num += 1;
 
         }
-        console.log('listAutoCompleteColumns', this.listAutoCompleteColumns);
         // thêm cột ẩn là id của sqllite
         columns.push({ data: 'childObjectId', type: 'numeric' });
         columns.push({ data: 's_table_id_sql_lite', type: 'numeric' });

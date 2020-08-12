@@ -310,6 +310,9 @@ export default class Control {
      */
 
     checkValidValueLength(rowIndex) {
+        if (this.type != "textInput") {
+            return true;
+        }
         let rs = true;
         if (this.inTable != false) {
             let table = getListInputInDocument(this.curParentInstance)[this.inTable];
@@ -340,39 +343,35 @@ export default class Control {
                 if (value == null) {
                     value = "";
                 }
-                if (this.type == "textInput") {
-                    table.tableInstance.validateValueMap[rowIndex + "_" + colIndex] = { validate: false }
-                    if (this.controlProperties.maxValue.value != "") {
-                        if (value.length > this.controlProperties.maxValue.value) {
-                            table.tableInstance.validateValueMap[rowIndex + "_" + colIndex] = { validate: true, msg: 'Độ dài kí tự không được vượt quá ' + this.controlProperties.maxValue.value + " kí tự" };
-                            rs = false;
-                        }
+                table.tableInstance.validateValueMap[rowIndex + "_" + colIndex] = { validate: false }
+                if (this.controlProperties.maxValue.value != "") {
+                    if (value.length > this.controlProperties.maxValue.value) {
+                        table.tableInstance.validateValueMap[rowIndex + "_" + colIndex] = { validate: true, msg: 'Độ dài kí tự không được vượt quá ' + this.controlProperties.maxValue.value + " kí tự" };
+                        rs = false;
                     }
-                    if (this.controlProperties.minValue.value != "") {
-                        if (value.length < this.controlProperties.minValue.value) {
-                            table.tableInstance.validateValueMap[rowIndex + "_" + colIndex] = { validate: true, msg: 'Độ dài kí tự không được ít hơn ' + this.controlProperties.minValue.value + " kí tự" };
-                            rs = false;
-                        }
+                }
+                if (this.controlProperties.minValue.value != "") {
+                    if (value.length < this.controlProperties.minValue.value) {
+                        table.tableInstance.validateValueMap[rowIndex + "_" + colIndex] = { validate: true, msg: 'Độ dài kí tự không được ít hơn ' + this.controlProperties.minValue.value + " kí tự" };
+                        rs = false;
                     }
                 }
             }
             table.tableInstance.tableInstance.render()
         } else {
-            if (this.type == "textInput") {
-                if (this.controlProperties.maxValue.value != "") {
-                    this.removeValidateIcon()
-                    if (this.value.length > this.controlProperties.maxValue.value) {
-                        this.renderValidateIcon('Độ dài kí tự không được vượt quá ' + this.controlProperties.maxValue.value + " kí tự");
-                        rs = false;
+            if (this.controlProperties.maxValue.value != "") {
+                this.removeValidateIcon()
+                if (this.value.length > this.controlProperties.maxValue.value) {
+                    this.renderValidateIcon('Độ dài kí tự không được vượt quá ' + this.controlProperties.maxValue.value + " kí tự");
+                    rs = false;
 
-                    }
                 }
-                if (this.controlProperties.minValue.value != "") {
-                    this.removeValidateIcon()
-                    if (this.value.length < this.controlProperties.minValue.value) {
-                        this.renderValidateIcon('Độ dài kí tự không được ít hơn ' + this.controlProperties.minValue.value + " kí tự");
-                        rs = false;
-                    }
+            }
+            if (this.controlProperties.minValue.value != "") {
+                this.removeValidateIcon()
+                if (this.value.length < this.controlProperties.minValue.value) {
+                    this.renderValidateIcon('Độ dài kí tự không được ít hơn ' + this.controlProperties.minValue.value + " kí tự");
+                    rs = false;
                 }
             }
         }
