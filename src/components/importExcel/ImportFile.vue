@@ -30,8 +30,9 @@
             </v-col>
         </v-row>
         <v-row class="ml-2 mt-1">
-                <UploadFile @dataExcel="getDataExcel" :selectType="selectType" @keyUpload="getKey"/>
+                <UploadFile @dataExcel="getDataExcel" :selectType="selectType" @clearFiles="clearFiles" @keyUpload="getKey"/>
         </v-row>
+        <v-row class="ml-5 mt-1"><span style="color:red" class="fs-12">{{errorType}}</span></v-row>
         <v-row class="ml-5">
             <span><b class="color-grey fs-13 fw-500">Khớp dữ liệu chứng từ và tệp</b></span>
         </v-row>
@@ -50,7 +51,8 @@
                         <b class="fw-500">{{table.name}}
                             <span v-if="tables[tableIdx]==tables[0]" style="color:red">*
                             </span>
-                            ({{table.controls.filter(p => p.dataColumn!=null).length}}/{{table.controls.filter(p => p.dataType!='table').length+1}})</b></span>
+                          
+                            (0/{{table.controls.filter(p => p.dataType!='table').length+1}})</b></span>
                 </v-col>
                 <v-col class="col-md-6 py-0">
                     <v-autocomplete :value="table.sheetMap" @input="value => onChangeSheet(tableIdx, value)" class="auto-complete color-normal mt-4 mb-3 fs-13 " 
@@ -74,7 +76,11 @@
                     <div class="color-normal" style="float:left; margin-top:-30px">Khoá</div>
                 </v-col>
                 <v-col class="col-md-6 py-0" style="margin-left:2px">
-                    <v-autocomplete class=" color-normal auto-complete" style="width: 215px" :items="nameColumnDetail[table.sheetMap.name] ? nameColumnDetail[table.sheetMap.name] : []" item-text="name" return-object v-model="table.keyColumn" clearable :menu-props="{'nudge-top':-10, 'max-width': 300}">
+                    <v-autocomplete class=" color-normal auto-complete" 
+                    style="width: 215px"
+                     :items="nameColumnDetail[table.sheetMap.name] ? nameColumnDetail[table.sheetMap.name] : []" item-text="name" 
+                     return-object 
+                     v-model="table.keyColumn" clearable :menu-props="{'nudge-top':-10, 'max-width': 300}">
                         <template v-slot:item="{ item, on, attrs }">
                             <v-list-item v-show="item.enable" v-on="on" v-bind="attrs">
                                 <v-list-item-content>
@@ -148,6 +154,7 @@ export default {
             nameColumnDetail: {},
             data: {},
             fileName: '',
+            errorType:'',
             dataExel: {},
             tables: [],
             showCancelBtn: true,
@@ -177,21 +184,41 @@ export default {
             this.$emit('cancel');
             this.$store.commit('importExcel/setNewImport', true);  
         },
+        clearFiles(){
+            // debugger
+            this.errorType="";
+            this.data=[];
+            this.nameSheets=[];
+            this.nameColumnDetail={};
+            for (let i = 0; i < this.tables.length; i++){
+                this.tables[i].keyColumn={};
+                this.tables[i].sheetMap={};
+                for (let j = 0; j < this.tables[i].controls.length; j++) {
+                        this.tables[i].controls[j].dataColumn=[]
+                }
+            }
+             
+        },
         // Lấy dữ liệu từ API
         getDataExcel(data) {
-            this.data = data.data;
-            console.log('Đây là data');
-            console.log(this.data);
-            if(Array.isArray(this.data)){
-                console.log('Data là k')
-
-            }else{
-                console.log('có data');
+            // debugger
+            console.log(data);
+            if(data.data){
+                this.data = data.data;
                 console.log(this.data);
-                this.getSheetAndColumnName();
+                if(Array.isArray(this.data)){
+                    console.log('Data là k')
+
+                }else{
+                    console.log('có data');
+                    console.log(this.data);
+                    this.getSheetAndColumnName();
+
+                }
+            }else{
+                this.errorType="* Kiểu file không hợp lệ";
 
             }
-           
         },
         //không để tên quá dài
         formatName(name) {

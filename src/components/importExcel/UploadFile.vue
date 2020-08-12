@@ -1,29 +1,31 @@
 <template>
 <div class="flex items-center justify-center w-full h-screen text-center mr-15 ml-3" id="app">
-  <!-- excel
-        -->
-    <div class="mt-2">
+    <div v-show="selectType" class="mt-2">
         <uploader 
           :options="options" 
           :autoStart="true"
            @file-success="handleFileUploaded"
-          @change="handleChange"
-         
+          @change="handleChange"   
           ref="upload">
             <uploader-unsupport></uploader-unsupport>
             <uploader-drop>
                 <p class="font-normal">Thả file ở đây để upload</p>
-                <uploader-btn depressed class="font-normal btn-upload"
-                :single="false"
+                <uploader-btn v-show="selectType=='Excel'" depressed class="font-normal btn-upload"
+                :single="true"
                 style="background-color:#3092E6; color:white; border-radius:2px; border:1px solid #3092E6; font-size:13px">
                     Chọn file
                 </uploader-btn>
+                <uploader-btn v-show="selectType=='CSV'" depressed class="font-normal btn-upload"
+                :single="false"
+                style="background-color:green; color:white; border-radius:2px; border:1px solid green; font-size:13px">
+                    Chọn file
+                </uploader-btn>
                 <v-btn 
-                  v-show="options.query.total > 0" 
-                  color="error" class="ml-1" 
-                  style="font-weight: 400; border-radius: 0px !important" 
+                  v-show ="dem >0" 
+                  color ="error" class="ml-1" 
+                  style ="font-weight: 400; border-radius: 0px !important" 
                   small depressed 
-                  @click="clearFiles">
+                  @click = "clearFiles">
                   Clear
                 </v-btn>
             </uploader-drop>
@@ -47,28 +49,19 @@ export default {
           if (val) {
             this.selectType='';
             this.$refs.upload.uploader.cancel();
-            this.options.query.total = 0;
+           //this.options.query.total = 0;
           }
         },
         selectType(){
-          if(this.selectType=='Excel'){
-            this.single = true;
-            this.$refs.upload.uploader.cancel()
-            this.options.query.total = 0;
+          this.clearFiles();
 
-          }
-          else{
-            this.single = false;
-            this.$refs.upload.uploader.cancel()
-            this.options.query.total = 0;
-            }
           }
     },
     data() {
         return {
             file: null,
             model: '',
-            single: false,
+            dem:0,
         }
     },
     computed: {
@@ -85,12 +78,12 @@ export default {
         }
       },
     },
-
     methods: {
         clearFiles() {
             this.$refs.upload.uploader.cancel()
-            this.options.query.total = 0
+            this.dem = 0
             this.options.query.key = ""
+            this.$emit('clearFiles')
         },
         handleFileUploaded(rootFile, file, response, chunk) {
             this.$refs.upload.uploader.resume();
@@ -98,14 +91,13 @@ export default {
             response = JSON.parse(response);
             this.$emit('dataExcel', response);
             this.$emit('keyUpload', this.options.query.key);
-
         },
         handleChange(event) {
             this.$refs.upload.uploader.cancel()
             this.options.query.total = event.currentTarget.files.length;
+            this.dem= event.currentTarget.files.length;
             this.options.query.key = uuidv4();
             this.options.query.typeImport = this.selectType;
-
         },
     }
 }

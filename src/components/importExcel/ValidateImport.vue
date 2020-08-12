@@ -29,7 +29,8 @@
             </span>
         </v-row>
         <v-row class=" ml-5 color-normal" style="margin-bottom:-10px">Kiểm tra dữ liệu
-            <span v-if="processing.validating.errors==null" style="color:green; font-size:16px; margin-top:-3px">
+            <span v-if="processing.validating.errors==null" 
+            style="color:green; font-size:16px; margin-top:-3px">
                 <i class="mdi mdi-check ml-4"></i>
             </span>
             <span v-else class="fw-400">: 
@@ -154,7 +155,6 @@ export default {
             result = String(result);
                 if(result.length>4){
                     return result.substr(0,4);
-
                 }
                 return result;
         },
