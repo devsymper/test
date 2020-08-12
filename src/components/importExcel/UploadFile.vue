@@ -1,18 +1,20 @@
 <template>
 <div class="flex items-center justify-center w-full h-screen text-center mr-15 ml-3" id="app">
-  <!-- excel -->
+  <!-- excel
+        -->
     <div class="mt-2">
         <uploader 
           :options="options" 
           :autoStart="true"
-          @file-success="handleFileUploaded"
-          @change="handleChange"  
-          :type="selectType == 'Excel' ? 'xlsx' : 'csv'"
+           @file-success="handleFileUploaded"
+          @change="handleChange"
+         
           ref="upload">
             <uploader-unsupport></uploader-unsupport>
             <uploader-drop>
                 <p class="font-normal">Thả file ở đây để upload</p>
-                <uploader-btn depressed class="font-normal btn-upload" :single="false"
+                <uploader-btn depressed class="font-normal btn-upload"
+                :single="false"
                 style="background-color:#3092E6; color:white; border-radius:2px; border:1px solid #3092E6; font-size:13px">
                     Chọn file
                 </uploader-btn>
@@ -42,21 +44,21 @@ export default {
     },
     watch: {
         newImport(val) {
-            if (val) {
-                this.selectType='';
-                this.$refs.upload.uploader.cancel();
-                this.options.query.total = 0;
-            }
-        },
-        selectType(){
-          if(this.selectType=='Excel')
-          {
-            this.options.singleFile=true;
-            this.$refs.upload.uploader.cancel()
+          if (val) {
+            this.selectType='';
+            this.$refs.upload.uploader.cancel();
             this.options.query.total = 0;
           }
+        },
+        selectType(){
+          if(this.selectType=='Excel'){
+            this.single = true;
+            this.$refs.upload.uploader.cancel()
+            this.options.query.total = 0;
+
+          }
           else{
-            this.options.singleFile=false;
+            this.single = false;
             this.$refs.upload.uploader.cancel()
             this.options.query.total = 0;
             }
@@ -66,6 +68,7 @@ export default {
         return {
             file: null,
             model: '',
+            single: false,
         }
     },
     computed: {
@@ -78,7 +81,7 @@ export default {
               total: 0,
           },
           autoStart: true,
-          singleFile: true
+          //singleFile: true
         }
       },
     },
