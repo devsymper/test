@@ -21,7 +21,6 @@
         <v-row >
             <v-col class="col-md-7">
                 <ImportFile 
-                    @reload="reload()"
                     :documentId="documentId"
                     :deleteFileName="deleteFileName" 
                     @setInterval='setInterval=true' 
@@ -29,7 +28,6 @@
                     @fileName="getFileName" 
                     @showValidate="showValidate=true"/>
             </v-col>  
-            <!-- <v-col>ádádád{{fileName}}</v-col> -->
             <v-col v-show="showValidate" class="col-md-5">
                 <ValidateImport 
                     @deleteFileName="deleteFileName=true"  
@@ -41,7 +39,6 @@
         </v-row>
     </v-navigation-drawer>
 </div>
-  
 </template>
 <script>
 import { documentApi } from "./../../api/Document.js";
@@ -59,7 +56,6 @@ export default {
         ImportFile,
         ValidateImport,
     },
- 
     data(){
         return {
             documentId:0,
@@ -138,12 +134,6 @@ export default {
     mounted() {
         this.calcContainerHeight();
     },
-    // watch:{
-    //     document(){
-    //          this.documentId = document.id;
-    //          console.log(this.document.id)
-    //     }
-    // },
     created(){
         let thisCpn = this;
         this.$evtBus.$on('change-user-locale',(locale)=>{
@@ -169,16 +159,12 @@ export default {
         cancel(){
             this.drawer = false;
         },
-        reload(){
-           // window.location.reload()
-        },
         getFileName(data){
             this.fileName = data
         },
         addDocument(){
             this.$router.push('/document/editor');
         },
-     
         calcContainerHeight() {
             this.containerHeight = util.getComponentSize(this).h;
         }

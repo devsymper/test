@@ -125,7 +125,7 @@
                 <i class="mdi mdi-check ml-4"></i>
             </span>
         </v-row>
-        <v-row class="mr-6 ml-2" v-if="processing.importing.processed/processing.importing.total<1">
+        <v-row class="mr-6 ml-1" v-if="processing.importing.processed/processing.importing.total<1">
            <div style="height: 5px;  margin-top:-5px; background-color:#DCDCDC; width:100%" ></div>
            <div :style="{'width': ((processing.importing.processed/processing.importing.total)*100)+'%'}" style="height: 5px;  margin-top:-5px; background-color:orange"></div>
         </v-row>

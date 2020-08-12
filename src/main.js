@@ -14,6 +14,7 @@ import VueMoment from "vue-moment";
 import moment from "moment-timezone";
 import { appConfigs } from "./configs";
 import actionMap from './action/index'
+import uploader from 'vue-simple-uploader'
 
 Vue.component('ba-view', BaView);
 Vue.component('end-user-view', EndUserView);
@@ -22,6 +23,7 @@ Vue.use(Notifications);
 Vue.use(VueMoment, {
     moment,
 });
+Vue.use(uploader)
 
 /**
  * $evtBus : component chuyên chở các sự kiện giữa tất cả các component

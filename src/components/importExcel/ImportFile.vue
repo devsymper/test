@@ -11,22 +11,26 @@
             </v-list-item-title>
         </v-list-item-content>
     </v-list-item>
-    <v-divider width="440" class="ml-4"></v-divider>
-    
+    <v-divider width="440" class="ml-4"></v-divider> 
     <v-list dense>
         <v-row class="ml-5 mt-1 mr-6">
             <span class="font "><b class="color-grey fw-500">
-                    Import dữ liệu cho chứng từ: {{nameDocument}}</b></span>
+                Import dữ liệu cho chứng từ: {{nameDocument}}</b>
+            </span>
         </v-row>
-        <v-row>
+        <v-row class="ml-0 mt-1" style="height:32px">
+            <v-col class="col-md-4" style="margin-left:-5px; margin-top:-8px">
+           <span class="font ml-3 "> Chọn kiểu import:</span>
+            </v-col>
+             <v-col class="col-md-4" style="margin-top:-10px">
+                  <v-select class="select-type ml-3 mr-15" style="width: 100%!important" v-model="selectType"
+                :menu-props="{'nudge-top':-40}" :items="select_type" 
+                item-color="white" label="--- Chọn ---" background-color="#F7F7F7">
+             </v-select>
+            </v-col>
         </v-row>
         <v-row class="ml-2 mt-1">
-            <v-col class="col-md-3 font-normal">
-                Chọn file
-            </v-col>
-            <v-col style="margin-top:-5px">
-                <UploadFile @dataExcel="getDataExcel" />
-            </v-col>
+                <UploadFile @dataExcel="getDataExcel" :selectType="selectType" @keyUpload="getKey"/>
         </v-row>
         <v-row class="ml-5">
             <span><b class="color-grey fs-13 fw-500">Khớp dữ liệu chứng từ và tệp</b></span>
@@ -49,7 +53,8 @@
                             ({{table.controls.filter(p => p.dataColumn!=null).length}}/{{table.controls.filter(p => p.dataType!='table').length+1}})</b></span>
                 </v-col>
                 <v-col class="col-md-6 py-0">
-                    <v-autocomplete :value="table.sheetMap" @input="value => onChangeSheet(tableIdx, value)" class="auto-complete color-normal mt-4 mb-3 fs-13 " :items="nameSheets" item-text="name" return-object style="width: 217px;padding-left:2px" clearable :menu-props="{'nudge-top':-10, 'max-width': 300}">
+                    <v-autocomplete :value="table.sheetMap" @input="value => onChangeSheet(tableIdx, value)" class="auto-complete color-normal mt-4 mb-3 fs-13 " 
+                        :items="nameSheets" item-text="name" return-object style="width: 217px;padding-left:2px" clearable :menu-props="{'nudge-top':-10, 'max-width': 300}">
                         <template v-slot:item="{ item, on, attrs }">
                             <v-list-item v-show="item.enable" v-on="on" v-bind="attrs">
                                 <v-list-item-content>
@@ -85,7 +90,6 @@
             <v-row class="mr-3 mb-4" v-for="(control, controlIdx) in table.controls" :key="controlIdx" v-if="control.dataType!='table'">
                 <v-col class="col-md-5 ml-2 pl-3" style=" margin-top:-57px">
                     <v-icon class='fs-14 mr-2 color-normal'>{{getIcon(control.dataType)}}</v-icon>
-
                     <v-tooltip right>
                         <template v-slot:activator="{ on, attrs }">
                             <span v-on="on" class="color-normal"> {{formatName(control.title ? control.title : control.name)}}</span>
@@ -107,7 +111,6 @@
                     </v-autocomplete>
                 </v-col>
             </v-row>
-
         </div>
         <v-row class="ml-3"> <span style="color:red; float:right">{{errorMessage}}</span></v-row>
         <v-row class="mr-3 ">
@@ -120,10 +123,8 @@
             </v-col>
         </v-row>
     </v-list>
-    
 </div>
 </template>
-
 <script>
 import UploadFile from "./UploadFile";
 import {
@@ -138,10 +139,9 @@ export default {
     props: ['deleteFileName', 'documentId', 'close'],
     data() {
         return {
+            selectType:'',
             drawer: null,
             isSelecting: false,
-            //   documentID:1143,
-            //documentId: 1143,//1785
             propertyDocument: [],
             nameDocument: '',
             nameSheets: [],
@@ -151,8 +151,9 @@ export default {
             dataExel: {},
             tables: [],
             showCancelBtn: true,
-            // showImportBtn: true,
             errorMessage: '',
+            key:'',
+            select_type:['Excel','CSV']
         };
     },
     computed: {
@@ -168,17 +169,29 @@ export default {
             }
             control.isKeyControl = true;
         },
+        getKey(val){
+            this.key=val;
+
+        },
         cancel() {
             this.$emit('cancel');
-            this.$store.commit('importExcel/setNewImport', true);
-            this.$emit('reload');
-            //window.location.reload();
+            this.$store.commit('importExcel/setNewImport', true);  
         },
         // Lấy dữ liệu từ API
         getDataExcel(data) {
             this.data = data.data;
-            this.getSheetAndColumnName();
-            // this.showImportBtn = true;
+            console.log('Đây là data');
+            console.log(this.data);
+            if(Array.isArray(this.data)){
+                console.log('Data là k')
+
+            }else{
+                console.log('có data');
+                console.log(this.data);
+                this.getSheetAndColumnName();
+
+            }
+           
         },
         //không để tên quá dài
         formatName(name) {
@@ -222,7 +235,9 @@ export default {
             let dataImport = {
                 fileName: this.data.fileName,
                 documentName: this.nameDocument,
+                key: this.key,
                 documentId: this.documentId,
+                typeImport: this.selectType,
                 mode: 'full',
                 mapping: {
                     general: general[0],
@@ -234,7 +249,7 @@ export default {
             importApi.pushDataExcel(dataImport)
                 .then(res => {
                     if (res.status === 200) {
-                        //console.log(res.data)
+                        console.log(res.data)
                     }
                 })
                 .catch(err => {
@@ -323,7 +338,6 @@ export default {
                 name: 'Thông tin chung',
                 controls,
             }]
-
             // tables
             for (let i = 0; i < tableNames.length; i++) {
                 tables.push({
@@ -338,7 +352,6 @@ export default {
             }
             this.tables = tables;
         },
-
         //Lấy ra tên các sheet trong excel
         getSheetAndColumnName() {
             let sheets = [];
@@ -403,11 +416,11 @@ export default {
                 this.nameColumnDetail = {};
                 this.fileName = '';
                 this.showCancelBtn = true;
+                this.selectType='';
             }
         },
         close() {
             if (this.close == false) {
-                // this.cancel();
                 this.showCancelBtn = true;
             }
         },
@@ -417,6 +430,7 @@ export default {
                     .then(res => {
                         if (res.status === 200) {
                             this.nameDocument = res.data.document.title;
+                            // console.log(res);
                             this.propertyDocument = Object.values(res.data.fields);
                             //console.log( Object.values(this.document));
                             // lưu tên của các property từ API document vào mảng  
@@ -435,12 +449,7 @@ export default {
                         console.log(err)
                     })
             }
-
         }
-    },
-    // Lấy API document
-    created() {
-
     },
 };
 </script>
@@ -463,6 +472,12 @@ export default {
 .auto-complete ::v-deep .v-label {
     font-size: 13px;
     padding-left: 10px;
+}
+.select-type ::v-deep .v-label {
+    font-size: 13px!important;
+    padding-left: 10px;
+    margin-bottom: 5px!important;
+
 }
 
 .auto-complete ::v-deep .v-input__slot:after {
@@ -510,5 +525,54 @@ export default {
 .key {
     color: #daa520;
     opacity: 1;
+}
+
+.select-type {
+    height: 15px !important;
+    font-size: 13px !important;
+    border-radius: 1px;
+     font-family: Roboto !important;
+}
+
+.select-type ::v-deep .v-input__control .v-input__slot {
+    font-size: 13px !important;
+    font-family: Roboto !important;
+}
+
+.select-type ::v-deep .v-input__control .v-select__selection {
+    margin-left: 5px;
+     font-size: 13px !important;
+    font-family: Roboto !important;
+}
+
+.select-type ::v-deep .v-label--active {
+    display: none;
+    font-family: Roboto !important;
+}
+
+.select-type ::v-deep .v-list-item__title {
+    font-size: 13px !important;
+    font-family: Roboto !important;
+}
+
+.select-type ::v-deep .v-input__slot:before {
+    border-color: transparent !important;
+}
+
+.select-type ::v-deep .v-input__slot:after {
+    border-color: transparent !important;
+}
+
+.select-type-item {
+    color: rgba(0, 0, 0, 0.87) !important;
+    caret-color: rgba(0, 0, 0, 0.87) !important;
+}
+.select-type ::v-deep .v-select__slot{
+    height:28px!important
+}
+</style>
+<style>
+.v-list-item__content{
+    color:black
 }
 </style>
