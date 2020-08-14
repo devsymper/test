@@ -9,7 +9,13 @@
         <v-card
         height="575"
         >
-            <h4 class="headline">Lưu Document</h4>
+            <div class="note-name-change" v-show="showNoteChangeName">
+                <span>{{$t('document.editor.dialog.saveDoc.checkNameRelated')}}</span>
+                <div class="buble-direction">
+                    <span>▼</span>
+                </div>
+            </div>
+            <h4 class="headline">{{$t('document.editor.dialog.saveDoc.heading')}}</h4>
             <v-divider></v-divider>
             <v-card-text style="height: calc(100% - 84px);    overflow: auto;">
                 <div id="setting-control-table" class="setting-control-table">
@@ -32,7 +38,7 @@
                 right
                 @click="saveDocument"
             >
-                Lưu
+                {{$t('common.save')}}
             </v-btn>
 
             <v-btn
@@ -41,12 +47,19 @@
                 right
                 @click="hideDialog"
             >
-                Đóng
+                {{$t('common.close')}}
             </v-btn>
             </v-card-actions>
         </v-card>
     </v-dialog>
-    <validate :message="messageValidate" ref="validate" />
+    <validate 
+    @after-click-confirm="checkNameDocument" 
+    @after-click-ignore="showNoteChangeName = false" 
+    :title="'Chú ý'" 
+    :message="messageValidate" 
+    :isShowAction="true"
+     ref="validate" />
+    
     </div>
    
     
@@ -82,7 +95,9 @@ export default {
             listRows:[],
             isShowModelSaveDoc:false,
             isValid :false,
-            messageValidate:""
+            messageValidate:"",
+            showNoteChangeName:false,
+            showValidate:true,
         }
     },
     created(){
@@ -94,10 +109,8 @@ export default {
         },
         //Hàm kiểm tra tên document đã tồn tai hay chưa
         handleChangeInput(name, input, data){
-            if(this.messageValidate == ""){
-                this.messageValidate = "Tên của văn bản này có thể được sử dụng trong công thức ở các đối tượng trong hệ thống. Chọn kiểm tra để kiểm tra lại các đối tượng";
-                this.$refs.validate.show(false)
-            }
+            
+            this.showNoteChangeName = true;
             
             let thisCpn = this;
             if(this.isValid)
@@ -135,7 +148,6 @@ export default {
         },
         // Hàm kiểm tra tên document
         checkValidateNameDocument(name, input, data){
-            console.log(input);
             
             if(name == 'name'){
                 let docProps = util.cloneDeep(this.documentProps);
@@ -159,16 +171,24 @@ export default {
             
         },
         saveDocument(){
-            if(this.isValid){
-                this.$emit("save-doc-action");
-                this.hideDialog();
+            if(this.showValidate && this.showNoteChangeName){
+                this.showValidate = false;
+                this.messageValidate = "Tên của văn bản này có thể được sử dụng trong công thức ở các đối tượng trong hệ thống. Chọn kiểm tra để kiểm tra lại các đối tượng";
+                this.$refs.validate.show(false)
             }
             else{
-                this.$snotify({
-                                type: "error",
-                                title: "Vui lòng nhập lại tên document"
-                            });  
+                if(this.isValid){
+                    this.$emit("save-doc-action");
+                    this.hideDialog();
+                }
+                else{
+                    this.$snotify({
+                                    type: "error",
+                                    title: "Vui lòng nhập lại tên document"
+                                });  
+                }
             }
+            
         },
         setPropsOfDoc(props){
             if(props.name != undefined){
@@ -238,7 +258,31 @@ export default {
     .action{
         height: 41px;
     }
-   
+    .note-name-change{
+        position: absolute;
+        right: 40px;
+        top: 38px;
+        border-top-left-radius: inherit;
+        border-top-right-radius: inherit;
+        background: #707070;
+        z-index: 999;
+        padding: 2px 8px;
+        border-radius: 4px;
+        transition: all ease-in-out 250ms;
+    }
+    .note-name-change > span{
+        color: white;
+        font-size: 12px;
+    }
+    .buble-direction{
+        position: relative;
+    }
+    .buble-direction span{
+        position: absolute;
+        color: #707070;
+        top: -8px;
+        right: 10px;
+    }
 </style>
 <style>
     .s-dialog{

@@ -792,7 +792,6 @@ export default class Table {
         let colHeaders = thisObj.columnsInfo.headerNames;
         thisObj.colHeaders = colHeaders;
         let defaultData = this.getDefaultData();
-        console.log(defaultData, 'defaultData');
         this.tableInstance = new Handsontable(tableContainer, {
             rowHeaders: true,
             filters: true,
@@ -894,6 +893,8 @@ export default class Table {
                 thisObj.tableInstance.setDataAtCell(index, thisObj.tableInstance.getDataAtRow(0).length - 1, id);
             }
         });
+        console.log(this.tableInstance, 'defaultData');
+
         this.tableInstance.keyInstance = this.keyInstance;
         this.tableInstance.tableName = this.tableName;
         if (!this.checkDetailView()) {
@@ -1072,8 +1073,8 @@ export default class Table {
         // thêm cột ẩn là id của sqllite
         columns.push({ data: 'childObjectId', type: 'numeric' });
         columns.push({ data: 's_table_id_sql_lite', type: 'numeric' });
-        hiddenColumns.push(columns.length - 1);
         hiddenColumns.push(columns.length - 2);
+        hiddenColumns.push(columns.length - 1);
         return {
             headerNames: headerName,
             columns: columns,

@@ -60,4 +60,10 @@ export const documentApi = {
     submitDraftDocument(data) {
         return coreApi.post("documents/draft-objects", data);
     },
+    updatePreDataForDoc(data) {
+        return coreApi.post("documents/relations", data);
+    },
+    updatePreDataForField(data) {
+        return coreApi.post("documents/fields/relations", data);
+    }
 };

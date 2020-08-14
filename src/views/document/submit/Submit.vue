@@ -102,10 +102,9 @@ import moment from "moment-timezone";
 
 
 import { checkCanBeBind, resetImpactedFieldsList, markBinedField } from './handlerCheckRunFormulas';
-import {checkDbOnly,getControlInstanceFromStore,getControlTitleFromName} from './../common/common'
+import {checkDbOnly,getControlInstanceFromStore,getControlTitleFromName, getListInputInDocument} from './../common/common'
 let impactedFieldsList = {};
 let impactedFieldsArr = {};
-var impactedFieldsListWhenStart = {};
 
 export default {
     props: {
@@ -208,7 +207,8 @@ export default {
             messageValidate:"",
             isComponentActive:false,
             cacheDataRunFormulas:{},
-            isDraft:0
+			isDraft:0,
+			preDataSubmit:{}
         };
     },
     beforeMount() {
@@ -660,7 +660,9 @@ export default {
                         if (res.status == 200) {
                             let content = res.data.document.content;
                             thisCpn.documentName = res.data.document.name;
-                            thisCpn.contentDocument = content;
+							thisCpn.contentDocument = content;
+							if(res.data.document.data_prepare_submit != "")
+							thisCpn.preDataSubmit = JSON.parse(res.data.document.data_prepare_submit);
                             setDataForPropsControl(res.data.fields,thisCpn.keyInstance,'submit'); // ddang chay bat dong bo
                             setTimeout(() => {
                                 thisCpn.processHtml(content);
@@ -854,8 +856,8 @@ export default {
                             mapControlEffected[formulasType] = {}
                         }
                         if(formulas[formulasType].hasOwnProperty('instance')){
-                            let inputControl = formulas[formulasType].instance.inputControl;
-                            let inputLocalFormulas = formulas[formulasType].instance.inputForLocalFormulas;
+							let inputControl = formulas[formulasType].instance.inputControl;
+							let inputLocalFormulas = formulas[formulasType].instance.inputForLocalFormulas;
                             for (let controlEffect in inputControl) {
                                 if (!mapControlEffected[formulasType].hasOwnProperty(controlEffect)) {
                                     mapControlEffected[formulasType][controlEffect] = {};
@@ -874,6 +876,8 @@ export default {
                     }
                 }
             }
+                            console.log('mapControlEffected',mapControlEffected);
+
             if(mapControlEffected.hasOwnProperty('formulas')){
                 this.updateEffectedControlToStore(mapControlEffected['formulas'],'effectedControl')
             }
@@ -1133,6 +1137,7 @@ export default {
 
         
         updateEffectedControlToStore(mapControlEffected,key) {
+            console.log("skdsad",mapControlEffected);
             for (let controlName in mapControlEffected) {
                 this.updateListInputInDocument(
                     controlName,
@@ -1449,43 +1454,69 @@ export default {
          * Hàm xử lí việc tìm kiếm các root control và chạy công thức cho control đó (lúc khởi tạo doc)
          */
         findRootControl(){ 
-            let listInput = this.sDocumentSubmit.listInputInDocument;
-            for(let controlName in listInput){
-                // console.log('sad',controlName);
-                this.setAllImpactedFieldsList(controlName);
-                let controlInstance = listInput[controlName];
-                if(controlInstance.type != "inputFilter"){
-                    if(Object.keys(controlInstance.controlFormulas).length > 0){
-                        let controlFormulas = controlInstance.controlFormulas;
-                        
-                        for(let formulasType in controlFormulas){
-                            if(formulasType != 'autocomplete' && formulasType != 'list'){
-                                if(controlFormulas[formulasType].hasOwnProperty('instance')){
-                                    let formulasInstance = controlFormulas[formulasType].instance;
-                                    if(formulasInstance.getFormulas() !== "" && Object.keys(formulasInstance.getInputControl()).length == 0){
-                                        impactedFieldsListWhenStart[controlName] = false;
-                                        this.$store.commit("document/addToDocumentSubmitStore", {
-                                            key: 'impactedFieldsListWhenStart',
-                                            value: impactedFieldsListWhenStart,
-                                            instance: this.keyInstance
-                                        });
-                                        this.handlerBeforeRunFormulasValue(formulasInstance,controlInstance.id,controlName,formulasType,'root')
-                                    }
-                                }
-                            }
-                            
-                        }
-                    }
+			let impactedFieldsListWhenStart = {}
+			if(this.preDataSubmit != null && Object.keys(this.preDataSubmit).length > 0){
+				impactedFieldsList = this.preDataSubmit.impactedFieldsList;
+				impactedFieldsListWhenStart = this.preDataSubmit.impactedFieldsListWhenStart;
+				this.$store.commit("document/addToDocumentSubmitStore", {
+												key: 'impactedFieldsListWhenStart',
+												value: impactedFieldsListWhenStart,
+												instance: this.keyInstance
+											});
+				let rootControl = this.preDataSubmit.rootControl;
+				for (let index = 0; index < rootControl.length; index++) {
+					const controlName = rootControl[index];
+					let controlInstance = getControlInstanceFromStore(this.keyInstance,controlName);
+					let controlFormulas = controlInstance.controlFormulas;
+					for(let formulasType in controlFormulas){
+						if(formulasType != 'autocomplete' && formulasType != 'list'){
+							let formulasInstance = controlFormulas[formulasType].instance;
+							this.handlerBeforeRunFormulasValue(formulasInstance,controlInstance.id,controlName,formulasType,'root')
+						}
+					}
+				}
+			}
+			else{
+				let listInput = getListInputInDocument(this.keyInstance);
+				let listRootControl = [];
+				for(let controlName in listInput){
+					this.setAllImpactedFieldsList(controlName);
+					let controlInstance = listInput[controlName];
+					if(controlInstance.type != "inputFilter"){
+						if(Object.keys(controlInstance.controlFormulas).length > 0){
+							let controlFormulas = controlInstance.controlFormulas;
+							for(let formulasType in controlFormulas){
+								if(formulasType != 'autocomplete' && formulasType != 'list'){
+									if(controlFormulas[formulasType].hasOwnProperty('instance')){
+										let formulasInstance = controlFormulas[formulasType].instance;
+										if(formulasInstance.getFormulas() !== "" && Object.keys(formulasInstance.getInputControl()).length == 0){
+											impactedFieldsListWhenStart[controlName] = false;
+											this.$store.commit("document/addToDocumentSubmitStore", {
+												key: 'impactedFieldsListWhenStart',
+												value: impactedFieldsListWhenStart,
+												instance: this.keyInstance
+											});
+											listRootControl.push(controlName);
+											this.handlerBeforeRunFormulasValue(formulasInstance,controlInstance.id,controlName,formulasType,'root')
+										}
+									}
+								}
+								
+							}
+						}
+					}
                 }
-                
-                
-            }
+			// lưu lại các mối quan hệ cho lần submit sau ko phải thực hiện các bước tìm quan hê này (các root control , các luồng chạy công thức)
+				let dataPost = {impactedFieldsList:impactedFieldsList,impactedFieldsListWhenStart:impactedFieldsListWhenStart,rootControl:listRootControl};
+				documentApi.updatePreDataForDoc({documentId:this.documentId,prepareData:JSON.stringify(dataPost)})
+			}
+			
             this.$store.commit("document/addToDocumentSubmitStore", {
                 key: 'impactedFieldsList',
                 value: impactedFieldsList,
                 instance: this.keyInstance
-
-            });
+			});
+			
         },
         /**
          * Lấy tất cả các control bị ảnh hưởng khi mà một control thay đổi giá trị
@@ -1503,14 +1534,13 @@ export default {
             var arr = [];
             if (sourceControlInstance != false) {
                 for (var i in sourceControlInstance['effectedControl']) {
+                    console.log("jhsdasad1",i);
                     arr.push(i);
-                    arr = arr.concat(this.getAllImpactedInput(i));
+                    arr = arr.concat(this.getAllImpactedInput(i)); 
                 }
             }
             return arr;
         },
-       
-
     }
 };
 </script>

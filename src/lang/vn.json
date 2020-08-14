@@ -22,6 +22,9 @@
         "quickSearch": "Tìm nhanh",
         "list_config": "Cấu hình danh sách",
         "save": "Lưu",
+        "confirm": "Xác nhận",
+        "check": "Kiểm tra",
+        "ignore": "Bỏ qua",
         "snippets": "Snippets",
         "permissions": "Phân quyền",
         "actions": "Actions package",
@@ -291,6 +294,10 @@
                         "source": "Nguồn",
                         "formulas": "Công thức"
                     }
+                },
+                "saveDoc": {
+                    "heading": "Lưu Document",
+                    "checkNameRelated": "Kiểm tra công thức liên quan"
                 }
             }
         },
