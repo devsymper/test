@@ -1,6 +1,6 @@
 <template>
-    <div>
-        <v-card-title class="pt-0 pb-2 subtitle-1 font-weight-bold">
+    <div class="update-app-symper">
+        <v-card-title class="pt-0 pb-2 subtitle-1 font-weight-bold ">
             <v-icon class="pr-4">mdi-apps</v-icon> {{ !!!isEdit ? "Thêm Applications" : "Cập nhật Applications" }}
         </v-card-title>
         <v-divider></v-divider>
@@ -9,7 +9,7 @@
         </v-card-title>
         <v-card-text>
             <v-row>
-                <v-col cols="8" class="pt-0 pb-0 pr-0">
+                <v-col cols="9" class="pt-0 pb-0 pr-0">
                     <v-row>
                         <v-col class="pt-0 pb-2" cols="4">
                             {{$t("apps.header.name")}}
@@ -50,13 +50,13 @@
                         </v-col>
                     </v-row>
                 </v-col>
-                <v-col cols="4" class="pt-0 pb-0 pl-0">
+                <v-col cols="3" class="pt-0 pb-0 pl-0">
                     <v-row>
                         <v-col class="pt-0 pb-2" cols="4">
                         </v-col>
                         <v-col class="pt-0 pb-2 text-center" cols="8">
-                            <v-icon v-if="!!currentApp.icon && currentApp.icon.indexOf('mdi-') > -1" class="display-3 pt-0">{{currentApp.icon}}</v-icon>
-                            <img v-else-if="!!currentApp.icon && currentApp.icon.indexOf('mdi-') < 0" :src="currentApp.icon" width="90">
+                       	     <v-icon v-if="!!currentApp.icon && currentApp.icon.indexOf('mdi-') > -1" class="display-3 pt-0">{{currentApp.icon}}</v-icon>
+                        	 <img v-else-if="!!currentApp.icon && currentApp.icon.indexOf('mdi-') < 0" :src="currentApp.icon" width="90">
                             <iconPicker ref="iconPicker" :icon="currentApp.icon" @selected="pickIcon"></iconPicker>
                         </v-col>
                     </v-row>
@@ -64,12 +64,24 @@
             </v-row>
         </v-card-text>
         <v-divider></v-divider>
-
         <!-- Thêm các object vào trong app -->
-        <v-card-title class="pb-2 pt-2 subtitle-2 font-weight-bold">
-            {{$t("apps.listObjects")}}
-        </v-card-title>
-        <v-col cols="12" class="pt-0 pb-0 search-wrap" v-click-outside="() => {showResult = false}">
+       <v-row>
+		   <v-col cols="7">
+			    <v-card-title class="pb-2 pt-2 subtitle-2 font-weight-bold">
+				{{$t("apps.listObjects")}}
+				</v-card-title>
+		   </v-col>
+		   <v-col cols="5">
+			  	<v-btn
+				  class="button-add-item"
+				  style="backgound-color:#F7F7F7"
+				>
+					<span> Click vào để thêm </span>
+					<v-icon right dark style="border-left:2px solid lightgrey">mdi-plus</v-icon>
+				</v-btn>
+		   </v-col>
+	   </v-row>
+        <!-- <v-col cols="12" class="pt-0 pb-0 search-wrap" v-click-outside="() => {showResult = false}">
             <v-text-field
                 v-model.lazy="searchStr"
                 class="sym-small-size bg-grey"
@@ -114,10 +126,22 @@
                     </v-list-group>
                 </v-list>
             </div>
-        </v-col>
-        <v-card-title class="pb-2 pt-2 subtitle-2 font-weight-bold">
-            {{$t("apps.objectSummary")}}
-        </v-card-title>
+        </v-col> -->
+		<div class="content-list-item">
+			 <div class="empty-item-list">
+				 <div style="display:flex"> 
+					  <v-icon >mdi-check</v-icon>
+					  <v-icon >mdi-account-box-outline</v-icon>
+					  <v-icon >mdi-check</v-icon>
+					  <!-- <v-icon >mdi-check</v-icon> -->
+					  <!-- <v-icon >mdi-check</v-icon> -->
+					  <!-- <v-icon >mdi-check</v-icon> -->
+					  <!-- <hr>
+					  <div style="display:flex; flex-direction:align"> <v-icon >mdi-check</v-icon></div> -->
+				 </div>
+				 <h6>Chưa có chức năng nào</h6>
+			 </div>
+		</div>
         <div class="list-app-object">
             <v-list nav dense class="">
                 <v-list-group
@@ -162,7 +186,6 @@
         </v-btn>
     </div>    
 </template>
-
 <script>
 import Api from "./../../api/api.js";
 import iconPicker from "../../components/common/pickIcon";
@@ -383,6 +406,27 @@ export default {
     height: 20px;
     font-size: 13px;
     text-shadow:  0 0 0;
+}
+.button-add-item{
+	border:1px solid lightgray;	
+	text-shadow: unset;
+	box-shadow: unset;
+	float:right;
+}
+.update-app-symper >>>.button-add-item .v-btn__content{
+	font: 13px Roboto !important;
+}
+.update-app-symper >>>.empty-item-list{
+	width:140px;
+	margin-left: auto;
+	margin-right: auto;
+	opacity: 0.2;
+	margin-top:30px;
+	display: flex;
+	 flex-wrap: wrap;
+}
+.update-app-symper >>>.empty-item-list .v-icon{
+	font-size: 40px;
 }
 .text-shadow {
     font-size: 13px;
