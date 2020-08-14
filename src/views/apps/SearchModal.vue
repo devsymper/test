@@ -1,5 +1,5 @@
 <template>
-<div width="500px" style="padding:10px">
+<div width="500px" style="padding:10px" class="search-modal">
 		<v-text-field
 			label="Search"
 			single-line
@@ -13,6 +13,7 @@
 				<ul v-for="(childItem,i) in itemT.item" :key="i" @click="clickItem(childItem,itemT.title)">
 					<li>
 						{{childItem.name}} 
+						<v-icon style="font-size:11px;float:right" >mdi-star</v-icon>
 					</li>
 				</ul>
 			</div>
@@ -62,27 +63,24 @@ export default {
 				   ]
 			   },
 			},  
-			listItemsSelected:{
-				documents:{},
-				orgcharts:{},
-				reports:{},
-				workflows:{}
-			},
-			 listItemsSelected2:{
-			   documents:{
+			 listItemsSelected:{
+			   documents:
+			   {
 				   icon : 'mdi-folder',
 				   title: 'documents',
 				   item:[
 				   ]
 			   },
-			   orgcharts:{
+			   orgcharts:
+			   {
  				   icon : 'mdi-folder',
 				   title: 'orgcharts',
 				   item:[
 				   ]
 			   },
-			   reports:{
-				    icon : 'mdi-folder',
+			   reports:
+			   {
+				   icon : 'mdi-folder',
 				   title: 'reports',
 				   item:[
 				   ]
@@ -105,11 +103,14 @@ export default {
 	},
 	methods:{
 		clickItem(obj,type){
-			if(this.listItemsSelected[type][obj.id]){
-				delete this.listItemsSelected[type][obj.id];
+			
+			let listItem = this.listItemsSelected[type].item;
+			if(listItem.indexOf(obj) == -1){
+				listItem.push(obj);
 			}else{
-				this.listItemsSelected[type][obj.id] = {name : obj.name};
+				listItem.splice(listItem.indexOf(obj));
 			}
+			// console.log(this.listItemsSelected[type].item,'selected');
 			this.$store.commit('appConfig/updateListItemSelected',this.listItemsSelected);
 		},
 		getListSearch(value){
@@ -138,15 +139,26 @@ export default {
 }
 </script>
 
-<style>
+<style scoped> 
+.search-modal >>>.v-input__slot{
+	border: 1px solid lightblue;
+    background-color: lightgray;
+    min-height: unset;
+    height: 36px;
+	box-shadow: unset;
+}
+ .search-box{
+	
+}
 ul {
 	list-style: none;
 }
-li{
+ li{
 	cursor: pointer;
-	
+	padding: 6px;
+	margin-right: 10px;
 }
-li:hover{
+ li:hover{
 	background-color:lightgray;
 }
 </style>

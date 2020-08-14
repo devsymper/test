@@ -31,7 +31,7 @@
                         </v-col>
                         <v-col class="pt-0 pb-2" cols="8">
                             <v-textarea
-                                v-model.lazy="currentApp.note"
+                                v-model.lazy="currentApp.description"
                                 dense
                                 solo
                                 flat
@@ -55,9 +55,9 @@
                         <v-col class="pt-0 pb-2" cols="4">
                         </v-col>
                         <v-col class="pt-0 pb-2 text-center" cols="8">
-                       	     <v-icon v-if="!!currentApp.icon && currentApp.icon.indexOf('mdi-') > -1" class="display-3 pt-0">{{currentApp.icon}}</v-icon>
-                        	 <img v-else-if="!!currentApp.icon && currentApp.icon.indexOf('mdi-') < 0" :src="currentApp.icon" width="90">
-                            <iconPicker ref="iconPicker" :icon="currentApp.icon" @selected="pickIcon"></iconPicker>
+                       	     <v-icon v-if="!!currentApp.iconName && currentApp.iconName.indexOf('mdi-') > -1" class="display-3 pt-0">{{currentApp.iconName}}</v-icon>
+                        	 <img v-else-if="!!currentApp.iconName && currentApp.iconName.indexOf('mdi-') < 0" :src="currentApp.iconName" width="90">
+                            <iconPicker ref="iconPicker" :icon="currentApp.iconName" @selected="pickIcon"></iconPicker>
                         </v-col>
                     </v-row>
                 </v-col>
@@ -153,7 +153,7 @@ export default {
     },
     data: function() {
         return {
-            apiUrl: "https://v2hoangnd.dev.symper.vn/",
+            apiUrl: "https://core.symper.vn/application",
             appUrl: "apps",
             removeCallback: null,
             showResult: false,
@@ -162,10 +162,23 @@ export default {
             appObjects: [],
             currentApp: {
                 name: "",
-                note: "",
-				icon: "",
+                description: "",
+				iconName: "",
+				iconType:"",
 				status: false,
-				
+				childrenApp:{
+					document:[
+						1
+					],
+					orgchart:[1
+					],
+					report:[
+						1
+					],
+					workflow:[
+						1
+					]
+				}
             },
             allObjectToImport: [],
 			listObjectToShows: [],
@@ -210,7 +223,8 @@ export default {
             });
         },
         pickIcon(data) {
-            this.currentApp.icon = data.icon.trim();
+            this.currentApp.iconName = data.icon.trim();
+            this.currentApp.iconTpye = data.type;
 		},
 		selectedItem(data){
 			this.listSelectedItem = data;
@@ -319,13 +333,30 @@ export default {
             return objs;
         },
         createApp() {
-            let req = new Api(this.apiUrl);
-            req.post(this.appUrl, {...this.currentApp, objects: this.getListObjsInShort()})
-            .then((res) => {
-                this.$emit("add-app", res)
-            }).catch((err) => {
-                this.showError()
-            });
+			// let req = new Api(this.apiUrl);
+			// console.log(this.currentApp,'currten-apps');
+            // req.post(this.appUrl, {...this.currentApp, objects: this.getListObjsInShort()})
+            // .then((res) => {
+            //     this.$emit("add-app", res)
+            // }).catch((err) => {
+            //     this.showError()
+			// });
+					console.log(this.currentApp);
+
+			$.ajax({  
+					url:"https://core.symper.vn/application",   
+					type: "POST",  
+					contentType: "application/json;charset=utf-8",  
+					data: JSON.stringify(this.currentApp),  
+					dataType: "json",  
+					success: function (response) {  
+						console.log(response); 
+					},  
+				
+					error: function (x, e) {  
+						alert('Failed');  
+					}  
+				});  
         },
         updateApp() {
             let req = new Api(this.apiUrl);
