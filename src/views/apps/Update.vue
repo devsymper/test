@@ -11,10 +11,10 @@
             <v-row>
                 <v-col cols="8" class="pt-0 pb-0 pr-0">
                     <v-row>
-                        <v-col class="pt-0 pb-2" cols="3">
+                        <v-col class="pt-0 pb-2" cols="4">
                             {{$t("apps.header.name")}}
                         </v-col>
-                        <v-col class="pt-0 pb-2" cols="9">
+                        <v-col class="pt-0 pb-2" cols="8">
                             <v-text-field
                                 v-model.lazy="currentApp.name"
                                 class="sym-small-size bg-grey"
@@ -26,10 +26,10 @@
                         </v-col>
                     </v-row>
                     <v-row>
-                        <v-col class="pt-0 pb-2" cols="3">
+                        <v-col class="pt-0 pb-2" cols="4">
                             {{$t("apps.header.note")}}
                         </v-col>
-                        <v-col class="pt-0 pb-2" cols="9">
+                        <v-col class="pt-0 pb-2" cols="8">
                             <v-textarea
                                 v-model.lazy="currentApp.note"
                                 dense
