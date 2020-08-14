@@ -9,8 +9,9 @@
             <span>{{errMessage}}</span>
 
         </v-card-text>
-        <v-card-actions style="flex-flow: row-reverse;">
-            <v-btn @click="isShow = false" text>{{$t('common.close')}}</v-btn>
+        <v-card-actions v-if="isShowAction" style="flex-flow: row-reverse;">
+            <v-btn @click="handleIgnoreClick" text>{{$t('common.ignore')}}</v-btn>
+            <v-btn @click="handleCheckClick" text>{{$t('common.check')}}</v-btn>
         </v-card-actions>
     </v-card>
 </template>
@@ -28,6 +29,11 @@ export default {
         message:{
             type:String,
             default:""
+        },
+     
+        isShowAction:{
+            type:Boolean,
+            default:false
         }
     },
     watch:{
@@ -54,6 +60,14 @@ export default {
         this.positionBox = {'top':0,'left':0};
     },
     methods:{
+        handleCheckClick(){
+            this.isShow = false;
+            this.$emit('after-click-confirm');
+        },
+        handleIgnoreClick(){
+            this.isShow = false;
+            this.$emit('after-click-ignore');
+        },
         show(e){
             this.isShow = true;
             this.calPosition(e);

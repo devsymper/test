@@ -199,20 +199,7 @@ export default {
          */
         this.$evtBus.$on("document-editor-click-treeview-list-control", locale => {
             let elControl = $("#document-editor-"+thisCpn.keyInstance+"_ifr").contents().find('body #'+locale.id);
-            $("#document-editor-"+thisCpn.keyInstance+"_ifr").contents().find('.on-selected').removeClass('on-selected');
-            elControl.addClass('on-selected');
-            let type = elControl.attr('s-control-type');
-            let controlId = elControl.attr('id');
-            let table = elControl.closest('.s-control-table');
-            if(table.length > 0 && controlId != table.attr('id')){
-                let tableId = table.attr('id');
-                let control = thisCpn.editorStore.allControl[tableId]['listFields'][controlId];
-                thisCpn.selectControl(control.properties, control.formulas,tableId);
-            }
-            else{
-                let control = thisCpn.editorStore.allControl[controlId];
-                thisCpn.selectControl(control.properties, control.formulas,controlId);
-            }
+            thisCpn.setSelectedControlProp(locale.event,elControl,$('#document-editor-'+this.keyInstance+'_ifr').get(0).contentWindow);
         });
         /**
          * Nhận sự kiện phát ra từ formTpl lúc on change để check trùng tên control
@@ -1650,7 +1637,7 @@ export default {
 
         },
         setSelectedControlProp(e,el,clientFrameWindow){
-             e.preventDefault();
+            e.preventDefault();
             $(clientFrameWindow.document).find('.on-selected').removeClass('on-selected');
             el.addClass('on-selected');
 

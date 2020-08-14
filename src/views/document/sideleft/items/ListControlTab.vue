@@ -11,7 +11,7 @@
      :style="{'font-size':'11px !important'}"
 >
     <template v-slot:label="{ item }">
-        <div v-on:click="clickItem(item)" :class="`tree-`+item.id">
+        <div v-on:click="clickItem($event,item)" :class="`tree-`+item.id">
             <img :src="`https://hoangnd.dev.symper.vn/`+item.icon" height="14" width="14" style="margin-top:3px;margin-right:8px;margin-bottom: -2px;">
             <label  :title="item.name">{{item.name}}</label>
         </div>
@@ -90,9 +90,12 @@ export default {
             }
             this.treeData = treeData;
         },
-        clickItem(item){
-            if(item.root == undefined && item.root != true)
-            this.$evtBus.$emit("document-editor-click-treeview-list-control",item);
+        clickItem(event,item){
+            
+            if(item.root == undefined && item.root != true){
+                item.event = event
+                this.$evtBus.$emit("document-editor-click-treeview-list-control",item);
+            }
             
         }
     }
