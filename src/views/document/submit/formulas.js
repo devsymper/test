@@ -332,12 +332,11 @@ export default class Formulas {
         let listSyql = this.refFormulas;
         if (listSyql != null && listSyql.length > 0) {
             let syql = listSyql[0].trim();
-            syql = this.replaceParamsToData(dataInput, syql);
             syql = syql.replace('ref(', '');
             syql = syql.replace('REF(', '');
 
             syql = syql.substring(0, syql.length - 1);
-            return this.runSyql(syql);
+            return this.runSyql(syql, dataInput);
         } else {
             let formulas = this.replaceParamsToData(dataInput, this.formulas);
             return this.runSQLLiteFormulas(formulas, true);
@@ -399,12 +398,12 @@ export default class Formulas {
 
     runSyql(formulas, dataInput = false) {
             let syql = formulas;
-            if (dataInput != false) {
-                syql = this.replaceParamsToData(dataInput, formulas);
-            }
             syql = syql.replace(/\r?\n|\r/g, ' ');
 
-            return formulasApi.execute({ formula: syql });
+            let dataPost = { formula: syql, data_input: JSON.stringify(dataInput) };
+            if (dataInput == false)
+                dataPost = { formula: syql };
+            return formulasApi.execute(dataPost);
         }
         /**
          * Hàm chạy công thức

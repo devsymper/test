@@ -217,7 +217,6 @@ const addToDocumentEditorStore = (state, params) => {
 const setDefaultSubmitStore = (state, params) => {
     let value = {
         listInputInDocument: {},
-        dataInputCache: {},
         docStatus: 'init',
         SQLLiteDB: {},
         rootControl: {},

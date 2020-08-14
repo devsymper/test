@@ -208,7 +208,7 @@ export default {
             isComponentActive:false,
             cacheDataRunFormulas:{},
 			isDraft:0,
-			preDataSubmit:{}
+            preDataSubmit:{},
         };
     },
     beforeMount() {
@@ -298,6 +298,7 @@ export default {
         this.$evtBus.$on("document-submit-input-change", locale => {
             try {
                 if(thisCpn.isComponentActive == false) return;
+                
                 this.$store.commit("document/addToDocumentSubmitStore", {
                             key: 'docStatus',
                             value: 'input',
@@ -305,6 +306,10 @@ export default {
                         });
                 let valueControl = locale.val;
                 let controlInstance = getControlInstanceFromStore(thisCpn.keyInstance,locale.controlName);
+                if( $('#'+controlInstance.id).hasClass('autocompleting') && $('#'+controlInstance.id).attr('data-autocomplete') != ""){
+                    $('#'+controlInstance.id).attr('data-autocomplete',"");
+                    return;
+                }
                 if(controlInstance.type == 'user'){
                     valueControl = $('#'+controlInstance.id).attr('user-id');
                     if(valueControl == undefined) valueControl = 0;
@@ -415,6 +420,11 @@ export default {
             if(thisCpn.isComponentActive == false) return;
             try {
                 thisCpn.$refs.autocompleteInput.show(e.e);
+                thisCpn.$store.commit("document/addToDocumentSubmitStore", {
+                            key: 'currentControlAutoComplete',
+                            value: e.alias,
+                            instance: thisCpn.keyInstance
+                        });
                 thisCpn.getDataForAutocomplete(e,'select',e.alias);
             } catch (error) {
                 
@@ -516,7 +526,6 @@ export default {
          * Hàm chạy công thức autocomplete để đổ dữ liệu vào box autucomplete, control select cũng dùng trường hợp này
          */
         getDataForAutocomplete(e,type,aliasControl=""){ 
-            console.log('ádsaf',e);
             let thisCpn = this
             if(type == 'select'){
                 let dataInput = this.getDataInputFormulas(e.selectFormulasInstance);  
@@ -596,18 +605,63 @@ export default {
          * Hàm xử lí nhận dữ liệu component autocomplete khi chọn 1 dòng
          */
         afterSelectRowAutoComplete(data){
-            // th này không phải trong table       
+            // th này không phải trong table      
             if(this.sDocumentSubmit.currentCellSelected == null){
-                let input = data.input;
-                input.val(data.value);
-                markBinedField(this.keyInstance,this.sDocumentSubmit.currentControlAutoComplete);
-                input.trigger('change');
+                let fromAutoComplete = true;
+                if(!data.fromEnterKey){
+                    fromAutoComplete = false
+                }
+                this.handleInputChangeBySystem(this.sDocumentSubmit.currentControlAutoComplete,data.value,fromAutoComplete);
             }
             else{
                 let currentTableInteractive = this.sDocumentSubmit.currentTableInteractive
                 currentTableInteractive.tableInstance.setDataAtCell(this.sDocumentSubmit.currentCellSelected.row,this.sDocumentSubmit.currentCellSelected.column,data.value)
                 currentTableInteractive.isAutoCompleting = false;
             }
+        },
+
+
+
+        /**
+         * Hàm xử lí sau khi chạy công thức được điền dữ liệu vào input bởi hệ thống
+         */
+        handleInputChangeBySystem(controlName,valueControl, fromAutocomplete = false){
+            let controlInstance = getControlInstanceFromStore(this.keyInstance,controlName);
+            if(controlInstance.getValue() == valueControl){ // kiểm tra ko có sự thay đổi giá trị của control thì return
+                return;
+            }
+            controlInstance.setValue(valueControl)
+            if(fromAutocomplete){
+                $('#'+controlInstance.id).attr('data-autocomplete',valueControl);
+            }
+            markBinedField(this.keyInstance,controlName);
+            if(controlInstance.type == 'user'){
+                valueControl = $('#'+controlInstance.id).attr('user-id');
+                if(valueControl == undefined) valueControl = 0;
+            }
+
+            // cần format lại giá trị date về năm tháng ngày để lưu vào store, tránh lỗi khi submit
+            if(controlInstance.type == 'date'){
+                valueControl = moment(valueControl).format('YYYY-MM-DD');
+            }
+          
+            this.updateListInputInDocument(
+                controlName,
+                "value",
+                valueControl
+            );
+            
+            // sau khi thay đổi giá trị input thì kiểm tra require control nếu có
+            if(controlInstance.isRequiredControl()){
+                if(controlInstance.isEmpty()){
+                    controlInstance.renderValidateIcon('Không được bỏ trống trường thông tin '+controlName)
+                }
+                else{
+                    controlInstance.removeValidateIcon()
+                }
+            }
+            resetImpactedFieldsList(this.keyInstance);
+            this.handleControlInputChange(controlName);
         },
         /**
          * Hàm  xử lí data sau khi query công thức autocomplete,
@@ -734,7 +788,7 @@ export default {
                 ".s-control:not(.bkerp-input-table .s-control)"
             );
             let thisCpn = this;
-            console.log(this.sDocumentEditor,'jkgds');
+            let isSetEffectedControl = false;
             for (let index = 0; index < allInputControl.length; index++) {
                 let id = $(allInputControl[index]).attr('id');
                 let controlType = $(allInputControl[index]).attr('s-control-type');
@@ -743,6 +797,10 @@ export default {
                     let field = this.sDocumentEditor.allControl[id];
                     let idField = field.id;
                     let valueInput = field.value
+                    let prepareData = field.prepareData
+                    if(prepareData != null && prepareData != ""){
+                        isSetEffectedControl = true;
+                    }
                     if(valueInput != undefined && valueInput != null && Object.keys(valueInput).length == 0){
                         valueInput = ""
                     }
@@ -750,6 +808,7 @@ export default {
                         let control = new ActionControl(idField, $(allInputControl[index]),field,thisCpn.keyInstance);
                         control.init();
                         control.render();
+                        control.setEffectedData(prepareData);
                         this.addToListInputInDocument('submit',control)
                     } else {
                         let controlName = field.properties.name.value;
@@ -767,6 +826,7 @@ export default {
                                 valueInput
                             );
                             control.init();
+                            control.setEffectedData(prepareData);
                             this.addToListInputInDocument(controlName,control)
                             control.render();
                         }
@@ -780,6 +840,7 @@ export default {
                                 thisCpn.keyInstance
                             );
                             tableControl.initTableControl();
+                            tableControl.setEffectedData(prepareData);
                             tableControl.tableInstance = new Table(
                                 tableControl,
                                 controlName,
@@ -791,6 +852,10 @@ export default {
                                 let childControlProp = thisCpn.sDocumentEditor.allControl[id].listFields[childControlId];
                                 childControlProp.properties.inTable = controlName;
                                 childControlProp.properties.docName = thisCpn.documentName;
+                                let childPrepareData = childControlProp.prepareData
+                                if(childPrepareData != null && childPrepareData != ""){
+                                    isSetEffectedControl = true;
+                                }
                                 let idFieldChild = childControlProp.id;
                                 let childControl = new BasicControl(
                                     idFieldChild,
@@ -799,6 +864,7 @@ export default {
                                     thisCpn.keyInstance
                                 );
                                 childControl.init();
+                                childControl.setEffectedData(childPrepareData);
                                 let childControlName = childControlProp.properties.name.value;
                                 thisCpn.addToListInputInDocument(childControlName,childControl)
                                 listInsideControls[childControlName] = true;
@@ -812,23 +878,21 @@ export default {
                 }
 
             }
-            console.log(this.sDocumentSubmit);
-            console.log(this.sDocumentEditor);
+            console.log('sDocumentSubmit',this.sDocumentSubmit);
+            if(!isSetEffectedControl)
             this.getEffectedControl();
             // thisCpn.createDocumentSQLLiteTable(); 
             if(this.docObjId == null)
             thisCpn.findRootControl();
+
         },
         /**
          * Sự kiện phát ra khi click vào date của date picker
          */
-        selectedDate(e){
+        selectedDate(data){
             this.$refs.datePicker.closePicker();
             let currentControl = this.sDocumentSubmit.currentControlEditByUser;
-            let controlInstance = getControlInstanceFromStore(this.keyInstance,currentControl);
-            let value = moment(e,'YYYY-MM-DD').format(controlInstance.formatDate);
-            $('#'+controlInstance.id).val(value);
-            $('#'+controlInstance.id).trigger('change');
+            this.handleInputChangeBySystem(currentControl,data)
         },
 
         /**
@@ -870,32 +934,12 @@ export default {
                                 }
                                 mapControlEffected[formulasType][controlEffect][name] = true;
                             }
-
                             this.detectControlEffectedInTableInDoc(mapControlEffected[formulasType], name, formulas[formulasType].instance);
                         }
                     }
                 }
             }
-                            console.log('mapControlEffected',mapControlEffected);
-
-            if(mapControlEffected.hasOwnProperty('formulas')){
-                this.updateEffectedControlToStore(mapControlEffected['formulas'],'effectedControl')
-            }
-            if(mapControlEffected.hasOwnProperty('readOnly')){
-                this.updateEffectedControlToStore(mapControlEffected['readOnly'],'effectedReadonlyControl')
-            }
-            if(mapControlEffected.hasOwnProperty('hidden')){
-                this.updateEffectedControlToStore(mapControlEffected['hidden'],'effectedHiddenControl')
-            }
-            if(mapControlEffected.hasOwnProperty('link')){
-                this.updateEffectedControlToStore(mapControlEffected['link'],'effectedLinkControl')
-            }
-            if(mapControlEffected.hasOwnProperty('require')){
-                this.updateEffectedControlToStore(mapControlEffected['require'],'effectedRequireControl')
-            }
-            if(mapControlEffected.hasOwnProperty('validate')){
-                this.updateEffectedControlToStore(mapControlEffected['validate'],'effectedValidateControl')
-            }
+            this.updateEffectedControlToStore(mapControlEffected);
         },
        
         detectControlEffectedInTableInDoc(mapControlEffected,name,formulasInstance){
@@ -1135,16 +1179,34 @@ export default {
             return dataTable;
         },
 
-        
-        updateEffectedControlToStore(mapControlEffected,key) {
-            console.log("skdsad",mapControlEffected);
-            for (let controlName in mapControlEffected) {
-                this.updateListInputInDocument(
-                    controlName,
-                    key,
-                    mapControlEffected[controlName]
-                );
+        updateEffectedControlToStore(mapControlEffected) {
+            let mapTypeToEffectedControl = {
+                                            link     :"effectedLinkControl",
+                                            formulas :"effectedControl",
+                                            readOnly :"effectedReadonlyControl",
+                                            hidden   :"effectedHiddenControl",
+                                            require  :"effectedRequireControl",
+                                            validate :"effectedValidateControl",
+                                            }
+            let dataToPreProcessControl = {};
+            for(let type in mapControlEffected){
+                if(mapTypeToEffectedControl.hasOwnProperty(type)){
+                    for (let controlName in mapControlEffected[type]) {
+                        this.updateListInputInDocument(
+                            controlName,
+                            mapTypeToEffectedControl[type],
+                            mapControlEffected[type][controlName]
+                        );
+                        let controlInstance = getControlInstanceFromStore(this.keyInstance,controlName)
+                        if(!dataToPreProcessControl.hasOwnProperty(controlInstance.idField)){
+                            dataToPreProcessControl[controlInstance.idField] = {};
+                        }
+                        dataToPreProcessControl[controlInstance.idField][mapTypeToEffectedControl[type]] = mapControlEffected[type][controlName];
+                    }
+                }
+                
             }
+            documentApi.updatePreDataForField({prepareData:JSON.stringify(dataToPreProcessControl)}) 
         },
         updateListInputInDocument(controlName, key, value) {
             this.$store.commit("document/updateListInputInDocument", {
@@ -1320,7 +1382,7 @@ export default {
                     }
                     switch (formulasType) {
                         case "formulas":
-                            this.handlerDataAfterRunFormulasValue(value,controlId,controlName,from);
+                            this.handleInputChangeBySystem(controlName,value);
                             break;
                         case "link":
                             this.handlerDataAfterRunFormulasLink(value,controlName);
@@ -1350,39 +1412,7 @@ export default {
 
             }
         },
-        handlerDataAfterRunFormulasValue(value,controlId,controlName,from){
-            let controlInstance = getControlInstanceFromStore(this.keyInstance,controlName);
-           
-            if($('#'+controlId).length > 0){
-                if(from != false && from == 'root'){
-                    this.updateListInputInDocument(
-                        controlName,
-                        "value",
-                        value
-                    );
-                    controlInstance.setValue(value)
-                    markBinedField(this.keyInstance,controlName);
-                    if(controlInstance.isRequiredControl()){
-                        if(controlInstance.isEmpty()){
-                            controlInstance.renderValidateIcon('Không được bỏ trống trường thông tin '+controlInstance.title)
-                        }
-                        else{
-                            controlInstance.removeValidateIcon()
-                        }
-                    }
-                    this.handleControlInputChange(controlName)
-                }else{
-                    if($('#'+controlId).attr('s-control-type') == 'label'){
-                        $('#'+controlId).text(value);
-                    }
-                    else{
-                        $('#'+controlId).val(value);
-                    }
-                    $('#'+controlId).trigger('change')
-                    markBinedField(this.keyInstance,controlName);
-                }
-            }
-        },
+     
 
         /**
          * Hàm set data cho bảng trong doc sau khi chạy công thức có dữ liệu
@@ -1534,7 +1564,6 @@ export default {
             var arr = [];
             if (sourceControlInstance != false) {
                 for (var i in sourceControlInstance['effectedControl']) {
-                    console.log("jhsdasad1",i);
                     arr.push(i);
                     arr = arr.concat(this.getAllImpactedInput(i)); 
                 }

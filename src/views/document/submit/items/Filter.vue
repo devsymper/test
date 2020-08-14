@@ -12,6 +12,9 @@
                 hide-details
             ></v-text-field>
         </div>
+        <div>
+            Tìm kiếm trên các trường {{fieldSearch}}
+        </div>
         <div class="content-table">
             <!-- :style="{'max-height':tableMaxHeight+'px','overflow':'auto'}" -->
             <data-table ref="dataTable" :isRenderAllRows="true" :columns="columns" @cell-change="cellChange" :data="data" class="hot-table" ></data-table>
@@ -46,7 +49,9 @@ export default {
             formulas:null,
             search:null,
             controlName:null,
-            dataSelected:[]
+            dataSelected:[],
+            fieldSearch:"",
+            mapNameToTitle:{}
         }
     },
     created(){
@@ -114,6 +119,32 @@ export default {
         setFormulas(formulas,controlName){
             this.formulas = formulas;
             this.controlName = controlName;
+            console.log("skdasdsad",formulas);
+            // ([0-9a-zA-Z_]+)\s+as\s+("(.*?)"|([0-9a-zA-Z_]+))
+            this.getSearchField(formulas.instance.formulas)
+        },
+        getSearchField(formulas){
+            let titleFieldSearch = []
+            let mapColumnToAlias = {}
+            let allColumnQuery = formulas.match(/([0-9a-zA-Z_]+)\s+as\s+("(.*?)"|([0-9a-zA-Z_]+))/gm);
+            for (let index = 0; index < allColumnQuery.length; index++) {
+                const fieldSelect = allColumnQuery[index];
+                fieldSelect = fieldSelect.split(' as ');
+                if(fieldSelect.length > 1){
+                    mapColumnToAlias[fieldSelect[0]] = fieldSelect[1].replace(/\"/gm,"");
+                }
+                else{
+                    mapColumnToAlias[fieldSelect[0]] = fieldSelect[0].replace(/\"/gm,"");
+                }
+            }
+            let allFieldCondition = formulas.match(/[a-zA-Z0-9_][^\s]*(?= ilike)/gm);
+            for (let index = 0; index < allFieldCondition.length; index++) {
+                const controlTitle = (mapColumnToAlias.hasOwnProperty(allFieldCondition[index])) ? mapColumnToAlias[allFieldCondition[index]] : "";
+                titleFieldSearch.push(controlTitle)
+            }
+            if(titleFieldSearch.length>0){
+                this.fieldSearch = titleFieldSearch.join(", ")
+            }  
         },
         handleKeyupSearch(data){
             this.$emit('search-data',{controlName:this.controlName,search:this.search})
@@ -160,14 +191,12 @@ export default {
         overflow-y: hidden !important;
     }
     .content-table{
-        height: calc(100% - 70px);
+        height: calc(100% - 90px);
         overflow-x: hidden;
         overflow-y: scroll;   
     }
     .content-filter{
         height: 100%;
     }
-    .content-filter .search-filter{
-        margin-right: 17px;
-    }
+  
 </style>

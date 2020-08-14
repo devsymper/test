@@ -48,9 +48,6 @@ const defaultState = {
             listInputInDocument: {
 
             },
-            dataInputCache: {
-
-            },
             docStatus: 'init',
             SQLLiteDB: {},
             rootControl: {},
