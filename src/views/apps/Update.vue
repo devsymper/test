@@ -72,108 +72,37 @@
 				</v-card-title>
 		   </v-col>
 		   <v-col cols="5">
-			  	<v-btn
-				  class="button-add-item"
-				  style="backgound-color:#F7F7F7"
-				>
-					<span> Click vào để thêm </span>
-					<v-icon right dark style="border-left:2px solid lightgrey">mdi-plus</v-icon>
-				</v-btn>
+					 <v-menu
+      				  offset-y
+						:close-on-content-click="false"
+       				    :nudge-width="390"
+      				>
+						<template v-slot:activator="{ attrs, on }">
+							<v-btn
+								class="button-add-item"
+								style="backgound-color:#F7F7F7"
+								v-bind="attrs"
+								v-on="on"
+								>
+									<span> Click vào để thêm </span>
+									<v-icon right dark style="border-left:2px solid lightgrey">mdi-plus</v-icon>
+							</v-btn>
+						</template>
+						<SearchModal @selectedItem="selectedItem"/>
+					</v-menu>
 		   </v-col>
 	   </v-row>
-        <!-- <v-col cols="12" class="pt-0 pb-0 search-wrap" v-click-outside="() => {showResult = false}">
-            <v-text-field
-                v-model.lazy="searchStr"
-                class="sym-small-size bg-grey"
-                append-icon="mdi-magnify"
-                dense
-                solo
-                :placeholder="$t('apps.addObject')"
-                flat
-                @focus="showResult = true"
-                @input="searchObjectToimport"
-            ></v-text-field>
-            <div class="search-results" v-show="showResult">
-                <v-list nav dense class="">
-                    <v-list-group
-                    no-action
-                    sub-group
-                    nav dense
-                    value="true"
-                    v-for="(obj) in listObjectToShows"
-                    :key="obj.type"
-                    v-show="obj.objects.length"
-                    >
-                        <template v-slot:activator>
-                            <v-list-item-content>
-                                <v-list-item-title>{{obj.type}}</v-list-item-title>
-                            </v-list-item-content>
-                        </template>
-                        <v-list-item
-                            nav dense
-                            v-for="(item) in obj.objects"
-                            :key="obj.type+item.id"
-                            :prepend-icon="item.icon"
-                        >
-                            <v-list-item-title @click="toggleObject(item, obj.type)">
-                                <v-icon>{{item.icon}}</v-icon> 
-                                {{item.title !== undefined && !!item.title ? item.title : item.name}}
-                            </v-list-item-title>
-                            <v-list-item-action>
-                                <v-icon class="subtitle-1" color="success" v-if="item.checked == 1">mdi-check</v-icon>
-                            </v-list-item-action>
-                        </v-list-item>
-                    </v-list-group>
-                </v-list>
-            </div>
-        </v-col> -->
-		<div class="content-list-item">
+		<!-- <div class="content-list-item">
 			 <div class="empty-item-list">
 				 <div style="display:flex"> 
 					  <v-icon >mdi-check</v-icon>
 					  <v-icon >mdi-account-box-outline</v-icon>
 					  <v-icon >mdi-check</v-icon>
-					  <!-- <v-icon >mdi-check</v-icon> -->
-					  <!-- <v-icon >mdi-check</v-icon> -->
-					  <!-- <v-icon >mdi-check</v-icon> -->
-					  <!-- <hr>
-					  <div style="display:flex; flex-direction:align"> <v-icon >mdi-check</v-icon></div> -->
 				 </div>
 				 <h6>Chưa có chức năng nào</h6>
 			 </div>
-		</div>
-        <div class="list-app-object">
-            <v-list nav dense class="">
-                <v-list-group
-                sub-group
-                nav dense
-                value="true"
-                v-for="obj in appObjects"
-                :key="obj.type"
-                v-show="obj.objects.length"
-                >
-                    <template v-slot:activator>
-                        <v-list-item-content>
-                            <v-list-item-title>{{obj.type}}</v-list-item-title>
-                        </v-list-item-content>
-                    </template>
-                    <v-list-item
-                        nav dense
-                        v-for="(item) in obj.objects"
-                        :key="obj.type+item.id"
-                        :prepend-icon="item.icon"
-                    >
-                        <v-list-item-title @click="toggleObject(item, obj.type)">
-                            <v-icon class="subtitle-1 pr-1">{{item.icon}}</v-icon> 
-                            {{item.title !== undefined && !!item.title ? item.title : item.name}}
-                        </v-list-item-title>
-                        <v-list-item-action>
-                            <v-icon class="subtitle-1" v-if="item.checked == 1">mdi-delete</v-icon>
-                        </v-list-item-action>
-                    </v-list-item>
-                </v-list-group>
-            </v-list>
-        </div>
+		</div> -->
+		<AppDetailVue />
         <v-btn
             small
             color="primary"
@@ -189,11 +118,15 @@
 <script>
 import Api from "./../../api/api.js";
 import iconPicker from "../../components/common/pickIcon";
-import vClickOutside from 'v-click-outside'
+import vClickOutside from 'v-click-outside';
+import SearchModal from './SearchModal.vue';
+import AppDetailVue from './AppDetail.vue'
 export default {
     name: "UpdateApp",
     components: {
-        iconPicker,
+		iconPicker,
+		SearchModal,
+		AppDetailVue
     },
     props: {
         isEdit: {
@@ -230,11 +163,13 @@ export default {
             currentApp: {
                 name: "",
                 note: "",
-                icon: "",
-                status: false,
+				icon: "",
+				status: false,
+				
             },
             allObjectToImport: [],
-            listObjectToShows: [],
+			listObjectToShows: [],
+			listSelectedItem:{},
         };
     },
     mounted() {
@@ -276,7 +211,11 @@ export default {
         },
         pickIcon(data) {
             this.currentApp.icon = data.icon.trim();
-        },
+		},
+		selectedItem(data){
+			this.listSelectedItem = data;
+			console.log(this.listSelectedItem,'this.listSelectedItem');	
+		},
         toggleObject(item, type) {
             item.checked = item.checked == 0 ? 1: 0;
             for (const index in this.allObjectToImport) {

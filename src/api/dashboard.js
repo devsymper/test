@@ -1,10 +1,16 @@
 import Api from "./api";
-import { appConfigs } from "./../configs.js";
+import {
+	appConfigs
+} from "./../configs.js";
 
 let api = new Api(appConfigs.apiDomain.dashboard);
 
 export const dashboardApi = {
-    getAllDashboard() {
-        return api.get("/root/falses");
-    }
+	getAllDashboard() {
+		return api.get("/root/falses");
+	},
+	searchDashboard(filter) {
+		return api.get("/root/falses", filter);
+	},
+
 };
