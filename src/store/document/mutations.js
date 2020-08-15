@@ -84,6 +84,7 @@ const resetCurrentControl = (state, params) => {
     Vue.set(state.editor[instance], 'currentSelectedControl', currentSelectedControl);
 }
 const updateProp = (state, params) => {
+    console.log("sadsafsad-set", params);
     let id = params.id
     let name = params.name
     let value = params.value
@@ -92,7 +93,7 @@ const updateProp = (state, params) => {
     let type = params.type;
     if (tableId != '0') {
         if (state.editor[instance].allControl[tableId]['listFields'][id]['properties'][name]) {
-            if (name == 'name') {
+            if (name == 'name' && state.editor[instance].currentSelectedControl['properties']['name'].hasOwnProperty(name)) {
                 Vue.set(state.editor[instance].currentSelectedControl['properties']['name'][name], type, value);
             }
             Vue.set(state.editor[instance].allControl[tableId]['listFields'][id]['properties'][name], type, value);

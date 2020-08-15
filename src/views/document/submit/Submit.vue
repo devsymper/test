@@ -1235,9 +1235,9 @@ export default {
             let controlInstance = this.sDocumentSubmit.listInputInDocument[controlName];
             let controlId = controlInstance.id
             let allFormulas = controlInstance.controlFormulas;
-            if(allFormulas.hasOwnProperty('formulas')){
-                if(allFormulas['formulas'].hasOwnProperty('instance')){
-                    let formulasInstance = allFormulas['formulas'].instance;
+            if(allFormulas.hasOwnProperty('list')){
+                if(allFormulas['list'].hasOwnProperty('instance')){
+                    let formulasInstance = allFormulas['list'].instance;
                     if(formulasInstance.getFormulas() != ""){
                         if( !formulasInstance.hasOwnProperty('oldFormulas')){
                             formulasInstance.oldFormulas = formulasInstance.getFormulas();
@@ -1245,7 +1245,7 @@ export default {
                         // trường hợp có search trong filter thì wrap lại công thức với biến search
                         let newFormulas = formulasInstance.wrapSyqlForSearchInputFilter(search);
                         formulasInstance.setFormulas(newFormulas);
-                        this.handlerBeforeRunFormulasValue(formulasInstance,controlId,controlName,'formulas')
+                        this.handlerBeforeRunFormulasValue(formulasInstance,controlId,controlName,'list')
                     }
                 }
             }

@@ -19,7 +19,7 @@ export default {
             return this.params.data.icon;
         },
         getValue() {
-            let value = (this.params.value.length == 1) ? this.params.value[0] : this.params.value[1]
+            let value = (this.params.value.length == 1) ? this.params.value[0] : this.params.value[1];
             return value;
         },
     },
