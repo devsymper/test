@@ -70,7 +70,11 @@
         "manager": "Manager",
         "userRoleSetting": "User role setting",
         "clone": "Clone",
-        "actionPack": "Action pack"
+        "actionPack": "Action pack",
+        "baAccount": "BA account",
+        "updatePassword": "Update password",
+        "fullName": "Full name",
+        "email": "Email"
     },
     "validate": {
         "required": "Not be empty",
@@ -180,7 +184,8 @@
             "changePassword": {
                 "title": "Change password",
                 "newPass": "New password",
-                "reNewPass": "Confirm password"
+                "reNewPass": "Confirm password",
+                "oldPassword": "Old password"
             },
             "configChange": {
                 "title": "Config change",
