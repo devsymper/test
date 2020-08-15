@@ -2,7 +2,7 @@
     <v-container fluid>
         <ListItems
             ref="listApp"
-            :getDataUrl="baseUrl"
+            :getDataUrl="apiUrl"
             :headerPrefixKeypath="'apps.header'"
             :pageTitle="$t('apps.title')"
             :containerHeight="tableHeight"
@@ -10,6 +10,7 @@
             :useDefaultContext="false"
             :actionPanelWidth="600"
             @after-open-add-panel="showAddModal"
+            :customAPIResult="customAPIResult"
         >
             <div slot="right-panel-content" class="h-100">
                 <updateApp
@@ -22,11 +23,11 @@
         </ListItems>
     </v-container>
 </template>
-
 <script>
 import Api from "./../../api/api.js";
 import ListItems from "../../components/common/ListItems";
 import UpdateApp from "./Update";
+import {appManagementApi} from './../../api/AppManagement.js'
 export default {
     name: "listApps",
     components: {
@@ -37,18 +38,51 @@ export default {
         baseUrl: function() {
             return this.apiUrl + this.appUrl ;
         },
+        
+    },
+    created(){
+        let self = this;
     },
     data: function() {
         return {
-            apiUrl: "https://v2hoangnd.dev.symper.vn/",
+            apiUrl: "https://core.symper.vn/application",
             appUrl: "apps",
             isEdit: false,
+            customAPIResult: {
+                reformatData(res){
+                   return{
+                         listObject: res.data.listObject,
+                         columns: [
+                                {name: "id", title: "id ", 	type: "text", },
+                                {name: "name", title: "Tên ứng dụng", type: "text"},
+                                {name: "iconName", title: "icon", type: "text",},
+                                    // renderer:  function(instance, td, row, col, prop, value, cellProperties) {
+                                    //         return td;
+                                    //     },},
+                                {name: "status", title: "Trạng thái", type: "text"},
+                                {name: "createdAt", title: "Thời gian tạo", type: "text"},
+                                {name: "updatedAt", title: "Thời gian cập nhật", type: "text"},
+                         ],
+                   }
+                }
+            },
+           
             tableContextMenu: [
                {
                     name: "edit",
                     text: this.$t("apps.contextMenu.edit"),
                     callback: (app, callback) => {
                         this.editCallback = callback;
+                        appManagementApi.getAppDetails(app.id).then(res => {
+                        if (res.status == 200) {
+                            console.log(res.data.listObject,"resdata listobj");
+                             this.showEditAppPanel(res.data.listObject)   
+                        }else {
+                            this.showError()
+                        }
+                         }).catch((err) => {
+                                this.showError()
+                        });
                         this.showEditAppPanel(app);
                     },
                 },
@@ -80,7 +114,8 @@ export default {
                 note: "",
                 icon: "",
                 status: false
-            });
+			});
+			this.$store.commit('appConfig/emptyItemSelected')
         },
         closeSidebar() {
             this.$refs.listApp.actionPanel = false;
@@ -93,12 +128,13 @@ export default {
             })
         },
         deleteApp(app) {
-            let req = new Api(this.apiUrl);
-            req.delete(this.appUrl + "/" + app.id)
+           
+            console.log(app[0].id);
+            appManagementApi.deleteApp(app[0].id)
             .then(res => {
                 if (res.status == 200) {
                     // callback here
-                    this.removeCallback(res);
+                    this.removeCallback(res);   
                     this.$snotify({
                         type: 'success',
                         title: this.$t('notification.successTitle'),
@@ -143,7 +179,8 @@ export default {
             } else {
                 this.showError()
             }
-        }
+        },
+      
     },
 };
 </script>

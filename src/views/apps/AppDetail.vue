@@ -1,7 +1,7 @@
 <template>
   <div class="app-details">
 	  	 <VuePerfectScrollbar :style="{height: menuItemsHeight}">
-			<div v-for="(itemT,i) in listItems" :key="i" class="app-item">
+			<div v-for="(itemT,i) in sAppModule.listItemSelected" :key="i" class="app-item">
 				<h4><v-icon>{{itemT.icon}}</v-icon>  {{ itemT.title }}</h4>
 					<ul v-for="(childItem,i) in itemT.item" :key="i"  class="app-child-item">
 							<li>
@@ -20,63 +20,24 @@ export default {
  data: function() {
         return {
 			menuItemsHeight: '100%',
-            listItems:{
-			   documents:{
-				   icon : 'mdi-folder',
-				   title: 'documents',
-				   item:[
-						{
-							id:1,
-							name: 'adnsdadas'
-						},
-						{
-							id:3,
-							name: 'adnsdadas'
-						},{
-							id:2,
-							name: 'adnsdadas'
-						}
-
-				   ]
-			   },
-			   orgcharts:{
- 				   icon : 'mdi-folder',
-				   title: 'orgcharts',
-				   item:[
-						
-				   ]
-			   },
-			   reports:{
-				    icon : 'mdi-folder',
-				   title: 'reports',
-				   item:[
-					
-				   ]
- 				 
-			   },
-			   workflows:
-			   {
-			    icon : 'mdi-folder',
-				   title: 'workflows',
-				   item:[
-						
-				   ]
-			   },
-			},  
     	};
 	},
 	created(){
 		// debugger
+		// this.$emit('update-list-item', this.listItems)
+		// console.log(this.listItems,'this.listItemsthis.listItems');
 	},
 	computed:{
-		// sAppModule(){
-		// 	return JSON.parse(JSON.stringify(this.$store.state.appConfig))
-		// }
+		sAppModule(){
+			return this.$store.state.appConfig
+		}
 	},
 	methods:{
 		removeItem(id,type){
-			this.listItems[type].item.splice(this.listItems[type].item.indexOf(id));
-			console.log(this.listItems[type].item,'this.listItems[type].item');
+			// this.listItems[type].item.splice(this.listItems[type].item.indexOf(id));
+			// console.log(this.listItems[type].item,'this.listItems[type].item');
+			console.log('click remove');
+			this.$store.commit('appConfig/removeItemSelected',{id:id,type:type})
 			this.$emit('update-list-item', this.listItems)
 			// console.log(this.listItems,'this.listItems');
 		}

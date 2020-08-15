@@ -77,9 +77,6 @@ export default {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	/* padding-left: 12px; */
-	/* margin-left:8px; */
-	/* margin-left:auto; */
 	margin-right:auto;
 	margin-bottom: 12px;
 }

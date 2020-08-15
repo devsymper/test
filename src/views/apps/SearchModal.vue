@@ -13,7 +13,7 @@
 				<ul v-for="(childItem,i) in itemT.item" :key="i" @click="clickItem(childItem,itemT.title)">
 					<li>
 						{{childItem.name}} 
-						<v-icon style="font-size:11px;float:right" >mdi-star</v-icon>
+						<v-icon style="font-size:11px;float:right">mdi-star</v-icon>
 					</li>
 				</ul>
 			</div>

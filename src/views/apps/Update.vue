@@ -120,14 +120,19 @@ import Api from "./../../api/api.js";
 import iconPicker from "../../components/common/pickIcon";
 import vClickOutside from 'v-click-outside';
 import SearchModal from './SearchModal.vue';
-import AppDetailVue from './AppDetail.vue'
+import AppDetailVue from './AppDetail.vue';
+import {appManagementApi} from './../../api/AppManagement.js'
+
 export default {
     name: "UpdateApp",
     components: {
 		iconPicker,
 		SearchModal,
 		AppDetailVue
-    },
+	},
+	created(){
+		// let self = this
+	},
     props: {
         isEdit: {
             type: Boolean,
@@ -135,18 +140,15 @@ export default {
         }
     },
     watch: {
-        currentApp(val) {
-            this.searchStr = "";
-            this.resetResult();
-            if (val.id !== undefined && !!val.id) {
-                this.getAllObjectInApp(val.id);
-            }
-        }
+        // currentApp(val) {
+        //     this.searchStr = "";
+        //     this.resetResult();
+        //     if (val.id !== undefined && !!val.id) {
+        //         // this.getAllObjectInApp(val.id);
+        //     }
+        // }
     },
     computed: {
-        baseUrl: function() {
-            return this.apiUrl + this.appUrl + "/lists";
-        },
     },
     directives: {
         clickOutside: vClickOutside.directive
@@ -167,93 +169,95 @@ export default {
 				iconType:"",
 				status: false,
 				childrenApp:{
-					documents:[
-						
+					document:[
 					],
-					orgcharts:[
+					orgchart:[
 					],
-					reports:[
-						
+					report:[
 					],
-					workflows:[
-						
+					workflow:[
 					]
 				}
             },
+            listItemsSelected:{
+			   documents:
+			   {
+				   icon : 'mdi-folder',
+				   title: 'documents',
+				   item:[
+				   ]
+			   },
+			   orgcharts:
+			   {
+ 				   icon : 'mdi-folder',
+				   title: 'orgcharts',
+				   item:[
+				   ]
+			   },
+			   reports:
+			   {
+				   icon : 'mdi-folder',
+				   title: 'reports',
+				   item:[
+				   ]
+			   },
+			   workflows:
+			   {
+			  	   icon : 'mdi-folder',
+				   title: 'workflows',
+				   item:[
+				   ]
+			   },
+			},  
             allObjectToImport: [],
 			listObjectToShows: [],
 			listSelectedItem:{},
         };
     },
-    mounted() {
-        this.getAllObjectToImport();
+    mounted(){
     },
     methods: {
         setAppObject(app) {
             this.currentApp = JSON.parse(JSON.stringify(app));
+            console.log(this.currentApp ,'this.currentApp ');
+            //code here
+            for(const type in this.currentApp.childrenApp){
+                console.log(typeof(type),'typeeeeeeeeeeeeeeeeeeeeeeeeeeee');
+            }
+            // this.currentApp.childrenApp.forEach(function(e){
+            //     console.log(e,'eeeeeeeeeeeeeeeeeeee');
+            // })
 		},
 		updateListItem(data){
-			let thisCpn = this
-			// thisCpn.currentApp.childrenApp.forEach(function(e){
-			// 	console.log(e,'thisCpn.currentApp.childrenApp.forEach');
-			// })
-			// for (const property in this.currentApp.childrenApp) {
-			// 	console.log(typeof(property),'property');
-			// 	// property.splice(0,property.length);
-			// }
-			thisCpn.currentApp.childrenApp.documents.splice(0,thisCpn.currentApp.childrenApp.documents.length)
-			thisCpn.currentApp.childrenApp.orgcharts.splice(0,thisCpn.currentApp.childrenApp.orgcharts.length)
-			thisCpn.currentApp.childrenApp.reports.splice(0,thisCpn.currentApp.childrenApp.reports.length)
-			thisCpn.currentApp.childrenApp.workflows.splice(0,thisCpn.currentApp.childrenApp.workflows.length)
-			data.documents.item.forEach(function(e){
-				thisCpn.currentApp.childrenApp.documents.push(e.id);
-			});
-			data.orgcharts.item.forEach(function(e){
-				thisCpn.currentApp.childrenApp.orgcharts.push(e.id);
-			});
-			data.reports.item.forEach(function(e){
-				thisCpn.currentApp.childrenApp.reports.push(e.id);
-			});
-			data.workflows.item.forEach(function(e){
-				thisCpn.currentApp.childrenApp.workflows.push(e.id);
-			});
-			// console.log(data.documents.item,'data.documents.id');
-			// console.log(data.documents.item.id,'data.documents.id');
-			console.log(this.currentApp.childrenApp,'childrenApp');
+			debugger
+			let self = this;
+			console.log(self.currentApp.childrenApp,'self.currentApp.childrenApp');
+			// data.documents.item.forEach(function(e){
+			// 	self.currentApp.childrenApp.document.push(e.id);
+			// });
+			// data.orgcharts.item.forEach(function(e){
+			// 	self.currentApp.childrenApp.orgchart.push(e.id);
+			// });
+			// data.reports.item.forEach(function(e){
+			// 	self.currentApp.childrenApp.report.push(e.id);
+			// });
+			// data.workflows.item.forEach(function(e){
+			// 	self.currentApp.childrenApp.workflow.push(e.id);
+			// });
 		},
-        getAllObjectInApp(id) {
-            let req = new Api(this.apiUrl);
-            req.get(this.appUrl + "/" + id + "/objects")
-            .then(res => {
-                // callback here
-                if (res.status == 200) {
-                    let objs = {};
-                    res.data.forEach(item => {
-                        if (!(item.type in objs)) {
-                            objs[item.type] = [];
-                        }
-                        objs[item.type].push(item.id)
-                    });
-                    this.allObjectToImport.forEach((obj, appIndex) => {
-                        if (objs[obj.type] != undefined) {
-                            obj.objects.forEach((item, itemIndex) => {
-                                this.allObjectToImport[appIndex].objects[itemIndex].checked = objs[obj.type].indexOf(item.id) > -1 ? 1 : 0;
-                            });
-                        } else {
-                            obj.objects.forEach((item, itemIndex) => {
-                                this.allObjectToImport[appIndex].objects[itemIndex].checked = 0;
-                            });
-                        }
-                    });
-                    this.resetAppObject()
-                    this.$refs.iconPicker.reset();
-                }
-            }).catch((err) => {
-            });
+        updateApp() {
+            console.log('update app');
+            // let req = new Api(this.apiUrl);
+            // req.put(this.appUrl, {...this.currentApp, objects: this.getListObjsInShort()})
+            // .then((res) => {
+            //     this.$emit("update-app", res)
+            // }).catch((err) => {
+            //     this.showError()
+            // });
         },
         pickIcon(data) {
             this.currentApp.iconName = data.icon.trim();
-            this.currentApp.iconTpye = data.type;
+            this.currentApp.iconType = data.type;
 		},
 		selectedItem(data){
 			this.listSelectedItem = data;
@@ -290,55 +294,15 @@ export default {
                 this.appObjects.push(group);
             });
         },
-        searchObjectToimport() {
-            let str = this.searchStr;
-            this.listObjectToShows = [];
-            if (str !== null && str.length && this.allObjectToImport.length) {
-                str = str.toLocaleLowerCase();
-                this.allObjectToImport.forEach(obj => {
-                    let group = {
-                        type: obj.type,
-                        objects: []
-                    };
-                    let count = 0;
-                    for (const item of obj.objects) {
-                        if(
-                            (item.name !== null && item.name.toLocaleLowerCase().includes(str)) || 
-                            (item.title !== undefined && item.title !== null && item.title.toLocaleLowerCase().includes(str))
-                        ) {
-                            group.objects.push(item);
-                            if (++count > 10) {
-                                break;
-                            }
-                        }
-                    }
-                    this.listObjectToShows.push(group);
-                });
-            } else {
-                this.resetResult();
-            }
-        },
+      
         resetResult() {
             this.listObjectToShows = JSON.parse(JSON.stringify(this.allObjectToImport));
             for (const index in this.listObjectToShows) {
                 this.listObjectToShows[index].objects = this.listObjectToShows[index].objects.slice(0, 10);
             }
         },
-        getAllObjectToImport() {
-            let req = new Api(this.apiUrl);
-            req.get(this.appUrl + "/objects")
-            .then(res => {
-                // callback here
-                if (res.status == 200) {
-                    this.allObjectToImport = res.data;
-                    this.resetResult();
-                }
-            }).catch((err) => {
-                console.log(err);
-            });
-        },
         addApp() {
-            if (this.isEdit) {
+            if(this.isEdit) {
                 this.updateApp();
             } else {
                 this.createApp();
@@ -351,55 +315,32 @@ export default {
                 text: this.$t('notification.error')
             })
         },
-        getListObjsInShort() {
-            let objs = [];
-            this.appObjects.forEach(obj => {
-                objs.push({
-                    type: obj.type,
-                    ids: obj.objects.map(item => { return item.id })
-                })
-            })
-            return objs;
-        },
         createApp() {
-			// let req = new Api(this.apiUrl);
-			// console.log(this.currentApp,'currten-apps');
-            // req.post(this.appUrl, {...this.currentApp, objects: this.getListObjsInShort()})
+			this.updateListItem(this.$store.state.appConfig.listItemSelected)
+			console.log(this.$store.state.appConfig.listItemSelected,'xxxxxxxxxxxxxxxx');
+			let data = JSON.stringify(this.currentApp);
+			appManagementApi.addApp(data).then(res => {
+				 this.$emit("add-app", res)
+			}).catch(err => {
+				this.showError()
+			})
+			.always(() => {});;
+				
+        },
+         updateApp() {
+            debugger
+            console.log('update app');
+            // let req = new Api(this.apiUrl);
+            // req.put(this.appUrl, {...this.currentApp, objects: this.getListObjsInShort()})
             // .then((res) => {
-            //     this.$emit("add-app", res)
+            //     this.$emit("update-app", res)
             // }).catch((err) => {
             //     this.showError()
-			// });
-					console.log(this.currentApp);
-
-			$.ajax({  
-					url:"https://core.symper.vn/application",   
-					type: "POST",  
-					contentType: "application/json;charset=utf-8",  
-					data: JSON.stringify(this.currentApp),  
-					dataType: "json",  
-					success: function (response) {  
-						console.log(response); 
-					},  
-				
-					error: function (x, e) {  
-						alert('Failed');  
-					}  
-				});  
-        },
-        updateApp() {
-            let req = new Api(this.apiUrl);
-            req.put(this.appUrl, {...this.currentApp, objects: this.getListObjsInShort()})
-            .then((res) => {
-                this.$emit("update-app", res)
-            }).catch((err) => {
-                this.showError()
-            });
+            // });
         },
     },
 };
 </script>
-
 <style scoped>
 .pb-2.col.col-3 {
     height: 20px;
