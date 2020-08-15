@@ -20,7 +20,10 @@
             <data-table ref="dataTable" :isRenderAllRows="true" :columns="columns" @cell-change="cellChange" :data="data" class="hot-table" ></data-table>
 
         </div>
-        <v-btn @click="saveInputFilter" small color="primary" right class="save-input-filter">Lưu</v-btn>
+        <div class="footer-filter">
+            <span class="total-record">Tổng số bản ghi: {{totalRecord}}</span>
+            <v-btn @click="saveInputFilter" small color="primary" right class="save-input-filter">Lưu</v-btn>
+        </div>
     </div>
 </template>
 <script>
@@ -51,7 +54,8 @@ export default {
             controlName:null,
             dataSelected:[],
             fieldSearch:"",
-            mapNameToTitle:{}
+            mapNameToTitle:{},
+            totalRecord:0
         }
     },
     created(){
@@ -92,6 +96,7 @@ export default {
             this.data = null;
             this.data = dataTable;
             this.curControlId = controlId;
+            this.totalRecord = dataTable.length
         },
         cellChange(res){
             let changes = res.changes;
@@ -119,8 +124,6 @@ export default {
         setFormulas(formulas,controlName){
             this.formulas = formulas;
             this.controlName = controlName;
-            console.log("skdasdsad",formulas);
-            // ([0-9a-zA-Z_]+)\s+as\s+("(.*?)"|([0-9a-zA-Z_]+))
             this.getSearchField(formulas.instance.formulas)
         },
         getSearchField(formulas){
@@ -197,6 +200,10 @@ export default {
     }
     .content-filter{
         height: 100%;
+    }
+    .footer-filter .total-record{
+        display: inline-block;
+        margin-top: 16px;
     }
   
 </style>
