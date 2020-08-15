@@ -102,7 +102,7 @@
 				 <h6>Chưa có chức năng nào</h6>
 			 </div>
 		</div> -->
-		<AppDetailVue />
+		<AppDetailVue  @update-list-item="updateListItem"/>
         <v-btn
             small
             color="primary"
@@ -167,16 +167,16 @@ export default {
 				iconType:"",
 				status: false,
 				childrenApp:{
-					document:[
-						1
+					documents:[
+						
 					],
-					orgchart:[1
+					orgcharts:[
 					],
-					report:[
-						1
+					reports:[
+						
 					],
-					workflow:[
-						1
+					workflows:[
+						
 					]
 				}
             },
@@ -191,7 +191,36 @@ export default {
     methods: {
         setAppObject(app) {
             this.currentApp = JSON.parse(JSON.stringify(app));
-        },
+		},
+		updateListItem(data){
+			let thisCpn = this
+			// thisCpn.currentApp.childrenApp.forEach(function(e){
+			// 	console.log(e,'thisCpn.currentApp.childrenApp.forEach');
+			// })
+			// for (const property in this.currentApp.childrenApp) {
+			// 	console.log(typeof(property),'property');
+			// 	// property.splice(0,property.length);
+			// }
+			thisCpn.currentApp.childrenApp.documents.splice(0,thisCpn.currentApp.childrenApp.documents.length)
+			thisCpn.currentApp.childrenApp.orgcharts.splice(0,thisCpn.currentApp.childrenApp.orgcharts.length)
+			thisCpn.currentApp.childrenApp.reports.splice(0,thisCpn.currentApp.childrenApp.reports.length)
+			thisCpn.currentApp.childrenApp.workflows.splice(0,thisCpn.currentApp.childrenApp.workflows.length)
+			data.documents.item.forEach(function(e){
+				thisCpn.currentApp.childrenApp.documents.push(e.id);
+			});
+			data.orgcharts.item.forEach(function(e){
+				thisCpn.currentApp.childrenApp.orgcharts.push(e.id);
+			});
+			data.reports.item.forEach(function(e){
+				thisCpn.currentApp.childrenApp.reports.push(e.id);
+			});
+			data.workflows.item.forEach(function(e){
+				thisCpn.currentApp.childrenApp.workflows.push(e.id);
+			});
+			// console.log(data.documents.item,'data.documents.id');
+			// console.log(data.documents.item.id,'data.documents.id');
+			console.log(this.currentApp.childrenApp,'childrenApp');
+		},
         getAllObjectInApp(id) {
             let req = new Api(this.apiUrl);
             req.get(this.appUrl + "/" + id + "/objects")
