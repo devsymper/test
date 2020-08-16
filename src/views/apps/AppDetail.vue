@@ -2,11 +2,11 @@
   <div class="app-details">
 	  	 <VuePerfectScrollbar :style="{height: menuItemsHeight}">
 			<div v-for="(itemT,i) in sAppModule.listItemSelected" :key="i" class="app-item">
-				<h4><v-icon>{{itemT.icon}}</v-icon>  {{ itemT.title }}</h4>
+					<div class="title-app" v-if="itemT.item.length >0"><v-icon style="font-size:13px">{{itemT.icon}}</v-icon> <h4> {{ itemT.title }} <span> {{'('+itemT.item.length +')' }}</span> </h4></div>
 					<ul v-for="(childItem,i) in itemT.item" :key="i"  class="app-child-item">
 							<li>
 								{{childItem.name}}
-							<v-icon style="font-size:15px;float:right;padding-top:5px" @click="removeItem(childItem.id,itemT.title)">mdi-cat</v-icon>
+							<v-icon class="icon-remove"  @click="removeItem(childItem.id,itemT.name)">mdi-delete-circle</v-icon>
 							</li>
 					</ul>
 			</div>
@@ -49,12 +49,31 @@ export default {
 </script>
 
 <style scoped>
+.app-details{
+	font: 13px roboto;
+}
 .app-details >>> .app-item ul{
 	list-style: none;
 }
+.app-details >>> .app-item .title-app{
+	/* padding-left: 15px; */
+	display: flex;
+	cursor: pointer;
+	padding:10px 15px;
+	
+}
+.app-details >>> .app-item .title-app h4{
+	padding-left:8px;
+	font-weight: unset;
+}
+.app-details >>> .app-item .app-child-item .icon-remove{
+	font-size:13px;
+	float:right;
+	padding-top:2px;
+}
 .app-details >>> .app-item li{
 	cursor: pointer;
-	padding: 6px;
+	padding: 8px;
 	margin-right: 10px;
 }
 .app-details >>> .app-item li:hover{

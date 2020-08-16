@@ -203,7 +203,7 @@ export default {
 			   },
 			   workflows:
 			   {
-			  	   icon : 'mdi-folder',
+			  	   icon : 'mdi-lan',
 				   title: 'workflows',
 				   item:[
 				   ]

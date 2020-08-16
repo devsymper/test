@@ -8,12 +8,12 @@
 			v-model="myValue"
 		></v-text-field>
 		 <VuePerfectScrollbar :style="{height: menuItemsHeight}">
-			<div v-for="(itemT,i) in listItems" :key="i">
-				<h4><v-icon>{{itemT.icon}}</v-icon>  {{ itemT.title}}</h4>
-				<ul v-for="(childItem,i) in itemT.item" :key="i" @click="clickItem(childItem,itemT.title)">
+			<div class="app-item" v-for="(itemT,i) in listItems" :key="i">
+				<div class="title-app" ><v-icon>{{itemT.icon}}</v-icon><h4> {{ itemT.title}}</h4> </div>
+				<ul class="app-child-item" v-for="(childItem,i) in itemT.item" :key="i" @click="clickItem(childItem,itemT.name)">
 					<li>
 						{{childItem.name}} 
-						<v-icon style="font-size:11px;float:right">mdi-star</v-icon>
+						<v-icon>mdi-check</v-icon>
 					</li>
 				</ul>
 			</div>
@@ -33,22 +33,25 @@ export default {
 			menuItemsHeight: '270px',
             listItems:{
 			   documents:{
-				   icon : 'mdi-folder',
-				   title: 'documents',
+				   icon : 'mdi-file-document',
+				   title: 'Documents',
+				   name: 'documents',
 				   item:[
 						
 				   ]
 			   },
 			   orgcharts:{
  				   icon : 'mdi-folder',
-				   title: 'orgcharts',
+				   title: 'Orgcharts',
+				   name: 'orgcharts',
 				   item:[
 						
 				   ]
 			   },
 			   reports:{
-				    icon : 'mdi-folder',
-				   title: 'reports',
+				    icon : 'mdi-view-dashboard',
+				   title: 'Reports',
+				   name: 'reports',
 				   item:[
 					
 				   ]
@@ -56,8 +59,9 @@ export default {
 			   },
 			   workflows:
 			   {
-			    icon : 'mdi-folder',
-				   title: 'workflows',
+			       icon : 'mdi-lan',
+				   title: 'Workflows',
+				   name: 'workflows',
 				   item:[
 						
 				   ]
@@ -66,29 +70,29 @@ export default {
 			 listItemsSelected:{
 			   documents:
 			   {
-				   icon : 'mdi-folder',
-				   title: 'documents',
+				   icon : 'mdi-file-document',
+				   title: 'Documents',
 				   item:[
 				   ]
 			   },
 			   orgcharts:
 			   {
- 				   icon : 'mdi-folder',
-				   title: 'orgcharts',
+ 				   icon : 'mdi-view-dashboard',
+				   title: 'Orgcharts',
 				   item:[
 				   ]
 			   },
 			   reports:
 			   {
 				   icon : 'mdi-folder',
-				   title: 'reports',
+				   title: 'Reports',
 				   item:[
 				   ]
 			   },
 			   workflows:
 			   {
-			  	   icon : 'mdi-folder',
-				   title: 'workflows',
+			  	   icon : 'mdi-lan',
+				   title: 'Workflows',
 				   item:[
 				   ]
 			   },
@@ -103,14 +107,13 @@ export default {
 	},
 	methods:{
 		clickItem(obj,type){
-			
+			// debugger
 			let listItem = this.listItemsSelected[type].item;
 			if(listItem.indexOf(obj) == -1){
 				listItem.push(obj);
 			}else{
 				listItem.splice(listItem.indexOf(obj));
 			}
-			// console.log(this.listItemsSelected[type].item,'selected');
 			this.$store.commit('appConfig/updateListItemSelected',this.listItemsSelected);
 		},
 		getListSearch(value){
@@ -140,25 +143,54 @@ export default {
 </script>
 
 <style scoped> 
-.search-modal >>>.v-input__slot{
-	border: 1px solid lightblue;
+.search-modal{
+	font: 13px roboto;
+}
+.search-modal >>> .v-input__control{
+	text-shadow: unset;
+}
+.search-modal >>> .v-input__control .v-input__slot{
+	/* border: 1px solid lightblue; */
     background-color: lightgray;
     min-height: unset;
     height: 36px;
 	box-shadow: unset;
 }
- .search-box{
-	
+.search-modal >>> .v-input__control .v-icon{
+	font-size:13px
 }
-ul {
+.search-modal >>> .v-input__control .v-text-field__details{
+	display: none;
+}
+.search-modal >>> .app-item ul{
 	list-style: none;
 }
- li{
+.search-modal >>> .app-item .title-app{
+	/* padding-left: 15px; */
+	display: flex;
 	cursor: pointer;
-	padding: 6px;
+	padding:10px 15px;
+	
+}
+.search-modal >>> .app-item .title-app .v-icon{
+	font-size: 13px;
+}
+.search-modal >>> .app-item .title-app h4{
+	padding-left:8px;
+	font-weight: unset;
+}
+.search-modal >>> .app-item .app-child-item .v-icon{
+	font-size:13px;
+	float:right;
+	padding-top:2px;
+	color: greenyellow;
+}
+.search-modal >>> .app-item li{
+	cursor: pointer;
+	padding: 8px 12px;
 	margin-right: 10px;
 }
- li:hover{
+.search-modal >>> .app-item li:hover{
 	background-color:lightgray;
 }
 </style>
