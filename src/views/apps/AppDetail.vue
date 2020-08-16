@@ -23,9 +23,6 @@ export default {
     	};
 	},
 	created(){
-		// debugger
-		// this.$emit('update-list-item', this.listItems)
-		// console.log(this.listItems,'this.listItemsthis.listItems');
 	},
 	computed:{
 		sAppModule(){
@@ -34,12 +31,7 @@ export default {
 	},
 	methods:{
 		removeItem(id,type){
-			// this.listItems[type].item.splice(this.listItems[type].item.indexOf(id));
-			// console.log(this.listItems[type].item,'this.listItems[type].item');
-			console.log('click remove');
 			this.$store.commit('appConfig/removeItemSelected',{id:id,type:type})
-			this.$emit('update-list-item', this.listItems)
-			// console.log(this.listItems,'this.listItems');
 		}
 	},
 	components: {
@@ -56,7 +48,6 @@ export default {
 	list-style: none;
 }
 .app-details >>> .app-item .title-app{
-	/* padding-left: 15px; */
 	display: flex;
 	cursor: pointer;
 	padding:10px 15px;

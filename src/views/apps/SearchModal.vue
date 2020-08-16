@@ -1,7 +1,7 @@
 <template>
 <div width="500px" style="padding:10px" class="search-modal">
 		<v-text-field
-			label="Search"
+			:label="$t('apps.search')"
 			single-line
 			solo
 			append-icon="mdi-magnify"
@@ -37,7 +37,6 @@ export default {
 				   title: 'Documents',
 				   name: 'documents',
 				   item:[
-						
 				   ]
 			   },
 			   orgcharts:{
@@ -45,7 +44,6 @@ export default {
 				   title: 'Orgcharts',
 				   name: 'orgcharts',
 				   item:[
-						
 				   ]
 			   },
 			   reports:{
@@ -53,9 +51,7 @@ export default {
 				   title: 'Reports',
 				   name: 'reports',
 				   item:[
-					
 				   ]
- 				 
 			   },
 			   workflows:
 			   {
@@ -64,36 +60,6 @@ export default {
 				   name: 'workflows',
 				   item:[
 						
-				   ]
-			   },
-			},  
-			 listItemsSelected:{
-			   documents:
-			   {
-				   icon : 'mdi-file-document',
-				   title: 'Documents',
-				   item:[
-				   ]
-			   },
-			   orgcharts:
-			   {
- 				   icon : 'mdi-view-dashboard',
-				   title: 'Orgcharts',
-				   item:[
-				   ]
-			   },
-			   reports:
-			   {
-				   icon : 'mdi-folder',
-				   title: 'Reports',
-				   item:[
-				   ]
-			   },
-			   workflows:
-			   {
-			  	   icon : 'mdi-lan',
-				   title: 'Workflows',
-				   item:[
 				   ]
 			   },
 			},  
@@ -107,14 +73,7 @@ export default {
 	},
 	methods:{
 		clickItem(obj,type){
-			// debugger
-			let listItem = this.listItemsSelected[type].item;
-			if(listItem.indexOf(obj) == -1){
-				listItem.push(obj);
-			}else{
-				listItem.splice(listItem.indexOf(obj));
-			}
-			this.$store.commit('appConfig/updateListItemSelected',this.listItemsSelected);
+			this.$store.commit('appConfig/updateListItemSelected',{obj:obj,type:type});
 		},
 		getListSearch(value){
 			orgchartApi.getOrgchartList({search:value,pageSize:50}).then(res => {
@@ -132,7 +91,6 @@ export default {
 				console.log(res.data);
 			});
 		},
-		
 	},
 	 watch: {
         'myValue': function(val){
@@ -150,7 +108,6 @@ export default {
 	text-shadow: unset;
 }
 .search-modal >>> .v-input__control .v-input__slot{
-	/* border: 1px solid lightblue; */
     background-color: lightgray;
     min-height: unset;
     height: 36px;
@@ -166,7 +123,6 @@ export default {
 	list-style: none;
 }
 .search-modal >>> .app-item .title-app{
-	/* padding-left: 15px; */
 	display: flex;
 	cursor: pointer;
 	padding:10px 15px;

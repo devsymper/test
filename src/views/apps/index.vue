@@ -66,7 +66,6 @@ export default {
                    }
                 }
             },
-           
             tableContextMenu: [
                {
                     name: "edit",
@@ -75,7 +74,8 @@ export default {
                         this.editCallback = callback;
                         appManagementApi.getAppDetails(app.id).then(res => {
                         if (res.status == 200) {
-                            console.log(res.data.listObject,"resdata listobj");
+							console.log(res.data.listObject,"resdata listobj");
+							debugger
                              this.showEditAppPanel(res.data.listObject)   
                         }else {
                             this.showError()
@@ -83,7 +83,6 @@ export default {
                          }).catch((err) => {
                                 this.showError()
                         });
-                        this.showEditAppPanel(app);
                     },
                 },
                 {

@@ -13,13 +13,44 @@ import {
 	type
 } from 'jquery';
 const updateListItemSelected = (state, data) => {
-	Vue.set(state, 'listItemSelected', data);
+	// Vue.set(state, 'listItemSelected', data);
+	let listItem = state.listItemSelected[data.type].item;
+	if (listItem.indexOf(data.obj) == -1) {
+		listItem.push(data.obj);
+	} else {
+		listItem.splice(listItem.indexOf(data.obj));
+	}
 }
 const removeItemSelected = (state, data) => {
 	state.listItemSelected[data.type].item.splice(state.listItemSelected[data.type].item.indexOf(data.id), 1);
 }
 const emptyItemSelected = (state) => {
-	state.listItemSelected = {}
+	state.listItemSelected = {
+		documents: {
+			icon: 'mdi-file-document',
+			title: 'Documents',
+			name: 'documents',
+			item: []
+		},
+		orgcharts: {
+			icon: 'mdi-view-dashboard',
+			title: 'Orgcharts',
+			name: 'orgcharts',
+			item: []
+		},
+		reports: {
+			icon: 'mdi-folder',
+			title: 'Reports',
+			name: 'reports',
+			item: []
+		},
+		workflows: {
+			icon: 'mdi-lan',
+			title: 'Workflows',
+			name: 'workflows',
+			item: []
+		},
+	}
 }
 export {
 	updateListItemSelected,

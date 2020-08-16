@@ -1,7 +1,7 @@
 <template>
     <div class="update-app-symper">
         <v-card-title class="pt-0 pb-2 subtitle-1 font-weight-bold ">
-            <v-icon class="pr-4">mdi-apps</v-icon> {{ !!!isEdit ? "Thêm Applications" : "Cập nhật Applications" }}
+            <v-icon class="pr-4">mdi-apps</v-icon> {{ !!!isEdit ? $t('apps.addApp') : $t('apps.editApp') }}
         </v-card-title>
         <v-divider></v-divider>
         <v-card-title class="pt-3 pb-0 subtitle-2 font-weight-bold">
@@ -84,7 +84,7 @@
 								v-bind="attrs"
 								v-on="on"
 								>
-									<span> Click vào để thêm </span>
+									<span> {{ $t('apps.clickToAdd')}} </span>
 									<v-icon right dark style="border-left:2px solid lightgrey">mdi-plus</v-icon>
 							</v-btn>
 						</template>
@@ -131,7 +131,6 @@ export default {
 		AppDetailVue
 	},
 	created(){
-		// let self = this
 	},
     props: {
         isEdit: {
@@ -140,13 +139,7 @@ export default {
         }
     },
     watch: {
-        // currentApp(val) {
-        //     this.searchStr = "";
-        //     this.resetResult();
-        //     if (val.id !== undefined && !!val.id) {
-        //         // this.getAllObjectInApp(val.id);
-        //     }
-        // }
+      
     },
     computed: {
     },
@@ -168,47 +161,17 @@ export default {
 				iconName: "",
 				iconType:"",
 				status: false,
-				childrenApp:{
-					document:[
-					],
-					orgchart:[
-					],
-					report:[
-					],
-					workflow:[
-					]
-				}
-            },
-            listItemsSelected:{
-			   documents:
-			   {
-				   icon : 'mdi-folder',
-				   title: 'documents',
-				   item:[
-				   ]
-			   },
-			   orgcharts:
-			   {
- 				   icon : 'mdi-folder',
-				   title: 'orgcharts',
-				   item:[
-				   ]
-			   },
-			   reports:
-			   {
-				   icon : 'mdi-folder',
-				   title: 'reports',
-				   item:[
-				   ]
-			   },
-			   workflows:
-			   {
-			  	   icon : 'mdi-lan',
-				   title: 'workflows',
-				   item:[
-				   ]
-			   },
-			},  
+			},
+			childrenApp:{
+				document:[
+				],
+				orgchart:[
+				],
+				report:[
+				],
+				workflow:[
+				]
+			},
             allObjectToImport: [],
 			listObjectToShows: [],
 			listSelectedItem:{},
@@ -219,49 +182,44 @@ export default {
     methods: {
         setAppObject(app) {
             this.currentApp = JSON.parse(JSON.stringify(app));
-            console.log(this.currentApp ,'this.currentApp ');
-            //code here
-            for(const type in this.currentApp.childrenApp){
-                console.log(typeof(type),'typeeeeeeeeeeeeeeeeeeeeeeeeeeee');
-            }
-            // this.currentApp.childrenApp.forEach(function(e){
-            //     console.log(e,'eeeeeeeeeeeeeeeeeeee');
-            // })
+			console.log(this.currentApp ,'this.currentApp ');
+			console.log(app ,'this.currentApp ');
+			debugger
+        
 		},
 		updateListItem(data){
-			debugger
 			let self = this;
-			console.log(self.currentApp.childrenApp,'self.currentApp.childrenApp');
-			// data.documents.item.forEach(function(e){
-			// 	self.currentApp.childrenApp.document.push(e.id);
-			// });
-			// data.orgcharts.item.forEach(function(e){
-			// 	self.currentApp.childrenApp.orgchart.push(e.id);
-			// });
-			// data.reports.item.forEach(function(e){
-			// 	self.currentApp.childrenApp.report.push(e.id);
-			// });
-			// data.workflows.item.forEach(function(e){
-			// 	self.currentApp.childrenApp.workflow.push(e.id);
-			// });
+			data.documents.item.forEach(function(e){
+				self.childrenApp.document.push(e.id);
+			});
+			data.orgcharts.item.forEach(function(e){
+				self.childrenApp.orgchart.push(e.id);
+			});
+			data.reports.item.forEach(function(e){
+				self.childrenApp.report.push(e.id);
+			});
+			data.workflows.item.forEach(function(e){
+				self.childrenApp.workflow.push(e.id);
+			});
+			self.currentApp.childrenApp = self.childrenApp
+			console.log();
 		},
-        updateApp() {
-            console.log('update app');
-            // let req = new Api(this.apiUrl);
-            // req.put(this.appUrl, {...this.currentApp, objects: this.getListObjsInShort()})
-            // .then((res) => {
-            //     this.$emit("update-app", res)
-            // }).catch((err) => {
-            //     this.showError()
-            // });
-        },
+        // updateApp() {
+        //     console.log('update app');
+        //     // let req = new Api(this.apiUrl);
+        //     // req.put(this.appUrl, {...this.currentApp, objects: this.getListObjsInShort()})
+        //     // .then((res) => {
+        //     //     this.$emit("update-app", res)
+        //     // }).catch((err) => {
+        //     //     this.showError()
+        //     // });
+        // },
         pickIcon(data) {
             this.currentApp.iconName = data.icon.trim();
             this.currentApp.iconType = data.type;
 		},
 		selectedItem(data){
 			this.listSelectedItem = data;
-			console.log(this.listSelectedItem,'this.listSelectedItem');	
 		},
         toggleObject(item, type) {
             item.checked = item.checked == 0 ? 1: 0;
@@ -317,8 +275,8 @@ export default {
         },
         createApp() {
 			this.updateListItem(this.$store.state.appConfig.listItemSelected)
-			console.log(this.$store.state.appConfig.listItemSelected,'xxxxxxxxxxxxxxxx');
 			let data = JSON.stringify(this.currentApp);
+			debugger
 			appManagementApi.addApp(data).then(res => {
 				 this.$emit("add-app", res)
 			}).catch(err => {
@@ -328,7 +286,6 @@ export default {
 				
         },
          updateApp() {
-            debugger
             console.log('update app');
             // let req = new Api(this.apiUrl);
             // req.put(this.appUrl, {...this.currentApp, objects: this.getListObjsInShort()})
