@@ -23,15 +23,15 @@ export const orgchartApi = {
 		// filter = {
 		// 	search: 'dsdsd',
 		// 	pageSize:50,
-		// 	filter: [
-		// 		{
-		// 			column: 'id',
-		// 			valueFilter: {
-		// 				operation: 'IN',
-		// 				values: [1,5,5,3]						
-		// 			}
+		// filter: [
+		// 	{
+		// 		column: 'id',
+		// 		valueFilter: {
+		// 			operation: 'IN',
+		// 			values: [1,5,5,3]						
 		// 		}
-		// 	]
+		// 	}
+		// ]
 		// };
 		return orgchart.get('orgchart', filter);
 	},

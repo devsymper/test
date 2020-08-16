@@ -7,7 +7,7 @@
 		>
 		</v-tabs>
       <!-- -->
-      <v-tabs-items v-model="tab">
+       <v-tabs-items v-model="tab">
         <v-tab-item
          value='tab-1'
         >
@@ -28,13 +28,15 @@
 				<!-- <hr> -->
 					<div class="title-list-app"> <v-icon>mdi-playlist-play</v-icon><h4>{{$t('apps.listApp')}}</h4></div>
 				<div class="list-app-cointaner">
-					<div v-for="i in 5" :key="i" 
-						class="list-app-item"
-						@click="clickDetails"
-						>
-						<v-icon>mdi-folder</v-icon>
-						<h5>Bán hàng</h5>
-					</div>
+					 <!-- <VuePerfectScrollbar :style="{height: menuItemsHeight}"  > -->
+						<div v-for="(item,i) in apps" :key="i" 
+							class="list-app-item"
+							@click="clickDetails(item.id)"
+							>
+							<v-icon>mdi-folder</v-icon>
+							<h5>{{item.name}}</h5>
+						</div>
+					<!-- </VuePerfectScrollbar>	 -->
 				</div>
 			</v-card>
         </v-tab-item>
@@ -49,8 +51,7 @@
 					solo
 					append-icon="mdi-magnify"
 				></v-text-field>
-              <v-card-text>tab2 ne ahihi replect component here</v-card-text>
-			  <AppDetail />
+			  <AppDetail :isEndUserCpn="isEndUserCpn" />
           </v-card>
         </v-tab-item>
       </v-tabs-items>
@@ -61,21 +62,43 @@
 <script>
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import AppDetail from './AppDetail.vue';
+import {appManagementApi} from './../../api/AppManagement.js';
 export default {
 	data: function() {
         return {
-		 menuItemsHeight: '100%',
+		 menuItemsHeight: '200px',
 		 tab: 'tab-1',
+		 isEndUserCpn:true,
 		//  sAppModule:{
 		//  }
+		 apps:{}
 		 }
+		
+	},
+	created(){
+		appManagementApi.getActiveApp().then(res => {
+			if (res.status == 200) {
+				// debugger
+				this.apps = res.data.listObject
+				console.log(res.data.listObject,"resdataaaaaaaaaaaaaa");
+			}
+			}).catch((err) => {
+		});
 	},
 	components: {
 		VuePerfectScrollbar,
 		AppDetail,
 	},
 	methods:{
-		clickDetails(){
+		clickDetails(id){
+			// alert(id)
+			appManagementApi.getAppDetails(id).then(res => {
+			if (res.status == 200) {
+				// debugger
+				console.log(res.data.listObject,"resdataaaaaaaaaaaaaa");
+			}
+			}).catch((err) => {
+		});
 			this.tab = 'tab-2'
 		},
 		clickBack(){

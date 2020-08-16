@@ -184,7 +184,6 @@ export default {
             this.currentApp = JSON.parse(JSON.stringify(app));
 			console.log(this.currentApp ,'this.currentApp ');
 			console.log(app ,'this.currentApp ');
-			debugger
         
 		},
 		updateListItem(data){
@@ -276,7 +275,6 @@ export default {
         createApp() {
 			this.updateListItem(this.$store.state.appConfig.listItemSelected)
 			let data = JSON.stringify(this.currentApp);
-			debugger
 			appManagementApi.addApp(data).then(res => {
 				 this.$emit("add-app", res)
 			}).catch(err => {

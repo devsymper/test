@@ -28,6 +28,10 @@ import Api from "./../../api/api.js";
 import ListItems from "../../components/common/ListItems";
 import UpdateApp from "./Update";
 import {appManagementApi} from './../../api/AppManagement.js'
+import {orgchartApi} from './../../api/orgchart';
+import {documentApi} from './../../api/Document';
+import {dashboardApi} from './../../api/dashboard';
+import BpmnEngine from './../../api/BPMNEngine';
 export default {
     name: "listApps",
     components: {
@@ -74,8 +78,7 @@ export default {
                         this.editCallback = callback;
                         appManagementApi.getAppDetails(app.id).then(res => {
                         if (res.status == 200) {
-							console.log(res.data.listObject,"resdata listobj");
-							debugger
+							 this.checkChildrenApp(res.data.listObject.childrenApp)
                              this.showEditAppPanel(res.data.listObject)   
                         }else {
                             this.showError()
@@ -127,7 +130,6 @@ export default {
             })
         },
         deleteApp(app) {
-           
             console.log(app[0].id);
             appManagementApi.deleteApp(app[0].id)
             .then(res => {
@@ -178,7 +180,84 @@ export default {
             } else {
                 this.showError()
             }
-        },
+		},
+		checkChildrenApp(data){
+			if(data.hasOwnProperty('orgchart')){
+						let dataOrg = data.orgchart;
+						orgchartApi.getOrgchartList({
+										search:'',
+										pageSize:50,
+										filter: [
+										{
+											column: 'id',
+											valueFilter: {
+												operation: 'IN',
+												values: dataOrg						
+											}
+										}
+						]}).then(resOrg => {
+							console.log(resOrg.data.listObject);
+							this.$store.commit('appConfig/updateChildrenApps',{obj:resOrg.data.listObject,type:'orgcharts'});
+							// debugger
+						});
+			}
+			if(data.hasOwnProperty('document')){
+						let dataDoc = data.document;
+						documentApi.searchListDocuments(
+							{
+								search:'',
+								pageSize:50,
+								filter: [
+								{
+									column: 'id',
+									valueFilter: {
+										operation: 'IN',
+										values: dataDoc						
+									}
+								}
+								]
+							}
+						).then(resOrg => {
+							this.$store.commit('appConfig/updateChildrenApps',{obj:resOrg.data.listObject,type:'documents'});
+							debugger
+						});
+			}
+			if(data.hasOwnProperty('workflow')){
+						let dataW = data.workflow;
+						BpmnEngine.getListModels({
+										search:'',
+										pageSize:50,
+										filter: [
+										{
+											column: 'id',
+											valueFilter: {
+												operation: 'IN',
+												values: dataW						
+											}
+										}
+						]}).then(resOrg => {
+							this.$store.commit('appConfig/updateChildrenApps',{obj:resOrg.data.listObject,type:'workflows'});
+						});
+			}
+			if(data.hasOwnProperty('report')){
+						let dataRep = data.report;
+						dashboardApi.searchDashboard({
+										search:'',
+										pageSize:50,
+										filter: [
+										{
+											column: 'id',
+											valueFilter: {
+												operation: 'IN',
+												values: dataRep						
+											}
+										}
+						]}).then(resOrg => {
+							this.$store.commit('appConfig/updateChildrenApps',{obj:resOrg.data.listObject,type:'reports'});
+						});
+			}
+
+		}
       
     },
 };

@@ -10,11 +10,14 @@ export const appManagementApi = {
 	addApp(data) {
 		return coreApi.post("application", data);
 	},
-	deleteApp(id){
-		return coreApi.delete('application/'+id)
+	deleteApp(id) {
+		return coreApi.delete('application/' + id)
 	},
-	getAppDetails(id){
-		return coreApi.get('application/'+id)
-	}
+	getAppDetails(id) {
+		return coreApi.get('application/' + id)
+	},
+	getActiveApp() {
+		return coreApi.get('application-active')
+	},
 
 };

@@ -12,7 +12,7 @@
 				<div class="title-app" ><v-icon>{{itemT.icon}}</v-icon><h4> {{ itemT.title}}</h4> </div>
 				<ul class="app-child-item" v-for="(childItem,i) in itemT.item" :key="i" @click="clickItem(childItem,itemT.name)">
 					<li>
-						{{childItem.name}} 
+						{{childItem.name}}
 						<v-icon>mdi-check</v-icon>
 					</li>
 				</ul>

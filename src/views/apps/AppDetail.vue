@@ -4,24 +4,54 @@
 			<div v-for="(itemT,i) in sAppModule.listItemSelected" :key="i" class="app-item">
 					<div class="title-app" v-if="itemT.item.length >0"><v-icon style="font-size:13px">{{itemT.icon}}</v-icon> <h4> {{ itemT.title }} <span> {{'('+itemT.item.length +')' }}</span> </h4></div>
 					<ul v-for="(childItem,i) in itemT.item" :key="i"  class="app-child-item">
-							<li>
+							<li v-on:contextmenu="rightClickHandler($event)">
 								{{childItem.name}}
-							<v-icon class="icon-remove"  @click="removeItem(childItem.id,itemT.name)">mdi-delete-circle</v-icon>
+							<v-icon class="icon-remove" v-if="isEndUserCpn == true">mdi-star</v-icon>	
+							<v-icon v-else class="icon-remove"  @click="removeItem(childItem.id,itemT.name)">mdi-delete-circle</v-icon>
 							</li>
 					</ul>
-			</div>
+			</div>	
 		</VuePerfectScrollbar>
+		<context-menu  ref="contextMenu" />
   </div>
 </template>
 
 <script>
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
+import ContextMenu from './ContextMenu'
 export default {
+	components:{
+		'context-menu': ContextMenu,
+	},
  data: function() {
         return {
 			menuItemsHeight: '100%',
+			contextMenus:
+			[
+				{name:'Thêm bản ghi',icon:'mdi-backup-restore',
+					callback: (item)=>{
+						
+						}
+				},
+				{name:'Danh sách bản ghi',icon:'mdi-delete',
+					callback: (item)=>{
+						
+					}
+				},
+				{name:'Yêu thích',icon:'mdi-delete',
+					callback: (item)=>{
+						
+					}
+				},
+				{name:'Import dữ liệu',icon:'mdi-delete',
+					callback: (item)=>{
+						
+					}
+				},
+			],
     	};
 	},
+	
 	created(){
 	},
 	computed:{
@@ -29,10 +59,24 @@ export default {
 			return this.$store.state.appConfig
 		}
 	},
+	props: {
+        isEndUserCpn: {
+            type: Boolean,
+            default: false
+        }
+    },
 	methods:{
 		removeItem(id,type){
 			this.$store.commit('appConfig/removeItemSelected',{id:id,type:type})
-		}
+		},
+		rightClickHandler(event){
+			// this.currentSelected = item;
+			event.stopPropagation();
+			event.preventDefault();
+			// debugger
+			this.$refs.contextMenu.setContextItem(this.contextMenus)
+			this.$refs.contextMenu.show(event)
+		}, 	
 	},
 	components: {
         VuePerfectScrollbar,

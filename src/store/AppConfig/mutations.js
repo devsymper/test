@@ -52,9 +52,21 @@ const emptyItemSelected = (state) => {
 		},
 	}
 }
+const updateChildrenApps = (state, data) => {
+	// Vue.set(state, 'listItemSelected', data);
+	state.listItemSelected[data.type].item = data.obj
+	// debugger
+	// let listItem = state.listItemSelected[data.type].item;
+	// if (listItem.indexOf(data.obj) == -1) {
+	// 	listItem.push(data.obj);
+	// } else {
+	// 	listItem.splice(listItem.indexOf(data.obj));
+	// }
+}
 export {
 	updateListItemSelected,
 	removeItemSelected,
-	emptyItemSelected
+	emptyItemSelected,
+	updateChildrenApps
 
 };
