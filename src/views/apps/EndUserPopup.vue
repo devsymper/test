@@ -1,48 +1,87 @@
 <template>
   <div class="end-user-popup"> 
-	  <v-card >
-		<v-app-bar dense flat color="white">
-			<v-toolbar-title>
-				<v-icon>mdi-apps</v-icon>
-					{{$t('apps.title')}}
-			</v-toolbar-title>
-			<v-spacer></v-spacer>
-		</v-app-bar>
-		<div class="list-favorite">
-			<div class="title-favorite"><v-icon >mdi-star</v-icon><h4>{{$t('apps.favorite')}}</h4></div>
-			<ul style="margin:0 10px;">
-				<li v-for="i in 5" :key="i">Document demo ne ahihi <v-icon color="yellow" style="float:right;font-size:13px">mdi-star</v-icon></li>
-			</ul>
-		</div>
-		<!-- <hr> -->
-			<div class="title-list-app"> <v-icon>mdi-playlist-play</v-icon><h4>{{$t('apps.listApp')}}</h4></div>
-		<div class="list-app-cointaner">
-			<div v-for="i in 5" :key="i" 
-				class="list-app-item"
-				>
-			 	 <v-icon>mdi-folder</v-icon>
-				<h5>bán hàng</h5>
-			</div>
-		</div>
-   	</v-card>
+	<v-card>
+		<v-tabs
+			v-model="tab"
+			v-show="false"
+		>
+		</v-tabs>
+      <!-- -->
+      <v-tabs-items v-model="tab">
+        <v-tab-item
+         value='tab-1'
+        >
+         	<v-card >
+				<v-app-bar dense flat color="white">
+					<v-toolbar-title>
+						<v-icon>mdi-apps</v-icon>
+							{{$t('apps.title')}}
+					</v-toolbar-title>
+					<v-spacer></v-spacer>
+				</v-app-bar>
+				<div class="list-favorite">
+					<div class="title-favorite"><v-icon >mdi-star</v-icon><h4>{{$t('apps.favorite')}}</h4></div>
+					<ul style="margin:0 10px;">
+						<li v-for="i in 5" :key="i">Document demo ne ahihi <v-icon color="yellow" style="float:right;font-size:13px">mdi-star</v-icon></li>
+					</ul>
+				</div>
+				<!-- <hr> -->
+					<div class="title-list-app"> <v-icon>mdi-playlist-play</v-icon><h4>{{$t('apps.listApp')}}</h4></div>
+				<div class="list-app-cointaner">
+					<div v-for="i in 5" :key="i" 
+						class="list-app-item"
+						@click="clickDetails"
+						>
+						<v-icon>mdi-folder</v-icon>
+						<h5>Bán hàng</h5>
+					</div>
+				</div>
+			</v-card>
+        </v-tab-item>
+        <v-tab-item
+         value='tab-2'
+        >
+          <v-card flat class="tab-detail">
+			  <v-card-title> <v-btn  @click="clickBack" icon><v-icon>mdi-keyboard-backspace</v-icon></v-btn> <v-icon>mdi-folder</v-icon> <h4>Bán hàng </h4></v-card-title>
+				<v-text-field
+					:label="$t('apps.search')"
+					single-line
+					solo
+					append-icon="mdi-magnify"
+				></v-text-field>
+              <v-card-text>tab2 ne ahihi replect component here</v-card-text>
+			  <AppDetail />
+          </v-card>
+        </v-tab-item>
+      </v-tabs-items>
+    </v-card>
   </div>
 </template>
 
 <script>
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
+import AppDetail from './AppDetail.vue';
 export default {
-	 data() {
-		 menuItemsHeight: '100%'
-		 sAppModule:{
-			//  documents:{
-
-			//  },
-
+	data: function() {
+        return {
+		 menuItemsHeight: '100%',
+		 tab: 'tab-1',
+		//  sAppModule:{
+		//  }
 		 }
 	},
 	components: {
-        VuePerfectScrollbar,
+		VuePerfectScrollbar,
+		AppDetail,
 	},
+	methods:{
+		clickDetails(){
+			this.tab = 'tab-2'
+		},
+		clickBack(){
+			this.tab = 'tab-1'
+		},
+	}
 }
 </script>
 
@@ -99,5 +138,36 @@ export default {
 }
 .end-user-popup >>> .list-app-cointaner .list-app-item h5{
 	margin-top: -12px;
+}
+.end-user-popup >>> .tab-detail .v-card__title{
+	font: 13px Roboto;
+	padding: unset;
+}
+.end-user-popup >>> .tab-detail .v-card__title .v-icon{
+	font-size: 13px;
+}
+.end-user-popup >>> .tab-detail .v-card__title h4{
+	padding-left: 8px;
+	font-size: 15px;
+}
+.end-user-popup >>> .tab-detail .v-input__control{
+	text-shadow: unset;
+	margin: 0px 6px;
+}
+.end-user-popup >>> .tab-detail .v-input__control .v-input__slot{
+    background-color: lightgray;
+    min-height: unset;
+    height: 30px;
+	box-shadow: unset;
+}
+.end-user-popup >>> .tab-detail .v-input__control .v-input__slot .v-label{
+    font: 12px Roboto !important;
+	padding-top:2px
+}
+.end-user-popup >>> .tab-detail .v-input__control .v-icon{
+	font-size:13px
+}
+.end-user-popup >>> .tab-detail .v-input__control .v-text-field__details{
+	display: none;
 }
 </style>
