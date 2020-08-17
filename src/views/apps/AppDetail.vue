@@ -131,41 +131,41 @@ export default {
 			this.$store.commit('appConfig/removeItemSelected',{id:id,type:type})
 		},
 		filterItem(){
-					let self = this
-					let listItem = this.$store.state.appConfig.listItemSelected;
-					self.objFilter.documents.item = []
-					self.objFilter.orgcharts.item = []
-					self.objFilter.reports.item = []
-					self.objFilter.workflows.item = []
-					if(listItem.documents.item.length > 0){
-						 listItem.documents.item.filter(function(item){
-							if(item.name.includes(self.searchKey)){
-								self.objFilter.documents.item.push(item)
-							}
-						})
+			let self = this
+			let listItem = this.$store.state.appConfig.listItemSelected;
+			self.objFilter.documents.item = []
+			self.objFilter.orgcharts.item = []
+			self.objFilter.reports.item = []
+			self.objFilter.workflows.item = []
+			if(listItem.documents.item.length > 0){
+					listItem.documents.item.filter(function(item){
+					if(item.name.includes(self.searchKey)){
+						self.objFilter.documents.item.push(item)
 					}
+				})
+			}
 
-					if(listItem.orgcharts.item.length > 0){
-						 listItem.orgcharts.item.filter(function(item){
-							if(item.name.includes(self.searchKey)){
-								self.objFilter.orgcharts.item.push(item)
-							}
-						})
+			if(listItem.orgcharts.item.length > 0){
+					listItem.orgcharts.item.filter(function(item){
+					if(item.name.includes(self.searchKey)){
+						self.objFilter.orgcharts.item.push(item)
 					}
-					if(listItem.reports.item.length > 0){
-						 listItem.reports.item.filter(function(item){
-							if(item.name.includes(self.searchKey)){
-								self.objFilter.reports.item.push(item)
-							}
-						})
+				})
+			}
+			if(listItem.reports.item.length > 0){
+					listItem.reports.item.filter(function(item){
+					if(item.name.includes(self.searchKey)){
+						self.objFilter.reports.item.push(item)
 					}
-					if(listItem.workflows.item.length > 0){
-						 listItem.workflows.item.filter(function(item){
-							if(item.name.includes(self.searchKey)){
-								self.objFilter.workflows.item.push(item)
-							}
-						})
+				})
+			}
+			if(listItem.workflows.item.length > 0){
+					listItem.workflows.item.filter(function(item){
+					if(item.name.includes(self.searchKey)){
+						self.objFilter.workflows.item.push(item)
 					}
+				})
+			}
 		},
 		rightClickHandler(event,item,type){
 			this.currentSelected = item;

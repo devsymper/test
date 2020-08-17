@@ -87,7 +87,10 @@ export default {
 			 workflow:[],
 		 },
 		 title:{
-		 }
+		 },
+		 mapId:{
+
+		 },
 
 		 }
 	},
@@ -118,9 +121,8 @@ export default {
 			this.title.name = item.name;
 			appManagementApi.getAppDetails(item.id).then(res => {
 			if (res.status == 200) {
-				// this.checkChildrenApp(res.data.listObject.childrenApp)
+				this.checkChildrenApp(res.data.listObject.childrenApp)
 				console.log(res.data.listObject);
-				debugger
 			}
 			}).catch((err) => {
 		});
@@ -204,26 +206,35 @@ export default {
 			this.tab = 'tab-1'
 		},
 		checkChildrenApp(data){
-			if(data.hasOwnProperty('orgchart')){
-				let dataOrg = data.orgchart;
-				orgchartApi.getOrgchartList({
-								search:'',
-								pageSize:50,
-								filter: [
-								{
-									column: 'id',
-									valueFilter: {
-										operation: 'IN',
-										values: dataOrg						
-									}
-								}
-				]}).then(resOrg => {
-					console.log(resOrg.data.listObject);
-					this.$store.commit('appConfig/updateChildrenApps',{obj:resOrg.data.listObject,type:'orgcharts'});
-				});
-			}
+				let self = this 
+			// if(data.hasOwnProperty('orgchart')){
+			// 	data.orgchart.forEach(function(e){
+			// 		console.log(e);
+			// 	})
+			// 	// let dataOrg = data.orgchart;
+			// 	orgchartApi.getOrgchartList({
+			// 					search:'',
+			// 					pageSize:50,
+			// 					filter: [
+			// 					{
+			// 						column: 'id',
+			// 						valueFilter: {
+			// 							operation: 'IN',
+			// 							values: dataOrg						
+			// 						}
+			// 					}
+			// 	]}).then(resOrg => {
+			// 		console.log(resOrg.data.listObject);
+			// 		this.$store.commit('appConfig/updateChildrenApps',{obj:resOrg.data.listObject,type:'orgcharts'});
+			// 	});
+			// }
 			if(data.hasOwnProperty('document')){
-				let dataDoc = data.document;
+				data.document.forEach(function(e){
+					self.arrType.document.push(e.id);
+					self.mapId[e.id] = e;
+				})
+				
+				let dataDoc = self.arrType.document
 				documentApi.searchListDocuments(
 					{
 						search:'',
@@ -241,46 +252,49 @@ export default {
 				).then(resDoc => {
 					this.$store.commit('appConfig/updateChildrenApps',{obj:resDoc.data.listObject,type:'documents'});
 				});
+				let dataStore = this.$store.state.appConfig.listItemSelected
+				console.log(self.mapId,'mapId');
+				console.log(dataStore,'dataStoredataStore');
+			
 			}
-			if(data.hasOwnProperty('workflow')){
-				let dataW = data.workflow;
-				BpmnEngine.getListModels({
-								search:'',
-								pageSize:50,
-								filter: [
-								{
-									column: 'id',
-									valueFilter: {
-										operation: 'IN',
-										values: dataW						
-									}
-								}
-				]}).then(resW => {
-					this.$store.commit('appConfig/updateChildrenApps',{obj:resW.data.listObject,type:'workflows'});
-				});
-			}
-			if(data.hasOwnProperty('report')){
-				let dataRep = data.report;
-				dashboardApi.getDashboards({
-								search:'',
-								pageSize:50,
-								filter: [
-								{
-									column: 'id',
-									valueFilter: {
-										operation: 'IN',
-										values: dataRep						
-									}
-								}
-				]}).then(resRp => {
-					this.$store.commit('appConfig/updateChildrenApps',{obj:resRp.data.listObject,type:'reports'});
-				});
-			}
+			// if(data.hasOwnProperty('workflow')){
+			// 	let dataW = data.workflow;
+			// 	BpmnEngine.getListModels({
+			// 					search:'',
+			// 					pageSize:50,
+			// 					filter: [
+			// 					{
+			// 						column: 'id',
+			// 						valueFilter: {
+			// 							operation: 'IN',
+			// 							values: dataW						
+			// 						}
+			// 					}
+			// 	]}).then(resW => {
+			// 		this.$store.commit('appConfig/updateChildrenApps',{obj:resW.data.listObject,type:'workflows'});
+			// 	});
+			// }
+			// if(data.hasOwnProperty('report')){
+			// 	let dataRep = data.report;
+			// 	dashboardApi.getDashboards({
+			// 		search:'',
+			// 		pageSize:50,
+			// 		filter: [
+			// 		{
+			// 			column: 'id',
+			// 			valueFilter: {
+			// 				operation: 'IN',
+			// 				values: dataRep						
+			// 			}
+			// 		}
+			// 	]}).then(resRp => {
+			// 		this.$store.commit('appConfig/updateChildrenApps',{obj:resRp.data.listObject,type:'reports'});
+			// 	});
+			// }
 		}
 	}
 }
 </script>
-
 <style scoped>
 .end-user-popup {
 	font: 13px Roboto;
@@ -300,7 +314,6 @@ export default {
 .end-user-popup >>> .title-list-app {
 	border-top: 1px solid lightgrey;
 	padding-top: 8px;
-
 }
 .end-user-popup >>> .title-favorite .v-icon,
 .end-user-popup >>> .title-list-app .v-icon{
