@@ -94,6 +94,11 @@ export default {
         },
         hide(){
             this.isShowAutoComplete = false;
+            this.resetData();
+        },
+        resetData(){
+            this.headers = []
+            this.dataTable = []
         },
         isShow(){
             return this.isShowAutoComplete;
@@ -123,6 +128,10 @@ export default {
                 if($(e.curTarget).is('div.select-cell')){
                     edtos = $(e.curTarget).parent().offset();
                 }
+                if($(e.curTarget).is('div.select-cell .select-chervon-bottom')){
+                    edtos = $(e.curTarget).parent().parent().offset();
+                }
+                console.log(e); 
                 
                 let tbcos = $(e.curTarget).closest('.wrap-table').find('[s-control-type="table"]').offset();
                 this.positionBox = {'top':edtos.top - tbcos.top + $(e.curTarget).height() +'px','left':edtos.left - tbcos.left+'px'};

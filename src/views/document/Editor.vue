@@ -906,15 +906,17 @@ export default {
         
         //su kiện click vào editor
         detectClickEvent(event){
-            if(this.editorStore.currentSelectedControl.id != ""){
+            
+            if(this.editorStore.currentSelectedControl.id != ""){ 
                 this.$refs.sidebarRight.hideDragPanel();
             }
             if($(event.target).is('.s-control'))
             this.setSelectedControlProp(event,$(event.target),$('#document-editor-'+this.keyInstance+'_ifr').get(0).contentWindow);
             else if($(event.target).closest('.s-control').length > 0){
+                
                 this.setSelectedControlProp(event,$(event.target).closest('.s-control'),$('#document-editor-'+this.keyInstance+'_ifr').get(0).contentWindow);
             }
-            
+
             
 
         // kiểm tra nếu click ngoài khung autocomplete control thì đóng lại
@@ -1653,6 +1655,7 @@ export default {
             
             let table = el.closest('.s-control-table');
             if(table.length > 0 && controlId != table.attr('id')){
+                tinyMCE.activeEditor.selection.setNode(e.target);
                 let tableId = table.attr('id');
                 let control = this.editorStore.allControl[tableId]['listFields'][controlId];
                 this.selectControl(control.properties, control.formulas,controlId);

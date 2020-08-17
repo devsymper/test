@@ -81,7 +81,7 @@ Handsontable.renderers.SelectRenderer = function(instance, td, row, col, prop, v
     Handsontable.renderers.TextRenderer.apply(this, arguments);
     if (value == null) value = ""
     let div = `<div class="select-cell" style="position:relative;height:24px;width:100%;">` + value + `
-                    <span style="position: absolute;right:8px;top:2px;font-size: 10px;color: #eee;">▼</span>
+                    <span class="select-chervon-bottom" style="position: absolute;right:8px;top:2px;font-size: 10px;color: #eee;">▼</span>
                 </div>`
     $(td).off('click')
     $(td).on('click', function(e) {
@@ -378,6 +378,9 @@ export default class Table {
             let thisObj = this;
             for (let index = 0; index < changes.length; index++) {
                 let colChange = changes[index];
+                if (colChange[2] == undefined) {
+                    return;
+                }
                 let rowData = thisObj.tableInstance.getDataAtRow(colChange[0]);
                 for (let index = 0; index < rowData.length; index++) {
                     let cell = rowData[index];

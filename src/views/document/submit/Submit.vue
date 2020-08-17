@@ -306,7 +306,7 @@ export default {
                         });
                 let valueControl = locale.val;
                 let controlInstance = getControlInstanceFromStore(thisCpn.keyInstance,locale.controlName);
-                if( $('#'+controlInstance.id).hasClass('autocompleting') && $('#'+controlInstance.id).attr('data-autocomplete') != ""){
+                if($('#'+controlInstance.id).attr('data-autocomplete') != ""){
                     $('#'+controlInstance.id).attr('data-autocomplete',"");
                     return;
                 }
@@ -390,7 +390,7 @@ export default {
             try {
                 if((e.e.keyCode >= 97 && e.e.keyCode <= 105) ||
                     (e.e.keyCode >= 48 && e.e.keyCode <= 57) ||
-                    (e.e.keyCode >= 65 && e.e.keyCode <= 90) || e.e.keyCode == 8) {
+                    (e.e.keyCode >= 65 && e.e.keyCode <= 90) || e.e.keyCode == 8) { // nếu key code là các kí tự chữ và số hợp lệ
                     if(!thisCpn.$refs.autocompleteInput.isShow()){
                         thisCpn.$refs.autocompleteInput.show(e.e);
                         let currentTableInteractive = this.sDocumentSubmit.currentTableInteractive;
@@ -438,9 +438,7 @@ export default {
             }
             if(thisCpn.isComponentActive == false) return;
             try {
-                
                 if (
-                    !$(evt.target).hasClass("autocompleting") &&
                     !$(evt.target).hasClass("v-data-table") &&
                     $(evt.target).closest(".v-data-table").length == 0
                 ) {
@@ -550,7 +548,7 @@ export default {
             controlAs[aliasControl] = controlTitle;
             if(res.data != undefined){
                 if(res.status == 200 && res.data != false){
-                     let dataTable = []
+                    let dataTable = []
                     if(res.data.data !== ""){
                         dataTable = this.handleDataAutoComplete(res.data.data,false,controlAs);
                     }
@@ -691,15 +689,18 @@ export default {
                 }
             }
             else{
-                for(let controlName in data[0]){
-                    let item = {value:controlName,text:controlName};
-                    if(controlAs.hasOwnProperty(controlName)){
-                        item.text = controlAs[controlName]
+                if(data.length > 0){
+                    for(let controlName in data[0]){
+                        let item = {value:controlName,text:controlName};
+                        if(controlAs.hasOwnProperty(controlName)){
+                            item.text = controlAs[controlName]
+                        }
+                        headers.push(item);
                     }
-                    headers.push(item);
+                    data[0]['active'] = true;
+                    bodyTable = data;
                 }
-                data[0]['active'] = true;
-                bodyTable = data;
+                
             }
             return {headers:headers,dataBody:bodyTable}
         },

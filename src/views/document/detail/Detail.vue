@@ -9,13 +9,14 @@
             
             
         </div>
-            <button v-on:click="togglePageSize"  id="toggle-doc-size-btn" :style="togglePageSizeBtnStyle">
+            <button v-if="!quickView" v-on:click="togglePageSize"  id="toggle-doc-size-btn" :style="togglePageSizeBtnStyle">
                 <span class="mdi mdi-arrow-horizontal-lock"></span>
             </button>
-            <button v-on:click="toggleSideBar"  id="side-bar-detail-btn" :style="toggleSideBarBtnStyle">
+            <button v-if="!quickView" v-on:click="toggleSideBar"  id="side-bar-detail-btn" :style="toggleSideBarBtnStyle">
                 <span class="mdi mdi-chevron-double-left"></span>
             </button>
             <side-bar-detail 
+            v-if="!quickView"
             :sidebarWidth="sidebarWidth"  
             :isShowSidebar="isShowSidebar"
             :userId="userId"
@@ -57,6 +58,10 @@ export default {
         isPrint:{
             type:Boolean,
             default:false
+        },
+        quickView:{
+            type:Boolean,
+            default:false,
         }
     },   
     components:{
