@@ -271,8 +271,54 @@
             "objectType": "Object type",
             "operation": "Operation",
             "allOperation": "Operation for all object"
-        }
-    },
+		},
+		"actionName":{
+			"account":{
+				"add":"Add",
+				"update":"Update",
+				"info":"Info",
+				"detail":"Detail",
+				"change_pass":"Change pass",
+				"disable":"Disable",
+				"change_avatar":"Change avatar",
+				"list":"List",
+				"set_role":"Set role"
+			},
+			"document_definition":{
+				"create" : "Create",
+				"edit" : "Edit",
+				"submit": "Submit",
+				"drop":"Drop",
+				"restore":"Restore",
+				"list":"List",
+				"list_trash":"Trash",
+				"list_instance":"List instance"
+			},
+			"orgchart":{
+				"create" : "Create",
+				"update":"Update",
+				"drop":"Drop",
+				"list":"List",
+				"detail":"Detail"
+			},
+			"dasboard":{
+				"create" : "Create",
+				"update":"Update",
+				"view":"View",
+				"list":"List",
+				"drop":"Drop"
+			},
+			"workflow_definition":{
+				"list" : "List",
+				"create" : "Create",
+				"deloy": "Deloy",
+				"drop":"Drop",
+				"update":"Update",
+				"list_instance":"List instance",
+				"start_instance":"Start instance"
+			}
+		}
+	},		
     "document": {
         "title": "List Document",
         "table": {

@@ -22,7 +22,7 @@
 						<div class="title-favorite"><v-icon >mdi-star</v-icon><h4>{{$t('apps.favorite')}}</h4></div>
 						<ul style="margin:0 10px;">
 							<VuePerfectScrollbar :style="{height: listFavoriteHeight}"  >
-								<li v-for="i in 10" :key="i">Document demo ne ahihi <v-icon color="yellow" style="float:right;font-size:13px">mdi-star</v-icon></li>
+								<li v-for="(item,i) in listFavorite[0]" :key="i">{{item.name}}<v-icon color="yellow" style="float:right;font-size:13px">mdi-star</v-icon></li>
 							</VuePerfectScrollbar>
 						</ul>
 					</div>
@@ -79,6 +79,13 @@ export default {
 		//  sAppModule:{
 		//  }
 		 apps:{},
+		 listFavorite:[],
+		 arrType:{
+			 document:[],
+			 orgchart:[],
+			 report:[],
+			 workflow:[],
+		 },
 		 title:{
 		 }
 
@@ -87,9 +94,16 @@ export default {
 	created(){
 		appManagementApi.getActiveApp().then(res => {
 			if (res.status == 200) {
-				// debugger
 				this.apps = res.data.listObject
 				console.log(res.data.listObject,"resdataaaaaaaaaaaaaa");
+			}
+			}).catch((err) => {
+		});
+		let userId = this.$store.state.app.endUserInfo.id
+		appManagementApi.getItemFavorite(userId).then(res => {
+			if (res.status == 200) {
+				this.checkTypeFavorite(res.data.listObject)
+				console.log(this.listFavorite,'listFavorite');
 			}
 			}).catch((err) => {
 		});
@@ -104,12 +118,87 @@ export default {
 			this.title.name = item.name;
 			appManagementApi.getAppDetails(item.id).then(res => {
 			if (res.status == 200) {
-				// console.log(res.data.listObject,"resdataaaaaaaaaaaaaa");
-				this.checkChildrenApp(res.data.listObject.childrenApp)
+				// this.checkChildrenApp(res.data.listObject.childrenApp)
+				console.log(res.data.listObject);
+				debugger
 			}
 			}).catch((err) => {
 		});
 			this.tab = 'tab-2'
+		},
+		checkTypeFavorite(data){
+			let self = this
+			data.forEach(function(e){
+				if(e.objectType == 'document'){
+					self.arrType.document.push(e.id)
+				}
+				if(e.objectType == 'orgchart'){
+					self.arrType.orgchart.push(e.id)
+				}
+				if(e.objectType == 'report'){
+					self.arrType.report.push(e.id)
+				}
+				if(e.objectType == 'workflow'){
+					self.arrType.workflow.push(e.id)
+				}
+			});
+			if(self.arrType.document.length > 0){
+				let dataDoc = self.arrType.document
+				documentApi.searchListDocuments(
+					{
+						search:'',
+						pageSize:50,
+						filter: [
+						{
+							column: 'id',
+							valueFilter: {
+								operation: 'IN',
+								values: dataDoc						
+							}
+						}
+						]
+					}
+				).then(resDoc => {
+					this.listFavorite.push(resDoc.data.listObject)
+				});
+			}
+			if(self.arrType.orgchart.length > 0){
+				let dataOrg = self.arrType.orgchart
+				orgchartApi.getOrgchartList({
+								search:'',
+								pageSize:50,
+								filter: [
+								{
+									column: 'id',
+									valueFilter: {
+										operation: 'IN',
+										values: dataOrg						
+									}
+								}
+				]}).then(resOrg => {
+					this.listFavorite.push(resDoc.data.listObject)
+				});
+			}
+			if(self.arrType.report.length > 0){
+				let dataRep = self.arrType.report
+				dashboardApi.getDashboards({
+								search:'',
+								pageSize:50,
+								filter: [
+								{
+									column: 'id',
+									valueFilter: {
+										operation: 'IN',
+										values: dataRep						
+									}
+								}
+				]}).then(resRp => {
+					this.listFavorite.push(resRp.data.listObject)
+				});
+			}
+			if(self.arrType.workflow.length > 0){
+
+			}
 		},
 		clickBack(){
 			this.tab = 'tab-1'

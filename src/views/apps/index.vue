@@ -45,7 +45,9 @@ export default {
         
     },
     created(){
-        let self = this;
+		let self = this;
+		this.$store.dispatch('actionPack/getAllActionByObjectType')
+		
     },
     data: function() {
         return {

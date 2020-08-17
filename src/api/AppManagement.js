@@ -28,6 +28,9 @@ export const appManagementApi = {
 			objectIdentifier: objectIdentifier,
 			objectType: objectType
 		})
+	},
+	getItemFavorite(userId) {
+		return coreApi.get('app-item-favorite/' + userId)
 	}
 
 };

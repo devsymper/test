@@ -40,10 +40,27 @@ export default {
 				{name:'Yêu thích',icon:'mdi-star',
 					callback: (item)=>{
 						console.log(this.currentSelected);
+						// console.log(this.typeSelected);
+						if(this.typeSelected == 'documents'){
+							this.typeSelected = 'document'
+						}
+						if(this.typeSelected == 'orgcharts'){
+							this.typeSelected = 'orgchart'
+						}
+						if(this.typeSelected == 'reports'){
+							this.typeSelected = 'report'
+						}
+						if(this.typeSelected == 'workflows'){
+							this.typeSelected = 'workflow'
+						}
 						console.log(this.typeSelected);
 						let userId = this.$store.state.app.endUserInfo.id
 						console.log(userId);
-						// appManagementApi.addFavoriteItem(userId,item)
+						appManagementApi.addFavoriteItem(userId,this.currentSelected.id,this.typeSelected).then(res => {
+							if (res.status == 200) {
+								console.log('add thanh cong');
+							}
+           				 });
 					}
 				},
 				{name:'Import dữ liệu',icon:'mdi-file-outline',
@@ -81,7 +98,6 @@ export default {
 			}
     	};
 	},
-	
 	created(){
 		let self = this
 	},
@@ -95,6 +111,26 @@ export default {
 					return this.$store.state.appConfig.listItemSelected
 				}
 				else{
+					this.filterItem();
+					return this.objFilter
+				}
+		}
+	},
+	props: {
+        isEndUserCpn: {
+            type: Boolean,
+            default: false
+		},
+		searchKey:{
+			type: String,
+			default:"",
+		}
+    },
+	methods:{
+		removeItem(id,type){
+			this.$store.commit('appConfig/removeItemSelected',{id:id,type:type})
+		},
+		filterItem(){
 					let self = this
 					let listItem = this.$store.state.appConfig.listItemSelected;
 					self.objFilter.documents.item = []
@@ -130,23 +166,6 @@ export default {
 							}
 						})
 					}
-					return this.objFilter
-				}
-		}
-	},
-	props: {
-        isEndUserCpn: {
-            type: Boolean,
-            default: false
-		},
-		searchKey:{
-			type: String,
-			default:"",
-		}
-    },
-	methods:{
-		removeItem(id,type){
-			this.$store.commit('appConfig/removeItemSelected',{id:id,type:type})
 		},
 		rightClickHandler(event,item,type){
 			this.currentSelected = item;

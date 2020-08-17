@@ -269,8 +269,55 @@
             "list": "Danh sách action pack ",
             "objectType": "Loại đối tượng",
             "operation": "Thao tác với từng đối tượng",
-            "allOperation": "Thao tác với toàn bộ đối tượng"
-        }
+			"allOperation": "Thao tác với toàn bộ đối tượng"
+		},
+		"actionName":{
+			"account":{
+				"add":"Add",
+				"update":"Update",
+				"info":"Info",
+				"detail":"Detail",
+				"change_pass":"Change pass",
+				"disable":"Disable",
+				"change_avatar":"Change avatar",
+				"list":"List",
+				"set_role":"Set role"
+			},
+			"document_definition":{
+				"create" : "Tạo mới",
+				"edit" : "Chỉnh sửa",
+				"submit": "Gửi đi",
+				"drop":"Xóa",
+				"restore":"Khôi phục",
+				"list":"Danh sách",
+				"list_trash":"Thùng rác",
+				"list_instance":"Danh sách bản ghi"
+			},
+			"orgchart":{
+				"create" : "Tạo mới",
+				"update":"Cập nhật",
+				"drop":"Xóa",
+				"list":"Danh sách",
+				"detail":"Chi tiết"
+			},
+			"dasboard":{
+				"create" : "Tạo mới",
+				"update":"Cập nhật",
+				"view":"Xem",
+				"list":"Danh sách",
+				"drop":"Xóa"
+			},
+			"workflow_definition":{
+				"list" : "Danh sách",
+				"create" : "Tạo mới",
+				"deloy": "Deloy",
+				"drop":"Xóa",
+				"update":"Cập nhật",
+				"list_instance":"Danh sách bản ghi",
+				"start_instance":"Khởi tạo bản ghi"
+			}
+
+		}
     },
     "document": {
         "title": "Danh sách Document",
