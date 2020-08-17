@@ -76,8 +76,6 @@ export default {
 		 tab: 'tab-1',
 		 isEndUserCpn:true,
 		 searchKey:"",
-		//  sAppModule:{
-		//  }
 		 apps:{},
 		 listFavorite:[],
 		 arrType:{
@@ -89,16 +87,25 @@ export default {
 		 title:{
 		 },
 		 mapId:{
+			 orgchart:{
 
+			 },
+			 document:{
+
+			 },
+			 report:{
+
+			 },
+			 workflow:{
+
+			 }
 		 },
-
 		 }
 	},
 	created(){
 		appManagementApi.getActiveApp().then(res => {
 			if (res.status == 200) {
 				this.apps = res.data.listObject
-				console.log(res.data.listObject,"resdataaaaaaaaaaaaaa");
 			}
 			}).catch((err) => {
 		});
@@ -106,7 +113,6 @@ export default {
 		appManagementApi.getItemFavorite(userId).then(res => {
 			if (res.status == 200) {
 				this.checkTypeFavorite(res.data.listObject)
-				console.log(this.listFavorite,'listFavorite');
 			}
 			}).catch((err) => {
 		});
@@ -115,18 +121,110 @@ export default {
 		VuePerfectScrollbar,
 		AppDetail,
 	},
+	computed:{
+		sAppManagement(){
+			return this.$store.state.appConfig.listItemSelected
+		}
+	},
 	methods:{
 		clickDetails(item){
 			this.title.icon = item.iconName;
 			this.title.name = item.name;
 			appManagementApi.getAppDetails(item.id).then(res => {
-			if (res.status == 200) {
-				this.checkChildrenApp(res.data.listObject.childrenApp)
-				console.log(res.data.listObject);
-			}
+				if (res.status == 200) {
+					this.checkChildrenApp(res.data.listObject.childrenApp)
+				}
 			}).catch((err) => {
-		});
+			});
 			this.tab = 'tab-2'
+		},
+		getDocumentsApi(dataDoc,type=''){
+			documentApi.searchListDocuments(
+					{
+						search:'',
+						pageSize:50,
+						filter: [
+						{
+							column: 'id',
+							valueFilter: {
+								operation: 'IN',
+								values: dataDoc						
+							}
+						}
+						]
+					}
+				).then(resDoc => {
+					if(type == 'listFavorite'){
+						this.listFavorite.push(resDoc.data.listObject)
+					}
+					else{
+						debugger
+						this.$store.commit('appConfig/updateChildrenApps',{obj:resDoc.data.listObject,type:'documents'});
+					}
+				});
+		},
+		getOrgchartApi(dataOrg,type=''){
+			orgchartApi.getOrgchartList({
+								search:'',
+								pageSize:50,
+								filter: [
+								{
+									column: 'id',
+									valueFilter: {
+										operation: 'IN',
+										values: dataOrg						
+									}
+								}
+				]}).then(resOrg => {
+					if(type == 'listFavorite'){
+						this.listFavorite.push(resDoc.data.listObject)
+					}
+					else{
+						this.$store.commit('appConfig/updateChildrenApps',{obj:resOrg.data.listObject,type:'orgcharts'});
+					}
+				});
+		},
+		getDashBoardApi(dataRep,type =''){
+			dashboardApi.getDashboards({
+								search:'',
+								pageSize:50,
+								filter: [
+								{
+									column: 'id',
+									valueFilter: {
+										operation: 'IN',
+										values: dataRep						
+									}
+								}
+				]}).then(resRp => {
+					if(type == 'listFavorite'){
+						this.listFavorite.push(resDoc.data.listObject)
+					}
+					else{
+						this.$store.commit('appConfig/updateChildrenApps',{obj:resRp.data.listObject,type:'reports'});
+					}
+				});
+		},
+		getWorkFlowApi(dataW,type=''){
+				BpmnEngine.getListModels({
+								search:'',
+								pageSize:50,
+								filter: [
+								{
+									column: 'id',
+									valueFilter: {
+										operation: 'IN',
+										values: dataW						
+									}
+								}
+				]}).then(resW => {
+					if(type == 'listFavorite'){
+						this.listFavorite.push(resDoc.data.listObject)
+					}
+					else{
+						this.$store.commit('appConfig/updateChildrenApps',{obj:resW.data.listObject,type:'workflows'});
+					}
+				});
 		},
 		checkTypeFavorite(data){
 			let self = this
@@ -146,153 +244,79 @@ export default {
 			});
 			if(self.arrType.document.length > 0){
 				let dataDoc = self.arrType.document
-				documentApi.searchListDocuments(
-					{
-						search:'',
-						pageSize:50,
-						filter: [
-						{
-							column: 'id',
-							valueFilter: {
-								operation: 'IN',
-								values: dataDoc						
-							}
-						}
-						]
-					}
-				).then(resDoc => {
-					this.listFavorite.push(resDoc.data.listObject)
-				});
+				this.getDocumentsApi(dataDoc,'listFavorite')
+				console.log(this.listFavorite,'list favoriteeeeeeeeeeeee');
 			}
 			if(self.arrType.orgchart.length > 0){
 				let dataOrg = self.arrType.orgchart
-				orgchartApi.getOrgchartList({
-								search:'',
-								pageSize:50,
-								filter: [
-								{
-									column: 'id',
-									valueFilter: {
-										operation: 'IN',
-										values: dataOrg						
-									}
-								}
-				]}).then(resOrg => {
-					this.listFavorite.push(resDoc.data.listObject)
-				});
+				this.getOrgchartApi(dataOrg,'listFavorite')
 			}
 			if(self.arrType.report.length > 0){
 				let dataRep = self.arrType.report
-				dashboardApi.getDashboards({
-								search:'',
-								pageSize:50,
-								filter: [
-								{
-									column: 'id',
-									valueFilter: {
-										operation: 'IN',
-										values: dataRep						
-									}
-								}
-				]}).then(resRp => {
-					this.listFavorite.push(resRp.data.listObject)
-				});
+				this.getDashBoardApi(dataRep,'listFavorite')
 			}
 			if(self.arrType.workflow.length > 0){
-
+				let dataRep = self.arrType.workflow
+				this.getWorkFlowApi(dataRep,'listFavorite')
 			}
 		},
 		clickBack(){
 			this.tab = 'tab-1'
 		},
 		checkChildrenApp(data){
-				let self = this 
-			// if(data.hasOwnProperty('orgchart')){
-			// 	data.orgchart.forEach(function(e){
-			// 		console.log(e);
-			// 	})
-			// 	// let dataOrg = data.orgchart;
-			// 	orgchartApi.getOrgchartList({
-			// 					search:'',
-			// 					pageSize:50,
-			// 					filter: [
-			// 					{
-			// 						column: 'id',
-			// 						valueFilter: {
-			// 							operation: 'IN',
-			// 							values: dataOrg						
-			// 						}
-			// 					}
-			// 	]}).then(resOrg => {
-			// 		console.log(resOrg.data.listObject);
-			// 		this.$store.commit('appConfig/updateChildrenApps',{obj:resOrg.data.listObject,type:'orgcharts'});
-			// 	});
-			// }
+			let self = this 
+			if(data.hasOwnProperty('orgchart')){
+				data.orgchart.forEach(function(e){
+					self.arrType.orgchart.push(e.id);
+					self.mapId.orgchart[e.id] = e;
+				})
+				let dataOrg = self.arrType.orgchart;
+				this.getOrgchartApi(dataOrg)
+				console.log(self.mapId,'mapId');
+				console.log(this.sAppManagement,'dataStoredataStore');
+				for( let [key,value] of Object.entries(self.mapId.orgchart)){
+					console.log(key,value,'mapID');
+					this.sAppManagement.orgcharts.item.forEach(function(item,index){
+						console.log(item,index,'storeee');
+						if(item.id == key){
+							item.favorite = value.isFavorite
+							debugger
+						} 
+					})
+					console.log(this.sAppManagement.orgcharts.item);
+					
+				}
+				// console.log(this.sAppManagement,'dataStoredataStore');
+			}	
 			if(data.hasOwnProperty('document')){
 				data.document.forEach(function(e){
 					self.arrType.document.push(e.id);
-					self.mapId[e.id] = e;
+					self.mapId.document[e.id] = e;
 				})
-				
 				let dataDoc = self.arrType.document
-				documentApi.searchListDocuments(
-					{
-						search:'',
-						pageSize:50,
-						filter: [
-						{
-							column: 'id',
-							valueFilter: {
-								operation: 'IN',
-								values: dataDoc						
-							}
-						}
-						]
-					}
-				).then(resDoc => {
-					this.$store.commit('appConfig/updateChildrenApps',{obj:resDoc.data.listObject,type:'documents'});
-				});
-				let dataStore = this.$store.state.appConfig.listItemSelected
+				this.getDocumentsApi(dataDoc);
 				console.log(self.mapId,'mapId');
-				console.log(dataStore,'dataStoredataStore');
-			
+				console.log(this.sAppManagement,'dataStoredataStore');
 			}
-			// if(data.hasOwnProperty('workflow')){
-			// 	let dataW = data.workflow;
-			// 	BpmnEngine.getListModels({
-			// 					search:'',
-			// 					pageSize:50,
-			// 					filter: [
-			// 					{
-			// 						column: 'id',
-			// 						valueFilter: {
-			// 							operation: 'IN',
-			// 							values: dataW						
-			// 						}
-			// 					}
-			// 	]}).then(resW => {
-			// 		this.$store.commit('appConfig/updateChildrenApps',{obj:resW.data.listObject,type:'workflows'});
-			// 	});
-			// }
-			// if(data.hasOwnProperty('report')){
-			// 	let dataRep = data.report;
-			// 	dashboardApi.getDashboards({
-			// 		search:'',
-			// 		pageSize:50,
-			// 		filter: [
-			// 		{
-			// 			column: 'id',
-			// 			valueFilter: {
-			// 				operation: 'IN',
-			// 				values: dataRep						
-			// 			}
-			// 		}
-			// 	]}).then(resRp => {
-			// 		this.$store.commit('appConfig/updateChildrenApps',{obj:resRp.data.listObject,type:'reports'});
-			// 	});
-			// }
+			if(data.hasOwnProperty('workflow')){
+				data.workflow.forEach(function(e){
+					self.arrType.workflow.push(e.id);
+					self.mapId.workflow[e.id] = e;
+				})
+				let dataW = self.arrType.workflow
+				this.getWorkFlowApi(data)
+			}
+			if(data.hasOwnProperty('report')){
+				data.report.forEach(function(e){
+					self.arrType.report.push(e.id);
+					self.mapId.report[e.id] = e;
+				})
+				let dataRep = self.arrType.report
+				this.getDashBoardApi(dataRep);
+			}
 		}
 	}
+
 }
 </script>
 <style scoped>

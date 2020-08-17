@@ -150,7 +150,6 @@ export default {
             })
         },
         deleteApp(app) {
-            console.log(app[0].id);
             appManagementApi.deleteApp(app[0].id)
             .then(res => {
                 if (res.status == 200) {
