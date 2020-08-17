@@ -19,24 +19,28 @@
 					</v-toolbar-title>
 					<v-spacer></v-spacer>
 				</v-app-bar>
-				<div class="list-favorite">
-					<div class="title-favorite"><v-icon >mdi-star</v-icon><h4>{{$t('apps.favorite')}}</h4></div>
-					<ul style="margin:0 10px;">
-						<li v-for="i in 5" :key="i">Document demo ne ahihi <v-icon color="yellow" style="float:right;font-size:13px">mdi-star</v-icon></li>
-					</ul>
-				</div>
+			
+					<div class="list-favorite">
+						<div class="title-favorite"><v-icon >mdi-star</v-icon><h4>{{$t('apps.favorite')}}</h4></div>
+						<ul style="margin:0 10px;">
+							<VuePerfectScrollbar :style="{height: listFavoriteHeight}"  >
+								<li v-for="i in 10" :key="i">Document demo ne ahihi <v-icon color="yellow" style="float:right;font-size:13px">mdi-star</v-icon></li>
+							</VuePerfectScrollbar>
+						</ul>
+					</div>
+				
 				<!-- <hr> -->
 					<div class="title-list-app"> <v-icon>mdi-playlist-play</v-icon><h4>{{$t('apps.listApp')}}</h4></div>
 				<div class="list-app-cointaner">
-					 <!-- <VuePerfectScrollbar :style="{height: menuItemsHeight}"  > -->
+					 <VuePerfectScrollbar :style="{height: listAppHeight}"  class="d-flex flex-wrap" >
 						<div v-for="(item,i) in apps" :key="i" 
 							class="list-app-item"
-							@click="clickDetails(item.id)"
+							@click="clickDetails(item)"
 							>
 							<v-icon>mdi-folder</v-icon>
 							<h5>{{item.name}}</h5>
 						</div>
-					<!-- </VuePerfectScrollbar>	 -->
+					</VuePerfectScrollbar>	
 				</div>
 			</v-card>
         </v-tab-item>
@@ -44,7 +48,7 @@
          value='tab-2'
         >
           <v-card flat class="tab-detail">
-			  <v-card-title> <v-btn  @click="clickBack" icon><v-icon>mdi-keyboard-backspace</v-icon></v-btn> <v-icon>mdi-folder</v-icon> <h4>Bán hàng </h4></v-card-title>
+			  <v-card-title> <v-btn  @click="clickBack" icon><v-icon>mdi-keyboard-backspace</v-icon></v-btn> <v-icon>{{title.icon}}</v-icon> <h4>{{title.name}}</h4></v-card-title>
 				<v-text-field
 					:label="$t('apps.search')"
 					single-line
@@ -63,17 +67,24 @@
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import AppDetail from './AppDetail.vue';
 import {appManagementApi} from './../../api/AppManagement.js';
+import {documentApi} from './../../api/Document';
+import {orgchartApi} from './../../api/orgchart';
+import {dashboardApi} from './../../api/dashboard';
+import BpmnEngine from './../../api/BPMNEngine';
 export default {
 	data: function() {
         return {
-		 menuItemsHeight: '200px',
+		 listAppHeight: '200px',
+		 listFavoriteHeight:'150px',
 		 tab: 'tab-1',
 		 isEndUserCpn:true,
 		//  sAppModule:{
 		//  }
-		 apps:{}
+		 apps:{},
+		 title:{
 		 }
-		
+
+		 }
 	},
 	created(){
 		appManagementApi.getActiveApp().then(res => {
@@ -90,12 +101,14 @@ export default {
 		AppDetail,
 	},
 	methods:{
-		clickDetails(id){
-			// alert(id)
-			appManagementApi.getAppDetails(id).then(res => {
+		clickDetails(item){
+			this.title.icon = item.iconName;
+			this.title.name = item.name;
+			appManagementApi.getAppDetails(item.id).then(res => {
 			if (res.status == 200) {
-				// debugger
 				console.log(res.data.listObject,"resdataaaaaaaaaaaaaa");
+				this.checkChildrenApp(res.data.listObject.childrenApp)
+				// debugger
 			}
 			}).catch((err) => {
 		});
@@ -104,6 +117,84 @@ export default {
 		clickBack(){
 			this.tab = 'tab-1'
 		},
+		checkChildrenApp(data){
+			if(data.hasOwnProperty('orgchart')){
+						let dataOrg = data.orgchart;
+						orgchartApi.getOrgchartList({
+										search:'',
+										pageSize:50,
+										filter: [
+										{
+											column: 'id',
+											valueFilter: {
+												operation: 'IN',
+												values: dataOrg						
+											}
+										}
+						]}).then(resOrg => {
+							console.log(resOrg.data.listObject);
+							this.$store.commit('appConfig/updateChildrenApps',{obj:resOrg.data.listObject,type:'orgcharts'});
+						});
+			}
+			if(data.hasOwnProperty('document')){
+						let dataDoc = data.document;
+								
+						documentApi.searchListDocuments(
+							{
+								search:'',
+								pageSize:50,
+								filter: [
+								{
+									column: 'id',
+									valueFilter: {
+										operation: 'IN',
+										values: dataDoc						
+									}
+								}
+								]
+							}
+						).then(resDoc => {
+							this.$store.commit('appConfig/updateChildrenApps',{obj:resDoc.data.listObject,type:'documents'});
+							
+						});
+			}
+			if(data.hasOwnProperty('workflow')){
+						let dataW = data.workflow;
+						debugger
+						BpmnEngine.getListModels({
+										search:'',
+										pageSize:50,
+										filter: [
+										{
+											column: 'id',
+											valueFilter: {
+												operation: 'IN',
+												values: dataW						
+											}
+										}
+						]}).then(resW => {
+							this.$store.commit('appConfig/updateChildrenApps',{obj:resW.data.listObject,type:'workflows'});
+							debugger
+						});
+			}
+			if(data.hasOwnProperty('report')){
+						let dataRep = data.report;
+						dashboardApi.searchDashboard({
+										search:'',
+										pageSize:50,
+										filter: [
+										{
+											column: 'id',
+											valueFilter: {
+												operation: 'IN',
+												values: dataRep						
+											}
+										}
+						]}).then(resRp => {
+							this.$store.commit('appConfig/updateChildrenApps',{obj:resRp.data.listObject,type:'reports'});
+						});
+			}
+		}
 	}
 }
 </script>

@@ -395,7 +395,7 @@
         "header": {
             "id": "ID",
             "name": "Application Name",
-            "note": "Note",
+            "description": "Description",
             "icon": "Icon",
             "price": "Price",
             "status": "Status",

@@ -12,13 +12,13 @@
 					</ul>
 			</div>	
 		</VuePerfectScrollbar>
-		<context-menu  ref="contextMenu" />
+		<context-menu ref="contextMenu"></context-menu>
   </div>
 </template>
 
 <script>
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
-import ContextMenu from './ContextMenu'
+import ContextMenu from './ContextMenu.vue';
 export default {
 	components:{
 		'context-menu': ContextMenu,
@@ -73,7 +73,7 @@ export default {
 			// this.currentSelected = item;
 			event.stopPropagation();
 			event.preventDefault();
-			// debugger
+			debugger
 			this.$refs.contextMenu.setContextItem(this.contextMenus)
 			this.$refs.contextMenu.show(event)
 		}, 	

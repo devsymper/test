@@ -407,7 +407,7 @@
         "header": {
             "id": "ID",
             "name": "Tên ứng dụng",
-            "note": "Ghi chú",
+            "description": "Mô tả",
             "icon": "Icon",
             "price": "Giá",
             "status": "Kích hoạt",

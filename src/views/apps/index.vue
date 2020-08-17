@@ -57,15 +57,22 @@ export default {
                    return{
                          listObject: res.data.listObject,
                          columns: [
-                                {name: "id", title: "id ", 	type: "text", },
-                                {name: "name", title: "Tên ứng dụng", type: "text"},
-                                {name: "iconName", title: "icon", type: "text",},
-                                    // renderer:  function(instance, td, row, col, prop, value, cellProperties) {
-                                    //         return td;
-                                    //     },},
-                                {name: "status", title: "Trạng thái", type: "text"},
-                                {name: "createdAt", title: "Thời gian tạo", type: "text"},
-                                {name: "updatedAt", title: "Thời gian cập nhật", type: "text"},
+                                {name: "id", title: "id", 	type: "text", },
+                                {name: "name", title: "name", type: "text"},
+                                {name: "iconName", title: "icon", type: "text",
+                                    renderer:  function(instance, td, row, col, prop, value, cellProperties) {
+										let icon;
+										debugger
+										icon = document.createElement('i');
+										icon.classList.add('mdi');
+										icon.classList.add(value[0]);
+										icon.style.lineHeight = "15px";
+										td.appendChild(icon);
+                                            return td;
+                                        },},
+                                {name: "status", title: "status", type: "text"},
+                                {name: "createdAt", title: "created_at", type: "text"},
+                                {name: "updatedAt", title: "updated_at", type: "text"},
                          ],
                    }
                 }
@@ -184,6 +191,7 @@ export default {
 		checkChildrenApp(data){
 			if(data.hasOwnProperty('orgchart')){
 						let dataOrg = data.orgchart;
+						debugger
 						orgchartApi.getOrgchartList({
 										search:'',
 										pageSize:50,
@@ -198,11 +206,12 @@ export default {
 						]}).then(resOrg => {
 							console.log(resOrg.data.listObject);
 							this.$store.commit('appConfig/updateChildrenApps',{obj:resOrg.data.listObject,type:'orgcharts'});
-							// debugger
+							debugger
 						});
 			}
 			if(data.hasOwnProperty('document')){
 						let dataDoc = data.document;
+								
 						documentApi.searchListDocuments(
 							{
 								search:'',
@@ -217,13 +226,14 @@ export default {
 								}
 								]
 							}
-						).then(resOrg => {
-							this.$store.commit('appConfig/updateChildrenApps',{obj:resOrg.data.listObject,type:'documents'});
-							debugger
+						).then(resDoc => {
+							this.$store.commit('appConfig/updateChildrenApps',{obj:resDoc.data.listObject,type:'documents'});
+							
 						});
 			}
 			if(data.hasOwnProperty('workflow')){
 						let dataW = data.workflow;
+						debugger
 						BpmnEngine.getListModels({
 										search:'',
 										pageSize:50,
@@ -235,8 +245,9 @@ export default {
 												values: dataW						
 											}
 										}
-						]}).then(resOrg => {
-							this.$store.commit('appConfig/updateChildrenApps',{obj:resOrg.data.listObject,type:'workflows'});
+						]}).then(resW => {
+							this.$store.commit('appConfig/updateChildrenApps',{obj:resW.data.listObject,type:'workflows'});
+							debugger
 						});
 			}
 			if(data.hasOwnProperty('report')){
@@ -252,11 +263,10 @@ export default {
 												values: dataRep						
 											}
 										}
-						]}).then(resOrg => {
-							this.$store.commit('appConfig/updateChildrenApps',{obj:resOrg.data.listObject,type:'reports'});
+						]}).then(resRp => {
+							this.$store.commit('appConfig/updateChildrenApps',{obj:resRp.data.listObject,type:'reports'});
 						});
 			}
-
 		}
       
     },

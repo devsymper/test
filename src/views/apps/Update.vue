@@ -284,7 +284,10 @@ export default {
 				
         },
          updateApp() {
-            console.log('update app');
+			 delete this.currentApp.childrenApp
+			this.updateListItem(this.$store.state.appConfig.listItemSelected)
+			console.log(this.currentApp,'update app');
+			debugger
             // let req = new Api(this.apiUrl);
             // req.put(this.appUrl, {...this.currentApp, objects: this.getListObjsInShort()})
             // .then((res) => {
