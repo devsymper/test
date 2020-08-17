@@ -407,12 +407,18 @@
         "header": {
             "id": "ID",
             "name": "Tên ứng dụng",
-            "description": "Mô tả",
+            "note": "Mô tả",
             "icon": "Icon",
             "price": "Giá",
             "status": "Kích hoạt",
             "created_at": "Ngày tạo",
             "updated_at": "Cập nhật lần cuối"
+		},
+		"listType":{
+			"documents":"Văn bản",
+			"workflows":"Quy trình",
+			"reports":"Báo cáo",
+			"orgcharts":"Sơ đồ tổ chức"
 		},
 		"addApp" : "Thêm ứng dụng",
 		"editApp" : "Sửa ứng dụng",

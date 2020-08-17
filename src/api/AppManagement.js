@@ -19,5 +19,15 @@ export const appManagementApi = {
 	getActiveApp() {
 		return coreApi.get('application-active')
 	},
+	updateApp(data) {
+		return coreApi.put("application", data)
+	},
+	addFavoriteItem(userId, objectIdentifier, objectType) {
+		return coreApi.post('app-item-favorite', {
+			userId: userId,
+			objectIdentifier: objectIdentifier,
+			objectType: objectType
+		})
+	}
 
 };

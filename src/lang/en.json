@@ -395,12 +395,18 @@
         "header": {
             "id": "ID",
             "name": "Application Name",
-            "description": "Description",
+            "note": "Description",
             "icon": "Icon",
             "price": "Price",
             "status": "Status",
             "created_at": "Date create",
             "updated_at": "Last update"
+		},
+		"listType":{
+			"documents":"Documents",
+			"workflows":"Work flows",
+			"reports":"Reports",
+			"orgcharts":"Orgcharts"
 		},
 		"addApp" : "Add application",
 		"editApp" : "Edit application",

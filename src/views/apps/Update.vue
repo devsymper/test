@@ -203,16 +203,6 @@ export default {
 			self.currentApp.childrenApp = self.childrenApp
 			console.log();
 		},
-        // updateApp() {
-        //     console.log('update app');
-        //     // let req = new Api(this.apiUrl);
-        //     // req.put(this.appUrl, {...this.currentApp, objects: this.getListObjsInShort()})
-        //     // .then((res) => {
-        //     //     this.$emit("update-app", res)
-        //     // }).catch((err) => {
-        //     //     this.showError()
-        //     // });
-        // },
         pickIcon(data) {
             this.currentApp.iconName = data.icon.trim();
             this.currentApp.iconType = data.type;
@@ -287,7 +277,13 @@ export default {
 			 delete this.currentApp.childrenApp
 			this.updateListItem(this.$store.state.appConfig.listItemSelected)
 			console.log(this.currentApp,'update app');
-			debugger
+			let data = JSON.stringify(this.currentApp);
+			appManagementApi.updateApp(data).then(res => {
+				  this.$emit("update-app", res)
+			}).catch(err => {
+				this.showError()
+			})
+			.always(() => {});;
             // let req = new Api(this.apiUrl);
             // req.put(this.appUrl, {...this.currentApp, objects: this.getListObjsInShort()})
             // .then((res) => {

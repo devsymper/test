@@ -19,17 +19,20 @@
 	methods:{
 		clickRow(item){
 			item.callback(item);
+			// debugger
 		},
 		show(e){
 			this.isShowContext = true;
-			this.calPosition(e)
+			// debugger
+			this.calPosition(e);
 		},
 		hide(){
 			this.isShowContext = false;
 		},
 		calPosition(event){
-			this.top = event.pageY  ;
-			this.left = event.pageX;
+			// debugger
+			this.top = event.pageY;
+			this.left = event.pageX-200;
 		},
 		setContextItem(ctx){
 			this.contextMenu = ctx;

@@ -62,7 +62,6 @@ export default {
                                 {name: "iconName", title: "icon", type: "text",
                                     renderer:  function(instance, td, row, col, prop, value, cellProperties) {
 										let icon;
-										debugger
 										icon = document.createElement('i');
 										icon.classList.add('mdi');
 										icon.classList.add(value[0]);
@@ -70,7 +69,19 @@ export default {
 										td.appendChild(icon);
                                             return td;
                                         },},
-                                {name: "status", title: "status", type: "text"},
+								{name: "status", title: "status", type: "text",
+									renderer:  function(instance, td, row, col, prop, value, cellProperties) {
+										let icon;
+										if(value[0] == 1){
+											icon = document.createElement('i');
+											icon.classList.add('mdi mdi-check');
+										// icon.classList.add(value[0]);
+											icon.style.lineHeight = "15px";
+											td.appendChild(icon);
+											return td;
+										}
+										},
+								},
                                 {name: "createdAt", title: "created_at", type: "text"},
                                 {name: "updatedAt", title: "updated_at", type: "text"},
                          ],
@@ -191,7 +202,6 @@ export default {
 		checkChildrenApp(data){
 			if(data.hasOwnProperty('orgchart')){
 						let dataOrg = data.orgchart;
-						debugger
 						orgchartApi.getOrgchartList({
 										search:'',
 										pageSize:50,
@@ -206,7 +216,6 @@ export default {
 						]}).then(resOrg => {
 							console.log(resOrg.data.listObject);
 							this.$store.commit('appConfig/updateChildrenApps',{obj:resOrg.data.listObject,type:'orgcharts'});
-							debugger
 						});
 			}
 			if(data.hasOwnProperty('document')){
@@ -233,7 +242,6 @@ export default {
 			}
 			if(data.hasOwnProperty('workflow')){
 						let dataW = data.workflow;
-						debugger
 						BpmnEngine.getListModels({
 										search:'',
 										pageSize:50,
@@ -247,12 +255,11 @@ export default {
 										}
 						]}).then(resW => {
 							this.$store.commit('appConfig/updateChildrenApps',{obj:resW.data.listObject,type:'workflows'});
-							debugger
 						});
 			}
 			if(data.hasOwnProperty('report')){
 						let dataRep = data.report;
-						dashboardApi.searchDashboard({
+						dashboardApi.getDashboards({
 										search:'',
 										pageSize:50,
 										filter: [

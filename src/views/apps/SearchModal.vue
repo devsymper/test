@@ -34,21 +34,21 @@ export default {
             listItems:{
 			   documents:{
 				   icon : 'mdi-file-document',
-				   title: 'Documents',
-				   name: 'documents',
+				   title: this.$t('apps.listType.documents'),
+				   name:  'documents',
 				   item:[
 				   ]
 			   },
 			   orgcharts:{
  				   icon : 'mdi-folder',
-				   title: 'Orgcharts',
+				   title: this.$t('apps.listType.orgcharts'),
 				   name: 'orgcharts',
 				   item:[
 				   ]
 			   },
 			   reports:{
-				    icon : 'mdi-view-dashboard',
-				   title: 'Reports',
+				   icon : 'mdi-view-dashboard',
+				   title: this.$t('apps.listType.reports'),
 				   name: 'reports',
 				   item:[
 				   ]
@@ -56,16 +56,15 @@ export default {
 			   workflows:
 			   {
 			       icon : 'mdi-lan',
-				   title: 'Workflows',
+				   title:  this.$t('apps.listType.workflows'),
 				   name: 'workflows',
 				   item:[
-						
 				   ]
 			   },
 			},  
     	};
 	},
-	 components: {
+	components: {
         VuePerfectScrollbar,
 	},
 	created(){
@@ -76,19 +75,22 @@ export default {
 			this.$store.commit('appConfig/updateListItemSelected',{obj:obj,type:type});
 		},
 		getListSearch(value){
+			this.listItems.documents.item =[]
+			this.listItems.orgcharts.item =[]
+			this.listItems.workflows.item =[]
+			this.listItems.reports.item =[]
 			orgchartApi.getOrgchartList({search:value,pageSize:50}).then(res => {
-			this.listItems.orgcharts.item = res.data.listObject;
+				this.listItems.orgcharts.item = res.data.listObject;
 			});
 			documentApi.searchListDocuments({search:value,pageSize:50}).then(res => {
 				this.listItems.documents.item = res.data.listObject;
 			});
 			BpmnEngine.getListModels({search:value,pageSize:50}).then(res => {
-				console.log(res.data);
 				this.listItems.workflows.item = res.data.listObject;
 			});
-			dashboardApi.searchDashboard({search:value,pageSize:50}).then(res => {
+			dashboardApi.getDashboards({search:value,pageSize:50}).then(res => {
 				this.listItems.reports.item = res.data.listObject;
-				console.log(res.data);
+				console.log(res.data,'getDashboardgetDashboardgetDashboardgetDashboardgetDashboard');
 			});
 		},
 	},
@@ -105,16 +107,17 @@ export default {
 	font: 13px roboto;
 }
 .search-modal >>> .v-input__control{
+	box-shadow: unset;
 	text-shadow: unset;
 }
 .search-modal >>> .v-input__control .v-input__slot{
-    background-color: lightgray;
+    background-color: #f7f7f7;
     min-height: unset;
     height: 36px;
-	box-shadow: unset;
+	box-shadow: unset !important;
 }
 .search-modal >>> .v-input__control .v-icon{
-	font-size:13px
+	font-size: 13px;
 }
 .search-modal >>> .v-input__control .v-text-field__details{
 	display: none;
@@ -125,14 +128,14 @@ export default {
 .search-modal >>> .app-item .title-app{
 	display: flex;
 	cursor: pointer;
-	padding:10px 15px;
+	padding:10px 0px;
 	
 }
 .search-modal >>> .app-item .title-app .v-icon{
 	font-size: 13px;
 }
 .search-modal >>> .app-item .title-app h4{
-	padding-left:8px;
+	padding-left:10px;
 	font-weight: unset;
 }
 .search-modal >>> .app-item .app-child-item .v-icon{
@@ -143,10 +146,11 @@ export default {
 }
 .search-modal >>> .app-item li{
 	cursor: pointer;
-	padding: 8px 12px;
+	padding: 8px 0px;
 	margin-right: 10px;
 }
 .search-modal >>> .app-item li:hover{
-	background-color:lightgray;
+	background-color:#f7f7f7;
+	border-radius: 10px;
 }
 </style>

@@ -6,7 +6,6 @@
 			v-show="false"
 		>
 		</v-tabs>
-      <!-- -->
        <v-tabs-items v-model="tab">
         <v-tab-item
          value='tab-1'
@@ -19,7 +18,6 @@
 					</v-toolbar-title>
 					<v-spacer></v-spacer>
 				</v-app-bar>
-			
 					<div class="list-favorite">
 						<div class="title-favorite"><v-icon >mdi-star</v-icon><h4>{{$t('apps.favorite')}}</h4></div>
 						<ul style="margin:0 10px;">
@@ -28,20 +26,18 @@
 							</VuePerfectScrollbar>
 						</ul>
 					</div>
-				
-				<!-- <hr> -->
 					<div class="title-list-app"> <v-icon>mdi-playlist-play</v-icon><h4>{{$t('apps.listApp')}}</h4></div>
-				<div class="list-app-cointaner">
-					 <VuePerfectScrollbar :style="{height: listAppHeight}"  class="d-flex flex-wrap" >
-						<div v-for="(item,i) in apps" :key="i" 
-							class="list-app-item"
-							@click="clickDetails(item)"
-							>
-							<v-icon>mdi-folder</v-icon>
-							<h5>{{item.name}}</h5>
-						</div>
-					</VuePerfectScrollbar>	
-				</div>
+					<div class="list-app-cointaner">
+						<VuePerfectScrollbar :style="{height: listAppHeight}"  class="d-flex flex-wrap" >
+							<div v-for="(item,i) in apps" :key="i" 
+								class="list-app-item"
+								@click="clickDetails(item)"
+								>
+								<v-icon>mdi-folder</v-icon>
+								<h5>{{item.name}}</h5>
+							</div>
+						</VuePerfectScrollbar>	
+					</div>
 			</v-card>
         </v-tab-item>
         <v-tab-item
@@ -54,8 +50,9 @@
 					single-line
 					solo
 					append-icon="mdi-magnify"
+					v-model="searchKey"
 				></v-text-field>
-			  <AppDetail :isEndUserCpn="isEndUserCpn" />
+			  <AppDetail :isEndUserCpn="isEndUserCpn" :searchKey="searchKey" />
           </v-card>
         </v-tab-item>
       </v-tabs-items>
@@ -78,6 +75,7 @@ export default {
 		 listFavoriteHeight:'150px',
 		 tab: 'tab-1',
 		 isEndUserCpn:true,
+		 searchKey:"",
 		//  sAppModule:{
 		//  }
 		 apps:{},
@@ -106,9 +104,8 @@ export default {
 			this.title.name = item.name;
 			appManagementApi.getAppDetails(item.id).then(res => {
 			if (res.status == 200) {
-				console.log(res.data.listObject,"resdataaaaaaaaaaaaaa");
+				// console.log(res.data.listObject,"resdataaaaaaaaaaaaaa");
 				this.checkChildrenApp(res.data.listObject.childrenApp)
-				// debugger
 			}
 			}).catch((err) => {
 		});
@@ -119,28 +116,8 @@ export default {
 		},
 		checkChildrenApp(data){
 			if(data.hasOwnProperty('orgchart')){
-						let dataOrg = data.orgchart;
-						orgchartApi.getOrgchartList({
-										search:'',
-										pageSize:50,
-										filter: [
-										{
-											column: 'id',
-											valueFilter: {
-												operation: 'IN',
-												values: dataOrg						
-											}
-										}
-						]}).then(resOrg => {
-							console.log(resOrg.data.listObject);
-							this.$store.commit('appConfig/updateChildrenApps',{obj:resOrg.data.listObject,type:'orgcharts'});
-						});
-			}
-			if(data.hasOwnProperty('document')){
-						let dataDoc = data.document;
-								
-						documentApi.searchListDocuments(
-							{
+				let dataOrg = data.orgchart;
+				orgchartApi.getOrgchartList({
 								search:'',
 								pageSize:50,
 								filter: [
@@ -148,51 +125,67 @@ export default {
 									column: 'id',
 									valueFilter: {
 										operation: 'IN',
-										values: dataDoc						
+										values: dataOrg						
 									}
 								}
-								]
+				]}).then(resOrg => {
+					console.log(resOrg.data.listObject);
+					this.$store.commit('appConfig/updateChildrenApps',{obj:resOrg.data.listObject,type:'orgcharts'});
+				});
+			}
+			if(data.hasOwnProperty('document')){
+				let dataDoc = data.document;
+				documentApi.searchListDocuments(
+					{
+						search:'',
+						pageSize:50,
+						filter: [
+						{
+							column: 'id',
+							valueFilter: {
+								operation: 'IN',
+								values: dataDoc						
 							}
-						).then(resDoc => {
-							this.$store.commit('appConfig/updateChildrenApps',{obj:resDoc.data.listObject,type:'documents'});
-							
-						});
+						}
+						]
+					}
+				).then(resDoc => {
+					this.$store.commit('appConfig/updateChildrenApps',{obj:resDoc.data.listObject,type:'documents'});
+				});
 			}
 			if(data.hasOwnProperty('workflow')){
-						let dataW = data.workflow;
-						debugger
-						BpmnEngine.getListModels({
-										search:'',
-										pageSize:50,
-										filter: [
-										{
-											column: 'id',
-											valueFilter: {
-												operation: 'IN',
-												values: dataW						
-											}
-										}
-						]}).then(resW => {
-							this.$store.commit('appConfig/updateChildrenApps',{obj:resW.data.listObject,type:'workflows'});
-							debugger
-						});
+				let dataW = data.workflow;
+				BpmnEngine.getListModels({
+								search:'',
+								pageSize:50,
+								filter: [
+								{
+									column: 'id',
+									valueFilter: {
+										operation: 'IN',
+										values: dataW						
+									}
+								}
+				]}).then(resW => {
+					this.$store.commit('appConfig/updateChildrenApps',{obj:resW.data.listObject,type:'workflows'});
+				});
 			}
 			if(data.hasOwnProperty('report')){
-						let dataRep = data.report;
-						dashboardApi.searchDashboard({
-										search:'',
-										pageSize:50,
-										filter: [
-										{
-											column: 'id',
-											valueFilter: {
-												operation: 'IN',
-												values: dataRep						
-											}
-										}
-						]}).then(resRp => {
-							this.$store.commit('appConfig/updateChildrenApps',{obj:resRp.data.listObject,type:'reports'});
-						});
+				let dataRep = data.report;
+				dashboardApi.getDashboards({
+								search:'',
+								pageSize:50,
+								filter: [
+								{
+									column: 'id',
+									valueFilter: {
+										operation: 'IN',
+										values: dataRep						
+									}
+								}
+				]}).then(resRp => {
+					this.$store.commit('appConfig/updateChildrenApps',{obj:resRp.data.listObject,type:'reports'});
+				});
 			}
 		}
 	}
@@ -211,9 +204,14 @@ export default {
 	padding: 5px 10px;
 }
 .end-user-popup >>> .title-favorite,
-.end-user-popup >>> .title-list-app{
+.end-user-popup >>> .title-list-app {
 	display: flex;
 	margin: 10px 15px;
+}
+.end-user-popup >>> .title-list-app {
+	border-top: 1px solid lightgrey;
+	padding-top: 8px;
+
 }
 .end-user-popup >>> .title-favorite .v-icon,
 .end-user-popup >>> .title-list-app .v-icon{
@@ -234,15 +232,14 @@ export default {
 	margin-left:auto;
 }
 .end-user-popup >>> .list-app-cointaner .list-app-item:hover{
-	background-color: lightgray;
+	background-color: #f7f7f7;
 	cursor: pointer;
-	
 }
 .end-user-popup >>> .list-app-cointaner .list-app-item{
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	margin-right:auto;
+	/* margin-right:8px; */
 	/* margin-left:auto; */
 	margin-bottom: 12px;
 }
@@ -269,10 +266,12 @@ export default {
 	margin: 0px 6px;
 }
 .end-user-popup >>> .tab-detail .v-input__control .v-input__slot{
-    background-color: lightgray;
+    background-color: #f7f7f7;
     min-height: unset;
     height: 30px;
 	box-shadow: unset;
+	margin: 8px;
+	width: unset;
 }
 .end-user-popup >>> .tab-detail .v-input__control .v-input__slot .v-label{
     font: 12px Roboto !important;

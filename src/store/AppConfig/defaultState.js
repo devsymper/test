@@ -4,19 +4,7 @@ const defaultState = {
 			icon: 'mdi-file-document',
 			title: 'Documents',
 			name: 'documents',
-			item: [{
-					id: 1,
-					name: 'adn2'
-				},
-				{
-					id: 3,
-					name: 'adn2'
-				},
-				{
-					id: 2,
-					name: 'adn2'
-				},
-			]
+			item: []
 		},
 		orgcharts: {
 			icon: 'mdi-view-dashboard',
@@ -38,5 +26,4 @@ const defaultState = {
 		},
 	}
 };
-
 export default defaultState;

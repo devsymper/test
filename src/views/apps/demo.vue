@@ -269,17 +269,11 @@ import { appConfigs } from '../../configs';
 		customAPIResult: {
 
 			reformatData(res){
-
 				console.log(res.data,'res.data');
-
 				self.setDataHotTable(res.data);
-
 				console.log(self.dataH,'done data');
-
 				// return dataRes
-
 				return self.dataH
-
 			}
 
 		},
@@ -299,57 +293,29 @@ import { appConfigs } from '../../configs';
 						type: "text", 
 
 						renderer:  function(instance, td, row, col, prop, value, cellProperties) {
-
 							let escaped = Handsontable.helper.stringify(value), div,icon,span,iconStar;
-
 								// icon 1
-
 								div = document.createElement('span');
-
 								icon = document.createElement('I');
-
 								icon.classList.add('mdi');
-
 								icon.classList.add(value[0]);
-
 								icon.style.lineHeight = "15px";
-
 								//span name
-
 								span = document.createElement('span');
-
 								span.appendChild( document.createTextNode(value[1]) );
-
 								//icon favorite
-
 									iconStar = document.createElement('i');
-
 									iconStar.classList.add('mdi');
-
-
-
 									iconStar.classList.add(value[2]);
-
 									iconStar.style.lineHeight = "15px";
-
-
-
 								Handsontable.dom.empty(td);
-
 								div.appendChild(icon);
-
 								div.appendChild(span);
-
 								div.appendChild(iconStar);	
-
 								td.appendChild(div);
-
 								// console.log(icon,'iconiconiconiconiconiconicon');
-
 								// console.log(span,'spanspanspanspanspanspanspanspan');
-
 								// console.log(iconStar,'iconStarssssssssssssssssssss');
-
 							return td;
 
 						},
