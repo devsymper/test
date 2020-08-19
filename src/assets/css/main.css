@@ -333,7 +333,7 @@ html {
     text-transform: unset!important;
     max-width: 200px;
     font-weight: 400;
-    white-space: nowrap;
+    white-space: nowrap!important;
     overflow: hidden;
     text-overflow: ellipsis;
     justify-content: left;
@@ -388,10 +388,18 @@ html {
     cursor: pointer;
     font-size: 12px;
     display: none;
+    height: 15px;
+    width: 15px;
+    line-height: 15px;
 }
 
 .symper-app-tab:hover .close-tab-btn {
     display: inline-block;
+}
+
+.symper-app-tab {
+    display: inline-block!important;
+    line-height: 40px!important;
 }
 
 .close-tab-btn:hover {
@@ -659,4 +667,8 @@ html {
 
 .position-absolute {
     position: absolute!important;
+}
+
+.symper-tab-active {
+    background-color: #ffeee1!important;
 }
