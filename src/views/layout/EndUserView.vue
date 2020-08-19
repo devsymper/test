@@ -6,12 +6,24 @@
                 <div class="w-100 app-header-bg-color" style="border-bottom:1px solid #cccccc">
                     <div style="width:calc(100% - 200px)" class="float-left">
                         <v-tabs
+                            hide-slider
+                            active-class="symper-tab-active"
                             @change="handleChangeTab"
                             v-model="currentTabIndex"
                             class="sym-small-size "
                             color="orange accent-4">
                             <v-tab class="symper-app-tab" v-for="(item, idx) in tabUrlItems" :key="idx">
-                                {{ item.title }} 
+                                <v-tooltip bottom>
+                                    <template v-slot:activator="{ on, attrs }">
+                                        <span 
+                                        v-bind="attrs"
+                                        v-on="on">
+                                            {{ item.title }}
+                                        </span> 
+                                    </template>
+                                    <span>{{ item.title }} </span>
+                                </v-tooltip>
+                                
                                 <i class="mdi mdi-close float-right close-tab-btn" @click.stop="closeTab(idx)"></i>
                             </v-tab>
                         </v-tabs>
