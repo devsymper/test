@@ -804,7 +804,7 @@ export default class Table {
             manualRowResize: true,
             hiddenColumns: {
                 columns: thisObj.columnsInfo.hiddenColumns,
-                indicators: false
+                indicators: true
             },
             // rowHeights: 29,
             // minSpareRows: 1,
@@ -836,18 +836,20 @@ export default class Table {
             afterRender: function(isForced) {
                 if (thisObj.tableHasRowSum)
                     $('.handsontable  span.rowHeader').last().text('Tổng').css({ 'font-weight': 'bold' })
-
+                console.log("columns", this);
                 let tbHeight = this.container.getElementsByClassName('htCore')[0].getBoundingClientRect().height;
+                // debugger
+                // this.getPlugin('hiddenColumns').hiddenColumns(thisObj.columnsInfo.hiddenColumns)
                 if (tbHeight < MAX_TABLE_HEIGHT) {} else {
                     $(this.rootElement).css('height', MAX_TABLE_HEIGHT);
                 }
                 if (!this.reRendered && thisObj.tableHasRowSum) {
                     this.reRendered = true;
                     setTimeout((hotTb) => {
-
-                        for (let index = 0; index < hotTb.getDataAtRow(0).length; index++) {
-                            // hotTb.setCellMeta(hotTb.countRows() - 1, index, 'readOnly', true);
-                        }
+                        // hotTb.getPlugin('hiddenColumns').hiddenColumns(thisObj.columnsInfo.hiddenColumns)
+                        // for (let index = 0; index < hotTb.getDataAtRow(0).length; index++) {
+                        //     // hotTb.setCellMeta(hotTb.countRows() - 1, index, 'readOnly', true);
+                        // }
                         hotTb.render();
                     }, 500, this);
                 }
@@ -1074,8 +1076,8 @@ export default class Table {
 
         }
         // thêm cột ẩn là id của sqllite
-        columns.push({ data: 'childObjectId', type: 'numeric' });
-        columns.push({ data: 's_table_id_sql_lite', type: 'numeric' });
+        columns.push({ data: 'childObjectId', type: 'numeric', renderer: function() {} });
+        columns.push({ data: 's_table_id_sql_lite', type: 'numeric', renderer: function() {} });
         hiddenColumns.push(columns.length - 2);
         hiddenColumns.push(columns.length - 1);
         return {

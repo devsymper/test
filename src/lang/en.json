@@ -303,6 +303,13 @@
                 }
             }
         },
+        "submit": {
+            "fab": {
+                "submit": "Submit",
+                "draft": "Save to Draft",
+                "toggleSize": "Toggle resize page"
+            }
+        },
         "process": {
             "header_bar": {
                 "undo": "Undo ",

@@ -7,9 +7,9 @@
             :style="{'width':docSize, 'height':'100%'}"
         >
             <div v-html="contentDocument"></div>
-            <button v-on:click="togglePageSize" v-show="!isQickSubmit" id="toggle-doc-size">
+            <!-- <button v-on:click="togglePageSize" v-show="!isQickSubmit" id="toggle-doc-size">
                 <span class="mdi mdi-arrow-horizontal-lock"></span>
-            </button>
+            </button> -->
             <autocomplete-input
                 ref="autocompleteInput"
                 @after-select-row="afterSelectRowAutoComplete"
@@ -59,19 +59,52 @@
                         <v-progress-circular indeterminate v-show="isSubmitting" color="red"></v-progress-circular>
                     </v-btn>
                 </template>
-                <v-btn fab dark small color="green" @click="handlerSubmitDocumentClick">
-                    <v-icon>mdi-content-save</v-icon>
-                </v-btn>
-                <v-btn
-                        v-if="this.isDraft != 1"
-                        fab
-                        dark
-                        small
-                        color="indigo"
-                        @click="handlerDraftClick"
-                    >
-                        <v-icon>mdi-trash-can-outline</v-icon>
-                    </v-btn>
+                
+                <v-tooltip left>
+                    <template v-slot:activator="{ on }">
+                        <div v-on="on">
+                            <v-btn fab dark small color="green" @click="handlerSubmitDocumentClick">
+                                <v-icon>mdi-content-save</v-icon>
+                            </v-btn>
+                        </div>
+                    </template>
+                    <span>{{$t('document.submit.fab.submit')}}</span>
+                </v-tooltip>
+                
+                <v-tooltip left>
+                    <template v-slot:activator="{ on }">
+                        <div v-on="on">
+                            <v-btn
+                                v-if="isDraft != 1"
+                                fab
+                                dark
+                                small
+                                color="indigo"
+                                @click="handlerDraftClick"
+                            >
+                                <v-icon>mdi-trash-can-outline</v-icon>
+                            </v-btn>
+                        </div>
+                    </template>
+                    <span>{{$t('document.submit.fab.draft')}}</span>
+                </v-tooltip>
+                <v-tooltip left>
+                    <template v-slot:activator="{ on }">
+                        <div v-on="on">
+                            <v-btn
+                                fab
+                                dark
+                                small
+                                color="secondary"
+                                @click="togglePageSize"
+                            >
+                                <v-icon>mdi-resize</v-icon>
+                                
+                            </v-btn>
+                        </div>
+                    </template>
+                    <span>{{$t('document.submit.fab.toggleSize')}}</span>
+                </v-tooltip>
             </v-speed-dial>
             <err-message :listErr="listMessageErr" ref="errMessage"/>
         </div>
@@ -439,6 +472,7 @@ export default {
             if(thisCpn.isComponentActive == false) return;
             try {
                 if (
+                    !$(evt.target).hasClass("s-control-select") &&
                     !$(evt.target).hasClass("v-data-table") &&
                     $(evt.target).closest(".v-data-table").length == 0
                 ) {
@@ -1623,7 +1657,7 @@ export default {
 }
 .wrap-content-submit{
     width: 100%;
-    height: calc(100% - 100px);
+    height: calc(100vh - 100px);
     overflow: auto;
 }
 </style>

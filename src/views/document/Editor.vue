@@ -285,7 +285,7 @@ export default {
             if(currentControl.properties.name.hasOwnProperty('name')){
                 this.$refs.controlNameRelated.setSubHeadingTitle(this.$t('document.editor.dialog.nameRelated.subTitleControl'))
                 this.$refs.controlNameRelated.setHeadingTitle(this.$t('document.editor.dialog.nameRelated.headingControl'));
-                this.$refs.controlNameRelated.getDataRelated(currentControl.properties.name.name.oldName,currentControl.properties.name.name.value);
+                this.$refs.controlNameRelated.getDataRelated("control",currentControl.properties.name.name.oldName,currentControl.properties.name.name.value);
                 this.$refs.controlNameRelated.showDialog();
             }
             else{
@@ -304,7 +304,7 @@ export default {
             setTimeout((self) => {
                 self.$refs.controlNameRelated.setSubHeadingTitle(self.$t('document.editor.dialog.nameRelated.subTitleDocument'))
                 self.$refs.controlNameRelated.setHeadingTitle(self.$t('document.editor.dialog.nameRelated.headingDocument'));
-                self.$refs.controlNameRelated.getDocumentRelated();
+                self.$refs.controlNameRelated.getDataRelated("document");
                 self.$refs.controlNameRelated.showDialog();
             }, 100,this);
         },

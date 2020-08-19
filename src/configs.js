@@ -32,7 +32,7 @@ export const appConfigs = {
         userRole: "https://orgchart.symper.vn/",
         permission: "https://accesscontrol.symper.vn/",
         dashboard: "https://bi-service.symper.vn/report-and-dashboard/",
-
+        biService: "https://bi-service.symper.vn",
         permissionPacks: "https://accesscontrol.symper.vn/permission_packs",
         actionPacks: "https://accesscontrol.symper.vn/action_packs",
         operations: "https://accesscontrol.symper.vn/operations",
