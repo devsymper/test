@@ -273,7 +273,10 @@
         }
     },
     "document": {
-        "title": "Danh sách Document",
+        "create": "Tạo mới văn bản",
+        "submit": "Submit văn bản",
+        "edit": "Chỉnh sửa văn bản",
+        "title": "Danh sách văn bản",
         "table": {
             "id": "Id",
             "name": "Tên",
@@ -580,6 +583,12 @@
         },
         "create": {
             "title": " Tạo sơ đồ tổ chức"
+        },
+        "update": {
+            "title": " Chỉnh sửa đồ tổ chức "
+        },
+        "detail": {
+            "title": " Chi tiết sơ đồ tổ chức "
         },
         "editor": {
             "main": "Chung",

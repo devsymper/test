@@ -27,7 +27,7 @@ Vue.use(VueMoment, {
  * $evtBus : component chuyên chở các sự kiện giữa tất cả các component
  */
 Vue.prototype.$evtBus = new Vue({});
-Vue.prototype.$evtBus.$on('symper-app-call-action-handeler', (action, context, extraParams) => {
+Vue.prototype.$evtBus.$on('symper-app-call-action-handler', (action, context, extraParams) => {
     if (typeof action == 'string') {
         try {
             action = JSON.parse(action);
@@ -57,6 +57,15 @@ function checkCanAddTag(context) {
     }
     return rsl;
 }
+
+Vue.prototype.$bindAction = function(actionDef) {
+    if (typeof actionDef == 'string') {
+        return actionDef;
+    } else if (typeof actionDef == 'object') {
+        return JSON.stringify(actionDef);
+    }
+}
+
 
 /**
  * Di chuyển đến một trang và tạo ra tab tương ứng

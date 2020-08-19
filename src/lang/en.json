@@ -274,6 +274,9 @@
         }
     },
     "document": {
+        "create": "Create document",
+        "submit": "Submit document",
+        "edit": "Edit document",
         "title": "List Document",
         "table": {
             "id": "Id",
@@ -344,7 +347,7 @@
     },
     "process": {
         "list": {
-            "title": "Process list",
+            "title": "Workflow list",
             "deploy_history": "Deploy history",
             "start": "Start workflow",
             "instances": "List lastest instances"
@@ -563,6 +566,12 @@
         "create": {
             "title": " Create orgchart"
         },
+        "update": {
+            "title": " Update orgchart"
+        },
+        "detail": {
+            "title": " Detail orgchart"
+        },
         "editor": {
             "main": "Main",
             "customAttributes": "Dynamic fields",
@@ -591,6 +600,11 @@
         "overMaxOpen": {
             "title": "Can not create more tabs",
             "detail": "Tabs number exceed limitation, please delete some opening tabs"
+        }
+    },
+    "dashboard": {
+        "detail": {
+            "title": "Detail dashboard "
         }
     }
 }

@@ -268,7 +268,7 @@ export default {
             let extraParams = {
                 openInNewTab: true
             };
-            this.$evtBus.$emit('symper-app-call-action-handeler', notificationItem.action, this, extraParams)
+            this.$evtBus.$emit('symper-app-call-action-handler', notificationItem.action, this, extraParams)
             this.markRead(notificationItem);
             
         },

@@ -328,3 +328,30 @@ export const addMoreInfoToTask = function(task) {
     }
     return task;
 }
+
+export const getLastestDefinition = function(row, needDeploy = false) {
+    return new Promise(async(resolve, reject) => {
+        let lastestDeployment = await bpmnApi.getDeployments({
+            name: row.name,
+            sort: 'deployTime',
+            size: 1,
+            order: 'desc'
+        });
+        let deploymentId = '';
+
+        if (lastestDeployment.data.length > 0) {
+            lastestDeployment = lastestDeployment.data[0];
+            deploymentId = lastestDeployment.id;
+        } else if (needDeploy) {
+            let deploymentData = await deployProcess(self, row);
+            deploymentId = deploymentData.id;
+        } else {
+            reject("this model have no deployment");
+        }
+
+        let defData = await bpmnApi.getDefinitions({
+            deploymentId: deploymentId
+        });
+        resolve(defData);
+    });
+}
