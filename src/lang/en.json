@@ -551,7 +551,10 @@
             "title": "Create task"
         },
         "claim": "Claim",
-        "created": "Task created"
+        "created": "Task created",
+        "relatedPeople": {
+            "title": "Related people"
+        }
     },
     "orgchart": {
         "list": {

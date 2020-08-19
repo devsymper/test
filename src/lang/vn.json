@@ -569,7 +569,10 @@
             "title": "Tạo task"
         },
         "claim": "Claim",
-        "created": "Đã tạo mới task"
+        "created": "Đã tạo mới task",
+        "relatedPeople": {
+            "title": "Những người liên quan"
+        }
     },
     "orgchart": {
         "list": {
