@@ -436,6 +436,7 @@ export default {
         },
         // loại những cột được chọn. Được chọn chuyển thành false, nếu xoá chuyển thành true
         onChangeDetailInfo(tableIdx, controlIdx, value) {
+            debugger
             if (value) {
                 value.enable = false;
                 if (this.tables[tableIdx].controls[controlIdx].dataColumn) {
@@ -450,22 +451,52 @@ export default {
 
         // phần mapping --- hàm đẩy giá trị mapping vào tables
         pushMappingInTables(name, column){
-            debugger
             for(let i = 0; i<this.tables.length; i++){
                for(let j= 0; j<this.tables[i].controls.length; j++){
                    if(this.tables[i].controls[j].name==name){
                        this.tables[i].controls[j].dataColumn = {name: '',index: 0, enable:false};
                        this.tables[i].controls[j].dataColumn.name= column;
+                       this.tables[i].sheetMap={name:'',enable:false};
+                       this.tables[i].sheetMap.name = this.getNameSheetMapping(column);
+                       this.tables[i].controls[j].dataColumn.index = this.getIndexColumnMapping(column);
+
                    }
                }
             }
         console.log(this.tables)
         },
         //phần mapping --- hàm tìm index mới cho cột
+         getIndexColumnMapping(value){
+            debugger
+            let index = -1;
+            for(let i = 0; i<this.nameSheets.length; i++){
+                 let arr = this.nameColumnDetail[this.nameSheets[i].name];
+                for(let j = 0; j<arr.length; j++){
+                    if(arr[j].name==value){
+                        this.nameColumnDetail[this.nameSheets[i].name][j].enable=false;
+                         return index = arr[j].index;
+                    }
+                }
+            }
+        },
+        //phần mapping--- hàm chuyển giá trị cho những sheet đã chọn
+        //phần mapping--- hàm chuyển giá trị cho những cột đã chọn
         //phần mapping --- hàm tìm sheet lưu cho cột 
+        getNameSheetMapping(value){
+            let nameSheetMapping = '';
+            for(let i = 0; i<this.nameSheets.length; i++){
+                 let arr = this.nameColumnDetail[this.nameSheets[i].name];
+                for(let j = 0; j<arr.length; j++){
+                    if(arr[j].name==value){
+                        this.nameSheets[i].enable=false;
+                         return nameSheetMapping = this.nameSheets[i].name;
+                    }
+                }
+            }
+
+        },
         //phần mapping---hàm so sánh tên cột trong danh sách file excel và tên cột trong mapping
         getMappingTable(){
-            debugger
             let column = this.nameColumnDetail;
             column =  JSON.stringify(column);
             let columnAr = this.nameColumnDetail;
@@ -477,6 +508,7 @@ export default {
                                 for(let k = 0; k < columnAr[j].length; k++){
                                     //nếu tên cột trong file excel trùng giá trị lần mapping cũ 
                                     if(this.lastTable[i].dataColumn==columnAr[j][k].name){
+                                        
                                         // đẩy giá trị mapping vào
                                         this.pushMappingInTables(this.lastTable[i].controlName,this.lastTable[i].dataColumn)
                                     }
@@ -499,7 +531,7 @@ export default {
             importApi.getMapping(this.documentId)
             .then(res => {
                 if (res.status === 200) {
-                console.log(res.data);
+                //console.log(res.data);
                 let mapping = JSON.parse(res.data[0].mapping);      
                 mapping = mapping.mapping;
                // tạo 1 mảng lưu những row được lấy
@@ -520,7 +552,7 @@ export default {
                     }
                 }
                 self.lastTable = row;
-                    console.log(row);
+                   // console.log(row);
                 //hàm tìm sheet theo row
                 }; 
             })
