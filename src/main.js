@@ -47,10 +47,25 @@ Vue.prototype.$evtBus.$on('symper-app-call-action-handeler', (action, context, e
     }
 })
 
+
+function checkCanAddTag(context) {
+    let rsl = true;
+    let urlMap = context.$store.state.app.urlToTabTitleMap;
+    if (Object.keys(urlMap).length == appConfigs.maxOpenTab) {
+        rsl = false;
+        context.$snotifyWarning({}, context.$t('appTabs.overMaxOpen.title'), context.$t('appTabs.overMaxOpen.detail'));
+    }
+    return rsl;
+}
+
 /**
  * Di chuyển đến một trang và tạo ra tab tương ứng
  */
 Vue.prototype.$goToPage = function(url, title, pageInstanceKey = false) {
+    let canAddTab = checkCanAddTag(this);
+    if (!canAddTab) {
+        return;
+    }
     let activeTabIndex = 0;
     if (!pageInstanceKey) {
         pageInstanceKey = Date.now();

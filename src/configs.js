@@ -7,6 +7,7 @@ export const appConfigs = {
         datetime: 'mdi-calendar-clock',
         time: 'mdi-timer-outline',
     },
+    maxOpenTab: 15,
     apiDomain: {
         account: 'https://account.symper.vn/',
         user: 'https://account.symper.vn/',

@@ -583,5 +583,11 @@
     },
     "userRole": {
         "userHasNoRole": "You have no role to select"
+    },
+    "appTabs": {
+        "overMaxOpen": {
+            "title": "Can not create more tabs",
+            "detail": "Tabs number exceed limitation, please delete some opening tabs"
+        }
     }
 }

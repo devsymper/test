@@ -601,5 +601,11 @@
     },
     "userRole": {
         "userHasNoRole": "Bạn chưa được phân vai trò trong hệ thống"
+    },
+    "appTabs": {
+        "overMaxOpen": {
+            "title": "Không thể tạo thêm tab mới",
+            "detail": "Số lượng tab vượt quá giới hạn, hãy xóa một vài tab"
+        }
     }
 }
