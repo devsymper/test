@@ -14,12 +14,26 @@
                                 {{ item.title }} 
                                 <i class="mdi mdi-close float-right close-tab-btn" @click.stop="closeTab(idx)"></i>
                             </v-tab>
+                              <div class="d-flex justify-end" style="float:right">
+                            <v-autocomplete
+                                :items="items"
+                                 :search-input.sync="value"
+                               
+                                label="Solo"
+                                solo
+                                ></v-autocomplete>
+                                  </div>
                         </v-tabs>
                     </div>
+                    
                     <div
                         class="float-right app-header-bg-color"
                         style="height:40px; line-height:40px;"
                     >
+                 ádádá{{value}}
+                         <v-btn icon>
+                            <v-icon>mdi-magnify</v-icon>
+                        </v-btn>
                         <v-menu
                             v-model="isShowDialog"
                             :close-on-content-click="false"
@@ -30,8 +44,9 @@
                             >
                             <template v-slot:activator="{ on }">
                                 <v-btn icon v-on="on">
-                                    <v-icon>mdi-apps</v-icon>
+                                    <v-icon>mdi-apps </v-icon>
                                 </v-btn>
+                                 
                             </template>
                             <v-card>
                                 <v-app-bar dense flat color="white">
@@ -48,9 +63,6 @@
                                 <list-app></list-app>
                             </v-card>
                         </v-menu>
-                        <v-btn icon>
-                            <v-icon>mdi-magnify</v-icon>
-                        </v-btn>
                         <v-menu  v-model="isShowDialogNotification"
                             z-index="161"
                             :close-on-content-click="false"
@@ -62,7 +74,6 @@
                                 <v-btn v-on="on" icon v-if="unreadNotification > 0">
                                     <v-badge
                                         class="sym-small-size"
-                                        
                                         :content="unreadNotification"
                                         :value="unreadNotification"
                                         color="red"
@@ -89,12 +100,41 @@
 </template>
 
 <script>
+import {
+    VTextField,
+    VSelect,
+    VCheckbox,
+    VRadio,
+    VSwitch,
+    VTextarea
+} from "vuetify/lib";
 import Api from "../../api/api.js";
+import searchApi from "../../api/search";
 import { appConfigs } from '../../configs';
 import BASidebar from "@/components/common/BASidebar.vue";
 import listApp from "@/components/common/listApp";
 import NotificationBar from "@/components/notification/NotificationBar.vue";
 export default {
+    watch:{
+        value(){
+            //debugger
+
+            console.log(this.value);
+             searchApi.getData({keyword:'minh'})
+                .then(res => {
+                    if (res.status === 200) {
+                        console.log('Đã gửi thành công');
+                        console.log(res.data);
+                    
+                    }
+                })
+                .catch(err => {
+                       console.log('Đã gửi mà lỗi');
+                    console.log(err);
+                 
+                });
+        }
+    },
     methods: {
         /**
          * Xử lý các tab
@@ -144,7 +184,8 @@ export default {
     components: {
         "ba-sidebar": BASidebar,
         "list-app": listApp,
-        "list-notification": NotificationBar
+        "list-notification": NotificationBar,
+          VTextField,
     },
     created() {
         this.$evtBus.$on("app-receive-remote-msg", data => {
@@ -174,6 +215,8 @@ export default {
     },
     data: function() {
         return {
+            value:'',
+            items:[],
             isShowDialog: false,
             isShowDialogNotification: false,
         };

@@ -33,6 +33,7 @@ export const appConfigs = {
         permission: "https://accesscontrol.symper.vn/",
         dashboard: "https://bi-service.symper.vn/report-and-dashboard/",
         importExcel: 'https://io.dev.symper.vn/',
+        search: 'https://search.symper.vn/',
         permissionPacks: "https://accesscontrol.symper.vn/permission_packs",
         actionPacks: "https://accesscontrol.symper.vn/action_packs",
         operations: "https://accesscontrol.symper.vn/operations",

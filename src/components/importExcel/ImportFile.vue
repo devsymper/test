@@ -51,11 +51,12 @@
                         <b class="fw-500">{{table.name}}
                             <span v-if="tables[tableIdx]==tables[0]" style="color:red">*
                             </span>
-                          
-                            (0/{{table.controls.filter(p => p.dataType!='table').length+1}})</b></span>
+                            {{sumCount(table.controls.filter(p => p.dataColumn!=null).length, table.keyColumn==undefined?0:1)}}/{{table.controls.filter(p => p.dataType!='table').length+1}}</b></span>
                 </v-col>
                 <v-col class="col-md-6 py-0">
-                    <v-autocomplete :value="table.sheetMap" @input="value => onChangeSheet(tableIdx, value)" class="auto-complete color-normal mt-4 mb-3 fs-13 " 
+                    <v-autocomplete :value="table.sheetMap" 
+                    @input="value => onChangeSheet(tableIdx, value)" 
+                    class="auto-complete color-normal mt-4 mb-3 fs-13 " 
                         :items="nameSheets" item-text="name" return-object style="width: 217px;padding-left:2px" clearable :menu-props="{'nudge-top':-10, 'max-width': 300}">
                         <template v-slot:item="{ item, on, attrs }">
                             <v-list-item v-show="item.enable" v-on="on" v-bind="attrs">
@@ -97,7 +98,7 @@
                 <v-col class="col-md-5 ml-2 pl-3" style=" margin-top:-57px">
                     <v-icon class='fs-14 mr-2 color-normal'>{{getIcon(control.dataType)}}</v-icon>
                     <v-tooltip right>
-                        <template v-slot:activator="{ on, attrs }">
+                        <template v-slot:activator="{ on}">
                             <span v-on="on" class="color-normal"> {{formatName(control.title ? control.title : control.name)}}</span>
                         </template>
                         {{control.title ? control.title : control.name}}
@@ -122,7 +123,8 @@
         <v-row class="mr-3 ">
             <v-col class="col-md-9 "></v-col>
             <v-col>
-                <v-btn class="ml-1" small @click="importButton()" depressed color="info" style="height:27px; width: 60px; border-radius:2px!important">
+                <v-btn class="ml-1" small @click="importButton()" 
+                depressed color="info" style="height:27px; width: 60px; border-radius:2px!important">
                     <span class='fs-13 fw-400'>Import</span>
                 </v-btn>
                 <!-- <button @click="test()">Null</button> -->
@@ -142,7 +144,7 @@ export default {
     components: {
         UploadFile
     },
-    props: ['deleteFileName', 'documentId', 'close'],
+    props: ['deleteFileName', 'documentId'],
     data() {
         return {
             selectType:'',
@@ -151,15 +153,18 @@ export default {
             propertyDocument: [],
             nameDocument: '',
             nameSheets: [],
+            lastTable:[],
             nameColumnDetail: {},
             data: {},
             fileName: '',
+            import:false,
             errorType:'',
             dataExel: {},
             tables: [],
             showCancelBtn: true,
             errorMessage: '',
             key:'',
+            countKey:0,
             select_type:['Excel','CSV']
         };
     },
@@ -169,6 +174,9 @@ export default {
       }
     },
     methods: {
+        sumCount(a,b){
+            return a + b;
+        },
         //Chọn key cho bảng
         selectKeyControl(control, allControls) {
             for (let ctrl of allControls) {
@@ -184,40 +192,38 @@ export default {
             this.$emit('cancel');
             this.$store.commit('importExcel/setNewImport', true);  
         },
+        // xoá dữ liệu trở về mặc định
         clearFiles(){
-            debugger
+            // debugger
             this.errorType="";
+            this.errorMessage ="";
             this.data=[];
             this.nameSheets=[];
+            this.showCancelBtn = true;
             this.nameColumnDetail={};
+            this.$emit('closeValidate');
             for (let i = 0; i < this.tables.length; i++){
-                this.tables[i].keyColumn={};
-                this.tables[i].sheetMap={};
+                this.tables[i].keyColumn=undefined;
+                this.tables[i].sheetMap='';
                 for (let j = 0; j < this.tables[i].controls.length; j++) {
-                        this.tables[i].controls[j].dataColumn=[]
+                        this.tables[i].controls[j].dataColumn=null
                 }
             }
              
         },
         // Lấy dữ liệu từ API
         getDataExcel(data) {
-            // debugger
-            console.log(data);
+           // console.log(data);
             if(data.data){
                 this.data = data.data;
-                console.log(this.data);
+              //  console.log(this.data);
                 if(Array.isArray(this.data)){
-                    console.log('Data là k')
-
                 }else{
-                    console.log('có data');
-                    console.log(this.data);
+                 //   console.log(this.data);
                     this.getSheetAndColumnName();
-
                 }
             }else{
                 this.errorType="* Kiểu file không hợp lệ";
-
             }
         },
         //không để tên quá dài
@@ -230,11 +236,12 @@ export default {
         },
         // Sự kiện được gọi khi ấn import
         importButton() {
+          //  debugger
             let cleanedTables = this.tables.map((t, idx) => ({
                 ...idx !== 0 && {
                     name: t.name
                 },
-                keyColumn: t.keyColumn ? t.keyColumn : null,
+                keyColumn: t.keyColumn ? t.keyColumn : undefined,
                 sheetMap: t.sheetMap.name,
                 controls: t.controls.map(c => ({
                     ...c,
@@ -265,35 +272,36 @@ export default {
                 key: this.key,
                 documentId: this.documentId,
                 typeImport: this.selectType,
+                objType: 'documnent',
                 mode: 'full',
                 mapping: {
                     general: general[0],
                     tables: general[1] ? general.slice(1, general.length) : [],
                 },
-
             };
             // console.log(dataImport);
             importApi.pushDataExcel(dataImport)
                 .then(res => {
                     if (res.status === 200) {
-                        console.log(res.data)
+                        //console.log('Đã gửi thành công');
                     }
                 })
                 .catch(err => {
-                    console.log(err)
+                    //console.log(err);
                 });
-            for (let i = 0; i < this.tables.length; i++) {
-                if (this.tables[i].sheetMap == '') {
-                    this.errorMessage = '* Điền thiếu trường thông tin';
-                } else {
-                    this.errorMessage = '';
-                    this.$emit('showValidate');
-                    this.$emit('fileName', this.data.fileName);
-                    this.showCancelBtn = false;
-                    this.$emit('setInterval');
-                    break;
+                for (let i = 0; i < this.tables.length; i++) {
+                    if (this.tables[i].sheetMap == '') {
+                        this.errorMessage = '* Điền thiếu trường thông tin';
+                    } else {
+                        this.errorMessage = '';
+                        this.$emit('showValidate');
+                        this.$emit('fileName', this.data.fileName);
+                        this.$emit('import');
+                        this.showCancelBtn = false;
+                        this.$emit('setInterval');
+                        break;
+                    }
                 }
-            }
         },
         //Lấy icon theo kiểu dữ liệu
         getIcon(controlType) {
@@ -340,13 +348,12 @@ export default {
                         title: list[j].properties.title,
                         isKeyControl: false,
                         dataColumn: null,
-                        dataType: this.getDataType(list[i].type)
+                        dataType: this.getDataType(list[j].type)
                     });
                 }
             }
             return controls;
         },
-
         // Khởi tạo giá trị của các bảng
         createTable(tableNames) {
             // general
@@ -359,6 +366,7 @@ export default {
                     dataColumn: null,
                     dataType: this.getDataType(this.propertyDocument[i].type)
                 });
+             
             };
             let tables = [{
                 sheetMap: '',
@@ -367,7 +375,9 @@ export default {
             }]
             // tables
             for (let i = 0; i < tableNames.length; i++) {
-                tables.push({
+               // console.log(this.propertyDocument[i].type);
+                //console.log(this.getDataType(this.propertyDocument[i].type));
+                    tables.push({
                     sheetMap: '',
                     keyColumn: {
                         index: -1,
@@ -376,6 +386,7 @@ export default {
                     name: tableNames[i],
                     controls: this.findControlsForTable(tableNames[i]),
                 })
+              //  console.log(this.findControlsForTable(tableNames[i]));
             }
             this.tables = tables;
         },
@@ -401,6 +412,7 @@ export default {
                 }
             }
             this.nameColumnDetail = columnDetail;
+            this.getMappingTable();
         },
         //Loại những sheet được chọn
         onChangeSheet(tableIdx, value) {
@@ -434,11 +446,88 @@ export default {
                 this.tables[tableIdx].controls[controlIdx].dataColumn.enable = true;
                 this.tables[tableIdx].controls[controlIdx].dataColumn = null;
             }
+        },
+
+        // phần mapping --- hàm đẩy giá trị mapping vào tables
+        pushMappingInTables(name, column){
+            debugger
+            for(let i = 0; i<this.tables.length; i++){
+               for(let j= 0; j<this.tables[i].controls.length; j++){
+                   if(this.tables[i].controls[j].name==name){
+                       this.tables[i].controls[j].dataColumn = {name: '',index: 0, enable:false};
+                       this.tables[i].controls[j].dataColumn.name= column;
+                   }
+               }
+            }
+        console.log(this.tables)
+        },
+        //phần mapping --- hàm tìm index mới cho cột
+        //phần mapping --- hàm tìm sheet lưu cho cột 
+        //phần mapping---hàm so sánh tên cột trong danh sách file excel và tên cột trong mapping
+        getMappingTable(){
+            debugger
+            let column = this.nameColumnDetail;
+            column =  JSON.stringify(column);
+            let columnAr = this.nameColumnDetail;
+            columnAr = Object.values(columnAr);
+            if(column.length>2){
+                for (let i = 0; i < this.lastTable.length; i++) {
+                    // nếu file đã được upload, có giá trị lưu tên cột trong file excel
+                        for(let j = 0; j < columnAr.length; j++){
+                                for(let k = 0; k < columnAr[j].length; k++){
+                                    //nếu tên cột trong file excel trùng giá trị lần mapping cũ 
+                                    if(this.lastTable[i].dataColumn==columnAr[j][k].name){
+                                        // đẩy giá trị mapping vào
+                                        this.pushMappingInTables(this.lastTable[i].controlName,this.lastTable[i].dataColumn)
+                                    }
+                                }
+                        }
+                    }
+            }else{
+                console.log('Không có file Mapping')
+            }
         }
     },
     watch: {
         data(){
             this.errorType = "";
+        },
+        //lay API lần mapping trước
+        selectType(){
+            //debugger
+            const self = this;
+            importApi.getMapping(this.documentId)
+            .then(res => {
+                if (res.status === 200) {
+                console.log(res.data);
+                let mapping = JSON.parse(res.data[0].mapping);      
+                mapping = mapping.mapping;
+               // tạo 1 mảng lưu những row được lấy
+               let row = [];
+                for (let i = 0; i < mapping.general.controls.length; i++) {
+                    row.push({
+                        controlName:mapping.general.controls[i].name,
+                        dataColumn:mapping.general.controls[i].dataColumn.name,
+                        });
+                };
+                if(mapping.tables){
+                    for (let i = 0; i < mapping.tables.length; i++) {
+                        for(let j = 0; j< mapping.tables[i].controls.length;j++)
+                            row.push({
+                                 controlName:mapping.tables[i].controls[j].name,
+                                dataColumn:mapping.tables[i].controls[j].dataColumn.name
+                            });
+                    }
+                }
+                self.lastTable = row;
+                    console.log(row);
+                //hàm tìm sheet theo row
+                }; 
+            })
+            .catch(err => {
+                console.log(err)
+            })
+
         },
         newImport(val) {
             if (val) {
@@ -449,13 +538,9 @@ export default {
                 this.selectType='';
             }
         },
-        close() {
-            if (this.close == false) {
-                this.showCancelBtn = true;
-            }
-        },
         documentId(val) {
             if (val) {
+                  // lấy API của documnent
                 documentApi.detailDocument(this.documentId)
                     .then(res => {
                         if (res.status === 200) {
@@ -478,6 +563,7 @@ export default {
                     .catch(err => {
                         console.log(err)
                     })
+                  
             }
         }
     },

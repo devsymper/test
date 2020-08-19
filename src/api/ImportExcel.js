@@ -9,4 +9,7 @@ export default {
     getProcessing(key) {
         return api.get('getProcessStatus' + '/' + key)
     },
+    getMapping(objId) {
+        return api.get('mapping/document/' + objId)
+    }
 }

@@ -5,17 +5,17 @@
           :options="options" 
           :autoStart="true"
            @file-success="handleFileUploaded"
-          @change="handleChange"   
+          @change="handleChange" 
           ref="upload">
             <uploader-unsupport></uploader-unsupport>
             <uploader-drop>
                 <p class="font-normal">Thả file ở đây để upload</p>
-                <uploader-btn v-show="selectType=='Excel'" depressed class="font-normal btn-upload"
+                <uploader-btn  v-show="selectType=='Excel'" depressed class="font-normal btn-upload"
                 :single="true"
                 style="background-color:#3092E6; color:white; border-radius:2px; border:1px solid #3092E6; font-size:13px">
                     Chọn file
                 </uploader-btn>
-                <uploader-btn v-show="selectType=='CSV'" depressed class="font-normal btn-upload"
+                <uploader-btn   v-show="selectType=='CSV'" depressed class="font-normal btn-upload"
                 :single="false"
                 style="background-color:green; color:white; border-radius:2px; border:1px solid green; font-size:13px">
                     Chọn file
@@ -84,16 +84,16 @@ export default {
             this.$emit('clearFiles')
         },
         handleFileUploaded(rootFile, file, response, chunk) {
-            this.$refs.upload.uploader.resume();
-            debugger
             // console.log(response);
+            // debugger
+            this.$refs.upload.uploader.resume();
             response = JSON.parse(response);
             // this.$emit('clearFiles');
             this.$emit('dataExcel', response);
             this.$emit('keyUpload', this.options.query.key);
         },
         handleChange(event) {
-            debugger
+            //  debugger
             this.$refs.upload.uploader.cancel()
             this.options.query.total = event.currentTarget.files.length;
             this.dem = event.currentTarget.files.length;

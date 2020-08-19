@@ -37,15 +37,17 @@
                 {{processing.validating.processed?Math.round((processing.validating.processed/processing.validating.total)* 100):0}}% </span>
         </v-row>
         <div v-if="processing.validating.errors!=null">
-            <v-row v-for="(errorControl, errorControlIdx) in processing.validating.errors " :key="errorControlIdx" class="ml-5 mt-1">
-                <v-row class="d-flex ml-0 mt-3" style="height:30px;margin-bottom:-25px">
-                    <span style="" class="color-grey fs-13">
-                        Cột: {{errorControl.title}} </span>
+            <v-row v-for="(errorControl, errorControlIdx) in processing.validating.errors " :key="errorControlIdx" 
+            class="ml-5 mt-1">
+                 <v-row style="width:100%;" class="mt-3 color-grey ml-0">Tên sheet {{errorControl.sheet}}
+                    </v-row>
+                <v-row class="d-flex ml-0 mt-2" style="margin-bottom:-18px">
+                    <span style=""  class="color-grey fs-13">Cột sai: {{errorControl.title}} </span>
                   
                 </v-row>
-                  <v-row style="width:100%; margin-left:-22px!important" class="mt-9 color-grey">
-                        {{errorControl.sheet}} {{errorControl.columnName}}
+                  <v-row style="width:100%;" class="mt-6 color-grey ml-0">Nội dung: {{errorControl.columnName}}
                     </v-row>
+                   
                 <div class="mb-1 mt-2" v-for="(error, errorIdx) in errorControl.errors" :key="errorIdx">
                     <!-- xử lý trường hợp không đúng định dạng dữ liệu -->
                     <div v-if="error.type=='invalidDataType'">
@@ -148,7 +150,7 @@ export default {
     components: {
         BeatLoader
     },
-    props:['fileName','setInterval'],
+    props:['fileName','setInterval','importFile'],
     methods: {
         getPercentage(process, total){
             let result = (process/total).toFixed(4)*1000/10;
@@ -209,13 +211,18 @@ export default {
             }
         },
         processing(){
-             if(this.processing.importing.total/this.processing.processed==1||this.processing.validating.errors.length>0)
+            if(this.processing.importing.total/this.processing.processed==1||this.processing.validating.errors.length>0)
            {
                 clearInterval(this.loopCheckProcess)
+           };
+           if(this.processing.importing.processed/this.processing.importing.total==1){
+                setTimeout(()=>this.$emit('showNotification'), 1000);
+                clearInterval(this.loopCheckProcess)
            }
+
         },
-        fileName(val) {
-            if (val) {
+        importFile() {
+            if (this.importFile>=0) {
                 const self = this;
                 if(this.setInterval){
                     this.loopCheckProcess = setInterval(()=>{
