@@ -85,6 +85,7 @@
                         :height="tableHeight"
                         :settings="tableSettings"
                         :data="data"
+                        :rowHeights="21"
                         :columns="tableColumns"
                         :contextMenu="itemContextMenu"
                         :colHeaders="colHeaders"
@@ -291,6 +292,7 @@ export default {
                 manualColumnMove: true,
                 manualColumnResize: true,
                 manualRowResize: true,
+                rowHeights: 21,
                 stretchH: "all",
                 licenseKey: "non-commercial-and-evaluation",
                 afterRender: isForced => {
@@ -701,6 +703,12 @@ export default {
         },
         bindToSearchkey(vl) {
             this.searchKey = vl;
+            if(this.debounceGetData){
+                clearTimeout(this.debounceGetData);
+            }
+            this.debounceGetData = setTimeout((self) => {
+                self.getData();
+            }, 300, this);
         },
         handleCloseDragPanel() {
             this.actionPanel = false;
@@ -814,7 +822,7 @@ export default {
          * @param {Boolean} cache có ưu tiên dữ liệu từ cache hay ko
          *
          */
-        getData(columns = false, cache = false, applyFilter = false) {
+        getData(columns = false, cache = false, applyFilter = true) {
             let thisCpn = this;
             let handler = (data) => {
                 if(thisCpn.customAPIResult.reformatData){
