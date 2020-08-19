@@ -2,7 +2,7 @@
     <div id="symper-app" @click="handleClickApp">
         <component :is="layout">
             <keep-alive>
-                <router-view :key="$route.params.pageInstanceKey" />
+                <router-view :key="$route.params.pageInstanceKey"  :ref="$route.params.pageInstanceKey" />
             </keep-alive>
             <notifications group="symper-general-notification" :position="sapp.generalNotificationPosition">
                 <template slot="body" slot-scope="props">

@@ -3,7 +3,7 @@
         <ba-sidebar />
         <v-content>
             <v-container fluid fill-height class="pa-0">
-                <div class="w-100 app-header-bg-color" style="border-bottom:1px solid #cccccc">
+                <div class="w-100 app-header-bg-color" >
                     <div style="width:calc(100% - 200px)" class="float-left">
                         <v-tabs
                             hide-slider
@@ -11,8 +11,8 @@
                             @change="handleChangeTab"
                             v-model="currentTabIndex"
                             class="sym-small-size "
-                            color="orange accent-4">
-                            <v-tab class="symper-app-tab" v-for="(item, idx) in tabUrlItems" :key="idx">
+                            color="grey darken-4">
+                            <v-tab class="symper-app-tab pr-6" v-for="(item, idx) in tabUrlItems" :key="idx">
                                 <v-tooltip bottom>
                                     <template v-slot:activator="{ on, attrs }">
                                         <span 
