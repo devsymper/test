@@ -57,7 +57,12 @@
                     <v-autocomplete :value="table.sheetMap" 
                     @input="value => onChangeSheet(tableIdx, value)" 
                     class="auto-complete color-normal mt-4 mb-3 fs-13 " 
-                        :items="nameSheets" item-text="name" return-object style="width: 217px;padding-left:2px" clearable :menu-props="{'nudge-top':-10, 'max-width': 300}">
+                        :items="nameSheets" 
+                        item-text="name" 
+                        return-object 
+                        style="width: 217px;padding-left:2px" 
+                        clearable 
+                        :menu-props="{'nudge-top':-10, 'max-width': 300}">
                         <template v-slot:item="{ item, on, attrs }">
                             <v-list-item v-show="item.enable" v-on="on" v-bind="attrs">
                                 <v-list-item-content>
@@ -105,7 +110,13 @@
                     </v-tooltip>
                 </v-col>
                 <v-col class="col-md-6 " style="margin-top:-39px;margin-left:2px">
-                    <v-autocomplete style="width: 215px;" class="auto-complete color-normal" :items="nameColumnDetail[table.sheetMap.name] ? nameColumnDetail[table.sheetMap.name] : []" item-text="name" return-object :value="control.dataColumn" @input="value => onChangeDetailInfo(tableIdx, controlIdx, value)" clearable :menu-props="{'nudge-top':-10, 'max-width': 300}">
+                    <v-autocomplete style="width: 215px;" class="auto-complete color-normal"
+                    :items="nameColumnDetail[table.sheetMap.name] ? nameColumnDetail[table.sheetMap.name] : []" 
+                    item-text="name" 
+                    return-object :value="control.dataColumn" 
+                    @input="value => onChangeDetailInfo(tableIdx, controlIdx, value)" 
+                    clearable 
+                    :menu-props="{'nudge-top':-10, 'max-width': 300}">
                         <template v-slot:item="{ item, on, attrs }">
                             <v-list-item v-show="item.enable" v-on="on" v-bind="attrs">
                                 <v-list-item-content>
@@ -208,8 +219,7 @@ export default {
                 for (let j = 0; j < this.tables[i].controls.length; j++) {
                         this.tables[i].controls[j].dataColumn=null
                 }
-            }
-             
+            }       
         },
         // Lấy dữ liệu từ API
         getDataExcel(data) {
@@ -423,8 +433,15 @@ export default {
                 }
                 this.tables[tableIdx].sheetMap = value;
             } else {
+                let name = this.tables[tableIdx].sheetMap.name;
                 this.tables[tableIdx].sheetMap.enable = true;
                 this.tables[tableIdx].sheetMap = '';
+                for(let i = 0; i<this.nameSheets.length; i++)
+                {
+                    if(this.nameSheets[i].name == name){
+                        this.nameSheets[i].enable= true;
+                    }
+                }
             }
             this.tables[tableIdx].controls.forEach(c => {
                 if (c.dataColumn) c.dataColumn.enable = true;
@@ -446,11 +463,24 @@ export default {
             } else {
                 this.tables[tableIdx].controls[controlIdx].dataColumn.enable = true;
                 this.tables[tableIdx].controls[controlIdx].dataColumn = null;
+                // nếu giá trị detail thì xoá thì true ở detail 
+                // for(let i = 0; i<this.nameSheets.length; i++){
+                //     let arr = this.nameColumnDetail[this.nameSheets[i].name];
+                //     for(let j = 0; j<arr.length; j++){
+                //         if( this.tables[tableIdx].controls[controlIdx].dataColumn.name==arr[j].name){
+                //             this.nameColumnDetail[this.nameSheets[i].name][j].enable=true;
+                    
+                          
+                //         }
+                //     }
+                // }
+               
             }
         },
 
         // phần mapping --- hàm đẩy giá trị mapping vào tables
         pushMappingInTables(name, column){
+            
             for(let i = 0; i<this.tables.length; i++){
                for(let j= 0; j<this.tables[i].controls.length; j++){
                    if(this.tables[i].controls[j].name==name){
@@ -467,13 +497,13 @@ export default {
         },
         //phần mapping --- hàm tìm index mới cho cột
          getIndexColumnMapping(value){
-            debugger
             let index = -1;
             for(let i = 0; i<this.nameSheets.length; i++){
                  let arr = this.nameColumnDetail[this.nameSheets[i].name];
                 for(let j = 0; j<arr.length; j++){
                     if(arr[j].name==value){
-                        this.nameColumnDetail[this.nameSheets[i].name][j].enable=false;
+                        // debugger
+                       // this.nameColumnDetail[this.nameSheets[i].name][j].enable=false;
                          return index = arr[j].index;
                     }
                 }
@@ -489,6 +519,10 @@ export default {
                 for(let j = 0; j<arr.length; j++){
                     if(arr[j].name==value){
                         this.nameSheets[i].enable=false;
+                        //  if (this.tables[i].sheetMap) {
+                        //     this.tables[i].sheetMap.enable = true;
+                        // }
+                        //this.tables[i].sheetMap = value;
                          return nameSheetMapping = this.nameSheets[i].name;
                     }
                 }
