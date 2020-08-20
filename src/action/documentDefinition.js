@@ -17,7 +17,7 @@ export default [{
         "handler": function(param) {
             let tabName = param.title ? param.title : (param.name ? param.name : '');
             tabName = this.$t('document.edit') + ' ' + tabName;
-            this.$goToPage('/document/editor/' + param.documentId, tabName);
+            this.$goToPage('/document/editor/' + param.id, tabName);
         }
     },
     {
@@ -26,7 +26,7 @@ export default [{
         "handler": function(param) {
             let tabName = param.title ? param.title : (param.name ? param.name : '');
             tabName = this.$t('document.submit') + ' ' + tabName;
-            this.$goToPage('/document/submit/' + param.documentId, tabName);
+            this.$goToPage('/document/submit/' + param.id, tabName);
         }
     },
     {
