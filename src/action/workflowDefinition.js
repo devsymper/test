@@ -9,7 +9,7 @@ let commonProps = {
 export default [{
         ...commonProps,
         "action": "list",
-        "handler": function(paramObj) {
+        "handler": function(param) {
             let tabName = this.$t('process.list.title');
             this.$goToPage('/workflow', tabName);
         }
@@ -17,7 +17,7 @@ export default [{
     {
         ...commonProps,
         "action": "create",
-        "handler": function(paramObj) {
+        "handler": function(param) {
             let tabName = this.$t('process.action.create');
             this.$goToPage('/workflow/create', tabName);
         }
@@ -25,39 +25,39 @@ export default [{
     {
         ...commonProps,
         "action": "deploy",
-        "handler": function(paramObj) {
-            deployProcess(paramObj);
+        "handler": function(param) {
+            deployProcess(param);
         }
     },
     {
         ...commonProps,
         "action": "drop",
-        "handler": function(paramObj) {
+        "handler": function(param) {
 
         }
     },
     {
         ...commonProps,
         "action": "update",
-        "handler": function(paramObj) {
+        "handler": function(param) {
             self.$goToPage(
-                "/workflow/" + paramObj.id + "/edit",
-                this.$t("common.edit") + " " + (paramObj.name ? paramObj.name : paramObj.key)
+                "/workflow/" + param.id + "/edit",
+                this.$t("common.edit") + " " + (param.name ? param.name : param.key)
             );
         }
     },
     {
         ...commonProps,
         "action": "list_instance",
-        "handler": function(paramObj) {
-            this.$goToPage('/workflow/process-key/' + paramObj.processKey + '/instances', this.$t('process.instance.listModelInstance') + paramObj.name)
+        "handler": function(param) {
+            this.$goToPage('/workflow/process-key/' + param.processKey + '/instances', this.$t('process.instance.listModelInstance') + param.name)
         }
     },
     {
         ...commonProps,
         "action": "start_instance",
-        "handler": async function(paramObj) {
-            let defData = await getLastestDefinition(paramObj, true);
+        "handler": async function(param) {
+            let defData = await getLastestDefinition(param, true);
             if (defData.data[0]) {
                 this.$goToPage(`/workflow/process-definition/${defData.data[0].id}/run`, 'Start process instance');
             } else {
