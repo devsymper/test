@@ -13,7 +13,7 @@
 				<ul class="app-child-item" v-for="(childItem,i) in itemT.item" :key="i" @click="clickItem(childItem,itemT.name)">
 					<li>
 						{{childItem.name}}
-						<v-icon>mdi-check</v-icon>
+						<v-icon v-if="sAppManagement[itemT.name].item.includes(childItem)" >mdi-check</v-icon> 
 					</li>
 				</ul>
 			</div>
@@ -37,6 +37,7 @@ export default {
 				   title: this.$t('apps.listType.documents'),
 				   name:  'documents',
 				   item:[
+
 				   ]
 			   },
 			   orgcharts:{
@@ -70,8 +71,15 @@ export default {
 	created(){
 		this.getListSearch('');
 	},
+	computed:{
+		sAppManagement(){
+			return this.$store.state.appConfig.listItemSelected
+		}
+	},
 	methods:{
 		clickItem(obj,type){
+			console.log(obj,'objjjj');
+			console.log(type,'typeeeeee');
 			this.$store.commit('appConfig/updateListItemSelected',{obj:obj,type:type});
 		},
 		getListSearch(value){
@@ -90,7 +98,6 @@ export default {
 			});
 			dashboardApi.getDashboards({search:value,pageSize:50}).then(res => {
 				this.listItems.reports.item = res.data.listObject;
-				console.log(res.data,'getDashboardgetDashboardgetDashboardgetDashboardgetDashboard');
 			});
 		},
 	},
@@ -142,7 +149,7 @@ export default {
 	font-size:13px;
 	float:right;
 	padding-top:2px;
-	color: greenyellow;
+	color: green;
 }
 .search-modal >>> .app-item li{
 	cursor: pointer;

@@ -85,7 +85,7 @@ export default {
                     }
                     else if(e.keyCode == 13){
                         let rowActive = thisCpn.dataTable[thisCpn.indexActive];
-                        thisCpn.handleClickRow(rowActive);
+                        thisCpn.handleClickRow(rowActive,true);
                     }
                 }
                 
@@ -141,7 +141,7 @@ export default {
         setAliasControl(aliasControl){
             this.alias = aliasControl;
         },
-        handleClickRow(item){
+        handleClickRow(item,fromEnterKey = false){
             this.curInput.off('keydown');
             let value = ""
             if(item.hasOwnProperty(this.alias)){
@@ -150,7 +150,7 @@ export default {
             else if(item.hasOwnProperty('column1')){
                 value = item['column1'];
             }
-            this.$emit('after-select-row',{value:value,input:this.curInput});
+            this.$emit('after-select-row',{value:value,fromEnterKey:fromEnterKey});
             this.dataTable = []
             this.hide();
         },

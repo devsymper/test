@@ -31,7 +31,7 @@
             </div>
         </vue-resizable>
         <div  class="sym-document__side-bar-right">
-            <sidebar-right :instance="keyInstance"/>
+            <sidebar-right ref="sidebarRight" :instance="keyInstance"/>
         </div>
         <s-table-setting  ref="tableSetting" @add-columns-table="addColumnTable"/>
         <auto-complete-control ref="autocompleteControl" @add-control="insertControl"/>
@@ -149,7 +149,7 @@ export default {
                                         text: 'Setting table',
                                         disabled : false,
                                         onAction: function(e) {
-                                            showSettingControlTable(e);
+                                            self.showSettingControlTable(e);
                                         }
                                     });
                                 
@@ -157,7 +157,7 @@ export default {
                                     icon:'margin',
                                     tooltip:'Margin',
                                         onAction: function (_) {
-                                            showPaddingPageConfig(ed);
+                                            self.showPaddingPageConfig(ed);
                                         }
                                     }); 
                                     for(let i = 0;i < self.listIconToolbar.length;i++){
@@ -778,8 +778,8 @@ export default {
 
         //hoangnd: hàm mở modal tablesetting của control table
         showSettingControlTable(e) {
-            let elements = $('#document-editor-'+this.keyInstance+'_ifr').contents().find('.on-selected');
-            if(elements.hasClass('s-control-table') || elements.parent().hasClass('s-control-table')){
+            let elements = $('#document-editor-'+this.keyInstance+'_ifr').contents().find('.on-selected').closest('.s-control-table');
+            if(elements.is('.s-control-table')){
                 let thead = elements.find('thead tr th');
                 let tbody = elements.find('tbody tr td');
                 let table = (elements.hasClass('s-control-table')) ? elements : elements.parent();
@@ -906,11 +906,16 @@ export default {
         
         //su kiện click vào editor
         detectClickEvent(event){
+            if(this.editorStore.currentSelectedControl.id != ""){
+                this.$refs.sidebarRight.hideDragPanel();
+            }
             if($(event.target).is('.s-control'))
             this.setSelectedControlProp(event,$(event.target),$('#document-editor-'+this.keyInstance+'_ifr').get(0).contentWindow);
             else if($(event.target).closest('.s-control').length > 0){
                 this.setSelectedControlProp(event,$(event.target).closest('.s-control'),$('#document-editor-'+this.keyInstance+'_ifr').get(0).contentWindow);
             }
+            
+            
 
         // kiểm tra nếu click ngoài khung autocomplete control thì đóng lại
             if (event.target.id != 'list-control-autocomplete' && $(event.target).parents('#list-control-autocomplete').length == 0) {

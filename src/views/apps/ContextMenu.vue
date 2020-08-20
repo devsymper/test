@@ -1,7 +1,7 @@
 <template>
    <v-card class="context-menu" v-show="isShowContext" :style="{top:top+'px',left:left+'px'}">
-			<div class="item" v-for="item in contextMenu" :key="item.name" @click="clickRow(item)">
-				<v-icon> {{item.icon}} </v-icon> {{item.name}}
+			<div class="item" v-for="(item,i) in contextMenu" :key="i" @click="clickRow(item)">
+				 {{item}}
 			</div>
    </v-card>
 </template>
@@ -19,23 +19,23 @@
 	methods:{
 		clickRow(item){
 			item.callback(item);
-			// debugger
 		},
 		show(e){
 			this.isShowContext = true;
-			// debugger
-			this.calPosition(e);
+			this.top = event.pageY;
+			this.left = event.pageX;
+				debugger
+			// this.calPosition(e)
 		},
 		hide(){
 			this.isShowContext = false;
 		},
 		calPosition(event){
-			// debugger
-			this.top = event.pageY;
-			this.left = event.pageX-200;
+				
 		},
 		setContextItem(ctx){
 			this.contextMenu = ctx;
+			debugger
 		}
 	}
 	}

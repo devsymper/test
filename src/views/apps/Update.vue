@@ -1,6 +1,6 @@
 <template>
     <div class="update-app-symper">
-        <v-card-title class="pt-0 pb-2 subtitle-1 font-weight-bold ">
+        <v-card-title class="pt-0 pb-2 subtitle-1 ">
             <v-icon class="pr-4">mdi-apps</v-icon> {{ !!!isEdit ? $t('apps.addApp') : $t('apps.editApp') }}
         </v-card-title>
         <v-divider></v-divider>
@@ -92,21 +92,24 @@
 					</v-menu>
 		   </v-col>
 	   </v-row>
-		<!-- <div class="content-list-item">
+		<!-- <div :v-if="isEmpty == true" class="content-list-item">
 			 <div class="empty-item-list">
-				 <div style="display:flex"> 
+				 <div class="empty-item-list-icon"> 
 					  <v-icon >mdi-check</v-icon>
 					  <v-icon >mdi-account-box-outline</v-icon>
+					  <v-icon >mdi-check</v-icon>
 					  <v-icon >mdi-check</v-icon>
 				 </div>
 				 <h6>Chưa có chức năng nào</h6>
 			 </div>
 		</div> -->
-		<AppDetailVue  @update-list-item="updateListItem"/>
+		<!-- <div ></div> -->
+		<AppDetailVue />
         <v-btn
             small
             color="primary"
-            class="btn-fixed-bottom"
+			style="margin-bottom:24px"
+            class="btn-fixed-bottom update-btn"
             @click="addApp"
             :disabled="!!!currentApp.name"
         >
@@ -139,10 +142,12 @@ export default {
         }
     },
     watch: {
-      
     },
     computed: {
-    },
+		sApp(){
+			return this.$store.state.appConfig.listItemSelected
+		},
+	},
     directives: {
         clickOutside: vClickOutside.directive
     },
@@ -153,7 +158,8 @@ export default {
             removeCallback: null,
             showResult: false,
             editCallback: null,
-            searchStr: "",
+			searchStr: "",
+			isEmpty: null,
             appObjects: [],
             currentApp: {
                 name: "",
@@ -178,76 +184,91 @@ export default {
         };
     },
     mounted(){
+		this.checkEmpty()	
     },
     methods: {
         setAppObject(app) {
             this.currentApp = JSON.parse(JSON.stringify(app));
-			console.log(this.currentApp ,'this.currentApp ');
-			console.log(app ,'this.currentApp ');
-        
+		},
+		checkEmpty(){
+			if(this.sApp.documents.item.length == 0 && this.sApp.orgcharts.item.length == 0 && this.sApp.reports.item.length == 0 && this.sApp.workflows.item.length == 0 ){
+				this.isEmpty = true;
+			}
+			else this.isEmpty = false;
 		},
 		updateListItem(data){
 			let self = this;
-			data.documents.item.forEach(function(e){
-				self.childrenApp.document.push(e.id);
-			});
-			data.orgcharts.item.forEach(function(e){
+			self.childrenApp.document = []
+			self.childrenApp.orgchart = []
+			self.childrenApp.report = []
+			self.childrenApp.workflow = []
+			if(data.documents.item.length > 0){
+				data.documents.item.forEach(function(e){
+					self.childrenApp.document.push(e.id);
+				});
+			}
+			if(data.orgcharts.item.length > 0){
+				data.orgcharts.item.forEach(function(e){
 				self.childrenApp.orgchart.push(e.id);
 			});
-			data.reports.item.forEach(function(e){
+			}
+			if(data.reports.item.length > 0){
+				data.reports.item.forEach(function(e){
 				self.childrenApp.report.push(e.id);
 			});
-			data.workflows.item.forEach(function(e){
-				self.childrenApp.workflow.push(e.id);
-			});
+			}
+			if(data.workflows.item.length > 0){
+				data.workflows.item.forEach(function(e){
+					self.childrenApp.workflow.push(e.id);
+				});
+			}
 			self.currentApp.childrenApp = self.childrenApp
-			console.log();
 		},
         pickIcon(data) {
-            this.currentApp.iconName = data.icon.trim();
+			this.currentApp.iconName = data.icon.trim();
             this.currentApp.iconType = data.type;
 		},
 		selectedItem(data){
 			this.listSelectedItem = data;
 		},
-        toggleObject(item, type) {
-            item.checked = item.checked == 0 ? 1: 0;
-            for (const index in this.allObjectToImport) {
-                let list = this.allObjectToImport[index];
-                if (list.type == type) {
-                    for (const i in list.objects) {
-                        const element = list.objects[i];
-                        if (element.id == item.id) {
-                            this.allObjectToImport[index].objects[i].checked = item.checked;
-                            this.resetAppObject();
-                            break;
-                        }
-                    }
-                }
-            }
-        },
-        resetAppObject() {
-            this.appObjects = [];
-            this.allObjectToImport.forEach(obj => {
-                let group = {
-                    type: obj.type,
-                    objects: []
-                };
-                for (const item of obj.objects) {
-                    if(item.checked == 1) {
-                        group.objects.push(item);
-                    }
-                }
-                this.appObjects.push(group);
-            });
-        },
+        // toggleObject(item, type) {
+        //     item.checked = item.checked == 0 ? 1: 0;
+        //     for (const index in this.allObjectToImport) {
+        //         let list = this.allObjectToImport[index];
+        //         if (list.type == type) {
+        //             for (const i in list.objects) {
+        //                 const element = list.objects[i];
+        //                 if (element.id == item.id) {
+        //                     this.allObjectToImport[index].objects[i].checked = item.checked;
+        //                     this.resetAppObject();
+        //                     break;
+        //                 }
+        //             }
+        //         }
+        //     }
+        // },
+        // resetAppObject() {
+        //     this.appObjects = [];
+        //     this.allObjectToImport.forEach(obj => {
+        //         let group = {
+        //             type: obj.type,
+        //             objects: []
+        //         };
+        //         for (const item of obj.objects) {
+        //             if(item.checked == 1) {
+        //                 group.objects.push(item);
+        //             }
+        //         }
+        //         this.appObjects.push(group);
+        //     });
+        // },
       
-        resetResult() {
-            this.listObjectToShows = JSON.parse(JSON.stringify(this.allObjectToImport));
-            for (const index in this.listObjectToShows) {
-                this.listObjectToShows[index].objects = this.listObjectToShows[index].objects.slice(0, 10);
-            }
-        },
+        // resetResult() {
+        //     this.listObjectToShows = JSON.parse(JSON.stringify(this.allObjectToImport));
+        //     for (const index in this.listObjectToShows) {
+        //         this.listObjectToShows[index].objects = this.listObjectToShows[index].objects.slice(0, 10);
+        //     }
+        // },
         addApp() {
             if(this.isEdit) {
                 this.updateApp();
@@ -264,8 +285,12 @@ export default {
         },
         createApp() {
 			this.updateListItem(this.$store.state.appConfig.listItemSelected)
+			
 			let data = JSON.stringify(this.currentApp);
+			// console.log(this.currentApp.iconName);
+			debugger	
 			appManagementApi.addApp(data).then(res => {
+				debugger
 				 this.$emit("add-app", res)
 			}).catch(err => {
 				this.showError()
@@ -274,23 +299,21 @@ export default {
 				
         },
          updateApp() {
-			 delete this.currentApp.childrenApp
+			if(this.currentApp.hasOwnProperty('childrenApp')){
+				delete this.currentApp.childrenApp
+			}
+			if(this.currentApp.status === null){
+				this.currentApp.status =0
+			}
 			this.updateListItem(this.$store.state.appConfig.listItemSelected)
-			console.log(this.currentApp,'update app');
 			let data = JSON.stringify(this.currentApp);
+			debugger
 			appManagementApi.updateApp(data).then(res => {
 				  this.$emit("update-app", res)
 			}).catch(err => {
 				this.showError()
 			})
 			.always(() => {});;
-            // let req = new Api(this.apiUrl);
-            // req.put(this.appUrl, {...this.currentApp, objects: this.getListObjsInShort()})
-            // .then((res) => {
-            //     this.$emit("update-app", res)
-            // }).catch((err) => {
-            //     this.showError()
-            // });
         },
     },
 };
@@ -310,6 +333,9 @@ export default {
 .update-app-symper >>>.button-add-item .v-btn__content{
 	font: 13px Roboto !important;
 }
+.update-app-symper >>> .v-card__title{
+	font-weight: 410 !important;
+}
 .update-app-symper >>>.empty-item-list{
 	width:140px;
 	margin-left: auto;
@@ -317,7 +343,13 @@ export default {
 	opacity: 0.2;
 	margin-top:30px;
 	display: flex;
-	 flex-wrap: wrap;
+	flex-wrap: wrap;
+	align-items: center;
+}
+.update-app-symper >>>.empty-item-list .empty-item-list-icon{
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
 }
 .update-app-symper >>>.empty-item-list .v-icon{
 	font-size: 40px;
@@ -379,6 +411,10 @@ export default {
 }
 .list-app-object >>> .v-list-group__items .v-list-item:hover .v-list-item__action{
     display: block;
+}
+.list-app-object >>> .v-navigation-drawer__content .update-btn{
+    /* display: block; */
+	margin-bottom: 20px;
 }
 .v-menu__content {
     background: #fff;

@@ -33,7 +33,7 @@
                                     <v-icon>mdi-apps</v-icon>
                                 </v-btn>
                             </template>
-                            <EndUserPopup />
+                            <EndUserPopup  />
 							<!-- <div>hello</div> -->
                         </v-menu>
                         <v-btn icon>
@@ -73,6 +73,7 @@
                 
             </v-container>
         </v-content>
+		 <!-- <EndUserPopup ref="endUserPopup" /> -->
     </v-app>
 </template>
 
@@ -127,7 +128,12 @@ export default {
                     this.$store.state.app.unreadNotification = res.data;
                 }
             });
-        }
+		},
+		clickApps(){
+			debugger
+			// this.$refs.endUserPopup.getActiveapps()
+			// this.$refs.endUserPopup.getFavorite()
+		}
         
     },
     components: {

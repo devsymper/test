@@ -14,7 +14,7 @@
 				<v-app-bar dense flat color="white">
 					<v-toolbar-title>
 						<v-icon>mdi-apps</v-icon>
-							{{$t('apps.title')}}
+							<span class="tittle">{{$t('apps.title')}}</span>
 					</v-toolbar-title>
 					<v-spacer></v-spacer>
 				</v-app-bar>
@@ -22,7 +22,7 @@
 						<div class="title-favorite"><v-icon >mdi-star</v-icon><h4>{{$t('apps.favorite')}}</h4></div>
 						<ul style="margin:0 10px;">
 							<VuePerfectScrollbar :style="{height: listFavoriteHeight}"  >
-								<li v-for="(item,i) in listFavorite[0]" :key="i">{{item.name}}<v-icon color="yellow" style="float:right;font-size:13px">mdi-star</v-icon></li>
+								<li v-for="(item,i) in listFavorite[0]" :key="i">{{item.name}}<v-icon  color="yellow" style="float:right;font-size:13px">mdi-star</v-icon></li>
 							</VuePerfectScrollbar>
 						</ul>
 					</div>
@@ -33,8 +33,18 @@
 								class="list-app-item"
 								@click="clickDetails(item)"
 								>
-								<v-icon>mdi-folder</v-icon>
-								<h5>{{item.name}}</h5>
+								<div class="app-item-icon">
+									<v-icon v-if="item.iconType == 'icon'">{{item.iconName}}</v-icon>
+									<img v-else-if="item.iconType == 'img'" :src="item.iconName" class="app-item-img"/>
+									<v-icon v-else>mdi-star</v-icon>
+								</div>
+								  <v-tooltip bottom>
+									<template v-slot:activator="{ on, attrs }">
+									<h5 v-bind="attrs"
+										v-on="on">{{item.name}}</h5>
+									</template>
+									<span>{{item.name}}</span>
+								 </v-tooltip>
 							</div>
 						</VuePerfectScrollbar>	
 					</div>
@@ -44,7 +54,7 @@
          value='tab-2'
         >
           <v-card flat class="tab-detail">
-			  <v-card-title> <v-btn  @click="clickBack" icon><v-icon>mdi-keyboard-backspace</v-icon></v-btn> <v-icon>{{title.icon}}</v-icon> <h4>{{title.name}}</h4></v-card-title>
+			  <v-card-title> <v-btn  @click="clickBack" icon><v-icon class="tab-detail-icon-title">mdi-keyboard-backspace</v-icon></v-btn> <v-icon v-if="title.iconType == 'icon'">{{title.iconName}}</v-icon> <img v-else :src="title.iconName" style="width:20px;height:20px"> <h4>{{title.name}}</h4></v-card-title>
 				<v-text-field
 					:label="$t('apps.search')"
 					single-line
@@ -52,7 +62,7 @@
 					append-icon="mdi-magnify"
 					v-model="searchKey"
 				></v-text-field>
-			  <AppDetail :isEndUserCpn="isEndUserCpn" :searchKey="searchKey" />
+			  <AppDetail ref="appDetails" :isEndUserCpn="isEndUserCpn" :searchKey="searchKey" />
           </v-card>
         </v-tab-item>
       </v-tabs-items>
@@ -88,34 +98,37 @@ export default {
 		 },
 		 mapId:{
 			 orgchart:{
-
 			 },
 			 document:{
-
 			 },
 			 report:{
-
 			 },
 			 workflow:{
-
 			 }
 		 },
 		 }
 	},
 	created(){
-		appManagementApi.getActiveApp().then(res => {
-			if (res.status == 200) {
-				this.apps = res.data.listObject
-			}
-			}).catch((err) => {
-		});
-		let userId = this.$store.state.app.endUserInfo.id
-		appManagementApi.getItemFavorite(userId).then(res => {
-			if (res.status == 200) {
-				this.checkTypeFavorite(res.data.listObject)
-			}
-			}).catch((err) => {
-		});
+		this.getActiveapps()
+		this.getFavorite()
+	},
+	mounted(){
+		 let thisCpn = this;
+	 	 $(document).click(function(e){
+				if(!$(e.target).is('.menu') && !$(e.target).is('.menuItem')){
+					$('.menu').hide()		
+				}
+			});
+			$(document).click(function(e){
+				if(!$(e.target).is('.context-menu')){
+					thisCpn.$refs.appDetails.hideContextMenu()		
+				}
+			})
+			// $(document).click(function(e){
+			// 	if(!$(e.target).is('.context-menu')){
+			// 		thisCpn.$refs.sidebar.hideContextMenu()		
+			// 	}
+			// })
 	},
 	components: {
 		VuePerfectScrollbar,
@@ -127,8 +140,26 @@ export default {
 		}
 	},
 	methods:{
+		getActiveapps(){
+			appManagementApi.getActiveApp().then(res => {
+				if (res.status == 200) {
+					this.apps = res.data.listObject
+				}
+			}).catch((err) => {
+			});
+		},
+		getFavorite(){
+			let userId = this.$store.state.app.endUserInfo.id
+			appManagementApi.getItemFavorite(userId).then(res => {
+				if (res.status == 200) {
+					this.checkTypeFavorite(res.data.listObject)
+				}
+			}).catch((err) => {
+			});
+		},
 		clickDetails(item){
-			this.title.icon = item.iconName;
+			this.title.iconName = item.iconName;
+			this.title.iconType = item.iconType;
 			this.title.name = item.name;
 			appManagementApi.getAppDetails(item.id).then(res => {
 				if (res.status == 200) {
@@ -139,6 +170,7 @@ export default {
 			this.tab = 'tab-2'
 		},
 		getDocumentsApi(dataDoc,type=''){
+			let self = this
 			documentApi.searchListDocuments(
 					{
 						search:'',
@@ -154,16 +186,18 @@ export default {
 						]
 					}
 				).then(resDoc => {
-					if(type == 'listFavorite'){
+					if(type == "listFavorite"){
 						this.listFavorite.push(resDoc.data.listObject)
+						console.log(this.listFavorite,'this.listFavoritethis.listFavoritethis.listFavorite');
 					}
 					else{
-						debugger
+						this.updateFavoriteItem(self.mapId.document,resDoc.data.listObject)
 						this.$store.commit('appConfig/updateChildrenApps',{obj:resDoc.data.listObject,type:'documents'});
 					}
 				});
 		},
 		getOrgchartApi(dataOrg,type=''){
+			let self = this
 			orgchartApi.getOrgchartList({
 								search:'',
 								pageSize:50,
@@ -177,14 +211,16 @@ export default {
 								}
 				]}).then(resOrg => {
 					if(type == 'listFavorite'){
-						this.listFavorite.push(resDoc.data.listObject)
+						this.listFavorite.push(resOrg.data.listObject)
 					}
 					else{
+						this.updateFavoriteItem(self.mapId.orgchart,resOrg.data.listObject)
 						this.$store.commit('appConfig/updateChildrenApps',{obj:resOrg.data.listObject,type:'orgcharts'});
 					}
 				});
 		},
 		getDashBoardApi(dataRep,type =''){
+			let self = this
 			dashboardApi.getDashboards({
 								search:'',
 								pageSize:50,
@@ -198,14 +234,16 @@ export default {
 								}
 				]}).then(resRp => {
 					if(type == 'listFavorite'){
-						this.listFavorite.push(resDoc.data.listObject)
+						this.listFavorite.push(resRp.data.listObject)
 					}
 					else{
+						this.updateFavoriteItem(self.mapId.report,resRp.data.listObject)
 						this.$store.commit('appConfig/updateChildrenApps',{obj:resRp.data.listObject,type:'reports'});
 					}
 				});
 		},
 		getWorkFlowApi(dataW,type=''){
+				let self = this
 				BpmnEngine.getListModels({
 								search:'',
 								pageSize:50,
@@ -219,9 +257,10 @@ export default {
 								}
 				]}).then(resW => {
 					if(type == 'listFavorite'){
-						this.listFavorite.push(resDoc.data.listObject)
+						this.listFavorite.push(resW.data.listObject)
 					}
 					else{
+						this.updateFavoriteItem(self.mapId.workflow,resW.data.listObject)
 						this.$store.commit('appConfig/updateChildrenApps',{obj:resW.data.listObject,type:'workflows'});
 					}
 				});
@@ -245,7 +284,7 @@ export default {
 			if(self.arrType.document.length > 0){
 				let dataDoc = self.arrType.document
 				this.getDocumentsApi(dataDoc,'listFavorite')
-				console.log(this.listFavorite,'list favoriteeeeeeeeeeeee');
+				
 			}
 			if(self.arrType.orgchart.length > 0){
 				let dataOrg = self.arrType.orgchart
@@ -262,31 +301,34 @@ export default {
 		},
 		clickBack(){
 			this.tab = 'tab-1'
+			this.getActiveapps()
+			this.getFavorite()
+		},
+		updateFavoriteItem(mapArray,array){
+			for( let [key,value] of Object.entries(mapArray)){
+				array.forEach(function(item){
+					if(item.id == key){
+						item.favorite = value.isFavorite
+						item.actions = value.actions
+					} 
+				})
+			}
+			return array
 		},
 		checkChildrenApp(data){
 			let self = this 
+			self.arrType.orgchart = []
+			self.arrType.document = []
+			self.arrType.report = []
+			self.arrType.workflow = []
 			if(data.hasOwnProperty('orgchart')){
 				data.orgchart.forEach(function(e){
 					self.arrType.orgchart.push(e.id);
 					self.mapId.orgchart[e.id] = e;
 				})
+				console.log(self.mapId.orgchart);
 				let dataOrg = self.arrType.orgchart;
 				this.getOrgchartApi(dataOrg)
-				console.log(self.mapId,'mapId');
-				console.log(this.sAppManagement,'dataStoredataStore');
-				for( let [key,value] of Object.entries(self.mapId.orgchart)){
-					console.log(key,value,'mapID');
-					this.sAppManagement.orgcharts.item.forEach(function(item,index){
-						console.log(item,index,'storeee');
-						if(item.id == key){
-							item.favorite = value.isFavorite
-							debugger
-						} 
-					})
-					console.log(this.sAppManagement.orgcharts.item);
-					
-				}
-				// console.log(this.sAppManagement,'dataStoredataStore');
 			}	
 			if(data.hasOwnProperty('document')){
 				data.document.forEach(function(e){
@@ -295,8 +337,6 @@ export default {
 				})
 				let dataDoc = self.arrType.document
 				this.getDocumentsApi(dataDoc);
-				console.log(self.mapId,'mapId');
-				console.log(this.sAppManagement,'dataStoredataStore');
 			}
 			if(data.hasOwnProperty('workflow')){
 				data.workflow.forEach(function(e){
@@ -324,6 +364,12 @@ export default {
 	font: 13px Roboto;
 	overflow: hidden;
 }
+.end-user-popup >>> .tittle{
+	font: 18px Roboto;
+	padding-left:8px;
+	font-weight:400
+
+}
 .end-user-popup >>> .list-favorite ul{
 	list-style: none;
 }
@@ -333,27 +379,31 @@ export default {
 .end-user-popup >>> .title-favorite,
 .end-user-popup >>> .title-list-app {
 	display: flex;
-	margin: 10px 15px;
+	margin: 8px 15px;
 }
 .end-user-popup >>> .title-list-app {
 	border-top: 1px solid lightgrey;
 	padding-top: 8px;
 }
-.end-user-popup >>> .title-favorite .v-icon,
+.end-user-popup >>> .title-favorite .v-icon
+{
+	font-size: 13px;
+	padding: 2px 8px ;
+}
 .end-user-popup >>> .title-list-app .v-icon{
 	font-size: 13px;
-	padding: 3px 8px ;
+	padding: 0px 8px ;
 }
 .end-user-popup >>> .title-favorite h4,
 .end-user-popup >>> .title-list-app h4{
 	padding-left: 2px;
-	padding-top: 2px;
+	/* padding-top: 2px; */
 	font-weight: unset;
 }
 .end-user-popup >>> .list-app-cointaner{
 	display: flex;
     flex-wrap: wrap;
-	width: 350px;
+	width: 370px;
 	margin-right:auto;
 	margin-left:auto;
 }
@@ -365,16 +415,50 @@ export default {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	/* margin-right:8px; */
+	/* margin-right:auto; */
 	/* margin-left:auto; */
+	padding:0px 8px;
 	margin-bottom: 12px;
 }
-.end-user-popup >>> .list-app-cointaner .list-app-item .v-icon{
-	font-size:60px;
-	padding:10px
+.end-user-popup >>> .list-app-cointaner .list-app-item .app-item-icon { 
+	/* max-width: 50px; */
+	/* max-height: 50px;1 */
+	/* display: flex;
+	justify-content: center;
+	align-items: center; */
+	width: 70px;
 }
+.end-user-popup >>> .list-app-cointaner .list-app-item .app-item-icon .v-icon { 
+	font-size:45px;
+}
+.end-user-popup >>> .list-app-cointaner .list-app-item .app-item-icon .app-item-img{
+	 width:40px;
+	 height:40px;
+	 margin:12px 8px 14px 16px;
+	 /* padding: 4px; */
+	 /* margin:13px 5px 0px 5px;padding:4px */
+}
+.end-user-popup >>> .list-app-cointaner .list-app-item .v-icon{
+	font-size:45px;
+	padding:12px;
+	opacity: 0.7;
+}
+/* .end-user-popup >>> .list-app-cointaner .list-app-item .v-icon {
+
+} */
 .end-user-popup >>> .list-app-cointaner .list-app-item h5{
 	margin-top: -12px;
+	font: 13px roboto;
+	font-weight: 400;
+	width: 60px; 
+	overflow: hidden;
+	text-overflow: ellipsis;
+	display: -webkit-box;
+	-webkit-line-clamp: 2;
+	-webkit-box-orient: vertical;
+}
+.end-user-popup >>> .list-app-cointaner .list-app-item {
+	padding-top: 2px;
 }
 .end-user-popup >>> .tab-detail .v-card__title{
 	font: 13px Roboto;
@@ -383,9 +467,14 @@ export default {
 .end-user-popup >>> .tab-detail .v-card__title .v-icon{
 	font-size: 13px;
 }
+.end-user-popup >>> .tab-detail .v-card__title .v-icon .tab-detail-icon-title{
+	padding-top: 2px;
+}
 .end-user-popup >>> .tab-detail .v-card__title h4{
 	padding-left: 8px;
-	font-size: 15px;
+	/* font-size: 15px; */
+	font: 15px roboto;
+	font-weight: 400;
 }
 .end-user-popup >>> .tab-detail .v-input__control{
 	text-shadow: unset;

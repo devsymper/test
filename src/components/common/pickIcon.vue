@@ -302,7 +302,7 @@ export default {
             }
         },
         selectIcon(icon,type='img') {
-			console.log(icon);
+			// console.log(icon);
             this.$emit("selected", {icon: icon.trim(),type:type});
         }
     }

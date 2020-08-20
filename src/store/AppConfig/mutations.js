@@ -15,14 +15,14 @@ import {
 const updateListItemSelected = (state, data) => {
 	// Vue.set(state, 'listItemSelected', data);
 	let listItem = state.listItemSelected[data.type].item;
-	if (listItem.indexOf(data.obj) == -1) {
-		listItem.push(data.obj);
+	if (listItem.includes(data.obj)) {
+		listItem.splice(listItem.indexOf(data.obj), 1);
 	} else {
-		listItem.splice(listItem.indexOf(data.obj));
+		listItem.push(data.obj);
 	}
 }
 const removeItemSelected = (state, data) => {
-	state.listItemSelected[data.type].item.splice(state.listItemSelected[data.type].item.indexOf(data.id), 1);
+	state.listItemSelected[data.type].item.splice(state.listItemSelected[data.type].item.indexOf(data.item), 1);
 }
 const emptyItemSelected = (state) => {
 	state.listItemSelected = {
@@ -55,18 +55,12 @@ const emptyItemSelected = (state) => {
 const updateChildrenApps = (state, data) => {
 	// Vue.set(state, 'listItemSelected', data);
 	state.listItemSelected[data.type].item = data.obj
-	// debugger
-	// let listItem = state.listItemSelected[data.type].item;
-	// if (listItem.indexOf(data.obj) == -1) {
-	// 	listItem.push(data.obj);
-	// } else {
-	// 	listItem.splice(listItem.indexOf(data.obj));
-	// }
 }
+
 export {
 	updateListItemSelected,
 	removeItemSelected,
 	emptyItemSelected,
-	updateChildrenApps
+	updateChildrenApps,
 
 };

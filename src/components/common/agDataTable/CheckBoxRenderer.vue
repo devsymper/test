@@ -18,12 +18,10 @@ export default {
         },
         changeCheckbox(){
             this.value = !this.value;
-            let checked = this.value;
-            let colId = this.params.column.colId;
-            console.log(colId);
-            console.log(this.params);
-            let rowIndex = this.params.rowIndex;
-            this.params.api.getRowNode(rowIndex).setDataValue(colId,checked)
+            let controlName = this.params.data.name[this.params.data.name.length - 1];
+            console.log("dákjdsd",this.params);
+            let prop = this.params.colDef.field;
+            this.$evtBus.$emit('document-editor-ag-grid-on-change-checkbox',{controlName:controlName,value:this.value,prop:prop})
 
         }
     },

@@ -32,6 +32,7 @@ import {orgchartApi} from './../../api/orgchart';
 import {documentApi} from './../../api/Document';
 import {dashboardApi} from './../../api/dashboard';
 import BpmnEngine from './../../api/BPMNEngine';
+import Handsontable from 'handsontable';
 export default {
     name: "listApps",
     components: {
@@ -42,7 +43,6 @@ export default {
         baseUrl: function() {
             return this.apiUrl + this.appUrl ;
         },
-        
     },
     created(){
 		let self = this;
@@ -63,26 +63,46 @@ export default {
                                 {name: "name", title: "name", type: "text"},
                                 {name: "iconName", title: "icon", type: "text",
                                     renderer:  function(instance, td, row, col, prop, value, cellProperties) {
-										let icon;
-										icon = document.createElement('i');
-										icon.classList.add('mdi');
-										icon.classList.add(value[0]);
-										icon.style.lineHeight = "15px";
-										td.appendChild(icon);
-                                            return td;
-                                        },},
+										Handsontable.dom.empty(td);
+										if(value === null || value == ""){
+											return td;
+										}
+										if(value.includes("mdi-")){
+											let icon;
+											icon = document.createElement('i');	
+											icon.classList.add('mdi');
+											icon.classList.add(value);
+											// icon.style.lineHeight = "20px";
+											$(icon).css('font-size','16px')
+											td.appendChild(icon);
+                                       		 return td;
+										}else{
+											let img;
+											img = document.createElement('img');
+											$(img).attr('src',value)
+											$(img).css('width','40px')
+											$(img).css('height','40px')
+											td.appendChild(img)
+											return td;
+										}
+										
+									},
+								},
 								{name: "status", title: "status", type: "text",
 									renderer:  function(instance, td, row, col, prop, value, cellProperties) {
 										let icon;
-										if(value[0] == 1){
+										Handsontable.dom.empty(td);
+										if(value === "1"){
 											icon = document.createElement('i');
-											icon.classList.add('mdi mdi-check');
-										// icon.classList.add(value[0]);
-											icon.style.lineHeight = "15px";
+											icon.classList.add('mdi');
+											icon.classList.add('mdi-check');
+											$(icon).css('color','green')
+											$(icon).css('font-size','16px')
+											// icon.style.lineHeight = "15px";
 											td.appendChild(icon);
 											return td;
 										}
-										},
+									},
 								},
                                 {name: "createdAt", title: "created_at", type: "text"},
                                 {name: "updatedAt", title: "updated_at", type: "text"},
@@ -117,7 +137,17 @@ export default {
                     },
                 },
             ],
-            tableHeight: 0,
+			tableHeight: 0,
+			arrType:{
+				document:[
+				],
+				orgchart:[
+				],
+				report:[
+				],
+				workflow:[
+				]
+			},
         };
     },
     mounted() {
@@ -153,7 +183,6 @@ export default {
             appManagementApi.deleteApp(app[0].id)
             .then(res => {
                 if (res.status == 200) {
-                    // callback here
                     this.removeCallback(res);   
                     this.$snotify({
                         type: 'success',
@@ -169,7 +198,6 @@ export default {
         },
         addApp(res) {
             if (res.status == 200) {
-                // callback come here
                 this.$refs.listApp.getData();
                 this.closeSidebar();
                 this.$snotify({
@@ -183,7 +211,6 @@ export default {
         },
         updateApp(res) {
             if (res.status == 200) {
-                // callback come here
                 this.editCallback({
                     ...res,
                     data: {
@@ -201,27 +228,48 @@ export default {
             }
 		},
 		checkChildrenApp(data){
+			let self = this
+			console.log(self.arrType);
 			if(data.hasOwnProperty('orgchart')){
-						let dataOrg = data.orgchart;
-						orgchartApi.getOrgchartList({
-										search:'',
-										pageSize:50,
-										filter: [
-										{
-											column: 'id',
-											valueFilter: {
-												operation: 'IN',
-												values: dataOrg						
-											}
-										}
-						]}).then(resOrg => {
-							console.log(resOrg.data.listObject);
-							this.$store.commit('appConfig/updateChildrenApps',{obj:resOrg.data.listObject,type:'orgcharts'});
-						});
+				data.orgchart.forEach(function(e){
+					self.arrType.orgchart.push(e.id)
+				});
 			}
 			if(data.hasOwnProperty('document')){
-						let dataDoc = data.document;
-								
+				data.document.forEach(function(e){
+					self.arrType.document.push(e.id)
+				});
+			}
+			if(data.hasOwnProperty('report')){
+				data.report.forEach(function(e){
+					self.arrType.report.push(e.id)
+				});
+			}
+			if(data.hasOwnProperty('workflow')){
+				data.workflow.forEach(function(e){
+					self.arrType.workflow.push(e.id)
+				});
+			}
+			if(self.arrType.orgchart.length > 0){
+				let dataOrg = self.arrType.orgchart;
+				orgchartApi.getOrgchartList({
+								search:'',
+								pageSize:50,
+								filter: [
+								{
+									column: 'id',
+									valueFilter: {
+										operation: 'IN',
+										values: dataOrg						
+									}
+								}
+				]}).then(resOrg => {
+					console.log(resOrg.data.listObject);
+					this.$store.commit('appConfig/updateChildrenApps',{obj:resOrg.data.listObject,type:'orgcharts'});
+				});
+			}
+			if(self.arrType.document.length > 0){
+						let dataDoc = self.arrType.document;
 						documentApi.searchListDocuments(
 							{
 								search:'',
@@ -238,11 +286,10 @@ export default {
 							}
 						).then(resDoc => {
 							this.$store.commit('appConfig/updateChildrenApps',{obj:resDoc.data.listObject,type:'documents'});
-							
 						});
 			}
-			if(data.hasOwnProperty('workflow')){
-						let dataW = data.workflow;
+			if(self.arrType.workflow.length > 0){
+						let dataW = self.arrType.workflow;
 						BpmnEngine.getListModels({
 										search:'',
 										pageSize:50,
@@ -258,25 +305,28 @@ export default {
 							this.$store.commit('appConfig/updateChildrenApps',{obj:resW.data.listObject,type:'workflows'});
 						});
 			}
-			if(data.hasOwnProperty('report')){
-						let dataRep = data.report;
-						dashboardApi.getDashboards({
-										search:'',
-										pageSize:50,
-										filter: [
-										{
-											column: 'id',
-											valueFilter: {
-												operation: 'IN',
-												values: dataRep						
-											}
-										}
-						]}).then(resRp => {
-							this.$store.commit('appConfig/updateChildrenApps',{obj:resRp.data.listObject,type:'reports'});
-						});
+			if(self.arrType.report.length > 0){
+				let dataRep = self.arrType.report;
+				dashboardApi.getDashboards({
+								search:'',
+								pageSize:50,
+								filter: [
+								{
+									column: 'id',
+									valueFilter: {
+										operation: 'IN',
+										values: dataRep						
+									}
+								}
+				]}).then(resRp => {
+					this.$store.commit('appConfig/updateChildrenApps',{obj:resRp.data.listObject,type:'reports'});
+				});
 			}
+			self.arrType.orgchart = []
+			self.arrType.document = []
+			self.arrType.workflow = []
+			self.arrType.report = []
 		}
-      
     },
 };
 </script>

@@ -435,6 +435,9 @@ export default {
 
         appendValueToSciptEditor(dateTime){
             this.$refs.basicFormulaEditor.setValue(dateTime);
+        },
+        hideDragPanel(){
+            this.$refs.dragPanel.hide();
         }
     },
     props: {

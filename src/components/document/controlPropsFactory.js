@@ -464,7 +464,7 @@ const controlTypes = {
         html: `<input class="s-control s-control-filter" contenteditable="false" title="Input filter" type="text" s-control-type="inputFilter">&nbsp;`,
         title: "Input filter",
         notInProps: ['minValue', 'maxValue', 'formatNumber', 'formatDate', 'isSumTable', 'isTableOnly', 'isAllowUpdate', 'isDisplayCompact', 'isMultipleValue'],
-        formulas: ['formulas', 'hidden', 'readOnly', 'link', 'require', 'validate']
+        formulas: ['formulas', 'list', 'hidden', 'readOnly', 'link', 'require', 'validate']
     },
     hidden: {
         icon: "/icon/ic_hidden.png",
@@ -710,27 +710,11 @@ export const getAllPropsControl = function() {
         let width = (type == 'checkbox') ? 40 : 100
         let colDefine = { headerName: data[key].title, field: key, groupType: data[key].groupType, width: width, editable: true, colId: key }
         if (type == 'checkbox') {
-            colDefine = {
-                headerName: data[key].title,
-                field: key,
-                cellRenderer: 'checkBoxRenderer',
-                editable: true,
-                groupType: data[key].groupType,
-                width: width,
-                colId: key,
-            }
+            colDefine['cellRenderer'] = 'checkBoxRenderer'
         }
-        // function(params) {
-        //     var checkbox = document.createElement("input");
-        //     checkbox.type = "checkbox";
-        //     checkbox.checked = params.value
-        //     checkbox.addEventListener('click', function(event) {
-        //         params.value = !params.value;
-        //         let colName = params.colDef.field;
-        //         params.node.data[colName] = params.value;
-        //     });
-        //     return checkbox
-        // },
+        if (key == 'name') {
+            colDefine['cellEditor'] = 'colGroupEditor'
+        }
         if (type == 'select') {
             colDefine['cellEditor'] = 'agSelectCellEditor'
             colDefine['cellRenderer'] = function(params) {
@@ -747,6 +731,7 @@ export const getAllPropsControl = function() {
         return colDefine;
     });
 
+    console.log("sdasfasd", result);
     let groups = util.cloneDeep(groupType);
     Object.filter = (obj, predicate) =>
         Object.fromEntries(Object.entries(obj).filter(predicate));

@@ -4,10 +4,15 @@
 			<div v-for="(itemT,i) in sAppModule" :key="i" class="app-item">
 					<div class="title-app" v-if="itemT.item.length >0"><v-icon style="font-size:13px">{{itemT.icon}}</v-icon> <h4> {{ itemT.title }} <span> {{'('+itemT.item.length +')' }}</span> </h4></div>
 					<ul v-for="(childItem,i) in itemT.item" :key="i"  class="app-child-item">
-							<li v-on:contextmenu="rightClickHandler($event,childItem,itemT.name)">
+							<li v-if="isEndUserCpn == true" v-on:contextmenu="rightClickHandler($event,childItem)">
 								{{childItem.name}}
-							<v-icon class="icon-star" v-if="isEndUserCpn == true">mdi-star</v-icon>	
-							<v-icon v-else class="icon-remove"  @click="removeItem(childItem.id,itemT.name)">mdi-delete-circle</v-icon>
+							<v-icon class="icon-star" v-if="childItem.favorite==true">mdi-star</v-icon>	
+							<!-- <v-icon v-if="isEndUserCpn == false" class="icon-remove"  @click="removeItem(childItem.id,itemT.name)">mdi-delete-circle</v-icon> -->
+							</li>
+							<li v-else>
+								{{childItem.name}}
+							<!-- <v-icon class="icon-star" v-if="isEndUserCpn == true && childItem.favorite==true">mdi-star</v-icon>	 -->
+							<v-icon  class="icon-remove"  @click="removeItem(childItem,itemT.name)">mdi-delete-circle</v-icon>
 							</li>
 					</ul>
 			</div>	
@@ -25,50 +30,6 @@ export default {
 			listItemHeight: '400px',
 			currentSelected:null,
 			typeSelected:null,
-			contextMenus:
-			[
-				{name:'Thêm bản ghi',icon:'mdi-backup-restore',
-					callback: (item)=>{
-						console.log(this.currentSelected,'cureenttttttttttttttttttttttttttt');
-					}
-				},
-				{name:'Danh sách bản ghi',icon:'mdi-format-list-bulleted',
-					callback: (item)=>{
-						console.log(self.currentSelected);
-					}
-				},
-				{name:'Yêu thích',icon:'mdi-star',
-					callback: (item)=>{
-						console.log(this.currentSelected);
-						// console.log(this.typeSelected);
-						if(this.typeSelected == 'documents'){
-							this.typeSelected = 'document'
-						}
-						if(this.typeSelected == 'orgcharts'){
-							this.typeSelected = 'orgchart'
-						}
-						if(this.typeSelected == 'reports'){
-							this.typeSelected = 'report'
-						}
-						if(this.typeSelected == 'workflows'){
-							this.typeSelected = 'workflow'
-						}
-						console.log(this.typeSelected);
-						let userId = this.$store.state.app.endUserInfo.id
-						console.log(userId);
-						appManagementApi.addFavoriteItem(userId,this.currentSelected.id,this.typeSelected).then(res => {
-							if (res.status == 200) {
-								console.log('add thanh cong');
-							}
-           				 });
-					}
-				},
-				{name:'Import dữ liệu',icon:'mdi-file-outline',
-					callback: (item)=>{
-						console.log(item);
-					}
-				},
-			],
 			objFilter:{
 				documents: {
 					icon: 'mdi-file-document',
@@ -105,6 +66,24 @@ export default {
 		ContextMenu,
 		VuePerfectScrollbar
 	},
+	mounted(){
+	  let thisCpn = this;
+	 		// $(document).click(function(e){
+			// 	if(!$(e.target).is('.menu') && !$(e.target).is('.menuItem')){
+			// 		$('.menu').hide()		
+			// 	}
+			// });
+			$(document).click(function(e){
+				if(!$(e.target).is('.context-menu')){
+					thisCpn.$refs.contextMenu.hide()		
+				}
+			})
+			$(document).click(function(e){
+				if(!$(e.target).is('.context-menu')){
+					thisCpn.$refs.contextMenu.hide()		
+				}
+			})
+  },
 	computed:{
 		sAppModule(){
 				if(this.searchKey == ""){
@@ -127,8 +106,9 @@ export default {
 		}
     },
 	methods:{
-		removeItem(id,type){
-			this.$store.commit('appConfig/removeItemSelected',{id:id,type:type})
+		removeItem(item,type){
+			this.$store.commit('appConfig/removeItemSelected',{item:item,type:type})
+			console.log(this.$store.state.appConfig.listItemSelected);
 		},
 		filterItem(){
 			let self = this
@@ -167,16 +147,19 @@ export default {
 				})
 			}
 		},
-		rightClickHandler(event,item,type){
+		rightClickHandler(event,item){
 			this.currentSelected = item;
-			this.typeSelected = type;
-
+			// this.typeSelected = type;
 			event.stopPropagation();
 			event.preventDefault();
-			// debugger
-			this.$refs.contextMenu.setContextItem(this.contextMenus)
+			console.log(event);
+			debugger
+			this.$refs.contextMenu.setContextItem(item.actions)
 			this.$refs.contextMenu.show(event)
-		}, 	
+		}, 
+		hideContextMenu(){
+			this.$refs.contextMenu.hide()
+		},	
 	},
 }
 </script>
@@ -191,15 +174,19 @@ export default {
 .app-details >>> .app-item .title-app{
 	display: flex;
 	cursor: pointer;
-	padding:10px 15px;
+	padding:8px 15px;
 }
 .app-details >>> .app-item .title-app h4{
 	padding-left:8px;
+	/* padding-top: -2px; */
 	font-weight: unset;
 }
 .app-details >>> .app-item .app-child-item .v-icon{
 	font-size:13px;
 	float:right;
+	/* padding-top: 2px; */
+	line-height:unset;
+
 }
 .app-details >>> .app-item .app-child-item .icon-remove{
 	 display: none;
@@ -209,7 +196,7 @@ export default {
 }
 .app-details >>> .app-item li{
 	cursor: pointer;
-	padding: 8px 10px;
+	padding:8px 12px;
 	margin-right: 10px;
 }
 .app-details >>> .app-item li:hover {

@@ -69,6 +69,11 @@ export default {
                 return {}
             }
         },
+        groupColumnCellEditorName: {
+            default(){
+                return {}
+            }
+        }
     },
     data(){
         return {
@@ -121,8 +126,11 @@ export default {
                 else{
                     params.data['name'][0] = x
                 }
+                
                 params.oldValue = y
-            }
+            },
+           
+            cellEditor: this.groupColumnCellEditorName
         };
         this.groupDefaultExpanded = -1;
         this.getDataPath = data => {
