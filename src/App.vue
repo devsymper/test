@@ -2,7 +2,7 @@
     <div id="symper-app" @click="handleClickApp">
         <component :is="layout">
             <keep-alive>
-                <router-view :key="$route.params.pageInstanceKey" />
+                <router-view :key="$route.params.pageInstanceKey"  :ref="$route.params.pageInstanceKey" />
             </keep-alive>
             <notifications group="symper-general-notification" :position="sapp.generalNotificationPosition">
                 <template slot="body" slot-scope="props">
@@ -71,6 +71,22 @@ export default {
     methods: {
         handleClickApp(evt) {
             this.$evtBus.$emit("symper-app-wrapper-clicked", evt);
+            if($(evt.target).attr('symper-action')){
+                let actionDef = null;
+                try {
+                    actionDef = JSON.parse($(evt.target).attr('symper-action'));
+                } catch (error) {
+                    console.error('[SYMPER-ACTION-HANDLER: DOM has symper-action attribute but can not parse to object]', evt.target);
+                }
+
+                if(actionDef){
+                    if(actionDef.action){
+                        this.$evtBus.$emit('symper-app-call-action-handler', actionDef.action, this, actionDef.params ? actionDef.params : {})
+                    }else{
+                        console.error('[SYMPER-ACTION-HANDLER: action property not found in action definition]', evt.target, actionDef);
+                    }
+                }
+            }
         },
         removeBacklogRequest() {
             let needResolve = this.backlogRequests.needResolve;

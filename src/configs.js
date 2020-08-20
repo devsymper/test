@@ -7,6 +7,7 @@ export const appConfigs = {
 		datetime: 'mdi-calendar-clock',
 		time: 'mdi-timer-outline',
 	},
+	maxOpenTab: 15,
 	apiDomain: {
 		account: 'https://account.symper.vn/',
 		user: 'https://account.symper.vn/',
@@ -32,12 +33,11 @@ export const appConfigs = {
 		userRole: "https://orgchart.symper.vn/",
 		permission: "https://accesscontrol.symper.vn/",
 		dashboard: "https://bi-service.symper.vn/report-and-dashboard/",
-		s: "https://core.symper.vn/",
+
 		permissionPacks: "https://accesscontrol.symper.vn/permission_packs",
 		actionPacks: "https://accesscontrol.symper.vn/action_packs",
 		operations: "https://accesscontrol.symper.vn/operations",
 		baAccount: "https://account.symper.vn/supporters",
-		appManagement: "https://core.symper.vn/",
 	},
 	notificationTimeout: {
 		success: 10000,

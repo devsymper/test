@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {
     "common": {
         "id": "Id",
@@ -661,4 +662,628 @@
     "userRole": {
         "userHasNoRole": "Bạn chưa được phân vai trò trong hệ thống"
     }
+=======
+{
+    "common": {
+        "id": "Id",
+        "select_lang": "Thay đổi ngôn ngữ",
+        "reports": "Báo cáo",
+        "workflows": "Quy trình",
+        "documents": "Văn bản",
+        "orgchart": "Sơ đồ tổ chức",
+        "methods": "Method",
+        "virtual_doc": "Văn bản ảo",
+        "service": "Dịch vụ hệ thống",
+        "menu": "Menu",
+        "users": "Tài khoản người dùng",
+        "add": "Thêm",
+        "edit": "Sửa",
+        "update": "Cập nhật",
+        "delete": "Xóa",
+        "refresh": "Làm mới",
+        "export_excel": "Xuất excel",
+        "list": "Danh sách",
+        "search": "Tìm kiếm",
+        "quickSearch": "Tìm nhanh",
+        "list_config": "Cấu hình danh sách",
+        "save": "Lưu",
+        "confirm": "Xác nhận",
+        "check": "Kiểm tra",
+        "ignore": "Bỏ qua",
+        "snippets": "Snippets",
+        "permissions": "Phân quyền",
+        "actions": "Actions package",
+        "apps": "Cài đặt Application",
+        "application": "Application",
+        "favorite": "Yêu thích",
+        "navigator": "Điều hướng",
+        "close": "Đóng",
+        "virtualdocs": "Virtualdocs",
+        "tasks": "Tasks",
+        "other": "Khác",
+        "deploy": "Deploy",
+        "start": "Bắt đầu",
+        "name": "Tên",
+        "key": "Định danh",
+        "description": "Mô tả",
+        "created_by": "Người tạo",
+        "version": "Phiên bản",
+        "last_updated": "Cập nhật lúc",
+        "last_updated_by": "Người cập nhật",
+        "statistics": "Thống kê",
+        "detail": "Chi tiết",
+        "tracking": "Theo dấu",
+        "works": "Công việc",
+        "all_task": "Tất cả công việc",
+        "pendding_task": "Việc chưa làm",
+        "have_no_data": "Không có dữ liệu",
+        "remove_confirm_title": "Bạn có chắc chắn muốn xóa",
+        "remove_confirm_message": "Bạn sẽ xóa {count} mục",
+        "remove_msg_success": "Xóa thành công {count} mục",
+        "remove_msg_err": "Không thể xóa các mục đã chọn!",
+        "logout": "Đăng xuất",
+        "last_update_at": "Cập nhật lần cuối",
+        "create_at": "Tạo lúc",
+        "filter": "Bộ lọc",
+        "sort": "Sắp xếp",
+        "status": "Trạng thái",
+        "done": "Hoàn thành",
+        "notDone": "Chưa hoàn thành",
+        "code": "Mã",
+        "apply": "Áp dụng",
+        "manager": "Quản lý",
+        "userRoleSetting": "Vai trò người dùng",
+        "clone": "Nhân bản",
+        "actionPack": "Action pack",
+        "baAccount": "Tài khoản BA",
+        "updatePassword": "Cập nhật mật khẩu",
+        "fullName": "Tên đầy đủ",
+        "email": "Email"
+    },
+    "login": {
+        "title": "Đăng nhập hệ thống",
+        "buttons": {
+            "login": "Đăng nhập"
+        },
+        "input_text": {
+            "email": "Địa chỉ email",
+            "password": "Mật khẩu"
+        },
+        "messages": {
+            "none_account": "Tạo tài khoản mới",
+            "register": "Đăng ký"
+        }
+    },
+    "table": {
+        "wrap_text_mode": "Chế độ xuống dòng",
+        "display_density": "Mật độ hiển thị dòng",
+        "column_config": "Cấu hình cột",
+        "freeze_column": "Cố định cột này",
+        "unfreeze_column": "Bỏ cố định cột này",
+        "hide_column": "Ẩn cột này",
+        "show_column": "Hiện cột này",
+        "wrap_tex_mode": {
+            "wrap": "Xuống dòng",
+            "clip": "Cắt bớt"
+        },
+        "display_density_mode": {
+            "loosen": "Rộng",
+            "medium": "Trung bình",
+            "compact": "Gần nhau"
+        },
+        "error": {
+            "cannot_get_data": "Không thể lấy dữ liệu từ máy chủ"
+        },
+        "filter": {
+            "none": "Không chọn",
+            "empty": "Rỗng",
+            "not_empty": "Không rỗng",
+            "equal": "Bằng",
+            "not_equal": "Không bằng",
+            "begins_with": "Bắt đầu với",
+            "ends_with": "Kết thúc với",
+            "contains": "Chứa",
+            "not_contain": "Không chứa",
+            "gt": "Lớn hơn ( > )",
+            "gte": "Lớn hơn hoặc bằng ( >= )",
+            "lt": "Nhỏ hơn ( < )",
+            "lte": "Nhỏ hơn hoặc bằng ( <= )",
+            "sort_asc": "Sắp xếp tăng dần",
+            "sort_desc": "Sắp xếp giảm dần",
+            "clear_filter": "Xóa bộ lọc",
+            "filter_by_value": "Lọc bởi giá trị",
+            "filter_by_condition": "Lọc bởi điều kiện"
+        }
+    },
+    "validate": {
+        "required": "Không được bỏ trống",
+        "min_8": "Yêu cầu mật khẩu lớn hơn 8 kí tự",
+        "max_24": "Yêu cầu mật khẩu ít hơn 24 kí tự",
+        "email": "Email không hợp lệ",
+        "notValid": "Trường này không hợp lệ"
+    },
+    "user": {
+        "title": "Danh sách User",
+        "general": {
+            "title": "Thông tin cơ bản",
+            "personalInfo": {
+                "title": "Thông tin cá nhân",
+                "userName": "Tên tài khoản",
+                "email": "Email",
+                "firstName": "Tên",
+                "lastName": "Họ",
+                "displayName": "Tên hiển thị",
+                "phoneNumber": "Số điện thoại"
+            },
+            "passwordSetting": {
+                "title": "Tùy chọn mật khẩu",
+                "autoGeneratePassword": "Tạo mật khẩu tự động",
+                "yourPassword": "Mật khẩu của bạn",
+                "requireChangePassFirstLogin": "Yêu cầu người dùng này thay đổi mật khẩu khi họ đăng nhập lần đầu",
+                "sendEmailAfterDone": "Gửi mật khẩu trong email sau khi hoàn thành",
+                "activeAccount": "Kích hoạt tài khoản"
+            }
+        },
+        "permission": {
+            "title": "Phân quyền",
+            "userType": {
+                "title": "Loại user",
+                "selected": "Chọn loại user"
+            },
+            "packagePermission": {
+                "title": "Phân quyền theo package"
+            },
+            "orgChartPositionPermission": {
+                "title": "Vị trí orgchart"
+            }
+        },
+        "other": {
+            "createUser": "Tạo tài khoản",
+            "updateUser": "Cập nhật tài khoản",
+            "nextStep": "Tiếp theo",
+            "done": "Hoàn thành"
+        },
+        "passwordSetting": {
+            "title": "Cài đặt mật khẩu",
+            "changePassword": {
+                "title": "Thay đổi mật khẩu",
+                "newPass": "Mật khẩu mới",
+                "reNewPass": "Nhập lại mật khẩu mới",
+                "oldPassword": "Mật khẩu cũ"
+            },
+            "configChange": {
+                "title": "Cấu hình thay đổi",
+                "checkChange": "Kích hoạt thay đổi định kì",
+                "lblSelectTime": "Chọn thời gian yêu cầu thay đổi định kì sau: ",
+                "month": "tháng",
+                "year": "năm"
+            }
+        },
+        "table": {
+            "id": "Id",
+            "firstName": "Tên",
+            "displayName": "Tên hiển thị",
+            "email": "Địa chỉ email",
+            "phoneNumber": "Số điện thoại",
+            "status": "Trạng thái",
+            "createAt": "Thời gian tạo",
+            "updateAt": "Thời gian cập nhật",
+            "contextMenu": {
+                "passwordSetting": "Tùy chọn mật khẩu",
+                "edit": "Sửa"
+            }
+        }
+    },
+    "snippet": {
+        "header": {
+            "id": "ID",
+            "name": "Tên",
+            "description": "Mô tả",
+            "snippet": "Nội dung"
+        },
+        "title": "Danh sách BA Snippets",
+        "contextMenu": {
+            "edit": "Sửa",
+            "add": "Thêm mới",
+            "remove": "Xóa"
+        }
+    },
+    "permissions": {
+        "header": {
+            "id": "ID",
+            "pack_name": "Tên package",
+            "date_created": "Ngày tạo",
+            "name": "Name",
+            "description": "Description",
+            "type": "Type"
+        },
+        "title": "Nhóm quyền",
+        "actionControlSummary": "Action pack Summary",
+        "addPermissionPack": "Thêm mới nhóm quyền",
+        "editPermissionPack": "Chỉnh sửa nhóm quyền",
+        "grandPermission": "Phân quyền chi tiết",
+        "apps": "Apps",
+        "contextMenu": {
+            "edit": "Sửa",
+            "grantPermission": "Phân quyền",
+            "remove": "Xóa"
+        },
+        "created": "Đã tạo mới nhóm quyền",
+        "deleted": "Đã xóa nhóm quyền",
+        "updated": "Đã cập nhật nhóm quyền",
+        "listPermission": {
+            "1": "Xem chi tiết",
+            "2": "Xem danh sách",
+            "4": "Tạo mới",
+            "8": "Sửa",
+            "16": "Thực thi",
+            "32": "Xóa",
+            "64": "Clone",
+            "128": "Xuất excel",
+            "256": "Import",
+            "512": "Import nhiều bản ghi",
+            "1024": "Khóa người dùng",
+            "2048": "Phân quyền",
+            "4096": "Phân quyền trong nhóm",
+            "8192": "Deny",
+            "16384": "Cấu hình printer",
+            "32768": "Xem toàn bộ control",
+            "65536": "Xem những control được cho phép"
+        },
+        "actionPack": {
+            "list": "Danh sách action pack ",
+            "objectType": "Loại đối tượng",
+            "operation": "Thao tác với từng đối tượng",
+            "allOperation": "Thao tác với toàn bộ đối tượng"
+        }
+    },
+    "document": {
+        "create": "Tạo mới văn bản",
+        "submit": "Submit văn bản",
+        "edit": "Chỉnh sửa văn bản",
+        "title": "Danh sách văn bản",
+        "table": {
+            "id": "Id",
+            "name": "Tên",
+            "title": "Tiêu đề",
+            "menu": "menu",
+            "countobject": "Số lượng bản gi",
+            "workflow": "Quy trình",
+            "createAt": "Thời gian tạo",
+            "updateAt": "Thời gian update",
+            "userCreate": "Người tạo",
+            "userUpdate": "Người cập nhật",
+            "countRecord": "Số lượng bản ghi"
+        },
+        "editor": {
+            "dialog": {
+                "nameRelated": {
+                    "headingControl": "Kiểm tra control",
+                    "headingDocument": "Kiểm tra tên Document",
+                    "subTitleControl": "Các công thức liên quan đến control ",
+                    "subTitleDocument": "Các công thức liên quan đến document ",
+                    "table": {
+                        "position": "Vị trí",
+                        "source": "Nguồn",
+                        "formulas": "Công thức"
+                    }
+                },
+                "saveDoc": {
+                    "heading": "Lưu Document",
+                    "checkNameRelated": "Kiểm tra công thức liên quan"
+                }
+            }
+        },
+        "process": {
+            "header_bar": {
+                "undo": "Undo ",
+                "redo": "Redo ",
+                "zoom_in": " Thu nhỏ",
+                "zoom_out": "Phóng to ",
+                "focus": "Vào giữa",
+                "save_svg": "Tải ảnh",
+                "save_bpmn": "Tải dưới dạng .bpmn",
+                "validate": "Kiểm tra dữ liệu ",
+                "save": "Lưu"
+            }
+        }
+    },
+    "documentObject": {
+        "title": "Danh sách bản ghi"
+    },
+    "draft": {
+        "title": "Danh sách bản nháp",
+        "table": {
+            "id": "Id",
+            "createAt": "Thời gian tạo"
+        }
+    },
+    "service": {
+        "title": "Danh sách dịch vụ hệ thống",
+        "table": {
+            "id": "Id",
+            "name": "Tên",
+            "description": "Mô tả",
+            "ifCondition": "Điều kiện chạy",
+            "runStatus": "Hoạt động",
+            "status": "Trạng thái",
+            "workflow": "Quy trình",
+            "createAt": "Thời gian tạo",
+            "updateAt": "Thời gian update",
+            "lastestRunAt": "Lần chạy gần nhât",
+            "userCreate": "Người tạo"
+        }
+    },
+    "panel": {
+        "add": {
+            "title": "Thêm dịch vụ hệ thống"
+        },
+        "edit": {
+            "title": "Sửa dịch vụ hệ thống"
+        }
+    },
+    "process": {
+        "list": {
+            "title": "Danh sách quy trình",
+            "deploy_history": "Lịch sử deploy",
+            "start": "Bắt đầu quy trình",
+            "instances": "Các bản đã chạy gần nhất"
+        },
+        "action": {
+            "create": "Tạo quy trình mới"
+        },
+        "taskList": "Danh sách task của ",
+        "instance": {
+            "list": "Danh sách các bản đã chạy",
+            "name": "Tên bản chạy",
+            "process_definition_name": "Tên định nghĩa của quy trình",
+            "business_key": "Khóa nghiệp vụ",
+            "ended": "Đã kết thúc",
+            "start_user_id": "Id người khởi tạo",
+            "user_start": "Người bắt đầu",
+            "start_time": "Thời gian bắt đầu",
+            "tracking": "Theo dấu quy trình",
+            "startSuccessfully": "Quy trình khởi tạo thành công",
+            "listModelInstance": "Danh sách bản chạy gần nhất của "
+        },
+        "deployment": {
+            "list": "Danh sách deploy",
+            "run": "Chạy phiên bản này",
+            "name": "Tên",
+            "deployment_time": "Thời gian deploy",
+            "category": "Loại"
+        },
+        "editror": {
+            "err": {
+                "get_data": "Không thể lấy dữ liệu cho soạn thảo quy trình",
+                "get_xml": "Không thể lấy XML cho soạn thảo quy trình"
+            }
+        },
+        "header_bar": {
+            "undo": "Undo ",
+            "redo": "Redo ",
+            "zoom_in": " Thu nhỏ",
+            "zoom_out": "Phóng to ",
+            "focus": "Vào giữa",
+            "save_svg": "Tải ảnh",
+            "save_bpmn": "Tải dưới dạng .bpmn",
+            "validate": "Kiểm tra dữ liệu ",
+            "save": "Lưu"
+        }
+    },
+    "apps": {
+        "header": {
+            "id": "ID",
+            "name": "Tên",
+            "note": "Ghi chú",
+            "icon": "Icon",
+            "price": "Giá",
+            "status": "Kích hoạt",
+            "created_at": "Ngày tạo",
+            "updated_at": "Cập nhật lần cuối"
+        },
+        "title": "Applications",
+        "pickIcon": "Chọn icon",
+        "apps": "Applications",
+        "commonInfo": "Thông tin chung của application",
+        "listObjects": "Các chức năng trong application",
+        "addObject": "Thêm tính năng",
+        "objectSummary": "Tổng hợp các chức năng",
+        "contextMenu": {
+            "edit": "Sửa",
+            "grantPermission": "Phân quyền",
+            "remove": "Xóa"
+        },
+        "updated": "Đã cập nhật application",
+        "added": "Đã thêm mới application",
+        "deleted": "Đã xóa application"
+    },
+    "actions": {
+        "header": {
+            "id": "ID",
+            "name": "Tên",
+            "icon": "Icon",
+            "price": "Giá",
+            "note": "Ghi chú",
+            "status": "Trạng thái",
+            "created_at": "Ngày tạo",
+            "is_default": "Mặc định",
+            "updated_at": "Cập nhật lần cuối"
+        },
+        "title": "Actions Package",
+        "addAction": "Thêm Actions Package",
+        "editAction": "Chỉnh sửa Actions Package",
+        "pickIcon": "Chọn icon",
+        "defaultPack": "Mặc định",
+        "objectTypes": "Loại object",
+        "commonInfo": "Thông tin chung của actions package",
+        "listObjects": "Các action trong actions package",
+        "addObject": "Thêm action",
+        "objectSummary": "Tổng hợp các action",
+        "contextMenu": {
+            "edit": "Sửa",
+            "remove": "Xóa"
+        },
+        "updated": "Đã cập nhật actions package",
+        "added": "Đã thêm mới actions package",
+        "deleted": "Đã xóa actions package",
+        "listActions": {
+            "document": {
+                "submit": "Submit",
+                "list": "Danh sách",
+                "import": "Import",
+                "favorite": "Thêm vào yêu thích",
+                "unfavorite": "Loại bỏ yêu thích"
+            },
+            "dataflow": {
+                "detail": "Chi tiết",
+                "execute": "Khởi tạo",
+                "list": "Danh sách",
+                "favorite": "Thêm vào yêu thích",
+                "unfavorite": "Loại bỏ yêu thích"
+            },
+            "orgchart": {
+                "detail": "Chi tiết",
+                "edit": "Chỉnh sửa",
+                "query": "Truy vấn",
+                "favorite": "Thêm vào yêu thích",
+                "unfavorite": "Loại bỏ yêu thích"
+            }
+        }
+    },
+    "iconPicker": {
+        "header": "Chọn icon",
+        "selectImage": "Chọn ảnh",
+        "tabs": {
+            "icon": "Icon",
+            "url": "Link",
+            "upload": "Tải lên"
+        }
+    },
+    "notification": {
+        "error": "Đã có lỗi xảy ra. Vui lòng thử lại sau",
+        "errorTitle": "Lỗi",
+        "successTitle": "Thành công"
+    },
+    "virtualdoc": {
+        "header": {
+            "id": "ID",
+            "name": "Tên",
+            "description": "Mô tả",
+            "updatetime": "Sửa lần cuối",
+            "lastestruntime": "Thời gian chạy (s)",
+            "lastestrunat": "Lần chạy cuối lúc",
+            "formula": "Công thức",
+            "columnsorder": "Thứ tự các cột"
+        },
+        "title": "Danh sách Virtualdocs",
+        "contextMenu": {
+            "edit": "Sửa",
+            "add": "Thêm mới",
+            "export": "Xuất excel",
+            "execute": "Thực thi",
+            "detail": "Xem chi tiết",
+            "remove": "Xóa"
+        },
+        "updated": "Virtualdoc đã được cập nhật",
+        "added": "Virtualdoc đã được tạo mới",
+        "deleted": "Virtualdoc đã xóa",
+        "loadingData": "Vui lòng đợi trong giây lát. Dữ liệu đang được chuẩn bị.",
+        "noData": "Virtualdoc chưa có dữ liệu",
+        "detailTitle": "Danh sách dữ liệu",
+        "common": "Thông tin chung"
+    },
+    "sortBy": "Sắp xếp",
+    "orderBy": "Thứ tự",
+    "order": {
+        "ascending": "Tăng dần",
+        "descending": "Giảm dần"
+    },
+    "notificationItem": {
+        "action": {
+            "read": "đánh dấu đã xem",
+            "delete": "xoá",
+            "unsubscribe": "Bỏ theo dõi"
+        }
+    },
+    "tasks": {
+        "error": {
+            "emptyAssignee": "Người nhận việc không được phép để trống",
+            "canNotCreateTask": "Không thể khởi tạo công việc"
+        },
+        "header": {
+            "date": "Ngày tạo",
+            "dueDate": "Ngày đến hạn",
+            "createDate": "Ngày khởi tạo",
+            "description": "Mô tả",
+            "owner": "Người tạo",
+            "name": "Tên công việc",
+            "assignee": "Người được giao",
+            "watcher": "Người theo dõi",
+            "participant": "Người tham gia",
+            "id": "Số đơn",
+            "list": "Danh sách công việc",
+            "submitForm": "Form nhập liệu"
+        },
+        "filterOptions": {
+            "all": "Toàn bộ task",
+            "myTask": "Task của tôi",
+            "myStaff": "Task của nhân viên",
+            "assigned": "Task đã được giao"
+        },
+        "taskTitle": "Tiêu đề",
+        "addSubtaskTitle": "Thêm mới subtask",
+        "createTask": {
+            "title": "Tạo task"
+        },
+        "claim": "Claim",
+        "created": "Đã tạo mới task",
+        "relatedPeople": {
+            "title": "Những người liên quan"
+        }
+    },
+    "orgchart": {
+        "list": {
+            "title": "Danh sách sơ đồ tổ chức"
+        },
+        "create": {
+            "title": " Tạo sơ đồ tổ chức"
+        },
+        "update": {
+            "title": " Chỉnh sửa đồ tổ chức "
+        },
+        "detail": {
+            "title": " Chi tiết sơ đồ tổ chức "
+        },
+        "editor": {
+            "main": "Chung",
+            "customAttributes": "Thuộc tính động",
+            "nodeName": "Tên node",
+            "department": "Phòng ban",
+            "listDynamicAttributes": "Thuộc tính động",
+            "generalAttributes": "Thuộc tính chung",
+            "position": "Vị trí",
+            "style": "Hiển thị",
+            "styleConfig": "Cấu hình hiển thị",
+            "applyForChild": "Áp dụng cho các node con",
+            "singleApply": "Áp dụng cho node hiện tại",
+            "saveNodeConfigTitle": "Lưu cấu hình hiển thị cho node"
+        }
+    },
+    "systemRole": {
+        "name": "Hệ thống",
+        "list": {
+            "title": "Danh sách vai trò người dùng hệ thống"
+        }
+    },
+    "userRole": {
+        "userHasNoRole": "Bạn chưa được phân vai trò trong hệ thống"
+    },
+    "appTabs": {
+        "overMaxOpen": {
+            "title": "Không thể tạo thêm tab mới",
+            "detail": "Số lượng tab vượt quá giới hạn, hãy xóa một vài tab"
+        }
+    }
+>>>>>>> 8438961ebc3500cf6f93817c350d448c0d88a68f
 }

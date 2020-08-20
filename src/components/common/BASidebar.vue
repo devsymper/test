@@ -155,18 +155,18 @@
                         v-for="item in sapp.items"
                         :key="item.title" 
                         link
-                        @click="gotoPage(item.link, item.title)"
-                    >
+                        :symper-action="$bindAction(item.action)"
+                        @click="gotoPage(item)">
                         <v-list-item-icon>
                             <v-tooltip right>
                                 <template v-slot:activator="{ on }">
-                                    <v-icon v-on="on">{{ item.icon }}</v-icon>
+                                    <v-icon :symper-action="$bindAction(item.action)" v-on="on">{{ item.icon }}</v-icon>
                                 </template>
                                 <span>{{ $t('common.'+item.title) }}</span>
                             </v-tooltip>
                         </v-list-item-icon>
 
-                        <v-list-item-content>
+                        <v-list-item-content :symper-action="$bindAction(item.action)">
                             <v-list-item-title>{{ $t('common.'+item.title) }}</v-list-item-title>
                         </v-list-item-content>
                     </v-list-item>
@@ -294,8 +294,12 @@ export default {
                 !this.sapp.collapseSideBar
             );
         },
-        gotoPage(uri, title) {
-            this.$goToPage(uri, title);
+        gotoPage(item) {
+            if(item.action){
+                // this.$evtBus.$emit('symper-app-call-action-handler', item.action, this, {});
+            }else{
+                this.$goToPage(item.link, item.title);
+            }
         }
     },
     data() {

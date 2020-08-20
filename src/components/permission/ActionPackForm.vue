@@ -5,6 +5,7 @@
             :viewOnly="action == 'detail'"
             :singleLine="false"
             :allInputs="allInputs"
+            @input-value-changed="handleInputValueChange"
         >
         </FormTpl> 
 
@@ -79,6 +80,44 @@ export default {
         self.setAllItemOfResource();
     },
     methods: { 
+        getDataSchema(){
+            let objectType = this.allInputs.objectType.value;
+            let schema = {
+                object: ''
+            };
+            if(this.listAction[objectType]){
+                for(let actionKey in this.listAction[objectType]){
+                    schema[actionKey] = true;
+                }
+            }
+            return schema;
+        },
+        getTableColumns(){
+            let self = this;
+            let cols = this.getActionAsColumns();
+            cols.unshift(
+            {
+                data: "object",
+                type: "autocomplete",
+                width: 400,
+                source: function (query, process) {
+                    let objectType = self.allInputs.objectType.value;
+                    if(self.allResourceForSearch[objectType]){
+                        process(self.allResourceForSearch[objectType]);
+                    }else{
+                        process([]);
+                    }
+                }
+            });
+            return cols;
+        },
+        handleInputValueChange(name, inputInfo, data){
+            if(name == 'objectType'){
+                this.dataSchema = this.getDataSchema();
+                this.tableColumnsForObjectType = this.getActionAsColumns();
+                this.tableColumns = this.getTableColumns();
+            }
+        },
         createNewOperations(){
             let self = this;
             return new Promise(async (resolve, reject) => {
@@ -284,6 +323,9 @@ export default {
         return {
             tableHeight: 200,
             isEditingCell : false,
+            tableColumnsForObjectType: [],
+            tableColumns: [],
+            dataSchema: [],
             tableSettings: {
                 ...commonTableSetting,
                 afterChange: function(changes, source) {
@@ -353,18 +395,6 @@ export default {
                 return [{}];
             }
         },
-        dataSchema(){
-            let objectType = this.allInputs.objectType.value;
-            let schema = {
-                object: ''
-            };
-            if(this.listAction[objectType]){
-                for(let actionKey in this.listAction[objectType]){
-                    schema[actionKey] = true;
-                }
-            }
-            return schema;
-        },
         allResourceForSearch(){
             let rsl = {};
             let allResource = this.$store.state.actionPack.allResource;
@@ -382,28 +412,6 @@ export default {
         },
         colHeadersForObjectType(){
             return this.getColumnHeadersFromAction();
-        },
-        tableColumnsForObjectType(){
-            return this.getActionAsColumns();
-        },
-        tableColumns(){
-            let self = this;
-            let cols = this.getActionAsColumns();
-            cols.unshift(
-            {
-                data: "object",
-                type: "autocomplete",
-                width: 400,
-                source: function (query, process) {
-                    let objectType = self.allInputs.objectType.value;
-                    if(self.allResourceForSearch[objectType]){
-                        process(self.allResourceForSearch[objectType]);
-                    }else{
-                        process([]);
-                    }
-                }
-            });
-            return cols;
         },
         allInputs(){
             return {
@@ -427,7 +435,18 @@ export default {
                     options: this.getObjectTypeSelections()
                 }
             };
-        },
+        }, 
+    },
+    watch: {
+        listAction: {
+            immediate: true,
+            deep: true,
+            handler(){
+                this.dataSchema = this.getDataSchema();
+                this.tableColumnsForObjectType = this.getActionAsColumns();
+                this.tableColumns = this.getTableColumns();
+            }
+        }
     }
 }
 </script>

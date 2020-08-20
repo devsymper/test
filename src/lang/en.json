@@ -271,55 +271,12 @@
             "objectType": "Object type",
             "operation": "Operation",
             "allOperation": "Operation for all object"
-		},
-		"actionName":{
-			"account":{
-				"add":"Add",
-				"update":"Update",
-				"info":"Info",
-				"detail":"Detail",
-				"change_pass":"Change pass",
-				"disable":"Disable",
-				"change_avatar":"Change avatar",
-				"list":"List",
-				"set_role":"Set role"
-			},
-			"document_definition":{
-				"create" : "Create",
-				"edit" : "Edit",
-				"submit": "Submit",
-				"drop":"Drop",
-				"restore":"Restore",
-				"list":"List",
-				"list_trash":"Trash",
-				"list_instance":"List instance"
-			},
-			"orgchart":{
-				"create" : "Create",
-				"update":"Update",
-				"drop":"Drop",
-				"list":"List",
-				"detail":"Detail"
-			},
-			"dasboard":{
-				"create" : "Create",
-				"update":"Update",
-				"view":"View",
-				"list":"List",
-				"drop":"Drop"
-			},
-			"workflow_definition":{
-				"list" : "List",
-				"create" : "Create",
-				"deloy": "Deloy",
-				"drop":"Drop",
-				"update":"Update",
-				"list_instance":"List instance",
-				"start_instance":"Start instance"
-			}
-		}
-	},		
+        }
+    },
     "document": {
+        "create": "Create document",
+        "submit": "Submit document",
+        "edit": "Edit document",
         "title": "List Document",
         "table": {
             "id": "Id",
@@ -390,7 +347,7 @@
     },
     "process": {
         "list": {
-            "title": "Process list",
+            "title": "Workflow list",
             "deploy_history": "Deploy history",
             "start": "Start workflow",
             "instances": "List lastest instances"
@@ -440,33 +397,21 @@
     "apps": {
         "header": {
             "id": "ID",
-            "name": "Application Name",
-            "note": "Description",
+            "name": "Name",
+            "note": "Note",
             "icon": "Icon",
             "price": "Price",
             "status": "Status",
             "created_at": "Date create",
             "updated_at": "Last update"
-		},
-		"listType":{
-			"documents":"Documents",
-			"workflows":"Work flows",
-			"reports":"Reports",
-			"orgcharts":"Orgcharts"
-		},
-		"addApp" : "Add application",
-		"editApp" : "Edit application",
+        },
         "title": "Applications",
         "pickIcon": "Pick icon",
         "apps": "Applications",
         "commonInfo": "General",
         "listObjects": "Objects",
         "addObject": "Add object",
-		"objectSummary": "Objects summary",
-		"clickToAdd": "Click to add item",
-		"search" : "Search",
-		"favorite" : "Favorite",
-		"listApp" : "List applications",
+        "objectSummary": "Objects summary",
         "contextMenu": {
             "edit": "Edit",
             "grantPermission": "Grant permission",
@@ -609,7 +554,10 @@
             "title": "Create task"
         },
         "claim": "Claim",
-        "created": "Task created"
+        "created": "Task created",
+        "relatedPeople": {
+            "title": "Related people"
+        }
     },
     "orgchart": {
         "list": {
@@ -617,6 +565,12 @@
         },
         "create": {
             "title": " Create orgchart"
+        },
+        "update": {
+            "title": " Update orgchart"
+        },
+        "detail": {
+            "title": " Detail orgchart"
         },
         "editor": {
             "main": "Main",
@@ -641,5 +595,16 @@
     },
     "userRole": {
         "userHasNoRole": "You have no role to select"
+    },
+    "appTabs": {
+        "overMaxOpen": {
+            "title": "Can not create more tabs",
+            "detail": "Tabs number exceed limitation, please delete some opening tabs"
+        }
+    },
+    "dashboard": {
+        "detail": {
+            "title": "Detail dashboard "
+        }
     }
 }

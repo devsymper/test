@@ -3,15 +3,27 @@
         <ba-sidebar />
         <v-content>
             <v-container fluid fill-height class="pa-0">
-                <div class="w-100 app-header-bg-color" style="border-bottom:1px solid #cccccc">
+                <div class="w-100 app-header-bg-color" >
                     <div style="width:calc(100% - 200px)" class="float-left">
                         <v-tabs
+                            hide-slider
+                            active-class="symper-tab-active"
                             @change="handleChangeTab"
                             v-model="currentTabIndex"
                             class="sym-small-size "
-                            color="orange accent-4">
-                            <v-tab class="symper-app-tab" v-for="(item, idx) in tabUrlItems" :key="idx">
-                                {{ item.title }} 
+                            color="grey darken-4">
+                            <v-tab class="symper-app-tab pr-6" v-for="(item, idx) in tabUrlItems" :key="idx">
+                                <v-tooltip bottom>
+                                    <template v-slot:activator="{ on, attrs }">
+                                        <span 
+                                        v-bind="attrs"
+                                        v-on="on">
+                                            {{ item.title }}
+                                        </span> 
+                                    </template>
+                                    <span>{{ item.title }} </span>
+                                </v-tooltip>
+                                
                                 <i class="mdi mdi-close float-right close-tab-btn" @click.stop="closeTab(idx)"></i>
                             </v-tab>
                         </v-tabs>
@@ -24,8 +36,8 @@
                             v-model="isShowDialog"
                             :close-on-content-click="false"
                             :max-width="500"
+                            :min-width="500"
                             :max-height="700"
-       				   	    :nudge-width="370"
                             offset-y
                             >
                             <template v-slot:activator="{ on }">
@@ -33,8 +45,20 @@
                                     <v-icon>mdi-apps</v-icon>
                                 </v-btn>
                             </template>
-                            <EndUserPopup  />
-							<!-- <div>hello</div> -->
+                            <v-card>
+                                <v-app-bar dense flat color="white">
+                                    <v-toolbar-title>
+                                        <v-icon>mdi-apps</v-icon>
+                                        {{$t('common.navigator')}}
+                                    </v-toolbar-title>
+                                    <v-spacer></v-spacer>
+                                    <v-btn icon>
+                                        <v-icon @click="isShowDialog = false">mdi-close</v-icon>
+                                    </v-btn>
+                                </v-app-bar>
+                                <v-divider></v-divider>
+                                <list-app></list-app>
+                            </v-card>
                         </v-menu>
                         <v-btn icon>
                             <v-icon>mdi-magnify</v-icon>
@@ -73,7 +97,6 @@
                 
             </v-container>
         </v-content>
-		 <!-- <EndUserPopup ref="endUserPopup" /> -->
     </v-app>
 </template>
 
@@ -83,7 +106,6 @@ import { appConfigs } from '../../configs';
 import BASidebar from "@/components/common/BASidebar.vue";
 import listApp from "@/components/common/listApp";
 import NotificationBar from "@/components/notification/NotificationBar.vue";
-import EndUserPopup from './../apps/EndUserPopup.vue';
 export default {
     methods: {
         /**
@@ -128,18 +150,13 @@ export default {
                     this.$store.state.app.unreadNotification = res.data;
                 }
             });
-		},
-		clickApps(){
-			// this.$refs.endUserPopup.getActiveapps()
-			// this.$refs.endUserPopup.getFavorite()
-		}
+        }
         
     },
     components: {
         "ba-sidebar": BASidebar,
         "list-app": listApp,
-		"list-notification": NotificationBar,
-		EndUserPopup
+        "list-notification": NotificationBar
     },
     created() {
         this.$evtBus.$on("app-receive-remote-msg", data => {
