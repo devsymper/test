@@ -7,46 +7,46 @@ let commonProps = {
 export default [{
         ...commonProps,
         "action": "create",
-        "handler": function(paramObj) {
+        "handler": function(param) {
             this.$goToPage('document/editor', this.$t('document.create'));
         }
     },
     {
         ...commonProps,
         "action": "edit",
-        "handler": function(paramObj) {
-            let tabName = paramObj.title ? paramObj.title : (paramObj.name ? paramObj.name : '');
+        "handler": function(param) {
+            let tabName = param.title ? param.title : (param.name ? param.name : '');
             tabName = this.$t('document.edit') + ' ' + tabName;
-            this.$goToPage('/document/editor/' + paramObj.documentId, tabName);
+            this.$goToPage('/document/editor/' + param.documentId, tabName);
         }
     },
     {
         ...commonProps,
         "action": "submit",
-        "handler": function(paramObj) {
-            let tabName = paramObj.title ? paramObj.title : (paramObj.name ? paramObj.name : '');
+        "handler": function(param) {
+            let tabName = param.title ? param.title : (param.name ? param.name : '');
             tabName = this.$t('document.submit') + ' ' + tabName;
-            this.$goToPage('/document/submit/' + paramObj.documentId, tabName);
+            this.$goToPage('/document/submit/' + param.documentId, tabName);
         }
     },
     {
         ...commonProps,
         "action": "drop",
-        "handler": function(paramObj) {
+        "handler": function(param) {
 
         }
     },
     {
         ...commonProps,
         "action": "restore",
-        "handler": function(paramObj) {
+        "handler": function(param) {
 
         }
     },
     {
         ...commonProps,
         "action": "list",
-        "handler": function(paramObj) {
+        "handler": function(param) {
             let tabName = this.$t('document.title');
             this.$goToPage('/documents', tabName);
         }
@@ -55,14 +55,14 @@ export default [{
     {
         ...commonProps,
         "action": "list_trash",
-        "handler": function(paramObj) {
+        "handler": function(param) {
 
         }
     },
     {
         ...commonProps,
         "action": "list_instance",
-        "handler": function(paramObj) {
+        "handler": function(param) {
 
         }
     }
