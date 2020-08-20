@@ -63,6 +63,7 @@ import { HotTable, HotColumn } from "@handsontable/vue";
 import { util } from '../../plugins/util';
 import CustomSelect from "./HandsonCustomSelect";
 import { permissionApi } from '../../api/permissionPack';
+import { permissionPackageApi } from '../../api/PermissionPackage';
 
 
 
@@ -71,15 +72,20 @@ export default {
         this.tableHeight = util.getComponentSize(this).h - util.getComponentSize(this.$refs.comonAttr).h - 180;
     },
     created(){
-        let self = this;
-        this.$evtBus.$on('symper-cache-set-all-resource', (data) => {
-            if(!self._inactive){
-                self.setAllItemOfResource(data);
-            }
-        });
-        self.setAllItemOfResource();
+        this.getObjectsOfObjectType();
     },
     methods: { 
+        triggerRerenderTable(){
+            setTimeout((self) => {
+                if(self.$refs.dataTable){
+                    self.$refs.dataTable.hotInstance.updateSettings({});
+                }
+
+                if(self.$refs.dataTableForObjectType){
+                    self.$refs.dataTableForObjectType.hotInstance.updateSettings({});
+                }
+            }, 2000, this);
+        },
         getDataSchema(){
             let objectType = this.allInputs.objectType.value;
             let schema = {
@@ -113,9 +119,42 @@ export default {
         },
         handleInputValueChange(name, inputInfo, data){
             if(name == 'objectType'){
-                this.dataSchema = this.getDataSchema();
-                this.tableColumnsForObjectType = this.getActionAsColumns();
-                this.tableColumns = this.getTableColumns();
+                this.handleChangeObjectType();
+            }
+        },
+        handleChangeObjectType(){
+            this.dataSchema = this.getDataSchema();
+            this.tableColumnsForObjectType = this.getActionAsColumns();
+            this.tableColumns = this.getTableColumns();
+            this.getObjectsOfObjectType();
+            this.setTableData();
+            this.setTableDataForObjectType();
+        },
+        
+        setTableData(){
+            let objectType = this.allInputs.objectType.value;
+            let rows = this.itemData.mapActionAndObjects[objectType];
+            if(rows && rows.length){
+                this.tableData =  rows;
+            }else{
+                this.tableData = [{}];
+            }
+
+            if(this.$refs.dataTable){
+                this.$refs.dataTable.hotInstance.updateSettings({});
+            }
+        },
+        setTableDataForObjectType(){
+            let objectType = this.allInputs.objectType.value;
+            let rows = this.itemData.mapActionForAllObjects[objectType];
+            if(rows && rows.length){
+                this.tableDataForObjectType = rows;
+            }else{
+                this.tableDataForObjectType = [{}];
+            }
+
+            if(this.$refs.dataTableForObjectType){
+                this.$refs.dataTableForObjectType.hotInstance.updateSettings({});
             }
         },
         createNewOperations(){
@@ -146,18 +185,34 @@ export default {
                         id = key.slice(0, key.indexOf(' -'));
                     }
                     
-                    if(allResource.hasOwnProperty(objectType) && allResource[objectType][id]){
-                        for(let actionName in row){
-                            if(actionName == 'object'){
-                                continue
+                    if(allResource.hasOwnProperty(objectType) ){
+                        if(allResource[objectType][id]){
+                            for(let actionName in row){
+                                if(actionName == 'object'){
+                                    continue
+                                }
+                                if(row[actionName]){
+                                    newOperations.push({
+                                        objectType: objectType,
+                                        action: actionName,
+                                        objectIdentifier: allResource[objectType][id].objectIdentifier,
+                                        name: actionName.replace(/_/g, ' ') + ' '+ objectType.replace(/_/g, ' ') + ' ' + id
+                                    });
+                                }
                             }
-                            if(row[actionName]){
-                                newOperations.push({
-                                    objectType: objectType,
-                                    action: actionName,
-                                    objectIdentifier: objectType + ':' + id,
-                                    name: actionName.replace(/_/g, ' ') + ' '+ objectType.replace(/_/g, ' ') + ' ' + id
-                                });
+                        }else if(key.trim() != ''){
+                            for(let actionName in row){
+                                if(actionName == 'object'){
+                                    continue
+                                }
+                                if(row[actionName]){
+                                    newOperations.push({
+                                        objectType: objectType,
+                                        action: actionName,
+                                        objectIdentifier: key,
+                                        name: key
+                                    });
+                                }
                             }
                         }
                     }
@@ -220,53 +275,43 @@ export default {
         handleEditorShow(data){
             this.isEditingCell = data;
         },
-        setAllItemOfResource(data = null){
+        async getObjectsOfObjectType(objectType = null){
+            let allResource = this.$store.state.actionPack.allResource;
+            if(!objectType){
+                objectType = this.allInputs.objectType.value;
+            }
+            if(!allResource[objectType]){
+                let res = await permissionApi.getObjectsByObjectType({
+                    type : objectType,
+                    pageSize: 2000,
+                    page: 1
+                });
 
-            if(data){
-                data.data = this.getItemForCacheResource(data);
-                if(!$.isEmptyObject(data.data)){
-                    this.$store.commit('actionPack/cacheAllResourceItem', data);
-                }
-            }else{
-                let itemsInStoreMap = {
-                    document_definition: this.$store.state.document.listAllDocument,
-                };
-
-                for(let module in itemsInStoreMap){
-                    let data = {
-                        type: module,
-                        data: itemsInStoreMap[module]
-                    };
-                    data.data = this.getItemForCacheResource(data);
-                    if(data.data.length > 0){
-                        this.$store.commit('actionPack/cacheAllResourceItem', data);
-                    }
+                if(res.status == 200){
+                    let dataToStore = this.translateDataToStore(res.data, objectType);
+                    this.$store.commit('actionPack/cacheAllResourceItem',{
+                        type: objectType,
+                        data: dataToStore
+                    });
+                }else{
+                    this.$snotifyError(res, "Can not get objects of " + objectType);
                 }
             }
         },
-        getItemForCacheResource(data){
-            let itemConvertMethods = {
-                document_definition: (items) => {
-                    let resources = items.reduce((obj, el) => {
-                        obj[el.id] = {
-                            id: el.id,
-                            name: el.name,
-                            title: el.title,
-                            fullText: `${el.id} - ${el.name} : ${el.title ? el.title : el.name} `
-                        };
-                        return obj; 
-                    }, {});
-                    return resources;
-                }
-            }
-
-            let type = data.type;
-            if(itemConvertMethods[type]){
-                return itemConvertMethods[type](data.data);
-            }else{
-                console.warn('[SYMPER-ACTIONPACK: object type not found in itemConvertMethods]');
-                return [];
-            }
+        translateDataToStore(items, type){
+            let resources = items.reduce((obj, el) => {
+                let iden = el.objectIdentifier;
+                let id = iden.substring(iden.lastIndexOf(':') + 1, iden.length);
+                obj[id] = {
+                    id: id,
+                    name: el.name,
+                    title: el.title ? el.title : '',
+                    fullText: `${id} - ${el.name} ${el.title ? (' : ' + el.title) : ''} `,
+                    objectIdentifier: iden
+                };
+                return obj; 
+            }, {});
+            return resources;
         },
         getActionAsColumns(){
             let self = this;
@@ -326,6 +371,8 @@ export default {
             tableColumnsForObjectType: [],
             tableColumns: [],
             dataSchema: [],
+            tableData: [],
+            tableDataForObjectType: [],
             tableSettings: {
                 ...commonTableSetting,
                 afterChange: function(changes, source) {
@@ -379,22 +426,6 @@ export default {
         listAction() {
             return this.$store.getters['actionPack/listActionByObjectType'];
         },
-        tableData(){
-            let rows = this.itemData.mapActionAndObjects[this.itemData.objectType];
-            if(rows && rows.length){
-                return rows;
-            }else{
-                return [{}];
-            }
-        },
-        tableDataForObjectType(){
-            let rows = this.itemData.mapActionForAllObjects[this.itemData.objectType];
-            if(rows && rows.length){
-                return rows;
-            }else{
-                return [{}];
-            }
-        },
         allResourceForSearch(){
             let rsl = {};
             let allResource = this.$store.state.actionPack.allResource;
@@ -442,9 +473,7 @@ export default {
             immediate: true,
             deep: true,
             handler(){
-                this.dataSchema = this.getDataSchema();
-                this.tableColumnsForObjectType = this.getActionAsColumns();
-                this.tableColumns = this.getTableColumns();
+                this.handleChangeObjectType();
             }
         }
     }
