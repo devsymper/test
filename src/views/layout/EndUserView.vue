@@ -118,9 +118,7 @@ export default {
     watch:{
         value(){
             //debugger
-
-            console.log(this.value);
-             searchApi.getData({keyword:'minh'})
+             searchApi.getData(this.value)
                 .then(res => {
                     if (res.status === 200) {
                         console.log('Đã gửi thành công');

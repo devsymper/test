@@ -462,19 +462,19 @@ export default {
                 this.tables[tableIdx].controls[controlIdx].dataColumn = value;
             } else {
                 this.tables[tableIdx].controls[controlIdx].dataColumn.enable = true;
-                this.tables[tableIdx].controls[controlIdx].dataColumn = null;
-                // nếu giá trị detail thì xoá thì true ở detail 
-                // for(let i = 0; i<this.nameSheets.length; i++){
-                //     let arr = this.nameColumnDetail[this.nameSheets[i].name];
-                //     for(let j = 0; j<arr.length; j++){
-                //         if( this.tables[tableIdx].controls[controlIdx].dataColumn.name==arr[j].name){
-                //             this.nameColumnDetail[this.nameSheets[i].name][j].enable=true;
-                    
-                          
-                //         }
-                //     }
-                // }
-               
+            
+                for(let i = 0; i<this.nameSheets.length; i++){
+                    let arr = this.nameColumnDetail[this.nameSheets[i].name];
+                    for(let j = 0; j<arr.length; j++){
+                        if(this.tables[tableIdx].controls[controlIdx].dataColumn!=null){
+                            if( this.tables[tableIdx].controls[controlIdx].dataColumn.name==arr[j].name){
+                                this.nameColumnDetail[this.nameSheets[i].name][j].enable=true;
+                        
+                          }
+                        }
+                    }
+                }
+                    this.tables[tableIdx].controls[controlIdx].dataColumn = null;
             }
         },
 
@@ -503,7 +503,7 @@ export default {
                 for(let j = 0; j<arr.length; j++){
                     if(arr[j].name==value){
                         // debugger
-                       // this.nameColumnDetail[this.nameSheets[i].name][j].enable=false;
+                        this.nameColumnDetail[this.nameSheets[i].name][j].enable=false;
                          return index = arr[j].index;
                     }
                 }
@@ -513,6 +513,7 @@ export default {
         //phần mapping--- hàm chuyển giá trị cho những cột đã chọn
         //phần mapping --- hàm tìm sheet lưu cho cột 
         getNameSheetMapping(value){
+            debugger
             let nameSheetMapping = '';
             for(let i = 0; i<this.nameSheets.length; i++){
                  let arr = this.nameColumnDetail[this.nameSheets[i].name];
