@@ -4,9 +4,10 @@
 			<div v-for="(itemT,i) in sAppModule" :key="i" class="app-item">
 					<div class="title-app" v-if="itemT.item.length >0"><v-icon style="font-size:13px">{{itemT.icon}}</v-icon> <h4> {{ itemT.title }} <span> {{'('+itemT.item.length +')' }}</span> </h4></div>
 					<ul v-for="(childItem,i) in itemT.item" :key="i"  class="app-child-item">
-							<li v-if="isEndUserCpn == true" v-on:contextmenu="rightClickHandler($event,childItem)">
+							<li  v-if="isEndUserCpn == true" v-on:contextmenu="rightClickHandler($event,childItem)">
 								{{childItem.name}}
-							<v-icon class="icon-star" v-if="childItem.favorite==true">mdi-star</v-icon>	
+							<v-icon  @click="changeFavorite(childItem,itemT.name)" :class="{'icon-star-active' : childItem.favorite==true, 'icon-star': true}" >mdi-star</v-icon>	
+							<!-- <v-icon  @click="changeFavorite(childItem,itemT.name,1)"  class="icon-star" >mdi-star</v-icon> -->
 							<!-- <v-icon v-if="isEndUserCpn == false" class="icon-remove"  @click="removeItem(childItem.id,itemT.name)">mdi-delete-circle</v-icon> -->
 							</li>
 							<li v-else>
@@ -67,22 +68,22 @@ export default {
 		VuePerfectScrollbar
 	},
 	mounted(){
-	  let thisCpn = this;
-	 		// $(document).click(function(e){
-			// 	if(!$(e.target).is('.menu') && !$(e.target).is('.menuItem')){
-			// 		$('.menu').hide()		
-			// 	}
-			// });
-			$(document).click(function(e){
-				if(!$(e.target).is('.context-menu')){
-					thisCpn.$refs.contextMenu.hide()		
-				}
-			})
-			$(document).click(function(e){
-				if(!$(e.target).is('.context-menu')){
-					thisCpn.$refs.contextMenu.hide()		
-				}
-			})
+	//   let thisCpn = this;
+	//  		// $(document).click(function(e){
+	// 		// 	if(!$(e.target).is('.menu') && !$(e.target).is('.menuItem')){
+	// 		// 		$('.menu').hide()		
+	// 		// 	}
+	// 		// });
+	// 		$(document).click(function(e){
+	// 			if(!$(e.target).is('.context-menu')){
+	// 				thisCpn.$refs.contextMenu.hide()		
+	// 			}
+	// 		})
+	// 		$(document).click(function(e){
+	// 			if(!$(e.target).is('.context-menu')){
+	// 				thisCpn.$refs.contextMenu.hide()		
+	// 			}
+	// 		})
   },
 	computed:{
 		sAppModule(){
@@ -148,18 +149,46 @@ export default {
 			}
 		},
 		rightClickHandler(event,item){
-			this.currentSelected = item;
+			// this.currentSelected = item;
 			// this.typeSelected = type;
 			event.stopPropagation();
 			event.preventDefault();
-			console.log(event);
-			debugger
 			this.$refs.contextMenu.setContextItem(item.actions)
 			this.$refs.contextMenu.show(event)
 		}, 
 		hideContextMenu(){
 			this.$refs.contextMenu.hide()
 		},	
+		changeFavorite(item,type){
+			if(type == 'documents'){
+				type = 'document'
+			}
+			if(type == 'orgcharts'){
+				type = 'orgchart'
+			}
+			if(type == 'reports'){
+				type = 'report'
+			}
+			if(type== 'workflows'){
+				type = 'workflow'
+			}
+			let userId = this.$store.state.app.endUserInfo.id
+			if(item.favorite == false){
+				appManagementApi.addFavoriteItem(userId,item.id,type,1).then(res => {
+					if (res.status == 200) {
+						item.favorite = true;
+					}
+				});
+			}else{
+				appManagementApi.addFavoriteItem(userId,item.id,type,0).then(res => {
+					if (res.status == 200) {
+						item.favorite = false;
+					}
+				});
+			}
+				
+			
+		},
 	},
 }
 </script>
@@ -192,6 +221,10 @@ export default {
 	 display: none;
 }
 .app-details >>> .app-item .app-child-item .icon-star{
+	/* color: yellow; */
+	display: none;
+}
+.app-details >>> .app-item .app-child-item .icon-star-active{
 	color: yellow;
 }
 .app-details >>> .app-item li{
@@ -206,6 +239,11 @@ export default {
 .app-details >>> .app-item li:hover .icon-remove{
 	background-color:#f7f7f7;
 	border-radius: 10px;
+	display: inline-block;
+}
+.app-details >>> .app-item li:hover .icon-star{
+	/* background-color:#f7f7f7; */
+	/* border-radius: 10px; */
 	display: inline-block;
 }
 </style>

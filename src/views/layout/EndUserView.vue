@@ -130,7 +130,6 @@ export default {
             });
 		},
 		clickApps(){
-			debugger
 			// this.$refs.endUserPopup.getActiveapps()
 			// this.$refs.endUserPopup.getFavorite()
 		}

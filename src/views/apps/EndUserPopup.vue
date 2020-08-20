@@ -111,6 +111,7 @@ export default {
 	created(){
 		this.getActiveapps()
 		this.getFavorite()
+		console.log(this.listFavorite);
 	},
 	mounted(){
 		 let thisCpn = this;
@@ -187,8 +188,7 @@ export default {
 					}
 				).then(resDoc => {
 					if(type == "listFavorite"){
-						this.listFavorite.push(resDoc.data.listObject)
-						console.log(this.listFavorite,'this.listFavoritethis.listFavoritethis.listFavorite');
+						self.listFavorite.push(resDoc.data.listObject)
 					}
 					else{
 						this.updateFavoriteItem(self.mapId.document,resDoc.data.listObject)
@@ -211,7 +211,9 @@ export default {
 								}
 				]}).then(resOrg => {
 					if(type == 'listFavorite'){
-						this.listFavorite.push(resOrg.data.listObject)
+						if(resOrg.data.listObject.length > 0){
+							self.listFavorite.push(resOrg.data.listObject)
+						}
 					}
 					else{
 						this.updateFavoriteItem(self.mapId.orgchart,resOrg.data.listObject)
@@ -234,7 +236,9 @@ export default {
 								}
 				]}).then(resRp => {
 					if(type == 'listFavorite'){
-						this.listFavorite.push(resRp.data.listObject)
+						if(resRp.data.listObject.length > 0){
+							self.listFavorite.push(resRp.data.listObject)
+						}
 					}
 					else{
 						this.updateFavoriteItem(self.mapId.report,resRp.data.listObject)
@@ -257,7 +261,10 @@ export default {
 								}
 				]}).then(resW => {
 					if(type == 'listFavorite'){
-						this.listFavorite.push(resW.data.listObject)
+						if(resW.data.listObject.length > 0){
+							self.listFavorite.push(resW.data.listObject)
+						}
+						console.log(self.listFavorite,'this.listFavoritethis.listFavoritethis.listFavorite');
 					}
 					else{
 						this.updateFavoriteItem(self.mapId.workflow,resW.data.listObject)
@@ -292,11 +299,12 @@ export default {
 			}
 			if(self.arrType.report.length > 0){
 				let dataRep = self.arrType.report
+
 				this.getDashBoardApi(dataRep,'listFavorite')
 			}
 			if(self.arrType.workflow.length > 0){
-				let dataRep = self.arrType.workflow
-				this.getWorkFlowApi(dataRep,'listFavorite')
+				let dataW = self.arrType.workflow
+				this.getWorkFlowApi(dataW,'listFavorite')
 			}
 		},
 		clickBack(){
@@ -344,7 +352,7 @@ export default {
 					self.mapId.workflow[e.id] = e;
 				})
 				let dataW = self.arrType.workflow
-				this.getWorkFlowApi(data)
+				this.getWorkFlowApi(dataW)
 			}
 			if(data.hasOwnProperty('report')){
 				data.report.forEach(function(e){

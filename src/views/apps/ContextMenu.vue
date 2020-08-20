@@ -1,8 +1,8 @@
 <template>
    <v-card class="context-menu" v-show="isShowContext" :style="{top:top+'px',left:left+'px'}">
-			<div class="item" v-for="(item,i) in contextMenu" :key="i" @click="clickRow(item)">
-				 {{item}}
-			</div>
+		<div class="item" v-for="(item,i) in listAction" :key="i" @click="clickRow(item)">
+				{{item}}
+		</div>
    </v-card>
 </template>
 <script>
@@ -11,7 +11,7 @@
 		isShowContext:false,
 		top:0,
 		left:0,
-		contextMenu:[],
+		listAction:[],
 	}),
 	created(){
 		let self = this
@@ -24,7 +24,7 @@
 			this.isShowContext = true;
 			this.top = event.pageY;
 			this.left = event.pageX;
-				debugger
+			$('#symper-app').append(this.$el);
 			// this.calPosition(e)
 		},
 		hide(){
@@ -34,8 +34,7 @@
 				
 		},
 		setContextItem(ctx){
-			this.contextMenu = ctx;
-			debugger
+			this.listAction = ctx;
 		}
 	}
 	}

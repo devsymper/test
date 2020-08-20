@@ -288,9 +288,7 @@ export default {
 			
 			let data = JSON.stringify(this.currentApp);
 			// console.log(this.currentApp.iconName);
-			debugger	
 			appManagementApi.addApp(data).then(res => {
-				debugger
 				 this.$emit("add-app", res)
 			}).catch(err => {
 				this.showError()
@@ -307,7 +305,6 @@ export default {
 			}
 			this.updateListItem(this.$store.state.appConfig.listItemSelected)
 			let data = JSON.stringify(this.currentApp);
-			debugger
 			appManagementApi.updateApp(data).then(res => {
 				  this.$emit("update-app", res)
 			}).catch(err => {

@@ -22,11 +22,12 @@ export const appManagementApi = {
 	updateApp(data) {
 		return coreApi.put("application", data)
 	},
-	addFavoriteItem(userId, objectIdentifier, objectType) {
+	addFavoriteItem(userId, objectIdentifier, objectType, action) {
 		return coreApi.post('app-item-favorite', {
 			userId: userId,
 			objectIdentifier: objectIdentifier,
-			objectType: objectType
+			objectType: objectType,
+			action: action
 		})
 	},
 	getItemFavorite(userId) {
