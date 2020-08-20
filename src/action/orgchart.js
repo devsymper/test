@@ -7,7 +7,7 @@ let commonProps = {
 export default [{
         ...commonProps,
         "action": "create",
-        "handler": function(paramObj) {
+        "handler": function(param) {
             let tabName = this.$t('orgchart.create.title');
             this.$goToPage('/orgchart/create', tabName);
         }
@@ -15,23 +15,15 @@ export default [{
     {
         ...commonProps,
         "action": "update",
-        "handler": function(paramObj) {
+        "handler": function(param) {
             let tabName = this.$t('orgchart.update.title');
-            this.$goToPage('/orgchart/' + paramObj.id + '/edit', tabName);
-        }
-    },
-    {
-        ...commonProps,
-        "action": "detail",
-        "handler": function(paramObj) {
-            let tabName = this.$t('orgchart.detail.title');
-            this.$goToPage('/orgchart/' + paramObj.id + '/view', tabName);
+            this.$goToPage('/orgchart/' + param.id + '/edit', tabName);
         }
     },
     {
         ...commonProps,
         "action": "list",
-        "handler": function(paramObj) {
+        "handler": function(param) {
             let tabName = this.$t('orgchart.list.title');
             this.$goToPage('/orgchart', tabName);
         }
@@ -39,8 +31,16 @@ export default [{
     {
         ...commonProps,
         "action": "drop",
-        "handler": function(paramObj) {
+        "handler": function(param) {
 
         }
-    }
+    },
+    {
+        ...commonProps,
+        "action": "detail",
+        "handler": function(param) {
+            let tabName = this.$t('orgchart.detail.title');
+            this.$goToPage('/orgchart/' + param.id + '/view', tabName);
+        }
+    },
 ]

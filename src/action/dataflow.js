@@ -1,7 +1,7 @@
 let commonProps = {
-    "module": "dashboard",
-    "resource": "dashboard",
-    "scope": "dashboard",
+    "module": "bi",
+    "resource": "dataflow",
+    "scope": "bi",
 };
 
 export default [{
@@ -13,14 +13,14 @@ export default [{
     },
     {
         ...commonProps,
-        "action": "update",
+        "action": "drop",
         "handler": function(param) {
 
         }
     },
     {
         ...commonProps,
-        "action": "view",
+        "action": "list",
         "handler": function(param) {
             let tabName = this.$t('dashboard.detail.title') + ' ' + param.name;
             this.$goToPage('/dashboard/' + param.id + '/view', tabName);
@@ -28,14 +28,14 @@ export default [{
     },
     {
         ...commonProps,
-        "action": "list",
+        "action": "update",
         "handler": function(param) {
 
         }
     },
     {
         ...commonProps,
-        "action": "drop",
+        "action": "detail",
         "handler": function(param) {
 
         }
