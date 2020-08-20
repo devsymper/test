@@ -10,7 +10,7 @@ export default [{
         ...commonProps,
         "action": "list",
         "handler": function(paramObj) {
-            tabName = this.$t('process.list.title');
+            let tabName = this.$t('process.list.title');
             this.$goToPage('/workflow', tabName);
         }
     },
@@ -18,7 +18,7 @@ export default [{
         ...commonProps,
         "action": "create",
         "handler": function(paramObj) {
-            tabName = this.$t('process.action.create');
+            let tabName = this.$t('process.action.create');
             this.$goToPage('/workflow/create', tabName);
         }
     },
@@ -56,7 +56,7 @@ export default [{
     {
         ...commonProps,
         "action": "start_instance",
-        "handler": function(paramObj) {
+        "handler": async function(paramObj) {
             let defData = await getLastestDefinition(paramObj, true);
             if (defData.data[0]) {
                 this.$goToPage(`/workflow/process-definition/${defData.data[0].id}/run`, 'Start process instance');

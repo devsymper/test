@@ -22,7 +22,7 @@ export default [{
         ...commonProps,
         "action": "view",
         "handler": function(paramObj) {
-            tabName = this.$t('dashboard.detail.title') + ' ' + paramObj.name;
+            let tabName = this.$t('dashboard.detail.title') + ' ' + paramObj.name;
             this.$goToPage('/dashboard/' + paramObj.id + '/view', tabName);
         }
     },

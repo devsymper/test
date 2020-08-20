@@ -18,6 +18,46 @@ import actionMap from './action/index'
 Vue.component('ba-view', BaView);
 Vue.component('end-user-view', EndUserView);
 Vue.component('content-only-view', ContentOnlyView);
+
+Vue.mixin({
+    methods: {
+        $bindAction(actionDef, param = {}) {
+            let isValidAction = true;
+            if (actionDef && typeof actionDef == 'object') {
+                let sampleAction = {
+                    "module": "orgchart",
+                    "resource": "orgchart",
+                    "scope": "orgchart",
+                    "action": "list"
+                };
+                for (let key in sampleAction) {
+                    if (!actionDef.hasOwnProperty(key)) {
+                        isValidAction = false;
+                        console.warn("[SYMPER-BIND-ACTION-FAILED]  action definition is not valid, action definition must be a object with 4 keys: module, resource, scope, action, but receive", actionDef);
+                        break;
+                    }
+                }
+            } else {
+                isValidAction = false;
+                console.warn("[SYMPER-BIND-ACTION-FAILED]  action definition is not valid, first param expected Object, but receive: ", actionDef);
+            }
+
+            if (isValidAction) {
+                return JSON.stringify({
+                    action: actionDef,
+                    params: param ? param : {}
+                });
+            } else {
+                return JSON.stringify({
+                    action: {},
+                    params: {}
+                });
+
+            }
+        }
+    }
+})
+
 Vue.use(Notifications);
 Vue.use(VueMoment, {
     moment,
@@ -37,6 +77,9 @@ Vue.prototype.$evtBus.$on('symper-app-call-action-handler', (action, context, ex
         } catch (error) {
             action = {};
         }
+    }
+    if (!action.parameter) {
+        action.parameter = {};
     }
     action.parameter = Object.assign(action.parameter, extraParams);
     let key = action.module + '_' + action.resource + '_' + action.scope + '_' + action.action;
@@ -58,13 +101,7 @@ function checkCanAddTag(context) {
     return rsl;
 }
 
-Vue.prototype.$bindAction = function(actionDef) {
-    if (typeof actionDef == 'string') {
-        return actionDef;
-    } else if (typeof actionDef == 'object') {
-        return JSON.stringify(actionDef);
-    }
-}
+
 
 
 /**

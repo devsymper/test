@@ -47,7 +47,7 @@ export default [{
         ...commonProps,
         "action": "list",
         "handler": function(paramObj) {
-            tabName = this.$t('document.title');
+            let tabName = this.$t('document.title');
             this.$goToPage('/documents' + paramObj.documentId, tabName);
         }
     },
