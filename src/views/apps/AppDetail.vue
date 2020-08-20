@@ -4,14 +4,16 @@
 			<div v-for="(itemT,i) in sAppModule" :key="i" class="app-item">
 					<div class="title-app" v-if="itemT.item.length >0"><v-icon style="font-size:13px">{{itemT.icon}}</v-icon> <h4> {{ itemT.title }} <span> {{'('+itemT.item.length +')' }}</span> </h4></div>
 					<ul v-for="(childItem,i) in itemT.item" :key="i"  class="app-child-item">
-							<li  v-if="isEndUserCpn == true" v-on:contextmenu="rightClickHandler($event,childItem)">
-								{{childItem.name}}
+							<li  v-if="isEndUserCpn == true" v-on:contextmenu="rightClickHandler($event,childItem,itemT.name)">
+								<span v-if="itemT.name == 'documents'">{{childItem.title}} <span style="font:10px;opacity:0.4">{{childItem.name}}</span></span>
+								<span v-else>{{childItem.name}}</span>
 							<v-icon  @click="changeFavorite(childItem,itemT.name)" :class="{'icon-star-active' : childItem.favorite==true, 'icon-star': true}" >mdi-star</v-icon>	
 							<!-- <v-icon  @click="changeFavorite(childItem,itemT.name,1)"  class="icon-star" >mdi-star</v-icon> -->
 							<!-- <v-icon v-if="isEndUserCpn == false" class="icon-remove"  @click="removeItem(childItem.id,itemT.name)">mdi-delete-circle</v-icon> -->
 							</li>
 							<li v-else>
-								{{childItem.name}}
+								<span v-if="itemT.name == 'documents'">{{childItem.title}} <span style="font:10px;opacity:0.4">{{childItem.name}}</span></span>
+								<span v-else>{{childItem.name}}</span>
 							<!-- <v-icon class="icon-star" v-if="isEndUserCpn == true && childItem.favorite==true">mdi-star</v-icon>	 -->
 							<v-icon  class="icon-remove"  @click="removeItem(childItem,itemT.name)">mdi-delete-circle</v-icon>
 							</li>
@@ -148,13 +150,15 @@ export default {
 				})
 			}
 		},
-		rightClickHandler(event,item){
+		rightClickHandler(event,item,type){
 			// this.currentSelected = item;
 			// this.typeSelected = type;
 			event.stopPropagation();
 			event.preventDefault();
 			this.$refs.contextMenu.setContextItem(item.actions)
 			this.$refs.contextMenu.show(event)
+			this.$refs.contextMenu.setItem(item)
+			this.$refs.contextMenu.setType(type)
 		}, 
 		hideContextMenu(){
 			this.$refs.contextMenu.hide()

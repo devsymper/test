@@ -22,7 +22,7 @@
 						<div class="title-favorite"><v-icon >mdi-star</v-icon><h4>{{$t('apps.favorite')}}</h4></div>
 						<ul style="margin:0 10px;">
 							<VuePerfectScrollbar :style="{height: listFavoriteHeight}"  >
-								<li v-for="(item,i) in listFavorite[0]" :key="i">{{item.name}}<v-icon  color="yellow" style="float:right;font-size:13px">mdi-star</v-icon></li>
+								<li v-for="(item,i) in listFavorite" :key="i">{{item.name}}<v-icon  color="yellow" style="float:right;font-size:13px">mdi-star</v-icon></li>
 							</VuePerfectScrollbar>
 						</ul>
 					</div>
@@ -188,7 +188,10 @@ export default {
 					}
 				).then(resDoc => {
 					if(type == "listFavorite"){
-						self.listFavorite.push(resDoc.data.listObject)
+
+						resDoc.data.listObject.forEach(function(e){
+							self.listFavorite.push(e)
+						})
 					}
 					else{
 						this.updateFavoriteItem(self.mapId.document,resDoc.data.listObject)
@@ -211,8 +214,12 @@ export default {
 								}
 				]}).then(resOrg => {
 					if(type == 'listFavorite'){
+
 						if(resOrg.data.listObject.length > 0){
-							self.listFavorite.push(resOrg.data.listObject)
+							resOrg.data.listObject.forEach(function(e){
+								self.listFavorite.push(e)
+							})
+							// self.listFavorite.push(resOrg.data.listObject)
 						}
 					}
 					else{
@@ -237,7 +244,9 @@ export default {
 				]}).then(resRp => {
 					if(type == 'listFavorite'){
 						if(resRp.data.listObject.length > 0){
-							self.listFavorite.push(resRp.data.listObject)
+							resRp.data.listObject.forEach(function(e){
+								self.listFavorite.push(e)
+							})
 						}
 					}
 					else{
@@ -262,7 +271,12 @@ export default {
 				]}).then(resW => {
 					if(type == 'listFavorite'){
 						if(resW.data.listObject.length > 0){
-							self.listFavorite.push(resW.data.listObject)
+
+
+							// self.listFavorite.push(resW.data.listObject)
+							resW.data.listObject.forEach(function(e){
+								self.listFavorite.push(e)
+							})
 						}
 						console.log(self.listFavorite,'this.listFavoritethis.listFavoritethis.listFavorite');
 					}
@@ -288,22 +302,26 @@ export default {
 					self.arrType.workflow.push(e.id)
 				}
 			});
+			self.listFavorite = []
+
 			if(self.arrType.document.length > 0){
 				let dataDoc = self.arrType.document
 				this.getDocumentsApi(dataDoc,'listFavorite')
-				
+				debugger
 			}
 			if(self.arrType.orgchart.length > 0){
 				let dataOrg = self.arrType.orgchart
 				this.getOrgchartApi(dataOrg,'listFavorite')
+				debugger
 			}
 			if(self.arrType.report.length > 0){
 				let dataRep = self.arrType.report
-
+				debugger
 				this.getDashBoardApi(dataRep,'listFavorite')
 			}
 			if(self.arrType.workflow.length > 0){
 				let dataW = self.arrType.workflow
+				debugger
 				this.getWorkFlowApi(dataW,'listFavorite')
 			}
 		},
