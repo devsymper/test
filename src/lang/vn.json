@@ -74,7 +74,8 @@
         "updatePassword": "Cập nhật mật khẩu",
         "fullName": "Tên đầy đủ",
         "email": "Email",
-        "pageSize": "Số bản ghi mỗi trang"
+        "pageSize": "Số bản ghi mỗi trang",
+        "pendding": "Cần làm"
     },
     "login": {
         "title": "Đăng nhập hệ thống",
@@ -375,7 +376,7 @@
         "action": {
             "create": "Tạo quy trình mới"
         },
-        "taskList": "Danh sách task của ",
+        "taskList": "Danh sách công việc  ",
         "instance": {
             "list": "Danh sách các bản đã chạy",
             "name": "Tên bản chạy",
