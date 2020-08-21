@@ -97,21 +97,26 @@
                     ></hot-table>
                 </v-col>
             </v-row>
-            <v-row no-gutters ref="bottomBar" class="pt-5">
+            <v-row no-gutters ref="bottomBar" >
                 <v-col>
-                    <v-select
-                        class="d-inline-block mr-5"
-                        style="width:70px"
-                        v-model="pageSize"
-                        :items="pageSizeOptions"
-                        label="Số bản ghi mỗi trang"
-                        dense
-                        flat
-                        @change="changePageSize"
-                    ></v-select>
+                    
+                    <v-tooltip top>
+                        <template v-slot:activator="{ }">
+                            <v-select
+                                class="d-inline-block mr-5 "
+                                style="width:70px; position: relative; bottom: 2px"
+                                v-model="pageSize"
+                                :items="pageSizeOptions"
+                                dense
+                                flat
+                                @change="changePageSize"
+                            ></v-select>
+                        </template>
+                        <span>{{ $t('common.pageSize') }}</span>
+                    </v-tooltip>
                     <v-pagination
                         style="width:200px"
-                        class="sym-small-size ml-10"
+                        class="sym-small-size ml-10 "
                         v-model="page"
                         :length="totalPage"
                         next-icon="mdi-chevron-right"
@@ -570,7 +575,7 @@ export default {
                     util.getComponentSize(ref.topBar).h +
                     util.getComponentSize(ref.bottomBar).h;
             }
-            return tbHeight - 50;
+            return tbHeight - 60;
         },
         /**
          * Tạo cấu hình cho hiển thị header của table

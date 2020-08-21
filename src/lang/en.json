@@ -74,7 +74,8 @@
         "baAccount": "BA account",
         "updatePassword": "Update password",
         "fullName": "Full name",
-        "email": "Email"
+        "email": "Email",
+        "pageSize": "Page size"
     },
     "validate": {
         "required": "Not be empty",

@@ -73,7 +73,8 @@
         "baAccount": "Tài khoản BA",
         "updatePassword": "Cập nhật mật khẩu",
         "fullName": "Tên đầy đủ",
-        "email": "Email"
+        "email": "Email",
+        "pageSize": "Số bản ghi mỗi trang"
     },
     "login": {
         "title": "Đăng nhập hệ thống",
