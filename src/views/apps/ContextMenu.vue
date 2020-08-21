@@ -93,7 +93,7 @@
 	text-align: left;
 }
 .context-menu >>> .item:hover{
-	background: lightsteelblue;
+	background: #f7f7f7;
 }
 .context-menu >>> .v-icon {
 	font-size: 13px;

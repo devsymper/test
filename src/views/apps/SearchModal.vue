@@ -12,7 +12,8 @@
 				<div class="title-app" ><v-icon>{{itemT.icon}}</v-icon><h4> {{ itemT.title}}</h4> </div>
 				<ul class="app-child-item" v-for="(childItem,i) in itemT.item" :key="i" @click="clickItem(childItem,itemT.name)">
 					<li>
-						{{childItem.name}}
+								<span v-if="itemT.name == 'documents'">{{childItem.title}} <span style="font:10px;opacity:0.4">{{childItem.name}}</span></span>
+								<span v-else>{{childItem.name}}</span>
 						<v-icon v-if="sAppManagement[itemT.name].item.includes(childItem)" >mdi-check</v-icon> 
 					</li>
 				</ul>
@@ -30,10 +31,10 @@ export default {
 	 data: function() {
         return {
 			myValue: '',
-			menuItemsHeight: '270px',
+			menuItemsHeight: '450px',
             listItems:{
 			   documents:{
-				   icon : 'mdi-file-document',
+				   icon : 'mdi-file-edit-outline',
 				   title: this.$t('apps.listType.documents'),
 				   name:  'documents',
 				   item:[
@@ -41,7 +42,7 @@ export default {
 				   ]
 			   },
 			   orgcharts:{
- 				   icon : 'mdi-folder',
+ 				   icon : 'mdi-widgets',
 				   title: this.$t('apps.listType.orgcharts'),
 				   name: 'orgcharts',
 				   item:[
@@ -153,11 +154,12 @@ export default {
 }
 .search-modal >>> .app-item li{
 	cursor: pointer;
-	padding: 8px 0px;
-	margin-right: 10px;
+	padding: 8px 8px;
+	margin-right: 6px;
+	margin-left: -10px;
 }
 .search-modal >>> .app-item li:hover{
 	background-color:#f7f7f7;
-	border-radius: 10px;
+	border-radius: 5px;
 }
 </style>

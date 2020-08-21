@@ -33,13 +33,13 @@ const emptyItemSelected = (state) => {
 			item: []
 		},
 		orgcharts: {
-			icon: 'mdi-view-dashboard',
+			icon: 'mdi-widgets',
 			title: 'Orgcharts',
 			name: 'orgcharts',
 			item: []
 		},
 		reports: {
-			icon: 'mdi-folder',
+			icon: 'mdi-view-dashboard',
 			title: 'Reports',
 			name: 'reports',
 			item: []

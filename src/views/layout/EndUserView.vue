@@ -95,6 +95,7 @@ import BASidebar from "@/components/common/BASidebar.vue";
 import listApp from "@/components/common/listApp";
 import NotificationBar from "@/components/notification/NotificationBar.vue";
 import EndUserPopup from './../apps/EndUserPopup.vue';
+import UploadFile from "@/components/common/UploadFile.vue"
 export default {
     methods: {
         /**
@@ -134,19 +135,22 @@ export default {
             let req = new Api(appConfigs.apiDomain.nofitication);
             req.get("/notifications/count-unread")
             .then(res => {
-                console.log(res);
                 if (res.status == 200) {
                     this.$store.state.app.unreadNotification = res.data;
                 }
             });
-        }
+		},
+		logItem(data){
+			console.log(data);
+		}
         
     },
     components: {
         "ba-sidebar": BASidebar,
         "list-app": listApp,
 		"list-notification": NotificationBar,
-		EndUserPopup
+		EndUserPopup,
+		UploadFile
     },
     created() {
         this.$evtBus.$on("app-receive-remote-msg", data => {

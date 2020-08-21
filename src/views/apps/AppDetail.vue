@@ -15,7 +15,7 @@
 								<span v-if="itemT.name == 'documents'">{{childItem.title}} <span style="font:10px;opacity:0.4">{{childItem.name}}</span></span>
 								<span v-else>{{childItem.name}}</span>
 							<!-- <v-icon class="icon-star" v-if="isEndUserCpn == true && childItem.favorite==true">mdi-star</v-icon>	 -->
-							<v-icon  class="icon-remove"  @click="removeItem(childItem,itemT.name)">mdi-delete-circle</v-icon>
+							<v-icon  class="icon-remove"  @click="removeItem(childItem,itemT.name)">mdi-delete-empty-outline</v-icon>
 							</li>
 					</ul>
 			</div>	
@@ -230,6 +230,7 @@ export default {
 }
 .app-details >>> .app-item .app-child-item .icon-star-active{
 	color: yellow;
+	display: inline-block;
 }
 .app-details >>> .app-item li{
 	cursor: pointer;

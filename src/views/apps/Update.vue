@@ -85,7 +85,7 @@
 								v-on="on"
 								>
 									<span> {{ $t('apps.clickToAdd')}} </span>
-									<v-icon right dark style="border-left:2px solid lightgrey">mdi-plus</v-icon>
+									<v-icon right dark style="border-left:2px solid lightgrey;padding-left:8px">mdi-plus</v-icon>
 							</v-btn>
 						</template>
 						<SearchModal @selectedItem="selectedItem"/>

@@ -1,7 +1,11 @@
-import { documentApi } from "../../api/Document";
-import { SYMPER_APP } from "./../../main.js";
+import {
+	documentApi
+} from "../../api/Document";
+import {
+	SYMPER_APP
+} from "./../../main.js";
 const action1 = (state, data) => {
-    state.data = data;
+	state.data = data;
 };
 
 /**
@@ -10,25 +14,24 @@ const action1 = (state, data) => {
  * @param {*} context 
  * @param {*} data 
  */
-const setListDocuments = async(context, forceGetData = false) => {
-    if (forceGetData || context.state.needGetAllDoc) {
-        context.state.needGetAllDoc = false;
-        try {
-            let res = await documentApi.getListDocuments({
-                pageSize: 3000
-            });
-            if (res.status == 200) {
-                context.commit('setAllDocuments', res.data.listObject);
-                SYMPER_APP.$evtBus.$emit('symper-cache-set-all-resource', {
-                    type: 'document_definition',
-                    data: res.data.listObject
-                });
-            } else {
-                console.error(res, "[Symper::get list documents failed!]");
-            }
-        } catch (error) {
-            console.error(error, "[Symper::get list documents failed!]");
-        }
-    }
+const setListDocuments = async (context, forceGetData = false) => {
+	if (forceGetData || context.state.needGetAllDoc) {
+		context.state.needGetAllDoc = false;
+		try {
+			let res = await documentApi.getListDocuments({
+				pageSize: 3000
+			});
+			if (res.status == 200) {
+				context.commit('setAllDocuments', res.data.listObject);
+			} else {
+				console.error(res, "[Symper::get list documents failed!]");
+			}
+		} catch (error) {
+			console.error(error, "[Symper::get list documents failed!]");
+		}
+	}
 }
-export { action1, setListDocuments };
+export {
+	action1,
+	setListDocuments
+};

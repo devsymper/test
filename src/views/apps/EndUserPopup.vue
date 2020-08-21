@@ -19,10 +19,11 @@
 					<v-spacer></v-spacer>
 				</v-app-bar>
 					<div class="list-favorite">
-						<div class="title-favorite"><v-icon >mdi-star</v-icon><h4>{{$t('apps.favorite')}}</h4></div>
+						<div class="title-favorite"><v-icon >mdi-playlist-star</v-icon><h4>{{$t('apps.favorite')}}</h4></div>
+						<!-- <span v-if="listFavorite.length == 0"> chuaw cos favorite </span> -->
 						<ul style="margin:0 10px;">
 							<VuePerfectScrollbar :style="{height: listFavoriteHeight}"  >
-								<li v-for="(item,i) in listFavorite" :key="i">{{item.name}}<v-icon  color="yellow" style="float:right;font-size:13px">mdi-star</v-icon></li>
+								<li v-for="(item,i) in listFavorite" :key="i"> <span v-if="item.hasOwnProperty('title')">{{item.title}}</span><span v-else>{{item.name}}</span> <v-icon  color="yellow" style="float:right;font-size:13px">mdi-star</v-icon></li>
 							</VuePerfectScrollbar>
 						</ul>
 					</div>
@@ -40,8 +41,10 @@
 								</div>
 								  <v-tooltip bottom>
 									<template v-slot:activator="{ on, attrs }">
-									<h5 v-bind="attrs"
+									<div class="app-active-title">
+										<h5 v-bind="attrs"
 										v-on="on">{{item.name}}</h5>
+									</div>
 									</template>
 									<span>{{item.name}}</span>
 								 </v-tooltip>
@@ -69,7 +72,6 @@
     </v-card>
   </div>
 </template>
-
 <script>
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import AppDetail from './AppDetail.vue';
@@ -82,7 +84,7 @@ export default {
 	data: function() {
         return {
 		 listAppHeight: '200px',
-		 listFavoriteHeight:'150px',
+		 listFavoriteHeight:'100%',
 		 tab: 'tab-1',
 		 isEndUserCpn:true,
 		 searchKey:"",
@@ -150,9 +152,11 @@ export default {
 			});
 		},
 		getFavorite(){
+			this.listFavorite= []
 			let userId = this.$store.state.app.endUserInfo.id
 			appManagementApi.getItemFavorite(userId).then(res => {
 				if (res.status == 200) {
+					debugger
 					this.checkTypeFavorite(res.data.listObject)
 				}
 			}).catch((err) => {
@@ -164,7 +168,12 @@ export default {
 			this.title.name = item.name;
 			appManagementApi.getAppDetails(item.id).then(res => {
 				if (res.status == 200) {
-					this.checkChildrenApp(res.data.listObject.childrenApp)
+					if(Object.keys(res.data.listObject.childrenApp).length > 0){
+						this.checkChildrenApp(res.data.listObject.childrenApp)
+					}else{
+						this.$store.commit('appConfig/emptyItemSelected')
+					}
+					
 				}
 			}).catch((err) => {
 			});
@@ -188,7 +197,7 @@ export default {
 					}
 				).then(resDoc => {
 					if(type == "listFavorite"){
-
+						debugger
 						resDoc.data.listObject.forEach(function(e){
 							self.listFavorite.push(e)
 						})
@@ -288,6 +297,10 @@ export default {
 		},
 		checkTypeFavorite(data){
 			let self = this
+			self.arrType.document = []
+			self.arrType.orgchart = []
+			self.arrType.report = []
+			self.arrType.workflow = []
 			data.forEach(function(e){
 				if(e.objectType == 'document'){
 					self.arrType.document.push(e.id)
@@ -302,7 +315,9 @@ export default {
 					self.arrType.workflow.push(e.id)
 				}
 			});
-			self.listFavorite = []
+			console.log(self.arrType);
+			debugger
+			// self.listFavorite = []
 
 			if(self.arrType.document.length > 0){
 				let dataDoc = self.arrType.document
@@ -312,16 +327,13 @@ export default {
 			if(self.arrType.orgchart.length > 0){
 				let dataOrg = self.arrType.orgchart
 				this.getOrgchartApi(dataOrg,'listFavorite')
-				debugger
 			}
 			if(self.arrType.report.length > 0){
 				let dataRep = self.arrType.report
-				debugger
 				this.getDashBoardApi(dataRep,'listFavorite')
 			}
 			if(self.arrType.workflow.length > 0){
 				let dataW = self.arrType.workflow
-				debugger
 				this.getWorkFlowApi(dataW,'listFavorite')
 			}
 		},
@@ -408,13 +420,16 @@ export default {
 	margin: 8px 15px;
 }
 .end-user-popup >>> .title-list-app {
-	border-top: 1px solid lightgrey;
+	/* border-top: 1px solid lightgrey; */
 	padding-top: 8px;
+}
+.end-user-popup >>> .title-list-app .app-active-title{
+	display: flex;
 }
 .end-user-popup >>> .title-favorite .v-icon
 {
-	font-size: 13px;
-	padding: 2px 8px ;
+	font-size: 15px;
+	padding: 0px 8px ;
 }
 .end-user-popup >>> .title-list-app .v-icon{
 	font-size: 13px;
@@ -431,7 +446,11 @@ export default {
     flex-wrap: wrap;
 	width: 370px;
 	margin-right:auto;
-	margin-left:auto;
+	/* margin-left:auto; */
+	margin-left: 30px;
+}
+.end-user-popup >>> .list-app-cointaner .ps__rail-x{
+	/* display:none; */
 }
 .end-user-popup >>> .list-app-cointaner .list-app-item:hover{
 	background-color: #f7f7f7;
@@ -476,12 +495,13 @@ export default {
 	margin-top: -12px;
 	font: 13px roboto;
 	font-weight: 400;
-	width: 60px; 
+	width: 70px; 
 	overflow: hidden;
 	text-overflow: ellipsis;
 	display: -webkit-box;
 	-webkit-line-clamp: 2;
 	-webkit-box-orient: vertical;
+	text-align: center;
 }
 .end-user-popup >>> .list-app-cointaner .list-app-item {
 	padding-top: 2px;

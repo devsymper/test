@@ -1,19 +1,19 @@
 const defaultState = {
 	listItemSelected: {
 		documents: {
-			icon: 'mdi-file-document',
+			icon: 'mdi-file-edit-outline',
 			title: 'Documents',
 			name: 'documents',
 			item: []
 		},
 		orgcharts: {
-			icon: 'mdi-view-dashboard',
+			icon: 'mdi-widgets-outline',
 			title: 'Orgcharts',
 			name: 'orgcharts',
 			item: []
 		},
 		reports: {
-			icon: 'mdi-folder',
+			icon: 'mdi-view-dashboard',
 			title: 'Reports',
 			name: 'reports',
 			item: []
