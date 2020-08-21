@@ -10,7 +10,7 @@
         ref="listObject"
     >
         <div slot="right-panel-content" class="h-100">
-            <detail-object :docObjInfo="docObjInfo"/>
+            <detail-object :quickView="true" :docObjInfo="docObjInfo"/>
         </div>
     </list-items>
 </template>

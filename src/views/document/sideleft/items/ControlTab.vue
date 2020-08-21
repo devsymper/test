@@ -96,7 +96,7 @@ export default {
         listControlDisplay: ['label','image','qrCode'],
         listControlInput:   ['textInput','richText','number','date','dateTime','time','month','select','documentSelect','phone','email','currency','radio','checkbox','color','percent','user','inputFilter','hidden'],
         listControlLayout:  ['table','panel','fileUpload'],
-        listControlReport:  ['report','approvalHistory','trackingValue'],
+        listControlReport:  ['dataFlow','report','approvalHistory','trackingValue'],
         listControlAction:  ['submit','reset','draft']
     }),
     methods:{
