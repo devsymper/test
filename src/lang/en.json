@@ -322,6 +322,31 @@
                 "validate": "Validate",
                 "save": "Save"
             }
+        },
+        "detail": {
+            "sidebar": {
+                "heading": "Information",
+                "body": {
+                    "general": {
+                        "title": "General",
+                        "dateCreate": "Date created",
+                        "userCreate": "User created",
+                        "history": "History",
+                        "comment": "Comment"
+                    },
+                    "worflowInfo": "Workflow infomation",
+                    "userRelated": {
+                        "title": "User related",
+                        "subTitle1": "User Approval",
+                        "subTitle2": "Assignee"
+                    }
+                }
+            },
+            "fab": {
+                "toggleSize": "Toggle Size",
+                "otherInfo": "Other information",
+                "print": "Print"
+            }
         }
     },
     "documentObject": {

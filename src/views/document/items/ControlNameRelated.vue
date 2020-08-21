@@ -149,7 +149,7 @@ export default {
                 this.newContext = this.sDocumentStore.name.value;
                 dataPost = {documentName:this.sDocumentStore.name.oldName};
             }
-            dataPost = Object.assign(dataPageSize,dataPost);
+            dataPost = Object.assign(this.dataPageSize,dataPost);
             formulasApi.getRelated(dataPost).then(res=>{
                 if(res.status == 200){
                     thisCpn.dataTable = []

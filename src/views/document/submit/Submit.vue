@@ -750,7 +750,7 @@ export default {
                             let content = res.data.document.content;
                             thisCpn.documentName = res.data.document.name;
 							thisCpn.contentDocument = content;
-							if(res.data.document.data_prepare_submit != "")
+							if(res .data.document.data_prepare_submit != "" && res.data.document.data_prepare_submit != null)
 							thisCpn.preDataSubmit = JSON.parse(res.data.document.data_prepare_submit);
                             setDataForPropsControl(res.data.fields,thisCpn.keyInstance,'submit'); // ddang chay bat dong bo
                             setTimeout(() => {

@@ -325,6 +325,32 @@
                 "validate": "Kiểm tra dữ liệu ",
                 "save": "Lưu"
             }
+        },
+        "detail": {
+            "sidebar": {
+                "heading": "THÔNG TIN",
+                "body": {
+                    "general": {
+                        "title": "THÔNG TIN CHUNG",
+                        "dateCreate": "Ngày tạo",
+                        "userCreate": "Người tạo",
+                        "history": "Lịch sử",
+                        "comment": "Bình luận"
+                    },
+                    "worflowInfo": "THÔNG TIN QUY TRÌNH",
+                    "userRelated": {
+                        "title": "NGƯỜI LIÊN QUAN",
+                        "subTitle1": "Người phê duyệt",
+                        "subTitle2": "Người tham gia"
+                    }
+
+                }
+            },
+            "fab": {
+                "toggleSize": "Thay đổi kích thước",
+                "otherInfo": "Xem thông tin khác",
+                "print": "In"
+            }
         }
     },
     "documentObject": {

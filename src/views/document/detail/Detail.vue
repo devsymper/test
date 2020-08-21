@@ -3,26 +3,96 @@
         <div
             class="sym-form-Detail"
             :id="'sym-Detail-'+keyInstance"
-            :style="{'width':documentSize, 'height':'100%','margin':contentMargin}"
-        >
+            :style="{'width':documentSize, 'height':'100%','margin':contentMargin}">
             <div v-html="contentDocument"></div>
             
             
+            
         </div>
-            <button v-if="!quickView" v-on:click="togglePageSize"  id="toggle-doc-size-btn" :style="togglePageSizeBtnStyle">
+            <!-- <button v-if="!quickView" v-on:click="togglePageSize"  id="toggle-doc-size-btn" :style="togglePageSizeBtnStyle">
                 <span class="mdi mdi-arrow-horizontal-lock"></span>
             </button>
             <button v-if="!quickView" v-on:click="toggleSideBar"  id="side-bar-detail-btn" :style="toggleSideBarBtnStyle">
                 <span class="mdi mdi-chevron-double-left"></span>
-            </button>
+            </button> -->
             <side-bar-detail 
             v-if="!quickView"
             :sidebarWidth="sidebarWidth"  
             :isShowSidebar="isShowSidebar"
             :userId="userId"
             :taskId="taskId"
+            :createTime="createTime"
+            :documentObjectId="documentObjectId1"
             :workflowId="workflowId"
             />
+     <v-speed-dial
+                v-if="!quickView"
+                v-model="fab"
+                :top="top"
+                :bottom="bottom"
+                :right="right"
+                :left="left"
+                :direction="direction"
+                :open-on-hover="hover"
+                :transition="transition"
+            >
+            <template v-slot:activator>
+                    <v-btn v-model="fab" color="blue darken-2" dark fab>
+                        <v-icon v-if="fab">mdi-close</v-icon>
+                        <v-icon v-if="!fab">mdi-menu</v-icon>
+                    </v-btn>
+                </template>
+                <v-tooltip left>
+                    <template v-slot:activator="{ on }">
+                        <div v-on="on">
+                            <v-btn fab dark small color="green" @click="togglePageSize">
+                                <v-icon>mdi-resize</v-icon>
+                            </v-btn>
+                        </div>
+                    </template>
+                    <span>{{$t('document.detail.fab.toggleSize')}}</span>
+                </v-tooltip>
+                
+                <v-tooltip left>
+                    <template v-slot:activator="{ on }">
+                        <div v-on="on">
+                            <v-btn
+                                fab
+                                dark
+                                small
+                                color="indigo"
+                                @click="toggleSideBar"
+                            >
+                                <v-icon>mdi-book-open-outline</v-icon>
+                            </v-btn>
+                        </div>
+                    </template>
+                    <span>{{$t('document.detail.fab.otherInfo')}}</span>
+                </v-tooltip>
+                <v-tooltip left>
+                    <template v-slot:activator="{ on }">
+                        <div v-on="on">
+                            <v-btn
+                                fab
+                                dark
+                                small
+                                color="indigo"
+                                @click="printDiv"
+                            >
+                                <v-icon>mdi-printer</v-icon>
+                            </v-btn>
+                        </div>
+                    </template>
+                    <span>{{$t('document.detail.fab.print')}}</span>
+                </v-tooltip>
+                
+            </v-speed-dial>
+
+
+           
+
+
+
 
     </div>
 </template>
@@ -41,7 +111,7 @@ import SideBarDetail from './SideBarDetail'
 
 export default {
     props: {
-        docObjectId: {
+        documentObjectId: {
             type: Number,
             default: 0
         },
@@ -83,19 +153,26 @@ export default {
             keyInstance: Date.now(),
             contentMargin:'auto',
             sidebarWidth:300,
-            toggleSideBarBtnStyle:null,
-            togglePageSizeBtnStyle:null,
             isShowSidebar:false,
             workflowId:"",
             taskId:"",
-            userId:""
+            createTime:"",
+            userId:"",
+            documentObjectId1:"",
+            direction: "top",
+            fab: false,
+            hover: false,
+            tabs: null,
+            top: false,
+            right: true,
+            bottom: true,
+            left: false,
+            transition: "slide-y-reverse-transition",
 
         };
     },
     beforeMount() {
         this.documentSize = "21cm";
-        this.toggleSideBarBtnStyle = {right: 20 + 'px'}
-        this.togglePageSizeBtnStyle = {right: 80 + 'px'}
     },
     created(){
         this.$store.commit("document/setDefaultSubmitStore",{instance:this.keyInstance});
@@ -107,13 +184,15 @@ export default {
             key: thisCpn.keyInstance,
             value: 'detail'
         });
-        if (this.docObjectId != 0) {
-            this.docObjId = this.docObjectId;
+        if (this.documentObjectId != 0) {
+            this.docObjId = this.documentObjectId;
         } else if (this.$route.name == "detailDocument" || this.$route.name == "printDocument") {
             this.docObjId = this.$route.params.id;
         }
-        if(this.docObjId != null)
-        this.loadDocumentObject();  
+        if(this.docObjId != null){
+            this.documentObjectId1 = this.docObjId;
+            this.loadDocumentObject();  
+        }
         userApi.getListUser(1,100000).then(res => {
             if (res.status == 200) {
                 thisCpn.$store.commit("document/addToDocumentSubmitStore", {
@@ -178,6 +257,7 @@ export default {
                     if (res.status == 200) {
                         thisCpn.userId = res.data.document_object_user_created_id;
                         thisCpn.taskId = res.data.document_object_task_id;
+                        thisCpn.createTime = res.data.document_object_create_time
                         thisCpn.workflowId = res.data.document_object_workflow_id;
                         thisCpn.$store.commit('document/addToDocumentDetailStore',{
                             key: 'allData',
@@ -197,7 +277,7 @@ export default {
         },
         togglePageSize() {
             this.contentMargin = this.documentSize == "21cm" ? "" : "auto";
-            this.documentSize = this.documentSize == "21cm" ? "calc(100% - "+this.sidebarWidth+"px)" : "21cm";
+            this.documentSize = this.documentSize == "21cm" ? "calc(100%)" : "21cm";
             let listInputInDocument = this.getListInputInDocument();
             let allControlInstance = Object.values(listInputInDocument);
             let listTableControlInstance = allControlInstance.filter(control =>{
@@ -213,13 +293,6 @@ export default {
         },
         toggleSideBar(){
             this.isShowSidebar = !this.isShowSidebar;
-            this.toggleSideBarBtnStyle = {right: 20 + 'px'}
-            this.togglePageSizeBtnStyle = {right: 80 + 'px'}
-            if(this.isShowSidebar){
-                this.toggleSideBarBtnStyle = {right:this.sidebarWidth - 15 + 'px','border-radius':'50%', top: '21px', padding:'0 6px','z-index':9999};
-                this.togglePageSizeBtnStyle = {right:this.sidebarWidth + 35  + 'px'}
-            }
-           
         },
         getListInputInDocument() {
             return getSDocumentSubmitStore(this.keyInstance).listInputInDocument;
@@ -324,10 +397,14 @@ export default {
         },
         
         printDiv(){
+            this.fab = false;
+            $('.sym-form-Detail').find('table[border="1"]').removeAttr('border');
+            $('.sym-form-Detail').find('table[border="1"]').css({border:'none'});
             // let css = this.getallcss();
             let head = document.head || document.getElementsByTagName('head')[0];
             let style = document.createElement('style');
-            
+            $('body').css({display: 'flex',
+            'justify-content': 'center',padding:'8px'})
             // style.type = 'text/css';
             // if (style.styleSheet){
             // // This is required for IE8 and below.
@@ -335,7 +412,8 @@ export default {
             // } else {
             // style.appendChild(document.createTextNode(css));
             // }
-			var printContents = $('.layout.justify-center')[0].innerHTML;
+            var printContents = $('.sym-form-Detail')[0].innerHTML;
+            $(printContents).find('.s-drawer').remove();
 			var originalContents = document.body.innerHTML;
             // head.appendChild(style);
 
@@ -343,7 +421,8 @@ export default {
 
 			window.print();
 
-			document.body.innerHTML = originalContents;
+            document.body.innerHTML = originalContents;
+             $('body').removeAttr('style');
 
         },
         getallcss() {
@@ -353,6 +432,11 @@ export default {
             {
                 css += styletags[i].innerHTML; //extract the css in the current style tag
             }
+            css += 'padding:12px';
+            if(this.documentSize == '21cm'){
+                $('body').addClass('content-print')
+            }
+
 
             // //loop over all the external stylesheets
 //             for(var i = 0; i < document.styleSheets.length; i++)
@@ -374,65 +458,72 @@ export default {
 }
 </script>
 <style  scoped>
-.sym-form-Detail {
-    width: 21cm;
-    padding: 16px;
-    position: relative;
-}
-.wrap-content-detail{
-    position: relative;
-    width: 100%;
-}
-.sym-form-Detail >>> .on-selected {
-    border: none !important;
-}
-.sym-form-Detail >>> table:not(.htCore) td,
-.sym-form-Detail >>> table:not(.htCore),
-.sym-form-Detail >>> table:not(.htCore) th {
-    border: none !important;
-}
-.sym-form-Detail >>> .htCore td:last-child {
-    border-right: 1px solid #ccc !important;
-}
-.sym-form-Detail >>> .ht_clone_left.handsontable table.htCore {
-    border-right: none;
-}
-.s-control-label{
-    background: none !important;
-}
+    .sym-form-Detail {
+        width: 21cm;
+        padding: 16px;
+        position: relative;
+    }
+    .wrap-content-detail{
+        position: relative;
+        width: 100%;
+        height: calc(100% - 40px);
+    }
+    .sym-form-Detail >>> .on-selected {
+        border: none !important; 
+    }
+    .sym-form-Detail >>> table:not(.htCore) td,
+    .sym-form-Detail >>> table:not(.htCore),
+    .sym-form-Detail >>> table:not(.htCore) th {
+        border: none !important;
+    }
+    .sym-form-Detail >>> .htCore td:last-child {
+        border-right: 1px solid #ccc !important;
+    }
+    .sym-form-Detail >>> .ht_clone_left.handsontable table.htCore {
+        border-right: none;
+    }
+    .s-control-label{
+        background: none !important;
+    }
 
-#toggle-doc-size-btn {
-    position: absolute;
-    top: 15px;
-    padding: 4px 12px;
-    font-size: 20px;
-    border-radius: 4px;
-    background: #fafafa;
-    opacity: 1;
-    color: #757575;
-    transition:all cubic-bezier(0.4, 0, 0.2, 1) 250ms;
-}
-#toggle-doc-size-btn:hover {
-    background: #dddddd;
-}
-#toggle-doc-size-btn:focus {
-    outline: none;
-}
-#side-bar-detail-btn {
-    position: absolute;
-    top: 15px;
-    padding: 4px 12px;
-    font-size: 20px;
-    border-radius: 4px;
-    background: #fafafa;
-    opacity: 1;
-    color: #757575;
-    transition:all cubic-bezier(0.4, 0, 0.2, 1) 250ms;
-}
-#side-bar-detail-btn:hover {
-    background: #dddddd;
-}
-#side-bar-detail-btn:focus {
-    outline: none;
-}
+    #toggle-doc-size-btn {
+        position: absolute;
+        top: 15px;
+        padding: 4px 12px;
+        font-size: 20px;
+        border-radius: 4px;
+        background: #fafafa;
+        opacity: 1;
+        color: #757575;
+        transition:all cubic-bezier(0.4, 0, 0.2, 1) 250ms;
+    }
+    #toggle-doc-size-btn:hover {
+        background: #dddddd;
+    }
+    #toggle-doc-size-btn:focus {
+        outline: none;
+    }
+    #side-bar-detail-btn {
+        position: absolute;
+        top: 15px;
+        padding: 4px 12px;
+        font-size: 20px;
+        border-radius: 4px;
+        background: #fafafa;
+        opacity: 1;
+        color: #757575;
+        transition:all cubic-bezier(0.4, 0, 0.2, 1) 250ms;
+    }
+    #side-bar-detail-btn:hover {
+        background: #dddddd;
+    }
+    #side-bar-detail-btn:focus {
+        outline: none;
+    }
+    ::v-deep .v-speed-dial {
+        position: absolute;
+    }
+    /* .sym-form-Detail table:not(.htCore) td, .sym-form-Detail table:not(.htCore), .sym-form-Detail table:not(.htCore) th{
+        border: none !important;
+    } */
 </style>
