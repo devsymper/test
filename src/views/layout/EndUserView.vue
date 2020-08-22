@@ -66,8 +66,8 @@
                         <v-menu  v-model="isShowDialogNotification"
                             z-index="161"
                             :close-on-content-click="false"
-                            :max-width="452"
-                            :min-width="452"
+                            :max-width="385"
+                            :min-width="385"
                             :max-height="700"
                             offset-y>
                             <template v-slot:activator="{ on }">
