@@ -9,7 +9,9 @@
         :actionPanelWidth="actionPanelWidth"
         @after-open-add-panel="addDocument"
     >
-      
+        <div slot="right-panel-content" class="h-100">
+            <submit-view ref="submitView" :isQickSubmit="true" :action="'submit'" @submit-document-success="aftersubmitDocument" :docId="documentId"/>
+        </div>
     </list-items>
 </template>
 <script>
@@ -17,15 +19,18 @@ import { documentApi } from "./../../api/Document.js";
 import ListItems from "./../../components/common/ListItems.vue";
 import ActionPanel from "./../../views/users/ActionPanel.vue";
 import ChangePassPanel from "./../../views/users/ChangePass.vue";
+import Submit from './submit/Submit'
 import { util } from "./../../plugins/util.js";
 export default {
     components: {
         "list-items": ListItems,
         "action-panel": ActionPanel,
+        'submit-view':Submit
     },
     data(){
         return {
-            actionPanelWidth:800,
+            documentId:0,
+            actionPanelWidth:830,
             containerHeight: 200,
             tableContextMenu:[
                 {name:"delete",text:'Xóa',
@@ -80,6 +85,14 @@ export default {
                     },
                 },
                 {
+                    name: "quickSubmit",
+                    text: "Nhập liệu nhanh",
+                    callback: (document, callback) => {
+                        this.$refs.listDocument.openactionPanel();
+                        this.documentId = parseInt(document.id)
+                    },
+                },
+                {
                     name: "listObject",
                     text: "Danh sách bản ghi",
                     callback: (document, callback) => {
@@ -118,6 +131,9 @@ export default {
      
         calcContainerHeight() {
             this.containerHeight = util.getComponentSize(this).h;
+        },
+        aftersubmitDocument(){
+            this.$refs.listDocument.closeactionPanel();
         }
     }
 }

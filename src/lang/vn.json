@@ -135,7 +135,8 @@
         "min_8": "Yêu cầu mật khẩu lớn hơn 8 kí tự",
         "max_24": "Yêu cầu mật khẩu ít hơn 24 kí tự",
         "email": "Email không hợp lệ",
-        "notValid": "Trường này không hợp lệ"
+        "notValid": "Trường này không hợp lệ",
+        "password": "Yêu cầu mật khẩu có cả chữ hoa và số"
     },
     "user": {
         "title": "Danh sách User",

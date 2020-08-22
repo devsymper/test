@@ -8,7 +8,7 @@
 	:style="{'transform':(isShow) ? 'translateX(0%)' : 'translateX(100%)'}"
 	>
 	<div style="display:flex;">
-		<span class="fs-20px">{{$t('document.detail.sidebar.heading')}}</span>
+		<span style="font-size:15px;">{{$t('document.detail.sidebar.heading')}}</span>
 		<span class="mdi mdi-close" @click="hide"></span>
 	</div>
 
@@ -155,8 +155,9 @@ export default {
 		},
 		userId(after){
 			userApi.getDetailUser(after).then(res=>{
-                    this.userCreate = res.data.user.displayName
-				}).always({}).catch({});
+				if(res.status == 200)
+				this.userCreate = res.data.user.displayName
+			}).always({}).catch({});
 		},
 		workflowId(after){
 			bpmnApi.getDefinitionData(this.workflowId).then(res=>{ 
@@ -196,6 +197,7 @@ export default {
 	methods:{
 		hide(){
 			this.isShow = false;
+			this.$emit('after-hide-sidebar')
 		},
 		show(){
 			this.isShow = true;
@@ -209,7 +211,7 @@ export default {
         min-height : 25px !important;
     }
     .v-expand-header{
-        font-size: 15px;
+        font-size: 13px;
         font-weight: 500;
 		min-height: unset;
 		padding: 8px 0;

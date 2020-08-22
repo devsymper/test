@@ -411,10 +411,11 @@ export default class BasicControl extends Control {
     renderUserControl() {
         if (this.checkDetailView()) {
             let thisObj = this;
-            userApi.getDetailUser(this.value).then(res => {
-                thisObj.value = res.data.user.displayName;
-                thisObj.ele.val(thisObj.value)
-            }).always({}).catch({})
+            if (this.value != null && this.value != "")
+                userApi.getDetailUser(this.value).then(res => {
+                    thisObj.value = res.data.user.displayName;
+                    thisObj.ele.val(thisObj.value)
+                }).always({}).catch({})
 
         } else {
             this.ele.attr('type', 'text');

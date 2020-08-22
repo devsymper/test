@@ -16,7 +16,6 @@
                 <span class="mdi mdi-chevron-double-left"></span>
             </button> -->
             <side-bar-detail 
-            v-if="!quickView"
             :sidebarWidth="sidebarWidth"  
             :isShowSidebar="isShowSidebar"
             :userId="userId"
@@ -24,6 +23,7 @@
             :createTime="createTime"
             :documentObjectId="documentObjectId1"
             :workflowId="workflowId"
+            @after-hide-sidebar="afterHideSidebar"
             />
      <v-speed-dial
                 v-if="!quickView"
@@ -174,6 +174,7 @@ export default {
     beforeMount() {
         this.documentSize = "21cm";
     },
+    
     created(){
         this.$store.commit("document/setDefaultSubmitStore",{instance:this.keyInstance});
         this.$store.commit("document/setDefaultDetailStore",{instance:this.keyInstance});
@@ -225,7 +226,13 @@ export default {
         }
     },
     methods: {
-        
+        afterHideSidebar(){
+            this.$emit('after-hide-sidebar')
+        },
+        setLayoutFromQuickView(size,margin){
+            this.documentSize = size;
+            this.contentMargin = margin;
+        },
         // Khadm: load data của document lên để hiển thị và xử lý
         loadDocumentStruct(documentId) {
             let thisCpn = this;
@@ -235,6 +242,7 @@ export default {
                     if (res.status == 200) {
                         let content = res.data.document.content;
                         thisCpn.contentDocument = content;
+                        thisCpn.$emit('after-load-document',res.data.document)
                         setDataForPropsControl(res.data.fields, thisCpn.keyInstance,'detail'); // ddang chay bat dong bo
                         setTimeout(() => {
                             thisCpn.processHtml(content);
@@ -293,6 +301,9 @@ export default {
         },
         toggleSideBar(){
             this.isShowSidebar = !this.isShowSidebar;
+        },
+        isShow(){
+            return this.isShowSidebar
         },
         getListInputInDocument() {
             return getSDocumentSubmitStore(this.keyInstance).listInputInDocument;

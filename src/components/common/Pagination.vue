@@ -19,7 +19,7 @@
                 :length="pageLength"
                 next-icon="mdi-chevron-right"
                 prev-icon="mdi-chevron-left"
-                :total-visible="7"
+                :total-visible="totalVisible"
                 @next="onNextPage"
                 @prev="onPrevPage"
                 @input="onInputPage"
@@ -34,23 +34,20 @@ export default {
             type:Number,
             default:0
         },
-        pageSize:{
-            type:Number,
-            default:50
-        },
         pageSizeOptions:{
             type:Array,
             default: function () { 
                 return [50,75,100] 
             }
+        },
+        totalVisible:{
+            type:Number,
+            default:7
         }
     },
     watch:{
-        pageSize(after){
-            this.size = after
-        },
         total(after){
-            this.pageLength = Math.floor(this.total/this.pageSize);
+            this.pageLength = Math.floor(this.total/this.size);
         }
     },
     data:()=>{
@@ -62,7 +59,7 @@ export default {
     },
     beforeMount(){
         this.page = 1;
-        this.pageLength = Math.floor(this.total/this.pageSize);
+        this.pageLength = Math.floor(this.total/this.size);
     },
     methods:{
         onNextPage(page){

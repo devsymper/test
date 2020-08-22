@@ -526,34 +526,49 @@ export default {
         minimizeControlEL(allControl){
             var allInputControl = $("#document-editor-"+this.keyInstance+"_ifr").contents().find('body').find(".s-control");
             let allId = [];
+            let allUserControl = {user:[]}
             $.each(allInputControl,function(k,v){
                 let id = $(v).attr('id');
                 allId.push(id);
             });
             for (let controlId in allControl){
+                let isCheck = false;
                 if(allId.indexOf(controlId) === -1){
                     delete allControl[controlId];
+                    isCheck = true;
                 }
                 else{
                     if(allControl[controlId].type == 'table'){
                         if(allId.indexOf(controlId) === -1){
                             for(let childControlId in allControl[controlId].listFields){
+                                let childControl = allControl[controlId].listFields[childControlId]
                                 if(allId.indexOf(childControlId) === -1){
                                     delete allControl[controlId].listFields[childControlId];
+                                    isCheck = true;
+                                }
+                                if(!isCheck && childControl.type == 'user'){
+                                    allUserControl['user'].push(childControl.properties.name.value)
                                 }
                             }
                         }
                     }   
                 }
+                if(!isCheck && allControl[controlId].type == 'user'){
+                    allUserControl['user'].push(allControl[controlId].properties.name.value)
+                }
                 
             }
-            return allControl
+            return {minimizeControl:allControl,userControls:allUserControl}
             
         },
+      
         // hoangnd: hàm gửi request lưu doc
         async saveDocument(){
-            let allControl = this.minimizeControlEL(this.editorStore.allControl);
+            let minimizeControl = this.minimizeControlEL(this.editorStore.allControl);
+            let allControl = minimizeControl.minimizeControl
+            let userControls = minimizeControl.userControls
             let documentProperties = util.cloneDeep(this.sDocumentProp);
+            documentProperties = Object.assign({controlInfo:userControls},documentProperties)
             documentProperties = JSON.stringify(documentProperties);
             let htmlContent = this.editorCore.getContent();
             let dataPost = this.getDataToSaveMultiFormulas(allControl);

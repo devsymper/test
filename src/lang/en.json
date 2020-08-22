@@ -81,7 +81,8 @@
         "min_8": "Password required is greater than 8 characters",
         "max_24": "Password required for less than 24 characters",
         "email": "Invalid email",
-        "notValid": "This field is not valid"
+        "notValid": "This field is not valid",
+        "password": "Password required at least one uppercase letter and one number"
     },
     "login": {
         "title": "Login system",

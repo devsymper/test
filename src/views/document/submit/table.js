@@ -836,7 +836,6 @@ export default class Table {
             afterRender: function(isForced) {
                 if (thisObj.tableHasRowSum)
                     $('.handsontable  span.rowHeader').last().text('Tổng').css({ 'font-weight': 'bold' })
-                console.log("columns", this);
                 let tbHeight = this.container.getElementsByClassName('htCore')[0].getBoundingClientRect().height;
                 // debugger
                 // this.getPlugin('hiddenColumns').hiddenColumns(thisObj.columnsInfo.hiddenColumns)
@@ -898,7 +897,6 @@ export default class Table {
                 thisObj.tableInstance.setDataAtCell(index, thisObj.tableInstance.getDataAtRow(0).length - 1, id);
             }
         });
-        console.log(this.tableInstance, 'defaultData');
 
         this.tableInstance.keyInstance = this.keyInstance;
         this.tableInstance.tableName = this.tableName;
@@ -924,7 +922,6 @@ export default class Table {
 
                     this.populateFromArray(indexArr[2] - 1, 0, [selectedData]);
                 }
-                console.log(key, selection, clickEvent);
             },
             items: {
                 "row_above": {
@@ -936,7 +933,6 @@ export default class Table {
                 'remove_row': {
                     callback: function(key, selection, clickEvent) { // Callback for specific option
                         setTimeout(function(hotTb) {
-                            console.log('selection', selection);
                             hotTb.alter(key, selection[0]['start']['row'], 1);
                         }, 0, this);
                     }
