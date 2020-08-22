@@ -88,7 +88,7 @@
                      return-object 
                      v-model="table.keyColumn" clearable :menu-props="{'nudge-top':-10, 'max-width': 300}">
                         <template v-slot:item="{ item, on, attrs }">
-                            <v-list-item v-show="item.enable" v-on="on" v-bind="attrs">
+                            <v-list-item  v-on="on" v-bind="attrs">
                                 <v-list-item-content>
                                     <v-list-item-title>
                                         {{item.name}}
@@ -223,7 +223,9 @@ export default {
         },
         // Lấy dữ liệu từ API
         getDataExcel(data) {
-           // console.log(data);
+            console.log("Đây là data trả về");
+           console.log(data);
+           console.log("kết thúc data trả về");
             if(data.data){
                 this.data = data.data;
               //  console.log(this.data);
@@ -289,7 +291,10 @@ export default {
                     tables: general[1] ? general.slice(1, general.length) : [],
                 },
             };
+            console.log('xem dữ liệu gửi lên ở đây');
             console.log(dataImport);
+            console.log('kết thúc xem dữ liệu gửi lên ở đây');
+
             importApi.pushDataExcel(dataImport)
                 .then(res => {
                     if (res.status === 200) {

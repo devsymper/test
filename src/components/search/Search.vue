@@ -2,7 +2,7 @@
 <div >
     <v-autocomplete @keydown="enter" style = "width: 400px" class="auto-complete"  
         :hide-no-data="true" no-filter :items="searchItems"
-        menu-props="offset-y nudge-top='10'"
+        menu-props="offset-y top=40"
         :search-input.sync="value" label="Tìm kiếm" >
         <template v-slot:item="{ item, attrs, on }">
             <template v-if="item.group">
@@ -219,7 +219,7 @@ export default {
 <style >
 .v-autocomplete__content{
     max-width: 400px!important;
-    top: 40px!important;
+    /* top: 40px!important; */
   
 }
 .v-list-item:hover{

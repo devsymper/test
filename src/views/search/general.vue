@@ -42,37 +42,52 @@
            <!-- kết thúc kết quả tìm kiếm -->
            <!-- danh sách kết quả  -->
           <v-row v-for="item in listSearch"  style="margin-top:-18px">
-            <v-row v-if="item.group" class="ml-1 mb-1 mr-4">
-                <v-list-item >
-                    <v-list-item-content >
-                        <v-list-item-title class="item-header" v-html="item.group"></v-list-item-title>
-                    </v-list-item-content>
-                    <v-list-item-action>
-                      <button class="fs-11 color-blue fm">Xem tất cả</button>
-                    </v-list-item-action>
-                </v-list-item>
-            </v-row >
-            <v-row v-else class="ml-3 mb-2">
-                <v-list-item>
-                    <v-list-item-avatar class="item-avatar" v-if="item.type === 'user'">
-                        <img :src="item.avatar || require('@/assets/image/avatar_default.jpg')">
-                    </v-list-item-avatar>
-                    <v-list-item-content>
-                        <v-list-item-title 
-                            :style="{'margin-left': item.type === 'user' ? '0' : '0.5rem'}" 
-                            class="item-title fs-13 mb-2" v-html="item.displayName">
-                        </v-list-item-title>
-                        <v-list-item-subtitle 
-                            :style="{'margin-left': item.type === 'user' ? '0' : '0.5rem'}" 
-                            class="fs-12 sub-title" >{{item.description}}
-                        </v-list-item-subtitle>
-                    </v-list-item-content>
-                </v-list-item>
+              <v-row v-if="item.group" class="ml-1 mt-2 mb-2 mr-4">
+                  <v-list-item >
+                      <v-list-item-content >
+                          <v-list-item-title class="item-header">{{item.group}}</v-list-item-title>
+                      </v-list-item-content>
+                      <v-list-item-action>
+                        <button class="fs-11 color-blue fm">Xem tất cả</button>
+                      </v-list-item-action>
+                  </v-list-item>
+              </v-row >
+              <v-row v-else class="ml-3">
+                <!-- danh sách tìm thấy không bao gồm user -->
+                  <v-row  v-if="item.type!='user'" class="mt-1">
+                        <v-list-item>
+                            <v-list-item-content>
+                                <v-list-item-title 
+                                    style="margin-left: 0.5rem" 
+                                    class="item-title fs-13 mb-2" v-html="item.displayName">
+                                </v-list-item-title>
+                                <v-list-item-subtitle
+                                    style="margin-left: 0.5rem" 
+                                    class="fs-12 sub-title" >{{item.description}}
+                                </v-list-item-subtitle>
+                            </v-list-item-content>
+                      </v-list-item>
+                  </v-row>
+              <!-- kết thúc danh sách tìm  -->
+                    <v-col style="width: 50px" class="d-flex justify-start" v-else>
+                          <v-list-item-avatar class="item-avatar">
+                          <img :src="item.avatar || require('@/assets/image/avatar_default.jpg')">
+                      </v-list-item-avatar>
+                      <v-list-item-content>
+                          <v-list-item-title 
+                              style="margin-left: 0.5" 
+                              class="item-title fs-13 fm" v-html="item.displayName">
+                          </v-list-item-title>
+                          <v-list-item-subtitle 
+                              style="margin-left:0" 
+                              class="sub-title fs-12" v-html="item.displayName">
+                          </v-list-item-subtitle>
+                      </v-list-item-content>
+                  </v-col>
            </v-row>
           </v-row>
            <!-- kết thúc danh sách  -->
-        <div class="d-flex ml-4 mr-10" style="width:100%" height="100%">
-    </div>
+     
      </v-col>
     </v-card>
     <v-col>
@@ -101,7 +116,8 @@ export default {
            // debugger
             this.menu = [];
             this.listSearch = this.newSearch;
-            let menu = []
+            console.log(this.listSearch);
+            let menu = [];
             for(let i = 0; i<this.newSearch.length; i++){
                // console.log(this.newSearch[i].group);
                 let name = Object.keys(this.newSearch[i]);
