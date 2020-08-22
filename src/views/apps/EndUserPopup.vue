@@ -156,7 +156,6 @@ export default {
 			let userId = this.$store.state.app.endUserInfo.id
 			appManagementApi.getItemFavorite(userId).then(res => {
 				if (res.status == 200) {
-					debugger
 					this.checkTypeFavorite(res.data.listObject)
 				}
 			}).catch((err) => {
@@ -197,7 +196,6 @@ export default {
 					}
 				).then(resDoc => {
 					if(type == "listFavorite"){
-						debugger
 						resDoc.data.listObject.forEach(function(e){
 							self.listFavorite.push(e)
 						})
@@ -303,26 +301,24 @@ export default {
 			self.arrType.workflow = []
 			data.forEach(function(e){
 				if(e.objectType == 'document'){
-					self.arrType.document.push(e.id)
+					self.arrType.document.push(e.objectIdentifier)
 				}
 				if(e.objectType == 'orgchart'){
-					self.arrType.orgchart.push(e.id)
+					self.arrType.orgchart.push(e.objectIdentifier)
 				}
 				if(e.objectType == 'report'){
-					self.arrType.report.push(e.id)
+					self.arrType.report.push(e.objectIdentifier)
 				}
 				if(e.objectType == 'workflow'){
-					self.arrType.workflow.push(e.id)
+					self.arrType.workflow.push(e.objectIdentifier)
 				}
 			});
 			console.log(self.arrType);
-			debugger
 			// self.listFavorite = []
 
 			if(self.arrType.document.length > 0){
 				let dataDoc = self.arrType.document
 				this.getDocumentsApi(dataDoc,'listFavorite')
-				debugger
 			}
 			if(self.arrType.orgchart.length > 0){
 				let dataOrg = self.arrType.orgchart

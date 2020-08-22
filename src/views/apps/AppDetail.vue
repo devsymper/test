@@ -122,12 +122,11 @@ export default {
 			self.objFilter.workflows.item = []
 			if(listItem.documents.item.length > 0){
 					listItem.documents.item.filter(function(item){
-					if(item.name.includes(self.searchKey)){
-						self.objFilter.documents.item.push(item)
-					}
+						if(item.title.includes(self.searchKey)){
+							self.objFilter.documents.item.push(item)
+						}
 				})
 			}
-
 			if(listItem.orgcharts.item.length > 0){
 					listItem.orgcharts.item.filter(function(item){
 					if(item.name.includes(self.searchKey)){
