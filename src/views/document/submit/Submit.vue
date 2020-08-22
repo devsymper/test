@@ -419,11 +419,12 @@ export default {
         }); 
         // hàm nhận sự thay đổi của input autocomplete gọi api để chạy công thức lấy dữ liệu
         this.$evtBus.$on("document-submit-autocomplete-key-event", e => {
+            console.log("sdsdad",e.e);
             if(thisCpn.isComponentActive == false) return;
             try {
                 if((e.e.keyCode >= 97 && e.e.keyCode <= 105) ||
                     (e.e.keyCode >= 48 && e.e.keyCode <= 57) ||
-                    (e.e.keyCode >= 65 && e.e.keyCode <= 90) || e.e.keyCode == 8) { // nếu key code là các kí tự chữ và số hợp lệ
+                    (e.e.keyCode >= 65 && e.e.keyCode <= 90) || [8,32,231].includes(e.e.keyCode)) { // nếu key code là các kí tự chữ và số hợp lệ
                     if(!thisCpn.$refs.autocompleteInput.isShow()){
                         thisCpn.$refs.autocompleteInput.show(e.e);
                         let currentTableInteractive = this.sDocumentSubmit.currentTableInteractive;
@@ -567,27 +568,59 @@ export default {
             }
             else{
                 let aliasControl = e.autocompleteFormulasInstance.autocompleteDetectAliasControl();
-                let dataInput = this.getDataInputFormulas(e.autocompleteFormulasInstance,e);
-                e.autocompleteFormulasInstance.handleRunAutoCompleteFormulas(dataInput).then(res=>{
-                    thisCpn.setDataForControlAutocomplete(res,aliasControl,e.controlTitle)
-                });
+                let dataFromCache = this.getDataAutocompleteFromCache(e.e.target.value, aliasControl);
+                if(dataFromCache == false){
+                    let dataInput = this.getDataInputFormulas(e.autocompleteFormulasInstance,e);
+                    e.autocompleteFormulasInstance.handleRunAutoCompleteFormulas(dataInput).then(res=>{
+                        thisCpn.setDataForControlAutocomplete(res,aliasControl,e.controlTitle, $(e.e.target).val())
+                    });
+                }
+                else{
+                    this.$refs.autocompleteInput.setAliasControl(aliasControl);
+                    this.$refs.autocompleteInput.setData(dataFromCache);
+                }
             }
-            
+        },
+
+        // hàm lấy data từ cache của control autocomplete
+        getDataAutocompleteFromCache(curTyping,controlName){
+            if(this.sDocumentSubmit.autocompleteData.hasOwnProperty(controlName) &&
+                this.sDocumentSubmit.autocompleteData[controlName].header.length > 0 &&
+                this.sDocumentSubmit.autocompleteData[controlName].cacheData.hasOwnProperty(curTyping)
+            ){
+                return {
+                    headers:this.sDocumentSubmit.autocompleteData[controlName].header,
+                    dataBody:this.sDocumentSubmit.autocompleteData[controlName].cacheData[curTyping]
+                }
+            }
+            else{
+                return false
+            }
         },
         /**
          * Hàm bind dữ liệu cho box autocomplete, cho component autocompleteInput
          */
-        setDataForControlAutocomplete(res,aliasControl,controlTitle){
+        setDataForControlAutocomplete(res,aliasControl,controlTitle, textTyping=""){
             let controlAs = {};
             controlAs[aliasControl] = controlTitle;
             if(res.data != undefined){
                 if(res.status == 200 && res.data != false){
-                    let dataTable = []
+                    let dataTable = {}
                     if(res.data.data !== ""){
                         dataTable = this.handleDataAutoComplete(res.data.data,false,controlAs);
                     }
                     this.$refs.autocompleteInput.setAliasControl(aliasControl);
                     this.$refs.autocompleteInput.setData(dataTable);
+                    if(dataTable.hasOwnProperty('headers')){
+                        let item = {}
+                        item[textTyping] = dataTable.dataBody
+                        this.$store.commit("document/cacheDataAutocomplete",{
+                            instance: this.keyInstance,
+                            controlName:aliasControl,
+                            header:dataTable.headers,
+                            cacheData:item
+                        })
+                    }
                 }
                 else{
                     this.$refs.autocompleteInput.setData([]);

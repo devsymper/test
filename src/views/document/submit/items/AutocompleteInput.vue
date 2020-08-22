@@ -105,6 +105,7 @@ export default {
         },
         setData(data){
             this.showHeader();
+            if(data.headers.length > 0)
             this.headers = data.headers;
             this.dataTable = data.dataBody;
             this.indexActive = 0;
