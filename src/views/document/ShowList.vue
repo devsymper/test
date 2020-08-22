@@ -8,6 +8,7 @@
         :containerHeight="containerHeight"
         :actionPanelWidth="actionPanelWidth"
         @after-open-add-panel="addDocument"
+        :headerPrefixKeypath="'document'"
     >
         <div slot="right-panel-content" class="h-100">
             <submit-view ref="submitView" :isQickSubmit="true" :action="'submit'" @submit-document-success="aftersubmitDocument" :docId="documentId"/>
