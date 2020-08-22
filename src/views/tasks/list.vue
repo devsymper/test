@@ -72,7 +72,7 @@
                             class="pl-3 pr-1 pb-1 pt-2">
                             <div class="pl-1">
                                 <!-- <div class="fz-13 text-truncate d-inline-block float-left text-ellipsis w-100">{{obj.name}}</div> -->
-                                <div class="text-left fs-12 pr-6 text-ellipsis w-100">
+                                <div class="text-left fs-13 pr-6 text-ellipsis w-100">
                                     {{obj.taskData.content}}
                                 </div>
                                 <div
@@ -90,8 +90,9 @@
                         </v-col>
                         <v-col
                             v-if="!sideBySideMode"
+                            style="line-height: 42px"
                             cols="2"
-                            class="fs-13 px-1 py-0">
+                            class="fs-12 px-1 py-0">
                             
                                 <v-avatar size="25" class="mr-2">
                                     <img :src="obj.assigneeInfo.avatar ? obj.assigneeInfo.avatar : require('@/assets/image/avatar_default.jpg')" />
@@ -100,6 +101,7 @@
                         </v-col>
                         <v-col
                             v-if="!sideBySideMode"
+                            style="line-height: 42px"
                             cols="2"
                             class="fs-13 px-1 py-0"
                         >
@@ -107,6 +109,7 @@
                         </v-col>
                         <v-col
                             v-if="!sideBySideMode"
+                            style="line-height: 42px"
                             cols="2"
                             class="fs-13 px-1 py-0">
                             <v-chip
@@ -122,7 +125,11 @@
                                 {{obj.ownerInfo.displayName}}
                             </v-chip>
                         </v-col>
-                        <v-col class="py-0" cols="2" v-if="!sideBySideMode && !smallComponentMode">
+                        <v-col 
+                            class="py-0" 
+                            cols="2" 
+                            v-if="!sideBySideMode && !smallComponentMode"
+                            style="line-height: 42px">
                             <span class="mt-1 d-inline-block fs-13">{{obj.processDefinitionName}}</span>
                         </v-col>
                     </v-row>

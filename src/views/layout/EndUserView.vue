@@ -3,7 +3,7 @@
         <ba-sidebar />
         <v-content>
             <v-container fluid fill-height class="pa-0">
-                <div class="w-100 app-header-bg-color" >
+                <div class="w-100 app-header-bg-color" style="border-bottom:1px solid #e6e5e5">
                     <div style="width:calc(100% - 200px)" class="float-left">
                         <v-tabs
                             hide-slider

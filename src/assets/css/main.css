@@ -400,6 +400,7 @@ html {
 .symper-app-tab {
     display: inline-block!important;
     line-height: 40px!important;
+    /* width: 200px!important; */
 }
 
 .top-right {

@@ -601,9 +601,10 @@ export default {
                 if (thisCpn.filteredColumns[colName]) {
                     markFilter = "applied-filter";
                 }
+                let headerName = prefix ? thisCpn.$t(prefix + colTitles[col]) : colTitles[col];
                 return `<span>
                             <span class="font-weight-medium">
-                                ${thisCpn.$t(prefix + colTitles[col])}
+                                ${headerName}
                             </span>
                             <span class="float-right symper-filter-button">
                                 <i col-name="${colName}" onclick="tableDropdownClickHandle(this, event)" class="grey-hover mdi mdi-filter-variant symper-table-dropdown-button ${markFilter}"></i>

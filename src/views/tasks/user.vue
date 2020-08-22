@@ -12,7 +12,7 @@
             </v-avatar>
         </div>
         <div class="d-inline-block">
-            <div class="fs-13 ">{{user.displayName}}</div>
+            <div class="fs-12 ">{{user.displayName}}</div>
             <!-- <div class="grey--text fs-11">{{user.role}}</div> -->
             <div class="grey--text fs-12">{{role.name}}</div>
         </div>
