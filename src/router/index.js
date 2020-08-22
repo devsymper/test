@@ -337,6 +337,21 @@ const routes = [{
         component: () =>
             import ('../views/permissions/AcitionPackList.vue'),
     },
+    // phần search
+    {
+        path: "/search/general",
+        name: "generalInfo",
+        component: () =>
+            import ('../views/search/general.vue'),
+    },
+
+    {
+        path: "/search/detail",
+        name: "detailInfo",
+        component: () =>
+            import ('../views/search/detail.vue'),
+    },
+
 ];
 
 routes.concat([{

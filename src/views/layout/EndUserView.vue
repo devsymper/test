@@ -1,148 +1,92 @@
 <template>
-    <v-app id="symper-platform-app">
-        <ba-sidebar />
-        <v-content>
-            <v-container fluid fill-height class="pa-0">
-                <div class="w-100 app-header-bg-color" style="border-bottom:1px solid #cccccc">
-                    <div style="width:calc(100% - 200px)" class="float-left">
-                        <v-tabs
-                            @change="handleChangeTab"
-                            v-model="currentTabIndex"
-                            class="sym-small-size "
-                            color="orange accent-4">
-                            <v-tab class="symper-app-tab" v-for="(item, idx) in tabUrlItems" :key="idx">
-                                {{ item.title }} 
-                                <i class="mdi mdi-close float-right close-tab-btn" @click.stop="closeTab(idx)"></i>
-                            </v-tab>
-                              <div class="d-flex justify-end" style="float:right">
-                            <v-autocomplete
-                                :items="items"
-                                 :search-input.sync="value"
-                               
-                                label="Solo"
-                                solo
-                                ></v-autocomplete>
-                                  </div>
-                        </v-tabs>
-                    </div>
-                    
-                    <div
-                        class="float-right app-header-bg-color"
-                        style="height:40px; line-height:40px;"
-                    >
-                 ádádá{{value}}
-                         <v-btn icon>
-                            <v-icon>mdi-magnify</v-icon>
-                        </v-btn>
-                        <v-menu
-                            v-model="isShowDialog"
-                            :close-on-content-click="false"
-                            :max-width="500"
-                            :min-width="500"
-                            :max-height="700"
-                            offset-y
-                            >
-                            <template v-slot:activator="{ on }">
-                                <v-btn icon v-on="on">
-                                    <v-icon>mdi-apps </v-icon>
-                                </v-btn>
-                                 
-                            </template>
-                            <v-card>
-                                <v-app-bar dense flat color="white">
-                                    <v-toolbar-title>
-                                        <v-icon>mdi-apps</v-icon>
-                                        {{$t('common.navigator')}}
-                                    </v-toolbar-title>
-                                    <v-spacer></v-spacer>
-                                    <v-btn icon>
-                                        <v-icon @click="isShowDialog = false">mdi-close</v-icon>
-                                    </v-btn>
-                                </v-app-bar>
-                                <v-divider></v-divider>
-                                <list-app></list-app>
-                            </v-card>
-                        </v-menu>
-                        <v-menu  v-model="isShowDialogNotification"
-                            z-index="161"
-                            :close-on-content-click="false"
-                            :max-width="452"
-                            :min-width="452"
-                            :max-height="700"
-                            offset-y>
-                            <template v-slot:activator="{ on }">
-                                <v-btn v-on="on" icon v-if="unreadNotification > 0">
-                                    <v-badge
-                                        class="sym-small-size"
-                                        :content="unreadNotification"
-                                        :value="unreadNotification"
-                                        color="red"
-                                        overlap
-                                    >
-                                        <v-icon>mdi-bell-outline</v-icon>
-                                    </v-badge>
-                                </v-btn>
-                                <v-btn v-on="on" icon v-else>
-                                    <v-icon>mdi-bell-outline</v-icon>
-                                </v-btn>
-                            </template>
-                            <list-notification></list-notification>
-                        </v-menu>
-                    </div>
+<v-app id="symper-platform-app">
+    <ba-sidebar />
+    <v-content>
+        <v-container fluid fill-height class="pa-0">
+            <div class="w-100 app-header-bg-color " style="border-bottom:1px solid #cccccc">
+                <div style="width:calc(100% - 200px)" class="float-left">
+                    <v-tabs @change="handleChangeTab" v-model="currentTabIndex" class="sym-small-size " color="orange accent-4">
+                        <v-tab class="symper-app-tab" v-for="(item, idx) in tabUrlItems" :key="idx">
+                            {{ item.title }}
+                            <i class="mdi mdi-close float-right close-tab-btn" @click.stop="closeTab(idx)"></i>
+                        </v-tab>
+                        <div class="d-flex justify-end " style="width:100%;margin-bottom:5px" >
+                          <Search class= "d-flex align-end mt-5" />
+                        </div>
+                    </v-tabs>
                 </div>
-                <v-layout style="height:calc(100% - 41px)" class="w-100 h-100" justify-center>
-                    <slot />
-                </v-layout>
-                
-            </v-container>
-        </v-content>
-    </v-app>
+                <div class="float-right app-header-bg-color" style="height:40px; line-height:40px;">
+                    <v-btn icon>
+                        <v-icon>mdi-magnify</v-icon>
+                    </v-btn>
+                    <v-menu v-model="isShowDialog" :close-on-content-click="false" :max-width="500" :min-width="500" :max-height="700" offset-y>
+                        <template v-slot:activator="{ on }">
+                            <v-btn icon v-on="on">
+                                <v-icon>mdi-apps </v-icon>
+                            </v-btn>
+                        </template>
+                        <v-card>
+                            <v-app-bar dense flat color="white">
+                                <v-toolbar-title>
+                                    <v-icon>mdi-apps</v-icon>
+                                    {{$t('common.navigator')}}
+                                </v-toolbar-title>
+                                <v-spacer></v-spacer>
+                                <v-btn icon>
+                                    <v-icon @click="isShowDialog = false">mdi-close</v-icon>
+                                </v-btn>
+                            </v-app-bar>
+                            <v-divider></v-divider>
+                            <list-app></list-app>
+                        </v-card>
+                    </v-menu>
+                    <v-menu v-model="isShowDialogNotification" z-index="161" :close-on-content-click="false" :max-width="452" :min-width="452" :max-height="700" offset-y>
+                        <template v-slot:activator="{ on }">
+                            <v-btn v-on="on" icon v-if="unreadNotification > 0">
+                                <v-badge class="sym-small-size" :content="unreadNotification" :value="unreadNotification" color="red" overlap>
+                                    <v-icon>mdi-bell-outline</v-icon>
+                                </v-badge>
+                            </v-btn>
+                            <v-btn v-on="on" icon v-else>
+                                <v-icon>mdi-bell-outline</v-icon>
+                            </v-btn>
+                        </template>
+                        <list-notification></list-notification>
+                    </v-menu>
+                </div>
+            </div>
+            <v-layout style="height:calc(100% - 41px)" class="w-100 h-100" justify-center>
+                <slot />
+            </v-layout>
+
+        </v-container>
+    </v-content>
+</v-app>
 </template>
 
 <script>
-import {
-    VTextField,
-    VSelect,
-    VCheckbox,
-    VRadio,
-    VSwitch,
-    VTextarea
-} from "vuetify/lib";
 import Api from "../../api/api.js";
-import searchApi from "../../api/search";
-import { appConfigs } from '../../configs';
+
+import {
+    appConfigs
+} from '../../configs';
 import BASidebar from "@/components/common/BASidebar.vue";
 import listApp from "@/components/common/listApp";
+import Search from "@/components/search/Search";
 import NotificationBar from "@/components/notification/NotificationBar.vue";
 export default {
-    watch:{
-        value(){
-            //debugger
-             searchApi.getData(this.value)
-                .then(res => {
-                    if (res.status === 200) {
-                        console.log('Đã gửi thành công');
-                        console.log(res.data);
-                    
-                    }
-                })
-                .catch(err => {
-                       console.log('Đã gửi mà lỗi');
-                    console.log(err);
-                 
-                });
-        }
-    },
+    
     methods: {
         /**
          * Xử lý các tab
          */
+
         handleChangeTab(index) {
-            if(index !== undefined){
+            if (index !== undefined) {
                 let urlKey = Object.keys(this.tabUrlItems)[index];
                 let urlInfo = this.tabUrlItems[urlKey];
 
-                if(urlInfo.routeName == this.$route.name){
+                if (urlInfo.routeName == this.$route.name) {
                     this.$router.push({
                         name: 'symperHiddenRedirectComponent',
                         params: {
@@ -150,7 +94,7 @@ export default {
                             pageInstanceKey: Date.now()
                         }
                     });
-                }else{
+                } else {
                     this.$router.push({
                         name: urlInfo.routeName,
                         params: urlInfo.routeParams
@@ -158,7 +102,7 @@ export default {
                 }
             }
         },
-        closeTab(idx){            
+        closeTab(idx) {
             let urlKey = Object.keys(this.$store.state.app.urlToTabTitleMap)[idx];
             let urlInfo = this.tabUrlItems[urlKey];
 
@@ -167,23 +111,23 @@ export default {
                 pageInstanceKey: urlInfo.pageInstanceKey
             });
         },
-        updateCountUnreadNotification(){
+        updateCountUnreadNotification() {
             let req = new Api(appConfigs.apiDomain.nofitication);
             req.get("/notifications/count-unread")
-            .then(res => {
-                console.log(res);
-                if (res.status == 200) {
-                    this.$store.state.app.unreadNotification = res.data;
-                }
-            });
+                .then(res => {
+                    console.log(res);
+                    if (res.status == 200) {
+                        this.$store.state.app.unreadNotification = res.data;
+                    }
+                });
         }
-        
+
     },
     components: {
         "ba-sidebar": BASidebar,
         "list-app": listApp,
         "list-notification": NotificationBar,
-          VTextField,
+        Search
     },
     created() {
         this.$evtBus.$on("app-receive-remote-msg", data => {
@@ -196,7 +140,7 @@ export default {
         sapp() {
             return this.$store.state.app;
         },
-        unreadNotification(){
+        unreadNotification() {
             return this.$store.state.app.unreadNotification;
         },
         currentTabIndex: {
@@ -211,10 +155,8 @@ export default {
             return Object.values(this.$store.state.app.urlToTabTitleMap);
         }
     },
-    data: function() {
+    data: function () {
         return {
-            value:'',
-            items:[],
             isShowDialog: false,
             isShowDialogNotification: false,
         };
@@ -222,14 +164,14 @@ export default {
 };
 </script>
 
-
 <style>
-.app-header-bg-color,.app-header-bg-color .v-item-group {
-    background-color: white!important;
+.app-header-bg-color,
+.app-header-bg-color .v-item-group {
+    background-color: white !important;
 }
-.nofitication-title-bar{
+
+.nofitication-title-bar {
     font-size: 13px;
     font-weight: bold;
 }
-
 </style>

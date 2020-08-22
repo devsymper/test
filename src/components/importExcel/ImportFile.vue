@@ -289,10 +289,11 @@ export default {
                     tables: general[1] ? general.slice(1, general.length) : [],
                 },
             };
-            // console.log(dataImport);
+            console.log(dataImport);
             importApi.pushDataExcel(dataImport)
                 .then(res => {
                     if (res.status === 200) {
+                         console.log(dataImport);
                         //console.log('Đã gửi thành công');
                     }
                 })
@@ -453,7 +454,7 @@ export default {
         },
         // loại những cột được chọn. Được chọn chuyển thành false, nếu xoá chuyển thành true
         onChangeDetailInfo(tableIdx, controlIdx, value) {
-            debugger
+            //debugger
             if (value) {
                 value.enable = false;
                 if (this.tables[tableIdx].controls[controlIdx].dataColumn) {
@@ -513,7 +514,7 @@ export default {
         //phần mapping--- hàm chuyển giá trị cho những cột đã chọn
         //phần mapping --- hàm tìm sheet lưu cho cột 
         getNameSheetMapping(value){
-            debugger
+            //debugger
             let nameSheetMapping = '';
             for(let i = 0; i<this.nameSheets.length; i++){
                  let arr = this.nameColumnDetail[this.nameSheets[i].name];

@@ -7,6 +7,7 @@ import orgchartModule from "./orgchart";
 import permissionModule from "./permission";
 import actionPackModule from "./actionPack";
 import importExcelModule from './importExcel';
+import searchModule from './search';
 
 Vue.use(Vuex);
 
@@ -18,6 +19,7 @@ export default new Vuex.Store({
         orgchart: orgchartModule,
         permission: permissionModule,
         actionPack: actionPackModule,
-        importExcel: importExcelModule
+        importExcel: importExcelModule,
+        search: searchModule,
     }
 });
