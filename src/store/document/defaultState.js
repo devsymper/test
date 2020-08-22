@@ -62,7 +62,17 @@ const defaultState = {
             listUser: null,
             localRelated: {},
             workflowVariable: {},
-            currentControlEditByUser: null
+            currentControlEditByUser: null,
+            autocompleteData: { // lưu lại các giá trị của autocomplete khi đã gõ
+                controlName: {
+                    header: [],
+                    cacheData: {
+                        letter: { // giá trị nhập và dữ liệu tương ứng
+                            data: []
+                        }
+                    }
+                }
+            }
         }
     },
     detail: {

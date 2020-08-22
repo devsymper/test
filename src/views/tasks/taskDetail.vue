@@ -194,7 +194,8 @@ export default {
             let bsr = this.breadcrumb.taskName;
             let allDef = this.$store.state.process.allDefinitions;
             if(this.breadcrumb.definitionName){
-                bsr = `App name / ${this.breadcrumb.definitionName} / ${this.breadcrumb.instanceName} / ${bsr}`;
+                // bsr = `App name / ${this.breadcrumb.definitionName} / ${this.breadcrumb.instanceName} / ${bsr}`;
+                bsr = `./ ${this.breadcrumb.definitionName} / ${bsr}`;
             }else if(this.isInitInstance && !$.isEmptyObject(allDef)){
                 if(allDef[this.$route.params.id]){
                     bsr = `${allDef[this.$route.params.id].name} / Start workflow`;
@@ -224,6 +225,14 @@ export default {
             });
         },
         setTaskBreadcrumb(task){
+            if(!task.name){
+                try {
+                    task.description = JSON.parse(task.description);
+                } catch (error) {
+                    task.description = {};
+                }
+                task.name = task.description.content;
+            }
             this.breadcrumb.taskName = task.name;
             if(task.processDefinitionId){
                 this.breadcrumb.definitionName = this.$store.state.process.allDefinitions[task.processDefinitionId].name;

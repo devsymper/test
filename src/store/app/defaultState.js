@@ -25,16 +25,38 @@ const defaultState = {
         // các menu mà ba hoặc enduser được phân quyền
         { title: "application", icon: "mdi-application", link: "/application" },
         { title: "reports", icon: "mdi-view-dashboard", link: "/reports" },
-        { title: "workflows", icon: "mdi-sitemap", link: "/workflow" },
+        {
+            title: "workflows",
+            icon: "mdi-sitemap",
+            // link: "/workflow" 
+            action: {
+                "module": "workflow",
+                "resource": "workflow_definition",
+                "scope": "workflow",
+                "action": "list"
+            }
+        },
         {
             title: "documents",
             icon: "mdi-file-document-outline",
-            link: "/documents",
+            // link: "/documents",
+            action: {
+                "module": "document",
+                "resource": "document_definition",
+                "scope": "document",
+                "action": "list"
+            }
         },
         {
             title: "orgchart",
             icon: "mdi-account-group-outline",
-            link: "/orgchart",
+            // link: "/orgchart",
+            action: {
+                "module": "orgchart",
+                "resource": "orgchart",
+                "scope": "orgchart",
+                "action": "list"
+            }
         },
         { title: "methods", icon: "mdi-function", link: "/methods" },
         { title: "virtual_doc", icon: "mdi-table-sync", link: "/virtual-doc" },

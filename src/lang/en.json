@@ -74,7 +74,9 @@
         "baAccount": "BA account",
         "updatePassword": "Update password",
         "fullName": "Full name",
-        "email": "Email"
+        "email": "Email",
+        "pageSize": "Page size",
+        "pendding": "Pendding"
     },
     "validate": {
         "required": "Not be empty",
@@ -275,6 +277,9 @@
         }
     },
     "document": {
+        "create": "Create document",
+        "submit": "Submit document",
+        "edit": "Edit document",
         "title": "List Document",
         "table": {
             "id": "Id",
@@ -377,7 +382,7 @@
     },
     "process": {
         "list": {
-            "title": "Process list",
+            "title": "Workflow list",
             "deploy_history": "Deploy history",
             "start": "Start workflow",
             "instances": "List lastest instances"
@@ -385,7 +390,7 @@
         "action": {
             "create": "Create new process"
         },
-        "taskList": "List task of ",
+        "taskList": "List task ",
         "instance": {
             "list": "List process instance",
             "name": "Process instance name",
@@ -584,7 +589,10 @@
             "title": "Create task"
         },
         "claim": "Claim",
-        "created": "Task created"
+        "created": "Task created",
+        "relatedPeople": {
+            "title": "Related people"
+        }
     },
     "orgchart": {
         "list": {
@@ -592,6 +600,12 @@
         },
         "create": {
             "title": " Create orgchart"
+        },
+        "update": {
+            "title": " Update orgchart"
+        },
+        "detail": {
+            "title": " Detail orgchart"
         },
         "editor": {
             "main": "Main",
@@ -616,5 +630,16 @@
     },
     "userRole": {
         "userHasNoRole": "You have no role to select"
+    },
+    "appTabs": {
+        "overMaxOpen": {
+            "title": "Can not create more tabs",
+            "detail": "Tabs number exceed limitation, please delete some opening tabs"
+        }
+    },
+    "dashboard": {
+        "detail": {
+            "title": "Detail dashboard "
+        }
     }
 }

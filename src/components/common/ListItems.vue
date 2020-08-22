@@ -85,6 +85,7 @@
                         :height="tableHeight"
                         :settings="tableSettings"
                         :data="data"
+                        :rowHeights="21"
                         :columns="tableColumns"
                         :contextMenu="itemContextMenu"
                         :colHeaders="colHeaders"
@@ -270,6 +271,7 @@ export default {
                 manualColumnMove: true,
                 manualColumnResize: true,
                 manualRowResize: true,
+                rowHeights: 21,
                 stretchH: "all",
                 licenseKey: "non-commercial-and-evaluation",
                 afterRender: isForced => {
@@ -548,7 +550,7 @@ export default {
                     util.getComponentSize(ref.topBar).h +
                     util.getComponentSize(ref.bottomBar).h + 14;
             }
-            return tbHeight - 50;
+            return tbHeight - 60;
         },
         /**
          * Tạo cấu hình cho hiển thị header của table
@@ -574,9 +576,10 @@ export default {
                 if (thisCpn.filteredColumns[colName]) {
                     markFilter = "applied-filter";
                 }
+                let headerName = prefix ? thisCpn.$t(prefix + colTitles[col]) : colTitles[col];
                 return `<span>
                             <span class="font-weight-medium">
-                                ${thisCpn.$t(prefix + colTitles[col])}
+                                ${headerName}
                             </span>
                             <span class="float-right symper-filter-button">
                                 <i col-name="${colName}" onclick="tableDropdownClickHandle(this, event)" class="grey-hover mdi mdi-filter-variant symper-table-dropdown-button ${markFilter}"></i>
@@ -681,6 +684,12 @@ export default {
         },
         bindToSearchkey(vl) {
             this.searchKey = vl;
+            if(this.debounceGetData){
+                clearTimeout(this.debounceGetData);
+            }
+            this.debounceGetData = setTimeout((self) => {
+                self.getData();
+            }, 300, this);
         },
         handleCloseDragPanel() {
             this.actionPanel = false;
@@ -794,7 +803,7 @@ export default {
          * @param {Boolean} cache có ưu tiên dữ liệu từ cache hay ko
          *
          */
-        getData(columns = false, cache = false, applyFilter = false) {
+        getData(columns = false, cache = false, applyFilter = true) {
             let thisCpn = this;
             let handler = (data) => {
                 if(thisCpn.customAPIResult.reformatData){
@@ -1006,6 +1015,12 @@ export default {
                             colMap[item.name].correctFormat = true;
                         }
                         colMap[item.name].renderer = this.dateRenderer;
+                    }
+
+                    
+
+                    if(item.renderer){
+                        colMap[item.name].renderer = item.renderer;
                     }
                 }
             }

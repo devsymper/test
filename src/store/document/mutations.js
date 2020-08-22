@@ -230,7 +230,18 @@ const setDefaultSubmitStore = (state, params) => {
         submitFormulas: null,
         listUser: null,
         localRelated: {},
-        workflowVariable: {}
+        workflowVariable: {},
+        currentControlEditByUser: null,
+        autocompleteData: { // lưu lại các giá trị của autocomplete khi đã gõ
+            controlName: {
+                header: [],
+                cacheData: {
+                    letter: { // giá trị nhập và dữ liệu tương ứng
+                        data: []
+                    }
+                }
+            }
+        }
     }
     let instance = params.instance;
     Vue.set(state.submit, instance, value);

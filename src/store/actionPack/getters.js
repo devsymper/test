@@ -7,7 +7,7 @@ const listActionByObjectType = (state) => {
     for (let key in allActionByObjectType) {
         rsl[key] = {};
         let idx = 1;
-        for (let item of allActionByObjectType[key]) {
+        for (let item of allActionByObjectType[key].action) {
             rsl[key][item] = {
                 name: item,
                 title: util.str.getCamelSpaceFromPascalText(item),

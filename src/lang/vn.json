@@ -73,7 +73,9 @@
         "baAccount": "Tài khoản BA",
         "updatePassword": "Cập nhật mật khẩu",
         "fullName": "Tên đầy đủ",
-        "email": "Email"
+        "email": "Email",
+        "pageSize": "Số bản ghi mỗi trang",
+        "pendding": "Cần làm"
     },
     "login": {
         "title": "Đăng nhập hệ thống",
@@ -274,7 +276,10 @@
         }
     },
     "document": {
-        "title": "Danh sách Document",
+        "create": "Tạo mới văn bản",
+        "submit": "Submit văn bản",
+        "edit": "Chỉnh sửa văn bản",
+        "title": "Danh sách văn bản",
         "table": {
             "id": "Id",
             "name": "Tên",
@@ -398,7 +403,7 @@
         "action": {
             "create": "Tạo quy trình mới"
         },
-        "taskList": "Danh sách task của ",
+        "taskList": "Danh sách công việc  ",
         "instance": {
             "list": "Danh sách các bản đã chạy",
             "name": "Tên bản chạy",
@@ -603,7 +608,10 @@
             "title": "Tạo task"
         },
         "claim": "Claim",
-        "created": "Đã tạo mới task"
+        "created": "Đã tạo mới task",
+        "relatedPeople": {
+            "title": "Những người liên quan"
+        }
     },
     "orgchart": {
         "list": {
@@ -611,6 +619,12 @@
         },
         "create": {
             "title": " Tạo sơ đồ tổ chức"
+        },
+        "update": {
+            "title": " Chỉnh sửa đồ tổ chức "
+        },
+        "detail": {
+            "title": " Chi tiết sơ đồ tổ chức "
         },
         "editor": {
             "main": "Chung",
@@ -635,5 +649,11 @@
     },
     "userRole": {
         "userHasNoRole": "Bạn chưa được phân vai trò trong hệ thống"
+    },
+    "appTabs": {
+        "overMaxOpen": {
+            "title": "Không thể tạo thêm tab mới",
+            "detail": "Số lượng tab vượt quá giới hạn, hãy xóa một vài tab"
+        }
     }
 }
