@@ -495,7 +495,6 @@ export default {
                     let row = selection[0].start.row;
                     let rowData = thisCpn.data[row];
                     let colName = Object.keys(rowData)[col];
-
                     /**
                      * Phát sự kiện khi có một hành động đối với một row, hoặc cell.
                      * tham số thứ nhất: row ( index của row đang được chọn)
@@ -723,7 +722,6 @@ export default {
                     symperHide: col.symperHide
                 });
             }
-
             configs = JSON.stringify(configs);
             userApi
                 .saveUserViewConfig("showList", this.$route.name, configs)
@@ -847,7 +845,6 @@ export default {
         prepareFilterAndCallApi(columns = false, cache = false, applyFilter = false, success, configs = {}){
             let url = this.getDataUrl;
             let method = 'GET';
-
             if (url != "") {
                 let thisCpn = this;
                 thisCpn.loadingData = true;
@@ -860,7 +857,6 @@ export default {
                     columns: columns ? columns : [],
                     distinct: configs.distinct ? configs.distinct : false
                 };
-
                 let header = {};
                 if(thisCpn.$route.name == "deployHistory" || thisCpn.$route.name == "listProcessInstances"){
                     header = {
@@ -923,7 +919,6 @@ export default {
                     configs.push(option);
                     continue;
                 }
-
                 if (condition.items[0].type != "none") {
                     option.conditions = [
                         {
@@ -938,7 +933,6 @@ export default {
                         });
                     }
                 }
-
                 if(filter.searchKey != '' && filter.clickedSelectAll){
                     option.conditions = [
                         {
@@ -947,7 +941,6 @@ export default {
                         }
                     ];
                 }
-
                 if(filter.selectAll && !$.isEmptyObject(filter.valuesNotIn)){
                     option.valueFilter = {
                         'operation': ' NOT IN ',
@@ -959,7 +952,6 @@ export default {
                         'values': Object.keys(filter.valuesIn)
                     };
                 }
-
                 if(!$.isEmptyObject(option)){
                     configs.push(option);
                 }
@@ -999,7 +991,6 @@ export default {
         getTableColumns(columns, forcedReOrder = false) {
             let savedOrderCols = this.savedTableDisplayConfig;
             let colMap = {};
-
             if (forcedReOrder) {
                 for (let item of columns) {
                     colMap[item.data] = item;
@@ -1035,15 +1026,11 @@ export default {
                         }
                         colMap[item.name].renderer = this.dateRenderer;
                     }
-
-                    
-
                     if(item.renderer){
                         colMap[item.name].renderer = item.renderer;
                     }
                 }
             }
-
             if (savedOrderCols.length > 0) {
                 let orderedCols = [];
                 let noneOrderedCols = [];
@@ -1123,7 +1110,6 @@ export default {
             $("#symper-platform-app").append(filterDom[0]);
             this.getItemForValueFilter();
         },
-
         /**
          * Lấy các item phục vụ cho việc lựa chọn trong autocomplete cuar filter
          */
