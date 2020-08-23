@@ -23,8 +23,7 @@ const defaultState = {
     needReloadNotification: false,
     items: [
         // các menu mà ba hoặc enduser được phân quyền
-        { title: "application", icon: "mdi-application", link: "/application" },
-        { title: "reports", icon: "mdi-view-dashboard", link: "/reports" },
+        // { title: "reports", icon: "mdi-view-dashboard", link: "/reports" },
         {
             title: "workflows",
             icon: "mdi-sitemap",
@@ -58,16 +57,16 @@ const defaultState = {
                 "action": "list"
             }
         },
-        { title: "methods", icon: "mdi-function", link: "/methods" },
-        { title: "virtual_doc", icon: "mdi-table-sync", link: "/virtual-doc" },
-        { title: "service", icon: "mdi-cogs", link: "/service" },
+        // { title: "methods", icon: "mdi-function", link: "/methods" },
+        // { title: "virtual_doc", icon: "mdi-table-sync", link: "/virtual-doc" },
+        // { title: "service", icon: "mdi-cogs", link: "/service" },
         {
             title: "menu",
             icon: "mdi-microsoft-xbox-controller-menu",
             link: "/menu",
         },
         { title: "users", icon: "mdi-account-settings", link: "/users" },
-        { title: "snippets", icon: "mdi-contain", link: "/snippets" },
+        // { title: "snippets", icon: "mdi-contain", link: "/snippets" },
         {
             title: "permissions",
             icon: "mdi-folder-account",
