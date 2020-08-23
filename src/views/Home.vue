@@ -1,6 +1,12 @@
 <template>
     <div class="home h-100 w-100">
+        <v-btn @click="runDataflow" color="primary">Primary</v-btn>
+
         <Dashboard></Dashboard>
+        <!-- <EmbedDataflow 
+        ref="dataflow"
+        :dataflowId="124"
+         /> -->
     </div>
 </template>
 
@@ -13,9 +19,13 @@ import FormulaEditor from "./../components/formula/editor/FormulaEditor";
 import SymperColorPicker from "@/components/common/symperInputs/SymperColorPicker.vue";
 import PermissionSelector from "@/components/permission/PermissionSelector.vue";
 import Dashboard from "@/views/dashboard/Dashboard.vue";
+import EmbedDataflow from "./../components/dataflow/EmbedDataflow";
 export default {
     name: "Home",
     methods: {
+        runDataflow(){
+            this.$refs.dataflow.runDataflow();
+        },
         addNum() {
             this.num += 1;
         }
@@ -80,7 +90,8 @@ export default {
         FormulaEditor: FormulaEditor,
         SymperColorPicker: SymperColorPicker,
         PermissionSelector,
-        Dashboard
+        Dashboard,
+        EmbedDataflow
     }
 };
 </script>
