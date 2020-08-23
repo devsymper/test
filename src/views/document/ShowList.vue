@@ -9,8 +9,7 @@
         :containerHeight="containerHeight"
         :actionPanelWidth="actionPanelWidth"
         @after-open-add-panel="addDocument"
-        :headerPrefixKeypath="'document'"
-    >
+        :headerPrefixKeypath="'document'">
         <div slot="right-panel-content" class="h-100">
             <submit-view ref="submitView" :isQickSubmit="true" :action="'submit'" @submit-document-success="aftersubmitDocument" :docId="documentId"/>
         </div>
@@ -23,9 +22,13 @@
         style="height: 100vh"
         v-bind:class="[showValidate==true?'manage-timesheet-800':'manage-timesheet-500']" 
         right>
-        
-        <ImportExcelPanel @cancel="closeImportExcelPanel" :documentId="documentId" :drawerImportExelPanel="drawerImportExelPanel" />
+         <ImportExcelPanel 
+            @cancel="closeImportExcelPanel" 
+            :documentId="documentId" 
+            @showValidate="showValidateComponent"
+            :drawerImportExelPanel="drawerImportExelPanel" />
     </v-navigation-drawer>
+    </div>
 </template>
 <script>
 import { documentApi } from "./../../api/Document.js";
@@ -34,14 +37,14 @@ import ActionPanel from "./../../views/users/ActionPanel.vue";
 import ChangePassPanel from "./../../views/users/ChangePass.vue";
 import Submit from './submit/Submit'
 import { util } from "./../../plugins/util.js";
-import ImportFile from "./../../components/importExcel/ImportFile";
 import ImportExcelPanel from "./../../components/document/ImportExelPanel";
+
 export default {
     components: {
         "list-items": ListItems,
         ImportExcelPanel: ImportExcelPanel,
         "action-panel": ActionPanel,
-        'submit-view':Submit
+        'submit-view':Submit,
     },
     data(){
         return {
@@ -123,7 +126,6 @@ export default {
                     callback: (document, callback) => {
                         this.drawerImportExelPanel =! this.drawerImportExelPanel; 
                         this.documentId = Number(document.id);
-                        console.log( document.id);
                     }
                 },
                 {
@@ -152,6 +154,9 @@ export default {
     methods:{
         closeImportExcelPanel(){
             this.drawerImportExelPanel = false;
+        },
+        showValidateComponent(data){
+            this.showValidate = data;
         },
         addDocument(){
             this.$router.push('/document/editor');

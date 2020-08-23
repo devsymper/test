@@ -34,7 +34,7 @@
             </v-row>
             <!-- kết thúc kết quả tìm kiếm -->
             <!-- danh sách kết quả  -->
-            <v-row v-for="item in listSearch.filter(x => x.group!= 'Nhân viên'&&x.type!= 'user')" style="margin-top:-18px">
+            <v-row v-for="(item,i) in listSearch.filter(x => x.group!= 'Nhân viên'&&x.type!= 'user')" :key="i" style="margin-top:-18px">
                 <v-row v-if="item.group" class="ml-1 mt-2 mb-2 mr-4">
                     <v-list-item>
                         <v-list-item-content>
@@ -59,7 +59,7 @@
                     </v-row>
                 </v-row>
             </v-row>
-            <v-row v-for="item in listSearch.filter(x => x.group== 'Nhân viên' )" style="margin-top:-18px">
+            <v-row v-for="(item, idx) in listSearch.filter(x => x.group== 'Nhân viên' )" :key="idx" style="margin-top:-18px">
                 <v-row v-if="item.group" class="ml-1 mt-2 mb-2 mr-4">
                     <v-list-item v-model='nothing'>
                         <v-list-item-content>
@@ -74,7 +74,7 @@
             <v-row class="ml-3">
                 <!-- kết thúc danh sách tìm  -->
                  <v-slide-group multiple show-arrows>
-                        <v-slide-item v-for="item in listSearch.filter(x => x.type== 'user' )" >
+                        <v-slide-item v-for="(item,index) in listSearch.filter(x => x.type== 'user' )" :key="index" >
                 <div class="d-flex justify-start mr-3 " style="width: 250px!important; border:1px solid rgba(0,0,0,0.2">
                    
                             <v-list-item-avatar class="item-avatar ml-3">

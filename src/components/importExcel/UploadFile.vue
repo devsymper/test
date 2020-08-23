@@ -9,7 +9,7 @@
           ref="upload">
             <uploader-unsupport></uploader-unsupport>
             <uploader-drop>
-                <p class="font-normal">Thả file ở đây để upload</p>
+                <p class="font-normal mb-3">Kéo thả file vào đây để upload</p>
                 <uploader-btn  v-show="selectType=='Excel'" depressed class="font-normal btn-upload"
                 :single="true"
                 style="background-color:#3092E6; color:white; border-radius:2px; border:1px solid #3092E6; font-size:13px">
@@ -23,10 +23,10 @@
                 <v-btn 
                   v-show ="dem >0" 
                   color ="error" class="ml-1" 
-                  style ="font-weight: 400; border-radius: 0px !important" 
+                  style ="margin-bottom:3px; font-weight: 400; border-radius: 0px !important" 
                   small depressed 
                   @click = "clearFiles">
-                  Clear
+                  Xoá 
                 </v-btn>
             </uploader-drop>
             <uploader-list></uploader-list>
@@ -93,7 +93,7 @@ export default {
             this.$emit('keyUpload', this.options.query.key);
         },
         handleChange(event) {
-            //  debugger
+            // debugger
             this.$refs.upload.uploader.cancel()
             this.options.query.total = event.currentTarget.files.length;
             this.dem = event.currentTarget.files.length;

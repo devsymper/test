@@ -245,7 +245,7 @@ export default {
 
 </style>
 <style >
-.v-autocomplete__content{
+/* .v-autocomplete__content{
     max-width: 400px!important;
     top: 40px!important;
   
@@ -256,5 +256,5 @@ export default {
 .v-select__slot{
     font-size:13px;
 
-}
+} */
 </style>

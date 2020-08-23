@@ -11,11 +11,12 @@
                             <i class="mdi mdi-close float-right close-tab-btn" @click.stop="closeTab(idx)"></i>
                         </v-tab>
                     </v-tabs>
+                    <!-- <div class="d-flex justify-end " style="width:100%;margin-bottom:5px" >
+                        <SearchInput class= "d-flex align-end mt-5" />
+                    </div> -->
                 </div>
                 <div class="float-right app-header-bg-color" style="height:40px; line-height:40px;">
-                    <div class="d-flex justify-end " style="width:100%;margin-bottom:5px" v-show="showSearchInput">
-                        <SearchInput class= "d-flex align-end mt-5" />
-                    </div>
+                    <!-- search -->
                     <v-btn icon @click="showSearchInput = !showSearchInput">
                         <v-icon>mdi-magnify</v-icon>
                     </v-btn>
