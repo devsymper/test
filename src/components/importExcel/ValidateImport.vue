@@ -177,6 +177,9 @@ export default {
                         self.processing = res.data;
                         console.log(self.processing);
                     }
+                }else{
+                     clearInterval(this.loopCheckProcess); 
+                     this.$emit("Error");
                 }
             })
             .catch(err => {
@@ -190,6 +193,11 @@ export default {
       }
     },
     watch: {
+        // setInterval(){
+        //     if(setInterval==false){
+        //           clearInterval(this.loopCheckProcess);
+        //     }
+        // },
         newImport(val) {
             if (val) {
                 this.processing = {

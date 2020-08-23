@@ -203,7 +203,7 @@ export default {
         },
         cancel() {
             this.$emit('cancel');
-            this.$emit('stopSetInterval');
+             this.$emit('stopSetInterval');
             this.$store.commit('importExcel/setNewImport', true);  
         },
         // xoá dữ liệu trở về mặc định
@@ -215,16 +215,16 @@ export default {
             this.nameSheets=[];
             this.showCancelBtn = true;
             this.nameColumnDetail={};
+             this.$emit('stopSetInterval');
             this.$emit('closeValidate');
-            this.$emit('stopSetInterval');
-
             for (let i = 0; i < this.tables.length; i++){
                 this.tables[i].keyColumn= {enable:false, index:-1, name:''};
                 this.tables[i].sheetMap='';
                 for (let j = 0; j < this.tables[i].controls.length; j++) {
                         this.tables[i].controls[j].dataColumn=null
                 }
-            }       
+            }
+            this.getLastData();       
         },
         // Lấy dữ liệu từ API
         getDataExcel(data) {
@@ -484,6 +484,48 @@ export default {
             }
         },
 
+        getLastData(){
+            const self = this;
+             importApi.getMapping(this.documentId)
+            .then(res => {
+                if (res.status === 200) {
+                let mapping = JSON.parse(res.data[0].mapping);    
+                console.log(mapping);  
+                mapping = mapping.mapping;
+               // tạo 1 mảng lưu những row được lấy
+               let row = [];
+               this.lastKeyGeneral = {enable:true,index:-1,name:''};
+               if(mapping.general.keyColumn)
+               {
+                   this.lastKeyGeneral.enable = mapping.general.keyColumn.enable;
+                   this.lastKeyGeneral.index = mapping.general.keyColumn.index;
+                   this.lastKeyGeneral.name = mapping.general.keyColumn.name;
+               }
+                for (let i = 0; i < mapping.general.controls.length; i++) {
+                    row.push({
+                        controlName:mapping.general.controls[i].name,
+                        dataColumn:mapping.general.controls[i].dataColumn.name,
+                        });
+                };
+                if(mapping.tables){
+                    for (let i = 0; i < mapping.tables.length; i++) {
+                        this.lastKeyTables.push(mapping.tables[i].keyColumn);
+                        for(let j = 0; j< mapping.tables[i].controls.length;j++)
+                            row.push({
+                                 controlName:mapping.tables[i].controls[j].name,
+                                dataColumn:mapping.tables[i].controls[j].dataColumn.name
+                            });
+                    }
+                }
+                self.lastTable = row;
+                   // console.log(row);
+                //hàm tìm sheet theo row
+                }; 
+            })
+            .catch(err => {
+                console.log(err)
+            })
+        },
         // phần mapping --- hàm đẩy giá trị mapping vào tables
         pushMappingInTables(name, column){
             debugger
@@ -525,7 +567,7 @@ export default {
                 for(let j = 0; j<arr.length; j++){
                     if(arr[j].name==this.lastKeyGeneral.name&&this.tables[0].keyColumn){
                       this.tables[0].keyColumn.name=this.lastKeyGeneral.name;
-                    this.tables[0].keyColumn.enable= this.lastKeyGeneral.enable;
+                    this.tables[0].keyColumn.enable= true;
                     this.tables[0].keyColumn.index= arr[j].index;
 
                     }
@@ -595,46 +637,7 @@ export default {
         },
         //lay API lần mapping trước
         selectType(){
-            const self = this;
-            importApi.getMapping(this.documentId)
-            .then(res => {
-                if (res.status === 200) {
-                let mapping = JSON.parse(res.data[0].mapping);    
-                console.log(mapping);  
-                mapping = mapping.mapping;
-               // tạo 1 mảng lưu những row được lấy
-               let row = [];
-               this.lastKeyGeneral = {enable:true,index:-1,name:''};
-               if(mapping.general.keyColumn)
-               {
-                   this.lastKeyGeneral.enable = mapping.general.keyColumn.enable;
-                   this.lastKeyGeneral.index = mapping.general.keyColumn.index;
-                   this.lastKeyGeneral.name = mapping.general.keyColumn.name;
-               }
-                for (let i = 0; i < mapping.general.controls.length; i++) {
-                    row.push({
-                        controlName:mapping.general.controls[i].name,
-                        dataColumn:mapping.general.controls[i].dataColumn.name,
-                        });
-                };
-                if(mapping.tables){
-                    for (let i = 0; i < mapping.tables.length; i++) {
-                        this.lastKeyTables.push(mapping.tables[i].keyColumn);
-                        for(let j = 0; j< mapping.tables[i].controls.length;j++)
-                            row.push({
-                                 controlName:mapping.tables[i].controls[j].name,
-                                dataColumn:mapping.tables[i].controls[j].dataColumn.name
-                            });
-                    }
-                }
-                self.lastTable = row;
-                   // console.log(row);
-                //hàm tìm sheet theo row
-                }; 
-            })
-            .catch(err => {
-                console.log(err)
-            })
+           this.getLastData();
 
         },
         newImport(val) {

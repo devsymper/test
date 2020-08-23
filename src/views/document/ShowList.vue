@@ -126,6 +126,7 @@ export default {
                     callback: (document, callback) => {
                         this.drawerImportExelPanel =! this.drawerImportExelPanel; 
                         this.documentId = Number(document.id);
+                        
                     }
                 },
                 {
