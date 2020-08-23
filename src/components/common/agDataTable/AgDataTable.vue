@@ -1,5 +1,8 @@
 <template>
-     <ag-grid-vue style="width: 100%; height: calc(100% - 40px);"
+     <ag-grid-vue :style="{
+         width: '100%',
+         height: tableHeight
+     }"
                  class="ag-theme-balham"
                  :gridOptions="gridOptions"
                  :defaultColDef="defaultColDef"
@@ -32,6 +35,10 @@ import Vue from "vue";
 
 export default {
     props:{
+        tableHeight: {
+            type: String,
+            default: 'calc(100% - 40px)'
+        },
         // Danh sách tất cả các column theo định dạng của ag grid
         allColumns:{
             type:Array,
@@ -62,6 +69,11 @@ export default {
                 return {}
             }
         },
+        groupColumnCellEditorName: {
+            default(){
+                return {}
+            }
+        }
     },
     data(){
         return {
@@ -114,8 +126,11 @@ export default {
                 else{
                     params.data['name'][0] = x
                 }
+                
                 params.oldValue = y
-            }
+            },
+           
+            cellEditor: this.groupColumnCellEditorName
         };
         this.groupDefaultExpanded = -1;
         this.getDataPath = data => {

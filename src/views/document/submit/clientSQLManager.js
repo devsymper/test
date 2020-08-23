@@ -1,7 +1,5 @@
 import sDocument from './../../../store/document'
 import store from './../../../store'
-import { util } from "./../../../plugins/util.js";
-import { Column } from 'ag-grid-community';
 
 const dataSubmitStore = sDocument.state.submit
 const initSqlJs = require('sql.js');

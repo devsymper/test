@@ -35,7 +35,7 @@
 </div>
 </template>
 <script>
-import {v4 as uuidv4} from 'uuid'
+import { util } from '../../plugins/util';
 
 export default {
     props: ["selectType"],
@@ -97,7 +97,7 @@ export default {
             this.$refs.upload.uploader.cancel()
             this.options.query.total = event.currentTarget.files.length;
             this.dem = event.currentTarget.files.length;
-            this.options.query.key = uuidv4();
+            this.options.query.key = util.str.randomString(6)+Date.now();
             this.options.query.typeImport = this.selectType;
             this.$emit('clearFiles');
 

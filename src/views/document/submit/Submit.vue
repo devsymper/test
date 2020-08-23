@@ -7,9 +7,9 @@
             :style="{'width':docSize, 'height':'100%'}"
         >
             <div v-html="contentDocument"></div>
-            <button v-on:click="togglePageSize" v-show="!isQickSubmit" id="toggle-doc-size">
+            <!-- <button v-on:click="togglePageSize" v-show="!isQickSubmit" id="toggle-doc-size">
                 <span class="mdi mdi-arrow-horizontal-lock"></span>
-            </button>
+            </button> -->
             <autocomplete-input
                 ref="autocompleteInput"
                 @after-select-row="afterSelectRowAutoComplete"
@@ -19,11 +19,11 @@
             <sym-drag-panel
                 ref="symDragPanel"
                 :dragPanelWidth="600"
-                :dragPanelHeight="'auto'"
                 :topPosition='topPositionDragPanel'
                 :leftPosition="leftPositionDragPanel"
                 :actionTitle="titleDragPanel"
                 :titleIcon="titleDragPanelIcon"
+                :styleBody="{overflow:'hidden',width:'100%'}"
             >
                 <template slot="drag-panel-content">
                     <!-- <submitDocument :isQickSubmit="true" :docId="340" v-if="!isQickSubmit"/> -->
@@ -59,25 +59,52 @@
                         <v-progress-circular indeterminate v-show="isSubmitting" color="red"></v-progress-circular>
                     </v-btn>
                 </template>
-                <v-btn fab dark small color="green" @click="handlerSubmitDocumentClick">
-                    <v-icon>mdi-content-save</v-icon>
-                </v-btn>
-                <!-- <v-btn
-                        fab
-                        dark
-                        small
-                        color="indigo"
-                    >
-                        <v-icon>mdi-plus</v-icon>
-                    </v-btn>
-                    <v-btn
-                        fab
-                        dark
-                        small
-                        color="red"
-                    >
-                        <v-icon>mdi-delete</v-icon>
-                </v-btn>-->
+                
+                <v-tooltip left>
+                    <template v-slot:activator="{ on }">
+                        <div v-on="on">
+                            <v-btn fab dark small color="green" @click="handlerSubmitDocumentClick">
+                                <v-icon>mdi-content-save</v-icon>
+                            </v-btn>
+                        </div>
+                    </template>
+                    <span>{{$t('document.submit.fab.submit')}}</span>
+                </v-tooltip>
+                
+                <v-tooltip left>
+                    <template v-slot:activator="{ on }">
+                        <div v-on="on">
+                            <v-btn
+                                v-if="isDraft != 1"
+                                fab
+                                dark
+                                small
+                                color="indigo"
+                                @click="handlerDraftClick"
+                            >
+                                <v-icon>mdi-trash-can-outline</v-icon>
+                            </v-btn>
+                        </div>
+                    </template>
+                    <span>{{$t('document.submit.fab.draft')}}</span>
+                </v-tooltip>
+                <v-tooltip left>
+                    <template v-slot:activator="{ on }">
+                        <div v-on="on">
+                            <v-btn
+                                fab
+                                dark
+                                small
+                                color="secondary"
+                                @click="togglePageSize"
+                            >
+                                <v-icon>mdi-resize</v-icon>
+                                
+                            </v-btn>
+                        </div>
+                    </template>
+                    <span>{{$t('document.submit.fab.toggleSize')}}</span>
+                </v-tooltip>
             </v-speed-dial>
             <err-message :listErr="listMessageErr" ref="errMessage"/>
         </div>
@@ -99,7 +126,7 @@ import { util } from "./../../../plugins/util.js";
 import AutocompleteInput from "./items/AutocompleteInput.vue";
 import User from "./items/User.vue";
 import Filter from "./items/Filter.vue";
-import Validate from "./items/Validate.vue";
+import Validate from "./../common/Validate";
 import ClientSQLManager from "./clientSQLManager.js";
 import Util from './util';
 import './customControl.css';
@@ -108,10 +135,9 @@ import moment from "moment-timezone";
 
 
 import { checkCanBeBind, resetImpactedFieldsList, markBinedField } from './handlerCheckRunFormulas';
-import {checkDbOnly,getControlInstanceFromStore,getControlTitleFromName} from './../common/common'
+import {checkDbOnly,getControlInstanceFromStore,getControlTitleFromName, getListInputInDocument} from './../common/common'
 let impactedFieldsList = {};
 let impactedFieldsArr = {};
-var impactedFieldsListWhenStart = {};
 
 export default {
     props: {
@@ -157,7 +183,7 @@ export default {
     name: "submitDocument",
 
     components: {
-        validate: Validate,
+        "validate": Validate,
         "user-select": User,
         "date-picker": DatePicker,
         "time-input": TimeInput,
@@ -212,7 +238,10 @@ export default {
             listMessageErr:[],
             titleValidate:"",
             messageValidate:"",
-            isComponentActive:false
+            isComponentActive:false,
+            cacheDataRunFormulas:{},
+			isDraft:0,
+            preDataSubmit:{},
         };
     },
     beforeMount() {
@@ -302,6 +331,7 @@ export default {
         this.$evtBus.$on("document-submit-input-change", locale => {
             try {
                 if(thisCpn.isComponentActive == false) return;
+                
                 this.$store.commit("document/addToDocumentSubmitStore", {
                             key: 'docStatus',
                             value: 'input',
@@ -309,6 +339,10 @@ export default {
                         });
                 let valueControl = locale.val;
                 let controlInstance = getControlInstanceFromStore(thisCpn.keyInstance,locale.controlName);
+                if($('#'+controlInstance.id).attr('data-autocomplete') != ""){
+                    $('#'+controlInstance.id).attr('data-autocomplete',"");
+                    return;
+                }
                 if(controlInstance.type == 'user'){
                     valueControl = $('#'+controlInstance.id).attr('user-id');
                     if(valueControl == undefined) valueControl = 0;
@@ -349,6 +383,7 @@ export default {
         });
         this.$evtBus.$on("document-submit-open-validate-message", e => {
             if(thisCpn.isComponentActive == false) return;
+            thisCpn.messageValidate = e.msg;
             thisCpn.$refs.validate.show(e);
         });
        
@@ -384,11 +419,12 @@ export default {
         }); 
         // hàm nhận sự thay đổi của input autocomplete gọi api để chạy công thức lấy dữ liệu
         this.$evtBus.$on("document-submit-autocomplete-key-event", e => {
+            console.log("sdsdad",e.e);
             if(thisCpn.isComponentActive == false) return;
             try {
                 if((e.e.keyCode >= 97 && e.e.keyCode <= 105) ||
                     (e.e.keyCode >= 48 && e.e.keyCode <= 57) ||
-                    (e.e.keyCode >= 65 && e.e.keyCode <= 90) || e.e.keyCode == 8) {
+                    (e.e.keyCode >= 65 && e.e.keyCode <= 90) || [8,32,231].includes(e.e.keyCode)) { // nếu key code là các kí tự chữ và số hợp lệ
                     if(!thisCpn.$refs.autocompleteInput.isShow()){
                         thisCpn.$refs.autocompleteInput.show(e.e);
                         let currentTableInteractive = this.sDocumentSubmit.currentTableInteractive;
@@ -418,6 +454,11 @@ export default {
             if(thisCpn.isComponentActive == false) return;
             try {
                 thisCpn.$refs.autocompleteInput.show(e.e);
+                thisCpn.$store.commit("document/addToDocumentSubmitStore", {
+                            key: 'currentControlAutoComplete',
+                            value: e.alias,
+                            instance: thisCpn.keyInstance
+                        });
                 thisCpn.getDataForAutocomplete(e,'select',e.alias);
             } catch (error) {
                 
@@ -431,9 +472,8 @@ export default {
             }
             if(thisCpn.isComponentActive == false) return;
             try {
-                
                 if (
-                    !$(evt.target).hasClass("autocompleting") &&
+                    !$(evt.target).hasClass("s-control-select") &&
                     !$(evt.target).hasClass("v-data-table") &&
                     $(evt.target).closest(".v-data-table").length == 0
                 ) {
@@ -528,27 +568,59 @@ export default {
             }
             else{
                 let aliasControl = e.autocompleteFormulasInstance.autocompleteDetectAliasControl();
-                let dataInput = this.getDataInputFormulas(e.autocompleteFormulasInstance,e);
-                e.autocompleteFormulasInstance.handleRunAutoCompleteFormulas(dataInput).then(res=>{
-                    thisCpn.setDataForControlAutocomplete(res,aliasControl,e.controlTitle)
-                });
+                let dataFromCache = this.getDataAutocompleteFromCache(e.e.target.value, aliasControl);
+                if(dataFromCache == false){
+                    let dataInput = this.getDataInputFormulas(e.autocompleteFormulasInstance,e);
+                    e.autocompleteFormulasInstance.handleRunAutoCompleteFormulas(dataInput).then(res=>{
+                        thisCpn.setDataForControlAutocomplete(res,aliasControl,e.controlTitle, $(e.e.target).val())
+                    });
+                }
+                else{
+                    this.$refs.autocompleteInput.setAliasControl(aliasControl);
+                    this.$refs.autocompleteInput.setData(dataFromCache);
+                }
             }
-            
+        },
+
+        // hàm lấy data từ cache của control autocomplete
+        getDataAutocompleteFromCache(curTyping,controlName){
+            if(this.sDocumentSubmit.autocompleteData.hasOwnProperty(controlName) &&
+                this.sDocumentSubmit.autocompleteData[controlName].header.length > 0 &&
+                this.sDocumentSubmit.autocompleteData[controlName].cacheData.hasOwnProperty(curTyping)
+            ){
+                return {
+                    headers:this.sDocumentSubmit.autocompleteData[controlName].header,
+                    dataBody:this.sDocumentSubmit.autocompleteData[controlName].cacheData[curTyping]
+                }
+            }
+            else{
+                return false
+            }
         },
         /**
          * Hàm bind dữ liệu cho box autocomplete, cho component autocompleteInput
          */
-        setDataForControlAutocomplete(res,aliasControl,controlTitle){
+        setDataForControlAutocomplete(res,aliasControl,controlTitle, textTyping=""){
             let controlAs = {};
             controlAs[aliasControl] = controlTitle;
             if(res.data != undefined){
                 if(res.status == 200 && res.data != false){
-                     let dataTable = []
+                    let dataTable = {}
                     if(res.data.data !== ""){
                         dataTable = this.handleDataAutoComplete(res.data.data,false,controlAs);
                     }
                     this.$refs.autocompleteInput.setAliasControl(aliasControl);
                     this.$refs.autocompleteInput.setData(dataTable);
+                    if(dataTable.hasOwnProperty('headers')){
+                        let item = {}
+                        item[textTyping] = dataTable.dataBody
+                        this.$store.commit("document/cacheDataAutocomplete",{
+                            instance: this.keyInstance,
+                            controlName:aliasControl,
+                            header:dataTable.headers,
+                            cacheData:item
+                        })
+                    }
                 }
                 else{
                     this.$refs.autocompleteInput.setData([]);
@@ -598,18 +670,63 @@ export default {
          * Hàm xử lí nhận dữ liệu component autocomplete khi chọn 1 dòng
          */
         afterSelectRowAutoComplete(data){
-            // th này không phải trong table       
+            // th này không phải trong table      
             if(this.sDocumentSubmit.currentCellSelected == null){
-                let input = data.input;
-                input.val(data.value);
-                markBinedField(this.keyInstance,this.sDocumentSubmit.currentControlAutoComplete);
-                input.trigger('change');
+                let fromAutoComplete = true;
+                if(!data.fromEnterKey){
+                    fromAutoComplete = false
+                }
+                this.handleInputChangeBySystem(this.sDocumentSubmit.currentControlAutoComplete,data.value,fromAutoComplete);
             }
             else{
                 let currentTableInteractive = this.sDocumentSubmit.currentTableInteractive
                 currentTableInteractive.tableInstance.setDataAtCell(this.sDocumentSubmit.currentCellSelected.row,this.sDocumentSubmit.currentCellSelected.column,data.value)
                 currentTableInteractive.isAutoCompleting = false;
             }
+        },
+
+
+
+        /**
+         * Hàm xử lí sau khi chạy công thức được điền dữ liệu vào input bởi hệ thống
+         */
+        handleInputChangeBySystem(controlName,valueControl, fromAutocomplete = false){
+            let controlInstance = getControlInstanceFromStore(this.keyInstance,controlName);
+            if(controlInstance.getValue() == valueControl){ // kiểm tra ko có sự thay đổi giá trị của control thì return
+                return;
+            }
+            controlInstance.setValue(valueControl)
+            if(fromAutocomplete){
+                $('#'+controlInstance.id).attr('data-autocomplete',valueControl);
+            }
+            markBinedField(this.keyInstance,controlName);
+            if(controlInstance.type == 'user'){
+                valueControl = $('#'+controlInstance.id).attr('user-id');
+                if(valueControl == undefined) valueControl = 0;
+            }
+
+            // cần format lại giá trị date về năm tháng ngày để lưu vào store, tránh lỗi khi submit
+            if(controlInstance.type == 'date'){
+                valueControl = moment(valueControl).format('YYYY-MM-DD');
+            }
+          
+            this.updateListInputInDocument(
+                controlName,
+                "value",
+                valueControl
+            );
+            
+            // sau khi thay đổi giá trị input thì kiểm tra require control nếu có
+            if(controlInstance.isRequiredControl()){
+                if(controlInstance.isEmpty()){
+                    controlInstance.renderValidateIcon('Không được bỏ trống trường thông tin '+controlName)
+                }
+                else{
+                    controlInstance.removeValidateIcon()
+                }
+            }
+            resetImpactedFieldsList(this.keyInstance);
+            this.handleControlInputChange(controlName);
         },
         /**
          * Hàm  xử lí data sau khi query công thức autocomplete,
@@ -639,15 +756,18 @@ export default {
                 }
             }
             else{
-                for(let controlName in data[0]){
-                    let item = {value:controlName,text:controlName};
-                    if(controlAs.hasOwnProperty(controlName)){
-                        item.text = controlAs[controlName]
+                if(data.length > 0){
+                    for(let controlName in data[0]){
+                        let item = {value:controlName,text:controlName};
+                        if(controlAs.hasOwnProperty(controlName)){
+                            item.text = controlAs[controlName]
+                        }
+                        headers.push(item);
                     }
-                    headers.push(item);
+                    data[0]['active'] = true;
+                    bodyTable = data;
                 }
-                data[0]['active'] = true;
-                bodyTable = data;
+                
             }
             return {headers:headers,dataBody:bodyTable}
         },
@@ -662,7 +782,9 @@ export default {
                         if (res.status == 200) {
                             let content = res.data.document.content;
                             thisCpn.documentName = res.data.document.name;
-                            thisCpn.contentDocument = content;
+							thisCpn.contentDocument = content;
+							if(res .data.document.data_prepare_submit != "" && res.data.document.data_prepare_submit != null)
+							thisCpn.preDataSubmit = JSON.parse(res.data.document.data_prepare_submit);
                             setDataForPropsControl(res.data.fields,thisCpn.keyInstance,'submit'); // ddang chay bat dong bo
                             setTimeout(() => {
                                 thisCpn.processHtml(content);
@@ -696,6 +818,7 @@ export default {
                             instance: this.keyInstance
                         })
                         thisCpn.documentId = res.data.documentId;
+                        thisCpn.isDraft = res.data.isDraft;
                         thisCpn.loadDocumentData();
                     }
                     else{
@@ -733,7 +856,7 @@ export default {
                 ".s-control:not(.bkerp-input-table .s-control)"
             );
             let thisCpn = this;
-            console.log(this.sDocumentEditor,'jkgds');
+            let isSetEffectedControl = false;
             for (let index = 0; index < allInputControl.length; index++) {
                 let id = $(allInputControl[index]).attr('id');
                 let controlType = $(allInputControl[index]).attr('s-control-type');
@@ -742,6 +865,10 @@ export default {
                     let field = this.sDocumentEditor.allControl[id];
                     let idField = field.id;
                     let valueInput = field.value
+                    let prepareData = field.prepareData
+                    if(prepareData != null && prepareData != ""){
+                        isSetEffectedControl = true;
+                    }
                     if(valueInput != undefined && valueInput != null && Object.keys(valueInput).length == 0){
                         valueInput = ""
                     }
@@ -749,6 +876,7 @@ export default {
                         let control = new ActionControl(idField, $(allInputControl[index]),field,thisCpn.keyInstance);
                         control.init();
                         control.render();
+                        control.setEffectedData(prepareData);
                         this.addToListInputInDocument('submit',control)
                     } else {
                         let controlName = field.properties.name.value;
@@ -766,6 +894,7 @@ export default {
                                 valueInput
                             );
                             control.init();
+                            control.setEffectedData(prepareData);
                             this.addToListInputInDocument(controlName,control)
                             control.render();
                         }
@@ -779,6 +908,7 @@ export default {
                                 thisCpn.keyInstance
                             );
                             tableControl.initTableControl();
+                            tableControl.setEffectedData(prepareData);
                             tableControl.tableInstance = new Table(
                                 tableControl,
                                 controlName,
@@ -790,6 +920,10 @@ export default {
                                 let childControlProp = thisCpn.sDocumentEditor.allControl[id].listFields[childControlId];
                                 childControlProp.properties.inTable = controlName;
                                 childControlProp.properties.docName = thisCpn.documentName;
+                                let childPrepareData = childControlProp.prepareData
+                                if(childPrepareData != null && childPrepareData != ""){
+                                    isSetEffectedControl = true;
+                                }
                                 let idFieldChild = childControlProp.id;
                                 let childControl = new BasicControl(
                                     idFieldChild,
@@ -798,6 +932,7 @@ export default {
                                     thisCpn.keyInstance
                                 );
                                 childControl.init();
+                                childControl.setEffectedData(childPrepareData);
                                 let childControlName = childControlProp.properties.name.value;
                                 thisCpn.addToListInputInDocument(childControlName,childControl)
                                 listInsideControls[childControlName] = true;
@@ -811,23 +946,21 @@ export default {
                 }
 
             }
-            console.log(this.sDocumentSubmit);
-            console.log(this.sDocumentEditor);
+            console.log('sDocumentSubmit',this.sDocumentSubmit);
+            if(!isSetEffectedControl)
             this.getEffectedControl();
             // thisCpn.createDocumentSQLLiteTable(); 
             if(this.docObjId == null)
             thisCpn.findRootControl();
+
         },
         /**
          * Sự kiện phát ra khi click vào date của date picker
          */
-        selectedDate(e){
+        selectedDate(data){
             this.$refs.datePicker.closePicker();
             let currentControl = this.sDocumentSubmit.currentControlEditByUser;
-            let controlInstance = getControlInstanceFromStore(this.keyInstance,currentControl);
-            let value = moment(e,'YYYY-MM-DD').format(controlInstance.formatDate);
-            $('#'+controlInstance.id).val(value);
-            $('#'+controlInstance.id).trigger('change');
+            this.handleInputChangeBySystem(currentControl,data)
         },
 
         /**
@@ -855,8 +988,8 @@ export default {
                             mapControlEffected[formulasType] = {}
                         }
                         if(formulas[formulasType].hasOwnProperty('instance')){
-                            let inputControl = formulas[formulasType].instance.inputControl;
-                            let inputLocalFormulas = formulas[formulasType].instance.inputForLocalFormulas;
+							let inputControl = formulas[formulasType].instance.inputControl;
+							let inputLocalFormulas = formulas[formulasType].instance.inputForLocalFormulas;
                             for (let controlEffect in inputControl) {
                                 if (!mapControlEffected[formulasType].hasOwnProperty(controlEffect)) {
                                     mapControlEffected[formulasType][controlEffect] = {};
@@ -869,30 +1002,12 @@ export default {
                                 }
                                 mapControlEffected[formulasType][controlEffect][name] = true;
                             }
-
                             this.detectControlEffectedInTableInDoc(mapControlEffected[formulasType], name, formulas[formulasType].instance);
                         }
                     }
                 }
             }
-            if(mapControlEffected.hasOwnProperty('formulas')){
-                this.updateEffectedControlToStore(mapControlEffected['formulas'],'effectedControl')
-            }
-            if(mapControlEffected.hasOwnProperty('readOnly')){
-                this.updateEffectedControlToStore(mapControlEffected['readOnly'],'effectedReadonlyControl')
-            }
-            if(mapControlEffected.hasOwnProperty('hidden')){
-                this.updateEffectedControlToStore(mapControlEffected['hidden'],'effectedHiddenControl')
-            }
-            if(mapControlEffected.hasOwnProperty('link')){
-                this.updateEffectedControlToStore(mapControlEffected['link'],'effectedLinkControl')
-            }
-            if(mapControlEffected.hasOwnProperty('require')){
-                this.updateEffectedControlToStore(mapControlEffected['require'],'effectedRequireControl')
-            }
-            if(mapControlEffected.hasOwnProperty('validate')){
-                this.updateEffectedControlToStore(mapControlEffected['validate'],'effectedValidateControl')
-            }
+            this.updateEffectedControlToStore(mapControlEffected);
         },
        
         detectControlEffectedInTableInDoc(mapControlEffected,name,formulasInstance){
@@ -900,6 +1015,37 @@ export default {
         },
 
 
+        handlerDraftClick(){
+            this.isSubmitting = true;
+            let thisCpn = this;
+            let dataPost = this.getDataPostSubmit();
+            dataPost['documentId'] = this.documentId;
+            documentApi.submitDraftDocument(dataPost).then(res => {
+                thisCpn.isSubmitting = false;
+                if (res.status == 200) {
+                    thisCpn.$snotify({
+                        type: "success",
+                        title: "Submit draft success!"
+                    });        
+                    thisCpn.$router.push('/documents/'+thisCpn.documentId+"/draft-objects");
+                }
+                else{
+                    thisCpn.$snotify({
+                        type: "error",
+                        title: res.message
+                    });
+                }
+            })
+            .catch(err => {
+                console.warn(err);
+                thisCpn.$snotify({
+                        type: "error",
+                        title: "error from submit document api!!!"
+                    });
+            })
+            .always(() => {
+            });
+        },
         handlerSubmitDocumentClick(){
             if($('.validate-icon').length == 0){
                 if(this.viewType == 'submit'){
@@ -950,7 +1096,6 @@ export default {
                         type: "success",
                         title: "Submit document success!"
                     });        
-                    console.log('assadsasadsadsdasadads',this.$route.name);
                     if(this.$route.name == 'submitDocument')
                      thisCpn.$router.push('/documents/'+thisCpn.documentId+"/objects");
                 }
@@ -976,6 +1121,9 @@ export default {
             let thisCpn = this;
             let dataPost = this.getDataPostSubmit();
             dataPost['documentId'] = this.documentId;
+            if(this.isDraft == 1){
+                dataPost['isDraft'] = true;
+            }
             documentApi.updateDocument(this.docObjId,dataPost).then(res => {
                 thisCpn.$emit('submit-document-success',res.data);
                 thisCpn.isSubmitting = false;
@@ -984,6 +1132,8 @@ export default {
                         type: "success",
                         title: "update document success!"
                     });        
+                    if(thisCpn.$route.name == 'updateDocumentObject')
+                     thisCpn.$router.push('/documents/'+thisCpn.documentId+"/objects");
                 }
                 else{
                     thisCpn.$snotify({
@@ -1097,15 +1247,34 @@ export default {
             return dataTable;
         },
 
-        
-        updateEffectedControlToStore(mapControlEffected,key) {
-            for (let controlName in mapControlEffected) {
-                this.updateListInputInDocument(
-                    controlName,
-                    key,
-                    mapControlEffected[controlName]
-                );
+        updateEffectedControlToStore(mapControlEffected) {
+            let mapTypeToEffectedControl = {
+                                            link     :"effectedLinkControl",
+                                            formulas :"effectedControl",
+                                            readOnly :"effectedReadonlyControl",
+                                            hidden   :"effectedHiddenControl",
+                                            require  :"effectedRequireControl",
+                                            validate :"effectedValidateControl",
+                                            }
+            let dataToPreProcessControl = {};
+            for(let type in mapControlEffected){
+                if(mapTypeToEffectedControl.hasOwnProperty(type)){
+                    for (let controlName in mapControlEffected[type]) {
+                        this.updateListInputInDocument(
+                            controlName,
+                            mapTypeToEffectedControl[type],
+                            mapControlEffected[type][controlName]
+                        );
+                        let controlInstance = getControlInstanceFromStore(this.keyInstance,controlName)
+                        if(!dataToPreProcessControl.hasOwnProperty(controlInstance.idField)){
+                            dataToPreProcessControl[controlInstance.idField] = {};
+                        }
+                        dataToPreProcessControl[controlInstance.idField][mapTypeToEffectedControl[type]] = mapControlEffected[type][controlName];
+                    }
+                }
+                
             }
+            documentApi.updatePreDataForField({prepareData:JSON.stringify(dataToPreProcessControl)}) 
         },
         updateListInputInDocument(controlName, key, value) {
             this.$store.commit("document/updateListInputInDocument", {
@@ -1134,9 +1303,9 @@ export default {
             let controlInstance = this.sDocumentSubmit.listInputInDocument[controlName];
             let controlId = controlInstance.id
             let allFormulas = controlInstance.controlFormulas;
-            if(allFormulas.hasOwnProperty('formulas')){
-                if(allFormulas['formulas'].hasOwnProperty('instance')){
-                    let formulasInstance = allFormulas['formulas'].instance;
+            if(allFormulas.hasOwnProperty('list')){
+                if(allFormulas['list'].hasOwnProperty('instance')){
+                    let formulasInstance = allFormulas['list'].instance;
                     if(formulasInstance.getFormulas() != ""){
                         if( !formulasInstance.hasOwnProperty('oldFormulas')){
                             formulasInstance.oldFormulas = formulasInstance.getFormulas();
@@ -1144,33 +1313,37 @@ export default {
                         // trường hợp có search trong filter thì wrap lại công thức với biến search
                         let newFormulas = formulasInstance.wrapSyqlForSearchInputFilter(search);
                         formulasInstance.setFormulas(newFormulas);
-                        this.handlerBeforeRunFormulasValue(formulasInstance,controlId,controlName,'formulas')
+                        this.handlerBeforeRunFormulasValue(formulasInstance,controlId,controlName,'list')
                     }
                 }
             }
         },
+
         /**
          * hàm được gọi khi input change, lấy ra các instance của control bị ảnh hưởng và chạy công thức cho các control đó
          * nếu có insideTableInDoc thì công thức từ nội bộ của bảng
          */
         handleControlInputChange(controlName){
-            let controlUnique = checkDbOnly(this.keyInstance,controlName);
-            if(controlUnique != false){
-                this.handlerBeforeRunFormulasValue(controlUnique.controlFormulas.uniqueDB,controlUnique.id,controlUnique.name,'uniqueDB');
-            }
             let controlInstance = this.sDocumentSubmit.listInputInDocument[controlName];
-            let controlEffected = controlInstance.getEffectedControl();
-            let controlHiddenEffected = controlInstance.getEffectedHiddenControl();
-            let controlReadonlyEffected = controlInstance.getEffectedReadonlyControl();
-            let controlRequireEffected = controlInstance.getEffectedRequireControl();
-            let controlLinkEffected = controlInstance.getEffectedLinkControl();
-            let controlValidateEffected = controlInstance.getEffectedValidateControl();
-            this.runFormulasControlEffected(controlName,controlEffected);
-            this.runOtherFormulasEffected(controlName,controlHiddenEffected,'hidden');
-            this.runOtherFormulasEffected(controlName,controlReadonlyEffected,'readonly');
-            this.runOtherFormulasEffected(controlName,controlRequireEffected,'require');
-            this.runOtherFormulasEffected(controlName,controlLinkEffected,'link');
-            this.runOtherFormulasEffected(controlName,controlValidateEffected,'validate');
+            if(controlInstance.checkValidValueLength()){
+                let controlUnique = checkDbOnly(this.keyInstance,controlName);
+                if(controlUnique != false){
+                    this.handlerBeforeRunFormulasValue(controlUnique.controlFormulas.uniqueDB,controlUnique.id,controlUnique.name,'uniqueDB');
+                }
+                
+                let controlEffected = controlInstance.getEffectedControl();
+                let controlHiddenEffected = controlInstance.getEffectedHiddenControl();
+                let controlReadonlyEffected = controlInstance.getEffectedReadonlyControl();
+                let controlRequireEffected = controlInstance.getEffectedRequireControl();
+                let controlLinkEffected = controlInstance.getEffectedLinkControl();
+                let controlValidateEffected = controlInstance.getEffectedValidateControl();
+                this.runFormulasControlEffected(controlName,controlEffected);
+                this.runOtherFormulasEffected(controlName,controlHiddenEffected,'hidden');
+                this.runOtherFormulasEffected(controlName,controlReadonlyEffected,'readonly');
+                this.runOtherFormulasEffected(controlName,controlRequireEffected,'require');
+                this.runOtherFormulasEffected(controlName,controlLinkEffected,'link');
+                this.runOtherFormulasEffected(controlName,controlValidateEffected,'validate');
+            }
         },
         /**
          * Hàm xử lí duyêt các control bị ảnh hưởng trong 1 công thức bởi 1 control nào đó và thực hiện chạy các công thức của control đó
@@ -1277,7 +1450,7 @@ export default {
                     }
                     switch (formulasType) {
                         case "formulas":
-                            this.handlerDataAfterRunFormulasValue(value,controlId,controlName,from);
+                            this.handleInputChangeBySystem(controlName,value);
                             break;
                         case "link":
                             this.handlerDataAfterRunFormulasLink(value,controlName);
@@ -1307,31 +1480,7 @@ export default {
 
             }
         },
-        handlerDataAfterRunFormulasValue(value,controlId,controlName,from){
-            let controlInstance = getControlInstanceFromStore(this.keyInstance,controlName);
-           
-            if($('#'+controlId).length > 0){
-                if(from != false && from == 'root'){
-                    this.updateListInputInDocument(
-                        controlName,
-                        "value",
-                        value
-                    );
-                    controlInstance.setValue(value)
-                    markBinedField(this.keyInstance,controlName);
-                    this.handleControlInputChange(controlName)
-                }else{
-                    if($('#'+controlId).attr('s-control-type') == 'label'){
-                        $('#'+controlId).text(value);
-                    }
-                    else{
-                        $('#'+controlId).val(value);
-                    }
-                    $('#'+controlId).trigger('change')
-                    markBinedField(this.keyInstance,controlName);
-                }
-            }
-        },
+     
 
         /**
          * Hàm set data cho bảng trong doc sau khi chạy công thức có dữ liệu
@@ -1403,43 +1552,69 @@ export default {
          * Hàm xử lí việc tìm kiếm các root control và chạy công thức cho control đó (lúc khởi tạo doc)
          */
         findRootControl(){ 
-            let listInput = this.sDocumentSubmit.listInputInDocument;
-            for(let controlName in listInput){
-                // console.log('sad',controlName);
-                this.setAllImpactedFieldsList(controlName);
-                let controlInstance = listInput[controlName];
-                if(controlInstance.type != "inputFilter"){
-                    if(Object.keys(controlInstance.controlFormulas).length > 0){
-                        let controlFormulas = controlInstance.controlFormulas;
-                        
-                        for(let formulasType in controlFormulas){
-                            if(formulasType != 'autocomplete'){
-                                if(controlFormulas[formulasType].hasOwnProperty('instance')){
-                                    let formulasInstance = controlFormulas[formulasType].instance;
-                                    if(formulasInstance.getFormulas() !== "" && Object.keys(formulasInstance.getInputControl()).length == 0){
-                                        impactedFieldsListWhenStart[controlName] = false;
-                                        this.$store.commit("document/addToDocumentSubmitStore", {
-                                            key: 'impactedFieldsListWhenStart',
-                                            value: impactedFieldsListWhenStart,
-                                            instance: this.keyInstance
-                                        });
-                                        this.handlerBeforeRunFormulasValue(formulasInstance,controlInstance.id,controlName,formulasType,'root')
-                                    }
-                                }
-                            }
-                            
-                        }
-                    }
+			let impactedFieldsListWhenStart = {}
+			if(this.preDataSubmit != null && Object.keys(this.preDataSubmit).length > 0){
+				impactedFieldsList = this.preDataSubmit.impactedFieldsList;
+				impactedFieldsListWhenStart = this.preDataSubmit.impactedFieldsListWhenStart;
+				this.$store.commit("document/addToDocumentSubmitStore", {
+												key: 'impactedFieldsListWhenStart',
+												value: impactedFieldsListWhenStart,
+												instance: this.keyInstance
+											});
+				let rootControl = this.preDataSubmit.rootControl;
+				for (let index = 0; index < rootControl.length; index++) {
+					const controlName = rootControl[index];
+					let controlInstance = getControlInstanceFromStore(this.keyInstance,controlName);
+					let controlFormulas = controlInstance.controlFormulas;
+					for(let formulasType in controlFormulas){
+						if(formulasType != 'autocomplete' && formulasType != 'list'){
+							let formulasInstance = controlFormulas[formulasType].instance;
+							this.handlerBeforeRunFormulasValue(formulasInstance,controlInstance.id,controlName,formulasType,'root')
+						}
+					}
+				}
+			}
+			else{
+				let listInput = getListInputInDocument(this.keyInstance);
+				let listRootControl = [];
+				for(let controlName in listInput){
+					this.setAllImpactedFieldsList(controlName);
+					let controlInstance = listInput[controlName];
+					if(controlInstance.type != "inputFilter"){
+						if(Object.keys(controlInstance.controlFormulas).length > 0){
+							let controlFormulas = controlInstance.controlFormulas;
+							for(let formulasType in controlFormulas){
+								if(formulasType != 'autocomplete' && formulasType != 'list'){
+									if(controlFormulas[formulasType].hasOwnProperty('instance')){
+										let formulasInstance = controlFormulas[formulasType].instance;
+										if(formulasInstance.getFormulas() !== "" && Object.keys(formulasInstance.getInputControl()).length == 0){
+											impactedFieldsListWhenStart[controlName] = false;
+											this.$store.commit("document/addToDocumentSubmitStore", {
+												key: 'impactedFieldsListWhenStart',
+												value: impactedFieldsListWhenStart,
+												instance: this.keyInstance
+											});
+											listRootControl.push(controlName);
+											this.handlerBeforeRunFormulasValue(formulasInstance,controlInstance.id,controlName,formulasType,'root')
+										}
+									}
+								}
+								
+							}
+						}
+					}
                 }
-                
-                
-            }
+			// lưu lại các mối quan hệ cho lần submit sau ko phải thực hiện các bước tìm quan hê này (các root control , các luồng chạy công thức)
+				let dataPost = {impactedFieldsList:impactedFieldsList,impactedFieldsListWhenStart:impactedFieldsListWhenStart,rootControl:listRootControl};
+				documentApi.updatePreDataForDoc({documentId:this.documentId,prepareData:JSON.stringify(dataPost)})
+			}
+			
             this.$store.commit("document/addToDocumentSubmitStore", {
                 key: 'impactedFieldsList',
                 value: impactedFieldsList,
                 instance: this.keyInstance
-
-            });
+			});
+			
         },
         /**
          * Lấy tất cả các control bị ảnh hưởng khi mà một control thay đổi giá trị
@@ -1458,13 +1633,11 @@ export default {
             if (sourceControlInstance != false) {
                 for (var i in sourceControlInstance['effectedControl']) {
                     arr.push(i);
-                    arr = arr.concat(this.getAllImpactedInput(i));
+                    arr = arr.concat(this.getAllImpactedInput(i)); 
                 }
             }
             return arr;
         },
-       
-
     }
 };
 </script>
@@ -1517,7 +1690,7 @@ export default {
 }
 .wrap-content-submit{
     width: 100%;
-    height: calc(100% - 100px);
+    height: calc(100vh - 100px);
     overflow: auto;
 }
 </style>

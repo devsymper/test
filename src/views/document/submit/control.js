@@ -34,47 +34,73 @@ export default class Control {
 
     }
     init() {
-        /**
-         * mảng luu giá trị các control bị ảnh hưởng, chỉ ra control này thay đổi giá trị thì sẽ thay đổi theo các control nào
-         */
-        this.effectedControl = [];
-        this.effectedHiddenControl = [];
-        this.effectedRequireControl = [];
-        this.effectedReadonlyControl = [];
-        this.effectedLinkControl = [];
-        this.effectedValidateControl = [];
-        this.inTable = (this.controlProperties.inTable != undefined) ? this.controlProperties.inTable : false;
-        this.docName = this.controlProperties.docName;
+            /**
+             * mảng luu giá trị các control bị ảnh hưởng, chỉ ra control này thay đổi giá trị thì sẽ thay đổi theo các control nào
+             */
+            this.effectedControl = {};
+            this.effectedHiddenControl = {};
+            this.effectedRequireControl = {};
+            this.effectedReadonlyControl = {};
+            this.effectedLinkControl = {};
+            this.effectedValidateControl = {};
+            this.inTable = (this.controlProperties.inTable != undefined) ? this.controlProperties.inTable : false;
+            this.docName = this.controlProperties.docName;
 
-        /**
-         * Tên của control
-         */
-        this.name = (this.controlProperties.hasOwnProperty('name')) ? this.controlProperties.name.value : "";
-        this.title = (this.controlProperties.hasOwnProperty('title')) ? this.controlProperties.title.value : "";
-        /**
-         * id của control
-         */
-        this.id = this.ele.attr('id');
+            /**
+             * Tên của control
+             */
+            this.name = (this.controlProperties.hasOwnProperty('name')) ? this.controlProperties.name.value : "";
+            this.title = (this.controlProperties.hasOwnProperty('title')) ? this.controlProperties.title.value : "";
+            /**
+             * id của control
+             */
+            this.id = this.ele.attr('id');
 
-        /**
-         * Loại control
-         */
-        this.type = this.ele.attr('s-control-type');
-
-
-        /**
-         * Danh sách các control bị thay đổi giá trị, hoặc hiển thị... khi control này thay đổi giá trị
-         */
-        this.sourceControlNames = {
-            validate: {},
-            readonly: {},
-            visibility: {},
-            require: {},
-            data: {}
-        };
-        this.initFormulas();
+            /**
+             * Loại control
+             */
+            this.type = this.ele.attr('s-control-type');
 
 
+            /**
+             * Danh sách các control bị thay đổi giá trị, hoặc hiển thị... khi control này thay đổi giá trị
+             */
+            this.sourceControlNames = {
+                validate: {},
+                readonly: {},
+                visibility: {},
+                require: {},
+                data: {}
+            };
+            this.initFormulas();
+
+
+        }
+        // set các mối quan hệ của các control trường hợp đã được lưu trên server
+    setEffectedData(effected) {
+        if (effected == "" || effected == null) {
+            return;
+        }
+        try {
+            effected = JSON.parse(effected)
+            for (let type in effected) {
+                if (type == "effectedControl") {
+                    this.effectedControl = effected[type];
+                } else if (type == "effectedHiddenControl") {
+                    this.effectedHiddenControl = effected[type]
+                } else if (type == "effectedRequireControl") {
+                    this.effectedRequireControl = effected[type]
+                } else if (type == "effectedReadonlyControl") {
+                    this.effectedReadonlyControl = effected[type]
+                } else if (type == "effectedLinkControl") {
+                    this.effectedLinkControl = effected[type]
+                } else if (type == "effectedValidateControl") {
+                    this.effectedValidateControl = effected[type]
+                }
+            }
+        } catch (error) {
+
+        }
     }
 
     /**
@@ -303,5 +329,79 @@ export default class Control {
         } else {
             return false;
         }
+    }
+
+    /**
+     * Hàm kiểm tra độ dài giá tri nhập vào với control TextInput
+     */
+
+    checkValidValueLength(rowIndex) {
+        if (this.type != "textInput") {
+            return true;
+        }
+        let rs = true;
+        if (this.inTable != false) {
+            let table = getListInputInDocument(this.curParentInstance)[this.inTable];
+            let colIndex = table.tableInstance.getColumnIndexFromControlName(this.name);
+            let dataAtCol = table.tableInstance.tableInstance.getDataAtCol(colIndex);
+            if (rowIndex == "all") {
+                for (let index = 0; index < dataAtCol.length; index++) {
+                    table.tableInstance.validateValueMap[rowIndex + "_" + colIndex] = { validate: false }
+                    let row = dataAtCol[index];
+                    if (row == null) {
+                        row = "";
+                    }
+                    if (this.controlProperties.maxValue.value != "") {
+                        if (row.length > this.controlProperties.maxValue.value) {
+                            table.tableInstance.validateValueMap[index + "_" + colIndex] = { validate: true, msg: 'Độ dài kí tự không được vượt quá ' + this.controlProperties.maxValue.value + " kí tự" };
+                            rs = false;
+                        }
+                    }
+                    if (this.controlProperties.minValue.value != "") {
+                        if (row.length < this.controlProperties.minValue.value) {
+                            table.tableInstance.validateValueMap[index + "_" + colIndex] = { validate: true, msg: 'Độ dài kí tự không được ít hơn ' + this.controlProperties.minValue.value + " kí tự" };
+                            rs = false;
+                        }
+                    }
+                }
+            } else {
+                let value = dataAtCol[rowIndex];
+                if (value == null) {
+                    value = "";
+                }
+                table.tableInstance.validateValueMap[rowIndex + "_" + colIndex] = { validate: false }
+                if (this.controlProperties.maxValue.value != "") {
+                    if (value.length > this.controlProperties.maxValue.value) {
+                        table.tableInstance.validateValueMap[rowIndex + "_" + colIndex] = { validate: true, msg: 'Độ dài kí tự không được vượt quá ' + this.controlProperties.maxValue.value + " kí tự" };
+                        rs = false;
+                    }
+                }
+                if (this.controlProperties.minValue.value != "") {
+                    if (value.length < this.controlProperties.minValue.value) {
+                        table.tableInstance.validateValueMap[rowIndex + "_" + colIndex] = { validate: true, msg: 'Độ dài kí tự không được ít hơn ' + this.controlProperties.minValue.value + " kí tự" };
+                        rs = false;
+                    }
+                }
+            }
+            table.tableInstance.tableInstance.render()
+        } else {
+            if (this.controlProperties.maxValue.value != "") {
+                this.removeValidateIcon()
+                if (this.value.length > this.controlProperties.maxValue.value) {
+                    this.renderValidateIcon('Độ dài kí tự không được vượt quá ' + this.controlProperties.maxValue.value + " kí tự");
+                    rs = false;
+
+                }
+            }
+            if (this.controlProperties.minValue.value != "") {
+                this.removeValidateIcon()
+                if (this.value.length < this.controlProperties.minValue.value) {
+                    this.renderValidateIcon('Độ dài kí tự không được ít hơn ' + this.controlProperties.minValue.value + " kí tự");
+                    rs = false;
+                }
+            }
+        }
+
+        return rs
     }
 }

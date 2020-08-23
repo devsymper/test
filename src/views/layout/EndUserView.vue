@@ -10,13 +10,13 @@
                             {{ item.title }}
                             <i class="mdi mdi-close float-right close-tab-btn" @click.stop="closeTab(idx)"></i>
                         </v-tab>
-                        <div class="d-flex justify-end " style="width:100%;margin-bottom:5px" >
-                          <Search class= "d-flex align-end mt-5" />
-                        </div>
                     </v-tabs>
                 </div>
                 <div class="float-right app-header-bg-color" style="height:40px; line-height:40px;">
-                    <v-btn icon>
+                    <div class="d-flex justify-end " style="width:100%;margin-bottom:5px" v-show="showSearchInput">
+                        <SearchInput class= "d-flex align-end mt-5" />
+                    </div>
+                    <v-btn icon @click="showSearchInput = !showSearchInput">
                         <v-icon>mdi-magnify</v-icon>
                     </v-btn>
                     <v-menu v-model="isShowDialog" :close-on-content-click="false" :max-width="500" :min-width="500" :max-height="700" offset-y>
@@ -77,6 +77,7 @@ import NotificationBar from "@/components/notification/NotificationBar.vue";
 export default {
     
     methods: {
+        
         /**
          * Xử lý các tab
          */
@@ -127,7 +128,7 @@ export default {
         "ba-sidebar": BASidebar,
         "list-app": listApp,
         "list-notification": NotificationBar,
-        Search
+        SearchInput: Search
     },
     created() {
         this.$evtBus.$on("app-receive-remote-msg", data => {
@@ -157,6 +158,7 @@ export default {
     },
     data: function () {
         return {
+            showSearchInput: false,
             isShowDialog: false,
             isShowDialogNotification: false,
         };

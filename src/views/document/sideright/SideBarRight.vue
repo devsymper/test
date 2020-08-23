@@ -34,19 +34,29 @@
                         <control-props-config  
                         @input-value-keyup="handleKeyupInput"
                         @input-value-changed="handleChangeInput" 
-                        :singleLine="true" :labelWidth="`100px`"  :allInputs="controlPropsGroup.name"/>
+                        :singleLine="true" 
+                        :labelWidth="`100px`"  
+                        :allInputs="controlPropsGroup.name"/>
                     </v-expansion-panel-content>
                 </v-expansion-panel>
                 <v-expansion-panel class="m-0" >
                     <v-expansion-panel-header class="v-expand-header">Hiển thị</v-expansion-panel-header>
                     <v-expansion-panel-content class="sym-v-expand-content">
-                        <control-props-config @input-value-changed="handleChangeInput" :singleLine="true" :labelWidth="`100px`" :allInputs="controlPropsGroup.display"/>
+                        <control-props-config 
+                        @input-value-changed="handleChangeInput" 
+                        :singleLine="true" 
+                        :labelWidth="`100px`" 
+                        :allInputs="controlPropsGroup.display"/>
                     </v-expansion-panel-content>
                 </v-expansion-panel>
                 <v-expansion-panel class="m-0" >
                     <v-expansion-panel-header class="v-expand-header">In</v-expansion-panel-header>
                     <v-expansion-panel-content class="sym-v-expand-content">
-                        <control-props-config @input-value-changed="handleChangeInput" :singleLine="true" :labelWidth="`100px`" :allInputs="controlPropsGroup.print"/>
+                        <control-props-config 
+                        @input-value-changed="handleChangeInput" 
+                        :singleLine="true" 
+                        :labelWidth="`100px`" 
+                        :allInputs="controlPropsGroup.print"/>
                     </v-expansion-panel-content>
                 </v-expansion-panel>
             </v-expansion-panels>
@@ -57,8 +67,11 @@
             class="p-2 h-100 formulas-control-tab"
         >
             <control-props-config 
+            ref="formFormulas"
             @input-blur="handleInputBlur"
-            :singleLine="false" @input-value-changed="handleChangeInput" :allInputs="sCurrentDocument.formulas"/>
+            :singleLine="false" 
+            @input-value-changed="handleChangeInput" 
+            :allInputs="sCurrentDocument.formulas"/>
         </v-tab-item>
 
         
@@ -86,8 +99,8 @@ export default {
         },
 
         controlPropsGroup(){
-            return this.sCurrentDocument.properties;
-            
+            return this.$store.state.document.editor[this.instance].currentSelectedControl.properties;
+            // return this.sCurrentDocument.properties;
         }
     },
     data () {
@@ -103,31 +116,35 @@ export default {
         
         }
     },
+    created(){
+        let thisCpn = this;
+        this.$evtBus.$on("symper-app-wrapper-clicked", evt =>{
+            if (!$(evt.target).hasClass("mdi-dock-window") && $(evt.target).closest(".symper-drag-panel").length == 0) {
+                thisCpn.hideDragPanel();
+            }
+        })
+    },
     methods:{
+        hideDragPanel(){
+            if(this.$refs.formFormulas != undefined)
+                this.$refs.formFormulas.hideDragPanel();
+        },
         handleInputBlur(inputInfo, name){
-            
-            // let dataPost = {syql:inputInfo.value,objectType:'field',objectIdentifier:this.sCurrentDocument.id}
-            // formulasApi.saveFormulas(dataPost).then(res => {
-            //     if (res.status == 200) {
-            //         inputInfo.formulasId = res.data.formulaId;  
-            //     }
-            // })
-            // .catch(err => {
-            //     thisCpn.$snotify({
-            //             type: "error",
-            //             title: "can not save document",
-            //         });
-            // })
-            // .always(() => {
-            // });
-            
+            // let value = inputInfo.value;
+            // let elements = $('#document-editor-'+this.instance+'_ifr').contents().find('#'+this.sCurrentDocument.id);
+            // let tableId = checkInTable(elements);
+            // if( tableId == this.sCurrentDocument.id)
+            // tableId = '0';
+            //  this.$store.commit(
+            //     "document/updateProp",{id:this.sCurrentDocument.id,name:name,value:value,tableId:tableId,type:"value",instance:this.instance}
+            // );   
         },
         handleKeyupInput(name, input, data){
             
         },
         handleChangeInput(name, input, data){
             let value = input.value
-            let elements = $('#editor_ifr').contents().find('#'+this.sCurrentDocument.id);
+            let elements = $('#document-editor-'+this.instance+'_ifr').contents().find('#'+this.sCurrentDocument.id);
             if(name == "width"){
                 elements.css({width:value});
             }
@@ -150,7 +167,7 @@ export default {
          * Hàm kiểm tra tên 1 control có bị trùng với các control khác hay không, nếu bị trùng thì thông báo lỗi
          */
         checkNameControl(name, input, data){
-            let elements = $('#editor_ifr').contents().find('#'+this.sCurrentDocument.id);
+            let elements = $('#document-editor-'+this.instance+'_ifr').contents().find('#'+this.sCurrentDocument.id);
             let tableId = checkInTable(elements)
             if( tableId == this.sCurrentDocument.id)
             tableId = '0';
@@ -175,7 +192,7 @@ export default {
                                 ...arr,obj.id
                             ],[]);
                             dataControl.match = listContrlIdConflic;
-                            $('#editor_ifr').contents().find('#'+this.sCurrentDocument.id).addClass('s-control-error');
+                            $('#document-editor-'+this.instance+'_ifr').contents().find('#'+this.sCurrentDocument.id).addClass('s-control-error');
                             for (let index = 0; index < controlConflic.length; index++) {
                                 let control = controlConflic[index];
                                 // console.log('sa',this.listNameValueControl[control.id]);
@@ -183,12 +200,12 @@ export default {
                                 newList.splice(newList.indexOf(control.id),1);
                                 newList.push(this.sCurrentDocument.id);
                                 this.listNameValueControl[control.id].match = newList;
-                                $('#editor_ifr').contents().find('#'+control.id).addClass('s-control-error');
+                                $('#document-editor-'+this.instance+'_ifr').contents().find('#'+control.id).addClass('s-control-error');
                             }
                             if(this.listNameValueControl.hasOwnProperty(this.sCurrentDocument.id)){
                                 for (let index = 0; index < this.listNameValueControl[this.sCurrentDocument.id].length; index++) {
                                     const element = this.listNameValueControl[this.sCurrentDocument.id][index];
-                                    $('#editor_ifr').contents().find('#'+element.id).removeClass('s-control-error')
+                                    $('#document-editor-'+this.instance+'_ifr').contents().find('#'+element.id).removeClass('s-control-error')
                                 }
                             }
                         }
@@ -199,10 +216,10 @@ export default {
                                     let control = controlOldConflic[index];
                                     this.listNameValueControl[control].match.splice(this.listNameValueControl[control].match.indexOf(this.sCurrentDocument.id),1);
                                     if(this.listNameValueControl[control].match.length == 0)
-                                    $('#editor_ifr').contents().find('#'+control).removeClass('s-control-error')
+                                    $('#document-editor-'+this.instance+'_ifr').contents().find('#'+control).removeClass('s-control-error')
                                 }
                             }
-                            $('#editor_ifr').contents().find('#'+this.sCurrentDocument.id).removeClass('s-control-error')
+                            $('#document-editor-'+this.instance+'_ifr').contents().find('#'+this.sCurrentDocument.id).removeClass('s-control-error')
                         }
                     }
                 

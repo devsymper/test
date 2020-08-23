@@ -86,7 +86,7 @@ export default {
         return{
             customFormat:'0,0[.]00',
             result:'12,345',
-            dataPattern:''
+            dataPattern:this.value
         }
     },
     mounted(){

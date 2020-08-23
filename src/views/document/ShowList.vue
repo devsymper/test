@@ -9,93 +9,46 @@
         :containerHeight="containerHeight"
         :actionPanelWidth="actionPanelWidth"
         @after-open-add-panel="addDocument"
-    >   </list-items>
-    <v-navigation-drawer 
-        v-model="drawer" 
+        :headerPrefixKeypath="'document'"
+    >
+        <div slot="right-panel-content" class="h-100">
+            <submit-view ref="submitView" :isQickSubmit="true" :action="'submit'" @submit-document-success="aftersubmitDocument" :docId="documentId"/>
+        </div>
+    </list-items>
+     <v-navigation-drawer 
+        v-model="drawerImportExelPanel" 
         absolute
         class="d-none d-sm-none d-md-flex"
         temporary
         style="height: 100vh"
         v-bind:class="[showValidate==true?'manage-timesheet-800':'manage-timesheet-500']" 
         right>
-        <v-row >
-        <v-dialog
-        v-model="dialog"
-        width="500"
-      >
-        <v-card>
-          <v-card-title style="height:50px; margin-top:-10px" class="headline grey lighten-2">
-            <span class="mb-3">Thông báo</span>
-          </v-card-title>
-        <v-card-text class="pt-6" style="height:40px">
-           <v-icon style="color:green" class="mdi mdi-check"></v-icon> Hoàn thành import
-          </v-card-text>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn
-              color="primary"
-              text
-              @click="dialog = false"
-            >
-              Thoát
-            </v-btn>
-          </v-card-actions>
-        </v-card>      </v-dialog>
-
-            <v-col class="col-md-7">
-                <ImportFile 
-                    :documentId="documentId"
-                    :deleteFileName="deleteFileName" 
-                    @setInterval='setInterval=true' 
-                    @cancel="cancel()"
-                    @closeValidate="showValidate=false"
-                    @import="importFile=i++"
-                    @fileName="getFileName" 
-                    @showValidate="showValidate=true"/>
-            </v-col>  
-            <v-col v-show="showValidate" class="col-md-5">
-                <ValidateImport 
-                    @deleteFileName="deleteFileName=true"  
-                    @cancel="cancel()" 
-                    @showNotification="showNotification()"
-                    :setInterval="setInterval"
-                    :importFile="importFile"
-                    :fileName="fileName" />
-            </v-col>
-        </v-row>
+        
+        <ImportExcelPanel @cancel="closeImportExcelPanel" :documentId="documentId" :drawerImportExelPanel="drawerImportExelPanel" />
     </v-navigation-drawer>
-
-</div>
 </template>
 <script>
 import { documentApi } from "./../../api/Document.js";
 import ListItems from "./../../components/common/ListItems.vue";
 import ActionPanel from "./../../views/users/ActionPanel.vue";
 import ChangePassPanel from "./../../views/users/ChangePass.vue";
+import Submit from './submit/Submit'
 import { util } from "./../../plugins/util.js";
 import ImportFile from "./../../components/importExcel/ImportFile";
-import ValidateImport from "./../../components/importExcel/ValidateImport";
-
+import ImportExcelPanel from "./../../components/document/ImportExelPanel";
 export default {
     components: {
         "list-items": ListItems,
+        ImportExcelPanel: ImportExcelPanel,
         "action-panel": ActionPanel,
-        ImportFile,
-        ValidateImport,
+        'submit-view':Submit
     },
     data(){
         return {
-            i:0,
-            dialog:false,
-            documentId:0,
-            importFile:false,
-            deleteFileName:false,
-            setInterval:false,
-            drawer: null,
+            drawerImportExelPanel: null,
             showValidate:false,
-            showImport:true,
-            fileName:'',
-            actionPanelWidth:800,
+            documentId:0,
+            actionPanelWidth:830,
             containerHeight: 200,
             tableContextMenu:[
                 {name:"delete",text:'Xóa',
@@ -136,10 +89,25 @@ export default {
                     },
                 },
                 {
+                    name: "cloneDoc",
+                    text: "Nhân bản",
+                    callback: (document, callback) => {
+                        this.$goToPage('/documents/'+document.id+'/clone/editor',"Nhân bản "+document.title);
+                    },
+                },
+                {
                     name: "submit",
                     text: "Nhập liệu",
                     callback: (document, callback) => {
                         this.$goToPage('/document/submit/'+document.id,document.title);
+                    },
+                },
+                {
+                    name: "quickSubmit",
+                    text: "Nhập liệu nhanh",
+                    callback: (document, callback) => {
+                        this.$refs.listDocument.openactionPanel();
+                        this.documentId = parseInt(document.id)
                     },
                 },
                 {
@@ -149,13 +117,20 @@ export default {
                         this.$goToPage('/documents/'+document.id+'/objects',"Danh sách bản ghi");
                     },
                 },
-                 {
+                {
                     name: "importExcel",
                     text: "Import excel",
                     callback: (document, callback) => {
-                        this.drawer =! this.drawer; 
+                        this.drawerImportExelPanel =! this.drawerImportExelPanel; 
                         this.documentId = Number(document.id);
                         console.log( document.id);
+                    }
+                },
+                {
+                    name: "listDraftObject",
+                    text: "Danh sách bản nháp",
+                    callback: (document, callback) => {
+                        this.$goToPage('/documents/'+document.id+'/draft-objects',"Danh sách bản nháp");
                     },
                 },
             ],
@@ -173,35 +148,19 @@ export default {
             ]
         });
     },
-    watch:{
-        drawer(val) {
-            if (val) {
-                this.$store.commit('importExcel/setNewImport', false);
-            } else {
-                this.$store.commit('importExcel/setNewImport', true);
-                this.fileName = '';
-                this.documentId = 0;
-            }
-            this.showValidate = false;
-        }
-    },
+    
     methods:{
-        showNotification(){
-            this.dialog = true;
-          
-            setTimeout(()=>this.dialog= false, 5000);
-        },
-        cancel(){
-            this.drawer = false;
-        },
-        getFileName(data){
-            this.fileName = data
+        closeImportExcelPanel(){
+            this.drawerImportExelPanel = false;
         },
         addDocument(){
             this.$router.push('/document/editor');
         },
         calcContainerHeight() {
             this.containerHeight = util.getComponentSize(this).h;
+        },
+        aftersubmitDocument(){
+            this.$refs.listDocument.closeactionPanel();
         }
     }
 }

@@ -7,9 +7,9 @@
         height="550"
         style="overflow: hidden;"
         >
-            <v-card-title class="headline">Kiểm tra control</v-card-title>
+            <v-card-title class="headline">{{heading}}</v-card-title>
             <v-card-subtitle  class="s-subtitle-control">
-                Các control có công thức liên quan đến control <span class="control-name">{{controlName}}</span>
+                {{subHeadingTitle}}<span class="control-name">{{oldContext}}</span>
             </v-card-subtitle>
             <v-card-text style="height: calc(100% - 112px);    overflow: auto;">
                 <!-- <v-list-item dense v-for="(formulas, index) in listFormulas" :key="index+formulas">
@@ -33,13 +33,12 @@
                        </v-icon>
                     </template>
                     <template v-slot:item.source="{ item }">
-                       <div>
+                       <div style="width:100px">
                            <a style="text-decoration: none;" target="_blank" :href="item.source.link">{{ item.source.documentTitle }}</a>
                        </div>
                     </template>
                     <template v-slot:item.position="{ item }">
-                       <div>
-                           
+                       <div style="width:100px">
                            <div>{{ item.position.fieldTitle }}</div>
                            <div style="    opacity: 0.5;">{{ item.position.fieldName }}</div>
                        </div>
@@ -49,9 +48,10 @@
             </v-card-text>
                 <v-divider></v-divider>
 
-            <v-card-actions>
+            <v-card-actions class="s-card-actions">
+            <s-pagination @on-change-page="getDataWithPage" @on-change-page-size="getDataWithPage" class="pagination" :total="totalRecord"/>
+
             <v-spacer></v-spacer>
-            
 
             <v-btn
                 color="green darken-1"
@@ -59,7 +59,7 @@
                 right
                 @click="checkUpdateFormulas"
             >
-                Cập nhật
+                {{$t('common.update')}}
             </v-btn>
             <v-btn
                 color="green darken-1"
@@ -67,7 +67,7 @@
                 right
                 @click="hideDialog"
             >
-                Đóng
+                {{$t('common.close')}}
             </v-btn>
             </v-card-actions>
         </v-card>
@@ -78,6 +78,7 @@
 <script>
 import {formulasApi} from './../../../api/Formulas'
 import {documentApi} from './../../../api/Document'
+import Pagination from './../../../components/common/Pagination'
 export default {
     computed:{
         sDocumentStore(){
@@ -88,49 +89,79 @@ export default {
         instance:{
             type:Number,
             default:Date.now()
-        }
+        },
+    },
+    components:{
+        's-pagination':Pagination
     },
     data(){
         return {
             isShow:false,
             listFormulas:[],
-            controlName:"",
-            newControlName:"",
+            oldContext:"",
+            newContext:"",
             headers:  [
             { text: '', value: 'icon' , width:50},
-            { text: 'Vị trí', value: 'position' },
-            { text: 'Nguồn', value: 'source' },
-            { text: 'Công thức', value: 'formulas' },
+            { text: this.$t('document.editor.dialog.nameRelated.table.position'), value: 'position' },
+            { text: this.$t('document.editor.dialog.nameRelated.table.source'), value: 'source' },
+            { text: this.$t('document.editor.dialog.nameRelated.table.formulas'), value: 'formulas' },
             ],
             dataTable: [],
-            mapIcon:{field:'mdi-file-document-outline'},
-            listFormulas:[]
+            mapIcon:{field:'mdi-flip-horizontal'},
+            listFormulas:[],
+            heading:"",
+            subHeadingTitle:"",
+            type:"",
+            totalRecord:0,
+            dataPageSize:{}
         }
     },
    
     methods:{
-        
+        setHeadingTitle(str){
+            this.heading = str;
+        },
+        setSubHeadingTitle(str){
+            this.subHeadingTitle = str;
+        },
         showDialog(){
             this.isShow = true
         },
         hideDialog(){
+            this.$emit("after-close-panel",this.type,this.newContext)
             this.isShow = false
         },
-        getDataRelated(fieldName,newFieldName){
+        getDataWithPage(data){
+            this.dataPageSize = data
+            this.getDataRelated(this.type,this.oldContext,this.newContext)
+        },
+        getDataRelated(type,fieldName="",newFieldName=""){
+            this.type = type;
             let thisCpn = this;
-            this.controlName = fieldName;
-            this.newControlName = newFieldName;
-            let dataPost = {fieldName:this.controlName,documentName:this.sDocumentStore.name.value};
+            let dataPost = {};
+            if(type == 'control'){
+                this.oldContext = fieldName;
+                this.newContext = newFieldName;
+                dataPost = {fieldName:this.oldContext,documentName:this.sDocumentStore.name.value};
+            }
+            else{
+                this.oldContext = this.sDocumentStore.name.oldName;
+                this.newContext = this.sDocumentStore.name.value;
+                dataPost = {documentName:this.sDocumentStore.name.oldName};
+            }
+            dataPost = Object.assign(this.dataPageSize,dataPost);
             formulasApi.getRelated(dataPost).then(res=>{
                 if(res.status == 200){
                     thisCpn.dataTable = []
                     let data = res.data;
                     if(data != false){
-                        thisCpn.handleData(data)
+                        thisCpn.handleData(data.data)
+                        thisCpn.totalRecord = parseInt(data.total)
                     }
                 }
             }).always(() => {}).catch({});
         },
+       
         handleData(data){
             let thisCpn = this;
             let listDocName = data.reduce((newArr,obj)=>{
@@ -145,7 +176,6 @@ export default {
                 if(res.status == 200){
                     let dataRes = res.data;
                     thisCpn.setDataTable(data,dataRes);
-                    
                 }
                 else{
                     thisCpn.setDataTable(data);
@@ -160,7 +190,6 @@ export default {
                 let curObj = dataRes.filter(c=>{
                     return c.documentname == element.context && c.fieldname == element.object_identifier;
                 })
-            
                 if(curObj.length> 0){
                     Object.assign(data[index],curObj[0])
                 }
@@ -175,30 +204,28 @@ export default {
                 this.listFormulas.push(itemFormulas);
                 this.dataTable.push(item);
             }
-            console.log(this.dataTable);
         },
         checkUpdateFormulas(){
-            console.log(this.listFormulas);
             let dataUpdate = {};
             for (let index = 0; index < this.listFormulas.length; index++) {
                 const element = this.listFormulas[index];
                 let id = Object.keys(element)[0];
                 let f = Object.values(element)[0];
                 let newFormulas = this.detectControlChangeInFormulas(f);
-                console.log(newFormulas);
                 dataUpdate['s-'+index] = [{"data":{syql:newFormulas,id:id}}]
-                
-                
             }
-            console.log(dataUpdate);
             formulasApi.updateMultiFormulas(JSON.stringify(dataUpdate)).then(res=>{
-
+                this.$snotify({
+                                type: "success",
+                                title: "Update successfull!"
+                            }); 
             }).always({}).catch({})
             
         },
+
         detectControlChangeInFormulas(formulas){
-            let regex = new RegExp("\\b(?:"+this.controlName+")\\b","gm");
-            let newFormulas = formulas.replace(regex,this.newControlName);
+            let regex = new RegExp("\\b(?:"+this.oldContext+")\\b","gm");
+            let newFormulas = formulas.replace(regex,this.newContext);
             return newFormulas;
         }
         
@@ -219,5 +246,11 @@ export default {
     }
     .headline{
         padding: 8px 0px 0px 24px !important;
+    }
+    .pagination{
+        margin-left: 12px;
+    }
+    .s-card-actions{
+        padding: 8px !important;
     }
 </style>

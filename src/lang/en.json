@@ -22,6 +22,9 @@
         "quickSearch": "Quick search",
         "list_config": "List config",
         "save": "Save",
+        "confirm": "Confirm",
+        "check": "Check",
+        "ignore": "Ignore",
         "snippets": "Snippets",
         "permissions": "Permissions",
         "actions": "Actions package",
@@ -67,14 +70,21 @@
         "manager": "Manager",
         "userRoleSetting": "User role setting",
         "clone": "Clone",
-        "actionPack": "Action pack"
+        "actionPack": "Action pack",
+        "baAccount": "BA account",
+        "updatePassword": "Update password",
+        "fullName": "Full name",
+        "email": "Email",
+        "pageSize": "Page size",
+        "pendding": "Pendding"
     },
     "validate": {
         "required": "Not be empty",
         "min_8": "Password required is greater than 8 characters",
         "max_24": "Password required for less than 24 characters",
         "email": "Invalid email",
-        "notValid": "This field is not valid"
+        "notValid": "This field is not valid",
+        "password": "Password required at least one uppercase letter and one number"
     },
     "login": {
         "title": "Login system",
@@ -177,7 +187,8 @@
             "changePassword": {
                 "title": "Change password",
                 "newPass": "New password",
-                "reNewPass": "Confirm password"
+                "reNewPass": "Confirm password",
+                "oldPassword": "Old password"
             },
             "configChange": {
                 "title": "Config change",
@@ -266,6 +277,9 @@
         }
     },
     "document": {
+        "create": "Create document",
+        "submit": "Submit document",
+        "edit": "Edit document",
         "title": "List Document",
         "table": {
             "id": "Id",
@@ -277,7 +291,30 @@
             "createAt": "Create at",
             "updateAt": "Update at",
             "userCreate": "BA Create",
-            "userUpdate": "BA update"
+            "userUpdate": "BA update",
+            "countRecord": "count record"
+        },
+        "editor": {
+            "dialog": {
+                "nameRelated": {
+                    "headingControl": "Check control name",
+                    "headingDocument": "Check document name",
+                    "subTitleControl": "Related formulas with ",
+                    "subTitleDocument": "Related formulas with ",
+                    "table": {
+                        "position": "Position",
+                        "source": "Source",
+                        "formulas": "Formulas"
+                    }
+                }
+            }
+        },
+        "submit": {
+            "fab": {
+                "submit": "Submit",
+                "draft": "Save to Draft",
+                "toggleSize": "Toggle resize page"
+            }
         },
         "process": {
             "header_bar": {
@@ -291,10 +328,42 @@
                 "validate": "Validate",
                 "save": "Save"
             }
+        },
+        "detail": {
+            "sidebar": {
+                "heading": "Information",
+                "body": {
+                    "general": {
+                        "title": "General",
+                        "dateCreate": "Date created",
+                        "userCreate": "User created",
+                        "history": "History",
+                        "comment": "Comment"
+                    },
+                    "worflowInfo": "Workflow infomation",
+                    "userRelated": {
+                        "title": "User related",
+                        "subTitle1": "User Approval",
+                        "subTitle2": "Assignee"
+                    }
+                }
+            },
+            "fab": {
+                "toggleSize": "Toggle Size",
+                "otherInfo": "Other information",
+                "print": "Print"
+            }
         }
     },
     "documentObject": {
         "title": "List Document Object"
+    },
+    "draft": {
+        "title": "List Draft Object",
+        "table": {
+            "id": "Id",
+            "createAt": "Create at"
+        }
     },
     "service": {
         "title": "List service",
@@ -313,7 +382,7 @@
     },
     "process": {
         "list": {
-            "title": "Process list",
+            "title": "Workflow list",
             "deploy_history": "Deploy history",
             "start": "Start workflow",
             "instances": "List lastest instances"
@@ -321,7 +390,7 @@
         "action": {
             "create": "Create new process"
         },
-        "taskList": "List task of ",
+        "taskList": "List task ",
         "instance": {
             "list": "List process instance",
             "name": "Process instance name",
@@ -520,7 +589,10 @@
             "title": "Create task"
         },
         "claim": "Claim",
-        "created": "Task created"
+        "created": "Task created",
+        "relatedPeople": {
+            "title": "Related people"
+        }
     },
     "orgchart": {
         "list": {
@@ -528,6 +600,12 @@
         },
         "create": {
             "title": " Create orgchart"
+        },
+        "update": {
+            "title": " Update orgchart"
+        },
+        "detail": {
+            "title": " Detail orgchart"
         },
         "editor": {
             "main": "Main",
@@ -552,5 +630,16 @@
     },
     "userRole": {
         "userHasNoRole": "You have no role to select"
+    },
+    "appTabs": {
+        "overMaxOpen": {
+            "title": "Can not create more tabs",
+            "detail": "Tabs number exceed limitation, please delete some opening tabs"
+        }
+    },
+    "dashboard": {
+        "detail": {
+            "title": "Detail dashboard "
+        }
     }
 }

@@ -85,7 +85,7 @@ export default {
                     }
                     else if(e.keyCode == 13){
                         let rowActive = thisCpn.dataTable[thisCpn.indexActive];
-                        thisCpn.handleClickRow(rowActive);
+                        thisCpn.handleClickRow(rowActive,true);
                     }
                 }
                 
@@ -94,12 +94,18 @@ export default {
         },
         hide(){
             this.isShowAutoComplete = false;
+            this.resetData();
+        },
+        resetData(){
+            this.headers = []
+            this.dataTable = []
         },
         isShow(){
             return this.isShowAutoComplete;
         },
         setData(data){
             this.showHeader();
+            if(data.headers.length > 0)
             this.headers = data.headers;
             this.dataTable = data.dataBody;
             this.indexActive = 0;
@@ -120,9 +126,13 @@ export default {
                 if(!$(e.curTarget).is('.handsontableInput')){
                     edtos = $(e.curTarget).closest('td.htAutocomplete.current.highlight').offset();
                 }
-                if($(e.curTarget).is('div.htAutocompleteArrow')){
-                    edtos = $(e.curTarget).parent().offset();;
+                if($(e.curTarget).is('div.select-cell')){
+                    edtos = $(e.curTarget).parent().offset();
                 }
+                if($(e.curTarget).is('div.select-cell .select-chervon-bottom')){
+                    edtos = $(e.curTarget).parent().parent().offset();
+                }
+                console.log(e); 
                 
                 let tbcos = $(e.curTarget).closest('.wrap-table').find('[s-control-type="table"]').offset();
                 this.positionBox = {'top':edtos.top - tbcos.top + $(e.curTarget).height() +'px','left':edtos.left - tbcos.left+'px'};
@@ -141,7 +151,7 @@ export default {
         setAliasControl(aliasControl){
             this.alias = aliasControl;
         },
-        handleClickRow(item){
+        handleClickRow(item,fromEnterKey = false){
             this.curInput.off('keydown');
             let value = ""
             if(item.hasOwnProperty(this.alias)){
@@ -150,7 +160,7 @@ export default {
             else if(item.hasOwnProperty('column1')){
                 value = item['column1'];
             }
-            this.$emit('after-select-row',{value:value,input:this.curInput});
+            this.$emit('after-select-row',{value:value,fromEnterKey:fromEnterKey});
             this.dataTable = []
             this.hide();
         },

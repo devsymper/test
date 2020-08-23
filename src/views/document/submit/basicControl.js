@@ -44,6 +44,8 @@ const fileTypes = {
 export default class BasicControl extends Control {
     constructor(idField, ele, controlProps, curParentInstance, value) {
         super(idField, ele, controlProps, curParentInstance, value);
+        this.minValue = (this.controlProperties.hasOwnProperty('minValue')) ? this.controlProperties.minValue.value : false;
+        this.maxValue = (this.controlProperties.hasOwnProperty('maxValue')) ? this.controlProperties.maxValue.value : false;
     }
 
 
@@ -161,7 +163,6 @@ export default class BasicControl extends Control {
             if (thisObj.checkAutoCompleteControl()) {
                 let fromSelect = false;
                 let formulasInstance = (fromSelect) ? thisObj.controlFormulas.formulas.instance : thisObj.controlFormulas.autocomplete.instance;
-                $(this).addClass('autocompleting')
                 e['controlName'] = thisObj.controlProperties.name.value;
                 SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-key-event', {
                     e: e,
@@ -223,6 +224,9 @@ export default class BasicControl extends Control {
 
         }
 
+    }
+    getValue() {
+        return this.value;
     }
 
     setValueControl() {
@@ -407,10 +411,11 @@ export default class BasicControl extends Control {
     renderUserControl() {
         if (this.checkDetailView()) {
             let thisObj = this;
-            userApi.getDetailUser(this.value).then(res => {
-                thisObj.value = res.data.user.displayName;
-                thisObj.ele.val(thisObj.value)
-            }).always({}).catch({})
+            if (this.value != null && this.value != "")
+                userApi.getDetailUser(this.value).then(res => {
+                    thisObj.value = res.data.user.displayName;
+                    thisObj.ele.val(thisObj.value)
+                }).always({}).catch({})
 
         } else {
             this.ele.attr('type', 'text');
@@ -428,33 +433,29 @@ export default class BasicControl extends Control {
         this.ele.text('').css({ border: 'none' })
     }
     renderSelectControl() {
-        let id = this.ele.attr('id');
-        let keyinstance = this.ele.attr('key-instance');
-        this.ele.replaceWith('<input class="s-control s-control-select" s-control-type="select" type="text" title="Select" readonly="readonly" id="' + id + '" key-instance="' + keyinstance + '">');
-        this.ele = $('#' + id);
         let thisObj = this;
+        this.ele.attr('readonly', 'readonly')
         this.ele.on('click', function(e) {
-            /**
-             * TH control select ở ngoài table
-             * reset biến chỉ ra là đang tương tác với table và cell nào
-             */
-            store.commit("document/addToDocumentSubmitStore", {
-                key: 'currentCellSelected',
-                value: null,
-                instance: thisObj.curParentInstance
-            });
-            store.commit("document/addToDocumentSubmitStore", {
-                key: 'currentTableInteractive',
-                value: null,
-                instance: thisObj.curParentInstance
-            });
-            $(this).addClass('autocompleting');
-            let formulasInstance = thisObj.controlFormulas.formulas.instance;
-            SYMPER_APP.$evtBus.$emit('document-submit-select-input', { e: e, selectFormulasInstance: formulasInstance, alias: thisObj.name, controlTitle: thisObj.title })
-        })
-        this.ele.on('change', function(e) {
-            SYMPER_APP.$evtBus.$emit('document-submit-input-change', { controlName: thisObj.controlProperties.name.value, val: $(e.target).val() })
-        })
+                /**
+                 * TH control select ở ngoài table
+                 * reset biến chỉ ra là đang tương tác với table và cell nào
+                 */
+                store.commit("document/addToDocumentSubmitStore", {
+                    key: 'currentCellSelected',
+                    value: null,
+                    instance: thisObj.curParentInstance
+                });
+                store.commit("document/addToDocumentSubmitStore", {
+                    key: 'currentTableInteractive',
+                    value: null,
+                    instance: thisObj.curParentInstance
+                });
+                let formulasInstance = thisObj.controlFormulas.list.instance;
+                SYMPER_APP.$evtBus.$emit('document-submit-select-input', { e: e, selectFormulasInstance: formulasInstance, alias: thisObj.name, controlTitle: thisObj.title })
+            })
+            // this.ele.on('change', function(e) {
+            //     SYMPER_APP.$evtBus.$emit('document-submit-input-change', { controlName: thisObj.controlProperties.name.value, val: $(e.target).val() })
+            // })
 
     }
 

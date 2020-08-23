@@ -14,6 +14,8 @@
         :placeholder="$t('common.search')"
         class="sym-small-size sym-pad-0 sym-style-input"
         :multiple="isMulti"
+        @change="handleChangeValue"
+        ref="userSelectAutocomplete"
     >
         <template v-slot:selection="data">
             <v-chip
@@ -104,7 +106,7 @@ export default {
         this.selected = this.value;
     },
     data: function() {
-        const srcs = {
+         const srcs = {
             1: 'https://cdn.vuetifyjs.com/images/lists/1.jpg',
             2: 'https://cdn.vuetifyjs.com/images/lists/2.jpg',
             3: 'https://cdn.vuetifyjs.com/images/lists/3.jpg',
@@ -146,6 +148,9 @@ export default {
                 this.$emit("change", this.selected);
                 this.$emit("input", this.selected);
             }
+        },
+        handleChangeValue(value){
+            this.$refs.userSelectAutocomplete.lazySearch= '';
         },
         getUser(id) {
             if (id == null || id == NaN) {

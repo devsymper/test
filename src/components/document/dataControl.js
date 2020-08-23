@@ -2,7 +2,6 @@ import { GetControlProps } from "./../../components/document/controlPropsFactory
 import store from './../../store'
 import sDocument from './../../store/document'
 import { util } from "./../../plugins/util.js";
-import { RowComp } from "ag-grid-community";
 
 
 /**
@@ -18,6 +17,7 @@ export const setDataForPropsControl = function(fields, instance, from) {
         let formulas = control.formulas
         let type = fields[controlId].type
         let id = fields[controlId]['properties'].id;
+        let prepareData = fields[controlId].dataPrepareSubmit;
         $.each(properties, function(k, v) {
             if (type == 'checkbox') {
                 properties[k].value = (fields[controlId]['properties'][k] == 0 || fields[controlId]['properties'][k] == '0' || fields[controlId]['properties'][k] == '') ? false : true
@@ -46,7 +46,7 @@ export const setDataForPropsControl = function(fields, instance, from) {
                 let allData = util.cloneDeep(sDocument.state.detail[instance].allData);
                 value = allData[controlName];
             }
-            addToAllControlInDoc(controlId, { id: id, properties: properties, formulas: formulas, type: type, value: value }, instance, from);
+            addToAllControlInDoc(controlId, { id: id, properties: properties, formulas: formulas, type: type, value: value, prepareData: prepareData }, instance, from);
         } else {
             let listField = fields[controlId].listFields
             let listChildField = {};
@@ -59,6 +59,7 @@ export const setDataForPropsControl = function(fields, instance, from) {
                 let childFormulas = childControl.formulas
                 let childType = listField[childFieldId].type
                 let childId = listField[childFieldId]['properties'].id
+                let childPrepareData = listField[childFieldId].dataPrepareSubmit;
                 $.each(childProperties, function(k, v) {
                     if (childType == 'checkbox') {
                         childProperties[k].value = (listField[childFieldId]['properties'][k] == 0 || listField[childFieldId]['properties'][k] == '0' || listField[childFieldId]['properties'][k] == '') ? false : true
@@ -96,17 +97,17 @@ export const setDataForPropsControl = function(fields, instance, from) {
                         }
                     }
                 }
-                listChildField[childFieldId] = { id: childId, properties: childProperties, formulas: childFormulas, type: childType }
+                listChildField[childFieldId] = { id: childId, properties: childProperties, formulas: childFormulas, type: childType, prepareData: childPrepareData }
                 i++;
             }
             colValue['childObjectId'] = childObjectId;
-            addToAllControlInDoc(controlId, { id: id, properties: properties, formulas: formulas, type: fields[controlId].type, listFields: listChildField, value: colValue }, instance, from);
+            addToAllControlInDoc(controlId, { id: id, properties: properties, formulas: formulas, type: fields[controlId].type, listFields: listChildField, value: colValue, prepareData: prepareData },
+                instance, from);
         }
     }
 }
 
 function addToAllControlInDoc(controlId, control, instance, from) {
-    console.log('asgsad', instance);
     store.commit(
         "document/addControl", { id: controlId, props: control, from: 'submit', instance: instance }
     );

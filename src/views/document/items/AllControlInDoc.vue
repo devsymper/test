@@ -23,8 +23,11 @@
                         @on-cell-change="updatePropsControl"
                         :allColumns="columns" 
                         :rowData="dataTable"
+                        :tableHeight="'calc(100% - 60px)'"
                         :customComponents="customAgComponents"
+                        :groupColumnCellEditorName="'colGroupEditor'"
                         :cellRendererParams="cellRendererParams"/>
+                        
                 </v-card-text>
                 <v-divider></v-divider>
                 <v-card-actions>
@@ -64,12 +67,13 @@
 <script>
 import AgDataTable from "./../../../components/common/agDataTable/AgDataTable.vue"
 import SymperDragPanel from "./../../../components/common/SymperDragPanel";
-import FormulaEditor from "./../../../components/common/FormulaEditor";
+import FormulaEditor from "@/components/formula/editor/FormulaEditor";
 import {getAllPropsControl,getIconFromType,getAllFormulasName} from "./../../../components/document/controlPropsFactory.js"
 import { util } from "./../../../plugins/util.js";
-
+import {checkInTable} from "@/views/document/common/common";
 import ImageRenderer from "@/components/common/agDataTable/ImageRenderer.vue";
 import CheckBoxRenderer from "@/components/common/agDataTable/CheckBoxRenderer.vue";
+import CustomTextCellEditor from "@/components/common/agDataTable/CustomTextCellEditor.vue";
 
 export default {
     components:{
@@ -82,6 +86,23 @@ export default {
             type:Number,
             default:Date.now()
         }
+    },
+    created(){
+        this.$evtBus.$on('document-editor-ag-grid-on-change-checkbox',data=>{
+            console.log("sakjdsadsad",data);
+            let controlName = data.controlName;
+            let value = data.value;
+            let controlId = this.mapNameToControlId[controlName];
+            let elements = $('#document-editor-'+this.instance+'_ifr').contents().find('#'+controlId);
+            let tableId = checkInTable(elements);
+            if(controlId == tableId){
+                tableId = 0;
+            }
+            let prop = data.prop;
+            this.$store.commit(
+                "document/updateProp",{id:controlId,name:prop,value:value,tableId:tableId,type:"value",instance:this.instance}
+            );   
+        })
     },
     computed:{
         sAllControl(){
@@ -104,9 +125,12 @@ export default {
         return{
             customAgComponents: {
                 image : ImageRenderer,
-                checkBoxRenderer : CheckBoxRenderer
+                checkBoxRenderer: CheckBoxRenderer,
+                colGroupEditor: CustomTextCellEditor
             },
-            cellRendererParams: { innerRenderer:'image' },
+            cellRendererParams: { 
+                innerRenderer:'image',
+            },
             isShow:false,
             columns:[],
             largeFormulaEditor: {
@@ -148,6 +172,7 @@ export default {
             }
         },
         updatePropsControl(params){
+            console.log("ádsadsad",params);
             let controlName = null;
             let table = '';
             let value = params.newValue;
@@ -158,15 +183,12 @@ export default {
             if(controlName == null){
                 controlName = params.node.key;
             }
-
-            
             let controlId = this.mapNameToControlId[controlName];
-            let tableId = 0;
-            if(table != ""){
-                tableId = this.mapNameToControlId[params.tableName];
-            }
+            let elements = $('#document-editor-'+this.instance+'_ifr').contents().find('#'+controlId);
+            let tableId = checkInTable(elements);
+
             this.$store.commit(
-                "document/updateProp",{id:controlId,name:params.colDef.field,value:value,tableId:tableId,type:"value"}
+                "document/updateProp",{id:controlId,name:params.colDef.field,value:value,tableId:tableId,type:"value",instance:this.instance}
             );   
             
         },
@@ -179,8 +201,6 @@ export default {
                 let formulas = allControl[id].formulas;
                 let type = allControl[id].type;
                 let row = {};
-                console.log(allControl[id]);
-                
                 for (let propType in props){
                     let value = props[propType].value;
                     if(props[propType].type == 'checkbox'){
@@ -191,12 +211,10 @@ export default {
                         row[propType] = [value];
                     }
                 }
-                if(type == "submit" || type == "reset" || type == "draft"){
+                if(type == "submit" || type == "reset" || type == "draft" || type == "approvalHistory"){
                     row['name'] = [type];
                     row['title'] = [type];
                 }
-                console.log(row);
-                
                 this.mapNameToControlId[row['name'][0]] = id;
                 row['icon'] = getIconFromType(type);
                 for (let f in formulas){

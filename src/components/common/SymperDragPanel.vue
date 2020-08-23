@@ -20,7 +20,7 @@
                     style="font-size:16px;position: relative;top: -3px;"
                 >mdi-close</v-icon>
             </div>
-            <div class="symper-drag-panel-body px-2 pb-2">
+            <div class="symper-drag-panel-body px-2 pb-2" :style="styleBody">
                 <slot name="drag-panel-content" :panelData="panelData"></slot>
             </div>
             <div ref="resizer" class="symper-drag-panel-resizer">
@@ -116,6 +116,12 @@ export default {
         titleIcon: {
             type: String,
             default: ''
+        },
+        styleBody:{
+            type:Object,
+            default(){
+                return {}
+            }
         }
     },
     
@@ -177,7 +183,6 @@ export default {
 
 .symper-drag-panel .symper-drag-panel-body {
     height: calc(100% - 30px);
-    overflow: auto;
 }
 
 .drag-panel-title {

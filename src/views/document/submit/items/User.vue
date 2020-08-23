@@ -161,7 +161,6 @@ export default {
     }
     .user-item{
         padding: 4px 8px;
-        height: 28px;
         display: flex;
         cursor: pointer;
         transition: ease-in-out 100ms;

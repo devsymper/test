@@ -66,5 +66,9 @@ export const permissionApi = {
 
     getActionPackOperations(actionPackId) {
         return actionModuleApi.get(actionPackId + '/operations');
+    },
+
+    getObjectsByObjectType(data) {
+        return operationPackApi.post('objects', data);
     }
 };

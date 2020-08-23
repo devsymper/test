@@ -19,6 +19,7 @@
                     @saved-item-data="handleSavedItem"
                     :action="actionOnItem"
                     :itemData="itemData"
+                    ref="actionPackForm"
                 ></ActionPackForm>
             </template>
         </list-items>
@@ -216,8 +217,13 @@ export default {
                             actionByObject[objectId] = util.cloneDeep(
                                 rowSchemaByObjectType[objectType]
                             );
-                            actionByObject[objectId].object =
-                                allResource[objectType][objectId].fullText;
+
+                            if(allResource[objectType][objectId]){
+                                actionByObject[objectId].object =
+                                    allResource[objectType][objectId].fullText;
+                            }else{
+                                actionByObject[objectId].object = '';
+                            }
                         }
                         actionByObject[objectId][op.action] = true;
                     }
@@ -240,6 +246,9 @@ export default {
             
             this.$set(this.currentItemData, 'mapActionAndObjects', mapActionAndObjects);
             this.$set(this.currentItemData, 'mapActionForAllObjects', mapActionForAllObjects);
+            setTimeout((self) => {
+                self.$refs.actionPackForm.handleChangeObjectType();
+            }, 200, this);
         },
         handleSavedItem() {
             this.$refs.listActionPack.refreshList();

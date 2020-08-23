@@ -18,7 +18,7 @@
 export default {
     created(){
         if(this.$route.name == 'editDocument'){
-            let checkControlItem = { text: 'Kiểm tra', icon: 'mdi-cog' ,action:'check-control'};
+            let checkControlItem = { text: 'Kiểm tra Control', icon: 'mdi-puzzle-check' ,action:'check-control'};
             this.items.splice(5,0,checkControlItem);
         }
         
@@ -26,14 +26,14 @@ export default {
     data(){
         return {
             items: [
-                { text: 'Lưu cache', icon: 'mdi-content-save' ,action:'save-to-local-storage'},
-                { text: 'From cache', icon: 'mdi-content-save' ,action:'get-from-local-storage'},
+                { text: 'Lưu cache', icon: 'mdi-wallet' ,action:'save-to-local-storage'},
+                { text: 'From cache', icon: 'mdi-cached' ,action:'get-from-local-storage'},
                 { text: 'Xóa bộ đệm', icon: 'mdi-delete-circle' ,action:'delete-cache'},
                 { text: 'Clone control', icon: 'mdi-content-copy' ,action:'clone-control'},
                 { text: 'Xóa control', icon: 'mdi-delete-forever' ,action:'delete-control'},
                
                 { text: 'TH control', icon: 'mdi-cog' ,action:'list-control-option'},
-                { text: 'Lưu doc', icon: 'mdi-file-document' ,action:'save-document'},
+                { text: 'Lưu doc', icon: 'mdi-content-save' ,action:'save-document'},
             ],
         }
     },

@@ -45,8 +45,8 @@ export const str = {
         return str;
     },
 
-    randomString(length) {
-        var randomChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    randomString(length = 6) {
+        var randomChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
         var result = '';
         for (var i = 0; i < length; i++) {
             result += randomChars.charAt(Math.floor(Math.random() * randomChars.length));

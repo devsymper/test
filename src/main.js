@@ -19,6 +19,46 @@ import uploader from 'vue-simple-uploader'
 Vue.component('ba-view', BaView);
 Vue.component('end-user-view', EndUserView);
 Vue.component('content-only-view', ContentOnlyView);
+
+Vue.mixin({
+    methods: {
+        $bindAction(actionDef, param = {}) {
+            let isValidAction = true;
+            if (actionDef && typeof actionDef == 'object') {
+                let sampleAction = {
+                    "module": "orgchart",
+                    "resource": "orgchart",
+                    "scope": "orgchart",
+                    "action": "list"
+                };
+                for (let key in sampleAction) {
+                    if (!actionDef.hasOwnProperty(key)) {
+                        isValidAction = false;
+                        console.warn("[SYMPER-BIND-ACTION-FAILED]  action definition is not valid, action definition must be a object with 4 keys: module, resource, scope, action, but receive", actionDef);
+                        break;
+                    }
+                }
+            } else {
+                isValidAction = false;
+                console.warn("[SYMPER-BIND-ACTION-FAILED]  action definition is not valid, first param expected Object, but receive: ", actionDef);
+            }
+
+            if (isValidAction) {
+                return JSON.stringify({
+                    action: actionDef,
+                    params: param ? param : {}
+                });
+            } else {
+                return JSON.stringify({
+                    action: {},
+                    params: {}
+                });
+
+            }
+        }
+    }
+})
+
 Vue.use(Notifications);
 Vue.use(VueMoment, {
     moment,
@@ -29,7 +69,7 @@ Vue.use(uploader)
  * $evtBus : component chuyên chở các sự kiện giữa tất cả các component
  */
 Vue.prototype.$evtBus = new Vue({});
-Vue.prototype.$evtBus.$on('symper-app-call-action-handeler', (action, context, extraParams) => {
+Vue.prototype.$evtBus.$on('symper-app-call-action-handler', (action, context, extraParams) => {
     if (typeof action == 'string') {
         try {
             action = JSON.parse(action);
@@ -40,6 +80,9 @@ Vue.prototype.$evtBus.$on('symper-app-call-action-handeler', (action, context, e
             action = {};
         }
     }
+    if (!action.parameter) {
+        action.parameter = {};
+    }
     action.parameter = Object.assign(action.parameter, extraParams);
     let key = action.module + '_' + action.resource + '_' + action.scope + '_' + action.action;
     if (actionMap[key]) {
@@ -49,10 +92,28 @@ Vue.prototype.$evtBus.$on('symper-app-call-action-handeler', (action, context, e
     }
 })
 
+
+function checkCanAddTag(context) {
+    let rsl = true;
+    let urlMap = context.$store.state.app.urlToTabTitleMap;
+    if (Object.keys(urlMap).length == appConfigs.maxOpenTab) {
+        rsl = false;
+        context.$snotifyWarning({}, context.$t('appTabs.overMaxOpen.title'), context.$t('appTabs.overMaxOpen.detail'));
+    }
+    return rsl;
+}
+
+
+
+
 /**
  * Di chuyển đến một trang và tạo ra tab tương ứng
  */
 Vue.prototype.$goToPage = function(url, title, pageInstanceKey = false) {
+    let canAddTab = checkCanAddTag(this);
+    if (!canAddTab) {
+        return;
+    }
     let activeTabIndex = 0;
     if (!pageInstanceKey) {
         pageInstanceKey = Date.now();
@@ -122,6 +183,10 @@ Vue.prototype.$snotifyError = function(err = {}, title = 'ERROR', detail = '', d
     console.warn(err);
     if (!detail && err.responseJSON && err.responseJSON.message) {
         detail = err.responseJSON.message;
+    }
+
+    if (!detail && err.message) {
+        detail = err.message;
     }
     let setting = {
         type: 'error',

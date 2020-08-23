@@ -22,6 +22,14 @@ export default class TableControl extends Control {
 
     }
     setData(data) {
+        if (Object.keys(data).length == 1 && Object.keys(data)[0] == 'childObjectId') {
+            this.tableInstance.tableInstance.updateSettings({
+                data: [
+                    []
+                ]
+            });
+            return
+        }
         for (let controlName in data) {
             let dataControl = data[controlName];
             let vls = [];
