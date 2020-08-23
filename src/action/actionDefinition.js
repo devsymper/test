@@ -14,17 +14,17 @@ import operation from "./operation";
 import action_pack from "./actionPack";
 
 export default {
-    document_definition,
-    document_instance,
-    workflow_definition,
-    workflow_instance,
-    orgchart,
-    account,
-    dasboard,
-    dataflow,
-    job,
-    department,
-    role,
-    operation,
-    action_pack
+	document_definition,
+	document_instance,
+	workflow_definition,
+	workflow_instance,
+	orgchart,
+	account,
+	dasboard,
+	dataflow,
+	job,
+	department,
+	role,
+	operation,
+	action_pack
 };

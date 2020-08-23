@@ -2,7 +2,7 @@
     <v-container fluid>
         <ListItems
             ref="listApp"
-            :getDataUrl="baseUrl"
+            :getDataUrl="apiUrl"
             :headerPrefixKeypath="'apps.header'"
             :pageTitle="$t('apps.title')"
             :containerHeight="tableHeight"
@@ -10,6 +10,7 @@
             :useDefaultContext="false"
             :actionPanelWidth="600"
             @after-open-add-panel="showAddModal"
+            :customAPIResult="customAPIResult"
         >
             <div slot="right-panel-content" class="h-100">
                 <updateApp
@@ -22,11 +23,16 @@
         </ListItems>
     </v-container>
 </template>
-
 <script>
 import Api from "./../../api/api.js";
 import ListItems from "../../components/common/ListItems";
 import UpdateApp from "./Update";
+import {appManagementApi} from './../../api/AppManagement.js'
+import {orgchartApi} from './../../api/orgchart';
+import {documentApi} from './../../api/Document';
+import {dashboardApi} from './../../api/dashboard';
+import BpmnEngine from './../../api/BPMNEngine';
+import Handsontable from 'handsontable';
 export default {
     name: "listApps",
     components: {
@@ -38,18 +44,88 @@ export default {
             return this.apiUrl + this.appUrl ;
         },
     },
+    created(){
+		let self = this;
+		this.$store.dispatch('actionPack/getAllActionByObjectType')
+		
+    },
     data: function() {
         return {
-            apiUrl: "https://v2hoangnd.dev.symper.vn/",
+            apiUrl: "https://core.symper.vn/application",
             appUrl: "apps",
             isEdit: false,
+            customAPIResult: {
+                reformatData(res){
+                   return{
+                         listObject: res.data.listObject,
+                         columns: [
+                                {name: "id", title: "id", 	type: "text", },
+                                {name: "name", title: "name", type: "text"},
+                                {name: "iconName", title: "icon", type: "text",
+                                    renderer:  function(instance, td, row, col, prop, value, cellProperties) {
+										Handsontable.dom.empty(td);
+										if(value === null || value == ""){
+											return td;
+										}
+										if(value.includes("mdi-")){
+											let icon;
+											icon = document.createElement('i');	
+											icon.classList.add('mdi');
+											icon.classList.add(value);
+											// icon.style.lineHeight = "20px";
+											$(icon).css('font-size','16px')
+											td.appendChild(icon);
+                                       		 return td;
+										}else{
+											let img;
+											img = document.createElement('img');
+											$(img).attr('src',value)
+											$(img).css('width','40px')
+											$(img).css('height','40px')
+											td.appendChild(img)
+											return td;
+										}
+										
+									},
+								},
+								{name: "status", title: "status", type: "text",
+									renderer:  function(instance, td, row, col, prop, value, cellProperties) {
+										let icon;
+										Handsontable.dom.empty(td);
+										if(value === "1"){
+											icon = document.createElement('i');
+											icon.classList.add('mdi');
+											icon.classList.add('mdi-check');
+											$(icon).css('color','green')
+											$(icon).css('font-size','16px')
+											// icon.style.lineHeight = "15px";
+											td.appendChild(icon);
+											return td;
+										}
+									},
+								},
+                                {name: "createdAt", title: "created_at", type: "text"},
+                                {name: "updatedAt", title: "updated_at", type: "text"},
+                         ],
+                   }
+                }
+            },
             tableContextMenu: [
                {
                     name: "edit",
                     text: this.$t("apps.contextMenu.edit"),
                     callback: (app, callback) => {
                         this.editCallback = callback;
-                        this.showEditAppPanel(app);
+                        appManagementApi.getAppDetails(app.id).then(res => {
+                        if (res.status == 200) {
+							 this.checkChildrenApp(res.data.listObject.childrenApp)
+                             this.showEditAppPanel(res.data.listObject)   
+                        }else {
+                            this.showError()
+                        }
+                         }).catch((err) => {
+                                this.showError()
+                        });
                     },
                 },
                 {
@@ -61,7 +137,17 @@ export default {
                     },
                 },
             ],
-            tableHeight: 0,
+			tableHeight: 0,
+			arrType:{
+				document:[
+				],
+				orgchart:[
+				],
+				report:[
+				],
+				workflow:[
+				]
+			},
         };
     },
     mounted() {
@@ -80,7 +166,8 @@ export default {
                 note: "",
                 icon: "",
                 status: false
-            });
+			});
+			this.$store.commit('appConfig/emptyItemSelected')
         },
         closeSidebar() {
             this.$refs.listApp.actionPanel = false;
@@ -93,12 +180,10 @@ export default {
             })
         },
         deleteApp(app) {
-            let req = new Api(this.apiUrl);
-            req.delete(this.appUrl + "/" + app.id)
+            appManagementApi.deleteApp(app[0].id)
             .then(res => {
                 if (res.status == 200) {
-                    // callback here
-                    this.removeCallback(res);
+                    this.removeCallback(res);   
                     this.$snotify({
                         type: 'success',
                         title: this.$t('notification.successTitle'),
@@ -113,7 +198,6 @@ export default {
         },
         addApp(res) {
             if (res.status == 200) {
-                // callback come here
                 this.$refs.listApp.getData();
                 this.closeSidebar();
                 this.$snotify({
@@ -127,7 +211,6 @@ export default {
         },
         updateApp(res) {
             if (res.status == 200) {
-                // callback come here
                 this.editCallback({
                     ...res,
                     data: {
@@ -143,7 +226,107 @@ export default {
             } else {
                 this.showError()
             }
-        }
+		},
+		checkChildrenApp(data){
+			let self = this
+			console.log(self.arrType);
+			if(data.hasOwnProperty('orgchart')){
+				data.orgchart.forEach(function(e){
+					self.arrType.orgchart.push(e.id)
+				});
+			}
+			if(data.hasOwnProperty('document')){
+				data.document.forEach(function(e){
+					self.arrType.document.push(e.id)
+				});
+			}
+			if(data.hasOwnProperty('report')){
+				data.report.forEach(function(e){
+					self.arrType.report.push(e.id)
+				});
+			}
+			if(data.hasOwnProperty('workflow')){
+				data.workflow.forEach(function(e){
+					self.arrType.workflow.push(e.id)
+				});
+			}
+			if(self.arrType.orgchart.length > 0){
+				let dataOrg = self.arrType.orgchart;
+				orgchartApi.getOrgchartList({
+								search:'',
+								pageSize:50,
+								filter: [
+								{
+									column: 'id',
+									valueFilter: {
+										operation: 'IN',
+										values: dataOrg						
+									}
+								}
+				]}).then(resOrg => {
+					console.log(resOrg.data.listObject);
+					this.$store.commit('appConfig/updateChildrenApps',{obj:resOrg.data.listObject,type:'orgcharts'});
+				});
+			}
+			if(self.arrType.document.length > 0){
+						let dataDoc = self.arrType.document;
+						documentApi.searchListDocuments(
+							{
+								search:'',
+								pageSize:50,
+								filter: [
+								{
+									column: 'id',
+									valueFilter: {
+										operation: 'IN',
+										values: dataDoc						
+									}
+								}
+								]
+							}
+						).then(resDoc => {
+							this.$store.commit('appConfig/updateChildrenApps',{obj:resDoc.data.listObject,type:'documents'});
+						});
+			}
+			if(self.arrType.workflow.length > 0){
+						let dataW = self.arrType.workflow;
+						BpmnEngine.getListModels({
+										search:'',
+										pageSize:50,
+										filter: [
+										{
+											column: 'id',
+											valueFilter: {
+												operation: 'IN',
+												values: dataW						
+											}
+										}
+						]}).then(resW => {
+							this.$store.commit('appConfig/updateChildrenApps',{obj:resW.data.listObject,type:'workflows'});
+						});
+			}
+			if(self.arrType.report.length > 0){
+				let dataRep = self.arrType.report;
+				dashboardApi.getDashboards({
+								search:'',
+								pageSize:50,
+								filter: [
+								{
+									column: 'id',
+									valueFilter: {
+										operation: 'IN',
+										values: dataRep						
+									}
+								}
+				]}).then(resRp => {
+					this.$store.commit('appConfig/updateChildrenApps',{obj:resRp.data.listObject,type:'reports'});
+				});
+			}
+			self.arrType.orgchart = []
+			self.arrType.document = []
+			self.arrType.workflow = []
+			self.arrType.report = []
+		}
     },
 };
 </script>

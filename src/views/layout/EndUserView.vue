@@ -32,12 +32,12 @@
                         class="float-right app-header-bg-color"
                         style="height:40px; line-height:40px;"
                     >
-                        <v-menu
+                       <v-menu
                             v-model="isShowDialog"
                             :close-on-content-click="false"
                             :max-width="500"
-                            :min-width="500"
                             :max-height="700"
+       				   	    :nudge-width="370"
                             offset-y
                             >
                             <template v-slot:activator="{ on }">
@@ -45,20 +45,8 @@
                                     <v-icon>mdi-apps</v-icon>
                                 </v-btn>
                             </template>
-                            <v-card>
-                                <v-app-bar dense flat color="white">
-                                    <v-toolbar-title>
-                                        <v-icon>mdi-apps</v-icon>
-                                        {{$t('common.navigator')}}
-                                    </v-toolbar-title>
-                                    <v-spacer></v-spacer>
-                                    <v-btn icon>
-                                        <v-icon @click="isShowDialog = false">mdi-close</v-icon>
-                                    </v-btn>
-                                </v-app-bar>
-                                <v-divider></v-divider>
-                                <list-app></list-app>
-                            </v-card>
+                            <EndUserPopup  />
+							<!-- <div>hello</div> -->
                         </v-menu>
                         <v-btn icon>
                             <v-icon>mdi-magnify</v-icon>
@@ -106,6 +94,8 @@ import { appConfigs } from '../../configs';
 import BASidebar from "@/components/common/BASidebar.vue";
 import listApp from "@/components/common/listApp";
 import NotificationBar from "@/components/notification/NotificationBar.vue";
+import EndUserPopup from './../apps/EndUserPopup.vue';
+import UploadFile from "@/components/common/UploadFile.vue"
 export default {
     methods: {
         /**
@@ -145,18 +135,22 @@ export default {
             let req = new Api(appConfigs.apiDomain.nofitication);
             req.get("/notifications/count-unread")
             .then(res => {
-                console.log(res);
                 if (res.status == 200) {
                     this.$store.state.app.unreadNotification = res.data;
                 }
             });
-        }
+		},
+		logItem(data){
+			console.log(data);
+		}
         
     },
     components: {
         "ba-sidebar": BASidebar,
         "list-app": listApp,
-        "list-notification": NotificationBar
+		"list-notification": NotificationBar,
+		EndUserPopup,
+		UploadFile
     },
     created() {
         this.$evtBus.$on("app-receive-remote-msg", data => {
