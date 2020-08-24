@@ -1,24 +1,24 @@
 <template>
 	<div class="content-comment">
-		<div :v-if="attackments.images.length > 0" class="content-comment-img">
-			<div  class="commnet-img-item" v-for="(item,i) in attackments.images" :key="i">
+		<div :v-if="attackmentsRender.images.length > 0" class="content-comment-img">
+			<div  class="commnet-img-item" v-for="(item,i) in attackmentsRender.images" :key="i">
 				<v-img
-           			 :src="item.src"
+           			 src="https://taiwebs.com/upload/images/Img-Converter-2018.png"
          		>
-				 <v-icon  v-if="isEditting == true" class="icon-remove-img"  @click="removeImage(item)">mdi-close-circle-outline</v-icon>
+				 <v-icon  v-if="isEditing == true" class="icon-remove-img"  @click="removeImage(item)">mdi-close-circle-outline</v-icon>
 				</v-img> 
 			</div>
 		</div>	
-		<div :v-if="attackments.files.length > 0" class="content-comment-file">
-			<div class="commnet-file-item" v-for="(item,i) in attackments.files" :key="i">
+		<div :v-if="attackmentsRender.files.length > 0" class="content-comment-file">
+			<div class="commnet-file-item" v-for="(item,i) in attackmentsRender.files" :key="i">
 				<v-icon>{{icon[item.type]}}</v-icon>
 				<span class="file-item-title">{{item.name}}</span>
-				<v-icon class="icon-remove-file" v-if="isEditting == true" @click="removeFile(item)">mdi-close-circle-outline</v-icon>
+				<v-icon class="icon-remove-file" v-if="isEditing == true" @click="removeFile(item)">mdi-close-circle-outline</v-icon>
 			</div>	
 		</div>
 		<div class="content-comment-input">
-			<span v-if="isEditting == false" >
-			<span style="color:black">Đào Mạnh Khá</span> Lorem issum Lorem issum Lorem issum Lorem issum
+			<span v-if="isEditing == false" >
+			<span>{{item.content}}</span>
 			</span>
 			 <!-- <v-text-field
 				v-else
@@ -42,7 +42,7 @@
 					<textarea v-model="inputComment" class="text-area">
 					</textarea>
 				</Mentionable>
-				<v-icon>mdi-attachment</v-icon>
+				<UploadFile @uploaded-file="uploadInfo"/>
 				<v-icon @click="addComment">mdi-send-circle-outline</v-icon>
 			</div>
 		</div>
@@ -53,9 +53,10 @@
 import MenuTagUser from './MenuTagUser.vue'
 import { Mentionable } from 'vue-mention'
 import At from 'vue-at'
+import UploadFile from '@/components/common/UploadFile.vue'
 export default {
 	props:{
-		isEditting:{
+		isEditing:{
 			type: Boolean,
 			default: false
 		},
@@ -66,13 +67,14 @@ export default {
 	components:{
 		MenuTagUser,
 		Mentionable,
+		UploadFile
 	},
 	methods:{
 		removeFile(item){
-			this.attackments.files.splice(this.attackments.files.indexOf(item),1)
+			this.attackmentsRender.files.splice(this.attackmentsRender.files.indexOf(item),1)
 		},
 		removeImage(item){
-			this.attackments.images.splice(this.attackments.images.indexOf(item),1)
+			this.attackmentsRender.images.splice(this.attackmentsRender.images.indexOf(item),1)
 		},
 		tagUser(event){
 			let $target = $(event.target);
@@ -88,45 +90,45 @@ export default {
 		addComment(){
 			delete this.item.attackments;
 			this.item.attackments = this.attackments
-			this.item.isEditting = false;
+			this.item.isEditing = false;
 			console.log(this.item);
+		},
+		uploadInfo(data){
+			// if(typeof(data) == Object){
+			// 	this.attackments.push(data);
+			// 	if(data.type == 'png' || data.type == 'jqeg' || data.type == 'jgp'){
+			// 		console.log('file anh');
+			// 	}else{
+			// 		console.log('file doc');
+			// 	}
+			// }else{
+			// 	alert(data);
+			// }
+			if(typeof data === 'string'){
+				alert(data)
+			}else{
+				if(data.type == 'jpg' || data.type == 'png' || data.type == 'jpeg'){
+					this.attackmentsRender.images.push(data)
+				}else{
+					this.attackmentsRender.files.push(data)
+				}
+			}
 		}
-	
+	},
+	computed:{
+		sEnduser(){
+			return this.$store.state.app.endUserInfo
+		}
 	},
 	data() {
 		return {
 			inputComment: '',
 			keyWord: '',
-			attackments:{
+			attackments:[],
+			attackmentsRender:{
 				images:[
-					{
-						id: 1,
-						src: 'https://cdn.iconscout.com/icon/free/png-256/facebook-social-media-fb-logo-square-44659.png'
-					},
-					{
-						id: 2,
-						src: 'https://upload.wikimedia.org/wikipedia/commons/f/f0/Icon-notepad.svg'
-					},
-					{
-						id: 3,
-						src: 'https://cdn.iconscout.com/icon/free/png-256/facebook-social-media-fb-logo-square-44659.png'
-					},
-					{
-						id: 4,
-						src: 'https://upload.wikimedia.org/wikipedia/commons/f/f0/Icon-notepad.svg'
-					},
 				],
 				files:[
-					{
-						id: 1,
-						name: 'Quản lí thu chi',
-						type:'xlxs'
-					},
-					{
-						id: 1,
-						name: 'Quản lí thu chi nữa nè',
-						type:'docx'
-					},
 				],
 			},
 			icon:{
@@ -135,19 +137,18 @@ export default {
 				docx: 'mdi-file-word-box',
 				doc: 'mdi-file-word-box',
 				pdf: 'mdi-file-pdf-box',
+				default: 'mdi-file'
 			},
 			itemsTag:[
 				{
-				value: 'cat',
-				label: 'Mr Cat',
+					value: 'cat',
+					label: 'Mr Cat',
 				},
 				{
-				value: 'dog',
-				label: 'Mr Dog',
+					value: 'dog',
+					label: 'Mr Dog',
 				},
 			],
-			 members: ['Roxie Miles', 'grace.carroll', '小浩']
-
 		}
 	},
 	watch:{
@@ -155,7 +156,6 @@ export default {
 			if(val.includes('@')){
 				this.keyWord = val.slice(val.indexOf('@')+1)
 			}
-			
 		}
 	}
 }	
@@ -166,7 +166,6 @@ export default {
 	display:flex;
 	flex-direction: column;
 	width: 330px;
-	
 }
 .content-comment >>> .v-icon{
 	font-size:13px;	

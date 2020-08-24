@@ -142,7 +142,6 @@ export default {
 			this.heightComment = "1000px"
 			this.idItem = 1721
 			this.objType = 'document'
-			debugger
 			this.contentTargetArea = ''
 		},
 		clickArea(event){
@@ -220,8 +219,6 @@ export default {
     }
 };
 </script>
-
-
 <style>
 .app-header-bg-color,.app-header-bg-color .v-item-group {
     background-color: white!important;

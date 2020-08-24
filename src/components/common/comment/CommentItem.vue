@@ -8,16 +8,16 @@
 					style="width:30px;height:30px;margin-top: -10px;margin-right: -8px;"
 					>
 				</v-avatar>
-				
 			<div class="comment-item-content">
 				<div style="display:flex">
 						<span style="color:#262626;width:330px">Đào Mạnh Khá</span> <br>
 						<v-btn class="icon-check" icon><v-icon >mdi-check</v-icon></v-btn>
 				</div>
 				<div style="display:flex">
-					<InputComment :isEditting="item.isEditting" :item="item" />
+					<InputComment :isEditing="item.isEditing" :item="item" />
 					<v-menu bottom left class="icon-menu">
-						<template v-slot:activator="{ on, attrs }">
+						<template  v-slot:activator="{ on, attrs }">
+							<!-- v-if="sEnduser == item.id" -->
 							<v-btn
 							icon
 							v-bind="attrs"
@@ -42,7 +42,7 @@
 				</div>
 				<div style="display:flex;font-size:11px"> 
 					<span class="btn-reply-comment">Trả lời </span>
-					<span style="padding-left:8px">{{item.updatedAt}}</span>
+					<span style="padding-left:8px">{{lassSeen(item.updatedAt)}}</span>
 				</div>
 			</div>
 		</div>
@@ -59,6 +59,8 @@
 <script>
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import InputComment from "./InputComment.vue"
+import moment from 'moment';
+import {commentApi} from '@/api/Comment.js'
 export default {
 	name: 'commentItem',
 	props:{
@@ -68,23 +70,33 @@ export default {
 	},
 	methods:{
 		editComment(item){
-			console.log(item);
-			item.isEditting = true
+			item.isEditing = true
 		},
 		deleteComment(item){
+			commentApi.deleteComment(item.id).then(res => {
+            });
 			this.listComment.splice(this.listComment.indexOf(item),1)
 		},
 		addComment(data){
 			console.log(data);
+		},
+		lassSeen(date){
+			return moment(date).fromNow();
 		}
 	},
 	components: {
 		VuePerfectScrollbar,
-		InputComment
+		InputComment,
+		moment
 	},
 	data() {
 		return {
 			listCommentHeight:'500px',
+		}
+	},
+	computed:{
+		sEnduser(){
+			return this.$store.state.app.endUserInfo.id
 		}
 	}
 }	
@@ -126,12 +138,12 @@ export default {
 .commnent-item>>>  .icon-check{
 	color: green;
 }
-.commnent-item>>> .comment-item-content{
+.commnent-item >>> .comment-item-content{
 	display: flex;
 	flex-direction: column;
 	margin-left: 8px;
 }
-.list-comment >>> .comment-item-content .btn-reply-comment:hover{ 
+.commnent-item >>> .comment-item-content .btn-reply-comment:hover{ 
 	cursor: pointer;
 	color: blue;
 	border-bottom: 1px solid blue;

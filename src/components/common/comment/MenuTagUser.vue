@@ -54,7 +54,6 @@
 				]
 			}
 			else{
-				// console.log(this.keyWord)
 			}
 		}
 	},

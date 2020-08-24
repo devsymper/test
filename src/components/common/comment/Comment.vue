@@ -23,7 +23,7 @@
 					align-with-title
 				>
 					<v-tabs-slider color="yellow"></v-tabs-slider>
-					<v-tab v-for="item in itemsTab" :key="item.value">
+					<v-tab v-for="item in itemsTab" :key="item.value" @click="clickTab(item.value)">
 						<span > {{ item.title }} </span> <v-icon style='padding-left:4px'>{{item.icon}}</v-icon>
 					</v-tab>
 				</v-tabs>
@@ -46,7 +46,7 @@
 				:key="item.value"
 				>
 				<v-card flat>
-					<list-comment :listComment="listComment" />
+					<list-comment :listComment="listComment"/>
 				</v-card>
 				</v-tab-item>
 				 <div class="input-comment">
@@ -54,8 +54,10 @@
 						<img
 						src="https://cdn.vuetifyjs.com/images/john.jpg"
 						alt="John"
+						style="width:30px;height:30px;margin-top: -10px;margin-right: -8px;"
 						>
 					</v-avatar>
+					<InputComment :isEditing="true" />
 				 </div>
 			</v-tabs-items>
 			</v-card>
@@ -76,17 +78,13 @@ export default {
 		InputComment
 	},
 	created(){
-		commentApi.getCommentById(this.objType,this.objId).then(res => {
-				console.log(res);
-				this.listComment = res.data.listObject.comments
-		});
+		this.getCommentById()
 	},
 	computed:{
-
 	},
 	mounted(){
 		// commentApi.getCommentById(this.objType,this.objId).then(res => {
-        //         console.log(res);
+		// 		this.listComment = res.data.listObject.comments
 		// });
 	},
 	 data() {
@@ -97,6 +95,8 @@ export default {
 			showMagnity:true,
 			showTargetArea:false,
 			listComment: [],
+			resolveComment:[],
+			comment:[],
 			itemsTab: [
 				{
 					title:'Comment',
@@ -148,6 +148,16 @@ export default {
 		}
 	},
 	methods:{
+		getCommentById(){
+			commentApi.getCommentById(this.objType,this.objId).then(res => {
+			this.listComment = res.data.listObject.comments
+			// this.comment = res.data.listObject.comments
+			// this.resolveComment = res.data.listObject.resolve
+			});
+		},
+		getCommentByUuid(){
+			
+		},
 		clickSearch(){
       		this.showInput = true
   		},
@@ -159,8 +169,20 @@ export default {
 		},
 		tagUser(event){
 			console.log(event);
+		},
+		clickTab(item){
+			// if(item == 'comment'){
+			// 	console.log('comment');
+			// 	this.listComment = this.comment
+				
+			// }else{
+			// 	console.log('resolve');
+			// 	this.listComment = this.resolveComment
+			// }
+			console.log(item);
 		}
-	}
+	},
+	
 }
 </script>
 
