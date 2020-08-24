@@ -168,7 +168,7 @@ const routes = [{
             import ('../views/document/Editor.vue'),
     },
     {
-        path: "/document/editor/:id?",
+        path: "/documents/:id?/editor/edit",
         name: "editDocument",
         // component: Editor,
         component: () =>
@@ -176,7 +176,15 @@ const routes = [{
 
     },
     {
-        path: "/documents/:id?/clone/editor",
+        path: "/documents/:id?/editor/print-config",
+        name: "printConfigDocument",
+        // component: Editor,
+        component: () =>
+            import ('../views/document/Editor.vue'),
+
+    },
+    {
+        path: "/documents/:id?/editor/clone",
         name: "cloneDocument",
         // component: Editor,
         component: () =>
@@ -184,7 +192,7 @@ const routes = [{
 
     },
     {
-        path: "/document/submit/:id?",
+        path: "/documents/:id?/submit",
         name: "submitDocument",
         // component: SubmitDocument,
         component: () =>
