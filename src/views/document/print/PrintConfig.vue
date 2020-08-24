@@ -442,21 +442,8 @@ export default {
         },
         // mở modal lưu , edit doc
         openPanelSaveDocument(){
-            if($('#document-editor-'+this.keyInstance+'_ifr').contents().find('.s-control').length > 0){
-                let allControl = this.editorStore.allControl;
-                this.checkEmptyControl(allControl,'0');
-                if($('#document-editor-'+this.keyInstance+'_ifr').contents().find('.s-control-error').length == 0){
-                    if(this.documentId == undefined || this.documentId == 0)
-                    this.setDocumentProperties({})
-                    this.$refs.saveDocPanel.showDialog()
-                }
-                else{
-                    this.$snotify({
-                                    type: "error",
-                                    title: "Tên một số control chưa hợp lệ",
-                                });
-                }
-            }
+            this.setDocumentProperties({})
+            this.$refs.saveDocPanel.showDialog()
         },
         checkEmptyControl(allControl,tableId){
             for(let controlId in allControl){

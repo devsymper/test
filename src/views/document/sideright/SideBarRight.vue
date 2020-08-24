@@ -171,7 +171,6 @@ export default {
             }
         },
         savePrintControlConfig(name, input, data){
-            console.log(name,input,data);
             let elements = $('#document-editor-'+this.instance+'_ifr').contents().find('#'+this.sCurrentDocument.id);
             if(name == "formulas"){
                 elements.attr('formulas',data);

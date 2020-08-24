@@ -325,7 +325,7 @@ const controlTypes = {
     labelPrint: {
         icon: `/icon/ic_label.png`,
         html: `<span class="s-control s-control-label" contenteditable="false" s-control-type="label"  title="Label">Aa</span>&nbsp;`,
-        title: "Label",
+        title: "Label in",
         inProps: ['width', 'color', 'fontSize'],
         formulas: ['formulas']
     },

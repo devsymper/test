@@ -32,13 +32,21 @@ export default {
             listUser:null,
             listAllUser:null,
             element:null,
-            indexActive:-1
+            indexActive:-1,
+            isComponentActive:false,
         }
+    },
+    activated() {
+        this.isComponentActive = true;
+    },
+    deactivated() {
+        this.isComponentActive = false;
     },
     created(){
         
         let thisCpn = this;
         this.$evtBus.$on('document-submit-user-input-change',e=>{
+            if(thisCpn.isComponentActive == false) return;
             if( thisCpn.isShow == false){
                 thisCpn.show();
                 thisCpn.calculatorPositionBox(e);
@@ -97,8 +105,9 @@ export default {
     methods:{
         filterUser(val){
             let list = this.listAllUser.filter(user=>{
-                return user.displayName.toLowerCase().includes(val) || user.id == val
+                return user.displayName.toLowerCase().includes(val.toLowerCase()) || user.id == val
             })
+            
             this.listUser = list;
             
         },

@@ -156,10 +156,29 @@ export default class BasicControl extends Control {
                 }
             }
         })
+        this.ele.on('keydown', function(e) {
+            if (thisObj.type == 'number') {
+                console.log(e.key);
+
+                if (['ArrowRight', 'ArrowLeft', 'Tab'].includes(e.key)) {
+                    return;
+                }
+                if (!/\d/.test(e.key)) {
+                    e.preventDefault();
+                    e.stopPropagation()
+                }
+            }
+        })
         this.ele.on('keyup', function(e) {
             if (thisObj.type == 'user') {
                 SYMPER_APP.$evtBus.$emit('document-submit-user-input-change', e)
             }
+            if (thisObj.type == 'percent') {
+                if (e.target.value > 100) {
+                    $(e.target).val(100)
+                }
+            }
+
             if (thisObj.checkAutoCompleteControl()) {
                 let fromSelect = false;
                 let formulasInstance = (fromSelect) ? thisObj.controlFormulas.formulas.instance : thisObj.controlFormulas.autocomplete.instance;
@@ -392,10 +411,14 @@ export default class BasicControl extends Control {
         this.ele.attr('type', 'text');
         this.numberFormat = (this.controlProperties.hasOwnProperty('formatNumber')) ? this.controlProperties.formatNumber.value : "";
         this.ele.on('blur', function(e) {
-            $(this).val(numbro($(this).val()).format(thisObj.numberFormat))
+            if (/\d/.test($(this).val())) {
+                $(this).val(numbro($(this).val()).format(thisObj.numberFormat))
+            }
         })
         this.ele.on('focus', function(e) {
-            $(this).val(numbro($(this).val()).format('0'))
+            if (/\d/.test($(this).val())) {
+                $(this).val(numbro($(this).val()).format('0'))
+            }
         })
     }
 
@@ -493,17 +516,6 @@ export default class BasicControl extends Control {
             return '';
         }
     }
-    addAutoCompleteEvent(fromSelect = false) {
-        let thisObj = this;
-        this.ele.on('input', function(e) {
-
-        })
-        this.ele.on('keyup', function(e) {
-
-        })
-
-    }
-
 
     // hàm kiểm tra control này có thuộc tính require hay không
     isRequiredControl() {

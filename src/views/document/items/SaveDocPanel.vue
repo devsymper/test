@@ -2,13 +2,12 @@
     
     <div>
         <v-dialog
+        scrollable
         v-model="isShowModelSaveDoc"
         width="800"
         content-class="s-dialog"
         >
-        <v-card
-        height="575"
-        >
+        <v-card>
             <div class="note-name-change" v-show="showNoteChangeName">
                 <span>{{$t('document.editor.dialog.saveDoc.checkNameRelated')}}</span>
                 <div class="buble-direction">
