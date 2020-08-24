@@ -93,10 +93,10 @@
 						:heightComment="heightComment" 
 						:top="top" 
 						:left="left"
-						:objId="idItem"
+						:objectIdentifier="idItem"
 						:uuid="uuidArea"
-						:contentTargetArea="contentTargetArea"
-						:objType="objType"
+						:targetArea="contentTargetArea"
+						:objectType="objType"
 					/>
                 </v-layout>
             </v-container>
@@ -143,12 +143,14 @@ export default {
 			this.idItem = 1721
 			this.objType = 'document'
 			this.contentTargetArea = ''
+			this.uuidArea = "0"
 		},
 		clickArea(event){
 			console.log(event);
 			this.showComment = !this.showComment;
 			this.heightComment ='100px'
 			this.contentTargetArea = '<span>ahihihi</span>'
+			this.uuidArea = 'asdasdasdasd'
 		},
         closeTab(idx){            
             let urlKey = Object.keys(this.$store.state.app.urlToTabTitleMap)[idx];
@@ -212,9 +214,10 @@ export default {
 			top: null,
 			left:null,
 			idItem:null,
-			uuidArea:null,
+			uuidArea:'0',
 			contentTargetArea:'',
 			objType:'',
+			commentTarget:{}
         };
     }
 };

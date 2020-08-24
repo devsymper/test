@@ -37,7 +37,8 @@ export const appConfigs = {
 		actionPacks: "https://accesscontrol.symper.vn/action_packs",
 		operations: "https://accesscontrol.symper.vn/operations",
 		baAccount: "https://account.symper.vn/supporters",
-		commnent: "https://comment-service.symper.vn"
+		commnent: "https://comment-service.symper.vn",
+		fileManagement: 'https://file.symper.vn/'
 	},
 	notificationTimeout: {
 		success: 10000,

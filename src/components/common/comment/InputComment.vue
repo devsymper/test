@@ -1,7 +1,7 @@
 <template>
 	<div class="content-comment">
-		<div :v-if="attackmentsRender.images.length > 0" class="content-comment-img">
-			<div  class="commnet-img-item" v-for="(item,i) in attackmentsRender.images" :key="i">
+		<div :v-if="images.length > 0" class="content-comment-img">
+			<div  class="commnet-img-item" v-for="(item,i) in images" :key="i">
 				<v-img
            			 src="https://taiwebs.com/upload/images/Img-Converter-2018.png"
          		>
@@ -9,8 +9,8 @@
 				</v-img> 
 			</div>
 		</div>	
-		<div :v-if="attackmentsRender.files.length > 0" class="content-comment-file">
-			<div class="commnet-file-item" v-for="(item,i) in attackmentsRender.files" :key="i">
+		<div :v-if="files.length > 0" class="content-comment-file">
+			<div class="commnet-file-item" v-for="(item,i) in files" :key="i">
 				<v-icon>{{icon[item.type]}}</v-icon>
 				<span class="file-item-title">{{item.name}}</span>
 				<v-icon class="icon-remove-file" v-if="isEditing == true" @click="removeFile(item)">mdi-close-circle-outline</v-icon>
@@ -53,7 +53,8 @@
 import MenuTagUser from './MenuTagUser.vue'
 import { Mentionable } from 'vue-mention'
 import At from 'vue-at'
-import UploadFile from '@/components/common/UploadFile.vue'
+import UploadFile from '@/components/common/UploadFile.vue';
+import {commentApi} from '@/api/Comment.js'
 export default {
 	props:{
 		isEditing:{
@@ -63,11 +64,19 @@ export default {
 		item:{
 			type: Object
 		},
+		images:{
+			type: Array,
+		},
+		files:{
+			type: Array,
+		},
 	},
 	components:{
 		MenuTagUser,
 		Mentionable,
 		UploadFile
+	},
+	created(){
 	},
 	methods:{
 		removeFile(item){
@@ -88,25 +97,20 @@ export default {
 			this.inputComment = res
 		},
 		addComment(){
-			delete this.item.attackments;
-			this.item.attackments = this.attackments
+			this.dataPostComment = this.sComment
+			this.dataPostComment.content = this.inputComment
+			this.dataPostComment.attackments = this.attackments
+			let data = JSON.stringify(this.dataPostComment)
+			commentApi.addComment(data).then(res => {
+				console.log(res);
+            });
 			this.item.isEditing = false;
-			console.log(this.item);
 		},
 		uploadInfo(data){
-			// if(typeof(data) == Object){
-			// 	this.attackments.push(data);
-			// 	if(data.type == 'png' || data.type == 'jqeg' || data.type == 'jgp'){
-			// 		console.log('file anh');
-			// 	}else{
-			// 		console.log('file doc');
-			// 	}
-			// }else{
-			// 	alert(data);
-			// }
 			if(typeof data === 'string'){
 				alert(data)
 			}else{
+				this.attackments.push(data.id)
 				if(data.type == 'jpg' || data.type == 'png' || data.type == 'jpeg'){
 					this.attackmentsRender.images.push(data)
 				}else{
@@ -118,7 +122,11 @@ export default {
 	computed:{
 		sEnduser(){
 			return this.$store.state.app.endUserInfo
+		},
+		sComment(){
+			return this.$store.state.comment.commentTarget
 		}
+
 	},
 	data() {
 		return {
@@ -149,14 +157,16 @@ export default {
 					label: 'Mr Dog',
 				},
 			],
+			dataPostComment:{
+			}
 		}
 	},
 	watch:{
-		inputComment(val){
-			if(val.includes('@')){
-				this.keyWord = val.slice(val.indexOf('@')+1)
-			}
-		}
+		// inputComment(val){
+		// 	if(val.includes('@')){
+		// 		this.keyWord = val.slice(val.indexOf('@')+1)
+		// 	}
+		// }
 	}
 }	
 </script>

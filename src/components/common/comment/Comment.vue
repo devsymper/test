@@ -70,22 +70,23 @@ import ListComment from './ListComment.vue';
 import CommentItem from './CommentItem.vue'
 import InputComment from './InputComment.vue';
 import {commentApi} from '@/api/Comment.js'
+import {fileManagementApi} from '@/api/FileManagement.js'
 export default {
 	components:{
 		TargetArea,
 		ListComment,
 		CommentItem,
-		InputComment
+		InputComment,
 	},
 	created(){
-		this.getCommentById()
 	},
 	computed:{
+		listComment(){
+			return this.$store.state.comment.listComment
+		}
 	},
 	mounted(){
-		// commentApi.getCommentById(this.objType,this.objId).then(res => {
-		// 		this.listComment = res.data.listObject.comments
-		// });
+		// this.getCommentById()
 	},
 	 data() {
         return {
@@ -94,8 +95,9 @@ export default {
 			showSpan:true,
 			showMagnity:true,
 			showTargetArea:false,
-			listComment: [],
+			// listComment: [],
 			resolveComment:[],
+			commentTarget:{},
 			comment:[],
 			itemsTab: [
 				{
@@ -112,52 +114,69 @@ export default {
         };
     },
 	 props: {
+		 /**
+		  * truyen vao show comment hay ko
+		  */
         showComment: {
             type: Boolean,
             default: false
 		},
+		 /**
+		  * truyen vao width comment
+		  */
         widthComment: {
             type: String,
             default: "450px"
 		},
+		 /**
+		  * truyen vao height comment hay ko
+		  */
         heightComment: {
             type: String,
             default: "1000px"
 		},
+		 /**
+		  * truyen vao vi tri comment
+		  */
 		top:{
 			type: Number,
 			default:0
 		},
+		 /**
+		  * truyen vao vi tri comment
+		  */
 		left:{
 			type: Number,
 			default:600
 		},
-		contentTargetArea:{
+		/**
+		  * truyen vao vi tri comment
+		*/
+		targetArea:{
 			type: String,
 			default:''
 		},
-		objId:{
+		/**
+		  * truyen vao vi tri comment
+		*/
+		objectIdentifier:{
 			type: Number,
 		},
-		objType:{
+		/**
+		  * truyen vao vi tri comment
+		*/
+		objectType:{
 			type: String,
 		},
+		/**
+		  * truyen vao vi tri comment
+		*/
 		uuid:{
 			type:String,
 			default:"0"
 		}
 	},
 	methods:{
-		getCommentById(){
-			commentApi.getCommentById(this.objType,this.objId).then(res => {
-			this.listComment = res.data.listObject.comments
-			// this.comment = res.data.listObject.comments
-			// this.resolveComment = res.data.listObject.resolve
-			});
-		},
-		getCommentByUuid(){
-			
-		},
 		clickSearch(){
       		this.showInput = true
   		},
@@ -171,18 +190,45 @@ export default {
 			console.log(event);
 		},
 		clickTab(item){
-			// if(item == 'comment'){
-			// 	console.log('comment');
-			// 	this.listComment = this.comment
-				
-			// }else{
-			// 	console.log('resolve');
-			// 	this.listComment = this.resolveComment
-			// }
 			console.log(item);
+		},
+		updateCommentTarget(){
+
 		}
 	},
-	
+	watch:{
+		objectIdentifier:function(val){
+				commentApi.getCommentById(this.objectType,val).then(res => {
+						this.$store.commit('comment/updateListComment',res.data.listObject.comments)
+						this.$store.commit('comment/updateListResolve',res.data.listObject.resolve)
+				});
+				this.commentTarget.objectIdentifier = val;
+				this.commentTarget.objectType = this.objectType;
+				this.commentTarget.uuid = this.uuid;
+				this.commentTarget.targetArea = this.targetArea;
+				this.commentTarget.parentId = 0;
+				this.$store.commit('comment/updateCommentTarget',this.commentTarget)	
+		},
+		uuid:function(val){
+				if(val == "0"){
+					commentApi.getCommentById(this.objectType,this.objectIdentifier).then(res => {
+						this.$store.commit('comment/updateListComment',res.data.listObject.comments)
+						this.$store.commit('comment/updateListResolve',res.data.listObject.resolve)
+					});
+				}else{
+					commentApi.getCommentByUuid(this.objectType,this.objectIdentifier,val).then(res => {
+						this.$store.commit('comment/updateListComment',res.data.listObject.comments)
+						this.$store.commit('comment/updateListResolve',res.data.listObject.resolve)
+					});
+				}
+					this.commentTarget.objectIdentifier = val;
+					this.commentTarget.objectType = this.objectType;
+					this.commentTarget.uuid = this.uuid;
+					this.commentTarget.targetArea = this.targetArea;
+					this.commentTarget.parentId = 0;
+					this.$store.commit('comment/updateCommentTarget',this.commentTarget)
+		},
+	}
 }
 </script>
 

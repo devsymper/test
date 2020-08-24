@@ -2,7 +2,9 @@
 	<div class="list-comment">
 		<VuePerfectScrollbar :style="{height: listCommentHeight}">
 			 <div :v-if="listComment.length > 0" v-for="(item,i) in listComment" :key="i"  class="comment-item"> 
-				<CommentItem :item="item"/>
+				<CommentItem
+					 :item="item"
+				 />
 			</div>
 		 </VuePerfectScrollbar>
 	</div>
@@ -10,7 +12,8 @@
 <script>
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import InputComment from "./InputComment.vue";
-import CommentItem from './CommentItem.vue'
+import CommentItem from './CommentItem.vue';
+import {commentApi} from '@/api/Comment.js'
 export default {
 	name: 'ListComment',
 	props:{
@@ -24,7 +27,12 @@ export default {
 			item.isEditting = true
 		},
 		deleteComment(item){
-			this.listComment.splice(this.listComment.indexOf(item),1)
+			commentApi.deleteComment(item.id).then(res => {
+				// if(sComment.)
+				console.log(res);
+            });
+			// this.listComment.splice(this.listComment.indexOf(item),1)
+
 		},
 	},
 	components: {
@@ -35,6 +43,11 @@ export default {
 	data() {
 		return {
 			listCommentHeight:'500px',
+		}
+	},
+	computed:{
+		sComment(){
+			return this.$store.state.comment
 		}
 	}
 }	

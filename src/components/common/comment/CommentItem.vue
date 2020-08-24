@@ -14,16 +14,20 @@
 						<v-btn class="icon-check" icon><v-icon >mdi-check</v-icon></v-btn>
 				</div>
 				<div style="display:flex">
-					<InputComment :isEditing="item.isEditing" :item="item" />
+					<InputComment 
+						:isEditing="item.isEditing" 
+						:item="item" 
+						:images="images"  
+						:files="files"
+					/>
 					<v-menu bottom left class="icon-menu">
 						<template  v-slot:activator="{ on, attrs }">
-							<!-- v-if="sEnduser == item.id" -->
 							<v-btn
 							icon
 							v-bind="attrs"
 							v-on="on"
 							>
-							<v-icon >mdi-dots-horizontal</v-icon>
+							<v-icon v-if="sEnduser==item.userId" >mdi-dots-horizontal</v-icon>
 							</v-btn>
 						</template>
 						<v-list>
@@ -61,6 +65,7 @@ import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import InputComment from "./InputComment.vue"
 import moment from 'moment';
 import {commentApi} from '@/api/Comment.js'
+import {fileManagementApi} from '@/api/FileManagement.js'
 export default {
 	name: 'commentItem',
 	props:{
@@ -68,14 +73,31 @@ export default {
 			type: Object,
 		}
 	},
+	mounted(){
+		if(this.item.attachments.length > 0){
+			let thisCpn = this
+			fileManagementApi.getFileByList(this.item.attachments).then(res => {
+				console.log(res);
+				res.data.forEach(function(e){
+					if(e.type == "png" || e.type == "jpg" || e.type == "jpeg"){
+						thisCpn.images.push(e)
+					}
+					else{
+						thisCpn.files.push(e)
+					}
+				})
+			});
+		}
+		
+	},
 	methods:{
 		editComment(item){
 			item.isEditing = true
 		},
 		deleteComment(item){
 			commentApi.deleteComment(item.id).then(res => {
+				console.log(res,'resssssss');
             });
-			this.listComment.splice(this.listComment.indexOf(item),1)
 		},
 		addComment(data){
 			console.log(data);
@@ -92,13 +114,18 @@ export default {
 	data() {
 		return {
 			listCommentHeight:'500px',
+			images:[],
+			files:[],
 		}
 	},
 	computed:{
 		sEnduser(){
 			return this.$store.state.app.endUserInfo.id
+		},
+		sComment(){
+			return this.$store.state.comment
 		}
-	}
+	},
 }	
 </script>
 <style scoped>
