@@ -1,7 +1,7 @@
 <template>
 	<div class="list-comment">
 		<VuePerfectScrollbar :style="{height: listCommentHeight}">
-			 <div v-for="(item,i) in listComment" :key="i"  class="comment-item"> 
+			 <div :v-if="listComment.length > 0" v-for="(item,i) in listComment" :key="i"  class="comment-item"> 
 				<CommentItem :item="item" />
 			</div>
 		 </VuePerfectScrollbar>
@@ -13,6 +13,11 @@ import InputComment from "./InputComment.vue";
 import CommentItem from './CommentItem.vue'
 export default {
 	name: 'ListComment',
+	props:{
+		listComment:{
+			type: Array
+		}
+	},
 	methods:{
 		editComment(item){
 			console.log('edititng');
@@ -30,221 +35,6 @@ export default {
 	data() {
 		return {
 			listCommentHeight:'500px',
-			listComment: [
-			{
-				"id":111,
-				"content":"comment 1",
-				"userId":922,
-				"isBa":0,
-				"createdAt":"2020-08-19 10:17",
-				"updatedAt":"2020-08-19 10:17",
-				"isEditting": false,
-				"tags":[
-					{
-					"objectType":"user",
-					"objectIdentifier":968,
-					"tagInfo":{
-						"offset":0,
-						"length":5
-					}
-					}
-				],
-				"attachments":[
-					{
-					"fileId":123,
-					"fileType":"image"
-					},
-					{
-					"fileId":124,
-					"fileType":"docx"
-					}
-				]
-			},
-			{
-				"id":1112,
-				"content":"comment 2",
-				"userId":922,
-				"isBa":0,
-				"createdAt":"2020-08-19 10:17",
-				"updatedAt":"2020-08-19 10:17",
-				"isEditting": false,
-				"tags":[
-					{
-					"objectType":"user",
-					"objectIdentifier":968,
-					"tagInfo":{
-						"offset":0,
-						"length":5
-					}
-					}
-				],
-				"attachments":[
-					{
-					"fileId":123,
-					"fileType":"image",
-					},
-					{
-					"fileId":124,
-					"fileType":"docx"
-					}
-				],
-				"childrens":[
-					{
-					"id":111,
-					"content":"comment child 1",
-					"userId":922,
-					"isBa":0,
-					"uuid":0,
-					"targetArea":"",
-					"createdAt":"2020-08-19 10:17",
-					"updatedAt":"2020-08-19 10:17",
-					"tags":[
-						{
-							"objectType":"user",
-							"objectIdentifier":968,
-							"tagInfo":{
-								"offset":20,
-								"length":5
-							}
-						}
-					],
-					"attachments":[
-						{
-							"fileId":123,
-							"fileType":"image"
-						},
-						{
-							"fileId":124,
-							"fileType":"docx"
-						}
-					]
-					},
-					{
-					"id":111,
-					"content":"comment child 2",
-					"userId":922,
-					"isBa":0,
-					"uuid":0,
-					"targetArea":"",
-					"createdAt":"2020-08-19 10:17",
-					"updatedAt":"2020-08-19 10:17",
-					"tags":[
-						{
-							"objectType":"user",
-							"objectIdentifier":968,
-							"tagInfo":{
-								"offset":20,
-								"length":5
-							}
-						}
-					],
-					"attachments":[
-						{
-							"fileId":123,
-							"fileType":"image"
-						},
-						{
-							"fileId":124,
-							"fileType":"docx"
-						}
-					]
-					},
-				]
-			},
-			{
-				"id":11132,
-				"content":"comment 3",
-				"userId":922,
-				"isBa":0,
-				"createdAt":"2020-08-19 10:17",
-				"updatedAt":"2020-08-19 10:17",
-				"isEditting": false,
-				"tags":[
-					{
-					"objectType":"user",
-					"objectIdentifier":968,
-					"tagInfo":{
-						"offset":0,
-						"length":5
-					}
-					}
-				],
-				"attachments":[
-					{
-					"fileId":123,
-					"fileType":"image"
-					},
-					{
-					"fileId":124,
-					"fileType":"docx"
-					}
-				],
-				"childrens":[
-					{
-					"id":111,
-					"content":"comment child 21",
-					"userId":922,
-					"isBa":0,
-					"uuid":0,
-					"targetArea":"",
-					"createdAt":"2020-08-19 10:17",
-					"updatedAt":"2020-08-19 10:17",
-					"isEditting": false,
-					"tags":[
-						{
-							"objectType":"user",
-							"objectIdentifier":968,
-							"tagInfo":{
-								"offset":20,
-								"length":5
-							}
-						}
-					],
-					"attachments":[
-						{
-							"fileId":123,
-							"fileType":"image"
-						},
-						{
-							"fileId":124,
-							"fileType":"docx"
-						}
-					]
-					},
-					{
-					"id":111,
-					"content":"comment child 22",
-					"userId":922,
-					"isBa":0,
-					"uuid":0,
-					"targetArea":"",
-					"createdAt":"2020-08-19 10:17",
-					"updatedAt":"2020-08-19 10:17",
-					"isEditting": false,
-					"tags":[
-						{
-							"objectType":"user",
-							"objectIdentifier":968,
-							"tagInfo":{
-								"offset":20,
-								"length":5
-							}
-						}
-					],
-					"attachments":[
-						{
-							"fileId":123,
-							"fileType":"image"
-						},
-						{
-							"fileId":124,
-							"fileType":"docx"
-						}
-					]
-					},
-				]
-			},
-		]
 		}
 	}
 }	

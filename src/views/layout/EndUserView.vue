@@ -93,9 +93,10 @@
 						:heightComment="heightComment" 
 						:top="top" 
 						:left="left"
-						:id="idItem"
+						:objId="idItem"
 						:uuid="uuidArea"
 						:contentTargetArea="contentTargetArea"
+						:objType="objType"
 					/>
                 </v-layout>
             </v-container>
@@ -137,10 +138,11 @@ export default {
             }
 		},
 		clickFull(event){
-			console.log(event);
 			this.showComment = !this.showComment;
 			this.heightComment = "1000px"
-			this.idItem = '1'
+			this.idItem = 1721
+			this.objType = 'document'
+			debugger
 			this.contentTargetArea = ''
 		},
 		clickArea(event){
@@ -213,6 +215,7 @@ export default {
 			idItem:null,
 			uuidArea:null,
 			contentTargetArea:'',
+			objType:'',
         };
     }
 };

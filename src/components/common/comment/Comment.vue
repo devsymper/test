@@ -28,7 +28,6 @@
 					</v-tab>
 				</v-tabs>
 				<v-spacer></v-spacer>
-
 				<v-text-field
 					solo
 					v-if="showInput"
@@ -47,7 +46,7 @@
 				:key="item.value"
 				>
 				<v-card flat>
-					<list-comment />
+					<list-comment :listComment="listComment" />
 				</v-card>
 				</v-tab-item>
 				 <div class="input-comment">
@@ -67,7 +66,8 @@
 import TargetArea from './TargetArea.vue';
 import ListComment from './ListComment.vue';
 import CommentItem from './CommentItem.vue'
-import InputComment from './InputComment.vue'
+import InputComment from './InputComment.vue';
+import {commentApi} from '@/api/Comment.js'
 export default {
 	components:{
 		TargetArea,
@@ -76,12 +76,18 @@ export default {
 		InputComment
 	},
 	created(){
-		
+		commentApi.getCommentById(this.objType,this.objId).then(res => {
+				console.log(res);
+				this.listComment = res.data.listObject.comments
+		});
+	},
+	computed:{
+
 	},
 	mounted(){
-		if(this.contentTargetArea != ''){
-			this.showTargetArea = true
-		}
+		// commentApi.getCommentById(this.objType,this.objId).then(res => {
+        //         console.log(res);
+		// });
 	},
 	 data() {
         return {
@@ -90,6 +96,7 @@ export default {
 			showSpan:true,
 			showMagnity:true,
 			showTargetArea:false,
+			listComment: [],
 			itemsTab: [
 				{
 					title:'Comment',
@@ -129,8 +136,11 @@ export default {
 			type: String,
 			default:''
 		},
-		id:{
-			type: Number ,
+		objId:{
+			type: Number,
+		},
+		objType:{
+			type: String,
 		},
 		uuid:{
 			type:String,
@@ -145,7 +155,6 @@ export default {
 			this.showInput = false
 		},
 		hide(){
-			console.log('hide');
 			this.showComment = false
 		},
 		tagUser(event){
