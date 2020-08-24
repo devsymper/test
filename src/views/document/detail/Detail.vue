@@ -401,6 +401,7 @@ export default {
                 }
 
             }
+            console.log(this.sDocumentSubmit);
             setTimeout(() => {
                 if(thisCpn.$route.name == 'printDocument'){
                     thisCpn.printDiv();

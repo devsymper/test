@@ -17,7 +17,19 @@
             multiple
             class="sym-list-control"
             >
-                <v-expansion-panel>
+                <v-expansion-panel v-if="isConfigPrint">
+                    <v-expansion-panel-header class="v-expand-header">In</v-expansion-panel-header>
+                    <v-expansion-panel-content class="sym-v-expand-content">
+                        <v-list>
+                            <control
+                            v-for="control in listControlPrint"
+                            :key="control"
+                            :type="control"
+                            />
+                        </v-list>
+                    </v-expansion-panel-content>
+                </v-expansion-panel>
+                <v-expansion-panel v-if="!isConfigPrint">
                     <v-expansion-panel-header class="v-expand-header">Hiển thị</v-expansion-panel-header>
                     <v-expansion-panel-content class="sym-v-expand-content">
                         <v-list>
@@ -29,7 +41,7 @@
                         </v-list>
                     </v-expansion-panel-content>
                 </v-expansion-panel>
-                <v-expansion-panel>
+                <v-expansion-panel v-if="!isConfigPrint">
                     <v-expansion-panel-header class="v-expand-header">Input</v-expansion-panel-header>
                     <v-expansion-panel-content class="sym-v-expand-content">
                         <v-list>
@@ -41,7 +53,7 @@
                         </v-list>
                     </v-expansion-panel-content>
                 </v-expansion-panel>
-                <v-expansion-panel>
+                <v-expansion-panel v-if="!isConfigPrint">
                     <v-expansion-panel-header class="v-expand-header">Layout</v-expansion-panel-header>
                     <v-expansion-panel-content class="sym-v-expand-content">
                     <v-list>
@@ -54,7 +66,7 @@
                     </v-expansion-panel-content>
                 </v-expansion-panel>
 
-                <v-expansion-panel>
+                <v-expansion-panel v-if="!isConfigPrint">
                     <v-expansion-panel-header class="v-expand-header">Report</v-expansion-panel-header>
                     <v-expansion-panel-content class="sym-v-expand-content">
                     <v-list>
@@ -66,7 +78,7 @@
                         </v-list>
                     </v-expansion-panel-content>
                 </v-expansion-panel>
-                <v-expansion-panel>
+                <v-expansion-panel v-if="!isConfigPrint">
                     <v-expansion-panel-header class="v-expand-header">Action</v-expansion-panel-header>
                     <v-expansion-panel-content class="sym-v-expand-content">
                     <v-list>
@@ -88,11 +100,18 @@
 import Control from './../../items/Control.vue';
 import getControlElement from './../../../../components/document/controlPropsFactory.js';
 export default {
+    props:{
+        isConfigPrint:{
+            type:Boolean,
+            default:false
+        }
+    },
     components:{
         'control' : Control,
     },
     data: () => ({
         panel: [0, 1, 2, 3, 4],
+        listControlPrint:   ['labelPrint'],
         listControlDisplay: ['label','image','qrCode'],
         listControlInput:   ['textInput','richText','number','date','dateTime','time','month','select','documentSelect','phone','email','currency','radio','checkbox','color','percent','user','inputFilter','hidden'],
         listControlLayout:  ['table','panel','fileUpload'],

@@ -180,7 +180,7 @@ const routes = [{
         name: "printConfigDocument",
         // component: Editor,
         component: () =>
-            import ('../views/document/Editor.vue'),
+            import ('../views/document/print/PrintConfig.vue'),
 
     },
     {

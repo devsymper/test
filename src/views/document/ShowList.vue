@@ -68,21 +68,28 @@ export default {
                     name: "editdoc",
                     text: "Sửa",
                     callback: (document, callback) => {
-                        this.$goToPage('/document/editor/'+document.id,document.title);
+                        this.$goToPage('/documents/'+document.id+'/editor/edit',document.title);
+                    },
+                },
+                {
+                    name: "printConfig",
+                    text: "Cấu hình in",
+                    callback: (document, callback) => {
+                        this.$goToPage('/documents/'+document.id+'/editor/print-config',document.title);
                     },
                 },
                 {
                     name: "cloneDoc",
                     text: "Nhân bản",
                     callback: (document, callback) => {
-                        this.$goToPage('/documents/'+document.id+'/clone/editor',"Nhân bản "+document.title);
+                        this.$goToPage('/documents/'+document.id+'/editor/clone',"Nhân bản "+document.title);
                     },
                 },
                 {
                     name: "submit",
                     text: "Nhập liệu",
                     callback: (document, callback) => {
-                        this.$goToPage('/document/submit/'+document.id,document.title);
+                        this.$goToPage('/documents/'+document.id+'/submit',document.title);
                     },
                 },
                 {

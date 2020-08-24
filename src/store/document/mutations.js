@@ -17,8 +17,7 @@ const addToListInputInDocument = (state, params) => {
     let name = params.name
     let control = params.control
     let instance = params.instance
-
-    // state.editor.allControl[id] = prop;
+        // state.editor.allControl[id] = prop;
     Vue.set(state.submit[instance].listInputInDocument, name, control);
 };
 
