@@ -179,7 +179,7 @@ export default {
                     }
                 }else{
                      clearInterval(this.loopCheckProcess); 
-                     this.$emit("Error");
+                     this.$emit("error",'Tên sheet trùng nhau');
                 }
             })
             .catch(err => {
@@ -226,6 +226,12 @@ export default {
            if(this.processing.importing.processed/this.processing.importing.total==1){
                 setTimeout(()=>this.$emit('showNotification'), 1000);
                 clearInterval(this.loopCheckProcess)
+           };
+           if(this.processing.importing.processed/this.processing.importing.total>1){
+               debugger
+               this.$emit('error','Lỗi xử lý');
+                clearInterval(this.loopCheckProcess);
+
            }
 
         },

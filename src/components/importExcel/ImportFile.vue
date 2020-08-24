@@ -533,7 +533,7 @@ export default {
         },
         // phần mapping --- hàm đẩy giá trị mapping vào tables
         pushMappingInTables(name, column){
-            debugger
+           // debugger
              this.setLastKeyGeneral();
 
             for(let i = 0; i<this.tables.length; i++){
@@ -583,7 +583,7 @@ export default {
         // hàm xử lý key từng bảng con, so sánh với dòng trong excel nếu trùng thì set sheetMap
         setLastKeyTables(){
             // kiểm tra để lấy key
-            debugger
+            //debugger
             let newLastKeyTables = [];
             for(let i = 0; i<this.lastKeyTables.length; i++){
                  for(let j = 0; j<this.nameSheets.length; j++){
@@ -604,7 +604,7 @@ export default {
             console.error(newLastKeyTables);
             //đẩy key
             const self = this;
-            debugger
+            //debugger
             for(let i = 1; i<this.tables.length; i++){
                    for(let j = 0; j<this.newLastKeyTables.length; j++){
                         if(this.tables[i].sheetMap&&this.tables[i].sheetMap.name==this.newLastKeyTables[j].sheet){

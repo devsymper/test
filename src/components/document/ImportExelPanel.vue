@@ -26,15 +26,15 @@
                 <v-card-title style="height:50px; margin-top:-10px" class="headline grey lighten-2">
                     <span class="mb-3">Thông báo</span>
                     </v-card-title>
-                 <v-card-text v-if="showError"  class="pt-6" style="height:40px">
-                <v-icon style="color:red" class="mdi-alert-circle"></v-icon> Lỗi
+                 <v-card-text  class="pt-6" style="height:40px">
+                <v-icon style="color:red" class="mdi mdi-alert-circle"></v-icon> {{messageError}}
                 </v-card-text>
                 <v-card-actions>
                     <v-spacer></v-spacer>
                     <v-btn
                         color="primary"
                         text
-                        @click="dialog = false, showError=false">
+                        @click="dialogError = false">
                         Thoát
                     </v-btn>
                 </v-card-actions>
@@ -85,6 +85,7 @@ export default {
             showImport:true,
             fileName:'',
             error:false,
+            messageError:'',
         }
     },
     props: {
@@ -96,9 +97,10 @@ export default {
         },
     },
     methods: {
-        showError(){
+        showError(data){
             this.error =true;
             this.dialogError = true; 
+            this.messageError = data;
         },
         cancel(){
             this.$emit('cancel');
