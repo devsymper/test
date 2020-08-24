@@ -51,6 +51,7 @@
                 :direction="direction"
                 :open-on-hover="hover"
                 :transition="transition"
+                style="z-index:9999;"
             >
                 <template v-slot:activator>
                     <v-btn v-model="fab" color="blue darken-2" dark fab>
@@ -339,7 +340,7 @@ export default {
                         });
                 let valueControl = locale.val;
                 let controlInstance = getControlInstanceFromStore(thisCpn.keyInstance,locale.controlName);
-                if($('#'+controlInstance.id).attr('data-autocomplete') != ""){
+                if($('#'+controlInstance.id).attr('data-autocomplete') != "" && $('#'+controlInstance.id).attr('data-autocomplete') != undefined){
                     $('#'+controlInstance.id).attr('data-autocomplete',"");
                     return;
                 }
@@ -858,9 +859,9 @@ export default {
             let thisCpn = this;
             let isSetEffectedControl = false;
             for (let index = 0; index < allInputControl.length; index++) {
+               
                 let id = $(allInputControl[index]).attr('id');
                 let controlType = $(allInputControl[index]).attr('s-control-type');
-                
                 if(this.sDocumentEditor.allControl[id] != undefined){   // ton tai id trong store
                     let field = this.sDocumentEditor.allControl[id];
                     let idField = field.id;

@@ -22,14 +22,6 @@ export default class TableControl extends Control {
 
     }
     setData(data) {
-        if (Object.keys(data).length == 1 && Object.keys(data)[0] == 'childObjectId') {
-            this.tableInstance.tableInstance.updateSettings({
-                data: [
-                    []
-                ]
-            });
-            return
-        }
         for (let controlName in data) {
             let dataControl = data[controlName];
             let vls = [];
@@ -41,6 +33,7 @@ export default class TableControl extends Control {
             }
             this.tableInstance.tableInstance.setDataAtRowProp(vls, null, null, 'auto_set');
         }
+
     }
 
 }

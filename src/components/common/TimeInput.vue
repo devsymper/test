@@ -55,7 +55,7 @@ export default {
             else{
                 let autoEL = $(this.$el).detach();
                 $(e.target).parent().append(autoEL);
-                this.positionBox = {'top':'0px','left':'0px'};
+                this.positionBox = {'top':$(e.target).height()+2+'px','left':'0px'};
             }
         },
         handlerKeyDown(e){
@@ -144,6 +144,10 @@ export default {
         height: auto;
         max-height: 300px;
         overflow: auto;
+        position: absolute;
+        width: 120px;
+        background: white;
+        z-index: 99999;
     }
     .active-item{
         background: #dadada !important;
