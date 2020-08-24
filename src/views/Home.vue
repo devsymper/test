@@ -1,6 +1,6 @@
 <template>
     <div class="home h-100 w-100">
-        <v-btn @click="runDataflow" color="primary">Primary</v-btn>
+        <!-- <v-btn @click="runDataflow" color="primary">Primary</v-btn> -->
 
         <Dashboard></Dashboard>
         <!-- <EmbedDataflow 
