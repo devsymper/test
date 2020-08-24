@@ -19,6 +19,7 @@
 						:item="item" 
 						:images="images"  
 						:files="files"
+						:status="item.status"
 					/>
 					<v-menu bottom left class="icon-menu">
 						<template  v-slot:activator="{ on, attrs }">
@@ -93,15 +94,23 @@ export default {
 	methods:{
 		editComment(item){
 			item.isEditing = true
+			item.status = 'edit'
 		},
 		deleteComment(item){
 			commentApi.deleteComment(item.id).then(res => {
-				console.log(res,'resssssss');
+				if(this.sComment.uuid == "0"){
+					commentApi.getCommentById(this.sComment.objectType,this.sComment.objectIdentifier).then(res => {
+						this.$store.commit('comment/updateListComment',res.data.listObject.comments)
+						this.$store.commit('comment/updateListResolve',res.data.listObject.resolve)
+					});
+				}else{
+					debugger
+				}
             });
 		},
-		addComment(data){
-			console.log(data);
-		},
+		// addComment(data){
+		// 	console.log(data);
+		// },
 		lassSeen(date){
 			return moment(date).fromNow();
 		}
@@ -123,7 +132,7 @@ export default {
 			return this.$store.state.app.endUserInfo.id
 		},
 		sComment(){
-			return this.$store.state.comment
+			return this.$store.state.comment.commentTarget
 		}
 	},
 }	

@@ -1,6 +1,6 @@
 <template>
 	<div class="content-comment">
-		<div :v-if="images.length > 0" class="content-comment-img">
+		<div v-if="images.length > 0" class="content-comment-img">
 			<div  class="commnet-img-item" v-for="(item,i) in images" :key="i">
 				<v-img
            			 src="https://taiwebs.com/upload/images/Img-Converter-2018.png"
@@ -9,7 +9,7 @@
 				</v-img> 
 			</div>
 		</div>	
-		<div :v-if="files.length > 0" class="content-comment-file">
+		<div v-if="files.length > 0" class="content-comment-file">
 			<div class="commnet-file-item" v-for="(item,i) in files" :key="i">
 				<v-icon>{{icon[item.type]}}</v-icon>
 				<span class="file-item-title">{{item.name}}</span>
@@ -17,7 +17,7 @@
 			</div>	
 		</div>
 		<div class="content-comment-input">
-			<span v-if="isEditing == false" >
+			<span v-if="isEditing == false"  >
 			<span>{{item.content}}</span>
 			</span>
 			 <!-- <v-text-field
@@ -70,6 +70,10 @@ export default {
 		files:{
 			type: Array,
 		},
+		status:{
+			type: String,
+			default: 'add'
+		}
 	},
 	components:{
 		MenuTagUser,
@@ -80,10 +84,18 @@ export default {
 	},
 	methods:{
 		removeFile(item){
-			this.attackmentsRender.files.splice(this.attackmentsRender.files.indexOf(item),1)
+			const index = this.attackments.indexOf(item.id);
+				if (index > -1) {
+					this.attackments.splice(index, 1);
+				}
+			this.files.splice(this.files.indexOf(item),1)
 		},
 		removeImage(item){
-			this.attackmentsRender.images.splice(this.attackmentsRender.images.indexOf(item),1)
+			const index = this.attackments.indexOf(item.id);
+			if (index > -1) {
+				this.attackments.splice(index, 1);
+			}
+			this.images.splice(this.images.indexOf(item),1)
 		},
 		tagUser(event){
 			let $target = $(event.target);
@@ -97,14 +109,29 @@ export default {
 			this.inputComment = res
 		},
 		addComment(){
+			if(this.status = 'add'){
+				debugger
+			}
+			else{
+				debugger
+			}
 			this.dataPostComment = this.sComment
 			this.dataPostComment.content = this.inputComment
 			this.dataPostComment.attackments = this.attackments
 			let data = JSON.stringify(this.dataPostComment)
 			commentApi.addComment(data).then(res => {
-				console.log(res);
-            });
-			this.item.isEditing = false;
+				if(this.sComment.uuid == "0"){
+					commentApi.getCommentById(this.sComment.objectType,this.sComment.objectIdentifier).then(res => {
+						this.$store.commit('comment/updateListComment',res.data.listObject.comments)
+						this.$store.commit('comment/updateListResolve',res.data.listObject.resolve)
+					});
+				}else{
+					debugger
+				}
+			});
+		},
+		editComment(){
+
 		},
 		uploadInfo(data){
 			if(typeof data === 'string'){
@@ -112,9 +139,9 @@ export default {
 			}else{
 				this.attackments.push(data.id)
 				if(data.type == 'jpg' || data.type == 'png' || data.type == 'jpeg'){
-					this.attackmentsRender.images.push(data)
+					this.images.push(data)
 				}else{
-					this.attackmentsRender.files.push(data)
+					this.files.push(data)
 				}
 			}
 		}
@@ -133,12 +160,7 @@ export default {
 			inputComment: '',
 			keyWord: '',
 			attackments:[],
-			attackmentsRender:{
-				images:[
-				],
-				files:[
-				],
-			},
+			
 			icon:{
 				xlxs: 'mdi-file-excel-box',
 				xls: 'mdi-file-excel-box',

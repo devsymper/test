@@ -22,18 +22,6 @@ export default {
 		}
 	},
 	methods:{
-		editComment(item){
-			console.log('edititng');
-			item.isEditting = true
-		},
-		deleteComment(item){
-			commentApi.deleteComment(item.id).then(res => {
-				// if(sComment.)
-				console.log(res);
-            });
-			// this.listComment.splice(this.listComment.indexOf(item),1)
-
-		},
 	},
 	components: {
 		VuePerfectScrollbar,
@@ -46,9 +34,6 @@ export default {
 		}
 	},
 	computed:{
-		sComment(){
-			return this.$store.state.comment
-		}
 	}
 }	
 </script>

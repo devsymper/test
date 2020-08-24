@@ -57,7 +57,7 @@
 						style="width:30px;height:30px;margin-top: -10px;margin-right: -8px;"
 						>
 					</v-avatar>
-					<InputComment :isEditing="true" />
+					<InputComment :isEditing="true" :images="[]" :files="[]" :status="'add'" />
 				 </div>
 			</v-tabs-items>
 			</v-card>
@@ -95,7 +95,6 @@ export default {
 			showSpan:true,
 			showMagnity:true,
 			showTargetArea:false,
-			// listComment: [],
 			resolveComment:[],
 			commentTarget:{},
 			comment:[],
