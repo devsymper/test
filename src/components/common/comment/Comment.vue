@@ -57,13 +57,12 @@
 						style="width:30px;height:30px;margin-top: -10px;margin-right: -8px;"
 						>
 					</v-avatar>
-					<InputComment :isEditing="true" :images="[]" :files="[]" :status="'add'" />
+					<InputComment :isEditing="true" :images="[]" :files="[]" :isAdd="true"/>
 				 </div>
 			</v-tabs-items>
 			</v-card>
 	</div>
 </template>
-
 <script>
 import TargetArea from './TargetArea.vue';
 import ListComment from './ListComment.vue';

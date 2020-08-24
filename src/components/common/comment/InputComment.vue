@@ -70,9 +70,9 @@ export default {
 		files:{
 			type: Array,
 		},
-		status:{
-			type: String,
-			default: 'add'
+		isAdd:{
+			type: Boolean,
+			default: true
 		}
 	},
 	components:{
@@ -109,26 +109,22 @@ export default {
 			this.inputComment = res
 		},
 		addComment(){
-			if(this.status = 'add'){
-				debugger
-			}
-			else{
-				debugger
-			}
 			this.dataPostComment = this.sComment
 			this.dataPostComment.content = this.inputComment
 			this.dataPostComment.attackments = this.attackments
 			let data = JSON.stringify(this.dataPostComment)
-			commentApi.addComment(data).then(res => {
-				if(this.sComment.uuid == "0"){
-					commentApi.getCommentById(this.sComment.objectType,this.sComment.objectIdentifier).then(res => {
-						this.$store.commit('comment/updateListComment',res.data.listObject.comments)
-						this.$store.commit('comment/updateListResolve',res.data.listObject.resolve)
-					});
-				}else{
-					debugger
-				}
-			});
+			if(this.isAdd == true){
+				commentApi.addComment(data).then(res => {
+					this.updateComment()
+				});
+			}
+			else{
+				commentApi.editComment(data).then(res => {
+					this.updateComment()
+				});
+			}
+			
+			
 		},
 		editComment(){
 
@@ -144,6 +140,16 @@ export default {
 					this.files.push(data)
 				}
 			}
+		},
+		updateComment(){
+			if(this.sComment.uuid == "0"){
+					commentApi.getCommentById(this.sComment.objectType,this.sComment.objectIdentifier).then(res => {
+						this.$store.commit('comment/updateListComment',res.data.listObject.comments)
+						this.$store.commit('comment/updateListResolve',res.data.listObject.resolve)
+					});
+				}else{
+					debugger
+				}
 		}
 	},
 	computed:{

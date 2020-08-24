@@ -19,7 +19,7 @@
 						:item="item" 
 						:images="images"  
 						:files="files"
-						:status="item.status"
+						:isAdd="false"
 					/>
 					<v-menu bottom left class="icon-menu">
 						<template  v-slot:activator="{ on, attrs }">
@@ -94,7 +94,6 @@ export default {
 	methods:{
 		editComment(item){
 			item.isEditing = true
-			item.status = 'edit'
 		},
 		deleteComment(item){
 			commentApi.deleteComment(item.id).then(res => {
@@ -125,6 +124,7 @@ export default {
 			listCommentHeight:'500px',
 			images:[],
 			files:[],
+			status,
 		}
 	},
 	computed:{
