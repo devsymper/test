@@ -17,7 +17,6 @@
 					<v-btn icon @click="hide()">
 					<v-icon>mdi-close</v-icon>
 				</v-btn>
-					<!-- <TargetArea :showTargetArea="showTargetArea" :content="contentTargetArea" />  -->
 				<template v-slot:extension>
 				<v-tabs
 					v-model="tab"
@@ -48,7 +47,6 @@
 				:key="item.value"
 				>
 				<v-card flat>
-					<!-- <v-card-text v-text="text"></v-card-text> -->
 					<list-comment />
 				</v-card>
 				</v-tab-item>
@@ -59,19 +57,6 @@
 						alt="John"
 						>
 					</v-avatar>
-					 <v-text-field
-						filled
-						clear-icon="mdi-close-circle"
-						clearable
-						label="Message"
-						type="text"
-						v-on:keyup.50="tagUser($event)"
-						>
-							<template slot="append">
-								<v-icon>mdi-attachment</v-icon>
-								<v-icon>mdi-send-circle-outline</v-icon>
-							</template>
-						</v-text-field>
 				 </div>
 			</v-tabs-items>
 			</v-card>
@@ -80,11 +65,15 @@
 
 <script>
 import TargetArea from './TargetArea.vue';
-import ListComment from './ListComment.vue'
+import ListComment from './ListComment.vue';
+import CommentItem from './CommentItem.vue'
+import InputComment from './InputComment.vue'
 export default {
 	components:{
 		TargetArea,
-		ListComment
+		ListComment,
+		CommentItem,
+		InputComment
 	},
 	created(){
 		
@@ -113,7 +102,6 @@ export default {
 					icon: 'mdi-comment-check'
 				}
 			],
-			text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
         };
     },
 	 props: {
@@ -141,6 +129,13 @@ export default {
 			type: String,
 			default:''
 		},
+		id:{
+			type: Number ,
+		},
+		uuid:{
+			type:String,
+			default:"0"
+		}
 	},
 	methods:{
 		clickSearch(){

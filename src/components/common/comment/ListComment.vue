@@ -1,61 +1,22 @@
 <template>
 	<div class="list-comment">
-		 <VuePerfectScrollbar :style="{height: listCommentHeight}">
-			<div v-for="(item,i) in listComment" :key="i"  class="comment-item"> 
-				<v-avatar>
-					<img
-					src="https://cdn.vuetifyjs.com/images/john.jpg"
-					alt="John"
-					>
-				</v-avatar>
-				<div class="comment-item-content">
-					<div style="display:flex">
-						<span style="color:#262626;width:330px">{{item.id}}</span> <br>
-						<v-btn class="icon-check" icon> <v-icon >mdi-check</v-icon>	</v-btn>
-					</div>
-					<div style="display:flex">
-						<InputComment :isEditting="isEditting" />
-						<v-menu bottom left class="icon-menu">
-							<template v-slot:activator="{ on, attrs }">
-								<v-btn
-								icon
-								v-bind="attrs"
-								v-on="on"
-								>   
-								<v-icon >mdi-dots-horizontal</v-icon>
-								</v-btn>
-							</template>
-							<v-list>
-								<v-list-item
-									@click="editComment"
-								>
-									<v-list-item-title> Sửa Bình luận</v-list-item-title>
-								</v-list-item>
-								<v-list-item
-									@click="deleteComment(item)"
-								>
-									<v-list-item-title> Xóa Bình luận</v-list-item-title>
-								</v-list-item>
-							</v-list>
-						</v-menu>
-					</div>
-					<div style="display:flex;font-size:11px"> 
-						<span class="btn-reply-comment">Trả lời </span>
-						<span style="padding-left:8px">{{item.updatedAt}}</span>
-					</div>
-				</div>	
+		<VuePerfectScrollbar :style="{height: listCommentHeight}">
+			 <div v-for="(item,i) in listComment" :key="i"  class="comment-item"> 
+				<CommentItem :item="item" />
 			</div>
 		 </VuePerfectScrollbar>
 	</div>
 </template>
-
 <script>
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
-import InputComment from "./InputComment.vue"
+import InputComment from "./InputComment.vue";
+import CommentItem from './CommentItem.vue'
 export default {
+	name: 'ListComment',
 	methods:{
-		editComment(){
+		editComment(item){
 			console.log('edititng');
+			item.isEditting = true
 		},
 		deleteComment(item){
 			this.listComment.splice(this.listComment.indexOf(item),1)
@@ -63,12 +24,12 @@ export default {
 	},
 	components: {
 		VuePerfectScrollbar,
-		InputComment
+		InputComment,
+		CommentItem
 	},
 	data() {
 		return {
 			listCommentHeight:'500px',
-			isEditting: false,
 			listComment: [
 			{
 				"id":111,
@@ -77,6 +38,7 @@ export default {
 				"isBa":0,
 				"createdAt":"2020-08-19 10:17",
 				"updatedAt":"2020-08-19 10:17",
+				"isEditting": false,
 				"tags":[
 					{
 					"objectType":"user",
@@ -105,6 +67,7 @@ export default {
 				"isBa":0,
 				"createdAt":"2020-08-19 10:17",
 				"updatedAt":"2020-08-19 10:17",
+				"isEditting": false,
 				"tags":[
 					{
 					"objectType":"user",
@@ -118,12 +81,74 @@ export default {
 				"attachments":[
 					{
 					"fileId":123,
-					"fileType":"image"
+					"fileType":"image",
 					},
 					{
 					"fileId":124,
 					"fileType":"docx"
 					}
+				],
+				"childrens":[
+					{
+					"id":111,
+					"content":"comment child 1",
+					"userId":922,
+					"isBa":0,
+					"uuid":0,
+					"targetArea":"",
+					"createdAt":"2020-08-19 10:17",
+					"updatedAt":"2020-08-19 10:17",
+					"tags":[
+						{
+							"objectType":"user",
+							"objectIdentifier":968,
+							"tagInfo":{
+								"offset":20,
+								"length":5
+							}
+						}
+					],
+					"attachments":[
+						{
+							"fileId":123,
+							"fileType":"image"
+						},
+						{
+							"fileId":124,
+							"fileType":"docx"
+						}
+					]
+					},
+					{
+					"id":111,
+					"content":"comment child 2",
+					"userId":922,
+					"isBa":0,
+					"uuid":0,
+					"targetArea":"",
+					"createdAt":"2020-08-19 10:17",
+					"updatedAt":"2020-08-19 10:17",
+					"tags":[
+						{
+							"objectType":"user",
+							"objectIdentifier":968,
+							"tagInfo":{
+								"offset":20,
+								"length":5
+							}
+						}
+					],
+					"attachments":[
+						{
+							"fileId":123,
+							"fileType":"image"
+						},
+						{
+							"fileId":124,
+							"fileType":"docx"
+						}
+					]
+					},
 				]
 			},
 			{
@@ -133,6 +158,7 @@ export default {
 				"isBa":0,
 				"createdAt":"2020-08-19 10:17",
 				"updatedAt":"2020-08-19 10:17",
+				"isEditting": false,
 				"tags":[
 					{
 					"objectType":"user",
@@ -152,6 +178,70 @@ export default {
 					"fileId":124,
 					"fileType":"docx"
 					}
+				],
+				"childrens":[
+					{
+					"id":111,
+					"content":"comment child 21",
+					"userId":922,
+					"isBa":0,
+					"uuid":0,
+					"targetArea":"",
+					"createdAt":"2020-08-19 10:17",
+					"updatedAt":"2020-08-19 10:17",
+					"isEditting": false,
+					"tags":[
+						{
+							"objectType":"user",
+							"objectIdentifier":968,
+							"tagInfo":{
+								"offset":20,
+								"length":5
+							}
+						}
+					],
+					"attachments":[
+						{
+							"fileId":123,
+							"fileType":"image"
+						},
+						{
+							"fileId":124,
+							"fileType":"docx"
+						}
+					]
+					},
+					{
+					"id":111,
+					"content":"comment child 22",
+					"userId":922,
+					"isBa":0,
+					"uuid":0,
+					"targetArea":"",
+					"createdAt":"2020-08-19 10:17",
+					"updatedAt":"2020-08-19 10:17",
+					"isEditting": false,
+					"tags":[
+						{
+							"objectType":"user",
+							"objectIdentifier":968,
+							"tagInfo":{
+								"offset":20,
+								"length":5
+							}
+						}
+					],
+					"attachments":[
+						{
+							"fileId":123,
+							"fileType":"image"
+						},
+						{
+							"fileId":124,
+							"fileType":"docx"
+						}
+					]
+					},
 				]
 			},
 		]

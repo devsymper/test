@@ -1,7 +1,7 @@
 <template>
 	<div class="content-comment">
-		<div :v-if="images.length > 0" class="content-comment-img">
-			<div  class="commnet-img-item" v-for="(item,i) in images" :key="i">
+		<div :v-if="attackments.images.length > 0" class="content-comment-img">
+			<div  class="commnet-img-item" v-for="(item,i) in attackments.images" :key="i">
 				<v-img
            			 :src="item.src"
          		>
@@ -9,8 +9,8 @@
 				</v-img> 
 			</div>
 		</div>	
-		<div :v-if="files.length > 0" class="content-comment-file">
-			<div class="commnet-file-item" v-for="(item,i) in files" :key="i">
+		<div :v-if="attackments.files.length > 0" class="content-comment-file">
+			<div class="commnet-file-item" v-for="(item,i) in attackments.files" :key="i">
 				<v-icon>{{icon[item.type]}}</v-icon>
 				<span class="file-item-title">{{item.name}}</span>
 				<v-icon class="icon-remove-file" v-if="isEditting == true" @click="removeFile(item)">mdi-close-circle-outline</v-icon>
@@ -45,15 +45,10 @@
 				<v-icon>mdi-attachment</v-icon>
 				<v-icon @click="addComment">mdi-send-circle-outline</v-icon>
 			</div>
-			
-			<!-- <at-ta :members="members">
-				<v-textarea v-model="inputComment"></v-textarea>
-			</at-ta> -->
 		</div>
 		<MenuTagUser ref="menuTagUser" @selected-item="tagged" :keyWord="keyWord" />
 	</div>
 </template>
-
 <script>
 import MenuTagUser from './MenuTagUser.vue'
 import { Mentionable } from 'vue-mention'
@@ -63,19 +58,21 @@ export default {
 		isEditting:{
 			type: Boolean,
 			default: false
-		}
+		},
+		item:{
+			type: Object
+		},
 	},
 	components:{
 		MenuTagUser,
 		Mentionable,
-		// 'at-ta': At
 	},
 	methods:{
 		removeFile(item){
-			this.files.splice(this.files.indexOf(item),1)
+			this.attackments.files.splice(this.attackments.files.indexOf(item),1)
 		},
 		removeImage(item){
-			this.images.splice(this.images.indexOf(item),1)
+			this.attackments.images.splice(this.attackments.images.indexOf(item),1)
 		},
 		tagUser(event){
 			let $target = $(event.target);
@@ -84,78 +81,54 @@ export default {
 			this.$refs.menuTagUser.show(x,y);
 		},
 		tagged(data){
-			// let span;
-			// span = document.createElement('span');
-			// $(span).attr('id','tagged'+data.id);
-			// $(span).text(data.name)
 			let character = this.inputComment.charAt(this.inputComment.length - 1)
 			let res = this.inputComment.replace(character,data.name);
-			// console.log(span);
 			this.inputComment = res
 		},
 		addComment(){
-			console.log('add comment here');
+			delete this.item.attackments;
+			this.item.attackments = this.attackments
+			this.item.isEditting = false;
+			console.log(this.item);
 		}
 	
 	},
 	data() {
 		return {
-			// isEditting: false,
 			inputComment: '',
 			keyWord: '',
-			images:[
-				{
-					id: 1,
-					src: 'https://cdn.iconscout.com/icon/free/png-256/facebook-social-media-fb-logo-square-44659.png'
-				},
-				{
-					id: 2,
-					src: 'https://upload.wikimedia.org/wikipedia/commons/f/f0/Icon-notepad.svg'
-				},
-				{
-					id: 3,
-					src: 'https://cdn.iconscout.com/icon/free/png-256/facebook-social-media-fb-logo-square-44659.png'
-				},
-				{
-					id: 4,
-					src: 'https://upload.wikimedia.org/wikipedia/commons/f/f0/Icon-notepad.svg'
-				},
-				{
-					id: 3,
-					src: 'https://cdn.iconscout.com/icon/free/png-256/facebook-social-media-fb-logo-square-44659.png'
-				},
-				{
-					id: 4,
-					src: 'https://upload.wikimedia.org/wikipedia/commons/f/f0/Icon-notepad.svg'
-				},
-			],
-			files:[
-				{
-					id: 1,
-					name: 'Quản lí thu chi',
-					type:'xlxs'
-				},
-				{
-					id: 1,
-					name: 'Quản lí thu chi nữa nè',
-					type:'docx'
-				},
-				{
-					id: 1,
-					name: 'Quản lí thu chi 2',
-					type:'xlxs'
-				},
-				{
-					id: 1,
-					name: 'Quản lí thu chi 3',
-					type:'docx'
-				},
-				{
-					id: 2,
-					name: 'Quản lí thu chi 4',
-					type:'pdf'
-				},
-			],
+			attackments:{
+				images:[
+					{
+						id: 1,
+						src: 'https://cdn.iconscout.com/icon/free/png-256/facebook-social-media-fb-logo-square-44659.png'
+					},
+					{
+						id: 2,
+						src: 'https://upload.wikimedia.org/wikipedia/commons/f/f0/Icon-notepad.svg'
+					},
+					{
+						id: 3,
+						src: 'https://cdn.iconscout.com/icon/free/png-256/facebook-social-media-fb-logo-square-44659.png'
+					},
+					{
+						id: 4,
+						src: 'https://upload.wikimedia.org/wikipedia/commons/f/f0/Icon-notepad.svg'
+					},
+				],
+				files:[
+					{
+						id: 1,
+						name: 'Quản lí thu chi',
+						type:'xlxs'
+					},
+					{
+						id: 1,
+						name: 'Quản lí thu chi nữa nè',
+						type:'docx'
+					},
+				],
+			},
 			icon:{
 				xlxs: 'mdi-file-excel-box',
 				xls: 'mdi-file-excel-box',
@@ -204,20 +177,19 @@ export default {
 .content-comment >>> .commnet-img-item{
 	width: 40px;
 	height: 40px;
-	margin: 0px 8px;
+	margin: 0px 4px 0px 0px;
 }
 .content-comment >>> .commnet-img-item .icon-remove-img{
 	font-size: 13px;
 	float: right;
 	top:0px;
-	/* margin:5px 5px 0 0; */
 }
 .content-comment >>> .content-comment-file{
 	display: flex;
 	flex-direction: column;
 }
 .content-comment >>> .content-comment-file .commnet-file-item{
-	padding: 4px;
+	padding: 4px 0px;
 	display: flex;
 }
 .content-comment >>> .content-comment-file .commnet-file-item .file-item-title{
@@ -233,7 +205,7 @@ export default {
 	float: right;
 }
 .content-comment >>>  .content-comment-input{
-	padding: 4px;
+	padding: 4px 0px;
 }
 .content-comment >>> .content-comment-file .v-icon{
 	font-size: 13px;
