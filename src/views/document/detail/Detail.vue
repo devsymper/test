@@ -235,6 +235,7 @@ export default {
         },
         // Khadm: load data của document lên để hiển thị và xử lý
         loadDocumentStruct(documentId) {
+            this.contentDocument = ""
             let thisCpn = this;
             documentApi
                 .detailDocument(documentId)
