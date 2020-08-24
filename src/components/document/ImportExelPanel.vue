@@ -14,7 +14,7 @@
                     <v-btn
                         color="primary"
                         text
-                        @click="dialog = false, showError=false">
+                        @click="cancel()">
                         Thoát
                     </v-btn>
                 </v-card-actions>
@@ -75,6 +75,7 @@ export default {
     data(){
         return {
             i:0,
+            dialogError:false,
             showValidate:false,
             dialog:false,
             importFile:false,
@@ -101,6 +102,7 @@ export default {
         },
         cancel(){
             this.$emit('cancel');
+            this.dialog = false
         },
         showNotification(){
             this.dialog = true;
