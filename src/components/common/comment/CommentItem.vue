@@ -89,7 +89,37 @@ export default {
 		width:{
 			type: String,
 			default: '380px'
+		},
+		searchItem:{
+			type: String,
+			default: ''
 		}
+	},
+	components: {
+		VuePerfectScrollbar,
+		InputComment,
+		moment
+	},
+	data() {
+		return {
+			listCommentHeight:'500px',
+			images:[],
+			files:[],
+			status,
+			contentEdit: '',
+			reply: false,
+		}
+	},
+	computed:{
+		sEnduser(){
+			return this.$store.state.app.endUserInfo.id
+		},
+		sComment(){
+			return this.$store.state.comment.commentTarget
+		},
+		sReply(){
+			return this.$store.state.comment.isReply
+		},
 	},
 	mounted(){
 		if(this.item.attachments.length > 0){
@@ -162,17 +192,15 @@ export default {
 			return moment(date).fromNow();
 		},
 		resolveComment(item){
-			this.$store.commit('comment/updateResolve',item)
-			debugger
 			commentApi.changeStatus(item.id).then(res => {
-				// item.status = 1
+				item.status = 1
+				this.$store.commit('comment/updateResolve',item)
             })
 		},
 		unresolveComment(item){
-			this.$store.commit('comment/updateUnResolve',item)
 			commentApi.changeStatus(item.id).then(res => {
-				// item.status = 0
-				
+				item.status = 0	
+				this.$store.commit('comment/updateUnResolve',item)
             })
 		},
 		replyComment(item){	
@@ -188,32 +216,8 @@ export default {
 			this.$store.commit('comment/updateParentCommentTarget',data.parentId)
 		}
 	},
-	components: {
-		VuePerfectScrollbar,
-		InputComment,
-		moment
-	},
-	data() {
-		return {
-			listCommentHeight:'500px',
-			images:[],
-			files:[],
-			status,
-			contentEdit: '',
-			reply: false,
-		}
-	},
-	computed:{
-		sEnduser(){
-			return this.$store.state.app.endUserInfo.id
-		},
-		sComment(){
-			return this.$store.state.comment.commentTarget
-		},
-		sReply(){
-			return this.$store.state.comment.isReply
-		},
-	},
+	
+	
 }	
 </script>
 <style scoped>

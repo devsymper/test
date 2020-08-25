@@ -35,24 +35,13 @@
 			</v-text-field> -->
 			<div class="text-area-wrapper" v-else>
 				 <Mentionable
-					:keys="['@']"
-					:items="itemTags"
 					offset="6"
+					:keys="['+']"
 					>
 					<textarea v-model="inputComment"  
 						v-on:keyup.50="tagUser($event)"
 						class="text-area">
 					</textarea>
-					<!-- <template #item-#="{ item }">
-					<div class="issue">
-						<span class="number">
-						#{{ item.id }}
-						</span>
-						<span class="dim">
-						{{ item.displayName }}
-						</span>
-					</div>
-					</template> -->
 				</Mentionable>
 				<UploadFile style="position:absolute;right: 16px;bottom: 5px;" @uploaded-file="uploadInfo"/>
 				<v-btn style="position:absolute;right: 0px;bottom: 5px;" icon @click="addComment">
@@ -152,14 +141,22 @@ export default {
 			item.tagInfo = tagInfo
 			this.tags.push(item)
 			this.inputComment = res
+			
 		},
 		addComment(){
+			if(this.item){
+				this.item.tags = this.tags
+			}
 			this.dataPostComment = this.sComment
 			this.dataPostComment.content = this.inputComment
 			this.dataPostComment.attachments = this.attachments
+			this.dataPostComment.tags = this.tags
+			console.log(this.tags);
+			debugger
 			if(this.isAdd == true){
 				let data = JSON.stringify(this.dataPostComment)
 				commentApi.addComment(data).then(res => {
+					setTimeout(function(){}, 1000);
 					this.$store.commit('comment/updateParentCommentTarget',0)
 					this.updateComment()
 					this.inputComment = ''
@@ -225,7 +222,6 @@ export default {
 				item = {}
 			});
 			return resItem
-			
 		},
 		sComment(){
 			return this.$store.state.comment.commentTarget
@@ -299,6 +295,7 @@ export default {
 	display: flex;
 	position: relative;
 	background-color: #f7f7f7;
+	width: 100%;
 }
 .content-comment >>> .text-area-wrapper .mentionable {
 	flex-grow: 1;
