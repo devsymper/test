@@ -35,20 +35,20 @@ export default {
 			typeSelected:null,
 			objFilter:{
 				documents: {
-					icon: 'mdi-file-document',
+					icon: 'mdi-file-edit-outline',
 					title: 'Documents',
 					name: 'documents',
 					item: [
 					]
 				},
 				orgcharts: {
-					icon: 'mdi-view-dashboard',
+					icon: 'mdi-widgets-outline',
 					title: 'Orgcharts',
 					name: 'orgcharts',
 					item: []
 				},
 				reports: {
-					icon: 'mdi-folder',
+					icon: 'mdi-view-dashboard',
 					title: 'Reports',
 					name: 'reports',
 					item: []
@@ -122,36 +122,34 @@ export default {
 			self.objFilter.workflows.item = []
 			if(listItem.documents.item.length > 0){
 					listItem.documents.item.filter(function(item){
-						if(item.title.includes(self.searchKey)){
+						if(item.title.toLowerCase().includes(self.searchKey.toLowerCase())){
 							self.objFilter.documents.item.push(item)
 						}
 				})
 			}
 			if(listItem.orgcharts.item.length > 0){
 					listItem.orgcharts.item.filter(function(item){
-					if(item.name.includes(self.searchKey)){
+					if(item.name.toLowerCase().includes(self.searchKey.toLowerCase())){
 						self.objFilter.orgcharts.item.push(item)
 					}
 				})
 			}
 			if(listItem.reports.item.length > 0){
 					listItem.reports.item.filter(function(item){
-					if(item.name.includes(self.searchKey)){
+					if(item.name.toLowerCase().includes(self.searchKey.toLowerCase())){
 						self.objFilter.reports.item.push(item)
 					}
 				})
 			}
 			if(listItem.workflows.item.length > 0){
 					listItem.workflows.item.filter(function(item){
-					if(item.name.includes(self.searchKey)){
+					if(item.name.toLowerCase().includes(self.searchKey.toLowerCase())){
 						self.objFilter.workflows.item.push(item)
 					}
 				})
 			}
 		},
 		rightClickHandler(event,item,type){
-			// this.currentSelected = item;
-			// this.typeSelected = type;
 			event.stopPropagation();
 			event.preventDefault();
 			this.$refs.contextMenu.setContextItem(item.actions)

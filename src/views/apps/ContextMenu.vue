@@ -83,6 +83,7 @@
 	position: fixed;
 	z-index: 10000;
 	width: 170px;
+	font:13px roboto;
 	background-color: #fff;
 }
 .context-menu >>> .item{

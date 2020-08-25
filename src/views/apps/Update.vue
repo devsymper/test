@@ -285,7 +285,6 @@ export default {
         },
         createApp() {
 			this.updateListItem(this.$store.state.appConfig.listItemSelected)
-			
 			let data = JSON.stringify(this.currentApp);
 			// console.log(this.currentApp.iconName);
 			appManagementApi.addApp(data).then(res => {
