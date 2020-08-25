@@ -195,12 +195,22 @@ export default {
 			commentApi.changeStatus(item.id).then(res => {
 				item.status = 1
 				this.$store.commit('comment/updateResolve',item)
+				// if(this.sComment.uuid == "0"){
+				// 	this.getCommentId()
+				// }else{
+				// 	this.getCommentUuid()
+				// }
             })
 		},
 		unresolveComment(item){
 			commentApi.changeStatus(item.id).then(res => {
 				item.status = 0	
 				this.$store.commit('comment/updateUnResolve',item)
+				// if(this.sComment.uuid == "0"){
+				// 	this.getCommentId()
+				// }else{
+				// 	this.getCommentUuid()
+				// }
             })
 		},
 		replyComment(item){	
@@ -254,8 +264,8 @@ export default {
 	display: none;
 }
 .commnent-item >>>.v-btn{
-	height: 25px;
-	width: 25px;
+	height: 46px;
+	width: 66px;
 }
 .commnent-item >>>  .v-btn__content .v-icon{
 	font-size: 15px;

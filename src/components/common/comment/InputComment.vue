@@ -279,8 +279,8 @@ export default {
 	
 }
 .content-comment >>> .content-comment-file .commnet-file-item .file-item-title:hover{
-	color: blue;
-	border-bottom: 1px solid blue;
+	color: #E88F15CC;
+	border-bottom: 1px solid #E88F15CC;
 }
 .content-comment >>> .content-comment-file .commnet-file-item .icon-remove-file{
 	float: right;

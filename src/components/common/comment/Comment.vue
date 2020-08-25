@@ -21,7 +21,7 @@
 				>
 					<v-tabs-slider color="yellow"></v-tabs-slider>
 					<v-tab v-for="item in itemsTab" :key="item.value" >
-						<v-icon v-if="isSearching == true">{{item.icon}}</v-icon>
+						<v-icon v-if="isSearching == true" style="font-size:18px">{{item.icon}}</v-icon>
 						<span v-else> <span> {{ item.title }} </span> <span style='padding-left:4px'>{{ '('+sComment[item.store].length+')'}}</span></span>
 					</v-tab>
 				</v-tabs>
@@ -248,7 +248,8 @@ export default {
 
 <style scoped>
 .symper-comment{
-	font:13px roboto
+	font:13px roboto;
+	position: relative;
 }
 .symper-comment  >>>.v-btn{
 	height: 25px;
@@ -312,5 +313,7 @@ export default {
 	margin-right:auto;
 	flex-direction: row;
 	justify-content: center;
+	/* position: absolute; */
+	/* bottom:0px; */
 }
 </style>

@@ -17,7 +17,7 @@
 		isShowMenu:false,
 		top:0,
 		left:0,
-	
+		listUserFilter: [],
 	}),
 	created(){
 		// let self = this
@@ -25,10 +25,11 @@
 	computed:{
 		listUser(){
 			if(this.keyWord == ''){
-				return this.$store.state.app.allUsers
+				return this.$store.state.app.allUsers.splice(2)
 			}
 			else{
-
+				this.filterItem()
+				return this.listUserFilter
 			}
 		},
 	},
@@ -42,6 +43,18 @@
 			this.top = y;
 			this.left = x;
 		},
+		filterItem(){
+			let self = this	
+			self.listUserFilter = []
+			let data = this.$store.state.app.allUsers
+			if(data.length > 0){
+				data.filter(function(item){
+					if(item.displayName.toLowerCase().includes(self.keyWord.toLowerCase())){
+						self.listUserFilter.push(item)
+					}
+				})
+			}
+		}
 	}
 	}
 </script>

@@ -1,7 +1,7 @@
 <template>
 	<div class="list-comment">
 		<VuePerfectScrollbar :style="{height: listCommentHeight}">
-			 <div :v-if="listItemFilter.length > 0" v-for="(item,i) in listItemFilter" :key="i"  class="comment-item"> 
+			 <div :v-if="listItemFilter.length > 0" v-for="(item,i) in listItemFilter	" :key="i"  class="comment-item"> 
 				<CommentItem
 					 :item="item"
 				 />
