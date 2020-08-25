@@ -22,6 +22,7 @@
                     @document-action-get-from-local-storage="getFromLocalStorege"
                     @document-action-delete-cache="deleteLocalStorage"
                     @document-action-check-control="checkBeforeControlNameChange"
+                    @document-action-swap-type-control="openPanelSwapType"
                     />
                 </div>
                 <textarea ref="editorLibWrapper" :id="'document-editor-'+keyInstance">
@@ -41,6 +42,7 @@
         <err-message :listErr="listMessageErr" ref="errMessage"/>
         <control-name-related :instance="keyInstance" @after-close-panel="afterClosePanel"  ref="controlNameRelated"/>
         <all-control-option :instance="keyInstance" ref="allControlOption"/>
+        <SwapTypeControlView :instance="keyInstance" @after-change-type-control="afterChangeTypeControl" ref="swapTypeControlView"/>
 
         <v-dialog v-model="dialog" persistent max-width="290">
             <v-card>
@@ -57,6 +59,7 @@
 <script>
 // import Editor from '@tinymce/tinymce-vue';
 import EditorAction from './items/Action.vue';
+import SwapTypeControlView from './items/SwapTypeControlView';
 import SideBarLeft from './sideleft/SideBarLeft.vue';
 import SideBarRight from './sideright/SideBarRight.vue';
 import TableSetting from './items/TableSetting.vue';
@@ -120,6 +123,7 @@ export default {
         "vue-resizable":VueResizable,
         "all-control-option":AllControlInDoc,
         "control-name-related":ControlNameRelated,
+        SwapTypeControlView
     },
     mounted(){
         let self = this;
@@ -216,8 +220,7 @@ export default {
             isAutocompleteControl:false,
             listMessageErr:[],
             documentId:0,
-            currentFormulasInput:'',
-            currentSelectedInputProps:'',
+            currentSelectedControl:'',
             documentProps:{},
             delta : 500,
             lastKeypressTime : 0,
@@ -276,6 +279,42 @@ export default {
         },
         px2cm(px) {
             return (Math.round((px / 37.7952) * 100) / 100).toFixed(1);
+        },
+
+        // hàm gọi từ compon đổi kiểu control để thay đổi dữ liệu của control có trong store
+        afterChangeTypeControl(newType){
+            let currentControl = this.editorStore.currentSelectedControl;
+            let control =  GetControlProps(newType);
+            let controlEl = $("#document-editor-"+this.keyInstance+"_ifr").contents().find('#'+currentControl.id);
+            let oldFormulas = currentControl.formulas
+            let oldProps = currentControl.properties
+            for(let formulasType in oldFormulas){
+                if(control.formulas.hasOwnProperty(formulasType)){
+                    control.formulas[formulasType] = oldFormulas[formulasType]
+                }
+            }
+            for(let group in oldProps){
+                for(let prop in oldProps[group]){
+                    if(control.properties.hasOwnProperty(prop)){
+                        control.properties[prop] = oldProps[group][prop]
+                    }
+                }
+            }
+            if(controlEl.length > 0){
+                let id = currentControl.id;
+                let table = controlEl.closest('.s-control-table');
+                if(table.length > 0 && currentControl.id != table.attr('id')){
+                    let tableId = table.attr('id');
+                    this.addToAllControlInTable(id,{properties: control.properties, formulas : control.formulas,type:newType},tableId);
+                }
+                else{
+                    this.addToAllControlInDoc(id,{properties: control.properties, formulas : control.formulas,type:newType});
+                }
+                let newControl = $(control.html);
+                newControl.attr('id',id).addClass('on-selected')
+                controlEl.replaceWith(newControl.prop('outerHTML'));
+                this.selectControl(control.properties, control.formulas,id);
+            }  
         },
         /**
          * Hàm xử lí kiểm tra xem tên của control hiện tại đang ở trong những công thức của các control nào doc nao
@@ -439,6 +478,9 @@ export default {
         setShowAllControlOption(){
             this.$refs.allControlOption.getData();
             this.$refs.allControlOption.showDialog();
+        },
+        openPanelSwapType(){
+            this.$refs.swapTypeControlView.show();
         },
         // mở modal lưu , edit doc
         openPanelSaveDocument(){
@@ -1665,6 +1707,7 @@ export default {
 
             let type = el.attr('s-control-type');
             let controlId = el.attr('id');
+            this.currentSelectedControl = controlId
             $('.editor-tree-active').removeClass('editor-tree-active')
             $('.tree-'+controlId).addClass('editor-tree-active')
             

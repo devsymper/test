@@ -83,7 +83,6 @@ const resetCurrentControl = (state, params) => {
     Vue.set(state.editor[instance], 'currentSelectedControl', currentSelectedControl);
 }
 const updateProp = (state, params) => {
-    console.log("sadsafsad-set", params);
     let id = params.id
     let name = params.name
     let value = params.value

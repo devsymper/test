@@ -169,6 +169,9 @@ export default {
             if(name == 'name'){
                 this.checkNameControl(name, input, data)
             }
+            if(name == 'title'){
+                this.checkTitleControl(name, input, data)
+            }
         },
         savePrintControlConfig(name, input, data){
             let elements = $('#document-editor-'+this.instance+'_ifr').contents().find('#'+this.sCurrentDocument.id);
@@ -179,6 +182,22 @@ export default {
                 let cssItem = {};
                 cssItem[name] = data;
                 elements.css(cssItem)
+            }
+        },
+        /**
+         * Hàm kiểm tra tên 1 control có bị trùng với các control khác hay không, nếu bị trùng thì thông báo lỗi
+         */
+        checkTitleControl(name, input, data){
+            let elements = $('#document-editor-'+this.instance+'_ifr').contents().find('#'+this.sCurrentDocument.id);
+            let tableId = checkInTable(elements)
+            if( tableId == this.sCurrentDocument.id)
+            tableId = '0';
+            if(input.value == "" && input.value.length == 0){
+                let errValue = "Không được bỏ trống tên control"
+                elements.addClass('s-control-error');
+                this.$store.commit(
+                    "document/updateProp",{id:this.sCurrentDocument.id,name:name,value:errValue,tableId:tableId,type:"errorMessage",instance:this.instance}
+                );  
             }
         },
 

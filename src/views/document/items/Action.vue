@@ -28,9 +28,10 @@ export default {
             items: [
                 { text: 'Lưu cache', icon: 'mdi-wallet' ,action:'save-to-local-storage'},
                 { text: 'From cache', icon: 'mdi-cached' ,action:'get-from-local-storage'},
-                { text: 'Xóa bộ đệm', icon: 'mdi-delete-circle' ,action:'delete-cache'},
-                { text: 'Clone control', icon: 'mdi-content-copy' ,action:'clone-control'},
+                // { text: 'Xóa bộ đệm', icon: 'mdi-delete-circle' ,action:'delete-cache'},
+                // { text: 'Clone control', icon: 'mdi-content-copy' ,action:'clone-control'},
                 { text: 'Xóa control', icon: 'mdi-delete-forever' ,action:'delete-control'},
+                { text: 'Ch.đ kiểu control', icon: 'mdi-swap-horizontal' ,action:'swap-type-control'},
                
                 { text: 'TH control', icon: 'mdi-cog' ,action:'list-control-option'},
                 { text: 'Lưu doc', icon: 'mdi-content-save' ,action:'save-document'},

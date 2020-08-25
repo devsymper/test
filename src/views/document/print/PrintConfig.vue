@@ -212,8 +212,6 @@ export default {
             isAutocompleteControl:false,
             listMessageErr:[],
             documentId:0,
-            currentFormulasInput:'',
-            currentSelectedInputProps:'',
             documentProps:{},
             delta : 500,
             lastKeypressTime : 0,

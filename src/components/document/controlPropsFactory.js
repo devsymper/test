@@ -23,7 +23,8 @@ const commonProps = {
         title: "Tiêu đề",
         type: "text",
         value: "",
-        groupType: "name"
+        groupType: "name",
+        errorMessage: ""
     },
     otherInfo: {
         title: "Thông tin thêm",
