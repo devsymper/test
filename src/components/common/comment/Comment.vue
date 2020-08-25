@@ -21,18 +21,19 @@
 				>
 					<v-tabs-slider color="yellow"></v-tabs-slider>
 					<v-tab v-for="item in itemsTab" :key="item.value" >
-						<span> {{ item.title }} </span> <!--<span style='padding-left:4px'>{{ '('+sComment[item.store].length+')'}}</span> -->
+						<v-icon v-if="isSearching == true">{{item.icon}}</v-icon>
+						<span v-else> <span> {{ item.title }} </span> <span style='padding-left:4px'>{{ '('+sComment[item.store].length+')'}}</span></span>
 					</v-tab>
 				</v-tabs>
 				<v-spacer></v-spacer>
-				<!-- <v-text-field
-					solo
-					v-if="showInput"
-					label="Append"
-					append-icon="mdi-close"
-					@click:append="clickClose"
-					></v-text-field> -->
-					<v-icon   @click="clickSearch" style="font-size:13px">mdi-magnify</v-icon>
+				  <v-text-field
+						solo
+						v-if="isSearching"
+						label="Append"
+						append-icon="mdi-close"
+						@click:append="clickClose"
+					></v-text-field>
+					<v-icon v-else  @click="clickSearch" style="font-size:13px">mdi-magnify</v-icon>
 				</template>
 			</v-toolbar>
 			<v-tabs-items v-model="tab">
@@ -87,7 +88,7 @@ export default {
 	 data() {
         return {
             tab: null,
-			showInput:false,
+			isSearching:false,
 			showSpan:true,
 			showMagnity:true,
 			showTargetArea:false,
@@ -176,10 +177,10 @@ export default {
 	},
 	methods:{
 		clickSearch(){
-      		this.showInput = true
+      		this.isSearching = true
   		},
 		clickClose(){
-			this.showInput = false
+			this.isSearching = false
 		},
 		hide(){
 			this.showComment = false
@@ -250,7 +251,10 @@ export default {
 	height: 25px;
 	width: 25px;
 }
-
+.symper-comment  >>> .v-input__slot{
+	box-shadow: unset;
+	background-color:#f7f7f7;
+}
 .symper-comment >>> .v-toolbar__title{
 	text-transform: uppercase;
 	font:15px roboto

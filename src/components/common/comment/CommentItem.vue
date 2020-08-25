@@ -138,31 +138,41 @@ export default {
 		},
 		getCommentUuid(){
 			commentApi.getCommentByUuid(this.sComment.objectType,this.sComment.objectIdentifier,this.sComment.uuid).then(res => {
-				this.$store.commit('comment/updateListComment',res.data.listObject.comments)
 				this.$store.commit('comment/updateListAvtiveComment',res.data.listObject.comments)
 				this.$store.commit('comment/updateListResolve',res.data.listObject.resolve)
+				if(this.$store.state.comment.currentTab == 'comment'){
+						this.$store.commit('comment/setComment')
+				}else{
+					this.$store.commit('comment/setResolve')
+				}
 			});
 		},
 		getCommentId(){
 			commentApi.getCommentById(this.sComment.objectType,this.sComment.objectIdentifier).then(res => {
-				this.$store.commit('comment/updateListComment',res.data.listObject.comments)
 				this.$store.commit('comment/updateListAvtiveComment',res.data.listObject.comments)
 				this.$store.commit('comment/updateListResolve',res.data.listObject.resolve)
+					if(this.$store.state.comment.currentTab == 'comment'){
+						this.$store.commit('comment/setComment')
+				}else{
+					this.$store.commit('comment/setResolve')
+				}
 			});
 		},
 		lassSeen(date){
 			return moment(date).fromNow();
 		},
 		resolveComment(item){
+			this.$store.commit('comment/updateResolve',item)
+			debugger
 			commentApi.changeStatus(item.id).then(res => {
-				item.status = 1
-				this.$store.commit('comment/updateResolve',item)
+				// item.status = 1
             })
 		},
 		unresolveComment(item){
+			this.$store.commit('comment/updateUnResolve',item)
 			commentApi.changeStatus(item.id).then(res => {
-				item.status = 0
-				this.$store.commit('comment/updateUnResolve',item)
+				// item.status = 0
+				
             })
 		},
 		replyComment(item){	

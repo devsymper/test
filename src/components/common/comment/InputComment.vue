@@ -70,6 +70,24 @@ import At from 'vue-at'
 import UploadFile from '@/components/common/UploadFile.vue';
 import {commentApi} from '@/api/Comment.js'
 export default {
+	data() {
+		return {
+			inputComment: '',
+			keyWord: '',
+			attachments:[],
+			tags:[],
+			icon:{
+				xlxs: 'mdi-file-excel-box',
+				xls: 'mdi-file-excel-box',
+				docx: 'mdi-file-word-box',
+				doc: 'mdi-file-word-box',
+				pdf: 'mdi-file-pdf-box',
+				default: 'mdi-file'
+			},
+			dataPostComment:{
+			}
+		}
+	},
 	props:{
 		isEditing:{
 			type: Boolean,
@@ -119,7 +137,7 @@ export default {
 		tagUser(event){
 			let $target = $(event.target);
 			var x = $target.offset().left;
-     		var y = $target.offset().top + 60;
+     		var y = $target.offset().top + 80;
 			this.$refs.menuTagUser.show(x,y);
 		},
 		tagged(data){
@@ -159,8 +177,6 @@ export default {
 			}
 			this.$store.commit('comment/updateReplyStatus',false)
 		},
-		editComment(){
-		},
 		uploadInfo(data){
 			if(typeof data === 'string'){
 				alert(data)
@@ -176,15 +192,23 @@ export default {
 		updateComment(){
 			if(this.sComment.uuid == "0"){
 				commentApi.getCommentById(this.sComment.objectType,this.sComment.objectIdentifier).then(res => {
-					this.$store.commit('comment/updateListComment',res.data.listObject.comments)
 					this.$store.commit('comment/updateListAvtiveComment',res.data.listObject.comments)
 					this.$store.commit('comment/updateListResolve',res.data.listObject.resolve)
+					if(this.$store.state.comment.currentTab == 'comment'){
+						this.$store.commit('comment/setComment')
+					}else{
+						this.$store.commit('comment/setResolve')
+					}
 				});
 			}else{
 				commentApi.getCommentByUuid(this.sComment.objectType,this.sComment.objectIdentifier,this.sComment.uuid).then(res => {
-					this.$store.commit('comment/updateListComment',res.data.listObject.comments)
 					this.$store.commit('comment/updateListAvtiveComment',res.data.listObject.comments)
 					this.$store.commit('comment/updateListResolve',res.data.listObject.resolve)
+					if(this.$store.state.comment.currentTab == 'comment'){
+						this.$store.commit('comment/setComment')
+					}else{
+						this.$store.commit('comment/setResolve')
+					}
 				});
 			}
 		}
@@ -205,34 +229,6 @@ export default {
 		},
 		sComment(){
 			return this.$store.state.comment.commentTarget
-		}
-	},
-	data() {
-		return {
-			inputComment: '',
-			keyWord: '',
-			attachments:[],
-			tags:[],
-			icon:{
-				xlxs: 'mdi-file-excel-box',
-				xls: 'mdi-file-excel-box',
-				docx: 'mdi-file-word-box',
-				doc: 'mdi-file-word-box',
-				pdf: 'mdi-file-pdf-box',
-				default: 'mdi-file'
-			},
-			// itemsTag:[
-			// 	{
-			// 		value: '1',
-			// 		label: 'Ngô Anh Dũng',
-			// 	},
-			// 	{
-			// 		value: '2',
-			// 		label: 'Đào Mạnh Khá',
-			// 	},
-			// ],
-			dataPostComment:{
-			}
 		}
 	},
 	watch:{
