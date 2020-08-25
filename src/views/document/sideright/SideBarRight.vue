@@ -88,6 +88,10 @@ export default {
         instance:{
             type:Number,
             default:Date.now()
+        },
+        isConfigPrint:{
+            type:Boolean,
+            default:false
         }
     },
     components:{
@@ -143,6 +147,10 @@ export default {
             
         },
         handleChangeInput(name, input, data){
+            if(this.isConfigPrint){
+                this.savePrintControlConfig(name, input, data);
+                return;
+            }
             let value = input.value
             let elements = $('#document-editor-'+this.instance+'_ifr').contents().find('#'+this.sCurrentDocument.id);
             if(name == "width"){
@@ -160,6 +168,18 @@ export default {
 
             if(name == 'name'){
                 this.checkNameControl(name, input, data)
+            }
+        },
+        savePrintControlConfig(name, input, data){
+            console.log(name,input,data);
+            let elements = $('#document-editor-'+this.instance+'_ifr').contents().find('#'+this.sCurrentDocument.id);
+            if(name == "formulas"){
+                elements.attr('formulas',data);
+            }
+            else{
+                let cssItem = {};
+                cssItem[name] = data;
+                elements.css(cssItem)
             }
         },
 

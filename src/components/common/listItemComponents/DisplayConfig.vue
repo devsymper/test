@@ -67,7 +67,7 @@
                             :key="column.data"
                         >
                             <v-icon size="18" class="mr-2">{{getDataTypeIcon(column.type)}}</v-icon>
-                            <span class="fw-400">{{$t(joinPrefixAndTile(column.columnTitle))}}</span>
+                            <span class="fw-400">{{columnTitle(column.columnTitle)}}</span>
                             <v-tooltip top>
                                 <template v-slot:activator="{ on }">
                                     <v-btn
@@ -184,13 +184,17 @@ export default {
             return appConfigs.dataTypeIcon[type];
         },
         
-        joinPrefixAndTile(title) {
+        columnTitle(title) {
             let prefix = this.headerPrefixKeypath;
             prefix =
                 prefix[prefix.length - 1] == "." || prefix == ""
                     ? prefix
                     : prefix + ".";
-            return prefix + title;
+            if(prefix){
+                return this.$t(prefix + title);            
+            }else{
+                return title;
+            }
         },
     }
     

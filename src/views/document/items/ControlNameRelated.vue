@@ -9,7 +9,7 @@
         >
             <v-card-title class="headline">{{heading}}</v-card-title>
             <v-card-subtitle  class="s-subtitle-control">
-                {{subHeadingTitle}}<span class="control-name">{{controlName}}</span>
+                {{subHeadingTitle}}<span class="control-name">{{oldContext}}</span>
             </v-card-subtitle>
             <v-card-text style="height: calc(100% - 112px);    overflow: auto;">
                 <!-- <v-list-item dense v-for="(formulas, index) in listFormulas" :key="index+formulas">
@@ -48,9 +48,10 @@
             </v-card-text>
                 <v-divider></v-divider>
 
-            <v-card-actions>
+            <v-card-actions class="s-card-actions">
+            <s-pagination @on-change-page="getDataWithPage" @on-change-page-size="getDataWithPage" class="pagination" :total="totalRecord"/>
+
             <v-spacer></v-spacer>
-            
 
             <v-btn
                 color="green darken-1"
@@ -77,6 +78,7 @@
 <script>
 import {formulasApi} from './../../../api/Formulas'
 import {documentApi} from './../../../api/Document'
+import Pagination from './../../../components/common/Pagination'
 export default {
     computed:{
         sDocumentStore(){
@@ -89,12 +91,15 @@ export default {
             default:Date.now()
         },
     },
+    components:{
+        's-pagination':Pagination
+    },
     data(){
         return {
             isShow:false,
             listFormulas:[],
-            controlName:"",
-            newControlName:"",
+            oldContext:"",
+            newContext:"",
             headers:  [
             { text: '', value: 'icon' , width:50},
             { text: this.$t('document.editor.dialog.nameRelated.table.position'), value: 'position' },
@@ -107,6 +112,8 @@ export default {
             heading:"",
             subHeadingTitle:"",
             type:"",
+            totalRecord:0,
+            dataPageSize:{}
         }
     },
    
@@ -121,41 +128,40 @@ export default {
             this.isShow = true
         },
         hideDialog(){
-            this.$emit("after-close-panel",this.type)
+            this.$emit("after-close-panel",this.type,this.newContext)
             this.isShow = false
         },
-        getDataRelated(fieldName,newFieldName){
-            this.type = "control";
+        getDataWithPage(data){
+            this.dataPageSize = data
+            this.getDataRelated(this.type,this.oldContext,this.newContext)
+        },
+        getDataRelated(type,fieldName="",newFieldName=""){
+            this.type = type;
             let thisCpn = this;
-            this.controlName = fieldName;
-            this.newControlName = newFieldName;
-            let dataPost = {fieldName:this.controlName,documentName:this.sDocumentStore.name.value};
+            let dataPost = {};
+            if(type == 'control'){
+                this.oldContext = fieldName;
+                this.newContext = newFieldName;
+                dataPost = {fieldName:this.oldContext,documentName:this.sDocumentStore.name.value};
+            }
+            else{
+                this.oldContext = this.sDocumentStore.name.oldName;
+                this.newContext = this.sDocumentStore.name.value;
+                dataPost = {documentName:this.sDocumentStore.name.oldName};
+            }
+            dataPost = Object.assign(this.dataPageSize,dataPost);
             formulasApi.getRelated(dataPost).then(res=>{
                 if(res.status == 200){
                     thisCpn.dataTable = []
                     let data = res.data;
                     if(data != false){
-                        thisCpn.handleData(data)
+                        thisCpn.handleData(data.data)
+                        thisCpn.totalRecord = parseInt(data.total)
                     }
                 }
             }).always(() => {}).catch({});
         },
-        getDocumentRelated(){
-            this.controlName = this.sDocumentStore.name.oldName;
-            this.newControlName = this.sDocumentStore.name.value;
-            this.type = "document";
-            let thisCpn = this;
-            let dataPost = {documentName:this.sDocumentStore.name.oldName};
-            formulasApi.getRelated(dataPost).then(res=>{
-                if(res.status == 200){
-                    thisCpn.dataTable = []
-                    let data = res.data;
-                    if(data != false){
-                        thisCpn.handleData(data)
-                    }
-                }
-            }).always(() => {}).catch({});
-        },
+       
         handleData(data){
             let thisCpn = this;
             let listDocName = data.reduce((newArr,obj)=>{
@@ -218,8 +224,8 @@ export default {
         },
 
         detectControlChangeInFormulas(formulas){
-            let regex = new RegExp("\\b(?:"+this.controlName+")\\b","gm");
-            let newFormulas = formulas.replace(regex,this.newControlName);
+            let regex = new RegExp("\\b(?:"+this.oldContext+")\\b","gm");
+            let newFormulas = formulas.replace(regex,this.newContext);
             return newFormulas;
         }
         
@@ -240,5 +246,11 @@ export default {
     }
     .headline{
         padding: 8px 0px 0px 24px !important;
+    }
+    .pagination{
+        margin-left: 12px;
+    }
+    .s-card-actions{
+        padding: 8px !important;
     }
 </style>

@@ -163,7 +163,6 @@ export default class BasicControl extends Control {
             if (thisObj.checkAutoCompleteControl()) {
                 let fromSelect = false;
                 let formulasInstance = (fromSelect) ? thisObj.controlFormulas.formulas.instance : thisObj.controlFormulas.autocomplete.instance;
-                $(this).addClass('autocompleting')
                 e['controlName'] = thisObj.controlProperties.name.value;
                 SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-key-event', {
                     e: e,
@@ -412,10 +411,11 @@ export default class BasicControl extends Control {
     renderUserControl() {
         if (this.checkDetailView()) {
             let thisObj = this;
-            userApi.getDetailUser(this.value).then(res => {
-                thisObj.value = res.data.user.displayName;
-                thisObj.ele.val(thisObj.value)
-            }).always({}).catch({})
+            if (this.value != null && this.value != "")
+                userApi.getDetailUser(this.value).then(res => {
+                    thisObj.value = res.data.user.displayName;
+                    thisObj.ele.val(thisObj.value)
+                }).always({}).catch({})
 
         } else {
             this.ele.attr('type', 'text');
@@ -450,7 +450,6 @@ export default class BasicControl extends Control {
                     value: null,
                     instance: thisObj.curParentInstance
                 });
-                $(this).addClass('autocompleting');
                 let formulasInstance = thisObj.controlFormulas.list.instance;
                 SYMPER_APP.$evtBus.$emit('document-submit-select-input', { e: e, selectFormulasInstance: formulasInstance, alias: thisObj.name, controlTitle: thisObj.title })
             })

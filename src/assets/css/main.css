@@ -307,8 +307,8 @@ html {
 .sym-small-size .v-pagination__navigation {
     font-size: 13px!important;
     box-shadow: none!important;
-    height: 28px!important;
-    min-width: 28px!important;
+    height: 20px!important;
+    min-width: 20px!important;
 }
 
 .sym-stepper-content .v-stepper__wrapper {
@@ -402,6 +402,7 @@ html {
 .symper-app-tab {
     display: inline-block!important;
     line-height: 40px!important;
+    /* width: 200px!important; */
 }
 
 .top-right {

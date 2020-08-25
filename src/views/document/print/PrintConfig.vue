@@ -1,7 +1,7 @@
 <template>
     <v-flex class="d-flex sym-document" style="height:calc(100%);">
         <div class="sym-document__side-bar-left">
-            <sidebar-left :instance="keyInstance"/>
+            <sidebar-left :isConfigPrint="true" :instance="keyInstance"/>
         </div>
             <vue-resizable 
             :active="['r']" 
@@ -31,7 +31,7 @@
             </div>
         </vue-resizable>
         <div  class="sym-document__side-bar-right">
-            <sidebar-right ref="sidebarRight" :instance="keyInstance"/>
+            <sidebar-right ref="sidebarRight" :isConfigPrint="true"  :instance="keyInstance"/>
         </div>
         <s-table-setting  ref="tableSetting" @add-columns-table="addColumnTable"/>
         <auto-complete-control ref="autocompleteControl" @add-control="insertControl"/>
@@ -56,25 +56,25 @@
 </template>
 <script>
 // import Editor from '@tinymce/tinymce-vue';
-import EditorAction from './items/Action.vue';
-import SideBarLeft from './sideleft/SideBarLeft.vue';
-import SideBarRight from './sideright/SideBarRight.vue';
-import TableSetting from './items/TableSetting.vue';
-import AutoCompleteControl from './items/AutoCompleteControl.vue';
-import controlCss from  "./../../assets/css/document/control/control.css";
-import SaveDocPanel from "./../../views/document/items/SaveDocPanel.vue";
-import ErrMessagePanel from "./../../views/document/items/ErrMessagePanel.vue";
-import ControlNameRelated from "./../../views/document/items/ControlNameRelated.vue";
-import AllControlInDoc from "./../../views/document/items/AllControlInDoc.vue";
+import EditorAction from './../items/Action.vue';
+import SideBarLeft from './../sideleft/SideBarLeft.vue';
+import SideBarRight from './../sideright/SideBarRight.vue';
+import TableSetting from './../items/TableSetting.vue';
+import AutoCompleteControl from './../items/AutoCompleteControl.vue';
+import controlCss from  "./../../../assets/css/document/control/control.css";
+import SaveDocPanel from "./../../../views/document/items/SaveDocPanel.vue";
+import ErrMessagePanel from "./../../../views/document/items/ErrMessagePanel.vue";
+import ControlNameRelated from "./../../../views/document/items/ControlNameRelated.vue";
+import AllControlInDoc from "./../../../views/document/items/AllControlInDoc.vue";
 import { GetControlProps,mappingOldVersionControlProps,
-        mappingOldVersionControlFormulas,getAPropsControl } from "./../../components/document/controlPropsFactory.js";
-import { documentApi } from "./../../api/Document.js";
-import { formulasApi } from "./../../api/Formulas.js";
-import { util } from "./../../plugins/util.js";
-import {checkInTable} from "./common/common";
-import { getInsertionCSS } from "./../../components/document/documentUtil.js";
+        mappingOldVersionControlFormulas,getAPropsControl } from "./../../../components/document/controlPropsFactory.js";
+import { documentApi } from "./../../../api/Document.js";
+import { formulasApi } from "./../../../api/Formulas.js";
+import { util } from "./../../../plugins/util.js";
+import {checkInTable} from "./../common/common";
+import { getInsertionCSS } from "./../../../components/document/documentUtil.js";
 import VueResizable from 'vue-resizable';
-import { minimizeControl } from '../../store/document/mutations';
+import { minimizeControl } from '../../../store/document/mutations';
 
 import tinymce from 'tinymce/tinymce';
 
