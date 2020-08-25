@@ -24,7 +24,7 @@ const commonProps = {
         type: "text",
         value: "",
         groupType: "name",
-        errorMessage: "Không được bỏ trống tiêu đề control"
+        errorMessage: ""
     },
     otherInfo: {
         title: "Thông tin thêm",

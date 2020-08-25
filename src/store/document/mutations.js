@@ -38,6 +38,7 @@ const addCurrentControl = (state, control) => {
     let instance = control.instance
     Vue.set(state.editor[instance].currentSelectedControl, 'formulas', control.formulas);
     Vue.set(state.editor[instance].currentSelectedControl, 'id', control.id);
+    Vue.set(state.editor[instance].currentSelectedControl, 'type', control.type);
 
     let groups = { name: {}, display: {}, print: {} };
     if (control.properties != undefined && typeof control.properties != 'undefined') {

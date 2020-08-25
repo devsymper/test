@@ -10,14 +10,14 @@
             </p>
             <p class="text-content">
                 <span>{{$t('document.editor.dialog.swapType.nameControl')}}:</span>
-                <span class="control-name">mct</span>
+                <span class="control-name">{{dataControl.name}}</span>
             </p>
             <div class="text-content">
                 <span>{{$t('document.editor.dialog.swapType.changeFrom')}}</span>   
                 <div style="    display: inline-block;margin: 0 12px;">
                     <img style="height:14px;margin-right: 8px;
-    margin-bottom: -3px;" src="https://hoangnd.dev.symper.vn//icon/ic_textinput.png" alt="">
-                    <span style="    font-weight: 500;">Document select</span>
+    margin-bottom: -3px;" :src="dataControl.icon" alt="">
+                    <span style="    font-weight: 500;">{{dataControl.type}}</span>
                 </div>
                 <span>{{$t('document.editor.dialog.swapType.changeTo')}}</span>
                 <v-select
@@ -58,6 +58,12 @@ export default {
         instance:{
             type:Number,
             default:Date.now()
+        },
+        dataControl:{
+            type:Object,
+            default:function(){
+                return {}
+            }
         },
     },
     data(){

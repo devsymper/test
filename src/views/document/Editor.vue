@@ -42,7 +42,11 @@
         <err-message :listErr="listMessageErr" ref="errMessage"/>
         <control-name-related :instance="keyInstance" @after-close-panel="afterClosePanel"  ref="controlNameRelated"/>
         <all-control-option :instance="keyInstance" ref="allControlOption"/>
-        <SwapTypeControlView :instance="keyInstance" @after-change-type-control="afterChangeTypeControl" ref="swapTypeControlView"/>
+        <SwapTypeControlView 
+        :instance="keyInstance" 
+        :dataControl="dataControlSwapType"
+        @after-change-type-control="afterChangeTypeControl" 
+        ref="swapTypeControlView"/>
 
         <v-dialog v-model="dialog" persistent max-width="290">
             <v-card>
@@ -70,7 +74,7 @@ import ErrMessagePanel from "./../../views/document/items/ErrMessagePanel.vue";
 import ControlNameRelated from "./../../views/document/items/ControlNameRelated.vue";
 import AllControlInDoc from "./../../views/document/items/AllControlInDoc.vue";
 import { GetControlProps,mappingOldVersionControlProps,
-        mappingOldVersionControlFormulas,getAPropsControl } from "./../../components/document/controlPropsFactory.js";
+        mappingOldVersionControlFormulas,getAPropsControl,getIconFromType } from "./../../components/document/controlPropsFactory.js";
 import { documentApi } from "./../../api/Document.js";
 import { formulasApi } from "./../../api/Formulas.js";
 import { util } from "./../../plugins/util.js";
@@ -221,6 +225,7 @@ export default {
             listNameValueControl:{},
             keyInstance:Date.now(),
             dialog: false,
+            dataControlSwapType:{}
         }
     },
     beforeMount(){
@@ -306,7 +311,7 @@ export default {
                 let newControl = $(control.html);
                 newControl.attr('id',id).addClass('on-selected')
                 controlEl.replaceWith(newControl.prop('outerHTML'));
-                this.selectControl(control.properties, control.formulas,id);
+                this.selectControl(control.properties, control.formulas,id,newType);
             }  
         },
         /**
@@ -473,7 +478,23 @@ export default {
             this.$refs.allControlOption.showDialog();
         },
         openPanelSwapType(){
-            this.$refs.swapTypeControlView.show();
+            let currentControl = this.editorStore.currentSelectedControl
+            if(currentControl.properties.name.hasOwnProperty('name')){
+                let icon = getIconFromType(currentControl.type)
+                this.dataControlSwapType = {
+                    name:currentControl.properties.name.name.value,
+                    type:currentControl.type,
+                    icon:icon
+                }
+                this.$refs.swapTypeControlView.show();
+            }
+            else{
+                 this.$snotify({
+                                type: "info",
+                                title: "Vui lòng chọn control trước khi sử dụng tính năng này"
+                            }); 
+            }
+            
         },
         // mở modal lưu , edit doc
         openPanelSaveDocument(){
@@ -846,11 +867,14 @@ export default {
             );  
         },
         // set config cho phần sidebar phải các thuộc tính control đang được click
-        selectControl(properties,formulas,id){
+        selectControl(properties,formulas,id,type){
             this.$store.commit(
                 "document/addCurrentControl",
                 {properties:properties,
-                formulas:formulas,id:id,instance:this.keyInstance}
+                formulas:formulas,
+                id:id,
+                type:type,
+                instance:this.keyInstance}
             );
         },
         resetSelectControl(){
@@ -880,7 +904,7 @@ export default {
             
             $(this.editorCore.selection.getNode()).html(newContent+'&nbsp;<span id = "caret_pose_holder"> </ span>')
             let table = $(this.editorCore.selection.getNode()).closest('.s-control-table');
-            this.selectControl(control.properties, control.formulas,inputid);
+            this.selectControl(control.properties, control.formulas,inputid,type);
             let ed  = this.editorCore;
             ed.focus(); 
             ed.selection.select(ed.dom.select('#caret_pose_holder')[0]); 
@@ -1662,7 +1686,7 @@ export default {
                         checkDiv.attr('contenteditable', false);
                     }
                     insertionPoint.remove();
-                    thisCpn.selectControl(control.properties, control.formulas,inputid);
+                    thisCpn.selectControl(control.properties, control.formulas,inputid,typeControl);
                     if(table.length > 0){   // nếu keo control vào trong table thì update dữ liệu trong table của state
                         idTable = table.attr('id');
                         thisCpn.addToAllControlInTable(inputid,{properties: control.properties, formulas : control.formulas,type:typeControl},idTable);
@@ -1692,11 +1716,11 @@ export default {
                 tinyMCE.activeEditor.selection.setNode(e.target);
                 let tableId = table.attr('id');
                 let control = this.editorStore.allControl[tableId]['listFields'][controlId];
-                this.selectControl(control.properties, control.formulas,controlId);
+                this.selectControl(control.properties, control.formulas,controlId,type);
             }
             else{
                 let control = this.editorStore.allControl[controlId];
-                this.selectControl(control.properties, control.formulas,controlId);
+                this.selectControl(control.properties, control.formulas,controlId,type);
             }
         }
     },

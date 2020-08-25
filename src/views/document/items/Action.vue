@@ -29,7 +29,7 @@ export default {
                 { text: 'Lưu cache', icon: 'mdi-wallet' ,action:'save-to-local-storage'},
                 { text: 'From cache', icon: 'mdi-cached' ,action:'get-from-local-storage'},
                 // { text: 'Xóa bộ đệm', icon: 'mdi-delete-circle' ,action:'delete-cache'},
-                // { text: 'Clone control', icon: 'mdi-content-copy' ,action:'clone-control'},
+                { text: 'Clone control', icon: 'mdi-content-copy' ,action:'clone-control'},
                 { text: 'Xóa control', icon: 'mdi-delete-forever' ,action:'delete-control'},
                 { text: 'Ch.đ kiểu control', icon: 'mdi-swap-horizontal' ,action:'swap-type-control'},
                
