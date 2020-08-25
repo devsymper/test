@@ -135,7 +135,7 @@ export default {
 		  */
         heightComment: {
             type: String,
-            default: "1000px"
+            default: "800px"
 		},
 		 /**
 		  * truyen vao vi tri comment
@@ -175,7 +175,7 @@ export default {
 		*/
 		uuid:{
 			type:String,
-			default:"0"
+			default:""
 		}
 	},
 	methods:{

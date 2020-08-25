@@ -25,7 +25,7 @@
 	computed:{
 		listUser(){
 			if(this.keyWord == ''){
-				return this.$store.state.app.allUsers.splice(2)
+				return this.$store.state.app.allUsers
 			}
 			else{
 				this.filterItem()
