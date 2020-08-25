@@ -93,17 +93,11 @@ export default {
 	},
 	methods:{
 		removeFile(item){
-			const index = this.attachments.indexOf(item.id);
-				if (index > -1) {
-					this.attachments.splice(index, 1);
-				}
+			this.attachments.splice(this.attachments.indexOf(item.id),1)
 			this.files.splice(this.files.indexOf(item),1)
 		},
 		removeImage(item){
-			const index = this.attachments.indexOf(item.id);
-			if (index > -1) {
-				this.attachments.splice(index, 1);
-			}
+			this.attachments.splice(this.attachments.indexOf(item.id),1)
 			this.images.splice(this.images.indexOf(item),1)
 		},
 		tagUser(event){
@@ -246,9 +240,10 @@ export default {
 	display: flex;
 }
 .content-comment >>> .content-comment-file .commnet-file-item .file-item-title{
-	padding-left: 0px 0px 4px 0px;
+	padding: 0px 0px 4px 4px;
 	flex-grow: 1;
 	cursor: pointer;
+	
 }
 .content-comment >>> .content-comment-file .commnet-file-item .file-item-title:hover{
 	color: blue;

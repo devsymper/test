@@ -247,7 +247,8 @@ export default {
 	width:340px;
 	display: flex;
 	margin-right:auto;
-	margin-left:auto
+	margin-left:auto;
+	margin-top: 8px;
 }
 .commnent-item >>> .commnent-item-wrapper:hover .icon-menu{
 	display: inline-block;
