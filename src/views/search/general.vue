@@ -11,7 +11,7 @@
                     </v-list-item-content>
                 </template>
                 <v-list dense>
-                    <v-list-item v-for="item in menu" :key="item.title">
+                    <v-list-item v-for="(item,menuIdx) in menu" :key="menuIdx">
                         <v-list-item-icon>
                             <v-icon>mdi mdi-home</v-icon>
                         </v-list-item-icon>
@@ -22,7 +22,7 @@
                 </v-list>
             </v-navigation-drawer>
         </v-col>
-        <v-col cols="md-10" class="ml-1 mr-3" style="margin-top:-11px">
+        <v-col cols="md-10" class="ml-1 mr-3">
             <!-- dòng kết quả tìm kiếm -->
             <v-row>
                 <v-list-item-content class="fm mb-2">
@@ -35,7 +35,7 @@
             <!-- kết thúc kết quả tìm kiếm -->
             <!-- danh sách kết quả  -->
             <v-row v-for="(item,i) in listSearch.filter(x => x.group!= 'Nhân viên'&&x.type!= 'user')" :key="i" style="margin-top:-18px">
-                <v-row v-if="item.group" class="ml-1 mt-2 mb-2 mr-4">
+                <v-row v-if="item.group" class="ml-1 mt-2 mr-4">
                     <v-list-item>
                         <v-list-item-content>
                             <v-list-item-title class="item-header">{{item.group}}</v-list-item-title>
@@ -45,23 +45,42 @@
                         </v-list-item-action>
                     </v-list-item>
                 </v-row>
-                <v-row v-else class="ml-3">
+                <v-row v-else-if="item.type !== 'user'" 
+                    @mouseleave="hideDotButton(i)" 
+                     @mousemove="showDotButton(i)" 
+                    class="mt-1 ml-1">
                     <!-- danh sách tìm thấy không bao gồm user -->
-                    <v-row v-if="item.type!='user'" class="mt-1">
-                        <v-list-item>
-                            <v-list-item-content>
-                                <v-list-item-title style="margin-left: 0.5rem" class="item-title fs-13 mb-2" v-html="item.displayName">
-                                </v-list-item-title>
-                                <v-list-item-subtitle style="margin-left: 0.5rem" class="fs-12 sub-title">{{item.description}}
-                                </v-list-item-subtitle>
-                            </v-list-item-content>
-                        </v-list-item>
-                    </v-row>
+                    <v-list-item>
+                        <v-list-item-content>
+                            <v-list-item-title style="margin-left: 0.5rem" class="item-title fs-13 mb-2" v-html="item.displayName">
+                            </v-list-item-title>
+                            <v-list-item-subtitle style="margin-left: 0.5rem" class="fs-12 sub-title">{{item.description}}
+                            </v-list-item-subtitle>
+                        </v-list-item-content>
+                        <v-list-item-action v-show="item.enable&&item.actions.length>0" class="dot" >
+                            <v-menu offset-y transition="scale-transition" style="width:50px!important">
+                                <template v-slot:activator="{ on }">
+                                    <button v-on="on">
+                                        <i style="height:20px!important;width:20px!important" 
+                                        class="mr-10 dot mdi mdi-dots-horizontal"></i>
+                                    </button>
+                                </template>
+                                <v-list>
+                                    <v-row>
+                                        <v-list-item-title v-for="itemsAction in item.actions" 
+                                        class="fm fs-13 ml-6 action-button" style="width:50px!important" >
+                                            {{itemsAction}}
+                                        </v-list-item-title>
+                                    </v-row>
+                                </v-list>
+                            </v-menu>
+                        </v-list-item-action>
+                    </v-list-item>
                 </v-row>
             </v-row>
-            <v-row v-for="(item, idx) in listSearch.filter(x => x.group== 'Nhân viên' )" :key="idx" style="margin-top:-18px">
-                <v-row v-if="item.group" class="ml-1 mt-2 mb-2 mr-4">
-                    <v-list-item v-model='nothing'>
+            <v-row v-for="item in listSearch.filter(x => x.group== 'Nhân viên' )" style="margin-top:-18px">
+                <v-row v-if="item.group" class=" mt-2 ml-1 mb-2 mr-4">
+                    <v-list-item>
                         <v-list-item-content>
                             <v-list-item-title class="item-header">{{item.group}}</v-list-item-title>
                         </v-list-item-content>
@@ -73,27 +92,27 @@
             </v-row>
             <v-row class="ml-3">
                 <!-- kết thúc danh sách tìm  -->
-                 <v-slide-group multiple show-arrows>
-                        <v-slide-item v-for="(item,index) in listSearch.filter(x => x.type== 'user' )" :key="index" >
-                <div class="d-flex justify-start mr-3 " style="width: 250px!important; border:1px solid rgba(0,0,0,0.2">
-                   
-                            <v-list-item-avatar class="item-avatar ml-3">
-                                <img :src="item.avatar || require('@/assets/image/avatar_default.jpg')">
-                            </v-list-item-avatar>
-                            <v-list-item-content>
-                                <v-list-item-title style="margin-left: 0.5" class="item-title fs-13 fm" v-html="item.displayName">
-                                </v-list-item-title>
-                                <v-list-item-subtitle style="margin-left:0" class="sub-title fs-12" v-html="item.displayName">
-                                </v-list-item-subtitle>
-                                <v-list-item-subtitle style="margin-left:0" class="sub-title fs-12" v-html="item.email">
-                                </v-list-item-subtitle>
-                            </v-list-item-content>
-                  
-
-                </div>
-                      </v-slide-item>
+                <v-sheet max-width="1100">
+                    <v-slide-group multiple show-arrows>
+                        <v-slide-item v-for="item in listSearch.filter(x => x.type== 'user' )" >
+                            <div class="d-flex justify-start mr-3 " style="width: 250px!important; border:1px solid rgba(0,0,0,0.2">
+                                <v-list-item-avatar class="item-avatar ml-3">
+                                    <img :src="item.avatar || require('@/assets/image/avatar_default.jpg')">
+                                </v-list-item-avatar>
+                                <v-list-item-content>
+                                    <v-list-item-title style="margin-left: 0.5" class="item-title fs-13 fm" v-html="item.displayName">
+                                    </v-list-item-title>
+                                    <v-list-item-subtitle style="margin-left:0" class="sub-title fs-12" v-html="item.displayName">
+                                    </v-list-item-subtitle>
+                                    <v-list-item-subtitle style="margin-left:0" class="sub-title fs-12" v-html="item.email">
+                                    </v-list-item-subtitle>
+                                </v-list-item-content>
+                            </div>
+                        </v-slide-item>
                     </v-slide-group>
+                </v-sheet>
             </v-row>
+
             <!-- kết thúc danh sách  -->
         </v-col>
     </v-card>
@@ -120,11 +139,19 @@ export default {
         getCountResult() {
             return this.listSearch.length;
         },
+        showDotButton(id){
+           this.listSearch[id].enable = true;
+        },
+        hideDotButton(id){
+           this.listSearch[id].enable = false;
+
+        },
         getMenu() {
             // debugger
             this.menu = [];
             this.listSearch = this.newSearch;
-            console.log(this.listSearch);
+            // console.log("list Search");
+            // console.log(this.listSearch);
             let menu = [];
             for (let i = 0; i < this.newSearch.length; i++) {
                 // console.log(this.newSearch[i].group);
@@ -175,5 +202,11 @@ export default {
 
 .color-blue {
     color: #0D66D0;
+}
+.action-button:hover{
+      background: rgba(0, 0, 0, 0.05);
+}
+.v-menu__content{
+    width:100px;
 }
 </style>

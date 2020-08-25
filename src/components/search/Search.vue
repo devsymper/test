@@ -1,9 +1,8 @@
 <template>
-<div >
-    <v-autocomplete @keydown="enter" style = "width: 400px" class="auto-complete"  
+    <v-combobox @keydown="enter" class="auto-complete" style="border-radius:4px"
         :hide-no-data="true" no-filter :items="searchItems"
         menu-props="offset-y "
-        :search-input.sync="value" label="Tìm kiếm" >
+        :search-input.sync="value" label="Tìm kiếm">
         <template v-slot:item="{ item, attrs }">
             <template v-if="item.group">
                 <v-list-item style="margin-top:-10px; margin-bottom:-10px">
@@ -13,44 +12,45 @@
                 </v-list-item>
             </template>
             <template v-else>
-                <v-list-item style="margin-top:-10px; margin-bottom:-10px" class="pl-7" :attrs="attrs">
-                    <v-list-item-avatar class="item-avatar" style="width:29px!important; height:30px!important" v-if="item.type === 'user'">
+                <v-list-item @mouseleave="hideDotButton(searchItems.indexOf(item))" 
+                 @mousemove="showDotButton(searchItems.indexOf(item))" style="margin-top:-10px; margin-bottom:-10px" class="pl-7" :attrs="attrs">
+                    <v-list-item-avatar 
+                        class="item-avatar" style="width:29px!important; height:30px!important" 
+                        v-if="item.type === 'user'">
                         <img :src="item.avatar || require('@/assets/image/avatar_default.jpg')">
                     </v-list-item-avatar>
                     <v-list-item-content style="margin-left:-10px">
                         <v-list-item-title 
                             :style="{'margin-left': item.type === 'user' ? '0' : '0.5rem'}" 
-                            class="item-title" v-html="item.displayName">
+                            class="item-title" >{{item.displayName}}
                         </v-list-item-title>
                         <v-list-item-subtitle 
-                            :style="{'margin-left': item.type === 'user' ? '0' : '0.5rem'}" 
+                            :style="{'margin-left': item.type === 'user' ? '0' : '0.5rem'}"
                             class="item-subtitle mt-1" v-html="item.searchField">
                         </v-list-item-subtitle>
                     </v-list-item-content>
-                    <v-list-item-action class="dot">
+                    <v-list-item-action v-show="item.enable&&item.actions.length>0" class="dot">
                         <v-menu
                             bottom offset-y 
                             transition="scale-transition" >
-                        <template v-slot:activator="{ on }">
-                        <button v-on="on">
-                          <i style="height:20px!important;width:20px!important" 
-                            class="dot mdi mdi-dots-horizontal"></i>
-                        </button>
-                        </template>
-                        <v-list>
-                        <v-list-item>
-                            <v-list-item-title>ádádád</v-list-item-title>
-                        </v-list-item>
-                        </v-list>
+                            <template v-slot:activator="{ on }">
+                                <button v-on="on">
+                                <i style="height:20px!important;width:20px!important" 
+                                    class="dot mdi mdi-dots-horizontal"></i>
+                                </button>
+                            </template>
+                            <v-list>
+                                 <v-list-item-title v-for="(itemsAction,index) in item.actions" :key="index" 
+                                        class="fm fs-13 action-button ml-2" style="width:100px!important" >
+                                            {{itemsAction}}
+                                    </v-list-item-title>
+                            </v-list>
                         </v-menu>
-                        <button >
-                        </button>
                     </v-list-item-action>
                 </v-list-item>
             </template>
         </template>
-    </v-autocomplete>
-</div>
+    </v-combobox>
 </template>
 <script>
 import _ from 'lodash';
@@ -68,6 +68,13 @@ export default {
             this.$router.push('/search/general');
             };
             this.searchItems = [];
+
+        },
+        showDotButton(id){
+           this.searchItems[id].enable = true;
+        },
+        hideDotButton(id){
+           this.searchItems[id].enable = false;
 
         },
         //hiển thị tên của thuộc tính
@@ -144,7 +151,12 @@ export default {
                                 returnObjSearch.searchField = returnObjSearch.searchField || "";
                                 returnObjSearch.avatar = data.avatar;
                                 returnObjSearch.type = data.type;
+                                returnObjSearch.id = data.id;
+                              
+                                returnObjSearch.actions = data.actions;
+                                returnObjSearch.enable = false;
                                 returnObjSearch.description = data.description?data.description:(data.description==null||data.description==''?"Mô tả đang để trống":"Symper");
+                                //debugger
                                 return returnObjSearch;
                             })
                             const groupByType = _.groupBy(normalizedData, 'type');
@@ -204,7 +216,8 @@ export default {
 }
 
 .auto-complete ::v-deep .v-label {
-    font-size: 13px;
+    font-size: 13px!important;
+    font-family: Roboto!important;
     margin-top: -2px!important;
     padding-left: 10px;
 }
@@ -229,24 +242,28 @@ export default {
 }
 
 .auto-complete ::v-deep .v-select__slot>input {
-    padding-top: 15px;
-    padding-left:5px;
+    padding-top: 10px;
+    padding-left: 5px;
 }
 
 .auto-complete ::v-deep .v-input__icon>button {
     font-size: 14px !important
 }
-.dot{
-
+.auto-complete {
+    margin-top: 0 !important;
+    padding-top: 6px !important;
 }
 .dot:hover{
  color:black;
 }
+.action-button:hover{
+      background: rgba(0, 0, 0, 0.05);
+}
 
 </style>
 <style >
-/* .v-autocomplete__content{
-    max-width: 400px!important;
+ .v-autocomplete__content{
+    max-width: 330px!important;
     top: 40px!important;
   
 }
@@ -255,6 +272,5 @@ export default {
 }
 .v-select__slot{
     font-size:13px;
-
-} */
+}
 </style>

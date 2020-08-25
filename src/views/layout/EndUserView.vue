@@ -4,7 +4,7 @@
     <v-content>
         <v-container fluid fill-height class="pa-0">
             <div class="w-100 app-header-bg-color " style="border-bottom:1px solid #cccccc">
-                <div style="width:calc(100% - 200px)" class="float-left">
+                <div style="width:calc(100% - 500px)" class="float-left">
                     <v-tabs @change="handleChangeTab" v-model="currentTabIndex" class="sym-small-size " color="orange accent-4">
                         <v-tab class="symper-app-tab" v-for="(item, idx) in tabUrlItems" :key="idx">
                             {{ item.title }}
@@ -13,10 +13,12 @@
                     </v-tabs>
                     
                 </div>
-                <div class="float-right app-header-bg-color" style="height:40px; line-height:40px;">
+                <div class="float-right app-header-bg-color d-flex justify-end " style="widh:500px;height:40px; line-height:40px;">
                     <!-- search -->
-                    <div class="d-flex justify-end " style="width:100%;margin-bottom:5px" >
-                        <SearchInput class= "d-flex align-end mt-5" />
+                    <div v-show="showSearchInput" class="d-flex justify-center align-items-center">
+                        <transition name="slide-fade">
+                            <SearchInput v-show="showSearchInput" class="mr-2" style="width:330px"/>
+                        </transition>
                     </div>
                     <v-btn icon @click="showSearchInput = !showSearchInput">
                         <v-icon>mdi-magnify</v-icon>
@@ -177,5 +179,16 @@ export default {
 .nofitication-title-bar {
     font-size: 13px;
     font-weight: bold;
+}
+.slide-fade-enter-active {
+  transition: all .3s ease;
+}
+.slide-fade-leave-active {
+  transition: all .8s cubic-bezier(1.0, 0.5, 0.8, 1.0);
+}
+.slide-fade-enter, .slide-fade-leave-to
+/* .slide-fade-leave-active below version 2.1.8 */ {
+  transform: translateX(10px);
+  opacity: 0;
 }
 </style>
