@@ -36,14 +36,26 @@
 			<div class="text-area-wrapper" v-else>
 				 <Mentionable
 					:keys="['@']"
-					:items="itemsTag"
+					:items="itemTags"
 					offset="6"
 					>
-					<textarea v-model="inputComment"  v-on:keyup.enter="addComment" class="text-area">
+					<textarea v-model="inputComment"  
+						v-on:keyup.50="tagUser($event)"
+						class="text-area">
 					</textarea>
+					<!-- <template #item-#="{ item }">
+					<div class="issue">
+						<span class="number">
+						#{{ item.id }}
+						</span>
+						<span class="dim">
+						{{ item.displayName }}
+						</span>
+					</div>
+					</template> -->
 				</Mentionable>
-				<UploadFile style="position:absolute;right: 12px;bottom: 0px;" @uploaded-file="uploadInfo"/>
-				<v-btn style="position:absolute;right: 0px;bottom: 0px;" icon @click="addComment">
+				<UploadFile style="position:absolute;right: 16px;bottom: 5px;" @uploaded-file="uploadInfo"/>
+				<v-btn style="position:absolute;right: 0px;bottom: 5px;" icon @click="addComment">
 					<v-icon >mdi-send-circle-outline</v-icon>
 				</v-btn>
 			</div>
@@ -82,6 +94,10 @@ export default {
 		isReply:{
 			type: Boolean,
 			default: false
+		},
+		contentEdit:{
+			type: String,
+			default: ''
 		}
 	},
 	components:{
@@ -103,12 +119,20 @@ export default {
 		tagUser(event){
 			let $target = $(event.target);
 			var x = $target.offset().left;
-     		var y = $target.offset().top + 23;
+     		var y = $target.offset().top + 60;
 			this.$refs.menuTagUser.show(x,y);
 		},
 		tagged(data){
 			let character = this.inputComment.charAt(this.inputComment.length - 1)
-			let res = this.inputComment.replace(character,data.name);
+			let res = this.inputComment.replace(character,data.displayName);
+			let item = {} 
+			item.objectIdentifier = data.id
+			item.objectType = 'user'
+			let tagInfo = {}
+			tagInfo.offset = this.inputComment.length - 1
+			tagInfo.length = data.displayName.length
+			item.tagInfo = tagInfo
+			this.tags.push(item)
 			this.inputComment = res
 		},
 		addComment(){
@@ -126,6 +150,7 @@ export default {
 			else{
 				this.dataPostComment.id = this.item.id
 				let dataEdit = JSON.stringify(this.dataPostComment)
+				debugger
 				commentApi.editComment(dataEdit).then(res => {
 					this.$store.commit('comment/updateParentCommentTarget',0)
 					this.updateComment()
@@ -164,8 +189,18 @@ export default {
 		}
 	},
 	computed:{
-		sEnduser(){
-			return this.$store.state.app
+		itemTags(){
+			let resItem = []
+			let item = {}
+			let thisCpn = this
+			this.$store.state.app.allUsers.forEach(function(e){
+				item.value = e.id
+				item.label = e.displayName
+				resItem.push(item)
+				item = {}
+			});
+			return resItem
+			
 		},
 		sComment(){
 			return this.$store.state.comment.commentTarget
@@ -176,7 +211,7 @@ export default {
 			inputComment: '',
 			keyWord: '',
 			attachments:[],
-			
+			tags:[],
 			icon:{
 				xlxs: 'mdi-file-excel-box',
 				xls: 'mdi-file-excel-box',
@@ -185,26 +220,31 @@ export default {
 				pdf: 'mdi-file-pdf-box',
 				default: 'mdi-file'
 			},
-			itemsTag:[
-				{
-					value: 'cat',
-					label: 'Mr Cat',
-				},
-				{
-					value: 'dog',
-					label: 'Mr Dog',
-				},
-			],
+			// itemsTag:[
+			// 	{
+			// 		value: '1',
+			// 		label: 'Ngô Anh Dũng',
+			// 	},
+			// 	{
+			// 		value: '2',
+			// 		label: 'Đào Mạnh Khá',
+			// 	},
+			// ],
 			dataPostComment:{
 			}
 		}
 	},
 	watch:{
-		// inputComment(val){
-		// 	if(val.includes('@')){
-		// 		this.keyWord = val.slice(val.indexOf('@')+1)
-		// 	}
-		// }
+		inputComment(val){
+			if(val.includes('@')){
+				this.keyWord = val.slice(val.indexOf('@')+1)
+			}
+		},
+		contentEdit(val){
+			if(val != ''){
+				this.inputComment = val
+			}
+		}
 	}
 }	
 </script>

@@ -34,6 +34,11 @@ const updateResolve = (state, data) => {
 	state.listComment.splice(state.listComment.indexOf(data), 1)
 	state.listResolve.push(data)
 }
+const updateUnResolve = (state, data) => {
+	state.listAvtiveComment.splice(state.listAvtiveComment.indexOf(data), 1)
+	state.listResolve.splice(state.listResolve.indexOf(data), 1)
+	state.listComment.push(data)
+}
 export {
 	updateCommentTarget,
 	addPropertyCommentTarget,
@@ -44,5 +49,6 @@ export {
 	setResolve,
 	updateReplyStatus,
 	updateParentCommentTarget,
-	updateResolve
+	updateResolve,
+	updateUnResolve
 };

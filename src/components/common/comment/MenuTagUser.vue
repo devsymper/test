@@ -1,7 +1,7 @@
 <template>
    <v-card class="context-menu" v-show="isShowMenu" :style="{top:top+'px',left:left+'px'}">
 			<div class="item" v-for="item in listUser" :key="item.name" @click="clickRow(item)">
-				{{item.name}}
+				{{item.displayName}}
 			</div>
    </v-card>
 </template>
@@ -17,20 +17,7 @@
 		isShowMenu:false,
 		top:0,
 		left:0,
-		// listUser:[
-		// 	{
-		// 		id:1,
-		// 		name:'anh dung ngo'
-		// 	},
-		// 	{
-		// 		id:2,
-		// 		name:'anh dung ngo2'
-		// 	},
-		// 	{
-		// 		id:3,
-		// 		name:'anh dung ngo3'
-		// 	},
-		// ]
+	
 	}),
 	created(){
 		// let self = this
@@ -38,24 +25,12 @@
 	computed:{
 		listUser(){
 			if(this.keyWord == ''){
-				return [
-					{
-						id:1,
-						name:'anh dung ngo'
-					},
-					{
-						id:2,
-						name:'anh dung ngo2'
-					},
-					{
-						id:3,
-						name:'anh dung ngo3'
-					},
-				]
+				return this.$store.state.app.allUsers
 			}
 			else{
+
 			}
-		}
+		},
 	},
 	methods:{
 		clickRow(item){
@@ -85,7 +60,7 @@
 	text-align: left;
 }
 .context-menu >>> .item:hover{
-	background: lightsteelblue;
+	background: #f7f7f7;
 }
 .context-menu >>> .v-icon {
 	font-size: 13px;

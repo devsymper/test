@@ -1,8 +1,8 @@
 <template>
 	<div class="commnent-item">
-		<div :item="item" class="commnent-item-wrapper" :style="{width:width}">
-		<v-icon class="icon-check" @click="resolveComment(item)" style="float:right">mdi-check</v-icon>
-
+		<div :item="item"  class="commnent-item-wrapper" :style="{width:width}">
+		<v-icon v-if="item.parentId == '0' && item.status == 0" class="icon-check" @click="resolveComment(item)" style="float:right">mdi-check</v-icon>
+		<v-icon v-if="item.parentId == '0' && item.status == 1" class="icon-check" @click="unresolveComment(item)" style="float:right">mdi-comment-arrow-left-outline</v-icon>
 				<v-avatar>
 					<img
 					src="https://cdn.vuetifyjs.com/images/john.jpg"
@@ -21,13 +21,14 @@
 						:images="images"  
 						:files="files"
 						:isAdd="false"
+						:contentEdit="contentEdit"
 					/>
-					<v-menu v-if="sEnduser==item.userId" bottom left >
+					<v-menu style="min-height:unset" v-if="sEnduser==item.userId" bottom left >
 						<template  v-slot:activator="{ on, attrs }">
 							<v-icon class="icon-menu" v-bind="attrs"
 							v-on="on" >mdi-dots-horizontal</v-icon>
 						</template>
-						<v-list>
+						<v-list >
 							<v-list-item
 								@click="editComment(item)"
 							>
@@ -54,9 +55,10 @@
 				:key="i"
 				:item="child"
 				:width="'340px'"
+				@reply-child="replyChild"
 			>
 			</commentItem>
-			<div class="reply-comment"  v-if="item.reply">
+			<div class="reply-comment"  v-if="item.reply && item.parentId == '0'">
 				<v-avatar>
 						<img
 						src="https://cdn.vuetifyjs.com/images/john.jpg"
@@ -77,6 +79,7 @@ import InputComment from "./InputComment.vue"
 import moment from 'moment';
 import {commentApi} from '@/api/Comment.js'
 import {fileManagementApi} from '@/api/FileManagement.js'
+import { mapGetters } from 'vuex';
 export default {
 	name: 'commentItem',
 	props:{
@@ -102,17 +105,32 @@ export default {
 				})
 			});
 		}
-		
+			// let mapIdToUser = this.$store.getters['app/mapIdToUser'];
+			// let itemInfor = mapIdToUser[this.item.userId];
+			// let infor = {}
+			// infor.avatar = itemInfor.avatar,
+			// infor.fullName = itemInfor.displayName
+			// this.item.infor = infor
+			// if(this.item.childrens.length > 0){
+			// 	this.item.childrens.forEach(function(e){	
+			// 		itemInfor = mapIdToUser[e.id];
+			// 		let inforChild = {}
+			// 		inforChild.avatar = itemInfor.avatar,
+			// 		inforChild.fullName = itemInfor.displayName
+			// 		e.infor = inforChild
+			// 	})
+			// }
+			// console.log(this.item,'itemavatarrrrr');
 	},
 	methods:{
 		editComment(item){
 			item.isEditing = true
+			this.contentEdit = item.content
 		},
 		deleteComment(item){
 			commentApi.deleteComment(item.id).then(res => {
 				if(this.sComment.uuid == "0"){
 					this.getCommentId()
-					debugger
 				}else{
 					this.getCommentUuid()
 				}
@@ -126,7 +144,6 @@ export default {
 			});
 		},
 		getCommentId(){
-			debugger
 			commentApi.getCommentById(this.sComment.objectType,this.sComment.objectIdentifier).then(res => {
 				this.$store.commit('comment/updateListComment',res.data.listObject.comments)
 				this.$store.commit('comment/updateListAvtiveComment',res.data.listObject.comments)
@@ -137,21 +154,29 @@ export default {
 			return moment(date).fromNow();
 		},
 		resolveComment(item){
-			console.log(item);
 			commentApi.changeStatus(item.id).then(res => {
-				   console.log(res);
-				   debugger
+				   item.status = 1
 				   this.$store.commit('comment/updateResolve',item)
-			  	// if(this.sComment.uuid == "0"){
-				// 	this.getCommentId()
-				// }else{
-				// 	this.getCommentUuid()
-				// }
+			  
+            })
+		},
+		unresolveComment(item){
+			commentApi.changeStatus(item.id).then(res => {
+					item.status = 0
+				   this.$store.commit('comment/updateUnResolve',item)
             })
 		},
 		replyComment(item){	
+			if(item.parentId == '0'){	
+				this.item.reply = true;
+				this.$store.commit('comment/updateParentCommentTarget',item.id)
+			}else{
+				this.$emit('reply-child',item)
+			}
+		},
+		replyChild(data){
 			this.item.reply = true;
-			this.$store.commit('comment/updateParentCommentTarget',item.id)
+			this.$store.commit('comment/updateParentCommentTarget',data.parentId)
 		}
 	},
 	components: {
@@ -165,6 +190,7 @@ export default {
 			images:[],
 			files:[],
 			status,
+			contentEdit: '',
 			reply: false,
 		}
 	},
@@ -228,7 +254,6 @@ export default {
 	font: 13px roboto;
 }
 .commnent-item>>>  .icon-check{
-	color: green;
 	position: absolute;
 	top:0;
 	right:0;
@@ -252,5 +277,8 @@ export default {
 }
 .commnent-item >>> .commnent-item-wrapper:hover .icon-menu{
 	display: inline-block;
+}
+.commnent-item >>> .v-menu__content{
+	min-height:unset
 }
 </style>
