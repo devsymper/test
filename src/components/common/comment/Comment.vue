@@ -229,10 +229,12 @@ export default {
 		tab:function(val){
 			if(val === 0){
 				this.$store.commit('comment/setComment')
+				this.$store.commit('comment/updateCurrentTab','comment')
 				this.tabComment = true
 			}
 			else{
 				this.$store.commit('comment/setResolve')
+				this.$store.commit('comment/updateCurrentTab','resolve')
 				this.tabComment = false
 			}
 		}

@@ -155,15 +155,14 @@ export default {
 		},
 		resolveComment(item){
 			commentApi.changeStatus(item.id).then(res => {
-				   item.status = 1
-				   this.$store.commit('comment/updateResolve',item)
-			  
+				item.status = 1
+				this.$store.commit('comment/updateResolve',item)
             })
 		},
 		unresolveComment(item){
 			commentApi.changeStatus(item.id).then(res => {
-					item.status = 0
-				   this.$store.commit('comment/updateUnResolve',item)
+				item.status = 0
+				this.$store.commit('comment/updateUnResolve',item)
             })
 		},
 		replyComment(item){	

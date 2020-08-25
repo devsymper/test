@@ -837,7 +837,6 @@ export default class Table {
                 if (thisObj.tableHasRowSum)
                     $('.handsontable  span.rowHeader').last().text('Tổng').css({ 'font-weight': 'bold' })
                 let tbHeight = this.container.getElementsByClassName('htCore')[0].getBoundingClientRect().height;
-                // debugger
                 // this.getPlugin('hiddenColumns').hiddenColumns(thisObj.columnsInfo.hiddenColumns)
                 if (tbHeight < MAX_TABLE_HEIGHT) {} else {
                     $(this.rootElement).css('height', MAX_TABLE_HEIGHT);

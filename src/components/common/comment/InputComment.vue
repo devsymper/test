@@ -140,20 +140,21 @@ export default {
 			this.dataPostComment.content = this.inputComment
 			this.dataPostComment.attachments = this.attachments
 			if(this.isAdd == true){
-			let data = JSON.stringify(this.dataPostComment)
+				let data = JSON.stringify(this.dataPostComment)
 				commentApi.addComment(data).then(res => {
 					this.$store.commit('comment/updateParentCommentTarget',0)
 					this.updateComment()
 					this.inputComment = ''
+					this.attachments = []
 				});
 			}
 			else{
 				this.dataPostComment.id = this.item.id
 				let dataEdit = JSON.stringify(this.dataPostComment)
-				debugger
 				commentApi.editComment(dataEdit).then(res => {
 					this.$store.commit('comment/updateParentCommentTarget',0)
 					this.updateComment()
+					this.attachments = []
 				});
 			}
 			this.$store.commit('comment/updateReplyStatus',false)

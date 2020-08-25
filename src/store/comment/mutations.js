@@ -30,14 +30,19 @@ const updateParentCommentTarget = (state, data) => {
 	state.commentTarget.parentId = data
 }
 const updateResolve = (state, data) => {
+	debugger
 	state.listAvtiveComment.splice(state.listAvtiveComment.indexOf(data), 1)
 	state.listComment.splice(state.listComment.indexOf(data), 1)
 	state.listResolve.push(data)
 }
 const updateUnResolve = (state, data) => {
+	debugger
 	state.listAvtiveComment.splice(state.listAvtiveComment.indexOf(data), 1)
 	state.listResolve.splice(state.listResolve.indexOf(data), 1)
 	state.listComment.push(data)
+}
+const updateCurrentTab = (state, data) => {
+	Vue.set(state, 'currentTab', data)
 }
 export {
 	updateCommentTarget,
@@ -50,5 +55,6 @@ export {
 	updateReplyStatus,
 	updateParentCommentTarget,
 	updateResolve,
-	updateUnResolve
+	updateUnResolve,
+	updateCurrentTab
 };
