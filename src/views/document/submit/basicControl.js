@@ -144,31 +144,31 @@ export default class BasicControl extends Control {
 
         let thisObj = this;
         this.ele.on('change', function(e) {
-            let valueChange = $(e.target).val();
-            if (thisObj.type == 'label') {
-                valueChange = $(e.target).text()
-            }
-            SYMPER_APP.$evtBus.$emit('document-submit-input-change', { controlName: thisObj.controlProperties.name.value, val: valueChange })
-            if (thisObj.type == 'date') {
-                if (this.formatDate != "" && typeof this.formatDate === 'string') {
-                    thisObj.value = $(this).val();
-                    $(this).val(moment($(this).val()).format(thisObj.formatDate))
+                let valueChange = $(e.target).val();
+                if (thisObj.type == 'label') {
+                    valueChange = $(e.target).text()
                 }
-            }
-        })
-        this.ele.on('keydown', function(e) {
-            if (thisObj.type == 'number') {
-                console.log(e.key);
+                SYMPER_APP.$evtBus.$emit('document-submit-input-change', { controlName: thisObj.controlProperties.name.value, val: valueChange })
+                if (thisObj.type == 'date') {
+                    if (this.formatDate != "" && typeof this.formatDate === 'string') {
+                        thisObj.value = $(this).val();
+                        $(this).val(moment($(this).val()).format(thisObj.formatDate))
+                    }
+                }
+            })
+            // this.ele.on('keydown', function(e) {
+            //     if (thisObj.type == 'number') {
+            //         console.log(e.key);
 
-                if (['ArrowRight', 'ArrowLeft', 'Tab'].includes(e.key)) {
-                    return;
-                }
-                if (!/\d/.test(e.key)) {
-                    e.preventDefault();
-                    e.stopPropagation()
-                }
-            }
-        })
+        //         if (['ArrowRight', 'ArrowLeft', 'Tab'].includes(e.key)) {
+        //             return;
+        //         }
+        //         if (!/\d/.test(e.key)) {
+        //             e.preventDefault();
+        //             e.stopPropagation()
+        //         }
+        //     }
+        // })
         this.ele.on('keyup', function(e) {
             if (thisObj.type == 'user') {
                 SYMPER_APP.$evtBus.$emit('document-submit-user-input-change', e)
@@ -411,12 +411,24 @@ export default class BasicControl extends Control {
         this.ele.attr('type', 'text');
         this.numberFormat = (this.controlProperties.hasOwnProperty('formatNumber')) ? this.controlProperties.formatNumber.value : "";
         this.ele.on('blur', function(e) {
-            if (/\d/.test($(this).val())) {
-                $(this).val(numbro($(this).val()).format(thisObj.numberFormat))
+            if ($(this).val() == "") {
+                thisObj.ele.removeClass('error');
+                thisObj.ele.removeAttr('valid');
+            } else {
+                if (/^[-0-9,.]+$/.test($(this).val())) {
+                    $(this).val(numbro($(this).val()).format(thisObj.numberFormat))
+                    thisObj.ele.removeClass('error')
+                    thisObj.ele.removeAttr('valid');
+                } else {
+                    thisObj.ele.addClass('error');
+                    let controlTitle = (thisObj.title == "") ? thisObj.name : thisObj.title;
+                    let valid = "Giá trị trường " + controlTitle + " phải là số"
+                    thisObj.ele.attr('valid', valid);
+                }
             }
         })
         this.ele.on('focus', function(e) {
-            if (/\d/.test($(this).val())) {
+            if (/^[-0-9,.]+$/.test($(this).val())) {
                 $(this).val(numbro($(this).val()).format('0'))
             }
         })

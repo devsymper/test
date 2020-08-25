@@ -340,6 +340,9 @@ export default {
                         });
                 let valueControl = locale.val;
                 let controlInstance = getControlInstanceFromStore(thisCpn.keyInstance,locale.controlName);
+                if(controlInstance.type == 'number' && !/^[-0-9,.]+$/.test(valueControl)){
+                    return;
+                }
                 if($('#'+controlInstance.id).attr('data-autocomplete') != "" && $('#'+controlInstance.id).attr('data-autocomplete') != undefined){
                     $('#'+controlInstance.id).attr('data-autocomplete',"");
                     return;
@@ -1048,7 +1051,7 @@ export default {
             });
         },
         handlerSubmitDocumentClick(){
-            if($('.validate-icon').length == 0){
+            if($('.validate-icon').length == 0 && $('.error').length == 0){
                 if(this.viewType == 'submit'){
                     this.submitDocument();
                 }
@@ -1058,9 +1061,14 @@ export default {
             }
             else{
                 let controlNotValid = $('.validate-icon');
+                let controlError = $('.error');
                 let listErr = []
                 $.each(controlNotValid,function(k,v){
                     let message = $(v).attr('title');
+                    listErr.push(message);
+                })
+                $.each(controlError,function(k,v){
+                    let message = $(v).attr('valid');
                     listErr.push(message);
                 })
                 this.listMessageErr = listErr;
