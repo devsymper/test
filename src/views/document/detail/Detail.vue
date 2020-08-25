@@ -237,8 +237,12 @@ export default {
         loadDocumentStruct(documentId) {
             this.contentDocument = ""
             let thisCpn = this;
+            let dataPost = {};
+            if(thisCpn.$route.name == 'printDocument'){
+                dataPost = {formType:'print'};
+            }
             documentApi
-                .detailDocument(documentId)
+                .detailDocument(documentId,dataPost)
                 .then(res => {
                     if (res.status == 200) {
                         let content = res.data.document.content;

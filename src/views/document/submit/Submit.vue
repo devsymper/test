@@ -1098,7 +1098,7 @@ export default {
                         title: "Submit document success!"
                     });        
                     if(this.$route.name == 'submitDocument')
-                     thisCpn.$router.push('/documents/'+thisCpn.documentId+"/objects");
+                        thisCpn.$router.push('/documents/'+thisCpn.documentId+"/objects");
                 }
                 else{
                     thisCpn.$snotify({
@@ -1692,7 +1692,8 @@ export default {
 .wrap-content-submit{
     width: 100%;
     height: calc(100vh - 100px);
-    overflow: auto;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 </style>
 

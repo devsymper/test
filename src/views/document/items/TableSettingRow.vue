@@ -45,7 +45,7 @@
             placeholder="Tên control" 
             name="nameControl"
             v-model="rowData.name">
-            <span>lỗi</span>
+            <!-- <span>lỗi</span> -->
             </td>
         <td><input 
             @focus="focusInput"
