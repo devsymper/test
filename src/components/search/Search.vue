@@ -105,16 +105,30 @@ export default {
     methods:{
         enter(event){
             if (event.code == "Enter"){
-           // this.$store.commit('search/setSearch', this.searchData);
+            this.setMenu();
+            this.$store.commit('search/setSearch',  this.searchItems);
+            this.$store.commit('search/setShowGeneral', true);
+            this.$store.commit('search/setCountResult', this.searchItems.length);
             this.$router.push('/search/general');
+
             };
-           // this.searchItems = [];
+            this.searchItems =[]
+            //this.$store.commit('search/setSearch',  []);
 
         },
+        setMenu(){
+            let menu = [];
+            for (let i = 0; i < this.searchItems.length; i++) {
+                // console.log(this.newSearch[i].group);
+                let name = Object.keys(this.searchItems[i]);
+                if (name[0] == 'group') {
+                    menu.push(this.searchItems[i].group);
+                }
+            };
+            this.$store.commit('search/setMenu', menu);
+        },
         gotoPage(action, type,id, name) {
-            debugger
             this.defineAction[type].action = action;
-            //console.log(this.defineAction[type]);
             this.$evtBus.$emit('symper-app-call-action-handler', this.defineAction[type], this, {id:id,name:name, title:name});
         },
         showDotButton(id){
@@ -167,11 +181,12 @@ export default {
     },
     watch: {
         value(newVal) {
+            console.log(typeof newVal);
             this.searchItems = [];
             this.$store.commit('search/setWordSearch', newVal);  
             if (newVal) {
                 const self = this;
-                if(newVal){
+                if(newVal!=''){
                 searchApi.getData(newVal)
                     .then(res => {
                         if (res.status === 200) {
@@ -197,7 +212,6 @@ export default {
                                 returnObjSearch.avatar = data.avatar;
                                 returnObjSearch.type = data.type;
                                 returnObjSearch.id = data.id;
-                              
                                 returnObjSearch.actions = data.actions;
                                 returnObjSearch.enable = false;
                                 returnObjSearch.description = data.description?data.description:(data.description==null||data.description==''?"Mô tả đang để trống":"Symper");
@@ -217,18 +231,25 @@ export default {
                             self.searchItems = searchData;
                             self.$store.commit('search/setSearch',  self.searchItems);
                             self.$store.commit('search/setSearchAll', allData);
+                            self.$store.commit('search/setCountResult', self.searchItems.length);
+                            self.$store.commit('search/setShowGeneral', true);
+                           
+
+
                         }
                     })
                     .catch(err => {
                         console.log('Đã gửi mà lỗi');
                         console.log(err);
-                       self.searchItems = [];
+                        this.$store.commit('search/setSearch', []);
+                        //this.$store.commit('search/setSearch', []);
+
                     });
             }
         }
          else{
-            this.searchItems = [];
-            this.$store.commit('search/setSearch', this.searchItems); 
+            this.$store.commit('search/setSearch', []); 
+            this.$store.commit('search/setMenu',  []);
             this.$store.commit('search/setWordSearch', newVal);  
         }
        }

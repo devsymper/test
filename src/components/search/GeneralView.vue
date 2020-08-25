@@ -34,7 +34,7 @@
             </v-row>
             <!-- kết thúc kết quả tìm kiếm -->
             <!-- danh sách kết quả  -->
-            <v-row v-if="showGeneral" v-for="(item,i) in listSearch.filter(x => x.group!= 'user'&&x.type!= 'user')" :key="i" style="margin-top:-18px">
+            <v-row v-if="showGeneral" v-for="(item,index1) in newSearch.filter(x => x.group!= 'user'&&x.type!= 'user')" :key="index1" style="margin-top:-18px">
                 <v-row v-if="item.group" class="ml-1 mt-2 mr-4">
                     <v-list-item>
                         <v-list-item-content>
@@ -46,8 +46,8 @@
                     </v-list-item>
                 </v-row>
                 <v-row v-else-if="item.type !== 'user'" 
-                    @mouseleave="hideDotButton(i)" 
-                     @mousemove="showDotButton(i)" 
+                    @mouseleave="hideDotButton(index1)" 
+                     @mousemove="showDotButton(index1)" 
                     class="mt-1 ml-1">
                     <!-- danh sách tìm thấy không bao gồm user -->
                     <v-list-item>
@@ -68,9 +68,8 @@
                                 <v-list>
                                     <v-row>
                                         <v-list-item-title v-for="itemsAction in item.actions" 
+                                         class="fm fs-13 ml-6 action-button" style="width:50px!important"
                                          @click="gotoPage(itemsAction,item.type,item.id,item.displayName)">
-                                            {{itemsAction}}
-                                        class="fm fs-13 ml-6 action-button" style="width:50px!important" >
                                             {{itemsAction}}
                                         </v-list-item-title>
                                     </v-row>
@@ -80,7 +79,7 @@
                     </v-list-item>
                 </v-row>
             </v-row>
-            <v-row v-for="item in listSearch.filter(x => x.group == 'Nhân viên' )" style="margin-top:-18px">
+            <v-row v-for="(item,userIdx) in newSearch.filter(x => x.group == 'Nhân viên' )"  :key="userIdx" style="margin-top:-18px">
                 <v-row v-if="item.group" class=" mt-2 ml-1 mb-2 mr-4">
                     <v-list-item>
                         <v-list-item-content>
@@ -94,9 +93,9 @@
             </v-row>
             <v-row  v-if="showGeneral" class="ml-2">
                 <!-- kết thúc danh sách tìm  -->
-                <v-sheet max-width="1100">
-                    <v-slide-group multiple show-arrows>
-                        <v-slide-item v-for="item in listSearch.filter(x => x.type== 'user' )" >
+                <v-sheet max-width="1150" style="margin-left:-55px!important">
+                    <v-slide-group multiple >
+                        <v-slide-item v-for="(item,slideInd) in  newSearchAll.filter(x => x.type== 'user' ).slice(0, 10)" :key="slideInd" >
                             <div class="d-flex justify-start mr-3 " style="width: 250px!important; border:1px solid rgba(0,0,0,0.2">
                                 <v-list-item-avatar class="item-avatar ml-3">
                                     <img :src="item.avatar || require('@/assets/image/avatar_default.jpg')">
@@ -116,12 +115,12 @@
             </v-row>
             <!-- kết thúc danh sách  -->
             <!-- danh sách tìm kiếm chi tiết -->
-            <v-row class="mb-2" v-if="showDetail" v-for="(item,i) in newSearchAll.filter(x => x.type== type||x.group==type )" :key="i" style="margin-top:-18px">
+            <v-row class="mb-2" v-if="showDetail" v-for="(item,ind) in newSearchAll.filter(x => x.type== type||x.group==type )" :key="ind" style="margin-top:-18px">
                     <v-row v-if="item.group" class="ml-1 mt-2 mr-4">
                 </v-row>
                 <v-row v-else-if="item.type != 'user'&&item.type !='application'" 
-                    @mouseleave="hideDotButton(i)" 
-                     @mousemove="showDotButton(i)" 
+                    @mouseleave="hideDotButton(ind)" 
+                     @mousemove="showDotButton(ind)" 
                     class="mt-1 ml-1">
                     <!-- danh sách tìm thấy không bao gồm user -->
                     <v-list-item>
@@ -160,9 +159,9 @@
             </v-row>
             <!-- kết thúc tìm kiếm chi tiết -->
             <!-- trang dành cho user -->
-             <v-row  v-if="showDetail&&checkUser" class="mt-4">
+             <v-row  v-if="showDetail&&type=='user'" class="mt-10">
                <v-col cols="12" 
-          md="3" v-for="item in listSearch.filter(x => x.type== 'user' )" >
+          md="4" v-for="item in newSearchAll.filter(x => x.type== 'user' )" >
                             <div class="d-flex justify-start mr-3 " style="width: 250px!important; border:1px solid rgba(0,0,0,0.2">
                                 <v-list-item-avatar class="item-avatar ml-3">
                                     <img :src="item.avatar || require('@/assets/image/avatar_default.jpg')">
@@ -194,12 +193,18 @@ export default {
         },
         wordSearch() {
             return this.$store.state.search.wordSearch;
+        },
+        menu() {
+            return this.$store.state.search.menu;
+        },
+        countResult() {
+            return this.$store.state.search.countResult;
+        },
+        showGeneral() {
+            return this.$store.state.search.showGeneral;
         }
     },
     methods: {
-        getDataMenu() {
-            alert('menu');
-        },
         formatGroupName(value) {
             let name = '';
             if (value == 'document_object') {
@@ -228,70 +233,71 @@ export default {
             return name
         },
         showDotButton(id) {
-            this.listSearch[id].enable = true;
+            this.newSearch[id].enable = true;
         },
         hideDotButton(id) {
-            this.listSearch[id].enable = false;
+            this.newSearch[id].enable = false;
         },
-        detailView(type) {
-            this.showGeneral = false;
-            this.showDetail = true;
-            this.type=type;
-            this.nameResult = this.formatGroupName(type);
-            this.countResult = this.newSearchAll.filter(x => x.type== type ).length
-            if(type=='user'){this.checkUser==true};
-            this.$store.commit('search/setType', type);
-           // this.$router.push('/search/detail');
-        },
-         gotoPage(action, type,id, name) {
-            debugger
-            this.defineAction[type].action = action;
-            //console.log(this.defineAction[type]);
-            this.$evtBus.$emit('symper-app-call-action-handler', this.defineAction[type], this, {id:id,name:name, title:name});
-        },
-        getMenu() {
-            // debugger
-            this.menu = [];
-            this.listSearch = this.newSearch;
-            // console.log("list Search");
-            // console.log(this.listSearch);
+        setMenu(){
+          //  debugger
             let menu = [];
             for (let i = 0; i < this.newSearch.length; i++) {
                 // console.log(this.newSearch[i].group);
                 let name = Object.keys(this.newSearch[i]);
                 if (name[0] == 'group') {
-                    this.menu.push(this.newSearch[i].group);
+                    menu.push(this.newSearch[i].group);
                 }
-            }
-            // console.log(this.menu)
-        }
+            };
+            this.$store.commit('search/setMenu', menu);
+        },
+        detailView(type) {
+             this.$store.commit('search/setShowGeneral', false);
+            this.showDetail = true;
+            this.type = type;
+            this.nameResult = this.formatGroupName(type);
+            this.$store.commit('search/setCountResult', this.newSearchAll.filter(x => x.type== type ).length);
+            debugger
+            if(type=='user'){this.checkUser==true};
+            this.$store.commit('search/setType', type);
+           // this.$router.push('/search/detail');
+        },
+         gotoPage(action, type,id, name) {
+            this.defineAction[type].action = action;
+            //console.log(this.defineAction[type]);
+            this.$evtBus.$emit('symper-app-call-action-handler', this.defineAction[type], this, {id:id,name:name, title:name});
+        },
     },
     watch: {
         newSearch() {
-            this.getMenu();
-            this.countResult = this.listSearch.length;
+            this.$store.commit('search/setCountResult', this.newSearch.length);
+            this.setMenu();
         },
         wordSearch() {
-            this.showGeneral= true;
-            this.showDetail = false;
+            if(this.wordSearch==''||this.wordSearch==null){
+                this.$store.commit('search/setMenu', []);
+                this.$store.commit('search/setCountResult', 0);
+                this.$store.commit('search/setSearch', []);
+                 this.nameResult ='toàn bộ hệ thống';
 
-            // this.listSearch = [];
-            // this.menu = [];
-
-            // this.getMenu();
+            }else{
+                this.showDetail = false;
+                this.$store.commit('search/setCountResult', this.newSearch.length);
+                this.$store.commit('search/setShowGeneral', true);
+            }
         },
+        
+        showGeneral(){
+            if(this.showGeneral==false){this.showDetail = true;};
+            if(this.showGeneral){this.showDetail = false;  this.nameResult ='toàn bộ hệ thống';};
+        }
     },
     data: () => {
         return {
-            showGeneral:true,
             showDetail:false,
-            menu: [],
             nameResult:' toàn bộ hệ thống',
             type:'',
-            listSearch: [],
             listSearchAll: [],
             checkUser:false,
-            countResult: 0,
              defineAction:{
                 document_definition:{
                     "module": "document",

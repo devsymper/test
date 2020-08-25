@@ -9,10 +9,22 @@ const setWordSearch = (state, newValue) => {
 };
 const setType = (state, newValue) => {
     state.type = newValue;
+};
+const setMenu = (state, newValue) => {
+    state.menu = newValue;
+};
+const setShowGeneral = (state, newValue) => {
+    state.showGeneral = newValue;
+};
+const setCountResult = (state, newValue) => {
+    state.countResult = newValue;
 }
 export {
     setSearch,
     setSearchAll,
     setWordSearch,
-    setType
+    setType,
+    setMenu,
+    setShowGeneral,
+    setCountResult
 };
