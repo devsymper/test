@@ -1,3 +1,7 @@
+import {
+	database
+} from "firebase";
+
 const updateCommentTarget = (state, data) => {
 	Vue.set(state, 'commentTarget', data)
 };
@@ -19,6 +23,17 @@ const setComment = (state) => {
 const setResolve = (state) => {
 	state.listComment = state.listResolve
 }
+const updateReplyStatus = (state, data) => {
+	state.isReply = data
+}
+const updateParentCommentTarget = (state, data) => {
+	state.commentTarget.parentId = data
+}
+const updateResolve = (state, data) => {
+	state.listAvtiveComment.splice(state.listAvtiveComment.indexOf(data), 1)
+	state.listComment.splice(state.listComment.indexOf(data), 1)
+	state.listResolve.push(data)
+}
 export {
 	updateCommentTarget,
 	addPropertyCommentTarget,
@@ -26,5 +41,8 @@ export {
 	updateListResolve,
 	updateListAvtiveComment,
 	setComment,
-	setResolve
+	setResolve,
+	updateReplyStatus,
+	updateParentCommentTarget,
+	updateResolve
 };

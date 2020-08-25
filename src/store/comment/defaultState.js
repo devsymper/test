@@ -9,5 +9,6 @@ const defaultState = {
 	listComment: [],
 	listResolve: [],
 	listAvtiveComment: [],
+	// isReply: false,
 };
 export default defaultState;

@@ -3,7 +3,7 @@
 		<div v-if="images.length > 0" class="content-comment-img">
 			<div  class="commnet-img-item" v-for="(item,i) in images" :key="i">
 				<v-img
-           			 src="https://taiwebs.com/upload/images/Img-Converter-2018.png"
+           			 :src="'http://file.symper.vn/readFile/'+item.serverPath"
          		>
 				 <v-icon  v-if="isEditing == true" class="icon-remove-img"  @click="removeImage(item)">mdi-close-circle-outline</v-icon>
 				</v-img> 
@@ -12,13 +12,13 @@
 		<div v-if="files.length > 0" class="content-comment-file">
 			<div class="commnet-file-item" v-for="(item,i) in files" :key="i">
 				<v-icon>{{icon[item.type]}}</v-icon>
-				<span class="file-item-title">{{item.name}}</span>
+				<span class="file-item-title">{{item.name+'.'+item.type}}</span>
 				<v-icon class="icon-remove-file" v-if="isEditing == true" @click="removeFile(item)">mdi-close-circle-outline</v-icon>
 			</div>	
 		</div>
 		<div class="content-comment-input">
-			<span v-if="isEditing == false"  >
-			<span>{{item.content}}</span>
+			<span v-if="isEditing == false" >
+				<span>{{item.content}}</span>
 			</span>
 			 <!-- <v-text-field
 				v-else
@@ -43,7 +43,9 @@
 					</textarea>
 				</Mentionable>
 				<UploadFile @uploaded-file="uploadInfo"/>
-				<v-icon @click="addComment">mdi-send-circle-outline</v-icon>
+				<v-btn icon @click="addComment">
+					<v-icon >mdi-send-circle-outline</v-icon>
+				</v-btn>
 			</div>
 		</div>
 		<MenuTagUser ref="menuTagUser" @selected-item="tagged" :keyWord="keyWord" />
@@ -73,6 +75,13 @@ export default {
 		isAdd:{
 			type: Boolean,
 			default: true
+		},
+		parentId:{
+			type:Number,
+		},
+		isReply:{
+			type: Boolean,
+			default: false
 		}
 	},
 	components:{
@@ -84,16 +93,16 @@ export default {
 	},
 	methods:{
 		removeFile(item){
-			const index = this.attackments.indexOf(item.id);
+			const index = this.attachments.indexOf(item.id);
 				if (index > -1) {
-					this.attackments.splice(index, 1);
+					this.attachments.splice(index, 1);
 				}
 			this.files.splice(this.files.indexOf(item),1)
 		},
 		removeImage(item){
-			const index = this.attackments.indexOf(item.id);
+			const index = this.attachments.indexOf(item.id);
 			if (index > -1) {
-				this.attackments.splice(index, 1);
+				this.attachments.splice(index, 1);
 			}
 			this.images.splice(this.images.indexOf(item),1)
 		},
@@ -111,31 +120,32 @@ export default {
 		addComment(){
 			this.dataPostComment = this.sComment
 			this.dataPostComment.content = this.inputComment
-			this.dataPostComment.attackments = this.attackments
-			debugger
+			this.dataPostComment.attachments = this.attachments
 			if(this.isAdd == true){
 			let data = JSON.stringify(this.dataPostComment)
 				commentApi.addComment(data).then(res => {
+					this.$store.commit('comment/updateParentCommentTarget',0)
 					this.updateComment()
+					this.inputComment = ''
 				});
 			}
 			else{
 				this.dataPostComment.id = this.item.id
-				let data = JSON.stringify(this.dataPostComment)
-				debugger
-				commentApi.editComment(data).then(res => {
+				let dataEdit = JSON.stringify(this.dataPostComment)
+				commentApi.editComment(dataEdit).then(res => {
+					this.$store.commit('comment/updateParentCommentTarget',0)
 					this.updateComment()
 				});
 			}
+			this.$store.commit('comment/updateReplyStatus',false)
 		},
 		editComment(){
-
 		},
 		uploadInfo(data){
 			if(typeof data === 'string'){
 				alert(data)
 			}else{
-				this.attackments.push(data.id)
+				this.attachments.push(data.id)
 				if(data.type == 'jpg' || data.type == 'png' || data.type == 'jpeg'){
 					this.images.push(data)
 				}else{
@@ -145,11 +155,11 @@ export default {
 		},
 		updateComment(){
 			if(this.sComment.uuid == "0"){
-					commentApi.getCommentById(this.sComment.objectType,this.sComment.objectIdentifier).then(res => {
-						this.$store.commit('comment/updateListComment',res.data.listObject.comments)
-						this.$store.commit('comment/updateListAvtiveComment',res.data.listObject.comments)
-						this.$store.commit('comment/updateListResolve',res.data.listObject.resolve)
-					});
+				commentApi.getCommentById(this.sComment.objectType,this.sComment.objectIdentifier).then(res => {
+					this.$store.commit('comment/updateListComment',res.data.listObject.comments)
+					this.$store.commit('comment/updateListAvtiveComment',res.data.listObject.comments)
+					this.$store.commit('comment/updateListResolve',res.data.listObject.resolve)
+				});
 			}else{
 				commentApi.getCommentByUuid(this.sComment.objectType,this.sComment.objectIdentifier,this.sComment.uuid).then(res => {
 					this.$store.commit('comment/updateListComment',res.data.listObject.comments)
@@ -161,18 +171,17 @@ export default {
 	},
 	computed:{
 		sEnduser(){
-			return this.$store.state.app.endUserInfo
+			return this.$store.state.app
 		},
 		sComment(){
 			return this.$store.state.comment.commentTarget
 		}
-
 	},
 	data() {
 		return {
 			inputComment: '',
 			keyWord: '',
-			attackments:[],
+			attachments:[],
 			
 			icon:{
 				xlxs: 'mdi-file-excel-box',
@@ -210,7 +219,7 @@ export default {
 .content-comment{
 	display:flex;
 	flex-direction: column;
-	width: 330px;
+	width: 100%;
 }
 .content-comment >>> .v-icon{
 	font-size:13px;	
@@ -219,8 +228,8 @@ export default {
 	display:flex;
 }
 .content-comment >>> .commnet-img-item{
-	width: 40px;
-	height: 40px;
+	width: 30px;
+	height: 30px;
 	margin: 0px 4px 0px 0px;
 }
 .content-comment >>> .commnet-img-item .icon-remove-img{

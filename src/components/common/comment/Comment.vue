@@ -2,21 +2,18 @@
 	<div class="symper-comment">
 		<v-card 
 			 v-show="showComment"
-			:width="widthComment"
+			 width="410px"
 			:height="heightComment"
 			:style="{top:top+'px',left:left+'px'}"
 		>
 			<v-toolbar
 				flat
+				style="height:auto"
 			>
 				<v-toolbar-title>Bình luận</v-toolbar-title>
-					<v-btn icon>
 					<v-icon>mdi-comment-text-outline</v-icon>
-					</v-btn>
 					<v-spacer></v-spacer>
-					<v-btn icon @click="hide()">
-					<v-icon>mdi-close</v-icon>
-				</v-btn>
+					<v-icon  @click="hide()">mdi-close</v-icon>
 				<template v-slot:extension>
 				<v-tabs
 					v-model="tab"
@@ -24,20 +21,18 @@
 				>
 					<v-tabs-slider color="yellow"></v-tabs-slider>
 					<v-tab v-for="item in itemsTab" :key="item.value" >
-						<span > {{ item.title }} </span> <span style='padding-left:4px'>{{ '('+sComment[item.store].length+')'}}</span>
+						<span> {{ item.title }} </span> <!--<span style='padding-left:4px'>{{ '('+sComment[item.store].length+')'}}</span> -->
 					</v-tab>
 				</v-tabs>
 				<v-spacer></v-spacer>
-				<v-text-field
+				<!-- <v-text-field
 					solo
 					v-if="showInput"
 					label="Append"
 					append-icon="mdi-close"
 					@click:append="clickClose"
-					></v-text-field>
-				<v-btn v-else icon>
-					<v-icon  @click="clickSearch">mdi-magnify</v-icon>
-				</v-btn>
+					></v-text-field> -->
+					<v-icon   @click="clickSearch" style="font-size:13px">mdi-magnify</v-icon>
 				</template>
 			</v-toolbar>
 			<v-tabs-items v-model="tab">
@@ -49,12 +44,12 @@
 					<list-comment :listComment="listComment"/>
 				</v-card>
 				</v-tab-item>
-				 <div class="input-comment">
+				 <div class="input-comment" v-if="tabComment == true">
 					 <v-avatar>
 						<img
 						src="https://cdn.vuetifyjs.com/images/john.jpg"
 						alt="John"
-						style="width:30px;height:30px;margin-top: -10px;margin-right: -8px;"
+						style="width:30px;height:30px;margin-top: -18px;margin-right: -8px;"
 						>
 					</v-avatar>
 					<InputComment :isEditing="true" :images="[]" :files="[]" :isAdd="true"/>
@@ -88,7 +83,6 @@ export default {
 		}
 	},
 	mounted(){
-		// this.getCommentById()
 	},
 	 data() {
         return {
@@ -100,6 +94,7 @@ export default {
 			resolveComment:[],
 			commentTarget:{},
 			comment:[],
+			tabComment : true,
 			itemsTab: [
 				{
 					title:'Comment',
@@ -127,10 +122,10 @@ export default {
 		 /**
 		  * truyen vao width comment
 		  */
-        widthComment: {
-            type: String,
-            default: "450px"
-		},
+        // widthComment: {
+        //     type: String,
+        //     default: "410px"
+		// },
 		 /**
 		  * truyen vao height comment hay ko
 		  */
@@ -198,48 +193,47 @@ export default {
 	},
 	watch:{
 		objectIdentifier:function(val){
-				commentApi.getCommentById(this.objectType,val).then(res => {
-						this.$store.commit('comment/updateListComment',res.data.listObject.comments)
-						this.$store.commit('comment/updateListAvtiveComment',res.data.listObject.comments)
-						this.$store.commit('comment/updateListResolve',res.data.listObject.resolve)
+			commentApi.getCommentById(this.objectType,val).then(res => {
+				this.$store.commit('comment/updateListComment',res.data.listObject.comments)
+				this.$store.commit('comment/updateListAvtiveComment',res.data.listObject.comments)
+				this.$store.commit('comment/updateListResolve',res.data.listObject.resolve)
+			});
+			this.commentTarget.objectIdentifier = val;
+			this.commentTarget.objectType = this.objectType;
+			this.commentTarget.uuid = this.uuid;
+			this.commentTarget.targetArea = this.targetArea;
+			this.commentTarget.parentId = 0;
+			this.$store.commit('comment/updateCommentTarget',this.commentTarget)	
+		},
+		uuid:function(val){
+			if(val == "0"){
+				commentApi.getCommentById(this.objectType,this.objectIdentifier).then(res => {
+					this.$store.commit('comment/updateListComment',res.data.listObject.comments)
+					this.$store.commit('comment/updateListAvtiveComment',res.data.listObject.comments)
+					this.$store.commit('comment/updateListResolve',res.data.listObject.resolve)
 				});
-				this.commentTarget.objectIdentifier = val;
+			}else{
+				commentApi.getCommentByUuid(this.objectType,this.objectIdentifier,val).then(res => {
+					this.$store.commit('comment/updateListComment',res.data.listObject.comments)
+					this.$store.commit('comment/updateListAvtiveComment',res.data.listObject.comments)
+					this.$store.commit('comment/updateListResolve',res.data.listObject.resolve)
+				});
+			}
+				this.commentTarget.objectIdentifier = this.objectIdentifier;
 				this.commentTarget.objectType = this.objectType;
 				this.commentTarget.uuid = this.uuid;
 				this.commentTarget.targetArea = this.targetArea;
 				this.commentTarget.parentId = 0;
-				this.$store.commit('comment/updateCommentTarget',this.commentTarget)	
-		},
-		uuid:function(val){
-				if(val == "0"){
-					commentApi.getCommentById(this.objectType,this.objectIdentifier).then(res => {
-						this.$store.commit('comment/updateListComment',res.data.listObject.comments)
-						this.$store.commit('comment/updateListAvtiveComment',res.data.listObject.comments)
-						this.$store.commit('comment/updateListResolve',res.data.listObject.resolve)
-					});
-				}else{
-					commentApi.getCommentByUuid(this.objectType,this.objectIdentifier,val).then(res => {
-						this.$store.commit('comment/updateListComment',res.data.listObject.comments)
-						this.$store.commit('comment/updateListAvtiveComment',res.data.listObject.comments)
-						this.$store.commit('comment/updateListResolve',res.data.listObject.resolve)
-					});
-				}
-					this.commentTarget.objectIdentifier = this.objectIdentifier;
-					this.commentTarget.objectType = this.objectType;
-					this.commentTarget.uuid = this.uuid;
-					this.commentTarget.targetArea = this.targetArea;
-					this.commentTarget.parentId = 0;
-					this.$store.commit('comment/updateCommentTarget',this.commentTarget)
+				this.$store.commit('comment/updateCommentTarget',this.commentTarget)
 		},
 		tab:function(val){
-			console.log(val);
 			if(val === 0){
-				console.log('comment');
 				this.$store.commit('comment/setComment')
+				this.tabComment = true
 			}
 			else{
 				this.$store.commit('comment/setResolve')
-				console.log('resolve');
+				this.tabComment = false
 			}
 		}
 	}
@@ -250,6 +244,11 @@ export default {
 .symper-comment{
 	font:13px roboto
 }
+.symper-comment  >>>.v-btn{
+	height: 25px;
+	width: 25px;
+}
+
 .symper-comment >>> .v-toolbar__title{
 	text-transform: uppercase;
 	font:15px roboto
@@ -258,7 +257,8 @@ export default {
 	height: 32px !important;
 }
 .symper-comment >>> .v-toolbar__content .v-icon{
-	font-size:15px
+	font-size:13px;
+	padding-left:8px
 }
 .symper-comment >>> .v-tab {
 	margin-left:0px !important;
@@ -267,14 +267,11 @@ export default {
 .symper-comment >>> .v-slide-group__wrapper{
 	margin-left:20px !important;
 	height: 32px;
-	/* display:none; */
 }
 .symper-comment >>> .v-toolbar__extension{
 	height: 32px !important;
-	/* display:none; */
 }
 .symper-comment >>> .v-slide-group__wrapper .v-tabs-slider{
-	/* margin-left:20px !important; */
 	display:none;
 }
 .symper-comment >>> .target-area{
