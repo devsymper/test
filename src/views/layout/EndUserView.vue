@@ -51,6 +51,12 @@
                         <v-btn icon>
                             <v-icon>mdi-magnify</v-icon>
                         </v-btn>
+                        <v-btn icon @click="clickFull($event)"> 
+                            <v-icon>mdi-folder</v-icon>
+                        </v-btn>
+                        <v-btn icon @click="clickArea($event)">
+                            <v-icon>mdi-file</v-icon>
+                        </v-btn>
                         <v-menu  v-model="isShowDialogNotification"
                             z-index="161"
                             :close-on-content-click="false"
@@ -77,12 +83,22 @@
                             </template>
                             <list-notification></list-notification>
                         </v-menu>
+					<!--  -->
                     </div>
                 </div>
                 <v-layout style="height:calc(100% - 41px)" class="w-100 h-100" justify-center>
-                    <slot />
+                    <slot></slot>
+					<comment 
+						:showComment="showComment" 
+						:heightComment="heightComment" 
+						:top="top" 
+						:left="left"
+						:objectIdentifier="idItem"
+						:uuid="uuidArea"
+						:targetArea="contentTargetArea"
+						:objectType="objType"
+					/>
                 </v-layout>
-                
             </v-container>
         </v-content>
     </v-app>
@@ -96,6 +112,7 @@ import listApp from "@/components/common/listApp";
 import NotificationBar from "@/components/notification/NotificationBar.vue";
 import EndUserPopup from './../apps/EndUserPopup.vue';
 import UploadFile from "@/components/common/UploadFile.vue"
+import comment from "@/components/common/comment/Comment.vue"
 export default {
     methods: {
         /**
@@ -121,7 +138,24 @@ export default {
                     });
                 }
             }
-        },
+		},
+		clickFull(event){
+			this.showComment = !this.showComment;
+			this.heightComment = "1000px"
+			this.idItem = 1721
+			this.objType = 'document'
+			this.contentTargetArea = ''
+			this.uuidArea = "0"
+		},
+		clickArea(event){
+			console.log(event);
+			this.showComment = !this.showComment;
+			this.heightComment ='100px'
+			this.idItem = 1721
+			this.objType = 'document'
+			this.contentTargetArea = '<span>ahihihi</span>'
+			this.uuidArea = 'asdasdasdasd'
+		},
         closeTab(idx){            
             let urlKey = Object.keys(this.$store.state.app.urlToTabTitleMap)[idx];
             let urlInfo = this.tabUrlItems[urlKey];
@@ -150,7 +184,8 @@ export default {
         "list-app": listApp,
 		"list-notification": NotificationBar,
 		EndUserPopup,
-		UploadFile
+		UploadFile,
+		comment
     },
     created() {
         this.$evtBus.$on("app-receive-remote-msg", data => {
@@ -181,17 +216,25 @@ export default {
     data: function() {
         return {
             isShowDialog: false,
-            isShowDialogNotification: false,
+			isShowDialogNotification: false,
+			showComment: false,
+			heightComment: '',
+			top: null,
+			left:null,
+			idItem:null,
+			uuidArea:'0',
+			contentTargetArea:'',
+			objType:'',
+			commentTarget:{}
         };
     }
 };
 </script>
-
-
 <style>
 .app-header-bg-color,.app-header-bg-color .v-item-group {
     background-color: white!important;
 }
+
 .nofitication-title-bar{
     font-size: 13px;
     font-weight: bold;

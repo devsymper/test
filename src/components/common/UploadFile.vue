@@ -4,7 +4,7 @@
 			:loading="isSelecting"
 			@click="onButtonClick"
 				> 
-			<v-icon>mdi-upload</v-icon>
+			<v-icon>mdi-attachment</v-icon>
 			<input
 				ref="uploader"
 				class="d-none"
@@ -45,9 +45,10 @@ export default {
 				type: 'post',
 				success: function (res){
 					let resObj = JSON.parse(res);
-					if(resObj.status == 500){
-					}else if(resObj.status == 200){
+					if(resObj.status == 200){
 						thisCpn.$emit('uploaded-file',resObj.data)
+					}else{
+						thisCpn.$emit('uploaded-file',resObj.message)
 					}
 				},
 			});

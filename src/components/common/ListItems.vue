@@ -997,7 +997,6 @@ export default {
                         }
                         colMap[item.name].renderer = this.dateRenderer;
                     }
-                    
                     if(item.renderer){
                         colMap[item.name].renderer = item.renderer;
                     }

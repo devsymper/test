@@ -6,17 +6,19 @@ import processModule from "./process";
 import orgchartModule from "./orgchart";
 import permissionModule from "./permission";
 import actionPackModule from "./actionPack";
-import AppConfig from "./AppConfig"
+import comment from "./comment";
+import AppConfig from "./AppConfig";
 Vue.use(Vuex);
 
 export default new Vuex.Store({
-	modules: {
-		app: appModule,
-		document: documentModule,
-		process: processModule,
-		orgchart: orgchartModule,
-		permission: permissionModule,
-		actionPack: actionPackModule,
-		appConfig: AppConfig,
-	}
-});
+            modules: {
+                app: appModule,
+                document: documentModule,
+                process: processModule,
+                orgchart: orgchartModule,
+                permission: permissionModule,
+                actionPack: actionPackModule,
+                comment: comment,
+                appConfig: AppConfig,
+            }
+        };
