@@ -48,7 +48,7 @@ export default [{
         "action": "list",
         "handler": function(param) {
             let tabName = this.$t('document.title');
-            this.$goToPage('/documents', tabName);
+            this.$goToPage('/documents', tabName, false, false);
         }
     },
 

@@ -298,7 +298,7 @@ export default {
             if(item.action){
                 // this.$evtBus.$emit('symper-app-call-action-handler', item.action, this, {});
             }else{
-                this.$goToPage(item.link, item.title);
+                this.$goToPage(item.link, item.title, false, false);
             }
         }
     },
