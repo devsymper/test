@@ -1,6 +1,8 @@
 <template>
 	<div class="commnent-item">
 		<div :item="item" class="commnent-item-wrapper" :style="{width:width}">
+		<v-icon class="icon-check" @click="resolveComment(item)" style="float:right">mdi-check</v-icon>
+
 				<v-avatar>
 					<img
 					src="https://cdn.vuetifyjs.com/images/john.jpg"
@@ -9,9 +11,8 @@
 					>
 				</v-avatar>
 			<div class="comment-item-content">
-				<div style="display:flex;height:20px;width:100%">
-						<span style="color:#262626">Đào Mạnh Khá</span>
-						<v-btn  icon @click="resolveComment(item)"><v-icon class="icon-check" style="float:right">mdi-check</v-icon></v-btn>
+				<div style="display:flex;height:16px;width:100%">
+						<span style="color:#00000099">Đào Mạnh Khá</span>
 				</div>
 				<div style="display:flex">
 					<InputComment 
@@ -21,15 +22,10 @@
 						:files="files"
 						:isAdd="false"
 					/>
-					<v-menu v-if="sEnduser==item.userId" bottom left class="icon-menu">
+					<v-menu v-if="sEnduser==item.userId" bottom left >
 						<template  v-slot:activator="{ on, attrs }">
-							<v-btn
-							icon
-							v-bind="attrs"
-							v-on="on"
-							>
-							<v-icon >mdi-dots-horizontal</v-icon>
-							</v-btn>
+							<v-icon class="icon-menu" v-bind="attrs"
+							v-on="on" >mdi-dots-horizontal</v-icon>
 						</template>
 						<v-list>
 							<v-list-item
@@ -57,7 +53,7 @@
 				v-for="(child, i) in item.childrens"
 				:key="i"
 				:item="child"
-				:width="'350px'"
+				:width="'340px'"
 			>
 			</commentItem>
 			<div class="reply-comment"  v-if="item.reply">
@@ -199,6 +195,7 @@ export default {
 	display: flex;
 	margin-left: auto;
 	margin-right: auto;
+	position: relative;
 }
 .commnent-item >>> .comment-item-content{
 	display: flex;
@@ -210,6 +207,12 @@ export default {
 	display: inline-block;
 	flex-grow: 1;
 	font-size: 15px;
+}
+.commnent-item>>> .icon-menu{
+	position: absolute;
+	top:10;
+	right:0;
+	display: none;
 }
 .commnent-item >>>.v-btn{
 	height: 25px;
@@ -226,6 +229,9 @@ export default {
 }
 .commnent-item>>>  .icon-check{
 	color: green;
+	position: absolute;
+	top:0;
+	right:0;
 }
 .commnent-item >>> .comment-item-content{
 	display: flex;
@@ -242,5 +248,8 @@ export default {
 	display: flex;
 	margin-right:auto;
 	margin-left:auto
+}
+.commnent-item >>> .commnent-item-wrapper:hover .icon-menu{
+	display: inline-block;
 }
 </style>

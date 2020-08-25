@@ -39,11 +39,11 @@
 					:items="itemsTag"
 					offset="6"
 					>
-					<textarea v-model="inputComment" class="text-area">
+					<textarea v-model="inputComment"  v-on:keyup.enter="addComment" class="text-area">
 					</textarea>
 				</Mentionable>
-				<UploadFile @uploaded-file="uploadInfo"/>
-				<v-btn icon @click="addComment">
+				<UploadFile style="position:absolute;right: 12px;bottom: 0px;" @uploaded-file="uploadInfo"/>
+				<v-btn style="position:absolute;right: 0px;bottom: 0px;" icon @click="addComment">
 					<v-icon >mdi-send-circle-outline</v-icon>
 				</v-btn>
 			</div>
@@ -263,8 +263,9 @@ export default {
 .content-comment >>> .content-comment-file .v-icon{
 	font-size: 13px;
 }
-.content-comment >>> .text-area-wrapper {
+.content-comment >>> .text-area-wrapper{
 	display: flex;
+	position: relative;
 	background-color: #f7f7f7;
 }
 .content-comment >>> .text-area-wrapper .mentionable {
@@ -278,6 +279,6 @@ export default {
 	border-radius: 4px;
 }
 .content-comment >>>  .text-area-wrapper .mention-selected {
-  background: rgb(192, 250, 153);
+    background: rgb(192, 250, 153);
 }
 </style>
