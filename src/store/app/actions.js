@@ -110,47 +110,58 @@ const getAllUsers = async(context) => {
 
 
 function getRolesByType(userInfo, type, apiObj, context) {
-    apiObj.getRolesByUser(userInfo).then((res) => {
-        if (res.status == 200) {
-            if (res.data[0]) {
-                countGetRoleType += 1;
-                context.commit('setUserRoleByType', {
-                    type: type,
-                    data: res.data[0].roles,
-                    countGetRoleType: countGetRoleType
-                });
+    return new Promise((resolve, reject) => {
+        apiObj.getRolesByUser(userInfo).then((res) => {
+            if (res.status == 200) {
+                if (res.data[0]) {
+                    countGetRoleType += 1;
+                    context.commit('setUserRoleByType', {
+                        type: type,
+                        data: res.data[0].roles,
+                        countGetRoleType: countGetRoleType
+                    });
+                }
+                resolve()
+            } else {
+                self.$snotifyError(res, "Can not get user role in orgchart");
+                reject();
             }
-        } else {
-            self.$snotifyError(res, "Can not get user role in orgchart");
-        }
-
-        setTimeout(() => {
-
-            SYMPER_APP.$evtBus.$emit('symper-user-add-loaded-role-type', {
-                type: type
-            });
-        }, 0);
-    }).catch((err) => {
-        self.$snotifyError(err, "Can not get user role in orgchart");
+        }).catch((err) => {
+            self.$snotifyError(err, "Can not get user role in orgchart");
+            reject();
+        });
     });
 }
 
 
-async function checkAndRefreshCurrentRole(data, context) {
-    // Nếu chưa load thông tin của role hiện tại lên thì lấy thông tin về để hiển thị
-    if (data.profile.userDelegate &&
-        data.profile.userDelegate.role &&
-        data.profile.userDelegate.role != context.state.endUserInfo.currentRole.id) {
-
-        let res = await userRoleApi.getRoleData(data.profile.userDelegate.role);
-        if (res.status == 200) {
-            context.commit("changeCurrentUserInfo", {
-                currentRole: res.data
-            });
+function checkAndRefreshCurrentRole(data, context) {
+    return new Promise(async(resolve, reject) => {
+        // Nếu chưa load thông tin của role hiện tại lên thì lấy thông tin về để hiển thị
+        let role = '';
+        if (data.profile.userDelegate &&
+            data.profile.userDelegate.role &&
+            data.profile.userDelegate.role != context.state.endUserInfo.currentRole.id) {
+            role = data.profile.userDelegate.role;
         } else {
-            SYMPER_APP.$snotifyError(res, "Can not get role detail");
+            role = data.profile.role;
         }
-    }
+
+        if (role) {
+
+            let res = await userRoleApi.getRoleData(role);
+            if (res.status == 200) {
+                context.commit("changeCurrentUserInfo", {
+                    currentRole: res.data
+                });
+                resolve();
+            } else {
+                SYMPER_APP.$snotifyError(res, "Can not get role detail");
+                reject();
+            }
+        } else {
+            resolve();
+        }
+    });
 }
 
 function setCookie(cname, cvalue, exdays) {
@@ -165,30 +176,32 @@ function setCookie(cname, cvalue, exdays) {
 }
 
 const setUserInfo = (context, data) => {
-    let accData = {
-        accType: data.profile.type,
-        info: data.profile
-    };
-    let endUserInfo = data.profile;
-    let accInfo = {
-        token: data.token,
-        baId: 0,
-        endUserId: 0,
-        profile: data.profile
-    }
-
-    if (data.profile.type == 'ba') {
-        accInfo.baId = data.profile.id;
-        context.commit("changeCurrentBAInfo", data.profile);
-        endUserInfo = endUserInfo.userDelegate;
-        accInfo.endUserId = data.profile.userDelegate.id;
-    } else {
-        accInfo.endUserId = data.profile.id;
-    }
-    context.commit("changeCurrentUserInfo", endUserInfo);
-    util.auth.saveLoginInfo(accInfo);
-    setCookie('symper_token', "Bearer " + data.token, 365);
-    checkAndRefreshCurrentRole(data, context);
+    return new Promise(async(resolve, reject) => {
+        try {
+            let endUserInfo = data.profile;
+            let accInfo = {
+                token: data.token,
+                baId: 0,
+                endUserId: 0,
+                profile: data.profile
+            }
+            if (data.profile.type == 'ba') {
+                accInfo.baId = data.profile.id;
+                context.commit("changeCurrentBAInfo", data.profile);
+                endUserInfo = endUserInfo.userDelegate;
+                accInfo.endUserId = data.profile.userDelegate.id;
+            } else {
+                accInfo.endUserId = data.profile.id;
+            }
+            context.commit("changeCurrentUserInfo", endUserInfo);
+            util.auth.saveLoginInfo(accInfo);
+            setCookie('symper_token', "Bearer " + data.token, 365);
+            await checkAndRefreshCurrentRole(data, context);
+            resolve();
+        } catch (error) {
+            reject(error);
+        }
+    });
 }
 
 
@@ -199,20 +212,25 @@ const getAllRoles = async function(context, userId) {
         orchart: [],
         systemRole: []
     };
-    getRolesByType([{
+    await getRolesByType([{
         idUser: userId
     }], 'orgchart', orgchartApi, context);
 
-    getRolesByType([userId], 'systemRole', systemRoleApi, context);
+    await getRolesByType([userId], 'systemRole', systemRoleApi, context);
+    SYMPER_APP.$evtBus.$emit('symper-user-add-loaded-role-type');
 }
 
 const changeUserRole = async function(context, role) {
-    let res = await userApi.changeRole(role.id);
-    if (res.status == 200) {
-        setUserInfo(context, res.data);
-        location.reload();
-    } else {
-        SYMPER_APP.$snotifyError(res, "Can not change user role");
+    try {
+        let res = await userApi.changeRole(role.id);
+        if (res.status == 200) {
+            await setUserInfo(context, res.data);
+            location.reload();
+        } else {
+            SYMPER_APP.$snotifyError(res, "Can not change user role");
+        }
+    } catch (error) {
+        console.error(error);
     }
 }
 export { getAllOrgChartData, getAllUsers, getAllRoles, setUserInfo, changeUserRole };
