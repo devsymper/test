@@ -27,7 +27,7 @@
             <v-row>
                 <v-list-item-content class="fm mb-2">
                     <v-list-item-title class="fs-15 ml-5 fm mb-2">
-                        Kết quả tìm kiếm trong toàn bộ hệ thống
+                        Kết quả tìm kiếm trong {{nameResult}}
                     </v-list-item-title>
                     <v-list-item-subtitle class="sub-title fs-12 ml-5 fm">Từ khoá "{{wordSearch}}" có {{countResult}} kết quả phù hợp</v-list-item-subtitle>
                 </v-list-item-content>
@@ -80,7 +80,7 @@
                     </v-list-item>
                 </v-row>
             </v-row>
-            <v-row v-for="item in listSearch.filter(x => x.group== 'Nhân viên' )" style="margin-top:-18px">
+            <v-row v-for="item in listSearch.filter(x => x.group == 'Nhân viên' )" style="margin-top:-18px">
                 <v-row v-if="item.group" class=" mt-2 ml-1 mb-2 mr-4">
                     <v-list-item>
                         <v-list-item-content>
@@ -116,15 +116,10 @@
             </v-row>
             <!-- kết thúc danh sách  -->
             <!-- danh sách tìm kiếm chi tiết -->
-                 <v-row class="mb-2" v-if="showDetail" v-for="(item,i) in newSearchAll.filter(x => x.type== type||x.group==type )" :key="i" style="margin-top:-18px">
+            <v-row class="mb-2" v-if="showDetail" v-for="(item,i) in newSearchAll.filter(x => x.type== type||x.group==type )" :key="i" style="margin-top:-18px">
                     <v-row v-if="item.group" class="ml-1 mt-2 mr-4">
-                        <v-list-item>
-                            <v-list-item-content>
-                                <v-list-item-title class="item-header">{{formatGroupName(item.group)}}</v-list-item-title>
-                            </v-list-item-content>
-                        </v-list-item>
                 </v-row>
-                <v-row v-else-if="item.type !== 'user'" 
+                <v-row v-else-if="item.type != 'user'&&item.type !='application'" 
                     @mouseleave="hideDotButton(i)" 
                      @mousemove="showDotButton(i)" 
                     class="mt-1 ml-1">
@@ -157,8 +152,33 @@
                         </v-list-item-action>
                     </v-list-item>
                 </v-row>
+                <!-- phần user -->
+                <v-row v-else-if="item.type == 'user'" 
+                    class="mt-1 ml-1">
+                    <!-- danh sách tìm thấy không bao gồm user -->
+                </v-row>
             </v-row>
             <!-- kết thúc tìm kiếm chi tiết -->
+            <!-- trang dành cho user -->
+             <v-row  v-if="showDetail&&checkUser" class="mt-4">
+               <v-col cols="12" 
+          md="3" v-for="item in listSearch.filter(x => x.type== 'user' )" >
+                            <div class="d-flex justify-start mr-3 " style="width: 250px!important; border:1px solid rgba(0,0,0,0.2">
+                                <v-list-item-avatar class="item-avatar ml-3">
+                                    <img :src="item.avatar || require('@/assets/image/avatar_default.jpg')">
+                                </v-list-item-avatar>
+                                <v-list-item-content>
+                                    <v-list-item-title style="margin-left: 0.5" class="item-title fs-13 fm" v-html="item.displayName">
+                                    </v-list-item-title>
+                                    <v-list-item-subtitle style="margin-left:0" class="sub-title fs-12" v-html="item.displayName">
+                                    </v-list-item-subtitle>
+                                    <v-list-item-subtitle style="margin-left:0" class="sub-title fs-12" v-html="item.email">
+                                    </v-list-item-subtitle>
+                                </v-list-item-content>
+                            </div>
+                        </v-col>
+            </v-row>
+            <!-- dành cho user -->
         </v-col>
            </v-card>
 </div>
@@ -217,8 +237,9 @@ export default {
             this.showGeneral = false;
             this.showDetail = true;
             this.type=type;
+            this.nameResult = this.formatGroupName(type);
             this.countResult = this.newSearchAll.filter(x => x.type== type ).length
-
+            if(type=='user'){this.checkUser==true};
             this.$store.commit('search/setType', type);
            // this.$router.push('/search/detail');
         },
@@ -265,9 +286,11 @@ export default {
             showGeneral:true,
             showDetail:false,
             menu: [],
+            nameResult:' toàn bộ hệ thống',
             type:'',
             listSearch: [],
             listSearchAll: [],
+            checkUser:false,
             countResult: 0,
              defineAction:{
                 document_definition:{
