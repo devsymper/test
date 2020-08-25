@@ -23,8 +23,8 @@
 					align-with-title
 				>
 					<v-tabs-slider color="yellow"></v-tabs-slider>
-					<v-tab v-for="item in itemsTab" :key="item.value" @click="clickTab(item.value)">
-						<span > {{ item.title }} </span> <v-icon style='padding-left:4px'>{{item.icon}}</v-icon>
+					<v-tab v-for="item in itemsTab" :key="item.value" >
+						<span > {{ item.title }} </span> <span style='padding-left:4px'>{{ '('+sComment[item.store].length+')'}}</span>
 					</v-tab>
 				</v-tabs>
 				<v-spacer></v-spacer>
@@ -82,6 +82,9 @@ export default {
 	computed:{
 		listComment(){
 			return this.$store.state.comment.listComment
+		},
+		sComment(){
+			return this.$store.state.comment
 		}
 	},
 	mounted(){
@@ -101,11 +104,13 @@ export default {
 				{
 					title:'Comment',
 					value:'comment',
+					store: 'listAvtiveComment',
 					icon: 'mdi-comment-processing-outline'
 				},
 				{
 					title: 'Resolve',
 					value:'resolve',
+					store: 'listResolve',
 					icon: 'mdi-comment-check'
 				}
 			],
@@ -190,14 +195,12 @@ export default {
 		clickTab(item){
 			console.log(item);
 		},
-		updateCommentTarget(){
-
-		}
 	},
 	watch:{
 		objectIdentifier:function(val){
 				commentApi.getCommentById(this.objectType,val).then(res => {
 						this.$store.commit('comment/updateListComment',res.data.listObject.comments)
+						this.$store.commit('comment/updateListAvtiveComment',res.data.listObject.comments)
 						this.$store.commit('comment/updateListResolve',res.data.listObject.resolve)
 				});
 				this.commentTarget.objectIdentifier = val;
@@ -211,21 +214,34 @@ export default {
 				if(val == "0"){
 					commentApi.getCommentById(this.objectType,this.objectIdentifier).then(res => {
 						this.$store.commit('comment/updateListComment',res.data.listObject.comments)
+						this.$store.commit('comment/updateListAvtiveComment',res.data.listObject.comments)
 						this.$store.commit('comment/updateListResolve',res.data.listObject.resolve)
 					});
 				}else{
 					commentApi.getCommentByUuid(this.objectType,this.objectIdentifier,val).then(res => {
 						this.$store.commit('comment/updateListComment',res.data.listObject.comments)
+						this.$store.commit('comment/updateListAvtiveComment',res.data.listObject.comments)
 						this.$store.commit('comment/updateListResolve',res.data.listObject.resolve)
 					});
 				}
-					this.commentTarget.objectIdentifier = val;
+					this.commentTarget.objectIdentifier = this.objectIdentifier;
 					this.commentTarget.objectType = this.objectType;
 					this.commentTarget.uuid = this.uuid;
 					this.commentTarget.targetArea = this.targetArea;
 					this.commentTarget.parentId = 0;
 					this.$store.commit('comment/updateCommentTarget',this.commentTarget)
 		},
+		tab:function(val){
+			console.log(val);
+			if(val === 0){
+				console.log('comment');
+				this.$store.commit('comment/setComment')
+			}
+			else{
+				this.$store.commit('comment/setResolve')
+				console.log('resolve');
+			}
+		}
 	}
 }
 </script>
@@ -233,6 +249,33 @@ export default {
 <style scoped>
 .symper-comment{
 	font:13px roboto
+}
+.symper-comment >>> .v-toolbar__title{
+	text-transform: uppercase;
+	font:15px roboto
+}
+.symper-comment >>> .v-toolbar__content {
+	height: 32px !important;
+}
+.symper-comment >>> .v-toolbar__content .v-icon{
+	font-size:15px
+}
+.symper-comment >>> .v-tab {
+	margin-left:0px !important;
+	height:32px;
+}
+.symper-comment >>> .v-slide-group__wrapper{
+	margin-left:20px !important;
+	height: 32px;
+	/* display:none; */
+}
+.symper-comment >>> .v-toolbar__extension{
+	height: 32px !important;
+	/* display:none; */
+}
+.symper-comment >>> .v-slide-group__wrapper .v-tabs-slider{
+	/* margin-left:20px !important; */
+	display:none;
 }
 .symper-comment >>> .target-area{
 	width: 100%;
@@ -242,5 +285,7 @@ export default {
 	width: 400px;
 	margin-left: auto;
 	margin-right:auto;
+	flex-direction: row;
+	justify-content: center;
 }
 </style>

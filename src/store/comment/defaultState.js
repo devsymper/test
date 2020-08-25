@@ -7,6 +7,7 @@ const defaultState = {
 		objectType: '',
 	},
 	listComment: [],
-	listResolve: []
+	listResolve: [],
+	listAvtiveComment: [],
 };
 export default defaultState;

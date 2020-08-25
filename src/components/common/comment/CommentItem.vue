@@ -9,9 +9,9 @@
 					>
 				</v-avatar>
 			<div class="comment-item-content">
-				<div style="display:flex">
+				<div style="display:flex;height:20px">
 						<span style="color:#262626;width:330px">Đào Mạnh Khá</span> <br>
-						<v-btn class="icon-check" icon><v-icon >mdi-check</v-icon></v-btn>
+						<v-btn class="icon-check" icon @click="resolveComment(item)"><v-icon >mdi-check</v-icon></v-btn>
 				</div>
 				<div style="display:flex">
 					<InputComment 
@@ -98,20 +98,42 @@ export default {
 		deleteComment(item){
 			commentApi.deleteComment(item.id).then(res => {
 				if(this.sComment.uuid == "0"){
-					commentApi.getCommentById(this.sComment.objectType,this.sComment.objectIdentifier).then(res => {
-						this.$store.commit('comment/updateListComment',res.data.listObject.comments)
-						this.$store.commit('comment/updateListResolve',res.data.listObject.resolve)
-					});
+					this.getCommentId()
 				}else{
-					debugger
+					this.getCommentUuid()
 				}
             });
+		},
+		getCommentUuid(){
+			commentApi.getCommentByUuid(this.sComment.objectType,this.sComment.objectIdentifier,this.sComment.uuid).then(res => {
+				this.$store.commit('comment/updateListComment',res.data.listObject.comments)
+				this.$store.commit('comment/updateListAvtiveComment',res.data.listObject.comments)
+				this.$store.commit('comment/updateListResolve',res.data.listObject.resolve)
+			});
+		},
+		getCommentId(){
+			commentApi.getCommentById(this.sComment.objectType,this.sComment.objectIdentifier).then(res => {
+				this.$store.commit('comment/updateListComment',res.data.listObject.comments)
+				this.$store.commit('comment/updateListAvtiveComment',res.data.listObject.comments)
+				this.$store.commit('comment/updateListResolve',res.data.listObject.resolve)
+			});
 		},
 		// addComment(data){
 		// 	console.log(data);
 		// },
 		lassSeen(date){
 			return moment(date).fromNow();
+		},
+		resolveComment(item){
+			console.log(item);
+			commentApi.changeStatus(item.id).then(res => {
+			   	console.log(res);
+			  	 if(this.sComment.uuid == "0"){
+					this.getCommentId()
+				}else{
+					this.getCommentUuid()
+				}
+            })
 		}
 	},
 	components: {
@@ -140,9 +162,12 @@ export default {
 <style scoped>
 .commnent-item {
 	padding: 8px;
-	width:400px;
+	width:100%;
 	margin-left: auto;
 	margin-right: auto;
+}
+.commnent-item >>> .v-sheet .v-toolbar {
+	height: unset !important;
 }
 .commnent-item >>> .commnent-item-wrapper {
 	display: flex;

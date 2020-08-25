@@ -13,7 +13,7 @@
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import InputComment from "./InputComment.vue";
 import CommentItem from './CommentItem.vue';
-import {commentApi} from '@/api/Comment.js'
+import {commentApi} from '@/api/Comment.js';
 export default {
 	name: 'ListComment',
 	props:{
@@ -40,5 +40,4 @@ export default {
 
 <style scoped>
 
-/*  */
 </style>

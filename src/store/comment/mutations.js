@@ -10,9 +10,21 @@ const updateListComment = (state, data) => {
 const updateListResolve = (state, data) => {
 	Vue.set(state, 'listResolve', data)
 };
+const updateListAvtiveComment = (state, data) => {
+	Vue.set(state, 'listAvtiveComment', data)
+};
+const setComment = (state) => {
+	state.listComment = state.listAvtiveComment
+};
+const setResolve = (state) => {
+	state.listComment = state.listResolve
+}
 export {
 	updateCommentTarget,
 	addPropertyCommentTarget,
 	updateListComment,
-	updateListResolve
+	updateListResolve,
+	updateListAvtiveComment,
+	setComment,
+	setResolve
 };

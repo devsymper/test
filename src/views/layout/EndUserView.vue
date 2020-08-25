@@ -149,6 +149,8 @@ export default {
 			console.log(event);
 			this.showComment = !this.showComment;
 			this.heightComment ='100px'
+			this.idItem = 1721
+			this.objType = 'document'
 			this.contentTargetArea = '<span>ahihihi</span>'
 			this.uuidArea = 'asdasdasdasd'
 		},

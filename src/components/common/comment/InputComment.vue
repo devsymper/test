@@ -112,19 +112,21 @@ export default {
 			this.dataPostComment = this.sComment
 			this.dataPostComment.content = this.inputComment
 			this.dataPostComment.attackments = this.attackments
-			let data = JSON.stringify(this.dataPostComment)
+			debugger
 			if(this.isAdd == true){
+			let data = JSON.stringify(this.dataPostComment)
 				commentApi.addComment(data).then(res => {
 					this.updateComment()
 				});
 			}
 			else{
+				this.dataPostComment.id = this.item.id
+				let data = JSON.stringify(this.dataPostComment)
+				debugger
 				commentApi.editComment(data).then(res => {
 					this.updateComment()
 				});
 			}
-			
-			
 		},
 		editComment(){
 
@@ -145,11 +147,16 @@ export default {
 			if(this.sComment.uuid == "0"){
 					commentApi.getCommentById(this.sComment.objectType,this.sComment.objectIdentifier).then(res => {
 						this.$store.commit('comment/updateListComment',res.data.listObject.comments)
+						this.$store.commit('comment/updateListAvtiveComment',res.data.listObject.comments)
 						this.$store.commit('comment/updateListResolve',res.data.listObject.resolve)
 					});
-				}else{
-					debugger
-				}
+			}else{
+				commentApi.getCommentByUuid(this.sComment.objectType,this.sComment.objectIdentifier,this.sComment.uuid).then(res => {
+					this.$store.commit('comment/updateListComment',res.data.listObject.comments)
+					this.$store.commit('comment/updateListAvtiveComment',res.data.listObject.comments)
+					this.$store.commit('comment/updateListResolve',res.data.listObject.resolve)
+				});
+			}
 		}
 	},
 	computed:{
@@ -226,11 +233,11 @@ export default {
 	flex-direction: column;
 }
 .content-comment >>> .content-comment-file .commnet-file-item{
-	padding: 4px 0px;
+	padding: 0px 0px 4px 0px;
 	display: flex;
 }
 .content-comment >>> .content-comment-file .commnet-file-item .file-item-title{
-	padding-left: 4px;
+	padding-left: 0px 0px 4px 0px;
 	flex-grow: 1;
 	cursor: pointer;
 }
@@ -242,7 +249,7 @@ export default {
 	float: right;
 }
 .content-comment >>>  .content-comment-input{
-	padding: 4px 0px;
+	padding: 0px 0px 4px 0px;
 }
 .content-comment >>> .content-comment-file .v-icon{
 	font-size: 13px;
