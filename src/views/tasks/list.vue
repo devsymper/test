@@ -50,7 +50,10 @@
                 </v-row>
                 <v-divider></v-divider>
 
-                <VuePerfectScrollbar v-if="!loadingTaskList" :style="{height: listTaskHeight+'px'}">
+                <VuePerfectScrollbar 
+                    v-if="!loadingTaskList" 
+                    @ps-y-reach-end="handleReachEndList"
+                    :style="{height: listTaskHeight+'px'}">
                     <v-row
                         v-for="(obj, idx) in allFlatTasks"
                         :key="idx"
@@ -69,7 +72,7 @@
                             class="pl-3 pr-1 pb-1 pt-2">
                             <div class="pl-1">
                                 <!-- <div class="fz-13 text-truncate d-inline-block float-left text-ellipsis w-100">{{obj.name}}</div> -->
-                                <div class="text-left fs-12 pr-6 text-ellipsis w-100">
+                                <div class="text-left fs-13 pr-6 text-ellipsis w-100">
                                     {{obj.taskData.content}}
                                 </div>
                                 <div
@@ -87,8 +90,9 @@
                         </v-col>
                         <v-col
                             v-if="!sideBySideMode"
+                            style="line-height: 42px"
                             cols="2"
-                            class="fs-13 px-1 py-0">
+                            class="fs-12 px-1 py-0">
                             
                                 <v-avatar size="25" class="mr-2">
                                     <img :src="obj.assigneeInfo.avatar ? obj.assigneeInfo.avatar : require('@/assets/image/avatar_default.jpg')" />
@@ -97,6 +101,7 @@
                         </v-col>
                         <v-col
                             v-if="!sideBySideMode"
+                            style="line-height: 42px"
                             cols="2"
                             class="fs-13 px-1 py-0"
                         >
@@ -104,6 +109,7 @@
                         </v-col>
                         <v-col
                             v-if="!sideBySideMode"
+                            style="line-height: 42px"
                             cols="2"
                             class="fs-13 px-1 py-0">
                             <v-chip
@@ -119,14 +125,25 @@
                                 {{obj.ownerInfo.displayName}}
                             </v-chip>
                         </v-col>
-                        <v-col class="py-0" cols="2" v-if="!sideBySideMode && !smallComponentMode">
+                        <v-col 
+                            class="py-0" 
+                            cols="2" 
+                            v-if="!sideBySideMode && !smallComponentMode"
+                            style="line-height: 42px">
                             <span class="mt-1 d-inline-block fs-13">{{obj.processDefinitionName}}</span>
                         </v-col>
                     </v-row>
+
                 </VuePerfectScrollbar>
 
                  <v-skeleton-loader
                     v-else
+                    ref="skeleton"
+                    :type="'table-tbody'"
+                    class="mx-auto"
+                ></v-skeleton-loader>
+                 <v-skeleton-loader
+                    v-if="loadingMoreTask"
                     ref="skeleton"
                     :type="'table-tbody'"
                     class="mx-auto"
@@ -208,7 +225,9 @@ export default {
         },
         headerTitle: {
             type: String,
-            default: 'List tasks'
+            default(){
+                return this.$t('process.taskList')
+            }
         },
         filterTaskAction: {
             type: String,
@@ -217,8 +236,10 @@ export default {
     },
     data: function() {
         return {
-            loadingTaskList: true,
+            loadingTaskList: false,
+            loadingMoreTask: false,
             listTaskHeight: 300,
+            totalTask: 0,
             selectedTask: {
                 taskInfo: {},
                 idx: -1,
@@ -233,6 +254,7 @@ export default {
                 size: 100,
                 sort: 'createTime',
                 order: 'desc',
+                page: 1,
                 assignee: this.$store.state.app.endUserInfo.id
             },
             defaultAvatar: appConfigs.defaultAvatar
@@ -256,6 +278,15 @@ export default {
         self.reCalcListTaskHeight();
     },
     methods: {
+        handleReachEndList(){
+
+            if(this.allFlatTasks.length < this.totalTask && this.allFlatTasks.length > 0){
+                this.myOwnFilter.page += 1;
+                this.myOwnFilter.size = 50;
+                
+                this.getTasks();
+            }
+        },
         handleTaskSubmited(){
             this.sideBySideMode = false;
             this.getTasks();
@@ -267,7 +298,7 @@ export default {
             this.getTasks();
         },
         reCalcListTaskHeight(){
-            this.listTaskHeight = util.getComponentSize(this.$el.parentElement).h - 75;            
+            this.listTaskHeight = util.getComponentSize(this.$el.parentElement).h - 125;            
         },
         getUser(id) {
             this.$refs.user.getUser(id);
@@ -307,8 +338,16 @@ export default {
             return rsl;
         },
         async getTasks(filter = {}) {
+            if(this.loadingTaskList || this.loadingMoreTask){
+                return;
+            }
             let self = this;
-            this.loadingTaskList = true;
+            if(this.myOwnFilter.page == 1){
+                this.allFlatTasks = [];
+                this.loadingTaskList = true;
+            }else{
+                this.loadingMoreTask = true;
+            }
             this.listProrcessInstances = [];
             filter = Object.assign(filter, this.filterFromParent);
             filter = Object.assign(filter, this.myOwnFilter);
@@ -326,8 +365,8 @@ export default {
                 res = await BPMNEngine.getTask(filter);
                 listTasks = res.data;
             }
+            this.totalTask = Number(res.total);
                         
-            self.allFlatTasks = [];
             for(let task of listTasks){
                 task.taskData = self.getTaskData(task);
                 task = addMoreInfoToTask(task);
@@ -369,7 +408,7 @@ export default {
             );
             this.addOtherProcess(listTasks);
             this.loadingTaskList = false;
-
+            this.loadingMoreTask = false
         },
         addOtherProcess(listTasks) {
             for (let index in listTasks) {

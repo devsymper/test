@@ -3,7 +3,7 @@
         <ba-sidebar />
         <v-content>
             <v-container fluid fill-height class="pa-0">
-                <div class="w-100 app-header-bg-color" >
+                <div class="w-100 app-header-bg-color" style="border-bottom:1px solid #e6e5e5">
                     <div style="width:calc(100% - 200px)" class="float-left">
                         <v-tabs
                             hide-slider
@@ -54,8 +54,8 @@
                         <v-menu  v-model="isShowDialogNotification"
                             z-index="161"
                             :close-on-content-click="false"
-                            :max-width="452"
-                            :min-width="452"
+                            :max-width="385"
+                            :min-width="385"
                             :max-height="700"
                             offset-y>
                             <template v-slot:activator="{ on }">
@@ -196,5 +196,7 @@ export default {
     font-size: 13px;
     font-weight: bold;
 }
-
+.v-menu__content{
+    min-height: 300px;
+}
 </style>

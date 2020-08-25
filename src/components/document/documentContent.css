@@ -197,6 +197,12 @@ input.s-control:not(.s-control-panel):not(.detail-view):hover {
     font-weight: 500;
 }
 
+.handsontable th.beforeHiddenColumn:after {
+    display: none;
+}
+
+
+/* 
 .ht_master .wtHolder::-webkit-scrollbar {
     width: 6px;
     height: 6px;
@@ -213,12 +219,13 @@ input.s-control:not(.s-control-panel):not(.detail-view):hover {
     -moz-border-radius: 4px;
     -ms-border-radius: 4px;
     -o-border-radius: 4px;
-}
+} */
 
-.ht_clone_bottom.handsontable {
+
+/* .ht_clone_bottom.handsontable {
     bottom: 6px !important;
 }
 
 .ht_clone_bottom_left_corner.handsontable {
     bottom: 6px !important;
-}
+} */

@@ -7,9 +7,9 @@
             :style="{'width':docSize, 'height':'100%'}"
         >
             <div v-html="contentDocument"></div>
-            <button v-on:click="togglePageSize" v-show="!isQickSubmit" id="toggle-doc-size">
+            <!-- <button v-on:click="togglePageSize" v-show="!isQickSubmit" id="toggle-doc-size">
                 <span class="mdi mdi-arrow-horizontal-lock"></span>
-            </button>
+            </button> -->
             <autocomplete-input
                 ref="autocompleteInput"
                 @after-select-row="afterSelectRowAutoComplete"
@@ -51,6 +51,7 @@
                 :direction="direction"
                 :open-on-hover="hover"
                 :transition="transition"
+                style="z-index:9999;"
             >
                 <template v-slot:activator>
                     <v-btn v-model="fab" color="blue darken-2" dark fab>
@@ -59,19 +60,52 @@
                         <v-progress-circular indeterminate v-show="isSubmitting" color="red"></v-progress-circular>
                     </v-btn>
                 </template>
-                <v-btn fab dark small color="green" @click="handlerSubmitDocumentClick">
-                    <v-icon>mdi-content-save</v-icon>
-                </v-btn>
-                <v-btn
-                        v-if="this.isDraft != 1"
-                        fab
-                        dark
-                        small
-                        color="indigo"
-                        @click="handlerDraftClick"
-                    >
-                        <v-icon>mdi-trash-can-outline</v-icon>
-                    </v-btn>
+                
+                <v-tooltip left>
+                    <template v-slot:activator="{ on }">
+                        <div v-on="on">
+                            <v-btn fab dark small color="green" @click="handlerSubmitDocumentClick">
+                                <v-icon>mdi-content-save</v-icon>
+                            </v-btn>
+                        </div>
+                    </template>
+                    <span>{{$t('document.submit.fab.submit')}}</span>
+                </v-tooltip>
+                
+                <v-tooltip left>
+                    <template v-slot:activator="{ on }">
+                        <div v-on="on">
+                            <v-btn
+                                v-if="isDraft != 1"
+                                fab
+                                dark
+                                small
+                                color="indigo"
+                                @click="handlerDraftClick"
+                            >
+                                <v-icon>mdi-trash-can-outline</v-icon>
+                            </v-btn>
+                        </div>
+                    </template>
+                    <span>{{$t('document.submit.fab.draft')}}</span>
+                </v-tooltip>
+                <v-tooltip left>
+                    <template v-slot:activator="{ on }">
+                        <div v-on="on">
+                            <v-btn
+                                fab
+                                dark
+                                small
+                                color="secondary"
+                                @click="togglePageSize"
+                            >
+                                <v-icon>mdi-resize</v-icon>
+                                
+                            </v-btn>
+                        </div>
+                    </template>
+                    <span>{{$t('document.submit.fab.toggleSize')}}</span>
+                </v-tooltip>
             </v-speed-dial>
             <err-message :listErr="listMessageErr" ref="errMessage"/>
         </div>
@@ -306,7 +340,7 @@ export default {
                         });
                 let valueControl = locale.val;
                 let controlInstance = getControlInstanceFromStore(thisCpn.keyInstance,locale.controlName);
-                if( $('#'+controlInstance.id).hasClass('autocompleting') && $('#'+controlInstance.id).attr('data-autocomplete') != ""){
+                if($('#'+controlInstance.id).attr('data-autocomplete') != "" && $('#'+controlInstance.id).attr('data-autocomplete') != undefined){
                     $('#'+controlInstance.id).attr('data-autocomplete',"");
                     return;
                 }
@@ -386,11 +420,12 @@ export default {
         }); 
         // hàm nhận sự thay đổi của input autocomplete gọi api để chạy công thức lấy dữ liệu
         this.$evtBus.$on("document-submit-autocomplete-key-event", e => {
+            console.log("sdsdad",e.e);
             if(thisCpn.isComponentActive == false) return;
             try {
                 if((e.e.keyCode >= 97 && e.e.keyCode <= 105) ||
                     (e.e.keyCode >= 48 && e.e.keyCode <= 57) ||
-                    (e.e.keyCode >= 65 && e.e.keyCode <= 90) || e.e.keyCode == 8) {
+                    (e.e.keyCode >= 65 && e.e.keyCode <= 90) || [8,32,231].includes(e.e.keyCode)) { // nếu key code là các kí tự chữ và số hợp lệ
                     if(!thisCpn.$refs.autocompleteInput.isShow()){
                         thisCpn.$refs.autocompleteInput.show(e.e);
                         let currentTableInteractive = this.sDocumentSubmit.currentTableInteractive;
@@ -438,9 +473,8 @@ export default {
             }
             if(thisCpn.isComponentActive == false) return;
             try {
-                
                 if (
-                    !$(evt.target).hasClass("autocompleting") &&
+                    !$(evt.target).hasClass("s-control-select") &&
                     !$(evt.target).hasClass("v-data-table") &&
                     $(evt.target).closest(".v-data-table").length == 0
                 ) {
@@ -535,27 +569,59 @@ export default {
             }
             else{
                 let aliasControl = e.autocompleteFormulasInstance.autocompleteDetectAliasControl();
-                let dataInput = this.getDataInputFormulas(e.autocompleteFormulasInstance,e);
-                e.autocompleteFormulasInstance.handleRunAutoCompleteFormulas(dataInput).then(res=>{
-                    thisCpn.setDataForControlAutocomplete(res,aliasControl,e.controlTitle)
-                });
+                let dataFromCache = this.getDataAutocompleteFromCache(e.e.target.value, aliasControl);
+                if(dataFromCache == false){
+                    let dataInput = this.getDataInputFormulas(e.autocompleteFormulasInstance,e);
+                    e.autocompleteFormulasInstance.handleRunAutoCompleteFormulas(dataInput).then(res=>{
+                        thisCpn.setDataForControlAutocomplete(res,aliasControl,e.controlTitle, $(e.e.target).val())
+                    });
+                }
+                else{
+                    this.$refs.autocompleteInput.setAliasControl(aliasControl);
+                    this.$refs.autocompleteInput.setData(dataFromCache);
+                }
             }
-            
+        },
+
+        // hàm lấy data từ cache của control autocomplete
+        getDataAutocompleteFromCache(curTyping,controlName){
+            if(this.sDocumentSubmit.autocompleteData.hasOwnProperty(controlName) &&
+                this.sDocumentSubmit.autocompleteData[controlName].header.length > 0 &&
+                this.sDocumentSubmit.autocompleteData[controlName].cacheData.hasOwnProperty(curTyping)
+            ){
+                return {
+                    headers:this.sDocumentSubmit.autocompleteData[controlName].header,
+                    dataBody:this.sDocumentSubmit.autocompleteData[controlName].cacheData[curTyping]
+                }
+            }
+            else{
+                return false
+            }
         },
         /**
          * Hàm bind dữ liệu cho box autocomplete, cho component autocompleteInput
          */
-        setDataForControlAutocomplete(res,aliasControl,controlTitle){
+        setDataForControlAutocomplete(res,aliasControl,controlTitle, textTyping=""){
             let controlAs = {};
             controlAs[aliasControl] = controlTitle;
             if(res.data != undefined){
                 if(res.status == 200 && res.data != false){
-                     let dataTable = []
+                    let dataTable = {}
                     if(res.data.data !== ""){
                         dataTable = this.handleDataAutoComplete(res.data.data,false,controlAs);
                     }
                     this.$refs.autocompleteInput.setAliasControl(aliasControl);
                     this.$refs.autocompleteInput.setData(dataTable);
+                    if(dataTable.hasOwnProperty('headers')){
+                        let item = {}
+                        item[textTyping] = dataTable.dataBody
+                        this.$store.commit("document/cacheDataAutocomplete",{
+                            instance: this.keyInstance,
+                            controlName:aliasControl,
+                            header:dataTable.headers,
+                            cacheData:item
+                        })
+                    }
                 }
                 else{
                     this.$refs.autocompleteInput.setData([]);
@@ -691,15 +757,18 @@ export default {
                 }
             }
             else{
-                for(let controlName in data[0]){
-                    let item = {value:controlName,text:controlName};
-                    if(controlAs.hasOwnProperty(controlName)){
-                        item.text = controlAs[controlName]
+                if(data.length > 0){
+                    for(let controlName in data[0]){
+                        let item = {value:controlName,text:controlName};
+                        if(controlAs.hasOwnProperty(controlName)){
+                            item.text = controlAs[controlName]
+                        }
+                        headers.push(item);
                     }
-                    headers.push(item);
+                    data[0]['active'] = true;
+                    bodyTable = data;
                 }
-                data[0]['active'] = true;
-                bodyTable = data;
+                
             }
             return {headers:headers,dataBody:bodyTable}
         },
@@ -715,7 +784,7 @@ export default {
                             let content = res.data.document.content;
                             thisCpn.documentName = res.data.document.name;
 							thisCpn.contentDocument = content;
-							if(res.data.document.data_prepare_submit != "")
+							if(res .data.document.data_prepare_submit != "" && res.data.document.data_prepare_submit != null)
 							thisCpn.preDataSubmit = JSON.parse(res.data.document.data_prepare_submit);
                             setDataForPropsControl(res.data.fields,thisCpn.keyInstance,'submit'); // ddang chay bat dong bo
                             setTimeout(() => {
@@ -790,9 +859,9 @@ export default {
             let thisCpn = this;
             let isSetEffectedControl = false;
             for (let index = 0; index < allInputControl.length; index++) {
+               
                 let id = $(allInputControl[index]).attr('id');
                 let controlType = $(allInputControl[index]).attr('s-control-type');
-                
                 if(this.sDocumentEditor.allControl[id] != undefined){   // ton tai id trong store
                     let field = this.sDocumentEditor.allControl[id];
                     let idField = field.id;
@@ -1622,7 +1691,7 @@ export default {
 }
 .wrap-content-submit{
     width: 100%;
-    height: calc(100% - 100px);
+    height: calc(100vh - 100px);
     overflow: auto;
 }
 </style>

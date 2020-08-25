@@ -74,14 +74,17 @@
         "baAccount": "BA account",
         "updatePassword": "Update password",
         "fullName": "Full name",
-        "email": "Email"
+        "email": "Email",
+        "pageSize": "Page size",
+        "pendding": "Pendding"
     },
     "validate": {
         "required": "Not be empty",
         "min_8": "Password required is greater than 8 characters",
         "max_24": "Password required for less than 24 characters",
         "email": "Invalid email",
-        "notValid": "This field is not valid"
+        "notValid": "This field is not valid",
+        "password": "Password required at least one uppercase letter and one number"
     },
     "login": {
         "title": "Login system",
@@ -306,6 +309,13 @@
                 }
             }
         },
+        "submit": {
+            "fab": {
+                "submit": "Submit",
+                "draft": "Save to Draft",
+                "toggleSize": "Toggle resize page"
+            }
+        },
         "process": {
             "header_bar": {
                 "undo": "Undo ",
@@ -317,6 +327,31 @@
                 "save_bpmn": "Download as .bpmn",
                 "validate": "Validate",
                 "save": "Save"
+            }
+        },
+        "detail": {
+            "sidebar": {
+                "heading": "Information",
+                "body": {
+                    "general": {
+                        "title": "General",
+                        "dateCreate": "Date created",
+                        "userCreate": "User created",
+                        "history": "History",
+                        "comment": "Comment"
+                    },
+                    "worflowInfo": "Workflow infomation",
+                    "userRelated": {
+                        "title": "User related",
+                        "subTitle1": "User Approval",
+                        "subTitle2": "Assignee"
+                    }
+                }
+            },
+            "fab": {
+                "toggleSize": "Toggle Size",
+                "otherInfo": "Other information",
+                "print": "Print"
             }
         }
     },
@@ -355,7 +390,7 @@
         "action": {
             "create": "Create new process"
         },
-        "taskList": "List task of ",
+        "taskList": "List task ",
         "instance": {
             "list": "List process instance",
             "name": "Process instance name",
@@ -404,25 +439,26 @@
             "status": "Status",
             "created_at": "Date create",
             "updated_at": "Last update"
-		},
-		"listType":{
-			"documents":"Documents",
-			"workflows":"Work flows",
-			"reports":"Reports",
-			"orgcharts":"Orgcharts"
-		},
-		"addApp" : "Add application",
-		"editApp" : "Edit application",
+        },
+
+        "listType": {
+            "documents": "Documents",
+            "workflows": "Work flows",
+            "reports": "Reports",
+            "orgcharts": "Orgcharts"
+        },
+        "addApp": "Add application",
+        "editApp": "Edit application",
         "title": "Applications",
         "pickIcon": "Pick icon",
         "apps": "Applications",
         "commonInfo": "General",
         "listObjects": "Objects",
-		"addObject": "Add object",
-		"clickToAdd": "Click to add item",
-		"search" : "Search",
-		"favorite" : "Favorite",
-		"listApp" : "List applications",
+        "addObject": "Add object",
+        "clickToAdd": "Click to add item",
+        "search": "Search",
+        "favorite": "Favorite",
+        "listApp": "List applications",
         "objectSummary": "Objects summary",
         "contextMenu": {
             "edit": "Edit",

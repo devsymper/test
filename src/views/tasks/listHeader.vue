@@ -1,12 +1,30 @@
 <template>
     <div class="w-100 d-flex justify-space-between py-2">
-        <div class="pl-3 symper-title" v-if="!sideBySideMode">{{headerTitle}}</div>
+        <div class="pl-3 symper-title" v-if="!sideBySideMode">
+            {{headerTitle}}
+            <v-chip
+                v-if="taskStatus == 'notDone'"
+                class="ma-2"
+                color="amber"
+                text-color="white"
+                x-small>
+                {{$t('common.pendding')}}
+            </v-chip>
+
+            <v-chip
+                v-else
+                class="ml-1"
+                color="green"
+                text-color="white"
+                x-small>
+                {{$t('common.done')}}
+            </v-chip>
+        </div>
         <div
             :class="{
             'pr-0 d-flex': true, 
             'w-100': sideBySideMode
-        } "
-        >
+        } ">
             <!-- Tìm kiếm -->
             <v-text-field
                 class="d-inline-block mx-2 sym-small-size"
@@ -230,7 +248,9 @@ export default {
         },
         headerTitle: {
             type: String,
-            default: "List tasks"
+            default(){
+                return this.$t('process.taskList')
+            }
         },
         parentTaskId: {
             type: String,
@@ -239,6 +259,7 @@ export default {
     },
     data: function() {
         return {
+            taskStatus: 'notDone',
             searchTaskKey: '',
             sortOption: [
                 {
@@ -326,6 +347,9 @@ export default {
             }
             this.filterList.nameLike = `%${this.searchTaskKey}%`;
             this.$emit("filter-change-value", this.filterList);
+            if(data.status){
+                this.taskStatus = data.status;
+            }
         },
         openCreateTaskDialog() {
             this.dialog = true;
