@@ -197,13 +197,7 @@ export default {
             let elControl = $("#document-editor-"+thisCpn.keyInstance+"_ifr").contents().find('body #'+locale.id);
             thisCpn.setSelectedControlProp(locale.event,elControl,$('#document-editor-'+this.keyInstance+'_ifr').get(0).contentWindow);
         });
-        /**
-         * Nhận sự kiện phát ra từ formTpl lúc on change để check trùng tên control
-         */
-        this.$evtBus.$on("form-tpl-input-value-changed", locale =>{
-            $('#document-editor'+thisCpn.keyInstance+'_ifr').contents().find('.s-control-error').removeClass('s-control-error');
-            thisCpn.checkNameAfterChange();
-        })
+       
             
     },
     data(){
@@ -532,47 +526,7 @@ export default {
             return {minimizeControl:allControl,userControls:allUserControl}
             
         },
-        
-        //hoangnd: hàm xác thưc các control trước khi lưu
-        // xac thực tên control và các formulas liên quan
-        checkNameAfterChange(){
-            let allControl = util.cloneDeep(this.editorStore.allControl);
-            let listControlName = [];
-            for(let controlId in allControl){
-                let control = allControl[controlId];
-                this.checkDupliucateNameControl(listControlName,control,controlId)
-            }
-        },
-        
-        // hàm kiểm tra xác thực tên control 
-        checkValidNameControl(controlId,control){
-            if(control.type != "submit" && control.type != "draft" && control.type != "reset" && control.type != "approvalHistory"){
-                if(control.properties.name.value == ''){
-                    let controlEl = $('#document-editor-'+this.keyInstance+'_ifr').contents().find('#'+controlId);
-                    controlEl.addClass('s-control-error');
-                    let message = 'Không được bỏ trống tên control'
-                    let tableId = checkInTable(controlEl)
-                    this.$store.commit(
-                        "document/updateProp",{id:controlId,name:'name',value:value,tableId:tableId,type:"errorMessage",instance:this.keyInstance}
-                    );   
-                }
-                else{
-                    this.checkDupliucateNameControl(control,controlId);
-                }
-                
-                
-            }
-            
-        },
-      //updateCurrentControlProps
-        // hàm kiểm tra xem co control nào trùng tên hay ko
-        checkDupliucateNameControl(control,controlId){
-            let controlEl = $('#document-editor-'+this.keyInstance+'_ifr').contents().find('#'+controlId);
-            controlEl.addClass('s-control-error');
-          
-           
-            
-        },
+    
         // hàm kiểm tra xem trong công thức có trỏ đến control ko tồn tại hay ko
         validateFormulasInControl(control,listControlName){
             // check control Name trong cong thức

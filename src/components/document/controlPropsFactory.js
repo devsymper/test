@@ -24,7 +24,7 @@ const commonProps = {
         type: "text",
         value: "",
         groupType: "name",
-        errorMessage: ""
+        errorMessage: "Không được bỏ trống tiêu đề control"
     },
     otherInfo: {
         title: "Thông tin thêm",
@@ -363,6 +363,13 @@ const controlTypes = {
         title: "Text input",
         notInProps: ['id', 'formatNumber', 'formatDate', 'isSumTable', 'isAllowUpdate'],
         formulas: ['link', 'formulas', 'hidden', 'readOnly', 'autocomplete', 'require', 'validate']
+    },
+    department: {
+        icon: "/icon/ic_textinput.png",
+        html: `<input class="s-control s-control-text mdi" contenteditable="false" s-control-type="department" type="text" title="Department">&nbsp;&nbsp;`,
+        title: "Department",
+        notInProps: ['id', 'formatNumber', 'formatDate', 'isSumTable', 'isAllowUpdate'],
+        formulas: ['formulas', 'list', 'hidden', 'readOnly', 'require', 'validate']
     },
     richText: {
         icon: "/icon/ic_richtext.png",

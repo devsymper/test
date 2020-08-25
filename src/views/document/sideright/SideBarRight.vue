@@ -189,16 +189,18 @@ export default {
          */
         checkTitleControl(name, input, data){
             let elements = $('#document-editor-'+this.instance+'_ifr').contents().find('#'+this.sCurrentDocument.id);
+             elements.removeClass('s-control-error');
             let tableId = checkInTable(elements)
             if( tableId == this.sCurrentDocument.id)
             tableId = '0';
+            let errValue = ""
             if(input.value == "" && input.value.length == 0){
-                let errValue = "Không được bỏ trống tên control"
+                errValue = "Không được bỏ trống tiêu đề control"
                 elements.addClass('s-control-error');
-                this.$store.commit(
-                    "document/updateProp",{id:this.sCurrentDocument.id,name:name,value:errValue,tableId:tableId,type:"errorMessage",instance:this.instance}
-                );  
             }
+            this.$store.commit(
+                    "document/updateProp",{id:this.sCurrentDocument.id,name:name,value:errValue,tableId:tableId,type:"errorMessage",instance:this.instance}
+                ); 
         },
 
         /**
@@ -219,6 +221,7 @@ export default {
             else{
                  if(/^[a-zA-Z_$][a-zA-Z_$0-9]*$/.test(input.value) == false){
                         errValue = "Tên không hợp lệ";
+                        elements.addClass('s-control-error');
                     }
                     else{
                         elements.removeClass('s-control-error');
@@ -230,7 +233,7 @@ export default {
                                 ...arr,obj.id
                             ],[]);
                             dataControl.match = listContrlIdConflic;
-                            $('#document-editor-'+this.instance+'_ifr').contents().find('#'+this.sCurrentDocument.id).addClass('s-control-error');
+                            elements.addClass('s-control-error');
                             for (let index = 0; index < controlConflic.length; index++) {
                                 let control = controlConflic[index];
                                 // console.log('sa',this.listNameValueControl[control.id]);

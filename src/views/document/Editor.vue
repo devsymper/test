@@ -205,14 +205,7 @@ export default {
             let elControl = $("#document-editor-"+thisCpn.keyInstance+"_ifr").contents().find('body #'+locale.id);
             thisCpn.setSelectedControlProp(locale.event,elControl,$('#document-editor-'+this.keyInstance+'_ifr').get(0).contentWindow);
         });
-        /**
-         * Nhận sự kiện phát ra từ formTpl lúc on change để check trùng tên control
-         */
-        this.$evtBus.$on("form-tpl-input-value-changed", locale =>{
-            $('#document-editor'+thisCpn.keyInstance+'_ifr').contents().find('.s-control-error').removeClass('s-control-error');
-            thisCpn.checkNameAfterChange();
-        })
-            
+        
     },
     data(){
         return{
@@ -490,6 +483,7 @@ export default {
                 if($('#document-editor-'+this.keyInstance+'_ifr').contents().find('.s-control-error').length == 0){
                     if(this.documentId == undefined || this.documentId == 0)
                     this.setDocumentProperties({})
+                    if(this.checkTitleControl())
                     this.$refs.saveDocPanel.showDialog()
                 }
                 else{
@@ -732,24 +726,15 @@ export default {
             .always(() => {
             });
         },
-        //hoangnd: hàm xác thưc các control trước khi lưu
-        // xac thực tên control và các formulas liên quan
-        checkNameAfterChange(){
-            let allControl = util.cloneDeep(this.editorStore.allControl);
-            let listControlName = [];
-            for(let controlId in allControl){
-                let control = allControl[controlId];
-                this.checkDupliucateNameControl(listControlName,control,controlId)
-            }
-        },
+      
         validateControl(){
             let thisCpn = this;
-            let allControl = util.cloneDeep(this.editorStore.allControl);
             let listControlName = [];
             this.listMessageErr = [];
             //check trung ten control
             $("#document-editor-"+thisCpn.keyInstance+"_ifr").contents().find('.on-selected').removeClass('on-selected');
             if($('#document-editor-'+thisCpn.keyInstance+'_ifr').contents().find('.s-control-error').length == 0){
+                
                 this.saveDocument();
             }
             else{
@@ -760,35 +745,26 @@ export default {
                             }); 
             }
         },
-        // hàm kiểm tra xác thực tên control 
-        checkValidNameControl(controlId,control){
-            if(control.type != "submit" && control.type != "draft" && control.type != "reset" && control.type != "approvalHistory"){
-                if(control.properties.name.value == ''){
-                    let controlEl = $('#document-editor-'+this.keyInstance+'_ifr').contents().find('#'+controlId);
-                    controlEl.addClass('s-control-error');
-                    let message = 'Không được bỏ trống tên control'
-                    let tableId = checkInTable(controlEl)
+        checkTitleControl(){
+            let rs = true;
+            let allControl = util.cloneDeep(this.editorStore.allControl);
+            for(let controlId in allControl){
+                let title = allControl[controlId].properties.title.value;
+                if(title == ""){
+                    rs = false;
+                    $("#document-editor-"+this.keyInstance+"_ifr").contents().find('#'+controlId).addClass('s-control-error');
+                    let errValue = "Không được bỏ trống tiêu đề"
+                    let tableId = checkInTable($("#document-editor-"+this.keyInstance+"_ifr").contents().find('#'+controlId))
+                    if( tableId == controlId)
+                    tableId = '0';
                     this.$store.commit(
-                        "document/updateProp",{id:controlId,name:'name',value:value,tableId:tableId,type:"errorMessage",instance:this.keyInstance}
-                    );   
+                        "document/updateProp",{id:controlId,name:'title',value:errValue,tableId:tableId,type:"errorMessage",instance:this.keyInstance}
+                    ); 
                 }
-                else{
-                    this.checkDupliucateNameControl(control,controlId);
-                }
-                
-                
             }
-            
+            return rs;
         },
-      //updateCurrentControlProps
-        // hàm kiểm tra xem co control nào trùng tên hay ko
-        checkDupliucateNameControl(control,controlId){
-            let controlEl = $('#document-editor-'+this.keyInstance+'_ifr').contents().find('#'+controlId);
-            controlEl.addClass('s-control-error');
-          
-           
-            
-        },
+       
         // hàm kiểm tra xem trong công thức có trỏ đến control ko tồn tại hay ko
         validateFormulasInControl(control,listControlName){
             // check control Name trong cong thức
