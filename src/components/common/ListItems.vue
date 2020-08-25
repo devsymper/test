@@ -85,6 +85,7 @@
                         :height="tableHeight"
                         :settings="tableSettings"
                         :data="data"
+                        :rowHeights="21"
                         :columns="tableColumns"
                         :contextMenu="itemContextMenu"
                         :colHeaders="colHeaders"
@@ -96,29 +97,13 @@
                     ></hot-table>
                 </v-col>
             </v-row>
-            <v-row no-gutters ref="bottomBar" class="pt-5">
-                <v-col>
-                    <v-select
-                        class="d-inline-block mr-5"
-                        style="width:70px"
-                        v-model="pageSize"
-                        :items="pageSizeOptions"
-                        label="Số bản ghi mỗi trang"
-                        dense
-                        flat
-                        @change="changePageSize"
-                    ></v-select>
-                    <v-pagination
-                        style="width:200px"
-                        class="sym-small-size ml-10"
-                        v-model="page"
-                        :length="totalPage"
-                        next-icon="mdi-chevron-right"
-                        prev-icon="mdi-chevron-left"
-                        :page="page"
-                        :total-visible="6"
-                    ></v-pagination>
-                </v-col>
+            <v-row no-gutters ref="bottomBar" class="pt-3">
+                <Pagination
+                    :total="totalObject"
+                    :totalVisible="7"
+                    @on-change-page-size="changePageSize"
+                    @on-change-page="changePage"
+                ></Pagination>
             </v-row>
         </div>
 
@@ -224,6 +209,7 @@ import Api from "./../../api/api.js";
 import { userApi } from "./../../api/user.js";
 import SymperDragPanel from "./SymperDragPanel.vue";
 import DisplayConfig from "./../common/listItemComponents/DisplayConfig";
+import Pagination from './../common/Pagination'
 
 var apiObj = new Api("");
 var testSelectData = [ ];
@@ -241,11 +227,6 @@ window.tableDropdownClickHandle = function(el, event) {
 export default {
     name: "SymperListItem",
     watch: {
-        page(newVl) {
-            // Phát sự kiện thay đổi trang đang xem
-            this.getData();
-            this.$emit("change-page", newVl);
-        },
         actionPanel() {
             if (this.actionPanel == true) {
                 this.$emit("open-panel");
@@ -275,7 +256,6 @@ export default {
             fixedColumnsCount: 0, // Số lượng cột fix ở bên trái
             tableColumns: [],
             actionPanel: false, // có hiển thị action pannel (create, detail, edit) hay không
-            pageSizeOptions: [20, 50, 100], // các lựa chọn cho số lượng bản ghi hiển thị cho mỗi trang
             loadingExportExcel: false, // có đang chạy export hay ko
             loadingRefresh: false, // có đang chạy refresh dữ liệu hay ko
             loadingData: false, // có đang loading data cho danh sách hay ko
@@ -291,6 +271,7 @@ export default {
                 manualColumnMove: true,
                 manualColumnResize: true,
                 manualRowResize: true,
+                rowHeights: 21,
                 stretchH: "all",
                 licenseKey: "non-commercial-and-evaluation",
                 afterRender: isForced => {
@@ -313,6 +294,7 @@ export default {
             searchKey: "", //Từ khóa cần tìm kiếm trên tất cả các cột,
             // Tổng số trang của danh sách này
             totalPage: 0,
+            totalObject:0,
             /**
              * Cấu hình các cột của bảng danh sách, có dạng
              * [
@@ -565,9 +547,9 @@ export default {
             if (ref.topBar) {
                 tbHeight -=
                     util.getComponentSize(ref.topBar).h +
-                    util.getComponentSize(ref.bottomBar).h;
+                    util.getComponentSize(ref.bottomBar).h + 14;
             }
-            return tbHeight - 50;
+            return tbHeight - 60;
         },
         /**
          * Tạo cấu hình cho hiển thị header của table
@@ -593,9 +575,10 @@ export default {
                 if (thisCpn.filteredColumns[colName]) {
                     markFilter = "applied-filter";
                 }
+                let headerName = prefix ? thisCpn.$t(prefix + colTitles[col]) : colTitles[col];
                 return `<span>
                             <span class="font-weight-medium">
-                                ${thisCpn.$t(prefix + colTitles[col])}
+                                ${headerName}
                             </span>
                             <span class="float-right symper-filter-button">
                                 <i col-name="${colName}" onclick="tableDropdownClickHandle(this, event)" class="grey-hover mdi mdi-filter-variant symper-table-dropdown-button ${markFilter}"></i>
@@ -700,6 +683,12 @@ export default {
         },
         bindToSearchkey(vl) {
             this.searchKey = vl;
+            if(this.debounceGetData){
+                clearTimeout(this.debounceGetData);
+            }
+            this.debounceGetData = setTimeout((self) => {
+                self.getData();
+            }, 300, this);
         },
         handleCloseDragPanel() {
             this.actionPanel = false;
@@ -812,7 +801,7 @@ export default {
          * @param {Boolean} cache có ưu tiên dữ liệu từ cache hay ko
          *
          */
-        getData(columns = false, cache = false, applyFilter = false) {
+        getData(columns = false, cache = false, applyFilter = true) {
             let thisCpn = this;
             let handler = (data) => {
                 if(thisCpn.customAPIResult.reformatData){
@@ -820,15 +809,7 @@ export default {
                 }else{
                     data = data.data;
                 }
-                let total = data.total ? data.total : 0;
-                let pageSize = thisCpn.pageSize;
-                thisCpn.totalPage =
-                    total % pageSize > 0
-                        ? Math.floor(total / pageSize) + 1
-                        : Math.floor(total / pageSize);
-                if (thisCpn.page > thisCpn.totalPage) {
-                    thisCpn.page = 1;
-                }
+                this.totalObject = data.total ? parseInt(data.total) : 0;
                 thisCpn.loadingData = false;
                 thisCpn.tableColumns = thisCpn.getTableColumns(
                     data.columns
@@ -1216,9 +1197,28 @@ export default {
             this.$emit("search-all", {});
         },
         changePageSize(vl) {
+            this.pageSize = vl.pageSize
             this.getData();
             // Phát sự kiện khi người dùng thay đổi số bản ghi ở mỗi page
-            this.$emit("change-page-size", vl);
+            this.$emit("change-page-size", vl.pageSize);
+        },
+        changePage(vl){
+            this.page = vl.page
+            this.getData();
+            this.$emit("change-page", vl.page);
+        },
+        nextPage(){
+            this.page += 1
+            this.getData();
+            this.$emit("change-page", this.page);
+        },
+        prevPage(){
+            if(this.page == 1){
+                return;
+            }
+            this.page -= 1
+            this.getData();
+            this.$emit("change-page", this.page);
         }
     },
 
@@ -1228,6 +1228,7 @@ export default {
         VDialog,
         VNavigationDrawer,
         TableFilter,
+        Pagination,
         "symper-drag-panel": SymperDragPanel,
         "display-config": DisplayConfig
     }

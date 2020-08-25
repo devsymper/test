@@ -1,27 +1,32 @@
 <template>
     <div class="w-100 symper-task-people px-5">
-        <v-text-field
-            :label="$t('common.search')"
-            dense
-            hide-details
-            v-model="searchUserKey"
-            append-icon="mdi-magnify"
-            single-line
-            outlined
-            class="mb-4 mt-4"
-        ></v-text-field>
-        <v-row class="list-users-in-task">
+        <div class="w-100 py-4 mb-6">
+            <span class="symper-title float-left">
+                {{$t('tasks.relatedPeople.title')}}
+            </span>
+            <v-text-field
+                dense
+                hide-details
+                v-model="searchUserKey"
+                append-icon="mdi-magnify"
+                single-line
+                outlined
+                style="width: 300px"
+                class="d-inline-block mx-2 sym-small-size float-right"
+            ></v-text-field>
+        </div>
+        <v-row class="list-users-in-task w-100">
             <div class="w-100 mb-2 pl-3" v-for="(users, role) in tabData" :key="role" >
-                <div  style="height: 30px" class=" fs-13 font-weight-bold symper-user-role-in-task d-flex">
+                <div  style="height: 30px" class=" fs-13 font-weight-medium symper-user-role-in-task d-flex">
                     <span>
-                        <v-icon class="mr-3">mdi-account</v-icon> 
+                        <v-icon class="mr-3" size="18">mdi-account</v-icon> 
                         <span mt-1>{{$t("tasks.header."+role)}}</span>
                     </span>
                     <v-btn small icon @click="addUserForRole(role)" class="ml-3 symper-add-user-btn" style="display: none" v-if="roleCanAddUser[role]">
                         <v-icon>mdi-plus</v-icon>
                     </v-btn>
                 </div>
-                <div class="pl-10 pt-2 d-flex justify-space-between user-show" v-for="userItem in tabData[role]" :key="userItem.id" >
+                <div class="pl-10 py-2 d-flex justify-space-between user-show" v-for="userItem in tabData[role]" :key="userItem.id" >
                     <user :user="userItem" class="float-left"></user>
                     <div class="float-right action-for-role d-flex" >
                         <div v-for="(btn, idx) in actionsForRole[role]" :key="idx" class="d-flex">
@@ -62,7 +67,7 @@
                 </div>
             </div>
         </v-row>
-        <div class="w-100 h-100 symper-select-user-autocomplete" ref="selectUserAutocomplete">
+        <!-- <div class="w-100 h-100 symper-select-user-autocomplete" ref="selectUserAutocomplete">
             <v-autocomplete
                 ref="selectDelegateUser"
                 return-object
@@ -87,7 +92,7 @@
                     </div>
                 </template>
             </v-autocomplete>
-        </div>
+        </div> -->
     </div>
 </template>
 

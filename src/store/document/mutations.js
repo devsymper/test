@@ -17,8 +17,7 @@ const addToListInputInDocument = (state, params) => {
     let name = params.name
     let control = params.control
     let instance = params.instance
-
-    // state.editor.allControl[id] = prop;
+        // state.editor.allControl[id] = prop;
     Vue.set(state.submit[instance].listInputInDocument, name, control);
 };
 
@@ -230,7 +229,18 @@ const setDefaultSubmitStore = (state, params) => {
         submitFormulas: null,
         listUser: null,
         localRelated: {},
-        workflowVariable: {}
+        workflowVariable: {},
+        currentControlEditByUser: null,
+        autocompleteData: { // lưu lại các giá trị của autocomplete khi đã gõ
+            controlName: {
+                header: [],
+                cacheData: {
+                    letter: { // giá trị nhập và dữ liệu tương ứng
+                        data: []
+                    }
+                }
+            }
+        }
     }
     let instance = params.instance;
     Vue.set(state.submit, instance, value);
@@ -305,6 +315,22 @@ const setAllDocuments = (state, docs) => {
     }, {});
     Vue.set(state, 'listAllDocument', docs);
 }
+const cacheDataAutocomplete = (state, params) => {
+    let controlName = params.controlName
+    let header = params.header
+    let cacheData = params.cacheData
+    let object = { header: header, cacheData: cacheData }
+    let instance = params.instance;
+    if (state.submit[instance]['autocompleteData'].hasOwnProperty(controlName)) {
+        Vue.set(state.submit[instance]['autocompleteData'][controlName]['cacheData'], Object.keys(cacheData)[0], Object.values(cacheData)[0]);
+        if (state.submit[instance]['autocompleteData'][controlName]['header'].length == 0) {
+            Vue.set(state.submit[instance]['autocompleteData'][controlName], 'header', header);
+        }
+    } else {
+        Vue.set(state.submit[instance]['autocompleteData'], controlName, object);
+    }
+
+}
 
 
 export {
@@ -329,6 +355,7 @@ export {
     setDefaultSubmitStore,
     setDefaultEditorStore,
     setDefaultDetailStore,
-    updateCurrentControlEditByUser
+    updateCurrentControlEditByUser,
+    cacheDataAutocomplete,
 
 };

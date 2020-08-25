@@ -3,10 +3,10 @@ export default [{
         "resource": "document_object",
         "scope": "workflow",
         "action": "approval",
-        "handler": function(paramObj) {
-            console.log(this, paramObj);
-            if (paramObj.openInNewTab) {
-                this.$goToPage('/tasks/' + paramObj.taskId, 'Do task');
+        "handler": function(param) {
+            console.log(this, param);
+            if (param.openInNewTab) {
+                this.$goToPage('/tasks/' + param.taskId, 'Do task');
             }
         }
     },
@@ -15,10 +15,10 @@ export default [{
         "resource": "document_object",
         "scope": "workflow",
         "action": "submit",
-        "handler": function(paramObj) {
-            console.log(this, paramObj);
-            if (paramObj.openInNewTab) {
-                this.$goToPage('/tasks/' + paramObj.taskId, 'Do task');
+        "handler": function(param) {
+            console.log(this, param);
+            if (param.openInNewTab) {
+                this.$goToPage('/tasks/' + param.taskId, 'Do task');
             }
         }
     },
@@ -27,10 +27,10 @@ export default [{
         "resource": "document_object",
         "scope": "workflow",
         "action": "update",
-        "handler": function(paramObj) {
-            console.log(this, paramObj);
-            if (paramObj.openInNewTab) {
-                this.$goToPage('/tasks/' + paramObj.taskId, 'Do task');
+        "handler": function(param) {
+            console.log(this, param);
+            if (param.openInNewTab) {
+                this.$goToPage('/tasks/' + param.taskId, 'Do task');
             }
         }
     },

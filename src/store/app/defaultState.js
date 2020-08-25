@@ -23,37 +23,58 @@ const defaultState = {
     needReloadNotification: false,
     items: [
         // các menu mà ba hoặc enduser được phân quyền
-        { title: "application", icon: "mdi-application", link: "/application" },
-        { title: "reports", icon: "mdi-view-dashboard", link: "/reports" },
-        { title: "workflows", icon: "mdi-sitemap", link: "/workflow" },
+        // { title: "reports", icon: "mdi-view-dashboard", link: "/reports" },
+        {
+            title: "workflows",
+            icon: "mdi-sitemap",
+            // link: "/workflow" 
+            action: {
+                "module": "workflow",
+                "resource": "workflow_definition",
+                "scope": "workflow",
+                "action": "list"
+            }
+        },
         {
             title: "documents",
             icon: "mdi-file-document-outline",
-            link: "/documents",
+            // link: "/documents",
+            action: {
+                "module": "document",
+                "resource": "document_definition",
+                "scope": "document",
+                "action": "list"
+            }
         },
         {
             title: "orgchart",
             icon: "mdi-account-group-outline",
-            link: "/orgchart",
+            // link: "/orgchart",
+            action: {
+                "module": "orgchart",
+                "resource": "orgchart",
+                "scope": "orgchart",
+                "action": "list"
+            }
         },
-        { title: "methods", icon: "mdi-function", link: "/methods" },
-        { title: "virtual_doc", icon: "mdi-table-sync", link: "/virtual-doc" },
-        { title: "service", icon: "mdi-cogs", link: "/service" },
+        // { title: "methods", icon: "mdi-function", link: "/methods" },
+        // { title: "virtual_doc", icon: "mdi-table-sync", link: "/virtual-doc" },
+        // { title: "service", icon: "mdi-cogs", link: "/service" },
         {
             title: "menu",
             icon: "mdi-microsoft-xbox-controller-menu",
             link: "/menu",
         },
         { title: "users", icon: "mdi-account-settings", link: "/users" },
-        { title: "snippets", icon: "mdi-contain", link: "/snippets" },
+        // { title: "snippets", icon: "mdi-contain", link: "/snippets" },
         {
             title: "permissions",
             icon: "mdi-folder-account",
             link: "/permissions",
         },
         { title: "actions", icon: "mdi-package", link: "/actions" },
-        { title: "apps", icon: "mdi-apps", link: "/apps" },
-        { title: "virtualdocs", icon: "mdi-table", link: "/virtualdocs" },
+        // { title: "apps", icon: "mdi-apps", link: "/apps" },
+        // { title: "virtualdocs", icon: "mdi-table", link: "/virtualdocs" },
         { title: "tasks", icon: "mdi-check-all", link: "/tasks" },
         { title: "works", icon: "mdi-briefcase-check-outline", link: "/works" },
         { title: "userRoleSetting", icon: "mdi-access-point-network", link: "/user-role-settings" },

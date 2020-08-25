@@ -108,7 +108,6 @@ export const setDataForPropsControl = function(fields, instance, from) {
 }
 
 function addToAllControlInDoc(controlId, control, instance, from) {
-    console.log('asgsad', control);
     store.commit(
         "document/addControl", { id: controlId, props: control, from: 'submit', instance: instance }
     );

@@ -19,10 +19,6 @@ const setListDocuments = async(context, forceGetData = false) => {
             });
             if (res.status == 200) {
                 context.commit('setAllDocuments', res.data.listObject);
-                SYMPER_APP.$evtBus.$emit('symper-cache-set-all-resource', {
-                    type: 'document_definition',
-                    data: res.data.listObject
-                });
             } else {
                 console.error(res, "[Symper::get list documents failed!]");
             }

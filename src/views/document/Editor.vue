@@ -285,7 +285,7 @@ export default {
             if(currentControl.properties.name.hasOwnProperty('name')){
                 this.$refs.controlNameRelated.setSubHeadingTitle(this.$t('document.editor.dialog.nameRelated.subTitleControl'))
                 this.$refs.controlNameRelated.setHeadingTitle(this.$t('document.editor.dialog.nameRelated.headingControl'));
-                this.$refs.controlNameRelated.getDataRelated(currentControl.properties.name.name.oldName,currentControl.properties.name.name.value);
+                this.$refs.controlNameRelated.getDataRelated("control",currentControl.properties.name.name.oldName,currentControl.properties.name.name.value);
                 this.$refs.controlNameRelated.showDialog();
             }
             else{
@@ -304,7 +304,7 @@ export default {
             setTimeout((self) => {
                 self.$refs.controlNameRelated.setSubHeadingTitle(self.$t('document.editor.dialog.nameRelated.subTitleDocument'))
                 self.$refs.controlNameRelated.setHeadingTitle(self.$t('document.editor.dialog.nameRelated.headingDocument'));
-                self.$refs.controlNameRelated.getDocumentRelated();
+                self.$refs.controlNameRelated.getDataRelated("document");
                 self.$refs.controlNameRelated.showDialog();
             }, 100,this);
         },
@@ -526,34 +526,49 @@ export default {
         minimizeControlEL(allControl){
             var allInputControl = $("#document-editor-"+this.keyInstance+"_ifr").contents().find('body').find(".s-control");
             let allId = [];
+            let allUserControl = {user:[]}
             $.each(allInputControl,function(k,v){
                 let id = $(v).attr('id');
                 allId.push(id);
             });
             for (let controlId in allControl){
+                let isCheck = false;
                 if(allId.indexOf(controlId) === -1){
                     delete allControl[controlId];
+                    isCheck = true;
                 }
                 else{
                     if(allControl[controlId].type == 'table'){
                         if(allId.indexOf(controlId) === -1){
                             for(let childControlId in allControl[controlId].listFields){
+                                let childControl = allControl[controlId].listFields[childControlId]
                                 if(allId.indexOf(childControlId) === -1){
                                     delete allControl[controlId].listFields[childControlId];
+                                    isCheck = true;
+                                }
+                                if(!isCheck && childControl.type == 'user'){
+                                    allUserControl['user'].push(childControl.properties.name.value)
                                 }
                             }
                         }
                     }   
                 }
+                if(!isCheck && allControl[controlId].type == 'user'){
+                    allUserControl['user'].push(allControl[controlId].properties.name.value)
+                }
                 
             }
-            return allControl
+            return {minimizeControl:allControl,userControls:allUserControl}
             
         },
+      
         // hoangnd: hàm gửi request lưu doc
         async saveDocument(){
-            let allControl = this.minimizeControlEL(this.editorStore.allControl);
+            let minimizeControl = this.minimizeControlEL(this.editorStore.allControl);
+            let allControl = minimizeControl.minimizeControl
+            let userControls = minimizeControl.userControls
             let documentProperties = util.cloneDeep(this.sDocumentProp);
+            documentProperties = Object.assign({controlInfo:userControls},documentProperties)
             documentProperties = JSON.stringify(documentProperties);
             let htmlContent = this.editorCore.getContent();
             let dataPost = this.getDataToSaveMultiFormulas(allControl);
@@ -906,15 +921,17 @@ export default {
         
         //su kiện click vào editor
         detectClickEvent(event){
-            if(this.editorStore.currentSelectedControl.id != ""){
+            
+            if(this.editorStore.currentSelectedControl.id != ""){ 
                 this.$refs.sidebarRight.hideDragPanel();
             }
             if($(event.target).is('.s-control'))
             this.setSelectedControlProp(event,$(event.target),$('#document-editor-'+this.keyInstance+'_ifr').get(0).contentWindow);
             else if($(event.target).closest('.s-control').length > 0){
+                
                 this.setSelectedControlProp(event,$(event.target).closest('.s-control'),$('#document-editor-'+this.keyInstance+'_ifr').get(0).contentWindow);
             }
-            
+
             
 
         // kiểm tra nếu click ngoài khung autocomplete control thì đóng lại
@@ -1653,6 +1670,7 @@ export default {
             
             let table = el.closest('.s-control-table');
             if(table.length > 0 && controlId != table.attr('id')){
+                tinyMCE.activeEditor.selection.setNode(e.target);
                 let tableId = table.attr('id');
                 let control = this.editorStore.allControl[tableId]['listFields'][controlId];
                 this.selectControl(control.properties, control.formulas,controlId);

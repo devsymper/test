@@ -119,7 +119,7 @@
 									:disabled="!enabledPassword"
 									dense
 									:append-icon="showPass ? 'mdi-eye' : 'mdi-eye-off'"
-									:rules="[rules.required, rules.min, rules.max]"
+									:rules="[rules.required, rules.min, rules.max,rules.password]"
 									:type="showPass ? 'text' : 'password'"
 									counter
 									@click:append="showPass = !showPass"
@@ -421,6 +421,10 @@ export default {
 				email: value => {
 					const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
 					return pattern.test(value) || this.$t('validate.email');
+				},
+				password:value => {
+					const pattern = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?).{8,}$/
+					return pattern.test(value) || this.$t('validate.notValid');
 				},
 			},
 			formHasErr : true,

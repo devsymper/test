@@ -20,6 +20,7 @@ const getInsertionCSS = function() {
     styles += '.s-control-table table{width:100%;text-align: left;border-collapse: collapse;font-size: 11px;outline: none;}';
     styles += '.s-control-table table thead{font-size: 11px;background:#f2f2f2}';
     styles += '.s-control-table table tbody td{width:20%;}';
+    styles += 'table:not(.s-control-table) tbody td[data-mce-selected="1"]{background:#e7eaff}';
     styles += '.ephox-snooker-resizer-rows {cursor: row-resize}';
     styles += '.ephox-snooker-resizer-cols {cursor: col-resize}';
     styles += '.ephox-snooker-resizer-bar {background-color: #b4d7ff;opacity: 0;-webkit-user-select: none;-moz-user-select: none;-ms-user-select: none;user-select: none;}';
