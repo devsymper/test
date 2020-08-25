@@ -44,7 +44,8 @@
                             <list-app></list-app>
                         </v-card>
                     </v-menu>
-                    <v-menu v-model="isShowDialogNotification" z-index="161" :close-on-content-click="false" :max-width="452" :min-width="452" :max-height="700" offset-y>
+                    <v-menu v-model="isShowDialogNotification" z-index="161" :close-on-content-click="false" 
+                    :max-width="452" :min-width="452" :max-height="700" offset-y>
                         <template v-slot:activator="{ on }">
                             <v-btn v-on="on" icon v-if="unreadNotification > 0">
                                 <v-badge class="sym-small-size" :content="unreadNotification" :value="unreadNotification" color="red" overlap>

@@ -7,7 +7,7 @@
             <template v-if="item.group">
                 <v-list-item style="margin-top:-10px; margin-bottom:-10px">
                     <v-list-item-content>
-                        <v-list-item-title class="item-header" v-html="item.group"></v-list-item-title>
+                        <v-list-item-title class="item-header">{{formatGroupName(item.group)}}</v-list-item-title>
                     </v-list-item-content>
                 </v-list-item>
             </template>
@@ -41,7 +41,8 @@
                             </template>
                             <v-list>
                                  <v-list-item-title v-for="(itemsAction,index) in item.actions" :key="index" 
-                                        class="fm fs-13 action-button ml-2" style="width:100px!important" >
+                                        class="fm fs-13 action-button ml-2" style="width:100px!important" 
+                                        @click="gotoPage(itemsAction,item.type,item.id,item.displayName)">
                                             {{itemsAction}}
                                     </v-list-item-title>
                             </v-list>
@@ -60,15 +61,61 @@ export default {
         return {
             value: '',
             searchItems: [],
+            defineAction:{
+                document_definition:{
+                    "module": "document",
+                    "resource": "document_definition",
+                    "scope": "document",
+                },
+                workflow_definition:{
+                    "module": "workflow",
+                    "resource": "workflow_definition",
+                    "scope": "workflow",
+                },
+                user:{
+                    "module": "orgchart",
+                    "resource": "orgchart",
+                    "scope": "orgchart",
+                },
+                dataflow:{
+                    "module": "bi",
+                    "resource": "dataflow",
+                    "scope": "bi",
+                },
+                document_object:{
+                    "module": "document",
+                    "resource": "document_instance",
+                    "scope": "document",
+                },
+                orgchart:{
+                    "module": "orgchart",
+                    "resource": "orgchart",
+                    "scope": "orgchart",
+
+                },
+                process_definition:{
+                },
+                syql:{
+                },
+                application_deninition:{
+                }
+            }
         };
     },
     methods:{
         enter(event){
             if (event.code == "Enter"){
+           // this.$store.commit('search/setSearch', this.searchData);
             this.$router.push('/search/general');
             };
-            this.searchItems = [];
+           // this.searchItems = [];
 
+        },
+        gotoPage(action, type,id, name) {
+            debugger
+            this.defineAction[type].action = action;
+            //console.log(this.defineAction[type]);
+            this.$evtBus.$emit('symper-app-call-action-handler', this.defineAction[type], this, {id:id,name:name, title:name});
         },
         showDotButton(id){
            this.searchItems[id].enable = true;
@@ -105,8 +152,6 @@ export default {
                 name =  'Workflow'
             }else if(value == 'orgchart'){
                 name =  'Sơ đồ tổ chức'
-            }else if(value == 'orgchart'){
-                name =  'Loại văn bản'
             }else if(value == 'process_definition'){
                 name =  'Quy trình'
             }else if(value == 'application_deninition'){
@@ -163,15 +208,15 @@ export default {
                             const searchData = [];
                             const allData = [];
                             Object.keys(groupByType).forEach(type => {
-                                let name = self.formatGroupName(type);
+                                let name = type;
                                 searchData.push({group: name });
                                 allData.push({group: name });
                                 searchData.push(...groupByType[type].slice(0, 3));
                                 allData.push(...groupByType[type]);
                             })
                             self.searchItems = searchData;
-                            self.$store.commit('search/setSearch', searchData);
-                          
+                            self.$store.commit('search/setSearch',  self.searchItems);
+                            self.$store.commit('search/setSearchAll', allData);
                         }
                     })
                     .catch(err => {
