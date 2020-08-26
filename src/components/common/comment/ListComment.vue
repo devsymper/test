@@ -63,7 +63,6 @@ export default {
 	},
 	watch:{
 		searchItem(val){
-			console.log(val,'valllllllll');
 		}
 	}
 }	
