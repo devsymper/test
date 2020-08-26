@@ -84,26 +84,6 @@
                 <v-layout style="height:calc(100% - 41px)" class="w-100 h-100" justify-center>
                     <slot>
 					</slot>
-					<v-tooltip left>
-						<template v-slot:activator="{ on, attrs }">
-							<v-btn icon @click="clickFull($event)" v-bind="attrs"
-								v-on="on"> 
-								<v-icon style="font-size:15px">mdi-comment-multiple</v-icon>
-							</v-btn>
-						</template>
-						<span>test comment by id</span>
-					</v-tooltip>
-					<v-tooltip left>
-						<template v-slot:activator="{ on, attrs }">
-						
-							  <v-btn icon @click="clickArea($event)" v-bind="attrs"
-								v-on="on"> 
-                            <v-icon style="font-size:15px">mdi-comment-multiple-outline</v-icon>
-                        </v-btn>
-						</template> 
-						<span>test comment by uuid</span>
-					</v-tooltip>
-					
                 </v-layout>
             </v-container>
         </v-content>
@@ -116,9 +96,6 @@ import { appConfigs } from '../../configs';
 import BASidebar from "@/components/common/BASidebar.vue";
 import listApp from "@/components/common/listApp";
 import NotificationBar from "@/components/notification/NotificationBar.vue";
-import EndUserPopup from './../apps/EndUserPopup.vue';
-import UploadFile from "@/components/common/UploadFile.vue"
-import comment from "@/components/common/comment/Comment.vue"
 export default {
     methods: {
         /**
@@ -145,23 +122,7 @@ export default {
                 }
             }
 		},
-		clickFull(event){
-			this.showComment = !this.showComment;
-			this.heightComment = "1000px"
-			this.idItem = 1721
-			this.objType = 'document'
-			this.contentTargetArea = ''
-			this.uuidArea = "0"
-		},
-		clickArea(event){
-			console.log(event);
-			this.showComment = !this.showComment;
-			this.heightComment ='100px'
-			this.idItem = 1721
-			this.objType = 'document'
-			this.contentTargetArea = '<span>ahihihi</span>'
-			this.uuidArea = 'asdasdasdasd'
-		},
+		
         closeTab(idx){            
             let urlKey = Object.keys(this.$store.state.app.urlToTabTitleMap)[idx];
             let urlInfo = this.tabUrlItems[urlKey];
@@ -189,9 +150,6 @@ export default {
         "ba-sidebar": BASidebar,
         "list-app": listApp,
 		"list-notification": NotificationBar,
-		EndUserPopup,
-		UploadFile,
-		comment
     },
     created() {
         let self = this;
@@ -229,15 +187,6 @@ export default {
         return {
             isShowDialog: false,
 			isShowDialogNotification: false,
-			showComment: false,
-			heightComment: '',
-			top: null,
-			left:null,
-			idItem:null,
-			uuidArea:'0',
-			contentTargetArea:'',
-			objType:'',
-			commentTarget:{}
         };
     }
 };
