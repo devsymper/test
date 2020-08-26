@@ -11,14 +11,14 @@ import AppConfig from "./AppConfig";
 Vue.use(Vuex);
 
 export default new Vuex.Store({
-            modules: {
-                app: appModule,
-                document: documentModule,
-                process: processModule,
-                orgchart: orgchartModule,
-                permission: permissionModule,
-                actionPack: actionPackModule,
-                comment: comment,
-                appConfig: AppConfig,
-            }
-        };
+    modules: {
+        app: appModule,
+        document: documentModule,
+        process: processModule,
+        orgchart: orgchartModule,
+        permission: permissionModule,
+        actionPack: actionPackModule,
+        comment: comment,
+        appConfig: AppConfig,
+    }
+});
