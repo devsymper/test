@@ -25,7 +25,7 @@ export default [{
         "action": "list",
         "handler": function(param) {
             let tabName = this.$t('orgchart.list.title');
-            this.$goToPage('/orgchart', tabName);
+            this.$goToPage('/orgchart', tabName, false, false);
         }
     },
     {
