@@ -129,7 +129,7 @@
                         <v-list-item-title class="item-header">{{formatGroupName(item.group)}}</v-list-item-title>
                     </v-list-item-content>
                     <v-list-item-action>
-                        <button @click="detailView(item.group)" style="margin-right:-9px" class="fs-11 color-blue fm">Xem tất cảádád</button>
+                        <button @click="detailView(item.group)" style="margin-right:-9px" class="fs-11 color-blue fm">Xem tất cả</button>
                     </v-list-item-action>
                 </v-list-item>
             </v-row>
@@ -137,13 +137,14 @@
              <v-row  v-if="showGeneral" class="">
                <v-col cols="12" md="6" v-for="item in newSearchAll.filter(x => x.type== 'application_deninition' )">
                     <div class="d-flex justify-start mr-3 " style="width: 250px!important">
-                        <v-list-item-avatar class="item-avatar ml-3">
-                            <img :src="item.avatar || require('@/assets/image/avatar_default.jpg')">
+                        <v-list-item-avatar class="ml-3">
+                         <v-icon>mdi-account-circle</v-icon>
                         </v-list-item-avatar>
                         <v-list-item-content>
                             <v-list-item-title style="margin-left: 0.5" class="item-title fs-13 fm">{{item.displayName}}
                             </v-list-item-title>
-            
+                            <v-list-item-subtitle style="color:rgba(0,0,0,0.3); margin-left: 0.5" class="item-title fs-12 fm">{{item.description}}
+                            </v-list-item-subtitle>
                         </v-list-item-content>
                     </div>
                 </v-col>
@@ -208,13 +209,13 @@
             <v-row  v-if="showDetail&&type=='application_deninition'">
                <v-col cols="12" md="6" v-for="item in newSearchAll.filter(x => x.type== 'application_deninition' )" >
                     <div class="d-flex justify-start mr-3 " style="width: 90%!important">
-                        <v-list-item-avatar class=" ml-3">
-                            <img :src="item.avatar || require('@/assets/image/avatar_default.jpg')">
+                       <v-list-item-avatar class="ml-3">
+                         <v-icon>mdi-account-circle</v-icon>
                         </v-list-item-avatar>
                         <v-list-item-content>
                             <v-list-item-title style="margin-left: 0.5" class="item-title fs-13 fm" v-html="item.displayName">
                             </v-list-item-title>
-                            <v-list-item-subtitle style="margin-left:0" class="sub-title fs-12" v-html="item.displayName">
+                            <v-list-item-subtitle style="margin-left:0" class="sub-title fs-12" v-html="item.decription">
                             </v-list-item-subtitle>
                         </v-list-item-content>
                     </div>
@@ -293,6 +294,9 @@ export default {
             this.$store.commit('search/setMenu', menu);
         },
         detailView(type) {
+            // if(type="Tất cả"){
+            //      this.$store.commit('search/setShowGeneral', true);
+            // }else{
              this.$store.commit('search/setShowGeneral', false);
             this.showDetail = true;
             this.type = type;
