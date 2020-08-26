@@ -171,6 +171,7 @@ export default class BasicControl extends Control {
         // })
         this.ele.on('keyup', function(e) {
             if (thisObj.type == 'user') {
+                e.curTarget = e.target
                 SYMPER_APP.$evtBus.$emit('document-submit-user-input-change', e)
             }
             if (thisObj.type == 'percent') {

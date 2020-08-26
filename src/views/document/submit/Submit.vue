@@ -509,8 +509,12 @@ export default {
                     !$(evt.target).hasClass("s-control-time") &&
                     !$(evt.target).hasClass("card-time-picker") &&
                     $(evt.target).closest(".card-time-picker").length == 0
-                ) {
-                    // thisCpn.$refs.timeInput.hide();
+                ) { 
+                    setTimeout(() => {
+                        if(!$(evt.target).is('td.current.highlight')){
+                            thisCpn.$refs.timeInput.hide();
+                        }
+                    }, 20);
                 }
                 if (
                     !$(evt.target).hasClass("validate-icon") &&
@@ -656,9 +660,7 @@ export default {
             else{
                 let currentTableInteractive = this.sDocumentSubmit.currentTableInteractive
                 currentTableInteractive.tableInstance.setDataAtCell(this.sDocumentSubmit.currentCellSelected.row,this.sDocumentSubmit.currentCellSelected.column,time)
-                
             }
-            this.$refs.timeInput.hide();
         },
         afterCheckTimeNotValid(data){
             let isValid = data.isValid;
@@ -671,9 +673,19 @@ export default {
             }
         },
 
-        afterSelectUser(){
-            let currentTableInteractive = this.sDocumentSubmit.currentTableInteractive.tableInstance;
+        afterSelectUser(data){
+            let user = data.value;
+            let input = data.input;
             
+            if(this.sDocumentSubmit.currentTableInteractive == null){
+                input.val(user.displayName);
+                input.trigger('change');
+            }
+            else{
+                let currentTableInteractive = this.sDocumentSubmit.currentTableInteractive
+                currentTableInteractive.tableInstance.setDataAtCell(this.sDocumentSubmit.currentCellSelected.row,this.sDocumentSubmit.currentCellSelected.column,user.id);
+                currentTableInteractive.showPopupUser = false
+            }
         },
         /**
          * Hàm xử lí nhận dữ liệu component autocomplete khi chọn 1 dòng
@@ -1206,6 +1218,7 @@ export default {
                 }
                 if (listInput[controlName].type == "table") {
                     let value = this.getDataTableInput(listInput[controlName]);
+                    console.log('valuevaluevaluevalue',value);
                     Object.assign(dataControl, value);
                 } else {
             
@@ -1277,7 +1290,8 @@ export default {
                 }
                 if (listInput[i].type == 'user') {
                     for (let index = 0; index < dataCol.length; index++) {
-                        if(typeof element !== 'number'){
+                        const element = dataCol[index];
+                        if(!/[0-9]/.test(element)){
                             dataCol[index] = 0;
                         }
                     }

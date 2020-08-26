@@ -25,8 +25,11 @@ export default {
             this.setEventInput(e);
         },
         hide(){
-            this.isShowPopup = false;
-            this.curInput.removeAttr('contenteditable');
+            if(this.isShowPopup){
+                this.isShowPopup = false;
+                this.curInput.removeAttr('contenteditable');
+            }
+            
         },
         setEventInput(e){
             let thisCpn = this;
@@ -46,7 +49,7 @@ export default {
                 this.curInput.closest('.wrap-table').append(autoEL);
                 let edtos = this.curInput.offset();
                 let tbcos = this.curInput.closest('.wrap-table').find('[s-control-type="table"]').offset();
-                this.positionBox = {'top':edtos.top - tbcos.top + this.curInput.height() +'px','left':edtos.left - tbcos.left+'px'};
+                this.positionBox = {'top':edtos.top - tbcos.top + this.curInput.height() + 2 +'px','left':edtos.left - tbcos.left+'px'};
             }
             //nêu là ngoài bảng
             else{

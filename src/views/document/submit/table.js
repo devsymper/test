@@ -249,21 +249,33 @@ export default class Table {
                             }
                         }
                         if (thisObj.checkControlType('user')) {
-                            thisObj.showPopupUser = true;
                             if (event.keyCode == 13) {
                                 thisObj.showPopupUser = false;
+                                event.curTarget = this.getActiveEditor().TEXTAREA;
+                                SYMPER_APP.$evtBus.$emit('document-submit-user-input-change', event)
                             }
+
                             // chặn bấm lên xuống trái phải khi có autocomplete
                             if ((event.keyCode == 40 || event.keyCode == 38 ||
                                     event.keyCode == 37 || event.keyCode == 39) && thisObj.showPopupUser != false) {
                                 event.stopImmediatePropagation();
                             }
-                            SYMPER_APP.$evtBus.$emit('document-submit-user-input-change', event)
+                            if (listKeyCodeNotChange.includes(event.keyCode) && !thisObj.showPopupUser) {
+                                return;
+                            }
+                            if (event.keyCode != 13) {
+                                setTimeout((hot) => {
+                                    thisObj.showPopupUser = true;
+                                    event.curTarget = hot.getActiveEditor().TEXTAREA;
+                                    SYMPER_APP.$evtBus.$emit('document-submit-user-input-change', event)
+                                }, 50, this);
+                            }
+
+
                         } else {
                             if (event.keyCode == 13) {
                                 return;
                             }
-                            thisObj.showPopupUser = false;
                             if (thisObj.listAutoCompleteColumns[thisObj.currentControlSelected] != false) {
                                 if ((event.keyCode == 40 || event.keyCode == 38 ||
                                         event.keyCode == 37 || event.keyCode == 39) && thisObj.isAutoCompleting) {
