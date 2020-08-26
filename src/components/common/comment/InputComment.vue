@@ -34,15 +34,10 @@
 					</template>
 			</v-text-field> -->
 			<div class="text-area-wrapper" v-else>
-				 <Mentionable
-					offset="6"
-					:keys="['+']"
-					>
 					<textarea v-model="inputComment"  
 						v-on:keyup.50="tagUser($event)"
 						class="text-area">
 					</textarea>
-				</Mentionable>
 				<UploadFile style="position:absolute;right: 16px;bottom: 5px;" @uploaded-file="uploadInfo"/>
 				<v-btn style="position:absolute;right: 0px;bottom: 5px;" icon @click="addComment">
 					<v-icon >mdi-send-circle-outline</v-icon>
@@ -54,12 +49,10 @@
 </template>
 <script>
 import MenuTagUser from './MenuTagUser.vue'
-import { Mentionable } from 'vue-mention'
-import At from 'vue-at'
 import UploadFile from '@/components/common/UploadFile.vue';
 import {commentApi} from '@/api/Comment.js'
 export default {
-	data() {
+	data(){
 		return {
 			inputComment: '',
 			keyWord: '',
@@ -109,7 +102,6 @@ export default {
 	},
 	components:{
 		MenuTagUser,
-		Mentionable,
 		UploadFile
 	},
 	created(){
