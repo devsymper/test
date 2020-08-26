@@ -11,7 +11,7 @@ export default [{
         "action": "list",
         "handler": function(param) {
             let tabName = this.$t('process.list.title');
-            this.$goToPage('/workflow', tabName);
+            this.$goToPage('/workflow', tabName, false, false);
         }
     },
     {

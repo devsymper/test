@@ -153,11 +153,17 @@ export default {
 		UploadFile
     },
     created() {
+        let self = this;
         this.$evtBus.$on("app-receive-remote-msg", data => {
             this.$store.state.app.unreadNotification += 1;
             this.$store.state.app.needReloadNotification = true;
         });
         this.updateCountUnreadNotification();
+        
+        this.$evtBus.$on("auto-active-tab", tabIndex => {
+            self.$store.state.app.currentTabIndex = tabIndex;
+            self.handleChangeTab(tabIndex);
+        });
     },
     computed: {
         sapp() {
