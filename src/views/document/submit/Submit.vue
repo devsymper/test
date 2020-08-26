@@ -40,7 +40,11 @@
                 :isTime="false"
                 ref="datePicker"
             />
-            <time-input :keyInstance="keyInstance"  @apply-time-selected="applyTimePicker" @after-check-input-time-valid="afterCheckTimeNotValid" ref="timeInput" />
+            <time-input 
+            :keyInstance="keyInstance"  
+            @apply-time-selected="applyTimePicker" 
+            @after-check-input-time-valid="afterCheckTimeNotValid" 
+            ref="timeInput" />
             <v-speed-dial
                 v-show="showSubmitButton"
                 v-model="fab"
@@ -243,6 +247,7 @@ export default {
             cacheDataRunFormulas:{},
 			isDraft:0,
             preDataSubmit:{},
+            objectIdentifier:{}
         };
     },
     beforeMount() {
@@ -393,7 +398,7 @@ export default {
        
         this.$evtBus.$on("document-submit-show-time-picker", e => {
             if(thisCpn.isComponentActive == false) return;
-            thisCpn.$refs.timeInput.show(e.event);
+            thisCpn.$refs.timeInput.show(e);
         });
         this.$evtBus.$on("document-submit-date-input-click", e => {
             if(thisCpn.isComponentActive == false) return;
@@ -505,7 +510,7 @@ export default {
                     !$(evt.target).hasClass("card-time-picker") &&
                     $(evt.target).closest(".card-time-picker").length == 0
                 ) {
-                    thisCpn.$refs.timeInput.hide();
+                    // thisCpn.$refs.timeInput.hide();
                 }
                 if (
                     !$(evt.target).hasClass("validate-icon") &&
@@ -787,8 +792,9 @@ export default {
                             let content = res.data.document.content;
                             thisCpn.documentName = res.data.document.name;
 							thisCpn.contentDocument = content;
-							if(res .data.document.data_prepare_submit != "" && res.data.document.data_prepare_submit != null)
-							thisCpn.preDataSubmit = JSON.parse(res.data.document.data_prepare_submit);
+							if(res.data.document.dataPrepareSubmit != "" && res.data.document.dataPrepareSubmit != null)
+							thisCpn.preDataSubmit = JSON.parse(res.data.document.dataPrepareSubmit);
+							thisCpn.objectIdentifier = JSON.parse(res.data.document.objectIdentifier);
                             setDataForPropsControl(res.data.fields,thisCpn.keyInstance,'submit'); // ddang chay bat dong bo
                             setTimeout(() => {
                                 thisCpn.processHtml(content);
@@ -1077,6 +1083,21 @@ export default {
             
         },
 
+
+        
+        getColumnIdentifier(){
+            let controlIdentifier = {}
+            let controlNameIdentifier = this.objectIdentifier['name'];
+            let controlInstance = getControlInstanceFromStore(this.keyInstance,controlNameIdentifier);
+            if(controlInstance != false && controlInstance.controlFormulas.hasOwnProperty('formulas')){
+                let datainput = this.getDataInputFormulas(controlInstance.controlFormulas['formulas']['instance'])
+                controlIdentifier['dataInput'] = datainput;
+                // controlIdentifier['dataInput'] = 
+                // return controlIdentifier;
+            }
+            return controlIdentifier;
+            
+        },
         /**
          * Hàm gọi api submit document
          */
@@ -1086,7 +1107,23 @@ export default {
             let thisCpn = this;
             let dataPost = this.getDataPostSubmit();
             dataPost['documentId'] = this.documentId;
+            let controlIdentifier = this.getColumnIdentifier();
+            if(Object.keys(controlIdentifier).length>0){
+                dataPost['dataRefreshControl'] = JSON.stringify(controlIdentifier);
+            }
+            if(thisCpn.sDocumentSubmit.submitFormulas != undefined){
+                let dataInput = thisCpn.getDataInputFormulas(thisCpn.sDocumentSubmit.submitFormulas);
+                thisCpn.sDocumentSubmit.submitFormulas.handleBeforeRunFormulas(dataInput).then(rs=>{
+                    this.callApiSubmit(dataPost);
+                });
+            }
+            else{
+                 this.callApiSubmit(dataPost);
+            }
             
+        },
+        callApiSubmit(dataPost){
+            let thisCpn = this;
             documentApi.submitDocument(dataPost).then(res => {
                 let dataResponSubmit = res.data;
                 userApi.getDetailUser(res.data.document_object_user_created_id).then(res=>{
@@ -1095,12 +1132,7 @@ export default {
                 }).always({}).catch({})
                 thisCpn.isSubmitting = false;
                 if (res.status == 200) {
-                    if(thisCpn.sDocumentSubmit.submitFormulas != undefined){
-                        let dataInput = thisCpn.getDataInputFormulas(thisCpn.sDocumentSubmit.submitFormulas);
-                        thisCpn.sDocumentSubmit.submitFormulas.handleBeforeRunFormulas(dataInput).then(rs=>{
-                            
-                        });
-                    }
+                    
                     thisCpn.$snotify({
                         type: "success",
                         title: "Submit document success!"

@@ -209,6 +209,7 @@ export default class Table {
             this.isAutoCompleting = false;
             this.cellAfterChange = "";
             this.showPopupUser = false;
+            this.showPopupTime = false;
             this.currentControlSelected = null,
                 this.listAutoCompleteColumns = {},
                 this.event = {
@@ -226,13 +227,7 @@ export default class Table {
                             value: thisObj.currentSelectedCell,
                             instance: thisObj.keyInstance
                         });
-                        let columns = thisObj.columnsInfo.columns;
-                        if (columns[column] != undefined)
-                            thisObj.currentControlSelected = columns[column].data;
-                        // nếu type cell là time thì emit qua submit mở timepicker
-                        if (thisObj.getCellSelectedType(column) == 'time') {
-                            // SYMPER_APP.$evtBus.$emit('document-submit-show-time-picker', { event: event });
-                        };
+
                         // if (thisObj.getCellSelectedType(column) == 'select') {
                         //     thisObj.setSelectCell(event);
                         // };
@@ -244,7 +239,15 @@ export default class Table {
                         if (event.ctrlKey || event.altKey || event.metaKey) {
                             return;
                         }
-
+                        if (thisObj.checkControlType('time')) {
+                            if (event.keyCode == 13) {
+                                thisObj.showPopupTime = false;
+                            }
+                            if ((event.keyCode == 40 || event.keyCode == 38 ||
+                                    event.keyCode == 37 || event.keyCode == 39) && thisObj.showPopupTime != false) {
+                                event.stopImmediatePropagation();
+                            }
+                        }
                         if (thisObj.checkControlType('user')) {
                             thisObj.showPopupUser = true;
                             if (event.keyCode == 13) {
@@ -291,7 +294,17 @@ export default class Table {
 
                         }
                     },
-
+                    afterOnCellMouseDown: function(event, coords, TD) {
+                        let columns = thisObj.columnsInfo.columns;
+                        if (columns[coords.col] != undefined)
+                            thisObj.currentControlSelected = columns[coords.col].data;
+                        // nếu type cell là time thì emit qua submit mở timepicker
+                        if (thisObj.getCellSelectedType(coords.col) == 'time') {
+                            thisObj.showPopupTime = true;
+                            event.controlName = columns[coords.col].data
+                            SYMPER_APP.$evtBus.$emit('document-submit-show-time-picker', event);
+                        };
+                    },
                     afterSelectionEnd: function(row, col) {
                         store.commit("document/addToDocumentSubmitStore", {
                             key: 'docStatus',

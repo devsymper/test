@@ -21,41 +21,38 @@ export default {
         show(e){
             this.isShowPopup = true;
             this.curInput = $(e.target);
-            this.calculatorPositionBox(e);
+            this.calculatorPositionBox();
             this.setEventInput(e);
         },
         hide(){
             this.isShowPopup = false;
+            this.curInput.removeAttr('contenteditable');
         },
         setEventInput(e){
             let thisCpn = this;
-            this.curInput = $(e.target);
             this.curInput.off('keyup');
+            if(this.curInput.closest('.handsontable').length > 0 ){
+                this.curInput.attr('contenteditable',true);
+            }
             this.curInput.on('keyup',function(event){
                 event.controlName = e.controlName;
                 thisCpn.handlerKeyDown(event);
             })
         },
-        calculatorPositionBox(e){
-            if($(e.target).closest('.handsontable').length > 0 ){
+        // tính toán vị trí của box timepicker 
+        calculatorPositionBox(){
+            if(this.curInput.closest('.handsontable').length > 0 ){
                 let autoEL = $(this.$el).detach();
-                $(e.target).closest('.wrap-table').append(autoEL);
-                let edtos = $(e.target).offset();
-                if(!$(e.target).is('.handsontableInput')){
-                    edtos = $(e.target).closest('td.htAutocomplete.current.highlight').offset();
-                }
-                if($(e.target).is('div.htAutocompleteArrow')){
-                    edtos = $(e.target).parent().offset();;
-                }
-                
-                let tbcos = $(e.target).closest('.wrap-table').find('[s-control-type="table"]').offset();
-                this.positionBox = {'top':edtos.top - tbcos.top + $(e.target).height() +'px','left':edtos.left - tbcos.left+'px'};
+                this.curInput.closest('.wrap-table').append(autoEL);
+                let edtos = this.curInput.offset();
+                let tbcos = this.curInput.closest('.wrap-table').find('[s-control-type="table"]').offset();
+                this.positionBox = {'top':edtos.top - tbcos.top + this.curInput.height() +'px','left':edtos.left - tbcos.left+'px'};
             }
             //nêu là ngoài bảng
             else{
                 let autoEL = $(this.$el).detach();
-                $(e.target).parent().append(autoEL);
-                this.positionBox = {'top':$(e.target).height()+2+'px','left':'0px'};
+                this.curInput.parent().append(autoEL);
+                this.positionBox = {'top':this.curInput.height()+2+'px','left':'0px'};
             }
         },
         handlerKeyDown(e){

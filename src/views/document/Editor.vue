@@ -618,7 +618,7 @@ export default {
             return {minimizeControl:allControl,userControls:allUserControl}
             
         },
-      
+   
         // hoangnd: hàm gửi request lưu doc
         async saveDocument(){
             let minimizeControl = this.minimizeControlEL(this.editorStore.allControl);
@@ -770,17 +770,19 @@ export default {
             let rs = true;
             let allControl = util.cloneDeep(this.editorStore.allControl);
             for(let controlId in allControl){
-                let title = allControl[controlId].properties.title.value;
-                if(title == ""){
-                    rs = false;
-                    $("#document-editor-"+this.keyInstance+"_ifr").contents().find('#'+controlId).addClass('s-control-error');
-                    let errValue = "Không được bỏ trống tiêu đề"
-                    let tableId = checkInTable($("#document-editor-"+this.keyInstance+"_ifr").contents().find('#'+controlId))
-                    if( tableId == controlId)
-                    tableId = '0';
-                    this.$store.commit(
-                        "document/updateProp",{id:controlId,name:'title',value:errValue,tableId:tableId,type:"errorMessage",instance:this.keyInstance}
-                    ); 
+                if(allControl[controlId].properties.hasOwnProperty('title')){
+                    let title = allControl[controlId].properties.title.value;
+                    if(title == ""){
+                        rs = false;
+                        $("#document-editor-"+this.keyInstance+"_ifr").contents().find('#'+controlId).addClass('s-control-error');
+                        let errValue = "Không được bỏ trống tiêu đề"
+                        let tableId = checkInTable($("#document-editor-"+this.keyInstance+"_ifr").contents().find('#'+controlId))
+                        if( tableId == controlId)
+                        tableId = '0';
+                        this.$store.commit(
+                            "document/updateProp",{id:controlId,name:'title',value:errValue,tableId:tableId,type:"errorMessage",instance:this.keyInstance}
+                        ); 
+                    }
                 }
             }
             return rs;
@@ -1152,7 +1154,12 @@ export default {
                 let type = fields[controlId].type
                 $.each(properties,function(k,v){
                     if(properties[k].type == 'checkbox'){
-                        properties[k].value = (fields[controlId]['properties'][k] == 0 || fields[controlId]['properties'][k] == '0' || fields[controlId]['properties'][k] == '') ? false : true
+                        console.log(k,fields[controlId]['properties'][k]);
+                        properties[k].value = (fields[controlId]['properties'][k] == 0 || 
+                                                fields[controlId]['properties'][k] == '0' || 
+                                                fields[controlId]['properties'][k] == '' ||
+                                                fields[controlId]['properties'][k] == undefined 
+                                                ) ? false : true
                     }
                     else{
                         properties[k].value = fields[controlId]['properties'][k]
