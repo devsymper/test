@@ -109,6 +109,16 @@ export default {
 			 workflow:{
 			 }
 		 },
+		 mapIdFavorite:{
+			 orgchart:{
+			 },
+			 document:{
+			 },
+			 report:{
+			 },
+			 workflow:{
+			 }
+		 },
 		 }
 	},
 	created(){
@@ -156,6 +166,7 @@ export default {
 			this.listFavorite= []
 			let userId = this.$store.state.app.endUserInfo.id
 			appManagementApi.getItemFavorite(userId).then(res => {
+				debugger
 				if (res.status == 200) {
 					this.checkTypeFavorite(res.data.listObject)
 				}
@@ -167,6 +178,7 @@ export default {
 			this.title.iconType = item.iconType;
 			this.title.name = item.name;
 			appManagementApi.getAppDetails(item.id).then(res => {
+				debugger
 				if (res.status == 200) {
 					if(Object.keys(res.data.listObject.childrenApp).length > 0){
 						this.checkChildrenApp(res.data.listObject.childrenApp)
@@ -278,14 +290,10 @@ export default {
 				]}).then(resW => {
 					if(type == 'listFavorite'){
 						if(resW.data.listObject.length > 0){
-
-
-							// self.listFavorite.push(resW.data.listObject)
 							resW.data.listObject.forEach(function(e){
 								self.listFavorite.push(e)
 							})
 						}
-						console.log(self.listFavorite,'this.listFavoritethis.listFavoritethis.listFavorite');
 					}
 					else{
 						this.updateFavoriteItem(self.mapId.workflow,resW.data.listObject)
@@ -313,9 +321,6 @@ export default {
 					self.arrType.workflow.push(e.objectIdentifier)
 				}
 			});
-			console.log(self.arrType);
-			// self.listFavorite = []
-
 			if(self.arrType.document.length > 0){
 				let dataDoc = self.arrType.document
 				this.getDocumentsApi(dataDoc,'listFavorite')

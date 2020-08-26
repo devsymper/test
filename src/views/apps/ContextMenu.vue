@@ -2,6 +2,7 @@
    <v-card class="context-menu" v-show="isShowContext" :style="{top:top+'px',left:left+'px'}">
 		<div class="item" v-for="(action,i) in listAction" :key="i" @click="clickAction(action)">
 				{{action}}
+				<!-- {{$t('apps.listActions')}} -->
 		</div>
    </v-card>
 </template>
@@ -43,6 +44,7 @@
 	methods:{
 		clickRow(item){
 			item.callback(item);
+			this.hide()
 		},
 		show(e){
 			this.isShowContext = true;
@@ -70,7 +72,9 @@
 			this.defineAction[this.type].action = action;
 			console.log(this.defineAction[this.type]);
 			console.log(this.targetItem);
+			this.hide()
 			let targetItem = this.targetItem
+			debugger
 			this.$evtBus.$emit('symper-app-call-action-handler', this.defineAction[this.type], this, {id:targetItem.id,name:targetItem.name,title:targetItem.title});
 
 		}
