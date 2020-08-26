@@ -312,13 +312,6 @@
                 }
             }
         },
-        "submit": {
-            "fab": {
-                "submit": "Gửi",
-                "draft": "Lưu bản nháp",
-                "toggleSize": "Thay đổi kích thước"
-            }
-        },
         "process": {
             "header_bar": {
                 "undo": "Undo ",

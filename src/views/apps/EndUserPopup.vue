@@ -20,7 +20,6 @@
 				</v-app-bar>
 					<div class="list-favorite">
 						<div class="title-favorite"><v-icon >mdi-playlist-star</v-icon><h4>{{$t('apps.favorite')}}</h4></div>
-						<!-- <span v-if="listFavorite.length == 0"> chuaw cos favorite </span> -->
 						<ul style="margin:0 10px;">
 							<VuePerfectScrollbar :style="{height: listFavoriteHeight}"  >
 								<li v-for="(item,i) in listFavorite" :key="i"> <span v-if="item.hasOwnProperty('title')">{{item.title}}</span><span v-else>{{item.name}}</span> <v-icon  color="yellow" style="float:right;font-size:13px">mdi-star</v-icon></li>
@@ -91,6 +90,7 @@ export default {
 		 searchKey:"",
 		 apps:{},
 		 listFavorite:[],
+		 testListFavorite:[],
 		 arrType:{
 			 document:[],
 			 orgchart:[],
@@ -138,11 +138,6 @@ export default {
 					thisCpn.$refs.appDetails.hideContextMenu()		
 				}
 			})
-			// $(document).click(function(e){
-			// 	if(!$(e.target).is('.context-menu')){
-			// 		thisCpn.$refs.sidebar.hideContextMenu()		
-			// 	}
-			// })
 	},
 	components: {
 		VuePerfectScrollbar,
@@ -165,9 +160,11 @@ export default {
 		getFavorite(){
 			this.listFavorite= []
 			let userId = this.$store.state.app.endUserInfo.id
-			appManagementApi.getItemFavorite(userId).then(res => {
-				debugger
+			appManagementApi.getItemFavorite(userId).then(res =>{
 				if (res.status == 200) {
+					this.testListFavorite = res.data.listObject
+					res.data.listObject.forEach(function(e){
+					})
 					this.checkTypeFavorite(res.data.listObject)
 				}
 			}).catch((err) => {
@@ -178,7 +175,6 @@ export default {
 			this.title.iconType = item.iconType;
 			this.title.name = item.name;
 			appManagementApi.getAppDetails(item.id).then(res => {
-				debugger
 				if (res.status == 200) {
 					if(Object.keys(res.data.listObject.childrenApp).length > 0){
 						this.checkChildrenApp(res.data.listObject.childrenApp)
@@ -233,12 +229,10 @@ export default {
 								}
 				]}).then(resOrg => {
 					if(type == 'listFavorite'){
-
 						if(resOrg.data.listObject.length > 0){
 							resOrg.data.listObject.forEach(function(e){
 								self.listFavorite.push(e)
 							})
-							// self.listFavorite.push(resOrg.data.listObject)
 						}
 					}
 					else{
