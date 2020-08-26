@@ -33,6 +33,7 @@
 							<div v-for="(item,i) in apps" :key="i" 
 								class="list-app-item"
 								@click="clickDetails(item)"
+								
 								>
 								<div class="app-item-icon">
 									<v-icon v-if="item.iconType == 'icon'">{{item.iconName}}</v-icon>
@@ -172,7 +173,6 @@ export default {
 					}else{
 						this.$store.commit('appConfig/emptyItemSelected')
 					}
-					
 				}
 			}).catch((err) => {
 			});
@@ -399,7 +399,7 @@ export default {
 	overflow: hidden;
 }
 .end-user-popup >>> .tittle{
-	font: 18px Roboto;
+	font: 15px Roboto;
 	padding-left:8px;
 	font-weight:400
 
