@@ -104,17 +104,6 @@
 						<span>test comment by uuid</span>
 					</v-tooltip>
 					
-                      
-					<comment 
-						:showComment="showComment" 
-						:heightComment="heightComment" 
-						:top="top" 
-						:left="left"
-						:objectIdentifier="idItem"
-						:uuid="uuidArea"
-						:targetArea="contentTargetArea"
-						:objectType="objType"
-					/>
                 </v-layout>
             </v-container>
         </v-content>
