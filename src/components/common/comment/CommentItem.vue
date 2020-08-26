@@ -89,7 +89,37 @@ export default {
 		width:{
 			type: String,
 			default: '380px'
+		},
+		searchItem:{
+			type: String,
+			default: ''
 		}
+	},
+	components: {
+		VuePerfectScrollbar,
+		InputComment,
+		moment
+	},
+	data() {
+		return {
+			listCommentHeight:'500px',
+			images:[],
+			files:[],
+			status,
+			contentEdit: '',
+			reply: false,
+		}
+	},
+	computed:{
+		sEnduser(){
+			return this.$store.state.app.endUserInfo.id
+		},
+		sComment(){
+			return this.$store.state.comment.commentTarget
+		},
+		sReply(){
+			return this.$store.state.comment.isReply
+		},
 	},
 	mounted(){
 		if(this.item.attachments.length > 0){
@@ -138,16 +168,24 @@ export default {
 		},
 		getCommentUuid(){
 			commentApi.getCommentByUuid(this.sComment.objectType,this.sComment.objectIdentifier,this.sComment.uuid).then(res => {
-				this.$store.commit('comment/updateListComment',res.data.listObject.comments)
 				this.$store.commit('comment/updateListAvtiveComment',res.data.listObject.comments)
 				this.$store.commit('comment/updateListResolve',res.data.listObject.resolve)
+				if(this.$store.state.comment.currentTab == 'comment'){
+						this.$store.commit('comment/setComment')
+				}else{
+					this.$store.commit('comment/setResolve')
+				}
 			});
 		},
 		getCommentId(){
 			commentApi.getCommentById(this.sComment.objectType,this.sComment.objectIdentifier).then(res => {
-				this.$store.commit('comment/updateListComment',res.data.listObject.comments)
 				this.$store.commit('comment/updateListAvtiveComment',res.data.listObject.comments)
 				this.$store.commit('comment/updateListResolve',res.data.listObject.resolve)
+					if(this.$store.state.comment.currentTab == 'comment'){
+						this.$store.commit('comment/setComment')
+				}else{
+					this.$store.commit('comment/setResolve')
+				}
 			});
 		},
 		lassSeen(date){
@@ -155,15 +193,24 @@ export default {
 		},
 		resolveComment(item){
 			commentApi.changeStatus(item.id).then(res => {
-				   item.status = 1
-				   this.$store.commit('comment/updateResolve',item)
-			  
+				item.status = 1
+				this.$store.commit('comment/updateResolve',item)
+				// if(this.sComment.uuid == "0"){
+				// 	this.getCommentId()
+				// }else{
+				// 	this.getCommentUuid()
+				// }
             })
 		},
 		unresolveComment(item){
 			commentApi.changeStatus(item.id).then(res => {
-					item.status = 0
-				   this.$store.commit('comment/updateUnResolve',item)
+				item.status = 0	
+				this.$store.commit('comment/updateUnResolve',item)
+				// if(this.sComment.uuid == "0"){
+				// 	this.getCommentId()
+				// }else{
+				// 	this.getCommentUuid()
+				// }
             })
 		},
 		replyComment(item){	
@@ -179,32 +226,8 @@ export default {
 			this.$store.commit('comment/updateParentCommentTarget',data.parentId)
 		}
 	},
-	components: {
-		VuePerfectScrollbar,
-		InputComment,
-		moment
-	},
-	data() {
-		return {
-			listCommentHeight:'500px',
-			images:[],
-			files:[],
-			status,
-			contentEdit: '',
-			reply: false,
-		}
-	},
-	computed:{
-		sEnduser(){
-			return this.$store.state.app.endUserInfo.id
-		},
-		sComment(){
-			return this.$store.state.comment.commentTarget
-		},
-		sReply(){
-			return this.$store.state.comment.isReply
-		},
-	},
+	
+	
 }	
 </script>
 <style scoped>
@@ -241,8 +264,8 @@ export default {
 	display: none;
 }
 .commnent-item >>>.v-btn{
-	height: 25px;
-	width: 25px;
+	height: 46px;
+	width: 66px;
 }
 .commnent-item >>>  .v-btn__content .v-icon{
 	font-size: 15px;

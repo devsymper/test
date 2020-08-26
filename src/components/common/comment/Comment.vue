@@ -21,18 +21,20 @@
 				>
 					<v-tabs-slider color="yellow"></v-tabs-slider>
 					<v-tab v-for="item in itemsTab" :key="item.value" >
-						<span> {{ item.title }} </span> <!--<span style='padding-left:4px'>{{ '('+sComment[item.store].length+')'}}</span> -->
+						<v-icon v-if="isSearching == true" style="font-size:18px">{{item.icon}}</v-icon>
+						<span v-else> <span> {{ item.title }} </span> <span style='padding-left:4px'>{{ '('+sComment[item.store].length+')'}}</span></span>
 					</v-tab>
 				</v-tabs>
 				<v-spacer></v-spacer>
-				<!-- <v-text-field
-					solo
-					v-if="showInput"
-					label="Append"
-					append-icon="mdi-close"
-					@click:append="clickClose"
-					></v-text-field> -->
-					<v-icon   @click="clickSearch" style="font-size:13px">mdi-magnify</v-icon>
+				  <v-text-field
+						solo
+						v-if="isSearching"
+						label="Search..."
+						append-icon="mdi-close-circle-outline"
+						v-model="searchItem"
+						@click:append="clickClose"
+					></v-text-field>
+					<v-icon v-else  @click="clickSearch" style="font-size:13px">mdi-magnify</v-icon>
 				</template>
 			</v-toolbar>
 			<v-tabs-items v-model="tab">
@@ -41,7 +43,7 @@
 				:key="item.value"
 				>
 				<v-card flat>
-					<list-comment :listComment="listComment"/>
+					<list-comment :listComment="listComment" :searchItem="searchItem"/>
 				</v-card>
 				</v-tab-item>
 				 <div class="input-comment" v-if="tabComment == true">
@@ -66,6 +68,34 @@ import InputComment from './InputComment.vue';
 import {commentApi} from '@/api/Comment.js'
 import {fileManagementApi} from '@/api/FileManagement.js'
 export default {
+	 data() {
+        return {
+            tab: null,
+			isSearching:false,
+			showSpan:true,
+			showMagnity:true,
+			showTargetArea:false,
+			resolveComment:[],
+			commentTarget:{},
+			comment:[],
+			tabComment : true,
+			searchItem:'',
+			itemsTab: [
+				{
+					title:'Comment',
+					value:'comment',
+					store: 'listAvtiveComment',
+					icon: 'mdi-comment-processing-outline'
+				},
+				{
+					title: 'Resolve',
+					value:'resolve',
+					store: 'listResolve',
+					icon: 'mdi-comment-check'
+				}
+			],
+        };
+    },
 	components:{
 		TargetArea,
 		ListComment,
@@ -84,33 +114,7 @@ export default {
 	},
 	mounted(){
 	},
-	 data() {
-        return {
-            tab: null,
-			showInput:false,
-			showSpan:true,
-			showMagnity:true,
-			showTargetArea:false,
-			resolveComment:[],
-			commentTarget:{},
-			comment:[],
-			tabComment : true,
-			itemsTab: [
-				{
-					title:'Comment',
-					value:'comment',
-					store: 'listAvtiveComment',
-					icon: 'mdi-comment-processing-outline'
-				},
-				{
-					title: 'Resolve',
-					value:'resolve',
-					store: 'listResolve',
-					icon: 'mdi-comment-check'
-				}
-			],
-        };
-    },
+	
 	 props: {
 		 /**
 		  * truyen vao show comment hay ko
@@ -131,7 +135,7 @@ export default {
 		  */
         heightComment: {
             type: String,
-            default: "1000px"
+            default: "800px"
 		},
 		 /**
 		  * truyen vao vi tri comment
@@ -171,15 +175,15 @@ export default {
 		*/
 		uuid:{
 			type:String,
-			default:"0"
+			default:""
 		}
 	},
 	methods:{
 		clickSearch(){
-      		this.showInput = true
+      		this.isSearching = true
   		},
 		clickClose(){
-			this.showInput = false
+			this.isSearching = false
 		},
 		hide(){
 			this.showComment = false
@@ -229,10 +233,12 @@ export default {
 		tab:function(val){
 			if(val === 0){
 				this.$store.commit('comment/setComment')
+				this.$store.commit('comment/updateCurrentTab','comment')
 				this.tabComment = true
 			}
 			else{
 				this.$store.commit('comment/setResolve')
+				this.$store.commit('comment/updateCurrentTab','resolve')
 				this.tabComment = false
 			}
 		}
@@ -242,13 +248,36 @@ export default {
 
 <style scoped>
 .symper-comment{
-	font:13px roboto
+	font:13px roboto;
+	position: relative;
 }
 .symper-comment  >>>.v-btn{
 	height: 25px;
 	width: 25px;
 }
-
+.symper-comment  >>> .v-input__control{
+	background-color:#f7f7f7;
+	min-height:unset
+}
+.symper-comment  >>> .v-input__control .v-text-field__details{
+	display: none;
+}
+.symper-comment  >>> .v-input__control .v-input__slot{
+	box-shadow: unset !important;
+	background-color:#f7f7f7;
+	border-radius: 5px;
+	margin:unset;
+	width: 200px;
+	padding: 0px 8px !important;
+	font: 12px roboto;
+}
+.symper-comment  >>> .v-input__control .v-input__slot .v-icon{
+	font-size: 15px;
+	margin-right: -8px;
+}
+.symper-comment  >>> .v-input__control .v-input__slot #input-4358{
+	
+}
 .symper-comment >>> .v-toolbar__title{
 	text-transform: uppercase;
 	font:15px roboto
@@ -284,5 +313,7 @@ export default {
 	margin-right:auto;
 	flex-direction: row;
 	justify-content: center;
+	/* position: absolute; */
+	/* bottom:0px; */
 }
 </style>

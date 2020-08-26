@@ -51,12 +51,7 @@
                         <v-btn icon>
                             <v-icon>mdi-magnify</v-icon>
                         </v-btn>
-                        <v-btn icon @click="clickFull($event)"> 
-                            <v-icon>mdi-folder</v-icon>
-                        </v-btn>
-                        <v-btn icon @click="clickArea($event)">
-                            <v-icon>mdi-file</v-icon>
-                        </v-btn>
+                       
                         <v-menu  v-model="isShowDialogNotification"
                             z-index="161"
                             :close-on-content-click="false"
@@ -87,7 +82,29 @@
                     </div>
                 </div>
                 <v-layout style="height:calc(100% - 41px)" class="w-100 h-100" justify-center>
-                    <slot></slot>
+                    <slot>
+					</slot>
+					<v-tooltip left>
+						<template v-slot:activator="{ on, attrs }">
+							<v-btn icon @click="clickFull($event)" v-bind="attrs"
+								v-on="on"> 
+								<v-icon style="font-size:15px">mdi-comment-multiple</v-icon>
+							</v-btn>
+						</template>
+						<span>test comment by id</span>
+					</v-tooltip>
+					<v-tooltip left>
+						<template v-slot:activator="{ on, attrs }">
+						
+							  <v-btn icon @click="clickArea($event)" v-bind="attrs"
+								v-on="on"> 
+                            <v-icon style="font-size:15px">mdi-comment-multiple-outline</v-icon>
+                        </v-btn>
+						</template> 
+						<span>test comment by uuid</span>
+					</v-tooltip>
+					
+                      
 					<comment 
 						:showComment="showComment" 
 						:heightComment="heightComment" 

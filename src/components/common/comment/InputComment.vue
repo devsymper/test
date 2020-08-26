@@ -34,26 +34,10 @@
 					</template>
 			</v-text-field> -->
 			<div class="text-area-wrapper" v-else>
-				 <Mentionable
-					:keys="['@']"
-					:items="itemTags"
-					offset="6"
-					>
 					<textarea v-model="inputComment"  
 						v-on:keyup.50="tagUser($event)"
 						class="text-area">
 					</textarea>
-					<!-- <template #item-#="{ item }">
-					<div class="issue">
-						<span class="number">
-						#{{ item.id }}
-						</span>
-						<span class="dim">
-						{{ item.displayName }}
-						</span>
-					</div>
-					</template> -->
-				</Mentionable>
 				<UploadFile style="position:absolute;right: 16px;bottom: 5px;" @uploaded-file="uploadInfo"/>
 				<v-btn style="position:absolute;right: 0px;bottom: 5px;" icon @click="addComment">
 					<v-icon >mdi-send-circle-outline</v-icon>
@@ -65,11 +49,27 @@
 </template>
 <script>
 import MenuTagUser from './MenuTagUser.vue'
-import { Mentionable } from 'vue-mention'
-import At from 'vue-at'
 import UploadFile from '@/components/common/UploadFile.vue';
 import {commentApi} from '@/api/Comment.js'
 export default {
+	data(){
+		return {
+			inputComment: '',
+			keyWord: '',
+			attachments:[],
+			tags:[],
+			icon:{
+				xlxs: 'mdi-file-excel-box',
+				xls: 'mdi-file-excel-box',
+				docx: 'mdi-file-word-box',
+				doc: 'mdi-file-word-box',
+				pdf: 'mdi-file-pdf-box',
+				default: 'mdi-file'
+			},
+			dataPostComment:{
+			}
+		}
+	},
 	props:{
 		isEditing:{
 			type: Boolean,
@@ -102,7 +102,6 @@ export default {
 	},
 	components:{
 		MenuTagUser,
-		Mentionable,
 		UploadFile
 	},
 	created(){
@@ -119,7 +118,7 @@ export default {
 		tagUser(event){
 			let $target = $(event.target);
 			var x = $target.offset().left;
-     		var y = $target.offset().top + 60;
+     		var y = $target.offset().top + 80;
 			this.$refs.menuTagUser.show(x,y);
 		},
 		tagged(data){
@@ -134,31 +133,38 @@ export default {
 			item.tagInfo = tagInfo
 			this.tags.push(item)
 			this.inputComment = res
+			
 		},
 		addComment(){
+			if(this.item){
+				this.item.tags = this.tags
+			}
 			this.dataPostComment = this.sComment
 			this.dataPostComment.content = this.inputComment
 			this.dataPostComment.attachments = this.attachments
+			this.dataPostComment.tags = this.tags
+			console.log(this.tags);
+			debugger
 			if(this.isAdd == true){
-			let data = JSON.stringify(this.dataPostComment)
+				let data = JSON.stringify(this.dataPostComment)
 				commentApi.addComment(data).then(res => {
+					setTimeout(function(){}, 1000);
 					this.$store.commit('comment/updateParentCommentTarget',0)
 					this.updateComment()
 					this.inputComment = ''
+					this.attachments = []
 				});
 			}
 			else{
 				this.dataPostComment.id = this.item.id
 				let dataEdit = JSON.stringify(this.dataPostComment)
-				debugger
 				commentApi.editComment(dataEdit).then(res => {
 					this.$store.commit('comment/updateParentCommentTarget',0)
 					this.updateComment()
+					this.attachments = []
 				});
 			}
 			this.$store.commit('comment/updateReplyStatus',false)
-		},
-		editComment(){
 		},
 		uploadInfo(data){
 			if(typeof data === 'string'){
@@ -175,15 +181,23 @@ export default {
 		updateComment(){
 			if(this.sComment.uuid == "0"){
 				commentApi.getCommentById(this.sComment.objectType,this.sComment.objectIdentifier).then(res => {
-					this.$store.commit('comment/updateListComment',res.data.listObject.comments)
 					this.$store.commit('comment/updateListAvtiveComment',res.data.listObject.comments)
 					this.$store.commit('comment/updateListResolve',res.data.listObject.resolve)
+					if(this.$store.state.comment.currentTab == 'comment'){
+						this.$store.commit('comment/setComment')
+					}else{
+						this.$store.commit('comment/setResolve')
+					}
 				});
 			}else{
 				commentApi.getCommentByUuid(this.sComment.objectType,this.sComment.objectIdentifier,this.sComment.uuid).then(res => {
-					this.$store.commit('comment/updateListComment',res.data.listObject.comments)
 					this.$store.commit('comment/updateListAvtiveComment',res.data.listObject.comments)
 					this.$store.commit('comment/updateListResolve',res.data.listObject.resolve)
+					if(this.$store.state.comment.currentTab == 'comment'){
+						this.$store.commit('comment/setComment')
+					}else{
+						this.$store.commit('comment/setResolve')
+					}
 				});
 			}
 		}
@@ -200,38 +214,9 @@ export default {
 				item = {}
 			});
 			return resItem
-			
 		},
 		sComment(){
 			return this.$store.state.comment.commentTarget
-		}
-	},
-	data() {
-		return {
-			inputComment: '',
-			keyWord: '',
-			attachments:[],
-			tags:[],
-			icon:{
-				xlxs: 'mdi-file-excel-box',
-				xls: 'mdi-file-excel-box',
-				docx: 'mdi-file-word-box',
-				doc: 'mdi-file-word-box',
-				pdf: 'mdi-file-pdf-box',
-				default: 'mdi-file'
-			},
-			// itemsTag:[
-			// 	{
-			// 		value: '1',
-			// 		label: 'Ngô Anh Dũng',
-			// 	},
-			// 	{
-			// 		value: '2',
-			// 		label: 'Đào Mạnh Khá',
-			// 	},
-			// ],
-			dataPostComment:{
-			}
 		}
 	},
 	watch:{
@@ -286,8 +271,8 @@ export default {
 	
 }
 .content-comment >>> .content-comment-file .commnet-file-item .file-item-title:hover{
-	color: blue;
-	border-bottom: 1px solid blue;
+	color: #E88F15CC;
+	border-bottom: 1px solid #E88F15CC;
 }
 .content-comment >>> .content-comment-file .commnet-file-item .icon-remove-file{
 	float: right;
@@ -302,6 +287,7 @@ export default {
 	display: flex;
 	position: relative;
 	background-color: #f7f7f7;
+	width: 100%;
 }
 .content-comment >>> .text-area-wrapper .mentionable {
 	flex-grow: 1;

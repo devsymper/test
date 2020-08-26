@@ -30,14 +30,52 @@ const updateParentCommentTarget = (state, data) => {
 	state.commentTarget.parentId = data
 }
 const updateResolve = (state, data) => {
-	state.listAvtiveComment.splice(state.listAvtiveComment.indexOf(data), 1)
-	state.listComment.splice(state.listComment.indexOf(data), 1)
+	debugger
+
 	state.listResolve.push(data)
+	state.listAvtiveComment.forEach(function (e) {
+		if (e.id == data.id) {
+			state.listAvtiveComment.splice(state.listAvtiveComment.indexOf(e), 1)
+		}
+	})
+	state.listComment.forEach(function (e) {
+		if (e.id == data.id) {
+			state.listComment.splice(state.listComment.indexOf(e), 1)
+		}
+	})
+	// state.listAvtiveComment.splice(state.listAvtiveComment.indexOf(data), 1)
+	// state.listComment.splice(state.listComment.indexOf(data), 1)
 }
 const updateUnResolve = (state, data) => {
-	state.listAvtiveComment.splice(state.listAvtiveComment.indexOf(data), 1)
-	state.listResolve.splice(state.listResolve.indexOf(data), 1)
-	state.listComment.push(data)
+	debugger
+	state.listAvtiveComment.push(data)
+	state.listResolve.forEach(function (e) {
+		if (e.id == data.id) {
+			state.listResolve.splice(state.listResolve.indexOf(e), 1)
+		}
+	})
+	state.listComment.forEach(function (e) {
+		if (e.id == data.id) {
+			state.listComment.splice(state.listComment.indexOf(e), 1)
+		}
+	})
+	// state.listResolve.splice(state.listResolve.indexOf(data), 1)
+	// state.listComment.splice(state.listComment.indexOf(data), 1)
+}
+const updateCurrentTab = (state, data) => {
+	Vue.set(state, 'currentTab', data)
+}
+const deleteComment = (state, data) => {
+	state.listComment.splice(state.listComment.indexOf(data))
+}
+const deleteResolve = (state, data) => {
+	state.listResolve.splice(state.listResolve.indexOf(data))
+}
+const deleteChildComment = (state, data) => {
+
+}
+const deleteChildResolve = (state, data) => {
+
 }
 export {
 	updateCommentTarget,
@@ -50,5 +88,8 @@ export {
 	updateReplyStatus,
 	updateParentCommentTarget,
 	updateResolve,
-	updateUnResolve
+	updateUnResolve,
+	updateCurrentTab,
+	deleteComment,
+	deleteResolve
 };
