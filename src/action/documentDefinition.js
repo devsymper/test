@@ -26,7 +26,8 @@ export default [{
         "handler": function(param) {
             let tabName = param.title ? param.title : (param.name ? param.name : '');
             tabName = this.$t('document.submit') + ' ' + tabName;
-            this.$goToPage('/document/submit/' + param.id, tabName);
+
+            this.$goToPage(`/documents/${param.id}/submit`, tabName);
         }
     },
     {
