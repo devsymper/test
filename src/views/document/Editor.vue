@@ -500,37 +500,85 @@ export default {
         openPanelSaveDocument(){
             if($('#document-editor-'+this.keyInstance+'_ifr').contents().find('.s-control').length > 0){
                 let allControl = this.editorStore.allControl;
-                this.checkEmptyControl(allControl,'0');
-                if($('#document-editor-'+this.keyInstance+'_ifr').contents().find('.s-control-error').length == 0){
-                    if(this.documentId == undefined || this.documentId == 0)
-                    this.setDocumentProperties({})
-                    if(this.checkTitleControl())
-                    this.$refs.saveDocPanel.showDialog()
-                }
-                else{
+                let controlPrimaryKey = this.validateControlBeforeSave(allControl,'0');
+                if(Object.keys(controlPrimaryKey).length > 1){
+                    let allKey = Object.keys(controlPrimaryKey);
                     this.$snotify({
                                     type: "error",
-                                    title: "Tên một số control chưa hợp lệ",
+                                    title: "Kiểm tra lại các trường định danh",
+                                    text : "Không được có "+allKey.length+" trường định danh trong 1 doc. Kiểm tra control: "+allKey.join(',')
                                 });
+                }
+                else{
+                    if($('#document-editor-'+this.keyInstance+'_ifr').contents().find('.s-control-error').length == 0){
+                        if(this.documentId == undefined || this.documentId == 0)
+                        this.setDocumentProperties({})
+                        this.$refs.saveDocPanel.showDialog()
+                    }
+                    else{
+                        this.$snotify({
+                                        type: "error",
+                                        title: "Tên một số control chưa hợp lệ",
+                                    });
+                    }
                 }
             }
         },
-        checkEmptyControl(allControl,tableId){
+        // checkTitleControl(){
+        //     let rs = true;
+        //     let allControl = util.cloneDeep(this.editorStore.allControl);
+        //     for(let controlId in allControl){
+        //         if(allControl[controlId].properties.hasOwnProperty('title')){
+        //             let title = allControl[controlId].properties.title.value;
+        //             if(title == ""){
+        //                 rs = false;
+        //                 $("#document-editor-"+this.keyInstance+"_ifr").contents().find('#'+controlId).addClass('s-control-error');
+        //                 let errValue = "Không được bỏ trống tiêu đề"
+        //                 let tableId = checkInTable($("#document-editor-"+this.keyInstance+"_ifr").contents().find('#'+controlId))
+        //                 if( tableId == controlId)
+        //                 tableId = '0';
+        //                 this.$store.commit(
+        //                     "document/updateProp",{id:controlId,name:'title',value:errValue,tableId:tableId,type:"errorMessage",instance:this.keyInstance}
+        //                 ); 
+        //             }
+        //         }
+        //     }
+        //     return rs;
+        // },
+        validateControlBeforeSave(allControl,tableId){
+            let controlPrimaryKey = {};
             for(let controlId in allControl){
                 if(allControl[controlId].hasOwnProperty('listFields')){
-                    this.checkEmptyControl(allControl[controlId]['listFields'],controlId);
+                    let childPrimary = this.validateControlBeforeSave(allControl[controlId]['listFields'],controlId);
+                    controlPrimaryKey = Object.assign(controlPrimaryKey,childPrimary)
                 }
                 if(allControl[controlId].type != 'submit' && allControl[controlId].type != 'draft' 
                 && allControl[controlId].type != 'reset' && allControl[controlId].type != 'approvalHistory'
-                && allControl[controlId].properties.name.value == ""){
-                    let controlEl = $('#document-editor-'+this.keyInstance+'_ifr').contents().find('#'+controlId);
-                    controlEl.addClass('s-control-error');
-                    this.$store.commit(
-                        "document/updateProp",{id:controlId,name:"name",value:"Không được bỏ trống tên control",
-                        tableId:tableId,type:"errorMessage",instance:this.keyInstance}
-                    );
+                ){
+                    let controlProps = allControl[controlId].properties;
+                    if( controlProps.name.value == ""){
+                        let controlEl = $('#document-editor-'+this.keyInstance+'_ifr').contents().find('#'+controlId);
+                        controlEl.addClass('s-control-error');
+                        this.$store.commit(
+                            "document/updateProp",{id:controlId,name:"name",value:"Không được bỏ trống tên control",
+                            tableId:tableId,type:"errorMessage",instance:this.keyInstance}
+                        );
+                    }
+                    let title = controlProps.title.value;
+                    if(title == ""){
+                        let controlEl = $('#document-editor-'+this.keyInstance+'_ifr').contents().find('#'+controlId);
+                        controlEl.addClass('s-control-error');
+                        this.$store.commit(
+                            "document/updateProp",{id:controlId,name:"title",value:"Không được bỏ trống tiêu đề",
+                            tableId:tableId,type:"errorMessage",instance:this.keyInstance}
+                        );
+                    }
+                    if(controlProps.hasOwnProperty('isPrimaryKey') && controlProps.isPrimaryKey.value == true){
+                        controlPrimaryKey[controlProps.name.value] = allControl[controlId];
+                    }
                 }
             }
+            return controlPrimaryKey;
         },
         /**
          * Hàm xử lí lấy dữ liệu các công thức để insert vào formulas service trước khi lưu
@@ -766,27 +814,7 @@ export default {
                             }); 
             }
         },
-        checkTitleControl(){
-            let rs = true;
-            let allControl = util.cloneDeep(this.editorStore.allControl);
-            for(let controlId in allControl){
-                if(allControl[controlId].properties.hasOwnProperty('title')){
-                    let title = allControl[controlId].properties.title.value;
-                    if(title == ""){
-                        rs = false;
-                        $("#document-editor-"+this.keyInstance+"_ifr").contents().find('#'+controlId).addClass('s-control-error');
-                        let errValue = "Không được bỏ trống tiêu đề"
-                        let tableId = checkInTable($("#document-editor-"+this.keyInstance+"_ifr").contents().find('#'+controlId))
-                        if( tableId == controlId)
-                        tableId = '0';
-                        this.$store.commit(
-                            "document/updateProp",{id:controlId,name:'title',value:errValue,tableId:tableId,type:"errorMessage",instance:this.keyInstance}
-                        ); 
-                    }
-                }
-            }
-            return rs;
-        },
+        
        
         // hàm kiểm tra xem trong công thức có trỏ đến control ko tồn tại hay ko
         validateFormulasInControl(control,listControlName){

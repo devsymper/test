@@ -14,7 +14,8 @@ export default {
             indexActive:-1,
             curInput:null,
             isShowPopup:false,
-            times:null
+            times:null,
+            controlName:""
         }
     },
     methods:{
@@ -33,6 +34,7 @@ export default {
         },
         setEventInput(e){
             let thisCpn = this;
+            this.controlName = e.controlName
             this.curInput.off('keyup');
             if(this.curInput.closest('.handsontable').length > 0 ){
                 this.curInput.attr('contenteditable',true);
@@ -95,6 +97,7 @@ export default {
             this.times[this.indexActive].active = false;
             this.indexActive = this.times.indexOf(item);
             item.active = true;
+            this.$emit('after-check-input-time-valid',{input:this.curInput,controlName: this.controlName,isValid:true});   
             this.hide();
         },
         checkValidTime(e){
