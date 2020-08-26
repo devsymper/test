@@ -20,14 +20,22 @@
                         <img :src="item.avatar || require('@/assets/image/avatar_default.jpg')">
                     </v-list-item-avatar>
                     <v-list-item-content style="margin-left:-10px">
-                        <v-list-item-title 
+                        <v-list-item-title v-if="item.type!= 'document_definition'"
                             :style="{'margin-left': item.type === 'user' ? '0' : '0.5rem'}" 
-                            class="item-title" >{{item.displayName}}
+                            class="item-title" v-html="item.displayName">
                         </v-list-item-title>
-                        <v-list-item-subtitle 
+                           <v-list-item-title v-else
+                            :style="{'margin-left': item.type === 'user' ? '0' : '0.5rem'}" 
+                            class="item-title" v-html="item.searchField">
+                        </v-list-item-title>
+                        <v-list-item-subtitle v-if="item.type!= 'document_definition'"
                             :style="{'margin-left': item.type === 'user' ? '0' : '0.5rem'}"
                             class="item-subtitle mt-1" v-html="item.searchField">
                         </v-list-item-subtitle>
+                          <v-list-item-title v-else
+                            :style="{'margin-left': item.type === 'user' ? '0' : '0.5rem'}" 
+                            class="item-title" v-html="item.description">
+                        </v-list-item-title>
                     </v-list-item-content>
                     <v-list-item-action v-show="item.enable&&item.actions.length>0" class="dot">
                         <v-menu
@@ -41,9 +49,9 @@
                             </template>
                             <v-list>
                                  <v-list-item-title v-for="(itemsAction,index) in item.actions" :key="index" 
-                                        class="fm fs-13 action-button ml-2" style="width:100px!important" 
+                                        class="fm fs-13 mt-1 action-button ml-2" style="width:130px!important" 
                                         @click="gotoPage(itemsAction,item.type,item.id,item.displayName)">
-                                            {{itemsAction}}
+                                             {{formatAction(itemsAction)}}
                                     </v-list-item-title>
                             </v-list>
                         </v-menu>
@@ -61,6 +69,7 @@ export default {
         return {
             value: '',
             searchItems: [],
+            dataResultSearch:[],
             defineAction:{
                 document_definition:{
                     "module": "document",
@@ -103,6 +112,23 @@ export default {
         };
     },
     methods:{
+          formatAction(value){
+            if(value== 'create'){
+                return "thêm";
+            }else if (value == 'edit'){
+                return "sửa"
+            }else if (value == 'submit'){
+                return "submit"
+            }else if (value == 'list'){
+                return "danh sách"
+             }else if (value == 'list_trash'){
+                return "danh sách bản nháp"
+             }else if (value == 'list_instance'){
+                return "list instance"
+            }else{
+                return value;
+            }
+        },
         enter(event){
             if (event.code == "Enter"){
             this.setMenu();
@@ -190,25 +216,32 @@ export default {
                 searchApi.getData(newVal)
                     .then(res => {
                         if (res.status === 200) {
+                            self.dataResultSearch = res.data;
                             console.log('Đã gửi thành công');
                             // display name, search field, type, avatar (user)
                             const regex = new RegExp(newVal,"gi");
                             const normalizedData = res.data.map(data => {
                                 const returnObjSearch = {};
-                                returnObjSearch.displayName = data.type === 'user' ? data.displayName : data.name;
+                                if(data.type=== 'user'){
+                                    returnObjSearch.displayName = data.displayName;
+                                }else if(data.type=='document_definition'){
+                                     returnObjSearch.displayName = data.title;
+                                }else{
+                                     returnObjSearch.displayName = data.name;
+                                }
                                 const keys = Object.keys(data);
                                 // xử lý bôi cam
                                 for (let i = 0, len = keys.length; i < len; i++) {
                                     const key = keys[i];
                                     if (typeof data[key] === 'string' && data[key].toLowerCase().includes(newVal.trim().toLowerCase())) {
-                                        returnObjSearch.normalField = key + ": " + data[key];
-                                        returnObjSearch.searchField = key + ": " + data[key].substring(0, 40)
+                                        returnObjSearch.normalField = data[key];
+                                        returnObjSearch.searchField = data[key].substring(0, 40)
                                             .replace(regex, x => '<span style="color: orange; font-weight: bold">'+x+'</span>');
                                         break;
                                     }
                                 }
                                 //console.log(data);
-                                returnObjSearch.searchField = returnObjSearch.searchField || "";
+                                
                                 returnObjSearch.avatar = data.avatar;
                                 returnObjSearch.type = data.type;
                                 returnObjSearch.id = data.id;
@@ -284,7 +317,7 @@ export default {
 .auto-complete ::v-deep .v-label {
     font-size: 13px!important;
     font-family: Roboto!important;
-    margin-top: -2px!important;
+    margin-top: -3px!important;
     padding-left: 10px;
 }
 .auto-complete ::v-deep .v-input__slot:after {

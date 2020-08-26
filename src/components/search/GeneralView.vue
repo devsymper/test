@@ -9,7 +9,7 @@
         <v-list dense>
             <v-list-item v-for="(item,menuIdx) in menu" :key="menuIdx">
                 <v-list-item-icon>
-                    <v-icon>mdi mdi-home</v-icon>
+                    <v-icon>{{getIcon(item)}}</v-icon>
                 </v-list-item-icon>
                 <v-list-item-content @click="detailView(item)">
                     <v-list-item-title>{{formatGroupName(item)}}</v-list-item-title>
@@ -54,19 +54,20 @@
                         </v-list-item-subtitle>
                     </v-list-item-content>
                     <v-list-item-action v-show="item.enable&&item.actions.length>0" class="dot" >
-                        <v-menu offset-y transition="scale-transition" style="width:50px!important">
+                        <v-menu   bottom offset-y 
+                            transition="scale-transition" style="120px!important" nudge-left="80">
                             <template v-slot:activator="{ on }">
                                 <button v-on="on">
                                     <i style="height:20px!important;width:20px!important" 
-                                    class="mr-10 dot mdi mdi-dots-horizontal"></i>
+                                    class="dot mdi mdi-dots-horizontal"></i>
                                 </button>
                             </template>
                             <v-list>
                                 <v-row>
                                     <v-list-item-title v-for="itemsAction in item.actions" 
-                                        class="fm fs-13 ml-6 action-button" style="width:50px!important"
+                                          class="fm fs-13 mt-1 action-button ml-4"  style="width:150px!important"
                                         @click="gotoPage(itemsAction,item.type,item.id,item.displayName)">
-                                        {{itemsAction}}
+                                        {{formatAction(itemsAction)}}
                                     </v-list-item-title>
                                 </v-row>
                             </v-list>
@@ -180,7 +181,7 @@
                                         <v-list-item-title v-for="itemsAction in item.actions" 
                                          @click="gotoPage(itemsAction,item.type,item.id,item.displayName)"
                                         class="fm fs-13 ml-6 action-button" style="width:50px!important" >
-                                            {{itemsAction}}
+                                              {{formatAction(itemsAction)}}
                                         </v-list-item-title>
                                     </v-row>
                                 </v-list>
@@ -189,7 +190,7 @@
                     </v-list-item>
                 </v-row>
                 </v-row>
-             <v-row  v-if="showDetail&&type=='user'" class="mt-10 ml-1">
+             <v-row  v-if="showDetail&&type=='user'" class="d-flex ml-1" v-bind:class="(newSearchAll.filter(x => x.type== 'user' ).length>3)? 'mt-15':'mt-1'">
                <v-col cols="12" md="4" v-for="item in newSearchAll.filter(x => x.type== 'user' )">
                     <div class="d-flex justify-start mr-3 " style="width: 100%!important; border:1px solid rgba(0,0,0,0.2">
                         <v-list-item-avatar class="item-avatar ml-3">
@@ -248,6 +249,48 @@ export default {
         }
     },
     methods: {
+        formatAction(value){
+            if(value== 'create'){
+                return "thêm";
+            }else if (value == 'edit'){
+                return "sửa"
+            }else if (value == 'submit'){
+                return "submit"
+            }else if (value == 'list'){
+                return "danh sách"
+             }else if (value == 'list_trash'){
+                return "danh sách nháp"
+             }else if (value == 'list_instance'){
+                return "list instance"
+            }else{
+                return value;
+            }
+        },
+        getIcon(value){
+             let icon = 'mdi-star-outline';
+            if (value == 'document_object') {
+                icon = 'mdi mdi-file-document-outline';
+            } else if (value == 'user') {
+                icon = 'mdi-account-multiple-outline';
+            } else if (value == 'document_definition') {
+                 icon = 'mdi mdi-file-outline';
+            } else if (value == 'workflow_definition') {
+                icon = 'mdi mdi-lan';
+            } else if (value == 'orgchart') {
+                 icon = 'mdi mdi-sitemap';
+            } else if (value == 'process_definition') {
+                 icon = 'mdi mdi-sitemap';          
+            } else if (value == 'application_deninition') {
+                 icon = 'mdi mdi-apps';         
+            } else if (value == 'syql') {
+                 icon = 'mdi mdi-alpha-f';          
+            } else if (value == 'dataflow') {
+                 icon = 'mdi mdi-arrange-send-to-back';          
+            } else {
+                 icon = 'mdi mdi-sitemap';     }
+            return icon
+
+        },
         formatGroupName(value) {
             let name = '';
             if (value == 'document_object') {

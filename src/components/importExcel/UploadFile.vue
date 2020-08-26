@@ -72,6 +72,10 @@ export default {
               total: 0,
               documentId:0,
           },
+       
+                headers:{
+                'Authorization': `Bearer ${util.auth.getToken()}`,
+          },
           autoStart: true,
           //singleFile: true
         }
