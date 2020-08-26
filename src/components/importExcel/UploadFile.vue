@@ -38,7 +38,7 @@
 import { util } from '../../plugins/util';
 
 export default {
-    props: ["selectType"],
+    props: ["selectType","documentId"],
     computed: {
         newImport() {
             return this.$store.state.importExcel.newImport;
@@ -70,6 +70,7 @@ export default {
           query: {
               key: "",
               total: 0,
+              documentId:0,
           },
           autoStart: true,
           //singleFile: true
@@ -80,7 +81,8 @@ export default {
         clearFiles() {
             this.$refs.upload.uploader.cancel()
             this.dem = 0
-            this.options.query.key = ""
+            this.options.query.key = "";
+            this.options.query.documentId = 0;
             this.$emit('clearFiles')
         },
         handleFileUploaded(rootFile, file, response, chunk) {
@@ -99,6 +101,7 @@ export default {
             this.dem = event.currentTarget.files.length;
             this.options.query.key = util.str.randomString(6)+Date.now();
             this.options.query.typeImport = this.selectType;
+            this.options.query.documentId = this.documentId;
             this.$emit('clearFiles');
 
         },

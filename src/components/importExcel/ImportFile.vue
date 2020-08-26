@@ -30,7 +30,7 @@
             </v-col>
         </v-row>
         <v-row class="ml-2 mt-1">
-                <UploadFile @dataExcel="getDataExcel" :selectType="selectType" @clearFiles="clearFiles" @keyUpload="getKey"/>
+                <UploadFile @dataExcel="getDataExcel" :documentId="documentId" :selectType="selectType" @clearFiles="clearFiles" @keyUpload="getKey"/>
         </v-row>
         <v-row class="ml-5 mt-1"><span style="color:red" class="fs-12">{{errorType}}</span></v-row>
         <v-row class="ml-5">
@@ -236,7 +236,12 @@ export default {
                         this.getSheetAndColumnName();
                     }
             }else{
+                if(data.status=='403')
+                {
+                    this.errorType = "* Bạn không có quyền upload";
+                }else{
                 this.errorType="* Kiểu file không hợp lệ";
+                }
             }
         },
         //không để tên quá dài
