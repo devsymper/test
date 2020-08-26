@@ -34,7 +34,7 @@ export default {
 	},
 	data() {
 		return {
-			listCommentHeight:'500px',
+			listCommentHeight:'400px',
 			resItem: [],
 		}
 	},
