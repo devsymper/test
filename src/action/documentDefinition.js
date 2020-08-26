@@ -40,9 +40,7 @@ export default [{
 	{
 		...commonProps,
 		"action": "restore",
-		"handler": function (param) {
-
-		}
+		"handler": function (param) {}
 	},
 	{
 		...commonProps,

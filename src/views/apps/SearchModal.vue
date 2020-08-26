@@ -56,7 +56,7 @@ export default {
 				   ]
 			   },
 			   orgcharts:{
- 				   icon : 'mdi-widgets',
+ 				   icon : 'mdi-widgets-outline',
 				   title: this.$t('apps.listType.orgcharts'),
 				   name: 'orgcharts',
 				   item:[

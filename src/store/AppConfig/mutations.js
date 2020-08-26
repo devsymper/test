@@ -27,13 +27,13 @@ const removeItemSelected = (state, data) => {
 const emptyItemSelected = (state) => {
 	state.listItemSelected = {
 		documents: {
-			icon: 'mdi-file-document',
+			icon: 'mdi-file-edit-outline',
 			title: 'Documents',
 			name: 'documents',
 			item: []
 		},
 		orgcharts: {
-			icon: 'mdi-widgets',
+			icon: 'mdi-widgets-outline',
 			title: 'Orgcharts',
 			name: 'orgcharts',
 			item: []
@@ -53,7 +53,6 @@ const emptyItemSelected = (state) => {
 	}
 }
 const updateChildrenApps = (state, data) => {
-	// Vue.set(state, 'listItemSelected', data);
 	state.listItemSelected[data.type].item = data.obj
 }
 

@@ -98,13 +98,13 @@ export default {
    },
 	computed:{
 		sAppModule(){
-				if(this.searchKey == ""){
-					return this.$store.state.appConfig.listItemSelected
-				}
-				else{
-					this.filterItem();
-					return this.objFilter
-				}
+			if(this.searchKey == ""){
+				return this.$store.state.appConfig.listItemSelected
+			}
+			else{
+				this.filterItem();
+				return this.objFilter
+			}
 		}
 	},
 	props: {
@@ -120,7 +120,6 @@ export default {
 	methods:{
 		removeItem(item,type){
 			this.$store.commit('appConfig/removeItemSelected',{item:item,type:type})
-			console.log(this.$store.state.appConfig.listItemSelected);
 		},
 		filterItem(){
 			let self = this
@@ -196,8 +195,6 @@ export default {
 					}
 				});
 			}
-				
-			
 		},
 	},
 }
@@ -223,19 +220,17 @@ export default {
 }
 .app-details >>> .app-item .title-document-enduser{
 	white-space: nowrap; 
-	width: 330px; 
+	width: 430px; 
 	overflow: hidden;
 	text-overflow: ellipsis; 
 }
 .app-details >>> .app-item .title-app h4{
 	padding-left:8px;
-	/* padding-top: -2px; */
 	font-weight: unset;
 }
 .app-details >>> .app-item .app-child-item .v-icon{
 	font-size:13px;
 	float:right;
-	/* padding-top: 2px; */
 	line-height:unset;
 
 }
