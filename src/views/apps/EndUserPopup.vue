@@ -20,21 +20,23 @@
 				</v-app-bar>
 					<div class="list-favorite">
 						<div class="title-favorite"><v-icon >mdi-playlist-star</v-icon><h4>{{$t('apps.favorite')}}</h4></div>
-						<!-- <span v-if="listFavorite.length == 0"> chuaw cos favorite </span> -->
 						<ul style="margin:0 10px;">
-							<VuePerfectScrollbar :style="{height: listFavoriteHeight}"  >
+							<VuePerfectScrollbar style="max-height:200px"  >
 								<li v-for="(item,i) in listFavorite" :key="i"> <span v-if="item.hasOwnProperty('title')">{{item.title}}</span><span v-else>{{item.name}}</span> <v-icon  color="yellow" style="float:right;font-size:13px">mdi-star</v-icon></li>
 							</VuePerfectScrollbar>
 						</ul>
 					</div>
 					<div class="title-list-app"> <v-icon>mdi-playlist-play</v-icon><h4>{{$t('apps.listApp')}}</h4></div>
 					<div class="list-app-cointaner">
-						<VuePerfectScrollbar :style="{height: listAppHeight}"  class="d-flex flex-wrap" >
+						<VuePerfectScrollbar style="max-height:330px"  class="d-flex flex-wrap" >
+							<!-- :style="{height: listAppHeight}" -->
 							<div v-for="(item,i) in apps" :key="i" 
 								class="list-app-item"
 								@click="clickDetails(item)"
+								
 								>
-								<div class="app-item-icon">
+								<div class="app-item-icon"
+								>
 									<v-icon v-if="item.iconType == 'icon'">{{item.iconName}}</v-icon>
 									<img v-else-if="item.iconType == 'img'" :src="item.iconName" class="app-item-img"/>
 									<v-icon v-else>mdi-star</v-icon>
@@ -90,6 +92,7 @@ export default {
 		 searchKey:"",
 		 apps:{},
 		 listFavorite:[],
+		 testListFavorite:[],
 		 arrType:{
 			 document:[],
 			 orgchart:[],
@@ -99,6 +102,16 @@ export default {
 		 title:{
 		 },
 		 mapId:{
+			 orgchart:{
+			 },
+			 document:{
+			 },
+			 report:{
+			 },
+			 workflow:{
+			 }
+		 },
+		 mapIdFavorite:{
 			 orgchart:{
 			 },
 			 document:{
@@ -127,11 +140,6 @@ export default {
 					thisCpn.$refs.appDetails.hideContextMenu()		
 				}
 			})
-			// $(document).click(function(e){
-			// 	if(!$(e.target).is('.context-menu')){
-			// 		thisCpn.$refs.sidebar.hideContextMenu()		
-			// 	}
-			// })
 	},
 	components: {
 		VuePerfectScrollbar,
@@ -154,8 +162,11 @@ export default {
 		getFavorite(){
 			this.listFavorite= []
 			let userId = this.$store.state.app.endUserInfo.id
-			appManagementApi.getItemFavorite(userId).then(res => {
+			appManagementApi.getItemFavorite(userId).then(res =>{
 				if (res.status == 200) {
+					this.testListFavorite = res.data.listObject
+					res.data.listObject.forEach(function(e){
+					})
 					this.checkTypeFavorite(res.data.listObject)
 				}
 			}).catch((err) => {
@@ -172,7 +183,6 @@ export default {
 					}else{
 						this.$store.commit('appConfig/emptyItemSelected')
 					}
-					
 				}
 			}).catch((err) => {
 			});
@@ -221,12 +231,10 @@ export default {
 								}
 				]}).then(resOrg => {
 					if(type == 'listFavorite'){
-
 						if(resOrg.data.listObject.length > 0){
 							resOrg.data.listObject.forEach(function(e){
 								self.listFavorite.push(e)
 							})
-							// self.listFavorite.push(resOrg.data.listObject)
 						}
 					}
 					else{
@@ -278,14 +286,10 @@ export default {
 				]}).then(resW => {
 					if(type == 'listFavorite'){
 						if(resW.data.listObject.length > 0){
-
-
-							// self.listFavorite.push(resW.data.listObject)
 							resW.data.listObject.forEach(function(e){
 								self.listFavorite.push(e)
 							})
 						}
-						console.log(self.listFavorite,'this.listFavoritethis.listFavoritethis.listFavorite');
 					}
 					else{
 						this.updateFavoriteItem(self.mapId.workflow,resW.data.listObject)
@@ -313,9 +317,6 @@ export default {
 					self.arrType.workflow.push(e.objectIdentifier)
 				}
 			});
-			console.log(self.arrType);
-			// self.listFavorite = []
-
 			if(self.arrType.document.length > 0){
 				let dataDoc = self.arrType.document
 				this.getDocumentsApi(dataDoc,'listFavorite')
@@ -397,9 +398,10 @@ export default {
 .end-user-popup {
 	font: 13px Roboto;
 	overflow: hidden;
+	width:500px;
 }
 .end-user-popup >>> .tittle{
-	font: 18px Roboto;
+	font: 15px Roboto;
 	padding-left:8px;
 	font-weight:400
 
@@ -440,7 +442,7 @@ export default {
 .end-user-popup >>> .list-app-cointaner{
 	display: flex;
     flex-wrap: wrap;
-	width: 370px;
+	width: 460px;
 	margin-right:auto;
 	/* margin-left:auto; */
 	margin-left: 30px;

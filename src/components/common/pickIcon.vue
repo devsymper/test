@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="pick-icon"> 
         <v-menu offset-x
             :close-on-content-click="false"
             light
@@ -310,6 +310,9 @@ export default {
 </script>
 
 <style scoped>
+/* .pick-icon{
+	overflow: hidden;
+} */
     .sym-small-size >>> .v-input__slot,
     .sym-small-size >>> .v-input__control{
         background: #f5f5f5 !important;

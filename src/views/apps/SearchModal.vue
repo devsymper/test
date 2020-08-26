@@ -12,9 +12,23 @@
 				<div class="title-app" ><v-icon>{{itemT.icon}}</v-icon><h4> {{ itemT.title}}</h4> </div>
 				<ul class="app-child-item" v-for="(childItem,i) in itemT.item" :key="i" @click="clickItem(childItem,itemT.name)">
 					<li>
-								<span v-if="itemT.name == 'documents'">{{childItem.title}} <span style="font:10px;opacity:0.4">{{childItem.name}}</span></span>
-								<span v-else>{{childItem.name}}</span>
-						<v-icon v-if="sAppManagement[itemT.name].item.includes(childItem)" >mdi-check</v-icon> 
+						<div style="position:relative">
+							<v-tooltip bottom v-if="itemT.name == 'documents'">
+								<template v-slot:activator="{ on, attrs }">
+								<div class="title-document" 	
+									v-bind="attrs"
+									v-on="on" >
+									<span>{{childItem.title}}</span> 
+									<span style="font:10px;opacity:0.4">{{childItem.name}}</span>
+								</div>
+								</template>
+									<span style="font:13px roboto">{{childItem.title}}</span> 
+									<span style="font:8px;opacity:0.4">{{childItem.name}}</span>
+							</v-tooltip>
+							<div v-else>{{childItem.name}}</div>
+							<v-icon  v-if="sAppManagement[itemT.name].item.includes(childItem)" style="position:absolute;top:0px;right:0px">mdi-check</v-icon> 
+						</div>						
+							
 					</li>
 				</ul>
 			</div>
@@ -42,7 +56,7 @@ export default {
 				   ]
 			   },
 			   orgcharts:{
- 				   icon : 'mdi-widgets',
+ 				   icon : 'mdi-widgets-outline',
 				   title: this.$t('apps.listType.orgcharts'),
 				   name: 'orgcharts',
 				   item:[
@@ -152,6 +166,12 @@ export default {
 	padding-top:2px;
 	color: green;
 }
+.search-modal >>> .app-item .app-child-item .title-document{
+	white-space: nowrap; 
+	width: 480px; 
+	overflow: hidden;
+	text-overflow: ellipsis; 
+}
 .search-modal >>> .app-item li{
 	cursor: pointer;
 	padding: 8px 8px;
@@ -162,4 +182,8 @@ export default {
 	background-color:#f7f7f7;
 	border-radius: 5px;
 }
+/* .search-modal >>> {
+	background-color:#f7f7f7;
+	border-radius: 5px;
+} */
 </style>

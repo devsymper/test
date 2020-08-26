@@ -129,6 +129,7 @@
                                         <span>Switch role</span>
                                     </v-tooltip>
                                 </template>
+                                
                                 <UserRoleSelector></UserRoleSelector>
                             </v-menu>
                         </div>

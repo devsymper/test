@@ -309,13 +309,6 @@
                 }
             }
         },
-        "submit": {
-            "fab": {
-                "submit": "Submit",
-                "draft": "Save to Draft",
-                "toggleSize": "Toggle resize page"
-            }
-        },
         "process": {
             "header_bar": {
                 "undo": "Undo ",
@@ -458,7 +451,7 @@
         "clickToAdd": "Click to add item",
         "search": "Search",
         "favorite": "Favorite",
-        "listApp": "List applications",
+		"listApp": "List applications",
         "objectSummary": "Objects summary",
         "contextMenu": {
             "edit": "Edit",

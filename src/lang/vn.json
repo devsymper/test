@@ -312,13 +312,6 @@
                 }
             }
         },
-        "submit": {
-            "fab": {
-                "submit": "Gửi",
-                "draft": "Lưu bản nháp",
-                "toggleSize": "Thay đổi kích thước"
-            }
-        },
         "process": {
             "header_bar": {
                 "undo": "Undo ",
@@ -459,7 +452,9 @@
             "workflows": "Quy trình làm việc",
             "reports": "Báo cáo",
             "orgcharts": "Sơ đồ tổ chức"
-        },
+		},
+		"addApp": "Thêm ứng dụng",
+		"editApp": "Sửa ứng dụng",
         "title": "Applications",
         "pickIcon": "Chọn icon",
         "apps": "Applications",
@@ -469,7 +464,8 @@
         "clickToAdd": "Click vào để thêm",
         "search": "Tìm kiếm",
         "favorite": "Yêu thích",
-        "listApp": "Danh sách ứng dụng",
+		"listApp": "Danh sách ứng dụng",
+		
         "objectSummary": "Tổng hợp các chức năng",
         "contextMenu": {
             "edit": "Sửa",
