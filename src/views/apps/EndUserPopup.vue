@@ -22,7 +22,13 @@
 						<div class="title-favorite"><v-icon >mdi-playlist-star</v-icon><h4>{{$t('apps.favorite')}}</h4></div>
 						<ul style="margin:0 10px;">
 							<VuePerfectScrollbar style="max-height:200px"  >
-								<li v-for="(item,i) in listFavorite" :key="i"> <span v-if="item.hasOwnProperty('title')">{{item.title}}</span><span v-else>{{item.name}}</span> <v-icon  color="yellow" style="float:right;font-size:13px">mdi-star</v-icon></li>
+								<li v-for="(item,i) in listFavorite" :key="i" v-on:contextmenu="rightClickHandler($event,item,item.type)" style="cursor:pointer"> 
+									<div style="position:relative">
+										<div v-if="item.hasOwnProperty('title')" class="title-item-favorite">{{item.title}}</div>
+										<div v-else  class="title-item-favorite">{{item.name}}</div> 
+										<v-icon  color="#F6BE4F" style="float:right;font-size:13px;position:absolute;top:0px;right:0px">mdi-star</v-icon>
+									</div>
+								</li>
 							</VuePerfectScrollbar>
 						</ul>
 					</div>
@@ -33,9 +39,8 @@
 							<div v-for="(item,i) in apps" :key="i" 
 								class="list-app-item"
 								@click="clickDetails(item)"
-								
 								>
-								<div class="app-item-icon"
+								<div class="app-item-icon" 
 								>
 									<v-icon v-if="item.iconType == 'icon'">{{item.iconName}}</v-icon>
 									<img v-else-if="item.iconType == 'img'" :src="item.iconName" class="app-item-img"/>
@@ -72,6 +77,7 @@
         </v-tab-item>
       </v-tabs-items>
     </v-card>
+	<ContextMenu ref="contextMenu" />
   </div>
 </template>
 <script>
@@ -82,6 +88,7 @@ import {documentApi} from './../../api/Document';
 import {orgchartApi} from './../../api/orgchart';
 import {dashboardApi} from './../../api/dashboard';
 import BpmnEngine from './../../api/BPMNEngine';
+import ContextMenu from './ContextMenu.vue'
 export default {
 	data: function() {
         return {
@@ -126,24 +133,28 @@ export default {
 	created(){
 		this.getActiveapps()
 		this.getFavorite()
-		console.log(this.listFavorite);
 	},
 	mounted(){
 		 let thisCpn = this;
-	 	 $(document).click(function(e){
+	 		$(document).click(function(e){
 				if(!$(e.target).is('.menu') && !$(e.target).is('.menuItem')){
 					$('.menu').hide()		
 				}
 			});
 			$(document).click(function(e){
 				if(!$(e.target).is('.context-menu')){
-					thisCpn.$refs.appDetails.hideContextMenu()		
+					if(thisCpn.tab == 'tab-1'){
+						thisCpn.$refs.contextMenu.hide()
+					}else{
+						thisCpn.$refs.appDetails.hideContextMenu()		
+					}
 				}
 			})
 	},
 	components: {
 		VuePerfectScrollbar,
 		AppDetail,
+		ContextMenu
 	},
 	computed:{
 		sAppManagement(){
@@ -161,13 +172,29 @@ export default {
 		},
 		getFavorite(){
 			this.listFavorite= []
+			let self = this 
 			let userId = this.$store.state.app.endUserInfo.id
 			appManagementApi.getItemFavorite(userId).then(res =>{
 				if (res.status == 200) {
 					this.testListFavorite = res.data.listObject
 					res.data.listObject.forEach(function(e){
+						// self.mapIdFavorite[e.objectIdentifier] = e
+						if(e.objectType == 'document'){
+							self.mapIdFavorite.document[e.objectIdentifier] = e
+						}  
+						if(e.objectType == 'orgchart'){
+							self.mapIdFavorite.orgchart[e.objectIdentifier] = e
+						}  
+						if(e.objectType == 'workflow'){
+							self.mapIdFavorite.docuworkflowment[e.objectIdentifier] = e
+						}  
+						if(e.objectType == 'report'){
+							self.mapIdFavorite.report[e.objectIdentifier] = e
+						}  
 					})
 					this.checkTypeFavorite(res.data.listObject)
+					// this.updateFavoriteItem(self.mapIdFavorite,this.listFavorite)
+					console.log(this.listFavorite,'listFavorite');
 				}
 			}).catch((err) => {
 			});
@@ -206,6 +233,7 @@ export default {
 					}
 				).then(resDoc => {
 					if(type == "listFavorite"){
+						this.updateActionItem(self.mapIdFavorite.document,resDoc.data.listObject,'documents')
 						resDoc.data.listObject.forEach(function(e){
 							self.listFavorite.push(e)
 						})
@@ -232,6 +260,7 @@ export default {
 				]}).then(resOrg => {
 					if(type == 'listFavorite'){
 						if(resOrg.data.listObject.length > 0){
+							this.updateActionItem(self.mapIdFavorite.orgchart,resOrg.data.listObject,'orgcharts')
 							resOrg.data.listObject.forEach(function(e){
 								self.listFavorite.push(e)
 							})
@@ -259,6 +288,7 @@ export default {
 				]}).then(resRp => {
 					if(type == 'listFavorite'){
 						if(resRp.data.listObject.length > 0){
+							this.updateActionItem(self.mapIdFavorite.report,resRp.data.listObject,'reports')
 							resRp.data.listObject.forEach(function(e){
 								self.listFavorite.push(e)
 							})
@@ -286,6 +316,7 @@ export default {
 				]}).then(resW => {
 					if(type == 'listFavorite'){
 						if(resW.data.listObject.length > 0){
+							this.updateActionItem(self.mapIdFavorite.workflow,resW.data.listObject,'workflows')
 							resW.data.listObject.forEach(function(e){
 								self.listFavorite.push(e)
 							})
@@ -350,6 +381,26 @@ export default {
 			}
 			return array
 		},
+		updateActionItem(mapArray,array,type){
+			for( let [key,value] of Object.entries(mapArray)){
+				array.forEach(function(item){
+					if(item.id == key){
+						item.favorite = 1
+						item.actions = value.actions
+						item.type = type
+					} 
+				})
+			}
+			return array
+		},
+		rightClickHandler(event,item,type){
+			event.stopPropagation();
+			event.preventDefault();
+			this.$refs.contextMenu.setContextItem(item.actions)
+			this.$refs.contextMenu.show(event)
+			this.$refs.contextMenu.setItem(item)
+			this.$refs.contextMenu.setType(type)
+		},
 		checkChildrenApp(data){
 			let self = this 
 			self.arrType.orgchart = []
@@ -389,7 +440,8 @@ export default {
 				let dataRep = self.arrType.report
 				this.getDashBoardApi(dataRep);
 			}
-		}
+		},
+		
 	}
 
 }
@@ -408,6 +460,12 @@ export default {
 }
 .end-user-popup >>> .list-favorite ul{
 	list-style: none;
+}
+.end-user-popup >>> .list-favorite .title-item-favorite{
+	white-space: nowrap; 
+	width: 410px; 
+	overflow: hidden;
+	text-overflow: ellipsis; 
 }
 .end-user-popup >>> .list-favorite li{
 	padding: 5px 10px;
