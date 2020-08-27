@@ -101,31 +101,31 @@ export default {
 		 listFavorite:[],
 		 testListFavorite:[],
 		 arrType:{
-			 document:[],
+			 document_definition:[],
 			 orgchart:[],
-			 report:[],
-			 workflow:[],
+			 dasboard:[],
+			 workflow_definition:[],
 		 },
 		 title:{
 		 },
 		 mapId:{
 			 orgchart:{
 			 },
-			 document:{
+			 document_definition:{
 			 },
-			 report:{
+			 dasboard:{
 			 },
-			 workflow:{
+			 workflow_definition:{
 			 }
 		 },
 		 mapIdFavorite:{
 			 orgchart:{
 			 },
-			 document:{
+			 document_definition:{
 			 },
-			 report:{
+			 dasboard:{
 			 },
-			 workflow:{
+			 workflow_definition:{
 			 }
 		 },
 		 }
@@ -175,25 +175,25 @@ export default {
 			let self = this 
 			let userId = this.$store.state.app.endUserInfo.id
 			appManagementApi.getItemFavorite(userId).then(res =>{
+				debugger
 				if (res.status == 200) {
-					this.testListFavorite = res.data.listObject
+					// this.testListFavorite = res.data.listObject
 					res.data.listObject.forEach(function(e){
 						// self.mapIdFavorite[e.objectIdentifier] = e
-						if(e.objectType == 'document'){
-							self.mapIdFavorite.document[e.objectIdentifier] = e
+						if(e.objectType == 'document_definition'){
+							self.mapIdFavorite.document_definition[e.objectIdentifier] = e
 						}  
 						if(e.objectType == 'orgchart'){
 							self.mapIdFavorite.orgchart[e.objectIdentifier] = e
 						}  
-						if(e.objectType == 'workflow'){
-							self.mapIdFavorite.docuworkflowment[e.objectIdentifier] = e
+						if(e.objectType == 'workflow_definition'){
+							self.mapIdFavorite.workflow_definition[e.objectIdentifier] = e
 						}  
-						if(e.objectType == 'report'){
-							self.mapIdFavorite.report[e.objectIdentifier] = e
+						if(e.objectType == 'dasboard'){
+							self.mapIdFavorite.dasboard[e.objectIdentifier] = e
 						}  
 					})
 					this.checkTypeFavorite(res.data.listObject)
-					console.log(this.listFavorite,'listFavorite');
 				}
 			}).catch((err) => {
 			});
@@ -232,13 +232,13 @@ export default {
 					}
 				).then(resDoc => {
 					if(type == "listFavorite"){
-						this.updateActionItem(self.mapIdFavorite.document,resDoc.data.listObject,'documents')
+						this.updateActionItem(self.mapIdFavorite.document_definition,resDoc.data.listObject,'documents')
 						resDoc.data.listObject.forEach(function(e){
 							self.listFavorite.push(e)
 						})
 					}
 					else{
-						this.updateFavoriteItem(self.mapId.document,resDoc.data.listObject)
+						this.updateFavoriteItem(self.mapId.document_definition,resDoc.data.listObject)
 						this.$store.commit('appConfig/updateChildrenApps',{obj:resDoc.data.listObject,type:'documents'});
 					}
 				});
@@ -287,14 +287,14 @@ export default {
 				]}).then(resRp => {
 					if(type == 'listFavorite'){
 						if(resRp.data.listObject.length > 0){
-							this.updateActionItem(self.mapIdFavorite.report,resRp.data.listObject,'reports')
+							this.updateActionItem(self.mapIdFavorite.dasboard,resRp.data.listObject,'reports')
 							resRp.data.listObject.forEach(function(e){
 								self.listFavorite.push(e)
 							})
 						}
 					}
 					else{
-						this.updateFavoriteItem(self.mapId.report,resRp.data.listObject)
+						this.updateFavoriteItem(self.mapId.dasboard,resRp.data.listObject)
 						this.$store.commit('appConfig/updateChildrenApps',{obj:resRp.data.listObject,type:'reports'});
 					}
 				});
@@ -315,52 +315,52 @@ export default {
 				]}).then(resW => {
 					if(type == 'listFavorite'){
 						if(resW.data.listObject.length > 0){
-							this.updateActionItem(self.mapIdFavorite.workflow,resW.data.listObject,'workflows')
+							this.updateActionItem(self.mapIdFavorite.workflow_definition,resW.data.listObject,'workflows')
 							resW.data.listObject.forEach(function(e){
 								self.listFavorite.push(e)
 							})
 						}
 					}
 					else{
-						this.updateFavoriteItem(self.mapId.workflow,resW.data.listObject)
+						this.updateFavoriteItem(self.mapId.workflow_definition,resW.data.listObject)
 						this.$store.commit('appConfig/updateChildrenApps',{obj:resW.data.listObject,type:'workflows'});
 					}
 				});
 		},
 		checkTypeFavorite(data){
 			let self = this
-			self.arrType.document = []
+			self.arrType.document_definition = []
 			self.arrType.orgchart = []
-			self.arrType.report = []
-			self.arrType.workflow = []
+			self.arrType.dasboard = []
+			self.arrType.workflow_definition = []
 			data.forEach(function(e){
-				if(e.objectType == 'document'){
-					self.arrType.document.push(e.objectIdentifier)
+				if(e.objectType == 'document_definition'){
+					self.arrType.document_definition.push(e.objectIdentifier)
 				}
 				if(e.objectType == 'orgchart'){
 					self.arrType.orgchart.push(e.objectIdentifier)
 				}
-				if(e.objectType == 'report'){
-					self.arrType.report.push(e.objectIdentifier)
+				if(e.objectType == 'dasboard'){
+					self.arrType.dasboard.push(e.objectIdentifier)
 				}
-				if(e.objectType == 'workflow'){
-					self.arrType.workflow.push(e.objectIdentifier)
+				if(e.objectType == 'workflow_definition'){
+					self.arrType.workflow_definition.push(e.objectIdentifier)
 				}
 			});
-			if(self.arrType.document.length > 0){
-				let dataDoc = self.arrType.document
+			if(self.arrType.document_definition.length > 0){
+				let dataDoc = self.arrType.document_definition
 				this.getDocumentsApi(dataDoc,'listFavorite')
 			}
 			if(self.arrType.orgchart.length > 0){
 				let dataOrg = self.arrType.orgchart
 				this.getOrgchartApi(dataOrg,'listFavorite')
 			}
-			if(self.arrType.report.length > 0){
-				let dataRep = self.arrType.report
+			if(self.arrType.dasboard.length > 0){
+				let dataRep = self.arrType.dasboard
 				this.getDashBoardApi(dataRep,'listFavorite')
 			}
-			if(self.arrType.workflow.length > 0){
-				let dataW = self.arrType.workflow
+			if(self.arrType.workflow_definition.length > 0){
+				let dataW = self.arrType.workflow_definition
 				this.getWorkFlowApi(dataW,'listFavorite')
 			}
 		},
@@ -403,40 +403,39 @@ export default {
 		checkChildrenApp(data){
 			let self = this 
 			self.arrType.orgchart = []
-			self.arrType.document = []
-			self.arrType.report = []
-			self.arrType.workflow = []
+			self.arrType.document_definition = []
+			self.arrType.dasboard = []
+			self.arrType.workflow_definition = []
 			if(data.hasOwnProperty('orgchart')){
 				data.orgchart.forEach(function(e){
 					self.arrType.orgchart.push(e.id);
 					self.mapId.orgchart[e.id] = e;
 				})
-				console.log(self.mapId.orgchart);
 				let dataOrg = self.arrType.orgchart;
 				this.getOrgchartApi(dataOrg)
 			}	
-			if(data.hasOwnProperty('document')){
-				data.document.forEach(function(e){
-					self.arrType.document.push(e.id);
-					self.mapId.document[e.id] = e;
+			if(data.hasOwnProperty('document_definition')){
+				data.document_definition.forEach(function(e){
+					self.arrType.document_definition.push(e.id);
+					self.mapId.document_definition[e.id] = e;
 				})
-				let dataDoc = self.arrType.document
+				let dataDoc = self.arrType.document_definition
 				this.getDocumentsApi(dataDoc);
 			}
-			if(data.hasOwnProperty('workflow')){
+			if(data.hasOwnProperty('workflow_definition')){
 				data.workflow.forEach(function(e){
-					self.arrType.workflow.push(e.id);
-					self.mapId.workflow[e.id] = e;
+					self.arrType.workflow_definition.push(e.id);
+					self.mapId.workflow_definition[e.id] = e;
 				})
-				let dataW = self.arrType.workflow
+				let dataW = self.arrType.workflow_definition
 				this.getWorkFlowApi(dataW)
 			}
-			if(data.hasOwnProperty('report')){
-				data.report.forEach(function(e){
-					self.arrType.report.push(e.id);
-					self.mapId.report[e.id] = e;
+			if(data.hasOwnProperty('dasboard')){
+				data.dasboard.forEach(function(e){
+					self.arrType.dasboard.push(e.id);
+					self.mapId.dasboard[e.id] = e;
 				})
-				let dataRep = self.arrType.report
+				let dataRep = self.arrType.dasboard
 				this.getDashBoardApi(dataRep);
 			}
 		},
