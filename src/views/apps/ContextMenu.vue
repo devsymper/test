@@ -69,13 +69,11 @@
 			this.type = type
 		},
 		clickAction(action){
-			debugger
 			this.defineAction[this.type].action = action;
 			console.log(this.defineAction[this.type]);
 			console.log(this.targetItem);
 			this.hide()
 			let targetItem = this.targetItem
-			debugger
 			this.$evtBus.$emit('symper-app-call-action-handler', this.defineAction[this.type], this, {id:targetItem.id,name:targetItem.name,title:targetItem.title});
 
 		}

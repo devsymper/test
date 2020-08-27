@@ -7,7 +7,6 @@ const commonProps = {
         type: "autocomplete",
         groupType: "name",
         items: function() {
-            debugger
             return [];
         }
     },

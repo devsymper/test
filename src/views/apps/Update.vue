@@ -169,13 +169,13 @@ export default {
 				status: false,
 			},
 			childrenApp:{
-				document:[
+				document_definition:[
 				],
 				orgchart:[
 				],
-				report:[
+				dasboard:[
 				],
-				workflow:[
+				workflow_definition:[
 				]
 			},
             allObjectToImport: [],
@@ -184,27 +184,27 @@ export default {
         };
     },
     mounted(){
-		this.checkEmpty()	
+		// this.checkEmpty()	
     },
     methods: {
         setAppObject(app) {
             this.currentApp = JSON.parse(JSON.stringify(app));
 		},
-		checkEmpty(){
-			if(this.sApp.documents.item.length == 0 && this.sApp.orgcharts.item.length == 0 && this.sApp.reports.item.length == 0 && this.sApp.workflows.item.length == 0 ){
-				this.isEmpty = true;
-			}
-			else this.isEmpty = false;
-		},
+		// checkEmpty(){
+		// 	if(this.sApp.documents.item.length == 0 && this.sApp.orgcharts.item.length == 0 && this.sApp.reports.item.length == 0 && this.sApp.workflows.item.length == 0 ){
+		// 		this.isEmpty = true;
+		// 	}
+		// 	else this.isEmpty = false;
+		// },
 		updateListItem(data){
 			let self = this;
-			self.childrenApp.document = []
+			self.childrenApp.document_definition = []
 			self.childrenApp.orgchart = []
-			self.childrenApp.report = []
-			self.childrenApp.workflow = []
+			self.childrenApp.dasboard = []
+			self.childrenApp.workflow_definition = []
 			if(data.documents.item.length > 0){
 				data.documents.item.forEach(function(e){
-					self.childrenApp.document.push(e.id);
+					self.childrenApp.document_definition.push(e.id);
 				});
 			}
 			if(data.orgcharts.item.length > 0){
@@ -214,12 +214,12 @@ export default {
 			}
 			if(data.reports.item.length > 0){
 				data.reports.item.forEach(function(e){
-				self.childrenApp.report.push(e.id);
+				self.childrenApp.dasboard.push(e.id);
 			});
 			}
 			if(data.workflows.item.length > 0){
 				data.workflows.item.forEach(function(e){
-					self.childrenApp.workflow.push(e.id);
+					self.childrenApp.workflow_definition.push(e.id);
 				});
 			}
 			self.currentApp.childrenApp = self.childrenApp
@@ -231,44 +231,6 @@ export default {
 		selectedItem(data){
 			this.listSelectedItem = data;
 		},
-        // toggleObject(item, type) {
-        //     item.checked = item.checked == 0 ? 1: 0;
-        //     for (const index in this.allObjectToImport) {
-        //         let list = this.allObjectToImport[index];
-        //         if (list.type == type) {
-        //             for (const i in list.objects) {
-        //                 const element = list.objects[i];
-        //                 if (element.id == item.id) {
-        //                     this.allObjectToImport[index].objects[i].checked = item.checked;
-        //                     this.resetAppObject();
-        //                     break;
-        //                 }
-        //             }
-        //         }
-        //     }
-        // },
-        // resetAppObject() {
-        //     this.appObjects = [];
-        //     this.allObjectToImport.forEach(obj => {
-        //         let group = {
-        //             type: obj.type,
-        //             objects: []
-        //         };
-        //         for (const item of obj.objects) {
-        //             if(item.checked == 1) {
-        //                 group.objects.push(item);
-        //             }
-        //         }
-        //         this.appObjects.push(group);
-        //     });
-        // },
-      
-        // resetResult() {
-        //     this.listObjectToShows = JSON.parse(JSON.stringify(this.allObjectToImport));
-        //     for (const index in this.listObjectToShows) {
-        //         this.listObjectToShows[index].objects = this.listObjectToShows[index].objects.slice(0, 10);
-        //     }
-        // },
         addApp() {
             if(this.isEdit) {
                 this.updateApp();
@@ -286,7 +248,7 @@ export default {
         createApp() {
 			this.updateListItem(this.$store.state.appConfig.listItemSelected)
 			let data = JSON.stringify(this.currentApp);
-			// console.log(this.currentApp.iconName);
+			debugger
 			appManagementApi.addApp(data).then(res => {
 				 this.$emit("add-app", res)
 			}).catch(err => {
@@ -304,6 +266,7 @@ export default {
 			}
 			this.updateListItem(this.$store.state.appConfig.listItemSelected)
 			let data = JSON.stringify(this.currentApp);
+			debugger
 			appManagementApi.updateApp(data).then(res => {
 				  this.$emit("update-app", res)
 			}).catch(err => {

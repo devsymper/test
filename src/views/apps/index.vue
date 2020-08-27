@@ -47,7 +47,6 @@ export default {
     created(){
 		let self = this;
 		this.$store.dispatch('actionPack/getAllActionByObjectType')
-		
     },
     data: function() {
         return {
@@ -72,7 +71,6 @@ export default {
 											icon = document.createElement('i');	
 											icon.classList.add('mdi');
 											icon.classList.add(value);
-											// icon.style.lineHeight = "20px";
 											$(icon).css('font-size','16px')
 											td.appendChild(icon);
                                        		 return td;
@@ -98,7 +96,6 @@ export default {
 											icon.classList.add('mdi-check');
 											$(icon).css('color','green')
 											$(icon).css('font-size','16px')
-											// icon.style.lineHeight = "15px";
 											td.appendChild(icon);
 											return td;
 										}
@@ -116,9 +113,13 @@ export default {
                     text: this.$t("apps.contextMenu.edit"),
                     callback: (app, callback) => {
                         this.editCallback = callback;
-                        appManagementApi.getAppDetails(app.id).then(res => {
+                        appManagementApi.getAppDetailBa(app.id).then(res => {
                         if (res.status == 200) {
-							 this.checkChildrenApp(res.data.listObject.childrenApp)
+							if(Object.keys(res.data.listObject.childrenApp).length > 0){
+								this.checkChildrenApp(res.data.listObject.childrenApp)
+							}else{
+								this.$store.commit('appConfig/emptyItemSelected')
+							}
                              this.showEditAppPanel(res.data.listObject)   
                         }else {
                             this.showError()
@@ -139,13 +140,13 @@ export default {
             ],
 			tableHeight: 0,
 			arrType:{
-				document:[
+				document_definition:[
 				],
 				orgchart:[
 				],
-				report:[
+				dasboard:[
 				],
-				workflow:[
+				workflow_definition:[
 				]
 			},
         };
@@ -179,9 +180,9 @@ export default {
                 text: this.$t('notification.error')
             })
         },
-        deleteApp(app) {
+        deleteApp(app){
             appManagementApi.deleteApp(app[0].id)
-            .then(res => {
+            .then(res =>{
                 if (res.status == 200) {
                     this.removeCallback(res);   
                     this.$snotify({
@@ -235,19 +236,19 @@ export default {
 					self.arrType.orgchart.push(e.id)
 				});
 			}
-			if(data.hasOwnProperty('document')){
-				data.document.forEach(function(e){
-					self.arrType.document.push(e.id)
+			if(data.hasOwnProperty('document_definition')){
+				data.document_definition.forEach(function(e){
+					self.arrType.document_definition.push(e.id)
 				});
 			}
-			if(data.hasOwnProperty('report')){
-				data.report.forEach(function(e){
-					self.arrType.report.push(e.id)
+			if(data.hasOwnProperty('dasboard')){
+				data.dasboard.forEach(function(e){
+					self.arrType.dasboard.push(e.id)
 				});
 			}
-			if(data.hasOwnProperty('workflow')){
-				data.workflow.forEach(function(e){
-					self.arrType.workflow.push(e.id)
+			if(data.hasOwnProperty('workflow_definition')){
+				data.workflow_definition.forEach(function(e){
+					self.arrType.workflow_definition.push(e.id)
 				});
 			}
 			if(self.arrType.orgchart.length > 0){
@@ -268,8 +269,8 @@ export default {
 					this.$store.commit('appConfig/updateChildrenApps',{obj:resOrg.data.listObject,type:'orgcharts'});
 				});
 			}
-			if(self.arrType.document.length > 0){
-						let dataDoc = self.arrType.document;
+			if(self.arrType.document_definition.length > 0){
+						let dataDoc = self.arrType.document_definition;
 						documentApi.searchListDocuments(
 							{
 								search:'',
@@ -288,8 +289,8 @@ export default {
 							this.$store.commit('appConfig/updateChildrenApps',{obj:resDoc.data.listObject,type:'documents'});
 						});
 			}
-			if(self.arrType.workflow.length > 0){
-						let dataW = self.arrType.workflow;
+			if(self.arrType.workflow_definition.length > 0){
+						let dataW = self.arrType.workflow_definition;
 						BpmnEngine.getListModels({
 										search:'',
 										pageSize:50,
@@ -305,8 +306,8 @@ export default {
 							this.$store.commit('appConfig/updateChildrenApps',{obj:resW.data.listObject,type:'workflows'});
 						});
 			}
-			if(self.arrType.report.length > 0){
-				let dataRep = self.arrType.report;
+			if(self.arrType.dasboard.length > 0){
+				let dataRep = self.arrType.dasboard;
 				dashboardApi.getDashboards({
 								search:'',
 								pageSize:50,
@@ -323,9 +324,9 @@ export default {
 				});
 			}
 			self.arrType.orgchart = []
-			self.arrType.document = []
-			self.arrType.workflow = []
-			self.arrType.report = []
+			self.arrType.document_definition = []
+			self.arrType.workflow_definition = []
+			self.arrType.dasboard = []
 		}
     },
 };
