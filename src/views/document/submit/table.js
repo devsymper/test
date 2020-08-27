@@ -148,6 +148,8 @@ const makeDelay = function(ms) {
     };
 };
 var delay = makeDelay(1000);
+var lastKey;
+
 /**
  * Các loại cell mà handsontable hỗ trợ hiển thị
  */
@@ -236,6 +238,10 @@ export default class Table {
 
 
                     beforeKeyDown: function(event) {
+                        if (thisObj.tableHasRowSum && thisObj.currentSelectedCell['row'] == this.countRows() - 1) {
+                            return;
+                        }
+
                         if (event.ctrlKey || event.altKey || event.metaKey) {
                             return;
                         }
@@ -254,7 +260,6 @@ export default class Table {
                                 event.curTarget = this.getActiveEditor().TEXTAREA;
                                 SYMPER_APP.$evtBus.$emit('document-submit-user-input-change', event)
                             }
-
                             // chặn bấm lên xuống trái phải khi có autocomplete
                             if ((event.keyCode == 40 || event.keyCode == 38 ||
                                     event.keyCode == 37 || event.keyCode == 39) && thisObj.showPopupUser != false) {
@@ -270,8 +275,6 @@ export default class Table {
                                     SYMPER_APP.$evtBus.$emit('document-submit-user-input-change', event)
                                 }, 50, this);
                             }
-
-
                         } else {
                             if (event.keyCode == 13) {
                                 return;
@@ -286,6 +289,7 @@ export default class Table {
                                 }
                                 // hoangnd: cần set timeout ở đây tại vì cần thực hiện đoạn này sau khi keydown hoàn tất thì input mới có dữ liệu
                                 setTimeout(() => {
+                                    console.log("dsadasdsadsads");
                                     let columns = thisObj.columnsInfo.columns;
                                     let formulasInstance = thisObj.listAutoCompleteColumns[thisObj.currentControlSelected]
                                     event.rowIndex = thisObj.currentSelectedCell['row'];
@@ -300,10 +304,7 @@ export default class Table {
                                         controlName: columns[columnIndex].data
                                     })
                                 }, 50);
-
                             }
-
-
                         }
                     },
                     afterOnCellMouseDown: function(event, coords, TD) {
@@ -324,7 +325,16 @@ export default class Table {
                             instance: thisObj.keyInstance
                         });
                     },
-
+                    afterDocumentKeyDown: function(e) {
+                        if (lastKey === 'Shift') {
+                            if (e.key === 'Enter') {
+                                this.alter('insert_row', thisObj.currentSelectedCell.row + 1, 1);
+                            } else if (e.key === 'Delete') {
+                                this.alter('remove_row', thisObj.currentSelectedCell.row, 1);
+                            }
+                        }
+                        lastKey = e.key;
+                    },
                     afterChange: function(changes, source) {
 
                         if (changes == null) {
@@ -381,17 +391,7 @@ export default class Table {
                                 thisObj.handlerRunFormulasForControlInTable('uniqueDB', controlUnique, dataInput, controlUnique.controlFormulas.uniqueDB);
                             }
                         }
-                        if (event != undefined && event.type == 'keydown' && event.keyCode == 13 && source == 'edit') {
-                            if (thisObj.tableHasRowSum) {
-                                if (thisObj.currentSelectedCell.row + 2 == this.getData().length) {
-                                    this.alter('insert_row', thisObj.currentSelectedCell.row + 1, 1);
-                                }
-                            } else {
-                                if (thisObj.currentSelectedCell.row + 1 == this.getData().length) {
-                                    this.alter('insert_row', thisObj.currentSelectedCell.row + 1, 1);
-                                }
-                            }
-                        }
+
                     }
                 }
             listTableInstance[this.tableName] = this;
@@ -870,10 +870,9 @@ export default class Table {
                 if (!this.reRendered && thisObj.tableHasRowSum) {
                     this.reRendered = true;
                     setTimeout((hotTb) => {
-                        // hotTb.getPlugin('hiddenColumns').hiddenColumns(thisObj.columnsInfo.hiddenColumns)
-                        // for (let index = 0; index < hotTb.getDataAtRow(0).length; index++) {
-                        //     // hotTb.setCellMeta(hotTb.countRows() - 1, index, 'readOnly', true);
-                        // }
+                        for (let index = 0; index < hotTb.getDataAtRow(0).length; index++) {
+                            hotTb.setCellMeta(hotTb.countRows() - 1, index, 'readOnly', true);
+                        }
                         hotTb.render();
                     }, 500, this);
                 }
@@ -888,6 +887,11 @@ export default class Table {
                             let CharAt = String.fromCharCode(65 + columnHasSum[controlName]);
                             let sumValue = '=SUM(' + CharAt + '1:' + CharAt + '' + (hotTb.countRows() - 1) + ')'
                             hotTb.setDataAtCell(hotTb.countRows() - 1, colIndex, sumValue, AUTO_SET);
+
+                        }
+                        for (let index = 0; index < hotTb.getDataAtRow(0).length; index++) {
+                            hotTb.setCellMeta(hotTb.countRows() - 1, index, 'readOnly', true);
+                            hotTb.setCellMeta(hotTb.countRows() - 2, index, 'readOnly', false);
                         }
                     }
                 });
