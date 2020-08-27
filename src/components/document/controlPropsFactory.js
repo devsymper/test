@@ -10,7 +10,7 @@ const commonProps = {
         //     debugger
         //     return [];
         // },
-        options: [{ id: '124', name: 'dataflow_1', title: 'dataflow 1' }, { id: '125', name: 'dataflow_2', title: 'dataflow 2' }],
+        options: [],
     },
     name: {
         title: "Tên",
@@ -118,6 +118,12 @@ const commonProps = {
     // },
     isPrimaryKey: {
         title: "Định danh",
+        type: "checkbox",
+        value: false,
+        groupType: "display"
+    },
+    isRefreshData: {
+        title: "Làm mới giá trị",
         type: "checkbox",
         value: false,
         groupType: "display"

@@ -258,6 +258,7 @@ export default {
 			isDraft:0,
             preDataSubmit:{},
             objectIdentifier:{},
+            otherInfo:{},
             listDataFlow:[]
         };
 
@@ -589,6 +590,11 @@ export default {
         },
         '$route' (to) {
             this.$refs.symDragPanel.hide();         
+        },
+        "sDocumentSubmit.readySubmit":function(data){
+            if(data == true){
+                this.submitDocument()
+            }
         }
     },
     
@@ -784,7 +790,7 @@ export default {
          */
         handleInputChangeBySystem(controlName,valueControl, fromAutocomplete = false){
             let controlInstance = getControlInstanceFromStore(this.keyInstance,controlName);
-            if(controlInstance.getValue() == valueControl){ // kiểm tra ko có sự thay đổi giá trị của control thì return
+            if(controlInstance.getValue() == valueControl && this.sDocumentSubmit.docStatus != 'beforeSubmit'){ // kiểm tra ko có sự thay đổi giá trị của control thì return
                 return;
             }
             controlInstance.setValue(valueControl)
@@ -817,7 +823,7 @@ export default {
                     controlInstance.removeValidateIcon()
                 }
             }
-            resetImpactedFieldsList(this.keyInstance);
+            // resetImpactedFieldsList(this.keyInstance);
             this.handleControlInputChange(controlName);
         },
         /**
@@ -876,8 +882,10 @@ export default {
                             thisCpn.documentName = res.data.document.name;
 							thisCpn.contentDocument = content;
 							if(res.data.document.dataPrepareSubmit != "" && res.data.document.dataPrepareSubmit != null)
-							thisCpn.preDataSubmit = JSON.parse(res.data.document.dataPrepareSubmit);
-							thisCpn.objectIdentifier = JSON.parse(res.data.document.objectIdentifier);
+                            thisCpn.preDataSubmit = JSON.parse(res.data.document.dataPrepareSubmit);
+                            if(res.data.document.otherInfo != "" && res.data.document.otherInfo != null)
+							thisCpn.otherInfo = JSON.parse(res.data.document.otherInfo);
+							thisCpn.objectIdentifier = thisCpn.otherInfo.objectIdentifier;
                             setDataForPropsControl(res.data.fields,thisCpn.keyInstance,'submit'); // ddang chay bat dong bo
                             setTimeout(() => {
                                 thisCpn.processHtml(content);
@@ -1152,7 +1160,7 @@ export default {
         handlerSubmitDocumentClick(){
             if($('.validate-icon').length == 0 && $('.error').length == 0){
                 if(this.viewType == 'submit'){
-                    this.submitDocument();
+                    this.handleRefreshDataBeforeSubmit();
                 }
                 else{
                     this.updateDocumentObject();
@@ -1177,7 +1185,7 @@ export default {
         },
 
 
-        
+        // Hàm chỉ ra control được đánh định danh trong document (sct...)
         getColumnIdentifier(){
             let controlIdentifier = {}
             let controlNameIdentifier = this.objectIdentifier['name'];
@@ -1191,11 +1199,48 @@ export default {
             return controlIdentifier;
             
         },
+        handleRefreshDataBeforeSubmit(){
+            this.$store.commit("document/addToDocumentSubmitStore", {
+                            key: 'docStatus',
+                            value: 'beforeSubmit',
+                            instance: this.keyInstance
+                        });
+            if(this.otherInfo.hasOwnProperty('refreshControl') && this.otherInfo.refreshControl.length > 0){
+                let refreshControl = this.otherInfo.refreshControl
+                let dataImpactedControlRefresh = {}
+                for (let index = 0; index < refreshControl.length; index++) {
+                    let controlName = refreshControl[index];
+                    let dataImpactedControl = util.cloneDeep(this.sDocumentSubmit.impactedFieldsList[controlName]);
+                    for(let control in dataImpactedControl){
+                        dataImpactedControl[control] = false
+                    }
+                    dataImpactedControlRefresh[controlName] = dataImpactedControl;
+                }
+                
+                this.$store.commit("document/addToDocumentSubmitStore", {
+                    key: 'dataImpactedControlRefresh',
+                    value: dataImpactedControlRefresh,
+                    instance: this.keyInstance
+                });
+                for (let index = 0; index < refreshControl.length; index++) {
+                    let controlName = refreshControl[index];
+                    let controlInstance = getControlInstanceFromStore(this.keyInstance,controlName);
+                    if(!controlInstance.controlFormulas.hasOwnProperty('formulas')){
+                        continue;
+                    }
+                    let formulas = controlInstance.controlFormulas.formulas.instance
+                    this.handlerBeforeRunFormulasValue(formulas,controlInstance.id,controlName,'formulas')
+                }
+            }
+            else{
+                submitDocument()
+            }
+            
+        },
         /**
          * Hàm gọi api submit document
          */
         submitDocument(){
-            
             this.isSubmitting = true;
             let thisCpn = this;
             let dataPost = this.getDataPostSubmit();
