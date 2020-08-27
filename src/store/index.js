@@ -8,6 +8,8 @@ import permissionModule from "./permission";
 import actionPackModule from "./actionPack";
 import comment from "./comment";
 import AppConfig from "./AppConfig";
+import searchModule from './search';
+
 Vue.use(Vuex);
 
 export default new Vuex.Store({
@@ -20,5 +22,6 @@ export default new Vuex.Store({
         actionPack: actionPackModule,
         comment: comment,
         appConfig: AppConfig,
+        search: searchModule,
     }
 });

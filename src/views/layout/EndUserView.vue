@@ -4,7 +4,7 @@
         <v-content>
             <v-container fluid fill-height class="pa-0">
                 <div class="w-100 app-header-bg-color" style="border-bottom:1px solid #e6e5e5">
-                    <div style="width:calc(100% - 200px)" class="float-left">
+                    <div style="width:calc(100% - 500px)" class="float-left">
                         <v-tabs
                             hide-slider
                             active-class="symper-tab-active"
@@ -29,10 +29,17 @@
                         </v-tabs>
                     </div>
                     <div
-                        class="float-right app-header-bg-color"
-                        style="height:40px; line-height:40px;"
+                        class="float-right app-header-bg-color d-flex justify-end "
+                        style="widh:500px;height:40px; line-height:40px;"
                     >
-                       <v-menu
+                     <!-- search -->
+                    <div v-show="showSearchInput" class="d-flex justify-center align-items-center">
+                        <transition name="slide-fade">
+                            <SearchInput v-show="showSearchInput" class="mr-2" style="width:330px"/>
+                        </transition>
+                    </div>
+                    <!--kết thúc search--->
+                        <v-menu
                             v-model="isShowDialog"
                             :close-on-content-click="false"
                             :max-width="500"
@@ -48,7 +55,7 @@
                             <EndUserPopup  />
 							<!-- <div>hello</div> -->
                         </v-menu>
-                        <v-btn icon>
+                        <v-btn icon @click="showSearchInput = !showSearchInput">
                             <v-icon>mdi-magnify</v-icon>
                         </v-btn>
                        
@@ -97,6 +104,8 @@ import BASidebar from "@/components/common/BASidebar.vue";
 import listApp from "@/components/common/listApp";
 import EndUserPopup from './../apps/EndUserPopup.vue';
 import NotificationBar from "@/components/notification/NotificationBar.vue";
+import Search from "@/components/search/Search";
+
 export default {
     methods: {
         /**
@@ -151,7 +160,8 @@ export default {
         "ba-sidebar": BASidebar,
         "list-app": listApp,
         "list-notification": NotificationBar,
-        EndUserPopup
+        EndUserPopup,
+        SearchInput: Search
     },
     created() {
         let self = this;
@@ -187,6 +197,7 @@ export default {
     },
     data: function() {
         return {
+            showSearchInput: false,
             isShowDialog: false,
 			isShowDialogNotification: false,
         };
