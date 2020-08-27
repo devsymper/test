@@ -36,7 +36,7 @@
 								</tr>
 								<tr>
 									<td>{{$t('document.detail.sidebar.body.general.history')}}</td>
-									<td style="text-decoration: underline;cursor:pointer;color:#F1853B;">Đã sửa 2 lần</td>
+									<td @click="showHistory" style="text-decoration: underline;cursor:pointer;color:#F1853B;">Đã sửa 2 lần</td>
 								</tr>
 								<tr>
 									<td>{{$t('document.detail.sidebar.body.general.comment')}}</td>
@@ -95,11 +95,11 @@
 			</v-expansion-panels>
 		</VuePerfectScrollbar>
 	</div>
-	<div class="history-info">
+	<div class="history-info" style="transform:translateX(300px)">
 		<div style="display:flex;">
-			<!-- <span class="mdi mdi-close" @click="hide"></span> -->
+			<span class="mdi mdi-keyboard-backspace" @click="hideHistory"></span>
 			<span style="font-size:15px;">LỊCH SỬ CHỈNH SỬA</span>
-			<span class="mdi mdi-close" @click="hide"></span>
+			<!-- <span class="mdi mdi-close" @click="hide"></span> -->
 		</div>
 
 		<v-divider></v-divider>
@@ -158,8 +158,8 @@ export default {
 			listApprovalUser:[],
 			listRelatedUser:[],
 			listHistoryControl:[
-                {date:'18/08/2020 11:20', userUpdate:'971', historyid:2, controls:[{id:'s-control-id-1596780634836',data:[]},{id:'s-control-id-1596780602772',data:[]},{id:'s-control-id-1596780611212',data:[]}]},
-                {date:'18/08/2020 11:20', userUpdate:'971', historyid:1, controls:[{id:'s-control-id-1596780602772',data:[]}]},
+                {date:'18/08/2020 11:20', userUpdate:'Nguyễn Đình Hoang', historyid:2, controls:[{id:'s-control-id-1596780634836',data:[]},{id:'s-control-id-1596780602772',data:[]},{id:'s-control-id-1596780611212',data:[]}]},
+                {date:'18/08/2020 11:20', userUpdate:'Nguyễn Đình Hoang', historyid:1, controls:[{id:'s-control-id-1596780602772',data:[]}]},
             ],
 		}
 	},
@@ -194,6 +194,7 @@ export default {
 		}
 	},
 	watch:{
+		
 		isShowSidebar(after){
 			this.isShow = !this.isShow
 		},
@@ -253,7 +254,13 @@ export default {
 				$("#"+control.id).addClass('highlight-history');
 			}
 			
-		}
+		},
+		hideHistory(){
+			$('.history-info').css({transform:'translateX(300px)'})
+		},
+		showHistory(){
+			$('.history-info').css({transform:'translateX(0px)'})
+		},
 	},
 
 
@@ -376,6 +383,22 @@ export default {
 	}
 	.history-item__action .mdi-backup-restore{
 		font-size: 15px;
+	}
+	.history-info{
+		position: absolute;
+		top: 0;
+		right: 0;
+		width: 99%;
+		height: 100%;
+		background: white;
+		z-index: 9999;
+		padding: 12px 6px 6px 11px;
+		transition: all ease-in-out 250ms;
+	}
+	.history-info .mdi-keyboard-backspace{
+		font-size: 15px;
+		cursor: pointer;
+		margin-right: 8px;
 	}
 
 </style>
