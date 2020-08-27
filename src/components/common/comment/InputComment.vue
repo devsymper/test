@@ -23,9 +23,11 @@
 			<div class="text-area-wrapper" v-else>
 					<textarea v-model="inputComment"  
 						v-on:keyup.50="tagUser($event)"
-						class="text-area">
+						class="text-area"
+						style="width:100%"
+						>
 					</textarea>
-				<UploadFile style="position:absolute;right: 16px;bottom: 5px;" @uploaded-file="uploadInfo"/>
+				<UploadFile style="position:absolute;right:16px;bottom: 5px;" @uploaded-file="uploadInfo"/>
 				<v-btn style="position:absolute;right: 0px;bottom: 5px;" icon @click="addComment">
 					<v-icon >mdi-send-circle-outline</v-icon>
 				</v-btn>
@@ -271,8 +273,9 @@ export default {
 	overflow: hidden;
 	text-overflow: ellipsis;
 	display: -webkit-box;
-	-webkit-line-clamp: 3;
-	-webkit-box-orient: vertical;width:280px;
+	-webkit-line-clamp: 20;
+	-webkit-box-orient: vertical;
+	width:265px;
 	font:13px roboto
 }
 .content-comment >>> .content-comment-file .v-icon{
@@ -284,17 +287,5 @@ export default {
 	background-color: #f7f7f7;
 	width: 100%;
 }
-.content-comment >>> .text-area-wrapper .mentionable {
-	flex-grow: 1;
-}
-.content-comment >>> .text-area-wrapper .mentionable .text-area{
-	width: 100%;
-}
-.content-comment >>> .text-area-wrapper .mention-item {
-	padding: 4px 10px;
-	border-radius: 4px;
-}
-.content-comment >>>  .text-area-wrapper .mention-selected {
-    background: rgb(192, 250, 153);
-}
+
 </style>
