@@ -281,6 +281,8 @@ export default {
                 icon = 'mdi mdi-file-document-outline';
             } else if (value == 'user') {
                 icon = 'mdi-account-multiple-outline';
+            } else if (value == 'Tất cả') {
+                icon = 'mdi-all-inclusive';
             } else if (value == 'document_definition') {
                  icon = 'mdi mdi-file-outline';
             } else if (value == 'workflow_definition') {
@@ -335,7 +337,7 @@ export default {
         },
         setMenu(){
           //  debugger
-            let menu = [];
+            let menu = ['Tất cả'];
             for (let i = 0; i < this.newSearch.length; i++) {
                 // console.log(this.newSearch[i].group);
                 let name = Object.keys(this.newSearch[i]);
@@ -346,9 +348,9 @@ export default {
             this.$store.commit('search/setMenu', menu);
         },
         detailView(type) {
-            // if(type="Tất cả"){
-            //      this.$store.commit('search/setShowGeneral', true);
-            // }else{
+            if(type=="Tất cả"){
+                 this.$store.commit('search/setShowGeneral', true);
+            }else{
              this.$store.commit('search/setShowGeneral', false);
             this.showDetail = true;
             this.type = type;
@@ -356,7 +358,7 @@ export default {
             this.$store.commit('search/setCountResult', this.newSearchAll.filter(x => x.type== type ).length);
            // debugger
             if(type=='user'){this.checkUser==true};
-            this.$store.commit('search/setType', type);
+            this.$store.commit('search/setType', type);}
            // this.$router.push('/search/detail');
         },
          formatName(name,number){
@@ -380,6 +382,7 @@ export default {
         },
         wordSearch() {
             if(this.wordSearch==''||this.wordSearch==null){
+                debugger
                 this.$store.commit('search/setMenu', []);
                 this.$store.commit('search/setCountResult', 0);
                 this.$store.commit('search/setSearch', []);

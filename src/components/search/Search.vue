@@ -134,19 +134,26 @@ export default {
             }
         },
         enter(event){
-            if (event.code == "Enter"){
-            this.setMenu();
-            this.$store.commit('search/setSearch',  this.searchItems);
-            this.$store.commit('search/setSearchAll',  this.searchItemsAll);
-            this.$store.commit('search/setShowGeneral', true);
-            this.$store.commit('search/setCountResult', this.searchItems.length);
-            this.$router.push('/search/general');
-            
-
+            if (event.code == "Enter"){debugger
+                if(this.value!=''&&this.value!=null){
+                this.setMenu();
+                this.$store.commit('search/setSearch',  this.searchItems);
+                this.$store.commit('search/setSearchAll',  this.searchItemsAll);
+                this.$store.commit('search/setShowGeneral', true);
+                this.$store.commit('search/setCountResult', this.searchItems.length);
+                this.$router.push('/search/general');}
+                else{
+                    this.$store.commit('search/setSearch', [] );
+                }
             };
-            this.menu= this.searchItemsAll;
-            this.searchItems =[];
-            this.$store.commit('search/setSearch', this.menu );
+            if(this.value!=''&&this.value!=null){
+                this.menu= this.searchItemsAll;
+                this.searchItems =[];
+                this.$store.commit('search/setSearch', this.menu );}
+            else{
+                this.$store.commit('search/setSearch', [] );
+            }
+            
 
         },
         setMenu(){
