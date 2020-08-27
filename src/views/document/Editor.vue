@@ -76,6 +76,7 @@ import AllControlInDoc from "./../../views/document/items/AllControlInDoc.vue";
 import { GetControlProps,mappingOldVersionControlProps,
         mappingOldVersionControlFormulas,getAPropsControl,getIconFromType } from "./../../components/document/controlPropsFactory.js";
 import { documentApi } from "./../../api/Document.js";
+import { biApi } from "./../../api/bi.js";
 import { formulasApi } from "./../../api/Formulas.js";
 import { util } from "./../../plugins/util.js";
 import {checkInTable} from "./common/common";
@@ -209,6 +210,16 @@ export default {
             let elControl = $("#document-editor-"+thisCpn.keyInstance+"_ifr").contents().find('body #'+locale.id);
             thisCpn.setSelectedControlProp(locale.event,elControl,$('#document-editor-'+this.keyInstance+'_ifr').get(0).contentWindow);
         });
+
+        biApi.getAllDataFlow().then(res=>{
+            console.log(res);
+            if(res.status == 200 && res.data.length>0){
+                for (let index = 0; index < res.data.length; index++) {
+                    let dataflow = res.data[index];
+                    this.listDataFlow.push({id:dataflow.id,name:dataflow.name,title:""})
+                }
+            }
+        })
         
     },
     data(){
@@ -225,7 +236,8 @@ export default {
             listNameValueControl:{},
             keyInstance:Date.now(),
             dialog: false,
-            dataControlSwapType:{}
+            dataControlSwapType:{},
+            listDataFlow:[]
         }
     },
     beforeMount(){
@@ -1720,6 +1732,10 @@ export default {
                     var insertionPoint = $("#document-editor-"+thisCpn.keyInstance+"_ifr").contents().find(".drop-marker");
                     var checkDiv = $(control.html);
                     let typeControl = checkDiv.attr('s-control-type');
+                    if(typeControl == 'dataFlow'){
+                        control.properties.dataFlowId.options = thisCpn.listDataFlow;
+                    }
+
                     var inputid = 's-control-id-' + Date.now();
                     checkDiv.attr('id', inputid);
                     insertionPoint.after(checkDiv);

@@ -113,6 +113,14 @@
             </v-speed-dial>
             <err-message :listErr="listMessageErr" ref="errMessage"/>
         </div>
+        <EmbedDataflow 
+        @after-mounted="afterDataFlowMounted" 
+        v-for="dataFlow in listDataFlow" 
+        :key="dataFlow.id"  
+        :dataflowId="dataFlow.id" 
+        :width="'100%'"
+        :ref="'dataFlow'+dataFlow.id"/>
+        <!-- v-for="dataFlow in listDataFlow" :key="dataFlow.id"  -->
     </div>
 </template>
 <script>
@@ -137,6 +145,7 @@ import Util from './util';
 import './customControl.css';
 import ErrMessagePanel from "./../../../views/document/items/ErrMessagePanel.vue";
 import moment from "moment-timezone";
+import EmbedDataflow from "@/components/dataflow/EmbedDataflow"
 
 
 import { checkCanBeBind, resetImpactedFieldsList, markBinedField } from './handlerCheckRunFormulas';
@@ -196,6 +205,7 @@ export default {
         "autocomplete-input": AutocompleteInput,
         "sym-drag-panel": SymperDragPanel,
         "err-message": ErrMessagePanel,
+        EmbedDataflow
     },
     computed: {
         sDocumentEditor() {
@@ -247,8 +257,10 @@ export default {
             cacheDataRunFormulas:{},
 			isDraft:0,
             preDataSubmit:{},
-            objectIdentifier:{}
+            objectIdentifier:{},
+            listDataFlow:[]
         };
+
     },
     beforeMount() {
         this.docSize = "21cm";
@@ -598,6 +610,19 @@ export default {
             if(this.isComponentActive == false) return;
             this.runInputFilterFormulas(data.controlName,data.search);
         },
+        afterDataFlowMounted(id){
+            for (let index = 0; index < this.listDataFlow.length; index++) {
+                const controlDataFlow = this.listDataFlow[index];
+                controlDataFlow.el.empty();
+                let element = $(this.$refs['dataFlow'+controlDataFlow.id][0].$el);
+                
+                controlDataFlow.el.append(element.detach());
+                // var iframe = controlDataFlow.el.find('iframe') // or some other selector to get the iframe
+                // $('.joint-paper-scroller', iframe.contents()).css({overflow:'hidden'});
+                // $(this.$refs['dataFlow'+controlDataFlow.id].$el).append(controlDataFlow.el);
+                
+            }
+        },
         getDataOrgchart(){
             // let dataFromCache = this.getDataAutocompleteFromCache(e.e.target.value, aliasControl);
             // if(dataFromCache == false){
@@ -925,10 +950,12 @@ export default {
             );
             let thisCpn = this;
             let isSetEffectedControl = false;
+            let listDataFlow = []
             for (let index = 0; index < allInputControl.length; index++) {
-               
                 let id = $(allInputControl[index]).attr('id');
                 let controlType = $(allInputControl[index]).attr('s-control-type');
+                            console.log(controlType);
+
                 if(this.sDocumentEditor.allControl[id] != undefined){   // ton tai id trong store
                     let field = this.sDocumentEditor.allControl[id];
                     let idField = field.id;
@@ -954,17 +981,24 @@ export default {
                         }
                         field.properties.docName = this.documentName
                         if (controlType != "table") {
-                            let control = new BasicControl(
-                                idField,
-                                $(allInputControl[index]),
-                                field,
-                                thisCpn.keyInstance,
-                                valueInput
-                            );
-                            control.init();
-                            control.setEffectedData(prepareData);
-                            this.addToListInputInDocument(controlName,control)
-                            control.render();
+                            if(controlType == 'dataFlow'){
+                                let id = field.properties.dataFlowId.value;
+                                listDataFlow.push({id:id,controlName:controlName,el:$(allInputControl[index])}) ;
+                            }
+                            else{
+                                let control = new BasicControl(
+                                    idField,
+                                    $(allInputControl[index]),
+                                    field,
+                                    thisCpn.keyInstance,
+                                    valueInput
+                                );
+                                control.init();
+                                control.setEffectedData(prepareData);
+                                this.addToListInputInDocument(controlName,control)
+                                control.render();
+                            }
+                            
                         }
                         //truong hop la control table
                         else {
@@ -1014,7 +1048,8 @@ export default {
                 }
 
             }
-            console.log('sDocumentSubmit',this.sDocumentSubmit);
+            this.listDataFlow = listDataFlow;
+            
             if(!isSetEffectedControl)
             this.getEffectedControl();
             // thisCpn.createDocumentSQLLiteTable(); 

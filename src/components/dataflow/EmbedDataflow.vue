@@ -47,10 +47,10 @@ export default {
             }
         },
         cpnWidth(){
-            return isNaN(this.width) ? this.width : (this.width + 'px');
+            return this.width
         },
         cpnHeight(){
-            return isNaN(this.height) ? this.height : (this.height + 'px');
+            return this.height
         },
     },
     props: {
@@ -58,10 +58,10 @@ export default {
             default: 0
         },
         height:{
-            default: 300
+            default: '300px'
         },
         width:{
-            default: 600
+            default: '600px'
         }
     }
 }
