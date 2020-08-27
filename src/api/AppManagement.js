@@ -32,6 +32,8 @@ export const appManagementApi = {
 	},
 	getItemFavorite(userId) {
 		return coreApi.get('app-item-favorite/' + userId)
+	},
+	getAppDetailBa(id) {
+		return coreApi.get('application-ba/' + id)
 	}
-
 };

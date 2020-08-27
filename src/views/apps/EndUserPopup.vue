@@ -193,7 +193,6 @@ export default {
 						}  
 					})
 					this.checkTypeFavorite(res.data.listObject)
-					// this.updateFavoriteItem(self.mapIdFavorite,this.listFavorite)
 					console.log(this.listFavorite,'listFavorite');
 				}
 			}).catch((err) => {
@@ -466,7 +465,11 @@ export default {
 	width: 410px; 
 	overflow: hidden;
 	text-overflow: ellipsis; 
+	
 }
+/* .end-user-popup >>> .list-favorite .title-item-favorite:hover{
+	background-color: #f7f7f7;
+} */
 .end-user-popup >>> .list-favorite li{
 	padding: 5px 10px;
 }

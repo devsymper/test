@@ -116,9 +116,14 @@ export default {
                     text: this.$t("apps.contextMenu.edit"),
                     callback: (app, callback) => {
                         this.editCallback = callback;
-                        appManagementApi.getAppDetails(app.id).then(res => {
+                        appManagementApi.getAppDetailBa(app.id).then(res => {
                         if (res.status == 200) {
-							 this.checkChildrenApp(res.data.listObject.childrenApp)
+							if(Object.keys(res.data.listObject.childrenApp).length > 0){
+								this.checkChildrenApp(res.data.listObject.childrenApp)
+							}else{
+								this.$store.commit('appConfig/emptyItemSelected')
+							}
+							//  this.checkChildrenApp(res.data.listObject.childrenApp)
                              this.showEditAppPanel(res.data.listObject)   
                         }else {
                             this.showError()
@@ -265,6 +270,7 @@ export default {
 								}
 				]}).then(resOrg => {
 					console.log(resOrg.data.listObject);
+					
 					this.$store.commit('appConfig/updateChildrenApps',{obj:resOrg.data.listObject,type:'orgcharts'});
 				});
 			}
