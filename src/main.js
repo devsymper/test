@@ -91,7 +91,7 @@ Vue.prototype.$evtBus.$on('symper-app-call-action-handler', (action, context, ex
 })
 
 
-function checkCanAddTag(context) {
+function checkCanAddTab(context) {
     let rsl = true;
     let urlMap = context.$store.state.app.urlToTabTitleMap;
     if (Object.keys(urlMap).length == appConfigs.maxOpenTab) {
@@ -102,13 +102,26 @@ function checkCanAddTag(context) {
 }
 
 
-
+function checkUrlNotExisted(url, context) {
+    let urlMap = context.$store.state.app.urlToTabTitleMap;
+    urlMap = Object.values(urlMap);
+    for (let idx in urlMap) {
+        if (urlMap[idx].url == url) {
+            context.$evtBus.$emit('auto-active-tab', Number(idx));
+            return false;
+        }
+    }
+    return true;
+}
 
 /**
  * Di chuyển đến một trang và tạo ra tab tương ứng
  */
-Vue.prototype.$goToPage = function(url, title, pageInstanceKey = false) {
-    let canAddTab = checkCanAddTag(this);
+Vue.prototype.$goToPage = function(url, title, pageInstanceKey = false, allwaysOpenNewTab = true) {
+    let canAddTab = checkCanAddTab(this);
+    if (!allwaysOpenNewTab) {
+        canAddTab = canAddTab && checkUrlNotExisted(url, this);
+    }
     if (!canAddTab) {
         return;
     }

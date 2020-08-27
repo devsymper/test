@@ -66,8 +66,8 @@
                         <v-menu  v-model="isShowDialogNotification"
                             z-index="161"
                             :close-on-content-click="false"
-                            :max-width="452"
-                            :min-width="452"
+                            :max-width="385"
+                            :min-width="385"
                             :max-height="700"
                             offset-y>
                             <template v-slot:activator="{ on }">
@@ -159,11 +159,17 @@ export default {
         "list-notification": NotificationBar
     },
     created() {
+        let self = this;
         this.$evtBus.$on("app-receive-remote-msg", data => {
             this.$store.state.app.unreadNotification += 1;
             this.$store.state.app.needReloadNotification = true;
         });
         this.updateCountUnreadNotification();
+        
+        this.$evtBus.$on("auto-active-tab", tabIndex => {
+            self.$store.state.app.currentTabIndex = tabIndex;
+            self.handleChangeTab(tabIndex);
+        });
     },
     computed: {
         sapp() {
@@ -202,5 +208,7 @@ export default {
     font-size: 13px;
     font-weight: bold;
 }
-
+.v-menu__content{
+    min-height: 300px;
+}
 </style>
