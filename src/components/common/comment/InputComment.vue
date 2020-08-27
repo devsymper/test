@@ -18,21 +18,8 @@
 		</div>
 		<div class="content-comment-input">
 			<span v-if="isEditing == false" >
-				<span>{{item.content}}</span>
+				<h5 >{{item.content}}</h5>
 			</span>
-			 <!-- <v-text-field
-				v-else
-				clear-icon="mdi-close-circle"
-				v-model="inputComment"
-				clearable
-				type="text"
-				v-on:keyup.50="tagUser($event)"
-				>
-					<template slot="append">
-						<v-icon>mdi-attachment</v-icon>
-						<v-icon @click="addComment">mdi-send-circle-outline</v-icon>
-					</template>
-			</v-text-field> -->
 			<div class="text-area-wrapper" v-else>
 					<textarea v-model="inputComment"  
 						v-on:keyup.50="tagUser($event)"
@@ -279,6 +266,14 @@ export default {
 }
 .content-comment >>>  .content-comment-input{
 	padding: 0px 0px 4px 0px;
+}
+.content-comment >>>  .content-comment-input h5{
+	overflow: hidden;
+	text-overflow: ellipsis;
+	display: -webkit-box;
+	-webkit-line-clamp: 3;
+	-webkit-box-orient: vertical;width:280px;
+	font:13px roboto
 }
 .content-comment >>> .content-comment-file .v-icon{
 	font-size: 13px;

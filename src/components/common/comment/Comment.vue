@@ -46,7 +46,9 @@
 					<list-comment :listComment="listComment" :searchItem="searchItem"/>
 				</v-card>
 				</v-tab-item>
-				 <div class="input-comment" v-if="tabComment == true">
+				
+			</v-tabs-items>
+			 <div class="input-comment" v-if="tabComment == true">
 					 <v-avatar>
 						<img
 						src="https://cdn.vuetifyjs.com/images/john.jpg"
@@ -56,7 +58,6 @@
 					</v-avatar>
 					<InputComment :isEditing="true" :images="[]" :files="[]" :isAdd="true"/>
 				 </div>
-			</v-tabs-items>
 			</v-card>
 	</div>
 </template>
@@ -313,7 +314,7 @@ export default {
 	margin-right:auto;
 	flex-direction: row;
 	justify-content: center;
-	/* position: absolute; */
-	/* bottom:0px; */
+	position: absolute;
+	bottom:0px;
 }
 </style>

@@ -1,7 +1,7 @@
 <template>
 	<div class="commnent-item">
 		<div :item="item"  class="commnent-item-wrapper" :style="{width:width}">
-		<v-icon v-if="item.parentId == '0' && item.status == 0" class="icon-check" @click="resolveComment(item)" style="float:right">mdi-check</v-icon>
+		<v-icon v-if="item.parentId == '0' && item.status == 0" class="icon-check" @click="resolveComment(item)" style="float:right">mdi-check-outline</v-icon>
 		<v-icon v-if="item.parentId == '0' && item.status == 1" class="icon-check" @click="unresolveComment(item)" style="float:right">mdi-comment-arrow-left-outline</v-icon>
 				<v-avatar>
 					<img
