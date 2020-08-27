@@ -32,7 +32,7 @@ import { appConfigs } from "./../../configs.js";
 import { systemRoleApi } from "@/api/systemRole.js";
 import ListItems from "@/components/common/ListItems.vue";
 
-import ActionPackForm from "@/components/permission/ActionPackForm.vue";
+import ActionPackForm from "@/components/permission/actionPack/ActionPackForm.vue";
 import { permissionPackageApi } from "../../api/PermissionPackage";
 import { permissionApi } from "../../api/permissionPack";
 export default {
