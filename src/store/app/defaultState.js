@@ -73,7 +73,7 @@ const defaultState = {
             link: "/permissions",
         },
         { title: "actions", icon: "mdi-package", link: "/actions" },
-        // { title: "apps", icon: "mdi-apps", link: "/apps" },
+        { title: "apps", icon: "mdi-apps", link: "/apps" },
         // { title: "virtualdocs", icon: "mdi-table", link: "/virtualdocs" },
         { title: "tasks", icon: "mdi-check-all", link: "/tasks" },
         { title: "works", icon: "mdi-briefcase-check-outline", link: "/works" },
