@@ -101,7 +101,7 @@ export default class Api {
             Authorization: `Bearer ${util.auth.getToken()}`
         }, headers);
 
-        if (method == 'GET' || (method == 'POST' && options.cacheResponse)) {
+        if ((method == 'GET' || (method == 'POST' && options.cacheResponse)) && !url.includes('workflow.symper.vn')) {
             headers = makeCacheHeader(headers, url, data, options);
         }
 

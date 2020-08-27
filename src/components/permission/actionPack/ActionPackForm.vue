@@ -42,7 +42,12 @@
             </hot-table>
         </div>
 
-        <ObjectInApplication v-if="allInputs.objectType.value == 'application_definition'"/>
+        <ObjectInApplication 
+            v-if="allInputs.objectType.value == 'application_definition'"
+            :tableDataDefinition="multipleLevelObjects.application_definition"
+            :commonTableSetting="commonTableSetting"
+            :idApplication="focusingIdApplication"
+            @app-detail-get="translateAppObjectIdToTableData" />
 
         <div class="mt-2" v-if="action != 'view' ">
             <v-btn
@@ -67,16 +72,46 @@ import CustomSelect from ".././HandsonCustomSelect";
 import { permissionApi } from '../../../api/permissionPack';
 import { permissionPackageApi } from '../../../api/PermissionPackage';
 import ObjectInApplication from "./ObjectInApplication";
-
+let defaultTabConfig = {
+    tableData: [],
+    columns: [],
+    colHeaders: [],
+    dataSchema: []
+};
 
 export default {
     mounted(){
-        this.tableHeight = util.getComponentSize(this).h - util.getComponentSize(this.$refs.comonAttr).h - 180;
+        this.reCaculateTableHeight();
     },
     created(){
-        this.getObjectsOfObjectType();
+        this.initAllResource();
     },
     methods: { 
+        initAllResource(){
+            let needInitResources = [
+                'document_definition',
+                'workflow_definition',
+                'orgchart',
+                'dashboard'
+            ];
+            for(let type of needInitResources){
+                this.getObjectsOfObjectType(type);
+            }
+        },
+        translateAppObjectIdToTableData(data){
+            let appId = data.id;
+            let objs = data.objects;
+            
+            
+        },
+        setConfigForApplicationObjects(){
+            let appDef = this.multipleLevelObjects.application_definition;
+            for(let key in appDef){
+                appDef[key].columns = this.getTableColumns(key);
+                appDef[key].colHeaders = ['Objects'].concat(this.getColumnHeadersFromAction(['create'], key));
+                appDef[key].dataSchema = this.getDataSchema(key);
+            }
+        },
         triggerRerenderTable(){
             setTimeout((self) => {
                 if(self.$refs.dataTable){
@@ -88,8 +123,10 @@ export default {
                 }
             }, 2000, this);
         },
-        getDataSchema(){
-            let objectType = this.allInputs.objectType.value;
+        getDataSchema(objectType = null){
+            if(!objectType){
+                objectType = this.allInputs.objectType.value;
+            }
             let schema = {
                 object: ''
             };
@@ -100,16 +137,18 @@ export default {
             }
             return schema;
         },
-        getTableColumns(){
+        getTableColumns(objectType = null){
+            if(!objectType){
+                objectType = this.allInputs.objectType.value;
+            }
             let self = this;
-            let cols = this.getActionAsColumns();
+            let cols = this.getActionAsColumns(['create'], objectType);
             cols.unshift(
             {
                 data: "object",
                 type: "autocomplete",
                 width: 400,
                 source: function (query, process) {
-                    let objectType = self.allInputs.objectType.value;
                     if(self.allResourceForSearch[objectType]){
                         process(self.allResourceForSearch[objectType]);
                     }else{
@@ -131,8 +170,15 @@ export default {
             this.getObjectsOfObjectType();
             this.setTableData();
             this.setTableDataForObjectType();
+            this.reCaculateTableHeight();
         },
-        
+        reCaculateTableHeight(){
+            let h = util.getComponentSize(this).h - util.getComponentSize(this.$refs.comonAttr).h - 180;
+            if(this.allInputs.objectType.value == 'application_definition'){
+                h = h*2/3;
+            }
+            this.tableHeight = h;
+        },
         setTableData(){
             let objectType = this.allInputs.objectType.value;
             let rows = this.itemData.mapActionAndObjects[objectType];
@@ -315,30 +361,48 @@ export default {
             }, {});
             return resources;
         },
-        getActionAsColumns(){
+        getActionAsColumns(ignoreColumns = [], objectType = null){
+            ignoreColumns = ignoreColumns.reduce((obj, el) => {
+                obj[el] = true;
+                return obj;
+            }, {});
             let self = this;
-            let objectType = this.allInputs.objectType.value;
+            if(!objectType){
+                objectType = this.allInputs.objectType.value;
+            }
+
             let listAction = this.listAction[objectType];
             let cols = [];
             if(listAction){
                 for(let actionKey in listAction){
-                    cols.push({
-                        data: actionKey,
-                        type: "checkbox"
-                    });
+                    if(!ignoreColumns[actionKey]){
+                        cols.push({
+                            data: actionKey,
+                            type: "checkbox"
+                        });
+                    }
                 }
             }
             return cols;
         },
-        getColumnHeadersFromAction(){
-            let objectType = this.allInputs.objectType.value;
+        getColumnHeadersFromAction(ignoreColumns = [], objectType = null){
+            ignoreColumns = ignoreColumns.reduce((obj, el) => {
+                obj[el] = true;
+                return obj;
+            }, {});
+
+            if(!objectType){
+                objectType = this.allInputs.objectType.value;
+            }
             let arr = [];
             let listAction = this.listAction[objectType];
 
             if(listAction){
                 for(let actionKey in listAction){
-                    let el = listAction[actionKey];
-                    arr.push(el.title);
+                    if(!ignoreColumns[actionKey]){
+                        let el = listAction[actionKey];
+                        arr.push(el.title);
+                    }
                 }
             }
             return arr;
@@ -375,6 +439,7 @@ export default {
             dataSchema: [],
             tableData: [],
             tableDataForObjectType: [],
+            commonTableSetting : commonTableSetting,
             tableSettings: {
                 ...commonTableSetting,
                 afterChange: function(changes, source) {
@@ -382,7 +447,6 @@ export default {
                         return;
                     }
                     let htIst = this;
-                    console.log(changes, source, htIst);
                     let lastIndex = htIst.getData().length;
                     if(changes[0][0] == lastIndex - 1){
                         this.alter('insert_row', lastIndex + 1, 1, 'add_row_on_enter');
@@ -393,6 +457,23 @@ export default {
                     }, 0);
 
                 },
+                afterSelectionEnd(rowNum	, column, row2 , column2 , preventScrolling, selectionLayerLevel){
+                    let objectType = self.allInputs.objectType.value;
+                    if(objectType == 'application_definition'){
+                        let object = this.getDataAtRow(rowNum)[0];
+                        if(object){
+                            let id = String(object).split(' ')[0].trim();
+                            debugger
+                            if(!isNaN(id)){
+                                self.focusingIdApplication = Number(id);
+                            }else{
+                                self.focusingIdApplication = 0;
+                            }
+                        }else{
+                            self.focusingIdApplication = 0;
+                        }
+                    }
+                }
             },
             tableSettingsForObjectType: {
                 ...commonTableSetting,
@@ -403,6 +484,17 @@ export default {
                     }, 0);
                 },
             },
+
+            // cấu trúc data giành cho các loại đối tượng có nhiều tầng object settings
+            multipleLevelObjects: {
+                application_definition: {
+                    document_definition : util.cloneDeep(defaultTabConfig),
+                    workflow_definition : util.cloneDeep(defaultTabConfig),
+                    orgchart : util.cloneDeep(defaultTabConfig),
+                    dashboard : util.cloneDeep(defaultTabConfig),
+                }
+            },
+            focusingIdApplication: 0
         }
     },
     components: {
@@ -442,7 +534,7 @@ export default {
         },
         // Tiêu đề của các cột  cần hiển thị
         colHeaders() {
-            return ["Objects"].concat(this.getColumnHeadersFromAction());
+            return ["Objects"].concat(this.getColumnHeadersFromAction(['create']));
         },
         colHeadersForObjectType(){
             return this.getColumnHeadersFromAction();
@@ -475,8 +567,11 @@ export default {
         listAction: {
             immediate: true,
             deep: true,
-            handler(){
+            handler(value){
                 this.handleChangeObjectType();
+                if(!$.isEmptyObject(value)){
+                    this.setConfigForApplicationObjects();
+                }
             }
         }
     }
