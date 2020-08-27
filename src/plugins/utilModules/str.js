@@ -76,4 +76,5 @@ export const str = {
             return hash;
         }
     }
+
 }
