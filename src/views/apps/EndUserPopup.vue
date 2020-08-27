@@ -175,7 +175,6 @@ export default {
 			let self = this 
 			let userId = this.$store.state.app.endUserInfo.id
 			appManagementApi.getItemFavorite(userId).then(res =>{
-				debugger
 				if (res.status == 200) {
 					// this.testListFavorite = res.data.listObject
 					res.data.listObject.forEach(function(e){

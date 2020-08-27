@@ -158,7 +158,7 @@ export default {
 }
 .search-modal >>> .app-item .title-app h4{
 	padding-left:10px;
-	font-weight: unset;
+	font-weight: 500;
 }
 .search-modal >>> .app-item .app-child-item .v-icon{
 	font-size:13px;

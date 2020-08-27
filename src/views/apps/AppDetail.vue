@@ -12,7 +12,6 @@
 											v-bind="attrs"
 											v-on="on" >
 											<span>{{childItem.title}}</span> 
-											<span style="font:10px;opacity:0.4">{{childItem.name}}</span>
 										</div>
 									</template>
 										<span style="font:13px roboto">{{childItem.title}}</span> 
@@ -211,6 +210,7 @@ export default {
 	display: flex;
 	cursor: pointer;
 	padding:8px 15px;
+	font-weight: 500;
 }
 .app-details >>> .app-item .title-document{
 	white-space: nowrap; 
@@ -268,8 +268,6 @@ export default {
 	display: inline-block;
 }
 .app-details >>> .app-item li:hover .icon-star{
-	/* background-color:#f7f7f7; */
-	/* border-radius: 10px; */
 	display: inline-block;
 }
 </style>

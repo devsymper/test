@@ -55,11 +55,23 @@ const emptyItemSelected = (state) => {
 const updateChildrenApps = (state, data) => {
 	state.listItemSelected[data.type].item = data.obj
 }
+const updateListFavorite = (state, data) => {
+	Vue.set(state, 'listFavorite', data)
+}
+const insertFavorite = (state, data) => {
+	state.listFavorite.push(data)
+}
+const delFavorite = (state, data) => {
+	state.listFavorite.splice(state.listFavorite.indexOf(data), 1)
+}
 
 export {
 	updateListItemSelected,
 	removeItemSelected,
 	emptyItemSelected,
 	updateChildrenApps,
+	updateListFavorite,
+	insertFavorite,
+	delFavorite
 
 };

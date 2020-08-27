@@ -88,17 +88,25 @@ export default {
 								},
 								{name: "status", title: "status", type: "text",
 									renderer:  function(instance, td, row, col, prop, value, cellProperties) {
-										let icon;
+										let span;
 										Handsontable.dom.empty(td);
+										span = document.createElement('span')
 										if(value === "1"){
-											icon = document.createElement('i');
-											icon.classList.add('mdi');
-											icon.classList.add('mdi-check');
-											$(icon).css('color','green')
-											$(icon).css('font-size','16px')
-											td.appendChild(icon);
-											return td;
+											// icon = document.createElement('i');
+											// icon.classList.add('mdi');
+											// icon.classList.add('mdi-check');
+											// $(icon).css('color','green')
+											// $(icon).css('font-size','16px')
+											// td.appendChild(icon);
+											// return td;
+											$(span).text('Kích hoạt')
+											// $(span).text(self.$t('apps.active'))
+										}else{
+												$(span).text('Không kich hoạt')
+												// $(span).text(self.$t('apps.notActive'))
 										}
+										td.appendChild(span);
+										return td
 									},
 								},
                                 {name: "createdAt", title: "created_at", type: "text"},
