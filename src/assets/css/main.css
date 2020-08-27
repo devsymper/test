@@ -9,7 +9,9 @@ html {
 .symper-bg-orange {
     background-color: #f58634!important;
 }
-
+/* .symper-app .v-menu__content{
+	overflow:hidden
+}  */
 .sym-tab-slider {
     height: 100%;
     width: 100%;

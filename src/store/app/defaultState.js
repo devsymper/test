@@ -65,21 +65,53 @@ const defaultState = {
             icon: "mdi-microsoft-xbox-controller-menu",
             link: "/menu",
         },
-        { title: "users", icon: "mdi-account-settings", link: "/users" },
+        {
+            title: "users",
+            icon: "mdi-account-settings",
+            link: "/users"
+        },
         // { title: "snippets", icon: "mdi-contain", link: "/snippets" },
         {
             title: "permissions",
             icon: "mdi-folder-account",
             link: "/permissions",
         },
-        { title: "actions", icon: "mdi-package", link: "/actions" },
-        { title: "apps", icon: "mdi-apps", link: "/apps" },
+        {
+            title: "actions",
+            icon: "mdi-package",
+            link: "/actions"
+        },
+        {
+            title: "apps",
+            icon: "mdi-apps",
+            link: "/apps"
+        },
         // { title: "virtualdocs", icon: "mdi-table", link: "/virtualdocs" },
-        { title: "tasks", icon: "mdi-check-all", link: "/tasks" },
-        { title: "works", icon: "mdi-briefcase-check-outline", link: "/works" },
-        { title: "userRoleSetting", icon: "mdi-access-point-network", link: "/user-role-settings" },
-        { title: "actionPack", icon: "mdi-access-point", link: "/action-pack" },
-        { title: "baAccount", icon: "mdi-account-tie", link: "/ba-account" },
+        {
+            title: "tasks",
+            icon: "mdi-check-all",
+            link: "/tasks"
+        },
+        {
+            title: "works",
+            icon: "mdi-briefcase-check-outline",
+            link: "/works"
+        },
+        {
+            title: "userRoleSetting",
+            icon: "mdi-access-point-network",
+            link: "/user-role-settings"
+        },
+        {
+            title: "actionPack",
+            icon: "mdi-access-point",
+            link: "/action-pack"
+        },
+        {
+            title: "baAccount",
+            icon: "mdi-account-tie",
+            link: "/ba-account"
+        },
     ],
     urlToTabTitleMap: {}, // map giữa url với title và pageInstanceKey của tab,
     currentTabIndex: 0, // index cuả tab hiện tại đang mở,

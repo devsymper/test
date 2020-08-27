@@ -433,12 +433,25 @@
             "created_at": "Date create",
             "updated_at": "Last update"
         },
+
+        "listType": {
+            "documents": "Documents",
+            "workflows": "Work flows",
+            "reports": "Reports",
+            "orgcharts": "Orgcharts"
+        },
+        "addApp": "Add application",
+        "editApp": "Edit application",
         "title": "Applications",
         "pickIcon": "Pick icon",
         "apps": "Applications",
         "commonInfo": "General",
         "listObjects": "Objects",
         "addObject": "Add object",
+        "clickToAdd": "Click to add item",
+        "search": "Search",
+        "favorite": "Favorite",
+		"listApp": "List applications",
         "objectSummary": "Objects summary",
         "contextMenu": {
             "edit": "Edit",

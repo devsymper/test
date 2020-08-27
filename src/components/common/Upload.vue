@@ -44,7 +44,7 @@ export default {
         },
         selectIcon() {
             // Upload go here
-            this.$emit("selectFile", this.img);
+			this.$emit("selectFile", this.img);
         },
         changeFile(evt) {
             let file = evt.target.files[0];

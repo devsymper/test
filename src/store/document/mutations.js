@@ -1,9 +1,17 @@
-import { getIconFromType } from './../../components/document/controlPropsFactory.js';
-import { defaultState } from "./defaultState";
-import { util } from "./../../plugins/util.js";
+import {
+    getIconFromType
+} from './../../components/document/controlPropsFactory.js';
+import {
+    defaultState
+} from "./defaultState";
+import {
+    util
+} from "./../../plugins/util.js";
 
 import Vue from "vue";
-import { type } from 'jquery';
+import {
+    type
+} from 'jquery';
 
 const addControl = (state, params) => {
     let id = params.id
@@ -39,7 +47,11 @@ const addCurrentControl = (state, control) => {
     Vue.set(state.editor[instance].currentSelectedControl, 'formulas', control.formulas);
     Vue.set(state.editor[instance].currentSelectedControl, 'id', control.id);
 
-    let groups = { name: {}, display: {}, print: {} };
+    let groups = {
+        name: {},
+        display: {},
+        print: {}
+    };
     if (control.properties != undefined && typeof control.properties != 'undefined') {
         Object.filter = (obj, predicate) =>
             Object.keys(obj)
@@ -50,7 +62,11 @@ const addCurrentControl = (state, control) => {
         let propsTypeIsName = Object.filter(control.properties, prop => prop.groupType == 'name')
         let propsTypeIsDisplay = Object.filter(control.properties, prop => prop.groupType == 'display')
         let propsTypeIsPrint = Object.filter(control.properties, prop => prop.groupType == 'print')
-        groups = { name: propsTypeIsName, display: propsTypeIsDisplay, print: propsTypeIsPrint };
+        groups = {
+            name: propsTypeIsName,
+            display: propsTypeIsDisplay,
+            print: propsTypeIsPrint
+        };
     }
     Vue.set(state.editor[instance].currentSelectedControl, 'properties', groups);
 
