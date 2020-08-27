@@ -32,7 +32,7 @@ export default {
     watch: {
         async idApplication(newId){
             if(!this.applicationObjects[newId]){
-                let appDetail = 
+                // let appDetail = 
             }
         }
     },
