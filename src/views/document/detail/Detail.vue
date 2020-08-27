@@ -25,6 +25,7 @@
             :workflowId="workflowId"
             @after-hide-sidebar="afterHideSidebar"
             />
+            <HistoryControl ref="historyView" />
      <v-speed-dial
                 v-if="!quickView"
                 v-model="fab"
@@ -88,12 +89,6 @@
                 
             </v-speed-dial>
 
-
-           
-
-
-
-
     </div>
 </template>
 <script>
@@ -108,6 +103,7 @@ import  Table from "./../submit/table.js"
 import './../submit/customControl.css'
 import { getSDocumentSubmitStore } from './../common/common'
 import SideBarDetail from './SideBarDetail'
+import HistoryControl from './HistoryControl'
 
 export default {
     props: {
@@ -135,7 +131,8 @@ export default {
         }
     },   
     components:{
-        'side-bar-detail':SideBarDetail
+        'side-bar-detail':SideBarDetail,
+        HistoryControl
     },
     computed: {
         sDocumentEditor() {
@@ -175,6 +172,7 @@ export default {
         this.documentSize = "21cm";
     },
     
+    
     created(){
         this.$store.commit("document/setDefaultSubmitStore",{instance:this.keyInstance});
         this.$store.commit("document/setDefaultDetailStore",{instance:this.keyInstance});
@@ -209,6 +207,20 @@ export default {
         })
         .always(() => {
         });
+        
+
+        this.$evtBus.$on('symper-app-wrapper-clicked',evt=>{
+            if($(evt.target).is('.highlight-history')){
+                this.$refs.historyView.show($(evt.target))    
+            }
+            else{
+                if(
+                    !$(evt.target).hasClass("v-data-table") &&
+                    $(evt.target).closest(".v-data-table").length == 0){
+                        this.$refs.historyView.hide() 
+                    }
+            }
+        })
     },
     destroyed(){
     },
@@ -229,6 +241,7 @@ export default {
         afterHideSidebar(){
             this.$emit('after-hide-sidebar')
         },
+      
         setLayoutFromQuickView(size,margin){
             this.documentSize = size;
             this.contentMargin = margin;
@@ -540,6 +553,7 @@ export default {
     ::v-deep .v-speed-dial {
         position: absolute;
     }
+    
     /* .sym-form-Detail table:not(.htCore) td, .sym-form-Detail table:not(.htCore), .sym-form-Detail table:not(.htCore) th{
         border: none !important;
     } */

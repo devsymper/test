@@ -7,92 +7,132 @@
 	:width="sidebarWidth"
 	:style="{'transform':(isShow) ? 'translateX(0%)' : 'translateX(100%)'}"
 	>
-	<div style="display:flex;">
-		<span style="font-size:15px;">{{$t('document.detail.sidebar.heading')}}</span>
-		<span class="mdi mdi-close" @click="hide"></span>
-	</div>
+	<div class="main-info">
+		<div style="display:flex;">
+			<span style="font-size:15px;">{{$t('document.detail.sidebar.heading')}}</span>
+			<span class="mdi mdi-close" @click="hide"></span>
+		</div>
 
-	<v-divider></v-divider>
+		<v-divider></v-divider>
 
-	<VuePerfectScrollbar style="calc(100% - 62px);">
-		<v-expansion-panels
-		v-model="panel"
-		multiple
-		class="s-detail-sidebar"
-		>
-			<v-expansion-panel>
-				<v-expansion-panel-header class="v-expand-header">{{$t('document.detail.sidebar.body.general.title')}}</v-expansion-panel-header>
-				<v-expansion-panel-content class="sym-v-expand-content">
-					<div>
-						<table class="general-info">
+		<VuePerfectScrollbar style="calc(100% - 62px);">
+			<v-expansion-panels
+			v-model="panel"
+			multiple
+			class="s-detail-sidebar"
+			>
+				<v-expansion-panel>
+					<v-expansion-panel-header class="v-expand-header">{{$t('document.detail.sidebar.body.general.title')}}</v-expansion-panel-header>
+					<v-expansion-panel-content class="sym-v-expand-content">
+						<div>
+							<table class="general-info">
+								<tr>
+									<td>{{$t('document.detail.sidebar.body.general.dateCreate')}}</td>
+									<td>{{createdDate}}</td>
+								</tr>
+								<tr>
+									<td style="width:70px">{{$t('document.detail.sidebar.body.general.userCreate')}}</td>
+									<td>{{userCreate}}</td>
+								</tr>
+								<tr>
+									<td>{{$t('document.detail.sidebar.body.general.history')}}</td>
+									<td style="text-decoration: underline;cursor:pointer;color:#F1853B;">Đã sửa 2 lần</td>
+								</tr>
+								<tr>
+									<td>{{$t('document.detail.sidebar.body.general.comment')}}</td>
+									<td style="text-decoration: underline;cursor:pointer;color:#F1853B;">Có 2 bình luận chưa giải quyết</td>
+								</tr>
+							</table>
+						</div>
+					</v-expansion-panel-content>
+				</v-expansion-panel>
+				<v-expansion-panel>
+					<v-expansion-panel-header class="v-expand-header">{{$t('document.detail.sidebar.body.userRelated.title')}}</v-expansion-panel-header>
+					<v-expansion-panel-content class="sym-v-expand-content">
+						<div class="approval-info">
+							<p class="approval-info__header">
+								<span class="mdi mdi-account-multiple-outline"></span> 
+								<span>{{$t('document.detail.sidebar.body.userRelated.subTitle1')}}</span>
+							</p>
+							<div v-for="user in listApprovalUser" :key="user.id" class="user-info">
+								<img src="https://randomuser.me/api/portraits/men/81.jpg" alt="">
+								<span class="user-name">{{user.displayName}}</span>
+							</div>
+						</div>
+						<div class="related-user-info">
+							<p class="approval-info__header">
+								<span class="mdi mdi-account-multiple-outline"></span> 
+								<span>{{$t('document.detail.sidebar.body.userRelated.subTitle2')}}</span>
+							</p> 
+							<div v-for="user in listRelatedUser" :key="user.id" class="user-info">
+								<img src="https://randomuser.me/api/portraits/men/81.jpg" alt="">
+								<span class="user-name">{{user.displayName}}</span>
+							</div>
+						</div>
+					</v-expansion-panel-content>
+				</v-expansion-panel>
+				<v-expansion-panel>
+					<v-expansion-panel-header class="v-expand-header">{{$t('document.detail.sidebar.body.worflowInfo')}}</v-expansion-panel-header>
+					<v-expansion-panel-content class="sym-v-expand-content">
+
+						<table class="workflow-info" v-if="workflowId !='' ">
 							<tr>
-								<td>{{$t('document.detail.sidebar.body.general.dateCreate')}}</td>
-								<td>{{createdDate}}</td>
-							</tr>
+								<td><span class="mdi mdi-share-variant"></span></td>
+								<td>{{workflowName}}</td>
 							<tr>
-								<td style="width:70px">{{$t('document.detail.sidebar.body.general.userCreate')}}</td>
-								<td>{{userCreate}}</td>
+								<td><span class="mdi mdi-briefcase-variant-outline"></span></td>
+								<td>{{workflowOtherName}}</td>
 							</tr>
-							<tr>
-								<td>{{$t('document.detail.sidebar.body.general.history')}}</td>
-								<td style="text-decoration: underline;cursor:pointer;color:#F1853B;">Đã sửa 2 lần</td>
-							</tr>
-							<tr>
-								<td>{{$t('document.detail.sidebar.body.general.comment')}}</td>
-								<td style="text-decoration: underline;cursor:pointer;color:#F1853B;">Có 2 bình luận chưa giải quyết</td>
-							</tr>
+							
 						</table>
-					</div>
-				</v-expansion-panel-content>
-			</v-expansion-panel>
-			<v-expansion-panel>
-				<v-expansion-panel-header class="v-expand-header">{{$t('document.detail.sidebar.body.userRelated.title')}}</v-expansion-panel-header>
-				<v-expansion-panel-content class="sym-v-expand-content">
-					<div class="approval-info">
-						<p class="approval-info__header">
-							<span class="mdi mdi-account-multiple-outline"></span> 
-							<span>{{$t('document.detail.sidebar.body.userRelated.subTitle1')}}</span>
-						</p>
-						<div v-for="user in listApprovalUser" :key="user.id" class="user-info">
-							<img src="https://randomuser.me/api/portraits/men/81.jpg" alt="">
-							<span class="user-name">{{user.displayName}}</span>
-						</div>
-					</div>
-					<div class="related-user-info">
-						<p class="approval-info__header">
-							<span class="mdi mdi-account-multiple-outline"></span> 
-							<span>{{$t('document.detail.sidebar.body.userRelated.subTitle2')}}</span>
-						</p> 
-						<div v-for="user in listRelatedUser" :key="user.id" class="user-info">
-							<img src="https://randomuser.me/api/portraits/men/81.jpg" alt="">
-							<span class="user-name">{{user.displayName}}</span>
-						</div>
-					</div>
-				</v-expansion-panel-content>
-			</v-expansion-panel>
-			<v-expansion-panel>
-				<v-expansion-panel-header class="v-expand-header">{{$t('document.detail.sidebar.body.worflowInfo')}}</v-expansion-panel-header>
-				<v-expansion-panel-content class="sym-v-expand-content">
+					<!-- mdi-share-variant -->
+					<!-- mdi-briefcase-variant-outline -->
+					</v-expansion-panel-content>
+				</v-expansion-panel>
 
-					<table class="workflow-info" v-if="workflowId !='' ">
-						<tr>
-							<td><span class="mdi mdi-share-variant"></span></td>
-							<td>{{workflowName}}</td>
-						<tr>
-							<td><span class="mdi mdi-briefcase-variant-outline"></span></td>
-							<td>{{workflowOtherName}}</td>
-						</tr>
-						
-					</table>
-				<!-- mdi-share-variant -->
-				<!-- mdi-briefcase-variant-outline -->
-				</v-expansion-panel-content>
-			</v-expansion-panel>
+				
+				
+			</v-expansion-panels>
+		</VuePerfectScrollbar>
+	</div>
+	<div class="history-info">
+		<div style="display:flex;">
+			<!-- <span class="mdi mdi-close" @click="hide"></span> -->
+			<span style="font-size:15px;">LỊCH SỬ CHỈNH SỬA</span>
+			<span class="mdi mdi-close" @click="hide"></span>
+		</div>
 
-			
-			
-		</v-expansion-panels>
-	</VuePerfectScrollbar>
+		<v-divider></v-divider>
+
+		<VuePerfectScrollbar style="calc(100% - 62px);">
+			<div v-for="history in listHistoryControl" 
+			:key="history.id" 
+			@click="showHistoryControl(history)"
+			class="history-item">
+				<div class="history-item__info">
+					<div class="date-update">
+						{{history.date}}
+					</div>
+					<div>
+						<img src="https://randomuser.me/api/portraits/men/81.jpg" height="14px" alt="">
+						<span>{{history.userUpdate}}</span>
+					</div>
+				</div>
+				<div class="history-item__action">
+					<v-tooltip left>
+						<template v-slot:activator="{ on }">
+							<div v-on="on">
+								<v-btn small>
+									<v-icon>mdi-backup-restore</v-icon>
+								</v-btn>
+							</div>
+						</template>
+						<span>Khôi phục</span>
+					</v-tooltip>
+				</div>
+			</div>
+		</VuePerfectScrollbar>
+	</div>
 	</v-navigation-drawer>
 </template>
 <script>
@@ -116,7 +156,11 @@ export default {
 			workflowName:"",
 			workflowOtherName:"",
 			listApprovalUser:[],
-			listRelatedUser:[]
+			listRelatedUser:[],
+			listHistoryControl:[
+                {date:'18/08/2020 11:20', userUpdate:'971', historyid:2, controls:[{id:'s-control-id-1596780634836',data:[]},{id:'s-control-id-1596780602772',data:[]},{id:'s-control-id-1596780611212',data:[]}]},
+                {date:'18/08/2020 11:20', userUpdate:'971', historyid:1, controls:[{id:'s-control-id-1596780602772',data:[]}]},
+            ],
 		}
 	},
 	props:{
@@ -201,8 +245,17 @@ export default {
 		},
 		show(){
 			this.isShow = true;
+		},
+		showHistoryControl(history){
+			$('.highlight-history').removeClass('highlight-history');
+			for (let index = 0; index < history.controls.length; index++) {
+				const control = history.controls[index];
+				$("#"+control.id).addClass('highlight-history');
+			}
+			
 		}
-	}
+	},
+
 
 }
 </script>
@@ -294,6 +347,35 @@ export default {
 	.mdi-close:hover{
 		color: rgb(0 0 0 / 1);
 	}
-	
+	.history-item{
+		cursor: pointer;
+		display: flex;
+		font-size: 13px;
+		padding: 6px 0;
+		transition: all ease-in-out 300ms;
+	}
+	.history-item:hover .date-update,
+	.history-item:hover .history-item__info span{
+		text-shadow: 1px 0px 5px rgba(0,0,0,0.6);
+	}
+	.history-item .date-update{
+		font-weight: 500;
+	}
+	.history-item img{
+		border-radius: 50%;
+		margin-bottom: -2px;
+		margin-right: 8px;
+	}
+	.history-item__action{
+		margin-left: auto;
+		margin-right: 8px;
+		margin-top: 5px;
+	}
+	.history-item__action >>> button{
+		box-shadow: none;
+	}
+	.history-item__action .mdi-backup-restore{
+		font-size: 15px;
+	}
 
 </style>

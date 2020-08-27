@@ -458,6 +458,36 @@ export default {
             }
             
         });
+        // sự kiện ném ra khi gõ vào control department
+        // một số key code gõ vào thì ko mở hoặc phải đóng đi
+        this.$evtBus.$on("document-submit-department-key-event", e => {
+            if(thisCpn.isComponentActive == false) return;
+            try {
+                if((e.e.keyCode >= 97 && e.e.keyCode <= 105) ||
+                    (e.e.keyCode >= 48 && e.e.keyCode <= 57) ||
+                    (e.e.keyCode >= 65 && e.e.keyCode <= 90) || [8,32,231].includes(e.e.keyCode)) { // nếu key code là các kí tự chữ và số hợp lệ
+                    if(!thisCpn.$refs.autocompleteInput.isShow()){
+                        thisCpn.$refs.autocompleteInput.show(e.e);
+                        let currentTableInteractive = this.sDocumentSubmit.currentTableInteractive;
+                        if(currentTableInteractive != null && currentTableInteractive != undefined)
+                        currentTableInteractive.isAutoCompleting = true;
+                        thisCpn.$store.commit("document/addToDocumentSubmitStore", {
+                            key: 'currentControlActive',
+                            value: e.controlName,
+                            instance: thisCpn.keyInstance
+                        });
+                    }
+                    thisCpn.getDataOrgchart(e);
+                }
+                else if((e.e.keyCode < 37 || e.e.keyCode > 40)){
+                    thisCpn.$refs.autocompleteInput.hide();
+                }
+                
+            } catch (error) {
+                
+            }
+            
+        });
         // hàm nhận sự thay đổi của input select gọi api để chạy công thức lấy dữ liệu
         this.$evtBus.$on("document-submit-select-input", e => {
             if(thisCpn.isComponentActive == false) return;
@@ -567,6 +597,22 @@ export default {
         searchDataFilter(data){
             if(this.isComponentActive == false) return;
             this.runInputFilterFormulas(data.controlName,data.search);
+        },
+        getDataOrgchart(){
+            // let dataFromCache = this.getDataAutocompleteFromCache(e.e.target.value, aliasControl);
+            // if(dataFromCache == false){
+            //     let dataInput = this.getDataInputFormulas(e.autocompleteFormulasInstance,e);
+            //     e.autocompleteFormulasInstance.handleRunAutoCompleteFormulas(dataInput).then(res=>{
+            //         thisCpn.setDataForControlAutocomplete(res,aliasControl,e.controlTitle, $(e.e.target).val())
+            //     });
+            // }
+            // else{
+            //     this.$refs.autocompleteInput.setAliasControl(aliasControl);
+            //     this.$refs.autocompleteInput.setData(dataFromCache);
+            // }
+            // e.listFormulasInstance.handleRunAutoCompleteFormulas(dataInput).then(res=>{
+            //     thisCpn.setDataForControlAutocomplete(res,aliasControl,e.controlTitle, $(e.e.target).val())
+            // });
         },
         /**
          * Hàm chạy công thức autocomplete để đổ dữ liệu vào box autucomplete, control select cũng dùng trường hợp này

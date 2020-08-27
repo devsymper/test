@@ -510,15 +510,24 @@ export default {
                                 });
                 }
                 else{
-                    if($('#document-editor-'+this.keyInstance+'_ifr').contents().find('.s-control-error').length == 0){
+                    let controlError = $('#document-editor-'+this.keyInstance+'_ifr').contents().find('.s-control-error');
+                    if(controlError.length == 0){
                         if(this.documentId == undefined || this.documentId == 0)
                         this.setDocumentProperties({})
                         this.$refs.saveDocPanel.showDialog()
                     }
                     else{
+                        let listName = []
+                        $.each(controlError,function(item){
+                            let id = $(item).attr('id');
+                            console.log("sadsdsad",id);
+                            let name = allControl[id].properties.name.value;
+                            listName.push(name);
+                        })
                         this.$snotify({
                                         type: "error",
                                         title: "Tên một số control chưa hợp lệ",
+                                        text: "Có "+listName.length+" control đặt tên không hợp lệ. Kiểm tra: "+listName.join(',')
                                     });
                     }
                 }

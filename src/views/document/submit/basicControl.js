@@ -179,6 +179,18 @@ export default class BasicControl extends Control {
                     $(e.target).val(100)
                 }
             }
+            if (thisObj.type = 'department') {
+                // let formulasInstance = (fromSelect) ? thisObj.controlFormulas.formulas.instance : thisObj.controlFormulas.autocomplete.instance;
+                // e['controlName'] = thisObj.name;
+                // SYMPER_APP.$evtBus.$emit('document-submit-department-key-event', {
+                //     e: e,
+                //     listFormulasInstance: formulasInstance,
+                //     isSelect: false,
+                //     controlTitle: thisObj.title,
+                //     controlName: thisObj.name,
+                //     val: $(e.target).val()
+                // })
+            }
 
             if (thisObj.checkAutoCompleteControl()) {
                 let fromSelect = false;
@@ -200,6 +212,9 @@ export default class BasicControl extends Control {
             if (thisObj.checkAutoCompleteControl() && e.keyCode == 9) {
                 e.keyCode = 200;
                 SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-key-event', {
+                    e: e,
+                })
+                SYMPER_APP.$evtBus.$emit('document-submit-department-key-event', {
                     e: e,
                 })
             }
