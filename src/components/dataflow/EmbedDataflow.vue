@@ -36,6 +36,7 @@ export default {
     },
     mounted(){
         this.listenEventsFromIframe();
+        this.$emit('after-mounted');
     },
     computed: {
         embedLink(){
