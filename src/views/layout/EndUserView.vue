@@ -95,6 +95,7 @@ import Api from "../../api/api.js";
 import { appConfigs } from '../../configs';
 import BASidebar from "@/components/common/BASidebar.vue";
 import listApp from "@/components/common/listApp";
+import EndUserPopup from './../apps/EndUserPopup.vue';
 import NotificationBar from "@/components/notification/NotificationBar.vue";
 export default {
     methods: {
@@ -149,7 +150,8 @@ export default {
     components: {
         "ba-sidebar": BASidebar,
         "list-app": listApp,
-		"list-notification": NotificationBar,
+        "list-notification": NotificationBar,
+        EndUserPopup
     },
     created() {
         let self = this;
