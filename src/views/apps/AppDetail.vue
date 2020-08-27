@@ -247,7 +247,7 @@ export default {
 	right:0px;
 }
 .app-details >>> .app-item .app-child-item .icon-star-active{
-	color: yellow;
+	color: #F6BE4F;
 	display: inline-block;
 	position:absolute;
 	top:-2px;

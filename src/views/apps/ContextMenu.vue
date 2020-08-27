@@ -69,6 +69,7 @@
 			this.type = type
 		},
 		clickAction(action){
+			debugger
 			this.defineAction[this.type].action = action;
 			console.log(this.defineAction[this.type]);
 			console.log(this.targetItem);
