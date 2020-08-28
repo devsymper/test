@@ -234,7 +234,11 @@ export default class BasicControl extends Control {
             } else if (thisObj.type == 'inputFilter') {
                 e.formulas = thisObj.controlFormulas.formulas;
                 SYMPER_APP.$evtBus.$emit('document-submit-filter-input-click', e)
+            } else if (thisObj.type == 'time') {
+                e.curTarget = e.target
+                SYMPER_APP.$evtBus.$emit('document-submit-show-time-picker', e)
             }
+
         })
 
 
@@ -524,13 +528,9 @@ export default class BasicControl extends Control {
         if (this.checkDetailView()) return;
     }
     renderTimeControl() {
-        let thisObj = this;
         if (this.checkDetailView()) return;
         this.ele.attr('type', 'text');
-        this.ele.on('click', function(e) {
-            e.controlName = thisObj.name;
-            SYMPER_APP.$evtBus.$emit('document-submit-time-input-click', e)
-        })
+
     }
     getDefaultValue() {
         if (this.isCheckbox) {

@@ -343,10 +343,17 @@ export default class Table {
                             thisObj.currentControlSelected = columns[coords.col].data;
                         // nếu type cell là time thì emit qua submit mở timepicker
                         if (thisObj.getCellSelectedType(coords.col) == 'time') {
+
+                            var activeEditor = this.getActiveEditor();
+                            this.selectCell(coords.row, coords.col);
+                            activeEditor.beginEditing();
                             thisObj.showPopupTime = true;
                             event.controlName = columns[coords.col].data
+                            event.curTarget = activeEditor.TEXTAREA
                             SYMPER_APP.$evtBus.$emit('document-submit-show-time-picker', event);
+                            // activeEditor.enableFullEditoMode();
                         };
+
                     },
                     afterSelectionEnd: function(row, col) {
                         store.commit("document/addToDocumentSubmitStore", {
@@ -983,19 +990,20 @@ export default class Table {
                 }
             },
             items: {
-                "row_above": {
-
-                },
-                "row_below": {
-
-                },
                 'remove_row': {
                     callback: function(key, selection, clickEvent) { // Callback for specific option
                         setTimeout(function(hotTb) {
                             hotTb.alter(key, selection[0]['start']['row'], 1);
                         }, 0, this);
                     }
-                }
+                },
+                "row_above": {
+
+                },
+                "row_below": {
+
+                },
+
             }
         }
 
@@ -1159,7 +1167,7 @@ export default class Table {
             rsl.readOnly = true;
 
         } else if (type == 'time') {
-            rsl.timeFormat = 'HH:mm:ss',
+            rsl.timeFormat = 'HH:mm a',
                 rsl.correctFormat = true;
 
         } else if (type == 'date') {

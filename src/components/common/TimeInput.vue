@@ -21,7 +21,7 @@ export default {
     methods:{
         show(e){
             this.isShowPopup = true;
-            this.curInput = $(e.target);
+            this.curInput = $(e.curTarget);
             this.calculatorPositionBox();
             this.setEventInput(e);
         },
@@ -106,7 +106,7 @@ export default {
             if(regex.test(this.curInput.val())){
                 isValid = true;
             }
-            this.$emit('after-check-input-time-valid',{input:this.curInput,controlName: e.controlName,isValid:isValid});      
+            this.$emit('after-check-input-time-valid',{input:this.curInput,controlName: e.controlName,isValid:isValid,event:e});      
         }
     },
     beforeMount(){

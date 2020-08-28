@@ -426,10 +426,7 @@ export default {
                 instance: thisCpn.keyInstance
             });
         });
-        this.$evtBus.$on("document-submit-time-input-click", e => {
-            if(thisCpn.isComponentActive == false) return;
-            thisCpn.$refs.timeInput.show(e);
-        });
+      
         // this.$evtBus.$on("document-submit-search-in-filter-input", e => {
         //     if(thisCpn.isComponentActive == false) return;
         //     thisCpn.runInputFilterFormulas(e.controlName,e.search);
@@ -774,8 +771,14 @@ export default {
             else{
                 controlInstance.renderValidateIcon('Định dạng thời gian không đúng!');
             }
+            this.checkEscKey(data.event);
         },
 
+        checkEscKey(evet){
+            if(evet.key === "Escape"){
+                this.$refs.timeInput.hide();
+            }
+        },
         afterSelectUser(data){
             let user = data.value;
             let input = data.input;
@@ -1210,6 +1213,9 @@ export default {
 
         // Hàm chỉ ra control được đánh định danh trong document (sct...)
         getColumnIdentifier(){
+            if(this.objectIdentifier == undefined){
+                return {}
+            }
             let controlIdentifier = {}
             let controlNameIdentifier = this.objectIdentifier['name'];
             let controlInstance = getControlInstanceFromStore(this.keyInstance,controlNameIdentifier);
@@ -1256,7 +1262,7 @@ export default {
                 }
             }
             else{
-                submitDocument()
+                this.submitDocument()
             }
             
         },
