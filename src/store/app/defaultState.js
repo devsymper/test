@@ -131,7 +131,8 @@ const defaultState = {
     // Danh sách tất cả các user trong hệ thống
     allUsers: [],
     generalNotificationPosition: 'top right',
-    userLoadedRoleType: []
+    userLoadedRoleType: [],
+    userOperations: {}
 };
 
 export default defaultState;

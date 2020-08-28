@@ -233,4 +233,46 @@ const changeUserRole = async function(context, role) {
         console.error(error);
     }
 }
-export { getAllOrgChartData, getAllUsers, getAllRoles, setUserInfo, changeUserRole };
+
+const getAndSetUserOperations = async function(context) {
+    let res = await userApi.getCurrentRoleOperations();
+    if (res.status == 200) {
+        let ops = res.data;
+        /**
+         * Biến lưu lại các operation nhóm bởi object type và id của object,
+         * có dạng: {
+         *      document_definition: {
+         *          1787: {
+         *              submit: true,
+         *              delete: true,..
+         *          },...
+         *      }
+         * }
+         */
+        let opsByObjectType = {};
+        for (let op of ops) {
+            let type = op.objectType;
+            if (!opsByObjectType[type]) {
+                opsByObjectType[type] = {}
+            }
+
+            let sections = op.objectIdentifier.split(':');
+            let id = sections[0];
+            if (!opsByObjectType[type][id]) {
+                opsByObjectType[type][id] = {};
+            }
+            opsByObjectType[type][id][op.action] = true;
+        }
+        context.commit('setUserActionsForObjects', opsByObjectType);
+    } else {
+        SYMPER_APP.$snotifyError(res, "Can not get operations of current role");
+    }
+}
+export {
+    getAndSetUserOperations,
+    getAllOrgChartData,
+    getAllUsers,
+    getAllRoles,
+    setUserInfo,
+    changeUserRole
+};
