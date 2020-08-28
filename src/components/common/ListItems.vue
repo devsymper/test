@@ -39,7 +39,7 @@
                             <v-icon left dark>mdi-refresh</v-icon>
                             {{$t('common.refresh')}}
                         </v-btn>
-                        <v-btn
+                        <!-- <v-btn
                             depressed
                             small
                             :loading="loadingExportExcel"
@@ -49,7 +49,7 @@
                         >
                             <v-icon left dark>mdi-microsoft-excel</v-icon>
                             {{$t('common.export_excel')}}
-                        </v-btn>
+                        </v-btn> -->
                         <component
                             :is="'span'"
                         >
@@ -87,7 +87,7 @@
                         :data="data"
                         :rowHeights="21"
                         :columns="tableColumns"
-                        :contextMenu="itemContextMenu"
+                        :contextMenu="hotTableContextMenuItems"
                         :colHeaders="colHeaders"
                         :hiddenColumns="{
                             columns: tableDisplayConfig.hiddenColumns
@@ -210,7 +210,7 @@ import { userApi } from "./../../api/user.js";
 import SymperDragPanel from "./SymperDragPanel.vue";
 import DisplayConfig from "./../common/listItemComponents/DisplayConfig";
 import Pagination from './../common/Pagination'
-
+import { actionHelper } from "./../../action/actionHelper";
 var apiObj = new Api("");
 var testSelectData = [ ];
 window.tableDropdownClickHandle = function(el, event) {
@@ -233,6 +233,7 @@ export default {
         }
     },
     data() {
+        let self = this;
         return {
             deleteDialogShow: false, // có hiển thị cảnh báo xóa hay không
             deleteItems: [], // danh sách các row cần xóa
@@ -254,6 +255,7 @@ export default {
             },
             fixedColumnsCount: 0, // Số lượng cột fix ở bên trái
             tableColumns: [],
+            cellAboutSelecting: {}, // cell có nguy cơ được lựa chọn, được set mỗi khi chuột hover qua
             actionPanel: false, // có hiển thị action pannel (create, detail, edit) hay không
             loadingExportExcel: false, // có đang chạy export hay ko
             loadingRefresh: false, // có đang chạy refresh dữ liệu hay ko
@@ -278,6 +280,32 @@ export default {
                         "after render handsontablelllllllllllllllllllllllllll",
                         Date.now()
                     );
+                },
+                beforeContextMenuSetItems: () => {
+
+                    // let row = self.$refs.dataTable.hotInstance.getSourceDataAtRow(self.cellAboutSelecting.row);
+                    // let id = row.id;
+                    // let items = self.tableContextMenu;
+                    // if(!$.isArray(items)){
+                    //     let objectType = self.commonActionProps.resource;
+                        
+                    //     let filteredItems = actionHelper.filterAdmittedActions(items, objectType, id);
+                    // }
+                    // self.hotTableContextMenuItems =  self.getItemContextMenu(items);
+                },
+                beforeOnCellMouseOver: (event, coords, TD, controller) => {
+                    console.log(event, coords);
+                    self.cellAboutSelecting = coords;
+
+                     let row = self.$refs.dataTable.hotInstance.getSourceDataAtRow(self.cellAboutSelecting.row);
+                    let id = row.id;
+                    let items = self.tableContextMenu;
+                    if(!$.isArray(items)){
+                        let objectType = self.commonActionProps.resource;
+                        
+                        let filteredItems = actionHelper.filterAdmittedActions(items, objectType, id);
+                    }
+                    self.hotTableContextMenuItems =  self.getItemContextMenu(items);
                 }
             },
             tableFilter: {
@@ -328,7 +356,8 @@ export default {
              */
             data: [],
             filteredColumns: {}, // tên các cột đã có filter, dạng {tên cột : true},
-            savedTableDisplayConfig: [] // cấu hình hiển thị của table đã được lueu trong db
+            savedTableDisplayConfig: [], // cấu hình hiển thị của table đã được lueu trong db
+            hotTableContextMenuItems: []
         };
     },
     activated(){
@@ -389,7 +418,6 @@ export default {
          * nó sẽ emit sự kiện tên là: context-selection-tên của menu item
          */
         tableContextMenu: {
-            type: Array,
             default() {
                 return [];
             }
@@ -451,6 +479,21 @@ export default {
         useActionPanel: {
             type: Boolean,
             default: true
+        },
+
+        /**
+         * Chứa các thông tin chung cho các action trong context menu cần định nghĩa
+         * có dạng : {
+         *      "module": "",
+         *      "resource": "",
+         *      "scope": "",
+         * }
+         */
+        commonActionProps: {
+            type: Object,
+            default(){
+                return {}
+            }
         }
     },
     mounted() {},
@@ -467,73 +510,6 @@ export default {
             } else {
                 return "100%";
             }
-        },
-        itemContextMenu() {
-            let thisCpn = this;
-            let contextMenu = {
-                callback: function(key, selection, clickEvent) {
-                    let col = selection[0].start.col;
-                    let row = selection[0].start.row;
-                    let rowData = thisCpn.data[row];
-                    let colName = Object.keys(rowData)[col];
-                    /**
-                     * Phát sự kiện khi có một hành động đối với một row, hoặc cell.
-                     * tham số thứ nhất: row ( index của row đang được chọn)
-                     * tham số thứ hai: colName ( Tên của cột (key trong một row) )
-                     */
-                    thisCpn.$emit("context-selection-" + key, row, colName);
-                    // Datnt
-                    // Callback for context menu item
-                    let menuItem = thisCpn.tableContextMenu.filter(menu => {
-                        return menu.name == key;
-                    });
-                    thisCpn.selectedContextItem = menuItem;
-                    if (
-                        menuItem.length &&
-                        menuItem[0].hasOwnProperty("callback")
-                    ) {
-                        if(key == 'remove' || key == 'delete'){
-                            thisCpn.deleteItems = [];
-                            let deletedIndexs = {};
-                            for(let item of selection ){
-                                for(let idx = item.start.row ; idx <= item.end.row; idx++){
-                                    if(!deletedIndexs[idx]){
-                                        thisCpn.deleteItems.push(thisCpn.data[idx]);
-                                        deletedIndexs[idx] = true;
-                                    }
-                                }
-                            }
-                            thisCpn.deleteDialogShow = true;
-                        }else{
-                            thisCpn.exeCallbackOnContextMenu(rowData);
-                        }
-                    }
-                    if (key == "remove") {
-                    } else if (key == "edit" || key == "view") {
-                        thisCpn.actionPanel = true;
-                    }
-                },
-                items: {}
-            };
-            if (this.useDefaultContext) {
-                contextMenu.items = {
-                    remove: {
-                        name: "Xóa"
-                    },
-                    edit: {
-                        name: "Sửa"
-                    },
-                    view: {
-                        name: "Chi tiết"
-                    }
-                };
-            }
-            for (let item of this.tableContextMenu) {
-                contextMenu.items[item.name] = {
-                    name: item.text
-                };
-            }
-            return contextMenu;
         },
         tableHeight() {
             let ref = this.$refs;
@@ -594,6 +570,73 @@ export default {
         }
     },
     methods: {
+        getItemContextMenu(rawItems) {
+            let thisCpn = this;
+            let contextMenu = {
+                callback: function(key, selection, clickEvent) {
+                    let col = selection[0].start.col;
+                    let row = selection[0].start.row;
+                    let rowData = thisCpn.data[row];
+                    let colName = Object.keys(rowData)[col];
+                    /**
+                     * Phát sự kiện khi có một hành động đối với một row, hoặc cell.
+                     * tham số thứ nhất: row ( index của row đang được chọn)
+                     * tham số thứ hai: colName ( Tên của cột (key trong một row) )
+                     */
+                    thisCpn.$emit("context-selection-" + key, row, colName);
+                    // Datnt
+                    // Callback for context menu item
+                    let menuItem = rawItems.filter(menu => {
+                        return menu.name == key;
+                    });
+                    thisCpn.selectedContextItem = menuItem;
+                    if (
+                        menuItem.length &&
+                        menuItem[0].hasOwnProperty("callback")
+                    ) {
+                        if(key == 'remove' || key == 'delete'){
+                            thisCpn.deleteItems = [];
+                            let deletedIndexs = {};
+                            for(let item of selection ){
+                                for(let idx = item.start.row ; idx <= item.end.row; idx++){
+                                    if(!deletedIndexs[idx]){
+                                        thisCpn.deleteItems.push(thisCpn.data[idx]);
+                                        deletedIndexs[idx] = true;
+                                    }
+                                }
+                            }
+                            thisCpn.deleteDialogShow = true;
+                        }else{
+                            thisCpn.exeCallbackOnContextMenu(rowData);
+                        }
+                    }
+                    
+                    if (key == "edit" || key == "view") {
+                        thisCpn.actionPanel = true;
+                    }
+                },
+                items: {}
+            };
+            if (this.useDefaultContext) {
+                contextMenu.items = {
+                    remove: {
+                        name: "Xóa"
+                    },
+                    edit: {
+                        name: "Sửa"
+                    },
+                    view: {
+                        name: "Chi tiết"
+                    }
+                };
+            }
+            for (let item of rawItems) {
+                contextMenu.items[item.name] = {
+                    name: item.text
+                };
+            }
+            return contextMenu;
+        },
         searchAutocompleteItems(vl){
             this.tableFilter.currentColumn.colFilter.searchKey = vl;
             this.getItemForValueFilter();

@@ -261,7 +261,12 @@ const getAndSetUserOperations = async function(context) {
             if (!opsByObjectType[type][id]) {
                 opsByObjectType[type][id] = {};
             }
-            opsByObjectType[type][id][op.action] = true;
+
+            if (id == type) { // nếu là operation đối với chính object type hiện tại thì quy định id sẽ là self
+                opsByObjectType[type]['self'][op.action] = true;
+            } else {
+                opsByObjectType[type][id][op.action] = true;
+            }
         }
         context.commit('setUserActionsForObjects', opsByObjectType);
     } else {
