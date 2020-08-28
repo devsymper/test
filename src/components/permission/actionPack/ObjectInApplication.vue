@@ -54,15 +54,21 @@ export default {
             if(!this.applicationObjects[appId]){
                 let appDetail = this.cacheAppDetail[appId];
                 if(!appDetail){
-                    let res = await appManagementApi.getAppDetails(appId);
-                    if(res.status == 200){
-                        appDetail = res.data.listObject.childrenApp;
-                        this.cacheAppDetail[appId] = appDetail;
+                    if(appId){
+                        let res = await appManagementApi.getAppDetails(appId);                        
+                        if(res.status == 200){
+                            appDetail = res.data.listObject.childrenApp;
+                            this.cacheAppDetail[appId] = appDetail;
+                        }else{
+                            this.$snotifyError(res, "Can not get application detail!");
+                        }
                     }else{
-                        this.$snotifyError(res, "Can not get application detail!");
+                        appDetail = {};
+                        this.cacheAppDetail[appId] = appDetail;
                     }
                 }
                 
+                let data = {};
                 for(let key in appDetail){
                     data[key] = appDetail[key];
                 }
@@ -108,21 +114,6 @@ export default {
         tableSettings() {
             return {
                 ...this.commonTableSetting,
-                afterChange: function(changes, source) {
-                    if(!changes){
-                        return;
-                    }
-                    let htIst = this;
-                    console.log(changes, source, htIst);
-                    let lastIndex = htIst.getData().length;
-                    if(changes[0][0] == lastIndex - 1){
-                        this.alter('insert_row', lastIndex + 1, 1, 'add_row_on_enter');
-                    }
-                    setTimeout(function() {
-                        htIst.selectCell(lastIndex, htIst.propToCol(changes[0][1]));
-                        self.tableDataDefinition[openingTabKey].tableData = htIst.getSourceData();
-                    }, 0);
-                },
             }
         }
     },

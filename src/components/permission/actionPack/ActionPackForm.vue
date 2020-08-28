@@ -84,25 +84,159 @@ export default {
         this.reCaculateTableHeight();
     },
     created(){
-        this.initAllResource();
     },
     methods: { 
-        initAllResource(){
-            let needInitResources = [
-                'document_definition',
-                'workflow_definition',
-                'orgchart',
-                'dashboard'
-            ];
+        
+        getTableDataFromOperations(operations){
+            let mapActionAndObjectTypes = this.mapObjectTypesAndAction;
+            let allResource = this.$store.state.actionPack.allResource;
+
+            /**
+             * Map giữa object type và action , có dạng
+             * {
+             *      document_definition: {
+             *          id_doc: [
+             *              'display text', true, true, false ....
+             *          ]
+             *      }
+             * }
+             */
+            let mapActionAndObjects = {};
+            let mapActionForAllObjects = {};
+
+
+            /**
+             * Schema cho row mới của từng object type, có dạng:
+             * {
+             *      document_definition: ['', false, false, ...]
+             * }
+             */
+            let rowSchemaByObjectType = {};
+            for (let key in mapActionAndObjectTypes) {
+                mapActionAndObjects[key] = {};
+                rowSchemaByObjectType[key] = {
+                    object: '',
+                };
+                mapActionForAllObjects[key] = [{}];
+                for (let actionName in mapActionAndObjectTypes[key]) {
+                    rowSchemaByObjectType[key][actionName] = false;
+                    mapActionForAllObjects[key][0][actionName] = false;
+                }
+            }
+            
+            // khởi tạo các operation ứng với các objectType
+            let sections, objectType, objectId, actionName;
+            for (let op of operations) {
+                sections = op.objectIdentifier.split(":");
+                objectType = sections[0];
+                objectId = sections[1] ? sections[1] : 0;
+
+                if(!objectId){
+                    // Nếu các action áp dụng cho toàn bộ object của object type
+                    mapActionForAllObjects[objectType][0][op.action] = true;
+                }else{
+                    // Nếu áp dụng cho các object cụ thể
+                    let actionByObject = mapActionAndObjects[objectType];
+                    if (actionByObject) {
+                        if (!actionByObject[objectId]) {
+                            actionByObject[objectId] = util.cloneDeep(
+                                rowSchemaByObjectType[objectType]
+                            );
+
+                            if(allResource[objectType][objectId]){
+                                actionByObject[objectId].object =
+                                    allResource[objectType][objectId].fullText;
+                            }else{
+                                actionByObject[objectId].object = '';
+                            }
+                        }
+                        if(op.action){
+                            actionByObject[objectId][op.action] = true;
+                        }
+                    }
+                }
+            }
+
+            // chế biến về cho đúng định dạng hiển thị của bảng
+            for(let objectType in mapActionAndObjects){
+                mapActionAndObjects[objectType] = Object.values(mapActionAndObjects[objectType]);
+
+                let lastEmptyRow = util.cloneDeep(rowSchemaByObjectType[objectType]);
+                for(let actionName in lastEmptyRow){
+                    if(actionName != 'object'){
+                        lastEmptyRow[actionName] = true;
+                    }
+                }
+                mapActionAndObjects[objectType].push(lastEmptyRow);
+            }
+            
+            return {
+                mapActionAndObjects,
+                mapActionForAllObjects
+            }
+        },
+        initAllResource(needInitResources){
+            // let needInitResources = [
+            //     'document_definition',
+            //     'workflow_definition',
+            //     'orgchart',
+            //     'dashboard'
+            // ];
             for(let type of needInitResources){
                 this.getObjectsOfObjectType(type);
             }
         },
-        translateAppObjectIdToTableData(data){
+        async translateAppObjectIdToTableData(data){
             let appId = data.id;
             let objs = data.objects;
-            
-            
+            let actionPackId = this.itemData.id;
+            let initOperations = {}; // các operation mà có action rỗng để đảm bảo luôn hiển thị các object của app ngay cả khi các object này chưa có quyền
+            let objectTypeDataTable = {};
+            // let allOperation = await permissionApi.
+
+            if(Number(appId) > 0){
+                let objsOfApp = this.multipleLevelObjects.application_definition;
+                for(let objectType in objsOfApp){
+                    objsOfApp[objectType].tableData = [];
+                }
+            }
+
+            for(let objectType in objs){
+                initOperations[objectType] = {};
+                for(let obj of objs[objectType]){
+                    let objIdentify = objectType+":"+obj.id;
+                    initOperations[objectType][objIdentify] = {
+                        objectIdentifier: objIdentify,
+                        objectType: objectType,
+                    };
+                }
+            }
+
+            let savedOperations = {};
+            for(let objectType in initOperations){
+                savedOperations[objectType] = [];
+                if(this.itemData.operationMapByObjectType[actionPackId]){
+                    for(let op of this.itemData.operationMapByObjectType[actionPackId][objectType]){
+                        if(initOperations[objectType][op.objectIdentifier]){
+                            savedOperations[objectType].push(op);
+                        }
+                    }
+                }
+            }
+
+            for(let objectType in objs){
+                objectTypeDataTable[objectType] = [];
+                let operations = Object.values(initOperations[objectType]);
+                if(savedOperations[objectType]){
+                    operations = operations.concat(savedOperations[objectType]);
+                }
+                let dataTable = this.getTableDataFromOperations(operations);
+                objectTypeDataTable[objectType] = dataTable.mapActionAndObjects[objectType];
+            }
+
+            for(let objectType in objectTypeDataTable){
+                this.multipleLevelObjects.application_definition[objectType].tableData = objectTypeDataTable[objectType];
+            }
         },
         setConfigForApplicationObjects(){
             let appDef = this.multipleLevelObjects.application_definition;
@@ -221,51 +355,68 @@ export default {
                 }
             });
         },
-        getNewOperationData(){
+        getOperationToSaveFromDataTable(dataTable, allResource, objectType){
             let newOperations = [];
-            let allResource = this.$store.state.actionPack.allResource;
-            for(let objectType in this.itemData.mapActionAndObjects){
-                let dataTable = this.itemData.mapActionAndObjects[objectType];
-                for (let row of dataTable) {
-                    let key = row['object'];
-                    let id = '';
-                    if(key){
-                        id = key.slice(0, key.indexOf(' -'));
-                    }
-                    
-                    if(allResource.hasOwnProperty(objectType) ){
-                        if(allResource[objectType][id]){
-                            for(let actionName in row){
-                                if(actionName == 'object'){
-                                    continue
-                                }
-                                if(row[actionName]){
-                                    newOperations.push({
-                                        objectType: objectType,
-                                        action: actionName,
-                                        objectIdentifier: allResource[objectType][id].objectIdentifier,
-                                        name: actionName.replace(/_/g, ' ') + ' '+ objectType.replace(/_/g, ' ') + ' ' + id
-                                    });
-                                }
+            for (let row of dataTable) {
+                let key = row['object'];
+                let id = '';
+                if(key){
+                    id = key.slice(0, key.indexOf(' -'));
+                }
+                
+                if(allResource.hasOwnProperty(objectType) ){
+                    if(allResource[objectType][id]){
+                        for(let actionName in row){
+                            if(actionName == 'object'){
+                                continue
                             }
-                        }else if(key.trim() != ''){
-                            for(let actionName in row){
-                                if(actionName == 'object'){
-                                    continue
-                                }
-                                if(row[actionName]){
-                                    newOperations.push({
-                                        objectType: objectType,
-                                        action: actionName,
-                                        objectIdentifier: key,
-                                        name: key
-                                    });
-                                }
+                            if(row[actionName]){
+                                newOperations.push({
+                                    objectType: objectType,
+                                    action: actionName,
+                                    objectIdentifier: allResource[objectType][id].objectIdentifier,
+                                    name: actionName.replace(/_/g, ' ') + ' '+ objectType.replace(/_/g, ' ') + ' ' + id
+                                });
+                            }
+                        }
+                    }else if(key.trim() != ''){
+                        for(let actionName in row){
+                            if(actionName == 'object'){
+                                continue
+                            }
+                            if(row[actionName]){
+                                newOperations.push({
+                                    objectType: objectType,
+                                    action: actionName,
+                                    objectIdentifier: key,
+                                    name: key
+                                });
                             }
                         }
                     }
                 }
             }
+            return newOperations;
+        },
+        removeDuplicateOperations(newOperations){
+            let opMap = newOperations.reduce( (map, op) => {
+                map[op.objectIdentifier+'|||'+op.action] = op;
+                return map;
+            }, {});
+            return Object.values(opMap);
+        },
+        getNewOperationData(){
+            let newOperations = [];
+            let allResource = this.$store.state.actionPack.allResource;
+            for(let objectType in this.itemData.mapActionAndObjects){
+                let dataTable = this.itemData.mapActionAndObjects[objectType];
+                newOperations = newOperations.concat(this.getOperationToSaveFromDataTable(dataTable, allResource, objectType));
+            }
+            for(let objectType in this.multipleLevelObjects.application_definition){
+                let dataTable = this.multipleLevelObjects.application_definition[objectType].tableData;
+                newOperations = newOperations.concat(this.getOperationToSaveFromDataTable(dataTable, allResource, objectType));
+            }
+            newOperations = this.removeDuplicateOperations(newOperations);
 
             for(let objectType in this.itemData.mapActionForAllObjects){
                 let dataTable = this.itemData.mapActionForAllObjects[objectType];
@@ -463,7 +614,6 @@ export default {
                         let object = this.getDataAtRow(rowNum)[0];
                         if(object){
                             let id = String(object).split(' ')[0].trim();
-                            debugger
                             if(!isNaN(id)){
                                 self.focusingIdApplication = Number(id);
                             }else{
@@ -517,6 +667,9 @@ export default {
         }
     },
     computed: {
+        mapObjectTypesAndAction() {
+            return this.$store.getters["actionPack/listActionByObjectType"];
+        },
         // các action ứng với object type
         listAction() {
             return this.$store.getters['actionPack/listActionByObjectType'];
@@ -571,6 +724,7 @@ export default {
                 this.handleChangeObjectType();
                 if(!$.isEmptyObject(value)){
                     this.setConfigForApplicationObjects();
+                    this.initAllResource(Object.keys(value));
                 }
             }
         }
