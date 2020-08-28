@@ -286,7 +286,12 @@ export default {
 
         });
         this.isComponentActive = true;
-
+        $(document).on('click','.run-dataflow',function(e){
+            let idControl = $(this).closest('.s-control-data-flow').attr('id');
+            let control = thisCpn.sDocumentEditor.allControl[idControl];
+            let dataParams = thisCpn.getParamsForRunDataFlow(control.properties);
+            let element = thisCpn.$refs['dataFlow'+control.properties.dataFlowId.value][0].runDataflow();
+        })
     },
 
     created() {
@@ -441,12 +446,11 @@ export default {
         }); 
         // hàm nhận sự thay đổi của input autocomplete gọi api để chạy công thức lấy dữ liệu
         this.$evtBus.$on("document-submit-autocomplete-key-event", e => {
-            console.log("sdsdad",e.e);
             if(thisCpn.isComponentActive == false) return;
             try {
                 if((e.e.keyCode >= 97 && e.e.keyCode <= 105) ||
                     (e.e.keyCode >= 48 && e.e.keyCode <= 57) ||
-                    (e.e.keyCode >= 65 && e.e.keyCode <= 90) || [8,32,231].includes(e.e.keyCode)) { // nếu key code là các kí tự chữ và số hợp lệ
+                    (e.e.keyCode >= 65 && e.e.keyCode <= 90) || [189,16,8,32,231].includes(e.e.keyCode)) { // nếu key code là các kí tự chữ và số hợp lệ
                     if(!thisCpn.$refs.autocompleteInput.isShow()){
                         thisCpn.$refs.autocompleteInput.show(e.e);
                         let currentTableInteractive = this.sDocumentSubmit.currentTableInteractive;
@@ -478,14 +482,14 @@ export default {
             try {
                 if((e.e.keyCode >= 97 && e.e.keyCode <= 105) ||
                     (e.e.keyCode >= 48 && e.e.keyCode <= 57) ||
-                    (e.e.keyCode >= 65 && e.e.keyCode <= 90) || [8,32,231].includes(e.e.keyCode)) { // nếu key code là các kí tự chữ và số hợp lệ
+                    (e.e.keyCode >= 65 && e.e.keyCode <= 90) || [189,16,8,32,231].includes(e.e.keyCode)) { // nếu key code là các kí tự chữ và số hợp lệ
                     if(!thisCpn.$refs.autocompleteInput.isShow()){
                         thisCpn.$refs.autocompleteInput.show(e.e);
                         let currentTableInteractive = this.sDocumentSubmit.currentTableInteractive;
                         if(currentTableInteractive != null && currentTableInteractive != undefined)
                         currentTableInteractive.isAutoCompleting = true;
                         thisCpn.$store.commit("document/addToDocumentSubmitStore", {
-                            key: 'currentControlActive',
+                            key: 'currentControlAutoComplete',
                             value: e.controlName,
                             instance: thisCpn.keyInstance
                         });
@@ -496,7 +500,7 @@ export default {
                     thisCpn.$refs.autocompleteInput.hide();
                 }
                 
-            } catch (error) {
+            } catch (error) { 
                 
             }
             
@@ -599,6 +603,19 @@ export default {
     },
     
     methods: {
+        // hàm
+        getParamsForRunDataFlow(properties){
+            let mapControlToParams = properties.mapParamsDataflow.value;
+            let dataParams = {}
+            for (let index = 0; index < mapControlToParams.length; index++) {
+                let item = mapControlToParams[index];
+                let param = item.name
+                let controlName = item.controlName;
+                let listInputInDocument = getListInputInDocument(this.keyInstance);
+                dataParams[param] = listInputInDocument[controlName].value;
+            }
+            debugger
+        },
         setWorkflowVariableToStore(after){
             this.$store.commit("document/addToDocumentSubmitStore", {
                     key: 'workflowVariable',
@@ -619,29 +636,35 @@ export default {
         afterDataFlowMounted(id){
             for (let index = 0; index < this.listDataFlow.length; index++) {
                 const controlDataFlow = this.listDataFlow[index];
+                let dataFlowActionEl = controlDataFlow.el.find('.run-dataflow').detach();
                 controlDataFlow.el.empty();
                 let element = $(this.$refs['dataFlow'+controlDataFlow.id][0].$el);
                 
+                controlDataFlow.el.append(dataFlowActionEl);
                 controlDataFlow.el.append(element.detach());
+                controlDataFlow.el.find('.run-dataflow').css({display:'block'})
                 // var iframe = controlDataFlow.el.find('iframe') // or some other selector to get the iframe
                 // $('.joint-paper-scroller', iframe.contents()).css({overflow:'hidden'});
                 // $(this.$refs['dataFlow'+controlDataFlow.id].$el).append(controlDataFlow.el);
                 
             }
         },
-        getDataOrgchart(){
-            // let dataFromCache = this.getDataAutocompleteFromCache(e.e.target.value, aliasControl);
-            // if(dataFromCache == false){
-            //     let dataInput = this.getDataInputFormulas(e.autocompleteFormulasInstance,e);
-            //     e.autocompleteFormulasInstance.handleRunAutoCompleteFormulas(dataInput).then(res=>{
-            //         thisCpn.setDataForControlAutocomplete(res,aliasControl,e.controlTitle, $(e.e.target).val())
-            //     });
-            // }
-            // else{
-            //     this.$refs.autocompleteInput.setAliasControl(aliasControl);
-            //     this.$refs.autocompleteInput.setData(dataFromCache);
-            // }
-            // e.listFormulasInstance.handleRunAutoCompleteFormulas(dataInput).then(res=>{
+        getDataOrgchart(e){
+            let thisCpn = this
+            let aliasControl = e.formulasInstance.autocompleteDetectAliasControl();
+            let dataFromCache = this.getDataAutocompleteFromCache(e.e.target.value, aliasControl);
+            if(dataFromCache == false){
+                let dataInput = this.getDataInputFormulas(e.formulasInstance,e);
+                e.formulasInstance.handleBeforeRunFormulas(dataInput).then(res=>{
+                    res.status = 200
+                    thisCpn.setDataForControlAutocomplete(res,aliasControl,e.controlTitle, $(e.e.target).val(),true)
+                });
+            }
+            else{
+                this.$refs.autocompleteInput.setAliasControl(aliasControl);
+                this.$refs.autocompleteInput.setData(dataFromCache);
+            }
+            // e.formulasInstance.handleBeforeRunFormulas(dataInput).then(res=>{
             //     thisCpn.setDataForControlAutocomplete(res,aliasControl,e.controlTitle, $(e.e.target).val())
             // });
         },
@@ -653,7 +676,7 @@ export default {
             if(type == 'select'){
                 let dataInput = this.getDataInputFormulas(e.selectFormulasInstance);  
                 e.selectFormulasInstance.handleRunAutoCompleteFormulas(dataInput).then(res=>{
-                    thisCpn.setDataForControlAutocomplete(res,aliasControl,e.controlTitle)
+                    thisCpn.setDataForControlAutocomplete(res,aliasControl,e.controlTitle,"",false)
                 });
             }
             else{
@@ -662,7 +685,7 @@ export default {
                 if(dataFromCache == false){
                     let dataInput = this.getDataInputFormulas(e.autocompleteFormulasInstance,e);
                     e.autocompleteFormulasInstance.handleRunAutoCompleteFormulas(dataInput).then(res=>{
-                        thisCpn.setDataForControlAutocomplete(res,aliasControl,e.controlTitle, $(e.e.target).val())
+                        thisCpn.setDataForControlAutocomplete(res,aliasControl,e.controlTitle, $(e.e.target).val(),"")
                     });
                 }
                 else{
@@ -690,14 +713,17 @@ export default {
         /**
          * Hàm bind dữ liệu cho box autocomplete, cho component autocompleteInput
          */
-        setDataForControlAutocomplete(res,aliasControl,controlTitle, textTyping=""){
+        setDataForControlAutocomplete(res,aliasControl,controlTitle, textTyping="",fromSqlite=false){
             let controlAs = {};
             controlAs[aliasControl] = controlTitle;
             if(res.data != undefined){
                 if(res.status == 200 && res.data != false){
                     let dataTable = {}
-                    if(res.data.data !== ""){
-                        dataTable = this.handleDataAutoComplete(res.data.data,false,controlAs);
+                    if(!fromSqlite && res.data.data !== ""){
+                        dataTable = this.handleDataAutoComplete(res.data.data,fromSqlite,controlAs);
+                    }
+                    else{
+                        dataTable = this.handleDataAutoComplete(res.data,fromSqlite,controlAs);
                     }
                     this.$refs.autocompleteInput.setAliasControl(aliasControl);
                     this.$refs.autocompleteInput.setData(dataTable);
@@ -717,8 +743,7 @@ export default {
                 }
             }
             else{
-                let data =  res[0];
-                let dataTable = this.handleDataAutoComplete(data,true,controlAs);
+                let dataTable = this.handleDataAutoComplete(res,true,controlAs);
                 this.$refs.autocompleteInput.setAliasControl(aliasControl);
                 this.$refs.autocompleteInput.setData(dataTable);
                 this.$refs.autocompleteInput.hideHeader();
@@ -834,23 +859,23 @@ export default {
             let headers = [];
             let bodyTable = [];
             if(isFromSQLLite){
-                for(let i = 0; i < data.columns.length; i++){
-                    let item = {value:data.columns[i], text:data.columns[i]};
-                    if(controlAs.hasOwnProperty(data.columns[i])){
-                        item.text = controlAs[data.columns[i]]
+                for(let i = 0; i < data[0].columns.length; i++){
+                    let item = {value:data[0].columns[i], text:data[0].columns[i]};
+                    if(controlAs.hasOwnProperty(data[0].columns[i])){
+                        item.text = controlAs[data[0].columns[i]]
                     }
-                    if(data.columns[i] == 'column1'){
+                    if(data[0].columns[i] == 'column1'){
                         item.text = controlAs[Object.keys(controlAs)[0]]
                     }
                     headers.push(item);
                 }
-                let values = data.values;
+                let values = data[0].values;
                 for(let i = 0; i < values.length; i++){
                     let item = {};
-                    for(let j = 0; j < data.columns.length; j++){
-                        item[data.columns[j]] = values[i][j];
-                        bodyTable.push(item);
+                    for(let j = 0; j < data[0].columns.length; j++){
+                        item[data[0].columns[j]] = values[i][j];
                     }
+                    bodyTable.push(item);
                 }
             }
             else{
@@ -962,8 +987,6 @@ export default {
             for (let index = 0; index < allInputControl.length; index++) {
                 let id = $(allInputControl[index]).attr('id');
                 let controlType = $(allInputControl[index]).attr('s-control-type');
-                            console.log(controlType);
-
                 if(this.sDocumentEditor.allControl[id] != undefined){   // ton tai id trong store
                     let field = this.sDocumentEditor.allControl[id];
                     let idField = field.id;
@@ -991,7 +1014,8 @@ export default {
                         if (controlType != "table") {
                             if(controlType == 'dataFlow'){
                                 let id = field.properties.dataFlowId.value;
-                                listDataFlow.push({id:id,controlName:controlName,el:$(allInputControl[index])}) ;
+                                let mapParamsDataflow = field.properties.mapParamsDataflow.value;
+                                listDataFlow.push({id:id,controlName:controlName,el:$(allInputControl[index]),mapParamsDataflow:mapParamsDataflow});
                             }
                             else{
                                 let control = new BasicControl(
@@ -1057,10 +1081,8 @@ export default {
 
             }
             this.listDataFlow = listDataFlow;
-            
             if(!isSetEffectedControl)
             this.getEffectedControl();
-            // thisCpn.createDocumentSQLLiteTable(); 
             if(this.docObjId == null)
             thisCpn.findRootControl();
 
@@ -1344,7 +1366,6 @@ export default {
                 }
                 if (listInput[controlName].type == "table") {
                     let value = this.getDataTableInput(listInput[controlName]);
-                    console.log('valuevaluevaluevalue',value);
                     Object.assign(dataControl, value);
                 } else {
             
@@ -1360,10 +1381,7 @@ export default {
                         if(listInput[controlName].type == 'checkbox'){
                             dataControl[controlName] = (value) ? 1 : 0;
                         } 
-                        // if(listInput[controlName].type == 'user'){
-                        //     dataPost[id] =  [0];
-                        // }
-                        
+                       
                     }
                     
                 }
@@ -1874,6 +1892,9 @@ export default {
     height: calc(100vh - 100px);
     overflow-y: auto;
     overflow-x: hidden;
+}
+.wrap-content-submit .icon{
+    font-size: 20px !important;
 }
 </style>
 

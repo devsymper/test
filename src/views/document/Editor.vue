@@ -216,8 +216,9 @@ export default {
             if(res.status == 200 && res.data.length>0){
                 for (let index = 0; index < res.data.length; index++) {
                     let dataflow = res.data[index];
-                    this.listDataFlow.push({id:dataflow.id,name:dataflow.name,title:""})
+                    thisCpn.listDataFlow.push({id:dataflow.id,name:dataflow.name,title:"",params:dataflow.params})
                 }
+                thisCpn.$store.commit("document/addToDocumentEditorStore",{key:"listDataFlow",value:thisCpn.listDataFlow,instance:thisCpn.keyInstance});  
             }
         })
         
@@ -919,6 +920,14 @@ export default {
         },
         // set config cho phần sidebar phải các thuộc tính control đang được click
         selectControl(properties,formulas,id,type){
+            if(type == 'dataFlow'){
+                // console.log(this.listDataFlow,'listDataFlowlistDataFlow');
+                // let curDataFlow = this.listDataFlow.filter(df=>{
+                //     return df.id == properties['dataFlowId'].value
+                // })
+                // console.log(curDataFlow,'listDataFlowlistDataFlow');
+                // properties[k].value = this.listDataFlow
+            }
             this.$store.commit(
                 "document/addCurrentControl",
                 {properties:properties,
@@ -1216,6 +1225,7 @@ export default {
                     if(k =='name'){
                         properties[k].oldName =  properties[k].value
                     }
+                    
                 }) 
                 if(fields[controlId]['formulas'] != false){
                     $.each(formulas,function(k,v){
@@ -1761,11 +1771,14 @@ export default {
 
         },
         setSelectedControlProp(e,el,clientFrameWindow){
+            
             e.preventDefault();
             $(clientFrameWindow.document).find('.on-selected').removeClass('on-selected');
             el.addClass('on-selected');
 
             let type = el.attr('s-control-type');
+
+            
             let controlId = el.attr('id');
             this.currentSelectedControl = controlId
             $('.editor-tree-active').removeClass('editor-tree-active')

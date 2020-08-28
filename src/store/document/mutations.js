@@ -51,17 +51,26 @@ const addCurrentControl = (state, control) => {
         let propsTypeIsName = Object.filter(control.properties, prop => prop.groupType == 'name')
         let propsTypeIsDisplay = Object.filter(control.properties, prop => prop.groupType == 'display')
         let propsTypeIsPrint = Object.filter(control.properties, prop => prop.groupType == 'print')
-        groups = { name: propsTypeIsName, display: propsTypeIsDisplay, print: propsTypeIsPrint };
+        let propsTypeIsTable = Object.filter(control.properties, prop => prop.groupType == 'table')
+        groups = { name: propsTypeIsName, display: propsTypeIsDisplay, print: propsTypeIsPrint, table: propsTypeIsTable };
     }
     Vue.set(state.editor[instance].currentSelectedControl, 'properties', groups);
 
 };
 const updateCurrentControlProps = (state, params) => {
-        let group = params.group;
-        let prop = params.prop;
+    let group = params.group;
+    let prop = params.prop;
+    let typeProp = params.typeProp;
+    let value = params.value;
+    let instance = params.instance
+    Vue.set(state.editor[instance].currentSelectedControl.properties[group][prop], typeProp, value);
+}
+const updateCurrentControlFormulas = (state, params) => {
+        let type = params.type;
         let typeProp = params.typeProp;
         let value = params.value;
-        Vue.set(state.editor.currentSelectedControl.properties[group][prop], typeProp, value);
+        let instance = params.instance
+        Vue.set(state.editor[instance].currentSelectedControl.formulas[type], typeProp, value);
     }
     // hàm xóa control đang chọn ra khỏi store
 const resetCurrentControl = (state, params) => {
@@ -72,6 +81,7 @@ const resetCurrentControl = (state, params) => {
             name: {},
             display: {},
             print: {},
+            table: {},
 
         },
         formulas: {
@@ -240,7 +250,8 @@ const setDefaultSubmitStore = (state, params) => {
                     }
                 }
             }
-        }
+        },
+        orgchartTableSqlName: {}
     }
     let instance = params.instance;
     Vue.set(state.submit, instance, value);
@@ -265,7 +276,8 @@ const setDefaultEditorStore = (state, params) => {
             id: ""
         },
         listControlTreeData: [],
-        allControlForTableOption: []
+        allControlForTableOption: [],
+        listDataFlow: []
     }
     let instance = params.instance;
     Vue.set(state.editor, instance, value);
@@ -351,6 +363,7 @@ export {
     setAllDocuments,
     resetCurrentControl,
     updateCurrentControlProps,
+    updateCurrentControlFormulas,
     addToRelatedLocalFormulas,
     setDefaultSubmitStore,
     setDefaultEditorStore,

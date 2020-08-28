@@ -155,6 +155,7 @@ var lastKey;
  */
 const supportCellsType = {
     textInput: 'TextRenderer',
+    department: 'TextRenderer',
     currency: 'NumericRenderer',
     number: 'NumericRenderer',
     date: 'DateRenderer',
@@ -274,6 +275,35 @@ export default class Table {
                                     event.curTarget = hot.getActiveEditor().TEXTAREA;
                                     SYMPER_APP.$evtBus.$emit('document-submit-user-input-change', event)
                                 }, 50, this);
+                            }
+                        }
+                        if (thisObj.checkControlType('department')) {
+                            if (event.keyCode == 13) {
+                                return;
+                            }
+                            if (thisObj.listAutoCompleteColumns[thisObj.currentControlSelected] != false) {
+                                if ((event.keyCode == 40 || event.keyCode == 38 ||
+                                        event.keyCode == 37 || event.keyCode == 39) && thisObj.isAutoCompleting) {
+                                    event.stopImmediatePropagation();
+                                }
+                                if (listKeyCodeNotChange.includes(event.keyCode)) {
+                                    return;
+                                }
+                                // hoangnd: cần set timeout ở đây tại vì cần thực hiện đoạn này sau khi keydown hoàn tất thì input mới có dữ liệu
+                                setTimeout(() => {
+                                    let columns = thisObj.columnsInfo.columns;
+                                    let formulasInstance = thisObj.listAutoCompleteColumns[thisObj.currentControlSelected]
+                                    event.rowIndex = thisObj.currentSelectedCell['row'];
+                                    let colHeaders = this.getColHeader();
+                                    let columnIndex = thisObj.currentSelectedCell['column'];
+                                    event.curTarget = this.getActiveEditor().TEXTAREA;
+                                    SYMPER_APP.$evtBus.$emit('document-submit-department-key-event', {
+                                        e: event,
+                                        formulasInstance: formulasInstance,
+                                        controlTitle: colHeaders[columnIndex],
+                                        controlName: columns[columnIndex].data
+                                    })
+                                }, 50);
                             }
                         } else {
                             if (event.keyCode == 13) {

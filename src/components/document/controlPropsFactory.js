@@ -224,9 +224,28 @@ const commonProps = {
         value: "",
         groupType: "print"
     },
+    mapParamsDataflow: {
+        title: 'Mapping',
+        type: 'table',
+        groupType: 'table',
+        value: [],
+        columns: [{
+                title: 'From',
+                name: 'name',
+                type: 'text',
+            },
+            {
+                title: 'To',
+                name: 'controlName',
+                type: 'text',
+            },
+        ],
+    },
 }
 
+
 let commonFormulas = {
+
     require: {
         title: "Công thức require",
         value: "",
@@ -390,7 +409,7 @@ const controlTypes = {
         html: `<input class="s-control s-control-text mdi" contenteditable="false" s-control-type="department" type="text" title="Department">&nbsp;&nbsp;`,
         title: "Department",
         notInProps: ['dataFlowId', 'isPrimaryKey', 'formatNumber', 'formatDate', 'isSumTable', 'isAllowUpdate'],
-        formulas: ['formulas', 'list', 'hidden', 'readOnly', 'require', 'validate']
+        formulas: ['formulas', 'autocomplete', 'hidden', 'readOnly', 'require', 'validate']
     },
     richText: {
         icon: "/icon/ic_richtext.png",
@@ -578,8 +597,13 @@ const controlTypes = {
     },
     dataFlow: {
         icon: "/icon/ic_report.png",
-        html: `<div class="s-control s-control-data-flow" contenteditable="false" title="Data Flow" s-control-type="dataFlow" style="display: inline-block;font-size: 11px;width: 100%;max-width: 100%;" >
-                    <button class="run-dataflow" style="display: none;"><span class="mdi-reload"></span></button>
+        html: `<div class="s-control s-control-data-flow" contenteditable="false" title="Data Flow" s-control-type="dataFlow" style="display: inline-block;font-size: 11px;width: 100%;max-width: 100%;position:relative;" >
+                    <button class="run-dataflow" style="display: none;
+                    position: absolute;
+                    font-size: 18px;
+                    right: 10px;
+                    color:#409eff;
+                    top: 4px;"><span class="mdi mdi-reload"></span></button>
                     <div>
                         <span class="panel-title2" style="background: #f2f2f2;color: gray;height: 30px;font-weight: bold;width: 100%;text-align: center;display: inline-block;line-height: 2.5;">Data Flow</span>
                         <div style="height: 30px;display: block;background: white;border: 1px solid #f2f2f2;border-top: none;    
@@ -595,7 +619,7 @@ const controlTypes = {
                     </div>
                 </div>&nbsp;`,
         title: "Data Flow",
-        inProps: ['dataFlowId', 'name', 'title', 'width', 'height', 'isAllowPrint'],
+        inProps: ['dataFlowId', 'mapParamsDataflow', 'name', 'title', 'width', 'height', 'isAllowPrint'],
         formulas: []
     },
     approvalHistory: {

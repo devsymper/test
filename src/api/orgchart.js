@@ -56,4 +56,7 @@ export const orgchartApi = {
     getAllNodes() {
         return orgchart.get("orgchart/nodes");
     },
+    queryOrgchart(data) {
+        return orgchart.post("orgchart/query", data);
+    }
 };

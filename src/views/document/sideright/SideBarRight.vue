@@ -59,6 +59,16 @@
                         :allInputs="controlPropsGroup.print"/>
                     </v-expansion-panel-content>
                 </v-expansion-panel>
+                <v-expansion-panel class="m-0" >
+                    <v-expansion-panel-header class="v-expand-header">Mapping</v-expansion-panel-header>
+                    <v-expansion-panel-content class="sym-v-expand-content">
+                        <control-props-config 
+                        @input-value-changed="handleChangeInput" 
+                        :singleLine="false" 
+                        :labelWidth="`100px`" 
+                        :allInputs="controlPropsGroup.table"/>
+                    </v-expansion-panel-content>
+                </v-expansion-panel>
             </v-expansion-panels>
             <!-- <control-props-config :singleLine="true" :labelWidth="`100px`" :allInputs="sCurrentDocument.properties"/> -->
 
@@ -101,11 +111,20 @@ export default {
         sCurrentDocument(){
             return this.$store.state.document.editor[this.instance].currentSelectedControl;
         },
+        listDataFlow(){
+            return this.$store.state.document.editor[this.instance].listDataFlow
+        },
 
         controlPropsGroup(){
             return this.$store.state.document.editor[this.instance].currentSelectedControl.properties;
             // return this.sCurrentDocument.properties;
         }
+    },
+    watch:{
+        "controlPropsGroup.table.mapParamsDataflow.value":function(after){
+            // debugger    
+        }
+        
     },
     data () {
         return {
@@ -146,7 +165,24 @@ export default {
         handleKeyupInput(name, input, data){
             
         },
+        setMappingForParamsDataFlow(id,tableId){
+            let currentDataflow = this.listDataFlow.filter(df=>{
+                return df.id == id;
+            })
+            try {
+                let params = JSON.parse(currentDataflow[0].params);
+                this.$store.commit(
+                    "document/updateCurrentControlProps",{instance:this.instance,group:'table',prop:'mapParamsDataflow',typeProp:'value',value:params}
+                );  
+                 this.$store.commit(
+                    "document/updateProp",{id:this.sCurrentDocument.id,name:'mapParamsDataflow',value:params,tableId:tableId,type:"value",instance:this.instance}
+                );   
+            } catch (error) {
+                
+            }
+        },
         handleChangeInput(name, input, data){
+            
             if(this.isConfigPrint){
                 this.savePrintControlConfig(name, input, data);
                 return;
@@ -162,6 +198,9 @@ export default {
             let tableId = checkInTable(elements);
             if( tableId == this.sCurrentDocument.id)
             tableId = '0';
+            if(name === "dataFlowId"){
+                this.setMappingForParamsDataFlow(data.value,tableId)
+            }
             this.$store.commit(
                 "document/updateProp",{id:this.sCurrentDocument.id,name:name,value:value,tableId:tableId,type:"value",instance:this.instance}
             );   

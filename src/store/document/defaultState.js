@@ -31,6 +31,7 @@ const defaultState = {
                     name: {},
                     display: {},
                     print: {},
+                    table: {},
 
                 },
                 formulas: {
@@ -40,7 +41,8 @@ const defaultState = {
                 id: ""
             },
             listControlTreeData: [],
-            allControlForTableOption: []
+            allControlForTableOption: [],
+            listDataFlow: []
         }
     },
     submit: {
@@ -73,7 +75,8 @@ const defaultState = {
                         }
                     }
                 }
-            }
+            },
+            orgchartTableSqlName: {}
         }
     },
     detail: {

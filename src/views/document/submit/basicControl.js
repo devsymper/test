@@ -179,20 +179,17 @@ export default class BasicControl extends Control {
                     $(e.target).val(100)
                 }
             }
-            if (thisObj.type = 'department') {
-                // let formulasInstance = (fromSelect) ? thisObj.controlFormulas.formulas.instance : thisObj.controlFormulas.autocomplete.instance;
-                // e['controlName'] = thisObj.name;
-                // SYMPER_APP.$evtBus.$emit('document-submit-department-key-event', {
-                //     e: e,
-                //     listFormulasInstance: formulasInstance,
-                //     isSelect: false,
-                //     controlTitle: thisObj.title,
-                //     controlName: thisObj.name,
-                //     val: $(e.target).val()
-                // })
+            if (thisObj.type == 'department') {
+                e['controlName'] = thisObj.name;
+                SYMPER_APP.$evtBus.$emit('document-submit-department-key-event', {
+                    e: e,
+                    formulasInstance: thisObj.controlFormulas.autocomplete.instance,
+                    controlTitle: thisObj.title,
+                    controlName: thisObj.name,
+                    val: $(e.target).val()
+                })
             }
-
-            if (thisObj.checkAutoCompleteControl()) {
+            if (thisObj.checkAutoCompleteControl() && thisObj.type != 'department') {
                 let fromSelect = false;
                 let formulasInstance = (fromSelect) ? thisObj.controlFormulas.formulas.instance : thisObj.controlFormulas.autocomplete.instance;
                 e['controlName'] = thisObj.controlProperties.name.value;
