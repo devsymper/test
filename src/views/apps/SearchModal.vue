@@ -41,6 +41,7 @@ import {documentApi} from './../../api/Document';
 import {orgchartApi} from './../../api/orgchart';
 import {dashboardApi} from './../../api/dashboard';
 import BpmnEngine from './../../api/BPMNEngine';
+import { debounce } from "debounce";
 export default {
 	 data: function() {
         return {
@@ -95,6 +96,18 @@ export default {
 		clickItem(obj,type){
 			this.$store.commit('appConfig/updateListItemSelected',{obj:obj,type:type});
 		},
+		debounce(func, wait) {
+			var timeout;
+			debugger
+			return function() {
+				var context = this, args = arguments;
+				var executeFunction = function() {
+					func.apply(context, args);
+				};
+				clearTimeout(timeout);
+				timeout = setTimeout(executeFunction, wait);
+			};
+		},
 		getListSearch(value){
 			this.listItems.document_definition.item =[]
 			this.listItems.orgchart.item =[]
@@ -116,7 +129,8 @@ export default {
 	},
 	 watch: {
         'myValue': function(val){
-			this.getListSearch(val);
+			this.getListSearch(val)
+			this.debounce(this.getListSearch(val),1000)
 	    }
 	}
 }

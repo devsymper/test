@@ -73,9 +73,7 @@
 			this.hide()
 			let targetItem = this.targetItem
 			this.$evtBus.$emit('symper-app-call-action-handler', this.defineAction[this.type], this, {id:targetItem.id,name:targetItem.name,title:targetItem.title});
-
 		}
-
 	}
 	}
 </script>

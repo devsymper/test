@@ -13,9 +13,10 @@ import {
 	type
 } from 'jquery';
 const updateListItemSelected = (state, data) => {
+	debugger
 	// Vue.set(state, 'listItemSelected', data);
 	let listItem = state.listItemSelected[data.type].item;
-	if (listItem.includes(data.obj)) {
+	if (listItem.includes(data.obj)){
 		listItem.splice(listItem.indexOf(data.obj), 1);
 	} else {
 		listItem.push(data.obj);
@@ -62,9 +63,13 @@ const insertFavorite = (state, data) => {
 	state.listFavorite.push(data)
 }
 const delFavorite = (state, data) => {
-	state.listFavorite.splice(state.listFavorite.indexOf(data), 1)
+	// state.listFavorite.splice(state.listFavorite.indexOf(data), 1)
+	state.listFavorite.forEach(function(e){
+		if(e.id === data.id && e.type === data.type){
+			state.listFavorite.splice(state.listFavorite.indexOf(e),1)
+		}
+	})
 }
-
 export {
 	updateListItemSelected,
 	removeItemSelected,
@@ -73,5 +78,4 @@ export {
 	updateListFavorite,
 	insertFavorite,
 	delFavorite
-
 };

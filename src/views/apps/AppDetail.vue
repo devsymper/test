@@ -20,8 +20,6 @@
 									<div v-else>{{childItem.name}}</div>
 									<v-icon  @click="changeFavorite(childItem,itemT.name)" :class="{'icon-star-active' : childItem.favorite==true, 'icon-star': true}" >mdi-star</v-icon>	
 								</div>
-							<!-- <v-icon  @click="changeFavorite(childItem,itemT.name,1)"  class="icon-star" >mdi-star</v-icon> -->
-							<!-- <v-icon v-if="isEndUserCpn == false" class="icon-remove"  @click="removeItem(childItem.id,itemT.name)">mdi-delete-circle</v-icon> -->
 							</li>
 							<li v-else>
 								<div style="position:relative">
@@ -127,7 +125,7 @@ export default {
 			self.objFilter.orgchart.item = []
 			self.objFilter.dasboard.item = []
 			self.objFilter.workflow_definition.item = []
-			if(listItem.documents.item.length > 0){
+			if(listItem.document_definition.item.length > 0){
 					listItem.document_definition.item.filter(function(item){
 						if(item.title.toLowerCase().includes(self.searchKey.toLowerCase())){
 							self.objFilter.document_definition.item.push(item)
@@ -168,59 +166,20 @@ export default {
 			this.$refs.contextMenu.hide()
 		},	
 		changeFavorite(item,type){
-			// if(type == 'documents'){
-			// 	type = 'document_definition'
-			// }
-			// if(type == 'orgcharts'){
-			// 	type = 'orgchart'
-			// }
-			// if(type == 'reports'){
-			// 	type = 'dasboard'
-			// }
-			// if(type== 'workflows'){
-			// 	type = 'workflow_definition'
-			// }
 			let userId = this.$store.state.app.endUserInfo.id
 			if(item.favorite == false){
 				appManagementApi.addFavoriteItem(userId,item.id,type,1).then(res => {
 					if (res.status == 200) {
-				
-						// if(type == 'document_definition'){
-						// 	type = 'documents'
-						// }
-						// if(type == 'orgchart'){
-						// 	type = 'orgcharts'
-						// }
-						// if(type == 'dasboard'){
-						// 	type = 'reports'
-						// }
-						// if(type== 'workflow_definition'){
-						// 	type = 'workflows'
-						// }
-						// item.type = type;
-						// this.$store.commit('appConfig/insertFavorite',item)
+						item.type = type;
+						this.$store.commit('appConfig/insertFavorite',item)
 						item.favorite = true;
-						
 					}
 				});
 			}else{
 				appManagementApi.addFavoriteItem(userId,item.id,type,0).then(res => {
 					if (res.status == 200) {
-
-						// if(type == 'document_definition'){
-						// 	type = 'documents'
-						// }
-						// if(type == 'orgchart'){
-						// 	type = 'orgcharts'
-						// }
-						// if(type == 'dasboard'){
-						// 	type = 'reports'
-						// }
-						// if(type== 'workflow_definition'){
-						// 	type = 'workflows'
-						// }
-						// item.type = type;
-						// this.$store.commit('appConfig/delFavorite',item)
+						item.type = type;
+						this.$store.commit('appConfig/delFavorite',item)
 						item.favorite = false;
 					}
 				});

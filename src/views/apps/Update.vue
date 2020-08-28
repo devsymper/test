@@ -104,7 +104,7 @@
 			 </div>
 		</div> -->
 		<!-- <div ></div> -->
-		<AppDetailVue />
+		<AppDetailVue/>
         <v-btn
             small
             color="primary"

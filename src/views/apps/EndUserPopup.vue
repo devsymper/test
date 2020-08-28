@@ -178,7 +178,6 @@ export default {
 			let self = this 
 			let userId = this.$store.state.app.endUserInfo.id
 			appManagementApi.getItemFavorite(userId).then(res =>{
-				debugger
 				if (res.status == 200) {
 					// this.testListFavorite = res.data.listObject
 					res.data.listObject.forEach(function(e){
@@ -202,6 +201,7 @@ export default {
 			});
 		},
 		clickDetails(item){
+			this.$store.commit('appConfig/emptyItemSelected')
 			this.title.iconName = item.iconName;
 			this.title.iconType = item.iconType;
 			this.title.name = item.name;
@@ -370,7 +370,7 @@ export default {
 		clickBack(){
 			this.tab = 'tab-1'
 			// this.getActiveapps()
-			this.getFavorite()
+			// this.getFavorite()
 		},
 		updateFavoriteItem(mapArray,array){
 			for( let [key,value] of Object.entries(mapArray)){
