@@ -290,7 +290,7 @@ export default {
             let idControl = $(this).closest('.s-control-data-flow').attr('id');
             let control = thisCpn.sDocumentEditor.allControl[idControl];
             let dataParams = thisCpn.getParamsForRunDataFlow(control.properties);
-            let element = thisCpn.$refs['dataFlow'+control.properties.dataFlowId.value][0].runDataflow();
+            let element = thisCpn.$refs['dataFlow'+control.properties.dataFlowId.value][0].runDataflow(dataParams);
         })
     },
 
@@ -612,9 +612,10 @@ export default {
                 let param = item.name
                 let controlName = item.controlName;
                 let listInputInDocument = getListInputInDocument(this.keyInstance);
+                if(param != null && param != "" && controlName != null && controlName !="")
                 dataParams[param] = listInputInDocument[controlName].value;
-            }
-            debugger
+            } 
+            return dataParams
         },
         setWorkflowVariableToStore(after){
             this.$store.commit("document/addToDocumentSubmitStore", {
