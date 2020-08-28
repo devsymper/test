@@ -60,6 +60,17 @@ export const str = {
         return str;
     },
 
+    toSnakeCase(inputString) {
+        return inputString.split('').map((character) => {
+                if (character == character.toUpperCase()) {
+                    return '_' + character.toLowerCase();
+                } else {
+                    return character;
+                }
+            })
+            .join('');
+    },
+
     hashCode(str) {
         if (Array.prototype.reduce) {
             return str.split("").reduce(function(a, b) { a = ((a << 5) - a) + b.charCodeAt(0); return a & a }, 0);
