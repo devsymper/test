@@ -22,7 +22,7 @@
 						<div class="title-favorite"><v-icon >mdi-playlist-star</v-icon><h4>{{$t('apps.favorite')}}</h4></div>
 						<ul style="margin:0 10px;">
 							<VuePerfectScrollbar style="max-height:200px"  >
-								<li v-for="(item,i) in listFavorite" :key="i" v-on:contextmenu="rightClickHandler($event,item,item.type)" style="cursor:pointer"> 
+								<li v-for="(item,i) in sFavorite" :key="i" v-on:contextmenu="rightClickHandler($event,item,item.type)" style="cursor:pointer"> 
 									<div style="position:relative">
 										<div v-if="item.hasOwnProperty('title')" class="title-item-favorite">{{item.title}}</div>
 										<div v-else  class="title-item-favorite">{{item.name}}</div> 
@@ -159,6 +159,9 @@ export default {
 	computed:{
 		sAppManagement(){
 			return this.$store.state.appConfig.listItemSelected
+		},
+		sFavorite(){
+			return   this.$store.state.appConfig.listFavorite
 		}
 	},
 	methods:{
@@ -178,7 +181,6 @@ export default {
 				if (res.status == 200) {
 					// this.testListFavorite = res.data.listObject
 					res.data.listObject.forEach(function(e){
-						// self.mapIdFavorite[e.objectIdentifier] = e
 						if(e.objectType == 'document_definition'){
 							self.mapIdFavorite.document_definition[e.objectIdentifier] = e
 						}  
@@ -193,6 +195,7 @@ export default {
 						}  
 					})
 					this.checkTypeFavorite(res.data.listObject)
+					this.$store.commit('appConfig/updateListFavorite',this.listFavorite)
 				}
 			}).catch((err) => {
 			});
@@ -365,7 +368,7 @@ export default {
 		},
 		clickBack(){
 			this.tab = 'tab-1'
-			this.getActiveapps()
+			// this.getActiveapps()
 			this.getFavorite()
 		},
 		updateFavoriteItem(mapArray,array){

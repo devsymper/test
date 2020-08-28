@@ -169,27 +169,58 @@ export default {
 		},	
 		changeFavorite(item,type){
 			if(type == 'documents'){
-				type = 'document'
+				type = 'document_definition'
 			}
 			if(type == 'orgcharts'){
 				type = 'orgchart'
 			}
 			if(type == 'reports'){
-				type = 'report'
+				type = 'dasboard'
 			}
 			if(type== 'workflows'){
-				type = 'workflow'
+				type = 'workflow_definition'
 			}
 			let userId = this.$store.state.app.endUserInfo.id
 			if(item.favorite == false){
 				appManagementApi.addFavoriteItem(userId,item.id,type,1).then(res => {
 					if (res.status == 200) {
+				
+						// if(type == 'document_definition'){
+						// 	type = 'documents'
+						// }
+						// if(type == 'orgchart'){
+						// 	type = 'orgcharts'
+						// }
+						// if(type == 'dasboard'){
+						// 	type = 'reports'
+						// }
+						// if(type== 'workflow_definition'){
+						// 	type = 'workflows'
+						// }
+						// item.type = type;
+						// this.$store.commit('appConfig/insertFavorite',item)
 						item.favorite = true;
+						
 					}
 				});
 			}else{
 				appManagementApi.addFavoriteItem(userId,item.id,type,0).then(res => {
 					if (res.status == 200) {
+
+						// if(type == 'document_definition'){
+						// 	type = 'documents'
+						// }
+						// if(type == 'orgchart'){
+						// 	type = 'orgcharts'
+						// }
+						// if(type == 'dasboard'){
+						// 	type = 'reports'
+						// }
+						// if(type== 'workflow_definition'){
+						// 	type = 'workflows'
+						// }
+						// item.type = type;
+						// this.$store.commit('appConfig/delFavorite',item)
 						item.favorite = false;
 					}
 				});
