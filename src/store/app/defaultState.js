@@ -77,11 +77,6 @@ const defaultState = {
             link: "/permissions",
         },
         {
-            title: "actions",
-            icon: "mdi-package",
-            link: "/actions"
-        },
-        {
             title: "apps",
             icon: "mdi-apps",
             link: "/apps"

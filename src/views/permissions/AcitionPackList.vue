@@ -70,6 +70,7 @@ export default {
             actionOnItem: "create",
             getListUrl: appConfigs.apiDomain.actionPacks,
             currentItemData: {
+                id: 0,
                 name: "",
                 description: "",
                 objectType: "document_definition",
@@ -85,6 +86,7 @@ export default {
                         self.getActionPackOperations(row.id);
                         self.actionOnItem = "update";
                         self.applyDataToForm(row);
+                        self.$refs.actionPackForm.objectTypeToDocumentDefinition();
                     }
                 },
                 {
@@ -124,6 +126,7 @@ export default {
                         self.getDetailActionPack(row.id);
                         self.actionOnItem = "detail";
                         self.applyDataToForm(row);
+                        self.$refs.actionPackForm.objectTypeToDocumentDefinition();
                     }
                 }
             ],
@@ -364,10 +367,12 @@ export default {
         handleAddItem() {
             this.actionOnItem = "create";
             this.currentItemData.name = "";
+            this.currentItemData.id = 0;
             this.currentItemData.description = "";
             this.currentItemData.objectType = "document_definition";
             this.currentItemData.mapActionAndObjects = [];
             this.currentItemData.mapActionForAllObjects = [];
+            this.$refs.actionPackForm.objectTypeToDocumentDefinition();
         },
         calcContainerHeight() {
             this.containerHeight = util.getComponentSize(this).h;
