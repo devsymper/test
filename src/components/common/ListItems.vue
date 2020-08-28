@@ -223,7 +223,6 @@ window.tableDropdownClickHandle = function(el, event) {
         $(el).attr("col-name")
     );
 };
-
 export default {
     name: "SymperListItem",
     watch: {
@@ -477,7 +476,6 @@ export default {
                     let row = selection[0].start.row;
                     let rowData = thisCpn.data[row];
                     let colName = Object.keys(rowData)[col];
-
                     /**
                      * Phát sự kiện khi có một hành động đối với một row, hoặc cell.
                      * tham số thứ nhất: row ( index của row đang được chọn)
@@ -517,7 +515,6 @@ export default {
                 },
                 items: {}
             };
-
             if (this.useDefaultContext) {
                 contextMenu.items = {
                     remove: {
@@ -536,7 +533,6 @@ export default {
                     name: item.text
                 };
             }
-
             return contextMenu;
         },
         tableHeight() {
@@ -562,14 +558,12 @@ export default {
                 prefix[prefix.length - 1] == "." || prefix == ""
                     ? prefix
                     : prefix + ".";
-
             let colNames = [];
             let colTitles = this.tableColumns.reduce((headers, item) => {
                 colNames.push(item.data);
                 headers.push(item.columnTitle);
                 return headers;
             }, []);
-
             return function(col) {
                 let colName = colNames[col];
                 let markFilter = "";
@@ -712,7 +706,6 @@ export default {
                     symperHide: col.symperHide
                 });
             }
-
             configs = JSON.stringify(configs);
             userApi
                 .saveUserViewConfig("showList", this.$route.name, configs)
@@ -751,7 +744,6 @@ export default {
             //     });
             // });
         },
-
         /**
          * Kiểm tra xem một cột trong table có đang áp dụng filter hay ko
          */
@@ -759,7 +751,6 @@ export default {
             if (!filter) {
                 filter = this.tableFilter.allColumn[colName];
             }
-
             if (!filter) {
                 return false;
             } else {
@@ -783,13 +774,11 @@ export default {
             let colName = this.tableFilter.currentColumn.name;
             this.$set(this.tableFilter.allColumn, colName, filter);
             let hasFilter = this.checkColumnHasFilter(colName, filter);
-
             this.filteredColumns[colName] = hasFilter;
             let icon = $(this.$el).find(
                 ".symper-table-dropdown-button[col-name=" + colName + "]"
             );
             this.getData(false,false,true);
-
             if(hasFilter && source != "clear-filter"){
                 icon.addClass("applied-filter");
             }else{
@@ -828,7 +817,6 @@ export default {
         prepareFilterAndCallApi(columns = false, cache = false, applyFilter = false, success, configs = {}){
             let url = this.getDataUrl;
             let method = 'GET';
-
             if (url != "") {
                 let thisCpn = this;
                 thisCpn.loadingData = true;
@@ -841,7 +829,6 @@ export default {
                     columns: columns ? columns : [],
                     distinct: configs.distinct ? configs.distinct : false
                 };
-
                 let header = {};
                 if(thisCpn.$route.name == "deployHistory" || thisCpn.$route.name == "listProcessInstances"){
                     header = {
@@ -887,7 +874,6 @@ export default {
         getFilterConfigs(getDataMode = '') {
             let configs = [];
             for (let colName in this.tableFilter.allColumn) {
-
                 let filter = this.tableFilter.allColumn[colName];
                 let condition = filter.conditionFilter;
                 let option = {
@@ -904,7 +890,6 @@ export default {
                     configs.push(option);
                     continue;
                 }
-
                 if (condition.items[0].type != "none") {
                     option.conditions = [
                         {
@@ -919,7 +904,6 @@ export default {
                         });
                     }
                 }
-
                 if(filter.searchKey != '' && filter.clickedSelectAll){
                     option.conditions = [
                         {
@@ -928,7 +912,6 @@ export default {
                         }
                     ];
                 }
-
                 if(filter.selectAll && !$.isEmptyObject(filter.valuesNotIn)){
                     option.valueFilter = {
                         'operation': ' NOT IN ',
@@ -940,7 +923,6 @@ export default {
                         'values': Object.keys(filter.valuesIn)
                     };
                 }
-
                 if(!$.isEmptyObject(option)){
                     configs.push(option);
                 }
@@ -980,7 +962,6 @@ export default {
         getTableColumns(columns, forcedReOrder = false) {
             let savedOrderCols = this.savedTableDisplayConfig;
             let colMap = {};
-
             if (forcedReOrder) {
                 for (let item of columns) {
                     colMap[item.data] = item;
@@ -1016,15 +997,12 @@ export default {
                         }
                         colMap[item.name].renderer = this.dateRenderer;
                     }
-
                     
-
                     if(item.renderer){
                         colMap[item.name].renderer = item.renderer;
                     }
                 }
             }
-
             if (savedOrderCols.length > 0) {
                 let orderedCols = [];
                 let noneOrderedCols = [];
@@ -1066,7 +1044,6 @@ export default {
                 this.tableColumns = fixedCols.concat(noneFixedCols);
             }
             this.fixedColumnsCount = fixedCols.length;
-
             setTimeout(
                 thisCpn => {
                     thisCpn.savedTableDisplayConfig = thisCpn.tableColumns;
@@ -1083,7 +1060,6 @@ export default {
             filterDom.css("left", x + "px").css("top", y + 10 + "px");
             this.$refs.dataTable.hotInstance.deselectCell();
             this.$refs.tableFilter.show();
-
             let colFilter = this.tableFilter.allColumn[colName];
             if (!colFilter) {
                 colFilter = getDefaultFilterConfig();
@@ -1099,12 +1075,10 @@ export default {
                 name: colName,
                 colFilter: colFilter
             });
-
             this.setSelectItemForFilter();
             $("#symper-platform-app").append(filterDom[0]);
             this.getItemForValueFilter();
         },
-
         /**
          * Lấy các item phục vụ cho việc lựa chọn trong autocomplete cuar filter
          */
@@ -1126,11 +1100,9 @@ export default {
                     self.tableFilter.currentColumn.colFilter.selectItems = self.createSelectableItems(items);
                 }
                 console.log(self.tableFilter.currentColumn.selectItems, 'datadatadatadatadata');
-
             }
             this.prepareFilterAndCallApi(columns , false, true, success, options);
         },
-
         /**
          * Lấy danh sách các giá trị cần đưa vào danh sách lựa chọn autocomplete từ server nếu chưa có danh sách này
          */
@@ -1235,7 +1207,6 @@ export default {
             this.$emit("change-page", this.page);
         }
     },
-
     components: {
         HotTable,
         "form-tpl": FormTpl,
@@ -1253,70 +1224,57 @@ export default {
 .ht_clone_top.handsontable {
     z-index: 6;
 }
-
 .handsontable .wtBorder.current {
     z-index: 5;
 }
-
 .symper-custom-table.clip-text .ht_master.handsontable .htCore td,
 .symper-custom-table.clip-text .ht_clone_left.handsontable .htCore td {
     text-overflow: ellipsis !important;
     white-space: nowrap !important;
 }
-
 .symper-custom-table.loosen-row .ht_master.handsontable .htCore td,
 .symper-custom-table.loosen-row .ht_clone_left.handsontable .htCore td {
     height: 40px !important;
     line-height: 40px !important;
 }
-
 .symper-custom-table.medium-row .ht_master.handsontable .htCore td,
 .symper-custom-table.medium-row .ht_clone_left.handsontable .htCore td {
     height: 30px !important;
     line-height: 30px !important;
 }
-
 .symper-custom-table.compact-row .ht_master.handsontable .htCore td,
 .symper-custom-table.compact-row .ht_clone_left.handsontable .htCore td {
     height: 20px !important;
     line-height: 20px !important;
     font-size: 12px !important;
 }
-
 .ghost {
     opacity: 0.5;
     background: #c8ebfb;
 }
-
 .flip-list-move {
     transition: transform 0.5s;
 }
 .no-move {
     transition: transform 0s;
 }
-
 .column-drag-pos {
     cursor: move;
     border-bottom: 1px solid #d0d0d0;
     background-color: white;
     padding-left: 8px;
 }
-
-
 .list-group {
     border: 1px solid #d0d0d0;
     border-radius: 3px;
 }
-
 i.applied-filter {
     color: #f58634;
     background-color: #ffdfc8;
 }
-
 .symper-list-item .ht_clone_left.handsontable table.htCore {
     border-right: 4px solid #f0f0f0;
 }
-
 .handsontable td,
 .handsontable th {
     color: #212529 !important;

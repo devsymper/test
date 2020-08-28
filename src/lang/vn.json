@@ -13,7 +13,7 @@
         "users": "Tài khoản người dùng",
         "add": "Thêm",
         "edit": "Sửa",
-        "cancel": "Hủy bỏ",
+        "cancel": "Hủy",
         "update": "Cập nhật",
         "delete": "Xóa",
         "refresh": "Làm mới",
@@ -454,12 +454,26 @@
             "created_at": "Ngày tạo",
             "updated_at": "Cập nhật lần cuối"
         },
+
+        "listType": {
+            "documents": "Văn bản",
+            "workflows": "Quy trình làm việc",
+            "reports": "Báo cáo",
+            "orgcharts": "Sơ đồ tổ chức"
+        },
+        "addApp": "Thêm ứng dụng",
+        "editApp": "Sửa ứng dụng",
         "title": "Applications",
         "pickIcon": "Chọn icon",
         "apps": "Applications",
         "commonInfo": "Thông tin chung của application",
         "listObjects": "Các chức năng trong application",
         "addObject": "Thêm tính năng",
+        "clickToAdd": "Click vào để thêm",
+        "search": "Tìm kiếm",
+        "favorite": "Yêu thích",
+        "listApp": "Danh sách ứng dụng",
+
         "objectSummary": "Tổng hợp các chức năng",
         "contextMenu": {
             "edit": "Sửa",

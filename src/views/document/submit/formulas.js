@@ -181,7 +181,10 @@ export default class Formulas {
                 syql = syql.replace('REF(', '');
                 syql = syql.substring(0, syql.length - 1);
                 syql = syql.replace(/\r?\n|\r/g, ' ');
-                let dataPost = { formula: syql, dataInput: JSON.stringify(dataInput) };
+                let dataPost = {
+                    formula: syql,
+                    dataInput: JSON.stringify(dataInput)
+                };
                 return formulasApi.getMultiData(dataPost);
             }
         } else {
@@ -191,7 +194,9 @@ export default class Formulas {
                 let res = await this.runSQLLiteFormulas(formula);
                 dataRes[rowId] = res[0].values[0][0];
             }
-            return { data: dataRes }
+            return {
+                data: dataRes
+            }
 
         }
 

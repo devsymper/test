@@ -94,7 +94,6 @@
                                                 <i class="mdi mdi-account mr-2 fs-16"> </i> <span> {{data.item.displayName}}</span>
                                             </div>
                                         </template>
-
                                     </v-autocomplete>
 
                                  </div>
@@ -152,7 +151,7 @@
             <VuePerfectScrollbar :style="{height: menuItemsHeight}">
                 <div class="pr-2">
                     <v-list-item
-                        v-for="item in sapp.items"
+                        v-for="item in userMenuItems"
                         :key="item.title" 
                         link
                         :symper-action="$bindAction(item.action)"
@@ -242,6 +241,9 @@ export default {
     computed: {
         sapp() {
             return this.$store.state.app;
+        },
+        userMenuItems(){
+            return this.$store.getters['app/userMenuItems'];
         }
     },
     watch: {

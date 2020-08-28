@@ -41,7 +41,14 @@ const systemRoutes = [{
         path: "*",
         name: "page",
         redirect: "/page-not-found",
-    }
+    },
+    // phần search
+    {
+        path: "/search/general",
+        name: "generalSearchInfo",
+        component: () =>
+            import ('../views/search/general.vue'),
+    },
 ];
 
 function autoImportRouteModules() {

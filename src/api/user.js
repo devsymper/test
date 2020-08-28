@@ -1,5 +1,6 @@
 import Api from "./api";
 import { appConfigs } from "./../configs.js";
+import { util } from "../plugins/util";
 
 var api = new Api(appConfigs.apiDomain.user);
 var coreApi = new Api(appConfigs.apiDomain.user);
@@ -90,4 +91,10 @@ export const userApi = {
     updateBAAccountPassword(id, data) {
         return api.put('supporters/' + id + '/password', data);
     },
+
+    // Lấy các operation của user ở role hiện tại
+    getCurrentRoleOperations() {
+        let roleIden = util.auth.getCurrentUserRole();
+        return api.get(`https://accesscontrol.symper.vn/roles/${roleIden}/accesscontrol`);
+    }
 };

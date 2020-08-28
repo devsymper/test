@@ -1,4 +1,4 @@
-import { deployProcess, getLastestDefinition } from "../components/process/processAction";
+import { deployProcess, getLastestDefinition } from "./../../components/process/processAction";
 
 let commonProps = {
     "module": "workflow",

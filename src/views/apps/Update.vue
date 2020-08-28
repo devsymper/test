@@ -1,7 +1,7 @@
 <template>
-    <div>
-        <v-card-title class="pt-0 pb-2 subtitle-1 font-weight-bold">
-            <v-icon class="pr-4">mdi-apps</v-icon> {{ !!!isEdit ? "Thêm Applications" : "Cập nhật Applications" }}
+    <div class="update-app-symper">
+        <v-card-title class="pt-0 pb-2 subtitle-1 ">
+            <v-icon class="pr-4">mdi-apps</v-icon> {{ !!!isEdit ? $t('apps.addApp') : $t('apps.editApp') }}
         </v-card-title>
         <v-divider></v-divider>
         <v-card-title class="pt-3 pb-0 subtitle-2 font-weight-bold">
@@ -9,12 +9,12 @@
         </v-card-title>
         <v-card-text>
             <v-row>
-                <v-col cols="8" class="pt-0 pb-0 pr-0">
+                <v-col cols="9" class="pt-0 pb-0 pr-0">
                     <v-row>
-                        <v-col class="pt-0 pb-2" cols="3">
+                        <v-col class="pt-0 pb-2" cols="4">
                             {{$t("apps.header.name")}}
                         </v-col>
-                        <v-col class="pt-0 pb-2" cols="9">
+                        <v-col class="pt-0 pb-2" cols="8">
                             <v-text-field
                                 v-model.lazy="currentApp.name"
                                 class="sym-small-size bg-grey"
@@ -26,12 +26,12 @@
                         </v-col>
                     </v-row>
                     <v-row>
-                        <v-col class="pt-0 pb-2" cols="3">
+                        <v-col class="pt-0 pb-2" cols="4">
                             {{$t("apps.header.note")}}
                         </v-col>
-                        <v-col class="pt-0 pb-2" cols="9">
+                        <v-col class="pt-0 pb-2" cols="8">
                             <v-textarea
-                                v-model.lazy="currentApp.note"
+                                v-model.lazy="currentApp.description"
                                 dense
                                 solo
                                 flat
@@ -50,110 +50,66 @@
                         </v-col>
                     </v-row>
                 </v-col>
-                <v-col cols="4" class="pt-0 pb-0 pl-0">
+                <v-col cols="3" class="pt-0 pb-0 pl-0">
                     <v-row>
                         <v-col class="pt-0 pb-2" cols="4">
                         </v-col>
                         <v-col class="pt-0 pb-2 text-center" cols="8">
-                            <v-icon v-if="!!currentApp.icon && currentApp.icon.indexOf('mdi-') > -1" class="display-3 pt-0">{{currentApp.icon}}</v-icon>
-                            <img v-else-if="!!currentApp.icon && currentApp.icon.indexOf('mdi-') < 0" :src="currentApp.icon" width="90">
-                            <iconPicker ref="iconPicker" :icon="currentApp.icon" @selected="pickIcon"></iconPicker>
+                       	     <v-icon v-if="!!currentApp.iconName && currentApp.iconName.indexOf('mdi-') > -1" class="display-3 pt-0">{{currentApp.iconName}}</v-icon>
+                        	 <img v-else-if="!!currentApp.iconName && currentApp.iconName.indexOf('mdi-') < 0" :src="currentApp.iconName" width="90">
+                            <iconPicker ref="iconPicker" :icon="currentApp.iconName" @selected="pickIcon"></iconPicker>
                         </v-col>
                     </v-row>
                 </v-col>
             </v-row>
         </v-card-text>
         <v-divider></v-divider>
-
         <!-- Thêm các object vào trong app -->
-        <v-card-title class="pb-2 pt-2 subtitle-2 font-weight-bold">
-            {{$t("apps.listObjects")}}
-        </v-card-title>
-        <v-col cols="12" class="pt-0 pb-0 search-wrap" v-click-outside="() => {showResult = false}">
-            <v-text-field
-                v-model.lazy="searchStr"
-                class="sym-small-size bg-grey"
-                append-icon="mdi-magnify"
-                dense
-                solo
-                :placeholder="$t('apps.addObject')"
-                flat
-                @focus="showResult = true"
-                @input="searchObjectToimport"
-            ></v-text-field>
-            <div class="search-results" v-show="showResult">
-                <v-list nav dense class="">
-                    <v-list-group
-                    no-action
-                    sub-group
-                    nav dense
-                    value="true"
-                    v-for="(obj) in listObjectToShows"
-                    :key="obj.type"
-                    v-show="obj.objects.length"
-                    >
-                        <template v-slot:activator>
-                            <v-list-item-content>
-                                <v-list-item-title>{{obj.type}}</v-list-item-title>
-                            </v-list-item-content>
-                        </template>
-                        <v-list-item
-                            nav dense
-                            v-for="(item) in obj.objects"
-                            :key="obj.type+item.id"
-                            :prepend-icon="item.icon"
-                        >
-                            <v-list-item-title @click="toggleObject(item, obj.type)">
-                                <v-icon>{{item.icon}}</v-icon> 
-                                {{item.title !== undefined && !!item.title ? item.title : item.name}}
-                            </v-list-item-title>
-                            <v-list-item-action>
-                                <v-icon class="subtitle-1" color="success" v-if="item.checked == 1">mdi-check</v-icon>
-                            </v-list-item-action>
-                        </v-list-item>
-                    </v-list-group>
-                </v-list>
-            </div>
-        </v-col>
-        <v-card-title class="pb-2 pt-2 subtitle-2 font-weight-bold">
-            {{$t("apps.objectSummary")}}
-        </v-card-title>
-        <div class="list-app-object">
-            <v-list nav dense class="">
-                <v-list-group
-                sub-group
-                nav dense
-                value="true"
-                v-for="obj in appObjects"
-                :key="obj.type"
-                v-show="obj.objects.length"
-                >
-                    <template v-slot:activator>
-                        <v-list-item-content>
-                            <v-list-item-title>{{obj.type}}</v-list-item-title>
-                        </v-list-item-content>
-                    </template>
-                    <v-list-item
-                        nav dense
-                        v-for="(item) in obj.objects"
-                        :key="obj.type+item.id"
-                        :prepend-icon="item.icon"
-                    >
-                        <v-list-item-title @click="toggleObject(item, obj.type)">
-                            <v-icon class="subtitle-1 pr-1">{{item.icon}}</v-icon> 
-                            {{item.title !== undefined && !!item.title ? item.title : item.name}}
-                        </v-list-item-title>
-                        <v-list-item-action>
-                            <v-icon class="subtitle-1" v-if="item.checked == 1">mdi-delete</v-icon>
-                        </v-list-item-action>
-                    </v-list-item>
-                </v-list-group>
-            </v-list>
-        </div>
+       <v-row>
+		   <v-col cols="7">
+			    <v-card-title class="pb-2 pt-2 subtitle-2 font-weight-bold">
+				{{$t("apps.listObjects")}}
+				</v-card-title>
+		   </v-col>
+		   <v-col cols="5">
+					 <v-menu
+      				  offset-y
+						:close-on-content-click="false"
+       				    :nudge-width="390"
+      				>
+						<template v-slot:activator="{ attrs, on }">
+							<v-btn
+								class="button-add-item"
+								style="backgound-color:#F7F7F7"
+								v-bind="attrs"
+								v-on="on"
+								>
+									<span> {{ $t('apps.clickToAdd')}} </span>
+									<v-icon right dark style="border-left:2px solid lightgrey;padding-left:8px">mdi-plus</v-icon>
+							</v-btn>
+						</template>
+						<SearchModal @selectedItem="selectedItem"/>
+					</v-menu>
+		   </v-col>
+	   </v-row>
+		<!-- <div :v-if="isEmpty == true" class="content-list-item">
+			 <div class="empty-item-list">
+				 <div class="empty-item-list-icon"> 
+					  <v-icon >mdi-check</v-icon>
+					  <v-icon >mdi-account-box-outline</v-icon>
+					  <v-icon >mdi-check</v-icon>
+					  <v-icon >mdi-check</v-icon>
+				 </div>
+				 <h6>Chưa có chức năng nào</h6>
+			 </div>
+		</div> -->
+		<!-- <div ></div> -->
+		<AppDetailVue />
         <v-btn
             small
             color="primary"
-            class="btn-fixed-bottom"
+			style="margin-bottom:24px"
+            class="btn-fixed-bottom update-btn"
             @click="addApp"
             :disabled="!!!currentApp.name"
         >
@@ -162,16 +118,23 @@
         </v-btn>
     </div>    
 </template>
-
 <script>
 import Api from "./../../api/api.js";
 import iconPicker from "../../components/common/pickIcon";
-import vClickOutside from 'v-click-outside'
+import vClickOutside from 'v-click-outside';
+import SearchModal from './SearchModal.vue';
+import AppDetailVue from './AppDetail.vue';
+import {appManagementApi} from './../../api/AppManagement.js'
+
 export default {
     name: "UpdateApp",
     components: {
-        iconPicker,
-    },
+		iconPicker,
+		SearchModal,
+		AppDetailVue
+	},
+	created(){
+	},
     props: {
         isEdit: {
             type: Boolean,
@@ -179,161 +142,97 @@ export default {
         }
     },
     watch: {
-        currentApp(val) {
-            this.searchStr = "";
-            this.resetResult();
-            if (val.id !== undefined && !!val.id) {
-                this.getAllObjectInApp(val.id);
-            }
-        }
     },
     computed: {
-        baseUrl: function() {
-            return this.apiUrl + this.appUrl + "/lists";
-        },
-    },
+		sApp(){
+			return this.$store.state.appConfig.listItemSelected
+		},
+	},
     directives: {
         clickOutside: vClickOutside.directive
     },
     data: function() {
         return {
-            apiUrl: "https://v2hoangnd.dev.symper.vn/",
+            apiUrl: "https://core.symper.vn/application",
             appUrl: "apps",
             removeCallback: null,
             showResult: false,
             editCallback: null,
-            searchStr: "",
+			searchStr: "",
+			isEmpty: null,
             appObjects: [],
             currentApp: {
                 name: "",
-                note: "",
-                icon: "",
-                status: false,
-            },
+                description: "",
+				iconName: "",
+				iconType:"",
+				status: false,
+			},
+			childrenApp:{
+				document_definition:[
+				],
+				orgchart:[
+				],
+				dasboard:[
+				],
+				workflow_definition:[
+				]
+			},
             allObjectToImport: [],
-            listObjectToShows: [],
+			listObjectToShows: [],
+			listSelectedItem:{},
         };
     },
-    mounted() {
-        this.getAllObjectToImport();
+    mounted(){
+		// this.checkEmpty()	
     },
     methods: {
         setAppObject(app) {
             this.currentApp = JSON.parse(JSON.stringify(app));
-        },
-        getAllObjectInApp(id) {
-            let req = new Api(this.apiUrl);
-            req.get(this.appUrl + "/" + id + "/objects")
-            .then(res => {
-                // callback here
-                if (res.status == 200) {
-                    let objs = {};
-                    res.data.forEach(item => {
-                        if (!(item.type in objs)) {
-                            objs[item.type] = [];
-                        }
-                        objs[item.type].push(item.id)
-                    });
-                    this.allObjectToImport.forEach((obj, appIndex) => {
-                        if (objs[obj.type] != undefined) {
-                            obj.objects.forEach((item, itemIndex) => {
-                                this.allObjectToImport[appIndex].objects[itemIndex].checked = objs[obj.type].indexOf(item.id) > -1 ? 1 : 0;
-                            });
-                        } else {
-                            obj.objects.forEach((item, itemIndex) => {
-                                this.allObjectToImport[appIndex].objects[itemIndex].checked = 0;
-                            });
-                        }
-                    });
-                    this.resetAppObject()
-                    this.$refs.iconPicker.reset();
-                }
-            }).catch((err) => {
-            });
-        },
+		},
+		// checkEmpty(){
+		// 	if(this.sApp.documents.item.length == 0 && this.sApp.orgcharts.item.length == 0 && this.sApp.reports.item.length == 0 && this.sApp.workflows.item.length == 0 ){
+		// 		this.isEmpty = true;
+		// 	}
+		// 	else this.isEmpty = false;
+		// },
+		updateListItem(data){
+			let self = this;
+			self.childrenApp.document_definition = []
+			self.childrenApp.orgchart = []
+			self.childrenApp.dasboard = []
+			self.childrenApp.workflow_definition = []
+			if(data.documents.item.length > 0){
+				data.documents.item.forEach(function(e){
+					self.childrenApp.document_definition.push(e.id);
+				});
+			}
+			if(data.orgcharts.item.length > 0){
+				data.orgcharts.item.forEach(function(e){
+				self.childrenApp.orgchart.push(e.id);
+			});
+			}
+			if(data.reports.item.length > 0){
+				data.reports.item.forEach(function(e){
+				self.childrenApp.dasboard.push(e.id);
+			});
+			}
+			if(data.workflows.item.length > 0){
+				data.workflows.item.forEach(function(e){
+					self.childrenApp.workflow_definition.push(e.id);
+				});
+			}
+			self.currentApp.childrenApp = self.childrenApp
+		},
         pickIcon(data) {
-            this.currentApp.icon = data.icon.trim();
-        },
-        toggleObject(item, type) {
-            item.checked = item.checked == 0 ? 1: 0;
-            for (const index in this.allObjectToImport) {
-                let list = this.allObjectToImport[index];
-                if (list.type == type) {
-                    for (const i in list.objects) {
-                        const element = list.objects[i];
-                        if (element.id == item.id) {
-                            this.allObjectToImport[index].objects[i].checked = item.checked;
-                            this.resetAppObject();
-                            break;
-                        }
-                    }
-                }
-            }
-        },
-        resetAppObject() {
-            this.appObjects = [];
-            this.allObjectToImport.forEach(obj => {
-                let group = {
-                    type: obj.type,
-                    objects: []
-                };
-                for (const item of obj.objects) {
-                    if(item.checked == 1) {
-                        group.objects.push(item);
-                    }
-                }
-                this.appObjects.push(group);
-            });
-        },
-        searchObjectToimport() {
-            let str = this.searchStr;
-            this.listObjectToShows = [];
-            if (str !== null && str.length && this.allObjectToImport.length) {
-                str = str.toLocaleLowerCase();
-                this.allObjectToImport.forEach(obj => {
-                    let group = {
-                        type: obj.type,
-                        objects: []
-                    };
-                    let count = 0;
-                    for (const item of obj.objects) {
-                        if(
-                            (item.name !== null && item.name.toLocaleLowerCase().includes(str)) || 
-                            (item.title !== undefined && item.title !== null && item.title.toLocaleLowerCase().includes(str))
-                        ) {
-                            group.objects.push(item);
-                            if (++count > 10) {
-                                break;
-                            }
-                        }
-                    }
-                    this.listObjectToShows.push(group);
-                });
-            } else {
-                this.resetResult();
-            }
-        },
-        resetResult() {
-            this.listObjectToShows = JSON.parse(JSON.stringify(this.allObjectToImport));
-            for (const index in this.listObjectToShows) {
-                this.listObjectToShows[index].objects = this.listObjectToShows[index].objects.slice(0, 10);
-            }
-        },
-        getAllObjectToImport() {
-            let req = new Api(this.apiUrl);
-            req.get(this.appUrl + "/objects")
-            .then(res => {
-                // callback here
-                if (res.status == 200) {
-                    this.allObjectToImport = res.data;
-                    this.resetResult();
-                }
-            }).catch((err) => {
-                console.log(err);
-            });
-        },
+			this.currentApp.iconName = data.icon.trim();
+            this.currentApp.iconType = data.type;
+		},
+		selectedItem(data){
+			this.listSelectedItem = data;
+		},
         addApp() {
-            if (this.isEdit) {
+            if(this.isEdit) {
                 this.updateApp();
             } else {
                 this.createApp();
@@ -346,43 +245,73 @@ export default {
                 text: this.$t('notification.error')
             })
         },
-        getListObjsInShort() {
-            let objs = [];
-            this.appObjects.forEach(obj => {
-                objs.push({
-                    type: obj.type,
-                    ids: obj.objects.map(item => { return item.id })
-                })
-            })
-            return objs;
-        },
         createApp() {
-            let req = new Api(this.apiUrl);
-            req.post(this.appUrl, {...this.currentApp, objects: this.getListObjsInShort()})
-            .then((res) => {
-                this.$emit("add-app", res)
-            }).catch((err) => {
-                this.showError()
-            });
+			this.updateListItem(this.$store.state.appConfig.listItemSelected)
+			let data = JSON.stringify(this.currentApp);
+			debugger
+			appManagementApi.addApp(data).then(res => {
+				 this.$emit("add-app", res)
+			}).catch(err => {
+				this.showError()
+			})
+			.always(() => {});;
+				
         },
-        updateApp() {
-            let req = new Api(this.apiUrl);
-            req.put(this.appUrl, {...this.currentApp, objects: this.getListObjsInShort()})
-            .then((res) => {
-                this.$emit("update-app", res)
-            }).catch((err) => {
-                this.showError()
-            });
+         updateApp() {
+			if(this.currentApp.hasOwnProperty('childrenApp')){
+				delete this.currentApp.childrenApp
+			}
+			if(this.currentApp.status === null){
+				this.currentApp.status =0
+			}
+			this.updateListItem(this.$store.state.appConfig.listItemSelected)
+			let data = JSON.stringify(this.currentApp);
+			debugger
+			appManagementApi.updateApp(data).then(res => {
+				  this.$emit("update-app", res)
+			}).catch(err => {
+				this.showError()
+			})
+			.always(() => {});;
         },
     },
 };
 </script>
-
 <style scoped>
 .pb-2.col.col-3 {
     height: 20px;
     font-size: 13px;
     text-shadow:  0 0 0;
+}
+.button-add-item{
+	border:1px solid lightgray;	
+	text-shadow: unset;
+	box-shadow: unset;
+	float:right;
+}
+.update-app-symper >>>.button-add-item .v-btn__content{
+	font: 13px Roboto !important;
+}
+.update-app-symper >>> .v-card__title{
+	font-weight: 410 !important;
+}
+.update-app-symper >>>.empty-item-list{
+	width:140px;
+	margin-left: auto;
+	margin-right: auto;
+	opacity: 0.2;
+	margin-top:30px;
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+}
+.update-app-symper >>>.empty-item-list .empty-item-list-icon{
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+}
+.update-app-symper >>>.empty-item-list .v-icon{
+	font-size: 40px;
 }
 .text-shadow {
     font-size: 13px;
@@ -441,6 +370,10 @@ export default {
 }
 .list-app-object >>> .v-list-group__items .v-list-item:hover .v-list-item__action{
     display: block;
+}
+.list-app-object >>> .v-navigation-drawer__content .update-btn{
+    /* display: block; */
+	margin-bottom: 20px;
 }
 .v-menu__content {
     background: #fff;

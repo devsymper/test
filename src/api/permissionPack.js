@@ -1,6 +1,10 @@
 import Api from "./api";
-import { appConfigs } from "../configs.js";
-import { util } from "../plugins/util";
+import {
+    appConfigs
+} from "../configs.js";
+import {
+    util
+} from "../plugins/util";
 
 var permissionModuleApi = new Api(appConfigs.apiDomain.permission);
 var actionModuleApi = new Api(appConfigs.apiDomain.actionPacks);
@@ -26,10 +30,14 @@ export const permissionApi = {
     },
 
     deletePermissionPack(idPacks) {
-        if ($.isArray(idPacks)) {
-            idPacks = idPacks.join(',');
+        if (typeof idPacks == 'string') {
+            idPacks = idPacks.split(',');
         }
-        return permissionPackApi.delete('', idPacks);
+        let prms = [];
+        for (let id of idPacks) {
+            prms.push(permissionPackApi.delete(id));
+        }
+        return Promise.all(prms);
     },
     getActionPackOfPermission(permissionId) {
         return permissionPackApi.get(permissionId + '/action_packs');

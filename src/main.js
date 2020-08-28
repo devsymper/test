@@ -5,14 +5,18 @@ import store from "./store";
 import "./assets/css/main.css";
 import vuetify from "./plugins/vuetify";
 import i18n from './lang/i18n'
-import { util } from "./plugins/util.js";
+import {
+    util
+} from "./plugins/util.js";
 import BaView from "./views/layout/BAView";
 import EndUserView from "./views/layout/EndUserView";
 import ContentOnlyView from "./views/layout/ContentOnlyView";
 import Notifications from 'vue-notification'
 import VueMoment from "vue-moment";
 import moment from "moment-timezone";
-import { appConfigs } from "./configs";
+import {
+    appConfigs
+} from "./configs";
 import actionMap from './action/index'
 
 Vue.component('ba-view', BaView);

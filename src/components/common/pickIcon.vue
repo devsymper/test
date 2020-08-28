@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="pick-icon"> 
         <v-menu offset-x
             :close-on-content-click="false"
             light
@@ -21,7 +21,6 @@
                     {{ item }}
                 </v-tab>
             </v-tabs>
-
             <v-tabs-items v-model="tab">
                 <!-- tab Chọn icon -->
                 <v-tab-item>
@@ -49,7 +48,7 @@
                                         cols="2" 
                                         class="pt-0 pb-0 text-center single-icon" 
                                         v-for="icon in listIconToShow" :key="icon"
-                                        @click="selectIcon(icon)"
+                                        @click="selectIcon(icon,'icon')"
                                     >
                                         <v-icon class="headline">{{icon}}</v-icon>
                                     </v-col>
@@ -72,7 +71,7 @@
                     <div v-if="!!link" class="w-100">
                         <img :src="link" width="150" max-height="150" class="mt-3" style="max-width:150px">
                     </div>
-                    <v-btn small color="primary" class="ml-4 mt-3 mb-3" :disabled="!!!link" @click="selectIcon(link)">{{$t("iconPicker.selectImage")}}</v-btn>
+                    <v-btn small color="primary" class="ml-4 mt-3 mb-3" :disabled="!!!link" @click="selectIcon(link,'img')">{{$t("iconPicker.selectImage")}}</v-btn>
                 </v-tab-item>
                 <!-- Tab upload ảnh -->
                 <v-tab-item>
@@ -112,14 +111,14 @@ export default {
         return {
             listIcon: `
                 mdi-account,mdi-account-alert,mdi-account-box,mdi-account-box-outline,mdi-account-check,
-                mdi-account-circle,mdi-account-key,mdi-account-location,mdi-account-minus,mdi-account-multiple,
+                mdi-account-circle,mdi-account-key,mdi-account-minus,mdi-account-multiple,
                 mdi-account-multiple-outline,mdi-account-multiple-plus,mdi-account-network,mdi-account-outline,
-                mdi-account-plus,mdi-account-remove,mdi-account-search,mdi-account-star,mdi-account-star-variant,
+                mdi-account-plus,mdi-account-remove,mdi-account-search,mdi-account-star,
                 mdi-account-switch,mdi-airballoon,mdi-airplane,mdi-airplane-off,mdi-alarm,mdi-alarm-check,
                 mdi-alarm-multiple,mdi-alarm-off,mdi-alarm-plus,mdi-album,mdi-alert,mdi-alert-box,mdi-alert-circle,
-                mdi-alert-octagon,mdi-alpha,mdi-alphabetical,mdi-amazon,mdi-amazon-clouddrive,mdi-ambulance,
+                mdi-alert-octagon,mdi-alpha,mdi-alphabetical,mdi-amazon,mdi-ambulance,
                 mdi-android,mdi-android-debug-bridge,mdi-android-studio,mdi-apple,mdi-apple-finder,mdi-apple-ios,
-                mdi-apple-mobileme,mdi-apple-safari,mdi-appnet,mdi-apps,mdi-archive,mdi-arrange-bring-forward,
+                mdi-apple-safari,mdi-apps,mdi-archive,mdi-arrange-bring-forward,
                 mdi-arrange-bring-to-front,mdi-arrange-send-backward,mdi-arrange-send-to-back,mdi-arrow-all,
                 mdi-arrow-bottom-left,mdi-arrow-bottom-right,mdi-arrow-collapse,mdi-arrow-down,mdi-arrow-down-bold,
                 mdi-arrow-down-bold-circle,mdi-arrow-down-bold-circle-outline,mdi-arrow-down-bold-hexagon-outline,
@@ -127,25 +126,25 @@ export default {
                 mdi-arrow-left-bold-hexagon-outline,mdi-arrow-right,mdi-arrow-right-bold,mdi-arrow-right-bold-circle,
                 mdi-arrow-right-bold-circle-outline,mdi-arrow-right-bold-hexagon-outline,mdi-arrow-top-left,
                 mdi-arrow-top-right,mdi-arrow-up,mdi-arrow-up-bold,mdi-arrow-up-bold-circle,mdi-arrow-up-bold-circle-outline,
-                mdi-arrow-up-bold-hexagon-outline,mdi-at,mdi-attachment,mdi-audiobook,mdi-auto-fix,mdi-auto-upload,
-                mdi-baby,mdi-backburger,mdi-backup-restore,mdi-bank,mdi-barcode,mdi-barley,mdi-barrel,mdi-basecamp,
+                mdi-arrow-up-bold-hexagon-outline,mdi-at,mdi-attachment,mdi-auto-fix,mdi-auto-upload,
+                mdi-baby,mdi-backburger,mdi-backup-restore,mdi-bank,mdi-barcode,mdi-barley,mdi-barrel,
                 mdi-basket,mdi-basket-fill,mdi-basket-unfill,mdi-battery,mdi-battery-10,mdi-battery-20,mdi-battery-30,
                 mdi-battery-40,mdi-battery-50,mdi-battery-60,mdi-battery-70,mdi-battery-80,mdi-battery-90,mdi-battery-alert,
                 mdi-battery-charging-100,mdi-battery-charging-20,mdi-battery-charging-30,mdi-battery-charging-40,mdi-battery-charging-60,
                 mdi-battery-charging-80,mdi-battery-charging-90,mdi-battery-minus,mdi-battery-negative,mdi-battery-outline,mdi-battery-plus,
-                mdi-battery-positive,mdi-battery-unknown,mdi-beach,mdi-beaker,mdi-beaker-empty,mdi-beaker-empty-outline,mdi-beaker-outline,
-                mdi-beats,mdi-beer,mdi-behance,mdi-bell,mdi-bell-off,mdi-bell-outline,mdi-bell-ring,mdi-bell-ring-outline,mdi-bell-sleep,
-                mdi-beta,mdi-bike,mdi-bing,mdi-binoculars,mdi-bio,mdi-biohazard,mdi-bitbucket,mdi-black-mesa,mdi-blackberry,mdi-blinds,
+                mdi-battery-positive,mdi-battery-unknown,mdi-beach,mdi-beaker,mdi-beaker-outline,
+                mdi-beer,mdi-bell,mdi-bell-off,mdi-bell-outline,mdi-bell-ring,mdi-bell-ring-outline,mdi-bell-sleep,
+                mdi-beta,mdi-bike,mdi-binoculars,mdi-bio,mdi-biohazard,mdi-bitbucket,mdi-black-mesa,mdi-blinds,
                 mdi-block-helper,mdi-blogger,mdi-bluetooth,mdi-bluetooth-audio,mdi-bluetooth-connect,mdi-bluetooth-settings,
                 mdi-bluetooth-transfer,mdi-blur,mdi-blur-linear,mdi-blur-off,mdi-blur-radial,mdi-bone,mdi-book,mdi-book-multiple,
-                mdi-book-multiple-variant,mdi-book-open,mdi-book-variant,mdi-bookmark,mdi-bookmark-check,mdi-bookmark-music,
-                mdi-bookmark-outline,mdi-bookmark-outline-plus,mdi-bookmark-plus,mdi-bookmark-remove,mdi-border-all,mdi-border-bottom,
+                mdi-book-open,mdi-book-variant,mdi-bookmark,mdi-bookmark-check,mdi-bookmark-music,
+                mdi-bookmark-outline,mdi-bookmark-plus,mdi-bookmark-remove,mdi-border-all,mdi-border-bottom,
                 mdi-border-color,mdi-border-horizontal,mdi-border-inside,mdi-border-left,mdi-border-none,mdi-border-outside,mdi-border-right,
                 mdi-border-top,mdi-border-vertical,mdi-bowling,mdi-box,mdi-briefcase,mdi-briefcase-check,mdi-briefcase-download,mdi-briefcase-upload,
                 mdi-brightness-1,mdi-brightness-2,mdi-brightness-3,mdi-brightness-4,mdi-brightness-5,mdi-brightness-6,mdi-brightness-7,mdi-brightness-auto,
                 mdi-broom,mdi-brush,mdi-bug,mdi-bulletin-board,mdi-bullhorn,mdi-bus,mdi-cake,mdi-cake-variant,mdi-calculator,mdi-calendar,mdi-calendar-blank,
                 mdi-calendar-check,mdi-calendar-clock,mdi-calendar-multiple,mdi-calendar-multiple-check,mdi-calendar-plus,mdi-calendar-remove,
-                mdi-calendar-text,mdi-calendar-today,mdi-camcorder,mdi-camcorder-box,mdi-camcorder-box-off,mdi-camcorder-off,mdi-camera,
+                mdi-calendar-text,mdi-calendar-today,mdi-camcorder,mdi-camcorder-off,mdi-camera,
                 mdi-camera-front,mdi-camera-front-variant,mdi-camera-iris,mdi-camera-party-mode,mdi-camera-rear,mdi-camera-rear-variant,
                 mdi-camera-switch,mdi-camera-timer,mdi-candycane,mdi-car,mdi-car-wash,mdi-carrot,mdi-cart,mdi-cart-outline,mdi-cash,
                 mdi-cash-100,mdi-cash-multiple,mdi-cash-usd,mdi-cast,mdi-cast-connected,mdi-castle,mdi-cat,mdi-cellphone,mdi-cellphone-android,
@@ -160,7 +159,7 @@ export default {
                 mdi-clock-fast,mdi-close,mdi-close-box,mdi-close-box-outline,mdi-close-circle,mdi-close-circle-outline,mdi-close-network,
                 mdi-closed-caption,mdi-cloud,mdi-cloud-check,mdi-cloud-circle,mdi-cloud-download,mdi-cloud-outline,mdi-cloud-outline-off,
                 mdi-cloud-upload,mdi-code-array,mdi-code-braces,mdi-code-equal,mdi-code-greater-than,mdi-code-less-than,mdi-code-less-than-or-equal,
-                mdi-code-not-equal,mdi-code-not-equal-variant,mdi-code-string,mdi-code-tags,mdi-codepen,mdi-coffee,mdi-coffee-to-go,mdi-coin,
+                mdi-code-not-equal,mdi-code-not-equal-variant,mdi-code-string,mdi-code-tags,mdi-codepen,mdi-coffee,mdi-coffee-to-go,
                 mdi-color-helper,mdi-comment,mdi-comment-account,mdi-comment-account-outline,mdi-comment-alert,mdi-comment-alert-outline,
                 mdi-comment-check,mdi-comment-check-outline,mdi-comment-multiple-outline,mdi-comment-outline,mdi-comment-plus-outline,
                 mdi-comment-processing,mdi-comment-processing-outline,mdi-comment-remove-outline,mdi-comment-text,mdi-comment-text-outline,
@@ -169,14 +168,14 @@ export default {
                 mdi-crop,mdi-crop-free,mdi-crop-landscape,mdi-crop-portrait,mdi-crop-square,mdi-crosshairs,mdi-crosshairs-gps,mdi-crown,mdi-cube,
                 mdi-cube-outline,mdi-cube-unfolded,mdi-cup,mdi-cup-water,mdi-currency-btc,mdi-currency-eur,mdi-currency-gbp,mdi-currency-inr,mdi-currency-rub,
                 mdi-currency-try,mdi-currency-usd,mdi-cursor-default,mdi-cursor-default-outline,mdi-cursor-move,mdi-cursor-pointer,mdi-database,mdi-database-minus,
-                mdi-database-outline,mdi-database-plus,mdi-debug-step-into,mdi-debug-step-out,mdi-debug-step-over,mdi-decimal-decrease,mdi-decimal-increase,
-                mdi-delete,mdi-delete-variant,mdi-deskphone,mdi-desktop-mac,mdi-desktop-tower,mdi-details,mdi-deviantart,mdi-diamond,mdi-dice,mdi-dice-1,
-                mdi-dice-2,mdi-dice-3,mdi-dice-4,mdi-dice-5,mdi-dice-6,mdi-directions,mdi-disk-alert,mdi-disqus,mdi-disqus-outline,mdi-division,
+                mdi-database-plus,mdi-debug-step-into,mdi-debug-step-out,mdi-debug-step-over,mdi-decimal-decrease,mdi-decimal-increase,
+                mdi-delete,mdi-delete-variant,mdi-deskphone,mdi-desktop-mac,mdi-desktop-tower,mdi-details,mdi-deviantart,mdi-diamond,mdi-dice-1,
+                mdi-dice-2,mdi-dice-3,mdi-dice-4,mdi-dice-5,mdi-dice-6,mdi-directions,mdi-disqus,mdi-division,
                 mdi-division-box,mdi-dns,mdi-domain,mdi-dots-horizontal,mdi-dots-vertical,mdi-download,mdi-drag,mdi-drag-horizontal,mdi-drag-vertical,
-                mdi-drawing,mdi-drawing-box,mdi-dribbble,mdi-dribbble-box,mdi-drone,mdi-dropbox,mdi-drupal,mdi-duck,mdi-dumbbell,mdi-earth,mdi-earth-off,
-                mdi-edge,mdi-eject,mdi-elevation-decline,mdi-elevation-rise,mdi-elevator,mdi-email,mdi-email-open,mdi-email-outline,mdi-email-secure,mdi-emoticon,
+                mdi-drawing,mdi-drawing-box,mdi-drone,mdi-dropbox,mdi-drupal,mdi-duck,mdi-dumbbell,mdi-earth,mdi-earth-off,
+                mdi-eject,mdi-elevation-decline,mdi-elevation-rise,mdi-elevator,mdi-email,mdi-email-open,mdi-email-outline,mdi-emoticon,
                 mdi-emoticon-cool,mdi-emoticon-devil,mdi-emoticon-happy,mdi-emoticon-neutral,mdi-emoticon-poop,mdi-emoticon-sad,mdi-emoticon-tongue,mdi-engine,
-                mdi-engine-outline,mdi-equal,mdi-equal-box,mdi-eraser,mdi-escalator,mdi-etsy,mdi-evernote,mdi-exclamation,mdi-exit-to-app,mdi-export,mdi-eye,mdi-eye-off,
+                mdi-engine-outline,mdi-equal,mdi-equal-box,mdi-eraser,mdi-escalator,mdi-evernote,mdi-exclamation,mdi-exit-to-app,mdi-export,mdi-eye,mdi-eye-off,
                 mdi-eyedropper,mdi-eyedropper-variant,mdi-facebook,mdi-facebook-box,mdi-facebook-messenger,mdi-factory,mdi-fan,mdi-fast-forward,mdi-ferry,mdi-file,
                 mdi-file-cloud,mdi-file-delimited,mdi-file-document,mdi-file-document-box,mdi-file-excel,mdi-file-excel-box,mdi-file-find,mdi-file-image,mdi-file-image-box,
                 mdi-file-multiple,mdi-file-music,mdi-file-outline,mdi-file-pdf,mdi-file-pdf-box,mdi-file-powerpoint,mdi-file-powerpoint-box,mdi-file-presentation-box,
@@ -261,7 +260,7 @@ export default {
                 mdi-weather-partlycloudy,mdi-weather-pouring,mdi-weather-rainy,mdi-weather-snowy,mdi-weather-sunny,mdi-weather-sunset,mdi-weather-sunset-down,mdi-weather-sunset-up,
                 mdi-weather-windy,mdi-weather-windy-variant,mdi-web,mdi-webcam,mdi-weight,mdi-weight-kilogram,mdi-whatsapp,mdi-wheelchair-accessibility,mdi-white-balance-auto,
                 mdi-white-balance-incandescent,mdi-white-balance-irradescent,mdi-white-balance-sunny,mdi-wifi,mdi-wii,mdi-wikipedia,mdi-window-close,mdi-window-closed,
-                mdi-window-maximize,mdi-window-minimize,mdi-window-open,mdi-window-restore,mdi-windows,mdi-wordpress,mdi-worker,mdi-wunderlist,mdi-xbox,mdi-xbox-controller,
+                mdi-window-maximize,mdi-window-open,mdi-window-restore,mdi-windows,mdi-wordpress,mdi-worker,mdi-xbox,mdi-xbox-controller,
                 mdi-xbox-controller-off,mdi-xda,mdi-xml,mdi-yeast,mdi-yelp,mdi-youtube-play,mdi-zip-box`,
             listIconToShow: [],
             tab: null,
@@ -302,14 +301,18 @@ export default {
                 this.listIconToShow = listIcons.slice(0, 150);
             }
         },
-        selectIcon(icon) {
-            this.$emit("selected", {icon: icon.trim()});
+        selectIcon(icon,type='img') {
+			// console.log(icon);
+            this.$emit("selected", {icon: icon.trim(),type:type});
         }
     }
 }
 </script>
 
 <style scoped>
+/* .pick-icon{
+	overflow: hidden;
+} */
     .sym-small-size >>> .v-input__slot,
     .sym-small-size >>> .v-input__control{
         background: #f5f5f5 !important;

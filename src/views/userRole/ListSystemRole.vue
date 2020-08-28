@@ -126,7 +126,7 @@ export default {
         handleAddItem(){
             this.actionOnItem = 'create';
             for(let key in this.currentItemData){
-                if(key == 'users'){
+                if(key == 'users' || key == 'permissions'){
                     this.currentItemData.users = [];
                 }else{
                     this.currentItemData[key] = '';
