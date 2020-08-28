@@ -6,7 +6,7 @@
 					<ul v-for="(childItem,i) in itemT.item" :key="i"  class="app-child-item">
 							<li  v-if="isEndUserCpn == true" v-on:contextmenu="rightClickHandler($event,childItem,itemT.name)">
 								<div style="position:relative">
-									<v-tooltip bottom v-if="itemT.name == 'documents'">
+									<v-tooltip bottom v-if="itemT.name == 'document_definition'">
 									<template v-slot:activator="{ on, attrs }">
 										<div class="title-document-enduser" 	
 											v-bind="attrs"
@@ -25,7 +25,7 @@
 							</li>
 							<li v-else>
 								<div style="position:relative">
-									<v-tooltip bottom v-if="itemT.name == 'documents'">
+									<v-tooltip bottom v-if="itemT.name == 'document_definition'">
 									<template v-slot:activator="{ on, attrs }">
 										<div class="title-document" 	
 											v-bind="attrs"
@@ -58,29 +58,29 @@ export default {
 			currentSelected:null,
 			typeSelected:null,
 			objFilter:{
-				documents: {
+				document_definition: {
 					icon: 'mdi-file-edit-outline',
 					title: 'Documents',
-					name: 'documents',
+					name: 'document_definition',
 					item: [
 					]
 				},
-				orgcharts: {
+				orgchart: {
 					icon: 'mdi-widgets-outline',
 					title: 'Orgcharts',
-					name: 'orgcharts',
+					name: 'orgchart',
 					item: []
 				},
-				reports: {
+				dasboard: {
 					icon: 'mdi-view-dashboard',
 					title: 'Reports',
-					name: 'reports',
+					name: 'dasboard',
 					item: []
 				},
-				workflows: {
+				workflow_definition: {
 					icon: 'mdi-lan',
 					title: 'Workflows',
-					name: 'workflows',
+					name: 'workflow_definition',
 					item: []
 				},
 			}
@@ -123,35 +123,35 @@ export default {
 		filterItem(){
 			let self = this
 			let listItem = this.$store.state.appConfig.listItemSelected;
-			self.objFilter.documents.item = []
-			self.objFilter.orgcharts.item = []
-			self.objFilter.reports.item = []
-			self.objFilter.workflows.item = []
+			self.objFilter.document_definition.item = []
+			self.objFilter.orgchart.item = []
+			self.objFilter.dasboard.item = []
+			self.objFilter.workflow_definition.item = []
 			if(listItem.documents.item.length > 0){
-					listItem.documents.item.filter(function(item){
+					listItem.document_definition.item.filter(function(item){
 						if(item.title.toLowerCase().includes(self.searchKey.toLowerCase())){
-							self.objFilter.documents.item.push(item)
+							self.objFilter.document_definition.item.push(item)
 						}
 				})
 			}
-			if(listItem.orgcharts.item.length > 0){
-					listItem.orgcharts.item.filter(function(item){
+			if(listItem.orgchart.item.length > 0){
+					listItem.orgchart.item.filter(function(item){
 					if(item.name.toLowerCase().includes(self.searchKey.toLowerCase())){
-						self.objFilter.orgcharts.item.push(item)
+						self.objFilter.orgchart.item.push(item)
 					}
 				})
 			}
-			if(listItem.reports.item.length > 0){
-					listItem.reports.item.filter(function(item){
+			if(listItem.dasboard.item.length > 0){
+					listItem.dasboard.item.filter(function(item){
 					if(item.name.toLowerCase().includes(self.searchKey.toLowerCase())){
-						self.objFilter.reports.item.push(item)
+						self.objFilter.dasboard.item.push(item)
 					}
 				})
 			}
-			if(listItem.workflows.item.length > 0){
-					listItem.workflows.item.filter(function(item){
+			if(listItem.workflow_definition.item.length > 0){
+					listItem.workflow_definition.item.filter(function(item){
 					if(item.name.toLowerCase().includes(self.searchKey.toLowerCase())){
-						self.objFilter.workflows.item.push(item)
+						self.objFilter.workflow_definition.item.push(item)
 					}
 				})
 			}
@@ -168,18 +168,18 @@ export default {
 			this.$refs.contextMenu.hide()
 		},	
 		changeFavorite(item,type){
-			if(type == 'documents'){
-				type = 'document_definition'
-			}
-			if(type == 'orgcharts'){
-				type = 'orgchart'
-			}
-			if(type == 'reports'){
-				type = 'dasboard'
-			}
-			if(type== 'workflows'){
-				type = 'workflow_definition'
-			}
+			// if(type == 'documents'){
+			// 	type = 'document_definition'
+			// }
+			// if(type == 'orgcharts'){
+			// 	type = 'orgchart'
+			// }
+			// if(type == 'reports'){
+			// 	type = 'dasboard'
+			// }
+			// if(type== 'workflows'){
+			// 	type = 'workflow_definition'
+			// }
 			let userId = this.$store.state.app.endUserInfo.id
 			if(item.favorite == false){
 				appManagementApi.addFavoriteItem(userId,item.id,type,1).then(res => {

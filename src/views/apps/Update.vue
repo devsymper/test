@@ -202,23 +202,23 @@ export default {
 			self.childrenApp.orgchart = []
 			self.childrenApp.dasboard = []
 			self.childrenApp.workflow_definition = []
-			if(data.documents.item.length > 0){
-				data.documents.item.forEach(function(e){
+			if(data.document_definition.item.length > 0){
+				data.document_definition.item.forEach(function(e){
 					self.childrenApp.document_definition.push(e.id);
 				});
 			}
-			if(data.orgcharts.item.length > 0){
-				data.orgcharts.item.forEach(function(e){
+			if(data.orgchart.item.length > 0){
+				data.orgchart.item.forEach(function(e){
 				self.childrenApp.orgchart.push(e.id);
 			});
 			}
-			if(data.reports.item.length > 0){
-				data.reports.item.forEach(function(e){
+			if(data.dasboard.item.length > 0){
+				data.dasboard.item.forEach(function(e){
 				self.childrenApp.dasboard.push(e.id);
 			});
 			}
-			if(data.workflows.item.length > 0){
-				data.workflows.item.forEach(function(e){
+			if(data.workflow_definition.item.length > 0){
+				data.workflow_definition.item.forEach(function(e){
 					self.childrenApp.workflow_definition.push(e.id);
 				});
 			}

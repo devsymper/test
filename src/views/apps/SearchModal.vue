@@ -13,7 +13,7 @@
 				<ul class="app-child-item" v-for="(childItem,i) in itemT.item" :key="i" @click="clickItem(childItem,itemT.name)">
 					<li>
 						<div style="position:relative">
-							<v-tooltip bottom v-if="itemT.name == 'documents'">
+							<v-tooltip bottom v-if="itemT.name == 'document_definition'">
 								<template v-slot:activator="{ on, attrs }">
 								<div class="title-document" 	
 									v-bind="attrs"
@@ -47,33 +47,33 @@ export default {
 			myValue: '',
 			menuItemsHeight: '450px',
             listItems:{
-			   documents:{
+			   document_definition:{
 				   icon : 'mdi-file-edit-outline',
 				   title: this.$t('apps.listType.documents'),
-				   name:  'documents',
+				   name:  'document_definition',
 				   item:[
 
 				   ]
 			   },
-			   orgcharts:{
+			   orgchart:{
  				   icon : 'mdi-widgets-outline',
 				   title: this.$t('apps.listType.orgcharts'),
-				   name: 'orgcharts',
+				   name: 'orgchart',
 				   item:[
 				   ]
 			   },
-			   reports:{
+			   dasboard:{
 				   icon : 'mdi-view-dashboard',
 				   title: this.$t('apps.listType.reports'),
-				   name: 'reports',
+				   name: 'dasboard',
 				   item:[
 				   ]
 			   },
-			   workflows:
+			   workflow_definition:
 			   {
 			       icon : 'mdi-lan',
 				   title:  this.$t('apps.listType.workflows'),
-				   name: 'workflows',
+				   name: 'workflow_definition',
 				   item:[
 				   ]
 			   },
@@ -93,26 +93,24 @@ export default {
 	},
 	methods:{
 		clickItem(obj,type){
-			console.log(obj,'objjjj');
-			console.log(type,'typeeeeee');
 			this.$store.commit('appConfig/updateListItemSelected',{obj:obj,type:type});
 		},
 		getListSearch(value){
-			this.listItems.documents.item =[]
-			this.listItems.orgcharts.item =[]
-			this.listItems.workflows.item =[]
-			this.listItems.reports.item =[]
+			this.listItems.document_definition.item =[]
+			this.listItems.orgchart.item =[]
+			this.listItems.workflow_definition.item =[]
+			this.listItems.dasboard.item =[]
 			orgchartApi.getOrgchartList({search:value,pageSize:50}).then(res => {
-				this.listItems.orgcharts.item = res.data.listObject;
+				this.listItems.orgchart.item = res.data.listObject;
 			});
 			documentApi.searchListDocuments({search:value,pageSize:50}).then(res => {
-				this.listItems.documents.item = res.data.listObject;
+				this.listItems.document_definition.item = res.data.listObject;
 			});
 			BpmnEngine.getListModels({search:value,pageSize:50}).then(res => {
-				this.listItems.workflows.item = res.data.listObject;
+				this.listItems.workflow_definition.item = res.data.listObject;
 			});
 			dashboardApi.getDashboards({search:value,pageSize:50}).then(res => {
-				this.listItems.reports.item = res.data.listObject;
+				this.listItems.dasboard.item = res.data.listObject;
 			});
 		},
 	},

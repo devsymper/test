@@ -274,7 +274,7 @@ export default {
 								}
 				]}).then(resOrg => {
 					console.log(resOrg.data.listObject);
-					this.$store.commit('appConfig/updateChildrenApps',{obj:resOrg.data.listObject,type:'orgcharts'});
+					this.$store.commit('appConfig/updateChildrenApps',{obj:resOrg.data.listObject,type:'orgchart'});
 				});
 			}
 			if(self.arrType.document_definition.length > 0){
@@ -294,7 +294,7 @@ export default {
 								]
 							}
 						).then(resDoc => {
-							this.$store.commit('appConfig/updateChildrenApps',{obj:resDoc.data.listObject,type:'documents'});
+							this.$store.commit('appConfig/updateChildrenApps',{obj:resDoc.data.listObject,type:'document_definition'});
 						});
 			}
 			if(self.arrType.workflow_definition.length > 0){
@@ -311,7 +311,7 @@ export default {
 											}
 										}
 						]}).then(resW => {
-							this.$store.commit('appConfig/updateChildrenApps',{obj:resW.data.listObject,type:'workflows'});
+							this.$store.commit('appConfig/updateChildrenApps',{obj:resW.data.listObject,type:'workflow_definition'});
 						});
 			}
 			if(self.arrType.dasboard.length > 0){
@@ -328,7 +328,7 @@ export default {
 									}
 								}
 				]}).then(resRp => {
-					this.$store.commit('appConfig/updateChildrenApps',{obj:resRp.data.listObject,type:'reports'});
+					this.$store.commit('appConfig/updateChildrenApps',{obj:resRp.data.listObject,type:'dasboard'});
 				});
 			}
 			self.arrType.orgchart = []

@@ -26,28 +26,28 @@ const removeItemSelected = (state, data) => {
 }
 const emptyItemSelected = (state) => {
 	state.listItemSelected = {
-		documents: {
+		document_definition: {
 			icon: 'mdi-file-edit-outline',
 			title: 'Documents',
-			name: 'documents',
+			name: 'document_definition',
 			item: []
 		},
-		orgcharts: {
+		orgchart: {
 			icon: 'mdi-widgets-outline',
 			title: 'Orgcharts',
-			name: 'orgcharts',
+			name: 'orgchart',
 			item: []
 		},
-		reports: {
+		dasboard: {
 			icon: 'mdi-view-dashboard',
 			title: 'Reports',
-			name: 'reports',
+			name: 'dasboard',
 			item: []
 		},
-		workflows: {
+		workflow_definition: {
 			icon: 'mdi-lan',
 			title: 'Workflows',
-			name: 'workflows',
+			name: 'workflow_definition',
 			item: []
 		},
 	}

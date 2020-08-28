@@ -178,6 +178,7 @@ export default {
 			let self = this 
 			let userId = this.$store.state.app.endUserInfo.id
 			appManagementApi.getItemFavorite(userId).then(res =>{
+				debugger
 				if (res.status == 200) {
 					// this.testListFavorite = res.data.listObject
 					res.data.listObject.forEach(function(e){
@@ -234,14 +235,14 @@ export default {
 					}
 				).then(resDoc => {
 					if(type == "listFavorite"){
-						this.updateActionItem(self.mapIdFavorite.document_definition,resDoc.data.listObject,'documents')
+						this.updateActionItem(self.mapIdFavorite.document_definition,resDoc.data.listObject,'document_definition')
 						resDoc.data.listObject.forEach(function(e){
 							self.listFavorite.push(e)
 						})
 					}
 					else{
 						this.updateFavoriteItem(self.mapId.document_definition,resDoc.data.listObject)
-						this.$store.commit('appConfig/updateChildrenApps',{obj:resDoc.data.listObject,type:'documents'});
+						this.$store.commit('appConfig/updateChildrenApps',{obj:resDoc.data.listObject,type:'document_definition'});
 					}
 				});
 		},
@@ -261,7 +262,7 @@ export default {
 				]}).then(resOrg => {
 					if(type == 'listFavorite'){
 						if(resOrg.data.listObject.length > 0){
-							this.updateActionItem(self.mapIdFavorite.orgchart,resOrg.data.listObject,'orgcharts')
+							this.updateActionItem(self.mapIdFavorite.orgchart,resOrg.data.listObject,'orgchart')
 							resOrg.data.listObject.forEach(function(e){
 								self.listFavorite.push(e)
 							})
@@ -269,7 +270,7 @@ export default {
 					}
 					else{
 						this.updateFavoriteItem(self.mapId.orgchart,resOrg.data.listObject)
-						this.$store.commit('appConfig/updateChildrenApps',{obj:resOrg.data.listObject,type:'orgcharts'});
+						this.$store.commit('appConfig/updateChildrenApps',{obj:resOrg.data.listObject,type:'orgchart'});
 					}
 				});
 		},
@@ -289,7 +290,7 @@ export default {
 				]}).then(resRp => {
 					if(type == 'listFavorite'){
 						if(resRp.data.listObject.length > 0){
-							this.updateActionItem(self.mapIdFavorite.dasboard,resRp.data.listObject,'reports')
+							this.updateActionItem(self.mapIdFavorite.dasboard,resRp.data.listObject,'dasboard')
 							resRp.data.listObject.forEach(function(e){
 								self.listFavorite.push(e)
 							})
@@ -297,7 +298,7 @@ export default {
 					}
 					else{
 						this.updateFavoriteItem(self.mapId.dasboard,resRp.data.listObject)
-						this.$store.commit('appConfig/updateChildrenApps',{obj:resRp.data.listObject,type:'reports'});
+						this.$store.commit('appConfig/updateChildrenApps',{obj:resRp.data.listObject,type:'dasboard'});
 					}
 				});
 		},
@@ -317,7 +318,7 @@ export default {
 				]}).then(resW => {
 					if(type == 'listFavorite'){
 						if(resW.data.listObject.length > 0){
-							this.updateActionItem(self.mapIdFavorite.workflow_definition,resW.data.listObject,'workflows')
+							this.updateActionItem(self.mapIdFavorite.workflow_definition,resW.data.listObject,'workflow_definition')
 							resW.data.listObject.forEach(function(e){
 								self.listFavorite.push(e)
 							})
@@ -325,7 +326,7 @@ export default {
 					}
 					else{
 						this.updateFavoriteItem(self.mapId.workflow_definition,resW.data.listObject)
-						this.$store.commit('appConfig/updateChildrenApps',{obj:resW.data.listObject,type:'workflows'});
+						this.$store.commit('appConfig/updateChildrenApps',{obj:resW.data.listObject,type:'workflow_definition'});
 					}
 				});
 		},

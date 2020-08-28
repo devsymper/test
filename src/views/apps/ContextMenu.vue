@@ -16,22 +16,22 @@
 		targetItem:{},
 		type:'',
 		defineAction:{
-			documents:{
+			document_definition:{
 				 "module": "document",
   				 "resource": "document_definition",
 				 "scope": "document",
 			},
-			workflows:{
+			workflow_definition:{
 				"module": "workflow",
 				"resource": "workflow_definition",
 				"scope": "workflow",
 			},
-			reports:{
+			dasboard:{
 				"module": "dashboard",
 				"resource": "dashboard",
 				"scope": "dashboard",
 			},
-			orgcharts:{
+			orgchart:{
 				 "module": "orgchart",
 				 "resource": "orgchart",
 				 "scope": "orgchart",
@@ -70,8 +70,6 @@
 		},
 		clickAction(action){
 			this.defineAction[this.type].action = action;
-			console.log(this.defineAction[this.type]);
-			console.log(this.targetItem);
 			this.hide()
 			let targetItem = this.targetItem
 			this.$evtBus.$emit('symper-app-call-action-handler', this.defineAction[this.type], this, {id:targetItem.id,name:targetItem.name,title:targetItem.title});
