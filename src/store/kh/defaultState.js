@@ -43,6 +43,7 @@ const defaultState = {
     arrIdFileAttach: [],
     arrFileAttach: [],
     flagFirst: 0,
+    flagErrEditor: 0,
     //statusAddTable: 0,
 
 

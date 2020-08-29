@@ -287,6 +287,10 @@ const resetData = (state, status) => {
 const setFlagFirst = (state, item) => {
     Vue.set(state, 'flagFirst', item);
 }
+
+const setFlagErrEditor = (state, item) => {
+    Vue.set(state, 'flagErrEditor', item);
+}
 export {
     changeSubCollapseSidebar,
     changeStatusRightBar,
@@ -333,4 +337,5 @@ export {
     removeListArrFileAttach,
     resetData,
     setFlagFirst,
+    setFlagErrEditor,
 };

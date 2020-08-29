@@ -234,20 +234,26 @@ export default {
             self.parentPath = res.data.listObject.parentPath;
             self.content = res.data.listObject.content;
             self.hash = res.data.listObject.hash;
-           // this.$store.commit("kh/changeHeaderSlugKH", 2);
+            // this.$store.commit("kh/changeHeaderSlugKH", 2);
           } else if (res.status == 403) {
-                self.$store.commit("kh/resetData", true);
-                this.$router.push("/knowledge");
-                SYMPER_APP.$snotifyError("Error", res.message);
+            self.$store.commit("kh/resetData", true);
+            this.$router.push("/knowledge");
+            SYMPER_APP.$snotifyError("Error", res.message);
           }
           self.loading = false;
         })
         .catch(err => {
           console.warn(err, "error when get document");
-          this.$snotify({
-            type: "error",
-            title: this.$t("document.error")
-          });
+          this.$store.commit(
+              "kh/setFlagErrEditor",
+              this.skh.flagErrEditor + 1
+            );
+          if (this.skh.flagErrEditor > 2 ||this.skh.flagErrEditor==1) {
+            this.$snotify({
+              type: "error",
+              title: this.$t("document.error")
+            });
+          }
         });
     },
     addSizeTable() {

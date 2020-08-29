@@ -183,8 +183,12 @@ export default {
         this.dialogSave = true;
       } else {
         if (id == undefined) {
-          this.$store.commit("kh/setCurrentDocument", hash);
+          if (this.skh.flagErrEditor == 0) {
+            this.$store.commit("kh/setFlagErrEditor", this.skh.flagErrEditor+1);
+          }
           this.$router.push("/knowledge/folder/" + hash);
+          this.$store.commit("kh/setCurrentDocument", hash);
+
         } else {
           this.$router.push("/knowledge/document/" + hash);
         }
