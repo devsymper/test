@@ -36,6 +36,7 @@ export const str = {
         str = str.replace(/ò|ó|ọ|ỏ|õ|ô|ồ|ố|ộ|ổ|ỗ|ơ|ờ|ớ|ợ|ở|ỡ/g, "o");
         str = str.replace(/ù|ú|ụ|ủ|ũ|ư|ừ|ứ|ự|ử|ữ/g, "u");
         str = str.replace(/ỳ|ý|ỵ|ỷ|ỹ/g, "y");
+        str = str.replace(/[^a-zA-Z _]/g, "");
         str = str.replace(/đ/g, "d");
         str = str.replace(/\s+/g, "_");
 
@@ -58,6 +59,17 @@ export const str = {
         str = str.replace(/_/g, ' ');
         str = str[0].toUpperCase() + str.slice(1);
         return str;
+    },
+
+    toSnakeCase(inputString) {
+        return inputString.split('').map((character) => {
+                if (character == character.toUpperCase()) {
+                    return '_' + character.toLowerCase();
+                } else {
+                    return character;
+                }
+            })
+            .join('');
     },
 
     hashCode(str) {

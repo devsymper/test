@@ -4,7 +4,7 @@
     v-show="isShow"
     :style="positionBox">
         <v-card-title>{{errTitle}}</v-card-title>
-        <v-card-text>
+        <v-card-text class="validate-message">
             <v-icon class="icon">mdi-information-outline</v-icon>
             <span>{{errMessage}}</span>
 
@@ -119,11 +119,14 @@ export default {
         padding: 0 8px 8px 8px !important;
     }
     .card-validate >>> .mdi-information-outline{
-        font-size: 50px!important;
         color: red !important;
     }
     .icon{
         float: left;
         margin-right: 10px;
+    }
+    .validate-message{
+        display: flex;
+        align-items: center;
     }
 </style>

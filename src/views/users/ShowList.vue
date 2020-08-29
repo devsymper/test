@@ -10,6 +10,7 @@
         :containerHeight="containerHeight"
         :getDataUrl="getListUrl+'users?page=1&pageSize=50'"
         :actionPanelWidth="actionPanelWidth"
+        :commonActionProps="commonActionProps"
     >
         <div slot="right-panel-content" class="h-100">
             <action-panel
@@ -38,19 +39,30 @@ export default {
     },
     data(){
         return {
+            commonActionProps: {
+                "module": "account",
+                "resource": "account",
+                "scope": "account",
+            },
             getListUrl: appConfigs.apiDomain.user,
             actionPanelWidth:800,
             containerHeight: 200,
-            tableContextMenu:[
-                {name:"passwordsetting",text:this.$t('user.table.contextMenu.passwordSetting'),
-                callback: (user, callback) => {
+            tableContextMenu:{
+                change_pass: {
+                    name:"passwordsetting",
+                    text:this.$t('user.table.contextMenu.passwordSetting'),
+                    callback: (user, callback) => {
                         this.showViewSetingPassword(user);
-                    },},
-                {name:"edit",text:this.$t('user.table.contextMenu.edit'), 
+                    }
+                },
+                update: {
+                    name:"edit",
+                    text:this.$t('user.table.contextMenu.edit'), 
                     callback: (user, callback) => {
                         this.editUser(user);
-                    },}
-            ],
+                    }
+                }
+            },
             columns: [],
             data: [],
             totalPage: 6,

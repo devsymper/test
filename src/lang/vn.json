@@ -14,6 +14,7 @@
         "users": "Tài khoản người dùng",
         "add": "Thêm",
         "edit": "Sửa",
+        "cancel": "Hủy",
         "update": "Cập nhật",
         "delete": "Xóa",
         "refresh": "Làm mới",
@@ -310,6 +311,13 @@
                 "saveDoc": {
                     "heading": "Lưu Document",
                     "checkNameRelated": "Kiểm tra công thức liên quan"
+                },
+                "swapType": {
+                    "heading": "Chuyển đổi kiểu control",
+                    "note": "Lưu ý: Việc chuyển đổi Control có thể dẫn đến mất dữ liệu đã ghi trong hệ thống",
+                    "nameControl": "Tên control",
+                    "changeFrom": "Đổi kiểu control từ",
+                    "changeTo": "Thành"
                 }
             }
         },

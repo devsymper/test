@@ -12,6 +12,7 @@
             @after-open-add-panel="handleAddItem"
             :currentItemData="currentItemData"
             :customAPIResult="customAPIResult"
+            :commonActionProps="commonActionProps"
         >
             <template slot="right-panel-content" slot-scope="{itemData}">
                 <PermissionForm
@@ -58,6 +59,11 @@ export default {
     data: function() {
         let self = this;
         return {
+            commonActionProps: {
+                "module": "permission_pack",
+                "resource": "permission_pack",
+                "scope": "permission_pack",
+            },
             customAPIResult: {
                 reformatData(res) {
                     if (res.status == 200) {
@@ -94,8 +100,8 @@ export default {
             containerHeight: 300,
             actionOnItem: 'create',
             currentItemData: util.cloneDeep(defaultItemData),
-            tableContextMenu: [
-                {
+            tableContextMenu: {
+                update: {
                     name: "edit",
                     text: this.$t("permissions.contextMenu.edit"),
                     callback: async (pack, callback) => {
@@ -119,7 +125,7 @@ export default {
                         }
                     }
                 },
-                {
+                remove: {
                     name: "remove",
                     text: this.$t("permissions.contextMenu.remove"),
                     callback: async (rows, refreshList) => {
@@ -140,7 +146,7 @@ export default {
                         refreshList();
                     }
                 }
-            ],
+            },
             tableHeight: 0
         };
     },
