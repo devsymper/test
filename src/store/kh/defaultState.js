@@ -42,6 +42,7 @@ const defaultState = {
     idTable: "",
     arrIdFileAttach: [],
     arrFileAttach: [],
+    flagFirst: 0,
     //statusAddTable: 0,
 
 

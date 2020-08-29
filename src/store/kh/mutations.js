@@ -284,6 +284,9 @@ const resetData = (state, status) => {
         Vue.set(state, 'currentDocument', '');
     }
 }
+const setFlagFirst = (state, item) => {
+    Vue.set(state, 'flagFirst', item);
+}
 export {
     changeSubCollapseSidebar,
     changeStatusRightBar,
@@ -329,4 +332,5 @@ export {
     removeFileAttachToStore,
     removeListArrFileAttach,
     resetData,
+    setFlagFirst,
 };

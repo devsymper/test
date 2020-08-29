@@ -593,6 +593,11 @@ export default {
               thisCpn.dialog_remove = false;
               this.$store.dispatch("kh/removeDocToTreeViewStore", id);
               this.$store.dispatch("kh/removeDocToListChildTableStore", id);
+              var url = window.location.href;
+              if(/document/g.test(url)){
+                this.$router.push("/knowledge");
+                this.$store.commit("kh/resetData", true);
+              }
             } else if (res.status == 403) {
               thisCpn.dialog_remove = false;
               SYMPER_APP.$snotifyError("Error", res.message);

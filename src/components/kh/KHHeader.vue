@@ -111,22 +111,25 @@ export default {
       count: 0,
       slugs: [],
       dialogSave: false
-   
     };
   },
   watch: {
     "skh.currentDocument": function(newVl) {
       this.hash = newVl;
       var url = window.location.href;
-      if(/folder/g.test(url)){
-        this.invertHeaderSlugKH(1);
+      if (this.skh.flagFirst == 0) {
+         this.invertHeaderSlugKH(2);
+         this.$store.commit("kh/setFlagFirst", this.skh.flagFirst+1);
+      } else {
+        if (/folder/g.test(url)) {
+          this.invertHeaderSlugKH(1);
+        } else if (/document/g.test(url)) {
+          this.invertHeaderSlugKH(2);
+        } else {
+          this.invertHeaderSlugKH(0);
+        }
       }
-      else if(/document/g.test(url)){
-        this.invertHeaderSlugKH(2);
-      }
-      else{
-        this.invertHeaderSlugKH(0);
-      }
+
       this.getSlug();
     }
   },
@@ -150,7 +153,7 @@ export default {
       this.y = e.clientY;
       this.context_create = true;
     },
-  
+
     invertStatusEdit() {
       this.$store.commit("kh/changeStatusEdit", !this.skh.statusEdit);
     },
@@ -197,7 +200,6 @@ export default {
               self.slugs = res.data.listObject;
               self.count = res.data.listObject.length;
             }
-            
           })
           .catch(err => {
             console.warn(err, "error when get slug");
@@ -206,11 +208,10 @@ export default {
               title: this.$t("slug.error")
             });
           });
+      } else {
+        self.slugs = [];
+        self.count = 0;
       }
-      else{
-               self.slugs = [];
-              self.count = 0;
-            }
     }
   },
   created() {
