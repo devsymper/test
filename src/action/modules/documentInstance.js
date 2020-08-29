@@ -1,0 +1,52 @@
+let commonProps = {
+    "module": "document",
+    "resource": "document_instance",
+    "scope": "document",
+};
+
+export default [{
+        ...commonProps,
+        "action": "update",
+        "handler": function(param) {}
+    },
+    {
+        ...commonProps,
+        "action": "delete",
+        "handler": function(param) {
+            // let tabName = param.title ? param.title : (param.name ? param.name : '');
+            // tabName = this.$t('document.edit') + ' ' + tabName;
+            // this.$goToPage('/document/editor/' + param.documentId, tabName);
+        }
+    },
+    {
+        ...commonProps,
+        "action": "restore",
+        "handler": function(param) {
+            // let tabName = param.title ? param.title : (param.name ? param.name : '');
+            // tabName = this.$t('document.submit') + ' ' + tabName;
+            // this.$goToPage('/document/submit/' + param.documentId, tabName);
+        }
+    },
+    {
+        ...commonProps,
+        "action": "detail",
+        "handler": function(param) {
+
+        }
+    },
+    {
+        ...commonProps,
+        "action": "print",
+        "handler": function(param) {
+
+        }
+    },
+    {
+        ...commonProps,
+        "action": "list_trash",
+        "handler": function(param) {
+            // let tabName = this.$t('document.title');
+            // this.$goToPage('/documents', tabName);
+        }
+    },
+]
