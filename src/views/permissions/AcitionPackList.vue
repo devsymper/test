@@ -365,9 +365,9 @@ export default {
         },
         handleSavedItem() {
             this.$refs.listActionPack.refreshList();
-            if(this.actionOnItem = "create"){
-                this.handleAddItem();
-            }
+            // if(this.actionOnItem == "create"){
+            //     this.handleAddItem();
+            // }
         },
         handleAddItem() {
             this.actionOnItem = "create";
@@ -375,8 +375,9 @@ export default {
             this.currentItemData.id = 0;
             this.currentItemData.description = "";
             this.currentItemData.objectType = "document_definition";
-            this.currentItemData.mapActionAndObjects = [];
-            this.currentItemData.mapActionForAllObjects = [];
+
+            this.$set(this.currentItemData, 'mapActionAndObjects', {});
+            this.$set(this.currentItemData, 'mapActionForAllObjects', {});
             this.$refs.actionPackForm.objectTypeToDocumentDefinition();
         },
         calcContainerHeight() {

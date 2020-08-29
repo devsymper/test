@@ -620,9 +620,8 @@ export default {
                     }
                     setTimeout(function() {
                         htIst.selectCell(lastIndex, htIst.propToCol(changes[0][1]));
-                        self.itemData.mapActionAndObjects[self.itemData.objectType] = htIst.getSourceData();
+                        self.itemData.mapActionAndObjects[self.allInputs.objectType.value] = htIst.getSourceData();
                     }, 0);
-
                 },
                 afterSelectionEnd(rowNum	, column, row2 , column2 , preventScrolling, selectionLayerLevel){
                     let objectType = self.allInputs.objectType.value;
