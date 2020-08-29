@@ -281,6 +281,7 @@ export default class BasicControl extends Control {
         } else {
             this.ele.val(value)
         }
+        this.ele.attr('value', value)
     }
     renderFileControl = function() {
         let fileHtml = this.genFileView();

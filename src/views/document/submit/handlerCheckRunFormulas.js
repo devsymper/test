@@ -21,7 +21,15 @@ const markBinedField = function(instance, fieldName) {
             instance: instance
         });
     } else if (docStatus == 'beforeSubmit') {
-        let dataImpactedControlRefresh = sDocumentSubmit.dataImpactedControlRefresh
+        let dataImpactedControlRefresh = sDocumentSubmit.dataImpactedControlRefresh;
+        if (Object.keys(Object.values(dataImpactedControlRefresh)[0]).length == 0) {
+            store.commit("document/addToDocumentSubmitStore", {
+                key: 'readySubmit',
+                value: true,
+                instance: instance
+            });
+            return;
+        }
         let root = findRoot(dataImpactedControlRefresh, fieldName);
         if (root == false) return;
         dataImpactedControlRefresh[root][fieldName] = true;

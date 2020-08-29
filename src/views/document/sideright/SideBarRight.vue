@@ -34,6 +34,7 @@
                         <control-props-config  
                         @input-value-keyup="handleKeyupInput"
                         @input-value-changed="handleChangeInput" 
+                        @input-blur="handleInputBlur"
                         :singleLine="true" 
                         :labelWidth="`100px`"  
                         :allInputs="controlPropsGroup.name"/>
@@ -161,6 +162,7 @@ export default {
             //  this.$store.commit(
             //     "document/updateProp",{id:this.sCurrentDocument.id,name:name,value:value,tableId:tableId,type:"value",instance:this.instance}
             // );   
+            // debugger
         },
         handleKeyupInput(name, input, data){
             

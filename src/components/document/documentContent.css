@@ -216,6 +216,31 @@ input.s-control:not(.s-control-panel):not(.detail-view):hover {
     display: none;
 }
 
+.run-dataflow {
+    display: block;
+    position: absolute;
+    font-size: 19px;
+    right: 6px;
+    top: 4px;
+    width: 30px;
+    color: #409eff;
+    background: rgba(0 0 0 / 0.05);
+    border-radius: 4px;
+    transition: background ease-in-out 250ms;
+    -webkit-transition: background ease-in-out 250ms;
+    -moz-transition: background ease-in-out 250ms;
+    -ms-transition: background ease-in-out 250ms;
+    -o-transition: background ease-in-out 250ms;
+}
+
+.run-dataflow:focus {
+    outline: none;
+}
+
+.run-dataflow:hover {
+    background: rgba(0 0 0 / 0.1);
+}
+
 
 /* 
 .ht_master .wtHolder::-webkit-scrollbar {

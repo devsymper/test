@@ -386,11 +386,11 @@ export default {
 
 </style>
 <style >
- .v-autocomplete__content{
+ /* .v-autocomplete__content{
     max-width: 330px!important;
     top: 40px!important;
   
-}
+} */
 .v-list-item:hover{
     background:rgba(0,0,0,0.05);
 }

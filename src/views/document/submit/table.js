@@ -213,6 +213,7 @@ export default class Table {
             this.cellAfterChange = "";
             this.showPopupUser = false;
             this.showPopupTime = false;
+            this.tableDefaultRow = []
             this.currentControlSelected = null,
                 this.listAutoCompleteColumns = {},
                 this.event = {
@@ -366,6 +367,9 @@ export default class Table {
                         if (lastKey === 'Shift') {
                             if (e.key === 'Enter') {
                                 this.alter('insert_row', thisObj.currentSelectedCell.row + 1, 1);
+                                let rowData = thisObj.tableDefaultRow;
+                                rowData[0] = thisObj.currentSelectedCell.row + 1;
+                                thisObj.tableInstance.setDataAtRowProp([rowData], null, null, 'auto_set');
                             } else if (e.key === 'Delete') {
                                 this.alter('remove_row', thisObj.currentSelectedCell.row, 1);
                             }
@@ -736,6 +740,9 @@ export default class Table {
                         const element = listIdRow[index];
                         vls.push([index, controlInstance.name, data[element]]);
                     }
+                    if (sDocument.state.submit[thisObj.keyInstance]['docStatus'] == 'init' && vls.length > 0) {
+                        thisObj.tableDefaultRow = vls[0];
+                    }
                     thisObj.tableInstance.setDataAtRowProp(vls, null, null, 'auto_set');
                     markBinedField(thisObj.keyInstance, controlInstance.name)
                 } else {
@@ -990,18 +997,19 @@ export default class Table {
                 }
             },
             items: {
+
+                "row_above": {
+
+                },
+                "row_below": {
+
+                },
                 'remove_row': {
                     callback: function(key, selection, clickEvent) { // Callback for specific option
                         setTimeout(function(hotTb) {
                             hotTb.alter(key, selection[0]['start']['row'], 1);
                         }, 0, this);
                     }
-                },
-                "row_above": {
-
-                },
-                "row_below": {
-
                 },
 
             }
@@ -1028,6 +1036,7 @@ export default class Table {
             if (this.tableHasRowSum) {
                 data.push({})
             }
+
             this.tableInstance.updateSettings({
                     data: data
                 })

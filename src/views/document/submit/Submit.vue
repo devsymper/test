@@ -555,9 +555,19 @@ export default {
                     $(evt.target).closest(".card-time-picker").length == 0
                 ) { 
                     setTimeout(() => {
-                        if(!$(evt.target).is('td.current.highlight')){
+                        console.log($(evt.target));
+                        let currentTableInteractive = thisCpn.sDocumentSubmit.currentTableInteractive
+                        if(currentTableInteractive != null){
+                            let cellActiveName = currentTableInteractive.tableInstance.getActiveEditor().prop;
+                            let control = getControlInstanceFromStore(this.keyInstance,cellActiveName);
+                            if(control.type != "time"){
+                                thisCpn.$refs.timeInput.hide();
+                            }
+                        }
+                        else{
                             thisCpn.$refs.timeInput.hide();
                         }
+                        
                     }, 20);
                 }
                 if (
@@ -774,8 +784,8 @@ export default {
             this.checkEscKey(data.event);
         },
 
-        checkEscKey(evet){
-            if(evet.key === "Escape"){
+        checkEscKey(event){
+            if(event != undefined && event.key === "Escape"){
                 this.$refs.timeInput.hide();
             }
         },
@@ -1774,7 +1784,7 @@ export default {
 					let controlFormulas = controlInstance.controlFormulas;
 					for(let formulasType in controlFormulas){
 						if(formulasType != 'autocomplete' && formulasType != 'list'){
-							let formulasInstance = controlFormulas[formulasType].instance;
+                            let formulasInstance = controlFormulas[formulasType].instance;
 							this.handlerBeforeRunFormulasValue(formulasInstance,controlInstance.id,controlName,formulasType,'root')
 						}
 					}
