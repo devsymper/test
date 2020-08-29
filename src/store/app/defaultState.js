@@ -87,6 +87,11 @@ const defaultState = {
 			icon: "mdi-comment",
 			link: "/comment"
 		},
+		{
+			title: "KH",
+			icon: "mdi-comment",
+			link: "/kh"
+		},
 
 		// { title: "virtualdocs", icon: "mdi-table", link: "/virtualdocs" },
 		{
