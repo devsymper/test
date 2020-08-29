@@ -18,27 +18,16 @@
 		</div>
 		<div class="content-comment-input">
 			<span v-if="isEditing == false" >
-				<span>{{item.content}}</span>
+				<h5 >{{item.content}}</h5>
 			</span>
-			 <!-- <v-text-field
-				v-else
-				clear-icon="mdi-close-circle"
-				v-model="inputComment"
-				clearable
-				type="text"
-				v-on:keyup.50="tagUser($event)"
-				>
-					<template slot="append">
-						<v-icon>mdi-attachment</v-icon>
-						<v-icon @click="addComment">mdi-send-circle-outline</v-icon>
-					</template>
-			</v-text-field> -->
 			<div class="text-area-wrapper" v-else>
 					<textarea v-model="inputComment"  
 						v-on:keyup.50="tagUser($event)"
-						class="text-area">
+						class="text-area"
+						style="width:100%"
+						>
 					</textarea>
-				<UploadFile style="position:absolute;right: 16px;bottom: 5px;" @uploaded-file="uploadInfo"/>
+				<UploadFile style="position:absolute;right:16px;bottom: 5px;" @uploaded-file="uploadInfo"/>
 				<v-btn style="position:absolute;right: 0px;bottom: 5px;" icon @click="addComment">
 					<v-icon >mdi-send-circle-outline</v-icon>
 				</v-btn>
@@ -144,6 +133,7 @@ export default {
 			this.dataPostComment.attachments = this.attachments
 			this.dataPostComment.tags = this.tags
 			console.log(this.tags);
+			debugger
 			if(this.isAdd == true){
 				let data = JSON.stringify(this.dataPostComment)
 				commentApi.addComment(data).then(res => {
@@ -279,6 +269,15 @@ export default {
 .content-comment >>>  .content-comment-input{
 	padding: 0px 0px 4px 0px;
 }
+.content-comment >>>  .content-comment-input h5{
+	overflow: hidden;
+	text-overflow: ellipsis;
+	display: -webkit-box;
+	-webkit-line-clamp: 20;
+	-webkit-box-orient: vertical;
+	width:265px;
+	font:13px roboto
+}
 .content-comment >>> .content-comment-file .v-icon{
 	font-size: 13px;
 }
@@ -288,17 +287,5 @@ export default {
 	background-color: #f7f7f7;
 	width: 100%;
 }
-.content-comment >>> .text-area-wrapper .mentionable {
-	flex-grow: 1;
-}
-.content-comment >>> .text-area-wrapper .mentionable .text-area{
-	width: 100%;
-}
-.content-comment >>> .text-area-wrapper .mention-item {
-	padding: 4px 10px;
-	border-radius: 4px;
-}
-.content-comment >>>  .text-area-wrapper .mention-selected {
-    background: rgb(192, 250, 153);
-}
+
 </style>

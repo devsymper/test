@@ -1,4 +1,4 @@
-<template>
+    <template>
     <div class="w-100 h-100">
         <list-items
             ref="listActionPack"
@@ -255,7 +255,6 @@ export default {
             //         }
             //     }
             // }
-
             // // chế biến về cho đúng định dạng hiển thị của bảng
             // for(let objectType in mapActionAndObjects){
             //     mapActionAndObjects[objectType] = Object.values(mapActionAndObjects[objectType]);
