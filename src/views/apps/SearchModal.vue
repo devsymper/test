@@ -27,8 +27,8 @@
 							</v-tooltip>
 							<div v-else>{{childItem.name}}</div>
 							<v-icon  v-if="sAppManagement[itemT.name].item.includes(childItem)" style="position:absolute;top:0px;right:0px">mdi-check</v-icon> 
+								<!-- v-if=""  sAppManagement.listItemSelected[itemT.name].item.includes(childItem)-->
 						</div>						
-							
 					</li>
 				</ul>
 			</div>
@@ -42,6 +42,8 @@ import {orgchartApi} from './../../api/orgchart';
 import {dashboardApi} from './../../api/dashboard';
 import BpmnEngine from './../../api/BPMNEngine';
 import { debounce } from "debounce";
+var delayTimer;
+let self =  this;
 export default {
 	 data: function() {
         return {
@@ -94,43 +96,61 @@ export default {
 	},
 	methods:{
 		clickItem(obj,type){
+			obj.active = !obj.active
 			this.$store.commit('appConfig/updateListItemSelected',{obj:obj,type:type});
 		},
-		debounce(func, wait) {
-			var timeout;
-			debugger
-			return function() {
-				var context = this, args = arguments;
-				var executeFunction = function() {
-					func.apply(context, args);
-				};
-				clearTimeout(timeout);
-				timeout = setTimeout(executeFunction, wait);
-			};
+		doSearch(val,time) {
+			clearTimeout(delayTimer);
+			let self = this;
+			delayTimer = setTimeout(function() {
+				self.getListSearch(val)
+			}, time); 
+		},
+		checkChildrenItem(resData,storeData){
+			if(resData.length > 0){
+				resData.forEach(function(e){
+					if(storeData.length > 0){
+						storeData.forEach(function(f){
+							if(e.id === f.id){
+								e.active = true
+							}else{
+								e.active = false
+							}
+						})
+					}else{
+						e.active = false
+					}
+				})
+			}
+			return resData	
 		},
 		getListSearch(value){
-			this.listItems.document_definition.item =[]
-			this.listItems.orgchart.item =[]
-			this.listItems.workflow_definition.item =[]
-			this.listItems.dasboard.item =[]
+			let self = this
+			this.listItems.document_definition.item = []
+			this.listItems.orgchart.item = []
+			this.listItems.workflow_definition.item = []
+			this.listItems.dasboard.item = []
 			orgchartApi.getOrgchartList({search:value,pageSize:50}).then(res => {
+				this.checkChildrenItem(res.data.listObject,self.sAppManagement.orgchart.item)
 				this.listItems.orgchart.item = res.data.listObject;
 			});
 			documentApi.searchListDocuments({search:value,pageSize:50}).then(res => {
+				this.checkChildrenItem(res.data.listObject,self.sAppManagement.document_definition.item)
 				this.listItems.document_definition.item = res.data.listObject;
 			});
 			BpmnEngine.getListModels({search:value,pageSize:50}).then(res => {
+				this.checkChildrenItem(res.data.listObject,self.sAppManagement.workflow_definition.item)
 				this.listItems.workflow_definition.item = res.data.listObject;
 			});
 			dashboardApi.getDashboards({search:value,pageSize:50}).then(res => {
+				this.checkChildrenItem(res.data.listObject,self.sAppManagement.dasboard.item)
 				this.listItems.dasboard.item = res.data.listObject;
 			});
 		},
 	},
 	 watch: {
         'myValue': function(val){
-			this.getListSearch(val)
-			this.debounce(this.getListSearch(val),1000)
+			this.doSearch(val,500)
 	    }
 	}
 }
@@ -163,7 +183,6 @@ export default {
 	display: flex;
 	cursor: pointer;
 	padding:10px 0px;
-	
 }
 .search-modal >>> .app-item .title-app .v-icon{
 	font-size: 13px;
@@ -194,8 +213,4 @@ export default {
 	background-color:#f7f7f7;
 	border-radius: 5px;
 }
-/* .search-modal >>> {
-	background-color:#f7f7f7;
-	border-radius: 5px;
-} */
 </style>

@@ -369,7 +369,7 @@ export default {
 		},
 		clickBack(){
 			this.tab = 'tab-1'
-			// this.getActiveapps()
+			this.getActiveapps()
 			// this.getFavorite()
 		},
 		updateFavoriteItem(mapArray,array){
