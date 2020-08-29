@@ -50,4 +50,16 @@ export const authUtil = {
         this.saveLoginInfo(loginInfo);
     },
 
+    getCurrentUserRole() {
+        let data = this.getSavedUserInfo();
+        let role = '';
+        if (data.profile.userDelegate &&
+            data.profile.userDelegate.role) {
+            role = data.profile.userDelegate.role;
+        } else {
+            role = data.profile.role;
+        }
+        return role;
+    }
+
 }

@@ -25,7 +25,7 @@
                     'ma-0 pb-1': true ,
                 }">
                 <v-list-item-avatar @click="invertSidebarShow()">
-                    <img src="https://randomuser.me/api/portraits/men/81.jpg" />
+                    <img :src="currentUserAvatar" />
                 </v-list-item-avatar>
 
                 <v-list-item-content>
@@ -94,7 +94,6 @@
                                                 <i class="mdi mdi-account mr-2 fs-16"> </i> <span> {{data.item.displayName}}</span>
                                             </div>
                                         </template>
-
                                     </v-autocomplete>
 
                                  </div>
@@ -152,23 +151,63 @@
             <VuePerfectScrollbar :style="{height: menuItemsHeight}">
                 <div class="pr-2">
                     <v-list-item
-                        v-for="item in sapp.items"
+                        v-for="item in userMenuItems"
                         :key="item.title" 
                         link
                         :symper-action="$bindAction(item.action)"
                         @click="gotoPage(item)">
-                        <v-list-item-icon>
-                            <v-tooltip right>
-                                <template v-slot:activator="{ on }">
-                                    <v-icon :symper-action="$bindAction(item.action)" v-on="on">{{ item.icon }}</v-icon>
-                                </template>
-                                <span>{{ $t('common.'+item.title) }}</span>
-                            </v-tooltip>
-                        </v-list-item-icon>
 
-                        <v-list-item-content :symper-action="$bindAction(item.action)">
-                            <v-list-item-title>{{ $t('common.'+item.title) }}</v-list-item-title>
-                        </v-list-item-content>
+                        <v-menu
+                            v-if="item.children && item.children.length"
+                            :open-on-hover="true"
+                            :offset-x="true"
+                            nudge-right="7"
+                            close-delay="200"
+                            >
+                            <template v-slot:activator="{ on, attrs }">
+                                <div class="h-100 w-100 d-flex "
+                                    v-bind="attrs"
+                                    v-on="on">    
+                                    <v-list-item-icon>
+                                        <v-tooltip top>
+                                            <template v-slot:activator="{ on }">
+                                                <v-icon :symper-action="$bindAction(item.action)" v-on="on">{{ item.icon }}</v-icon>
+                                            </template>
+                                            <span :symper-action="$bindAction(item.action)">{{ $t('common.'+item.title) }}</span>
+                                        </v-tooltip>
+                                    </v-list-item-icon>
+
+                                    <v-list-item-content :symper-action="$bindAction(item.action)">
+                                        <v-list-item-title :symper-action="$bindAction(item.action)">{{ $t('common.'+item.title) }}</v-list-item-title>
+                                    </v-list-item-content>
+                                </div>
+                            </template>
+
+                            <v-list>
+                                <v-list-item
+                                    v-for="(subMenu, index) in item.children"
+                                    :key="index"
+                                    @click="gotoPage(subMenu)">
+                                    <v-list-item-title>{{ subMenu.title }}</v-list-item-title>
+                                </v-list-item>
+                            </v-list>
+                        </v-menu>
+                        
+                        <template v-else>
+                            <v-list-item-icon>
+                                <v-tooltip top>
+                                    <template v-slot:activator="{ on }">
+                                        <v-icon :symper-action="$bindAction(item.action)" v-on="on">{{ item.icon }}</v-icon>
+                                    </template>
+                                    <span >{{ $t('common.'+item.title) }}</span>
+                                </v-tooltip>
+                            </v-list-item-icon>
+
+                            <v-list-item-content :symper-action="$bindAction(item.action)">
+                                <v-list-item-title :symper-action="$bindAction(item.action)">{{ $t('common.'+item.title) }}</v-list-item-title>
+                            </v-list-item-content>
+                        </template>
+
                     </v-list-item>
                 </div>
             </VuePerfectScrollbar>
@@ -212,6 +251,7 @@ import { util } from "./../../plugins/util.js";
 import { userApi } from "./../../api/user.js";
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import UserRoleSelector from "@/components/app/UserRoleSelector.vue";
+import { appConfigs } from '../../configs.js';
 
 export default {
     created(){
@@ -240,8 +280,15 @@ export default {
         UserRoleSelector
     },
     computed: {
+        currentUserAvatar(){
+            let userId = this.$store.state.app.endUserInfo.id;
+            return appConfigs.apiDomain.fileManagement+'readFile/user_avatar_' + userId;
+        },
         sapp() {
             return this.$store.state.app;
+        },
+        userMenuItems(){
+            return this.$store.getters['app/userMenuItems'];
         }
     },
     watch: {

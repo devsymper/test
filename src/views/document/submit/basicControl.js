@@ -144,23 +144,52 @@ export default class BasicControl extends Control {
 
         let thisObj = this;
         this.ele.on('change', function(e) {
-            let valueChange = $(e.target).val();
-            if (thisObj.type == 'label') {
-                valueChange = $(e.target).text()
-            }
-            SYMPER_APP.$evtBus.$emit('document-submit-input-change', { controlName: thisObj.controlProperties.name.value, val: valueChange })
-            if (thisObj.type == 'date') {
-                if (this.formatDate != "" && typeof this.formatDate === 'string') {
-                    thisObj.value = $(this).val();
-                    $(this).val(moment($(this).val()).format(thisObj.formatDate))
+                let valueChange = $(e.target).val();
+                if (thisObj.type == 'label') {
+                    valueChange = $(e.target).text()
                 }
-            }
-        })
+                SYMPER_APP.$evtBus.$emit('document-submit-input-change', { controlName: thisObj.controlProperties.name.value, val: valueChange })
+                if (thisObj.type == 'date') {
+                    if (this.formatDate != "" && typeof this.formatDate === 'string') {
+                        thisObj.value = $(this).val();
+                        $(this).val(moment($(this).val()).format(thisObj.formatDate))
+                    }
+                }
+            })
+            // this.ele.on('keydown', function(e) {
+            //     if (thisObj.type == 'number') {
+            //         console.log(e.key);
+
+        //         if (['ArrowRight', 'ArrowLeft', 'Tab'].includes(e.key)) {
+        //             return;
+        //         }
+        //         if (!/\d/.test(e.key)) {
+        //             e.preventDefault();
+        //             e.stopPropagation()
+        //         }
+        //     }
+        // })
         this.ele.on('keyup', function(e) {
             if (thisObj.type == 'user') {
+                e.curTarget = e.target
                 SYMPER_APP.$evtBus.$emit('document-submit-user-input-change', e)
             }
-            if (thisObj.checkAutoCompleteControl()) {
+            if (thisObj.type == 'percent') {
+                if (e.target.value > 100) {
+                    $(e.target).val(100)
+                }
+            }
+            if (thisObj.type == 'department') {
+                e['controlName'] = thisObj.name;
+                SYMPER_APP.$evtBus.$emit('document-submit-department-key-event', {
+                    e: e,
+                    formulasInstance: thisObj.controlFormulas.autocomplete.instance,
+                    controlTitle: thisObj.title,
+                    controlName: thisObj.name,
+                    val: $(e.target).val()
+                })
+            }
+            if (thisObj.checkAutoCompleteControl() && thisObj.type != 'department') {
                 let fromSelect = false;
                 let formulasInstance = (fromSelect) ? thisObj.controlFormulas.formulas.instance : thisObj.controlFormulas.autocomplete.instance;
                 e['controlName'] = thisObj.controlProperties.name.value;
@@ -180,6 +209,9 @@ export default class BasicControl extends Control {
             if (thisObj.checkAutoCompleteControl() && e.keyCode == 9) {
                 e.keyCode = 200;
                 SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-key-event', {
+                    e: e,
+                })
+                SYMPER_APP.$evtBus.$emit('document-submit-department-key-event', {
                     e: e,
                 })
             }
@@ -392,10 +424,26 @@ export default class BasicControl extends Control {
         this.ele.attr('type', 'text');
         this.numberFormat = (this.controlProperties.hasOwnProperty('formatNumber')) ? this.controlProperties.formatNumber.value : "";
         this.ele.on('blur', function(e) {
-            $(this).val(numbro($(this).val()).format(thisObj.numberFormat))
+            if ($(this).val() == "") {
+                thisObj.ele.removeClass('error');
+                thisObj.ele.removeAttr('valid');
+            } else {
+                if (/^[-0-9,.]+$/.test($(this).val())) {
+                    $(this).val(numbro($(this).val()).format(thisObj.numberFormat))
+                    thisObj.ele.removeClass('error')
+                    thisObj.ele.removeAttr('valid');
+                } else {
+                    thisObj.ele.addClass('error');
+                    let controlTitle = (thisObj.title == "") ? thisObj.name : thisObj.title;
+                    let valid = "Giá trị trường " + controlTitle + " phải là số"
+                    thisObj.ele.attr('valid', valid);
+                }
+            }
         })
         this.ele.on('focus', function(e) {
-            $(this).val(numbro($(this).val()).format('0'))
+            if (/^[-0-9,.]+$/.test($(this).val())) {
+                $(this).val(numbro($(this).val()).format('0'))
+            }
         })
     }
 
@@ -493,17 +541,6 @@ export default class BasicControl extends Control {
             return '';
         }
     }
-    addAutoCompleteEvent(fromSelect = false) {
-        let thisObj = this;
-        this.ele.on('input', function(e) {
-
-        })
-        this.ele.on('keyup', function(e) {
-
-        })
-
-    }
-
 
     // hàm kiểm tra control này có thuộc tính require hay không
     isRequiredControl() {

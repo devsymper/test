@@ -77,11 +77,6 @@ const defaultState = {
             link: "/permissions",
         },
         {
-            title: "actions",
-            icon: "mdi-package",
-            link: "/actions"
-        },
-        {
             title: "apps",
             icon: "mdi-apps",
             link: "/apps"
@@ -136,7 +131,8 @@ const defaultState = {
     // Danh sách tất cả các user trong hệ thống
     allUsers: [],
     generalNotificationPosition: 'top right',
-    userLoadedRoleType: []
+    userLoadedRoleType: [],
+    userOperations: {}
 };
 
 export default defaultState;

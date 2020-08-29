@@ -13,6 +13,7 @@
         "users": "Users",
         "add": "Add",
         "edit": "Edit",
+        "cancel": "Cancel",
         "update": "Update",
         "delete": "Delete",
         "refresh": "Refresh",
@@ -306,6 +307,18 @@
                         "source": "Source",
                         "formulas": "Formulas"
                     }
+                },
+
+                "saveDoc": {
+                    "heading": "Save Document",
+                    "checkNameRelated": "Check formulas related"
+                },
+                "swapType": {
+                    "heading": "Swap type control",
+                    "note": "Note: The Control to be convert can lead to be lost data in system",
+                    "nameControl": "Control name",
+                    "changeFrom": "From",
+                    "changeTo": "To"
                 }
             }
         },
@@ -451,7 +464,7 @@
         "clickToAdd": "Click to add item",
         "search": "Search",
         "favorite": "Favorite",
-		"listApp": "List applications",
+        "listApp": "List applications",
         "objectSummary": "Objects summary",
         "contextMenu": {
             "edit": "Edit",

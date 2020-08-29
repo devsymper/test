@@ -31,6 +31,7 @@ const defaultState = {
                     name: {},
                     display: {},
                     print: {},
+                    table: {},
 
                 },
                 formulas: {
@@ -40,7 +41,8 @@ const defaultState = {
                 id: ""
             },
             listControlTreeData: [],
-            allControlForTableOption: []
+            allControlForTableOption: [],
+            listDataFlow: []
         }
     },
     submit: {
@@ -57,6 +59,7 @@ const defaultState = {
             //biến phục vụ cho autocomplete trong table
             currentTableInteractive: null, //chỉ ra table đang được tương tác
             currentCellSelected: null, // chỉ ra cell đang nhập
+            currentControlActive: null, // biến chỉ ra control nào đang active
             currentControlAutoComplete: null, // biến chỉ ra control nào đang autocomplete
             submitFormulas: null,
             listUser: null,
@@ -72,7 +75,8 @@ const defaultState = {
                         }
                     }
                 }
-            }
+            },
+            orgchartTableSqlName: {}
         }
     },
     detail: {

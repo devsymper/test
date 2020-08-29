@@ -213,7 +213,5 @@ export default {
     font-size: 13px;
     font-weight: bold;
 }
-.v-menu__content{
-    min-height: 300px;
-}
+
 </style>

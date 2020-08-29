@@ -5,6 +5,7 @@
             :useDefaultContext="false"
             :pageTitle="$t('orgchart.list.title')"
             :tableContextMenu="tableContextMenu"
+            :commonActionProps="commonActionProps"
             :containerHeight="containerHeight"
             :getDataUrl="getListUrl"
             :useActionPanel="false"
@@ -18,16 +19,20 @@ import { util } from "./../../plugins/util.js";
 import { appConfigs } from "./../../configs.js";
 import ListItems from "./../../components/common/ListItems.vue";
 import { orgchartApi } from '../../api/orgchart';
-//xxx
 export default {
     data() {
         let self = this;
         return {
+            commonActionProps: {
+                "module": "orgchart",
+                "resource": "orgchart",
+                "scope": "orgchart",
+            },
             containerHeight: 300,
             listItemOptions: {},
             getListUrl: appConfigs.apiDomain.orgchart+'orgchart',
-            tableContextMenu: [
-                {
+            tableContextMenu: {
+                update: {
                     name: "edit",
                     text: this.$t("common.edit"),
                     callback: (row, callback) => {
@@ -37,7 +42,7 @@ export default {
                         );
                     }
                 },
-                {
+                drop: {
                     name: "remove",
                     text: this.$t("common.delete"),
                     callback: async (rows, refreshList) => {
@@ -58,7 +63,7 @@ export default {
                         refreshList();
                     }
                 },
-                {
+                detail: {
                     name: "detail",
                     text: this.$t("common.detail"),
                     callback: (row, callback) => {
@@ -69,7 +74,7 @@ export default {
                         );
                     }
                 }
-            ]
+            }
         };
     },
     mounted() {
