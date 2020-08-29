@@ -42,7 +42,7 @@ import { IndexedDB } from "./plugins/utilModules/indexedDB.js";
 import ResolveBacklogRequest from "./components/app/ResolveBacklogRequest";
 require("@/assets/css/handsontable.min.css");
 require("firebase/messaging");
-
+require('@/assets/css/kh.css')
 const firebaseConfig = appConfigs.firebaseConfig;
 
 var SYM_IDB_NAME = "SYMPER-IDB-STORE";

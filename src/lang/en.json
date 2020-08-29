@@ -2,6 +2,7 @@
     "common": {
         "id": "Id",
         "select_lang": "Select language",
+        "KH": "Knowledge Management",
         "reports": "Reports",
         "workflows": "Workflows",
         "documents": "Documents",
@@ -451,7 +452,7 @@
         "clickToAdd": "Click to add item",
         "search": "Search",
         "favorite": "Favorite",
-		"listApp": "List applications",
+        "listApp": "List applications",
         "objectSummary": "Objects summary",
         "contextMenu": {
             "edit": "Edit",
@@ -483,6 +484,49 @@
                 "favorite": "Add to favorite",
                 "unfavorite": "Remove from favorite"
             }
+        }
+    },
+    "kh": {
+        "folder": "Folder",
+        "document": "Document",
+        "sidebar": {
+            "add": "Add",
+            "edit": "Edit",
+            "delete": "Delete",
+            "add_favorite": "Add to favorite",
+            "delete_favorite": "Remove from favorite",
+            "restore": "Restore",
+            "attach": "Attach file to",
+            "rename": "Rename"
+
+
+        },
+        "dialog": {
+            "save": "Document has not been saved?",
+            "remove": "You will delete this item?",
+            "note": "You need to press the save button to perform this action",
+            "restore": "Are you sure you want to restore?",
+            "titleRestore": "You will restore this version!",
+            "cancel": "Cancel",
+            "yes": "Yes"
+
+        },
+        "toolbox": {
+            "save": "Save",
+            "attach": "Attach",
+            "toc": "Table of content",
+            "comment": "Comment",
+            "history": "History",
+            "backup": "Backup"
+        },
+        "contextmenu": {
+            "open": "Open",
+            "download": "Download",
+            "rename": "Rename",
+            "delete": "Delete"
+        },
+        "table": {
+            "totalDoc": "Total document"
         }
     },
     "actions": {
