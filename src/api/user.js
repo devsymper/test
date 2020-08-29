@@ -25,8 +25,8 @@ export const userApi = {
         return api.post('users', data);
     },
 
-    updateUser(data) {
-        return api.put('users', data);
+    updateUser(id, data) {
+        return api.put('users/' + id, data);
     },
     getDetailUser(id) {
         return api.get("users/" + id);
