@@ -144,7 +144,6 @@ export default {
 			this.dataPostComment.attachments = this.attachments
 			this.dataPostComment.tags = this.tags
 			console.log(this.tags);
-			debugger
 			if(this.isAdd == true){
 				let data = JSON.stringify(this.dataPostComment)
 				commentApi.addComment(data).then(res => {

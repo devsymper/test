@@ -161,7 +161,7 @@
                                 <template v-slot:activator="{ on }">
                                     <v-icon :symper-action="$bindAction(item.action)" v-on="on">{{ item.icon }}</v-icon>
                                 </template>
-                                <span>{{ $t('common.'+item.title) }}</span>
+                                <span :symper-action="$bindAction(item.action)">{{ $t('common.'+item.title) }}</span>
                             </v-tooltip>
                         </v-list-item-icon>
 

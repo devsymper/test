@@ -282,16 +282,6 @@ export default {
                     );
                 },
                 beforeContextMenuSetItems: () => {
-
-                    // let row = self.$refs.dataTable.hotInstance.getSourceDataAtRow(self.cellAboutSelecting.row);
-                    // let id = row.id;
-                    // let items = self.tableContextMenu;
-                    // if(!$.isArray(items)){
-                    //     let objectType = self.commonActionProps.resource;
-                        
-                    //     let filteredItems = actionHelper.filterAdmittedActions(items, objectType, id);
-                    // }
-                    // self.hotTableContextMenuItems =  self.getItemContextMenu(items);
                 },
                 beforeOnCellMouseOver: (event, coords, TD, controller) => {
                     console.log(event, coords);
@@ -302,8 +292,7 @@ export default {
                     let items = self.tableContextMenu;
                     if(!$.isArray(items)){
                         let objectType = self.commonActionProps.resource;
-                        
-                        let filteredItems = actionHelper.filterAdmittedActions(items, objectType, id);
+                        items = actionHelper.filterAdmittedActions(items, objectType, id);
                     }
                     self.hotTableContextMenuItems =  self.getItemContextMenu(items);
                 }

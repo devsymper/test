@@ -26,8 +26,8 @@ function hasShowListPermission(opsMap, objectType) {
      * nếu object id là 0 thì là có tác dụng với toàn bộ object trong definition
      */
     return mapObjectTypeAndMenu[objectType] &&
-        opsMap[objectType].self &&
-        opsMap[objectType].self.list;
+        opsMap[objectType][0] &&
+        opsMap[objectType][0].list;
 }
 
 const userMenuItems = function(state) {

@@ -17,15 +17,19 @@ export const actionHelper = {
         } else {
             if (opsMap[objectType]) {
                 let rsl = {};
-                if (opsMap[objectType].self) { // nếu có quyền với thằng cha, thì các thằng con sẽ phải theo thằng cha hết
-                    for (let action in opsMap[objectType].self) {
-                        rsl[action] = collection[action];
+                if (opsMap[objectType][0]) { // nếu có quyền với thằng cha, thì các thằng con sẽ phải theo thằng cha hết
+                    for (let action in opsMap[objectType][0]) {
+                        if (collection[action]) {
+                            rsl[action] = collection[action];
+                        }
                     }
                 }
 
                 // và còn có một vài quyền riêng mà thằng con được cài đặt
                 for (let action in opsMap[objectType][objId]) {
-                    rsl[action] = collection[action];
+                    if (collection[action]) {
+                        rsl[action] = collection[action];
+                    }
                 }
                 return returnArr ? Object.values(rsl) : rsl;
             } else {

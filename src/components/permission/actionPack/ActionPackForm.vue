@@ -436,7 +436,7 @@ export default {
                             newOperations.push({
                                 objectType: objectType,
                                 action: actionName,
-                                objectIdentifier: objectType,
+                                objectIdentifier: objectType+':0',
                                 name: actionName.replace(/_/g, ' ') + ' '+ objectType.replace(/_/g, ' ')
                             });
                         }
