@@ -129,11 +129,11 @@ export default {
                         }
                         try {
                             let res = await permissionApi.deletePermissionPack(ids);
-                            if(res.status == 200){
+                            // if(res.status == 200){
                                 self.$snotifySuccess("Deleted "+ids.length+' items');
-                            }else{
-                                self.$snotifyError(res, "Can not delete selected items");
-                            }
+                            // }else{
+                            //     self.$snotifyError(res, "Can not delete selected items");
+                            // }
                         } catch (error) {
                             self.$snotifyError(error, "Can not delete selected items");
                         }

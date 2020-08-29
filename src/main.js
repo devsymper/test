@@ -5,14 +5,18 @@ import store from "./store";
 import "./assets/css/main.css";
 import vuetify from "./plugins/vuetify";
 import i18n from './lang/i18n'
-import { util } from "./plugins/util.js";
+import {
+    util
+} from "./plugins/util.js";
 import BaView from "./views/layout/BAView";
 import EndUserView from "./views/layout/EndUserView";
 import ContentOnlyView from "./views/layout/ContentOnlyView";
 import Notifications from 'vue-notification'
 import VueMoment from "vue-moment";
 import moment from "moment-timezone";
-import { appConfigs } from "./configs";
+import {
+    appConfigs
+} from "./configs";
 import actionMap from './action/index'
 
 Vue.component('ba-view', BaView);
@@ -91,7 +95,7 @@ Vue.prototype.$evtBus.$on('symper-app-call-action-handler', (action, context, ex
 })
 
 
-function checkCanAddTag(context) {
+function checkCanAddTab(context) {
     let rsl = true;
     let urlMap = context.$store.state.app.urlToTabTitleMap;
     if (Object.keys(urlMap).length == appConfigs.maxOpenTab) {
@@ -102,13 +106,26 @@ function checkCanAddTag(context) {
 }
 
 
-
+function checkUrlNotExisted(url, context) {
+    let urlMap = context.$store.state.app.urlToTabTitleMap;
+    urlMap = Object.values(urlMap);
+    for (let idx in urlMap) {
+        if (urlMap[idx].url == url) {
+            context.$evtBus.$emit('auto-active-tab', Number(idx));
+            return false;
+        }
+    }
+    return true;
+}
 
 /**
  * Di chuyển đến một trang và tạo ra tab tương ứng
  */
-Vue.prototype.$goToPage = function(url, title, pageInstanceKey = false) {
-    let canAddTab = checkCanAddTag(this);
+Vue.prototype.$goToPage = function(url, title, pageInstanceKey = false, allwaysOpenNewTab = true) {
+    let canAddTab = checkCanAddTab(this);
+    if (!allwaysOpenNewTab) {
+        canAddTab = canAddTab && checkUrlNotExisted(url, this);
+    }
     if (!canAddTab) {
         return;
     }

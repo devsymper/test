@@ -13,6 +13,7 @@
         "users": "Users",
         "add": "Add",
         "edit": "Edit",
+        "cancel": "Cancel",
         "update": "Update",
         "delete": "Delete",
         "refresh": "Refresh",
@@ -306,14 +307,19 @@
                         "source": "Source",
                         "formulas": "Formulas"
                     }
+                },
+
+                "saveDoc": {
+                    "heading": "Save Document",
+                    "checkNameRelated": "Check formulas related"
+                },
+                "swapType": {
+                    "heading": "Swap type control",
+                    "note": "Note: The Control to be convert can lead to be lost data in system",
+                    "nameControl": "Control name",
+                    "changeFrom": "From",
+                    "changeTo": "To"
                 }
-            }
-        },
-        "submit": {
-            "fab": {
-                "submit": "Submit",
-                "draft": "Save to Draft",
-                "toggleSize": "Toggle resize page"
             }
         },
         "process": {
@@ -440,12 +446,25 @@
             "created_at": "Date create",
             "updated_at": "Last update"
         },
+
+        "listType": {
+            "documents": "Documents",
+            "workflows": "Work flows",
+            "reports": "Reports",
+            "orgcharts": "Orgcharts"
+        },
+        "addApp": "Add application",
+        "editApp": "Edit application",
         "title": "Applications",
         "pickIcon": "Pick icon",
         "apps": "Applications",
         "commonInfo": "General",
         "listObjects": "Objects",
         "addObject": "Add object",
+        "clickToAdd": "Click to add item",
+        "search": "Search",
+        "favorite": "Favorite",
+        "listApp": "List applications",
         "objectSummary": "Objects summary",
         "contextMenu": {
             "edit": "Edit",

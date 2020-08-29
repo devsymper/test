@@ -1,6 +1,8 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
-import { routeMiddleware } from './middleware.js';
+import {
+    routeMiddleware
+} from './middleware.js';
 import PageNotFound from './../views/PageNotFound.vue';
 import MultiGuard from 'vue-router-multiguard';
 import SymperHiddenRedirectComponent from "../views/SymperHiddenRedirectComponent.vue";
@@ -17,14 +19,16 @@ const systemRoutes = [{
         path: "/",
         name: "home",
         component: () =>
-            import ('../views/Home.vue')
+            import('../views/Home.vue')
     },
     {
         path: "/login",
         name: "login",
-        meta: { layout: "content-only" },
+        meta: {
+            layout: "content-only"
+        },
         component: () =>
-            import ('../views/Login.vue'),
+            import('../views/Login.vue'),
     },
     // một link để redirect khi chọn một tab mà trùng name với tab hiện tại
     {
@@ -35,13 +39,22 @@ const systemRoutes = [{
         path: "/page-not-found",
         name: "pageNotFound",
         component: PageNotFound, //Vue component,
-        meta: { layout: "content-only" },
+        meta: {
+            layout: "content-only"
+        },
     },
     {
         path: "*",
         name: "page",
         redirect: "/page-not-found",
-    }
+    },
+    // phần search
+    {
+        path: "/search/general",
+        name: "generalSearchInfo",
+        component: () =>
+            import('../views/search/general.vue'),
+    },
 ];
 
 function autoImportRouteModules() {

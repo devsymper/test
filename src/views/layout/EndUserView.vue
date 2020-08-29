@@ -4,7 +4,7 @@
         <v-content>
             <v-container fluid fill-height class="pa-0">
                 <div class="w-100 app-header-bg-color" style="border-bottom:1px solid #e6e5e5">
-                    <div style="width:calc(100% - 200px)" class="float-left">
+                    <div style="width:calc(100% - 500px)" class="float-left">
                         <v-tabs
                             hide-slider
                             active-class="symper-tab-active"
@@ -29,15 +29,22 @@
                         </v-tabs>
                     </div>
                     <div
-                        class="float-right app-header-bg-color"
-                        style="height:40px; line-height:40px;"
+                        class="float-right app-header-bg-color d-flex justify-end "
+                        style="widh:500px;height:40px; line-height:40px;"
                     >
+                     <!-- search -->
+                    <div v-show="showSearchInput" class="d-flex justify-center align-items-center">
+                        <transition name="slide-fade">
+                            <SearchInput v-show="showSearchInput" class="mr-2" style="width:330px"/>
+                        </transition>
+                    </div>
+                    <!--kết thúc search--->
                         <v-menu
                             v-model="isShowDialog"
                             :close-on-content-click="false"
                             :max-width="500"
-                            :min-width="500"
                             :max-height="700"
+       				   	    :nudge-width="370"
                             offset-y
                             >
                             <template v-slot:activator="{ on }">
@@ -45,22 +52,10 @@
                                     <v-icon>mdi-apps</v-icon>
                                 </v-btn>
                             </template>
-                            <v-card>
-                                <v-app-bar dense flat color="white">
-                                    <v-toolbar-title>
-                                        <v-icon>mdi-apps</v-icon>
-                                        {{$t('common.navigator')}}
-                                    </v-toolbar-title>
-                                    <v-spacer></v-spacer>
-                                    <v-btn icon>
-                                        <v-icon @click="isShowDialog = false">mdi-close</v-icon>
-                                    </v-btn>
-                                </v-app-bar>
-                                <v-divider></v-divider>
-                                <list-app></list-app>
-                            </v-card>
+                            <EndUserPopup  />
+							<!-- <div>hello</div> -->
                         </v-menu>
-                        <v-btn icon>
+                        <v-btn icon @click="showSearchInput = !showSearchInput">
                             <v-icon>mdi-magnify</v-icon>
                         </v-btn>
                        
@@ -107,7 +102,10 @@ import Api from "../../api/api.js";
 import { appConfigs } from '../../configs';
 import BASidebar from "@/components/common/BASidebar.vue";
 import listApp from "@/components/common/listApp";
+import EndUserPopup from './../apps/EndUserPopup.vue';
 import NotificationBar from "@/components/notification/NotificationBar.vue";
+import Search from "@/components/search/Search";
+
 export default {
     methods: {
         /**
@@ -148,25 +146,35 @@ export default {
             let req = new Api(appConfigs.apiDomain.nofitication);
             req.get("/notifications/count-unread")
             .then(res => {
-                console.log(res);
                 if (res.status == 200) {
                     this.$store.state.app.unreadNotification = res.data;
                 }
             });
-        }
+		},
+		logItem(data){
+			console.log(data);
+		}
         
     },
     components: {
         "ba-sidebar": BASidebar,
         "list-app": listApp,
-		"list-notification": NotificationBar,
+        "list-notification": NotificationBar,
+        EndUserPopup,
+        SearchInput: Search
     },
     created() {
+        let self = this;
         this.$evtBus.$on("app-receive-remote-msg", data => {
             this.$store.state.app.unreadNotification += 1;
             this.$store.state.app.needReloadNotification = true;
         });
         this.updateCountUnreadNotification();
+        
+        this.$evtBus.$on("auto-active-tab", tabIndex => {
+            self.$store.state.app.currentTabIndex = tabIndex;
+            self.handleChangeTab(tabIndex);
+        });
     },
     computed: {
         sapp() {
@@ -189,6 +197,7 @@ export default {
     },
     data: function() {
         return {
+            showSearchInput: false,
             isShowDialog: false,
 			isShowDialogNotification: false,
         };

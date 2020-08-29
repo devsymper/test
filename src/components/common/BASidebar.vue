@@ -94,7 +94,6 @@
                                                 <i class="mdi mdi-account mr-2 fs-16"> </i> <span> {{data.item.displayName}}</span>
                                             </div>
                                         </template>
-
                                     </v-autocomplete>
 
                                  </div>
@@ -129,6 +128,7 @@
                                         <span>Switch role</span>
                                     </v-tooltip>
                                 </template>
+                                
                                 <UserRoleSelector></UserRoleSelector>
                             </v-menu>
                         </div>
@@ -151,7 +151,7 @@
             <VuePerfectScrollbar :style="{height: menuItemsHeight}">
                 <div class="pr-2">
                     <v-list-item
-                        v-for="item in sapp.items"
+                        v-for="item in userMenuItems"
                         :key="item.title" 
                         link
                         :symper-action="$bindAction(item.action)"
@@ -241,6 +241,9 @@ export default {
     computed: {
         sapp() {
             return this.$store.state.app;
+        },
+        userMenuItems(){
+            return this.$store.getters['app/userMenuItems'];
         }
     },
     watch: {
@@ -297,7 +300,7 @@ export default {
             if(item.action){
                 // this.$evtBus.$emit('symper-app-call-action-handler', item.action, this, {});
             }else{
-                this.$goToPage(item.link, item.title);
+                this.$goToPage(item.link, item.title, false, false);
             }
         }
     },

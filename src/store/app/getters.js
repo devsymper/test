@@ -1,3 +1,5 @@
+import mapObjectTypeAndMenu from "./allMenuItems";
+import { util } from "../../plugins/util";
 /**
  * Biến dữ liệu của orgchart từ dạng tree sang dạng phẳng 
  * @param {*} state 
@@ -17,4 +19,43 @@ const mapIdToUser = function(state) {
         return map;
     }, {});
 }
-export { listOrgcNodeAsFlat, mapIdToUser };
+
+
+function hasShowListPermission(opsMap, objectType) {
+    /**
+     * nếu object id là 0 thì là có tác dụng với toàn bộ object trong definition
+     */
+    return mapObjectTypeAndMenu[objectType] &&
+        opsMap[objectType].self &&
+        opsMap[objectType].self.list;
+}
+
+const userMenuItems = function(state) {
+    let opsMap = state.userOperations;
+    let userInfo = util.auth.getSavedUserInfo();
+    let userType = userInfo.profile.type;
+
+    if (userType == 'ba') {
+        return Object.values(mapObjectTypeAndMenu);
+    } else {
+        let allwaysHave = ['tasks', 'works'];
+        let items = [];
+        for (let objectType in opsMap) {
+            if (hasShowListPermission(opsMap, objectType)) {
+                items.push(mapObjectTypeAndMenu[objectType]);
+            }
+        }
+
+        for (let objectType of allwaysHave) {
+            items.push(mapObjectTypeAndMenu[objectType]);
+        }
+        return items;
+    }
+}
+
+
+export {
+    listOrgcNodeAsFlat,
+    mapIdToUser,
+    userMenuItems
+};

@@ -50,6 +50,7 @@ const STORE_REQUEST_NAME = "requestes";
 export default {
     created() {
         this.initFirebase();
+        this.$store.dispatch('app/getAndSetUserOperations');
     },
     data() {
         return {

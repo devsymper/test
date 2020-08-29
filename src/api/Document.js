@@ -14,8 +14,8 @@ export const documentApi = {
         return coreApi.delete("documents", ids);
     },
 
-    detailDocument(id) {
-        return coreApi.get("documents/" + id);
+    detailDocument(id, data) {
+        return coreApi.get("documents/" + id, data);
     },
     deleteDocumentObject(objectIds) {
         return coreApi.delete("documents/objects", objectIds);
@@ -65,5 +65,9 @@ export const documentApi = {
     },
     updatePreDataForField(data) {
         return coreApi.post("documents/fields/relations", data);
+    },
+
+    saveForm(data) {
+        return coreApi.post("documents/forms", data);
     }
 };

@@ -2,13 +2,12 @@
     
     <div>
         <v-dialog
+        scrollable
         v-model="isShowModelSaveDoc"
         width="800"
         content-class="s-dialog"
         >
-        <v-card
-        height="575"
-        >
+        <v-card>
             <div class="note-name-change" v-show="showNoteChangeName">
                 <span>{{$t('document.editor.dialog.saveDoc.checkNameRelated')}}</span>
                 <div class="buble-direction">
@@ -171,7 +170,7 @@ export default {
             
         },
         saveDocument(){
-            if(this.showValidate && this.showNoteChangeName){
+            if(this.showValidate && this.showNoteChangeName && this.$route.name == 'editDocument'){
                 this.showValidate = false;
                 this.messageValidate = "Tên của văn bản này có thể được sử dụng trong công thức ở các đối tượng trong hệ thống. Chọn kiểm tra để kiểm tra lại các đối tượng";
                 this.$refs.validate.show(false)

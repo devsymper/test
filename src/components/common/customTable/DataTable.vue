@@ -51,7 +51,9 @@ export default {
                     self.resetTbWrapperHeight();
                 },
                 afterChange(changes,source){
-                    self.$emit('cell-change',{changes:changes,source:source})
+                    self.$emit('cell-change',{changes:changes,source:source});
+                    self.$emit('change', this.getSourceData());
+                    self.$emit('input', this.getSourceData());
                 }
             }
         };

@@ -39,7 +39,7 @@
                             <v-icon left dark>mdi-refresh</v-icon>
                             {{$t('common.refresh')}}
                         </v-btn>
-                        <v-btn
+                        <!-- <v-btn
                             depressed
                             small
                             :loading="loadingExportExcel"
@@ -49,7 +49,7 @@
                         >
                             <v-icon left dark>mdi-microsoft-excel</v-icon>
                             {{$t('common.export_excel')}}
-                        </v-btn>
+                        </v-btn> -->
                         <component
                             :is="'span'"
                         >
@@ -87,7 +87,7 @@
                         :data="data"
                         :rowHeights="21"
                         :columns="tableColumns"
-                        :contextMenu="itemContextMenu"
+                        :contextMenu="hotTableContextMenuItems"
                         :colHeaders="colHeaders"
                         :hiddenColumns="{
                             columns: tableDisplayConfig.hiddenColumns
@@ -210,7 +210,7 @@ import { userApi } from "./../../api/user.js";
 import SymperDragPanel from "./SymperDragPanel.vue";
 import DisplayConfig from "./../common/listItemComponents/DisplayConfig";
 import Pagination from './../common/Pagination'
-
+import { actionHelper } from "./../../action/actionHelper";
 var apiObj = new Api("");
 var testSelectData = [ ];
 window.tableDropdownClickHandle = function(el, event) {
@@ -223,7 +223,6 @@ window.tableDropdownClickHandle = function(el, event) {
         $(el).attr("col-name")
     );
 };
-
 export default {
     name: "SymperListItem",
     watch: {
@@ -234,6 +233,7 @@ export default {
         }
     },
     data() {
+        let self = this;
         return {
             deleteDialogShow: false, // có hiển thị cảnh báo xóa hay không
             deleteItems: [], // danh sách các row cần xóa
@@ -255,6 +255,7 @@ export default {
             },
             fixedColumnsCount: 0, // Số lượng cột fix ở bên trái
             tableColumns: [],
+            cellAboutSelecting: {}, // cell có nguy cơ được lựa chọn, được set mỗi khi chuột hover qua
             actionPanel: false, // có hiển thị action pannel (create, detail, edit) hay không
             loadingExportExcel: false, // có đang chạy export hay ko
             loadingRefresh: false, // có đang chạy refresh dữ liệu hay ko
@@ -279,6 +280,32 @@ export default {
                         "after render handsontablelllllllllllllllllllllllllll",
                         Date.now()
                     );
+                },
+                beforeContextMenuSetItems: () => {
+
+                    // let row = self.$refs.dataTable.hotInstance.getSourceDataAtRow(self.cellAboutSelecting.row);
+                    // let id = row.id;
+                    // let items = self.tableContextMenu;
+                    // if(!$.isArray(items)){
+                    //     let objectType = self.commonActionProps.resource;
+                        
+                    //     let filteredItems = actionHelper.filterAdmittedActions(items, objectType, id);
+                    // }
+                    // self.hotTableContextMenuItems =  self.getItemContextMenu(items);
+                },
+                beforeOnCellMouseOver: (event, coords, TD, controller) => {
+                    console.log(event, coords);
+                    self.cellAboutSelecting = coords;
+
+                     let row = self.$refs.dataTable.hotInstance.getSourceDataAtRow(self.cellAboutSelecting.row);
+                    let id = row.id;
+                    let items = self.tableContextMenu;
+                    if(!$.isArray(items)){
+                        let objectType = self.commonActionProps.resource;
+                        
+                        let filteredItems = actionHelper.filterAdmittedActions(items, objectType, id);
+                    }
+                    self.hotTableContextMenuItems =  self.getItemContextMenu(items);
                 }
             },
             tableFilter: {
@@ -329,7 +356,8 @@ export default {
              */
             data: [],
             filteredColumns: {}, // tên các cột đã có filter, dạng {tên cột : true},
-            savedTableDisplayConfig: [] // cấu hình hiển thị của table đã được lueu trong db
+            savedTableDisplayConfig: [], // cấu hình hiển thị của table đã được lueu trong db
+            hotTableContextMenuItems: []
         };
     },
     activated(){
@@ -390,7 +418,6 @@ export default {
          * nó sẽ emit sự kiện tên là: context-selection-tên của menu item
          */
         tableContextMenu: {
-            type: Array,
             default() {
                 return [];
             }
@@ -452,6 +479,21 @@ export default {
         useActionPanel: {
             type: Boolean,
             default: true
+        },
+
+        /**
+         * Chứa các thông tin chung cho các action trong context menu cần định nghĩa
+         * có dạng : {
+         *      "module": "",
+         *      "resource": "",
+         *      "scope": "",
+         * }
+         */
+        commonActionProps: {
+            type: Object,
+            default(){
+                return {}
+            }
         }
     },
     mounted() {},
@@ -468,75 +510,6 @@ export default {
             } else {
                 return "100%";
             }
-        },
-        itemContextMenu() {
-            let thisCpn = this;
-            let contextMenu = {
-                callback: function(key, selection, clickEvent) {
-                    let col = selection[0].start.col;
-                    let row = selection[0].start.row;
-                    let rowData = thisCpn.data[row];
-                    let colName = Object.keys(rowData)[col];
-                    /**
-                     * Phát sự kiện khi có một hành động đối với một row, hoặc cell.
-                     * tham số thứ nhất: row ( index của row đang được chọn)
-                     * tham số thứ hai: colName ( Tên của cột (key trong một row) )
-                     */
-                    thisCpn.$emit("context-selection-" + key, row, colName);
-                    // Datnt
-                    // Callback for context menu item
-                    let menuItem = thisCpn.tableContextMenu.filter(menu => {
-                        return menu.name == key;
-                    });
-                    thisCpn.selectedContextItem = menuItem;
-                    if (
-                        menuItem.length &&
-                        menuItem[0].hasOwnProperty("callback")
-                    ) {
-                        if(key == 'remove' || key == 'delete'){
-                            thisCpn.deleteItems = [];
-                            let deletedIndexs = {};
-                            for(let item of selection ){
-                                for(let idx = item.start.row ; idx <= item.end.row; idx++){
-                                    if(!deletedIndexs[idx]){
-                                        thisCpn.deleteItems.push(thisCpn.data[idx]);
-                                        deletedIndexs[idx] = true;
-                                    }
-                                }
-                            }
-                            thisCpn.deleteDialogShow = true;
-                        }else{
-                            thisCpn.exeCallbackOnContextMenu(rowData);
-                        }
-                    }
-                    if (key == "remove") {
-                    } else if (key == "edit" || key == "view") {
-                        thisCpn.actionPanel = true;
-                    }
-                },
-                items: {}
-            };
-
-            if (this.useDefaultContext) {
-                contextMenu.items = {
-                    remove: {
-                        name: "Xóa"
-                    },
-                    edit: {
-                        name: "Sửa"
-                    },
-                    view: {
-                        name: "Chi tiết"
-                    }
-                };
-            }
-            for (let item of this.tableContextMenu) {
-                contextMenu.items[item.name] = {
-                    name: item.text
-                };
-            }
-
-            return contextMenu;
         },
         tableHeight() {
             let ref = this.$refs;
@@ -561,14 +534,12 @@ export default {
                 prefix[prefix.length - 1] == "." || prefix == ""
                     ? prefix
                     : prefix + ".";
-
             let colNames = [];
             let colTitles = this.tableColumns.reduce((headers, item) => {
                 colNames.push(item.data);
                 headers.push(item.columnTitle);
                 return headers;
             }, []);
-
             return function(col) {
                 let colName = colNames[col];
                 let markFilter = "";
@@ -599,6 +570,73 @@ export default {
         }
     },
     methods: {
+        getItemContextMenu(rawItems) {
+            let thisCpn = this;
+            let contextMenu = {
+                callback: function(key, selection, clickEvent) {
+                    let col = selection[0].start.col;
+                    let row = selection[0].start.row;
+                    let rowData = thisCpn.data[row];
+                    let colName = Object.keys(rowData)[col];
+                    /**
+                     * Phát sự kiện khi có một hành động đối với một row, hoặc cell.
+                     * tham số thứ nhất: row ( index của row đang được chọn)
+                     * tham số thứ hai: colName ( Tên của cột (key trong một row) )
+                     */
+                    thisCpn.$emit("context-selection-" + key, row, colName);
+                    // Datnt
+                    // Callback for context menu item
+                    let menuItem = rawItems.filter(menu => {
+                        return menu.name == key;
+                    });
+                    thisCpn.selectedContextItem = menuItem;
+                    if (
+                        menuItem.length &&
+                        menuItem[0].hasOwnProperty("callback")
+                    ) {
+                        if(key == 'remove' || key == 'delete'){
+                            thisCpn.deleteItems = [];
+                            let deletedIndexs = {};
+                            for(let item of selection ){
+                                for(let idx = item.start.row ; idx <= item.end.row; idx++){
+                                    if(!deletedIndexs[idx]){
+                                        thisCpn.deleteItems.push(thisCpn.data[idx]);
+                                        deletedIndexs[idx] = true;
+                                    }
+                                }
+                            }
+                            thisCpn.deleteDialogShow = true;
+                        }else{
+                            thisCpn.exeCallbackOnContextMenu(rowData);
+                        }
+                    }
+                    
+                    if (key == "edit" || key == "view") {
+                        thisCpn.actionPanel = true;
+                    }
+                },
+                items: {}
+            };
+            if (this.useDefaultContext) {
+                contextMenu.items = {
+                    remove: {
+                        name: "Xóa"
+                    },
+                    edit: {
+                        name: "Sửa"
+                    },
+                    view: {
+                        name: "Chi tiết"
+                    }
+                };
+            }
+            for (let item of rawItems) {
+                contextMenu.items[item.name] = {
+                    name: item.text
+                };
+            }
+            return contextMenu;
+        },
         searchAutocompleteItems(vl){
             this.tableFilter.currentColumn.colFilter.searchKey = vl;
             this.getItemForValueFilter();
@@ -749,7 +787,6 @@ export default {
             //     });
             // });
         },
-
         /**
          * Kiểm tra xem một cột trong table có đang áp dụng filter hay ko
          */
@@ -757,7 +794,6 @@ export default {
             if (!filter) {
                 filter = this.tableFilter.allColumn[colName];
             }
-
             if (!filter) {
                 return false;
             } else {
@@ -781,13 +817,11 @@ export default {
             let colName = this.tableFilter.currentColumn.name;
             this.$set(this.tableFilter.allColumn, colName, filter);
             let hasFilter = this.checkColumnHasFilter(colName, filter);
-
             this.filteredColumns[colName] = hasFilter;
             let icon = $(this.$el).find(
                 ".symper-table-dropdown-button[col-name=" + colName + "]"
             );
             this.getData(false,false,true);
-
             if(hasFilter && source != "clear-filter"){
                 icon.addClass("applied-filter");
             }else{
@@ -883,7 +917,6 @@ export default {
         getFilterConfigs(getDataMode = '') {
             let configs = [];
             for (let colName in this.tableFilter.allColumn) {
-
                 let filter = this.tableFilter.allColumn[colName];
                 let condition = filter.conditionFilter;
                 let option = {
@@ -1007,6 +1040,7 @@ export default {
                         }
                         colMap[item.name].renderer = this.dateRenderer;
                     }
+                    
                     if(item.renderer){
                         colMap[item.name].renderer = item.renderer;
                     }
@@ -1053,7 +1087,6 @@ export default {
                 this.tableColumns = fixedCols.concat(noneFixedCols);
             }
             this.fixedColumnsCount = fixedCols.length;
-
             setTimeout(
                 thisCpn => {
                     thisCpn.savedTableDisplayConfig = thisCpn.tableColumns;
@@ -1070,7 +1103,6 @@ export default {
             filterDom.css("left", x + "px").css("top", y + 10 + "px");
             this.$refs.dataTable.hotInstance.deselectCell();
             this.$refs.tableFilter.show();
-
             let colFilter = this.tableFilter.allColumn[colName];
             if (!colFilter) {
                 colFilter = getDefaultFilterConfig();
@@ -1086,7 +1118,6 @@ export default {
                 name: colName,
                 colFilter: colFilter
             });
-
             this.setSelectItemForFilter();
             $("#symper-platform-app").append(filterDom[0]);
             this.getItemForValueFilter();
@@ -1112,11 +1143,9 @@ export default {
                     self.tableFilter.currentColumn.colFilter.selectItems = self.createSelectableItems(items);
                 }
                 console.log(self.tableFilter.currentColumn.selectItems, 'datadatadatadatadata');
-
             }
             this.prepareFilterAndCallApi(columns , false, true, success, options);
         },
-
         /**
          * Lấy danh sách các giá trị cần đưa vào danh sách lựa chọn autocomplete từ server nếu chưa có danh sách này
          */
@@ -1221,7 +1250,6 @@ export default {
             this.$emit("change-page", this.page);
         }
     },
-
     components: {
         HotTable,
         "form-tpl": FormTpl,
@@ -1239,70 +1267,57 @@ export default {
 .ht_clone_top.handsontable {
     z-index: 6;
 }
-
 .handsontable .wtBorder.current {
     z-index: 5;
 }
-
 .symper-custom-table.clip-text .ht_master.handsontable .htCore td,
 .symper-custom-table.clip-text .ht_clone_left.handsontable .htCore td {
     text-overflow: ellipsis !important;
     white-space: nowrap !important;
 }
-
 .symper-custom-table.loosen-row .ht_master.handsontable .htCore td,
 .symper-custom-table.loosen-row .ht_clone_left.handsontable .htCore td {
     height: 40px !important;
     line-height: 40px !important;
 }
-
 .symper-custom-table.medium-row .ht_master.handsontable .htCore td,
 .symper-custom-table.medium-row .ht_clone_left.handsontable .htCore td {
     height: 30px !important;
     line-height: 30px !important;
 }
-
 .symper-custom-table.compact-row .ht_master.handsontable .htCore td,
 .symper-custom-table.compact-row .ht_clone_left.handsontable .htCore td {
     height: 20px !important;
     line-height: 20px !important;
     font-size: 12px !important;
 }
-
 .ghost {
     opacity: 0.5;
     background: #c8ebfb;
 }
-
 .flip-list-move {
     transition: transform 0.5s;
 }
 .no-move {
     transition: transform 0s;
 }
-
 .column-drag-pos {
     cursor: move;
     border-bottom: 1px solid #d0d0d0;
     background-color: white;
     padding-left: 8px;
 }
-
-
 .list-group {
     border: 1px solid #d0d0d0;
     border-radius: 3px;
 }
-
 i.applied-filter {
     color: #f58634;
     background-color: #ffdfc8;
 }
-
 .symper-list-item .ht_clone_left.handsontable table.htCore {
     border-right: 4px solid #f0f0f0;
 }
-
 .handsontable td,
 .handsontable th {
     color: #212529 !important;

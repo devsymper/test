@@ -9,6 +9,7 @@
             :getDataUrl="getListUrl"
             :useActionPanel="false"
             :headerPrefixKeypath="'common'"
+            :commonActionProps="commonActionProps"
             @on-add-item-clicked="goToCreatePage()"
         ></list-items>
     </div>
@@ -26,12 +27,17 @@ export default {
     data() {
         let self = this;
         return {
+            commonActionProps: {
+                "module": "workflow",
+                "resource": "workflow_definition",
+                "scope": "workflow",
+            },
             containerHeight: 300,
             deployProcessFromXML: deployProcessFromXML,
             listItemOptions: {},
             getListUrl: appConfigs.apiDomain.bpmne.models,
-            tableContextMenu: [
-                {
+            tableContextMenu: {
+               update: {
                     name: "edit",
                     text: this.$t("common.edit"),
                     callback: (row, callback) => {
@@ -41,7 +47,7 @@ export default {
                         );
                     }
                 },
-                {
+                clone: {
                     name: "clone",
                     text: this.$t("common.clone"),
                     callback: (row, callback) => {
@@ -51,7 +57,7 @@ export default {
                         );
                     }
                 },
-                {
+                drop: {
                     name: "remove",
                     text: this.$t("common.delete"),
                     callback: async (rows, refreshList) => {
@@ -72,21 +78,21 @@ export default {
                         refreshList();
                     }
                 },
-                {
+                deploy: {
                     name: "deploy",
                     text: this.$t("common.deploy"),
                     callback: (row, callback) => {
                         deployProcess(self, row);
                     }
                 },
-                {
+                deploy_history: {
                     name: "deployHistory",
                     text: this.$t("process.list.deploy_history"),
                     callback: (row, callback) => {
                         self.$goToPage(`/workflow/${row.name}/deploy-history`,self.$t('process.deployment.list'));
                     }
                 },
-                {
+                start_instance: {
                     name: "start",
                     text: this.$t("process.list.start"),
                     callback: async function (row, callback){
@@ -98,7 +104,7 @@ export default {
                         }
                     }
                 },
-                {
+                list_instance: {
                     name: "instances",
                     text: this.$t("process.list.instances"),
                     callback: async function (row, callback) {
@@ -106,7 +112,7 @@ export default {
                         self.$goToPage('/workflow/process-key/'+row.processKey+'/instances', self.$t('process.instance.listModelInstance')+row.name)
                     }
                 },
-                {
+                detail:{
                     name: "detail",
                     text: this.$t("common.detail"),
                     callback: (row, callback) => {
@@ -117,7 +123,7 @@ export default {
                         );
                     }
                 },
-                {
+                list_task: {
                     name: "listTask",
                     text: this.$t("tasks.header.list"),
                     callback: async (row, callback) => {
@@ -127,7 +133,7 @@ export default {
                         }
                     }
                 },
-            ]
+            }
         };
     },
     mounted() {
@@ -145,7 +151,6 @@ export default {
         getDataAnddeploy(processId){
           
         },
-
     },
     components: {
         ListItems: ListItems

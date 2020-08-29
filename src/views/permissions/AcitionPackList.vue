@@ -1,4 +1,4 @@
-<template>
+    <template>
     <div class="w-100 h-100">
         <list-items
             ref="listActionPack"
@@ -32,8 +32,7 @@ import { appConfigs } from "./../../configs.js";
 import { systemRoleApi } from "@/api/systemRole.js";
 import ListItems from "@/components/common/ListItems.vue";
 
-import ActionPackForm from "@/components/permission/ActionPackForm.vue";
-import { permissionPackageApi } from "../../api/PermissionPackage";
+import ActionPackForm from "@/components/permission/actionPack/ActionPackForm.vue";
 import { permissionApi } from "../../api/permissionPack";
 export default {
     data() {
@@ -71,11 +70,13 @@ export default {
             actionOnItem: "create",
             getListUrl: appConfigs.apiDomain.actionPacks,
             currentItemData: {
+                id: 0,
                 name: "",
                 description: "",
                 objectType: "document_definition",
                 mapActionAndObjects: {}, // dạng: {workflow: {objectId: 'acx', create: true}, document: {objectId: 'acx', create: true}}}
-                mapActionForAllObjects: {} // dạng: {workflow: {create: true, ...}, document: {create: true, ...}}}
+                mapActionForAllObjects: {}, // dạng: {workflow: {create: true, ...}, document: {create: true, ...}}},
+                operationMapByObjectType: {}
             },
             tableContextMenu: [
                 {
@@ -85,6 +86,7 @@ export default {
                         self.getActionPackOperations(row.id);
                         self.actionOnItem = "update";
                         self.applyDataToForm(row);
+                        self.$refs.actionPackForm.objectTypeToDocumentDefinition();
                     }
                 },
                 {
@@ -124,9 +126,10 @@ export default {
                         self.getDetailActionPack(row.id);
                         self.actionOnItem = "detail";
                         self.applyDataToForm(row);
+                        self.$refs.actionPackForm.objectTypeToDocumentDefinition();
                     }
                 }
-            ]
+            ],
         };
     },
     mounted() {
@@ -149,6 +152,20 @@ export default {
         }
     },
     methods: {
+        makeOperationMapByObjectType(idActionPack, operations){
+            let allActionByObjectType = this.$store.state.actionPack.allActionByObjectType;
+            
+            let map = Object.keys(allActionByObjectType).reduce( (obj, objectType) => {
+                obj[objectType] = [];
+                return obj;
+            }, {});
+
+            for(let op of operations){
+                op.objectType = op.objectType ? op.objectType : 'document_definition' 
+                map[op.objectType].push(op);
+            }
+            this.currentItemData.operationMapByObjectType[idActionPack] = map;
+        },
         async getActionPackOperations(id) {
             let res = await permissionApi.getActionPackOperations(id);
             let operations = [];
@@ -162,7 +179,97 @@ export default {
                 );
                 return;
             }
+            this.makeOperationMapByObjectType(id, operations);
+            let tableDatas = this.getTableDataFromOperations(operations);
+            let mapActionAndObjects = tableDatas.mapActionAndObjects;
+            let mapActionForAllObjects = tableDatas.mapActionForAllObjects;
 
+            // let mapActionAndObjectTypes = this.mapObjectTypesAndAction;
+            // let allResource = this.$store.state.actionPack.allResource;
+
+            // /**
+            //  * Map giữa object type và action , có dạng
+            //  * {
+            //  *      document_definition: {
+            //  *          id_doc: [
+            //  *              'display text', true, true, false ....
+            //  *          ]
+            //  *      }
+            //  * }
+            //  */
+            // let mapActionAndObjects = {};
+            // let mapActionForAllObjects = {};
+
+
+            // /**
+            //  * Schema cho row mới của từng object type, có dạng:
+            //  * {
+            //  *      document_definition: ['', false, false, ...]
+            //  * }
+            //  */
+            // let rowSchemaByObjectType = {};
+            // for (let key in mapActionAndObjectTypes) {
+            //     mapActionAndObjects[key] = {};
+            //     rowSchemaByObjectType[key] = {
+            //         object: '',
+            //     };
+            //     mapActionForAllObjects[key] = [{}];
+            //     for (let actionName in mapActionAndObjectTypes[key]) {
+            //         rowSchemaByObjectType[key][actionName] = false;
+            //         mapActionForAllObjects[key][0][actionName] = false;
+            //     }
+            // }
+            
+            // // khởi tạo các operation ứng với các objectType
+            // let sections, objectType, objectId, actionName;
+            // for (let op of operations) {
+            //     sections = op.objectIdentifier.split(":");
+            //     objectType = sections[0];
+            //     objectId = sections[1] ? sections[1] : 0;
+
+            //     if(!objectId){
+            //         // Nếu các action áp dụng cho toàn bộ object của object type
+            //         mapActionForAllObjects[objectType][0][op.action] = true;
+            //     }else{
+            //         // Nếu áp dụng cho các object cụ thể
+            //         let actionByObject = mapActionAndObjects[objectType];
+            //         if (actionByObject) {
+            //             if (!actionByObject[objectId]) {
+            //                 actionByObject[objectId] = util.cloneDeep(
+            //                     rowSchemaByObjectType[objectType]
+            //                 );
+
+            //                 if(allResource[objectType][objectId]){
+            //                     actionByObject[objectId].object =
+            //                         allResource[objectType][objectId].fullText;
+            //                 }else{
+            //                     actionByObject[objectId].object = '';
+            //                 }
+            //             }
+            //             actionByObject[objectId][op.action] = true;
+            //         }
+            //     }
+            // }
+            // // chế biến về cho đúng định dạng hiển thị của bảng
+            // for(let objectType in mapActionAndObjects){
+            //     mapActionAndObjects[objectType] = Object.values(mapActionAndObjects[objectType]);
+
+            //     let lastEmptyRow = util.cloneDeep(rowSchemaByObjectType[objectType]);
+            //     for(let actionName in lastEmptyRow){
+            //         if(actionName != 'object'){
+            //             lastEmptyRow[actionName] = true;
+            //         }
+            //     }
+            //     mapActionAndObjects[objectType].push(lastEmptyRow);
+            // }
+            
+            this.$set(this.currentItemData, 'mapActionAndObjects', mapActionAndObjects);
+            this.$set(this.currentItemData, 'mapActionForAllObjects', mapActionForAllObjects);
+            setTimeout((self) => {
+                self.$refs.actionPackForm.handleChangeObjectType();
+            }, 200, this);
+        },
+        getTableDataFromOperations(operations){
             let mapActionAndObjectTypes = this.mapObjectTypesAndAction;
             let allResource = this.$store.state.actionPack.allResource;
 
@@ -181,7 +288,7 @@ export default {
 
 
             /**
-             * Schema cho row mới của từ object type, có dạng:
+             * Schema cho row mới của từng object type, có dạng:
              * {
              *      document_definition: ['', false, false, ...]
              * }
@@ -203,7 +310,7 @@ export default {
             let sections, objectType, objectId, actionName;
             for (let op of operations) {
                 sections = op.objectIdentifier.split(":");
-                objectType = sections[0];
+                objectType = op.objectType;
                 objectId = sections[1] ? sections[1] : 0;
 
                 if(!objectId){
@@ -225,7 +332,9 @@ export default {
                                 actionByObject[objectId].object = '';
                             }
                         }
-                        actionByObject[objectId][op.action] = true;
+                        if(op.action){
+                            actionByObject[objectId][op.action] = true;
+                        }
                     }
                 }
             }
@@ -241,14 +350,12 @@ export default {
                     }
                 }
                 mapActionAndObjects[objectType].push(lastEmptyRow);
-
             }
             
-            this.$set(this.currentItemData, 'mapActionAndObjects', mapActionAndObjects);
-            this.$set(this.currentItemData, 'mapActionForAllObjects', mapActionForAllObjects);
-            setTimeout((self) => {
-                self.$refs.actionPackForm.handleChangeObjectType();
-            }, 200, this);
+            return {
+                mapActionAndObjects,
+                mapActionForAllObjects
+            }
         },
         handleSavedItem() {
             this.$refs.listActionPack.refreshList();
@@ -259,10 +366,12 @@ export default {
         handleAddItem() {
             this.actionOnItem = "create";
             this.currentItemData.name = "";
+            this.currentItemData.id = 0;
             this.currentItemData.description = "";
             this.currentItemData.objectType = "document_definition";
             this.currentItemData.mapActionAndObjects = [];
             this.currentItemData.mapActionForAllObjects = [];
+            this.$refs.actionPackForm.objectTypeToDocumentDefinition();
         },
         calcContainerHeight() {
             this.containerHeight = util.getComponentSize(this).h;

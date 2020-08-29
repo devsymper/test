@@ -1,7 +1,11 @@
-import { GetControlProps } from "./../../components/document/controlPropsFactory.js";
+import {
+    GetControlProps
+} from "./../../components/document/controlPropsFactory.js";
 import store from './../../store'
 import sDocument from './../../store/document'
-import { util } from "./../../plugins/util.js";
+import {
+    util
+} from "./../../plugins/util.js";
 
 
 /**
@@ -46,7 +50,14 @@ export const setDataForPropsControl = function(fields, instance, from) {
                 let allData = util.cloneDeep(sDocument.state.detail[instance].allData);
                 value = allData[controlName];
             }
-            addToAllControlInDoc(controlId, { id: id, properties: properties, formulas: formulas, type: type, value: value, prepareData: prepareData }, instance, from);
+            addToAllControlInDoc(controlId, {
+                id: id,
+                properties: properties,
+                formulas: formulas,
+                type: type,
+                value: value,
+                prepareData: prepareData
+            }, instance, from);
         } else {
             let listField = fields[controlId].listFields
             let listChildField = {};
@@ -97,11 +108,25 @@ export const setDataForPropsControl = function(fields, instance, from) {
                         }
                     }
                 }
-                listChildField[childFieldId] = { id: childId, properties: childProperties, formulas: childFormulas, type: childType, prepareData: childPrepareData }
+                listChildField[childFieldId] = {
+                    id: childId,
+                    properties: childProperties,
+                    formulas: childFormulas,
+                    type: childType,
+                    prepareData: childPrepareData
+                }
                 i++;
             }
             colValue['childObjectId'] = childObjectId;
-            addToAllControlInDoc(controlId, { id: id, properties: properties, formulas: formulas, type: fields[controlId].type, listFields: listChildField, value: colValue, prepareData: prepareData },
+            addToAllControlInDoc(controlId, {
+                    id: id,
+                    properties: properties,
+                    formulas: formulas,
+                    type: fields[controlId].type,
+                    listFields: listChildField,
+                    value: colValue,
+                    prepareData: prepareData
+                },
                 instance, from);
         }
     }

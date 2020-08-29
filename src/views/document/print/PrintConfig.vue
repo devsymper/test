@@ -14,14 +14,13 @@
             <div class="sym-document-body">
                 <div class="sym-document-action">
                     <editor-action
-                    @document-action-save-document="openPanelSaveDocument"
+                    @document-action-save-document="saveFormPrint"
                     @document-action-clone-control="cloneControl"
                     @document-action-list-control-option="setShowAllControlOption"
                     @document-action-delete-control="deleteControl"
                     @document-action-save-to-local-storage="saveContentToLocalStorage"
                     @document-action-get-from-local-storage="getFromLocalStorege"
                     @document-action-delete-cache="deleteLocalStorage"
-                    @document-action-check-control="checkBeforeControlNameChange"
                     />
                 </div>
                 <textarea ref="editorLibWrapper" :id="'document-editor-'+keyInstance">
@@ -35,11 +34,8 @@
         </div>
         <s-table-setting  ref="tableSetting" @add-columns-table="addColumnTable"/>
         <auto-complete-control ref="autocompleteControl" @add-control="insertControl"/>
-        <save-doc-panel :instance="keyInstance" ref="saveDocPanel" 
-        @check-name-document="checkBeforeDocumentNameChange"
-        @save-doc-action="validateControl"/>
+        <save-form-panel :instance="keyInstance" ref="saveFormPanel"/>
         <err-message :listErr="listMessageErr" ref="errMessage"/>
-        <control-name-related :instance="keyInstance" @after-close-panel="afterClosePanel"  ref="controlNameRelated"/>
         <all-control-option :instance="keyInstance" ref="allControlOption"/>
 
         <v-dialog v-model="dialog" persistent max-width="290">
@@ -62,7 +58,7 @@ import SideBarRight from './../sideright/SideBarRight.vue';
 import TableSetting from './../items/TableSetting.vue';
 import AutoCompleteControl from './../items/AutoCompleteControl.vue';
 import controlCss from  "./../../../assets/css/document/control/control.css";
-import SaveDocPanel from "./../../../views/document/items/SaveDocPanel.vue";
+import SaveFormPanel from "./SaveFormPanel";
 import ErrMessagePanel from "./../../../views/document/items/ErrMessagePanel.vue";
 import ControlNameRelated from "./../../../views/document/items/ControlNameRelated.vue";
 import AllControlInDoc from "./../../../views/document/items/AllControlInDoc.vue";
@@ -115,7 +111,7 @@ export default {
         'editor-action' : EditorAction,
         's-table-setting' : TableSetting,
         'auto-complete-control' : AutoCompleteControl,
-        'save-doc-panel': SaveDocPanel,
+        'save-form-panel': SaveFormPanel,
         'err-message': ErrMessagePanel,
         "vue-resizable":VueResizable,
         "all-control-option":AllControlInDoc,
@@ -201,13 +197,7 @@ export default {
             let elControl = $("#document-editor-"+thisCpn.keyInstance+"_ifr").contents().find('body #'+locale.id);
             thisCpn.setSelectedControlProp(locale.event,elControl,$('#document-editor-'+this.keyInstance+'_ifr').get(0).contentWindow);
         });
-        /**
-         * Nhận sự kiện phát ra từ formTpl lúc on change để check trùng tên control
-         */
-        this.$evtBus.$on("form-tpl-input-value-changed", locale =>{
-            $('#document-editor'+thisCpn.keyInstance+'_ifr').contents().find('.s-control-error').removeClass('s-control-error');
-            thisCpn.checkNameAfterChange();
-        })
+       
             
     },
     data(){
@@ -216,8 +206,6 @@ export default {
             isAutocompleteControl:false,
             listMessageErr:[],
             documentId:0,
-            currentFormulasInput:'',
-            currentSelectedInputProps:'',
             documentProps:{},
             delta : 500,
             lastKeypressTime : 0,
@@ -277,43 +265,8 @@ export default {
         px2cm(px) {
             return (Math.round((px / 37.7952) * 100) / 100).toFixed(1);
         },
-        /**
-         * Hàm xử lí kiểm tra xem tên của control hiện tại đang ở trong những công thức của các control nào doc nao
-         */
-        checkBeforeControlNameChange(){
-            let currentControl = this.editorStore.currentSelectedControl;
-            if(currentControl.properties.name.hasOwnProperty('name')){
-                this.$refs.controlNameRelated.setSubHeadingTitle(this.$t('document.editor.dialog.nameRelated.subTitleControl'))
-                this.$refs.controlNameRelated.setHeadingTitle(this.$t('document.editor.dialog.nameRelated.headingControl'));
-                this.$refs.controlNameRelated.getDataRelated("control",currentControl.properties.name.name.oldName,currentControl.properties.name.name.value);
-                this.$refs.controlNameRelated.showDialog();
-            }
-            else{
-                 this.$snotify({
-                                type: "info",
-                                title: "Vui lòng chọn control trước khi sử dụng tính năng này"
-                            }); 
-            }
-            
-        },
-        /**
-         * Kiểm tra xem tên của doc đang được sử dụng ở trong những công thức nào
-         */
-        checkBeforeDocumentNameChange(){
-            this.$refs.saveDocPanel.hideDialog();
-            setTimeout((self) => {
-                self.$refs.controlNameRelated.setSubHeadingTitle(self.$t('document.editor.dialog.nameRelated.subTitleDocument'))
-                self.$refs.controlNameRelated.setHeadingTitle(self.$t('document.editor.dialog.nameRelated.headingDocument'));
-                self.$refs.controlNameRelated.getDataRelated("document");
-                self.$refs.controlNameRelated.showDialog();
-            }, 100,this);
-        },
-        afterClosePanel(from){
-            if(from == "document")
-            setTimeout((self) => {
-                this.$refs.saveDocPanel.showDialog();
-            }, 100,this);
-        },
+       
+       
         // lấy data từ local storage
         getFromLocalStorege(){
             let allControl = localStorage.getItem(ALL_CONTROL);
@@ -441,22 +394,34 @@ export default {
             this.$refs.allControlOption.showDialog();
         },
         // mở modal lưu , edit doc
-        openPanelSaveDocument(){
-            if($('#document-editor-'+this.keyInstance+'_ifr').contents().find('.s-control').length > 0){
-                let allControl = this.editorStore.allControl;
-                this.checkEmptyControl(allControl,'0');
-                if($('#document-editor-'+this.keyInstance+'_ifr').contents().find('.s-control-error').length == 0){
-                    if(this.documentId == undefined || this.documentId == 0)
-                    this.setDocumentProperties({})
-                    this.$refs.saveDocPanel.showDialog()
+        saveFormPrint(){
+            let dataPost = {documentId:this.documentId,type:'print',content:this.editorCore.getContent()}
+            let thisCpn = this;
+            documentApi.saveForm(dataPost).then(res => {
+                if (res.status == 200) {
+                    thisCpn.editorCore.remove();
+                    thisCpn.$router.push('/documents');
+                    thisCpn.$snotify({
+                        type: "success",
+                        title: "Save form success!"
+                    });
                 }
                 else{
-                    this.$snotify({
-                                    type: "error",
-                                    title: "Tên một số control chưa hợp lệ",
-                                });
+                    thisCpn.$snotify({
+                        type: "error",
+                        title: res.message,
+                        text:res.lastErrorMessage
+                    });
                 }
-            }
+            })
+            .catch(err => {
+                thisCpn.$snotify({
+                        type: "error",
+                        title: "can not save document",
+                    });
+            })
+            .always(() => {
+            });
         },
         checkEmptyControl(allControl,tableId){
             for(let controlId in allControl){
@@ -561,192 +526,7 @@ export default {
             return {minimizeControl:allControl,userControls:allUserControl}
             
         },
-      
-        // hoangnd: hàm gửi request lưu doc
-        async saveDocument(){
-            let minimizeControl = this.minimizeControlEL(this.editorStore.allControl);
-            let allControl = minimizeControl.minimizeControl
-            let userControls = minimizeControl.userControls
-            let documentProperties = util.cloneDeep(this.sDocumentProp);
-            documentProperties = Object.assign({controlInfo:userControls},documentProperties)
-            documentProperties = JSON.stringify(documentProperties);
-            let htmlContent = this.editorCore.getContent();
-            let dataPost = this.getDataToSaveMultiFormulas(allControl);
-            let thisCpn = this;
-            try {
-                if(Object.keys(dataPost.update).length > 0)
-                await formulasApi.updateMultiFormulas({formulas:JSON.stringify(dataPost.update)})
-                if(Object.keys(dataPost.insert).length > 0){
-                    let res = await formulasApi.saveMultiFormulas({formulas:JSON.stringify(dataPost.insert)})
-                    if(res.status == 200){ 
-                        let data = res.data;
-                        for(let controlId in data){
-                            for(let i = 0; i < data[controlId].length; i++){ 
-                                let key = Object.keys(data[controlId][i])[0];
-                                let controlEl = $("#document-editor-"+thisCpn.keyInstance+"_ifr").contents().find('#'+controlId);
-                                let tableId = 0;
-                                if(!controlEl.is('.s-control-table') && controlEl.closest(".s-control-table").length > 0){
-                                    tableId = controlEl.closest(".s-control-table").attr('id');
-                                }
-                                thisCpn.$store.commit(
-                                    "document/updateFormulasId",{id:controlId,name:key,value:data[controlId][i][key],tableId:tableId,instance:this.keyInstance}
-                                );   
-                            }
-                        } 
-                        if(this.$route.name == "editDocument"){   //edit doc
-                            this.editDocument({documentProperty:documentProperties,fields:JSON.stringify(allControl),content:htmlContent,id:this.documentId})
-                        } 
-                        else{
-                            this.createDocument({documentProperty:documentProperties,fields:JSON.stringify(allControl),content:htmlContent});
-                        }
-                    }
-                    else{
-                        this.$snotify({
-                                type: "error",
-                                title: "error from formulas serice, can't not save into formulas service!!!",
-                                text: res.message
-                            });
-                    }
-                }
-                else{
-                    if(this.$route.name == "editDocument"){   //edit doc
-                        this.editDocument({documentProperty:documentProperties,fields:JSON.stringify(allControl),content:htmlContent,id:this.documentId})
-                    }
-                    else{
-                        this.createDocument({documentProperty:documentProperties,fields:JSON.stringify(allControl),content:htmlContent});
-                    }
-                }
-                
-            } catch (error) {
-                this.$snotify({
-                            type: "error",
-                            title: "error from formulas serice, can't not save into formulas service!!!",
-                            text: error
-                        });
-            }     
-        },
-        /**
-         * Hàm gọi Api tạo mới ducument
-         */
-        createDocument(dataPost){
-            let thisCpn = this;
-            documentApi.saveDocument(dataPost).then(res => {
-                if (res.status == 200) {
-                    thisCpn.editorCore.remove();
-                    thisCpn.$router.push('/documents');
-                    thisCpn.$snotify({
-                        type: "success",
-                        title: "Save document success!"
-                    });
-                }
-                else{
-                    thisCpn.$snotify({
-                        type: "error",
-                        title: res.message,
-                        text:res.lastErrorMessage
-                    });
-                }
-            })
-            .catch(err => {
-                thisCpn.$snotify({
-                        type: "error",
-                        title: "can not save document",
-                    });
-            })
-            .always(() => {
-            });
-        },
-        /**
-         * Hàm gọi api edit document
-         */
-        editDocument(dataPost){
-            let thisCpn = this;
-            documentApi.editDocument(dataPost).then(res => {
-                if (res.status == 200) {
-                    thisCpn.editorCore.remove();
-                    thisCpn.$router.push('/documents');
-                    thisCpn.$snotify({
-                        type: "success",
-                        title: "Save document success!"
-                    });
-                }
-                else{
-                    thisCpn.$snotify({
-                        type: "error",
-                        title: res.message,
-                        text:res.lastErrorMessage,
-                    });
-                }
-                
-            })
-            .catch(err => {
-                thisCpn.$snotify({
-                    type: "error",
-                    title: "error from edit document api",
-                    text:"can not save document"
-
-                });
-            })
-            .always(() => {
-            });
-        },
-        //hoangnd: hàm xác thưc các control trước khi lưu
-        // xac thực tên control và các formulas liên quan
-        checkNameAfterChange(){
-            let allControl = util.cloneDeep(this.editorStore.allControl);
-            let listControlName = [];
-            for(let controlId in allControl){
-                let control = allControl[controlId];
-                this.checkDupliucateNameControl(listControlName,control,controlId)
-            }
-        },
-        validateControl(){
-            let thisCpn = this;
-            let allControl = util.cloneDeep(this.editorStore.allControl);
-            let listControlName = [];
-            this.listMessageErr = [];
-            //check trung ten control
-            $("#document-editor-"+thisCpn.keyInstance+"_ifr").contents().find('.on-selected').removeClass('on-selected');
-            if($('#document-editor-'+thisCpn.keyInstance+'_ifr').contents().find('.s-control-error').length == 0){
-                this.saveDocument();
-            }
-            else{
-                this.$snotify({
-                                type: "error",
-                                title: "Thông tin control chưa hợp lệ",
-                                text : "Kiểm tra lại tên các control"
-                            }); 
-            }
-        },
-        // hàm kiểm tra xác thực tên control 
-        checkValidNameControl(controlId,control){
-            if(control.type != "submit" && control.type != "draft" && control.type != "reset" && control.type != "approvalHistory"){
-                if(control.properties.name.value == ''){
-                    let controlEl = $('#document-editor-'+this.keyInstance+'_ifr').contents().find('#'+controlId);
-                    controlEl.addClass('s-control-error');
-                    let message = 'Không được bỏ trống tên control'
-                    let tableId = checkInTable(controlEl)
-                    this.$store.commit(
-                        "document/updateProp",{id:controlId,name:'name',value:value,tableId:tableId,type:"errorMessage",instance:this.keyInstance}
-                    );   
-                }
-                else{
-                    this.checkDupliucateNameControl(control,controlId);
-                }
-                
-                
-            }
-            
-        },
-      //updateCurrentControlProps
-        // hàm kiểm tra xem co control nào trùng tên hay ko
-        checkDupliucateNameControl(control,controlId){
-            let controlEl = $('#document-editor-'+this.keyInstance+'_ifr').contents().find('#'+controlId);
-            controlEl.addClass('s-control-error');
-          
-           
-            
-        },
+    
         // hàm kiểm tra xem trong công thức có trỏ đến control ko tồn tại hay ko
         validateFormulasInControl(control,listControlName){
             // check control Name trong cong thức
@@ -1096,7 +876,7 @@ export default {
         },
 
         setDocumentProperties(documentProp){
-            this.$refs.saveDocPanel.setPropsOfDoc(documentProp);
+            this.$refs.saveFormPanel.setPropsOfDoc(documentProp);
         },
         //hoangnd: hàm set các giá trị của thuộc tính và formulas vào từng contrl trong doc lúc load dữ liệu và đưa vào state
         setDataForPropsControl(fields){
