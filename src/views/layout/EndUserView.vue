@@ -213,5 +213,4 @@ export default {
     font-size: 13px;
     font-weight: bold;
 }
-
 </style>
