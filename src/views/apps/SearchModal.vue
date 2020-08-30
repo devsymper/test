@@ -65,10 +65,10 @@ export default {
 				   item:[
 				   ]
 			   },
-			   dasboard:{
+			   dashboard:{
 				   icon : 'mdi-view-dashboard',
 				   title: this.$t('apps.listType.reports'),
-				   name: 'dasboard',
+				   name: 'dashboard',
 				   item:[
 				   ]
 			   },
@@ -129,7 +129,7 @@ export default {
 			this.listItems.document_definition.item = []
 			this.listItems.orgchart.item = []
 			this.listItems.workflow_definition.item = []
-			this.listItems.dasboard.item = []
+			this.listItems.dashboard.item = []
 			orgchartApi.getOrgchartList({search:value,pageSize:50}).then(res => {
 				this.checkChildrenItem(res.data.listObject,self.sAppManagement.orgchart.item)
 				this.listItems.orgchart.item = res.data.listObject;
@@ -143,8 +143,8 @@ export default {
 				this.listItems.workflow_definition.item = res.data.listObject;
 			});
 			dashboardApi.getDashboards({search:value,pageSize:50}).then(res => {
-				this.checkChildrenItem(res.data.listObject,self.sAppManagement.dasboard.item)
-				this.listItems.dasboard.item = res.data.listObject;
+				this.checkChildrenItem(res.data.listObject,self.sAppManagement.dashboard.item)
+				this.listItems.dashboard.item = res.data.listObject;
 			});
 		},
 	},

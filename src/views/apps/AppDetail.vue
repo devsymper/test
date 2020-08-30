@@ -52,7 +52,8 @@ import {appManagementApi} from './../../api/AppManagement.js'
 export default {
  data: function() {
         return {
-			listItemHeight: '400px',
+			
+			listItemHeight: 'calc(100vh - 380px)',
 			currentSelected:null,
 			typeSelected:null,
 			objFilter:{
@@ -69,10 +70,10 @@ export default {
 					name: 'orgchart',
 					item: []
 				},
-				dasboard: {
+				dashboard: {
 					icon: 'mdi-view-dashboard',
 					title: 'Reports',
-					name: 'dasboard',
+					name: 'dashboard',
 					item: []
 				},
 				workflow_definition: {
@@ -118,12 +119,15 @@ export default {
 		removeItem(item,type){
 			this.$store.commit('appConfig/removeItemSelected',{item:item,type:type})
 		},
+		setHeight(){
+			this.listItemHeight = '400px'
+		},
 		filterItem(){
 			let self = this
 			let listItem = this.$store.state.appConfig.listItemSelected;
 			self.objFilter.document_definition.item = []
 			self.objFilter.orgchart.item = []
-			self.objFilter.dasboard.item = []
+			self.objFilter.dashboard.item = []
 			self.objFilter.workflow_definition.item = []
 			if(listItem.document_definition.item.length > 0){
 					listItem.document_definition.item.filter(function(item){
@@ -139,10 +143,10 @@ export default {
 					}
 				})
 			}
-			if(listItem.dasboard.item.length > 0){
-					listItem.dasboard.item.filter(function(item){
+			if(listItem.dashboard.item.length > 0){
+					listItem.dashboard.item.filter(function(item){
 					if(item.name.toLowerCase().includes(self.searchKey.toLowerCase())){
-						self.objFilter.dasboard.item.push(item)
+						self.objFilter.dashboard.item.push(item)
 					}
 				})
 			}

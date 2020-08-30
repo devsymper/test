@@ -173,7 +173,7 @@ export default {
 				],
 				orgchart:[
 				],
-				dasboard:[
+				dashboard:[
 				],
 				workflow_definition:[
 				]
@@ -200,7 +200,7 @@ export default {
 			let self = this;
 			self.childrenApp.document_definition = []
 			self.childrenApp.orgchart = []
-			self.childrenApp.dasboard = []
+			self.childrenApp.dashboard = []
 			self.childrenApp.workflow_definition = []
 			if(data.document_definition.item.length > 0){
 				data.document_definition.item.forEach(function(e){
@@ -212,9 +212,9 @@ export default {
 				self.childrenApp.orgchart.push(e.id);
 			});
 			}
-			if(data.dasboard.item.length > 0){
-				data.dasboard.item.forEach(function(e){
-				self.childrenApp.dasboard.push(e.id);
+			if(data.dashboard.item.length > 0){
+				data.dashboard.item.forEach(function(e){
+				self.childrenApp.dashboard.push(e.id);
 			});
 			}
 			if(data.workflow_definition.item.length > 0){

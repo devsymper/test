@@ -13,10 +13,10 @@ const defaultState = {
 			name: 'orgchart',
 			item: []
 		},
-		dasboard: {
+		dashboard: {
 			icon: 'mdi-view-dashboard',
 			title: 'Reports',
-			name: 'dasboard',
+			name: 'dashboard',
 			item: []
 		},
 		workflow_definition: {

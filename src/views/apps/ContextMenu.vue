@@ -26,7 +26,7 @@
 				"resource": "workflow_definition",
 				"scope": "workflow",
 			},
-			dasboard:{
+			dashboard:{
 				"module": "dashboard",
 				"resource": "dashboard",
 				"scope": "dashboard",
