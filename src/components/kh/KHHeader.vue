@@ -3,7 +3,7 @@
     <div class="kh-header-slug">
       <v-icon
         class="fs-16"
-        style="float:left; margin-left:10px; margin-right:0px;padding-top: 8px;"
+        style="float:left; margin-left:10px; margin-right:0px;margin-top: 8px;"
         v-if="skh.subCollapseSideBar==true"
         @click.stop="invertSubSidebarShow()"
       >mdi-chevron-double-right</v-icon>

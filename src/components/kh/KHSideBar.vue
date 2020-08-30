@@ -89,7 +89,8 @@
                   :key="index"
                   @click="item.menuAction(item.title)"
                   dense
-                  v-bind:class="index==statusMove?'d-none': ''"
+                  v-bind:class="index==statusMove?'d-none': '' || index==0 && id !=undefined ?'d-none': ''"
+
                   @mouseover="handleContext(index)"
                 >
                   <v-icon class="fs-15">{{item.icon}}</v-icon>

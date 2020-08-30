@@ -103,6 +103,7 @@ export default {
   padding-top:5px;
   border: 1px solid #888;
   width: 80%;
+  overflow: scroll;
 }
 /* The Close Button */
 .close {

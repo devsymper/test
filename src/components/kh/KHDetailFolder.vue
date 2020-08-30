@@ -120,13 +120,15 @@ export default {
       ],
       headers: [
         {
-          text: this.$t("user.table.firstName"),
+          text: this.$t("document.table.title"),
           align: "start",
           value: "name"
         },
+        { text: this.$t("common.created_by"), value: "displayName" },
+        { text: this.$t("common.last_updated_by"), value: "displayNameEdit" },
         { text: this.$t("user.table.createAt"), value: "created_at" },
         { text: this.$t("user.table.updateAt"), value: "updated_at" },
-        { text: this.$t("common.created_by"), value: "displayName" },
+     
         { text: this.$t("kh.table.totalDoc"), value: "total_document" }
       ]
     };
@@ -354,12 +356,23 @@ export default {
     listToTable(directory, users) {
       for (let i = 0; i < directory.length; i++) {
         var uid = directory[i]["user_id"];
+        if (directory[i]["user_editing"]!=undefined) {
+          var uidEdit = directory[i]["user_editing"];
+        }else{
+          var uidEdit = directory[i]["user_edit"];
+        }
+       
         let obj = users.find(data => data.id === uid);
+        let objEdit = users.find(data => data.id === uidEdit);
         if (obj) {
           var index = users.indexOf(obj);
           directory[i]["displayName"] = users[index].displayName;
           directory[i]["created_at"] = this.convertDate(directory[i]["created_at"]);
           directory[i]["updated_at"] = this.convertDate(directory[i]["updated_at"]);
+        }
+        if (objEdit) {
+          var index = users.indexOf(objEdit);
+          directory[i]["displayNameEdit"] = users[index].displayName;
         }
       }
       return directory;
