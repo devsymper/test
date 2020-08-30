@@ -516,10 +516,16 @@
             "backup": "Backup"
         },
         "contextmenu": {
+            "add": "Thêm",
+            "move": "Di chuyển",
+            "paste": "Dán",
+            "folder": "Thư mục",
+            "document": "Văn bản",
             "open": "Mở",
             "download": "Tải xuống",
             "rename": "Đổi tên",
-            "delete": "Xóa"
+            "delete": "Xóa",
+            "addfavorite": "Thêm vào yêu thích"
         },
         "table": {
             "totalDoc": "Số văn bản"

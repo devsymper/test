@@ -211,14 +211,14 @@ export default {
       tree: [],
       contextMenu: [
         {
-          title: "Thêm",
+          title: this.$t("kh.contextmenu.add"),
           menuAction: action => {
             this.context_create = true;
           },
           icon: "mdi-plus"
         },
         {
-          title: "Đổi tên",
+          title: this.$t("kh.contextmenu.rename"),
           menuAction: action => {
             this.rename(
               this.path,
@@ -232,7 +232,7 @@ export default {
           icon: "mdi-border-color"
         },
         {
-          title: "Di chuyển",
+          title:this.$t("kh.contextmenu.move"),
           menuAction: action => {
             this.oldHashPath = this.hash;
             this.statusMove = 2;
@@ -240,7 +240,7 @@ export default {
           icon: "mdi-folder-move"
         },
         {
-          title: "Dán",
+          title:this.$t("kh.contextmenu.paste"),
           menuAction: action => {
             let self = this;
             if (this.oldHashPath != "") {
@@ -283,8 +283,15 @@ export default {
           },
           icon: "mdi-content-paste"
         },
+        // {
+        //   title: this.$t("kh.contextmenu.addfavorite"),
+        //   menuAction: action => {
+        //     this.dialog_remove = true;
+        //   },
+        //   icon: "mdi-star"
+        // },
         {
-          title: "Xóa",
+          title: this.$t("kh.contextmenu.delete"),
           menuAction: action => {
             this.dialog_remove = true;
           },
@@ -293,7 +300,7 @@ export default {
       ],
       contextCreate: [
         {
-          title: "Thư mục",
+          title: this.$t("kh.contextmenu.folder"),
           menuAction: action => {
             var path = this.path;
             $("#" + path)
@@ -370,7 +377,7 @@ export default {
           icon: "mdi-folder"
         },
         {
-          title: "Văn bản",
+          title: this.$t("kh.contextmenu.document"),
           menuAction: action => {
             var path = this.path;
             $("#" + path)

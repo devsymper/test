@@ -532,10 +532,16 @@
             "backup": "Backup"
         },
         "contextmenu": {
+            "add": "Add",
+            "move": "Move",
+            "paste": "Paste",
+            "folder": "Folder",
+            "document": "Document",
             "open": "Open",
             "download": "Download",
             "rename": "Rename",
-            "delete": "Delete"
+            "delete": "Delete",
+            "addfavorite": "Add to favorite"
         },
         "table": {
             "totalDoc": "Total document"
