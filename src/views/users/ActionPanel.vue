@@ -488,8 +488,8 @@ export default {
         handleAvatarSelected(tempUrl){
             this.avatarUrl = tempUrl;
             if(this.actionType == 'edit'){
-                cpn.avatarFileName = 'user_avatar_' + this.user.id;
-                cpn.$refs.uploadAvatar.uploadFile();
+                this.avatarFileName = 'user_avatar_' + this.user.id;
+                this.$refs.uploadAvatar.uploadFile();
             }
         },
 		handleResize ({ width, height }) {
