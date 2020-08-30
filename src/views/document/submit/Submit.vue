@@ -555,7 +555,6 @@ export default {
                     $(evt.target).closest(".card-time-picker").length == 0
                 ) { 
                     setTimeout(() => {
-                        console.log($(evt.target));
                         let currentTableInteractive = thisCpn.sDocumentSubmit.currentTableInteractive
                         if(currentTableInteractive != null){
                             let cellActiveName = currentTableInteractive.tableInstance.getActiveEditor().prop;
@@ -769,7 +768,7 @@ export default {
             }
             else{
                 let currentTableInteractive = this.sDocumentSubmit.currentTableInteractive
-                currentTableInteractive.tableInstance.setDataAtCell(this.sDocumentSubmit.currentCellSelected.row,this.sDocumentSubmit.currentCellSelected.column,time)
+                currentTableInteractive.tableInstance.setDataAtCell(this.sDocumentSubmit.currentCellSelected.row,this.sDocumentSubmit.currentCellSelected.column,time,'edit')
             }
         },
         afterCheckTimeNotValid(data){

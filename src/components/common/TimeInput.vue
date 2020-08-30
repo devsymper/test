@@ -111,7 +111,7 @@ export default {
     },
     beforeMount(){
         this.times = [
-            {"time":"12:00 AM","active":false},{"time":"12:30 AM","active":false},{"time":"1:00 AM","active":false},
+            {"time":"0:00 AM","active":false},{"time":"0:30 AM","active":false},{"time":"1:00 AM","active":false},
             {"time":"1:30 AM","active":false},{"time":"2:00 AM","active":false},{"time":"2:30 AM","active":false},
             {"time":"3:00 AM","active":false},{"time":"3:30 AM","active":false},{"time":"4:00 AM","active":false},
             {"time":"4:30 AM","active":false},{"time":"5:00 AM","active":false},{"time":"5:30 AM","active":false},

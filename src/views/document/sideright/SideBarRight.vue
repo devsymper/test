@@ -137,6 +137,7 @@ export default {
             
             ],
             listNameValueControl:{},
+            delayTimer:null
         
         }
     },
@@ -154,18 +155,13 @@ export default {
                 this.$refs.formFormulas.hideDragPanel();
         },
         handleInputBlur(inputInfo, name){
-            // let value = inputInfo.value;
-            // let elements = $('#document-editor-'+this.instance+'_ifr').contents().find('#'+this.sCurrentDocument.id);
-            // let tableId = checkInTable(elements);
-            // if( tableId == this.sCurrentDocument.id)
-            // tableId = '0';
-            //  this.$store.commit(
-            //     "document/updateProp",{id:this.sCurrentDocument.id,name:name,value:value,tableId:tableId,type:"value",instance:this.instance}
-            // );   
-            // debugger
+            
         },
         handleKeyupInput(name, input, data){
-            
+            clearTimeout(this.delayTimer);
+            this.delayTimer = setTimeout(function(self) {
+                self.handleValidateControl(name, input, data)
+            }, 300,this);
         },
         setMappingForParamsDataFlow(id,tableId){
             let currentDataflow = this.listDataFlow.filter(df=>{
@@ -184,7 +180,10 @@ export default {
             }
         },
         handleChangeInput(name, input, data){
+            // this.handleValidateControl(name, input, data);
             
+        },
+        handleValidateControl(name, input, data){
             if(this.isConfigPrint){
                 this.savePrintControlConfig(name, input, data);
                 return;
@@ -207,11 +206,10 @@ export default {
                 "document/updateProp",{id:this.sCurrentDocument.id,name:name,value:value,tableId:tableId,type:"value",instance:this.instance}
             );   
 
-            if(name == 'name'){
-                this.checkNameControl(name, input, data)
-            }
-            if(name == 'title'){
-                this.checkTitleControl(name, input, data)
+            if(name == 'name' || name == 'title'){
+                let currentInput = this.sCurrentDocument.properties.name;
+                this.checkNameControl('name', currentInput.name);
+                this.checkTitleControl('title', currentInput.title);
             }
         },
         savePrintControlConfig(name, input, data){
@@ -228,7 +226,7 @@ export default {
         /**
          * Hàm kiểm tra tên 1 control có bị trùng với các control khác hay không, nếu bị trùng thì thông báo lỗi
          */
-        checkTitleControl(name, input, data){
+        checkTitleControl(name, input){
             let elements = $('#document-editor-'+this.instance+'_ifr').contents().find('#'+this.sCurrentDocument.id);
              elements.removeClass('s-control-error');
             let tableId = checkInTable(elements)
@@ -241,13 +239,16 @@ export default {
             }
             this.$store.commit(
                     "document/updateProp",{id:this.sCurrentDocument.id,name:name,value:errValue,tableId:tableId,type:"errorMessage",instance:this.instance}
-                ); 
+                );
+            this.$store.commit(
+                "document/updateCurrentControlProps",{instance:this.instance,group:'name',prop:'title',typeProp:'errorMessage',value:errValue}
+            );   
         },
 
         /**
          * Hàm kiểm tra tên 1 control có bị trùng với các control khác hay không, nếu bị trùng thì thông báo lỗi
          */
-        checkNameControl(name, input, data){
+        checkNameControl(name, input){
             let elements = $('#document-editor-'+this.instance+'_ifr').contents().find('#'+this.sCurrentDocument.id);
             let tableId = checkInTable(elements)
             if( tableId == this.sCurrentDocument.id)
@@ -310,6 +311,9 @@ export default {
             this.$store.commit(
                 "document/updateProp",{id:this.sCurrentDocument.id,name:name,value:errValue,tableId:tableId,type:"errorMessage",instance:this.instance}
             );  
+            this.$store.commit(
+                "document/updateCurrentControlProps",{instance:this.instance,group:'name',prop:'name',typeProp:'errorMessage',value:errValue}
+            );   
         },
  
        
