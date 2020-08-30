@@ -25,7 +25,7 @@
                     'ma-0 pb-1': true ,
                 }">
                 <v-list-item-avatar @click="invertSidebarShow()">
-                    <img :src="currentUserAvatar" />
+                    <SymperAvatar :size="35"/>
                 </v-list-item-avatar>
 
                 <v-list-item-content>
@@ -252,6 +252,7 @@ import { userApi } from "./../../api/user.js";
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import UserRoleSelector from "@/components/app/UserRoleSelector.vue";
 import { appConfigs } from '../../configs.js';
+import SymperAvatar from "@/components/common/SymperAvatar";
 
 export default {
     created(){
@@ -277,7 +278,8 @@ export default {
     },
     components: {
         VuePerfectScrollbar,
-        UserRoleSelector
+        UserRoleSelector,
+        SymperAvatar
     },
     computed: {
         currentUserAvatar(){
