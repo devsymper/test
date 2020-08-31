@@ -158,7 +158,7 @@
                         @click="gotoPage(item)">
 
                         <v-menu
-                            v-if="item.children && item.children.length"
+                            v-if="item.children && Object.keys(item.children).length"
                             :open-on-hover="true"
                             :offset-x="true"
                             nudge-right="7"
@@ -185,8 +185,8 @@
 
                             <v-list>
                                 <v-list-item
-                                    v-for="(subMenu, index) in item.children"
-                                    :key="index"
+                                    v-for="(subMenu, objectType) in item.children"
+                                    :key="objectType"
                                     @click="gotoPage(subMenu)">
                                     <v-list-item-title>{{ subMenu.title }}</v-list-item-title>
                                 </v-list-item>
