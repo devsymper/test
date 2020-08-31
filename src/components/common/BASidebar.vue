@@ -25,7 +25,7 @@
                     'ma-0 pb-1': true ,
                 }">
                 <v-list-item-avatar @click="invertSidebarShow()">
-                    <SymperAvatar :size="35"/>
+                    <SymperAvatar :size="35" :userId="sapp.endUserInfo.id"/>
                 </v-list-item-avatar>
 
                 <v-list-item-content>
