@@ -19,7 +19,7 @@ const systemRoutes = [{
         path: "/",
         name: "home",
         component: () =>
-            import('../views/Home.vue')
+            import ('../views/Home.vue')
     },
     {
         path: "/login",
@@ -28,7 +28,7 @@ const systemRoutes = [{
             layout: "content-only"
         },
         component: () =>
-            import('../views/Login.vue'),
+            import ('../views/Login.vue'),
     },
     // một link để redirect khi chọn một tab mà trùng name với tab hiện tại
     {
@@ -53,7 +53,41 @@ const systemRoutes = [{
         path: "/search/general",
         name: "generalSearchInfo",
         component: () =>
-            import('../views/search/general.vue'),
+            import ('../views/search/general.vue'),
+    },
+    //phần timesheet
+    {
+        path: "/timesheet",
+        name: "timesheet",
+        component: () =>
+            import ('../views/timesheet/ShowLogTime.vue'),
+    },
+
+    {
+        path: "/timesheet",
+        name: "Report timesheet",
+        component: () =>
+            import ('../views/timesheet/ReportTimesheet.vue'),
+    },
+
+    {
+        path: "/timesheet/submit",
+        name: "Submit Timesheet",
+        component: () =>
+            import ('../views/timesheet/SubmitTimesheet.vue'),
+    },
+    {
+        path: "/timesheet/report",
+        name: "Timesheet Report",
+        component: () =>
+            import ('../views/timesheet/ReportTimesheet.vue'),
+    },
+
+    {
+        path: "/timesheet/manage",
+        name: "Manage Timesheet",
+        component: () =>
+            import ('../views/timesheet/ManageTimeSheet.vue'),
     },
 ];
 

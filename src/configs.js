@@ -42,6 +42,7 @@ export const appConfigs = {
         commnent: "https://comment-service.symper.vn",
         fileManagement: 'https://file.symper.vn/',
         knowledge: 'https://kh-service.dev.symper.vn/',
+        timesheet: 'https://timesheet-service.dev.symper.vn/',
         search: "https://search.symper.vn/",
     },
     notificationTimeout: {
