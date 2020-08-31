@@ -26,8 +26,7 @@
 									<span style="font:8px;opacity:0.4">{{childItem.name}}</span>
 							</v-tooltip>
 							<div v-else>{{childItem.name}}</div>
-							<v-icon  v-if="sAppManagement[itemT.name].item.includes(childItem)" style="position:absolute;top:0px;right:0px">mdi-check</v-icon> 
-								<!-- v-if=""  sAppManagement.listItemSelected[itemT.name].item.includes(childItem)-->
+							<v-icon  v-if="childItem.active == true" style="position:absolute;top:0px;right:0px">mdi-check</v-icon> 
 						</div>						
 					</li>
 				</ul>
@@ -111,7 +110,7 @@ export default {
 				resData.forEach(function(e){
 					if(storeData.length > 0){
 						storeData.forEach(function(f){
-							if(e.id === f.id){
+							if(e.id == f.id){
 								e.active = true
 							}else{
 								e.active = false
@@ -123,6 +122,22 @@ export default {
 				})
 			}
 			return resData	
+		},
+		checkActive(obj,type){
+			// debugger
+			// if(this.sAppManagement[type].item.includes(obj) === true){
+			// 	return true
+			// }else{
+			// 	return false
+			// }
+			this.sAppManagement[type].item.forEach(function(e){
+				if(e.id == obj.id){
+					return true
+				}else{
+					return false
+				}
+			})
+			
 		},
 		getListSearch(value){
 			let self = this

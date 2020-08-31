@@ -6,18 +6,18 @@
 					<ul v-for="(childItem,i) in itemT.item" :key="i"  class="app-child-item">
 							<li  v-if="isEndUserCpn == true" v-on:contextmenu="rightClickHandler($event,childItem,itemT.name)">
 								<div style="position:relative">
-									<v-tooltip bottom v-if="itemT.name == 'document_definition'">
-									<template v-slot:activator="{ on, attrs }">
-										<div class="title-document-enduser" 	
-											v-bind="attrs"
-											v-on="on" >
-											<span>{{childItem.title}}</span> 
-										</div>
-									</template>
+									<!-- <v-tooltip bottom v-if="itemT.name == 'document_definition'">
+										<template v-slot:activator="{ on, attrs }">
+											<div class="title-document-enduser" 	
+												v-bind="attrs"
+												v-on="on" >
+												<span>{{childItem.title}}</span> 
+											</div>
+										</template>
 										<span style="font:13px roboto">{{childItem.title}}</span> 
 										<span style="font:8px;opacity:0.4">{{childItem.name}}</span>
-									</v-tooltip>
-									<div v-else>{{childItem.name}}</div>
+									</v-tooltip> -->
+									<div>{{childItem.name}}</div>
 									<v-icon  @click="changeFavorite(childItem,itemT.name)" :class="{'icon-star-active' : childItem.favorite==true, 'icon-star': true}" >mdi-star</v-icon>	
 								</div>
 							</li>
@@ -171,10 +171,21 @@ export default {
 		},	
 		changeFavorite(item,type){
 			let userId = this.$store.state.app.endUserInfo.id
+			if(item.objectIdentifier.includes("document_definition:")){
+				item.id = item.objectIdentifier.replace("document_definition:","")
+			}
+			if(item.objectIdentifier.includes("orgchart:")){
+				item.id = item.objectIdentifier.replace("orgchart:","")
+			}
+			if(item.objectIdentifier.includes("dashboard:")){
+				item.id = item.objectIdentifier.replace("dashboard:","")
+			}
+			if(item.objectIdentifier.includes("workflow_definition:")){
+				item.id = item.objectIdentifier.replace("workflow_definition:","")
+			}
 			if(item.favorite == false){
 				appManagementApi.addFavoriteItem(userId,item.id,type,1).then(res => {
 					if (res.status == 200) {
-						item.type = type;
 						this.$store.commit('appConfig/insertFavorite',item)
 						item.favorite = true;
 					}

@@ -71,8 +71,20 @@
 		clickAction(action){
 			this.defineAction[this.type].action = action;
 			this.hide()
+			if(this.targetItem.objectIdentifier.includes("document_definition:")){
+				this.targetItem.id = this.targetItem.objectIdentifier.replace("document_definition:","")
+			}
+			if(this.targetItem.objectIdentifier.includes("orgchart:")){
+				this.targetItem.id = this.targetItem.objectIdentifier.replace("orgchart:","")
+			}
+			if(this.targetItem.objectIdentifier.includes("dashboard:")){
+				this.targetItem.id = this.targetItem.objectIdentifier.replace("dashboard:","")
+			}
+			if(this.targetItem.objectIdentifier.includes("workflow_definition:")){
+				this.targetItem.id = this.targetItem.objectIdentifier.replace("workflow_definition:","")
+			}
 			let targetItem = this.targetItem
-			this.$evtBus.$emit('symper-app-call-action-handler', this.defineAction[this.type], this, {id:targetItem.id,name:targetItem.name,title:targetItem.title});
+			this.$evtBus.$emit('symper-app-call-action-handler', this.defineAction[this.type], this, {id:targetItem.id,name:targetItem.name,title:''});
 		}
 	}
 	}

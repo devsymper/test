@@ -182,16 +182,16 @@ export default {
 				if (res.status == 200) {
 					res.data.listObject.forEach(function(e){
 						if(e.objectType == 'document_definition'){
-							self.mapIdFavorite.document_definition[e.objectIdentifier] = e
+							self.mapIdFavorite.document_definition["document_definition:"+e.objectIdentifier] = e
 						}  
 						if(e.objectType == 'orgchart'){
-							self.mapIdFavorite.orgchart[e.objectIdentifier] = e
+							self.mapIdFavorite.orgchart["orgchart:"+e.objectIdentifier] = e
 						}  
 						if(e.objectType == 'workflow_definition'){
-							self.mapIdFavorite.workflow_definition[e.objectIdentifier] = e
+							self.mapIdFavorite.workflow_definition["workflow_definition:"+e.objectIdentifier] = e
 						}  
 						if(e.objectType == 'dashboard'){
-							self.mapIdFavorite.dashboard[e.objectIdentifier] = e
+							self.mapIdFavorite.dashboard["dashboard:"+e.objectIdentifier] = e
 						}  
 					})
 					this.checkTypeFavorite(res.data.listObject)
@@ -217,122 +217,6 @@ export default {
 			});
 			this.tab = 'tab-2'
 		},
-		getDocumentsApi(dataDoc,type=''){
-			debugger
-			let self = this
-			documentApi.searchListDocuments(
-					{
-						search:'',
-						pageSize:50,
-						filter: [
-						{
-							column: 'id',
-							valueFilter: {
-								operation: 'IN',
-								values: dataDoc						
-							}
-						}
-						]
-					}
-				).then(resDoc => {
-					if(type == "listFavorite"){
-						this.updateActionItem(self.mapIdFavorite.document_definition,resDoc.data.listObject,'document_definition')
-						resDoc.data.listObject.forEach(function(e){
-							self.listFavorite.push(e)
-						})
-					}
-					else{
-						this.updateFavoriteItem(self.mapId.document_definition,resDoc.data.listObject)
-						this.$store.commit('appConfig/updateChildrenApps',{obj:resDoc.data.listObject,type:'document_definition'});
-					}
-				});
-		},
-		getOrgchartApi(dataOrg,type=''){
-			let self = this
-			orgchartApi.getOrgchartList({
-								search:'',
-								pageSize:50,
-								filter: [
-								{
-									column: 'id',
-									valueFilter: {
-										operation: 'IN',
-										values: dataOrg						
-									}
-								}
-				]}).then(resOrg => {
-					if(type == 'listFavorite'){
-						if(resOrg.data.listObject.length > 0){
-							this.updateActionItem(self.mapIdFavorite.orgchart,resOrg.data.listObject,'orgchart')
-							resOrg.data.listObject.forEach(function(e){
-								self.listFavorite.push(e)
-							})
-						}
-					}
-					else{
-						this.updateFavoriteItem(self.mapId.orgchart,resOrg.data.listObject)
-						this.$store.commit('appConfig/updateChildrenApps',{obj:resOrg.data.listObject,type:'orgchart'});
-					}
-				});
-		},
-		getDashBoardApi(dataRep,type =''){
-			let self = this
-			dashboardApi.getDashboards({
-								search:'',
-								pageSize:50,
-								filter: [
-								{
-									column: 'id',
-									valueFilter: {
-										operation: 'IN',
-										values: dataRep						
-									}
-								}
-				]}).then(resRp => {
-					if(type == 'listFavorite'){
-						if(resRp.data.listObject.length > 0){
-							this.updateActionItem(self.mapIdFavorite.dashboard,resRp.data.listObject,'dashboard')
-							resRp.data.listObject.forEach(function(e){
-								self.listFavorite.push(e)
-							})
-						}
-					}
-					else{
-						this.updateFavoriteItem(self.mapId.dashboard,resRp.data.listObject)
-						debugger
-						this.$store.commit('appConfig/updateChildrenApps',{obj:resRp.data.listObject,type:'dashboard'});
-					}
-				});
-		},
-		getWorkFlowApi(dataW,type=''){
-				let self = this
-				BpmnEngine.getListModels({
-								search:'',
-								pageSize:50,
-								filter: [
-								{
-									column: 'id',
-									valueFilter: {
-										operation: 'IN',
-										values: dataW						
-									}
-								}
-				]}).then(resW => {
-					if(type == 'listFavorite'){
-						if(resW.data.listObject.length > 0){
-							this.updateActionItem(self.mapIdFavorite.workflow_definition,resW.data.listObject,'workflow_definition')
-							resW.data.listObject.forEach(function(e){
-								self.listFavorite.push(e)
-							})
-						}
-					}
-					else{
-						debugger
-						this.updateFavoriteItem(self.mapId.workflow_definition,resW.data.listObject)
-						this.$store.commit('appConfig/updateChildrenApps',{obj:resW.data.listObject,type:'workflow_definition'});
-					}
-				});
-		},
 		checkTypeFavorite(data){
 			let self = this
 			self.arrType.document_definition = []
@@ -341,33 +225,33 @@ export default {
 			self.arrType.workflow_definition = []
 			data.forEach(function(e){
 				if(e.objectType == 'document_definition'){
-					self.arrType.document_definition.push(e.objectIdentifier)
+					self.arrType.document_definition.push("document_definition:"+e.objectIdentifier)
 				}
 				if(e.objectType == 'orgchart'){
-					self.arrType.orgchart.push(e.objectIdentifier)
+					self.arrType.orgchart.push("orgchart:"+e.objectIdentifier)
 				}
 				if(e.objectType == 'dashboard'){
-					self.arrType.dashboard.push(e.objectIdentifier)
+					self.arrType.dashboard.push("dashboard:"+e.objectIdentifier)
 				}
 				if(e.objectType == 'workflow_definition'){
-					self.arrType.workflow_definition.push(e.objectIdentifier)
+					self.arrType.workflow_definition.push("workflow_definition:"+e.objectIdentifier)
 				}
 			});
 			if(self.arrType.document_definition.length > 0){
 				let dataDoc = self.arrType.document_definition
-				this.getDocumentsApi(dataDoc,'listFavorite')
+				this.getFavoriteByAccessControl(dataDoc,'document_definition')
 			}
 			if(self.arrType.orgchart.length > 0){
 				let dataOrg = self.arrType.orgchart
-				this.getOrgchartApi(dataOrg,'listFavorite')
+				this.getFavoriteByAccessControl(dataOrg,'orgchart')
 			}
 			if(self.arrType.dashboard.length > 0){
 				let dataRep = self.arrType.dashboard
-				this.getDashBoardApi(dataRep,'listFavorite')
+				this.getFavoriteByAccessControl(dataRep,'dashboard')
 			}
 			if(self.arrType.workflow_definition.length > 0){
 				let dataW = self.arrType.workflow_definition
-				this.getWorkFlowApi(dataW,'listFavorite')
+				this.getFavoriteByAccessControl(dataW,'workflow_definition')
 			}
 		},
 		clickBack(){
@@ -378,7 +262,7 @@ export default {
 		updateFavoriteItem(mapArray,array){
 			for( let [key,value] of Object.entries(mapArray)){
 				array.forEach(function(item){
-					if(item.id == key){
+					if(item.objectIdentifier == key){
 						item.favorite = value.isFavorite
 						item.actions = value.actions
 					} 
@@ -389,7 +273,7 @@ export default {
 		updateActionItem(mapArray,array,type){
 			for( let [key,value] of Object.entries(mapArray)){
 				array.forEach(function(item){
-					if(item.id == key){
+					if(item.objectIdentifier == key){
 						item.favorite = 1
 						item.actions = value.actions
 						item.type = type
@@ -414,49 +298,102 @@ export default {
 			self.arrType.workflow_definition = []
 			if(data.hasOwnProperty('orgchart')){
 				data.orgchart.forEach(function(e){
-					self.arrType.orgchart.push(e.id);
-					self.mapId.orgchart[e.id] = e;
+					self.arrType.orgchart.push("orgchart:"+e.id);
+					self.mapId.orgchart["orgchart:"+e.id] = e;
 				})
 				let dataOrg = self.arrType.orgchart;
-				this.getOrgchartApi(dataOrg)
-			}	
+				this.getByAccessControl(dataOrg,'orgchart')
+			}
 			if(data.hasOwnProperty('document_definition')){
 				data.document_definition.forEach(function(e){
-					self.arrType.document_definition.push(e.id);
-					self.mapId.document_definition[e.id] = e;
+					self.arrType.document_definition.push("document_definition:"+e.id);
+					self.mapId.document_definition["document_definition:"+e.id] = e;
 				})
 				let dataDoc = self.arrType.document_definition
-				debugger
-				this.getDocumentsApi(dataDoc);
-
+				// this.getDocumentsApi(dataDoc);
+				this.getByAccessControl(dataDoc,'document_definition')
 			}
 			if(data.hasOwnProperty('workflow_definition')){
 				data.workflow_definition.forEach(function(e){
-					self.arrType.workflow_definition.push(e.id);
-					self.mapId.workflow_definition[e.id] = e;
+					self.arrType.workflow_definition.push("workflow_definition:"+e.id);
+					self.mapId.workflow_definition["workflow_definition:"+e.id] = e;
 				})
 				let dataW = self.arrType.workflow_definition
-				this.getWorkFlowApi(dataW)
+				this.getByAccessControl(dataW,'workflow_definition')
 			}
 			if(data.hasOwnProperty('dashboard')){
 				data.dashboard.forEach(function(e){
-					self.arrType.dashboard.push(e.id);
-					self.mapId.dashboard[e.id] = e;
+					self.arrType.dashboard.push("dashboard:"+e.id);
+					self.mapId.dashboard["dashboard:"+e.id] = e;
 				})
 				let dataRep = self.arrType.dashboard
-				this.getDashBoardApi(dataRep);
+				this.getByAccessControl(dataW,'dashboard')
 			}
 		},
-		testAccesscontrol(){
-			debugger
+		getByAccessControl(ids,type){
+			let self = this
 			appManagementApi.getListObjectIdentifier({
 				pageSize:50,
-				type:'document_definition',
-				ids: ["document_definition:1814"]
+				ids: ids
 			}).then(res=>{
-				debugger
+				if(type == 'orgchart'){
+					this.updateFavoriteItem(self.mapId.orgchart,res.data)
+					this.$store.commit('appConfig/updateChildrenApps',{obj:res.data,type:'orgchart'});
+				}
+				if(type == 'document_definition'){
+					this.updateFavoriteItem(self.mapId.document_definition,res.data)
+					this.$store.commit('appConfig/updateChildrenApps',{obj:res.data,type:'document_definition'});
+				}
+				if(type == 'workflow_definition'){
+					this.updateFavoriteItem(self.mapId.workflow_definition,res.data)
+					this.$store.commit('appConfig/updateChildrenApps',{obj:res.data,type:'workflow_definition'});
+				}
+				if(type == 'dashboard'){
+					this.updateFavoriteItem(self.mapId.dashboard,res.data)
+					this.$store.commit('appConfig/updateChildrenApps',{obj:res.data,type:'dashboard'});
+				}
 			}).catch(err=>{
-
+			})
+		},
+		getFavoriteByAccessControl(ids,type){
+			let self = this
+			appManagementApi.getListObjectIdentifier({
+				pageSize:50,
+				ids: ids
+			}).then(res=>{
+				if(type == 'orgchart'){
+					if(res.data.length > 0){
+						this.updateActionItem(self.mapIdFavorite.orgchart,res.data,'orgchart')
+						res.data.forEach(function(e){
+							self.listFavorite.push(e)
+						})
+					}
+				}
+				if(type == 'document_definition'){
+						if(res.data.length > 0){
+						this.updateActionItem(self.mapIdFavorite.document_definition,res.data,'document_definition')
+						res.data.forEach(function(e){
+							self.listFavorite.push(e)
+						})
+					}
+				}
+				if(type == 'workflow_definition'){
+					if(res.data.length > 0){
+						this.updateActionItem(self.mapIdFavorite.workflow_definition,res.data,'workflow_definition')
+						res.data.forEach(function(e){
+							self.listFavorite.push(e)
+						})
+					}
+				}
+				if(type == 'dashboard'){
+					if(res.data.length > 0){
+						this.updateActionItem(self.mapIdFavorite.dashboard,res.data,'dashboard')
+						res.data.forEach(function(e){
+							self.listFavorite.push(e)
+						})
+					}
+				}
+			}).catch(err=>{
 			})
 		}
 	}
