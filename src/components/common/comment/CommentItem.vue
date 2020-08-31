@@ -12,7 +12,8 @@
 				</v-avatar>
 			<div class="comment-item-content">
 				<div style="display:flex;height:16px;width:100%">
-						<span style="color:#00000099">Đào Mạnh Khá</span>
+						<span style="color:#00000099">Dao Manh Kha</span>
+						<!-- {{item.infor.fullName}} -->
 				</div>
 				<div style="display:flex">
 					<InputComment 
@@ -137,11 +138,12 @@ export default {
 		}
 			// let mapIdToUser = this.$store.getters['app/mapIdToUser'];
 			// let itemInfor = mapIdToUser[this.item.userId];
+			// // debugger
 			// let infor = {}
 			// infor.avatar = itemInfor.avatar,
 			// infor.fullName = itemInfor.displayName
-			// this.item.infor = infor
-			// if(this.item.childrens.length > 0){
+			// this.item.infor = infor	
+			// if(this.item.hasOwnProperty('childrens') && this.item.childrens.length > 0){
 			// 	this.item.childrens.forEach(function(e){	
 			// 		itemInfor = mapIdToUser[e.id];
 			// 		let inforChild = {}
@@ -285,6 +287,10 @@ export default {
 	display: flex;
 	flex-direction: column;
 	margin-left: 8px;
+}
+.commnent-item >>> .comment-item-content .btn-reply-comment{ 
+	cursor: pointer;
+	border-bottom: 1px solid white;
 }
 .commnent-item >>> .comment-item-content .btn-reply-comment:hover{ 
 	cursor: pointer;

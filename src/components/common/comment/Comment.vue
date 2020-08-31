@@ -2,7 +2,7 @@
 	<div class="symper-comment">
 		<v-card 
 			 v-show="showComment"
-			 width="410px"
+			 width="420px"
 			:height="heightComment"
 			:style="{top:top+'px',left:left+'px'}"
 		>

@@ -1,12 +1,28 @@
 <template>
 	<div class="content-comment">
-		<div v-if="images.length > 0" class="content-comment-img">
+		<div v-if="images.length > 0"  class="content-comment-img">
 			<div  class="commnet-img-item" v-for="(item,i) in images" :key="i">
 				<v-img
-           			 :src="'http://file.symper.vn/readFile/'+item.serverPath"
+           			 :src="item.serverPath"
+						style="margin-top:auto;margin-bottom:auto"
          		>
-				 <v-icon  v-if="isEditing == true" class="icon-remove-img"  @click="removeImage(item)">mdi-close-circle-outline</v-icon>
+					<v-icon  v-if="isEditing == true" class="icon-remove-img"  @click="removeImage(item)">mdi-close-circle-outline</v-icon>
 				</v-img> 
+				<!-- <div style="width:300px" >
+					<v-tabs
+						next-icon="mdi-arrow-right-bold-box-outline"
+						prev-icon="mdi-arrow-left-bold-box-outline"
+						show-arrows
+					>
+						<v-tab
+					  	
+						:href="'#tab-' + i"
+						>
+						<img src="https://img.icons8.com/carbon-copy/2x/image.png" style="width:80px;height:80px"/>
+						 <v-icon  v-if="isEditing == true" class="icon-remove-img"  @click="removeImage(item)">mdi-close-circle-outline</v-icon>
+						</v-tab>
+					</v-tabs>
+				</div> -->
 			</div>
 		</div>	
 		<div v-if="files.length > 0" class="content-comment-file">
@@ -18,7 +34,9 @@
 		</div>
 		<div class="content-comment-input">
 			<span v-if="isEditing == false" >
-				<h5 >{{item.content}}</h5>
+				<!-- <h5 >{{reduce(item.content)}}</h5> -->
+				 <h5 v-if="item.tags.length == 0">{{item.content}}</h5>
+				 <h5 v-else v-html="reduce(item.content)"></h5>
 			</span>
 			<div class="text-area-wrapper" v-else>
 					<textarea v-model="inputComment"  
@@ -27,8 +45,8 @@
 						style="width:100%"
 						>
 					</textarea>
-				<UploadFile style="position:absolute;right:16px;bottom: 5px;" @uploaded-file="uploadInfo"/>
-				<v-btn style="position:absolute;right: 0px;bottom: 5px;" icon @click="addComment">
+				<UploadFile style="position:absolute;right:16px;bottom: 0px;" @uploaded-file="uploadInfo" />
+				<v-btn style="position:absolute;right: 0px;bottom: 0px;" icon @click="addComment">
 					<v-icon >mdi-send-circle-outline</v-icon>
 				</v-btn>
 			</div>
@@ -111,6 +129,9 @@ export default {
 			this.$refs.menuTagUser.show(x,y);
 		},
 		tagged(data){
+			if(this.item){
+				 this.tags = this.item.tags 
+			}
 			let character = this.inputComment.charAt(this.inputComment.length - 1)
 			let res = this.inputComment.replace(character,data.displayName);
 			let item = {} 
@@ -124,16 +145,22 @@ export default {
 			this.inputComment = res
 			
 		},
+		reduce(content){
+				this.item.tags.forEach(function(e){
+					let name = content.slice(e.tagInfo.offset,e.tagInfo.offset+e.tagInfo.length)
+					debugger
+					let span;
+					span = `<span style="color:red">${name}</span>`
+					let res = content.replace(name,span)
+					content = res
+				})
+			return content
+		},
 		addComment(){
-			if(this.item){
-				this.item.tags = this.tags
-			}
 			this.dataPostComment = this.sComment
 			this.dataPostComment.content = this.inputComment
 			this.dataPostComment.attachments = this.attachments
 			this.dataPostComment.tags = this.tags
-			console.log(this.tags);
-			debugger
 			if(this.isAdd == true){
 				let data = JSON.stringify(this.dataPostComment)
 				commentApi.addComment(data).then(res => {
@@ -156,6 +183,7 @@ export default {
 			this.$store.commit('comment/updateReplyStatus',false)
 		},
 		uploadInfo(data){
+			debugger
 			if(typeof data === 'string'){
 				alert(data)
 			}else{
@@ -218,6 +246,16 @@ export default {
 			if(val != ''){
 				this.inputComment = val
 			}
+		},
+		isEditing(val){
+			console.log(val);
+			if(val == true){
+				if(this.item){
+					 this.tags = this.item.tags 
+				}
+			}
+			console.log(this.tags);
+			debugger
 		}
 	}
 }	
@@ -236,9 +274,11 @@ export default {
 	display:flex;
 }
 .content-comment >>> .commnet-img-item{
-	width: 30px;
-	height: 30px;
+	width: 80px;
+	height: 80px;
 	margin: 0px 4px 0px 0px;
+	display: flex;
+    align-items: center;
 }
 .content-comment >>> .commnet-img-item .icon-remove-img{
 	font-size: 13px;
@@ -257,7 +297,7 @@ export default {
 	padding: 0px 0px 4px 4px;
 	flex-grow: 1;
 	cursor: pointer;
-	
+	border-bottom: 1px solid white;
 }
 .content-comment >>> .content-comment-file .commnet-file-item .file-item-title:hover{
 	color: #E88F15CC;

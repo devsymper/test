@@ -116,7 +116,8 @@ const defaultState = {
 	],
 	urlToTabTitleMap: {}, // map giữa url với title và pageInstanceKey của tab,
 	currentTabIndex: 0, // index cuả tab hiện tại đang mở,
-	supportedLanguages: [{
+	supportedLanguages: [
+		{
 			key: 'vn',
 			title: 'Tiếng Việt',
 		},
