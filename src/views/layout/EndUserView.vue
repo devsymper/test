@@ -4,7 +4,7 @@
         <v-content>
             <v-container fluid fill-height class="pa-0">
                 <div class="w-100 app-header-bg-color" style="border-bottom:1px solid #e6e5e5">
-                    <div style="width:calc(100% - 200px)" class="float-left">
+                    <div style="width:calc(100% - 500px)" class="float-left">
                         <v-tabs
                             hide-slider
                             active-class="symper-tab-active"
@@ -29,10 +29,17 @@
                         </v-tabs>
                     </div>
                     <div
-                        class="float-right app-header-bg-color"
-                        style="height:40px; line-height:40px;"
+                        class="float-right app-header-bg-color d-flex justify-end "
+                        style="widh:500px;height:40px; line-height:40px;"
                     >
-                       <v-menu
+                     <!-- search -->
+                    <div v-show="showSearchInput" class="d-flex justify-center align-items-center">
+                        <transition name="slide-fade">
+                            <SearchInput v-show="showSearchInput" class="mr-2" style="width:330px"/>
+                        </transition>
+                    </div>
+                    <!--kết thúc search--->
+                        <v-menu
                             v-model="isShowDialog"
                             :close-on-content-click="false"
                             :max-width="500"
@@ -48,9 +55,10 @@
                             <EndUserPopup  />
 							<!-- <div>hello</div> -->
                         </v-menu>
-                        <v-btn icon>
+                        <v-btn icon @click="showSearchInput = !showSearchInput">
                             <v-icon>mdi-magnify</v-icon>
                         </v-btn>
+                       
                         <v-menu  v-model="isShowDialogNotification"
                             z-index="161"
                             :close-on-content-click="false"
@@ -77,12 +85,13 @@
                             </template>
                             <list-notification></list-notification>
                         </v-menu>
+					<!--  -->
                     </div>
                 </div>
                 <v-layout style="height:calc(100% - 41px)" class="w-100 h-100" justify-center>
-                    <slot />
+                    <slot>
+					</slot>
                 </v-layout>
-                
             </v-container>
         </v-content>
     </v-app>
@@ -93,9 +102,10 @@ import Api from "../../api/api.js";
 import { appConfigs } from '../../configs';
 import BASidebar from "@/components/common/BASidebar.vue";
 import listApp from "@/components/common/listApp";
-import NotificationBar from "@/components/notification/NotificationBar.vue";
 import EndUserPopup from './../apps/EndUserPopup.vue';
-import UploadFile from "@/components/common/UploadFile.vue"
+import NotificationBar from "@/components/notification/NotificationBar.vue";
+import Search from "@/components/search/Search";
+
 export default {
     methods: {
         /**
@@ -121,7 +131,8 @@ export default {
                     });
                 }
             }
-        },
+		},
+		
         closeTab(idx){            
             let urlKey = Object.keys(this.$store.state.app.urlToTabTitleMap)[idx];
             let urlInfo = this.tabUrlItems[urlKey];
@@ -148,9 +159,9 @@ export default {
     components: {
         "ba-sidebar": BASidebar,
         "list-app": listApp,
-		"list-notification": NotificationBar,
-		EndUserPopup,
-		UploadFile
+        "list-notification": NotificationBar,
+        EndUserPopup,
+        SearchInput: Search
     },
     created() {
         let self = this;
@@ -186,18 +197,18 @@ export default {
     },
     data: function() {
         return {
+            showSearchInput: false,
             isShowDialog: false,
-            isShowDialogNotification: false,
+			isShowDialogNotification: false,
         };
     }
 };
 </script>
-
-
 <style>
 .app-header-bg-color,.app-header-bg-color .v-item-group {
     background-color: white!important;
 }
+
 .nofitication-title-bar{
     font-size: 13px;
     font-weight: bold;

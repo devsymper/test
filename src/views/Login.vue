@@ -84,7 +84,9 @@ export default {
             checkingUser: false,
             valid: true,
             email: "",
+            // dinhnv@symper.vn
             password: "",
+            // Damthatbai@2010
             emailRules: [
                 v => !!v || "E-mail is required",
                 v => /.+@.+\..+/.test(v) || "E-mail must be valid"

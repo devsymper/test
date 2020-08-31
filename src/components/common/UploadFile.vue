@@ -16,7 +16,14 @@
 </template>
 
 <script>
+import {fileManagementApi} from '@/api/FileManagement.js'
 export default {
+	props:{
+		fileName:{
+			type:String,
+			default: ''
+		}
+	},
 	data() {
 	   return {
 			isSelecting: false,
@@ -35,22 +42,23 @@ export default {
 			let formData = new FormData()
 			formData.append('file',this.selectedFile)
 			formData.append('user',this.$store.state.app.endUserInfo.displayName)
+			if(this.fileName != ''){
+				formData.append('fileName',this.fileName)
+			}
 			let thisCpn = this
-			$.ajax({
-				url: 'https://file.symper.vn/uploadS', 
+			fileManagementApi.uploadFileSymper(formData,
+			{
 				dataType: 'text',
 				contentType: false,
 				processData: false,
-				data: formData,
-				type: 'post',
-				success: function (res){
-					let resObj = JSON.parse(res);
-					if(resObj.status == 500){
-					}else if(resObj.status == 200){
-						thisCpn.$emit('uploaded-file',resObj.data)
-					}
-				},
-			});
+			}).then(res => {
+               if(res.status == 200){
+					thisCpn.$emit('uploaded-file',res.data)
+				}
+				else{
+					thisCpn.$emit('upload-error',res.message)
+				}
+            });
 		}
 	}
 }

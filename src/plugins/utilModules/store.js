@@ -4,6 +4,13 @@
 import { cookie } from "./cookie.js";
 export const store = {
     getComponentSize(comp) {
+        if (!comp) {
+            return {
+                h: 0,
+                w: 0
+            }
+        }
+
         let dom = false;
         if (comp._isVue) {
             dom = comp.$el;

@@ -218,6 +218,7 @@ export default {
 			this.tab = 'tab-2'
 		},
 		getDocumentsApi(dataDoc,type=''){
+			debugger
 			let self = this
 			documentApi.searchListDocuments(
 					{
@@ -241,8 +242,8 @@ export default {
 						})
 					}
 					else{
-						debugger
 						this.updateFavoriteItem(self.mapId.document_definition,resDoc.data.listObject)
+						debugger
 						this.$store.commit('appConfig/updateChildrenApps',{obj:resDoc.data.listObject,type:'document_definition'});
 					}
 				});
@@ -427,7 +428,9 @@ export default {
 					self.mapId.document_definition[e.id] = e;
 				})
 				let dataDoc = self.arrType.document_definition
+				debugger
 				this.getDocumentsApi(dataDoc);
+
 			}
 			if(data.hasOwnProperty('workflow_definition')){
 				data.workflow_definition.forEach(function(e){
