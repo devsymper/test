@@ -4,7 +4,7 @@
 			:loading="isSelecting"
 			@click="onButtonClick"
 				> 
-			<v-icon>mdi-upload</v-icon>
+			<v-icon>mdi-attachment</v-icon>
 			<input
 				ref="uploader"
 				class="d-none"
@@ -30,8 +30,8 @@ export default {
 	},
 	data() {
 	   return {
-                isSelecting: false,
-                formDatas:{
+			isSelecting: false,
+			formDatas:{
 			}
 		}
 	},
@@ -58,20 +58,20 @@ export default {
             if(this.fileName != ''){
 				this.formDatas.append('fileName',this.fileName)
             }
-            debugger
 			fileManagementApi.uploadFileSymper(this.formDatas,
 			{
 				dataType: 'text',
 				contentType: false,
 				processData: false,
 			}).then(res => {
-			if(res.status == 200){
-					this.$emit('uploaded-file',res.data)
-				}
-				else{
-					this.$emit('upload-error',res.message)
-				}
-			});
+				let resObj = JSON.parse(res);
+				if(resObj.status == 200){
+						this.$emit('uploaded-file',resObj.data)
+					}
+					else{
+						this.$emit('upload-error',resObj.message)
+					}
+				});
 		}
 	},
 }
