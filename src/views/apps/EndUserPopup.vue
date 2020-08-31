@@ -133,6 +133,7 @@ export default {
 	created(){
 		this.getActiveapps()
 		this.getFavorite()
+		// this.testAccesscontrol()
 	},
 	mounted(){
 		 let thisCpn = this;
@@ -207,7 +208,6 @@ export default {
 			appManagementApi.getAppDetails(item.id).then(res => {
 				if (res.status == 200) {
 					if(Object.keys(res.data.listObject.childrenApp).length > 0){
-						debugger
 						this.checkChildrenApp(res.data.listObject.childrenApp)
 					}else{
 						this.$store.commit('appConfig/emptyItemSelected')
@@ -243,7 +243,6 @@ export default {
 					}
 					else{
 						this.updateFavoriteItem(self.mapId.document_definition,resDoc.data.listObject)
-						debugger
 						this.$store.commit('appConfig/updateChildrenApps',{obj:resDoc.data.listObject,type:'document_definition'});
 					}
 				});
@@ -271,7 +270,6 @@ export default {
 						}
 					}
 					else{
-						debugger
 						this.updateFavoriteItem(self.mapId.orgchart,resOrg.data.listObject)
 						this.$store.commit('appConfig/updateChildrenApps',{obj:resOrg.data.listObject,type:'orgchart'});
 					}
@@ -449,7 +447,18 @@ export default {
 				this.getDashBoardApi(dataRep);
 			}
 		},
-		
+		testAccesscontrol(){
+			debugger
+			appManagementApi.getListObjectIdentifier({
+				pageSize:50,
+				type:'document_definition',
+				ids: ["document_definition:1814"]
+			}).then(res=>{
+				debugger
+			}).catch(err=>{
+
+			})
+		}
 	}
 
 }
