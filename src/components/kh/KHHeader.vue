@@ -153,7 +153,6 @@ export default {
       this.y = e.clientY;
       this.context_create = true;
     },
-
     invertStatusEdit() {
       this.$store.commit("kh/changeStatusEdit", !this.skh.statusEdit);
     },

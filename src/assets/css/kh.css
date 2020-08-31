@@ -51,7 +51,7 @@
 }
 
 .kh-side-bar .star-favorite {
-    color: yellow!important;
+    color: rgb(88, 88, 86)!important;
     position: absolute;
     right: 0px;
     margin-right: 0px!important;
@@ -344,13 +344,15 @@
     width: auto!important;
 } */
 
-.kh-editor #myeditablediv #mceResizeHandlenw {
-    left: unset!important;
-}
 
-.kh-editor #myeditablediv #mceResizeHandlesw {
+/* .kh-editor #myeditablediv #mceResizeHandlenw {
     left: unset!important;
-}
+} */
+
+
+/* .kh-editor #myeditablediv #mceResizeHandlesw {
+    left: unset!important;
+} */
 
 .kh-editor #myeditablediv {
     min-height: 100px!important;

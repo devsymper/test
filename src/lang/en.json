@@ -541,7 +541,9 @@
             "download": "Download",
             "rename": "Rename",
             "delete": "Delete",
-            "addfavorite": "Add to favorite"
+            "addfavorite": "Add to favorite",
+            "removefavorite": "Remove from favorite"
+
         },
         "table": {
             "totalDoc": "Total document"

@@ -244,11 +244,8 @@ export default {
         })
         .catch(err => {
           console.warn(err, "error when get document");
-          this.$store.commit(
-              "kh/setFlagErrEditor",
-              this.skh.flagErrEditor + 1
-            );
-          if (this.skh.flagErrEditor > 2 ||this.skh.flagErrEditor==1) {
+          this.$store.commit("kh/setFlagErrEditor", this.skh.flagErrEditor + 1);
+          if (this.skh.flagErrEditor > 2 || this.skh.flagErrEditor == 1) {
             this.$snotify({
               type: "error",
               title: this.$t("document.error")
@@ -302,6 +299,21 @@ export default {
       );
       self.$store.commit("kh/setDataTable", result);
       self.$store.commit("kh/changeStatusHansonTable", true);
+    });
+    
+    $(".kh-editor").on("click", "table", function(event) {
+      var p = $(this);
+      var position=p.position();
+      console.log(p.width());
+      document.getElementById("mceResizeHandlenw").style.left =position.left;
+      document.getElementById("mceResizeHandlene").style.left = p.width();
+    });
+
+    $(".kh-editor").on("click", "img", function(event) {
+      var p = $(this);
+      var position=p.position();
+      document.getElementById("mceResizeHandlenw").style.left =position.left;
+      document.getElementById("mceResizeHandlene").style.left = p.width();
     });
   }
 };

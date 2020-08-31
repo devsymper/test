@@ -16,8 +16,8 @@
         </div>
       </div>
       <div class="list-item">
-        <v-sheet id="scrolling-techniques" class="overflow-y-auto" max-height="498">
-          <v-container style="height: 498;">
+        <!-- <v-sheet id="scrolling-techniques" class="overflow-y-auto" max-height="498"> -->
+          <v-container class="scroll-bar-right" max-height="498" style="height: calc(100vh - 65px);overflow: auto;">
             <v-list dense>
               <v-list-item-group class>
                 <v-list-item
@@ -41,7 +41,7 @@
               </v-list-item-group>
             </v-list>
           </v-container>
-        </v-sheet>
+        <!-- </v-sheet> -->
       </div>
     </div>
     <div class="kh-table-content kh-sbr-all ml-4" v-if="skh.statusRightBar==2">
@@ -55,7 +55,6 @@
         <ul id="toc"></ul>
       </div>
     </div>
-
     <div class="kh-comment kh-sbr-all ml-4" v-if="skh.statusRightBar==3">
       <div class="row sb-top" style="height:33px;">
         <div class="symper-title col pt-1 pl-1">Bình luận</div>
@@ -64,7 +63,6 @@
         </div>
       </div>
     </div>
-
     <div class="kh-history kh-sbr-all ml-4" v-if="skh.statusRightBar==4">
       <div class="row sb-top" style="height:33px;">
         <div class="symper-title col pt-1 pl-1">Lịch sử</div>
@@ -89,8 +87,8 @@
         </table>
       </div>
       <div v-if="history_active==0">
-        <v-sheet id="scrolling-techniques" class="overflow-y-auto" max-height="498">
-          <v-container style="height: 498;">
+        <!-- <v-sheet id="scrolling-techniques" class="overflow-y-auto" max-height="498"> -->
+          <v-container class="scroll-bar-right" max-height="498" style="height: calc(100vh - 65px);overflow: auto;">
             <v-list dense class="list-log">
               <v-list-item-group>
                 <v-list-item v-for="(item, i) in listLogAll" :key="i">
@@ -114,11 +112,11 @@
               </v-list-item-group>
             </v-list>
           </v-container>
-        </v-sheet>
+        <!-- </v-sheet> -->
       </div>
       <div v-if="history_active==1">
-        <v-sheet id="scrolling-techniques" class="overflow-y-auto" max-height="498">
-          <v-container style="height: 498;">
+        <!-- <v-sheet id="scrolling-techniques" class="overflow-y-auto" max-height="498"> -->
+          <v-container class="scroll-bar-right" max-height="498" style="height: calc(100vh - 65px);overflow: auto;">
             <v-list dense class="list-log">
               <v-list-item-group>
                 <v-list-item v-for="(item, i) in listLogDoc" :key="i">
@@ -137,7 +135,7 @@
               </v-list-item-group>
             </v-list>
           </v-container>
-        </v-sheet>
+        <!-- </v-sheet> -->
       </div>
     </div>
 
@@ -452,8 +450,11 @@ export default {
             this.$store.dispatch("kh/removeListArrFileAttach", fileId);
           } else if (res.status == 403) {
             SYMPER_APP.$snotifyError("Error", res.message);
-          }else{
-            SYMPER_APP.$snotifyError("Error", "Error from delete attachment file!!!");
+          } else {
+            SYMPER_APP.$snotifyError(
+              "Error",
+              "Error from delete attachment file!!!"
+            );
           }
         })
         .catch(err => {
@@ -466,19 +467,24 @@ export default {
   watch: {
     "skh.statusRightBar": function(newVl) {
       if (newVl == 1) {
-        setTimeout(() => {
-          let hash = this.skh.currentDocument;
-          if (hash == false) {
-            hash = this.$route.params.hash;
-          }
-          this.$store.dispatch("kh/getFileAttachment", hash);
-          let data = this.skh.arrIdFileAttach;
-          this.$store.dispatch("kh/getArrFileAttachment", data);
-        }, 100);
+        let hash = this.skh.currentDocument;
+        if (hash == false) {
+          hash = this.$route.params.hash;
+        }
+        // setTimeout(
+        //   self => {
+        //     self.$store.dispatch("kh/getFileAttachment", hash);
+        //   },
+        //   100,
+        //   this
+        // );
+        this.$store.dispatch("kh/getFileAttachment", hash);
+        let data = this.skh.arrIdFileAttach;
+        this.$store.dispatch("kh/getArrFileAttachment", data);
       } else if (newVl == 2) {
         setTimeout(() => {
           this.detectHeading();
-        }, 300);
+        }, 200);
       } else if (newVl == 4) {
         setTimeout(() => {
           let hash = this.skh.currentDocument;
@@ -501,9 +507,6 @@ export default {
     "skh.currentDocument": function(newVl) {
       this.getData(newVl);
     }
-    // hash: function(nevVL) {
-    //   this.getData();
-    // }
   },
   computed: {
     sapp() {
@@ -563,5 +566,9 @@ export default {
   top: 74px;
   border-left: 1px solid #bebebe;
   background-color: white;
+}
+.scroll-bar-right{
+  padding-left: 0px;
+  padding-top: 0px;
 }
 </style>

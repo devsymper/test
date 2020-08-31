@@ -2,7 +2,7 @@
   <div id="myModal" class="modal kh-handson">
     <div class="modal-content">
       <div class="kh-handson-header">
-        <h2 style="width:970px">Bảng</h2>
+        <h2 style="width:95%">Bảng</h2>
         <v-icon class="btn-save-handson mr-1 fs-16" v-if="skh.statusEdit==false" @click.stop="saveData">mdi-content-save</v-icon>
         <v-icon class="btn-closes-handson fs-17" @click="invertStatusHandson">mdi-close</v-icon>
       </div>

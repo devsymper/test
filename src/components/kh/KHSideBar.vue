@@ -53,7 +53,7 @@
                 <v-btn
                   class="fz-13 side-bar-item"
                   text
-                  @contextmenu="show($event,item.path,item.name,item.id,item.parentPath,item.content,item.hash)"
+                  @contextmenu="show($event,item.path,item.name,item.id,item.parentPath,item.content,item.hash,item.isFavorite)"
                 >
                   <v-icon
                     class="fs-14"
@@ -89,8 +89,11 @@
                   :key="index"
                   @click="item.menuAction(item.title)"
                   dense
-                  v-bind:class="index==statusMove?'d-none': '' || index==0 && id !=undefined ?'d-none': ''"
-
+                  v-bind:class="index==statusMove?'d-none': '' || 
+                      index==0 && id !=undefined ?'d-none': '' || 
+                      (index==4 ||index==5) && id ==undefined ?'d-none': '' || 
+                      index==4 && isFavorite ==1 && id !=undefined ?'d-none': '' || 
+                      index==5 && isFavorite ==0 && id !=undefined ?'d-none': '' "
                   @mouseover="handleContext(index)"
                 >
                   <v-icon class="fs-15">{{item.icon}}</v-icon>
@@ -189,6 +192,7 @@ export default {
     let self = this;
     return {
       openAll: false,
+      isFavorite:-1,
       showByIndex: null,
       oldHashPath: "",
       statusMove: 3,
@@ -257,7 +261,6 @@ export default {
                       data.id = res.data.id;
                       data.parentPath = res.data.parentPath;
                       data.hash = res.data.hash;
-
                       self.$store.dispatch("kh/MoveDocToTreeViewStore", data);
                     } else {
                       //dichuyen thư mục
@@ -271,10 +274,14 @@ export default {
                       );
                     }
                     // self.$store.dispatch("kh/addToTreeViewStore", data);
+                  }else if(res.status == 403){
+                    SYMPER_APP.$snotifyError("Error", res.message);
+                  }else if(res.status == 400){
+                    SYMPER_APP.$snotifyError("Error", res.message);
                   }
                 })
                 .catch(err => {
-                  console.log("error from Add folder to treee!!!", err);
+                  console.log("error from Move item to tree!!!", err);
                 })
                 .always(() => {});
             }
@@ -283,13 +290,30 @@ export default {
           },
           icon: "mdi-content-paste"
         },
-        // {
-        //   title: this.$t("kh.contextmenu.addfavorite"),
-        //   menuAction: action => {
-        //     this.dialog_remove = true;
-        //   },
-        //   icon: "mdi-star"
-        // },
+        {
+          title: this.$t("kh.contextmenu.addfavorite"),
+          menuAction: action => {
+            let id=this.id;
+            let isFavorite=this.isFavorite;
+            let name=this.txtNode;
+            let parentPath=this.parentPath;
+            let hash=this.hash;
+            this.updateFavorite(id, isFavorite, name, parentPath, hash);
+          },
+          icon: "mdi-star"
+        },
+        {
+          title: this.$t("kh.contextmenu.removefavorite"),
+          menuAction: action => {
+             let id=this.id;
+            let isFavorite=this.isFavorite;
+            let name=this.txtNode;
+            let parentPath=this.parentPath;
+            let hash=this.hash;
+            this.updateFavorite(id, isFavorite, name, parentPath, hash);
+          },
+          icon: "mdi-star-off"
+        },
         {
           title: this.$t("kh.contextmenu.delete"),
           menuAction: action => {
@@ -561,7 +585,7 @@ export default {
     /**
      * Hiển thị dialog thêm sửa xóa
      */
-    show(e, path, name, id, parentPath, content, hash) {
+    show(e, path, name, id, parentPath, content, hash,isFavorite) {
       e.preventDefault();
       this.id = id;
       this.path = path;
@@ -569,6 +593,7 @@ export default {
       this.content = content;
       this.txtNode = name;
       this.parentPath = parentPath;
+      this.isFavorite=isFavorite;
       this.showMenu = false;
       this.x = e.clientX;
       this.y = e.clientY;
@@ -656,7 +681,6 @@ export default {
               " </p>"
           );
         });
-
         setTimeout(function() {
           $("#" + id)
             .focus()

@@ -525,7 +525,8 @@
             "download": "Tải xuống",
             "rename": "Đổi tên",
             "delete": "Xóa",
-            "addfavorite": "Thêm vào yêu thích"
+            "addfavorite": "Thêm vào yêu thích",
+            "removefavorite": "Xóa khỏi yêu thích"
         },
         "table": {
             "totalDoc": "Số văn bản"
