@@ -2,6 +2,7 @@
     "common": {
         "id": "Id",
         "select_lang": "Thay đổi ngôn ngữ",
+        "KH": "Knowledge Management",
         "reports": "Báo cáo",
         "workflows": "Quy trình",
         "documents": "Văn bản",
@@ -483,6 +484,53 @@
         "updated": "Đã cập nhật application",
         "added": "Đã thêm mới application",
         "deleted": "Đã xóa application"
+    },
+    "kh": {
+        "folder": " Thư mục ",
+        "document": " Văn bản ",
+        "sidebar": {
+            "add": "Tạo mới",
+            "edit": "Chỉnh sửa",
+            "delete": "Xóa",
+            "add_favorite": "Thêm vào mục yêu thích",
+            "delete_favorite": "Xóa khỏi mục yêu thích",
+            "restore": "Khôi phục",
+            "attach": "Đính kèm file vào ",
+            "rename": "Đổi tên"
+        },
+        "dialog": {
+            "save": "Văn bản chưa được lưu?",
+            "remove": "Bạn sẽ xóa mục này?",
+            "note": "Bạn cần nhấn nút lưu để thực hiện hành động này! ",
+            "restore": "Bạn có chắc muốn khôi phục không?",
+            "titleRestore": "Bạn sẽ khôi phục lại bản version này!",
+            "cancel": "Hủy",
+            "yes": "Xác nhận"
+        },
+        "toolbox": {
+            "save": "Lưu",
+            "attach": "Đính kèm",
+            "toc": "Mục lục",
+            "comment": "Bình luận",
+            "history": "Lịch sử",
+            "backup": "Backup"
+        },
+        "contextmenu": {
+            "add": "Thêm",
+            "move": "Di chuyển",
+            "paste": "Dán",
+            "folder": "Thư mục",
+            "document": "Văn bản",
+            "open": "Mở",
+            "download": "Tải xuống",
+            "rename": "Đổi tên",
+            "delete": "Xóa",
+            "addfavorite": "Thêm vào yêu thích",
+            "removefavorite": "Xóa khỏi yêu thích"
+        },
+        "table": {
+            "totalDoc": "Số văn bản"
+        }
     },
     "actions": {
         "header": {

@@ -9,7 +9,7 @@ import actionPackModule from "./actionPack";
 import comment from "./comment";
 import AppConfig from "./AppConfig";
 import searchModule from './search';
-
+import khModule from "./kh";
 Vue.use(Vuex);
 
 export default new Vuex.Store({
@@ -23,5 +23,6 @@ export default new Vuex.Store({
         comment: comment,
         appConfig: AppConfig,
         search: searchModule,
+        kh: khModule,
     }
 });
