@@ -57,13 +57,11 @@
     margin-right: 0px!important;
 }
 
- 
 .kh-side-bar .favorite .star-favorite {
     color: yellow!important;
     position: absolute;
     right: 0px;
- 
-   margin-right: 0px!important;
+    margin-right: 0px!important;
 }
 
 .kh-treeview .is-star-favorite {
@@ -252,14 +250,15 @@
 
 /* `````````````````` Css Homepage````````````````````````````` */
 
-.image-recentAccess {
+
+/* .image-recentAccess {
     flex-flow: wrap;
     overflow: hidden;
     height: 210px;
     display: flex;
     margin-right: -15px;
     margin-left: -10px;
-}
+} */
 
 .image-recentAccess .preview {
     height: 120px;
@@ -304,7 +303,11 @@
 }
 
 .kh-table {
-    width: 97%;
+    width: 94%;
+}
+
+.kh-sub-table {
+    width: 99%!important;
 }
 
 .kh-table th {

@@ -1,5 +1,9 @@
-<template >
-  <v-navigation-drawer class="khSidebar" v-show="!skh.subCollapseSideBar">
+<template>
+<vue-resizable 
+  :maxWidth=450
+  :width='skh.widthSideBar'
+   >
+  <v-navigation-drawer class="khSidebar resizable-content" v-show="!skh.subCollapseSideBar">
     <div>
       <v-text-field
         v-model="search"
@@ -181,13 +185,16 @@
       </v-card>
     </v-dialog>
   </v-navigation-drawer>
+</vue-resizable>
 </template>
 
 <script>
 import { knowledgeApi } from "./../../api/kh.js";
 import { util } from "./../../plugins/util";
 import { SYMPER_APP } from "./../../main.js";
+import VueResizable from 'vue-resizable';
 export default {
+  components: {VueResizable},
   data() {
     let self = this;
     return {
@@ -911,6 +918,10 @@ export default {
 </script>
 
 <style scoped>
+ .resizable-content {
+        height: 100%;
+        width: 100%;
+    }
 .collapse-sidebar-btn {
   position: absolute;
   bottom: 20px;
@@ -919,7 +930,7 @@ export default {
   width: 30px;
 }
 .khSidebar {
-  width: 300px !important;
+  width:auto !important;
 }
 .khSidebar hr {
   display: none;
