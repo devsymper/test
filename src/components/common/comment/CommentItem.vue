@@ -12,8 +12,7 @@
 				</v-avatar>
 			<div class="comment-item-content">
 				<div style="display:flex;height:16px;width:100%">
-						<span style="color:#00000099">{{item.infor.fullName}}</span>
-						<!-- {{item.infor.fullName}} -->
+						<span style="color:#00000099">Dao Manh Kha</span>
 				</div>
 				<div style="display:flex">
 					<InputComment 
@@ -137,7 +136,7 @@ export default {
 				})
 			});
 		}
-		this.addAvatar()
+		// this.addAvatar()
 	},
 	methods:{
 		addAvatar(){
