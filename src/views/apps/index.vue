@@ -94,17 +94,25 @@ export default {
 								},
 								{name: "status", title: "status", type: "text",
 									renderer:  function(instance, td, row, col, prop, value, cellProperties) {
-										let icon;
+										let span;
 										Handsontable.dom.empty(td);
+										span = document.createElement('span')
 										if(value === "1"){
-											icon = document.createElement('i');
-											icon.classList.add('mdi');
-											icon.classList.add('mdi-check');
-											$(icon).css('color','green')
-											$(icon).css('font-size','16px')
-											td.appendChild(icon);
-											return td;
+											// icon = document.createElement('i');
+											// icon.classList.add('mdi');
+											// icon.classList.add('mdi-check');
+											// $(icon).css('color','green')
+											// $(icon).css('font-size','16px')
+											// td.appendChild(icon);
+											// return td;
+											$(span).text('Kích hoạt')
+											// $(span).text(self.$t('apps.active'))
+										}else{
+												$(span).text('Không kich hoạt')
+												// $(span).text(self.$t('apps.notActive'))
 										}
+										td.appendChild(span);
+										return td
 									},
 								},
                                 {name: "createdAt", title: "created_at", type: "text"},
@@ -150,7 +158,7 @@ export default {
 				],
 				orgchart:[
 				],
-				dasboard:[
+				dashboard:[
 				],
 				workflow_definition:[
 				]
@@ -247,9 +255,9 @@ export default {
 					self.arrType.document_definition.push(e.id)
 				});
 			}
-			if(data.hasOwnProperty('dasboard')){
-				data.dasboard.forEach(function(e){
-					self.arrType.dasboard.push(e.id)
+			if(data.hasOwnProperty('dashboard')){
+				data.dashboard.forEach(function(e){
+					self.arrType.dashboard.push(e.id)
 				});
 			}
 			if(data.hasOwnProperty('workflow_definition')){
@@ -272,7 +280,7 @@ export default {
 								}
 				]}).then(resOrg => {
 					console.log(resOrg.data.listObject);
-					this.$store.commit('appConfig/updateChildrenApps',{obj:resOrg.data.listObject,type:'orgcharts'});
+					this.$store.commit('appConfig/updateChildrenApps',{obj:resOrg.data.listObject,type:'orgchart'});
 				});
 			}
 			if(self.arrType.document_definition.length > 0){
@@ -292,7 +300,7 @@ export default {
 								]
 							}
 						).then(resDoc => {
-							this.$store.commit('appConfig/updateChildrenApps',{obj:resDoc.data.listObject,type:'documents'});
+							this.$store.commit('appConfig/updateChildrenApps',{obj:resDoc.data.listObject,type:'document_definition'});
 						});
 			}
 			if(self.arrType.workflow_definition.length > 0){
@@ -309,11 +317,11 @@ export default {
 											}
 										}
 						]}).then(resW => {
-							this.$store.commit('appConfig/updateChildrenApps',{obj:resW.data.listObject,type:'workflows'});
+							this.$store.commit('appConfig/updateChildrenApps',{obj:resW.data.listObject,type:'workflow_definition'});
 						});
 			}
-			if(self.arrType.dasboard.length > 0){
-				let dataRep = self.arrType.dasboard;
+			if(self.arrType.dashboard.length > 0){
+				let dataRep = self.arrType.dashboard;
 				dashboardApi.getDashboards({
 								search:'',
 								pageSize:50,
@@ -326,13 +334,13 @@ export default {
 									}
 								}
 				]}).then(resRp => {
-					this.$store.commit('appConfig/updateChildrenApps',{obj:resRp.data.listObject,type:'reports'});
+					this.$store.commit('appConfig/updateChildrenApps',{obj:resRp.data.listObject,type:'dashboard'});
 				});
 			}
 			self.arrType.orgchart = []
 			self.arrType.document_definition = []
 			self.arrType.workflow_definition = []
-			self.arrType.dasboard = []
+			self.arrType.dashboard = []
 		}
     },
 };

@@ -13,7 +13,7 @@
 				<ul class="app-child-item" v-for="(childItem,i) in itemT.item" :key="i" @click="clickItem(childItem,itemT.name)">
 					<li>
 						<div style="position:relative">
-							<v-tooltip bottom v-if="itemT.name == 'documents'">
+							<v-tooltip bottom v-if="itemT.name == 'document_definition'">
 								<template v-slot:activator="{ on, attrs }">
 								<div class="title-document" 	
 									v-bind="attrs"
@@ -27,8 +27,8 @@
 							</v-tooltip>
 							<div v-else>{{childItem.name}}</div>
 							<v-icon  v-if="sAppManagement[itemT.name].item.includes(childItem)" style="position:absolute;top:0px;right:0px">mdi-check</v-icon> 
+								<!-- v-if=""  sAppManagement.listItemSelected[itemT.name].item.includes(childItem)-->
 						</div>						
-							
 					</li>
 				</ul>
 			</div>
@@ -41,39 +41,42 @@ import {documentApi} from './../../api/Document';
 import {orgchartApi} from './../../api/orgchart';
 import {dashboardApi} from './../../api/dashboard';
 import BpmnEngine from './../../api/BPMNEngine';
+import { debounce } from "debounce";
+var delayTimer;
+let self =  this;
 export default {
 	 data: function() {
         return {
 			myValue: '',
 			menuItemsHeight: '450px',
             listItems:{
-			   documents:{
+			   document_definition:{
 				   icon : 'mdi-file-edit-outline',
 				   title: this.$t('apps.listType.documents'),
-				   name:  'documents',
+				   name:  'document_definition',
 				   item:[
 
 				   ]
 			   },
-			   orgcharts:{
+			   orgchart:{
  				   icon : 'mdi-widgets-outline',
 				   title: this.$t('apps.listType.orgcharts'),
-				   name: 'orgcharts',
+				   name: 'orgchart',
 				   item:[
 				   ]
 			   },
-			   reports:{
+			   dashboard:{
 				   icon : 'mdi-view-dashboard',
 				   title: this.$t('apps.listType.reports'),
-				   name: 'reports',
+				   name: 'dashboard',
 				   item:[
 				   ]
 			   },
-			   workflows:
+			   workflow_definition:
 			   {
 			       icon : 'mdi-lan',
 				   title:  this.$t('apps.listType.workflows'),
-				   name: 'workflows',
+				   name: 'workflow_definition',
 				   item:[
 				   ]
 			   },
@@ -93,32 +96,61 @@ export default {
 	},
 	methods:{
 		clickItem(obj,type){
-			console.log(obj,'objjjj');
-			console.log(type,'typeeeeee');
+			obj.active = !obj.active
 			this.$store.commit('appConfig/updateListItemSelected',{obj:obj,type:type});
 		},
+		doSearch(val,time) {
+			clearTimeout(delayTimer);
+			let self = this;
+			delayTimer = setTimeout(function() {
+				self.getListSearch(val)
+			}, time); 
+		},
+		checkChildrenItem(resData,storeData){
+			if(resData.length > 0){
+				resData.forEach(function(e){
+					if(storeData.length > 0){
+						storeData.forEach(function(f){
+							if(e.id === f.id){
+								e.active = true
+							}else{
+								e.active = false
+							}
+						})
+					}else{
+						e.active = false
+					}
+				})
+			}
+			return resData	
+		},
 		getListSearch(value){
-			this.listItems.documents.item =[]
-			this.listItems.orgcharts.item =[]
-			this.listItems.workflows.item =[]
-			this.listItems.reports.item =[]
+			let self = this
+			this.listItems.document_definition.item = []
+			this.listItems.orgchart.item = []
+			this.listItems.workflow_definition.item = []
+			this.listItems.dashboard.item = []
 			orgchartApi.getOrgchartList({search:value,pageSize:50}).then(res => {
-				this.listItems.orgcharts.item = res.data.listObject;
+				this.checkChildrenItem(res.data.listObject,self.sAppManagement.orgchart.item)
+				this.listItems.orgchart.item = res.data.listObject;
 			});
 			documentApi.searchListDocuments({search:value,pageSize:50}).then(res => {
-				this.listItems.documents.item = res.data.listObject;
+				this.checkChildrenItem(res.data.listObject,self.sAppManagement.document_definition.item)
+				this.listItems.document_definition.item = res.data.listObject;
 			});
 			BpmnEngine.getListModels({search:value,pageSize:50}).then(res => {
-				this.listItems.workflows.item = res.data.listObject;
+				this.checkChildrenItem(res.data.listObject,self.sAppManagement.workflow_definition.item)
+				this.listItems.workflow_definition.item = res.data.listObject;
 			});
 			dashboardApi.getDashboards({search:value,pageSize:50}).then(res => {
-				this.listItems.reports.item = res.data.listObject;
+				this.checkChildrenItem(res.data.listObject,self.sAppManagement.dashboard.item)
+				this.listItems.dashboard.item = res.data.listObject;
 			});
 		},
 	},
 	 watch: {
         'myValue': function(val){
-			this.getListSearch(val);
+			this.doSearch(val,500)
 	    }
 	}
 }
@@ -151,14 +183,13 @@ export default {
 	display: flex;
 	cursor: pointer;
 	padding:10px 0px;
-	
 }
 .search-modal >>> .app-item .title-app .v-icon{
 	font-size: 13px;
 }
 .search-modal >>> .app-item .title-app h4{
 	padding-left:10px;
-	font-weight: unset;
+	font-weight: 500;
 }
 .search-modal >>> .app-item .app-child-item .v-icon{
 	font-size:13px;
@@ -182,8 +213,4 @@ export default {
 	background-color:#f7f7f7;
 	border-radius: 5px;
 }
-/* .search-modal >>> {
-	background-color:#f7f7f7;
-	border-radius: 5px;
-} */
 </style>

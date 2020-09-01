@@ -474,7 +474,8 @@
         "search": "Tìm kiếm",
         "favorite": "Yêu thích",
         "listApp": "Danh sách ứng dụng",
-
+        "active": "Kích hoạt",
+        "notActive": "Không kích hoạt",
         "objectSummary": "Tổng hợp các chức năng",
         "contextMenu": {
             "edit": "Sửa",

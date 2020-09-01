@@ -22,7 +22,7 @@
 						<div class="title-favorite"><v-icon >mdi-playlist-star</v-icon><h4>{{$t('apps.favorite')}}</h4></div>
 						<ul style="margin:0 10px;">
 							<VuePerfectScrollbar style="max-height:200px"  >
-								<li v-for="(item,i) in listFavorite" :key="i" v-on:contextmenu="rightClickHandler($event,item,item.type)" style="cursor:pointer"> 
+								<li v-for="(item,i) in sFavorite" :key="i" v-on:contextmenu="rightClickHandler($event,item,item.type)" style="cursor:pointer"> 
 									<div style="position:relative">
 										<div v-if="item.hasOwnProperty('title')" class="title-item-favorite">{{item.title}}</div>
 										<div v-else  class="title-item-favorite">{{item.name}}</div> 
@@ -103,7 +103,7 @@ export default {
 		 arrType:{
 			 document_definition:[],
 			 orgchart:[],
-			 dasboard:[],
+			 dashboard:[],
 			 workflow_definition:[],
 		 },
 		 title:{
@@ -113,7 +113,7 @@ export default {
 			 },
 			 document_definition:{
 			 },
-			 dasboard:{
+			 dashboard:{
 			 },
 			 workflow_definition:{
 			 }
@@ -123,7 +123,7 @@ export default {
 			 },
 			 document_definition:{
 			 },
-			 dasboard:{
+			 dashboard:{
 			 },
 			 workflow_definition:{
 			 }
@@ -159,6 +159,9 @@ export default {
 	computed:{
 		sAppManagement(){
 			return this.$store.state.appConfig.listItemSelected
+		},
+		sFavorite(){
+			return this.$store.state.appConfig.listFavorite
 		}
 	},
 	methods:{
@@ -175,11 +178,8 @@ export default {
 			let self = this 
 			let userId = this.$store.state.app.endUserInfo.id
 			appManagementApi.getItemFavorite(userId).then(res =>{
-				debugger
 				if (res.status == 200) {
-					// this.testListFavorite = res.data.listObject
 					res.data.listObject.forEach(function(e){
-						// self.mapIdFavorite[e.objectIdentifier] = e
 						if(e.objectType == 'document_definition'){
 							self.mapIdFavorite.document_definition[e.objectIdentifier] = e
 						}  
@@ -189,22 +189,25 @@ export default {
 						if(e.objectType == 'workflow_definition'){
 							self.mapIdFavorite.workflow_definition[e.objectIdentifier] = e
 						}  
-						if(e.objectType == 'dasboard'){
-							self.mapIdFavorite.dasboard[e.objectIdentifier] = e
+						if(e.objectType == 'dashboard'){
+							self.mapIdFavorite.dashboard[e.objectIdentifier] = e
 						}  
 					})
 					this.checkTypeFavorite(res.data.listObject)
+					this.$store.commit('appConfig/updateListFavorite',this.listFavorite)
 				}
 			}).catch((err) => {
 			});
 		},
 		clickDetails(item){
+			this.$store.commit('appConfig/emptyItemSelected')
 			this.title.iconName = item.iconName;
 			this.title.iconType = item.iconType;
 			this.title.name = item.name;
 			appManagementApi.getAppDetails(item.id).then(res => {
 				if (res.status == 200) {
 					if(Object.keys(res.data.listObject.childrenApp).length > 0){
+						debugger
 						this.checkChildrenApp(res.data.listObject.childrenApp)
 					}else{
 						this.$store.commit('appConfig/emptyItemSelected')
@@ -232,14 +235,15 @@ export default {
 					}
 				).then(resDoc => {
 					if(type == "listFavorite"){
-						this.updateActionItem(self.mapIdFavorite.document_definition,resDoc.data.listObject,'documents')
+						this.updateActionItem(self.mapIdFavorite.document_definition,resDoc.data.listObject,'document_definition')
 						resDoc.data.listObject.forEach(function(e){
 							self.listFavorite.push(e)
 						})
 					}
 					else{
+						debugger
 						this.updateFavoriteItem(self.mapId.document_definition,resDoc.data.listObject)
-						this.$store.commit('appConfig/updateChildrenApps',{obj:resDoc.data.listObject,type:'documents'});
+						this.$store.commit('appConfig/updateChildrenApps',{obj:resDoc.data.listObject,type:'document_definition'});
 					}
 				});
 		},
@@ -259,15 +263,16 @@ export default {
 				]}).then(resOrg => {
 					if(type == 'listFavorite'){
 						if(resOrg.data.listObject.length > 0){
-							this.updateActionItem(self.mapIdFavorite.orgchart,resOrg.data.listObject,'orgcharts')
+							this.updateActionItem(self.mapIdFavorite.orgchart,resOrg.data.listObject,'orgchart')
 							resOrg.data.listObject.forEach(function(e){
 								self.listFavorite.push(e)
 							})
 						}
 					}
 					else{
+						debugger
 						this.updateFavoriteItem(self.mapId.orgchart,resOrg.data.listObject)
-						this.$store.commit('appConfig/updateChildrenApps',{obj:resOrg.data.listObject,type:'orgcharts'});
+						this.$store.commit('appConfig/updateChildrenApps',{obj:resOrg.data.listObject,type:'orgchart'});
 					}
 				});
 		},
@@ -287,15 +292,16 @@ export default {
 				]}).then(resRp => {
 					if(type == 'listFavorite'){
 						if(resRp.data.listObject.length > 0){
-							this.updateActionItem(self.mapIdFavorite.dasboard,resRp.data.listObject,'reports')
+							this.updateActionItem(self.mapIdFavorite.dashboard,resRp.data.listObject,'dashboard')
 							resRp.data.listObject.forEach(function(e){
 								self.listFavorite.push(e)
 							})
 						}
 					}
 					else{
-						this.updateFavoriteItem(self.mapId.dasboard,resRp.data.listObject)
-						this.$store.commit('appConfig/updateChildrenApps',{obj:resRp.data.listObject,type:'reports'});
+						this.updateFavoriteItem(self.mapId.dashboard,resRp.data.listObject)
+						debugger
+						this.$store.commit('appConfig/updateChildrenApps',{obj:resRp.data.listObject,type:'dashboard'});
 					}
 				});
 		},
@@ -315,15 +321,16 @@ export default {
 				]}).then(resW => {
 					if(type == 'listFavorite'){
 						if(resW.data.listObject.length > 0){
-							this.updateActionItem(self.mapIdFavorite.workflow_definition,resW.data.listObject,'workflows')
+							this.updateActionItem(self.mapIdFavorite.workflow_definition,resW.data.listObject,'workflow_definition')
 							resW.data.listObject.forEach(function(e){
 								self.listFavorite.push(e)
 							})
 						}
 					}
 					else{
+						debugger
 						this.updateFavoriteItem(self.mapId.workflow_definition,resW.data.listObject)
-						this.$store.commit('appConfig/updateChildrenApps',{obj:resW.data.listObject,type:'workflows'});
+						this.$store.commit('appConfig/updateChildrenApps',{obj:resW.data.listObject,type:'workflow_definition'});
 					}
 				});
 		},
@@ -331,7 +338,7 @@ export default {
 			let self = this
 			self.arrType.document_definition = []
 			self.arrType.orgchart = []
-			self.arrType.dasboard = []
+			self.arrType.dashboard = []
 			self.arrType.workflow_definition = []
 			data.forEach(function(e){
 				if(e.objectType == 'document_definition'){
@@ -340,8 +347,8 @@ export default {
 				if(e.objectType == 'orgchart'){
 					self.arrType.orgchart.push(e.objectIdentifier)
 				}
-				if(e.objectType == 'dasboard'){
-					self.arrType.dasboard.push(e.objectIdentifier)
+				if(e.objectType == 'dashboard'){
+					self.arrType.dashboard.push(e.objectIdentifier)
 				}
 				if(e.objectType == 'workflow_definition'){
 					self.arrType.workflow_definition.push(e.objectIdentifier)
@@ -355,8 +362,8 @@ export default {
 				let dataOrg = self.arrType.orgchart
 				this.getOrgchartApi(dataOrg,'listFavorite')
 			}
-			if(self.arrType.dasboard.length > 0){
-				let dataRep = self.arrType.dasboard
+			if(self.arrType.dashboard.length > 0){
+				let dataRep = self.arrType.dashboard
 				this.getDashBoardApi(dataRep,'listFavorite')
 			}
 			if(self.arrType.workflow_definition.length > 0){
@@ -367,7 +374,7 @@ export default {
 		clickBack(){
 			this.tab = 'tab-1'
 			this.getActiveapps()
-			this.getFavorite()
+			// this.getFavorite()
 		},
 		updateFavoriteItem(mapArray,array){
 			for( let [key,value] of Object.entries(mapArray)){
@@ -404,7 +411,7 @@ export default {
 			let self = this 
 			self.arrType.orgchart = []
 			self.arrType.document_definition = []
-			self.arrType.dasboard = []
+			self.arrType.dashboard = []
 			self.arrType.workflow_definition = []
 			if(data.hasOwnProperty('orgchart')){
 				data.orgchart.forEach(function(e){
@@ -423,19 +430,19 @@ export default {
 				this.getDocumentsApi(dataDoc);
 			}
 			if(data.hasOwnProperty('workflow_definition')){
-				data.workflow.forEach(function(e){
+				data.workflow_definition.forEach(function(e){
 					self.arrType.workflow_definition.push(e.id);
 					self.mapId.workflow_definition[e.id] = e;
 				})
 				let dataW = self.arrType.workflow_definition
 				this.getWorkFlowApi(dataW)
 			}
-			if(data.hasOwnProperty('dasboard')){
-				data.dasboard.forEach(function(e){
-					self.arrType.dasboard.push(e.id);
-					self.mapId.dasboard[e.id] = e;
+			if(data.hasOwnProperty('dashboard')){
+				data.dashboard.forEach(function(e){
+					self.arrType.dashboard.push(e.id);
+					self.mapId.dashboard[e.id] = e;
 				})
-				let dataRep = self.arrType.dasboard
+				let dataRep = self.arrType.dashboard
 				this.getDashBoardApi(dataRep);
 			}
 		},

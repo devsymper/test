@@ -470,7 +470,9 @@
             "edit": "Edit",
             "grantPermission": "Grant permission",
             "remove": "Delete"
-        },
+		},
+		"active": "Active",
+		"notActive": "Not active",
         "updated": "Permission package updated",
         "added": "Permission package created",
         "deleted": "Permission package deleted",

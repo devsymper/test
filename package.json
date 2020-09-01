@@ -26,6 +26,7 @@
         "bpmn-moddle": "^6.0.5",
         "core-js": "^3.6.4",
         "dayjs": "^1.8.34",
+        "debounce": "^1.2.0",
         "firebase": "^7.13.2",
         "handsontable": "^7.4.2",
         "html2canvas": "^1.0.0-rc.5",
