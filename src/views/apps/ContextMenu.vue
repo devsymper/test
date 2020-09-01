@@ -1,7 +1,7 @@
 <template>
    <v-card class="context-menu" v-show="isShowContext" :style="{top:top+'px',left:left+'px'}">
 		<div class="item" v-for="(action,i) in listAction" :key="i" @click="clickAction(action)">
-				{{action}}
+				<span v-html="reduce(action)"></span>
 				<!-- {{$t('apps.listActions')}} -->
 		</div>
    </v-card>
@@ -83,7 +83,18 @@ export default {
 				this.targetItem.id = this.targetItem.objectIdentifier.replace("workflow_definition:","")
 			}
 			let targetItem = this.targetItem
+			debugger
 			this.$evtBus.$emit('symper-app-call-action-handler', this.defineAction[this.type], this, {id:targetItem.id,name:targetItem.name,title:''});
+		},
+		reduce(action){
+
+			let str = this.type.concat('.').concat(action)
+			let nameIcon = this.$t('actions.iconListActions.'+str)
+			let icon =	` <i class="mdi ${nameIcon}" style="padding-right:5px"></i>`
+			let name = this.$t('actions.listActions.'+str)
+			let res = icon.concat(name)
+			return res
+			
 		}
 	}
 }
