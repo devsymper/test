@@ -13,14 +13,13 @@
             </template>
             <template v-else>
                 <v-list-item @mouseleave="hideDotButton(searchItems.indexOf(item))" 
-                 @mousemove="showDotButton(searchItems.indexOf(item))" style="margin-top:-10px; margin-bottom:-10px" class="pl-7" :attrs="attrs">
-                    <v-list-item-avatar 
-                        class="item-avatar" style="width:29px!important; height:30px!important" 
-                        v-if="item.type === 'user'">
-                        <img :src="item.avatar || require('@/assets/image/avatar_default.jpg')">
-                    </v-list-item-avatar>
+                 @mousemove="showDotButton(searchItems.indexOf(item))" style="margin-top:-10px; margin-bottom:-10px" class="pl-7 search-menu" :attrs="attrs">
+                    <!-- <v-list-item-avatar  v-if="item.type === 'user'" -->
+                        <SymperAvatar v-if="item.type === 'user'" style ="height: 30px!important; width: 32px!important" :userId="item.userId"/>
+                    <!-- </v-list-item-avatar> -->
+                  
                     <v-list-item-content style="margin-left:-10px">
-                        <v-list-item-title v-if="item.type!= 'document_definition'"
+                        <v-list-item-title v-if="item.type!= 'document_definition'&&item.type!='workflow_definition'"
                             :style="{'margin-left': item.type === 'user' ? '0' : '0.5rem'}" 
                             class="item-title" v-html="item.displayName">
                         </v-list-item-title>
@@ -30,7 +29,7 @@
                             <span v-if="item.searchField!=undefined" v-html="item.searchField"></span>
                             <span v-else v-html="item.displayName"></span>
                         </v-list-item-title>
-                        <v-list-item-subtitle v-if="item.type!= 'document_definition'"
+                        <v-list-item-subtitle v-if="item.type!= 'document_definition'&&item.type!='workflow_definition'"
                             :style="{'margin-left': item.type === 'user' ? '0' : '0.5rem'}"
                             class="item-subtitle mt-1" v-html="item.searchField">
                         </v-list-item-subtitle>
@@ -65,8 +64,12 @@
 </template>
 <script>
 import _ from 'lodash';
+import SymperAvatar from '../../components/common/SymperAvatar'
 import searchApi from "../../api/search.js";
 export default {
+    components:{
+        SymperAvatar
+    },
      data: function () {
         return {
             value: '',
@@ -236,6 +239,8 @@ export default {
                                 }
                                 if(data.type=== 'user'){
                                     returnObjSearch.displayName = data.displayName? data.displayName:"Không có tên";
+                                    debugger
+                                    returnObjSearch.userId = data.id;
                                 }else if(data.type=='document_definition'){
                                      returnObjSearch.displayName = data.title?data.title:"Không có tên";
                                 }else if(data.type=='syql'){
@@ -382,14 +387,18 @@ export default {
 .auto-complete ::v-deep .v-select__slot{
     font-size:13px;
 }
-
 .auto-complete >>> .v-autocomplete__content{
     max-width: 330px!important;
     top: 40px!important;
     z-index:108;
     min-height: 100px!important;
-    background-color:white;
-    
-  
+    background-color:white
+}
+.search-menu ::v-deep .symper-avatar-image{
+    height:30px!important;
+}
+
+.v-list-item:hover{
+      background:rgba(0,0,0,0.05);
 }
 </style>

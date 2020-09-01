@@ -117,13 +117,11 @@
                            <v-icon> mdi mdi-chevron-left</v-icon>
                         </div>
                     </template>
-                    <v-slide-item 
+                    <v-slide-item class="item-user"
                         v-for="(item, newSearchAllIdx) in  newSearchAll.filter(x => x.type== 'user' ).slice(0, 10)"  
                         :key="newSearchAllIdx">
                         <div class="d-flex justify-start ml-3 mr-3 slider-user ">
-                            <v-list-item-avatar class="item-avatar ml-3">
-                                <img :src="item.avatar || require('@/assets/image/avatar_default.jpg')">
-                            </v-list-item-avatar>
+                             <SymperAvatar style ="height: 30px!important; width: 32px!important" :userId="item.userId"/>
                             <v-list-item-content>
                                 <v-list-item-title style="margin-left: 0.5" class="item-title fs-13 fm" v-html="item.displayName">
                                 </v-list-item-title>
@@ -228,9 +226,7 @@
                 v-for="(item, newSearchAllIdx) in newSearchAll.filter(x => x.type== 'user' )"
                 :key="newSearchAllIdx">
                 <div class="d-flex justify-start mr-3 " style="width: 100%!important; border:1px solid rgba(0,0,0,0.2">
-                    <v-list-item-avatar class="item-avatar ml-3">
-                        <img :src="item.avatar || require('@/assets/image/avatar_default.jpg')">
-                    </v-list-item-avatar>
+                    <SymperAvatar v-if="item.type === 'user'" style ="height: 30px!important; width: 32px!important" :userId="item.userId"/>
                     <v-list-item-content>
                         <v-list-item-title style="margin-left: 0.5" class="item-title fs-13 fm" v-html="item.displayName">
                         </v-list-item-title>
@@ -270,7 +266,11 @@
 </div>
 </template>
 <script>
+import SymperAvatar from '../../components/common/SymperAvatar'
 export default {
+     components:{
+        SymperAvatar
+    },
      computed: {
         newSearch() {
             return this.$store.state.search.newSearch;
@@ -529,7 +529,14 @@ export default {
 }
 .slider-user{
      width: 250px!important; 
-     border:1px solid rgba(0,0,0,0.2)
+     border:1px solid rgba(0,0,0,0.2);
+
+}
+.item-user ::v-deep .v-avatar{
+    margin:8px!important;
+    height: 40px!important;
+    min-width: 35px;
+    width: 40px!important;
 }
 .general ::v-deep .v-slide-group__prev{
     margin-right:-35px!important;
