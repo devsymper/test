@@ -5,18 +5,24 @@
         <h2 style="width:95%" v-if="type!='document_backup'">{{name+'.'+type}}</h2>
         <h2 style="width:95%" v-else>{{name}}</h2>
         <v-icon
-          class="btn-save-handson mr-1 fs-16"
-          v-if="skh.statusEdit==false"
-          @click.stop="saveData"
-        >mdi-content-save</v-icon>
+          v-if="type!='document_backup'"
+          class="fs-17 btn-download"
+          @click.stop="downloadFile"
+        >mdi-download</v-icon>
+        <v-icon
+          v-else
+          class="fs-17 btn-restore"
+          @click.stop="downloadFile"
+        >mdi-backup-restore</v-icon>
         <v-icon
           class="btn-closes-handson fs-17"
-          style="margin-left: 40px;"
+          style="margin-left: 5px;"
           @click="invertStatusShowImage"
         >mdi-close</v-icon>
       </div>
 
       <div v-if="type==='jpg' ||type==='png' ||type==='jpeg'">
+        <hr>
         <img class="image-modal" :src="serverPath" alt />
       </div>
 
@@ -26,11 +32,9 @@
           :src="`https://docs.google.com/gview?url=${serverPath}&embedded=true`"
         ></iframe>
       </div>
-
       <div class="div-show-content" v-if="type==='txt'">
         <iframe class="show-content" :src="serverPath"></iframe>
       </div>
-
       <div class="div-show-content" v-if="type==='document_backup'">
         <div class="show-content"  v-html="docContent"></div>
       </div>
@@ -41,6 +45,14 @@
 <script>
 export default {
   props: {
+    id: {
+      type: String,
+      default: ''
+    },
+    fileId: {
+      type: String,
+      default: -1
+    },
     name: {
       type: String,
       default: "Image"
@@ -60,11 +72,24 @@ export default {
   },
   data() {
     return {
-      // src: "https://file.symper.vn/readFile/"
     };
   },
   methods: {
     invertStatusShowImage() {
+      this.$store.commit("kh/changeStatusShowImage", !this.skh.statusShowImage);
+    },
+    downloadFile(){
+      if (this.type!='document_backup') {
+        let data={};
+        data.fileId=this.fileId;
+        data.type=this.type;
+			  this.$emit("downloadOrBackupFile", data);
+      }else if(this.type=='document_backup'){
+        let data={};
+        data.id=this.id;
+        data.type=this.type;
+			  this.$emit("downloadOrBackupFile", data);
+      }
       this.$store.commit("kh/changeStatusShowImage", !this.skh.statusShowImage);
     }
   },
@@ -73,11 +98,6 @@ export default {
       var modal = document.getElementById("modalImage");
       if (newVl == true) {
         modal.style.display = "block";
-        setTimeout(() => {
-          //   let size = this.skh.arrSizeTable;
-          //   this.configTable(size);
-        }, 100);
-        //document.getElementById("hot-display-license-info").style.display = "none";
       } else {
         modal.style.display = "none";
       }
@@ -154,5 +174,15 @@ export default {
 }
 #modalImage {
   padding-top: 40px !important;
+}
+.btn-download{
+  width: 24px!important;
+  margin-top:4px ;
+}
+.btn-restore{
+  width: 26px!important;
+  height: 26px!important;
+  margin-top:5px ;
+  margin-right:0px ;
 }
 </style>

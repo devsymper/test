@@ -39,7 +39,7 @@ export default {
         type: "post",
         success: function(res) {
           let resObj = JSON.parse(res);
-			thisCpn.$emit("uploaded-file", resObj);
+			    thisCpn.$emit("uploaded-file", resObj);
         }
       });
     }

@@ -235,7 +235,7 @@
       </v-list>
     </v-menu>
 
-    <KHShowImage v-bind:name="name" v-bind:serverPath="serverPath" v-bind:type="type" v-bind:docContent="docContent" />
+    <KHShowImage @downloadOrBackupFile="downloadOrBackupFile" v-bind:id="id" v-bind:fileId="fileId" v-bind:name="name" v-bind:serverPath="serverPath" v-bind:type="type" v-bind:docContent="docContent" />
   </div>
 </template>
 
@@ -252,7 +252,7 @@ export default {
   },
   data() {
     return {
-      fileId: 0,
+      fileId: '',
       serverPath: "",
       name: "",
       type: "",
@@ -265,7 +265,7 @@ export default {
       dialogAlert: false,
       context_menu_backup:false,
       history_active: 1,
-      id: -1,
+      id: '',
       docVersionID: 0,
       hash: "",
       items_attach: [
@@ -374,6 +374,13 @@ export default {
           .always(() => {});
       } else {
         SYMPER_APP.$snotifyError(error, dataObj.message);
+      }
+    },
+    downloadOrBackupFile(data){
+      if (data.type=='document_backup') {
+        this.backupDocument(data.id);
+      }else{
+        alert("Await API dowload file");
       }
     },
     /**
