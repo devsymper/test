@@ -57,6 +57,15 @@
     margin-right: 0px!important;
 }
 
+ 
+.kh-side-bar .favorite .star-favorite {
+    color: yellow!important;
+    position: absolute;
+    right: 0px;
+ 
+   margin-right: 0px!important;
+}
+
 .kh-treeview .is-star-favorite {
     color: yellow!important;
     position: absolute;
@@ -339,21 +348,6 @@
     display: flex;
 }
 
-
-/* .kh-editor #handson-table .handsontable .wtHolder .wtHider .htCore colgroup col {
-    width: auto!important;
-} */
-
-
-/* .kh-editor #myeditablediv #mceResizeHandlenw {
-    left: unset!important;
-} */
-
-
-/* .kh-editor #myeditablediv #mceResizeHandlesw {
-    left: unset!important;
-} */
-
 .kh-editor #myeditablediv {
     min-height: 100px!important;
 }
@@ -373,6 +367,25 @@
 
 .tableHandson:hover {
     border: 2px solid red;
+}
+
+.kh-editor-view .mceTable table,
+.kh-editor-view .mceTable table th,
+.kh-editor-view .mceTable table td {
+    border: 1px solid #bebebe!important;
+    border-collapse: collapse!important;
+}
+
+.kh-editor-view .mceTable {
+    width: 1000px;
+    display: flex;
+}
+
+.show-content .mceTable table,
+.show-content .mceTable table th,
+.show-content .mceTable table td {
+    border: 1px solid #bebebe!important;
+    border-collapse: collapse!important;
 }
 
 

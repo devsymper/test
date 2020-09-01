@@ -2,7 +2,7 @@
   <div class="w-100">
     <v-skeleton-loader v-if="loading" class="mx-auto" width="100%" height="100%" type="table"></v-skeleton-loader>
     <k-h-header />
-    <div v-show="skh.statusEdit" class="kh-editor-view" v-html="content"></div>
+    <div v-show="skh.statusEdit" class="kh-editor-view"  v-html="content"></div>
     <div v-show="!skh.statusEdit" class="kh-editor" ref="printMe">
       <editor
         id="myeditablediv"
@@ -174,7 +174,7 @@ export default {
             content += `</tr>`;
           }
           content += `</table></div>`;
-          $("#" + idTable).replaceWith(content);
+          $('.kh-editor').find( "#" + idTable).replaceWith(content);
           this.$store.commit("kh/setIdTable", "");
         } else {
           var uuid = this.create_UUID();
@@ -278,6 +278,7 @@ export default {
   mounted() {
     let self = this;
     $(".kh-editor").on("dblclick", "table", function(event) {
+      console.log($(this));
       var p = $(this);
       var idTable = p.attr("id");
       self.$store.commit("kh/setIdTable", idTable);
@@ -304,7 +305,7 @@ export default {
     $(".kh-editor").on("click", "table", function(event) {
       var p = $(this);
       var position=p.position();
-      console.log(p.width());
+      console.log(position);
       document.getElementById("mceResizeHandlenw").style.left =position.left;
       document.getElementById("mceResizeHandlene").style.left = p.width();
     });
@@ -329,9 +330,5 @@ export default {
   overflow: auto;
   padding: 8px;
 }
-.kh-editor-view table{
-  border: 1px solid #bebebe;
-  border-collapse: collapse;
-    
-}
+
 </style>
