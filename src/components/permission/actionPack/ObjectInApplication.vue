@@ -38,6 +38,7 @@ let defaultTabConfig = {
 };
 import { appManagementApi } from '../../../api/AppManagement';
 import { HotTable, HotColumn } from "@handsontable/vue";
+import { util } from 'jointjs';
 
 export default {
     data(){
@@ -112,9 +113,11 @@ export default {
             }
         },
         tableSettings() {
-            return {
+            let setting = util.cloneDeep({
                 ...this.commonTableSetting,
-            }
+            });
+            // setting.
+            return setting;
         }
     },
     props: {

@@ -86,6 +86,7 @@
                         :settings="tableSettings"
                         :data="data"
                         :rowHeights="21"
+                        :renderAllRows="true"
                         :columns="tableColumns"
                         :contextMenu="hotTableContextMenuItems"
                         :colHeaders="colHeaders"
@@ -271,6 +272,7 @@ export default {
                 filters: true,
                 manualColumnMove: true,
                 manualColumnResize: true,
+                renderAllRows: true,
                 manualRowResize: true,
                 rowHeights: 21,
                 stretchH: "all",

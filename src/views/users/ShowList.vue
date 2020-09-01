@@ -3,11 +3,12 @@
         ref="listUser"
         @after-open-add-panel="addUser"
 
-
+        :headerPrefixKeypath="'user'"
         :useDefaultContext="false"
         :pageTitle="$t('user.title')"
         :tableContextMenu="tableContextMenu"
         :containerHeight="containerHeight"
+        :customAPIResult="customAPIResult"
         :getDataUrl="getListUrl+'users?page=1&pageSize=50'"
         :actionPanelWidth="actionPanelWidth"
         :commonActionProps="commonActionProps"
@@ -39,6 +40,15 @@ export default {
     },
     data(){
         return {
+            customAPIResult: {
+                reformatData(res){
+                    let data = res.data;
+                    for(let col of data.columns){
+                        col.title = col.title.replace('user.','');
+                    }
+                    return data;
+                } 
+            },
             commonActionProps: {
                 "module": "account",
                 "resource": "account",

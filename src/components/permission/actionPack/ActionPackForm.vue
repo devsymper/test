@@ -79,6 +79,11 @@ let defaultTabConfig = {
     dataSchema: []
 };
 
+const actionForObjectType = {
+    create: true,
+    list: true
+};
+
 export default {
     mounted(){
         this.reCaculateTableHeight();
@@ -430,13 +435,15 @@ export default {
             for(let objectType in this.itemData.mapActionForAllObjects){
                 let dataTable = this.itemData.mapActionForAllObjects[objectType];
                 let row = dataTable[0];
+
                 if(allResource.hasOwnProperty(objectType)){
                     for(let actionName in row){
+                        let objectIdentifier = actionForObjectType[actionName] ? objectType : (objectType+':0');
                         if(row[actionName]){
                             newOperations.push({
                                 objectType: objectType,
                                 action: actionName,
-                                objectIdentifier: objectType+':0',
+                                objectIdentifier: objectIdentifier,
                                 name: actionName.replace(/_/g, ' ') + ' '+ objectType.replace(/_/g, ' ')
                             });
                         }
@@ -613,9 +620,8 @@ export default {
                     }
                     setTimeout(function() {
                         htIst.selectCell(lastIndex, htIst.propToCol(changes[0][1]));
-                        self.itemData.mapActionAndObjects[self.itemData.objectType] = htIst.getSourceData();
+                        self.itemData.mapActionAndObjects[self.allInputs.objectType.value] = htIst.getSourceData();
                     }, 0);
-
                 },
                 afterSelectionEnd(rowNum	, column, row2 , column2 , preventScrolling, selectionLayerLevel){
                     let objectType = self.allInputs.objectType.value;

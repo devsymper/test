@@ -50,11 +50,22 @@
 									</v-col>
 								</v-row>
 						</v-col>
-						<v-col cols="3">
-							<div id="preview" @click="triggerClickAddAvatar()">
+						<v-col cols="3" class="text-center">
+							<!-- <div id="preview" @click="triggerClickAddAvatar()">
 							<img :src="url" />
 							</div>
-							<input type="file" ref="btnAddAvatar" class="input-file" @change="onFileChange" />
+							<input type="file" ref="btnAddAvatar" class="input-file" @change="onFileChange" /> -->
+                              <v-avatar :size="80" v-if="actionType == 'edit' || avatarUrl != ''">
+                                <img
+                                    :src="avatarUrl"
+                                >
+                            </v-avatar>
+                            <UploadFile 
+                                ref="uploadAvatar"
+                                :autoUpload="false"
+                                :fileName="avatarFileName"
+                                @uploaded-file="handleAvatarUploaded"
+                                @selected-file="handleAvatarSelected" />
 						</v-col>
 						</v-row>
 						<v-row >
@@ -369,13 +380,15 @@ import { permissionPositionOrgchartApi } from "./../../api/PermissionPositionOrg
 import { orgchartApi } from "./../../api/orgchart.js";
 import { str } from "./../../plugins/utilModules/str.js";
 import avatarDefault from "@/assets/image/avatar_default.jpg";
-
 import VueResizable from 'vue-resizable'
+import UploadFile from "./../../components/common/UploadFile";
+import { appConfigs } from '../../configs';
 let heighOrgchart = 0;
 export default {
 	components:{
 		"vue-resizable":VueResizable,
-		"v-change-password":ChangePassword
+        "v-change-password":ChangePassword,
+        UploadFile
 	},
 	props:{
 		actionType:{    // type là add hay update hay detail user
@@ -391,10 +404,12 @@ export default {
 	computed: {
         sapp() {
             return this.$store.state.app;
-        }
+        },
     },
 	data(){
 		return {
+            avatarFileName: '',
+            avatarUrl: '',
 			user:{id:'', firstName:'', lastName:'', displayName:'', userName:' ', email:' ', password:null, phone:'', active:true},
 			url: avatarDefault,
 			stepper: 1,
@@ -451,17 +466,32 @@ export default {
 			if(this.actionType == 'add') {
 				this.resetData();
 				this.editStep = false;
-				this.actionPanel = this.$t('user.other.createUser');
+                this.actionPanel = this.$t('user.other.createUser');
+                this.avatarUrl = '';
 			}
 			if(this.actionType == 'edit') {
 				this.formHasErr = false;
 				this.editStep = true;
-				this.actionPanel = this.$t('user.other.updateUser');
+                this.actionPanel = this.$t('user.other.updateUser');
+                this.avatarUrl = this.getAvatarUrl();
 			}
 		}
   	},
   
   	methods:{
+          getAvatarUrl(){
+              return appConfigs.apiDomain.fileManagement+'readFile/user_avatar_'+this.user.id;
+          },
+        handleAvatarUploaded(data){
+            
+        },
+        handleAvatarSelected(tempUrl){
+            this.avatarUrl = tempUrl;
+            if(this.actionType == 'edit'){
+                this.avatarFileName = 'user_avatar_' + this.user.id;
+                this.$refs.uploadAvatar.uploadFile();
+            }
+        },
 		handleResize ({ width, height }) {
 			console.log('resized', width, height)
 		},
@@ -475,7 +505,9 @@ export default {
 			this.user = user;
 			if(user.avatar != null && user.avatar != ""){
 				this.url = user.avatar;	  
-			}
+            }
+            this.avatarUrl = this.getAvatarUrl();
+            this.avatarFileName = 'user_avatar_'+this.user.id;
 		},
 		actionUser(){
 			if(this.actionType == 'add'){
@@ -591,8 +623,13 @@ export default {
 					cpn.loading = false;
 					cpn.editStep = true;
 					cpn.loader = null;
-					cpn.user.id = res.data.id;
-					cpn.$emit("refresh-data");
+					cpn.user.id = res.user.id;
+                    
+                    cpn.avatarFileName = 'user_avatar_'+res.user.id;
+                    setTimeout(() => {
+                        cpn.$refs.uploadAvatar.uploadFile();
+                        cpn.$emit("refresh-data");
+                    }, 10);
 				}
 				else{
 					cpn.loading = false;
@@ -627,10 +664,10 @@ export default {
 				passwordProps: JSON.stringify(passProps),
 				avatar : avatar
 			}
-			userApi.updateUser(data).then(res => {
+			userApi.updateUser(this.user.id, data).then(res => {
 				if (res.status == 200) {
 					cpn.loading = false;
-					cpn.loader = null;
+                    cpn.loader = null;
 					cpn.$emit("refresh-data");
 				}
 			})

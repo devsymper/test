@@ -69,6 +69,16 @@ export default {
         icon: "mdi-account-tie",
         link: "/ba-account"
     },
+    comment: {
+        title: 'Comment',
+        icon: 'mdi-comment',
+        link: '/comment',
+    },
+    comment: {
+        title: 'KH',
+        icon: 'mdi-file-document-outline',
+        link: '/knowledge',
+    },
     // { title: "reports", icon: "mdi-view-dashboard", link: "/reports" },
     // { title: "virtualdocs", icon: "mdi-table", link: "/virtualdocs" },
     // { title: "methods", icon: "mdi-function", link: "/methods" },

@@ -1,4 +1,4 @@
-<template>
+    <template>
     <div class="w-100 h-100">
         <list-items
             ref="listActionPack"
@@ -255,7 +255,6 @@ export default {
             //         }
             //     }
             // }
-
             // // chế biến về cho đúng định dạng hiển thị của bảng
             // for(let objectType in mapActionAndObjects){
             //     mapActionAndObjects[objectType] = Object.values(mapActionAndObjects[objectType]);
@@ -365,9 +364,9 @@ export default {
         },
         handleSavedItem() {
             this.$refs.listActionPack.refreshList();
-            if(this.actionOnItem = "create"){
-                this.handleAddItem();
-            }
+            // if(this.actionOnItem == "create"){
+            //     this.handleAddItem();
+            // }
         },
         handleAddItem() {
             this.actionOnItem = "create";
@@ -375,8 +374,9 @@ export default {
             this.currentItemData.id = 0;
             this.currentItemData.description = "";
             this.currentItemData.objectType = "document_definition";
-            this.currentItemData.mapActionAndObjects = [];
-            this.currentItemData.mapActionForAllObjects = [];
+
+            this.$set(this.currentItemData, 'mapActionAndObjects', {});
+            this.$set(this.currentItemData, 'mapActionForAllObjects', {});
             this.$refs.actionPackForm.objectTypeToDocumentDefinition();
         },
         calcContainerHeight() {

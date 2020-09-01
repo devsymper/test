@@ -40,7 +40,7 @@ export default {
 	methods:{
 		clickFull(event){
 			this.showComment = !this.showComment;
-			this.heightComment = "700px"
+			this.heightComment = "800px"
 			this.idItem = 1721
 			this.objType = 'document'
 			this.contentTargetArea = ''
