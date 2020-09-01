@@ -180,6 +180,9 @@ export default {
             }
         },
         handleChangeInput(name, input, data){
+            if(input.groupType == "formulas"){
+                this.handleValidateControl(name, input, data);
+            }
             // this.handleValidateControl(name, input, data);
             
         },

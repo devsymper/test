@@ -50,10 +50,13 @@ Handsontable.renderers.PercentRenderer = function(instance, td, row, col, prop, 
     td.textContent = (td.textContent == "" || td.textContent == null || !/\d/.test(td.textContent)) ? 0 + " %" : td.textContent + " %";
     if (row == instance.countRows() - 1 && table != undefined && instance.hasOwnProperty('tableName')) {
         let tableControl = table.listInputInDocument[instance.tableName];
-        let tableInstance = tableControl.tableInstance;
-        if (tableInstance.tableHasRowSum) {
-            td.textContent = "";
+        if (tableControl != undefined && tableControl.hasOwnProperty('tableInstance')) {
+            let tableInstance = tableControl.tableInstance;
+            if (tableInstance.tableHasRowSum) {
+                td.textContent = "";
+            }
         }
+
     }
 }
 
@@ -91,12 +94,16 @@ Handsontable.renderers.SelectRenderer = function(instance, td, row, col, prop, v
     })
     let table = store.state.document.submit[instance.keyInstance];
     td.innerHTML = div;
-    if (row == instance.countRows() - 1 && table != undefined) {
+    console.log(instance.tableName, 'instanceinstanceinstance');
+    if (row == instance.countRows() - 1 && table != undefined && instance.tableName != undefined) {
         let tableControl = table.listInputInDocument[instance.tableName];
-        let tableInstance = tableControl.tableInstance;
-        if (tableInstance.tableHasRowSum) {
-            td.innerHTML = "";
+        if (tableControl != undefined && tableControl.hasOwnProperty('tableInstance')) {
+            let tableInstance = tableControl.tableInstance;
+            if (tableInstance.tableHasRowSum) {
+                td.innerHTML = "";
+            }
         }
+
     }
 }
 
@@ -925,10 +932,8 @@ export default class Table {
             height: 'auto',
             afterRender: function(isForced) {
                 if (thisObj.tableHasRowSum)
-                    $('.handsontable  span.rowHeader').last().text('Tổng').css({ 'font-weight': 'bold' })
+                    $('.handsontable span.rowHeader').last().text('Tổng').css({ 'font-weight': 'bold' })
                 let tbHeight = this.container.getElementsByClassName('htCore')[0].getBoundingClientRect().height;
-                // debugger
-                // this.getPlugin('hiddenColumns').hiddenColumns(thisObj.columnsInfo.hiddenColumns)
                 if (tbHeight < MAX_TABLE_HEIGHT) {} else {
                     $(this.rootElement).css('height', MAX_TABLE_HEIGHT);
                 }

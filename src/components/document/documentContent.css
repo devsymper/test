@@ -81,6 +81,7 @@ p {
     border: 1px solid #e9ecef;
     padding: 4px 8px 4px 7px;
     border-radius: 4px;
+    background: white;
 }
 
 .sym-form-submit .s-control-table {
