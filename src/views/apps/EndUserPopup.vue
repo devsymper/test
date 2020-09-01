@@ -133,7 +133,6 @@ export default {
 	created(){
 		this.getActiveapps()
 		this.getFavorite()
-		// this.testAccesscontrol()
 	},
 	mounted(){
 		 let thisCpn = this;
@@ -422,9 +421,6 @@ export default {
 	text-overflow: ellipsis; 
 	
 }
-/* .end-user-popup >>> .list-favorite .title-item-favorite:hover{
-	background-color: #f7f7f7;
-} */
 .end-user-popup >>> .list-favorite li{
 	padding: 5px 10px;
 }
@@ -434,7 +430,6 @@ export default {
 	margin: 8px 15px;
 }
 .end-user-popup >>> .title-list-app {
-	/* border-top: 1px solid lightgrey; */
 	padding-top: 8px;
 }
 .end-user-popup >>> .title-list-app .app-active-title{
@@ -452,7 +447,6 @@ export default {
 .end-user-popup >>> .title-favorite h4,
 .end-user-popup >>> .title-list-app h4{
 	padding-left: 2px;
-	/* padding-top: 2px; */
 	font-weight: unset;
 }
 .end-user-popup >>> .list-app-cointaner{
@@ -460,11 +454,9 @@ export default {
     flex-wrap: wrap;
 	width: 460px;
 	margin-right:auto;
-	/* margin-left:auto; */
 	margin-left: 30px;
 }
 .end-user-popup >>> .list-app-cointaner .ps__rail-x{
-	/* display:none; */
 }
 .end-user-popup >>> .list-app-cointaner .list-app-item:hover{
 	background-color: #f7f7f7;
@@ -474,17 +466,11 @@ export default {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	/* margin-right:auto; */
-	/* margin-left:auto; */
 	padding:0px 8px;
 	margin-bottom: 12px;
 }
 .end-user-popup >>> .list-app-cointaner .list-app-item .app-item-icon { 
-	/* max-width: 50px; */
-	/* max-height: 50px;1 */
-	/* display: flex;
-	justify-content: center;
-	align-items: center; */
+	
 	width: 70px;
 }
 .end-user-popup >>> .list-app-cointaner .list-app-item .app-item-icon .v-icon { 

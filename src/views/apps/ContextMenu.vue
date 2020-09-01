@@ -7,7 +7,7 @@
    </v-card>
 </template>
 <script>
-  export default {
+export default {
     data: () => ({
 		isShowContext:false,
 		top:0,
@@ -51,7 +51,6 @@
 			this.top = event.pageY;
 			this.left = event.pageX;
 			$('#symper-app').append(this.$el);
-			// this.calPosition(e)
 		},
 		hide(){
 			this.isShowContext = false;
@@ -87,7 +86,7 @@
 			this.$evtBus.$emit('symper-app-call-action-handler', this.defineAction[this.type], this, {id:targetItem.id,name:targetItem.name,title:''});
 		}
 	}
-	}
+}
 </script>
 <style scoped>
 .context-menu{

@@ -1,4 +1,4 @@
-<template>
+ <template>
     <v-flex xs12 sm8 md4>
         <v-card class="elevation-6">
             <v-toolbar flat>
