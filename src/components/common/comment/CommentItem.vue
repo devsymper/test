@@ -12,7 +12,7 @@
 				</v-avatar>
 			<div class="comment-item-content">
 				<div style="display:flex;height:16px;width:100%">
-						<span style="color:#00000099">Dao Manh Kha</span>
+						<span style="color:#00000099">{{item.infor.fullName}}</span>
 						<!-- {{item.infor.fullName}} -->
 				</div>
 				<div style="display:flex">
@@ -137,25 +137,35 @@ export default {
 				})
 			});
 		}
-			// let mapIdToUser = this.$store.getters['app/mapIdToUser'];
-			// let itemInfor = mapIdToUser[this.item.userId];
-			// // debugger
-			// let infor = {}
-			// infor.avatar = itemInfor.avatar,
-			// infor.fullName = itemInfor.displayName
-			// this.item.infor = infor	
-			// if(this.item.hasOwnProperty('childrens') && this.item.childrens.length > 0){
-			// 	this.item.childrens.forEach(function(e){	
-			// 		itemInfor = mapIdToUser[e.id];
-			// 		let inforChild = {}
-			// 		inforChild.avatar = itemInfor.avatar,
-			// 		inforChild.fullName = itemInfor.displayName
-			// 		e.infor = inforChild
-			// 	})
-			// }
-			// console.log(this.item,'itemavatarrrrr');
+		this.addAvatar()
 	},
 	methods:{
+		addAvatar(){
+			let mapIdToUser = this.$store.getters['app/mapIdToUser'];
+			let itemInfor = mapIdToUser[this.item.userId];
+			let infor = {}
+			if(itemInfor.hasOwnProperty('avatar')){
+				infor.avatar = itemInfor.avatar
+			}
+			if(itemInfor.hasOwnProperty('displayName')){
+				infor.fullName = itemInfor.displayName
+			}
+			this.item.infor = infor	
+			if(this.item.hasOwnProperty('childrens') && this.item.childrens.length > 0){
+				this.item.childrens.forEach(function(e){	
+					let itemInforChild = mapIdToUser[e.userId];
+					let inforChild = {}
+					debugger
+					if(itemInforChild.hasOwnProperty('avatar')){
+						inforChild.avatar = itemInforChild.avatar
+					}
+					if(itemInforChild.hasOwnProperty('displayName')){
+						inforChild.fullName = itemInforChild.displayName
+					}
+					e.infor = inforChild
+				})
+			}
+		},
 		editComment(item){
 			item.isEditing = true
 			this.contentEdit = item.content

@@ -4,27 +4,12 @@
 			<div  class="commnet-img-item" v-for="(item,i) in images" :key="i">
 				<v-img
            			 :src="item.serverPath"
-						style="margin-top:auto;margin-bottom:auto"
+					style="margin-top:auto;margin-bottom:auto"
          		>
-					<v-icon  v-if="isEditing == true" class="icon-remove-img"  @click="removeImage(item)">mdi-close-circle-outline</v-icon>
+					<v-icon  v-if="isEditing == true" class="icon-remove-img" @click="removeImage(item)">mdi-close-circle-outline</v-icon>
 				</v-img> 
-				<!-- <div style="width:300px" >
-					<v-tabs
-						next-icon="mdi-arrow-right-bold-box-outline"
-						prev-icon="mdi-arrow-left-bold-box-outline"
-						show-arrows
-					>
-						<v-tab
-					  	
-						:href="'#tab-' + i"
-						>
-						<img src="https://img.icons8.com/carbon-copy/2x/image.png" style="width:80px;height:80px"/>
-						 <v-icon  v-if="isEditing == true" class="icon-remove-img"  @click="removeImage(item)">mdi-close-circle-outline</v-icon>
-						</v-tab>
-					</v-tabs>
-				</div> -->
 			</div>
-		</div>	
+		</div>
 		<div v-if="files.length > 0" class="content-comment-file">
 			<div class="commnet-file-item" v-for="(item,i) in files" :key="i">
 				<v-icon>{{icon[item.type]}}</v-icon>
@@ -34,7 +19,6 @@
 		</div>
 		<div class="content-comment-input">
 			<span v-if="isEditing == false" >
-				<!-- <h5 >{{reduce(item.content)}}</h5> -->
 				 <h5 v-if="item.tags.length == 0">{{item.content}}</h5>
 				 <h5 v-else v-html="reduce(item.content)"></h5>
 			</span>
@@ -44,7 +28,7 @@
 						v-on:keyup.enter="addComment"
 						class="text-area"
 						style="width:100%"
-						v-on:keyup.esc="cancel"
+						v-on:keyup.down="chooseUser"
 						>
 					</textarea>
 				<UploadFile style="position:absolute;right:16px;bottom: 0px;" @uploaded-file="uploadInfo" />
@@ -134,7 +118,6 @@ export default {
 			if(this.item){
 				 this.tags = this.item.tags 
 			}
-			// let character = this.inputComment.charAt(this.inputComment.length - 1)
 			let item = {} 
 			item.objectIdentifier = data.id
 			item.objectType = 'user'
@@ -148,18 +131,16 @@ export default {
 			
 		},
 		reduce(content){
-				this.item.tags.forEach(function(e){
-					let name = content.slice(e.tagInfo.offset,e.tagInfo.offset+e.tagInfo.length)
-					let span;
-					span = `<span style="color:red">${name}</span>`
-					let res = content.replace(name,span)
-					content = res
-				})
+			this.item.tags.forEach(function(e){
+				let name = content.slice(e.tagInfo.offset,e.tagInfo.offset+e.tagInfo.length)
+				let span;
+				span = `<span style="color:red">${name}</span>`
+				let res = content.replace(name,span)
+				content = res
+			})
 			return content
 		},
 		cancel(){
-			debugger
-			// this.isEditing = false 
 			this.$emit('cancel-reply')
 		},
 		addComment(){
@@ -169,6 +150,7 @@ export default {
 			this.dataPostComment.tags = this.tags
 			if(this.isAdd == true){
 				let data = JSON.stringify(this.dataPostComment)
+				debugger
 				commentApi.addComment(data).then(res => {
 					setTimeout(function(){}, 1000);
 					this.$store.commit('comment/updateParentCommentTarget',0)
@@ -223,7 +205,11 @@ export default {
 					}
 				});
 			}
+		},
+		chooseUser(){
+			this.$refs.menuTagUser.chooseUser()
 		}
+
 	},
 	computed:{
 		itemTags(){
@@ -254,14 +240,11 @@ export default {
 			}
 		},
 		isEditing(val){
-			console.log(val);
 			if(val == true){
 				if(this.item){
 					 this.tags = this.item.tags 
 				}
 			}
-			console.log(this.tags);
-			debugger
 		}
 	}
 }	
@@ -281,7 +264,7 @@ export default {
 }
 .content-comment >>> .commnet-img-item{
 	width: 80px;
-	height: 80px;
+	height: 50px;
 	margin: 0px 4px 0px 0px;
 	display: flex;
     align-items: center;
@@ -333,5 +316,4 @@ export default {
 	background-color: #f7f7f7;
 	width: 100%;
 }
-
 </style>

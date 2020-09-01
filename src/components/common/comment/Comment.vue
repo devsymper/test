@@ -22,7 +22,7 @@
 					<v-tabs-slider color="yellow"></v-tabs-slider>
 					<v-tab v-for="item in itemsTab" :key="item.value" >
 						<v-icon v-if="isSearching == true" @click="isSearching = false" style="font-size:18px">{{item.icon}}</v-icon>
-						<span v-else> <span> {{ item.title }} </span> <span style='padding-left:4px'>{{ '('+sComment[item.store].length+')'}}</span></span>
+						<span v-else> <span style="font:13px roboto !important;text-transform:none"> {{ item.title }} </span> <span style='padding-left:4px'>{{ '('+sComment[item.store].length+')'}}</span></span>
 					</v-tab>
 				</v-tabs>
 				<v-spacer></v-spacer>
@@ -43,7 +43,7 @@
 				:key="item.value"
 				>
 				<v-card flat>
-					<list-comment style="height:calc(100%-100px)" :listComment="listComment" :searchItem="searchItem"/>
+					<list-comment  :listComment="listComment" :searchItem="searchItem"/>
 				</v-card>
 				</v-tab-item>
 			</v-tabs-items>
@@ -255,6 +255,8 @@ export default {
 	height: 25px;
 	width: 25px;
 }
+.symper-comment  >>>.v-tabs-bar__content span{
+	}
 .symper-comment  >>> .v-input__control{
 	background-color:#f7f7f7;
 	min-height:unset
@@ -270,6 +272,9 @@ export default {
 	width: 200px;
 	padding: 0px 8px !important;
 	font: 12px roboto;
+}
+.symper-comment  >>> .v-input__control .v-input__slot .v-text-field__slot label{
+	font-size: 13px ;
 }
 .symper-comment  >>> .v-input__control .v-input__slot .v-icon{
 	font-size: 15px;

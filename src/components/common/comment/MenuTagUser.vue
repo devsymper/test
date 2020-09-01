@@ -1,7 +1,7 @@
 <template>
    <v-card class="context-menu" v-show="isShowMenu" :style="{top:top+'px',left:left+'px'}">
 			<div class="item" v-for="item in listUser" :key="item.name" @click="clickRow(item)">
-				{{item.displayName}}
+				<span v-on:keyup.down="down"  v-on:keyup.up="up" v-on:keyup.enter="clickRow(item)"> {{item.displayName}}</span>
 			</div>
    </v-card>
 </template>
@@ -54,7 +54,19 @@
 					}
 				})
 			}
+		},
+		chooseUser(){
+			console.log('ahuhu')
+			debugger
+		},
+		down(){
+
+		},
+		up(){
+			
 		}
+
+
 	}
 	}
 </script>
