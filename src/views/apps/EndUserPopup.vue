@@ -1,6 +1,6 @@
 <template>
   <div class="end-user-popup"> 
-	<v-card>
+	<v-card> 
 		<v-tabs
 			v-model="tab"
 			v-show="false"
@@ -399,11 +399,13 @@ export default {
 }
 </script>
 <style scoped>
+.v-menu__content{
+	z-index:1000
+}
 .end-user-popup {
 	font: 13px Roboto;
 	overflow: hidden;
 	width:500px;
-	z-index:1000000;
 }
 .end-user-popup >>> .tittle{
 	font: 15px Roboto;
