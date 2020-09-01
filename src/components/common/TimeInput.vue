@@ -21,7 +21,7 @@ export default {
     methods:{
         show(e){
             this.isShowPopup = true;
-            this.curInput = $(e.target);
+            this.curInput = $(e.curTarget);
             this.calculatorPositionBox();
             this.setEventInput(e);
         },
@@ -106,12 +106,12 @@ export default {
             if(regex.test(this.curInput.val())){
                 isValid = true;
             }
-            this.$emit('after-check-input-time-valid',{input:this.curInput,controlName: e.controlName,isValid:isValid});      
+            this.$emit('after-check-input-time-valid',{input:this.curInput,controlName: e.controlName,isValid:isValid,event:e});      
         }
     },
     beforeMount(){
         this.times = [
-            {"time":"12:00 AM","active":false},{"time":"12:30 AM","active":false},{"time":"1:00 AM","active":false},
+            {"time":"0:00 AM","active":false},{"time":"0:30 AM","active":false},{"time":"1:00 AM","active":false},
             {"time":"1:30 AM","active":false},{"time":"2:00 AM","active":false},{"time":"2:30 AM","active":false},
             {"time":"3:00 AM","active":false},{"time":"3:30 AM","active":false},{"time":"4:00 AM","active":false},
             {"time":"4:30 AM","active":false},{"time":"5:00 AM","active":false},{"time":"5:30 AM","active":false},
