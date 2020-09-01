@@ -161,7 +161,10 @@ export default {
             clearTimeout(this.delayTimer);
             this.delayTimer = setTimeout(function(self) {
                 self.handleValidateControl(name, input, data)
-            }, 300,this);
+            }, 200,this);
+            if(data.key == 'Tab'){
+                this.handleValidateControl(name, input, data)
+            }
         },
         setMappingForParamsDataFlow(id,tableId){
             let currentDataflow = this.listDataFlow.filter(df=>{

@@ -455,14 +455,14 @@ const controlTypes = {
     },
     select: {
         icon: "/icon/ic_select.png",
-        html: `<input class="s-control s-control-select" readonly="readonly" contenteditable="false" title="Select" s-control-type="select" type="select"></input>&nbsp;&nbsp;`,
+        html: `<input class="s-control s-control-select" readonly="readonly" contenteditable="false" title="Select" s-control-type="select" type="select">&nbsp;&nbsp;`,
         title: "Select",
         notInProps: ['dataFlowId', 'isPrimaryKey', 'minValue', 'maxValue', 'formatNumber', 'isSumTable', 'formatDate', 'isAllowUpdate', 'isDisplayCompact', 'isMultipleValue'],
         formulas: ['formulas', 'list', 'hidden', 'readOnly', 'link', 'require']
     },
     documentSelect: {
         icon: "/icon/ic_document_select.png",
-        html: `<select class="s-control s-control-document" contenteditable="false" title="Document Select" s-control-type="documentSelect" type="select"></select>&nbsp;&nbsp;`,
+        html: `<input class="s-control s-control-document" readonly="readonly" contenteditable="false" title="Document Select" s-control-type="documentSelect">&nbsp;&nbsp;`,
         title: "Document select",
         notInProps: ['dataFlowId', 'isPrimaryKey', 'minValue', 'maxValue', 'formatNumber', 'isSumTable', 'formatDate', 'isAllowUpdate', 'isDisplayCompact', 'isMultipleValue'],
         formulas: ['formulas', 'hidden', 'readOnly', 'require']

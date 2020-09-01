@@ -252,7 +252,8 @@ export default class BasicControl extends Control {
             } else if (this.type == 'date') {
                 $('#' + this.id).val(moment(value).format(this.formatDate));
             } else if (this.type == 'number') {
-                if (typeof value == 'number')
+                let v = parseInt(value);
+                if (!isNaN(v))
                     $('#' + this.id).val(numbro(value).format(this.numberFormat))
             } else {
                 $('#' + this.id).val(value);
