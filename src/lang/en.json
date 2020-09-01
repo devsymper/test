@@ -542,8 +542,8 @@
             "rename": "Rename",
             "delete": "Delete",
             "addfavorite": "Add to favorite",
-            "removefavorite": "Remove from favorite"
-
+            "removefavorite": "Remove from favorite",
+            "viewcontent": "View content"
         },
         "table": {
             "totalDoc": "Total document"

@@ -2,22 +2,37 @@
   <div id="modalImage" class="modal kh-handson">
     <div class="modal-content">
       <div class="kh-handson-header kh-showFile">
-        <h2 style="width:970px">{{name+'.'+type}}</h2>
+        <h2 style="width:95%" v-if="type!='document_backup'">{{name+'.'+type}}</h2>
+        <h2 style="width:95%" v-else>{{name}}</h2>
         <v-icon
           class="btn-save-handson mr-1 fs-16"
           v-if="skh.statusEdit==false"
           @click.stop="saveData"
         >mdi-content-save</v-icon>
-        <v-icon class="btn-closes-handson fs-17" style="margin-left: 40px;" @click="invertStatusShowImage">mdi-close</v-icon>
+        <v-icon
+          class="btn-closes-handson fs-17"
+          style="margin-left: 40px;"
+          @click="invertStatusShowImage"
+        >mdi-close</v-icon>
       </div>
+
       <div v-if="type==='jpg' ||type==='png' ||type==='jpeg'">
         <img class="image-modal" :src="serverPath" alt />
       </div>
+
       <div class="div-show-content" v-if="type==='doc' ||type==='docx' ||type==='xlsx'">
-        <iframe class="show-content" :src="`https://docs.google.com/gview?url=${serverPath}&embedded=true`"></iframe>
+        <iframe
+          class="show-content"
+          :src="`https://docs.google.com/gview?url=${serverPath}&embedded=true`"
+        ></iframe>
       </div>
-       <div class="div-show-content" v-if="type==='txt'">
-        <iframe  class="show-content" :src="serverPath" ></iframe>
+
+      <div class="div-show-content" v-if="type==='txt'">
+        <iframe class="show-content" :src="serverPath"></iframe>
+      </div>
+
+      <div class="div-show-content" v-if="type==='document_backup'">
+        <div class="show-content"  v-html="docContent"></div>
       </div>
     </div>
   </div>
@@ -28,16 +43,20 @@ export default {
   props: {
     name: {
       type: String,
-      default: 'Image'
+      default: "Image"
     },
-    serverPath:{
+    serverPath: {
       type: String,
-      default: ''
+      default: ""
     },
-    type:{
+    type: {
       type: String,
-      default: ''
+      default: ""
     },
+    docContent: {
+      type: String,
+      default: ""
+    }
   },
   data() {
     return {
@@ -91,8 +110,8 @@ export default {
   background-color: rgb(0, 0, 0); /* Fallback color */
   background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
 }
-.kh-showFile{
-  padding:0px;
+.kh-showFile {
+  padding: 0px;
 }
 /* Modal Content */
 .modal-content {
@@ -100,7 +119,7 @@ export default {
   background-color: #fefefe;
   margin: auto;
   padding: 20px;
-  padding-top:5px;
+  padding-top: 5px;
   border: 1px solid #888;
   width: 80%;
   overflow: scroll;
@@ -124,12 +143,12 @@ export default {
   margin-left: auto;
   margin-right: auto;
 }
-.div-show-content{
+.div-show-content {
   height: 95%;
 }
-.show-content{
-  border: none!important;
-  border-top:1px solid #aaaaaa!important ;
+.show-content {
+  border: none !important;
+  border-top: 1px solid #aaaaaa !important ;
   width: 100%;
   height: 95%;
 }

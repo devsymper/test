@@ -17,30 +17,34 @@
       </div>
       <div class="list-item">
         <!-- <v-sheet id="scrolling-techniques" class="overflow-y-auto" max-height="498"> -->
-          <v-container class="scroll-bar-right" max-height="498" style="height: calc(100vh - 65px);overflow: auto;">
-            <v-list dense>
-              <v-list-item-group class>
-                <v-list-item
-                  v-for="(item, i) in listFileAttachment"
-                  :key="i"
-                  @contextmenu="show($event,item.serverPath,item.name,item.type,item.id)"
-                >
-                  <v-icon
-                    class="fs-14"
-                    v-if="item.type=='jpg' || item.type=='png' ||item.type=='jpeg'"
-                  >mdi-image</v-icon>
-                  <v-icon class="fs-14" v-else>mdi-file-document-outline</v-icon>
-                  <v-tooltip bottom>
-                    <template v-slot:activator="{ on }">
-                      <v-list-item-title v-on="on" class="fs-13" v-text="item.name+'.'+item.type"></v-list-item-title>
-                    </template>
-                    <span>{{ item.name+'.'+item.type }}</span>
-                  </v-tooltip>
-                  <v-list-item-title class="fs-13 sb-date-file" v-text="item.createAt"></v-list-item-title>
-                </v-list-item>
-              </v-list-item-group>
-            </v-list>
-          </v-container>
+        <v-container
+          class="scroll-bar-right"
+          max-height="498"
+          style="height: calc(100vh - 65px);overflow: auto;"
+        >
+          <v-list dense>
+            <v-list-item-group class>
+              <v-list-item
+                v-for="(item, i) in listFileAttachment"
+                :key="i"
+                @contextmenu="show($event,item.serverPath,item.name,item.type,item.id)"
+              >
+                <v-icon
+                  class="fs-14"
+                  v-if="item.type=='jpg' || item.type=='png' ||item.type=='jpeg'"
+                >mdi-image</v-icon>
+                <v-icon class="fs-14" v-else>mdi-file-document-outline</v-icon>
+                <v-tooltip bottom>
+                  <template v-slot:activator="{ on }">
+                    <v-list-item-title v-on="on" class="fs-13" v-text="item.name+'.'+item.type"></v-list-item-title>
+                  </template>
+                  <span>{{ item.name+'.'+item.type }}</span>
+                </v-tooltip>
+                <v-list-item-title class="fs-13 sb-date-file" v-text="item.createAt"></v-list-item-title>
+              </v-list-item>
+            </v-list-item-group>
+          </v-list>
+        </v-container>
         <!-- </v-sheet> -->
       </div>
     </div>
@@ -88,53 +92,61 @@
       </div>
       <div v-if="history_active==0">
         <!-- <v-sheet id="scrolling-techniques" class="overflow-y-auto" max-height="498"> -->
-          <v-container class="scroll-bar-right" max-height="498" style="height: calc(100vh - 65px);overflow: auto;">
-            <v-list dense class="list-log">
-              <v-list-item-group>
-                <v-list-item v-for="(item, i) in listLogAll" :key="i">
-                  <v-avatar>
-                    <img src="https://cdn.vuetifyjs.com/images/john.jpg" alt="John" />
-                  </v-avatar>
-                  <!-- <v-list-item-title class="fs-13"><b>{{item.userName}}</b> Đã {{item.action}} văn bản <b>{{item.name}}</b></v-list-item-title> -->
-                  <p class="fs-13">
-                    <b>{{item.userName}}</b>
-                    Đã {{convertAction(item.action)}}
-                    <span
-                      v-if="item.docId!=undefined"
-                    >{{$t("kh.document")}}</span>
-                    <span v-if="item.docId==undefined">{{$t("kh.folder")}}</span>
-                    <b>{{item.name}}</b>
-                    <br />
-                    {{item.createdAt}}
-                  </p>
-                  <!-- <p class="fs-13">{{item.createdAt}}</p> -->
-                </v-list-item>
-              </v-list-item-group>
-            </v-list>
-          </v-container>
+        <v-container
+          class="scroll-bar-right"
+          max-height="498"
+          style="height: calc(100vh - 65px);overflow: auto;"
+        >
+          <v-list dense class="list-log">
+            <v-list-item-group>
+              <v-list-item v-for="(item, i) in listLogAll" :key="i">
+                <v-avatar>
+                  <img src="https://cdn.vuetifyjs.com/images/john.jpg" alt="John" />
+                </v-avatar>
+                <!-- <v-list-item-title class="fs-13"><b>{{item.userName}}</b> Đã {{item.action}} văn bản <b>{{item.name}}</b></v-list-item-title> -->
+                <p class="fs-13">
+                  <b>{{item.userName}}</b>
+                  Đã {{convertAction(item.action)}}
+                  <span
+                    v-if="item.docId!=undefined"
+                  >{{$t("kh.document")}}</span>
+                  <span v-if="item.docId==undefined">{{$t("kh.folder")}}</span>
+                  <b>{{item.name}}</b>
+                  <br />
+                  {{item.createdAt}}
+                </p>
+                <!-- <p class="fs-13">{{item.createdAt}}</p> -->
+              </v-list-item>
+            </v-list-item-group>
+          </v-list>
+        </v-container>
         <!-- </v-sheet> -->
       </div>
       <div v-if="history_active==1">
         <!-- <v-sheet id="scrolling-techniques" class="overflow-y-auto" max-height="498"> -->
-          <v-container class="scroll-bar-right" max-height="498" style="height: calc(100vh - 65px);overflow: auto;">
-            <v-list dense class="list-log">
-              <v-list-item-group>
-                <v-list-item v-for="(item, i) in listLogDoc" :key="i">
-                  <v-avatar>
-                    <img src="https://cdn.vuetifyjs.com/images/john.jpg" alt="John" />
-                  </v-avatar>
-                  <p class="fs-13">
-                    <b>{{item.userName}}</b>
-                    Đã {{convertAction(item.action)}}
-                    <span>{{$t("kh.document")}}</span>
-                    <b>{{item.name}}</b>
-                    <br />
-                    <span v-text="convertDate(item.createdAt)"></span>
-                  </p>
-                </v-list-item>
-              </v-list-item-group>
-            </v-list>
-          </v-container>
+        <v-container
+          class="scroll-bar-right"
+          max-height="498"
+          style="height: calc(100vh - 65px);overflow: auto;"
+        >
+          <v-list dense class="list-log">
+            <v-list-item-group>
+              <v-list-item v-for="(item, i) in listLogDoc" :key="i">
+                <v-avatar>
+                  <img src="https://cdn.vuetifyjs.com/images/john.jpg" alt="John" />
+                </v-avatar>
+                <p class="fs-13">
+                  <b>{{item.userName}}</b>
+                  Đã {{convertAction(item.action)}}
+                  <span>{{$t("kh.document")}}</span>
+                  <b>{{item.name}}</b>
+                  <br />
+                  <span v-text="convertDate(item.createdAt)"></span>
+                </p>
+              </v-list-item>
+            </v-list-item-group>
+          </v-list>
+        </v-container>
         <!-- </v-sheet> -->
       </div>
     </div>
@@ -155,7 +167,11 @@
       <div class="list-item">
         <v-list dense>
           <v-list-item-group class>
-            <v-list-item v-for="(item, i) in listBackupDocument" :key="i">
+            <v-list-item 
+              v-for="(item, i) in listBackupDocument" 
+              :key="i"
+              @contextmenu="showMenuBackup($event,item.id,item.docName,item.docContent)"
+              >
               <v-tooltip bottom>
                 <template v-slot:activator="{ on }">
                   <v-list-item-title v-on="on" class="fs-13 text-ellipsis" v-text="item.backupName"></v-list-item-title>
@@ -168,7 +184,7 @@
                   <v-icon
                     v-on="on"
                     class="fs-14"
-                    @click="backupDocument(item.id)"
+                    @click="backupDocument(item.id,item.docContent)"
                   >mdi-backup-restore</v-icon>
                 </template>
                 <span>{{ $t("kh.sidebar.restore") }}</span>
@@ -186,11 +202,24 @@
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn color="green darken-1" text @click="handleClick">{{$t("kh.dialog.yes")}}</v-btn>
-          <!-- <v-btn color="green darken-1" text @click="restoreDocument">{{$t("kh.dialog.yes")}}</v-btn> -->
           <v-btn color="red darken-1" text @click="dialogAlert = false">{{$t("kh.dialog.cancel")}}</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
+
+    <v-menu v-model="context_menu_backup" :position-x="x" :position-y="y" absolute offset-y>
+      <v-list class="context-menu">
+        <v-list-item
+          v-for="(item, index) in contextMenuBackup"
+          :key="index"
+          @click="item.menuAction(item.title)"
+          dense
+        >
+          <v-icon class="fs-15">{{item.icon}}</v-icon>
+          <v-list-item-title class="fs-13">{{ item.title }}</v-list-item-title>
+        </v-list-item>
+      </v-list>
+    </v-menu>
 
     <v-menu v-model="context_menu" :position-x="x" :position-y="y" absolute offset-y>
       <v-list class="context-menu">
@@ -206,7 +235,7 @@
       </v-list>
     </v-menu>
 
-    <KHShowImage v-bind:name="name" v-bind:serverPath="serverPath" v-bind:type="type" />
+    <KHShowImage v-bind:name="name" v-bind:serverPath="serverPath" v-bind:type="type" v-bind:docContent="docContent" />
   </div>
 </template>
 
@@ -227,14 +256,16 @@ export default {
       serverPath: "",
       name: "",
       type: "",
+      docContent: "",
       header: "",
       title: "",
       x: 0,
       y: 0,
       context_menu: false,
       dialogAlert: false,
+      context_menu_backup:false,
       history_active: 1,
-      id: "",
+      id: -1,
       docVersionID: 0,
       hash: "",
       items_attach: [
@@ -277,6 +308,23 @@ export default {
           },
           icon: "mdi-delete-forever"
         }
+      ],
+      contextMenuBackup:[
+         {
+          title: this.$t("kh.contextmenu.viewcontent"),
+          menuAction: action => {
+            this.$store.commit("kh/changeStatusShowImage", true);
+          },
+          icon: "mdi-view-carousel"
+        },
+        {
+          title: this.$t("kh.sidebar.restore"),
+          menuAction: action => {
+            let id=this.id;
+            this.backupDocument(id);
+          },
+          icon: "mdi-backup-restore"
+        },
       ]
     };
   },
@@ -433,6 +481,19 @@ export default {
         this.context_menu = true;
       });
     },
+    showMenuBackup(e,id,docName,docContent){
+      e.preventDefault();
+      this.context_menu_backup = false;
+      this.x = e.clientX;
+      this.y = e.clientY;
+      this.id = id;
+      this.name=docName;
+      this.type = 'document_backup';
+      this.docContent=docContent;
+      this.$nextTick(() => {
+        this.context_menu_backup = true;
+      });
+    },
     handleClick() {
       if (this.skh.statusRightBar == 1) {
         this.removeFileAttach();
@@ -471,13 +532,6 @@ export default {
         if (hash == false) {
           hash = this.$route.params.hash;
         }
-        // setTimeout(
-        //   self => {
-        //     self.$store.dispatch("kh/getFileAttachment", hash);
-        //   },
-        //   100,
-        //   this
-        // );
         this.$store.dispatch("kh/getFileAttachment", hash);
         let data = this.skh.arrIdFileAttach;
         this.$store.dispatch("kh/getArrFileAttachment", data);
@@ -567,7 +621,7 @@ export default {
   border-left: 1px solid #bebebe;
   background-color: white;
 }
-.scroll-bar-right{
+.scroll-bar-right {
   padding-left: 0px;
   padding-top: 0px;
 }

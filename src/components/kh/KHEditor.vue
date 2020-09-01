@@ -2,7 +2,8 @@
   <div class="w-100">
     <v-skeleton-loader v-if="loading" class="mx-auto" width="100%" height="100%" type="table"></v-skeleton-loader>
     <k-h-header />
-    <div class="kh-editor" ref="printMe">
+    <div v-show="skh.statusEdit" class="kh-editor-view" v-html="content"></div>
+    <div v-show="!skh.statusEdit" class="kh-editor" ref="printMe">
       <editor
         id="myeditablediv"
         api-key="x7abgywktsdoz7uca2ogf5xikxkrz9w999t7cu9oi0wu6isq"
@@ -300,7 +301,6 @@ export default {
       self.$store.commit("kh/setDataTable", result);
       self.$store.commit("kh/changeStatusHansonTable", true);
     });
-    
     $(".kh-editor").on("click", "table", function(event) {
       var p = $(this);
       var position=p.position();
@@ -308,7 +308,6 @@ export default {
       document.getElementById("mceResizeHandlenw").style.left =position.left;
       document.getElementById("mceResizeHandlene").style.left = p.width();
     });
-
     $(".kh-editor").on("click", "img", function(event) {
       var p = $(this);
       var position=p.position();
@@ -324,5 +323,15 @@ export default {
   height: calc(98vh - 65px);
   overflow: auto;
   padding: 8px;
+}
+.kh-editor-view{
+  height: calc(98vh - 65px);
+  overflow: auto;
+  padding: 8px;
+}
+.kh-editor-view table{
+  border: 1px solid #bebebe;
+  border-collapse: collapse;
+    
 }
 </style>
