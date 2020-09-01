@@ -578,11 +578,72 @@
                 "unfavorite": "Loại bỏ yêu thích"
             },
             "orgchart": {
-                "detail": "Chi tiết",
-                "edit": "Chỉnh sửa",
-                "query": "Truy vấn",
-                "favorite": "Thêm vào yêu thích",
-                "unfavorite": "Loại bỏ yêu thích"
+                "create":"Tạo mới ",
+                "update":"Cập nhật",
+                "drop":"Xóa",
+                "list":"Danh sách",
+                "detail":"Chi tiết"
+            },
+            "document_definition":{
+                "create":"Tạo mới văn bản ",
+                "edit":"Chỉnh sửa văn bản",
+                "submit":"Gửi văn bản",
+                "drop":"Xóa văn bản",
+                "restore":"Khôi phục",
+                "list":"Danh sách văn bản",
+                "list_trash":"Thùng rác",
+                "list_instance":"Danh sách bản ghi"
+            },
+            "workflow_definition":{
+                "list":"Danh sách quy trình ",
+                "create":"Tạo mới quy trình ",
+                "deploy":"Triển khai",
+                "drop":"Xóa quy trình ",
+                "update":"Cập nhật quy trình ",
+                "list_instance":"Danh sách bản ghi",
+                "start_instance":"Bản ghi bắt đầu"
+            },
+            "dashboard":{
+                "create":"Tạo mới",
+                "update":"Cập nhât",
+                "view":"Xem",
+                "list":"Danh sách",
+                "drop":"Xóa"
+            }
+        },
+        "iconListActions":{
+            "orgchart": {
+                "create":"mdi-folder-plus-outline",
+                "update":"mdi-note-plus-outline",
+                "drop":"mdi-arrow-down-drop-circle-outline",
+                "list":"mdi-clipboard-list-outline",
+                "detail":"mdi-details"
+            },
+            "document_definition":{
+                "create":"mdi-folder-plus-outline",
+                "edit":"mdi-file-document-edit-outline",
+                "submit":"mdi-content-save-outline",
+                "drop":"mdi-arrow-down-drop-circle-outline",
+                "restore":"mdi-file-restore-outline",
+                "list":"mdi-clipboard-list-outline",
+                "list_trash":"mdi-playlist-remove",
+                "list_instance":"mdi-file-document-multiple-outline"
+            },
+            "workflow_definition":{
+                "list":"mdi-clipboard-list-outline",
+                "create":"mdi-folder-plus-outline",
+                "deploy":"mdi-rocket",
+                "drop":"mdi-arrow-down-drop-circle-outline",
+                "update":"mdi-note-plus-outline",
+                "list_instance":"mdi-file-document-multiple-outline",
+                "start_instance":"mdi-play-outline"
+            },
+            "dashboard":{
+                "create":"mdi-folder-plus-outline",
+                "update":"mdi-note-plus-outline",
+                "view":"mdi-eye-outline",
+                "list":"clipboard-list-outline",
+                "drop":"arrow-down-drop-circle-outline"
             }
         }
     },
