@@ -290,7 +290,7 @@ export default {
             let idControl = $(this).closest('.s-control-data-flow').attr('id');
             let control = thisCpn.sDocumentEditor.allControl[idControl];
             let dataParams = thisCpn.getParamsForRunDataFlow(control.properties);
-            let element = thisCpn.$refs['dataFlow'+control.properties.dataFlowId.value][0].runDataflow();
+            let element = thisCpn.$refs['dataFlow'+control.properties.dataFlowId.value][0].runDataflow(dataParams);
         })
     },
 
@@ -426,10 +426,7 @@ export default {
                 instance: thisCpn.keyInstance
             });
         });
-        this.$evtBus.$on("document-submit-time-input-click", e => {
-            if(thisCpn.isComponentActive == false) return;
-            thisCpn.$refs.timeInput.show(e);
-        });
+      
         // this.$evtBus.$on("document-submit-search-in-filter-input", e => {
         //     if(thisCpn.isComponentActive == false) return;
         //     thisCpn.runInputFilterFormulas(e.controlName,e.search);
@@ -558,9 +555,18 @@ export default {
                     $(evt.target).closest(".card-time-picker").length == 0
                 ) { 
                     setTimeout(() => {
-                        if(!$(evt.target).is('td.current.highlight')){
+                        let currentTableInteractive = thisCpn.sDocumentSubmit.currentTableInteractive
+                        if(currentTableInteractive != null){
+                            let cellActiveName = currentTableInteractive.tableInstance.getActiveEditor().prop;
+                            let control = getControlInstanceFromStore(this.keyInstance,cellActiveName);
+                            if(control.type != "time"){
+                                thisCpn.$refs.timeInput.hide();
+                            }
+                        }
+                        else{
                             thisCpn.$refs.timeInput.hide();
                         }
+                        
                     }, 20);
                 }
                 if (
@@ -612,9 +618,10 @@ export default {
                 let param = item.name
                 let controlName = item.controlName;
                 let listInputInDocument = getListInputInDocument(this.keyInstance);
+                if(param != null && param != "" && controlName != null && controlName !="")
                 dataParams[param] = listInputInDocument[controlName].value;
-            }
-            debugger
+            } 
+            return dataParams
         },
         setWorkflowVariableToStore(after){
             this.$store.commit("document/addToDocumentSubmitStore", {
@@ -761,7 +768,7 @@ export default {
             }
             else{
                 let currentTableInteractive = this.sDocumentSubmit.currentTableInteractive
-                currentTableInteractive.tableInstance.setDataAtCell(this.sDocumentSubmit.currentCellSelected.row,this.sDocumentSubmit.currentCellSelected.column,time)
+                currentTableInteractive.tableInstance.setDataAtCell(this.sDocumentSubmit.currentCellSelected.row,this.sDocumentSubmit.currentCellSelected.column,time,'edit')
             }
         },
         afterCheckTimeNotValid(data){
@@ -773,8 +780,14 @@ export default {
             else{
                 controlInstance.renderValidateIcon('Định dạng thời gian không đúng!');
             }
+            this.checkEscKey(data.event);
         },
 
+        checkEscKey(event){
+            if(event != undefined && event.key === "Escape"){
+                this.$refs.timeInput.hide();
+            }
+        },
         afterSelectUser(data){
             let user = data.value;
             let input = data.input;
@@ -1209,6 +1222,9 @@ export default {
 
         // Hàm chỉ ra control được đánh định danh trong document (sct...)
         getColumnIdentifier(){
+            if(this.objectIdentifier == undefined){
+                return {}
+            }
             let controlIdentifier = {}
             let controlNameIdentifier = this.objectIdentifier['name'];
             let controlInstance = getControlInstanceFromStore(this.keyInstance,controlNameIdentifier);
@@ -1255,7 +1271,7 @@ export default {
                 }
             }
             else{
-                submitDocument()
+                this.submitDocument()
             }
             
         },
@@ -1767,7 +1783,7 @@ export default {
 					let controlFormulas = controlInstance.controlFormulas;
 					for(let formulasType in controlFormulas){
 						if(formulasType != 'autocomplete' && formulasType != 'list'){
-							let formulasInstance = controlFormulas[formulasType].instance;
+                            let formulasInstance = controlFormulas[formulasType].instance;
 							this.handlerBeforeRunFormulasValue(formulasInstance,controlInstance.id,controlName,formulasType,'root')
 						}
 					}

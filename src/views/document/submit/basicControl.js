@@ -234,7 +234,11 @@ export default class BasicControl extends Control {
             } else if (thisObj.type == 'inputFilter') {
                 e.formulas = thisObj.controlFormulas.formulas;
                 SYMPER_APP.$evtBus.$emit('document-submit-filter-input-click', e)
+            } else if (thisObj.type == 'time') {
+                e.curTarget = e.target
+                SYMPER_APP.$evtBus.$emit('document-submit-show-time-picker', e)
             }
+
         })
 
 
@@ -248,7 +252,8 @@ export default class BasicControl extends Control {
             } else if (this.type == 'date') {
                 $('#' + this.id).val(moment(value).format(this.formatDate));
             } else if (this.type == 'number') {
-                if (typeof value == 'number')
+                let v = parseInt(value);
+                if (!isNaN(v))
                     $('#' + this.id).val(numbro(value).format(this.numberFormat))
             } else {
                 $('#' + this.id).val(value);
@@ -277,6 +282,7 @@ export default class BasicControl extends Control {
         } else {
             this.ele.val(value)
         }
+        this.ele.attr('value', value)
     }
     renderFileControl = function() {
         let fileHtml = this.genFileView();
@@ -524,13 +530,9 @@ export default class BasicControl extends Control {
         if (this.checkDetailView()) return;
     }
     renderTimeControl() {
-        let thisObj = this;
         if (this.checkDetailView()) return;
         this.ele.attr('type', 'text');
-        this.ele.on('click', function(e) {
-            e.controlName = thisObj.name;
-            SYMPER_APP.$evtBus.$emit('document-submit-time-input-click', e)
-        })
+
     }
     getDefaultValue() {
         if (this.isCheckbox) {

@@ -9,7 +9,7 @@
         :icon="notiIcon"
     >
         <div class="subtitle-1 font-weight-medium" v-html="data.title"></div>
-        <div class="fs-13" v-html="data.text"></div>
+        <div class="fs-13" style="word-break: break-word!important;" v-html="data.text"></div>
         <i class="mdi mdi-close top-right close-btn" @click="handleClose()"></i>
         <div class="mt-2 float-right" v-if="actionBtns.length > 0">
             <v-btn

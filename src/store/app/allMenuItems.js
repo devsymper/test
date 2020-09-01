@@ -74,9 +74,9 @@ export default {
         icon: 'mdi-comment',
         link: '/comment',
     },
-    comment: {
+    knowledge: {
         title: 'KH',
-        icon: 'mdi-file-document-outline',
+        icon: 'file-edit-outline',
         link: '/knowledge',
     },
     timeSheetLogWork: {
