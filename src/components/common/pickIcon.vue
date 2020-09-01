@@ -71,11 +71,6 @@
                     <div v-if="!!link" class="w-100">
                         <img :src="link" width="150" max-height="150" class="mt-3" style="max-width:150px">
                     </div>
-                    <v-btn small color="primary" class="ml-4 mt-3 mb-3" :disabled="!!!link" @click="selectIcon(link,'img')">{{$t("iconPicker.selectImage")}}</v-btn>
-                </v-tab-item>
-                <!-- Tab upload ảnh -->
-                <v-tab-item>
-                    <Upload ref="fileUpload" @selectFile="selectIcon"></Upload>
                 </v-tab-item>
             </v-tabs-items>
         </v-menu>

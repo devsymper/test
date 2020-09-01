@@ -24,6 +24,7 @@ const defaultState = {
     items: [
         // các menu mà ba hoặc enduser được phân quyền
         // { title: "reports", icon: "mdi-view-dashboard", link: "/reports" },
+
         {
             title: "workflows",
             icon: "mdi-sitemap",
@@ -77,16 +78,16 @@ const defaultState = {
             link: "/permissions",
         },
         {
-            title: "actions",
-            icon: "mdi-package",
-            link: "/actions"
-        },
-        {
             title: "apps",
             icon: "mdi-apps",
             link: "/apps"
         },
         // { title: "virtualdocs", icon: "mdi-table", link: "/virtualdocs" },
+        {
+            title: "KH",
+            icon: "mdi-file-chart",
+            link: "/"
+        },
         {
             title: "tasks",
             icon: "mdi-check-all",
@@ -136,7 +137,8 @@ const defaultState = {
     // Danh sách tất cả các user trong hệ thống
     allUsers: [],
     generalNotificationPosition: 'top right',
-    userLoadedRoleType: []
+    userLoadedRoleType: [],
+    userOperations: {}
 };
 
 export default defaultState;

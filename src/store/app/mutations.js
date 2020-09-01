@@ -68,6 +68,11 @@ const setUserRoleByType = (state, param) => {
     Vue.set(state.endUserInfo.roles, type, param.data);
 }
 
+
+const setUserActionsForObjects = (state, data) => {
+    Vue.set(state, 'userOperations', data)
+}
+
 export {
     changeCollapseSidebar,
     increaseUnreadNotification,
@@ -79,5 +84,6 @@ export {
     removeTab,
     setOrgchartNodes,
     setAllUsers,
-    setUserRoleByType
+    setUserRoleByType,
+    setUserActionsForObjects
 };

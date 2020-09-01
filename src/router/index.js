@@ -1,6 +1,8 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
-import { routeMiddleware } from './middleware.js';
+import {
+    routeMiddleware
+} from './middleware.js';
 import PageNotFound from './../views/PageNotFound.vue';
 import MultiGuard from 'vue-router-multiguard';
 import SymperHiddenRedirectComponent from "../views/SymperHiddenRedirectComponent.vue";
@@ -22,7 +24,9 @@ const systemRoutes = [{
     {
         path: "/login",
         name: "login",
-        meta: { layout: "content-only" },
+        meta: {
+            layout: "content-only"
+        },
         component: () =>
             import ('../views/Login.vue'),
     },
@@ -35,7 +39,9 @@ const systemRoutes = [{
         path: "/page-not-found",
         name: "pageNotFound",
         component: PageNotFound, //Vue component,
-        meta: { layout: "content-only" },
+        meta: {
+            layout: "content-only"
+        },
     },
     {
         path: "*",
@@ -48,6 +54,40 @@ const systemRoutes = [{
         name: "generalSearchInfo",
         component: () =>
             import ('../views/search/general.vue'),
+    },
+    //phần timesheet
+    {
+        path: "/timesheet",
+        name: "timesheet",
+        component: () =>
+            import ('../views/timesheet/ShowLogTime.vue'),
+    },
+
+    {
+        path: "/timesheet",
+        name: "Report timesheet",
+        component: () =>
+            import ('../views/timesheet/ReportTimesheet.vue'),
+    },
+
+    {
+        path: "/timesheet/submit",
+        name: "Submit Timesheet",
+        component: () =>
+            import ('../views/timesheet/SubmitTimesheet.vue'),
+    },
+    {
+        path: "/timesheet/report",
+        name: "Timesheet Report",
+        component: () =>
+            import ('../views/timesheet/ReportTimesheet.vue'),
+    },
+
+    {
+        path: "/timesheet/manage",
+        name: "Manage Timesheet",
+        component: () =>
+            import ('../views/timesheet/ManageTimeSheet.vue'),
     },
 ];
 

@@ -83,12 +83,13 @@
 								style="backgound-color:#F7F7F7"
 								v-bind="attrs"
 								v-on="on"
+                                @click="clickToAdd"
 								>
 									<span> {{ $t('apps.clickToAdd')}} </span>
 									<v-icon right dark style="border-left:2px solid lightgrey;padding-left:8px">mdi-plus</v-icon>
 							</v-btn>
 						</template>
-						<SearchModal @selectedItem="selectedItem"/>
+						<SearchModal ref="searchModal" @selectedItem="selectedItem"/>
 					</v-menu>
 		   </v-col>
 	   </v-row>
@@ -189,7 +190,10 @@ export default {
     methods: {
         setAppObject(app) {
             this.currentApp = JSON.parse(JSON.stringify(app));
-		},
+        },
+        clickToAdd(){
+            this.$refs.searchModal.getListSearch('');
+        },
 		// checkEmpty(){
 		// 	if(this.sApp.documents.item.length == 0 && this.sApp.orgcharts.item.length == 0 && this.sApp.reports.item.length == 0 && this.sApp.workflows.item.length == 0 ){
 		// 		this.isEmpty = true;

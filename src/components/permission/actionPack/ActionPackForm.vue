@@ -79,6 +79,11 @@ let defaultTabConfig = {
     dataSchema: []
 };
 
+const actionForObjectType = {
+    create: true,
+    list: true
+};
+
 export default {
     mounted(){
         this.reCaculateTableHeight();
@@ -86,7 +91,11 @@ export default {
     created(){
     },
     methods: { 
-        
+        objectTypeToDocumentDefinition(){
+            // debugger
+            // this.itemData.objectType = 'document_definition'
+            // this.allInputs.objectType.value = 'document_definition'
+        },
         getTableDataFromOperations(operations){
             let mapActionAndObjectTypes = this.mapObjectTypesAndAction;
             let allResource = this.$store.state.actionPack.allResource;
@@ -301,6 +310,11 @@ export default {
             this.dataSchema = this.getDataSchema();
             this.tableColumnsForObjectType = this.getActionAsColumns();
             this.tableColumns = this.getTableColumns();
+
+            this.colHeaders = ["Objects"].concat(this.getColumnHeadersFromAction(['create']));
+            this.colHeadersForObjectType = this.getColumnHeadersFromAction();
+            // Tiêu đề của các cột  cần hiển thị
+
             this.getObjectsOfObjectType();
             this.setTableData();
             this.setTableDataForObjectType();
@@ -421,13 +435,15 @@ export default {
             for(let objectType in this.itemData.mapActionForAllObjects){
                 let dataTable = this.itemData.mapActionForAllObjects[objectType];
                 let row = dataTable[0];
+
                 if(allResource.hasOwnProperty(objectType)){
                     for(let actionName in row){
+                        let objectIdentifier = actionForObjectType[actionName] ? objectType : (objectType+':0');
                         if(row[actionName]){
                             newOperations.push({
                                 objectType: objectType,
                                 action: actionName,
-                                objectIdentifier: objectType,
+                                objectIdentifier: objectIdentifier,
                                 name: actionName.replace(/_/g, ' ') + ' '+ objectType.replace(/_/g, ' ')
                             });
                         }
@@ -604,9 +620,8 @@ export default {
                     }
                     setTimeout(function() {
                         htIst.selectCell(lastIndex, htIst.propToCol(changes[0][1]));
-                        self.itemData.mapActionAndObjects[self.itemData.objectType] = htIst.getSourceData();
+                        self.itemData.mapActionAndObjects[self.allInputs.objectType.value] = htIst.getSourceData();
                     }, 0);
-
                 },
                 afterSelectionEnd(rowNum	, column, row2 , column2 , preventScrolling, selectionLayerLevel){
                     let objectType = self.allInputs.objectType.value;
@@ -644,7 +659,10 @@ export default {
                     dashboard : util.cloneDeep(defaultTabConfig),
                 }
             },
-            focusingIdApplication: 0
+            focusingIdApplication: 0,
+            // Tiêu đề của các cột  cần hiển thị
+            colHeaders: [],
+            colHeadersForObjectType: [],
         }
     },
     components: {
@@ -684,13 +702,6 @@ export default {
                 }
             }
             return rsl;
-        },
-        // Tiêu đề của các cột  cần hiển thị
-        colHeaders() {
-            return ["Objects"].concat(this.getColumnHeadersFromAction(['create']));
-        },
-        colHeadersForObjectType(){
-            return this.getColumnHeadersFromAction();
         },
         allInputs(){
             return {

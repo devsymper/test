@@ -3,14 +3,14 @@
     <v-dialog
         v-model="isShowTableSetting"
         width="800"
+        scrollable
+        style="overflow:hidden;"
         >
         <v-card
-        height="550"
-        >
+         height="550">
             <v-card-title class="headline">Table setting</v-card-title>
             <v-divider></v-divider>
-            <v-card-text style="height: calc(100% - 112px);    overflow: auto;">
-            
+            <v-card-text>
                 <div id="setting-control-table" class="setting-control-table">
                     <div class="content-setting-control-table scroll-thin">
                         <v-simple-table fixed-header height="100%" >

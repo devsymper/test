@@ -11,6 +11,7 @@
             :actionPanelWidth="600"
             @after-open-add-panel="showAddModal"
             :customAPIResult="customAPIResult"
+            :commonActionProps="commonActionProps"
         >
             <div slot="right-panel-content" class="h-100">
                 <updateApp
@@ -42,7 +43,7 @@ export default {
     computed: {
         baseUrl: function() {
             return this.apiUrl + this.appUrl ;
-        },
+        }, 
     },
     created(){
 		let self = this;
@@ -50,6 +51,11 @@ export default {
     },
     data: function() {
         return {
+            commonActionProps: {
+                "module": "application",
+                "resource": "application_definition",
+                "scope": "application",
+            },
             apiUrl: "https://core.symper.vn/application",
             appUrl: "apps",
             isEdit: false,
@@ -115,8 +121,8 @@ export default {
                    }
                 }
             },
-            tableContextMenu: [
-               {
+            tableContextMenu: {
+               update: {
                     name: "edit",
                     text: this.$t("apps.contextMenu.edit"),
                     callback: (app, callback) => {
@@ -137,7 +143,7 @@ export default {
                         });
                     },
                 },
-                {
+                remove: {
                     name: "remove",
                     text: this.$t("apps.contextMenu.remove"),
                     callback: (app, callback) => {
@@ -145,7 +151,7 @@ export default {
                         this.deleteApp(app);
                     },
                 },
-            ],
+            },
 			tableHeight: 0,
 			arrType:{
 				document_definition:[

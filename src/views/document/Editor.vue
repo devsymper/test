@@ -22,6 +22,7 @@
                     @document-action-get-from-local-storage="getFromLocalStorege"
                     @document-action-delete-cache="deleteLocalStorage"
                     @document-action-check-control="checkBeforeControlNameChange"
+                    @document-action-swap-type-control="openPanelSwapType"
                     />
                 </div>
                 <textarea ref="editorLibWrapper" :id="'document-editor-'+keyInstance">
@@ -41,6 +42,11 @@
         <err-message :listErr="listMessageErr" ref="errMessage"/>
         <control-name-related :instance="keyInstance" @after-close-panel="afterClosePanel"  ref="controlNameRelated"/>
         <all-control-option :instance="keyInstance" ref="allControlOption"/>
+        <SwapTypeControlView 
+        :instance="keyInstance" 
+        :dataControl="dataControlSwapType"
+        @after-change-type-control="afterChangeTypeControl" 
+        ref="swapTypeControlView"/>
 
         <v-dialog v-model="dialog" persistent max-width="290">
             <v-card>
@@ -57,6 +63,7 @@
 <script>
 // import Editor from '@tinymce/tinymce-vue';
 import EditorAction from './items/Action.vue';
+import SwapTypeControlView from './items/SwapTypeControlView';
 import SideBarLeft from './sideleft/SideBarLeft.vue';
 import SideBarRight from './sideright/SideBarRight.vue';
 import TableSetting from './items/TableSetting.vue';
@@ -67,8 +74,9 @@ import ErrMessagePanel from "./../../views/document/items/ErrMessagePanel.vue";
 import ControlNameRelated from "./../../views/document/items/ControlNameRelated.vue";
 import AllControlInDoc from "./../../views/document/items/AllControlInDoc.vue";
 import { GetControlProps,mappingOldVersionControlProps,
-        mappingOldVersionControlFormulas,getAPropsControl } from "./../../components/document/controlPropsFactory.js";
+        mappingOldVersionControlFormulas,getAPropsControl,getIconFromType } from "./../../components/document/controlPropsFactory.js";
 import { documentApi } from "./../../api/Document.js";
+import { biApi } from "./../../api/bi.js";
 import { formulasApi } from "./../../api/Formulas.js";
 import { util } from "./../../plugins/util.js";
 import {checkInTable} from "./common/common";
@@ -120,6 +128,7 @@ export default {
         "vue-resizable":VueResizable,
         "all-control-option":AllControlInDoc,
         "control-name-related":ControlNameRelated,
+        SwapTypeControlView
     },
     mounted(){
         let self = this;
@@ -201,14 +210,18 @@ export default {
             let elControl = $("#document-editor-"+thisCpn.keyInstance+"_ifr").contents().find('body #'+locale.id);
             thisCpn.setSelectedControlProp(locale.event,elControl,$('#document-editor-'+this.keyInstance+'_ifr').get(0).contentWindow);
         });
-        /**
-         * Nhận sự kiện phát ra từ formTpl lúc on change để check trùng tên control
-         */
-        this.$evtBus.$on("form-tpl-input-value-changed", locale =>{
-            $('#document-editor'+thisCpn.keyInstance+'_ifr').contents().find('.s-control-error').removeClass('s-control-error');
-            thisCpn.checkNameAfterChange();
+
+        biApi.getAllDataFlow().then(res=>{
+            console.log(res);
+            if(res.status == 200 && res.data.length>0){
+                for (let index = 0; index < res.data.length; index++) {
+                    let dataflow = res.data[index];
+                    thisCpn.listDataFlow.push({id:dataflow.id,name:dataflow.name,title:"",params:dataflow.params})
+                }
+                thisCpn.$store.commit("document/addToDocumentEditorStore",{key:"listDataFlow",value:thisCpn.listDataFlow,instance:thisCpn.keyInstance});  
+            }
         })
-            
+        
     },
     data(){
         return{
@@ -216,8 +229,7 @@ export default {
             isAutocompleteControl:false,
             listMessageErr:[],
             documentId:0,
-            currentFormulasInput:'',
-            currentSelectedInputProps:'',
+            currentSelectedControl:'',
             documentProps:{},
             delta : 500,
             lastKeypressTime : 0,
@@ -225,6 +237,8 @@ export default {
             listNameValueControl:{},
             keyInstance:Date.now(),
             dialog: false,
+            dataControlSwapType:{},
+            listDataFlow:[]
         }
     },
     beforeMount(){
@@ -276,6 +290,42 @@ export default {
         },
         px2cm(px) {
             return (Math.round((px / 37.7952) * 100) / 100).toFixed(1);
+        },
+
+        // hàm gọi từ compon đổi kiểu control để thay đổi dữ liệu của control có trong store
+        afterChangeTypeControl(newType){
+            let currentControl = this.editorStore.currentSelectedControl;
+            let control =  GetControlProps(newType);
+            let controlEl = $("#document-editor-"+this.keyInstance+"_ifr").contents().find('#'+currentControl.id);
+            let oldFormulas = currentControl.formulas
+            let oldProps = currentControl.properties
+            for(let formulasType in oldFormulas){
+                if(control.formulas.hasOwnProperty(formulasType)){
+                    control.formulas[formulasType] = oldFormulas[formulasType]
+                }
+            }
+            for(let group in oldProps){
+                for(let prop in oldProps[group]){
+                    if(control.properties.hasOwnProperty(prop)){
+                        control.properties[prop] = oldProps[group][prop]
+                    }
+                }
+            }
+            if(controlEl.length > 0){
+                let id = currentControl.id;
+                let table = controlEl.closest('.s-control-table');
+                if(table.length > 0 && currentControl.id != table.attr('id')){
+                    let tableId = table.attr('id');
+                    this.addToAllControlInTable(id,{properties: control.properties, formulas : control.formulas,type:newType},tableId);
+                }
+                else{
+                    this.addToAllControlInDoc(id,{properties: control.properties, formulas : control.formulas,type:newType});
+                }
+                let newControl = $(control.html);
+                newControl.attr('id',id).addClass('on-selected')
+                controlEl.replaceWith(newControl.prop('outerHTML'));
+                this.selectControl(control.properties, control.formulas,id,newType);
+            }  
         },
         /**
          * Hàm xử lí kiểm tra xem tên của control hiện tại đang ở trong những công thức của các control nào doc nao
@@ -440,40 +490,117 @@ export default {
             this.$refs.allControlOption.getData();
             this.$refs.allControlOption.showDialog();
         },
+        openPanelSwapType(){
+            let currentControl = this.editorStore.currentSelectedControl
+            if(currentControl.properties.name.hasOwnProperty('name')){
+                let icon = getIconFromType(currentControl.type)
+                this.dataControlSwapType = {
+                    name:currentControl.properties.name.name.value,
+                    type:currentControl.type,
+                    icon:icon
+                }
+                this.$refs.swapTypeControlView.show();
+            }
+            else{
+                 this.$snotify({
+                                type: "info",
+                                title: "Vui lòng chọn control trước khi sử dụng tính năng này"
+                            }); 
+            }
+            
+        },
         // mở modal lưu , edit doc
         openPanelSaveDocument(){
             if($('#document-editor-'+this.keyInstance+'_ifr').contents().find('.s-control').length > 0){
                 let allControl = this.editorStore.allControl;
-                this.checkEmptyControl(allControl,'0');
-                if($('#document-editor-'+this.keyInstance+'_ifr').contents().find('.s-control-error').length == 0){
-                    if(this.documentId == undefined || this.documentId == 0)
-                    this.setDocumentProperties({})
-                    this.$refs.saveDocPanel.showDialog()
-                }
-                else{
+                let controlPrimaryKey = this.validateControlBeforeSave(allControl,'0');
+                if(Object.keys(controlPrimaryKey).length > 1){
+                    let allKey = Object.keys(controlPrimaryKey);
                     this.$snotify({
                                     type: "error",
-                                    title: "Tên một số control chưa hợp lệ",
+                                    title: "Kiểm tra lại các trường định danh",
+                                    text : "Không được có "+allKey.length+" trường định danh trong 1 doc. Kiểm tra control: "+allKey.join(',')
                                 });
+                }
+                else{
+                    let controlError = $('#document-editor-'+this.keyInstance+'_ifr').contents().find('.s-control-error');
+                    if(controlError.length == 0){
+                        if(this.documentId == undefined || this.documentId == 0)
+                        this.setDocumentProperties({})
+                        this.$refs.saveDocPanel.showDialog()
+                    }
+                    else{
+                        let listName = []
+                        $.each(controlError,function(item){
+                            let id = $(item).attr('id');
+                            console.log("sadsdsad",id);
+                            let name = allControl[id].properties.name.value;
+                            listName.push(name);
+                        })
+                        this.$snotify({
+                                        type: "error",
+                                        title: "Tên một số control chưa hợp lệ",
+                                        text: "Có "+listName.length+" control đặt tên không hợp lệ. Kiểm tra: "+listName.join(',')
+                                    });
+                    }
                 }
             }
         },
-        checkEmptyControl(allControl,tableId){
+        // checkTitleControl(){
+        //     let rs = true;
+        //     let allControl = util.cloneDeep(this.editorStore.allControl);
+        //     for(let controlId in allControl){
+        //         if(allControl[controlId].properties.hasOwnProperty('title')){
+        //             let title = allControl[controlId].properties.title.value;
+        //             if(title == ""){
+        //                 rs = false;
+        //                 $("#document-editor-"+this.keyInstance+"_ifr").contents().find('#'+controlId).addClass('s-control-error');
+        //                 let errValue = "Không được bỏ trống tiêu đề"
+        //                 let tableId = checkInTable($("#document-editor-"+this.keyInstance+"_ifr").contents().find('#'+controlId))
+        //                 if( tableId == controlId)
+        //                 tableId = '0';
+        //                 this.$store.commit(
+        //                     "document/updateProp",{id:controlId,name:'title',value:errValue,tableId:tableId,type:"errorMessage",instance:this.keyInstance}
+        //                 ); 
+        //             }
+        //         }
+        //     }
+        //     return rs;
+        // },
+        validateControlBeforeSave(allControl,tableId){
+            let controlPrimaryKey = {};
             for(let controlId in allControl){
                 if(allControl[controlId].hasOwnProperty('listFields')){
-                    this.checkEmptyControl(allControl[controlId]['listFields'],controlId);
+                    let childPrimary = this.validateControlBeforeSave(allControl[controlId]['listFields'],controlId);
+                    controlPrimaryKey = Object.assign(controlPrimaryKey,childPrimary)
                 }
                 if(allControl[controlId].type != 'submit' && allControl[controlId].type != 'draft' 
                 && allControl[controlId].type != 'reset' && allControl[controlId].type != 'approvalHistory'
-                && allControl[controlId].properties.name.value == ""){
-                    let controlEl = $('#document-editor-'+this.keyInstance+'_ifr').contents().find('#'+controlId);
-                    controlEl.addClass('s-control-error');
-                    this.$store.commit(
-                        "document/updateProp",{id:controlId,name:"name",value:"Không được bỏ trống tên control",
-                        tableId:tableId,type:"errorMessage",instance:this.keyInstance}
-                    );
+                ){
+                    let controlProps = allControl[controlId].properties;
+                    if( controlProps.name.value == ""){
+                        let controlEl = $('#document-editor-'+this.keyInstance+'_ifr').contents().find('#'+controlId);
+                        controlEl.addClass('s-control-error');
+                        this.$store.commit(
+                            "document/updateProp",{id:controlId,name:"name",value:"Không được bỏ trống tên control",
+                            tableId:tableId,type:"errorMessage",instance:this.keyInstance}
+                        );
+                    }
+                    let title = controlProps.title.value;
+                    if(title == ""){
+                        let controlEl = $('#document-editor-'+this.keyInstance+'_ifr').contents().find('#'+controlId);
+                        controlEl.addClass('s-control-error');
+                        this.$store.commit(
+                            "document/updateProp",{id:controlId,name:"title",value:"Không được bỏ trống tiêu đề",
+                            tableId:tableId,type:"errorMessage",instance:this.keyInstance}
+                        );
+                    }
+                    if(controlProps.hasOwnProperty('isPrimaryKey') && controlProps.isPrimaryKey.value == true){
+                        controlPrimaryKey[controlProps.name.value] = allControl[controlId];
+                    }
                 }
             }
+            return controlPrimaryKey;
         },
         /**
          * Hàm xử lí lấy dữ liệu các công thức để insert vào formulas service trước khi lưu
@@ -561,7 +688,7 @@ export default {
             return {minimizeControl:allControl,userControls:allUserControl}
             
         },
-      
+   
         // hoangnd: hàm gửi request lưu doc
         async saveDocument(){
             let minimizeControl = this.minimizeControlEL(this.editorStore.allControl);
@@ -690,24 +817,15 @@ export default {
             .always(() => {
             });
         },
-        //hoangnd: hàm xác thưc các control trước khi lưu
-        // xac thực tên control và các formulas liên quan
-        checkNameAfterChange(){
-            let allControl = util.cloneDeep(this.editorStore.allControl);
-            let listControlName = [];
-            for(let controlId in allControl){
-                let control = allControl[controlId];
-                this.checkDupliucateNameControl(listControlName,control,controlId)
-            }
-        },
+      
         validateControl(){
             let thisCpn = this;
-            let allControl = util.cloneDeep(this.editorStore.allControl);
             let listControlName = [];
             this.listMessageErr = [];
             //check trung ten control
             $("#document-editor-"+thisCpn.keyInstance+"_ifr").contents().find('.on-selected').removeClass('on-selected');
             if($('#document-editor-'+thisCpn.keyInstance+'_ifr').contents().find('.s-control-error').length == 0){
+                
                 this.saveDocument();
             }
             else{
@@ -718,35 +836,8 @@ export default {
                             }); 
             }
         },
-        // hàm kiểm tra xác thực tên control 
-        checkValidNameControl(controlId,control){
-            if(control.type != "submit" && control.type != "draft" && control.type != "reset" && control.type != "approvalHistory"){
-                if(control.properties.name.value == ''){
-                    let controlEl = $('#document-editor-'+this.keyInstance+'_ifr').contents().find('#'+controlId);
-                    controlEl.addClass('s-control-error');
-                    let message = 'Không được bỏ trống tên control'
-                    let tableId = checkInTable(controlEl)
-                    this.$store.commit(
-                        "document/updateProp",{id:controlId,name:'name',value:value,tableId:tableId,type:"errorMessage",instance:this.keyInstance}
-                    );   
-                }
-                else{
-                    this.checkDupliucateNameControl(control,controlId);
-                }
-                
-                
-            }
-            
-        },
-      //updateCurrentControlProps
-        // hàm kiểm tra xem co control nào trùng tên hay ko
-        checkDupliucateNameControl(control,controlId){
-            let controlEl = $('#document-editor-'+this.keyInstance+'_ifr').contents().find('#'+controlId);
-            controlEl.addClass('s-control-error');
-          
-           
-            
-        },
+        
+       
         // hàm kiểm tra xem trong công thức có trỏ đến control ko tồn tại hay ko
         validateFormulasInControl(control,listControlName){
             // check control Name trong cong thức
@@ -828,11 +919,22 @@ export default {
             );  
         },
         // set config cho phần sidebar phải các thuộc tính control đang được click
-        selectControl(properties,formulas,id){
+        selectControl(properties,formulas,id,type){
+            if(type == 'dataFlow'){
+                // console.log(this.listDataFlow,'listDataFlowlistDataFlow');
+                // let curDataFlow = this.listDataFlow.filter(df=>{
+                //     return df.id == properties['dataFlowId'].value
+                // })
+                // console.log(curDataFlow,'listDataFlowlistDataFlow');
+                // properties[k].value = this.listDataFlow
+            }
             this.$store.commit(
                 "document/addCurrentControl",
                 {properties:properties,
-                formulas:formulas,id:id,instance:this.keyInstance}
+                formulas:formulas,
+                id:id,
+                type:type,
+                instance:this.keyInstance}
             );
         },
         resetSelectControl(){
@@ -862,7 +964,7 @@ export default {
             
             $(this.editorCore.selection.getNode()).html(newContent+'&nbsp;<span id = "caret_pose_holder"> </ span>')
             let table = $(this.editorCore.selection.getNode()).closest('.s-control-table');
-            this.selectControl(control.properties, control.formulas,inputid);
+            this.selectControl(control.properties, control.formulas,inputid,type);
             let ed  = this.editorCore;
             ed.focus(); 
             ed.selection.select(ed.dom.select('#caret_pose_holder')[0]); 
@@ -1110,7 +1212,12 @@ export default {
                 let type = fields[controlId].type
                 $.each(properties,function(k,v){
                     if(properties[k].type == 'checkbox'){
-                        properties[k].value = (fields[controlId]['properties'][k] == 0 || fields[controlId]['properties'][k] == '0' || fields[controlId]['properties'][k] == '') ? false : true
+                        console.log(k,fields[controlId]['properties'][k]);
+                        properties[k].value = (fields[controlId]['properties'][k] == 0 || 
+                                                fields[controlId]['properties'][k] == '0' || 
+                                                fields[controlId]['properties'][k] == '' ||
+                                                fields[controlId]['properties'][k] == undefined 
+                                                ) ? false : true
                     }
                     else{
                         properties[k].value = fields[controlId]['properties'][k]
@@ -1118,6 +1225,7 @@ export default {
                     if(k =='name'){
                         properties[k].oldName =  properties[k].value
                     }
+                    
                 }) 
                 if(fields[controlId]['formulas'] != false){
                     $.each(formulas,function(k,v){
@@ -1634,6 +1742,10 @@ export default {
                     var insertionPoint = $("#document-editor-"+thisCpn.keyInstance+"_ifr").contents().find(".drop-marker");
                     var checkDiv = $(control.html);
                     let typeControl = checkDiv.attr('s-control-type');
+                    if(typeControl == 'dataFlow'){
+                        control.properties.dataFlowId.options = thisCpn.listDataFlow;
+                    }
+
                     var inputid = 's-control-id-' + Date.now();
                     checkDiv.attr('id', inputid);
                     insertionPoint.after(checkDiv);
@@ -1644,7 +1756,7 @@ export default {
                         checkDiv.attr('contenteditable', false);
                     }
                     insertionPoint.remove();
-                    thisCpn.selectControl(control.properties, control.formulas,inputid);
+                    thisCpn.selectControl(control.properties, control.formulas,inputid,typeControl);
                     if(table.length > 0){   // nếu keo control vào trong table thì update dữ liệu trong table của state
                         idTable = table.attr('id');
                         thisCpn.addToAllControlInTable(inputid,{properties: control.properties, formulas : control.formulas,type:typeControl},idTable);
@@ -1659,12 +1771,16 @@ export default {
 
         },
         setSelectedControlProp(e,el,clientFrameWindow){
+            
             e.preventDefault();
             $(clientFrameWindow.document).find('.on-selected').removeClass('on-selected');
             el.addClass('on-selected');
 
             let type = el.attr('s-control-type');
+
+            
             let controlId = el.attr('id');
+            this.currentSelectedControl = controlId
             $('.editor-tree-active').removeClass('editor-tree-active')
             $('.tree-'+controlId).addClass('editor-tree-active')
             
@@ -1673,11 +1789,11 @@ export default {
                 tinyMCE.activeEditor.selection.setNode(e.target);
                 let tableId = table.attr('id');
                 let control = this.editorStore.allControl[tableId]['listFields'][controlId];
-                this.selectControl(control.properties, control.formulas,controlId);
+                this.selectControl(control.properties, control.formulas,controlId,type);
             }
             else{
                 let control = this.editorStore.allControl[controlId];
-                this.selectControl(control.properties, control.formulas,controlId);
+                this.selectControl(control.properties, control.formulas,controlId,type);
             }
         }
     },

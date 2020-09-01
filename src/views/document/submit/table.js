@@ -47,7 +47,7 @@ Handsontable.renderers.PercentRenderer = function(instance, td, row, col, prop, 
     Handsontable.renderers.NumericRenderer.apply(this, arguments);
     td.style.textAlign = 'left'
     let table = store.state.document.submit[instance.keyInstance];
-    td.textContent = (td.textContent == "" || td.textContent == null) ? 0 + " %" : td.textContent + " %";
+    td.textContent = (td.textContent == "" || td.textContent == null || !/\d/.test(td.textContent)) ? 0 + " %" : td.textContent + " %";
     if (row == instance.countRows() - 1 && table != undefined && instance.hasOwnProperty('tableName')) {
         let tableControl = table.listInputInDocument[instance.tableName];
         let tableInstance = tableControl.tableInstance;
@@ -148,11 +148,14 @@ const makeDelay = function(ms) {
     };
 };
 var delay = makeDelay(1000);
+var lastKey;
+
 /**
  * Các loại cell mà handsontable hỗ trợ hiển thị
  */
 const supportCellsType = {
     textInput: 'TextRenderer',
+    department: 'TextRenderer',
     currency: 'NumericRenderer',
     number: 'NumericRenderer',
     date: 'DateRenderer',
@@ -209,6 +212,7 @@ export default class Table {
             this.isAutoCompleting = false;
             this.cellAfterChange = "";
             this.showPopupUser = false;
+            this.showPopupTime = false;
             this.currentControlSelected = null,
                 this.listAutoCompleteColumns = {},
                 this.event = {
@@ -226,13 +230,7 @@ export default class Table {
                             value: thisObj.currentSelectedCell,
                             instance: thisObj.keyInstance
                         });
-                        let columns = thisObj.columnsInfo.columns;
-                        if (columns[column] != undefined)
-                            thisObj.currentControlSelected = columns[column].data;
-                        // nếu type cell là time thì emit qua submit mở timepicker
-                        if (thisObj.getCellSelectedType(column) == 'time') {
-                            // SYMPER_APP.$evtBus.$emit('document-submit-show-time-picker', { event: event });
-                        };
+
                         // if (thisObj.getCellSelectedType(column) == 'select') {
                         //     thisObj.setSelectCell(event);
                         // };
@@ -241,26 +239,48 @@ export default class Table {
 
 
                     beforeKeyDown: function(event) {
-                        if (event.ctrlKey || event.altKey || event.metaKey) {
+                        if (thisObj.tableHasRowSum && thisObj.currentSelectedCell['row'] == this.countRows() - 1) {
                             return;
                         }
 
+                        if (event.ctrlKey || event.altKey || event.metaKey) {
+                            return;
+                        }
+                        if (thisObj.checkControlType('time')) {
+                            if (event.keyCode == 13) {
+                                thisObj.showPopupTime = false;
+                            }
+                            if ((event.keyCode == 40 || event.keyCode == 38 ||
+                                    event.keyCode == 37 || event.keyCode == 39) && thisObj.showPopupTime != false) {
+                                event.stopImmediatePropagation();
+                            }
+                        }
                         if (thisObj.checkControlType('user')) {
-                            thisObj.showPopupUser = true;
                             if (event.keyCode == 13) {
                                 thisObj.showPopupUser = false;
+                                event.curTarget = this.getActiveEditor().TEXTAREA;
+                                SYMPER_APP.$evtBus.$emit('document-submit-user-input-change', event)
                             }
                             // chặn bấm lên xuống trái phải khi có autocomplete
                             if ((event.keyCode == 40 || event.keyCode == 38 ||
                                     event.keyCode == 37 || event.keyCode == 39) && thisObj.showPopupUser != false) {
                                 event.stopImmediatePropagation();
                             }
-                            SYMPER_APP.$evtBus.$emit('document-submit-user-input-change', event)
-                        } else {
+                            if (listKeyCodeNotChange.includes(event.keyCode) && !thisObj.showPopupUser) {
+                                return;
+                            }
+                            if (event.keyCode != 13) {
+                                setTimeout((hot) => {
+                                    thisObj.showPopupUser = true;
+                                    event.curTarget = hot.getActiveEditor().TEXTAREA;
+                                    SYMPER_APP.$evtBus.$emit('document-submit-user-input-change', event)
+                                }, 50, this);
+                            }
+                        }
+                        if (thisObj.checkControlType('department')) {
                             if (event.keyCode == 13) {
                                 return;
                             }
-                            thisObj.showPopupUser = false;
                             if (thisObj.listAutoCompleteColumns[thisObj.currentControlSelected] != false) {
                                 if ((event.keyCode == 40 || event.keyCode == 38 ||
                                         event.keyCode == 37 || event.keyCode == 39) && thisObj.isAutoCompleting) {
@@ -277,6 +297,35 @@ export default class Table {
                                     let colHeaders = this.getColHeader();
                                     let columnIndex = thisObj.currentSelectedCell['column'];
                                     event.curTarget = this.getActiveEditor().TEXTAREA;
+                                    SYMPER_APP.$evtBus.$emit('document-submit-department-key-event', {
+                                        e: event,
+                                        formulasInstance: formulasInstance,
+                                        controlTitle: colHeaders[columnIndex],
+                                        controlName: columns[columnIndex].data
+                                    })
+                                }, 50);
+                            }
+                        } else {
+                            if (event.keyCode == 13) {
+                                return;
+                            }
+                            if (thisObj.listAutoCompleteColumns[thisObj.currentControlSelected] != false) {
+                                if ((event.keyCode == 40 || event.keyCode == 38 ||
+                                        event.keyCode == 37 || event.keyCode == 39) && thisObj.isAutoCompleting) {
+                                    event.stopImmediatePropagation();
+                                }
+                                if (listKeyCodeNotChange.includes(event.keyCode)) {
+                                    return;
+                                }
+                                // hoangnd: cần set timeout ở đây tại vì cần thực hiện đoạn này sau khi keydown hoàn tất thì input mới có dữ liệu
+                                setTimeout(() => {
+                                    console.log("dsadasdsadsads");
+                                    let columns = thisObj.columnsInfo.columns;
+                                    let formulasInstance = thisObj.listAutoCompleteColumns[thisObj.currentControlSelected]
+                                    event.rowIndex = thisObj.currentSelectedCell['row'];
+                                    let colHeaders = this.getColHeader();
+                                    let columnIndex = thisObj.currentSelectedCell['column'];
+                                    event.curTarget = this.getActiveEditor().TEXTAREA;
                                     SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-key-event', {
                                         e: event,
                                         autocompleteFormulasInstance: formulasInstance,
@@ -285,13 +334,20 @@ export default class Table {
                                         controlName: columns[columnIndex].data
                                     })
                                 }, 50);
-
                             }
-
-
                         }
                     },
-
+                    afterOnCellMouseDown: function(event, coords, TD) {
+                        let columns = thisObj.columnsInfo.columns;
+                        if (columns[coords.col] != undefined)
+                            thisObj.currentControlSelected = columns[coords.col].data;
+                        // nếu type cell là time thì emit qua submit mở timepicker
+                        if (thisObj.getCellSelectedType(coords.col) == 'time') {
+                            thisObj.showPopupTime = true;
+                            event.controlName = columns[coords.col].data
+                            SYMPER_APP.$evtBus.$emit('document-submit-show-time-picker', event);
+                        };
+                    },
                     afterSelectionEnd: function(row, col) {
                         store.commit("document/addToDocumentSubmitStore", {
                             key: 'docStatus',
@@ -299,7 +355,16 @@ export default class Table {
                             instance: thisObj.keyInstance
                         });
                     },
-
+                    afterDocumentKeyDown: function(e) {
+                        if (lastKey === 'Shift') {
+                            if (e.key === 'Enter') {
+                                this.alter('insert_row', thisObj.currentSelectedCell.row + 1, 1);
+                            } else if (e.key === 'Delete') {
+                                this.alter('remove_row', thisObj.currentSelectedCell.row, 1);
+                            }
+                        }
+                        lastKey = e.key;
+                    },
                     afterChange: function(changes, source) {
 
                         if (changes == null) {
@@ -356,17 +421,7 @@ export default class Table {
                                 thisObj.handlerRunFormulasForControlInTable('uniqueDB', controlUnique, dataInput, controlUnique.controlFormulas.uniqueDB);
                             }
                         }
-                        if (event != undefined && event.type == 'keydown' && event.keyCode == 13 && source == 'edit') {
-                            if (thisObj.tableHasRowSum) {
-                                if (thisObj.currentSelectedCell.row + 2 == this.getData().length) {
-                                    this.alter('insert_row', thisObj.currentSelectedCell.row + 1, 1);
-                                }
-                            } else {
-                                if (thisObj.currentSelectedCell.row + 1 == this.getData().length) {
-                                    this.alter('insert_row', thisObj.currentSelectedCell.row + 1, 1);
-                                }
-                            }
-                        }
+
                     }
                 }
             listTableInstance[this.tableName] = this;
@@ -845,10 +900,9 @@ export default class Table {
                 if (!this.reRendered && thisObj.tableHasRowSum) {
                     this.reRendered = true;
                     setTimeout((hotTb) => {
-                        // hotTb.getPlugin('hiddenColumns').hiddenColumns(thisObj.columnsInfo.hiddenColumns)
-                        // for (let index = 0; index < hotTb.getDataAtRow(0).length; index++) {
-                        //     // hotTb.setCellMeta(hotTb.countRows() - 1, index, 'readOnly', true);
-                        // }
+                        for (let index = 0; index < hotTb.getDataAtRow(0).length; index++) {
+                            hotTb.setCellMeta(hotTb.countRows() - 1, index, 'readOnly', true);
+                        }
                         hotTb.render();
                     }, 500, this);
                 }
@@ -863,6 +917,11 @@ export default class Table {
                             let CharAt = String.fromCharCode(65 + columnHasSum[controlName]);
                             let sumValue = '=SUM(' + CharAt + '1:' + CharAt + '' + (hotTb.countRows() - 1) + ')'
                             hotTb.setDataAtCell(hotTb.countRows() - 1, colIndex, sumValue, AUTO_SET);
+
+                        }
+                        for (let index = 0; index < hotTb.getDataAtRow(0).length; index++) {
+                            hotTb.setCellMeta(hotTb.countRows() - 1, index, 'readOnly', true);
+                            hotTb.setCellMeta(hotTb.countRows() - 2, index, 'readOnly', false);
                         }
                     }
                 });

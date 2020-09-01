@@ -14,16 +14,16 @@ import {
 } from 'jquery';
 const updateListItemSelected = (state, data) => {
 	let listItem = state.listItemSelected[data.type].item;
-	if (listItem.includes(data.obj) === true) {
-		listItem.splice(listItem.indexOf(data.obj), 1);
-	} else {
-		listItem.push(data.obj);
+	let check = false
+	listItem.forEach(function(e){
+		if(e.id == data.obj.id){
+			check = true
+			listItem.splice(listItem.indexOf(e),1)
+		}
+	});
+	if(check == false){
+		listItem.push(data.obj)
 	}
-	// if(listItem.indexOf(data.obj) == -1){
-	// 	listItem.push(data.obj);
-	// }else{
-	// 	listItem.splice(listItem.indexOf(data.obj), 1);
-	// }
 }
 const removeItemSelected = (state, data) => {
 	state.listItemSelected[data.type].item.splice(state.listItemSelected[data.type].item.indexOf(data.item), 1);

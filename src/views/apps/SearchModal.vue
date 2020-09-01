@@ -108,39 +108,38 @@ export default {
 		checkChildrenItem(resData,storeData){
 			if(resData.length > 0){
 				resData.forEach(function(e){
+					e.active = false
 					if(storeData.length > 0){
 						storeData.forEach(function(f){
 							if(e.id == f.id){
 								e.active = true
-							}else{
-								e.active = false
+								debugger
 							}
 						})
-					}else{
-						e.active = false
 					}
 				})
 			}
 			return resData	
 		},
-		checkActive(obj,type){
-			// debugger
-			// if(this.sAppManagement[type].item.includes(obj) === true){
-			// 	return true
-			// }else{
-			// 	return false
-			// }
-			this.sAppManagement[type].item.forEach(function(e){
-				if(e.id == obj.id){
-					return true
-				}else{
-					return false
-				}
-			})
-			
-		},
+		// checkActive(obj,type){
+		// 	debugger
+		// 	// if(this.sAppManagement[type].item.includes(obj) === true){
+		// 	// 	return true
+		// 	// }else{
+		// 	// 	return false
+		// 	// }
+		// 	let check = false
+		// 	this.sAppManagement[type].item.forEach(function(e){
+		// 		if(e.id == obj.id){
+		// 			check =  true
+		// 		}else{
+		// 			check = false
+		// 		}
+		// 	})
+		// 	return check
+		// },
 		getListSearch(value){
-			let self = this
+ 			let self = this
 			this.listItems.document_definition.item = []
 			this.listItems.orgchart.item = []
 			this.listItems.workflow_definition.item = []
