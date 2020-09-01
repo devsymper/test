@@ -24,7 +24,7 @@
 							<VuePerfectScrollbar style="max-height:200px"  >
 								<li v-for="(item,i) in sFavorite" :key="i" v-on:contextmenu="rightClickHandler($event,item,item.type)" style="cursor:pointer"> 
 									<div style="position:relative">
-										<div v-if="item.hasOwnProperty('title')" class="title-item-favorite">{{item.title}}</div>
+										<div v-if="item.type == 'document_definition'" class="title-item-favorite">{{item.title}}</div>
 										<div v-else  class="title-item-favorite">{{item.name}}</div> 
 										<v-icon  color="#F6BE4F" style="float:right;font-size:13px;position:absolute;top:0px;right:0px">mdi-star</v-icon>
 									</div>
@@ -309,7 +309,6 @@ export default {
 					self.mapId.document_definition["document_definition:"+e.id] = e;
 				})
 				let dataDoc = self.arrType.document_definition
-				// this.getDocumentsApi(dataDoc);
 				this.getByAccessControl(dataDoc,'document_definition')
 			}
 			if(data.hasOwnProperty('workflow_definition')){
@@ -404,6 +403,7 @@ export default {
 	font: 13px Roboto;
 	overflow: hidden;
 	width:500px;
+	z-index:1000000;
 }
 .end-user-popup >>> .tittle{
 	font: 15px Roboto;

@@ -492,11 +492,72 @@
                 "unfavorite": "Remove from favorite"
             },
             "orgchart": {
-                "detail": "Detail",
-                "edit": "Edit",
-                "query": "Query",
-                "favorite": "Add to favorite",
-                "unfavorite": "Remove from favorite"
+                "create":"Create",
+                "update":"Update",
+                "drop":"Drop",
+                "list":"List",
+                "detail":"Detail"
+            },
+            "document_definition":{
+                "create":"Create document",
+                "edit":"Edit document",
+                "submit":"Submit document",
+                "drop":"Delete document",
+                "restore":"Restore",
+                "list":"List",
+                "list_trash":"List trash",
+                "list_instance":"List instance"
+            },
+            "workflow_definition":{
+                "list":"List",
+                "create":"Create",
+                "deploy":"Deloy",
+                "drop":"Delete",
+                "update":"Update",
+                "list_instance":"List instance",
+                "start_instance":"Start instance"
+            },
+            "dashboard":{
+                "create":"Create dashboard",
+                "update":"Update",
+                "view":"View",
+                "list":"List",
+                "drop":"Delete"
+            }
+        },
+        "iconListActions":{
+            "orgchart": {
+                "create":"mdi-folder-plus-outline",
+                "update":"mdi-note-plus-outline",
+                "drop":"mdi-arrow-down-drop-circle-outline",
+                "list":"mdi-clipboard-list-outline",
+                "detail":"mdi-details"
+            },
+            "document_definition":{
+                "create":"mdi-folder-plus-outline",
+                "edit":"mdi-file-document-edit-outline",
+                "submit":"mdi-content-save-outline",
+                "drop":"mdi-arrow-down-drop-circle-outline",
+                "restore":"mdi-file-restore-outline",
+                "list":"mdi-clipboard-list-outline",
+                "list_trash":"mdi-playlist-remove",
+                "list_instance":"mdi-file-document-multiple-outline"
+            },
+            "workflow_definition":{
+                "list":"mdi-clipboard-list-outline",
+                "create":"mdi-folder-plus-outline",
+                "deploy":"mdi-rocket",
+                "drop":"mdi-arrow-down-drop-circle-outline",
+                "update":"mdi-note-plus-outline",
+                "list_instance":"mdi-file-document-multiple-outline",
+                "start_instance":"mdi-play-outline"
+            },
+            "dashboard":{
+                "create":"mdi-folder-plus-outline",
+                "update":"mdi-note-plus-outline",
+                "view":"mdi-eye-outline",
+                "list":"clipboard-list-outline",
+                "drop":"arrow-down-drop-circle-outline"
             }
         }
     },
