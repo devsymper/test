@@ -43,10 +43,9 @@
 				:key="item.value"
 				>
 				<v-card flat>
-					<list-comment :listComment="listComment" :searchItem="searchItem"/>
+					<list-comment style="height:calc(100%-100px)" :listComment="listComment" :searchItem="searchItem"/>
 				</v-card>
 				</v-tab-item>
-				
 			</v-tabs-items>
 			 <div class="input-comment" v-if="tabComment == true">
 					 <v-avatar>

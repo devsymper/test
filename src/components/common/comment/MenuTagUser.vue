@@ -25,11 +25,11 @@
 	computed:{
 		listUser(){
 			if(this.keyWord == ''){
-				return this.$store.state.app.allUsers
+				return this.$store.state.app.allUsers.slice(0,3)
 			}
 			else{
 				this.filterItem()
-				return this.listUserFilter
+				return this.listUserFilter.slice(0,4)
 			}
 		},
 	},

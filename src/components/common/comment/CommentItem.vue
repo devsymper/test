@@ -23,6 +23,7 @@
 						:files="files"
 						:isAdd="false"
 						:contentEdit="contentEdit"
+						@cancel-reply="cancelReply()"
 					/>
 					<v-menu style="min-height:unset" v-if="sEnduser==item.userId" bottom left >
 						<template  v-slot:activator="{ on, attrs }">
@@ -214,6 +215,10 @@ export default {
 				// 	this.getCommentUuid()
 				// }
             })
+		},
+		cancelReply(){
+			debugger
+			this.item.reply = false
 		},
 		replyComment(item){	
 			if(item.parentId == '0'){	

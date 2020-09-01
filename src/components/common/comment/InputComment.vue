@@ -41,8 +41,10 @@
 			<div class="text-area-wrapper" v-else>
 					<textarea v-model="inputComment"  
 						v-on:keyup.50="tagUser($event)"
+						v-on:keyup.enter="addComment"
 						class="text-area"
 						style="width:100%"
+						v-on:keyup.esc="cancel"
 						>
 					</textarea>
 				<UploadFile style="position:absolute;right:16px;bottom: 0px;" @uploaded-file="uploadInfo" />
@@ -125,36 +127,40 @@ export default {
 		tagUser(event){
 			let $target = $(event.target);
 			var x = $target.offset().left;
-     		var y = $target.offset().top + 80;
+     		var y = $target.offset().top+28;
 			this.$refs.menuTagUser.show(x,y);
 		},
 		tagged(data){
 			if(this.item){
 				 this.tags = this.item.tags 
 			}
-			let character = this.inputComment.charAt(this.inputComment.length - 1)
-			let res = this.inputComment.replace(character,data.displayName);
+			// let character = this.inputComment.charAt(this.inputComment.length - 1)
 			let item = {} 
 			item.objectIdentifier = data.id
 			item.objectType = 'user'
 			let tagInfo = {}
-			tagInfo.offset = this.inputComment.length - 1
+			tagInfo.offset = this.inputComment.indexOf('@')
 			tagInfo.length = data.displayName.length
 			item.tagInfo = tagInfo
 			this.tags.push(item)
-			this.inputComment = res
+			let substr = this.inputComment.slice(0,this.inputComment.indexOf('@'))
+			this.inputComment = substr.concat(data.displayName)
 			
 		},
 		reduce(content){
 				this.item.tags.forEach(function(e){
 					let name = content.slice(e.tagInfo.offset,e.tagInfo.offset+e.tagInfo.length)
-					debugger
 					let span;
 					span = `<span style="color:red">${name}</span>`
 					let res = content.replace(name,span)
 					content = res
 				})
 			return content
+		},
+		cancel(){
+			debugger
+			// this.isEditing = false 
+			this.$emit('cancel-reply')
 		},
 		addComment(){
 			this.dataPostComment = this.sComment
