@@ -285,6 +285,7 @@
             "id": "Id",
             "name": "Tên",
             "title": "Tiêu đề",
+            "note": "Ghi chú",
             "menu": "menu",
             "countobject": "Số lượng bản gi",
             "workflow": "Quy trình",

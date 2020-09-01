@@ -11,7 +11,7 @@ export default {
     data(){
         return {
             positionBox:{'top':0,'left':0},
-            indexActive:-1,
+            indexActive:0,
             curInput:null,
             isShowPopup:false,
             times:null,
@@ -35,13 +35,10 @@ export default {
         setEventInput(e){
             let thisCpn = this;
             this.controlName = e.controlName
-            this.curInput.off('keyup');
-            if(this.curInput.closest('.handsontable').length > 0 ){
-                this.curInput.attr('contenteditable',true);
-            }
-            this.curInput.on('keyup',function(event){
+            this.curInput.off('keydown');
+            this.curInput.on('keydown',function(event){
                 event.controlName = e.controlName;
-                thisCpn.handlerKeyDown(event);
+                thisCpn.handlerKeyUp(event);
             })
         },
         // tính toán vị trí của box timepicker 
@@ -60,7 +57,7 @@ export default {
                 this.positionBox = {'top':this.curInput.height()+2+'px','left':'0px'};
             }
         },
-        handlerKeyDown(e){
+        handlerKeyUp(e){
             if(e.keyCode == 38){    //len
                 if(this.indexActive == 0){
                     return false;
@@ -91,7 +88,7 @@ export default {
         },
     
         handleClickRow(item){
-            this.curInput.off('keyup');
+            this.curInput.off('keydown');
             this.$emit('apply-time-selected',{input:this.curInput,value:item.time});
             if(this.indexActive != -1)
             this.times[this.indexActive].active = false;
@@ -111,7 +108,7 @@ export default {
     },
     beforeMount(){
         this.times = [
-            {"time":"0:00 AM","active":false},{"time":"0:30 AM","active":false},{"time":"1:00 AM","active":false},
+            {"time":"0:00 AM","active":true},{"time":"0:30 AM","active":false},{"time":"1:00 AM","active":false},
             {"time":"1:30 AM","active":false},{"time":"2:00 AM","active":false},{"time":"2:30 AM","active":false},
             {"time":"3:00 AM","active":false},{"time":"3:30 AM","active":false},{"time":"4:00 AM","active":false},
             {"time":"4:30 AM","active":false},{"time":"5:00 AM","active":false},{"time":"5:30 AM","active":false},

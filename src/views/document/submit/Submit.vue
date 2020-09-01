@@ -762,13 +762,14 @@ export default {
         applyTimePicker(data){
             let time = data.value;
             let input = data.input;
+            input.val(time);
             if(this.sDocumentSubmit.currentTableInteractive == null){
-                input.val(time);
+
                 input.trigger('change');
             }
             else{
-                let currentTableInteractive = this.sDocumentSubmit.currentTableInteractive
-                currentTableInteractive.tableInstance.setDataAtCell(this.sDocumentSubmit.currentCellSelected.row,this.sDocumentSubmit.currentCellSelected.column,time,'edit')
+                // let currentTableInteractive = this.sDocumentSubmit.currentTableInteractive
+                // currentTableInteractive.tableInstance.setDataAtCell(this.sDocumentSubmit.currentCellSelected.row,this.sDocumentSubmit.currentCellSelected.column,time,'edit')
             }
         },
         afterCheckTimeNotValid(data){
@@ -1768,7 +1769,7 @@ export default {
          */
         findRootControl(){ 
 			let impactedFieldsListWhenStart = {}
-			if(this.preDataSubmit != null && Object.keys(this.preDataSubmit).length > 0){
+			if(this.preDataSubmit != null && Object.keys(this.preDataSubmit).length > 0 && false){
 				impactedFieldsList = this.preDataSubmit.impactedFieldsList;
 				impactedFieldsListWhenStart = this.preDataSubmit.impactedFieldsListWhenStart;
 				this.$store.commit("document/addToDocumentSubmitStore", {

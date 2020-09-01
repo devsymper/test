@@ -286,6 +286,7 @@
             "id": "Id",
             "name": "Name",
             "title": "Title",
+            "note": "note",
             "menu": "menu",
             "countobject": "Count object",
             "workflow": "Workflow",

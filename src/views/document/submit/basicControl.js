@@ -268,6 +268,9 @@ export default class BasicControl extends Control {
 
     setValueControl() {
         let value = this.value
+        if (value == null) {
+            return;
+        }
         if (this.type == 'percent') {
             value *= 100
         } else if (this.type == 'number') {
