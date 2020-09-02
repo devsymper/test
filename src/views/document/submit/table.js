@@ -181,278 +181,302 @@ const supportCellsType = {
 const AUTO_SET = 'auto_set';
 export default class Table {
     constructor(control, tableName, keyInstance) {
-        /**
-         * Chứa object của Control tương ứng
-         */
-        this.controlObj = control;
-        /**
-         * Tên table tương ứng
-         */
-        this.tableName = tableName;
+            /**
+             * Chứa object của Control tương ứng
+             */
+            this.controlObj = control;
+            /**
+             * Tên table tương ứng
+             */
+            this.tableName = tableName;
 
 
-        /**
-         * Lưu tên cột tương ứng với số thứ tự của cột trong bảng
-         */
-        this.colName2Idx = {};
-        /**Mẫu giá trị cho các dòng của bảng khi được thêm mới */
-        this.sampleRowValues = {};
+            /**
+             * Lưu tên cột tương ứng với số thứ tự của cột trong bảng
+             */
+            this.colName2Idx = {};
+            /**Mẫu giá trị cho các dòng của bảng khi được thêm mới */
+            this.sampleRowValues = {};
 
-        /**
-         * object chứa tọa độ của cell và giá trị validate của cell đó, phải có cái này do handsontable chỉ có render toàn bộ bảng, chứ không render cho từng cell
-         * cấu trúc {
-         *      "row_column":{vld:true|false,msg:' thông báo lỗi'} //Chỉ cần quan tâm tới false, các trường hợp còn lại hiển thị bình thường
-         * }
-         */
-        let thisObj = this;
-        this.tableHasRowSum = false;
-        this.validateValueMap = {};
+            /**
+             * object chứa tọa độ của cell và giá trị validate của cell đó, phải có cái này do handsontable chỉ có render toàn bộ bảng, chứ không render cho từng cell
+             * cấu trúc {
+             *      "row_column":{vld:true|false,msg:' thông báo lỗi'} //Chỉ cần quan tâm tới false, các trường hợp còn lại hiển thị bình thường
+             * }
+             */
+            let thisObj = this;
+            this.tableHasRowSum = false;
+            this.validateValueMap = {};
 
-        /**Tổng số dòng trong table */
-        this.rowCount = 0;
-        this.tableInstance = null;
-        this.columnsInfo = null;
-        this.keyInstance = keyInstance;
-        /**Danh sách các celltpye trong table */
-        this.listCellType = {};
-        this.currentSelectedCell = {};
-        this.isAutoCompleting = false;
-        this.cellAfterChange = "";
-        this.showPopupUser = false;
-        this.showPopupTime = false;
-        this.tableDefaultRow = []
-        this.currentControlSelected = null,
-            this.listAutoCompleteColumns = {},
-            this.event = {
-                afterSelection: (row, column, row2, column2, preventScrolling, selectionLayerLevel) => {
+            /**Tổng số dòng trong table */
+            this.rowCount = 0;
+            this.tableInstance = null;
+            this.columnsInfo = null;
+            this.keyInstance = keyInstance;
+            /**Danh sách các celltpye trong table */
+            this.listCellType = {};
+            this.currentSelectedCell = {};
+            this.isAutoCompleting = false;
+            this.cellAfterChange = "";
+            this.showPopupUser = false;
+            this.showPopupTime = false;
+            this.tableDefaultRow = []
+            this.currentControlSelected = null,
+                this.listAutoCompleteColumns = {},
+                this.event = {
+                    afterSelection: (row, column, row2, column2, preventScrolling, selectionLayerLevel) => {
 
-                    thisObj.currentSelectedCell['row'] = row;
-                    thisObj.currentSelectedCell['column'] = column;
-                    store.commit("document/addToDocumentSubmitStore", {
-                        key: 'currentTableInteractive',
-                        value: thisObj,
-                        instance: thisObj.keyInstance
-                    });
-                    store.commit("document/addToDocumentSubmitStore", {
-                        key: 'currentCellSelected',
-                        value: thisObj.currentSelectedCell,
-                        instance: thisObj.keyInstance
-                    });
-
-                    // if (thisObj.getCellSelectedType(column) == 'select') {
-                    //     thisObj.setSelectCell(event);
-                    // };
-
-                },
-
-
-                beforeKeyDown: function(event) {
-                    if (thisObj.tableHasRowSum && thisObj.currentSelectedCell['row'] == this.countRows() - 1) {
-                        return;
-                    }
-
-                    if (event.ctrlKey || event.altKey || event.metaKey) {
-                        return;
-                    }
-                    if (thisObj.checkControlType('time')) {
-                        if (event.keyCode == 13) {
-                            thisObj.showPopupTime = false;
-                        }
-                        if ((event.keyCode == 40 || event.keyCode == 38 ||
-                                event.keyCode == 37 || event.keyCode == 39) && thisObj.showPopupTime != false) {
-                            event.stopImmediatePropagation();
-                        }
-                    }
-                    if (thisObj.checkControlType('user')) {
-                        if (event.keyCode == 13) {
-                            thisObj.showPopupUser = false;
-                            event.curTarget = this.getActiveEditor().TEXTAREA;
-                            SYMPER_APP.$evtBus.$emit('document-submit-user-input-change', event)
-                        }
-                        // chặn bấm lên xuống trái phải khi có autocomplete
-                        if ((event.keyCode == 40 || event.keyCode == 38 ||
-                                event.keyCode == 37 || event.keyCode == 39) && thisObj.showPopupUser != false) {
-                            event.stopImmediatePropagation();
-                        }
-                        if (listKeyCodeNotChange.includes(event.keyCode) && !thisObj.showPopupUser) {
-                            return;
-                        }
-                        if (event.keyCode != 13) {
-                            setTimeout((hot) => {
-                                thisObj.showPopupUser = true;
-                                event.curTarget = hot.getActiveEditor().TEXTAREA;
-                                SYMPER_APP.$evtBus.$emit('document-submit-user-input-change', event)
-                            }, 50, this);
-                        }
-                    }
-                    if (thisObj.checkControlType('department')) {
-                        if (event.keyCode == 13) {
-                            return;
-                        }
-                        if (thisObj.listAutoCompleteColumns[thisObj.currentControlSelected] != false) {
-                            if ((event.keyCode == 40 || event.keyCode == 38 ||
-                                    event.keyCode == 37 || event.keyCode == 39) && thisObj.isAutoCompleting) {
-                                event.stopImmediatePropagation();
-                            }
-                            if (listKeyCodeNotChange.includes(event.keyCode)) {
-                                return;
-                            }
-                            // hoangnd: cần set timeout ở đây tại vì cần thực hiện đoạn này sau khi keydown hoàn tất thì input mới có dữ liệu
-                            setTimeout(() => {
-                                let columns = thisObj.columnsInfo.columns;
-                                let formulasInstance = thisObj.listAutoCompleteColumns[thisObj.currentControlSelected]
-                                event.rowIndex = thisObj.currentSelectedCell['row'];
-                                let colHeaders = this.getColHeader();
-                                let columnIndex = thisObj.currentSelectedCell['column'];
-                                event.curTarget = this.getActiveEditor().TEXTAREA;
-                                SYMPER_APP.$evtBus.$emit('document-submit-department-key-event', {
-                                    e: event,
-                                    formulasInstance: formulasInstance,
-                                    controlTitle: colHeaders[columnIndex],
-                                    controlName: columns[columnIndex].data
-                                })
-                            }, 50);
-                        }
-                    } else {
-                        if (event.keyCode == 13) {
-                            return;
-                        }
-                        if (thisObj.listAutoCompleteColumns[thisObj.currentControlSelected] != false) {
-                            if ((event.keyCode == 40 || event.keyCode == 38 ||
-                                    event.keyCode == 37 || event.keyCode == 39) && thisObj.isAutoCompleting) {
-                                event.stopImmediatePropagation();
-                            }
-                            if (listKeyCodeNotChange.includes(event.keyCode)) {
-                                return;
-                            }
-                            // hoangnd: cần set timeout ở đây tại vì cần thực hiện đoạn này sau khi keydown hoàn tất thì input mới có dữ liệu
-                            setTimeout(() => {
-                                console.log("dsadasdsadsads");
-                                let columns = thisObj.columnsInfo.columns;
-                                let formulasInstance = thisObj.listAutoCompleteColumns[thisObj.currentControlSelected]
-                                event.rowIndex = thisObj.currentSelectedCell['row'];
-                                let colHeaders = this.getColHeader();
-                                let columnIndex = thisObj.currentSelectedCell['column'];
-                                event.curTarget = this.getActiveEditor().TEXTAREA;
-                                SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-key-event', {
-                                    e: event,
-                                    autocompleteFormulasInstance: formulasInstance,
-                                    isSelect: false,
-                                    controlTitle: colHeaders[columnIndex],
-                                    controlName: columns[columnIndex].data
-                                })
-                            }, 50);
-                        }
-                    }
-                },
-                afterOnCellMouseDown: function(event, coords, TD) {
-                    let columns = thisObj.columnsInfo.columns;
-                    if (columns[coords.col] != undefined)
-                        thisObj.currentControlSelected = columns[coords.col].data;
-                    // nếu type cell là time thì emit qua submit mở timepicker
-                    if (thisObj.getCellSelectedType(coords.col) == 'time') {
-
-                        var activeEditor = this.getActiveEditor();
-                        this.selectCell(coords.row, coords.col);
-                        activeEditor.beginEditing();
-                        thisObj.showPopupTime = true;
-                        event.controlName = columns[coords.col].data
-                        event.curTarget = activeEditor.TEXTAREA
-                        SYMPER_APP.$evtBus.$emit('document-submit-show-time-picker', event);
-                        // activeEditor.enableFullEditoMode();
-                    };
-                    SYMPER_APP.$evtBus.$emit("symper-app-wrapper-clicked", event);
-
-                },
-                afterSelectionEnd: function(row, col) {
-                    store.commit("document/addToDocumentSubmitStore", {
-                        key: 'docStatus',
-                        value: 'input',
-                        instance: thisObj.keyInstance
-                    });
-                },
-                afterDocumentKeyDown: function(e) {
-                    if (lastKey === 'Shift') {
-                        if (e.key === 'Enter') {
-                            this.alter('insert_row', thisObj.currentSelectedCell.row + 1, 1);
-                            let rowData = thisObj.tableDefaultRow;
-                            rowData[0] = thisObj.currentSelectedCell.row + 1;
-                            thisObj.tableInstance.setDataAtRowProp([rowData], null, null, 'auto_set');
-                        } else if (e.key === 'Delete') {
-                            this.alter('remove_row', thisObj.currentSelectedCell.row, 1);
-                        }
-                    }
-                    lastKey = e.key;
-                },
-                afterChange: function(changes, source) {
-
-                    if (changes == null) {
-                        return
-                    }
-                    if (getSDocumentSubmitStore(thisObj.keyInstance).docStatus == 'init' &&
-                        sDocument.state.viewType[thisObj.keyInstance] == 'update') {
-                        return;
-                    }
-
-                    let controlName = changes[0][1];
-                    let columns = thisObj.columnsInfo.columns;
-                    let currentRowData = thisObj.tableInstance.getDataAtRow(thisObj.currentSelectedCell['row']);
-
-                    // nếu có sự thay đổi cell mà là id của row sqlite thì ko thực hiện update
-                    if (controlName != 's_table_id_sql_lite') {
-                        thisObj.checkUniqueTable(controlName, columns);
-                        if (source != AUTO_SET) {
-                            store.commit("document/addToDocumentSubmitStore", {
-                                key: 'rootChangeFieldName',
-                                value: controlName,
-                                instance: thisObj.keyInstance
-                            });
-                            resetImpactedFieldsList(thisObj.keyInstance);
-                        }
-                        let currentColData = thisObj.tableInstance.getDataAtCol(thisObj.currentSelectedCell['column']);
-                        if (thisObj.tableHasRowSum) {
-                            currentColData.pop();
-                        }
-                        columns = columns.map(function(c) {
-                            return c.data;
+                        thisObj.currentSelectedCell['row'] = row;
+                        thisObj.currentSelectedCell['column'] = column;
+                        store.commit("document/addToDocumentSubmitStore", {
+                            key: 'currentTableInteractive',
+                            value: thisObj,
+                            instance: thisObj.keyInstance
                         });
-                        if (thisObj.checkControlType('time')) {
-                            currentColData = thisObj.getTimeValueToStore(currentColData);
-                            store.commit("document/updateListInputInDocument", {
-                                controlName: controlName,
-                                key: 'value',
-                                value: currentColData,
-                                instance: this.keyInstance
-                            });
-                        } else {
-                            store.commit("document/updateListInputInDocument", {
-                                controlName: controlName,
-                                key: 'value',
-                                value: currentColData,
-                                instance: this.keyInstance
-                            });
+                        store.commit("document/addToDocumentSubmitStore", {
+                            key: 'currentCellSelected',
+                            value: thisObj.currentSelectedCell,
+                            instance: thisObj.keyInstance
+                        });
 
+                        // if (thisObj.getCellSelectedType(column) == 'select') {
+                        //     thisObj.setSelectCell(event);
+                        // };
+
+                    },
+
+
+                    beforeKeyDown: function(event) {
+                        let cellMeta = this.getSelected();
+                        if (thisObj.checkLastCell(cellMeta, this)) {
+                            return;
                         }
-                        if (source == "edit") {
-                            thisObj.handlerAfterChangeCellByUser(changes, currentRowData, columns, controlName);
+                        if (thisObj.tableHasRowSum && cellMeta[0][0] == this.countRows() - 1) {
+                            return;
+                        }
+                        if (event.ctrlKey || event.altKey || event.metaKey) {
+                            return;
+                        }
+                        let columns = thisObj.columnsInfo.columns;
+                        let colHeaders = this.getColHeader();
+                        let columnIndex = cellMeta[0][1];
+                        let controlName = columns[columnIndex].data;
+
+                        if (thisObj.checkControlType('time', columnIndex)) {
+                            if (event.keyCode == 13 && thisObj.showPopupTime) {
+                                thisObj.showPopupTime = false;
+                                event.stopImmediatePropagation();
+                                event.stopPropagation();
+                                event.preventDefault();
+                            }
+                            if ((event.keyCode == 40 || event.keyCode == 38 ||
+                                    event.keyCode == 37 || event.keyCode == 39) && thisObj.showPopupTime != false) {
+                                event.stopImmediatePropagation();
+                            }
+                        }
+                        if (thisObj.checkControlType('user', columnIndex)) {
+                            if (event.keyCode == 13 && thisObj.showPopupUser) {
+                                thisObj.showPopupUser = false;
+                                event.curTarget = this.getActiveEditor().TEXTAREA;
+                                SYMPER_APP.$evtBus.$emit('document-submit-user-input-change', event);
+                                event.stopImmediatePropagation();
+                                event.stopPropagation();
+                                event.preventDefault();
+                            }
+                            // chặn bấm lên xuống trái phải khi có autocomplete
+                            if ((event.keyCode == 40 || event.keyCode == 38 ||
+                                    event.keyCode == 37 || event.keyCode == 39) && thisObj.showPopupUser != false) {
+                                event.stopImmediatePropagation();
+                            }
+                            if (listKeyCodeNotChange.includes(event.keyCode) && !thisObj.showPopupUser) {
+                                return;
+                            }
+                            if (event.keyCode != 13) {
+                                setTimeout((hot) => {
+                                    thisObj.showPopupUser = true;
+                                    event.curTarget = hot.getActiveEditor().TEXTAREA;
+                                    SYMPER_APP.$evtBus.$emit('document-submit-user-input-change', event)
+                                }, 50, this);
+                            }
+                        }
+                        if (thisObj.checkControlType('department', columnIndex)) {
+                            if (event.keyCode == 13) {
+                                return;
+                            }
+                            if (thisObj.listAutoCompleteColumns[thisObj.currentControlSelected] != false) {
+                                if ((event.keyCode == 40 || event.keyCode == 38 ||
+                                        event.keyCode == 37 || event.keyCode == 39) && thisObj.isAutoCompleting) {
+                                    event.stopImmediatePropagation();
+                                }
+                                if (listKeyCodeNotChange.includes(event.keyCode)) {
+                                    return;
+                                }
+                                // hoangnd: cần set timeout ở đây tại vì cần thực hiện đoạn này sau khi keydown hoàn tất thì input mới có dữ liệu
+                                setTimeout(() => {
+                                    let columns = thisObj.columnsInfo.columns;
+                                    let formulasInstance = thisObj.listAutoCompleteColumns[thisObj.currentControlSelected]
+                                    event.rowIndex = cellMeta[0][0];
+                                    let colHeaders = this.getColHeader();
+                                    let columnIndex = cellMeta[0][1];
+                                    event.curTarget = this.getActiveEditor().TEXTAREA;
+                                    SYMPER_APP.$evtBus.$emit('document-submit-department-key-event', {
+                                        e: event,
+                                        formulasInstance: formulasInstance,
+                                        controlTitle: colHeaders[columnIndex],
+                                        controlName: columns[columnIndex].data
+                                    })
+                                }, 50);
+                            }
                         } else {
-                            thisObj.handlerAfterChangeCellByAutoSet(changes, columns, controlName);
+                            if (event.keyCode == 13) {
+                                return;
+                            }
+                            if (thisObj.listAutoCompleteColumns[thisObj.currentControlSelected] != false) {
+                                if ((event.keyCode == 40 || event.keyCode == 38 ||
+                                        event.keyCode == 37 || event.keyCode == 39) && thisObj.isAutoCompleting) {
+                                    event.stopImmediatePropagation();
+                                }
+                                if (listKeyCodeNotChange.includes(event.keyCode)) {
+                                    return;
+                                }
+                                // hoangnd: cần set timeout ở đây tại vì cần thực hiện đoạn này sau khi keydown hoàn tất thì input mới có dữ liệu
+                                setTimeout(() => {
+                                    let formulasInstance = thisObj.listAutoCompleteColumns[thisObj.currentControlSelected]
+                                    event.rowIndex = cellMeta[0][0];
+                                    event.curTarget = this.getActiveEditor().TEXTAREA;
+                                    SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-key-event', {
+                                        e: event,
+                                        autocompleteFormulasInstance: formulasInstance,
+                                        isSelect: false,
+                                        controlTitle: colHeaders[columnIndex],
+                                        controlName: controlName
+                                    })
+                                }, 50);
+                            }
                         }
-                        let controlUnique = checkDbOnly(thisObj.keyInstance, controlName);
-                        if (controlUnique != false) {
-                            let dataInput = {}
-                            dataInput[controlName] = [changes[0][3]]
-                            thisObj.handlerRunFormulasForControlInTable('uniqueDB', controlUnique, dataInput, controlUnique.controlFormulas.uniqueDB);
+                    },
+                    afterOnCellMouseDown: function(event, coords, TD) {
+                        let columns = thisObj.columnsInfo.columns;
+                        if (columns[coords.col] != undefined)
+                            thisObj.currentControlSelected = columns[coords.col].data;
+                        // nếu type cell là time thì emit qua submit mở timepicker
+                        if (thisObj.getCellSelectedType(coords.col) == 'time') {
+
+                            var activeEditor = this.getActiveEditor();
+                            this.selectCell(coords.row, coords.col);
+                            activeEditor.beginEditing();
+                            thisObj.showPopupTime = true;
+                            event.controlName = columns[coords.col].data
+                            event.curTarget = activeEditor.TEXTAREA
+                            SYMPER_APP.$evtBus.$emit('document-submit-show-time-picker', event);
+                            // activeEditor.enableFullEditoMode();
+                        };
+                        SYMPER_APP.$evtBus.$emit("symper-app-wrapper-clicked", event);
+
+                    },
+                    afterSelectionEnd: function(row, col) {
+                        store.commit("document/addToDocumentSubmitStore", {
+                            key: 'docStatus',
+                            value: 'input',
+                            instance: thisObj.keyInstance
+                        });
+                    },
+
+                    afterDocumentKeyDown: function(e) {
+                        console.log("ádas", e.key === 'Enter' && e.shiftKey === true);
+                        let cellMeta = this.getSelected();
+                        if (e.key === 'Enter' && e.shiftKey === true) {
+                            this.alter('insert_row', cellMeta[0][0] + 1, 1);
+                            let rowData = thisObj.tableDefaultRow;
+                            rowData[0] = cellMeta[0][0] + 1;
+                            thisObj.tableInstance.setDataAtRowProp([rowData], null, null, 'auto_set');
+                        } else if (e.key === 'Delete' && e.shiftKey == true) {
+                            this.alter('remove_row', cellMeta[0][0], 1);
                         }
+                    },
+                    afterChange: function(changes, source) {
+                        if (changes == null || changes[0][1] == undefined) {
+                            return
+                        }
+                        if (getSDocumentSubmitStore(thisObj.keyInstance).docStatus == 'init' &&
+                            sDocument.state.viewType[thisObj.keyInstance] == 'update') {
+                            return;
+                        }
+
+                        let controlName = changes[0][1];
+                        let colIndex = this.propToCol(controlName);
+                        let columns = thisObj.columnsInfo.columns;
+                        let currentRowData = thisObj.tableInstance.getDataAtRow(changes[0][0]);
+
+                        // nếu có sự thay đổi cell mà là id của row sqlite thì ko thực hiện update
+                        if (controlName != 's_table_id_sql_lite') {
+                            thisObj.checkUniqueTable(controlName, columns);
+                            if (source != AUTO_SET) {
+                                store.commit("document/addToDocumentSubmitStore", {
+                                    key: 'rootChangeFieldName',
+                                    value: controlName,
+                                    instance: thisObj.keyInstance
+                                });
+                                resetImpactedFieldsList(thisObj.keyInstance);
+                            }
+                            let currentColData = thisObj.tableInstance.getDataAtCol(colIndex);
+                            if (thisObj.tableHasRowSum) {
+                                currentColData.pop();
+                            }
+                            columns = columns.map(function(c) {
+                                return c.data;
+                            });
+                            if (thisObj.checkControlType('time', colIndex)) {
+                                currentColData = thisObj.getTimeValueToStore(currentColData);
+                                store.commit("document/updateListInputInDocument", {
+                                    controlName: controlName,
+                                    key: 'value',
+                                    value: currentColData,
+                                    instance: this.keyInstance
+                                });
+                            } else {
+                                store.commit("document/updateListInputInDocument", {
+                                    controlName: controlName,
+                                    key: 'value',
+                                    value: currentColData,
+                                    instance: this.keyInstance
+                                });
+
+                            }
+                            if (source == "edit") {
+                                thisObj.handlerAfterChangeCellByUser(changes, currentRowData, columns, controlName);
+                            } else {
+                                thisObj.handlerAfterChangeCellByAutoSet(changes, columns, controlName);
+                            }
+                            let controlUnique = checkDbOnly(thisObj.keyInstance, controlName);
+                            if (controlUnique != false) {
+                                let dataInput = {}
+                                dataInput[controlName] = [changes[0][3]]
+                                thisObj.handlerRunFormulasForControlInTable('uniqueDB', controlUnique, dataInput, controlUnique.controlFormulas.uniqueDB);
+                            }
+                        }
+
                     }
-
                 }
+            listTableInstance[this.tableName] = this;
+        }
+        // kiểm tra nếu đang edit ở cell cuối cùng mà ấn enter thì cho cell selected về dòng đầu tiên (lỗi do control hidden)
+    checkLastCell(cellMeta, hotTb) {
+            let colLength = hotTb.getDataAtRow(0).length;
+            let rowLength = hotTb.countRows();
+            if (cellMeta[0][1] == colLength - 3 && rowLength - 1 == cellMeta[0][0]) {
+                hotTb.selectCell(0, 0, 0, 0, true);
+                return true
             }
-        listTableInstance[this.tableName] = this;
-    }
+            return false
+        }
+        // chuyển giá trị control time về dạng HH:MM:ss để lưu vào db
     getTimeValueToStore(colData) {
             for (let index = 0; index < colData.length; index++) {
                 let cellData = colData[index];
+                if (cellData == null) {
+                    continue;
+                }
                 cellData = cellData.replace(' AM', ":00");
                 cellData = cellData.replace(' PM', ":00");
                 colData[index] = cellData
@@ -525,12 +549,12 @@ export default class Table {
 
 
 
-    checkControlType(type) {
+    checkControlType(type, col) {
             let columns = this.columnsInfo.columns;
-            if (columns[this.currentSelectedCell['column']] == undefined) {
+            if (columns[col] == undefined) {
                 return false;
             }
-            let controlName = columns[this.currentSelectedCell['column']].data;
+            let controlName = columns[col].data;
             let controlInstance = this.getControlInstance(controlName);
             if (controlInstance.type == type) {
                 return true;
