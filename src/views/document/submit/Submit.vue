@@ -264,7 +264,6 @@ export default {
 
     },
     beforeMount() {
-        this.docSize = "21cm";
         this.columnsSQLLiteDocument = {};
     },
     mounted() {
@@ -919,6 +918,7 @@ export default {
                         if (res.status == 200) {
                             let content = res.data.document.content;
                             thisCpn.documentName = res.data.document.name;
+                            thisCpn.docSize = (parseInt(res.data.document.isFullSize) == 1) ? "100%":"21cm";
 							thisCpn.contentDocument = content;
 							if(res.data.document.dataPrepareSubmit != "" && res.data.document.dataPrepareSubmit != null)
                             thisCpn.preDataSubmit = JSON.parse(res.data.document.dataPrepareSubmit);

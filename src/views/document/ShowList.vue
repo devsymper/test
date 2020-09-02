@@ -127,7 +127,40 @@ export default {
                             }
                         })
                         .catch(err => {
-                            console.log("error from detail document api!!!", err);
+                            console.log("error from delete document api!!!", err);
+                        })
+                        .always(() => {});
+                    },
+                },
+                {name:"remove",text:
+                function() {
+                        return " <i class= 'mdi mdi-delete-outline' > </i>&nbsp; Xóa mềm";
+                    },
+                    callback: (document, callback) => {
+                        let ids = document.reduce((arr,obj)=>{
+                            arr.push(obj.id);
+                            return arr;
+                        },[]);
+                        let thisCpn = this;
+                        documentApi
+                        .moveToTrash({ids:ids.join()})
+                        .then(res => {
+                            if (res.status == 200) {
+                                thisCpn.$snotify({
+                                    type: "success",
+                                    title: "Delete document success!"
+                                });  
+                                thisCpn.$refs.listDocument.refreshList();
+                            }
+                            else{
+                                thisCpn.$snotify({
+                                    type: "error",
+                                    title: res.messagr
+                                });  
+                            }
+                        })
+                        .catch(err => {
+                            console.log("error from delete document api!!!", err);
                         })
                         .always(() => {});
                     },

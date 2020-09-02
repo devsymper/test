@@ -211,31 +211,36 @@ export default {
                     type: "text",
                     value: (props.title_for_rencent != undefined) ? props.title_for_rencent : '',
                 },
-                editObjectValidate : {
-                    title: "Điều kiện Edit Object",
-                    type: "script",
-                    value: (props.edit_condition != undefined) ? props.edit_condition : '',
-                },
-                public : {
-                    title: "Public",
+                fullSize : {
+                    title: "Toàn màn hình",
                     type: "checkbox",
-                    value: (props.allow_public == '0') ? false : true,
+                    value: (parseInt(props.isFullSize) === 0) ? false : true,
                 },
-                mobile : {
-                    title: "Mobile",
-                    type: "checkbox",
-                    value: (props.mobile == '0') ? false : true,
-                },
-                editAfterSubmit : {
-                    title: "Sửa dữ liệu sau submit",
-                    type: "checkbox",
-                    value: (props.edit_able == '0') ? false : true,
-                },
-                submitOutsideWorkflow : {
-                    title: "Submit ngoài workflow",
-                    type: "checkbox",
-                    value: (props.add_outside_wf == '0') ? false : true,
-                },
+                // editObjectValidate : {
+                //     title: "Điều kiện Edit Object",
+                //     type: "script",
+                //     value: (props.edit_condition != undefined) ? props.edit_condition : '',
+                // },
+                // public : {
+                //     title: "Public",
+                //     type: "checkbox",
+                //     value: (props.allow_public == '0') ? false : true,
+                // },
+                // mobile : {
+                //     title: "Mobile",
+                //     type: "checkbox",
+                //     value: (props.mobile == '0') ? false : true,
+                // },
+                // editAfterSubmit : {
+                //     title: "Sửa dữ liệu sau submit",
+                //     type: "checkbox",
+                //     value: (props.edit_able == '0') ? false : true,
+                // },
+                // submitOutsideWorkflow : {
+                //     title: "Submit ngoài workflow",
+                //     type: "checkbox",
+                //     value: (props.add_outside_wf == '0') ? false : true,
+                // },
                 note : {
                     title: "Ghi chú",
                     type: "textarea",

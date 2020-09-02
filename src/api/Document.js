@@ -13,6 +13,9 @@ export const documentApi = {
     deleteDocument(ids) {
         return coreApi.delete("documents", ids);
     },
+    moveToTrash(ids) {
+        return coreApi.delete("documents/trash", ids);
+    },
 
     detailDocument(id, data) {
         return coreApi.get("documents/" + id, data);
