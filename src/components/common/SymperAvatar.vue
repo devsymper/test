@@ -79,7 +79,7 @@ export default {
 
 <style>
 .symper-avatar-image {
-    height: unset!important;
+    height: inherit!important;
 }
 
 .symper-avatar-loading .v-skeleton-loader__avatar {

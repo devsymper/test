@@ -14,6 +14,7 @@
                     @change-density="isSmallRow = !isSmallRow"
                     @filter-change-value="handleChangeFilterValue"
                     @create-task="getTasks({})"
+                    @refresh-task-list="getTasks()"
                     @get-list-process-instance="listProrcessInstances = $event"
                 ></listHeader>
                 <v-divider v-if="!sideBySideMode"></v-divider>

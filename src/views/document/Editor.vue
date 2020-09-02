@@ -238,8 +238,16 @@ export default {
             keyInstance:Date.now(),
             dialog: false,
             dataControlSwapType:{},
-            listDataFlow:[]
+            listDataFlow:[],
+            isComponentActive:false
         }
+    },
+    activated() {
+        this.isComponentActive = true;
+    },
+    deactivated() {
+        $('.tox-pop').css({display:'none'})
+        this.isComponentActive = false;
     },
     beforeMount(){
         this.listIconToolbar = [

@@ -40,7 +40,6 @@ export default {
             actionPanelWidth:830,
             containerHeight: 200,
             tableContextMenu:{
-                
                 edit: {
                     name: "editdoc",
                     text: function() {
@@ -105,8 +104,9 @@ export default {
                         this.$goToPage('/documents/'+document.id+'/draft-objects',"Danh sách bản nháp");
                     },
                 },
-                drop: {name:"delete",text:
-                function() {
+                drop: {
+                    name:"delete",
+                    text:function() {
                         return " <i class= 'mdi mdi-delete-outline' > </i>&nbsp; Xóa";
                     },
                     callback: (document, callback) => {

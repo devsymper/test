@@ -32,7 +32,7 @@ export default {
             listUser:null,
             listAllUser:null,
             element:null,
-            indexActive:-1,
+            indexActive:1,
             isComponentActive:false,
         }
     },
@@ -107,7 +107,9 @@ export default {
             let list = this.listAllUser.filter(user=>{
                 return user.displayName.toLowerCase().includes(val.toLowerCase()) || user.id == val
             })
-            
+            if(this.listUser.length > 0){
+                this.listUser[0].active = true;
+            }
             this.listUser = list;
             
         },
