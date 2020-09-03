@@ -22,7 +22,7 @@
 						<div class="title-favorite"><v-icon >mdi-playlist-star</v-icon><h4>{{$t('apps.favorite')}}</h4></div>
 						<ul style="margin:0 10px;">
 							<VuePerfectScrollbar style="max-height:200px"  >
-								<li v-for="(item,i) in sFavorite" :key="i" v-on:contextmenu="rightClickHandler($event,item,item.type)" style="cursor:pointer"> 
+								<li v-for="(item,i) in sFavorite" :key="i" v-on:click="rightClickHandler($event,item,item.type)" v-on:contextmenu="rightClickHandler($event,item,item.type)" style="cursor:pointer"> 
 									<div style="position:relative">
 										<div v-if="item.type == 'document_definition'" class="title-item-favorite">{{item.title}}</div>
 										<div v-else  class="title-item-favorite">{{item.name}}</div> 
@@ -284,6 +284,9 @@ export default {
 		rightClickHandler(event,item,type){
 			event.stopPropagation();
 			event.preventDefault();
+			if(!item.actions.includes('unfavorite')){
+				item.actions.push('unfavorite')
+			}
 			this.$refs.contextMenu.setContextItem(item.actions)
 			this.$refs.contextMenu.show(event)
 			this.$refs.contextMenu.setItem(item)
