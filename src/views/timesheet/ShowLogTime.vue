@@ -13,7 +13,9 @@
     <v-dialog v-model="logtimeDialog" width="357">
         <LogTimeForm v-show="showTask==false"
             @showTaskForm="showTaskForm"
+            @showCategoryForm="showCategoryForm"
             :eventLog="eventLog"
+            :updateAPICategory ="updateAPICate"
             @cancel="cancelSave()"
             :dateMonth ="dateMonth"
             :formType="formType"
@@ -23,7 +25,8 @@
             :onSave="onSaveLogTimeEvent"
             :onCancel="onCancelSave">
         </LogTimeForm>
-         <TaskForm @loadTask="loadTask()" v-show="showTask" @cancel="cancel()"/>      
+         <TaskForm @loadTask="loadTask()" v-show="showTask&&showCategory==false" @cancel="cancel()"/>
+         <CategoryForm @updateList="updateAPICategory()" v-show="showCategory" @cancel="cancel()"/>
     </v-dialog>
      <!-- test -->
       <v-dialog
@@ -39,8 +42,7 @@
             <v-btn
               color="primary"
               text
-              @click="remindDialog = false"
-            >
+              @click="remindDialog = false">
               OK
             </v-btn>
           </v-card-actions>
@@ -50,12 +52,15 @@
     <v-dialog v-model="deleteDialog" width="357">
         <DeleteLogView
             @cancel="cancelDelete()"
-
             :deleteEvent="deleteEvent"
             :onDelete="onDeleteLogTimeEvent">
         </DeleteLogView>
     </v-dialog>
-    <LogCalendar @showLog="showLog" ref="logCalendar" :time-view="time_view" @create-time="onCreateTime" 
+    <LogCalendar 
+        @showLog="showLog" 
+        ref="logCalendar" 
+        :time-view="time_view" 
+        @create-time="onCreateTime" 
         @delete-event="onDeleteEvent" />
 </div>
 </template>
@@ -68,6 +73,7 @@ import TaskForm from "./../../components/timesheet/TaskForm";
 import CalendarViewMode from "../../components/timesheet/CalendarViewMode";
 import LogTimeForm from "../../components/timesheet/LogTimeForm";
 import DeleteLogView from "../../components/timesheet/DeleteLogView";
+import CategoryForm from "../../components/timesheet/CategoryForm";
 import timesheetApi from '../../api/timesheet';
 import dayjs from 'dayjs';
 
@@ -80,16 +86,18 @@ export default {
         LogCalendar,
         LogTimeForm,
         DeleteLogView,
-        TaskForm
+        TaskForm,CategoryForm
     },
     data() {
         return {
             showTask:false,
+            showCategory:false,
             time_view: true,
             eventLog:{},
+            updateAPICate:false,
             load:false,
             // log form
-            dateMonth:dayjs(),
+            dateMonth:'',
             logtimeDialog: false,
             logtimeEvent: null,
             formType: 'log',
@@ -124,18 +132,30 @@ export default {
         })
     },
     methods: {
+        updateAPICategory(){
+            this.updateAPICate =true;
+
+        },
         loadTask(){
             debugger
             this.load = true;
         },
         cancel(){
             debugger
-             this.showTask=false;
+            this.showTask=false;
+            this.showCategory=false;
         },
         showTaskForm(value){
             debugger
             this.eventLog = value;
             this.showTask=true; 
+          
+        },
+         showCategoryForm(value){
+            debugger
+            this.eventLog = value;
+            this.showCategory=true;
+            this.showTask =true;
           
         },
         getNow: function() {
@@ -145,12 +165,9 @@ export default {
             }
          },
          showLog(date){
-             debugger
-             this.dateMonth= date;
-              this.logtimeDialog = true;
-               this.$nextTick(() => {
-                this.update = false;
-            });
+            debugger
+            this.dateMonth = date;
+            this.logtimeDialog = true;
               //this.update=true;
          },
         cancelSave() {

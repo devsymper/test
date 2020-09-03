@@ -29,7 +29,7 @@
         <v-btn icon @click="pre()">
             <v-icon>mdi-chevron-left</v-icon>
         </v-btn>
-        <span>{{totalHours*10/10}}/{{hoursRequired}} {{$t('common.of')}} {{startDate}} - {{endDate}}</span>
+        <span>{{totalHours*10/10}}/{{hoursRequired}} {{$t('timesheet.of')}} {{startDate}} - {{endDate}}</span>
        
         <v-btn icon @click="next()">
             <v-icon>mdi-chevron-right </v-icon>
@@ -54,39 +54,39 @@ export default {
         format(date){
             switch(date){
                 case'Next week':
-                    return this.$t('common.next_week');
+                    return this.$t('timesheet.next_week');
                 case'Last week':
-                    return this.$t('common.last_week');
+                    return this.$t('timesheet.last_week');
                 case'Current week':
-                    return this.$t('common.cur_week');
+                    return this.$t('timesheet.cur_week');
                 case'Next day':
-                    return this.$t('common.next_day');
+                    return this.$t('timesheet.next_day');
                 case'Last day':
-                    return this.$t('common.last_day');
+                    return this.$t('timesheet.last_day');
                 case'Current day':
-                    return this.$t('common.cur_day');
+                    return this.$t('timesheet.cur_day');
                 case'Jan':
-                    return this.$t('common.jan');
+                    return this.$t('timesheet.jan');
                 case'Feb':
-                    return this.$t('common.feb');
+                    return this.$t('timesheet.feb');
                 case'Mar':
-                    return this.$t('common.mar');
+                    return this.$t('timesheet.mar');
                 case'Apr':
-                    return this.$t('common.apr');
+                    return this.$t('timesheet.apr');
                 case'May':
-                    return this.$t('common.may');
+                    return this.$t('timesheet.may');
                 case'Jun':
-                    return this.$t('common.jun');
+                    return this.$t('timesheet.jun');
                 case'Jul':
-                    return this.$t('common.jul');
+                    return this.$t('timesheet.jul');
                 case'Aug':
-                    return this.$t('common.aug');
+                    return this.$t('timesheet.aug');
                 case'Sep':
-                    return this.$t('common.sep');
+                    return this.$t('timesheet.sep');
                 case'Oct':
-                    return this.$t('common.oct');
+                    return this.$t('timesheet.oct');
                 case'Nov':
-                    return this.$t('common.nov');
+                    return this.$t('timesheet.nov');
                 case'Dec':
                     return this.$t('commom.dec');
             }

@@ -122,9 +122,9 @@
                                         </template>
                                         <div class="d-flex flex-column">
                                             <v-btn class="font-normal fs-13"
-                                            depressed @click="openLogTimeDialog(event, true)">{{$t('common.update')}}</v-btn>
+                                            depressed @click="openLogTimeDialog(event, true)">{{$t('timesheet.update')}}</v-btn>
                                             <v-btn class="font-normal fs-13"
-                                             depressed @click="openDeleteDialog(event)">{{$t('common.delete')}}</v-btn>
+                                             depressed @click="openDeleteDialog(event)">{{$t('timesheet.delete')}}</v-btn>
                                               <v-btn class="font-normal fs-13"
                                              depressed @click="copyLogTime(event)">Sao chép</v-btn>
                                         </div>
@@ -167,13 +167,13 @@
                 <div :class="[monthEvents[date]? 'light-green-color' :'grey-color']">
                     <div class="px-3 pt-2">
                         <div class="d-flex justify-space-between">
-                            <span v-if=" weekday==1" v-bind:class="[present ? 'color-orange' :'color-grey']"><span class="fs-14">{{$t('common.mon')}}</span><span v-bind:class="[present ? 'color-orange' :'color-darkgrey fs-12 ']" class="fs-14"> {{day}}</span></span>
-                            <span v-if=" weekday==2" v-bind:class="[present ? 'color-orange' :'color-grey']"><span class="fs-14">{{$t('common.tue')}}</span><span v-bind:class="[present ? 'color-orange' :'color-darkgrey fs-12']" class="fs-14"> {{day}}</span></span>
-                            <span v-if=" weekday==3" v-bind:class="[present ? 'color-orange' :'color-grey']"><span class="fs-14">{{$t('common.wed')}}</span><span v-bind:class="[present ? 'color-orange' :'color-darkgrey fs-12']" class="fs-14"> {{day}}</span></span>
-                            <span v-if=" weekday==4" v-bind:class="[present ? 'color-orange' :'color-grey']"><span class="fs-14">{{$t('common.thu')}}</span><span v-bind:class="[present ? 'color-orange' :'color-darkgrey fs-12']" class="fs-14"> {{day}}</span></span>
-                            <span v-if=" weekday==5" v-bind:class="[present ? 'color-orange' :'color-grey']"><span class="fs-14">{{$t('common.fri')}}</span><span v-bind:class="[present ? 'color-orange' :'color-darkgrey fs-12']" class="fs-14"> {{day}}</span></span>
-                            <span v-if=" weekday==6" v-bind:class="[present ? 'color-orange' :'color-grey']"><span class="fs-14">{{$t('common.sat')}}</span><span v-bind:class="[present ? 'color-orange' :'color-darkgrey fs-12']" class="fs-14"> {{day}}</span></span>
-                            <span v-if=" weekday==0" v-bind:class="[present ? 'color-orange' :'color-grey']"><span class="fs-14">{{$t('common.sun')}}</span><span v-bind:class="[present ? 'color-orange' :'color-darkgrey fs-12']" class="fs-14"> {{day}}</span></span>
+                            <span v-if=" weekday==1" v-bind:class="[present ? 'color-orange' :'color-grey']"><span class="fs-14">{{$t('timesheet.mon')}}</span><span v-bind:class="[present ? 'color-orange' :'color-darkgrey fs-12 ']" class="fs-14"> {{day}}</span></span>
+                            <span v-if=" weekday==2" v-bind:class="[present ? 'color-orange' :'color-grey']"><span class="fs-14">{{$t('timesheet.tue')}}</span><span v-bind:class="[present ? 'color-orange' :'color-darkgrey fs-12']" class="fs-14"> {{day}}</span></span>
+                            <span v-if=" weekday==3" v-bind:class="[present ? 'color-orange' :'color-grey']"><span class="fs-14">{{$t('timesheet.wed')}}</span><span v-bind:class="[present ? 'color-orange' :'color-darkgrey fs-12']" class="fs-14"> {{day}}</span></span>
+                            <span v-if=" weekday==4" v-bind:class="[present ? 'color-orange' :'color-grey']"><span class="fs-14">{{$t('timesheet.thu')}}</span><span v-bind:class="[present ? 'color-orange' :'color-darkgrey fs-12']" class="fs-14"> {{day}}</span></span>
+                            <span v-if=" weekday==5" v-bind:class="[present ? 'color-orange' :'color-grey']"><span class="fs-14">{{$t('timesheet.fri')}}</span><span v-bind:class="[present ? 'color-orange' :'color-darkgrey fs-12']" class="fs-14"> {{day}}</span></span>
+                            <span v-if=" weekday==6" v-bind:class="[present ? 'color-orange' :'color-grey']"><span class="fs-14">{{$t('timesheet.sat')}}</span><span v-bind:class="[present ? 'color-orange' :'color-darkgrey fs-12']" class="fs-14"> {{day}}</span></span>
+                            <span v-if=" weekday==0" v-bind:class="[present ? 'color-orange' :'color-grey']"><span class="fs-14">{{$t('timesheet.sun')}}</span><span v-bind:class="[present ? 'color-orange' :'color-darkgrey fs-12']" class="fs-14"> {{day}}</span></span>
                             <span v-if="monthEvents[date]">
                                <span class="fs-12" style="color:#484848">
                                    {{ changeDuration(monthEvents[date].reduce((acc, d) => +d.duration + acc, 0))}}/{{hoursRequired.substr(0,1)+'h'}}</span> 

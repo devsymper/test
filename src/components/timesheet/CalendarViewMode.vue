@@ -32,7 +32,7 @@
             </span>
         </template>
         <template v-slot:selection >
-          <span style= "color:black!important; padding-left:5px"> {{format(type)}}</span>
+          <span style= "color:black!important; padding-left:4px"> {{format(type)}}</span>
         </template>
     </v-select>
 </div>
@@ -61,16 +61,16 @@ export default {
         format(date) {
             switch (date) {
                 case 'week':
-                    return this.$t('common.week');
+                    return this.$t('timesheet.week');
                     break;
                 case 'day':
-                    return this.$t('common.day');
+                    return this.$t('timesheet.day');
                     break;
                 case 'month':
-                    return this.$t('common.month');
+                    return this.$t('timesheet.month');
                     break;
                 case 'weekday':
-                    return this.$t('common.weekday');
+                    return this.$t('timesheet.weekday');
                     break;
             }
         }
@@ -122,7 +122,7 @@ button {
 }
 
 .viewmode ::v-deep .v-input__control .v-select__selection {
-    margin-left: 5px;
+    margin-left: 4px;
 
 }
 

@@ -144,8 +144,6 @@ export default {
             this.$store.commit('search/setShowGeneral', true);
             this.$store.commit('search/setCountResult', this.searchItems.length);
             this.$router.push('/search/general');
-            
-
             };
             this.menu= this.searchItemsAll;
             this.searchItems =[];
@@ -211,6 +209,12 @@ export default {
                 name =  'Công thức'
             }else if(value == 'dataflow'){
                 name =  'Data flow'
+            }else if(value == 'file'){
+                name =  'Tệp'
+            }else if(value == 'knowledge'){
+                name =  'Knowledge'
+            }else if(value == 'comment'){
+                name =  'Bình luận'
             }else{
                 name = value;}
             return name

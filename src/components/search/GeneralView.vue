@@ -121,7 +121,7 @@
                         v-for="(item, newSearchAllIdx) in  newSearchAll.filter(x => x.type== 'user' ).slice(0, 10)"  
                         :key="newSearchAllIdx">
                         <div class="d-flex justify-start ml-3 mr-3 slider-user ">
-                             <SymperAvatar style ="height: 30px!important; width: 32px!important" :userId="item.userId"/>
+                             <SymperAvatar style ="height: 40px!important; width: 40px!important; min-width:40px" :userId="item.userId"/>
                             <v-list-item-content>
                                 <v-list-item-title style="margin-left: 0.5" class="item-title fs-13 fm" v-html="item.displayName">
                                 </v-list-item-title>
@@ -226,7 +226,7 @@
                 v-for="(item, newSearchAllIdx) in newSearchAll.filter(x => x.type== 'user' )"
                 :key="newSearchAllIdx">
                 <div class="d-flex justify-start mr-3 " style="width: 100%!important; border:1px solid rgba(0,0,0,0.2">
-                    <SymperAvatar v-if="item.type === 'user'" style ="height: 30px!important; width: 32px!important" :userId="item.userId"/>
+                    <SymperAvatar class="mt-2 mr-2 ml-2" v-if="item.type === 'user'" style ="height: 40px!important; width: 40px!important; min-width:40px" :userId="item.userId"/>
                     <v-list-item-content>
                         <v-list-item-title style="margin-left: 0.5" class="item-title fs-13 fm" v-html="item.displayName">
                         </v-list-item-title>
