@@ -66,12 +66,14 @@
                 :key="item.id"
                 class="text-left notification-item  pt-0 pb-0"
             >
-                <v-col cols="1">
+                <v-col cols="2">
                     <v-row>
-                        <v-icon size="35">mdi-account</v-icon>
+                         <v-list-item-avatar>
+                            <SymperAvatar :userId="item.userRelatedId"/>
+                        </v-list-item-avatar>
                     </v-row>
                 </v-col>
-                <v-col cols="11" @click="openNotification(item)">
+                <v-col cols="10" @click="openNotification(item)">
                     <v-row>
                         <span class="notification-item-title">
                             {{item.title}}
@@ -218,11 +220,13 @@ import icon from "../common/SymperIcon";
 import listObject from "../../views/apps/singleObject";
 import { appConfigs } from '../../configs';
 import Vue from "vue";
+import SymperAvatar from "@/components/common/SymperAvatar";
 export default {
     name: "listApp",
     components: {
         icon,
-        listObject
+        listObject,
+        SymperAvatar
     },
     data: function() {
         return {
