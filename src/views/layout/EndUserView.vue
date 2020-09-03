@@ -116,7 +116,6 @@ export default {
             if(index !== undefined){
                 let urlKey = Object.keys(this.tabUrlItems)[index];
                 let urlInfo = this.tabUrlItems[urlKey];
-
                 if(urlInfo.routeName == this.$route.name){
                     this.$router.push({
                         name: 'symperHiddenRedirectComponent',
