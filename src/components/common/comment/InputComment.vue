@@ -5,6 +5,7 @@
 				<v-img
            			 :src="item.serverPath"
 					style="margin-top:auto;margin-bottom:auto"
+					@click="download(item.id)"
          		>
 					<v-icon  v-if="isEditing == true" class="icon-remove-img" @click="removeImage(item)">mdi-close-circle-outline</v-icon>
 				</v-img> 
@@ -13,7 +14,7 @@
 		<div v-if="files.length > 0" class="content-comment-file">
 			<div class="commnet-file-item" v-for="(item,i) in files" :key="i">
 				<v-icon>{{icon[item.type]}}</v-icon>
-				<span class="file-item-title">{{item.name+'.'+item.type}}</span>
+				<span class="file-item-title" @click="download(item.id)">{{item.name+'.'+item.type}}</span>
 				<v-icon class="icon-remove-file" v-if="isEditing == true" @click="removeFile(item)">mdi-close-circle-outline</v-icon>
 			</div>	
 		</div>
@@ -129,6 +130,10 @@ export default {
 			let substr = this.inputComment.slice(0,this.inputComment.indexOf('@'))
 			this.inputComment = substr.concat(data.displayName)
 			
+		},
+		download(id){
+			console.log(id);
+			debugger
 		},
 		reduce(content){
 			this.item.tags.forEach(function(e){
