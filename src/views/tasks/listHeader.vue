@@ -118,6 +118,16 @@
                 solo
                 depressed
                 class="mr-2"
+                @click="refreshTaskList"
+                v-show="!sideBySideMode"
+            >
+                <v-icon size="18">mdi-refresh</v-icon>
+            </v-btn>
+            <v-btn
+                small
+                solo
+                depressed
+                class="mr-2"
                 @click="changeDensity"
                 v-show="!sideBySideMode"
             >
@@ -332,6 +342,9 @@ export default {
         this.getProcessInstance();
     },
     methods: {
+        refreshTaskList(){
+            this.$emit('refresh-task-list');
+        },
         handleChangeFilterValue(data = {}) {
             if ($.isEmptyObject(data)) {
                 if (this.orderBy !== null) {

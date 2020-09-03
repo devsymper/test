@@ -47,38 +47,40 @@
 			<v-checkbox dense class="sym-small-size mt-2 pl-3" v-model="checkChangeDuedate" @click="changeDuedate = !changeDuedate" :label="$t('user.passwordSetting.configChange.checkChange')"></v-checkbox>
             <label class="title__a">{{$t('user.passwordSetting.configChange.lblSelectTime')}}</label>
                 
-                <v-text-field
-                    ref="dueDate"
-                    class="dueDate fs-13"
-                    v-model="dueDate"
-                    type="number"
-                    :disabled="!changeDuedate"
-                    :rules="[rules.required]"
-                    dense
-                ></v-text-field>
-                <v-select
-                    v-model="typeDueDate"
-                    return-object
-                    hide-details
-                    dense
-                    item-text="name"
-                    item-value="type"
-                    class="select-type-due-date fs-13"
-                    :disabled="!changeDuedate"
-                    :items="[
-                        {name:$t('user.passwordSetting.configChange.month'),type:'month'},
-                        {name:$t('user.passwordSetting.configChange.year'),type:'year'}
-                        ]"
-                ></v-select>
+            <v-text-field
+                ref="dueDate"
+                class="dueDate fs-13"
+                v-model="dueDate"
+                type="number"
+                :disabled="!changeDuedate"
+                :rules="[rules.required]"
+                dense
+            ></v-text-field>
+            
+            <v-select
+                v-model="typeDueDate"
+                return-object
+                hide-details
+                dense
+                item-text="name"
+                item-value="type"
+                class="select-type-due-date fs-13"
+                :disabled="!changeDuedate"
+                :items="[
+                    {name:$t('user.passwordSetting.configChange.month'),type:'month'},
+                    {name:$t('user.passwordSetting.configChange.year'),type:'year'}
+                    ]"
+            ></v-select>
+
         </div>
         <v-btn
-                class="float-right btn-update"
-                :loading="loading"
-                :disabled="loading"
-                @click="loader = 'loading'"
-            >
-                {{$t('common.update')}}
-            </v-btn>
+            class="float-right btn-update"
+            :loading="loading"
+            :disabled="loading"
+            @click="loader = 'loading'">
+
+            {{$t('common.update')}}
+        </v-btn>
     </div>
 </template>
 <script>
@@ -138,7 +140,7 @@ export default {
             if(this.newPassword != ''){
                 data.password = this.newPassword
             }
-            userApi.updateUser(data).then(res => {
+            userApi.updateUser(this.user.id, data).then(res => {
 				if (res.status == 200) {
                     this.loader = "";
                     this.loading = false;
