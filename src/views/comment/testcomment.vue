@@ -28,14 +28,21 @@
 						:targetArea="contentTargetArea"
 						:objectType="objType"
 					/>
+				<UploadAvatar />
+				<UploadFile  />
 		</div>
 </template>
 
 <script>
 import comment from "@/components/common/comment/Comment.vue"
+import UploadAvatar from "@/components/common/UploadAvatar.vue"
+import UploadFile from "@/components/common/UploadFile.vue"
+
 export default {
 	components:{
-		comment
+		comment,
+		UploadAvatar,
+		UploadFile
 	},
 	methods:{
 		clickFull(event){
