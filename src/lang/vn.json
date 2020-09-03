@@ -604,7 +604,7 @@
                 "drop":"Xóa quy trình ",
                 "update":"Cập nhật quy trình ",
                 "list_instance":"Danh sách bản ghi",
-                "start_instance":"Bản ghi bắt đầu",
+                "start_instance":"Bắt đầu quy trình",
                 "unfavorite": "Loại bỏ yêu thích"
             },
             "dashboard":{

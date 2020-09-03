@@ -200,6 +200,7 @@ export default {
 			});
 		},
 		clickDetails(item){
+			this.$refs.contextMenu.hide()
 			this.$store.commit('appConfig/emptyItemSelected')
 			this.title.iconName = item.iconName;
 			this.title.iconType = item.iconType;
@@ -255,6 +256,7 @@ export default {
 		},
 		clickBack(){
 			this.tab = 'tab-1'
+			this.$refs.contextMenu.hide()
 			this.getActiveapps()
 			// this.getFavorite()
 		},
