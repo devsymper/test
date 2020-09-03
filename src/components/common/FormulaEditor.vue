@@ -568,7 +568,7 @@ export default {
 </script>
 
 <style>
-.v-text-field {
+/* .v-text-field {
     padding-top: 0 !important;
     margin-top: 0 !important;
 }
@@ -587,7 +587,7 @@ export default {
 .v-data-table th {
     height: unset !important;
     padding: 5px 10px !important;
-}
+} */
 .sym-formula-editor.simple-mode .v-window.v-item-group.v-tabs-items,
 .sym-formula-editor .v-window-item.v-window-item--active {
     height: 100%;
@@ -601,7 +601,7 @@ export default {
     height: 100%;
 }
 
-.v-tab {
+/* .v-tab {
     font-size: 12px !important;
     text-transform: inherit !important;
     font-weight: normal !important;
@@ -619,7 +619,7 @@ export default {
 .v-dialog .col-12 {
     padding-top: 0px;
     padding-bottom: 0px;
-}
+} */
 .sym-formula-editor {
     background: #ffffff;
     z-index: 2;

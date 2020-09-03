@@ -117,13 +117,11 @@
                            <v-icon> mdi mdi-chevron-left</v-icon>
                         </div>
                     </template>
-                    <v-slide-item 
+                    <v-slide-item class="item-user"
                         v-for="(item, newSearchAllIdx) in  newSearchAll.filter(x => x.type== 'user' ).slice(0, 10)"  
                         :key="newSearchAllIdx">
                         <div class="d-flex justify-start ml-3 mr-3 slider-user ">
-                            <v-list-item-avatar class="item-avatar ml-3">
-                                <img :src="item.avatar || require('@/assets/image/avatar_default.jpg')">
-                            </v-list-item-avatar>
+                             <SymperAvatar style ="height: 40px!important; width: 40px!important; min-width:40px" :userId="item.userId"/>
                             <v-list-item-content>
                                 <v-list-item-title style="margin-left: 0.5" class="item-title fs-13 fm" v-html="item.displayName">
                                 </v-list-item-title>
@@ -228,9 +226,7 @@
                 v-for="(item, newSearchAllIdx) in newSearchAll.filter(x => x.type== 'user' )"
                 :key="newSearchAllIdx">
                 <div class="d-flex justify-start mr-3 " style="width: 100%!important; border:1px solid rgba(0,0,0,0.2">
-                    <v-list-item-avatar class="item-avatar ml-3">
-                        <img :src="item.avatar || require('@/assets/image/avatar_default.jpg')">
-                    </v-list-item-avatar>
+                    <SymperAvatar class="mt-2 mr-2 ml-2" v-if="item.type === 'user'" style ="height: 40px!important; width: 40px!important; min-width:40px" :userId="item.userId"/>
                     <v-list-item-content>
                         <v-list-item-title style="margin-left: 0.5" class="item-title fs-13 fm" v-html="item.displayName">
                         </v-list-item-title>
@@ -270,7 +266,11 @@
 </div>
 </template>
 <script>
+import SymperAvatar from '../../components/common/SymperAvatar'
 export default {
+     components:{
+        SymperAvatar
+    },
      computed: {
         newSearch() {
             return this.$store.state.search.newSearch;
@@ -311,7 +311,7 @@ export default {
         },
         getIcon(value){
              let icon = 'mdi-star-outline';
-            if (value == 'document_object') {
+            if (value == 'document_instance') {
                 icon = 'mdi mdi-file-document-outline';
             } else if (value == 'user') {
                 icon = 'mdi-account-multiple-outline';
@@ -325,7 +325,7 @@ export default {
                  icon = 'mdi mdi-sitemap';
             } else if (value == 'process_definition') {
                  icon = 'mdi mdi-sitemap';          
-            } else if (value == 'application_deninition') {
+            } else if (value == 'application_definition') {
                  icon = 'mdi mdi-apps';         
             } else if (value == 'syql') {
                  icon = 'mdi mdi-alpha-f';          
@@ -338,7 +338,7 @@ export default {
         },
         formatGroupName(value) {
             let name = '';
-            if (value == 'document_object') {
+            if (value == 'document_instance') {
                 name = 'Văn bản';
             } else if (value == 'user') {
                 name = 'Nhân viên'
@@ -348,16 +348,20 @@ export default {
                 name = 'Workflow'
             } else if (value == 'orgchart') {
                 name = 'Sơ đồ tổ chức'
-            } else if (value == 'orgchart') {
-                name = 'Loại văn bản'
             } else if (value == 'process_definition') {
                 name = 'Quy trình'
-            } else if (value == 'application_deninition') {
+            } else if (value == 'application_definition') {
                 name = 'Ứng dụng'
             } else if (value == 'syql') {
                 name = 'Công thức'
             } else if (value == 'dataflow') {
                 name = 'Data flow'
+             }else if(value == 'file'){
+                name =  'Tệp'
+            }else if(value == 'knowledge'){
+                name =  'Knowledge'
+            }else if(value == 'comment'){
+                name =  'Bình luận'
             } else {
                 name = value;
             }
@@ -467,7 +471,7 @@ export default {
                     "resource": "dataflow",
                     "scope": "bi",
                 },
-                document_object:{
+                document_instance:{
                     "module": "document",
                     "resource": "document_instance",
                     "scope": "document",
@@ -529,7 +533,14 @@ export default {
 }
 .slider-user{
      width: 250px!important; 
-     border:1px solid rgba(0,0,0,0.2)
+     border:1px solid rgba(0,0,0,0.2);
+
+}
+.item-user ::v-deep .v-avatar{
+    margin:8px!important;
+    height: 40px!important;
+    min-width: 35px;
+    width: 40px!important;
 }
 .general ::v-deep .v-slide-group__prev{
     margin-right:-35px!important;

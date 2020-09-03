@@ -4,15 +4,19 @@
         <!-- <v-hover v-slot:default>
             <v-btn depressed small class="mr-1" color="#162D89" dark @click="$router.push('/timesheet/submit')">
                 <span style='color:white'>
-                    {{$t('common.timesheet_button')}}
+                    {{$t('timesheet.timesheet_button')}}
                 </span>
             </v-btn>
         </v-hover> -->
         <v-dialog v-model="dialog" width="357">
             <template v-slot:activator="{on}">
-                <v-btn style="font-weight: normal" depressed small class="mr-2 fs-13" color="success" v-on="on">
-                    {{$t('common.task')}}    <v-icon>mdi-plus</v-icon>
+                <v-btn style="font-weight: normal;margin-left:-23px!important" depressed small class=" fs-13" color="success" v-on="on">
+                    Tạo task<v-icon>mdi-plus</v-icon>
                 </v-btn>
+                <!-- <button  type="button" class="ml-1 v-btn theme--light v-size--small" 
+                style="margin-left:-40px!important"><span><i aria-hidden="true" class=" mr-4 v-icon notranslate mdi mdi-plus theme--light" 
+                style="font-size: 18px;"></i><span  class="ml-2">
+                    Tạo task</span></span></button> -->
             </template>
             <TaskForm @cancel="cancel()"/>
         </v-dialog>
