@@ -1,9 +1,9 @@
 <template>
-<div class='log-time' style="padding-left: 10px; height: 100%">
-    <v-row style="padding-bottom: 10px; margin-left:2px; margin-bottom:-22px;margin-top:-10px">
+<div class='log-time h-100' style="padding-left: 10px">
+    <v-row style="padding-bottom: 10px; margin-left:2px; margin-bottom:-22px">
         <period-selector />
         <div style="width:38%;float:right" 
-             class=".d-lg-flex .d-lg-none d-none d-lg-block">
+             class="">
             <CalendarViewMode
                 @time_view="time_view = true"
                 @list_view="time_view = false" />

@@ -163,7 +163,7 @@
             </div>
         </div>
     </v-card-text>
-       <v-card-text>
+       <v-card-text v-if="timeError" class="mb-3">
          <span class="red--text" v-show="timeError">{{timeError}}</span>
     </v-card-text>
     <v-card-text class="div-description">

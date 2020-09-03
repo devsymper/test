@@ -13,9 +13,9 @@
             </template>
             <template v-else>
                 <v-list-item @mouseleave="hideDotButton(searchItems.indexOf(item))" 
-                 @mousemove="showDotButton(searchItems.indexOf(item))" style="margin-top:-10px; margin-bottom:-10px" class="pl-7 search-menu" :attrs="attrs">
+                 @mousemove="showDotButton(searchItems.indexOf(item))" style="margin-top:-10px; margin-bottom:-10px; margin-left:-5px" class="pl-7 search-menu" :attrs="attrs">
                     <!-- <v-list-item-avatar  v-if="item.type === 'user'" -->
-                        <SymperAvatar v-if="item.type === 'user'" style ="height: 30px!important; width: 32px!important" :userId="item.userId"/>
+                        <SymperAvatar v-if="item.type === 'user'" style="height: 35px!important; width:35px!important" class="mr-4" :userId="item.userId"/>
                     <!-- </v-list-item-avatar> -->
                   
                     <v-list-item-content style="margin-left:-10px">
@@ -98,7 +98,7 @@ export default {
                     "resource": "dataflow",
                     "scope": "bi",
                 },
-                document_object:{
+                document_instance:{
                     "module": "document",
                     "resource": "document_instance",
                     "scope": "document",
@@ -113,7 +113,7 @@ export default {
                 },
                 syql:{
                 },
-                application_deninition:{
+                application_definition:{
                 }
             }
         };
@@ -191,7 +191,7 @@ export default {
         //hiển thị tên của các menu
         formatGroupName(value){
             let name = '';
-            if(value=='document_object'){
+            if(value=='document_instance'){
                 name =  'Văn bản';
             }else if(value =='user'){
                 name =  'Nhân viên'
@@ -203,7 +203,7 @@ export default {
                 name =  'Sơ đồ tổ chức'
             }else if(value == 'process_definition'){
                 name =  'Quy trình'
-            }else if(value == 'application_deninition'){
+            }else if(value == 'application_definition'){
                 name =  'Ứng dụng'
             }else if(value == 'syql'){
                 name =  'Công thức'
@@ -237,7 +237,7 @@ export default {
                             const regex = new RegExp(newVal,"gi");
                             const normalizedData = res.data.map(data => {
                                 const returnObjSearch = {};
-                                 if(data.type=='application_deninition'){
+                                 if(data.type=='application_definition'){
                                     returnObjSearch.iconType = data.iconType;
                                     returnObjSearch.iconName = data.iconName;
                                 }
@@ -398,11 +398,10 @@ export default {
     min-height: 100px!important;
     background-color:white
 }
-.search-menu ::v-deep .symper-avatar-image{
-    height:30px!important;
-}
 
 .v-list-item:hover{
       background:rgba(0,0,0,0.05);
 }
+
+
 </style>

@@ -1,19 +1,8 @@
 <template>
 <div style="width:62%;float:left">
-    <div class="float-lg-left float-md-left .d-lg-flex .d-lg-none d-none d-lg-block select-time" 
+    <div class="float-lg-left float-md-left  select-time" 
         v-bind:class = "[type=='month' ? 'width-55' :'width-58']">
         <v-menu offset-y>
-            <!-- <template v-slot:activator="{on}">
-                <v-btn class="mr-1" 
-                color="#F7F7F7" 
-                v-on="on" 
-                depressed small>
-                    Quynh
-                    <v-btn icon>
-                        <v-icon>mdi-chevron-down</v-icon>
-                    </v-btn>    
-                </v-btn>
-            </template> -->
             <v-list>
                 <v-list-item v-for="(item, index) in items" :key="index">
                     <v-list-item-title>{{ item.title }}</v-list-item-title>
@@ -30,7 +19,6 @@
             <v-icon>mdi-chevron-left</v-icon>
         </v-btn>
         <span>{{totalHours*10/10}}/{{hoursRequired}} {{$t('timesheet.of')}} {{startDate}} - {{endDate}}</span>
-       
         <v-btn icon @click="next()">
             <v-icon>mdi-chevron-right </v-icon>
         </v-btn>

@@ -1,6 +1,7 @@
 <template>
-<div class="w-100 ml-3 pr-5 mt-2 mb-10 mr-3" style="height: calc(100vh - 120px)">
-    <v-sheet style = "border-bottom:1px solid lightgrey; height:100%" v-bind:class="[calendarType=='month'? 'h-50' :'h-580']"  class="calendar">
+<div class="w-100 pr-5 mt-2 mr-3" style="height: calc(100vh - 120px)">
+    <v-sheet style = "border-bottom:1px solid lightgrey" v-bind:class="[calendarType=='month'? 'h-50' :'h-580']" 
+     class="h-100 calendar">
         <v-toolbar-title v-if="$refs.calendar">
         </v-toolbar-title>
     <!-- <div style="height:100%;width:97%; background-color:lightgrey;opacity:0.8;position: relative;"> -->
@@ -250,7 +251,6 @@ export default {
     },
     methods: {
         start(date){
-            let dateForm = date;
             this.$emit('showLog',date);   
         },
         copyLogTime(event){
@@ -669,6 +669,7 @@ export default {
         //     }
         // },
         calendarType(newType) {
+               this.load();
             if (newType === 'weekday') {
                 this.internalCalendarType = 'week';
             } else {
@@ -878,8 +879,13 @@ border-bottom: 1px solid rgb(0,0,0,0.05)
 
 }
 
-/* .new-log:hover{
-    display:block
-} */
+.new-log{
+   opacity: 0;
+}
+
+.new-log:hover{
+    opacity: 1;
+    color:grey
+}
 
 </style>

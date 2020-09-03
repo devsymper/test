@@ -311,7 +311,7 @@ export default {
         },
         getIcon(value){
              let icon = 'mdi-star-outline';
-            if (value == 'document_object') {
+            if (value == 'document_instance') {
                 icon = 'mdi mdi-file-document-outline';
             } else if (value == 'user') {
                 icon = 'mdi-account-multiple-outline';
@@ -325,7 +325,7 @@ export default {
                  icon = 'mdi mdi-sitemap';
             } else if (value == 'process_definition') {
                  icon = 'mdi mdi-sitemap';          
-            } else if (value == 'application_deninition') {
+            } else if (value == 'application_definition') {
                  icon = 'mdi mdi-apps';         
             } else if (value == 'syql') {
                  icon = 'mdi mdi-alpha-f';          
@@ -338,7 +338,7 @@ export default {
         },
         formatGroupName(value) {
             let name = '';
-            if (value == 'document_object') {
+            if (value == 'document_instance') {
                 name = 'Văn bản';
             } else if (value == 'user') {
                 name = 'Nhân viên'
@@ -348,11 +348,9 @@ export default {
                 name = 'Workflow'
             } else if (value == 'orgchart') {
                 name = 'Sơ đồ tổ chức'
-            } else if (value == 'orgchart') {
-                name = 'Loại văn bản'
             } else if (value == 'process_definition') {
                 name = 'Quy trình'
-            } else if (value == 'application_deninition') {
+            } else if (value == 'application_definition') {
                 name = 'Ứng dụng'
             } else if (value == 'syql') {
                 name = 'Công thức'
@@ -473,7 +471,7 @@ export default {
                     "resource": "dataflow",
                     "scope": "bi",
                 },
-                document_object:{
+                document_instance:{
                     "module": "document",
                     "resource": "document_instance",
                     "scope": "document",
