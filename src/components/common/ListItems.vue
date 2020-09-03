@@ -563,7 +563,8 @@ export default {
             let items = this.tableContextMenu;
             if(!$.isArray(items)){
                 let objectType = this.commonActionProps.resource;
-                items = actionHelper.filterAdmittedActions(items, objectType, id);
+                let parentId = this.commonActionProps.parentId ? this.commonActionProps.parentId : id;
+                items = actionHelper.filterAdmittedActions(items, objectType, parentId ,id);
             }
             this.hotTableContextMenuItems =  this.getItemContextMenu(items);
         },

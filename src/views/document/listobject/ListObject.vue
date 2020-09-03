@@ -8,6 +8,7 @@
         :actionPanelWidth="actionPanelWidth"
         @after-open-add-panel="submitDocument"
         @data-get="afterGetData"
+        :commonActionProps="commonActionProps"
         ref="listObject"
     >
         <div slot="right-panel-content" class="h-100">
@@ -45,6 +46,12 @@ export default {
     },
     data(){
         return {
+            commonActionProps: {
+                "module": "document",
+                "resource": "document_instance",
+                "scope": "document",
+                "parentId": this.$route.params.id
+            },
             docId:this.$route.params.id,
             currentDocObjectActiveIndex:'',
             panelDocTitle:"",
@@ -53,8 +60,9 @@ export default {
             containerHeight: 200,
             dataTable:[],
             dataClipboard:"",
-            tableContextMenu:[
-                {name:"delete",text:'Xóa',
+            tableContextMenu:{
+                delete: {
+                    name:"delete",text:'Xóa',
                     callback: (documentObject, callback) => {
                         let ids = documentObject.reduce((arr,obj)=>{
                             arr.push(obj.document_object_id);
@@ -83,21 +91,21 @@ export default {
                         .always(() => {});
                     },
                 },
-                {
+                detail: {
                     name: "detail",
                     text: "Xem chi tiết",
                     callback: (documentObject, callback) => {
                         this.$goToPage('/documents/objects/'+documentObject.document_object_id,"Danh sách bản ghi");
                     },
                 },
-                {
+                print: {
                     name: "print",
                     text: "In",
                     callback: (documentObject, callback) => {
                         this.$goToPage('/documents/objects/'+documentObject.document_object_id+'/print',"In");
                     },
                 },
-                {
+                detail_in_view: {
                     name: "detailInView",
                     text: "Xem trong trang",
                     callback: (documentObject, callback) => {
@@ -107,14 +115,14 @@ export default {
                         this.docObjInfo = {docObjId:parseInt(documentObject.document_object_id),docSize:'21cm'}
                     },
                 },
-                {
+                update: {
                     name: "edit",
                     text: "Cập nhật",
                     callback: (documentObject, callback) => {
                         this.$goToPage('/document/objects/update/'+documentObject.document_object_id,"Cập nhật");
                     },
                 },
-            ],
+            },
         }
     },
     computed:{
