@@ -23,14 +23,6 @@
         </div>
         <div style="width:37%;float:right" class=" .d-lg-flex .d-lg-none d-none d-lg-block">
             <div class="icon-calendar">
-                 <!-- <v-dialog v-model="dialog" width="357">
-            <template v-slot:activator="{on}">
-                <v-btn style="font-weight: normal" depressed small class="mr-2 fs-13" color="success" v-on="on">
-                    {{$t('timesheet.task')}}    <v-icon>mdi-plus</v-icon>
-                </v-btn>
-            </template>
-            <!-- <CategoryForm @cancel="cancel()"/> -->
-        <!-- </v-dialog> --> 
                 <v-btn icon class="mdi-calendar-button" @click="$router.push('/timesheet')">
                     <v-icon>mdi-calendar</v-icon>
                 </v-btn>

@@ -79,44 +79,43 @@
               <!-- màn hình week/day/weekday - event log -->
             <template v-slot:event="{ event, eventSummary,timed, eventParsed  }">
                 <v-menu offset-x :nudge-right="10">
-                    <template v-slot:activator="{on}">
+                    <template v-slot:activator="{on: detailEvents}">
                         <div
                             @dblclick="openLogTimeDialog(event, true)"
-                            @click="on.click"
-                            @mouseover="viewEvent = true" 
-                            @mouseout="viewEvent = false">
+                            v-on="detailEvents"
+                            class="d-flex flex-column"
+                            style="height: 100%">
                             <div v-if="event.type==null" class="v-event-draggable" v-html="eventSummary()">Task</div>
-                            <div style="padding-left: 10px; padding-top:2px" class="fs-14">
-                                <div v-on="on" class="fs-13 fm"  :style="{'width':(findDuration(event.start, event.end)>62)?'70%':'50%'}" 
-                                style="margin-top:-2px; width: 70%; float:left">
-                                   <span v-if="findDuration(event.start, event.end)<62">
-                                       <v-icon v-if="event.type==0" class="fs-15" color='primary'>
+                            <div class="d-flex flex-row fs-14" style="padding-left: 10px; padding-top:2px">
+                                <div class="fs-13 fm" :style="{'width':(findDuration(event.start, event.end)>62)?'70%':'75%'}">
+                                    <span v-if="findDuration(event.start, event.end)<62">
+                                        <v-icon v-if="event.type==0" class="fs-15" color='primary'>
                                             mdi-calendar</v-icon>
                                         <v-icon v-if="event.type==1" class="fs-15" color='success'>mdi-check-all</v-icon>
                                     </span>
                                     <b style="font-weight:430; color:#303030" class="fs-12">
-                                    <span v-if="findDuration(event.start, event.end)<62">
-                                    {{validateContent(event.name,9)}}
-                                    </span>
-                                    <span v-if="findDuration(event.start, event.end)>61">
-                                    {{validateContent(event.name,20)}}
-                                    </span>
+                                        <span v-if="findDuration(event.start, event.end)<62">
+                                        {{validateContent(event.name,12)}}
+                                        </span>
+                                        <span v-if="findDuration(event.start, event.end)>61">
+                                        {{validateContent(event.name,18)}}
+                                        </span>
                                     </b>
                                 </div>
-                                <div style="float:right; margin-top:-10px">
+                                <div style="margin-top: -8px">
                                     <v-menu open-on-focus transition="scale-transition" 
                                         open-on-hover bottom left nudge-left='5' 
                                         nudge-top='-10'>
-                                        <template v-slot:activator="{ on, attrs }">
-                                               <span class="fs-12" v-if="findDuration(event.start, event.end)<62"
-                                                v-on="on" style="margin-right:-15px">
-                                                   {{getDuration(eventParsed.input.start,eventParsed.input.end )}}
-                                                </span>
-                                            <v-btn dark icon v-bind="attrs" v-on="on">
+                                        <template v-slot:activator="{ on: actionEvents, attrs: actionAttrs }">
+                                            <span class="fs-12" v-if="findDuration(event.start, event.end)<62"
+                                                v-on="actionEvents" style="margin-right:-20px;margin-left:5px;font-weight:430">
+                                                {{getDuration(eventParsed.input.start,eventParsed.input.end )}}
+                                            </span>
+                                            <v-btn style = "margin-left:5px" dense dark icon v-bind="actionAttrs" v-on="actionEvents">
                                                 <v-icon v-if="event.type"
-                                                 small class=" fs-13 ml-4" 
-                                                 :style="{'margin-right':(findDuration(event.start, event.end)>62)?'':':19px'}" 
-                                                 style="color:black" >
+                                                small class=" fs-13 ml-4" 
+                                                :style="{'margin-right':(findDuration(event.start, event.end)>62)?'':':25px'}" 
+                                                style="color:black" >
                                                     mdi-dots-vertical</v-icon>
                                             </v-btn>
                                         </template>
@@ -124,19 +123,20 @@
                                             <v-btn class="font-normal fs-13"
                                             depressed @click="openLogTimeDialog(event, true)">{{$t('timesheet.update')}}</v-btn>
                                             <v-btn class="font-normal fs-13"
-                                             depressed @click="openDeleteDialog(event)">{{$t('timesheet.delete')}}</v-btn>
-                                              <v-btn class="font-normal fs-13"
-                                             depressed @click="copyLogTime(event)">Sao chép</v-btn>
+                                            depressed @click="openDeleteDialog(event)">{{$t('timesheet.delete')}}</v-btn>
+                                            <v-btn class="font-normal fs-13"
+                                            depressed @click="copyLogTime(event)">Sao chép</v-btn>
                                         </div>
                                     </v-menu>
                                 </div>
                             </div>
-                            <div v-if="findDuration(event.start, event.end)>105" style="clear:both; color:grey; 
+                            <div v-if="findDuration(event.start, event.end)>105" style="color:grey; 
                                 height: 30px; padding-left: 10px;" class="fs-12">
                                 {{event.desc ? validateContent(event.desc,18) : "" }}
                             </div>
-                            <div class="pa-2 w-100" style="position:absolute; bottom: -7px">
-                                <div style="width: 50%; float:left">
+                            <v-spacer />
+                            <div class="pa-2 w-100 d-flex flex-row justify-space-between align-center">
+                                <div>
                                     <span v-if="findDuration(event.start, event.end)>70">
                                         <v-icon v-if="event.type==0" class="fs-15" color='primary'>
                                             mdi-calendar</v-icon>
@@ -147,14 +147,14 @@
                                     </span>
                                 </div>
                                 <div>
-                                    <div  v-if="findDuration(event.start, event.end)>61" class="fs-11 font-normal" style="float: right;font-weight:410">
+                                    <div  v-if="findDuration(event.start, event.end)>61" class="fs-11 font-normal" style="float: right;font-weight:410;margin-top: -5px">
                                         {{getDuration(eventParsed.input.start,eventParsed.input.end )}}
                                     </div>
                                     <!-- <div v-else  class="pr-5"  v-on="on">ádạdk</div> -->
                                 </div>
                             </div>
                         </div>
-                        <div v-if="timed" class="v-event-drag-bottom" @mousedown.stop="extendBottom(event)">
+                        <div v-if="timed" class="v-event-drag-bottom" style="height: 10px" @mousedown.stop="extendBottom(event)">
                         </div>
                     </template>
                     <div>
@@ -163,17 +163,17 @@
                 </v-menu>
             </template>
              <!-- màn hình week/day/weekday - header -->
-            <template v-slot:day-header="{day, present,  weekday, date}">
+            <template v-slot:day-header="{day, present, month, weekday, date}">
                 <div :class="[monthEvents[date]? 'light-green-color' :'grey-color']">
                     <div class="px-3 pt-2">
                         <div class="d-flex justify-space-between">
-                            <span v-if=" weekday==1" v-bind:class="[present ? 'color-orange' :'color-grey']"><span class="fs-14">{{$t('timesheet.mon')}}</span><span v-bind:class="[present ? 'color-orange' :'color-darkgrey fs-12 ']" class="fs-14"> {{day}}</span></span>
-                            <span v-if=" weekday==2" v-bind:class="[present ? 'color-orange' :'color-grey']"><span class="fs-14">{{$t('timesheet.tue')}}</span><span v-bind:class="[present ? 'color-orange' :'color-darkgrey fs-12']" class="fs-14"> {{day}}</span></span>
-                            <span v-if=" weekday==3" v-bind:class="[present ? 'color-orange' :'color-grey']"><span class="fs-14">{{$t('timesheet.wed')}}</span><span v-bind:class="[present ? 'color-orange' :'color-darkgrey fs-12']" class="fs-14"> {{day}}</span></span>
-                            <span v-if=" weekday==4" v-bind:class="[present ? 'color-orange' :'color-grey']"><span class="fs-14">{{$t('timesheet.thu')}}</span><span v-bind:class="[present ? 'color-orange' :'color-darkgrey fs-12']" class="fs-14"> {{day}}</span></span>
-                            <span v-if=" weekday==5" v-bind:class="[present ? 'color-orange' :'color-grey']"><span class="fs-14">{{$t('timesheet.fri')}}</span><span v-bind:class="[present ? 'color-orange' :'color-darkgrey fs-12']" class="fs-14"> {{day}}</span></span>
-                            <span v-if=" weekday==6" v-bind:class="[present ? 'color-orange' :'color-grey']"><span class="fs-14">{{$t('timesheet.sat')}}</span><span v-bind:class="[present ? 'color-orange' :'color-darkgrey fs-12']" class="fs-14"> {{day}}</span></span>
-                            <span v-if=" weekday==0" v-bind:class="[present ? 'color-orange' :'color-grey']"><span class="fs-14">{{$t('timesheet.sun')}}</span><span v-bind:class="[present ? 'color-orange' :'color-darkgrey fs-12']" class="fs-14"> {{day}}</span></span>
+                            <span v-if=" weekday==1" v-bind:class="[present ? 'color-orange' :'color-grey']"><span class="fs-14">{{$t('timesheet.mon')}}</span><span v-bind:class="[present ? 'color-orange' :'color-darkgrey fs-12 ']" class="fs-14"> {{day}}/{{month}}</span></span>
+                            <span v-if=" weekday==2" v-bind:class="[present ? 'color-orange' :'color-grey']"><span class="fs-14">{{$t('timesheet.tue')}}</span><span v-bind:class="[present ? 'color-orange' :'color-darkgrey fs-12']" class="fs-14"> {{day}}/{{month}}</span></span>
+                            <span v-if=" weekday==3" v-bind:class="[present ? 'color-orange' :'color-grey']"><span class="fs-14">{{$t('timesheet.wed')}}</span><span v-bind:class="[present ? 'color-orange' :'color-darkgrey fs-12']" class="fs-14"> {{day}}/{{month}}</span></span>
+                            <span v-if=" weekday==4" v-bind:class="[present ? 'color-orange' :'color-grey']"><span class="fs-14">{{$t('timesheet.thu')}}</span><span v-bind:class="[present ? 'color-orange' :'color-darkgrey fs-12']" class="fs-14"> {{day}}/{{month}}</span></span>
+                            <span v-if=" weekday==5" v-bind:class="[present ? 'color-orange' :'color-grey']"><span class="fs-14">{{$t('timesheet.fri')}}</span><span v-bind:class="[present ? 'color-orange' :'color-darkgrey fs-12']" class="fs-14"> {{day}}/{{month}}</span></span>
+                            <span v-if=" weekday==6" v-bind:class="[present ? 'color-orange' :'color-grey']"><span class="fs-14">{{$t('timesheet.sat')}}</span><span v-bind:class="[present ? 'color-orange' :'color-darkgrey fs-12']" class="fs-14"> {{day}}/{{month}}</span></span>
+                            <span v-if=" weekday==0" v-bind:class="[present ? 'color-orange' :'color-grey']"><span class="fs-14">{{$t('timesheet.sun')}}</span><span v-bind:class="[present ? 'color-orange' :'color-darkgrey fs-12']" class="fs-14"> {{day}}/{{month}}</span></span>
                             <span v-if="monthEvents[date]">
                                <span class="fs-12" style="color:#484848">
                                    {{ changeDuration(monthEvents[date].reduce((acc, d) => +d.duration + acc, 0))}}/{{hoursRequired.substr(0,1)+'h'}}</span> 
@@ -181,9 +181,9 @@
                         </div>
                     </div>
                     <div style="background-color:#CCCCCC; width: 90%; height: 5px; border:1px; margin-top: 9px; margin: 0 auto">
-                        <div v-bind:class="[monthEvents[date]?'green' :'grey-color']" style="height: 5px; border:1px; margin-top: 9px;" 
+                        <div v-bind:class="[monthEvents[date]?'green' :'grey-color']" style="overflow:hidden; height: 5px; border:1px; margin-top: 9px;" 
                         :style="{'width': monthEvents[date]
-                        ? (((monthEvents[date].reduce((acc, d) => +d.duration + acc, 0) / 60) / hoursRequired) * 100) + '%'
+                        ? ((((monthEvents[date].reduce((acc, d) => +d.duration + acc, 0) / 60) / hoursRequired) * 100))>100?100+ '%':(((monthEvents[date].reduce((acc, d) => +d.duration + acc, 0) / 60) / hoursRequired) * 100) + '%'
                         : '0%'}">
                         </div>
                     </div>
@@ -224,7 +224,6 @@ export default {
             detail: false,
             color: 'orange',
             dragEvent: null,
-            dragStart: null,
             createEvent: null,
             createStart: null,
             extendOriginal: null,
@@ -251,13 +250,14 @@ export default {
     },
     methods: {
         start(date){
-            debugger
-             this.$emit('showLog',date);   
+            let dateForm = date;
+            this.$emit('showLog',date);   
         },
         copyLogTime(event){
+            debugger
               timesheetApi.createLogTime({
-                        start:dayjs(event.start).format("YYYY-MM-DD HH:mm"),
-                        end: dayjs(event.end).format("YYYY-MM-DD HH:mm"),
+                        start:dayjs(event.start).add(1, 'h').format("YYYY-MM-DD HH:mm"),
+                        end: dayjs(event.end).add(1, 'h').format("YYYY-MM-DD HH:mm"),
                         duration:event.duration,
                         task: event.task,
                         type: event.type,
@@ -331,7 +331,6 @@ export default {
             let end = endFormatted.get('hour') * 60 + endFormatted.get('minute');
             let duration = end - start;
             return duration;
-
         },
         getDuration(startTime, endTime) {
             let duration = this.findDuration(startTime, endTime);
@@ -409,19 +408,21 @@ export default {
             // console.log(now.isAfter(today));
             // let checkBt = today.isBetween(end, start);
             // if(checkBt||now.isAfter(today)){
-                  if (this.dragEvent && this.dragTime === null) {} 
-                    else {
-                        this.createStart = this.roundTime(mouse)
-                        this.createEvent = {
-                            name: ``,
-                            timed: true,
-                            date: this.createStart,
-                            start: this.createStart,
-                            end: this.createStart,
-                        }
-                        this.events.push(this.createEvent);
-                        this.creatingEvent = true;
-                    }
+            if (this.dragEvent && this.dragTime === null) {
+                const start = this.dragEvent.start
+                this.dragTime = mouse - start
+            } else {
+                this.createStart = this.roundTime(mouse)
+                this.createEvent = {
+                    name: ``,
+                    timed: true,
+                    date: this.createStart,
+                    start: this.createStart,
+                    end: this.createStart,
+                }
+                this.events.push(this.createEvent);
+                // this.creatingEvent = true;
+            }
 
             // }else{
             // }
@@ -440,7 +441,7 @@ export default {
                 this.dragEvent.end = newEnd
 
             } else if (this.createEvent && this.createStart !== null) {
-                this.creatingEvent = true;
+                // this.creatingEvent = true;
                 const mouseRounded = this.roundTime(mouse, false)
                 const min = Math.min(mouseRounded, this.createStart)
                 const max = Math.max(mouseRounded, this.createStart)
@@ -448,40 +449,88 @@ export default {
                 this.createEvent.end = max
             }
         },
-        endDrag() {
-            if (this.creatingEvent || !this.viewEvent) {
-                if (this.createEvent&&this.extend==false) {
+        async endDrag() {
+            async function updateEvent(event, duration) {
+                let start = dayjs(event.start);
+                let end = dayjs(event.end);
+                let res = await timesheetApi.updateLogTime({
+                    start: start.format("YYYY-MM-DD HH:mm"),
+                    end: end.format("YYYY-MM-DD HH:mm"),
+                    duration: duration,
+                    task: event.task,
+                    type: event.type,
+                    id: event.id,
+                    date: start.format('YYYY-MM-DD'),
+                    categoryTask: event.category,
+                    desc: event.desc || ""
+                });
+                if (res.status === 200) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+            // 3 loai su kien: create, extend, drag
+            // 1. neu createEvent khac null, co 2 truong hop nho
+            if (this.createEvent) {
+                if (this.extend) {
+                    // truong hop 1.1: neu extend => update event
+                    try {
+                        let duration = this.findDuration(this.createEvent.start, this.createEvent.end);
+                        let result = await updateEvent(this.createEvent, duration);
+                        if (result) this.load();
+                    } catch(e) {
+                        console.log(e);
+                    }
+                } else {
+                    // truong hop 1.2: tao moi event
                     this.openLogTimeDialog(this.createEvent);
                 }
-                if(this.extend){
-                    let start =  dayjs(this.createEvent.start);
-                    let end = dayjs(this.createEvent.end);
-                    let duration = this.findDuration(start,end);
-                   timesheetApi.updateLogTime({
-                        start: start.format("YYYY-MM-DD HH:mm"),
-                        end: end.format("YYYY-MM-DD HH:mm"),
-                        duration: duration,
-                        task: this.createEvent.task,
-                        type: this.createEvent.type,
-                        id: this.createEvent.id,
-                        date: this.createEvent.date,
-                        categoryTask: this.createEvent.category,
-                        desc: this.createEvent.desc || ""
-                    })
-                    .then(res => {
-                        if (res.status === 200) {
-                            //console.log(res);
-                           this.load()
-                        }
-                    })
-                    .catch(console.log);
-                    this.extend=false
-                    }
+            } else if(this.dragEvent) {
+                // 2. drag event => update event
+                try {
+                    let duration = this.findDuration(this.dragEvent.start, this.dragEvent.end);
+                    let result = await updateEvent(this.dragEvent, duration);
+                    if (result) this.load();
+                } catch(e) {
+                    console.log(e);
+                }
             }
+            
+            // if (this.creatingEvent || this.dragEvent || !this.viewEvent) {
+            //     if (this.createEvent && !this.extend) {
+            //         this.openLogTimeDialog(this.createEvent);
+            //     }
+            //     if(this.extend) {
+            //         let start = dayjs(this.createEvent.start);
+            //         let end = dayjs(this.createEvent.end);
+            //         let duration = this.findDuration(start,end);
+            //         timesheetApi.updateLogTime({
+            //             start: start.format("YYYY-MM-DD HH:mm"),
+            //             end: end.format("YYYY-MM-DD HH:mm"),
+            //             duration: duration,
+            //             task: this.createEvent.task,
+            //             type: this.createEvent.type,
+            //             id: this.createEvent.id,
+            //             date: this.createEvent.date,
+            //             categoryTask: this.createEvent.category,
+            //             desc: this.createEvent.desc || ""
+            //         })
+            //         .then(res => {
+            //             if (res.status === 200) {
+            //                 //console.log(res);
+            //             this.load()
+            //             }
+            //         })
+            //         .catch(console.log);
+            //         this.extend=false
+            //     }
+            // }
             this.dragEvent = null
-            this.dragStart = null
             this.createEvent = null
             this.createStart = null
+            this.extend = false
+            this.extendOriginal = null
         },
         extendBottom(event) {
             this.createEvent = event;
@@ -626,8 +675,9 @@ export default {
                 this.internalCalendarType = newType;
             }
              this.$nextTick(() => {
-                 this.$nextTick(this.onChangeCalendar);
+                this.$nextTick(this.onChangeCalendar);
                 this.updateTotalHours();
+                this.load()
             });   
         },
         calendarShowDate() {

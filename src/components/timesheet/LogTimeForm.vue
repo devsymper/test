@@ -19,8 +19,6 @@
                     item-color="white" 
                     background-color="#F7F7F7">
                     <template v-slot:item="data" class="category-task">
-                        <!-- <img style='max-height: 40px; max-width: 30px; margin-right:5px' 
-                        :src="require('../../assets/icon/AD-IT.png')" /> -->
                         <span style='color:black' >{{ data.item }}
                             <v-icon v-if="data.item === categoryTask " color="success">
                             mdi-check
@@ -47,8 +45,7 @@
         <v-row style="margin-top:-10px">
             <div style="width: 275px!important" class="ml-3 mr-1">
                 <v-autocomplete 
-                    class="task" 
-                    style="width:100%;margin-top:8px!important;font-size:13px" 
+                    class="task w-100 mt-2 fs-13" 
                     v-model="task"
                     :items="items" 
                     :loading="isLoading" 
@@ -312,6 +309,9 @@ export default {
             this.getEventLog();
             
         },
+        dateMonth(){
+            this.getDateMonth()
+        },
        
         duration(){
             if(this.duration<=0||Number.isNaN(this.duration)){
@@ -348,9 +348,8 @@ export default {
             else this.tab = null
         },
         newEvent(val) {
+            ///debugger
             this.loadTaskList();
-            let date = this.dateMonth;
-            this.getDateMonth(date);
             this.inputs.startTime = val ? dayjs(val.start).format('HH:mm') : "08:00";
             this.inputs.endTime = val ? dayjs(val.end).format('HH:mm') : "08:40";
             this.inputs.date = val ? dayjs(val.date).format('YYYY-MM-DD') : dayjs().format('YYYY-MM-DD');
@@ -366,20 +365,21 @@ export default {
         },
     },
     created(){
+        // load lại trang ở màn month
+       // debugger
+        let date = this.dateMonth;
+        this.getDateMonth(date);
         this.loadTaskList();
         this.getCategory();
-        // if(this.dateMonth){
-        //     this.newEvent.start=1598310600000;
-        //     this.newEvent.end=1598310600000;
-        //     this.inputs.date = dayjs().format('DD/MMM/YYYY')
-        // };
     },
     methods: { 
         // lấy giờ
          getDateMonth(){
+          //   debugger
              let date = this.dateMonth;
             // debugger
             this.dateLogMonthView = date;
+           // debugger
             this.inputs.startTime='08:00';
              this.inputs.endTime='08:30';
             this.inputs.description = '';
@@ -501,7 +501,9 @@ export default {
                 })
                 .then(res => {
                     if (res.status === 200) {
-                        this.onSave()
+                        debugger
+                        this.onSave();
+                        this.$emit('loadMonthView')
                      
                     }
                 })
@@ -557,6 +559,7 @@ export default {
                     })
                     .then(res => {
                         if (res.status === 200) {
+                            debugger
                             this.onSave()
                         }
                     })
@@ -573,13 +576,13 @@ export default {
                 try {
                     let res =  await timesheetApi.getTaskDB()
                     let task = [];
-                    debugger
+                   //debugger
                     let id = res.data.id;
                     task.push(...res.data.task);
                     self.items = task.filter(x=>x.userAssignId==id);
                      res = await timesheetApi.getTask({size: 100});
                     self.items.push(...res.data).filter(x=>x.assignee==id);
-                    debugger
+                  //  debugger
                     console.log(self.items)
                 } catch(e) {
                     console.log(e)
@@ -589,22 +592,18 @@ export default {
                 // lọc task theo giá trị category
                 try {
                     self.item = [];
-                   debugger
+                //   debugger
                     let idCategory = self.getIdCategory(self.categoryTask);
                     let res =  await timesheetApi.getTaskDB();
                     let id = res.data.id;
-                    debugger
+                   // debugger
                     self.items.push(...res.data.task);
                     self.items = self.items.filter(x=>x.userAssignId==id&&x.categoryId==idCategory);
                      res = await timesheetApi.getTask({size: 100});
-                     debugger
+                   //  debugger
                     self.items.push(...res.data).filter(x=>x.assignee==id);
                     console.log(self.items)
-                     debugger
-                 
-                   // res = await timesheetApi.getTask({size: 100});
-                  //  task.push(...res.data);
-                   // self.items = task;
+                  //   debugger
                 } catch(e) {
                     console.log(e)
                 } finally {
