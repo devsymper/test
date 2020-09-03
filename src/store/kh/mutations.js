@@ -9,6 +9,11 @@
 // };
 const changeSubCollapseSidebar = (state, newValue) => {
     state.subCollapseSideBar = newValue;
+    if (!newValue) {
+        state.widthSideBar = 250;
+    } else {
+        state.widthSideBar = 0;
+    }
 };
 const changeStatusRightBar = (state, newValue) => {
     state.statusRightBar = newValue;

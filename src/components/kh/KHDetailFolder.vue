@@ -1,7 +1,7 @@
 <template>
   <div class="kh-homepage">
     <k-h-header />
-    <div class="kh-table">
+    <div class="kh-table kh-sub-table">
       <template>
         <v-data-table
           :headers="headers"

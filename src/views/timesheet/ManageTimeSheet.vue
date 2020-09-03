@@ -7,9 +7,9 @@
              </v-navigation-drawer>
         <div style="width:63%;float:left; color: black!important">
             <div class="float-lg-left float-md-left .d-lg-flex .d-lg-none d-none d-lg-block sub-submit-view">
-                <v-btn @click="changeRange('year')" depressed small class="mr-2" color="#F7F7F7" style="letter-spacing:1px;font-family:Roboto">{{$t('common.year_to_date')}}</v-btn>
-                <v-btn @click="changeRange('quarter')" depressed small class="mr-2" color="#F7F7F7" style="letter-spacing:1px;font-family:Roboto">{{$t('common.quarter_to_date')}}</v-btn>
-                <v-btn @click="changeRange('month')" depressed small class="mr-2" color="#F7F7F7" style="letter-spacing:1px;font-family:Roboto">{{$t('common.month_to_date')}}</v-btn>
+                <v-btn @click="changeRange('year')" depressed small class="mr-2" color="#F7F7F7" style="letter-spacing:1px;font-family:Roboto">{{$t('timesheet.year_to_date')}}</v-btn>
+                <v-btn @click="changeRange('quarter')" depressed small class="mr-2" color="#F7F7F7" style="letter-spacing:1px;font-family:Roboto">{{$t('timesheet.quarter_to_date')}}</v-btn>
+                <v-btn @click="changeRange('month')" depressed small class="mr-2" color="#F7F7F7" style="letter-spacing:1px;font-family:Roboto">{{$t('timesheet.month_to_date')}}</v-btn>
             </div>
             <v-col style="padding-left:0px" class=".d-lg-flex .d-lg-none d-none d-lg-block">
                 <v-btn icon @click="pre()">
@@ -23,14 +23,6 @@
         </div>
         <div style="width:37%;float:right" class=" .d-lg-flex .d-lg-none d-none d-lg-block">
             <div class="icon-calendar">
-                 <!-- <v-dialog v-model="dialog" width="357">
-            <template v-slot:activator="{on}">
-                <v-btn style="font-weight: normal" depressed small class="mr-2 fs-13" color="success" v-on="on">
-                    {{$t('common.task')}}    <v-icon>mdi-plus</v-icon>
-                </v-btn>
-            </template>
-            <!-- <CategoryForm @cancel="cancel()"/> -->
-        <!-- </v-dialog> --> 
                 <v-btn icon class="mdi-calendar-button" @click="$router.push('/timesheet')">
                     <v-icon>mdi-calendar</v-icon>
                 </v-btn>
@@ -57,8 +49,6 @@
 import AgDataTable from "./../../components/common/agDataTable/AgDataTable";
 import CheckBoxRenderer from "./../../components/common/agDataTable/CheckBoxRenderer";
 import Config from "../../components/timesheet/Config";
-import CategoryForm from "../../components/timesheet/CategoryForm";
-
 
 import timesheetApi from '../../api/timesheet';
 
@@ -71,7 +61,7 @@ export default {
     components: {
         AgDataTable,
         CheckBoxRenderer,
-        Config, CategoryForm
+        Config, 
     },
     data() {
         return {
@@ -87,13 +77,13 @@ export default {
             dataTable: [],
             baseColumns: [
                 {
-                    "headerName": this.$t("common.department"),
+                    "headerName": this.$t("timesheet.department"),
                     "field": "department",
                     "width": 100,
                     "colId": "department",
                 },
                 {
-                    "headerName": this.$t("common.logged_time"),
+                    "headerName": this.$t("timesheet.logged_time"),
                     "field": "logged",
                     "width": 100,
                     "colId": "logged",

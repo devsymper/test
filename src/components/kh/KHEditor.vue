@@ -2,7 +2,8 @@
   <div class="w-100">
     <v-skeleton-loader v-if="loading" class="mx-auto" width="100%" height="100%" type="table"></v-skeleton-loader>
     <k-h-header />
-    <div class="kh-editor" ref="printMe">
+    <div v-show="skh.statusEdit" class="kh-editor-view"  v-html="content"></div>
+    <div v-show="!skh.statusEdit" class="kh-editor" ref="printMe">
       <editor
         id="myeditablediv"
         api-key="x7abgywktsdoz7uca2ogf5xikxkrz9w999t7cu9oi0wu6isq"
@@ -173,7 +174,7 @@ export default {
             content += `</tr>`;
           }
           content += `</table></div>`;
-          $("#" + idTable).replaceWith(content);
+          $('.kh-editor').find( "#" + idTable).replaceWith(content);
           this.$store.commit("kh/setIdTable", "");
         } else {
           var uuid = this.create_UUID();
@@ -277,6 +278,7 @@ export default {
   mounted() {
     let self = this;
     $(".kh-editor").on("dblclick", "table", function(event) {
+      console.log($(this));
       var p = $(this);
       var idTable = p.attr("id");
       self.$store.commit("kh/setIdTable", idTable);
@@ -300,15 +302,13 @@ export default {
       self.$store.commit("kh/setDataTable", result);
       self.$store.commit("kh/changeStatusHansonTable", true);
     });
-    
     $(".kh-editor").on("click", "table", function(event) {
       var p = $(this);
       var position=p.position();
-      console.log(p.width());
+      console.log(position);
       document.getElementById("mceResizeHandlenw").style.left =position.left;
       document.getElementById("mceResizeHandlene").style.left = p.width();
     });
-
     $(".kh-editor").on("click", "img", function(event) {
       var p = $(this);
       var position=p.position();
@@ -325,4 +325,10 @@ export default {
   overflow: auto;
   padding: 8px;
 }
+.kh-editor-view{
+  height: calc(98vh - 65px);
+  overflow: auto;
+  padding: 8px;
+}
+
 </style>

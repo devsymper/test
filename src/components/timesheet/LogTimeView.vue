@@ -2,38 +2,38 @@
 <v-card>
     <v-card-title class=" pt-1 pb-2 headline lighten-2" primary-title>
         <div class="w-100 pb-1" style="border-bottom: 1px solid lightgrey">
-            <span v-if="event.type==1" style="font-size:16px; font-weight:450">{{$t('common.view_log_time')}} {{event.name}}</span>
-             <span v-if="event.type==0" style="font-size:16px; font-weight:450">{{$t('common.view_plan_time')}} {{event.name}}</span> 
+            <span v-if="event.type==1" style="font-size:16px; font-weight:450">{{$t('timesheet.view_log_time')}} {{event.name}}</span>
+             <span v-if="event.type==0" style="font-size:16px; font-weight:450">{{$t('timesheet.view_plan_time')}} {{event.name}}</span> 
             <!-- <span style="font-size:16px; font-weight:bold" v-else>View plan time</span> -->
             </div>
     </v-card-title>
      <v-card-text style="height: 55px!important ">
-        <span class="label pt-2 ">{{$t('common.category_task')}}</span>
+        <span class="label pt-2 ">{{$t('timesheet.category_task')}}</span>
        <br/> {{event.category}}
     </v-card-text>
     <v-card-text style="height: 55px!important ">
-        <span class="label pt-2 ">{{$t('common.task')}}</span>
+        <span class="label pt-2 ">{{$t('timesheet.task')}}</span>
        <br/> {{event.name}}
     </v-card-text>
     <v-card-text class="div-calender-picker .d-lg-flex .d-lg-none d-none d-lg-block">
         <div style="height: 32px; margin-top:3px">
             <div class="date ">
-                <span class="label pt-2">{{$t('common.date')}}</span>
+                <span class="label pt-2">{{$t('timesheet.date')}}</span>
                 {{changeDate(event.start)}}
             </div>
-            <div class="duration"> <span class="label pt-2">{{$t('common.duration')}}</span>
+            <div class="duration"> <span class="label pt-2">{{$t('timesheet.duration')}}</span>
                  {{getDuration(event.start,event.end)}}</div>
             <div class='start-time'>
-                <span class="label pt-2">{{$t('common.start')}}</span>
+                <span class="label pt-2">{{$t('timesheet.start_time')}}</span>
                 {{changeTime(event.start)}}
             </div>
-            <div style="width: 60px; float: left"> <span class="label pt-2">{{$t('common.end_time')}}</span>
+            <div style="width: 60px; float: left"> <span class="label pt-2">{{$t('timesheet.end_time')}}</span>
               {{changeTime(event.end)}}
             </div>
         </div>
     </v-card-text>
     <v-card-text v-if="event.desc" class="div-description" style="max-width:340px">
-        <span class="label pt-2">{{$t('common.description')}}</span>
+        <span class="label pt-2">{{$t('timesheet.description')}}</span>
         <br/>  {{event.desc}}
     </v-card-text>
     <v-card-actions class="pb-5">

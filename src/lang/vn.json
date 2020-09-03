@@ -277,6 +277,80 @@
             "allOperation": "Thao tác với toàn bộ đối tượng"
         }
     },
+    "timesheet": {
+        "submit_remind": "Tần suất nhắc gửi",
+        "date_submit": "Ngày nhắc gửi ",
+        "week_remind": "Tuần nhắc",
+        "remind": "Nhắc nhở",
+        "My work": "Lịch làm việc",
+        "Timesheet": "Thời gian biểu",
+        "category_submit": "Loại công việc",
+        "Timesheet report": "Báo cáo",
+        "timesheet_button": "T.gian biểu",
+        "last_day": "Ngày trước",
+        "cur_day": "Hiện tại",
+        "next_day": "Ngày tới",
+        "Manage timesheet": "Quản lý thời gian biểu",
+        "cur_week": " Tuần này",
+        "submit_timesheet": "Gửi t.gian biểu",
+        "group_by": "Nhóm theo",
+        "next_week": "Tuần tới",
+        "last_week": " Tuần trước",
+        "desciption": "Mô tả",
+        "task": "Việc",
+        "mon": "T2",
+        "tue": "T3",
+        "wed": "T4",
+        "thu": "T5",
+        "fri": "T6",
+        "sat": "T7",
+        "sun": "CN",
+        "jun": "T6",
+        "jul": "T7",
+        "aug": "T8",
+        "sep": "T9",
+        "oct": "T10",
+        "dec": "T12",
+        "nov": "T11",
+        "jan": "T1",
+        "feb": "T2",
+        "mar": "T3",
+        "apr": "T4",
+        "may": "T5",
+        "week": "Tuần",
+        "day": "Ngày",
+        "weekday": "Ngày trong tuần",
+        "month": "Tháng",
+        "cancel": "Thoát",
+        "submit": "Gửi",
+        "date": "Ngày",
+        "task_form": "Việc",
+        "time_invalid": "Thời gian không hợp lệ",
+        "required_value": "Không được để trống",
+        "of": "từ",
+        "category_task": "Loại công việc",
+        "duration": "Khoảng",
+        "log_time": "Công việc",
+        "start_time": "Bắt đầu",
+        "end_time": "Kết thúc",
+        "plan": "Kế hoạch",
+        "log": "Đã làm",
+        "name": "Tên việc",
+        "description": "Mô tả",
+        "view_log_time": "Xem công việc",
+        "save": "Lưu",
+        "update": "Cập nhật",
+        "delete": "Xoá",
+        "category": "Loại công việc",
+        "logged_time": "Số giờ",
+        "view_plan_time": "Kế hoạch",
+        "year_to_date": "Từ đầu năm",
+        "quarter_to_date": "Từ quý",
+        "month_to_date": "Từ đầu tháng",
+        "key": "Định danh",
+        "last_week1": " Tuần này",
+        "department": "Phòng ban"
+    },
     "document": {
         "create": "Tạo mới văn bản",
         "submit": "Submit văn bản",
@@ -528,7 +602,8 @@
             "rename": "Đổi tên",
             "delete": "Xóa",
             "addfavorite": "Thêm vào yêu thích",
-            "removefavorite": "Xóa khỏi yêu thích"
+            "removefavorite": "Xóa khỏi yêu thích",
+            "viewcontent": "Xem nội dung"
         },
         "table": {
             "totalDoc": "Số văn bản"
@@ -583,7 +658,8 @@
                 "update":"Cập nhật",
                 "drop":"Xóa",
                 "list":"Danh sách",
-                "detail":"Chi tiết"
+                "detail":"Chi tiết",
+                "unfavorite": "Loại bỏ yêu thích"
             },
             "document_definition":{
                 "create":"Tạo mới văn bản ",
@@ -593,7 +669,8 @@
                 "restore":"Khôi phục",
                 "list":"Danh sách văn bản",
                 "list_trash":"Thùng rác",
-                "list_instance":"Danh sách bản ghi"
+                "list_instance":"Danh sách bản ghi",
+                "unfavorite": "Loại bỏ yêu thích"
             },
             "workflow_definition":{
                 "list":"Danh sách quy trình ",
@@ -602,14 +679,16 @@
                 "drop":"Xóa quy trình ",
                 "update":"Cập nhật quy trình ",
                 "list_instance":"Danh sách bản ghi",
-                "start_instance":"Bản ghi bắt đầu"
+                "start_instance":"Bắt đầu quy trình",
+                "unfavorite": "Loại bỏ yêu thích"
             },
             "dashboard":{
                 "create":"Tạo mới",
                 "update":"Cập nhât",
                 "view":"Xem",
                 "list":"Danh sách",
-                "drop":"Xóa"
+                "drop":"Xóa",
+                "unfavorite": "Loại bỏ yêu thích"
             }
         },
         "iconListActions":{
@@ -618,7 +697,8 @@
                 "update":"mdi-note-plus-outline",
                 "drop":"mdi-arrow-down-drop-circle-outline",
                 "list":"mdi-clipboard-list-outline",
-                "detail":"mdi-details"
+                "detail":"mdi-details",
+                "unfavorite": "mdi-star-off"
             },
             "document_definition":{
                 "create":"mdi-folder-plus-outline",
@@ -628,7 +708,8 @@
                 "restore":"mdi-file-restore-outline",
                 "list":"mdi-clipboard-list-outline",
                 "list_trash":"mdi-playlist-remove",
-                "list_instance":"mdi-file-document-multiple-outline"
+                "list_instance":"mdi-file-document-multiple-outline",
+                "unfavorite": "mdi-star-off"
             },
             "workflow_definition":{
                 "list":"mdi-clipboard-list-outline",
@@ -637,14 +718,16 @@
                 "drop":"mdi-arrow-down-drop-circle-outline",
                 "update":"mdi-note-plus-outline",
                 "list_instance":"mdi-file-document-multiple-outline",
-                "start_instance":"mdi-play-outline"
+                "start_instance":"mdi-play-outline",
+                "unfavorite": "mdi-star-off"
             },
             "dashboard":{
                 "create":"mdi-folder-plus-outline",
                 "update":"mdi-note-plus-outline",
                 "view":"mdi-eye-outline",
                 "list":"clipboard-list-outline",
-                "drop":"arrow-down-drop-circle-outline"
+                "drop":"arrow-down-drop-circle-outline",
+                "unfavorite": "mdi-star-off"
             }
         }
     },
