@@ -9,13 +9,26 @@ const addPropertyCommentTarget = (state, data) => {
 	state.commentTarget[data.property] = data.value
 };
 const updateListComment = (state, data) => {
-	Vue.set(state, 'listComment', data)
+	if (typeof data !== 'undefined'){
+		Vue.set(state, 'listComment', data)
+	}else{
+		Vue.set(state, 'listComment',[] )
+	}
+
 };
 const updateListResolve = (state, data) => {
-	Vue.set(state, 'listResolve', data)
+	if (typeof data !== 'undefined'){
+		Vue.set(state, 'listResolve', data)
+	}else{
+		Vue.set(state, 'listResolve',[] )
+	}
 };
 const updateListAvtiveComment = (state, data) => {
-	Vue.set(state, 'listAvtiveComment', data)
+	if (typeof data !== 'undefined'){
+		Vue.set(state, 'listAvtiveComment', data)
+	}else{
+		Vue.set(state, 'listAvtiveComment',[] )
+	}
 };
 const setComment = (state) => {
 	state.listComment = state.listAvtiveComment

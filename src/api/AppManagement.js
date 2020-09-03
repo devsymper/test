@@ -39,5 +39,5 @@ export const appManagementApi = {
 	},
 	getListObjectIdentifier(data){
 		return accessControlApi.post('objects',data)
-	}
+	},
 };

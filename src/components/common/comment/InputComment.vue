@@ -132,8 +132,7 @@ export default {
 			
 		},
 		download(id){
-			console.log(id);
-			debugger
+			commentApi.download(id)
 		},
 		reduce(content){
 			this.item.tags.forEach(function(e){

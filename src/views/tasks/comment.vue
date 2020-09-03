@@ -1,10 +1,34 @@
 <template>
-    <div></div>
+    <div>
+        	<Comment 
+                :showComment="true" 
+                :objectIdentifier="originData.id"
+                :objectType="'task'"
+            />
+    </div>
 </template>
 
 <script>
+import Comment from '@/components/common/comment/Comment.vue'
 export default {
-    name: "comment"
+    name: "comment",
+    components:{
+        Comment
+    },
+    props:{
+        taskInfo: {
+            type: Object,
+            default: () => {}
+        },
+        originData:{
+            type: Object,
+            default: () => {}
+        }
+    },
+    mounted(){
+        console.log(this.originData,'taskkkkkkkkkkkkkkkkkkkkkkkkkkk');
+        debugger
+    }
 }
 </script>
 
