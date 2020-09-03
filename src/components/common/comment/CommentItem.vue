@@ -23,6 +23,7 @@
 						:isAdd="false"
 						:contentEdit="contentEdit"
 						@cancel-reply="cancelReply()"
+						style="max-width:100%"
 					/>
 					<v-menu style="min-height:unset" v-if="sEnduser==item.userId" bottom left >
 						<template  v-slot:activator="{ on, attrs }">
@@ -55,7 +56,7 @@
 				v-for="(child, i) in item.childrens"
 				:key="i"
 				:item="child"
-				:width="'340px'"
+				:width="'calc(100vh-45px)'"
 				@reply-child="replyChild"
 			>
 			</commentItem>
@@ -89,7 +90,7 @@ export default {
 		},
 		width:{
 			type: String,
-			default: '380px'
+			default: '100%'
 		},
 		searchItem:{
 			type: String,
@@ -266,6 +267,7 @@ export default {
 	display: flex;
 	flex-direction: column;
 	margin-left: 8px;
+	width: 100%	;
 }
 .commnent-item>>>  .icon-menu,
 .commnent-item>>> .icon-check{
@@ -312,10 +314,10 @@ export default {
 	border-bottom: 1px solid blue;
 }
 .commnent-item >>> .reply-comment{ 
-	width:340px;
+	width:100%;
 	display: flex;
 	margin-right:auto;
-	margin-left:auto;
+	margin-left:6px;
 	margin-top: 8px;
 }
 .commnent-item >>> .commnent-item-wrapper:hover .icon-menu{

@@ -258,7 +258,7 @@ export default {
 .content-comment{
 	display:flex;
 	flex-direction: column;
-	width: 100%;
+	width: 100% !important;
 }
 .content-comment >>> .v-icon{
 	font-size:13px;	
@@ -287,20 +287,19 @@ export default {
 	display: flex;
 }
 .content-comment >>> .content-comment-file .commnet-file-item .file-item-title{
-	padding: 0px 0px 4px 4px;
+	padding: 2px 0px 4px 4px;
 	flex-grow: 1;
 	cursor: pointer;
-	border-bottom: 1px solid white;
 }
 .content-comment >>> .content-comment-file .commnet-file-item .file-item-title:hover{
 	color: #E88F15CC;
-	border-bottom: 1px solid #E88F15CC;
 }
 .content-comment >>> .content-comment-file .commnet-file-item .icon-remove-file{
 	float: right;
 }
 .content-comment >>>  .content-comment-input{
 	padding: 0px 0px 4px 0px;
+	width: 100%;
 }
 .content-comment >>>  .content-comment-input h5{
 	overflow: hidden;
@@ -308,7 +307,7 @@ export default {
 	display: -webkit-box;
 	-webkit-line-clamp: 20;
 	-webkit-box-orient: vertical;
-	width:265px;
+	width:94%;
 	font:13px roboto
 }
 .content-comment >>> .content-comment-file .v-icon{
@@ -318,6 +317,6 @@ export default {
 	display: flex;
 	position: relative;
 	background-color: #f7f7f7;
-	width: 100%;
+	width: 100% !important;
 }
 </style>

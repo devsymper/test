@@ -2,7 +2,7 @@
 	<div class="symper-comment">
 		<v-card 
 			 v-show="showComment"
-			 width="420px"
+			 :width="widthComment"
 			:height="heightComment"
 			:style="{top:top+'px',left:left+'px'}"
 		>
@@ -12,8 +12,6 @@
 			>
 				<v-toolbar-title>Bình luận</v-toolbar-title>
 					<v-icon>mdi-comment-text-outline</v-icon>
-					<v-spacer></v-spacer>
-					<v-icon  @click="hide()">mdi-close</v-icon>
 				<template v-slot:extension>
 				<v-tabs
 					v-model="tab"
@@ -131,10 +129,10 @@ export default {
 		 /**
 		  * truyen vao width comment
 		  */
-        // widthComment: {
-        //     type: String,
-        //     default: "410px"
-		// },
+        widthComment: {
+            type: String,
+            default: "100%"
+		},
 		 /**
 		  * truyen vao height comment hay ko
 		  */
@@ -322,7 +320,7 @@ export default {
 }
 .symper-comment >>> .input-comment{
 	display: flex;
-	width: 400px;
+	width: 100%;
 	margin-left: auto;
 	margin-right:auto;
 	flex-direction: row;
