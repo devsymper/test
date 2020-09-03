@@ -238,8 +238,16 @@ export default {
             keyInstance:Date.now(),
             dialog: false,
             dataControlSwapType:{},
-            listDataFlow:[]
+            listDataFlow:[],
+            isComponentActive:false
         }
+    },
+    activated() {
+        this.isComponentActive = true;
+    },
+    deactivated() {
+        $('.tox-pop').css({display:'none'})
+        this.isComponentActive = false;
     },
     beforeMount(){
         this.listIconToolbar = [
@@ -530,17 +538,30 @@ export default {
                         this.$refs.saveDocPanel.showDialog()
                     }
                     else{
-                        let listName = []
-                        $.each(controlError,function(item){
-                            let id = $(item).attr('id');
-                            console.log("sadsdsad",id);
-                            let name = allControl[id].properties.name.value;
+                        let listName = [];
+                        let thisCpn = this;
+                        $.each(controlError,function(key,value){
+                            let id = $(value).attr('id');
+                            let elements = $('#document-editor-'+thisCpn.keyInstance+'_ifr').contents().find('#'+id);
+                            let tableId = checkInTable(elements);
+                            if( tableId == id){
+                                tableId = '0';
+                            }
+                            let name = ""
+                            if(tableId == "0"){
+                                name = allControl[id].properties.name.value;
+                            }
+                            else{
+                                name = allControl[tableId].listFields[id].properties.name.value;
+                            }
+
+                            
                             listName.push(name);
                         })
                         this.$snotify({
                                         type: "error",
                                         title: "Tên một số control chưa hợp lệ",
-                                        text: "Có "+listName.length+" control đặt tên không hợp lệ. Kiểm tra: "+listName.join(',')
+                                        text: "Có "+listName.length+" control đặt tên hoặc tiêu đề không hợp lệ \n. Kiểm tra control: "+listName.join(',')
                                     });
                     }
                 }
@@ -1170,7 +1191,14 @@ export default {
                         thisCpn.editorCore.setContent(content);
                         $("#document-editor-"+thisCpn.keyInstance+"_ifr").contents().find('body select').each(function(e){
                             let id = $(this).attr('id')
-                            $(this).replaceWith('<input class="s-control s-control-select" s-control-type="select" type="text" title="Select" readonly="readonly" id="' + id + '"/>');
+                            $(this).replaceWith('<input class="s-control s-control-select" s-control-type="select" type="text" title="Select" readonly="readonly" id="' + id + '">');
+                        })
+                        $("#document-editor-"+thisCpn.keyInstance+"_ifr").contents().find('body .s-control-select').each(function(e){
+                            let id = $(this).attr('id')
+                            let parentNode = $(this).closest('td');
+                            let input = '<input class="s-control h s-control-select" s-control-type="select" type="text" title="Select" contenteditable="false" id="' + id + '">&#65279;';
+                            parentNode.empty();
+                            parentNode.append(input)
                         })
                         if(res.data.document.version == 1){
                             thisCpn.setContentForDocumentV1();
@@ -1786,7 +1814,7 @@ export default {
             
             let table = el.closest('.s-control-table');
             if(table.length > 0 && controlId != table.attr('id')){
-                tinyMCE.activeEditor.selection.setNode(e.target);
+                tinyMCE.activeEditor.selection.setNode($(e.target).parent());
                 let tableId = table.attr('id');
                 let control = this.editorStore.allControl[tableId]['listFields'][controlId];
                 this.selectControl(control.properties, control.formulas,controlId,type);

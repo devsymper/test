@@ -383,7 +383,7 @@ export default {
     font-size:13px;
 }
 
-.auto-complete >>> .v-autocomplete__content{
+/* .auto-complete >>> .v-autocomplete__content{
     max-width: 330px!important;
     top: 40px!important;
     z-index:108;
@@ -391,5 +391,5 @@ export default {
     background-color:white;
     
   
-}
+} */
 </style>

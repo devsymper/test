@@ -455,14 +455,14 @@ const controlTypes = {
     },
     select: {
         icon: "/icon/ic_select.png",
-        html: `<input class="s-control s-control-select" readonly="readonly" contenteditable="false" title="Select" s-control-type="select" type="select"></input>&nbsp;&nbsp;`,
+        html: `<input class="s-control s-control-select" readonly="readonly" contenteditable="false" title="Select" s-control-type="select" type="select">&nbsp;&nbsp;`,
         title: "Select",
         notInProps: ['dataFlowId', 'isPrimaryKey', 'minValue', 'maxValue', 'formatNumber', 'isSumTable', 'formatDate', 'isAllowUpdate', 'isDisplayCompact', 'isMultipleValue'],
         formulas: ['formulas', 'list', 'hidden', 'readOnly', 'link', 'require']
     },
     documentSelect: {
         icon: "/icon/ic_document_select.png",
-        html: `<select class="s-control s-control-document" contenteditable="false" title="Document Select" s-control-type="documentSelect" type="select"></select>&nbsp;&nbsp;`,
+        html: `<input class="s-control s-control-document" readonly="readonly" contenteditable="false" title="Document Select" s-control-type="documentSelect">&nbsp;&nbsp;`,
         title: "Document select",
         notInProps: ['dataFlowId', 'isPrimaryKey', 'minValue', 'maxValue', 'formatNumber', 'isSumTable', 'formatDate', 'isAllowUpdate', 'isDisplayCompact', 'isMultipleValue'],
         formulas: ['formulas', 'hidden', 'readOnly', 'require']
@@ -598,12 +598,7 @@ const controlTypes = {
     dataFlow: {
         icon: "/icon/ic_report.png",
         html: `<div class="s-control s-control-data-flow" contenteditable="false" title="Data Flow" s-control-type="dataFlow" style="display: inline-block;font-size: 11px;width: 100%;max-width: 100%;position:relative;" >
-                    <button class="run-dataflow" style="display: none;
-                    position: absolute;
-                    font-size: 18px;
-                    right: 10px;
-                    color:#409eff;
-                    top: 4px;"><span class="mdi mdi-reload"></span></button>
+                    <button class="run-dataflow"><span class="mdi mdi-play-outline"></span></button>
                     <div>
                         <span class="panel-title2" style="background: #f2f2f2;color: gray;height: 30px;font-weight: bold;width: 100%;text-align: center;display: inline-block;line-height: 2.5;">Data Flow</span>
                         <div style="height: 30px;display: block;background: white;border: 1px solid #f2f2f2;border-top: none;    

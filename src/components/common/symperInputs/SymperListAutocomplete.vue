@@ -20,6 +20,7 @@
         <!-- Kiểu 1: mainAndSub -->
         <template class="w-100" v-slot:selection="{ attr, on, item, selected }">
             <v-chip
+                :title="item[textKey] ? item[textKey] : item.name"
                 style="height: 22px"
                 v-bind="attr"
                 :input-value="selected"

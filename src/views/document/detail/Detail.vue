@@ -165,6 +165,7 @@ export default {
             bottom: true,
             left: false,
             transition: "slide-y-reverse-transition",
+            isComponentActive:false
 
         };
     },
@@ -210,6 +211,7 @@ export default {
         
 
         this.$evtBus.$on('symper-app-wrapper-clicked',evt=>{
+            if(thisCpn.isComponentActive == false) return;
             if($(evt.target).is('.highlight-history')){
                 this.$refs.historyView.show($(evt.target))    
             }
@@ -221,6 +223,12 @@ export default {
                     }
             }
         })
+    },
+    activated() {
+        this.isComponentActive = true;
+    },
+    deactivated() {
+        this.isComponentActive = false;
     },
     destroyed(){
     },
@@ -427,33 +435,36 @@ export default {
         },
         
         printDiv(){
-            this.fab = false;
-            $('.sym-form-Detail').find('table[border="1"]').removeAttr('border');
-            $('.sym-form-Detail').find('table[border="1"]').css({border:'none'});
-            // let css = this.getallcss();
-            let head = document.head || document.getElementsByTagName('head')[0];
-            let style = document.createElement('style');
-            $('body').css({display: 'flex',
-            'justify-content': 'center',padding:'8px'})
-            // style.type = 'text/css';
-            // if (style.styleSheet){
-            // // This is required for IE8 and below.
-            // style.styleSheet.cssText = css;
-            // } else {
-            // style.appendChild(document.createTextNode(css));
-            // }
-            var printContents = $('.sym-form-Detail')[0].innerHTML;
-            $(printContents).find('.s-drawer').remove();
-			var originalContents = document.body.innerHTML;
-            // head.appendChild(style);
+            this.$snotify({
+                                type: "error",
+                                title: "hoàng đang xử lí, vui lòng quay lại sau",
+                            });
+            // this.fab = false;
 
-			document.body.innerHTML = printContents;
+            // $('.sym-form-Detail').find('table[border="1"]').removeAttr('border');
+            // $('.sym-form-Detail').find('table[border="1"]').css({border:'none'});
+            // // let css = this.getallcss();
+            // let head = document.head || document.getElementsByTagName('head')[0];
+            // let style = document.createElement('style');
+            // $('body').css({display: 'flex',
+            // 'justify-content': 'center',padding:'8px'})
+          
+            // var printContents = $('.sym-form-Detail')[0].innerHTML;
+            // $(printContents).find('.s-drawer').remove();
+			// var originalContents = document.body.innerHTML;
+            // // head.appendChild(style);
+            // let x = this.$el.detach();
+            // let old = this.$root.$el;
+            // // let content = $(printContents).detach();
+            // $(this.$root.$el).empty();
+            // $(this.$root.$el).append(x);
+			// // document.body.innerHTML = printContents;
 
-			window.print();
-
-            document.body.innerHTML = originalContents;
-             $('body').removeAttr('style');
-
+			// window.print();
+            // $(this.$root.$el).append($(old).children().detach());
+            // // document.body.innerHTML = originalContents;
+            //  $('body').removeAttr('style');
+            
         },
         getallcss() {
             var css = "", //variable to hold all the css that we extract
