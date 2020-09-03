@@ -3,13 +3,7 @@
 		<div :item="item"  class="commnent-item-wrapper" :style="{width:width}">
 		<v-icon v-if="item.parentId == '0' && item.status == 0" class="icon-check" @click="resolveComment(item)" style="float:right">mdi-check-outline</v-icon>
 		<v-icon v-if="item.parentId == '0' && item.status == 1" class="icon-check" @click="unresolveComment(item)" style="float:right">mdi-comment-arrow-left-outline</v-icon>
-				<v-avatar>
-					<img
-					src="https://cdn.vuetifyjs.com/images/john.jpg"
-					alt="John"
-					style="width:30px;height:30px;margin-top: -10px;margin-right: -8px;"
-					>
-				</v-avatar>
+				<SymperAvatar :size="'30'" :userId="item.userId" style="margin-left:12px" />
 			<div class="comment-item-content">
 				<div style="display:flex;height:16px;width:100%">
 						<span style="color:#00000099">{{item.infor.fullName}}</span>
@@ -51,23 +45,16 @@
 
 			</div>
 		</div>
-		<div style="padding-left:40px;">
+		<div style="padding-left:30px;">
 			<commentItem
 				v-for="(child, i) in item.childrens"
 				:key="i"
 				:item="child"
-				:width="'calc(100vh-45px)'"
 				@reply-child="replyChild"
 			>
 			</commentItem>
 			<div class="reply-comment"  v-if="item.reply && item.parentId == '0'">
-				<v-avatar>
-						<img
-						src="https://cdn.vuetifyjs.com/images/john.jpg"
-						alt="John"
-						style="width:30px;height:30px;margin-top: -18px;margin-right: -10px;"
-						>
-				</v-avatar>
+				<SymperAvatar :size="'30'" :userId="item.userId" style="margin-left:14px" />
 				<div style="padding-left:8px;width:100%">
 					<InputComment  :isEditing="true" :images="[]" :files="[]" :isAdd="true" />
 				</div>
@@ -81,6 +68,7 @@ import InputComment from "./InputComment.vue"
 import moment from 'moment';
 import {commentApi} from '@/api/Comment.js'
 import {fileManagementApi} from '@/api/FileManagement.js'
+import SymperAvatar from '@/components/common/SymperAvatar.vue'
 import { mapGetters } from 'vuex';
 export default {
 	name: 'commentItem',
@@ -100,7 +88,8 @@ export default {
 	components: {
 		VuePerfectScrollbar,
 		InputComment,
-		moment
+		moment,
+		SymperAvatar
 	},
 	data() {
 		return {

@@ -46,13 +46,14 @@
 				</v-tab-item>
 			</v-tabs-items>
 			 <div class="input-comment" v-if="tabComment == true">
-					 <v-avatar>
+					 <!-- <v-avatar>
 						<img
 						src="https://cdn.vuetifyjs.com/images/john.jpg"
 						alt="John"
 						style="width:30px;height:30px;margin-top: -18px;margin-right: -8px;"
 						>
-					</v-avatar>
+					</v-avatar> -->
+					<SymperAvatar :userId="userId" :size="'30'" style="padding-right:4px" />
 					<InputComment :isEditing="true" :images="[]" :files="[]" :isAdd="true"/>
 				 </div>
 			</v-card>
@@ -65,6 +66,7 @@ import CommentItem from './CommentItem.vue'
 import InputComment from './InputComment.vue';
 import {commentApi} from '@/api/Comment.js'
 import {fileManagementApi} from '@/api/FileManagement.js'
+import SymperAvatar from '@/components/common/SymperAvatar.vue'
 export default {
 	 data() {
         return {
@@ -99,6 +101,7 @@ export default {
 		ListComment,
 		CommentItem,
 		InputComment,
+		SymperAvatar
 	},
 	created(){
 		if(this.uuid == "0"){
@@ -113,6 +116,9 @@ export default {
 		},
 		sComment(){
 			return this.$store.state.comment
+		},
+		userId(){
+			return  this.$store.state.app.endUserInfo.id
 		}
 	},
 	mounted(){
@@ -236,7 +242,7 @@ export default {
 						infor.fullName = itemInfor.displayName
 					}
 					e.infor = infor	
-				 }
+				}
 				if(e.hasOwnProperty('childrens') && e.childrens.length > 0){
 					e.childrens.forEach(function(k){	
 					 if(!isNaN(k.userId)){
@@ -250,7 +256,6 @@ export default {
 						}
 						k.infor = inforChild
 					 }
-				
 				})
 			}
 			})
