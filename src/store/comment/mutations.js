@@ -9,6 +9,7 @@ const addPropertyCommentTarget = (state, data) => {
 	state.commentTarget[data.property] = data.value
 };
 const updateListComment = (state, data) => {
+
 	if (typeof data !== 'undefined'){
 		Vue.set(state, 'listComment', data)
 	}else{
@@ -17,6 +18,7 @@ const updateListComment = (state, data) => {
 
 };
 const updateListResolve = (state, data) => {
+	
 	if (typeof data !== 'undefined'){
 		Vue.set(state, 'listResolve', data)
 	}else{

@@ -199,9 +199,9 @@ export default {
 		},
 		getCommentById(){
 			commentApi.getCommentById(this.objectType,this.objectIdentifier).then(res => {
-				this.$store.commit('comment/updateListComment',res.data.listObject.comments)
-				this.$store.commit('comment/updateListAvtiveComment',res.data.listObject.comments)
-				this.$store.commit('comment/updateListResolve',res.data.listObject.resolve)
+				this.$store.commit('comment/updateListComment',this.addAvatar(res.data.listObject.comments))
+				this.$store.commit('comment/updateListAvtiveComment',this.addAvatar(res.data.listObject.comments))
+				this.$store.commit('comment/updateListResolve',this.addAvatar(res.data.listObject.resolve))
 			});
 			this.commentTarget.objectIdentifier = this.objectIdentifier;
 			this.commentTarget.objectType = this.objectType;
@@ -212,9 +212,9 @@ export default {
 		},
 		getCommentByUuid(){
 			commentApi.getCommentByUuid(this.objectType,this.objectIdentifier,this.uuid).then(res => {
-				this.$store.commit('comment/updateListComment',res.data.listObject.comments)
-				this.$store.commit('comment/updateListAvtiveComment',res.data.listObject.comments)
-				this.$store.commit('comment/updateListResolve',res.data.listObject.resolve)
+				this.$store.commit('comment/updateListComment',this.addAvatar(res.data.listObject.comments))
+				this.$store.commit('comment/updateListAvtiveComment',this.addAvatar(res.data.listObject.comments))
+				this.$store.commit('comment/updateListResolve',this.addAvatar(res.data.listObject.resolve))
 			});
 			this.commentTarget.objectIdentifier = this.objectIdentifier;
 			this.commentTarget.objectType = this.objectType;
@@ -222,7 +222,40 @@ export default {
 			this.commentTarget.targetArea = this.targetArea;
 			this.commentTarget.parentId = 0;
 			this.$store.commit('comment/updateCommentTarget',this.commentTarget)
-		}
+		},
+		addAvatar(data){
+			let mapIdToUser = this.$store.getters['app/mapIdToUser'];
+			data.forEach(function(e){
+				if(!isNaN(e.userId)){
+					let itemInfor = mapIdToUser[e.userId];
+					let infor = {}
+					if(itemInfor.hasOwnProperty('avatar')){
+						infor.avatar = itemInfor.avatar
+					}
+					if(itemInfor.hasOwnProperty('displayName')){
+						infor.fullName = itemInfor.displayName
+					}
+					e.infor = infor	
+				 }
+				if(e.hasOwnProperty('childrens') && e.childrens.length > 0){
+					e.childrens.forEach(function(k){	
+					 if(!isNaN(k.userId)){
+						let itemInforChild = mapIdToUser[k.userId];
+						let inforChild = {}
+						if(itemInforChild.hasOwnProperty('avatar')){
+							inforChild.avatar = itemInforChild.avatar
+						}
+						if(itemInforChild.hasOwnProperty('displayName')){
+							inforChild.fullName = itemInforChild.displayName
+						}
+						k.infor = inforChild
+					 }
+				
+				})
+			}
+			})
+			return data
+		},
 	},
 	watch:{
 		objectIdentifier:function(val){

@@ -1,10 +1,11 @@
 <template>
     <div>
-        	<Comment 
-                :showComment="true" 
-                :objectIdentifier="originData.id"
-                :objectType="'task'"
-            />
+        <Comment 
+            :showComment="true" 
+            :objectIdentifier="originData.id"
+            :objectType="'task'"
+            :height="'100%'"
+        />
     </div>
 </template>
 
