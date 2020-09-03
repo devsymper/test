@@ -39,8 +39,76 @@ export default {
             documentId:0,
             actionPanelWidth:830,
             containerHeight: 200,
-            tableContextMenu: {
-                drop: {name:"delete",text:'Xóa',
+            tableContextMenu:{
+                edit: {
+                    name: "editdoc",
+                    text: function() {
+                        return " <i class= 'mdi mdi-file-document-edit-outline' > </i>&nbsp; Sửa";
+                    },
+                    callback: (document, callback) => {
+                        this.$goToPage('/documents/'+document.id+'/editor/edit',document.title);
+                    },
+                },
+                print_config: {
+                    name: "printConfig",
+                    text: function() {
+                        return " <i class= 'mdi mdi-printer-3d-nozzle-outline' > </i>&nbsp; Cấu hình in";
+                    },
+                    callback: (document, callback) => {
+                        this.$goToPage('/documents/'+document.id+'/editor/print-config',document.title);
+                    },
+                },
+                clone: {
+                    name: "cloneDoc",
+                    text: function() {
+                        return " <i class= 'mdi mdi-file-document-multiple-outline' > </i>&nbsp; Nhân bản";
+                    },
+                    callback: (document, callback) => {
+                        this.$goToPage('/documents/'+document.id+'/editor/clone',"Nhân bản "+document.title);
+                    },
+                },
+                submit: {
+                    name: "submit",
+                    text: function() {
+                        return " <i class= 'mdi mdi-file-document-outline' > </i>&nbsp; Nhập liệu";
+                    },
+                    callback: (document, callback) => {
+                        this.$goToPage('/documents/'+document.id+'/submit',document.title);
+                    },
+                },
+                quick_submit :{
+                    name: "quickSubmit",
+                    text: function() {
+                        return " <i class= 'mdi mdi-text-box-plus-outline' > </i>&nbsp; Nhập liệu nhanh";
+                    },
+                    callback: (document, callback) => {
+                        this.$refs.listDocument.openactionPanel();
+                        this.documentId = parseInt(document.id)
+                    },
+                },
+                list: {
+                    name: "listObject",
+                    text: function() {
+                        return " <i class= 'mdi mdi-format-list-checkbox' > </i>&nbsp; Danh sách bản ghi";
+                    },
+                    callback: (document, callback) => {
+                        this.$goToPage('/documents/'+document.id+'/objects',"Danh sách bản ghi");
+                    },
+                },
+                list_draft: {
+                    name: "listDraftObject",
+                    text: function() {
+                        return " <i class= 'mdi mdi-playlist-edit' > </i>&nbsp; Danh sách bản nháp";
+                    },
+                    callback: (document, callback) => {
+                        this.$goToPage('/documents/'+document.id+'/draft-objects',"Danh sách bản nháp");
+                    },
+                },
+                drop: {
+                    name:"delete",
+                    text:function() {
+                        return " <i class= 'mdi mdi-delete-outline' > </i>&nbsp; Xóa";
+                    },
                     callback: (document, callback) => {
                         let ids = document.reduce((arr,obj)=>{
                             arr.push(obj.id);
@@ -68,56 +136,6 @@ export default {
                             console.log("error from detail document api!!!", err);
                         })
                         .always(() => {});
-                    },
-                },
-                update: {
-                    name: "editdoc",
-                    text: "Sửa",
-                    callback: (document, callback) => {
-                        this.$goToPage('/documents/'+document.id+'/editor/edit',document.title);
-                    },
-                },
-                print_config: {
-                    name: "printConfig",
-                    text: "Cấu hình in",
-                    callback: (document, callback) => {
-                        this.$goToPage('/documents/'+document.id+'/editor/print-config',document.title);
-                    },
-                },
-                clone: {
-                    name: "cloneDoc",
-                    text: "Nhân bản",
-                    callback: (document, callback) => {
-                        this.$goToPage('/documents/'+document.id+'/editor/clone',"Nhân bản "+document.title);
-                    },
-                },
-                submit: {
-                    name: "submit",
-                    text: "Nhập liệu",
-                    callback: (document, callback) => {
-                        this.$goToPage('/documents/'+document.id+'/submit',document.title);
-                    },
-                },
-                quick_submit :{
-                    name: "quickSubmit",
-                    text: "Nhập liệu nhanh",
-                    callback: (document, callback) => {
-                        this.$refs.listDocument.openactionPanel();
-                        this.documentId = parseInt(document.id)
-                    },
-                },
-                list: {
-                    name: "listObject",
-                    text: "Danh sách bản ghi",
-                    callback: (document, callback) => {
-                        this.$goToPage('/documents/'+document.id+'/objects',"Danh sách bản ghi");
-                    },
-                },
-                list_draft: {
-                    name: "listDraftObject",
-                    text: "Danh sách bản nháp",
-                    callback: (document, callback) => {
-                        this.$goToPage('/documents/'+document.id+'/draft-objects',"Danh sách bản nháp");
                     },
                 },
             },

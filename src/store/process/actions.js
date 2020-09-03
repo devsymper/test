@@ -31,7 +31,11 @@ const getLastestProcessDefinition = async function(context) {
     try {
         let res = await BPMNEngine.getLastestByModel();
         if (res.status == 200) {
-            context.commit('setAllWorkflowModel', res.data);
+            let data = res.data;
+            for (let obj of data) {
+                obj.modelName = obj.modelId + ' - ' + obj.modelName;
+            }
+            context.commit('setAllWorkflowModel', data);
         } else {
             SYMPER_APP.$snotifyError(res, "Can not get list workflow models");
         }

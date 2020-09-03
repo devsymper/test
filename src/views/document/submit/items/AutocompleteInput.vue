@@ -61,6 +61,10 @@ export default {
         show(e){
             this.isShowAutoComplete = true;
             this.calculatorPositionBox(e);
+            this.setEvent();
+            // this.search = $(e.target).val();
+        },
+        setEvent(){
             let thisCpn = this;
             this.curInput.off('keydown');
             this.curInput.on('keydown',function(e){
@@ -88,9 +92,7 @@ export default {
                         thisCpn.handleClickRow(rowActive,true);
                     }
                 }
-                
-        })
-            // this.search = $(e.target).val();
+            })
         },
         hide(){
             this.isShowAutoComplete = false;
