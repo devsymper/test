@@ -208,7 +208,7 @@ export default {
          */
         this.$evtBus.$on("document-editor-click-treeview-list-control", locale => {
             let elControl = $("#document-editor-"+thisCpn.keyInstance+"_ifr").contents().find('body #'+locale.id);
-            thisCpn.setSelectedControlProp(locale.event,elControl,$('#document-editor-'+this.keyInstance+'_ifr').get(0).contentWindow);
+            thisCpn.setSelectedControlProp(locale.event,elControl,$('#document-editor-'+this.keyInstance+'_ifr').get(0).contentWindow,true);
         });
 
         biApi.getAllDataFlow().then(res=>{
@@ -1798,7 +1798,7 @@ export default {
             
 
         },
-        setSelectedControlProp(e,el,clientFrameWindow){
+        setSelectedControlProp(e,el,clientFrameWindow,fromTreeView = false){
             
             e.preventDefault();
             $(clientFrameWindow.document).find('.on-selected').removeClass('on-selected');
@@ -1814,6 +1814,7 @@ export default {
             
             let table = el.closest('.s-control-table');
             if(table.length > 0 && controlId != table.attr('id')){
+                if(!fromTreeView)
                 tinyMCE.activeEditor.selection.setNode($(e.target).parent());
                 let tableId = table.attr('id');
                 let control = this.editorStore.allControl[tableId]['listFields'][controlId];

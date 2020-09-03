@@ -138,8 +138,9 @@ export default {
                         .always(() => {});
                     },
                 },
-                {name:"remove",text:
-                function() {
+                trash:{
+                    name:"remove",text:
+                    function() {
                         return " <i class= 'mdi mdi-delete-outline' > </i>&nbsp; Xóa mềm";
                     },
                     callback: (document, callback) => {
