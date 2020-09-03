@@ -46,15 +46,8 @@
 				</v-tab-item>
 			</v-tabs-items>
 			 <div class="input-comment" v-if="tabComment == true">
-					 <!-- <v-avatar>
-						<img
-						src="https://cdn.vuetifyjs.com/images/john.jpg"
-						alt="John"
-						style="width:30px;height:30px;margin-top: -18px;margin-right: -8px;"
-						>
-					</v-avatar> -->
-					<SymperAvatar :userId="userId" :size="'30'" style="padding-right:4px" />
-					<InputComment :isEditing="true" :images="[]" :files="[]" :isAdd="true"/>
+					<SymperAvatar :userId="userId" :size="'30'"  />
+					<InputComment style="margin-left:8px" :isEditing="true" :images="[]" :files="[]" :isAdd="true"/>
 				 </div>
 			</v-card>
 	</div>
@@ -301,7 +294,8 @@ export default {
 	width: 25px;
 }
 .symper-comment  >>>.v-tabs-bar__content span{
-	}
+
+}
 .symper-comment  >>> .v-input__control{
 	background-color:#f7f7f7;
 	min-height:unset
@@ -358,12 +352,13 @@ export default {
 }
 .symper-comment >>> .input-comment{
 	display: flex;
-	width: 100%;
-	margin-left: auto;
-	margin-right:auto;
+	width: 98%;
+	margin-left: 12px;
+	margin-right:12px;
 	flex-direction: row;
 	justify-content: center;
 	position: absolute;
 	bottom:0px;
+	
 }
 </style>
