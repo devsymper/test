@@ -2,7 +2,7 @@
 	<div class="symper-comment">
 		<v-card 
 			 v-show="showComment"
-			 width="420px"
+			 :width="widthComment"
 			:height="heightComment"
 			:style="{top:top+'px',left:left+'px'}"
 		>
@@ -12,8 +12,6 @@
 			>
 				<v-toolbar-title>Bình luận</v-toolbar-title>
 					<v-icon>mdi-comment-text-outline</v-icon>
-					<v-spacer></v-spacer>
-					<v-icon  @click="hide()">mdi-close</v-icon>
 				<template v-slot:extension>
 				<v-tabs
 					v-model="tab"
@@ -22,7 +20,7 @@
 					<v-tabs-slider color="yellow"></v-tabs-slider>
 					<v-tab v-for="item in itemsTab" :key="item.value" >
 						<v-icon v-if="isSearching == true" @click="isSearching = false" style="font-size:18px">{{item.icon}}</v-icon>
-						<span v-else> <span> {{ item.title }} </span> <span style='padding-left:4px'>{{ '('+sComment[item.store].length+')'}}</span></span>
+						<span v-else> <span style="font:13px roboto !important;text-transform:none"> {{ item.title }} </span> <span style='padding-left:4px'>{{ '('+sComment[item.store].length+')'}}</span></span>
 					</v-tab>
 				</v-tabs>
 				<v-spacer></v-spacer>
@@ -43,20 +41,13 @@
 				:key="item.value"
 				>
 				<v-card flat>
-					<list-comment :listComment="listComment" :searchItem="searchItem"/>
+					<list-comment  :listComment="listComment" :searchItem="searchItem"/>
 				</v-card>
 				</v-tab-item>
-				
 			</v-tabs-items>
 			 <div class="input-comment" v-if="tabComment == true">
-					 <v-avatar>
-						<img
-						src="https://cdn.vuetifyjs.com/images/john.jpg"
-						alt="John"
-						style="width:30px;height:30px;margin-top: -18px;margin-right: -8px;"
-						>
-					</v-avatar>
-					<InputComment :isEditing="true" :images="[]" :files="[]" :isAdd="true"/>
+					<SymperAvatar :userId="userId" :size="'30'"  />
+					<InputComment style="margin-left:8px" :isEditing="true" :images="[]" :files="[]" :isAdd="true"/>
 				 </div>
 			</v-card>
 	</div>
@@ -68,6 +59,7 @@ import CommentItem from './CommentItem.vue'
 import InputComment from './InputComment.vue';
 import {commentApi} from '@/api/Comment.js'
 import {fileManagementApi} from '@/api/FileManagement.js'
+import SymperAvatar from '@/components/common/SymperAvatar.vue'
 export default {
 	 data() {
         return {
@@ -102,8 +94,14 @@ export default {
 		ListComment,
 		CommentItem,
 		InputComment,
+		SymperAvatar
 	},
 	created(){
+		if(this.uuid == "0"){
+			this.getCommentById()
+		}else{
+			this.getCommentByUuid()
+		}
 	},
 	computed:{
 		listComment(){
@@ -111,6 +109,9 @@ export default {
 		},
 		sComment(){
 			return this.$store.state.comment
+		},
+		userId(){
+			return  this.$store.state.app.endUserInfo.id
 		}
 	},
 	mounted(){
@@ -127,10 +128,10 @@ export default {
 		 /**
 		  * truyen vao width comment
 		  */
-        // widthComment: {
-        //     type: String,
-        //     default: "410px"
-		// },
+        widthComment: {
+            type: String,
+            default: "100%"
+		},
 		 /**
 		  * truyen vao height comment hay ko
 		  */
@@ -150,7 +151,7 @@ export default {
 		  */
 		left:{
 			type: Number,
-			default:600
+			default:0
 		},
 		/**
 		  * truyen vao vi tri comment
@@ -163,7 +164,7 @@ export default {
 		  * truyen vao vi tri comment
 		*/
 		objectIdentifier:{
-			type: Number,
+			type: String,
 		},
 		/**
 		  * truyen vao vi tri comment
@@ -176,7 +177,7 @@ export default {
 		*/
 		uuid:{
 			type:String,
-			default:""
+			default:"0"
 		}
 	},
 	methods:{
@@ -195,41 +196,77 @@ export default {
 		clickTab(item){
 			console.log(item);
 		},
-	},
-	watch:{
-		objectIdentifier:function(val){
-			commentApi.getCommentById(this.objectType,val).then(res => {
-				this.$store.commit('comment/updateListComment',res.data.listObject.comments)
-				this.$store.commit('comment/updateListAvtiveComment',res.data.listObject.comments)
-				this.$store.commit('comment/updateListResolve',res.data.listObject.resolve)
+		getCommentById(){
+			commentApi.getCommentById(this.objectType,this.objectIdentifier).then(res => {
+				this.$store.commit('comment/updateListComment',this.addAvatar(res.data.listObject.comments))
+				this.$store.commit('comment/updateListAvtiveComment',this.addAvatar(res.data.listObject.comments))
+				this.$store.commit('comment/updateListResolve',this.addAvatar(res.data.listObject.resolve))
 			});
-			this.commentTarget.objectIdentifier = val;
+			this.commentTarget.objectIdentifier = this.objectIdentifier;
 			this.commentTarget.objectType = this.objectType;
 			this.commentTarget.uuid = this.uuid;
 			this.commentTarget.targetArea = this.targetArea;
 			this.commentTarget.parentId = 0;
 			this.$store.commit('comment/updateCommentTarget',this.commentTarget)	
 		},
+		getCommentByUuid(){
+			commentApi.getCommentByUuid(this.objectType,this.objectIdentifier,this.uuid).then(res => {
+				this.$store.commit('comment/updateListComment',this.addAvatar(res.data.listObject.comments))
+				this.$store.commit('comment/updateListAvtiveComment',this.addAvatar(res.data.listObject.comments))
+				this.$store.commit('comment/updateListResolve',this.addAvatar(res.data.listObject.resolve))
+			});
+			this.commentTarget.objectIdentifier = this.objectIdentifier;
+			this.commentTarget.objectType = this.objectType;
+			this.commentTarget.uuid = this.uuid;
+			this.commentTarget.targetArea = this.targetArea;
+			this.commentTarget.parentId = 0;
+			this.$store.commit('comment/updateCommentTarget',this.commentTarget)
+		},
+		addAvatar(data){
+			let mapIdToUser = this.$store.getters['app/mapIdToUser'];
+			data.forEach(function(e){
+				if(!isNaN(e.userId)){
+					let itemInfor = mapIdToUser[e.userId];
+					let infor = {}
+					if(itemInfor.hasOwnProperty('avatar')){
+						infor.avatar = itemInfor.avatar
+					}
+					if(itemInfor.hasOwnProperty('displayName')){
+						infor.fullName = itemInfor.displayName
+					}
+					e.infor = infor	
+				}
+				if(e.hasOwnProperty('childrens') && e.childrens.length > 0){
+					e.childrens.forEach(function(k){	
+					 if(!isNaN(k.userId)){
+						let itemInforChild = mapIdToUser[k.userId];
+						let inforChild = {}
+						if(itemInforChild.hasOwnProperty('avatar')){
+							inforChild.avatar = itemInforChild.avatar
+						}
+						if(itemInforChild.hasOwnProperty('displayName')){
+							inforChild.fullName = itemInforChild.displayName
+						}
+						k.infor = inforChild
+					 }
+				})
+			}
+			})
+			return data
+		},
+	},
+	watch:{
+		objectIdentifier:function(val){
+			this.getCommentById()
+			
+		},
 		uuid:function(val){
 			if(val == "0"){
-				commentApi.getCommentById(this.objectType,this.objectIdentifier).then(res => {
-					this.$store.commit('comment/updateListComment',res.data.listObject.comments)
-					this.$store.commit('comment/updateListAvtiveComment',res.data.listObject.comments)
-					this.$store.commit('comment/updateListResolve',res.data.listObject.resolve)
-				});
+				this.getCommentById()
 			}else{
-				commentApi.getCommentByUuid(this.objectType,this.objectIdentifier,val).then(res => {
-					this.$store.commit('comment/updateListComment',res.data.listObject.comments)
-					this.$store.commit('comment/updateListAvtiveComment',res.data.listObject.comments)
-					this.$store.commit('comment/updateListResolve',res.data.listObject.resolve)
-				});
+				this.getCommentByUuid()
 			}
-				this.commentTarget.objectIdentifier = this.objectIdentifier;
-				this.commentTarget.objectType = this.objectType;
-				this.commentTarget.uuid = this.uuid;
-				this.commentTarget.targetArea = this.targetArea;
-				this.commentTarget.parentId = 0;
-				this.$store.commit('comment/updateCommentTarget',this.commentTarget)
+				
 		},
 		tab:function(val){
 			if(val === 0){
@@ -256,6 +293,9 @@ export default {
 	height: 25px;
 	width: 25px;
 }
+.symper-comment  >>>.v-tabs-bar__content span{
+
+}
 .symper-comment  >>> .v-input__control{
 	background-color:#f7f7f7;
 	min-height:unset
@@ -271,6 +311,9 @@ export default {
 	width: 200px;
 	padding: 0px 8px !important;
 	font: 12px roboto;
+}
+.symper-comment  >>> .v-input__control .v-input__slot .v-text-field__slot label{
+	font-size: 13px ;
 }
 .symper-comment  >>> .v-input__control .v-input__slot .v-icon{
 	font-size: 15px;
@@ -309,12 +352,13 @@ export default {
 }
 .symper-comment >>> .input-comment{
 	display: flex;
-	width: 400px;
-	margin-left: auto;
-	margin-right:auto;
+	width: 98%;
+	margin-left: 12px;
+	margin-right:12px;
 	flex-direction: row;
 	justify-content: center;
 	position: absolute;
 	bottom:0px;
+	
 }
 </style>
