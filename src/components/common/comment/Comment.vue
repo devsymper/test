@@ -46,7 +46,7 @@
 				</v-tab-item>
 			</v-tabs-items>
 			 <div class="input-comment" v-if="tabComment == true">
-					<SymperAvatar :userId="userId" :size="'30'"  />
+					<SymperAvatar :userId="userId" :size="30"  />
 					<InputComment style="margin-left:8px" :isEditing="true" :images="[]" :files="[]" :isAdd="true"/>
 				 </div>
 			</v-card>
@@ -103,6 +103,7 @@ export default {
 			this.getCommentByUuid()
 		}
 	},
+
 	computed:{
 		listComment(){
 			return this.$store.state.comment.listComment
@@ -115,6 +116,7 @@ export default {
 		}
 	},
 	mounted(){
+		
 	},
 	
 	 props: {
@@ -224,41 +226,43 @@ export default {
 		},
 		addAvatar(data){
 			let mapIdToUser = this.$store.getters['app/mapIdToUser'];
-			data.forEach(function(e){
-				if(!isNaN(e.userId)){
-					let itemInfor = mapIdToUser[e.userId];
-					let infor = {}
-					if(itemInfor.hasOwnProperty('avatar')){
-						infor.avatar = itemInfor.avatar
-					}
-					if(itemInfor.hasOwnProperty('displayName')){
-						infor.fullName = itemInfor.displayName
-					}
-					e.infor = infor	
-				}
-				if(e.hasOwnProperty('childrens') && e.childrens.length > 0){
-					e.childrens.forEach(function(k){	
-					 if(!isNaN(k.userId)){
-						let itemInforChild = mapIdToUser[k.userId];
-						let inforChild = {}
-						if(itemInforChild.hasOwnProperty('avatar')){
-							inforChild.avatar = itemInforChild.avatar
+			if(typeof data !== 'undefined'){
+				data.forEach(function(e){
+					if(!isNaN(e.userId)){
+						let itemInfor = mapIdToUser[e.userId];
+						let infor = {}
+						if(itemInfor.hasOwnProperty('avatar')){
+							infor.avatar = itemInfor.avatar
 						}
-						if(itemInforChild.hasOwnProperty('displayName')){
-							inforChild.fullName = itemInforChild.displayName
+						if(itemInfor.hasOwnProperty('displayName')){
+							infor.fullName = itemInfor.displayName
 						}
-						k.infor = inforChild
-					 }
+						e.infor = infor	
+					}
+					if(e.hasOwnProperty('childrens') && e.childrens.length > 0){
+						e.childrens.forEach(function(k){	
+							if(!isNaN(k.userId)){
+								let itemInforChild = mapIdToUser[k.userId];
+								let inforChild = {}
+								if(itemInforChild.hasOwnProperty('avatar')){
+									inforChild.avatar = itemInforChild.avatar
+								}
+								if(itemInforChild.hasOwnProperty('displayName')){
+									inforChild.fullName = itemInforChild.displayName
+								}
+								k.infor = inforChild
+							}
+						})
+					}
 				})
 			}
-			})
 			return data
 		},
 	},
 	watch:{
 		objectIdentifier:function(val){
+			debugger
 			this.getCommentById()
-			
 		},
 		uuid:function(val){
 			if(val == "0"){

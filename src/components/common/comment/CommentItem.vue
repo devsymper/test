@@ -3,7 +3,7 @@
 		<div :item="item"  class="commnent-item-wrapper" :style="{width:width}">
 		<v-icon v-if="item.parentId == '0' && item.status == 0" class="icon-check" @click="resolveComment(item)" style="float:right">mdi-check-outline</v-icon>
 		<v-icon v-if="item.parentId == '0' && item.status == 1" class="icon-check" @click="unresolveComment(item)" style="float:right">mdi-comment-arrow-left-outline</v-icon>
-				<SymperAvatar :size="'30'" :userId="item.userId" style="margin-left:12px" />
+				<SymperAvatar :size="30" :userId="item.userId" style="margin-left:12px" />
 			<div class="comment-item-content">
 				<div style="display:flex;height:16px;width:100%">
 						<span style="color:#00000099">{{item.infor.fullName}}</span>
@@ -54,7 +54,7 @@
 			>
 			</commentItem>
 			<div class="reply-comment"  v-if="item.reply && item.parentId == '0'">
-				<SymperAvatar :size="'30'" :userId="item.userId" style="margin-left:14px" />
+				<SymperAvatar :size="30" :userId="item.userId" style="margin-left:14px" />
 				<div style="padding-left:8px;width:100%">
 					<InputComment  :isEditing="true" :images="[]" :files="[]" :isAdd="true" />
 				</div>
@@ -208,35 +208,36 @@ export default {
 		},
 		addAvatar(data){
 			let mapIdToUser = this.$store.getters['app/mapIdToUser'];
-			data.forEach(function(e){
-				if(!isNaN(e.userId)){
-					let itemInfor = mapIdToUser[e.userId];
-					let infor = {}
-					if(itemInfor.hasOwnProperty('avatar')){
-						infor.avatar = itemInfor.avatar
-					}
-					if(itemInfor.hasOwnProperty('displayName')){
-						infor.fullName = itemInfor.displayName
-					}
-					e.infor = infor	
-				 }
-				if(e.hasOwnProperty('childrens') && e.childrens.length > 0){
-					e.childrens.forEach(function(k){	
-					 if(!isNaN(k.userId)){
-						let itemInforChild = mapIdToUser[k.userId];
-						let inforChild = {}
-						if(itemInforChild.hasOwnProperty('avatar')){
-							inforChild.avatar = itemInforChild.avatar
+			if(typeof data !== 'undefined'){
+				data.forEach(function(e){
+					if(!isNaN(e.userId)){
+						let itemInfor = mapIdToUser[e.userId];
+						let infor = {}
+						if(itemInfor.hasOwnProperty('avatar')){
+							infor.avatar = itemInfor.avatar
 						}
-						if(itemInforChild.hasOwnProperty('displayName')){
-							inforChild.fullName = itemInforChild.displayName
+						if(itemInfor.hasOwnProperty('displayName')){
+							infor.fullName = itemInfor.displayName
 						}
-						k.infor = inforChild
-					 }
-				
+						e.infor = infor	
+					}
+					if(e.hasOwnProperty('childrens') && e.childrens.length > 0){
+						e.childrens.forEach(function(k){	
+							if(!isNaN(k.userId)){
+								let itemInforChild = mapIdToUser[k.userId];
+								let inforChild = {}
+								if(itemInforChild.hasOwnProperty('avatar')){
+									inforChild.avatar = itemInforChild.avatar
+								}
+								if(itemInforChild.hasOwnProperty('displayName')){
+									inforChild.fullName = itemInforChild.displayName
+								}
+								k.infor = inforChild
+							}
+						})
+					}
 				})
 			}
-			})
 			return data
 		},
 	},
