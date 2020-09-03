@@ -257,11 +257,20 @@ const getAndSetUserOperations = async function(context) {
             }
 
             let sections = op.objectIdentifier.split(':');
-            let id = sections[0];
+            let id = sections[1];
+
+            if (!id || id == '0') { // xét các trường hợp từ trước đến nay là set cho tất cả các object trong danh sách
+                id = 0;
+            }
             if (!opsByObjectType[type][id]) {
                 opsByObjectType[type][id] = {};
             }
-            opsByObjectType[type][id][op.action] = true;
+
+            if (id == type) { // nếu là operation đối với chính object type hiện tại thì quy định id sẽ là 0
+                opsByObjectType[type][0][op.action] = true;
+            } else {
+                opsByObjectType[type][id][op.action] = true;
+            }
         }
         context.commit('setUserActionsForObjects', opsByObjectType);
     } else {

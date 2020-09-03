@@ -1,4 +1,4 @@
-<template>
+    <template>
     <div class="w-100 h-100">
         <list-items
             ref="listActionPack"
@@ -13,6 +13,7 @@
             :customAPIResult="customAPIResult"
             :actionPanelWidth="600"
             @after-open-add-panel="handleAddItem"
+            :commonActionProps="commonActionProps"
         >
             <template slot="right-panel-content" slot-scope="{itemData}">
                 <ActionPackForm
@@ -38,6 +39,11 @@ export default {
     data() {
         let self = this;
         return {
+            commonActionProps: {
+                "module": "action_pack",
+                "resource": "action_pack",
+                "scope": "action_pack",
+            },
             customAPIResult: {
                 reformatData(res) {
                     if (res.status == 200) {
@@ -78,8 +84,8 @@ export default {
                 mapActionForAllObjects: {}, // dạng: {workflow: {create: true, ...}, document: {create: true, ...}}},
                 operationMapByObjectType: {}
             },
-            tableContextMenu: [
-                {
+            tableContextMenu: {
+                update: {
                     name: "edit",
                     text: this.$t("common.edit"),
                     callback: (row, callback) => {
@@ -89,7 +95,7 @@ export default {
                         self.$refs.actionPackForm.objectTypeToDocumentDefinition();
                     }
                 },
-                {
+                remove: {
                     name: "remove",
                     text: this.$t("common.delete"),
                     callback: async (rows, refreshList) => {
@@ -118,7 +124,7 @@ export default {
                         refreshList();
                     }
                 },
-                {
+                detail: {
                     name: "detail",
                     text: this.$t("common.detail"),
                     callback: (row, callback) => {
@@ -129,7 +135,7 @@ export default {
                         self.$refs.actionPackForm.objectTypeToDocumentDefinition();
                     }
                 }
-            ],
+            },
         };
     },
     mounted() {
@@ -171,7 +177,6 @@ export default {
             let operations = [];
             if (res.status == 200) {
                 operations = res.data;
-                // operations = [ { id: "38", name: "list trash document_definition 1538", description: "", action: "list_trash", objectName: "", objectIdentifier: "document_definition", objectType: "", status: "1", listForeignKey: [] }, { id: "39", name: "list trash document_definition 1538", description: "", action: "list_trash", objectName: "", objectIdentifier: "document_definition", objectType: "", status: "1", listForeignKey: [] }, { id: "40", name: "list instance document_definition 1538", description: "", action: "list_instance", objectName: "", objectIdentifier: "document_definition:1538", objectType: "", status: "1", listForeignKey: [] }, { id: "41", name: "list instance document_definition 1538", description: "", action: "list_instance", objectName: "", objectIdentifier: "document_definition", objectType: "", status: "1", listForeignKey: [] }, { id: "42", name: "create document_definition 1766", description: "", action: "create", objectName: "", objectIdentifier: "document_definition:1766", objectType: "", status: "1", listForeignKey: [] }, { id: "43", name: "edit document_definition 1766", description: "", action: "edit", objectName: "", objectIdentifier: "document_definition:1766", objectType: "", status: "1", listForeignKey: [] }, { id: "44", name: "submit document_definition 1766", description: "", action: "submit", objectName: "", objectIdentifier: "document_definition:1766", objectType: "", status: "1", listForeignKey: [] }, { id: "45", name: "drop document_definition 1766", description: "", action: "drop", objectName: "", objectIdentifier: "document_definition:1766", objectType: "", status: "1", listForeignKey: [] }, { id: "46", name: "restore document_definition 1766", description: "", action: "restore", objectName: "", objectIdentifier: "document_definition:1766", objectType: "", status: "1", listForeignKey: [] }, { id: "47", name: "list document_definition 1766", description: "", action: "list", objectName: "", objectIdentifier: "document_definition:1766", objectType: "", status: "1", listForeignKey: [] }, { id: "48", name: "list trash document_definition 1766", description: "", action: "list_trash", objectName: "", objectIdentifier: "document_definition:1766", objectType: "", status: "1", listForeignKey: [] }, { id: "49", name: "list instance document_definition 1766", description: "", action: "list_instance", objectName: "", objectIdentifier: "document_definition:1766", objectType: "", status: "1", listForeignKey: [] }, { id: "50", name: "create document_definition 1765", description: "", action: "create", objectName: "", objectIdentifier: "document_definition:1765", objectType: "", status: "1", listForeignKey: [] }, { id: "51", name: "edit document_definition 1765", description: "", action: "edit", objectName: "", objectIdentifier: "document_definition:1765", objectType: "", status: "1", listForeignKey: [] }, ];
             } else {
                 this.$snotifyError(
                     res,
@@ -250,7 +255,6 @@ export default {
             //         }
             //     }
             // }
-
             // // chế biến về cho đúng định dạng hiển thị của bảng
             // for(let objectType in mapActionAndObjects){
             //     mapActionAndObjects[objectType] = Object.values(mapActionAndObjects[objectType]);
@@ -313,8 +317,8 @@ export default {
                 sections = op.objectIdentifier.split(":");
                 objectType = op.objectType;
                 objectId = sections[1] ? sections[1] : 0;
-
-                if(!objectId){
+ 
+                if(!objectId || objectId == '0'){
                     // Nếu các action áp dụng cho toàn bộ object của object type
                     mapActionForAllObjects[objectType][0][op.action] = true;
                 }else{
@@ -360,9 +364,9 @@ export default {
         },
         handleSavedItem() {
             this.$refs.listActionPack.refreshList();
-            if(this.actionOnItem = "create"){
-                this.handleAddItem();
-            }
+            // if(this.actionOnItem == "create"){
+            //     this.handleAddItem();
+            // }
         },
         handleAddItem() {
             this.actionOnItem = "create";
@@ -370,8 +374,9 @@ export default {
             this.currentItemData.id = 0;
             this.currentItemData.description = "";
             this.currentItemData.objectType = "document_definition";
-            this.currentItemData.mapActionAndObjects = [];
-            this.currentItemData.mapActionForAllObjects = [];
+
+            this.$set(this.currentItemData, 'mapActionAndObjects', {});
+            this.$set(this.currentItemData, 'mapActionForAllObjects', {});
             this.$refs.actionPackForm.objectTypeToDocumentDefinition();
         },
         calcContainerHeight() {

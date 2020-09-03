@@ -2,7 +2,7 @@
 	<div class="symper-comment">
 		<v-card 
 			 v-show="showComment"
-			 width="410px"
+			 width="420px"
 			:height="heightComment"
 			:style="{top:top+'px',left:left+'px'}"
 		>
@@ -21,7 +21,7 @@
 				>
 					<v-tabs-slider color="yellow"></v-tabs-slider>
 					<v-tab v-for="item in itemsTab" :key="item.value" >
-						<v-icon v-if="isSearching == true" style="font-size:18px">{{item.icon}}</v-icon>
+						<v-icon v-if="isSearching == true" @click="isSearching = false" style="font-size:18px">{{item.icon}}</v-icon>
 						<span v-else> <span> {{ item.title }} </span> <span style='padding-left:4px'>{{ '('+sComment[item.store].length+')'}}</span></span>
 					</v-tab>
 				</v-tabs>
@@ -46,7 +46,9 @@
 					<list-comment :listComment="listComment" :searchItem="searchItem"/>
 				</v-card>
 				</v-tab-item>
-				 <div class="input-comment" v-if="tabComment == true">
+				
+			</v-tabs-items>
+			 <div class="input-comment" v-if="tabComment == true">
 					 <v-avatar>
 						<img
 						src="https://cdn.vuetifyjs.com/images/john.jpg"
@@ -56,7 +58,6 @@
 					</v-avatar>
 					<InputComment :isEditing="true" :images="[]" :files="[]" :isAdd="true"/>
 				 </div>
-			</v-tabs-items>
 			</v-card>
 	</div>
 </template>
@@ -313,7 +314,7 @@ export default {
 	margin-right:auto;
 	flex-direction: row;
 	justify-content: center;
-	/* position: absolute; */
-	/* bottom:0px; */
+	position: absolute;
+	bottom:0px;
 }
 </style>

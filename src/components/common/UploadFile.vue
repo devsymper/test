@@ -4,7 +4,7 @@
 			:loading="isSelecting"
 			@click="onButtonClick"
 				> 
-			<v-icon>mdi-upload</v-icon>
+			<v-icon>mdi-attachment</v-icon>
 			<input
 				ref="uploader"
 				class="d-none"
@@ -22,11 +22,17 @@ export default {
 		fileName:{
 			type:String,
 			default: ''
-		}
+		},
+		autoUpload:{
+			type: Boolean,
+			default: true
+        }
 	},
 	data() {
 	   return {
 			isSelecting: false,
+			formDatas:{
+			}
 		}
 	},
 	methods:{
@@ -42,25 +48,32 @@ export default {
 			let formData = new FormData()
 			formData.append('file',this.selectedFile)
 			formData.append('user',this.$store.state.app.endUserInfo.displayName)
-			if(this.fileName != ''){
-				formData.append('fileName',this.fileName)
+            this.formDatas = formData;
+            this.$emit('selected-file', window.URL.createObjectURL(e.target.files[0]))
+			if(this.autoUpload == true){
+				this.uploadFile()
 			}
-			let thisCpn = this
-			fileManagementApi.uploadFileSymper(formData,
+		},
+		uploadFile(){
+            if(this.fileName != ''){
+				this.formDatas.append('fileName',this.fileName)
+            }
+			fileManagementApi.uploadFileSymper(this.formDatas,
 			{
 				dataType: 'text',
 				contentType: false,
 				processData: false,
 			}).then(res => {
-               if(res.status == 200){
-					thisCpn.$emit('uploaded-file',res.data)
-				}
-				else{
-					thisCpn.$emit('upload-error',res.message)
-				}
-            });
+				let resObj = JSON.parse(res);
+				if(resObj.status == 200){
+						this.$emit('uploaded-file',resObj.data)
+					}
+					else{
+						this.$emit('upload-error',resObj.message)
+					}
+				});
 		}
-	}
+	},
 }
 </script>
 

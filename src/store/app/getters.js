@@ -21,6 +21,16 @@ const mapIdToUser = function(state) {
 }
 
 
+function hasShowListPermission(opsMap, objectType) {
+    /**
+     * nếu object id là 0 thì là có tác dụng với toàn bộ object trong definition
+     */
+    // return mapObjectTypeAndMenu[objectType] &&
+    //     opsMap[objectType][0] &&
+    //     opsMap[objectType][0].list;
+    return mapObjectTypeAndMenu[objectType]
+}
+
 const userMenuItems = function(state) {
     let opsMap = state.userOperations;
     let userInfo = util.auth.getSavedUserInfo();
@@ -29,10 +39,10 @@ const userMenuItems = function(state) {
     if (userType == 'ba') {
         return Object.values(mapObjectTypeAndMenu);
     } else {
-        let allwaysHave = ['tasks', 'works'];
+        let allwaysHave = ['tasks', 'works', 'comment'];
         let items = [];
         for (let objectType in opsMap) {
-            if (mapObjectTypeAndMenu[objectType]) {
+            if (hasShowListPermission(opsMap, objectType)) {
                 items.push(mapObjectTypeAndMenu[objectType]);
             }
         }

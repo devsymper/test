@@ -1,5 +1,5 @@
 <template>
-    <div class="pick-icon"> 
+    <div class="pick-icon" > 
         <v-menu offset-x
             :close-on-content-click="false"
             light
@@ -71,11 +71,6 @@
                     <div v-if="!!link" class="w-100">
                         <img :src="link" width="150" max-height="150" class="mt-3" style="max-width:150px">
                     </div>
-                    <v-btn small color="primary" class="ml-4 mt-3 mb-3" :disabled="!!!link" @click="selectIcon(link,'img')">{{$t("iconPicker.selectImage")}}</v-btn>
-                </v-tab-item>
-                <!-- Tab upload ảnh -->
-                <v-tab-item>
-                    <Upload ref="fileUpload" @selectFile="selectIcon"></Upload>
                 </v-tab-item>
             </v-tabs-items>
         </v-menu>
@@ -310,20 +305,21 @@ export default {
 </script>
 
 <style scoped>
-/* .pick-icon{
+.pick-icon >>> .v-menu__content{
 	overflow: hidden;
-} */
-    .sym-small-size >>> .v-input__slot,
-    .sym-small-size >>> .v-input__control{
-        background: #f5f5f5 !important;
-    }
-    .single-icon {
-        cursor: pointer;
-    }
-    .single-icon:hover{
-        background-color: #f5f5f5;
-    }
-    .v-menu__content {
-        background: #fff;
-    }
+}
+.sym-small-size >>> .v-input__slot,
+.sym-small-size >>> .v-input__control{
+	background: #f5f5f5 !important;
+}
+.single-icon {
+	cursor: pointer;
+}
+.single-icon:hover{
+	background-color: #f5f5f5;
+}
+.v-menu__content {
+	background: #fff;
+	overflow: hidden;
+}
 </style>

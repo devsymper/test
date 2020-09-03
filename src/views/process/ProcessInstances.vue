@@ -162,7 +162,7 @@ export default {
         },
         getListUrl(){
             let processKey = this.$route.params.processKey;
-            return appConfigs.apiDomain.bpmne.instances+'?processDefinitionKey='+processKey;
+            return appConfigs.apiDomain.bpmne.instances+'?size=100&sort=startTime&order=desc&processDefinitionKey='+processKey;
         },
         calcContainerHeight() {
             this.containerHeight = util.getComponentSize(this).h;

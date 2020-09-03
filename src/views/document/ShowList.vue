@@ -9,10 +9,11 @@
         :actionPanelWidth="actionPanelWidth"
         @after-open-add-panel="addDocument"
         :headerPrefixKeypath="'document'"
+        :commonActionProps="commonActionProps"
     >
         <div slot="right-panel-content" class="h-100">
             <submit-view ref="submitView" :isQickSubmit="true" :action="'submit'" @submit-document-success="aftersubmitDocument" :docId="documentId"/>
-        </div>
+        </div> 
     </list-items>
 </template>
 <script>
@@ -30,12 +31,16 @@ export default {
     },
     data(){
         return {
+            commonActionProps: {
+                "module": "document",
+                "resource": "document_definition",
+                "scope": "document",
+            },
             documentId:0,
             actionPanelWidth:830,
             containerHeight: 200,
-            tableContextMenu:[
-                
-                {
+            tableContextMenu:{
+                edit: {
                     name: "editdoc",
                     text: function() {
                         return " <i class= 'mdi mdi-file-document-edit-outline' > </i>&nbsp; Sửa";
@@ -44,7 +49,7 @@ export default {
                         this.$goToPage('/documents/'+document.id+'/editor/edit',document.title);
                     },
                 },
-                {
+                print_config: {
                     name: "printConfig",
                     text: function() {
                         return " <i class= 'mdi mdi-printer-3d-nozzle-outline' > </i>&nbsp; Cấu hình in";
@@ -53,7 +58,7 @@ export default {
                         this.$goToPage('/documents/'+document.id+'/editor/print-config',document.title);
                     },
                 },
-                {
+                clone: {
                     name: "cloneDoc",
                     text: function() {
                         return " <i class= 'mdi mdi-file-document-multiple-outline' > </i>&nbsp; Nhân bản";
@@ -62,7 +67,7 @@ export default {
                         this.$goToPage('/documents/'+document.id+'/editor/clone',"Nhân bản "+document.title);
                     },
                 },
-                {
+                submit: {
                     name: "submit",
                     text: function() {
                         return " <i class= 'mdi mdi-file-document-outline' > </i>&nbsp; Nhập liệu";
@@ -71,7 +76,7 @@ export default {
                         this.$goToPage('/documents/'+document.id+'/submit',document.title);
                     },
                 },
-                {
+                quick_submit :{
                     name: "quickSubmit",
                     text: function() {
                         return " <i class= 'mdi mdi-text-box-plus-outline' > </i>&nbsp; Nhập liệu nhanh";
@@ -81,7 +86,7 @@ export default {
                         this.documentId = parseInt(document.id)
                     },
                 },
-                {
+                list: {
                     name: "listObject",
                     text: function() {
                         return " <i class= 'mdi mdi-format-list-checkbox' > </i>&nbsp; Danh sách bản ghi";
@@ -90,7 +95,7 @@ export default {
                         this.$goToPage('/documents/'+document.id+'/objects',"Danh sách bản ghi");
                     },
                 },
-                {
+                list_draft: {
                     name: "listDraftObject",
                     text: function() {
                         return " <i class= 'mdi mdi-playlist-edit' > </i>&nbsp; Danh sách bản nháp";
@@ -99,8 +104,9 @@ export default {
                         this.$goToPage('/documents/'+document.id+'/draft-objects',"Danh sách bản nháp");
                     },
                 },
-                {name:"delete",text:
-                function() {
+                drop: {
+                    name:"delete",
+                    text:function() {
                         return " <i class= 'mdi mdi-delete-outline' > </i>&nbsp; Xóa";
                     },
                     callback: (document, callback) => {
@@ -165,7 +171,7 @@ export default {
                         .always(() => {});
                     },
                 },
-            ],
+            },
         }
     },
     mounted() {

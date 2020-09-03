@@ -1,7 +1,7 @@
 <template>
     <v-combobox @keydown="enter" class="auto-complete" style="border-radius:4px"
         :hide-no-data="true" no-filter :items="searchItems"
-        menu-props="{offset-y:true, maxHeight:300}"
+        :menu-props="{ maxHeight:300, maxWidth:330, nudgeBottom:5}"
         :search-input.sync="value" label="Tìm kiếm">
         <template v-slot:item="{ item, attrs }">
             <template v-if="item.group">
@@ -134,26 +134,19 @@ export default {
             }
         },
         enter(event){
-            if (event.code == "Enter"){debugger
-                if(this.value!=''&&this.value!=null){
-                this.setMenu();
-                this.$store.commit('search/setSearch',  this.searchItems);
-                this.$store.commit('search/setSearchAll',  this.searchItemsAll);
-                this.$store.commit('search/setShowGeneral', true);
-                this.$store.commit('search/setCountResult', this.searchItems.length);
-                this.$router.push('/search/general');}
-                else{
-                    this.$store.commit('search/setSearch', [] );
-                }
-            };
-            if(this.value!=''&&this.value!=null){
-                this.menu= this.searchItemsAll;
-                this.searchItems =[];
-                this.$store.commit('search/setSearch', this.menu );}
-            else{
-                this.$store.commit('search/setSearch', [] );
-            }
+            if (event.code == "Enter"){
+            this.setMenu();
+            this.$store.commit('search/setSearch',  this.searchItems);
+            this.$store.commit('search/setSearchAll',  this.searchItemsAll);
+            this.$store.commit('search/setShowGeneral', true);
+            this.$store.commit('search/setCountResult', this.searchItems.length);
+            this.$router.push('/search/general');
             
+
+            };
+            this.menu= this.searchItemsAll;
+            this.searchItems =[];
+            this.$store.commit('search/setSearch', this.menu );
 
         },
         setMenu(){
@@ -315,7 +308,7 @@ export default {
     },
 }
 </script>
-<style scoped lang="scss">
+<style scoped >
 .item-header {
     font-size: 13px;
     font-weight: 600;
@@ -383,18 +376,20 @@ export default {
 .action-button:hover{
       background: rgba(0, 0, 0, 0.05);
 }
-
-</style>
-<style >
- /* .v-autocomplete__content{
-    max-width: 330px!important;
-    top: 40px!important;
-  
-} */
-.v-list-item:hover{
+.auto-complete ::v-deep .v-list-item:hover{
     background:rgba(0,0,0,0.05);
 }
-.v-select__slot{
+.auto-complete ::v-deep .v-select__slot{
     font-size:13px;
+}
+
+.auto-complete >>> .v-autocomplete__content{
+    max-width: 330px!important;
+    top: 40px!important;
+    z-index:108;
+    min-height: 100px!important;
+    background-color:white;
+    
+  
 }
 </style>

@@ -69,6 +69,43 @@ export default {
         icon: "mdi-account-tie",
         link: "/ba-account"
     },
+    comment: {
+        title: 'Comment',
+        icon: 'mdi-comment',
+        link: '/comment',
+    },
+    knowledge: {
+        title: 'KH',
+        icon: 'file-edit-outline',
+        link: '/knowledge',
+    },
+    timeSheetLogWork: {
+        title: "My work",
+        icon: "mdi-calendar",
+        link: "/timesheet",
+        children: {
+            timeSheetLogWork: {
+                title: "My work",
+                icon: "mdi-calendar",
+                link: "/timesheet"
+            },
+            timeSheetSubmit: {
+                title: "Timesheet",
+                icon: "mdi-calendar-check",
+                link: "/timesheet/submit",
+            },
+            timeSheetReport: {
+                title: "Timesheet report",
+                icon: "mdi-chart-line",
+                link: "/timesheet/report",
+            },
+            timeSheetManage: {
+                title: "Manage timesheet",
+                icon: " mdi-calendar-text",
+                link: "/timesheet/manage",
+            }
+        }
+    }
     // { title: "reports", icon: "mdi-view-dashboard", link: "/reports" },
     // { title: "virtualdocs", icon: "mdi-table", link: "/virtualdocs" },
     // { title: "methods", icon: "mdi-function", link: "/methods" },

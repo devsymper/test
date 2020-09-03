@@ -13,12 +13,16 @@ import {
 	type
 } from 'jquery';
 const updateListItemSelected = (state, data) => {
-	// Vue.set(state, 'listItemSelected', data);
 	let listItem = state.listItemSelected[data.type].item;
-	if (listItem.includes(data.obj)) {
-		listItem.splice(listItem.indexOf(data.obj), 1);
-	} else {
-		listItem.push(data.obj);
+	let check = false
+	listItem.forEach(function(e){
+		if(e.id == data.obj.id){
+			check = true
+			listItem.splice(listItem.indexOf(e),1)
+		}
+	});
+	if(check == false){
+		listItem.push(data.obj)
 	}
 }
 const removeItemSelected = (state, data) => {
@@ -26,28 +30,28 @@ const removeItemSelected = (state, data) => {
 }
 const emptyItemSelected = (state) => {
 	state.listItemSelected = {
-		documents: {
+		document_definition: {
 			icon: 'mdi-file-edit-outline',
 			title: 'Documents',
-			name: 'documents',
+			name: 'document_definition',
 			item: []
 		},
-		orgcharts: {
+		orgchart: {
 			icon: 'mdi-widgets-outline',
 			title: 'Orgcharts',
-			name: 'orgcharts',
+			name: 'orgchart',
 			item: []
 		},
-		reports: {
+		dashboard: {
 			icon: 'mdi-view-dashboard',
 			title: 'Reports',
-			name: 'reports',
+			name: 'dashboard',
 			item: []
 		},
-		workflows: {
+		workflow_definition: {
 			icon: 'mdi-lan',
 			title: 'Workflows',
-			name: 'workflows',
+			name: 'workflow_definition',
 			item: []
 		},
 	}
@@ -55,11 +59,25 @@ const emptyItemSelected = (state) => {
 const updateChildrenApps = (state, data) => {
 	state.listItemSelected[data.type].item = data.obj
 }
-
+const updateListFavorite = (state, data) => {
+	Vue.set(state, 'listFavorite', data)
+}
+const insertFavorite = (state, data) => {
+	state.listFavorite.push(data)
+}
+const delFavorite = (state, data) => {
+	state.listFavorite.forEach(function (e) {
+		if (e.id === data.id && e.type === data.type) {
+			state.listFavorite.splice(state.listFavorite.indexOf(e), 1)
+		}
+	})
+}
 export {
 	updateListItemSelected,
 	removeItemSelected,
 	emptyItemSelected,
 	updateChildrenApps,
-
+	updateListFavorite,
+	insertFavorite,
+	delFavorite
 };

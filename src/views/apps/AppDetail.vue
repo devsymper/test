@@ -6,27 +6,25 @@
 					<ul v-for="(childItem,i) in itemT.item" :key="i"  class="app-child-item">
 							<li  v-if="isEndUserCpn == true" v-on:contextmenu="rightClickHandler($event,childItem,itemT.name)">
 								<div style="position:relative">
-									<v-tooltip bottom v-if="itemT.name == 'documents'">
-									<template v-slot:activator="{ on, attrs }">
-										<div class="title-document-enduser" 	
-											v-bind="attrs"
-											v-on="on" >
-											<span>{{childItem.title}}</span> 
-											<span style="font:10px;opacity:0.4">{{childItem.name}}</span>
-										</div>
-									</template>
+									<v-tooltip bottom v-if="itemT.name == 'document_definition'">
+										<template v-slot:activator="{ on, attrs }">
+											<div class="title-document-enduser" 	
+												v-bind="attrs"
+												v-on="on" >
+												<span>{{childItem.title}} <span style="font:8px;opacity:0.4">{{childItem.name}}</span></span> 
+												
+											</div>
+										</template>
 										<span style="font:13px roboto">{{childItem.title}}</span> 
 										<span style="font:8px;opacity:0.4">{{childItem.name}}</span>
 									</v-tooltip>
 									<div v-else>{{childItem.name}}</div>
 									<v-icon  @click="changeFavorite(childItem,itemT.name)" :class="{'icon-star-active' : childItem.favorite==true, 'icon-star': true}" >mdi-star</v-icon>	
 								</div>
-							<!-- <v-icon  @click="changeFavorite(childItem,itemT.name,1)"  class="icon-star" >mdi-star</v-icon> -->
-							<!-- <v-icon v-if="isEndUserCpn == false" class="icon-remove"  @click="removeItem(childItem.id,itemT.name)">mdi-delete-circle</v-icon> -->
 							</li>
 							<li v-else>
 								<div style="position:relative">
-									<v-tooltip bottom v-if="itemT.name == 'documents'">
+									<v-tooltip bottom v-if="itemT.name == 'document_definition'">
 									<template v-slot:activator="{ on, attrs }">
 										<div class="title-document" 	
 											v-bind="attrs"
@@ -55,33 +53,34 @@ import {appManagementApi} from './../../api/AppManagement.js'
 export default {
  data: function() {
         return {
-			listItemHeight: '400px',
+			
+			listItemHeight: 'calc(100vh - 380px)',
 			currentSelected:null,
 			typeSelected:null,
 			objFilter:{
-				documents: {
+				document_definition: {
 					icon: 'mdi-file-edit-outline',
 					title: 'Documents',
-					name: 'documents',
+					name: 'document_definition',
 					item: [
 					]
 				},
-				orgcharts: {
+				orgchart: {
 					icon: 'mdi-widgets-outline',
 					title: 'Orgcharts',
-					name: 'orgcharts',
+					name: 'orgchart',
 					item: []
 				},
-				reports: {
+				dashboard: {
 					icon: 'mdi-view-dashboard',
 					title: 'Reports',
-					name: 'reports',
+					name: 'dashboard',
 					item: []
 				},
-				workflows: {
+				workflow_definition: {
 					icon: 'mdi-lan',
 					title: 'Workflows',
-					name: 'workflows',
+					name: 'workflow_definition',
 					item: []
 				},
 			}
@@ -121,38 +120,42 @@ export default {
 		removeItem(item,type){
 			this.$store.commit('appConfig/removeItemSelected',{item:item,type:type})
 		},
+		setHeight(){
+			this.listItemHeight = '400px'
+		},
 		filterItem(){
 			let self = this
+			debugger
 			let listItem = this.$store.state.appConfig.listItemSelected;
-			self.objFilter.documents.item = []
-			self.objFilter.orgcharts.item = []
-			self.objFilter.reports.item = []
-			self.objFilter.workflows.item = []
-			if(listItem.documents.item.length > 0){
-					listItem.documents.item.filter(function(item){
-						if(item.title.toLowerCase().includes(self.searchKey.toLowerCase())){
-							self.objFilter.documents.item.push(item)
+			self.objFilter.document_definition.item = []
+			self.objFilter.orgchart.item = []
+			self.objFilter.dashboard.item = []
+			self.objFilter.workflow_definition.item = []
+			if(listItem.document_definition.item.length > 0){
+					listItem.document_definition.item.filter(function(item){
+						if(item.name.toLowerCase().includes(self.searchKey.toLowerCase())){
+							self.objFilter.document_definition.item.push(item)
 						}
 				})
 			}
-			if(listItem.orgcharts.item.length > 0){
-					listItem.orgcharts.item.filter(function(item){
+			if(listItem.orgchart.item.length > 0){
+					listItem.orgchart.item.filter(function(item){
 					if(item.name.toLowerCase().includes(self.searchKey.toLowerCase())){
-						self.objFilter.orgcharts.item.push(item)
+						self.objFilter.orgchart.item.push(item)
 					}
 				})
 			}
-			if(listItem.reports.item.length > 0){
-					listItem.reports.item.filter(function(item){
+			if(listItem.dashboard.item.length > 0){
+					listItem.dashboard.item.filter(function(item){
 					if(item.name.toLowerCase().includes(self.searchKey.toLowerCase())){
-						self.objFilter.reports.item.push(item)
+						self.objFilter.dashboard.item.push(item)
 					}
 				})
-			}
-			if(listItem.workflows.item.length > 0){
-					listItem.workflows.item.filter(function(item){
+			}title
+			if(listItem.workflow_definition.item.length > 0){
+					listItem.workflow_definition.item.filter(function(item){
 					if(item.name.toLowerCase().includes(self.searchKey.toLowerCase())){
-						self.objFilter.workflows.item.push(item)
+						self.objFilter.workflow_definition.item.push(item)
 					}
 				})
 			}
@@ -169,28 +172,31 @@ export default {
 			this.$refs.contextMenu.hide()
 		},	
 		changeFavorite(item,type){
-			if(type == 'documents'){
-				type = 'document'
-			}
-			if(type == 'orgcharts'){
-				type = 'orgchart'
-			}
-			if(type == 'reports'){
-				type = 'report'
-			}
-			if(type== 'workflows'){
-				type = 'workflow'
-			}
 			let userId = this.$store.state.app.endUserInfo.id
+			if(item.objectIdentifier.includes("document_definition:")){
+				item.id = item.objectIdentifier.replace("document_definition:","")
+			}
+			if(item.objectIdentifier.includes("orgchart:")){
+				item.id = item.objectIdentifier.replace("orgchart:","")
+			}
+			if(item.objectIdentifier.includes("dashboard:")){
+				item.id = item.objectIdentifier.replace("dashboard:","")
+			}
+			if(item.objectIdentifier.includes("workflow_definition:")){
+				item.id = item.objectIdentifier.replace("workflow_definition:","")
+			}
 			if(item.favorite == false){
 				appManagementApi.addFavoriteItem(userId,item.id,type,1).then(res => {
 					if (res.status == 200) {
+						this.$store.commit('appConfig/insertFavorite',item)
 						item.favorite = true;
 					}
 				});
 			}else{
 				appManagementApi.addFavoriteItem(userId,item.id,type,0).then(res => {
 					if (res.status == 200) {
+						item.type = type;
+						this.$store.commit('appConfig/delFavorite',item)
 						item.favorite = false;
 					}
 				});
@@ -211,6 +217,7 @@ export default {
 	display: flex;
 	cursor: pointer;
 	padding:8px 15px;
+	font-weight: 500;
 }
 .app-details >>> .app-item .title-document{
 	white-space: nowrap; 
@@ -268,8 +275,6 @@ export default {
 	display: inline-block;
 }
 .app-details >>> .app-item li:hover .icon-star{
-	/* background-color:#f7f7f7; */
-	/* border-radius: 10px; */
 	display: inline-block;
 }
 </style>
