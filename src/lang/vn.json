@@ -528,7 +528,8 @@
             "rename": "Đổi tên",
             "delete": "Xóa",
             "addfavorite": "Thêm vào yêu thích",
-            "removefavorite": "Xóa khỏi yêu thích"
+            "removefavorite": "Xóa khỏi yêu thích",
+            "viewcontent": "Xem nội dung"
         },
         "table": {
             "totalDoc": "Số văn bản"
