@@ -219,11 +219,6 @@ export default class BasicControl extends Control {
         })
         this.ele.on('click', function(e) {
             store.commit("document/addToDocumentSubmitStore", {
-                key: 'currentCellSelected',
-                value: null,
-                instance: thisObj.curParentInstance
-            });
-            store.commit("document/addToDocumentSubmitStore", {
                 key: 'currentTableInteractive',
                 value: null,
                 instance: thisObj.curParentInstance
@@ -493,15 +488,6 @@ export default class BasicControl extends Control {
         let thisObj = this;
         this.ele.attr('readonly', 'readonly')
         this.ele.on('click', function(e) {
-                /**
-                 * TH control select ở ngoài table
-                 * reset biến chỉ ra là đang tương tác với table và cell nào
-                 */
-                store.commit("document/addToDocumentSubmitStore", {
-                    key: 'currentCellSelected',
-                    value: null,
-                    instance: thisObj.curParentInstance
-                });
                 store.commit("document/addToDocumentSubmitStore", {
                     key: 'currentTableInteractive',
                     value: null,

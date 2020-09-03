@@ -435,66 +435,26 @@ export default {
         },
         
         printDiv(){
-            this.$snotify({
-                                type: "error",
-                                title: "hoàng đang xử lí, vui lòng quay lại sau",
-                            });
-            // this.fab = false;
-
-            // $('.sym-form-Detail').find('table[border="1"]').removeAttr('border');
-            // $('.sym-form-Detail').find('table[border="1"]').css({border:'none'});
-            // // let css = this.getallcss();
-            // let head = document.head || document.getElementsByTagName('head')[0];
-            // let style = document.createElement('style');
-            // $('body').css({display: 'flex',
-            // 'justify-content': 'center',padding:'8px'})
-          
-            // var printContents = $('.sym-form-Detail')[0].innerHTML;
-            // $(printContents).find('.s-drawer').remove();
-			// var originalContents = document.body.innerHTML;
-            // // head.appendChild(style);
-            // let x = this.$el.detach();
-            // let old = this.$root.$el;
-            // // let content = $(printContents).detach();
-            // $(this.$root.$el).empty();
-            // $(this.$root.$el).append(x);
-			// // document.body.innerHTML = printContents;
-
-			// window.print();
-            // $(this.$root.$el).append($(old).children().detach());
-            // // document.body.innerHTML = originalContents;
-            //  $('body').removeAttr('style');
+            this.quickView = true;
+            $('.sym-form-Detail').addClass('w-auto');
+            $('main').addClass('p-0');
+            $('.app-header-bg-color').addClass('d-none')
+            $('.s-drawer').addClass('d-none')
+            $('.v-navigation-drawer').addClass('d-none')
+			setTimeout(() => {
+                window.print();
+                this.quickView = false;
+                $('.sym-form-Detail').removeClass('w-auto');
+                $('main').removeClass('p-0');
+                
+                $('.app-header-bg-color').removeClass('d-none')
+                $('.s-drawer').removeClass('d-none')
+                $('.v-navigation-drawer').removeClass('d-none')
+            }, 100);
+           
             
         },
-        getallcss() {
-            var css = "", //variable to hold all the css that we extract
-                styletags = document.getElementsByTagName("style");
-            for(var i = 0; i < styletags.length; i++)
-            {
-                css += styletags[i].innerHTML; //extract the css in the current style tag
-            }
-            css += 'padding:12px';
-            if(this.documentSize == '21cm'){
-                $('body').addClass('content-print')
-            }
-
-
-            // //loop over all the external stylesheets
-//             for(var i = 0; i < document.styleSheets.length; i++)
-//             {
-//                 var currentsheet = document.styleSheets[i];
-//                 if(currentsheet.href == null){
-// //loop over all the styling rules in this external stylesheet
-//                     for(var e = 0; e < currentsheet.cssRules.length; e++)
-//                     {
-//                         css += currentsheet.cssRules[e].cssText; //extract all the styling rules
-//                     }
-//                 }
-                
-//             }
-
-            return css;
-        }
+       
     }
 }
 </script>

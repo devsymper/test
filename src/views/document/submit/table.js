@@ -155,7 +155,6 @@ const makeDelay = function(ms) {
     };
 };
 var delay = makeDelay(1000);
-var lastKey;
 
 /**
  * Các loại cell mà handsontable hỗ trợ hiển thị
@@ -204,9 +203,10 @@ export default class Table {
              *      "row_column":{vld:true|false,msg:' thông báo lỗi'} //Chỉ cần quan tâm tới false, các trường hợp còn lại hiển thị bình thường
              * }
              */
+            this.validateValueMap = {};
+
             let thisObj = this;
             this.tableHasRowSum = false;
-            this.validateValueMap = {};
 
             /**Tổng số dòng trong table */
             this.rowCount = 0;
@@ -215,9 +215,10 @@ export default class Table {
             this.keyInstance = keyInstance;
             /**Danh sách các celltpye trong table */
             this.listCellType = {};
-            this.currentSelectedCell = {};
+            /**CHỉ ra  vị trí của cell được click */
             this.isAutoCompleting = false;
-            this.cellAfterChange = "";
+            /**Chỉ ra tên của control nào đang setdata để callback sau khi setdata */
+            this.controlNameAfterChange = "";
             this.showPopupUser = false;
             this.showPopupTime = false;
             this.tableDefaultRow = []
@@ -225,30 +226,18 @@ export default class Table {
                 this.listAutoCompleteColumns = {},
                 this.event = {
                     afterSelection: (row, column, row2, column2, preventScrolling, selectionLayerLevel) => {
-
-                        thisObj.currentSelectedCell['row'] = row;
-                        thisObj.currentSelectedCell['column'] = column;
                         store.commit("document/addToDocumentSubmitStore", {
                             key: 'currentTableInteractive',
                             value: thisObj,
                             instance: thisObj.keyInstance
                         });
-                        store.commit("document/addToDocumentSubmitStore", {
-                            key: 'currentCellSelected',
-                            value: thisObj.currentSelectedCell,
-                            instance: thisObj.keyInstance
-                        });
-
-                        // if (thisObj.getCellSelectedType(column) == 'select') {
-                        //     thisObj.setSelectCell(event);
-                        // };
 
                     },
 
 
                     beforeKeyDown: function(event) {
                         let cellMeta = this.getSelected();
-                        if (thisObj.checkLastCell(cellMeta, this)) {
+                        if (event.keyCode == 13 && thisObj.checkLastCell(cellMeta, this)) {
                             return;
                         }
                         if (thisObj.tableHasRowSum && cellMeta[0][0] == this.countRows() - 1) {
@@ -362,13 +351,15 @@ export default class Table {
                         // nếu type cell là time thì emit qua submit mở timepicker
                         if (thisObj.getCellSelectedType(coords.col) == 'time') {
 
-                            var activeEditor = this.getActiveEditor();
-                            this.selectCell(coords.row, coords.col);
-                            activeEditor.beginEditing();
-                            thisObj.showPopupTime = true;
-                            event.controlName = columns[coords.col].data
-                            event.curTarget = activeEditor.TEXTAREA
-                            SYMPER_APP.$evtBus.$emit('document-submit-show-time-picker', event);
+                            setTimeout((self) => {
+                                var activeEditor = self.getActiveEditor();
+                                self.selectCell(coords.row, coords.col);
+                                activeEditor.beginEditing();
+                                thisObj.showPopupTime = true;
+                                event.controlName = columns[coords.col].data
+                                event.curTarget = activeEditor.TEXTAREA
+                                SYMPER_APP.$evtBus.$emit('document-submit-show-time-picker', event);
+                            }, 50, this);
                             // activeEditor.enableFullEditoMode();
                         };
                         SYMPER_APP.$evtBus.$emit("symper-app-wrapper-clicked", event);
@@ -383,7 +374,6 @@ export default class Table {
                     },
 
                     afterDocumentKeyDown: function(e) {
-                        console.log("ádas", e.key === 'Enter' && e.shiftKey === true);
                         let cellMeta = this.getSelected();
                         if (e.key === 'Enter' && e.shiftKey === true) {
                             this.alter('insert_row', cellMeta[0][0] + 1, 1);
@@ -462,11 +452,14 @@ export default class Table {
         }
         // kiểm tra nếu đang edit ở cell cuối cùng mà ấn enter thì cho cell selected về dòng đầu tiên (lỗi do control hidden)
     checkLastCell(cellMeta, hotTb) {
-            let colLength = hotTb.getDataAtRow(0).length;
-            let rowLength = hotTb.countRows();
-            if (cellMeta[0][1] == colLength - 3 && rowLength - 1 == cellMeta[0][0]) {
-                hotTb.selectCell(0, 0, 0, 0, true);
-                return true
+            if (!this.showPopupTime && !this.showPopupUser) {
+                let colLength = hotTb.getDataAtRow(0).length;
+                let rowLength = hotTb.countRows();
+                if (cellMeta[0][1] == colLength - 3 && rowLength - 1 == cellMeta[0][0]) {
+                    hotTb.selectCell(0, 0, 0, 0, true);
+                    return true
+                }
+                return false
             }
             return false
         }
@@ -537,7 +530,7 @@ export default class Table {
         if (currentRowData[currentRowData.length - 1] == 'NULL') {
             let id = Date.now();
             currentRowData[currentRowData.length - 1] = id;
-            thisObj.cellAfterChange = controlName
+            thisObj.controlNameAfterChange = controlName
             thisObj.tableInstance.setDataAtCell(changes[0][0], currentRowData.length - 1, id);
         } else {
             await ClientSQLManager.editRow(thisObj.keyInstance, thisObj.tableName, controlName, changes[0][3],
@@ -943,11 +936,10 @@ export default class Table {
             // viewportRowRenderingOffset: 20,
             // viewportColRenderingOffset: 20,
             contextMenu: (thisObj.checkDetailView()) ? false : thisObj.getContextMenu(),
-            dragToScroll: false,
+            // dragToScroll: false,
             stretchH: 'all',
-            formulas: true,
             autoRowSize: false,
-            autoColSize: false,
+            autoColSize: true,
             // defaultRowHeight: 29,
             width: '100%',
             fixedRowsBottom: (thisObj.tableHasRowSum) ? 1 : 0,
@@ -990,11 +982,6 @@ export default class Table {
                     }
                 });
             },
-            afterCreateRow: function(i, amount) {
-
-
-            },
-            afterSetDataAtRowProp: function(changes, source) {},
             afterSetDataAtCell: function(changes, source) {
                 if (changes.length == 0) {
                     return
@@ -1008,7 +995,7 @@ export default class Table {
                         });
 
                         ClientSQLManager.insertRow(thisObj.keyInstance, thisObj.tableName, columns, currentRowData, true).then(res => {
-                            thisObj.handlerCheckEffectedControlInTable(thisObj.cellAfterChange, changes[0][0]);
+                            thisObj.handlerCheckEffectedControlInTable(thisObj.controlNameAfterChange, changes[0][0]);
                         })
                     }, 10);
                 } else if (source == 'timeValidator') {

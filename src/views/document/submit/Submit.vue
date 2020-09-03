@@ -264,7 +264,6 @@ export default {
 
     },
     beforeMount() {
-        this.docSize = "21cm";
         this.columnsSQLLiteDocument = {};
     },
     mounted() {
@@ -762,14 +761,14 @@ export default {
         applyTimePicker(data){
             let time = data.value;
             let input = data.input;
-            input.val(time);
             if(this.sDocumentSubmit.currentTableInteractive == null){
-
+                input.val(time);
                 input.trigger('change');
             }
             else{
-                // let currentTableInteractive = this.sDocumentSubmit.currentTableInteractive
-                // currentTableInteractive.tableInstance.setDataAtCell(this.sDocumentSubmit.currentCellSelected.row,this.sDocumentSubmit.currentCellSelected.column,time,'edit')
+                let currentTableInteractive = this.sDocumentSubmit.currentTableInteractive
+                let cellActive = currentTableInteractive.tableInstance.getActiveEditor();
+                currentTableInteractive.tableInstance.setDataAtCell(cellActive.row,cellActive.col,time,'edit')
             }
         },
         afterCheckTimeNotValid(data){
@@ -799,8 +798,8 @@ export default {
             }
             else{
                 let currentTableInteractive = this.sDocumentSubmit.currentTableInteractive
-                currentTableInteractive.tableInstance.setDataAtCell(this.sDocumentSubmit.currentCellSelected.row,this.sDocumentSubmit.currentCellSelected.column,user.id);
-                currentTableInteractive.showPopupUser = false
+                let cellActive = currentTableInteractive.tableInstance.getActiveEditor();
+                currentTableInteractive.tableInstance.setDataAtCell(cellActive.row,cellActive.col,user.id,'edit')
             }
         },
         /**
@@ -808,7 +807,7 @@ export default {
          */
         afterSelectRowAutoComplete(data){
             // th này không phải trong table      
-            if(this.sDocumentSubmit.currentCellSelected == null){
+            if(this.sDocumentSubmit.currentTableInteractive == null){
                 let fromAutoComplete = true;
                 if(!data.fromEnterKey){
                     fromAutoComplete = false
@@ -817,8 +816,8 @@ export default {
             }
             else{
                 let currentTableInteractive = this.sDocumentSubmit.currentTableInteractive
-                currentTableInteractive.tableInstance.setDataAtCell(this.sDocumentSubmit.currentCellSelected.row,this.sDocumentSubmit.currentCellSelected.column,data.value)
-                currentTableInteractive.isAutoCompleting = false;
+                let cellActive = currentTableInteractive.tableInstance.getActiveEditor();
+                currentTableInteractive.tableInstance.setDataAtCell(cellActive.row,cellActive.col,data.value,'edit')
             }
         },
 
@@ -919,6 +918,7 @@ export default {
                         if (res.status == 200) {
                             let content = res.data.document.content;
                             thisCpn.documentName = res.data.document.name;
+                            thisCpn.docSize = (parseInt(res.data.document.isFullSize) == 1) ? "100%":"21cm";
 							thisCpn.contentDocument = content;
 							if(res.data.document.dataPrepareSubmit != "" && res.data.document.dataPrepareSubmit != null)
                             thisCpn.preDataSubmit = JSON.parse(res.data.document.dataPrepareSubmit);
