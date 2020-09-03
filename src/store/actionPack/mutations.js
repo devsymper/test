@@ -5,7 +5,12 @@ const cacheAllResourceItem = (state, data) => {
     let items = data.data;
     if (!state.allResource[type] && !$.isEmptyObject(items)) {
         Vue.set(state.allResource, type, items);
+
+        if (type == 'document_definition') {
+            Vue.set(state.allResource, 'document_instance_all_by_def', items);
+        }
     }
+
 };
 
 const setAllActionByObjectType = (state, data) => {

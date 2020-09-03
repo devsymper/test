@@ -274,6 +274,10 @@ export default {
                 self.$refs.actionPackForm.handleChangeObjectType();
             }, 200, this);
         },
+
+        createRowsForAllInstancesDocDef(operationForInstancesOfDocDef, rowsOfDocDefs){
+            this.$refs.actionPackForm.setRowsForAllInstancesDocDef(operationForInstancesOfDocDef, rowsOfDocDefs);
+        },
         getTableDataFromOperations(operations){
             let mapActionAndObjectTypes = this.mapObjectTypesAndAction;
             let allResource = this.$store.state.actionPack.allResource;
@@ -299,24 +303,31 @@ export default {
              * }
              */
             let rowSchemaByObjectType = {};
-            for (let key in mapActionAndObjectTypes) {
-                mapActionAndObjects[key] = {};
-                rowSchemaByObjectType[key] = {
+            for (let objType in mapActionAndObjectTypes) {
+                mapActionAndObjects[objType] = {};
+                rowSchemaByObjectType[objType] = {
                     object: '',
                 };
-                mapActionForAllObjects[key] = [{}];
-                for (let actionName in mapActionAndObjectTypes[key]) {
-                    rowSchemaByObjectType[key][actionName] = false;
-                    mapActionForAllObjects[key][0][actionName] = false;
+                mapActionForAllObjects[objType] = [{}];
+                for (let actionName in mapActionAndObjectTypes[objType]) {
+                    rowSchemaByObjectType[objType][actionName] = false;
+                    mapActionForAllObjects[objType][0][actionName] = false;
                 }
             }
             
             // khởi tạo các operation ứng với các objectType
             let sections, objectType, objectId, actionName;
+            let operationForInstancesOfDocDef = []; // danh sách các operation của các doc definition mà áp dụng cho tất cả các instance bên trong
             for (let op of operations) {
                 sections = op.objectIdentifier.split(":");
                 objectType = op.objectType;
                 objectId = sections[1] ? sections[1] : 0;
+
+                if(objectType == 'document_instance' && (sections[2] === 0 || sections[2] === '0')){
+                    op.documentId = objectId;
+                    operationForInstancesOfDocDef.push(op);
+                    continue;
+                }
  
                 if(!objectId || objectId == '0'){
                     // Nếu các action áp dụng cho toàn bộ object của object type
@@ -343,6 +354,9 @@ export default {
                     }
                 }
             }
+
+            this.createRowsForAllInstancesDocDef(operationForInstancesOfDocDef, mapActionAndObjects['document_definition']);
+
 
             // chế biến về cho đúng định dạng hiển thị của bảng
             for(let objectType in mapActionAndObjects){

@@ -109,17 +109,43 @@ export default {
     created(){
     },
     methods: { 
+        caculateTableDataForAllInstancesDocDef(rowsOfDocDefs){
+            let operationForInstancesOfDocDef = this.multipleLevelObjects.document_definition.savedOpsForAllInstancesDocDef;
+            operationForInstancesOfDocDef = operationForInstancesOfDocDef ? operationForInstancesOfDocDef : [];
+            let dataTable = util.cloneDeep(rowsOfDocDefs);
+            for(let docId in dataTable){
+                for(let action in dataTable[docId]){
+                    if(action != 'object'){
+                        dataTable[docId][action] = false;
+                    }
+                }
+            }
+
+            for(let op of operationForInstancesOfDocDef){
+                dataTable[op.documentId][op.action] = true;
+            }
+            this.multipleLevelObjects.document_definition.tableData = Object.values(dataTable);
+        },
+        setRowsForAllInstancesDocDef(operationForInstancesOfDocDef, rowsOfDocDefs){
+            this.multipleLevelObjects.document_definition.savedOpsForAllInstancesDocDef = operationForInstancesOfDocDef;
+            this.caculateTableDataForAllInstancesDocDef(rowsOfDocDefs);
+        },
         genDocumentInstanceOperations(){
             let docDefs = this.itemData.mapActionAndObjects['document_definition'];
-            let initDocObjDataTable = [];
+            let initDocObjDataTable = {};
             let schema = this.getDataSchema('document_instance', false);
 
             for(let row of docDefs){
-                let newRow = util.cloneDeep(schema);
-                newRow.object = row.object;
-                initDocObjDataTable.push(newRow);
+                let key = row['object'];
+                if(key){
+                    let id = key.slice(0, key.indexOf(' -'));
+                    let newRow = util.cloneDeep(schema);
+                    newRow.object = row.object;
+                    initDocObjDataTable[id] = newRow;
+                }
             }
-            this.multipleLevelObjects.document_definition.tableData = initDocObjDataTable;
+            // this.multipleLevelObjects.document_definition.tableData = initDocObjDataTable;
+            this.caculateTableDataForAllInstancesDocDef(initDocObjDataTable);
         },
         objectTypeToDocumentDefinition(){
             // debugger
@@ -460,6 +486,44 @@ export default {
             }, {});
             return Object.values(opMap);
         },
+
+
+        /**
+         * Tạo operation cho tất cả document instance trong màn hình cấu hình action cho các document definition
+         */
+        getOperationForAllDocInstance(){
+            let objectType = 'document_instance';
+            let dataTable = this.multipleLevelObjects.document_definition.tableData
+            let newOperations = [];
+            let rowSchema = this.getDataSchema(objectType);
+            delete rowSchema.object;
+
+            for (let row of dataTable) {
+                let key = row['object'];
+                let id = '';
+                if(key){
+                    id = key.slice(0, key.indexOf(' -'));
+                    id = id.trim();
+                }
+
+                if(id){
+                    for(let actionName in row){
+                        if(actionName == 'object' || !rowSchema.hasOwnProperty(actionName)){
+                            continue
+                        }
+                        if(row[actionName]){
+                            newOperations.push({
+                                objectType: objectType,
+                                action: actionName,
+                                objectIdentifier: `${objectType}:${id}:0`,
+                                name: actionName.replace(/_/g, ' ') + ' for all instance of document definition ' + id
+                            });
+                        }
+                    }
+                }
+            }
+            return newOperations;
+        },
         getNewOperationData(){
             let newOperations = [];
             let allResource = this.$store.state.actionPack.allResource;
@@ -467,10 +531,13 @@ export default {
                 let dataTable = this.itemData.mapActionAndObjects[objectType];
                 newOperations = newOperations.concat(this.getOperationToSaveFromDataTable(dataTable, allResource, objectType));
             }
+            
             for(let objectType in this.multipleLevelObjects.application_definition){
                 let dataTable = this.multipleLevelObjects.application_definition[objectType].tableData;
                 newOperations = newOperations.concat(this.getOperationToSaveFromDataTable(dataTable, allResource, objectType));
             }
+
+            newOperations = newOperations.concat(this.getOperationForAllDocInstance());
             newOperations = this.removeDuplicateOperations(newOperations);
 
             for(let objectType in this.itemData.mapActionForAllObjects){
@@ -479,7 +546,7 @@ export default {
 
                 if(allResource.hasOwnProperty(objectType)){
                     for(let actionName in row){
-                        let objectIdentifier = actionForObjectType[actionName] ? objectType : (objectType+':0');
+                        let objectIdentifier = actionForObjectType[actionName] ? objectType : (objectType + ':0' );
                         if(row[actionName]){
                             newOperations.push({
                                 objectType: objectType,
