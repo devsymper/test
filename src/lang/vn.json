@@ -418,7 +418,9 @@
                         "dateCreate": "Ngày tạo",
                         "userCreate": "Người tạo",
                         "history": "Lịch sử",
-                        "comment": "Bình luận"
+                        "comment": "Bình luận",
+                        "has": "Có",
+                        "commentNotResolve": "chưa được giải quyết"
                     },
                     "worflowInfo": "THÔNG TIN QUY TRÌNH",
                     "userRelated": {
@@ -433,6 +435,9 @@
                 "toggleSize": "Thay đổi kích thước",
                 "otherInfo": "Xem thông tin khác",
                 "print": "In"
+            },
+            "comment": {
+                "heading": "BÌNH LUẬN"
             }
         }
     },
