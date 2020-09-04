@@ -579,9 +579,9 @@ export default {
                    //debugger
                     let id = res.data.id;
                     task.push(...res.data.task);
-                    self.items = task.filter(x=>x.userAssignId==id);
+                    self.items = task;
                      res = await timesheetApi.getTask({size: 100});
-                    self.items.push(...res.data).filter(x=>x.assignee==id);
+                    self.items.push(...res.data);
                   //  debugger
                     console.log(self.items)
                 } catch(e) {
@@ -598,10 +598,10 @@ export default {
                     let id = res.data.id;
                    // debugger
                     self.items.push(...res.data.task);
-                    self.items = self.items.filter(x=>x.userAssignId==id&&x.categoryId==idCategory);
+                    self.items = self.items.filter(x.categoryId==idCategory);
                      res = await timesheetApi.getTask({size: 100});
                    //  debugger
-                    self.items.push(...res.data).filter(x=>x.assignee==id);
+                    self.items.push(...res.data);
                     console.log(self.items)
                   //   debugger
                 } catch(e) {
