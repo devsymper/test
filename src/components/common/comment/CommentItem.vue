@@ -3,7 +3,7 @@
 		<div :item="item"  class="commnent-item-wrapper" :style="{width:width}">
 		<v-icon v-if="item.parentId == '0' && item.status == 0" class="icon-check" @click="resolveComment(item)" style="float:right">mdi-check-outline</v-icon>
 		<v-icon v-if="item.parentId == '0' && item.status == 1" class="icon-check" @click="unresolveComment(item)" style="float:right">mdi-comment-arrow-left-outline</v-icon>
-				<SymperAvatar :size="30" :userId="item.userId" style="margin-left:12px" />
+				<SymperAvatar :size="30" :userId="item.userId" style="margin-left:12px;margin-top:4px" />
 			<div class="comment-item-content">
 				<div style="display:flex;height:16px;width:100%">
 						<span style="color:#00000099">{{item.infor.fullName}}</span>
@@ -40,7 +40,8 @@
 				</div>
 				<div style="display:flex;font-size:11px"> 
 					<span class="btn-reply-comment" @click="replyComment(item)">Trả lời </span>
-					<span style="padding-left:8px">{{lassSeen(item.updatedAt)}}</span>
+					<span style="padding-left:8px">{{lassSeen(item.createdAt)}}</span>
+					<span v-if="item.createdAt != item.updatedAt" style="padding-left:8px;cursor:pointer"> Edited</span>
 				</div>
 
 			</div>
@@ -55,7 +56,7 @@
 			</commentItem>
 			<div class="reply-comment"  v-if="item.reply && item.parentId == '0'">
 				<SymperAvatar :size="30" :userId="item.userId" style="margin-left:14px" />
-				<div style="padding-left:8px;width:100%">
+				<div style="padding-left:8px;width:98%">
 					<InputComment  :isEditing="true" :images="[]" :files="[]" :isAdd="true" />
 				</div>
 			</div>
