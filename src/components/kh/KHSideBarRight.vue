@@ -16,7 +16,6 @@
         </div>
       </div>
       <div class="list-item">
-        <!-- <v-sheet id="scrolling-techniques" class="overflow-y-auto" max-height="498"> -->
         <v-container
           class="scroll-bar-right"
           max-height="498"
@@ -36,7 +35,15 @@
                 <v-icon class="fs-14" v-else>mdi-file-document-outline</v-icon>
                 <v-tooltip bottom>
                   <template v-slot:activator="{ on }">
-                    <v-list-item-title v-on="on" class="fs-13" v-text="item.name+'.'+item.type"></v-list-item-title>
+                    <!-- <p  :id="`file-`+item.id"
+                      v-on="on"
+                     v-text="item.name+'.'+item.type"></p> -->
+                    <v-list-item-title
+                      :id="`file-`+item.id"
+                      v-on="on"
+                      class="fs-13"
+                      v-text="item.name+'.'+item.type"
+                    ></v-list-item-title>
                   </template>
                   <span>{{ item.name+'.'+item.type }}</span>
                 </v-tooltip>
@@ -45,7 +52,6 @@
             </v-list-item-group>
           </v-list>
         </v-container>
-        <!-- </v-sheet> -->
       </div>
     </div>
     <div class="kh-table-content kh-sbr-all ml-4" v-if="skh.statusRightBar==2">
@@ -165,13 +171,13 @@
         </div>
       </div>
       <div class="list-item">
-        <v-list dense>
+        <v-list dense :flat="true">
           <v-list-item-group class>
-            <v-list-item 
-              v-for="(item, i) in listBackupDocument" 
+            <v-list-item
+              v-for="(item, i) in listBackupDocument"
               :key="i"
               @contextmenu="showMenuBackup($event,item.id,item.docName,item.docContent)"
-              >
+            >
               <v-tooltip bottom>
                 <template v-slot:activator="{ on }">
                   <v-list-item-title v-on="on" class="fs-13 text-ellipsis" v-text="item.backupName"></v-list-item-title>
@@ -235,7 +241,15 @@
       </v-list>
     </v-menu>
 
-    <KHShowImage @downloadOrBackupFile="downloadOrBackupFile" v-bind:id="id" v-bind:fileId="fileId" v-bind:name="name" v-bind:serverPath="serverPath" v-bind:type="type" v-bind:docContent="docContent" />
+    <KHShowImage
+      @downloadOrBackupFile="downloadOrBackupFile"
+      v-bind:id="id"
+      v-bind:fileId="fileId"
+      v-bind:name="name"
+      v-bind:serverPath="serverPath"
+      v-bind:type="type"
+      v-bind:docContent="docContent"
+    />
   </div>
 </template>
 
@@ -252,7 +266,7 @@ export default {
   },
   data() {
     return {
-      fileId: '',
+      fileId: "",
       serverPath: "",
       name: "",
       type: "",
@@ -263,9 +277,9 @@ export default {
       y: 0,
       context_menu: false,
       dialogAlert: false,
-      context_menu_backup:false,
+      context_menu_backup: false,
       history_active: 1,
-      id: '',
+      id: "",
       docVersionID: 0,
       hash: "",
       items_attach: [
@@ -291,12 +305,70 @@ export default {
         },
         {
           title: this.$t("kh.contextmenu.download"),
-          menuAction: action => {},
-          icon: "mdi-inbox-arrow-down"
+          menuAction: action => {
+            let fileId = this.fileId;
+            this.downLoadFile(fileId);
+          },
+          icon: "mdi-download"
         },
         {
           title: this.$t("kh.contextmenu.rename"),
-          menuAction: action => {},
+          menuAction: action => {
+            let id = this.fileId;
+            let name=this.name;
+            var renameInput = $("<input id="+"file-" + id + " value=" + name + " >");
+            $("#file-" + id).replaceWith(renameInput);
+            $("#file-" + id).val(name);
+            renameInput.on("blur", function(evt) {
+              $(this).replaceWith(
+                "<div id="+"file-" +
+                  id +
+                  " class='v-list-item__title fs-13'>"+
+                  name +
+                  " </div>"
+              );
+            });
+            setTimeout(function() {
+              $("#file-" + id)
+                .focus()
+                .val(name)
+                .select();
+            }, 200);
+            $("#file-" + id).keyup(function(e) {
+              if (e.keyCode === 13) {
+                var text = $("#file-" + id)
+                  .val()
+                  .trim();
+
+                if (text != "" && text != name) {
+                  let data = {};
+                  data.id = id;
+                  data.newName = text;
+                  knowledgeApi
+                    .renameFile(data)
+                    .then(res => {
+                      if (res.status == 200) {
+                        console.log(res);
+                      } else if (res.status == 403) {
+                        SYMPER_APP.$snotifyError("Error", res.message);
+                      }
+                    })
+                    .catch(err => {
+                      console.log("error from rename file !!!", err);
+                    })
+                    .always(() => {});
+                } else {
+                  $(this).replaceWith(
+                    "<div id="+"file-" +
+                      id +
+                      " class='v-list-item__title fs-13'>" +
+                      name +
+                      " </div>"
+                  );
+                }
+              }
+            });
+          },
           icon: "mdi-pencil"
         },
         {
@@ -309,8 +381,8 @@ export default {
           icon: "mdi-delete-forever"
         }
       ],
-      contextMenuBackup:[
-         {
+      contextMenuBackup: [
+        {
           title: this.$t("kh.contextmenu.viewcontent"),
           menuAction: action => {
             this.$store.commit("kh/changeStatusShowImage", true);
@@ -320,11 +392,11 @@ export default {
         {
           title: this.$t("kh.sidebar.restore"),
           menuAction: action => {
-            let id=this.id;
+            let id = this.id;
             this.backupDocument(id);
           },
           icon: "mdi-backup-restore"
-        },
+        }
       ]
     };
   },
@@ -347,6 +419,15 @@ export default {
       } else if (action == 8) {
         return this.$t("kh.sidebar.rename");
       }
+    },
+    downLoadFile(id) {
+      knowledgeApi
+        .downloadFile(id)
+        .then(res => {})
+        .catch(err => {
+          console.log("error download file!!!", err);
+        })
+        .always(() => {});
     },
     /**
      * bắt sự kiện upload file
@@ -376,11 +457,11 @@ export default {
         SYMPER_APP.$snotifyError(error, dataObj.message);
       }
     },
-    downloadOrBackupFile(data){
-      if (data.type=='document_backup') {
+    downloadOrBackupFile(data) {
+      if (data.type == "document_backup") {
         this.backupDocument(data.id);
-      }else{
-        alert("Await API dowload file");
+      } else {
+        this.downLoadFile(data.fileId);
       }
     },
     /**
@@ -411,7 +492,7 @@ export default {
       if (this.docVersionID != 0) {
         setTimeout(() => {
           this.$store.commit("kh/changeStatusBackup", true);
-        }, 200);
+        }, 100);
         let id = this.docVersionID;
         knowledgeApi
           .restoreDocumentBackup(id)
@@ -454,6 +535,7 @@ export default {
       //this.$store.dispatch("kh/getLogAll");
       this.$store.dispatch("kh/getBackupDocument", hash);
       this.$store.dispatch("kh/getBackupDocument", hash);
+      this.$store.dispatch("kh/getFileAttachment", hash);
       this.detectHeading();
     },
     convertDate(date) {
@@ -488,15 +570,15 @@ export default {
         this.context_menu = true;
       });
     },
-    showMenuBackup(e,id,docName,docContent){
+    showMenuBackup(e, id, docName, docContent) {
       e.preventDefault();
       this.context_menu_backup = false;
       this.x = e.clientX;
       this.y = e.clientY;
       this.id = id;
-      this.name=docName;
-      this.type = 'document_backup';
-      this.docContent=docContent;
+      this.name = docName;
+      this.type = "document_backup";
+      this.docContent = docContent;
       this.$nextTick(() => {
         this.context_menu_backup = true;
       });
@@ -539,7 +621,7 @@ export default {
         if (hash == false) {
           hash = this.$route.params.hash;
         }
-        this.$store.dispatch("kh/getFileAttachment", hash);
+        // this.$store.dispatch("kh/getFileAttachment", hash);
         let data = this.skh.arrIdFileAttach;
         this.$store.dispatch("kh/getArrFileAttachment", data);
       } else if (newVl == 2) {
@@ -632,4 +714,5 @@ export default {
   padding-left: 0px;
   padding-top: 0px;
 }
+
 </style>

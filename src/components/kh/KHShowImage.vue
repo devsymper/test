@@ -4,25 +4,39 @@
       <div class="kh-handson-header kh-showFile">
         <h2 style="width:95%" v-if="type!='document_backup'">{{name+'.'+type}}</h2>
         <h2 style="width:95%" v-else>{{name}}</h2>
-        <v-icon
-          v-if="type!='document_backup'"
-          class="fs-17 btn-download"
-          @click.stop="downloadFile"
-        >mdi-download</v-icon>
-        <v-icon
-          v-else
-          class="fs-17 btn-restore"
-          @click.stop="downloadFile"
-        >mdi-backup-restore</v-icon>
-        <v-icon
-          class="btn-closes-handson fs-17"
-          style="margin-left: 5px;"
-          @click="invertStatusShowImage"
-        >mdi-close</v-icon>
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on }">
+            <v-icon
+              v-on="on"
+              v-if="type!='document_backup'"
+              class="fs-17 btn-download"
+              @click.stop="downloadFile"
+            >mdi-download</v-icon>
+            <v-icon
+              v-on="on"
+              v-else
+              class="fs-17 btn-restore"
+              @click.stop="downloadFile"
+            >mdi-backup-restore</v-icon>
+          </template>
+          <span v-if="type!='document_backup'">{{$t("kh.contextmenu.download") }}</span>
+          <span v-else>{{$t("kh.sidebar.restore") }}</span>
+        </v-tooltip>
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on }">
+            <v-icon
+              v-on="on"
+              class="btn-closes-handson fs-17"
+              style="margin-left: 5px;"
+              @click="invertStatusShowImage"
+            >mdi-close</v-icon>
+          </template>
+          <span>{{$t("common.close") }}</span>
+        </v-tooltip>
       </div>
 
       <div v-if="type==='jpg' ||type==='png' ||type==='jpeg'">
-        <hr>
+        <hr />
         <img class="image-modal" :src="serverPath" alt />
       </div>
 
@@ -36,7 +50,7 @@
         <iframe class="show-content" :src="serverPath"></iframe>
       </div>
       <div class="div-show-content" v-if="type==='document_backup'">
-        <div class="show-content"  v-html="docContent"></div>
+        <div class="show-content" v-html="docContent"></div>
       </div>
     </div>
   </div>
@@ -47,7 +61,7 @@ export default {
   props: {
     id: {
       type: String,
-      default: ''
+      default: ""
     },
     fileId: {
       type: String,
@@ -71,24 +85,23 @@ export default {
     }
   },
   data() {
-    return {
-    };
+    return {};
   },
   methods: {
     invertStatusShowImage() {
       this.$store.commit("kh/changeStatusShowImage", !this.skh.statusShowImage);
     },
-    downloadFile(){
-      if (this.type!='document_backup') {
-        let data={};
-        data.fileId=this.fileId;
-        data.type=this.type;
-			  this.$emit("downloadOrBackupFile", data);
-      }else if(this.type=='document_backup'){
-        let data={};
-        data.id=this.id;
-        data.type=this.type;
-			  this.$emit("downloadOrBackupFile", data);
+    downloadFile() {
+      if (this.type != "document_backup") {
+        let data = {};
+        data.fileId = this.fileId;
+        data.type = this.type;
+        this.$emit("downloadOrBackupFile", data);
+      } else if (this.type == "document_backup") {
+        let data = {};
+        data.id = this.id;
+        data.type = this.type;
+        this.$emit("downloadOrBackupFile", data);
       }
       this.$store.commit("kh/changeStatusShowImage", !this.skh.statusShowImage);
     }
@@ -175,14 +188,14 @@ export default {
 #modalImage {
   padding-top: 40px !important;
 }
-.btn-download{
-  width: 24px!important;
-  margin-top:4px ;
+.btn-download {
+  width: 24px !important;
+  margin-top: 4px;
 }
-.btn-restore{
-  width: 26px!important;
-  height: 26px!important;
-  margin-top:5px ;
-  margin-right:0px ;
+.btn-restore {
+  width: 26px !important;
+  height: 26px !important;
+  margin-top: 5px;
+  margin-right: 0px;
 }
 </style>
