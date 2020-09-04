@@ -65,14 +65,17 @@
         <ul id="toc"></ul>
       </div>
     </div>
-    <div class="kh-comment kh-sbr-all ml-4" v-if="skh.statusRightBar==3">
-      <div class="row sb-top" style="height:33px;">
+
+    <div class="kh-comment kh-sbr-all" v-if="skh.statusRightBar==3">
+      <!-- <div class="row sb-top" style="height:33px;">
         <div class="symper-title col pt-1 pl-1">Bình luận</div>
         <div class="r-right col">
           <v-icon class="fs-16" @click="invertStatusRightBar(-1)">mdi-close</v-icon>
         </div>
-      </div>
+      </div> -->
+      <Comment :showComment="true" :height="'100%'" :objectIdentifier="hash" :objectType="`knowledge`"/>
     </div>
+
     <div class="kh-history kh-sbr-all ml-4" v-if="skh.statusRightBar==4">
       <div class="row sb-top" style="height:33px;">
         <div class="symper-title col pt-1 pl-1">Lịch sử</div>
@@ -257,12 +260,13 @@
 import { knowledgeApi } from "./../../api/kh.js";
 import UploadFile from "./../../components/kh/uploadfile";
 import KHShowImage from "./../../components/kh/KHShowImage";
-
+import Comment from '@/components/common/comment/Comment.vue';
 import { SYMPER_APP } from "./../../main.js";
 export default {
   components: {
     UploadFile,
-    KHShowImage
+    KHShowImage,
+    Comment
   },
   data() {
     return {
@@ -530,6 +534,7 @@ export default {
       if (hash == false) {
         hash = this.$route.params.hash;
       }
+      this.hash=hash;
       this.$store.dispatch("app/getAllUsers");
       this.$store.dispatch("kh/getLogDocument", hash);
       //this.$store.dispatch("kh/getLogAll");
