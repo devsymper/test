@@ -45,6 +45,7 @@ export default {
 		},
 		onFileChanged(e) {
 			this.selectedFile = e.target.files[0]
+			debugger
 			let formData = new FormData()
 			formData.append('file',this.selectedFile)
 			formData.append('user',this.$store.state.app.endUserInfo.displayName)

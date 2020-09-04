@@ -13,14 +13,15 @@
 			default: ''
 		}
 	},
-    data: () => ({
-		isShowMenu:false,
-		top:0,
-		left:0,
-		listUserFilter: [],
-	}),
+	 data: function() {
+        return {
+            isShowMenu:false,
+			top:0,
+			left:0,
+			listUserFilter: [],
+        };
+    },
 	created(){
-		// let self = this
 	},
 	computed:{
 		listUser(){
@@ -56,19 +57,17 @@
 			}
 		},
 		chooseUser(){
-			console.log('ahuhu')
-			debugger
 		},
 		down(){
-
+			console.log('down');
 		},
 		up(){
-			
+			console.log('up');
 		}
 
 
 	}
-	}
+}
 </script>
 <style scoped>
 .context-menu{
