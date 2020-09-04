@@ -4,8 +4,8 @@
 			<div  class="commnet-img-item" v-for="(item,i) in images" :key="i">
 				<v-img
            			 :src="item.serverPath"
-					style="margin-top:auto;margin-bottom:auto"
-					@click="download(item.id)"
+					style="margin-top:auto;margin-bottom:auto;max-height:50px"
+					@click="previewImage(item)"
          		>
 					<v-icon  v-if="isEditing == true" class="icon-remove-img" @click="removeImage(item)">mdi-close-circle-outline</v-icon>
 				</v-img> 
@@ -26,6 +26,7 @@
 			<div class="text-area-wrapper" v-else>
 					<textarea v-model="inputComment"  
 						v-on:keyup.50="tagUser($event)"
+						v-on:keyup.esc="cancelComment"
 						v-on:keyup.enter="addComment"
 						class="text-area"
 						style="width:100%"
@@ -39,6 +40,22 @@
 			</div>
 		</div>
 		<MenuTagUser ref="menuTagUser" @selected-item="tagged" :keyWord="keyWord" />
+		 <v-dialog
+			v-model="dialog"
+			max-width="80%"
+			max-height="80%"
+			style="overflow-x: hidden"
+		>
+			<v-card>
+			<!-- <v-card-title class="headline">Use Google's location service?</v-card-title> -->
+				<v-icon @click="dialog = false" style="float:right">mdi-close</v-icon>
+				<v-img
+					:src="srcImg"
+					style="width:100%;height:100%"
+				>
+				</v-img>		
+			</v-card>
+		</v-dialog>
 	</div>
 </template>
 <script>
@@ -51,6 +68,8 @@ export default {
 			inputComment: '',
 			keyWord: '',
 			attachments:[],
+			srcImg:'',
+			dialog:false,	
 			tags:[],
 			icon:{
 				xlxs: 'mdi-file-excel-box',
@@ -134,14 +153,40 @@ export default {
 		download(id){
 			commentApi.download(id)
 		},
+		previewImage(item){
+			this.dialog = true
+			this.srcImg = item.serverPath
+		},
 		reduce(content){
-			this.item.tags.forEach(function(e){
-				let name = content.slice(e.tagInfo.offset,e.tagInfo.offset+e.tagInfo.length)
+			let tags = this.item.tags
+			if(tags.length == 1){
+				let name = content.slice(tags[0].tagInfo.offset,tags[0].tagInfo.offset+tags[0].tagInfo.length)
 				let span;
 				span = `<span style="color:red">${name}</span>`
 				let res = content.replace(name,span)
 				content = res
-			})
+			}else if(tags.length >1){
+				let offSet = []
+				let lengthTag = []
+				tags.forEach(function(e){
+					offSet.push(e.tagInfo.offset)
+					lengthTag.push(e.tagInfo.length)
+				})
+				if(!offSet.includes(0)){
+					offSet.unshift(0)	
+				}
+				offSet.push(lengthTag[lengthTag.length - 1]+offSet[offSet.length-1]+1)
+				let arr = []
+				for(let i =0 ; i< offSet.length-1;i++){
+					let name = content.slice(offSet[i],offSet[i+1] -1)
+					if(offSet.includes(offSet[i])){
+						name = `<span style="color:red">${name}</span>`
+					}
+					arr.push(name)
+				}
+				// console.log(arr);
+				content = arr.join(' ')
+			}
 			return content
 		},
 		cancel(){
@@ -154,7 +199,6 @@ export default {
 			this.dataPostComment.tags = this.tags
 			if(this.isAdd == true){
 				let data = JSON.stringify(this.dataPostComment)
-				debugger
 				commentApi.addComment(data).then(res => {
 					setTimeout(function(){}, 1000);
 					this.$store.commit('comment/updateParentCommentTarget',0)

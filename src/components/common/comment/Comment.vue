@@ -1,10 +1,8 @@
 <template>
-	<div class="symper-comment">
+	<div class="symper-comment" :style="{height:heightComment}">
 		<v-card 
 			 v-show="showComment"
-			 :width="widthComment"
-			:height="heightComment"
-			:style="{top:top+'px',left:left+'px'}"
+			 :style="{top:top+'px',left:left+'px',height:'inherit'}"
 		>
 			<v-toolbar
 				flat
@@ -43,7 +41,7 @@
 				:key="item.value"
 				>
 				<v-card flat>
-					<list-comment  :listComment="listComment" :searchItem="searchItem"/>
+					<list-comment  :listComment="listComment" :searchItem="searchItem" />
 				</v-card>
 				</v-tab-item>
 			</v-tabs-items>
@@ -141,7 +139,7 @@ export default {
 		  */
         heightComment: {
             type: String,
-            default: "800px"
+            default: "100%"
 		},
 		 /**
 		  * truyen vao vi tri comment

@@ -1,11 +1,9 @@
 <template>
-    <div>
+    <div class="h-100">
         <Comment 
             :showComment="true" 
             :objectIdentifier="originData.id"
             :objectType="'task'"
-            :height="'100%'"
-            :width="'100%'"
         />
     </div>
 </template>
@@ -28,8 +26,6 @@ export default {
         }
     },
     mounted(){
-        console.log(this.originData,'taskkkkkkkkkkkkkkkkkkkkkkkkkkk');
-        debugger
     }
 }
 </script>

@@ -40,7 +40,8 @@
 				</div>
 				<div style="display:flex;font-size:11px"> 
 					<span class="btn-reply-comment" @click="replyComment(item)">Trả lời </span>
-					<span style="padding-left:8px">{{lassSeen(item.updatedAt)}}</span>
+					<span style="padding-left:8px">{{lassSeen(item.createdAt)}}</span>
+					<span v-if="item.createdAt != item.updatedAt" style="padding-left:8px;cursor:pointer"> Edited</span>
 				</div>
 
 			</div>
@@ -55,7 +56,7 @@
 			</commentItem>
 			<div class="reply-comment"  v-if="item.reply && item.parentId == '0'">
 				<SymperAvatar :size="30" :userId="item.userId" style="margin-left:14px" />
-				<div style="padding-left:8px;width:100%">
+				<div style="padding-left:8px;width:98%">
 					<InputComment  :isEditing="true" :images="[]" :files="[]" :isAdd="true" />
 				</div>
 			</div>

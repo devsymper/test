@@ -137,7 +137,7 @@
 			</div>
 		</VuePerfectScrollbar>
 	</div>
-	<Comment ref="commentView"/>
+	<Comment ref="commentView" :objectIdentifier="documentObjectId"/>
 
 	</v-navigation-drawer>
 </template>
@@ -155,6 +155,11 @@ export default {
 		 VuePerfectScrollbar,
 		 Comment
 	},
+	computed:{
+		countCommentNotResolve(){
+			return this.$store.state.comment.listAvtiveComment.length
+		}
+	},
 	data () {
 		return {
 			isShow:false,
@@ -169,7 +174,7 @@ export default {
                 {date:'18/08/2020 11:20', userUpdate:'Nguyễn Đình Hoang', historyid:2, controls:[{id:'s-control-id-1596780634836',data:[]},{id:'s-control-id-1596780602772',data:[]},{id:'s-control-id-1596780611212',data:[]}]},
                 {date:'18/08/2020 11:20', userUpdate:'Nguyễn Đình Hoang', historyid:1, controls:[{id:'s-control-id-1596780602772',data:[]}]},
 			],
-			countCommentNotResolve:0
+			// countCommentNotResolve:0
 		}
 	},
 	props:{
