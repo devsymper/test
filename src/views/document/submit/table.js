@@ -657,9 +657,6 @@ export default class Table {
                             });
                         }
                     } else {
-
-                        // let dataInput = this.getDataInputForFormulas(formulasInstance, controlInstance.name);
-                        // this.handlerRunFormulasForControlInTable('formulas', controlInstance, dataInput, formulasInstance);
                         SYMPER_APP.$evtBus.$emit('run-formulas-control-outside-table', {
                             formulasInstance: formulasInstance,
                             controlName: control
@@ -678,8 +675,8 @@ export default class Table {
             let inputControl = formulasInstance.getInputControl();
             let dataInput = {};
             let listInputInDocument = this.getListInputInDocument();
-            console.log('listInputInDocumentlistInputInDocument', sDocument.state.submit[this.keyInstance]);
             for (let inputControlName in inputControl) {
+                console.log(inputControlName, 'inputControlNameinputControlName', listInputInDocument);
                 dataInput[inputControlName] = listInputInDocument[inputControlName].value;
                 // if (valueInputControlItem === false) {
 
@@ -714,6 +711,7 @@ export default class Table {
                 for (let control in dataInput) {
                     let controlType = getControlType(thisObj.keyInstance, control);
                     let dataRow = dataInput[control];
+                    console.log('dataRowdataRow', dataRow);
                     if (!Array.isArray(dataRow)) {
                         for (let index = 0; index < listIdRow.length; index++) {
                             if (allRowDataInput.length <= index) {
@@ -759,6 +757,7 @@ export default class Table {
                         }
                     }
                 }
+                console.log("sadasdsavalue", allRowDataInput);
 
                 for (let index = 0; index < allRowDataInput.length; index++) {
                     let rowInput = allRowDataInput[index];

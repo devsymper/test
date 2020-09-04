@@ -107,14 +107,16 @@ export const setDataForPropsControl = function(fields, instance, from) {
                             colValue[controlName].push(rowData[controlName]);
                         }
                     }
+                    listChildField[childFieldId] = {
+                        id: childId,
+                        properties: childProperties,
+                        formulas: childFormulas,
+                        type: childType,
+                        prepareData: childPrepareData,
+                        value: colValue[controlName]
+                    }
                 }
-                listChildField[childFieldId] = {
-                    id: childId,
-                    properties: childProperties,
-                    formulas: childFormulas,
-                    type: childType,
-                    prepareData: childPrepareData
-                }
+
                 i++;
             }
             colValue['childObjectId'] = childObjectId;

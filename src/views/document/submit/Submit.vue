@@ -1057,6 +1057,8 @@ export default {
                                 let childControlProp = thisCpn.sDocumentEditor.allControl[id].listFields[childControlId];
                                 childControlProp.properties.inTable = controlName;
                                 childControlProp.properties.docName = thisCpn.documentName;
+                                let childValue = childControlProp.value;
+                                console.log('childControlProp',childControlProp);
                                 let childPrepareData = childControlProp.prepareData
                                 if(childPrepareData != null && childPrepareData != ""){
                                     isSetEffectedControl = true;
@@ -1066,7 +1068,8 @@ export default {
                                     idFieldChild,
                                     $(this),
                                     childControlProp,
-                                    thisCpn.keyInstance
+                                    thisCpn.keyInstance,
+                                    childValue
                                 );
                                 childControl.init();
                                 childControl.setEffectedData(childPrepareData);
@@ -1425,11 +1428,11 @@ export default {
                 if(listInput[i].type == 'number'){
                     for (let index = 0; index < dataCol.length; index++) {
                         const element = dataCol[index];
-                        if(isNaN(parseInt(element))){
+                        if(isNaN(Number(element))){
                             dataCol[index] = 0;
                         }
                         else{
-                            dataCol[index] = parseInt(element);
+                            dataCol[index] = Number(element);
                         }
                     }
                 }
