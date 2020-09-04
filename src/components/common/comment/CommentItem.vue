@@ -3,7 +3,7 @@
 		<div :item="item"  class="commnent-item-wrapper" :style="{width:width}">
 		<v-icon v-if="item.parentId == '0' && item.status == 0" class="icon-check" @click="resolveComment(item)" style="float:right">mdi-check-outline</v-icon>
 		<v-icon v-if="item.parentId == '0' && item.status == 1" class="icon-check" @click="unresolveComment(item)" style="float:right">mdi-comment-arrow-left-outline</v-icon>
-				<SymperAvatar :size="30" :userId="item.userId" style="margin-left:12px" />
+				<SymperAvatar :size="30" :userId="item.userId" style="margin-left:12px;margin-top:4px" />
 			<div class="comment-item-content">
 				<div style="display:flex;height:16px;width:100%">
 						<span style="color:#00000099">{{item.infor.fullName}}</span>

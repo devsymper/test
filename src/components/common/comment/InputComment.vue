@@ -350,7 +350,13 @@ export default {
 .content-comment >>> .text-area-wrapper{
 	display: flex;
 	position: relative;
-	background-color: #f7f7f7;
+	background-color: #EEEEEE;
 	width: 100% !important;
+}
+.content-comment .text-area-wrapper textarea:focus{
+	outline: none;
+}
+.content-comment .text-area-wrapper textarea{
+	padding: 8px;
 }
 </style>

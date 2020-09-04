@@ -12,6 +12,8 @@
 			>
 				<v-toolbar-title>Bình luận</v-toolbar-title>
 					<v-icon>mdi-comment-text-outline</v-icon>
+					<v-spacer></v-spacer>
+					<v-icon @click="showComment = false">mdi-close-outline</v-icon>
 				<template v-slot:extension>
 				<v-tabs
 					v-model="tab"
