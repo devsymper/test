@@ -46,13 +46,14 @@
                             :max-height="700"
        				   	    :nudge-width="370"
                             offset-y
+                            style="z-index:1000"
                             >
                             <template v-slot:activator="{ on }">
                                 <v-btn icon v-on="on">
                                     <v-icon>mdi-apps</v-icon>
                                 </v-btn>
                             </template>
-                            <EndUserPopup  />
+                            <EndUserPopup style="z-index:1000 !important"  />
 							<!-- <div>hello</div> -->
                         </v-menu>
                         <v-btn icon @click="showSearchInput = !showSearchInput">
@@ -115,7 +116,6 @@ export default {
             if(index !== undefined){
                 let urlKey = Object.keys(this.tabUrlItems)[index];
                 let urlInfo = this.tabUrlItems[urlKey];
-
                 if(urlInfo.routeName == this.$route.name){
                     this.$router.push({
                         name: 'symperHiddenRedirectComponent',

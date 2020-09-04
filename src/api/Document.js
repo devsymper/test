@@ -69,5 +69,9 @@ export const documentApi = {
 
     saveForm(data) {
         return coreApi.post("documents/forms", data);
-    }
+    },
+    searchListDocuments(filter) {
+        return coreApi.get('documents', filter);
+    },
+
 };

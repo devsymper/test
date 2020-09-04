@@ -23,4 +23,7 @@ export const commentApi = {
 	editComment(data) {
 		return coreApi.put('comment', data)
 	},
+	download(id){
+        window.open('https://file.symper.vn/downloadS/'+id,'_blank');
+    }
 };

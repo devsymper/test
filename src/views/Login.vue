@@ -1,4 +1,4 @@
-<template>
+ <template>
     <v-flex xs12 sm8 md4>
         <v-card class="elevation-6">
             <v-toolbar flat>
@@ -84,6 +84,7 @@ export default {
             checkingUser: false,
             valid: true,
             email: "",
+            // dinhnv@symper.vn
             password: "",
             // email: "dinhnv@symper.vn",
             // password: "Damthatbai@2010",

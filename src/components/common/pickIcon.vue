@@ -1,5 +1,5 @@
 <template>
-    <div class="pick-icon"> 
+    <div class="pick-icon" > 
         <v-menu offset-x
             :close-on-content-click="false"
             light
@@ -305,20 +305,21 @@ export default {
 </script>
 
 <style scoped>
-/* .pick-icon{
+.pick-icon >>> .v-menu__content{
 	overflow: hidden;
-} */
-    .sym-small-size >>> .v-input__slot,
-    .sym-small-size >>> .v-input__control{
-        background: #f5f5f5 !important;
-    }
-    .single-icon {
-        cursor: pointer;
-    }
-    .single-icon:hover{
-        background-color: #f5f5f5;
-    }
-    .v-menu__content {
-        background: #fff;
-    }
+}
+.sym-small-size >>> .v-input__slot,
+.sym-small-size >>> .v-input__control{
+	background: #f5f5f5 !important;
+}
+.single-icon {
+	cursor: pointer;
+}
+.single-icon:hover{
+	background-color: #f5f5f5;
+}
+.v-menu__content {
+	background: #fff;
+	overflow: hidden;
+}
 </style>

@@ -286,17 +286,13 @@ export default {
                 beforeContextMenuSetItems: () => {
                 },
                 beforeOnCellMouseOver: (event, coords, TD, controller) => {
-                    console.log(event, coords);
-                    self.cellAboutSelecting = coords;
-
-                     let row = self.$refs.dataTable.hotInstance.getSourceDataAtRow(self.cellAboutSelecting.row);
-                    let id = row.id;
-                    let items = self.tableContextMenu;
-                    if(!$.isArray(items)){
-                        let objectType = self.commonActionProps.resource;
-                        items = actionHelper.filterAdmittedActions(items, objectType, id);
+                    this.cellAboutSelecting = coords;
+                    if(this.debounceRelistContextmenu){
+                        clearTimeout(this.debounceRelistContextmenu);
                     }
-                    self.hotTableContextMenuItems =  self.getItemContextMenu(items);
+                    this.debounceRelistContextmenu = setTimeout((self) => {
+                        self.relistContextmenu();
+                    }, 200, this);
                 }
             },
             tableFilter: {
@@ -561,6 +557,17 @@ export default {
         }
     },
     methods: {
+        relistContextmenu(){
+            let row = this.$refs.dataTable.hotInstance.getSourceDataAtRow(this.cellAboutSelecting.row);
+            let id = row.id;
+            let items = this.tableContextMenu;
+            if(!$.isArray(items)){
+                let objectType = this.commonActionProps.resource;
+                let parentId = this.commonActionProps.parentId ? this.commonActionProps.parentId : id;
+                items = actionHelper.filterAdmittedActions(items, objectType, parentId ,id);
+            }
+            this.hotTableContextMenuItems =  this.getItemContextMenu(items);
+        },
         getItemContextMenu(rawItems) {
             let thisCpn = this;
             let contextMenu = {

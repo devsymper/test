@@ -49,6 +49,12 @@
             :idApplication="focusingIdApplication"
             @app-detail-get="translateAppObjectIdToTableData" />
 
+        <DocumentInstanceOperation 
+            v-if="allInputs.objectType.value == 'document_definition'"
+            :tableDataDefinition="multipleLevelObjects.document_definition"
+            :commonTableSetting="commonTableSetting"
+            :tableHeight="tableHeight - 32"/>
+
         <div class="mt-2" v-if="action != 'view' ">
             <v-btn
                 class="float-right mr-1"
@@ -72,6 +78,8 @@ import CustomSelect from ".././HandsonCustomSelect";
 import { permissionApi } from '../../../api/permissionPack';
 import { permissionPackageApi } from '../../../api/PermissionPackage';
 import ObjectInApplication from "./ObjectInApplication";
+import DocumentInstanceOperation from "./DocumentInstanceOperation";
+
 let defaultTabConfig = {
     tableData: [],
     columns: [],
@@ -84,6 +92,16 @@ const actionForObjectType = {
     list: true
 };
 
+let commonTableSetting = {
+    // các setting cho handsontable
+    filters: true,
+    manualColumnMove: true,
+    manualColumnResize: true,
+    manualRowResize: true,
+    stretchH: "all",
+    rowHeaders: true,
+    licenseKey: "non-commercial-and-evaluation",
+}
 export default {
     mounted(){
         this.reCaculateTableHeight();
@@ -91,6 +109,44 @@ export default {
     created(){
     },
     methods: { 
+        caculateTableDataForAllInstancesDocDef(rowsOfDocDefs){
+            let operationForInstancesOfDocDef = this.multipleLevelObjects.document_definition.savedOpsForAllInstancesDocDef;
+            operationForInstancesOfDocDef = operationForInstancesOfDocDef ? operationForInstancesOfDocDef : [];
+            let dataTable = util.cloneDeep(rowsOfDocDefs);
+            for(let docId in dataTable){
+                for(let action in dataTable[docId]){
+                    if(action != 'object'){
+                        dataTable[docId][action] = false;
+                    }
+                }
+            }
+
+            for(let op of operationForInstancesOfDocDef){
+                dataTable[op.documentId][op.action] = true;
+            }
+            this.multipleLevelObjects.document_definition.tableData = Object.values(dataTable);
+        },
+        setRowsForAllInstancesDocDef(operationForInstancesOfDocDef, rowsOfDocDefs){
+            this.multipleLevelObjects.document_definition.savedOpsForAllInstancesDocDef = operationForInstancesOfDocDef;
+            this.caculateTableDataForAllInstancesDocDef(rowsOfDocDefs);
+        },
+        genDocumentInstanceOperations(){
+            let docDefs = this.itemData.mapActionAndObjects['document_definition'];
+            let initDocObjDataTable = {};
+            let schema = this.getDataSchema('document_instance', false);
+
+            for(let row of docDefs){
+                let key = row['object'];
+                if(key){
+                    let id = key.slice(0, key.indexOf(' -'));
+                    let newRow = util.cloneDeep(schema);
+                    newRow.object = row.object;
+                    initDocObjDataTable[id] = newRow;
+                }
+            }
+            // this.multipleLevelObjects.document_definition.tableData = initDocObjDataTable;
+            this.caculateTableDataForAllInstancesDocDef(initDocObjDataTable);
+        },
         objectTypeToDocumentDefinition(){
             // debugger
             // this.itemData.objectType = 'document_definition'
@@ -255,6 +311,15 @@ export default {
                 appDef[key].dataSchema = this.getDataSchema(key);
             }
         },
+        setConfigForDocumentInstanceOperations(){
+            let docObjDef = this.multipleLevelObjects.document_definition;
+            let key = 'document_instance';
+
+            docObjDef.columns = this.getTableColumns(key);
+            this.$set(docObjDef.columns[0],'readOnly',true);
+            docObjDef.colHeaders = ['Documents'].concat(this.getColumnHeadersFromAction(['create'], key));
+            docObjDef.dataSchema = this.getDataSchema(key, false);
+        },
         triggerRerenderTable(){
             setTimeout((self) => {
                 if(self.$refs.dataTable){
@@ -266,7 +331,7 @@ export default {
                 }
             }, 2000, this);
         },
-        getDataSchema(objectType = null){
+        getDataSchema(objectType = null, defaultValue = true){
             if(!objectType){
                 objectType = this.allInputs.objectType.value;
             }
@@ -275,7 +340,7 @@ export default {
             };
             if(this.listAction[objectType]){
                 for(let actionKey in this.listAction[objectType]){
-                    schema[actionKey] = true;
+                    schema[actionKey] = defaultValue;
                 }
             }
             return schema;
@@ -324,6 +389,8 @@ export default {
             let h = util.getComponentSize(this).h - util.getComponentSize(this.$refs.comonAttr).h - 180;
             if(this.allInputs.objectType.value == 'application_definition'){
                 h = h*2/3;
+            }else if(this.allInputs.objectType.value == 'document_definition'){
+                h = h/2;
             }
             this.tableHeight = h;
         },
@@ -419,6 +486,44 @@ export default {
             }, {});
             return Object.values(opMap);
         },
+
+
+        /**
+         * Tạo operation cho tất cả document instance trong màn hình cấu hình action cho các document definition
+         */
+        getOperationForAllDocInstance(){
+            let objectType = 'document_instance';
+            let dataTable = this.multipleLevelObjects.document_definition.tableData
+            let newOperations = [];
+            let rowSchema = this.getDataSchema(objectType);
+            delete rowSchema.object;
+
+            for (let row of dataTable) {
+                let key = row['object'];
+                let id = '';
+                if(key){
+                    id = key.slice(0, key.indexOf(' -'));
+                    id = id.trim();
+                }
+
+                if(id){
+                    for(let actionName in row){
+                        if(actionName == 'object' || !rowSchema.hasOwnProperty(actionName)){
+                            continue
+                        }
+                        if(row[actionName]){
+                            newOperations.push({
+                                objectType: objectType,
+                                action: actionName,
+                                objectIdentifier: `${objectType}:${id}:0`,
+                                name: actionName.replace(/_/g, ' ') + ' for all instance of document definition ' + id
+                            });
+                        }
+                    }
+                }
+            }
+            return newOperations;
+        },
         getNewOperationData(){
             let newOperations = [];
             let allResource = this.$store.state.actionPack.allResource;
@@ -426,10 +531,13 @@ export default {
                 let dataTable = this.itemData.mapActionAndObjects[objectType];
                 newOperations = newOperations.concat(this.getOperationToSaveFromDataTable(dataTable, allResource, objectType));
             }
+            
             for(let objectType in this.multipleLevelObjects.application_definition){
                 let dataTable = this.multipleLevelObjects.application_definition[objectType].tableData;
                 newOperations = newOperations.concat(this.getOperationToSaveFromDataTable(dataTable, allResource, objectType));
             }
+
+            newOperations = newOperations.concat(this.getOperationForAllDocInstance());
             newOperations = this.removeDuplicateOperations(newOperations);
 
             for(let objectType in this.itemData.mapActionForAllObjects){
@@ -438,7 +546,7 @@ export default {
 
                 if(allResource.hasOwnProperty(objectType)){
                     for(let actionName in row){
-                        let objectIdentifier = actionForObjectType[actionName] ? objectType : (objectType+':0');
+                        let objectIdentifier = actionForObjectType[actionName] ? objectType : (objectType + ':0' );
                         if(row[actionName]){
                             newOperations.push({
                                 objectType: objectType,
@@ -588,16 +696,6 @@ export default {
     },
     data(){
         let self = this;
-        let commonTableSetting = {
-            // các setting cho handsontable
-            filters: true,
-            manualColumnMove: true,
-            manualColumnResize: true,
-            manualRowResize: true,
-            stretchH: "all",
-            rowHeaders: true,
-            licenseKey: "non-commercial-and-evaluation",
-        }
         return {
             tableHeight: 200,
             isEditingCell : false,
@@ -619,8 +717,13 @@ export default {
                         this.alter('insert_row', lastIndex + 1, 1, 'add_row_on_enter');
                     }
                     setTimeout(function() {
+                        let objectType = self.allInputs.objectType.value;
                         htIst.selectCell(lastIndex, htIst.propToCol(changes[0][1]));
-                        self.itemData.mapActionAndObjects[self.allInputs.objectType.value] = htIst.getSourceData();
+                        self.itemData.mapActionAndObjects[objectType] = htIst.getSourceData();
+
+                        if(objectType == 'document_definition'){
+                            self.genDocumentInstanceOperations();
+                        }
                     }, 0);
                 },
                 afterSelectionEnd(rowNum	, column, row2 , column2 , preventScrolling, selectionLayerLevel){
@@ -657,7 +760,8 @@ export default {
                     workflow_definition : util.cloneDeep(defaultTabConfig),
                     orgchart : util.cloneDeep(defaultTabConfig),
                     dashboard : util.cloneDeep(defaultTabConfig),
-                }
+                },
+                document_definition: util.cloneDeep(defaultTabConfig),
             },
             focusingIdApplication: 0,
             // Tiêu đề của các cột  cần hiển thị
@@ -670,7 +774,8 @@ export default {
         HotTable,
         CustomSelect,
         HotColumn,
-        ObjectInApplication
+        ObjectInApplication,
+        DocumentInstanceOperation
     },
     props: {
         itemData: {
@@ -735,6 +840,7 @@ export default {
                 this.handleChangeObjectType();
                 if(!$.isEmptyObject(value)){
                     this.setConfigForApplicationObjects();
+                    this.setConfigForDocumentInstanceOperations();
                     this.initAllResource(Object.keys(value));
                 }
             }

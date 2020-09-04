@@ -5,6 +5,7 @@ import {
 
 
 var coreApi = new Api(appConfigs.apiDomain.appManagement);
+var accessControlApi = new Api(appConfigs.apiDomain.operations);
 // var formulasApi = new Api(appConfigs.apiDomain.formulasService)
 export const appManagementApi = {
 	addApp(data) {
@@ -35,5 +36,8 @@ export const appManagementApi = {
 	},
 	getAppDetailBa(id) {
 		return coreApi.get('application-ba/' + id)
-	}
+	},
+	getListObjectIdentifier(data){
+		return accessControlApi.post('objects',data)
+	},
 };

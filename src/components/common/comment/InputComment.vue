@@ -1,34 +1,39 @@
 <template>
 	<div class="content-comment">
-		<div v-if="images.length > 0" class="content-comment-img">
+		<div v-if="images.length > 0"  class="content-comment-img">
 			<div  class="commnet-img-item" v-for="(item,i) in images" :key="i">
 				<v-img
-           			 :src="'http://file.symper.vn/readFile/'+item.serverPath"
+           			 :src="item.serverPath"
+					style="margin-top:auto;margin-bottom:auto"
+					@click="download(item.id)"
          		>
-				 <v-icon  v-if="isEditing == true" class="icon-remove-img"  @click="removeImage(item)">mdi-close-circle-outline</v-icon>
+					<v-icon  v-if="isEditing == true" class="icon-remove-img" @click="removeImage(item)">mdi-close-circle-outline</v-icon>
 				</v-img> 
 			</div>
-		</div>	
+		</div>
 		<div v-if="files.length > 0" class="content-comment-file">
 			<div class="commnet-file-item" v-for="(item,i) in files" :key="i">
 				<v-icon>{{icon[item.type]}}</v-icon>
-				<span class="file-item-title">{{item.name+'.'+item.type}}</span>
+				<span class="file-item-title" @click="download(item.id)">{{item.name+'.'+item.type}}</span>
 				<v-icon class="icon-remove-file" v-if="isEditing == true" @click="removeFile(item)">mdi-close-circle-outline</v-icon>
 			</div>	
 		</div>
 		<div class="content-comment-input">
 			<span v-if="isEditing == false" >
-				<h5 >{{item.content}}</h5>
+				 <h5 v-if="item.tags.length == 0">{{item.content}}</h5>
+				 <h5 v-else v-html="reduce(item.content)"></h5>
 			</span>
 			<div class="text-area-wrapper" v-else>
 					<textarea v-model="inputComment"  
 						v-on:keyup.50="tagUser($event)"
+						v-on:keyup.enter="addComment"
 						class="text-area"
 						style="width:100%"
+						v-on:keyup.down="chooseUser"
 						>
 					</textarea>
-				<UploadFile style="position:absolute;right:16px;bottom: 5px;" @uploaded-file="uploadInfo"/>
-				<v-btn style="position:absolute;right: 0px;bottom: 5px;" icon @click="addComment">
+				<UploadFile style="position:absolute;right:16px;bottom: 0px;" @uploaded-file="uploadInfo" />
+				<v-btn style="position:absolute;right: 0px;bottom: 0px;" icon @click="addComment">
 					<v-icon >mdi-send-circle-outline</v-icon>
 				</v-btn>
 			</div>
@@ -107,35 +112,49 @@ export default {
 		tagUser(event){
 			let $target = $(event.target);
 			var x = $target.offset().left;
-     		var y = $target.offset().top + 80;
+     		var y = $target.offset().top+28;
 			this.$refs.menuTagUser.show(x,y);
 		},
 		tagged(data){
-			let character = this.inputComment.charAt(this.inputComment.length - 1)
-			let res = this.inputComment.replace(character,data.displayName);
+			if(this.item){
+				 this.tags = this.item.tags 
+			}
 			let item = {} 
 			item.objectIdentifier = data.id
 			item.objectType = 'user'
 			let tagInfo = {}
-			tagInfo.offset = this.inputComment.length - 1
+			tagInfo.offset = this.inputComment.indexOf('@')
 			tagInfo.length = data.displayName.length
 			item.tagInfo = tagInfo
 			this.tags.push(item)
-			this.inputComment = res
+			let substr = this.inputComment.slice(0,this.inputComment.indexOf('@'))
+			this.inputComment = substr.concat(data.displayName)
 			
 		},
+		download(id){
+			commentApi.download(id)
+		},
+		reduce(content){
+			this.item.tags.forEach(function(e){
+				let name = content.slice(e.tagInfo.offset,e.tagInfo.offset+e.tagInfo.length)
+				let span;
+				span = `<span style="color:red">${name}</span>`
+				let res = content.replace(name,span)
+				content = res
+			})
+			return content
+		},
+		cancel(){
+			this.$emit('cancel-reply')
+		},
 		addComment(){
-			if(this.item){
-				this.item.tags = this.tags
-			}
 			this.dataPostComment = this.sComment
 			this.dataPostComment.content = this.inputComment
 			this.dataPostComment.attachments = this.attachments
 			this.dataPostComment.tags = this.tags
-			console.log(this.tags);
-			debugger
 			if(this.isAdd == true){
 				let data = JSON.stringify(this.dataPostComment)
+				debugger
 				commentApi.addComment(data).then(res => {
 					setTimeout(function(){}, 1000);
 					this.$store.commit('comment/updateParentCommentTarget',0)
@@ -156,6 +175,7 @@ export default {
 			this.$store.commit('comment/updateReplyStatus',false)
 		},
 		uploadInfo(data){
+			debugger
 			if(typeof data === 'string'){
 				alert(data)
 			}else{
@@ -170,8 +190,8 @@ export default {
 		updateComment(){
 			if(this.sComment.uuid == "0"){
 				commentApi.getCommentById(this.sComment.objectType,this.sComment.objectIdentifier).then(res => {
-					this.$store.commit('comment/updateListAvtiveComment',res.data.listObject.comments)
-					this.$store.commit('comment/updateListResolve',res.data.listObject.resolve)
+					this.$store.commit('comment/updateListAvtiveComment',this.addAvatar(res.data.listObject.comments))
+					this.$store.commit('comment/updateListResolve',this.addAvatar(res.data.listObject.resolve))
 					if(this.$store.state.comment.currentTab == 'comment'){
 						this.$store.commit('comment/setComment')
 					}else{
@@ -180,8 +200,8 @@ export default {
 				});
 			}else{
 				commentApi.getCommentByUuid(this.sComment.objectType,this.sComment.objectIdentifier,this.sComment.uuid).then(res => {
-					this.$store.commit('comment/updateListAvtiveComment',res.data.listObject.comments)
-					this.$store.commit('comment/updateListResolve',res.data.listObject.resolve)
+					this.$store.commit('comment/updateListAvtiveComment',this.addAvatar(res.data.listObject.comments))
+					this.$store.commit('comment/updateListResolve',this.addAvatar(res.data.listObject.resolve))
 					if(this.$store.state.comment.currentTab == 'comment'){
 						this.$store.commit('comment/setComment')
 					}else{
@@ -189,7 +209,45 @@ export default {
 					}
 				});
 			}
-		}
+		},
+		chooseUser(){
+			this.$refs.menuTagUser.chooseUser()
+		},
+		addAvatar(data){
+			let mapIdToUser = this.$store.getters['app/mapIdToUser'];
+			if(typeof data !== 'undefined'){
+				data.forEach(function(e){
+					if(!isNaN(e.userId)){
+						let itemInfor = mapIdToUser[e.userId];
+						let infor = {}
+						if(itemInfor.hasOwnProperty('avatar')){
+							infor.avatar = itemInfor.avatar
+						}
+						if(itemInfor.hasOwnProperty('displayName')){
+							infor.fullName = itemInfor.displayName
+						}
+						e.infor = infor	
+					}
+					if(e.hasOwnProperty('childrens') && e.childrens.length > 0){
+						e.childrens.forEach(function(k){	
+							if(!isNaN(k.userId)){
+								let itemInforChild = mapIdToUser[k.userId];
+								let inforChild = {}
+								if(itemInforChild.hasOwnProperty('avatar')){
+									inforChild.avatar = itemInforChild.avatar
+								}
+								if(itemInforChild.hasOwnProperty('displayName')){
+									inforChild.fullName = itemInforChild.displayName
+								}
+								k.infor = inforChild
+							}
+						})
+					}
+				})
+			}
+			return data
+		},
+
 	},
 	computed:{
 		itemTags(){
@@ -218,6 +276,13 @@ export default {
 			if(val != ''){
 				this.inputComment = val
 			}
+		},
+		isEditing(val){
+			if(val == true){
+				if(this.item){
+					 this.tags = this.item.tags 
+				}
+			}
 		}
 	}
 }	
@@ -227,7 +292,7 @@ export default {
 .content-comment{
 	display:flex;
 	flex-direction: column;
-	width: 100%;
+	width: 100% !important;
 }
 .content-comment >>> .v-icon{
 	font-size:13px;	
@@ -236,9 +301,11 @@ export default {
 	display:flex;
 }
 .content-comment >>> .commnet-img-item{
-	width: 30px;
-	height: 30px;
+	width: 80px;
+	height: 50px;
 	margin: 0px 4px 0px 0px;
+	display: flex;
+    align-items: center;
 }
 .content-comment >>> .commnet-img-item .icon-remove-img{
 	font-size: 13px;
@@ -254,20 +321,19 @@ export default {
 	display: flex;
 }
 .content-comment >>> .content-comment-file .commnet-file-item .file-item-title{
-	padding: 0px 0px 4px 4px;
+	padding: 2px 0px 4px 4px;
 	flex-grow: 1;
 	cursor: pointer;
-	
 }
 .content-comment >>> .content-comment-file .commnet-file-item .file-item-title:hover{
 	color: #E88F15CC;
-	border-bottom: 1px solid #E88F15CC;
 }
 .content-comment >>> .content-comment-file .commnet-file-item .icon-remove-file{
 	float: right;
 }
 .content-comment >>>  .content-comment-input{
 	padding: 0px 0px 4px 0px;
+	width: 100%;
 }
 .content-comment >>>  .content-comment-input h5{
 	overflow: hidden;
@@ -275,7 +341,7 @@ export default {
 	display: -webkit-box;
 	-webkit-line-clamp: 20;
 	-webkit-box-orient: vertical;
-	width:265px;
+	width:94%;
 	font:13px roboto
 }
 .content-comment >>> .content-comment-file .v-icon{
@@ -285,7 +351,6 @@ export default {
 	display: flex;
 	position: relative;
 	background-color: #f7f7f7;
-	width: 100%;
+	width: 100% !important;
 }
-
 </style>

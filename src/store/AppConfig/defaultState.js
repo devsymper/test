@@ -1,27 +1,28 @@
 const defaultState = {
+	listFavorite: [],
 	listItemSelected: {
-		documents: {
+		document_definition: {
 			icon: 'mdi-file-edit-outline',
 			title: 'Documents',
-			name: 'documents',
+			name: 'document_definition',
 			item: []
 		},
-		orgcharts: {
+		orgchart: {
 			icon: 'mdi-widgets-outline',
 			title: 'Orgcharts',
-			name: 'orgcharts',
+			name: 'orgchart',
 			item: []
 		},
-		reports: {
+		dashboard: {
 			icon: 'mdi-view-dashboard',
 			title: 'Reports',
-			name: 'reports',
+			name: 'dashboard',
 			item: []
 		},
-		workflows: {
+		workflow_definition: {
 			icon: 'mdi-lan',
 			title: 'Workflows',
-			name: 'workflows',
+			name: 'workflow_definition',
 			item: []
 		},
 	}
