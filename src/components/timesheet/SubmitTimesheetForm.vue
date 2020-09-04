@@ -4,20 +4,21 @@
     primary-title style="padding-bottom: 22px">
         <div 
         style="border-bottom: 1px solid lightgrey!important; width: 370px; padding-bottom: 10px;font-size: 18px!important">
-        {{$t('common.submit_timesheet_form')}}</div>
+        {{$t('timesheet.submit_timesheet_form')}}</div>
     </v-card-title>
     <v-card-text style="color: black;font-size: 13px">
-        {{$t('common.period')}}: {{startEndDate}} 
+        {{$t('timesheet.period')}}: <span style="font-weight:430">{{startEndDate.slice(0,8)}}</span> đến <span style="font-weight:430">{{startEndDate.slice(11,19)}}</span>
     </v-card-text>
     <v-card-text style="color: black;font-size: 13px">
-        {{$t('common.hours_logged')}}: {{hours}}
+        {{$t('timesheet.hours_logged')}}: {{hours}}
     </v-card-text>
     <v-card-text style="color: black;font-size: 13px">
-        {{$t('common.hours_required')}}: {{hoursRequired}}
+        {{$t('timesheet.hours_required')}}: {{hoursRequired}}
     </v-card-text>
     <v-card-text style="color: black;font-size: 13px">
-        {{$t('common.reviewer')}}
+        {{$t('timesheet.reviewer')}}
         <v-select class="select-reviewer" 
+        v-model = 'reviewerSubmit'
         :items="reviewer.name" item-color="white" 
         background-color="#F7F7F7" :menu-props="{'nudge-top':-40}">
         </v-select>
@@ -29,11 +30,12 @@
             <v-btn 
                 style="float:right; margin-right:15px" 
                 @click="cancel()">
-                {{$t('common.cancel')}}
+                {{$t('timesheet.cancel')}}
             </v-btn>
             <v-btn 
+            @click="submit()"
             color="primary" 
-            style="float:right; margin-right:15px;">{{$t('common.submit')}}</v-btn>
+            style="float:right; margin-right:15px;">{{$t('timesheet.submit')}}</v-btn>
         </div>
     </v-card-actions>
 </v-card>
@@ -45,6 +47,7 @@ export default {
         return {
             dialog: false,
             view: ['task', 'label', 'category task'],
+            reviewerSubmit:'',
             reviewer: {
                 name: ["Thắng Nguyễn", "Dinh Nguyễn"],
                 icon: ['1', '2'],
@@ -53,6 +56,11 @@ export default {
     },
     props:['hours'],
     methods: {
+        submit(){
+            if(this.reviewerSubmit==""){ alert("Vui lòng chọn người duyệt")}else{
+                 alert("submit thành công");
+            }
+        },
         cancel() {
             this.$emit('cancel');
         }

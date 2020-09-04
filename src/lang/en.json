@@ -502,7 +502,8 @@
                 "update":"Update",
                 "drop":"Drop",
                 "list":"List",
-                "detail":"Detail"
+                "detail":"Detail",
+                "unfavorite": "Remove favorite"
             },
             "document_definition":{
                 "create":"Create document",
@@ -512,7 +513,8 @@
                 "restore":"Restore",
                 "list":"List",
                 "list_trash":"List trash",
-                "list_instance":"List instance"
+                "list_instance":"List instance",
+                "unfavorite": "Remove favorite"
             },
             "workflow_definition":{
                 "list":"List",
@@ -521,14 +523,16 @@
                 "drop":"Delete",
                 "update":"Update",
                 "list_instance":"List instance",
-                "start_instance":"Start instance"
+                "start_instance":"Start instance",
+                "unfavorite": "Remove favorite"
             },
             "dashboard":{
                 "create":"Create dashboard",
                 "update":"Update",
                 "view":"View",
                 "list":"List",
-                "drop":"Delete"
+                "drop":"Delete",
+                "unfavorite": "Remove favorite"
             }
         },
         "iconListActions":{
@@ -537,7 +541,8 @@
                 "update":"mdi-note-plus-outline",
                 "drop":"mdi-arrow-down-drop-circle-outline",
                 "list":"mdi-clipboard-list-outline",
-                "detail":"mdi-details"
+                "detail":"mdi-details",
+                "unfavorite": "mdi-star-off"
             },
             "document_definition":{
                 "create":"mdi-folder-plus-outline",
@@ -547,7 +552,8 @@
                 "restore":"mdi-file-restore-outline",
                 "list":"mdi-clipboard-list-outline",
                 "list_trash":"mdi-playlist-remove",
-                "list_instance":"mdi-file-document-multiple-outline"
+                "list_instance":"mdi-file-document-multiple-outline",
+                "unfavorite": "mdi-star-off"
             },
             "workflow_definition":{
                 "list":"mdi-clipboard-list-outline",
@@ -556,14 +562,16 @@
                 "drop":"mdi-arrow-down-drop-circle-outline",
                 "update":"mdi-note-plus-outline",
                 "list_instance":"mdi-file-document-multiple-outline",
-                "start_instance":"mdi-play-outline"
+                "start_instance":"mdi-play-outline",
+                "unfavorite": "mdi-star-off"
             },
             "dashboard":{
                 "create":"mdi-folder-plus-outline",
                 "update":"mdi-note-plus-outline",
                 "view":"mdi-eye-outline",
                 "list":"clipboard-list-outline",
-                "drop":"arrow-down-drop-circle-outline"
+                "drop":"arrow-down-drop-circle-outline",
+                "unfavorite": "mdi-star-off"
             }
         }
     },
@@ -611,8 +619,8 @@
             "rename": "Rename",
             "delete": "Delete",
             "addfavorite": "Add to favorite",
-            "removefavorite": "Remove from favorite"
-
+            "removefavorite": "Remove from favorite",
+            "viewcontent": "View content"
         },
         "table": {
             "totalDoc": "Total document"

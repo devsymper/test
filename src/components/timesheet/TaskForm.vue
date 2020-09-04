@@ -3,11 +3,11 @@
     <v-card-title class="pb-2 pt-2 headline lighten-2" 
     primary-title>
         <div class="w-100 pb-1" style=" font-size: 18px; border-bottom: 1px solid lightgrey;">
-            {{$t('common.task_form')}}
+            {{$t('timesheet.task_form')}}
             </div>
     </v-card-title>
     <v-card-text  v-bind:style="cateError? 'height:80px' :'height:60px'" class="mt-1 h-65" >
-        <span class="label pt-2 ">{{$t('common.category_task')}}<span style="color:red"> *</span></span>
+        <span class="label pt-2 ">{{$t('timesheet.category_task')}}<span style="color:red"> *</span></span>
         <v-autocomplete 
          v-bind:style="cateError? 'margin-bottom:4px' :''"
             style="margin-top:2px!important; " 
@@ -20,7 +20,7 @@
             background-color="#F7F7F7">
             <template v-slot:item="data" class="category-task">
                 <!-- <img style='max-height: 40px; max-width: 30px; margin-right:5px' 
-             -->
+                :src="require('../../assets/icon/AD-IT.png')" /> -->
             <span style='color:black' >{{ data.item }}
                 <v-icon v-if="data.item === categoryTask " color="success">
                 mdi-check</v-icon></span>
@@ -31,9 +31,9 @@
         </div>
     </v-card-text>
     <v-card-text v-bind:style="nameError? 'height:80px' :'height:60px'">
-        <span class="label pt-2"> {{$t('common.name')}}<span style="color:red"> *</span></span>
+        <span class="label pt-2"> {{$t('timesheet.name')}}<span style="color:red"> *</span></span>
         <div>
-            <input type="text" v-model= "name" class="w-100 input-logform"
+            <input type="text" placeholder="Tên ..." v-model= "name" class="w-100 input-logform"
             v-bind:style="nameError? 'margin-bottom:4px' :''">
         </div>
         <div class="w-100 mb-5" style="height:20px">
@@ -54,9 +54,12 @@
             :menu-props="{'nudge-top':-10, 'max-width': 300}" 
             label="Chọn người được giao việc">
                 <template v-slot:item="data">
-                    <v-list-item-avatar>
+                     <SymperAvatar class="mr-2" style ="height: 30px!important; width: 30px!important;min-width: 30px!important" :userId="data.item.id"/>
+                    <!-- </v-list-item-avatar> -->
+                    <!-- <v-list-item-avatar>
+                        {{data.item}}
                       <img :src="data.item.avatar|| require('@/assets/image/avatar_default.jpg')">
-                    </v-list-item-avatar>
+                    </v-list-item-avatar> -->
                     <v-list-item-content>
                       <v-list-item-title >{{data.item.displayName}}</v-list-item-title>
                       <v-list-item-subtitle class="fs-11 color-grey" >{{data.item.email}}</v-list-item-subtitle>
@@ -66,7 +69,7 @@
         </v-autocomplete>
     </v-card-text>
     <v-card-text>
-        <span class="label pt-2">{{$t('common.description')}}</span>
+        <span class="label pt-2">{{$t('timesheet.description')}}</span>
         <textarea class='pl-3' style="background-color:#F7F7F7"
          rows="4" cols="44" v-model= "desc"></textarea>
     </v-card-text>
@@ -77,9 +80,9 @@
     <v-card-actions class="pb-5">
         <div class= "d-flex justify-end w-100">
              <v-btn color="success" class="mr-2" width="50" style="color:white" 
-             @click="save()">{{$t('common.save')}}</v-btn>
+             @click="save()">{{$t('timesheet.save')}}</v-btn>
              <v-btn  width="50" class='mr-5' @click="cancel()">
-                {{$t('common.cancel')}}
+                {{$t('timesheet.cancel')}}
             </v-btn>
         </div>
     </v-card-actions>
@@ -88,9 +91,12 @@
 <script>
 import timesheetApi from '../../api/timesheet';
 import userApi from '../../api/user';
-
+import SymperAvatar from '../../components/common/SymperAvatar'
 
 export default {
+    components:{
+        SymperAvatar
+    },
     name: 'TaskForm',
     data: () => ({
         dialog: false,
@@ -185,14 +191,14 @@ export default {
             let self = this;
             this.check = true;
             if(this.name==''&&this.categoryTask==''){
-                 this.nameError = this.$t('common.required_value'); 
-                  this.cateError = this.$t('common.required_value'); 
+                 this.nameError = this.$t('timesheet.required_value'); 
+                  this.cateError = this.$t('timesheet.required_value'); 
              }
              else if(this.categoryTask==''){
-                this.cateError = this.$t('common.required_value'); 
+                this.cateError = this.$t('timesheet.required_value'); 
              }
              else if(this.name==''){
-                this.nameError = this.$t('common.required_value'); 
+                this.nameError = this.$t('timesheet.required_value'); 
              }
             else{
                 

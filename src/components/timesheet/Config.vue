@@ -1,14 +1,11 @@
 <template>
 <v-card>
-    <v-tabs v-model="tab" color="orange" centered style="flex-grow: 0">
-        <v-tab href="#tab-1" class="tab">
-           {{$t('common.permission')}}
-        </v-tab>
+    <v-tabs v-model="tab" color="orange" grow style="flex-grow: 0">
         <v-tab href="#tab-2" class="tab">
-            {{$t('common.period')}}
+            {{$t('timesheet.period')}}
         </v-tab>
         <v-tab href="#tab-3" class="tab">
-            {{$t('common.remind')}}
+            {{$t('timesheet.remind')}}
         </v-tab>
         <v-tab href="#tab-4" class="tab">
            Loại việc
@@ -16,32 +13,7 @@
     </v-tabs>
     <v-tabs-items v-model="tab" style="flex-grow: 1">
         <!-- start of tab 1 -->
-        <v-tab-item :key="1" :value="'tab-' + 1" class="tab-item">
-            <v-divider></v-divider>
-            <div class="d-flex flex-column flex-grow-1" style="padding-bottom: 4rem">
-                <v-row class='justify-center align-center flex-grow-0 mt-4'>
-                    <div class="d-flex justify-center align-center mr-4">
-                        <span class="font">
-                            {{$t('common.permission')}} HR: </span>
-                    </div>
-                    <div class="d-flex justify-center align-center">
-                        <v-select :items="hr_roles" item-text="name" return-object 
-                        v-model="hrConfig" :menu-props="{'nudge-top':-40}" class="groupBy" style="width: 200px" item-color="white" label="Group by" background-color="#F7F7F7">
-                        </v-select>
-                    </div>
-                </v-row>
-                <v-row class="flex-grow-1">
-                    <button @click="saveHr()" type="button" class="v-btn font v-btn--depressed theme--light v-size--small primary" 
-                    style=" margin-left: 350px; align-self: flex-end">
-                        <span>
-                            <i class="v-icon  mr-2 mdi mdi-content-save"></i>
-                              {{$t('common.save')}}
-                        </span>
-                    </button>
-                </v-row>
-            </div>
-        </v-tab-item>
-        <!-- end of tab 1 -->
+  
 
         <!-- start of tab 2 -->
         <v-tab-item :key="2" :value="'tab-' + 2" class="tab-item" style="flex-grow: 1">
@@ -49,7 +21,7 @@
             <div class="d-flex flex-column flex-grow-1" style="padding-bottom: 4rem">
                 <v-row class='justify-center align-center flex-grow-0 mt-4'>
                     <div class="d-flex justify-start align-center" style="flex-basis: 40%">
-                        <span class="font">{{$t('common.fre_submit')}}:</span>
+                        <span class="font">{{$t('timesheet.fre_submit')}}:</span>
                     </div>
                     <div class="d-flex justify-start align-center" style="flex-basis: 40%">
                         <v-select 
@@ -60,7 +32,7 @@
                 <v-row class='justify-center align-center flex-grow-0 mt-4'>
                     <div class="d-flex justify-start align-center" style="flex-basis: 40%">
                         <span class="font">
-                            {{$t('common.fow')}}:
+                            {{$t('timesheet.fow')}}:
                         </span>
                     </div>
                     <div class="d-flex justify-start align-center" style="flex-basis: 40%">
@@ -72,7 +44,7 @@
                 <v-row class='justify-center align-center flex-grow-0 mt-4'>
                     <div class="d-flex justify-start align-center" style="flex-basis: 40%">
                         <span class="font">
-                              {{$t('common.fom')}}:
+                              {{$t('timesheet.fom')}}:
                         </span>
                     </div>
                     <div class="d-flex justify-start align-center" style="flex-basis: 40%">
@@ -83,7 +55,7 @@
                 <v-row class='justify-center align-center flex-grow-0 mt-4'>
                     <div class="d-flex justify-start align-center" style="flex-basis: 40%">
                         <span class="font">
-                               {{$t('common.hour_required')}}:
+                               {{$t('timesheet.hour_required')}}:
                         </span>
                     </div>
                     <div class="d-flex flex-column justify-center align-start" style="flex-basis: 40%">
@@ -93,7 +65,7 @@
                 </v-row>
                 <v-row class='justify-center align-center flex-grow-0 mt-8'>
                     <div class="d-flex justify-start align-center" style="flex-basis: 40%">
-                        <span class="font">   {{$t('common.working_day')}}:</span>
+                        <span class="font">   {{$t('timesheet.working_day')}}:</span>
                     </div>
                     <div class="d-flex justify-start align-center" style="flex-basis: 40%"></div>
                 </v-row>
@@ -121,7 +93,7 @@
                     style="margin-left: 350px; align-self: flex-end">
                         <span>
                             <i class="v-icon  mr-2 mdi mdi-content-save"></i>
-                            {{$t('common.save')}}
+                            {{$t('timesheet.save')}}
                         </span>
                     </button>
                 </v-row>
@@ -135,11 +107,11 @@
             <div class="d-flex flex-column flex-grow-1" style="padding-bottom: 4rem">
                 <v-row class='justify-center align-center flex-grow-0 '>
                     <div class="d-flex justify-start align-center" style="flex-basis: 80%">
-                        <span style="margin-right: 6rem; width: 100px;" class="font">{{$t('common.daily_log')}}:</span>
+                        <span style="margin-right: 6rem; width: 100px;" class="font">{{$t('timesheet.daily_log')}}:</span>
                         <v-checkbox v-model='check_daily' color="success" class="check-box">
                         </v-checkbox>
                         <template v-if="check_daily">
-                            <span class="font ml-8 mr-8">{{$t('common.time')}}:</span>
+                            <span class="font ml-8 mr-8">{{$t('timesheet.time')}}:</span>
                             <v-menu ref="menu" nudge-top="-10" nudge-left="100" 
                             :close-on-content-click="false" 
                             :return-value.sync="time_remind_daily_log"
@@ -158,7 +130,7 @@
                 </v-row>
                 <v-row class='justify-center align-center flex-grow-0'>
                     <div class="d-flex justify-start align-center" style="flex-basis: 80%">
-                        <span style="margin-right: 3rem; width:150px" class="font">{{$t('common.submit_remind')}}:</span>
+                        <span style="margin-right: 3rem; width:150px" class="font">{{$t('timesheet.submit_remind')}}:</span>
                         <v-select :items="submit_timesheet" :menu-props="{'nudge-top':-40}" v-model="submit_timesheet_selected" class="select" placeholder="Select" item-color="white" background-color="#F7F7F7">
                         </v-select>
                     </div>
@@ -167,14 +139,14 @@
                     <div class="d-flex justify-start align-center" style="flex-basis: 80%">
 
                         <template v-if="submit_timesheet_selected!='monthly'">
-                            <span class="font" style="width: 120px">{{$t('common.date_submit')}}:</span>
+                            <span class="font" style="width: 120px">{{$t('timesheet.date_submit')}}:</span>
                             <v-select style="margin-left:5rem" v-model="date_submited"
                             :items="date_submit.week" :menu-props="{'nudge-top':-40}" class="select" placeholder="Select" 
                             item-color="white" background-color="#F7F7F7">
                             </v-select>
                         </template>
                         <template v-if="submit_timesheet_selected==='monthly'">
-                            <span class="font" style="width: 120px">{{$t('common.date_submit')}}:</span>
+                            <span class="font" style="width: 120px">{{$t('timesheet.date_submit')}}:</span>
                             <v-select style="margin-left:5rem" :menu-props="{'nudge-top':-40}" :items="date_submit.month" 
                             :value="date_submited" class="select" placeholder="Select" item-color="white" background-color="#F7F7F7">
                             </v-select>
@@ -184,7 +156,7 @@
                 </v-row>
                 <v-row v-if="submit_timesheet_selected==='biweekly'" class='justify-center align-center flex-grow-0 mt-4'>
                     <div class="d-flex justify-start align-center" style="flex-basis: 80%">
-                        <span class="font mr-4" style="width:80px">{{$t('common.week_remind')}}:</span>
+                        <span class="font mr-4" style="width:80px">{{$t('timesheet.week_remind')}}:</span>
                         <v-select style="margin-left:6.4rem" :menu-props="{'nudge-top':-40}" 
                         :items="date_submit.week_time" v-model="week_remind" class="select" placeholder="" 
                         item-color="white" background-color="#F7F7F7">
@@ -194,7 +166,7 @@
                 </v-row>
                 <v-row v-if="submit_timesheet_selected" class='justify-center align-center flex-grow-0  mt-4'>
                     <div class="d-flex justify-start align-center" style="flex-basis: 80%">
-                        <span style="margin-right: 7.6rem; width: 78px" class="font">{{$t('common.time')}}:</span>
+                        <span style="margin-right: 7.6rem; width: 78px" class="font">{{$t('timesheet.time')}}:</span>
                         <v-menu ref="menu2" nudge-top="-10" nudge-left="100" :close-on-content-click="false" :return-value.sync="time_submit_timesheet" transition="scale-transition" offset-y>
                             <template v-slot:activator="{ on }">
                                 <input type="text" v-on="on" v-model="time_submit_timesheet" class="input-logtime font">
@@ -212,7 +184,7 @@
                     @click="saveRemind()" style=" margin-left: 350px; align-self: flex-end">
                         <span>
                             <i class="v-icon  mr-2 mdi mdi-content-save" ></i>
-                              {{$t('common.save')}}
+                              {{$t('timesheet.save')}}
                         </span>
                     </button>
                 </v-row>
