@@ -133,7 +133,8 @@ export default {
     },
     "skh.statusRestore": function(newVl) {
       if (newVl == true) {
-        this.getData();
+        let hash= this.skh.currentDocument;
+        this.getData(hash);
         this.$store.commit("kh/changeStatusRestore", false);
       }
     },

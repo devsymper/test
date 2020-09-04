@@ -24,6 +24,115 @@ const getInsertionCSS = function() {
     styles += '.ephox-snooker-resizer-rows {cursor: row-resize}';
     styles += '.ephox-snooker-resizer-cols {cursor: col-resize}';
     styles += '.ephox-snooker-resizer-bar {background-color: #b4d7ff;opacity: 0;-webkit-user-select: none;-moz-user-select: none;-ms-user-select: none;user-select: none;}';
+
+    styles += `
+      
+      /* Style the buttons inside the tab */
+      .tab button {
+        background:transparent;
+        float: left;
+        border: none;
+        outline: none;
+        padding: 0px 10px;
+        transition: 0.3s;
+        font-size: 14px;
+        height: 25px;
+        border-radius:4px;
+        margin-right: 4px;
+
+      }
+      button{
+        cursor: pointer;
+      }
+      /* Change background color of buttons on hover */
+      button:hover {
+        background: rgba(0 0 0 / 0.1) !important;
+      }
+      
+      
+      .page-content-header{
+        display: flex;
+        margin-top: 6px;
+      }
+      .tab-active{
+        background: rgba(0 0 0 / 0.05) !important;
+      }
+
+      .tabcontent {
+        display: none;
+        height:100%;
+        cursor: text;
+      }
+      .tabcontent:focus{
+          outline:none;
+      }
+      .content-active{
+        display: block !important;
+      }
+      .add-tab-btn{
+        border: none;
+        margin: 0 8px;
+        border-radius: 4px;
+        padding: 0 10px;
+        height: 25px;
+        transition: all ease-in-out 250ms;
+      }
+      .page-content-body{
+        height: calc(100% - 50px);
+        padding: 10px;
+      }
+      .page-header-action button{
+        height: 25px;
+        width: 100%;
+        border: none;
+        background: #f2f2f2;
+        transition: all ease-in-out 250ms;
+        margin-top: 6px;
+      }
+      .collap-sidebar-btn{
+        position: absolute;
+        bottom: 6px;
+        right: 0;
+        border: none;
+        background: rgba(0 0 0 / 0.05);
+        height: 25px;
+        border-radius: 4px;
+      }
+      .sidebar-page{
+        background: #f2f2f2;
+        height: 100%;
+        width: 150px;
+        position: relative;
+      }
+      .page-content{
+        height:100%;
+        width:100%;
+        display: none;
+      }
+      .list-page-content{
+        height:100%;
+        width:100%;
+        background: white;
+      }
+      .list-page{
+        height: calc(100% - 35px);
+        padding: 2px;
+        font-size: 13px;
+      }
+      .page-item{
+        padding: 5px 4px;
+        border-radius: 4px;
+        margin-bottom: 4px;
+        transition: all ease-in-out 150ms;
+      }
+      .sb-page-active{
+        background: #077afe;
+        color: white;
+      }
+      .page-active{
+        display: block !important;
+      }
+      `;
     return styles;
 }
 export { getInsertionCSS }

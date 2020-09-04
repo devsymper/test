@@ -676,19 +676,7 @@ export default class Table {
             let dataInput = {};
             let listInputInDocument = this.getListInputInDocument();
             for (let inputControlName in inputControl) {
-                console.log(inputControlName, 'inputControlNameinputControlName', listInputInDocument);
                 dataInput[inputControlName] = listInputInDocument[inputControlName].value;
-                // if (valueInputControlItem === false) {
-
-                // } else {
-                //     let valueInputControlItem = this.getColumnIndexFromControlName(inputControlName);
-                //     valueInputControlItem = this.tableInstance.getDataAtCol(valueInputControlItem);
-                //     if (listInputInDocument[tableName].tableInstance.tableHasRowSum) {
-                //         valueInputControlItem.pop();
-                //     }
-                //     dataInput[inputControlName] = valueInputControlItem;
-                // }
-
             }
             return dataInput;
         }
@@ -1056,11 +1044,14 @@ export default class Table {
         // ['row_above', 'row_below', 'remove_row', 'freeze_column', 'unfreeze_column']
 
     }
-    setDefaulFotterRowData(value, rowIndex, prop) {
-        this.setDataAtRowProp(rowIndex, prop, value, AUTO_SET);
-    }
+
+    /**
+     * Hàm set giá tri cho bảng từ lúc load doc (cho trường hợp update bản ghi)
+     * mặc định data luôn có 1 giá trị là docObjectId chỉ ra id của dòng trên 
+     * @param {*} data 
+     */
     updateTable(data) {
-        if (Object.keys(data).length > 0) {
+        if (Object.keys(data).length > 1) {
             let dataUpdate = [];
             for (let controlName in data) {
                 for (let index = 0; index < data[controlName].length; index++) {
