@@ -345,7 +345,9 @@
                         "dateCreate": "Date created",
                         "userCreate": "User created",
                         "history": "History",
-                        "comment": "Comment"
+                        "comment": "Comment",
+                        "has": "Has",
+                        "commentNotResolve": "comment Not Resolve"
                     },
                     "worflowInfo": "Workflow infomation",
                     "userRelated": {
@@ -359,6 +361,9 @@
                 "toggleSize": "Toggle Size",
                 "otherInfo": "Other information",
                 "print": "Print"
+            },
+            "comment": {
+                "heading": "COMMENT"
             }
         }
     },

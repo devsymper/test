@@ -11,6 +11,7 @@ import AppConfig from "./AppConfig";
 import searchModule from './search';
 import khModule from "./kh";
 import timeSheetModule from './timesheet';
+import user from './user';
 
 Vue.use(Vuex);
 
@@ -27,5 +28,6 @@ export default new Vuex.Store({
         search: searchModule,
         kh: khModule,
         timesheet: timeSheetModule,
+        user: user
     }
 });
