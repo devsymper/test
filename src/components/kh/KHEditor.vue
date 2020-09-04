@@ -2,7 +2,7 @@
   <div class="w-100">
     <v-skeleton-loader v-if="loading" class="mx-auto" width="100%" height="100%" type="table"></v-skeleton-loader>
     <k-h-header />
-    <div v-show="skh.statusEdit" class="kh-editor-view"  v-html="content"></div>
+    <div v-show="skh.statusEdit" class="kh-editor-view" v-html="content"></div>
     <div v-show="!skh.statusEdit" class="kh-editor" ref="printMe">
       <editor
         id="myeditablediv"
@@ -13,41 +13,43 @@
         :inline="true"
         :disabled="skh.statusEdit"
         :init="{
-              menubar: false,
-              toolbar: false,
-              plugins: [
-              'autolink',
-              'codesample',
-              'link',
-              'lists',
-              'media',
-              'image',
-              'quickbars',
-              'paste',
-              'advcode',
-              'table',
-              'fullscreen',
-              'emoticons',
-              'casechange',
-              'codesample'
-              ],
-              quickbars_insert_toolbar: false,
-              quickbars_selection_toolbar: ' addHandsonTableBtn | bold italic underline strikethrough | fontselect fontsizeselect formatselect  |numlist bullist checklist| forecolor backcolor casechange| blockquote quicklink| alignleft aligncenter alignright alignjustify| codesample | outdent indent quickimage media|  emoticons | table',
-              media_live_embeds: true,
-              setup: function (editor) {
-                editor.ui.registry.addButton('addHandsonTableBtn', {
-                  text: 'Handson',
-                  onAction: function () {
-                    //editor.insertContent('&nbsp;<strong>It\'s my button!</strong>&nbsp;');
-                    addSizeTable();
-                    
-                  }
-                });
-              },
-              init_instance_callback: function(editor) {
-                getData()
-              }
-            }"
+        menubar: false,
+        toolbar: false,
+        plugins: [
+        'autolink',
+        'codesample',
+        'link',
+        'lists',
+        'media',
+        'image',
+        'quickbars',
+        'paste',
+        'advcode',
+        'table',
+        'fullscreen',
+        'emoticons',
+        'casechange',
+        'codesample'
+        ],
+        paste_data_images: true,
+        images_upload_url:'https://kh-service.dev.symper.vn/uploadImage',
+        quickbars_insert_toolbar: false,
+        quickbars_selection_toolbar: ' addHandsonTableBtn | bold italic underline strikethrough | fontselect fontsizeselect formatselect |numlist bullist checklist| forecolor backcolor casechange| blockquote quicklink| alignleft aligncenter alignright alignjustify| codesample | outdent indent quickimage media| emoticons | table',
+        media_live_embeds: true,
+        setup: function (editor) {
+          editor.ui.registry.addButton('addHandsonTableBtn', {
+            text: 'Handson',
+            onAction: function () {
+            addSizeTable();
+            }
+          });
+        },
+        init_instance_callback: function(editor) {
+          getData()
+        },
+        external_plugins: {'wave': 'https://cdn2.codox.io/waveTinymce/plugin.min.js'},
+        wave:configWaveDocument() ,
+        }"
       />
     </div>
     <KHAddSizeTable ref="dialogAddSizeTable" />
@@ -174,7 +176,9 @@ export default {
             content += `</tr>`;
           }
           content += `</table></div>`;
-          $('.kh-editor').find( "#" + idTable).replaceWith(content);
+          $(".kh-editor")
+            .find("#" + idTable)
+            .replaceWith(content);
           this.$store.commit("kh/setIdTable", "");
         } else {
           var uuid = this.create_UUID();
@@ -214,6 +218,22 @@ export default {
       );
       return uuid;
     },
+    getDocId(){
+      let hash=this.skh.currentDocument;
+      if (hash=='') {
+        hash=this.$route.params.hash;
+      }
+      return hash;
+    },
+    configWaveDocument(){
+      console.log("user",this.sapp.endUserInfo);
+      let user=this.sapp.endUserInfo;
+      return {
+      'docId': this.getDocId(), // unique document id,
+      'user': {'name': user.userName}, // unique user name
+      'apiKey': '1b8dfb28-5828-42bb-9bf8-140c99e78f3b' // this is your actual API Key
+      }
+    },
     getData(hash = false) {
       this.loading = true;
       if (hash == false) {
@@ -230,6 +250,7 @@ export default {
             } else {
               self.$refs.editor.editor.setContent(res.data.listObject.content);
             }
+
             self.id = res.data.listObject.id;
             self.name = res.data.listObject.name;
             self.parentPath = res.data.listObject.parentPath;
@@ -304,15 +325,15 @@ export default {
     });
     $(".kh-editor").on("click", "table", function(event) {
       var p = $(this);
-      var position=p.position();
+      var position = p.position();
       console.log(position);
-      document.getElementById("mceResizeHandlenw").style.left =position.left;
+      document.getElementById("mceResizeHandlenw").style.left = position.left;
       document.getElementById("mceResizeHandlene").style.left = p.width();
     });
     $(".kh-editor").on("click", "img", function(event) {
       var p = $(this);
-      var position=p.position();
-      document.getElementById("mceResizeHandlenw").style.left =position.left;
+      var position = p.position();
+      document.getElementById("mceResizeHandlenw").style.left = position.left;
       document.getElementById("mceResizeHandlene").style.left = p.width();
     });
   }
@@ -320,15 +341,5 @@ export default {
 </script>
 
 <style  scoped>
-.kh-editor {
-  height: calc(98vh - 65px);
-  overflow: auto;
-  padding: 8px;
-}
-.kh-editor-view{
-  height: calc(98vh - 65px);
-  overflow: auto;
-  padding: 8px;
-}
 
 </style>

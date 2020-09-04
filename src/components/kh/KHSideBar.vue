@@ -1,205 +1,220 @@
 <template>
-<vue-resizable 
-  :maxWidth=450
-  :width='skh.widthSideBar'
-   >
-  <v-navigation-drawer class="khSidebar resizable-content" v-show="!skh.subCollapseSideBar">
-    <div>
-      <v-text-field
-        v-model="search"
-        background-color="#F7F7F7"
-        class="d-inline-block mr-2 sym-small-size pa-1 w-100"
-        single-line
-        append-icon="mdi-magnify"
-        dense
-        @keyup="changeValueOpenAll"
-        solo
-        label="Search"
-        :placeholder="$t('common.search')"
-      ></v-text-field>
-      <div class="kh-side-bar">
-        <v-container style="height: calc(100vh - 65px);overflow: auto;">
-          <div class="workspace">
-            <div class="symper-title">WORKSPACE</div>
-            <div class="icon-add">
-              <v-icon v-on:click="addNode()" class="fs-16 add-folder">mdi-plus</v-icon>
+  <vue-resizable :maxWidth="500" :width="skh.widthSideBar">
+    <v-navigation-drawer class="khSidebar resizable-content" v-show="!skh.subCollapseSideBar">
+      <div>
+        <v-text-field
+          v-model="search"
+          background-color="#F7F7F7"
+          class="d-inline-block mr-2 sym-small-size pa-1 w-100"
+          single-line
+          append-icon="mdi-magnify"
+          dense
+          @keyup="changeValueOpenAll"
+          solo
+          label="Search"
+          :placeholder="$t('common.search')"
+        ></v-text-field>
+        <div class="kh-side-bar">
+          <v-container style="height: calc(100vh - 65px);overflow: auto;">
+            <div class="workspace">
+              <div class="symper-title">WORKSPACE</div>
+              <div class="icon-add">
+                <v-icon v-on:click="addNode()" class="fs-16 add-folder">mdi-plus</v-icon>
+              </div>
             </div>
-          </div>
-          <div class="kh-add-node-parent" v-bind:class="{'d-none' : !showAddNode}">
-            <v-list-item-group class="favorite">
-              <v-list-item>
-                <v-icon class="fs-14">mdi-folder</v-icon>
-                <v-text-field
-                  v-model="txtNode"
-                  v-on:keyup="validateAddNode"
-                  ref="newFolderInput"
-                  @blur="handleBlur"
-                  class="fs-13"
-                ></v-text-field>
-              </v-list-item>
-            </v-list-item-group>
-          </div>
-          <template>
-            <v-treeview
-              v-model="tree"
-              :open="open"
-              :items="treeFolderData"
-              :search="search"
-              :filter="filter"
-              item-key="name"
-              open-on-click
-              :open-all="openAll"
-              dense
-              class="kh-treeview"
-            >
-              <!-- <template v-slot:prepend="{ item, open }" > -->
-              <template v-slot:label="{ item, open }">
-                <v-btn
-                  class="fz-13 side-bar-item"
-                  text
-                  @contextmenu="show($event,item.path,item.name,item.id,item.parentPath,item.content,item.hash,item.isFavorite)"
-                >
-                  <v-icon
-                    class="fs-14"
-                    @click="dbclickDoc(item.path,item.id,item.hash)"
-                    v-if="item.id == undefined"
-                  >{{ open ? 'mdi-folder-open' : 'mdi-folder' }}</v-icon>
-                  <v-icon class="fs-14" v-else>mdi-file-document-outline</v-icon>
-                  <p
-                    :title="item.name"
-                    :id="item.id ? item.id: item.path"
-                    @click="dbclickDoc(item.path,item.id,item.hash)"
-                    class="objTitle"
-                  >{{item.name}}</p>
-                  <v-icon
-                    v-if="item.id !=undefined && item.isFavorite==0"
-                    class="fs-15 star-favorite"
-                    @click="updateFavorite(item.id,item.isFavorite,item.name,item.parentPath,item.hash)"
-                    style="padding-bottom:3px;"
-                  >mdi-star-outline</v-icon>
-                  <v-icon
-                    v-if="item.id !=undefined && item.isFavorite==1"
-                    class="fs-15 is-star-favorite"
-                    @click="updateFavorite(item.id,item.isFavorite,item.name,item.parentPath,item.hash)"
-                    style="padding-bottom:3px;"
-                  >mdi-star</v-icon>
-                </v-btn>
-              </template>
-            </v-treeview>
-            <v-menu v-model="showMenu" :position-x="x" :position-y="y" absolute offset-y>
-              <v-list class="context-menu contextSideBar" id="item-context">
-                <v-list-item
-                  v-for="(item, index) in contextMenu"
-                  :key="index"
-                  @click="item.menuAction(item.title)"
-                  dense
-                  v-bind:class="index==statusMove?'d-none': '' || 
+            <div class="kh-add-node-parent" v-bind:class="{'d-none' : !showAddNode}">
+              <v-list-item-group class="favorite">
+                <v-list-item>
+                  <v-icon class="fs-14">mdi-folder</v-icon>
+                  <v-text-field
+                    v-model="txtNode"
+                    v-on:keyup="validateAddNode"
+                    ref="newFolderInput"
+                    @blur="handleBlur"
+                    class="fs-13"
+                  ></v-text-field>
+                </v-list-item>
+              </v-list-item-group>
+            </div>
+            <template>
+              <v-treeview
+                v-model="tree"
+                :open="open"
+                :items="treeFolderData"
+                :search="search"
+                :filter="filter"
+                item-key="name"
+                open-on-click
+                :open-all="openAll"
+                dense
+                class="kh-treeview"
+              >
+                <!-- <template v-slot:prepend="{ item, open }" > -->
+                <template v-slot:label="{ item, open }">
+                  <v-btn
+                    class="fz-13 side-bar-item"
+                    text
+                    @contextmenu="show($event,item.path,item.name,item.id,item.parentPath,item.content,item.hash,item.isFavorite)"
+                  >
+                    <v-tooltip bottom>
+                      <template v-slot:activator="{ on }">
+                        <v-icon
+                          v-on="on"
+                          class="fs-14"
+                          @click="dbclickDoc(item.path,item.id,item.hash)"
+                          v-if="item.id == undefined"
+                        >{{ open ? 'mdi-folder-open' : 'mdi-folder' }}</v-icon>
+                        <v-icon v-on="on" class="fs-14" v-else>mdi-file-document-outline</v-icon>
+                        <p
+                          v-on="on"
+                          :id="item.id ? item.id: item.path"
+                          @click="dbclickDoc(item.path,item.id,item.hash)"
+                          class="objTitle"
+                        >{{item.name}}</p>
+                      </template>
+                      <span>{{ item.name }}</span>
+                    </v-tooltip>
+                    <v-icon
+                      v-if="item.id !=undefined && item.isFavorite==0"
+                      class="fs-15 star-favorite"
+                      @click="updateFavorite(item.id,item.isFavorite,item.name,item.parentPath,item.hash)"
+                      style="padding-bottom:3px;"
+                    >mdi-star-outline</v-icon>
+                    <v-icon
+                      v-if="item.id !=undefined && item.isFavorite==1"
+                      class="fs-15 is-star-favorite"
+                      @click="updateFavorite(item.id,item.isFavorite,item.name,item.parentPath,item.hash)"
+                      style="padding-bottom:3px;"
+                    >mdi-star</v-icon>
+                  </v-btn>
+                </template>
+              </v-treeview>
+              <v-menu v-model="showMenu" :position-x="x" :position-y="y" absolute offset-y>
+                <v-list class="context-menu contextSideBar" id="item-context">
+                  <v-list-item
+                    v-for="(item, index) in contextMenu"
+                    :key="index"
+                    @click="item.menuAction(item.title)"
+                    dense
+                    v-bind:class="index==statusMove?'d-none': '' || 
                       index==0 && id !=undefined ?'d-none': '' || 
                       (index==4 ||index==5) && id ==undefined ?'d-none': '' || 
                       index==4 && isFavorite ==1 && id !=undefined ?'d-none': '' || 
                       index==5 && isFavorite ==0 && id !=undefined ?'d-none': '' "
-                  @mouseover="handleContext(index)"
-                >
-                  <v-icon class="fs-15">{{item.icon}}</v-icon>
-                  <v-list-item-title class="fs-13">{{ item.title }}</v-list-item-title>
-                  <v-icon v-if="index==0" style="margin-left:10px" class="fs-16">mdi-menu-right</v-icon>
-                </v-list-item>
+                    @mouseover="handleContext(index)"
+                  >
+                    <v-icon class="fs-15">{{item.icon}}</v-icon>
+                    <v-list-item-title class="fs-13">{{ item.title }}</v-list-item-title>
+                    <v-icon v-if="index==0" style="margin-left:10px" class="fs-16">mdi-menu-right</v-icon>
+                  </v-list-item>
+                </v-list>
+              </v-menu>
+              <v-menu
+                v-model="context_create"
+                :position-x="x+115"
+                :position-y="y"
+                absolute
+                offset-y
+              >
+                <v-list class="context-menu">
+                  <v-list-item
+                    v-for="(item, index) in contextCreate"
+                    :key="index"
+                    @click="item.menuAction(item.title)"
+                    dense
+                  >
+                    <v-icon class="fs-15">{{item.icon}}</v-icon>
+                    <v-list-item-title class="fs-13">{{ item.title }}</v-list-item-title>
+                  </v-list-item>
+                </v-list>
+              </v-menu>
+            </template>
+            <div class="workspace">
+              <div class="symper-title">FAVORITE</div>
+              <v-list dense :flat="true">
+                <v-list-item-group class="favorite">
+                  <v-list-item
+                    v-for="(item, i) in favorites"
+                    :key="i"
+                    @mouseover="showByIndex = i"
+                    @mouseout="showByIndex = null"
+                  >
+                    <v-tooltip bottom>
+                      <template v-slot:activator="{ on }">
+                        <v-icon
+                          @click="dbclickDoc(item.path,item.id,item.hash)"
+                          v-on="on"
+                          class="fs-14"
+                        >mdi-file-document-outline</v-icon>
+                        <v-list-item-title
+                          v-on="on"
+                          class="fs-13"
+                          v-text="item.name"
+                          @click="dbclickDoc(item.path,item.id,item.hash)"
+                        ></v-list-item-title>
+                      </template>
+                      <span>{{ item.name }}</span>
+                    </v-tooltip>
+                    <v-tooltip bottom>
+                      <template v-slot:activator="{ on }">
+                        <v-icon
+                          v-on="on"
+                          class="fs-15 star-favorite"
+                          v-show="showByIndex === i"
+                          @click="updateFavorite(item.id,item.isFavorite,item.name,item.parentPath,item.hash)"
+                          style="padding-bottom:3px;"
+                        >mdi-star</v-icon>
+                      </template>
+                      <span>{{$t("kh.contextmenu.removefavorite") }}</span>
+                    </v-tooltip>
+                  </v-list-item>
+                </v-list-item-group>
               </v-list>
-            </v-menu>
-
-            <v-menu v-model="context_create" :position-x="x+115" :position-y="y" absolute offset-y>
-              <v-list class="context-menu">
-                <v-list-item
-                  v-for="(item, index) in contextCreate"
-                  :key="index"
-                  @click="item.menuAction(item.title)"
-                  dense
-                >
-                  <v-icon class="fs-15">{{item.icon}}</v-icon>
-                  <v-list-item-title class="fs-13">{{ item.title }}</v-list-item-title>
-                </v-list-item>
-              </v-list>
-            </v-menu>
-          </template>
-          <div class="workspace">
-            <div class="symper-title">FAVORITE</div>
-            <v-list dense :flat="true">
-              <v-list-item-group class="favorite">
-                <v-list-item
-                  v-for="(item, i) in favorites"
-                  :key="i"
-                  @mouseover="showByIndex = i"
-                  @mouseout="showByIndex = null"
-                >
-                  <v-tooltip bottom>
-                    <template v-slot:activator="{ on }">
-                      <v-icon
-                        @click="dbclickDoc(item.path,item.id,item.hash)"
-                        v-on="on"
-                        class="fs-14"
-                      >mdi-file-document-outline</v-icon>
-                      <v-list-item-title
-                        v-on="on"
-                        class="fs-13"
-                        v-text="item.name"
-                        @click="dbclickDoc(item.path,item.id,item.hash)"
-                      ></v-list-item-title>
-                      <v-icon
-                        class="fs-15 star-favorite"
-                        v-show="showByIndex === i"
-                        @click="updateFavorite(item.id,item.isFavorite,item.name,item.parentPath,item.hash)"
-                        style="padding-bottom:3px;"
-                      >mdi-star</v-icon>
-                    </template>
-                    <span>{{ item.name }}</span>
-                  </v-tooltip>
-                </v-list-item>
-              </v-list-item-group>
-            </v-list>
-          </div>
-        </v-container>
+            </div>
+          </v-container>
+        </div>
       </div>
-    </div>
 
-    <v-dialog v-model="dialog_remove" max-width="350">
-      <v-card>
-        <v-card-title class="headline">{{$t("common.remove_confirm_title")}}</v-card-title>
-        <v-card-text>{{$t("kh.dialog.remove")}}</v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn color="green darken-1" text @click="dialog_remove = false">Hủy</v-btn>
-          <v-btn color="red darken-1" text @click="removeNode">Xóa</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+      <v-dialog v-model="dialog_remove" max-width="350">
+        <v-card>
+          <v-card-title class="headline">{{$t("common.remove_confirm_title")}}</v-card-title>
+          <v-card-text>{{$t("kh.dialog.remove")}}</v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="green darken-1" text @click="dialog_remove = false">Hủy</v-btn>
+            <v-btn color="red darken-1" text @click="removeNode">Xóa</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
 
-    <!-- Dialog Next router document -->
-    <v-dialog v-model="dialogSave" max-width="350">
-      <v-card>
-        <v-card-title class="headline">{{$t("kh.dialog.save")}}</v-card-title>
-        <v-card-text>{{$t("kh.dialog.note")}}</v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn color="green darken-1" text @click="dialogSave = false">OK</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-  </v-navigation-drawer>
-</vue-resizable>
+      <!-- Dialog Next router document -->
+      <v-dialog v-model="dialogSave" max-width="350">
+        <v-card>
+          <v-card-title class="headline">{{$t("kh.dialog.save")}}</v-card-title>
+          <v-card-text>{{$t("kh.dialog.note")}}</v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="green darken-1" text @click="saveDocument">Lưu</v-btn>
+            <v-btn color="red darken-1" text @click="dialogSave = false">Hủy</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+    </v-navigation-drawer>
+  </vue-resizable>
 </template>
 
 <script>
 import { knowledgeApi } from "./../../api/kh.js";
 import { util } from "./../../plugins/util";
 import { SYMPER_APP } from "./../../main.js";
-import VueResizable from 'vue-resizable';
+import VueResizable from "vue-resizable";
 export default {
-  components: {VueResizable},
+  components: { VueResizable },
   data() {
     let self = this;
     return {
       openAll: false,
-      isFavorite:-1,
+      isFavorite: -1,
       showByIndex: null,
       oldHashPath: "",
       statusMove: 3,
@@ -243,7 +258,7 @@ export default {
           icon: "mdi-border-color"
         },
         {
-          title:this.$t("kh.contextmenu.move"),
+          title: this.$t("kh.contextmenu.move"),
           menuAction: action => {
             this.oldHashPath = this.hash;
             this.statusMove = 2;
@@ -251,7 +266,7 @@ export default {
           icon: "mdi-folder-move"
         },
         {
-          title:this.$t("kh.contextmenu.paste"),
+          title: this.$t("kh.contextmenu.paste"),
           menuAction: action => {
             let self = this;
             if (this.oldHashPath != "") {
@@ -281,9 +296,9 @@ export default {
                       );
                     }
                     // self.$store.dispatch("kh/addToTreeViewStore", data);
-                  }else if(res.status == 403){
+                  } else if (res.status == 403) {
                     SYMPER_APP.$snotifyError("Error", res.message);
-                  }else if(res.status == 400){
+                  } else if (res.status == 400) {
                     SYMPER_APP.$snotifyError("Error", res.message);
                   }
                 })
@@ -300,11 +315,11 @@ export default {
         {
           title: this.$t("kh.contextmenu.addfavorite"),
           menuAction: action => {
-            let id=this.id;
-            let isFavorite=this.isFavorite;
-            let name=this.txtNode;
-            let parentPath=this.parentPath;
-            let hash=this.hash;
+            let id = this.id;
+            let isFavorite = this.isFavorite;
+            let name = this.txtNode;
+            let parentPath = this.parentPath;
+            let hash = this.hash;
             this.updateFavorite(id, isFavorite, name, parentPath, hash);
           },
           icon: "mdi-star"
@@ -312,11 +327,11 @@ export default {
         {
           title: this.$t("kh.contextmenu.removefavorite"),
           menuAction: action => {
-             let id=this.id;
-            let isFavorite=this.isFavorite;
-            let name=this.txtNode;
-            let parentPath=this.parentPath;
-            let hash=this.hash;
+            let id = this.id;
+            let isFavorite = this.isFavorite;
+            let name = this.txtNode;
+            let parentPath = this.parentPath;
+            let hash = this.hash;
             this.updateFavorite(id, isFavorite, name, parentPath, hash);
           },
           icon: "mdi-star-off"
@@ -505,6 +520,7 @@ export default {
     dbclickDoc(path, id, hash) {
       $(".favorite .v-list-item").removeClass("v-item--active");
       if (!this.skh.statusEdit) {
+        this.hash = hash;
         this.dialogSave = true;
       } else {
         if (id != undefined) {
@@ -516,12 +532,24 @@ export default {
             const title = "SYMPER APP";
             const url = "/#/knowledge/document/" + hash;
             history.pushState(state, title, url);
-            
           } else {
             this.$router.push("/knowledge/document/" + hash);
           }
         }
       }
+    },
+    /**
+     * Thay đổi trạng thái doc để lưu doc
+     */
+    saveDocument() {
+      this.$store.commit("kh/changeStatusEdit", !this.skh.statusEdit);
+      this.dialogSave = false;
+      let hash = this.hash;
+      this.$store.commit("kh/setCurrentDocument", hash);
+      const state = {};
+      const title = "SYMPER APP";
+      const url = "/#/knowledge/document/" + hash;
+      history.pushState(state, title, url);
     },
     /**
      * Show div input thêm node và focus vào input
@@ -592,7 +620,7 @@ export default {
     /**
      * Hiển thị dialog thêm sửa xóa
      */
-    show(e, path, name, id, parentPath, content, hash,isFavorite) {
+    show(e, path, name, id, parentPath, content, hash, isFavorite) {
       e.preventDefault();
       this.id = id;
       this.path = path;
@@ -600,7 +628,7 @@ export default {
       this.content = content;
       this.txtNode = name;
       this.parentPath = parentPath;
-      this.isFavorite=isFavorite;
+      this.isFavorite = isFavorite;
       this.showMenu = false;
       this.x = e.clientX;
       this.y = e.clientY;
@@ -634,7 +662,7 @@ export default {
               this.$store.dispatch("kh/removeDocToTreeViewStore", id);
               this.$store.dispatch("kh/removeDocToListChildTableStore", id);
               var url = window.location.href;
-              if(/document/g.test(url)){
+              if (/document/g.test(url)) {
                 this.$router.push("/knowledge");
                 this.$store.commit("kh/resetData", true);
               }
@@ -700,7 +728,6 @@ export default {
             var text = $("#" + id)
               .val()
               .trim();
-
             if (text != "" && text != name) {
               let data = {};
               data.id = id;
@@ -918,10 +945,10 @@ export default {
 </script>
 
 <style scoped>
- .resizable-content {
-        height: 100%;
-        width: 100%;
-    }
+.resizable-content {
+  height: 100%;
+  width: 100%;
+}
 .collapse-sidebar-btn {
   position: absolute;
   bottom: 20px;
@@ -930,7 +957,7 @@ export default {
   width: 30px;
 }
 .khSidebar {
-  width:auto !important;
+  width: auto !important;
 }
 .khSidebar hr {
   display: none;

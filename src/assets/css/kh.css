@@ -331,6 +331,22 @@
 
 /* `````````````````` Css Homepage````````````````````````````` */
 
+.kh-editor {
+    height: calc(98vh - 65px);
+    overflow: auto!important;
+    padding: 8px;
+}
+
+.kh-editor-view {
+    height: calc(98vh - 65px);
+    overflow: auto!important;
+    padding: 8px;
+}
+
+#myeditablediv {
+    clear: both;
+}
+
 .kh-editor #editor {
     width: 100%!important;
     height: 100%!important;
@@ -361,6 +377,10 @@
 
 .mce-edit-focus:focus {
     outline: 0px solid transparent!important;
+}
+
+.kh-editor .codox-styles .codox-container {
+    float: left!important;
 }
 
 
