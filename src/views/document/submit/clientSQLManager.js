@@ -126,7 +126,6 @@ export default class ClientSQLManager {
         tbValue = tbValue.trim()
         tbValue = tbValue.substring(0, tbValue.length - 1);
         let sql = `INSERT INTO ${tableName} (${tbColumn}) VALUES(${tbValue})`;
-        console.log('checkid sql', sql);
         if (returnPromise) {
             return new Promise((resolve, reject) => {
                 try {

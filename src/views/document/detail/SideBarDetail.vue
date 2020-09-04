@@ -40,7 +40,11 @@
 								</tr>
 								<tr>
 									<td>{{$t('document.detail.sidebar.body.general.comment')}}</td>
-									<td style="text-decoration: underline;cursor:pointer;color:#F1853B;">Có 2 bình luận chưa giải quyết</td>
+									<td style="text-decoration: underline;cursor:pointer;color:#F1853B;" @click="showComment">
+										{{$t('document.detail.sidebar.body.general.has')}} 
+										{{countCommentNotResolve}} 
+										{{$t('document.detail.sidebar.body.general.commentNotResolve')}}
+										</td>
 								</tr>
 							</table>
 						</div>
@@ -133,6 +137,8 @@
 			</div>
 		</VuePerfectScrollbar>
 	</div>
+	<Comment ref="commentView"/>
+
 	</v-navigation-drawer>
 </template>
 <script>
@@ -143,9 +149,11 @@ import bpmnApi from "./../../../api/BPMNEngine.js";
 import { util } from "./../../../plugins/util.js";
 import { data } from 'jquery'
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
+import Comment from './Comment'
 export default {
 	components:{
-		 VuePerfectScrollbar
+		 VuePerfectScrollbar,
+		 Comment
 	},
 	data () {
 		return {
@@ -160,7 +168,8 @@ export default {
 			listHistoryControl:[
                 {date:'18/08/2020 11:20', userUpdate:'Nguyễn Đình Hoang', historyid:2, controls:[{id:'s-control-id-1596780634836',data:[]},{id:'s-control-id-1596780602772',data:[]},{id:'s-control-id-1596780611212',data:[]}]},
                 {date:'18/08/2020 11:20', userUpdate:'Nguyễn Đình Hoang', historyid:1, controls:[{id:'s-control-id-1596780602772',data:[]}]},
-            ],
+			],
+			countCommentNotResolve:0
 		}
 	},
 	props:{
@@ -261,6 +270,9 @@ export default {
 		showHistory(){
 			$('.history-info').css({transform:'translateX(0px)'})
 		},
+		showComment(){
+			this.$refs.commentView.show()
+		}
 	},
 
 
