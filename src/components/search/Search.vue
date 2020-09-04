@@ -113,10 +113,22 @@ export default {
                 },
                 syql:{
                 },
-                application_definition:{
+                application_deninition:{
                 }
             }
         };
+    },
+     created: function () {
+        this.debouncedGetValueSearch = _.debounce(this.getValueSearch, 300)
+    },
+     watch: {
+        value(){
+            debugger
+            this.debouncedGetValueSearch();
+            //this.getValueSearch();
+        }
+        
+       
     },
     methods:{
           formatAction(value){
@@ -188,41 +200,10 @@ export default {
                 name = value;}
             return name;
         },
-        //hiển thị tên của các menu
-        formatGroupName(value){
-            let name = '';
-            if(value=='document_instance'){
-                name =  'Văn bản';
-            }else if(value =='user'){
-                name =  'Nhân viên'
-            }else if(value =='document_definition'){
-                name =  'Loại văn bản'
-            }else if(value == 'workflow_definition'){
-                name =  'Workflow'
-            }else if(value == 'orgchart'){
-                name =  'Sơ đồ tổ chức'
-            }else if(value == 'process_definition'){
-                name =  'Quy trình'
-            }else if(value == 'application_definition'){
-                name =  'Ứng dụng'
-            }else if(value == 'syql'){
-                name =  'Công thức'
-            }else if(value == 'dataflow'){
-                name =  'Data flow'
-            }else if(value == 'file'){
-                name =  'Tệp'
-            }else if(value == 'knowledge'){
-                name =  'Knowledge'
-            }else if(value == 'comment'){
-                name =  'Bình luận'
-            }else{
-                name = value;}
-            return name
-        }
-    },
-    watch: {
-        value(newVal) {
-            console.log(typeof newVal);
+         getValueSearch() {
+        debugger
+            let newVal = this.value;
+           // this.debouncedGetAnswer();
             this.searchItems = [];
             this.$store.commit('search/setWordSearch', newVal);  
             if (newVal) {
@@ -293,9 +274,6 @@ export default {
                             self.$store.commit('search/setSearchAll', allData);
                             self.$store.commit('search/setCountResult', self.searchItems.length);
                             self.$store.commit('search/setShowGeneral', true);
-                           
-
-
                         }
                     })
                     .catch(err => {
@@ -312,9 +290,41 @@ export default {
             this.$store.commit('search/setMenu',  []);
             this.$store.commit('search/setWordSearch', newVal);  
         }
-       }
-       
+       },
+        //hiển thị tên của các menu
+        formatGroupName(value){
+            let name = '';
+            if(value=='document_instance'){
+                name =  'Văn bản';
+            }else if(value =='user'){
+                name =  'Nhân viên'
+            }else if(value =='document_definition'){
+                name =  'Loại văn bản'
+            }else if(value == 'workflow_definition'){
+                name =  'Workflow'
+            }else if(value == 'orgchart'){
+                name =  'Sơ đồ tổ chức'
+            }else if(value == 'process_definition'){
+                name =  'Quy trình'
+            }else if(value == 'application_definition'){
+                name =  'Ứng dụng'
+            }else if(value == 'syql'){
+                name =  'Công thức'
+            }else if(value == 'dataflow'){
+                name =  'Data flow'
+            }else if(value == 'file'){
+                name =  'Tệp'
+            }else if(value == 'knowledge'){
+                name =  'Knowledge'
+            }else if(value == 'comment'){
+                name =  'Bình luận'
+            }else{
+                name = value;}
+            return name
+        }
     },
+   
+   
 }
 </script>
 <style scoped >
