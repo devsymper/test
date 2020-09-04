@@ -14,4 +14,7 @@ export const fileManagementApi = {
     uploadFileSymper(data, options) {
         return coreApi.post('uploadS', data, {}, options);
     },
+    download(id){
+        window.open('https://file.symper.vn/downloadS/'+id,'_blank');
+    }
 };

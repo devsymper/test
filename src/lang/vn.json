@@ -418,7 +418,9 @@
                         "dateCreate": "Ngày tạo",
                         "userCreate": "Người tạo",
                         "history": "Lịch sử",
-                        "comment": "Bình luận"
+                        "comment": "Bình luận",
+                        "has": "Có",
+                        "commentNotResolve": "chưa được giải quyết"
                     },
                     "worflowInfo": "THÔNG TIN QUY TRÌNH",
                     "userRelated": {
@@ -433,6 +435,9 @@
                 "toggleSize": "Thay đổi kích thước",
                 "otherInfo": "Xem thông tin khác",
                 "print": "In"
+            },
+            "comment": {
+                "heading": "BÌNH LUẬN"
             }
         }
     },
@@ -602,7 +607,8 @@
             "rename": "Đổi tên",
             "delete": "Xóa",
             "addfavorite": "Thêm vào yêu thích",
-            "removefavorite": "Xóa khỏi yêu thích"
+            "removefavorite": "Xóa khỏi yêu thích",
+            "viewcontent": "Xem nội dung"
         },
         "table": {
             "totalDoc": "Số văn bản"
@@ -653,11 +659,80 @@
                 "unfavorite": "Loại bỏ yêu thích"
             },
             "orgchart": {
-                "detail": "Chi tiết",
-                "edit": "Chỉnh sửa",
-                "query": "Truy vấn",
-                "favorite": "Thêm vào yêu thích",
+                "create":"Tạo mới ",
+                "update":"Cập nhật",
+                "drop":"Xóa",
+                "list":"Danh sách",
+                "detail":"Chi tiết",
                 "unfavorite": "Loại bỏ yêu thích"
+            },
+            "document_definition":{
+                "create":"Tạo mới văn bản ",
+                "edit":"Chỉnh sửa văn bản",
+                "submit":"Gửi văn bản",
+                "drop":"Xóa văn bản",
+                "restore":"Khôi phục",
+                "list":"Danh sách văn bản",
+                "list_trash":"Thùng rác",
+                "list_instance":"Danh sách bản ghi",
+                "unfavorite": "Loại bỏ yêu thích"
+            },
+            "workflow_definition":{
+                "list":"Danh sách quy trình ",
+                "create":"Tạo mới quy trình ",
+                "deploy":"Triển khai",
+                "drop":"Xóa quy trình ",
+                "update":"Cập nhật quy trình ",
+                "list_instance":"Danh sách bản ghi",
+                "start_instance":"Bắt đầu quy trình",
+                "unfavorite": "Loại bỏ yêu thích"
+            },
+            "dashboard":{
+                "create":"Tạo mới",
+                "update":"Cập nhât",
+                "view":"Xem",
+                "list":"Danh sách",
+                "drop":"Xóa",
+                "unfavorite": "Loại bỏ yêu thích"
+            }
+        },
+        "iconListActions":{
+            "orgchart": {
+                "create":"mdi-folder-plus-outline",
+                "update":"mdi-note-plus-outline",
+                "drop":"mdi-arrow-down-drop-circle-outline",
+                "list":"mdi-clipboard-list-outline",
+                "detail":"mdi-details",
+                "unfavorite": "mdi-star-off"
+            },
+            "document_definition":{
+                "create":"mdi-folder-plus-outline",
+                "edit":"mdi-file-document-edit-outline",
+                "submit":"mdi-content-save-outline",
+                "drop":"mdi-arrow-down-drop-circle-outline",
+                "restore":"mdi-file-restore-outline",
+                "list":"mdi-clipboard-list-outline",
+                "list_trash":"mdi-playlist-remove",
+                "list_instance":"mdi-file-document-multiple-outline",
+                "unfavorite": "mdi-star-off"
+            },
+            "workflow_definition":{
+                "list":"mdi-clipboard-list-outline",
+                "create":"mdi-folder-plus-outline",
+                "deploy":"mdi-rocket",
+                "drop":"mdi-arrow-down-drop-circle-outline",
+                "update":"mdi-note-plus-outline",
+                "list_instance":"mdi-file-document-multiple-outline",
+                "start_instance":"mdi-play-outline",
+                "unfavorite": "mdi-star-off"
+            },
+            "dashboard":{
+                "create":"mdi-folder-plus-outline",
+                "update":"mdi-note-plus-outline",
+                "view":"mdi-eye-outline",
+                "list":"clipboard-list-outline",
+                "drop":"arrow-down-drop-circle-outline",
+                "unfavorite": "mdi-star-off"
             }
         }
     },

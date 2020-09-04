@@ -57,6 +57,13 @@
     margin-right: 0px!important;
 }
 
+.kh-side-bar .favorite .star-favorite {
+    color: yellow!important;
+    position: absolute;
+    right: 0px;
+    margin-right: 0px!important;
+}
+
 .kh-treeview .is-star-favorite {
     color: yellow!important;
     position: absolute;
@@ -243,14 +250,15 @@
 
 /* `````````````````` Css Homepage````````````````````````````` */
 
-.image-recentAccess {
+
+/* .image-recentAccess {
     flex-flow: wrap;
     overflow: hidden;
     height: 210px;
     display: flex;
     margin-right: -15px;
     margin-left: -10px;
-}
+} */
 
 .image-recentAccess .preview {
     height: 120px;
@@ -295,7 +303,11 @@
 }
 
 .kh-table {
-    width: 97%;
+    width: 94%;
+}
+
+.kh-sub-table {
+    width: 99%!important;
 }
 
 .kh-table th {
@@ -319,6 +331,22 @@
 
 /* `````````````````` Css Homepage````````````````````````````` */
 
+.kh-editor {
+    height: calc(98vh - 65px);
+    overflow: auto!important;
+    padding: 8px;
+}
+
+.kh-editor-view {
+    height: calc(98vh - 65px);
+    overflow: auto!important;
+    padding: 8px;
+}
+
+#myeditablediv {
+    clear: both;
+}
+
 .kh-editor #editor {
     width: 100%!important;
     height: 100%!important;
@@ -339,21 +367,6 @@
     display: flex;
 }
 
-
-/* .kh-editor #handson-table .handsontable .wtHolder .wtHider .htCore colgroup col {
-    width: auto!important;
-} */
-
-
-/* .kh-editor #myeditablediv #mceResizeHandlenw {
-    left: unset!important;
-} */
-
-
-/* .kh-editor #myeditablediv #mceResizeHandlesw {
-    left: unset!important;
-} */
-
 .kh-editor #myeditablediv {
     min-height: 100px!important;
 }
@@ -366,6 +379,10 @@
     outline: 0px solid transparent!important;
 }
 
+.kh-editor .codox-styles .codox-container {
+    float: left!important;
+}
+
 
 /* .kh-editor #myeditablediv .mce-item-table td {
     min-width: 80px!important;
@@ -373,6 +390,25 @@
 
 .tableHandson:hover {
     border: 2px solid red;
+}
+
+.kh-editor-view .mceTable table,
+.kh-editor-view .mceTable table th,
+.kh-editor-view .mceTable table td {
+    border: 1px solid #bebebe!important;
+    border-collapse: collapse!important;
+}
+
+.kh-editor-view .mceTable {
+    width: 1000px;
+    display: flex;
+}
+
+.show-content .mceTable table,
+.show-content .mceTable table th,
+.show-content .mceTable table td {
+    border: 1px solid #bebebe!important;
+    border-collapse: collapse!important;
 }
 
 

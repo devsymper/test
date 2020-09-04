@@ -1,7 +1,7 @@
 <template>
    <v-card class="context-menu" v-show="isShowMenu" :style="{top:top+'px',left:left+'px'}">
 			<div class="item" v-for="item in listUser" :key="item.name" @click="clickRow(item)">
-				{{item.displayName}}
+				<span v-on:keyup.down="down"  v-on:keyup.up="up" v-on:keyup.enter="clickRow(item)"> {{item.displayName}}</span>
 			</div>
    </v-card>
 </template>
@@ -13,23 +13,24 @@
 			default: ''
 		}
 	},
-    data: () => ({
-		isShowMenu:false,
-		top:0,
-		left:0,
-		listUserFilter: [],
-	}),
+	 data: function() {
+        return {
+            isShowMenu:false,
+			top:0,
+			left:0,
+			listUserFilter: [],
+        };
+    },
 	created(){
-		// let self = this
 	},
 	computed:{
 		listUser(){
 			if(this.keyWord == ''){
-				return this.$store.state.app.allUsers
+				return this.$store.state.app.allUsers.slice(0,3)
 			}
 			else{
 				this.filterItem()
-				return this.listUserFilter
+				return this.listUserFilter.slice(0,4)
 			}
 		},
 	},
@@ -54,9 +55,19 @@
 					}
 				})
 			}
+		},
+		chooseUser(){
+		},
+		down(){
+			console.log('down');
+		},
+		up(){
+			console.log('up');
 		}
+
+
 	}
-	}
+}
 </script>
 <style scoped>
 .context-menu{

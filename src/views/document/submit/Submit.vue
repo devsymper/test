@@ -264,7 +264,6 @@ export default {
 
     },
     beforeMount() {
-        this.docSize = "21cm";
         this.columnsSQLLiteDocument = {};
     },
     mounted() {
@@ -555,18 +554,7 @@ export default {
                     $(evt.target).closest(".card-time-picker").length == 0
                 ) { 
                     setTimeout(() => {
-                        let currentTableInteractive = thisCpn.sDocumentSubmit.currentTableInteractive
-                        if(currentTableInteractive != null){
-                            let cellActiveName = currentTableInteractive.tableInstance.getActiveEditor().prop;
-                            let control = getControlInstanceFromStore(this.keyInstance,cellActiveName);
-                            if(control.type != "time"){
-                                thisCpn.$refs.timeInput.hide();
-                            }
-                        }
-                        else{
-                            thisCpn.$refs.timeInput.hide();
-                        }
-                        
+                        thisCpn.$refs.timeInput.hide();
                     }, 20);
                 }
                 if (
@@ -762,14 +750,14 @@ export default {
         applyTimePicker(data){
             let time = data.value;
             let input = data.input;
-            input.val(time);
             if(this.sDocumentSubmit.currentTableInteractive == null){
-
+                input.val(time);
                 input.trigger('change');
             }
             else{
-                // let currentTableInteractive = this.sDocumentSubmit.currentTableInteractive
-                // currentTableInteractive.tableInstance.setDataAtCell(this.sDocumentSubmit.currentCellSelected.row,this.sDocumentSubmit.currentCellSelected.column,time,'edit')
+                let currentTableInteractive = this.sDocumentSubmit.currentTableInteractive
+                let cellActive = currentTableInteractive.tableInstance.getActiveEditor();
+                currentTableInteractive.tableInstance.setDataAtCell(cellActive.row,cellActive.col,time,'edit')
             }
         },
         afterCheckTimeNotValid(data){
@@ -799,8 +787,8 @@ export default {
             }
             else{
                 let currentTableInteractive = this.sDocumentSubmit.currentTableInteractive
-                currentTableInteractive.tableInstance.setDataAtCell(this.sDocumentSubmit.currentCellSelected.row,this.sDocumentSubmit.currentCellSelected.column,user.id);
-                currentTableInteractive.showPopupUser = false
+                let cellActive = currentTableInteractive.tableInstance.getActiveEditor();
+                currentTableInteractive.tableInstance.setDataAtCell(cellActive.row,cellActive.col,user.id,'edit')
             }
         },
         /**
@@ -808,7 +796,7 @@ export default {
          */
         afterSelectRowAutoComplete(data){
             // th này không phải trong table      
-            if(this.sDocumentSubmit.currentCellSelected == null){
+            if(this.sDocumentSubmit.currentTableInteractive == null){
                 let fromAutoComplete = true;
                 if(!data.fromEnterKey){
                     fromAutoComplete = false
@@ -817,8 +805,8 @@ export default {
             }
             else{
                 let currentTableInteractive = this.sDocumentSubmit.currentTableInteractive
-                currentTableInteractive.tableInstance.setDataAtCell(this.sDocumentSubmit.currentCellSelected.row,this.sDocumentSubmit.currentCellSelected.column,data.value)
-                currentTableInteractive.isAutoCompleting = false;
+                let cellActive = currentTableInteractive.tableInstance.getActiveEditor();
+                currentTableInteractive.tableInstance.setDataAtCell(cellActive.row,cellActive.col,data.value,'edit')
             }
         },
 
@@ -919,6 +907,7 @@ export default {
                         if (res.status == 200) {
                             let content = res.data.document.content;
                             thisCpn.documentName = res.data.document.name;
+                            thisCpn.docSize = (parseInt(res.data.document.isFullSize) == 1) ? "100%":"21cm";
 							thisCpn.contentDocument = content;
 							if(res.data.document.dataPrepareSubmit != "" && res.data.document.dataPrepareSubmit != null)
                             thisCpn.preDataSubmit = JSON.parse(res.data.document.dataPrepareSubmit);
@@ -1068,6 +1057,8 @@ export default {
                                 let childControlProp = thisCpn.sDocumentEditor.allControl[id].listFields[childControlId];
                                 childControlProp.properties.inTable = controlName;
                                 childControlProp.properties.docName = thisCpn.documentName;
+                                let childValue = childControlProp.value;
+                                console.log('childControlProp',childControlProp);
                                 let childPrepareData = childControlProp.prepareData
                                 if(childPrepareData != null && childPrepareData != ""){
                                     isSetEffectedControl = true;
@@ -1077,7 +1068,8 @@ export default {
                                     idFieldChild,
                                     $(this),
                                     childControlProp,
-                                    thisCpn.keyInstance
+                                    thisCpn.keyInstance,
+                                    childValue
                                 );
                                 childControl.init();
                                 childControl.setEffectedData(childPrepareData);
@@ -1087,7 +1079,7 @@ export default {
                             });
                             tableControl.listInsideControls = listInsideControls;
                             tableControl.renderTable();
-                            tableControl.setData(valueInput);
+                            tableControl.tableInstance.updateTable(valueInput);
                             this.addToListInputInDocument(controlName,tableControl)
                         }
                     }
@@ -1338,6 +1330,7 @@ export default {
             this.isSubmitting = true;
             let thisCpn = this;
             let dataPost = this.getDataPostSubmit();
+            console.log(dataPost,'dataPostdataPost');
             dataPost['documentId'] = this.documentId;
             if(this.isDraft == 1){
                 dataPost['isDraft'] = true;
@@ -1435,8 +1428,11 @@ export default {
                 if(listInput[i].type == 'number'){
                     for (let index = 0; index < dataCol.length; index++) {
                         const element = dataCol[index];
-                        if(typeof element !== 'number'){
+                        if(isNaN(Number(element))){
                             dataCol[index] = 0;
+                        }
+                        else{
+                            dataCol[index] = Number(element);
                         }
                     }
                 }
@@ -1459,7 +1455,7 @@ export default {
                 }
                 dataControlInTable[i] = dataCol;
             }
-            dataTable[tableControl.name] = dataControlInTable
+            dataTable[tableControl.name] = dataControlInTable;
             return dataTable;
         },
 

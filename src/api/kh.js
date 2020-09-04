@@ -94,6 +94,12 @@ export const knowledgeApi = {
     },
     removeFileAttach(fileId) {
         return knowledge.delete('upload/' + fileId);
+    },
+    downloadFile(id) {
+        window.open('https://file.symper.vn/downloadS/' + id, '_blank');
+    },
+    renameFile(data) {
+        return fileManagement.put('renameFile', data);
     }
 
 

@@ -1,5 +1,30 @@
 <template>
     <div class="wrap-content-detail">
+        
+        <div class="panel-header" v-if="!quickView">
+            <div class="right-action">
+                <v-tooltip bottom>
+                    <template v-slot:activator="{ on }">
+                        <v-icon  @click="togglePageSize" v-on="on">mdi-resize</v-icon>
+                    </template>
+                    <span>{{$t('document.detail.fab.toggleSize')}}</span>
+                </v-tooltip>
+                
+                <v-tooltip bottom>
+                    <template v-slot:activator="{ on }">
+                        <v-icon @click="toggleSideBar" v-on="on">mdi-information-outline</v-icon>
+                    </template>
+                    <span>{{$t('document.detail.fab.otherInfo')}}</span>
+                </v-tooltip>
+                <v-tooltip bottom>
+                    
+                     <template v-slot:activator="{ on }">
+                        <v-icon  @click="printDiv" v-on="on">mdi-printer</v-icon>
+                    </template>
+                    <span>{{$t('document.detail.fab.print')}}</span>
+                </v-tooltip>
+            </div>
+        </div>
         <div
             class="sym-form-Detail"
             :id="'sym-Detail-'+keyInstance"
@@ -9,85 +34,19 @@
             
             
         </div>
-            <!-- <button v-if="!quickView" v-on:click="togglePageSize"  id="toggle-doc-size-btn" :style="togglePageSizeBtnStyle">
-                <span class="mdi mdi-arrow-horizontal-lock"></span>
-            </button>
-            <button v-if="!quickView" v-on:click="toggleSideBar"  id="side-bar-detail-btn" :style="toggleSideBarBtnStyle">
-                <span class="mdi mdi-chevron-double-left"></span>
-            </button> -->
-            <side-bar-detail 
-            :sidebarWidth="sidebarWidth"  
-            :isShowSidebar="isShowSidebar"
-            :userId="userId"
-            :taskId="taskId"
-            :createTime="createTime"
-            :documentObjectId="documentObjectId1"
-            :workflowId="workflowId"
-            @after-hide-sidebar="afterHideSidebar"
-            />
-            <HistoryControl ref="historyView" />
-     <v-speed-dial
-                v-if="!quickView"
-                v-model="fab"
-                :top="top"
-                :bottom="bottom"
-                :right="right"
-                :left="left"
-                :direction="direction"
-                :open-on-hover="hover"
-                :transition="transition"
-            >
-            <template v-slot:activator>
-                    <v-btn v-model="fab" color="blue darken-2" dark fab>
-                        <v-icon v-if="fab">mdi-close</v-icon>
-                        <v-icon v-if="!fab">mdi-menu</v-icon>
-                    </v-btn>
-                </template>
-                <v-tooltip left>
-                    <template v-slot:activator="{ on }">
-                        <div v-on="on">
-                            <v-btn fab dark small color="green" @click="togglePageSize">
-                                <v-icon>mdi-resize</v-icon>
-                            </v-btn>
-                        </div>
-                    </template>
-                    <span>{{$t('document.detail.fab.toggleSize')}}</span>
-                </v-tooltip>
-                
-                <v-tooltip left>
-                    <template v-slot:activator="{ on }">
-                        <div v-on="on">
-                            <v-btn
-                                fab
-                                dark
-                                small
-                                color="indigo"
-                                @click="toggleSideBar"
-                            >
-                                <v-icon>mdi-book-open-outline</v-icon>
-                            </v-btn>
-                        </div>
-                    </template>
-                    <span>{{$t('document.detail.fab.otherInfo')}}</span>
-                </v-tooltip>
-                <v-tooltip left>
-                    <template v-slot:activator="{ on }">
-                        <div v-on="on">
-                            <v-btn
-                                fab
-                                dark
-                                small
-                                color="indigo"
-                                @click="printDiv"
-                            >
-                                <v-icon>mdi-printer</v-icon>
-                            </v-btn>
-                        </div>
-                    </template>
-                    <span>{{$t('document.detail.fab.print')}}</span>
-                </v-tooltip>
-                
-            </v-speed-dial>
+      
+        <side-bar-detail 
+        :sidebarWidth="sidebarWidth"  
+        :isShowSidebar="isShowSidebar"
+        :userId="userId"
+        :taskId="taskId"
+        :createTime="createTime"
+        :documentObjectId="documentObjectId1"
+        :workflowId="workflowId"
+        @after-hide-sidebar="afterHideSidebar"
+        />
+        <HistoryControl ref="historyView" />
+       
 
     </div>
 </template>
@@ -274,6 +233,12 @@ export default {
                             thisCpn.processHtml(content);
                         }, 100);
                     }
+                    else{
+                        this.$snotify({
+                                type: "error",
+                                title: res.message,
+                            });
+                    }
                 })
                 .catch(err => {
                      this.$snotify({
@@ -435,66 +400,26 @@ export default {
         },
         
         printDiv(){
-            this.$snotify({
-                                type: "error",
-                                title: "hoàng đang xử lí, vui lòng quay lại sau",
-                            });
-            // this.fab = false;
-
-            // $('.sym-form-Detail').find('table[border="1"]').removeAttr('border');
-            // $('.sym-form-Detail').find('table[border="1"]').css({border:'none'});
-            // // let css = this.getallcss();
-            // let head = document.head || document.getElementsByTagName('head')[0];
-            // let style = document.createElement('style');
-            // $('body').css({display: 'flex',
-            // 'justify-content': 'center',padding:'8px'})
-          
-            // var printContents = $('.sym-form-Detail')[0].innerHTML;
-            // $(printContents).find('.s-drawer').remove();
-			// var originalContents = document.body.innerHTML;
-            // // head.appendChild(style);
-            // let x = this.$el.detach();
-            // let old = this.$root.$el;
-            // // let content = $(printContents).detach();
-            // $(this.$root.$el).empty();
-            // $(this.$root.$el).append(x);
-			// // document.body.innerHTML = printContents;
-
-			// window.print();
-            // $(this.$root.$el).append($(old).children().detach());
-            // // document.body.innerHTML = originalContents;
-            //  $('body').removeAttr('style');
+            this.quickView = true;
+            $('.sym-form-Detail').addClass('w-auto');
+            $('main').addClass('p-0');
+            $('.app-header-bg-color').addClass('d-none')
+            $('.s-drawer').addClass('d-none')
+            $('.v-navigation-drawer').addClass('d-none')
+			setTimeout(() => {
+                window.print();
+                this.quickView = false;
+                $('.sym-form-Detail').removeClass('w-auto');
+                $('main').removeClass('p-0');
+                
+                $('.app-header-bg-color').removeClass('d-none')
+                $('.s-drawer').removeClass('d-none')
+                $('.v-navigation-drawer').removeClass('d-none')
+            }, 100);
+           
             
         },
-        getallcss() {
-            var css = "", //variable to hold all the css that we extract
-                styletags = document.getElementsByTagName("style");
-            for(var i = 0; i < styletags.length; i++)
-            {
-                css += styletags[i].innerHTML; //extract the css in the current style tag
-            }
-            css += 'padding:12px';
-            if(this.documentSize == '21cm'){
-                $('body').addClass('content-print')
-            }
-
-
-            // //loop over all the external stylesheets
-//             for(var i = 0; i < document.styleSheets.length; i++)
-//             {
-//                 var currentsheet = document.styleSheets[i];
-//                 if(currentsheet.href == null){
-// //loop over all the styling rules in this external stylesheet
-//                     for(var e = 0; e < currentsheet.cssRules.length; e++)
-//                     {
-//                         css += currentsheet.cssRules[e].cssText; //extract all the styling rules
-//                     }
-//                 }
-                
-//             }
-
-            return css;
-        }
+       
     }
 }
 </script>
@@ -568,4 +493,27 @@ export default {
     /* .sym-form-Detail table:not(.htCore) td, .sym-form-Detail table:not(.htCore), .sym-form-Detail table:not(.htCore) th{
         border: none !important;
     } */
+    .panel-header{
+        height: 30px;
+        display: flex;
+        color: #757575;
+    }
+    .panel-header .mdi:hover{
+        color: rgba(0,0,0 / 0.6);
+    }
+    .panel-body{
+        height: calc(100vh - 55px);
+    }
+    .right-action{
+        margin-left: auto;
+        font-size: 15px;
+    }
+    .right-action >>> .v-icon{
+        font-size: 16px !important;
+    }
+    .panel-header .mdi {
+        cursor: pointer;
+        margin-right: 12px;
+        transition: all ease-in-out 250ms;
+    }
 </style>
