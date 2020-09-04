@@ -272,6 +272,13 @@ export default {
                 case 'read':
                     this.markRead(notificationItem)
                     break;
+                default:
+                    var actionData=JSON.parse(notificationItem.action); 
+                    actionData['action']=action;
+                    console.log(actionData);
+                    this.$evtBus.$emit('symper-app-call-action-handler', actionData, this, {openInNewTab: true})
+                    this.markRead(notificationItem);
+                    break;
             }
         },
         markRead(notificationItem){
