@@ -658,6 +658,42 @@ const controlTypes = {
         formulas: ['hidden']
     },
 
+    tabPage: {
+        icon: "/icon/ic_panel.png",
+        html: `<div class="s-control s-control-tab-page"  title="Tab / Page" 
+                s-control-type="tabPage" 
+                style="display: flex;width: 100%;height:300px;border: 1px solid rgba(0 0 0 / 0.1);" >
+                    <div class="sidebar-page">
+                        <div class="page-header-action">
+                            <button>+  Thêm trang</button>
+                        </div>
+                        <div class="list-page">
+                            <div class="page-item sb-page-active" page-index="1" page-id="s-page-id-123">
+                                <span class="mdi mdi-format-page-break"></span>
+                                <span>Trang so 1</span>
+                            </div>
+                        </div>
+                        <button class="collap-sidebar-btn"><<</button>
+                    </div>
+                    <div class="list-page-content">
+                        <div class="page-content page-active" s-page-content-id="s-page-id-123">
+                            <div class="page-content-header">
+                                <button class="add-tab-btn">+ Thêm tab</button>
+                                <div class="tab">
+                                
+                                </div>
+                            </div>
+                            <div class="page-content-body">
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>&nbsp;`,
+        title: "Tab / Page",
+        inProps: ['height'],
+        formulas: ['hidden']
+    },
+
 
 }
 
