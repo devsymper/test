@@ -1,24 +1,25 @@
 <template>
     <v-row>
         <v-app-bar dense flat color="white" class="notification-list-bar" fixed>
-            <v-toolbar-title class="nofitication-title-bar">
+
+            <v-col :cols="4"> <v-toolbar-title class="nofitication-title-bar">
                 Notification
             </v-toolbar-title>
-            <v-col :cols="10" class="text-right pt-1 pb-1 pr-0">
+            </v-col>
+            <v-col :cols="8" class="text-right pt-1 pb-1 pr-0">
                 <!-- Tìm kiếm -->
                 <v-text-field dense
                     class="bg-grey sym-small-pad sym-small-size d-inline-block mr-2"
                     append-icon="mdi-magnify"
                     flat
                     solo
-                    v-on:keyup="searchNotification"
+                    @input="searchNotification"
                     v-model="txtSearch"
                     :placeholder="$t('common.search')"
                 ></v-text-field>
                
                 <v-menu
-                    :close-on-content-click="true"
-                    :open-on-hover="true"
+                    z-index="162"
                     :max-width="200"
                     :min-width="200"
                     :max-height="500"
@@ -45,17 +46,7 @@
                                     </v-chip>
                                 </v-list-item-content>
                             
-                        </v-list-item>    
-                        <v-list-item dense flat>
-                            <v-list-item-content class="pt-0 pb-0  notification-global-action" @click="showConfig()">
-                                <v-chip>
-                                    <v-icon size="15">mdi-cog</v-icon>
-                                        Config notification
-                                </v-chip>
-                                    
-                                                                    
-                            </v-list-item-content>
-                        </v-list-item>    
+                        </v-list-item>     
                     </v-list>
                 </v-menu>
             </v-col>
@@ -281,6 +272,13 @@ export default {
                 case 'read':
                     this.markRead(notificationItem)
                     break;
+                default:
+                    var actionData=JSON.parse(notificationItem.action); 
+                    actionData['action']=action;
+                    console.log(actionData);
+                    this.$evtBus.$emit('symper-app-call-action-handler', actionData, this, {openInNewTab: true})
+                    this.markRead(notificationItem);
+                    break;
             }
         },
         markRead(notificationItem){
@@ -340,8 +338,12 @@ export default {
                     this.showError();
                 })
         },
-        searchNotification(event){
-            this.getListNoticication()
+        searchNotification(){
+            if(this.searchDebounce){
+                clearTimeout(this.searchDebounce);
+            }
+            this.searchDebounce = setTimeout(this.getListNoticication,500);
+            
         },
         showConfig(){
             this.dialogConfigNotification = true
