@@ -94,7 +94,6 @@ Handsontable.renderers.SelectRenderer = function(instance, td, row, col, prop, v
     })
     let table = store.state.document.submit[instance.keyInstance];
     td.innerHTML = div;
-    console.log(instance.tableName, 'instanceinstanceinstance');
     if (row == instance.countRows() - 1 && table != undefined && instance.tableName != undefined) {
         let tableControl = table.listInputInDocument[instance.tableName];
         if (tableControl != undefined && tableControl.hasOwnProperty('tableInstance')) {
@@ -350,11 +349,11 @@ export default class Table {
                             thisObj.currentControlSelected = columns[coords.col].data;
                         // nếu type cell là time thì emit qua submit mở timepicker
                         if (thisObj.getCellSelectedType(coords.col) == 'time') {
-
                             setTimeout((self) => {
                                 var activeEditor = self.getActiveEditor();
                                 self.selectCell(coords.row, coords.col);
                                 activeEditor.beginEditing();
+                                activeEditor.TEXTAREA.value = (activeEditor.originalValue == undefined) ? "" : activeEditor.originalValue
                                 thisObj.showPopupTime = true;
                                 event.controlName = columns[coords.col].data
                                 event.curTarget = activeEditor.TEXTAREA
@@ -679,8 +678,8 @@ export default class Table {
             let inputControl = formulasInstance.getInputControl();
             let dataInput = {};
             let listInputInDocument = this.getListInputInDocument();
+            console.log('listInputInDocumentlistInputInDocument', sDocument.state.submit[this.keyInstance]);
             for (let inputControlName in inputControl) {
-                console.log("sada0,", listInputInDocument[inputControlName]);
                 dataInput[inputControlName] = listInputInDocument[inputControlName].value;
                 // if (valueInputControlItem === false) {
 
@@ -1061,6 +1060,22 @@ export default class Table {
     setDefaulFotterRowData(value, rowIndex, prop) {
         this.setDataAtRowProp(rowIndex, prop, value, AUTO_SET);
     }
+    updateTable(data) {
+        if (Object.keys(data).length > 0) {
+            let dataUpdate = [];
+            for (let controlName in data) {
+                for (let index = 0; index < data[controlName].length; index++) {
+                    if (dataUpdate.length <= index) {
+                        dataUpdate.push({})
+                    }
+                    dataUpdate[index][controlName] = data[controlName][index];
+                }
+            }
+            this.tableInstance.updateSettings({
+                data: dataUpdate
+            })
+        }
+    }
 
     // Hàm set data cho table
     setData(vls) {
@@ -1068,11 +1083,35 @@ export default class Table {
             ClientSQLManager.delete(this.keyInstance, this.tableName, false)
             let data = vls;
             let controlBinding = Object.keys(data[0]);
+            let dataToStore = {};
             for (let index = 0; index < data.length; index++) {
                 let rowId = Date.now() + index;
                 data[index]['s_table_id_sql_lite'] = rowId;
-            }
 
+                let listKey = Object.keys(data[index]);
+                for (let j = 0; j < listKey.length; j++) {
+                    let controlName = listKey[j];
+                    if (controlName == 's_table_id_sql_lite') {
+                        continue;
+                    }
+                    if (!dataToStore.hasOwnProperty(controlName)) {
+                        dataToStore[controlName] = [];
+                    }
+                    if (data[index] != undefined)
+                        dataToStore[controlName].push(data[index][controlName]);
+                }
+
+            }
+            for (let controlName in dataToStore) {
+                store.commit("document/updateListInputInDocument", {
+                    controlName: controlName,
+                    key: 'value',
+                    value: dataToStore[controlName],
+                    instance: this.keyInstance
+                });
+            }
+            // nếu table có tính tổng thì thêm 1 dòng trống ở cuối
+            console.log("saddsadsadsad", data);
             if (this.tableHasRowSum) {
                 data.push({})
             }
@@ -1275,22 +1314,6 @@ export default class Table {
         }
     }
 
-
-    /**
-     * set giá trị cho một cột tương ứng với các rowId
-     * @param {string} name tên control
-     * @param {Object} values {
-     *                              "rowId":"value"
-     *                          }
-     */
-    setColValues(name, values, tbName) {
-        let vls = [];
-        for (let i = 0; i < values.length; i++) {
-            vls.push([i, name, values[i]]);
-        }
-        this.tableInstance.setDataAtRowProp(vls, null, null, AUTO_SET);
-        // listInputInDocument[tbName].reCaclSumAndAvg();
-    }
     checkCellIsTime(str) {
         var patt = new RegExp("^([0-1]?[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$", "g");
         return patt.test(str)

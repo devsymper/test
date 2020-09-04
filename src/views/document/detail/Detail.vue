@@ -1,5 +1,30 @@
 <template>
     <div class="wrap-content-detail">
+        
+        <div class="panel-header" v-if="!quickView">
+            <div class="right-action">
+                <v-tooltip bottom>
+                    <template v-slot:activator="{ on }">
+                        <v-icon  @click="togglePageSize" v-on="on">mdi-resize</v-icon>
+                    </template>
+                    <span>{{$t('document.detail.fab.toggleSize')}}</span>
+                </v-tooltip>
+                
+                <v-tooltip bottom>
+                    <template v-slot:activator="{ on }">
+                        <v-icon @click="toggleSideBar" v-on="on">mdi-information-outline</v-icon>
+                    </template>
+                    <span>{{$t('document.detail.fab.otherInfo')}}</span>
+                </v-tooltip>
+                <v-tooltip bottom>
+                    
+                     <template v-slot:activator="{ on }">
+                        <v-icon  @click="printDiv" v-on="on">mdi-printer</v-icon>
+                    </template>
+                    <span>{{$t('document.detail.fab.print')}}</span>
+                </v-tooltip>
+            </div>
+        </div>
         <div
             class="sym-form-Detail"
             :id="'sym-Detail-'+keyInstance"
@@ -9,85 +34,19 @@
             
             
         </div>
-            <!-- <button v-if="!quickView" v-on:click="togglePageSize"  id="toggle-doc-size-btn" :style="togglePageSizeBtnStyle">
-                <span class="mdi mdi-arrow-horizontal-lock"></span>
-            </button>
-            <button v-if="!quickView" v-on:click="toggleSideBar"  id="side-bar-detail-btn" :style="toggleSideBarBtnStyle">
-                <span class="mdi mdi-chevron-double-left"></span>
-            </button> -->
-            <side-bar-detail 
-            :sidebarWidth="sidebarWidth"  
-            :isShowSidebar="isShowSidebar"
-            :userId="userId"
-            :taskId="taskId"
-            :createTime="createTime"
-            :documentObjectId="documentObjectId1"
-            :workflowId="workflowId"
-            @after-hide-sidebar="afterHideSidebar"
-            />
-            <HistoryControl ref="historyView" />
-     <v-speed-dial
-                v-if="!quickView"
-                v-model="fab"
-                :top="top"
-                :bottom="bottom"
-                :right="right"
-                :left="left"
-                :direction="direction"
-                :open-on-hover="hover"
-                :transition="transition"
-            >
-            <template v-slot:activator>
-                    <v-btn v-model="fab" color="blue darken-2" dark fab>
-                        <v-icon v-if="fab">mdi-close</v-icon>
-                        <v-icon v-if="!fab">mdi-menu</v-icon>
-                    </v-btn>
-                </template>
-                <v-tooltip left>
-                    <template v-slot:activator="{ on }">
-                        <div v-on="on">
-                            <v-btn fab dark small color="green" @click="togglePageSize">
-                                <v-icon>mdi-resize</v-icon>
-                            </v-btn>
-                        </div>
-                    </template>
-                    <span>{{$t('document.detail.fab.toggleSize')}}</span>
-                </v-tooltip>
-                
-                <v-tooltip left>
-                    <template v-slot:activator="{ on }">
-                        <div v-on="on">
-                            <v-btn
-                                fab
-                                dark
-                                small
-                                color="indigo"
-                                @click="toggleSideBar"
-                            >
-                                <v-icon>mdi-book-open-outline</v-icon>
-                            </v-btn>
-                        </div>
-                    </template>
-                    <span>{{$t('document.detail.fab.otherInfo')}}</span>
-                </v-tooltip>
-                <v-tooltip left>
-                    <template v-slot:activator="{ on }">
-                        <div v-on="on">
-                            <v-btn
-                                fab
-                                dark
-                                small
-                                color="indigo"
-                                @click="printDiv"
-                            >
-                                <v-icon>mdi-printer</v-icon>
-                            </v-btn>
-                        </div>
-                    </template>
-                    <span>{{$t('document.detail.fab.print')}}</span>
-                </v-tooltip>
-                
-            </v-speed-dial>
+      
+        <side-bar-detail 
+        :sidebarWidth="sidebarWidth"  
+        :isShowSidebar="isShowSidebar"
+        :userId="userId"
+        :taskId="taskId"
+        :createTime="createTime"
+        :documentObjectId="documentObjectId1"
+        :workflowId="workflowId"
+        @after-hide-sidebar="afterHideSidebar"
+        />
+        <HistoryControl ref="historyView" />
+       
 
     </div>
 </template>
@@ -273,6 +232,12 @@ export default {
                         setTimeout(() => {
                             thisCpn.processHtml(content);
                         }, 100);
+                    }
+                    else{
+                        this.$snotify({
+                                type: "error",
+                                title: res.message,
+                            });
                     }
                 })
                 .catch(err => {
@@ -528,4 +493,27 @@ export default {
     /* .sym-form-Detail table:not(.htCore) td, .sym-form-Detail table:not(.htCore), .sym-form-Detail table:not(.htCore) th{
         border: none !important;
     } */
+    .panel-header{
+        height: 30px;
+        display: flex;
+        color: #757575;
+    }
+    .panel-header .mdi:hover{
+        color: rgba(0,0,0 / 0.6);
+    }
+    .panel-body{
+        height: calc(100vh - 55px);
+    }
+    .right-action{
+        margin-left: auto;
+        font-size: 15px;
+    }
+    .right-action >>> .v-icon{
+        font-size: 16px !important;
+    }
+    .panel-header .mdi {
+        cursor: pointer;
+        margin-right: 12px;
+        transition: all ease-in-out 250ms;
+    }
 </style>
