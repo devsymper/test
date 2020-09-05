@@ -158,7 +158,8 @@
                             :color="'transparent'"
                             :textColor="''"
                             :flat="true"
-                            v-model="taskObject.assignee"
+                         
+                            @input="inputAssignee"
                         ></userSelector>
                     </div>
                     <div class="label pt-2">{{$t("tasks.header.dueDate")}}</div>
@@ -170,7 +171,6 @@
                     <div>
                         <symper-document-selec v-model="taskObject.docId"></symper-document-selec>
                     </div>
-
                     <div class="label pt-2">{{$t("tasks.header.description")}}</div>
                     <div>
                         <v-textarea
@@ -327,10 +327,11 @@ export default {
             selectedProcess: null,
             taskObject: {
                 name: "",
-                assignee: [],
+                assignee: "",
                 dueDate: "",
                 description: "",
-                docId: ''
+                docId: '',
+              
             },
             filterList: {}
         };
@@ -342,6 +343,9 @@ export default {
         this.getProcessInstance();
     },
     methods: {
+        inputAssignee(data){
+            this.taskObject.assignee=data;
+        },
         refreshTaskList(){
             this.$emit('refresh-task-list');
         },
@@ -423,16 +427,16 @@ export default {
             }
             let data = {
                 ...this.taskObject,
-                assignee: this.taskObject.assignee[0],
+                assignee: this.taskObject.assignee,
                 parentTaskId: this.parentTaskId ? this.parentTaskId : "",
-                owner: this.$store.state.app.endUserInfo.id
+                owner: this.$store.state.app.endUserInfo.id,
             };
 
             if(this.taskObject.docId){
                 let description = util.cloneDeep(defaultTaskDescription);
                 description.action.action = 'submit';
-                description.action.content = this.taskObject.description;
                 description.action.parameter.documentId = this.taskObject.docId;
+                description.content = this.taskObject.name;
 
                 data.description = JSON.stringify(description);
             }

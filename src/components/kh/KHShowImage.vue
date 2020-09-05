@@ -40,16 +40,16 @@
         <img class="image-modal" :src="serverPath" alt />
       </div>
 
-      <div class="div-show-content" v-if="type==='doc' ||type==='docx' ||type==='xlsx'">
+      <div class="div-show-content" v-else-if="type==='doc' ||type==='docx' ||type==='xlsx'">
         <iframe
           class="show-content"
           :src="`https://docs.google.com/gview?url=${serverPath}&embedded=true`"
         ></iframe>
       </div>
-      <div class="div-show-content" v-if="type==='txt'">
+      <div class="div-show-content" v-else-if="type==='txt'">
         <iframe class="show-content" :src="serverPath"></iframe>
       </div>
-      <div class="div-show-content" v-if="type==='document_backup'">
+      <div class="div-show-content" v-else-if="type==='document_backup'">
         <div class="show-content" v-html="docContent"></div>
       </div>
     </div>
