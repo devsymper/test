@@ -131,6 +131,7 @@ import { setDataForPropsControl,allControlNotSetData } from "./../../../componen
 import BasicControl from "./basicControl";
 import TableControl from "./tableControl";
 import ActionControl from "./actionControl";
+import LayoutControl from "./layoutControl";
 import DatePicker from "./../../../components/common/DateTimePicker";
 import TimeInput from "./../../../components/common/TimeInput";
 import Table from "./table.js";
@@ -566,6 +567,8 @@ export default {
                 ) {
                     thisCpn.$refs.validate.hide();
                 }
+               
+                
             } catch (error) {
                 
             }
@@ -599,6 +602,7 @@ export default {
     },
     
     methods: {
+        
         // hàm
         getParamsForRunDataFlow(properties){
             let mapControlToParams = properties.mapParamsDataflow.value;
@@ -1009,7 +1013,13 @@ export default {
                         control.render();
                         control.setEffectedData(prepareData);
                         this.addToListInputInDocument('submit',control)
-                    } else {
+                    } 
+                    else if(controlType == 'tabPage'){
+                        let control = new LayoutControl(idField, $(allInputControl[index]),field,thisCpn.keyInstance);
+                        control.init();
+                        control.render();
+                    }
+                    else {
                         let controlName = field.properties.name.value;
                         let mapColumnType = Util.mapTypeControlToTypeSQLLite(controlType); 
                         if(mapColumnType != false){
