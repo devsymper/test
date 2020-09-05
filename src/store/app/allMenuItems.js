@@ -17,6 +17,13 @@ export default {
             "resource": "document_definition",
             "scope": "document",
             "action": "list"
+        },
+        children: {
+            listTrash: {
+                title: "Thùng rác",
+                icon: "mdi-trash",
+                link: "/documents/trash"
+            }
         }
     },
     orgchart: {

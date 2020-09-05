@@ -558,6 +558,9 @@ export default {
     },
     methods: {
         relistContextmenu(){
+            if(this.cellAboutSelecting.row < 0){
+                return;
+            }
             let row = this.$refs.dataTable.hotInstance.getSourceDataAtRow(this.cellAboutSelecting.row);
             let id = row.id;
             let items = this.tableContextMenu;

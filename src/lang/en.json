@@ -280,7 +280,6 @@
     },
     "document": {
         "create": "Create document",
-        "submit": "Submit document",
         "edit": "Edit document",
         "title": "List Document",
         "table": {
@@ -322,6 +321,14 @@
                     "changeTo": "To"
                 }
             }
+        },
+        "submit": {
+            "fab": {
+                "submit": "Submit",
+                "draft": "Draft",
+                "toggleSize": "Toggle Size"
+            },
+            "title": "Submit document"
         },
         "process": {
             "header_bar": {

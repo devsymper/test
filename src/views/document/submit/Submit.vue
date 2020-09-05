@@ -146,6 +146,8 @@ import './customControl.css';
 import ErrMessagePanel from "./../../../views/document/items/ErrMessagePanel.vue";
 import moment from "moment-timezone";
 import EmbedDataflow from "@/components/dataflow/EmbedDataflow"
+import {listControlNotNameProp} from "./../../../components/document/controlPropsFactory.js"
+
 
 
 import { checkCanBeBind, resetImpactedFieldsList, markBinedField } from './handlerCheckRunFormulas';
@@ -1222,8 +1224,8 @@ export default {
             let controlNameIdentifier = this.objectIdentifier['name'];
             let controlInstance = getControlInstanceFromStore(this.keyInstance,controlNameIdentifier);
             if(controlInstance != false && controlInstance.controlFormulas.hasOwnProperty('formulas')){
-                let datainput = this.getDataInputFormulas(controlInstance.controlFormulas['formulas']['instance'])
-                controlIdentifier['dataInput'] = datainput;
+                let dataInput = this.getDataInputFormulas(controlInstance.controlFormulas['formulas']['instance'])
+                controlIdentifier['dataInput'] = dataInput;
                 // controlIdentifier['dataInput'] = 
                 // return controlIdentifier;
             }
@@ -1379,10 +1381,7 @@ export default {
                     Object.assign(dataControl, value);
                 } else {
             
-                    if (listInput[controlName].type != "submit" && 
-                    listInput[controlName].type != "reset" && 
-                    listInput[controlName].type != "draft" &&
-                    listInput[controlName].type != "approvalHistory") {
+                    if (!listControlNotNameProp.includes(listInput[controlName].type)) {
                         let value = (listInput[controlName].type == 'number' && listInput[controlName].value == "" ) ? 0 : listInput[controlName].value;
                         if(listInput[controlName].type == 'percent'){
                             value = (listInput[controlName].value === "" ) ? 0 : listInput[controlName].value/100;
