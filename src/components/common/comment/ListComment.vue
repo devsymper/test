@@ -78,7 +78,7 @@ export default {
 .list-comment{
 	height:500px
 }
-.ps__rail-x{
+.list-comment >>> .ps__rail-x{
 	display: none;
 }
 </style>

@@ -7,13 +7,11 @@
 
 <script>
 import comment from "@/components/common/comment/Comment.vue"
-import UploadAvatar from "@/components/common/UploadAvatar.vue"
 import UploadFile from "@/components/common/UploadFile.vue"
 
 export default {
 	components:{
 		comment,
-		UploadAvatar,
 		UploadFile
 	},
 	methods:{

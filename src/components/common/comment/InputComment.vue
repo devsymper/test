@@ -145,6 +145,7 @@ export default {
 			tagInfo.offset = this.inputComment.indexOf('@')
 			tagInfo.length = data.displayName.length
 			item.tagInfo = tagInfo
+			debugger
 			this.tags.push(item)
 			let substr = this.inputComment.slice(0,this.inputComment.indexOf('@'))
 			this.inputComment = substr.concat(data.displayName)
@@ -168,24 +169,30 @@ export default {
 			}else if(tags.length >1){
 				let offSet = []
 				let lengthTag = []
+				let offSetOrigin = []
 				tags.forEach(function(e){
 					offSet.push(e.tagInfo.offset)
+					offSet.push(e.tagInfo.offset + e.tagInfo.length )
+					offSetOrigin.push(e.tagInfo.offset)
 					lengthTag.push(e.tagInfo.length)
+					debugger
 				})
 				if(!offSet.includes(0)){
 					offSet.unshift(0)	
 				}
 				offSet.push(lengthTag[lengthTag.length - 1]+offSet[offSet.length-1]+1)
+				offSet.push(content.length)
 				let arr = []
 				for(let i =0 ; i< offSet.length-1;i++){
-					let name = content.slice(offSet[i],offSet[i+1] -1)
-					if(offSet.includes(offSet[i])){
+					let name = content.slice(offSet[i],offSet[i+1] )
+					if(offSetOrigin.includes(offSet[i])){
 						name = `<span style="color:red">${name}</span>`
 					}
 					arr.push(name)
 				}
-				// console.log(arr);
+				console.log(arr);
 				content = arr.join(' ')
+				debugger
 			}
 			return content
 		},
