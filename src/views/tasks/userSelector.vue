@@ -20,23 +20,24 @@
         <template v-slot:selection="data">
             <v-chip
                 :color="color"
-                v-bind="data.attrs"
                 :input-value="data.selected"
                 :close="!compactChip"
                 small
                 :class="textColor+ ' mt-1'"
                 @click:close="remove(data.item)"
             > 
-                <v-avatar sizes="23" left v-if="compactChip">
+                <!-- <v-avatar sizes="23" left v-if="compactChip">
                     <v-img  sizes="23" :src="data.item.avatar ? data.item.avatar : avatarDefault"></v-img>
-                </v-avatar>
+                </v-avatar> -->
+                <symperAvatar :size="20" :userId="data.item.id" />
                 <span class="fs-11">{{ data.item.displayName }}</span>
             </v-chip>
         </template>
         <template v-slot:item="data">
             <template>
                 <v-list-item-avatar height="20" width="20" size="20" class="mt-1 mb-1">
-                    <v-img sizes="20" height="20" width="20" :src="data.item.avatar ? data.item.avatar : avatarDefault"></v-img>
+                    <!-- <v-img sizes="20" height="20" width="20" :src="data.item.avatar ? data.item.avatar : avatarDefault"></v-img> -->
+                    <symperAvatar :size="20" :userId="data.item.id" />
                 </v-list-item-avatar>
                 <v-list-item-content class="pt-0 pb-0">
                     <v-list-item-title v-html="data.item.displayName"></v-list-item-title>
@@ -52,8 +53,12 @@
 
 <script>
 import avatarDefault from "@/assets/image/avatar_default.jpg";
+import symperAvatar from "@/components/common/SymperAvatar.vue";
 
 export default {
+    components:{
+        symperAvatar
+    },
     name: "userSelector",
     props: {
         color: {
@@ -65,8 +70,8 @@ export default {
             default: "blue-grey--text"
         },
         value: {
-            type: Array,
-            default: () => []
+            type: String,
+            default: ""
         },
         isMulti: {
             type: Boolean,
@@ -86,14 +91,7 @@ export default {
         }
     },
     watch: {
-        selected(items){
-            let userToInput = items;
-            if (!Array.isArray(items)) {
-                userToInput = [items]
-            }
-            this.$emit("change", userToInput);
-            this.$emit("input", userToInput);
-        },
+       
         value: {
             deep: true,
             immediate: true,
@@ -117,27 +115,8 @@ export default {
             avatarDefault: avatarDefault,
             autoUpdate: true,
             isUpdating: false,
-            selected: [],
-            people: [
-                { id: 1, name: 'Sandra Adams', role: 'BA', avatar: srcs[1] },
-                { id: 2, name: 'Ali Connors', role: 'BA', avatar: srcs[2] },
-                { id: 3, name: 'Trevor Hansen', role: 'BA', avatar: srcs[3] },
-                { id: 4, name: 'Tucker Smith', role: 'BA', avatar: srcs[2] },
-                { id: 5, name: 'Britta Holt', role: 'BA', avatar: srcs[4] },
-                { id: 6, name: 'Jane Smith ', role: 'BA', avatar: srcs[5] },
-                { id: 7, name: 'John Smith', role: 'BA', avatar: srcs[1] },
-                { id: 8, name: 'Sandra Williams', role: 'BA', avatar: srcs[3] },
-            ],
-            users: {
-                1: { name: 'Sandra Adams', role: 'BA', avatar: srcs[1] },
-                2: { name: 'Ali Connors', role: 'BA', avatar: srcs[2] },
-                3: { name: 'Trevor Hansen', role: 'BA', avatar: srcs[3] },
-                4: { name: 'Tucker Smith', role: 'BA', avatar: srcs[2] },
-                5: { name: 'Britta Holt', role: 'BA', avatar: srcs[4] },
-                6: { name: 'Jane Smith ', role: 'BA', avatar: srcs[5] },
-                7: { name: 'John Smith', role: 'BA', avatar: srcs[1] },
-                8: { name: 'Sandra Williams', role: 'BA', avatar: srcs[3] },
-            }
+            selected: null,
+            users:[],
         }
     },
     methods: {
@@ -150,17 +129,24 @@ export default {
             }
         },
         handleChangeValue(value){
+            let userToInput = this.selected;
+            this.$emit("change", userToInput);
+            this.$emit("input", userToInput);
             this.$refs.userSelectAutocomplete.lazySearch= '';
         },
         getUser(id) {
             if (id == null || id == NaN) {
                 return null;
             }
-            return this.users[id];
+            this.users=this.$store.state.app.allUsers;
+            let obj = this.users.find(data => data.id === id)
+            return obj;
         }
     },
     computed: {
         allUser(){
+            console.log(this.$store.state.app.allUsers,"alluser");
+
             return this.$store.state.app.allUsers;
         }
     }
