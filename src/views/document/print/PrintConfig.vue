@@ -63,7 +63,7 @@ import ErrMessagePanel from "./../../../views/document/items/ErrMessagePanel.vue
 import ControlNameRelated from "./../../../views/document/items/ControlNameRelated.vue";
 import AllControlInDoc from "./../../../views/document/items/AllControlInDoc.vue";
 import { GetControlProps,mappingOldVersionControlProps,
-        mappingOldVersionControlFormulas,getAPropsControl } from "./../../../components/document/controlPropsFactory.js";
+        mappingOldVersionControlFormulas,getAPropsControl,listControlNotNameProp } from "./../../../components/document/controlPropsFactory.js";
 import { documentApi } from "./../../../api/Document.js";
 import { formulasApi } from "./../../../api/Formulas.js";
 import { util } from "./../../../plugins/util.js";
@@ -428,8 +428,7 @@ export default {
                 if(allControl[controlId].hasOwnProperty('listFields')){
                     this.checkEmptyControl(allControl[controlId]['listFields'],controlId);
                 }
-                if(allControl[controlId].type != 'submit' && allControl[controlId].type != 'draft' 
-                && allControl[controlId].type != 'reset' && allControl[controlId].type != 'approvalHistory'
+                if(!listControlNotNameProp.includes(allControl[controlId].type)
                 && allControl[controlId].properties.name.value == ""){
                     let controlEl = $('#document-editor-'+this.keyInstance+'_ifr').contents().find('#'+controlId);
                     controlEl.addClass('s-control-error');

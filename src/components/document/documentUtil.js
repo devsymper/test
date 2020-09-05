@@ -89,7 +89,7 @@ const getInsertionCSS = function() {
         transition: all ease-in-out 250ms;
         margin-top: 6px;
       }
-      .collap-sidebar-btn{
+      .collapse-sidebar-btn{
         position: absolute;
         bottom: 6px;
         right: 0;
@@ -103,6 +103,7 @@ const getInsertionCSS = function() {
         height: 100%;
         width: 150px;
         position: relative;
+        transition: all ease-in-out 250ms;
       }
       .page-content{
         height:100%;
@@ -123,7 +124,15 @@ const getInsertionCSS = function() {
         padding: 5px 4px;
         border-radius: 4px;
         margin-bottom: 4px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
         transition: all ease-in-out 150ms;
+      }
+      .add-page-btn{
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
       }
       .sb-page-active{
         background: #077afe;
@@ -131,6 +140,12 @@ const getInsertionCSS = function() {
       }
       .page-active{
         display: block !important;
+      }
+      .collapse-sb{
+        width: 30px;
+      }
+      .d-none{
+        display:none;
       }
       `;
     return styles;

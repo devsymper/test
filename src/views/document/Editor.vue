@@ -74,7 +74,8 @@ import ErrMessagePanel from "./../../views/document/items/ErrMessagePanel.vue";
 import ControlNameRelated from "./../../views/document/items/ControlNameRelated.vue";
 import AllControlInDoc from "./../../views/document/items/AllControlInDoc.vue";
 import { GetControlProps,mappingOldVersionControlProps,
-        mappingOldVersionControlFormulas,getAPropsControl,getIconFromType } from "./../../components/document/controlPropsFactory.js";
+        mappingOldVersionControlFormulas,getAPropsControl,
+        getIconFromType,listControlNotNameProp } from "./../../components/document/controlPropsFactory.js";
 import { documentApi } from "./../../api/Document.js";
 import { biApi } from "./../../api/bi.js";
 import { formulasApi } from "./../../api/Formulas.js";
@@ -595,9 +596,7 @@ export default {
                     let childPrimary = this.validateControlBeforeSave(allControl[controlId]['listFields'],controlId);
                     controlPrimaryKey = Object.assign(controlPrimaryKey,childPrimary)
                 }
-                if(allControl[controlId].type != 'submit' && allControl[controlId].type != 'draft' 
-                && allControl[controlId].type != 'reset' && allControl[controlId].type != 'approvalHistory'
-                ){
+                if(listControlNotNameProp.includes(allControl[controlId].type) == false){
                     let controlProps = allControl[controlId].properties;
                     if( controlProps.name.value == ""){
                         let controlEl = $('#document-editor-'+this.keyInstance+'_ifr').contents().find('#'+controlId);
@@ -670,7 +669,10 @@ export default {
             
         },
        
-
+        /**
+         * Hàm loại bỏ các dữ liệu thừa trong biến lưu danh sách control trong store
+         * và lấy lại các control user để lưu vào db phục vụ cho việc hiển thị ngoài danh sách bản ghi (từ id -> tên)
+         */
         minimizeControlEL(allControl){
             var allInputControl = $("#document-editor-"+this.keyInstance+"_ifr").contents().find('body').find(".s-control");
             let allId = [];
@@ -721,6 +723,7 @@ export default {
             let htmlContent = this.editorCore.getContent();
             let dataPost = this.getDataToSaveMultiFormulas(allControl);
             let thisCpn = this;
+            console.log("ádsadsad",allControl);
             try {
                 if(Object.keys(dataPost.update).length > 0)
                 await formulasApi.updateMultiFormulas({formulas:JSON.stringify(dataPost.update)})
@@ -1041,6 +1044,9 @@ export default {
                 this.lastKeypressTime = thisKeypressTime;
             }
         },
+        /**
+         * Hàm xử lí sự kiên click vào tab bên trên header của control tab/page để chuyển tab
+         */
         handleClickTabInControlTab(elTarget){
             elTarget.siblings().removeClass('tab-active')
             elTarget.addClass('tab-active')
@@ -1048,6 +1054,9 @@ export default {
             elTarget.closest('.page-content').find(".page-content-body .content-active").removeClass('content-active');
             elTarget.closest('.page-content').find(".page-content-body #tab-"+tabId).addClass('content-active');
         },
+        /**
+         * Hàm xử lí sự kiên click vào nút add tab bên trên header của control tab/page để thêm tab
+         */
         handleClickAddTabInControlTab(elTarget){
             if(elTarget.closest('.page-content-header').find('.tab button').length < 9){
                 elTarget.closest('.page-content-header').find('.tab br').remove();
@@ -1062,7 +1071,7 @@ export default {
                     elTarget.closest('.page-content').find(".page-content-body .content-active").removeClass('content-active');
                 }
                 let tabId = Date.now();
-                let newTabHtml = '<button tab-id="'+tabId+'" class="'+activeClass+'" contenteditable="true" tab-index="'+newTabIndex +'">&nbsp;Tab-'+newTabIndex +'</button>';
+                let newTabHtml = '<button tab-id="'+tabId+'" class="'+activeClass+'" class="tab-item" contenteditable="true" tab-index="'+newTabIndex +'">&nbsp;Tab-'+newTabIndex +'</button>';
 
                 let contentPageHtml = ` <div id="tab-`+tabId+`" contenteditable="true" class="tabcontent `+contentActiveClass+`">
                                             <div>tab `+tabId+`</div>
@@ -1072,6 +1081,9 @@ export default {
             }
             
         },
+        /**
+         * Hàm xử lí sự kiên click vào nút thêm page bên sidebar của control tab/page để thêm page
+         */
         handleClickAddPageInControlTab(elTarget){
             if(elTarget.closest('.sidebar-page').find('.list-page .page-item').length < 6){
                 let lastPage = elTarget.closest('.sidebar-page').find('.page-item').last();
@@ -1084,7 +1096,7 @@ export default {
                 let pageId = Date.now();
                 let newPageHtml = `<div class="page-item sb-page-active" page-index="`+newPageIndex+`" page-id="`+pageId+`">
                                     <span class="mdi mdi-format-page-break"></span>
-                                    <span>Trang so `+newPageIndex+`</span>
+                                    <span class="page-item__name">Trang so `+newPageIndex+`</span>
                                 </div>`;
 
                 let contentPageHtml = ` <div class="page-content page-active" s-page-content-id="`+pageId+`">
@@ -1102,12 +1114,22 @@ export default {
                 elTarget.closest('.s-control-tab-page').find('.list-page-content').append(contentPageHtml);
             }
         },
+        /**
+         * Hàm xử lí sự kiên click vào page bên sidebar của control tab/page để chuyển page
+         */
         handleClickPageInControlTab(elTarget){
             elTarget.siblings().removeClass('sb-page-active')
             elTarget.addClass('sb-page-active')
             let pageId = elTarget.attr('page-id');
-            elTarget.closest('.s-control-tab-page').find('.list-page-content').removeClass('page-active');
+            elTarget.closest('.s-control-tab-page').find('.list-page-content .page-content').removeClass('page-active');
             elTarget.closest('.s-control-tab-page').find('.list-page-content').find('[s-page-content-id="'+pageId+'"]').addClass('page-active');
+        },
+        /**
+         * Hàm click đóng mở sidebar của control tab/page
+         */
+        handleClickCollapseInControlTab(elTarget){
+            elTarget.closest('.sidebar-page').toggleClass('collapse-sb');
+            elTarget.closest('.sidebar-page').find('.page-item__name').toggleClass('d-none');
         },
         //su kiện click vào editor
         detectClickEvent(event){
@@ -1127,11 +1149,17 @@ export default {
             if($(event.target).is('.add-tab-btn')){
                 this.handleClickAddTabInControlTab($(event.target))
             }
-            if($(event.target).is('.page-header-action button')){
-                this.handleClickAddPageInControlTab($(event.target))
+            if($(event.target).closest('.add-page-btn').length){
+                this.handleClickAddPageInControlTab($(event.target).closest('.add-page-btn'))
+            }
+            if($(event.target).closest('.collapse-sidebar-btn').length > 0){
+                this.handleClickCollapseInControlTab($(event.target).closest('.collapse-sidebar-btn'))
             }
             if($(event.target).closest('.page-item').length > 0){
                 this.handleClickPageInControlTab($(event.target).closest('.page-item'))
+            }
+            if($(event.target).is('.tab-item')){
+                this.handleClickPageInControlTab($(event.target))
             }
             
 

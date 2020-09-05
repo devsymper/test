@@ -76,5 +76,8 @@ export const documentApi = {
     searchListDocuments(filter) {
         return coreApi.get('documents', filter);
     },
+    restoreDocument(data) {
+        return coreApi.post('documents/trash', data);
+    }
 
 };
