@@ -83,9 +83,9 @@ const defaultState = {
 			link: '/apps',
 		},
 		// {
-		//     title: 'Comment',
-		//     icon: 'mdi-comment',
-		//     link: '/comment',
+		// 	title: 'Comment',
+		// 	icon: 'mdi-comment',
+		// 	link: '/comment',
 		// },
 		// { title: "virtualdocs", icon: "mdi-table", link: "/virtualdocs" },
 		{

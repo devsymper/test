@@ -56,7 +56,7 @@
 
 <script>
 import {fileManagementApi} from '@/api/FileManagement.js'
-import { clipperBasic , clipperFixed } from 'vuejs-clipper'
+import {clipperBasic} from 'vuejs-clipper'
 let formData = new FormData()
 export default {
 	components:{
@@ -66,6 +66,9 @@ export default {
 		fileName:{
 			type:String,
 			default: ''
+		},
+		module:{
+			type:String,
 		},
 		autoUpload:{
 			type: Boolean,
@@ -98,6 +101,7 @@ export default {
 		onFileChanged(e) {
 			this.selectedFile = e.target.files[0]
 			formData.append('user',this.$store.state.app.endUserInfo.displayName)
+			formData.append('module',this.module)
 			if(this.pickAvatar == true){
 				if(this.selectedFile.type == 'image/jpeg' || this.selectedFile.type == 'image/jpg' || this.selectedFile.type == 'image/png'){
 					this.dialog = true
@@ -124,7 +128,6 @@ export default {
 			formData.append('file',file)
 			this.formDatas = formData
 			this.$emit('selected-file', this.previewImg)
-			debugger
 			if(this.autoUpload == true){
 				this.uploadFile()
 			}
