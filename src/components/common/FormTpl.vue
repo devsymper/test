@@ -84,7 +84,7 @@
                     <template>
                         <div>
                             <v-icon v-if="data.item.icon">{{data.item.icon}}</v-icon>
-                            <span>{{data.item.text}}</span>
+                            <span>{{$t("objectType."+data.item.text)}}</span>
                         </div>
                     </template>
                 </template>
