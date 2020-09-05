@@ -1,5 +1,5 @@
 <template>
-	<div class="list-comment" >
+	<div class="list-comment" :style="{height:heightListComment+'px'}" >
 		<VuePerfectScrollbar style="height:inherit">
 			 <div :v-if="listItemFilter.length > 0" v-for="(item,i) in listItemFilter" :key="i"  class="comment-item"> 
 				<CommentItem
@@ -24,10 +24,14 @@ export default {
 			type: String,
 			default: ''
 		},
+		heightListComment:{
+			type: Number,
+		}
 	},
 	methods:{
 	},
 	mounted(){
+		console.log(this.heightListComment,'heightListCommentheightListComment');
 	},
 	components: {
 		VuePerfectScrollbar,
@@ -36,9 +40,7 @@ export default {
 	},
 	data(){
 		return {
-			listCommentHeight:'100px',
 			resItem: [],
-			heightListComment:'',
 		}
 	},
 	computed:{

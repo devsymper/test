@@ -47,7 +47,6 @@
 			style="overflow-x: hidden"
 		>
 			<v-card>
-			<!-- <v-card-title class="headline">Use Google's location service?</v-card-title> -->
 				<v-icon @click="dialog = false" style="float:right">mdi-close</v-icon>
 				<v-img
 					:src="srcImg"
@@ -145,7 +144,6 @@ export default {
 			tagInfo.offset = this.inputComment.indexOf('@')
 			tagInfo.length = data.displayName.length
 			item.tagInfo = tagInfo
-			debugger
 			this.tags.push(item)
 			let substr = this.inputComment.slice(0,this.inputComment.indexOf('@'))
 			this.inputComment = substr.concat(data.displayName)
@@ -226,7 +224,6 @@ export default {
 			this.$store.commit('comment/updateReplyStatus',false)
 		},
 		uploadInfo(data){
-			debugger
 			if(typeof data === 'string'){
 				alert(data)
 			}else{

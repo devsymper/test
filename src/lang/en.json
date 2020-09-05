@@ -788,5 +788,12 @@
         "detail": {
             "title": "Detail dashboard "
         }
-    }
+	},
+	"comment":{
+		"comment": "Comment",
+		"resolve": "Resolve",
+		"reply": "Reply",
+		"edited": "Edited",
+		"search": "Search"
+	}
 }
