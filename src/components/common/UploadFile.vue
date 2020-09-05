@@ -69,6 +69,7 @@ export default {
 		},
 		module:{
 			type:String,
+			default: ''
 		},
 		autoUpload:{
 			type: Boolean,
