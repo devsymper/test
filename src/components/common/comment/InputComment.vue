@@ -47,7 +47,9 @@
 			style="overflow-x: hidden"
 		>
 			<v-card>
-				<v-icon @click="dialog = false" style="float:right">mdi-close</v-icon>
+				<v-icon @click="dialog = false" style="float:right;font-size:18px;padding-top:2px">mdi-close</v-icon>
+				<v-icon @click="downloadImg" style="float:right;padding-right:8px;font-size:18px;padding-top:4px">mdi-download</v-icon>
+
 				<v-img
 					:src="srcImg"
 					style="width:100%;height:100%"
@@ -70,6 +72,7 @@ export default {
 			srcImg:'',
 			dialog:false,	
 			tags:[],
+			idImg:null,
 			icon:{
 				xlxs: 'mdi-file-excel-box',
 				xls: 'mdi-file-excel-box',
@@ -152,9 +155,13 @@ export default {
 		download(id){
 			commentApi.download(id)
 		},
+		downloadImg(){
+			commentApi.download(this.idImg)
+		},
 		previewImage(item){
 			this.dialog = true
 			this.srcImg = item.serverPath
+			this.idImg = item.id
 		},
 		reduce(content){
 			let tags = this.item.tags
