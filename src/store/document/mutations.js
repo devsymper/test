@@ -234,7 +234,6 @@ const setDefaultSubmitStore = (state, params) => {
         impactedFieldsListWhenStart: {},
         rootChangeFieldName: null,
         currentTableInteractive: null,
-        currentCellSelected: null,
         currentControlAutoComplete: null,
         submitFormulas: null,
         listUser: null,

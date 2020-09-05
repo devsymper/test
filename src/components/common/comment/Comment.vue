@@ -1,10 +1,8 @@
 <template>
-	<div class="symper-comment">
+	<div class="symper-comment" :style="{height:heightComment}">
 		<v-card 
 			 v-show="showComment"
-			 :width="widthComment"
-			:height="heightComment"
-			:style="{top:top+'px',left:left+'px'}"
+			 :style="{top:top+'px',left:left+'px',height:'inherit'}"
 		>
 			<v-toolbar
 				flat
@@ -12,6 +10,8 @@
 			>
 				<v-toolbar-title>Bình luận</v-toolbar-title>
 					<v-icon>mdi-comment-text-outline</v-icon>
+					<v-spacer></v-spacer>
+					<v-icon @click="showComment = false">mdi-close-outline</v-icon>
 				<template v-slot:extension>
 				<v-tabs
 					v-model="tab"
@@ -41,7 +41,7 @@
 				:key="item.value"
 				>
 				<v-card flat>
-					<list-comment  :listComment="listComment" :searchItem="searchItem"/>
+					<list-comment  :listComment="listComment" :searchItem="searchItem" />
 				</v-card>
 				</v-tab-item>
 			</v-tabs-items>
@@ -139,7 +139,7 @@ export default {
 		  */
         heightComment: {
             type: String,
-            default: "800px"
+            default: "100%"
 		},
 		 /**
 		  * truyen vao vi tri comment

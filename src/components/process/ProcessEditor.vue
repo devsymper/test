@@ -757,6 +757,19 @@ export default {
                             data: newNodeData
                         } );
         },
+        checkDuplicateNodeId(newId){
+            let currentNodeId = this.selectingNode.id;
+            if(currentNodeId == newId){
+                return false;
+            }else{
+                if(this.stateAllElements.hasOwnProperty(newId)){
+                    this.$snotifyError({}, "Element id can not be duplicated!", "Please input other id");
+                    return true;
+                }else{
+                    return false;
+                }
+            }
+        },
         /** Xử lý các sự kiện khi có sự thay đổi giá trị của các input trong panel cấu hình bên phải
          * data là giá trị sau thay đổi của một input trong formtpl
          *  **/
@@ -772,9 +785,16 @@ export default {
             };
 
             if (name == "overrideid" || name == "process_id") {
-                attrs[name].value = util.str.nonAccentVietnamese(
-                    attrs[name].value
-                );
+                let newId = util.str.nonAccentVietnamese(
+                        attrs[name].value
+                    );
+                let isDuplicated = this.checkDuplicateNodeId(newId);
+                if(isDuplicated){
+                    inputInfo.value = this.selectingNode.id;
+                    return;
+                }else{
+                    attrs[name].value = newId;
+                }
             }
 
             if (typeData.checkShowOrHideInput) {

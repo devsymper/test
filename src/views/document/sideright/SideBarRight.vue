@@ -45,6 +45,7 @@
                     <v-expansion-panel-content class="sym-v-expand-content">
                         <control-props-config 
                         @input-value-changed="handleChangeInput" 
+                        @input-value-keyup="handleKeyupInput"
                         :singleLine="true" 
                         :labelWidth="`100px`" 
                         :allInputs="controlPropsGroup.display"/>
@@ -183,10 +184,9 @@ export default {
             }
         },
         handleChangeInput(name, input, data){
-            if(input.groupType == "formulas"){
+            if(input.groupType == "formulas" || input.type == 'checkbox'){
                 this.handleValidateControl(name, input, data);
             }
-            // this.handleValidateControl(name, input, data);
             
         },
         handleValidateControl(name, input, data){

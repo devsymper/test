@@ -40,7 +40,6 @@ import {documentApi} from './../../api/Document';
 import {orgchartApi} from './../../api/orgchart';
 import {dashboardApi} from './../../api/dashboard';
 import BpmnEngine from './../../api/BPMNEngine';
-import { debounce } from "debounce";
 var delayTimer;
 let self =  this;
 export default {

@@ -208,7 +208,7 @@ export default {
          */
         this.$evtBus.$on("document-editor-click-treeview-list-control", locale => {
             let elControl = $("#document-editor-"+thisCpn.keyInstance+"_ifr").contents().find('body #'+locale.id);
-            thisCpn.setSelectedControlProp(locale.event,elControl,$('#document-editor-'+this.keyInstance+'_ifr').get(0).contentWindow);
+            thisCpn.setSelectedControlProp(locale.event,elControl,$('#document-editor-'+this.keyInstance+'_ifr').get(0).contentWindow,true);
         });
 
         biApi.getAllDataFlow().then(res=>{
@@ -1041,7 +1041,74 @@ export default {
                 this.lastKeypressTime = thisKeypressTime;
             }
         },
-        
+        handleClickTabInControlTab(elTarget){
+            elTarget.siblings().removeClass('tab-active')
+            elTarget.addClass('tab-active')
+            let tabId = elTarget.attr('tab-id');
+            elTarget.closest('.page-content').find(".page-content-body .content-active").removeClass('content-active');
+            elTarget.closest('.page-content').find(".page-content-body #tab-"+tabId).addClass('content-active');
+        },
+        handleClickAddTabInControlTab(elTarget){
+            if(elTarget.closest('.page-content-header').find('.tab button').length < 9){
+                elTarget.closest('.page-content-header').find('.tab br').remove();
+                let lastTab = elTarget.closest('.page-content-header').find('.tab button').last();
+                let newTabIndex = parseInt(lastTab.attr('tab-index')) + 1;
+                let activeClass = "";
+                let contentActiveClass = ""
+                if(isNaN(newTabIndex)){
+                    newTabIndex = 1;
+                    activeClass = 'tab-active'
+                    contentActiveClass = 'content-active'
+                    elTarget.closest('.page-content').find(".page-content-body .content-active").removeClass('content-active');
+                }
+                let tabId = Date.now();
+                let newTabHtml = '<button tab-id="'+tabId+'" class="'+activeClass+'" contenteditable="true" tab-index="'+newTabIndex +'">&nbsp;Tab-'+newTabIndex +'</button>';
+
+                let contentPageHtml = ` <div id="tab-`+tabId+`" contenteditable="true" class="tabcontent `+contentActiveClass+`">
+                                            <div>tab `+tabId+`</div>
+                                        </div>`
+                elTarget.closest('.page-content-header').find('.tab').append(newTabHtml);
+                elTarget.closest('.page-content').find('.page-content-body').append(contentPageHtml);
+            }
+            
+        },
+        handleClickAddPageInControlTab(elTarget){
+            if(elTarget.closest('.sidebar-page').find('.list-page .page-item').length < 6){
+                let lastPage = elTarget.closest('.sidebar-page').find('.page-item').last();
+                let newPageIndex = parseInt(lastPage.attr('page-index')) + 1;
+                elTarget.closest('.s-control-tab-page').find(".page-active").removeClass('page-active');
+                elTarget.closest('.s-control-tab-page').find(".sb-page-active").removeClass('sb-page-active');
+                if(isNaN(newPageIndex)){
+                    newPageIndex = 1;
+                }
+                let pageId = Date.now();
+                let newPageHtml = `<div class="page-item sb-page-active" page-index="`+newPageIndex+`" page-id="`+pageId+`">
+                                    <span class="mdi mdi-format-page-break"></span>
+                                    <span>Trang so `+newPageIndex+`</span>
+                                </div>`;
+
+                let contentPageHtml = ` <div class="page-content page-active" s-page-content-id="`+pageId+`">
+                                            <div class="page-content-header">
+                                                <button class="add-tab-btn">+ Thêm tab</button>
+                                                <div class="tab">
+                                                
+                                                </div>
+                                            </div>
+                                            <div class="page-content-body">
+                                                
+                                            </div>
+                                        </div>`
+                elTarget.closest('.sidebar-page').find('.list-page').append(newPageHtml);
+                elTarget.closest('.s-control-tab-page').find('.list-page-content').append(contentPageHtml);
+            }
+        },
+        handleClickPageInControlTab(elTarget){
+            elTarget.siblings().removeClass('sb-page-active')
+            elTarget.addClass('sb-page-active')
+            let pageId = elTarget.attr('page-id');
+            elTarget.closest('.s-control-tab-page').find('.list-page-content').removeClass('page-active');
+            elTarget.closest('.s-control-tab-page').find('.list-page-content').find('[s-page-content-id="'+pageId+'"]').addClass('page-active');
+        },
         //su kiện click vào editor
         detectClickEvent(event){
             
@@ -1054,7 +1121,18 @@ export default {
                 
                 this.setSelectedControlProp(event,$(event.target).closest('.s-control'),$('#document-editor-'+this.keyInstance+'_ifr').get(0).contentWindow);
             }
-
+            if($(event.target).is('.tab button')){
+                this.handleClickTabInControlTab($(event.target))
+            }
+            if($(event.target).is('.add-tab-btn')){
+                this.handleClickAddTabInControlTab($(event.target))
+            }
+            if($(event.target).is('.page-header-action button')){
+                this.handleClickAddPageInControlTab($(event.target))
+            }
+            if($(event.target).closest('.page-item').length > 0){
+                this.handleClickPageInControlTab($(event.target).closest('.page-item'))
+            }
             
 
         // kiểm tra nếu click ngoài khung autocomplete control thì đóng lại
@@ -1798,7 +1876,7 @@ export default {
             
 
         },
-        setSelectedControlProp(e,el,clientFrameWindow){
+        setSelectedControlProp(e,el,clientFrameWindow,fromTreeView = false){
             
             e.preventDefault();
             $(clientFrameWindow.document).find('.on-selected').removeClass('on-selected');
@@ -1814,6 +1892,7 @@ export default {
             
             let table = el.closest('.s-control-table');
             if(table.length > 0 && controlId != table.attr('id')){
+                if(!fromTreeView)
                 tinyMCE.activeEditor.selection.setNode($(e.target).parent());
                 let tableId = table.attr('id');
                 let control = this.editorStore.allControl[tableId]['listFields'][controlId];

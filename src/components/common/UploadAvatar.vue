@@ -48,8 +48,8 @@ export default {
     },
     methods: {
          getResult: function () {
-                const canvas = this.$refs.clipper.clip();//call component's clip method
-                this.resultURL = canvas.toDataURL("image/jpeg", 1);//canvas->image
+			const canvas = this.$refs.clipper.clip();//call component's clip method
+			this.resultURL = canvas.toDataURL("image/jpeg", 1);//canvas->image
          },
          upload(){
              console.log(dsds);
