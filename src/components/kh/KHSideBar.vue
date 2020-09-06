@@ -945,6 +945,9 @@ export default {
 </script>
 
 <style scoped>
+.resizable-component{
+  height: 100%!important;
+}
 .resizable-content {
   height: 100%;
   width: 100%;

@@ -51,8 +51,8 @@
                 </v-row>
                 <v-divider></v-divider>
 
-                <VuePerfectScrollbar 
-                    v-if="!loadingTaskList" 
+                <VuePerfectScrollbar
+                    v-if="!loadingTaskList"
                     @ps-y-reach-end="handleReachEndList"
                     :style="{height: listTaskHeight+'px'}">
                     <v-row
@@ -94,10 +94,7 @@
                             style="line-height: 42px"
                             cols="2"
                             class="fs-12 px-1 py-0">
-                            
-                                <v-avatar size="25" class="mr-2">
-                                    <img :src="obj.assigneeInfo.avatar ? obj.assigneeInfo.avatar : require('@/assets/image/avatar_default.jpg')" />
-                                </v-avatar>
+                                <symperAvatar :size="20" :userId="obj.assigneeInfo.id" />
                                 {{obj.assigneeInfo.displayName}}
                         </v-col>
                         <v-col
@@ -118,20 +115,23 @@
                                 class="mt-0 pl-1 pr-0 d-inline-block text-truncate"
                                 small
                                 label
-                                v-if="obj.owner != null">
-                                <v-avatar size="25" class="mr-2">
-                                    <img :src="obj.ownerInfo.avatar" alt v-if="!!obj.ownerInfo.avatar" />
-                                    <v-icon v-else v-text="obj.ownerInfo.avatar"></v-icon>
-                                </v-avatar>
+                               >
+                                 <symperAvatar :size="20" :userId="obj.ownerInfo.id" />
                                 {{obj.ownerInfo.displayName}}
                             </v-chip>
                         </v-col>
-                        <v-col 
-                            class="py-0" 
-                            cols="2" 
+                        <v-col
+                            class="py-0"
+                            cols="2"
                             v-if="!sideBySideMode && !smallComponentMode"
                             style="line-height: 42px">
-                            <span class="mt-1 d-inline-block fs-13">{{obj.processDefinitionName}}</span>
+                             <v-tooltip bottom>
+                                <template v-slot:activator="{ on }">
+                                    <span v-on="on" v-if="obj.processDefinitionName" class="mt-1 d-inline-block fs-13 title-quytrinh">{{obj.processDefinitionName}}</span>
+                                    <span v-on="on" v-else class="mt-1 d-inline-block fs-13 title-quytrinh">ad hoc</span>
+                                </template>
+                                <span>{{ obj.processDefinitionName }}</span>
+                            </v-tooltip>
                         </v-col>
                     </v-row>
 
@@ -158,12 +158,12 @@
                 height="30"
                 style="border-left: 1px solid #e0e0e0;">
                 <taskDetail
-                    :parentHeight="listTaskHeight" 
+                    :parentHeight="listTaskHeight"
                     :taskInfo="selectedTask.taskInfo"
                     :originData="selectedTask.originData"
                     @close-detail="closeDetail"
                     @task-submited="handleTaskSubmited"></taskDetail>
-            </v-col> 
+            </v-col>
             <userSelector ref="user" class="d-none"></userSelector>
         </v-row>
     </div>
@@ -179,7 +179,8 @@ import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import { util } from '../../plugins/util';
 import { appConfigs } from '../../configs';
 import { extractTaskInfoFromObject, addMoreInfoToTask } from '../../components/process/processAction';
- 
+import symperAvatar from "@/components/common/SymperAvatar.vue";
+
 export default {
     computed: {
         // Liệt kê danh sách các task dưới dạng phẳng - ko phân cấp
@@ -202,7 +203,8 @@ export default {
         taskDetail: taskDetail,
         listHeader: listHeader,
         userSelector: userSelector,
-        VuePerfectScrollbar: VuePerfectScrollbar
+        VuePerfectScrollbar: VuePerfectScrollbar,
+        symperAvatar:symperAvatar
     },
     props: {
         compackMode: {
@@ -284,7 +286,7 @@ export default {
             if(this.allFlatTasks.length < this.totalTask && this.allFlatTasks.length > 0){
                 this.myOwnFilter.page += 1;
                 this.myOwnFilter.size = 50;
-                
+
                 this.getTasks();
             }
         },
@@ -299,7 +301,7 @@ export default {
             this.getTasks();
         },
         reCalcListTaskHeight(){
-            this.listTaskHeight = util.getComponentSize(this.$el.parentElement).h - 125;            
+            this.listTaskHeight = util.getComponentSize(this.$el.parentElement).h - 125;
         },
         getUser(id) {
             this.$refs.user.getUser(id);
@@ -359,7 +361,7 @@ export default {
                 res = await BPMNEngine.getSubtasks(this.filterFromParent.parentTaskId, filter);
                 listTasks = res;
             }else {
-                
+
                 if(!filter.assignee){
                     filter.assignee = this.$store.state.app.endUserInfo.id;
                 }
@@ -367,7 +369,7 @@ export default {
                 listTasks = res.data;
             }
             this.totalTask = Number(res.total);
-                        
+
             for(let task of listTasks){
                 task.taskData = self.getTaskData(task);
                 task = addMoreInfoToTask(task);
@@ -407,6 +409,7 @@ export default {
                     );
                 }
             );
+            console.log(listTasks,"listTassk");
             this.addOtherProcess(listTasks);
             this.loadingTaskList = false;
             this.loadingMoreTask = false
@@ -498,5 +501,12 @@ export default {
 .v-list-group >>> .v-list--dense >>> .v-list-item >>> .v-list-item__icon {
     margin-top: 3px;
     margin-bottom: 3px;
+}
+.title-quytrinh {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box!important;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
 }
 </style>

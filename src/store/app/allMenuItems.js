@@ -17,6 +17,13 @@ export default {
 			"resource": "document_definition",
 			"scope": "document",
 			"action": "list"
+		},
+		children: {
+			listTrash: {
+				title: "Thùng rác",
+				icon: "mdi-trash",
+				link: "/documents/trash"
+			}
 		}
 	},
 	orgchart: {
@@ -68,6 +75,11 @@ export default {
 		title: "baAccount",
 		icon: "mdi-account-tie",
 		link: "/ba-account"
+	},
+	comment: {
+		title: 'Comment',
+		icon: 'mdi-comment',
+		link: '/comment',
 	},
 	knowledge: {
 		title: 'KH',

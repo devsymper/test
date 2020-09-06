@@ -353,7 +353,6 @@
     },
     "document": {
         "create": "Tạo mới văn bản",
-        "submit": "Submit văn bản",
         "edit": "Chỉnh sửa văn bản",
         "title": "Danh sách văn bản",
         "table": {
@@ -395,6 +394,14 @@
                     "changeTo": "Thành"
                 }
             }
+        },
+        "submit": {
+            "fab": {
+                "submit": "Gửi",
+                "draft": "Lưu bản nháp",
+                "toggleSize": "Thay đổi kích thước"
+            },
+            "title": "Submit văn bản"
         },
         "process": {
             "header_bar": {
