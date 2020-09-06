@@ -69,11 +69,6 @@ export default {
 		icon: "mdi-account-tie",
 		link: "/ba-account"
 	},
-	comment: {
-		title: 'Comment',
-		icon: 'mdi-comment',
-		link: '/comment',
-	},
 	knowledge: {
 		title: 'KH',
 		icon: 'file-edit-outline',

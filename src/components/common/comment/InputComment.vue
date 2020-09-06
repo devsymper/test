@@ -168,7 +168,7 @@ export default {
 			if(tags.length == 1){
 				let name = content.slice(tags[0].tagInfo.offset,tags[0].tagInfo.offset+tags[0].tagInfo.length)
 				let span;
-				span = `<span style="color:red">${name}</span>`
+				span = `<span style="color:#e67e00">${name}</span>`
 				let res = content.replace(name,span)
 				content = res
 			}else if(tags.length >1){
@@ -191,7 +191,7 @@ export default {
 				for(let i =0 ; i< offSet.length-1;i++){
 					let name = content.slice(offSet[i],offSet[i+1] )
 					if(offSetOrigin.includes(offSet[i])){
-						name = `<span style="color:red">${name}</span>`
+						name = `<span style="color:#e67e00">${name}</span>`
 					}
 					arr.push(name)
 				}
