@@ -5,7 +5,7 @@
 			<v-toolbar
 				flat
 				style="height:auto">
-				<v-toolbar-title>Bình luận</v-toolbar-title>
+				<v-toolbar-title>{{$t('comment.comment')}}  </v-toolbar-title>
 					<v-icon>mdi-comment-text-outline</v-icon>
 					<v-spacer></v-spacer>
 					<v-icon @click="showComment = false">mdi-close-outline</v-icon>
@@ -24,7 +24,7 @@
 				  <v-text-field
 						solo
 						v-if="isSearching"
-						label="Search..."
+						:label="$t('comment.search')"
 						append-icon="mdi-close-circle-outline"
 						v-model="searchItem"
 						@click:append="clickClose"
@@ -71,13 +71,13 @@ export default {
 			heightListComment:null,
 			itemsTab: [
 				{
-					title:'Comment',
+					title: this.$t('comment.comment'),
 					value:'comment',
 					store: 'listAvtiveComment',
 					icon: 'mdi-comment-processing-outline'
 				},
 				{
-					title: 'Resolve',
+					title: this.$t('comment.resolve'),
 					value:'resolve',
 					store: 'listResolve',
 					icon: 'mdi-comment-check'
