@@ -83,7 +83,7 @@ export default {
     },
     knowledge: {
         title: 'KH',
-        icon: 'file-edit-outline',
+        icon: 'mdi-file-edit-outline',
         link: '/knowledge',
     },
     timeSheetLogWork: {
