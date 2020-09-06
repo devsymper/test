@@ -20,7 +20,13 @@
 				</v-app-bar>
 					<div class="list-favorite">
 						<div class="title-favorite"><v-icon >mdi-playlist-star</v-icon><h4>{{$t('apps.favorite')}}</h4></div>
-						<ul style="margin:0 10px;">
+						  <v-skeleton-loader
+						 		v-if="loadingFavorite == true"
+								type="table-tbody"
+								class="mx-auto"
+								height="200"
+							></v-skeleton-loader>
+						<ul style="margin:0 10px;" v-else>
 							<VuePerfectScrollbar style="max-height:200px"  >
 								<li v-for="(item,i) in sFavorite" :key="i" v-on:click="rightClickHandler($event,item,item.type)" v-on:contextmenu="rightClickHandler($event,item,item.type)" style="cursor:pointer"> 
 									<div style="position:relative">
@@ -100,6 +106,7 @@ export default {
 		 apps:{},
 		 listFavorite:[],
 		 testListFavorite:[],
+		 loadingFavorite: true,
 		 arrType:{
 			 document_definition:[],
 			 orgchart:[],
@@ -195,6 +202,7 @@ export default {
 					})
 					this.checkTypeFavorite(res.data.listObject)
 					this.$store.commit('appConfig/updateListFavorite',this.listFavorite)
+					this.loadingFavorite = false
 				}
 			}).catch((err) => {
 			});
