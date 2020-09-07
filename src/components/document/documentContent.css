@@ -107,15 +107,13 @@ p {
 }
 
 .s-control:not(.s-control-tab-page):not(button):not(.page-item):not(.s-control-approval-history):not(.s-control-label):not(.s-control-submit):not(.s-control-draft):not(.s-control-reset):not(.s-control-file-upload):not(.s-control-table):not(.s-control-data-flow):not(.s-control-panel) {
-    /*width: 100% !important;*/
     padding: 0 5px !important;
     background: transparent;
     box-shadow: none !important;
-    /*border: none !important;*/
     border-top: none !important;
     border-right: none !important;
     border-left: none !important;
-    border-bottom: 0.5px solid #ccc !important;
+    border-bottom: 0.5px solid #ccc;
     border-radius: 0 !important;
     font-weight: normal;
 }
@@ -425,4 +423,26 @@ button:hover {
 
 .add-tab-btn {
     display: none;
+}
+
+.table-print {
+    border-collapse: collapse;
+    width: 100%;
+    margin-top: 16px;
+}
+
+.table-print td,
+.table-print th {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+
+.table-print th {
+    padding-top: 8px;
+    padding-bottom: 8px;
+    text-align: left;
+}
+
+.content-print-document .s-control {
+    border: none !important;
 }

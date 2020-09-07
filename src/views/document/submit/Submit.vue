@@ -359,12 +359,6 @@ export default {
         this.$evtBus.$on("document-submit-input-change", locale => {
             try {
                 if(thisCpn.isComponentActive == false) return;
-                
-                this.$store.commit("document/addToDocumentSubmitStore", {
-                            key: 'docStatus',
-                            value: 'input',
-                            instance: this.keyInstance
-                        });
                 let valueControl = locale.val;
                 let controlInstance = getControlInstanceFromStore(thisCpn.keyInstance,locale.controlName);
                 if(controlInstance.type == 'number' && !/^[-0-9,.]+$/.test(valueControl)){
@@ -386,11 +380,7 @@ export default {
                     "value",
                     valueControl
                 );
-                thisCpn.$store.commit("document/addToDocumentSubmitStore", {
-                    key: 'rootChangeFieldName',
-                    value: locale.controlName,
-                    instance: thisCpn.keyInstance
-                });
+                
                 // sau khi thay đổi giá trị input thì kiểm tra require control nếu có
                 if(controlInstance.isRequiredControl()){
                     if(controlInstance.isEmpty()){

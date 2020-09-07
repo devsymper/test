@@ -560,36 +560,20 @@ export default class Table {
          */
 
     checkIsAutocompleteCell(controlName) {
-            let controlInstance = this.getControlInstance(controlName);
-            if (controlInstance != null && controlInstance != undefined) {
-                let controlFormulas = controlInstance.controlFormulas;
-                if (controlFormulas.hasOwnProperty('autocomplete')) {
-                    let formulasInstance = controlFormulas['autocomplete'].instance;
-                    if (formulasInstance == undefined) {
-                        return false;
-                    }
-                    return formulasInstance;
+        let controlInstance = this.getControlInstance(controlName);
+        if (controlInstance != null && controlInstance != undefined) {
+            let controlFormulas = controlInstance.controlFormulas;
+            if (controlFormulas.hasOwnProperty('autocomplete')) {
+                let formulasInstance = controlFormulas['autocomplete'].instance;
+                if (formulasInstance == undefined) {
+                    return false;
                 }
-            }
-            return false;
-        }
-        /**
-         * Hàm xử lí tìm các control bị ảnh hưởng sau khi  change 1 control trong table và chạy công thức cho các control bị ảnh hưởng đó
-         * @param {String} controlName Control bị thay đổi dữ liệu
-         */
-
-    checkRunLocalSql() {
-        let currentSubmitStoreData = getSDocumentSubmitStore(this.keyInstance);
-        let listRelatedLocal = currentSubmitStoreData.localRelated;
-        if (listRelatedLocal.hasOwnProperty(this.tableName)) {
-            listRelatedLocal = listRelatedLocal[this.tableName];
-            for (let index = 0; index < listRelatedLocal.length; index++) {
-                const element = listRelatedLocal[index];
-                this.handlerCheckCanBeRunFormulas(element);
+                return formulasInstance;
             }
         }
-
+        return false;
     }
+
     handlerCheckEffectedControlInTable(controlName, rowIndex = "") {
         if (controlName == "") {
             return
@@ -891,7 +875,7 @@ export default class Table {
         thisObj.controlObj.ele.before(tableContainer);
         thisObj.tableContainer = $(tableContainer);
         thisObj.columnsInfo = this.getColumnsInfo();
-        thisObj.controlObj.ele.detach().hide();
+
         let colHeaders = thisObj.columnsInfo.headerNames;
         thisObj.colHeaders = colHeaders;
         let defaultData = this.getDefaultData();
