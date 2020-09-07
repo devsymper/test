@@ -384,6 +384,10 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
+.v-tab{
+    padding: 0px!important;
+    border-width: 20px!important;
+}
 
 </style>

@@ -22,22 +22,22 @@
                         <v-icon class="mr-3" size="18">mdi-account</v-icon> 
                         <span mt-1>{{$t("tasks.header."+role)}}</span>
                     </span>
-                    <v-btn small icon @click="addUserForRole(role)" class="ml-3 symper-add-user-btn" style="display: none" v-if="roleCanAddUser[role]">
+                    <!-- <v-btn small icon @click="addUserForRole(role)" class="ml-3 symper-add-user-btn" style="display: none" v-if="roleCanAddUser[role]">
                         <v-icon>mdi-plus</v-icon>
-                    </v-btn>
+                    </v-btn> -->
                 </div>
                 <div class="pl-10 py-2 d-flex justify-space-between user-show" v-for="userItem in tabData[role]" :key="userItem.id" >
                     <user :user="userItem" class="float-left"></user>
-                    <div class="float-right action-for-role d-flex" >
-                        <div v-for="(btn, idx) in actionsForRole[role]" :key="idx" class="d-flex">
-                            <v-menu v-if="btn.showUserSelect" 
+                    <div class="float-right action-for-role d-flex"  >
+                        <div v-for="(btn, idx) in actionsForRole[role]" :key="idx" class="d-flex" >
+                            <v-menu v-if="btn.showUserSelect==true" 
                                 v-model="showDelegatedUser[role+'_'+idx]"
                                 :offset-y="true"
                                 class="symper-select-user-autocomplete"
                                 :close-on-content-click="false"
                                 :close-on-click="false"
                                 >
-                                <template v-slot:activator="{ on: menu, attrs }">
+                                <template  v-slot:activator="{ on: menu, attrs }">
                                     <v-tooltip bottom>
                                         <template v-slot:activator="{ on: tooltip }">
                                             <v-btn 
@@ -45,28 +45,28 @@
                                                 v-bind="attrs"
                                                 depressed
                                                 v-on="{ ...tooltip, ...menu }"
-                                                 class="mr-3" 
-                                                 small 
-                                                 @click="handleAction(btn.name, role, idx)" >
+                                                class="mr-3" 
+                                                small 
+                                                @click="handleAction(btn.name, role, idx)" >
                                                 <v-icon left>{{btn.icon}}</v-icon> {{btn.text}}
                                             </v-btn>
                                         </template>
-                                        <span>{{btn.text}}</span>
+                                        <span >{{btn.text}}</span>
                                     </v-tooltip>
                                 </template>
                                 <div class="bg-white" style="width: 200px; z-index: 99999" :ref="'selectUserWrapper_'+role+'_'+idx">
                                 </div>
                             </v-menu>
 
-                            <v-btn v-else depressed class="mr-3" small @click="handleAction(btn.name, role, idx)" >
+                            <!-- <v-btn v-else depressed class="mr-3" small @click="handleAction(btn.name, role, idx)" >
                                 <v-icon left>{{btn.icon}}</v-icon> {{btn.text}}
-                            </v-btn>
+                            </v-btn> -->
                         </div>
                     </div>
                 </div>
             </div>
         </v-row>
-        <div class="w-100 h-100 symper-select-user-autocomplete" ref="selectUserAutocomplete">
+        <div class="w-100 h-100 symper-select-user-autocomplete " v-show="statusChange" ref="selectUserAutocomplete">
             <v-autocomplete
                 ref="selectDelegateUser"
                 return-object
@@ -84,7 +84,6 @@
                 @change="changeUserSelect"
                 item-value="name"
                 :filter="filterUser">
-
                 <template v-slot:item="data">
                     <div class="fs-13 py-1">
                         <i class="mdi mdi-account mr-2 fs-16"> </i> <span> {{data.item.displayName}}</span>
@@ -149,6 +148,7 @@ export default {
     },
     data: function() {
         return {
+            statusChange:false,
             selectedUserForAssignment: {},
             showDelegatedUser: {},
             autoUpdate: true,
@@ -178,7 +178,7 @@ export default {
                         icon: 'mdi-account-switch-outline',
                         name: 'change',
                         text: 'Change',
-                        showUserSelect: true
+                        showUserSelect: false
                     },
                     {
                         icon: 'mdi-sitemap',
@@ -239,6 +239,7 @@ export default {
             } catch (error) {
                 this.$snotifyError(error, "Update task assignment failed");
             }
+            this.statusChange=false;
         },
         filterUser(item, queryText, itemText){
             let lowcaseText = queryText.toLowerCase();
@@ -258,9 +259,10 @@ export default {
             }, []);
         },
         handleAction(actionName, role, idx){
+            this.statusChange=true;
             this.selectingPosition.role  = role;
             this.selectingPosition.idx  = idx;
-
+            
             let self = this;
             let refKey = 'selectUserWrapper_'+role+'_'+idx;
             if(!this.$refs[refKey]){
