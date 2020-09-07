@@ -67,7 +67,11 @@ export default {
 			type:String,
 			default: ''
 		},
-		module:{
+		objectType:{
+			type:String,
+			default: ''
+		},
+		objectIdentifier:{
 			type:String,
 			default: ''
 		},
@@ -102,7 +106,8 @@ export default {
 		onFileChanged(e) {
 			this.selectedFile = e.target.files[0]
 			formData.append('user',this.$store.state.app.endUserInfo.displayName)
-			formData.append('module',this.module)
+			formData.append('objectType',this.objectType)
+			formData.append('objectIdentifier',this.objectIdentifier)
 			if(this.pickAvatar == true){
 				if(this.selectedFile.type == 'image/jpeg' || this.selectedFile.type == 'image/jpg' || this.selectedFile.type == 'image/png'){
 					this.dialog = true
@@ -170,4 +175,5 @@ export default {
 .vuejs-clipper-basic__zoom-area {
 	border-radius: 50%
 }
+
 </style>
