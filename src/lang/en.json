@@ -748,7 +748,8 @@
             "participant": "Participant",
             "id": "Seri",
             "list": "List task",
-            "submitForm": "Submit form"
+            "submitForm": "Submit form",
+            "alertDescription": "No description"
         },
         "filterOptions": {
             "all": "All task",

@@ -151,7 +151,7 @@ export default {
 		uploadFile(){
             if(this.fileName != ''){
 				this.formDatas.append('fileName',this.fileName)
-            }
+			}
 			fileManagementApi.uploadFileSymper(this.formDatas,
 			{
 				dataType: 'text',

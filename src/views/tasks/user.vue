@@ -1,15 +1,7 @@
 <template>
     <div>
         <div class="d-inline-block float-left mr-3">
-            <v-avatar size="30">
-                <v-img 
-                    :src="user.avatar ? user.avatar : avatarDefault"
-                ></v-img>
-                <!-- <v-icon
-                    v-else
-                    v-text="user.avatar"
-                ></v-icon> -->
-            </v-avatar>
+            <symperAvatar :size="20" :userId="user.id" />
         </div>
         <div class="d-inline-block">
             <div class="fs-12 ">{{user.displayName}}</div>
@@ -21,8 +13,12 @@
 
 <script>
 import avatarDefault from "@/assets/image/avatar_default.jpg";
+import symperAvatar from "@/components/common/SymperAvatar.vue";
 
 export default {
+    components: {
+        symperAvatar:symperAvatar
+    },
     name: "user",
     props: {
         user: {

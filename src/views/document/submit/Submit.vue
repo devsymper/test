@@ -1804,7 +1804,6 @@ export default {
          */
         findRootControl(){ 
             let listInput1 = getListInputInDocument(this.keyInstance);
-            console.log("asdasdsad",listInput1);
 			let impactedFieldsListWhenStart = {}
 			if(this.preDataSubmit != null && Object.keys(this.preDataSubmit).length > 0 && false){
 				impactedFieldsList = this.preDataSubmit.impactedFieldsList;

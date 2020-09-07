@@ -22,8 +22,6 @@ let testHeader = {
 let testOptions = {
 
 }
-
-
 export default {
     /** 
      * Lấy danh sách các process đã được tạo ra
@@ -162,4 +160,6 @@ export default {
     getLastestByModel() {
         return bpmneApi.get('/deploy-history/lastest-by-model');
     }
+   
+
 };

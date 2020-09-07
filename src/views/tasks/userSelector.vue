@@ -132,7 +132,7 @@ export default {
             let userToInput = this.selected;
             this.$emit("change", userToInput);
             this.$emit("input", userToInput);
-            this.$refs.userSelectAutocomplete.lazySearch= '';
+          //  this.$refs.userSelectAutocomplete.lazySearch= '';
         },
         getUser(id) {
             if (id == null || id == NaN) {

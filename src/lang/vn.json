@@ -850,7 +850,8 @@
             "participant": "Người tham gia",
             "id": "Số đơn",
             "list": "Danh sách công việc",
-            "submitForm": "Form nhập liệu"
+            "submitForm": "Form nhập liệu",
+            "alertDescription": "Không có mô tả"
         },
         "filterOptions": {
             "all": "Toàn bộ task",
