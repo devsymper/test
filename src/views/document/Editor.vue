@@ -230,7 +230,6 @@ export default {
             isAutocompleteControl:false,
             listMessageErr:[],
             documentId:0,
-            currentSelectedControl:'',
             documentProps:{},
             delta : 500,
             lastKeypressTime : 0,
@@ -1050,9 +1049,9 @@ export default {
         handleClickTabInControlTab(elTarget){
             elTarget.siblings().removeClass('tab-active')
             elTarget.addClass('tab-active')
-            let tabId = elTarget.attr('tab-id');
+            let tabId = elTarget.attr('id');
             elTarget.closest('.page-content').find(".page-content-body .content-active").removeClass('content-active');
-            elTarget.closest('.page-content').find(".page-content-body #tab-"+tabId).addClass('content-active');
+            elTarget.closest('.page-content').find('.page-content-body [tabId="'+tabId+'"]').addClass('content-active');
         },
         /**
          * Hàm xử lí sự kiên click vào nút add tab bên trên header của control tab/page để thêm tab
@@ -1070,14 +1069,17 @@ export default {
                     contentActiveClass = 'content-active'
                     elTarget.closest('.page-content').find(".page-content-body .content-active").removeClass('content-active');
                 }
-                let tabId = Date.now();
-                let newTabHtml = '<button tab-id="'+tabId+'" class="'+activeClass+'" class="tab-item" contenteditable="true" tab-index="'+newTabIndex +'">&nbsp;Tab-'+newTabIndex +'</button>';
+                let tabId = "s-control-id-" + Date.now();
+                let newTabHtml = '<button s-control-type="tab" id="'+tabId+'" class="s-control '+activeClass+'" class="tab-item" contenteditable="true" tab-index="'+newTabIndex +'">&nbsp;Tab-'+newTabIndex +'</button>';
 
-                let contentPageHtml = ` <div id="tab-`+tabId+`" contenteditable="true" class="tabcontent `+contentActiveClass+`">
-                                            <div>tab `+tabId+`</div>
+                let contentPageHtml = ` <div tab-id="`+tabId+`" contenteditable="true" class="tabcontent `+contentActiveClass+`">
+                                            <div></div>
                                         </div>`
                 elTarget.closest('.page-content-header').find('.tab').append(newTabHtml);
                 elTarget.closest('.page-content').find('.page-content-body').append(contentPageHtml);
+                let control = GetControlProps('tab');
+                control.properties.title.value = "Tab-"+newTabIndex;
+                this.addToAllControlInDoc(tabId,{properties: control.properties, formulas : control.formulas,type:'tab'});
             }
             
         },
@@ -1093,8 +1095,8 @@ export default {
                 if(isNaN(newPageIndex)){
                     newPageIndex = 1;
                 }
-                let pageId = Date.now();
-                let newPageHtml = `<div class="page-item sb-page-active" page-index="`+newPageIndex+`" page-id="`+pageId+`">
+                let pageId = "s-control-id-" + Date.now();
+                let newPageHtml = `<div s-control-type="page" class="s-control page-item sb-page-active" page-index="`+newPageIndex+`" id="`+pageId+`">
                                     <span class="mdi mdi-format-page-break"></span>
                                     <span class="page-item__name">Trang so `+newPageIndex+`</span>
                                 </div>`;
@@ -1112,6 +1114,9 @@ export default {
                                         </div>`
                 elTarget.closest('.sidebar-page').find('.list-page').append(newPageHtml);
                 elTarget.closest('.s-control-tab-page').find('.list-page-content').append(contentPageHtml);
+                let control = GetControlProps('page');
+                control.properties.title.value = "Trang số "+newPageIndex;
+                this.addToAllControlInDoc(pageId,{properties: control.properties, formulas : control.formulas,type:'page'});
             }
         },
         /**
@@ -1120,7 +1125,7 @@ export default {
         handleClickPageInControlTab(elTarget){
             elTarget.siblings().removeClass('sb-page-active')
             elTarget.addClass('sb-page-active')
-            let pageId = elTarget.attr('page-id');
+            let pageId = elTarget.attr('id');
             elTarget.closest('.s-control-tab-page').find('.list-page-content .page-content').removeClass('page-active');
             elTarget.closest('.s-control-tab-page').find('.list-page-content').find('[s-page-content-id="'+pageId+'"]').addClass('page-active');
         },
@@ -1137,8 +1142,9 @@ export default {
             if(this.editorStore.currentSelectedControl.id != ""){ 
                 this.$refs.sidebarRight.hideDragPanel();
             }
-            if($(event.target).is('.s-control'))
-            this.setSelectedControlProp(event,$(event.target),$('#document-editor-'+this.keyInstance+'_ifr').get(0).contentWindow);
+            if($(event.target).is('.s-control')){
+                this.setSelectedControlProp(event,$(event.target),$('#document-editor-'+this.keyInstance+'_ifr').get(0).contentWindow);
+            }
             else if($(event.target).closest('.s-control').length > 0){
                 
                 this.setSelectedControlProp(event,$(event.target).closest('.s-control'),$('#document-editor-'+this.keyInstance+'_ifr').get(0).contentWindow);
@@ -1890,6 +1896,14 @@ export default {
                         checkDiv.attr('contenteditable', false);
                     }
                     insertionPoint.remove();
+                    if(typeControl == 'tabPage'){
+                        let newPageId = 's-control-id-' + (Date.now() + 1);
+                        checkDiv.find('.page-item.sb-page-active').attr('id',newPageId);
+                        checkDiv.find('.page-content.page-active').attr('s-page-content-id',newPageId);
+                        let control = GetControlProps('page');
+                        control.properties.title.value = "Trang số 1";
+                        thisCpn.addToAllControlInDoc(newPageId,{properties: control.properties, formulas : control.formulas,type:'page'});
+                    }
                     thisCpn.selectControl(control.properties, control.formulas,inputid,typeControl);
                     if(table.length > 0){   // nếu keo control vào trong table thì update dữ liệu trong table của state
                         idTable = table.attr('id');
@@ -1904,20 +1918,20 @@ export default {
             
 
         },
+
+        /**
+         * Hàm xử lí khi click vào control thì lấy thông tin của control đó và hiển thị vào sidebar
+         */
         setSelectedControlProp(e,el,clientFrameWindow,fromTreeView = false){
-            
             e.preventDefault();
-            $(clientFrameWindow.document).find('.on-selected').removeClass('on-selected');
-            el.addClass('on-selected');
-
             let type = el.attr('s-control-type');
-
-            
+            if(!['tab','page'].includes(type)){
+                $(clientFrameWindow.document).find('.on-selected').removeClass('on-selected');
+                el.addClass('on-selected');
+            }
             let controlId = el.attr('id');
-            this.currentSelectedControl = controlId
             $('.editor-tree-active').removeClass('editor-tree-active')
             $('.tree-'+controlId).addClass('editor-tree-active')
-            
             let table = el.closest('.s-control-table');
             if(table.length > 0 && controlId != table.attr('id')){
                 if(!fromTreeView)
@@ -1929,6 +1943,21 @@ export default {
             else{
                 let control = this.editorStore.allControl[controlId];
                 this.selectControl(control.properties, control.formulas,controlId,type);
+            }
+        },
+        checkSelectedTabPageControl(e,control,controlId){
+            if($(e.target).closest('.page-item').length > 0){
+                let pageId = $(e.target).closest('.page-item').attr('id');
+                let control = this.editorStore.allControl[pageId];
+                this.selectControl(control.properties, control.formulas,controlId,'page');
+            }
+            else if($(e.target).is('.tab button')){
+                let tabId = $(e.target).attr('id');
+                let control = this.editorStore.allControl[tabId];
+                this.selectControl(control.properties, control.formulas,controlId,'tab');
+            }
+            else{
+                this.selectControl(control.properties, control.formulas,controlId,'tabPage');
             }
         }
     },

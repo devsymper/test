@@ -1,8 +1,4 @@
 import Control from "./control";
-import { documentApi } from './../../../api/Document.js'
-import { userApi } from './../../../api/user.js'
-import store from './../../../store'
-import moment from "moment-timezone";
 export default class LayoutControl extends Control {
     constructor(idField, ele, controlProps, curParentInstance, value) {
         super(idField, ele, controlProps, curParentInstance, value);
@@ -11,11 +7,12 @@ export default class LayoutControl extends Control {
         if (this.type == 'tabPage') {
             this.renderTabPageControl();
         }
-        this.setEvent()
+
     }
     renderTabPageControl() {
         this.ele.find('.tabcontent').attr('contenteditable', false);
         this.ele.find('.tab button').attr('contenteditable', false);
+        this.setEvent()
     }
     setEvent() {
             let self = this;
@@ -44,9 +41,9 @@ export default class LayoutControl extends Control {
     handleClickTabInControlTab(elTarget) {
             elTarget.siblings().removeClass('tab-active')
             elTarget.addClass('tab-active')
-            let tabId = elTarget.attr('tab-id');
+            let tabId = elTarget.attr('id');
             elTarget.closest('.page-content').find(".page-content-body .content-active").removeClass('content-active');
-            elTarget.closest('.page-content').find(".page-content-body #tab-" + tabId).addClass('content-active');
+            elTarget.closest('.page-content').find('.page-content-body [tabId="' + tabId + '"]').addClass('content-active');
         }
         /**
          * Hàm xử lí sự kiên click vào page bên sidebar của control tab/page để chuyển page
@@ -54,7 +51,7 @@ export default class LayoutControl extends Control {
     handleClickPageInControlTab(elTarget) {
         elTarget.siblings().removeClass('sb-page-active')
         elTarget.addClass('sb-page-active')
-        let pageId = elTarget.attr('page-id');
+        let pageId = elTarget.attr('id');
         elTarget.closest('.s-control-tab-page').find('.list-page-content .page-content').removeClass('page-active');
         elTarget.closest('.s-control-tab-page').find('.list-page-content').find('[s-page-content-id="' + pageId + '"]').addClass('page-active');
     }
