@@ -234,7 +234,13 @@ export default {
          */
         checkTitleControl(name, input){
             let elements = $('#document-editor-'+this.instance+'_ifr').contents().find('#'+this.sCurrentDocument.id);
-             elements.removeClass('s-control-error');
+            elements.removeClass('s-control-error');
+            if(elements.is('.page-item')){
+                elements.find('.page-item__name').text(input.value);
+            }
+            if(elements.is('[s-control-type="tab"]')){
+                elements.text(input.value);
+            }
             let tableId = checkInTable(elements)
             if( tableId == this.sCurrentDocument.id)
             tableId = '0';

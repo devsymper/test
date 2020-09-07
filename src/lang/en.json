@@ -280,7 +280,6 @@
     },
     "document": {
         "create": "Create document",
-        "submit": "Submit document",
         "edit": "Edit document",
         "title": "List Document",
         "table": {
@@ -322,6 +321,14 @@
                     "changeTo": "To"
                 }
             }
+        },
+        "submit": {
+            "fab": {
+                "submit": "Submit",
+                "draft": "Draft",
+                "toggleSize": "Toggle Size"
+            },
+            "title": "Submit document"
         },
         "process": {
             "header_bar": {
@@ -440,6 +447,25 @@
             "validate": "Validate",
             "save": "Save"
         }
+    },
+    "objectType": {
+        "Document definition": "Văn bản",
+        "Document instance": "Danh sách bản ghi",
+        "Orgchart": "Sơ đồ tổ chức",
+        "Dataflow": "Luồng xử lý dữ liệu",
+        "Workflow definition": "Quy trình",
+        "Workflow instance": "Văn bản",
+        "Syql": "Công thức",
+        "Account": "Tài khoản người dùng",
+        "Report": "Báo cáo",
+        "Dashboard": "Dashboard",
+        "Job": "Job",
+        "Operation": "Operation",
+        "Action pack": "Nhóm hành động",
+        "Knowledge": "Văn bản nội bộ",
+        "File": "Quản lý tệp",
+        "Department": "Phòng ban",
+        "Timesheet": "Thời gian biểu"
     },
     "apps": {
         "header": {
@@ -789,5 +815,12 @@
         "detail": {
             "title": "Detail dashboard "
         }
-    }
+	},
+	"comment":{
+		"comment": "Comment",
+		"resolve": "Resolve",
+		"reply": "Reply",
+		"edited": "Edited",
+		"search": "Search"
+	}
 }

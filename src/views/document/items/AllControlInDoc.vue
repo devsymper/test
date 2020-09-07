@@ -68,7 +68,7 @@
 import AgDataTable from "./../../../components/common/agDataTable/AgDataTable.vue"
 import SymperDragPanel from "./../../../components/common/SymperDragPanel";
 import FormulaEditor from "@/components/formula/editor/FormulaEditor";
-import {getAllPropsControl,getIconFromType,getAllFormulasName} from "./../../../components/document/controlPropsFactory.js"
+import {getAllPropsControl,getIconFromType,getAllFormulasName,listControlNotNameProp} from "./../../../components/document/controlPropsFactory.js"
 import { util } from "./../../../plugins/util.js";
 import {checkInTable} from "@/views/document/common/common";
 import ImageRenderer from "@/components/common/agDataTable/ImageRenderer.vue";
@@ -211,7 +211,7 @@ export default {
                         row[propType] = [value];
                     }
                 }
-                if(type == "submit" || type == "reset" || type == "draft" || type == "approvalHistory"){
+                if(listControlNotNameProp.includes(type)){
                     row['name'] = [type];
                     row['title'] = [type];
                 }

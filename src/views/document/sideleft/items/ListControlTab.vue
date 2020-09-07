@@ -20,7 +20,7 @@
 </v-treeview>
 </template>
 <script>
-import { getIconFromType } from './../../../../components/document/controlPropsFactory.js';
+import { getIconFromType,listControlNotNameProp } from './../../../../components/document/controlPropsFactory.js';
 export default {
     computed: {
         sDocumentEditor() {
@@ -64,7 +64,7 @@ export default {
                 let props = control.properties;
                 let name = "";
                 let title = "";
-                if (type == 'submit' || type == 'draft' || type == 'reset' || type == 'approvalHistory') {
+                if (listControlNotNameProp.includes(type)) {
                     name = type
                     title = type
                 } else {

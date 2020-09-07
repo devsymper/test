@@ -351,9 +351,31 @@
         "last_week1": " Tuần này",
         "department": "Phòng ban"
     },
+    "objectType": {
+        "Document definition": "Văn bản",
+        "Document instance": "Danh sách bản ghi",
+        "Orgchart": "Sơ đồ tổ chức",
+        "Dataflow": "Luồng xử lý dữ liệu",
+        "Workflow definition": "Quy trình",
+        "Workflow instance": "Văn bản",
+        "Permission pack": "Permission pack",
+        "Report folder": "Report folder",
+        "Syql": "Công thức",
+        "Application definition": "Application definition",
+        "Account": "Tài khoản người dùng",
+        "Report": "Báo cáo",
+        "Dashboard": "Dashboard",
+        "Job": "Job",
+        "Operation": "Operation",
+        "Action pack": "Nhóm hành động",
+        "Role": "Quyền",
+        "Knowledge": "Văn bản nội bộ",
+        "File": "Quản lý tệp",
+        "Department": "Phòng ban",
+        "Timesheet": "Thời gian biểu"
+    },
     "document": {
         "create": "Tạo mới văn bản",
-        "submit": "Submit văn bản",
         "edit": "Chỉnh sửa văn bản",
         "title": "Danh sách văn bản",
         "table": {
@@ -395,6 +417,14 @@
                     "changeTo": "Thành"
                 }
             }
+        },
+        "submit": {
+            "fab": {
+                "submit": "Gửi",
+                "draft": "Lưu bản nháp",
+                "toggleSize": "Thay đổi kích thước"
+            },
+            "title": "Submit văn bản"
         },
         "process": {
             "header_bar": {
@@ -649,7 +679,19 @@
                 "list": "Danh sách",
                 "import": "Import",
                 "favorite": "Thêm vào yêu thích",
-                "unfavorite": "Loại bỏ yêu thích"
+                "unfavorite": "Loại bỏ yêu thích",
+                "restore": "Khôi phục",
+                "list instance": "Danh sách bản ghi",
+                "list trash": "Các bản đã xoá",
+                "create": "Thêm mới",
+                "edit": "Sửa",
+                "update": "Sửa",
+                "drop": "Xoá",
+                "delete": "Xoá",
+                "detail": "Chi tiết",
+                "print": "In"
+
+
             },
             "dataflow": {
                 "detail": "Chi tiết",
@@ -870,5 +912,12 @@
             "title": "Không thể tạo thêm tab mới",
             "detail": "Số lượng tab vượt quá giới hạn, hãy xóa một vài tab"
         }
-    }
+	},
+	"comment":{
+		"comment": "Bình luận",
+		"resolve": "Đã giải quyết",
+		"reply": "Trả lời",
+		"edited": "Đã chỉnh sửa",
+		"search": "Tìm kiếm"
+	}
 }

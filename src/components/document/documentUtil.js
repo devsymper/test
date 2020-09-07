@@ -9,7 +9,7 @@ const getInsertionCSS = function() {
     styles += 'table td, table th{ border: 1px dotted #ccc !important;padding: 2px !important;height:25px !important}';
     styles += '.on-selected{border:1px dashed #2196f3 !important;cursor: pointer !important;}';
     styles += '.s-control-tracking-value,.s-control-approval-history,.s-control-report,.s-control-file-upload,.s-control-reset,.s-control-draf,.s-control-submit,.s-control-text,.s-control-select,.s-control-document,.s-control-phone,.s-control-email,.s-control-currency,.s-control-radio,.s-control-color,.s-control-percent,.s-control-hidden,.s-control-user,.s-control-filter,.s-control-date,.s-control-datetime,.s-control-month,.s-control-time,.s-control-number{width: auto;height: 25px;border-radius: 3px;font-size: 11px;border:1px solid #e9ecef;font-family:Roboto,sans-serif;color:gray;padding: 0 5px;outline: 0!important;}'
-    styles += '.s-control:not(.s-control-table) {display: inline-block;background: rgb(233, 236, 239);min-width: 50px;outline: none !important;margin:1px}';
+    styles += '.s-control:not(.s-control-table):not(s-control-type="tab"):not(s-control-type="page") {display: inline-block;background: rgb(233, 236, 239);min-width: 50px;outline: none !important;margin:1px}';
     styles += '.s-control-rich-text {border:none;}';
     styles += '.s-control-reset,.s-control-draft,.s-control-submit{padding: 5px 8px;}';
     styles += '.s-control-user,.s-control-select,.s-control-document{width: 120px;}';
@@ -89,7 +89,7 @@ const getInsertionCSS = function() {
         transition: all ease-in-out 250ms;
         margin-top: 6px;
       }
-      .collap-sidebar-btn{
+      .collapse-sidebar-btn{
         position: absolute;
         bottom: 6px;
         right: 0;
@@ -103,6 +103,7 @@ const getInsertionCSS = function() {
         height: 100%;
         width: 150px;
         position: relative;
+        transition: all ease-in-out 250ms;
       }
       .page-content{
         height:100%;
@@ -123,7 +124,15 @@ const getInsertionCSS = function() {
         padding: 5px 4px;
         border-radius: 4px;
         margin-bottom: 4px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
         transition: all ease-in-out 150ms;
+      }
+      .add-page-btn{
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
       }
       .sb-page-active{
         background: #077afe;
@@ -131,6 +140,12 @@ const getInsertionCSS = function() {
       }
       .page-active{
         display: block !important;
+      }
+      .collapse-sb{
+        width: 30px;
+      }
+      .d-none{
+        display:none;
       }
       `;
     return styles;

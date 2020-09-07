@@ -665,18 +665,18 @@ const controlTypes = {
                 style="display: flex;width: 100%;height:300px;border: 1px solid rgba(0 0 0 / 0.1);" >
                     <div class="sidebar-page">
                         <div class="page-header-action">
-                            <button>+  Thêm trang</button>
+                            <button class="add-page-btn"> <span class="mdi mdi-plus"></span>  <span class="page-item__name">Thêm trang</span></button>
                         </div>
                         <div class="list-page">
-                            <div class="page-item sb-page-active" page-index="1" page-id="s-page-id-123">
+                            <div class="page-item sb-page-active s-control" s-control-type="page" page-index="1">
                                 <span class="mdi mdi-format-page-break"></span>
-                                <span>Trang so 1</span>
+                                <span class="page-item__name">Trang so 1</span>
                             </div>
                         </div>
-                        <button class="collap-sidebar-btn"><<</button>
+                        <button class="collapse-sidebar-btn"><span class="mdi mdi-chevron-double-left"></span></button>
                     </div>
                     <div class="list-page-content">
-                        <div class="page-content page-active" s-page-content-id="s-page-id-123">
+                        <div class="page-content page-active">
                             <div class="page-content-header">
                                 <button class="add-tab-btn">+ Thêm tab</button>
                                 <div class="tab">
@@ -690,7 +690,29 @@ const controlTypes = {
                     </div>
                 </div>&nbsp;`,
         title: "Tab / Page",
-        inProps: ['height'],
+        inProps: ['height', 'isHidden'],
+        formulas: ['hidden']
+    },
+    tab: {
+        html: `<div contenteditable="true" class="tabcontent">
+                <div>tab 1</div>
+            </div>`,
+        inProps: ['name', 'title', 'isHidden'],
+        formulas: ['hidden']
+    },
+    page: {
+        html: `<div class="page-content page-active">
+                <div class="page-content-header">
+                    <button class="add-tab-btn">+ Thêm tab</button>
+                    <div class="tab">
+                    
+                    </div>
+                </div>
+                <div class="page-content-body">
+                    
+                </div>
+            </div>`,
+        inProps: ['name', 'title', 'isHidden'],
         formulas: ['hidden']
     },
 
@@ -739,9 +761,10 @@ export const mappingOldVersionControlFormulas = {
     "ReadonlyDataFormulas": "uniqueTable"
 }
 
-// hàm lấy tất cac thuoc tinh và các trường công thức của control
-// input : type của control
-// output : data control  : {icon,html,title,formulas,properties}
+export const listControlNotNameProp = ['approvalHistory', 'submit', 'reset', 'draft', 'tabPage']
+    // hàm lấy tất cac thuoc tinh và các trường công thức của control
+    // input : type của control
+    // output : data control  : {icon,html,title,formulas,properties}
 export const GetControlProps = function(type) {
     let control = util.cloneDeep(controlTypes[type]);
 

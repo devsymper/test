@@ -1,6 +1,7 @@
 <template>
 <div style="width:100%;" class= "mb-10 d-flex justify-start "  >
     <v-col cols="md-2 sm-2 lg-2" style="border-right:1px solid rgba(0,0,0,0.1); height:100%!important">
+    <v-list-item-group >
         <v-list-item-content>
             <v-list-item-title class="fs-15 ml-5 fm">
                 <i class="mdi mdi-magnify"></i>
@@ -17,6 +18,7 @@
                 </v-list-item-content>
             </v-list-item>
         </v-list>
+           </v-list-item-group >
     </v-col>
     <v-col cols="md-10 sm-10 lg-10 mb-10 pb-10" style="height:100vh; overflow:scroll!important" class="ml-1 mr-2">
         <!-- dòng kết quả tìm kiếm -->
@@ -414,7 +416,7 @@ export default {
         formatGroupName(value) {
             let name = '';
             if (value == 'document_instance') {
-                name = 'Văn bản';
+                name = 'Bản ghi dữ liệu';
             } else if (value == 'user') {
                 name = 'Nhân viên'
             } else if (value == 'document_definition') {

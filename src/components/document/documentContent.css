@@ -47,7 +47,7 @@ p {
     outline: 0!important;
 }
 
-.sym-form-submit .s-control:not(.s-control-table) {
+.sym-form-submit .s-control:not(.s-control-table):not(button):not(.page-item) {
     display: inline-block;
     /* background: rgb(233, 236, 239); */
     min-width: 50px;
@@ -106,7 +106,7 @@ p {
     border-bottom: 1px solid rgb(230, 230, 230);
 }
 
-.s-control:not(.s-control-approval-history):not(.s-control-label):not(.s-control-submit):not(.s-control-draft):not(.s-control-reset):not(.s-control-file-upload):not(.s-control-table):not(.s-control-data-flow):not(.s-control-panel) {
+.s-control:not(.s-control-tab-page):not(button):not(.page-item):not(.s-control-approval-history):not(.s-control-label):not(.s-control-submit):not(.s-control-draft):not(.s-control-reset):not(.s-control-file-upload):not(.s-control-table):not(.s-control-data-flow):not(.s-control-panel) {
     /*width: 100% !important;*/
     padding: 0 5px !important;
     background: transparent;
@@ -270,3 +270,159 @@ input.s-control:not(.s-control-panel):not(.detail-view):hover {
 .ht_clone_bottom_left_corner.handsontable {
     bottom: 6px !important;
 } */
+
+
+/* Style the buttons inside the tab */
+
+.tab button {
+    background: transparent;
+    float: left;
+    border: none;
+    outline: none;
+    padding: 0px 10px;
+    transition: 0.3s;
+    font-size: 14px;
+    height: 25px;
+    border-radius: 4px;
+    margin: 0 8px;
+}
+
+button {
+    cursor: pointer;
+}
+
+
+/* Change background color of buttons on hover */
+
+button:hover {
+    background: rgba(0 0 0 / 0.1) !important;
+}
+
+.page-content-header {
+    display: flex;
+    margin-top: 6px;
+}
+
+.tab-active {
+    background: rgba(0 0 0 / 0.05) !important;
+}
+
+.tabcontent {
+    display: none;
+    height: 100%;
+    cursor: text;
+}
+
+.tabcontent:focus {
+    outline: none;
+}
+
+.content-active {
+    display: block !important;
+}
+
+.add-tab-btn {
+    border: none;
+    margin: 0 8px;
+    border-radius: 4px;
+    padding: 0 10px;
+    height: 25px;
+    transition: all ease-in-out 250ms;
+}
+
+.page-content-body {
+    height: calc(100% - 50px);
+    padding: 10px;
+}
+
+.page-header-action button {
+    height: 25px;
+    width: 100%;
+    border: none;
+    background: #f2f2f2;
+    transition: all ease-in-out 250ms;
+    margin-top: 6px;
+}
+
+.collapse-sidebar-btn {
+    position: absolute;
+    bottom: 6px;
+    right: 0;
+    border: none;
+    background: rgba(0 0 0 / 0.05);
+    height: 25px;
+    width: 25px;
+    border-radius: 4px;
+}
+
+.collapse-sidebar-btn:focus {
+    outline: none;
+}
+
+.sidebar-page {
+    background: #f2f2f2;
+    height: 100%;
+    width: 150px;
+    position: relative;
+    transition: all ease-in-out 250ms;
+}
+
+.page-content {
+    height: 100%;
+    width: 100%;
+    display: none;
+}
+
+.list-page-content {
+    height: 100%;
+    width: 100%;
+    background: white;
+}
+
+.list-page {
+    height: calc(100% - 35px);
+    padding: 2px;
+    font-size: 13px;
+}
+
+.page-item {
+    padding: 5px 4px;
+    border-radius: 4px;
+    margin-bottom: 4px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    transition: all ease-in-out 150ms;
+}
+
+.add-page-btn {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.sb-page-active {
+    background: #077afe;
+    color: white;
+}
+
+.page-active {
+    display: block !important;
+}
+
+.collapse-sb {
+    width: 30px;
+}
+
+.d-none {
+    display: none;
+}
+
+.page-header-action {
+    opacity: 0;
+    user-select: none;
+}
+
+.add-tab-btn {
+    display: none;
+}
