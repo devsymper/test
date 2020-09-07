@@ -23,8 +23,6 @@ export default {
             style:'transform:translateX(300px)'
         }
     },
- 
-    
     methods:{
         hide(){
 			this.style = 'transform:translateX(300px)'
@@ -32,7 +30,6 @@ export default {
 		show(){
             this.style = 'transform:translateX(0px)'
 		},
-       
     }
 }
 </script>
@@ -53,5 +50,4 @@ export default {
 		cursor: pointer;
 		margin-right: 8px;
 	}
-
 </style>

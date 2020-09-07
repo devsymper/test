@@ -911,5 +911,12 @@
             "title": "Không thể tạo thêm tab mới",
             "detail": "Số lượng tab vượt quá giới hạn, hãy xóa một vài tab"
         }
-    }
+	},
+	"comment":{
+		"comment": "Bình luận",
+		"resolve": "Đã giải quyết",
+		"reply": "Trả lời",
+		"edited": "Đã chỉnh sửa",
+		"search": "Tìm kiếm"
+	}
 }

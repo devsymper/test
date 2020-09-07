@@ -1,19 +1,18 @@
 <template>
 		<div>
-				<UploadFile :autoUpload="true" :pickAvatar="true" @selected-file="selectedFile" :fileName="'adn100198'"/>
+				<UploadFile :autoUpload="true" :pickAvatar="true" @selected-file="selectedFile" :fileName="'adn100198'" :module="'document'"/>
+				<!-- :pickAvatar="true"  -->
 				<img :src="src" alt="">
 		</div>	
 </template>
 
 <script>
 import comment from "@/components/common/comment/Comment.vue"
-import UploadAvatar from "@/components/common/UploadAvatar.vue"
 import UploadFile from "@/components/common/UploadFile.vue"
 
 export default {
 	components:{
 		comment,
-		UploadAvatar,
 		UploadFile
 	},
 	methods:{

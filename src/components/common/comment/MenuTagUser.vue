@@ -1,12 +1,19 @@
 <template>
    <v-card class="context-menu" v-show="isShowMenu" :style="{top:top+'px',left:left+'px'}">
 			<div class="item" v-for="item in listUser" :key="item.name" @click="clickRow(item)">
-				<span v-on:keyup.down="down"  v-on:keyup.up="up" v-on:keyup.enter="clickRow(item)"> {{item.displayName}}</span>
+				<div>
+					<SymperAvatar :size="25" :userId="item.id" />
+					<span v-on:keyup.down="down"  v-on:keyup.up="up" v-on:keyup.enter="clickRow(item)" style="padding-left:8px"> {{item.displayName}}</span>
+				</div>
 			</div>
    </v-card>
 </template>
 <script>
+import SymperAvatar from '@/components/common/SymperAvatar.vue'
   export default {
+	components:{
+		SymperAvatar
+	},
 	props:{
 		keyWord:{
 			type: String,
@@ -73,7 +80,7 @@
 .context-menu{
 	position: fixed;
 	z-index: 10000;
-	width: 170px;
+	width: 200px;
 	background-color: #fff;
 }
 .context-menu >>> .item{
