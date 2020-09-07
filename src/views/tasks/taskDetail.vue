@@ -213,6 +213,7 @@ export default {
             }
             let self = this;
             BPMNEngine.getATaskInfo(taskId).then((res) => {
+                console.log(res,"task");
                 for(let role in self.tabsData.people){
                     if(res[role]){
                         self.tabsData.people[role] = res[role].split(',').reduce((arr, el) => {

@@ -83,7 +83,7 @@
                                     </div>
 
                                     <div class="fs-11  py-0 pr-2 text-ellipsis" >
-                                        {{$moment(obj.createTime).fromNow()}}
+                                        {{obj.createTime ? $moment(obj.createTime).fromNow():$moment(obj.endTime).fromNow()}}
                                         <v-icon class="grey--text lighten-2 ml-1" x-small>mdi-clock-time-nine-outline</v-icon>
                                     </div>
                                 </div>
@@ -103,7 +103,7 @@
                             cols="2"
                             class="fs-13 px-1 py-0"
                         >
-                            <span class="mt-1 ">{{$moment(obj.dueDate).fromNow()}}</span>
+                            <span class="mt-1 ">{{obj.dueDate ==null? '':$moment(obj.dueDate).fromNow()}}</span>
                         </v-col>
                         <v-col
                             v-if="!sideBySideMode"
@@ -509,4 +509,5 @@ export default {
     -webkit-line-clamp: 1;
     -webkit-box-orient: vertical;
 }
+
 </style>

@@ -659,79 +659,79 @@
                 "unfavorite": "Loại bỏ yêu thích"
             },
             "orgchart": {
-                "create":"Tạo mới ",
-                "update":"Cập nhật",
-                "drop":"Xóa",
-                "list":"Danh sách",
-                "detail":"Chi tiết",
+                "create": "Tạo mới ",
+                "update": "Cập nhật",
+                "drop": "Xóa",
+                "list": "Danh sách",
+                "detail": "Chi tiết",
                 "unfavorite": "Loại bỏ yêu thích"
             },
-            "document_definition":{
-                "create":"Tạo mới văn bản ",
-                "edit":"Chỉnh sửa văn bản",
-                "submit":"Gửi văn bản",
-                "drop":"Xóa văn bản",
-                "restore":"Khôi phục",
-                "list":"Danh sách văn bản",
-                "list_trash":"Thùng rác",
-                "list_instance":"Danh sách bản ghi",
+            "document_definition": {
+                "create": "Tạo mới văn bản ",
+                "edit": "Chỉnh sửa văn bản",
+                "submit": "Gửi văn bản",
+                "drop": "Xóa văn bản",
+                "restore": "Khôi phục",
+                "list": "Danh sách văn bản",
+                "list_trash": "Thùng rác",
+                "list_instance": "Danh sách bản ghi",
                 "unfavorite": "Loại bỏ yêu thích"
             },
-            "workflow_definition":{
-                "list":"Danh sách quy trình ",
-                "create":"Tạo mới quy trình ",
-                "deploy":"Triển khai",
-                "drop":"Xóa quy trình ",
-                "update":"Cập nhật quy trình ",
-                "list_instance":"Danh sách bản ghi",
-                "start_instance":"Bắt đầu quy trình",
+            "workflow_definition": {
+                "list": "Danh sách quy trình ",
+                "create": "Tạo mới quy trình ",
+                "deploy": "Triển khai",
+                "drop": "Xóa quy trình ",
+                "update": "Cập nhật quy trình ",
+                "list_instance": "Danh sách bản ghi",
+                "start_instance": "Bắt đầu quy trình",
                 "unfavorite": "Loại bỏ yêu thích"
             },
-            "dashboard":{
-                "create":"Tạo mới",
-                "update":"Cập nhât",
-                "view":"Xem",
-                "list":"Danh sách",
-                "drop":"Xóa",
+            "dashboard": {
+                "create": "Tạo mới",
+                "update": "Cập nhât",
+                "view": "Xem",
+                "list": "Danh sách",
+                "drop": "Xóa",
                 "unfavorite": "Loại bỏ yêu thích"
             }
         },
-        "iconListActions":{
+        "iconListActions": {
             "orgchart": {
-                "create":"mdi-folder-plus-outline",
-                "update":"mdi-note-plus-outline",
-                "drop":"mdi-arrow-down-drop-circle-outline",
-                "list":"mdi-clipboard-list-outline",
-                "detail":"mdi-details",
+                "create": "mdi-folder-plus-outline",
+                "update": "mdi-note-plus-outline",
+                "drop": "mdi-arrow-down-drop-circle-outline",
+                "list": "mdi-clipboard-list-outline",
+                "detail": "mdi-details",
                 "unfavorite": "mdi-star-off"
             },
-            "document_definition":{
-                "create":"mdi-folder-plus-outline",
-                "edit":"mdi-file-document-edit-outline",
-                "submit":"mdi-content-save-outline",
-                "drop":"mdi-arrow-down-drop-circle-outline",
-                "restore":"mdi-file-restore-outline",
-                "list":"mdi-clipboard-list-outline",
-                "list_trash":"mdi-playlist-remove",
-                "list_instance":"mdi-file-document-multiple-outline",
+            "document_definition": {
+                "create": "mdi-folder-plus-outline",
+                "edit": "mdi-file-document-edit-outline",
+                "submit": "mdi-content-save-outline",
+                "drop": "mdi-arrow-down-drop-circle-outline",
+                "restore": "mdi-file-restore-outline",
+                "list": "mdi-clipboard-list-outline",
+                "list_trash": "mdi-playlist-remove",
+                "list_instance": "mdi-file-document-multiple-outline",
                 "unfavorite": "mdi-star-off"
             },
-            "workflow_definition":{
-                "list":"mdi-clipboard-list-outline",
-                "create":"mdi-folder-plus-outline",
-                "deploy":"mdi-rocket",
-                "drop":"mdi-arrow-down-drop-circle-outline",
-                "update":"mdi-note-plus-outline",
-                "list_instance":"mdi-file-document-multiple-outline",
-                "start_instance":"mdi-play-outline",
+            "workflow_definition": {
+                "list": "mdi-clipboard-list-outline",
+                "create": "mdi-folder-plus-outline",
+                "deploy": "mdi-rocket",
+                "drop": "mdi-arrow-down-drop-circle-outline",
+                "update": "mdi-note-plus-outline",
+                "list_instance": "mdi-file-document-multiple-outline",
+                "start_instance": "mdi-play-outline",
                 "unfavorite": "mdi-star-off"
             },
-            "dashboard":{
-                "create":"mdi-folder-plus-outline",
-                "update":"mdi-note-plus-outline",
-                "view":"mdi-eye-outline",
-                "list":"clipboard-list-outline",
-                "drop":"arrow-down-drop-circle-outline",
+            "dashboard": {
+                "create": "mdi-folder-plus-outline",
+                "update": "mdi-note-plus-outline",
+                "view": "mdi-eye-outline",
+                "list": "clipboard-list-outline",
+                "drop": "arrow-down-drop-circle-outline",
                 "unfavorite": "mdi-star-off"
             }
         }
@@ -808,7 +808,8 @@
             "participant": "Người tham gia",
             "id": "Số đơn",
             "list": "Danh sách công việc",
-            "submitForm": "Form nhập liệu"
+            "submitForm": "Form nhập liệu",
+            "alertDescription": "Không có mô tả"
         },
         "filterOptions": {
             "all": "Toàn bộ task",

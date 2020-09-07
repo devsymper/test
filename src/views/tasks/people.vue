@@ -55,7 +55,6 @@
                                     </v-tooltip>
                                 </template>
                                 <div class="bg-white" style="width: 200px; z-index: 99999" :ref="'selectUserWrapper_'+role+'_'+idx">
-                                    
                                 </div>
                             </v-menu>
 
@@ -67,7 +66,7 @@
                 </div>
             </div>
         </v-row>
-        <!-- <div class="w-100 h-100 symper-select-user-autocomplete" ref="selectUserAutocomplete">
+        <div class="w-100 h-100 symper-select-user-autocomplete" ref="selectUserAutocomplete">
             <v-autocomplete
                 ref="selectDelegateUser"
                 return-object
@@ -92,7 +91,7 @@
                     </div>
                 </template>
             </v-autocomplete>
-        </div> -->
+        </div>
     </div>
 </template>
 
@@ -135,6 +134,7 @@ export default {
             return this.$store.state.app;
         },
         roleCanAddUser() {
+            
             let canAddAssignee = false;
             let assignee = this.tabData.assignee[0];
             if(!assignee && this.tabData.owner[0]){
