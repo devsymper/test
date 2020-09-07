@@ -43,7 +43,7 @@ export default class LayoutControl extends Control {
             elTarget.addClass('tab-active')
             let tabId = elTarget.attr('id');
             elTarget.closest('.page-content').find(".page-content-body .content-active").removeClass('content-active');
-            elTarget.closest('.page-content').find('.page-content-body [tabId="' + tabId + '"]').addClass('content-active');
+            elTarget.closest('.page-content').find('.page-content-body [tab-id="' + tabId + '"]').addClass('content-active');
         }
         /**
          * Hàm xử lí sự kiên click vào page bên sidebar của control tab/page để chuyển page
