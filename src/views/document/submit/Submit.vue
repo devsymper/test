@@ -131,6 +131,9 @@ import { setDataForPropsControl,allControlNotSetData } from "./../../../componen
 import BasicControl from "./basicControl";
 import TableControl from "./tableControl";
 import ActionControl from "./actionControl";
+import LayoutControl from "./layoutControl";
+import PageControl from "./pageControl";
+import TabControl from "./tabControl";
 import DatePicker from "./../../../components/common/DateTimePicker";
 import TimeInput from "./../../../components/common/TimeInput";
 import Table from "./table.js";
@@ -566,6 +569,8 @@ export default {
                 ) {
                     thisCpn.$refs.validate.hide();
                 }
+               
+                
             } catch (error) {
                 
             }
@@ -599,6 +604,7 @@ export default {
     },
     
     methods: {
+        
         // hàm
         getParamsForRunDataFlow(properties){
             let mapControlToParams = properties.mapParamsDataflow.value;
@@ -1008,8 +1014,30 @@ export default {
                         control.init();
                         control.render();
                         control.setEffectedData(prepareData);
-                        this.addToListInputInDocument('submit',control)
-                    } else {
+                        this.addToListInputInDocument(allControlNotSetData[controlType],control)
+                    } 
+                    else if(controlType == 'tabPage'){
+                        let control = new LayoutControl(idField, $(allInputControl[index]),field,thisCpn.keyInstance);
+                        control.init();
+                        control.render();
+                        this.addToListInputInDocument('tabPage',control)
+                    }
+                    else if(controlType == 'tab'){
+                         let controlName = field.properties.name.value;
+                        let control = new TabControl(idField, $(allInputControl[index]),field,thisCpn.keyInstance);
+                        control.init();
+                        control.render();
+                        this.addToListInputInDocument(controlName,control)
+                    }
+                    else if(controlType == 'page'){
+                         let controlName = field.properties.name.value;
+                        let control = new PageControl(idField, $(allInputControl[index]),field,thisCpn.keyInstance);
+                        control.init();
+                        control.render();
+                        this.addToListInputInDocument(controlName,control)
+                    }
+                   
+                    else {
                         let controlName = field.properties.name.value;
                         let mapColumnType = Util.mapTypeControlToTypeSQLLite(controlType); 
                         if(mapColumnType != false){
@@ -1038,6 +1066,10 @@ export default {
                             
                         }
                         //truong hop la control table
+                        
+                        
+                        
+                        
                         else {
                             let listInsideControls = {};
                             let tableControl = new TableControl(
@@ -1673,7 +1705,7 @@ export default {
                             this.handlerDataAfterRunFormulasRequire(value,controlName);
                             break;
                         case "hidden":
-                            this.handlerDataAfterRunFormulasHidden(value,controlId);
+                            this.handlerDataAfterRunFormulasHidden(controlInstance,value,controlId);
                             break;
                         case "readOnly":
                             this.handlerDataAfterRunFormulasReadonly(value,controlId);
@@ -1739,12 +1771,19 @@ export default {
                 controlInstance.removeValidateIcon();
             }
         },
-        handlerDataAfterRunFormulasHidden(isHidden,controlId){
+        handlerDataAfterRunFormulasHidden(controlInstance,isHidden,controlId){
             if(Array.isArray(isHidden)){
                 isHidden=isHidden[0];
             }
             let display = (isHidden == 1 || isHidden==true ) ? 'none' : 'inline-block'
-            $('#'+controlId).parent().css({'display':display})
+            if(controlInstance.type == 'page'){
+                controlInstance.setHiddenPage()
+            }
+            else if(controlInstance.type == 'tab'){
+            }
+            else{
+                $('#'+controlId).parent().css({'display':display})
+            }
         },
         handlerDataAfterRunFormulasReadonly(isReadonly,controlId){
             if(Array.isArray(isReadonly)){
@@ -1763,6 +1802,8 @@ export default {
          * Hàm xử lí việc tìm kiếm các root control và chạy công thức cho control đó (lúc khởi tạo doc)
          */
         findRootControl(){ 
+            let listInput1 = getListInputInDocument(this.keyInstance);
+            console.log("asdasdsad",listInput1);
 			let impactedFieldsListWhenStart = {}
 			if(this.preDataSubmit != null && Object.keys(this.preDataSubmit).length > 0 && false){
 				impactedFieldsList = this.preDataSubmit.impactedFieldsList;

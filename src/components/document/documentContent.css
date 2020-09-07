@@ -47,7 +47,7 @@ p {
     outline: 0!important;
 }
 
-.sym-form-submit .s-control:not(.s-control-table) {
+.sym-form-submit .s-control:not(.s-control-table):not(button):not(.page-item) {
     display: inline-block;
     /* background: rgb(233, 236, 239); */
     min-width: 50px;
@@ -106,7 +106,7 @@ p {
     border-bottom: 1px solid rgb(230, 230, 230);
 }
 
-.s-control:not(.s-control-approval-history):not(.s-control-label):not(.s-control-submit):not(.s-control-draft):not(.s-control-reset):not(.s-control-file-upload):not(.s-control-table):not(.s-control-data-flow):not(.s-control-panel) {
+.s-control:not(.s-control-tab-page):not(button):not(.page-item):not(.s-control-approval-history):not(.s-control-label):not(.s-control-submit):not(.s-control-draft):not(.s-control-reset):not(.s-control-file-upload):not(.s-control-table):not(.s-control-data-flow):not(.s-control-panel) {
     /*width: 100% !important;*/
     padding: 0 5px !important;
     background: transparent;
@@ -284,7 +284,7 @@ input.s-control:not(.s-control-panel):not(.detail-view):hover {
     font-size: 14px;
     height: 25px;
     border-radius: 4px;
-    margin-right: 4px;
+    margin: 0 8px;
 }
 
 button {
@@ -351,7 +351,12 @@ button:hover {
     border: none;
     background: rgba(0 0 0 / 0.05);
     height: 25px;
+    width: 25px;
     border-radius: 4px;
+}
+
+.collapse-sidebar-btn:focus {
+    outline: none;
 }
 
 .sidebar-page {
@@ -410,5 +415,14 @@ button:hover {
 }
 
 .d-none {
+    display: none;
+}
+
+.page-header-action {
+    opacity: 0;
+    user-select: none;
+}
+
+.add-tab-btn {
     display: none;
 }

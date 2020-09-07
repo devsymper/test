@@ -61,7 +61,15 @@ export default {
                         .always(() => {});
                     },
                 },
-                
+                edit: {
+                    name: "editdoc",
+                    text: function() {
+                        return " <i class= 'mdi mdi-file-document-edit-outline' > </i>&nbsp; Sửa";
+                    },
+                    callback: (document, callback) => {
+                        this.$goToPage('/documents/'+document.id+'/editor/edit',document.title);
+                    },
+                },
                 drop: {
                     name:"delete",
                     text:function() {

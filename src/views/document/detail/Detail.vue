@@ -58,6 +58,7 @@ import { setDataForPropsControl } from "./../../../components/document/dataContr
 import BasicControl from "./../submit/basicControl";
 import  TableControl from "./../submit/tableControl.js"
 import  ActionControl from "./../submit/actionControl.js"
+import LayoutControl from "./../submit/layoutControl";
 import  Table from "./../submit/table.js"
 import './../submit/customControl.css'
 import { getSDocumentSubmitStore } from './../common/common'
@@ -333,6 +334,17 @@ export default {
                             );
                             control.init();
                             control.render();
+                    }
+                    else if(controlType == 'tabPage'){
+                        let control = new LayoutControl(
+                                idField,
+                                $(allInputControl[index]),
+                                this.sDocumentEditor.allControl[id],
+                                thisCpn.keyInstance,
+                                this.docObjId
+                            );
+                        control.init();
+                        control.render();
                     }
                     else {
                         let controlName = this.sDocumentEditor.allControl[id].properties.name.value;
