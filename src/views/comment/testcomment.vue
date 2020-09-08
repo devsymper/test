@@ -1,6 +1,6 @@
 <template>
 		<div>
-				<UploadFile :autoUpload="true" :pickAvatar="true" @selected-file="selectedFile" :fileName="'adn100198'" :module="'document'"/>
+				<UploadFile :autoUpload="true" @selected-file="selectedFile" :fileName="'adn100198'" :objectType="'document'" :objectIdentifier="'1dasdadasd'"/>
 				<!-- :pickAvatar="true"  -->
 				<img :src="src" alt="">
 		</div>	

@@ -94,7 +94,6 @@
                 {{inputInfo.errorMessage}}
             </div>
         </div>
-
         <symper-drag-panel 
             @before-close="closeLargeFormulaEditor()"
             :showPanel="largeFormulaEditor.open"

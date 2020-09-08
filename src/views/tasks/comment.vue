@@ -7,7 +7,6 @@
         />
     </div>
 </template>
-
 <script>
 import Comment from '@/components/common/comment/Comment.vue'
 export default {

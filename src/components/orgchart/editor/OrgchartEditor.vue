@@ -1,7 +1,6 @@
 <template>
     <div class="d-flex w-100 h-100">
         <!-- <NodeSelector class="border-right-1"></NodeSelector> -->
-
         <div class="h-100 flex-grow-1">
             <div class="border-bottom-1 pt-1 pl-2">
                 <v-tooltip bottom v-for="(item, key) in headerActions" :key="key">
@@ -17,7 +16,19 @@
                     </template>
                     <span>{{$t(item.text) }}</span>
                 </v-tooltip>
-
+				<v-tooltip bottom v-if="checkPageEmpty == true" >
+                    <template v-slot:activator="{ on }">
+                        <v-btn
+                            @click="addNode"
+                            icon
+                            class="mr-2"
+                            style="position:relative; top: -3px"
+                        > 
+                            <v-icon size="21" v-on="on">mdi-plus-thick</v-icon>
+                        </v-btn>
+                    </template>
+                    <span>them node moi </span>
+                </v-tooltip>
                 <v-btn
                     v-if="action != 'view' && context == 'department'"
                     class="float-right mr-1"
@@ -45,10 +56,9 @@
                         top: 45%;
                         left: 50%;
                         margin-right: -50%;
-                        transform: translate(-50%, -50%) "      
+                        transform: translate(-50%, -50%)"      
                 ></v-progress-circular>
             </div>
-            
             <EditorWorkspace 
                 :class="{
                     'w-100': true,
@@ -60,12 +70,11 @@
                 @blank-paper-clicked="handleBlankPaperClicked"
                 @cell-contextmenu="showPositionEditor"
                 @cell-clicked="selectNode"
+				@delete-node="handlerDeleteNode"
                 :instanceKey="instanceKey"
                 :context="context"
                 ref="editorWorkspace"/>
-
         </div>
-
         <div :style="{
             width:'250px'
         }" class="h-100 border-left-1">
@@ -89,7 +98,6 @@
             :style="{
                 width: '1000px'
             }">
-
             <OrgchartEditor
                 @update-department-name="changeDepartmentName"
                 ref="positionDiagram"
@@ -98,7 +106,6 @@
                 :instanceKey="selectingNode.positionDiagramCells ? selectingNode.positionDiagramCells.instanceKey : ''"
                 context="position">
             </OrgchartEditor>
-
         </v-navigation-drawer>
     </div>
 </template>
@@ -146,7 +153,8 @@ export default {
     data(){
         return {
             loadingDiagramView: true,
-            positionEditor: false,
+			positionEditor: false,
+			checkPageEmpty: false,
             headerActions: {
                 // undo: {
                 //     icon: "mdi-undo",
@@ -157,7 +165,6 @@ export default {
                 //     icon: "mdi-redo",
                 //     text: "process.header_bar.redo",
                 //     action: "redo"
-
                 // },
                 zoomIn: {
                     icon: "mdi-plus-circle-outline",
@@ -184,7 +191,8 @@ export default {
                 home: {
                     icon: "mdi-home-outline",
                     text: ""
-                },
+				},
+				
             },
         }
     },
@@ -211,9 +219,21 @@ export default {
         }
     },
     methods: {
+		handlerDeleteNode(){
+			let array = this.$refs.editorWorkspace.getAllNode()
+			if(array.length == 0){
+				this.checkPageEmpty = true
+			}
+		},
         handleStyleChange(info){
             this.changeNodeBottomColor(info.data.highlight.value, info.type == 'child');
-        },
+		},
+		addNode(){
+			this.checkPageEmpty= false
+			this.$refs.editorWorkspace.createFirstVizNode()
+			self.centerDiagram();
+			self.scrollPaperToTop(200);
+		},
         changeNodeBottomColor(color, applyForChild = false){
             let affectedNodeIds = [];
             let workspace = this.$refs.editorWorkspace;
@@ -247,7 +267,6 @@ export default {
         },
         handleConfigUserSelectChange(listUserIds){
             this.$refs.editorWorkspace.changeUserDisplayInNode(listUserIds);
-
             if(this.context == 'department'){
                 this.changeManagerForDepartment(this.selectingNode.id, listUserIds);
             }
@@ -331,7 +350,6 @@ export default {
                             };
                             let newPosition = this.createNodeConfigData('position', nodeData, dpmInstanceKey);
                             newPosition.style = this.restoreNodeStyle(position.style);
-
                             if(position.dynamicAttributes){
                                 newPosition.customAttributes = position.dynamicAttributes;
                             }
@@ -384,13 +402,16 @@ export default {
         showPositionEditor(nodeId){
             if(this.context == 'department'){
                 this.positionEditor = true;
-                this.selectNode(nodeId);
+				this.selectNode(nodeId);
+				
                 setTimeout((self) => {
                     self.checkAndCreateOrgchartData();
                     if(self.selectingNode.positionDiagramCells.cells){
-                        self.$refs.positionDiagram.loadDiagramFromJson(self.selectingNode.positionDiagramCells.cells);
+						self.$refs.positionDiagram.loadDiagramFromJson(self.selectingNode.positionDiagramCells.cells);
+						debugger
                     }else{
-                        self.$refs.positionDiagram.createFirstVizNode();
+						self.$refs.positionDiagram.createFirstVizNode();
+						debugger
                     }
                     self.$refs.positionDiagram.centerDiagram();
                     self.$refs.positionDiagram.$refs.editorWorkspace.scrollPaperToTop(200);
@@ -607,7 +628,7 @@ export default {
                 dynamicAttrs: JSON.stringify(orgchartAttr.customAttributes),
                 name: orgchartAttr.commonAttrs.name.value,
                 code: orgchartAttr.commonAttrs.code.value
-            };
+			};
             return data;
         },
         normalizeDiagramNodeDisplay(allVizCell){
@@ -702,8 +723,8 @@ export default {
         },
         handleConfigValueChange(data){
             let cellId = this.selectingNode.id;
-
             if(data.name == 'name' && cellId != SYMPER_HOME_ORGCHART){
+				debugger
                 this.$refs.editorWorkspace.updateCellAttrs(cellId, 'name', data.data);
             }else if(cellId == SYMPER_HOME_ORGCHART && this.context == 'position'){
                 this.$emit('update-department-name', data.data);
