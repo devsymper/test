@@ -219,7 +219,8 @@ export default {
             for(let childId in mapNode[currentNodeId].children){
                 this.appendChildToNode(result, mapNode, childId);
             }
-        },
+		},
+		
         unHighlightCurrentNode(){
             let displayConfig = this.context == 'department' ? DEFAULT_DEPARTMENT_DISPLAY : DEFAULT_POSITION_DISPLAY;
             if(this.selectingNode && this.selectingNode.id && this.selectingNode.id != SYMPER_HOME_ORGCHART){
@@ -240,12 +241,14 @@ export default {
             let nodeName = this.context == 'department' ? this.$t('orgchart.editor.department') : this.$t('orgchart.editor.position');
             nodeName += ' 1';
             let firstNode = this.context == 'department' ?  createDepartmentNode(nodeName) : createPositionNode(nodeName);
-            this.$refs.jointPaper.graph.resetCells([firstNode]);
-            this.$emit('new-viz-cell-added', {
+			this.$refs.jointPaper.graph.resetCells([firstNode]);
+			let data = {
                 id: firstNode.id,
                 name: nodeName,
                 autoCreateFirstNode: true
-            });
+			}
+            this.$emit('new-viz-cell-added', data);
+			return data
         },
         changeUserDisplayInNode(userIdList){
             let lastUserInfo = this.mapUserById[userIdList[userIdList.length - 1]];

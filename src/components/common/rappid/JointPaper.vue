@@ -52,7 +52,8 @@ export default {
 	created() {
 		this.name = this.$options.name;
 		console.log(`[${this.name}] Created`);
-		this.graph = new joint.dia.Graph({}, { cellNamespace: joint.shapes });
+		this.graph = new joint.dia.Graph({
+		}, { cellNamespace: joint.shapes });
 	
 	},
 	mounted() {
@@ -65,7 +66,7 @@ export default {
 			model: this.graph,
 			width: this.width,
 			height: this.height,
-			background: this.background,
+			background: '#ffffff',
             interactive: !this.readonly,
             sorting: joint.dia.Paper.sorting.APPROX,
         });

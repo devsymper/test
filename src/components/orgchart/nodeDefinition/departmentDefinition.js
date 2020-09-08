@@ -110,6 +110,7 @@ export const DEFAULT_DEPARTMENT_ATTRS = {
 		y: 4,
 		'font-family': 'Roboto'
 	},
+
 	'.stick': {
 		height: CEConfig.stickHeight,
 		width: CEConfig.stickWidth,

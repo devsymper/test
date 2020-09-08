@@ -156,16 +156,7 @@ export default {
 			positionEditor: false,
 			checkPageEmpty: false,
             headerActions: {
-                // undo: {
-                //     icon: "mdi-undo",
-                //     text: "process.header_bar.undo",
-                //     action: "undo"
-                // },
-                // redo: {
-                //     icon: "mdi-redo",
-                //     text: "process.header_bar.redo",
-                //     action: "redo"
-                // },
+              
                 zoomIn: {
                     icon: "mdi-plus-circle-outline",
                     text: "process.header_bar.zoom_out",
@@ -269,15 +260,25 @@ export default {
             this.$refs.editorWorkspace.changeUserDisplayInNode(listUserIds);
             if(this.context == 'department'){
                 this.changeManagerForDepartment(this.selectingNode.id, listUserIds);
-            }
+            }else{
+				this.$store.commit('orgchart/updateUserFatherNode',listUserIds)
+			}
         },
         // Kiểm tra xem department hiện tại đã có node Manager hay chưa
         changeManagerForDepartment(departmentVizId, userIds){
-            this.checkAndCreateOrgchartData();
+			this.checkAndCreateOrgchartData();
             if(!this.selectingNode.positionDiagramCells.cells){
-                this.$refs.positionDiagram.createFirstVizNode();
+				let data = this.$refs.positionDiagram.createFirstVizNode();
+				this.$store.commit('orgchart/updateIdCurrentChildrenNode',data.id)
                 this.storeDepartmentPositionCells(); 
-            }
+			}
+				let curentKey =  this.$store.state.orgchart.instanceKey
+				let id = this.$store.state.orgchart.idCurrentChildrenNode
+				this.$store.commit('orgchart/updateUserChildNode',{ 
+					curentKey: curentKey,
+					id :id,
+					users: userIds
+				})
         },
         restoreMainOrgchartConfig(config){
             let homeConfig = this.$store.state.orgchart.editor[this.instanceKey].homeConfig;
@@ -401,17 +402,16 @@ export default {
         },
         showPositionEditor(nodeId){
             if(this.context == 'department'){
+				this.$store.commit('orgchart/updateCurrentFatherNode',{id:nodeId,instanceKey:this.instanceKey})
                 this.positionEditor = true;
 				this.selectNode(nodeId);
-				
                 setTimeout((self) => {
                     self.checkAndCreateOrgchartData();
                     if(self.selectingNode.positionDiagramCells.cells){
 						self.$refs.positionDiagram.loadDiagramFromJson(self.selectingNode.positionDiagramCells.cells);
-						debugger
                     }else{
-						self.$refs.positionDiagram.createFirstVizNode();
-						debugger
+						let data = self.$refs.positionDiagram.createFirstVizNode();
+						this.$store.commit('orgchart/updateIdCurrentChildrenNode',data.id)
                     }
                     self.$refs.positionDiagram.centerDiagram();
                     self.$refs.positionDiagram.$refs.editorWorkspace.scrollPaperToTop(200);
@@ -420,7 +420,7 @@ export default {
             }
         },
         createFirstVizNode(){
-            this.$refs.editorWorkspace.createFirstVizNode();
+			return this.$refs.editorWorkspace.createFirstVizNode();
         },
         loadDiagramFromJson(cells){
             this.$refs.editorWorkspace.loadDiagramFromJson(cells);
@@ -724,7 +724,7 @@ export default {
         handleConfigValueChange(data){
             let cellId = this.selectingNode.id;
             if(data.name == 'name' && cellId != SYMPER_HOME_ORGCHART){
-				debugger
+				
                 this.$refs.editorWorkspace.updateCellAttrs(cellId, 'name', data.data);
             }else if(cellId == SYMPER_HOME_ORGCHART && this.context == 'position'){
                 this.$emit('update-department-name', data.data);
@@ -788,7 +788,8 @@ export default {
         createNodeConfigData(type = 'department', nodeData, instanceKey = false){
             if(!instanceKey){
                 instanceKey = this.instanceKey;
-            }
+			}
+			this.$store.commit('orgchart/updateInstanceKey',instanceKey)
             let defaultConfig = getDefaultConfigNodeData(nodeData.id, type == 'department');
             for(let key in nodeData){
                 if(defaultConfig.commonAttrs[key]){
@@ -826,7 +827,7 @@ export default {
                 instanceKey: this.instanceKey,
                 nodeId: nodeId,
             });
-            
+            // this.$store.commit('orgchart/updateInstanceKey', this.instanceKey)
             this.$refs.editorWorkspace.highlightNode(); 
             if(this.context == 'position'){
                 this.showPermissionsOfNode();

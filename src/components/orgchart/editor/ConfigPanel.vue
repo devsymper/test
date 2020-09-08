@@ -426,7 +426,7 @@ export default {
             this.$emit("update-dynamic-attr-display");
         },
         handleChangeUser(newValue) {
-            this.$emit("change-user-select", newValue);
+			this.$emit("change-user-select", newValue);
         },
         removeDynamicItem(index) {
             this.selectingNode.customAttributes.splice(index, 1);
