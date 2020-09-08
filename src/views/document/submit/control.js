@@ -40,47 +40,56 @@ export default class Control {
 
     }
     init() {
-            /**
-             * mảng luu giá trị các control bị ảnh hưởng, chỉ ra control này thay đổi giá trị thì sẽ thay đổi theo các control nào
-             */
-            this.effectedControl = {};
-            this.effectedHiddenControl = {};
-            this.effectedRequireControl = {};
-            this.effectedReadonlyControl = {};
-            this.effectedLinkControl = {};
-            this.effectedValidateControl = {};
-            this.inTable = (this.controlProperties.inTable != undefined) ? this.controlProperties.inTable : false;
-            this.docName = this.controlProperties.docName;
+        /**
+         * mảng luu giá trị các control bị ảnh hưởng, chỉ ra control này thay đổi giá trị thì sẽ thay đổi theo các control nào
+         */
+        this.effectedControl = {};
+        this.effectedHiddenControl = {};
+        this.effectedRequireControl = {};
+        this.effectedReadonlyControl = {};
+        this.effectedLinkControl = {};
+        this.effectedValidateControl = {};
+        this.inTable = (this.controlProperties.inTable != undefined) ? this.controlProperties.inTable : false;
+        this.docName = this.controlProperties.docName;
 
-            /**
-             * Tên của control
-             */
-            this.name = (this.controlProperties.hasOwnProperty('name')) ? this.controlProperties.name.value : "";
-            this.title = (this.controlProperties.hasOwnProperty('title')) ? this.controlProperties.title.value : "";
-            /**
-             * id của control
-             */
-            this.id = this.ele.attr('id');
+        /**
+         * Tên của control
+         */
+        this.name = (this.controlProperties.hasOwnProperty('name')) ? this.controlProperties.name.value : "";
+        this.title = (this.controlProperties.hasOwnProperty('title')) ? this.controlProperties.title.value : "";
+        /**
+         * id của control
+         */
+        this.id = this.ele.attr('id');
 
-            /**
-             * Loại control
-             */
-            this.type = this.ele.attr('s-control-type');
-
-
-            /**
-             * Danh sách các control bị thay đổi giá trị, hoặc hiển thị... khi control này thay đổi giá trị
-             */
-            this.sourceControlNames = {
-                validate: {},
-                readonly: {},
-                visibility: {},
-                require: {},
-                data: {}
-            };
-            this.initFormulas();
+        /**
+         * Loại control
+         */
+        this.type = this.ele.attr('s-control-type');
 
 
+        /**
+         * Danh sách các control bị thay đổi giá trị, hoặc hiển thị... khi control này thay đổi giá trị
+         */
+        this.sourceControlNames = {
+            validate: {},
+            readonly: {},
+            visibility: {},
+            require: {},
+            data: {}
+        };
+        this.initFormulas();
+
+
+    }
+    checkProps(props) {
+            if (this.controlProperties[props] !== undefined &&
+                (this.controlProperties[props].value === "1" ||
+                    this.controlProperties[props].value === 1 ||
+                    this.controlProperties[props].value)) {
+                return true;
+            }
+            return false;
         }
         // set các mối quan hệ của các control trường hợp đã được lưu trên server
     setEffectedData(effected) {

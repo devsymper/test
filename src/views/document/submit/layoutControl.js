@@ -1,4 +1,5 @@
 import Control from "./control";
+import sDocument from './../../../store/document'
 export default class LayoutControl extends Control {
     constructor(idField, ele, controlProps, curParentInstance, value) {
         super(idField, ele, controlProps, curParentInstance, value);
@@ -12,7 +13,13 @@ export default class LayoutControl extends Control {
     renderTabPageControl() {
         this.ele.find('.tabcontent').attr('contenteditable', false);
         this.ele.find('.tab button').attr('contenteditable', false);
+        this.checkAutoHeight()
         this.setEvent()
+    }
+    checkAutoHeight() {
+        if (this.checkProps('autoHeight')) {
+            this.ele.css({ height: 'auto' });
+        }
     }
     setEvent() {
             let self = this;
@@ -32,8 +39,15 @@ export default class LayoutControl extends Control {
          * Hàm click đóng mở sidebar của control tab/page
          */
     handleClickCollapseInControlTab(elTarget) {
+            elTarget.toggleClass('rotate-180')
             elTarget.closest('.sidebar-page').toggleClass('collapse-sb');
             elTarget.closest('.sidebar-page').find('.page-item__name').toggleClass('d-none');
+            let curSideBar = elTarget.closest('.s-control-tab-page').find('.sidebar-page');
+            let curSideBarWidth = (curSideBar.is('.collapse-sb')) ? 30 : 150;
+            elTarget.closest('.s-control-tab-page').find('.list-page-content').css({ width: 'calc(100% - ' + curSideBarWidth + 'px )' });
+            setTimeout((self) => {
+                self.reRenderTableInPage(elTarget);
+            }, 250, this);
         }
         /**
          * Hàm xử lí sự kiên click vào tab bên trên header của control tab/page để chuyển tab
@@ -54,5 +68,18 @@ export default class LayoutControl extends Control {
         let pageId = elTarget.attr('id');
         elTarget.closest('.s-control-tab-page').find('.list-page-content .page-content').removeClass('page-active');
         elTarget.closest('.s-control-tab-page').find('.list-page-content').find('[s-page-content-id="' + pageId + '"]').addClass('page-active');
+        this.reRenderTableInPage(elTarget)
+    }
+
+    reRenderTableInPage(elTarget) {
+        let self = this;
+        let tableInTab = elTarget.closest('.s-control-tab-page').find('.list-page-content .page-content').find('[s-control-type="table"]');
+        $.each(tableInTab, function(k, v) {
+            let tableId = $(v).attr('id');
+            let control = sDocument.state.editor[self.curParentInstance].allControl[tableId];
+            let controlName = control.properties.name.value;
+            let controlInstance = sDocument.state.submit[self.curParentInstance].listInputInDocument[controlName];
+            controlInstance.tableInstance.tableInstance.render()
+        })
     }
 }

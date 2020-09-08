@@ -1,10 +1,30 @@
 <template>
     <div class="wrap-content-submit">
+        <v-skeleton-loader
+            class="mx-auto"
+            max-width="auto"
+            type="article, actions"
+            v-if="loading"
+            
+        ></v-skeleton-loader>
+        <v-skeleton-loader
+            class="mx-auto"
+            max-width="auto"
+            v-if="loading"
+            type="table-heading, list-item-two-line, table-tfoot"
+        ></v-skeleton-loader>
+        <v-skeleton-loader
+            class="mx-auto"
+            max-width="auto"
+            type="article, actions,table-heading, list-item-two-line"
+            v-if="loading"
+            
+        ></v-skeleton-loader>
         <div
             :key="keyInstance"
             class="sym-form-submit"
             :id="'sym-submit-'+keyInstance"
-            :style="{'width':docSize, 'height':'100%'}"
+            :style="{'width':docSize, 'height':'100%','opacity':0}"
         >
             <div v-html="contentDocument"></div>
             <!-- <button v-on:click="togglePageSize" v-show="!isQickSubmit" id="toggle-doc-size">
@@ -159,6 +179,7 @@ let impactedFieldsList = {};
 let impactedFieldsArr = {};
 
 export default {
+    inject: ['theme'],
     props: {
         isQickSubmit: {
             type: Boolean,
@@ -210,7 +231,20 @@ export default {
         "autocomplete-input": AutocompleteInput,
         "sym-drag-panel": SymperDragPanel,
         "err-message": ErrMessagePanel,
-        EmbedDataflow
+        EmbedDataflow,
+        VBoilerplate: {
+            functional: true,
+            render (h, { data, props, children }) {
+            return h('v-skeleton-loader', {
+                ...data,
+                props: {
+                boilerplate: true,
+                elevation: 2,
+                ...props,
+                },
+            }, children)
+        },
+        },
     },
     computed: {
         sDocumentEditor() {
@@ -264,7 +298,8 @@ export default {
             preDataSubmit:{},
             objectIdentifier:{},
             otherInfo:{},
-            listDataFlow:[]
+            listDataFlow:[],
+            loading: true,
         };
 
     },
@@ -359,12 +394,6 @@ export default {
         this.$evtBus.$on("document-submit-input-change", locale => {
             try {
                 if(thisCpn.isComponentActive == false) return;
-                
-                this.$store.commit("document/addToDocumentSubmitStore", {
-                            key: 'docStatus',
-                            value: 'input',
-                            instance: this.keyInstance
-                        });
                 let valueControl = locale.val;
                 let controlInstance = getControlInstanceFromStore(thisCpn.keyInstance,locale.controlName);
                 if(controlInstance.type == 'number' && !/^[-0-9,.]+$/.test(valueControl)){
@@ -386,11 +415,7 @@ export default {
                     "value",
                     valueControl
                 );
-                thisCpn.$store.commit("document/addToDocumentSubmitStore", {
-                    key: 'rootChangeFieldName',
-                    value: locale.controlName,
-                    instance: thisCpn.keyInstance
-                });
+                
                 // sau khi thay đổi giá trị input thì kiểm tra require control nếu có
                 if(controlInstance.isRequiredControl()){
                     if(controlInstance.isEmpty()){
@@ -600,7 +625,15 @@ export default {
             if(data == true){
                 this.submitDocument()
             }
-        }
+        },
+        "sDocumentSubmit.readyLoaded":function(data){
+            if(data == true){
+                this.loading = false;
+                $("#sym-submit-" + this.keyInstance).find('.page-content').removeClass('d-block');
+                $("#sym-submit-" + this.keyInstance).find('.list-page-content').removeClass('d-flex');
+                $("#sym-submit-" + this.keyInstance).css({opacity:'1'});
+            }
+        },
     },
     
     methods: {
@@ -989,6 +1022,9 @@ export default {
             }
         },
         processHtml(content) {
+            $("#sym-submit-" + this.keyInstance).find('.page-content').addClass('d-block');
+            $("#sym-submit-" + this.keyInstance).find('.list-page-content').addClass('d-flex');
+            
             var allInputControl = $("#sym-submit-" + this.keyInstance).find(
                 ".s-control:not(.bkerp-input-table .s-control)"
             );
@@ -1078,6 +1114,7 @@ export default {
                                 field,
                                 thisCpn.keyInstance
                             );
+                            this.addToTableLoadedStore(controlName)
                             tableControl.initTableControl();
                             tableControl.setEffectedData(prepareData);
                             tableControl.tableInstance = new Table(
@@ -1126,6 +1163,16 @@ export default {
             if(this.docObjId == null)
             thisCpn.findRootControl();
 
+        },
+        addToTableLoadedStore(controlName){
+            let curTableLoaded = this.sDocumentSubmit.tableLoaded;
+            curTableLoaded[controlName] = false;
+            console.log('curTableLoaded',controlName,curTableLoaded);
+            this.$store.commit("document/addToDocumentSubmitStore", {
+                key: 'tableLoaded',
+                value: curTableLoaded,
+                instance: this.keyInstance
+            });
         },
         /**
          * Sự kiện phát ra khi click vào date của date picker
