@@ -1,5 +1,6 @@
 const defaultState = {
     arrFileAttach: [],
+    filter:'notDone',
     
 };
 

@@ -62,7 +62,8 @@
                         :class="{
                             'mr-0 ml-0 single-row': true ,
                             'py-1': !isSmallRow,
-                            'py-0': isSmallRow
+                            'py-0': isSmallRow,
+                            'd-active':index==idx
                         }"
                         :style="{
                             minHeight: '50px'
@@ -72,10 +73,14 @@
                             :cols="sideBySideMode ? 12 : compackMode ? 6: 4"
                             class="pl-3 pr-1 pb-1 pt-2">
                             <div class="pl-1">
-                                <!-- <div class="fz-13 text-truncate d-inline-block float-left text-ellipsis w-100">{{obj.name}}</div> -->
-                                <div class="text-left fs-13 pr-6 text-ellipsis w-100">
-                                    {{obj.taskData.content}}
-                                </div>
+                                <v-tooltip bottom>
+                                    <template v-slot:activator="{ on }">
+                                    <div v-on="on" class="text-left fs-13 pr-6 text-ellipsis w-100">
+                                        {{obj.taskData.content}}
+                                    </div>
+                                     </template>
+                                <span>{{ obj.taskData.content }}</span>
+                            </v-tooltip>
                                 <div
                                     class="pa-0 grey--text mt-1 lighten-2 d-flex justify-space-between">
                                     <div class="fs-11 pr-6 text-ellipsis">
@@ -239,6 +244,7 @@ export default {
     },
     data: function() {
         return {
+            index:-1,
             loadingTaskList: false,
             loadingMoreTask: false,
             listTaskHeight: 300,
@@ -307,6 +313,7 @@ export default {
             this.$refs.user.getUser(id);
         },
         selectObject(obj, idx) {
+            this.index=idx;
             this.$set(this.selectedTask,'originData', obj);
             if(this.smallComponentMode){
                 this.$goToPage('/tasks/' + obj.id, 'Do task');
@@ -356,7 +363,9 @@ export default {
             filter = Object.assign(filter, this.myOwnFilter);
             let res = {};
             let listTasks = [];
-
+            if (filter.status) {
+                this.$store.commit("task/setFilter", filter.status);
+            }
             if(this.filterTaskAction == 'subtasks'){
                 res = await BPMNEngine.getSubtasks(this.filterFromParent.parentTaskId, filter);
                 listTasks = res;
@@ -508,6 +517,9 @@ export default {
     display: -webkit-box!important;
     -webkit-line-clamp: 1;
     -webkit-box-orient: vertical;
+}
+.d-active{
+    background: #f5f5f5;
 }
 
 </style>
