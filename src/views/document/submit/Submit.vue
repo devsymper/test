@@ -1780,6 +1780,7 @@ export default {
                 controlInstance.setHiddenPage()
             }
             else if(controlInstance.type == 'tab'){
+                controlInstance.setHiddenTab()
             }
             else{
                 $('#'+controlId).parent().css({'display':display})
