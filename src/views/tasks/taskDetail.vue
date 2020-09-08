@@ -143,7 +143,7 @@ export default {
                     color:"blue"
                 },
             ],
-            taskAction: 'submit',
+            taskAction: undefined,
             tab: null,
             items: [
                 { 
@@ -287,7 +287,8 @@ export default {
                 let res = await this.submitTask(taskData);
                 this.saveApprovalHistory(value);
                 this.$emit('task-submited', res);
-            }else if(this.taskAction == 'undefined'){
+            }else if(this.taskAction == '' ||this.taskAction==undefined){
+                debugger
                 let taskData = {
                     "action": "complete",
                     "outcome": value,
