@@ -51,16 +51,24 @@ const updateInstanceKey = (state, data) => {
 	state.instanceKey = data
 }
 const updateUserChildNode = (state, data) => {
-	state.editor[data.curentKey].allNode[data.id].users = data.users
+	if (state.editor[data.currentInstanceKey].allNode[data.id]) {
+		state.editor[data.currentInstanceKey].allNode[data.id].users = data.users
+	} else {
+		let key = state.editor[data.currentInstanceKey].selectingNode.positionDiagramCells.instanceKey
+		state.editor[key].allNode[data.id].users = data.users
+	}
 }
-const updateIdCurrentChildrenNode = (state, data) => {
-	state.idCurrentChildrenNode = data
+const updateCurrentChildrenNodeId = (state, data) => {
+	state.currentChildrenNodeId = data
 }
 const updateCurrentFatherNode = (state, data) => {
 	state.currentFatherNode = data
 }
 const updateUserFatherNode = (state, data) => {
 	state.editor[state.currentFatherNode.instanceKey].allNode[state.currentFatherNode.id].users = data
+}
+const updateFirstChildNodeId = (state, data) => {
+	state.firstChildNodeId = data
 }
 export {
 	setOrgchartData,
@@ -71,7 +79,8 @@ export {
 	addNodeStyle,
 	updateInstanceKey,
 	updateUserChildNode,
-	updateIdCurrentChildrenNode,
+	updateCurrentChildrenNodeId,
 	updateCurrentFatherNode,
-	updateUserFatherNode
+	updateUserFatherNode,
+	updateFirstChildNodeId
 };

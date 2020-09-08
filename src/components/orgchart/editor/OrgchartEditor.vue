@@ -219,6 +219,29 @@ export default {
         handleStyleChange(info){
             this.changeNodeBottomColor(info.data.highlight.value, info.type == 'child');
 		},
+		getAllLink(){
+			 return this.$refs.editorWorkspace.getAllLink()
+		},
+		getAllNode(){
+			return  this.$refs.editorWorkspace.getAllNode()
+		},
+		getFirstNode(data,allNode){
+			let res 
+			if(data.length == 0){
+				res =  allNode
+			}else{
+				let arrNodeId = []
+				allNode.forEach(function(e){
+					arrNodeId.push(e.id);
+					data.forEach(function(k){
+						if(arrNodeId.includes(k.attributes.target.id) == false){
+							res = k
+						}
+					})
+				})
+			}
+			return res
+		},
 		addNode(){
 			this.checkPageEmpty= false
 			this.$refs.editorWorkspace.createFirstVizNode()
@@ -261,7 +284,13 @@ export default {
             if(this.context == 'department'){
                 this.changeManagerForDepartment(this.selectingNode.id, listUserIds);
             }else{
-				this.$store.commit('orgchart/updateUserFatherNode',listUserIds)
+				// let dataLink = self.$refs.positionDiagram.getAllLink()
+				// let allNodes = self.$refs.positionDiagram.getAllNode()
+				// let firstNode = self.getFirstNode(dataLink,allNodes)
+				// self.$store.commit('orgchart/updateCurrentChildrenNodeId',firstNode[0].id)
+				if(this.$store.state.orgchart.firstChildNodeId == this.$store.state.orgchart.currentChildrenNodeId){
+					this.$store.commit('orgchart/updateUserFatherNode',listUserIds)
+				}
 			}
         },
         // Kiểm tra xem department hiện tại đã có node Manager hay chưa
@@ -269,13 +298,13 @@ export default {
 			this.checkAndCreateOrgchartData();
             if(!this.selectingNode.positionDiagramCells.cells){
 				let data = this.$refs.positionDiagram.createFirstVizNode();
-				this.$store.commit('orgchart/updateIdCurrentChildrenNode',data.id)
+				this.$store.commit('orgchart/updateFirstChildNodeId',data.id)
                 this.storeDepartmentPositionCells(); 
 			}
-				let curentKey =  this.$store.state.orgchart.instanceKey
-				let id = this.$store.state.orgchart.idCurrentChildrenNode
+				let currentInstanceKey =  this.$store.state.orgchart.instanceKey
+				let id = this.$store.state.orgchart.firstChildNodeId
 				this.$store.commit('orgchart/updateUserChildNode',{ 
-					curentKey: curentKey,
+					currentInstanceKey: currentInstanceKey,
 					id :id,
 					users: userIds
 				})
@@ -403,15 +432,22 @@ export default {
         showPositionEditor(nodeId){
             if(this.context == 'department'){
 				this.$store.commit('orgchart/updateCurrentFatherNode',{id:nodeId,instanceKey:this.instanceKey})
-                this.positionEditor = true;
+				this.positionEditor = true;
+				this.$store.commit('orgchart/updateInstanceKey', this.instanceKey)
 				this.selectNode(nodeId);
                 setTimeout((self) => {
-                    self.checkAndCreateOrgchartData();
+					self.checkAndCreateOrgchartData();
                     if(self.selectingNode.positionDiagramCells.cells){
 						self.$refs.positionDiagram.loadDiagramFromJson(self.selectingNode.positionDiagramCells.cells);
+						let dataLink = self.$refs.positionDiagram.getAllLink()
+						let allNodes = self.$refs.positionDiagram.getAllNode()
+						let firstNode = self.getFirstNode(dataLink,allNodes)
+						self.$store.commit('orgchart/updateFirstChildNodeId',firstNode[0].id)
+						self.$store.commit('orgchart/updateCurrentChildrenNodeId',firstNode[0].id)
                     }else{
 						let data = self.$refs.positionDiagram.createFirstVizNode();
-						this.$store.commit('orgchart/updateIdCurrentChildrenNode',data.id)
+						self.$store.commit('orgchart/updateCurrentChildrenNodeId',data.id)
+						self.$store.commit('orgchart/updateFirstChildNodeId',data.id)
                     }
                     self.$refs.positionDiagram.centerDiagram();
                     self.$refs.positionDiagram.$refs.editorWorkspace.scrollPaperToTop(200);
@@ -724,7 +760,6 @@ export default {
         handleConfigValueChange(data){
             let cellId = this.selectingNode.id;
             if(data.name == 'name' && cellId != SYMPER_HOME_ORGCHART){
-				
                 this.$refs.editorWorkspace.updateCellAttrs(cellId, 'name', data.data);
             }else if(cellId == SYMPER_HOME_ORGCHART && this.context == 'position'){
                 this.$emit('update-department-name', data.data);
@@ -826,8 +861,7 @@ export default {
             this.$store.commit('orgchart/changeSelectingNode', {
                 instanceKey: this.instanceKey,
                 nodeId: nodeId,
-            });
-            // this.$store.commit('orgchart/updateInstanceKey', this.instanceKey)
+			});
             this.$refs.editorWorkspace.highlightNode(); 
             if(this.context == 'position'){
                 this.showPermissionsOfNode();

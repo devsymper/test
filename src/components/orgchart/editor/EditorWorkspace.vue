@@ -144,7 +144,8 @@ export default {
             paper.on('cell:pointerclick', function(elementView, evt, x, y) {
                 evt.stopPropagation();
                 self.unHighlightCurrentNode();
-                self.$emit('cell-clicked', elementView.model.id);
+				self.$emit('cell-clicked', elementView.model.id);
+				self.$store.commit('orgchart/updateCurrentChildrenNodeId',elementView.model.id)
                 self.highlightNode(elementView.model);               
             });
 
