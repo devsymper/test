@@ -643,12 +643,17 @@ export default {
                 if(cell.type == "org.Arrow"){
                     links.push(cell);
                 }else{
-                    nodeMap[cell.id] = this.getNodeDataToSave(cell.id, instanceKey, type);
+                    let node = this.$store.state.orgchart.editor[instanceKey].allNode[cell.id];
+                    if(node){
+                        nodeMap[cell.id] = this.getNodeDataToSave(cell.id, instanceKey, type);
+                    }
                 }
             }
 
             for(let link of links){
-                nodeMap[link.target.id].vizParentId = link.source.id;
+                if(nodeMap[link.target.id]){
+                    nodeMap[link.target.id].vizParentId = link.source.id;
+                }
             }
             return Object.values(nodeMap);
         },
