@@ -594,7 +594,10 @@
         },
         "updated": "Đã cập nhật application",
         "added": "Đã thêm mới application",
-        "deleted": "Đã xóa application"
+        "deleted": "Đã xóa application",
+        "emptyApp": " Danh sách ứng dụng trống",
+        "emptyFavorite": " Danh sách yêu thích trống"
+
     },
     "kh": {
         "folder": " Thư mục ",

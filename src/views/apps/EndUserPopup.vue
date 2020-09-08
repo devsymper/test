@@ -39,8 +39,8 @@
 						</ul>
 						<div v-else>
 							<div style="padding-left:180px">
-								<div style="margin-right:auto;margin-left:auto">Danh sách yêu thích trống</div>
-								<v-icon style="font-size:60px;padding-left:36px;margin-top:8px">
+								<div style="margin-right:auto;margin-left:auto"> {{$t('apps.emptyFavorite')}} </div>
+								<v-icon style="font-size:60px;padding-left:40px;margin-top:8px">
 									mdi-star-off
 								</v-icon>
 								<!-- <v-img
@@ -82,10 +82,10 @@
 						</VuePerfectScrollbar>	
 						<div v-else>
 							<div style="padding-left:150px">
-								<div style="margin-right:auto;margin-left:auto">Không có ứng dụng nào</div>
+								<div style="margin-right:auto;margin-left:auto"> {{$t('apps.emptyApp')}} </div>
 								
 								<v-img
-								:src="urlEmptyApp" style="width:60px;height:60px;margin-left:34px;margin-bottom:12px;margin-top:8px">
+								:src="urlEmptyApp" style="width:60px;height:60px;margin-left:38px;margin-bottom:12px;margin-top:8px">
 								</v-img>
 							</div>
 						</div>
