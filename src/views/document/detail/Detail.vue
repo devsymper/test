@@ -111,6 +111,7 @@ export default {
             contentDocument: null,
             contentPrintDocument:null,
             docObjId: null,
+            documentId:null,
             documentSize: null,
             keyInstance: Date.now(),
             contentMargin:'auto',
@@ -279,6 +280,7 @@ export default {
                 thisCpn.taskId = res.data.document_object_task_id;
                 thisCpn.createTime = res.data.document_object_create_time
                 thisCpn.workflowId = res.data.document_object_workflow_id;
+                thisCpn.documentId = res.data.documentId;
                 thisCpn.$store.commit('document/addToDocumentDetailStore',{
                     key: 'allData',
                     value: res.data,
@@ -435,7 +437,7 @@ export default {
             console.log(this.sDocumentSubmit);
             setTimeout(() => {
                 if(thisCpn.$route.name == 'printDocument'){
-                    thisCpn.printDiv();
+                    thisCpn.printContent(true);
                 }
             }, 1000);
         },
@@ -443,34 +445,36 @@ export default {
         getColIndexControl(controlEl){
             let td = controlEl.closest('td');
             let tr = controlEl.closest('tr').css('position','relative');
-            let tdIndex = td.index()
-            return tdIndex
+            let tdIndex = td.index();
+            return tdIndex;
         },
         async handleClickPrint(){
             await this.loadDocumentObject(true);
             setTimeout((self) => {
-                self.printDiv()
+                self.printContent();
             }, 500,this);
-            
         },
         
-        printDiv(){
+        printContent(fromContext = false){
             $('.sym-form-Detail').addClass('w-auto');
             $('main').addClass('p-0');
-            $('.panel-header').addClass('d-none')
-            $('.app-header-bg-color').addClass('d-none')
-            $('.s-drawer').addClass('d-none')
-            $('.v-navigation-drawer').addClass('d-none')
+            $('.panel-header').addClass('d-none');
+            $('.app-header-bg-color').addClass('d-none');
+            $('.s-drawer').addClass('d-none');
+            $('.v-navigation-drawer').addClass('d-none');
 			setTimeout((self) => {
                 window.print();
-                $('.panel-header').removeClass('d-none')
+                $('.panel-header').removeClass('d-none');
                 $('.sym-form-Detail').removeClass('w-auto');
                 $('main').removeClass('p-0');
-                $('.app-header-bg-color').removeClass('d-none')
-                $('.s-drawer').removeClass('d-none')
+                $('.app-header-bg-color').removeClass('d-none');
+                $('.s-drawer').removeClass('d-none');
                 $('.v-navigation-drawer').removeClass('d-none');
                 $('.content-print-document').addClass('d-none');
-                $('.content-document').removeClass('d-none')
+                $('.content-document').removeClass('d-none');
+                if(fromContext){
+                    self.$router.push('/documents/'+self.documentId+'/objects',"Danh sách bản ghi");
+                }
             }, 200,this);
            
             
