@@ -23,7 +23,6 @@ export default class TableControl extends Control {
 
     }
     renderTable() {
-
             if (this.isPrintView) {
                 this.ele.attr('table-id', this.ele.attr('id'));
                 this.ele.removeAttr('id');

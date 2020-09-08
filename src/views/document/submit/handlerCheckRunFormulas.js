@@ -15,6 +15,14 @@ const markBinedField = function(instance, fieldName) {
     // debugger
     if (docStatus === 'init') {
         impactedFieldsListWhenStart[fieldName] = true;
+        let check = checkFinishProcessFormulasInit(impactedFieldsListWhenStart);
+        if (check) {
+            store.commit("document/addToDocumentSubmitStore", {
+                key: 'readyLoaded',
+                value: true,
+                instance: instance
+            });
+        }
         store.commit("document/addToDocumentSubmitStore", {
             key: 'impactedFieldsListWhenStart',
             value: impactedFieldsListWhenStart,
@@ -91,6 +99,14 @@ const findRoot = function(dataImpactedControlRefresh, fieldName) {
 }
 
 const checkFinishProcessFormulas = function(dataImpactedControlRefresh) {
+    for (let controlRoot in dataImpactedControlRefresh) {
+        if (Object.values(dataImpactedControlRefresh[controlRoot]).includes(false)) {
+            return false
+        }
+    }
+    return true
+}
+const checkFinishProcessFormulasInit = function(dataImpactedControlRefresh) {
     for (let controlRoot in dataImpactedControlRefresh) {
         if (Object.values(dataImpactedControlRefresh[controlRoot]).includes(false)) {
             return false

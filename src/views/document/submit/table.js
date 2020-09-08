@@ -212,6 +212,7 @@ export default class Table {
             this.tableInstance = null;
             this.columnsInfo = null;
             this.keyInstance = keyInstance;
+            this.reRendered = false;
             /**Danh sách các celltpye trong table */
             this.listCellType = {};
             /**CHỉ ra  vị trí của cell được click */
@@ -374,7 +375,7 @@ export default class Table {
 
                     afterDocumentKeyDown: function(e) {
                         let cellMeta = this.getSelected();
-                        if (e.key === 'Enter' && e.shiftKey === true) {
+                        if (e.key === 'Enter' && e.shiftKey === true && cellMeta != undefined) {
                             this.alter('insert_row', cellMeta[0][0] + 1, 1);
                             let rowData = thisObj.tableDefaultRow;
                             rowData[0] = cellMeta[0][0] + 1;
@@ -923,6 +924,17 @@ export default class Table {
                 if (tbHeight < MAX_TABLE_HEIGHT) {} else {
                     $(this.rootElement).css('height', MAX_TABLE_HEIGHT);
                 }
+                if (!this.reRendered) {
+                    setTimeout((hotTb) => {
+                        let curTableLoaded = sDocument.state.submit[thisObj.keyInstance].tableLoaded;
+                        curTableLoaded[thisObj.tableName] = true;
+                        store.commit("document/addToDocumentSubmitStore", {
+                            key: 'tableLoaded',
+                            value: curTableLoaded,
+                            instance: thisObj.keyInstance
+                        });
+                    }, 500, this);
+                }
                 if (!this.reRendered && thisObj.tableHasRowSum) {
                     this.reRendered = true;
                     setTimeout((hotTb) => {
@@ -932,6 +944,7 @@ export default class Table {
                         hotTb.render();
                     }, 500, this);
                 }
+
 
             },
             beforeCreateRow: function(i, amount) {
@@ -978,7 +991,8 @@ export default class Table {
             afterCreateRow: function(index, amount, source) {
                 let id = Date.now();
                 thisObj.tableInstance.setDataAtCell(index, thisObj.tableInstance.getDataAtRow(0).length - 1, id);
-            }
+            },
+
         });
 
         this.tableInstance.keyInstance = this.keyInstance;
