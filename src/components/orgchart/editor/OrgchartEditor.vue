@@ -298,7 +298,7 @@ export default {
                             name: node.name,
                             description: node.description,
                             code: node.code,
-                            users: JSON.parse(node.users)
+                            users: this.getListUserAsArr(node.users)
                         };
 
                         if(node.content && node.content !== 'false'){
@@ -321,13 +321,13 @@ export default {
                         let dpmInstanceKey = this.$store.state.orgchart.editor[this.instanceKey].allNode[dpmId].positionDiagramCells.instanceKey;
                         for(let idPosition in allPositionInADpm[dpmId]){
                             let position = allPositionInADpm[dpmId][idPosition];
-
+                            let userSelected = this.getListUserAsArr(position.users);
                             let nodeData = {
                                 id: position.vizId,
                                 name: position.name,
                                 description: position.description,
                                 code: position.code,
-                                users: position.users ? position.users : []
+                                users: userSelected
                             };
                             let newPosition = this.createNodeConfigData('position', nodeData, dpmInstanceKey);
                             newPosition.style = this.restoreNodeStyle(position.style);
@@ -347,6 +347,20 @@ export default {
             } catch (error) {
                 this.$snotifyError(error, "Can not get orgchart data");
             }
+        },
+        getListUserAsArr(users){
+            if(!users){
+                users = [];
+            }else{
+                if(typeof users == 'string'){
+                    try {
+                        users = JSON.parse(users);
+                    } catch (error) {
+                        users = [];
+                    }
+                }
+            }
+            return users;
         },
         restoreNodeStyle(savedStyle){
             if(typeof savedStyle != 'object'){
