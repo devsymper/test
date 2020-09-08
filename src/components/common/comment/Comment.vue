@@ -1,17 +1,14 @@
 <template>
-	<div class="symper-comment" :style="{height:heightComment}">
-		<v-card 
-			 v-show="showComment"
-			 :style="{top:top+'px',left:left+'px',height:'inherit'}"
-		>
+	<div class="symper-comment"
+		v-show="showComment"
+		:style="{top:top+'px',left:left+'px',height: heightComment}">
 			<v-toolbar
 				flat
-				style="height:auto"
-			>
-				<v-toolbar-title>Bình luận</v-toolbar-title>
+				style="height:auto">
+				<v-toolbar-title>{{$t('comment.comment')}}  </v-toolbar-title>
 					<v-icon>mdi-comment-text-outline</v-icon>
 					<v-spacer></v-spacer>
-					<v-icon @click="showComment = false">mdi-close-outline</v-icon>
+					<!-- s<v-icon @click="showComment = false">mdi-close-outline</v-icon> -->
 				<template v-slot:extension>
 				<v-tabs
 					v-model="tab"
@@ -27,7 +24,7 @@
 				  <v-text-field
 						solo
 						v-if="isSearching"
-						label="Search..."
+						:label="$t('comment.search')"
 						append-icon="mdi-close-circle-outline"
 						v-model="searchItem"
 						@click:append="clickClose"
@@ -37,19 +34,16 @@
 			</v-toolbar>
 			<v-tabs-items v-model="tab">
 				<v-tab-item
-				v-for="item in itemsTab"
-				:key="item.value"
-				>
-				<v-card flat>
-					<list-comment  :listComment="listComment" :searchItem="searchItem" />
-				</v-card>
+					v-for="item in itemsTab"
+					:key="item.value"
+					>
+						<list-comment  :listComment="listComment" :searchItem="searchItem"  :heightListComment='heightListComment' />
 				</v-tab-item>
 			</v-tabs-items>
-			 <div class="input-comment" v-if="tabComment == true">
-					<SymperAvatar :userId="userId" :size="30"  />
-					<InputComment style="margin-left:8px" :isEditing="true" :images="[]" :files="[]" :isAdd="true"/>
-				 </div>
-			</v-card>
+			<div class="input-comment" v-if="tabComment == true">
+				<SymperAvatar :userId="userId" :size="30"  />
+				<InputComment style="margin-left:8px" :isEditing="true" :images="[]" :files="[]" :isAdd="true"/>
+			</div>
 	</div>
 </template>
 <script>
@@ -60,6 +54,7 @@ import InputComment from './InputComment.vue';
 import {commentApi} from '@/api/Comment.js'
 import {fileManagementApi} from '@/api/FileManagement.js'
 import SymperAvatar from '@/components/common/SymperAvatar.vue'
+import { util } from '../../../plugins/util';
 export default {
 	 data() {
         return {
@@ -73,15 +68,16 @@ export default {
 			comment:[],
 			tabComment : true,
 			searchItem:'',
+			heightListComment:null,
 			itemsTab: [
 				{
-					title:'Comment',
+					title: this.$t('comment.comment'),
 					value:'comment',
 					store: 'listAvtiveComment',
 					icon: 'mdi-comment-processing-outline'
 				},
 				{
-					title: 'Resolve',
+					title: this.$t('comment.resolve'),
 					value:'resolve',
 					store: 'listResolve',
 					icon: 'mdi-comment-check'
@@ -94,7 +90,7 @@ export default {
 		ListComment,
 		CommentItem,
 		InputComment,
-		SymperAvatar
+		SymperAvatar,
 	},
 	created(){
 		if(this.uuid == "0"){
@@ -116,7 +112,9 @@ export default {
 		}
 	},
 	mounted(){
-		
+		 var x =util.getComponentSize(this);
+		 this.heightListComment = x.h - 120
+		 console.log( this.heightListComment,' this.heightListComment');
 	},
 	
 	 props: {

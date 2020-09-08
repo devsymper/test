@@ -1,5 +1,5 @@
 <template>
-    <div class="h-100 w-100 d-flex justify-center ml-6"> 
+    <div class="h-100 w-100 d-flex justify-center ml-5 task-style"> 
         <DocumentSubmit 
             v-if="showDoTaskComponent && (action == 'submit' || action=='update')"
             ref="submitComponent"
@@ -14,7 +14,7 @@
             @submit-document-success="onSubmitDone">
         </DocumentSubmit>
         <Detail 
-            v-else-if="showDoTaskComponent && (action == 'approval')"
+            v-else-if="(showDoTaskComponent && (action == 'approval')) || filter=='done'"
             :docObjInfo="docObjInfo">
         </Detail>
 
@@ -60,7 +60,8 @@ export default {
                 documentObjectTaskId: ''
             },
             showDoTaskComponent: false,
-            documentObjectId: 0
+            documentObjectId: 0,
+            filter:'notDone'
         }
     },
     props: {
@@ -73,6 +74,11 @@ export default {
             }
         }
     },
+    computed:{
+        stask() {
+            return this.$store.state.task;
+        },
+    },
     watch: {
         taskInfo: {
             deep: true,
@@ -80,41 +86,47 @@ export default {
             handler: async function (after, before) {
                 console.log(after, before, "after taskInfo change");
                 this.showDoTaskComponent = false;
-                if(this.taskInfo.action){
-                    let action = this.taskInfo.action.action;
-                    this.action = action;
-                    let varsMap = await getProcessInstanceVarsMap(this.taskInfo.action.parameter.processInstanceId);
-                    
-                    this.workflowInfo.documentObjectWorkflowId = this.taskInfo.action.parameter.processDefinitionId;
-                    this.workflowInfo.documentObjectWorkflowObjectId = this.taskInfo.action.parameter.processInstanceId;
-                    this.workflowInfo.documentObjectTaskId = this.taskInfo.action.parameter.taskId;
-                    // cần activityId  của task truyền vào nữa 
-                    let workflowVariable = {};
-                    for(let key in varsMap){
-                        workflowVariable['workflow_'+key] = varsMap[key].value;
-                    }
-
-                    this.workflowVariable = null;
-                    this.workflowVariable = workflowVariable;
-
-
-                    if(action == 'submit'){
-                        this.docId = Number(this.taskInfo.action.parameter.documentId);
-                        this.documentObjectId = 0;
-                    }else if(action == 'approval' || action == 'update'){
-                        if(!this.taskInfo.action.parameter.documentObjectId){
-                            
-                            let approvaledElId = this.taskInfo.targetElement;
-                            let docObjId = varsMap[approvaledElId+'_document_object_id'];
-                            this.docObjInfo.docObjId = docObjId.value;
-                        }else{
-                            this.docObjInfo.docObjId = this.taskInfo.action.parameter.documentObjectId;
+                let filter = this.stask.filter;
+                this.filter=filter;
+                if (filter!='done') {
+                    if(this.taskInfo.action){
+                        let action = this.taskInfo.action.action;
+                        this.action = action;
+                        let varsMap = await getProcessInstanceVarsMap(this.taskInfo.action.parameter.processInstanceId);
+                        this.workflowInfo.documentObjectWorkflowId = this.taskInfo.action.parameter.processDefinitionId;
+                        this.workflowInfo.documentObjectWorkflowObjectId = this.taskInfo.action.parameter.processInstanceId;
+                        this.workflowInfo.documentObjectTaskId = this.taskInfo.action.parameter.taskId;
+                        // cần activityId  của task truyền vào nữa 
+                        let workflowVariable = {};
+                        for(let key in varsMap){
+                            workflowVariable['workflow_'+key] = varsMap[key].value;
                         }
-                        this.documentObjectId = Number(this.docObjInfo.docObjId);
+
+                        this.workflowVariable = null;
+                        this.workflowVariable = workflowVariable;
+                    
+                        if(action == 'submit'){
+                            this.docId = Number(this.taskInfo.action.parameter.documentId);
+                            this.documentObjectId = 0;
+                        }else if(action == 'approval' || action == 'update' || filter =='done'){
+                            if(!this.taskInfo.action.parameter.documentObjectId){
+                                
+                                let approvaledElId = this.taskInfo.targetElement;
+                                let docObjId = varsMap[approvaledElId+'_document_object_id'];
+                                this.docObjInfo.docObjId = docObjId.value;
+                            }else{
+                                this.docObjInfo.docObjId = this.taskInfo.action.parameter.documentObjectId;
+                            }
+                            this.documentObjectId = Number(this.docObjInfo.docObjId);
+                        }
+                        this.showDoTaskComponent = true;                    
+                    }else if((this.docId && Number(this.docId > 0)) || this.documentObjectId){
+                        this.showDoTaskComponent = true;
                     }
-                    this.showDoTaskComponent = true;                    
-                }else if((this.docId && Number(this.docId > 0)) || this.documentObjectId){
-                    this.showDoTaskComponent = true;
+                }else{
+                    if(this.taskInfo.action.parameter.documentObjectId){
+                         this.docObjInfo.docObjId = this.taskInfo.action.parameter.documentObjectId;
+                    }          
                 }
             }
         }
@@ -150,6 +162,9 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
+.task-style >>> .wrap-content-submit{
+    width:96%!important;
+}
 
 </style>

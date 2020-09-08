@@ -50,7 +50,7 @@
                 <span class="ml-2">{{$t('tasks.createTask.title')}}</span>
             </v-btn>
             <!-- Bộ lọc cho  task -->
-            <v-menu offset-y light :close-on-content-click="false" :min-width="300" class="mr-2">
+            <v-menu offset-y light :close-on-content-click="false" :min-width="300" class="mr-2" style="z-index:1000!important">
                 <template v-slot:activator="{ on }">
                     <v-btn v-on="on" depressed class="mr-2" small>
                         <v-icon size="18">mdi-filter-menu-outline</v-icon>
@@ -158,7 +158,6 @@
                             :color="'transparent'"
                             :textColor="''"
                             :flat="true"
-                         
                             @input="inputAssignee"
                         ></userSelector>
                     </div>
@@ -344,6 +343,7 @@ export default {
     },
     methods: {
         inputAssignee(data){
+            console.log('userId',data);
             this.taskObject.assignee=data;
         },
         refreshTaskList(){
@@ -431,15 +431,20 @@ export default {
                 parentTaskId: this.parentTaskId ? this.parentTaskId : "",
                 owner: this.$store.state.app.endUserInfo.id,
             };
-
+            let description = util.cloneDeep(defaultTaskDescription);
             if(this.taskObject.docId){
-                let description = util.cloneDeep(defaultTaskDescription);
                 description.action.action = 'submit';
                 description.action.parameter.documentId = this.taskObject.docId;
-                description.content = this.taskObject.name;
-
-                data.description = JSON.stringify(description);
             }
+
+            description.content = this.taskObject.name;
+
+            if (this.taskObject.description==''||this.taskObject.description== null) {
+                description.extraLabel=this.$t('tasks.header.alertDescription');
+            }else{
+                description.extraLabel=this.taskObject.description;
+            }
+            data.description = JSON.stringify(description);
             let res = await BPMNEngine.addTask(JSON.stringify(data));
             if (res.id != undefined) {
                 this.selectedProcess = null;

@@ -228,12 +228,14 @@ export default {
                                     returnObjSearch.userId = data.id;
                                 }else if(data.type=='document_definition'){
                                      returnObjSearch.displayName = data.title?data.title:"Không có tên";
-                                }else if(data.type=='syql'){
-                                    debugger
-                                    let name = self.getInfoSyql(data.id);
-                                    debugger
-                                     returnObjSearch.displayName = data.lastContent?data.lastContent:"Không có công thức";
                                      debugger
+                                     returnObjSearch.description = data.note?data.note:'Chưa điền mô tả';
+                                }else if(data.type=='syql'){
+                                   // debugger
+                                    let name = self.getInfoSyql(data.id);
+                                   // debugger
+                                     returnObjSearch.displayName = data.lastContent?data.lastContent:"Không có công thức";
+                                   //  debugger
                                      returnObjSearch.nameSql = name.content;
                                      returnObjSearch.objectType = name.objectType;
                                      // lấy api của tên
@@ -257,7 +259,12 @@ export default {
                                 returnObjSearch.id = data.id;
                                 returnObjSearch.actions = data.actions;
                                 returnObjSearch.enable = false;
-                                returnObjSearch.description = data.description?data.description:(data.description==null||data.description==''?"Mô tả đang để trống":"Symper");
+                                debugger
+                                if(data.type!='document_definition'){
+                                      returnObjSearch.description = data.description?data.description:(data.description==null||data.description==''?"Mô tả đang để trống":"Symper");
+                                }
+                              
+                                debugger
                                 //debugger
                                 return returnObjSearch;
                             })
@@ -322,7 +329,7 @@ export default {
         formatGroupName(value){
             let name = '';
             if(value=='document_instance'){
-                name =  'Văn bản';
+                name =  'Bản ghi dữ liệu';
             }else if(value =='user'){
                 name =  'Nhân viên'
             }else if(value =='document_definition'){

@@ -12,6 +12,7 @@ import searchModule from './search';
 import khModule from "./kh";
 import timeSheetModule from './timesheet';
 import user from './user';
+import task from "./task";
 
 Vue.use(Vuex);
 
@@ -28,6 +29,7 @@ export default new Vuex.Store({
         search: searchModule,
         kh: khModule,
         timesheet: timeSheetModule,
-        user: user
+        user: user,
+        task:task
     }
 });

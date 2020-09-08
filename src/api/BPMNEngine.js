@@ -22,8 +22,6 @@ let testHeader = {
 let testOptions = {
 
 }
-
-
 export default {
     /** 
      * Lấy danh sách các process đã được tạo ra
@@ -141,8 +139,12 @@ export default {
     getSubtasks(idParent, filter) {
         return bpmneApi.get(appConfigs.apiDomain.bpmne.tasks + '/' + idParent + '/subtasks', filter, testHeader);
     },
-    getATaskInfo(taskId) {
-        return bpmneApi.get(appConfigs.apiDomain.bpmne.tasks + '/' + taskId, {}, testHeader);
+    getATaskInfo(taskId,filter='notDone') {
+        if (filter=='done') {
+            return bpmneApi.get(appConfigs.apiDomain.bpmne.tasksHistory+'/'+taskId, {}, testHeader);
+        }else{
+            return bpmneApi.get(appConfigs.apiDomain.bpmne.tasks + '/' + taskId, {}, testHeader);
+        }
     },
     updateTask(taskId, data) {
         data = JSON.stringify(data);
@@ -162,4 +164,6 @@ export default {
     getLastestByModel() {
         return bpmneApi.get('/deploy-history/lastest-by-model');
     }
+   
+
 };

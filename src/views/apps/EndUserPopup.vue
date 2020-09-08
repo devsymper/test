@@ -26,7 +26,7 @@
 								class="mx-auto"
 								height="200"
 							></v-skeleton-loader>
-						<ul style="margin:0 10px;" v-else>
+						<ul style="margin:0 10px;" v-else-if="loadingFavorite == false && sFavorite.length > 0">
 							<VuePerfectScrollbar style="max-height:200px"  >
 								<li v-for="(item,i) in sFavorite" :key="i" v-on:click="rightClickHandler($event,item,item.type)" v-on:contextmenu="rightClickHandler($event,item,item.type)" style="cursor:pointer"> 
 									<div style="position:relative">
@@ -37,12 +37,28 @@
 								</li>
 							</VuePerfectScrollbar>
 						</ul>
+						<div v-else>
+							<div style="padding-left:180px">
+								<div style="margin-right:auto;margin-left:auto">Danh sách yêu thích trống</div>
+								<v-icon style="font-size:60px;padding-left:36px;margin-top:8px">
+									mdi-star-off
+								</v-icon>
+								<!-- <v-img
+								:src="urlEmptyApp">
+								</v-img> -->
+							</div>
+						</div>
 					</div>
 					<div class="title-list-app"> <v-icon>mdi-playlist-play</v-icon><h4>{{$t('apps.listApp')}}</h4></div>
 					<div class="list-app-cointaner">
-						<VuePerfectScrollbar style="max-height:330px"  class="d-flex flex-wrap" >
-							<!-- :style="{height: listAppHeight}" -->
-							<div v-for="(item,i) in apps" :key="i" 
+						<v-skeleton-loader
+						 		v-if="loadingApp == true"
+								type="table-tbody"
+								class="mx-auto"
+								height="200"
+						></v-skeleton-loader>
+						<VuePerfectScrollbar v-else-if="loadingApp == false && apps.length > 0" style="max-height:330px"  class="d-flex flex-wrap" >
+							<div  v-for="(item,i) in apps" :key="i" 
 								class="list-app-item"
 								@click="clickDetails(item)"
 								>
@@ -62,7 +78,17 @@
 									<span>{{item.name}}</span>
 								 </v-tooltip>
 							</div>
+							
 						</VuePerfectScrollbar>	
+						<div v-else>
+							<div style="padding-left:150px">
+								<div style="margin-right:auto;margin-left:auto">Không có ứng dụng nào</div>
+								
+								<v-img
+								:src="urlEmptyApp" style="width:60px;height:60px;margin-left:34px;margin-bottom:12px;margin-top:8px">
+								</v-img>
+							</div>
+						</div>
 					</div>
 			</v-card>
         </v-tab-item>
@@ -95,6 +121,7 @@ import {orgchartApi} from './../../api/orgchart';
 import {dashboardApi} from './../../api/dashboard';
 import BpmnEngine from './../../api/BPMNEngine';
 import ContextMenu from './ContextMenu.vue'
+import emptyApp from "@/assets/image/empty_app.png";
 export default {
 	data: function() {
         return {
@@ -107,6 +134,8 @@ export default {
 		 listFavorite:[],
 		 testListFavorite:[],
 		 loadingFavorite: true,
+		 loadingApp: true,
+		 urlEmptyApp: emptyApp,
 		 arrType:{
 			 document_definition:[],
 			 orgchart:[],
@@ -176,6 +205,7 @@ export default {
 			appManagementApi.getActiveApp().then(res => {
 				if (res.status == 200) {
 					this.apps = res.data.listObject
+					this.loadingApp = false
 				}
 			}).catch((err) => {
 			});

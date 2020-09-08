@@ -39,9 +39,9 @@
 					</v-menu>
 				</div>
 				<div style="display:flex;font-size:11px"> 
-					<span class="btn-reply-comment" @click="replyComment(item)">Trả lời </span>
+					<span class="btn-reply-comment" @click="replyComment(item)"> {{ $t('comment.reply')}} </span>
 					<span style="padding-left:8px">{{lassSeen(item.createdAt)}}</span>
-					<span v-if="item.createdAt != item.updatedAt" style="padding-left:8px;cursor:pointer"> Edited</span>
+					<span v-if="item.createdAt != item.updatedAt" style="padding-left:8px;cursor:pointer"> {{ $t('comment.edited')}}</span>
 				</div>
 
 			</div>

@@ -1,7 +1,7 @@
 <template>
 	<div class="content-comment">
-		<div v-if="images.length > 0"  class="content-comment-img">
-			<div  class="commnet-img-item" v-for="(item,i) in images" :key="i">
+		<div v-if="listImage.length > 0"  class="content-comment-img">
+			<div  class="commnet-img-item" v-for="(item,i) in listImage" :key="i">
 				<v-img
            			 :src="item.serverPath"
 					style="margin-top:auto;margin-bottom:auto;max-height:50px"
@@ -11,9 +11,10 @@
 				</v-img> 
 			</div>
 		</div>
-		<div v-if="files.length > 0" class="content-comment-file">
-			<div class="commnet-file-item" v-for="(item,i) in files" :key="i">
-				<v-icon>{{icon[item.type]}}</v-icon>
+		<div v-if="listFile.length > 0" class="content-comment-file">
+			<div class="commnet-file-item" v-for="(item,i) in listFile" :key="i">
+				<v-icon v-if="icon[item.type]">{{icon[item.type]}}</v-icon>
+				<v-icon v-else>{{icon.default}}</v-icon>
 				<span class="file-item-title" @click="download(item.id)">{{item.name+'.'+item.type}}</span>
 				<v-icon class="icon-remove-file" v-if="isEditing == true" @click="removeFile(item)">mdi-close-circle-outline</v-icon>
 			</div>	
@@ -47,8 +48,9 @@
 			style="overflow-x: hidden"
 		>
 			<v-card>
-			<!-- <v-card-title class="headline">Use Google's location service?</v-card-title> -->
-				<v-icon @click="dialog = false" style="float:right">mdi-close</v-icon>
+				<v-icon @click="dialog = false" style="float:right;font-size:18px;padding-top:2px">mdi-close</v-icon>
+				<v-icon @click="downloadImg" style="float:right;padding-right:8px;font-size:18px;padding-top:4px">mdi-download</v-icon>
+
 				<v-img
 					:src="srcImg"
 					style="width:100%;height:100%"
@@ -71,6 +73,7 @@ export default {
 			srcImg:'',
 			dialog:false,	
 			tags:[],
+			idImg:null,
 			icon:{
 				xlxs: 'mdi-file-excel-box',
 				xls: 'mdi-file-excel-box',
@@ -80,7 +83,9 @@ export default {
 				default: 'mdi-file'
 			},
 			dataPostComment:{
-			}
+			},
+			listImage:[],
+			listFile:[]
 		}
 	},
 	props:{
@@ -148,43 +153,49 @@ export default {
 			this.tags.push(item)
 			let substr = this.inputComment.slice(0,this.inputComment.indexOf('@'))
 			this.inputComment = substr.concat(data.displayName)
-			
 		},
 		download(id){
 			commentApi.download(id)
 		},
+		downloadImg(){
+			commentApi.download(this.idImg)
+		},
 		previewImage(item){
 			this.dialog = true
 			this.srcImg = item.serverPath
+			this.idImg = item.id
 		},
 		reduce(content){
 			let tags = this.item.tags
 			if(tags.length == 1){
 				let name = content.slice(tags[0].tagInfo.offset,tags[0].tagInfo.offset+tags[0].tagInfo.length)
 				let span;
-				span = `<span style="color:red">${name}</span>`
+				span = `<span style="color:#e67e00">${name}</span>`
 				let res = content.replace(name,span)
 				content = res
 			}else if(tags.length >1){
 				let offSet = []
 				let lengthTag = []
+				let offSetOrigin = []
 				tags.forEach(function(e){
 					offSet.push(e.tagInfo.offset)
+					offSet.push(e.tagInfo.offset + e.tagInfo.length )
+					offSetOrigin.push(e.tagInfo.offset)
 					lengthTag.push(e.tagInfo.length)
 				})
 				if(!offSet.includes(0)){
 					offSet.unshift(0)	
 				}
 				offSet.push(lengthTag[lengthTag.length - 1]+offSet[offSet.length-1]+1)
+				offSet.push(content.length)
 				let arr = []
 				for(let i =0 ; i< offSet.length-1;i++){
-					let name = content.slice(offSet[i],offSet[i+1] -1)
-					if(offSet.includes(offSet[i])){
-						name = `<span style="color:red">${name}</span>`
+					let name = content.slice(offSet[i],offSet[i+1] )
+					if(offSetOrigin.includes(offSet[i])){
+						name = `<span style="color:#e67e00">${name}</span>`
 					}
 					arr.push(name)
 				}
-				// console.log(arr);
 				content = arr.join(' ')
 			}
 			return content
@@ -219,15 +230,14 @@ export default {
 			this.$store.commit('comment/updateReplyStatus',false)
 		},
 		uploadInfo(data){
-			debugger
 			if(typeof data === 'string'){
 				alert(data)
 			}else{
 				this.attachments.push(data.id)
-				if(data.type == 'jpg' || data.type == 'png' || data.type == 'jpeg'){
-					this.images.push(data)
+				if(data.type == 'jpg' || data.type == 'png' || data.type == 'jpeg' || data.type == 'jfif'){
+					this.listImage.push(data)
 				}else{
-					this.files.push(data)
+					this.listFile.push(data)
 				}
 			}
 		},
@@ -327,6 +337,21 @@ export default {
 					 this.tags = this.item.tags 
 				}
 			}
+		},
+		images:{
+			deep:true,
+			immediate:true,
+			handler(after){
+				this.listImage = after;
+			}
+		},
+		
+		files:{
+			deep:true,
+			immediate:true,
+			handler(after){
+				this.listFile = after;
+			}
 		}
 	}
 }	
@@ -374,6 +399,7 @@ export default {
 }
 .content-comment >>> .content-comment-file .commnet-file-item .icon-remove-file{
 	float: right;
+	margin-right:8px
 }
 .content-comment >>>  .content-comment-input{
 	padding: 0px 0px 4px 0px;

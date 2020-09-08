@@ -676,7 +676,10 @@ export default {
                 for(let actionKey in listAction){
                     if(!ignoreColumns[actionKey]){
                         let el = listAction[actionKey];
-                        arr.push(el.title);
+                        let nameAction  = el.title.toLowerCase();
+                        arr.push(this.$t('actions.listActions.document.'+ nameAction));
+                       // arr.push(this.$t(nameAction));
+
                     }
                 }
             }
