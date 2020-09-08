@@ -106,7 +106,8 @@ export default {
             handler(valueAfter){
                 this.changeTaskDetail();
             }
-        }
+        },
+
     },
     components: {
         icon: icon,
@@ -120,6 +121,7 @@ export default {
                 instanceName: '',
                 taskName: ''
             },
+            descriptionTask:'',
             tabsData: {
                 people: {
                     assignee: [],
@@ -184,6 +186,9 @@ export default {
         }
     },
     computed: {
+        stask() {
+            return this.$store.state.task;
+        },
         usersMap(){
             return this.$store.state.app.allUsers.reduce((map, el) => {
                 map[el.id] = el;
@@ -195,7 +200,7 @@ export default {
             let allDef = this.$store.state.process.allDefinitions;
             if(this.breadcrumb.definitionName){
                 // bsr = `App name / ${this.breadcrumb.definitionName} / ${this.breadcrumb.instanceName} / ${bsr}`;
-                bsr = `./ ${this.breadcrumb.definitionName} / ${bsr}`;
+                bsr = `${this.breadcrumb.definitionName} / ${bsr}`;
             }else if(this.isInitInstance && !$.isEmptyObject(allDef)){
                 if(allDef[this.$route.params.id]){
                     bsr = `${allDef[this.$route.params.id].name} / Start workflow`;
@@ -212,7 +217,8 @@ export default {
                 return;
             }
             let self = this;
-            BPMNEngine.getATaskInfo(taskId).then((res) => {
+            let filter = this.stask.filter;
+            BPMNEngine.getATaskInfo(taskId,filter).then((res) => {
                 console.log(res,"task");
                 for(let role in self.tabsData.people){
                     if(res[role]){
@@ -229,11 +235,13 @@ export default {
             if(!task.name){
                 try {
                     task.description = JSON.parse(task.description);
+                  
                 } catch (error) {
                     task.description = {};
                 }
                 task.name = task.description.content;
             }
+            this.descriptionTask=task.description;
             this.breadcrumb.taskName = task.name;
             if(task.processDefinitionId){
                 this.breadcrumb.definitionName = this.$store.state.process.allDefinitions[task.processDefinitionId].name;
@@ -247,7 +255,6 @@ export default {
             this.$emit("close-detail", {});
         },
         async saveTaskOutcome(value){ // hành động khi người dùng submit task của họ
-            // this.$emit('save-task-outcome');
             if(this.taskAction == 'submit' || this.taskAction == 'update' ){
                 this.$refs.task[0].submitForm(value);
             }else if(this.taskAction == 'approval'){
@@ -309,6 +316,9 @@ export default {
         },
         async submitTask(taskData){
             let self = this;
+            if (taskData.action=='submit') {
+                await this.updateTask(taskData);
+            }
             return new Promise(async (resolve, reject) => {
                 try {
                     let taskId = self.taskInfo.action.parameter.taskId;
@@ -326,6 +336,16 @@ export default {
                 }
             });
             
+        },
+        async updateTask(taskData) {
+            let description=JSON.parse(this.descriptionTask) ;
+            description.action.parameter.documentObjectId=taskData.variables[0].value;
+            let taskId=taskData.variables[5].value;
+            let data = {};
+            data.description= JSON.stringify(description);
+
+            return BPMNEngine.updateTask(taskId,data);
+           
         },
         async handleTaskSubmited(data){
             if(this.isInitInstance){
@@ -388,6 +408,8 @@ export default {
 .v-tab{
     padding: 0px!important;
     border-width: 20px!important;
+    text-transform: none !important;
+
 }
 
 </style>

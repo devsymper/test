@@ -6,8 +6,13 @@ const addToListAttachStore = (state, item) => {
     currentarrFileAttach.unshift(item)
     Vue.set(state, 'arrFileAttach', currentarrFileAttach);
 }
+const setFilter = (state, item) => {
+    Vue.set(state, 'filter', item);
+}
+
 export {
     setArrFileAttach,
-    addToListAttachStore
+    addToListAttachStore,
+    setFilter
   
 };

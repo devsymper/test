@@ -50,7 +50,7 @@
                 <span class="ml-2">{{$t('tasks.createTask.title')}}</span>
             </v-btn>
             <!-- Bộ lọc cho  task -->
-            <v-menu offset-y light :close-on-content-click="false" :min-width="300" class="mr-2">
+            <v-menu offset-y light :close-on-content-click="false" :min-width="300" class="mr-2" style="z-index:1000!important">
                 <template v-slot:activator="{ on }">
                     <v-btn v-on="on" depressed class="mr-2" small>
                         <v-icon size="18">mdi-filter-menu-outline</v-icon>
@@ -436,7 +436,9 @@ export default {
                 description.action.action = 'submit';
                 description.action.parameter.documentId = this.taskObject.docId;
             }
+
             description.content = this.taskObject.name;
+
             if (this.taskObject.description==''||this.taskObject.description== null) {
                 description.extraLabel=this.$t('tasks.header.alertDescription');
             }else{

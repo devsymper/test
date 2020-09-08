@@ -5,7 +5,9 @@
         @uploaded-file="uploaded"
         :objectIdentifier="taskInfo.action.parameter.taskId"
         :objectType="`task`"
+        style="margin-right:10px!important"
       />
+      <span>Upload File</span> 
     </div>
     <v-data-table
       :headers="headers"
@@ -101,6 +103,7 @@ export default {
       default: () => {}
     }
   },
+  
   data: function() {
     const srcs = {
       1: "https://cdn.vuetifyjs.com/images/lists/1.jpg",
@@ -118,6 +121,8 @@ export default {
       name: "",
       type: "",
       dialogAlert: false,
+      header:'',
+      title:'',
       desserts: [
         {
           name: "Frozen Yogurt",
@@ -199,6 +204,7 @@ export default {
         {
           title: this.$t("kh.contextmenu.rename"),
           menuAction: action => {
+              alert("Đang hoàn thiện");
           },
           icon: "mdi-pencil"
         },
@@ -281,4 +287,5 @@ export default {
     color:#757575!important;
     font-size: 13px!important;
 }
+
 </style>

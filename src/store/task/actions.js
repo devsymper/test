@@ -13,7 +13,8 @@ const getArrFileAttachment = async(context, data) => {
             context.commit('setArrFileAttach', []);
         }
     } catch (error) {
-        SYMPER_APP.$snotifyError(error, "Can not get list file attachment document !");
+        // SYMPER_APP.$snotifyError(error, "Can not get list file attachment document !");
+        console.log("Can not get list file attachment!");
     }
 }
 export {
