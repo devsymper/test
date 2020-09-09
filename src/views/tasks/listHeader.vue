@@ -319,7 +319,7 @@ export default {
             ],
             sortBy: null,
             orderBy: null,
-            apiUrl: "https://v2.symper.vn:8443/symper-rest/service/",
+            apiUrl: "https://v2.symper.vn/symper-rest/service/",
             queryProcessInstance: "runtime/process-instances",
             listProrcessInstances: [],
             dialog: false,

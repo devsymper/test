@@ -70,8 +70,10 @@ export default {
             default: "blue-grey--text"
         },
         value: {
-            type: String,
-            default: ""
+            type: Array,
+            default(){
+                return []
+            }
         },
         isMulti: {
             type: Boolean,

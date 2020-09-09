@@ -564,7 +564,7 @@ export default {
 
             let hasCreatePermission = true;
             if(!util.auth.isSupportter()){
-                hasCreatePermission = objectTypePermission && objectTypePermission[0]['create'];
+                hasCreatePermission = objectTypePermission && objectTypePermission[0] && objectTypePermission[0]['create'];
             }
             return rsl && hasCreatePermission;
         },
@@ -849,22 +849,23 @@ export default {
          */
         getData(columns = false, cache = false, applyFilter = true) {
             let thisCpn = this;
-            let handler = (data) => {
-                if(thisCpn.customAPIResult.reformatData){
-                    data = thisCpn.customAPIResult.reformatData(data);
-                }else{
-                    data = data.data;
+            if(!this.loadingData){
+                let handler = (data) => {
+                    if(thisCpn.customAPIResult.reformatData){
+                        data = thisCpn.customAPIResult.reformatData(data);
+                    }else{
+                        data = data.data;
+                    }
+                    this.totalObject = data.total ? parseInt(data.total) : 0;
+                    thisCpn.tableColumns = thisCpn.getTableColumns(
+                        data.columns
+                    );
+                    thisCpn.data = data.listObject ? data.listObject : [];
+                    thisCpn.handleStopDragColumn();
+                    thisCpn.$emit('data-get', data.listObject);
                 }
-                this.totalObject = data.total ? parseInt(data.total) : 0;
-                thisCpn.loadingData = false;
-                thisCpn.tableColumns = thisCpn.getTableColumns(
-                    data.columns
-                );
-                thisCpn.data = data.listObject ? data.listObject : [];
-                thisCpn.handleStopDragColumn();
-                thisCpn.$emit('data-get', data.listObject);
+                this.prepareFilterAndCallApi(columns , cache , applyFilter, handler);
             }
-            this.prepareFilterAndCallApi(columns , cache , applyFilter, handler);
         },
         /**
          * Lấy ra cấu hình cho việc sort
@@ -893,16 +894,17 @@ export default {
                 }
                 apiObj
                     .callApi(method, url, options, header, {})
-                    .then(data => {
-                        success(data);
+                    .then(res => {
+                        if(res.status == 200){
+                            success(res);
+                        }else{
+                            thisCpn.$snotifyError(res, "Can not get data from server!");
+                        }
+                        thisCpn.loadingData = false;
                     })
                     .catch(err => {
-                        console.warn(err);
-                        thisCpn.$snotify({
-                            type: "error",
-                            title: thisCpn.$t("table.error.cannot_get_data"),
-                            text: ""
-                        });
+                        thisCpn.$snotifyError(err, "Error when processing data!");
+                        thisCpn.loadingData = false;
                     });
             }
         },
