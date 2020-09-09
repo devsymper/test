@@ -1048,22 +1048,22 @@ export default class Table {
      * mặc định data luôn có 1 giá trị là docObjectId chỉ ra id của dòng trên 
      * @param {*} data 
      */
-    updateTable(data) {
-        if (Object.keys(data).length > 1) {
-            let dataUpdate = [];
-            for (let controlName in data) {
-                for (let index = 0; index < data[controlName].length; index++) {
-                    if (dataUpdate.length <= index) {
-                        dataUpdate.push({})
-                    }
-                    dataUpdate[index][controlName] = data[controlName][index];
-                }
-            }
-            this.tableInstance.updateSettings({
-                data: dataUpdate
-            })
-        }
-    }
+    // updateTable(data) {
+    //     if (Object.keys(data).length > 1) {
+    //         let dataUpdate = [];
+    //         for (let controlName in data) {
+    //             for (let index = 0; index < data[controlName].length; index++) {
+    //                 if (dataUpdate.length <= index) {
+    //                     dataUpdate.push({})
+    //                 }
+    //                 dataUpdate[index][controlName] = data[controlName][index];
+    //             }
+    //         }
+    //         this.tableInstance.updateSettings({
+    //             data: dataUpdate
+    //         })
+    //     }
+    // }
 
     // Hàm set data cho table
     setData(vls) {

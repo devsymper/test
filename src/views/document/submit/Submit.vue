@@ -1153,7 +1153,7 @@ export default {
                             });
                             tableControl.listInsideControls = listInsideControls;
                             tableControl.renderTable();
-                            tableControl.tableInstance.updateTable(valueInput);
+                            tableControl.setData(valueInput);
                             this.addToListInputInDocument(controlName,tableControl)
                         }
                     }
@@ -1390,7 +1390,6 @@ export default {
                 thisCpn.$emit('submit-document-success',dataResponSubmit);
                 thisCpn.isSubmitting = false;
                 if (res.status == 200) {
-                    
                     thisCpn.$snotify({
                         type: "success",
                         title: "Submit document success!"
