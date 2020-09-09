@@ -288,7 +288,6 @@ export default {
                 this.saveApprovalHistory(value);
                 this.$emit('task-submited', res);
             }else if(this.taskAction == '' ||this.taskAction==undefined){
-                debugger
                 let taskData = {
                     "action": "complete",
                     "outcome": value,
@@ -344,9 +343,7 @@ export default {
             let taskId=taskData.variables[5].value;
             let data = {};
             data.description= JSON.stringify(description);
-
             return BPMNEngine.updateTask(taskId,data);
-           
         },
         async handleTaskSubmited(data){
             if(this.isInitInstance){

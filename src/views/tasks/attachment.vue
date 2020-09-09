@@ -123,56 +123,6 @@ export default {
       dialogAlert: false,
       header:'',
       title:'',
-      desserts: [
-        {
-          name: "Frozen Yogurt",
-          size: 159,
-          owner: { id: 1, name: "Sandra Adams", role: "BA", avatar: srcs[1] },
-          type: "xlsx",
-          date: "02-03-2020",
-          remove: ""
-        },
-        {
-          name: "Ice cream sandwich",
-          size: 237,
-          owner: { id: 2, name: "Ali Connors", role: "BA", avatar: srcs[2] },
-          type: "pdf",
-          date: "02-03-2020",
-          remove: ""
-        },
-        {
-          name: "Eclair",
-          size: 262,
-          owner: { id: 3, name: "Trevor Hansen", role: "BA", avatar: srcs[3] },
-          type: "dpcs",
-          date: "02-03-2020",
-          remove: ""
-        },
-        {
-          name: "Jelly bean",
-          size: 375,
-          owner: { id: 4, name: "Tucker Smith", role: "BA", avatar: srcs[2] },
-          type: "xlsx",
-          date: "02-03-2020",
-          remove: ""
-        },
-        {
-          name: "Lollipop",
-          size: 392,
-          owner: { id: 5, name: "Britta Holt", role: "BA", avatar: srcs[4] },
-          type: "txt",
-          date: "02-03-2020",
-          remove: ""
-        },
-        {
-          name: "KitKat",
-          size: 518,
-          owner: { id: 6, name: "Jane Smith ", role: "BA", avatar: srcs[5] },
-          type: "ppt",
-          date: "02-03-2020",
-          remove: ""
-        }
-      ],
       headers: [
         {
           text: "File",
