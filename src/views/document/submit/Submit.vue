@@ -253,6 +253,9 @@ export default {
         sDocumentSubmit() {
             return this.$store.state.document.submit[this.keyInstance];
         },
+        endUserInfo(){
+            return this.$store.state.app.endUserInfo;
+        },
         viewType(){
             return this.$store.state.document.viewType[this.keyInstance]
         }
@@ -1157,11 +1160,18 @@ export default {
                 }
 
             }
+            console.log("sadsadsad",this.sDocumentSubmit);
             this.listDataFlow = listDataFlow;
             if(!isSetEffectedControl)
             this.getEffectedControl();
             if(this.docObjId == null)
             thisCpn.findRootControl();
+            else{
+                this.loading = false;
+                $("#sym-submit-" + this.keyInstance).find('.page-content').removeClass('d-block');
+                $("#sym-submit-" + this.keyInstance).find('.list-page-content').removeClass('d-flex');
+                $("#sym-submit-" + this.keyInstance).css({opacity:'1'});
+            }
 
         },
         addToTableLoadedStore(controlName){
@@ -1376,10 +1386,8 @@ export default {
             let thisCpn = this;
             documentApi.submitDocument(dataPost).then(res => {
                 let dataResponSubmit = res.data;
-                userApi.getDetailUser(res.data.document_object_user_created_id).then(res=>{
-                    dataResponSubmit['document_object_user_created_fullname'] = res.data.user.displayName;
-                    thisCpn.$emit('submit-document-success',dataResponSubmit);
-                }).always({}).catch({})
+                dataResponSubmit['document_object_user_created_fullname'] = thisCpn.endUserInfo.id;
+                thisCpn.$emit('submit-document-success',dataResponSubmit);
                 thisCpn.isSubmitting = false;
                 if (res.status == 200) {
                     

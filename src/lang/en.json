@@ -766,7 +766,15 @@
         "created": "Task created",
         "relatedPeople": {
             "title": "Related people"
+        },
+        "table":{
+            "fileName":"File name",
+            "type":"Type",
+            "owner":"Owner",
+            "size":"Size",
+            "date":"Date"
         }
+
     },
     "orgchart": {
         "list": {

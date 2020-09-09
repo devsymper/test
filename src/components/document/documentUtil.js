@@ -132,6 +132,7 @@ const getInsertionCSS = function() {
         text-overflow: ellipsis;
         white-space: nowrap;
         transition: all ease-in-out 150ms;
+        position:relative;
       }
       .add-page-btn{
         overflow: hidden;
@@ -160,6 +161,16 @@ const getInsertionCSS = function() {
       }
       .rotate-180 {
         transform: rotate(180deg);
+      }
+      .delete-page-icon{
+        position:absolute;
+        font-size:11px;
+        right:4px;
+        top: 7px;
+        opacity:0;
+      }
+      .page-item:hover .delete-page-icon{
+        opacity:1;
       }
       `;
     return styles;

@@ -677,6 +677,8 @@ const controlTypes = {
                             <div class="page-item sb-page-active s-control" s-control-type="page" page-index="1">
                                 <span class="icon-page mdi mdi-format-page-break"></span>
                                 <span class="page-item__name">Trang so 1</span>
+                                <span class="delete-page-icon mdi mdi-window-close"></span>
+                                
                             </div>
                         </div>
                         <button class="collapse-sidebar-btn"><span class="mdi mdi-chevron-left"></span></button>

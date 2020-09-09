@@ -868,6 +868,13 @@
         "created": "Đã tạo mới task",
         "relatedPeople": {
             "title": "Những người liên quan"
+        },
+        "table":{
+            "fileName":"Tên tệp",
+            "type":"Kiểu",
+            "owner":"Người upload",
+            "size":"Kích thước",
+            "date":"Ngày upload"
         }
         
     },
