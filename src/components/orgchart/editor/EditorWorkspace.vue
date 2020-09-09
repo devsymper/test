@@ -67,6 +67,7 @@ export default {
             this.$refs.jointPaper.actionOnToolbar(action);
         },
         loadDiagramFromJson(cells){
+            debugger
             this.$refs.jointPaper.graph.fromJSON(cells);
         },
         getAllDiagramCells(){

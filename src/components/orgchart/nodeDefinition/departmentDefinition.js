@@ -263,11 +263,14 @@ export const createDepartmentNode = function (name) {
 	var element = new SymperDepartment().on({
 		'change:name': function (cell, name) {
 			cell.attr('.name/text',
-				joint.util.breakText(name, {
-						width: 160,
+				joint.util.breakText(name, 
+					{
+						width: 100,
 						height: 45
 					},
-					cell.attr('.name'))
+					{ 'font-size': 13 },
+					{ ellipsis: true },
+					cell.attr('.name',))
 			);
 		},
 		'change:rank': function (cell, rank) {

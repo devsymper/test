@@ -362,9 +362,9 @@ export default {
                         newDepartment.style = this.restoreNodeStyle(node.style);
                         mapIdToDpm[node.vizId] = newDepartment;
                     }
-
-                    this.addUsersToPosition(savedData.positions, savedData.userInPostion);
-
+                    savedData.positions.forEach(function(e){
+                        e.users = JSON.parse(e.users)
+                    })
                     let allPositionInADpm = getMapDpmIdToPosition(savedData.positions);
                     for(let dpmId in allPositionInADpm){
                         let dpmInstanceKey = this.$store.state.orgchart.editor[this.instanceKey].allNode[dpmId].positionDiagramCells.instanceKey;
@@ -438,12 +438,13 @@ export default {
                 setTimeout((self) => {
 					self.checkAndCreateOrgchartData();
                     if(self.selectingNode.positionDiagramCells.cells){
-						self.$refs.positionDiagram.loadDiagramFromJson(self.selectingNode.positionDiagramCells.cells);
+                        self.$refs.positionDiagram.loadDiagramFromJson(self.selectingNode.positionDiagramCells.cells);
+                        debugger
 						let dataLink = self.$refs.positionDiagram.getAllLink()
 						let allNodes = self.$refs.positionDiagram.getAllNode()
 						let firstNode = self.getFirstNode(dataLink,allNodes)
 						self.$store.commit('orgchart/updateFirstChildNodeId',firstNode[0].id)
-						self.$store.commit('orgchart/updateCurrentChildrenNodeId',firstNode[0].id)
+                        self.$store.commit('orgchart/updateCurrentChildrenNodeId',firstNode[0].id)
                     }else{
 						let data = self.$refs.positionDiagram.createFirstVizNode();
 						self.$store.commit('orgchart/updateCurrentChildrenNodeId',data.id)
@@ -861,7 +862,13 @@ export default {
             this.$store.commit('orgchart/changeSelectingNode', {
                 instanceKey: this.instanceKey,
                 nodeId: nodeId,
-			});
+            });
+            // debugger
+            // let dataLink = this.$refs.positionDiagram.getAllLink()
+            // let allNodes = this.$refs.positionDiagram.getAllNode()
+            // let firstNode = this.getFirstNode(dataLink,allNodes)
+            // this.$store.commit('orgchart/updateFirstChildNodeId',firstNode[0].id)
+            // this.$store.commit('orgchart/updateCurrentChildrenNodeId',firstNode[0].id)
             this.$refs.editorWorkspace.highlightNode(); 
             if(this.context == 'position'){
                 this.showPermissionsOfNode();

@@ -26,6 +26,7 @@
                     <AgDataTable
                         :tableHeight="'calc(100% - 100px)'"
                         ref="displayTable" 
+                        :likeHandsonTable="true"
                         :allColumns="allColumns"
                         :rowData="dataTable"
                         :editable="false"

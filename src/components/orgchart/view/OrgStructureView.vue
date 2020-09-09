@@ -5,7 +5,6 @@
             class="h-100"
             :context="'position'"
         >
-
         </EditorWorkspace>
     </div>
 </template>
@@ -133,6 +132,7 @@ export default {
             for(let l of lazyAddLink){
                 lazyCells.push(jointLinkNode(l.source, l.target));
             }
+            debugger
 
             //Dòng dưới chạy nhưng chưa đúng với thiết kế, cần nghĩ ra giải pháp khác để tự vẽ link
             // this.$refs.editorWorkspace.graph.addCells(lazyCells);
@@ -154,7 +154,7 @@ export default {
                 ];
                 link.prop('vertices', vertices);
             }
-            console.log(lazyCells, 'lazyCellslazyCellslazyCells');
+            debugger
             this.$refs.editorWorkspace.graph.addCells(lazyCells);
         },
         getCellSizeAndPosition(cellId){
