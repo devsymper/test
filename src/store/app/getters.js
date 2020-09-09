@@ -47,7 +47,7 @@ const userMenuItems = function(state) {
     if (userType == 'ba') {
         return Object.values(mapObjectTypeAndMenu);
     } else {
-        let allwaysHave = ['tasks', 'knowledge', 'timeSheetLogWork'];
+        let allwaysHave = ['tasks'];
         let items = [];
         for (let objectType in opsMap) {
             if (hasShowListPermission(opsMap, objectType)) {
