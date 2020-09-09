@@ -631,17 +631,22 @@ export default {
         },
         "sDocumentSubmit.readyLoaded":function(data){
             if(data == true){
-                this.loading = false;
-                $("#sym-submit-" + this.keyInstance).find('.page-content').removeClass('d-block');
-                $("#sym-submit-" + this.keyInstance).find('.list-page-content').removeClass('d-flex');
-                $("#sym-submit-" + this.keyInstance).css({opacity:'1'});
+                this.hidePreloader()
             }
         },
     },
     
     methods: {
-        
-        // hàm
+        /**
+         * Hàm ẩn loader
+         */
+        hidePreloader(){
+            this.loading = false;
+            $("#sym-submit-" + this.keyInstance).find('.page-content').removeClass('d-block');
+            $("#sym-submit-" + this.keyInstance).find('.list-page-content').removeClass('d-flex');
+            $("#sym-submit-" + this.keyInstance).css({opacity:'1'});
+        },
+        // hàm lây các tham số trong workflow phục vụ cho submit
         getParamsForRunDataFlow(properties){
             let mapControlToParams = properties.mapParamsDataflow.value;
             let dataParams = {}
@@ -1167,10 +1172,7 @@ export default {
             if(this.docObjId == null)
             thisCpn.findRootControl();
             else{
-                this.loading = false;
-                $("#sym-submit-" + this.keyInstance).find('.page-content').removeClass('d-block');
-                $("#sym-submit-" + this.keyInstance).find('.list-page-content').removeClass('d-flex');
-                $("#sym-submit-" + this.keyInstance).css({opacity:'1'});
+                this.hidePreloader()
             }
 
         },
@@ -1858,7 +1860,6 @@ export default {
          */
         findRootControl(){ 
             let listInput1 = getListInputInDocument(this.keyInstance);
-            console.log("asdasdsad",listInput1);
 			let impactedFieldsListWhenStart = {}
 			if(this.preDataSubmit != null && Object.keys(this.preDataSubmit).length > 0 && false){
 				impactedFieldsList = this.preDataSubmit.impactedFieldsList;
@@ -1909,7 +1910,10 @@ export default {
 								
 							}
 						}
-					}
+                    }
+                }
+                if(listRootControl.length == 0){
+                    this.hidePreloader();
                 }
 			// lưu lại các mối quan hệ cho lần submit sau ko phải thực hiện các bước tìm quan hê này (các root control , các luồng chạy công thức)
 				let dataPost = {impactedFieldsList:impactedFieldsList,impactedFieldsListWhenStart:impactedFieldsListWhenStart,rootControl:listRootControl};

@@ -237,7 +237,12 @@ export default class Table {
 
                     beforeKeyDown: function(event) {
                         let cellMeta = this.getSelected();
+                        // trường hợp ấn enter mà ở dòng cuối cùng thì đưa cell selected vào đầu cột 1 (lỗi xảy ra do có 2 cột mặc định ẩn trong table)
                         if (event.keyCode == 13 && thisObj.checkLastCell(cellMeta, this)) {
+                            return;
+                        }
+                        // trường hợp ấn -> mà ở dòng cuối cùng thì đưa cell selected vào đầu cột 1 (lỗi xảy ra do có 2 cột mặc định ẩn trong table)
+                        if (event.keyCode == 39 && thisObj.checkLastCellInRow(cellMeta, this)) {
                             return;
                         }
                         if (thisObj.tableHasRowSum && cellMeta[0][0] == this.countRows() - 1) {
@@ -400,6 +405,7 @@ export default class Table {
 
                         // nếu có sự thay đổi cell mà là id của row sqlite thì ko thực hiện update
                         if (controlName != 's_table_id_sql_lite') {
+
                             thisObj.checkUniqueTable(controlName, columns);
                             if (source != AUTO_SET) {
                                 store.commit("document/addToDocumentSubmitStore", {
@@ -463,6 +469,18 @@ export default class Table {
             }
             return false
         }
+        // kiểm tra nếu đang edit ở cell cuối cùng mà ấn enter thì cho cell selected về dòng đầu tiên (lỗi do control hidden)
+    checkLastCellInRow(cellMeta, hotTb) {
+            if (!this.showPopupTime && !this.showPopupUser) {
+                let colLength = hotTb.getDataAtRow(0).length;
+                if (cellMeta[0][1] == colLength - 3) {
+                    hotTb.selectCell(cellMeta[0][0], 0, 0, 0, true);
+                    return true
+                }
+                return false
+            }
+            return false
+        }
         // chuyển giá trị control time về dạng HH:MM:ss để lưu vào db
     getTimeValueToStore(colData) {
             for (let index = 0; index < colData.length; index++) {
@@ -484,9 +502,6 @@ export default class Table {
             let thisObj = this;
             for (let index = 0; index < changes.length; index++) {
                 let colChange = changes[index];
-                if (colChange[2] == undefined) {
-                    return;
-                }
                 let rowData = thisObj.tableInstance.getDataAtRow(colChange[0]);
                 for (let index = 0; index < rowData.length; index++) {
                     let cell = rowData[index];
@@ -580,10 +595,12 @@ export default class Table {
             return
         }
         let controlInstance = this.getControlInstance(controlName);
+
         if (controlInstance.checkValidValueLength(rowIndex)) {
             if (controlInstance == null || controlInstance == undefined) {
                 return;
             }
+
             let controlEffected = controlInstance.getEffectedControl();
             let controlHiddenEffected = controlInstance.getEffectedHiddenControl();
             let controlReadonlyEffected = controlInstance.getEffectedReadonlyControl();
@@ -627,6 +644,7 @@ export default class Table {
          * @param {String} control 
          */
     handlerCheckCanBeRunFormulas(control) {
+
             if (checkCanBeBind(this.keyInstance, control)) {
                 let controlInstance = this.getControlInstance(control);
                 if (controlInstance.controlFormulas.hasOwnProperty('formulas')) {

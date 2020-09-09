@@ -33,6 +33,12 @@ const commonProps = {
         value: "",
         groupType: "name"
     },
+    defaultValue: {
+        title: "Giá trị mặc định",
+        type: "text",
+        value: "",
+        groupType: "name"
+    },
 
     //hiên thi
     maxValue: {
@@ -390,7 +396,7 @@ const controlTypes = {
                     <input type="hidden">
                 </span>&nbsp;`,
         title: "QrCode",
-        notInProps: ['autoHeight', 'dataFlowId', 'isPrimaryKey', 'minValue', 'maxValue', 'otherInfo', 'formatDate', 'fontSize', 'color', 'formatNumber', 'isSumTable', 'isRequired', 'isAllowUpdate', 'isReadOnly', 'isDisplayCompact', 'isMultipleValue'],
+        notInProps: ['defaultValue', 'autoHeight', 'dataFlowId', 'isPrimaryKey', 'minValue', 'maxValue', 'otherInfo', 'formatDate', 'fontSize', 'color', 'formatNumber', 'isSumTable', 'isRequired', 'isAllowUpdate', 'isReadOnly', 'isDisplayCompact', 'isMultipleValue'],
         formulas: ['link', 'formulas', 'hidden']
     },
     image: {
@@ -400,7 +406,7 @@ const controlTypes = {
                     <input type="hidden" >
                 </span>&nbsp;`,
         title: "Image",
-        notInProps: ['autoHeight', 'dataFlowId', 'isPrimaryKey', 'minValue', 'maxValue', 'otherInfo', 'formatDate', 'fontSize', 'color', 'formatNumber', 'isSumTable', 'isRequired', 'isDBOnly', 'isTableOnly', 'isAllowUpdate', 'isReadOnly', 'isDisplayCompact', 'isMultipleValue'],
+        notInProps: ['defaultValue', 'autoHeight', 'dataFlowId', 'isPrimaryKey', 'minValue', 'maxValue', 'otherInfo', 'formatDate', 'fontSize', 'color', 'formatNumber', 'isSumTable', 'isRequired', 'isDBOnly', 'isTableOnly', 'isAllowUpdate', 'isReadOnly', 'isDisplayCompact', 'isMultipleValue'],
         formulas: ['link', 'formulas', 'hidden']
     },
     textInput: {
@@ -505,7 +511,7 @@ const controlTypes = {
         icon: "/icon/ic_checkbox.png",
         html: `<input type="checkbox" value="false" class="s-control s-control-checkbox" title="Checkbox" s-control-type="checkbox" contenteditable="false">&nbsp;`,
         title: "Checkbox",
-        notInProps: ['autoHeight', 'dataFlowId', 'isPrimaryKey', 'minValue', 'maxValue', 'otherInfo', 'formatDate', 'fontSize', 'formatNumber', 'isSumTable', 'isDBOnly', 'isRequired', 'isTableOnly', 'isAllowUpdate', 'isDisplayCompact', 'isMultipleValue', 'isBorderSubmit', 'isBorderView', 'isBorderPrint'],
+        notInProps: ['defaultValue', 'autoHeight', 'dataFlowId', 'isPrimaryKey', 'minValue', 'maxValue', 'otherInfo', 'formatDate', 'fontSize', 'formatNumber', 'isSumTable', 'isDBOnly', 'isRequired', 'isTableOnly', 'isAllowUpdate', 'isDisplayCompact', 'isMultipleValue', 'isBorderSubmit', 'isBorderView', 'isBorderPrint'],
         formulas: ['formulas', 'hidden', 'readOnly', 'require']
     },
     color: {
@@ -567,7 +573,7 @@ const controlTypes = {
             </tbody>
             </table></div> &nbsp;&nbsp;`,
         title: "Table",
-        notInProps: ['autoHeight', 'dataFlowId', 'isPrimaryKey', 'minValue', 'maxValue', 'width', 'height', 'formatDate', 'isPrimary', 'formatNumber', 'isSumTable', 'isRequired', 'isDBOnly', 'isTableOnly', 'isAllowUpdate', 'isDisplayCompact', 'isMultipleValue', 'isAllowPrint', 'isBorderSubmit', 'isBorderView', 'isBorderPrint'],
+        notInProps: ['defaultValue', 'autoHeight', 'dataFlowId', 'isPrimaryKey', 'minValue', 'maxValue', 'width', 'height', 'formatDate', 'isPrimary', 'formatNumber', 'isSumTable', 'isRequired', 'isDBOnly', 'isTableOnly', 'isAllowUpdate', 'isDisplayCompact', 'isMultipleValue', 'isAllowPrint', 'isBorderSubmit', 'isBorderView', 'isBorderPrint'],
         formulas: ['formulas', 'hidden', 'readOnly', 'headerTable', 'filterOptions']
     },
     panel: {
@@ -579,7 +585,7 @@ const controlTypes = {
                     </div>
                 </div>&nbsp;`,
         title: "Panel",
-        notInProps: ['autoHeight', 'dataFlowId', 'isPrimaryKey', 'minValue', 'maxValue', 'fontSize', 'formatNumber', 'formatDate', 'isPrimary', 'isSumTable', 'isRequired', 'isDBOnly', 'isTableOnly', 'isAllowUpdate', 'isReadOnly', 'isDisplayCompact', 'isMultipleValue', 'isAllowPrint', 'isBorderSubmit', 'isBorderView', 'isBorderPrint'],
+        notInProps: ['defaultValue', 'autoHeight', 'dataFlowId', 'isPrimaryKey', 'minValue', 'maxValue', 'fontSize', 'formatNumber', 'formatDate', 'isPrimary', 'isSumTable', 'isRequired', 'isDBOnly', 'isTableOnly', 'isAllowUpdate', 'isReadOnly', 'isDisplayCompact', 'isMultipleValue', 'isAllowPrint', 'isBorderSubmit', 'isBorderView', 'isBorderPrint'],
         formulas: ['hidden']
     },
     fileUpload: {
@@ -589,7 +595,7 @@ const controlTypes = {
                 <input type="hidden" name="FileUpload">
                 </div> &nbsp;`,
         title: "File upload",
-        notInProps: ['autoHeight', 'dataFlowId', 'isPrimaryKey', 'minValue', 'maxValue', 'width', 'height', 'formatDate', 'fontSize', 'color', 'mobileProps', 'isPrimary', 'formatNumber', 'isMobile', 'isSumTable', 'isDBOnly', 'isTableOnly', 'isAllowUpdate', 'isReadOnly', 'isDisplayCompact', 'isMultipleValue'],
+        notInProps: ['defaultValue', 'autoHeight', 'dataFlowId', 'isPrimaryKey', 'minValue', 'maxValue', 'width', 'height', 'formatDate', 'fontSize', 'color', 'mobileProps', 'isPrimary', 'formatNumber', 'isMobile', 'isSumTable', 'isDBOnly', 'isTableOnly', 'isAllowUpdate', 'isReadOnly', 'isDisplayCompact', 'isMultipleValue'],
         formulas: ['hidden']
     },
     report: {
@@ -598,7 +604,7 @@ const controlTypes = {
                 <h5 style="margin:0;height: 100%;padding-top: 5px;font-size: 12px;font-weight:normal">Report</h5>
                 </div>&nbsp;`,
         title: "Report",
-        notInProps: ['autoHeight', 'dataFlowId', 'isPrimaryKey', 'minValue', 'maxValue', 'fontSize', 'formatDate', 'mobileProps', 'isPrimary', 'formatNumber', 'isMobile', 'isSumTable', 'isRequired', 'isDBOnly', 'isTableOnly', 'isHidden', 'isAllowUpdate', 'isReadOnly', 'isDisplayCompact', 'isMultipleValue', 'isBorderSubmit', 'isBorderView', 'isBorderPrint'],
+        notInProps: ['defaultValue', 'autoHeight', 'dataFlowId', 'isPrimaryKey', 'minValue', 'maxValue', 'fontSize', 'formatDate', 'mobileProps', 'isPrimary', 'formatNumber', 'isMobile', 'isSumTable', 'isRequired', 'isDBOnly', 'isTableOnly', 'isHidden', 'isAllowUpdate', 'isReadOnly', 'isDisplayCompact', 'isMultipleValue', 'isBorderSubmit', 'isBorderView', 'isBorderPrint'],
         formulas: ['hidden', 'report']
     },
     dataFlow: {

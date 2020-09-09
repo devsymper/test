@@ -132,14 +132,38 @@ export default class BasicControl extends Control {
         if (sDocument.state.viewType[this.curParentInstance] != 'submit') {
             this.setValueControl();
         }
+        if (sDocument.state.viewType[this.curParentInstance] == 'submit') {
+            this.setDefaultValue();
+        }
+
         this.setEvent();
 
     }
 
+    /**
+     * Trường hợp có điền vào giá trị defaul trong editor thì gọi hàm này để set giá trị
+     */
+    setDefaultValue() {
+        if (['submit', 'update'].includes(sDocument.state.viewType[this.curParentInstance]) &&
+            this.controlProperties['defaultValue'] != undefined) {
+            this.value = this.controlProperties['defaultValue'].value;
+            this.setValueControl();
+        }
+    }
+
+
+    /**
+     * sử dụng cho trường hợp control nằm trong bảng
+     * Hàm chỉ ra control nằm ở vị trí cột nào trong bảng
+     * @param {*} index 
+     */
     setColIndexInTable(index) {
         this.colIndex = index
     }
 
+    /**
+     * Hàm kiểm tra control có công thức autocomplete hay không
+     */
     checkAutoCompleteControl() {
         if (this.controlFormulas.hasOwnProperty('autocomplete') && this.controlFormulas.autocomplete.instance != undefined) {
             return true;
