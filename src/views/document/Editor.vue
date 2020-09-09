@@ -51,11 +51,11 @@
 
         <v-dialog v-model="dialog" persistent max-width="290">
             <v-card>
-                <v-card-title class="headline">Chuyển sang định dạng version 2</v-card-title>
+                <v-card-title class="headline">{{titleDialog}}</v-card-title>
                 <v-card-actions>
                 <v-spacer></v-spacer>
                 <v-btn color="green darken-1" text @click="dialog = false">Hủy bỏ</v-btn>
-                <v-btn color="green darken-1" text @click="handlePasteContent">Đồng ý</v-btn>
+                <v-btn color="green darken-1" text @click="acceptDialog">Đồng ý</v-btn>
                 </v-card-actions>
             </v-card>
             </v-dialog>
@@ -196,7 +196,7 @@ export default {
                                         self.keyHandler(e)
                                     });
                                     ed.on('paste', function(e) {
-                                        self.onPaste(e)
+                                        self.showDialogEditor('onPaste','Chuyển sang định dạng v2');
                                     });
                                 },
                                 init_instance_callback : function(editor) {
@@ -250,7 +250,9 @@ export default {
             dataControlSwapType:{},
             listDataFlow:[],
             isComponentActive:false,
-            currentTabSelectedIcon:null
+            currentTabSelectedIcon:null,
+            titleDialog:"",
+            currentPageActive:null
         }
     },
     activated() {
@@ -299,12 +301,23 @@ export default {
         }
     },
     methods:{
-        onPaste(event){
+        
+        showDialogEditor(type,title){
             this.dialog = true;
-            
+            this.typeDialog = type;
+            this.titleDialog = title;
+        },
+        acceptDialog(){
+            this.dialog = false;
+            if(this.typeDialog == 'onPaste'){
+                this.handlePasteContent();
+            }
+            else if(this.typeDialog == 'deletePage'){
+                this.handleClickDeletePageInControlTab(this.currentPageActive)
+            }
         },
         handlePasteContent(){
-            this.dialog = false;
+            
             this.setContentForDocumentV1();
         },
         px2cm(px) {
@@ -1124,6 +1137,7 @@ export default {
                 let newPageHtml = `<div s-control-type="page" class="s-control page-item sb-page-active" page-index="`+newPageIndex+`" id="`+pageId+`">
                                     <span class="icon-page mdi mdi-format-page-break"></span>
                                     <span class="page-item__name">Trang so `+newPageIndex+`</span>
+                                    <span class="delete-page-icon mdi mdi-window-close"></span>
                                 </div>`;
 
                 let contentPageHtml = ` <div class="page-content page-active" s-page-content-id="`+pageId+`" page-name="pg_`+newPageIndex+`">
@@ -1144,6 +1158,12 @@ export default {
                 control.properties.name.value = "pg_"+newPageIndex;
                 this.addToAllControlInDoc(pageId,{properties: control.properties, formulas : control.formulas,type:'page'});
             }
+        },
+        handleClickDeletePageInControlTab(elTarget){
+            let pageId = elTarget.attr('id');
+            elTarget.closest('.s-control-tab-page').find('[s-page-content-id="'+pageId+'"]').remove();
+            elTarget.remove();
+
         },
         /**
          * Hàm xử lí sự kiên click vào page bên sidebar của control tab/page để chuyển page
@@ -1200,9 +1220,12 @@ export default {
             if($(event.target).closest('.page-item').length > 0){
                 this.handleClickPageInControlTab($(event.target).closest('.page-item'))
             }
-            if($(event.target).is('.tab-item')){
-                this.handleClickPageInControlTab($(event.target))
+            if($(event.target).closest('.delete-page-icon').length > 0){
+                // this.handleClickDeletePageInControlTab($(event.target).closest('.page-item'))
+                this.currentPageActive = $(event.target).closest('.page-item')
+                this.showDialogEditor('deletePage','Bạn chắc chắn xóa!');
             }
+          
             if($(event.target).is('.icon-page')){
                 let position = {top:(event.pageY+100) + 'px',left:event.screenX + 'px'};
                 this.currentTabSelectedIcon = $(event.target);
