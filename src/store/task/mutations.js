@@ -10,9 +10,19 @@ const setFilter = (state, item) => {
     Vue.set(state, 'filter', item);
 }
 
+const removeFileAttachToStore = (state, id) => {
+    let currentArrFileAttach = state.arrFileAttach;
+    let obj = currentArrFileAttach.find(data => data.id === id)
+    var index = currentArrFileAttach.indexOf(obj);
+    if (index > -1) {
+        currentArrFileAttach.splice(index, 1);
+    }
+    Vue.set(state, 'arrFileAttach', currentArrFileAttach);
+}
 export {
     setArrFileAttach,
     addToListAttachStore,
-    setFilter
+    setFilter,
+    removeFileAttachToStore
   
 };

@@ -17,14 +17,14 @@
         </div>
         <v-row class="list-users-in-task w-100">
             <div class="w-100 mb-2 pl-3" v-for="(users, role) in tabData" :key="role" >
-                <div  style="height: 30px" class=" fs-13 font-weight-medium symper-user-role-in-task d-flex">
+                <div v-if="users.length>0" style="height: 30px" class=" fs-13 font-weight-medium symper-user-role-in-task d-flex">
                     <span>
                         <v-icon class="mr-3" size="18">mdi-account</v-icon> 
                         <span mt-1>{{$t("tasks.header."+role)}}</span>
                     </span>
-                    <!-- <v-btn small icon @click="addUserForRole(role)" class="ml-3 symper-add-user-btn" style="display: none" v-if="roleCanAddUser[role]">
+                    <v-btn small icon @click="addUserForRole(role)" class="ml-3 symper-add-user-btn" style="display: none" v-if="roleCanAddUser[role]">
                         <v-icon>mdi-plus</v-icon>
-                    </v-btn> -->
+                    </v-btn>
                 </div>
                 <div class="pl-10 py-2 d-flex justify-space-between user-show" v-for="userItem in tabData[role]" :key="userItem.id" >
                     <user :user="userItem" class="float-left"></user>
@@ -133,7 +133,6 @@ export default {
             return this.$store.state.app;
         },
         roleCanAddUser() {
-            
             let canAddAssignee = false;
             let assignee = this.tabData.assignee[0];
             if(!assignee && this.tabData.owner[0]){

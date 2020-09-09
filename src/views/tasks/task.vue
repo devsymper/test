@@ -17,7 +17,9 @@
             v-else-if="(showDoTaskComponent && (action == 'approval')) || filter=='done'"
             :docObjInfo="docObjInfo">
         </Detail>
-
+        <div style="width:100%" v-else-if="filter=='done-noneObj'">
+            <h3 style="text-align:left; margin-top:20px; color:#4e4e4e">Mô tả: {{taskInfo.extraLabel}} </h3>
+        </div>
         <div v-else-if="action == 'undefined'">
             <div class="text-md-center mt-6">
                 <span class="fs-16 font-weight-bold">
@@ -90,43 +92,49 @@ export default {
                 this.filter=filter;
                 if (filter!='done') {
                     if(this.taskInfo.action){
-                        let action = this.taskInfo.action.action;
-                        this.action = action;
-                        let varsMap = await getProcessInstanceVarsMap(this.taskInfo.action.parameter.processInstanceId);
-                        this.workflowInfo.documentObjectWorkflowId = this.taskInfo.action.parameter.processDefinitionId;
-                        this.workflowInfo.documentObjectWorkflowObjectId = this.taskInfo.action.parameter.processInstanceId;
-                        this.workflowInfo.documentObjectTaskId = this.taskInfo.action.parameter.taskId;
-                        // cần activityId  của task truyền vào nữa 
-                        let workflowVariable = {};
-                        for(let key in varsMap){
-                            workflowVariable['workflow_'+key] = varsMap[key].value;
-                        }
-
-                        this.workflowVariable = null;
-                        this.workflowVariable = workflowVariable;
-                    
-                        if(action == 'submit'){
-                            this.docId = Number(this.taskInfo.action.parameter.documentId);
-                            this.documentObjectId = 0;
-                        }else if(action == 'approval' || action == 'update' || filter =='done'){
-                            if(!this.taskInfo.action.parameter.documentObjectId){
-                                
-                                let approvaledElId = this.taskInfo.targetElement;
-                                let docObjId = varsMap[approvaledElId+'_document_object_id'];
-                                this.docObjInfo.docObjId = docObjId.value;
-                            }else{
-                                this.docObjInfo.docObjId = this.taskInfo.action.parameter.documentObjectId;
+                        if(this.taskInfo.action.parameter.documentId==0){
+                            this.filter='done-noneObj';
+                        }else{
+                            let action = this.taskInfo.action.action;
+                            this.action = action;
+                            let varsMap = await getProcessInstanceVarsMap(this.taskInfo.action.parameter.processInstanceId);
+                            this.workflowInfo.documentObjectWorkflowId = this.taskInfo.action.parameter.processDefinitionId;
+                            this.workflowInfo.documentObjectWorkflowObjectId = this.taskInfo.action.parameter.processInstanceId;
+                            this.workflowInfo.documentObjectTaskId = this.taskInfo.action.parameter.taskId;
+                            // cần activityId  của task truyền vào nữa 
+                            let workflowVariable = {};
+                            for(let key in varsMap){
+                                workflowVariable['workflow_'+key] = varsMap[key].value;
                             }
-                            this.documentObjectId = Number(this.docObjInfo.docObjId);
+                            this.workflowVariable = null;
+                            this.workflowVariable = workflowVariable;
+                        
+                            if(action == 'submit'){
+                                this.docId = Number(this.taskInfo.action.parameter.documentId);
+                                this.documentObjectId = 0;
+                            }else if(action == 'approval' || action == 'update' || filter =='done'){
+                                if(!this.taskInfo.action.parameter.documentObjectId){
+                                    
+                                    let approvaledElId = this.taskInfo.targetElement;
+                                    let docObjId = varsMap[approvaledElId+'_document_object_id'];
+                                    this.docObjInfo.docObjId = docObjId.value;
+                                }else{
+                                    this.docObjInfo.docObjId = this.taskInfo.action.parameter.documentObjectId;
+                                }
+                                this.documentObjectId = Number(this.docObjInfo.docObjId);
+                            }
+                            this.showDoTaskComponent = true;    
                         }
-                        this.showDoTaskComponent = true;                    
+                                      
                     }else if((this.docId && Number(this.docId > 0)) || this.documentObjectId){
                         this.showDoTaskComponent = true;
                     }
                 }else{
                     if(this.taskInfo.action.parameter.documentObjectId){
-                         this.docObjInfo.docObjId = this.taskInfo.action.parameter.documentObjectId;
-                    }          
+                        this.docObjInfo.docObjId = this.taskInfo.action.parameter.documentObjectId;
+                    }else{
+                        this.filter='done-noneObj';
+                    }
                 }
             }
         }

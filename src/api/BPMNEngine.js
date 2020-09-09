@@ -146,6 +146,33 @@ export default {
             return bpmneApi.get(appConfigs.apiDomain.bpmne.tasks + '/' + taskId, {}, testHeader);
         }
     },
+    getATaskInfoV2(taskId){
+        let result1=bpmneApi.get(appConfigs.apiDomain.bpmne.tasksHistory+'/'+taskId, {}, testHeader);
+        let result2=bpmneApi.get(appConfigs.apiDomain.bpmne.tasks+'/'+taskId, {}, testHeader);
+        let result;
+        let isCheck=false;
+
+        result1.then((res) => {
+                if (res.status==0) {
+                }else{
+                    console.log("ge1",res);
+                    isCheck=true;
+                    result=result1;
+                }
+            }
+        );
+        result2.then((res) => {
+            if (res.status==0) {
+                }else{
+                    console.log("ge2",res);
+                    isCheck=true;
+                    result=result2;
+                }
+            }
+        );
+            
+        return result;
+    },
     updateTask(taskId, data) {
         data = JSON.stringify(data);
         return bpmneApi.put(appConfigs.apiDomain.bpmne.tasks + '/' + taskId, data, testHeader);
