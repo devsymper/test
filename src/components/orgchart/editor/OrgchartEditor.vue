@@ -395,18 +395,17 @@ export default {
         },
 
         addUsersToPosition(postions, users){
-            let mapPostitions = postions.reduce((map, el)=> {
-                map[el.id] = el;
-                return map;
-            } , {});
-            for(let u of users){
-                let pos = mapPostitions[u.positionNodeId];
-                if(!pos.users){
+            for(let pos of postions){
+                if(pos.users){
+                    pos.users = typeof pos.users == 'string' ? JSON.parse(pos.users) : pos.users;
+                    let map = {};
+                    for(let u of pos.users){
+                        map[u] = true;
+                    }
+                    pos.users = Object.keys(map);
+                }else{
                     pos.users = [];
-                }else if(typeof pos.users == 'string'){
-                    pos.users = JSON.parse(pos.users);
                 }
-                pos.users.push(u.userId);
             }
         },
         centerDiagram(){
