@@ -39,8 +39,8 @@
 						</ul>
 						<div v-else>
 							<div style="padding-left:180px">
-								<div style="margin-right:auto;margin-left:auto"> {{$t('apps.emptyFavorite')}} </div>
-								<v-icon style="font-size:60px;padding-left:40px;margin-top:8px">
+								<div style="margin-right:auto;margin-left:auto;opacity:0.3"> {{$t('apps.emptyFavorite')}} </div>
+								<v-icon style="font-size:60px;padding-left:40px;margin-top:8px;opacity:0.3">
 									mdi-star-off
 								</v-icon>
 								<!-- <v-img
@@ -82,7 +82,7 @@
 						</VuePerfectScrollbar>	
 						<div v-else>
 							<div style="padding-left:150px">
-								<div style="margin-right:auto;margin-left:auto"> {{$t('apps.emptyApp')}} </div>
+								<div style="margin-right:auto;margin-left:auto;opacity:0.3"> {{$t('apps.emptyApp')}} </div>
 								
 								<v-img
 								:src="urlEmptyApp" style="width:60px;height:60px;margin-left:38px;margin-bottom:12px;margin-top:8px">
