@@ -475,7 +475,7 @@ export default {
                 if(fromContext){
                     self.$router.push('/documents/'+self.documentId+'/objects',"Danh sách bản ghi");
                 }
-            }, 200,this);
+            }, 300,this);
            
             
         },

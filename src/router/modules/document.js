@@ -13,6 +13,12 @@ export default [
             import ('../../views/document/trash/ShowListTrash.vue'),
     },
     {
+        path: "/documents/:id?/print-config",
+        name: "prinConfigDocument",
+        component: () =>
+            import ('../../views/document/print/ShowList.vue'),
+    },
+    {
         path: "/document/editor",
         name: "createDocument",
         component: () =>

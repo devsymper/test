@@ -631,17 +631,22 @@ export default {
         },
         "sDocumentSubmit.readyLoaded":function(data){
             if(data == true){
-                this.loading = false;
-                $("#sym-submit-" + this.keyInstance).find('.page-content').removeClass('d-block');
-                $("#sym-submit-" + this.keyInstance).find('.list-page-content').removeClass('d-flex');
-                $("#sym-submit-" + this.keyInstance).css({opacity:'1'});
+                this.hidePreloader()
             }
         },
     },
     
     methods: {
-        
-        // hàm
+        /**
+         * Hàm ẩn loader
+         */
+        hidePreloader(){
+            this.loading = false;
+            $("#sym-submit-" + this.keyInstance).find('.page-content').removeClass('d-block');
+            $("#sym-submit-" + this.keyInstance).find('.list-page-content').removeClass('d-flex');
+            $("#sym-submit-" + this.keyInstance).css({opacity:'1'});
+        },
+        // hàm lây các tham số trong workflow phục vụ cho submit
         getParamsForRunDataFlow(properties){
             let mapControlToParams = properties.mapParamsDataflow.value;
             let dataParams = {}
@@ -1153,7 +1158,7 @@ export default {
                             });
                             tableControl.listInsideControls = listInsideControls;
                             tableControl.renderTable();
-                            tableControl.tableInstance.updateTable(valueInput);
+                            tableControl.setData(valueInput);
                             this.addToListInputInDocument(controlName,tableControl)
                         }
                     }
@@ -1167,10 +1172,7 @@ export default {
             if(this.docObjId == null)
             thisCpn.findRootControl();
             else{
-                this.loading = false;
-                $("#sym-submit-" + this.keyInstance).find('.page-content').removeClass('d-block');
-                $("#sym-submit-" + this.keyInstance).find('.list-page-content').removeClass('d-flex');
-                $("#sym-submit-" + this.keyInstance).css({opacity:'1'});
+                this.hidePreloader()
             }
 
         },
@@ -1390,7 +1392,6 @@ export default {
                 thisCpn.$emit('submit-document-success',dataResponSubmit);
                 thisCpn.isSubmitting = false;
                 if (res.status == 200) {
-                    
                     thisCpn.$snotify({
                         type: "success",
                         title: "Submit document success!"
@@ -1909,7 +1910,10 @@ export default {
 								
 							}
 						}
-					}
+                    }
+                }
+                if(listRootControl.length == 0){
+                    this.hidePreloader();
                 }
 			// lưu lại các mối quan hệ cho lần submit sau ko phải thực hiện các bước tìm quan hê này (các root control , các luồng chạy công thức)
 				let dataPost = {impactedFieldsList:impactedFieldsList,impactedFieldsListWhenStart:impactedFieldsListWhenStart,rootControl:listRootControl};

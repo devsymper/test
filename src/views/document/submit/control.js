@@ -83,15 +83,16 @@ export default class Control {
 
     }
     checkProps(props) {
-            if (this.controlProperties[props] !== undefined &&
-                (this.controlProperties[props].value === "1" ||
-                    this.controlProperties[props].value === 1 ||
-                    this.controlProperties[props].value)) {
-                return true;
-            }
-            return false;
+        if (this.controlProperties[props] !== undefined &&
+            (this.controlProperties[props].value === "1" ||
+                this.controlProperties[props].value === 1 ||
+                this.controlProperties[props].value)) {
+            return true;
         }
-        // set các mối quan hệ của các control trường hợp đã được lưu trên server
+        return false;
+    }
+
+    // set các mối quan hệ của các control trường hợp đã được lưu trên server
     setEffectedData(effected) {
         if (effected == "" || effected == null) {
             return;

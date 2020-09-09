@@ -454,7 +454,7 @@
                         "history": "Lịch sử",
                         "comment": "Bình luận",
                         "has": "Có",
-                        "commentNotResolve": "chưa được giải quyết"
+                        "commentNotResolve": "bình luận chưa được giải quyết"
                     },
                     "worflowInfo": "THÔNG TIN QUY TRÌNH",
                     "userRelated": {
