@@ -17,7 +17,7 @@
 			width="500"
      	 >
 			<v-card>
-			<v-card-title class="headline grey lighten-2">
+			<v-card-title >
 				Chọn avatar
 			</v-card-title>
 			 <clipper-basic v-if="spliting" class="my-clipper" ref="clipper" :ratio="1/1" :src="previewImg" >
@@ -56,7 +56,8 @@
 
 <script>
 import {fileManagementApi} from '@/api/FileManagement.js'
-import {clipperBasic} from 'vuejs-clipper'
+import { clipperBasic } from 'vuejs-clipper'
+
 let formData = new FormData()
 export default {
 	components:{
@@ -67,6 +68,14 @@ export default {
 			type:String,
 			default: ''
 		},
+		autoUpload:{
+			type: Boolean,
+			default: true
+		},
+		pickAvatar:{
+			type: Boolean,
+			default: false
+		},
 		objectType:{
 			type:String,
 			default: ''
@@ -75,14 +84,6 @@ export default {
 			type:String,
 			default: ''
 		},
-		autoUpload:{
-			type: Boolean,
-			default: true
-		},
-		pickAvatar:{
-			type: Boolean,
-			default: false
-		}
 	},
 	data() {
 	   return {
@@ -111,6 +112,7 @@ export default {
 			if(this.pickAvatar == true){
 				if(this.selectedFile.type == 'image/jpeg' || this.selectedFile.type == 'image/jpg' || this.selectedFile.type == 'image/png'){
 					this.dialog = true
+					debugger
 					this.previewImg = window.URL.createObjectURL(e.target.files[0])
 				}
 			}else{
@@ -134,6 +136,7 @@ export default {
 			formData.append('file',file)
 			this.formDatas = formData
 			this.$emit('selected-file', this.previewImg)
+			debugger
 			if(this.autoUpload == true){
 				this.uploadFile()
 			}

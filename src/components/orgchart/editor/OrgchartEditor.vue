@@ -12,7 +12,7 @@
                             style="position:relative; top: -3px"
                         > 
                             <v-icon size="21" v-on="on">{{item.icon}}</v-icon>
-                        </v-btn>
+               	         </v-btn>
                     </template>
                     <span>{{$t(item.text) }}</span>
                 </v-tooltip>

@@ -92,7 +92,18 @@ export default {
                         cell.attr(mapName[attrName]+'/'+key, value[key]);
                     }
                 }else{
-                    cell.attr(mapName[attrName], value);
+                     let newValue =   joint.util.breakText(
+                            value, 
+                            {
+                                width: 100,
+                                height: 30
+                            },
+                            { 'font-size': 13 },
+                            { ellipsis: true  }
+                        )
+                    cell.attr(mapName[attrName], newValue,
+                    );
+                   
                 }
             }
         },
