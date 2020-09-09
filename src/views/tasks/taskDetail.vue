@@ -24,7 +24,7 @@
                     <span>Sao chép đường dẫn</span>
                 </v-tooltip>
 
-                <!-- <button @click="getTaskTest">Click</button> -->
+                <button @click="getTaskTest">Click</button>
 
                 <v-btn small text  @click="closeDetail">
                     <v-icon small>mdi-close</v-icon>
@@ -234,7 +234,7 @@ export default {
         getTaskTest(){
             let taskId=this.taskInfo.action.parameter.taskId;
             BPMNEngine.getATaskInfoV2(taskId).then((res) => {
-                // console.log(res,"task");
+                console.log("task123",res);
             });
         },
         onCopySuccess(){

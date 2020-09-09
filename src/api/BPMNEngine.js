@@ -153,25 +153,29 @@ export default {
         let isCheck=false;
 
         result1.then((res) => {
+            console.log("aa",res);
                 if (res.status==0) {
                 }else{
                     console.log("ge1",res);
-                    isCheck=true;
-                    result=result1;
+                    isCheck=1;
                 }
             }
         );
         result2.then((res) => {
+            console.log("bb",res);
             if (res.status==0) {
                 }else{
                     console.log("ge2",res);
-                    isCheck=true;
-                    result=result2;
+                    isCheck=2;
                 }
             }
         );
-            
-        return result;
+        if (isCheck==1) {
+            return result1
+        }else{
+            return result2
+        }
+        
     },
     updateTask(taskId, data) {
         data = JSON.stringify(data);
