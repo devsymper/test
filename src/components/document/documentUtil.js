@@ -78,7 +78,9 @@ const getInsertionCSS = function() {
         transition: all ease-in-out 250ms;
       }
       .page-content-body{
-        height: calc(100% - 50px);
+        height: calc(100% - 30px);
+        overflow-y: auto;
+        overflow-x: hidden;
         padding: 10px;
       }
       .page-header-action button{
@@ -114,6 +116,7 @@ const getInsertionCSS = function() {
         height:100%;
         width:100%;
         background: white;
+        width: calc(100% - 150px);
       }
       .list-page{
         height: calc(100% - 35px);
@@ -124,10 +127,12 @@ const getInsertionCSS = function() {
         padding: 5px 4px;
         border-radius: 4px;
         margin-bottom: 4px;
+        cursor: pointer;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
         transition: all ease-in-out 150ms;
+        position:relative;
       }
       .add-page-btn{
         overflow: hidden;
@@ -146,6 +151,26 @@ const getInsertionCSS = function() {
       }
       .d-none{
         display:none;
+      }
+      .drag-table{
+        height: 20px;
+        text-align: center;
+        padding-top: 6px;
+        background: rgb(0 0 255 / 0.2);
+        cursor: move;
+      }
+      .rotate-180 {
+        transform: rotate(180deg);
+      }
+      .delete-page-icon{
+        position:absolute;
+        font-size:11px;
+        right:4px;
+        top: 7px;
+        opacity:0;
+      }
+      .page-item:hover .delete-page-icon{
+        opacity:1;
       }
       `;
     return styles;

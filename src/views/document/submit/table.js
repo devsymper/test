@@ -212,6 +212,7 @@ export default class Table {
             this.tableInstance = null;
             this.columnsInfo = null;
             this.keyInstance = keyInstance;
+            this.reRendered = false;
             /**Danh sách các celltpye trong table */
             this.listCellType = {};
             /**CHỉ ra  vị trí của cell được click */
@@ -236,7 +237,12 @@ export default class Table {
 
                     beforeKeyDown: function(event) {
                         let cellMeta = this.getSelected();
+                        // trường hợp ấn enter mà ở dòng cuối cùng thì đưa cell selected vào đầu cột 1 (lỗi xảy ra do có 2 cột mặc định ẩn trong table)
                         if (event.keyCode == 13 && thisObj.checkLastCell(cellMeta, this)) {
+                            return;
+                        }
+                        // trường hợp ấn -> mà ở dòng cuối cùng thì đưa cell selected vào đầu cột 1 (lỗi xảy ra do có 2 cột mặc định ẩn trong table)
+                        if (event.keyCode == 39 && thisObj.checkLastCellInRow(cellMeta, this)) {
                             return;
                         }
                         if (thisObj.tableHasRowSum && cellMeta[0][0] == this.countRows() - 1) {
@@ -374,7 +380,7 @@ export default class Table {
 
                     afterDocumentKeyDown: function(e) {
                         let cellMeta = this.getSelected();
-                        if (e.key === 'Enter' && e.shiftKey === true) {
+                        if (e.key === 'Enter' && e.shiftKey === true && cellMeta != undefined) {
                             this.alter('insert_row', cellMeta[0][0] + 1, 1);
                             let rowData = thisObj.tableDefaultRow;
                             rowData[0] = cellMeta[0][0] + 1;
@@ -399,6 +405,7 @@ export default class Table {
 
                         // nếu có sự thay đổi cell mà là id của row sqlite thì ko thực hiện update
                         if (controlName != 's_table_id_sql_lite') {
+
                             thisObj.checkUniqueTable(controlName, columns);
                             if (source != AUTO_SET) {
                                 store.commit("document/addToDocumentSubmitStore", {
@@ -462,6 +469,18 @@ export default class Table {
             }
             return false
         }
+        // kiểm tra nếu đang edit ở cell cuối cùng mà ấn enter thì cho cell selected về dòng đầu tiên (lỗi do control hidden)
+    checkLastCellInRow(cellMeta, hotTb) {
+            if (!this.showPopupTime && !this.showPopupUser) {
+                let colLength = hotTb.getDataAtRow(0).length;
+                if (cellMeta[0][1] == colLength - 3) {
+                    hotTb.selectCell(cellMeta[0][0], 0, 0, 0, true);
+                    return true
+                }
+                return false
+            }
+            return false
+        }
         // chuyển giá trị control time về dạng HH:MM:ss để lưu vào db
     getTimeValueToStore(colData) {
             for (let index = 0; index < colData.length; index++) {
@@ -483,9 +502,6 @@ export default class Table {
             let thisObj = this;
             for (let index = 0; index < changes.length; index++) {
                 let colChange = changes[index];
-                if (colChange[2] == undefined) {
-                    return;
-                }
                 let rowData = thisObj.tableInstance.getDataAtRow(colChange[0]);
                 for (let index = 0; index < rowData.length; index++) {
                     let cell = rowData[index];
@@ -560,45 +576,31 @@ export default class Table {
          */
 
     checkIsAutocompleteCell(controlName) {
-            let controlInstance = this.getControlInstance(controlName);
-            if (controlInstance != null && controlInstance != undefined) {
-                let controlFormulas = controlInstance.controlFormulas;
-                if (controlFormulas.hasOwnProperty('autocomplete')) {
-                    let formulasInstance = controlFormulas['autocomplete'].instance;
-                    if (formulasInstance == undefined) {
-                        return false;
-                    }
-                    return formulasInstance;
+        let controlInstance = this.getControlInstance(controlName);
+        if (controlInstance != null && controlInstance != undefined) {
+            let controlFormulas = controlInstance.controlFormulas;
+            if (controlFormulas.hasOwnProperty('autocomplete')) {
+                let formulasInstance = controlFormulas['autocomplete'].instance;
+                if (formulasInstance == undefined) {
+                    return false;
                 }
-            }
-            return false;
-        }
-        /**
-         * Hàm xử lí tìm các control bị ảnh hưởng sau khi  change 1 control trong table và chạy công thức cho các control bị ảnh hưởng đó
-         * @param {String} controlName Control bị thay đổi dữ liệu
-         */
-
-    checkRunLocalSql() {
-        let currentSubmitStoreData = getSDocumentSubmitStore(this.keyInstance);
-        let listRelatedLocal = currentSubmitStoreData.localRelated;
-        if (listRelatedLocal.hasOwnProperty(this.tableName)) {
-            listRelatedLocal = listRelatedLocal[this.tableName];
-            for (let index = 0; index < listRelatedLocal.length; index++) {
-                const element = listRelatedLocal[index];
-                this.handlerCheckCanBeRunFormulas(element);
+                return formulasInstance;
             }
         }
-
+        return false;
     }
+
     handlerCheckEffectedControlInTable(controlName, rowIndex = "") {
         if (controlName == "") {
             return
         }
         let controlInstance = this.getControlInstance(controlName);
+
         if (controlInstance.checkValidValueLength(rowIndex)) {
             if (controlInstance == null || controlInstance == undefined) {
                 return;
             }
+
             let controlEffected = controlInstance.getEffectedControl();
             let controlHiddenEffected = controlInstance.getEffectedHiddenControl();
             let controlReadonlyEffected = controlInstance.getEffectedReadonlyControl();
@@ -642,6 +644,7 @@ export default class Table {
          * @param {String} control 
          */
     handlerCheckCanBeRunFormulas(control) {
+
             if (checkCanBeBind(this.keyInstance, control)) {
                 let controlInstance = this.getControlInstance(control);
                 if (controlInstance.controlFormulas.hasOwnProperty('formulas')) {
@@ -891,7 +894,7 @@ export default class Table {
         thisObj.controlObj.ele.before(tableContainer);
         thisObj.tableContainer = $(tableContainer);
         thisObj.columnsInfo = this.getColumnsInfo();
-        thisObj.controlObj.ele.detach().hide();
+
         let colHeaders = thisObj.columnsInfo.headerNames;
         thisObj.colHeaders = colHeaders;
         let defaultData = this.getDefaultData();
@@ -939,6 +942,17 @@ export default class Table {
                 if (tbHeight < MAX_TABLE_HEIGHT) {} else {
                     $(this.rootElement).css('height', MAX_TABLE_HEIGHT);
                 }
+                if (!this.reRendered) {
+                    setTimeout((hotTb) => {
+                        let curTableLoaded = sDocument.state.submit[thisObj.keyInstance].tableLoaded;
+                        curTableLoaded[thisObj.tableName] = true;
+                        store.commit("document/addToDocumentSubmitStore", {
+                            key: 'tableLoaded',
+                            value: curTableLoaded,
+                            instance: thisObj.keyInstance
+                        });
+                    }, 500, this);
+                }
                 if (!this.reRendered && thisObj.tableHasRowSum) {
                     this.reRendered = true;
                     setTimeout((hotTb) => {
@@ -948,6 +962,7 @@ export default class Table {
                         hotTb.render();
                     }, 500, this);
                 }
+
 
             },
             beforeCreateRow: function(i, amount) {
@@ -994,7 +1009,8 @@ export default class Table {
             afterCreateRow: function(index, amount, source) {
                 let id = Date.now();
                 thisObj.tableInstance.setDataAtCell(index, thisObj.tableInstance.getDataAtRow(0).length - 1, id);
-            }
+            },
+
         });
 
         this.tableInstance.keyInstance = this.keyInstance;
@@ -1050,22 +1066,22 @@ export default class Table {
      * mặc định data luôn có 1 giá trị là docObjectId chỉ ra id của dòng trên 
      * @param {*} data 
      */
-    updateTable(data) {
-        if (Object.keys(data).length > 1) {
-            let dataUpdate = [];
-            for (let controlName in data) {
-                for (let index = 0; index < data[controlName].length; index++) {
-                    if (dataUpdate.length <= index) {
-                        dataUpdate.push({})
-                    }
-                    dataUpdate[index][controlName] = data[controlName][index];
-                }
-            }
-            this.tableInstance.updateSettings({
-                data: dataUpdate
-            })
-        }
-    }
+    // updateTable(data) {
+    //     if (Object.keys(data).length > 1) {
+    //         let dataUpdate = [];
+    //         for (let controlName in data) {
+    //             for (let index = 0; index < data[controlName].length; index++) {
+    //                 if (dataUpdate.length <= index) {
+    //                     dataUpdate.push({})
+    //                 }
+    //                 dataUpdate[index][controlName] = data[controlName][index];
+    //             }
+    //         }
+    //         this.tableInstance.updateSettings({
+    //             data: dataUpdate
+    //         })
+    //     }
+    // }
 
     // Hàm set data cho table
     setData(vls) {

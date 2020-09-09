@@ -62,11 +62,15 @@ const setOrgchartNodes = (state, orgchartNodes) => {
 const setAllUsers = (state, allUsers) => {
     Vue.set(state, 'allUsers', allUsers);
 }
+const setAllBA = (state, allBA) => {
+    Vue.set(state, 'allBA', allBA);
+}
 
 const setUserRoleByType = (state, param) => {
     let type = param.type;
     Vue.set(state.endUserInfo.roles, type, param.data);
 }
+
 
 
 const setUserActionsForObjects = (state, data) => {
@@ -84,6 +88,7 @@ export {
     removeTab,
     setOrgchartNodes,
     setAllUsers,
+    setAllBA,
     setUserRoleByType,
     setUserActionsForObjects
 };

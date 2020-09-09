@@ -236,7 +236,11 @@
             "date_created": "Date",
             "name": "Name",
             "description": "Description",
-            "type": "Type"
+            "type": "Type",
+            "createAt": "Create at",
+            "updateAt": "Update at",
+            "userCreate": "User create",
+            "userUpdate": "User update"
         },
         "title": "Permissions packages",
         "actionControlSummary": "Action pack Summary",
@@ -748,7 +752,8 @@
             "participant": "Participant",
             "id": "Seri",
             "list": "List task",
-            "submitForm": "Submit form"
+            "submitForm": "Submit form",
+            "alertDescription": "No description"
         },
         "filterOptions": {
             "all": "All task",
@@ -765,7 +770,15 @@
         "created": "Task created",
         "relatedPeople": {
             "title": "Related people"
+        },
+        "table":{
+            "fileName":"File name",
+            "type":"Type",
+            "owner":"Owner",
+            "size":"Size",
+            "date":"Date"
         }
+
     },
     "orgchart": {
         "list": {

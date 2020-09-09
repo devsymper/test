@@ -42,6 +42,7 @@
         <err-message :listErr="listMessageErr" ref="errMessage"/>
         <control-name-related :instance="keyInstance" @after-close-panel="afterClosePanel"  ref="controlNameRelated"/>
         <all-control-option :instance="keyInstance" ref="allControlOption"/>
+        <MaterialIcon :instance="keyInstance" @selected="selectedIcon" :float="true" ref="materialIconPicker"/>
         <SwapTypeControlView 
         :instance="keyInstance" 
         :dataControl="dataControlSwapType"
@@ -50,11 +51,11 @@
 
         <v-dialog v-model="dialog" persistent max-width="290">
             <v-card>
-                <v-card-title class="headline">Chuyển sang định dạng version 2</v-card-title>
+                <v-card-title class="headline">{{titleDialog}}</v-card-title>
                 <v-card-actions>
                 <v-spacer></v-spacer>
                 <v-btn color="green darken-1" text @click="dialog = false">Hủy bỏ</v-btn>
-                <v-btn color="green darken-1" text @click="handlePasteContent">Đồng ý</v-btn>
+                <v-btn color="green darken-1" text @click="acceptDialog">Đồng ý</v-btn>
                 </v-card-actions>
             </v-card>
             </v-dialog>
@@ -73,6 +74,7 @@ import SaveDocPanel from "./../../views/document/items/SaveDocPanel.vue";
 import ErrMessagePanel from "./../../views/document/items/ErrMessagePanel.vue";
 import ControlNameRelated from "./../../views/document/items/ControlNameRelated.vue";
 import AllControlInDoc from "./../../views/document/items/AllControlInDoc.vue";
+import MaterialIcon from "@/components/common/MaterialIcon.vue";
 import { GetControlProps,mappingOldVersionControlProps,
         mappingOldVersionControlFormulas,getAPropsControl,
         getIconFromType,listControlNotNameProp } from "./../../components/document/controlPropsFactory.js";
@@ -129,7 +131,8 @@ export default {
         "vue-resizable":VueResizable,
         "all-control-option":AllControlInDoc,
         "control-name-related":ControlNameRelated,
-        SwapTypeControlView
+        SwapTypeControlView,
+        MaterialIcon
     },
     mounted(){
         let self = this;
@@ -145,7 +148,7 @@ export default {
                                 ' fullscreen',
                                 'table paste code hr'
                                 ],
-                                contextmenu: 'inserttable table | settingtable',
+                                contextmenu: 'inserttable table | settingtable | dragTable',
                                 toolbar:
                                 'undo redo | fontselect fontsizeselect formatselect | bold italic forecolor backcolor | \
                                 alignleft aligncenter alignright alignjustify | \
@@ -160,6 +163,13 @@ export default {
                                         disabled : false,
                                         onAction: function(e) {
                                             self.showSettingControlTable(e);
+                                        }
+                                    });
+                                    ed.ui.registry.addMenuItem('dragTable', {
+                                        text: 'Drag table',
+                                        disabled : false,
+                                        onAction: function(e) {
+                                            self.showDragTable(e);
                                         }
                                     });
                                 
@@ -186,7 +196,7 @@ export default {
                                         self.keyHandler(e)
                                     });
                                     ed.on('paste', function(e) {
-                                        self.onPaste(e)
+                                        self.showDialogEditor('onPaste','Chuyển sang định dạng v2');
                                     });
                                 },
                                 init_instance_callback : function(editor) {
@@ -239,7 +249,10 @@ export default {
             dialog: false,
             dataControlSwapType:{},
             listDataFlow:[],
-            isComponentActive:false
+            isComponentActive:false,
+            currentTabSelectedIcon:null,
+            titleDialog:"",
+            currentPageActive:null
         }
     },
     activated() {
@@ -288,12 +301,23 @@ export default {
         }
     },
     methods:{
-        onPaste(event){
+        
+        showDialogEditor(type,title){
             this.dialog = true;
-            
+            this.typeDialog = type;
+            this.titleDialog = title;
+        },
+        acceptDialog(){
+            this.dialog = false;
+            if(this.typeDialog == 'onPaste'){
+                this.handlePasteContent();
+            }
+            else if(this.typeDialog == 'deletePage'){
+                this.handleClickDeletePageInControlTab(this.currentPageActive)
+            }
         },
         handlePasteContent(){
-            this.dialog = false;
+            
             this.setContentForDocumentV1();
         },
         px2cm(px) {
@@ -905,6 +929,18 @@ export default {
             elements.find('tbody tr').html(tbody);
         },
 
+        // ham drag table trong editor
+        showDragTable(e){
+            let elements = $('#document-editor-'+this.keyInstance+'_ifr').contents().find('.on-selected').closest('.s-control-table');
+            if(elements.is('.s-control-table')){
+                if(elements.find('.drag-table').length > 0){
+                    elements.find('.drag-table').remove()
+                }
+                else{
+                    elements.prepend('<p class="drag-table">Drag here</p>');
+                }
+            }
+        },
         //hoangnd: hàm mở modal tablesetting của control table
         showSettingControlTable(e) {
             let elements = $('#document-editor-'+this.keyInstance+'_ifr').contents().find('.on-selected').closest('.s-control-table');
@@ -1051,13 +1087,13 @@ export default {
             elTarget.addClass('tab-active')
             let tabId = elTarget.attr('id');
             elTarget.closest('.page-content').find(".page-content-body .content-active").removeClass('content-active');
-            elTarget.closest('.page-content').find('.page-content-body [tabId="'+tabId+'"]').addClass('content-active');
+            elTarget.closest('.page-content').find('.page-content-body [tab-id="'+tabId+'"]').addClass('content-active');
         },
         /**
          * Hàm xử lí sự kiên click vào nút add tab bên trên header của control tab/page để thêm tab
          */
         handleClickAddTabInControlTab(elTarget){
-            if(elTarget.closest('.page-content-header').find('.tab button').length < 9){
+            if(elTarget.closest('.page-content-header').find('.tab button').length < 8){
                 elTarget.closest('.page-content-header').find('.tab br').remove();
                 let lastTab = elTarget.closest('.page-content-header').find('.tab button').last();
                 let newTabIndex = parseInt(lastTab.attr('tab-index')) + 1;
@@ -1077,8 +1113,10 @@ export default {
                                         </div>`
                 elTarget.closest('.page-content-header').find('.tab').append(newTabHtml);
                 elTarget.closest('.page-content').find('.page-content-body').append(contentPageHtml);
+                let curPageName = elTarget.closest('.page-content').attr('page-name')
                 let control = GetControlProps('tab');
                 control.properties.title.value = "Tab-"+newTabIndex;
+                control.properties.name.value = curPageName + "_t_"+newTabIndex;
                 this.addToAllControlInDoc(tabId,{properties: control.properties, formulas : control.formulas,type:'tab'});
             }
             
@@ -1097,11 +1135,12 @@ export default {
                 }
                 let pageId = "s-control-id-" + Date.now();
                 let newPageHtml = `<div s-control-type="page" class="s-control page-item sb-page-active" page-index="`+newPageIndex+`" id="`+pageId+`">
-                                    <span class="mdi mdi-format-page-break"></span>
+                                    <span class="icon-page mdi mdi-format-page-break"></span>
                                     <span class="page-item__name">Trang so `+newPageIndex+`</span>
+                                    <span class="delete-page-icon mdi mdi-window-close"></span>
                                 </div>`;
 
-                let contentPageHtml = ` <div class="page-content page-active" s-page-content-id="`+pageId+`">
+                let contentPageHtml = ` <div class="page-content page-active" s-page-content-id="`+pageId+`" page-name="pg_`+newPageIndex+`">
                                             <div class="page-content-header">
                                                 <button class="add-tab-btn">+ Thêm tab</button>
                                                 <div class="tab">
@@ -1116,8 +1155,15 @@ export default {
                 elTarget.closest('.s-control-tab-page').find('.list-page-content').append(contentPageHtml);
                 let control = GetControlProps('page');
                 control.properties.title.value = "Trang số "+newPageIndex;
+                control.properties.name.value = "pg_"+newPageIndex;
                 this.addToAllControlInDoc(pageId,{properties: control.properties, formulas : control.formulas,type:'page'});
             }
+        },
+        handleClickDeletePageInControlTab(elTarget){
+            let pageId = elTarget.attr('id');
+            elTarget.closest('.s-control-tab-page').find('[s-page-content-id="'+pageId+'"]').remove();
+            elTarget.remove();
+
         },
         /**
          * Hàm xử lí sự kiên click vào page bên sidebar của control tab/page để chuyển page
@@ -1133,12 +1179,22 @@ export default {
          * Hàm click đóng mở sidebar của control tab/page
          */
         handleClickCollapseInControlTab(elTarget){
+            elTarget.toggleClass('rotate-180')
             elTarget.closest('.sidebar-page').toggleClass('collapse-sb');
             elTarget.closest('.sidebar-page').find('.page-item__name').toggleClass('d-none');
+            let curSideBar = elTarget.closest('.s-control-tab-page').find('.sidebar-page');
+            let curSideBarWidth = (curSideBar.is('.collapse-sb')) ? 30 : 150;
+
+            elTarget.closest('.s-control-tab-page').find('.list-page-content').css({width:'calc(100% - '+curSideBarWidth+'px )'});
         },
         //su kiện click vào editor
         detectClickEvent(event){
-            
+            if($(event.target).closest('.s-control-table').length == 0){
+                if($(event.target).closest('body').find('.drag-table').length > 0){
+                    $(event.target).closest('body').find('.drag-table').remove()
+                }
+                
+            }
             if(this.editorStore.currentSelectedControl.id != ""){ 
                 this.$refs.sidebarRight.hideDragPanel();
             }
@@ -1164,8 +1220,19 @@ export default {
             if($(event.target).closest('.page-item').length > 0){
                 this.handleClickPageInControlTab($(event.target).closest('.page-item'))
             }
-            if($(event.target).is('.tab-item')){
-                this.handleClickPageInControlTab($(event.target))
+            if($(event.target).closest('.delete-page-icon').length > 0){
+                // this.handleClickDeletePageInControlTab($(event.target).closest('.page-item'))
+                this.currentPageActive = $(event.target).closest('.page-item')
+                this.showDialogEditor('deletePage','Bạn chắc chắn xóa!');
+            }
+          
+            if($(event.target).is('.icon-page')){
+                let position = {top:(event.pageY+100) + 'px',left:event.screenX + 'px'};
+                this.currentTabSelectedIcon = $(event.target);
+                this.$refs.materialIconPicker.show(position)
+            }
+            if(!$(event.target).is('.icon-page') && $(event.target).closest('.card-icon-material').length == 0){
+                this.$refs.materialIconPicker.hide()
             }
             
 
@@ -1173,6 +1240,11 @@ export default {
             if (event.target.id != 'list-control-autocomplete' && $(event.target).parents('#list-control-autocomplete').length == 0) {
                 this.hideAutocompletaControl();
             }
+        },
+        selectedIcon(data){
+            this.currentTabSelectedIcon.removeClass();
+            this.currentTabSelectedIcon.addClass('icon-page mdi '+data.icon);
+            this.$refs.materialIconPicker.hide()
         },
         // hàm click ra ngoài editor thì cập nhật lại dữ liệu của store
         detectBlurEditorEvent(event){
@@ -1902,6 +1974,7 @@ export default {
                         checkDiv.find('.page-content.page-active').attr('s-page-content-id',newPageId);
                         let control = GetControlProps('page');
                         control.properties.title.value = "Trang số 1";
+                        control.properties.name.value = "pg_1";
                         thisCpn.addToAllControlInDoc(newPageId,{properties: control.properties, formulas : control.formulas,type:'page'});
                     }
                     thisCpn.selectControl(control.properties, control.formulas,inputid,typeControl);

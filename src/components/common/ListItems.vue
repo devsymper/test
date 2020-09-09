@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <template>
     <div class="ml-2 w-100 pr-3 pt-3">
         <div :style="{width:contentWidth, display: 'inline-block'}">
@@ -1337,3 +1338,1339 @@ i.applied-filter {
     border-right: 0;
 }
 </style>
+=======
+<template>
+    <div class="ml-2 w-100 pr-3 pt-3">
+        <div :style="{width:contentWidth, display: 'inline-block'}">
+            <v-row no-gutters class="pb-2" ref="topBar">
+                <v-col>
+                    <span class="symper-title float-left">{{pageTitle}}</span>
+                    <div class="float-right overline">
+                        <v-text-field
+                            @input="bindToSearchkey"
+                            class="d-inline-block mr-2 sym-small-size"
+                            single-line
+                            append-icon="mdi-magnify"
+                            outlined
+                            dense
+                            label="Search"
+                            :placeholder="$t('common.search')"
+                        ></v-text-field>
+                        <v-btn
+                            depressed
+                            small
+                            :loading="loadingRefresh"
+                            :disabled="loadingRefresh"
+                            class="mr-2"
+                            @click="addItem"
+                            v-if="!isCompactMode"
+                        >
+                            <v-icon left dark>mdi-plus</v-icon>
+                            {{$t('common.add')}}
+                        </v-btn>
+                        <v-btn
+                            depressed
+                            small
+                            :loading="loadingRefresh"
+                            :disabled="loadingRefresh"
+                            class="mr-2"
+                            v-if="!isCompactMode"
+                            @click="refreshList"
+                        >
+                            <v-icon left dark>mdi-refresh</v-icon>
+                            {{$t('common.refresh')}}
+                        </v-btn>
+                        <!-- <v-btn
+                            depressed
+                            small
+                            :loading="loadingExportExcel"
+                            class="mr-2"
+                            :disabled="loadingExportExcel"
+                            v-if="!isCompactMode"
+                        >
+                            <v-icon left dark>mdi-microsoft-excel</v-icon>
+                            {{$t('common.export_excel')}}
+                        </v-btn> -->
+                        <component
+                            :is="'span'"
+                        >
+                            <slot name="extra-button"></slot>
+                        </component>
+                        <v-tooltip top>
+                            <template v-slot:activator="{ on }">
+                                <v-btn
+                                    @click="openTableDisplayConfigPanel"
+                                    depressed
+                                    small
+                                    v-on="on"
+                                >
+                                    <v-icon left dark class="ml-1 mr-0">mdi-table-cog</v-icon>
+                                </v-btn>
+                            </template>
+                            <span>{{ $t('common.list_config') }}</span>
+                        </v-tooltip>
+                    </div>
+                </v-col>
+            </v-row>
+            <v-row no-gutters>
+                <v-col
+                    :class="{
+                            'fs-13 symper-custom-table symper-list-item': true,
+                            'clip-text' : tableDisplayConfig.wrapTextMode == 1,
+                            'loosen-row':  tableDisplayConfig.densityMode == 0,
+                            'medium-row':  tableDisplayConfig.densityMode == 1,
+                            'compact-row':  tableDisplayConfig.densityMode == 2,
+                        }"
+                >
+                    <hot-table
+                        :height="tableHeight"
+                        :settings="tableSettings"
+                        :data="data"
+                        :rowHeights="21"
+                        :renderAllRows="true"
+                        :columns="tableColumns"
+                        :contextMenu="hotTableContextMenuItems"
+                        :colHeaders="colHeaders"
+                        :hiddenColumns="{
+                            columns: tableDisplayConfig.hiddenColumns
+                        }"
+                        ref="dataTable"
+                        :fixedColumnsLeft="fixedColumnsCount"
+                    ></hot-table>
+                </v-col>
+            </v-row>
+            <v-row no-gutters ref="bottomBar" class="pt-3">
+                <Pagination
+                    :total="totalObject"
+                    :totalVisible="7"
+                    @on-change-page-size="changePageSize"
+                    @on-change-page="changePage"
+                ></Pagination>
+            </v-row>
+        </div>
+
+        <component
+            :is="actionPanelWrapper"
+            :width="actionPanelWidth"
+            :max-width="actionPanelWidth"
+            v-model="actionPanel"
+            class="pa-3"
+            absolute
+            right
+            v-if="actionPanelType != 'drag'"
+            :temporary="actionPanelType == 'temporary'"
+        >
+            <slot name="right-panel-content" :itemData="currentItemDataClone">
+                <v-card flat>
+                    <v-card-title class="pa-0 pl-2" primary-title>{{itemActionTitle}}</v-card-title>
+                    <v-card-text>
+                        <form-tpl :allInputs="itemInputs"></form-tpl>
+                    </v-card-text>
+
+                    <v-divider></v-divider>
+                </v-card>
+            </slot>
+        </component>
+
+        <symper-drag-panel
+            v-else
+            @before-close="handleCloseDragPanel"
+            :showPanel="actionPanel"
+            :panelData="currentItemDataClone"
+            :actionTitle="itemActionTitle"
+            :dragPanelWidth="actionPanelWidth">
+            <template slot="drag-panel-content" slot-scope="{panelData}">
+                <slot name="right-panel-content" :itemData="panelData">
+                    <v-card flat>
+                        <v-card-text>
+                            <form-tpl :allInputs="itemInputs"></form-tpl>
+                        </v-card-text>
+                        <v-divider></v-divider>
+                    </v-card>
+                </slot>
+            </template>
+        </symper-drag-panel>
+
+        <display-config
+            ref="tableDisplayConfig"
+            @drag-columns-stopped="handleStopDragColumn"
+            @change-colmn-display-config="configColumnDisplay"
+            :tableDisplayConfig="tableDisplayConfig"
+            :tableColumns="tableColumns"
+            :headerPrefixKeypath="headerPrefixKeypath"
+        ></display-config>
+
+        <table-filter
+            ref="tableFilter"
+            :columnFilter="tableFilter.currentColumn.colFilter"
+            @apply-filter-value="applyFilter"
+            @search-autocomplete-items="searchAutocompleteItems"
+        ></table-filter>
+
+        <v-dialog
+            v-model="deleteDialogShow"
+            max-width="290">
+            <v-card>
+                <v-card-title class="headline">{{$t('common.remove_confirm_title')}}</v-card-title>
+                <v-card-text>
+                {{$t('common.remove_confirm_message', {count: deleteItems.length})}}
+                </v-card-text>
+
+                <v-card-actions>
+                <v-spacer></v-spacer>
+
+                <v-btn
+                    color="green darken-1"
+                    text
+                    @click="deleteDialogShow = false"
+                >
+                    {{$t('common.close')}}
+                </v-btn>
+
+                <v-btn
+                    color="red"
+                    text
+                    @click="confirmDeleteItems()">
+                    {{$t('common.delete')}}
+                </v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
+    </div>
+</template>
+
+<script>
+import { HotTable } from "@handsontable/vue";
+import { util } from "./../../plugins/util.js";
+import Handsontable from 'handsontable';
+import FormTpl from "./FormTpl.vue";
+import { VDialog, VNavigationDrawer } from "vuetify/lib";
+import TableFilter from "./customTable/TableFilter.vue";
+import { getDefaultFilterConfig } from "./../common/customTable/defaultFilterConfig.js";
+import Api from "./../../api/api.js";
+import { userApi } from "./../../api/user.js";
+import SymperDragPanel from "./SymperDragPanel.vue";
+import DisplayConfig from "./../common/listItemComponents/DisplayConfig";
+import Pagination from './../common/Pagination'
+import { actionHelper } from "./../../action/actionHelper";
+var apiObj = new Api("");
+var testSelectData = [ ];
+window.tableDropdownClickHandle = function(el, event) {
+    event.preventDefault();
+    event.stopPropagation();
+    let thisListItem = util.getClosestVueInstanceFromDom(el, "SymperListItem");
+    thisListItem.showTableDropdownMenu(
+        event.pageX,
+        event.pageY,
+        $(el).attr("col-name")
+    );
+};
+export default {
+    name: "SymperListItem",
+    watch: {
+        actionPanel() {
+            if (this.actionPanel == true) {
+                this.$emit("open-panel");
+            }
+        }
+    },
+    data() {
+        let self = this;
+        return {
+            deleteDialogShow: false, // có hiển thị cảnh báo xóa hay không
+            deleteItems: [], // danh sách các row cần xóa
+            savingConfigs: false, // có đang lưu cấu hình của showlist hay không
+            // các cấu hình cho việc hiển thị và giá trị của panel cấu hình hiển thị của bảng
+            tableDisplayConfig: {
+                show: false, // có hiển thị panel cấu hình ko
+                width: 300, // Chiều rộng của panel cấu hình,
+                wrapTextMode: 0,
+                densityMode: 2,
+                hiddenColumns: [],
+                dragOptions: {
+                    animation: 200,
+                    group: "display-column-drag",
+                    disabled: false,
+                    ghostClass: "ghost-item"
+                },
+                drag: false
+            },
+            fixedColumnsCount: 0, // Số lượng cột fix ở bên trái
+            tableColumns: [],
+            cellAboutSelecting: {}, // cell có nguy cơ được lựa chọn, được set mỗi khi chuột hover qua
+            actionPanel: false, // có hiển thị action pannel (create, detail, edit) hay không
+            loadingExportExcel: false, // có đang chạy export hay ko
+            loadingRefresh: false, // có đang chạy refresh dữ liệu hay ko
+            loadingData: false, // có đang loading data cho danh sách hay ko
+            page: 1, // trang hiện tại
+            currentAction: {
+                // hành động hiện tại đang thực thi trong listitem (edit, remove, create ...)
+                key: ""
+            },
+            pageSize: 50,
+            tableSettings: {
+                // các setting cho handsontable
+                filters: true,
+                manualColumnMove: true,
+                manualColumnResize: true,
+                renderAllRows: true,
+                manualRowResize: true,
+                rowHeights: 21,
+                stretchH: "all",
+                licenseKey: "non-commercial-and-evaluation",
+                afterRender: isForced => {
+                    console.log(
+                        "after render handsontablelllllllllllllllllllllllllll",
+                        Date.now()
+                    );
+                },
+                beforeContextMenuSetItems: () => {
+                },
+                beforeOnCellMouseOver: (event, coords, TD, controller) => {
+                    this.cellAboutSelecting = coords;
+                    if(this.debounceRelistContextmenu){
+                        clearTimeout(this.debounceRelistContextmenu);
+                    }
+                    this.debounceRelistContextmenu = setTimeout((self) => {
+                        self.relistContextmenu();
+                    }, 200, this);
+                }
+            },
+            tableFilter: {
+                // cấu hình filter của danh sách này
+                allColumn: {
+                    // cấu hình filter của tất cả các cột trong bảng này dạng {tên cột : cấu hình filter}
+                },
+                currentColumn: {
+                    colFilter: getDefaultFilterConfig(),
+                    name: ""
+                }
+            },
+            searchKey: "", //Từ khóa cần tìm kiếm trên tất cả các cột,
+            // Tổng số trang của danh sách này
+            totalPage: 0,
+            totalObject:0,
+            /**
+             * Cấu hình các cột của bảng danh sách, có dạng
+             * [
+             *    {
+             *        name: 'A1', ứng với một key của data
+             *        type: 'B1', Loại dữ liệu của cột này
+             *        title: 'C1', Tiêu đề hiển thị lên bảng
+             *    },
+             *    {
+             *        name: 'A2', ứng với một key của data
+             *        type: 'B2', Loại dữ liệu của cột này
+             *        title: 'C2', Tiêu đề hiển thị lên bảng
+             *    }
+             * ]
+             */
+            /**
+             * Dữ liệu để hiển thị trong bảng, có dạng
+             * [
+             *    {
+             *        A1: "vl1",
+             *        A2: 'V2',
+             *        A3: 'vl3',
+             *        ...
+             *    },
+             *    {
+             *        A1: "vl4",
+             *        A2: 'V5',
+             *        A3: 'vl6',
+             *        ...
+             *    },
+             * ]
+             */
+            data: [],
+            filteredColumns: {}, // tên các cột đã có filter, dạng {tên cột : true},
+            savedTableDisplayConfig: [], // cấu hình hiển thị của table đã được lueu trong db
+            hotTableContextMenuItems: []
+        };
+    },
+    activated(){
+        // this.$refs.dataTable.hotInstance.render();
+        this.refreshList();
+    },
+    created() {
+        let thisCpn = this;
+        // this.$evtBus.$on("change-user-locale", locale => {
+        //     if (thisCpn.$refs.dataTable) {
+        //         thisCpn.$refs.dataTable.hotInstance.render();
+        //     }
+        // });
+        this.getData();
+        this.restoreTableDisplayConfig();
+    },
+    props: {
+        currentItemData: {
+            type: Object,
+            default() {
+                return {};
+            }
+        },
+        /**
+         * Prefix cho keypath trong file đa ngôn ngữ để hiển thị header của table
+         */
+        headerPrefixKeypath: {
+            type: String,
+            default: ""
+        },
+        getDataUrl: {
+            type: String,
+            default: ""
+        },
+        getDataFromFilterUrl: {
+            type: String,
+            default: ""
+        },
+        // Tiêu đề của trang: Danh sách văn bản, danh sách người dùng ...
+        pageTitle: {
+            type: String,
+            default: "Danh sách"
+        },
+        // Chiều cao của khung chứa danh sách
+        containerHeight: {
+            type: Number,
+            default: 200
+        },
+        /**
+         * * Các contextmenu cho các item trong list, có dạng:
+         * [
+         *      {
+         *          name: 'action1' // Tên của context menu để phân biệt với các context menu khác.
+         *          text: ' Action 1' // Text hiển thị lên .
+         *      }
+         * ]
+         * Khi một menu item được click,
+         * nó sẽ emit sự kiện tên là: context-selection-tên của menu item
+         */
+        tableContextMenu: {
+            default() {
+                return [];
+            }
+        },
+        /**
+         * Mặc định context menu chứa các options: remove, view, edit
+         */
+        useDefaultContext: {
+            type: Boolean,
+            default: true
+        },
+        // Chiều rộng của pannel bên phải
+        actionPanelWidth: {
+            type: Number,
+            default: 400
+        },
+        // Loại hiển thị cho actionPanel - một trong ba loại: modal, temporary, elastic, drag
+        actionPanelType: {
+            type: String,
+            default: "temporary"
+        },
+        // Các input khi edit hoặc thêm hoặc xem chi tiết một item trong danh sách
+        itemInputs: {
+            type: Object,
+            default() {
+                return {};
+            }
+        },
+        itemActionTitle: {
+            type: String,
+            default: ""
+        },
+        listItemName: {
+            type: String,
+            default: "item"
+        },
+        isCompactMode: {
+            type: Boolean,
+            default: false
+        },
+        /**
+         * Dùng Trong trường hợp mà gọi đến một API mà không thể thay đổi định dạng trả về của API đó  theo đúng với định dạng chung của ListItem 
+         * định dạng: 
+         * {
+         *     reformatData(res){} // Lấy ra các cột cần hiển thị
+         * }
+         **/
+        customAPIResult: {
+            type: Object,
+            default(){
+                return {}
+            }
+        },
+        /**
+         * Có sử dụng action panel để add, edit, clone hay ko. 
+         * Nếu có thì mở action panel( ở bên phải hoặc modal ...)
+         * Nếu không thì dev cần xử lý bằng cách: các action dẫn sang một page mới
+         */
+        useActionPanel: {
+            type: Boolean,
+            default: true
+        },
+
+        /**
+         * Chứa các thông tin chung cho các action trong context menu cần định nghĩa
+         * có dạng : {
+         *      "module": "",
+         *      "resource": "",
+         *      "scope": "",
+         * }
+         */
+        commonActionProps: {
+            type: Object,
+            default(){
+                return {}
+            }
+        }
+    },
+    mounted() {},
+    computed: {
+        currentItemDataClone() {
+            return util.cloneDeep(this.currentItemData);
+        },
+        actionTitle() {},
+        contentWidth() {
+            if (this.actionPanel && this.actionPanelType == "elastic") {
+                return "calc(100% - " + this.actionPanelWidth + "px)";
+            } else if (this.tableDisplayConfig.show) {
+                return "calc(100% - " + this.tableDisplayConfig.width + "px)";
+            } else {
+                return "100%";
+            }
+        },
+        tableHeight() {
+            let ref = this.$refs;
+            let tbHeight = this.containerHeight;
+            if (tbHeight <= 250) {
+                tbHeight = util.getComponentSize(this).h;
+            }
+            if (ref.topBar) {
+                tbHeight -=
+                    util.getComponentSize(ref.topBar).h +
+                    util.getComponentSize(ref.bottomBar).h + 14;
+            }
+            return tbHeight - 60;
+        },
+        /**
+         * Tạo cấu hình cho hiển thị header của table
+         */
+        colHeaders() {
+            let thisCpn = this;
+            let prefix = this.headerPrefixKeypath;
+            prefix =
+                prefix[prefix.length - 1] == "." || prefix == ""
+                    ? prefix
+                    : prefix + ".";
+            let colNames = [];
+            let colTitles = this.tableColumns.reduce((headers, item) => {
+                colNames.push(item.data);
+                headers.push(item.columnTitle);
+                return headers;
+          
+            }, []);
+          
+            return function(col) {
+                let colName = colNames[col];
+                let markFilter = "";
+                if (thisCpn.filteredColumns[colName]) {
+                    markFilter = "applied-filter";
+                }
+                let headerName = prefix ? thisCpn.$t(prefix + colTitles[col]) : colTitles[col];
+                return `<span>
+                            <span class="font-weight-medium">
+                                ${headerName}
+                            </span>
+                            <span class="float-right symper-filter-button">
+                                <i col-name="${colName}" onclick="tableDropdownClickHandle(this, event)" class="grey-hover mdi mdi-filter-variant symper-table-dropdown-button ${markFilter}"></i>
+                            </span>
+                        </span>`;
+                //.replace(/\n|\r\n/g,'')
+            };
+    
+        },
+        actionPanelWrapper() {
+            let mapType = {
+                modal: "v-dialog",
+                temporary: "v-navigation-drawer",
+                elastic: "v-navigation-drawer"
+            };
+            return mapType[this.actionPanelType]
+                ? mapType[this.actionPanelType]
+                : mapType["temporary"];
+        }
+    },
+    methods: {
+        relistContextmenu(){
+            let row = this.$refs.dataTable.hotInstance.getSourceDataAtRow(this.cellAboutSelecting.row);
+            let id = row.id;
+            let items = this.tableContextMenu;
+            if(!$.isArray(items)){
+                let objectType = this.commonActionProps.resource;
+                let parentId = this.commonActionProps.parentId ? this.commonActionProps.parentId : id;
+                items = actionHelper.filterAdmittedActions(items, objectType, parentId ,id);
+            }
+            this.hotTableContextMenuItems =  this.getItemContextMenu(items);
+        },
+        getItemContextMenu(rawItems) {
+            let thisCpn = this;
+            let contextMenu = {
+                callback: function(key, selection, clickEvent) {
+                    let col = selection[0].start.col;
+                    let row = selection[0].start.row;
+                    let rowData = thisCpn.data[row];
+                    let colName = Object.keys(rowData)[col];
+                    /**
+                     * Phát sự kiện khi có một hành động đối với một row, hoặc cell.
+                     * tham số thứ nhất: row ( index của row đang được chọn)
+                     * tham số thứ hai: colName ( Tên của cột (key trong một row) )
+                     */
+                    thisCpn.$emit("context-selection-" + key, row, colName);
+                    // Datnt
+                    // Callback for context menu item
+                    let menuItem = rawItems.filter(menu => {
+                        return menu.name == key;
+                    });
+                    thisCpn.selectedContextItem = menuItem;
+                    if (
+                        menuItem.length &&
+                        menuItem[0].hasOwnProperty("callback")
+                    ) {
+                        if(key == 'remove' || key == 'delete'){
+                            thisCpn.deleteItems = [];
+                            let deletedIndexs = {};
+                            for(let item of selection ){
+                                for(let idx = item.start.row ; idx <= item.end.row; idx++){
+                                    if(!deletedIndexs[idx]){
+                                        thisCpn.deleteItems.push(thisCpn.data[idx]);
+                                        deletedIndexs[idx] = true;
+                                    }
+                                }
+                            }
+                            thisCpn.deleteDialogShow = true;
+                        }else{
+                            thisCpn.exeCallbackOnContextMenu(rowData);
+                        }
+                    }
+                    
+                    if (key == "edit" || key == "view") {
+                        thisCpn.actionPanel = true;
+                    }
+                },
+                items: {}
+            };
+            if (this.useDefaultContext) {
+                contextMenu.items = {
+                    remove: {
+                        name: "Xóa"
+                    },
+                    edit: {
+                        name: "Sửa"
+                    },
+                    view: {
+                        name: "Chi tiết"
+                    }
+                };
+            }
+            for (let item of rawItems) {
+                contextMenu.items[item.name] = {
+                    name: item.text
+                };
+            }
+            return contextMenu;
+        },
+        searchAutocompleteItems(vl){
+            this.tableFilter.currentColumn.colFilter.searchKey = vl;
+            this.getItemForValueFilter();
+        },
+        confirmDeleteItems(){
+            this.deleteDialogShow = false;
+            this.exeCallbackOnContextMenu(this.deleteItems);
+            setTimeout((self) => {
+                self.deleteItems = [];
+            }, 200, this);
+        },
+        exeCallbackOnContextMenu(rowData){
+            let thisCpn = this;
+            let menuItem = this.selectedContextItem;
+            menuItem[0].callback(util.cloneDeep(rowData), () => {
+                thisCpn.getData();
+            });
+        },
+        // Datnt render image/icon, custom status, date
+        imgRenderer (instance, td, row, col, prop, value, cellProperties) {
+            let escaped = Handsontable.helper.stringify(value), img;
+            if (escaped.indexOf('mdi-') < 0) {
+                img = document.createElement('IMG');
+                img.src = value;
+                img.width = 40;
+            }
+            else {
+                img = document.createElement('I');
+                img.classList.add('v-icon');
+                img.classList.add('mdi');
+                img.classList.add('theme--light');
+                img.classList.add('title');
+                img.classList.add(escaped);
+                img.style.lineHeight = "15px";
+            }
+            Handsontable.dom.addEvent(img, 'mousedown', function (e){
+                e.preventDefault(); // prevent selection quirk
+            });
+            Handsontable.dom.empty(td);
+            td.appendChild(img);
+            return td;
+        },
+        statusRenderer (instance, td, row, col, prop, value, cellProperties) {
+            let escaped = Handsontable.helper.stringify(value), icon;
+            icon = document.createElement('I');
+            icon.classList.add('v-icon');
+            icon.classList.add('mdi');
+            icon.classList.add('theme--light');
+            icon.classList.add('subtitle-1');
+            icon.style.lineHeight = "15px";
+            if (escaped == 'true' || escaped == '1') {
+                icon.classList.add('mdi-check');
+                icon.classList.add('success--text');
+            }
+            else {
+                icon.classList.add('mdi-delete');
+            }
+            Handsontable.dom.addEvent(icon, 'mousedown', function (e){
+                e.preventDefault(); // prevent selection quirk
+            });
+            Handsontable.dom.empty(td);
+            td.appendChild(icon);
+            return td;
+        },
+        dateRenderer (instance, td, row, col, prop, value, cellProperties) {
+            let format = "";
+            for (const col of this.tableColumns) {
+                if (col.data == prop) {
+                    format = col.dateFormat != undefined ? col.dateFormat : "";
+                    break;
+                }
+            }
+            if (!!format) {
+                value = this.$moment(value).format(format)
+            }
+            let span = document.createElement('SPAN');
+            span.innerHTML = value;
+            span.style.color = 'blue';
+            Handsontable.dom.empty(td);
+            td.appendChild(span);
+            return td;
+        },
+        bindToSearchkey(vl) {
+            this.searchKey = vl;
+            if(this.debounceGetData){
+                clearTimeout(this.debounceGetData);
+            }
+            this.debounceGetData = setTimeout((self) => {
+                self.getData();
+            }, 300, this);
+        },
+        handleCloseDragPanel() {
+            this.actionPanel = false;
+        },
+        /**
+         * Lưu lại cấu hình hiển thị của table
+         */
+        saveTableDisplayConfig() {
+            this.savingConfigs = true;
+            let thisCpn = this;
+            let configs = {
+                wrapTextMode: this.tableDisplayConfig.wrapTextMode,
+                densityMode: this.tableDisplayConfig.densityMode,
+                columns: []
+            };
+            
+            for (let col of this.tableColumns) {
+                
+                configs.columns.push({
+                    data: col.data,
+                    symperFixed: col.symperFixed,
+                    symperHide: col.symperHide
+                });
+            }
+            configs = JSON.stringify(configs);
+            userApi
+                .saveUserViewConfig("showList", this.$route.name, configs)
+                .then(() => {
+                    thisCpn.savingConfigs = false;
+                    thisCpn.$snotify({
+                        type: "success",
+                        title: thisCpn.$t("table.success.save_config")
+                    });
+                })
+                .catch(err => {
+                    console.warn(err, "error when save config");
+                    thisCpn.$snotify({
+                        type: "error",
+                        title: thisCpn.$t("table.error.save_config")
+                    });
+                });
+        },
+        /**
+         * Khôi phục lại cấu hình của hiển thị của table từ dữ liệu được lưu
+         */
+        restoreTableDisplayConfig() {
+            // userApi.getUserViewConfig(this.$route.name, 'showList').then(()=>{
+            //     this.tableDisplayConfig.wrapTextMode =  savedConfigs.wrapTextMode;
+            //     this.tableDisplayConfig.densityMode =  savedConfigs.densityMode;
+            //     this.savedTableDisplayConfig = savedConfigs.columns;
+            //     if(this.tableColumns.length > 0){
+            //         this.tableColumns = this.getTableColumns(this.tableColumns, true);
+            //         this.handleStopDragColumn();
+            //     }
+            // }).catch((err) => {
+            //     console.warn(err, 'error when get user view config');
+            //     thisCpn.$snotify({
+            //         type: 'error',
+            //         'title': thisCpn.$t('table.error.get_config'),
+            //     });
+            // });
+        },
+        /**
+         * Kiểm tra xem một cột trong table có đang áp dụng filter hay ko
+         */
+        checkColumnHasFilter(colName, filter = false) {
+            if (!filter) {
+                filter = this.tableFilter.allColumn[colName];
+            }
+            if (!filter) {
+                return false;
+            } else {
+                if (
+                    filter.sort == "" &&
+                    $.isEmptyObject(filter.valuesIn) &&
+                    $.isEmptyObject(filter.valuesNotIn) &&
+                    filter.conditionFilter.items[0].type == "none" &&
+                    filter.searchKey == ''
+                ) {
+                    return false;
+                } else {
+                    return true;
+                }
+            }
+        },
+        /**
+         * Thực hiện filter khi người dùng click vào nút apply của filter
+         */
+        applyFilter(filter, source = "filter") {
+            let colName = this.tableFilter.currentColumn.name;
+            this.$set(this.tableFilter.allColumn, colName, filter);
+            let hasFilter = this.checkColumnHasFilter(colName, filter);
+            this.filteredColumns[colName] = hasFilter;
+            let icon = $(this.$el).find(
+                ".symper-table-dropdown-button[col-name=" + colName + "]"
+            );
+            this.getData(false,false,true);
+            if(hasFilter && source != "clear-filter"){
+                icon.addClass("applied-filter");
+            }else{
+                this.$delete(this.tableFilter.allColumn, colName);
+                icon.removeClass("applied-filter");
+            }
+        },
+        /**
+         * Lấy data từ server
+         * @param {Array} columns chứa thông tin của các cột cần trả về.
+         * @param {Boolean} cache có ưu tiên dữ liệu từ cache hay ko
+         *
+         */
+        getData(columns = false, cache = false, applyFilter = true) {
+            let thisCpn = this;
+            let handler = (data) => {
+                if(thisCpn.customAPIResult.reformatData){
+                    data = thisCpn.customAPIResult.reformatData(data);
+                }else{
+                    data = data.data;
+                }
+                this.totalObject = data.total ? parseInt(data.total) : 0;
+                thisCpn.loadingData = false;
+                
+                thisCpn.tableColumns = thisCpn.getTableColumns(
+                    data.columns
+                );
+                thisCpn.data = data.listObject ? data.listObject : [];
+                thisCpn.handleStopDragColumn();
+                thisCpn.$emit('data-get', data.listObject);
+            }
+            this.prepareFilterAndCallApi(columns , cache , applyFilter, handler);
+        },
+        /**
+         * Lấy ra cấu hình cho việc sort
+         */
+        prepareFilterAndCallApi(columns = false, cache = false, applyFilter = false, success, configs = {}){
+            let url = this.getDataUrl;
+            let method = 'GET';
+            if (url != "") {
+                let thisCpn = this;
+                thisCpn.loadingData = true;
+                let options = {
+                    filter: this.getFilterConfigs(configs.getDataMode),
+                    sort: this.getSortConfigs(),
+                    search: this.searchKey,
+                    page: this.page,
+                    pageSize: configs.pageSize ? configs.pageSize : this.pageSize,
+                    columns: columns ? columns : [],
+                    distinct: configs.distinct ? configs.distinct : false
+                };
+                let header = {};
+                if(thisCpn.$route.name == "deployHistory" || thisCpn.$route.name == "listProcessInstances"){
+                    header = {
+                        Authorization: 'Basic cmVzdC1hZG1pbjp0ZXN0'
+                    };
+                    options = {};
+                }
+                apiObj
+                    .callApi(method, url, options, header, {})
+                    .then(data => {
+                        success(data);
+                    })
+                    .catch(err => {
+                        console.warn(err);
+                        thisCpn.$snotify({
+                            type: "error",
+                            title: thisCpn.$t("table.error.cannot_get_data"),
+                            text: ""
+                        });
+                    });
+            }
+        },
+        getSortConfigs() {
+            let columnMap = this.tableColumns.reduce((map, item) => {
+                map[item.data] = item;
+                return map;
+            }, {});
+            let sort = [];
+            for (let colName in this.tableFilter.allColumn) {
+                let filter = this.tableFilter.allColumn[colName];
+                if (filter.sort != "") {
+                    sort.push({
+                        column: columnMap[colName].data,
+                        type: filter.sort
+                    });
+                }
+            }
+            return sort;
+        },
+        /**
+         * Chuyển đổi cấu hình filter của component này sang dạng api hiểu được
+         */
+        getFilterConfigs(getDataMode = '') {
+            let configs = [];
+            for (let colName in this.tableFilter.allColumn) {
+                let filter = this.tableFilter.allColumn[colName];
+                let condition = filter.conditionFilter;
+                let option = {
+                    column: colName, // tên cột cần filter
+                    operation: condition.conjunction,
+                };
+                if(getDataMode == 'autocomplete' && colName == this.tableFilter.currentColumn.name){
+                    option.conditions = [
+                        {
+                            name: 'contains',
+                            value: this.tableFilter.currentColumn.colFilter.searchKey ? this.tableFilter.currentColumn.colFilter.searchKey : ''
+                        }
+                    ];
+                    configs.push(option);
+                    continue;
+                }
+                if (condition.items[0].type != "none") {
+                    option.conditions = [
+                        {
+                            name: condition.items[0].type,
+                            value: condition.items[0].value
+                        }
+                    ];
+                    if (condition.items[1].type != "none") {
+                        option.conditions.push({
+                            name: condition.items[1].type,
+                            value: condition.items[1].value
+                        });
+                    }
+                }
+                if(filter.searchKey != '' && filter.clickedSelectAll){
+                    option.conditions = [
+                        {
+                            name: 'contains',
+                            value: filter.searchKey
+                        }
+                    ];
+                }
+                if(filter.selectAll && !$.isEmptyObject(filter.valuesNotIn)){
+                    option.valueFilter = {
+                        'operation': ' NOT IN ',
+                        'values': Object.keys(filter.valuesNotIn)
+                    };
+                }else if(!filter.selectAll && !$.isEmptyObject(filter.valuesIn)){
+                    option.valueFilter = {
+                        'operation': ' IN ',
+                        'values': Object.keys(filter.valuesIn)
+                    };
+                }
+                if(!$.isEmptyObject(option)){
+                    configs.push(option);
+                }
+            }
+            return configs;
+        },
+        /**
+         * Xử lý việc sau khi kết thúc kéo thả các cột ở thanh cấu hình hiển thị danh sách
+         */
+        handleStopDragColumn(tbCols) {
+            this.tableDisplayConfig.drag = false;
+            if(tbCols){
+                this.tableColumns = tbCols;
+            }
+            this.resetHiddenColumns();
+            this.reOrderFixedCols();
+            this.$refs.tableDisplayConfig.resetTableColumnsData();
+        },
+        resetHiddenColumns() {
+            let hiddenColumns = {};
+            this.tableColumns.forEach((col, idx) => {
+                if (col.symperHide) {
+                    hiddenColumns[idx] = true;
+                }
+            });
+            hiddenColumns = Object.keys(hiddenColumns).reduce((newArr, el) => {
+                newArr.push(Number(el));
+                return newArr;
+            }, []);
+            this.$set(this.tableDisplayConfig, "hiddenColumns", hiddenColumns);
+        },
+        /**
+         * Lấy cấu hình các cột của table
+         * @param {array} columns mảng các cột ban đầu
+         * @param {Boolean} forcedReOrder có phải bắt buộc sắp xếp lại thứ tự các cột hay ko
+         */
+        getTableColumns(columns, forcedReOrder = false) {
+            let savedOrderCols = this.savedTableDisplayConfig;
+            let colMap = {};
+            if (forcedReOrder) {
+                for (let item of columns) {
+                    colMap[item.data] = item;
+                }
+            } else {
+                for (let item of columns) {
+                    
+                    colMap[item.name] = {
+                        data: item.name,
+                        type: item.type, // lưu ý khi loại dữ liệu của cột là number (cần format) và dạng html
+                        editor: false,
+                        symperFixed: false,
+                        symperHide: false,
+                        columnTitle: item.title,
+                    };
+                    // Render image - icon
+                    if (item.type === 'image') {
+                        colMap[item.name].type = 'handsontable';
+                        colMap[item.name].renderer = this.imgRenderer;
+                    } else if (item.type === 'status') {
+                        colMap[item.name].type = 'handsontable';
+                        colMap[item.name].renderer = this.statusRenderer;
+                    } else if (item.type === 'checkbox') {
+                        colMap[item.name].checkedTemplate = item.checkedValue != undefined ? item.checkedValue : 1;
+                        colMap[item.name].uncheckedTemplate = item.uncheckedValue != undefined ? item.uncheckedValue : 0;
+                    } else if(item.type === 'numeric' && item.hasFormat != undefined) {
+                        colMap[item.name].numericFormat = {
+                            pattern: item.pattern != undefined && !!item.pattern ? item.pattern : "0,0"
+                        };
+                    } else if((item.type.indexOf('date') === 0)) {
+                        if (item.hasFormat != undefined) {
+                            colMap[item.name].dateFormat = item.pattern != undefined && !!item.pattern ? item.pattern : "MM/DD/YYYY";
+                            colMap[item.name].correctFormat = true;
+                        }
+                        colMap[item.name].renderer = this.dateRenderer;
+                    }
+                    
+                    if(item.renderer){
+                        colMap[item.name].renderer = item.renderer;
+                    }
+                }
+            }
+            if (savedOrderCols.length > 0) {
+                let orderedCols = [];
+                let noneOrderedCols = [];
+                for (let col of savedOrderCols) {
+                    if (colMap[col.data]) {
+                        colMap[col.data].symperFixed = col.symperFixed;
+                        colMap[col.data].symperHide = col.symperHide;
+                        orderedCols.push(colMap[col.data]);
+                    } else {
+                        noneOrderedCols.push(colMap[col.data]);
+                    }
+                }
+                return orderedCols.concat(noneOrderedCols);
+            } else {
+                return Object.values(colMap);
+            }
+        },
+        configColumnDisplay(type, idx) {
+            
+            let column = this.tableColumns[idx];
+            column[type] = !column[type];
+            let isValue = column[type];
+            if (type == "symperHide") {
+                this.resetHiddenColumns();
+            } else {
+                this.reOrderFixedCols();
+            }
+        },
+        reOrderFixedCols() {
+            let fixedCols = [];
+            let noneFixedCols = [];
+            for (let col of this.tableColumns) {
+                if (col.symperFixed) {
+                    fixedCols.push(col);
+                } else {
+                    noneFixedCols.push(col);
+                }
+            }
+            if (fixedCols.length > 0) {
+                this.tableColumns = fixedCols.concat(noneFixedCols);
+            }
+            this.fixedColumnsCount = fixedCols.length;
+            setTimeout(
+                thisCpn => {
+                    thisCpn.savedTableDisplayConfig = thisCpn.tableColumns;
+                },
+                1000,
+                this
+            );
+        },
+        openTableDisplayConfigPanel() {
+            this.tableDisplayConfig.show = !this.tableDisplayConfig.show;
+        },
+        showTableDropdownMenu(x, y, colName) {
+            let filterDom = $(this.$refs.tableFilter.$el);
+            filterDom.css("left", x + "px").css("top", y + 10 + "px");
+            this.$refs.dataTable.hotInstance.deselectCell();
+            this.$refs.tableFilter.show();
+            let colFilter = this.tableFilter.allColumn[colName];
+            if (!colFilter) {
+                colFilter = getDefaultFilterConfig();
+                this.$set(this.tableFilter.allColumn, colName, colFilter);
+            }
+            for (let col of this.tableColumns) {
+                if (col.data == colName) {
+                    colFilter.dataType = col.type;
+                    break;
+                }
+            }
+            this.$set(this.tableFilter, "currentColumn", {
+                name: colName,
+                colFilter: colFilter
+            });
+            this.setSelectItemForFilter();
+            $("#symper-platform-app").append(filterDom[0]);
+            this.getItemForValueFilter();
+        },
+        /**
+         * Lấy các item phục vụ cho việc lựa chọn trong autocomplete cuar filter
+         */
+        getItemForValueFilter(){
+            let columns = [this.tableFilter.currentColumn.name];
+            let self = this;
+            let options = {
+                pageSize: 300,
+                getDataMode: 'autocomplete',
+                distinct: true
+            };
+            let success = (data) => {
+                if(data.status == 200){
+                    self.tableFilter.currentColumn.colFilter.selectItems = null;
+                   // 
+                    let items = data.data.listObject.reduce((arr, el) => {
+                        arr.push(el[columns[0]]);
+                        return arr;
+                    }, []);
+                    self.tableFilter.currentColumn.colFilter.selectItems = self.createSelectableItems(items);
+                }
+                console.log(self.tableFilter.currentColumn.selectItems, 'datadatadatadatadata');
+            }
+            this.prepareFilterAndCallApi(columns , false, true, success, options);
+        },
+        /**
+         * Lấy danh sách các giá trị cần đưa vào danh sách lựa chọn autocomplete từ server nếu chưa có danh sách này
+         */
+        async setSelectItemForFilter(){
+            let colFilter = this.tableFilter.currentColumn.colFilter;
+            if(colFilter.selectItems.length == 0){
+                let textItems = testSelectData;
+                colFilter.selectItems = this.createSelectableItems(textItems);
+            }
+        },
+        /**
+         * Tạo ra các item có check box với trạng thái đã check hay chưa 
+         * @param items danh sách các value dạng ['ccc','xxc', ....]
+         */
+        createSelectableItems(items){
+            let colFilter = this.tableFilter.currentColumn.colFilter;
+            let selectableItems = [];
+            if(colFilter.clickedSelectAll){ // chọn tất cả
+                selectableItems = items.reduce((arr, el) => {
+                    arr.push({
+                        value: el,
+                        checked: true
+                    });
+                    return arr;
+                }, []);
+            }else if(colFilter.selectAll){ // not in
+                selectableItems = items.reduce((arr, el) => {
+                    arr.push({
+                        value: el,
+                        checked: colFilter.valuesNotIn[el] ? false : true
+                    });
+                    return arr;
+                }, []);
+            }else{ // in
+                selectableItems = items.reduce((arr, el) => {
+                    arr.push({
+                        value: el,
+                        checked: colFilter.valuesIn[el] ? true : false
+                    });
+                    return arr;
+                }, []);
+            }  
+            return selectableItems;
+        },
+        saveDataAction() {
+            this.closeactionPanel();
+            this.$emit("save-item", {});
+        },
+        closeactionPanel() {
+            this.actionPanel = false;
+        },
+        openactionPanel() {
+            this.actionPanel = true;
+        },
+        addItem() {
+            if(this.useActionPanel){
+                this.actionPanel = true;
+                // Phát sự kiện khi click vào nút thêm mới
+                this.$emit("after-open-add-panel", {});
+            }
+            this.$emit('on-add-item-clicked', {});
+        },
+        removeItem() {
+            // Phát sự kiện khi xóa danh sách các item trong list
+            this.$emit("remove-item", []);
+        },
+        refreshList() {
+            // Phát sự kiện khi click vào refresh dữ liệu
+            this.getData();
+            this.$emit("refresh-list", {});
+        },
+        filterList() {
+            // Phát sự kiện khi có filter danh sách
+            this.$emit("filter-list", {});
+        },
+        searchAll() {
+            // Phát sự kiện khi người dùng gõ vào ô tìm kiếm
+            this.$emit("search-all", {});
+        },
+        changePageSize(vl) {
+            this.pageSize = vl.pageSize
+            this.getData();
+            // Phát sự kiện khi người dùng thay đổi số bản ghi ở mỗi page
+            this.$emit("change-page-size", vl.pageSize);
+        },
+        changePage(vl){
+            this.page = vl.page
+            this.getData();
+            this.$emit("change-page", vl.page);
+        },
+        nextPage(){
+            this.page += 1
+            this.getData();
+            this.$emit("change-page", this.page);
+        },
+        prevPage(){
+            if(this.page == 1){
+                return;
+            }
+            this.page -= 1
+            this.getData();
+            this.$emit("change-page", this.page);
+        }
+    },
+    components: {
+        HotTable,
+        "form-tpl": FormTpl,
+        VDialog,
+        VNavigationDrawer,
+        TableFilter,
+        Pagination,
+        "symper-drag-panel": SymperDragPanel,
+        "display-config": DisplayConfig
+    }
+};
+</script>
+
+<style>
+.ht_clone_top.handsontable {
+    z-index: 6;
+}
+.handsontable .wtBorder.current {
+    z-index: 5;
+}
+.symper-custom-table.clip-text .ht_master.handsontable .htCore td,
+.symper-custom-table.clip-text .ht_clone_left.handsontable .htCore td {
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+}
+.symper-custom-table.loosen-row .ht_master.handsontable .htCore td,
+.symper-custom-table.loosen-row .ht_clone_left.handsontable .htCore td {
+    height: 40px !important;
+    line-height: 40px !important;
+}
+.symper-custom-table.medium-row .ht_master.handsontable .htCore td,
+.symper-custom-table.medium-row .ht_clone_left.handsontable .htCore td {
+    height: 30px !important;
+    line-height: 30px !important;
+}
+.symper-custom-table.compact-row .ht_master.handsontable .htCore td,
+.symper-custom-table.compact-row .ht_clone_left.handsontable .htCore td {
+    height: 20px !important;
+    line-height: 20px !important;
+    font-size: 12px !important;
+}
+.ghost {
+    opacity: 0.5;
+    background: #c8ebfb;
+}
+.flip-list-move {
+    transition: transform 0.5s;
+}
+.no-move {
+    transition: transform 0s;
+}
+.column-drag-pos {
+    cursor: move;
+    border-bottom: 1px solid #d0d0d0;
+    background-color: white;
+    padding-left: 8px;
+}
+.list-group {
+    border: 1px solid #d0d0d0;
+    border-radius: 3px;
+}
+i.applied-filter {
+    color: #f58634;
+    background-color: #ffdfc8;
+}
+.symper-list-item .ht_clone_left.handsontable table.htCore {
+    border-right: 4px solid #f0f0f0;
+}
+.handsontable td,
+.handsontable th {
+    color: #212529 !important;
+    border-color: #bbb;
+    border-right: 0;
+}
+</style>
+>>>>>>> f8914a2da8acfb95d1b9ec60d4a6ab57f1eaf2c1

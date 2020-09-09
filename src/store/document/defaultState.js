@@ -75,7 +75,9 @@ const defaultState = {
                     }
                 }
             },
-            orgchartTableSqlName: {}
+            orgchartTableSqlName: {},
+            tableLoaded: {},
+            readyLoaded: false
         }
     },
     detail: {

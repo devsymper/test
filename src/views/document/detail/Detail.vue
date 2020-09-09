@@ -19,7 +19,7 @@
                 <v-tooltip bottom>
                     
                      <template v-slot:activator="{ on }">
-                        <v-icon  @click="printDiv" v-on="on">mdi-printer</v-icon>
+                        <v-icon  @click="handleClickPrint" v-on="on">mdi-printer</v-icon>
                     </template>
                     <span>{{$t('document.detail.fab.print')}}</span>
                 </v-tooltip>
@@ -29,7 +29,9 @@
             class="sym-form-Detail"
             :id="'sym-Detail-'+keyInstance"
             :style="{'width':documentSize, 'height':'100%','margin':contentMargin}">
-            <div v-html="contentDocument"></div>
+            <div class="content-document" v-html="contentDocument"></div>
+            
+            <div class="content-print-document" v-html="contentPrintDocument"></div>
             
             
             
@@ -60,10 +62,12 @@ import  TableControl from "./../submit/tableControl.js"
 import  ActionControl from "./../submit/actionControl.js"
 import LayoutControl from "./../submit/layoutControl";
 import  Table from "./../submit/table.js"
+import  TablePrint from "./../print/PrintTable"
 import './../submit/customControl.css'
 import { getSDocumentSubmitStore } from './../common/common'
 import SideBarDetail from './SideBarDetail'
 import HistoryControl from './HistoryControl'
+import { util } from '../../../plugins/util.js';
 
 export default {
     props: {
@@ -105,7 +109,9 @@ export default {
     data() {
         return {
             contentDocument: null,
+            contentPrintDocument:null,
             docObjId: null,
+            documentId:null,
             documentSize: null,
             keyInstance: Date.now(),
             contentMargin:'auto',
@@ -215,11 +221,18 @@ export default {
             this.contentMargin = margin;
         },
         // Khadm: load data của document lên để hiển thị và xử lý
-        loadDocumentStruct(documentId) {
-            this.contentDocument = ""
+        loadDocumentStruct(documentId,isPrint = false) {
+            if(isPrint && this.contentPrintDocument != null){
+                $('.content-print-document').removeClass('d-none');
+                $('.content-document').addClass('d-none');
+                return
+            }
+            if(this.$route.name == 'printDocument'){
+                isPrint = true;
+            }
             let thisCpn = this;
             let dataPost = {};
-            if(thisCpn.$route.name == 'printDocument'){
+            if(isPrint){
                 dataPost = {formType:'print'};
             }
             documentApi
@@ -227,11 +240,20 @@ export default {
                 .then(res => {
                     if (res.status == 200) {
                         let content = res.data.document.content;
-                        thisCpn.contentDocument = content;
+                        if(!isPrint){
+                            $('.content-print-document').addClass('d-none');
+                            $('.content-document').removeClass('d-none');
+                            thisCpn.contentDocument = content;
+                        }
+                        else{
+                            $('.content-print-document').removeClass('d-none');
+                            $('.content-document').addClass('d-none');
+                            thisCpn.contentPrintDocument = content;
+                        }
                         thisCpn.$emit('after-load-document',res.data.document)
                         setDataForPropsControl(res.data.fields, thisCpn.keyInstance,'detail'); // ddang chay bat dong bo
                         setTimeout(() => {
-                            thisCpn.processHtml(content);
+                            thisCpn.processHtml(content,isPrint);
                         }, 100);
                     }
                     else{
@@ -249,31 +271,30 @@ export default {
                 })
                 .always(() => {});
         },
-        loadDocumentObject() {
+        async loadDocumentObject(isPrint=false) {
             let thisCpn = this;
-            documentApi
-                .detailDocumentObject(this.docObjId)
-                .then(res => {
-                    if (res.status == 200) {
-                        thisCpn.userId = res.data.document_object_user_created_id;
-                        thisCpn.taskId = res.data.document_object_task_id;
-                        thisCpn.createTime = res.data.document_object_create_time
-                        thisCpn.workflowId = res.data.document_object_workflow_id;
-                        thisCpn.$store.commit('document/addToDocumentDetailStore',{
-                            key: 'allData',
-                            value: res.data,
-                            instance:thisCpn.keyInstance
-                        }) 
-                        thisCpn.loadDocumentStruct(res.data.documentId);
-                    }
-                })
-                .catch(err => {
+            let res = await documentApi
+                .detailDocumentObject(this.docObjId);
+            if (res.status == 200) {
+                thisCpn.userId = res.data.document_object_user_created_id;
+                thisCpn.taskId = res.data.document_object_task_id;
+                thisCpn.createTime = res.data.document_object_create_time
+                thisCpn.workflowId = res.data.document_object_workflow_id;
+                thisCpn.documentId = res.data.documentId;
+                thisCpn.$store.commit('document/addToDocumentDetailStore',{
+                    key: 'allData',
+                    value: res.data,
+                    instance:thisCpn.keyInstance
+                }) 
+                thisCpn.loadDocumentStruct(res.data.documentId,isPrint);
+            }
+            else{
                     this.$snotify({
-                                type: "error",
-                                title: "Can not load document object",
-                            });
-                })
-                .always(() => {});
+                        type: "error",
+                        title: "Can not load document object",
+                    });
+            }
+                
         },
         togglePageSize() {
             this.contentMargin = this.documentSize == "21cm" ? "" : "auto";
@@ -309,7 +330,7 @@ export default {
                             { name: name, control: control ,instance: this.keyInstance}
                         );
         },
-        processHtml(content) {
+        processHtml(content,isPrint = false) {
             var allInputControl = $("#sym-Detail-" + this.keyInstance).find(
                 ".s-control:not(.bkerp-input-table .s-control)"
             );
@@ -363,14 +384,20 @@ export default {
                         //truong hop la control table
                         else {
                             let listInsideControls = {};
+                            let mapControlToIndex = {};
                             let tableControl = new TableControl(
                                 idField,
                                 $(allInputControl[index]),
                                 this.sDocumentEditor.allControl[id],
                                 thisCpn.keyInstance
                             );
-                            tableControl.initTableControl();
+                            tableControl.initTableControl(isPrint);
                             tableControl.tableInstance = new Table(
+                                tableControl,
+                                controlName,
+                                thisCpn.keyInstance
+                            );
+                            tableControl.tablePrint = new TablePrint(
                                 tableControl,
                                 controlName,
                                 thisCpn.keyInstance
@@ -391,10 +418,14 @@ export default {
                                 childControl.inTable = controlName;
                                
                                 let childControlName = childControlProp.properties.name.value;
+                                let colIndex = thisCpn.getColIndexControl($(this));
+                                mapControlToIndex[childControlName] = colIndex
+
                                 thisCpn.addToListInputInDocument(childControlName,childControl)
                                 listInsideControls[childControlName] = true;
                             });
                             tableControl.listInsideControls = listInsideControls;
+                            tableControl.mapControlToIndex = mapControlToIndex;
                             this.addToListInputInDocument(controlName,tableControl)
                             tableControl.renderTable();
                             tableControl.setData(valueInput);
@@ -406,28 +437,45 @@ export default {
             console.log(this.sDocumentSubmit);
             setTimeout(() => {
                 if(thisCpn.$route.name == 'printDocument'){
-                    thisCpn.printDiv();
+                    thisCpn.printContent(true);
                 }
             }, 1000);
         },
+
+        getColIndexControl(controlEl){
+            let td = controlEl.closest('td');
+            let tr = controlEl.closest('tr').css('position','relative');
+            let tdIndex = td.index();
+            return tdIndex;
+        },
+        async handleClickPrint(){
+            await this.loadDocumentObject(true);
+            setTimeout((self) => {
+                self.printContent();
+            }, 500,this);
+        },
         
-        printDiv(){
-            this.quickView = true;
+        printContent(fromContext = false){
             $('.sym-form-Detail').addClass('w-auto');
             $('main').addClass('p-0');
-            $('.app-header-bg-color').addClass('d-none')
-            $('.s-drawer').addClass('d-none')
-            $('.v-navigation-drawer').addClass('d-none')
-			setTimeout(() => {
+            $('.panel-header').addClass('d-none');
+            $('.app-header-bg-color').addClass('d-none');
+            $('.s-drawer').addClass('d-none');
+            $('.v-navigation-drawer').addClass('d-none');
+			setTimeout((self) => {
                 window.print();
-                this.quickView = false;
+                $('.panel-header').removeClass('d-none');
                 $('.sym-form-Detail').removeClass('w-auto');
                 $('main').removeClass('p-0');
-                
-                $('.app-header-bg-color').removeClass('d-none')
-                $('.s-drawer').removeClass('d-none')
-                $('.v-navigation-drawer').removeClass('d-none')
-            }, 100);
+                $('.app-header-bg-color').removeClass('d-none');
+                $('.s-drawer').removeClass('d-none');
+                $('.v-navigation-drawer').removeClass('d-none');
+                $('.content-print-document').addClass('d-none');
+                $('.content-document').removeClass('d-none');
+                if(fromContext){
+                    self.$router.push('/documents/'+self.documentId+'/objects',"Danh sách bản ghi");
+                }
+            }, 300,this);
            
             
         },
@@ -449,9 +497,9 @@ export default {
     .sym-form-Detail >>> .on-selected {
         border: none !important; 
     }
-    .sym-form-Detail >>> table:not(.htCore) td,
-    .sym-form-Detail >>> table:not(.htCore),
-    .sym-form-Detail >>> table:not(.htCore) th {
+    .sym-form-Detail >>> table:not(.htCore):not(.table-print) td,
+    .sym-form-Detail >>> table:not(.htCore):not(.table-print),
+    .sym-form-Detail >>> table:not(.htCore):not(.table-print) th {
         border: none !important;
     }
     .sym-form-Detail >>> .htCore td:last-child {
@@ -502,9 +550,7 @@ export default {
         position: absolute;
     }
     
-    /* .sym-form-Detail table:not(.htCore) td, .sym-form-Detail table:not(.htCore), .sym-form-Detail table:not(.htCore) th{
-        border: none !important;
-    } */
+
     .panel-header{
         height: 30px;
         display: flex;
@@ -528,4 +574,5 @@ export default {
         margin-right: 12px;
         transition: all ease-in-out 250ms;
     }
+   
 </style>

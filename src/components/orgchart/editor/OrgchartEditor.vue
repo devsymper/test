@@ -347,7 +347,7 @@ export default {
                             name: node.name,
                             description: node.description,
                             code: node.code,
-                            users: JSON.parse(node.users)
+                            users: this.getListUserAsArr(node.users)
                         };
 
                         if(node.content && node.content !== 'false'){
@@ -370,13 +370,13 @@ export default {
                         let dpmInstanceKey = this.$store.state.orgchart.editor[this.instanceKey].allNode[dpmId].positionDiagramCells.instanceKey;
                         for(let idPosition in allPositionInADpm[dpmId]){
                             let position = allPositionInADpm[dpmId][idPosition];
-
+                            let userSelected = this.getListUserAsArr(position.users);
                             let nodeData = {
                                 id: position.vizId,
                                 name: position.name,
                                 description: position.description,
                                 code: position.code,
-                                users: position.users ? position.users : []
+                                users: userSelected
                             };
                             let newPosition = this.createNodeConfigData('position', nodeData, dpmInstanceKey);
                             newPosition.style = this.restoreNodeStyle(position.style);
@@ -396,6 +396,20 @@ export default {
                 this.$snotifyError(error, "Can not get orgchart data");
             }
         },
+        getListUserAsArr(users){
+            if(!users){
+                users = [];
+            }else{
+                if(typeof users == 'string'){
+                    try {
+                        users = JSON.parse(users);
+                    } catch (error) {
+                        users = [];
+                    }
+                }
+            }
+            return users;
+        },
         restoreNodeStyle(savedStyle){
             if(typeof savedStyle != 'object'){
                 savedStyle = JSON.parse(savedStyle);
@@ -410,18 +424,17 @@ export default {
         },
 
         addUsersToPosition(postions, users){
-            let mapPostitions = postions.reduce((map, el)=> {
-                map[el.id] = el;
-                return map;
-            } , {});
-            for(let u of users){
-                let pos = mapPostitions[u.positionNodeId];
-                if(!pos.users){
+            for(let pos of postions){
+                if(pos.users){
+                    pos.users = typeof pos.users == 'string' ? JSON.parse(pos.users) : pos.users;
+                    let map = {};
+                    for(let u of pos.users){
+                        map[u] = true;
+                    }
+                    pos.users = Object.keys(map);
+                }else{
                     pos.users = [];
-                }else if(typeof pos.users == 'string'){
-                    pos.users = JSON.parse(pos.users);
                 }
-                pos.users.push(u.userId);
             }
         },
         centerDiagram(){
@@ -687,12 +700,17 @@ export default {
                 if(cell.type == "org.Arrow"){
                     links.push(cell);
                 }else{
-                    nodeMap[cell.id] = this.getNodeDataToSave(cell.id, instanceKey, type);
+                    let node = this.$store.state.orgchart.editor[instanceKey].allNode[cell.id];
+                    if(node){
+                        nodeMap[cell.id] = this.getNodeDataToSave(cell.id, instanceKey, type);
+                    }
                 }
             }
 
             for(let link of links){
-                nodeMap[link.target.id].vizParentId = link.source.id;
+                if(nodeMap[link.target.id]){
+                    nodeMap[link.target.id].vizParentId = link.source.id;
+                }
             }
             return Object.values(nodeMap);
         },

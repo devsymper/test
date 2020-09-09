@@ -80,20 +80,6 @@ export default {
         this.paper.on('blank:pointerdown', paperScroller.startPanning);
         this.addToolbar(paperScroller);
 		this.$emit('init', this.graph, this.paper, paperScroller);
-		// add element
-		 var rect = new joint.shapes.standard.Rectangle();
-			rect.position(100, 30);
-			rect.resize(100, 40);
-			rect.attr({
-				body: {
-					fill: 'blue'
-				},
-				label: {
-					text: 'Hello',
-					fill: 'white'
-				}
-			});
-			rect.addTo(this.paper);
 		
     },
     methods: {

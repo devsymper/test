@@ -59,7 +59,6 @@
                 @keyup="(data) => {
                     handleKeyUpInputValue(inputInfo, name,data);
                 }"
-
                 :ref="'inputItem_'+name"
                 solo
                 :items="inputInfo.options"

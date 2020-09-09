@@ -10,9 +10,26 @@
                         {{action.text}}
                     </v-btn>
                 </span>
+                <!-- <input class="d-none" type="text" id="myInputLink" v-model="linkTask" > -->
+                <!-- <v-text-field class="d-none"  v-model="linkTask"></v-text-field> -->
+                <v-tooltip bottom>
+                    <template v-slot:activator="{ on }">
+                        <v-btn  
+                            v-clipboard:copy="linkTask"  
+                            v-clipboard:success="onCopySuccess" 
+                            v-on="on" text small>
+                                <v-icon  small>mdi-page-next-outline</v-icon>
+                        </v-btn>
+                    </template>
+                    <span>Sao chép đường dẫn</span>
+                </v-tooltip>
+
+                <button @click="getTaskTest">Click</button>
+
                 <v-btn small text  @click="closeDetail">
                     <v-icon small>mdi-close</v-icon>
                 </v-btn>
+
             </div>
         </v-row>
         <v-divider style="border-color: #ff7400;"></v-divider>
@@ -73,7 +90,8 @@ import BPMNEngine from '../../api/BPMNEngine';
 import { getVarsFromSubmitedDoc, getProcessInstanceVarsMap } from '../../components/process/processAction';
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import { documentApi } from '../../api/Document';
-
+import VueClipboard from 'vue-clipboard2';
+Vue.use(VueClipboard)
 export default {
     name: "taskDetail",
     props: {
@@ -106,7 +124,8 @@ export default {
             handler(valueAfter){
                 this.changeTaskDetail();
             }
-        }
+        },
+
     },
     components: {
         icon: icon,
@@ -120,6 +139,7 @@ export default {
                 instanceName: '',
                 taskName: ''
             },
+            descriptionTask:'',
             tabsData: {
                 people: {
                     assignee: [],
@@ -134,6 +154,7 @@ export default {
                 info: {},
                 'related-items': {}
             },
+            linkTask:'',
             taskActionBtns: [
                 {
                     text:"Submit",
@@ -141,7 +162,7 @@ export default {
                     color:"blue"
                 },
             ],
-            taskAction: 'submit',
+            taskAction: undefined,
             tab: null,
             items: [
                 { 
@@ -184,6 +205,9 @@ export default {
         }
     },
     computed: {
+        stask() {
+            return this.$store.state.task;
+        },
         usersMap(){
             return this.$store.state.app.allUsers.reduce((map, el) => {
                 map[el.id] = el;
@@ -195,7 +219,7 @@ export default {
             let allDef = this.$store.state.process.allDefinitions;
             if(this.breadcrumb.definitionName){
                 // bsr = `App name / ${this.breadcrumb.definitionName} / ${this.breadcrumb.instanceName} / ${bsr}`;
-                bsr = `./ ${this.breadcrumb.definitionName} / ${bsr}`;
+                bsr = `${this.breadcrumb.definitionName} / ${bsr}`;
             }else if(this.isInitInstance && !$.isEmptyObject(allDef)){
                 if(allDef[this.$route.params.id]){
                     bsr = `${allDef[this.$route.params.id].name} / Start workflow`;
@@ -207,12 +231,32 @@ export default {
         },
     },
     methods: {
+        getTaskTest(){
+            let taskId=this.taskInfo.action.parameter.taskId;
+            BPMNEngine.getATaskInfoV2(taskId).then((res) => {
+                console.log("task123",res);
+            });
+        },
+        onCopySuccess(){
+           this.$snotify({
+                type: 'success',
+                title: "Copy to clipboard",
+                text: "Copy success"
+                });
+        },
         changeTaskDetailInfo(taskId){
+            let hostname=window.location.hostname;
+            let copyText = this.taskInfo.action.parameter.taskId;
+            copyText='https://'+hostname+'/#/tasks/'+copyText;
+            this.linkTask=copyText;
+
             if(!taskId){
                 return;
             }
             let self = this;
-            BPMNEngine.getATaskInfo(taskId).then((res) => {
+            let filter = this.stask.filter;
+            BPMNEngine.getATaskInfo(taskId,filter).then((res) => {
+                console.log(res,"task");
                 for(let role in self.tabsData.people){
                     if(res[role]){
                         self.tabsData.people[role] = res[role].split(',').reduce((arr, el) => {
@@ -228,11 +272,13 @@ export default {
             if(!task.name){
                 try {
                     task.description = JSON.parse(task.description);
+                  
                 } catch (error) {
                     task.description = {};
                 }
                 task.name = task.description.content;
             }
+            this.descriptionTask=task.description;
             this.breadcrumb.taskName = task.name;
             if(task.processDefinitionId){
                 this.breadcrumb.definitionName = this.$store.state.process.allDefinitions[task.processDefinitionId].name;
@@ -246,10 +292,21 @@ export default {
             this.$emit("close-detail", {});
         },
         async saveTaskOutcome(value){ // hành động khi người dùng submit task của họ
-            // this.$emit('save-task-outcome');
-            if(this.taskAction == 'submit' || this.taskAction == 'update' ){
-                this.$refs.task[0].submitForm(value);
-            }else if(this.taskAction == 'approval'){
+            if(value == 'submit' || value == 'update' ){
+                let taskInfo=this.taskInfo;
+                if (taskInfo.action.parameter.documentId==0) {
+                    this.taskAction='submit-noneObj';
+                    let taskData = {
+                        "action": "complete",
+                        "outcome": value,
+                    }
+                    let res = await this.submitTask(taskData);
+                    this.$emit('task-submited', res);
+                }else{
+                    this.taskAction=value;
+                    this.$refs.task[0].submitForm(value);
+                }
+            }else if(value == 'approval'){
                 let elId = this.originData.taskDefinitionKey;
                 let taskData = {
                     // action nhận 1 trong 4 giá trị: complete, claim, resolve, delegate
@@ -279,7 +336,7 @@ export default {
                 let res = await this.submitTask(taskData);
                 this.saveApprovalHistory(value);
                 this.$emit('task-submited', res);
-            }else if(this.taskAction == 'undefined'){
+            }else if(value == '' ||value ==undefined){
                 let taskData = {
                     "action": "complete",
                     "outcome": value,
@@ -308,6 +365,9 @@ export default {
         },
         async submitTask(taskData){
             let self = this;
+            if (this.taskAction=='submit') {
+                await this.updateTask(taskData);
+            }
             return new Promise(async (resolve, reject) => {
                 try {
                     let taskId = self.taskInfo.action.parameter.taskId;
@@ -325,6 +385,19 @@ export default {
                 }
             });
             
+        },
+        async updateTask(taskData) {
+            let description;
+            if ((typeof this.descriptionTask)=="string" ) {
+                description=JSON.parse(this.descriptionTask) ;
+            }else{
+                description=this.descriptionTask;
+            }
+            description.action.parameter.documentObjectId=taskData.variables[0].value;
+            let taskId=taskData.variables[5].value;
+            let data = {};
+            data.description= JSON.stringify(description);
+            return BPMNEngine.updateTask(taskId,data);
         },
         async handleTaskSubmited(data){
             if(this.isInitInstance){
@@ -360,12 +433,12 @@ export default {
 
         // lấy data mới dựa theo data của task
         async changeTaskDetail(){
+            console.log(this.taskInfo.action);
             if(!this.taskInfo.action){
                 return
             }
             let varsMap = {};
             this.taskAction = this.taskInfo.action.action;
-            
             if(this.taskAction == 'approval'){
                 this.showApprovalOutcomes(JSON.parse(this.taskInfo.approvalActions));
             }else if(this.taskAction == 'undefined'){
@@ -383,6 +456,12 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
+.v-tab{
+    padding: 0px!important;
+    border-width: 20px!important;
+    text-transform: none !important;
+
+}
 
 </style>

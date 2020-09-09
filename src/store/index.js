@@ -12,22 +12,24 @@ import searchModule from './search';
 import khModule from "./kh";
 import timeSheetModule from './timesheet';
 import user from './user';
+import task from "./task";
 
 Vue.use(Vuex);
 
 export default new Vuex.Store({
-    modules: {
-        app: appModule,
-        document: documentModule,
-        process: processModule,
-        orgchart: orgchartModule,
-        permission: permissionModule,
-        actionPack: actionPackModule,
-        comment: comment,
-        appConfig: AppConfig,
-        search: searchModule,
-        kh: khModule,
-        timesheet: timeSheetModule,
-        user: user
-    }
+	modules: {
+		app: appModule,
+		document: documentModule,
+		process: processModule,
+		orgchart: orgchartModule,
+		permission: permissionModule,
+		actionPack: actionPackModule,
+		comment: comment,
+		appConfig: AppConfig,
+		search: searchModule,
+		kh: khModule,
+		timesheet: timeSheetModule,
+		user: user,
+		task: task
+	}
 });
