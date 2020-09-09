@@ -50,7 +50,7 @@
                 <span class="ml-2">{{$t('tasks.createTask.title')}}</span>
             </v-btn>
             <!-- Bộ lọc cho  task -->
-            <v-menu offset-y light :close-on-content-click="false" :min-width="300" class="mr-2">
+            <v-menu offset-y light :close-on-content-click="false" :min-width="300" class="mr-2" style="z-index:1000!important">
                 <template v-slot:activator="{ on }">
                     <v-btn v-on="on" depressed class="mr-2" small>
                         <v-icon size="18">mdi-filter-menu-outline</v-icon>
@@ -158,7 +158,7 @@
                             :color="'transparent'"
                             :textColor="''"
                             :flat="true"
-                            v-model="taskObject.assignee"
+                            @input="inputAssignee"
                         ></userSelector>
                     </div>
                     <div class="label pt-2">{{$t("tasks.header.dueDate")}}</div>
@@ -170,7 +170,6 @@
                     <div>
                         <symper-document-selec v-model="taskObject.docId"></symper-document-selec>
                     </div>
-
                     <div class="label pt-2">{{$t("tasks.header.description")}}</div>
                     <div>
                         <v-textarea
@@ -320,17 +319,18 @@ export default {
             ],
             sortBy: null,
             orderBy: null,
-            apiUrl: "https://v2.symper.vn:8443/symper-rest/service/",
+            apiUrl: "https://v2.symper.vn/symper-rest/service/",
             queryProcessInstance: "runtime/process-instances",
             listProrcessInstances: [],
             dialog: false,
             selectedProcess: null,
             taskObject: {
                 name: "",
-                assignee: [],
+                assignee: "",
                 dueDate: "",
                 description: "",
-                docId: ''
+                docId: '',
+              
             },
             filterList: {}
         };
@@ -342,6 +342,10 @@ export default {
         this.getProcessInstance();
     },
     methods: {
+        inputAssignee(data){
+            console.log('userId',data);
+            this.taskObject.assignee=data;
+        },
         refreshTaskList(){
             this.$emit('refresh-task-list');
         },
@@ -423,19 +427,24 @@ export default {
             }
             let data = {
                 ...this.taskObject,
-                assignee: this.taskObject.assignee[0],
+                assignee: this.taskObject.assignee,
                 parentTaskId: this.parentTaskId ? this.parentTaskId : "",
-                owner: this.$store.state.app.endUserInfo.id
+                owner: this.$store.state.app.endUserInfo.id,
             };
-
+            let description = util.cloneDeep(defaultTaskDescription);
             if(this.taskObject.docId){
-                let description = util.cloneDeep(defaultTaskDescription);
                 description.action.action = 'submit';
-                description.action.content = this.taskObject.description;
                 description.action.parameter.documentId = this.taskObject.docId;
-
-                data.description = JSON.stringify(description);
             }
+
+            description.content = this.taskObject.name;
+
+            if (this.taskObject.description==''||this.taskObject.description== null) {
+                description.extraLabel=this.$t('tasks.header.alertDescription');
+            }else{
+                description.extraLabel=this.taskObject.description;
+            }
+            data.description = JSON.stringify(description);
             let res = await BPMNEngine.addTask(JSON.stringify(data));
             if (res.id != undefined) {
                 this.selectedProcess = null;

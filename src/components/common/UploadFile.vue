@@ -56,7 +56,7 @@
 
 <script>
 import {fileManagementApi} from '@/api/FileManagement.js'
-import { clipperBasic , clipperFixed } from 'vuejs-clipper'
+import {clipperBasic} from 'vuejs-clipper'
 let formData = new FormData()
 export default {
 	components:{
@@ -64,6 +64,14 @@ export default {
 	},
 	props:{
 		fileName:{
+			type:String,
+			default: ''
+		},
+		objectType:{
+			type:String,
+			default: ''
+		},
+		objectIdentifier:{
 			type:String,
 			default: ''
 		},
@@ -98,6 +106,8 @@ export default {
 		onFileChanged(e) {
 			this.selectedFile = e.target.files[0]
 			formData.append('user',this.$store.state.app.endUserInfo.displayName)
+			formData.append('objectType',this.objectType)
+			formData.append('objectIdentifier',this.objectIdentifier)
 			if(this.pickAvatar == true){
 				if(this.selectedFile.type == 'image/jpeg' || this.selectedFile.type == 'image/jpg' || this.selectedFile.type == 'image/png'){
 					this.dialog = true
@@ -141,7 +151,7 @@ export default {
 		uploadFile(){
             if(this.fileName != ''){
 				this.formDatas.append('fileName',this.fileName)
-            }
+			}
 			fileManagementApi.uploadFileSymper(this.formDatas,
 			{
 				dataType: 'text',
@@ -165,4 +175,5 @@ export default {
 .vuejs-clipper-basic__zoom-area {
 	border-radius: 50%
 }
+
 </style>

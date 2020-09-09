@@ -29,7 +29,7 @@ const fileTypes = {
     '3gv': 'mdi-file-video-outline',
 
     'jpg': 'mdi-file-image',
-    png: 'mdi-file-image',
+    'png': 'mdi-file-image',
     'gif': 'mdi-file-image',
     'svg': 'mdi-file-image',
 
@@ -46,6 +46,7 @@ export default class BasicControl extends Control {
         super(idField, ele, controlProps, curParentInstance, value);
         this.minValue = (this.controlProperties.hasOwnProperty('minValue')) ? this.controlProperties.minValue.value : false;
         this.maxValue = (this.controlProperties.hasOwnProperty('maxValue')) ? this.controlProperties.maxValue.value : false;
+        this.colIndex = -1;
     }
 
 
@@ -125,7 +126,7 @@ export default class BasicControl extends Control {
         }
 
         if (this.checkDetailView()) {
-            this.ele.addClass('detail-view');
+            // this.ele.addClass('detail-view');
             this.ele.attr('disabled', 'disabled');
         }
         if (sDocument.state.viewType[this.curParentInstance] != 'submit') {
@@ -134,6 +135,11 @@ export default class BasicControl extends Control {
         this.setEvent();
 
     }
+
+    setColIndexInTable(index) {
+        this.colIndex = index
+    }
+
     checkAutoCompleteControl() {
         if (this.controlFormulas.hasOwnProperty('autocomplete') && this.controlFormulas.autocomplete.instance != undefined) {
             return true;
@@ -144,17 +150,24 @@ export default class BasicControl extends Control {
 
         let thisObj = this;
         this.ele.on('change', function(e) {
-                let valueChange = $(e.target).val();
-                if (thisObj.type == 'label') {
-                    valueChange = $(e.target).text()
+            let valueChange = $(e.target).val();
+            if (thisObj.type == 'label') {
+                valueChange = $(e.target).text()
+            }
+            SYMPER_APP.$evtBus.$emit('document-submit-input-change', { controlName: thisObj.controlProperties.name.value, val: valueChange })
+            if (thisObj.type == 'date') {
+                if (this.formatDate != "" && typeof this.formatDate === 'string') {
+                    thisObj.value = $(this).val();
+                    $(this).val(moment($(this).val()).format(thisObj.formatDate))
                 }
-                SYMPER_APP.$evtBus.$emit('document-submit-input-change', { controlName: thisObj.controlProperties.name.value, val: valueChange })
-                if (thisObj.type == 'date') {
-                    if (this.formatDate != "" && typeof this.formatDate === 'string') {
-                        thisObj.value = $(this).val();
-                        $(this).val(moment($(this).val()).format(thisObj.formatDate))
-                    }
-                }
+            }
+        })
+        this.ele.on('focus', function(e) {
+                store.commit("document/addToDocumentSubmitStore", {
+                    key: 'rootChangeFieldName',
+                    value: thisObj.name,
+                    instance: thisObj.curParentInstance
+                });
             })
             // this.ele.on('keydown', function(e) {
             //     if (thisObj.type == 'number') {
@@ -218,6 +231,12 @@ export default class BasicControl extends Control {
 
         })
         this.ele.on('click', function(e) {
+            store.commit("document/addToDocumentSubmitStore", {
+                key: 'docStatus',
+                value: 'input',
+                instance: thisObj.curParentInstance
+            });
+
             store.commit("document/addToDocumentSubmitStore", {
                 key: 'currentTableInteractive',
                 value: null,

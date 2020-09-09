@@ -51,8 +51,8 @@
                 </v-row>
                 <v-divider></v-divider>
 
-                <VuePerfectScrollbar 
-                    v-if="!loadingTaskList" 
+                <VuePerfectScrollbar
+                    v-if="!loadingTaskList"
                     @ps-y-reach-end="handleReachEndList"
                     :style="{height: listTaskHeight+'px'}">
                     <v-row
@@ -62,7 +62,8 @@
                         :class="{
                             'mr-0 ml-0 single-row': true ,
                             'py-1': !isSmallRow,
-                            'py-0': isSmallRow
+                            'py-0': isSmallRow,
+                            'd-active':index==idx
                         }"
                         :style="{
                             minHeight: '50px'
@@ -72,10 +73,14 @@
                             :cols="sideBySideMode ? 12 : compackMode ? 6: 4"
                             class="pl-3 pr-1 pb-1 pt-2">
                             <div class="pl-1">
-                                <!-- <div class="fz-13 text-truncate d-inline-block float-left text-ellipsis w-100">{{obj.name}}</div> -->
-                                <div class="text-left fs-13 pr-6 text-ellipsis w-100">
-                                    {{obj.taskData.content}}
-                                </div>
+                                <v-tooltip bottom>
+                                    <template v-slot:activator="{ on }">
+                                    <div v-on="on" class="text-left fs-13 pr-6 text-ellipsis w-100">
+                                        {{obj.taskData.content}}
+                                    </div>
+                                     </template>
+                                <span>{{ obj.taskData.content }}</span>
+                            </v-tooltip>
                                 <div
                                     class="pa-0 grey--text mt-1 lighten-2 d-flex justify-space-between">
                                     <div class="fs-11 pr-6 text-ellipsis">
@@ -83,7 +88,7 @@
                                     </div>
 
                                     <div class="fs-11  py-0 pr-2 text-ellipsis" >
-                                        {{$moment(obj.createTime).fromNow()}}
+                                        {{obj.createTime ? $moment(obj.createTime).fromNow():$moment(obj.endTime).fromNow()}}
                                         <v-icon class="grey--text lighten-2 ml-1" x-small>mdi-clock-time-nine-outline</v-icon>
                                     </div>
                                 </div>
@@ -94,10 +99,7 @@
                             style="line-height: 42px"
                             cols="2"
                             class="fs-12 px-1 py-0">
-                            
-                                <v-avatar size="25" class="mr-2">
-                                    <img :src="obj.assigneeInfo.avatar ? obj.assigneeInfo.avatar : require('@/assets/image/avatar_default.jpg')" />
-                                </v-avatar>
+                                <symperAvatar :size="20" :userId="obj.assigneeInfo.id" />
                                 {{obj.assigneeInfo.displayName}}
                         </v-col>
                         <v-col
@@ -106,7 +108,7 @@
                             cols="2"
                             class="fs-13 px-1 py-0"
                         >
-                            <span class="mt-1 ">{{$moment(obj.dueDate).fromNow()}}</span>
+                            <span class="mt-1 ">{{obj.dueDate ==null? '':$moment(obj.dueDate).fromNow()}}</span>
                         </v-col>
                         <v-col
                             v-if="!sideBySideMode"
@@ -118,20 +120,23 @@
                                 class="mt-0 pl-1 pr-0 d-inline-block text-truncate"
                                 small
                                 label
-                                v-if="obj.owner != null">
-                                <v-avatar size="25" class="mr-2">
-                                    <img :src="obj.ownerInfo.avatar" alt v-if="!!obj.ownerInfo.avatar" />
-                                    <v-icon v-else v-text="obj.ownerInfo.avatar"></v-icon>
-                                </v-avatar>
+                               >
+                                 <symperAvatar :size="20" :userId="obj.ownerInfo.id" />
                                 {{obj.ownerInfo.displayName}}
                             </v-chip>
                         </v-col>
-                        <v-col 
-                            class="py-0" 
-                            cols="2" 
+                        <v-col
+                            class="py-0"
+                            cols="2"
                             v-if="!sideBySideMode && !smallComponentMode"
                             style="line-height: 42px">
-                            <span class="mt-1 d-inline-block fs-13">{{obj.processDefinitionName}}</span>
+                             <v-tooltip bottom>
+                                <template v-slot:activator="{ on }">
+                                    <span v-on="on" v-if="obj.processDefinitionName" class="mt-1 d-inline-block fs-13 title-quytrinh">{{obj.processDefinitionName}}</span>
+                                    <span v-on="on" v-else class="mt-1 d-inline-block fs-13 title-quytrinh">ad hoc</span>
+                                </template>
+                                <span>{{ obj.processDefinitionName }}</span>
+                            </v-tooltip>
                         </v-col>
                     </v-row>
 
@@ -158,12 +163,12 @@
                 height="30"
                 style="border-left: 1px solid #e0e0e0;">
                 <taskDetail
-                    :parentHeight="listTaskHeight" 
+                    :parentHeight="listTaskHeight"
                     :taskInfo="selectedTask.taskInfo"
                     :originData="selectedTask.originData"
                     @close-detail="closeDetail"
                     @task-submited="handleTaskSubmited"></taskDetail>
-            </v-col> 
+            </v-col>
             <userSelector ref="user" class="d-none"></userSelector>
         </v-row>
     </div>
@@ -179,7 +184,8 @@ import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import { util } from '../../plugins/util';
 import { appConfigs } from '../../configs';
 import { extractTaskInfoFromObject, addMoreInfoToTask } from '../../components/process/processAction';
- 
+import symperAvatar from "@/components/common/SymperAvatar.vue";
+
 export default {
     computed: {
         // Liệt kê danh sách các task dưới dạng phẳng - ko phân cấp
@@ -202,7 +208,8 @@ export default {
         taskDetail: taskDetail,
         listHeader: listHeader,
         userSelector: userSelector,
-        VuePerfectScrollbar: VuePerfectScrollbar
+        VuePerfectScrollbar: VuePerfectScrollbar,
+        symperAvatar:symperAvatar
     },
     props: {
         compackMode: {
@@ -237,6 +244,7 @@ export default {
     },
     data: function() {
         return {
+            index:-1,
             loadingTaskList: false,
             loadingMoreTask: false,
             listTaskHeight: 300,
@@ -284,7 +292,7 @@ export default {
             if(this.allFlatTasks.length < this.totalTask && this.allFlatTasks.length > 0){
                 this.myOwnFilter.page += 1;
                 this.myOwnFilter.size = 50;
-                
+
                 this.getTasks();
             }
         },
@@ -299,12 +307,13 @@ export default {
             this.getTasks();
         },
         reCalcListTaskHeight(){
-            this.listTaskHeight = util.getComponentSize(this.$el.parentElement).h - 125;            
+            this.listTaskHeight = util.getComponentSize(this.$el.parentElement).h - 125;
         },
         getUser(id) {
             this.$refs.user.getUser(id);
         },
         selectObject(obj, idx) {
+            this.index=idx;
             this.$set(this.selectedTask,'originData', obj);
             if(this.smallComponentMode){
                 this.$goToPage('/tasks/' + obj.id, 'Do task');
@@ -354,12 +363,14 @@ export default {
             filter = Object.assign(filter, this.myOwnFilter);
             let res = {};
             let listTasks = [];
-
+            if (filter.status) {
+                this.$store.commit("task/setFilter", filter.status);
+            }
             if(this.filterTaskAction == 'subtasks'){
                 res = await BPMNEngine.getSubtasks(this.filterFromParent.parentTaskId, filter);
                 listTasks = res;
             }else {
-                
+
                 if(!filter.assignee){
                     filter.assignee = this.$store.state.app.endUserInfo.id;
                 }
@@ -367,7 +378,7 @@ export default {
                 listTasks = res.data;
             }
             this.totalTask = Number(res.total);
-                        
+
             for(let task of listTasks){
                 task.taskData = self.getTaskData(task);
                 task = addMoreInfoToTask(task);
@@ -407,6 +418,7 @@ export default {
                     );
                 }
             );
+            console.log(listTasks,"listTassk");
             this.addOtherProcess(listTasks);
             this.loadingTaskList = false;
             this.loadingMoreTask = false
@@ -499,4 +511,15 @@ export default {
     margin-top: 3px;
     margin-bottom: 3px;
 }
+.title-quytrinh {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box!important;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+}
+.d-active{
+    background: #f5f5f5;
+}
+
 </style>

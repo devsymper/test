@@ -1,10 +1,30 @@
 <template>
     <div class="wrap-content-submit">
+        <v-skeleton-loader
+            class="mx-auto"
+            max-width="auto"
+            type="article, actions"
+            v-if="loading"
+            
+        ></v-skeleton-loader>
+        <v-skeleton-loader
+            class="mx-auto"
+            max-width="auto"
+            v-if="loading"
+            type="table-heading, list-item-two-line, table-tfoot"
+        ></v-skeleton-loader>
+        <v-skeleton-loader
+            class="mx-auto"
+            max-width="auto"
+            type="article, actions,table-heading, list-item-two-line"
+            v-if="loading"
+            
+        ></v-skeleton-loader>
         <div
             :key="keyInstance"
             class="sym-form-submit"
             :id="'sym-submit-'+keyInstance"
-            :style="{'width':docSize, 'height':'100%'}"
+            :style="{'width':docSize, 'height':'100%','opacity':0}"
         >
             <div v-html="contentDocument"></div>
             <!-- <button v-on:click="togglePageSize" v-show="!isQickSubmit" id="toggle-doc-size">
@@ -131,6 +151,9 @@ import { setDataForPropsControl,allControlNotSetData } from "./../../../componen
 import BasicControl from "./basicControl";
 import TableControl from "./tableControl";
 import ActionControl from "./actionControl";
+import LayoutControl from "./layoutControl";
+import PageControl from "./pageControl";
+import TabControl from "./tabControl";
 import DatePicker from "./../../../components/common/DateTimePicker";
 import TimeInput from "./../../../components/common/TimeInput";
 import Table from "./table.js";
@@ -146,6 +169,8 @@ import './customControl.css';
 import ErrMessagePanel from "./../../../views/document/items/ErrMessagePanel.vue";
 import moment from "moment-timezone";
 import EmbedDataflow from "@/components/dataflow/EmbedDataflow"
+import {listControlNotNameProp} from "./../../../components/document/controlPropsFactory.js"
+
 
 
 import { checkCanBeBind, resetImpactedFieldsList, markBinedField } from './handlerCheckRunFormulas';
@@ -154,6 +179,7 @@ let impactedFieldsList = {};
 let impactedFieldsArr = {};
 
 export default {
+    inject: ['theme'],
     props: {
         isQickSubmit: {
             type: Boolean,
@@ -205,7 +231,20 @@ export default {
         "autocomplete-input": AutocompleteInput,
         "sym-drag-panel": SymperDragPanel,
         "err-message": ErrMessagePanel,
-        EmbedDataflow
+        EmbedDataflow,
+        VBoilerplate: {
+            functional: true,
+            render (h, { data, props, children }) {
+            return h('v-skeleton-loader', {
+                ...data,
+                props: {
+                boilerplate: true,
+                elevation: 2,
+                ...props,
+                },
+            }, children)
+        },
+        },
     },
     computed: {
         sDocumentEditor() {
@@ -259,7 +298,8 @@ export default {
             preDataSubmit:{},
             objectIdentifier:{},
             otherInfo:{},
-            listDataFlow:[]
+            listDataFlow:[],
+            loading: true,
         };
 
     },
@@ -354,12 +394,6 @@ export default {
         this.$evtBus.$on("document-submit-input-change", locale => {
             try {
                 if(thisCpn.isComponentActive == false) return;
-                
-                this.$store.commit("document/addToDocumentSubmitStore", {
-                            key: 'docStatus',
-                            value: 'input',
-                            instance: this.keyInstance
-                        });
                 let valueControl = locale.val;
                 let controlInstance = getControlInstanceFromStore(thisCpn.keyInstance,locale.controlName);
                 if(controlInstance.type == 'number' && !/^[-0-9,.]+$/.test(valueControl)){
@@ -381,11 +415,7 @@ export default {
                     "value",
                     valueControl
                 );
-                thisCpn.$store.commit("document/addToDocumentSubmitStore", {
-                    key: 'rootChangeFieldName',
-                    value: locale.controlName,
-                    instance: thisCpn.keyInstance
-                });
+                
                 // sau khi thay đổi giá trị input thì kiểm tra require control nếu có
                 if(controlInstance.isRequiredControl()){
                     if(controlInstance.isEmpty()){
@@ -564,6 +594,8 @@ export default {
                 ) {
                     thisCpn.$refs.validate.hide();
                 }
+               
+                
             } catch (error) {
                 
             }
@@ -593,10 +625,19 @@ export default {
             if(data == true){
                 this.submitDocument()
             }
-        }
+        },
+        "sDocumentSubmit.readyLoaded":function(data){
+            if(data == true){
+                this.loading = false;
+                $("#sym-submit-" + this.keyInstance).find('.page-content').removeClass('d-block');
+                $("#sym-submit-" + this.keyInstance).find('.list-page-content').removeClass('d-flex');
+                $("#sym-submit-" + this.keyInstance).css({opacity:'1'});
+            }
+        },
     },
     
     methods: {
+        
         // hàm
         getParamsForRunDataFlow(properties){
             let mapControlToParams = properties.mapParamsDataflow.value;
@@ -981,6 +1022,9 @@ export default {
             }
         },
         processHtml(content) {
+            $("#sym-submit-" + this.keyInstance).find('.page-content').addClass('d-block');
+            $("#sym-submit-" + this.keyInstance).find('.list-page-content').addClass('d-flex');
+            
             var allInputControl = $("#sym-submit-" + this.keyInstance).find(
                 ".s-control:not(.bkerp-input-table .s-control)"
             );
@@ -1006,8 +1050,30 @@ export default {
                         control.init();
                         control.render();
                         control.setEffectedData(prepareData);
-                        this.addToListInputInDocument('submit',control)
-                    } else {
+                        this.addToListInputInDocument(allControlNotSetData[controlType],control)
+                    } 
+                    else if(controlType == 'tabPage'){
+                        let control = new LayoutControl(idField, $(allInputControl[index]),field,thisCpn.keyInstance);
+                        control.init();
+                        control.render();
+                        this.addToListInputInDocument('tabPage',control)
+                    }
+                    else if(controlType == 'tab'){
+                         let controlName = field.properties.name.value;
+                        let control = new TabControl(idField, $(allInputControl[index]),field,thisCpn.keyInstance);
+                        control.init();
+                        control.render();
+                        this.addToListInputInDocument(controlName,control)
+                    }
+                    else if(controlType == 'page'){
+                         let controlName = field.properties.name.value;
+                        let control = new PageControl(idField, $(allInputControl[index]),field,thisCpn.keyInstance);
+                        control.init();
+                        control.render();
+                        this.addToListInputInDocument(controlName,control)
+                    }
+                   
+                    else {
                         let controlName = field.properties.name.value;
                         let mapColumnType = Util.mapTypeControlToTypeSQLLite(controlType); 
                         if(mapColumnType != false){
@@ -1036,6 +1102,10 @@ export default {
                             
                         }
                         //truong hop la control table
+                        
+                        
+                        
+                        
                         else {
                             let listInsideControls = {};
                             let tableControl = new TableControl(
@@ -1044,6 +1114,7 @@ export default {
                                 field,
                                 thisCpn.keyInstance
                             );
+                            this.addToTableLoadedStore(controlName)
                             tableControl.initTableControl();
                             tableControl.setEffectedData(prepareData);
                             tableControl.tableInstance = new Table(
@@ -1092,6 +1163,16 @@ export default {
             if(this.docObjId == null)
             thisCpn.findRootControl();
 
+        },
+        addToTableLoadedStore(controlName){
+            let curTableLoaded = this.sDocumentSubmit.tableLoaded;
+            curTableLoaded[controlName] = false;
+            console.log('curTableLoaded',controlName,curTableLoaded);
+            this.$store.commit("document/addToDocumentSubmitStore", {
+                key: 'tableLoaded',
+                value: curTableLoaded,
+                instance: this.keyInstance
+            });
         },
         /**
          * Sự kiện phát ra khi click vào date của date picker
@@ -1222,8 +1303,8 @@ export default {
             let controlNameIdentifier = this.objectIdentifier['name'];
             let controlInstance = getControlInstanceFromStore(this.keyInstance,controlNameIdentifier);
             if(controlInstance != false && controlInstance.controlFormulas.hasOwnProperty('formulas')){
-                let datainput = this.getDataInputFormulas(controlInstance.controlFormulas['formulas']['instance'])
-                controlIdentifier['dataInput'] = datainput;
+                let dataInput = this.getDataInputFormulas(controlInstance.controlFormulas['formulas']['instance'])
+                controlIdentifier['dataInput'] = dataInput;
                 // controlIdentifier['dataInput'] = 
                 // return controlIdentifier;
             }
@@ -1379,10 +1460,7 @@ export default {
                     Object.assign(dataControl, value);
                 } else {
             
-                    if (listInput[controlName].type != "submit" && 
-                    listInput[controlName].type != "reset" && 
-                    listInput[controlName].type != "draft" &&
-                    listInput[controlName].type != "approvalHistory") {
+                    if (!listControlNotNameProp.includes(listInput[controlName].type)) {
                         let value = (listInput[controlName].type == 'number' && listInput[controlName].value == "" ) ? 0 : listInput[controlName].value;
                         if(listInput[controlName].type == 'percent'){
                             value = (listInput[controlName].value === "" ) ? 0 : listInput[controlName].value/100;
@@ -1674,7 +1752,7 @@ export default {
                             this.handlerDataAfterRunFormulasRequire(value,controlName);
                             break;
                         case "hidden":
-                            this.handlerDataAfterRunFormulasHidden(value,controlId);
+                            this.handlerDataAfterRunFormulasHidden(controlInstance,value,controlId);
                             break;
                         case "readOnly":
                             this.handlerDataAfterRunFormulasReadonly(value,controlId);
@@ -1740,12 +1818,20 @@ export default {
                 controlInstance.removeValidateIcon();
             }
         },
-        handlerDataAfterRunFormulasHidden(isHidden,controlId){
+        handlerDataAfterRunFormulasHidden(controlInstance,isHidden,controlId){
             if(Array.isArray(isHidden)){
                 isHidden=isHidden[0];
             }
             let display = (isHidden == 1 || isHidden==true ) ? 'none' : 'inline-block'
-            $('#'+controlId).parent().css({'display':display})
+            if(controlInstance.type == 'page'){
+                controlInstance.setHiddenPage()
+            }
+            else if(controlInstance.type == 'tab'){
+                controlInstance.setHiddenTab()
+            }
+            else{
+                $('#'+controlId).parent().css({'display':display})
+            }
         },
         handlerDataAfterRunFormulasReadonly(isReadonly,controlId){
             if(Array.isArray(isReadonly)){
@@ -1764,6 +1850,7 @@ export default {
          * Hàm xử lí việc tìm kiếm các root control và chạy công thức cho control đó (lúc khởi tạo doc)
          */
         findRootControl(){ 
+            let listInput1 = getListInputInDocument(this.keyInstance);
 			let impactedFieldsListWhenStart = {}
 			if(this.preDataSubmit != null && Object.keys(this.preDataSubmit).length > 0 && false){
 				impactedFieldsList = this.preDataSubmit.impactedFieldsList;

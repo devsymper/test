@@ -15,13 +15,13 @@ export const appConfigs = {
         bpmne: {
             models: 'https://workflow-modeler.symper.vn',
             // models: 'https://v2khadm.dev.symper.vn/process-modeler',
-            deployments: "https://workflow.symper.vn:8443/symper-rest/service/repository/deployments",
-            definitions: "https://workflow.symper.vn:8443/symper-rest/service/repository/process-definitions",
-            instances: "https://workflow.symper.vn:8443/symper-rest/service/runtime/process-instances",
-            history: "https://workflow.symper.vn:8443/symper-rest/service/history",
-            tasks: "https://workflow.symper.vn:8443/symper-rest/service/runtime/tasks",
-            tasksHistory: "https://workflow.symper.vn:8443/symper-rest/service/history/historic-task-instances",
-            validateModel: "https://workflow.symper.vn:8443/symper-modeler/api/editor/validate-model"
+            deployments: "https://workflow.symper.vn/symper-rest/service/repository/deployments",
+            definitions: "https://workflow.symper.vn/symper-rest/service/repository/process-definitions",
+            instances: "https://workflow.symper.vn/symper-rest/service/runtime/process-instances",
+            history: "https://workflow.symper.vn/symper-rest/service/history",
+            tasks: "https://workflow.symper.vn/symper-rest/service/runtime/tasks",
+            tasksHistory: "https://workflow.symper.vn/symper-rest/service/history/historic-task-instances",
+            validateModel: "https://workflow.symper.vn/symper-modeler/api/editor/validate-model"
         },
         documents: 'https://v2hoangnd.dev.symper.vn/document',
         nofitication: 'https://notifi.symper.vn/',

@@ -7,6 +7,12 @@ export default [
             import ('../../views/document/ShowList.vue'),
     },
     {
+        path: "/documents/trash",
+        name: "processListTrashDocument",
+        component: () =>
+            import ('../../views/document/trash/ShowListTrash.vue'),
+    },
+    {
         path: "/document/editor",
         name: "createDocument",
         component: () =>

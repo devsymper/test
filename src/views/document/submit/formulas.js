@@ -626,14 +626,15 @@ export default class Formulas {
         // hàm lấy các column được query sau select và trước from
     getColumnsQuery(syql) {
         let columns = [];
-        let allColumns = syql.match(/(?<=SELECT|select).*(?=from|from)/gm);
+        syql = syql.replace(/[\s\r]+/gm, " ");
+        let allColumns = syql.match(/(?<=SELECT|select).*(?=FROM|from)/gm);
         for (let index = 0; index < allColumns.length; index++) {
             let element = allColumns[index];
             element = element.trim();
             element = element.split(',')
             for (let i = 0; i < element.length; i++) {
                 let column = element[i];
-                column = column.replace(/(.*?)(?<=as)/g, "");
+                column = column.replace(/(.*?)(?<= as )/g, "");
                 columns.push(column.trim())
             }
 
@@ -641,5 +642,5 @@ export default class Formulas {
         return columns;
     }
 
-
+    //\s+as\s+(([a-zA-Z0-9_]+)|("(.*?)"))
 }
