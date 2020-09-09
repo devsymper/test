@@ -14,6 +14,7 @@
                     :menu-props="{'nudge-top':-10}" 
                     v-model="categoryTask"
                     class="category-task" 
+                     :search-input.sync="searchCategory" 
                     :items="category.category_name" 
                     placeholder="Tìm việc ..." 
                     item-color="white" 
@@ -51,7 +52,7 @@
                     :loading="isLoading" 
                     :search-input.sync="search" 
                     item-text="name"    
-                    item-value="symbol" 
+                    item-value="symbol"
                     :menu-props="{'nudge-top':-10, 'max-width': 300}" 
                     label="Tìm loại công việc ...">
                         <template v-slot:item="data">
@@ -59,9 +60,9 @@
                                <v-list-item-title class="st-icon-pandora">{{data.item.name?data.item.name:'Không có tên'}}</v-list-item-title>
                             <v-list-item-subtitle class="fs-11 color-grey" >
                                 <span v-if="data.item.categoryId" style="color:black" class="color-grey">
-                                     {{getNameCategory(data.item.categoryId)}}-{{data.item.description?data.item.description:'Chưa có mô tả'}}- Người giao: </span>
+                                     {{getNameCategory(data.item.categoryId)}}-{{data.item.description?data.item.description:'Chưa có mô tả'}} </span>
                                 <span v-else style="color:black" class="color-grey">
-                                   Symper task - Người giao:  </span>
+                                   Symper task  </span>
                                    </v-list-item-subtitle>
                             </v-list-item-content>
                         </template>
@@ -214,16 +215,18 @@ import TaskForm from '../timesheet/TaskForm';
 
 export default {
     name: 'LogTimeForm',
-    props: ['formType', 'newEvent', 'onSave', 'onCancel', 'update','dateMonth','eventLog','load','updateAPICategory'],
+    props: ['formType', 'newEvent', 'onSave', 'onCancel', 'update','dateMonth','eventLog','load','updateAPICategory','cancelTask','cancelCate'],
     data: () => ({
         date: new Date().toISOString().substr(0, 10),
         isLoading: false,
         dialog: false,
         items: [],
+        displayDate: '',
         showLog:false,
         showPlan:false,
         model: null,
         search: null,
+        searchCategory:null,
         tab: null,
         checkDateUpdate:false,
         task: '',
@@ -255,6 +258,9 @@ export default {
         TaskForm
     },
     computed: {
+         typeCalendar() {
+            return this.$store.state.timesheet.calendarType;
+        },
         duration() {
             let startTime = this.inputs.startTime.split(":");
             let endTime = this.inputs.endTime.split(":");
@@ -286,24 +292,23 @@ export default {
                 return '';
             }
         },
-        displayDate() {
-            // debugger
-            if(this.eventLog.startTime!=undefined){this.getEventLog();};
-            if(this.dateLogMonthView!=''){
-                return dayjs(this.dateLogMonthView).format('DD/MMM/YYYY');
-            }else{
-                 return dayjs().format('DD/MMM/YYYY');
-            }
+        // displayDate() {
+        //   debugger
+        //     if(this.eventLog.startTime!=undefined){this.getEventLog();};
            
-        }
+        // }
     },
     watch: {
         updateAPICategory(){
              this.getCategory();
+             this.$emit("doneCate")
 
         },
-        load(){
-            this.loadTaskList();
+        cancelTask(){
+            if(this.cancelTask){
+           
+                this.getAllTask();
+            }
         },
         eventLog(){
             this.getEventLog();
@@ -320,6 +325,13 @@ export default {
                 this.timeError = ''
             }
         },
+        search(){
+            if(!this.categoryTask){
+                this.getAllTask(this.search);
+            }else{
+                this.filterTaskByCategory();
+            }
+        },
         task(){
              if(this.checkNullTask){
                 if(this.task==undefined){
@@ -332,6 +344,13 @@ export default {
              else{}
         },
         categoryTask(){
+            if(!this.categoryTask){
+                this.getAllTask();
+                this.filterTaskByCategory();
+
+            }else{
+                this.filterTaskByCategory();
+            }
             if(this.checkNullCate){
                 if(!this.categoryTask){
                     this.cateError = this.$t('timesheet.required_value');
@@ -341,54 +360,75 @@ export default {
                 }
              }
              else{};
-              this.loadTaskList();
+             // this.loadTaskList();
         },
         model(val) {
             if (val != null) this.tab = 0
             else this.tab = null
         },
         newEvent(val) {
-            ///debugger
-            this.loadTaskList();
+           // debugger
+            this.getAllTask();
             this.inputs.startTime = val ? dayjs(val.start).format('HH:mm') : "08:00";
             this.inputs.endTime = val ? dayjs(val.end).format('HH:mm') : "08:40";
+         //   debugger
             this.inputs.date = val ? dayjs(val.date).format('YYYY-MM-DD') : dayjs().format('YYYY-MM-DD');
+            this.displayDate = this.inputs.date;
             this.inputs.description = val.desc;
             this.categoryTask = val.category;
             this.task = val.task;
+            this.items.push({name:val.task});
+         //   debugger
             // hiển thị nút plan và log theo từng giờ
             let now = dayjs();
-           // let lastDay = dayjs().subtract(1,'days').format('DD/MMM/YYYY');
             let dateLog = dayjs(this.newEvent.start).format('DD/MMM/YYYY h:mm A');
             this.showLog =  dayjs(dateLog).isAfter(now)==true?false:true;
             this.showPlan = dayjs(dateLog).isAfter(now);
+            this.filterTaskByCategory();
         },
     },
     created(){
         // load lại trang ở màn month
-       // debugger
+     //  debugger
         let date = this.dateMonth;
         this.getDateMonth(date);
-        this.loadTaskList();
+        this.getAllTask();
         this.getCategory();
     },
-    methods: { 
+    methods: {
+        filterTaskByCategory(){
+            if(this.categoryTask){
+                debugger
+            let categoryId = this.getIdCategory(this.categoryTask);
+            this.items = this.items.filter(x=>x.categoryId==categoryId||x.categoryId==null);
+            }
+        },
+         async getAllTask(nameTask){
+            let self = this;
+            this.items = [];
+           await timesheetApi.getTaskDB()
+            .then(res => {
+                self.items.push(...res.data.task);
+                })
+                .catch(console.log);
+            await timesheetApi.getTask({nameLike:'%'+nameTask+'%'})
+            .then(res => {
+                self.items.push(...res.data);
+                })
+                .catch(console.log);
+
+        },
         // lấy giờ
          getDateMonth(){
-          //   debugger
-             let date = this.dateMonth;
-            // debugger
+            let date = this.dateMonth;
             this.dateLogMonthView = date;
-           // debugger
+            this.displayDate = date;
             this.inputs.startTime='08:00';
-             this.inputs.endTime='08:30';
+            this.inputs.endTime='08:30';
             this.inputs.description = '';
             this.categoryTask = '';
             this.task ='';
-            // debugger
-            //check
-               let now = dayjs();
-           // let lastDay = dayjs().subtract(1,'days').format('DD/MMM/YYYY');
+            let now = dayjs();
             let dateLog = dayjs(date).format('DD/MMM/YYYY');
             this.showLog =  dayjs(dateLog).isAfter(now)==true?false:true;
             this.showPlan = dayjs(dateLog).isAfter(now);
@@ -436,9 +476,7 @@ export default {
                     date: this.inputs.date,
                     categoryTask: this.categoryTask,
                     desc: this.inputs.description || ""
-                    
                 })
- 
                 this.getEventLog();
 
          },
@@ -483,15 +521,26 @@ export default {
         log(type) {
             // debugger
             this.checkNullTask = true;
+            let start = null;
+            let end = null;
             this.checkNullCate = true;
             let check = this.checkValidateLogForm();
+            if(this.typeCalendar=="month"){
+                start = this.changeTimeToDate(this.inputs.startTime);
+                end = this.changeTimeToDate(this.inputs.endTime);
+
+            }else{
+                start = dayjs(this.newEvent.start).hour(+this.inputs.startTime.split(":")[0]).minute(+this.inputs.startTime.split(":")[1]).format("YYYY-MM-DD HH:mm");
+                end  = dayjs(this.newEvent.start).hour(+this.inputs.endTime.split(":")[0]).minute(+this.inputs.endTime.split(":")[1]).format("YYYY-MM-DD HH:mm");
+
+            }
             //debugger
             if (!check){}
             else{
-                debugger
+               // debugger
                 timesheetApi.createLogTime({
-                     start: this.newEvent?(dayjs(this.newEvent.start).hour(+this.inputs.startTime.split(":")[0]).minute(+this.inputs.startTime.split(":")[1]).format("YYYY-MM-DD HH:mm")):(this.changeTimeToDate(this.inputs.startTime)),
-                    end: this.newEvent?(dayjs(this.newEvent.start).hour(+this.inputs.endTime.split(":")[0]).minute(+this.inputs.endTime.split(":")[1]).format("YYYY-MM-DD HH:mm")):(this.changeTimeToDate(this.inputs.endTime)),
+                    start: start,
+                    end: end,
                     duration: this.duration,
                     task: this.task,
                     type: type,
@@ -501,7 +550,7 @@ export default {
                 })
                 .then(res => {
                     if (res.status === 200) {
-                        debugger
+                     //   debugger
                         this.onSave();
                         this.$emit('loadMonthView')
                      
@@ -559,7 +608,7 @@ export default {
                     })
                     .then(res => {
                         if (res.status === 200) {
-                            debugger
+                          //  debugger
                             this.onSave()
                         }
                     })
@@ -567,51 +616,6 @@ export default {
                this.cancel();
             }
         },
-        allowedDates: val => parseInt(val.split('-')[2], 10),
-        async loadTaskList() {
-            const self = this;
-            let b = self.categoryTask;
-            //nếu có giá trị của category
-             if(!self.categoryTask){
-                try {
-                    let res =  await timesheetApi.getTaskDB()
-                    let task = [];
-                   //debugger
-                    let id = res.data.id;
-                    task.push(...res.data.task);
-                    self.items = task;
-                     res = await timesheetApi.getTask({size: 100});
-                    self.items.push(...res.data);
-                  //  debugger
-                    console.log(self.items)
-                } catch(e) {
-                    console.log(e)
-                } finally {}
-                
-            }else{
-                // lọc task theo giá trị category
-                try {
-                    self.item = [];
-                //   debugger
-                    let idCategory = self.getIdCategory(self.categoryTask);
-                    let res =  await timesheetApi.getTaskDB();
-                    let id = res.data.id;
-                   // debugger
-                    self.items.push(...res.data.task);
-                    self.items = self.items.filter(x.categoryId==idCategory);
-                     res = await timesheetApi.getTask({size: 100});
-                   //  debugger
-                    self.items.push(...res.data);
-                    console.log(self.items)
-                  //   debugger
-                } catch(e) {
-                    console.log(e)
-                } finally {
-                    self.isLoading = false
-                }
-            }
-            // nếu không có giá trị category
-        }
     },
 
 }

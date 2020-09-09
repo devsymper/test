@@ -1,6 +1,7 @@
 import { SYMPER_APP } from "./../../main.js";
 import { orgchartApi } from "./../../api/orgchart";
 import { userApi } from "../../api/user.js";
+import accountApi from "../../api/account.js";
 import { userRoleApi } from "../../api/userRole.js";
 import { systemRoleApi } from "../../api/systemRole.js";
 import { util } from "../../plugins/util.js";
@@ -107,7 +108,20 @@ const getAllUsers = async(context) => {
         }
     }
 }
-
+const getAllBA = async(context) => {
+    if (context.state.allBA.length == 0) {
+        try {
+            let res = await accountApi.getListBA(1, 2000);
+            if (res.status == 200) {
+                context.commit('setAllBA', res.data.data);
+            } else {
+                SYMPER_APP.$snotifyError(error, "Can not get all user!");
+            }
+        } catch (error) {
+            SYMPER_APP.$snotifyError(error, "Can not get all user!");
+        }
+    }
+}
 
 function getRolesByType(userInfo, type, apiObj, context) {
     return new Promise((resolve, reject) => {
@@ -281,6 +295,7 @@ export {
     getAndSetUserOperations,
     getAllOrgChartData,
     getAllUsers,
+    getAllBA,
     getAllRoles,
     setUserInfo,
     changeUserRole

@@ -136,9 +136,11 @@ const defaultState = {
     orgchartNodes: {},
     // Danh sách tất cả các user trong hệ thống
     allUsers: [],
+    allBA: [],
     generalNotificationPosition: 'top right',
     userLoadedRoleType: [],
     userOperations: {},
+
 };
 
 export default defaultState;

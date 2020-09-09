@@ -124,7 +124,6 @@ export default {
 			formData.append('file',file)
 			this.formDatas = formData
 			this.$emit('selected-file', this.previewImg)
-			debugger
 			if(this.autoUpload == true){
 				this.uploadFile()
 			}
