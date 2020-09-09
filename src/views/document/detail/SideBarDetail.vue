@@ -59,7 +59,7 @@
 								<span>{{$t('document.detail.sidebar.body.userRelated.subTitle1')}}</span>
 							</p>
 							<div v-for="user in listApprovalUser" :key="user.id" class="user-info">
-								<img src="https://randomuser.me/api/portraits/men/81.jpg" alt="">
+								<img :src="'https://file.symper.vn/readFile/user_avatar_'+user.userId" alt="">
 								<span class="user-name">{{user.displayName}}</span>
 							</div>
 						</div>
@@ -69,7 +69,7 @@
 								<span>{{$t('document.detail.sidebar.body.userRelated.subTitle2')}}</span>
 							</p> 
 							<div v-for="user in listRelatedUser" :key="user.id" class="user-info">
-								<img src="https://randomuser.me/api/portraits/men/81.jpg" alt="">
+								<img :src="'https://file.symper.vn/readFile/user_avatar_'+user.userId" alt="">
 								<span class="user-name">{{user.displayName}}</span>
 							</div>
 						</div>
@@ -81,10 +81,10 @@
 
 						<table class="workflow-info" v-if="workflowId !='' ">
 							<tr>
-								<td><span class="mdi mdi-share-variant"></span></td>
+								<!-- <td><span class="mdi mdi-share-variant"></span></td> -->
 								<td>{{workflowName}}</td>
 							<tr>
-								<td><span class="mdi mdi-briefcase-variant-outline"></span></td>
+								<!-- <td><span class="mdi mdi-briefcase-variant-outline"></span></td> -->
 								<td>{{workflowOtherName}}</td>
 							</tr>
 							
@@ -228,6 +228,11 @@ export default {
 		},
 		
 	},
+	computed:{
+		allUsers(){
+            return this.$store.state.app.allUsers;
+        },
+	},
 	created(){
 		let thisCpn = this;
 		documentApi.getListApprovalHistory(this.documentObjectId).then(res => {
@@ -236,10 +241,14 @@ export default {
 					for (let index = 0; index < res.data.length; index++) {
 						let user = res.data[index];
 						let userId = user.userId;
-						userApi.getDetailUser(userId).then(res1=>{
-							user.displayName = res1.data.user.displayName
-							thisCpn.listApprovalUser.push(user)
-						}).always({}).catch({});
+						let userInfo = thisCpn.allUsers.filter(user=>{
+							return user.id == userId;
+						})
+						if(userInfo.length > 0){
+							user.displayName = userInfo[0].displayName
+							thisCpn.listApprovalUser.push(user);
+						}
+						
 					}
 				}
 			})
@@ -327,6 +336,7 @@ export default {
 	}
 	.related-user-info img, .approval-info img{
 		height: 24px;
+		width: 24px;
 		border-radius: 50%;
 		margin-left: 14px;
 		margin-right: 8px;

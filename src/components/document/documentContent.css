@@ -46,7 +46,6 @@ p {
     font-size: 11px;
     border: 1px solid #e9ecef;
     font-family: Roboto, sans-serif;
-    color: gray;
     padding: 0 5px;
     outline: 0!important;
 }
@@ -120,6 +119,7 @@ p {
     border-bottom: 0.5px solid #ccc;
     border-radius: 0 !important;
     font-weight: normal;
+    height: 25px;
 }
 
 .s-control-label {
@@ -152,6 +152,10 @@ p {
 
 input.s-control:not(.s-control-panel):not(.detail-view):hover {
     background: rgb(233, 236, 239) !important;
+}
+
+input.s-control {
+    color: blue;
 }
 
 .handsontable td,
@@ -201,9 +205,11 @@ input.s-control:not(.s-control-panel):not(.detail-view):hover {
 }
 
 .s-control-approval-history {
-    padding: 0 !important;
     width: 100% !important;
-    border: none !important;
+    background: white;
+    border: 1px solid #dedddd;
+    margin-top: 12px;
+    padding: 8px;
 }
 
 .s-control-approval-history .approved-item {

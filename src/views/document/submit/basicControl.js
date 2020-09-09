@@ -52,11 +52,9 @@ export default class BasicControl extends Control {
 
     render() {
         let thisObj = this;
-        this.ele.wrap('<span style="position:relative;display:inline-block;">');
+        this.ele.wrap('<span style="position:relative;display:inline-block">');
         this.ele.attr('key-instance', this.curParentInstance);
-        if (!this.checkDetailView()) {
-            this.ele.css({ color: 'blue' })
-        }
+
         // if (this.checkDetailView() &&
         //     this.controlProperties['isSaveToDB'] !== undefined &&
         //     (this.controlProperties['isSaveToDB'].value !== "1" ||
@@ -135,6 +133,7 @@ export default class BasicControl extends Control {
         if (sDocument.state.viewType[this.curParentInstance] == 'submit') {
             this.setDefaultValue();
         }
+
 
         this.setEvent();
 
