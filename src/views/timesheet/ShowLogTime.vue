@@ -19,14 +19,17 @@
             @cancel="cancelSave()"
             :dateMonth ="dateMonth"
             :formType="formType"
+            :cancelTask="cancelTask"
+            :cancelCate="cancelCate"
             :load ="load"
+            @doneCate="doneCate()"
             :update ="update"
             :newEvent="logtimeEvent" 
             :onSave="onSaveLogTimeEvent"
             :onCancel="onCancelSave">
         </LogTimeForm>
-         <TaskForm @loadTask="loadTask()" v-show="showTask&&showCategory==false" @cancel="cancel()"/>
-         <CategoryForm @updateList="updateAPICategory()" v-show="showCategory" @cancel="cancel()"/>
+         <TaskForm @loadTask="loadTask()" v-show="showTask&&showCategory==false" @cancel="cancelTaskForm()"/>
+         <CategoryForm @updateList="updateAPICategory()" v-show="showCategory" @cancel="cancelCateForm()"/>
     </v-dialog>
      <!-- test -->
       <v-dialog
@@ -98,6 +101,8 @@ export default {
             load:false,
             // log form
             dateMonth:'',
+            cancelTask:false,
+            cancelCate:false,
             logtimeDialog: false,
             logtimeEvent: null,
             formType: 'log',
@@ -132,6 +137,9 @@ export default {
         })
     },
     methods: {
+        doneCate(){
+            this.updateAPICate = false
+        },
         updateAPICategory(){
             this.updateAPICate =true;
 
@@ -140,10 +148,18 @@ export default {
             debugger
             this.load = true;
         },
-        cancel(){
+        cancelTaskForm(){
             debugger
             this.showTask=false;
             this.showCategory=false;
+            this.cancelTask != this.cancelTask;
+        },
+        
+        cancelCateForm(){
+            debugger
+            this.showTask=false;
+            this.showCategory=false;
+            this.cancelCate != this.cancelCate;
         },
         showTaskForm(value){
             debugger

@@ -64,7 +64,7 @@
         <v-card-text>{{title}}</v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="green darken-1" text @click=" removeFileAttach">{{$t("kh.dialog.yes")}}</v-btn>
+          <v-btn color="green darken-1" text @click="removeFileAttach">{{$t("kh.dialog.yes")}}</v-btn>
           <v-btn color="red darken-1" text @click="dialogAlert = false">{{$t("kh.dialog.cancel")}}</v-btn>
         </v-card-actions>
       </v-card>
@@ -103,7 +103,11 @@ export default {
       default: () => {}
     }
   },
-  
+  watch:{
+    taskInfo:function(newVl){
+      this.getData();
+    }
+  },
   data: function() {
     const srcs = {
       1: "https://cdn.vuetifyjs.com/images/lists/1.jpg",
@@ -123,66 +127,16 @@ export default {
       dialogAlert: false,
       header:'',
       title:'',
-      desserts: [
-        {
-          name: "Frozen Yogurt",
-          size: 159,
-          owner: { id: 1, name: "Sandra Adams", role: "BA", avatar: srcs[1] },
-          type: "xlsx",
-          date: "02-03-2020",
-          remove: ""
-        },
-        {
-          name: "Ice cream sandwich",
-          size: 237,
-          owner: { id: 2, name: "Ali Connors", role: "BA", avatar: srcs[2] },
-          type: "pdf",
-          date: "02-03-2020",
-          remove: ""
-        },
-        {
-          name: "Eclair",
-          size: 262,
-          owner: { id: 3, name: "Trevor Hansen", role: "BA", avatar: srcs[3] },
-          type: "dpcs",
-          date: "02-03-2020",
-          remove: ""
-        },
-        {
-          name: "Jelly bean",
-          size: 375,
-          owner: { id: 4, name: "Tucker Smith", role: "BA", avatar: srcs[2] },
-          type: "xlsx",
-          date: "02-03-2020",
-          remove: ""
-        },
-        {
-          name: "Lollipop",
-          size: 392,
-          owner: { id: 5, name: "Britta Holt", role: "BA", avatar: srcs[4] },
-          type: "txt",
-          date: "02-03-2020",
-          remove: ""
-        },
-        {
-          name: "KitKat",
-          size: 518,
-          owner: { id: 6, name: "Jane Smith ", role: "BA", avatar: srcs[5] },
-          type: "ppt",
-          date: "02-03-2020",
-          remove: ""
-        }
-      ],
       headers: [
         {
-          text: "File",
+          text: this.$t('tasks.table.fileName'),
           align: "start",
           value: "name"
         },
-        { text: "Kiểu", value: "type" },
-        { text: "Người upload", value: "userId" },
-        { text: "Size", value: "size" },
-        { text: "Ngày", value: "createAt" },
+        { text: this.$t('tasks.table.type'), value: "type" },
+        { text: this.$t('tasks.table.owner'), value: "userId" },
+        { text: this.$t('tasks.table.size'), value: "size" },
+        { text: this.$t('tasks.table.date'), value: "createAt" },
         { text: "", value: "remove" }
       ],
        contextMenu: [
@@ -255,7 +209,33 @@ export default {
         .always(() => {});
     },
     removeFileAttach() {
-        alert("Chức năng đang được hoàn thiện");
+        let data={};
+        data.id=this.fileId;
+        taskApi
+        .deleteFile(data)
+        .then(res => {
+          if (res.status == 200) {
+            this.$store.dispatch("task/removeFileAttachToStore", this.fileId);
+          } else if (res.status == 403) {
+            this.$snotifyError("Error", res.message);
+          } else {
+            this.$snotifyError(
+              "Error",
+              "Error from delete attachment file!!!"
+            );
+          }
+        })
+        .catch(err => {
+          console.log("error from delete attachment file!!!", err);
+        })
+        .always(() => {});
+      this.dialogAlert = false;
+    },
+    getData(){
+      let data = {};
+      data.objectIdentifier = this.taskInfo.action.parameter.taskId;
+      data.objectType = "task";
+      this.$store.dispatch("task/getArrFileAttachment", data);
     }
   },
   computed: {
@@ -267,15 +247,11 @@ export default {
     },
     listFileAttachment() {
       let arr = this.stask.arrFileAttach;
-      console.log(arr);
       return arr;
     }
   },
   created() {
-    let data = {};
-    data.objectIdentifier = this.taskInfo.action.parameter.taskId;
-    data.objectType = "task";
-    this.$store.dispatch("task/getArrFileAttachment", data);
+    this.getData();
   }
 };
 </script>

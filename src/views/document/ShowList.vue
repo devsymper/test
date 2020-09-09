@@ -58,6 +58,15 @@ export default {
                         this.$goToPage('/documents/'+document.id+'/editor/print-config',document.title);
                     },
                 },
+                list_print_config: {
+                    name: "listPrintConfig",
+                    text: function() {
+                        return " <i class= 'mdi mdi-format-list-checkbox' > </i>&nbsp; Danh sách bản in";
+                    },
+                    callback: (document, callback) => {
+                        this.$goToPage('/documents/'+document.id+'/print-config',"Danh sách bản in");
+                    },
+                },
                 clone: {
                     name: "cloneDoc",
                     text: function() {
@@ -95,6 +104,7 @@ export default {
                         this.$goToPage('/documents/'+document.id+'/objects',"Danh sách bản ghi");
                     },
                 },
+                
                 list_draft: {
                     name: "listDraftObject",
                     text: function() {

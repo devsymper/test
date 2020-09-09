@@ -17,7 +17,6 @@
                 </template>
                 <span>{{$t('orgchart.editor.main')}}</span>
             </v-tooltip>
-
             <v-tooltip top>
                 <template v-slot:activator="{ on, attrs }">
                     <v-tab
@@ -31,7 +30,6 @@
                 </template>
                 <span>{{$t('orgchart.editor.customAttributes')}}</span>
             </v-tooltip>
-
             <v-tooltip top>
                 <template v-slot:activator="{ on, attrs }">
                     <v-tab
@@ -79,10 +77,8 @@
                         class="fs-12">
                     Select permissions
                     </span>
-
                     <PermissionSelector
                         v-model="selectingNode.permissions">
-                        
                     </PermissionSelector>
                 </div>
             </v-tab-item>
@@ -178,7 +174,7 @@
 
             <v-tab-item :key="'style'" class="pa-2">
                 <span class="fs-15 font-weight-medium">{{$t('orgchart.editor.style')}}</span>
-                <SearchNodeStyle class="mt-2 mb-4" @change-style-template="changeNodeStyle"></SearchNodeStyle>
+                <SearchNodeStyle class="mt-2 mb-4" @change-style-template="changeNodeStyle" :change="Math.floor(Math.random() * 1000)"></SearchNodeStyle>
                 <form-tpl
                     :viewOnly="action == 'view'"
                     :singleLine="false"
@@ -237,7 +233,6 @@
                 </v-card-text>
                 <v-card-actions class="mt-4">
                     <v-spacer></v-spacer>
-
                     <v-btn
                         text
                         small
@@ -284,7 +279,7 @@ export default {
                     this.openAddPanel = false;
                 }
             }
-        });
+		});
     },
     components: {
         "form-tpl": FormTpl,
@@ -346,7 +341,7 @@ export default {
                     type: "text",
                     value: "",
                     info: ""
-                }
+                },
             },
             nodeStyleConfig: getNodeStyleConfig(),
             SYMPER_HOME_ORGCHART: SYMPER_HOME_ORGCHART,
@@ -409,9 +404,10 @@ export default {
                 name: this.nodeStyleConfigToSave.name.value,
                 description: this.nodeStyleConfigToSave.description.value,
                 shareMode: this.nodeStyleConfig.public.value ? 1 : 0,
-                content: JSON.stringify(content)
+				content: JSON.stringify(content)
             };
-            let res = await orgchartApi.createNodeStyle(dataToSave);
+			let res = await orgchartApi.createNodeStyle(dataToSave);
+			debugger
             if (res.status == 200) {
                 this.$snotifySuccess("Save node style successfully!");
                 this.showSaveStyleDialog = false;
@@ -430,7 +426,7 @@ export default {
             this.$emit("update-dynamic-attr-display");
         },
         handleChangeUser(newValue) {
-            this.$emit("change-user-select", newValue);
+			this.$emit("change-user-select", newValue);
         },
         removeDynamicItem(index) {
             this.selectingNode.customAttributes.splice(index, 1);

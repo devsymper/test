@@ -6,18 +6,13 @@
         @init="setupGraph"
         ref="jointPaper" />
 </template>
-
 <script>
 import JointPaper from "@/components/common/rappid/JointPaper";
 import { createDepartmentNode, defineDepartment, DEFAULT_DEPARTMENT_DISPLAY, FOUCUS_DEPARTMENT_DISPLAY } from "./../nodeDefinition/departmentDefinition";
 import { createPositionNode, definePosition, DEFAULT_POSITION_DISPLAY, FOUCUS_POSITION_DISPLAY } from "./../nodeDefinition/positionDefinition";
 import { SYMPER_HOME_ORGCHART, getDefaultConfigNodeData, jointLinkNode } from './nodeAttrFactory';
-
 import avatarDefault from "@/assets/image/avatar_default.jpg";
-
 require('@/plugins/rappid/rappid.css');
-
-
 export default {
     components: {
         JointPaper
@@ -105,8 +100,6 @@ export default {
             let graph = this.$refs.jointPaper.graph;
             let treeLayout = this.$refs.jointPaper.treeLayout;
             let self = this;
-
-            
             paper.on('element:remove', function(elementView, evt, x, y) {
                 evt.stopPropagation();
                 let allChildIds = self.getAllChildIdOfNode(elementView.model.id);
@@ -115,7 +108,8 @@ export default {
                     cell.remove();
                 }
                 // A member removal
-                treeLayout.layout();
+				treeLayout.layout();
+				self.$emit('delete-node')
             });
             
             paper.on('element:add', function(elementView, evt) {
@@ -132,7 +126,6 @@ export default {
                 }else{
                     newNode = createPositionNode(name);
                 }
-                
                 var newConnection = jointLinkNode(elementView.model, newNode);
                 graph.addCells([newNode, newConnection]);
                 treeLayout.layout();
@@ -161,9 +154,8 @@ export default {
             });
 
             paper.on('cell:contextmenu', function(elementView, evt, x, y) {
-                self.$emit('cell-contextmenu', elementView.model.id);      
+				self.$emit('cell-contextmenu', elementView.model.id); 
             });
-
             
             paper.on('element:collapse', function(view, evt) {
                 evt.stopPropagation();
@@ -186,8 +178,9 @@ export default {
         },
         getAllNode(){
             return this.$refs.jointPaper.graph.getCells().filter((el) => {
-                return el.attributes.type != 'org.Arrow';
-            });
+				return el.attributes.type != 'org.Arrow';
+			});
+			
         },
         getAllLink(){
             return this.$refs.jointPaper.graph.getCells().filter((el) => {
@@ -226,7 +219,8 @@ export default {
             for(let childId in mapNode[currentNodeId].children){
                 this.appendChildToNode(result, mapNode, childId);
             }
-        },
+		},
+		
         unHighlightCurrentNode(){
             let displayConfig = this.context == 'department' ? DEFAULT_DEPARTMENT_DISPLAY : DEFAULT_POSITION_DISPLAY;
             if(this.selectingNode && this.selectingNode.id && this.selectingNode.id != SYMPER_HOME_ORGCHART){
@@ -247,12 +241,14 @@ export default {
             let nodeName = this.context == 'department' ? this.$t('orgchart.editor.department') : this.$t('orgchart.editor.position');
             nodeName += ' 1';
             let firstNode = this.context == 'department' ?  createDepartmentNode(nodeName) : createPositionNode(nodeName);
-            this.$refs.jointPaper.graph.resetCells([firstNode]);
-            this.$emit('new-viz-cell-added', {
+			this.$refs.jointPaper.graph.resetCells([firstNode]);
+			let data = {
                 id: firstNode.id,
                 name: nodeName,
                 autoCreateFirstNode: true
-            });
+			}
+            this.$emit('new-viz-cell-added', data);
+			return data
         },
         changeUserDisplayInNode(userIdList){
             let lastUserInfo = this.mapUserById[userIdList[userIdList.length - 1]];
@@ -327,7 +323,6 @@ export default {
         repositionFirstCell(graph, paperScroller){
             let firstNode = graph.getCells()[0];
             firstNode.position(300,20);
-            console.log(paperScroller, 'paperScrollerpaperScrollerpaperScrollerpaperScroller');
             
         },
 		exampleSetupGraph(graph) {

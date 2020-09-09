@@ -253,6 +253,9 @@ export default {
         sDocumentSubmit() {
             return this.$store.state.document.submit[this.keyInstance];
         },
+        endUserInfo(){
+            return this.$store.state.app.endUserInfo;
+        },
         viewType(){
             return this.$store.state.document.viewType[this.keyInstance]
         }
@@ -628,17 +631,22 @@ export default {
         },
         "sDocumentSubmit.readyLoaded":function(data){
             if(data == true){
-                this.loading = false;
-                $("#sym-submit-" + this.keyInstance).find('.page-content').removeClass('d-block');
-                $("#sym-submit-" + this.keyInstance).find('.list-page-content').removeClass('d-flex');
-                $("#sym-submit-" + this.keyInstance).css({opacity:'1'});
+                this.hidePreloader()
             }
         },
     },
     
     methods: {
-        
-        // hàm
+        /**
+         * Hàm ẩn loader
+         */
+        hidePreloader(){
+            this.loading = false;
+            $("#sym-submit-" + this.keyInstance).find('.page-content').removeClass('d-block');
+            $("#sym-submit-" + this.keyInstance).find('.list-page-content').removeClass('d-flex');
+            $("#sym-submit-" + this.keyInstance).css({opacity:'1'});
+        },
+        // hàm lây các tham số trong workflow phục vụ cho submit
         getParamsForRunDataFlow(properties){
             let mapControlToParams = properties.mapParamsDataflow.value;
             let dataParams = {}
@@ -1150,18 +1158,22 @@ export default {
                             });
                             tableControl.listInsideControls = listInsideControls;
                             tableControl.renderTable();
-                            tableControl.tableInstance.updateTable(valueInput);
+                            tableControl.setData(valueInput);
                             this.addToListInputInDocument(controlName,tableControl)
                         }
                     }
                 }
 
             }
+            console.log("sadsadsad",this.sDocumentSubmit);
             this.listDataFlow = listDataFlow;
             if(!isSetEffectedControl)
             this.getEffectedControl();
             if(this.docObjId == null)
             thisCpn.findRootControl();
+            else{
+                this.hidePreloader()
+            }
 
         },
         addToTableLoadedStore(controlName){
@@ -1376,13 +1388,10 @@ export default {
             let thisCpn = this;
             documentApi.submitDocument(dataPost).then(res => {
                 let dataResponSubmit = res.data;
-                userApi.getDetailUser(res.data.document_object_user_created_id).then(res=>{
-                    dataResponSubmit['document_object_user_created_fullname'] = res.data.user.displayName;
-                    thisCpn.$emit('submit-document-success',dataResponSubmit);
-                }).always({}).catch({})
+                dataResponSubmit['document_object_user_created_fullname'] = thisCpn.endUserInfo.id;
+                thisCpn.$emit('submit-document-success',dataResponSubmit);
                 thisCpn.isSubmitting = false;
                 if (res.status == 200) {
-                    
                     thisCpn.$snotify({
                         type: "success",
                         title: "Submit document success!"
@@ -1901,7 +1910,10 @@ export default {
 								
 							}
 						}
-					}
+                    }
+                }
+                if(listRootControl.length == 0){
+                    this.hidePreloader();
                 }
 			// lưu lại các mối quan hệ cho lần submit sau ko phải thực hiện các bước tìm quan hê này (các root control , các luồng chạy công thức)
 				let dataPost = {impactedFieldsList:impactedFieldsList,impactedFieldsListWhenStart:impactedFieldsListWhenStart,rootControl:listRootControl};

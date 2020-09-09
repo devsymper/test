@@ -81,6 +81,11 @@ export default {
         icon: 'mdi-file-edit-outline',
         link: '/knowledge',
     },
+    // comment: {
+    // 	title: 'tesstsdádasdad',
+    // 	icon: 'mdi-file-edit-outline',
+    // 	link: '/comment',
+    // },
     timeSheetLogWork: {
         title: "My work",
         icon: "mdi-calendar",

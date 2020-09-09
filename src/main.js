@@ -4,7 +4,7 @@ import router from "./router";
 import store from "./store";
 import "./assets/css/main.css";
 import vuetify from "./plugins/vuetify";
-import i18n from './lang/i18n'
+import i18n from './lang/i18n';
 import {
     util
 } from "./plugins/util.js";
