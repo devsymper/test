@@ -32,7 +32,7 @@
         <div  class="sym-document__side-bar-right">
             <sidebar-right ref="sidebarRight" :isConfigPrint="true"  :instance="keyInstance"/>
         </div>
-        <s-table-setting  ref="tableSetting" @add-columns-table="addColumnTable"/>
+        <PrintTableConfig  ref="printTableConfig" @config-column-table-print="ConfigColumnTablePrint"/>
         <auto-complete-control ref="autocompleteControl" @add-control="insertControl"/>
         <save-form-panel :instance="keyInstance" ref="saveFormPanel"/>
         <err-message :listErr="listMessageErr" ref="errMessage"/>
@@ -55,7 +55,7 @@
 import EditorAction from './../items/Action.vue';
 import SideBarLeft from './../sideleft/SideBarLeft.vue';
 import SideBarRight from './../sideright/SideBarRight.vue';
-import TableSetting from './../items/TableSetting.vue';
+import PrintTableConfig from './PrintTableConfig';
 import AutoCompleteControl from './../items/AutoCompleteControl.vue';
 import controlCss from  "./../../../assets/css/document/control/control.css";
 import SaveFormPanel from "./SaveFormPanel";
@@ -109,13 +109,13 @@ export default {
         'sidebar-left' : SideBarLeft,
         'sidebar-right' : SideBarRight,
         'editor-action' : EditorAction,
-        's-table-setting' : TableSetting,
         'auto-complete-control' : AutoCompleteControl,
         'save-form-panel': SaveFormPanel,
         'err-message': ErrMessagePanel,
         "vue-resizable":VueResizable,
         "all-control-option":AllControlInDoc,
         "control-name-related":ControlNameRelated,
+        PrintTableConfig
     },
     mounted(){
         let self = this;
@@ -145,7 +145,7 @@ export default {
                                         text: 'Setting table',
                                         disabled : false,
                                         onAction: function(e) {
-                                            self.showSettingControlTable(e);
+                                            self.showPrintConfigTable(e);
                                         }
                                     });
                                 
@@ -547,31 +547,19 @@ export default {
             }
         },
         // hàm xử lí thêm các cột vào trong control table khi lưu ở tablesetting
-        addColumnTable(listRowData){
+        ConfigColumnTablePrint(listRowData){
             let elements = $('#document-editor-'+this.keyInstance+'_ifr').contents().find('.s-control-table.on-selected');
-            let table = elements.find('thead').closest('.s-control-table');
-            let tableId = table.attr('id');
-            let thead = '';
-            let tbody = '';
-            for(let i = 0; i < listRowData.length; i++ ){
-                let row = listRowData[i];
-                let type = row.type;
-                let control = GetControlProps(type);
-                control.properties.name.value = row.name;
-                control.properties.title.value = row.title;
-                let controlEl = $(control.html);
+            let thead = elements.find('thead th');
+            for (let index = 0; index < thead.length; index++) {
+                let th = thead[index];
+                $(th).css({width:listRowData[index].colWidth})
+                $(th).attr('data-mce-style',$(th).attr('style'))
                 
-                controlEl.attr('id', row.key);
-                thead += `<th>`+row.columnName+`</th>`
-                tbody += `<td>`+controlEl[0].outerHTML+`</td>`
-                this.addToAllControlInTable(row.key,{properties: control.properties, formulas : control.formulas,type:type},tableId)
             }
-            elements.find('thead tr').html(thead);
-            elements.find('tbody tr').html(tbody);
         },
 
         //hoangnd: hàm mở modal tablesetting của control table
-        showSettingControlTable(e) {
+        showPrintConfigTable(e) {
             let elements = $('#document-editor-'+this.keyInstance+'_ifr').contents().find('.on-selected').closest('.s-control-table');
             if(elements.is('.s-control-table')){
                 let thead = elements.find('thead tr th');
@@ -581,16 +569,13 @@ export default {
                 let listData = [];
                 if($(tbody[0].innerHTML).length > 0){
                     for(let i = 0; i< thead.length; i++){
-                        let idControl = $(tbody[i].innerHTML).first().attr('id');
-                        let typeControl = $(tbody[i].innerHTML).first().attr('s-control-type');
-                        let name = this.editorStore.allControl[tableId]['listFields'][idControl].properties.name.value;
-                        let title = this.editorStore.allControl[tableId]['listFields'][idControl].properties.title.value;
-                        let row = {columnName: $(thead[i]).text(),name: name,title:title, type: typeControl,key:idControl}
+                        var width = Math.ceil(( 100 * parseFloat($(thead[i]).css('width')) / parseFloat($(thead[i]).parent().css('width')) ) )+ '%';
+                        let row = {title: $(thead[i]).text(),colWidth:width}
                         listData.push(row)
                     }
                 }
-                this.$refs.tableSetting.showDialog();
-                this.$refs.tableSetting.setListRow(listData);
+                this.$refs.printTableConfig.showDialog();
+                this.$refs.printTableConfig.setListRow(listData);
             }
         },
 
