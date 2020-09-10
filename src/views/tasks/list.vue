@@ -74,8 +74,9 @@
                         }"
                         @click="selectObject(obj, idx)">
                         <v-col
+                            v-if="!sideBySideMode"
                             style="line-height: 42px"
-                            :cols="sideBySideMode ? 2 : 1"
+                            cols="1"
                             class="fs-12 px-1 py-0">
                                 {{obj.taskData.action.action=='submit'? $t('tasks.header.submit'): $t('tasks.header.approval')}}
                         </v-col>
@@ -444,18 +445,12 @@ export default {
                                     );
                                     listTasks.splice(index, 1);
                                 }
-                                let description=JSON.parse(listTasks[index].description);
-                                if (description.action.action=="approval" && description.action.parameter.documentObjectId != undefined) {
-                                    console.log("docOi",description.action.parameter.documentObjectId);
-                                    this.arrdocObjId.push(description.action.parameter.documentObjectId);
-                                }
                             }
                         }
                     );
                 }
             );
-            console.log("arrdocObjId", this.arrdocObjId);
-            this.$store.dispatch("task/getArrDocObjId", this.arrdocObjId);
+          
             console.log(listTasks,"listTassk");
             this.addOtherProcess(listTasks);
             this.loadingTaskList = false;
@@ -469,7 +464,12 @@ export default {
                 listTasks[index].owner = this.getUser(
                     parseInt(listTasks[index].owner)
                 );
+                let description=JSON.parse(listTasks[index].description);
+                if (description.action.action=="approval" && description.action.parameter.documentObjectId != undefined) {
+                    this.arrdocObjId.push(description.action.parameter.documentObjectId);
+                }
             }
+            this.$store.dispatch("task/getArrDocObjId", this.arrdocObjId);
             this.listProrcessInstances.push({
                 processDefinitionId: null,
                 processDefinitionName: this.$t("common.other"),
