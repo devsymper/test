@@ -1229,6 +1229,7 @@ export default {
             this.$emit("filter-list", {});
         },
         searchAll() {
+            debugger
             // Phát sự kiện khi người dùng gõ vào ô tìm kiếm
             this.$emit("search-all", {});
         },
