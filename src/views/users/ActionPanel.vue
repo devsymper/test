@@ -620,7 +620,21 @@ export default {
 
 			});
 		},
-
+		deleteUser(id){
+			let self = this;
+			let data = {status:-1};
+			userApi.updateUser(id, data).then(res => {
+				if (res.status == 200) {
+					self.$emit("refresh-data");
+					self.$snotify({
+						type: "success",
+						title: this.$t("notification.successTitle")});
+				}
+			})
+			.catch(err => {
+				console.log("error from add user api!!!", err);
+			});
+		},
 		/**
 		 * Hoangnd: 14/4/2020
 		 * Hàm update user
