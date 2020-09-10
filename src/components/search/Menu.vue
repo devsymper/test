@@ -98,12 +98,12 @@ export default {
 </script>
 
 <style>
-.fm {
+/* .fm {
     font-family: Roboto;
 }
 
 .v-list-item:hover {
     background: rgba(0, 0, 0, 0.05);
-}
+} */
 
 </style>

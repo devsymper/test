@@ -187,7 +187,7 @@ export default {
 }
 </script>  
 <style>
-.fm {
+/* .fm {
     font-family: Roboto;
 }
 
@@ -209,5 +209,5 @@ export default {
 
 .v-menu__content {
     width: 100px;
-}
+} */
 </style>

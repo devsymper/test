@@ -1,7 +1,7 @@
 <template>
     <v-combobox @keydown="enter" class="auto-complete" style="border-radius:4px"
         :hide-no-data="true" no-filter :items="searchItems"
-        menu-props="offset-y "
+        menu-props="{offset-y:true, maxHeight:300}"
         :search-input.sync="value" label="Tìm kiếm">
         <template v-slot:item="{ item, attrs }">
             <template v-if="item.group">
@@ -25,8 +25,10 @@
                             class="item-title" v-html="item.displayName">
                         </v-list-item-title>
                            <v-list-item-title v-else
-                            :style="{'margin-left': item.type === 'user' ? '0' : '0.5rem'}" 
-                            class="item-title" v-html="item.searchField">
+                            style="margin-left: 0.5rem" 
+                            class="item-title" >
+                            <span v-if="item.searchField!=undefined" v-html="item.searchField"></span>
+                            <span v-else v-html="item.displayName"></span>
                         </v-list-item-title>
                         <v-list-item-subtitle v-if="item.type!= 'document_definition'"
                             :style="{'margin-left': item.type === 'user' ? '0' : '0.5rem'}"
@@ -34,7 +36,7 @@
                         </v-list-item-subtitle>
                           <v-list-item-title v-else
                             :style="{'margin-left': item.type === 'user' ? '0' : '0.5rem'}" 
-                            class="item-title" v-html="item.description">
+                            class="item-subtitle" v-html="item.description">
                         </v-list-item-title>
                     </v-list-item-content>
                     <v-list-item-action v-show="item.enable&&item.actions.length>0" class="dot">
@@ -68,6 +70,8 @@ export default {
      data: function () {
         return {
             value: '',
+            menu:[],
+            searchItemsAll:[],
             searchItems: [],
             dataResultSearch:[],
             defineAction:{
@@ -130,25 +134,36 @@ export default {
             }
         },
         enter(event){
-            if (event.code == "Enter"){
-            this.setMenu();
-            this.$store.commit('search/setSearch',  this.searchItems);
-            this.$store.commit('search/setShowGeneral', true);
-            this.$store.commit('search/setCountResult', this.searchItems.length);
-            this.$router.push('/search/general');
-
+            if (event.code == "Enter"){debugger
+                if(this.value!=''&&this.value!=null){
+                this.setMenu();
+                this.$store.commit('search/setSearch',  this.searchItems);
+                this.$store.commit('search/setSearchAll',  this.searchItemsAll);
+                this.$store.commit('search/setShowGeneral', true);
+                this.$store.commit('search/setCountResult', this.searchItems.length);
+                this.$router.push('/search/general');}
+                else{
+                    this.$store.commit('search/setSearch', [] );
+                }
             };
-            this.searchItems =[]
-            //this.$store.commit('search/setSearch',  []);
+            if(this.value!=''&&this.value!=null){
+                this.menu= this.searchItemsAll;
+                this.searchItems =[];
+                this.$store.commit('search/setSearch', this.menu );}
+            else{
+                this.$store.commit('search/setSearch', [] );
+            }
+            
 
         },
         setMenu(){
+            debugger
             let menu = [];
-            for (let i = 0; i < this.searchItems.length; i++) {
+            for (let i = 0; i < this.menu.length; i++) {
                 // console.log(this.newSearch[i].group);
-                let name = Object.keys(this.searchItems[i]);
+                let name = Object.keys(this.menu[i]);
                 if (name[0] == 'group') {
-                    menu.push(this.searchItems[i].group);
+                    menu.push(this.menu[i].group);
                 }
             };
             this.$store.commit('search/setMenu', menu);
@@ -222,12 +237,18 @@ export default {
                             const regex = new RegExp(newVal,"gi");
                             const normalizedData = res.data.map(data => {
                                 const returnObjSearch = {};
+                                 if(data.type=='application_deninition'){
+                                    returnObjSearch.iconType = data.iconType;
+                                    returnObjSearch.iconName = data.iconName;
+                                }
                                 if(data.type=== 'user'){
-                                    returnObjSearch.displayName = data.displayName;
+                                    returnObjSearch.displayName = data.displayName? data.displayName:"Không có tên";
                                 }else if(data.type=='document_definition'){
-                                     returnObjSearch.displayName = data.title;
+                                     returnObjSearch.displayName = data.title?data.title:"Không có tên";
+                                }else if(data.type=='syql'){
+                                     returnObjSearch.displayName = data.lastContent?data.lastContent:"Không có công thức";
                                 }else{
-                                     returnObjSearch.displayName = data.name;
+                                     returnObjSearch.displayName = data.name? data.name:"Không có tên";
                                 }
                                 const keys = Object.keys(data);
                                 // xử lý bôi cam
@@ -241,14 +262,17 @@ export default {
                                     }
                                 }
                                 //console.log(data);
-                                
+                                //debugger
+                                returnObjSearch.searchField = returnObjSearch.searchField!=undefined?(returnObjSearch.searchField.indexOf('{')>-1?'Không có mô tả':returnObjSearch.searchField):undefined;
                                 returnObjSearch.avatar = data.avatar;
                                 returnObjSearch.type = data.type;
                                 returnObjSearch.id = data.id;
                                 returnObjSearch.actions = data.actions;
                                 returnObjSearch.enable = false;
                                 returnObjSearch.description = data.description?data.description:(data.description==null||data.description==''?"Mô tả đang để trống":"Symper");
+                               
                                 //debugger
+                               
                                 return returnObjSearch;
                             })
                             const groupByType = _.groupBy(normalizedData, 'type');
@@ -261,6 +285,7 @@ export default {
                                 searchData.push(...groupByType[type].slice(0, 3));
                                 allData.push(...groupByType[type]);
                             })
+                            self.searchItemsAll = allData;
                             self.searchItems = searchData;
                             self.$store.commit('search/setSearch',  self.searchItems);
                             self.$store.commit('search/setSearchAll', allData);
@@ -361,7 +386,7 @@ export default {
 
 </style>
 <style >
- .v-autocomplete__content{
+ /* .v-autocomplete__content{
     max-width: 330px!important;
     top: 40px!important;
   
@@ -371,5 +396,5 @@ export default {
 }
 .v-select__slot{
     font-size:13px;
-}
+} */
 </style>

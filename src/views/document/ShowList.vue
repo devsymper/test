@@ -111,6 +111,7 @@ export default {
                     callback: (document, callback) => {
                         this.$refs.listDocument.openactionPanel();
                         this.documentId = parseInt(document.id)
+
                     },
                 },
                 {
@@ -124,8 +125,10 @@ export default {
                     name: "importExcel",
                     text: "Import excel",
                     callback: (document, callback) => {
-                        this.drawerImportExelPanel =! this.drawerImportExelPanel; 
+                        this.drawerImportExelPanel = true; 
                         this.documentId = Number(document.id);
+                       // this.documentId = 1729;
+
                         
                     }
                 },

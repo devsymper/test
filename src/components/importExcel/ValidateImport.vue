@@ -39,16 +39,16 @@
         <div v-if="processing.validating.errors!=null">
             <v-row v-for="(errorControl, errorControlIdx) in processing.validating.errors " :key="errorControlIdx" 
             class="ml-5 mt-1">
-                 <v-row style="width:100%;" class="mt-3 color-grey ml-0">Tên sheet {{errorControl.sheet}}
+                 <v-row style="width:100%;" class="mt-3 color-grey ml-0">Sheet lỗi: <span style="margin-left:5px; color:red;font-weight:430"> {{errorControl.sheet}}</span>
                     </v-row>
                 <v-row class="d-flex ml-0 mt-2" style="margin-bottom:-18px">
-                    <span style=""  class="color-grey fs-13">Cột sai: {{errorControl.title}} </span>
+                    <span style=""  class="color-grey fs-13">Trường Doc sai: <span style="margin-left:5px; color:red;font-weight:400"> {{errorControl.controlName}} </span> </span>
                   
                 </v-row>
-                  <v-row style="width:100%;" class="mt-6 color-grey ml-0">Nội dung: {{errorControl.columnName}}
+                  <v-row style="width:100%;" class="mt-6 color-grey ml-0">Cột lỗi trong excel: <span style="margin-left:5px; color:red;font-weight:400"> {{errorControl.columnName}}</span>
                     </v-row>
                    
-                <div class="mb-1 mt-2" v-for="(error, errorIdx) in errorControl.errors" :key="errorIdx">
+                <div class="mb-15 mt-2" v-for="(error, errorIdx) in errorControl.errors" :key="errorIdx">
                     <!-- xử lý trường hợp không đúng định dạng dữ liệu -->
                     <div v-if="error.type=='invalidDataType'">
                         <span class="font">
@@ -63,17 +63,17 @@
                         </v-row>
                         <v-row style="background-color:#F5F5F5; height: 30px" class="ml-0 mt-2">
                             <v-col>
-                                Dòng
+                                Dòng sai
                             </v-col>
                             <v-col>
-                                Giá trị
+                                Giá trị đang sai
                             </v-col>
                         </v-row>
-                        <v-row v-for="(errorInfo, i) in error.info" :key="i" class="ml-0 " style="background-color:#F5F5F5; margin-top:-5px; margin-bottom:-15px">
-                            <v-col>
+                        <v-row v-for="(errorInfo, i) in error.info" :key="i" class="ml-0" style="background-color:#F5F5F5; margin-top:-5px; margin-bottom:-15px">
+                            <v-col v-if="i<10">
                                 {{errorInfo.row}}
                             </v-col>
-                            <v-col>
+                            <v-col v-if="i<10">
                                 {{errorInfo.value}}
                             </v-col>
                         </v-row>

@@ -43,7 +43,7 @@
     <!-- Thông tin chung -->
     <v-list class="fs-13 ml-4 mr-0">
         <div class="col-flex" style= "margin-bottom:-42px" v-for="(table, tableIdx) in tables" :key="tableIdx">
-            <v-row class=" mr-1 mb-4">
+            <v-row  class=" mr-1 mb-4">
                 <v-col class="col-md-5 ml-1 pl-2" style="margin-top: -13px">
                     <v-icon v-if="tables[tableIdx]==tables[0]" size="18">mdi-file-outline</v-icon>
                     <v-icon v-else size="18" class='ml-3'>mdi-table</v-icon>
@@ -99,7 +99,7 @@
                     </v-autocomplete>
                 </v-col>
             </v-row>
-            <v-row class="mr-3 mb-4" v-for="(control, controlIdx) in table.controls" :key="controlIdx" v-if="control.dataType!='table'">
+            <v-row class="mr-3 mb-4" v-for="(control, controlIdx) in table.controls" :key="controlIdx" v-if="control.dataType!='table'&&control.title||control.name">
                 <v-col class="col-md-5 ml-2 pl-3" style=" margin-top:-57px">
                     <v-icon class='fs-14 mr-2 color-normal'>{{getIcon(control.dataType)}}</v-icon>
                     <v-tooltip right>
@@ -170,6 +170,7 @@ export default {
             lastTable:[],
             nameColumnDetail: {},
             data: {},
+            lastNameSheet:[],
             fileName: '',
             import:false,
             errorType:'',
@@ -435,6 +436,7 @@ export default {
             }
             this.nameColumnDetail = columnDetail;
             this.getMappingTable();
+              
         },
         //Loại những sheet được chọn
         onChangeSheet(tableIdx, value) {
@@ -500,6 +502,8 @@ export default {
                 mapping = mapping.mapping;
                // tạo 1 mảng lưu những row được lấy
                let row = [];
+               let lastNameSheet = [];
+               lastNameSheet.push(mapping.general.sheetMap)
                this.lastKeyGeneral = {enable:true,index:-1,name:''};
                this.lastKeyTables =[];
                if(mapping.general.keyColumn)
@@ -511,23 +515,28 @@ export default {
                 for (let i = 0; i < mapping.general.controls.length; i++) {
                     row.push({
                         controlName:mapping.general.controls[i].name,
+                        nameSheet: mapping.general.sheetMap,
                         dataColumn:mapping.general.controls[i].dataColumn.name,
                         });
+                    
                 };
                 if(mapping.tables){
                     for (let i = 0; i < mapping.tables.length; i++) {
+                        lastNameSheet.push(mapping.tables[i].sheetMap);
                         if(mapping.tables[i].keyColumn){
                             let nameLastKeyTables = mapping.tables[i].keyColumn.name
                             this.lastKeyTables.push({name:nameLastKeyTables, index:-1,enable:false});
                         }
                         for(let j = 0; j< mapping.tables[i].controls.length;j++)
                             row.push({
-                                 controlName:mapping.tables[i].controls[j].name,
+                                nameSheet: mapping.tables[i].sheetMap,
+                                controlName:mapping.tables[i].controls[j].name,
                                 dataColumn:mapping.tables[i].controls[j].dataColumn.name
                             });
                     }
                 }
                 self.lastTable = row;
+                self.lastNameSheet = lastNameSheet;
                    // console.log(row);
                 //hàm tìm sheet theo row
                 }; 
@@ -552,6 +561,8 @@ export default {
 
                    }
                }
+               // hàm check 
+           
               // this.setLastKeyTables();
             }
         console.log(this.tables)
@@ -626,12 +637,13 @@ export default {
         // },
         //phần mapping --- hàm tìm sheet lưu cho cột 
         getNameSheetMapping(value){
+          
             let nameSheetMapping = '';
             for(let i = 0; i<this.nameSheets.length; i++){
                  let arr = this.nameColumnDetail[this.nameSheets[i].name];
                 for(let j = 0; j<arr.length; j++){
                     if(arr[j].name==value){
-                        this.nameSheets[i].enable=false;
+                       // this.nameSheets[i].enable=false;
                         //  if (this.tables[i].sheetMap) {
                         //     this.tables[i].sheetMap.enable = true;
                         // }
@@ -649,20 +661,33 @@ export default {
             let columnAr = this.nameColumnDetail;
             columnAr = Object.values(columnAr);
             if(column.length>2){
-                for (let i = 0; i < this.lastTable.length; i++) {
-                    // nếu file đã được upload, có giá trị lưu tên cột trong file excel
-                        for(let j = 0; j < columnAr.length; j++){
-                                for(let k = 0; k < columnAr[j].length; k++){
-                                    //nếu tên cột trong file excel trùng giá trị lần mapping cũ 
-                                    if(this.lastTable[i].dataColumn==columnAr[j][k].name){
-                                        
-                                        // đẩy giá trị mapping vào
-                                        this.pushMappingInTables(this.lastTable[i].controlName,this.lastTable[i].dataColumn)
-                                    }
+                //debugger
+                for(let m = 0; m<this.lastNameSheet.length;m++){
+                    debugger
+                    for(let k = 0; k<this.nameSheets.length;k++){
+                        if(this.lastNameSheet[m]==this.nameSheets[k].name){
+                            for (let i = 0; i < this.lastTable.length; i++) {
+                                
+                                //if(this.lastTable[i])
+                                // nếu file đã được upload, có giá trị lưu tên cột trong file excel
+                                        for(let j = 0; j < columnAr.length; j++){
+                                                for(let k = 0; k < columnAr[j].length; k++){
+                                                    //nếu tên cột trong file excel trùng giá trị lần mapping cũ 
+                                                    if(this.lastTable[i].dataColumn==columnAr[j][k].name){
+                                                        
+                                                        // đẩy giá trị mapping vào
+                                                        this.pushMappingInTables(this.lastTable[i].controlName,this.lastTable[i].dataColumn)
+                                                    }
+                                                }
+                                        }
+                                }
                                 }
                         }
+                
                     };
+                    
             this.setLastKeyTables();
+           
 
             }else{
                 console.log('Không có file Mapping')

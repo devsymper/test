@@ -18,18 +18,22 @@
         </v-list>
     </v-col>
      <v-col cols="md-10 sm-10 lg-10 mb-10 pb-10" style="height:100vh; overflow:scroll!important" class="ml-1 mr-2">
+         
             <!-- dòng kết quả tìm kiếm -->
         <v-row>
             <v-list-item-content class="fm mb-2">
                 <v-list-item-title class="fs-15 fm ml-3 mb-2">
                     Kết quả tìm kiếm trong {{nameResult}}
                 </v-list-item-title>
-                <v-list-item-subtitle class="sub-title fs-12 ml-4 fm">Từ khoá "{{wordSearch}}" có {{countResult}} kết quả phù hợp</v-list-item-subtitle>
+                <v-list-item-subtitle class="sub-title fs-12 ml-3 fm">Từ khoá "{{wordSearch}}" có {{countResult}} kết quả phù hợp</v-list-item-subtitle>
             </v-list-item-content>
         </v-row>
             <!-- danh sách kết quả màn hình chung  -->
                 <!-- danh sách kết quả màn hình chung- group   -->
-        <v-row class="general" v-if="showGeneral" v-for="(item,index1) in newSearch.filter(x => x.group!= 'user'&&x.type!= 'user'&&x.group!= 'application_deninition'&&x.type!= 'application_deninition')" :key="index1" 
+        <v-row 
+            class="general" v-if="showGeneral" 
+            v-for="(item,generalOthersIdx) in newSearch.filter(x => x.group!= 'user'&&x.type!= 'user'&&x.group!= 'application_deninition'&&x.type!= 'application_deninition')"  
+            :key="generalOthersIdx"
             style="margin-top:-18px">
             <v-row v-if="item.group" style="magrin-left:2px" class="ml-2 mt-1 mr-2">
                 <v-list-item class=" mr-3 pl-1 " >
@@ -42,20 +46,20 @@
                 </v-list-item>
             </v-row>
                 <!-- danh sách kết quả màn hình chung- danh sách    -->
-            <v-row v-else-if="item.type !== 'user'" 
-                @mouseleave="hideDotButton(index1)" 
-                    @mousemove="showDotButton(index1)" 
+            <v-row v-else-if="item.type != 'user'" 
+                @mouseleave="hideDotButton(generalOthersIdx)" 
+                    @mousemove="showDotButton(generalOthersIdx)" 
                 class="mt-2 mr-2 mb-1" style="margin-left:2px">
                 <v-list-item class="ml-2 mr-3">
                     <v-list-item-content class="ml-2">
-                        <v-list-item-title style="margin-left: 0.5rem" class="item-title fs-13 mb-2" v-html="item.displayName">
+                        <v-list-item-title style="margin-left: 0.5rem" class="item-title fs-13 mb-2">{{formatName(item.displayName,230)}}
                         </v-list-item-title>
                         <v-list-item-subtitle style="margin-left: 0.5rem" class="fs-12 sub-title">{{item.description}}
                         </v-list-item-subtitle>
                     </v-list-item-content>
-                    <v-list-item-action v-show="item.enable&&item.actions.length>0" class="dot" >
-                        <v-menu   bottom offset-y 
-                            transition="scale-transition" style="120px!important" nudge-left="80">
+                    <v-list-item-action v-show="item.enable&&item.actions.length>0" >
+                        <v-menu  max-height="180" max-width="120" offset-y 
+                            style="background-color:white" nudge-left="100">
                             <template v-slot:activator="{ on }">
                                 <button v-on="on">
                                     <i style="height:20px!important;width:20px!important" 
@@ -64,10 +68,10 @@
                             </template>
                             <v-list>
                                 <v-row>
-                                    <v-list-item-title v-for="itemsAction in item.actions" 
-                                          class="fm fs-13 mt-1 action-button ml-4"  style="width:150px!important"
+                                    <v-list-item-title v-for="itemsAction in item.actions"
+                                          class="fm fs-13 mt-1 action-button ml-4 mr-6" 
                                         @click="gotoPage(itemsAction,item.type,item.id,item.displayName)">
-                                        {{formatAction(itemsAction)}}
+                                        <span class="ml-2">{{formatAction(itemsAction)}}</span>
                                     </v-list-item-title>
                                 </v-row>
                             </v-list>
@@ -77,7 +81,10 @@
             </v-row>
         </v-row>
                 <!-- danh sách kết quả màn hình chung- nhân viên    -->
-        <v-row  v-if="showGeneral"  v-for="item in newSearch.filter(x => x.group == 'user' )"  style="margin-top:-18px">
+        <v-row  
+            v-if="showGeneral"  
+            v-for="item in newSearch.filter(x => x.group == 'user' )"  
+            style="margin-top:-18px">
             <v-row v-if="item.group"  style="magrin-left:2px" class="ml-2 mt-2 mr-2 mb-1">
                 <v-list-item class="pl-1 mr-3">
                     <v-list-item-content class="ml-1">
@@ -92,20 +99,20 @@
         <v-row  v-if="showGeneral" >
             <!-- kết thúc danh sách tìm  -->
             <v-sheet max-width="93%">
-                <v-slide-group multiple  prev-icon="mdi-minus"
-                    >
+                <v-slide-group multiple  prev-icon="mdi-minus">
                     <template v-slot:next>
-                        <div style="border-radius: 20px; margin-left:-55px; border: 1px solid grey;background-color:white;z-index:3">
+                        <div class="slider-user-button slider-button-right"> 
                            <v-icon> mdi mdi-chevron-right</v-icon>
                         </div>
                     </template>
                     <template v-slot:prev >
-                        <div style="border-radius: 20px; border: 1px solid grey;background-color:white;z-index:3">
+                        <div class="slider-user-button">
                            <v-icon> mdi mdi-chevron-left</v-icon>
                         </div>
                     </template>
-                    <v-slide-item v-for="item in  newSearchAll.filter(x => x.type== 'user' ).slice(0, 10)" >
-                        <div class="d-flex justify-start ml-3 mr-3 " style="width: 250px!important; border:1px solid rgba(0,0,0,0.2">
+                    <v-slide-item 
+                        v-for="item in  newSearchAll.filter(x => x.type== 'user' ).slice(0, 10)"  >
+                        <div class="d-flex justify-start ml-3 mr-3 slider-user ">
                             <v-list-item-avatar class="item-avatar ml-3">
                                 <img :src="item.avatar || require('@/assets/image/avatar_default.jpg')">
                             </v-list-item-avatar>
@@ -123,7 +130,7 @@
             </v-sheet>
         </v-row>
               <!-- danh sách kết quả màn hình chung-   -->
-        <v-row v-if="showGeneral"  v-for="item in newSearch.filter(x => x.group == 'application_deninition' )" style="margin-top:-18px">
+        <v-row v-if="showGeneral"  v-for="item in newSearch.filter(x => x.group == 'application_deninition' )">
             <v-row v-if="item.group" style="magrin-left:2px" class="ml-2 mr-2">
                 <v-list-item class="pl-1 mr-3"> 
                     <v-list-item-content class="ml-1">
@@ -139,7 +146,9 @@
                <v-col cols="12" md="6" v-for="item in newSearchAll.filter(x => x.type== 'application_deninition' )">
                     <div class="d-flex justify-start mr-3 " style="width: 250px!important">
                         <v-list-item-avatar class="ml-3">
-                         <v-icon>mdi-account-circle</v-icon>
+                         <v-icon v-if="item.iconType=='icon'">{{item.iconName}}</v-icon>
+                         <img v-else-if="item.iconType=='img'" :src="item.iconName">
+                         <v-icon v-else>mdi-star</v-icon>
                         </v-list-item-avatar>
                         <v-list-item-content>
                             <v-list-item-title style="margin-left: 0.5" class="item-title fs-13 fm">{{item.displayName}}
@@ -153,22 +162,20 @@
             <!-- danh sách tìm kiếm chi tiết -->
             <!-- kết thúc tìm kiếm chi tiết -->
             <!-- trang dành cho user -->
-               <v-row class="mb-2" v-if="showDetail&&type!='application_deninition'" v-for="(item,ind) in newSearchAll.filter(x => x.type== type )" :key="ind" style="margin-top:-18px">
-                    <v-row v-if="item.group" class="ml-1 mt-2 mr-4">
-                </v-row>
-                <v-row v-else-if="item.type != 'user'&&item.type !='application_deninition'" 
+               <v-row v-if="showDetail&&type!='application_deninition'&&type!='user'" v-for="(item,ind) in newSearchAll.filter(x => x.type== type )" :key="ind" >
+                <v-row
                     @mouseleave="hideDotButton(ind)" 
                      @mousemove="showDotButton(ind)" 
-                    class="mt-1 ml-1">
+                    class="mr-3">
                     <!-- danh sách tìm thấy không bao gồm user -->
                     <v-list-item>
                         <v-list-item-content>
-                            <v-list-item-title style="margin-left: 0.5rem" class="item-title fs-13 mb-2" v-html="item.displayName">
+                            <v-list-item-title style="margin-left: 0.5rem" class="item-title fs-13 mb-2">{{formatName(item.displayName,230)}}
                             </v-list-item-title>
                             <v-list-item-subtitle style="margin-left: 0.5rem" class="fs-12 sub-title">{{item.description}}
                             </v-list-item-subtitle>
                         </v-list-item-content>
-                        <v-list-item-action v-show="item.enable&&item.actions.length>0" class="dot" >
+                        <v-list-item-action v-show="item.enable&&item.actions.length>0" >
                             <v-menu offset-y transition="scale-transition" style="width:50px!important">
                                 <template v-slot:activator="{ on }">
                                     <button v-on="on">
@@ -190,7 +197,7 @@
                     </v-list-item>
                 </v-row>
                 </v-row>
-             <v-row  v-if="showDetail&&type=='user'" class="d-flex ml-1" v-bind:class="(newSearchAll.filter(x => x.type== 'user' ).length>3)? 'mt-15':'mt-1'">
+             <v-row  v-if="showDetail&&type=='user'" class="d-flex mb-3" >
                <v-col cols="12" md="4" v-for="item in newSearchAll.filter(x => x.type== 'user' )">
                     <div class="d-flex justify-start mr-3 " style="width: 100%!important; border:1px solid rgba(0,0,0,0.2">
                         <v-list-item-avatar class="item-avatar ml-3">
@@ -211,12 +218,14 @@
                <v-col cols="12" md="6" v-for="item in newSearchAll.filter(x => x.type== 'application_deninition' )" >
                     <div class="d-flex justify-start mr-3 " style="width: 90%!important">
                        <v-list-item-avatar class="ml-3">
-                         <v-icon>mdi-account-circle</v-icon>
+                         <v-icon v-if="item.iconType=='icon'">{{item.iconName}}</v-icon>
+                         <img v-else-if="item.iconType=='img'" :src="item.iconName">
+                         <v-icon v-else>mdi-star</v-icon>
                         </v-list-item-avatar>
                         <v-list-item-content>
                             <v-list-item-title style="margin-left: 0.5" class="item-title fs-13 fm" v-html="item.displayName">
                             </v-list-item-title>
-                            <v-list-item-subtitle style="margin-left:0" class="sub-title fs-12" v-html="item.decription">
+                            <v-list-item-subtitle style="margin-left:0" class="sub-title fs-12" v-html="item.description">
                             </v-list-item-subtitle>
                         </v-list-item-content>
                     </div>
@@ -272,6 +281,8 @@ export default {
                 icon = 'mdi mdi-file-document-outline';
             } else if (value == 'user') {
                 icon = 'mdi-account-multiple-outline';
+            } else if (value == 'Tất cả') {
+                icon = 'mdi-all-inclusive';
             } else if (value == 'document_definition') {
                  icon = 'mdi mdi-file-outline';
             } else if (value == 'workflow_definition') {
@@ -326,7 +337,7 @@ export default {
         },
         setMenu(){
           //  debugger
-            let menu = [];
+            let menu = ['Tất cả'];
             for (let i = 0; i < this.newSearch.length; i++) {
                 // console.log(this.newSearch[i].group);
                 let name = Object.keys(this.newSearch[i]);
@@ -337,9 +348,9 @@ export default {
             this.$store.commit('search/setMenu', menu);
         },
         detailView(type) {
-            // if(type="Tất cả"){
-            //      this.$store.commit('search/setShowGeneral', true);
-            // }else{
+            if(type=="Tất cả"){
+                 this.$store.commit('search/setShowGeneral', true);
+            }else{
              this.$store.commit('search/setShowGeneral', false);
             this.showDetail = true;
             this.type = type;
@@ -347,8 +358,16 @@ export default {
             this.$store.commit('search/setCountResult', this.newSearchAll.filter(x => x.type== type ).length);
            // debugger
             if(type=='user'){this.checkUser==true};
-            this.$store.commit('search/setType', type);
+            this.$store.commit('search/setType', type);}
            // this.$router.push('/search/detail');
+        },
+         formatName(name,number){
+            if(name.length>number){
+                return name.slice(0,number)+"...";
+            }
+            else{
+                return name
+            }
         },
          gotoPage(action, type,id, name) {
             this.defineAction[type].action = action;
@@ -358,11 +377,12 @@ export default {
     },
     watch: {
         newSearch() {
-            this.$store.commit('search/setCountResult', this.newSearch.length);
+            this.$store.commit('search/setCountResult', this.newSearchAll.length);
             this.setMenu();
         },
         wordSearch() {
             if(this.wordSearch==''||this.wordSearch==null){
+                debugger
                 this.$store.commit('search/setMenu', []);
                 this.$store.commit('search/setCountResult', 0);
                 this.$store.commit('search/setSearch', []);
@@ -380,7 +400,7 @@ export default {
         showGeneral(){
             if(this.showGeneral==false){this.showDetail = true;};
             if(this.showGeneral){this.showDetail = false;  this.nameResult ='toàn bộ hệ thống';};
-        }
+        },
     },
     data: () => {
         return {
@@ -389,6 +409,9 @@ export default {
             type:'',
             listSearchAll: [],
             checkUser:false,
+            action:{
+
+            },
              defineAction:{
                 document_definition:{
                     "module": "document",
@@ -433,7 +456,7 @@ export default {
 }
 </script>  
 <style scoped>
-.fm {
+/* .fm {
     font-family: Roboto;
 }
 
@@ -451,17 +474,29 @@ export default {
 
 .action-button:hover {
     background: rgba(0, 0, 0, 0.05);
-}
+} */
 
-.v-menu__content {
-    width: 100px;
-}
 </style>
 <style scoped lang="scss">
 .general ::v-deep .v-list-item{
     padding: 0px
 }
-
+.slider-button-right{
+   margin-left:-55px;
+}
+.slider-button-left{
+   margin-left:-55px;
+}
+.slider-user-button{
+    border-radius: 20px; 
+    border: 1px solid grey;
+    background-color:white;
+    z-index:3
+}
+.slider-user{
+     width: 250px!important; 
+     border:1px solid rgba(0,0,0,0.2)
+}
 .general ::v-deep .v-slide-group__prev{
     margin-right:-35px!important;
     margin-top:15px;
@@ -470,8 +505,8 @@ export default {
 }
 </style>
 <style >
-    .v-slide-group__next,.v-slide-group__prev{
+    /* .v-slide-group__next,.v-slide-group__prev{
     min-width: -1px!important;
      margin-right:-35px!important;
-}
+} */
 </style>

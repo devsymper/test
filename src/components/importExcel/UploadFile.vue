@@ -4,11 +4,14 @@
         <uploader 
           :options="options" 
           :autoStart="true"
+          @dragover="handleDrop"
+
+          
            @file-success="handleFileUploaded"
           @change="handleChange" 
           ref="upload">
             <uploader-unsupport></uploader-unsupport>
-            <uploader-drop>
+            <uploader-drop  >
                 <p class="font-normal mb-3">Kéo thả file vào đây để upload</p>
                 <uploader-btn  v-show="selectType=='Excel'" depressed class="font-normal btn-upload"
                 :single="true"
@@ -67,10 +70,12 @@ export default {
         return {
           target: 'https://io.dev.symper.vn/upload-file',
           testChunks: false,
+          chunkSize:100*1024*1024,
           query: {
               key: "",
               total: 0,
               documentId:0,
+            
           },
        
                 headers:{
@@ -98,8 +103,18 @@ export default {
             this.$emit('dataExcel', response);
             this.$emit('keyUpload', this.options.query.key);
         },
+        handleDrop(event){
+            this.$refs.upload.uploader.cancel()
+            this.dem = event.dataTransfer.items.length;
+            this.options.query.total = event.dataTransfer.items.length;
+            this.options.query.key = util.str.randomString(6)+Date.now();
+            this.options.query.typeImport = this.selectType;
+            this.options.query.documentId = this.documentId;
+            this.$emit('clearFiles');
+            
+        },
         handleChange(event) {
-            // debugger
+            debugger
             this.$refs.upload.uploader.cancel()
             this.options.query.total = event.currentTarget.files.length;
             this.dem = event.currentTarget.files.length;
