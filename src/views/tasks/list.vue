@@ -124,27 +124,10 @@
                             v-if="!sideBySideMode"
                             style="line-height: 42px"
                             cols="2"
-                            class="fs-13 px-1 py-0">
-                            <v-chip
-                                color="transparent"
-                                class="mt-0 pl-1 pr-0 d-inline-block text-truncate"
-                                small
-                                label
-                                v-if="obj.ownerInfo.id"
-                               >
-                                 <symperAvatar  :size="20" :userId="obj.ownerInfo.id" />
-                                {{obj.ownerInfo.displayName}}
-                            </v-chip>
-                            <v-chip
-                                color="transparent"
-                                class="mt-0 pl-1 pr-0 d-inline-block text-truncate"
-                                small
-                                label
-                                v-else
-                               >
-                                <symperAvatar :size="20" :userId="obj.assigneeInfo.id" />
-                                {{obj.assigneeInfo.displayName}}
-                            </v-chip>
+                            class="fs-12 px-1 py-0">
+                                <symperAvatar  v-if="obj.ownerInfo.id" :size="20" :userId="obj.ownerInfo.id" />
+                                <symperAvatar  v-else :size="20" :userId="obj.assigneeInfo.id" />
+                                {{obj.ownerInfo.id ? obj.ownerInfo.displayName: obj.assigneeInfo.displayName }}
                         </v-col>
                         <v-col
                             class="py-0"
