@@ -31,6 +31,7 @@ import ListItems from "../../components/common/ListItems";
 import grandPermission from "./grandPermission";
 import UpdatePermission from "./Update";
 import Api from "./../../api/api.js";
+import accountApi from "./../../api/account";
 import { appConfigs } from "../../configs";
 import { permissionApi } from '../../api/permissionPack';
 import PermissionForm from "@/components/permission/PermissionForm.vue";
@@ -56,9 +57,15 @@ export default {
             return appConfigs.apiDomain.permissionPacks;
         }
     },
+    created(){
+        this.$store.dispatch("app/getAllBA");
+        this.getUserName();
+    },
     data: function() {
         let self = this;
         return {
+            listUser:[],
+            nameUser:[],
             commonActionProps: {
                 "module": "permission_pack",
                 "resource": "permission_pack",
@@ -68,7 +75,7 @@ export default {
                 reformatData(res) {
                     if (res.status == 200) {
                         return {
-                            listObject: res.data,
+                            listObject: self.setNameForUserId(res.data),
                             columns: [
                                 {
                                     name: "id",
@@ -88,6 +95,26 @@ export default {
                                 {
                                     name: "type",
                                     title: "type",
+                                    type: "text"
+                                },
+                                {
+                                    name: "createAt",
+                                    title: "createAt",
+                                    type: "text"
+                                },
+                                {
+                                    name: "updateAt",
+                                    title: "updateAt",
+                                    type: "text"
+                                },
+                                {
+                                    name: "userCreate",
+                                    title: "userCreate",
+                                    type: "text"
+                                },
+                                 {
+                                    name: "userUpdate",
+                                    title: "userUpdate",
                                     type: "text"
                                 }
                             ]
@@ -154,6 +181,21 @@ export default {
         this.tableHeight = document.body.clientHeight - 0;
     },
     methods: {
+        setNameForUserId(listData){
+            let list = this.$store.state.app.allBA;
+            for(let i = 0; i<listData.length; i++){
+                listData[i].userCreate = this.getBAName(list, listData[i].userCreate);
+                listData[i].userUpdate = this.getBAName(list, listData[i].userUpdate);
+            }
+            return listData;
+        },
+        getBAName(list, id){
+            for(let i = 0; i<list.length;i++){
+                if(list[i].id==id){
+                    return list[i].name;
+                }
+            }
+        },
         async getDetailSystemRole(id){
             let res = await systemRoleApi.detail(id);
             if(res.status == 200){

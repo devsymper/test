@@ -236,7 +236,11 @@
             "date_created": "Date",
             "name": "Name",
             "description": "Description",
-            "type": "Type"
+            "type": "Type",
+            "createAt": "Create at",
+            "updateAt": "Update at",
+            "userCreate": "User create",
+            "userUpdate": "User update"
         },
         "title": "Permissions packages",
         "actionControlSummary": "Action pack Summary",

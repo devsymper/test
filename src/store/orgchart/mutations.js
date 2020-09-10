@@ -1,4 +1,6 @@
-import { SYMPER_HOME_ORGCHART } from "../../components/orgchart/editor/nodeAttrFactory";
+import {
+    SYMPER_HOME_ORGCHART
+} from "../../components/orgchart/editor/nodeAttrFactory";
 
 function normalizeNodeStyle(node) {
     if (typeof node.content != 'object') {
@@ -45,13 +47,31 @@ const addNodeStyle = (state, nodeData) => {
     nodeData = normalizeNodeStyle(nodeData);
     state.allNodeStyle.push(nodeData);
 };
-
-
+const updateInstanceKey = (state, data) => {
+    state.instanceKey = data
+}
+const updateUserChildNode = (state, data) => {
+    state.editor[data.curentKey].allNode[data.id].users = data.users
+}
+const updateIdCurrentChildrenNode = (state, data) => {
+    state.idCurrentChildrenNode = data
+}
+const updateCurrentFatherNode = (state, data) => {
+    state.currentFatherNode = data
+}
+const updateUserFatherNode = (state, data) => {
+    state.editor[state.currentFatherNode.instanceKey].allNode[state.currentFatherNode.id].users = data
+}
 export {
     setOrgchartData,
     setNodeConfig,
     changeSelectingNode,
     setNodeStyle,
     deleteNodeStyle,
-    addNodeStyle
+    addNodeStyle,
+    updateInstanceKey,
+    updateUserChildNode,
+    updateIdCurrentChildrenNode,
+    updateCurrentFatherNode,
+    updateUserFatherNode
 };

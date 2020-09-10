@@ -59,7 +59,6 @@
                 @keyup="(data) => {
                     handleKeyUpInputValue(inputInfo, name,data);
                 }"
-
                 :ref="'inputItem_'+name"
                 solo
                 :items="inputInfo.options"
@@ -94,7 +93,6 @@
                 {{inputInfo.errorMessage}}
             </div>
         </div>
-
         <symper-drag-panel 
             @before-close="closeLargeFormulaEditor()"
             :showPanel="largeFormulaEditor.open"

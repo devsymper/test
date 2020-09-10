@@ -231,11 +231,15 @@
     "permissions": {
         "header": {
             "id": "ID",
+            "createAt": "Ngày tạo",
+            "updateAt": "Ngày cập nhật",
+            "userCreate": "Người tạo",
+            "userUpdate": "Người cập nhật",
             "pack_name": "Tên package",
             "date_created": "Ngày tạo",
-            "name": "Name",
-            "description": "Description",
-            "type": "Type"
+            "name": "Tên nhóm quyền",
+            "description": "Mô tả",
+            "type": "Mô tả"
         },
         "title": "Nhóm quyền",
         "actionControlSummary": "Action pack Summary",
@@ -357,7 +361,7 @@
         "Orgchart": "Sơ đồ tổ chức",
         "Dataflow": "Luồng xử lý dữ liệu",
         "Workflow definition": "Quy trình",
-        "Workflow instance": "Văn bản",
+        "Workflow instance": "Quy trình",
         "Permission pack": "Permission pack",
         "Report folder": "Report folder",
         "Syql": "Công thức",
@@ -450,7 +454,7 @@
                         "history": "Lịch sử",
                         "comment": "Bình luận",
                         "has": "Có",
-                        "commentNotResolve": "chưa được giải quyết"
+                        "commentNotResolve": "bình luận chưa được giải quyết"
                     },
                     "worflowInfo": "THÔNG TIN QUY TRÌNH",
                     "userRelated": {
@@ -687,9 +691,33 @@
                 "edit": "Sửa",
                 "update": "Sửa",
                 "drop": "Xoá",
+                "remove": "Xoá",
                 "delete": "Xoá",
+                "add": "Thêm",
+                "info": "Thông tin",
+                "change pass": "Đổi mật khẩu",
                 "detail": "Chi tiết",
-                "print": "In"
+                "print": "In",
+                "deploy": "Triển khai",
+                "start instance": "Bắt đầu quy trình",
+                "execute": "Thực thi",
+                "disable": "Disable",
+                "change avatar": "Đổi ảnh đại diện",
+                "set role": "Role",
+                "view": "Xem",
+                "rename": "Đổi tên",
+                "set permission": "Cấu hình permission",
+                "set user": "Cấu hình user",
+                "set manager": "Cấu hình Manager",
+                "update permission": "Cập nhật permission",
+                "add user": "Thêm tài khoản",
+                "add operation": "Thêm",
+                "remove operation": "Xoá",
+                "add action pack": "Thêm",
+                "remove action pack": "Xoá"
+
+
+
 
 
             },

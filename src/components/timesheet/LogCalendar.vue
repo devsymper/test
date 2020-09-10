@@ -254,7 +254,7 @@ export default {
             this.$emit('showLog',date);   
         },
         copyLogTime(event){
-            debugger
+            //debugger
               timesheetApi.createLogTime({
                         start:dayjs(event.start).add(1, 'h').format("YYYY-MM-DD HH:mm"),
                         end: dayjs(event.end).add(1, 'h').format("YYYY-MM-DD HH:mm"),
@@ -337,6 +337,7 @@ export default {
             return this.changeDuration(duration);
         },
         openLogTimeDialog(event, update = false) {
+           // debugger
             this.$emit('create-time', {
                 update: update,
                 logtimeEvent: event,

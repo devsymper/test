@@ -7,13 +7,11 @@
 				<v-stepper v-model="stepper" class="d-flex stepper-create-user">
 				<v-stepper-header class="stepper-header">
 					<v-stepper-step  editable step="1">{{ $t('user.general.title')}}</v-stepper-step>
-					<v-stepper-step :editable="editStep" @click="loadPermission()" step="2">{{ $t('user.permission.title')}}</v-stepper-step>
+					<!-- <v-stepper-step :editable="editStep" @click="loadPermission()" step="2">{{ $t('user.permission.title')}}</v-stepper-step> -->
 				</v-stepper-header>
-
 				<v-stepper-items class="stepper-items">
 					<v-stepper-content step="1">
 					<h4>{{ $t('user.general.personalInfo.title')}}</h4>
-
 						<v-row class="mt-2">
 						<v-col cols="3">
 							<div>
@@ -22,9 +20,7 @@
 							<div>
 								<v-subheader>{{ $t('user.general.personalInfo.email')}}</v-subheader>
 							</div>
-
 						</v-col>
-
 						<v-col cols="6">
 							<v-row>
 									<v-col cols="9">
@@ -55,14 +51,23 @@
 							<img :src="url" />
 							</div>
 							<input type="file" ref="btnAddAvatar" class="input-file" @change="onFileChange" /> -->
-                              <v-avatar :size="80" v-if="actionType == 'edit' || avatarUrl != ''">
-                                <img
+                              <v-avatar :size="80" v-if="actionType == 'edit' ">
+                                <img v-if="avatarUrl != ''"
                                     :src="avatarUrl"
+                                >
+								<img v-if="avatarUrl== ''"
+                                    :src="require('./../../assets/image/avatar_default.jpg')"
+                                >
+                            </v-avatar>
+								<v-avatar :size="80" v-else>
+                                <img
+                                    :src="require('./../../assets/image/avatar_default.jpg')"
                                 >
                             </v-avatar>
                             <UploadFile 
                                 ref="uploadAvatar"
                                 :autoUpload="false"
+
                                 :fileName="avatarFileName"
                                 @uploaded-file="handleAvatarUploaded"
                                 @selected-file="handleAvatarSelected" />
@@ -140,9 +145,7 @@
 							<v-checkbox dense class="sym-small-size" v-model="needChangePassword" :label="$t('user.general.passwordSetting.requireChangePassFirstLogin')"></v-checkbox>
 							<v-checkbox dense class="sym-small-size" v-model="sendMailAfterChange" :label="$t('user.general.passwordSetting.sendEmailAfterDone')"></v-checkbox>
 							<v-checkbox dense class="sym-small-size" v-model="user.active" :label="$t('user.general.passwordSetting.activeAccount')"></v-checkbox>
-						</div>
-
-						
+						</div>	
 					<v-btn class="btn-next-step"
 						ref="addUserBtn"
 						:loading="loading"
@@ -151,9 +154,7 @@
 					>
 						{{actionPanel}}
 					</v-btn>
-
 					</v-stepper-content>
-
 					<v-stepper-content class="sym-stepper-content" step="2">
 					<v-tabs
 						v-model="tabIndex"
@@ -176,9 +177,7 @@
 						>
 							{{$t('user.permission.orgChartPositionPermission.title')}}
 						</v-tab>
-						
 					</v-tabs>
-
 					<v-tabs-items  v-model="tabIndex">
 						<v-tab-item
 						:key="userRole.title"
@@ -216,10 +215,6 @@
 							small-chips
 							item-text="packName"
 						>
-
-							<!-- <template v-slot:selection="dataPackage">
-							{{dataPackage.item.packName}}
-							</template> -->
 							<template v-slot:item="dataPackage">
 							<v-list-item-content class="autocomplete-package-item" @click="selectPermissionPackage(dataPackage.item)">
 								<v-list-item-title >{{ dataPackage.item.packName }}</v-list-item-title>
@@ -233,7 +228,6 @@
 										v-for="permission in permissionPackage.permissionSelected"
 										:key="permission.id"
 									>
-
 									<v-list-item-content>
 										<v-list-item-title>{{ permission.packName }}</v-list-item-title>
 									</v-list-item-content>
@@ -245,36 +239,14 @@
 											<span>{{$t('common.delete')}}</span>
 										</v-tooltip>
 									</v-list-item-icon>
-
-
 								</v-list-item>
 							</v-list>
 						</div>
 						</v-tab-item>
-
 						<v-tab-item
 						:key="permissionPosittionOrgChart.title"
 						>
-						
 							<template>
-								<!-- <v-row>
-									<v-col cols="4">
-										<v-text-field
-											class="mt-2"
-											v-model="search"
-											dense
-											outlined
-											hide-details
-											clearable
-										></v-text-field>
-									</v-col>
-									<v-col cols="8">
-
-									</v-col>
-								</v-row> -->
-								
-								
-								
 								<div class="tree-orgchart-content">
 									<v-autocomplete
 										class="mt-2"
@@ -346,17 +318,12 @@
 								</vue-resizable>
 							</template>
 						</v-tab-item>
-						
 					</v-tabs-items>
-
-
-
 					<v-btn class="btn-next-step"
 						@click="resetData();closePanel()"
 					>
 						Hoàn thành
 					</v-btn>
-
 					</v-stepper-content>
 				</v-stepper-items>
 				</v-stepper>
@@ -479,7 +446,7 @@ export default {
   	},
   
   	methods:{
-          getAvatarUrl(){
+        getAvatarUrl(){
               return appConfigs.apiDomain.fileManagement+'readFile/user_avatar_'+this.user.id;
           },
         handleAvatarUploaded(data){
@@ -618,8 +585,8 @@ export default {
 			}
 			userApi.addUser(data).then(res => {
 				if (res.status == 200) {
-					cpn.loadPermission();
-					cpn.setStepper(2);
+					//cpn.loadPermission();
+					//cpn.setStepper(2);
 					cpn.loading = false;
 					cpn.editStep = true;
 					cpn.loader = null;
@@ -628,16 +595,22 @@ export default {
                     cpn.avatarFileName = 'user_avatar_'+res.user.id;
                     setTimeout(() => {
                         cpn.$refs.uploadAvatar.uploadFile();
-                        cpn.$emit("refresh-data");
-                    }, 10);
+                      
+					}, 10);
+					cpn.$emit("refresh-data");
+					debugger
+					this.$snotify({
+					type: "success",
+					title: this.$t("notification.successTitle")});
 				}
 				else{
-					cpn.loading = false;
-					cpn.loader = null;
+					this.$snotify({
+					type: "error",
+					title: this.$t("notification.error")});
 				}
 			})
 			.catch(err => {
-				console.log("error from add user api!!!", err);
+				
 			})
 			.always(() => {
 
@@ -667,13 +640,19 @@ export default {
 			userApi.updateUser(this.user.id, data).then(res => {
 				if (res.status == 200) {
 					cpn.loading = false;
-                    cpn.loader = null;
+					cpn.loader = null;
+					debugger
 					cpn.$emit("refresh-data");
+					this.$snotify({
+					type: "success",
+					title: this.$t("notification.successTitle")});
 				}
 			})
 			.catch(err => {
 				console.log("error from add user api!!!", err);
-			})
+				this.$snotify({
+					type: "error",
+					title: this.$t("notification.error")});})
 			.always(() => {
 
 			});
@@ -1028,6 +1007,7 @@ export default {
 		padding: 0 12px;
 	}
 	.stepper-header .v-stepper__step{
+	
 		height: 30px;
 		margin: 10px;
 		padding: 20px;
@@ -1035,6 +1015,7 @@ export default {
 	}
 	.stepper-header .v-stepper__step--active{
 		background: #f2f2f2;
+		
 		border-radius: 4px;
 	}
 	.v-stepper__content{
