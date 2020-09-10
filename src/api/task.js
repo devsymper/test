@@ -1,6 +1,7 @@
 import Api from "./api";
 import { appConfigs } from "./../configs.js";
 let fileManagement = new Api(appConfigs.apiDomain.fileManagement);
+let document = new Api(appConfigs.apiDomain.sdocumentManagement);
 
 export const taskApi = {
     getFileByList(data) {
@@ -12,6 +13,9 @@ export const taskApi = {
     deleteFile(data){
         return fileManagement.put('changeStatusSymperFile', data);
 
+    },
+    getDocumentObjIds(data){
+        return document.post('documents/object/batch', data);
     }
 
 }

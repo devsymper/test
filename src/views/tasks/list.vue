@@ -22,7 +22,11 @@
                     <v-col cols="12" class="list-tasks pt-0 pb-0">
                         <v-row>
                             <v-col
-                                :cols="sideBySideMode ? 12 : compackMode ? 6 : 4"
+                                cols="1"
+                                class="pl-3 fs-13 font-weight-medium "
+                            >{{$t("tasks.header.type")}}</v-col>
+                            <v-col
+                                :cols="sideBySideMode ? 12 : compackMode ? 5 : 3"
                                 class="pl-3 fs-13 font-weight-medium "
                             >{{$t("tasks.header.name")}}</v-col>
                             <v-col
@@ -70,13 +74,19 @@
                         }"
                         @click="selectObject(obj, idx)">
                         <v-col
-                            :cols="sideBySideMode ? 12 : compackMode ? 6: 4"
+                            style="line-height: 42px"
+                            :cols="sideBySideMode ? 2 : 1"
+                            class="fs-12 px-1 py-0">
+                                {{obj.taskData.action.action=='submit'? $t('tasks.header.submit'): $t('tasks.header.approval')}}
+                        </v-col>
+                        <v-col
+                            :cols="sideBySideMode ? 10 : compackMode ? 5: 3"
                             class="pl-3 pr-1 pb-1 pt-2">
                             <div class="pl-1">
                                 <v-tooltip bottom>
                                     <template v-slot:activator="{ on }">
                                     <div v-on="on" class="text-left fs-13 pr-6 text-ellipsis w-100">
-                                        {{obj.taskData.content}}
+                                        <span v-if="obj.taskData.action.action=='approval'"  style="color:#ffc107">{{obj.taskData.action.parameter.documentObjectId ? checkData(obj.taskData.action.parameter.documentObjectId): ''}}</span> {{obj.taskData.content}}
                                     </div>
                                      </template>
                                 <span>{{ obj.taskData.content }}</span>
@@ -120,9 +130,20 @@
                                 class="mt-0 pl-1 pr-0 d-inline-block text-truncate"
                                 small
                                 label
+                                v-if="obj.ownerInfo.id"
                                >
-                                 <symperAvatar :size="20" :userId="obj.ownerInfo.id" />
+                                 <symperAvatar  :size="20" :userId="obj.ownerInfo.id" />
                                 {{obj.ownerInfo.displayName}}
+                            </v-chip>
+                            <v-chip
+                                color="transparent"
+                                class="mt-0 pl-1 pr-0 d-inline-block text-truncate"
+                                small
+                                label
+                                v-else
+                               >
+                                <symperAvatar :size="20" :userId="obj.assigneeInfo.id" />
+                                {{obj.assigneeInfo.displayName}}
                             </v-chip>
                         </v-col>
                         <v-col
@@ -200,7 +221,14 @@ export default {
                 }
             }
             return tasks;
-        }
+        },
+        stask() {
+            return this.$store.state.task;
+        },
+        sapp() {
+            return this.$store.state.app;
+        },
+
     },
     name: "listTask",
     components: {
@@ -266,7 +294,8 @@ export default {
                 page: 1,
                 assignee: this.$store.state.app.endUserInfo.id
             },
-            defaultAvatar: appConfigs.defaultAvatar
+            defaultAvatar: appConfigs.defaultAvatar,
+            arrdocObjId:[]
         };
     },
     created(){
@@ -287,6 +316,25 @@ export default {
         self.reCalcListTaskHeight();
     },
     methods: {
+        checkData(documentObjectId){
+            if (documentObjectId!='' ||documentObjectId != undefined) {
+                let arr = this.stask.arrDocObjId;
+                let obj = arr.find(data => data.id === documentObjectId);
+                if (obj) {
+                    let arrUser = this.sapp.allUsers;
+                    let user = arrUser.find(data => data.email === obj.userCreate);
+                    if (user) {
+                        return user.displayName;
+                    }else{
+                        return ""
+                    }
+                }else{
+                    return ""
+                }
+            }else{
+                return ""
+            }
+        },
         handleReachEndList(){
 
             if(this.allFlatTasks.length < this.totalTask && this.allFlatTasks.length > 0){
@@ -413,11 +461,18 @@ export default {
                                     );
                                     listTasks.splice(index, 1);
                                 }
+                                let description=JSON.parse(listTasks[index].description);
+                                if (description.action.action=="approval" && description.action.parameter.documentObjectId != undefined) {
+                                    console.log("docOi",description.action.parameter.documentObjectId);
+                                    this.arrdocObjId.push(description.action.parameter.documentObjectId);
+                                }
                             }
                         }
                     );
                 }
             );
+            console.log("arrdocObjId", this.arrdocObjId);
+            this.$store.dispatch("task/getArrDocObjId", this.arrdocObjId);
             console.log(listTasks,"listTassk");
             this.addOtherProcess(listTasks);
             this.loadingTaskList = false;

@@ -433,8 +433,6 @@ export default {
 
         // lấy data mới dựa theo data của task
         async changeTaskDetail(){
-            debugger
-            console.log("taskIn",this.taskInfo.action);
             if(!this.taskInfo.action){
                 return
             }

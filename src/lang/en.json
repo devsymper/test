@@ -737,6 +737,9 @@
             "canNotCreateTask": "Can not create task"
         },
         "header": {
+            "type":"Loại",
+            "approval":"Phê duyệt",
+            "submit":"Gửi văn bản",
             "date": "Date",
             "dueDate": "Due Date",
             "createDate": "Create date",
