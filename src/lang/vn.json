@@ -867,11 +867,14 @@
             "canNotCreateTask": "Không thể khởi tạo công việc"
         },
         "header": {
+            "type":"Loại",
+            "approval":"Phê duyệt",
+            "submit":"Gửi văn bản",
             "date": "Ngày tạo",
             "dueDate": "Ngày đến hạn",
             "createDate": "Ngày khởi tạo",
             "description": "Mô tả",
-            "owner": "Người tạo",
+            "owner": "Người sở hữu",
             "name": "Tên công việc",
             "assignee": "Người được giao",
             "watcher": "Người theo dõi",
