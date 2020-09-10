@@ -14,6 +14,7 @@ import { orgchartApi } from '../../api/orgchart';
 export default {
     methods: {
         async saveOrgchart(orgchartData){
+			debugger
             try {
                 let res = null;
                 if(this.action == 'create'){

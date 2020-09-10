@@ -1,6 +1,6 @@
 <template>
 		<div>
-				<UploadFile :autoUpload="true" @selected-file="selectedFile" :fileName="'adn100198'" :objectType="'document'" :objectIdentifier="'1dasdadasd'"/>
+				<UploadFile :autoUpload="true" :pickAvatar="true" @selected-file="selectedFile" :fileName="'adn100198'" :objectType="'document'" :objectIdentifier="'1dasdadasd'"/>
 				<!-- :pickAvatar="true"  -->
 				<img :src="src" alt="">
 		</div>	
@@ -40,6 +40,9 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
+.v-card__title{
+	font:15px roboto
+}
 
 </style>
