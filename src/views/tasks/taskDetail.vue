@@ -24,7 +24,7 @@
                     <span>Sao chép đường dẫn</span>
                 </v-tooltip>
 
-                <button @click="getTaskTest">Click</button>
+                <!-- <button @click="getTaskTest">Click</button> -->
 
                 <v-btn small text  @click="closeDetail">
                     <v-icon small>mdi-close</v-icon>
@@ -433,7 +433,8 @@ export default {
 
         // lấy data mới dựa theo data của task
         async changeTaskDetail(){
-            console.log(this.taskInfo.action);
+            debugger
+            console.log("taskIn",this.taskInfo.action);
             if(!this.taskInfo.action){
                 return
             }
@@ -441,6 +442,14 @@ export default {
             this.taskAction = this.taskInfo.action.action;
             if(this.taskAction == 'approval'){
                 this.showApprovalOutcomes(JSON.parse(this.taskInfo.approvalActions));
+            }else if(this.taskAction == 'submit'){
+                this.taskActionBtns = [
+                    {
+                    text:"Submit",
+                    value:"submit",
+                    color:"blue"
+                    }
+                ]
             }else if(this.taskAction == 'undefined'){
                 this.taskActionBtns = [
                     {
