@@ -1,5 +1,11 @@
 <template>
     <div class="h-100 w-100">
+        <v-skeleton-loader
+            v-if="loadingActionTask"
+            :type="'table-tbody'"
+            class="mx-auto"
+            width="100%" height="100%" 
+        ></v-skeleton-loader>
         <v-row class="ml-0 mr-0 justify-space-between" style="    line-height: 36px;">
             <div class="fs-13 pl-2 pt-1 float-left">
                 {{taskBreadcrumb}}
@@ -73,6 +79,7 @@
                 </v-card>
             </v-col>
         </v-row>
+   
     </div>
 </template>
 
@@ -134,6 +141,7 @@ export default {
     },
     data: function() {
         return {
+            loadingActionTask:false,
             breadcrumb: {
                 definitionName: '',
                 instanceName: '',
@@ -292,6 +300,7 @@ export default {
             this.$emit("close-detail", {});
         },
         async saveTaskOutcome(value){ // hành động khi người dùng submit task của họ
+            this.loadingActionTask=true;
             if(value == 'submit' || value == 'update' ){
                 let taskInfo=this.taskInfo;
                 if (taskInfo.action.parameter.documentId==0) {
@@ -344,6 +353,7 @@ export default {
                 let res = await this.submitTask(taskData);
                 this.$emit('task-submited', res);
             }
+            this.loadingActionTask=false;
         },
         saveApprovalHistory(value){
             let title = this.taskActionBtns.reduce((tt, el) => {
