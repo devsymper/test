@@ -101,6 +101,7 @@
             <OrgchartEditor
                 @update-department-name="changeDepartmentName"
                 ref="positionDiagram"
+				@update-father-node="handleConfigUserSelectChange"
                 :action="action"
                 :id="id"
                 :instanceKey="selectingNode.positionDiagramCells ? selectingNode.positionDiagramCells.instanceKey : ''"
@@ -155,6 +156,7 @@ export default {
             loadingDiagramView: true,
 			positionEditor: false,
 			checkPageEmpty: false,
+			listUserIds:null,
             headerActions: {
               
                 zoomIn: {
@@ -230,15 +232,16 @@ export default {
 			if(data.length == 0){
 				res =  allNode
 			}else{
-				let arrNodeId = []
-				allNode.forEach(function(e){
-					arrNodeId.push(e.id);
-					data.forEach(function(k){
-						if(arrNodeId.includes(k.attributes.target.id) == false){
-							res = k
-						}
-					})
-				})
+				// let arrNodeId = []
+				// allNode.forEach(function(e){
+				// 	arrNodeId.push(e.id);
+				// 	data.forEach(function(k){
+				// 		if(arrNodeId.includes(k.attributes.target.id) == false){
+				// 			res = k
+				// 		}
+				// 	})
+				// })
+				res = allNode[0]
 			}
 			return res
 		},
@@ -282,17 +285,26 @@ export default {
         handleConfigUserSelectChange(listUserIds){
             this.$refs.editorWorkspace.changeUserDisplayInNode(listUserIds);
             if(this.context == 'department'){
-                this.changeManagerForDepartment(this.selectingNode.id, listUserIds);
+				this.changeManagerForDepartment(this.selectingNode.id, listUserIds);
+				let allNodes = this.$refs.positionDiagram.getAllNode()
+				let firstNode = allNodes[0]
+				let instanceKey = this.selectingNode.positionDiagramCells.instanceKey
+				this.$store.commit('orgchart/changeSelectingNode',
+					{
+						instanceKey: instanceKey,
+						nodeId: firstNode.id
+					}
+				)
+				this.listUserIds = listUserIds
             }else{
-				// let dataLink = self.$refs.positionDiagram.getAllLink()
-				// let allNodes = self.$refs.positionDiagram.getAllNode()
-				// let firstNode = self.getFirstNode(dataLink,allNodes)
-				// self.$store.commit('orgchart/updateCurrentChildrenNodeId',firstNode[0].id)
 				if(this.$store.state.orgchart.firstChildNodeId == this.$store.state.orgchart.currentChildrenNodeId){
 					this.$store.commit('orgchart/updateUserFatherNode',listUserIds)
+					this.$emit('update-father-node',listUserIds)
+					// this.$refs.editorWorkspace.changeUserDisplayInNode(listUserIds);
 				}
 			}
-        },
+		},
+	
         // Kiểm tra xem department hiện tại đã có node Manager hay chưa
         changeManagerForDepartment(departmentVizId, userIds){
 			this.checkAndCreateOrgchartData();
@@ -452,12 +464,12 @@ export default {
 					self.checkAndCreateOrgchartData();
                     if(self.selectingNode.positionDiagramCells.cells){
                         self.$refs.positionDiagram.loadDiagramFromJson(self.selectingNode.positionDiagramCells.cells);
-                        debugger
-						let dataLink = self.$refs.positionDiagram.getAllLink()
 						let allNodes = self.$refs.positionDiagram.getAllNode()
-						let firstNode = self.getFirstNode(dataLink,allNodes)
-						self.$store.commit('orgchart/updateFirstChildNodeId',firstNode[0].id)
-                        self.$store.commit('orgchart/updateCurrentChildrenNodeId',firstNode[0].id)
+						let firstNode = allNodes[0]
+						self.$refs.positionDiagram.$refs.editorWorkspace.changeUserDisplayInNode(this.listUserIds);
+						debugger
+						self.$store.commit('orgchart/updateFirstChildNodeId', firstNode.id)
+                        self.$store.commit('orgchart/updateCurrentChildrenNodeId',firstNode.id)
                     }else{
 						let data = self.$refs.positionDiagram.createFirstVizNode();
 						self.$store.commit('orgchart/updateCurrentChildrenNodeId',data.id)
@@ -478,7 +490,7 @@ export default {
         checkAndCreateOrgchartData(){
             let subInstanceKey = this.selectingNode.positionDiagramCells.instanceKey;
             if(!this.$store.state.orgchart.editor[subInstanceKey]){
-                this.$refs.positionDiagram.initOrgchartData();
+				this.$refs.positionDiagram.initOrgchartData();
             }
             this.$store.state.orgchart.editor[subInstanceKey].homeConfig = this.selectingNode;
         },
@@ -663,6 +675,7 @@ export default {
             }      
 
             if(passed){
+				debugger
                 let orgchartData = this.getDataToSave();
                 this.$emit('save-orgchart-data', orgchartData);    
             }
@@ -876,6 +889,7 @@ export default {
          * Chọn một node và hiển thị lên cấu hình ở bên tay phải
          */
         selectNode(nodeId){
+			debugger
             this.$refs.editorWorkspace.unHighlightCurrentNode();
             this.$store.commit('orgchart/changeSelectingNode', {
                 instanceKey: this.instanceKey,

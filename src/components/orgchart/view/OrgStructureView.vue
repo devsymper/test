@@ -132,7 +132,6 @@ export default {
             for(let l of lazyAddLink){
                 lazyCells.push(jointLinkNode(l.source, l.target));
             }
-            debugger
 
             //Dòng dưới chạy nhưng chưa đúng với thiết kế, cần nghĩ ra giải pháp khác để tự vẽ link
             // this.$refs.editorWorkspace.graph.addCells(lazyCells);

@@ -33,6 +33,7 @@ const changeSelectingNode = (state, params) => {
 	let selectingNode = null;
 	if (params.nodeId == SYMPER_HOME_ORGCHART) {
 		selectingNode = state.editor[params.instanceKey].homeConfig;
+
 	} else {
 		selectingNode = state.editor[params.instanceKey].allNode[params.nodeId];
 	}

@@ -67,7 +67,7 @@ export default {
             this.$refs.jointPaper.actionOnToolbar(action);
         },
         loadDiagramFromJson(cells){
-            debugger
+			debugger
             this.$refs.jointPaper.graph.fromJSON(cells);
         },
         getAllDiagramCells(){
@@ -95,7 +95,7 @@ export default {
                      let newValue =   joint.util.breakText(
                             value, 
                             {
-                                width: 100,
+                                width: 130,
                                 height: 30
                             },
                             { 'font-size': 13 },
@@ -278,7 +278,8 @@ export default {
                     if(!lastUserInfo) return;
                     this.updateCellAttrs( this.selectingNode.id, 'userInPositionAvartar', lastUserInfo.avatar ? lastUserInfo.avatar : avatarDefault );
                     let plusUser = userIdList.length == 1 ? '' : ('+' + (userIdList.length - 1));
-                    this.updateCellAttrs( this.selectingNode.id, 'accountNumberPlus', plusUser);
+					this.updateCellAttrs( this.selectingNode.id, 'accountNumberPlus', plusUser);
+					debugger
                 }
             }
         },
