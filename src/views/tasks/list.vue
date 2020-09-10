@@ -24,6 +24,7 @@
                             <v-col
                                 cols="1"
                                 class="pl-3 fs-13 font-weight-medium "
+                                style="flex:0!important"
                             >{{$t("tasks.header.type")}}</v-col>
                             <v-col
                                 :cols="sideBySideMode ? 12 : compackMode ? 5 : 3"
@@ -74,11 +75,11 @@
                         }"
                         @click="selectObject(obj, idx)">
                         <v-col
-                            v-if="!sideBySideMode"
-                            style="line-height: 42px"
+                            style="line-height: 42px; flex:0!important"
                             cols="1"
-                            class="fs-12 px-1 py-0">
-                                {{obj.taskData.action.action=='submit'? $t('tasks.header.submit'): $t('tasks.header.approval')}}
+                            class="fs-12 px-1 py-0 pl-3">
+                                <v-icon>{{obj.taskData.action.action=='submit' ? 'mdi-file-document-edit-outline': 'mdi-seal-variant'}}</v-icon>
+                                <!-- {{obj.taskData.action.action=='submit'? $t('tasks.header.submit'): $t('tasks.header.approval')}} -->
                         </v-col>
                         <v-col
                             :cols="sideBySideMode ? 10 : compackMode ? 5: 3"
@@ -450,7 +451,7 @@ export default {
                     );
                 }
             );
-          
+
             console.log(listTasks,"listTassk");
             this.addOtherProcess(listTasks);
             this.loadingTaskList = false;
