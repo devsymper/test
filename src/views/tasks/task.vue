@@ -1,5 +1,5 @@
 <template>
-    <div class="h-100 w-100 d-flex justify-center ml-5 task-style"> 
+    <div class="h-100 w-100 d-flex justify-center task-style"> 
         <DocumentSubmit 
             v-if="showDoTaskComponent && (action == 'submit' || action=='update')"
             ref="submitComponent"
@@ -170,6 +170,9 @@ export default {
 </script>
 
 <style scoped>
+.task-style{
+    overflow: hidden!important;
+}
 .task-style >>> .wrap-content-submit{
     width:96%!important;
 }
