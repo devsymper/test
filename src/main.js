@@ -123,7 +123,7 @@ function checkUrlNotExisted(url, context) {
 /**
  * Di chuyển đến một trang và tạo ra tab tương ứng
  */
-Vue.prototype.$goToPage = function(url, title, pageInstanceKey = false, allwaysOpenNewTab = true) {
+Vue.prototype.$goToPage = function(url, title, pageInstanceKey = false, allwaysOpenNewTab = true, extraData = {}) {
     let canAddTab = checkCanAddTab(this);
     if (!allwaysOpenNewTab) {
         canAddTab = canAddTab && checkUrlNotExisted(url, this);
@@ -137,7 +137,8 @@ Vue.prototype.$goToPage = function(url, title, pageInstanceKey = false, allwaysO
     }
     let routeObj = this.$router.match(url);
     let params = Object.assign(routeObj.params, {
-        pageInstanceKey: pageInstanceKey
+        pageInstanceKey: pageInstanceKey,
+        extraData: extraData
     });
 
     let urlMap = this.$store.state.app.urlToTabTitleMap;
@@ -158,13 +159,13 @@ Vue.prototype.$goToPage = function(url, title, pageInstanceKey = false, allwaysO
                 name: 'symperHiddenRedirectComponent',
                 params: {
                     urlInfo: urlInfo,
-                    pageInstanceKey: Date.now()
+                    pageInstanceKey: Date.now(),
                 }
             });
         } else {
             this.$router.push({
                 name: routeObj.name,
-                params: util.cloneDeep(params)
+                params: util.cloneDeep(params),
             });
         }
     } else {

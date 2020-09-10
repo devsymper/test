@@ -120,21 +120,8 @@ export default {
         filterSelectedPack(search){
 
         },
-        addPermission(pk){
-            if(!pk){
-                return;
-            }
-            let selectedPK = false;
-            for(let pack of this.lazyValue){
-                if(pack.id == pk.id){
-                    selectedPK = true;
-                    break;
-                }
-            }
-
-            if(!selectedPK){
-                this.lazyValue.unshift(pk);
-            }
+        addPermission(pks){
+            this.lazyValue = pks;
             this.$emit('input', this.lazyValue);
         }
     },
@@ -179,7 +166,8 @@ export default {
             deep: true,
             immediate: true,
             handler: function(after){
-                this.lazyValue = after
+                this.lazyValue = after;
+                this.selectedPermission = after;
             }
         }
     },

@@ -230,7 +230,24 @@ export default {
             return bsr;
         },
     },
+    created(){
+        this.checkAndSwitchToTab();
+    },
     methods: {
+        checkAndSwitchToTab(){
+            if(this.$route.params.extraData && this.$route.params.extraData.subAction){
+                let tabAction = {
+                    'view_comment': 'comment'
+                };
+                let tab = tabAction[this.$route.params.extraData.subAction];
+                for(let i = 0; i < this.items.length; i++){
+                    if(this.items[i].tab == tab){
+                        this.tab = i;
+                        break;
+                    }
+                }
+            }
+        },
         getTaskTest(){
             let taskId=this.taskInfo.action.parameter.taskId;
             BPMNEngine.getATaskInfoV2(taskId).then((res) => {
