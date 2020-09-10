@@ -79,6 +79,10 @@ export default {
         instance:{
             type:Number,
             default:Date.now()
+        },
+        isConfigPrint:{
+            type:Boolean,
+            default:false
         }
     },
     computed: {
@@ -170,21 +174,26 @@ export default {
             
         },
         saveDocument(){
-            if(this.showValidate && this.showNoteChangeName && this.$route.name == 'editDocument'){
-                this.showValidate = false;
-                this.messageValidate = "Tên của văn bản này có thể được sử dụng trong công thức ở các đối tượng trong hệ thống. Chọn kiểm tra để kiểm tra lại các đối tượng";
-                this.$refs.validate.show(false)
+            if(this.isConfigPrint){
+                this.$emit("save-form-print-action",this.documentProps);
             }
             else{
-                if(this.isValid){
-                    this.$emit("save-doc-action");
-                    this.hideDialog();
+                if(this.showValidate && this.showNoteChangeName && this.$route.name == 'editDocument'){
+                    this.showValidate = false;
+                    this.messageValidate = "Tên của văn bản này có thể được sử dụng trong công thức ở các đối tượng trong hệ thống. Chọn kiểm tra để kiểm tra lại các đối tượng";
+                    this.$refs.validate.show(false)
                 }
                 else{
-                    this.$snotify({
-                                    type: "error",
-                                    title: "Vui lòng nhập lại tên document"
-                                });  
+                    if(this.isValid){
+                        this.$emit("save-doc-action");
+                        this.hideDialog();
+                    }
+                    else{
+                        this.$snotify({
+                                        type: "error",
+                                        title: "Vui lòng nhập lại tên document"
+                                    });  
+                    }
                 }
             }
             
@@ -216,41 +225,29 @@ export default {
                     type: "checkbox",
                     value: (parseInt(props.isFullSize) === 0) ? false : true,
                 },
-                // editObjectValidate : {
-                //     title: "Điều kiện Edit Object",
-                //     type: "script",
-                //     value: (props.edit_condition != undefined) ? props.edit_condition : '',
-                // },
-                // public : {
-                //     title: "Public",
-                //     type: "checkbox",
-                //     value: (props.allow_public == '0') ? false : true,
-                // },
-                // mobile : {
-                //     title: "Mobile",
-                //     type: "checkbox",
-                //     value: (props.mobile == '0') ? false : true,
-                // },
-                // editAfterSubmit : {
-                //     title: "Sửa dữ liệu sau submit",
-                //     type: "checkbox",
-                //     value: (props.edit_able == '0') ? false : true,
-                // },
-                // submitOutsideWorkflow : {
-                //     title: "Submit ngoài workflow",
-                //     type: "checkbox",
-                //     value: (props.add_outside_wf == '0') ? false : true,
-                // },
+            
                 note : {
                     title: "Ghi chú",
                     type: "textarea",
                     value: (props.note != undefined) ? props.note : '',
                 }
             }
+            if(this.isConfigPrint){
+                console.log("ádasdasdsad",props);
+                docProps = {
+                    title : {
+                        title: "Tiêu đề bản in",
+                        type: "text",
+                        value: (props.title != undefined) ? props.title : '',
+                    },
+                }
+            }
+
             this.$store.commit('document/addToDocumentPropsEditor',{key: this.instance,value :docProps})
         }
         
     },
+    
 }
 </script>
 <style scoped>

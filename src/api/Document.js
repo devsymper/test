@@ -78,6 +78,20 @@ export const documentApi = {
     },
     restoreDocument(data) {
         return coreApi.post('documents/trash', data);
+    },
+    savePrintConfig(data) {
+        return coreApi.post('documents/prints', data);
+    },
+    updatePrintConfig(data) {
+        return coreApi.put('documents/prints', data);
+    },
+    deletePrintConfig(data) {
+        return coreApi.delete('documents/prints', data);
+    },
+    getListPrintConfig(docId) {
+        return coreApi.get('documents/' + docId + '/prints')
+    },
+    getDetailPrintConfig(docId, printConfigId) {
+        return coreApi.get('documents/' + docId + '/prints/' + printConfigId);
     }
-
 };

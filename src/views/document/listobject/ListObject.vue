@@ -1,5 +1,7 @@
 <template>
-    <list-items
+    
+    <div class="h-100 w-100">
+        <list-items
         :getDataUrl="'https://sdocument-management.symper.vn/documents/'+docId+'/objects'"   
         :useDefaultContext="false"
         :tableContextMenu="tableContextMenu"
@@ -30,10 +32,19 @@
             </div>
         </div>
     </list-items>
+        <ListPrintConfig :documentId="docId"
+        :width="'30cm'" 
+        :height="'80%'" 
+        :title="`<span class='mdi mdi-printer-settings'></span> &nbsp;Chọn mẫu in`" 
+        :actions="listActionForPrint"
+        class="view-print-config" ref="listPrintView"/>
+    </div>
 </template>
 <script>
 import ListItems from "./../../../components/common/ListItems.vue";
 import ActionPanel from "./../../../views/users/ActionPanel.vue";
+import ListPrintConfig from "./../print/ListPrintConfig";
+
 import { documentApi } from "./../../../api/Document.js";
 import { util } from "./../../../plugins/util.js";
 import Detail from './../detail/Detail.vue'
@@ -42,10 +53,11 @@ export default {
         "list-items": ListItems,
         "detail-object": Detail,
         "action-panel": ActionPanel,
+        ListPrintConfig
     },
     data(){
         return {
-            docId:this.$route.params.id,
+            docId:parseInt(this.$route.params.id),
             currentDocObjectActiveIndex:'',
             panelDocTitle:"",
             docObjInfo:{},
@@ -53,6 +65,17 @@ export default {
             containerHeight: 200,
             dataTable:[],
             dataClipboard:"",
+            listActionForPrint:{
+                print:{
+                    title: this.$t('common.print'),
+                    icon : '',
+                    action: function(data){
+                        this.$goToPage('/documents/objects/'+data.documentObjectId+'/print/'+data.formId,"In");
+                    }.bind(this)
+
+                },
+                
+            },
             tableContextMenu:[
                 {name:"delete",text:'Xóa',
                     callback: (documentObject, callback) => {
@@ -94,7 +117,8 @@ export default {
                     name: "print",
                     text: "In",
                     callback: (documentObject, callback) => {
-                        this.$goToPage('/documents/objects/'+documentObject.document_object_id+'/print',"In");
+                        this.$refs.listPrintView.show();
+                        this.$refs.listPrintView.setDocObjectId(documentObject.document_object_id);
                     },
                 },
                 {

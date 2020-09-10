@@ -110,29 +110,7 @@ export default {
         hideDialog(){
             this.isShow = false
         },
-        // Hàm kiểm tra tên document
-        checkValidateNameDocument(name, input, data){
-            
-            // if(name == 'name'){
-            //     let docProps = util.cloneDeep(this.documentProps);
-            //     let message = "";
-            //     if(input.value.length == 0){
-            //         message = "Không được bỏ trống";
-            //         this.isValid = false;
-            //     }
-            //     else{
-            //         if(/^[a-zA-Z_$][a-zA-Z_$0-9]*$/.test(input.value) == false){
-            //             message = "Tên không hợp lệ";
-            //             this.isValid = false;
-            //         }
-            //         else{
-            //             this.isValid = true
-            //         }
-            //     }
-            //     docProps.name.errorMessage = message;
-            
-            
-        },
+       
         saveForm(){
             if(!this.isDisable){
                 this.$emit('saveFormPrint')
