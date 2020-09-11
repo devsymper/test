@@ -78,7 +78,7 @@
                             style="line-height: 42px; flex:0!important"
                             cols="1"
                             class="fs-12 px-1 py-0 pl-3">
-                                <v-icon>{{obj.taskData.action.action=='submit' ? 'mdi-file-document-edit-outline': 'mdi-seal-variant'}}</v-icon>
+                                <v-icon>{{(obj.taskData.action.action=='submit' || obj.taskData.action.action=='') ? 'mdi-file-document-edit-outline': 'mdi-seal-variant'}}</v-icon>
                                 <!-- {{obj.taskData.action.action=='submit'? $t('tasks.header.submit'): $t('tasks.header.approval')}} -->
                         </v-col>
                         <v-col

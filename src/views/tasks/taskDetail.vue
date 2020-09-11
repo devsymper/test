@@ -316,6 +316,7 @@ export default {
             this.$emit("close-detail", {});
         },
         async saveTaskOutcome(value){ // hành động khi người dùng submit task của họ
+            this.loadingActionTask=true;
             if(this.taskAction == 'submit' || this.taskAction == 'update' ){
                 this.$refs.task[0].submitForm(value);
             }else if(this.taskAction == 'approval'){
@@ -356,6 +357,7 @@ export default {
                 let res = await this.submitTask(taskData);
                 this.$emit('task-submited', res);
             }
+            this.loadingActionTask=false;
         },
         saveApprovalHistory(value){
             let title = this.taskActionBtns.reduce((tt, el) => {
@@ -372,7 +374,6 @@ export default {
                 actionName: value,
                 note: ''
             };
-
             documentApi.saveApprovalHistory(dataToSave);
         },
         async submitTask(taskData){
