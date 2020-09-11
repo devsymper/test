@@ -199,4 +199,7 @@ export default {
     .like-handson-table >>> .ag-row:hover{
         background-color:unset;
     }
+    .like-handson-table >>> .ag-cell-wrapper span{
+        margin-left:0px
+    }
 </style>

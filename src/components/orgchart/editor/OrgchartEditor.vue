@@ -604,7 +604,6 @@ export default {
                 let invalidIds = [];
                 let mapCodeDpms = {};
                 let passed = true;
-                debugger
                 let mapVizNode = this.$refs.editorWorkspace.getAllDiagramCells().cells.reduce((map, el) => {
                     map[el.id] = el;
                     return map;
@@ -614,11 +613,19 @@ export default {
                     if(!mapVizNode[dpmId]){
                         continue;
                     }
-
                     let dpm = allDpmns[dpmId];
+                    let posNodeIds = []
+                    dpm.positionDiagramCells.cells.cells.forEach(function(e){
+                        if(e.type == "Symper.Position"){
+                            posNodeIds.push(e.id)
+                        }
+                    })
                     let allPos = self.$store.state.orgchart.editor[dpm.positionDiagramCells.instanceKey].allNode;
-                    debugger
-                    for(let posId in allPos){
+                    let resAllPos = []
+                    posNodeIds.forEach(function(e){
+                        resAllPos[e] = allPos[e]
+                    })
+                    for(let posId in resAllPos){
                         let attr = allPos[posId].commonAttrs;
                         if(!attr.name.value || !attr.code.value){
                             passed = false;
