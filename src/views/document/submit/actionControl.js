@@ -35,6 +35,7 @@ export default class ActionControl extends Control {
                         if (data.length == 0) {
                             thisCpn.ele.hide()
                         } else {
+                            console.log("theanhcheckxem", data);
                             $.each(data, function(k, v) {
                                 userApi.getDetailUser(v.userId).then(res => {
                                         if (res.status == 200) {

@@ -77,7 +77,8 @@
         "fullName": "Tên đầy đủ",
         "email": "Email",
         "pageSize": "Số bản ghi mỗi trang",
-        "pendding": "Cần làm"
+        "pendding": "Cần làm",
+        "print": "In"
     },
     "login": {
         "title": "Đăng nhập hệ thống",

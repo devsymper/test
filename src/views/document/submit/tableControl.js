@@ -60,7 +60,10 @@ export default class TableControl extends Control {
                 const rowData = dataTablePrint[index];
                 let tr = '<tr>'
                 for (let j = 0; j < rowData.length; j++) {
-                    const cellData = rowData[j];
+                    let cellData = rowData[j];
+                    if (cellData == null || cellData == undefined) {
+                        cellData = ""
+                    }
                     tr += '<td>' + cellData + '</td>';
                 }
                 tr += '</tr>';
