@@ -220,9 +220,6 @@ export default {
                           
 
     },
-    activated(){
-        
-    },
     created() {
         this.$store.commit("document/setDefaultEditorStore",{instance:this.keyInstance});
         if(this.$route.name == 'printConfigDocument'){
@@ -238,12 +235,10 @@ export default {
          * Nhận sự kiên từ click treeview danh sách các control trong doc thì highlight control và selected control
          */
         this.$evtBus.$on("document-editor-click-treeview-list-control", locale => {
+            if(thisCpn._inactive == true) return;
             let elControl = $("#document-editor-"+thisCpn.keyInstance+"_ifr").contents().find('body #'+locale.id);
             thisCpn.setSelectedControlProp(locale.event,elControl,$('#document-editor-'+this.keyInstance+'_ifr').get(0).contentWindow,true);
         });
-
-        
-        
     },
     data(){
         return{
@@ -261,19 +256,15 @@ export default {
             dialog: false,
             dataControlSwapType:{},
             listDataFlow:[],
-            isComponentActive:false,
             currentTabSelectedIcon:null,
             titleDialog:"",
             currentPageActive:null,
             isConfigPrint:false
         }
     },
-    activated() {
-        this.isComponentActive = true;
-    },
+    
     deactivated() {
         $('.tox-pop').css({display:'none'})
-        this.isComponentActive = false;
     },
     beforeMount(){
         this.listIconToolbar = [
@@ -329,6 +320,7 @@ export default {
                 }
             })
         },
+        
         showDialogEditor(type,title){
             this.dialog = true;
             this.typeDialog = type;

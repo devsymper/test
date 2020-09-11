@@ -33,7 +33,6 @@ export default {
             listAllUser:null,
             element:null,
             indexActive:1,
-            isComponentActive:false,
         }
     },
     computed:{
@@ -41,19 +40,12 @@ export default {
             return this.$store.state.app.allUsers;
         }
     },
-    activated() {
-        debugger
-        this.isComponentActive = true;
-    },
-    deactivated() {
-        debugger
-        this.isComponentActive = false;
-    },
+ 
     created(){
         
         let thisCpn = this;
         this.$evtBus.$on('document-submit-user-input-change',e=>{
-            if(thisCpn.isComponentActive == false) return;
+            if(thisCpn._inactive == true) return;
             if( thisCpn.isShow == false){
                 thisCpn.element = $(e.curTarget)
                 thisCpn.show();

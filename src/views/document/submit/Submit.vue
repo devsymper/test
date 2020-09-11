@@ -260,12 +260,6 @@ export default {
             return this.$store.state.document.viewType[this.keyInstance]
         }
     },
-    activated() {
-        this.isComponentActive = true;
-    },
-    deactivated() {
-        this.isComponentActive = false;
-    },
     data() {
         return {
             contentDocument: null,
@@ -295,7 +289,7 @@ export default {
             listMessageErr:[],
             titleValidate:"",
             messageValidate:"",
-            isComponentActive:false,
+            _inactive:false,
             cacheDataRunFormulas:{},
 			isDraft:0,
             preDataSubmit:{},
@@ -327,7 +321,7 @@ export default {
             thisCpn.$refs.validate.show(e);
 
         });
-        this.isComponentActive = true;
+        this._inactive = true;
         $(document).on('click','.run-dataflow',function(e){
             let idControl = $(this).closest('.s-control-data-flow').attr('id');
             let control = thisCpn.sDocumentEditor.allControl[idControl];
@@ -377,7 +371,7 @@ export default {
         }
 
         this.$evtBus.$on("run-formulas-control-outside-table", e => {
-            if(thisCpn.isComponentActive == false) return;
+            if(thisCpn._inactive == true) return;
             try {
                 let formulasInstance = e.formulasInstance;
                 let controlName = e.controlName;
@@ -396,7 +390,7 @@ export default {
         // hàm nhận sự kiện thay đổi của input
         this.$evtBus.$on("document-submit-input-change", locale => {
             try {
-                if(thisCpn.isComponentActive == false) return;
+                if(thisCpn._inactive == true) return;
                 let valueControl = locale.val;
                 let controlInstance = getControlInstanceFromStore(thisCpn.keyInstance,locale.controlName);
                 if(controlInstance.type == 'number' && !/^[-0-9,.]+$/.test(valueControl)){
@@ -437,21 +431,21 @@ export default {
             
         });
         this.$evtBus.$on("run-effected-control-when-table-change", control => {
-            if(thisCpn.isComponentActive == false) return;
+            if(thisCpn._inactive == true) return;
             thisCpn.handlerBeforeRunFormulasValue(control.controlFormulas.formulas.instance,control.id,control.name,'formulas');
         });
         this.$evtBus.$on("document-submit-open-validate-message", e => {
-            if(thisCpn.isComponentActive == false) return;
+            if(thisCpn._inactive == true) return;
             thisCpn.messageValidate = e.msg;
             thisCpn.$refs.validate.show(e);
         });
        
         this.$evtBus.$on("document-submit-show-time-picker", e => {
-            if(thisCpn.isComponentActive == false) return;
+            if(thisCpn._inactive == true) return;
             thisCpn.$refs.timeInput.show(e);
         });
         this.$evtBus.$on("document-submit-date-input-click", e => {
-            if(thisCpn.isComponentActive == false) return;
+            if(thisCpn._inactive == true) return;
             thisCpn.$refs.datePicker.openPicker(e);
             thisCpn.$store.commit("document/updateCurrentControlEditByUser", {
                 currentControl: e.controlName,
@@ -460,11 +454,11 @@ export default {
         });
       
         // this.$evtBus.$on("document-submit-search-in-filter-input", e => {
-        //     if(thisCpn.isComponentActive == false) return;
+        //     if(thisCpn._inactive == true) return;
         //     thisCpn.runInputFilterFormulas(e.controlName,e.search);
         // }); 
         this.$evtBus.$on("document-submit-filter-input-click", e => {
-            if(thisCpn.isComponentActive == false) return;
+            if(thisCpn._inactive == true) return;
             thisCpn.topPositionDragPanel = $(e.target).offset().top + 2 + $(e.target).height();
             thisCpn.leftPositionDragPanel = e.screenX - e.offsetX;
             thisCpn.runInputFilterFormulas(e.controlName);
@@ -475,7 +469,7 @@ export default {
         }); 
         // hàm nhận sự thay đổi của input autocomplete gọi api để chạy công thức lấy dữ liệu
         this.$evtBus.$on("document-submit-autocomplete-key-event", e => {
-            if(thisCpn.isComponentActive == false) return;
+            if(thisCpn._inactive == true) return;
             try {
                 if((e.e.keyCode >= 97 && e.e.keyCode <= 105) ||
                     (e.e.keyCode >= 48 && e.e.keyCode <= 57) ||
@@ -507,7 +501,7 @@ export default {
         // sự kiện ném ra khi gõ vào control department
         // một số key code gõ vào thì ko mở hoặc phải đóng đi
         this.$evtBus.$on("document-submit-department-key-event", e => {
-            if(thisCpn.isComponentActive == false) return;
+            if(thisCpn._inactive == true) return;
             try {
                 if((e.e.keyCode >= 97 && e.e.keyCode <= 105) ||
                     (e.e.keyCode >= 48 && e.e.keyCode <= 57) ||
@@ -536,7 +530,7 @@ export default {
         });
         // hàm nhận sự thay đổi của input select gọi api để chạy công thức lấy dữ liệu
         this.$evtBus.$on("document-submit-select-input", e => {
-            if(thisCpn.isComponentActive == false) return;
+            if(thisCpn._inactive == true) return;
             try {
                 thisCpn.$refs.autocompleteInput.show(e.e);
                 thisCpn.$store.commit("document/addToDocumentSubmitStore", {
@@ -555,7 +549,7 @@ export default {
             if(evt == undefined){
                 return;
             }
-            if(thisCpn.isComponentActive == false) return;
+            if(thisCpn._inactive == true) return;
             try {
                 if (
                     !$(evt.target).hasClass("s-control-select") &&
@@ -674,7 +668,7 @@ export default {
             this.$refs.symDragPanel.hide()
         },
         searchDataFilter(data){
-            if(this.isComponentActive == false) return;
+            if(this._inactive == false) return;
             this.runInputFilterFormulas(data.controlName,data.search);
         },
         afterDataFlowMounted(id){
