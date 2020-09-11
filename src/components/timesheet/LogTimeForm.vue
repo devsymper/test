@@ -1,73 +1,88 @@
 <template>
-<v-card style="width:100%important" >
+<v-card class="w-100" >
     <v-card-title class="pb-1 pt-2 headline lighten-2" primary-title>
         <div class="pb-1 w-100" style="border-bottom: 1px solid lightgrey">
-            <span style="font-size:18px">{{$t('common.log_time')}}</span> 
-            </div>
+            <span style="font-size:18px">{{$t('timesheet.log_time')}}</span> 
+        </div>
     </v-card-title>
     <v-card-text class="mt-1 h-65" >
-        <span class="label pt-2 ">{{$t('common.category_task')}}<span style="color:red"> *</span></span>
-        <v-autocomplete 
-            style="margin-top:2px!important; " 
-            :menu-props="{'nudge-top':-40}" 
-            v-model="categoryTask"
-            class="category-task" 
-            :items="category.category_name" 
-            placeholder="Tìm việc ..." 
-            item-color="white" 
-            background-color="#F7F7F7">
-            <template v-slot:item="data" class="category-task">
-                <!-- <img style='max-height: 40px; max-width: 30px; margin-right:5px' 
-                :src="require('')" /> -->
-            <span style='color:black' >{{ data.item }}
-                <v-icon v-if="data.item === categoryTask " color="success">
-                mdi-check</v-icon></span>
-        </template>
-        </v-autocomplete>
+        <span class="label ">{{$t('timesheet.category_task')}}<span style="color:red"> *</span></span>
+        <v-row>
+            <div style="width: 275px!important" class="ml-3 mr-1">
+                <v-autocomplete 
+                    style="margin-top:-10px!important; " 
+                    :menu-props="{'nudge-top':-10}" 
+                    v-model="categoryTask"
+                    class="category-task" 
+                     :search-input.sync="searchCategory" 
+                    :items="category.category_name" 
+                    placeholder="Tìm việc ..." 
+                    item-color="white" 
+                    background-color="#F7F7F7">
+                    <template v-slot:item="data" class="category-task">
+                        <span style='color:black' >{{ data.item }}
+                            <v-icon v-if="data.item === categoryTask " color="success">
+                            mdi-check
+                            </v-icon>
+                        </span>
+                    </template>
+                </v-autocomplete>
+            </div>
+            <div style="width:10%">
+                <button 
+                    style="border-radius:2px;font-weight: normal; float:right;margin-left:2px"
+                    @click="showCategoryForm()" 
+                    depressed small class="mr-2 ml-1 fs-13">
+                        <v-icon>mdi-plus</v-icon>
+                </button>
+            </div>
+        </v-row>
     </v-card-text>
      <v-card-text>
          <span class="red--text" v-show="cateError">{{cateError}}</span>
     </v-card-text>
-    <v-card-text class='task-form h-65'>
-        <span class="label pt-2">{{$t('common.task_form')}}<span style="color:red"> *</span></span>
-        <v-row>
+    <v-card-text class='task-form h-65' style="margin-top:-4px">
+        <span class="label">{{$t('timesheet.task_form')}}<span style="color:red"> *</span></span>
+        <v-row style="margin-top:-10px">
             <div style="width: 275px!important" class="ml-3 mr-1">
-        <v-autocomplete 
-            class="task" 
-            style="width:100%;margin-top:8px!important;font-size:13px" 
-            v-model="task"
-            :items="items" 
-            
-            :loading="isLoading" 
-            :search-input.sync="search" 
-            item-text="name"    
-            item-value="symbol" 
-            :menu-props="{'nudge-top':-10, 'max-width': 300}" 
-            label="Tìm loại công việc ...">
-         <template v-slot:item="data">
-                    <v-list-item-content>
-                      <v-list-item-title class="st-icon-pandora">{{data.item.name}}</v-list-item-title>
-                      <v-list-item-subtitle class="fs-11 color-grey" ><span v-if="data.item.categoryId" style="color:black" class="color-grey">{{getNameCategory(data.item.categoryId)}} </span>{{data.item.description}}</v-list-item-subtitle>
-              
-                    </v-list-item-content>
-                  </template>
-        </v-autocomplete>
+                <v-autocomplete 
+                    class="task w-100 mt-2 fs-13" 
+                    v-model="task"
+                    :items="items" 
+                    :loading="isLoading" 
+                    :search-input.sync="search" 
+                    item-text="name"    
+                    item-value="symbol"
+                    :menu-props="{'nudge-top':-10, 'max-width': 300}" 
+                    label="Tìm loại công việc ...">
+                        <template v-slot:item="data">
+                            <v-list-item-content>
+                               <v-list-item-title class="st-icon-pandora">{{data.item.name?data.item.name:'Không có tên'}}</v-list-item-title>
+                            <v-list-item-subtitle class="fs-11 color-grey" >
+                                <span v-if="data.item.categoryId" style="color:black" class="color-grey">
+                                     {{getNameCategory(data.item.categoryId)}}-{{data.item.description?data.item.description:'Chưa có mô tả'}} </span>
+                                <span v-else style="color:black" class="color-grey">
+                                   Symper task  </span>
+                                   </v-list-item-subtitle>
+                            </v-list-item-content>
+                        </template>
+                </v-autocomplete>
            </div>
-              <div style="width:10%">
+            <div>
                 <button style="border-radius:2px;font-weight: normal; float:right" @click="showTaskForm()" 
-                depressed small class="mr-2 ml-1 fs-13">
+                depressed small class="mr-2  mt-3 fs-13">
                 <v-icon>mdi-plus</v-icon>
                 </button>
-        </div>
-         </v-row>
+            </div>
+        </v-row>
     </v-card-text>
     <v-card-text>
          <span class="red--text" v-show="taskError">{{taskError}}</span>
     </v-card-text>
     <v-card-text class="div-calender-picker">
-        <div style="height: 32px; margin-top:3px">
+        <div style="height: 32px; margin-top:-3px">
             <div class="date ">
-                <span class="label pt-2">{{$t('common.date')}} <span style="color:red"> </span></span>
+                <span class="label">{{$t('timesheet.date')}} <span style="color:red"> </span></span>
                 <v-menu offset-y nudge-top="-10">
                     <template v-slot:activator="{ on }">
                         <input 
@@ -87,10 +102,10 @@
                  <!-- date -->
                 </v-menu>
             </div>
-            <div class="duration"> <span class="label pt-2">{{$t('common.duration')}}</span>
+            <div class="duration"> <span class="label">{{$t('timesheet.duration')}}</span>
                 <input type="text" readonly v-model="displayDuration" class="input-logtime"></div>
             <div class='start-time'>
-                <span class="label pt-2">{{$t('common.start_time')}}<span style="color:red"> *</span> </span>
+                <span class="label">{{$t('timesheet.start_time')}}<span style="color:red"> *</span> </span>
                 <v-menu 
                     ref="start-picker"
                     class='clock'
@@ -118,8 +133,8 @@
                     </v-time-picker>
                 </v-menu>
             </div>
-            <div style="width: 63px; float: left"> <span class="label pt-2">
-                {{$t('common.end_time')}}<span style="color:red">*</span></span>
+            <div style="width: 63px; float: left"> <span class="label">
+                {{$t('timesheet.end_time')}}<span style="color:red">*</span></span>
                 <v-menu 
                     ref="end-picker"
                     nudge-top="-10"
@@ -149,42 +164,42 @@
             </div>
         </div>
     </v-card-text>
-       <v-card-text>
+       <v-card-text v-if="timeError" class="mb-3">
          <span class="red--text" v-show="timeError">{{timeError}}</span>
     </v-card-text>
     <v-card-text class="div-description">
-        <span class="label pt-2">{{$t('common.description')}}</span>
+        <span class="label">Mô tả</span>
         <textarea v-model="inputs.description" class='description'></textarea>
     </v-card-text>
     <v-card-actions class="pb-5">
-        <div style="width:100%; float:right">
+        <div class="w-100" style="float:right">
             <v-btn class='cancel' @click="cancel()">
-               {{$t('common.cancel')}}
+               {{$t('timesheet.cancel')}}
             </v-btn>
             <v-btn v-if= "update==false&&showLog" color="primary" 
             class="button-logtime"
              @click="log(1)">
-             <span >{{$t('common.log')}}</span> 
+             <span >{{$t('timesheet.log')}}</span> 
              </v-btn>
               <v-btn v-if= "update==false&&showPlan" color="success" 
             class="button-logtime"
              @click="log(0)">
-             <span >{{$t('common.plan')}}</span> 
+             <span >{{$t('timesheet.plan')}}</span> 
              </v-btn>
                <v-btn v-if= "update&&newEvent.type==1" color="primary" 
             class="button-logtime"
              @click="updatelog(1)">
-             <span >{{$t('common.update')}}</span> 
+             <span >{{$t('timesheet.update')}}</span> 
              </v-btn>
                <v-btn v-if= "update&&newEvent.type==0&&showPlan" color="primary" 
             class="button-logtime"
              @click="updatelog(0)">
-             <span >{{$t('common.update')}}</span> 
+             <span >{{$t('timesheet.update')}}</span> 
              </v-btn>
                <v-btn v-if= "update&&newEvent.type==0&&showLog" color="success" 
             class="button-logtime mr-2" style="float:right!important; width: 60px"
              @click="updatelog(1)">
-             <span >{{$t('common.log')}}</span> 
+             <span >{{$t('timesheet.log')}}</span> 
              </v-btn>
         </div>
     </v-card-actions>
@@ -200,19 +215,23 @@ import TaskForm from '../timesheet/TaskForm';
 
 export default {
     name: 'LogTimeForm',
-    props: ['formType', 'newEvent', 'onSave', 'onCancel', 'update','dateMonth','eventLog','load'],
+    props: ['formType', 'newEvent', 'onSave', 'onCancel', 'update','dateMonth','eventLog','load','updateAPICategory','cancelTask','cancelCate'],
     data: () => ({
         date: new Date().toISOString().substr(0, 10),
         isLoading: false,
         dialog: false,
         items: [],
+        displayDate: '',
         showLog:false,
         showPlan:false,
         model: null,
         search: null,
+        searchCategory:null,
         tab: null,
+        checkDateUpdate:false,
         task: '',
         desc: '',
+        dateLogMonthView:'',
         listCategory:[],
         type: 'week',
         checkNullCate:false,
@@ -224,7 +243,6 @@ export default {
         categoryTask: '',
         category: {
             category_name: [
-                "BD-Business Development",
             ],
             task: [],
         },
@@ -240,6 +258,9 @@ export default {
         TaskForm
     },
     computed: {
+         typeCalendar() {
+            return this.$store.state.timesheet.calendarType;
+        },
         duration() {
             let startTime = this.inputs.startTime.split(":");
             let endTime = this.inputs.endTime.split(":");
@@ -271,38 +292,50 @@ export default {
                 return '';
             }
         },
-        displayDate() {
-
-            if(this.eventLog.startTime!=undefined){this.getEventLog();};
-         
-            return dayjs(this.inputs.date).format('DD/MMM/YYYY');
-        }
+        // displayDate() {
+        //   debugger
+        //     if(this.eventLog.startTime!=undefined){this.getEventLog();};
+           
+        // }
     },
     watch: {
-        load(){
-            this.loadTaskList();
+        updateAPICategory(){
+             this.getCategory();
+             this.$emit("doneCate")
+
+        },
+        cancelTask(){
+            if(this.cancelTask){
+           
+                this.getAllTask();
+            }
         },
         eventLog(){
             this.getEventLog();
             
         },
-        dateMonth(date){
-            let test = date;
-            this.showLog = true;
-            this.inputs.date = dayjs(date).format('DD/MMM/YYYY')
-           
+        dateMonth(){
+            this.getDateMonth()
         },
+       
         duration(){
             if(this.duration<=0||Number.isNaN(this.duration)){
-                this.timeError = this.$t('common.time_invalid');}
+                this.timeError = this.$t('timesheet.time_invalid');}
             else{
                 this.timeError = ''
+            }
+        },
+        search(){
+            if(!this.categoryTask){
+                this.getAllTask(this.search);
+            }else{
+                this.filterTaskByCategory();
             }
         },
         task(){
              if(this.checkNullTask){
                 if(this.task==undefined){
-                    this.taskError = this.$t('common.required_value');
+                    this.taskError = this.$t('timesheet.required_value');
                 }else{
                     this.taskError=""
                     this.checkNullTask =false
@@ -311,42 +344,104 @@ export default {
              else{}
         },
         categoryTask(){
+            if(!this.categoryTask){
+                this.getAllTask();
+                this.filterTaskByCategory();
+
+            }else{
+                this.filterTaskByCategory();
+            }
             if(this.checkNullCate){
                 if(!this.categoryTask){
-                    this.cateError = this.$t('common.required_value');
+                    this.cateError = this.$t('timesheet.required_value');
                 }else{
-                    this.cateError=""
+                    this.cateError="";
                     this.checkNullCate =false
                 }
              }
              else{};
-              this.loadTaskList();
+             // this.loadTaskList();
         },
         model(val) {
             if (val != null) this.tab = 0
             else this.tab = null
         },
         newEvent(val) {
-            this.loadTaskList();
+           // debugger
+            this.getAllTask();
             this.inputs.startTime = val ? dayjs(val.start).format('HH:mm') : "08:00";
             this.inputs.endTime = val ? dayjs(val.end).format('HH:mm') : "08:40";
+         //   debugger
             this.inputs.date = val ? dayjs(val.date).format('YYYY-MM-DD') : dayjs().format('YYYY-MM-DD');
+            this.displayDate = this.inputs.date;
             this.inputs.description = val.desc;
             this.categoryTask = val.category;
             this.task = val.task;
+            this.items.push({name:val.task});
+         //   debugger
             // hiển thị nút plan và log theo từng giờ
             let now = dayjs();
-           // let lastDay = dayjs().subtract(1,'days').format('DD/MMM/YYYY');
             let dateLog = dayjs(this.newEvent.start).format('DD/MMM/YYYY h:mm A');
             this.showLog =  dayjs(dateLog).isAfter(now)==true?false:true;
             this.showPlan = dayjs(dateLog).isAfter(now);
+            this.filterTaskByCategory();
         },
     },
     created(){
-        this.loadTaskList();
+        // load lại trang ở màn month
+     //  debugger
+        let date = this.dateMonth;
+        this.getDateMonth(date);
+        this.getAllTask();
         this.getCategory();
     },
     methods: {
+        filterTaskByCategory(){
+            if(this.categoryTask){
+                debugger
+            let categoryId = this.getIdCategory(this.categoryTask);
+            this.items = this.items.filter(x=>x.categoryId==categoryId||x.categoryId==null);
+            }
+        },
+         async getAllTask(nameTask){
+            let self = this;
+            this.items = [];
+           await timesheetApi.getTaskDB()
+            .then(res => {
+                self.items.push(...res.data.task);
+                })
+                .catch(console.log);
+            await timesheetApi.getTask({nameLike:'%'+nameTask+'%'})
+            .then(res => {
+                self.items.push(...res.data);
+                })
+                .catch(console.log);
+
+        },
+        // lấy giờ
+         getDateMonth(){
+            let date = this.dateMonth;
+            this.dateLogMonthView = date;
+            this.displayDate = date;
+            this.inputs.startTime='08:00';
+            this.inputs.endTime='08:30';
+            this.inputs.description = '';
+            this.categoryTask = '';
+            this.task ='';
+            let now = dayjs();
+            let dateLog = dayjs(date).format('DD/MMM/YYYY');
+            this.showLog =  dayjs(dateLog).isAfter(now)==true?false:true;
+            this.showPlan = dayjs(dateLog).isAfter(now);
+            this.inputs.date = dayjs(date).format('YYYY-MM-DD')
+           
+        },
+        // đổi giờ thành ngày giờ trong màn hình month
+         changeTimeToDate(time){
+            let hour = Number(time.split(":")[0]);
+            let minutes = Number(time.split(":")[1]);
+            let dateTime = dayjs(this.dateLogMonthView).hour(hour).minute(minutes).format("YYYY-MM-DD HH:mm");
+            return dateTime;
+        },
         //lấy danh sách category
         getNameCategory(value){
             for(let i=0; i<this.listCategory.length; i++){
@@ -363,7 +458,6 @@ export default {
             }
         },
         getEventLog(){
- 
             this.inputs.startTime = this.eventLog.startTime;
             this.inputs.endTime = this.eventLog.endTime;
             this.task  = this.eventLog.task;
@@ -372,6 +466,18 @@ export default {
             this.categoryTask = this.eventLog.categoryTask;
             this.inputs.description = this.eventLog.desc;
 
+
+         },
+         showCategoryForm(){
+             this.$emit("showCategoryForm",{
+                    startTime:this.inputs.startTime,
+                    endTime:this.inputs.endTime,
+                    task: this.task,
+                    date: this.inputs.date,
+                    categoryTask: this.categoryTask,
+                    desc: this.inputs.description || ""
+                })
+                this.getEventLog();
 
          },
         showTaskForm(){
@@ -413,17 +519,28 @@ export default {
         },
         // type= 0 là plan, 1 là log
         log(type) {
+            // debugger
             this.checkNullTask = true;
+            let start = null;
+            let end = null;
             this.checkNullCate = true;
             let check = this.checkValidateLogForm();
+            if(this.typeCalendar=="month"){
+                start = this.changeTimeToDate(this.inputs.startTime);
+                end = this.changeTimeToDate(this.inputs.endTime);
+
+            }else{
+                start = dayjs(this.newEvent.start).hour(+this.inputs.startTime.split(":")[0]).minute(+this.inputs.startTime.split(":")[1]).format("YYYY-MM-DD HH:mm");
+                end  = dayjs(this.newEvent.start).hour(+this.inputs.endTime.split(":")[0]).minute(+this.inputs.endTime.split(":")[1]).format("YYYY-MM-DD HH:mm");
+
+            }
             //debugger
             if (!check){}
             else{
-                let a = this.newEvent.start?(dayjs(this.newEvent.start).hour(+this.inputs.startTime.split(":")[0]).minute(+this.inputs.startTime.split(":")[1]).format("YYYY-MM-DD HH:mm")):(dayjs(this.inputs.startTime).format("YYYY-MM-DD HH:mm"));
+               // debugger
                 timesheetApi.createLogTime({
-                
-                    start: this.newEvent.start?(dayjs(this.newEvent.start).hour(+this.inputs.startTime.split(":")[0]).minute(+this.inputs.startTime.split(":")[1]).format("YYYY-MM-DD HH:mm")):(dayjs(this.inputs.startTime).format("YYYY-MM-DD HH:mm")),
-                    end: this.newEvent.end?(dayjs(this.newEvent.start).hour(+this.inputs.endTime.split(":")[0]).minute(+this.inputs.endTime.split(":")[1]).format("YYYY-MM-DD HH:mm")):(dayjs(this.inputs.endTime).format("YYYY-MM-DD HH:mm")),
+                    start: start,
+                    end: end,
                     duration: this.duration,
                     task: this.task,
                     type: type,
@@ -433,35 +550,38 @@ export default {
                 })
                 .then(res => {
                     if (res.status === 200) {
-                        this.onSave()
+                     //   debugger
+                        this.onSave();
+                        this.$emit('loadMonthView')
+                     
                     }
                 })
-                .catch(console.log);
+                .catch();
             this.cancel();
             }       
         },
         showError() {
             if (this.duration < 0) {
-                this.timeError = this.$t('common.time_invalid'); 
+                this.timeError = this.$t('timesheet.time_invalid'); 
             }
         },
         checkValidateLogForm()
         {
             let check = true;
-            if(this.taskError!=undefined&&this.task==undefined){
-                this.taskError = this.$t('common.required_value'); 
-                this.cateError = this.$t('common.required_value');
+            if(this.categoryTask==undefined&&this.task==undefined){
+                this.taskError = this.$t('timesheet.required_value'); 
+                this.cateError = this.$t('timesheet.required_value');
                 check = false;
             }
             else if(this.timeError!=''){
                 check = false;
              }
             else if (this.categoryTask==undefined) {
-                this.cateError = this.$t('common.required_value'); 
+                this.cateError = this.$t('timesheet.required_value'); 
                 check = false;
             }  
             else if (this.task==undefined) {
-                this.taskError = this.$t('common.required_value');      
+                this.taskError = this.$t('timesheet.required_value');      
                 check = false;
             }
             else{
@@ -488,6 +608,7 @@ export default {
                     })
                     .then(res => {
                         if (res.status === 200) {
+                          //  debugger
                             this.onSave()
                         }
                     })
@@ -495,46 +616,6 @@ export default {
                this.cancel();
             }
         },
-        allowedDates: val => parseInt(val.split('-')[2], 10),
-        async loadTaskList() {
-            const self = this;
-            let b = self.categoryTask;
-            //nếu có giá trị của category
-            if(!self.categoryTask){
-                try {
-                    let res =  await timesheetApi.getTaskDB()
-                    let task =[];
-                    task.push(...res.data.task);
-                    self.items = task;
-                    res = await timesheetApi.getTask({size: 1000});
-                    task.push(...res.data);
-                    self.items = task;
-                } catch(e) {
-                    console.log(e)
-                } finally {
-                    self.isLoading = false
-                }
-                
-            }else{
-                // lọc task theo giá trị category
-                try {
-                    let idCategory = self.getIdCategory(self.categoryTask);
-                    let res = await timesheetApi.getTaskDB()
-                    console.log(idCategory)
-                    console.log(res)
-                    let task = res.data.task;// lọc ở đây theo id
-                    console.log(task)
-                    res = await timesheetApi.getTask({size: 1000});
-                    task.push(...res.data);
-                    self.items = task;
-                } catch(e) {
-                    console.log(e)
-                } finally {
-                    self.isLoading = false
-                }
-            }
-            // nếu không có giá trị category
-        }
     },
 
 }
@@ -544,6 +625,7 @@ export default {
 .div-description {
     clear: left;
     clear: right;
+    margin-top:-10px;
 }
 .description {
     padding-left: 10px;
@@ -711,7 +793,9 @@ button {
     margin-left: -12px;
     margin-right: 12px;
 }
-
+.v-autocomplete ::v-deep .v-input__control{
+    margin-top:12px;
+}
 .start-time {
     width: 67px;
     margin-right: 5px;
@@ -756,5 +840,13 @@ button {
 }
 .viewmode .v-select__selections {
     padding-left: 0px !important;
+}.v-list-item__title {
+    font-size: 13px !important;
+    color: black;
+}
+.v-list-item {
+    font-size: 13px !important;
+    color: black;
+    min-height: 30px!important;
 }
 </style>

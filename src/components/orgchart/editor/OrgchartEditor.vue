@@ -1,7 +1,6 @@
 <template>
     <div class="d-flex w-100 h-100">
         <!-- <NodeSelector class="border-right-1"></NodeSelector> -->
-
         <div class="h-100 flex-grow-1">
             <div class="border-bottom-1 pt-1 pl-2">
                 <v-tooltip bottom v-for="(item, key) in headerActions" :key="key">
@@ -13,11 +12,23 @@
                             style="position:relative; top: -3px"
                         > 
                             <v-icon size="21" v-on="on">{{item.icon}}</v-icon>
-                        </v-btn>
+               	         </v-btn>
                     </template>
                     <span>{{$t(item.text) }}</span>
                 </v-tooltip>
-
+				<v-tooltip bottom v-if="checkPageEmpty == true" >
+                    <template v-slot:activator="{ on }">
+                        <v-btn
+                            @click="addNode"
+                            icon
+                            class="mr-2"
+                            style="position:relative; top: -3px"
+                        > 
+                            <v-icon size="21" v-on="on">mdi-plus-thick</v-icon>
+                        </v-btn>
+                    </template>
+                    <span>them node moi </span>
+                </v-tooltip>
                 <v-btn
                     v-if="action != 'view' && context == 'department'"
                     class="float-right mr-1"
@@ -45,10 +56,9 @@
                         top: 45%;
                         left: 50%;
                         margin-right: -50%;
-                        transform: translate(-50%, -50%) "      
+                        transform: translate(-50%, -50%)"      
                 ></v-progress-circular>
             </div>
-            
             <EditorWorkspace 
                 :class="{
                     'w-100': true,
@@ -60,12 +70,11 @@
                 @blank-paper-clicked="handleBlankPaperClicked"
                 @cell-contextmenu="showPositionEditor"
                 @cell-clicked="selectNode"
+				@delete-node="handlerDeleteNode"
                 :instanceKey="instanceKey"
                 :context="context"
                 ref="editorWorkspace"/>
-
         </div>
-
         <div :style="{
             width:'250px'
         }" class="h-100 border-left-1">
@@ -89,16 +98,15 @@
             :style="{
                 width: '1000px'
             }">
-
             <OrgchartEditor
                 @update-department-name="changeDepartmentName"
                 ref="positionDiagram"
+				@update-father-node="handleConfigUserSelectChange"
                 :action="action"
                 :id="id"
                 :instanceKey="selectingNode.positionDiagramCells ? selectingNode.positionDiagramCells.instanceKey : ''"
                 context="position">
             </OrgchartEditor>
-
         </v-navigation-drawer>
     </div>
 </template>
@@ -146,19 +154,11 @@ export default {
     data(){
         return {
             loadingDiagramView: true,
-            positionEditor: false,
+			positionEditor: false,
+			checkPageEmpty: false,
+			listUserIds:null,
             headerActions: {
-                // undo: {
-                //     icon: "mdi-undo",
-                //     text: "process.header_bar.undo",
-                //     action: "undo"
-                // },
-                // redo: {
-                //     icon: "mdi-redo",
-                //     text: "process.header_bar.redo",
-                //     action: "redo"
-
-                // },
+              
                 zoomIn: {
                     icon: "mdi-plus-circle-outline",
                     text: "process.header_bar.zoom_out",
@@ -184,7 +184,8 @@ export default {
                 home: {
                     icon: "mdi-home-outline",
                     text: ""
-                },
+				},
+				
             },
         }
     },
@@ -211,9 +212,45 @@ export default {
         }
     },
     methods: {
+		handlerDeleteNode(){
+			let array = this.$refs.editorWorkspace.getAllNode()
+			if(array.length == 0){
+				this.checkPageEmpty = true
+			}
+		},
         handleStyleChange(info){
             this.changeNodeBottomColor(info.data.highlight.value, info.type == 'child');
-        },
+		},
+		getAllLink(){
+			 return this.$refs.editorWorkspace.getAllLink()
+		},
+		getAllNode(){
+			return  this.$refs.editorWorkspace.getAllNode()
+		},
+		getFirstNode(data,allNode){
+			let res 
+			if(data.length == 0){
+				res =  allNode
+			}else{
+				// let arrNodeId = []
+				// allNode.forEach(function(e){
+				// 	arrNodeId.push(e.id);
+				// 	data.forEach(function(k){
+				// 		if(arrNodeId.includes(k.attributes.target.id) == false){
+				// 			res = k
+				// 		}
+				// 	})
+				// })
+				res = allNode[0]
+			}
+			return res
+		},
+		addNode(){
+			this.checkPageEmpty= false
+			this.$refs.editorWorkspace.createFirstVizNode()
+			self.centerDiagram();
+			self.scrollPaperToTop(200);
+		},
         changeNodeBottomColor(color, applyForChild = false){
             let affectedNodeIds = [];
             let workspace = this.$refs.editorWorkspace;
@@ -247,18 +284,42 @@ export default {
         },
         handleConfigUserSelectChange(listUserIds){
             this.$refs.editorWorkspace.changeUserDisplayInNode(listUserIds);
-
             if(this.context == 'department'){
-                this.changeManagerForDepartment(this.selectingNode.id, listUserIds);
-            }
-        },
+				this.changeManagerForDepartment(this.selectingNode.id, listUserIds);
+				let allNodes = this.$refs.positionDiagram.getAllNode()
+				let firstNode = allNodes[0]
+				let instanceKey = this.selectingNode.positionDiagramCells.instanceKey
+				this.$store.commit('orgchart/changeSelectingNode',
+					{
+						instanceKey: instanceKey,
+						nodeId: firstNode.id
+					}
+				)
+				this.listUserIds = listUserIds
+            }else{
+				if(this.$store.state.orgchart.firstChildNodeId == this.$store.state.orgchart.currentChildrenNodeId){
+					this.$store.commit('orgchart/updateUserFatherNode',listUserIds)
+					this.$emit('update-father-node',listUserIds)
+					// this.$refs.editorWorkspace.changeUserDisplayInNode(listUserIds);
+				}
+			}
+		},
+	
         // Kiểm tra xem department hiện tại đã có node Manager hay chưa
         changeManagerForDepartment(departmentVizId, userIds){
-            this.checkAndCreateOrgchartData();
+			this.checkAndCreateOrgchartData();
             if(!this.selectingNode.positionDiagramCells.cells){
-                this.$refs.positionDiagram.createFirstVizNode();
+				let data = this.$refs.positionDiagram.createFirstVizNode();
+				this.$store.commit('orgchart/updateFirstChildNodeId',data.id)
                 this.storeDepartmentPositionCells(); 
-            }
+			}
+				let currentInstanceKey =  this.$store.state.orgchart.instanceKey
+				let id = this.$store.state.orgchart.firstChildNodeId
+				this.$store.commit('orgchart/updateUserChildNode',{ 
+					currentInstanceKey: currentInstanceKey,
+					id :id,
+					users: userIds
+				})
         },
         restoreMainOrgchartConfig(config){
             let homeConfig = this.$store.state.orgchart.editor[this.instanceKey].homeConfig;
@@ -298,7 +359,7 @@ export default {
                             name: node.name,
                             description: node.description,
                             code: node.code,
-                            users: JSON.parse(node.users)
+                            users: this.getListUserAsArr(node.users)
                         };
 
                         if(node.content && node.content !== 'false'){
@@ -313,25 +374,24 @@ export default {
                         newDepartment.style = this.restoreNodeStyle(node.style);
                         mapIdToDpm[node.vizId] = newDepartment;
                     }
-
-                    this.addUsersToPosition(savedData.positions, savedData.userInPostion);
-
+                    savedData.positions.forEach(function(e){
+                        e.users = JSON.parse(e.users)
+                    })
                     let allPositionInADpm = getMapDpmIdToPosition(savedData.positions);
                     for(let dpmId in allPositionInADpm){
                         let dpmInstanceKey = this.$store.state.orgchart.editor[this.instanceKey].allNode[dpmId].positionDiagramCells.instanceKey;
                         for(let idPosition in allPositionInADpm[dpmId]){
                             let position = allPositionInADpm[dpmId][idPosition];
-
+                            let userSelected = this.getListUserAsArr(position.users);
                             let nodeData = {
                                 id: position.vizId,
                                 name: position.name,
                                 description: position.description,
                                 code: position.code,
-                                users: position.users ? position.users : []
+                                users: userSelected
                             };
                             let newPosition = this.createNodeConfigData('position', nodeData, dpmInstanceKey);
                             newPosition.style = this.restoreNodeStyle(position.style);
-
                             if(position.dynamicAttributes){
                                 newPosition.customAttributes = position.dynamicAttributes;
                             }
@@ -348,6 +408,20 @@ export default {
                 this.$snotifyError(error, "Can not get orgchart data");
             }
         },
+        getListUserAsArr(users){
+            if(!users){
+                users = [];
+            }else{
+                if(typeof users == 'string'){
+                    try {
+                        users = JSON.parse(users);
+                    } catch (error) {
+                        users = [];
+                    }
+                }
+            }
+            return users;
+        },
         restoreNodeStyle(savedStyle){
             if(typeof savedStyle != 'object'){
                 savedStyle = JSON.parse(savedStyle);
@@ -362,18 +436,17 @@ export default {
         },
 
         addUsersToPosition(postions, users){
-            let mapPostitions = postions.reduce((map, el)=> {
-                map[el.id] = el;
-                return map;
-            } , {});
-            for(let u of users){
-                let pos = mapPostitions[u.positionNodeId];
-                if(!pos.users){
+            for(let pos of postions){
+                if(pos.users){
+                    pos.users = typeof pos.users == 'string' ? JSON.parse(pos.users) : pos.users;
+                    let map = {};
+                    for(let u of pos.users){
+                        map[u] = true;
+                    }
+                    pos.users = Object.keys(map);
+                }else{
                     pos.users = [];
-                }else if(typeof pos.users == 'string'){
-                    pos.users = JSON.parse(pos.users);
                 }
-                pos.users.push(u.userId);
             }
         },
         centerDiagram(){
@@ -383,14 +456,24 @@ export default {
         },
         showPositionEditor(nodeId){
             if(this.context == 'department'){
-                this.positionEditor = true;
-                this.selectNode(nodeId);
+				this.$store.commit('orgchart/updateCurrentFatherNode',{id:nodeId,instanceKey:this.instanceKey})
+				this.positionEditor = true;
+				this.$store.commit('orgchart/updateInstanceKey', this.instanceKey)
+				this.selectNode(nodeId);
                 setTimeout((self) => {
-                    self.checkAndCreateOrgchartData();
+					self.checkAndCreateOrgchartData();
                     if(self.selectingNode.positionDiagramCells.cells){
                         self.$refs.positionDiagram.loadDiagramFromJson(self.selectingNode.positionDiagramCells.cells);
+						let allNodes = self.$refs.positionDiagram.getAllNode()
+						let firstNode = allNodes[0]
+						self.$refs.positionDiagram.$refs.editorWorkspace.changeUserDisplayInNode(this.listUserIds);
+						debugger
+						self.$store.commit('orgchart/updateFirstChildNodeId', firstNode.id)
+                        self.$store.commit('orgchart/updateCurrentChildrenNodeId',firstNode.id)
                     }else{
-                        self.$refs.positionDiagram.createFirstVizNode();
+						let data = self.$refs.positionDiagram.createFirstVizNode();
+						self.$store.commit('orgchart/updateCurrentChildrenNodeId',data.id)
+						self.$store.commit('orgchart/updateFirstChildNodeId',data.id)
                     }
                     self.$refs.positionDiagram.centerDiagram();
                     self.$refs.positionDiagram.$refs.editorWorkspace.scrollPaperToTop(200);
@@ -399,7 +482,7 @@ export default {
             }
         },
         createFirstVizNode(){
-            this.$refs.editorWorkspace.createFirstVizNode();
+			return this.$refs.editorWorkspace.createFirstVizNode();
         },
         loadDiagramFromJson(cells){
             this.$refs.editorWorkspace.loadDiagramFromJson(cells);
@@ -407,7 +490,7 @@ export default {
         checkAndCreateOrgchartData(){
             let subInstanceKey = this.selectingNode.positionDiagramCells.instanceKey;
             if(!this.$store.state.orgchart.editor[subInstanceKey]){
-                this.$refs.positionDiagram.initOrgchartData();
+				this.$refs.positionDiagram.initOrgchartData();
             }
             this.$store.state.orgchart.editor[subInstanceKey].homeConfig = this.selectingNode;
         },
@@ -592,6 +675,7 @@ export default {
             }      
 
             if(passed){
+				debugger
                 let orgchartData = this.getDataToSave();
                 this.$emit('save-orgchart-data', orgchartData);    
             }
@@ -607,7 +691,7 @@ export default {
                 dynamicAttrs: JSON.stringify(orgchartAttr.customAttributes),
                 name: orgchartAttr.commonAttrs.name.value,
                 code: orgchartAttr.commonAttrs.code.value
-            };
+			};
             return data;
         },
         normalizeDiagramNodeDisplay(allVizCell){
@@ -629,12 +713,17 @@ export default {
                 if(cell.type == "org.Arrow"){
                     links.push(cell);
                 }else{
-                    nodeMap[cell.id] = this.getNodeDataToSave(cell.id, instanceKey, type);
+                    let node = this.$store.state.orgchart.editor[instanceKey].allNode[cell.id];
+                    if(node){
+                        nodeMap[cell.id] = this.getNodeDataToSave(cell.id, instanceKey, type);
+                    }
                 }
             }
 
             for(let link of links){
-                nodeMap[link.target.id].vizParentId = link.source.id;
+                if(nodeMap[link.target.id]){
+                    nodeMap[link.target.id].vizParentId = link.source.id;
+                }
             }
             return Object.values(nodeMap);
         },
@@ -702,7 +791,6 @@ export default {
         },
         handleConfigValueChange(data){
             let cellId = this.selectingNode.id;
-
             if(data.name == 'name' && cellId != SYMPER_HOME_ORGCHART){
                 this.$refs.editorWorkspace.updateCellAttrs(cellId, 'name', data.data);
             }else if(cellId == SYMPER_HOME_ORGCHART && this.context == 'position'){
@@ -767,7 +855,8 @@ export default {
         createNodeConfigData(type = 'department', nodeData, instanceKey = false){
             if(!instanceKey){
                 instanceKey = this.instanceKey;
-            }
+			}
+			this.$store.commit('orgchart/updateInstanceKey',instanceKey)
             let defaultConfig = getDefaultConfigNodeData(nodeData.id, type == 'department');
             for(let key in nodeData){
                 if(defaultConfig.commonAttrs[key]){
@@ -800,12 +889,18 @@ export default {
          * Chọn một node và hiển thị lên cấu hình ở bên tay phải
          */
         selectNode(nodeId){
+			debugger
             this.$refs.editorWorkspace.unHighlightCurrentNode();
             this.$store.commit('orgchart/changeSelectingNode', {
                 instanceKey: this.instanceKey,
                 nodeId: nodeId,
             });
-            
+            // debugger
+            // let dataLink = this.$refs.positionDiagram.getAllLink()
+            // let allNodes = this.$refs.positionDiagram.getAllNode()
+            // let firstNode = this.getFirstNode(dataLink,allNodes)
+            // this.$store.commit('orgchart/updateFirstChildNodeId',firstNode[0].id)
+            // this.$store.commit('orgchart/updateCurrentChildrenNodeId',firstNode[0].id)
             this.$refs.editorWorkspace.highlightNode(); 
             if(this.context == 'position'){
                 this.showPermissionsOfNode();

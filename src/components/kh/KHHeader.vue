@@ -93,7 +93,9 @@
         <v-card-text>{{$t("kh.dialog.note")}}</v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="green darken-1" text @click="dialogSave = false">OK</v-btn>
+          <v-btn color="green darken-1" text @click="saveDocument">Lưu</v-btn>
+          <v-btn color="red darken-1" text @click="dialogSave = false">Hủy</v-btn>
+
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -179,6 +181,7 @@ export default {
      */
     goRoute(id, hash) {
       if (!this.skh.statusEdit) {
+        this.hash=hash;
         this.dialogSave = true;
       } else {
         if (id == undefined) {
@@ -187,11 +190,20 @@ export default {
           }
           this.$router.push("/knowledge/folder/" + hash);
           this.$store.commit("kh/setCurrentDocument", hash);
-
         } else {
           this.$router.push("/knowledge/document/" + hash);
         }
       }
+    },
+     /**
+     * Thay đổi trạng thái doc để lưu doc 
+     */
+    saveDocument() {
+      this.$store.commit("kh/changeStatusEdit", !this.skh.statusEdit);
+      this.dialogSave = false;
+      let hash=this.hash;
+      this.$router.push("/knowledge/folder/" + hash);
+      this.$store.commit("kh/setCurrentDocument", hash);
     },
     getSlug() {
       let self = this;

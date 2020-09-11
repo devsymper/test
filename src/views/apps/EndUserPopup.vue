@@ -1,6 +1,6 @@
 <template>
   <div class="end-user-popup"> 
-	<v-card>
+	<v-card> 
 		<v-tabs
 			v-model="tab"
 			v-show="false"
@@ -20,23 +20,45 @@
 				</v-app-bar>
 					<div class="list-favorite">
 						<div class="title-favorite"><v-icon >mdi-playlist-star</v-icon><h4>{{$t('apps.favorite')}}</h4></div>
-						<ul style="margin:0 10px;">
+						  <v-skeleton-loader
+						 		v-if="loadingFavorite == true"
+								type="table-tbody"
+								class="mx-auto"
+								height="200"
+							></v-skeleton-loader>
+						<ul style="margin:0 10px;" v-else-if="loadingFavorite == false && sFavorite.length > 0">
 							<VuePerfectScrollbar style="max-height:200px"  >
-								<li v-for="(item,i) in sFavorite" :key="i" v-on:contextmenu="rightClickHandler($event,item,item.type)" style="cursor:pointer"> 
+								<li v-for="(item,i) in sFavorite" :key="i" v-on:click="rightClickHandler($event,item,item.type)" v-on:contextmenu="rightClickHandler($event,item,item.type)" style="cursor:pointer"> 
 									<div style="position:relative">
-										<div v-if="item.hasOwnProperty('title')" class="title-item-favorite">{{item.title}}</div>
+										<div v-if="item.type == 'document_definition'" class="title-item-favorite">{{item.title}}</div>
 										<div v-else  class="title-item-favorite">{{item.name}}</div> 
 										<v-icon  color="#F6BE4F" style="float:right;font-size:13px;position:absolute;top:0px;right:0px">mdi-star</v-icon>
 									</div>
 								</li>
 							</VuePerfectScrollbar>
 						</ul>
+						<div v-else>
+							<div style="padding-left:180px">
+								<div style="margin-right:auto;margin-left:auto;opacity:0.3"> {{$t('apps.emptyFavorite')}} </div>
+								<v-icon style="font-size:60px;padding-left:40px;margin-top:8px;opacity:0.3">
+									mdi-star-off
+								</v-icon>
+								<!-- <v-img
+								:src="urlEmptyApp">
+								</v-img> -->
+							</div>
+						</div>
 					</div>
 					<div class="title-list-app"> <v-icon>mdi-playlist-play</v-icon><h4>{{$t('apps.listApp')}}</h4></div>
 					<div class="list-app-cointaner">
-						<VuePerfectScrollbar style="max-height:330px"  class="d-flex flex-wrap" >
-							<!-- :style="{height: listAppHeight}" -->
-							<div v-for="(item,i) in apps" :key="i" 
+						<v-skeleton-loader
+						 		v-if="loadingApp == true"
+								type="table-tbody"
+								class="mx-auto"
+								height="200"
+						></v-skeleton-loader>
+						<VuePerfectScrollbar v-else-if="loadingApp == false && apps.length > 0" style="max-height:330px"  class="d-flex flex-wrap" >
+							<div  v-for="(item,i) in apps" :key="i" 
 								class="list-app-item"
 								@click="clickDetails(item)"
 								>
@@ -56,7 +78,17 @@
 									<span>{{item.name}}</span>
 								 </v-tooltip>
 							</div>
+							
 						</VuePerfectScrollbar>	
+						<div v-else>
+							<div style="padding-left:150px">
+								<div style="margin-right:auto;margin-left:auto;opacity:0.3"> {{$t('apps.emptyApp')}} </div>
+								
+								<v-img
+								:src="urlEmptyApp" style="width:60px;height:60px;margin-left:38px;margin-bottom:12px;margin-top:8px">
+								</v-img>
+							</div>
+						</div>
 					</div>
 			</v-card>
         </v-tab-item>
@@ -89,6 +121,7 @@ import {orgchartApi} from './../../api/orgchart';
 import {dashboardApi} from './../../api/dashboard';
 import BpmnEngine from './../../api/BPMNEngine';
 import ContextMenu from './ContextMenu.vue'
+import emptyApp from "@/assets/image/empty_app.png";
 export default {
 	data: function() {
         return {
@@ -100,6 +133,9 @@ export default {
 		 apps:{},
 		 listFavorite:[],
 		 testListFavorite:[],
+		 loadingFavorite: true,
+		 loadingApp: true,
+		 urlEmptyApp: emptyApp,
 		 arrType:{
 			 document_definition:[],
 			 orgchart:[],
@@ -169,6 +205,7 @@ export default {
 			appManagementApi.getActiveApp().then(res => {
 				if (res.status == 200) {
 					this.apps = res.data.listObject
+					this.loadingApp = false
 				}
 			}).catch((err) => {
 			});
@@ -195,11 +232,13 @@ export default {
 					})
 					this.checkTypeFavorite(res.data.listObject)
 					this.$store.commit('appConfig/updateListFavorite',this.listFavorite)
+					this.loadingFavorite = false
 				}
 			}).catch((err) => {
 			});
 		},
 		clickDetails(item){
+			this.$refs.contextMenu.hide()
 			this.$store.commit('appConfig/emptyItemSelected')
 			this.title.iconName = item.iconName;
 			this.title.iconType = item.iconType;
@@ -255,6 +294,7 @@ export default {
 		},
 		clickBack(){
 			this.tab = 'tab-1'
+			this.$refs.contextMenu.hide()
 			this.getActiveapps()
 			// this.getFavorite()
 		},
@@ -284,6 +324,9 @@ export default {
 		rightClickHandler(event,item,type){
 			event.stopPropagation();
 			event.preventDefault();
+			if(!item.actions.includes('unfavorite')){
+				item.actions.push('unfavorite')
+			}
 			this.$refs.contextMenu.setContextItem(item.actions)
 			this.$refs.contextMenu.show(event)
 			this.$refs.contextMenu.setItem(item)
@@ -309,7 +352,6 @@ export default {
 					self.mapId.document_definition["document_definition:"+e.id] = e;
 				})
 				let dataDoc = self.arrType.document_definition
-				// this.getDocumentsApi(dataDoc);
 				this.getByAccessControl(dataDoc,'document_definition')
 			}
 			if(data.hasOwnProperty('workflow_definition')){
@@ -400,6 +442,9 @@ export default {
 }
 </script>
 <style scoped>
+.v-menu__content{
+	z-index:1000
+}
 .end-user-popup {
 	font: 13px Roboto;
 	overflow: hidden;

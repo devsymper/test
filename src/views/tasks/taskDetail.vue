@@ -1,5 +1,11 @@
 <template>
     <div class="h-100 w-100">
+        <v-skeleton-loader
+            v-if="loadingActionTask"
+            :type="'table-tbody'"
+            class="mx-auto"
+            width="100%" height="100%" 
+        ></v-skeleton-loader>
         <v-row class="ml-0 mr-0 justify-space-between" style="    line-height: 36px;">
             <div class="fs-13 pl-2 pt-1 float-left">
                 {{taskBreadcrumb}}
@@ -10,9 +16,26 @@
                         {{action.text}}
                     </v-btn>
                 </span>
+                <!-- <input class="d-none" type="text" id="myInputLink" v-model="linkTask" > -->
+                <!-- <v-text-field class="d-none"  v-model="linkTask"></v-text-field> -->
+                <v-tooltip bottom>
+                    <template v-slot:activator="{ on }">
+                        <v-btn  
+                            v-clipboard:copy="linkTask"  
+                            v-clipboard:success="onCopySuccess" 
+                            v-on="on" text small>
+                                <v-icon  small>mdi-page-next-outline</v-icon>
+                        </v-btn>
+                    </template>
+                    <span>Sao chép đường dẫn</span>
+                </v-tooltip>
+
+                <!-- <button @click="getTaskTest">Click</button> -->
+
                 <v-btn small text  @click="closeDetail">
                     <v-icon small>mdi-close</v-icon>
                 </v-btn>
+
             </div>
         </v-row>
         <v-divider style="border-color: #ff7400;"></v-divider>
@@ -56,6 +79,7 @@
                 </v-card>
             </v-col>
         </v-row>
+   
     </div>
 </template>
 
@@ -73,7 +97,7 @@ import BPMNEngine from '../../api/BPMNEngine';
 import { getVarsFromSubmitedDoc, getProcessInstanceVarsMap } from '../../components/process/processAction';
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import { documentApi } from '../../api/Document';
-
+import VueClipboard from 'vue-clipboard2';
 export default {
     name: "taskDetail",
     props: {
@@ -106,7 +130,8 @@ export default {
             handler(valueAfter){
                 this.changeTaskDetail();
             }
-        }
+        },
+
     },
     components: {
         icon: icon,
@@ -115,11 +140,13 @@ export default {
     },
     data: function() {
         return {
+            loadingActionTask:false,
             breadcrumb: {
                 definitionName: '',
                 instanceName: '',
                 taskName: ''
             },
+            descriptionTask:'',
             tabsData: {
                 people: {
                     assignee: [],
@@ -134,6 +161,7 @@ export default {
                 info: {},
                 'related-items': {}
             },
+            linkTask:'',
             taskActionBtns: [
                 {
                     text:"Submit",
@@ -141,7 +169,7 @@ export default {
                     color:"blue"
                 },
             ],
-            taskAction: 'submit',
+            taskAction: undefined,
             tab: null,
             items: [
                 { 
@@ -184,6 +212,9 @@ export default {
         }
     },
     computed: {
+        stask() {
+            return this.$store.state.task;
+        },
         usersMap(){
             return this.$store.state.app.allUsers.reduce((map, el) => {
                 map[el.id] = el;
@@ -195,7 +226,7 @@ export default {
             let allDef = this.$store.state.process.allDefinitions;
             if(this.breadcrumb.definitionName){
                 // bsr = `App name / ${this.breadcrumb.definitionName} / ${this.breadcrumb.instanceName} / ${bsr}`;
-                bsr = `./ ${this.breadcrumb.definitionName} / ${bsr}`;
+                bsr = `${this.breadcrumb.definitionName} / ${bsr}`;
             }else if(this.isInitInstance && !$.isEmptyObject(allDef)){
                 if(allDef[this.$route.params.id]){
                     bsr = `${allDef[this.$route.params.id].name} / Start workflow`;
@@ -206,13 +237,50 @@ export default {
             return bsr;
         },
     },
+    created(){
+        this.checkAndSwitchToTab();
+    },
     methods: {
+        checkAndSwitchToTab(){
+            if(this.$route.params.extraData && this.$route.params.extraData.subAction){
+                let tabAction = {
+                    'view_comment': 'comment'
+                };
+                let tab = tabAction[this.$route.params.extraData.subAction];
+                for(let i = 0; i < this.items.length; i++){
+                    if(this.items[i].tab == tab){
+                        this.tab = i;
+                        break;
+                    }
+                }
+            }
+        },
+        getTaskTest(){
+            let taskId=this.taskInfo.action.parameter.taskId;
+            BPMNEngine.getATaskInfoV2(taskId).then((res) => {
+                console.log("task123",res);
+            });
+        },
+        onCopySuccess(){
+           this.$snotify({
+                type: 'success',
+                title: "Copy to clipboard",
+                text: "Copy success"
+                });
+        },
         changeTaskDetailInfo(taskId){
+            let hostname=window.location.hostname;
+            let copyText = this.taskInfo.action.parameter.taskId;
+            copyText='https://'+hostname+'/#/tasks/'+copyText;
+            this.linkTask=copyText;
+
             if(!taskId){
                 return;
             }
             let self = this;
-            BPMNEngine.getATaskInfo(taskId).then((res) => {
+            let filter = this.stask.filter;
+            BPMNEngine.getATaskInfo(taskId,filter).then((res) => {
+                console.log(res,"task");
                 for(let role in self.tabsData.people){
                     if(res[role]){
                         self.tabsData.people[role] = res[role].split(',').reduce((arr, el) => {
@@ -228,11 +296,13 @@ export default {
             if(!task.name){
                 try {
                     task.description = JSON.parse(task.description);
+                  
                 } catch (error) {
                     task.description = {};
                 }
                 task.name = task.description.content;
             }
+            this.descriptionTask=task.description;
             this.breadcrumb.taskName = task.name;
             if(task.processDefinitionId){
                 this.breadcrumb.definitionName = this.$store.state.process.allDefinitions[task.processDefinitionId].name;
@@ -246,7 +316,7 @@ export default {
             this.$emit("close-detail", {});
         },
         async saveTaskOutcome(value){ // hành động khi người dùng submit task của họ
-            // this.$emit('save-task-outcome');
+            this.loadingActionTask=true;
             if(this.taskAction == 'submit' || this.taskAction == 'update' ){
                 this.$refs.task[0].submitForm(value);
             }else if(this.taskAction == 'approval'){
@@ -279,7 +349,7 @@ export default {
                 let res = await this.submitTask(taskData);
                 this.saveApprovalHistory(value);
                 this.$emit('task-submited', res);
-            }else if(this.taskAction == 'undefined'){
+            }else if(this.taskAction == '' ||this.taskAction==undefined){
                 let taskData = {
                     "action": "complete",
                     "outcome": value,
@@ -287,6 +357,7 @@ export default {
                 let res = await this.submitTask(taskData);
                 this.$emit('task-submited', res);
             }
+            this.loadingActionTask=false;
         },
         saveApprovalHistory(value){
             let title = this.taskActionBtns.reduce((tt, el) => {
@@ -303,11 +374,13 @@ export default {
                 actionName: value,
                 note: ''
             };
-
             documentApi.saveApprovalHistory(dataToSave);
         },
         async submitTask(taskData){
             let self = this;
+            if (this.taskAction=='submit') {
+                await this.updateTask(taskData);
+            }
             return new Promise(async (resolve, reject) => {
                 try {
                     let taskId = self.taskInfo.action.parameter.taskId;
@@ -325,6 +398,19 @@ export default {
                 }
             });
             
+        },
+        async updateTask(taskData) {
+            let description;
+            if ((typeof this.descriptionTask)=="string" ) {
+                description=JSON.parse(this.descriptionTask) ;
+            }else{
+                description=this.descriptionTask;
+            }
+            description.action.parameter.documentObjectId=taskData.variables[0].value;
+            let taskId=taskData.variables[5].value;
+            let data = {};
+            data.description= JSON.stringify(description);
+            return BPMNEngine.updateTask(taskId,data);
         },
         async handleTaskSubmited(data){
             if(this.isInitInstance){
@@ -365,9 +451,16 @@ export default {
             }
             let varsMap = {};
             this.taskAction = this.taskInfo.action.action;
-            
             if(this.taskAction == 'approval'){
                 this.showApprovalOutcomes(JSON.parse(this.taskInfo.approvalActions));
+            }else if(this.taskAction == 'submit'){
+                this.taskActionBtns = [
+                    {
+                    text:"Submit",
+                    value:"submit",
+                    color:"blue"
+                    }
+                ]
             }else if(this.taskAction == 'undefined'){
                 this.taskActionBtns = [
                     {
@@ -383,6 +476,12 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
+.v-tab{
+    padding: 0px!important;
+    border-width: 20px!important;
+    text-transform: none !important;
+
+}
 
 </style>

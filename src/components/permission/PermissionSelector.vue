@@ -12,9 +12,7 @@
                 dense
                 label="Search"
                 placeholder="Search selected permission packs"
-            ></v-text-field>
-
-                
+            ></v-text-field>   
             <v-autocomplete
                 style="width: calc(100% - 80px)!important"
                 v-if="actionOnSearchItem == 'add'"
@@ -30,9 +28,18 @@
                 item-value="id"
                 placeholder="Find permission pack to add"
                 class="sym-small-size sym-pad-0 mr-2 "
-                :multiple="false"
+                multiple
                 @change="addPermission">
-
+                <!-- <template v-slot:item="data">
+                    <div >
+                        <span @click="showCheck(1)"> {{data.item.name}}
+                         <span @click="showCheck()"> {{data.item.name}}ádasdasd
+                        <v-icon v-if="data.item.enable" color="success">
+                             mdi-check</v-icon>
+                    </span>
+                    </div>
+                 </template>-->
+                 
             </v-autocomplete>
 
             <v-tooltip top>
@@ -60,7 +67,7 @@
                     class="w-100 selected-permission-pack">
 
                     <span class="fs-13">
-                        {{item.name}}
+                        {{item.name}} 
                     </span>
 
                     <v-btn
@@ -84,8 +91,20 @@
 export default {
     created(){
         this.$store.dispatch('permission/getAllPermission');
+        this.addEnable();
     },
     methods: {
+        addEnable(){
+            for(let i = 0; i<this.allPermission.length; i++){
+                this.newPermission.push(this.allPermission[i]);
+                this.allPermission[i].enable = false;
+
+                 this.newPermission[i].enable = false;
+            }
+        },
+        // showCheck(id){
+        //     //  this.allPermission[id].enable = true;
+        // },
         deleteSelectedPermission(item, i){
             this.lazyValue.splice(i, 1);
             this.$emit('input', this.lazyValue);
@@ -101,21 +120,8 @@ export default {
         filterSelectedPack(search){
 
         },
-        addPermission(pk){
-            if(!pk){
-                return;
-            }
-            let selectedPK = false;
-            for(let pack of this.lazyValue){
-                if(pack.id == pk.id){
-                    selectedPK = true;
-                    break;
-                }
-            }
-
-            if(!selectedPK){
-                this.lazyValue.unshift(pk);
-            }
+        addPermission(pks){
+            this.lazyValue = pks;
             this.$emit('input', this.lazyValue);
         }
     },
@@ -160,12 +166,14 @@ export default {
             deep: true,
             immediate: true,
             handler: function(after){
-                this.lazyValue = after
+                this.lazyValue = after;
+                this.selectedPermission = after;
             }
         }
     },
     data(){
         return {
+            newPermission:[],
             searchKey: '',
             selectedPermission: null,
             lazyValue: [],

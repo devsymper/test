@@ -3,7 +3,6 @@
         <OrgchartTableView
             :allDepartments="allDepartments"
             :allPositions="allPositions">
-            
         </OrgchartTableView>
     </div>
 </template>

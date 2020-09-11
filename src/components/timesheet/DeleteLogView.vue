@@ -2,40 +2,40 @@
 <v-card>
     <v-card-title style=" padding-bottom: 15px; padding-top: 10px" class="headline lighten-2" primary-title>
         <div style="border-bottom: 1px solid lightgrey; width: 100%; padding-bottom: 10px">
-            <span style="font-size:16px; font-weight:bold">{{$t('common.delete')}} {{formattedDeleteEvent.name}}</span> 
+            <span style="font-size:16px; font-weight:bold">{{$t('timesheet.delete')}} {{formattedDeleteEvent.name}}</span> 
             <!-- <span style="font-size:16px; font-weight:bold" v-else>View plan time</span> -->
             </div>
     </v-card-title>
     <v-card-text style="height: 55px!important ">
-        <span class="label pt-2 ">{{$t('common.category_task')}}</span>
+        <span class="label pt-2 ">{{$t('timesheet.category_task')}}</span>
        <br/> {{formattedDeleteEvent.category}}
     </v-card-text>
     <v-card-text style="height: 55px" class='cate-task'>
-        <span class="label pt-2">{{$t('common.task_form')}}</span>
+        <span class="label pt-2">{{$t('timesheet.task_form')}}</span>
         <br/> {{formattedDeleteEvent.name}}
     </v-card-text>
     <v-card-text class="div-calender-picker .d-lg-flex .d-lg-none d-none d-lg-block">
         <div style="height: 32px; margin-top:3px">
             <div class="date ">
-                <span class="label pt-2">{{$t('common.date')}}</span>
+                <span class="label pt-2">{{$t('timesheet.date')}}</span>
                 {{formattedDeleteEvent.date}}
             </div>
             <div class="duration">
-                <span class="label pt-2">{{$t('common.duration')}}</span>
+                <span class="label pt-2">{{$t('timesheet.duration')}}</span>
                 {{formattedDeleteEvent.duration}}
             </div>
             <div class='start-time'>
-                <span class="label pt-2">{{$t('common.start_time')}}</span>
+                <span class="label pt-2">{{$t('timesheet.start_time')}}</span>
                 {{formattedDeleteEvent.start}}
             </div>
             <div style="width: 60px; float: left">
-                <span class="label pt-2">{{$t('common.end_time')}}</span>
+                <span class="label pt-2">{{$t('timesheet.end_time')}}</span>
                 {{formattedDeleteEvent.end}}
             </div>
         </div>
     </v-card-text>
     <v-card-text v-if="formattedDeleteEvent.desc" class="div-description">
-        <span class="label pt-2">{{$t('common.description')}}</span>
+        <span class="label pt-2">{{$t('timesheet.description')}}</span>
         <br/> {{formattedDeleteEvent.desc}}
     </v-card-text>
     <v-card-actions style="padding-bottom:20px">

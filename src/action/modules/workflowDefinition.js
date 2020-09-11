@@ -1,4 +1,5 @@
 import { deployProcess, getLastestDefinition } from "./../../components/process/processAction";
+import BPMNEngine from "../../api/BPMNEngine";
 
 let commonProps = {
     "module": "workflow",
@@ -49,7 +50,12 @@ export default [{
     {
         ...commonProps,
         "action": "list_instance",
-        "handler": function(param) {
+        "handler": async function(param) {
+            if (!param.processKey && param.id) {
+                let res = await BPMNEngine.getModelData(param.id);
+                param.processKey = res.data.processKey;
+            }
+            debugger
             this.$goToPage('/workflow/process-key/' + param.processKey + '/instances', this.$t('process.instance.listModelInstance') + param.name)
         }
     },

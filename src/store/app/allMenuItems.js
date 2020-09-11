@@ -76,16 +76,16 @@ export default {
         icon: "mdi-account-tie",
         link: "/ba-account"
     },
-    comment: {
-        title: 'Comment',
-        icon: 'mdi-comment',
-        link: '/comment',
-    },
     knowledge: {
         title: 'KH',
-        icon: 'file-edit-outline',
+        icon: 'mdi-file-edit-outline',
         link: '/knowledge',
     },
+    // comment: {
+    // 	title: 'tesstsdádasdad',
+    // 	icon: 'mdi-file-edit-outline',
+    // 	link: '/comment',
+    // },
     timeSheetLogWork: {
         title: "My work",
         icon: "mdi-calendar",

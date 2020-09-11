@@ -2,7 +2,6 @@
     <list-items
         ref="listUser"
         @after-open-add-panel="addUser"
-
         :headerPrefixKeypath="'user'"
         :useDefaultContext="false"
         :pageTitle="$t('user.title')"
@@ -16,6 +15,7 @@
         <div slot="right-panel-content" class="h-100">
             <action-panel
             ref="panel"
+            @refresh-data="refreshListUser"
             @refresh-new-user="setNewUserItem"
             @close-panel="closePanel"
             :actionType="actionType"
@@ -31,7 +31,6 @@ import ActionPanel from "./../../views/users/ActionPanel.vue";
 import ChangePassPanel from "./../../views/users/ChangePass.vue";
 import { util } from "./../../plugins/util.js";
 import { appConfigs } from '../../configs';
-
 
 export default {
     components: {
@@ -71,6 +70,13 @@ export default {
                     callback: (user, callback) => {
                         this.editUser(user);
                     }
+                },
+                delete: {
+                    name:"delete",
+                    text:this.$t('user.table.contextMenu.delete'), 
+                    callback: (user, callback) => {
+                        this.deleteUser(user);
+                    }
                 }
             },
             columns: [],
@@ -88,7 +94,9 @@ export default {
         this.$evtBus.$on('change-user-locale',(locale)=>{
              thisCpn.tableContextMenu = [
                 {name:"passwordsetting",text:this.$t('user.table.contextMenu.passwordSetting')},
-                {name:"edit",text:this.$t('user.table.contextMenu.edit')}
+                {name:"edit",text:this.$t('user.table.contextMenu.edit')},
+                {name:"xóa",text:this.$t('user.table.contextMenu.delete')}
+
             ]
 
         });
@@ -97,6 +105,10 @@ export default {
         
     },
     methods:{
+        refreshListUser(){
+            debugger
+            this.$refs.listUser.refreshList();
+        },
         openPanel(){
             this.$refs.panel.setStepper(1);
             this.$refs.panel.resetPermissionPosittionOrgChart();
@@ -126,7 +138,11 @@ export default {
             this.$refs.panel.resetData();
             this.$refs.panel.setUser(user);
         },
-       
+       deleteUser(user){
+           debugger
+           this.$refs.panel.deleteUser(user[0].id);
+
+       },
         setNewUserItem(user){
             this.data.unshift(user);
         },

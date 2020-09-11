@@ -4,21 +4,23 @@
 			<div v-for="(itemT,i) in sAppModule" :key="i" class="app-item">
 					<div class="title-app" v-if="itemT.item.length >0"><v-icon style="font-size:13px">{{itemT.icon}}</v-icon> <h4> {{ itemT.title }} <span> {{'('+itemT.item.length +')' }}</span> </h4></div>
 					<ul v-for="(childItem,i) in itemT.item" :key="i"  class="app-child-item">
-							<li  v-if="isEndUserCpn == true" v-on:contextmenu="rightClickHandler($event,childItem,itemT.name)">
+							<li  v-if="isEndUserCpn == true" 
+								v-on:contextmenu="rightClickHandler($event,childItem,itemT.name)"
+							>
 								<div style="position:relative">
 									<v-tooltip bottom v-if="itemT.name == 'document_definition'">
 										<template v-slot:activator="{ on, attrs }">
 											<div class="title-document-enduser" 	
 												v-bind="attrs"
 												v-on="on" >
-												<span>{{childItem.title}} <span style="font:8px;opacity:0.4">{{childItem.name}}</span></span> 
+												<span v-on:click="rightClickHandler($event,childItem,itemT.name)">{{childItem.title}}</span> 
 												
 											</div>
 										</template>
 										<span style="font:13px roboto">{{childItem.title}}</span> 
 										<span style="font:8px;opacity:0.4">{{childItem.name}}</span>
 									</v-tooltip>
-									<div v-else>{{childItem.name}}</div>
+									<div v-else v-on:click="rightClickHandler($event,childItem,itemT.name)">{{childItem.name}}</div>
 									<v-icon  @click="changeFavorite(childItem,itemT.name)" :class="{'icon-star-active' : childItem.favorite==true, 'icon-star': true}" >mdi-star</v-icon>	
 								</div>
 							</li>
@@ -125,7 +127,6 @@ export default {
 		},
 		filterItem(){
 			let self = this
-			debugger
 			let listItem = this.$store.state.appConfig.listItemSelected;
 			self.objFilter.document_definition.item = []
 			self.objFilter.orgchart.item = []
@@ -133,7 +134,7 @@ export default {
 			self.objFilter.workflow_definition.item = []
 			if(listItem.document_definition.item.length > 0){
 					listItem.document_definition.item.filter(function(item){
-						if(item.name.toLowerCase().includes(self.searchKey.toLowerCase())){
+						if(item.title.toLowerCase().includes(self.searchKey.toLowerCase())){
 							self.objFilter.document_definition.item.push(item)
 						}
 				})
@@ -151,7 +152,7 @@ export default {
 						self.objFilter.dashboard.item.push(item)
 					}
 				})
-			}title
+			}
 			if(listItem.workflow_definition.item.length > 0){
 					listItem.workflow_definition.item.filter(function(item){
 					if(item.name.toLowerCase().includes(self.searchKey.toLowerCase())){

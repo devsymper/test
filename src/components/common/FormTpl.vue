@@ -59,7 +59,6 @@
                 @keyup="(data) => {
                     handleKeyUpInputValue(inputInfo, name,data);
                 }"
-
                 :ref="'inputItem_'+name"
                 solo
                 :items="inputInfo.options"
@@ -84,7 +83,7 @@
                     <template>
                         <div>
                             <v-icon v-if="data.item.icon">{{data.item.icon}}</v-icon>
-                            <span>{{data.item.text}}</span>
+                            <span>{{$t("objectType."+data.item.text)}}</span>
                         </div>
                     </template>
                 </template>
@@ -94,7 +93,6 @@
                 {{inputInfo.errorMessage}}
             </div>
         </div>
-
         <symper-drag-panel 
             @before-close="closeLargeFormulaEditor()"
             :showPanel="largeFormulaEditor.open"

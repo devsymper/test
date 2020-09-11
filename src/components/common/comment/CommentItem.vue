@@ -3,17 +3,10 @@
 		<div :item="item"  class="commnent-item-wrapper" :style="{width:width}">
 		<v-icon v-if="item.parentId == '0' && item.status == 0" class="icon-check" @click="resolveComment(item)" style="float:right">mdi-check-outline</v-icon>
 		<v-icon v-if="item.parentId == '0' && item.status == 1" class="icon-check" @click="unresolveComment(item)" style="float:right">mdi-comment-arrow-left-outline</v-icon>
-				<v-avatar>
-					<img
-					src="https://cdn.vuetifyjs.com/images/john.jpg"
-					alt="John"
-					style="width:30px;height:30px;margin-top: -10px;margin-right: -8px;"
-					>
-				</v-avatar>
+				<SymperAvatar :size="30" :userId="item.userId" style="margin-left:12px;margin-top:4px" />
 			<div class="comment-item-content">
 				<div style="display:flex;height:16px;width:100%">
-						<span style="color:#00000099">Dao Manh Kha</span>
-						<!-- {{item.infor.fullName}} -->
+						<span style="color:#00000099">{{item.infor.fullName}}</span>
 				</div>
 				<div style="display:flex">
 					<InputComment 
@@ -23,6 +16,8 @@
 						:files="files"
 						:isAdd="false"
 						:contentEdit="contentEdit"
+						@cancel-reply="cancelReply()"
+						style="max-width:100%"
 					/>
 					<v-menu style="min-height:unset" v-if="sEnduser==item.userId" bottom left >
 						<template  v-slot:activator="{ on, attrs }">
@@ -44,30 +39,24 @@
 					</v-menu>
 				</div>
 				<div style="display:flex;font-size:11px"> 
-					<span class="btn-reply-comment" @click="replyComment(item)">Trả lời </span>
-					<span style="padding-left:8px">{{lassSeen(item.updatedAt)}}</span>
+					<span class="btn-reply-comment" @click="replyComment(item)"> {{ $t('comment.reply')}} </span>
+					<span style="padding-left:8px">{{lassSeen(item.createdAt)}}</span>
+					<span v-if="item.createdAt != item.updatedAt" style="padding-left:8px;cursor:pointer"> {{ $t('comment.edited')}}</span>
 				</div>
 
 			</div>
 		</div>
-		<div style="padding-left:40px;">
+		<div style="padding-left:30px;">
 			<commentItem
 				v-for="(child, i) in item.childrens"
 				:key="i"
 				:item="child"
-				:width="'340px'"
 				@reply-child="replyChild"
 			>
 			</commentItem>
 			<div class="reply-comment"  v-if="item.reply && item.parentId == '0'">
-				<v-avatar>
-						<img
-						src="https://cdn.vuetifyjs.com/images/john.jpg"
-						alt="John"
-						style="width:30px;height:30px;margin-top: -18px;margin-right: -10px;"
-						>
-				</v-avatar>
-				<div style="padding-left:8px;width:100%">
+				<SymperAvatar :size="30" :userId="item.userId" style="margin-left:14px" />
+				<div style="padding-left:8px;width:98%">
 					<InputComment  :isEditing="true" :images="[]" :files="[]" :isAdd="true" />
 				</div>
 			</div>
@@ -80,6 +69,7 @@ import InputComment from "./InputComment.vue"
 import moment from 'moment';
 import {commentApi} from '@/api/Comment.js'
 import {fileManagementApi} from '@/api/FileManagement.js'
+import SymperAvatar from '@/components/common/SymperAvatar.vue'
 import { mapGetters } from 'vuex';
 export default {
 	name: 'commentItem',
@@ -89,7 +79,7 @@ export default {
 		},
 		width:{
 			type: String,
-			default: '380px'
+			default: '100%'
 		},
 		searchItem:{
 			type: String,
@@ -99,7 +89,8 @@ export default {
 	components: {
 		VuePerfectScrollbar,
 		InputComment,
-		moment
+		moment,
+		SymperAvatar
 	},
 	data() {
 		return {
@@ -122,6 +113,8 @@ export default {
 			return this.$store.state.comment.isReply
 		},
 	},
+	created(){
+	},
 	mounted(){
 		if(this.item.attachments.length > 0){
 			let thisCpn = this
@@ -136,25 +129,9 @@ export default {
 				})
 			});
 		}
-			// let mapIdToUser = this.$store.getters['app/mapIdToUser'];
-			// let itemInfor = mapIdToUser[this.item.userId];
-			// // debugger
-			// let infor = {}
-			// infor.avatar = itemInfor.avatar,
-			// infor.fullName = itemInfor.displayName
-			// this.item.infor = infor	
-			// if(this.item.hasOwnProperty('childrens') && this.item.childrens.length > 0){
-			// 	this.item.childrens.forEach(function(e){	
-			// 		itemInfor = mapIdToUser[e.id];
-			// 		let inforChild = {}
-			// 		inforChild.avatar = itemInfor.avatar,
-			// 		inforChild.fullName = itemInfor.displayName
-			// 		e.infor = inforChild
-			// 	})
-			// }
-			// console.log(this.item,'itemavatarrrrr');
 	},
 	methods:{
+	
 		editComment(item){
 			item.isEditing = true
 			this.contentEdit = item.content
@@ -170,8 +147,8 @@ export default {
 		},
 		getCommentUuid(){
 			commentApi.getCommentByUuid(this.sComment.objectType,this.sComment.objectIdentifier,this.sComment.uuid).then(res => {
-				this.$store.commit('comment/updateListAvtiveComment',res.data.listObject.comments)
-				this.$store.commit('comment/updateListResolve',res.data.listObject.resolve)
+				this.$store.commit('comment/updateListAvtiveComment',this.addAvatar(res.data.listObject.comments))
+				this.$store.commit('comment/updateListResolve',this.addAvatar(res.data.listObject.resolve))
 				if(this.$store.state.comment.currentTab == 'comment'){
 						this.$store.commit('comment/setComment')
 				}else{
@@ -181,8 +158,8 @@ export default {
 		},
 		getCommentId(){
 			commentApi.getCommentById(this.sComment.objectType,this.sComment.objectIdentifier).then(res => {
-				this.$store.commit('comment/updateListAvtiveComment',res.data.listObject.comments)
-				this.$store.commit('comment/updateListResolve',res.data.listObject.resolve)
+				this.$store.commit('comment/updateListAvtiveComment',this.addAvatar(res.data.listObject.comments))
+				this.$store.commit('comment/updateListResolve',this.addAvatar(res.data.listObject.resolve))
 					if(this.$store.state.comment.currentTab == 'comment'){
 						this.$store.commit('comment/setComment')
 				}else{
@@ -215,6 +192,9 @@ export default {
 				// }
             })
 		},
+		cancelReply(){
+			this.item.reply = false
+		},
 		replyComment(item){	
 			if(item.parentId == '0'){	
 				this.item.reply = true;
@@ -226,7 +206,41 @@ export default {
 		replyChild(data){
 			this.item.reply = true;
 			this.$store.commit('comment/updateParentCommentTarget',data.parentId)
-		}
+		},
+		addAvatar(data){
+			let mapIdToUser = this.$store.getters['app/mapIdToUser'];
+			if(typeof data !== 'undefined'){
+				data.forEach(function(e){
+					if(!isNaN(e.userId)){
+						let itemInfor = mapIdToUser[e.userId];
+						let infor = {}
+						if(itemInfor.hasOwnProperty('avatar')){
+							infor.avatar = itemInfor.avatar
+						}
+						if(itemInfor.hasOwnProperty('displayName')){
+							infor.fullName = itemInfor.displayName
+						}
+						e.infor = infor	
+					}
+					if(e.hasOwnProperty('childrens') && e.childrens.length > 0){
+						e.childrens.forEach(function(k){	
+							if(!isNaN(k.userId)){
+								let itemInforChild = mapIdToUser[k.userId];
+								let inforChild = {}
+								if(itemInforChild.hasOwnProperty('avatar')){
+									inforChild.avatar = itemInforChild.avatar
+								}
+								if(itemInforChild.hasOwnProperty('displayName')){
+									inforChild.fullName = itemInforChild.displayName
+								}
+								k.infor = inforChild
+							}
+						})
+					}
+				})
+			}
+			return data
+		},
 	},
 	
 	
@@ -252,6 +266,7 @@ export default {
 	display: flex;
 	flex-direction: column;
 	margin-left: 8px;
+	width: 100%	;
 }
 .commnent-item>>>  .icon-menu,
 .commnent-item>>> .icon-check{
@@ -298,10 +313,10 @@ export default {
 	border-bottom: 1px solid blue;
 }
 .commnent-item >>> .reply-comment{ 
-	width:340px;
+	width:100%;
 	display: flex;
 	margin-right:auto;
-	margin-left:auto;
+	margin-left:6px;
 	margin-top: 8px;
 }
 .commnent-item >>> .commnent-item-wrapper:hover .icon-menu{

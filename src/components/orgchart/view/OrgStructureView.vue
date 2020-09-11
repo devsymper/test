@@ -5,7 +5,6 @@
             class="h-100"
             :context="'position'"
         >
-
         </EditorWorkspace>
     </div>
 </template>
@@ -154,7 +153,7 @@ export default {
                 ];
                 link.prop('vertices', vertices);
             }
-            console.log(lazyCells, 'lazyCellslazyCellslazyCells');
+            debugger
             this.$refs.editorWorkspace.graph.addCells(lazyCells);
         },
         getCellSizeAndPosition(cellId){

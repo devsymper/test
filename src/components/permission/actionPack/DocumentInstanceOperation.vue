@@ -2,7 +2,7 @@
     
     <div >
         <div class="my-2 fs-12">
-            Chọn hành động cho các văn bản
+            Chọn hành động cho bản ghi của các văn bản
         </div>
         <hot-table
             :height="tableHeight"

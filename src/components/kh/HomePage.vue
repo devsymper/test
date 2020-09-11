@@ -6,21 +6,23 @@
         <v-container style="height: 530px;">
           <div class="symper-title">Mới truy cập</div>
           <!-- <div class="image-recentAccess" v-for="item of listQuickAccess" :key="item.id"> -->
-          <div class="image-recentAccess">
-            <div
-              class="quickAccessItem"
-              v-for="item of listQuickAccess"
-              :key="item.id"
-              @click.stop="goDocumentQuickAccess(item.hash)"
-            >
-              <div class="preview">
-                <img v-bind:src="item.previewImage" alt />
-              </div>
-              <div class="quickTitle">
-                <p>{{item.name}}</p>
+          <VuePerfectScrollbar style="width:90%"  >
+            <div class="image-recentAccess" style="display:flex; ">
+              <div
+                class="quickAccessItem"
+                v-for="item of listQuickAccess"
+                :key="item.id"
+                @click.stop="goDocumentQuickAccess(item.hash)"
+              >
+                <div class="preview">
+                  <img v-bind:src="item.previewImage" alt />
+                </div>
+                <div class="quickTitle">
+                  <p>{{item.name}}</p>
+                </div>
               </div>
             </div>
-          </div>
+           </VuePerfectScrollbar>
           <div class="kh-table">
             <template>
               <v-data-table
@@ -93,6 +95,7 @@
 <script>
 import KHHeader from "./../../components/kh/KHHeader.vue";
 import { knowledgeApi } from "./../../api/kh.js";
+import VuePerfectScrollbar from "vue-perfect-scrollbar";
 
 export default {
   data() {
@@ -127,17 +130,18 @@ export default {
           align: "start",
           value: "name"
         },
-         { text: this.$t("common.created_by"), value: "displayName" },
+        { text: this.$t("common.created_by"), value: "displayName" },
         { text: this.$t("common.last_updated_by"), value: "displayNameEdit" },
         { text: this.$t("user.table.createAt"), value: "created_at" },
         { text: this.$t("user.table.updateAt"), value: "updated_at" },
-       
+
         { text: this.$t("kh.table.totalDoc"), value: "total_document" }
       ]
     };
   },
   components: {
-    "k-h-header": KHHeader
+    "k-h-header": KHHeader,
+     VuePerfectScrollbar
   },
   watch: {},
   computed: {
@@ -190,8 +194,12 @@ export default {
         if (obj) {
           var index = users.indexOf(obj);
           directory[i]["displayName"] = users[index].displayName;
-          directory[i]["created_at"] = this.convertDate(directory[i]["created_at"]);
-          directory[i]["updated_at"] = this.convertDate(directory[i]["updated_at"]);
+          directory[i]["created_at"] = this.convertDate(
+            directory[i]["created_at"]
+          );
+          directory[i]["updated_at"] = this.convertDate(
+            directory[i]["updated_at"]
+          );
         }
         if (objEdit) {
           var index = users.indexOf(objEdit);

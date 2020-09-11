@@ -22,8 +22,6 @@ let testHeader = {
 let testOptions = {
 
 }
-
-
 export default {
     /** 
      * Lấy danh sách các process đã được tạo ra
@@ -141,8 +139,43 @@ export default {
     getSubtasks(idParent, filter) {
         return bpmneApi.get(appConfigs.apiDomain.bpmne.tasks + '/' + idParent + '/subtasks', filter, testHeader);
     },
-    getATaskInfo(taskId) {
-        return bpmneApi.get(appConfigs.apiDomain.bpmne.tasks + '/' + taskId, {}, testHeader);
+    getATaskInfo(taskId,filter='notDone') {
+        if (filter=='done') {
+            return bpmneApi.get(appConfigs.apiDomain.bpmne.tasksHistory+'/'+taskId, {}, testHeader);
+        }else{
+            return bpmneApi.get(appConfigs.apiDomain.bpmne.tasks + '/' + taskId, {}, testHeader);
+        }
+    },
+    getATaskInfoV2(taskId){
+        let result1=bpmneApi.get(appConfigs.apiDomain.bpmne.tasksHistory+'/'+taskId, {}, testHeader);
+        let result2=bpmneApi.get(appConfigs.apiDomain.bpmne.tasks+'/'+taskId, {}, testHeader);
+        let result;
+        let isCheck=false;
+
+        result1.then((res) => {
+            console.log("aa",res);
+                if (res.status==0) {
+                }else{
+                    console.log("ge1",res);
+                    isCheck=1;
+                }
+            }
+        );
+        result2.then((res) => {
+            console.log("bb",res);
+            if (res.status==0) {
+                }else{
+                    console.log("ge2",res);
+                    isCheck=2;
+                }
+            }
+        );
+        if (isCheck==1) {
+            return result1
+        }else{
+            return result2
+        }
+        
     },
     updateTask(taskId, data) {
         data = JSON.stringify(data);
@@ -162,4 +195,6 @@ export default {
     getLastestByModel() {
         return bpmneApi.get('/deploy-history/lastest-by-model');
     }
+   
+
 };

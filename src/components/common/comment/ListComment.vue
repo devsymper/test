@@ -1,8 +1,7 @@
 <template>
-	<div class="list-comment">
-		<VuePerfectScrollbar  :style="{height: listCommentHeight}">
-			<!-- -->
-			 <div :v-if="listItemFilter.length > 0" v-for="(item,i) in listItemFilter	" :key="i"  class="comment-item"> 
+	<div class="list-comment" :style="{height:heightListComment+'px'}" >
+		<VuePerfectScrollbar style="height:inherit">
+			 <div :v-if="listItemFilter.length > 0" v-for="(item,i) in listItemFilter" :key="i"  class="comment-item"> 
 				<CommentItem
 					 :item="item"
 				 />
@@ -24,18 +23,23 @@ export default {
 		searchItem:{
 			type: String,
 			default: ''
+		},
+		heightListComment:{
+			type: Number,
 		}
 	},
 	methods:{
+	},
+	mounted(){
+		console.log(this.heightListComment,'heightListCommentheightListComment');
 	},
 	components: {
 		VuePerfectScrollbar,
 		InputComment,
 		CommentItem
 	},
-	data() {
+	data(){
 		return {
-			listCommentHeight:'600px',
 			resItem: [],
 		}
 	},
@@ -60,7 +64,10 @@ export default {
 						}
 					})
 			}
-		}
+		},
+		// calc(){
+		// 	this.heightListComment = 100%-'120px'
+		// }
 	},
 	watch:{
 		searchItem(val){
@@ -70,5 +77,10 @@ export default {
 </script>
 
 <style scoped>
-
+.list-comment{
+	height:500px
+}
+.list-comment >>> .ps__rail-x{
+	display: none;
+}
 </style>

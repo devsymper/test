@@ -1,59 +1,25 @@
 <template>
 		<div>
-			<v-tooltip left>
-				<template v-slot:activator="{ on, attrs }">
-					<v-btn icon @click="clickFull($event)" v-bind="attrs"
-						v-on="on"> 
-						<v-icon style="font-size:15px">mdi-comment-multiple</v-icon>
-					</v-btn>
-				</template>
-				<span>test comment by id</span>
-			</v-tooltip>
-			<v-tooltip left>
-				<template v-slot:activator="{ on, attrs }">
-					<v-btn icon @click="clickArea($event)" v-bind="attrs"
-						v-on="on"> 
-					<v-icon style="font-size:15px">mdi-comment-multiple-outline</v-icon>
-				</v-btn>
-				</template> 
-				<span>test comment by uuid</span>
-			</v-tooltip>
-					<comment 
-						:showComment="showComment" 
-						:heightComment="heightComment" 
-						:top="top" 
-						:left="left"
-						:objectIdentifier="idItem"
-						:uuid="uuidArea"
-						:targetArea="contentTargetArea"
-						:objectType="objType"
-					/>
-		</div>
+				<UploadFile :autoUpload="true" :pickAvatar="true" @selected-file="selectedFile" :fileName="'adn100198'" :objectType="'document'" :objectIdentifier="'1dasdadasd'"/>
+				<!-- :pickAvatar="true"  -->
+				<img :src="src" alt="">
+		</div>	
 </template>
 
 <script>
 import comment from "@/components/common/comment/Comment.vue"
+import UploadFile from "@/components/common/UploadFile.vue"
+
 export default {
 	components:{
-		comment
+		comment,
+		UploadFile
 	},
 	methods:{
-		clickFull(event){
-			this.showComment = !this.showComment;
-			this.heightComment = "800px"
-			this.idItem = 1721
-			this.objType = 'document'
-			this.contentTargetArea = ''
-			this.uuidArea = "0"
-		},
-		clickArea(event){
-			this.showComment = !this.showComment;
-			this.heightComment ='200px'
-			this.idItem = 1721
-			this.objType = 'document'
-			this.contentTargetArea = '<span>ahihihi</span>'
-			this.uuidArea = 'asdasdasdasd'
-		},
+		selectedFile(data){
+			this.src = data
+		}
+	
 	},
 	 data: function() {
         return {
@@ -67,12 +33,16 @@ export default {
 			uuidArea:'0',
 			contentTargetArea:'',
 			objType:'',
+			src: '',
 			commentTarget:{}
         };
     }
 }
 </script>
 
-<style>
+<style scoped>
+.v-card__title{
+	font:15px roboto
+}
 
 </style>

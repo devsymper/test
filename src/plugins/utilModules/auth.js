@@ -22,6 +22,10 @@ export const authUtil = {
         }
     },
 
+    isSupportter() {
+        return this.getSavedUserInfo().profile.type == 'ba';
+    },
+
     checkLogin() {
         if (this.getToken()) {
             return true;

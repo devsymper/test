@@ -1,27 +1,28 @@
 <template>
     <div class="wraper-comment" :style="style">
-		<div style="display:flex;">
-			<span class="mdi mdi-keyboard-backspace" @click="hide"></span>
-			<span style="font-size:15px;">{{$t('document.detail.comment.heading')}}</span>
-		</div>
-
-		<v-divider></v-divider>
-        <div class="comment-content">
-            <!-- comment hear -->
+		<!-- <v-divider></v-divider> -->
+        <div class="comment-content " style="height:97%">
+				<span class="mdi mdi-keyboard-backspace" @click="hide"></span>
+			<Comment :showComment="true" :objectIdentifier="objectIdentifier" :objectType="'document'" :height="'100%'" />
         </div>
 	</div>
 </template>
 <script>
-
+import Comment from '@/components/common/comment/Comment.vue'
 export default {
-
+	props:{
+		objectIdentifier:{
+			type: String,
+		}
+	},
+	components:{
+		Comment
+	},
     data () { 
         return {
             style:'transform:translateX(300px)'
         }
     },
- 
-    
     methods:{
         hide(){
 			this.style = 'transform:translateX(300px)'
@@ -29,7 +30,6 @@ export default {
 		show(){
             this.style = 'transform:translateX(0px)'
 		},
-       
     }
 }
 </script>
@@ -50,5 +50,4 @@ export default {
 		cursor: pointer;
 		margin-right: 8px;
 	}
-
 </style>

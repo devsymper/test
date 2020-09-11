@@ -7,8 +7,8 @@
                     <v-list>
                     </v-list>
                 </v-menu>
-                <v-btn @click="adjust(-1)" depressed small class="mr-2" color="#F7F7F7" style="letter-spacing:1px">{{$t('common.last_week')}}</v-btn>
-                <v-btn @click="adjust(0)" depressed small class="mr-2" color="#F7F7F7" style="letter-spacing:1px">{{$t('common.last_week1')}}</v-btn>
+                <v-btn @click="adjust(-1)" depressed small class="mr-2" color="#F7F7F7" style="letter-spacing:1px">{{$t('timesheet.last_week')}}</v-btn>
+                <v-btn @click="adjust(0)" depressed small class="mr-2" color="#F7F7F7" style="letter-spacing:1px">{{$t('timesheet.last_week1')}}</v-btn>
             </div>
             <v-col style="padding-left:0px" class=".d-lg-flex .d-lg-none d-none d-lg-block">
                 <v-btn @click="adjust(-1, true)" icon>
@@ -31,14 +31,14 @@
                  style="" item-color="white" 
                  label="Group by" background-color="#F7F7F7">
                     <template v-slot:selection>
-                        <span style="color:black!important; padding-left:5px">{{$t('common.task_form')}}</span>
+                        <span style="color:black!important; padding-left:5px">{{$t('timesheet.task_form')}}</span>
                     </template>
                     <template v-slot:label>
-                        {{$t('common.group_by')}}
+                        {{$t('timesheet.group_by')}}
                     </template>
                     <template v-slot:item>
                         <span class="viewmode-item" 
-                        style="color:black">{{$t('common.task')}}
+                        style="color:black">{{$t('timesheet.task')}}
                         </span>
                     </template>
                 </v-select>
@@ -49,7 +49,7 @@
                     <v-dialog v-model="dialog" width="350">
                         <template v-slot:activator="{ on, attrs }">
                             <v-btn depressed small class="mr-1 submit-button" color="orange" v-bind="attrs" v-on="on" dark>
-                                <span>{{$t('common.submit_timesheet')}}</span>
+                                <span>{{$t('timesheet.submit_timesheet')}}</span>
                             </v-btn>
                         </template>
                         <SubmitTimesheetForm :hours="hoursRequired" @cancel="cancel()">
@@ -188,15 +188,14 @@ export default {
             ],
             baseColumns: [
                 {
-                    "headerName":this.$t("common.category_submit"),
+                    "headerName":this.$t("timesheet.category_submit"),
                     "field": "category",
                     "width": 200,
                     "colId": "category",
                    
-                   
                 },
                 {
-                    "headerName":this.$t("common.logged_time"),
+                    "headerName":this.$t("timesheet.logged_time"),
                     "field": "logged",
                     "width": 100,
                     "colId": "logged", 

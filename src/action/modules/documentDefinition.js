@@ -55,14 +55,18 @@ export default [{
         ...commonProps,
         "action": "list_trash",
         "handler": function(param) {
-
+            let tabName = this.$t('apps.listActions.document_definition.list_trash');
+            tabName = `${tabName} ${param.title}`;
+            this.$goToPage(`documents/${param.id}/draft-objects`, tabName, false, false);
         }
     },
     {
         ...commonProps,
         "action": "list_instance",
         "handler": function(param) {
-
+            let tabName = this.$t('apps.listActions.document_definition.list_instance');
+            tabName = `${tabName} ${param.title}`;
+            this.$goToPage(`documents/${param.id}/objects`, tabName, false, false);
         }
     }
 ]

@@ -7,8 +7,8 @@
                     <v-list>
                     </v-list>
                 </v-menu>
-                <v-btn @click="adjust(-1)" depressed small class="mr-2" color="#F7F7F7" style="letter-spacing:1px">{{$t('common.last_week')}}</v-btn>
-                <v-btn @click="adjust(0)" depressed small class="mr-2" color="#F7F7F7" style="letter-spacing:1px">{{$t('common.last_week1')}}</v-btn>
+                <v-btn @click="adjust(-1)" depressed small class="mr-2" color="#F7F7F7" style="letter-spacing:1px">{{$t('timesheet.last_week')}}</v-btn>
+                <v-btn @click="adjust(0)" depressed small class="mr-2" color="#F7F7F7" style="letter-spacing:1px">{{$t('timesheet.last_week1')}}</v-btn>
             </div>
             <v-col style="padding-left:0px" class=".d-lg-flex .d-lg-none d-none d-lg-block">
                 <v-btn @click="adjust(-1, true)" icon>
@@ -58,30 +58,50 @@ export default {
         SubmitTimesheetForm,
     },
     methods: {
+       getUser(){
+            let self= this;
+            timesheetApi.getListUser({page:1,pageSize: 2000})
+            .then(res => {
+            if (res.status === 200){
+                debugger
+                self.listUser=res.data.listObject;
+                  for(let i = 0; i<self.listUser.length;i++){
+                    debugger 
+                    console.log('ádádád');
+                     console.log(self.listUser[i].userName);
+                    self.nameUser.push(self.listUser[i].userName);
+                    console.log(self.nameUser);
+                }
+            }
+            }).catch(console.log);
+        },
+        getTask(id){
+            const self = this;
+            timesheetApi.getListReport({
+                    startEnd: this.startEndDate
+                })
+                .then(res => {
+                    if (res.status === 200) {
+                        let task = res.data;
+                        for (let i=0; i<res.data.length;i++){
+                            if(id==res.data.id){
+                                return res.data.task_id
+                            }
+                        }
+                    } })
+                .catch(err => {
+                    console.log(err);
+
+                });
+        },
         getName(id){
-            if(id==971){
-                return "Nguyễn Đình Hoàng";
-            }
-            else if(id==973){
-                return "Hoàng Quỳnh Anh";
-            }
-             else if(id==925){
-                return "Nguyễn Đức Trung";
-            }
-            else if(id==974){
-                return "Hương Nguyễn";
-            }
-            else if(id==970){
-                return "Thế Anh";
-            }
-            else if(id==969){
-                return "Thắngnt";
-            }
-            else if(id==972){
-                return "tannq";
-            }
-            else{
-                return " "
+            debugger
+            for(let i = 0; i<this.listUser.length;i++){
+                if(this.listUser[i].id==id){
+                    debugger
+                    this.nameUser.push(this.listUser[i].userName);
+                    return this.listUser[i].userName;
+                }
             }
         },
         cancel() {
@@ -105,13 +125,15 @@ export default {
                         const ranges = self.allColumns.slice(2, self.allColumns.length).map(c => c.colId);
                         const logTimeList = _.groupBy(res.data.listLogTime, 'id');
                         const dateList = _.groupBy(res.data.listLogTime, 'date');
+                        debugger
                         const userName = _.groupBy(res.data.listLogTime, 'account_id');
-                         let nameUser = ["Nguyễn Đình Hoàng", "Hoàng Quỳnh Anh", "Nguyễn Đức Trung", "Hương Nguyễn", "Thế Anh","Thắngnt","tannq"];
+                        debugger
+                         let nameUser = self.nameUser;
                         //console.log(dateList);
                         const rows = Object.keys(logTimeList).map(k => {
                             const returnObj = {
-                               // category: logTimeList[k][0].category_task,
-                                //name: [this.getName(logTimeList[k][0].account_id),k],
+                                category: logTimeList[k][0].category_task,
+                                name: [this.getName(logTimeList[k][0].account_id),k+'-'+logTimeList[k][0].task_id],
                             };
                             let logged = 0;
                             logTimeList[k].forEach(log => {
@@ -165,9 +187,9 @@ export default {
     },
     data() {
         return {
+            listUser: [],
               customGridOptions: {
                 getRowStyle : function(params) {
-                    console.log(params, 'paramsparamsparamsparams');
                     if (params.node.key === 'Tổng') {
                         return { background: '#E0FFFF' };
                     }
@@ -177,6 +199,7 @@ export default {
                 customCheckBox: CheckBoxRenderer
             },
             sum:0,
+            nameUser:[],
             dialog: false,
             groupBy: ['task'],
             reviewer: {
@@ -188,8 +211,15 @@ export default {
                 
             ],
             baseColumns: [
+                  {
+                    "headerName":this.$t("timesheet.category_submit"),
+                    "field": "category",
+                    "width": 200,
+                    "colId": "category",
+                   
+                },
                 {
-                    "headerName":this.$t("common.logged_time"),
+                    "headerName":this.$t("timesheet.logged_time"),
                     "field": "logged",
                     "width": 50,
                     "colId": "logged",
@@ -220,7 +250,9 @@ export default {
         }
     },
     created() {
+        this.getUser();
         this.load();
+     
         end: this.$store.getters['timesheet/submitStartEndDate'];
     },
 }

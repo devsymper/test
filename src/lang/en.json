@@ -237,7 +237,11 @@
             "date_created": "Date",
             "name": "Name",
             "description": "Description",
-            "type": "Type"
+            "type": "Type",
+            "createAt": "Create at",
+            "updateAt": "Update at",
+            "userCreate": "User create",
+            "userUpdate": "User update"
         },
         "title": "Permissions packages",
         "actionControlSummary": "Action pack Summary",
@@ -449,6 +453,25 @@
             "save": "Save"
         }
     },
+    "objectType": {
+        "Document definition": "Văn bản",
+        "Document instance": "Danh sách bản ghi",
+        "Orgchart": "Sơ đồ tổ chức",
+        "Dataflow": "Luồng xử lý dữ liệu",
+        "Workflow definition": "Quy trình",
+        "Workflow instance": "Văn bản",
+        "Syql": "Công thức",
+        "Account": "Tài khoản người dùng",
+        "Report": "Báo cáo",
+        "Dashboard": "Dashboard",
+        "Job": "Job",
+        "Operation": "Operation",
+        "Action pack": "Nhóm hành động",
+        "Knowledge": "Văn bản nội bộ",
+        "File": "Quản lý tệp",
+        "Department": "Phòng ban",
+        "Timesheet": "Thời gian biểu"
+    },
     "apps": {
         "header": {
             "id": "ID",
@@ -460,7 +483,8 @@
             "created_at": "Date create",
             "updated_at": "Last update"
         },
-
+        "emptyApp": "List application epmty",
+        "emptyFavorite": " List favorite empty",
         "listType": {
             "documents": "Documents",
             "workflows": "Work flows",
@@ -506,11 +530,80 @@
                 "unfavorite": "Remove from favorite"
             },
             "orgchart": {
+                "create": "Create",
+                "update": "Update",
+                "drop": "Drop",
+                "list": "List",
                 "detail": "Detail",
-                "edit": "Edit",
-                "query": "Query",
-                "favorite": "Add to favorite",
-                "unfavorite": "Remove from favorite"
+                "unfavorite": "Remove favorite"
+            },
+            "document_definition": {
+                "create": "Create document",
+                "edit": "Edit document",
+                "submit": "Submit document",
+                "drop": "Delete document",
+                "restore": "Restore",
+                "list": "List",
+                "list_trash": "List trash",
+                "list_instance": "List instance",
+                "unfavorite": "Remove favorite"
+            },
+            "workflow_definition": {
+                "list": "List",
+                "create": "Create",
+                "deploy": "Deloy",
+                "drop": "Delete",
+                "update": "Update",
+                "list_instance": "List instance",
+                "start_instance": "Start instance",
+                "unfavorite": "Remove favorite"
+            },
+            "dashboard": {
+                "create": "Create dashboard",
+                "update": "Update",
+                "view": "View",
+                "list": "List",
+                "drop": "Delete",
+                "unfavorite": "Remove favorite"
+            }
+        },
+        "iconListActions": {
+            "orgchart": {
+                "create": "mdi-folder-plus-outline",
+                "update": "mdi-note-plus-outline",
+                "drop": "mdi-arrow-down-drop-circle-outline",
+                "list": "mdi-clipboard-list-outline",
+                "detail": "mdi-details",
+                "unfavorite": "mdi-star-off"
+            },
+            "document_definition": {
+                "create": "mdi-folder-plus-outline",
+                "edit": "mdi-file-document-edit-outline",
+                "submit": "mdi-content-save-outline",
+                "drop": "mdi-arrow-down-drop-circle-outline",
+                "restore": "mdi-file-restore-outline",
+                "list": "mdi-clipboard-list-outline",
+                "list_trash": "mdi-playlist-remove",
+                "list_instance": "mdi-file-document-multiple-outline",
+                "unfavorite": "mdi-star-off"
+            },
+            "workflow_definition": {
+                "list": "mdi-clipboard-list-outline",
+                "create": "mdi-folder-plus-outline",
+                "deploy": "mdi-rocket",
+                "drop": "mdi-arrow-down-drop-circle-outline",
+                "update": "mdi-note-plus-outline",
+                "list_instance": "mdi-file-document-multiple-outline",
+                "start_instance": "mdi-play-outline",
+                "unfavorite": "mdi-star-off"
+            },
+            "dashboard": {
+                "create": "mdi-folder-plus-outline",
+                "update": "mdi-note-plus-outline",
+                "view": "mdi-eye-outline",
+                "list": "clipboard-list-outline",
+                "drop": "arrow-down-drop-circle-outline",
+                "unfavorite": "mdi-star-off"
             }
         }
     },
@@ -558,8 +651,8 @@
             "rename": "Rename",
             "delete": "Delete",
             "addfavorite": "Add to favorite",
-            "removefavorite": "Remove from favorite"
-
+            "removefavorite": "Remove from favorite",
+            "viewcontent": "View content"
         },
         "table": {
             "totalDoc": "Total document"
@@ -650,6 +743,9 @@
             "canNotCreateTask": "Can not create task"
         },
         "header": {
+            "type":"Loại",
+            "approval":"Phê duyệt",
+            "submit":"Gửi văn bản",
             "date": "Date",
             "dueDate": "Due Date",
             "createDate": "Create date",
@@ -661,7 +757,8 @@
             "participant": "Participant",
             "id": "Seri",
             "list": "List task",
-            "submitForm": "Submit form"
+            "submitForm": "Submit form",
+            "alertDescription": "No description"
         },
         "filterOptions": {
             "all": "All task",
@@ -678,7 +775,15 @@
         "created": "Task created",
         "relatedPeople": {
             "title": "Related people"
+        },
+        "table":{
+            "fileName":"File name",
+            "type":"Type",
+            "owner":"Owner",
+            "size":"Size",
+            "date":"Date"
         }
+
     },
     "orgchart": {
         "list": {
@@ -727,5 +832,12 @@
         "detail": {
             "title": "Detail dashboard "
         }
-    }
+	},
+	"comment":{
+		"comment": "Comment",
+		"resolve": "Resolve",
+		"reply": "Reply",
+		"edited": "Edited",
+		"search": "Search"
+	}
 }

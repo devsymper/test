@@ -7,11 +7,15 @@ export const actionHelper = {
      * value có thể là bất cứ cái gì
      * @param {Object} collection object chứa các actionName và value
      * @param {string} objectType Loại object: document_definition, orgchart ....
+     * @param {string} objId id cuả object cha cần check quyền, thường sẽ bằng hẳn thằng 
+     * @param {string} subId id của các object con (instance id của objId), thường áp dụng cho document hoặc workflow
+     * 
      */
-    filterAdmittedActions(collection, objectType, objId, returnArr = true) {
+    filterAdmittedActions(collection, objectType, objId, subId = -1, returnArr = true) {
         let opsMap = SYMPER_APP.$store.state.app.userOperations;
         let userInfo = util.auth.getSavedUserInfo();
         let userType = userInfo.profile.type;
+
         if (userType == 'ba') {
             return returnArr ? Object.values(collection) : collection;
         } else {

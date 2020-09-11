@@ -1,9 +1,9 @@
 <template>
-<div class='log-time' style="padding-left: 10px; height: 100%">
-    <v-row style="padding-bottom: 10px; margin-left:2px; margin-bottom:-22px;margin-top:-10px">
+<div class='log-time h-100' style="padding-left: 10px">
+    <v-row style="padding-bottom: 10px; margin-left:2px; margin-bottom:-22px">
         <period-selector />
         <div style="width:38%;float:right" 
-             class=".d-lg-flex .d-lg-none d-none d-lg-block">
+             class="">
             <CalendarViewMode
                 @time_view="time_view = true"
                 @list_view="time_view = false" />
@@ -13,17 +13,23 @@
     <v-dialog v-model="logtimeDialog" width="357">
         <LogTimeForm v-show="showTask==false"
             @showTaskForm="showTaskForm"
+            @showCategoryForm="showCategoryForm"
             :eventLog="eventLog"
+            :updateAPICategory ="updateAPICate"
             @cancel="cancelSave()"
             :dateMonth ="dateMonth"
             :formType="formType"
+            :cancelTask="cancelTask"
+            :cancelCate="cancelCate"
             :load ="load"
+            @doneCate="doneCate()"
             :update ="update"
             :newEvent="logtimeEvent" 
             :onSave="onSaveLogTimeEvent"
             :onCancel="onCancelSave">
         </LogTimeForm>
-         <TaskForm @loadTask="loadTask()" v-show="showTask" @cancel="cancel()"/>      
+         <TaskForm @loadTask="loadTask()" v-show="showTask&&showCategory==false" @cancel="cancelTaskForm()"/>
+         <CategoryForm @updateList="updateAPICategory()" v-show="showCategory" @cancel="cancelCateForm()"/>
     </v-dialog>
      <!-- test -->
       <v-dialog
@@ -39,8 +45,7 @@
             <v-btn
               color="primary"
               text
-              @click="remindDialog = false"
-            >
+              @click="remindDialog = false">
               OK
             </v-btn>
           </v-card-actions>
@@ -50,12 +55,15 @@
     <v-dialog v-model="deleteDialog" width="357">
         <DeleteLogView
             @cancel="cancelDelete()"
-
             :deleteEvent="deleteEvent"
             :onDelete="onDeleteLogTimeEvent">
         </DeleteLogView>
     </v-dialog>
-    <LogCalendar @showLog="showLog" ref="logCalendar" :time-view="time_view" @create-time="onCreateTime" 
+    <LogCalendar 
+        @showLog="showLog" 
+        ref="logCalendar" 
+        :time-view="time_view" 
+        @create-time="onCreateTime" 
         @delete-event="onDeleteEvent" />
 </div>
 </template>
@@ -68,6 +76,7 @@ import TaskForm from "./../../components/timesheet/TaskForm";
 import CalendarViewMode from "../../components/timesheet/CalendarViewMode";
 import LogTimeForm from "../../components/timesheet/LogTimeForm";
 import DeleteLogView from "../../components/timesheet/DeleteLogView";
+import CategoryForm from "../../components/timesheet/CategoryForm";
 import timesheetApi from '../../api/timesheet';
 import dayjs from 'dayjs';
 
@@ -80,16 +89,20 @@ export default {
         LogCalendar,
         LogTimeForm,
         DeleteLogView,
-        TaskForm
+        TaskForm,CategoryForm
     },
     data() {
         return {
             showTask:false,
+            showCategory:false,
             time_view: true,
             eventLog:{},
+            updateAPICate:false,
             load:false,
             // log form
-            dateMonth:dayjs(),
+            dateMonth:'',
+            cancelTask:false,
+            cancelCate:false,
             logtimeDialog: false,
             logtimeEvent: null,
             formType: 'log',
@@ -124,18 +137,41 @@ export default {
         })
     },
     methods: {
+        doneCate(){
+            this.updateAPICate = false
+        },
+        updateAPICategory(){
+            this.updateAPICate =true;
+
+        },
         loadTask(){
             debugger
             this.load = true;
         },
-        cancel(){
+        cancelTaskForm(){
             debugger
-             this.showTask=false;
+            this.showTask=false;
+            this.showCategory=false;
+            this.cancelTask != this.cancelTask;
+        },
+        
+        cancelCateForm(){
+            debugger
+            this.showTask=false;
+            this.showCategory=false;
+            this.cancelCate != this.cancelCate;
         },
         showTaskForm(value){
             debugger
             this.eventLog = value;
             this.showTask=true; 
+          
+        },
+         showCategoryForm(value){
+            debugger
+            this.eventLog = value;
+            this.showCategory=true;
+            this.showTask =true;
           
         },
         getNow: function() {
@@ -145,12 +181,9 @@ export default {
             }
          },
          showLog(date){
-             debugger
-             this.dateMonth= date;
-              this.logtimeDialog = true;
-               this.$nextTick(() => {
-                this.update = false;
-            });
+            debugger
+            this.dateMonth = date;
+            this.logtimeDialog = true;
               //this.update=true;
          },
         cancelSave() {

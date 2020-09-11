@@ -9,13 +9,26 @@ const addPropertyCommentTarget = (state, data) => {
 	state.commentTarget[data.property] = data.value
 };
 const updateListComment = (state, data) => {
-	Vue.set(state, 'listComment', data)
+	if (typeof data !== 'undefined'){
+		Vue.set(state, 'listComment', data)
+	}else{
+		Vue.set(state, 'listComment',[])
+	}
+
 };
 const updateListResolve = (state, data) => {
-	Vue.set(state, 'listResolve', data)
+	if (typeof data !== 'undefined'){
+		Vue.set(state, 'listResolve', data)
+	}else{
+		Vue.set(state, 'listResolve',[] )
+	}
 };
 const updateListAvtiveComment = (state, data) => {
-	Vue.set(state, 'listAvtiveComment', data)
+	if (typeof data !== 'undefined'){
+		Vue.set(state, 'listAvtiveComment', data)
+	}else{
+		Vue.set(state, 'listAvtiveComment',[] )
+	}
 };
 const setComment = (state) => {
 	state.listComment = state.listAvtiveComment
@@ -30,8 +43,7 @@ const updateParentCommentTarget = (state, data) => {
 	state.commentTarget.parentId = data
 }
 const updateResolve = (state, data) => {
-	debugger
-
+	
 	state.listResolve.push(data)
 	state.listAvtiveComment.forEach(function (e) {
 		if (e.id == data.id) {
@@ -47,7 +59,6 @@ const updateResolve = (state, data) => {
 	// state.listComment.splice(state.listComment.indexOf(data), 1)
 }
 const updateUnResolve = (state, data) => {
-	debugger
 	state.listAvtiveComment.push(data)
 	state.listResolve.forEach(function (e) {
 		if (e.id == data.id) {

@@ -22,7 +22,7 @@
                             :disabled="loadingRefresh"
                             class="mr-2"
                             @click="addItem"
-                            v-if="!isCompactMode"
+                            v-if="checkShowCreateButton()"
                         >
                             <v-icon left dark>mdi-plus</v-icon>
                             {{$t('common.add')}}
@@ -557,6 +557,17 @@ export default {
         }
     },
     methods: {
+        checkShowCreateButton(){
+            let rsl = !this.isCompactMode;
+            let objectType = this.commonActionProps.resource;
+            let objectTypePermission = this.$store.state.app.userOperations[objectType];
+
+            let hasCreatePermission = true;
+            if(!util.auth.isSupportter()){
+                hasCreatePermission = objectTypePermission && objectTypePermission[0]['create'];
+            }
+            return rsl && hasCreatePermission;
+        },
         relistContextmenu(){
             if(this.cellAboutSelecting.row < 0){
                 return;
@@ -566,7 +577,8 @@ export default {
             let items = this.tableContextMenu;
             if(!$.isArray(items)){
                 let objectType = this.commonActionProps.resource;
-                items = actionHelper.filterAdmittedActions(items, objectType, id);
+                let parentId = this.commonActionProps.parentId ? this.commonActionProps.parentId : id;
+                items = actionHelper.filterAdmittedActions(items, objectType, parentId ,id);
             }
             this.hotTableContextMenuItems =  this.getItemContextMenu(items);
         },

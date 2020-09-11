@@ -20,6 +20,7 @@ const defaultState = {
     statusEdit: true, //trạng thái của document
     statusRightBar: -1, //trạng thái của thanh sidebar right
     subCollapseSideBar: false, // trạng thái của sidebar KH: true là đang nhỏ, false là đang mở rộng
+    widthSideBar: 250,
     search: "",
 
     // Danh sách tất cả các Directory

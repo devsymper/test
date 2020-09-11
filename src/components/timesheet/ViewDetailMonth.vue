@@ -32,7 +32,7 @@ width: 360px; color: black; max-height: 580px;" class='fs-13 view_detail_month v
             <v-list-item-title class="description_task">
                 <span class="fs-12 pl-7" style="color:grey">
                     {{changeDuration(event.duration)}}: </span>
-                <span style="color:grey">{{event.desc?event.desc:$t('common.view_des')}} </span>
+                <span style="color:grey">{{event.desc?event.desc:$t('timesheet.view_des')}} </span>
             </v-list-item-title>
         </v-list-item-content>
     </v-list-item>
