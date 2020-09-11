@@ -154,8 +154,6 @@ Vue.prototype.$goToPage = function(url, title, pageInstanceKey = false, allwaysO
     this.$store.commit('app/changeUrlsToTabs', urlInfo);
     activeTabIndex = Object.keys(urlMap).length - 1;
 
-    <<
-    << << < HEAD
     this.$store.commit('app/updateCurrentTabIndex', activeTabIndex);
     if (routeObj.name) {
         if (routeObj.name == this.$route.name) {
@@ -174,28 +172,7 @@ Vue.prototype.$goToPage = function(url, title, pageInstanceKey = false, allwaysO
         }
     } else {
         this.$snotifyError('Url not found');
-    } ===
-    === =
-    this.$store.commit('app/updateCurrentTabIndex', activeTabIndex);
-    if (routeObj.name) {
-        if (routeObj.name == this.$route.name) {
-            this.$router.push({
-                name: 'symperHiddenRedirectComponent',
-                params: {
-                    urlInfo: urlInfo,
-                    pageInstanceKey: Date.now()
-                }
-            });
-        } else {
-            this.$router.push({
-                name: routeObj.name,
-                params: util.cloneDeep(params)
-            });
-        }
-    } else {
-        this.$snotifyError('Url not found');
-    } >>>
-    >>> > 3340384085 cce81ea7c2296e686449b496f7c489
+    }
 };
 
 /**
