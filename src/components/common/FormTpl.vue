@@ -321,6 +321,7 @@ export default {
             this.$emit('append-icon-click');
         },
         handleLargeFormulaEditorBlur(){
+            debugger
             let name = this.largeFormulaEditor.name;
             let inputInfo = this.allInputs[name];
             this.handleInputBlur(inputInfo, name);
@@ -385,6 +386,7 @@ export default {
             inputInfo.activeTab = type;
         },
         closeLargeFormulaEditor() {
+            debugger
             let info = this.largeFormulaEditor;
             setTimeout((self) => {
                 self.largeFormulaEditor.name = '';            

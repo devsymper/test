@@ -63,7 +63,7 @@
             </v-menu>
 
             <!-- Sort option -->
-            <v-menu offset-y light :close-on-content-click="false" :min-width="200" class="mr-2">
+            <v-menu offset-y light :close-on-content-click="false" :min-width="200" class="mr-2"  style="z-index:1000!important">
                 <template v-slot:activator="{ on }">
                     <v-btn small class="mr-2" v-on="on" depressed>
                         <v-icon size="18">mdi-swap-vertical</v-icon>
