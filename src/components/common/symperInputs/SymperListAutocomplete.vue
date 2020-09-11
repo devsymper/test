@@ -115,16 +115,20 @@ export default {
         search(){
             let val = this.search;
             if(!this.onSearch){
-                this.myItems = this.myItems.filter((el, idx) => {
-                    if (
-                        String(el.id).includes(val) ||
-                        String(el.name).includes(val) ||
-                        String(el.title).includes(val)
-                    ) {
-                        return true;
-                    }
-                    return false;
-                });
+                if(!val){
+                    this.myItems = util.cloneDeep(this.items);
+                }else{
+                    this.myItems = this.myItems.filter((el, idx) => {
+                        if (
+                            String(el.id).includes(val) ||
+                            String(el.name).includes(val) ||
+                            String(el.title).includes(val)
+                        ) {
+                            return true;
+                        }
+                        return false;
+                    });
+                }
             }else{
                 this.onSearch(val, this);
             }

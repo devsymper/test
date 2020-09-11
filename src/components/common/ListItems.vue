@@ -22,7 +22,7 @@
                             :disabled="loadingRefresh"
                             class="mr-2"
                             @click="addItem"
-                            v-if="!isCompactMode"
+                            v-if="checkShowCreateButton()"
                         >
                             <v-icon left dark>mdi-plus</v-icon>
                             {{$t('common.add')}}
@@ -526,9 +526,7 @@ export default {
                 colNames.push(item.data);
                 headers.push(item.columnTitle);
                 return headers;
-          
             }, []);
-          
             return function(col) {
                 let colName = colNames[col];
                 let markFilter = "";
@@ -546,7 +544,6 @@ export default {
                         </span>`;
                 //.replace(/\n|\r\n/g,'')
             };
-    
         },
         actionPanelWrapper() {
             let mapType = {
@@ -560,7 +557,21 @@ export default {
         }
     },
     methods: {
+        checkShowCreateButton(){
+            let rsl = !this.isCompactMode;
+            let objectType = this.commonActionProps.resource;
+            let objectTypePermission = this.$store.state.app.userOperations[objectType];
+
+            let hasCreatePermission = true;
+            if(!util.auth.isSupportter()){
+                hasCreatePermission = objectTypePermission && objectTypePermission[0]['create'];
+            }
+            return rsl && hasCreatePermission;
+        },
         relistContextmenu(){
+            if(this.cellAboutSelecting.row < 0){
+                return;
+            }
             let row = this.$refs.dataTable.hotInstance.getSourceDataAtRow(this.cellAboutSelecting.row);
             let id = row.id;
             let items = this.tableContextMenu;
@@ -743,9 +754,7 @@ export default {
                 densityMode: this.tableDisplayConfig.densityMode,
                 columns: []
             };
-            
             for (let col of this.tableColumns) {
-                
                 configs.columns.push({
                     data: col.data,
                     symperFixed: col.symperFixed,
@@ -848,7 +857,6 @@ export default {
                 }
                 this.totalObject = data.total ? parseInt(data.total) : 0;
                 thisCpn.loadingData = false;
-                
                 thisCpn.tableColumns = thisCpn.getTableColumns(
                     data.columns
                 );
@@ -1015,7 +1023,6 @@ export default {
                 }
             } else {
                 for (let item of columns) {
-                    
                     colMap[item.name] = {
                         data: item.name,
                         type: item.type, // lưu ý khi loại dữ liệu của cột là number (cần format) và dạng html
@@ -1069,7 +1076,6 @@ export default {
             }
         },
         configColumnDisplay(type, idx) {
-            
             let column = this.tableColumns[idx];
             column[type] = !column[type];
             let isValue = column[type];
@@ -1142,7 +1148,6 @@ export default {
             let success = (data) => {
                 if(data.status == 200){
                     self.tableFilter.currentColumn.colFilter.selectItems = null;
-                   // 
                     let items = data.data.listObject.reduce((arr, el) => {
                         arr.push(el[columns[0]]);
                         return arr;
@@ -1229,7 +1234,6 @@ export default {
             this.$emit("filter-list", {});
         },
         searchAll() {
-            debugger
             // Phát sự kiện khi người dùng gõ vào ô tìm kiếm
             this.$emit("search-all", {});
         },
