@@ -67,6 +67,7 @@ export default {
             this.$refs.jointPaper.actionOnToolbar(action);
         },
         loadDiagramFromJson(cells){
+			debugger
             this.$refs.jointPaper.graph.fromJSON(cells);
         },
         getAllDiagramCells(){
@@ -91,7 +92,18 @@ export default {
                         cell.attr(mapName[attrName]+'/'+key, value[key]);
                     }
                 }else{
-                    cell.attr(mapName[attrName], value);
+                     let newValue =   joint.util.breakText(
+                            value, 
+                            {
+                                width: 130,
+                                height: 30
+                            },
+                            { 'font-size': 13 },
+                            { ellipsis: true  }
+                        )
+                    cell.attr(mapName[attrName], newValue,
+                    );
+                   
                 }
             }
         },
@@ -144,7 +156,8 @@ export default {
             paper.on('cell:pointerclick', function(elementView, evt, x, y) {
                 evt.stopPropagation();
                 self.unHighlightCurrentNode();
-                self.$emit('cell-clicked', elementView.model.id);
+				self.$emit('cell-clicked', elementView.model.id);
+				self.$store.commit('orgchart/updateCurrentChildrenNodeId',elementView.model.id)
                 self.highlightNode(elementView.model);               
             });
 
@@ -265,7 +278,8 @@ export default {
                     if(!lastUserInfo) return;
                     this.updateCellAttrs( this.selectingNode.id, 'userInPositionAvartar', lastUserInfo.avatar ? lastUserInfo.avatar : avatarDefault );
                     let plusUser = userIdList.length == 1 ? '' : ('+' + (userIdList.length - 1));
-                    this.updateCellAttrs( this.selectingNode.id, 'accountNumberPlus', plusUser);
+					this.updateCellAttrs( this.selectingNode.id, 'accountNumberPlus', plusUser);
+					debugger
                 }
             }
         },

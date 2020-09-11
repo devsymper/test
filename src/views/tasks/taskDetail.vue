@@ -98,7 +98,6 @@ import { getVarsFromSubmitedDoc, getProcessInstanceVarsMap } from '../../compone
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import { documentApi } from '../../api/Document';
 import VueClipboard from 'vue-clipboard2';
-Vue.use(VueClipboard)
 export default {
     name: "taskDetail",
     props: {
@@ -238,7 +237,24 @@ export default {
             return bsr;
         },
     },
+    created(){
+        this.checkAndSwitchToTab();
+    },
     methods: {
+        checkAndSwitchToTab(){
+            if(this.$route.params.extraData && this.$route.params.extraData.subAction){
+                let tabAction = {
+                    'view_comment': 'comment'
+                };
+                let tab = tabAction[this.$route.params.extraData.subAction];
+                for(let i = 0; i < this.items.length; i++){
+                    if(this.items[i].tab == tab){
+                        this.tab = i;
+                        break;
+                    }
+                }
+            }
+        },
         getTaskTest(){
             let taskId=this.taskInfo.action.parameter.taskId;
             BPMNEngine.getATaskInfoV2(taskId).then((res) => {
@@ -333,7 +349,7 @@ export default {
                 let res = await this.submitTask(taskData);
                 this.saveApprovalHistory(value);
                 this.$emit('task-submited', res);
-            }else if(this.taskAction == '' ||this.taskAction ==undefined){
+            }else if(this.taskAction == '' ||this.taskAction==undefined){
                 let taskData = {
                     "action": "complete",
                     "outcome": value,

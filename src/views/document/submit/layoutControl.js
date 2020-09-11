@@ -12,6 +12,7 @@ export default class LayoutControl extends Control {
     }
     renderTabPageControl() {
         this.ele.find('.tabcontent').attr('contenteditable', false);
+        this.ele.find('.delete-page-icon').remove()
         this.ele.find('.tab button').attr('contenteditable', false);
         this.checkAutoHeight()
         this.setEvent()

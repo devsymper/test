@@ -29,6 +29,7 @@ import { defaultXML } from "./../../components/process/reformatGetListData";
 import bpmneApi from "./../../api/BPMNEngine";
 import CustomRenderInstance from "./../../components/process/CustomRenderInstance";
 import SymperDragPanel from '../../components/common/SymperDragPanel.vue';
+import { appConfigs } from '../../configs';
 
 const nodeStatusColors = {
     failed: {
@@ -204,10 +205,8 @@ export default {
                     return self.getDefinitionData(res.processDefinitionId);
                 })
                 .then(res => {
-                    let resourceDataUrl = res.resource.replace(
-                        "/resources/",
-                        "/resourcedata/"
-                    );
+                    let resourceDataUrl = res.resource.replace(/^https?\:\/\/([^\/?#]+)(?:[\/?#]|$)/g, '');
+                    resourceDataUrl = appConfigs.apiDomain.bpmne.general + resourceDataUrl;
                     return self.getDefinitionXML(resourceDataUrl);
                 })
                 .then(res => {

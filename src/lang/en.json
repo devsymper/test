@@ -78,7 +78,8 @@
         "fullName": "Full name",
         "email": "Email",
         "pageSize": "Page size",
-        "pendding": "Pendding"
+        "pendding": "Pendding",
+        "print": "Print"
     },
     "validate": {
         "required": "Not be empty",

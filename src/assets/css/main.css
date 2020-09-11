@@ -6,6 +6,13 @@ html {
     width: 100vw;
 }
 
+:root {
+    --symper-background-default: #f2f2f2;
+    --symper-background-active: rgba(0 0 0 / 0.1);
+    --symper-background-hover: rgba(0 0 0 / 0.05);
+    --symper-border: 1px solid rgb(230, 229, 229);
+}
+
 .symper-bg-orange {
     background-color: #f58634!important;
 }

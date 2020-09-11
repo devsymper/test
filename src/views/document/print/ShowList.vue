@@ -38,27 +38,8 @@ export default {
                     text: function() {
                         return " <i class= 'mdi mdi-file-document-edit-outline' > </i>&nbsp; Sửa";
                     },
-                    callback: (document, callback) => {
-                        this.$goToPage('/documents/'+document.id+'/editor/edit',document.title);
-                    },
-                },
-                print_config: {
-                    name: "printConfig",
-                    text: function() {
-                        return " <i class= 'mdi mdi-printer-3d-nozzle-outline' > </i>&nbsp; Cấu hình in";
-                    },
-                    callback: (document, callback) => {
-                        this.$goToPage('/documents/'+document.id+'/editor/print-config',document.title);
-                    },
-                },
-                
-                submit: {
-                    name: "submit",
-                    text: function() {
-                        return " <i class= 'mdi mdi-file-document-outline' > </i>&nbsp; Nhập liệu";
-                    },
-                    callback: (document, callback) => {
-                        this.$goToPage('/documents/'+document.id+'/submit',document.title);
+                    callback: (printConfig, callback) => {
+                        this.$goToPage('/documents/'+printConfig.documentId+'/editor/print-config/'+printConfig.id,printConfig.title);
                     },
                 },
                 
@@ -68,32 +49,32 @@ export default {
                         return " <i class= 'mdi mdi-delete-outline' > </i>&nbsp; Xóa";
                     },
                     callback: (document, callback) => {
-                        let ids = document.reduce((arr,obj)=>{
-                            arr.push(obj.id);
-                            return arr;
-                        },[]);
-                        let thisCpn = this;
-                        documentApi
-                        .deleteDocument({ids:ids.join()})
-                        .then(res => {
-                            if (res.status == 200) {
-                                thisCpn.$snotify({
-                                    type: "success",
-                                    title: "Delete document success!"
-                                });  
-                                thisCpn.$refs.listDocument.refreshList();
-                            }
-                            else{
-                                thisCpn.$snotify({
-                                    type: "error",
-                                    title: res.messagr
-                                });  
-                            }
-                        })
-                        .catch(err => {
-                            console.log("error from delete document api!!!", err);
-                        })
-                        .always(() => {});
+                        // let ids = document.reduce((arr,obj)=>{
+                        //     arr.push(obj.id);
+                        //     return arr;
+                        // },[]);
+                        // let thisCpn = this;
+                        // documentApi
+                        // .deleteDocument({ids:ids.join()})
+                        // .then(res => {
+                        //     if (res.status == 200) {
+                        //         thisCpn.$snotify({
+                        //             type: "success",
+                        //             title: "Delete document success!"
+                        //         });  
+                        //         thisCpn.$refs.listDocument.refreshList();
+                        //     }
+                        //     else{
+                        //         thisCpn.$snotify({
+                        //             type: "error",
+                        //             title: res.messagr
+                        //         });  
+                        //     }
+                        // })
+                        // .catch(err => {
+                        //     console.log("error from delete document api!!!", err);
+                        // })
+                        // .always(() => {});
                     },
                 },
             },

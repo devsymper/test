@@ -1,7 +1,7 @@
 <template>
     <div class="wrap-content-detail">
         
-        <div class="panel-header" v-if="!quickView">
+        <div class="panel-header" v-if="!quickView && !isPrint">
             <div class="right-action">
                 <v-tooltip bottom>
                     <template v-slot:activator="{ on }">
@@ -38,12 +38,13 @@
         </div>
       
         <side-bar-detail 
+        v-if="!isPrint"
         :sidebarWidth="sidebarWidth"  
         :isShowSidebar="isShowSidebar"
         :userId="userId"
         :taskId="taskId"
         :createTime="createTime"
-        :documentObjectId="documentObjectId1"
+        :documentObjectId="docObjId"
         :workflowId="workflowId"
         @after-hide-sidebar="afterHideSidebar"
         />
@@ -89,6 +90,10 @@ export default {
             type:Boolean,
             default:false
         },
+        formId:{
+            type:Number,
+            default:0
+        },
         quickView:{
             type:Boolean,
             default:false,
@@ -121,7 +126,6 @@ export default {
             taskId:"",
             createTime:"",
             userId:"",
-            documentObjectId1:"",
             direction: "top",
             fab: false,
             hover: false,
@@ -151,13 +155,12 @@ export default {
             value: 'detail'
         });
         if (this.documentObjectId != 0) {
-            this.docObjId = this.documentObjectId;
+            this.docObjId = parseInt(this.documentObjectId);
         } else if (this.$route.name == "detailDocument" || this.$route.name == "printDocument") {
-            this.docObjId = this.$route.params.id;
+            this.docObjId = parseInt(this.$route.params.id);
         }
         if(this.docObjId != null){
-            this.documentObjectId1 = this.docObjId;
-            this.loadDocumentObject();  
+            this.loadDocumentObject(this.isPrint);  
         }
         userApi.getListUser(1,100000).then(res => {
             if (res.status == 200) {
@@ -206,9 +209,18 @@ export default {
                 if(after.docObjId){
                     this.docObjId = after.docObjId;
                     this.documentSize = after.docSize;
-                    this.loadDocumentObject();
+                    this.loadDocumentObject(this.isPrint);
                 }
             }
+        },
+        formId(after){
+            this.contentPrintDocument = null
+            this.loadDocumentObject(this.isPrint);
+        },
+        documentObjectId(after){
+            this.contentPrintDocument = null
+            this.docObjId = after
+            this.loadDocumentObject(this.isPrint);
         }
     },
     methods: {
@@ -233,7 +245,7 @@ export default {
             let thisCpn = this;
             let dataPost = {};
             if(isPrint){
-                dataPost = {formType:'print'};
+                dataPost = {formId:this.formId};
             }
             documentApi
                 .detailDocument(documentId,dataPost)
@@ -275,25 +287,25 @@ export default {
             let thisCpn = this;
             let res = await documentApi
                 .detailDocumentObject(this.docObjId);
-            if (res.status == 200) {
-                thisCpn.userId = res.data.document_object_user_created_id;
-                thisCpn.taskId = res.data.document_object_task_id;
-                thisCpn.createTime = res.data.document_object_create_time
-                thisCpn.workflowId = res.data.document_object_workflow_id;
-                thisCpn.documentId = res.data.documentId;
-                thisCpn.$store.commit('document/addToDocumentDetailStore',{
-                    key: 'allData',
-                    value: res.data,
-                    instance:thisCpn.keyInstance
-                }) 
-                thisCpn.loadDocumentStruct(res.data.documentId,isPrint);
-            }
-            else{
-                    this.$snotify({
-                        type: "error",
-                        title: "Can not load document object",
-                    });
-            }
+                if (res.status == 200) {
+                    thisCpn.userId = res.data.document_object_user_created_id;
+                    thisCpn.taskId = res.data.document_object_task_id;
+                    thisCpn.createTime = res.data.document_object_create_time
+                    thisCpn.workflowId = res.data.document_object_workflow_id;
+                    thisCpn.documentId = res.data.documentId;
+                    thisCpn.$store.commit('document/addToDocumentDetailStore',{
+                        key: 'allData',
+                        value: res.data,
+                        instance:thisCpn.keyInstance
+                    }) 
+                    thisCpn.loadDocumentStruct(res.data.documentId,isPrint);
+                }
+                else{
+                        this.$snotify({
+                            type: "error",
+                            title: "Can not load document object",
+                        });
+                }
                 
         },
         togglePageSize() {

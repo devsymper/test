@@ -21,7 +21,8 @@ const defaultState = {
 	},
 	allNodeStyle: [],
 	instanceKey: '',
-	idCurrentChildrenNode: '',
+	currentChildrenNodeId: '',
+	firstChildNodeId: '',
 	currentFatherNode: {},
 };
 
