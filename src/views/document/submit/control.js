@@ -91,6 +91,15 @@ export default class Control {
         }
         return false;
     }
+    checkEmptyProps(props) {
+        if (this.controlProperties[props] !== undefined &&
+            (this.controlProperties[props].value !== "" &&
+                this.controlProperties[props].value !== null &&
+                this.controlProperties[props].value !== undefined)) {
+            return true;
+        }
+        return false;
+    }
 
     // set các mối quan hệ của các control trường hợp đã được lưu trên server
     setEffectedData(effected) {

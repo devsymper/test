@@ -124,7 +124,10 @@ export default {
         },
         sDocumentProp(){
             return this.$store.state.document.documentProps[this.keyInstance]
-        }
+        },
+        sDocumentData(){
+            return this.$store.state.document;
+        },
     }, 
     components: {
         'sidebar-left' : SideBarLeft,
@@ -259,7 +262,8 @@ export default {
             currentTabSelectedIcon:null,
             titleDialog:"",
             currentPageActive:null,
-            isConfigPrint:false
+            isConfigPrint:false,
+            listDocument:[]
         }
     },
     
@@ -302,6 +306,11 @@ export default {
             else if(to.name == 'createDocument'){
                 this.documentId = 0;
             }            
+        },
+        'sDocumentData.listAllDocument':function(data){
+            for(let docName in data){
+                this.listDocument.push({name:docName,id:data[docName].id,title:data[docName].title});
+            }
         }
     },
     methods:{
@@ -1960,7 +1969,9 @@ export default {
                     if(typeControl == 'dataFlow'){
                         control.properties.dataFlowId.options = thisCpn.listDataFlow;
                     }
-
+                    if(control.properties.hasOwnProperty('quickSubmit')){
+                        control.properties.quickSubmit.options = thisCpn.listDocument;
+                    }
                     var inputid = 's-control-id-' + Date.now();
                     checkDiv.attr('id', inputid);
                     insertionPoint.after(checkDiv);
