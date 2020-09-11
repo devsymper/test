@@ -67,7 +67,6 @@ export default {
             this.$refs.jointPaper.actionOnToolbar(action);
         },
         loadDiagramFromJson(cells){
-			debugger
             this.$refs.jointPaper.graph.fromJSON(cells);
         },
         getAllDiagramCells(){
@@ -114,6 +113,7 @@ export default {
             let self = this;
             paper.on('element:remove', function(elementView, evt, x, y) {
                 evt.stopPropagation();
+                debugger
                 let allChildIds = self.getAllChildIdOfNode(elementView.model.id);
                 for(let idCell of allChildIds){
                     let cell = self.$refs.jointPaper.graph.getCell(idCell);
@@ -278,8 +278,7 @@ export default {
                     if(!lastUserInfo) return;
                     this.updateCellAttrs( this.selectingNode.id, 'userInPositionAvartar', lastUserInfo.avatar ? lastUserInfo.avatar : avatarDefault );
                     let plusUser = userIdList.length == 1 ? '' : ('+' + (userIdList.length - 1));
-					this.updateCellAttrs( this.selectingNode.id, 'accountNumberPlus', plusUser);
-					debugger
+                    this.updateCellAttrs( this.selectingNode.id, 'accountNumberPlus', plusUser);
                 }
             }
         },

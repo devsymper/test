@@ -71,6 +71,9 @@ const updateUserFatherNode = (state, data) => {
 const updateFirstChildNodeId = (state, data) => {
 	state.firstChildNodeId = data
 }
+const deleteNode = (state,params) =>{
+	state.editor[params.instanceKey].splice(state.editor[params.instanceKey].indexOf(state.editor[params.instanceKey][params.id]),1)
+}
 export {
 	setOrgchartData,
 	setNodeConfig,
@@ -83,5 +86,6 @@ export {
 	updateCurrentChildrenNodeId,
 	updateCurrentFatherNode,
 	updateUserFatherNode,
-	updateFirstChildNodeId
+	updateFirstChildNodeId,
+	deleteNode
 };

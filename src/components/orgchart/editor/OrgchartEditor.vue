@@ -216,7 +216,7 @@ export default {
 			let array = this.$refs.editorWorkspace.getAllNode()
 			if(array.length == 0){
 				this.checkPageEmpty = true
-			}
+            }
 		},
         handleStyleChange(info){
             this.changeNodeBottomColor(info.data.highlight.value, info.type == 'child');
@@ -467,7 +467,6 @@ export default {
 						let allNodes = self.$refs.positionDiagram.getAllNode()
 						let firstNode = allNodes[0]
 						self.$refs.positionDiagram.$refs.editorWorkspace.changeUserDisplayInNode(this.listUserIds);
-						debugger
 						self.$store.commit('orgchart/updateFirstChildNodeId', firstNode.id)
                         self.$store.commit('orgchart/updateCurrentChildrenNodeId',firstNode.id)
                     }else{
@@ -605,7 +604,7 @@ export default {
                 let invalidIds = [];
                 let mapCodeDpms = {};
                 let passed = true;
-
+                debugger
                 let mapVizNode = this.$refs.editorWorkspace.getAllDiagramCells().cells.reduce((map, el) => {
                     map[el.id] = el;
                     return map;
@@ -618,6 +617,7 @@ export default {
 
                     let dpm = allDpmns[dpmId];
                     let allPos = self.$store.state.orgchart.editor[dpm.positionDiagramCells.instanceKey].allNode;
+                    debugger
                     for(let posId in allPos){
                         let attr = allPos[posId].commonAttrs;
                         if(!attr.name.value || !attr.code.value){
@@ -656,7 +656,6 @@ export default {
                     self.validateDuplicateCodeDepartment(),
                     self.validateEmptyNameAndCodePosition(),
                 ];
-
                 Promise.all(validateMethods).then(() => {
                     resolve(true);
                 }).catch((err) => {
@@ -675,7 +674,6 @@ export default {
             }      
 
             if(passed){
-				debugger
                 let orgchartData = this.getDataToSave();
                 this.$emit('save-orgchart-data', orgchartData);    
             }
@@ -889,7 +887,6 @@ export default {
          * Chọn một node và hiển thị lên cấu hình ở bên tay phải
          */
         selectNode(nodeId){
-			debugger
             this.$refs.editorWorkspace.unHighlightCurrentNode();
             this.$store.commit('orgchart/changeSelectingNode', {
                 instanceKey: this.instanceKey,
