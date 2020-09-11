@@ -136,8 +136,9 @@ export default class BasicControl extends Control {
 
 
         this.setEvent();
-        if (this.checkEmptyProps('quickSubmit')) {
-            this.renderSubformButton();
+        let subFormId = this.checkEmptyProps('quickSubmit');
+        if (subFormId != false) {
+            this.renderSubformButton(subFormId);
         }
 
     }
@@ -332,9 +333,14 @@ export default class BasicControl extends Control {
     /**
      * Hàm append thêm button + vào sau input trường hợp control có đánh dấu là có sub form submit
      */
-    renderSubformButton() {
+    renderSubformButton(subFormId) {
         if (this.inTable == false) {
-            this.ele.parent().append('<span class="mdi mdi-plus add-subform-btn"></span>')
+            let thisObj = this;
+            this.ele.parent().append('<span class="mdi mdi-plus add-subform-btn"></span>');
+            this.ele.parent().off('click', '.add-subform-btn')
+            this.ele.parent().on('click', '.add-subform-btn', function(e) {
+                SYMPER_APP.$evtBus.$emit('document-submit-open-subform', { docId: subFormId, instance: thisObj.curParentInstance })
+            })
         } else {
 
         }

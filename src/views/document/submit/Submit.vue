@@ -142,15 +142,16 @@
         :ref="'dataFlow'+dataFlow.id"/>
         <!-- v-for="dataFlow in listDataFlow" :key="dataFlow.id"  -->
         
-         <!-- <v-navigation-drawer
+         <v-navigation-drawer
             :width="830"
+            v-model="drawer"
             class="pa-3"
             absolute
             right
-            :temporary="'temporary'"
+            temporary
         >
-            <submit-view ref="submitView" :isQickSubmit="true" :action="'submit'" @submit-document-success="aftersubmitDocument" :docId="docSubFormId"/>
-        </v-navigation-drawer> -->
+            <submitDocument v-if="parrentInstance == 0 && docSubFormId != 0" :parrentInstance="keyInstance" ref="subSubmitView" :isQickSubmit="true" :action="'submit'" @submit-document-success="afterSubmitSubformDocument" :docId="docSubFormId"/>
+        </v-navigation-drawer>
     </div>
      
 </template>
@@ -229,6 +230,10 @@ export default {
             default(){
                 return {}
             }
+        },
+        parrentInstance:{
+            type:Number,
+            default:0
         }
     },
     name: "submitDocument",
@@ -307,6 +312,8 @@ export default {
             otherInfo:{},
             listDataFlow:[],
             loading: true,
+            docSubFormId:0,
+            drawer: false,
         };
 
     },
@@ -390,6 +397,20 @@ export default {
                 formulasInstance.handleBeforeRunFormulas(dataInput).then(rs=>{
                     thisCpn.handlerAfterRunFormulas(rs,controlId,controlName,'formulas',false)
                 });
+            } catch (error) {
+                
+            }
+            
+        });
+        this.$evtBus.$on("document-submit-open-subform", data => {
+            if(thisCpn._inactive == true) return;
+            try {
+                console.log("sadsdsadsadsad",data);
+                if(thisCpn.drawer == false){
+                    thisCpn.drawer = true;
+                    thisCpn.docSubFormId = parseInt(data.docId);
+                }   
+                
             } catch (error) {
                 
             }
@@ -640,6 +661,9 @@ export default {
     },
     
     methods: {
+        afterSubmitSubformDocument(){
+
+        },
         /**
          * Hàm ẩn loader
          */
@@ -960,7 +984,7 @@ export default {
                             let content = res.data.document.content;
                             thisCpn.documentName = res.data.document.name;
                             thisCpn.docSize = (parseInt(res.data.document.isFullSize) == 1) ? "100%":"21cm";
-							thisCpn.contentDocument = content;
+                            thisCpn.contentDocument = content;
 							if(res.data.document.dataPrepareSubmit != "" && res.data.document.dataPrepareSubmit != null)
                             thisCpn.preDataSubmit = JSON.parse(res.data.document.dataPrepareSubmit);
                             if(res.data.document.otherInfo != "" && res.data.document.otherInfo != null)
@@ -1915,6 +1939,7 @@ export default {
 						}
                     }
                 }
+                this.hidePreloader();
                 if(listRootControl.length == 0){
                     this.hidePreloader();
                 }
