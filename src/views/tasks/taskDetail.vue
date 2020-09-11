@@ -301,21 +301,9 @@ export default {
         },
         async saveTaskOutcome(value){ // hành động khi người dùng submit task của họ
             this.loadingActionTask=true;
-            if(value == 'submit' || value == 'update' ){
-                let taskInfo=this.taskInfo;
-                if (taskInfo.action.parameter.documentId==0) {
-                    this.taskAction='submit-noneObj';
-                    let taskData = {
-                        "action": "complete",
-                        "outcome": value,
-                    }
-                    let res = await this.submitTask(taskData);
-                    this.$emit('task-submited', res);
-                }else{
-                    this.taskAction=value;
-                    this.$refs.task[0].submitForm(value);
-                }
-            }else if(value == 'approval'){
+            if(this.taskAction == 'submit' || this.taskAction == 'update' ){
+                this.$refs.task[0].submitForm(value);
+            }else if(this.taskAction == 'approval'){
                 let elId = this.originData.taskDefinitionKey;
                 let taskData = {
                     // action nhận 1 trong 4 giá trị: complete, claim, resolve, delegate
@@ -345,7 +333,7 @@ export default {
                 let res = await this.submitTask(taskData);
                 this.saveApprovalHistory(value);
                 this.$emit('task-submited', res);
-            }else if(value == '' ||value ==undefined){
+            }else if(this.taskAction == '' ||this.taskAction ==undefined){
                 let taskData = {
                     "action": "complete",
                     "outcome": value,
@@ -370,7 +358,6 @@ export default {
                 actionName: value,
                 note: ''
             };
-
             documentApi.saveApprovalHistory(dataToSave);
         },
         async submitTask(taskData){
