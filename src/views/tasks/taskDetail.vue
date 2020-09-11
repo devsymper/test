@@ -315,65 +315,6 @@ export default {
         closeDetail() {
             this.$emit("close-detail", {});
         },
-
-        // Commnet phần code này do đang thay đổi logic nhiều so với hàm viết ban đầu bên dưới, cần confirm lại với nhau để chuyển về
-        // async saveTaskOutcome(value){ // hành động khi người dùng submit task của họ
-        //     this.loadingActionTask=true;
-        //     if(value == 'submit' || value == 'update' ){
-        //         let taskInfo=this.taskInfo;
-        //         if (taskInfo.action.parameter.documentId==0) {
-        //             this.taskAction='submit-noneObj';
-        //             let taskData = {
-        //                 "action": "complete",
-        //                 "outcome": value,
-        //             }
-        //             let res = await this.submitTask(taskData);
-        //             this.$emit('task-submited', res);
-        //         }else{
-        //             this.taskAction=value;
-        //             this.$refs.task[0].submitForm(value);
-        //         }
-        //     }else if(value == 'approval'){
-        //         let elId = this.originData.taskDefinitionKey;
-        //         let taskData = {
-        //             // action nhận 1 trong 4 giá trị: complete, claim, resolve, delegate
-        //             "action": "complete",
-        //             "assignee": "1",
-        //             // "formDefinitionId": "12345",
-        //             "outcome": value,
-        //             "variables": [
-        //                 {
-        //                     name: elId+'_outcome',
-        //                     type: 'string',
-        //                     value: value
-        //                 },
-        //                 {
-        //                     name: elId+'_executor_fullname',
-        //                     type: 'string',
-        //                     value: this.$store.state.app.endUserInfo.displayName
-        //                 },
-        //                 {
-        //                     name: elId+'_executor_id',
-        //                     type: 'string',
-        //                     value: this.$store.state.app.endUserInfo.id
-        //                 },
-        //             ],
-        //             // "transientVariables": []
-        //         }
-        //         let res = await this.submitTask(taskData);
-        //         this.saveApprovalHistory(value);
-        //         this.$emit('task-submited', res);
-        //     }else if(value == '' ||value ==undefined){
-        //         let taskData = {
-        //             "action": "complete",
-        //             "outcome": value,
-        //         }
-        //         let res = await this.submitTask(taskData);
-        //         this.$emit('task-submited', res);
-        //     }
-        //     this.loadingActionTask=false;
-        // },
-        
         async saveTaskOutcome(value){ // hành động khi người dùng submit task của họ
             if(this.taskAction == 'submit' || this.taskAction == 'update' ){
                 this.$refs.task[0].submitForm(value);
