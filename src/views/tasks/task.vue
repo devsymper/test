@@ -10,7 +10,7 @@
             :documentObjectWorkflowId="workflowInfo.documentObjectWorkflowId"
             :documentObjectWorkflowObjectId="workflowInfo.documentObjectWorkflowObjectId"
             :action="action"
-            :documentObjectId="documentObjectId"
+            :documentObjectId="converstNumber(documentObjectId)"
             @submit-document-success="onSubmitDone">
         </DocumentSubmit>
         <Detail 
@@ -163,6 +163,9 @@ export default {
         },
         submitForm(){
             this.$refs.submitComponent.handlerSubmitDocumentClick();
+        },
+        converstNumber(documentObjectId){
+            return Number(documentObjectId);
         }
     },
     name: "task"

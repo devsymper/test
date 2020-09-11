@@ -255,12 +255,12 @@ export default {
                 }
             }
         },
-        getTaskTest(){
-            let taskId=this.taskInfo.action.parameter.taskId;
-            BPMNEngine.getATaskInfoV2(taskId).then((res) => {
-                console.log("task123",res);
-            });
-        },
+        // getTaskTest(){
+        //     let taskId=this.taskInfo.action.parameter.taskId;
+        //     BPMNEngine.getATaskInfoV2(taskId).then((res) => {
+        //         console.log("task123",res);
+        //     });
+        // },
         onCopySuccess(){
            this.$snotify({
                 type: 'success',

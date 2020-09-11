@@ -79,7 +79,7 @@
                             cols="1"
                             class="fs-12 px-1 py-0 pl-3">
                                 <v-icon v-if="obj.taskData.action">{{(obj.taskData.action.action=='submit' || obj.taskData.action.action=='') ? 'mdi-file-document-edit-outline': 'mdi-seal-variant'}}</v-icon>
-                                <!-- {{obj.taskData.action.action=='submit'? $t('tasks.header.submit'): $t('tasks.header.approval')}} -->
+                                <v-icon v-else>mdi-checkbox-marked-circle-outline</v-icon>
                         </v-col>
                         <v-col
                             :cols="sideBySideMode ? 10 : compackMode ? 5: 3"
