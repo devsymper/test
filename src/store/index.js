@@ -17,19 +17,19 @@ import task from "./task";
 Vue.use(Vuex);
 
 export default new Vuex.Store({
-    modules: {
-        app: appModule,
-        document: documentModule,
-        process: processModule,
-        orgchart: orgchartModule,
-        permission: permissionModule,
-        actionPack: actionPackModule,
-        comment: comment,
-        appConfig: AppConfig,
-        search: searchModule,
-        kh: khModule,
-        timesheet: timeSheetModule,
-        user: user,
-        task:task
-    }
+	modules: {
+		app: appModule,
+		document: documentModule,
+		process: processModule,
+		orgchart: orgchartModule,
+		permission: permissionModule,
+		actionPack: actionPackModule,
+		comment: comment,
+		appConfig: AppConfig,
+		search: searchModule,
+		kh: khModule,
+		timesheet: timeSheetModule,
+		user: user,
+		task: task
+	}
 });

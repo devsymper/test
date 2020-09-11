@@ -5,7 +5,6 @@
 					<div class="title-app" v-if="itemT.item.length >0"><v-icon style="font-size:13px">{{itemT.icon}}</v-icon> <h4> {{ itemT.title }} <span> {{'('+itemT.item.length +')' }}</span> </h4></div>
 					<ul v-for="(childItem,i) in itemT.item" :key="i"  class="app-child-item">
 							<li  v-if="isEndUserCpn == true" 
-								
 								v-on:contextmenu="rightClickHandler($event,childItem,itemT.name)"
 							>
 								<div style="position:relative">

@@ -41,7 +41,7 @@
                         {{$t("tasks.header.assignee")}}
                     </v-col> 
                     <v-col cols="9" class="pt-1">
-                        <user :user="originData.assigneeInfo"></user>
+                        <user  :user="originData.assigneeInfo"></user>
                     </v-col>
                      <v-col cols="3" class="pt-1">
                         <v-icon small size="18" class="mr-2 mb-1">mdi-calendar-text</v-icon>

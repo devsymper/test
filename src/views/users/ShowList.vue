@@ -70,6 +70,13 @@ export default {
                     callback: (user, callback) => {
                         this.editUser(user);
                     }
+                },
+                delete: {
+                    name:"delete",
+                    text:this.$t('user.table.contextMenu.delete'), 
+                    callback: (user, callback) => {
+                        this.deleteUser(user);
+                    }
                 }
             },
             columns: [],
@@ -87,7 +94,9 @@ export default {
         this.$evtBus.$on('change-user-locale',(locale)=>{
              thisCpn.tableContextMenu = [
                 {name:"passwordsetting",text:this.$t('user.table.contextMenu.passwordSetting')},
-                {name:"edit",text:this.$t('user.table.contextMenu.edit')}
+                {name:"edit",text:this.$t('user.table.contextMenu.edit')},
+                {name:"xóa",text:this.$t('user.table.contextMenu.delete')}
+
             ]
 
         });
@@ -129,7 +138,11 @@ export default {
             this.$refs.panel.resetData();
             this.$refs.panel.setUser(user);
         },
-       
+       deleteUser(user){
+           debugger
+           this.$refs.panel.deleteUser(user[0].id);
+
+       },
         setNewUserItem(user){
             this.data.unshift(user);
         },

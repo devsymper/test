@@ -407,7 +407,6 @@ export default {
 				content: JSON.stringify(content)
             };
 			let res = await orgchartApi.createNodeStyle(dataToSave);
-			debugger
             if (res.status == 200) {
                 this.$snotifySuccess("Save node style successfully!");
                 this.showSaveStyleDialog = false;

@@ -3,7 +3,7 @@
          width: '100%',
          height: tableHeight
      }"
-                 class="ag-theme-balham"
+                 :class="{'ag-theme-balham': true, 'like-handson-table': likeHandsonTable == true}"
                  :gridOptions="gridOptions"
                  :defaultColDef="defaultColDef"
                  :autoGroupColumnDef="autoGroupColumnDef"
@@ -73,6 +73,11 @@ export default {
             default(){
                 return {}
             }
+        },
+        // css like handson table
+        likeHandsonTable:{
+            type: Boolean,
+            default: false
         }
     },
     data(){
@@ -181,3 +186,17 @@ export default {
     
     
 </script>
+<style scoped>
+    .like-handson-table >>> .ag-header{
+        background-color: #FFFFFF;
+    }
+    .like-handson-table >>> .ag-header-icon .ag-icon{
+        display: inline-block;
+    }
+    .like-handson-table >>> .ag-row{
+        background-color: #FFFFFF;
+    }
+    .like-handson-table >>> .ag-row:hover{
+        background-color:unset;
+    }
+</style>

@@ -1,5 +1,11 @@
 <template>
     <div class="h-100 w-100">
+        <v-skeleton-loader
+            v-if="loadingActionTask"
+            :type="'table-tbody'"
+            class="mx-auto"
+            width="100%" height="100%" 
+        ></v-skeleton-loader>
         <v-row class="ml-0 mr-0 justify-space-between" style="    line-height: 36px;">
             <div class="fs-13 pl-2 pt-1 float-left">
                 {{taskBreadcrumb}}
@@ -24,7 +30,7 @@
                     <span>Sao chép đường dẫn</span>
                 </v-tooltip>
 
-                <button @click="getTaskTest">Click</button>
+                <!-- <button @click="getTaskTest">Click</button> -->
 
                 <v-btn small text  @click="closeDetail">
                     <v-icon small>mdi-close</v-icon>
@@ -73,6 +79,7 @@
                 </v-card>
             </v-col>
         </v-row>
+   
     </div>
 </template>
 
@@ -91,7 +98,6 @@ import { getVarsFromSubmitedDoc, getProcessInstanceVarsMap } from '../../compone
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import { documentApi } from '../../api/Document';
 import VueClipboard from 'vue-clipboard2';
-Vue.use(VueClipboard)
 export default {
     name: "taskDetail",
     props: {
@@ -134,6 +140,7 @@ export default {
     },
     data: function() {
         return {
+            loadingActionTask:false,
             breadcrumb: {
                 definitionName: '',
                 instanceName: '',
@@ -230,7 +237,24 @@ export default {
             return bsr;
         },
     },
+    created(){
+        this.checkAndSwitchToTab();
+    },
     methods: {
+        checkAndSwitchToTab(){
+            if(this.$route.params.extraData && this.$route.params.extraData.subAction){
+                let tabAction = {
+                    'view_comment': 'comment'
+                };
+                let tab = tabAction[this.$route.params.extraData.subAction];
+                for(let i = 0; i < this.items.length; i++){
+                    if(this.items[i].tab == tab){
+                        this.tab = i;
+                        break;
+                    }
+                }
+            }
+        },
         getTaskTest(){
             let taskId=this.taskInfo.action.parameter.taskId;
             BPMNEngine.getATaskInfoV2(taskId).then((res) => {
@@ -292,21 +316,10 @@ export default {
             this.$emit("close-detail", {});
         },
         async saveTaskOutcome(value){ // hành động khi người dùng submit task của họ
-            if(value == 'submit' || value == 'update' ){
-                let taskInfo=this.taskInfo;
-                if (taskInfo.action.parameter.documentId==0) {
-                    this.taskAction='submit-noneObj';
-                    let taskData = {
-                        "action": "complete",
-                        "outcome": value,
-                    }
-                    let res = await this.submitTask(taskData);
-                    this.$emit('task-submited', res);
-                }else{
-                    this.taskAction=value;
-                    this.$refs.task[0].submitForm(value);
-                }
-            }else if(value == 'approval'){
+            this.loadingActionTask=true;
+            if(this.taskAction == 'submit' || this.taskAction == 'update' ){
+                this.$refs.task[0].submitForm(value);
+            }else if(this.taskAction == 'approval'){
                 let elId = this.originData.taskDefinitionKey;
                 let taskData = {
                     // action nhận 1 trong 4 giá trị: complete, claim, resolve, delegate
@@ -336,7 +349,7 @@ export default {
                 let res = await this.submitTask(taskData);
                 this.saveApprovalHistory(value);
                 this.$emit('task-submited', res);
-            }else if(value == '' ||value ==undefined){
+            }else if(this.taskAction == '' ||this.taskAction==undefined){
                 let taskData = {
                     "action": "complete",
                     "outcome": value,
@@ -344,6 +357,7 @@ export default {
                 let res = await this.submitTask(taskData);
                 this.$emit('task-submited', res);
             }
+            this.loadingActionTask=false;
         },
         saveApprovalHistory(value){
             let title = this.taskActionBtns.reduce((tt, el) => {
@@ -360,7 +374,6 @@ export default {
                 actionName: value,
                 note: ''
             };
-
             documentApi.saveApprovalHistory(dataToSave);
         },
         async submitTask(taskData){
@@ -433,7 +446,6 @@ export default {
 
         // lấy data mới dựa theo data của task
         async changeTaskDetail(){
-            console.log(this.taskInfo.action);
             if(!this.taskInfo.action){
                 return
             }
@@ -441,6 +453,14 @@ export default {
             this.taskAction = this.taskInfo.action.action;
             if(this.taskAction == 'approval'){
                 this.showApprovalOutcomes(JSON.parse(this.taskInfo.approvalActions));
+            }else if(this.taskAction == 'submit'){
+                this.taskActionBtns = [
+                    {
+                    text:"Submit",
+                    value:"submit",
+                    color:"blue"
+                    }
+                ]
             }else if(this.taskAction == 'undefined'){
                 this.taskActionBtns = [
                     {

@@ -1,5 +1,5 @@
 <template>
-<detail-view :isPrint="true" :docObjectId="docObjectId" />
+<detail-view :isPrint="true" :formId="formPrintId" :documentObjectId="docObjectId" />
 </template>
 
 <script>
@@ -10,24 +10,32 @@ export default {
             type: Number,
             default: 0 
         },
+        formId: {
+            type: Number,
+            default: 0 
+        },
 
-        docObjInfo: {
-            type: Object,
-            default(){
-                return {
-                    docObjId: 0,
-                    docSize : '21cm'
-                }
-            }
-        }
     },   
     components:{
         'detail-view' : Detail
     },
     data(){
         return {
+            formPrintId:this.formId
+        }
+    },
+    watch:{
+        formId(after){
+            this.formPrintId = after
+        }
+    },
+    created(){
+        if(this.$route.name == 'printDocument'){
+            this.formPrintId = this.$route.params.formId
         }
     }
+    
+    
     
 }
 </script>

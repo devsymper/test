@@ -1,4 +1,6 @@
-import { util } from "./../../plugins/util.js";
+import {
+    util
+} from "./../../plugins/util.js";
 // đầu vào : loại control
 // đầu ra: tất cả các thuộc tính của control đó
 const commonProps = {
@@ -69,14 +71,34 @@ const commonProps = {
         title: "Cỡ chữ",
         type: "select",
         value: "",
-        options: [
-            { text: '8px', value: '8px' },
-            { text: '10px', value: '10px' },
-            { text: '11px', value: '11px' },
-            { text: '12px', value: '12px' },
-            { text: '13px', value: '13px' },
-            { text: '14px', value: '14px' },
-            { text: '15px', value: '15px' }
+        options: [{
+                text: '8px',
+                value: '8px'
+            },
+            {
+                text: '10px',
+                value: '10px'
+            },
+            {
+                text: '11px',
+                value: '11px'
+            },
+            {
+                text: '12px',
+                value: '12px'
+            },
+            {
+                text: '13px',
+                value: '13px'
+            },
+            {
+                text: '14px',
+                value: '14px'
+            },
+            {
+                text: '15px',
+                value: '15px'
+            }
         ],
         groupType: "display"
     },
@@ -814,7 +836,10 @@ export const GetControlProps = function(type) {
 export const getAllTypeControl = function() {
         let allControl = util.cloneDeep(controlTypes);
         let result = Object.keys(allControl).map(function(key) {
-            return { type: key, prop: allControl[key] };
+            return {
+                type: key,
+                prop: allControl[key]
+            };
         });
         return result;
     }
@@ -824,7 +849,10 @@ export const getAllControlForTableSetting = function(inType) {
         let allControl = util.cloneDeep(controlTypes);
 
         let result = Object.keys(allControl).map(function(key) {
-            return { type: key, prop: allControl[key] };
+            return {
+                type: key,
+                prop: allControl[key]
+            };
         });
         let controlInTableSetting = result.filter(control => {
             return $.inArray(control.type, inType) != -1;
@@ -853,7 +881,10 @@ export const getAPropsControl = function(type, value) {
 export const getControlElementForTableSetting = function(type) {
     let control = util.cloneDeep(controlTypes[type]);
     let result = Object.keys(control).map(function(key) {
-        return { type: key, prop: control[key] };
+        return {
+            type: key,
+            prop: control[key]
+        };
     });
     return result
 }
@@ -866,7 +897,14 @@ export const getAllPropsControl = function() {
     let result = Object.keys(data).map(function(key) {
         let type = data[key].type;
         let width = (type == 'checkbox') ? 40 : 100
-        let colDefine = { headerName: data[key].title, field: key, groupType: data[key].groupType, width: width, editable: true, colId: key }
+        let colDefine = {
+            headerName: data[key].title,
+            field: key,
+            groupType: data[key].groupType,
+            width: width,
+            editable: true,
+            colId: key
+        }
         if (type == 'checkbox') {
             colDefine['cellRenderer'] = 'checkBoxRenderer'
         }

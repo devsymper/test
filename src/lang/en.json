@@ -78,7 +78,8 @@
         "fullName": "Full name",
         "email": "Email",
         "pageSize": "Page size",
-        "pendding": "Pendding"
+        "pendding": "Pendding",
+        "print": "Print"
     },
     "validate": {
         "required": "Not be empty",
@@ -482,7 +483,8 @@
             "created_at": "Date create",
             "updated_at": "Last update"
         },
-
+        "emptyApp": "List application epmty",
+        "emptyFavorite": " List favorite empty",
         "listType": {
             "documents": "Documents",
             "workflows": "Work flows",
@@ -741,6 +743,9 @@
             "canNotCreateTask": "Can not create task"
         },
         "header": {
+            "type":"Loại",
+            "approval":"Phê duyệt",
+            "submit":"Gửi văn bản",
             "date": "Date",
             "dueDate": "Due Date",
             "createDate": "Create date",

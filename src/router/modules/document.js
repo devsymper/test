@@ -32,10 +32,10 @@ export default [
 
     },
     {
-        path: "/documents/:id?/editor/print-config",
+        path: "/documents/:id?/editor/print-config/:printConfigId?",
         name: "printConfigDocument",
         component: () =>
-            import ('../../views/document/print/PrintConfig.vue'),
+            import ('../../views/document/Editor.vue'),
 
     },
     {
@@ -59,10 +59,10 @@ export default [
             import ('../../views/document/detail/Detail.vue'),
     },
     {
-        path: "/documents/objects/:id?/print",
+        path: "/documents/objects/:id?/print/:formId?",
         name: "printDocument",
         component: () =>
-            import ('../../views/document/detail/Detail.vue'),
+            import ('../../views/document/print/Print.vue'),
     },
     {
         path: "/document/objects/update/:id?",

@@ -1,29 +1,29 @@
 <template>
 	<div class="h-100">
-		<div class="h-100" v-if="!isSettingPasswordView">
+		<div class="h-100" v-if="!isSettingPasswordView" >
 			<div class="h-100">
-				<h3 class="header-title" v-if="actionType == 'add'">{{ $t('user.other.createUser')}}</h3>
+				<h3 class="header-title fs-16" style="font-weight:430!important" v-if="actionType == 'add'">{{ $t('user.other.createUser')}}</h3>
 				<h3 class="header-title" v-if="actionType == 'edit'">{{ $t('user.other.updateUser')}}</h3>
 				<v-stepper v-model="stepper" class="d-flex stepper-create-user">
-				<v-stepper-header class="stepper-header">
-					<v-stepper-step  editable step="1">{{ $t('user.general.title')}}</v-stepper-step>
+				<v-stepper-header class="stepper-header" >
+					<v-stepper-step class="fs-13 font-normal" editable step="1">{{ $t('user.general.title')}}</v-stepper-step>
 					<!-- <v-stepper-step :editable="editStep" @click="loadPermission()" step="2">{{ $t('user.permission.title')}}</v-stepper-step> -->
 				</v-stepper-header>
 				<v-stepper-items class="stepper-items">
 					<v-stepper-content step="1">
 					<h4>{{ $t('user.general.personalInfo.title')}}</h4>
-						<v-row class="mt-2">
-						<v-col cols="3">
-							<div>
-								<v-subheader>{{ $t('user.general.personalInfo.userName')}}</v-subheader>
+						<v-row style=" height: 84px">
+						<v-col cols="3" class="mt-1">
+							<div >
+								<v-subheader class="font-normal">{{ $t('user.general.personalInfo.userName')}}</v-subheader>
 							</div>
-							<div>
-								<v-subheader>{{ $t('user.general.personalInfo.email')}}</v-subheader>
+							<div style="margin-top: -10px;" >
+								<v-subheader class="font-normal">{{ $t('user.general.personalInfo.email')}}</v-subheader>
 							</div>
 						</v-col>
-						<v-col cols="6">
+						<v-col cols="6" class="mt-2">
 							<v-row>
-									<v-col cols="9">
+									<v-col style="margin-top:-10px" cols="9">
 										<v-text-field
 										class="fs-13"
 											ref="userName"
@@ -67,29 +67,29 @@
                             <UploadFile 
                                 ref="uploadAvatar"
                                 :autoUpload="false"
-
                                 :fileName="avatarFileName"
                                 @uploaded-file="handleAvatarUploaded"
                                 @selected-file="handleAvatarSelected" />
 						</v-col>
 						</v-row>
-						<v-row >
+						<v-row class="mt-1" >
 							<v-col cols="3">
-								<v-subheader>{{ $t('user.general.personalInfo.firstName')}}</v-subheader>
+								<v-subheader class="font-normal">{{ $t('user.general.personalInfo.firstName')}}</v-subheader>
 							</v-col>
-							<v-col cols="3">
-								<v-text-field
-								class="fs-13"
+							<v-col cols="3" >
+								<v-text-field 
+								class="fs-13 font-normal"
+								
 								v-model="user.firstName"
 								dense
 								></v-text-field>
 							</v-col>
 							<v-col cols="2 text-center">
-								<v-subheader class="lb-last-name">{{ $t('user.general.personalInfo.lastName')}}</v-subheader>
+								<v-subheader class="lb-last-name font-normal">{{ $t('user.general.personalInfo.lastName')}}</v-subheader>
 							</v-col>	
 							<v-col cols="4">
 								<v-text-field
-								class="fs-13"
+								class="fs-13 font-normal"
 								v-model="user.lastName"
 								dense
 								></v-text-field>
@@ -97,11 +97,11 @@
 						</v-row>
 						<v-row>
 						<v-col cols="3">
-								<v-subheader>{{ $t('user.general.personalInfo.displayName')}}</v-subheader>
+								<v-subheader class="fs-13 font-normal">{{ $t('user.general.personalInfo.displayName')}}</v-subheader>
 							</v-col>
 							<v-col cols="9">
 								<v-text-field
-								class="fs-13"
+								class="fs-13 font-normal"
 									v-model="user.displayName"
 									dense
 								></v-text-field>
@@ -109,7 +109,7 @@
 						</v-row>
 						<v-row>
 							<v-col cols="3">
-								<v-subheader>{{ $t('user.general.personalInfo.phoneNumber')}}</v-subheader>
+								<v-subheader class="fs-13 font-normal">{{ $t('user.general.personalInfo.phoneNumber')}}</v-subheader>
 							</v-col>
 							<v-col cols="9">
 								<v-text-field
@@ -119,26 +119,31 @@
 								></v-text-field>
 							</v-col>
 						</v-row>
-
 						<div v-if="actionType == 'add'">
 							<h4 class="setting-password">{{ $t('user.general.passwordSetting.title')}}</h4>
 							<v-checkbox dense class="sym-small-size" v-model="autoRenPassword" @click="enabledPassword = !enabledPassword" :label="$t('user.general.passwordSetting.autoGeneratePassword')"></v-checkbox>
 							<v-row>
 								<v-col cols="4">
-									<v-checkbox dense class="sym-small-size" v-model="enabledPassword" @click="autoRenPassword = !autoRenPassword" :label="$t('user.general.passwordSetting.yourPassword')"></v-checkbox>
+									<v-checkbox 
+										dense 
+										class="sym-small-size" 
+										v-model="enabledPassword" 
+										@click="autoRenPassword = !autoRenPassword" 
+										:label="$t('user.general.passwordSetting.yourPassword')">
+									</v-checkbox>
 								</v-col>
 								<v-col cols="8 input-password">
 									<v-text-field
-									class="fs-13"
-									ref="password"
-									v-model="user.password"
-									:disabled="!enabledPassword"
-									dense
-									:append-icon="showPass ? 'mdi-eye' : 'mdi-eye-off'"
-									:rules="[rules.required, rules.min, rules.max,rules.password]"
-									:type="showPass ? 'text' : 'password'"
-									counter
-									@click:append="showPass = !showPass"
+										class="fs-13"
+										ref="password"
+										v-model="user.password"
+										:disabled="!enabledPassword"
+										dense
+										:append-icon="showPass ? 'mdi-eye' : 'mdi-eye-off'"
+										:rules="[rules.required, rules.min, rules.max,rules.password]"
+										:type="showPass ? 'text' : 'password'"
+										counter
+										@click:append="showPass = !showPass"
 									></v-text-field>
 								</v-col>
 							</v-row>
@@ -556,7 +561,7 @@ export default {
 				}
 			})
 			.catch(err => {
-				console.log("error from add delete api!!!", err);
+				//console.log("error from add delete api!!!", err);
 			})
 			.always(() => {
 
@@ -598,7 +603,6 @@ export default {
                       
 					}, 10);
 					cpn.$emit("refresh-data");
-					debugger
 					this.$snotify({
 					type: "success",
 					title: this.$t("notification.successTitle")});
@@ -616,7 +620,21 @@ export default {
 
 			});
 		},
-
+		deleteUser(id){
+			let self = this;
+			let data = {status:-1};
+			userApi.updateUser(id, data).then(res => {
+				if (res.status == 200) {
+					self.$emit("refresh-data");
+					self.$snotify({
+						type: "success",
+						title: this.$t("notification.successTitle")});
+				}
+			})
+			.catch(err => {
+				console.log("error from add user api!!!", err);
+			});
+		},
 		/**
 		 * Hoangnd: 14/4/2020
 		 * Hàm update user
@@ -993,6 +1011,10 @@ export default {
 
 </script>
 <style scoped>
+	.font-normal{
+		font-family:Roboto;
+		font-size: 13px;
+	}
 	.stepper-header{
 		width: 200px;
 		height: auto;
@@ -1004,10 +1026,9 @@ export default {
 		width: calc(100% - 200px);
 	}
 	.stepper-items .row .col{
-		padding: 0 12px;
+		padding: 0 3px;
 	}
 	.stepper-header .v-stepper__step{
-	
 		height: 30px;
 		margin: 10px;
 		padding: 20px;
@@ -1015,11 +1036,11 @@ export default {
 	}
 	.stepper-header .v-stepper__step--active{
 		background: #f2f2f2;
-		
 		border-radius: 4px;
 	}
 	.v-stepper__content{
 		height: 100%;
+		padding: 10px 15px!important
 	}
 
 	.v-subheader{
@@ -1031,10 +1052,10 @@ export default {
 	.setting-password{
 		margin: 16px 0;
 	}
-	/* .sym-stepper-content .v-stepper__wrapper .row .col{
+	.v-stepper__wrapper .row .col{
 		padding: 0 12px;
 	}
-	*/
+	
 	.btn-next-step{
 		position: absolute;
 		bottom: 20px;

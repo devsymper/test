@@ -4,7 +4,7 @@ import router from "./router";
 import store from "./store";
 import "./assets/css/main.css";
 import vuetify from "./plugins/vuetify";
-import i18n from './lang/i18n';
+import i18n from './lang/i18n'
 import {
     util
 } from "./plugins/util.js";
@@ -18,13 +18,15 @@ import {
     appConfigs
 } from "./configs";
 import actionMap from './action/index'
+import VueRx from 'vue-rx'
+
 //Anhtger import html2canvas
 import VueHtml2Canvas from 'vue-html2canvas';
 Vue.use(VueHtml2Canvas);
 Vue.component('ba-view', BaView);
 Vue.component('end-user-view', EndUserView);
 Vue.component('content-only-view', ContentOnlyView);
-
+Vue.use(VueRx)
 Vue.mixin({
     methods: {
         $bindAction(actionDef, param = {}) {
@@ -123,7 +125,7 @@ function checkUrlNotExisted(url, context) {
 /**
  * Di chuyển đến một trang và tạo ra tab tương ứng
  */
-Vue.prototype.$goToPage = function(url, title, pageInstanceKey = false, allwaysOpenNewTab = true) {
+Vue.prototype.$goToPage = function(url, title, pageInstanceKey = false, allwaysOpenNewTab = true, extraData = {}) {
     let canAddTab = checkCanAddTab(this);
     if (!allwaysOpenNewTab) {
         canAddTab = canAddTab && checkUrlNotExisted(url, this);
@@ -137,7 +139,8 @@ Vue.prototype.$goToPage = function(url, title, pageInstanceKey = false, allwaysO
     }
     let routeObj = this.$router.match(url);
     let params = Object.assign(routeObj.params, {
-        pageInstanceKey: pageInstanceKey
+        pageInstanceKey: pageInstanceKey,
+        extraData: extraData
     });
 
     let urlMap = this.$store.state.app.urlToTabTitleMap;
@@ -158,13 +161,13 @@ Vue.prototype.$goToPage = function(url, title, pageInstanceKey = false, allwaysO
                 name: 'symperHiddenRedirectComponent',
                 params: {
                     urlInfo: urlInfo,
-                    pageInstanceKey: Date.now()
+                    pageInstanceKey: Date.now(),
                 }
             });
         } else {
             this.$router.push({
                 name: routeObj.name,
-                params: util.cloneDeep(params)
+                params: util.cloneDeep(params),
             });
         }
     } else {

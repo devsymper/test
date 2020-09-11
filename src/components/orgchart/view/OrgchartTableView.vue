@@ -26,6 +26,7 @@
                     <AgDataTable
                         :tableHeight="'calc(100% - 100px)'"
                         ref="displayTable" 
+                        :likeHandsonTable="true"
                         :allColumns="allColumns"
                         :rowData="dataTable"
                         :editable="false"
@@ -157,14 +158,14 @@ export default {
                 {
                     "headerName": this.$t('common.manager'),
                     "field": "managers",
-                    "width": 100,
+                    "width": 600,
                     "colId": "managers",
                     "cellRenderer": "UserInNodeView"
                 },
                 {
                     "headerName": this.$t('common.users'),
                     "field": "users",
-                    "width": 100,
+                    "width": 600,
                     "colId": "users",
                     "cellRenderer": "UserInNodeView"
                 },
@@ -175,7 +176,7 @@ export default {
                 colDefs.push({
                     "headerName": name,
                     "field": this.mapNameToDynamicAttr[name],
-                    "width": 100,
+                    "width": 300,
                     "colId": this.mapNameToDynamicAttr[name],
                 });
             }
