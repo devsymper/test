@@ -141,7 +141,18 @@
         :width="'100%'"
         :ref="'dataFlow'+dataFlow.id"/>
         <!-- v-for="dataFlow in listDataFlow" :key="dataFlow.id"  -->
+        
+         <!-- <v-navigation-drawer
+            :width="830"
+            class="pa-3"
+            absolute
+            right
+            :temporary="'temporary'"
+        >
+            <submit-view ref="submitView" :isQickSubmit="true" :action="'submit'" @submit-document-success="aftersubmitDocument" :docId="docSubFormId"/>
+        </v-navigation-drawer> -->
     </div>
+     
 </template>
 <script>
 import { documentApi } from "./../../../api/Document.js";
@@ -289,7 +300,6 @@ export default {
             listMessageErr:[],
             titleValidate:"",
             messageValidate:"",
-            _inactive:false,
             cacheDataRunFormulas:{},
 			isDraft:0,
             preDataSubmit:{},
@@ -321,7 +331,6 @@ export default {
             thisCpn.$refs.validate.show(e);
 
         });
-        this._inactive = true;
         $(document).on('click','.run-dataflow',function(e){
             let idControl = $(this).closest('.s-control-data-flow').attr('id');
             let control = thisCpn.sDocumentEditor.allControl[idControl];

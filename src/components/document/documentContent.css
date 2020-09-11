@@ -479,3 +479,10 @@ button:hover {
 .content-print-document .s-control {
     border: none !important;
 }
+
+.sym-form-submit .add-subform-btn {
+    position: absolute;
+    right: 4px;
+    top: 5px;
+    cursor: pointer;
+}
