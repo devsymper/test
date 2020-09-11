@@ -1,11 +1,7 @@
 <template>
-    <v-skeleton-loader
-        v-if="loading"
-        type="avatar"
-        :height="size"
-        :width="size"
-        class="symper-avatar-loading"
-    ></v-skeleton-loader>
+    <v-avatar v-if="loading" :size="size">
+        <img :src="defaultAvatar" class="symper-avatar-image">
+    </v-avatar>
     <v-avatar v-else :size="size">
         <img :src="imgUrl" class="symper-avatar-image">
     </v-avatar>
@@ -18,6 +14,7 @@ import { ajax } from 'backbone';
 export default {
     data(){
         return {
+            defaultAvatar: defaultAvatar,
             imgUrl: defaultAvatar,
             loading: false,
         }
