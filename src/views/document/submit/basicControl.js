@@ -131,7 +131,7 @@ export default class BasicControl extends Control {
             this.setValueControl();
         }
         if (sDocument.state.viewType[this.curParentInstance] == 'submit') {
-            this.setDefaultValue();
+            // this.setDefaultValue();
         }
 
 

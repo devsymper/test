@@ -36,10 +36,17 @@ export default {
             isComponentActive:false,
         }
     },
+    computed:{
+        allUsers(){
+            return this.$store.state.app.allUsers;
+        }
+    },
     activated() {
+        debugger
         this.isComponentActive = true;
     },
     deactivated() {
+        debugger
         this.isComponentActive = false;
     },
     created(){
@@ -78,21 +85,11 @@ export default {
             thisCpn.filterUser(thisCpn.element.val())
         })
 
-        userApi.getListUser(1,100000).then(res => {
-            if (res.status == 200) {
-                thisCpn.listAllUser = res.data.listObject;
-                thisCpn.$store.commit("document/addToDocumentSubmitStore", {
-                    key: 'listUser',
-                    value: thisCpn.listAllUser,
-                    instance:thisCpn.keyInstance
-                });
-            }
-            
-        })
-        .catch(err => {
-            
-        })
-        .always(() => {
+        this.listAllUser = this.allUsers
+        this.$store.commit("document/addToDocumentSubmitStore", {
+            key: 'listUser',
+            value: this.listAllUser,
+            instance:this.keyInstance
         });
         
     },
@@ -160,6 +157,8 @@ export default {
         position: absolute;
         z-index: 99999;
         max-width: unset !important;
+        max-height: 500px;
+        overflow: hidden;
     }
     .user-item{
         padding: 4px 8px;

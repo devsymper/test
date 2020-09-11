@@ -829,9 +829,9 @@ export default {
         afterSelectUser(data){
             let user = data.value;
             let input = data.input;
-            
             if(this.sDocumentSubmit.currentTableInteractive == null){
                 input.val(user.displayName);
+                input.attr('user-id',user.id);
                 input.trigger('change');
             }
             else{
@@ -1902,7 +1902,7 @@ export default {
 												value: impactedFieldsListWhenStart,
 												instance: this.keyInstance
 											});
-											listRootControl.push(controlName);
+                                            listRootControl.push(controlName);
 											this.handlerBeforeRunFormulasValue(formulasInstance,controlInstance.id,controlName,formulasType,'root')
 										}
 									}

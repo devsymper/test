@@ -49,7 +49,6 @@
         <all-control-option :instance="keyInstance" ref="allControlOption"/>
         <MaterialIcon :instance="keyInstance" @selected="selectedIcon" :float="true" ref="materialIconPicker"/>
         <SwapTypeControlView 
-        v-if="!isConfigPrint"
         :instance="keyInstance" 
         :dataControl="dataControlSwapType"
         @after-change-type-control="afterChangeTypeControl" 
@@ -210,7 +209,7 @@ export default {
                                         self.keyHandler(e)
                                     });
                                     ed.on('paste', function(e) {
-                                        self.showDialogEditor('onPaste','Chuyển sang định dạng v2');
+                                        self.handlePasteContent();
                                     });
                                 },
                                 init_instance_callback : function(editor) {
@@ -337,15 +336,11 @@ export default {
         },
         acceptDialog(){
             this.dialog = false;
-            if(this.typeDialog == 'onPaste'){
-                this.handlePasteContent();
-            }
-            else if(this.typeDialog == 'deletePage'){
+            if(this.typeDialog == 'deletePage'){
                 this.handleClickDeletePageInControlTab(this.currentPageActive)
             }
         },
         handlePasteContent(){
-            
             this.setContentForDocumentV1();
         },
         px2cm(px) {
@@ -1446,7 +1441,8 @@ export default {
                                                 ) ? false : true
                     }
                     else{
-                        properties[k].value = fields[controlId]['properties'][k]
+                        if(typeof fields[controlId]['properties'][k] != "object")
+                        properties[k].value = fields[controlId]['properties'][k];
                     }
                     if(k =='name'){
                         properties[k].oldName =  properties[k].value
@@ -1478,6 +1474,7 @@ export default {
                                 childProperties[k].value = (listField[childFieldId]['properties'][k] == 0 || listField[childFieldId]['properties'][k] == '0' || listField[childFieldId]['properties'][k] == '') ? false : true
                             }
                             else{
+                                if(typeof listField[childFieldId]['properties'][k] != "object")
                                 childProperties[k].value = listField[childFieldId]['properties'][k]
                             }
                             if(k =='name'){
