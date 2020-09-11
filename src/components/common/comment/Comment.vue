@@ -8,7 +8,7 @@
 				<v-toolbar-title>{{$t('comment.comment')}}  </v-toolbar-title>
 					<v-icon>mdi-comment-text-outline</v-icon>
 					<v-spacer></v-spacer>
-					<!-- s<v-icon @click="showComment = false">mdi-close-outline</v-icon> -->
+					<v-icon v-if="buttonClose == true" @click="clickCloseComment">mdi-close-outline</v-icon>
 				<template v-slot:extension>
 				<v-tabs
 					v-model="tab"
@@ -178,6 +178,10 @@ export default {
 		uuid:{
 			type:String,
 			default:"0"
+		},
+		buttonClose:{
+			type: Boolean,
+			default: false
 		}
 	},
 	methods:{
@@ -186,6 +190,9 @@ export default {
   		},
 		clickClose(){
 			this.isSearching = false
+		},
+		clickCloseComment(){
+			this.$emit('close-comment')
 		},
 		hide(){
 			this.showComment = false
@@ -197,6 +204,7 @@ export default {
 			console.log(item);
 		},
 		getCommentById(){
+			debugger
 			commentApi.getCommentById(this.objectType,this.objectIdentifier).then(res => {
 				this.$store.commit('comment/updateListComment',this.addAvatar(res.data.listObject.comments))
 				this.$store.commit('comment/updateListAvtiveComment',this.addAvatar(res.data.listObject.comments))

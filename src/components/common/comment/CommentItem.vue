@@ -55,7 +55,7 @@
 			>
 			</commentItem>
 			<div class="reply-comment"  v-if="item.reply && item.parentId == '0'">
-				<SymperAvatar :size="30" :userId="item.userId" style="margin-left:14px" />
+				<SymperAvatar :size="30" :userId="userId" style="margin-left:14px" />
 				<div style="padding-left:8px;width:98%">
 					<InputComment  :isEditing="true" :images="[]" :files="[]" :isAdd="true" />
 				</div>
@@ -112,6 +112,9 @@ export default {
 		sReply(){
 			return this.$store.state.comment.isReply
 		},
+		userId(){
+			return  this.$store.state.app.endUserInfo.id
+		}
 	},
 	created(){
 	},

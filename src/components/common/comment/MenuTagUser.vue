@@ -1,11 +1,12 @@
 <template>
    <v-card class="context-menu" v-show="isShowMenu" :style="{top:top+'px',left:left+'px'}">
-			<div class="item" v-for="item in listUser" :key="item.name" @click="clickRow(item)">
-				<div>
+	   <div  v-for="(item, idx) in listUser" :key="item.name" @click="clickRow(item)">
+		   <div :class="{'active': idx == activeIndex,'item':true}">
 					<SymperAvatar :size="25" :userId="item.id" />
 					<span v-on:keyup.down="down"  v-on:keyup.up="up" v-on:keyup.enter="clickRow(item)" style="padding-left:8px"> {{item.displayName}}</span>
-				</div>
 			</div>
+	   </div>
+			
    </v-card>
 </template>
 <script>
@@ -25,7 +26,10 @@ import SymperAvatar from '@/components/common/SymperAvatar.vue'
             isShowMenu:false,
 			top:0,
 			left:0,
+			activeIndex: 0,
 			listUserFilter: [],
+			itemSelected: null,
+			listUserReduce:null,
         };
     },
 	created(){
@@ -33,11 +37,12 @@ import SymperAvatar from '@/components/common/SymperAvatar.vue'
 	computed:{
 		listUser(){
 			if(this.keyWord == ''){
-				return this.$store.state.app.allUsers.slice(0,3)
+				 let data = this.$store.state.app.allUsers.slice(0,3)
+				 return data
 			}
 			else{
 				this.filterItem()
-				return this.listUserFilter.slice(0,4)
+				return this.listUserFilter.slice(0,3)
 			}
 		},
 	},
@@ -50,6 +55,7 @@ import SymperAvatar from '@/components/common/SymperAvatar.vue'
 			this.isShowMenu = true;
 			this.top = y;
 			this.left = x;
+			// this.activeIndex = 0
 		},
 		filterItem(){
 			let self = this	
@@ -63,16 +69,32 @@ import SymperAvatar from '@/components/common/SymperAvatar.vue'
 				})
 			}
 		},
-		chooseUser(){
+		selectedUser(){
+			this.$emit('selected-item',this.itemSelected)
+			this.isShowMenu = false;
 		},
 		down(){
-			console.log('down');
+			// this.listUserReduce = this.listUser 
+			// if(this.i>0){
+			// 	this.listUser[this.i-1]['active'] = false
+			// }
+			// if(this.listUser.length-1 >= this.i){
+			// 	this.listUser[this.i]['active'] = true
+			// 	this.itemSelected = this.listUser[this.i]
+			// 	this.i++;
+			// }
+			this.activeIndex = this.activeIndex == this.listUser.length ? 0 : (this.activeIndex + 1);
+			this.itemSelected = this.listUser[this.activeIndex]
 		},
 		up(){
-			console.log('up');
+			this.activeIndex = this.activeIndex == this.listUser.length ? 0 : (this.activeIndex - 1);
+			this.itemSelected = this.listUser[this.activeIndex]
 		}
 
 
+	},
+	watch:{
+	
 	}
 }
 </script>
@@ -95,6 +117,9 @@ import SymperAvatar from '@/components/common/SymperAvatar.vue'
 }
 .context-menu >>> .v-icon {
 	font-size: 13px;
+}
+.context-menu >>> .active {
+	background-color: #EEEEEE;
 }
  .mention-item {
   padding: 4px 10px;

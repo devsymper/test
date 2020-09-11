@@ -27,11 +27,13 @@
 			<div class="text-area-wrapper" v-else>
 					<textarea v-model="inputComment"  
 						v-on:keyup.50="tagUser($event)"
+						v-on:keyup.right="selectedUser"
 						v-on:keyup.esc="cancelComment"
-						v-on:keyup.enter="addComment"
+						v-on:keyup.enter="enterClick"
 						class="text-area"
 						style="width:100%"
-						v-on:keyup.down="chooseUser"
+						v-on:keyup.down="chooseUserDown($event)"
+						v-on:keyup.up="chooseUserUp($event)"
 						>
 					</textarea>
 				<UploadFile style="position:absolute;right:16px;bottom: 0px;" @uploaded-file="uploadInfo" />
@@ -73,6 +75,7 @@ export default {
 			srcImg:'',
 			dialog:false,	
 			tags:[],
+			isSelectingUser:false,
 			idImg:null,
 			icon:{
 				xlxs: 'mdi-file-excel-box',
@@ -264,8 +267,23 @@ export default {
 				});
 			}
 		},
-		chooseUser(){
-			this.$refs.menuTagUser.chooseUser()
+		chooseUserDown(){
+			this.isSelectingUser = true
+			this.$refs.menuTagUser.down()
+		},
+		chooseUserUp(){
+			this.$refs.menuTagUser.up()
+		},
+		selectedUser(){
+			this.$refs.menuTagUser.selectedUser()
+			this.isSelectingUser = false
+		},
+		enterClick(){
+			if(this.isSelectingUser == true){
+				this.selectedUser()
+			}else{
+				this.addComment()
+			}
 		},
 		addAvatar(data){
 			let mapIdToUser = this.$store.getters['app/mapIdToUser'];
