@@ -4,7 +4,7 @@ import { SYMPER_APP } from "./../../main.js";
 
 const getArrFileAttachment = async(context, data) => {
     try {
-        let res =await taskApi.getFileByList(data);
+        let res = await taskApi.getFileByList(data);
         if (res.status == 200) {
             if (res.data != null) {
                 context.commit('setArrFileAttach', res.data);
@@ -24,7 +24,7 @@ const removeFileAttachToStore = async(context, id) => {
 
 const getArrDocObjId = async(context, data) => {
     try {
-        let res =await taskApi.getDocumentObjIds({ids:JSON.stringify(data)});
+        let res = await taskApi.getDocumentObjIds({ ids: JSON.stringify(data) });
         if (res.status == 200) {
             if (res.data != null) {
                 context.commit('setArrDocObjId', res.data);
@@ -41,5 +41,5 @@ export {
     getArrFileAttachment,
     removeFileAttachToStore,
     getArrDocObjId,
-  
+
 };

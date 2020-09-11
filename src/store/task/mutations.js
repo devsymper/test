@@ -28,5 +28,5 @@ export {
     setFilter,
     removeFileAttachToStore,
     setArrDocObjId
-  
+
 };
