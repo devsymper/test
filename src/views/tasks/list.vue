@@ -78,7 +78,7 @@
                             style="line-height: 42px; flex:0!important"
                             cols="1"
                             class="fs-12 px-1 py-0 pl-3">
-                                <v-icon>{{(obj.taskData.action.action=='submit' || obj.taskData.action.action=='') ? 'mdi-file-document-edit-outline': 'mdi-seal-variant'}}</v-icon>
+                                <v-icon v-if="obj.taskData.action">{{(obj.taskData.action.action=='submit' || obj.taskData.action.action=='') ? 'mdi-file-document-edit-outline': 'mdi-seal-variant'}}</v-icon>
                                 <!-- {{obj.taskData.action.action=='submit'? $t('tasks.header.submit'): $t('tasks.header.approval')}} -->
                         </v-col>
                         <v-col
@@ -88,7 +88,7 @@
                                 <v-tooltip bottom>
                                     <template v-slot:activator="{ on }">
                                     <div v-on="on" class="text-left fs-13 pr-6 text-ellipsis w-100">
-                                        <span v-if="obj.taskData.action.action=='approval'"  style="color:#ffc107">{{obj.taskData.action.parameter.documentObjectId ? checkData(obj.taskData.action.parameter.documentObjectId): ''}}</span> {{obj.taskData.content}}
+                                        <span v-if="obj.taskData.action && obj.taskData.action.action=='approval'"  style="color:#ffc107">{{obj.taskData.action.parameter.documentObjectId ? checkData(obj.taskData.action.parameter.documentObjectId): ''}}</span> {{obj.taskData.content}}
                                     </div>
                                      </template>
                                 <span>{{ obj.taskData.content }}</span>
@@ -451,7 +451,7 @@ export default {
                     );
                 }
             );
-
+            
             console.log(listTasks,"listTassk");
             this.addOtherProcess(listTasks);
             this.loadingTaskList = false;
@@ -465,10 +465,14 @@ export default {
                 listTasks[index].owner = this.getUser(
                     parseInt(listTasks[index].owner)
                 );
-                let description=JSON.parse(listTasks[index].description);
-                if (description.action.action=="approval" && description.action.parameter.documentObjectId != undefined) {
-                    this.arrdocObjId.push(description.action.parameter.documentObjectId);
+                if (listTasks[index].description) {
+                    console.log(index,listTasks[index]);
+                    let description=JSON.parse(listTasks[index].description);
+                    if (description.action.action=="approval" && description.action.parameter.documentObjectId != undefined) {
+                        this.arrdocObjId.push(description.action.parameter.documentObjectId);
+                    }
                 }
+               
             }
             this.$store.dispatch("task/getArrDocObjId", this.arrdocObjId);
             this.listProrcessInstances.push({

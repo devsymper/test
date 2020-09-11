@@ -34,7 +34,8 @@
                         {{$t("tasks.header.owner")}}
                     </v-col>
                     <v-col cols="9" class="pb-2">
-                        <user :user="originData.ownerInfo"></user>
+                        <user v-if="originData.ownerInfo.id" :user="originData.ownerInfo"></user>
+                        <user v-else :user="originData.assigneeInfo"></user>
                     </v-col>
                     <v-col cols="3" class="pt-1">
                         <v-icon small size="18" class="mr-2 mb-1">mdi-account</v-icon>
