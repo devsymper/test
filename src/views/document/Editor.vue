@@ -49,7 +49,6 @@
         <all-control-option :instance="keyInstance" ref="allControlOption"/>
         <MaterialIcon :instance="keyInstance" @selected="selectedIcon" :float="true" ref="materialIconPicker"/>
         <SwapTypeControlView 
-        v-if="!isConfigPrint"
         :instance="keyInstance" 
         :dataControl="dataControlSwapType"
         @after-change-type-control="afterChangeTypeControl" 
@@ -210,7 +209,7 @@ export default {
                                         self.keyHandler(e)
                                     });
                                     ed.on('paste', function(e) {
-                                        self.showDialogEditor('onPaste','Chuyển sang định dạng v2');
+                                        self.handlePasteContent();
                                     });
                                 },
                                 init_instance_callback : function(editor) {
@@ -220,9 +219,6 @@ export default {
                             });
                           
 
-    },
-    activated(){
-        
     },
     created() {
         this.$store.commit("document/setDefaultEditorStore",{instance:this.keyInstance});
@@ -239,12 +235,10 @@ export default {
          * Nhận sự kiên từ click treeview danh sách các control trong doc thì highlight control và selected control
          */
         this.$evtBus.$on("document-editor-click-treeview-list-control", locale => {
+            if(thisCpn._inactive == true) return;
             let elControl = $("#document-editor-"+thisCpn.keyInstance+"_ifr").contents().find('body #'+locale.id);
             thisCpn.setSelectedControlProp(locale.event,elControl,$('#document-editor-'+this.keyInstance+'_ifr').get(0).contentWindow,true);
         });
-
-        
-        
     },
     data(){
         return{
@@ -262,19 +256,15 @@ export default {
             dialog: false,
             dataControlSwapType:{},
             listDataFlow:[],
-            isComponentActive:false,
             currentTabSelectedIcon:null,
             titleDialog:"",
             currentPageActive:null,
             isConfigPrint:false
         }
     },
-    activated() {
-        this.isComponentActive = true;
-    },
+    
     deactivated() {
         $('.tox-pop').css({display:'none'})
-        this.isComponentActive = false;
     },
     beforeMount(){
         this.listIconToolbar = [
@@ -330,6 +320,7 @@ export default {
                 }
             })
         },
+        
         showDialogEditor(type,title){
             this.dialog = true;
             this.typeDialog = type;
@@ -337,15 +328,11 @@ export default {
         },
         acceptDialog(){
             this.dialog = false;
-            if(this.typeDialog == 'onPaste'){
-                this.handlePasteContent();
-            }
-            else if(this.typeDialog == 'deletePage'){
+            if(this.typeDialog == 'deletePage'){
                 this.handleClickDeletePageInControlTab(this.currentPageActive)
             }
         },
         handlePasteContent(){
-            
             this.setContentForDocumentV1();
         },
         px2cm(px) {
@@ -1446,7 +1433,8 @@ export default {
                                                 ) ? false : true
                     }
                     else{
-                        properties[k].value = fields[controlId]['properties'][k]
+                        if(typeof fields[controlId]['properties'][k] != "object")
+                        properties[k].value = fields[controlId]['properties'][k];
                     }
                     if(k =='name'){
                         properties[k].oldName =  properties[k].value
@@ -1478,6 +1466,7 @@ export default {
                                 childProperties[k].value = (listField[childFieldId]['properties'][k] == 0 || listField[childFieldId]['properties'][k] == '0' || listField[childFieldId]['properties'][k] == '') ? false : true
                             }
                             else{
+                                if(typeof listField[childFieldId]['properties'][k] != "object")
                                 childProperties[k].value = listField[childFieldId]['properties'][k]
                             }
                             if(k =='name'){
