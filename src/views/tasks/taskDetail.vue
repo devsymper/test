@@ -98,6 +98,7 @@ import { getVarsFromSubmitedDoc, getProcessInstanceVarsMap } from '../../compone
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import { documentApi } from '../../api/Document';
 import VueClipboard from 'vue-clipboard2';
+Vue.use(VueClipboard)
 export default {
     name: "taskDetail",
     props: {
@@ -317,6 +318,7 @@ export default {
         },
         async saveTaskOutcome(value){ // hành động khi người dùng submit task của họ
             this.loadingActionTask=true;
+            debugger
             if(this.taskAction == 'submit' || this.taskAction == 'update' ){
                 this.$refs.task[0].submitForm(value);
             }else if(this.taskAction == 'approval'){

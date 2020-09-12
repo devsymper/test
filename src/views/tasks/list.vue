@@ -466,7 +466,6 @@ export default {
                     parseInt(listTasks[index].owner)
                 );
                 if (listTasks[index].description) {
-                    console.log(index,listTasks[index]);
                     let description=JSON.parse(listTasks[index].description);
                     if (description.action.action=="approval" && description.action.parameter.documentObjectId != undefined) {
                         this.arrdocObjId.push(description.action.parameter.documentObjectId);

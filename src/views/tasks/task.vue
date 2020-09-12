@@ -144,7 +144,7 @@ export default {
                 return;
             }
             this.docId = 0;
-            let defModel = await BPMNEngine.getDefinitionModel(defId);
+            let defModel = await BPMNEnginfe.getDefinitionModel(defId);
             
             let nodeData = defModel.processes[0].flowElementMap[nodeId];
             let symperActionMap = {};
@@ -162,6 +162,7 @@ export default {
             this.$emit('task-submited', data);
         },
         submitForm(){
+            debugger
             this.$refs.submitComponent.handlerSubmitDocumentClick();
         },
         converstNumber(documentObjectId){
