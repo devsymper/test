@@ -1373,14 +1373,19 @@ export default {
                     value: dataImpactedControlRefresh,
                     instance: this.keyInstance
                 });
+                let checkRun = false;
                 for (let index = 0; index < refreshControl.length; index++) {
                     let controlName = refreshControl[index];
                     let controlInstance = getControlInstanceFromStore(this.keyInstance,controlName);
                     if(!controlInstance.controlFormulas.hasOwnProperty('formulas')){
                         continue;
                     }
+                    checkRun = true;
                     let formulas = controlInstance.controlFormulas.formulas.instance
                     this.handlerBeforeRunFormulasValue(formulas,controlInstance.id,controlName,'formulas')
+                }
+                if(checkRun == false){
+                    this.submitDocument()
                 }
             }
             else{
