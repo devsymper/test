@@ -10,7 +10,7 @@
             :documentObjectWorkflowId="workflowInfo.documentObjectWorkflowId"
             :documentObjectWorkflowObjectId="workflowInfo.documentObjectWorkflowObjectId"
             :action="action"
-            :documentObjectId="documentObjectId"
+            :documentObjectId="converstNumber(documentObjectId)"
             @submit-document-success="onSubmitDone">
         </DocumentSubmit>
         <Detail 
@@ -144,7 +144,7 @@ export default {
                 return;
             }
             this.docId = 0;
-            let defModel = await BPMNEngine.getDefinitionModel(defId);
+            let defModel = await BPMNEnginfe.getDefinitionModel(defId);
             
             let nodeData = defModel.processes[0].flowElementMap[nodeId];
             let symperActionMap = {};
@@ -163,6 +163,9 @@ export default {
         },
         submitForm(){
             this.$refs.submitComponent.handlerSubmitDocumentClick();
+        },
+        converstNumber(documentObjectId){
+            return Number(documentObjectId);
         }
     },
     name: "task"
