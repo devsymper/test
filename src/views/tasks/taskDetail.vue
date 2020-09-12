@@ -318,7 +318,6 @@ export default {
         },
         async saveTaskOutcome(value){ // hành động khi người dùng submit task của họ
             this.loadingActionTask=true;
-            debugger
             if(this.taskAction == 'submit' || this.taskAction == 'update' ){
                 this.$refs.task[0].submitForm(value);
             }else if(this.taskAction == 'approval'){

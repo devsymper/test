@@ -162,7 +162,6 @@ export default {
             this.$emit('task-submited', data);
         },
         submitForm(){
-            debugger
             this.$refs.submitComponent.handlerSubmitDocumentClick();
         },
         converstNumber(documentObjectId){
