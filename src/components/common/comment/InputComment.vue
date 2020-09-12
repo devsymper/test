@@ -39,14 +39,14 @@
 				<v-btn style="position:absolute;right: 0px;bottom: 0px;" icon @click="addComment">
 					<v-icon >mdi-send-circle-outline</v-icon>
 				</v-btn>
+				<MenuTagUser style="position:absolute;left:0;bottom:45px" ref="menuTagUser" @selected-item="tagged" :keyWord="keyWord" />
 			</div>
 		</div>
-		<MenuTagUser ref="menuTagUser" @selected-item="tagged" :keyWord="keyWord" />
 		 <v-dialog
 			v-model="dialog"
 			max-width="80%"
 			max-height="80%"
-			style="overflow-x: hidden"
+			style="overflow-x: hidden;z-index:1000"
 		>
 			<v-card>
 				<v-icon @click="dialog = false" style="float:right;font-size:18px;padding-top:2px">mdi-close</v-icon>
@@ -130,7 +130,14 @@ export default {
 		 let thisCpn = this;
 			$(document).click(function(e){
 				if(!$(e.target).is('.context-menu')){
-					thisCpn.$refs.menuTagUser.hide()
+					if(thisCpn.$refs.menuTagUser){
+						thisCpn.$refs.menuTagUser.hide()
+					}
+				}
+			})
+			$(document).keydown(function(e){
+				if(e.keyCode == 38 || e.keyCode == 40){
+					event.preventDefault()
 				}
 			})
 	},

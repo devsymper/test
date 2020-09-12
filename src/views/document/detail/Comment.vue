@@ -1,7 +1,7 @@
 <template>
     <div class="wraper-comment" :style="style">
 		<!-- <v-divider></v-divider> -->
-        <div class="comment-content " style="height:99%">
+        <div class="comment-content " style="height:100%">
 				<!-- <span class="mdi mdi-keyboard-backspace" @click="hide"></span> -->
 			<Comment style="margin-left:-12px;margin-right:8px" :showComment="true" :objectIdentifier="objectIdentifier" :objectType="'document'" :height="'100%'" :buttonClose="true" @close-comment="hide" />
         </div>
@@ -38,7 +38,7 @@ export default {
 		position: absolute;
 		top: 0;
 		right: 0;
-		width: 99%;
+		width: 400px;
 		height: 100%;
 		background: white;
 		z-index: 9999;

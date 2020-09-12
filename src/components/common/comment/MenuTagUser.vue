@@ -10,6 +10,7 @@
 </template>
 <script>
 import SymperAvatar from '@/components/common/SymperAvatar.vue'
+// import { util } from "./../../plugins/util.js";
   export default {
 	components:{
 		SymperAvatar
@@ -36,12 +37,12 @@ import SymperAvatar from '@/components/common/SymperAvatar.vue'
 	computed:{
 		listUser(){
 			if(this.keyWord == ''){
-				 let data = this.$store.state.app.allUsers.slice(0,5)
+				 let data = this.$store.state.app.allUsers.slice(0,3)
 				 return data
 			}
 			else{
 				this.filterItem()
-				return this.listUserFilter.slice(0,5)
+				return this.listUserFilter.slice(0,3)
 			}
 		},
 	},
@@ -52,18 +53,6 @@ import SymperAvatar from '@/components/common/SymperAvatar.vue'
 		},
 		show(x,y){
 			this.isShowMenu = true;
-			var windowHeight = $(window).height()/2;
-			var windowWidth = $(window).width()/2;
-			if(y > windowHeight && x <= windowWidth) {
-				 $(".context-menu").css("left", x);
-     			 $(".context-menu").css("bottom", $(window).height()-y);
-				 $(".context-menu").css("right", "auto");
-     			 $(".context-menu").css("top", "auto");
-			} else{
-				// this.top = y;
-				// this.left = x;
-			}
-			
 			this.activeIndex = 0
 			this.itemSelected = this.listUser[0]
 		},
@@ -97,7 +86,10 @@ import SymperAvatar from '@/components/common/SymperAvatar.vue'
 
 	},
 	watch:{
-		
+		keyWord(val){
+			// this.activeIndex = 0
+			// this.itemSelected = this.listUser[0]
+		}
 	}
 }
 </script>

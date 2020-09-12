@@ -204,7 +204,6 @@ export default {
 			console.log(item);
 		},
 		getCommentById(){
-			debugger
 			commentApi.getCommentById(this.objectType,this.objectIdentifier).then(res => {
 				this.$store.commit('comment/updateListComment',this.addAvatar(res.data.listObject.comments))
 				this.$store.commit('comment/updateListAvtiveComment',this.addAvatar(res.data.listObject.comments))
