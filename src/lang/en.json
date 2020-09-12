@@ -333,7 +333,9 @@
                 "draft": "Draft",
                 "toggleSize": "Toggle Size"
             },
-            "title": "Submit document"
+            "title": "Submit document",
+            "goToList": "Go to list",
+            "continueSubmit": "Submit again"
         },
         "process": {
             "header_bar": {
@@ -743,9 +745,9 @@
             "canNotCreateTask": "Can not create task"
         },
         "header": {
-            "type":"Loại",
-            "approval":"Phê duyệt",
-            "submit":"Gửi văn bản",
+            "type": "Loại",
+            "approval": "Phê duyệt",
+            "submit": "Gửi văn bản",
             "date": "Date",
             "dueDate": "Due Date",
             "createDate": "Create date",
@@ -776,12 +778,12 @@
         "relatedPeople": {
             "title": "Related people"
         },
-        "table":{
-            "fileName":"File name",
-            "type":"Type",
-            "owner":"Owner",
-            "size":"Size",
-            "date":"Date"
+        "table": {
+            "fileName": "File name",
+            "type": "Type",
+            "owner": "Owner",
+            "size": "Size",
+            "date": "Date"
         }
 
     },
@@ -832,12 +834,12 @@
         "detail": {
             "title": "Detail dashboard "
         }
-	},
-	"comment":{
-		"comment": "Comment",
-		"resolve": "Resolve",
-		"reply": "Reply",
-		"edited": "Edited",
-		"search": "Search"
-	}
+    },
+    "comment": {
+        "comment": "Comment",
+        "resolve": "Resolve",
+        "reply": "Reply",
+        "edited": "Edited",
+        "search": "Search"
+    }
 }

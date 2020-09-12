@@ -143,14 +143,23 @@
         <!-- v-for="dataFlow in listDataFlow" :key="dataFlow.id"  -->
         
          <v-navigation-drawer
+            v-if="parrentInstance == 0" 
             :width="830"
             v-model="drawer"
             class="pa-3"
             absolute
             right
             temporary
+            style="z-index:9999"
         >
-            <submitDocument v-if="parrentInstance == 0 && docSubFormId != 0" :parrentInstance="keyInstance" ref="subSubmitView" :isQickSubmit="true" :action="'submit'" @submit-document-success="afterSubmitSubformDocument" :docId="docSubFormId"/>
+            <submitDocument v-if="parrentInstance == 0 && docSubFormId != 0" 
+            :showSubmitButton="false"
+            :parrentInstance="keyInstance" ref="subSubmitView" :isQickSubmit="true" :action="'submit'" @submit-document-success="afterSubmitSubformDocument" :docId="docSubFormId"/>
+            <div class="sub-form-action">
+                <button>{{$t('document.submit.goToList')}}</button>
+                <button><span class="mdi mdi-content-save-move-outline"></span>{{$t('document.submit.continueSubmit')}}</button>
+                <button><span class="mdi mdi-content-save-settings-outline"></span>{{$t('document.submit.fab.submit')}}</button>
+            </div>
         </v-navigation-drawer>
     </div>
      
@@ -402,14 +411,17 @@ export default {
             }
             
         });
+        /**
+         * Hàm gọi mở sub form submit
+         */
         this.$evtBus.$on("document-submit-open-subform", data => {
             if(thisCpn._inactive == true) return;
             try {
-                console.log("sadsdsadsadsad",data);
-                if(thisCpn.drawer == false){
-                    thisCpn.drawer = true;
+                if(thisCpn.drawer == false && thisCpn.docSubFormId == 0){
+                    
                     thisCpn.docSubFormId = parseInt(data.docId);
                 }   
+                thisCpn.drawer = true;
                 
             } catch (error) {
                 
@@ -2040,6 +2052,9 @@ export default {
 }
 .wrap-content-submit .icon{
     font-size: 20px !important;
+}
+.v-navigation-drawer >>> .wrap-content-submit{
+    height: calc(100% - 25px);
 }
 </style>
 
