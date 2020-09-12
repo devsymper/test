@@ -58,7 +58,7 @@
                     </v-card>
                 </v-tab-item>
                 <!-- Tab chèn link -->
-                <v-tab-item class="text-center">
+                <v-tab-item class="text-center" style="min-height:200px">
                     <v-text-field
                         v-model="link"
                         solo
@@ -72,7 +72,7 @@
                         <img :src="link" width="150" max-height="150" class="mt-3" style="max-width:150px">
                     </div>
                 </v-tab-item>
-                 <v-tab-item>
+                <v-tab-item>
                     <Upload ref="fileUpload" @selectFile="selectIcon"></Upload>
                 </v-tab-item>
             </v-tabs-items>
