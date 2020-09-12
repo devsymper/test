@@ -8,7 +8,7 @@
 				<v-toolbar-title>{{$t('comment.comment')}}  </v-toolbar-title>
 					<v-icon>mdi-comment-text-outline</v-icon>
 					<v-spacer></v-spacer>
-					<!-- s<v-icon @click="showComment = false">mdi-close-outline</v-icon> -->
+					<v-icon v-if="buttonClose == true" @click="clickCloseComment">mdi-close-outline</v-icon>
 				<template v-slot:extension>
 				<v-tabs
 					v-model="tab"
@@ -42,7 +42,7 @@
 			</v-tabs-items>
 			<div class="input-comment" v-if="tabComment == true">
 				<SymperAvatar :userId="userId" :size="30"  />
-				<InputComment style="margin-left:8px" :isEditing="true" :images="[]" :files="[]" :isAdd="true"/>
+				<InputComment style="margin-left:8px" :isEditing="true" :images="[]" :files="[]" :isAdd="true" />
 			</div>
 	</div>
 </template>
@@ -109,7 +109,7 @@ export default {
 		},
 		userId(){
 			return  this.$store.state.app.endUserInfo.id
-		}
+		},
 	},
 	mounted(){
 		 var x =util.getComponentSize(this);
@@ -178,6 +178,10 @@ export default {
 		uuid:{
 			type:String,
 			default:"0"
+		},
+		buttonClose:{
+			type: Boolean,
+			default: false
 		}
 	},
 	methods:{
@@ -186,6 +190,9 @@ export default {
   		},
 		clickClose(){
 			this.isSearching = false
+		},
+		clickCloseComment(){
+			this.$emit('close-comment')
 		},
 		hide(){
 			this.showComment = false
