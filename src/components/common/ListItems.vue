@@ -564,7 +564,7 @@ export default {
 
             let hasCreatePermission = true;
             if(!util.auth.isSupportter()){
-                hasCreatePermission = objectTypePermission && objectTypePermission[0]['create'];
+                hasCreatePermission = objectTypePermission && objectTypePermission[0] && objectTypePermission[0]['create'];
             }
             return rsl && hasCreatePermission;
         },

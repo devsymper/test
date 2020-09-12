@@ -72,6 +72,9 @@
                         <img :src="link" width="150" max-height="150" class="mt-3" style="max-width:150px">
                     </div>
                 </v-tab-item>
+                 <v-tab-item>
+                    <Upload ref="fileUpload" @selectFile="selectIcon"></Upload>
+                </v-tab-item>
             </v-tabs-items>
         </v-menu>
     </div>
@@ -307,6 +310,7 @@ export default {
 <style scoped>
 .pick-icon >>> .v-menu__content{
 	overflow: hidden;
+    height:500px
 }
 .sym-small-size >>> .v-input__slot,
 .sym-small-size >>> .v-input__control{

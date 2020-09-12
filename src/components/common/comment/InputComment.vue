@@ -27,7 +27,6 @@
 			<div class="text-area-wrapper" v-else>
 					<textarea v-model="inputComment"  
 						v-on:keyup.50="tagUser($event)"
-						v-on:keyup.right="selectedUser"
 						v-on:keyup.esc="cancelComment"
 						v-on:keyup.enter="enterClick"
 						class="text-area"
@@ -127,6 +126,14 @@ export default {
 	},
 	created(){
 	},
+	mounted(){
+		 let thisCpn = this;
+			$(document).click(function(e){
+				if(!$(e.target).is('.context-menu')){
+					thisCpn.$refs.menuTagUser.hide()
+				}
+			})
+	},
 	methods:{
 		removeFile(item){
 			this.attachments.splice(this.attachments.indexOf(item.id),1)
@@ -205,6 +212,9 @@ export default {
 		},
 		cancel(){
 			this.$emit('cancel-reply')
+		},
+		cancelComment(){
+			this.$refs.menuTagUser.hide()
 		},
 		addComment(){
 			this.dataPostComment = this.sComment

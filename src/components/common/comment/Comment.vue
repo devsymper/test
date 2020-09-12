@@ -42,7 +42,7 @@
 			</v-tabs-items>
 			<div class="input-comment" v-if="tabComment == true">
 				<SymperAvatar :userId="userId" :size="30"  />
-				<InputComment style="margin-left:8px" :isEditing="true" :images="[]" :files="[]" :isAdd="true"/>
+				<InputComment style="margin-left:8px" :isEditing="true" :images="[]" :files="[]" :isAdd="true" />
 			</div>
 	</div>
 </template>
@@ -109,7 +109,7 @@ export default {
 		},
 		userId(){
 			return  this.$store.state.app.endUserInfo.id
-		}
+		},
 	},
 	mounted(){
 		 var x =util.getComponentSize(this);

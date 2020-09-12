@@ -27,13 +27,15 @@
 						<v-list >
 							<v-list-item
 								@click="editComment(item)"
+								style="height:30px"
 							>
-								<v-list-item-title>Sửa Bình luận</v-list-item-title>
+								<v-list-item-title style="font:13px roboto">Sửa Bình luận</v-list-item-title>
 							</v-list-item>
 							<v-list-item
 								@click="deleteComment(item)"
+								style="height:30px"
 							>
-								<v-list-item-title> Xóa Bình luận</v-list-item-title>
+								<v-list-item-title style="font:13px roboto"> Xóa Bình luận</v-list-item-title>
 							</v-list-item>
 						</v-list>
 					</v-menu>
