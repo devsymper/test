@@ -173,7 +173,7 @@ export default {
                             });
                         }
                         reject({
-                            title: "Validate failed wwhen checking for deployment"
+                            title: "Validate failed when checking for deployment"
                         });
                     }
                 }).catch((err) => {
