@@ -162,7 +162,7 @@ export default {
             clearTimeout(this.delayTimer);
             this.delayTimer = setTimeout(function(self) {
                 self.handleValidateControl(name, input, data)
-            }, 200,this);
+            }, 100,this);
             if(data.key == 'Tab'){
                 this.handleValidateControl(name, input, data)
             }
@@ -184,10 +184,13 @@ export default {
             }
         },
         handleChangeInput(name, input, data){
-            if(input.groupType == "formulas" || input.type == 'checkbox'){
+            if(input.groupType == "formulas"){
                 this.handleValidateControl(name, input, data);
             }
-            
+            if(['numberFormat','checkbox','formatDate'].includes(input.type)){
+                input.value = data
+                this.handleValidateControl(name, input, data);
+            }
         },
         handleValidateControl(name, input, data){
             if(this.isConfigPrint){
@@ -211,7 +214,6 @@ export default {
             this.$store.commit(
                 "document/updateProp",{id:this.sCurrentDocument.id,name:name,value:value,tableId:tableId,type:"value",instance:this.instance}
             );   
-
             if(name == 'name' || name == 'title'){
                 let currentInput = this.sCurrentDocument.properties.name;
                 this.checkNameControl('name', currentInput.name);

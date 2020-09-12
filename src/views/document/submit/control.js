@@ -96,7 +96,7 @@ export default class Control {
             (this.controlProperties[props].value !== "" &&
                 this.controlProperties[props].value !== null &&
                 this.controlProperties[props].value !== undefined)) {
-            return true;
+            return this.controlProperties[props].value;
         }
         return false;
     }
