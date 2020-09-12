@@ -1553,6 +1553,22 @@ let allAttrs = {
                 "type": "String"
             }]
         },
+        validate(){
+            let vl=this.value;
+            if (Number(vl) <=0) {
+                let item={
+                    'isValid':false,
+                    'message':"Please enter a number greater than 0"
+                }
+                Vue.set(this,'validateStatus',item);
+            }else{
+                let item={
+                    'isValid':true,
+                    'message':"success"
+                }
+                Vue.set(this,'validateStatus',item);
+            }
+        },
         pushToXML: attrToXMLMethods.subLoopCharMethod,
     },
     "multiinstance_collection": {
@@ -1954,7 +1970,7 @@ let allAttrs = {
                     bgColor = bgColor == '' ? 'green' : bgColor;
                     let textColor = bgColor == 'white' ? '#212121' : 'white'
                     let bgColorMap = {
-                        "yellow": "#FFD60",
+                        "yellow": "#FFD600",
                         "red": "#F44336",
                         "orange": "#FF9800",
                         "green": "#4CAF50",
