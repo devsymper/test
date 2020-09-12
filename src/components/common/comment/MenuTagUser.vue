@@ -2,15 +2,14 @@
    <v-card class="context-menu" v-show="isShowMenu" >
 	   <div  v-for="(item, idx) in listUser" :key="item.name" @click="clickRow(item)">
 		   <div :class="{'active': idx == activeIndex,'item':true}">
-					<SymperAvatar :size="25" :userId="item.id" />
-					<span  style="padding-left:8px"> {{item.displayName}}</span>
+				<SymperAvatar :size="25" :userId="item.id" />
+				<span  style="padding-left:8px"> {{item.displayName}}</span>
 			</div>
 	   </div>
    </v-card>
 </template>
 <script>
 import SymperAvatar from '@/components/common/SymperAvatar.vue'
-// import { util } from "./../../plugins/util.js";
   export default {
 	components:{
 		SymperAvatar
@@ -83,12 +82,13 @@ import SymperAvatar from '@/components/common/SymperAvatar.vue'
 		hide(){
 			this.isShowMenu = false
 		}
-
 	},
 	watch:{
 		keyWord(val){
-			// this.activeIndex = 0
-			// this.itemSelected = this.listUser[0]
+			if(this.listUser.length > 0){
+				this.activeIndex = 0
+				this.itemSelected = this.listUser[this.activeIndex]
+			}
 		}
 	}
 }

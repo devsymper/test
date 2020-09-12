@@ -151,6 +151,7 @@ export default {
 			this.images.splice(this.images.indexOf(item),1)
 		},
 		tagUser(event){
+			this.isSelectingUser = true
 			let $target = $(event.target);
 			var x = $target.offset().left;
      		var y = $target.offset().top+28;

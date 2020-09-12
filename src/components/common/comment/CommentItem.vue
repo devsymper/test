@@ -32,7 +32,7 @@
 								<v-list-item-title style="font:13px roboto">Sửa Bình luận</v-list-item-title>
 							</v-list-item>
 							<v-list-item
-								@click="deleteComment(item)"
+								@click="confirmDelete(item)"
 								style="height:30px"
 							>
 								<v-list-item-title style="font:13px roboto"> Xóa Bình luận</v-list-item-title>
@@ -63,6 +63,13 @@
 				</div>
 			</div>
 		</div>
+		<!-- <DialogDelete :showDialog="showDialog" @confirm-delete="deleteComment" /> -->
+		<SymperDialogConfirm 
+			:showDialog="showDialog"
+			:title="'Xóa bình luận'"
+			:content="'Bạn có chắc muốn xóa bình luận này không'"
+			@confirm="deleteComment"
+		 />
 	</div>
 </template>
 <script>
@@ -72,7 +79,8 @@ import moment from 'moment';
 import {commentApi} from '@/api/Comment.js'
 import {fileManagementApi} from '@/api/FileManagement.js'
 import SymperAvatar from '@/components/common/SymperAvatar.vue'
-import { mapGetters } from 'vuex';
+import DialogDelete from './DialogDelete.vue'
+import SymperDialogConfirm from '@/components/common/SymperDialogConfirm.vue'
 export default {
 	name: 'commentItem',
 	props:{
@@ -92,7 +100,9 @@ export default {
 		VuePerfectScrollbar,
 		InputComment,
 		moment,
-		SymperAvatar
+		SymperAvatar,
+		DialogDelete,
+		SymperDialogConfirm
 	},
 	data() {
 		return {
@@ -102,6 +112,8 @@ export default {
 			status,
 			contentEdit: '',
 			reply: false,
+			showDialog: false,
+			itemDeleting: null
 		}
 	},
 	computed:{
@@ -136,13 +148,17 @@ export default {
 		}
 	},
 	methods:{
-	
+		confirmDelete(item){
+			this.showDialog = true
+			this.itemDeleting = item
+		},
 		editComment(item){
 			item.isEditing = true
 			this.contentEdit = item.content
 		},
-		deleteComment(item){
-			commentApi.deleteComment(item.id).then(res => {
+		deleteComment(){
+			this.showDialog = false
+			commentApi.deleteComment(this.itemDeleting.id).then(res => {
 				if(this.sComment.uuid == "0"){
 					this.getCommentId()
 				}else{
