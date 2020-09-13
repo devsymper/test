@@ -389,6 +389,7 @@
             "name": "Tên",
             "title": "Tiêu đề",
             "note": "Ghi chú",
+            "type": "Loại Văn bản",
             "menu": "menu",
             "countobject": "Số lượng bản gi",
             "workflow": "Quy trình",
@@ -421,6 +422,9 @@
                     "nameControl": "Tên control",
                     "changeFrom": "Đổi kiểu control từ",
                     "changeTo": "Thành"
+                },
+                "quickInfoControl": {
+                    "heading": "Thông tin control"
                 }
             }
         },

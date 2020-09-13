@@ -82,6 +82,10 @@ export default class TableControl extends Control {
                 }
                 this.tableInstance.tableInstance.setDataAtRowProp(vls, null, null, 'auto_set');
             }
+            if (sDocument.state.submit[this.curParentInstance].docStatus == 'init') {
+                this.defaultValue = data;
+            }
+
         }
     }
 

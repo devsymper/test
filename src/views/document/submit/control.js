@@ -36,6 +36,7 @@ export default class Control {
          */
         this.idField = idField;
         this.value = value;
+        this.defaultValue = "";
 
 
     }
@@ -91,6 +92,13 @@ export default class Control {
         }
         return false;
     }
+    checkEmptyFormulas(type) {
+        if (this.controlFormulas.hasOwnProperty(type)) {
+            return true;
+        }
+        return false;
+    }
+
     checkEmptyProps(props) {
         if (this.controlProperties[props] !== undefined &&
             (this.controlProperties[props].value !== "" &&

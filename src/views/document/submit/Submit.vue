@@ -1,5 +1,9 @@
 <template>
-    <div class="wrap-content-submit">
+    <div :class="{
+    'wrap-content-submit':true,
+    'sym-sub-form-submit':(parrentInstance == 0) ? false : true
+
+    }">
         <v-skeleton-loader
             class="mx-auto"
             max-width="auto"
@@ -66,6 +70,7 @@
             @after-check-input-time-valid="afterCheckTimeNotValid" 
             ref="timeInput" />
             <v-speed-dial
+                v-if="parrentInstance == 0"
                 v-show="showSubmitButton"
                 v-model="fab"
                 :top="top"
@@ -154,13 +159,16 @@
         >
             <submitDocument v-if="parrentInstance == 0 && docSubFormId != 0" 
             :showSubmitButton="false"
-            :parrentInstance="keyInstance" ref="subSubmitView" :isQickSubmit="true" :action="'submit'" @submit-document-success="afterSubmitSubformDocument" :docId="docSubFormId"/>
-            <div class="sub-form-action">
-                <button>{{$t('document.submit.goToList')}}</button>
-                <button><span class="mdi mdi-content-save-move-outline"></span>{{$t('document.submit.continueSubmit')}}</button>
-                <button><span class="mdi mdi-content-save-settings-outline"></span>{{$t('document.submit.fab.submit')}}</button>
-            </div>
+            :parrentInstance="keyInstance" 
+            @submit-document-success="submitSubFormSuccess"
+            ref="subSubmitView" :isQickSubmit="true" :action="'submit'" :docId="docSubFormId"/>
+            
         </v-navigation-drawer>
+        <div class="sub-form-action" v-if="parrentInstance != 0">
+            <button @click="goToListDocument()" class=subfom-action__item>{{$t('document.submit.goToList')}}</button>
+            <button @click="handlerSubmitDocumentClick(true);" class=subfom-action__item><span class="mdi mdi-content-save-move-outline"></span>{{$t('document.submit.continueSubmit')}}</button>
+            <button @click="handlerSubmitDocumentClick" class=subfom-action__item><span class="mdi mdi-content-save-settings-outline"></span>{{$t('document.submit.fab.submit')}}</button>
+        </div>
     </div>
      
 </template>
@@ -323,6 +331,7 @@ export default {
             loading: true,
             docSubFormId:0,
             drawer: false,
+            isContinueSubmit:false
         };
 
     },
@@ -767,6 +776,15 @@ export default {
                 let dataFromCache = this.getDataAutocompleteFromCache(e.e.target.value, aliasControl);
                 if(dataFromCache == false){
                     let dataInput = this.getDataInputFormulas(e.autocompleteFormulasInstance,e);
+                    let currentTableInteractive = this.sDocumentSubmit.currentTableInteractive;
+                    if(currentTableInteractive != null){
+                        let cellMeta = currentTableInteractive.tableInstance.getSelected();
+                        for(let controlName in dataInput){
+                            if(Array.isArray(dataInput[controlName])){
+                                dataInput[controlName] = dataInput[controlName][cellMeta[0][0]]
+                            }
+                        }
+                    }
                     e.autocompleteFormulasInstance.handleRunAutoCompleteFormulas(dataInput).then(res=>{
                         thisCpn.setDataForControlAutocomplete(res,aliasControl,e.controlTitle, $(e.e.target).val(),"")
                     });
@@ -1317,7 +1335,8 @@ export default {
             .always(() => {
             });
         },
-        handlerSubmitDocumentClick(){
+        handlerSubmitDocumentClick(isContinueSubmit = false){
+            this.isContinueSubmit = isContinueSubmit;
             if($('.validate-icon').length == 0 && $('.error').length == 0){
                 if(this.viewType == 'submit'){
                     this.handleRefreshDataBeforeSubmit();
@@ -1433,6 +1452,7 @@ export default {
             documentApi.submitDocument(dataPost).then(res => {
                 let dataResponSubmit = res.data;
                 dataResponSubmit['document_object_user_created_fullname'] = thisCpn.endUserInfo.id;
+                dataResponSubmit['isContinueSubmit'] = thisCpn.isContinueSubmit;
                 thisCpn.$emit('submit-document-success',dataResponSubmit);
                 thisCpn.isSubmitting = false;
                 if (res.status == 200) {
@@ -1440,8 +1460,13 @@ export default {
                         type: "success",
                         title: "Submit document success!"
                     });        
-                    if(this.$route.name == 'submitDocument')
+                    // nếu submit từ form sub submit thì ko rediect trang
+                    // mà tìm giá trị của control cần được bind lại giá trị từ emit dataResponSubmit
+                    thisCpn.resetDataSubmit()
+                    if(this.$route.name == 'submitDocument' && this.$route.id == this.documentId){
                         thisCpn.$router.push('/documents/'+thisCpn.documentId+"/objects");
+                    }
+                
                 }
                 else{
                     thisCpn.$snotify({
@@ -1994,7 +2019,47 @@ export default {
             }
             return arr;
         },
+        goToListDocument(){
+            this.drawer = false;
+            this.$goToPage('/documents/'+this.documentId+'/objects',"Danh sách bản ghi");
+        },
+        /**
+         * Ham call back từ sub form ra compon submit chính và bind giá trị cho control 
+         */
+        submitSubFormSuccess(data){
+            if(!data.isContinueSubmit){
+                this.drawer = false; 
+            }
+            let controlOpenSubform = this.sDocumentSubmit.controlOpenSubform;
+            let columnBindingSubForm = controlOpenSubform.columnBindingSubForm;
+            let dataBinding = data[columnBindingSubForm];
+            controlOpenSubform.setValue(dataBinding);
+        },
+        resetDataSubmit(){
+            let listInputInDocument = getListInputInDocument(this.keyInstance);
+            for(let controlName in listInputInDocument){
+                if(listInputInDocument[controlName].type=='table'){
+                    listInputInDocument[controlName].setData(listInputInDocument[controlName].defaultValue);
+                    this.updateListInputInDocument(
+                        controlName,
+                        "value",
+                        listInputInDocument[controlName].defaultValue
+                    );
+                }
+                else if(!listControlNotNameProp.includes(listInputInDocument[controlName].type)){
+                    listInputInDocument[controlName].setValue(listInputInDocument[controlName].defaultValue);
+                    this.updateListInputInDocument(
+                        controlName,
+                        "value",
+                        listInputInDocument[controlName].defaultValue
+                    );
+                }
+            }
+            
+        }
     }
+    
+    
 };
 </script>
 <style  scoped>
@@ -2054,7 +2119,31 @@ export default {
     font-size: 20px !important;
 }
 .v-navigation-drawer >>> .wrap-content-submit{
-    height: calc(100% - 25px);
+    height: calc(100%);
+}
+.sub-form-action{
+    float: right;
+    font-size: 13px;
+}
+.subfom-action__item{
+    margin: 0 8px 0 0;
+    padding: 4px 12px;
+    border-radius: 4px;
+    transition: all ease-in-out 250ms;
+    background: var(--symper-background-default);
+
+}
+.subfom-action__item:focus{
+    outline: none;
+}
+.subfom-action__item:hover{
+    background: var(--symper-background-hover);
+}
+.subfom-action__item .mdi{
+    margin-right: 4px;
+}
+.v-navigation-drawer >>> .sym-sub-form-submit  .sym-form-submit{
+    height: calc(100% - 30px) !important;
 }
 </style>
 
