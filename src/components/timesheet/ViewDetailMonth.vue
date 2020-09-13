@@ -59,7 +59,6 @@ import dayjs from 'dayjs';
         };
     },
     created(){
-      //  debugger
         // this.detailTest = this.detail.sort((a,b) => a.start - b.start).slice(0, 3);
         // this.detailTest.sort((a,b) => a.start - b.start)
     },

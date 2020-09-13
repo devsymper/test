@@ -70,7 +70,6 @@ export default class Formulas {
 						data: res.data
 					};
 				} else {
-					debugger
 					let reverseData = await this.reverseDataToFormulas(res.data, beforeStr.trim().toLowerCase());
 
 					formulas = formulas.replace(listSyql[i], reverseData);

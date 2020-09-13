@@ -201,7 +201,6 @@ export default {
         },
         //hiển thị tên của thuộc tính
          getValueSearch() {
-        //debugger
             let newVal = this.value;
            // this.debouncedGetAnswer();
             this.searchItems = [];
@@ -231,12 +230,10 @@ export default {
     
                                      returnObjSearch.description = data.note?data.note:'Chưa điền mô tả';
                                 }else if(data.type=='syql'){
-                    debugger
                                     let name = self.getNameSyql(self.getInfoSyql(data.id));
                         
                     
                                      returnObjSearch.displayName = data.lastContent?data.lastContent:"Không có công thức";
-                                   //  debugger
                                      returnObjSearch.nameSql = name.content;
                                      returnObjSearch.objectType = name.objectType;
                                      // lấy api của tên
@@ -307,7 +304,6 @@ export default {
        },
        // lấy API hiển thì nguồn công thức
          getInfoSyql(syqlId){
-             debugger
            const self = this;
            this.syqlIdInfo = syqlId;
            searchApi.getInfoSyql(syqlId)

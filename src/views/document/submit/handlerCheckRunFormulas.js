@@ -12,7 +12,6 @@ const markBinedField = function (instance, fieldName) {
 	let docStatus = sDocumentSubmit.docStatus;
 	let impactedFieldsList = sDocumentSubmit.impactedFieldsList;
 	let impactedFieldsListWhenStart = sDocumentSubmit.impactedFieldsListWhenStart;
-	// debugger
 	if (docStatus === 'init') {
 		impactedFieldsListWhenStart[fieldName] = true;
 		let check = checkFinishProcessFormulasInit(impactedFieldsListWhenStart);

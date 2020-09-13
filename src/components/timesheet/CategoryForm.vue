@@ -108,7 +108,6 @@ export default {
             this.id = this.update.id
         },
         save(){
-            // debugger
             this.check = true;
             const self = this;
             if(this.name==''){

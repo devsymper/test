@@ -106,7 +106,6 @@ export default {
     },
     methods:{
         refreshListUser(){
-            debugger
             this.$refs.listUser.refreshList();
         },
         openPanel(){
@@ -139,7 +138,6 @@ export default {
             this.$refs.panel.setUser(user);
         },
        deleteUser(user){
-           debugger
            this.$refs.panel.deleteUser(user[0].id);
 
        },

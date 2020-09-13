@@ -109,6 +109,7 @@
                     v-else-if="panelData.type == 'userAssignment'"
                     v-model="panelData.value.formula"
                     @blur="handleLargeFormulaEditorBlur"
+                    ref="edtFormula"
                     :width="'100%'"
                     :height="'370px'"
                 ></formula-editor>
@@ -116,6 +117,7 @@
                     v-else
                     @blur="handleLargeFormulaEditorBlur"
                     v-model="panelData.value"
+                    ref="edtFormula"
                     :width="'100%'"
                     :height="'370px'"
                 ></formula-editor>
@@ -321,6 +323,7 @@ export default {
             this.$emit('append-icon-click');
         },
         handleLargeFormulaEditorBlur(){
+            this.hideDragPanel();
             let name = this.largeFormulaEditor.name;
             let inputInfo = this.allInputs[name];
             this.handleInputBlur(inputInfo, name);
@@ -392,6 +395,7 @@ export default {
         },
         openLargeValueEditor(inputInfo, name) {
             this.$refs.dragPanel.show();
+            this.$refs.edtFormula.onFocus();
             this.largeFormulaEditor.name = name;
             this.$set(this.largeFormulaEditor, "data", inputInfo);
             if(this.getDragPanelContent(inputInfo) == 'orgchart-selector'){

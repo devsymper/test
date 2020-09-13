@@ -659,7 +659,6 @@ export default {
 				if (res.status == 200) {
 					cpn.loading = false;
 					cpn.loader = null;
-					debugger
 					cpn.$emit("refresh-data");
 					this.$snotify({
 					type: "success",

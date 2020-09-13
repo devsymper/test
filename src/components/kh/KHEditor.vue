@@ -93,7 +93,7 @@ export default {
           data.hash = this.hash;
           data.name = this.name;
           data.parentPath = this.parentPath;
-          data.content = this.content;
+          data.content = this.$refs.editor.editor.getContent();
           data.previewImage = this.previewImage;
           console.log(data);
           knowledgeApi

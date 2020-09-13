@@ -493,7 +493,6 @@ export default {
                     bnodeRoot = bnode;
                 }else if(nodeType == "SequenceFlow"){
                     if(!mapSaveNodes[bnode.id]){
-                        // debugger;
                     }
                     di.childShapes.push(mapSaveNodes[bnode.id]); // theo quy tắc 1 của flowable về lưu SequenceFlow
                 }
@@ -503,7 +502,6 @@ export default {
                 for(let pool of bnodeRoot.participants){
                     let poolToSave = mapSaveNodes[pool.id];
                     if(!poolToSave){
-                        // debugger;
                     }
                     di.childShapes.push(poolToSave);
                     poolToSave.properties.process_id = poolToSave.properties.process_id ? poolToSave.properties.process_id : poolToSave.properties.overrideid;
@@ -511,7 +509,6 @@ export default {
                         // thêm các con cho các lane
                         for(let lane of pool.processRef.laneSets[0].lanes){
                             if(!mapSaveNodes[lane.id]){
-                                // debugger;
                             }
                             poolToSave.childShapes.push(mapSaveNodes[lane.id]);
                             this.addChildrenForProcess(mapSaveNodes[lane.id], lane.flowNodeRef, mapSaveNodes);

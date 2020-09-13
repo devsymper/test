@@ -112,7 +112,6 @@ export default {
 						storeData.forEach(function(f){
 							if(e.id == f.id){
 								e.active = true
-								debugger
 							}
 						})
 					}
@@ -120,23 +119,6 @@ export default {
 			}
 			return resData	
 		},
-		// checkActive(obj,type){
-		// 	debugger
-		// 	// if(this.sAppManagement[type].item.includes(obj) === true){
-		// 	// 	return true
-		// 	// }else{
-		// 	// 	return false
-		// 	// }
-		// 	let check = false
-		// 	this.sAppManagement[type].item.forEach(function(e){
-		// 		if(e.id == obj.id){
-		// 			check =  true
-		// 		}else{
-		// 			check = false
-		// 		}
-		// 	})
-		// 	return check
-		// },
 		getListSearch(value){
  			let self = this
 			this.listItems.document_definition.item = []

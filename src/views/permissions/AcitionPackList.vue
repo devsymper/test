@@ -99,7 +99,6 @@ export default {
                     name: "remove",
                     text: this.$t("common.delete"),
                     callback: async (rows, refreshList) => {
-                        debugger
                         let ids = [];
                         for (let item of rows) {
                             ids.push(item.id);
@@ -107,7 +106,6 @@ export default {
                         try {
                             let res = await permissionApi.deleteActionPack(ids);
                             if (res.status == 200) {
-                                debugger
                                 self.$snotifySuccess(
                                     "Deleted " + ids.length + " items"
                                 );
