@@ -55,7 +55,6 @@ export default [{
                 let res = await BPMNEngine.getModelData(param.id);
                 param.processKey = res.data.processKey;
             }
-            debugger
             this.$goToPage('/workflow/process-key/' + param.processKey + '/instances', this.$t('process.instance.listModelInstance') + param.name)
         }
     },

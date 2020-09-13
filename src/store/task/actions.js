@@ -4,7 +4,7 @@ import { SYMPER_APP } from "./../../main.js";
 
 const getArrFileAttachment = async(context, data) => {
     try {
-        let res =await taskApi.getFileByList(data);
+        let res = await taskApi.getFileByList(data);
         if (res.status == 200) {
             if (res.data != null) {
                 context.commit('setArrFileAttach', res.data);
@@ -21,8 +21,25 @@ const getArrFileAttachment = async(context, data) => {
 const removeFileAttachToStore = async(context, id) => {
     context.commit('removeFileAttachToStore', id);
 }
+
+const getArrDocObjId = async(context, data) => {
+    try {
+        let res = await taskApi.getDocumentObjIds({ ids: JSON.stringify(data) });
+        if (res.status == 200) {
+            if (res.data != null) {
+                context.commit('setArrDocObjId', res.data);
+            }
+        } else {
+            context.commit('setArrDocObjId', []);
+        }
+    } catch (error) {
+        context.commit('setArrDocObjId', []);
+        console.log("Can not get list documentObjId!");
+    }
+}
 export {
     getArrFileAttachment,
     removeFileAttachToStore,
-  
+    getArrDocObjId,
+
 };

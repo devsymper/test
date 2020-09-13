@@ -3,6 +3,9 @@
         :hide-no-data="true" no-filter :items="searchItems"
         :menu-props="{ maxHeight:300, maxWidth:330, nudgeBottom:5}"
         :search-input.sync="value" label="Tìm kiếm">
+         <template v-slot:append>
+            <i aria-hidden="true" style = "font-size:20px" class="fs- 13 v-icon notranslate mdi mdi-magnify theme--light"></i>
+        </template>
         <template v-slot:item="{ item, attrs }">
             <template v-if="item.group">
                 <v-list-item style="margin-top:-10px; margin-bottom:-10px">
@@ -45,7 +48,7 @@
                     </v-list-item-content>
                     <!-- sql -->
                         <v-list-item-content v-else style="margin-left:-15px">
-                        <v-list-item-title
+                        <v-list-item-title 
                             class="item-title">Nguồn: {{item.objectType}} - Tên: {{item.nameSql}}
                         </v-list-item-title>
                         <v-list-item-subtitle
@@ -89,6 +92,7 @@ export default {
         return {
             value: '',
             syqlId:{},
+            syqlIdInfo:'',
             menu:[],
             searchItemsAll:[],
             searchItems: [],
@@ -165,17 +169,15 @@ export default {
             this.$store.commit('search/setSearch',  this.searchItems);
             this.$store.commit('search/setSearchAll',  this.searchItemsAll);
             this.$store.commit('search/setShowGeneral', true);
-           // debugger
             this.$store.commit('search/setCountResult', this.searchItems.filter(x=>x.type).length);
             this.$router.push('/search/general');
             };
-            this.menu= this.searchItemsAll;
+            this.menu = this.searchItemsAll;
             this.searchItems =[];
             this.$store.commit('search/setSearch', this.menu );
 
         },
         setMenu(){
-            //debugger
             let menu = [];
             for (let i = 0; i < this.menu.length; i++) {
                 // console.log(this.newSearch[i].group);
@@ -221,19 +223,18 @@ export default {
                                     returnObjSearch.iconName = data.iconName;
                                 }
                                 if(data.type=== 'user'){
-                                    //debugger
                                     returnObjSearch.displayName = data.displayName? data.displayName:"Không có tên";
                                     returnObjSearch.email = data.email;
-                                    //debugger
                                     returnObjSearch.userId = data.id;
                                 }else if(data.type=='document_definition'){
                                      returnObjSearch.displayName = data.title?data.title:"Không có tên";
-                                     debugger
+    
                                      returnObjSearch.description = data.note?data.note:'Chưa điền mô tả';
                                 }else if(data.type=='syql'){
-                                   // debugger
-                                    let name = self.getInfoSyql(data.id);
-                                   // debugger
+                    debugger
+                                    let name = self.getNameSyql(self.getInfoSyql(data.id));
+                        
+                    
                                      returnObjSearch.displayName = data.lastContent?data.lastContent:"Không có công thức";
                                    //  debugger
                                      returnObjSearch.nameSql = name.content;
@@ -252,20 +253,15 @@ export default {
                                         break;
                                     }
                                 }
-                                //debugger
                                 returnObjSearch.searchField = returnObjSearch.searchField!=undefined?(returnObjSearch.searchField.indexOf('{')>-1?'Không có mô tả':returnObjSearch.searchField):undefined;
                                 returnObjSearch.avatar = data.avatar;
                                 returnObjSearch.type = data.type;
                                 returnObjSearch.id = data.id;
                                 returnObjSearch.actions = data.actions;
                                 returnObjSearch.enable = false;
-                                debugger
                                 if(data.type!='document_definition'){
                                       returnObjSearch.description = data.description?data.description:(data.description==null||data.description==''?"Mô tả đang để trống":"Symper");
                                 }
-                              
-                                debugger
-                                //debugger
                                 return returnObjSearch;
                             })
                             const groupByType = _.groupBy(normalizedData, 'type');
@@ -301,18 +297,24 @@ export default {
             this.$store.commit('search/setWordSearch', newVal);  
         }
        },
+       getNameSyql(id){
+          id =  this.syqlIdInfo;
+           let name = this.getInfoSyql(this.syqlIdInfo);
+           if(JSON.stringify(name) === '{}'){
+            // this.getNameSyql(id);
+           }
+           return name;
+       },
        // lấy API hiển thì nguồn công thức
-       getInfoSyql(syqlId){
-
+         getInfoSyql(syqlId){
+             debugger
            const self = this;
-            searchApi.getInfoSyql(syqlId)
+           this.syqlIdInfo = syqlId;
+           searchApi.getInfoSyql(syqlId)
             .then(res => {
                  if (res.status === 200) {
                      self.syqlId.content= res.data[0].context;
                      self.syqlId.objectType = res.data[0].objectType!='workflow'?'Document':'Workflow';
-
-
-                     console.log(self.syqlId);
                  }
             })
             .catch(err => {
@@ -322,8 +324,6 @@ export default {
 
             });
              return this.syqlId;
-    
-
        },
         //hiển thị tên của các menu
         formatGroupName(value){

@@ -131,11 +131,14 @@ export default class BasicControl extends Control {
             this.setValueControl();
         }
         if (sDocument.state.viewType[this.curParentInstance] == 'submit') {
-            this.setDefaultValue();
+            // this.setDefaultValue();
         }
 
 
         this.setEvent();
+        if (this.checkEmptyProps('quickSubmit')) {
+            this.renderSubformButton();
+        }
 
     }
 
@@ -303,6 +306,7 @@ export default class BasicControl extends Control {
         return this.value;
     }
 
+
     setValueControl() {
         let value = this.value
         if (value == null) {
@@ -324,6 +328,18 @@ export default class BasicControl extends Control {
         }
         this.ele.attr('value', value)
     }
+
+    /**
+     * Hàm append thêm button + vào sau input trường hợp control có đánh dấu là có sub form submit
+     */
+    renderSubformButton() {
+        if (this.inTable == false) {
+            this.ele.parent().append('<span class="mdi mdi-plus add-subform-btn"></span>')
+        } else {
+
+        }
+    }
+
     renderFileControl = function() {
         let fileHtml = this.genFileView();
         this.ele.css('width', 'unset').css('cursor', 'pointer').css('height', '25px').css('vertical-align', 'middle').html(fileHtml);

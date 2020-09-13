@@ -13,10 +13,10 @@
                  @cell-value-changed="cellValueChanged"
                  :rowData="rowDataTable"
                  :treeData="true"
-                :animateRows="true"
-                :groupDefaultExpanded="groupDefaultExpanded"
-                :frameworkComponents="frameworkComponents"
-                :modules="modules"
+                 :animateRows="true"
+                 :groupDefaultExpanded="groupDefaultExpanded"
+                 :frameworkComponents="frameworkComponents"
+                 :modules="modules"
                  :getDataPath="getDataPath"
                  >
     </ag-grid-vue>

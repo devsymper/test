@@ -113,7 +113,6 @@ export default {
             let self = this;
             paper.on('element:remove', function(elementView, evt, x, y) {
                 evt.stopPropagation();
-                debugger
                 let allChildIds = self.getAllChildIdOfNode(elementView.model.id);
                 for(let idCell of allChildIds){
                     let cell = self.$refs.jointPaper.graph.getCell(idCell);

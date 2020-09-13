@@ -1,7 +1,7 @@
 <template>
     <v-flex class="d-flex sym-document" style="height:calc(100%);">
         <div class="sym-document__side-bar-left">
-            <sidebar-left :instance="keyInstance"/>
+            <sidebar-left :isConfigPrint="isConfigPrint" :instance="keyInstance"/>
         </div>
             <vue-resizable 
             :active="['r']" 
@@ -32,15 +32,20 @@
             </div>
         </vue-resizable>
         <div  class="sym-document__side-bar-right">
-            <sidebar-right ref="sidebarRight" :instance="keyInstance"/>
+            <sidebar-right ref="sidebarRight" :isConfigPrint="isConfigPrint" :instance="keyInstance"/>
         </div>
-        <s-table-setting  ref="tableSetting" @add-columns-table="addColumnTable"/>
-        <auto-complete-control ref="autocompleteControl" @add-control="insertControl"/>
-        <save-doc-panel :instance="keyInstance" ref="saveDocPanel" 
+        <s-table-setting v-if="!isConfigPrint" ref="tableSetting" @add-columns-table="addColumnTable"/>
+        <PrintTableConfig v-if="isConfigPrint" ref="printTableConfig" @config-column-table-print="configColumnTablePrint"/>
+        <auto-complete-control v-if="!isConfigPrint" ref="autocompleteControl" @add-control="insertControl"/>
+        <save-doc-panel 
+        :isConfigPrint="isConfigPrint"
+        :instance="keyInstance" 
+        ref="saveDocPanel" 
         @check-name-document="checkBeforeDocumentNameChange"
-        @save-doc-action="validateControl"/>
+        @save-doc-action="validateControl"
+        @save-form-print-action="saveFormPrint"/>
         <err-message :listErr="listMessageErr" ref="errMessage"/>
-        <control-name-related :instance="keyInstance" @after-close-panel="afterClosePanel"  ref="controlNameRelated"/>
+        <control-name-related v-if="!isConfigPrint" :instance="keyInstance" @after-close-panel="afterClosePanel"  ref="controlNameRelated"/>
         <all-control-option :instance="keyInstance" ref="allControlOption"/>
         <MaterialIcon :instance="keyInstance" @selected="selectedIcon" :float="true" ref="materialIconPicker"/>
         <SwapTypeControlView 
@@ -68,6 +73,7 @@ import SwapTypeControlView from './items/SwapTypeControlView';
 import SideBarLeft from './sideleft/SideBarLeft.vue';
 import SideBarRight from './sideright/SideBarRight.vue';
 import TableSetting from './items/TableSetting.vue';
+import PrintTableConfig from './print/PrintTableConfig';
 import AutoCompleteControl from './items/AutoCompleteControl.vue';
 import controlCss from  "./../../assets/css/document/control/control.css";
 import SaveDocPanel from "./../../views/document/items/SaveDocPanel.vue";
@@ -118,7 +124,10 @@ export default {
         },
         sDocumentProp(){
             return this.$store.state.document.documentProps[this.keyInstance]
-        }
+        },
+        sDocumentData(){
+            return this.$store.state.document;
+        },
     }, 
     components: {
         'sidebar-left' : SideBarLeft,
@@ -132,7 +141,8 @@ export default {
         "all-control-option":AllControlInDoc,
         "control-name-related":ControlNameRelated,
         SwapTypeControlView,
-        MaterialIcon
+        MaterialIcon,
+        PrintTableConfig
     },
     mounted(){
         let self = this;
@@ -162,7 +172,13 @@ export default {
                                         text: 'Setting table',
                                         disabled : false,
                                         onAction: function(e) {
-                                            self.showSettingControlTable(e);
+                                            if(self.$route.name == 'printConfigDocument'){
+                                                self.showPrintConfigTable(e);
+                                            }
+                                            else{
+                                                self.showSettingControlTable(e);
+                                            }
+                                            
                                         }
                                     });
                                     ed.ui.registry.addMenuItem('dragTable', {
@@ -196,7 +212,7 @@ export default {
                                         self.keyHandler(e)
                                     });
                                     ed.on('paste', function(e) {
-                                        self.showDialogEditor('onPaste','Chuyển sang định dạng v2');
+                                        self.handlePasteContent();
                                     });
                                 },
                                 init_instance_callback : function(editor) {
@@ -207,32 +223,25 @@ export default {
                           
 
     },
-    activated(){
-        
-    },
     created() {
         this.$store.commit("document/setDefaultEditorStore",{instance:this.keyInstance});
+        if(this.$route.name == 'printConfigDocument'){
+            this.isConfigPrint = true;
+            this.printConfigId = this.$route.params.printConfigId;
+        }
+        else{
+            this.isConfigPrint = false;
+            this.getDataFlow();
+        }
         this.documentId = this.$route.params.id;
-        let thisCpn = this;
         /**
          * Nhận sự kiên từ click treeview danh sách các control trong doc thì highlight control và selected control
          */
         this.$evtBus.$on("document-editor-click-treeview-list-control", locale => {
+            if(thisCpn._inactive == true) return;
             let elControl = $("#document-editor-"+thisCpn.keyInstance+"_ifr").contents().find('body #'+locale.id);
             thisCpn.setSelectedControlProp(locale.event,elControl,$('#document-editor-'+this.keyInstance+'_ifr').get(0).contentWindow,true);
         });
-
-        biApi.getAllDataFlow().then(res=>{
-            console.log(res);
-            if(res.status == 200 && res.data.length>0){
-                for (let index = 0; index < res.data.length; index++) {
-                    let dataflow = res.data[index];
-                    thisCpn.listDataFlow.push({id:dataflow.id,name:dataflow.name,title:"",params:dataflow.params})
-                }
-                thisCpn.$store.commit("document/addToDocumentEditorStore",{key:"listDataFlow",value:thisCpn.listDataFlow,instance:thisCpn.keyInstance});  
-            }
-        })
-        
     },
     data(){
         return{
@@ -240,6 +249,7 @@ export default {
             isAutocompleteControl:false,
             listMessageErr:[],
             documentId:0,
+            printConfigId:0,
             documentProps:{},
             delta : 500,
             lastKeypressTime : 0,
@@ -249,18 +259,16 @@ export default {
             dialog: false,
             dataControlSwapType:{},
             listDataFlow:[],
-            isComponentActive:false,
             currentTabSelectedIcon:null,
             titleDialog:"",
-            currentPageActive:null
+            currentPageActive:null,
+            isConfigPrint:false,
+            listDocument:[]
         }
     },
-    activated() {
-        this.isComponentActive = true;
-    },
+    
     deactivated() {
         $('.tox-pop').css({display:'none'})
-        this.isComponentActive = false;
     },
     beforeMount(){
         this.listIconToolbar = [
@@ -298,9 +306,29 @@ export default {
             else if(to.name == 'createDocument'){
                 this.documentId = 0;
             }            
+        },
+        'sDocumentData.listAllDocument':function(data){
+            for(let docName in data){
+                this.listDocument.push({name:docName,id:data[docName].id,title:data[docName].title});
+            }
         }
     },
     methods:{
+        /**
+         * Hàm lấy tất cả thông tin của workflow phục vụ cho việc chọn dataflow trong control dataflow
+         */
+        getDataFlow(){
+            let thisCpn = this;
+            biApi.getAllDataFlow().then(res=>{
+                if(res.status == 200 && res.data.length>0){
+                    for (let index = 0; index < res.data.length; index++) {
+                        let dataflow = res.data[index];
+                        thisCpn.listDataFlow.push({id:dataflow.id,name:dataflow.name,title:"",params:dataflow.params})
+                    }
+                    thisCpn.$store.commit("document/addToDocumentEditorStore",{key:"listDataFlow",value:thisCpn.listDataFlow,instance:thisCpn.keyInstance});  
+                }
+            })
+        },
         
         showDialogEditor(type,title){
             this.dialog = true;
@@ -309,15 +337,11 @@ export default {
         },
         acceptDialog(){
             this.dialog = false;
-            if(this.typeDialog == 'onPaste'){
-                this.handlePasteContent();
-            }
-            else if(this.typeDialog == 'deletePage'){
+            if(this.typeDialog == 'deletePage'){
                 this.handleClickDeletePageInControlTab(this.currentPageActive)
             }
         },
         handlePasteContent(){
-            
             this.setContentForDocumentV1();
         },
         px2cm(px) {
@@ -543,75 +567,61 @@ export default {
         },
         // mở modal lưu , edit doc
         openPanelSaveDocument(){
-            if($('#document-editor-'+this.keyInstance+'_ifr').contents().find('.s-control').length > 0){
-                let allControl = this.editorStore.allControl;
-                let controlPrimaryKey = this.validateControlBeforeSave(allControl,'0');
-                if(Object.keys(controlPrimaryKey).length > 1){
-                    let allKey = Object.keys(controlPrimaryKey);
-                    this.$snotify({
-                                    type: "error",
-                                    title: "Kiểm tra lại các trường định danh",
-                                    text : "Không được có "+allKey.length+" trường định danh trong 1 doc. Kiểm tra control: "+allKey.join(',')
-                                });
-                }
-                else{
-                    let controlError = $('#document-editor-'+this.keyInstance+'_ifr').contents().find('.s-control-error');
-                    if(controlError.length == 0){
-                        if(this.documentId == undefined || this.documentId == 0)
-                        this.setDocumentProperties({})
-                        this.$refs.saveDocPanel.showDialog()
-                    }
-                    else{
-                        let listName = [];
-                        let thisCpn = this;
-                        $.each(controlError,function(key,value){
-                            let id = $(value).attr('id');
-                            let elements = $('#document-editor-'+thisCpn.keyInstance+'_ifr').contents().find('#'+id);
-                            let tableId = checkInTable(elements);
-                            if( tableId == id){
-                                tableId = '0';
-                            }
-                            let name = ""
-                            if(tableId == "0"){
-                                name = allControl[id].properties.name.value;
-                            }
-                            else{
-                                name = allControl[tableId].listFields[id].properties.name.value;
-                            }
-
-                            
-                            listName.push(name);
-                        })
+            if(this.isConfigPrint){
+                this.$refs.saveDocPanel.showDialog()
+            }
+            else{
+                if($('#document-editor-'+this.keyInstance+'_ifr').contents().find('.s-control').length > 0){
+                    let allControl = this.editorStore.allControl;
+                    let controlPrimaryKey = this.validateControlBeforeSave(allControl,'0');
+                    if(Object.keys(controlPrimaryKey).length > 1){
+                        let allKey = Object.keys(controlPrimaryKey);
                         this.$snotify({
                                         type: "error",
-                                        title: "Tên một số control chưa hợp lệ",
-                                        text: "Có "+listName.length+" control đặt tên hoặc tiêu đề không hợp lệ \n. Kiểm tra control: "+listName.join(',')
+                                        title: "Kiểm tra lại các trường định danh",
+                                        text : "Không được có "+allKey.length+" trường định danh trong 1 doc. Kiểm tra control: "+allKey.join(',')
                                     });
+                    }
+                    else{
+                        let controlError = $('#document-editor-'+this.keyInstance+'_ifr').contents().find('.s-control-error');
+                        if(controlError.length == 0){
+                            if(this.documentId == undefined || this.documentId == 0)
+                            this.setDocumentProperties({})
+                            this.$refs.saveDocPanel.showDialog()
+                        }
+                        else{
+                            let listName = [];
+                            let thisCpn = this;
+                            $.each(controlError,function(key,value){
+                                let id = $(value).attr('id');
+                                let elements = $('#document-editor-'+thisCpn.keyInstance+'_ifr').contents().find('#'+id);
+                                let tableId = checkInTable(elements);
+                                if( tableId == id){
+                                    tableId = '0';
+                                }
+                                let name = ""
+                                if(tableId == "0"){
+                                    name = allControl[id].properties.name.value;
+                                }
+                                else{
+                                    name = allControl[tableId].listFields[id].properties.name.value;
+                                }
+
+                                
+                                listName.push(name);
+                            })
+                            this.$snotify({
+                                            type: "error",
+                                            title: "Tên một số control chưa hợp lệ",
+                                            text: "Có "+listName.length+" control đặt tên hoặc tiêu đề không hợp lệ \n. Kiểm tra control: "+listName.join(',')
+                                        });
+                        }
                     }
                 }
             }
+            
         },
-        // checkTitleControl(){
-        //     let rs = true;
-        //     let allControl = util.cloneDeep(this.editorStore.allControl);
-        //     for(let controlId in allControl){
-        //         if(allControl[controlId].properties.hasOwnProperty('title')){
-        //             let title = allControl[controlId].properties.title.value;
-        //             if(title == ""){
-        //                 rs = false;
-        //                 $("#document-editor-"+this.keyInstance+"_ifr").contents().find('#'+controlId).addClass('s-control-error');
-        //                 let errValue = "Không được bỏ trống tiêu đề"
-        //                 let tableId = checkInTable($("#document-editor-"+this.keyInstance+"_ifr").contents().find('#'+controlId))
-        //                 if( tableId == controlId)
-        //                 tableId = '0';
-        //                 this.$store.commit(
-        //                     "document/updateProp",{id:controlId,name:'title',value:errValue,tableId:tableId,type:"errorMessage",instance:this.keyInstance}
-        //                 ); 
-        //             }
-        //         }
-        //     }
-        //     return rs;
-        // },
+        
         validateControlBeforeSave(allControl,tableId){
             let controlPrimaryKey = {};
             for(let controlId in allControl){
@@ -1363,42 +1373,42 @@ export default {
             })
         },
         // hàm gọi request lấy thông tin của document khi vào edit doc
-        getContentDocument(){
-            let thisCpn = this;
+        async getContentDocument(){
             if(this.documentId != 0){
-                documentApi.detailDocument(this.documentId).then(res => {
-                    if (res.status == 200) {
-                        if(this.$route.name == "editDocument"){
-                            thisCpn.setDocumentProperties(res.data.document);
-                        }
-                        let content = res.data.document.content;
-                        thisCpn.editorCore.setContent(content);
-                        $("#document-editor-"+thisCpn.keyInstance+"_ifr").contents().find('body select').each(function(e){
-                            let id = $(this).attr('id')
-                            $(this).replaceWith('<input class="s-control s-control-select" s-control-type="select" type="text" title="Select" readonly="readonly" id="' + id + '">');
-                        })
-                        $("#document-editor-"+thisCpn.keyInstance+"_ifr").contents().find('body .s-control-select').each(function(e){
-                            let id = $(this).attr('id')
-                            let parentNode = $(this).closest('td');
-                            let input = '<input class="s-control h s-control-select" s-control-type="select" type="text" title="Select" contenteditable="false" id="' + id + '">&#65279;';
-                            parentNode.empty();
-                            parentNode.append(input)
-                        })
-                        if(res.data.document.version == 1){
-                            thisCpn.setContentForDocumentV1();
-                        }
-                        else{
-                            let fields = res.data.fields;
-                            thisCpn.setDataForPropsControl(fields);
-                        }
-                        thisCpn.wrapTableElement();
+                let res = await documentApi.detailDocument(this.documentId)
+                if (res.status == 200) {
+                    if(this.$route.name == "editDocument"){
+                        this.setDocumentProperties(res.data.document);
                     }
-                })
-                .catch(err => {
-                    console.log("error from detail document api!!!", err);
-                })
-                .always(() => {
-                });
+                    let content = res.data.document.content;
+                    if(this.printConfigId != 0 && this.printConfigId != undefined && this.printConfigId != null){
+                        let res1 = await documentApi.getDetailPrintConfig(this.documentId,this.printConfigId);
+                        content = res1.data.content;
+                        this.setDocumentProperties({title:res1.data.title});
+                    }
+                    
+                    this.editorCore.setContent(content);
+                    $("#document-editor-"+this.keyInstance+"_ifr").contents().find('body select').each(function(e){
+                        let id = $(this).attr('id')
+                        $(this).replaceWith('<input class="s-control s-control-select" s-control-type="select" type="text" title="Select" readonly="readonly" id="' + id + '">');
+                    })
+                    $("#document-editor-"+this.keyInstance+"_ifr").contents().find('body .s-control-select').each(function(e){
+                        let id = $(this).attr('id')
+                        let parentNode = $(this).closest('td');
+                        let input = '<input class="s-control h s-control-select" s-control-type="select" type="text" title="Select" contenteditable="false" id="' + id + '">&#65279;';
+                        parentNode.empty();
+                        parentNode.append(input)
+                    })
+                    if(res.data.document.version == 1){
+                        this.setContentForDocumentV1();
+                    }
+                    else{
+                        let fields = res.data.fields;
+                        this.setDataForPropsControl(fields);
+                    }
+                    this.wrapTableElement();
+                }
+                
             }
         },
         // wrap div cho table truong hợp trước đây chưa có scroll
@@ -1432,7 +1442,8 @@ export default {
                                                 ) ? false : true
                     }
                     else{
-                        properties[k].value = fields[controlId]['properties'][k]
+                        if(typeof fields[controlId]['properties'][k] != "object")
+                        properties[k].value = fields[controlId]['properties'][k];
                     }
                     if(k =='name'){
                         properties[k].oldName =  properties[k].value
@@ -1464,6 +1475,7 @@ export default {
                                 childProperties[k].value = (listField[childFieldId]['properties'][k] == 0 || listField[childFieldId]['properties'][k] == '0' || listField[childFieldId]['properties'][k] == '') ? false : true
                             }
                             else{
+                                if(typeof listField[childFieldId]['properties'][k] != "object")
                                 childProperties[k].value = listField[childFieldId]['properties'][k]
                             }
                             if(k =='name'){
@@ -1957,7 +1969,9 @@ export default {
                     if(typeControl == 'dataFlow'){
                         control.properties.dataFlowId.options = thisCpn.listDataFlow;
                     }
-
+                    if(control.properties.hasOwnProperty('quickSubmit')){
+                        control.properties.quickSubmit.options = thisCpn.listDocument;
+                    }
                     var inputid = 's-control-id-' + Date.now();
                     checkDiv.attr('id', inputid);
                     insertionPoint.after(checkDiv);
@@ -2032,7 +2046,107 @@ export default {
             else{
                 this.selectControl(control.properties, control.formulas,controlId,'tabPage');
             }
-        }
+        },
+
+
+
+
+        // ************************* Các hàm xử lí liên quan đến cấu hình in *******************************//
+        // hàm xử lí thêm các cột vào trong control table khi lưu ở tablesetting
+        configColumnTablePrint(listRowData){
+            let elements = $('#document-editor-'+this.keyInstance+'_ifr').contents().find('.s-control-table.on-selected');
+            let thead = elements.find('thead th');
+            for (let index = 0; index < thead.length; index++) {
+                let th = thead[index];
+                $(th).css({width:listRowData[index].colWidth})
+                $(th).attr('data-mce-style',$(th).attr('style'))
+                
+            }
+        },
+
+        //hoangnd: hàm mở modal tablesetting của control table
+        showPrintConfigTable(e) {
+            let elements = $('#document-editor-'+this.keyInstance+'_ifr').contents().find('.on-selected').closest('.s-control-table');
+            if(elements.is('.s-control-table')){
+                let thead = elements.find('thead tr th');
+                let tbody = elements.find('tbody tr td');
+                let table = (elements.hasClass('s-control-table')) ? elements : elements.parent();
+                let tableId = table.attr('id');
+                let listData = [];
+                if($(tbody[0].innerHTML).length > 0){
+                    for(let i = 0; i< thead.length; i++){
+                        var width = Math.ceil(( 100 * parseFloat($(thead[i]).css('width')) / parseFloat($(thead[i]).parent().css('width')) ) )+ '%';
+                        let row = {title: $(thead[i]).text(),colWidth:width}
+                        listData.push(row)
+                    }
+                }
+                this.$refs.printTableConfig.showDialog();
+                this.$refs.printTableConfig.setListRow(listData);
+            }
+        },
+        // mở modal lưu , edit doc
+        saveFormPrint(docProps){
+            if(this.printConfigId != 0 && this.printConfigId != undefined && this.printConfigId != null){
+                let dataPost = {documentId:this.documentId,title:docProps.title.value,content:this.editorCore.getContent(),printConfigId:this.printConfigId}
+                let thisCpn = this;
+                documentApi.updatePrintConfig(dataPost).then(res => {
+                    if (res.status == 200) {
+                        thisCpn.editorCore.remove();
+                        thisCpn.$router.push('/documents');
+                        thisCpn.$snotify({
+                            type: "success",
+                            title: "update form success!"
+                        });
+                    }
+                    else{
+                        thisCpn.$snotify({
+                            type: "error",
+                            title: res.message,
+                            text:res.lastErrorMessage
+                        });
+                    }
+                })
+                .catch(err => {
+                    thisCpn.$snotify({
+                            type: "error",
+                            title: "can not save form print document",
+                        });
+                })
+                .always(() => {
+                });
+            }
+            else{
+                let dataPost = {documentId:this.documentId,title:docProps.title.value,content:this.editorCore.getContent()}
+                let thisCpn = this;
+                documentApi.savePrintConfig(dataPost).then(res => {
+                    if (res.status == 200) {
+                        thisCpn.editorCore.remove();
+                        thisCpn.$router.push('/documents');
+                        thisCpn.$snotify({
+                            type: "success",
+                            title: "Save form success!"
+                        });
+                    }
+                    else{
+                        thisCpn.$snotify({
+                            type: "error",
+                            title: res.message,
+                            text:res.lastErrorMessage
+                        });
+                    }
+                })
+                .catch(err => {
+                    thisCpn.$snotify({
+                            type: "error",
+                            title: "can not save form print document",
+                        });
+                })
+                .always(() => {
+                });
+            }
+            
+        },
+
     },
 }
 </script>

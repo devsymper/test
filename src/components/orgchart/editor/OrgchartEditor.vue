@@ -64,7 +64,7 @@
                     'w-100': true,
                     'symper-orgchart-view': action == 'view',
                     'symper-orgchart-active-editor': action != 'view'
-                }" 
+                }"
                 style="height: calc(100% - 41px)"
                 @new-viz-cell-added="handleNewNodeAdded"
                 @blank-paper-clicked="handleBlankPaperClicked"
@@ -227,24 +227,6 @@ export default {
 		getAllNode(){
 			return  this.$refs.editorWorkspace.getAllNode()
 		},
-		getFirstNode(data,allNode){
-			let res 
-			if(data.length == 0){
-				res =  allNode
-			}else{
-				// let arrNodeId = []
-				// allNode.forEach(function(e){
-				// 	arrNodeId.push(e.id);
-				// 	data.forEach(function(k){
-				// 		if(arrNodeId.includes(k.attributes.target.id) == false){
-				// 			res = k
-				// 		}
-				// 	})
-				// })
-				res = allNode[0]
-			}
-			return res
-		},
 		addNode(){
 			this.checkPageEmpty= false
 			this.$refs.editorWorkspace.createFirstVizNode()
@@ -300,11 +282,9 @@ export default {
 				if(this.$store.state.orgchart.firstChildNodeId == this.$store.state.orgchart.currentChildrenNodeId){
 					this.$store.commit('orgchart/updateUserFatherNode',listUserIds)
 					this.$emit('update-father-node',listUserIds)
-					// this.$refs.editorWorkspace.changeUserDisplayInNode(listUserIds);
 				}
 			}
 		},
-	
         // Kiểm tra xem department hiện tại đã có node Manager hay chưa
         changeManagerForDepartment(departmentVizId, userIds){
 			this.checkAndCreateOrgchartData();
@@ -346,6 +326,7 @@ export default {
             try {
                 let res = await orgchartApi.getOrgchartDetail(id);
                 if(res.status == 200){
+                    this.$refs.editorWorkspace.createFirstVizNode()
                     let savedData = res.data;
                     let departments = this.correctDiagramDisplay(savedData.orgchart.content);
                     this.$refs.editorWorkspace.loadDiagramFromJson(departments);
@@ -400,6 +381,8 @@ export default {
                     this.showOrgchartConfig();
                     setTimeout((self) => {
                         self.loadingDiagramView = false;
+                    //  this.$refs.editorWorkspace.createFirstVizNode()
+
                     }, 1500, this);
                 }else{
                     this.$snotifyError(res, "Can not get orgchart data",res.message);
@@ -466,6 +449,10 @@ export default {
                         self.$refs.positionDiagram.loadDiagramFromJson(self.selectingNode.positionDiagramCells.cells);
 						let allNodes = self.$refs.positionDiagram.getAllNode()
 						let firstNode = allNodes[0]
+						this.$store.commit('orgchart/changeSelectingNode', {
+							instanceKey: self.selectingNode.positionDiagramCells.instanceKey,
+							nodeId: firstNode.id,
+						});
 						self.$refs.positionDiagram.$refs.editorWorkspace.changeUserDisplayInNode(this.listUserIds);
 						self.$store.commit('orgchart/updateFirstChildNodeId', firstNode.id)
                         self.$store.commit('orgchart/updateCurrentChildrenNodeId',firstNode.id)
@@ -899,12 +886,7 @@ export default {
                 instanceKey: this.instanceKey,
                 nodeId: nodeId,
             });
-            // debugger
-            // let dataLink = this.$refs.positionDiagram.getAllLink()
-            // let allNodes = this.$refs.positionDiagram.getAllNode()
-            // let firstNode = this.getFirstNode(dataLink,allNodes)
-            // this.$store.commit('orgchart/updateFirstChildNodeId',firstNode[0].id)
-            // this.$store.commit('orgchart/updateCurrentChildrenNodeId',firstNode[0].id)
+         
             this.$refs.editorWorkspace.highlightNode(); 
             if(this.context == 'position'){
                 this.showPermissionsOfNode();

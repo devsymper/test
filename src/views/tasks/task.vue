@@ -1,5 +1,5 @@
 <template>
-    <div class="h-100 w-100 d-flex justify-center ml-5 task-style"> 
+    <div class="h-100 w-100 d-flex justify-center task-style"> 
         <DocumentSubmit 
             v-if="showDoTaskComponent && (action == 'submit' || action=='update')"
             ref="submitComponent"
@@ -92,7 +92,7 @@ export default {
                 this.filter=filter;
                 if (filter!='done') {
                     if(this.taskInfo.action){
-                        if(this.taskInfo.action.parameter.documentId==0){
+                        if(!this.taskInfo.action.parameter.documentObjectId && this.taskInfo.action.parameter.documentObjectId==0 ){
                             this.filter='done-noneObj';
                         }else{
                             let action = this.taskInfo.action.action;
@@ -108,7 +108,6 @@ export default {
                             }
                             this.workflowVariable = null;
                             this.workflowVariable = workflowVariable;
-                        
                             if(action == 'submit'){
                                 this.docId = Number(this.taskInfo.action.parameter.documentId);
                                 this.documentObjectId = 0;
@@ -171,6 +170,9 @@ export default {
 </script>
 
 <style scoped>
+.task-style{
+    overflow: hidden!important;
+}
 .task-style >>> .wrap-content-submit{
     width:96%!important;
 }

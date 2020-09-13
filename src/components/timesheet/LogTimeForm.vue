@@ -293,7 +293,6 @@ export default {
             }
         },
         // displayDate() {
-        //   debugger
         //     if(this.eventLog.startTime!=undefined){this.getEventLog();};
            
         // }

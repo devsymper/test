@@ -465,18 +465,24 @@ button:hover {
     margin-top: 16px;
 }
 
-.table-print td,
-.table-print th {
+.table-print td {
     border: 1px solid #ddd;
     padding: 8px;
 }
 
 .table-print th {
-    padding-top: 8px;
-    padding-bottom: 8px;
+    padding: 2px;
     text-align: left;
+    border: 1px solid #ddd;
 }
 
 .content-print-document .s-control {
     border: none !important;
+}
+
+.sym-form-submit .add-subform-btn {
+    position: absolute;
+    right: 4px;
+    top: 5px;
+    cursor: pointer;
 }

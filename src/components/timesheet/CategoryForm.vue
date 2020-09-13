@@ -61,7 +61,6 @@ export default {
             }
         },
         update(){
-            debugger
             if(JSON.stringify(this.update) != '{}'){
                 this.checkUpdate = true;
             }
@@ -76,7 +75,6 @@ export default {
     },
     methods: {
         cancel(){
-            // debugger
             this.name="";
             this.key="";
             this.nameError ="";
@@ -88,7 +86,6 @@ export default {
                  this.nameError = this.$t('timesheet.required_value'); 
              }
             else{
-                debugger
             timesheetApi.updateCategory({
                     taskName: this.name,
                     key: this.key,
@@ -96,8 +93,7 @@ export default {
                 })
                 .then(res => {
                     if (res.status === 200) {
-                        alert('Cập nhậ thành công');
-                        debugger
+                        alert('Cập nhật thành công');
                         self.$emit('updateList')
                     }
                 })

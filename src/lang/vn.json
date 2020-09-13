@@ -77,7 +77,8 @@
         "fullName": "Tên đầy đủ",
         "email": "Email",
         "pageSize": "Số bản ghi mỗi trang",
-        "pendding": "Cần làm"
+        "pendding": "Cần làm",
+        "print": "In"
     },
     "login": {
         "title": "Đăng nhập hệ thống",
@@ -210,7 +211,8 @@
             "updateAt": "Thời gian cập nhật",
             "contextMenu": {
                 "passwordSetting": "Tùy chọn mật khẩu",
-                "edit": "Sửa"
+                "edit": "Sửa",
+                "delete": "Xóa"
             }
         }
     },
@@ -598,7 +600,10 @@
         },
         "updated": "Đã cập nhật application",
         "added": "Đã thêm mới application",
-        "deleted": "Đã xóa application"
+        "deleted": "Đã xóa application",
+        "emptyApp": " Danh sách ứng dụng trống",
+        "emptyFavorite": " Danh sách yêu thích trống"
+
     },
     "kh": {
         "folder": " Thư mục ",
@@ -867,11 +872,14 @@
             "canNotCreateTask": "Không thể khởi tạo công việc"
         },
         "header": {
+            "type":"Loại",
+            "approval":"Phê duyệt",
+            "submit":"Gửi văn bản",
             "date": "Ngày tạo",
             "dueDate": "Ngày đến hạn",
             "createDate": "Ngày khởi tạo",
             "description": "Mô tả",
-            "owner": "Người tạo",
+            "owner": "Người sở hữu",
             "name": "Tên công việc",
             "assignee": "Người được giao",
             "watcher": "Người theo dõi",
@@ -897,14 +905,14 @@
         "relatedPeople": {
             "title": "Những người liên quan"
         },
-        "table":{
-            "fileName":"Tên tệp",
-            "type":"Kiểu",
-            "owner":"Người upload",
-            "size":"Kích thước",
-            "date":"Ngày upload"
+        "table": {
+            "fileName": "Tên tệp",
+            "type": "Kiểu",
+            "owner": "Người upload",
+            "size": "Kích thước",
+            "date": "Ngày upload"
         }
-        
+
     },
     "orgchart": {
         "list": {
@@ -948,12 +956,12 @@
             "title": "Không thể tạo thêm tab mới",
             "detail": "Số lượng tab vượt quá giới hạn, hãy xóa một vài tab"
         }
-	},
-	"comment":{
-		"comment": "Bình luận",
-		"resolve": "Đã giải quyết",
-		"reply": "Trả lời",
-		"edited": "Đã chỉnh sửa",
-		"search": "Tìm kiếm"
-	}
+    },
+    "comment": {
+        "comment": "Bình luận",
+        "resolve": "Đã giải quyết",
+        "reply": "Trả lời",
+        "edited": "Đã chỉnh sửa",
+        "search": "Tìm kiếm"
+    }
 }
