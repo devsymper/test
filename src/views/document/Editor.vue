@@ -2079,8 +2079,10 @@ export default {
                 let listData = [];
                 if($(tbody[0].innerHTML).length > 0){
                     for(let i = 0; i< thead.length; i++){
-                        var width = Math.ceil(( 100 * parseFloat($(thead[i]).css('width')) / parseFloat($(thead[i]).parent().css('width')) ) )+ '%';
-                        let row = {title: $(thead[i]).text(),colWidth:width}
+                        let style = $(thead[i]).attr('style');
+                        console.log("sadsadasdasda",style);
+                        let width = style.match(/(?<=width:\s)\s*([^;"]*)(?=\;)/gmi);
+                        let row = {title: $(thead[i]).text(),colWidth:width[0]}
                         listData.push(row)
                     }
                 }

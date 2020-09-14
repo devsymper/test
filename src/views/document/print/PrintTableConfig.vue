@@ -11,30 +11,25 @@
             <v-card-title class="headline">Cấu hình in</v-card-title>
             <v-divider></v-divider>
             <v-card-text>
-                <div id="setting-control-table" class="setting-control-table">
-                    <div class="content-setting-control-table scroll-thin">
-                        <v-simple-table fixed-header height="100%" >
-                            <template v-slot:default>
-                                <thead>
-                                    <tr>
-                                        <th class="text-left">Thông tin cột</th>
-                                        <th class="text-center">Chiều rộng</th>
-                                        <th></th>
-                                    </tr>
-                                </thead>
-                                <tbody id="tableDrag">
-                                    <tr v-for="(row,i) in listRows" :key="i">
-                                        <td>{{row.title}}</td>
-                                        <td class="text-center"><input 
-                                            v-model="row.colWidth"
-                                            type="text" placeholder="Chiều rộng"></td>
-                                    </tr>
-                                </tbody>
-                            </template>
-                        </v-simple-table>
-                        
-                    </div>
-                </div>
+                <v-simple-table fixed-header height="100%" >
+                    <template v-slot:default>
+                        <thead>
+                            <tr>
+                                <th class="text-left">Thông tin cột</th>
+                                <th class="text-center">Chiều rộng</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableDrag">
+                            <tr v-for="(row,i) in listRows" :key="i">
+                                <td>{{row.title}}</td>
+                                <td class="text-center"><input 
+                                    v-model="row.colWidth"
+                                    type="text" placeholder="Chiều rộng"></td>
+                            </tr>
+                        </tbody>
+                    </template>
+                </v-simple-table>
             </v-card-text>
                 <v-divider></v-divider>
 
@@ -96,6 +91,3 @@ export default {
   
 }
 </script>
-<style  scoped>
-    
-</style>

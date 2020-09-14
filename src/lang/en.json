@@ -295,6 +295,7 @@
             "type": "Type",
             "menu": "menu",
             "countobject": "Count object",
+            "countPrint": "Count print",
             "workflow": "Workflow",
             "createAt": "Create at",
             "updateAt": "Update at",

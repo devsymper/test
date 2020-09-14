@@ -63,7 +63,7 @@ const defaultState = {
             submitFormulas: null,
             listUser: null,
             localRelated: {},
-            workflowVariable: {},
+            workflowVariable: {}, // các tham số của workflow khi submit doc
             currentControlEditByUser: null,
             autocompleteData: { // lưu lại các giá trị của autocomplete khi đã gõ
                 controlName: {
@@ -75,9 +75,10 @@ const defaultState = {
                     }
                 }
             },
-            orgchartTableSqlName: {},
+            orgchartTableSqlName: {}, // biến lưu lại tên các bảng sqlite được tạo ra sau khi chạy công thức orgchart  
             tableLoaded: {},
-            readyLoaded: false
+            readyLoaded: false, // biến đánh dấu công thức đã chạy xong mỗi lần thực thi hay chưa
+            listTableRootControl: [], // biến lưu lại các controk được coi là root trong trong table (trường hợp công thức ko có đầu vào thì là root)
         }
     },
     detail: {

@@ -252,7 +252,8 @@ const setDefaultSubmitStore = (state, params) => {
         },
         orgchartTableSqlName: {},
         tableLoaded: {},
-        readyLoaded: false
+        readyLoaded: false,
+        listTableRootControl: []
     }
     let instance = params.instance;
     Vue.set(state.submit, instance, value);

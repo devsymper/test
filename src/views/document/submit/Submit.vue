@@ -1462,8 +1462,8 @@ export default {
                     });        
                     // nếu submit từ form sub submit thì ko rediect trang
                     // mà tìm giá trị của control cần được bind lại giá trị từ emit dataResponSubmit
-                    thisCpn.resetDataSubmit()
-                    if(this.$route.name == 'submitDocument' && this.$route.id == this.documentId){
+                    thisCpn.resetDataSubmit();
+                    if(this.$route.name == 'submitDocument' && this.$route.params.id == this.documentId){
                         thisCpn.$router.push('/documents/'+thisCpn.documentId+"/objects");
                     }
                 
@@ -1929,18 +1929,16 @@ export default {
          */
         findRootControl(){ 
             let listInput1 = getListInputInDocument(this.keyInstance);
-			let impactedFieldsListWhenStart = {}
-			if(this.preDataSubmit != null && Object.keys(this.preDataSubmit).length > 0 && false){
+            let impactedFieldsListWhenStart = {}
+            let listTableRootControl = [];
+            let listRootControl = [];
+			if(this.preDataSubmit != null && Object.keys(this.preDataSubmit).length > 0){
 				impactedFieldsList = this.preDataSubmit.impactedFieldsList;
 				impactedFieldsListWhenStart = this.preDataSubmit.impactedFieldsListWhenStart;
-				this.$store.commit("document/addToDocumentSubmitStore", {
-												key: 'impactedFieldsListWhenStart',
-												value: impactedFieldsListWhenStart,
-												instance: this.keyInstance
-											});
-				let rootControl = this.preDataSubmit.rootControl;
-				for (let index = 0; index < rootControl.length; index++) {
-					const controlName = rootControl[index];
+				listRootControl = this.preDataSubmit.rootControl;
+				listTableRootControl = this.preDataSubmit.tableRootControl;
+				for (let index = 0; index < listRootControl.length; index++) {
+					const controlName = listRootControl[index];
 					let controlInstance = getControlInstanceFromStore(this.keyInstance,controlName);
 					let controlFormulas = controlInstance.controlFormulas;
 					for(let formulasType in controlFormulas){
@@ -1953,10 +1951,9 @@ export default {
 			}
 			else{
 				let listInput = getListInputInDocument(this.keyInstance);
-				let listRootControl = [];
 				for(let controlName in listInput){
 					this.setAllImpactedFieldsList(controlName);
-					let controlInstance = listInput[controlName];
+                    let controlInstance = listInput[controlName];
 					if(controlInstance.type != "inputFilter"){
 						if(Object.keys(controlInstance.controlFormulas).length > 0){
 							let controlFormulas = controlInstance.controlFormulas;
@@ -1966,12 +1963,10 @@ export default {
 										let formulasInstance = controlFormulas[formulasType].instance;
 										if(formulasInstance.getFormulas() !== "" && Object.keys(formulasInstance.getInputControl()).length == 0){
 											impactedFieldsListWhenStart[controlName] = false;
-											this.$store.commit("document/addToDocumentSubmitStore", {
-												key: 'impactedFieldsListWhenStart',
-												value: impactedFieldsListWhenStart,
-												instance: this.keyInstance
-											});
                                             listRootControl.push(controlName);
+                                            if(controlInstance.inTable != false){
+                                                listTableRootControl.push(controlName);
+                                            }
 											this.handlerBeforeRunFormulasValue(formulasInstance,controlInstance.id,controlName,formulasType,'root')
 										}
 									}
@@ -1981,20 +1976,29 @@ export default {
 						}
                     }
                 }
+                // lưu lại các mối quan hệ cho lần submit sau ko phải thực hiện các bước tìm quan hê này (các root control , các luồng chạy công thức)
+                let dataPost = {impactedFieldsList:impactedFieldsList,impactedFieldsListWhenStart:impactedFieldsListWhenStart,rootControl:listRootControl,tableRootControl:listTableRootControl};
+                documentApi.updatePreDataForDoc({documentId:this.documentId,prepareData:JSON.stringify(dataPost)})
+            }
+            if(listRootControl.length == 0){
                 this.hidePreloader();
-                if(listRootControl.length == 0){
-                    this.hidePreloader();
-                }
-			// lưu lại các mối quan hệ cho lần submit sau ko phải thực hiện các bước tìm quan hê này (các root control , các luồng chạy công thức)
-				let dataPost = {impactedFieldsList:impactedFieldsList,impactedFieldsListWhenStart:impactedFieldsListWhenStart,rootControl:listRootControl};
-				documentApi.updatePreDataForDoc({documentId:this.documentId,prepareData:JSON.stringify(dataPost)})
-			}
+            }
 			
             this.$store.commit("document/addToDocumentSubmitStore", {
                 key: 'impactedFieldsList',
                 value: impactedFieldsList,
                 instance: this.keyInstance
-			});
+            });
+            this.$store.commit("document/addToDocumentSubmitStore", {
+												key: 'impactedFieldsListWhenStart',
+												value: impactedFieldsListWhenStart,
+												instance: this.keyInstance
+											});
+            this.$store.commit("document/addToDocumentSubmitStore", {
+												key: 'listTableRootControl',
+												value: listTableRootControl,
+												instance: this.keyInstance
+											});
 			
         },
         /**
@@ -2019,6 +2023,9 @@ export default {
             }
             return arr;
         },
+        /**
+         * 
+         */
         goToListDocument(){
             this.drawer = false;
             this.$goToPage('/documents/'+this.documentId+'/objects',"Danh sách bản ghi");

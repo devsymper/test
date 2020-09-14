@@ -70,6 +70,7 @@ export default class TableControl extends Control {
                 bodyHtml += tr;
             }
             this.ele.find('table tbody').append(bodyHtml);
+            this.ele.find('table').attr('contenteditable', 'false')
         } else {
             for (let controlName in data) {
                 let dataControl = data[controlName];
