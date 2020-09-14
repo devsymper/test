@@ -83,11 +83,19 @@ export default class TableControl extends Control {
                 }
                 this.tableInstance.tableInstance.setDataAtRowProp(vls, null, null, 'auto_set');
             }
-            if (sDocument.state.submit[this.curParentInstance].docStatus == 'init') {
+            if (this.currentDataStore.docStatus == 'init') {
                 this.defaultValue = data;
+                this.getDefaultRowInTable();
             }
 
         }
+    }
+
+    // hàm chạy lại các công thức root trong table để lấy ra được dòng giá trị defaul phục vụ cho việc shift+enter thêm dòng thì 
+    // điền giá trị default này vào
+    getDefaultRowInTable() {
+        console.log(this.currentDataStore, 'this.currentDataStore');
+
     }
 
 }

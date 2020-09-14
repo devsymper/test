@@ -674,17 +674,58 @@ export default {
                 this.submitDocument()
             }
         },
+        /**
+         * watch từ store xem các control root  đã chạy xong chưa -> set defaul row cho table lúc shift+enter
+         * trường hợp submit doc
+         */
         "sDocumentSubmit.readyLoaded":function(data){
             if(data == true){
-                this.hidePreloader()
+                this.hidePreloader();
+                setTimeout((self) => {
+                        if(self.viewType === 'submit'){
+                            let listControlRootInTable = self.sDocumentSubmit.listTableRootControl;
+                            for(let tableName in listControlRootInTable){
+                                let tableControl = getControlInstanceFromStore(self.keyInstance,tableName);
+                                let listDataControlRoot = listControlRootInTable[tableName];
+                                let rowData = [];
+                                for(let controlName in listDataControlRoot){
+                                    let cellValue = tableControl.tableInstance.tableInstance.getDataAtRowProp(0,controlName);
+                                    rowData.push([0,controlName,cellValue]);
+                                }
+                                self.$store.commit("document/updateDataToTableControlRoot",
+                                {instance:self.keyInstance,value:rowData,controlName:'defaultRow',tableName:tableName});
+                            }
+                        }
+                }, 1000,this);
             }
+        },
+        /**
+         * watch từ store xem các control root trong table đã chạy xong chưa -> set defaul row cho table lúc shift+enter
+         * trường hợp update doc
+         */
+        "sDocumentSubmit.listTableRootControl":function(data){
+            if(this.viewType === 'submit'){
+                return;
+            }
+            setTimeout((self) => {
+                for(let tableName in data){
+                    let listDataControlRoot = data[tableName];
+                    let s = Object.values(listDataControlRoot);
+                    if( Object.values(listDataControlRoot).includes(false) == false){
+                        let rowData = [];
+                        for(let controlInTb in listDataControlRoot){
+                            rowData.push([0,controlInTb,listDataControlRoot[controlInTb]])
+                        }
+                        self.$store.commit("document/updateDataToTableControlRoot",
+                        {instance:self.keyInstance,value:rowData,controlName:'defaultRow',tableName:tableName});
+                    }
+                }
+            }, 500,this);
+            
         },
     },
     
     methods: {
-        afterSubmitSubformDocument(){
-
-        },
         /**
          * Hàm ẩn loader
          */
@@ -1215,24 +1256,63 @@ export default {
                             });
                             tableControl.listInsideControls = listInsideControls;
                             tableControl.renderTable();
-                            tableControl.setData(valueInput);
+                            if(this.viewType !== 'submit'){
+                                tableControl.setData(valueInput);
+                            }
                             this.addToListInputInDocument(controlName,tableControl)
                         }
                     }
                 }
-
             }
             console.log("sadsadsad",this.sDocumentSubmit);
             this.listDataFlow = listDataFlow;
-            if(!isSetEffectedControl)
+            if(!isSetEffectedControl);
             this.getEffectedControl();
-            if(this.docObjId == null)
-            thisCpn.findRootControl();
+            if(this.docObjId == null){
+                thisCpn.findRootControl();
+            }
             else{
-                this.hidePreloader()
+                if(this.preDataSubmit != null && Object.keys(this.preDataSubmit).length > 0){
+                    impactedFieldsList = this.preDataSubmit.impactedFieldsList;
+                    let impactedFieldsListWhenStart = this.preDataSubmit.impactedFieldsListWhenStart;
+                    let listTableRootControl = this.preDataSubmit.tableRootControl;
+                    this.pushDataRootToStore(impactedFieldsList,impactedFieldsListWhenStart,listTableRootControl);
+                    for(let tableName in listTableRootControl){
+                        let tableRootControl = listTableRootControl[tableName];
+                        for(let controlInTable in tableRootControl){
+                            let controlInstance = getControlInstanceFromStore(this.keyInstance,controlInTable);
+                            let controlFormulas = controlInstance.controlFormulas;
+                            let formulasInstance = controlFormulas['formulas'].instance;
+                            this.handlerBeforeRunFormulasValue(formulasInstance,controlInstance.id,controlInTable,'formulasDefaulRow','root');
+                        }
+                    }
+                   
+                    
+                }
+                this.hidePreloader();
             }
 
         },
+
+        pushDataRootToStore(impactedFieldsList,impactedFieldsListWhenStart,listTableRootControl){
+            this.$store.commit("document/addToDocumentSubmitStore", {
+                        key: 'impactedFieldsList',
+                        value: impactedFieldsList,
+                        instance: this.keyInstance
+                    });
+            this.$store.commit("document/addToDocumentSubmitStore", {
+                                                key: 'impactedFieldsListWhenStart',
+                                                value: impactedFieldsListWhenStart,
+                                                instance: this.keyInstance
+                                            });
+            this.$store.commit("document/addToDocumentSubmitStore", {
+                                                key: 'listTableRootControl',
+                                                value: listTableRootControl,
+                                                instance: this.keyInstance
+                                            });
+        },
+
+
         addToTableLoadedStore(controlName){
             let curTableLoaded = this.sDocumentSubmit.tableLoaded;
             curTableLoaded[controlName] = false;
@@ -1789,9 +1869,32 @@ export default {
             }
             return dataInput;
         },
+
+
+        getValueFromDataResponse(rs){
+            let value = "";
+            if(!rs.server){
+                let data = rs.data; 
+                if(data.length > 0){
+                    value=data[0].values[0][0];
+                }
+            }
+            else{
+                let data = rs.data.data;
+                if(data.length > 0){
+                    value=data[0][Object.keys(data[0])[0]];
+                }
+            }
+            return value;
+        },
         
         handlerAfterRunFormulas(rs,controlId,controlName,formulasType,from){
             let controlInstance = getControlInstanceFromStore(this.keyInstance,controlName);
+            if(formulasType === 'formulasDefaulRow'){
+                let value = this.getValueFromDataResponse(rs);
+                this.$store.commit("document/updateDataToTableControlRoot",{instance:this.keyInstance,value:value,controlName:controlName,tableName:controlInstance.inTable});
+                return;
+            }
             if($('#'+controlId).length > 0){
                 if($('#'+controlId).attr('s-control-type') == 'inputFilter'){
                     this.$refs.inputFilter.setData(controlId,controlName,rs.data.data);
@@ -1803,19 +1906,7 @@ export default {
                     }
                 }
                 else{
-                    let value = ""
-                    if(!rs.server){
-                        let data = rs.data; 
-                        if(data.length > 0){
-                            value=data[0].values[0][0];
-                        }
-                    }
-                    else{
-                        let data = rs.data.data;
-                        if(data.length > 0){
-                            value=data[0][Object.keys(data[0])[0]];
-                        }
-                    }
+                    let value = this.getValueFromDataResponse(rs);
                     switch (formulasType) {
                         case "formulas":
                             this.handleInputChangeBySystem(controlName,value);
@@ -1928,9 +2019,8 @@ export default {
          * Hàm xử lí việc tìm kiếm các root control và chạy công thức cho control đó (lúc khởi tạo doc)
          */
         findRootControl(){ 
-            let listInput1 = getListInputInDocument(this.keyInstance);
             let impactedFieldsListWhenStart = {}
-            let listTableRootControl = [];
+            let listTableRootControl = {};
             let listRootControl = [];
 			if(this.preDataSubmit != null && Object.keys(this.preDataSubmit).length > 0){
 				impactedFieldsList = this.preDataSubmit.impactedFieldsList;
@@ -1960,13 +2050,19 @@ export default {
 							for(let formulasType in controlFormulas){
 								if(formulasType != 'autocomplete' && formulasType != 'list'){
 									if(controlFormulas[formulasType].hasOwnProperty('instance')){
-										let formulasInstance = controlFormulas[formulasType].instance;
+                                        let formulasInstance = controlFormulas[formulasType].instance;
+                                        let controlRootInTable = this.checkControlOutSideTable(controlInstance,formulasInstance.getInputControl());
+                                        if(controlRootInTable != false){
+                                            if(listTableRootControl.hasOwnProperty(controlInstance.inTable) == false){
+                                                listTableRootControl[controlInstance.inTable] = {};
+                                            }
+                                            listTableRootControl[controlInstance.inTable][controlRootInTable] = false;
+
+                                        }
 										if(formulasInstance.getFormulas() !== "" && Object.keys(formulasInstance.getInputControl()).length == 0){
 											impactedFieldsListWhenStart[controlName] = false;
                                             listRootControl.push(controlName);
-                                            if(controlInstance.inTable != false){
-                                                listTableRootControl.push(controlName);
-                                            }
+                                            
 											this.handlerBeforeRunFormulasValue(formulasInstance,controlInstance.id,controlName,formulasType,'root')
 										}
 									}
@@ -1983,23 +2079,23 @@ export default {
             if(listRootControl.length == 0){
                 this.hidePreloader();
             }
-			
-            this.$store.commit("document/addToDocumentSubmitStore", {
-                key: 'impactedFieldsList',
-                value: impactedFieldsList,
-                instance: this.keyInstance
-            });
-            this.$store.commit("document/addToDocumentSubmitStore", {
-												key: 'impactedFieldsListWhenStart',
-												value: impactedFieldsListWhenStart,
-												instance: this.keyInstance
-											});
-            this.$store.commit("document/addToDocumentSubmitStore", {
-												key: 'listTableRootControl',
-												value: listTableRootControl,
-												instance: this.keyInstance
-											});
-			
+            this.pushDataRootToStore(impactedFieldsList,impactedFieldsListWhenStart,listTableRootControl)
+        },
+
+        /**
+         * Hàm kiểm tra các input của 1 control có nằm trong cùng table đó hay không
+         */
+        checkControlOutSideTable(controlInstance,InputControl){
+            if(controlInstance.inTable != false ){
+                for(let controlName in InputControl){
+                    let controlInputIns = getControlInstanceFromStore(this.keyInstance,controlName);
+                    if(controlInputIns.inTable == controlInstance.inTable){
+                        return false;
+                    }
+                }
+                return controlInstance.name;
+            }
+            return false
         },
         /**
          * Lấy tất cả các control bị ảnh hưởng khi mà một control thay đổi giá trị

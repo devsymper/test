@@ -79,10 +79,19 @@ export default class Control {
             require: {},
             data: {}
         };
+        this.currentDataStore = this.getDataStoreSubmit();
         this.initFormulas();
 
 
     }
+    getDataStoreSubmit() {
+        return sDocument.state.submit[this.curParentInstance];
+    }
+
+    /**
+     * Hàm check có tồn tại và có giá trị thuộc tính của control
+     * @param {*} props 
+     */
     checkProps(props) {
         if (this.controlProperties[props] !== undefined &&
             (this.controlProperties[props].value === "1" ||
