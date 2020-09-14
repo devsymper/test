@@ -180,4 +180,5 @@ export default {
     width:96%!important;
 }
 
+
 </style>
