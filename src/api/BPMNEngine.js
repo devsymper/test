@@ -130,9 +130,19 @@ export default {
             if (filter.nameLike) {
                 filter.taskNameLike = filter.nameLike;
             }
+            if (filter.processDefinitionId) {
+                filter.processDefinitionKey=filter.processDefinitionId;
+                delete filter['processDefinitionId']; 
+
+            }
             filter.finished = true
             return bpmneApi.get(appConfigs.apiDomain.bpmne.tasksHistory, filter, testHeader);
         } else {
+            if (filter.processDefinitionId) {
+                filter.processDefinitionKey=filter.processDefinitionId;
+                delete filter['processDefinitionId']; 
+
+            }
             return bpmneApi.get(appConfigs.apiDomain.bpmne.tasks, filter, testHeader);
         }
     },

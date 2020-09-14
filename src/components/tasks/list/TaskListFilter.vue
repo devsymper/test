@@ -69,7 +69,11 @@ export default {
 
                     if($.isArray(this.listFilter[key].value)){
                         filterData[key] = this.listFilter[key].value.reduce((arr, ele) => {
-                            arr.push(ele.id);
+                            if (key=='processDefinitionId') {
+                                arr.push(ele.processKey);
+                            }else{
+                                arr.push(ele.id);
+                            }
                             return arr;
                         }, []);
                         filterData[key] = filterData[key].join(',');

@@ -27,7 +27,7 @@
                         {{$t("tasks.header.createDate")}}
                     </v-col>
                     <v-col cols="9">
-                        {{$moment(originData.createTime).fromNow()}}
+                        {{$moment(originData.createTime).format('DD/MM/YY  HH:mm:ss')}}
                     </v-col>
                     <v-col cols="3" class="pb-1">
                         <v-icon small size="18" class="mr-2 mb-1">mdi-account</v-icon>
@@ -54,7 +54,6 @@
                 </v-row>
             </VuePerfectScrollbar>
         </VueResizable>
-       
         <v-row class="border-top-1">
             <trackingProcessInstance
                 v-if="taskInfo.action.parameter.processInstanceId"
@@ -103,6 +102,9 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
+.mt-2 >>> .ps-container{
+    height: 100%!important;
+}
 
 </style>
