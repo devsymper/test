@@ -5,7 +5,7 @@
             :min-height="100"
             :max-height="400"
             @resize:end="handleEndDrag"
-            :height="150"
+            :height="200"
             width="100%"
             :active="['b']"
             :style="{overflow: 'hidden'}">

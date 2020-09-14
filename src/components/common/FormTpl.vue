@@ -32,7 +32,7 @@
                     v-if="inputInfo.isDateTime"
                 ></i>
                 <i
-                    :class="{'mdi mdi-dock-window float-right input-item-func ml-1': true,'active': inputInfo.title == largeFormulaEditor.name}"
+                    :class="{'mdi mdi-dock-window float-right input-item-func ml-1': true,'active': inputInfo.title == largeFormulaEditor.name, 'd-none':(inputInfo.activeTab && inputInfo.activeTab=='orgchart' )}"
                     @click="openLargeValueEditor(inputInfo, name)"
                     v-if="inputInfo.type == 'script' || inputInfo.type == 'userAssignment'"
                 ></i>

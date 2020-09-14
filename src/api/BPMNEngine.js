@@ -149,7 +149,6 @@ export default {
     getATaskInfoV2(taskId){
         let result1=bpmneApi.get(appConfigs.apiDomain.bpmne.tasksHistory+'/'+taskId, {}, testHeader);
         let result2=bpmneApi.get(appConfigs.apiDomain.bpmne.tasks+'/'+taskId, {}, testHeader);
-        let result;
         let isCheck=false;
 
         result1.then((res) => {
