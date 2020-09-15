@@ -120,7 +120,7 @@ export default {
             documentSize: null,
             keyInstance: Date.now(),
             contentMargin:'auto',
-            sidebarWidth:300,
+            sidebarWidth:400,
             isShowSidebar:false,
             workflowId:"",
             taskId:"",

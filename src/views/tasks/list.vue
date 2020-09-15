@@ -79,7 +79,7 @@
                             cols="1"
                             class="fs-12 px-1 py-0 pl-3">
                                 <v-icon v-if="obj.taskData.action">{{(obj.taskData.action.action=='submit' || obj.taskData.action.action=='') ? 'mdi-file-document-edit-outline': 'mdi-seal-variant'}}</v-icon>
-                                <!-- {{obj.taskData.action.action=='submit'? $t('tasks.header.submit'): $t('tasks.header.approval')}} -->
+                                <v-icon v-else>mdi-checkbox-marked-circle-outline</v-icon>
                         </v-col>
                         <v-col
                             :cols="sideBySideMode ? 10 : compackMode ? 5: 3"
@@ -100,7 +100,7 @@
                                     </div>
 
                                     <div class="fs-11  py-0 pr-2 text-ellipsis" >
-                                        {{obj.createTime ? $moment(obj.createTime).fromNow():$moment(obj.endTime).fromNow()}}
+                                        {{obj.createTime ? $moment(obj.createTime).format('DD/MM/YY  HH:mm:ss'):$moment(obj.endTime).format('DD/MM/YY  HH:mm:ss')}}
                                         <v-icon class="grey--text lighten-2 ml-1" x-small>mdi-clock-time-nine-outline</v-icon>
                                     </div>
                                 </div>
@@ -466,7 +466,6 @@ export default {
                     parseInt(listTasks[index].owner)
                 );
                 if (listTasks[index].description) {
-                    console.log(index,listTasks[index]);
                     let description=JSON.parse(listTasks[index].description);
                     if (description.action.action=="approval" && description.action.parameter.documentObjectId != undefined) {
                         this.arrdocObjId.push(description.action.parameter.documentObjectId);

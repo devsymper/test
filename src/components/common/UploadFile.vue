@@ -84,6 +84,10 @@ export default {
 			type:String,
 			default: ''
 		},
+		objectContext:{
+			type: String,
+			default: ''
+		}
 	},
 	data() {
 	   return {
@@ -112,7 +116,7 @@ export default {
 			if(this.pickAvatar == true){
 				if(this.selectedFile.type == 'image/jpeg' || this.selectedFile.type == 'image/jpg' || this.selectedFile.type == 'image/png'){
 					this.dialog = true
-					debugger
+					debuggerdebugger
 					this.previewImg = window.URL.createObjectURL(e.target.files[0])
 				}
 			}else{

@@ -190,7 +190,8 @@ export default {
             let self = this;
             let checkArr = [
                 this.checkModelName(),
-                this.validateDeployData()
+                this.validateDeployData(),
+                this.checkValStatus()
             ];
             Promise.all(checkArr)
                 .then(rsl => {
@@ -210,6 +211,36 @@ export default {
                         fail();
                     }
                 });
+        },
+        /**
+         * check validateStatus 
+         */
+        checkValStatus(){
+            let self=this;
+            console.log("aaa",this.stateAllElements);
+            let isCheck=true;
+            let arrError;
+            return new Promise((resolve,reject)=>{
+                let allElements=this.stateAllElements;
+                for (let i in allElements) {
+                    let items=allElements[i].attrs;
+                    for (let j in items) {
+                        if (items[j].validateStatus && items[j].validateStatus.isValid==false ) {
+                            isCheck=false;
+                            self.$snotifyError({},'Error when validate','Error at node ' +allElements[i].id+', property ' +items[j].title+' with detail:'+items[j].validateStatus.message )
+                        }
+                    }
+                }
+                if (!isCheck) {
+                    reject({
+                        type: "Error validate status",
+                        title: "Error when validate",
+                        message: "Error ",
+                    })
+                }else{
+                    resolve();
+                }
+            });
         },
         /**
          * Kiểm tra định danh của model: đã có hay chưa? có bị trùng định danh ko

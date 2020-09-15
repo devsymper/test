@@ -130,9 +130,19 @@ export default {
             if (filter.nameLike) {
                 filter.taskNameLike = filter.nameLike;
             }
+            if (filter.processDefinitionId) {
+                filter.processDefinitionKey=filter.processDefinitionId;
+                delete filter['processDefinitionId']; 
+
+            }
             filter.finished = true
             return bpmneApi.get(appConfigs.apiDomain.bpmne.tasksHistory, filter, testHeader);
         } else {
+            if (filter.processDefinitionId) {
+                filter.processDefinitionKey=filter.processDefinitionId;
+                delete filter['processDefinitionId']; 
+
+            }
             return bpmneApi.get(appConfigs.apiDomain.bpmne.tasks, filter, testHeader);
         }
     },
@@ -149,7 +159,6 @@ export default {
     getATaskInfoV2(taskId){
         let result1=bpmneApi.get(appConfigs.apiDomain.bpmne.tasksHistory+'/'+taskId, {}, testHeader);
         let result2=bpmneApi.get(appConfigs.apiDomain.bpmne.tasks+'/'+taskId, {}, testHeader);
-        let result;
         let isCheck=false;
 
         result1.then((res) => {

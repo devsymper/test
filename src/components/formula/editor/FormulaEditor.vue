@@ -156,6 +156,9 @@ export default {
                 }
             }
             langTools.setCompleters([staticWordCompleter]);
+        },
+        onFocus(){
+            this.$refs.edtScript.editor.focus();
         }
     }
 }

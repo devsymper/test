@@ -28,24 +28,25 @@
 					<textarea v-model="inputComment"  
 						v-on:keyup.50="tagUser($event)"
 						v-on:keyup.esc="cancelComment"
-						v-on:keyup.enter="addComment"
+						v-on:keyup.enter="enterClick"
 						class="text-area"
 						style="width:100%"
-						v-on:keyup.down="chooseUser"
+						v-on:keyup.down="chooseUserDown($event)"
+						v-on:keyup.up="chooseUserUp($event)"
 						>
 					</textarea>
 				<UploadFile style="position:absolute;right:16px;bottom: 0px;" @uploaded-file="uploadInfo" />
 				<v-btn style="position:absolute;right: 0px;bottom: 0px;" icon @click="addComment">
 					<v-icon >mdi-send-circle-outline</v-icon>
 				</v-btn>
+				<MenuTagUser style="position:absolute;left:0;bottom:45px" ref="menuTagUser" @selected-item="tagged" :keyWord="keyWord" />
 			</div>
 		</div>
-		<MenuTagUser ref="menuTagUser" @selected-item="tagged" :keyWord="keyWord" />
 		 <v-dialog
 			v-model="dialog"
 			max-width="80%"
 			max-height="80%"
-			style="overflow-x: hidden"
+			style="overflow-x: hidden;z-index:1000"
 		>
 			<v-card>
 				<v-icon @click="dialog = false" style="float:right;font-size:18px;padding-top:2px">mdi-close</v-icon>
@@ -73,6 +74,7 @@ export default {
 			srcImg:'',
 			dialog:false,	
 			tags:[],
+			isSelectingUser:false,
 			idImg:null,
 			icon:{
 				xlxs: 'mdi-file-excel-box',
@@ -124,6 +126,21 @@ export default {
 	},
 	created(){
 	},
+	mounted(){
+		 let thisCpn = this;
+			$(document).click(function(e){
+				if(!$(e.target).is('.context-menu')){
+					if(thisCpn.$refs.menuTagUser){
+						thisCpn.$refs.menuTagUser.hide()
+					}
+				}
+			})
+			$(document).keydown(function(e){
+				if(e.keyCode == 38 || e.keyCode == 40){
+					event.preventDefault()
+				}
+			})
+	},
 	methods:{
 		removeFile(item){
 			this.attachments.splice(this.attachments.indexOf(item.id),1)
@@ -134,6 +151,7 @@ export default {
 			this.images.splice(this.images.indexOf(item),1)
 		},
 		tagUser(event){
+			this.isSelectingUser = true
 			let $target = $(event.target);
 			var x = $target.offset().left;
      		var y = $target.offset().top+28;
@@ -203,6 +221,9 @@ export default {
 		cancel(){
 			this.$emit('cancel-reply')
 		},
+		cancelComment(){
+			this.$refs.menuTagUser.hide()
+		},
 		addComment(){
 			this.dataPostComment = this.sComment
 			this.dataPostComment.content = this.inputComment
@@ -264,8 +285,23 @@ export default {
 				});
 			}
 		},
-		chooseUser(){
-			this.$refs.menuTagUser.chooseUser()
+		chooseUserDown(){
+			this.isSelectingUser = true
+			this.$refs.menuTagUser.down()
+		},
+		chooseUserUp(){
+			this.$refs.menuTagUser.up()
+		},
+		selectedUser(){
+			this.$refs.menuTagUser.selectedUser()
+			this.isSelectingUser = false
+		},
+		enterClick(){
+			if(this.isSelectingUser == true){
+				this.selectedUser()
+			}else{
+				this.addComment()
+			}
 		},
 		addAvatar(data){
 			let mapIdToUser = this.$store.getters['app/mapIdToUser'];

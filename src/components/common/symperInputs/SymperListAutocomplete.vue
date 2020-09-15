@@ -111,27 +111,31 @@ export default {
                 this.myValue = after;
             }
         },
-
         search(){
-            let val = this.search;
-            if(!this.onSearch){
-                if(!val){
-                    this.myItems = util.cloneDeep(this.items);
+            clearTimeout(this.delayTimer);
+            let self = this;
+            this.delayTimer = setTimeout(function() {
+                let val = self.search;
+                if(!self.onSearch){
+                    if(!val){
+                        self.myItems = util.cloneDeep(self.items);
+                    }else{
+                        self.myItems = self.myItems.filter((el, idx) => {
+                            if (
+                                String(el.id).includes(val) ||
+                                String(el.name).includes(val) ||
+                                String(el.title).includes(val) ||
+                                String(el.modelName).includes(val) 
+                            ) {
+                                return true;
+                            }
+                            return false;
+                        });
+                    }
                 }else{
-                    this.myItems = this.myItems.filter((el, idx) => {
-                        if (
-                            String(el.id).includes(val) ||
-                            String(el.name).includes(val) ||
-                            String(el.title).includes(val)
-                        ) {
-                            return true;
-                        }
-                        return false;
-                    });
+                    self.onSearch(val, self);
                 }
-            }else{
-                this.onSearch(val, this);
-            }
+            }, 300);
         }
     },
     data() {
@@ -139,7 +143,8 @@ export default {
             isLoading: false,
             search: '',
             myItems: [],
-            myValue: ''
+            myValue: '',
+            delayTimer:null,
         };
     },
     methods: {
