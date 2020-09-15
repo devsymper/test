@@ -318,7 +318,12 @@
                 },
                 "saveDoc": {
                     "heading": "Save Document",
-                    "checkNameRelated": "Check formulas related"
+                    "checkNameRelated": "Check formulas related",
+                    "selectType": {
+                        "system": "System",
+                        "list": "List",
+                        "business": "Business"
+                    }
                 },
                 "swapType": {
                     "heading": "Swap type control",
@@ -477,19 +482,7 @@
         "Knowledge": "Văn bản nội bộ",
         "File": "Quản lý tệp",
         "Department": "Phòng ban",
-        "Timesheet": "Thời gian biểu",
-        "documentPanel": {
-            "system": "System",
-            "list": "List"
-        },
-        "documentEditor": {
-            "f_10px": "10px",
-            "f_11px": "11px",
-            "f_12px": "12px",
-            "f_13px": "13px",
-            "f_14px": "14px"
-        }
-
+        "Timesheet": "Thời gian biểu"
     },
     "apps": {
         "header": {

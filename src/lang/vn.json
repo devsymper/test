@@ -378,18 +378,7 @@
         "Knowledge": "Văn bản nội bộ",
         "File": "Quản lý tệp",
         "Department": "Phòng ban",
-        "Timesheet": "Thời gian biểu",
-        "documentPanel": {
-            "system": "Hệ thống",
-            "list": "danh mục"
-        },
-        "documentEditor": {
-            "f_10px": "10px",
-            "f_11px": "11px",
-            "f_12px": "12px",
-            "f_13px": "13px",
-            "f_14px": "14px"
-        }
+        "Timesheet": "Thời gian biểu"
     },
     "document": {
         "create": "Tạo mới văn bản",
@@ -426,7 +415,12 @@
                 },
                 "saveDoc": {
                     "heading": "Lưu Document",
-                    "checkNameRelated": "Kiểm tra công thức liên quan"
+                    "checkNameRelated": "Kiểm tra công thức liên quan",
+                    "selectType": {
+                        "system": "Hệ thống",
+                        "list": "danh mục",
+                        "business": "Nghiệp vụ"
+                    }
                 },
                 "swapType": {
                     "heading": "Chuyển đổi kiểu control",

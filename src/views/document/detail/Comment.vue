@@ -3,7 +3,7 @@
 		<!-- <v-divider></v-divider> -->
         <div class="comment-content " style="height:100%">
 				<!-- <span class="mdi mdi-keyboard-backspace" @click="hide"></span> -->
-			<Comment style="margin-left:-12px;margin-right:8px" :showComment="true" :objectIdentifier="objectIdentifier" :objectType="'document'" :height="'100%'" :buttonClose="true" @close-comment="hide" />
+			<Comment style="margin-left:-12px;margin-right:8px" :showComment="true" :objectIdentifier="objectIdentifierCmt" :objectType="'document'" :height="'100%'" :buttonClose="true" @close-comment="hide" />
         </div>
 	</div>
 </template>
@@ -12,7 +12,12 @@ import Comment from '@/components/common/comment/Comment.vue'
 export default {
 	props:{
 		objectIdentifier:{
-			type: String,
+			type: Number,
+		}
+	},
+	watch:{
+		objectIdentifier(after){
+			this.objectIdentifierCmt = after + ""
 		}
 	},
 	components:{
@@ -20,7 +25,8 @@ export default {
 	},
     data () { 
         return {
-            style:'transform:translateX(300px)'
+			style:'transform:translateX(300px)',
+			objectIdentifierCmt:""
         }
     },
     methods:{
