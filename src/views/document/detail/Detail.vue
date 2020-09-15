@@ -120,7 +120,7 @@ export default {
             documentSize: null,
             keyInstance: Date.now(),
             contentMargin:'auto',
-            sidebarWidth:300,
+            sidebarWidth:400,
             isShowSidebar:false,
             workflowId:"",
             taskId:"",
@@ -504,7 +504,9 @@ export default {
     .wrap-content-detail{
         position: relative;
         width: 100%;
-        height: calc(100% - 40px);
+        height: calc(100vh - 50px);
+        overflow-y: auto;
+        overflow-x: hidden;
     }
     .sym-form-Detail >>> .on-selected {
         border: none !important; 

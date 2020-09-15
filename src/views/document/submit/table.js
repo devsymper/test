@@ -221,7 +221,6 @@ export default class Table {
             this.controlNameAfterChange = "";
             this.showPopupUser = false;
             this.showPopupTime = false;
-            this.tableDefaultRow = [];
             this.currentControlSelected = null;
             this.listAutoCompleteColumns = {};
             this.event = {
@@ -386,9 +385,11 @@ export default class Table {
                     let cellMeta = this.getSelected();
                     if (e.key === 'Enter' && e.shiftKey === true && cellMeta != undefined) {
                         this.alter('insert_row', cellMeta[0][0] + 1, 1);
-                        let rowData = thisObj.tableDefaultRow;
-                        rowData[0] = cellMeta[0][0] + 1;
-                        thisObj.tableInstance.setDataAtRowProp([rowData], null, null, 'auto_set');
+                        let rowData = sDocument.state.submit[thisObj.keyInstance]['listTableRootControl'][thisObj.tableName]['defaultRow'];
+                        for (let index = 0; index < rowData.length; index++) {
+                            rowData[index][0] = cellMeta[0][0] + 1;
+                        }
+                        thisObj.tableInstance.setDataAtRowProp(rowData, null, null, 'auto_set');
                     } else if (e.key === 'Delete' && e.shiftKey == true) {
                         this.alter('remove_row', cellMeta[0][0], 1);
                     }
@@ -774,9 +775,7 @@ export default class Table {
                         const element = listIdRow[index];
                         vls.push([index, controlInstance.name, data[element]]);
                     }
-                    if (sDocument.state.submit[thisObj.keyInstance]['docStatus'] == 'init' && vls.length > 0) {
-                        thisObj.tableDefaultRow = vls[0];
-                    }
+
                     thisObj.tableInstance.setDataAtRowProp(vls, null, null, 'auto_set');
                     markBinedField(thisObj.keyInstance, controlInstance.name);
                     store.commit("document/updateListInputInDocument", {

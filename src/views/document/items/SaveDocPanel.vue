@@ -225,6 +225,20 @@ export default {
                     type: "checkbox",
                     value: (parseInt(props.isFullSize) === 0) ? false : true,
                 },
+                type : {
+                    title: "Loại Văn bản",
+                    type: "select",
+                    value: 1,
+                    options: [{
+                            text: 'Danh mục',
+                            value: 2
+                        },
+                        {
+                            text: 'Hệ thống',
+                            value: 1
+                        },
+                    ],
+                },
             
                 note : {
                     title: "Ghi chú",

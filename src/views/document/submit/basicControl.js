@@ -7,6 +7,7 @@ var numbro = require("numbro");
 import moment from "moment-timezone";
 
 import { userApi } from "./../../../api/user.js";
+import { documentApi } from "../../../api/Document";
 let listInputInDocument = sDocument.state.submit.listInputInDocument;
 const fileTypes = {
     'xlsx': 'mdi-microsoft-excel',
@@ -131,16 +132,27 @@ export default class BasicControl extends Control {
             this.setValueControl();
         }
         if (sDocument.state.viewType[this.curParentInstance] == 'submit') {
-            // this.setDefaultValue();
+            this.setDefaultValue();
         }
-
-
         this.setEvent();
-        let subFormId = this.checkEmptyProps('quickSubmit');
-        if (subFormId != false) {
-            this.renderSubformButton(subFormId);
-        }
+        if (this.checkProps('isQuickSubmit') && this.checkEmptyFormulas('autocomplete')) {
+            let allTable = this.controlFormulas.autocomplete.instance.autocompleteDetectTableQuery();
+            let columnBinding = this.controlFormulas.autocomplete.instance.autocompleteDetectAliasControl(false);
+            this.columnBindingSubForm = columnBinding;
+            if (allTable !== false) {
+                let table = allTable[0];
+                documentApi.getDetailDocumentByName({ name: table }).then(res => {
+                        if (res.status == 200) {
+                            let documentId = res.data.id;
+                            this.renderSubformButton(documentId);
+                        }
 
+                    }).catch(err => {
+
+                    })
+                    .always(() => {});
+            }
+        }
     }
 
     /**
@@ -301,6 +313,10 @@ export default class BasicControl extends Control {
             }
 
         }
+        if (sDocument.state.submit[this.curParentInstance].docStatus == 'init') {
+            this.defaultValue = value;
+        }
+
 
     }
     getValue() {
@@ -327,7 +343,10 @@ export default class BasicControl extends Control {
         } else {
             this.ele.val(value)
         }
-        this.ele.attr('value', value)
+        this.ele.attr('value', value);
+        if (sDocument.state.submit[this.curParentInstance].docStatus == 'init') {
+            this.defaultValue = value;
+        }
     }
 
     /**
@@ -339,6 +358,11 @@ export default class BasicControl extends Control {
             this.ele.parent().append('<span class="mdi mdi-plus add-subform-btn"></span>');
             this.ele.parent().off('click', '.add-subform-btn')
             this.ele.parent().on('click', '.add-subform-btn', function(e) {
+                store.commit("document/addToDocumentSubmitStore", {
+                    key: 'controlOpenSubform',
+                    value: thisObj,
+                    instance: thisObj.curParentInstance
+                });
                 SYMPER_APP.$evtBus.$emit('document-submit-open-subform', { docId: subFormId, instance: thisObj.curParentInstance })
             })
         } else {
