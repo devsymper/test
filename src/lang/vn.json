@@ -378,7 +378,18 @@
         "Knowledge": "Văn bản nội bộ",
         "File": "Quản lý tệp",
         "Department": "Phòng ban",
-        "Timesheet": "Thời gian biểu"
+        "Timesheet": "Thời gian biểu",
+        "documentPanel": {
+            "system": "Hệ thống",
+            "list": "danh mục"
+        },
+        "documentEditor": {
+            "f_10px": "10px",
+            "f_11px": "11px",
+            "f_12px": "12px",
+            "f_13px": "13px",
+            "f_14px": "14px"
+        }
     },
     "document": {
         "create": "Tạo mới văn bản",
