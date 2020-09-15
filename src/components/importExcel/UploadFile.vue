@@ -1,5 +1,5 @@
 <template>
-<div class="flex items-center justify-center w-full h-screen text-center mr-15 ml-3">
+<div class="flex items-center justify-center w-full h-screen text-center mr-15 ml-3 mr-3">
     <div v-show="selectType" class="mt-2">
         <uploader 
           :options="options" 
@@ -114,7 +114,7 @@ export default {
             
         },
         handleChange(event) {
-            debugger
+           // debugger
             this.$refs.upload.uploader.cancel()
             this.options.query.total = event.currentTarget.files.length;
             this.dem = event.currentTarget.files.length;

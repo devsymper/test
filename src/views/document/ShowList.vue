@@ -176,7 +176,7 @@ export default {
 </script>
 <style lang="scss" scoped>
 .manage-timesheet-500{
-    width: 500px!important;
+    width: 470px!important;
 }
 .manage-timesheet-800{
     width: 800px!important  ;
