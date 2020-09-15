@@ -371,6 +371,8 @@ export default class Formulas {
          */
     replaceParamsToData(dataInput, formulas) {
         // debugger
+
+        // thay thế các tham số của workflow 
         formulas = this.replaceWorkflowParams(formulas);
 
         if (Object.keys(dataInput).length == 0 || dataInput == false) {
@@ -426,12 +428,34 @@ export default class Formulas {
             return this.runSQLLiteFormulas(formulas, true);
         }
     }
-    autocompleteDetectAliasControl() {
-        let control = this.formulas.match(/(?<=as)(\s+([a-zA-Z_0-9]+)|\s*\"(.*?)\")/gi);
+    autocompleteDetectAliasControl(alias = true) {
+        let selectColumn = this.formulas.match(/(?<=select|SELECT).*(?=from|FROM)/gi);
+        if (selectColumn == null) {
+            return 'column1';
+        }
+        let control = selectColumn[0].match(/([a-zA-Z0-9_]+)\s+as\s+(([a-zA-Z0-9_]+))/gi);
         if (control == null) {
             return "column1";
         }
-        return control[0].trim();
+        let controlAlias = control[0].split('as');
+        if (alias && controlAlias.length > 1) {
+            return controlAlias[1].trim();
+        } else {
+            return controlAlias[0].trim();
+        }
+    }
+    autocompleteDetectTableQuery() {
+        let table = this.formulas.match(/(from|FROM)\s+(\w+\.)?(\w+)(?=\s+as)?(\s+\w+\n+)?/gim);
+        if (table == null) {
+            return false;
+        }
+        let listTable = []
+        for (let index = 0; index < table.length; index++) {
+            let fromTable = table[index];
+            let tableItem = fromTable.trim().replace("from ", "");
+            listTable.push(tableItem);
+        }
+        return listTable;
     }
 
     /**

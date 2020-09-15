@@ -49,24 +49,7 @@ export default {
                         this.$goToPage('/documents/'+document.id+'/editor/edit',document.title);
                     },
                 },
-                print_config: {
-                    name: "printConfig",
-                    text: function() {
-                        return " <i class= 'mdi mdi-printer-3d-nozzle-outline' > </i>&nbsp; Cấu hình in";
-                    },
-                    callback: (document, callback) => {
-                        this.$goToPage('/documents/'+document.id+'/editor/print-config',document.title);
-                    },
-                },
-                list_print_config: {
-                    name: "listPrintConfig",
-                    text: function() {
-                        return " <i class= 'mdi mdi-format-list-checkbox' > </i>&nbsp; Danh sách bản in";
-                    },
-                    callback: (document, callback) => {
-                        this.$goToPage('/documents/'+document.id+'/print-config',"Danh sách bản in");
-                    },
-                },
+               
                 clone: {
                     name: "cloneDoc",
                     text: function() {
@@ -112,6 +95,24 @@ export default {
                     },
                     callback: (document, callback) => {
                         this.$goToPage('/documents/'+document.id+'/draft-objects',"Danh sách bản nháp");
+                    },
+                },
+                 print_config: {
+                    name: "printConfig",
+                    text: function() {
+                        return " <i class= 'mdi mdi-printer-3d-nozzle-outline' > </i>&nbsp; Cấu hình in";
+                    },
+                    callback: (document, callback) => {
+                        this.$goToPage('/documents/'+document.id+'/editor/print-config',document.title);
+                    },
+                },
+                list_print_config: {
+                    name: "listPrintConfig",
+                    text: function() {
+                        return " <i class= 'mdi mdi-format-list-checkbox' > </i>&nbsp; Danh sách bản in";
+                    },
+                    callback: (document, callback) => {
+                        this.$goToPage('/documents/'+document.id+'/print-config',"Danh sách bản in");
                     },
                 },
                 drop: {

@@ -1,5 +1,9 @@
 <template>
-    <div class="wrap-content-submit">
+    <div :class="{
+    'wrap-content-submit':true,
+    'sym-sub-form-submit':(parrentInstance == 0) ? false : true
+
+    }">
         <v-skeleton-loader
             class="mx-auto"
             max-width="auto"
@@ -66,6 +70,7 @@
             @after-check-input-time-valid="afterCheckTimeNotValid" 
             ref="timeInput" />
             <v-speed-dial
+                v-if="parrentInstance == 0"
                 v-show="showSubmitButton"
                 v-model="fab"
                 :top="top"
@@ -154,13 +159,16 @@
         >
             <submitDocument v-if="parrentInstance == 0 && docSubFormId != 0" 
             :showSubmitButton="false"
-            :parrentInstance="keyInstance" ref="subSubmitView" :isQickSubmit="true" :action="'submit'" @submit-document-success="afterSubmitSubformDocument" :docId="docSubFormId"/>
-            <div class="sub-form-action">
-                <button>{{$t('document.submit.goToList')}}</button>
-                <button><span class="mdi mdi-content-save-move-outline"></span>{{$t('document.submit.continueSubmit')}}</button>
-                <button><span class="mdi mdi-content-save-settings-outline"></span>{{$t('document.submit.fab.submit')}}</button>
-            </div>
+            :parrentInstance="keyInstance" 
+            @submit-document-success="submitSubFormSuccess"
+            ref="subSubmitView" :isQickSubmit="true" :action="'submit'" :docId="docSubFormId"/>
+            
         </v-navigation-drawer>
+        <div class="sub-form-action" v-if="parrentInstance != 0">
+            <button @click="goToListDocument()" class=subfom-action__item>{{$t('document.submit.goToList')}}</button>
+            <button @click="handlerSubmitDocumentClick(true);" class=subfom-action__item><span class="mdi mdi-content-save-move-outline"></span>{{$t('document.submit.continueSubmit')}}</button>
+            <button @click="handlerSubmitDocumentClick" class=subfom-action__item><span class="mdi mdi-content-save-settings-outline"></span>{{$t('document.submit.fab.submit')}}</button>
+        </div>
     </div>
      
 </template>
@@ -323,6 +331,7 @@ export default {
             loading: true,
             docSubFormId:0,
             drawer: false,
+            isContinueSubmit:false
         };
 
     },
@@ -665,17 +674,58 @@ export default {
                 this.submitDocument()
             }
         },
+        /**
+         * watch từ store xem các control root  đã chạy xong chưa -> set defaul row cho table lúc shift+enter
+         * trường hợp submit doc
+         */
         "sDocumentSubmit.readyLoaded":function(data){
             if(data == true){
-                this.hidePreloader()
+                this.hidePreloader();
+                setTimeout((self) => {
+                        if(self.viewType === 'submit'){
+                            let listControlRootInTable = self.sDocumentSubmit.listTableRootControl;
+                            for(let tableName in listControlRootInTable){
+                                let tableControl = getControlInstanceFromStore(self.keyInstance,tableName);
+                                let listDataControlRoot = listControlRootInTable[tableName];
+                                let rowData = [];
+                                for(let controlName in listDataControlRoot){
+                                    let cellValue = tableControl.tableInstance.tableInstance.getDataAtRowProp(0,controlName);
+                                    rowData.push([0,controlName,cellValue]);
+                                }
+                                self.$store.commit("document/updateDataToTableControlRoot",
+                                {instance:self.keyInstance,value:rowData,controlName:'defaultRow',tableName:tableName});
+                            }
+                        }
+                }, 1000,this);
             }
+        },
+        /**
+         * watch từ store xem các control root trong table đã chạy xong chưa -> set defaul row cho table lúc shift+enter
+         * trường hợp update doc
+         */
+        "sDocumentSubmit.listTableRootControl":function(data){
+            if(this.viewType === 'submit'){
+                return;
+            }
+            setTimeout((self) => {
+                for(let tableName in data){
+                    let listDataControlRoot = data[tableName];
+                    let s = Object.values(listDataControlRoot);
+                    if( Object.values(listDataControlRoot).includes(false) == false){
+                        let rowData = [];
+                        for(let controlInTb in listDataControlRoot){
+                            rowData.push([0,controlInTb,listDataControlRoot[controlInTb]])
+                        }
+                        self.$store.commit("document/updateDataToTableControlRoot",
+                        {instance:self.keyInstance,value:rowData,controlName:'defaultRow',tableName:tableName});
+                    }
+                }
+            }, 500,this);
+            
         },
     },
     
     methods: {
-        afterSubmitSubformDocument(){
-
-        },
         /**
          * Hàm ẩn loader
          */
@@ -767,6 +817,15 @@ export default {
                 let dataFromCache = this.getDataAutocompleteFromCache(e.e.target.value, aliasControl);
                 if(dataFromCache == false){
                     let dataInput = this.getDataInputFormulas(e.autocompleteFormulasInstance,e);
+                    let currentTableInteractive = this.sDocumentSubmit.currentTableInteractive;
+                    if(currentTableInteractive != null){
+                        let cellMeta = currentTableInteractive.tableInstance.getSelected();
+                        for(let controlName in dataInput){
+                            if(Array.isArray(dataInput[controlName])){
+                                dataInput[controlName] = dataInput[controlName][cellMeta[0][0]]
+                            }
+                        }
+                    }
                     e.autocompleteFormulasInstance.handleRunAutoCompleteFormulas(dataInput).then(res=>{
                         thisCpn.setDataForControlAutocomplete(res,aliasControl,e.controlTitle, $(e.e.target).val(),"")
                     });
@@ -1197,24 +1256,63 @@ export default {
                             });
                             tableControl.listInsideControls = listInsideControls;
                             tableControl.renderTable();
-                            tableControl.setData(valueInput);
+                            if(this.viewType !== 'submit'){
+                                tableControl.setData(valueInput);
+                            }
                             this.addToListInputInDocument(controlName,tableControl)
                         }
                     }
                 }
-
             }
             console.log("sadsadsad",this.sDocumentSubmit);
             this.listDataFlow = listDataFlow;
-            if(!isSetEffectedControl)
+            if(!isSetEffectedControl);
             this.getEffectedControl();
-            if(this.docObjId == null)
-            thisCpn.findRootControl();
+            if(this.docObjId == null){
+                thisCpn.findRootControl();
+            }
             else{
-                this.hidePreloader()
+                if(this.preDataSubmit != null && Object.keys(this.preDataSubmit).length > 0){
+                    impactedFieldsList = this.preDataSubmit.impactedFieldsList;
+                    let impactedFieldsListWhenStart = this.preDataSubmit.impactedFieldsListWhenStart;
+                    let listTableRootControl = this.preDataSubmit.tableRootControl;
+                    this.pushDataRootToStore(impactedFieldsList,impactedFieldsListWhenStart,listTableRootControl);
+                    for(let tableName in listTableRootControl){
+                        let tableRootControl = listTableRootControl[tableName];
+                        for(let controlInTable in tableRootControl){
+                            let controlInstance = getControlInstanceFromStore(this.keyInstance,controlInTable);
+                            let controlFormulas = controlInstance.controlFormulas;
+                            let formulasInstance = controlFormulas['formulas'].instance;
+                            this.handlerBeforeRunFormulasValue(formulasInstance,controlInstance.id,controlInTable,'formulasDefaulRow','root');
+                        }
+                    }
+                   
+                    
+                }
+                this.hidePreloader();
             }
 
         },
+
+        pushDataRootToStore(impactedFieldsList,impactedFieldsListWhenStart,listTableRootControl){
+            this.$store.commit("document/addToDocumentSubmitStore", {
+                        key: 'impactedFieldsList',
+                        value: impactedFieldsList,
+                        instance: this.keyInstance
+                    });
+            this.$store.commit("document/addToDocumentSubmitStore", {
+                                                key: 'impactedFieldsListWhenStart',
+                                                value: impactedFieldsListWhenStart,
+                                                instance: this.keyInstance
+                                            });
+            this.$store.commit("document/addToDocumentSubmitStore", {
+                                                key: 'listTableRootControl',
+                                                value: listTableRootControl,
+                                                instance: this.keyInstance
+                                            });
+        },
+
+
         addToTableLoadedStore(controlName){
             let curTableLoaded = this.sDocumentSubmit.tableLoaded;
             curTableLoaded[controlName] = false;
@@ -1317,7 +1415,8 @@ export default {
             .always(() => {
             });
         },
-        handlerSubmitDocumentClick(){
+        handlerSubmitDocumentClick(isContinueSubmit = false){
+            this.isContinueSubmit = isContinueSubmit;
             if($('.validate-icon').length == 0 && $('.error').length == 0){
                 if(this.viewType == 'submit'){
                     this.handleRefreshDataBeforeSubmit();
@@ -1433,6 +1532,7 @@ export default {
             documentApi.submitDocument(dataPost).then(res => {
                 let dataResponSubmit = res.data;
                 dataResponSubmit['document_object_user_created_fullname'] = thisCpn.endUserInfo.id;
+                dataResponSubmit['isContinueSubmit'] = thisCpn.isContinueSubmit;
                 thisCpn.$emit('submit-document-success',dataResponSubmit);
                 thisCpn.isSubmitting = false;
                 if (res.status == 200) {
@@ -1440,8 +1540,13 @@ export default {
                         type: "success",
                         title: "Submit document success!"
                     });        
-                    if(this.$route.name == 'submitDocument')
+                    // nếu submit từ form sub submit thì ko rediect trang
+                    // mà tìm giá trị của control cần được bind lại giá trị từ emit dataResponSubmit
+                    thisCpn.resetDataSubmit();
+                    if(this.$route.name == 'submitDocument' && this.$route.params.id == this.documentId){
                         thisCpn.$router.push('/documents/'+thisCpn.documentId+"/objects");
+                    }
+                
                 }
                 else{
                     thisCpn.$snotify({
@@ -1764,9 +1869,32 @@ export default {
             }
             return dataInput;
         },
+
+
+        getValueFromDataResponse(rs){
+            let value = "";
+            if(!rs.server){
+                let data = rs.data; 
+                if(data.length > 0){
+                    value=data[0].values[0][0];
+                }
+            }
+            else{
+                let data = rs.data.data;
+                if(data.length > 0){
+                    value=data[0][Object.keys(data[0])[0]];
+                }
+            }
+            return value;
+        },
         
         handlerAfterRunFormulas(rs,controlId,controlName,formulasType,from){
             let controlInstance = getControlInstanceFromStore(this.keyInstance,controlName);
+            if(formulasType === 'formulasDefaulRow'){
+                let value = this.getValueFromDataResponse(rs);
+                this.$store.commit("document/updateDataToTableControlRoot",{instance:this.keyInstance,value:value,controlName:controlName,tableName:controlInstance.inTable});
+                return;
+            }
             if($('#'+controlId).length > 0){
                 if($('#'+controlId).attr('s-control-type') == 'inputFilter'){
                     this.$refs.inputFilter.setData(controlId,controlName,rs.data.data);
@@ -1778,19 +1906,7 @@ export default {
                     }
                 }
                 else{
-                    let value = ""
-                    if(!rs.server){
-                        let data = rs.data; 
-                        if(data.length > 0){
-                            value=data[0].values[0][0];
-                        }
-                    }
-                    else{
-                        let data = rs.data.data;
-                        if(data.length > 0){
-                            value=data[0][Object.keys(data[0])[0]];
-                        }
-                    }
+                    let value = this.getValueFromDataResponse(rs);
                     switch (formulasType) {
                         case "formulas":
                             this.handleInputChangeBySystem(controlName,value);
@@ -1903,19 +2019,16 @@ export default {
          * Hàm xử lí việc tìm kiếm các root control và chạy công thức cho control đó (lúc khởi tạo doc)
          */
         findRootControl(){ 
-            let listInput1 = getListInputInDocument(this.keyInstance);
-			let impactedFieldsListWhenStart = {}
-			if(this.preDataSubmit != null && Object.keys(this.preDataSubmit).length > 0 && false){
+            let impactedFieldsListWhenStart = {}
+            let listTableRootControl = {};
+            let listRootControl = [];
+			if(this.preDataSubmit != null && Object.keys(this.preDataSubmit).length > 0){
 				impactedFieldsList = this.preDataSubmit.impactedFieldsList;
 				impactedFieldsListWhenStart = this.preDataSubmit.impactedFieldsListWhenStart;
-				this.$store.commit("document/addToDocumentSubmitStore", {
-												key: 'impactedFieldsListWhenStart',
-												value: impactedFieldsListWhenStart,
-												instance: this.keyInstance
-											});
-				let rootControl = this.preDataSubmit.rootControl;
-				for (let index = 0; index < rootControl.length; index++) {
-					const controlName = rootControl[index];
+				listRootControl = this.preDataSubmit.rootControl;
+				listTableRootControl = this.preDataSubmit.tableRootControl;
+				for (let index = 0; index < listRootControl.length; index++) {
+					const controlName = listRootControl[index];
 					let controlInstance = getControlInstanceFromStore(this.keyInstance,controlName);
 					let controlFormulas = controlInstance.controlFormulas;
 					for(let formulasType in controlFormulas){
@@ -1928,25 +2041,28 @@ export default {
 			}
 			else{
 				let listInput = getListInputInDocument(this.keyInstance);
-				let listRootControl = [];
 				for(let controlName in listInput){
 					this.setAllImpactedFieldsList(controlName);
-					let controlInstance = listInput[controlName];
+                    let controlInstance = listInput[controlName];
 					if(controlInstance.type != "inputFilter"){
 						if(Object.keys(controlInstance.controlFormulas).length > 0){
 							let controlFormulas = controlInstance.controlFormulas;
 							for(let formulasType in controlFormulas){
 								if(formulasType != 'autocomplete' && formulasType != 'list'){
 									if(controlFormulas[formulasType].hasOwnProperty('instance')){
-										let formulasInstance = controlFormulas[formulasType].instance;
+                                        let formulasInstance = controlFormulas[formulasType].instance;
+                                        let controlRootInTable = this.checkControlOutSideTable(controlInstance,formulasInstance.getInputControl());
+                                        if(controlRootInTable != false){
+                                            if(listTableRootControl.hasOwnProperty(controlInstance.inTable) == false){
+                                                listTableRootControl[controlInstance.inTable] = {};
+                                            }
+                                            listTableRootControl[controlInstance.inTable][controlRootInTable] = false;
+
+                                        }
 										if(formulasInstance.getFormulas() !== "" && Object.keys(formulasInstance.getInputControl()).length == 0){
 											impactedFieldsListWhenStart[controlName] = false;
-											this.$store.commit("document/addToDocumentSubmitStore", {
-												key: 'impactedFieldsListWhenStart',
-												value: impactedFieldsListWhenStart,
-												instance: this.keyInstance
-											});
                                             listRootControl.push(controlName);
+                                            
 											this.handlerBeforeRunFormulasValue(formulasInstance,controlInstance.id,controlName,formulasType,'root')
 										}
 									}
@@ -1956,21 +2072,30 @@ export default {
 						}
                     }
                 }
+                // lưu lại các mối quan hệ cho lần submit sau ko phải thực hiện các bước tìm quan hê này (các root control , các luồng chạy công thức)
+                let dataPost = {impactedFieldsList:impactedFieldsList,impactedFieldsListWhenStart:impactedFieldsListWhenStart,rootControl:listRootControl,tableRootControl:listTableRootControl};
+                documentApi.updatePreDataForDoc({documentId:this.documentId,prepareData:JSON.stringify(dataPost)})
+            }
+            if(listRootControl.length == 0){
                 this.hidePreloader();
-                if(listRootControl.length == 0){
-                    this.hidePreloader();
+            }
+            this.pushDataRootToStore(impactedFieldsList,impactedFieldsListWhenStart,listTableRootControl)
+        },
+
+        /**
+         * Hàm kiểm tra các input của 1 control có nằm trong cùng table đó hay không
+         */
+        checkControlOutSideTable(controlInstance,InputControl){
+            if(controlInstance.inTable != false ){
+                for(let controlName in InputControl){
+                    let controlInputIns = getControlInstanceFromStore(this.keyInstance,controlName);
+                    if(controlInputIns.inTable == controlInstance.inTable){
+                        return false;
+                    }
                 }
-			// lưu lại các mối quan hệ cho lần submit sau ko phải thực hiện các bước tìm quan hê này (các root control , các luồng chạy công thức)
-				let dataPost = {impactedFieldsList:impactedFieldsList,impactedFieldsListWhenStart:impactedFieldsListWhenStart,rootControl:listRootControl};
-				documentApi.updatePreDataForDoc({documentId:this.documentId,prepareData:JSON.stringify(dataPost)})
-			}
-			
-            this.$store.commit("document/addToDocumentSubmitStore", {
-                key: 'impactedFieldsList',
-                value: impactedFieldsList,
-                instance: this.keyInstance
-			});
-			
+                return controlInstance.name;
+            }
+            return false
         },
         /**
          * Lấy tất cả các control bị ảnh hưởng khi mà một control thay đổi giá trị
@@ -1994,7 +2119,50 @@ export default {
             }
             return arr;
         },
+        /**
+         * 
+         */
+        goToListDocument(){
+            this.drawer = false;
+            this.$goToPage('/documents/'+this.documentId+'/objects',"Danh sách bản ghi");
+        },
+        /**
+         * Ham call back từ sub form ra compon submit chính và bind giá trị cho control 
+         */
+        submitSubFormSuccess(data){
+            if(!data.isContinueSubmit){
+                this.drawer = false; 
+            }
+            let controlOpenSubform = this.sDocumentSubmit.controlOpenSubform;
+            let columnBindingSubForm = controlOpenSubform.columnBindingSubForm;
+            let dataBinding = data[columnBindingSubForm];
+            controlOpenSubform.setValue(dataBinding);
+        },
+        resetDataSubmit(){
+            let listInputInDocument = getListInputInDocument(this.keyInstance);
+            for(let controlName in listInputInDocument){
+                if(listInputInDocument[controlName].type=='table'){
+                    listInputInDocument[controlName].setData(listInputInDocument[controlName].defaultValue);
+                    this.updateListInputInDocument(
+                        controlName,
+                        "value",
+                        listInputInDocument[controlName].defaultValue
+                    );
+                }
+                else if(!listControlNotNameProp.includes(listInputInDocument[controlName].type)){
+                    listInputInDocument[controlName].setValue(listInputInDocument[controlName].defaultValue);
+                    this.updateListInputInDocument(
+                        controlName,
+                        "value",
+                        listInputInDocument[controlName].defaultValue
+                    );
+                }
+            }
+            
+        }
     }
+    
+    
 };
 </script>
 <style  scoped>
@@ -2054,7 +2222,31 @@ export default {
     font-size: 20px !important;
 }
 .v-navigation-drawer >>> .wrap-content-submit{
-    height: calc(100% - 25px);
+    height: calc(100%);
+}
+.sub-form-action{
+    float: right;
+    font-size: 13px;
+}
+.subfom-action__item{
+    margin: 0 8px 0 0;
+    padding: 4px 12px;
+    border-radius: 4px;
+    transition: all ease-in-out 250ms;
+    background: var(--symper-background-default);
+
+}
+.subfom-action__item:focus{
+    outline: none;
+}
+.subfom-action__item:hover{
+    background: var(--symper-background-hover);
+}
+.subfom-action__item .mdi{
+    margin-right: 4px;
+}
+.v-navigation-drawer >>> .sym-sub-form-submit  .sym-form-submit{
+    height: calc(100% - 30px) !important;
 }
 </style>
 

@@ -291,9 +291,11 @@
             "id": "Id",
             "name": "Name",
             "title": "Title",
-            "note": "note",
+            "note": "Note",
+            "type": "Type",
             "menu": "menu",
             "countobject": "Count object",
+            "countPrint": "Count print",
             "workflow": "Workflow",
             "createAt": "Create at",
             "updateAt": "Update at",
@@ -324,6 +326,9 @@
                     "nameControl": "Control name",
                     "changeFrom": "From",
                     "changeTo": "To"
+                },
+                "quickInfoControl": {
+                    "heading": "Control Infomation"
                 }
             }
         },

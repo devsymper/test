@@ -70,6 +70,7 @@ export default class TableControl extends Control {
                 bodyHtml += tr;
             }
             this.ele.find('table tbody').append(bodyHtml);
+            this.ele.find('table').attr('contenteditable', 'false')
         } else {
             for (let controlName in data) {
                 let dataControl = data[controlName];
@@ -82,7 +83,19 @@ export default class TableControl extends Control {
                 }
                 this.tableInstance.tableInstance.setDataAtRowProp(vls, null, null, 'auto_set');
             }
+            if (this.currentDataStore.docStatus == 'init') {
+                this.defaultValue = data;
+                this.getDefaultRowInTable();
+            }
+
         }
+    }
+
+    // hàm chạy lại các công thức root trong table để lấy ra được dòng giá trị defaul phục vụ cho việc shift+enter thêm dòng thì 
+    // điền giá trị default này vào
+    getDefaultRowInTable() {
+        console.log(this.currentDataStore, 'this.currentDataStore');
+
     }
 
 }
