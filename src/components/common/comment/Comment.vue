@@ -407,4 +407,14 @@ export default {
 	bottom:0px;
 	
 }
+.symper-comment >>> .content-comment-img .v-tab{
+	height:60px
+}
+.symper-comment >>> .content-comment-img .v-slide-group__wrapper{
+	height:60px;
+	margin-bottom:12px
+}
+.symper-comment >>> .v-dialog {
+	overflow:hidden;
+}
 </style>

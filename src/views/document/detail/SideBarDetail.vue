@@ -35,6 +35,7 @@
 									<td>{{userCreate}}</td>
 								</tr>
 								<tr>
+
 									<td>{{$t('document.detail.sidebar.body.general.history')}}</td>
 									<td @click="showHistory" style="text-decoration: underline;cursor:pointer;color:#F1853B;">Đã sửa 2 lần</td>
 								</tr>
