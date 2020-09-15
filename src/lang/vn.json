@@ -976,7 +976,8 @@
         }
     },
     "comment": {
-        "comment": "Bình luận",
+        "title":"Bình luận",
+        "comment": "Chưa giải quyết",
         "resolve": "Đã giải quyết",
         "reply": "Trả lời",
         "edited": "Đã chỉnh sửa",

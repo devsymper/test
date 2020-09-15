@@ -10,6 +10,7 @@
 				class="d-none"
 				type="file"
 				@change="onFileChanged"
+				:multiple="uploadMultyFile"
 			>
 		</v-btn>
 		 <v-dialog
@@ -87,6 +88,10 @@ export default {
 		objectContext:{
 			type: String,
 			default: ''
+		},
+		uploadMultyFile:{
+			type: Boolean,
+			default: false
 		}
 	},
 	data() {
@@ -95,7 +100,8 @@ export default {
 			dialog: false,
 			previewImg: '',
 			spliting: true,
-			formDatas:{}
+			formDatas:{},
+			selectedFile:null,
 		}
 	},
 	mounted(){
@@ -109,24 +115,38 @@ export default {
 			this.$refs.uploader.click()
 		},
 		onFileChanged(e) {
-			this.selectedFile = e.target.files[0]
-			formData.append('user',this.$store.state.app.endUserInfo.displayName)
-			formData.append('objectType',this.objectType)
-			formData.append('objectIdentifier',this.objectIdentifier)
-			if(this.pickAvatar == true){
-				if(this.selectedFile.type == 'image/jpeg' || this.selectedFile.type == 'image/jpg' || this.selectedFile.type == 'image/png'){
-					this.dialog = true
-					debuggerdebugger
-					this.previewImg = window.URL.createObjectURL(e.target.files[0])
-				}
+			if(this.uploadMultyFile == true){
+				let self = this
+				e.target.files.forEach(function(k){
+					self.formDatas = {}
+					let form = new FormData()
+					form.append('user',self.$store.state.app.endUserInfo.displayName)
+					form.append('objectType',self.objectType)
+					form.append('objectIdentifier',self.objectIdentifier)
+					form.append('file',k)
+					self.formDatas = form;
+					self.uploadFile()
+				})
 			}else{
-				formData.append('file',this.selectedFile)
-				this.formDatas = formData;
-				this.$emit('selected-file', window.URL.createObjectURL(e.target.files[0]))
-				if(this.autoUpload == true){
-					this.uploadFile()
+				this.selectedFile = e.target.files[0]
+				formData.append('user',this.$store.state.app.endUserInfo.displayName)
+				formData.append('objectType',this.objectType)
+				formData.append('objectIdentifier',this.objectIdentifier)
+				if(this.pickAvatar == true){
+					if(this.selectedFile.type == 'image/jpeg' || this.selectedFile.type == 'image/jpg' || this.selectedFile.type == 'image/png'){
+						this.dialog = true
+						this.previewImg = window.URL.createObjectURL(e.target.files[0])
+					}
+				}else{
+					formData.append('file',this.selectedFile)
+					this.formDatas = formData;
+					this.$emit('selected-file', window.URL.createObjectURL(e.target.files[0]))
+					if(this.autoUpload == true){
+						this.uploadFile()
+					}
 				}
 			}
+			
 		},
 		splitImg() {
 			const canvas = this.$refs.clipper.clip();
@@ -140,7 +160,6 @@ export default {
 			formData.append('file',file)
 			this.formDatas = formData
 			this.$emit('selected-file', this.previewImg)
-			debugger
 			if(this.autoUpload == true){
 				this.uploadFile()
 			}
