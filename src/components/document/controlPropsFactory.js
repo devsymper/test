@@ -72,32 +72,24 @@ const commonProps = {
         type: "select",
         value: "",
         options: [{
-                text: '8px',
-                value: '8px'
-            },
-            {
-                text: '10px',
+                text: 'documentEditor.f_10px',
                 value: '10px'
             },
             {
-                text: '11px',
+                text: 'documentEditor.f_11px',
                 value: '11px'
             },
             {
-                text: '12px',
+                text: 'documentEditor.f_12px',
                 value: '12px'
             },
             {
-                text: '13px',
+                text: 'documentEditor.f_13px',
                 value: '13px'
             },
             {
-                text: '14px',
+                text: 'documentEditor.f_14px',
                 value: '14px'
-            },
-            {
-                text: '15px',
-                value: '15px'
             }
         ],
         groupType: "display"
