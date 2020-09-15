@@ -266,7 +266,6 @@ export default {
 	},
 	watch:{
 		objectIdentifier:function(val){
-			debugger
 			this.getCommentById()
 		},
 		uuid:function(val){
