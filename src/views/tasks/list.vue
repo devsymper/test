@@ -100,7 +100,7 @@
                                     </div>
 
                                     <div class="fs-11  py-0 pr-2 text-ellipsis" >
-                                        {{obj.createTime ? $moment(obj.createTime).fromNow():$moment(obj.endTime).fromNow()}}
+                                        {{obj.createTime ? $moment(obj.createTime).format('DD/MM/YY  HH:mm:ss'):$moment(obj.endTime).format('DD/MM/YY  HH:mm:ss')}}
                                         <v-icon class="grey--text lighten-2 ml-1" x-small>mdi-clock-time-nine-outline</v-icon>
                                     </div>
                                 </div>

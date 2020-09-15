@@ -414,6 +414,10 @@ export default {
 	height:60px;
 	margin-bottom:12px
 }
+.symper-comment >>> .content-comment-img .v-slide-group__next,
+.symper-comment >>> .content-comment-img .v-slide-group__prev{
+	padding-top:12px
+}
 .symper-comment >>> .v-dialog {
 	overflow:hidden;
 }

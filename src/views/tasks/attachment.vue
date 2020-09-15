@@ -1,13 +1,17 @@
 <template>
   <div class="pt-0">
-    <div class="text-right pb-3 mr-5">
-      <UploadFile
+    <div class="text-right pb-3 mr-5 mb-5 mt-3">
+      <div style="display:flex; float:right;">
+        <span style="padding-top:10px">Upload File</span> 
+        <UploadFile
         @uploaded-file="uploaded"
         :objectIdentifier="taskInfo.action.parameter.taskId"
         :objectType="`task`"
         style="margin-right:10px!important"
-      />
-      <span>Upload File</span> 
+        />
+      </div>
+      
+    
     </div>
     <v-data-table
       :headers="headers"

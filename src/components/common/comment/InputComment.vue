@@ -51,17 +51,23 @@
 			v-model="dialog"
 			max-width="80%"
 			max-height="80%"
-			style="overflow-x: hidden;z-index:1000"
+			style="overflow:hidden !important;z-index:1000"
+			:content-class="'dialog-preview-image-comment'"
 		>
-			<v-card>
-				<v-icon @click="dialog = false" style="float:right;font-size:18px;padding-top:2px">mdi-close</v-icon>
-				<v-icon @click="downloadImg" style="float:right;padding-right:8px;font-size:18px;padding-top:4px">mdi-download</v-icon>
-
-				<v-img
+			<v-card style="display:flex;flex-direction:column">
+				<div>
+					<v-icon @click="dialog = false" style="float:right;font-size:18px;padding-top:2px">mdi-close</v-icon>
+					<v-icon @click="downloadImg" style="float:right;padding-right:8px;font-size:18px;padding-top:4px">mdi-download</v-icon>
+				</div>
+				<div class="preview-image-wrapper">
+					<v-img
 					:src="srcImg"
-					style="width:100%;height:100%"
-				>
-				</v-img>		
+					style="height: 200%;
+							width: 200%; 
+							vertical-align: bottom; "
+					>
+					</v-img>	
+				</div>		
 			</v-card>
 		</v-dialog>
 	</div>
@@ -419,13 +425,14 @@ export default {
 	display:flex;
 	flex-direction: column;
 	width: 100% !important;
+	max-width: unset;
 }
 .content-comment >>> .v-icon{
 	font-size:13px;	
 }
 .content-comment >>> .content-comment-img{
 	display:flex;	
-	width:95%;
+	width:90%;
 	margin-bottom:20px;
 	margin-top:4px;
 }
@@ -495,5 +502,21 @@ width: 0.6em;
 }
 .content-comment .text-area-wrapper textarea{
 	padding: 8px;
+}
+.dialog-preview-image{
+	overflow: hidden;
+	z-index:1000;
+	overflow-y:hidden
+}
+.preview-image-wrapper{
+	overflow: auto; /* adds scrollbars */
+    height: 800px;
+    background-color: blue;
+    position: relative;
+}
+.preview-image-wrapper .v-image{
+	height: 200%; /* probably looks neater if auto */
+    width: 200%; /* double width image to show only first quarter */
+    vertical-align: bottom; 
 }
 </style>

@@ -10,11 +10,9 @@ const getAllDefinitions = async(context) => {
     return new Promise(async(resolve, reject) => {
         if ($.isEmptyObject(context.state.allDefinitions)) {
             try {
-                let res = await workflowApi.getDefinitions({
-                    "start": 0,
-                    "size": 1000
-                });
-                context.commit('setAllDefinition', res.data);
+                // let res = await workflowApi.getDefinitions({
+                let res = await workflowApi.getListModels();
+                context.commit('setAllDefinition', res.data.listObject);
                 resolve(res);
             } catch (error) {
                 SYMPER_APP.$snotifyError(error, "Can not get all definitions!");

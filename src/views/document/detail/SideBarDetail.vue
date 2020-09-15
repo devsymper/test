@@ -138,7 +138,7 @@
 			</div>
 		</VuePerfectScrollbar>
 	</div>
-	<Comment style="height:100%" ref="commentView" :objectIdentifier="documentObjectId" />
+	<Comment style="height:100%" ref="commentView" :objectIdentifier="documentObjectId" @close-comment="hide" />
 
 	</v-navigation-drawer>
 </template>
