@@ -2,8 +2,8 @@
 	<div class="content-comment">
 		<div v-if="listImage.length > 0"  class="content-comment-img">
 				 <splide :options="options" style="padding:4px 40px">
-					<splide-slide v-for="(slide,i) in listImage" :key="i" style="positon:relative" >
-						<img :src="slide.serverPath" style="margin-top:auto;margin-bottom:auto;max-height:50px" @click="previewImage(slide)">
+					<splide-slide v-for="(slide,i) in listImage" :key="i" style="positon:relative" @click="previewImage(slide)" >
+						<img :src="slide.serverPath" style="margin-top:auto;margin-bottom:auto;max-height:50px" >
 						<v-icon  v-if="isEditing == true" class="icon-remove-img" @click="removeImage(slide)">mdi-close-circle-outline</v-icon>
 					</splide-slide>
 				</splide>

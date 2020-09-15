@@ -100,7 +100,8 @@ export default {
 			dialog: false,
 			previewImg: '',
 			spliting: true,
-			formDatas:{}
+			formDatas:{},
+			selectedFile:null,
 		}
 	},
 	mounted(){

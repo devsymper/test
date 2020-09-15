@@ -1,11 +1,11 @@
 <template>
-	<div class="symper-comment"
+	<div :class="{'symper-comment':true , 'symper-comment-float': floatComment == true }"
 		v-show="showComment"
-		:style="{top:top+'px',left:left+'px',height: heightComment}">
+		:style="{top: top+'px', left:left+'px', height: heightComment}">
 			<v-toolbar
 				flat
 				style="height:auto">
-				<v-toolbar-title>{{$t('comment.comment')}}  </v-toolbar-title>
+				<v-toolbar-title>{{$t('comment.title')}}  </v-toolbar-title>
 					<v-icon>mdi-comment-text-outline</v-icon>
 					<v-spacer></v-spacer>
 					<v-icon v-if="buttonClose == true" @click="clickCloseComment">mdi-close-outline</v-icon>
@@ -36,8 +36,10 @@
 				<v-tab-item
 					v-for="item in itemsTab"
 					:key="item.value"
-					>
-						<list-comment  :listComment="listComment" :searchItem="searchItem"  :heightListComment='heightListComment' />
+					style="height:100%"
+				>
+					<TargetArea v-if="showTargetComment == true" :content="contentTargetArea" />
+					<list-comment  :listComment="listComment" :searchItem="searchItem"  :heightListComment='heightListComment' />
 				</v-tab-item>
 			</v-tabs-items>
 			<div class="input-comment" v-if="tabComment == true">
@@ -69,6 +71,8 @@ export default {
 			tabComment : true,
 			searchItem:'',
 			heightListComment:null,
+			showTargetComment: false,
+			floatComment: false,
 			itemsTab: [
 				{
 					title: this.$t('comment.comment'),
@@ -114,7 +118,7 @@ export default {
 	mounted(){
 		 var x =util.getComponentSize(this);
 		 this.heightListComment = x.h - 120
-		 console.log( this.heightListComment,' this.heightListComment');
+		
 	},
 	
 	 props: {
@@ -182,6 +186,10 @@ export default {
 		buttonClose:{
 			type: Boolean,
 			default: false
+		},
+		contentTargetArea:{
+			type: String,
+			default: ''
 		}
 	},
 	methods:{
@@ -266,7 +274,6 @@ export default {
 	},
 	watch:{
 		objectIdentifier:function(val){
-			debugger
 			this.getCommentById()
 		},
 		uuid:function(val){
@@ -274,6 +281,20 @@ export default {
 				this.getCommentById()
 			}else{
 				this.getCommentByUuid()
+				this.floatComment = true
+				 var x = util.getComponentSize(this);
+				 debugger
+				 let item =  $('.symper-comment-float .comment-item')
+				 let height = 0
+				 $.each(item,function(k,v){
+					 height += $(v).height()
+				 })
+				 debugger
+				 let targetArea = $(".symper-comment-float .target-area-comment").height()
+				 if(height + targetArea + 70 > 500){
+					this.heightListComment = 500
+				 }
+
 			}
 				
 		},
@@ -288,12 +309,28 @@ export default {
 				this.$store.commit('comment/updateCurrentTab','resolve')
 				this.tabComment = false
 			}
+		},
+		contentTargetArea(val){
+			if(val != ''){
+				this.showTargetComment = true
+			}
 		}
 	}
 }
 </script>
 
 <style scoped>
+.symper-comment-float{
+	position:relative;
+	width:450px;
+	border:1px solid lightgray;
+	-webkit-box-shadow: 0px 0px 22px -4px rgba(0,0,0,0.75);
+	-moz-box-shadow: 0px 0px 22px -4px rgba(0,0,0,0.75);
+	box-shadow: 0px 0px 22px -4px rgba(0,0,0,0.75);
+}
+.symper-comment-float >>> {
+
+}
 .symper-comment{
 	font:13px roboto;
 	position: relative;

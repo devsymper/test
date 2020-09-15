@@ -834,6 +834,7 @@
         }
 	},
 	"comment":{
+        "title":"Comment",
 		"comment": "Comment",
 		"resolve": "Resolve",
 		"reply": "Reply",
