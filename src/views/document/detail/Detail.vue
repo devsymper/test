@@ -65,7 +65,6 @@ import { getSDocumentSubmitStore } from './../common/common'
 import SideBarDetail from './SideBarDetail'
 import HistoryControl from './HistoryControl'
 import { util } from '../../../plugins/util.js';
-import VueHtmlToPaper from 'vue-html-to-paper';
 export default {
     props: {
         documentObjectId: {
