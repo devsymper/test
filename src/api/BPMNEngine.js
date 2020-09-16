@@ -141,9 +141,9 @@ export default {
         if (filter.status=='done') {
             filter.parentTaskId=idParent;
             filter.finished=true;
-
-            delete filter.sort;
-            return bpmneApi.get(appConfigs.apiDomain.bpmne.tasksHistory , filter, testHeader);
+            filter.sort='endTime';
+            filter= JSON.stringify(filter);
+            return bpmneApi.post(appConfigs.apiDomain.bpmne.subTasksHistory , filter, testHeader);
         }else{
             return bpmneApi.get(appConfigs.apiDomain.bpmne.tasks + '/' + idParent + '/subtasks', filter, testHeader);
         }
@@ -160,34 +160,6 @@ export default {
                 return bpmneApi.get(appConfigs.apiDomain.bpmne.tasksHistory+'/'+taskId, {}, testHeader);
             }
         }
-    },
-    getATaskInfoV2(taskId){
-        let result1=bpmneApi.get(appConfigs.apiDomain.bpmne.tasksHistory+'/'+taskId, {}, testHeader);
-        let result2=bpmneApi.get(appConfigs.apiDomain.bpmne.tasks+'/'+taskId, {}, testHeader);
-        let isCheck=null;
-
-        result1.then((res) => {
-                if (res.status==0) {
-                }else{
-                    console.log("ge1",res);
-                    isCheck=1;
-                }
-            }
-        );
-        result2.then((res) => {
-            if (res.status==0) {
-                }else{
-                    console.log("ge2",res);
-                    isCheck=2;
-                }
-            }
-        );
-        if (isCheck==1) {
-            return result1
-        }else{
-            return result2
-        }
-        
     },
     updateTask(taskId, data) {
         data = JSON.stringify(data);
