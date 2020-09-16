@@ -22,7 +22,7 @@ export default {
     methods: {
         async getOrgchartDetail(){
             let id = this.$route.params.id;
-            let res = await orgchartApi.getOrgchartDetail(id);
+            let res = await orgchartApi.getOrgchartDetail(id)
             this.allDepartments = res.data.departments;
             this.allPositions = res.data.positions;
         }

@@ -11,6 +11,7 @@
                  @first-data-rendered="firstDataRendered"
                  @cell-editing-started="cellEditingStarted"
                  @cell-value-changed="cellValueChanged"
+                 @cell-double-clicked="cellDoubleClick"
                  :rowData="rowDataTable"
                  :treeData="true"
                  :animateRows="true"
@@ -180,6 +181,9 @@ export default {
         cellValueChanged(params){
             this.$emit('on-cell-change',params)
         },
+        cellDoubleClick(params){
+            this.$emit('on-cell-db-click',params)
+        }
         
     },
 }

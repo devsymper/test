@@ -1,7 +1,7 @@
 <template>
     <span>
         <i :class="'mdi mr-2 fs-16 '+icon"></i>
-        {{text}}
+        <span style="padding-right:8px;margin-top:-2px">{{text}}</span>
     </span>
 </template>
 <script>

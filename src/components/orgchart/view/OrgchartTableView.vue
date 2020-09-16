@@ -14,6 +14,11 @@
                 <span>Table view</span>
             </v-tab>
             <v-tab 
+                :key="'tableSideBySideView'" >
+                <v-icon size="17">mdi-home</v-icon>
+                <span>Table side by side view</span>
+            </v-tab>
+            <v-tab 
                 :key="'diagramView'" >
                 <v-icon size="17">mdi-home</v-icon>
                 <span>Diagram view</span>
@@ -37,16 +42,36 @@
                     </AgDataTable>
                 </div>
             </v-tab-item>
+              <v-tab-item :key="'tableSideBySideView'" class="px-2 pt-2 h-100">
+                <div class="h-100 symper-orgchart-table-side-by-side-view">
+                        <VueResizable :width="500" :max-width="600" :min-width="300" :active ="['r']">
+                            <AgDataTable
+                                    :tableHeight="'calc(100% - 100px)'"
+                                    :likeHandsonTable="true"
+                                    :rowData="dataTable"
+                                    :editable="false"
+                                    :customComponents="customAgComponents"
+                                    @on-cell-db-click="onCellDbClick"
+                                    :cellRendererParams="{
+                                        innerRenderer:'nodeName'
+                                    }">
+                            </AgDataTable>
+                        </VueResizable>
+                       <ListItems 
+                             ref="listApp"
+                            :pageTitle="'Danh sách người dùng'"
+                            :getDataUrl="apiUrl"
+                            :containerHeight="containerHeight"
+                            :tableContextMenu="tableContextMenu"
+                            :useDefaultContext="false"
+                            :customAPIResult="customAPIResult"
+                        />
 
+                </div>
+            </v-tab-item>
 
             <v-tab-item :key="'diagramView'" class="px-2 pt-2 h-100">
-                <!-- <OrgStructureView
-                ref="orgStructureView"
-                :mapDpmToPos="mapDpmToPos"
-                :allDepartments="allDepartments"
-                :allPositions="allPositions">
-                    
-                </OrgStructureView> -->
+               
                 <OrgchartEditor
                     :action="'view'"
                     :id="$route.params.id">
@@ -65,7 +90,10 @@ import NodeNameInTable  from "./NodeNameInTable.vue";
 import UserInNodeView  from "./UserInNodeView.vue";
 import OrgStructureView from './OrgStructureView.vue';
 import OrgchartEditor from "@/components/orgchart/editor/OrgchartEditor.vue";
-
+import TableSideBySildeView from './TableSideBySildeView.vue'
+import ListItems from '@/components/common/ListItems.vue'
+import VueResizable from 'vue-resizable';
+import { util } from "./../../../plugins/util.js";
 export default {
     props: {
         allDepartments: {
@@ -83,7 +111,13 @@ export default {
     components: {
         'AgDataTable' : AgDataTable,
         'OrgStructureView': OrgStructureView,
-        OrgchartEditor
+        OrgchartEditor,
+        TableSideBySildeView,
+        ListItems,
+        VueResizable
+    },
+    mounted(){
+        this.containerHeight = util.getComponentSize(this).h - 50
     },
     computed: {
         dataTable(){
@@ -114,6 +148,7 @@ export default {
                 let dpm = mapDepartments[dpmId];
                 let row = {
                     name: dpm.path,
+                    vizId: dpm.vizId,
                     code: dpm.code,
                     managers: typeof dpm.users == 'string' ? JSON.parse(dpm.users) : dpm.users,
                     users: [],
@@ -130,7 +165,7 @@ export default {
                     let pos = mapPos[posId];
                     let row = {
                         name: dpm.path.concat(pos.path),
-                        // name: dpm.path.concat(['Positions']).concat(pos.path),
+                        vizId: pos.vizId,
                         code: pos.code,
                         users: typeof pos.users == 'string' ? JSON.parse(pos.users) : pos.users,
                         managers: [],
@@ -185,10 +220,12 @@ export default {
                     self.$refs.displayTable.refreshData(colDefs);
                 }
             }, 0, this);
+            console.log(colDefs,'colDefscolDefscolDefs');
             return colDefs;
         }
     },
     methods: {
+        
         addDynamicValue(row, node){
             if(node.dynamicAttributes){
                 for(let attr of node.dynamicAttributes){
@@ -255,6 +292,10 @@ export default {
                     return this.getPathOfNode(mapNode[node.vizParentId], mapNode).concat([node.name]);
                 }
             }
+        },
+        onCellDbClick(params){
+            console.log(params);
+            debugger
         }
     },
     data(){
@@ -265,7 +306,28 @@ export default {
                 UserInNodeView: UserInNodeView,
             },
             mapNameToDynamicAttr: null,
-            mapDpmToPos: null
+            mapDpmToPos: null,
+            apiUrl: 'https://account.symper.vn/users',
+            customAPIResult:{
+                reformatData(res){
+                   return{
+                         listObject: res.data.listObject,
+                         columns: res.data.columns,
+                         total: res.data.total
+                   }
+                }
+            },
+            containerHeight:null,
+            tableContextMenu: {
+               viewDetails: {
+                    name: "View details",
+                    text: "View details",
+                    callback: (app, callback) => {
+                      
+                    },
+                },
+             
+            },
         }
     }
 }
@@ -275,6 +337,9 @@ export default {
 .symper-orgchart-table-view .ag-group-child-count{
     position: absolute;
     right: 5px;
+}
+.symper-orgchart-table-side-by-side-view{
+    display:flex
 }
 </style>
 
