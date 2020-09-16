@@ -1,6 +1,6 @@
 <template>
-		<div v-show="showTargetArea">
-				<p v-html="content"></p>
+		<div style="display:flex;align-item:center">
+				<p class="target-area-comment" v-html="content" style="margin-left:auto;margin-right:auto;margin-top:8px"></p>
 		</div>
 </template>
 <script>

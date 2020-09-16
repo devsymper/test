@@ -35,6 +35,7 @@
 									<td>{{userCreate}}</td>
 								</tr>
 								<tr>
+
 									<td>{{$t('document.detail.sidebar.body.general.history')}}</td>
 									<td @click="showHistory" style="text-decoration: underline;cursor:pointer;color:#F1853B;">Đã sửa 2 lần</td>
 								</tr>
@@ -137,7 +138,7 @@
 			</div>
 		</VuePerfectScrollbar>
 	</div>
-	<Comment style="height:100%" ref="commentView" :objectIdentifier="documentObjectId" />
+	<Comment style="height:100%" ref="commentView" :objectIdentifier="documentObjectId" @close-comment="hide" />
 
 	</v-navigation-drawer>
 </template>

@@ -74,9 +74,6 @@ export default {
 					})
 			}
 		},
-		// calc(){
-		// 	this.heightListComment = 100%-'120px'
-		// }
 	},
 	watch:{
 		searchItem(val){
