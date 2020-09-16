@@ -252,7 +252,8 @@ const setDefaultSubmitStore = (state, params) => {
         },
         orgchartTableSqlName: {},
         tableLoaded: {},
-        readyLoaded: false
+        readyLoaded: false,
+        listTableRootControl: {}
     }
     let instance = params.instance;
     Vue.set(state.submit, instance, value);
@@ -329,21 +330,35 @@ const setAllDocuments = (state, docs) => {
     Vue.set(state, 'listAllDocument', docs);
 }
 const cacheDataAutocomplete = (state, params) => {
-    let controlName = params.controlName
-    let header = params.header
-    let cacheData = params.cacheData
-    let object = { header: header, cacheData: cacheData }
-    let instance = params.instance;
-    if (state.submit[instance]['autocompleteData'].hasOwnProperty(controlName)) {
-        Vue.set(state.submit[instance]['autocompleteData'][controlName]['cacheData'], Object.keys(cacheData)[0], Object.values(cacheData)[0]);
-        if (state.submit[instance]['autocompleteData'][controlName]['header'].length == 0) {
-            Vue.set(state.submit[instance]['autocompleteData'][controlName], 'header', header);
+        let controlName = params.controlName
+        let header = params.header
+        let cacheData = params.cacheData
+        let object = { header: header, cacheData: cacheData }
+        let instance = params.instance;
+        if (state.submit[instance]['autocompleteData'].hasOwnProperty(controlName)) {
+            Vue.set(state.submit[instance]['autocompleteData'][controlName]['cacheData'], Object.keys(cacheData)[0], Object.values(cacheData)[0]);
+            if (state.submit[instance]['autocompleteData'][controlName]['header'].length == 0) {
+                Vue.set(state.submit[instance]['autocompleteData'][controlName], 'header', header);
+            }
+        } else {
+            Vue.set(state.submit[instance]['autocompleteData'], controlName, object);
         }
-    } else {
-        Vue.set(state.submit[instance]['autocompleteData'], controlName, object);
+
     }
+    /**
+     * Hàm update dữ liệu vào danh sách các control root trong table
+     * @param {*} state 
+     * @param {*} params 
+     */
+const updateDataToTableControlRoot = (state, params) => {
+    let controlName = params.controlName;
+    let tableName = params.tableName;
+    let value = params.value;
+    let instance = params.instance;
+    Vue.set(state.submit[instance]['listTableRootControl'][tableName], controlName, value);
 
 }
+
 
 
 export {
@@ -371,5 +386,6 @@ export {
     setDefaultDetailStore,
     updateCurrentControlEditByUser,
     cacheDataAutocomplete,
+    updateDataToTableControlRoot
 
 };

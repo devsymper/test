@@ -32,7 +32,7 @@
                     v-if="inputInfo.isDateTime"
                 ></i>
                 <i
-                    :class="{'mdi mdi-dock-window float-right input-item-func ml-1': true,'active': inputInfo.title == largeFormulaEditor.name}"
+                    :class="{'mdi mdi-dock-window float-right input-item-func ml-1': true,'active': inputInfo.title == largeFormulaEditor.name, 'd-none':(inputInfo.activeTab && inputInfo.activeTab=='orgchart' )}"
                     @click="openLargeValueEditor(inputInfo, name)"
                     v-if="inputInfo.type == 'script' || inputInfo.type == 'userAssignment'"
                 ></i>
@@ -83,17 +83,17 @@
                     <template>
                         <div>
                             <v-icon v-if="data.item.icon">{{data.item.icon}}</v-icon>
-                            <span>{{$t("objectType."+data.item.text)}}</span>
+                            <span>{{data.item.text}}</span>
                         </div>
                     </template>
                 </template>
             </component>
 
-            <div class="error-message"> 
-                {{inputInfo.errorMessage}}
+            <div class="error-message" v-if="inputInfo.validateStatus && !inputInfo.validateStatus.isValid">
+                {{inputInfo.validateStatus.message}}
             </div>
         </div>
-        <symper-drag-panel 
+        <symper-drag-panel
             @before-close="closeLargeFormulaEditor()"
             :showPanel="largeFormulaEditor.open"
             :actionTitle="largeFormulaEditor.data.title"
@@ -125,8 +125,8 @@
         </symper-drag-panel>
 
         <datetime-picker ref="dateTimePicker" @apply-datetime="appendValueToSciptEditor" :position="currentPointer"></datetime-picker>
-        
-        
+
+
     </div>
 </template>
 <script>
@@ -370,7 +370,7 @@ export default {
                     });
                 }
             }
-            this.largeFormulaEditor.data.value.orgchartSelectorValue = vls;  
+            this.largeFormulaEditor.data.value.orgchartSelectorValue = vls;
         },
         getDragPanelContent(panelData){
             if(panelData.type == 'userAssignment'){
@@ -390,7 +390,7 @@ export default {
         closeLargeFormulaEditor() {
             let info = this.largeFormulaEditor;
             setTimeout((self) => {
-                self.largeFormulaEditor.name = '';            
+                self.largeFormulaEditor.name = '';
             }, 500, this);
         },
         openLargeValueEditor(inputInfo, name) {
@@ -421,10 +421,12 @@ export default {
              * inputInfo: chứa các thông tin về input
              */
             this.$emit("input-value", name, inputInfo, data);
+            if (inputInfo.validate && typeof inputInfo.validate == 'function') {
+                inputInfo.validate();
+            }
         },
         handleKeyUpInputValue(inputInfo, name, data){
             console.log('jj',inputInfo, name, data);
-            
             this.$emit("input-value-keyup", name, inputInfo, data);
         },
         getInputProps(inputConfigs) {
@@ -513,7 +515,7 @@ export default {
             let w = this.labelWidth;
             return this.singleLine ? `calc(100% - ${w} - 8px)` : "100%";
         },
-     
+
     },
     components: {
         VTextField,

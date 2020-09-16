@@ -1,9 +1,7 @@
 <template>
     <div class="wraper-comment" :style="style">
-		<!-- <v-divider></v-divider> -->
-        <div class="comment-content " style="height:97%">
-				<span class="mdi mdi-keyboard-backspace" @click="hide"></span>
-			<Comment :showComment="true" :objectIdentifier="objectIdentifier" :objectType="'document'" :height="'100%'" />
+        <div class="comment-content " style="height:100%">
+			<Comment style="margin-left:-12px;margin-right:8px" :showComment="true" :objectIdentifier="objectIdentifier" :objectType="'document'" :height="'100%'" :buttonClose="true" @close-comment="hide" />
         </div>
 	</div>
 </template>
@@ -26,6 +24,7 @@ export default {
     methods:{
         hide(){
 			this.style = 'transform:translateX(300px)'
+			this.$emit('close-comment')
 		},
 		show(){
             this.style = 'transform:translateX(0px)'
@@ -38,7 +37,7 @@ export default {
 		position: absolute;
 		top: 0;
 		right: 0;
-		width: 99%;
+		width: 400px;
 		height: 100%;
 		background: white;
 		z-index: 9999;

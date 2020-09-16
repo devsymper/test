@@ -378,7 +378,18 @@
         "Knowledge": "Văn bản nội bộ",
         "File": "Quản lý tệp",
         "Department": "Phòng ban",
-        "Timesheet": "Thời gian biểu"
+        "Timesheet": "Thời gian biểu",
+        "documentPanel": {
+            "system": "Hệ thống",
+            "list": "danh mục"
+        },
+        "documentEditor": {
+            "f_10px": "10px",
+            "f_11px": "11px",
+            "f_12px": "12px",
+            "f_13px": "13px",
+            "f_14px": "14px"
+        }
     },
     "document": {
         "create": "Tạo mới văn bản",
@@ -389,8 +400,10 @@
             "name": "Tên",
             "title": "Tiêu đề",
             "note": "Ghi chú",
+            "type": "Loại Văn bản",
             "menu": "menu",
-            "countobject": "Số lượng bản gi",
+            "countobject": "Số lượng bản ghi",
+            "countPrint": "Số lượng bản in",
             "workflow": "Quy trình",
             "createAt": "Thời gian tạo",
             "updateAt": "Thời gian update",
@@ -421,6 +434,9 @@
                     "nameControl": "Tên control",
                     "changeFrom": "Đổi kiểu control từ",
                     "changeTo": "Thành"
+                },
+                "quickInfoControl": {
+                    "heading": "Thông tin control"
                 }
             }
         },
@@ -430,7 +446,9 @@
                 "draft": "Lưu bản nháp",
                 "toggleSize": "Thay đổi kích thước"
             },
-            "title": "Submit văn bản"
+            "title": "Submit văn bản",
+            "goToList": "Đi đến danh sách",
+            "continueSubmit": "Nhập liệu tiếp"
         },
         "process": {
             "header_bar": {
@@ -872,9 +890,9 @@
             "canNotCreateTask": "Không thể khởi tạo công việc"
         },
         "header": {
-            "type":"Loại",
-            "approval":"Phê duyệt",
-            "submit":"Gửi văn bản",
+            "type": "Loại",
+            "approval": "Phê duyệt",
+            "submit": "Gửi văn bản",
             "date": "Ngày tạo",
             "dueDate": "Ngày đến hạn",
             "createDate": "Ngày khởi tạo",
@@ -958,7 +976,8 @@
         }
     },
     "comment": {
-        "comment": "Bình luận",
+        "title":"Bình luận",
+        "comment": "Chưa giải quyết",
         "resolve": "Đã giải quyết",
         "reply": "Trả lời",
         "edited": "Đã chỉnh sửa",

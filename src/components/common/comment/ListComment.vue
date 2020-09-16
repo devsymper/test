@@ -62,12 +62,18 @@ export default {
 						if(item.content.toLowerCase().includes(self.searchItem.toLowerCase())){
 							self.resItem.push(item)
 						}
+						if(item.childrens.length > 0){
+							item.childrens.filter(function(itemChild){
+								if(itemChild.content.toLowerCase().includes(self.searchItem.toLowerCase())){
+									if(self.resItem.includes(item) == false){
+										self.resItem.push(item)
+									}
+								}
+							})
+						}
 					})
 			}
 		},
-		// calc(){
-		// 	this.heightListComment = 100%-'120px'
-		// }
 	},
 	watch:{
 		searchItem(val){

@@ -293,6 +293,7 @@ export default {
             }
         },
         // displayDate() {
+        //   debugger
         //     if(this.eventLog.startTime!=undefined){this.getEventLog();};
            
         // }
@@ -366,15 +367,18 @@ export default {
             else this.tab = null
         },
         newEvent(val) {
+           // debugger
             this.getAllTask();
             this.inputs.startTime = val ? dayjs(val.start).format('HH:mm') : "08:00";
             this.inputs.endTime = val ? dayjs(val.end).format('HH:mm') : "08:40";
+         //   debugger
             this.inputs.date = val ? dayjs(val.date).format('YYYY-MM-DD') : dayjs().format('YYYY-MM-DD');
             this.displayDate = this.inputs.date;
             this.inputs.description = val.desc;
             this.categoryTask = val.category;
             this.task = val.task;
             this.items.push({name:val.task});
+         //   debugger
             // hiển thị nút plan và log theo từng giờ
             let now = dayjs();
             let dateLog = dayjs(this.newEvent.start).format('DD/MMM/YYYY h:mm A');
@@ -385,6 +389,7 @@ export default {
     },
     created(){
         // load lại trang ở màn month
+     //  debugger
         let date = this.dateMonth;
         this.getDateMonth(date);
         this.getAllTask();
@@ -393,6 +398,7 @@ export default {
     methods: {
         filterTaskByCategory(){
             if(this.categoryTask){
+                debugger
             let categoryId = this.getIdCategory(this.categoryTask);
             this.items = this.items.filter(x=>x.categoryId==categoryId||x.categoryId==null);
             }
@@ -495,6 +501,7 @@ export default {
                     self.listCategory = res.data.category;
                     self.category.category_name=[];
                     let category = res.data.category;
+                     // debugger
                     for(let i=0; i<category.length; i++){
                         self.category.category_name.push(
                             category[i].key+"-"+category[i].name
@@ -512,6 +519,7 @@ export default {
         },
         // type= 0 là plan, 1 là log
         log(type) {
+            // debugger
             this.checkNullTask = true;
             let start = null;
             let end = null;
@@ -526,8 +534,10 @@ export default {
                 end  = dayjs(this.newEvent.start).hour(+this.inputs.endTime.split(":")[0]).minute(+this.inputs.endTime.split(":")[1]).format("YYYY-MM-DD HH:mm");
 
             }
+            //debugger
             if (!check){}
             else{
+               // debugger
                 timesheetApi.createLogTime({
                     start: start,
                     end: end,
@@ -540,6 +550,7 @@ export default {
                 })
                 .then(res => {
                     if (res.status === 200) {
+                     //   debugger
                         this.onSave();
                         this.$emit('loadMonthView')
                      
@@ -597,6 +608,7 @@ export default {
                     })
                     .then(res => {
                         if (res.status === 200) {
+                          //  debugger
                             this.onSave()
                         }
                     })

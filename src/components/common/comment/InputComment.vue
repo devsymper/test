@@ -1,15 +1,20 @@
 <template>
 	<div class="content-comment">
 		<div v-if="listImage.length > 0"  class="content-comment-img">
-			<div  class="commnet-img-item" v-for="(item,i) in listImage" :key="i">
-				<v-img
-           			 :src="item.serverPath"
-					style="margin-top:auto;margin-bottom:auto;max-height:50px"
-					@click="previewImage(item)"
-         		>
-					<v-icon  v-if="isEditing == true" class="icon-remove-img" @click="removeImage(item)">mdi-close-circle-outline</v-icon>
-				</v-img> 
-			</div>
+				<v-tabs
+				show-arrows
+				>
+				<v-tab
+				v-for="(item,i) in listImage"
+				:key="i"
+				:href="'#tab-' + i"
+				style="position:relative"
+				>
+					<v-img :src="item.serverPath" aspect-ratio="1.7" style="width:100px;height:100px"  @click="previewImage(item)">
+					</v-img>
+					<v-icon class="icon-remove-img" style="position:absolute;top:0;right:0" v-if="isEditing == true" @click="removeImage(item)">mdi-close-circle-outline</v-icon>
+				</v-tab>
+			</v-tabs>
 		</div>
 		<div v-if="listFile.length > 0" class="content-comment-file">
 			<div class="commnet-file-item" v-for="(item,i) in listFile" :key="i">
@@ -28,34 +33,41 @@
 					<textarea v-model="inputComment"  
 						v-on:keyup.50="tagUser($event)"
 						v-on:keyup.esc="cancelComment"
-						v-on:keyup.enter="addComment"
+						v-on:keyup.enter="enterClick"
 						class="text-area"
 						style="width:100%"
-						v-on:keyup.down="chooseUser"
+						v-on:keyup.down="chooseUserDown($event)"
+						v-on:keyup.up="chooseUserUp($event)"
 						>
 					</textarea>
-				<UploadFile style="position:absolute;right:16px;bottom: 0px;" @uploaded-file="uploadInfo" />
+				<UploadFile style="position:absolute;right:16px;bottom: 0px;" @uploaded-file="uploadInfo" :uploadMultyFile="true" @upload-error="showError" />
 				<v-btn style="position:absolute;right: 0px;bottom: 0px;" icon @click="addComment">
 					<v-icon >mdi-send-circle-outline</v-icon>
 				</v-btn>
+				<MenuTagUser style="position:absolute;left:0;bottom:45px" ref="menuTagUser" @selected-item="tagged" :keyWord="keyWord" />
 			</div>
 		</div>
-		<MenuTagUser ref="menuTagUser" @selected-item="tagged" :keyWord="keyWord" />
 		 <v-dialog
 			v-model="dialog"
 			max-width="80%"
 			max-height="80%"
-			style="overflow-x: hidden"
+			style="overflow:hidden !important;z-index:1000"
+			:content-class="'dialog-preview-image-comment'"
 		>
-			<v-card>
-				<v-icon @click="dialog = false" style="float:right;font-size:18px;padding-top:2px">mdi-close</v-icon>
-				<v-icon @click="downloadImg" style="float:right;padding-right:8px;font-size:18px;padding-top:4px">mdi-download</v-icon>
-
-				<v-img
+			<v-card style="display:flex;flex-direction:column">
+				<div>
+					<v-icon @click="dialog = false" style="float:right;font-size:18px;padding-top:2px">mdi-close</v-icon>
+					<v-icon @click="downloadImg" style="float:right;padding-right:8px;font-size:18px;padding-top:4px">mdi-download</v-icon>
+				</div>
+				<div class="preview-image-wrapper">
+					<v-img
 					:src="srcImg"
-					style="width:100%;height:100%"
-				>
-				</v-img>		
+					style="height: 200%;
+							width: 200%; 
+							vertical-align: bottom; "
+					>
+					</v-img>	
+				</div>		
 			</v-card>
 		</v-dialog>
 	</div>
@@ -64,6 +76,8 @@
 import MenuTagUser from './MenuTagUser.vue'
 import UploadFile from '@/components/common/UploadFile.vue';
 import {commentApi} from '@/api/Comment.js'
+import { util } from '../../../plugins/util';
+
 export default {
 	data(){
 		return {
@@ -73,6 +87,7 @@ export default {
 			srcImg:'',
 			dialog:false,	
 			tags:[],
+			isSelectingUser:false,
 			idImg:null,
 			icon:{
 				xlxs: 'mdi-file-excel-box',
@@ -85,7 +100,8 @@ export default {
 			dataPostComment:{
 			},
 			listImage:[],
-			listFile:[]
+			listFile:[],
+			
 		}
 	},
 	props:{
@@ -116,13 +132,29 @@ export default {
 		contentEdit:{
 			type: String,
 			default: ''
-		}
+		},
+		
 	},
 	components:{
 		MenuTagUser,
-		UploadFile
+		UploadFile,
 	},
 	created(){
+	},
+	mounted(){
+		 let thisCpn = this;
+			$(document).click(function(e){
+				if(!$(e.target).is('.context-menu')){
+					if(thisCpn.$refs.menuTagUser){
+						thisCpn.$refs.menuTagUser.hide()
+					}
+				}
+			})
+			$(document).keydown(function(e){
+				if(e.keyCode == 38 || e.keyCode == 40){
+					event.preventDefault()
+				}
+			})
 	},
 	methods:{
 		removeFile(item){
@@ -134,12 +166,14 @@ export default {
 			this.images.splice(this.images.indexOf(item),1)
 		},
 		tagUser(event){
+			this.isSelectingUser = true
 			let $target = $(event.target);
 			var x = $target.offset().left;
      		var y = $target.offset().top+28;
 			this.$refs.menuTagUser.show(x,y);
 		},
 		tagged(data){
+			this.isSelectingUser = false
 			if(this.item){
 				 this.tags = this.item.tags 
 			}
@@ -203,6 +237,16 @@ export default {
 		cancel(){
 			this.$emit('cancel-reply')
 		},
+		cancelComment(){
+			this.$refs.menuTagUser.hide()
+		},
+		showError(){
+			this.$snotify({
+                type: 'error',
+                title: "FILE UPLOAD ERROR",
+                text: this.$t('notification.error')
+            })
+		},
 		addComment(){
 			this.dataPostComment = this.sComment
 			this.dataPostComment.content = this.inputComment
@@ -216,6 +260,7 @@ export default {
 					this.updateComment()
 					this.inputComment = ''
 					this.attachments = []
+					this.tags = []
 				});
 			}
 			else{
@@ -225,6 +270,7 @@ export default {
 					this.$store.commit('comment/updateParentCommentTarget',0)
 					this.updateComment()
 					this.attachments = []
+					this.tags = []
 				});
 			}
 			this.$store.commit('comment/updateReplyStatus',false)
@@ -236,6 +282,7 @@ export default {
 				this.attachments.push(data.id)
 				if(data.type == 'jpg' || data.type == 'png' || data.type == 'jpeg' || data.type == 'jfif'){
 					this.listImage.push(data)
+					console.log(this.listImage,'this.listImage');
 				}else{
 					this.listFile.push(data)
 				}
@@ -264,8 +311,24 @@ export default {
 				});
 			}
 		},
-		chooseUser(){
-			this.$refs.menuTagUser.chooseUser()
+		chooseUserDown(){
+			this.isSelectingUser = true
+			this.$refs.menuTagUser.down()
+		},
+		chooseUserUp(){
+			this.$refs.menuTagUser.up()
+		},
+		selectedUser(){
+			this.$refs.menuTagUser.selectedUser()
+			this.isSelectingUser = false
+		},
+		enterClick(){
+			if(this.isSelectingUser == true){
+				this.selectedUser()
+			}else{
+				this.addComment()
+			}
+	/* float: right; */
 		},
 		addAvatar(data){
 			let mapIdToUser = this.$store.getters['app/mapIdToUser'];
@@ -362,12 +425,16 @@ export default {
 	display:flex;
 	flex-direction: column;
 	width: 100% !important;
+	max-width: unset;
 }
 .content-comment >>> .v-icon{
 	font-size:13px;	
 }
 .content-comment >>> .content-comment-img{
-	display:flex;
+	display:flex;	
+	width:90%;
+	margin-bottom:20px;
+	margin-top:4px;
 }
 .content-comment >>> .commnet-img-item{
 	width: 80px;
@@ -378,12 +445,19 @@ export default {
 }
 .content-comment >>> .commnet-img-item .icon-remove-img{
 	font-size: 13px;
-	float: right;
-	top:0px;
+	position:absolute !important;
+	top: 0;
+	right: 0;
+}
+.content-comment >>> .splide__arrow svg{
+width: 0.6em;
+    height: 0.6em;
 }
 .content-comment >>> .content-comment-file{
 	display: flex;
 	flex-direction: column;
+
+
 }
 .content-comment >>> .content-comment-file .commnet-file-item{
 	padding: 0px 0px 4px 0px;
@@ -428,5 +502,21 @@ export default {
 }
 .content-comment .text-area-wrapper textarea{
 	padding: 8px;
+}
+.dialog-preview-image{
+	overflow: hidden;
+	z-index:1000;
+	overflow-y:hidden
+}
+.preview-image-wrapper{
+	overflow: auto; /* adds scrollbars */
+    height: 800px;
+    background-color: blue;
+    position: relative;
+}
+.preview-image-wrapper .v-image{
+	height: 200%; /* probably looks neater if auto */
+    width: 200%; /* double width image to show only first quarter */
+    vertical-align: bottom; 
 }
 </style>

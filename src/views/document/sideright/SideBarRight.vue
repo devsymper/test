@@ -192,10 +192,6 @@ export default {
             }
         },
         handleValidateControl(name, input, data){
-            if(this.isConfigPrint){
-                this.savePrintControlConfig(name, input, data);
-                return;
-            }
             let value = input.value
             let elements = $('#document-editor-'+this.instance+'_ifr').contents().find('#'+this.sCurrentDocument.id);
             if(name == "width"){
@@ -213,23 +209,13 @@ export default {
             this.$store.commit(
                 "document/updateProp",{id:this.sCurrentDocument.id,name:name,value:value,tableId:tableId,type:"value",instance:this.instance}
             );   
-            if(name == 'name' || name == 'title'){
+            if((name == 'name' || name == 'title') && !this.isConfigPrint){
                 let currentInput = this.sCurrentDocument.properties.name;
                 this.checkNameControl('name', currentInput.name);
                 this.checkTitleControl('title', currentInput.title);
             }
         },
-        savePrintControlConfig(name, input, data){
-            let elements = $('#document-editor-'+this.instance+'_ifr').contents().find('#'+this.sCurrentDocument.id);
-            if(name == "formulas"){
-                elements.attr('formulas',data);
-            }
-            else{
-                let cssItem = {};
-                cssItem[name] = data;
-                elements.css(cssItem)
-            }
-        },
+        
         /**
          * Hàm kiểm tra tên 1 control có bị trùng với các control khác hay không, nếu bị trùng thì thông báo lỗi
          */

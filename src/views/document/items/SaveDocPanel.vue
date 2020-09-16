@@ -112,11 +112,8 @@ export default {
         },
         //Hàm kiểm tra tên document đã tồn tai hay chưa
         handleChangeInput(name, input, data){
-            
             this.showNoteChangeName = true;
-            
             let thisCpn = this;
-            if(this.isValid)
             documentApi
                     .checkExistDocument(input.value)
                     .then(res => {
@@ -129,17 +126,12 @@ export default {
                             else{
                                 thisCpn.isValid = true;
                             }
-                            let docProps = util.cloneDeep(thisCpn.documentProps);
-                                docProps.name.errorMessage = message;
-                                thisCpn.$store.commit('document/addToDocumentPropsEditor',{key: thisCpn.instance,value :docProps})
+                            this.documentProps.name.errorMessage = message;
                         }
                        
                     })
                     .catch(err => {
-                        thisCpn.$snotify({
-                            type: "error",
-                            title: "error from check exist document api!!!"
-                        }); 
+                        
                     })
                     .always(() => {});
         },
@@ -151,9 +143,7 @@ export default {
         },
         // Hàm kiểm tra tên document
         checkValidateNameDocument(name, input, data){
-            
             if(name == 'name'){
-                let docProps = util.cloneDeep(this.documentProps);
                 let message = "";
                 if(input.value.length == 0){
                     message = "Không được bỏ trống";
@@ -168,10 +158,8 @@ export default {
                         this.isValid = true
                     }
                 }
-                docProps.name.errorMessage = message;
-                this.$store.commit('document/addToDocumentPropsEditor',{key: this.instance,value :docProps})
+                this.documentProps.name.errorMessage = message;
             }
-            
         },
         saveDocument(){
             if(this.isConfigPrint){
@@ -184,22 +172,30 @@ export default {
                     this.$refs.validate.show(false)
                 }
                 else{
+                    this.checkTitleDocument();
                     if(this.isValid){
                         this.$emit("save-doc-action");
                         this.hideDialog();
-                    }
-                    else{
-                        this.$snotify({
-                                        type: "error",
-                                        title: "Vui lòng nhập lại tên document"
-                                    });  
                     }
                 }
             }
             
         },
+        /**
+         * Hàm kiểm tra tiêu đề của doc đã điền hay chưa, nếu chưa thì báo lỗi
+         */
+        checkTitleDocument(){
+            if(!this.documentProps.title.value){
+                this.isValid = false;
+                this.documentProps.title.errorMessage = "Vui lòng nhập tiêu đề document"
+            }
+            else{
+                this.isValid = true;
+                this.documentProps.title.errorMessage = ""
+            }
+        },
         setPropsOfDoc(props){
-            if(props.name != undefined){
+            if(!props.name){
                 this.isValid = true
             }
             let docProps = {
@@ -208,12 +204,14 @@ export default {
                     type: "text",
                     value: (props.name != undefined) ? props.name : '',
                     appendIcon:"mdi-checkbox-multiple-marked-circle-outline",
-                    oldName:(props.name != undefined) ? props.name : ''
+                    oldName:(props.name != undefined) ? props.name : '',
+                    errorMessage:""
                 },
                 title : {
                     title: "Tiêu đề document",
                     type: "text",
                     value: (props.title != undefined) ? props.title : '',
+                    errorMessage:""
                 },
                 recentName : {
                     title: "Tên trường hiển thị thông tin trong mục gần đây",
@@ -224,6 +222,20 @@ export default {
                     title: "Toàn màn hình",
                     type: "checkbox",
                     value: (parseInt(props.isFullSize) === 0) ? false : true,
+                },
+                type : {
+                    title: "Loại Văn bản",
+                    type: "select",
+                    value: 1,
+                    options: [{
+                            text: 'documentPanel.list',
+                            value: 2
+                        },
+                        {
+                            text: 'documentPanel.system',
+                            value: 1
+                        },
+                    ],
                 },
             
                 note : {

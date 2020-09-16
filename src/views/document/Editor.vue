@@ -44,6 +44,7 @@
         @check-name-document="checkBeforeDocumentNameChange"
         @save-doc-action="validateControl"
         @save-form-print-action="saveFormPrint"/>
+        <QuickInfoControl :keyInstance="keyInstance" ref="quickInfoControlView"/>
         <err-message :listErr="listMessageErr" ref="errMessage"/>
         <control-name-related v-if="!isConfigPrint" :instance="keyInstance" @after-close-panel="afterClosePanel"  ref="controlNameRelated"/>
         <all-control-option :instance="keyInstance" ref="allControlOption"/>
@@ -77,6 +78,7 @@ import PrintTableConfig from './print/PrintTableConfig';
 import AutoCompleteControl from './items/AutoCompleteControl.vue';
 import controlCss from  "./../../assets/css/document/control/control.css";
 import SaveDocPanel from "./../../views/document/items/SaveDocPanel.vue";
+import QuickInfoControl from "./../../views/document/items/QuickInfoControl";
 import ErrMessagePanel from "./../../views/document/items/ErrMessagePanel.vue";
 import ControlNameRelated from "./../../views/document/items/ControlNameRelated.vue";
 import AllControlInDoc from "./../../views/document/items/AllControlInDoc.vue";
@@ -142,7 +144,8 @@ export default {
         "control-name-related":ControlNameRelated,
         SwapTypeControlView,
         MaterialIcon,
-        PrintTableConfig
+        PrintTableConfig,
+        QuickInfoControl
     },
     mounted(){
         let self = this;
@@ -164,7 +167,7 @@ export default {
                                 alignleft aligncenter alignright alignjustify | \
                                 bullist numlist indent hr | removeformat  table |  preview margin',
                                 fontsize_formats: '8px 10px 11px 12px 13px 14px 15px 16px 17px 18px 19px 20px 21px 22px 23px 24px 25px 26px 27px 28px 29px 30px 32px 34px 36px',
-                                font_formats: 'Roboto = Roboto,sans-serif; Andale Mono=andale mono,times;'+ 'Arial=arial,helvetica,sans-serif;'+ 'Arial Black=arial black,avant garde;'+ 'Book Antiqua=book antiqua,palatino;'+ 'Comic Sans MS=comic sans ms,sans-serif;'+ 'Courier New=courier new,courier;'+ 'Georgia=georgia,palatino;'+ 'Helvetica=helvetica;'+ 'Impact=impact,chicago;'+ 'Symbol=symbol;'+ 'Tahoma=tahoma,arial,helvetica,sans-serif;'+ 'Terminal=terminal,monaco;'+ 'Times New Roman=times new roman,times;'+ 'Trebuchet MS=trebuchet ms,geneva;'+ 'Verdana=verdana,geneva;'+ 'Webdings=webdings;'+ 'Wingdings=wingdings,zapf dingbats',
+                                font_formats: 'Roboto=Roboto,sans-serif; Andale Mono=andale mono,times;'+ 'Arial=arial,helvetica,sans-serif;'+ 'Arial Black=arial black,avant garde;'+ 'Book Antiqua=book antiqua,palatino;'+ 'Comic Sans MS=comic sans ms,sans-serif;'+ 'Courier New=courier new,courier;'+ 'Georgia=georgia,palatino;'+ 'Helvetica=helvetica;'+ 'Impact=impact,chicago;'+ 'Symbol=symbol;'+ 'Tahoma=tahoma,arial,helvetica,sans-serif;'+ 'Terminal=terminal,monaco;'+ 'Times New Roman=times new roman,times,serif;'+ 'Trebuchet MS=trebuchet ms,geneva;'+ 'Verdana=verdana,geneva;'+ 'Webdings=webdings;'+ 'Wingdings=wingdings,zapf dingbats',
                                 valid_elements: '*[*]',
                                 content_css:['https://cdn.jsdelivr.net/npm/@mdi/font@latest/css/materialdesignicons.min.css'],
                                 setup: function(ed){
@@ -756,7 +759,6 @@ export default {
             let htmlContent = this.editorCore.getContent();
             let dataPost = this.getDataToSaveMultiFormulas(allControl);
             let thisCpn = this;
-            console.log("ádsadsad",allControl);
             try {
                 if(Object.keys(dataPost.update).length > 0)
                 await formulasApi.updateMultiFormulas({formulas:JSON.stringify(dataPost.update)})
@@ -1992,6 +1994,7 @@ export default {
                         thisCpn.addToAllControlInDoc(newPageId,{properties: control.properties, formulas : control.formulas,type:'page'});
                     }
                     thisCpn.selectControl(control.properties, control.formulas,inputid,typeControl);
+                    thisCpn.$refs.quickInfoControlView.show(event)
                     if(table.length > 0){   // nếu keo control vào trong table thì update dữ liệu trong table của state
                         idTable = table.attr('id');
                         thisCpn.addToAllControlInTable(inputid,{properties: control.properties, formulas : control.formulas,type:typeControl},idTable);
@@ -2075,8 +2078,10 @@ export default {
                 let listData = [];
                 if($(tbody[0].innerHTML).length > 0){
                     for(let i = 0; i< thead.length; i++){
-                        var width = Math.ceil(( 100 * parseFloat($(thead[i]).css('width')) / parseFloat($(thead[i]).parent().css('width')) ) )+ '%';
-                        let row = {title: $(thead[i]).text(),colWidth:width}
+                        let style = $(thead[i]).attr('style');
+                        console.log("sadsadasdasda",style);
+                        let width = style.match(/(?<=width:\s)\s*([^;"]*)(?=\;)/gmi);
+                        let row = {title: $(thead[i]).text(),colWidth:width[0]}
                         listData.push(row)
                     }
                 }

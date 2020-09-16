@@ -3,8 +3,10 @@
         <TaskDetail
             :taskInfo="data.taskInfo"
             :originData="data.originData"
-            :parentHeight="taskDetailHeight" >
-
+            :parentHeight="taskDetailHeight" 
+            @close-detail="closeDetail"
+            
+            >
         </TaskDetail>
     </div>
 </template>
@@ -53,6 +55,9 @@ export default {
                 this.$set(this.data, 'taskInfo', taskInfo);
                 this.$set(this.data, 'originData', task);
             }
+        },
+        closeDetail(){
+            this.$router.push("/tasks");
         }
     }
 }
