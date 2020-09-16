@@ -91,7 +91,7 @@
 </template>
 <script>
 import FormTpl from "./../../../components/common/FormTpl.vue"
-import {checkInTable} from "./../common/common";
+import {checkInTable,checkNameControl,checkTitleControl} from "./../common/common";
 import { formulasApi } from "./../../../api/Formulas.js";
 import { util } from '../../../plugins/util';
 
@@ -137,7 +137,7 @@ export default {
             {id:'formulas', tab: 'Công thức' ,icon:'mdi-function-variant'},
             
             ],
-            listNameValueControl:{},
+            listNameValueControl:{},    
             delayTimer:null
         
         }
@@ -211,110 +211,14 @@ export default {
                 "document/updateProp",{id:this.sCurrentDocument.id,name:name,value:value,tableId:tableId,type:"value",instance:this.instance}
             );   
             if((name == 'name' || name == 'title') && !this.isConfigPrint){
-                let currentInput = this.sCurrentDocument.properties.name;
-                this.checkNameControl('name', currentInput.name);
-                this.checkTitleControl('title', currentInput.title);
+                checkNameControl(this.instance);
+                checkTitleControl(this.instance);
             }
         },
         
-        /**
-         * Hàm kiểm tra tên 1 control có bị trùng với các control khác hay không, nếu bị trùng thì thông báo lỗi
-         */
-        checkTitleControl(name, input){
-            let elements = $('#document-editor-'+this.instance+'_ifr').contents().find('#'+this.sCurrentDocument.id);
-            elements.removeClass('s-control-error');
-            if(elements.is('.page-item')){
-                elements.find('.page-item__name').text(input.value);
-            }
-            if(elements.is('[s-control-type="tab"]')){
-                elements.text(input.value);
-            }
-            let tableId = checkInTable(elements)
-            if( tableId == this.sCurrentDocument.id)
-            tableId = '0';
-            let errValue = ""
-            if(input.value == "" && input.value.length == 0){
-                errValue = "Không được bỏ trống tiêu đề control"
-                elements.addClass('s-control-error');
-            }
-            this.$store.commit(
-                    "document/updateProp",{id:this.sCurrentDocument.id,name:name,value:errValue,tableId:tableId,type:"errorMessage",instance:this.instance}
-                );
-            this.$store.commit(
-                "document/updateCurrentControlProps",{instance:this.instance,group:'name',prop:'title',typeProp:'errorMessage',value:errValue}
-            );   
-        },
+        
 
-        /**
-         * Hàm kiểm tra tên 1 control có bị trùng với các control khác hay không, nếu bị trùng thì thông báo lỗi
-         */
-        checkNameControl(name, input){
-            let elements = $('#document-editor-'+this.instance+'_ifr').contents().find('#'+this.sCurrentDocument.id);
-            let tableId = checkInTable(elements)
-            if( tableId == this.sCurrentDocument.id)
-            tableId = '0';
-            let errValue = ''
-            let listValue = Object.values(this.listNameValueControl);
-            let dataControl = {value: input.value, match:false,id:this.sCurrentDocument.id};
-            if(input.value == "" && input.value.length == 0){
-                errValue = "Không được bỏ trống tên control"
-                elements.addClass('s-control-error');
-            }
-            else{
-                 if(/^[a-zA-Z_$][a-zA-Z_$0-9]*$/.test(input.value) == false){
-                        errValue = "Tên không hợp lệ";
-                        elements.addClass('s-control-error');
-                    }
-                    else{
-                        elements.removeClass('s-control-error');
-                        let controlConflic = listValue.filter(c=>{
-                            return c.value == input.value
-                        });
-                        if(controlConflic.length > 0){
-                            let listContrlIdConflic = controlConflic.reduce((arr,obj)=>[
-                                ...arr,obj.id
-                            ],[]);
-                            dataControl.match = listContrlIdConflic;
-                            elements.addClass('s-control-error');
-                            for (let index = 0; index < controlConflic.length; index++) {
-                                let control = controlConflic[index];
-                                // console.log('sa',this.listNameValueControl[control.id]);
-                                let newList = util.cloneDeep(listContrlIdConflic);
-                                newList.splice(newList.indexOf(control.id),1);
-                                newList.push(this.sCurrentDocument.id);
-                                this.listNameValueControl[control.id].match = newList;
-                                $('#document-editor-'+this.instance+'_ifr').contents().find('#'+control.id).addClass('s-control-error');
-                            }
-                            if(this.listNameValueControl.hasOwnProperty(this.sCurrentDocument.id)){
-                                for (let index = 0; index < this.listNameValueControl[this.sCurrentDocument.id].length; index++) {
-                                    const element = this.listNameValueControl[this.sCurrentDocument.id][index];
-                                    $('#document-editor-'+this.instance+'_ifr').contents().find('#'+element.id).removeClass('s-control-error')
-                                }
-                            }
-                        }
-                        else{
-                            if(this.listNameValueControl.hasOwnProperty(this.sCurrentDocument.id)){
-                                let controlOldConflic = this.listNameValueControl[this.sCurrentDocument.id].match;
-                                for (let index = 0; index < controlOldConflic.length; index++) {
-                                    let control = controlOldConflic[index];
-                                    this.listNameValueControl[control].match.splice(this.listNameValueControl[control].match.indexOf(this.sCurrentDocument.id),1);
-                                    if(this.listNameValueControl[control].match.length == 0)
-                                    $('#document-editor-'+this.instance+'_ifr').contents().find('#'+control).removeClass('s-control-error')
-                                }
-                            }
-                            $('#document-editor-'+this.instance+'_ifr').contents().find('#'+this.sCurrentDocument.id).removeClass('s-control-error')
-                        }
-                    }
-                
-            }
-            this.listNameValueControl[this.sCurrentDocument.id] = dataControl;
-            this.$store.commit(
-                "document/updateProp",{id:this.sCurrentDocument.id,name:name,value:errValue,tableId:tableId,type:"errorMessage",instance:this.instance}
-            );  
-            this.$store.commit(
-                "document/updateCurrentControlProps",{instance:this.instance,group:'name',prop:'name',typeProp:'errorMessage',value:errValue}
-            );   
-        },
+        
  
        
     }

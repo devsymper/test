@@ -426,7 +426,6 @@ export default {
             }
         },
         handleKeyUpInputValue(inputInfo, name, data){
-            console.log('jj',inputInfo, name, data);
             this.$emit("input-value-keyup", name, inputInfo, data);
         },
         getInputProps(inputConfigs) {

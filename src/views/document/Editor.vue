@@ -345,7 +345,9 @@ export default {
             }
         },
         handlePasteContent(){
-            this.setContentForDocumentV1();
+            setTimeout((self) => {
+                self.setContentForDocumentV1();
+            }, 300,this);
         },
         px2cm(px) {
             return (Math.round((px / 37.7952) * 100) / 100).toFixed(1);
@@ -1297,6 +1299,7 @@ export default {
             $("#document-editor-"+this.keyInstance+"_ifr").contents().find('body style').remove()
             let allControl = $("#document-editor-"+this.keyInstance+"_ifr").contents().find('.s-control:not(.bkerp-input-table .s-control)');
             console.log('safashd',allControl);
+
             $.each(allControl,function(item,value){
                 let controlProps = $(value).attr('data-property');
                 controlProps = controlProps.replace(/\"\[/gm,"[");
@@ -1334,8 +1337,8 @@ export default {
                     // tableEl.find('table thead').remove();
                     tableEl.find('thead').remove();
                     tableEl.find('tbody').remove();
-                    tableEl.append(bodyTable.find('thead')[0].outerHTML);
-                    tableEl.append(bodyTable.find('tbody')[0].outerHTML);
+                    tableEl.find('table').append(bodyTable.find('thead')[0].outerHTML);
+                    tableEl.find('table').append(bodyTable.find('tbody')[0].outerHTML);
                     tableEl.find('thead').attr('contenteditable',true);
                     let allControlInTable = tableEl.find('.s-control');
                     console.log(allControlInTable);
@@ -1401,13 +1404,8 @@ export default {
                         parentNode.empty();
                         parentNode.append(input)
                     })
-                    if(res.data.document.version == 1){
-                        this.setContentForDocumentV1();
-                    }
-                    else{
-                        let fields = res.data.fields;
-                        this.setDataForPropsControl(fields);
-                    }
+                    let fields = res.data.fields;
+                    this.setDataForPropsControl(fields);
                     this.wrapTableElement();
                 }
                 

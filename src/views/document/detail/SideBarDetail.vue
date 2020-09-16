@@ -199,8 +199,8 @@ export default {
 			default:""
 		},
 		documentObjectId:{
-			type:String,
-			default:""
+			type:Number,
+			default:0
 		}
 	},
 	watch:{
