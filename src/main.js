@@ -20,7 +20,6 @@ import {
 import actionMap from './action/index'
 import VueRx from 'vue-rx'
 //thu vien slider thumbnails
-import VueSplide from '@splidejs/vue-splide';
 
 //Anhtger import html2canvas
 import VueHtml2Canvas from 'vue-html2canvas';
@@ -29,7 +28,6 @@ Vue.component('ba-view', BaView);
 Vue.component('end-user-view', EndUserView);
 Vue.component('content-only-view', ContentOnlyView);
 Vue.use(VueRx)
-Vue.use( VueSplide );
 
 Vue.mixin({
     methods: {

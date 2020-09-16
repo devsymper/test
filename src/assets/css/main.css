@@ -689,3 +689,6 @@ html {
 .w-auto {
     width: 100% !important;
 }
+#symper-app .dialog-preview-image-comment{
+    overflow:hidden
+}

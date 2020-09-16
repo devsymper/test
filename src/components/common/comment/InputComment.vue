@@ -1,12 +1,20 @@
 <template>
 	<div class="content-comment">
 		<div v-if="listImage.length > 0"  class="content-comment-img">
-				 <splide :options="options" style="padding:4px 40px">
-					<splide-slide v-for="(slide,i) in listImage" :key="i" style="positon:relative" @click="previewImage(slide)" >
-						<img :src="slide.serverPath" style="margin-top:auto;margin-bottom:auto;max-height:50px" >
-						<v-icon  v-if="isEditing == true" class="icon-remove-img" @click="removeImage(slide)">mdi-close-circle-outline</v-icon>
-					</splide-slide>
-				</splide>
+				<v-tabs
+				show-arrows
+				>
+				<v-tab
+				v-for="(item,i) in listImage"
+				:key="i"
+				:href="'#tab-' + i"
+				style="position:relative"
+				>
+					<v-img :src="item.serverPath" aspect-ratio="1.7" style="width:100px;height:100px"  @click="previewImage(item)">
+					</v-img>
+					<v-icon class="icon-remove-img" style="position:absolute;top:0;right:0" v-if="isEditing == true" @click="removeImage(item)">mdi-close-circle-outline</v-icon>
+				</v-tab>
+			</v-tabs>
 		</div>
 		<div v-if="listFile.length > 0" class="content-comment-file">
 			<div class="commnet-file-item" v-for="(item,i) in listFile" :key="i">
@@ -43,17 +51,23 @@
 			v-model="dialog"
 			max-width="80%"
 			max-height="80%"
-			style="overflow-x: hidden;z-index:1000"
+			style="overflow:hidden !important;z-index:1000"
+			:content-class="'dialog-preview-image-comment'"
 		>
-			<v-card>
-				<v-icon @click="dialog = false" style="float:right;font-size:18px;padding-top:2px">mdi-close</v-icon>
-				<v-icon @click="downloadImg" style="float:right;padding-right:8px;font-size:18px;padding-top:4px">mdi-download</v-icon>
-
-				<v-img
+			<v-card style="display:flex;flex-direction:column">
+				<div>
+					<v-icon @click="dialog = false" style="float:right;font-size:18px;padding-top:2px">mdi-close</v-icon>
+					<v-icon @click="downloadImg" style="float:right;padding-right:8px;font-size:18px;padding-top:4px">mdi-download</v-icon>
+				</div>
+				<div class="preview-image-wrapper">
+					<v-img
 					:src="srcImg"
-					style="width:100%;height:100%"
-				>
-				</v-img>		
+					style="height: 200%;
+							width: 200%; 
+							vertical-align: bottom; "
+					>
+					</v-img>	
+				</div>		
 			</v-card>
 		</v-dialog>
 	</div>
@@ -62,9 +76,7 @@
 import MenuTagUser from './MenuTagUser.vue'
 import UploadFile from '@/components/common/UploadFile.vue';
 import {commentApi} from '@/api/Comment.js'
-import { Splide, SplideSlide } from '@splidejs/vue-splide';
 import { util } from '../../../plugins/util';
-import '@splidejs/splide/dist/css/themes/splide-default.min.css';
 
 export default {
 	data(){
@@ -89,23 +101,6 @@ export default {
 			},
 			listImage:[],
 			listFile:[],
-			options: {
-				fixedWidth : 100,
-				height     : 60,
-				width      : null,
-				gap        : 10,
-				rewind     : true,
-				perPage: 2,
-				cover      : true,
-				pagination : false,
-				focus      : 'center',
-				breakpoints : {
-					'300': {
-						fixedWidth: 66,
-						height    : 40,
-					}
-				}
-			},
 			
 		}
 	},
@@ -143,8 +138,6 @@ export default {
 	components:{
 		MenuTagUser,
 		UploadFile,
-		Splide,
-		SplideSlide
 	},
 	created(){
 	},
@@ -162,7 +155,6 @@ export default {
 					event.preventDefault()
 				}
 			})
-			this.options.width = util.getComponentSize(this).w-20
 	},
 	methods:{
 		removeFile(item){
@@ -433,12 +425,16 @@ export default {
 	display:flex;
 	flex-direction: column;
 	width: 100% !important;
+	max-width: unset;
 }
 .content-comment >>> .v-icon{
 	font-size:13px;	
 }
 .content-comment >>> .content-comment-img{
 	display:flex;	
+	width:90%;
+	margin-bottom:20px;
+	margin-top:4px;
 }
 .content-comment >>> .commnet-img-item{
 	width: 80px;
@@ -449,9 +445,9 @@ export default {
 }
 .content-comment >>> .commnet-img-item .icon-remove-img{
 	font-size: 13px;
-	position:absolute;
-	top: 0px;
-	right: 0px;
+	position:absolute !important;
+	top: 0;
+	right: 0;
 }
 .content-comment >>> .splide__arrow svg{
 width: 0.6em;
@@ -506,5 +502,21 @@ width: 0.6em;
 }
 .content-comment .text-area-wrapper textarea{
 	padding: 8px;
+}
+.dialog-preview-image{
+	overflow: hidden;
+	z-index:1000;
+	overflow-y:hidden
+}
+.preview-image-wrapper{
+	overflow: auto; /* adds scrollbars */
+    height: 800px;
+    background-color: blue;
+    position: relative;
+}
+.preview-image-wrapper .v-image{
+	height: 200%; /* probably looks neater if auto */
+    width: 200%; /* double width image to show only first quarter */
+    vertical-align: bottom; 
 }
 </style>
