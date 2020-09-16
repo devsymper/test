@@ -96,8 +96,8 @@ export default {
         return {
             listRows:[],
             isShowModelSaveDoc:false,
-            isValidName :false,
-            isValidTitle :false,
+            isValidName :true,
+            isValidTitle :true,
             messageValidate:"",
             showNoteChangeName:false,
             showValidate:true,
@@ -175,6 +175,10 @@ export default {
                         this.$emit("save-doc-action");
                         this.hideDialog();
                     }
+                    else{
+                        this.checkValidateNameDocument(this.documentProps.name.value);
+                        this.checkTitleDocument();
+                    }
                 }
             }
             
@@ -197,11 +201,16 @@ export default {
             this.documentProps.title.validateStatus.message = message;
         },
         setPropsOfDoc(props){
-            
             if(!props.name){
+                this.isValidName = false
+            }
+            else{
                 this.isValidName = true
             }
             if(!props.title){
+                this.isValidTitle = false
+            }
+            else{
                 this.isValidTitle = true
             }
             let self = this;

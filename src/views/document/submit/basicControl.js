@@ -201,25 +201,13 @@ export default class BasicControl extends Control {
             }
         })
         this.ele.on('focus', function(e) {
-                store.commit("document/addToDocumentSubmitStore", {
-                    key: 'rootChangeFieldName',
-                    value: thisObj.name,
-                    instance: thisObj.curParentInstance
-                });
-            })
-            // this.ele.on('keydown', function(e) {
-            //     if (thisObj.type == 'number') {
-            //         console.log(e.key);
+            store.commit("document/addToDocumentSubmitStore", {
+                key: 'rootChangeFieldName',
+                value: thisObj.name,
+                instance: thisObj.curParentInstance
+            });
+        })
 
-        //         if (['ArrowRight', 'ArrowLeft', 'Tab'].includes(e.key)) {
-        //             return;
-        //         }
-        //         if (!/\d/.test(e.key)) {
-        //             e.preventDefault();
-        //             e.stopPropagation()
-        //         }
-        //     }
-        // })
         this.ele.on('keyup', function(e) {
             if (thisObj.type == 'user') {
                 e.curTarget = e.target
@@ -520,9 +508,19 @@ export default class BasicControl extends Control {
                 thisObj.ele.removeAttr('valid');
             } else {
                 if (/^[-0-9,.]+$/.test($(this).val())) {
-                    $(this).val(numbro($(this).val()).format(thisObj.numberFormat))
                     thisObj.ele.removeClass('error')
                     thisObj.ele.removeAttr('valid');
+                    if (this.numberFormat) {
+                        $(this).val(numbro($(this).val()).format(thisObj.numberFormat))
+                    } else {
+                        if (/,|\.$/.test($(this).val())) {
+                            thisObj.ele.addClass('error');
+                            let controlTitle = (thisObj.title == "") ? thisObj.name : thisObj.title;
+                            let valid = "Giá trị trường " + controlTitle + " không đúng định dạng số"
+                            thisObj.ele.attr('valid', valid);
+                        }
+                    }
+
                 } else {
                     thisObj.ele.addClass('error');
                     let controlTitle = (thisObj.title == "") ? thisObj.name : thisObj.title;
@@ -533,10 +531,11 @@ export default class BasicControl extends Control {
         })
         this.ele.on('focus', function(e) {
             if (/^[-0-9,.]+$/.test($(this).val())) {
-                $(this).val(numbro($(this).val()).format('0'))
+                $(this).val(thisObj.value)
             }
         })
     }
+
 
     renderFilterControl() {
         if (this.checkDetailView()) return;
