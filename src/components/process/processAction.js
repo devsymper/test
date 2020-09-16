@@ -325,24 +325,27 @@ export const extractTaskInfoFromObject = function(obj) {
 }
 
 
-export const addMoreInfoToTask = function(task) {
-    let mapUser = SYMPER_APP.$store.getters['app/mapIdToUser'];
+export const addMoreInfoToTask = function (task) {
+	let mapUser = SYMPER_APP.$store.getters['app/mapIdToUser'];
+	task.assigneeInfo = {};
+	if (mapUser[task.assignee]) {
+		task.assigneeInfo = mapUser[task.assignee];
+	}
 
-    task.assigneeInfo = {};
-    if (mapUser[task.assignee]) {
-        task.assigneeInfo = mapUser[task.assignee];
-    }
-
-    task.ownerInfo = {};
-    if (mapUser[task.owner]) {
-        task.ownerInfo = mapUser[task.owner];
-    }
-
-    let allDefinitions = SYMPER_APP.$store.state.process.allDefinitions;
-    if (allDefinitions[task.processDefinitionId]) {
-        task.processDefinitionName = allDefinitions[task.processDefinitionId].name;
-    }
-    return task;
+	task.ownerInfo = {};
+	if (mapUser[task.owner]) {
+		task.ownerInfo = mapUser[task.owner];
+	}
+	let allDefinitions = SYMPER_APP.$store.state.process.allDefinitions;
+	let processDefinitionId=task.processDefinitionId;
+	if (processDefinitionId!=null && processDefinitionId!='') {
+		var arrProcessDefinitionId = processDefinitionId.split(":"); //tách chuỗi để lấy DefinitionKey
+		if (allDefinitions[arrProcessDefinitionId[0]]) {
+			task.processDefinitionName = allDefinitions[arrProcessDefinitionId[0]].name;
+		}
+	}
+	
+	return task;
 }
 
 export const getLastestDefinition = function(row, needDeploy = false) {

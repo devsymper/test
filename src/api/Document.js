@@ -97,7 +97,13 @@ export const documentApi = {
     getListPrintConfig(docId) {
         return coreApi.get('documents/' + docId + '/prints')
     },
+    getPrintConfigActive(docId) {
+        return coreApi.get('documents/' + docId + '/prints-active')
+    },
     getDetailPrintConfig(docId, printConfigId) {
         return coreApi.get('documents/' + docId + '/prints/' + printConfigId);
+    },
+    updateActivePrintConfig(data) {
+        return coreApi.patch('documents/prints', data);
     }
 };

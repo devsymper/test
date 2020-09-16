@@ -52,7 +52,6 @@ export default class BasicControl extends Control {
 
 
     render() {
-        let thisObj = this;
         this.ele.wrap('<span style="position:relative;display:inline-block">');
         this.ele.attr('key-instance', this.curParentInstance);
 
@@ -549,13 +548,15 @@ export default class BasicControl extends Control {
 
     }
     renderUserControl() {
+        let listUser = store.state.app.allUsers;
         if (this.checkDetailView()) {
-            let thisObj = this;
-            if (this.value != null && this.value != "")
-                userApi.getDetailUser(this.value).then(res => {
-                    thisObj.value = res.data.user.displayName;
-                    thisObj.ele.val(thisObj.value)
-                }).always({}).catch({})
+            if (this.value != null && this.value != "" && !isNaN(this.value)) {
+                let user = listUser.filter(u => {
+                    return u.id == this.value
+                })
+                this.value = user[0].displayName;
+                this.ele.val(this.value)
+            }
 
         } else {
             this.ele.attr('type', 'text');

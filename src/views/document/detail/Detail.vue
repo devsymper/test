@@ -30,11 +30,7 @@
             :id="'sym-Detail-'+keyInstance"
             :style="{'width':documentSize, 'height':'100%','margin':contentMargin}">
             <div class="content-document" v-html="contentDocument"></div>
-            
             <div class="content-print-document" v-html="contentPrintDocument"></div>
-            
-            
-            
         </div>
       
         <side-bar-detail 
@@ -69,7 +65,6 @@ import { getSDocumentSubmitStore } from './../common/common'
 import SideBarDetail from './SideBarDetail'
 import HistoryControl from './HistoryControl'
 import { util } from '../../../plugins/util.js';
-
 export default {
     props: {
         documentObjectId: {
@@ -135,7 +130,8 @@ export default {
             bottom: true,
             left: false,
             transition: "slide-y-reverse-transition",
-            isComponentActive:false
+            isComponentActive:false,
+            printConfigActive:null
 
         };
     },
@@ -155,9 +151,9 @@ export default {
             value: 'detail'
         });
         if (this.documentObjectId != 0) {
-            this.docObjId = parseInt(this.documentObjectId);
+            this.docObjId = Number(this.documentObjectId);
         } else if (this.$route.name == "detailDocument" || this.$route.name == "printDocument") {
-            this.docObjId = parseInt(this.$route.params.id);
+            this.docObjId = Number(this.$route.params.id);
         }
         if(this.docObjId != null){
             this.loadDocumentObject(this.isPrint);  
@@ -207,7 +203,7 @@ export default {
             immediate: true,
             handler(after){
                 if(after.docObjId){
-                    this.docObjId = after.docObjId;
+                    this.docObjId = Number(after.docObjId);
                     this.documentSize = after.docSize;
                     this.loadDocumentObject(this.isPrint);
                 }
@@ -219,8 +215,24 @@ export default {
         },
         documentObjectId(after){
             this.contentPrintDocument = null
-            this.docObjId = after
+            this.docObjId = Number(after)
             this.loadDocumentObject(this.isPrint);
+        },
+        documentId(after){
+            if(after){
+                let self = this;
+                documentApi.getPrintConfigActive(this.documentId).then(res => {
+                    if (res.status == 200) {
+                       self.printConfigActive = res.data
+                    }
+                    
+                })
+                .catch(err => {
+                
+                })
+                .always(() => {
+                });
+            }
         }
     },
     methods: {
@@ -343,9 +355,15 @@ export default {
                         );
         },
         processHtml(content,isPrint = false) {
-            var allInputControl = $("#sym-Detail-" + this.keyInstance).find(
+            var allInputControl = $("#sym-Detail-" + this.keyInstance +" .content-document").find(
                 ".s-control:not(.bkerp-input-table .s-control)"
             );
+            if(isPrint){
+                allInputControl = $("#sym-Detail-" + this.keyInstance +" .content-print-document").find(
+                    ".s-control:not(.bkerp-input-table .s-control)"
+                );
+            }
+            
             let thisCpn = this;
             for (let index = 0; index < allInputControl.length; index++) {
                 let id = $(allInputControl[index]).attr('id');
@@ -446,12 +464,11 @@ export default {
                 }
 
             }
-            console.log(this.sDocumentSubmit);
             setTimeout(() => {
-                if(thisCpn.$route.name == 'printDocument'){
+                if(thisCpn.$route.name == 'printDocument' || (isPrint && this.formId == 0)){
                     thisCpn.printContent(true);
                 }
-            }, 1000);
+            }, 200);
         },
 
         getColIndexControl(controlEl){
@@ -461,33 +478,71 @@ export default {
             return tdIndex;
         },
         async handleClickPrint(){
-            await this.loadDocumentObject(true);
-            setTimeout((self) => {
-                self.printContent();
-            }, 500,this);
+            // await this.loadDocumentStruct(this.documentId,true);
+            if(this.printConfigActive){
+                let content = this.printConfigActive.content
+                this.contentPrintDocument = content;
+                setTimeout((self) => {
+                    self.processHtml(content,true);
+                }, 100,this);
+                
+            }
+            else{
+                this.$snotify({
+                    type: "error",
+                    title: "Vui lòng cấu hình trước khi in"
+                });
+            }
+            
         },
         
         printContent(fromContext = false){
-            $('.sym-form-Detail').addClass('w-auto');
-            $('main').addClass('p-0');
-            $('.panel-header').addClass('d-none');
-            $('.app-header-bg-color').addClass('d-none');
-            $('.s-drawer').addClass('d-none');
-            $('.v-navigation-drawer').addClass('d-none');
-			setTimeout((self) => {
-                window.print();
-                $('.panel-header').removeClass('d-none');
-                $('.sym-form-Detail').removeClass('w-auto');
-                $('main').removeClass('p-0');
-                $('.app-header-bg-color').removeClass('d-none');
-                $('.s-drawer').removeClass('d-none');
-                $('.v-navigation-drawer').removeClass('d-none');
-                $('.content-print-document').addClass('d-none');
-                $('.content-document').removeClass('d-none');
-                if(fromContext){
-                    self.$router.push('/documents/'+self.documentId+'/objects',"Danh sách bản ghi");
-                }
-            }, 300,this);
+            
+            // Get HTML to print from element
+            
+            let prtHtml = $('#sym-Detail-'+this.keyInstance).closest('.wrap-content-detail').clone();
+            prtHtml.find('.content-print-document').removeClass('d-none');
+            prtHtml.find('.sym-form-Detail').css({width:'auto'})
+            prtHtml.find('.panel-header').remove();
+            prtHtml.find('.content-document').remove();
+            prtHtml = prtHtml.html();
+
+            // Get all stylesheets HTML
+            let stylesHtml = '';
+            for (const node of [...document.querySelectorAll('link, style')]) {
+            stylesHtml += node.outerHTML;
+            }
+           
+
+            let cstyle = `<style type="text/css">
+                         @media print {
+                                html, body{
+                                height:100%;
+                                width:100%;
+                                }
+                            }
+                    </style>`
+                     stylesHtml += cstyle;
+            // Open the print window
+            const WinPrint = window.open('', 'Print', 'width=800,height=900,toolbar=0,scrollbars=0,status=0');
+
+            WinPrint.document.write(`<!DOCTYPE html>
+            <html>
+            <head>
+                ${stylesHtml}
+            </head>
+            <body>
+                ${prtHtml}
+            </body>
+            </html>`);
+
+            WinPrint.document.close(); // necessary for IE >= 10
+            WinPrint.focus(); // necessary for IE >= 10*/
+
+            setTimeout(() => {
+                WinPrint.print();
+                WinPrint.close();
+            }, 1000);
            
             
         },

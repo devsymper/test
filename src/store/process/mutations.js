@@ -27,7 +27,7 @@ const changeSelectingNode = (state, info) => {
 
 const setAllDefinition = (state, data) => {
     let info = data.reduce((map, item) => {
-        map[item.id] = item;
+        map[item.processKey] = item;
         return map;
     }, {});
     Vue.set(state, 'allDefinitions', info);

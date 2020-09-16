@@ -153,11 +153,10 @@ export default class Control {
             for (let key in this.controlFormulas) {
                 if (this.controlFormulas[key].value != "" && this.controlFormulas[key].value != undefined && Object.values(this.controlFormulas[key].value).length > 0) {
                     let formulas = Object.values(this.controlFormulas[key].value)[0];
+                    formulas = formulas.replace(/\r?\n|\r/g, ' ');
                     this.controlFormulas[key]['instance'] = new Formulas(this.curParentInstance, formulas, key);
                     let table = this.controlFormulas[key]['instance'].detectTableRelateLocalFormulas();
                     if (table.length > 0) {
-                        console.log('gadkjda', this.name);
-                        console.log('gadkjda', table);
                         store.commit("document/addToRelatedLocalFormulas", {
                             key: this.name,
                             value: table,

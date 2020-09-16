@@ -130,61 +130,36 @@ export default {
             if (filter.nameLike) {
                 filter.taskNameLike = filter.nameLike;
             }
-            if (filter.processDefinitionId) {
-                filter.processDefinitionKey=filter.processDefinitionId;
-                delete filter['processDefinitionId']; 
-
-            }
+          
             filter.finished = true
             return bpmneApi.get(appConfigs.apiDomain.bpmne.tasksHistory, filter, testHeader);
         } else {
-            if (filter.processDefinitionId) {
-                filter.processDefinitionKey=filter.processDefinitionId;
-                delete filter['processDefinitionId']; 
-
-            }
             return bpmneApi.get(appConfigs.apiDomain.bpmne.tasks, filter, testHeader);
         }
     },
     getSubtasks(idParent, filter) {
-        return bpmneApi.get(appConfigs.apiDomain.bpmne.tasks + '/' + idParent + '/subtasks', filter, testHeader);
+        if (filter.status=='done') {
+            filter.parentTaskId=idParent;
+            filter.finished=true;
+            filter.sort='endTime';
+            filter= JSON.stringify(filter);
+            return bpmneApi.post(appConfigs.apiDomain.bpmne.subTasksHistory , filter, testHeader);
+        }else{
+            return bpmneApi.get(appConfigs.apiDomain.bpmne.tasks + '/' + idParent + '/subtasks', filter, testHeader);
+        }
     },
-    getATaskInfo(taskId,filter='notDone') {
+    async getATaskInfo(taskId,filter='notDone') {
         if (filter=='done') {
             return bpmneApi.get(appConfigs.apiDomain.bpmne.tasksHistory+'/'+taskId, {}, testHeader);
         }else{
-            return bpmneApi.get(appConfigs.apiDomain.bpmne.tasks + '/' + taskId, {}, testHeader);
-        }
-    },
-    getATaskInfoV2(taskId){
-        let result1=bpmneApi.get(appConfigs.apiDomain.bpmne.tasksHistory+'/'+taskId, {}, testHeader);
-        let result2=bpmneApi.get(appConfigs.apiDomain.bpmne.tasks+'/'+taskId, {}, testHeader);
-        let isCheck=false;
-
-        result1.then((res) => {
-            console.log("aa",res);
-                if (res.status==0) {
-                }else{
-                    console.log("ge1",res);
-                    isCheck=1;
-                }
+            try {
+                let result = bpmneApi.get(appConfigs.apiDomain.bpmne.tasks + '/' + taskId, {}, testHeader);
+                await result;
+                return result;
+            } catch (error) {
+                return bpmneApi.get(appConfigs.apiDomain.bpmne.tasksHistory+'/'+taskId, {}, testHeader);
             }
-        );
-        result2.then((res) => {
-            console.log("bb",res);
-            if (res.status==0) {
-                }else{
-                    console.log("ge2",res);
-                    isCheck=2;
-                }
-            }
-        );
-        if (isCheck==1) {
-            return result1
-        }else{
-            return result2
         }
-        
     },
     updateTask(taskId, data) {
         data = JSON.stringify(data);
