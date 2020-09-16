@@ -46,15 +46,15 @@
                 <div class="h-100 symper-orgchart-table-side-by-side-view">
                         <VueResizable :width="500" :max-width="600" :min-width="300" :active ="['r']">
                             <AgDataTable
-                                    :tableHeight="'calc(100% - 100px)'"
-                                    :likeHandsonTable="true"
-                                    :rowData="dataTable"
-                                    :editable="false"
-                                    :customComponents="customAgComponents"
-                                    @on-cell-db-click="onCellDbClick"
-                                    :cellRendererParams="{
-                                        innerRenderer:'nodeName'
-                                    }">
+                                :tableHeight="'calc(100% - 100px)'"
+                                :likeHandsonTable="true"
+                                :rowData="dataTable"
+                                :editable="false"
+                                :customComponents="customAgComponents"
+                                @on-cell-db-click="onCellDbClick"
+                                :cellRendererParams="{
+                                    innerRenderer:'nodeName'
+                                }">
                             </AgDataTable>
                         </VueResizable>
                        <ListItems 
@@ -65,8 +65,12 @@
                             :tableContextMenu="tableContextMenu"
                             :useDefaultContext="false"
                             :customAPIResult="customAPIResult"
-                        />
-
+                        >
+                         <!-- <template slot="right-panel-content" slot-scope="{}">  -->
+                         <!-- </template> -->
+                       </ListItems>  
+                              <navigation-detail-user  :showNavigation="showNavigation"  style="z-index:10001" @close-navigation="showNavigation = false" />
+                        
                 </div>
             </v-tab-item>
 
@@ -94,6 +98,7 @@ import TableSideBySildeView from './TableSideBySildeView.vue'
 import ListItems from '@/components/common/ListItems.vue'
 import VueResizable from 'vue-resizable';
 import { util } from "./../../../plugins/util.js";
+import NavigationDetailUser from './NavidationDetailUser.vue'
 export default {
     props: {
         allDepartments: {
@@ -114,7 +119,8 @@ export default {
         OrgchartEditor,
         TableSideBySildeView,
         ListItems,
-        VueResizable
+        VueResizable,
+        NavigationDetailUser
     },
     mounted(){
         this.containerHeight = util.getComponentSize(this).h - 50
@@ -295,7 +301,9 @@ export default {
         },
         onCellDbClick(params){
             console.log(params);
-            debugger
+            params.data.orgchartId =  this.$route.params.id;
+            this.$store.dispatch('orgchart/updateUserInNode',params.data)
+            this.listUserInNode = this.$store.getters['orgchart/listUserInChildrenNode'](this.$route.params.id);
         }
     },
     data(){
@@ -305,6 +313,8 @@ export default {
                 nodeName: NodeNameInTable,
                 UserInNodeView: UserInNodeView,
             },
+            showNavigation:false,
+            listUserInNode:[],
             mapNameToDynamicAttr: null,
             mapDpmToPos: null,
             apiUrl: 'https://account.symper.vn/users',
@@ -323,11 +333,21 @@ export default {
                     name: "View details",
                     text: "View details",
                     callback: (app, callback) => {
-                      
+                       this.showNavigation = true
+                       this.$emit('view-details',app)
                     },
                 },
              
             },
+        }
+    },
+    watch:{
+        listUserInNode:{
+            deep: true,
+            immediate: true,
+            handler: function(after){
+                debugger
+            }
         }
     }
 }

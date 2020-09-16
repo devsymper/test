@@ -895,7 +895,6 @@ export default {
                     .callApi(method, url, options, header, {})
                     .then(data => {
                         success(data);
-                        debugger
                     })
                     .catch(err => {
                         console.warn(err);

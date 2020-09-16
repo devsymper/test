@@ -26,6 +26,9 @@ const defaultState = {
 	currentFatherNode: {},
 	allUserInOrgChart: {},
 	userInActiveNode: {},
+	orgChartData:{},
+	userInNode:{},
+	listChildrenOfNode:{}
 };
 
 export default defaultState;
