@@ -429,7 +429,9 @@ export default class Formulas {
         }
     }
     autocompleteDetectAliasControl(alias = true) {
-        let selectColumn = this.formulas.match(/(?<=select|SELECT).*(?=from|FROM)/gi);
+        let formulas = this.getFormulas();
+        formulas = formulas.replace(/\r?\n|\r/g, ' ');
+        let selectColumn = formulas.match(/(?<=select|SELECT).*(?=from|FROM)/gi);
         if (selectColumn == null) {
             return 'column1';
         }
