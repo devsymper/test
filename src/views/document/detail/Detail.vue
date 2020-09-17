@@ -5,14 +5,12 @@
             max-width="auto"
             type="article, actions"
             v-if="loading"
-            transition="fade-transition"
             
         ></v-skeleton-loader>
         <v-skeleton-loader
             class="mx-auto"
             max-width="auto"
             v-if="loading"
-            transition="fade-transition"
             type="table-heading, list-item-two-line, table-tfoot"
         ></v-skeleton-loader>
         <v-skeleton-loader
@@ -20,7 +18,6 @@
             max-width="auto"
             type="article, actions,table-heading, list-item-two-line"
             v-if="loading"
-            transition="fade-transition"
             
         ></v-skeleton-loader>
         <v-skeleton-loader
@@ -28,7 +25,6 @@
             max-width="auto"
             type="article, actions,table-heading, list-item-two-line"
             v-if="loading"
-            transition="fade-transition"
             
         ></v-skeleton-loader>
         <v-skeleton-loader
@@ -36,7 +32,6 @@
             max-width="auto"
             type="article, actions,table-heading, list-item-two-line"
             v-if="loading"
-            transition="fade-transition"
             
         ></v-skeleton-loader>
         <div class="panel-header" v-if="!quickView && !isPrint">
@@ -193,10 +188,9 @@ export default {
             this.docObjId = Number(this.documentObjectId);
         } else if (this.$route.name == "detailDocument" || this.$route.name == "printDocument") {
             this.docObjId = Number(this.$route.params.id);
+            this.loadDocumentObject(this.isPrint); 
         }
-        if(this.docObjId != null){
-            this.loadDocumentObject(this.isPrint);  
-        }
+        
         userApi.getListUser(1,100000).then(res => {
             if (res.status == 200) {
                 thisCpn.$store.commit("document/addToDocumentSubmitStore", {
@@ -415,6 +409,8 @@ export default {
                         $(allInputControl[index]).remove()
                     }
                     else if(controlType == "approvalHistory"){
+                        debugger
+
                         let control = new ActionControl(
                                 idField,
                                 $(allInputControl[index]),

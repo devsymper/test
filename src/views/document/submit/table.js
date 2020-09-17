@@ -126,18 +126,22 @@ Handsontable.cellTypes.registerCellType('user', {
 });
 Handsontable.renderers.FileRenderer = function(instance, td, row, col, prop, value, cellProperties) {
     Handsontable.renderers.TextRenderer.apply(this, arguments);
-    td.innerHTML = listInputInDocument[prop].genFileView(row);
-    td.classList.add("upload-file-wrapper-inTb");
-    $(td).off('click', '.file-add');
-    if (sDocument.state.viewType[thisObj.keyInstance] != 'detail') {
-        $(td).on('click', '.file-add', function(e) {
-            let el = $(e.target).closest('.file-add');
-            $("#file-upload-alter-" + instance.keyInstance).attr('data-rowid', row).attr('data-control-name', el.attr('data-ctrlname'));
-            $("#file-upload-alter-" + instance.keyInstance).click();
-        })
-        $(td).off('click', '.remove-file')
-        listInputInDocument[prop].setDeleteFileEvent($(td), prop)
+    let table = store.state.document.submit[instance.keyInstance];
+    if (table != undefined && instance.tableName != undefined) {
+        td.innerHTML = table.listInputInDocument[prop].genFileView(row);
+        td.classList.add("upload-file-wrapper-inTb");
+        $(td).off('click', '.file-add');
+        if (sDocument.state.viewType[instance.keyInstance] != 'detail') {
+            $(td).on('click', '.file-add', function(e) {
+                let el = $(e.target).closest('.file-add');
+                $("#file-upload-alter-" + instance.keyInstance).attr('data-rowid', row).attr('data-control-name', el.attr('data-ctrlname'));
+                $("#file-upload-alter-" + instance.keyInstance).click();
+            })
+            $(td).off('click', '.remove-file')
+            table.listInputInDocument[prop].setDeleteFileEvent($(td), prop)
+        }
     }
+
 }
 Handsontable.cellTypes.registerCellType('file', {
     renderer: Handsontable.renderers.PercentRenderer
