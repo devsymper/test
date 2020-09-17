@@ -140,6 +140,7 @@ Vue.prototype.$goToPage = function(url, title, pageInstanceKey = false, allwaysO
         pageInstanceKey = Date.now();
     }
     let routeObj = this.$router.match(url);
+    debugger
     let params = Object.assign(routeObj.params, {
         pageInstanceKey: pageInstanceKey,
         extraData: extraData

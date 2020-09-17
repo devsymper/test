@@ -1,11 +1,15 @@
 import listActionMap from "./actionDefinition";
-import { SYMPER_APP } from "../main";
+
+export const getKeyForAction = function(action) {
+    return ac.module + '_' + ac.resource + '_' + ac.scope + '_' + ac.action;
+}
+
 
 let actionMap = {};
 for (let acKey in listActionMap) {
     let actions = listActionMap[acKey];
     for (let ac of actions) {
-        let key = ac.module + '_' + ac.resource + '_' + ac.scope + '_' + ac.action;
+        let key = getKeyForAction(ac);
         if (!actionMap[key]) {
             actionMap[key] = ac;
         } else {

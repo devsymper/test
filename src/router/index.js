@@ -50,6 +50,8 @@ const systemRoutes = [{
     // Không viết thêm các route vào đây, viết vào một file riêng tương ứng với module của mình vào trong thư mục module
 ];
 
+let mapUrlToComponents = {};
+
 function autoImportRouteModules() {
     var context = require.context('./modules', true, /\.(js)$/);
     var files = {};
@@ -66,6 +68,10 @@ function autoImportRouteModules() {
 }
 
 let routes = autoImportRouteModules();
+for (let item of routes) {
+    mapUrlToComponents[item.path] = item.component;
+}
+console.log(mapUrlToComponents, 'mapUrlToComponentsmapUrlToComponentsmapUrlToComponentsmapUrlToComponentsmapUrlToComponents');
 routes = routes.concat(systemRoutes);
 
 
