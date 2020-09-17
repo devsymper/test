@@ -203,9 +203,9 @@ export default {
 	methods:{
 		getActiveapps(){
 			appManagementApi.getActiveApp().then(res => {
+				this.loadingApp = false
 				if (res.status == 200) {
 					this.apps = res.data.listObject
-					this.loadingApp = false
 				}
 			}).catch((err) => {
 			});
