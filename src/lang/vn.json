@@ -37,6 +37,7 @@
         "close": "Đóng",
         "virtualdocs": "Virtualdocs",
         "tasks": "Tasks",
+        "myItem": "My Item",
         "other": "Khác",
         "deploy": "Deploy",
         "start": "Bắt đầu",
@@ -873,6 +874,10 @@
             "unsubscribe": "Bỏ theo dõi"
         }
     },
+    "myItem":{
+        "objType":"Loại đối tượng",
+        "today":"Hôm nay"
+    },
     "tasks": {
         "error": {
             "emptyAssignee": "Người nhận việc không được phép để trống",
@@ -885,6 +890,7 @@
             "date": "Ngày tạo",
             "dueDate": "Ngày đến hạn",
             "createDate": "Ngày khởi tạo",
+            "app": "Ứng dụng",
             "description": "Mô tả",
             "owner": "Người sở hữu",
             "name": "Tên công việc",

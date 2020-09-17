@@ -51,6 +51,11 @@ export default {
         icon: "mdi-apps",
         link: "/apps"
     },
+    myItem: {
+        title: "myItem",
+        icon: "mdi-format-list-checkbox",
+        link: "/myitem"
+    },
     tasks: {
         title: "tasks",
         icon: "mdi-check-all",

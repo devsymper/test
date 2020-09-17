@@ -37,6 +37,7 @@
         "close": "Close",
         "virtualdocs": "Virtualdocs",
         "tasks": "Tasks",
+        "myItem": "My Item",
         "other": "Other",
         "deploy": "Deploy",
         "start": "Start",
@@ -744,6 +745,10 @@
         "ascending": "Ascending",
         "descending": "Descending"
     },
+    "myItem":{
+        "objType":"Object type",
+        "today":"Today"
+    },
     "tasks": {
         "error": {
             "emptyAssignee": "Assignee can not be empty",
@@ -756,6 +761,7 @@
             "date": "Date",
             "dueDate": "Due Date",
             "createDate": "Create date",
+            "app": "Ứng dụng",
             "description": "Task description",
             "owner": "Task Owner",
             "name": "Task name",
