@@ -115,44 +115,44 @@ export default {
                         this.$goToPage('/documents/'+document.id+'/print-config',"Danh sách bản in");
                     },
                 },
-                drop: {
-                    name:"delete",
-                    text:function() {
-                        return " <i class= 'mdi mdi-delete-outline' > </i>&nbsp; Xóa";
-                    },
-                    callback: (document, callback) => {
-                        let ids = document.reduce((arr,obj)=>{
-                            arr.push(obj.id);
-                            return arr;
-                        },[]);
-                        let thisCpn = this;
-                        documentApi
-                        .deleteDocument({ids:ids.join()})
-                        .then(res => {
-                            if (res.status == 200) {
-                                thisCpn.$snotify({
-                                    type: "success",
-                                    title: "Delete document success!"
-                                });  
-                                thisCpn.$refs.listDocument.refreshList();
-                            }
-                            else{
-                                thisCpn.$snotify({
-                                    type: "error",
-                                    title: res.messagr
-                                });  
-                            }
-                        })
-                        .catch(err => {
-                            console.log("error from delete document api!!!", err);
-                        })
-                        .always(() => {});
-                    },
-                },
+                // drop: {
+                //     name:"delete",
+                //     text:function() {
+                //         return " <i class= 'mdi mdi-delete-outline' > </i>&nbsp; Xóa";
+                //     },
+                //     callback: (document, callback) => {
+                //         let ids = document.reduce((arr,obj)=>{
+                //             arr.push(obj.id);
+                //             return arr;
+                //         },[]);
+                //         let thisCpn = this;
+                //         documentApi
+                //         .deleteDocument({ids:ids.join()})
+                //         .then(res => {
+                //             if (res.status == 200) {
+                //                 thisCpn.$snotify({
+                //                     type: "success",
+                //                     title: "Delete document success!"
+                //                 });  
+                //                 thisCpn.$refs.listDocument.refreshList();
+                //             }
+                //             else{
+                //                 thisCpn.$snotify({
+                //                     type: "error",
+                //                     title: res.messagr
+                //                 });  
+                //             }
+                //         })
+                //         .catch(err => {
+                //             console.log("error from delete document api!!!", err);
+                //         })
+                //         .always(() => {});
+                //     },
+                // },
                 trash:{
                     name:"remove",text:
                     function() {
-                        return " <i class= 'mdi mdi-delete-outline' > </i>&nbsp; Xóa mềm";
+                        return " <i class= 'mdi mdi-delete-outline' > </i>&nbsp; Xóa";
                     },
                     callback: (document, callback) => {
                         let ids = document.reduce((arr,obj)=>{
