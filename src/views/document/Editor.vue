@@ -167,7 +167,7 @@ export default {
                                 alignleft aligncenter alignright alignjustify | \
                                 bullist numlist indent hr | removeformat  table |  preview margin',
                                 fontsize_formats: '8px 10px 11px 12px 13px 14px 15px 16px 17px 18px 19px 20px 21px 22px 23px 24px 25px 26px 27px 28px 29px 30px 32px 34px 36px',
-                                font_formats: 'Roboto = Roboto,sans-serif; Andale Mono=andale mono,times;'+ 'Arial=arial,helvetica,sans-serif;'+ 'Arial Black=arial black,avant garde;'+ 'Book Antiqua=book antiqua,palatino;'+ 'Comic Sans MS=comic sans ms,sans-serif;'+ 'Courier New=courier new,courier;'+ 'Georgia=georgia,palatino;'+ 'Helvetica=helvetica;'+ 'Impact=impact,chicago;'+ 'Symbol=symbol;'+ 'Tahoma=tahoma,arial,helvetica,sans-serif;'+ 'Terminal=terminal,monaco;'+ 'Times New Roman=times new roman,times,serif;'+ 'Trebuchet MS=trebuchet ms,geneva;'+ 'Verdana=verdana,geneva;'+ 'Webdings=webdings;'+ 'Wingdings=wingdings,zapf dingbats',
+                                font_formats: 'Roboto=Roboto,sans-serif; Andale Mono=andale mono,times;'+ 'Arial=arial,helvetica,sans-serif;'+ 'Arial Black=arial black,avant garde;'+ 'Book Antiqua=book antiqua,palatino;'+ 'Comic Sans MS=comic sans ms,sans-serif;'+ 'Courier New=courier new,courier;'+ 'Georgia=georgia,palatino;'+ 'Helvetica=helvetica;'+ 'Impact=impact,chicago;'+ 'Symbol=symbol;'+ 'Tahoma=tahoma,arial,helvetica,sans-serif;'+ 'Terminal=terminal,monaco;'+ 'Times New Roman=times new roman,times,serif;'+ 'Trebuchet MS=trebuchet ms,geneva;'+ 'Verdana=verdana,geneva;'+ 'Webdings=webdings;'+ 'Wingdings=wingdings,zapf dingbats',
                                 valid_elements: '*[*]',
                                 content_css:['https://cdn.jsdelivr.net/npm/@mdi/font@latest/css/materialdesignicons.min.css'],
                                 setup: function(ed){
@@ -241,9 +241,9 @@ export default {
          * Nhận sự kiên từ click treeview danh sách các control trong doc thì highlight control và selected control
          */
         this.$evtBus.$on("document-editor-click-treeview-list-control", locale => {
-            if(thisCpn._inactive == true) return;
-            let elControl = $("#document-editor-"+thisCpn.keyInstance+"_ifr").contents().find('body #'+locale.id);
-            thisCpn.setSelectedControlProp(locale.event,elControl,$('#document-editor-'+this.keyInstance+'_ifr').get(0).contentWindow,true);
+            if(this._inactive == true) return;
+            let elControl = $("#document-editor-"+this.keyInstance+"_ifr").contents().find('body #'+locale.id);
+            this.setSelectedControlProp(locale.event,elControl,$('#document-editor-'+this.keyInstance+'_ifr').get(0).contentWindow,true);
         });
     },
     data(){
@@ -345,7 +345,9 @@ export default {
             }
         },
         handlePasteContent(){
-            this.setContentForDocumentV1();
+            setTimeout((self) => {
+                self.setContentForDocumentV1();
+            }, 300,this);
         },
         px2cm(px) {
             return (Math.round((px / 37.7952) * 100) / 100).toFixed(1);
@@ -759,7 +761,6 @@ export default {
             let htmlContent = this.editorCore.getContent();
             let dataPost = this.getDataToSaveMultiFormulas(allControl);
             let thisCpn = this;
-            console.log("ádsadsad",allControl);
             try {
                 if(Object.keys(dataPost.update).length > 0)
                 await formulasApi.updateMultiFormulas({formulas:JSON.stringify(dataPost.update)})
@@ -1288,6 +1289,9 @@ export default {
         resizeEditorEnd(e){
             $('#bg-over-editor').remove();
         },
+        /**
+         * Hàm xử lí chuyển cấu trúc doc của v1 sang v2 (bao gồm các thuộc tính của control)
+         */
         setContentForDocumentV1(){
             let thisCpn = this;
             $("#document-editor-"+this.keyInstance+"_ifr").contents().find('.bkerp-input').addClass('s-control').removeClass('bkerp-input');
@@ -1297,7 +1301,6 @@ export default {
             $("#document-editor-"+this.keyInstance+"_ifr").contents().find('body meta').remove()
             $("#document-editor-"+this.keyInstance+"_ifr").contents().find('body style').remove()
             let allControl = $("#document-editor-"+this.keyInstance+"_ifr").contents().find('.s-control:not(.bkerp-input-table .s-control)');
-            console.log('safashd',allControl);
             $.each(allControl,function(item,value){
                 let controlProps = $(value).attr('data-property');
                 controlProps = controlProps.replace(/\"\[/gm,"[");
@@ -1335,12 +1338,10 @@ export default {
                     // tableEl.find('table thead').remove();
                     tableEl.find('thead').remove();
                     tableEl.find('tbody').remove();
-                    tableEl.append(bodyTable.find('thead')[0].outerHTML);
-                    tableEl.append(bodyTable.find('tbody')[0].outerHTML);
+                    tableEl.find('table').append(bodyTable.find('thead')[0].outerHTML);
+                    tableEl.find('table').append(bodyTable.find('tbody')[0].outerHTML);
                     tableEl.find('thead').attr('contenteditable',true);
                     let allControlInTable = tableEl.find('.s-control');
-                    console.log(allControlInTable);
-                    
                     $.each(allControlInTable,function(item,value){
                         let childControlProps = $(value).attr('data-property');
                         let type = $(value).attr('bkerp-type');
@@ -1402,13 +1403,8 @@ export default {
                         parentNode.empty();
                         parentNode.append(input)
                     })
-                    if(res.data.document.version == 1){
-                        this.setContentForDocumentV1();
-                    }
-                    else{
-                        let fields = res.data.fields;
-                        this.setDataForPropsControl(fields);
-                    }
+                    let fields = res.data.fields;
+                    this.setDataForPropsControl(fields);
                     this.wrapTableElement();
                 }
                 

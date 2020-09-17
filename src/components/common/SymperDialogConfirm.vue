@@ -1,6 +1,6 @@
 <template>
-    <v-dialog v-model="showDialog" persistent max-width="290">
-      <v-card>
+    <v-dialog v-model="showDialog" persistent max-width="290" style="z-index:1001">
+      <v-card >
         <v-card-title class="headline"> {{title}} </v-card-title>
         <v-card-text> {{content}} </v-card-text>
         <v-card-actions>

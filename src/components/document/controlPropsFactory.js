@@ -19,15 +19,21 @@ const commonProps = {
         type: "text",
         value: "",
         groupType: "name",
-        errorMessage: "",
-        oldName: ""
+        oldName: "",
+        validateStatus: {
+            isValid: true,
+            message: ""
+        }
     },
     title: {
         title: "Tiêu đề",
         type: "text",
         value: "",
         groupType: "name",
-        errorMessage: ""
+        validateStatus: {
+            isValid: true,
+            message: ""
+        }
     },
     otherInfo: {
         title: "Thông tin thêm",

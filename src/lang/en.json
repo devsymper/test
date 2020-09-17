@@ -319,7 +319,12 @@
                 },
                 "saveDoc": {
                     "heading": "Save Document",
-                    "checkNameRelated": "Check formulas related"
+                    "checkNameRelated": "Check formulas related",
+                    "selectType": {
+                        "system": "System",
+                        "list": "List",
+                        "business": "Business"
+                    }
                 },
                 "swapType": {
                     "heading": "Swap type control",
@@ -847,6 +852,7 @@
         }
     },
     "comment": {
+        "title": "Comment",
         "comment": "Comment",
         "resolve": "Resolve",
         "reply": "Reply",

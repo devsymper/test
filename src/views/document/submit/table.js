@@ -7,6 +7,7 @@ import { checkDbOnly, getControlType, getSDocumentSubmitStore } from './../commo
 import { SYMPER_APP } from './../../../main.js'
 import { Date } from 'core-js';
 import { checkCanBeBind, resetImpactedFieldsList, markBinedField } from './handlerCheckRunFormulas';
+import { util } from '../../../plugins/util';
 class UserEditor extends Handsontable.editors.TextEditor {
     createElements() {
         super.createElements();
@@ -154,6 +155,8 @@ const makeDelay = function(ms) {
     };
 };
 var delay = makeDelay(1000);
+var delayTypingEnter = makeDelay(100);
+
 
 /**
  * Các loại cell mà handsontable hỗ trợ hiển thị
@@ -221,6 +224,7 @@ export default class Table {
             this.controlNameAfterChange = "";
             this.showPopupUser = false;
             this.showPopupTime = false;
+            this.dataInsertRows = []; // mảng lưu lại các dòng dữ liệu sau khi ấn enter
             this.currentControlSelected = null;
             this.listAutoCompleteColumns = {};
             this.event = {
@@ -385,11 +389,15 @@ export default class Table {
                     let cellMeta = this.getSelected();
                     if (e.key === 'Enter' && e.shiftKey === true && cellMeta != undefined) {
                         this.alter('insert_row', cellMeta[0][0] + 1, 1);
-                        let rowData = sDocument.state.submit[thisObj.keyInstance]['listTableRootControl'][thisObj.tableName]['defaultRow'];
-                        for (let index = 0; index < rowData.length; index++) {
-                            rowData[index][0] = cellMeta[0][0] + 1;
-                        }
-                        thisObj.tableInstance.setDataAtRowProp(rowData, null, null, 'auto_set');
+                        thisObj.dataInsertRows.push([]);
+                        delayTypingEnter(function(e) {
+                            let rowData = util.cloneDeep(sDocument.state.submit[thisObj.keyInstance]['listTableRootControl'][thisObj.tableName]['defaultRow']);
+                            for (let index = 0; index < thisObj.dataInsertRows.length; index++) {
+                                let newRowData = util.cloneDeep(rowData);
+                                newRowData[0][0] = cellMeta[0][0] + index + 1;
+                                thisObj.tableInstance.setDataAtRowProp(newRowData, null, null, 'auto_set');
+                            }
+                        });
                     } else if (e.key === 'Delete' && e.shiftKey == true) {
                         this.alter('remove_row', cellMeta[0][0], 1);
                     }
@@ -600,7 +608,9 @@ export default class Table {
             return
         }
         let controlInstance = this.getControlInstance(controlName);
-
+        if (rowIndex == 'all' && controlName == "tb1_ca_lam") {
+            // debugger
+        }
         if (controlInstance.checkValidValueLength(rowIndex)) {
             if (controlInstance == null || controlInstance == undefined) {
                 return;
@@ -649,7 +659,6 @@ export default class Table {
          * @param {String} control 
          */
     handlerCheckCanBeRunFormulas(control) {
-
             if (checkCanBeBind(this.keyInstance, control)) {
                 let controlInstance = this.getControlInstance(control);
                 if (controlInstance.controlFormulas.hasOwnProperty('formulas')) {
@@ -1117,7 +1126,6 @@ export default class Table {
                 });
             }
             // nếu table có tính tổng thì thêm 1 dòng trống ở cuối
-            console.log("saddsadsadsad", data);
             if (this.tableHasRowSum) {
                 data.push({})
             }

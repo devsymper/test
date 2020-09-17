@@ -21,7 +21,6 @@
                     <div class="content-setting-control-table">
                         <form-save-doc 
                         @append-icon-click="checkNameDocument"
-                        @input-value-keyup="checkValidateNameDocument"
                         @input-value-changed="handleChangeInput" 
                          :allInputs="documentProps"/>
                     </div>
@@ -97,7 +96,8 @@ export default {
         return {
             listRows:[],
             isShowModelSaveDoc:false,
-            isValid :false,
+            isValidName :true,
+            isValidTitle :true,
             messageValidate:"",
             showNoteChangeName:false,
             showValidate:true,
@@ -112,11 +112,8 @@ export default {
         },
         //Hàm kiểm tra tên document đã tồn tai hay chưa
         handleChangeInput(name, input, data){
-            
             this.showNoteChangeName = true;
-            
             let thisCpn = this;
-            if(this.isValid)
             documentApi
                     .checkExistDocument(input.value)
                     .then(res => {
@@ -124,22 +121,17 @@ export default {
                             let message = ""
                             if(res.data === true){
                                 message = "Tên document đã tồn tại"
-                                thisCpn.isValid = false;
+                                thisCpn.isValidName = false;
                             }
                             else{
-                                thisCpn.isValid = true;
+                                thisCpn.isValidName = true;
                             }
-                            let docProps = util.cloneDeep(thisCpn.documentProps);
-                                docProps.name.errorMessage = message;
-                                thisCpn.$store.commit('document/addToDocumentPropsEditor',{key: thisCpn.instance,value :docProps})
+                            this.documentProps.name.errorMessage = message;
                         }
                        
                     })
                     .catch(err => {
-                        thisCpn.$snotify({
-                            type: "error",
-                            title: "error from check exist document api!!!"
-                        }); 
+                        
                     })
                     .always(() => {});
         },
@@ -150,28 +142,23 @@ export default {
             this.isShowModelSaveDoc = false
         },
         // Hàm kiểm tra tên document
-        checkValidateNameDocument(name, input, data){
-            
-            if(name == 'name'){
-                let docProps = util.cloneDeep(this.documentProps);
-                let message = "";
-                if(input.value.length == 0){
-                    message = "Không được bỏ trống";
-                    this.isValid = false;
+        checkValidateNameDocument(value){
+            let message = "";
+            if(value.length == 0){
+                message = "Không được bỏ trống";
+                this.isValidName = false;
+            }
+            else{
+                if(/^[a-zA-Z_$][a-zA-Z_$0-9]*$/.test(value) == false){
+                    message = "Tên không hợp lệ";
+                    this.isValidName = false;
                 }
                 else{
-                    if(/^[a-zA-Z_$][a-zA-Z_$0-9]*$/.test(input.value) == false){
-                        message = "Tên không hợp lệ";
-                        this.isValid = false;
-                    }
-                    else{
-                        this.isValid = true
-                    }
+                    this.isValidName = true
                 }
-                docProps.name.errorMessage = message;
-                this.$store.commit('document/addToDocumentPropsEditor',{key: this.instance,value :docProps})
             }
-            
+            this.documentProps.name.validateStatus.isValid = this.isValidName;
+            this.documentProps.name.validateStatus.message = message;
         },
         saveDocument(){
             if(this.isConfigPrint){
@@ -184,36 +171,75 @@ export default {
                     this.$refs.validate.show(false)
                 }
                 else{
-                    if(this.isValid){
+                    if(this.isValidName && this.isValidTitle){
                         this.$emit("save-doc-action");
                         this.hideDialog();
                     }
                     else{
-                        this.$snotify({
-                                        type: "error",
-                                        title: "Vui lòng nhập lại tên document"
-                                    });  
+                        this.checkValidateNameDocument(this.documentProps.name.value);
+                        this.checkTitleDocument();
                     }
                 }
             }
             
         },
-        setPropsOfDoc(props){
-            if(props.name != undefined){
-                this.isValid = true
+        /**
+         * Hàm kiểm tra tiêu đề của doc đã điền hay chưa, nếu chưa thì báo lỗi
+         */
+        checkTitleDocument(){
+            let message = ""
+            if(!this.documentProps.title.value){
+                this.isValidTitle = false;
+                message = "Vui lòng nhập tiêu đề document"
             }
+            else{
+                this.isValidTitle = true;
+                message = ""
+            }
+
+            this.documentProps.title.validateStatus.isValid = this.isValidTitle;
+            this.documentProps.title.validateStatus.message = message;
+        },
+        setPropsOfDoc(props){
+            if(!props.name){
+                this.isValidName = false
+            }
+            else{
+                this.isValidName = true
+            }
+            if(!props.title){
+                this.isValidTitle = false
+            }
+            else{
+                this.isValidTitle = true
+            }
+            let self = this;
             let docProps = {
                 name : { 
                     title: "Tên document",
                     type: "text",
                     value: (props.name != undefined) ? props.name : '',
                     appendIcon:"mdi-checkbox-multiple-marked-circle-outline",
-                    oldName:(props.name != undefined) ? props.name : ''
+                    oldName:(props.name != undefined) ? props.name : '',
+                    validateStatus:{
+                        isValid:true,
+                        message:""
+                    },
+                    validate(){
+                        self.checkValidateNameDocument(this.value)
+                    }
                 },
                 title : {
                     title: "Tiêu đề document",
                     type: "text",
                     value: (props.title != undefined) ? props.title : '',
+                    validateStatus:{
+                        isValid:true,
+                        message:""
+                    },
+                    validate(){
+                        self.checkTitleDocument(this.value)
+                    }
                 },
                 recentName : {
                     title: "Tên trường hiển thị thông tin trong mục gần đây",
@@ -230,11 +256,15 @@ export default {
                     type: "select",
                     value: 1,
                     options: [{
-                            text: 'Danh mục',
+                            text: this.$t('document.editor.dialog.saveDoc.selectType.list'),
                             value: 2
                         },
                         {
-                            text: 'Hệ thống',
+                            text: this.$t('document.editor.dialog.saveDoc.selectType.system'),
+                            value: 3
+                        },
+                        {
+                            text: this.$t('document.editor.dialog.saveDoc.selectType.business'),
                             value: 1
                         },
                     ],

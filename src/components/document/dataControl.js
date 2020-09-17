@@ -27,7 +27,7 @@ export const setDataForPropsControl = function(fields, instance, from) {
                 properties[k].value = (fields[controlId]['properties'][k] == 0 || fields[controlId]['properties'][k] == '0' || fields[controlId]['properties'][k] == '') ? false : true
             } else {
                 let valueControl = fields[controlId]['properties'][k];
-                if (type == "number" && valueControl == "") {
+                if (type == "number" && k == 'defaultValue' && valueControl == "") {
                     valueControl = 0;
                 }
                 properties[k].value = valueControl;
@@ -76,7 +76,7 @@ export const setDataForPropsControl = function(fields, instance, from) {
                         childProperties[k].value = (listField[childFieldId]['properties'][k] == 0 || listField[childFieldId]['properties'][k] == '0' || listField[childFieldId]['properties'][k] == '') ? false : true
                     } else {
                         let valueChildControl = listField[childFieldId]['properties'][k];
-                        if (childType == "number" && valueChildControl == "") {
+                        if (childType == "number" && k == 'defaultValue' && valueChildControl == "") {
                             valueChildControl = 0;
                         }
                         childProperties[k].value = valueChildControl;
