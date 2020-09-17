@@ -1,6 +1,44 @@
 <template>
-    <div class="wrap-content-detail">
-        
+    <div class="wrap-content-detail" style="overflow:hidden;">
+        <v-skeleton-loader
+            class="mx-auto"
+            max-width="auto"
+            type="article, actions"
+            v-if="loading"
+            transition="fade-transition"
+            
+        ></v-skeleton-loader>
+        <v-skeleton-loader
+            class="mx-auto"
+            max-width="auto"
+            v-if="loading"
+            transition="fade-transition"
+            type="table-heading, list-item-two-line, table-tfoot"
+        ></v-skeleton-loader>
+        <v-skeleton-loader
+            class="mx-auto"
+            max-width="auto"
+            type="article, actions,table-heading, list-item-two-line"
+            v-if="loading"
+            transition="fade-transition"
+            
+        ></v-skeleton-loader>
+        <v-skeleton-loader
+            class="mx-auto"
+            max-width="auto"
+            type="article, actions,table-heading, list-item-two-line"
+            v-if="loading"
+            transition="fade-transition"
+            
+        ></v-skeleton-loader>
+        <v-skeleton-loader
+            class="mx-auto"
+            max-width="auto"
+            type="article, actions,table-heading, list-item-two-line"
+            v-if="loading"
+            transition="fade-transition"
+            
+        ></v-skeleton-loader>
         <div class="panel-header" v-if="!quickView && !isPrint">
             <div class="right-action">
                 <v-tooltip bottom>
@@ -28,7 +66,7 @@
         <div
             class="sym-form-Detail"
             :id="'sym-Detail-'+keyInstance"
-            :style="{'width':documentSize, 'height':'100%','margin':contentMargin}">
+            :style="{'width':documentSize, 'height':'calc(100% - 30px);','margin':contentMargin}">
             <div class="content-document" v-html="contentDocument"></div>
             <div class="content-print-document" v-html="contentPrintDocument"></div>
         </div>
@@ -131,7 +169,8 @@ export default {
             left: false,
             transition: "slide-y-reverse-transition",
             isComponentActive:false,
-            printConfigActive:null
+            printConfigActive:null,
+            loading: true,
 
         };
     },
@@ -464,6 +503,8 @@ export default {
                 }
 
             }
+            this.loading = false;
+            $('.wrap-content-detail').removeAttr('style');
             setTimeout(() => {
                 if(thisCpn.$route.name == 'printDocument' || (isPrint && this.formId == 0)){
                     thisCpn.printContent(true);
