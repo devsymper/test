@@ -91,9 +91,3 @@ export default {
   
 }
 </script>
-<<<<<<< HEAD
-<style  scoped>
-    
-</style>
-=======
->>>>>>> 724fe605070be6dc1bf1be4470ac970d5ddeb906
