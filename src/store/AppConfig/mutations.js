@@ -72,6 +72,9 @@ const delFavorite = (state, data) => {
 		}
 	})
 }
+const changeTypeView = (state) =>{
+	state.viewSideBySide = !state.viewSideBySide
+}
 export {
 	updateListItemSelected,
 	removeItemSelected,
@@ -79,5 +82,6 @@ export {
 	updateChildrenApps,
 	updateListFavorite,
 	insertFavorite,
-	delFavorite
+	delFavorite,
+	changeTypeView
 };

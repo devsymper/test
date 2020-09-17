@@ -1,5 +1,6 @@
 const defaultState = {
 	listFavorite: [],
+	viewSideBySide:false,
 	listItemSelected: {
 		document_definition: {
 			icon: 'mdi-file-edit-outline',
