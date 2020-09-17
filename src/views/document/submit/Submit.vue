@@ -2012,9 +2012,6 @@ export default {
                 $('#'+controlId).removeAttr('disabled');
             }
         },
-       
-        
-       
         /**
          * Hàm xử lí việc tìm kiếm các root control và chạy công thức cho control đó (lúc khởi tạo doc)
          */
@@ -2057,17 +2054,14 @@ export default {
                                                 listTableRootControl[controlInstance.inTable] = {};
                                             }
                                             listTableRootControl[controlInstance.inTable][controlRootInTable] = false;
-
                                         }
 										if(formulasInstance.getFormulas() !== "" && Object.keys(formulasInstance.getInputControl()).length == 0){
 											impactedFieldsListWhenStart[controlName] = false;
                                             listRootControl.push(controlName);
-                                            
 											this.handlerBeforeRunFormulasValue(formulasInstance,controlInstance.id,controlName,formulasType,'root')
 										}
 									}
 								}
-								
 							}
 						}
                     }

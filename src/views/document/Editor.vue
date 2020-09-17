@@ -241,9 +241,9 @@ export default {
          * Nhận sự kiên từ click treeview danh sách các control trong doc thì highlight control và selected control
          */
         this.$evtBus.$on("document-editor-click-treeview-list-control", locale => {
-            if(thisCpn._inactive == true) return;
-            let elControl = $("#document-editor-"+thisCpn.keyInstance+"_ifr").contents().find('body #'+locale.id);
-            thisCpn.setSelectedControlProp(locale.event,elControl,$('#document-editor-'+this.keyInstance+'_ifr').get(0).contentWindow,true);
+            if(this._inactive == true) return;
+            let elControl = $("#document-editor-"+this.keyInstance+"_ifr").contents().find('body #'+locale.id);
+            this.setSelectedControlProp(locale.event,elControl,$('#document-editor-'+this.keyInstance+'_ifr').get(0).contentWindow,true);
         });
     },
     data(){
@@ -1289,6 +1289,9 @@ export default {
         resizeEditorEnd(e){
             $('#bg-over-editor').remove();
         },
+        /**
+         * Hàm xử lí chuyển cấu trúc doc của v1 sang v2 (bao gồm các thuộc tính của control)
+         */
         setContentForDocumentV1(){
             let thisCpn = this;
             $("#document-editor-"+this.keyInstance+"_ifr").contents().find('.bkerp-input').addClass('s-control').removeClass('bkerp-input');
@@ -1298,8 +1301,6 @@ export default {
             $("#document-editor-"+this.keyInstance+"_ifr").contents().find('body meta').remove()
             $("#document-editor-"+this.keyInstance+"_ifr").contents().find('body style').remove()
             let allControl = $("#document-editor-"+this.keyInstance+"_ifr").contents().find('.s-control:not(.bkerp-input-table .s-control)');
-            console.log('safashd',allControl);
-
             $.each(allControl,function(item,value){
                 let controlProps = $(value).attr('data-property');
                 controlProps = controlProps.replace(/\"\[/gm,"[");
@@ -1341,8 +1342,6 @@ export default {
                     tableEl.find('table').append(bodyTable.find('tbody')[0].outerHTML);
                     tableEl.find('thead').attr('contenteditable',true);
                     let allControlInTable = tableEl.find('.s-control');
-                    console.log(allControlInTable);
-                    
                     $.each(allControlInTable,function(item,value){
                         let childControlProps = $(value).attr('data-property');
                         let type = $(value).attr('bkerp-type');
