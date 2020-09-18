@@ -174,6 +174,7 @@
 </template>
 <script>
 import { documentApi } from "./../../../api/Document.js";
+import { formulasApi } from "./../../../api/Formulas.js";
 import { userApi } from "./../../../api/user.js";
 import "./../../../components/document/documentContent.css";
 import { setDataForPropsControl,allControlNotSetData } from "./../../../components/document/dataControl";
@@ -204,6 +205,7 @@ import {listControlNotNameProp} from "./../../../components/document/controlProp
 
 import { checkCanBeBind, resetImpactedFieldsList, markBinedField } from './handlerCheckRunFormulas';
 import {checkDbOnly,getControlInstanceFromStore,getControlTitleFromName, getListInputInDocument} from './../common/common'
+import Formulas from './formulas.js';
 let impactedFieldsList = {};
 let impactedFieldsArr = {};
 
@@ -331,7 +333,8 @@ export default {
             loading: true,
             docSubFormId:0,
             drawer: false,
-            isContinueSubmit:false
+            isContinueSubmit:false,
+            titleObjectFormulas:null
         };
 
     },
@@ -1054,6 +1057,7 @@ export default {
                         if (res.status == 200) {
                             let content = res.data.document.content;
                             thisCpn.documentName = res.data.document.name;
+                            thisCpn.getTitleObjectFormulas(res.data.document.titleObjectFormulasId)
                             thisCpn.docSize = (parseInt(res.data.document.isFullSize) == 1) ? "100%":"21cm";
                             thisCpn.contentDocument = content;
 							if(res.data.document.dataPrepareSubmit != "" && res.data.document.dataPrepareSubmit != null)
@@ -1082,6 +1086,23 @@ export default {
                     .always(() => {});
             }
         },
+
+        /**
+         * hàm lấy thông tin của formulas cho title bản ghi
+         */
+        getTitleObjectFormulas(formulasId){
+            if(formulasId && formulasId != 0){
+                let self = this;
+                formulasApi.detailFormulas(formulasId).then(res=>{
+                    self.titleObjectFormulas = new Formulas(self.keyInstance,res.data.lastContent,'titleObject');
+                })
+            }
+            
+        },
+
+        /**
+         * Hàm lấy thông tin của bản ghi trường hợp update 
+         */
         loadDocumentObject() {
             let thisCpn = this;
             documentApi
@@ -1264,7 +1285,6 @@ export default {
                     }
                 }
             }
-            console.log("sadsadsad",this.sDocumentSubmit);
             this.listDataFlow = listDataFlow;
             if(!isSetEffectedControl);
             this.getEffectedControl();
@@ -1468,13 +1488,13 @@ export default {
                             instance: this.keyInstance
                         });
             if(this.otherInfo.hasOwnProperty('refreshControl') && this.otherInfo.refreshControl.length > 0){
-                let refreshControl = this.otherInfo.refreshControl
-                let dataImpactedControlRefresh = {}
+                let refreshControl = this.otherInfo.refreshControl;
+                let dataImpactedControlRefresh = {};
                 for (let index = 0; index < refreshControl.length; index++) {
                     let controlName = refreshControl[index];
                     let dataImpactedControl = util.cloneDeep(this.sDocumentSubmit.impactedFieldsList[controlName]);
                     for(let control in dataImpactedControl){
-                        dataImpactedControl[control] = false
+                        dataImpactedControl[control] = false;
                     }
                     dataImpactedControlRefresh[controlName] = dataImpactedControl;
                 }
@@ -1492,22 +1512,22 @@ export default {
                         continue;
                     }
                     checkRun = true;
-                    let formulas = controlInstance.controlFormulas.formulas.instance
-                    this.handlerBeforeRunFormulasValue(formulas,controlInstance.id,controlName,'formulas')
+                    let formulas = controlInstance.controlFormulas.formulas.instance;
+                    this.handlerBeforeRunFormulasValue(formulas,controlInstance.id,controlName,'formulas');
                 }
                 if(checkRun == false){
-                    this.submitDocument()
+                    this.submitDocument();
                 }
             }
             else{
-                this.submitDocument()
+                this.submitDocument();
             }
             
         },
         /**
          * Hàm gọi api submit document
          */
-        submitDocument(){
+        async submitDocument(){
             this.isSubmitting = true;
             let thisCpn = this;
             let dataPost = this.getDataPostSubmit();
@@ -1518,17 +1538,23 @@ export default {
             }
             if(thisCpn.sDocumentSubmit.submitFormulas != undefined){
                 let dataInput = thisCpn.getDataInputFormulas(thisCpn.sDocumentSubmit.submitFormulas);
-                thisCpn.sDocumentSubmit.submitFormulas.handleBeforeRunFormulas(dataInput).then(rs=>{
-                    this.callApiSubmit(dataPost);
-                });
+                await thisCpn.sDocumentSubmit.submitFormulas.handleBeforeRunFormulas(dataInput);
+                this.callApiSubmit(dataPost);
             }
             else{
-                 this.callApiSubmit(dataPost);
+                this.callApiSubmit(dataPost);
             }
             
         },
-        callApiSubmit(dataPost){
+        async callApiSubmit(dataPost){
             let thisCpn = this;
+            let titleObject = "";
+            if(this.titleObjectFormulas != null){
+                let dataInputTitle = thisCpn.getDataInputFormulas(this.titleObjectFormulas);
+                let res = await this.titleObjectFormulas.handleBeforeRunFormulas(dataInputTitle);
+                let value = this.getValueFromDataResponse(res);
+                dataPost['titleObject'] = value
+            }
             documentApi.submitDocument(dataPost).then(res => {
                 let dataResponSubmit = res.data;
                 dataResponSubmit['document_object_user_created_fullname'] = thisCpn.endUserInfo.id;

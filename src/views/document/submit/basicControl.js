@@ -6,9 +6,7 @@ import Util from './util'
 var numbro = require("numbro");
 import moment from "moment-timezone";
 
-import { userApi } from "./../../../api/user.js";
 import { documentApi } from "../../../api/Document";
-let listInputInDocument = sDocument.state.submit.listInputInDocument;
 const fileTypes = {
     'xlsx': 'mdi-microsoft-excel',
     'txt': 'mdi-file-document-outline',
@@ -400,7 +398,8 @@ export default class BasicControl extends Control {
         }
         let deleteFileIcon = '';
         if (this.checkDetailView()) {
-            this.value = sDocument.state.editor.allControl[listInputInDocument[this.inTable].id].value[this.name];
+            let tableInstance = sDocument.state.submit[this.curParentInstance].listInputInDocument[this.inTable]
+            this.value = sDocument.state.editor[this.curParentInstance].allControl[tableInstance.id].value[this.name];
         }
         if (this.value != '' && this.value.hasOwnProperty(rowId)) {
             for (let index = 0; index < this.value[rowId].length; index++) {
@@ -409,7 +408,6 @@ export default class BasicControl extends Control {
                 let icon = fileTypes[fileExt];
                 if (!this.checkDetailView()) {
                     deleteFileIcon = `<span data-rowid="` + rowId + `" data-file-name="` + fileName + `" title="xóa" class="remove-file"><span class="mdi mdi-close"></span></span>`;
-
                 }
                 let file = `<div  class="file-item">
                                 ` + deleteFileIcon + `
@@ -444,7 +442,7 @@ export default class BasicControl extends Control {
                             </div>`
                     thisObj.setDeleteFileEvent(thisObj.ele, thisObj.name)
                     thisObj.ele.find('.upload-file-wrapper-outtb').append(file);
-                    let curValue = listInputInDocument[thisObj.name].value;
+                    let curValue = sDocument.state.submit[this.curParentInstance].listInputInDocument[thisObj.name].value;
                     let tableName = thisObj.inTable;
                     if (tableName != false) {
                         if (!Array.isArray(curValue)) {
@@ -464,7 +462,7 @@ export default class BasicControl extends Control {
                         value: curValue
                     });
                     if (tableName != false) {
-                        listInputInDocument[tableName].tableInstance.tableInstance.render();
+                        sDocument.state.submit[this.curParentInstance].listInputInDocument[tableName].tableInstance.tableInstance.render();
                     }
 
                 }
@@ -472,6 +470,7 @@ export default class BasicControl extends Control {
         });
     }
     setDeleteFileEvent(ele, controlName) {
+        let listInputInDocument = sDocument.state.submit[this.curParentInstance].listInputInDocument
         let value = listInputInDocument[controlName].value;
         ele.off('click', '.remove-file')
         ele.on('click', '.remove-file', function(e) {
