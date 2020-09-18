@@ -18,7 +18,7 @@
                     'position' : 'relative',
                     'font-size':'11px',
                 }"
-                v-if="!inputInfo.hidden && (inputInfo.type != 'checkbox' && inputInfo.type != 'switch' )">
+                v-if="!inputInfo.hidden && (inputInfo.type != 'checkbox' && inputInfo.type != 'switch' ) && !inputInfo.isShowTitle">
                 {{inputInfo.title}}
                 <i
                     :class="{'mdi mdi-calendar float-right input-item-func ml-1': true}"

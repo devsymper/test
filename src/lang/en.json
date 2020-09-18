@@ -345,7 +345,12 @@
             },
             "title": "Submit document",
             "goToList": "Go to list",
-            "continueSubmit": "Submit again"
+            "continueSubmit": "Submit again",
+            "panel": {
+                "traceInput": "Input",
+                "traceCurrent": "Current",
+                "traceOutput": "Output"
+            }
         },
         "process": {
             "header_bar": {

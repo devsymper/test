@@ -149,12 +149,13 @@
         
          <v-navigation-drawer
             v-if="parrentInstance == 0" 
-            :width="830"
+            :width="(isShowTraceControlSidebar) ? 300 : 830"
             v-model="drawer"
             class="pa-3"
             absolute
             right
             temporary
+            :hide-overlay="isShowTraceControlSidebar"
             style="z-index:9999"
         >
             <submitDocument v-if="parrentInstance == 0 && docSubFormId != 0" 
@@ -162,7 +163,11 @@
             :parrentInstance="keyInstance" 
             @submit-document-success="submitSubFormSuccess"
             ref="subSubmitView" :isQickSubmit="true" :action="'submit'" :docId="docSubFormId"/>
-            
+            <SidebarTraceFormulas 
+            :controlTrace="controlTrace"
+            :keyInstance="keyInstance"
+            :listFormulasTrace="listFormulasTrace"
+            ref="traceControlView" v-show="isShowTraceControlSidebar" />
         </v-navigation-drawer>
         <div class="sub-form-action" v-if="parrentInstance != 0">
             <button @click="goToListDocument()" class=subfom-action__item>{{$t('document.submit.goToList')}}</button>
@@ -195,6 +200,7 @@ import Filter from "./items/Filter.vue";
 import Validate from "./../common/Validate";
 import ClientSQLManager from "./clientSQLManager.js";
 import Util from './util';
+import SidebarTraceFormulas from './SidebarTraceFormulas.vue';
 import './customControl.css';
 import ErrMessagePanel from "./../../../views/document/items/ErrMessagePanel.vue";
 import moment from "moment-timezone";
@@ -204,7 +210,7 @@ import {listControlNotNameProp} from "./../../../components/document/controlProp
 
 
 import { checkCanBeBind, resetImpactedFieldsList, markBinedField } from './handlerCheckRunFormulas';
-import {checkDbOnly,getControlInstanceFromStore,getControlTitleFromName, getListInputInDocument} from './../common/common'
+import {checkDbOnly,getControlInstanceFromStore,getControlTitleFromName, getListInputInDocument,mapTypeToEffectedControl} from './../common/common'
 import Formulas from './formulas.js';
 let impactedFieldsList = {};
 let impactedFieldsArr = {};
@@ -267,6 +273,7 @@ export default {
         "sym-drag-panel": SymperDragPanel,
         "err-message": ErrMessagePanel,
         EmbedDataflow,
+        SidebarTraceFormulas,
         VBoilerplate: {
             functional: true,
             render (h, { data, props, children }) {
@@ -334,7 +341,10 @@ export default {
             docSubFormId:0,
             drawer: false,
             isContinueSubmit:false,
-            titleObjectFormulas:null
+            titleObjectFormulas:null,
+            isShowTraceControlSidebar:false,
+            listFormulasTrace:{},
+            controlTrace:null
         };
 
     },
@@ -651,6 +661,17 @@ export default {
                 
             }
         });
+        /**
+         * Sự kiện bắn ra khi ấn f2 vào 1 control để trace formulas
+         */
+        this.$evtBus.$on('document-submit-show-trace-control',data=>{
+            data.control.renderCurrentTraceControlColor();
+            this.controlTrace = data.control.name;
+            let controlFormulas = data.control.controlFormulas;
+            this.listFormulasTrace = controlFormulas;
+            this.isShowTraceControlSidebar = true;
+            this.drawer = true;
+        })
     },
     watch: {
         docId(after) {
@@ -726,6 +747,12 @@ export default {
             }, 500,this);
             
         },
+
+        drawer(after){
+            if(this.isShowTraceControlSidebar && after == false){
+                this.$refs.traceControlView.removeTrace()
+            }
+        }
     },
     
     methods: {
@@ -1722,14 +1749,6 @@ export default {
         },
 
         updateEffectedControlToStore(mapControlEffected) {
-            let mapTypeToEffectedControl = {
-                                            link     :"effectedLinkControl",
-                                            formulas :"effectedControl",
-                                            readOnly :"effectedReadonlyControl",
-                                            hidden   :"effectedHiddenControl",
-                                            require  :"effectedRequireControl",
-                                            validate :"effectedValidateControl",
-                                            }
             let dataToPreProcessControl = {};
             for(let type in mapControlEffected){
                 if(mapTypeToEffectedControl.hasOwnProperty(type)){
@@ -2199,11 +2218,15 @@ export default {
 .sym-form-submit >>> table:not(.htCore) th {
     border: none !important;
 }
-.sym-form-submit >>> .htCore td:nth-last-child(3) {
+/* .sym-form-submit >>> .htCore td:nth-last-child(3) {
     border-right: 1px solid #ccc !important;
 }
 .sym-form-submit >>> .htCore thead tr th:nth-last-child(3) {
     border-right: 1px solid #ccc !important;
+} */
+
+.sym-form-submit >>> .handsontable[s-control-type="table"]{
+    border-right: 1px solid #ccc;
 }
 .sym-form-submit >>> .ht_clone_left.handsontable table.htCore {
     border-right: none;

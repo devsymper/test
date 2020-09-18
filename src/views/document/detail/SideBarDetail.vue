@@ -264,7 +264,7 @@ export default {
 	methods:{
 		hide(){
 			this.isShow = false;
-			this.$emit('after-hide-sidebar')
+			this.$emit('after-hide-sidebar');
 		},
 		show(){
 			this.isShow = true;

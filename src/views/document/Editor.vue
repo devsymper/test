@@ -149,79 +149,79 @@ export default {
     mounted(){
         let self = this;
          tinymce.init({
-                                theme: 'silver',
-                                skin: 'oxide',
-                                selector:  '#document-editor-'+self.keyInstance,
-                                forced_root_block:'div',
-                                toolbar_items_size : 'small',
-                                menubar: false,
-                                plugins: [
-                                'advlist autolink lists link image table print preview',
-                                ' fullscreen',
-                                'table paste code hr'
-                                ],
-                                contextmenu: 'inserttable table | settingtable | dragTable',
-                                toolbar:
-                                'undo redo | fontselect fontsizeselect formatselect | bold italic forecolor backcolor | \
-                                alignleft aligncenter alignright alignjustify | \
-                                bullist numlist indent hr | removeformat  table |  preview margin',
-                                fontsize_formats: '8px 10px 11px 12px 13px 14px 15px 16px 17px 18px 19px 20px 21px 22px 23px 24px 25px 26px 27px 28px 29px 30px 32px 34px 36px',
-                                font_formats: 'Roboto=Roboto,sans-serif; Andale Mono=andale mono,times;'+ 'Arial=arial,helvetica,sans-serif;'+ 'Arial Black=arial black,avant garde;'+ 'Book Antiqua=book antiqua,palatino;'+ 'Comic Sans MS=comic sans ms,sans-serif;'+ 'Courier New=courier new,courier;'+ 'Georgia=georgia,palatino;'+ 'Helvetica=helvetica;'+ 'Impact=impact,chicago;'+ 'Symbol=symbol;'+ 'Tahoma=tahoma,arial,helvetica,sans-serif;'+ 'Terminal=terminal,monaco;'+ 'Times New Roman=times new roman,times,serif;'+ 'Trebuchet MS=trebuchet ms,geneva;'+ 'Verdana=verdana,geneva;'+ 'Webdings=webdings;'+ 'Wingdings=wingdings,zapf dingbats',
-                                valid_elements: '*[*]',
-                                content_css:['https://cdn.jsdelivr.net/npm/@mdi/font@latest/css/materialdesignicons.min.css'],
-                                setup: function(ed){
-                                    ed.ui.registry.addMenuItem('settingtable', {
-                                        text: 'Setting table',
-                                        disabled : false,
-                                        onAction: function(e) {
-                                            if(self.$route.name == 'printConfigDocument'){
-                                                self.showPrintConfigTable(e);
-                                            }
-                                            else{
-                                                self.showSettingControlTable(e);
-                                            }
-                                            
-                                        }
-                                    });
-                                    ed.ui.registry.addMenuItem('dragTable', {
-                                        text: 'Drag table',
-                                        disabled : false,
-                                        onAction: function(e) {
-                                            self.showDragTable(e);
-                                        }
-                                    });
-                                
-                                    ed.ui.registry.addButton('margin', {
-                                    icon:'margin',
-                                    tooltip:'Margin',
-                                        onAction: function (_) {
-                                            self.showPaddingPageConfig(ed);
-                                        }
-                                    }); 
-                                    for(let i = 0;i < self.listIconToolbar.length;i++){
-                                        ed.ui.registry.addIcon(self.listIconToolbar[i].name,`<i class='mdi `+self.listIconToolbar[i].icon+`' style='font-size:18px;rgba(0, 0, 0, 0.54);'></i>`)
-                                    }
-                                    ed.on('click', function(e) {
-                                        self.detectClickEvent(e)
-                                    });
-                                    ed.on('contextmenu', function(e) {
-                                        self.detectClickEvent(e)
-                                    });
-                                    ed.on('blur', function(e) {
-                                        self.detectBlurEditorEvent(e)
-                                    });
-                                    ed.on('keyup', function(e) {
-                                        self.keyHandler(e)
-                                    });
-                                    ed.on('paste', function(e) {
-                                        self.handlePasteContent();
-                                    });
-                                },
-                                init_instance_callback : function(editor) {
-                                    self.editorCore = editor
-                                    self.initEditor()
-                                },
-                            });
+            theme: 'silver',
+            skin: 'oxide',
+            selector:  '#document-editor-'+self.keyInstance,
+            forced_root_block:'div',
+            toolbar_items_size : 'small',
+            menubar: false,
+            plugins: [
+            'advlist autolink lists link image table print preview',
+            ' fullscreen',
+            'table paste code hr'
+            ],
+            contextmenu: 'inserttable table | settingtable | dragTable',
+            toolbar:
+            'undo redo | fontselect fontsizeselect formatselect | bold italic forecolor backcolor | \
+            alignleft aligncenter alignright alignjustify | \
+            bullist numlist indent hr | removeformat  table |  preview margin',
+            fontsize_formats: '8px 10px 11px 12px 13px 14px 15px 16px 17px 18px 19px 20px 21px 22px 23px 24px 25px 26px 27px 28px 29px 30px 32px 34px 36px',
+            font_formats: 'Roboto=Roboto,sans-serif; Andale Mono=andale mono,times;'+ 'Arial=arial,helvetica,sans-serif;'+ 'Arial Black=arial black,avant garde;'+ 'Book Antiqua=book antiqua,palatino;'+ 'Comic Sans MS=comic sans ms,sans-serif;'+ 'Courier New=courier new,courier;'+ 'Georgia=georgia,palatino;'+ 'Helvetica=helvetica;'+ 'Impact=impact,chicago;'+ 'Symbol=symbol;'+ 'Tahoma=tahoma,arial,helvetica,sans-serif;'+ 'Terminal=terminal,monaco;'+ 'Times New Roman=times new roman,times,serif;'+ 'Trebuchet MS=trebuchet ms,geneva;'+ 'Verdana=verdana,geneva;'+ 'Webdings=webdings;'+ 'Wingdings=wingdings,zapf dingbats',
+            valid_elements: '*[*]',
+            content_css:['https://cdn.jsdelivr.net/npm/@mdi/font@latest/css/materialdesignicons.min.css'],
+            setup: function(ed){
+                ed.ui.registry.addMenuItem('settingtable', {
+                    text: 'Setting table',
+                    disabled : false,
+                    onAction: function(e) {
+                        if(self.$route.name == 'printConfigDocument'){
+                            self.showPrintConfigTable(e);
+                        }
+                        else{
+                            self.showSettingControlTable(e);
+                        }
+                        
+                    }
+                });
+                ed.ui.registry.addMenuItem('dragTable', {
+                    text: 'Drag table',
+                    disabled : false,
+                    onAction: function(e) {
+                        self.showDragTable(e);
+                    }
+                });
+            
+                ed.ui.registry.addButton('margin', {
+                icon:'margin',
+                tooltip:'Margin',
+                    onAction: function (_) {
+                        self.showPaddingPageConfig(ed);
+                    }
+                }); 
+                for(let i = 0;i < self.listIconToolbar.length;i++){
+                    ed.ui.registry.addIcon(self.listIconToolbar[i].name,`<i class='mdi `+self.listIconToolbar[i].icon+`' style='font-size:18px;rgba(0, 0, 0, 0.54);'></i>`)
+                }
+                ed.on('click', function(e) {
+                    self.detectClickEvent(e)
+                });
+                ed.on('contextmenu', function(e) {
+                    self.detectClickEvent(e)
+                });
+                ed.on('blur', function(e) {
+                    self.detectBlurEditorEvent(e)
+                });
+                ed.on('keyup', function(e) {
+                    self.keyHandler(e)
+                });
+                ed.on('paste', function(e) {
+                    self.handlePasteContent();
+                });
+            },
+            init_instance_callback : function(editor) {
+                self.editorCore = editor
+                self.initEditor()
+            },
+        });
                           
 
     },
