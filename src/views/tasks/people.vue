@@ -215,7 +215,6 @@ export default {
     },
     methods: {
         async changeUserSelect(value){
-            
             let updateData = {};
             for(let role in this.tabData){
                 let userIds = this.tabData[role].reduce((arr, user) => {

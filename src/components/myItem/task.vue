@@ -37,6 +37,7 @@
             :isShowSidebar="isShowSidebar"
             :taskInfo="taskInfo"
             :originData="originData"
+            :tabsData="tabsData"
         />
     </div>
 </template> 
@@ -91,7 +92,11 @@ export default {
         isShowSidebar:{
             type:Boolean,
           	default:false
-        }
+        },
+        tabsData: {
+            type: Object,
+            default: () => {}
+        },
     },
     computed:{
         stask() {

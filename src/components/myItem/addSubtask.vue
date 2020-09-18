@@ -98,7 +98,7 @@
 
 <script>
 import datePicker from "../../components/common/datePicker";
-import userSelector from "./userSelector"
+import userSelector from "./UserSelector"
 export default {
     name: "addSubtask",
     components: {

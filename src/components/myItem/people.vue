@@ -96,7 +96,7 @@
 
 <script>
 import OrgchartSelector from "./../../components/user/OrgchartSelector";
-import user from "./user";
+import user from "./User";
 import BPMNEngine from '../../api/BPMNEngine';
 export default {
     name: "people",

@@ -905,7 +905,9 @@
             "id": "Số đơn",
             "list": "Danh sách công việc",
             "submitForm": "Form nhập liệu",
-            "alertDescription": "Không có mô tả"
+            "alertDescription": "Không có mô tả",
+            "relatedTask":"CÁC TASK LIÊN QUAN",
+            "attachment":"TỆP ĐÍNH KÈM"
         },
         "filterOptions": {
             "all": "Toàn bộ task",

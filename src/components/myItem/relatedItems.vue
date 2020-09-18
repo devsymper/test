@@ -11,10 +11,11 @@
 </template>
 
 <script>
+import listTask from "./List";
 export default {
     name: "relatedItems",
     components: {
-        listTask: () => import("./list.vue")
+        listTask
     },
     props: {
         taskInfo: {

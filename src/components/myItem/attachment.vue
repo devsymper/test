@@ -84,7 +84,7 @@
 </template>
 
 <script>
-import user from "./user";
+import user from "./User";
 import UploadFile from "@/components/common/UploadFile.vue";
 import KHShowFile from "@/components/kh/KHShowImage";
 import { taskApi } from "@/api/task.js";

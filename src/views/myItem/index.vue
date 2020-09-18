@@ -7,7 +7,7 @@
 
 <script>
 import Api from "./../../api/api.js";
-import list from "@/components/myItem/list";
+import list from "@/components/myItem/List";
 export default {
     name: "ListTaskContainer",
     components: {

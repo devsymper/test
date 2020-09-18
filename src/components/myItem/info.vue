@@ -66,7 +66,7 @@
 
 <script>
 import VueResizable from 'vue-resizable';
-import user from "./user";
+import user from "./User";
 import trackingProcessInstance from "@/views/process/TrackingProcessInstance.vue";
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 

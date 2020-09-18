@@ -60,7 +60,8 @@
                     :taskInfo="taskInfo"
                     :isShowSidebar="isShowSidebar"
                     :originData="originData"
-                    :tabData="tabsData['task']"
+                    :tabsData="tabsData['people']"
+                    :ref="`task`"
                   >
                 </task>
             <!-- </VuePerfectScrollbar> -->
@@ -71,19 +72,23 @@
 
 <script>
 import icon from "../../components/common/SymperIcon";
-import attachment from "./attachment";
-import comment from "./comment";
-import flow from "./flow";
-import info from "./info";
-import people from "./people";
-import relatedItems from "./relatedItems";
-import subtask from "./subtask";
-import task from "./task";
+import attachment from "./Attachment";
+import comment from "./Comment";
+import flow from "./Flow";
+import info from "./Info";
+import people from "./People";
+import relatedItems from "./RelatedItems";
+import subtask from "./Subtask";
+import task from "./Task";
 import BPMNEngine from '../../api/BPMNEngine';
 import { getVarsFromSubmitedDoc, getProcessInstanceVarsMap } from '../../components/process/processAction';
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import { documentApi } from '../../api/Document';
+import { appManagementApi } from '@/api/AppManagement';
+
 import VueClipboard from 'vue-clipboard2';
+
+
 Vue.use(VueClipboard)
 export default {
     name: "taskDetail",
@@ -127,9 +132,11 @@ export default {
     },
     data: function() {
         return {
+            appId:'',
             isShowSidebar:false,
             loadingActionTask:false,
             breadcrumb: {
+                appName:'',
                 definitionName: '',
                 instanceName: '',
                 taskName: ''
@@ -176,8 +183,11 @@ export default {
             let bsr = this.breadcrumb.taskName;
             let allDef = this.$store.state.process.allDefinitions;
             if(this.breadcrumb.definitionName){
-                // bsr = `App name / ${this.breadcrumb.definitionName} / ${this.breadcrumb.instanceName} / ${bsr}`;
-                bsr = `${this.breadcrumb.definitionName} / ${bsr}`;
+                if (this.breadcrumb.appName && this.breadcrumb.appName!= '') {
+                    bsr = `${this.breadcrumb.appName} / ${this.breadcrumb.definitionName} / ${bsr}`;
+                }else{
+                    bsr = `${this.breadcrumb.definitionName} / ${bsr}`;
+                }
             }else if(this.isInitInstance && !$.isEmptyObject(allDef)){
                 if(allDef[this.$route.params.id]){
                     bsr = `${allDef[this.$route.params.id].name} / Start workflow`;
@@ -250,14 +260,41 @@ export default {
                 }
                 task.name = task.description.content;
             }
+
             this.descriptionTask=task.description;
             this.breadcrumb.taskName = task.name;
             if(task.processDefinitionId){
-                this.breadcrumb.definitionName = this.$store.state.process.allDefinitions[task.processDefinitionId].name;
+                let processDefinitionId=task.processDefinitionId;
+		        var arrProcessDefinitionId = processDefinitionId.split(":"); //tách chuỗi để lấy DefinitionKey
+
+                this.breadcrumb.definitionName = this.$store.state.process.allDefinitions[arrProcessDefinitionId[0]].name;
                 this.breadcrumb.instanceName = this.taskInfo.extraLabel+' '+this.taskInfo.extraValue;
             }else{
                 this.breadcrumb.definitionName = '';
                 this.breadcrumb.instanceName = '';
+            }
+            if (task.processInstanceId && task.processInstanceId!=null) {
+                this.getProcessInstance(task.processInstanceId);
+            }
+        },
+        getProcessInstance(processInstanceId){
+            let self=this;
+            BPMNEngine.getProcessInstanceVars(processInstanceId).then((res) => {
+                const symperAppId = res.find(element => element.name=='symper_application_id');
+                    if (symperAppId) {
+                        self.appId=symperAppId.value;
+                        console.log(res,"symperApp");
+                    }
+            }).catch(()=>{
+                self.appId='';
+            });
+            if (this.appId!=-1 && this.appId!="") {
+                appManagementApi.getAppDetails(Number(this.appId)).then((res) => {
+                    console.log(res,"Appdetail");
+                    self.breadcrumb.appName=res.data.listObject.name;
+                }).catch(()=>{
+                    self.breadcrumb.appName=null;
+                });
             }
         },
         closeDetail() {
@@ -266,7 +303,7 @@ export default {
         async saveTaskOutcome(value){ // hành động khi người dùng submit task của họ
             this.loadingActionTask=true;
             if(this.taskAction == 'submit' || this.taskAction == 'update' ){
-                this.$refs.task[0].submitForm(value);
+                this.$refs.task.submitForm(value);
             }else if(this.taskAction == 'approval'){
                 let elId = this.originData.taskDefinitionKey;
                 let taskData = {

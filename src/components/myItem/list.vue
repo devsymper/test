@@ -234,18 +234,18 @@
 </template>
 
 <script>
-import BPMNEngine from "./../../api/BPMNEngine";
-import icon from "../../components/common/SymperIcon";
-import taskDetail from "./taskDetail";
-import listHeader from "./listHeader";
-import userSelector from "./userSelector";
+import BPMNEngine from "@/api/BPMNEngine";
+import icon from "@/components/common/SymperIcon";
+import taskDetail from "./TaskDetail";
+import listHeader from "./ListHeader";
+import userSelector from "./UserSelector";
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import { util } from "../../plugins/util";
 import { appConfigs } from "../../configs";
 import {
   extractTaskInfoFromObject,
   addMoreInfoToTask
-} from "../../components/process/processAction";
+} from "@/components/process/processAction";
 import symperAvatar from "@/components/common/SymperAvatar.vue";
 
 export default {

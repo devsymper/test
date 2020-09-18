@@ -12,13 +12,13 @@
 </template>
 
 <script>
-import addSubtask from "./addSubtask";
+import addSubtask from "./AddSubtask";
 
 export default {
     name: "subtask",
     components: {
         addSubtask: addSubtask,
-        listTask:  () => import('./list.vue')
+        listTask:  () => import('./List')
     },
     data: function() {
         return {

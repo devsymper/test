@@ -776,7 +776,10 @@
             "id": "Seri",
             "list": "List task",
             "submitForm": "Submit form",
-            "alertDescription": "No description"
+            "alertDescription": "No description",
+            "relatedTask":"RELATED TASK",
+            "attachment":"ATTACHMENT FILE"
+
         },
         "filterOptions": {
             "all": "All task",
