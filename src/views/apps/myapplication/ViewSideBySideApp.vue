@@ -69,6 +69,7 @@ import AppDetail from './../AppDetail.vue'
         clickDetails(item){
             this.activeIndex = item.id
             debugger
+            this.$store.commit("appConfig/updateCurrentAppId",item.id);
             this.showDetailDiv = true
 			this.$store.commit('appConfig/emptyItemSelected')
 			appManagementApi.getAppDetails(item.id).then(res => {

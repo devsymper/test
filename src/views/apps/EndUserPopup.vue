@@ -243,6 +243,7 @@ export default {
 			this.title.iconName = item.iconName;
 			this.title.iconType = item.iconType;
 			this.title.name = item.name;
+			this.$store.commit("appConfig/updateCurrentAppId",item.id);
 			appManagementApi.getAppDetails(item.id).then(res => {
 				if (res.status == 200) {
 					if(Object.keys(res.data.listObject.childrenApp).length > 0){
@@ -296,7 +297,6 @@ export default {
 			this.tab = 'tab-1'
 			this.$refs.contextMenu.hide()
 			this.getActiveapps()
-			// this.getFavorite()
 		},
 		updateFavoriteItem(mapArray,array){
 			for( let [key,value] of Object.entries(mapArray)){
