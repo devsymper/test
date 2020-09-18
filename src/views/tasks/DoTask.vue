@@ -49,7 +49,6 @@ export default {
         async setTaskInfo(){
             if(this.$route.params.id){
                 let task = await BPMNEngine.getATaskInfo(this.$route.params.id);
-                
                 let taskInfo = extractTaskInfoFromObject(task);
                 task = addMoreInfoToTask(task);
                 this.$set(this.data, 'taskInfo', taskInfo);

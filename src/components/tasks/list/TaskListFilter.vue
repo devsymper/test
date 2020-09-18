@@ -69,7 +69,7 @@ export default {
 
                     if($.isArray(this.listFilter[key].value)){
                         filterData[key] = this.listFilter[key].value.reduce((arr, ele) => {
-                            if (key=='processDefinitionId') {
+                            if (key=='processDefinitionKey') {
                                 arr.push(ele.processKey);
                             }else{
                                 arr.push(ele.id);
@@ -110,7 +110,7 @@ export default {
                     def.displayName = def.name;
                     arr.push(def);
                 }
-                this.$set(this.listFilter.processDefinitionId, 'items', arr);
+                this.$set(this.listFilter.processDefinitionKey, 'items', arr);
             }
         }
     },
@@ -130,7 +130,7 @@ export default {
                     value: null,
                     searchKey: ''
                 },
-                processDefinitionId: {
+                processDefinitionKey: {
                     label: this.$t('process.instance.process_definition_name'),
                     items: [],
                     value: null,
