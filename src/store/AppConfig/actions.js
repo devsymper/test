@@ -1,9 +1,9 @@
 import {
-	documentApi
+    documentApi
 } from "../../api/Document";
 import {
-	SYMPER_APP
-} from "./../../main.js";
+    SYMPER_APP
+} from "../../main.js";
 
 
 /**
