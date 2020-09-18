@@ -44,7 +44,7 @@
         @check-name-document="checkBeforeDocumentNameChange"
         @save-doc-action="validateControl"
         @save-form-print-action="saveFormPrint"/>
-        <QuickInfoControl :keyInstance="keyInstance" ref="quickInfoControlView"/>
+        <!-- <QuickInfoControl :keyInstance="keyInstance" ref="quickInfoControlView"/> -->
         <err-message :listErr="listMessageErr" ref="errMessage"/>
         <control-name-related v-if="!isConfigPrint" :instance="keyInstance" @after-close-panel="afterClosePanel"  ref="controlNameRelated"/>
         <all-control-option :instance="keyInstance" ref="allControlOption"/>
@@ -1032,8 +1032,7 @@ export default {
             if (checkDiv.attr('s-control-type') != 'table') {
                 checkDiv.attr('contenteditable', false);
             }
-
-            let newContent = contentNode.replace(/\/{2}/, checkDiv[0].outerHTML);
+            let newContent = contentNode.replace(/\/{2}$/, checkDiv[0].outerHTML);
             
             $(this.editorCore.selection.getNode()).html(newContent+'&nbsp;<span id = "caret_pose_holder"> </ span>')
             let table = $(this.editorCore.selection.getNode()).closest('.s-control-table');
@@ -1207,7 +1206,6 @@ export default {
                 if($(event.target).closest('body').find('.drag-table').length > 0){
                     $(event.target).closest('body').find('.drag-table').remove()
                 }
-                
             }
             if(this.editorStore.currentSelectedControl.id != ""){ 
                 this.$refs.sidebarRight.hideDragPanel();
@@ -1961,7 +1959,8 @@ export default {
                     var e = event.originalEvent;
                 try {
                     var control = e.dataTransfer.getData('control');
-                    control = JSON.parse(control)
+                    control = JSON.parse(control);
+                    $("#document-editor-"+thisCpn.keyInstance+"_ifr").contents().find(".on-selected").removeClass('on-selected');
                     var insertionPoint = $("#document-editor-"+thisCpn.keyInstance+"_ifr").contents().find(".drop-marker");
                     var checkDiv = $(control.html);
                     let typeControl = checkDiv.attr('s-control-type');
@@ -1980,6 +1979,7 @@ export default {
                     if (checkDiv.attr('s-control-type') != 'table') {
                         checkDiv.attr('contenteditable', false);
                     }
+                    checkDiv.addClass('on-selected');
                     insertionPoint.remove();
                     if(typeControl == 'tabPage'){
                         let newPageId = 's-control-id-' + (Date.now() + 1);
@@ -1991,7 +1991,6 @@ export default {
                         thisCpn.addToAllControlInDoc(newPageId,{properties: control.properties, formulas : control.formulas,type:'page'});
                     }
                     thisCpn.selectControl(control.properties, control.formulas,inputid,typeControl);
-                    thisCpn.$refs.quickInfoControlView.show(event)
                     if(table.length > 0){   // nếu keo control vào trong table thì update dữ liệu trong table của state
                         idTable = table.attr('id');
                         thisCpn.addToAllControlInTable(inputid,{properties: control.properties, formulas : control.formulas,type:typeControl},idTable);
@@ -1999,7 +1998,6 @@ export default {
                     else{
                         thisCpn.addToAllControlInDoc(inputid,{properties: control.properties, formulas : control.formulas,type:typeControl});
                     }
-                    // set_window_property(inputid, objecttype);
                 } catch (e) {}
             });
             

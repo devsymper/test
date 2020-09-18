@@ -123,6 +123,14 @@ export default {
     watch:{
         "controlPropsGroup.table.mapParamsDataflow.value":function(after){
             // debugger    
+        },
+        /**
+         * Tự động focus vào input name sau khi chọn control
+         */
+        "controlPropsGroup.name":function(){
+            setTimeout(() => {
+                $('.sym-v-expand-content input').first().focus();
+            }, 200);
         }
         
     },
