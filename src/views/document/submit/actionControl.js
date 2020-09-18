@@ -21,7 +21,6 @@ export default class ActionControl extends Control {
                     instance: this.curParentInstance
                 });
             }
-
         } else {
             this.ele.addClass('d-none');
         }
@@ -46,7 +45,7 @@ export default class ActionControl extends Control {
                                     user = user[0]
                                 }
                                 let item = `<div class="approved-item">
-                                                            <span>Người duyệt 1: </span>  <img src="https://file.symper.vn/readFile/user_avatar_` + user.id + `" style="    height: 18px;
+                                                            <span>Người duyệt ` + index + 1 + `: </span>  <img src="https://file.symper.vn/readFile/user_avatar_` + user.id + `" style="    height: 18px;
                                                             border-radius: 50%;
                                                             width: 18px;
                                                             margin-bottom: -4px;"> <strong>` + user.displayName + `</strong> <span>đã duyệt ` + moment(approvalHistory.createAt).fromNow() + ` ( ` + approvalHistory.createAt + ` )</span>

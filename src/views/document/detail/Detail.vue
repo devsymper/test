@@ -409,8 +409,6 @@ export default {
                         $(allInputControl[index]).remove()
                     }
                     else if(controlType == "approvalHistory"){
-                        debugger
-
                         let control = new ActionControl(
                                 idField,
                                 $(allInputControl[index]),
