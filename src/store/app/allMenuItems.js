@@ -1,4 +1,9 @@
 export default {
+    my_application:{
+        title: 'My application',
+        icon: 'mdi-briefcase-edit-outline',
+        link: "/my-applications"
+    },
     workflow_definition: {
         title: "workflows",
         icon: "mdi-sitemap",

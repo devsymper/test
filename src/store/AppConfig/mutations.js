@@ -72,6 +72,13 @@ const delFavorite = (state, data) => {
         }
     })
 }
+const changeTypeView = (state) => {
+    state.viewSideBySide = !state.viewSideBySide
+}
+const updateCurrentAppId = (state, data) => {
+    state.currentAppId = data
+    debugger
+}
 export {
     updateListItemSelected,
     removeItemSelected,
@@ -79,5 +86,7 @@ export {
     updateChildrenApps,
     updateListFavorite,
     insertFavorite,
-    delFavorite
+    delFavorite,
+    changeTypeView,
+    updateCurrentAppId
 };
