@@ -226,6 +226,7 @@
           :originData="selectedTask.originData"
           @close-detail="closeDetail"
           @task-submited="handleTaskSubmited"
+          @changeUpdateAsignee="changeUpdateAsignee"
         ></taskDetail>
       </v-col>
       <userSelector ref="user" class="d-none"></userSelector>
@@ -383,6 +384,9 @@ export default {
     self.reCalcListTaskHeight();
   },
   methods: {
+    changeUpdateAsignee(){
+      this.handleTaskSubmited();
+    },
     showTime(time){
         var today = this.$moment().format('YYYY-MM-DD');
         if (time===today) {

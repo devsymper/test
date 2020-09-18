@@ -420,6 +420,8 @@ export default {
                 let res = await BPMNEngine.updateTask(this.taskInfo.action.parameter.taskId ,updateData);
                 this.$evtBus.$emit('symper-update-task-assignment', res);
 				this.$snotifySuccess("Update task assignment successfully");
+                this.$emit('changeUpdateAsignee');
+				
             } catch (error) {
                 this.$snotifyError(error, "Update task assignment failed");
             }

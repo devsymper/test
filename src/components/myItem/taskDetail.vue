@@ -61,6 +61,7 @@
                     :isShowSidebar="isShowSidebar"
                     :originData="originData"
                     :tabsData="tabsData['people']"
+                    @changeUpdateAsignee="changeUpdateAsignee"
                     :ref="`task`"
                   >
                 </task>
@@ -202,6 +203,9 @@ export default {
         this.checkAndSwitchToTab();
     },
     methods: {
+        changeUpdateAsignee(){
+            this.$emit('changeUpdateAsignee');
+        },
         toggleSidebar(){
             this.isShowSidebar = !this.isShowSidebar;
         },
@@ -277,24 +281,29 @@ export default {
                 this.getProcessInstance(task.processInstanceId);
             }
         },
-        getProcessInstance(processInstanceId){
+        async getProcessInstance(processInstanceId){
             let self=this;
-            BPMNEngine.getProcessInstanceVars(processInstanceId).then((res) => {
+            await BPMNEngine.getProcessInstanceVars(processInstanceId).then((res) => {
                 const symperAppId = res.find(element => element.name=='symper_application_id');
                     if (symperAppId) {
                         self.appId=symperAppId.value;
                         console.log(res,"symperApp");
+                    }else{
+                        self.appId='';
                     }
             }).catch(()=>{
                 self.appId='';
             });
+
             if (this.appId!=-1 && this.appId!="") {
-                appManagementApi.getAppDetails(Number(this.appId)).then((res) => {
+                await appManagementApi.getAppDetails(Number(this.appId)).then((res) => {
                     console.log(res,"Appdetail");
                     self.breadcrumb.appName=res.data.listObject.name;
                 }).catch(()=>{
                     self.breadcrumb.appName=null;
                 });
+            }else{
+                self.breadcrumb.appName=null;
             }
         },
         closeDetail() {

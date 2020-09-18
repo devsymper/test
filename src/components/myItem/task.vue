@@ -38,6 +38,7 @@
             :taskInfo="taskInfo"
             :originData="originData"
             :tabsData="tabsData"
+            @changeUpdateAsignee="changeUpdateAsignee"
         />
     </div>
 </template> 
@@ -161,6 +162,9 @@ export default {
         }
     },
     methods: {
+        changeUpdateAsignee(){
+            this.$emit('changeUpdateAsignee');
+        },
         async handleTaskDetailChange(defId, nodeId){
             if(!defId || !nodeId){
                 return;
