@@ -76,7 +76,6 @@ import SideBarRight from './sideright/SideBarRight.vue';
 import TableSetting from './items/TableSetting.vue';
 import PrintTableConfig from './print/PrintTableConfig';
 import AutoCompleteControl from './items/AutoCompleteControl.vue';
-import controlCss from  "./../../assets/css/document/control/control.css";
 import SaveDocPanel from "./../../views/document/items/SaveDocPanel.vue";
 import QuickInfoControl from "./../../views/document/items/QuickInfoControl";
 import ErrMessagePanel from "./../../views/document/items/ErrMessagePanel.vue";
@@ -1207,9 +1206,6 @@ export default {
                     $(event.target).closest('body').find('.drag-table').remove()
                 }
             }
-            if(this.editorStore.currentSelectedControl.id != ""){ 
-                this.$refs.sidebarRight.hideDragPanel();
-            }
             if($(event.target).is('.s-control')){
                 this.setSelectedControlProp(event,$(event.target),$('#document-editor-'+this.keyInstance+'_ifr').get(0).contentWindow);
             }
@@ -1412,7 +1408,7 @@ export default {
         wrapTableElement(){
             let listTable = $("#document-editor-"+this.keyInstance+"_ifr").contents().find('.s-control-table');
             if(listTable.length > 0 && !listTable.parent().is('.wrap-s-control-table')){
-                listTable.wrap('<div class="wrap-s-control-table" style="overflow:auto;"></div>')
+                listTable.wrap('<div class="wrap-s-control-table"></div>')
             }
         },
 
