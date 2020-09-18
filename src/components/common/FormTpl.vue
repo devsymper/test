@@ -394,10 +394,10 @@ export default {
             }, 500, this);
         },
         openLargeValueEditor(inputInfo, name) {
+            this.$set(this.largeFormulaEditor, "data", inputInfo);
+            this.largeFormulaEditor.name = name;
             this.$refs.dragPanel.show();
             this.$refs.edtFormula.onFocus();
-            this.largeFormulaEditor.name = name;
-            this.$set(this.largeFormulaEditor, "data", inputInfo);
             if(this.getDragPanelContent(inputInfo) == 'orgchart-selector'){
                 this.translateTagsToOrgchartValues()
             }

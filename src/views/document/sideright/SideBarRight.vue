@@ -72,8 +72,6 @@
                     </v-expansion-panel-content>
                 </v-expansion-panel>
             </v-expansion-panels>
-            <!-- <control-props-config :singleLine="true" :labelWidth="`100px`" :allInputs="sCurrentDocument.properties"/> -->
-
         </v-tab-item>
         <v-tab-item
             class="p-2 h-100 formulas-control-tab"
@@ -215,12 +213,6 @@ export default {
                 checkTitleControl(this.instance);
             }
         },
-        
-        
-
-        
- 
-       
     }
 }
 </script>

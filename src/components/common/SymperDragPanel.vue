@@ -143,7 +143,7 @@ export default {
     methods: {
         show(){
             this.selfShowPanel = true;
-            $('.v-application:first-child').append(this.$el);
+            $('.v-application:first-child').append(this.$el.detach());
         },
         hide() {
             this.$emit('before-close',{});
