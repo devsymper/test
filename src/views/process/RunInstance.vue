@@ -112,7 +112,6 @@ export default {
                 
                 let instanceName = await this.getInstanceName(dataInputForFormula);
                 
-                // let newProcessInstance = await runProcessDefinition(this, processDef, [], instanceName);
                 let newProcessInstance = await runProcessDefinition(this, processDef, vars, instanceName);
                 this.$snotifySuccess("Task submited successfully");
             } catch (error) {
