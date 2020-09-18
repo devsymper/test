@@ -56,7 +56,7 @@ export default {
  data: function() {
         return {
 			
-			listItemHeight: 'calc(100vh - 380px)',
+			
 			currentSelected:null,
 			typeSelected:null,
 			objFilter:{
@@ -106,6 +106,13 @@ export default {
 				this.filterItem();
 				return this.objFilter
 			}
+		},
+		listItemHeight(){
+			if(this.isMyApplication == true){
+				return 'calc(100vh - 125px)'
+			}else{
+				return  'calc(100vh - 380px)'
+			}
 		}
 	},
 	props: {
@@ -116,6 +123,10 @@ export default {
 		searchKey:{
 			type: String,
 			default:"",
+		},
+		isMyApplication:{
+			type: Boolean,
+			default: false
 		}
     },
 	methods:{
@@ -228,7 +239,7 @@ export default {
 }
 .app-details >>> .app-item .title-document-enduser{
 	white-space: nowrap; 
-	width: 430px; 
+	width: 90%; 
 	overflow: hidden;
 	text-overflow: ellipsis; 
 }
