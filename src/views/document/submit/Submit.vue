@@ -2199,7 +2199,10 @@ export default {
 .sym-form-submit >>> table:not(.htCore) th {
     border: none !important;
 }
-.sym-form-submit >>> .htCore td:last-child {
+.sym-form-submit >>> .htCore td:nth-last-child(3) {
+    border-right: 1px solid #ccc !important;
+}
+.sym-form-submit >>> .htCore thead tr th:nth-last-child(3) {
     border-right: 1px solid #ccc !important;
 }
 .sym-form-submit >>> .ht_clone_left.handsontable table.htCore {

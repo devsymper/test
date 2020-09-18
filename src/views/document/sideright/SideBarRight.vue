@@ -77,7 +77,6 @@
             class="p-2 h-100 formulas-control-tab"
         >
             <control-props-config 
-            ref="formFormulas"
             @input-blur="handleInputBlur"
             :singleLine="false" 
             @input-value-changed="handleChangeInput" 
@@ -148,19 +147,7 @@ export default {
         
         }
     },
-    created(){
-        let thisCpn = this;
-        this.$evtBus.$on("symper-app-wrapper-clicked", evt =>{
-            if (!$(evt.target).hasClass("mdi-dock-window") && $(evt.target).closest(".symper-drag-panel").length == 0) {
-                thisCpn.hideDragPanel();
-            }
-        })
-    },
     methods:{
-        hideDragPanel(){
-            if(this.$refs.formFormulas != undefined)
-                this.$refs.formFormulas.hideDragPanel();
-        },
         handleInputBlur(inputInfo, name){
             
         },
