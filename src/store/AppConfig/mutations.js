@@ -77,7 +77,6 @@ const changeTypeView = (state) =>{
 }
 const updateCurrentAppId = (state, data) =>{
 	state.currentAppId = data
-	debugger
 }
 export {
 	updateListItemSelected,
