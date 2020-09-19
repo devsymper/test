@@ -17,10 +17,10 @@ export default [{
         "handler": function(param) {
             let tabName = param.title ? param.title : (param.name ? param.name : '');
             tabName = this.$t('document.edit') + ' ' + tabName;
-            let url = this.getLink(param);
+            let url = this.$getActionLink(param);
             this.$goToPage(url, tabName);
         },
-        getLink(param) {
+        $getActionLink(param) {
             return 'documents/' + param.id + '/editor/edit';
         }
     },
@@ -30,10 +30,10 @@ export default [{
         "handler": function(param) {
             let tabName = param.title ? param.title : (param.name ? param.name : '');
             tabName = this.$t('document.submit') + ' ' + tabName;
-            let url = this.getLink(param);
+            let url = this.$getActionLink(param);
             this.$goToPage(url, tabName);
         },
-        getLink(param) {
+        $getActionLink(param) {
             return `/documents/${param.id}/submit`;
         }
     },
@@ -54,9 +54,9 @@ export default [{
         "action": "list",
         "handler": function(param) {
             let tabName = this.$t('document.title');
-            this.$goToPage(this.getLink(param), tabName, false, false);
+            this.$goToPage(this.$getActionLink(param), tabName, false, false);
         },
-        getLink(param) {
+        $getActionLink(param) {
             return '/documents';
         }
     },
@@ -67,9 +67,9 @@ export default [{
         "handler": function(param) {
             let tabName = this.$t('apps.listActions.document_definition.list_trash');
             tabName = `${tabName} ${param.title}`;
-            this.$goToPage(this.getLink(param), tabName, false, false);
+            this.$goToPage(this.$getActionLink(param), tabName, false, false);
         },
-        getLink(param) {
+        $getActionLink(param) {
             return `documents/${param.id}/draft-objects`;
         }
     },
@@ -79,9 +79,9 @@ export default [{
         "handler": function(param) {
             let tabName = this.$t('apps.listActions.document_definition.list_instance');
             tabName = `${tabName} ${param.title}`;
-            this.$goToPage(this.getLink(param), tabName, false, false);
+            this.$goToPage(this.$getActionLink(param), tabName, false, false);
         },
-        getLink(param) {
+        $getActionLink(param) {
             return `documents/${param.id}/objects`;
         }
     }

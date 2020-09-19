@@ -7,6 +7,19 @@
         ref="dataflow"
         :dataflowId="124"
          /> -->
+
+        <!-- <SymperActionView 
+            :actionDef="{
+                module: 'document',
+                resource: 'document_definition',
+                scope: 'document',
+                action: 'edit'
+            }"
+            :param="{
+                id: 1944,
+                title: 'xxxx',
+                name: 'yyyy'
+            }" /> -->
     </div>
 </template>
 
@@ -20,6 +33,8 @@ import SymperColorPicker from "@/components/common/symperInputs/SymperColorPicke
 import PermissionSelector from "@/components/permission/PermissionSelector.vue";
 import Dashboard from "@/views/dashboard/Dashboard.vue";
 import EmbedDataflow from "./../components/dataflow/EmbedDataflow";
+
+import SymperActionView from "./../action/SymperActionView";
 export default {
     name: "Home",
     methods: {
@@ -91,7 +106,8 @@ export default {
         SymperColorPicker: SymperColorPicker,
         PermissionSelector,
         Dashboard,
-        EmbedDataflow
+        EmbedDataflow,
+        SymperActionView
     }
 };
 </script>

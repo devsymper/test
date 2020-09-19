@@ -1,7 +1,11 @@
 import listActionMap from "./actionDefinition";
 
-export const getKeyForAction = function(action) {
-    return ac.module + '_' + ac.resource + '_' + ac.scope + '_' + ac.action;
+export const getKeyForAction = function(ac) {
+    if (ac) {
+        return ac.module + '_' + ac.resource + '_' + ac.scope + '_' + ac.action;
+    } else {
+        return '';
+    }
 }
 
 

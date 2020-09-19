@@ -1,17 +1,18 @@
 <template>
-    <div class="symper-action-view" :style="{
-        width: myWidth,
-        height: myHeight,
-    }">
-        <div class="h-100 w-100" ref="container">
-
-        </div>
+    <div class="symper-action-view" 
+        :style="{
+            width: myWidth,
+            height: myHeight,
+        }"
+    >
+        <component :is="actionViewCompon" class="h-100 w-100"></component>
     </div>
 </template>
 
 <script>
 import {getKeyForAction} from "./index";
 import actionMap from "./index";
+import Vue from 'vue'
 
 export default {
     props: {
@@ -43,33 +44,43 @@ export default {
         }
     },
     watch: {
-        actionDef: {
-            deep: true,
-            immediate: true,
-            handler(newValue){
-                this.displayActionView();
-            }
-        }
+        // actionDef: {
+        //     deep: true,
+        //     immediate: true,
+        //     handler(newValue){
+        //         this.displayActionView();
+        //     }
+        // }
     },
-    created(){
+    mounted(){
         this.displayActionView();
+    },
+    data(){
+        return {
+            actionViewCompon: null
+        }
     },
     methods: {
         async displayActionView(){
-            let key = getKeyForAction(this.action);
+            let key = getKeyForAction(this.actionDef);
             if(actionMap.hasOwnProperty(key)) {
-                if(actionMap[key].hasOwnProperty('getLink')){
-                    let link = actionMap[key].getLink(this.param);
-                    let matchRoute = this.$router.match(url);
+                if(actionMap[key].hasOwnProperty('$getActionLink')){
+                    let link = actionMap[key].$getActionLink(this.param);
+                    let matchRoute = this.$router.match(link);
                     if(matchRoute && matchRoute.matched && matchRoute.matched[0]){
-                        let newComponent = await matchRoute.matched[0].components.default();
-                        debugger;
+                        let matchedRoute = matchRoute.matched[0];
+                        for(let key in matchRoute.params){
+                            this.$route.params[key] = matchRoute.params[key];
+                        }
+
+                        let componentData = await matchedRoute.components.default();
+                        this.actionViewCompon = componentData.default ;
                     }
                 }else{
-                    console.warn('[SYMPER ACTION VIEW]: getLink method not found in action definition', this.action, this.param);
+                    console.warn('[SYMPER ACTION VIEW]: $getActionLink method not found in action definition', this.action, this.param);
                 }
             } else {
-                console.error('[SYMPER ACTION VIEW]: action key not ', this.action);
+                console.error('[SYMPER ACTION VIEW]: action key not found', this.action);
             }
         }
     },
