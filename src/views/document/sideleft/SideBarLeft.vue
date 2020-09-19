@@ -32,6 +32,9 @@
             <list-control-tab :instance="instance" v-if="tab.id == 'listControl'">
 
             </list-control-tab>
+            <template-control v-if="tab.id == 'templateControl'">
+
+            </template-control>
 
             
         </v-tab-item>
@@ -42,11 +45,13 @@
 <script>
 import ControlTab from './items/ControlTab'
 import ListControlTab from './items/ListControlTab.vue'
+import TemplateControl from './items/TemplateControl.vue'
 
 export default {
     components: {
         'control-tab' : ControlTab,
         'list-control-tab' : ListControlTab,
+        'template-control' : TemplateControl,
     },
     props:{
         instance:{
@@ -64,7 +69,7 @@ export default {
         sideLeftTabs: [
           {id:'control', tab: 'Control',icon:'mdi mdi-drag-variant', content: 'Control' },
           {id:'listControl', tab: 'Danh sách control',icon:'mdi mdi-format-list-text', content: 'Danh sách control' },
-          {id:'controlPack', tab: 'Control Package',icon:'mdi mdi-package-variant', content: 'Control Package' },
+          {id:'templateControl', tab: 'Control template',icon:'mdi mdi-package-variant', content: 'Control template' },
           
         ],
        

@@ -184,102 +184,113 @@ export default class BasicControl extends Control {
     }
     setEvent() {
 
-        let thisObj = this;
-        this.ele.on('change', function(e) {
-            let valueChange = $(e.target).val();
-            if (thisObj.type == 'label') {
-                valueChange = $(e.target).text()
-            }
-            SYMPER_APP.$evtBus.$emit('document-submit-input-change', { controlName: thisObj.controlProperties.name.value, val: valueChange })
-            if (thisObj.type == 'date') {
-                if (this.formatDate != "" && typeof this.formatDate === 'string') {
-                    thisObj.value = $(this).val();
-                    $(this).val(moment($(this).val()).format(thisObj.formatDate))
+            let thisObj = this;
+            this.ele.on('change', function(e) {
+                let valueChange = $(e.target).val();
+                if (thisObj.type == 'label') {
+                    valueChange = $(e.target).text()
                 }
-            }
-        })
-        this.ele.on('focus', function(e) {
-            store.commit("document/addToDocumentSubmitStore", {
-                key: 'rootChangeFieldName',
-                value: thisObj.name,
-                instance: thisObj.curParentInstance
-            });
-        })
-
-        this.ele.on('keyup', function(e) {
-            if (thisObj.type == 'user') {
-                e.curTarget = e.target
-                SYMPER_APP.$evtBus.$emit('document-submit-user-input-change', e)
-            }
-            if (thisObj.type == 'percent') {
-                if (e.target.value > 100) {
-                    $(e.target).val(100)
+                SYMPER_APP.$evtBus.$emit('document-submit-input-change', { controlName: thisObj.controlProperties.name.value, val: valueChange })
+                if (thisObj.type == 'date') {
+                    if (this.formatDate != "" && typeof this.formatDate === 'string') {
+                        thisObj.value = $(this).val();
+                        $(this).val(moment($(this).val()).format(thisObj.formatDate))
+                    }
                 }
-            }
-            if (thisObj.type == 'department') {
-                e['controlName'] = thisObj.name;
-                SYMPER_APP.$evtBus.$emit('document-submit-department-key-event', {
-                    e: e,
-                    formulasInstance: thisObj.controlFormulas.autocomplete.instance,
-                    controlTitle: thisObj.title,
-                    controlName: thisObj.name,
-                    val: $(e.target).val()
-                })
-            }
-            if (thisObj.checkAutoCompleteControl() && thisObj.type != 'department') {
-                let fromSelect = false;
-                let formulasInstance = (fromSelect) ? thisObj.controlFormulas.formulas.instance : thisObj.controlFormulas.autocomplete.instance;
-                e['controlName'] = thisObj.controlProperties.name.value;
-                SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-key-event', {
-                    e: e,
-                    autocompleteFormulasInstance: formulasInstance,
-                    isSelect: false,
-                    controlTitle: thisObj.title,
-                    controlName: thisObj.controlProperties.name.value,
-                    val: $(e.target).val()
-                })
-            }
+            })
+            this.ele.on('focus', function(e) {
+                store.commit("document/addToDocumentSubmitStore", {
+                    key: 'rootChangeFieldName',
+                    value: thisObj.name,
+                    instance: thisObj.curParentInstance
+                });
+            })
 
-        })
+            this.ele.on('keyup', function(e) {
+                if (e.key == 'F2' && store.state.app.accountType == 'ba') {
+                    thisObj.traceControl();
+                }
+                if (thisObj.type == 'user') {
+                    e.curTarget = e.target
+                    SYMPER_APP.$evtBus.$emit('document-submit-user-input-change', e)
+                }
+                if (thisObj.type == 'percent') {
+                    if (e.target.value > 100) {
+                        $(e.target).val(100)
+                    }
+                }
+                if (thisObj.type == 'department') {
+                    e['controlName'] = thisObj.name;
+                    SYMPER_APP.$evtBus.$emit('document-submit-department-key-event', {
+                        e: e,
+                        formulasInstance: thisObj.controlFormulas.autocomplete.instance,
+                        controlTitle: thisObj.title,
+                        controlName: thisObj.name,
+                        val: $(e.target).val()
+                    })
+                }
+                if (thisObj.checkAutoCompleteControl() && thisObj.type != 'department') {
+                    let fromSelect = false;
+                    let formulasInstance = (fromSelect) ? thisObj.controlFormulas.formulas.instance : thisObj.controlFormulas.autocomplete.instance;
+                    e['controlName'] = thisObj.controlProperties.name.value;
+                    SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-key-event', {
+                        e: e,
+                        autocompleteFormulasInstance: formulasInstance,
+                        isSelect: false,
+                        controlTitle: thisObj.title,
+                        controlName: thisObj.controlProperties.name.value,
+                        val: $(e.target).val()
+                    })
+                }
 
-        this.ele.closest('.sym-form-submit').on('keyup', function(e) {
-            if (thisObj.checkAutoCompleteControl() && e.keyCode == 9) {
-                e.keyCode = 200;
-                SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-key-event', {
-                    e: e,
-                })
-                SYMPER_APP.$evtBus.$emit('document-submit-department-key-event', {
-                    e: e,
-                })
-            }
+            })
 
-        })
-        this.ele.on('click', function(e) {
-            store.commit("document/addToDocumentSubmitStore", {
-                key: 'docStatus',
-                value: 'input',
-                instance: thisObj.curParentInstance
+            this.ele.closest('.sym-form-submit').on('keyup', function(e) {
+                if (thisObj.checkAutoCompleteControl() && e.keyCode == 9) {
+                    e.keyCode = 200;
+                    SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-key-event', {
+                        e: e,
+                    })
+                    SYMPER_APP.$evtBus.$emit('document-submit-department-key-event', {
+                        e: e,
+                    })
+                }
+
+            })
+            this.ele.on('click', function(e) {
+                store.commit("document/addToDocumentSubmitStore", {
+                    key: 'docStatus',
+                    value: 'input',
+                    instance: thisObj.curParentInstance
+                });
+
+                store.commit("document/addToDocumentSubmitStore", {
+                    key: 'currentTableInteractive',
+                    value: null,
+                    instance: thisObj.curParentInstance
+                });
+                e.controlName = thisObj.name;
+                if (thisObj.type == 'date') {
+                    SYMPER_APP.$evtBus.$emit('document-submit-date-input-click', e)
+                } else if (thisObj.type == 'inputFilter') {
+                    e.formulas = thisObj.controlFormulas.formulas;
+                    SYMPER_APP.$evtBus.$emit('document-submit-filter-input-click', e)
+                } else if (thisObj.type == 'time') {
+                    e.curTarget = e.target
+                    SYMPER_APP.$evtBus.$emit('document-submit-show-time-picker', e)
+                }
+
             });
 
-            store.commit("document/addToDocumentSubmitStore", {
-                key: 'currentTableInteractive',
-                value: null,
-                instance: thisObj.curParentInstance
-            });
-            e.controlName = thisObj.name;
-            if (thisObj.type == 'date') {
-                SYMPER_APP.$evtBus.$emit('document-submit-date-input-click', e)
-            } else if (thisObj.type == 'inputFilter') {
-                e.formulas = thisObj.controlFormulas.formulas;
-                SYMPER_APP.$evtBus.$emit('document-submit-filter-input-click', e)
-            } else if (thisObj.type == 'time') {
-                e.curTarget = e.target
-                SYMPER_APP.$evtBus.$emit('document-submit-show-time-picker', e)
-            }
 
-        })
-
-
+        }
+        /**
+         * Hàm tracking xem control lấy dữ liệu từ đâu và ảnh hướng đến control nào
+         * nguồn: control màu xanh lá  cây
+         * đich: control màu xanh nước biển
+         */
+    traceControl() {
+        SYMPER_APP.$evtBus.$emit('document-submit-show-trace-control', { control: this })
     }
 
     setValue(value) {
@@ -296,7 +307,6 @@ export default class BasicControl extends Control {
             } else {
                 $('#' + this.id).val(value);
             }
-
         }
         if (sDocument.state.submit[this.curParentInstance].docStatus == 'init') {
             this.defaultValue = value;
@@ -575,17 +585,20 @@ export default class BasicControl extends Control {
         let thisObj = this;
         this.ele.attr('readonly', 'readonly')
         this.ele.on('click', function(e) {
-                store.commit("document/addToDocumentSubmitStore", {
-                    key: 'currentTableInteractive',
-                    value: null,
-                    instance: thisObj.curParentInstance
-                });
-                let formulasInstance = thisObj.controlFormulas.list.instance;
-                SYMPER_APP.$evtBus.$emit('document-submit-select-input', { e: e, selectFormulasInstance: formulasInstance, alias: thisObj.name, controlTitle: thisObj.title })
-            })
-            // this.ele.on('change', function(e) {
-            //     SYMPER_APP.$evtBus.$emit('document-submit-input-change', { controlName: thisObj.controlProperties.name.value, val: $(e.target).val() })
-            // })
+            store.commit("document/addToDocumentSubmitStore", {
+                key: 'currentTableInteractive',
+                value: null,
+                instance: thisObj.curParentInstance
+            });
+            if (!thisObj.controlFormulas.list) {
+                return;
+            }
+            let formulasInstance = thisObj.controlFormulas.list.instance;
+            SYMPER_APP.$evtBus.$emit('document-submit-select-input', { e: e, selectFormulasInstance: formulasInstance, alias: thisObj.name, controlTitle: thisObj.title })
+        });
+        // this.ele.on('change', function(e) {
+        //     SYMPER_APP.$evtBus.$emit('document-submit-input-change', { controlName: thisObj.controlProperties.name.value, val: $(e.target).val() })
+        // })
 
     }
 

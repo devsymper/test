@@ -443,7 +443,12 @@
             },
             "title": "Submit văn bản",
             "goToList": "Đi đến danh sách",
-            "continueSubmit": "Nhập liệu tiếp"
+            "continueSubmit": "Nhập liệu tiếp",
+            "panel": {
+                "traceInput": "Control Đầu vào",
+                "traceCurrent": "Control Kiểm tra",
+                "traceOutput": "Control Đầu ra"
+            }
         },
         "process": {
             "header_bar": {
@@ -978,7 +983,7 @@
         }
     },
     "comment": {
-        "title":"Bình luận",
+        "title": "Bình luận",
         "comment": "Chưa giải quyết",
         "resolve": "Đã giải quyết",
         "reply": "Trả lời",

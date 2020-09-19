@@ -22,8 +22,9 @@
             </v-tooltip>
         </v-tab>
         <v-tab-item
-            class="p-2 h-100 properties-control-tab"
+            class="p-2 properties-control-tab"
         >
+        <VuePerfectScrollbar style="height:calc(100vh - 90px);">
             <v-expansion-panels
                 v-model="panel"
                 multiple
@@ -72,18 +73,18 @@
                     </v-expansion-panel-content>
                 </v-expansion-panel>
             </v-expansion-panels>
-            <!-- <control-props-config :singleLine="true" :labelWidth="`100px`" :allInputs="sCurrentDocument.properties"/> -->
-
+            </VuePerfectScrollbar>
         </v-tab-item>
         <v-tab-item
             class="p-2 h-100 formulas-control-tab"
         >
+        <VuePerfectScrollbar style="height:calc(100vh - 90px);">
             <control-props-config 
-            ref="formFormulas"
             @input-blur="handleInputBlur"
             :singleLine="false" 
             @input-value-changed="handleChangeInput" 
             :allInputs="sCurrentDocument.formulas"/>
+        </VuePerfectScrollbar>
         </v-tab-item>
 
         
@@ -94,6 +95,7 @@ import FormTpl from "./../../../components/common/FormTpl.vue"
 import {checkInTable,checkNameControl,checkTitleControl} from "./../common/common";
 import { formulasApi } from "./../../../api/Formulas.js";
 import { util } from '../../../plugins/util';
+import VuePerfectScrollbar from "vue-perfect-scrollbar";
 
 export default {
     props:{
@@ -108,6 +110,7 @@ export default {
     },
     components:{
         'control-props-config' : FormTpl,
+        VuePerfectScrollbar
     },
     computed: {
         sCurrentDocument(){
@@ -125,6 +128,14 @@ export default {
     watch:{
         "controlPropsGroup.table.mapParamsDataflow.value":function(after){
             // debugger    
+        },
+        /**
+         * Tự động focus vào input name sau khi chọn control
+         */
+        "controlPropsGroup.name":function(){
+            setTimeout(() => {
+                $('.sym-v-expand-content input').first().focus();
+            }, 200);
         }
         
     },
@@ -142,19 +153,7 @@ export default {
         
         }
     },
-    created(){
-        let thisCpn = this;
-        this.$evtBus.$on("symper-app-wrapper-clicked", evt =>{
-            if (!$(evt.target).hasClass("mdi-dock-window") && $(evt.target).closest(".symper-drag-panel").length == 0) {
-                thisCpn.hideDragPanel();
-            }
-        })
-    },
     methods:{
-        hideDragPanel(){
-            if(this.$refs.formFormulas != undefined)
-                this.$refs.formFormulas.hideDragPanel();
-        },
         handleInputBlur(inputInfo, name){
             
         },
@@ -215,12 +214,6 @@ export default {
                 checkTitleControl(this.instance);
             }
         },
-        
-        
-
-        
- 
-       
     }
 }
 </script>
@@ -242,10 +235,6 @@ export default {
     
     .properties-control-tab .v-expansion-panel{
         margin: 0;
-    }
-    .properties-control-tab,.formulas-control-tab{
-        overflow: auto;
-        max-height: calc(100vh - 65px);
     }
     .sym-v-expand-content{
         padding-left: 8px;
