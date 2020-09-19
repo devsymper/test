@@ -15,7 +15,7 @@
 
 		<v-divider></v-divider>
 
-		<VuePerfectScrollbar style="calc(100% - 62px);">
+		<VuePerfectScrollbar style="height:calc(100% - 110px);">
 			<v-expansion-panels
 			v-model="panel"
 			multiple
@@ -40,7 +40,7 @@
 										{{$t('document.detail.sidebar.body.general.has')}} 
 										<!-- {{countCommentNotResolve}}  -->
 										{{$t('document.detail.sidebar.body.general.commentNotResolve')}}
-										</td>
+									</td>
 								</tr>
 							</table>
 						</div>
@@ -54,7 +54,9 @@
 							<trackingProcessInstance
 								v-if="taskInfo.action.parameter.processInstanceId"
 								:instanceId="taskInfo.action.parameter.processInstanceId"
-								:elementId="taskInfo.action.parameter.activityId">
+								:elementId="taskInfo.action.parameter.activityId"
+								@showPopupDiagram="showPopupDiagram"
+								>
 							</trackingProcessInstance>
 						</v-row>
 					</v-expansion-panel-content>
@@ -62,7 +64,7 @@
 				<v-expansion-panel>
 					<v-expansion-panel-header class="v-expand-header">{{$t('document.detail.sidebar.body.userRelated.title')}}</v-expansion-panel-header>
 					<v-expansion-panel-content class="sym-v-expand-content">
-				   		<div class="w-100 mb-2 pl-3" v-for="(users, role) in tabsData" :key="role" >
+				   		<div class="w-100 mb-2 pl-3" v-for="(users, role) in dataTask" :key="role" >
 							<div v-if="users.length>0 " style="height: 30px" class=" fs-13 font-weight-medium symper-user-role-in-task d-flex">
 								<span>
 									<v-icon class="mr-3" size="18">mdi-account</v-icon> 
@@ -119,7 +121,7 @@
 				   	
 					</v-expansion-panel-content>
 				</v-expansion-panel>
-					<v-expansion-panel>
+					<v-expansion-panel style="margin-bottom: 20px;">
 					<v-expansion-panel-header class="v-expand-header">{{$t('tasks.header.attachment')}}
 						  <UploadFile
 							@uploaded-file="uploaded"
@@ -129,7 +131,74 @@
 							/>
 					</v-expansion-panel-header>
 					<v-expansion-panel-content class="sym-v-expand-content">
-				   	
+						<div
+							v-for="(item, idex) in listFileAttachment"
+							:key="idex"
+							
+						>
+							<v-row  :class="{
+								'mr-0 ml-0 single-row': true ,
+								'd-active':showByIndex==idex 
+								}"
+								:style="{
+									minHeight: '25px'
+								}"
+								@mouseover="showByIndex = idex"
+                    			@mouseout="showByIndex = null"
+							>
+								<v-col 
+									@click="showContentFile(item.serverPath,item.name,item.type,item.id)" 
+									cols="5" 
+									style="font-size:13px;padding:0px;padding-top:3px!important">
+									<v-tooltip bottom>
+             							<template v-slot:activator="{ on }">
+											<div v-on="on"
+												style="font-size:12px;
+														padding:0px;
+														white-space: nowrap;
+														overflow: hidden;
+														text-overflow: ellipsis;
+														width: 140px;">
+											<v-icon v-if="item.type=='doc' ||item.type=='docx' " style="font-size:15px">mdi-file-word</v-icon>
+											<v-icon v-else-if="item.type=='pdf'" style="font-size:15px">mdi-file-pdf</v-icon>
+											<v-icon v-else-if="item.type=='jpg' ||item.type=='jpeg'||item.type=='png'" style="font-size:15px">mdi-file-image-outline</v-icon>
+											<v-icon v-else-if="item.type=='xlsx' ||item.type=='xls' " style="font-size:15px">mdi-file-excel</v-icon>
+											<v-icon v-else style="font-size:15px">mdi-file-document-outline</v-icon>
+											{{item.name}}</div>
+										</template>
+										<span>{{ item.name }}</span>
+									</v-tooltip>
+								</v-col> 
+								<v-col 	
+									cols="4" 
+									style="font-size:12px;padding:0px;padding-top:3px!important">
+									<span>{{item.createAt}}</span>
+								</v-col>
+								<v-col class="pull-right" style="padding:0px;padding-top:3px!important">
+									<v-icon  @click="downLoadFile(item.id)"  v-show="showByIndex === idex" style="font-size:18px;margin-left:40px">mdi-download</v-icon>
+									<v-icon  @click="actionFileAttachment($event,item.serverPath,item.name,item.type,item.id)"  v-show="showByIndex === idex" style="font-size:18px; margin-left:8px">mdi-dots-horizontal</v-icon>
+								</v-col> 
+							</v-row>
+						     <v-menu
+								v-model="context_attachment"
+								:position-x="x"
+								:position-y="y"
+								absolute
+								offset-y
+							>
+								<v-list class="context-menu">
+								<v-list-item
+									v-for="(item, index) in contextAttachment"
+									:key="index"
+									@click="item.menuAction(item.title)"
+									dense
+								>
+									<v-icon class="fs-15">{{item.icon}}</v-icon>
+									<v-list-item-title class="fs-13">{{ item.title }}</v-list-item-title>
+								</v-list-item>
+								</v-list>
+							</v-menu>
+						</div>
 					</v-expansion-panel-content>
 				</v-expansion-panel>
 			</v-expansion-panels>
@@ -173,7 +242,11 @@
 			</div>
 		</VuePerfectScrollbar>
 	</div>
-	<!-- <Comment style="height:100%" ref="commentView" :objectIdentifier="documentObjectId" /> -->
+	<Comment style="height:100%" 
+		:objectIdentifier="originData.id"
+		ref="commentTaskView"
+		@close-comment="hide" />
+	
 	<div class="w-100 h-100 symper-select-user-autocomplete " style="z-index:1010" v-show="statusChange" ref="selectUserAutocomplete">
 			<v-autocomplete
 				ref="selectDelegateUser"
@@ -198,18 +271,30 @@
 					</div>
 				</template>
 			</v-autocomplete>
-		</div>
+	</div>
+ 	<v-dialog v-model="dialogAlert" max-width="450">
+      <v-card>
+        <v-card-title class="headline">{{headerDialog}}</v-card-title>
+        <v-card-text>{{titleDialog}}</v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="green darken-1" text @click="removeFileAttach">{{$t("kh.dialog.yes")}}</v-btn>
+          <v-btn color="red darken-1" text @click="dialogAlert = false">{{$t("kh.dialog.cancel")}}</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
 	</v-navigation-drawer>
 </template>
 <script>
 import user from "./User";
+import { taskApi } from "@/api/task.js";
 import { userApi } from "@/api/user.js";
 import { documentApi } from "@/api/Document";
 import BPMNEngine from "@/api/BPMNEngine.js";
 import { util } from "@/plugins/util.js";
 import { data } from 'jquery'
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
-import Comment from './Comment';
+import Comment from './Comment'
 import trackingProcessInstance from "@/views/process/TrackingProcessInstance.vue";
 import UploadFile from "@/components/common/UploadFile.vue";
 
@@ -223,10 +308,17 @@ export default {
 	},
 	data () {
 		return {
+			x:0,
+			y:0,
+			headerDialog:'',
+      		titleDialog:'',
+			dialogAlert: false,
+			context_attachment:false,
+			showByIndex: null,
 			selectingPosition: {
                 role: '',
                 idx: ''
-            },
+			},
 			selectedUserForAssignment: {},
 			statusChange:false,
 			showDelegatedUser: {},
@@ -241,6 +333,24 @@ export default {
 			listHistoryControl:[
                 {date:'18/08/2020 11:20', userUpdate:'Nguyễn Đình Hoang', historyid:2, controls:[{id:'s-control-id-1596780634836',data:[]},{id:'s-control-id-1596780602772',data:[]},{id:'s-control-id-1596780611212',data:[]}]},
                 {date:'18/08/2020 11:20', userUpdate:'Nguyễn Đình Hoang', historyid:1, controls:[{id:'s-control-id-1596780602772',data:[]}]},
+			],
+			contextAttachment: [
+				{
+					title: this.$t("kh.contextmenu.rename"),
+						menuAction: action => {
+							alert("Đổi tên");
+						},
+					icon: "mdi-pencil"
+				},
+				{
+					title: this.$t("kh.contextmenu.delete"),
+						menuAction: action => {
+						 	this.headerDialog = this.$t("common.remove_confirm_title");
+							this.titleDialog = this.$t("kh.dialog.remove");
+							this.dialogAlert = true;
+						},
+					icon: "mdi-delete-forever"
+				},
 			],
 			actionsForRole: {
                 assignee: [
@@ -344,7 +454,9 @@ export default {
 		isShowSidebar(after){
 			this.isShow = !this.isShow
 		},
-	
+		taskInfo:function(newVl){
+			this.getData();
+		}
 		
 	},
 	computed:{
@@ -362,10 +474,24 @@ export default {
                 watcher: true,
                 assignee: canAddAssignee
             }
-        }
+		},
+		dataTask(){
+			if (this.tabsData.owner.length==0) {
+				this.tabsData.owner=this.tabsData.assignee;
+			}
+			return this.tabsData;
+		},
+		stask() {
+			return this.$store.state.task;
+		},
+		listFileAttachment() {
+			let arr = this.stask.arrFileAttach;
+			return arr;
+		}
 	},
 	created(){
 		let thisCpn = this;
+		this.getData();
 		documentApi.getListApprovalHistory(this.documentObjectId).then(res => {
 				if (res.status == 200) {
 					let listUser = []
@@ -379,7 +505,6 @@ export default {
 							user.displayName = userInfo[0].displayName
 							thisCpn.listApprovalUser.push(user);
 						}
-						
 					}
 				}
 			})
@@ -394,9 +519,68 @@ export default {
                     this.showDelegatedUser[key] = false;
                 }
             }
-        });
+		});
 	},
 	methods:{
+		showPopupDiagram(){
+			this.$emit("showPopupTracking");
+		},
+		removeFileAttach() {
+			let data={};
+			data.id=this.fileId;
+			taskApi
+			.deleteFile(data)
+			.then(res => {
+			if (res.status == 200) {
+				this.$store.dispatch("task/removeFileAttachToStore", this.fileId);
+			} else if (res.status == 403) {
+				this.$snotifyError("Error", res.message);
+			} else {
+				this.$snotifyError(
+				"",
+				"Error from delete attachment file!!!"
+				);
+			}
+			})
+			.catch(err => {
+			console.log("error from delete attachment file!!!", err);
+			})
+			.always(() => {});
+		this.dialogAlert = false;
+		},
+		showContentFile(serverPath, name, type, id){
+			let data={};
+			data.serverPath=serverPath;
+			data.name=name;
+			data.type=type;
+			data.id=id;
+			this.$emit("showContentFile", data);
+		},
+		downloadOrBackupFile(data) {
+			this.downLoadFile(data.fileId);
+		},
+		downLoadFile(id) {
+			taskApi
+			.downloadFile(id)
+			.then(res => {})
+			.catch(err => {
+			console.log("error download file!!!", err);
+			})
+			.always(() => {});
+		},
+		actionFileAttachment(e, serverPath, name, type, id){
+			e.preventDefault();
+			this.context_attachment = false;
+			this.x = e.clientX;
+			this.y = e.clientY;
+			this.serverPath = serverPath;
+			this.name = name;
+			this.type = type;
+			this.fileId = id;
+			this.$nextTick(() => {
+				this.context_attachment = true;
+			});
+		},
 		uploaded(dataObj) {
 			this.$store.commit("task/addToListAttachStore", dataObj);
 		},
@@ -453,7 +637,7 @@ export default {
 			$('.history-info').css({transform:'translateX(0px)'})
 		},
 		showComment(){
-			this.$refs.commentView.show()
+			this.$refs.commentTaskView.show();
 		},
 		handleAction(actionName, role, idx){
             this.statusChange=true;
@@ -478,9 +662,15 @@ export default {
                     $(self.$refs[refKey]).find('.v-select__slot').click();
                 }, 200, this);
             }
-        }
+		},
+		getData(){
+			let data = {};
+			data.objectIdentifier = this.taskInfo.action.parameter.taskId;
+			data.objectType = "task";
+			this.$store.dispatch("task/getArrFileAttachment", data);
+    	}
 	},
-
+	
 
 }
 </script>
@@ -503,7 +693,6 @@ export default {
         margin: 0;
     }
     .s-detail-sidebar{
-        overflow: hidden;
         max-height: 100%;
     }
 	
@@ -628,5 +817,17 @@ export default {
 	}
 	.symper-upload-file >>> .v-btn >>>.v-btn__content >>> .mdi-upload-outline{
 		font-size: 19px!important;
+	}
+	.d-active {
+		background: #e5e5e5;
+	}
+	.single-row{
+		cursor: pointer;
+	}
+	.s-drawer >>> .v-navigation-drawer__content{
+		overflow: hidden !important;
+	}
+	.main-info{
+		height: 100%;
 	}
 </style>
