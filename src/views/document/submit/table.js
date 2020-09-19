@@ -248,6 +248,12 @@ export default class Table {
 
                 beforeKeyDown: function(event) {
                     let cellMeta = this.getSelected();
+                    // ấn f2 vào cell thì trace control đó
+                    if (event.key == 'F2' && store.state.app.accountType == 'ba') {
+                        let control = thisObj.getControlInstance(thisObj.currentControlSelected);
+                        SYMPER_APP.$evtBus.$emit('document-submit-show-trace-control', { control: control });
+                        return;
+                    }
                     // trường hợp ấn enter mà ở dòng cuối cùng thì đưa cell selected vào đầu cột 1 (lỗi xảy ra do có 2 cột mặc định ẩn trong table)
                     if (event.keyCode == 13 && thisObj.checkLastCell(cellMeta, this)) {
                         return;
@@ -1381,5 +1387,35 @@ export default class Table {
             }
             this.tableInstance.render()
         }
+    }
+
+    traceInputTable(colName, className, isRemove) {
+        let colIndex = this.getColumnIndexFromControlName(colName);
+        let setting = {
+            afterGetColHeader: function(col, TH) {
+                function applyClass(elem, className) {
+                    if (!Handsontable.dom.hasClass(elem, className)) {
+                        Handsontable.dom.addClass(elem, className);
+                    }
+                }
+
+                function removeClass(elem) {
+                    Handsontable.dom.removeClass(elem, 'trace-output-control');
+                    Handsontable.dom.removeClass(elem, 'trace-input-control');
+                    Handsontable.dom.removeClass(elem, 'trace-current-control');
+                }
+                if (isRemove) {
+                    if (colIndex == col) {
+                        removeClass(TH)
+                    }
+                } else {
+                    if (colIndex == col) {
+                        applyClass(TH, className)
+                    }
+                }
+
+            }
+        }
+        this.tableInstance.updateSettings(setting);
     }
 }

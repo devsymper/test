@@ -750,7 +750,8 @@ export default {
 
         drawer(after){
             if(this.isShowTraceControlSidebar && after == false){
-                this.$refs.traceControlView.removeTrace()
+                this.$refs.traceControlView.removeTrace();
+                this.$refs.traceControlView.removeCurrentControlTrace();
             }
         }
     },
@@ -1313,6 +1314,7 @@ export default {
                 }
             }
             this.listDataFlow = listDataFlow;
+            console.log(this.sDocumentSubmit,'sDocumentSubmitsDocumentSubmit');
             if(!isSetEffectedControl);
             this.getEffectedControl();
             if(this.docObjId == null){

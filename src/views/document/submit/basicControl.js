@@ -292,20 +292,7 @@ export default class BasicControl extends Control {
     traceControl() {
         SYMPER_APP.$evtBus.$emit('document-submit-show-trace-control', { control: this })
     }
-    renderInputTraceControlColor() {
-        this.ele.addClass('trace-input-control');
-    }
-    renderOutputTraceControlColor() {
-        this.ele.addClass('trace-output-control');
-    }
-    renderCurrentTraceControlColor() {
-        this.ele.addClass('trace-current-control');
-    }
-    removeTraceControlColor() {
-        this.ele.attr('class', function(i, c) {
-            return c.replace(/trace-.*-control/g, '');
-        });
-    }
+
     setValue(value) {
         this.value = value;
         if (this.inTable === false) {
@@ -598,17 +585,20 @@ export default class BasicControl extends Control {
         let thisObj = this;
         this.ele.attr('readonly', 'readonly')
         this.ele.on('click', function(e) {
-                store.commit("document/addToDocumentSubmitStore", {
-                    key: 'currentTableInteractive',
-                    value: null,
-                    instance: thisObj.curParentInstance
-                });
-                let formulasInstance = thisObj.controlFormulas.list.instance;
-                SYMPER_APP.$evtBus.$emit('document-submit-select-input', { e: e, selectFormulasInstance: formulasInstance, alias: thisObj.name, controlTitle: thisObj.title })
-            })
-            // this.ele.on('change', function(e) {
-            //     SYMPER_APP.$evtBus.$emit('document-submit-input-change', { controlName: thisObj.controlProperties.name.value, val: $(e.target).val() })
-            // })
+            store.commit("document/addToDocumentSubmitStore", {
+                key: 'currentTableInteractive',
+                value: null,
+                instance: thisObj.curParentInstance
+            });
+            if (!thisObj.controlFormulas.list) {
+                return;
+            }
+            let formulasInstance = thisObj.controlFormulas.list.instance;
+            SYMPER_APP.$evtBus.$emit('document-submit-select-input', { e: e, selectFormulasInstance: formulasInstance, alias: thisObj.name, controlTitle: thisObj.title })
+        });
+        // this.ele.on('change', function(e) {
+        //     SYMPER_APP.$evtBus.$emit('document-submit-input-change', { controlName: thisObj.controlProperties.name.value, val: $(e.target).val() })
+        // })
 
     }
 

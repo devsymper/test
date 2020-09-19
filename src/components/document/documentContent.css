@@ -489,12 +489,15 @@ button:hover {
 
 .trace-input-control {
     background: rgb(255 128 3 / 0.5) !important;
+    color: white !important;
 }
 
 .trace-output-control {
     background: rgb(64 129 55 / 0.5) !important;
+    color: white !important;
 }
 
 .trace-current-control {
     background: rgb(7 96 217 / 0.5) !important;
+    color: white !important;
 }

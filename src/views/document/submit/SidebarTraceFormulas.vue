@@ -30,7 +30,7 @@
 				<v-expansion-panel>
 					<v-expansion-panel-header disable-icon-rotate class="v-expand-header">{{value.title}}
                         <template v-slot:actions>
-                            <button @click.stop.prevent="traceControlFormulas(value.instance)">{{$t('common.check')}}</button>
+                            <button class="trace-btn" @click.stop.prevent="traceControlFormulas(value.instance)">{{$t('common.check')}}</button>
                         </template>
                     </v-expansion-panel-header>
 					<v-expansion-panel-content class="sym-v-expand-content">
@@ -62,6 +62,7 @@ export default {
             listFormulas:{},
             effectedControl:{},
             inputControl:{},
+            controlNameTrace:null
         }
     },
     computed:{
@@ -70,22 +71,43 @@ export default {
         }
     },
     methods:{
+        /**
+         * Hàm kiểm tra xem công thức của 1 control thì cần đầu vào nào và đầu ra nào
+         * trong màn hình submit
+         */
         traceControlFormulas(instance){
             this.removeTrace();
-            let curControl = this.listInputInDocument[this.controlTrace];
-            curControl.renderCurrentTraceControlColor();
+            let curControl = this.listInputInDocument[this.controlNameTrace];
+            if(curControl.inTable){
+                // nếu là control trong table , trường hợp này do handson tự render lại nên cần set current trace lại tại cột đó
+                setTimeout(() => {
+                    curControl.renderCurrentTraceControlColor();
+                }, 200);
+            }
+            
             let formulasType = instance.type;
             this.inputControl = instance.inputControl;
-            this.effectedControl = curControl[mapTypeToEffectedControl[formulasType]];
+            if(['list','autocomplete','formulas'].includes(formulasType)){
+                this.effectedControl = curControl[mapTypeToEffectedControl['formulas']];
+            }
+            else{
+                this.effectedControl = curControl[mapTypeToEffectedControl[formulasType]];
+            }
             for(let controlName in this.inputControl){
                 let controlIns = this.listInputInDocument[controlName];
-                controlIns.renderInputTraceControlColor()
+                controlIns.renderInputTraceControlColor();
             }
             for(let controlName in this.effectedControl){
                 let controlIns = this.listInputInDocument[controlName];
-                controlIns.renderOutputTraceControlColor()
+                controlIns.renderOutputTraceControlColor();
             }
+
+                        
+            
         },
+        /**
+         * bỏ trace khi đóng sidebar
+         */
         removeTrace(){
             for(let controlName in this.inputControl){
                 let controlIns = this.listInputInDocument[controlName];
@@ -95,8 +117,11 @@ export default {
                 let controlIns = this.listInputInDocument[controlName];
                 controlIns.removeTraceControlColor()
             }
-            let curControl = this.listInputInDocument[this.controlTrace];
-            curControl.removeTraceControlColor()
+            
+        },
+        removeCurrentControlTrace(){
+            let curControl = this.listInputInDocument[this.controlNameTrace];
+            curControl.removeTraceControlColor();
         }
     },
     props:{
@@ -116,6 +141,12 @@ export default {
         }
     },
     watch:{
+        controlTrace(name){
+            this.controlNameTrace = name
+        },
+        /**
+         * Hàm xử lí data trước khi đưa vào sidebar
+         */
         listFormulasTrace(after){
             let data = {};
             let index = 0;
@@ -153,6 +184,9 @@ export default {
 		min-height: unset;
 		padding: 8px 0;
 		border: none !important;
+    }
+    .v-expand-header:hover{
+        background: none !important;
     }
     .s-trace-control-panel{
         overflow: hidden;
@@ -197,5 +231,9 @@ export default {
     }
     .sidebar-trace-control ::v-deep .v-stepper__label{
         text-align: center;
+    }
+
+    .trace-btn:focus{
+        outline: none;
     }
 </style>
