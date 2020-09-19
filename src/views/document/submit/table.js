@@ -1417,5 +1417,6 @@ export default class Table {
             }
         }
         this.tableInstance.updateSettings(setting);
+        this.tableInstance.scrollViewportTo(0, colIndex)
     }
 }
