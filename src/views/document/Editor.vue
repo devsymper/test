@@ -190,6 +190,13 @@ export default {
                         self.showDragTable(e);
                     }
                 });
+                ed.ui.registry.addMenuItem('saveControlTemplate', {
+                    text: 'Lưu control template',
+                    disabled : false,
+                    onAction: function(e) {
+                        self.saveControlTemplate(ed);
+                    }
+                });
             
                 ed.ui.registry.addButton('margin', {
                 icon:'margin',
@@ -219,6 +226,7 @@ export default {
             },
             init_instance_callback : function(editor) {
                 self.editorCore = editor
+                console.log('self.editorCoreself.editorCore',self.editorCore);
                 self.initEditor()
             },
         });
@@ -953,6 +961,14 @@ export default {
                     elements.prepend('<p class="drag-table">Drag here</p>');
                 }
             }
+        },
+
+        /**
+         * Hàm lưu control template
+         */
+        saveControlTemplate(editor){
+            // let content = editor.selection.getContent();
+            
         },
         //hoangnd: hàm mở modal tablesetting của control table
         showSettingControlTable(e) {

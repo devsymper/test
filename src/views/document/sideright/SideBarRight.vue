@@ -22,8 +22,9 @@
             </v-tooltip>
         </v-tab>
         <v-tab-item
-            class="p-2 h-100 properties-control-tab"
+            class="p-2 properties-control-tab"
         >
+        <VuePerfectScrollbar style="height:calc(100vh - 90px);">
             <v-expansion-panels
                 v-model="panel"
                 multiple
@@ -72,15 +73,18 @@
                     </v-expansion-panel-content>
                 </v-expansion-panel>
             </v-expansion-panels>
+            </VuePerfectScrollbar>
         </v-tab-item>
         <v-tab-item
             class="p-2 h-100 formulas-control-tab"
         >
+        <VuePerfectScrollbar style="height:calc(100vh - 90px);">
             <control-props-config 
             @input-blur="handleInputBlur"
             :singleLine="false" 
             @input-value-changed="handleChangeInput" 
             :allInputs="sCurrentDocument.formulas"/>
+        </VuePerfectScrollbar>
         </v-tab-item>
 
         
@@ -91,6 +95,7 @@ import FormTpl from "./../../../components/common/FormTpl.vue"
 import {checkInTable,checkNameControl,checkTitleControl} from "./../common/common";
 import { formulasApi } from "./../../../api/Formulas.js";
 import { util } from '../../../plugins/util';
+import VuePerfectScrollbar from "vue-perfect-scrollbar";
 
 export default {
     props:{
@@ -105,6 +110,7 @@ export default {
     },
     components:{
         'control-props-config' : FormTpl,
+        VuePerfectScrollbar
     },
     computed: {
         sCurrentDocument(){
@@ -229,10 +235,6 @@ export default {
     
     .properties-control-tab .v-expansion-panel{
         margin: 0;
-    }
-    .properties-control-tab,.formulas-control-tab{
-        overflow: auto;
-        max-height: calc(100vh - 65px);
     }
     .sym-v-expand-content{
         padding-left: 8px;
