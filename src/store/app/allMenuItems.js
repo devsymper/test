@@ -1,4 +1,9 @@
 export default {
+    my_application:{
+        title: 'My application',
+        icon: 'mdi-briefcase-edit-outline',
+        link: "/my-applications"
+    },
     workflow_definition: {
         title: "workflows",
         icon: "mdi-sitemap",
@@ -50,6 +55,11 @@ export default {
         title: "apps",
         icon: "mdi-apps",
         link: "/apps"
+    },
+    myItem: {
+        title: "myItem",
+        icon: "mdi-format-list-checkbox",
+        link: "/myitem"
     },
     tasks: {
         title: "tasks",

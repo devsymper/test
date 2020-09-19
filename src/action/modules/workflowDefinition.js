@@ -55,7 +55,6 @@ export default [{
                 let res = await BPMNEngine.getModelData(param.id);
                 param.processKey = res.data.processKey;
             }
-            debugger
             this.$goToPage('/workflow/process-key/' + param.processKey + '/instances', this.$t('process.instance.listModelInstance') + param.name)
         }
     },
@@ -65,7 +64,11 @@ export default [{
         "handler": async function(param) {
             let defData = await getLastestDefinition(param, true);
             if (defData.data[0]) {
-                this.$goToPage(`/workflow/process-definition/${defData.data[0].id}/run`, 'Start process instance');
+                let extraData = {};
+                if (param.appId) {
+                    extraData.appId = param.appId;
+                }
+                this.$goToPage(`/workflow/process-definition/${defData.data[0].id}/run`, 'Start process instance', false, true, extraData);
             } else {
                 this.$snotifyError({}, "Can not find process definition having deployment id " + deploymentId);
             }

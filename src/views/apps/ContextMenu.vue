@@ -69,7 +69,8 @@ export default {
 			this.type = type
 		},
 		clickAction(action){
-			
+			let appId = this.$store.state.appConfig.currentAppId
+			debugger
 			this.defineAction[this.type].action = action;
 			this.hide()
 			if(this.targetItem.objectIdentifier.includes("document_definition:")){
@@ -93,7 +94,7 @@ export default {
 					});
 			}else{
 				let targetItem = this.targetItem
-				this.$evtBus.$emit('symper-app-call-action-handler', this.defineAction[this.type], this, {id:targetItem.id,name:targetItem.name,title:targetItem.title});
+				this.$evtBus.$emit('symper-app-call-action-handler', this.defineAction[this.type], this, {id:targetItem.id,name:targetItem.name,title:targetItem.title,appId:appId });
 			}
 		},
 		reduce(action){
