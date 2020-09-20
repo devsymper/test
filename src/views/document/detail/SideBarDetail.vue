@@ -4,7 +4,7 @@
 	absolute
 	permanent
 	right
-	:width="sidebarWidth"
+	:width="400"
 	:style="{'transform':(isShow) ? 'translateX(0%)' : 'translateX(100%)'}"
 	>
 	<div class="main-info">
@@ -82,16 +82,12 @@
 
 						<table class="workflow-info" v-if="workflowId !='' ">
 							<tr>
-								<!-- <td><span class="mdi mdi-share-variant"></span></td> -->
 								<td>{{workflowName}}</td>
 							<tr>
-								<!-- <td><span class="mdi mdi-briefcase-variant-outline"></span></td> -->
-								<td>{{workflowOtherName}}</td>
+									<td>{{workflowOtherName}}</td>
 							</tr>
 							
 						</table>
-					<!-- mdi-share-variant -->
-					<!-- mdi-briefcase-variant-outline -->
 					</v-expansion-panel-content>
 				</v-expansion-panel>
 
@@ -100,11 +96,10 @@
 			</v-expansion-panels>
 		</VuePerfectScrollbar>
 	</div>
-	<div class="history-info" style="transform:translateX(300px)">
+	<div class="history-info" style="transform:translateX(400px)">
 		<div style="display:flex;">
 			<span class="mdi mdi-keyboard-backspace" @click="hideHistory"></span>
 			<span style="font-size:15px;">LỊCH SỬ CHỈNH SỬA</span>
-			<!-- <span class="mdi mdi-close" @click="hide"></span> -->
 		</div>
 
 		<v-divider></v-divider>
@@ -139,7 +134,6 @@
 		</VuePerfectScrollbar>
 	</div>
 	<Comment style="height:100%" ref="commentView" :objectIdentifier="documentObjectId" @close-comment="hide" />
-
 	</v-navigation-drawer>
 </template>
 <script>
@@ -176,7 +170,7 @@ export default {
 	props:{
 		sidebarWidth:{
 			type:Number,
-			default:300
+			default:400
 		},
 		isShowSidebar:{
 			type:Boolean,
@@ -278,7 +272,7 @@ export default {
 			
 		},
 		hideHistory(){
-			$('.history-info').css({transform:'translateX(300px)'})
+			$('.history-info').css({transform:'translateX(400px)'})
 		},
 		showHistory(){
 			$('.history-info').css({transform:'translateX(0px)'})
@@ -311,6 +305,7 @@ export default {
     }
     .s-detail-sidebar{
         overflow: hidden;
+		width:400px;
         max-height: 100%;
     }
 	

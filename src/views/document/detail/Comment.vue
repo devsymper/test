@@ -18,12 +18,12 @@ export default {
 	},
     data () { 
         return {
-            style:'transform:translateX(300px)'
+            style:'transform:translateX(400px)'
         }
     },
     methods:{
         hide(){
-			this.style = 'transform:translateX(300px)'
+			this.style = 'transform:translateX(400px)'
 			this.$emit('close-comment')
 		},
 		show(){
@@ -38,6 +38,7 @@ export default {
 		top: 0;
 		right: 0;
 		width: 400px;
+		/* left:100px; */
 		height: 100%;
 		background: white;
 		z-index: 9999;
