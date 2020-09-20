@@ -21,7 +21,6 @@
                     <div class="content-setting-control-table">
                         <form-save-doc 
                         @append-icon-click="checkNameDocument"
-                        @input-value-keyup="checkValidateNameDocument"
                         @input-value-changed="handleChangeInput" 
                          :allInputs="documentProps"/>
                     </div>
@@ -67,6 +66,7 @@
 import FormTpl from "./../../../components/common/FormTpl.vue"
 import { util } from "./../../../plugins/util.js";
 import { documentApi } from "./../../../api/Document.js";
+import { formulasApi } from "./../../../api/Formulas.js";
 import Validate from "./../common/Validate";
 
 export default {
@@ -93,11 +93,23 @@ export default {
             return this.$store.state.document.documentProps[this.instance];
         }
     },
+    watch:{
+        "documentProps.titleObjectFormulas.formulasId":function(data){
+            let self = this;
+            if(data != 0){
+                formulasApi.detailFormulas(data).then(res=>{
+                    self.documentProps.titleObjectFormulas.value = res.data.lastContent;
+                })
+            }
+            
+        }
+    },
     data(){
         return {
             listRows:[],
             isShowModelSaveDoc:false,
-            isValid :false,
+            isValidName :true,
+            isValidTitle :true,
             messageValidate:"",
             showNoteChangeName:false,
             showValidate:true,
@@ -112,28 +124,31 @@ export default {
         },
         //Hàm kiểm tra tên document đã tồn tai hay chưa
         handleChangeInput(name, input, data){
-            this.showNoteChangeName = true;
-            let thisCpn = this;
-            documentApi
-                    .checkExistDocument(input.value)
-                    .then(res => {
-                        if (res.status == 200) {
-                            let message = ""
-                            if(res.data === true){
-                                message = "Tên document đã tồn tại"
-                                thisCpn.isValid = false;
-                            }
-                            else{
-                                thisCpn.isValid = true;
-                            }
-                            this.documentProps.name.errorMessage = message;
+            if(name == 'name'){
+                this.showNoteChangeName = true;
+                let thisCpn = this;
+                documentApi.checkExistDocument(input.value)
+                .then(res => {
+                    if (res.status == 200) {
+                        let message = ""
+                        if(res.data === true){
+                            message = "Tên document đã tồn tại"
+                            thisCpn.isValidName = false;
                         }
-                       
-                    })
-                    .catch(err => {
-                        
-                    })
-                    .always(() => {});
+                        else{
+                            thisCpn.isValidName = true;
+                        }
+                        this.documentProps.name.validateStatus.isValid = thisCpn.isValidName;
+                        this.documentProps.name.validateStatus.message = message;
+                    }
+                
+                })
+                .catch(err => {
+                    
+                })
+                .always(() => {});
+            }
+            
         },
         showDialog(){
             this.isShowModelSaveDoc = true
@@ -142,24 +157,23 @@ export default {
             this.isShowModelSaveDoc = false
         },
         // Hàm kiểm tra tên document
-        checkValidateNameDocument(name, input, data){
-            if(name == 'name'){
-                let message = "";
-                if(input.value.length == 0){
-                    message = "Không được bỏ trống";
-                    this.isValid = false;
+        checkValidateNameDocument(value){
+            let message = "";
+            if(value.length == 0){
+                message = "Không được bỏ trống";
+                this.isValidName = false;
+            }
+            else{
+                if(/^[a-zA-Z_$][a-zA-Z_$0-9]*$/.test(value) == false){
+                    message = "Tên không hợp lệ";
+                    this.isValidName = false;
                 }
                 else{
-                    if(/^[a-zA-Z_$][a-zA-Z_$0-9]*$/.test(input.value) == false){
-                        message = "Tên không hợp lệ";
-                        this.isValid = false;
-                    }
-                    else{
-                        this.isValid = true
-                    }
+                    this.isValidName = true
                 }
-                this.documentProps.name.errorMessage = message;
             }
+            this.documentProps.name.validateStatus.isValid = this.isValidName;
+            this.documentProps.name.validateStatus.message = message;
         },
         saveDocument(){
             if(this.isConfigPrint){
@@ -172,32 +186,73 @@ export default {
                     this.$refs.validate.show(false)
                 }
                 else{
-                    this.checkTitleDocument();
-                    if(this.isValid){
-                        this.$emit("save-doc-action");
-                        this.hideDialog();
+                    if(this.isValidName && this.isValidTitle){
+                        this.saveFormulasForRecord();
+                    }
+                    else{
+                        this.checkValidateNameDocument(this.documentProps.name.value);
+                        this.checkTitleDocument();
                     }
                 }
             }
-            
+        },
+
+        async saveFormulasForRecord(){
+            if(this.documentProps.titleObjectFormulas.formulasId != 0){
+                let formulas = {};
+                formulas['syql'] = this.documentProps.titleObjectFormulas.value;
+                let formulaId = this.documentProps.titleObjectFormulas.formulasId;
+                await formulasApi.updateFormulas(formulaId,formulas);
+            }
+            else{
+                if(this.documentProps.titleObjectFormulas.value){
+                    let formulas = {};
+                    formulas['syql'] = this.documentProps.titleObjectFormulas.value;
+                    formulas['objectType'] = "document";
+                    formulas['objectIdentifier'] = this.documentProps.name.value;
+                    formulas['context'] = "";
+                    let res = await formulasApi.saveFormulas(formulas);
+                    if(res.status == 200){
+                        let formulaId = res.data['formulaId'];
+                        this.documentProps.titleObjectFormulas.formulasId = formulaId;
+                    }
+                }
+                
+            }
+            this.$emit("save-doc-action");
+            this.hideDialog();
         },
         /**
          * Hàm kiểm tra tiêu đề của doc đã điền hay chưa, nếu chưa thì báo lỗi
          */
         checkTitleDocument(){
+            let message = ""
             if(!this.documentProps.title.value){
-                this.isValid = false;
-                this.documentProps.title.errorMessage = "Vui lòng nhập tiêu đề document"
+                this.isValidTitle = false;
+                message = "Vui lòng nhập tiêu đề document"
             }
             else{
-                this.isValid = true;
-                this.documentProps.title.errorMessage = ""
+                this.isValidTitle = true;
+                message = ""
             }
+
+            this.documentProps.title.validateStatus.isValid = this.isValidTitle;
+            this.documentProps.title.validateStatus.message = message;
         },
         setPropsOfDoc(props){
             if(!props.name){
-                this.isValid = true
+                this.isValidName = false
             }
+            else{
+                this.isValidName = true
+            }
+            if(!props.title){
+                this.isValidTitle = false
+            }
+            else{
+                this.isValidTitle = true
+            }
+            let self = this;
             let docProps = {
                 name : { 
                     title: "Tên document",
@@ -205,13 +260,25 @@ export default {
                     value: (props.name != undefined) ? props.name : '',
                     appendIcon:"mdi-checkbox-multiple-marked-circle-outline",
                     oldName:(props.name != undefined) ? props.name : '',
-                    errorMessage:""
+                    validateStatus:{
+                        isValid:true,
+                        message:""
+                    },
+                    validate(){
+                        self.checkValidateNameDocument(this.value)
+                    }
                 },
                 title : {
                     title: "Tiêu đề document",
                     type: "text",
                     value: (props.title != undefined) ? props.title : '',
-                    errorMessage:""
+                    validateStatus:{
+                        isValid:true,
+                        message:""
+                    },
+                    validate(){
+                        self.checkTitleDocument(this.value)
+                    }
                 },
                 recentName : {
                     title: "Tên trường hiển thị thông tin trong mục gần đây",
@@ -228,11 +295,15 @@ export default {
                     type: "select",
                     value: 1,
                     options: [{
-                            text: 'documentPanel.list',
+                            text: this.$t('document.editor.dialog.saveDoc.selectType.list'),
                             value: 2
                         },
                         {
-                            text: 'documentPanel.system',
+                            text: this.$t('document.editor.dialog.saveDoc.selectType.system'),
+                            value: 3
+                        },
+                        {
+                            text: this.$t('document.editor.dialog.saveDoc.selectType.business'),
                             value: 1
                         },
                     ],
@@ -242,10 +313,16 @@ export default {
                     title: "Ghi chú",
                     type: "textarea",
                     value: (props.note != undefined) ? props.note : '',
+                },
+                titleObjectFormulas: {
+                    title: "Tiêu đề bản ghi",
+                    value: "",
+                    formulasId: (props.titleObjectFormulasId != undefined) ? props.titleObjectFormulasId : 0,
+                    type: "script",
+                    groupType: "formulas"
                 }
             }
             if(this.isConfigPrint){
-                console.log("ádasdasdsad",props);
                 docProps = {
                     title : {
                         title: "Tiêu đề bản in",

@@ -7,13 +7,6 @@
     outline: 0!important;
 }
 
-.s-control:not(.s-control-tab-page):not(button):not(.page-item) {
-    background: rgb(233, 236, 239);
-    min-width: 50px;
-    border: 1px solid #aaaaaa;
-    font-size: 13px;
-}
-
 .s-control-label {
     padding: 2px 8px;
     border: none !important;

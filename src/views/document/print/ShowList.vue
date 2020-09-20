@@ -42,6 +42,30 @@ export default {
                         this.$goToPage('/documents/'+printConfig.documentId+'/editor/print-config/'+printConfig.id,printConfig.title);
                     },
                 },
+                active: {
+                    name: "active",
+                    text: function() {
+                        return " <i class= 'mdi mdi-file-document-edit-outline' > </i>&nbsp; Chọn để in";
+                    },
+                    callback: (printConfig, callback) => {
+                        
+                        let thisCpn = this;
+                        documentApi
+                        .updateActivePrintConfig({printConfigId:printConfig.id})
+                        .then(res => {
+                            if (res.status == 200) {
+                                thisCpn.$snotify({
+                                    type: "success",
+                                    title: "Success"
+                                });  
+                            }
+                           
+                        })
+                        .catch(err => {
+                        })
+                        .always(() => {});
+                    },
+                },
                 
                 drop: {
                     name:"delete",

@@ -19,15 +19,21 @@ const commonProps = {
         type: "text",
         value: "",
         groupType: "name",
-        errorMessage: "",
-        oldName: ""
+        oldName: "",
+        validateStatus: {
+            isValid: true,
+            message: ""
+        }
     },
     title: {
         title: "Tiêu đề",
         type: "text",
         value: "",
         groupType: "name",
-        errorMessage: ""
+        validateStatus: {
+            isValid: true,
+            message: ""
+        }
     },
     otherInfo: {
         title: "Thông tin thêm",
@@ -72,24 +78,32 @@ const commonProps = {
         type: "select",
         value: "",
         options: [{
-                text: 'documentEditor.f_10px',
+                text: '8px',
+                value: '8px'
+            },
+            {
+                text: '10px',
                 value: '10px'
             },
             {
-                text: 'documentEditor.f_11px',
+                text: '11px',
                 value: '11px'
             },
             {
-                text: 'documentEditor.f_12px',
+                text: '12px',
                 value: '12px'
             },
             {
-                text: 'documentEditor.f_13px',
+                text: '13px',
                 value: '13px'
             },
             {
-                text: 'documentEditor.f_14px',
+                text: '14px',
                 value: '14px'
+            },
+            {
+                text: '15px',
+                value: '15px'
             }
         ],
         groupType: "display"

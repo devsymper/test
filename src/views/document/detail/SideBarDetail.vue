@@ -193,8 +193,8 @@ export default {
 			default:""
 		},
 		documentObjectId:{
-			type:String,
-			default:""
+			type:Number,
+			default:0
 		}
 	},
 	watch:{
@@ -258,7 +258,7 @@ export default {
 	methods:{
 		hide(){
 			this.isShow = false;
-			this.$emit('after-hide-sidebar')
+			this.$emit('after-hide-sidebar');
 		},
 		show(){
 			this.isShow = true;

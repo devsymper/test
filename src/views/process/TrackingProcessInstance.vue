@@ -205,8 +205,8 @@ export default {
                     return self.getDefinitionData(res.processDefinitionId);
                 })
                 .then(res => {
-                    let resourceDataUrl = res.resource.replace(/^https?\:\/\/([^\/?#]+)(?:[\/?#]|$)/g, '');
-                    resourceDataUrl = appConfigs.apiDomain.bpmne.general + resourceDataUrl;
+                    
+                    let resourceDataUrl = appConfigs.apiDomain.bpmne.general + 'symper-rest/service/repository/deployments/'+res.deploymentId+'/resourcedata/process_draft.bpmn';
                     return self.getDefinitionXML(resourceDataUrl);
                 })
                 .then(res => {

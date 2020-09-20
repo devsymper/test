@@ -94,6 +94,7 @@ Vue.prototype.$evtBus.$on('symper-app-call-action-handler', (action, context, ex
     action.parameter = Object.assign(action.parameter, extraParams);
     let key = action.module + '_' + action.resource + '_' + action.scope + '_' + action.action;
     if (actionMap[key]) {
+        context.$getActionLink = actionMap[key].$getActionLink;
         actionMap[key].handler.apply(context, [action.parameter]);
     } else {
         console.error('[Symper action find failed]: can not find action with key :' + key, action);

@@ -57,7 +57,6 @@ import SideBarLeft from './../sideleft/SideBarLeft.vue';
 import SideBarRight from './../sideright/SideBarRight.vue';
 import PrintTableConfig from './PrintTableConfig';
 import AutoCompleteControl from './../items/AutoCompleteControl.vue';
-import controlCss from  "./../../../assets/css/document/control/control.css";
 import SaveFormPanel from "./SaveFormPanel";
 import ErrMessagePanel from "./../../../views/document/items/ErrMessagePanel.vue";
 import ControlNameRelated from "./../../../views/document/items/ControlNameRelated.vue";
