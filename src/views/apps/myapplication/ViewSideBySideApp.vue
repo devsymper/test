@@ -119,7 +119,7 @@ import AppDetail from './../AppDetail.vue'
 					self.mapId.dashboard["dashboard:"+e.id] = e;
 				})
 				let dataRep = self.arrType.dashboard
-				this.getByAccessControl(dataW,'dashboard')
+				this.getByAccessControl(dataRep,'dashboard')
 			}
         },
         updateFavoriteItem(mapArray,array){
