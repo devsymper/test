@@ -19,6 +19,7 @@ export const appConfigs = {
             deployments: "https://workflow.symper.vn/symper-rest/service/repository/deployments",
             definitions: "https://workflow.symper.vn/symper-rest/service/repository/process-definitions",
             instances: "https://workflow.symper.vn/symper-rest/service/runtime/process-instances",
+            historyInstances: "https://workflow.symper.vn/symper-rest/service/query/historic-process-instances",
             history: "https://workflow.symper.vn/symper-rest/service/history",
             tasks: "https://workflow.symper.vn/symper-rest/service/runtime/tasks",
             tasksHistory: "https://workflow.symper.vn/symper-rest/service/history/historic-task-instances",
