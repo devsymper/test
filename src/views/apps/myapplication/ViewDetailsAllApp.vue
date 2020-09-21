@@ -240,10 +240,18 @@ export default {
             }
         },
         filterObj(value){
-        let self = this
            for(let e in this.apps){
-               if(self.apps[e].childrenAppReduce.hasOwnProperty('document_definition')){
-                    self.apps[e].childrenAppReduce.document_definition.item.forEach(function(k){
+                this.filterItemInApp(e,"document_definition",value)
+                this.filterItemInApp(e,"orgchart",value)
+                this.filterItemInApp(e,"dashboard",value)
+                this.filterItemInApp(e,"workflow_definition",value)
+           }
+        },
+        filterItemInApp(e, type,value){
+            debugger
+             let self = this
+             if(self.apps[e].childrenAppReduce.hasOwnProperty(type)){
+                    self.apps[e].childrenAppReduce[type].item.forEach(function(k){
                         if(value == ""){
                             k.show = true
                         }
@@ -254,43 +262,7 @@ export default {
                         }
                     })
 			    }
-                 if(this.apps[e].childrenAppReduce.hasOwnProperty('orgchart')){
-                    this.apps[e].childrenAppReduce.orgchart.item.filter(function(k){
-                         if(value == ""){
-                            k.show = true
-                        }
-                         if(k.name.toLowerCase().includes(value.toLowerCase())){
-                            k.show = true
-                        }else{
-                            k.show = false
-                        }
-                    })
-			    }
-                 if(this.apps[e].childrenAppReduce.hasOwnProperty('dashboard')){
-                    this.apps[e].childrenAppReduce.dashboard.item.filter(function(k){
-                         if(value == ""){
-                            k.show = true
-                        }
-                        if(k.name.toLowerCase().includes(value.toLowerCase())){
-                            k.show = true
-                        }else{
-                            k.show = false
-                        }
-                    })
-			    }
-                 if(this.apps[e].childrenAppReduce.hasOwnProperty('workflow_definition')){
-                    this.apps[e].childrenAppReduce.workflow_definition.item.filter(function(k){
-                         if(value == ""){
-                            k.show = true
-                        }
-                         if(k.name.toLowerCase().includes(value.toLowerCase())){
-                            k.show = true
-                        }else{
-                            k.show = false
-                        }
-                    })
-                }
-           }
+               
         },
 
 		getByAccessControl(ids,type,idApp){
@@ -375,12 +347,7 @@ export default {
     },
   
     mounted(){
-        // let self = this
-        // $(document).click(function(e){
-        //     if(!$(e.target).is('.context-menu')){
-        //             self.$refs.contextMenu.hide()
-        //     }
-        // })
+      
     },
     watch:{
         searchItemKey(val){
