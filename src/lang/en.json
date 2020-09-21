@@ -62,6 +62,7 @@
         "logout": "Log out",
         "last_update_at": "Last updated at",
         "create_at": "Created at",
+        "user_create": "User create",
         "filter": "Filter",
         "sort": "Sort",
         "status": "Status",
@@ -323,7 +324,14 @@
                         "system": "System",
                         "list": "List",
                         "business": "Business"
-                    }
+                    },
+                    "name": "Document name",
+                    "title": "Document title",
+                    "fullSize": "Full size Form Submit",
+                    "type": "Document type",
+                    "note": "Note",
+                    "titleObject": "Title Object",
+                    "titlePrint": "Title Form Print"
                 },
                 "swapType": {
                     "heading": "Swap type control",
@@ -335,6 +343,9 @@
                 "quickInfoControl": {
                     "heading": "Control Infomation"
                 }
+            },
+            "sidebarLeft": {
+
             }
         },
         "submit": {
@@ -394,6 +405,10 @@
             "comment": {
                 "heading": "COMMENT"
             }
+        },
+        "validate": {
+            "emptyTitle": "Title must not be blank",
+            "emptyContentControlTemplate": "Please select the template before saving the control template"
         }
     },
     "documentObject": {

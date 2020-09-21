@@ -23,6 +23,7 @@
                     @document-action-delete-cache="deleteLocalStorage"
                     @document-action-check-control="checkBeforeControlNameChange"
                     @document-action-swap-type-control="openPanelSwapType"
+                    @document-action-control-template="showFormAddControlTemplate"
                     />
                 </div>
                 <textarea ref="editorLibWrapper" :id="'document-editor-'+keyInstance">
@@ -44,6 +45,13 @@
         @check-name-document="checkBeforeDocumentNameChange"
         @save-doc-action="validateControl"
         @save-form-print-action="saveFormPrint"/>
+        
+        <FormModal 
+        :instance="keyInstance"
+        :inputsObject="inputSaveControlTemplate" 
+        ref="formModalView" 
+        @form-modal-save="saveControlTemplate"/>
+
         <!-- <QuickInfoControl :keyInstance="keyInstance" ref="quickInfoControlView"/> -->
         <err-message :listErr="listMessageErr" ref="errMessage"/>
         <control-name-related v-if="!isConfigPrint" :instance="keyInstance" @after-close-panel="afterClosePanel"  ref="controlNameRelated"/>
@@ -77,6 +85,7 @@ import TableSetting from './items/TableSetting.vue';
 import PrintTableConfig from './print/PrintTableConfig';
 import AutoCompleteControl from './items/AutoCompleteControl.vue';
 import SaveDocPanel from "./../../views/document/items/SaveDocPanel.vue";
+import FormModal from "./../../views/document/items/FormModal";
 import QuickInfoControl from "./../../views/document/items/QuickInfoControl";
 import ErrMessagePanel from "./../../views/document/items/ErrMessagePanel.vue";
 import ControlNameRelated from "./../../views/document/items/ControlNameRelated.vue";
@@ -129,6 +138,9 @@ export default {
         sDocumentData(){
             return this.$store.state.document;
         },
+        allControlTemplate(){  
+            return this.$store.state.document.editor[this.keyInstance].allControlTemplate;
+        },
     }, 
     components: {
         'sidebar-left' : SideBarLeft,
@@ -144,7 +156,8 @@ export default {
         SwapTypeControlView,
         MaterialIcon,
         PrintTableConfig,
-        QuickInfoControl
+        QuickInfoControl,
+        FormModal
     },
     mounted(){
         let self = this;
@@ -190,13 +203,7 @@ export default {
                         self.showDragTable(e);
                     }
                 });
-                ed.ui.registry.addMenuItem('saveControlTemplate', {
-                    text: 'Lưu control template',
-                    disabled : false,
-                    onAction: function(e) {
-                        self.saveControlTemplate(ed);
-                    }
-                });
+             
             
                 ed.ui.registry.addButton('margin', {
                 icon:'margin',
@@ -223,10 +230,14 @@ export default {
                 ed.on('paste', function(e) {
                     self.handlePasteContent();
                 });
+                ed.on('SelectionChange',function (e) {
+                    self.handleHighlightControlSelection(e)
+                });
+               
+                
             },
             init_instance_callback : function(editor) {
                 self.editorCore = editor
-                console.log('self.editorCoreself.editorCore',self.editorCore);
                 self.initEditor()
             },
         });
@@ -261,7 +272,6 @@ export default {
             documentId:0,
             printConfigId:0,
             documentProps:{},
-            delta : 500,
             lastKeypressTime : 0,
             listIconToolbar:null,
             listNameValueControl:{},
@@ -273,7 +283,9 @@ export default {
             titleDialog:"",
             currentPageActive:null,
             isConfigPrint:false,
-            listDocument:[]
+            listDocument:[],
+            inputSaveControlTemplate:{},
+
         }
     },
     
@@ -303,7 +315,18 @@ export default {
             {name:'undo',icon:'mdi-undo'},
             {name:'redo',icon:'mdi-redo'},
             
-        ]
+        ];
+        this.inputSaveControlTemplate = {
+            title : {
+                title: this.$t('document.editor.dialog.saveDoc.title'),
+                type: "text",
+                value: "",
+                validateStatus:{
+                    isValid:true,
+                    message:this.$t('document.validate.emptyTitle')
+                }
+            },
+        }
     },
     watch:{
         // kiểm tra xem route thay đổi khi vào editor là edit doc hay create doc
@@ -558,6 +581,23 @@ export default {
             this.$refs.allControlOption.getData();
             this.$refs.allControlOption.showDialog();
         },
+        /**
+         * Sự kiện bấm mở modal lưu control template
+         */
+        showFormAddControlTemplate(){
+            if(this.checkIsSelectionText()){
+                this.$refs.formModalView.show();
+            }
+            else{
+                let currentControl = this.editorStore.currentSelectedControl;
+                if(currentControl.properties.name.hasOwnProperty('name')){
+                    this.$refs.formModalView.show();
+                }
+            }
+        },
+        /**
+         * Sự kiện bấm mở popup chuyển đổi kiểu control
+         */
         openPanelSwapType(){
             let currentControl = this.editorStore.currentSelectedControl
             if(currentControl.properties.name.hasOwnProperty('name')){
@@ -964,12 +1004,70 @@ export default {
         },
 
         /**
-         * Hàm lưu control template
+         * sự kiện từ modal save control template
+         * lưu control template
+         * @input : {allInputs : thông tin tiêu đề control template}
          */
-        saveControlTemplate(editor){
-            // let content = editor.selection.getContent();
-            
+        saveControlTemplate(allInputs){
+            let title = allInputs.title.value;
+            let content = this.editorCore.selection.getContent();
+            let allControlProps = {};
+            if(content){
+                let allControlInForm = $(content).find('.s-control');
+                for (let index = 0; index < allControlInForm.length; index++) {
+                    const element = allControlInForm[index];
+                    let controlId = $(element).attr('id');
+                    allControlProps[controlId] = this.editorStore['allControl'][controlId];
+                }
+                this.callApiSaveControlTemplate(title,content,allControlProps);
+            }
+            else{
+                let currentControl = this.editorStore.currentSelectedControl;
+                if(currentControl.properties.name.hasOwnProperty('name')){
+                    let id = currentControl.id;
+                    allControlProps[id] = this.editorStore['allControl'][id];
+                    this.callApiSaveControlTemplate(title,content,allControlProps);
+                }
+                else{
+                    this.$snotify({
+                        type: "error",
+                        title: this.$t('document.validate.emptyContentControlTemplate')
+                    });  
+                }
+            }
         },
+        /**
+         * Api lưu control template
+         * @input : {title : tiêu đề control template, content: html, controlProps: thông tin các control có trong đó nếu có}
+         */
+        callApiSaveControlTemplate(title, content, controlProps){
+            let self = this;
+            documentApi.saveControlTemplate({title:title,content:content,controlProps:JSON.stringify(controlProps)}).then(res=>{
+                self.$refs.formModalView.hide()
+                if(res.status == 200){
+                    this.$snotify({
+                        type: "success",
+                        title: "Lưu Control Template thành công"
+                    });  
+                    let allControlTemplate = self.editorStore.allControlTemplate;
+                    let control = res.data;
+                    control.ba_create = control.baCreate;
+                    control.create_at = control.createAt;
+                    allControlTemplate.push(control);
+                    self.$store.commit(
+                        "document/addToDocumentEditorStore",{key:'allControlTemplate',value:allControlTemplate,instance:self.keyInstance}
+                    );
+                }
+                else{
+                    this.$snotify({
+                        type: "error",
+                        title: res.message
+                    });  
+                }
+            })
+        },
+       
+        
         //hoangnd: hàm mở modal tablesetting của control table
         showSettingControlTable(e) {
             let elements = $('#document-editor-'+this.keyInstance+'_ifr').contents().find('.on-selected').closest('.s-control-table');
@@ -1078,7 +1176,7 @@ export default {
             if ( event.keyCode == 191 )
             {
                 var thisKeypressTime = new Date();
-                if ( thisKeypressTime - this.lastKeypressTime <= this.delta )
+                if ( thisKeypressTime - this.lastKeypressTime <= 500 )
                 {
                     var scroll_top = $("#document-editor-"+thisCpn.keyInstance+"_ifr").contents().scrollTop();
                     var nodePosition = $(thisCpn.editorCore.selection.getNode()).position();
@@ -1217,6 +1315,8 @@ export default {
         },
         //su kiện click vào editor
         detectClickEvent(event){
+            event.preventDefault();
+            event.stopPropagation();
             if($(event.target).closest('.s-control-table').length == 0){
                 if($(event.target).closest('body').find('.drag-table').length > 0){
                     $(event.target).closest('body').find('.drag-table').remove()
@@ -1909,16 +2009,26 @@ export default {
 
             $(".sym-document-tab-control .sym-control").attr('draggable', 'true');
             
-            $(".sym-control").on('dragstart', function(event) {
+            $(document).on('dragstart','.sym-control,.control-template-item', function(event) {
                 dragoverqueue_processtimer = setInterval(function() {
                     DragDropFunctions.ProcessDragOverQueue();
                 }, 100);
                 var controlType = $(this).attr('control-type');
-                let control = GetControlProps(controlType);
+                let control = null;
+                if($(this).is('.control-template-item')){
+                    let id = $(this).attr('control-id');
+                    control = thisCpn.allControlTemplate.filter(c=>{
+                        return c.id === id
+                    });
+                    control = control[0]
+                }
+                else{
+                    control = GetControlProps(controlType);
+                }
                 event.originalEvent.dataTransfer.setData("control", JSON.stringify(control));
             });
 
-            $(".sym-control").on('dragend', function() {
+            $(document).on('dragend','.sym-control,.control-template-item', function() {
                 clearInterval(dragoverqueue_processtimer);
                 DragDropFunctions.removePlaceholder();
                 DragDropFunctions.ClearContainerContext();
@@ -1974,46 +2084,70 @@ export default {
                     control = JSON.parse(control);
                     $("#document-editor-"+thisCpn.keyInstance+"_ifr").contents().find(".on-selected").removeClass('on-selected');
                     var insertionPoint = $("#document-editor-"+thisCpn.keyInstance+"_ifr").contents().find(".drop-marker");
-                    var checkDiv = $(control.html);
-                    let typeControl = checkDiv.attr('s-control-type');
-                    if(typeControl == 'dataFlow'){
-                        control.properties.dataFlowId.options = thisCpn.listDataFlow;
-                    }
-                    if(control.properties.hasOwnProperty('quickSubmit')){
-                        control.properties.quickSubmit.options = thisCpn.listDocument;
-                    }
-                    var inputid = 's-control-id-' + Date.now();
-                    checkDiv.attr('id', inputid);
-                    insertionPoint.after(checkDiv);
-                    let table = insertionPoint.closest('.s-control-table'); // nếu kéo control vào table thì lưu prop của control đó vào table trong allControl của state
-                    let idTable = '';
-                    checkDiv.prop('readonly', false);
-                    if (checkDiv.attr('s-control-type') != 'table') {
-                        checkDiv.attr('contenteditable', false);
-                    }
-                    checkDiv.addClass('on-selected');
-                    insertionPoint.remove();
-                    if(typeControl == 'tabPage'){
-                        let newPageId = 's-control-id-' + (Date.now() + 1);
-                        checkDiv.find('.page-item.sb-page-active').attr('id',newPageId);
-                        checkDiv.find('.page-content.page-active').attr('s-page-content-id',newPageId);
-                        let control = GetControlProps('page');
-                        control.properties.title.value = "Trang số 1";
-                        control.properties.name.value = "pg_1";
-                        thisCpn.addToAllControlInDoc(newPageId,{properties: control.properties, formulas : control.formulas,type:'page'});
-                    }
-                    thisCpn.selectControl(control.properties, control.formulas,inputid,typeControl);
-                    if(table.length > 0){   // nếu keo control vào trong table thì update dữ liệu trong table của state
-                        idTable = table.attr('id');
-                        thisCpn.addToAllControlInTable(inputid,{properties: control.properties, formulas : control.formulas,type:typeControl},idTable);
+                    if(control.type == 'control-template'){
+                        thisCpn.dropControlTemplate(insertionPoint,control);
                     }
                     else{
-                        thisCpn.addToAllControlInDoc(inputid,{properties: control.properties, formulas : control.formulas,type:typeControl});
+                        var checkDiv = $(control.html);
+                        let typeControl = checkDiv.attr('s-control-type');
+                        if(typeControl == 'dataFlow'){
+                            control.properties.dataFlowId.options = thisCpn.listDataFlow;
+                        }
+                        if(control.properties.hasOwnProperty('quickSubmit')){
+                            control.properties.quickSubmit.options = thisCpn.listDocument;
+                        }
+                        var inputid = 's-control-id-' + Date.now();
+                        checkDiv.attr('id', inputid);
+                        insertionPoint.after(checkDiv);
+                        let table = insertionPoint.closest('.s-control-table'); // nếu kéo control vào table thì lưu prop của control đó vào table trong allControl của state
+                        let idTable = '';
+                        checkDiv.prop('readonly', false);
+                        if (checkDiv.attr('s-control-type') != 'table') {
+                            checkDiv.attr('contenteditable', false);
+                        }
+                        checkDiv.addClass('on-selected');
+                        if(typeControl == 'tabPage'){
+                            let newPageId = 's-control-id-' + (Date.now() + 1);
+                            checkDiv.find('.page-item.sb-page-active').attr('id',newPageId);
+                            checkDiv.find('.page-content.page-active').attr('s-page-content-id',newPageId);
+                            let control = GetControlProps('page');
+                            control.properties.title.value = "Trang số 1";
+                            control.properties.name.value = "pg_1";
+                            thisCpn.addToAllControlInDoc(newPageId,{properties: control.properties, formulas : control.formulas,type:'page'});
+                        }
+                        thisCpn.selectControl(control.properties, control.formulas,inputid,typeControl);
+                        if(table.length > 0){   // nếu keo control vào trong table thì update dữ liệu trong table của state
+                            idTable = table.attr('id');
+                            thisCpn.addToAllControlInTable(inputid,{properties: control.properties, formulas : control.formulas,type:typeControl},idTable);
+                        }
+                        else{
+                            thisCpn.addToAllControlInDoc(inputid,{properties: control.properties, formulas : control.formulas,type:typeControl});
+                        }
                     }
+                    insertionPoint.remove();
+
+                    
+                    
                 } catch (e) {}
             });
             
 
+        },
+
+
+        dropControlTemplate(insertionPoint, control){
+            let contentEl = $(control.content);
+            let controlInEL = contentEl.find('.s-control');
+            let allControlProp = JSON.parse(control.control_props);
+            for (let index = 0; index < controlInEL.length; index++) {
+                let controlEl = $(controlInEL[index]);
+                let newId = Date.now();
+                let controlProp = allControlProp[controlEl.attr('id')];
+                contentEl.find('#'+controlEl.attr('id')).attr('id',newId)
+                this.addToAllControlInDoc(newId,{properties: controlProp.properties, formulas : controlProp.formulas,type:controlEl.attr('type')});
+            }
+            insertionPoint.after(contentEl);
+            
         },
 
         /**
@@ -2158,6 +2292,33 @@ export default {
             }
             
         },
+        /**
+         * Hàm kiêm tra có select content trong editor hay không
+         */
+        checkIsSelectionText(){
+            if(this.editorCore.selection.getContent()){
+                return true;
+            }
+            return false;
+        },
+        
+        handleHighlightControlSelection(e){
+            try {
+                $("#document-editor-"+this.keyInstance+"_ifr").contents().find(".selection-highlight").removeClass('selection-highlight');
+                let contentSelection = this.editorCore.selection.getContent();
+                let allControlInForm = $(contentSelection).find('.s-control');
+                for (let index = 0; index < allControlInForm.length; index++) {
+                    let element = allControlInForm[index];
+                    let id = $(element).attr('id');
+                    $("#document-editor-"+this.keyInstance+"_ifr").contents().find("#"+id).addClass('selection-highlight');
+                }
+                
+            } catch (error) {
+                
+            }
+            
+           
+        }
 
     },
 }

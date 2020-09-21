@@ -105,5 +105,11 @@ export const documentApi = {
     },
     updateActivePrintConfig(data) {
         return coreApi.patch('documents/prints', data);
-    }
+    },
+    saveControlTemplate(data) {
+        return coreApi.post('control-templates', data);
+    },
+    getControlTemplate() {
+        return coreApi.get('control-templates');
+    },
 };
