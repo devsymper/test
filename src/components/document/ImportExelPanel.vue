@@ -45,12 +45,10 @@
                 :documentId="documentId"
                  @stopSetInterval ="setInterval=false"
                 :deleteFileName="deleteFileName" 
-                @setInterval='setInterval=true' 
                 @cancel="cancel()"
                 @closeValidate="showValidate=false"
-                @import="importFile=i++"
-                @fileName="setFileName" 
-                @showValidate="showValidate=true"/>
+                @import="importFiles"
+                />
             </v-col>  
         <v-col v-show="showValidate" class="col-md-5">
             <ValidateImport 
@@ -97,6 +95,12 @@ export default {
         },
     },
     methods: {
+        importFiles(data){
+            this.importFile=this.i++;
+            this.showValidate=true;
+            this.setFileName(data.fileName);
+            this.setInterval=true;
+        },
         showError(data){
             this.error =true;
             this.dialogError = true; 

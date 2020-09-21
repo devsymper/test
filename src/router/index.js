@@ -274,13 +274,13 @@ const routes = [{
         component: () =>
             import ('../views/apps/yourApp.vue'),
     },
-    {
-        path: "/actions",
-        name: "actions",
-        // component: actions,
-        component: () =>
-            import ('../views/actions/index.vue'),
-    },
+    // {
+    //     path: "/actions",
+    //     name: "actions",
+    //     // component: actions,
+    //     component: () =>
+    //         import ('../views/actions/index.vue'),
+    // },
     {
         path: "/virtualdocs",
         name: "virtualdocs",
