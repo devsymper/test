@@ -2,7 +2,6 @@
    <v-card class="context-menu" v-show="isShowContext" >
 		<div class="item" v-for="(action,i) in listAction" :key="i" @click="clickAction(action)">
 				<span v-html="reduce(action)"></span>
-				<!-- {{$t('apps.listActions')}} -->
 		</div>
    </v-card>
 </template>
@@ -49,12 +48,9 @@ export default {
 			this.hide()
 		},
 		show(e){
-			debugger
-			var windowHeight = $(window).height()/2;
-			var windowWidth = $(window).width()/2;
+			var windowHeight = $(window).height()/1.5;
+			var windowWidth = $(window).width()/1.3;
 			this.isShowContext = true;
-			// this.top = event.pageY;
-			// this.left = event.pageX;
 			if(e.clientY > windowHeight && e.clientX <= windowWidth) {
 				$(".context-menu").css("left", e.clientX);
 				$(".context-menu").css("bottom", $(window).height()-e.clientY);
@@ -95,7 +91,6 @@ export default {
 		},
 		clickAction(action){
 			let appId = this.$store.state.appConfig.currentAppId
-			debugger
 			this.defineAction[this.type].action = action;
 			this.hide()
 			if(this.targetItem.objectIdentifier.includes("document_definition:")){

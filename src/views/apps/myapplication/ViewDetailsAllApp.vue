@@ -31,6 +31,7 @@
                         <v-expansion-panels
                             accordion 
                             v-model="panel"
+                            multiple
                         >
                             <v-expansion-panel
                             >
@@ -114,7 +115,6 @@ export default {
     },
     methods:{
         hideContextMenu(){
-            debugger
             this.$refs.contextMenu.hide()	
         },
         rightClickHandler(event,item,type){
@@ -241,7 +241,6 @@ export default {
             }
         },
         filterObj(value){
-        debugger
         let self = this
            for(let e in this.apps){
                if(self.apps[e].childrenAppReduce.hasOwnProperty('document_definition')){

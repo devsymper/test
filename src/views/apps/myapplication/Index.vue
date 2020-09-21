@@ -22,11 +22,15 @@ export default {
         let self = this 
             $(document).click(function(e){
 				if(!$(e.target).is('.context-menu')){
-                    debugger
                     if(self.viewSideBySide == true){
-                         self.$refs.ViewSideBySideApp.hideContextMenu()		
+                        if(self.$refs.ViewSideBySideApp){
+                            self.$refs.ViewSideBySideApp.hideContextMenu()		
+                        }
                     }else{
-                         self.$refs.ViewDetailsAllApp.hideContextMenu()		
+                        if(self.$refs.ViewDetailsAllApp){
+                            self.$refs.ViewDetailsAllApp.hideContextMenu()		
+                        }
+                        //  self.$refs.ViewDetailsAllApp.hideContextMenu()		
                     }
 				}
 			})
