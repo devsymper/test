@@ -26,7 +26,7 @@
         <div class="content-view-details-all-app h-100">
            
                 <v-row no-gutters>
-                    <template v-for="(item,i) in apps" >
+                    <template v-for="(item,i) in dataApps" >
                         <v-col cols="6" :key="i">
                         <v-expansion-panels
                             accordion 
@@ -184,11 +184,7 @@ export default {
             let obj = {}
             obj = this[type]
             obj.item = data
-            // console.log()
             this.$set(this.apps[idApp].childrenAppReduce,type,obj)
-            // this.apps[idApp].childrenAppReduce[type] = obj
-            console.log(this.apps[idApp].childrenAppReduce,'this.apps[idApp].childrenAppReduce');
-            debugger
         },
         updateFavoriteItem(mapArray,array){
 			for( let [key,value] of Object.entries(mapArray)){
@@ -232,17 +228,52 @@ export default {
 				});
             }
         },
-        // filterObj(value){
-        //     this.apps.filter(function(e){
-        //          if(e.childrenApp.document_definition.item.length > 0){
-        //             e.childrenApp.document_definition.item.filter(function(item){
-        //                 if(item.title.toLowerCase().includes(value.toLowerCase())){
-        //                     self.objFilter.document_definition.item.push(item)
-        //                 }
-        //             })
-		// 	    }
-        //     })
-        // },
+        filterObj(value){
+        debugger
+        let self = this
+           for(let e in this.apps){
+               if(self.apps[e].childrenAppReduce.hasOwnProperty('document_definition')){
+                    // console.log(self.apps[e].childrenAppReduce.document_definition.item.length);
+                    self.apps[e].childrenAppReduce.document_definition.item.filter(function(k){
+                        console.log(k,'kkkkk');
+                        // debugger
+                        if(k.title.toLowerCase().includes(value.toLowerCase())){
+                            //  debugger
+                            return k
+                            //  self.apps[e].childrenAppReduce.document_definition.item.push(k)
+                        }
+                    })
+			    }
+                 if(this.apps[e].childrenAppReduce.hasOwnProperty('orgchart')){
+                    // this.appsReduce[e].childrenAppReduce.orgchart.item = []
+                    this.apps[e].childrenAppReduce.orgchart.item.filter(function(k){
+                        if(k.title.toLowerCase().includes(value.toLowerCase())){
+                        //    self.appsReduce[e].childrenAppReduce.orgchart.item.push(k)
+                           return k
+                        }
+                    })
+			    }
+                 if(this.apps[e].childrenAppReduce.hasOwnProperty('dashboard')){
+                    //  this.appsReduce[e].childrenAppReduce.dashboard.item = []
+                    this.apps[e].childrenAppReduce.dashboard.item.filter(function(k){
+                        if(k.title.toLowerCase().includes(value.toLowerCase())){
+                        //    self.appsReduce[e].childrenAppReduce.orgchart.item.push(k)
+                           return k
+                        }
+                    })
+			    }
+                 if(this.apps[e].childrenAppReduce.hasOwnProperty('workflow_definition')){
+                    // this.appsReduce[e].childrenAppReduce.workflow_definition.item = []
+                    this.apps[e].childrenAppReduce.workflow_definition.item.filter(function(k){
+                        if(k.title.toLowerCase().includes(value.toLowerCase())){
+                        //    self.appsReduce[e].childrenAppReduce.workflow_definition.item.push(k)
+                           return k
+                        }
+                    })
+                }
+                console.log(this.appsReduce,'appsReduceappsReduce');
+           }
+        },
 
 		getByAccessControl(ids,type,idApp){
 			let self = this
@@ -250,7 +281,6 @@ export default {
 				pageSize:50,
 				ids: ids
 			}).then(res=>{
-                debugger
 				if(type == 'orgchart'){
                     this.updateFavoriteItem(self.mapId.orgchart,res.data)
                     this.updateChidrenItem('orgchart',res.data,idApp)
@@ -300,8 +330,10 @@ export default {
             },
              panel: [0,1,2,3],
              menuItemsHeight: 'calc(100vh - 125px)',
-             searchItemKey: '',
+             searchItemKey: "",
              apps:{},
+             appsReduce:{},
+            //  dataApps:{},
              currentAppId:0,
              arrType:{
                 document_definition:[],
@@ -323,6 +355,21 @@ export default {
     },
     created(){
         this.getActiveapps()
+        // this.dataApps = this.apps
+        // debugger
+    },
+    computed:{
+        dataApps(){
+            if(this.searchItemKey != ""){
+                debugger
+                // this.appsReduce = this.apps
+                this.filterObj(this.searchItemKey)
+                return this.apps
+            }else{
+                debugger
+                return this.apps
+            }
+        }
     },
     mounted(){
         let self = this
@@ -333,11 +380,17 @@ export default {
         })
     },
     watch:{
-        searchItemKey(val){
-            console.log(val);
-
-            debugger    
-        }
+        // searchItemKey(val){
+            // debugger
+            // if(val == ""){
+            //     this.dataApps = this.apps
+            // }else{
+            //      this.appsReduce = this.apps
+            //     this.filterObj(val)
+            //     this.dataApps = this.appsReduce
+            //     debugger
+            // }
+        // }
     }
 }
 </script>
