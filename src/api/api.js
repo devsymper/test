@@ -69,8 +69,20 @@ export default class Api {
      * @returns {Object} Đối tượng có thể sử dụng như của promise
      */
     put(uri, data, header = {}, options = {}) {
+            let url = this.getFullUrl(uri);
+            return this.callApi("PUT", url, data, header, options);
+        }
+        /**
+         * Thực hiện patch request
+         * @param {String} uri uri của API
+         * @param {Object} data data muốn gửi về cho server
+         * @param {Object} header custom header cho request
+         * @param {Object} options các option thêm cho request theo Jquery Ajax
+         * @returns {Object} Đối tượng có thể sử dụng như của promise
+         */
+    patch(uri, data, header = {}, options = {}) {
         let url = this.getFullUrl(uri);
-        return this.callApi("PUT", url, data, header, options);
+        return this.callApi("PATCH", url, data, header, options);
     }
 
     /**

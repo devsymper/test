@@ -18,7 +18,7 @@
                     'position' : 'relative',
                     'font-size':'11px',
                 }"
-                v-if="!inputInfo.hidden && (inputInfo.type != 'checkbox' && inputInfo.type != 'switch' )">
+                v-if="!inputInfo.hidden && (inputInfo.type != 'checkbox' && inputInfo.type != 'switch' ) && !inputInfo.isShowTitle">
                 {{inputInfo.title}}
                 <i
                     :class="{'mdi mdi-calendar float-right input-item-func ml-1': true}"
@@ -394,10 +394,10 @@ export default {
             }, 500, this);
         },
         openLargeValueEditor(inputInfo, name) {
+            this.$set(this.largeFormulaEditor, "data", inputInfo);
+            this.largeFormulaEditor.name = name;
             this.$refs.dragPanel.show();
             this.$refs.edtFormula.onFocus();
-            this.largeFormulaEditor.name = name;
-            this.$set(this.largeFormulaEditor, "data", inputInfo);
             if(this.getDragPanelContent(inputInfo) == 'orgchart-selector'){
                 this.translateTagsToOrgchartValues()
             }
@@ -426,7 +426,6 @@ export default {
             }
         },
         handleKeyUpInputValue(inputInfo, name, data){
-            console.log('jj',inputInfo, name, data);
             this.$emit("input-value-keyup", name, inputInfo, data);
         },
         getInputProps(inputConfigs) {

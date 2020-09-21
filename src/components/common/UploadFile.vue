@@ -4,7 +4,7 @@
 			:loading="isSelecting"
 			@click="onButtonClick"
 				> 
-			<v-icon>mdi-attachment</v-icon>
+			<v-icon>{{iconName}}</v-icon>
 			<input
 				ref="uploader"
 				class="d-none"
@@ -92,6 +92,10 @@ export default {
 		uploadMultyFile:{
 			type: Boolean,
 			default: false
+		},
+		iconName:{
+			type: String,
+			default: 'mdi-attachment'
 		}
 	},
 	data() {

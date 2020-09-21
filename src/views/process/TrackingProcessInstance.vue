@@ -1,5 +1,12 @@
 <template>
     <div class="h-100 w-100">
+        <div class="action-diagram-bpmn" style="text-align:right;margin-top:3px">
+            <v-icon class="action-btn"  @click="handleZoomOut">mdi-plus-circle-outline</v-icon>
+            <v-icon class="action-btn"  @click="handleZoomIn">mdi-minus-circle-outline</v-icon>
+            <v-icon class="action-btn"  @click="handleFocus">mdi-image-filter-center-focus</v-icon>
+            <v-icon v-if="stask.statusPopupTracking==false" class="action-btn"  @click="handleShowPopup">mdi-fullscreen</v-icon>
+            <v-icon v-else class="action-btn"  @click="handleClosePopup">mdi-close</v-icon>
+        </div>
         <symper-bpmn
             @node-clicked="handleNodeSelected"
             ref="symperBpmn"
@@ -96,7 +103,27 @@ export default {
         "symper-bpmn": SymperBpmn,
         "symper-drag-panel": SymperDragPanel
     },
+    computed:{
+        stask() {
+			return this.$store.state.task;
+		},
+    },
     methods: {
+        handleClosePopup(){
+            this.$store.commit("task/setStatusPopupTracking",false);
+        },
+        handleShowPopup(){
+            this.$emit("showPopupDiagram");
+        },
+        handleFocus(){
+            this.$refs.symperBpmn.focus();
+        },
+        handleZoomIn(){
+            this.$refs.symperBpmn.zoomIn();
+        },
+        handleZoomOut(){
+            this.$refs.symperBpmn.zoomOut();
+        },
         closeDetailPanel(){
             this.nodeDetailPanel.show = false;
         },
@@ -154,11 +181,13 @@ export default {
         setTasksStatus(){
             for(let eleId in this.runtimeNodeMap){
                 let nodeInfo = this.runtimeNodeMap[eleId];
-                if(nodeInfo.activityType.includes('Task')){
-                    let symBpmn = this.$refs.symperBpmn;
-                    symBpmn.updateElementProperties(eleId, {
-                        statusCount: nodeInfo.instancesStatusCount
-                    });
+                if (nodeInfo.activityType) {
+                    if(nodeInfo.activityType.includes('Task')){
+                        let symBpmn = this.$refs.symperBpmn;
+                        symBpmn.updateElementProperties(eleId, {
+                            statusCount: nodeInfo.instancesStatusCount
+                        });
+                    }
                 }
             }
         },
@@ -205,8 +234,8 @@ export default {
                     return self.getDefinitionData(res.processDefinitionId);
                 })
                 .then(res => {
-                    let resourceDataUrl = res.resource.replace(/^https?\:\/\/([^\/?#]+)(?:[\/?#]|$)/g, '');
-                    resourceDataUrl = appConfigs.apiDomain.bpmne.general + resourceDataUrl;
+                    
+                    let resourceDataUrl = appConfigs.apiDomain.bpmne.general + 'symper-rest/service/repository/deployments/'+res.deploymentId+'/resourcedata/process_draft.bpmn';
                     return self.getDefinitionXML(resourceDataUrl);
                 })
                 .then(res => {
@@ -288,5 +317,14 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
+.action-diagram-bpmn{
+    width:98%;
+    margin-right: 20px;
+}
+.action-btn{
+    cursor: pointer;
+    font-size: 20px;
+    margin-right:5px ;
+}
 </style>

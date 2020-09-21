@@ -153,11 +153,10 @@ export default class Control {
             for (let key in this.controlFormulas) {
                 if (this.controlFormulas[key].value != "" && this.controlFormulas[key].value != undefined && Object.values(this.controlFormulas[key].value).length > 0) {
                     let formulas = Object.values(this.controlFormulas[key].value)[0];
+                    formulas = formulas.replace(/\r?\n|\r/g, ' ');
                     this.controlFormulas[key]['instance'] = new Formulas(this.curParentInstance, formulas, key);
                     let table = this.controlFormulas[key]['instance'].detectTableRelateLocalFormulas();
                     if (table.length > 0) {
-                        console.log('gadkjda', this.name);
-                        console.log('gadkjda', table);
                         store.commit("document/addToRelatedLocalFormulas", {
                             key: this.name,
                             value: table,
@@ -482,5 +481,42 @@ export default class Control {
         }
 
         return rs
+    }
+    renderInputTraceControlColor() {
+        console.log("áddsadsad", this.name);
+        if (this.inTable) {
+            this.traceInputTable();
+        } else {
+            this.ele.addClass('trace-input-control');
+        }
+    }
+    renderOutputTraceControlColor() {
+        if (this.inTable) {
+            this.traceInputTable('trace-output-control');
+        } else {
+            this.ele.addClass('trace-output-control');
+        }
+    }
+    renderCurrentTraceControlColor() {
+        if (this.inTable) {
+            this.traceInputTable('trace-current-control');
+        } else {
+            this.ele.addClass('trace-current-control');
+        }
+    }
+    removeTraceControlColor() {
+
+        if (this.inTable) {
+            this.traceInputTable('', true);
+        } else {
+            this.ele.attr('class', function(i, c) {
+                return c.replace(/trace-.*-control/g, '');
+            });
+        }
+    }
+
+    traceInputTable(className, isRemove = false) {
+        let tableControl = getListInputInDocument(this.curParentInstance)[this.inTable];
+        tableControl.tableInstance.traceInputTable(this.name, className, isRemove)
     }
 }

@@ -37,6 +37,7 @@
         "close": "Close",
         "virtualdocs": "Virtualdocs",
         "tasks": "Tasks",
+        "myItem": "My Item",
         "other": "Other",
         "deploy": "Deploy",
         "start": "Start",
@@ -318,7 +319,12 @@
                 },
                 "saveDoc": {
                     "heading": "Save Document",
-                    "checkNameRelated": "Check formulas related"
+                    "checkNameRelated": "Check formulas related",
+                    "selectType": {
+                        "system": "System",
+                        "list": "List",
+                        "business": "Business"
+                    }
                 },
                 "swapType": {
                     "heading": "Swap type control",
@@ -340,7 +346,12 @@
             },
             "title": "Submit document",
             "goToList": "Go to list",
-            "continueSubmit": "Submit again"
+            "continueSubmit": "Submit again",
+            "panel": {
+                "traceInput": "Input",
+                "traceCurrent": "Current",
+                "traceOutput": "Output"
+            }
         },
         "process": {
             "header_bar": {
@@ -477,19 +488,7 @@
         "Knowledge": "Văn bản nội bộ",
         "File": "Quản lý tệp",
         "Department": "Phòng ban",
-        "Timesheet": "Thời gian biểu",
-        "documentPanel": {
-            "system": "System",
-            "list": "List"
-        },
-        "documentEditor": {
-            "f_10px": "10px",
-            "f_11px": "11px",
-            "f_12px": "12px",
-            "f_13px": "13px",
-            "f_14px": "14px"
-        }
-
+        "Timesheet": "Thời gian biểu"
     },
     "apps": {
         "header": {
@@ -756,6 +755,10 @@
         "ascending": "Ascending",
         "descending": "Descending"
     },
+    "myItem":{
+        "objType":"Object type",
+        "today":"Today"
+    },
     "tasks": {
         "error": {
             "emptyAssignee": "Assignee can not be empty",
@@ -768,6 +771,7 @@
             "date": "Date",
             "dueDate": "Due Date",
             "createDate": "Create date",
+            "app": "Ứng dụng",
             "description": "Task description",
             "owner": "Task Owner",
             "name": "Task name",
@@ -777,7 +781,10 @@
             "id": "Seri",
             "list": "List task",
             "submitForm": "Submit form",
-            "alertDescription": "No description"
+            "alertDescription": "No description",
+            "relatedTask":"RELATED TASK",
+            "attachment":"ATTACHMENT FILE"
+
         },
         "filterOptions": {
             "all": "All task",

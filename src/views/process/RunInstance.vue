@@ -8,7 +8,6 @@
                 ></v-skeleton-loader>
         </div>
         <div v-else class="h-100 w-100">
-
             <taskDetail 
                 v-if="taskInfo.action.parameter.documentId > 0"
                 :isInitInstance="true" 
@@ -112,9 +111,9 @@ export default {
                 
                 let instanceName = await this.getInstanceName(dataInputForFormula);
                 
-                // let newProcessInstance = await runProcessDefinition(this, processDef, [], instanceName);
                 let newProcessInstance = await runProcessDefinition(this, processDef, vars, instanceName);
                 this.$snotifySuccess("Task submited successfully");
+                this.$router.push('/documents/objects/'+outcomeData.document_object_id);
             } catch (error) {
                 this.$snotifyError(error ,"Error on run process definition ");
             }
@@ -163,6 +162,7 @@ export default {
         },
         handleTaskSubmited(outcomeData){
             this.saveTaskOutcome(outcomeData);
+            
         },
         closeDetail(){
             this.$router.push("/workflow");

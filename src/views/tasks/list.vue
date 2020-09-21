@@ -147,7 +147,6 @@
                     </v-row>
 
                 </VuePerfectScrollbar>
-
                  <v-skeleton-loader
                     v-else
                     ref="skeleton"
@@ -401,7 +400,11 @@ export default {
             }
             if(this.filterTaskAction == 'subtasks'){
                 res = await BPMNEngine.getSubtasks(this.filterFromParent.parentTaskId, filter);
-                listTasks = res;
+                if (filter.status=='done') {
+                    listTasks = res.data;
+                }else{
+                    listTasks = res;
+                }
             }else {
 
                 if(!filter.assignee){
@@ -411,7 +414,10 @@ export default {
                 listTasks = res.data;
             }
             this.totalTask = Number(res.total);
-
+            // let allDefinitions=this.$store.state.process.allDefinitions;
+            // if(Object.entries(allDefinitions).length === 0){
+            //     this.$store.dispatch('process/getAllDefinitions');
+            // }
             for(let task of listTasks){
                 task.taskData = self.getTaskData(task);
                 task = addMoreInfoToTask(task);

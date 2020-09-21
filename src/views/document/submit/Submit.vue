@@ -149,12 +149,13 @@
         
          <v-navigation-drawer
             v-if="parrentInstance == 0" 
-            :width="830"
+            :width="(isShowTraceControlSidebar) ? 300 : 830"
             v-model="drawer"
             class="pa-3"
             absolute
             right
             temporary
+            :hide-overlay="isShowTraceControlSidebar"
             style="z-index:9999"
         >
             <submitDocument v-if="parrentInstance == 0 && docSubFormId != 0" 
@@ -162,7 +163,11 @@
             :parrentInstance="keyInstance" 
             @submit-document-success="submitSubFormSuccess"
             ref="subSubmitView" :isQickSubmit="true" :action="'submit'" :docId="docSubFormId"/>
-            
+            <SidebarTraceFormulas 
+            :controlTrace="controlTrace"
+            :keyInstance="keyInstance"
+            :listFormulasTrace="listFormulasTrace"
+            ref="traceControlView" v-show="isShowTraceControlSidebar" />
         </v-navigation-drawer>
         <div class="sub-form-action" v-if="parrentInstance != 0">
             <button @click="goToListDocument()" class=subfom-action__item>{{$t('document.submit.goToList')}}</button>
@@ -174,6 +179,7 @@
 </template>
 <script>
 import { documentApi } from "./../../../api/Document.js";
+import { formulasApi } from "./../../../api/Formulas.js";
 import { userApi } from "./../../../api/user.js";
 import "./../../../components/document/documentContent.css";
 import { setDataForPropsControl,allControlNotSetData } from "./../../../components/document/dataControl";
@@ -194,6 +200,7 @@ import Filter from "./items/Filter.vue";
 import Validate from "./../common/Validate";
 import ClientSQLManager from "./clientSQLManager.js";
 import Util from './util';
+import SidebarTraceFormulas from './SidebarTraceFormulas.vue';
 import './customControl.css';
 import ErrMessagePanel from "./../../../views/document/items/ErrMessagePanel.vue";
 import moment from "moment-timezone";
@@ -203,7 +210,8 @@ import {listControlNotNameProp} from "./../../../components/document/controlProp
 
 
 import { checkCanBeBind, resetImpactedFieldsList, markBinedField } from './handlerCheckRunFormulas';
-import {checkDbOnly,getControlInstanceFromStore,getControlTitleFromName, getListInputInDocument} from './../common/common'
+import {checkDbOnly,getControlInstanceFromStore,getControlTitleFromName, getListInputInDocument,mapTypeToEffectedControl} from './../common/common'
+import Formulas from './formulas.js';
 let impactedFieldsList = {};
 let impactedFieldsArr = {};
 
@@ -265,6 +273,7 @@ export default {
         "sym-drag-panel": SymperDragPanel,
         "err-message": ErrMessagePanel,
         EmbedDataflow,
+        SidebarTraceFormulas,
         VBoilerplate: {
             functional: true,
             render (h, { data, props, children }) {
@@ -331,7 +340,11 @@ export default {
             loading: true,
             docSubFormId:0,
             drawer: false,
-            isContinueSubmit:false
+            isContinueSubmit:false,
+            titleObjectFormulas:null,
+            isShowTraceControlSidebar:false,
+            listFormulasTrace:{},
+            controlTrace:null
         };
 
     },
@@ -648,6 +661,17 @@ export default {
                 
             }
         });
+        /**
+         * Sự kiện bắn ra khi ấn f2 vào 1 control để trace formulas
+         */
+        this.$evtBus.$on('document-submit-show-trace-control',data=>{
+            data.control.renderCurrentTraceControlColor();
+            this.controlTrace = data.control.name;
+            let controlFormulas = data.control.controlFormulas;
+            this.listFormulasTrace = controlFormulas;
+            this.isShowTraceControlSidebar = true;
+            this.drawer = true;
+        })
     },
     watch: {
         docId(after) {
@@ -723,6 +747,13 @@ export default {
             }, 500,this);
             
         },
+
+        drawer(after){
+            if(this.isShowTraceControlSidebar && after == false){
+                this.$refs.traceControlView.removeTrace();
+                this.$refs.traceControlView.removeCurrentControlTrace();
+            }
+        }
     },
     
     methods: {
@@ -1054,6 +1085,7 @@ export default {
                         if (res.status == 200) {
                             let content = res.data.document.content;
                             thisCpn.documentName = res.data.document.name;
+                            thisCpn.getTitleObjectFormulas(res.data.document.titleObjectFormulasId)
                             thisCpn.docSize = (parseInt(res.data.document.isFullSize) == 1) ? "100%":"21cm";
                             thisCpn.contentDocument = content;
 							if(res.data.document.dataPrepareSubmit != "" && res.data.document.dataPrepareSubmit != null)
@@ -1082,6 +1114,23 @@ export default {
                     .always(() => {});
             }
         },
+
+        /**
+         * hàm lấy thông tin của formulas cho title bản ghi
+         */
+        getTitleObjectFormulas(formulasId){
+            if(formulasId && formulasId != 0){
+                let self = this;
+                formulasApi.detailFormulas(formulasId).then(res=>{
+                    self.titleObjectFormulas = new Formulas(self.keyInstance,res.data.lastContent,'titleObject');
+                })
+            }
+            
+        },
+
+        /**
+         * Hàm lấy thông tin của bản ghi trường hợp update 
+         */
         loadDocumentObject() {
             let thisCpn = this;
             documentApi
@@ -1264,8 +1313,8 @@ export default {
                     }
                 }
             }
-            console.log("sadsadsad",this.sDocumentSubmit);
             this.listDataFlow = listDataFlow;
+            console.log(this.sDocumentSubmit,'sDocumentSubmitsDocumentSubmit');
             if(!isSetEffectedControl);
             this.getEffectedControl();
             if(this.docObjId == null){
@@ -1468,13 +1517,13 @@ export default {
                             instance: this.keyInstance
                         });
             if(this.otherInfo.hasOwnProperty('refreshControl') && this.otherInfo.refreshControl.length > 0){
-                let refreshControl = this.otherInfo.refreshControl
-                let dataImpactedControlRefresh = {}
+                let refreshControl = this.otherInfo.refreshControl;
+                let dataImpactedControlRefresh = {};
                 for (let index = 0; index < refreshControl.length; index++) {
                     let controlName = refreshControl[index];
                     let dataImpactedControl = util.cloneDeep(this.sDocumentSubmit.impactedFieldsList[controlName]);
                     for(let control in dataImpactedControl){
-                        dataImpactedControl[control] = false
+                        dataImpactedControl[control] = false;
                     }
                     dataImpactedControlRefresh[controlName] = dataImpactedControl;
                 }
@@ -1492,22 +1541,22 @@ export default {
                         continue;
                     }
                     checkRun = true;
-                    let formulas = controlInstance.controlFormulas.formulas.instance
-                    this.handlerBeforeRunFormulasValue(formulas,controlInstance.id,controlName,'formulas')
+                    let formulas = controlInstance.controlFormulas.formulas.instance;
+                    this.handlerBeforeRunFormulasValue(formulas,controlInstance.id,controlName,'formulas');
                 }
                 if(checkRun == false){
-                    this.submitDocument()
+                    this.submitDocument();
                 }
             }
             else{
-                this.submitDocument()
+                this.submitDocument();
             }
             
         },
         /**
          * Hàm gọi api submit document
          */
-        submitDocument(){
+        async submitDocument(){
             this.isSubmitting = true;
             let thisCpn = this;
             let dataPost = this.getDataPostSubmit();
@@ -1518,17 +1567,23 @@ export default {
             }
             if(thisCpn.sDocumentSubmit.submitFormulas != undefined){
                 let dataInput = thisCpn.getDataInputFormulas(thisCpn.sDocumentSubmit.submitFormulas);
-                thisCpn.sDocumentSubmit.submitFormulas.handleBeforeRunFormulas(dataInput).then(rs=>{
-                    this.callApiSubmit(dataPost);
-                });
+                await thisCpn.sDocumentSubmit.submitFormulas.handleBeforeRunFormulas(dataInput);
+                this.callApiSubmit(dataPost);
             }
             else{
-                 this.callApiSubmit(dataPost);
+                this.callApiSubmit(dataPost);
             }
             
         },
-        callApiSubmit(dataPost){
+        async callApiSubmit(dataPost){
             let thisCpn = this;
+            let titleObject = "";
+            if(this.titleObjectFormulas != null){
+                let dataInputTitle = thisCpn.getDataInputFormulas(this.titleObjectFormulas);
+                let res = await this.titleObjectFormulas.handleBeforeRunFormulas(dataInputTitle);
+                let value = this.getValueFromDataResponse(res);
+                dataPost['titleObject'] = value
+            }
             documentApi.submitDocument(dataPost).then(res => {
                 let dataResponSubmit = res.data;
                 dataResponSubmit['document_object_user_created_fullname'] = thisCpn.endUserInfo.id;
@@ -1696,14 +1751,6 @@ export default {
         },
 
         updateEffectedControlToStore(mapControlEffected) {
-            let mapTypeToEffectedControl = {
-                                            link     :"effectedLinkControl",
-                                            formulas :"effectedControl",
-                                            readOnly :"effectedReadonlyControl",
-                                            hidden   :"effectedHiddenControl",
-                                            require  :"effectedRequireControl",
-                                            validate :"effectedValidateControl",
-                                            }
             let dataToPreProcessControl = {};
             for(let type in mapControlEffected){
                 if(mapTypeToEffectedControl.hasOwnProperty(type)){
@@ -2012,9 +2059,6 @@ export default {
                 $('#'+controlId).removeAttr('disabled');
             }
         },
-       
-        
-       
         /**
          * Hàm xử lí việc tìm kiếm các root control và chạy công thức cho control đó (lúc khởi tạo doc)
          */
@@ -2057,17 +2101,14 @@ export default {
                                                 listTableRootControl[controlInstance.inTable] = {};
                                             }
                                             listTableRootControl[controlInstance.inTable][controlRootInTable] = false;
-
                                         }
 										if(formulasInstance.getFormulas() !== "" && Object.keys(formulasInstance.getInputControl()).length == 0){
 											impactedFieldsListWhenStart[controlName] = false;
                                             listRootControl.push(controlName);
-                                            
 											this.handlerBeforeRunFormulasValue(formulasInstance,controlInstance.id,controlName,formulasType,'root')
 										}
 									}
 								}
-								
 							}
 						}
                     }
@@ -2179,8 +2220,15 @@ export default {
 .sym-form-submit >>> table:not(.htCore) th {
     border: none !important;
 }
-.sym-form-submit >>> .htCore td:last-child {
+/* .sym-form-submit >>> .htCore td:nth-last-child(3) {
     border-right: 1px solid #ccc !important;
+}
+.sym-form-submit >>> .htCore thead tr th:nth-last-child(3) {
+    border-right: 1px solid #ccc !important;
+} */
+
+.sym-form-submit >>> .handsontable[s-control-type="table"]{
+    border-right: 1px solid #ccc;
 }
 .sym-form-submit >>> .ht_clone_left.handsontable table.htCore {
     border-right: none;
