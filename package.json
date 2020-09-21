@@ -14,6 +14,7 @@
         "@ag-grid-community/vue": "^23.1.0",
         "@ag-grid-enterprise/row-grouping": "^23.1.0",
         "@handsontable/vue": "^4.1.1",
+        "@saeris/vue-spinners": "^1.0.8",
         "@tinymce/tinymce-vue": "^3.2.2",
         "@types/rappid": "^1.5.32",
         "ace-builds": "^1.4.11",
