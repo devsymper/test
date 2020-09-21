@@ -2,7 +2,7 @@
   <div id="modalImage" class="modal kh-handson">
     <div class="modal-content">
       <div class="kh-handson-header kh-showFile">
-        <h2 style="width:95%" v-if="type!='document_backup'">{{name+'.'+type}}</h2>
+        <h2 style="width:95%" v-if="type!='document_backup'">{{name}}</h2>
         <h2 style="width:95%" v-else>{{name}}</h2>
         <v-tooltip bottom>
           <template v-slot:activator="{ on }">
@@ -40,15 +40,15 @@
         <img class="image-modal" :src="serverPath" alt />
       </div>
 
-      <div class="div-show-content" v-else-if="type==='doc' ||type==='docx' ||type==='xlsx'">
+      <div class="div-show-content" v-else-if="type==='doc' ||type==='docx' ||type==='xlsx' || type==='txt'">
         <iframe
           class="show-content"
           :src="`https://docs.google.com/gview?url=${serverPath}&embedded=true`"
         ></iframe>
       </div>
-      <div class="div-show-content" v-else-if="type==='txt'">
+      <!-- <div class="div-show-content" v-else-if="type==='txt'">
         <iframe class="show-content" :src="serverPath"></iframe>
-      </div>
+      </div> -->
       <div class="div-show-content" v-else-if="type==='document_backup'">
         <div class="show-content" v-html="docContent"></div>
       </div>
@@ -187,6 +187,7 @@ export default {
 }
 #modalImage {
   padding-top: 40px !important;
+  z-index: 200!important;
 }
 .btn-download {
   width: 24px !important;
