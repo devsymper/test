@@ -44,13 +44,13 @@ export default {
         }
     },
     watch: {
-        // actionDef: {
-        //     deep: true,
-        //     immediate: true,
-        //     handler(newValue){
-        //         this.displayActionView();
-        //     }
-        // }
+        actionDef: {
+            deep: true,
+            immediate: true,
+            handler(newValue){
+                this.displayActionView();
+            }
+        }
     },
     mounted(){
         this.displayActionView();
