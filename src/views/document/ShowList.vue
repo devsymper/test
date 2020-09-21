@@ -198,16 +198,6 @@ export default {
     display: flex;
     flex-direction: column;
 }
-</style>
-<style>
-.v-list-item__title{
-    font-size:13px!important;
-}
-.v-select__slot{
-    padding-left:7px;
-    font-size:13px!important;
-    font-family: Roboto;
-}
 .fw-500 {
     font-weight: 500;
 }
@@ -231,4 +221,15 @@ export default {
 .color-normal {
     color: #707070
 }
+</style>
+<style>
+.v-list-item__title{
+    font-size:13px!important;
+}
+.v-select__slot{
+    padding-left:7px;
+    font-size:13px!important;
+    font-family: Roboto;
+}
+
 </style>

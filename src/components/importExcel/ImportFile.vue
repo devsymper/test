@@ -14,7 +14,7 @@
     <v-divider width="440" class="ml-4"></v-divider> 
     <v-list dense>
         <v-row class="ml-5 mt-1 mr-6">
-            <span class="font "><b class="color-grey fw-500">
+            <span class="font "><b class="color-grey fw-500 fs-13">
                 Import dữ liệu cho chứng từ: {{nameDocument}}</b>
             </span>
         </v-row>
@@ -452,13 +452,17 @@ export default {
             this.getMappingTable();
               
         },
-        //Loại những sheet được chọn
+        //Sự kiện xảy ra khi thay đổi tên Sheet
         onChangeSheet(tableIdx, value) {
+            // 1. Khi select sheet 
             if (value) {
+                // chuyển giá trị được chọn thành false
                 value.enable = false;
+                // đẩy giá trị cũ thành true
                 if (this.tables[tableIdx].sheetMap) {
                     this.tables[tableIdx].sheetMap.enable = true;
                 }
+                // kiểm tra những sheet đã tồn tại khi lấy giá trị từ mapping 
                  for(let i = 0; i<this.nameSheets.length; i++)
                 {
                     if(this.nameSheets[i].name ==  this.tables[tableIdx].sheetMap.name){
@@ -466,6 +470,7 @@ export default {
                     }
                 }
                 this.tables[tableIdx].sheetMap = value;
+              // 2. Khi xóa sheet
             } else {
                 let name = this.tables[tableIdx].sheetMap.name;
                 this.tables[tableIdx].sheetMap.enable = true;
@@ -485,7 +490,7 @@ export default {
                 dataColumn: null
             }));
         },
-        // loại những cột được chọn. Được chọn chuyển thành false, nếu xoá chuyển thành true
+        // Sự kiện xảy ra khi thay đổi từng cột thông in trong sheet
         onChangeDetailInfo(tableIdx, controlIdx, value) {
             // trường hợp đổi trực tiếp
             if (value) {
@@ -499,11 +504,9 @@ export default {
                         if(this.tables[tableIdx].controls[controlIdx].dataColumn!=null){
                             if( this.tables[tableIdx].controls[controlIdx].dataColumn.name==arr[j].name){
                                 this.nameColumnDetail[this.nameSheets[i].name][j].enable=true;
-                        
                           }
                         }
                     }
-               
                 }
                  this.tables[tableIdx].controls[controlIdx].dataColumn = value;
                 // trường hợp khi ấn dấu xóa
@@ -515,12 +518,11 @@ export default {
                         if(this.tables[tableIdx].controls[controlIdx].dataColumn!=null){
                             if( this.tables[tableIdx].controls[controlIdx].dataColumn.name==arr[j].name){
                                 this.nameColumnDetail[this.nameSheets[i].name][j].enable=true;
-                        
                           }
                         }
                     }
                 }
-                    this.tables[tableIdx].controls[controlIdx].dataColumn = null;
+                this.tables[tableIdx].controls[controlIdx].dataColumn = null;
             }
         },
 
@@ -531,38 +533,38 @@ export default {
                 if (res.status === 200) {
                     let mapping = JSON.parse(res.data[0].mapping);    
                     mapping = mapping.mapping;
-                // tạo 1 mảng lưu những row được lấy
-                let row = [];
-                let lastNameSheet = [];
-                lastNameSheet.push(mapping.general.sheetMap)
-                this.lastKeyGeneral = {enable:true,index:-1,name:''};
-                this.lastKeyTables =[];
-                if(mapping.general.keyColumn){
-                    this.lastKeyGeneral.enable = mapping.general.keyColumn.enable;
-                    this.lastKeyGeneral.index = mapping.general.keyColumn.index;
-                    this.lastKeyGeneral.name = mapping.general.keyColumn.name;
-                }
-                for (let i = 0; i < mapping.general.controls.length; i++) {
-                    row.push({
-                        controlName:mapping.general.controls[i].name,
-                        nameSheet: mapping.general.sheetMap,
-                        dataColumn:mapping.general.controls[i].dataColumn.name});
-                };
-                if(mapping.tables){
-                    for (let i = 0; i < mapping.tables.length; i++) {
-                        lastNameSheet.push(mapping.tables[i].sheetMap);
-                        if(mapping.tables[i].keyColumn){
-                            let nameLastKeyTables = mapping.tables[i].keyColumn.name
-                            this.lastKeyTables.push({name:nameLastKeyTables, index:-1,enable:false});
-                        }
-                        for(let j = 0; j< mapping.tables[i].controls.length;j++)
-                            row.push({
-                                nameSheet: mapping.tables[i].sheetMap,
-                                controlName:mapping.tables[i].controls[j].name,
-                                dataColumn:mapping.tables[i].controls[j].dataColumn.name
-                            });
-                        }
+                    // tạo 1 mảng lưu những row được lấy
+                    let row = [];
+                    let lastNameSheet = [];
+                    lastNameSheet.push(mapping.general.sheetMap)
+                    this.lastKeyGeneral = {enable:true,index:-1,name:''};
+                    this.lastKeyTables = [];
+                    if(mapping.general.keyColumn){
+                        this.lastKeyGeneral.enable = mapping.general.keyColumn.enable;
+                        this.lastKeyGeneral.index = mapping.general.keyColumn.index;
+                        this.lastKeyGeneral.name = mapping.general.keyColumn.name;
                     }
+                    for (let i = 0; i < mapping.general.controls.length; i++) {
+                        row.push({
+                            controlName:mapping.general.controls[i].name,
+                            nameSheet: mapping.general.sheetMap,
+                            dataColumn:mapping.general.controls[i].dataColumn.name});
+                    };
+                    if(mapping.tables){
+                        for (let i = 0; i < mapping.tables.length; i++) {
+                            lastNameSheet.push(mapping.tables[i].sheetMap);
+                            if(mapping.tables[i].keyColumn){
+                                let nameLastKeyTables = mapping.tables[i].keyColumn.name
+                                this.lastKeyTables.push({name:nameLastKeyTables, index:-1,enable:false});
+                            }
+                            for(let j = 0; j< mapping.tables[i].controls.length;j++)
+                                row.push({
+                                    nameSheet: mapping.tables[i].sheetMap,
+                                    controlName:mapping.tables[i].controls[j].name,
+                                    dataColumn:mapping.tables[i].controls[j].dataColumn.name
+                                });
+                            }
+                        }
                     self.lastTable = row;
                     self.lastNameSheet = lastNameSheet;
                 //hàm tìm sheet theo row
@@ -758,11 +760,11 @@ export default {
     font-size: 13px;
     padding-left: 10px;
 }
+
 .select-type ::v-deep .v-label {
     font-size: 13px!important;
     padding-left: 10px;
     margin-bottom: 5px!important;
-
 }
 
 .auto-complete ::v-deep .v-input__slot:after {
@@ -859,10 +861,5 @@ export default {
     overflow: hidden;
     white-space: nowrap; 
     text-overflow: ellipsis
-}
-</style>
-<style>
-.v-list-item__content{
-    color:black
 }
 </style>

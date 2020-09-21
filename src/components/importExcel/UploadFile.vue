@@ -1,12 +1,10 @@
 <template>
-<div class="flex items-center justify-center w-full h-screen text-center mr-15 ml-3 mr-3">
+<div class="flex items-center justify-center w-full h-screen text-center mr-15 ml-3 mr-3 custom-upload">
     <div v-show="selectType" class="mt-2">
         <uploader 
           :options="options" 
           :autoStart="true"
           @dragover="handleDrop"
-
-          
            @file-success="handleFileUploaded"
           @change="handleChange" 
           ref="upload">
@@ -24,7 +22,7 @@
                     Chọn file
                 </uploader-btn>
                 <v-btn 
-                  v-show ="dem >0" 
+                  v-show ="dem > 0" 
                   color ="error" class="ml-1" 
                   style ="margin-bottom:3px; font-weight: 400; border-radius: 0px !important" 
                   small depressed 
@@ -52,13 +50,11 @@ export default {
           if (val) {
             this.selectType='';
             this.$refs.upload.uploader.cancel();
-           //this.options.query.total = 0;
           }
         },
         selectType(){
           this.clearFiles();
-
-          }
+        }
     },
     data() {
         return {
@@ -72,14 +68,12 @@ export default {
           testChunks: false,
           chunkSize:100*1024*1024,
           query: {
-              key: "",
-              total: 0,
-              documentId:0,
-            
+            key: "",
+            total: 0,
+            documentId:0,
           },
-       
-                headers:{
-                'Authorization': `Bearer ${util.auth.getToken()}`,
+            headers:{
+            'Authorization': `Bearer ${util.auth.getToken()}`,
           },
           autoStart: true,
           //singleFile: true
@@ -95,11 +89,8 @@ export default {
             this.$emit('clearFiles')
         },
         handleFileUploaded(rootFile, file, response, chunk) {
-            // console.log(response);
-            // debugger
             this.$refs.upload.uploader.resume();
             response = JSON.parse(response);
-            // this.$emit('clearFiles');
             this.$emit('dataExcel', response);
             this.$emit('keyUpload', this.options.query.key);
         },
@@ -111,10 +102,8 @@ export default {
             this.options.query.typeImport = this.selectType;
             this.options.query.documentId = this.documentId;
             this.$emit('clearFiles');
-            
         },
         handleChange(event) {
-           // debugger
             this.$refs.upload.uploader.cancel()
             this.options.query.total = event.currentTarget.files.length;
             this.dem = event.currentTarget.files.length;
@@ -122,7 +111,6 @@ export default {
             this.options.query.typeImport = this.selectType;
             this.options.query.documentId = this.documentId;
             this.$emit('clearFiles');
-
         },
     }
 }
@@ -131,36 +119,29 @@ export default {
 .upload-file {
     color: white !important
 }
-
 .btn-upload {
     height: 27px !important;
     border-radius: 0px !important
 }
-</style><style>
-.uploader-file {
+.custom-upload ::v-deep .uploader-file {
     font-size: 13px;
     height: 37px !important;
 }
-
-.uploader-file-icon {
+.custom-upload ::v-deep .uploader-file-icon {
     display: none !important
 }
-
-.uploader-file-name {
+.custom-upload ::v-deep .uploader-file-name {
     display: flex;
     width: 250px !important;
     font-size: 12px;
-
     padding-left: 5px;
     margin-top: -5px
 }
-
-.uploader-file-meta {
+.custom-upload ::v-deep .uploader-file-meta {
     display: none
 }
-
-.uploader-file-size,
-.uploader-file-status {
+.custom-upload ::v-deep .uploader-file-size,
+.custom-upload ::v-deep .uploader-file-status {
     margin-top: -5px
 }
 </style>

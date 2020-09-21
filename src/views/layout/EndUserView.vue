@@ -33,7 +33,6 @@
                     <!-- search -->
                     <div v-show="showSearchInput" class="d-flex justify-center align-items-center">
                         <transition name="slide-fade">
-                            <SearchInput v-show="showSearchInput" class="mr-2" style="width:330px"/>
                         </transition>
                     </div>
                     <v-btn icon @click="showSearchInput = !showSearchInput">
@@ -93,7 +92,6 @@ import {
 } from '../../configs';
 import BASidebar from "@/components/common/BASidebar.vue";
 import listApp from "@/components/common/listApp";
-import Search from "@/components/search/Search";
 import NotificationBar from "@/components/notification/NotificationBar.vue";
 export default {
     
