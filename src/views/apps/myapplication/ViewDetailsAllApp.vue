@@ -1,8 +1,8 @@
 <template>
    <div class="view-details-all-app h-100" style="display:flex">
        <div class="header-view-details-all-app">
-            <h4 style="flex-grow:1"> Danh sách công việc của tôi </h4>
-            <div style="width:500px;display:flex">
+            <h4 style="flex-grow:1;font:15px roboto"> Danh sách công việc của tôi </h4>
+            <div style="width:440px;display:flex">
                 <v-btn
                     class="button-add-task"
                     style="backgound-color:#F7F7F7;margin-8px"
@@ -26,7 +26,7 @@
         <div class="content-view-details-all-app h-100">
            
                 <v-row no-gutters>
-                    <template v-for="(item,i) in dataApps" >
+                    <template v-for="(item,i) in apps" >
                         <v-col cols="6" :key="i">
                         <v-expansion-panels
                             accordion 
@@ -35,26 +35,31 @@
                             <v-expansion-panel
                             >
                             <v-expansion-panel-header>
-                                <v-icon v-if="item.iconType == 'icon'" style="font-size:16px;flex:unset;margin-left:0px;margin-right:0px">{{item.iconName}}</v-icon>
-                                <img v-else-if="item.iconType == 'img'" :src="item.iconName" class="app-item-img"/>
-                                <span style="padding-left:8px">
-                                    {{item.name}}
-                                </span>
+                               <div class="app-title">
+                                    <v-icon v-if="item.iconType == 'icon'" style="font-size:16px;flex:unset;margin-left:0px;margin-right:0px;padding-top:2px">{{item.iconName}}</v-icon>
+                                    <img v-else-if="item.iconType == 'img'" :src="item.iconName" class="app-item-img"/>
+                                    <span style="padding-left:8px">
+                                        {{item.name}}
+                                    </span>
+                               </div>
                                 
                                 </v-expansion-panel-header>
                             <v-expansion-panel-content>
                                 <!-- chi tiet tung app  -->
-                            <v-row no-gutters>
+                                 <v-row no-gutters>
                                     <template v-for="(childItem,n) in item.childrenAppReduce">
                                         <v-col cols="6" :key="n">
-                                            <div>
-                                                 <div>
+                                            <div style="margin-left:-5px">
+                                                 <div >
                                                      <v-icon>{{ childItem.icon }}</v-icon>
-                                                      {{ childItem.title }}
+                                                     <span style="font-weight:200;font:13px">
+                                                          {{ childItem.title  ? childItem.title : childItem.name}}
+                                                     </span>
                                                  </div>
                                                  <div>
                                                     <ul v-for="(subChildItem,k) in childItem.item" :key="k"  class="app-child-item">
                                                             <li
+                                                                v-if="subChildItem.show == true"
                                                                 v-on:contextmenu="rightClickHandler($event,subChildItem,childItem.name)"
                                                             >
                                                                 <div style="position:relative">
@@ -70,7 +75,7 @@
                                                                         <span style="font:13px roboto">{{subChildItem.title}}</span> 
                                                                         <span style="font:8px;opacity:0.4">{{subChildItem.name}}</span>
                                                                     </v-tooltip>
-                                                                    <div v-else v-on:click="rightClickHandler($event,subChildItem,childItem.name)">{{subChildItem.name}}</div>
+                                                                    <div v-else v-on:click="rightClickHandler($event,subChildItem,childItem.name)">{{subChildItem.title ? subChildItem.title : subChildItem.name }}</div>
                                                                     <v-icon  @click="changeFavorite(subChildItem,childItem.name)" :class="{'icon-star-active' : subChildItem.favorite==true, 'icon-star': true}" >mdi-star</v-icon>	
                                                                 </div>
                                                             </li>
@@ -85,7 +90,7 @@
                                         width="100%"
                                         ></v-responsive>
                                     </template>
-                                </v-row>
+                                 </v-row>
                             </v-expansion-panel-content>
                             </v-expansion-panel>
                         </v-expansion-panels>
@@ -108,6 +113,10 @@ export default {
         ContextMenu
     },
     methods:{
+        hideContextMenu(){
+            debugger
+            this.$refs.contextMenu.hide()	
+        },
         rightClickHandler(event,item,type){
 			event.stopPropagation();
 			event.preventDefault();
@@ -183,6 +192,9 @@ export default {
         updateChidrenItem(type,data,idApp){
             let obj = {}
             obj = this[type]
+            data.forEach(function(e){
+                e.show = true
+            })
             obj.item = data
             this.$set(this.apps[idApp].childrenAppReduce,type,obj)
         },
@@ -233,45 +245,53 @@ export default {
         let self = this
            for(let e in this.apps){
                if(self.apps[e].childrenAppReduce.hasOwnProperty('document_definition')){
-                    // console.log(self.apps[e].childrenAppReduce.document_definition.item.length);
-                    self.apps[e].childrenAppReduce.document_definition.item.filter(function(k){
-                        console.log(k,'kkkkk');
-                        // debugger
+                    self.apps[e].childrenAppReduce.document_definition.item.forEach(function(k){
+                        if(value == ""){
+                            k.show = true
+                        }
                         if(k.title.toLowerCase().includes(value.toLowerCase())){
-                            //  debugger
-                            return k
-                            //  self.apps[e].childrenAppReduce.document_definition.item.push(k)
+                            k.show = true
+                        }else{
+                            k.show = false
                         }
                     })
 			    }
                  if(this.apps[e].childrenAppReduce.hasOwnProperty('orgchart')){
-                    // this.appsReduce[e].childrenAppReduce.orgchart.item = []
                     this.apps[e].childrenAppReduce.orgchart.item.filter(function(k){
-                        if(k.title.toLowerCase().includes(value.toLowerCase())){
-                        //    self.appsReduce[e].childrenAppReduce.orgchart.item.push(k)
-                           return k
+                         if(value == ""){
+                            k.show = true
+                        }
+                         if(k.name.toLowerCase().includes(value.toLowerCase())){
+                            k.show = true
+                        }else{
+                            k.show = false
                         }
                     })
 			    }
                  if(this.apps[e].childrenAppReduce.hasOwnProperty('dashboard')){
-                    //  this.appsReduce[e].childrenAppReduce.dashboard.item = []
                     this.apps[e].childrenAppReduce.dashboard.item.filter(function(k){
-                        if(k.title.toLowerCase().includes(value.toLowerCase())){
-                        //    self.appsReduce[e].childrenAppReduce.orgchart.item.push(k)
-                           return k
+                         if(value == ""){
+                            k.show = true
+                        }
+                        if(k.name.toLowerCase().includes(value.toLowerCase())){
+                            k.show = true
+                        }else{
+                            k.show = false
                         }
                     })
 			    }
                  if(this.apps[e].childrenAppReduce.hasOwnProperty('workflow_definition')){
-                    // this.appsReduce[e].childrenAppReduce.workflow_definition.item = []
                     this.apps[e].childrenAppReduce.workflow_definition.item.filter(function(k){
-                        if(k.title.toLowerCase().includes(value.toLowerCase())){
-                        //    self.appsReduce[e].childrenAppReduce.workflow_definition.item.push(k)
-                           return k
+                         if(value == ""){
+                            k.show = true
+                        }
+                         if(k.name.toLowerCase().includes(value.toLowerCase())){
+                            k.show = true
+                        }else{
+                            k.show = false
                         }
                     })
                 }
-                console.log(this.appsReduce,'appsReduceappsReduce');
            }
         },
 
@@ -333,7 +353,6 @@ export default {
              searchItemKey: "",
              apps:{},
              appsReduce:{},
-            //  dataApps:{},
              currentAppId:0,
              arrType:{
                 document_definition:[],
@@ -355,42 +374,20 @@ export default {
     },
     created(){
         this.getActiveapps()
-        // this.dataApps = this.apps
-        // debugger
     },
-    computed:{
-        dataApps(){
-            if(this.searchItemKey != ""){
-                debugger
-                // this.appsReduce = this.apps
-                this.filterObj(this.searchItemKey)
-                return this.apps
-            }else{
-                debugger
-                return this.apps
-            }
-        }
-    },
+  
     mounted(){
-        let self = this
-        $(document).click(function(e){
-            if(!$(e.target).is('.context-menu')){
-                    self.$refs.contextMenu.hide()
-            }
-        })
+        // let self = this
+        // $(document).click(function(e){
+        //     if(!$(e.target).is('.context-menu')){
+        //             self.$refs.contextMenu.hide()
+        //     }
+        // })
     },
     watch:{
-        // searchItemKey(val){
-            // debugger
-            // if(val == ""){
-            //     this.dataApps = this.apps
-            // }else{
-            //      this.appsReduce = this.apps
-            //     this.filterObj(val)
-            //     this.dataApps = this.appsReduce
-            //     debugger
-            // }
-        // }
+        searchItemKey(val){
+                this.filterObj(val)
+        }
     }
 }
 </script>
@@ -413,6 +410,7 @@ export default {
     width:16px;
     height:16px;
     flex:unset;
+    padding-top:2px
     
 }
 .view-details-all-app h4{
@@ -498,5 +496,16 @@ export default {
 }
 .view-details-all-app >>> li:hover .icon-star{
 	display: inline-block;
+}
+.view-details-all-app >>> .v-expansion-panel{
+    box-shadow: unset;
+}
+.view-details-all-app >>> .v-expansion-panel::before{
+    box-shadow: unset;
+}
+.view-details-all-app >>> .v-expansion-panel-header--active .app-title {
+    border-bottom: 1px solid #FF8003;
+    padding-bottom:4px;
+	/* display: inline-block; */
 }
 </style>

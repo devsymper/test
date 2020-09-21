@@ -10,6 +10,9 @@ const setFilter = (state, item) => {
     Vue.set(state, 'filter', item);
 }
 
+const setStatusPopupTracking= (state, item) => {
+    Vue.set(state, 'statusPopupTracking', item);
+}
 const setArrDocObjId = (state, arrDocObjId) => {
     Vue.set(state, 'arrDocObjId', arrDocObjId);
 }
@@ -27,6 +30,7 @@ export {
     addToListAttachStore,
     setFilter,
     removeFileAttachToStore,
-    setArrDocObjId
+    setArrDocObjId,
+    setStatusPopupTracking
 
 };

@@ -54,7 +54,14 @@ const getSDocumentEditorStore = function(instance) {
 const getListInputInDocument = function(instance) {
     return getSDocumentSubmitStore(instance).listInputInDocument;
 }
-
+const mapTypeToEffectedControl = {
+    link: "effectedLinkControl",
+    formulas: "effectedControl",
+    readOnly: "effectedReadonlyControl",
+    hidden: "effectedHiddenControl",
+    require: "effectedRequireControl",
+    validate: "effectedValidateControl",
+}
 const currentSelectedControl = function(instance) {
     return getSDocumentEditorStore(instance).currentSelectedControl;
 }
@@ -185,5 +192,6 @@ export {
     getSDocumentSubmitStore,
     getListInputInDocument,
     checkNameControl,
-    checkTitleControl
+    checkTitleControl,
+    mapTypeToEffectedControl
 }

@@ -1,5 +1,5 @@
 <template>
-   <v-card class="context-menu" v-show="isShowContext" :style="{top:top+'px',left:left+'px'}">
+   <v-card class="context-menu" v-show="isShowContext" >
 		<div class="item" v-for="(action,i) in listAction" :key="i" @click="clickAction(action)">
 				<span v-html="reduce(action)"></span>
 				<!-- {{$t('apps.listActions')}} -->
@@ -8,6 +8,7 @@
 </template>
 <script>
 import {appManagementApi} from './../../api/AppManagement.js'
+import { util } from "../../plugins/util";
 export default {
     data: () => ({
 		isShowContext:false,
@@ -48,9 +49,33 @@ export default {
 			this.hide()
 		},
 		show(e){
+			debugger
+			var windowHeight = $(window).height()/2;
+			var windowWidth = $(window).width()/2;
 			this.isShowContext = true;
-			this.top = event.pageY;
-			this.left = event.pageX;
+			// this.top = event.pageY;
+			// this.left = event.pageX;
+			if(e.clientY > windowHeight && e.clientX <= windowWidth) {
+				$(".context-menu").css("left", e.clientX);
+				$(".context-menu").css("bottom", $(window).height()-e.clientY);
+				$(".context-menu").css("right", "auto");
+				$(".context-menu").css("top", "auto");
+				} else if(e.clientY > windowHeight && e.clientX > windowWidth) {
+				$(".context-menu").css("right", $(window).width()-e.clientX);
+				$(".context-menu").css("bottom", $(window).height()-e.clientY);
+				$(".context-menu").css("left", "auto");
+				$(".context-menu").css("top", "auto");
+				} else if(e.clientY <= windowHeight && e.clientX <= windowWidth) {
+				$(".context-menu").css("left", e.clientX);
+				$(".context-menu").css("top", e.clientY);
+				$(".context-menu").css("right", "auto");
+				$(".context-menu").css("bottom", "auto");
+				} else {
+				$(".context-menu").css("right", $(window).width()-e.clientX);
+				$(".context-menu").css("top", e.clientY);
+				$(".context-menu").css("left", "auto");
+				$(".context-menu").css("bottom", "auto");
+			}
 			$('#symper-app').append(this.$el);
 		},
 		hide(){
@@ -117,6 +142,9 @@ export default {
 	width: 170px;
 	font:13px roboto;
 	background-color: #fff;
+	-webkit-box-shadow: 2px 0px 24px 0px rgba(0,0,0,0.75);
+	-moz-box-shadow: 2px 0px 24px 0px rgba(0,0,0,0.75);
+	box-shadow: 2px 0px 24px 0px rgba(0,0,0,0.75);
 }
 .context-menu >>> .item{
 	padding: 8px 10px;
@@ -124,6 +152,7 @@ export default {
 	cursor: pointer;
 	color: black;
 	text-align: left;
+	border-bottom:unset;
 }
 .context-menu >>> .item:hover{
 	background: #f7f7f7;

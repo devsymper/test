@@ -46,17 +46,21 @@ import AppDetail from './../AppDetail.vue'
     components:{
         AppDetail,
     },
-    mounted(){ 
-            let self = this
-        	$(document).click(function(e){
-				if(!$(e.target).is('.context-menu')){
-                    self.$refs.appDetail.hideContextMenu()		
-				}
-			})
-    },
+    // mounted(){ 
+    //         let self = this
+    //     	$(document).click(function(e){
+	// 			if(!$(e.target).is('.context-menu')){
+    //                 self.$refs.appDetail.hideContextMenu()		
+	// 			}
+	// 		})
+    // },
     methods:{
         changeView(){
             this.$store.commit('appConfig/changeTypeView')
+        },
+        hideContextMenu(){
+            debugger
+            this.$refs.appDetail.hideContextMenu()	
         },
         getActiveapps(){
 			appManagementApi.getActiveApp().then(res => {
