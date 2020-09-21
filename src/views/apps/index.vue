@@ -98,25 +98,37 @@ export default {
 										Handsontable.dom.empty(td);
 										span = document.createElement('span')
 										if(value === "1"){
-											// icon = document.createElement('i');
-											// icon.classList.add('mdi');
-											// icon.classList.add('mdi-check');
-											// $(icon).css('color','green')
-											// $(icon).css('font-size','16px')
-											// td.appendChild(icon);
-											// return td;
+											
 											$(span).text('Kích hoạt')
-											// $(span).text(self.$t('apps.active'))
 										}else{
 												$(span).text('Không kich hoạt')
-												// $(span).text(self.$t('apps.notActive'))
 										}
 										td.appendChild(span);
 										return td
 									},
 								},
-                                {name: "createdAt", title: "created_at", type: "text"},
-                                {name: "updatedAt", title: "updated_at", type: "text"},
+								{name: "createdAt", title: "created_at", type: "text",
+									renderer:  function(instance, td, row, col, prop, value, cellProperties) {
+										let span;
+										Handsontable.dom.empty(td);
+										span = document.createElement('span')
+										let newValue = value.slice(0,value.length-3)
+											$(span).text(newValue)
+										td.appendChild(span);
+										return td
+									},
+								},
+								{name: "updatedAt", title: "updated_at", type: "text",
+									renderer:  function(instance, td, row, col, prop, value, cellProperties) {
+											let span;
+											Handsontable.dom.empty(td);
+											span = document.createElement('span')
+											let newValue = value.slice(0,value.length-3)
+												$(span).text(newValue)
+											td.appendChild(span);
+											return td
+										},
+								},
                          ],
                    }
                 }

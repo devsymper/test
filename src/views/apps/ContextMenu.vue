@@ -1,6 +1,6 @@
 <template>
    <v-card class="context-menu" v-show="isShowContext" >
-		<div class="item" v-for="(action,i) in listAction" :key="i" @click="clickAction(action)">
+		<div class="item" v-for="(action,i) in listAction" :key="i" @click="clickAction(action,sideBySide)">
 				<span v-html="reduce(action)"></span>
 		</div>
    </v-card>
@@ -41,6 +41,12 @@ export default {
 	}),
 	created(){
 		let self = this
+	},
+	props:{
+		sideBySide:{
+			type: Boolean,
+			default: false
+		}
 	},
 	methods:{
 		clickRow(item){
@@ -89,7 +95,7 @@ export default {
 		setType(type){
 			this.type = type
 		},
-		clickAction(action){
+		clickAction(action,sideBySide = false){
 			let appId = this.$store.state.appConfig.currentAppId
 			this.defineAction[this.type].action = action;
 			this.hide()
@@ -105,6 +111,7 @@ export default {
 			if(this.targetItem.objectIdentifier.includes("workflow_definition:")){
 				this.targetItem.id = this.targetItem.objectIdentifier.replace("workflow_definition:","")
 			}
+				let targetItem = this.targetItem
 			if(action == 'unfavorite'){
 				    let userId = this.$store.state.app.endUserInfo.id
 					appManagementApi.addFavoriteItem(userId,this.targetItem.id,this.type,0).then(res => {
@@ -112,20 +119,22 @@ export default {
 						this.$store.commit('appConfig/delFavorite',this.targetItem)
 					}
 					});
+			}
+			if(sideBySide == true){
+				this.$store.commit('AppConfig/updateActionDef', this.defineAction[this.type])
+				this.$store.commit('AppConfig/updateParam', {id:targetItem.id,name:targetItem.name,title:targetItem.title,appId:appId })
 			}else{
-				let targetItem = this.targetItem
 				this.$evtBus.$emit('symper-app-call-action-handler', this.defineAction[this.type], this, {id:targetItem.id,name:targetItem.name,title:targetItem.title,appId:appId });
+
 			}
 		},
 		reduce(action){
-
 			let str = this.type.concat('.').concat(action)
 			let nameIcon = this.$t('actions.iconListActions.'+str)
 			let icon =	` <i class="mdi ${nameIcon}" style="padding-right:5px"></i>`
 			let name = this.$t('actions.listActions.'+str)
 			let res = icon.concat(name)
 			return res
-			
 		}
 	}
 }

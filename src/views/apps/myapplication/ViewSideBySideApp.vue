@@ -35,7 +35,7 @@
                         append-icon="mdi-magnify"
                         v-model="searchKey"
                     ></v-text-field>
-                <AppDetail ref="appDetail"  :isMyApplication="true" :isEndUserCpn="true" :searchKey="searchKey" />
+                <AppDetail ref="appDetail"  :isMyApplication="true" :isEndUserCpn="true" :searchKey="searchKey" :sideBySide="true" />
           </div>
          <div v-else class="favorite-area-item">
               <h4>Danh sách yêu thích</h4>
@@ -51,7 +51,10 @@
                     </ul>
                 </VuePerfectScrollbar>
          </div>
-        <ContextMenu ref="contextMenu" />
+        <ContextMenu ref="contextMenu" :sideBySide="true" />
+       </div>
+       <div class="action-area h-100 w-100">
+            <SymperActionView :actionDef="actionDef" :param="param" />
        </div>
    </div>
 </template>
@@ -61,21 +64,28 @@ import {appManagementApi} from '@/api/AppManagement.js';
 import AppDetail from './../AppDetail.vue'
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import ContextMenu from './../ContextMenu.vue'
+import SymperActionView from '@/action/SymperActionView.vue'
     export default {
     created(){
         this.getActiveapps()
-            this.getFavorite()
-        
+        this.getFavorite()
     },
     components:{
         AppDetail,
         VuePerfectScrollbar,
-        ContextMenu
+        ContextMenu,
+        SymperActionView
     },
     computed:{
         sFavorite(){
 			return this.$store.state.appConfig.listFavorite
-		}
+        },
+        actionDef(){
+             return this.$store.state.appConfig.actionDef
+        },
+        param(){
+             return this.$store.state.appConfig.param
+        }
     },
     methods:{
         rightClickHandler(event,item,type){
@@ -99,7 +109,6 @@ import ContextMenu from './../ContextMenu.vue'
 			let self = this 
 			let userId = this.$store.state.app.endUserInfo.id
 			appManagementApi.getItemFavorite(userId).then(res =>{
-                    debugger
 				if (res.status == 200) {
 					res.data.listObject.forEach(function(e){
 						if(e.objectType == 'document_definition'){
@@ -169,7 +178,6 @@ x				}
 						this.updateActionItem(self.mapIdFavorite.orgchart,res.data,'orgchart')
 						res.data.forEach(function(e){
                             self.listFavorite.push(e)
-                            debugger
 						})
 					}
 				}
@@ -373,6 +381,15 @@ x				}
                 }
             },
         }
+    },
+    watch:{
+         actionDef: {
+            deep: true,
+            immediate: true,
+            handler(newValue){
+                debugger
+            }
+        }
     }
 }
 </script>
@@ -393,7 +410,7 @@ x				}
 
 .view-side-by-side-apps .list-apps{
     padding-top:12px;
-    width:170px;
+    width:220px;
     border-right:1px solid lightgray;
     position: relative;
 }

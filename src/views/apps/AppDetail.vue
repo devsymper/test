@@ -45,7 +45,7 @@
 					</ul>
 			</div>	
 		</VuePerfectScrollbar>
-		<ContextMenu ref="contextMenu" />	
+		<ContextMenu ref="contextMenu" :sideBySide="sideBySide" />	
   </div>
 </template>
 <script>
@@ -125,6 +125,10 @@ export default {
 			default:"",
 		},
 		isMyApplication:{
+			type: Boolean,
+			default: false
+		},
+		sideBySide:{
 			type: Boolean,
 			default: false
 		}

@@ -29,7 +29,6 @@
                     <template v-for="(item,i) in apps" >
                         <v-col cols="6" :key="i">
                         <v-expansion-panels
-                            accordion 
                             v-model="panel"
                             multiple
                         >
@@ -347,7 +346,7 @@ export default {
                 name: 'workflow_definition',
                 item: []
             },
-             panel: [0,1,2,3],
+             panel: [],
              menuItemsHeight: 'calc(100vh - 125px)',
              searchItemKey: "",
              apps:{},
@@ -418,7 +417,7 @@ export default {
 .view-details-all-app .button-add-task{
     margin:0px 12px;
     box-shadow: unset;
-    height:30px;
+    height:32px;
     min-width: unset;
     padding:unset;
     width: 110px;
