@@ -51,16 +51,16 @@ export default class ClientSQLManager {
     static run(keyInstance, sql, isWithoutReturn = false) {
         let db = this.getInstanceDB(keyInstance);
         if (isWithoutReturn) {
-
+            console.log(sql);
             return db.run(sql);
         } else {
             return db.exec(sql);
         }
     }
 
-    static createTable(keyInstance, tableName, columns, temporary = "", columnInsert, dataInsert = false, returnPromise = false) {
+    static createTable(keyInstance, tableName, columns, temporary = "", columnInsert = false, dataInsert = false, returnPromise = false) {
         let sql = `CREATE ${temporary} TABLE IF NOT EXISTS ${tableName} (${columns});`;
-        if (dataInsert != false) {
+        if (dataInsert != false && columnInsert != false) {
             sql += `INSERT INTO ${tableName} (${columnInsert}) VALUES ${dataInsert};`
         }
         // this.run(keyInstance, sql, true);
@@ -79,7 +79,7 @@ export default class ClientSQLManager {
         // console.log(this.run(keyInstance, 'select * from this_document', false));
 
     }
-    static async insertDataToTable(tableName, columns, data, returnPromise = false) {
+    static async insertDataToTable(keyInstance, tableName, columns, data, returnPromise = false) {
         let sql = `INSERT INTO ${tableName} (${columns}) VALUES ${data}`;
         if (returnPromise) {
             return new Promise((resolve, reject) => {
@@ -126,7 +126,6 @@ export default class ClientSQLManager {
         tbValue = tbValue.trim()
         tbValue = tbValue.substring(0, tbValue.length - 1);
         let sql = `INSERT INTO ${tableName} (${tbColumn}) VALUES(${tbValue})`;
-        console.log('checkid sql', sql);
         if (returnPromise) {
             return new Promise((resolve, reject) => {
                 try {

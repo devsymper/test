@@ -11,54 +11,53 @@ export default {
     data(){
         return {
             positionBox:{'top':0,'left':0},
-            indexActive:-1,
+            indexActive:0,
             curInput:null,
             isShowPopup:false,
-            times:null
+            times:null,
+            controlName:""
         }
     },
     methods:{
         show(e){
             this.isShowPopup = true;
-            this.curInput = $(e.target);
-            this.calculatorPositionBox(e);
+            this.curInput = $(e.curTarget);
+            this.calculatorPositionBox();
             this.setEventInput(e);
         },
         hide(){
-            this.isShowPopup = false;
+            if(this.isShowPopup){
+                this.isShowPopup = false;
+                this.curInput.removeAttr('contenteditable');
+            }
+            
         },
         setEventInput(e){
             let thisCpn = this;
-            this.curInput = $(e.target);
-            this.curInput.off('keyup');
-            this.curInput.on('keyup',function(event){
+            this.controlName = e.controlName
+            this.curInput.off('keydown');
+            this.curInput.on('keydown',function(event){
                 event.controlName = e.controlName;
-                thisCpn.handlerKeyDown(event);
+                thisCpn.handlerKeyUp(event);
             })
         },
-        calculatorPositionBox(e){
-            if($(e.target).closest('.handsontable').length > 0 ){
+        // tính toán vị trí của box timepicker 
+        calculatorPositionBox(){
+            if(this.curInput.closest('.handsontable').length > 0 ){
                 let autoEL = $(this.$el).detach();
-                $(e.target).closest('.wrap-table').append(autoEL);
-                let edtos = $(e.target).offset();
-                if(!$(e.target).is('.handsontableInput')){
-                    edtos = $(e.target).closest('td.htAutocomplete.current.highlight').offset();
-                }
-                if($(e.target).is('div.htAutocompleteArrow')){
-                    edtos = $(e.target).parent().offset();;
-                }
-                
-                let tbcos = $(e.target).closest('.wrap-table').find('[s-control-type="table"]').offset();
-                this.positionBox = {'top':edtos.top - tbcos.top + $(e.target).height() +'px','left':edtos.left - tbcos.left+'px'};
+                this.curInput.closest('.wrap-table').append(autoEL);
+                let edtos = this.curInput.offset();
+                let tbcos = this.curInput.closest('.wrap-table').find('[s-control-type="table"]').offset();
+                this.positionBox = {'top':edtos.top - tbcos.top + this.curInput.height() + 2 +'px','left':edtos.left - tbcos.left+'px'};
             }
             //nêu là ngoài bảng
             else{
                 let autoEL = $(this.$el).detach();
-                $(e.target).parent().append(autoEL);
-                this.positionBox = {'top':'0px','left':'0px'};
+                this.curInput.parent().append(autoEL);
+                this.positionBox = {'top':this.curInput.height()+2+'px','left':'0px'};
             }
         },
-        handlerKeyDown(e){
+        handlerKeyUp(e){
             if(e.keyCode == 38){    //len
                 if(this.indexActive == 0){
                     return false;
@@ -89,12 +88,13 @@ export default {
         },
     
         handleClickRow(item){
-            this.curInput.off('keyup');
+            this.curInput.off('keydown');
             this.$emit('apply-time-selected',{input:this.curInput,value:item.time});
             if(this.indexActive != -1)
             this.times[this.indexActive].active = false;
             this.indexActive = this.times.indexOf(item);
             item.active = true;
+            this.$emit('after-check-input-time-valid',{input:this.curInput,controlName: this.controlName,isValid:true});   
             this.hide();
         },
         checkValidTime(e){
@@ -103,12 +103,12 @@ export default {
             if(regex.test(this.curInput.val())){
                 isValid = true;
             }
-            this.$emit('after-check-input-time-valid',{input:this.curInput,controlName: e.controlName,isValid:isValid});      
+            this.$emit('after-check-input-time-valid',{input:this.curInput,controlName: e.controlName,isValid:isValid,event:e});      
         }
     },
     beforeMount(){
         this.times = [
-            {"time":"12:00 AM","active":false},{"time":"12:30 AM","active":false},{"time":"1:00 AM","active":false},
+            {"time":"0:00 AM","active":true},{"time":"0:30 AM","active":false},{"time":"1:00 AM","active":false},
             {"time":"1:30 AM","active":false},{"time":"2:00 AM","active":false},{"time":"2:30 AM","active":false},
             {"time":"3:00 AM","active":false},{"time":"3:30 AM","active":false},{"time":"4:00 AM","active":false},
             {"time":"4:30 AM","active":false},{"time":"5:00 AM","active":false},{"time":"5:30 AM","active":false},
@@ -144,6 +144,10 @@ export default {
         height: auto;
         max-height: 300px;
         overflow: auto;
+        position: absolute;
+        width: 120px;
+        background: white;
+        z-index: 99999;
     }
     .active-item{
         background: #dadada !important;

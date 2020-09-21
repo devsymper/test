@@ -1,8 +1,14 @@
 import bpmnApi from "./../../api/BPMNEngine";
-import { util } from "../../plugins/util";
-import { documentApi } from "../../api/Document";
+import {
+    util
+} from "../../plugins/util";
+import {
+    documentApi
+} from "../../api/Document";
 import BPMNEngine from "./../../api/BPMNEngine";
-import { SYMPER_APP } from "@/main.js";
+import {
+    SYMPER_APP
+} from "@/main.js";
 
 function moveTaskTitleToNameAttr(content, configValue) {
     for (let idEl in configValue) {
@@ -51,6 +57,16 @@ function cleanContent(content, configValue) {
             rsl = rsl.replace(element, "</" + element.split(':')[1]);
         }
     });
+
+    // Thay đổi các ký tự trong CDATA thành các ký tự chưa mã hóa
+    symperMatches = rsl.match(/<!\[CDATA\[(.*?)\]\]>/g);
+    if (symperMatches) {
+        symperMatches.forEach(cdataStr => {
+            let newCdataStr = cdataStr.replace(/&lt;/g, '<').replace(/&gt;/g, '>');
+            rsl = rsl.replace(cdataStr, newCdataStr);
+        });
+    }
+
     return rsl;
 }
 

@@ -22,7 +22,6 @@ export default class ActionControl extends Control {
             }
 
         } else {
-            // console.log('sầ', this.controlFormulas.submit.instance);
             this.ele.addClass('d-none');
         }
     }
@@ -33,21 +32,32 @@ export default class ActionControl extends Control {
             documentApi.getListApprovalHistory(this.value).then(res => {
                     if (res.status == 200) {
                         let data = res.data;
-                        $.each(data, function(k, v) {
-                            userApi.getDetailUser(v.userId).then(res => {
-                                    if (res.status == 200) {
-                                        let user = res.data.user;
-                                        let item = `<div class="approved-item">
-                                    <span>Người duyệt 1: </span> <strong>` + user.displayName + `</strong> <span>đã duyệt ` + moment(v.createAt).fromNow() + ` ( ` + v.createAt + ` )</span>
-                                </div>`
-                                        thisCpn.ele.append(item)
-                                    }
-                                })
-                                .catch(err => {
+                        if (data.length == 0) {
+                            thisCpn.ele.hide()
+                        } else {
+                            console.log("theanhcheckxem", data);
+                            $.each(data, function(k, v) {
+                                userApi.getDetailUser(v.userId).then(res => {
+                                        if (res.status == 200) {
+                                            let user = res.data.user;
+                                            let item = `<div class="approved-item">
+                                                            <span>Người duyệt 1: </span>  <img src="https://file.symper.vn/readFile/user_avatar_` + user.id + `" style="    height: 18px;
+                                                            border-radius: 50%;
+                                                            width: 18px;
+                                                            margin-bottom: -4px;"> <strong>` + user.displayName + `</strong> <span>đã duyệt ` + moment(v.createAt).fromNow() + ` ( ` + v.createAt + ` )</span>
+                                                        </div>`
+                                            thisCpn.ele.append(item)
+                                        }
+                                    })
+                                    .catch(err => {
 
-                                })
-                                .always(() => {});
-                        })
+                                    })
+                                    .always(() => {});
+                            })
+                        }
+
+                    } else {
+                        thisCpn.ele.hide()
                     }
 
                 })

@@ -31,6 +31,7 @@ const defaultState = {
                     name: {},
                     display: {},
                     print: {},
+                    table: {},
 
                 },
                 formulas: {
@@ -40,7 +41,8 @@ const defaultState = {
                 id: ""
             },
             listControlTreeData: [],
-            allControlForTableOption: []
+            allControlForTableOption: [],
+            listDataFlow: []
         }
     },
     submit: {
@@ -56,12 +58,12 @@ const defaultState = {
             rootChangeFieldName: null,
             //biến phục vụ cho autocomplete trong table
             currentTableInteractive: null, //chỉ ra table đang được tương tác
-            currentCellSelected: null, // chỉ ra cell đang nhập
+            currentControlActive: null, // biến chỉ ra control nào đang active
             currentControlAutoComplete: null, // biến chỉ ra control nào đang autocomplete
             submitFormulas: null,
             listUser: null,
             localRelated: {},
-            workflowVariable: {},
+            workflowVariable: {}, // các tham số của workflow khi submit doc
             currentControlEditByUser: null,
             autocompleteData: { // lưu lại các giá trị của autocomplete khi đã gõ
                 controlName: {
@@ -72,7 +74,11 @@ const defaultState = {
                         }
                     }
                 }
-            }
+            },
+            orgchartTableSqlName: {}, // biến lưu lại tên các bảng sqlite được tạo ra sau khi chạy công thức orgchart  
+            tableLoaded: {},
+            readyLoaded: false, // biến đánh dấu công thức đã chạy xong mỗi lần thực thi hay chưa
+            listTableRootControl: {}, // biến lưu lại các controk được coi là root trong trong table (trường hợp công thức ko có đầu vào thì là root)
         }
     },
     detail: {

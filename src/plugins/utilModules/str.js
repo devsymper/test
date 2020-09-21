@@ -36,6 +36,7 @@ export const str = {
         str = str.replace(/ò|ó|ọ|ỏ|õ|ô|ồ|ố|ộ|ổ|ỗ|ơ|ờ|ớ|ợ|ở|ỡ/g, "o");
         str = str.replace(/ù|ú|ụ|ủ|ũ|ư|ừ|ứ|ự|ử|ữ/g, "u");
         str = str.replace(/ỳ|ý|ỵ|ỷ|ỹ/g, "y");
+        str = str.replace(/[^a-zA-Z0-9 _]/g, "");
         str = str.replace(/đ/g, "d");
         str = str.replace(/\s+/g, "_");
 
@@ -58,5 +59,34 @@ export const str = {
         str = str.replace(/_/g, ' ');
         str = str[0].toUpperCase() + str.slice(1);
         return str;
+    },
+
+    toSnakeCase(inputString) {
+        return inputString.split('').map((character) => {
+                if (character == character.toUpperCase()) {
+                    return '_' + character.toLowerCase();
+                } else {
+                    return character;
+                }
+            })
+            .join('');
+    },
+
+    hashCode(str) {
+        if (Array.prototype.reduce) {
+            return str.split("").reduce(function(a, b) { a = ((a << 5) - a) + b.charCodeAt(0); return a & a }, 0);
+        } else {
+
+            var hash = 0,
+                i, chr, len;
+            if (str.length == 0) return hash;
+            for (i = 0, len = str.length; i < len; i++) {
+                chr = str.charCodeAt(i);
+                hash = ((hash << 5) - hash) + chr;
+                hash |= 0; // Convert to 32bit integer
+            }
+            return hash;
+        }
     }
+
 }

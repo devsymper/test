@@ -7,6 +7,7 @@ var numbro = require("numbro");
 import moment from "moment-timezone";
 
 import { userApi } from "./../../../api/user.js";
+import { documentApi } from "../../../api/Document";
 let listInputInDocument = sDocument.state.submit.listInputInDocument;
 const fileTypes = {
     'xlsx': 'mdi-microsoft-excel',
@@ -29,7 +30,7 @@ const fileTypes = {
     '3gv': 'mdi-file-video-outline',
 
     'jpg': 'mdi-file-image',
-    png: 'mdi-file-image',
+    'png': 'mdi-file-image',
     'gif': 'mdi-file-image',
     'svg': 'mdi-file-image',
 
@@ -46,16 +47,15 @@ export default class BasicControl extends Control {
         super(idField, ele, controlProps, curParentInstance, value);
         this.minValue = (this.controlProperties.hasOwnProperty('minValue')) ? this.controlProperties.minValue.value : false;
         this.maxValue = (this.controlProperties.hasOwnProperty('maxValue')) ? this.controlProperties.maxValue.value : false;
+        this.colIndex = -1;
     }
 
 
     render() {
         let thisObj = this;
-        this.ele.wrap('<span style="position:relative;display:inline-block;">');
+        this.ele.wrap('<span style="position:relative;display:inline-block">');
         this.ele.attr('key-instance', this.curParentInstance);
-        if (!this.checkDetailView()) {
-            this.ele.css({ color: 'blue' })
-        }
+
         // if (this.checkDetailView() &&
         //     this.controlProperties['isSaveToDB'] !== undefined &&
         //     (this.controlProperties['isSaveToDB'].value !== "1" ||
@@ -125,15 +125,60 @@ export default class BasicControl extends Control {
         }
 
         if (this.checkDetailView()) {
-            this.ele.addClass('detail-view');
+            // this.ele.addClass('detail-view');
             this.ele.attr('disabled', 'disabled');
         }
         if (sDocument.state.viewType[this.curParentInstance] != 'submit') {
             this.setValueControl();
         }
+        if (sDocument.state.viewType[this.curParentInstance] == 'submit') {
+            this.setDefaultValue();
+        }
         this.setEvent();
+        if (this.checkProps('isQuickSubmit') && this.checkEmptyFormulas('autocomplete')) {
+            let allTable = this.controlFormulas.autocomplete.instance.autocompleteDetectTableQuery();
+            let columnBinding = this.controlFormulas.autocomplete.instance.autocompleteDetectAliasControl(false);
+            this.columnBindingSubForm = columnBinding;
+            if (allTable !== false) {
+                let table = allTable[0];
+                documentApi.getDetailDocumentByName({ name: table }).then(res => {
+                        if (res.status == 200) {
+                            let documentId = res.data.id;
+                            this.renderSubformButton(documentId);
+                        }
 
+                    }).catch(err => {
+
+                    })
+                    .always(() => {});
+            }
+        }
     }
+
+    /**
+     * Trường hợp có điền vào giá trị defaul trong editor thì gọi hàm này để set giá trị
+     */
+    setDefaultValue() {
+        if (['submit', 'update'].includes(sDocument.state.viewType[this.curParentInstance]) &&
+            this.controlProperties['defaultValue'] != undefined) {
+            this.value = this.controlProperties['defaultValue'].value;
+            this.setValueControl();
+        }
+    }
+
+
+    /**
+     * sử dụng cho trường hợp control nằm trong bảng
+     * Hàm chỉ ra control nằm ở vị trí cột nào trong bảng
+     * @param {*} index 
+     */
+    setColIndexInTable(index) {
+        this.colIndex = index
+    }
+
+    /**
+     * Hàm kiểm tra control có công thức autocomplete hay không
+     */
     checkAutoCompleteControl() {
         if (this.controlFormulas.hasOwnProperty('autocomplete') && this.controlFormulas.autocomplete.instance != undefined) {
             return true;
@@ -156,11 +201,47 @@ export default class BasicControl extends Control {
                 }
             }
         })
+        this.ele.on('focus', function(e) {
+                store.commit("document/addToDocumentSubmitStore", {
+                    key: 'rootChangeFieldName',
+                    value: thisObj.name,
+                    instance: thisObj.curParentInstance
+                });
+            })
+            // this.ele.on('keydown', function(e) {
+            //     if (thisObj.type == 'number') {
+            //         console.log(e.key);
+
+        //         if (['ArrowRight', 'ArrowLeft', 'Tab'].includes(e.key)) {
+        //             return;
+        //         }
+        //         if (!/\d/.test(e.key)) {
+        //             e.preventDefault();
+        //             e.stopPropagation()
+        //         }
+        //     }
+        // })
         this.ele.on('keyup', function(e) {
             if (thisObj.type == 'user') {
+                e.curTarget = e.target
                 SYMPER_APP.$evtBus.$emit('document-submit-user-input-change', e)
             }
-            if (thisObj.checkAutoCompleteControl()) {
+            if (thisObj.type == 'percent') {
+                if (e.target.value > 100) {
+                    $(e.target).val(100)
+                }
+            }
+            if (thisObj.type == 'department') {
+                e['controlName'] = thisObj.name;
+                SYMPER_APP.$evtBus.$emit('document-submit-department-key-event', {
+                    e: e,
+                    formulasInstance: thisObj.controlFormulas.autocomplete.instance,
+                    controlTitle: thisObj.title,
+                    controlName: thisObj.name,
+                    val: $(e.target).val()
+                })
+            }
+            if (thisObj.checkAutoCompleteControl() && thisObj.type != 'department') {
                 let fromSelect = false;
                 let formulasInstance = (fromSelect) ? thisObj.controlFormulas.formulas.instance : thisObj.controlFormulas.autocomplete.instance;
                 e['controlName'] = thisObj.controlProperties.name.value;
@@ -182,15 +263,19 @@ export default class BasicControl extends Control {
                 SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-key-event', {
                     e: e,
                 })
+                SYMPER_APP.$evtBus.$emit('document-submit-department-key-event', {
+                    e: e,
+                })
             }
 
         })
         this.ele.on('click', function(e) {
             store.commit("document/addToDocumentSubmitStore", {
-                key: 'currentCellSelected',
-                value: null,
+                key: 'docStatus',
+                value: 'input',
                 instance: thisObj.curParentInstance
             });
+
             store.commit("document/addToDocumentSubmitStore", {
                 key: 'currentTableInteractive',
                 value: null,
@@ -202,7 +287,11 @@ export default class BasicControl extends Control {
             } else if (thisObj.type == 'inputFilter') {
                 e.formulas = thisObj.controlFormulas.formulas;
                 SYMPER_APP.$evtBus.$emit('document-submit-filter-input-click', e)
+            } else if (thisObj.type == 'time') {
+                e.curTarget = e.target
+                SYMPER_APP.$evtBus.$emit('document-submit-show-time-picker', e)
             }
+
         })
 
 
@@ -216,21 +305,30 @@ export default class BasicControl extends Control {
             } else if (this.type == 'date') {
                 $('#' + this.id).val(moment(value).format(this.formatDate));
             } else if (this.type == 'number') {
-                if (typeof value == 'number')
+                let v = parseInt(value);
+                if (!isNaN(v))
                     $('#' + this.id).val(numbro(value).format(this.numberFormat))
             } else {
                 $('#' + this.id).val(value);
             }
 
         }
+        if (sDocument.state.submit[this.curParentInstance].docStatus == 'init') {
+            this.defaultValue = value;
+        }
+
 
     }
     getValue() {
         return this.value;
     }
 
+
     setValueControl() {
         let value = this.value
+        if (value == null) {
+            return;
+        }
         if (this.type == 'percent') {
             value *= 100
         } else if (this.type == 'number') {
@@ -245,7 +343,33 @@ export default class BasicControl extends Control {
         } else {
             this.ele.val(value)
         }
+        this.ele.attr('value', value);
+        if (sDocument.state.submit[this.curParentInstance].docStatus == 'init') {
+            this.defaultValue = value;
+        }
     }
+
+    /**
+     * Hàm append thêm button + vào sau input trường hợp control có đánh dấu là có sub form submit
+     */
+    renderSubformButton(subFormId) {
+        if (this.inTable == false) {
+            let thisObj = this;
+            this.ele.parent().append('<span class="mdi mdi-plus add-subform-btn"></span>');
+            this.ele.parent().off('click', '.add-subform-btn')
+            this.ele.parent().on('click', '.add-subform-btn', function(e) {
+                store.commit("document/addToDocumentSubmitStore", {
+                    key: 'controlOpenSubform',
+                    value: thisObj,
+                    instance: thisObj.curParentInstance
+                });
+                SYMPER_APP.$evtBus.$emit('document-submit-open-subform', { docId: subFormId, instance: thisObj.curParentInstance })
+            })
+        } else {
+
+        }
+    }
+
     renderFileControl = function() {
         let fileHtml = this.genFileView();
         this.ele.css('width', 'unset').css('cursor', 'pointer').css('height', '25px').css('vertical-align', 'middle').html(fileHtml);
@@ -392,10 +516,26 @@ export default class BasicControl extends Control {
         this.ele.attr('type', 'text');
         this.numberFormat = (this.controlProperties.hasOwnProperty('formatNumber')) ? this.controlProperties.formatNumber.value : "";
         this.ele.on('blur', function(e) {
-            $(this).val(numbro($(this).val()).format(thisObj.numberFormat))
+            if ($(this).val() == "") {
+                thisObj.ele.removeClass('error');
+                thisObj.ele.removeAttr('valid');
+            } else {
+                if (/^[-0-9,.]+$/.test($(this).val())) {
+                    $(this).val(numbro($(this).val()).format(thisObj.numberFormat))
+                    thisObj.ele.removeClass('error')
+                    thisObj.ele.removeAttr('valid');
+                } else {
+                    thisObj.ele.addClass('error');
+                    let controlTitle = (thisObj.title == "") ? thisObj.name : thisObj.title;
+                    let valid = "Giá trị trường " + controlTitle + " phải là số"
+                    thisObj.ele.attr('valid', valid);
+                }
+            }
         })
         this.ele.on('focus', function(e) {
-            $(this).val(numbro($(this).val()).format('0'))
+            if (/^[-0-9,.]+$/.test($(this).val())) {
+                $(this).val(numbro($(this).val()).format('0'))
+            }
         })
     }
 
@@ -436,15 +576,6 @@ export default class BasicControl extends Control {
         let thisObj = this;
         this.ele.attr('readonly', 'readonly')
         this.ele.on('click', function(e) {
-                /**
-                 * TH control select ở ngoài table
-                 * reset biến chỉ ra là đang tương tác với table và cell nào
-                 */
-                store.commit("document/addToDocumentSubmitStore", {
-                    key: 'currentCellSelected',
-                    value: null,
-                    instance: thisObj.curParentInstance
-                });
                 store.commit("document/addToDocumentSubmitStore", {
                     key: 'currentTableInteractive',
                     value: null,
@@ -476,13 +607,9 @@ export default class BasicControl extends Control {
         if (this.checkDetailView()) return;
     }
     renderTimeControl() {
-        let thisObj = this;
         if (this.checkDetailView()) return;
         this.ele.attr('type', 'text');
-        this.ele.on('click', function(e) {
-            e.controlName = thisObj.name;
-            SYMPER_APP.$evtBus.$emit('document-submit-time-input-click', e)
-        })
+
     }
     getDefaultValue() {
         if (this.isCheckbox) {
@@ -493,17 +620,6 @@ export default class BasicControl extends Control {
             return '';
         }
     }
-    addAutoCompleteEvent(fromSelect = false) {
-        let thisObj = this;
-        this.ele.on('input', function(e) {
-
-        })
-        this.ele.on('keyup', function(e) {
-
-        })
-
-    }
-
 
     // hàm kiểm tra control này có thuộc tính require hay không
     isRequiredControl() {

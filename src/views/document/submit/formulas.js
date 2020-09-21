@@ -1,6 +1,12 @@
 import sDocument from './../../../store/document'
+import store from './../../../store'
 import ClientSQLManager from "./clientSQLManager.js";
-import { formulasApi } from "./../../../api/Formulas";
+import {
+    formulasApi
+} from "./../../../api/Formulas";
+import {
+    orgchartApi
+} from "./../../../api/orgchart";
 import Util from "./util";
 const BUILD_IN_FUNCTION = ['TODAY', 'BEGIN_WEEK', 'END_WEEK', 'BEGIN_MONTH', 'END_MONTH',
     'BEGIN_YEAR', 'END_YEAR', 'TIMESTAMP', 'PARENT_WORKFLOW', 'CURRENT_WORKFLOW',
@@ -24,6 +30,7 @@ export default class Formulas {
             this.type = type;
             this.inputControl = this.setInputControl();
             this.refFormulas = this.getReferenceFormulas();
+            this.orgChartFormulas = this.getOrgChartFormulas();
             this.localFormulas = this.getLocalFormulas();
             this.inputForLocalFormulas = this.setInputLocal();
         }
@@ -42,50 +49,105 @@ export default class Formulas {
          * @param {Object} dataInput 
          */
     async handleBeforeRunFormulas(dataInput, inject = "") {
-            let formulas = this.formulas;
-            let listLocal = this.localFormulas;
-            if (listLocal != null && listLocal.length > 0) {
-                for (let index = 0; index < listLocal.length; index++) {
-                    let sql = listLocal[index];
-                    sql = sql.replace('local(', '');
-                    sql = sql.replace('LOCAL(', '');
-                    sql = sql.substring(0, sql.length - 1);
-                    sql = sql.replace(/\r?\n|\r/g, ' ');
-                    let res = await this.runSQLLiteFormulas(sql);
-                    let strBeforeSql = this.checkBeforeReferenceFormulas(listLocal[index].trim(), formulas);
-                    let reverse = this.reverseSqliteDataToFormulas(res[0], strBeforeSql.trim().toLowerCase());
-                    formulas = formulas.replace(listLocal[index], reverse);
+        if (Object.keys(dataInput).length == 0) {
+            dataInput = false;
+        }
+        var formulas = this.formulas;
+        formulas = await this.handleRunLocalFormulas(formulas, dataInput);
+        formulas = await this.handleRunOrgChartFormulas(formulas, dataInput);
+        let listSyql = this.getReferenceFormulas(formulas);
+        if (listSyql != null && listSyql.length > 0) {
+            for (let i = 0; i < listSyql.length; i++) {
+                let syql = listSyql[i].trim();
+                syql = syql.replace('ref(', '');
+                syql = syql.replace('REF(', '');
+                syql = syql.substring(0, syql.length - 1);
+                let res = await this.runSyql(syql, dataInput);
+                let beforeStr = this.checkBeforeReferenceFormulas(formulas, listSyql[i].trim());
+                if (!beforeStr) {
+                    return {
+                        server: true,
+                        data: res.data
+                    };
+                } else {
+                    let reverseData = await this.reverseDataToFormulas(res.data, beforeStr.trim().toLowerCase());
+
+                    formulas = formulas.replace(listSyql[i], reverseData);
+                }
+                if (i == listSyql.length - 1) {
+                    let formulas = this.replaceParamsToData(dataInput, formulas);
+                    return {
+                        server: false,
+                        data: this.runSQLLiteFormulas(formulas)
+                    };
                 }
             }
-            let listSyql = this.getReferenceFormulas(formulas);
-            if (listSyql != null && listSyql.length > 0) {
-                for (let i = 0; i < listSyql.length; i++) {
-                    let syql = listSyql[i].trim();
-                    syql = syql.replace('ref(', '');
-                    syql = syql.replace('REF(', '');
-                    syql = syql.substring(0, syql.length - 1);
-                    if (Object.keys(dataInput).length == 0) {
-                        dataInput = false;
-                    }
-                    let res = await this.runSyql(syql, dataInput);
+        } else {
+            let sql = this.replaceParamsToData(dataInput, formulas);
+            return {
+                server: false,
+                data: this.runSQLLiteFormulas(sql, false, inject)
+            };
+        }
 
-                    let beforeStr = this.checkBeforeReferenceFormulas(formulas, listSyql[i].trim());
-                    if (!beforeStr) {
-                        return { server: true, data: res.data };
-                    } else {
-                        let reverseData = this.reverseDataToFormulas(res.data, beforeStr.trim().toLowerCase());
-                        formulas = formulas.replace(listSyql[i], reverseData);
-                    }
-                    if (i == listSyql.length - 1) {
-                        let formulas = this.replaceParamsToData(dataInput, formulas);
-                        return { server: false, data: this.runSQLLiteFormulas(formulas) };
-                    }
+    }
+
+    async handleRunLocalFormulas(formulas, dataInput) {
+        let listLocal = this.localFormulas;
+        if (listLocal != null && listLocal.length > 0) {
+            for (let index = 0; index < listLocal.length; index++) {
+                let sql = listLocal[index];
+                sql = sql.replace('local(', '');
+                sql = sql.replace('LOCAL(', '');
+                sql = sql.substring(0, sql.length - 1);
+                sql = sql.replace(/\r?\n|\r/g, ' ');
+                if (Object.keys(dataInput).length == 0) {
+                    dataInput = false;
                 }
-            } else {
-                let formulas = this.replaceParamsToData(dataInput, this.formulas);
-                return { server: false, data: this.runSQLLiteFormulas(formulas, false, inject) };
+                sql = this.replaceParamsToData(dataInput, sql)
+                let res = await this.runSQLLiteFormulas(sql);
+                let strBeforeSql = this.checkBeforeReferenceFormulas(formulas, listLocal[index].trim());
+                let reverse = this.reverseSqliteDataToFormulas(res[0], strBeforeSql.trim().toLowerCase());
+                formulas = formulas.replace(listLocal[index], reverse);
             }
+        }
+        return formulas
+    }
+    async handleRunOrgChartFormulas(formulas, dataInput) {
+            let listOrgChartFormulas = this.orgChartFormulas;
+            if (listOrgChartFormulas != null && listOrgChartFormulas.length > 0) {
+                let item = {};
+                for (let i = 0; i < listOrgChartFormulas.length; i++) {
+                    let reverseData = sDocument.state.submit[this.keyInstance].orgchartTableSqlName[listOrgChartFormulas[i].trim()];
+                    if (reverseData == undefined) {
+                        let orgChartFormulas = listOrgChartFormulas[i].trim();
+                        orgChartFormulas = orgChartFormulas.replace('orgchart(', '');
+                        orgChartFormulas = orgChartFormulas.replace('ORGCHART(', '');
+                        orgChartFormulas = orgChartFormulas.substring(0, orgChartFormulas.length - 1);
+                        if (Object.keys(dataInput).length == 0) {
+                            dataInput = false;
+                        }
+                        orgChartFormulas = this.replaceParamsToData(dataInput, orgChartFormulas)
+                        let res = await this.queryOrgchart(orgChartFormulas);
+                        let beforeStr = this.checkBeforeReferenceFormulas(formulas, listOrgChartFormulas[i].trim());
+                        if (!beforeStr) {
+                            return res.data;
+                        } else {
+                            reverseData = await this.reverseDataToFormulas(res.data.fullInfo, beforeStr.trim().toLowerCase());
+                            item[listOrgChartFormulas[i].trim()] = reverseData;
+                            store.commit("document/addToDocumentSubmitStore", {
+                                key: 'orgchartTableSqlName',
+                                value: item,
+                                instance: this.keyInstance
+                            });
+                        }
+                    }
+                    formulas = formulas.replace(listOrgChartFormulas[i].trim(), reverseData);
 
+
+                }
+            }
+            return formulas;
         }
         /**
          * Hàm xử lí chạy formulas cho các cột trong table 
@@ -104,7 +166,7 @@ export default class Formulas {
                 sql = sql.substring(0, sql.length - 1);
                 sql = sql.replace(/\r?\n|\r/g, ' ');
                 let res = await this.runSQLLiteFormulas(sql);
-                let strBeforeSql = this.checkBeforeReferenceFormulas(listLocal[index].trim(), formulas);
+                let strBeforeSql = this.checkBeforeReferenceFormulas(formulas, listLocal[index].trim());
                 let reverse = this.reverseSqliteDataToFormulas(res[0], strBeforeSql.trim().toLowerCase());
                 formulas = formulas.replace(listLocal[index], reverse);
 
@@ -131,20 +193,22 @@ export default class Formulas {
                 syql = syql.replace('REF(', '');
                 syql = syql.substring(0, syql.length - 1);
                 syql = syql.replace(/\r?\n|\r/g, ' ');
-                let dataPost = { formula: syql, dataInput: JSON.stringify(dataInput) };
+                let dataPost = {
+                    formula: syql,
+                    dataInput: JSON.stringify(dataInput)
+                };
                 return formulasApi.getMultiData(dataPost);
             }
         } else {
             let dataRes = {}
-            let x = dataInput
-            let formula = formulas
-                // debugger
             for (let rowId in dataInput) {
                 let formula = this.replaceParamsToData(dataInput[rowId], formulas);
                 let res = await this.runSQLLiteFormulas(formula);
                 dataRes[rowId] = res[0].values[0][0];
             }
-            return { data: dataRes }
+            return {
+                data: dataRes
+            }
 
         }
 
@@ -164,7 +228,7 @@ export default class Formulas {
                 }
                 let formulas = this.replaceParamsToData(dataInput, sql);
                 let res = await this.runSQLLiteFormulas(formulas);
-                let strBeforeSql = this.checkBeforeReferenceFormulas(listLocal[i].trim(), script);
+                let strBeforeSql = this.checkBeforeReferenceFormulas(script, listLocal[i].trim());
                 let reverse = this.reverseSqliteDataToFormulas(res[0], strBeforeSql.trim().toLowerCase());
                 script = script.replace(listLocal[i], reverse);
             }
@@ -202,8 +266,6 @@ export default class Formulas {
                 let tableName = Util.generateString(10);
                 strReplace = tableName;
                 ClientSQLManager.createTable(this.keyInstance, Util.generateString(10), columns, "TEMPORARY", columnsInsert, dataInsert);
-                // ClientSQLManager.insertDataToTable(tableName,columnsInsert,dataInsert);
-
             }
         } else if (beforeStr === 'in') {
             if (data.values.length > 0) {
@@ -240,17 +302,33 @@ export default class Formulas {
      * @param {Array} data 
      * @param {String} refSyql 
      */
-    reverseDataToFormulas(data, beforeStr) {
+    async reverseDataToFormulas(data, beforeStr) {
             let strReplace = "";
             if (beforeStr == 'from' || beforeStr == 'union' || beforeStr == 'all' || beforeStr == 'join') {
                 if (data.length > 0) {
                     let columns = {};
+                    let columnsTable = [];
                     for (let i in data[0]) {
+                        if (['id', 'createAt', 'style', 'departmentVizId', 'orgchartId', 'listForeignKey', 'nodeIdentify', 'vizParentId', 'vizId'].includes(i)) {
+                            continue;
+                        }
                         columns[i] = "TEXT";
+                        columnsTable.push(i + " TEXT");
+                    }
+                    let dataTable = []
+                    for (let index = 0; index < data.length; index++) {
+                        let rowData = []
+                        let row = data[index];
+                        for (let columnName in columns) {
+                            // let columnData = row[columnName.replace()
+                            rowData.push("'" + row[columnName] + "'");
+                        }
+                        rowData = "(" + rowData.join(',') + ")";
+                        dataTable.push(rowData);
                     }
                     let tableName = Util.generateString(10);
                     strReplace = tableName;
-                    ClientSQLManager.createTable(this.keyInstance, tableName, columns, "TEMPORARY");
+                    await ClientSQLManager.createTable(this.keyInstance, tableName, columnsTable.join(','), "TEMPORARY", Object.keys(columns).join(','), dataTable.join(','), true);
                 }
             } else if (beforeStr == 'in') {
                 strReplace = "(";
@@ -274,12 +352,13 @@ export default class Formulas {
          * else => value
          */
     checkBeforeReferenceFormulas(script, refScript) {
-            let s = script.replace(/\(/g, "\\(");
+            let s = refScript.replace(/\(/g, "\\(");
             s = s.replace(/\)/g, "\\)");
-            let reg = new RegExp("([a-zA-Z_0-9]+)\\s+" + s, "gm")
-            let textBefore = refScript.match(reg);
+            s = s.replace(/\|/g, "\\|");
+            let reg = new RegExp("([a-zA-Z_0-9]+)\\s+(?=" + s + ")", "gm")
+            let textBefore = script.match(reg);
             if (textBefore != null && textBefore.length > 0) {
-                textBefore = textBefore[0].replace(script, "")
+                textBefore = textBefore[0].trim()
                 return textBefore;
             } else {
                 return false;
@@ -291,6 +370,14 @@ export default class Formulas {
          * @param {String} formulas 
          */
     replaceParamsToData(dataInput, formulas) {
+        // debugger
+
+        // thay thế các tham số của workflow 
+        formulas = this.replaceWorkflowParams(formulas);
+
+        if (Object.keys(dataInput).length == 0 || dataInput == false) {
+            return formulas;
+        }
         let listControlInDoc = this.getDataSubmitInStore();
         for (let controlName in dataInput) {
             let regex = new RegExp("{" + controlName + "}", "g");
@@ -305,7 +392,6 @@ export default class Formulas {
                 formulas = formulas.replace(regex, value);
             }
         }
-        formulas = this.replaceWorkflowParams(formulas);
         return formulas;
     }
 
@@ -342,12 +428,34 @@ export default class Formulas {
             return this.runSQLLiteFormulas(formulas, true);
         }
     }
-    autocompleteDetectAliasControl() {
-        let control = this.formulas.match(/(?<=as)(\s+([a-zA-Z_0-9]+)|\s*\"(.*?)\")/gi);
+    autocompleteDetectAliasControl(alias = true) {
+        let selectColumn = this.formulas.match(/(?<=select|SELECT).*(?=from|FROM)/gi);
+        if (selectColumn == null) {
+            return 'column1';
+        }
+        let control = selectColumn[0].match(/([a-zA-Z0-9_]+)\s+as\s+(([a-zA-Z0-9_]+))/gi);
         if (control == null) {
             return "column1";
         }
-        return control[0].trim();
+        let controlAlias = control[0].split('as');
+        if (alias && controlAlias.length > 1) {
+            return controlAlias[1].trim();
+        } else {
+            return controlAlias[0].trim();
+        }
+    }
+    autocompleteDetectTableQuery() {
+        let table = this.formulas.match(/(from|FROM)\s+(\w+\.)?(\w+)(?=\s+as)?(\s+\w+\n+)?/gim);
+        if (table == null) {
+            return false;
+        }
+        let listTable = []
+        for (let index = 0; index < table.length; index++) {
+            let fromTable = table[index];
+            let tableItem = fromTable.trim().replace("from ", "");
+            listTable.push(tableItem);
+        }
+        return listTable;
     }
 
     /**
@@ -392,18 +500,38 @@ export default class Formulas {
      * Hàm tách các công thức local (công thức chạy owr client)
      */
     getLocalFormulas() {
-        let listSqlite = this.formulas.match(/(LOCAL|local)\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\([^)(]*\))*\))*\))*\))*\))*\))*\))*\))*\))*\)/gm);
+            let listSqlite = this.formulas.match(/(LOCAL|local)\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\([^)(]*\))*\))*\))*\))*\))*\))*\))*\))*\))*\)/gm);
+            return listSqlite;
+        }
+        /**
+         * Hàm tách các công thức local (công thức chạy owr client)
+         */
+    getOrgChartFormulas() {
+        let listSqlite = this.formulas.match(/(ORGCHART|orgchart)\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\([^)(]*\))*\))*\))*\))*\))*\))*\))*\))*\))*\)/gm);
         return listSqlite;
     }
 
     runSyql(formulas, dataInput = false) {
+        let syql = formulas;
+        syql = syql.replace(/\r?\n|\r/g, ' ');
+
+        let dataPost = {
+            formula: syql,
+            data_input: JSON.stringify(dataInput)
+        };
+        if (dataInput == false)
+            dataPost = {
+                formula: syql
+            };
+        return formulasApi.execute(dataPost);
+    }
+    queryOrgchart(formulas) {
             let syql = formulas;
             syql = syql.replace(/\r?\n|\r/g, ' ');
-
-            let dataPost = { formula: syql, data_input: JSON.stringify(dataInput) };
-            if (dataInput == false)
-                dataPost = { formula: syql };
-            return formulasApi.execute(dataPost);
+            let dataPost = {
+                query: syql
+            };
+            return orgchartApi.queryOrgchart(dataPost);
         }
         /**
          * Hàm chạy công thức
@@ -543,14 +671,15 @@ export default class Formulas {
         // hàm lấy các column được query sau select và trước from
     getColumnsQuery(syql) {
         let columns = [];
-        let allColumns = syql.match(/(?<=SELECT|select).*(?=from|from)/gm);
+        syql = syql.replace(/[\s\r]+/gm, " ");
+        let allColumns = syql.match(/(?<=SELECT|select).*(?=FROM|from)/gm);
         for (let index = 0; index < allColumns.length; index++) {
             let element = allColumns[index];
             element = element.trim();
             element = element.split(',')
             for (let i = 0; i < element.length; i++) {
                 let column = element[i];
-                column = column.replace(/(.*?)(?<=as)/g, "");
+                column = column.replace(/(.*?)(?<= as )/g, "");
                 columns.push(column.trim())
             }
 
@@ -558,5 +687,5 @@ export default class Formulas {
         return columns;
     }
 
-
+    //\s+as\s+(([a-zA-Z0-9_]+)|("(.*?)"))
 }

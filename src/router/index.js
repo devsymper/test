@@ -361,19 +361,6 @@ const routes = [{
             import ('../views/permissions/AcitionPackList.vue'),
     },
     // phần search
-    {
-        path: "/search/general",
-        name: "generalSearchInfo",
-        component: () =>
-            import ('../views/search/general.vue'),
-    },
-
-    {
-        path: "/search/detail",
-        name: "detailSearchInfo",
-        component: () =>
-            import ('../views/search/detail.vue'),
-    },
 
     {
         path: "/ba-account",

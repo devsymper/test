@@ -173,7 +173,7 @@ export default {
                             });
                         }
                         reject({
-                            title: "Validate failed wwhen checking for deployment"
+                            title: "Validate failed when checking for deployment"
                         });
                     }
                 }).catch((err) => {
@@ -190,7 +190,8 @@ export default {
             let self = this;
             let checkArr = [
                 this.checkModelName(),
-                this.validateDeployData()
+                this.validateDeployData(),
+                this.checkValStatus()
             ];
             Promise.all(checkArr)
                 .then(rsl => {
@@ -210,6 +211,36 @@ export default {
                         fail();
                     }
                 });
+        },
+        /**
+         * check validateStatus 
+         */
+        checkValStatus(){
+            let self=this;
+            console.log("aaa",this.stateAllElements);
+            let isCheck=true;
+            let arrError;
+            return new Promise((resolve,reject)=>{
+                let allElements=this.stateAllElements;
+                for (let i in allElements) {
+                    let items=allElements[i].attrs;
+                    for (let j in items) {
+                        if (items[j].validateStatus && items[j].validateStatus.isValid==false ) {
+                            isCheck=false;
+                            self.$snotifyError({},'Error when validate','Error at node ' +allElements[i].id+', property ' +items[j].title+' with detail:'+items[j].validateStatus.message )
+                        }
+                    }
+                }
+                if (!isCheck) {
+                    reject({
+                        type: "Error validate status",
+                        title: "Error when validate",
+                        message: "Error ",
+                    })
+                }else{
+                    resolve();
+                }
+            });
         },
         /**
          * Kiểm tra định danh của model: đã có hay chưa? có bị trùng định danh ko
@@ -757,6 +788,19 @@ export default {
                             data: newNodeData
                         } );
         },
+        checkDuplicateNodeId(newId){
+            let currentNodeId = this.selectingNode.id;
+            if(currentNodeId == newId){
+                return false;
+            }else{
+                if(this.stateAllElements.hasOwnProperty(newId)){
+                    this.$snotifyError({}, "Element id can not be duplicated!", "Please input other id");
+                    return true;
+                }else{
+                    return false;
+                }
+            }
+        },
         /** Xử lý các sự kiện khi có sự thay đổi giá trị của các input trong panel cấu hình bên phải
          * data là giá trị sau thay đổi của một input trong formtpl
          *  **/
@@ -772,9 +816,16 @@ export default {
             };
 
             if (name == "overrideid" || name == "process_id") {
-                attrs[name].value = util.str.nonAccentVietnamese(
-                    attrs[name].value
-                );
+                let newId = util.str.nonAccentVietnamese(
+                        attrs[name].value
+                    );
+                let isDuplicated = this.checkDuplicateNodeId(newId);
+                if(isDuplicated){
+                    inputInfo.value = this.selectingNode.id;
+                    return;
+                }else{
+                    attrs[name].value = newId;
+                }
             }
 
             if (typeData.checkShowOrHideInput) {

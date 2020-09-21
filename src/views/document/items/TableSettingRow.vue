@@ -37,14 +37,16 @@
             </template>
         </v-autocomplete>
         </td>
-        <td><input 
+        <td ><input 
             @focus="focusInput"
             @blur="unFocusInput" 
             @keyup="handleKeyup"
             type="text" 
             placeholder="Tên control" 
             name="nameControl"
-            v-model="rowData.name"></td>
+            v-model="rowData.name">
+            <!-- <span class="validate-item d1-none">Tên không đúng định dạng</span> -->
+            </td>
         <td><input 
             @focus="focusInput"
             @blur="unFocusInput" 
@@ -193,5 +195,5 @@ export default {
     #rowDrag .v-autocomplete-type .v-input__append-inner{ 
         display: none;
     }
-  
+
 </style>

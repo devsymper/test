@@ -10,11 +10,9 @@ const getAllDefinitions = async(context) => {
     return new Promise(async(resolve, reject) => {
         if ($.isEmptyObject(context.state.allDefinitions)) {
             try {
-                let res = await workflowApi.getDefinitions({
-                    "start": 0,
-                    "size": 1000
-                });
-                context.commit('setAllDefinition', res.data);
+                // let res = await workflowApi.getDefinitions({
+                let res = await workflowApi.getListModels();
+                context.commit('setAllDefinition', res.data.listObject);
                 resolve(res);
             } catch (error) {
                 SYMPER_APP.$snotifyError(error, "Can not get all definitions!");
@@ -31,7 +29,11 @@ const getLastestProcessDefinition = async function(context) {
     try {
         let res = await BPMNEngine.getLastestByModel();
         if (res.status == 200) {
-            context.commit('setAllWorkflowModel', res.data);
+            let data = res.data;
+            for (let obj of data) {
+                obj.modelName = obj.modelId + ' - ' + obj.modelName;
+            }
+            context.commit('setAllWorkflowModel', data);
         } else {
             SYMPER_APP.$snotifyError(res, "Can not get list workflow models");
         }

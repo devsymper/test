@@ -22,6 +22,10 @@ export const authUtil = {
         }
     },
 
+    isSupportter() {
+        return this.getSavedUserInfo().profile.type == 'ba';
+    },
+
     checkLogin() {
         if (this.getToken()) {
             return true;
@@ -49,5 +53,17 @@ export const authUtil = {
         loginInfo = Object.assign(loginInfo, data);
         this.saveLoginInfo(loginInfo);
     },
+
+    getCurrentUserRole() {
+        let data = this.getSavedUserInfo();
+        let role = '';
+        if (data.profile.userDelegate &&
+            data.profile.userDelegate.role) {
+            role = data.profile.userDelegate.role;
+        } else {
+            role = data.profile.role;
+        }
+        return role;
+    }
 
 }

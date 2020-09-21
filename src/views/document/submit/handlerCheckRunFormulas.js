@@ -12,13 +12,49 @@ const markBinedField = function(instance, fieldName) {
     let docStatus = sDocumentSubmit.docStatus;
     let impactedFieldsList = sDocumentSubmit.impactedFieldsList;
     let impactedFieldsListWhenStart = sDocumentSubmit.impactedFieldsListWhenStart;
+    // debugger
     if (docStatus === 'init') {
         impactedFieldsListWhenStart[fieldName] = true;
+        let check = checkFinishProcessFormulasInit(impactedFieldsListWhenStart);
+        if (check) {
+            store.commit("document/addToDocumentSubmitStore", {
+                key: 'readyLoaded',
+                value: true,
+                instance: instance
+            });
+        }
         store.commit("document/addToDocumentSubmitStore", {
             key: 'impactedFieldsListWhenStart',
             value: impactedFieldsListWhenStart,
             instance: instance
         });
+    } else if (docStatus == 'beforeSubmit') {
+        let dataImpactedControlRefresh = sDocumentSubmit.dataImpactedControlRefresh;
+        if (Object.keys(Object.values(dataImpactedControlRefresh)[0]).length == 0) {
+            store.commit("document/addToDocumentSubmitStore", {
+                key: 'readySubmit',
+                value: true,
+                instance: instance
+            });
+            return;
+        }
+        let root = findRoot(dataImpactedControlRefresh, fieldName);
+        if (root == false) return;
+        dataImpactedControlRefresh[root][fieldName] = true;
+        store.commit("document/addToDocumentSubmitStore", {
+            key: 'dataImpactedControlRefresh',
+            value: dataImpactedControlRefresh,
+            instance: instance
+        });
+        let check = checkFinishProcessFormulas(dataImpactedControlRefresh);
+        if (check) {
+            store.commit("document/addToDocumentSubmitStore", {
+                key: 'readySubmit',
+                value: true,
+                instance: instance
+            });
+        }
+
     } else if (impactedFieldsList.hasOwnProperty(rootChangeFieldName) && impactedFieldsList[rootChangeFieldName].hasOwnProperty(fieldName)) {
         impactedFieldsList[rootChangeFieldName][fieldName] = true;
         store.commit("document/addToDocumentSubmitStore", {
@@ -52,6 +88,32 @@ const resetImpactedFieldsList = function(instance, fieldToReset = null) {
         instance: instance
     });
 }
+const findRoot = function(dataImpactedControlRefresh, fieldName) {
+
+    for (let controlRoot in dataImpactedControlRefresh) {
+        if (Object.keys(dataImpactedControlRefresh[controlRoot]).includes(fieldName)) {
+            return controlRoot
+        }
+    }
+    return false
+}
+
+const checkFinishProcessFormulas = function(dataImpactedControlRefresh) {
+    for (let controlRoot in dataImpactedControlRefresh) {
+        if (Object.values(dataImpactedControlRefresh[controlRoot]).includes(false)) {
+            return false
+        }
+    }
+    return true
+}
+const checkFinishProcessFormulasInit = function(dataImpactedControlRefresh) {
+    for (let controlRoot in dataImpactedControlRefresh) {
+        if (Object.values(dataImpactedControlRefresh[controlRoot]).includes(false)) {
+            return false
+        }
+    }
+    return true
+}
 
 /**
  * Kiểm tra xem control fieldName có thể chạy công thức để bind giá trị hay không
@@ -66,23 +128,34 @@ const checkCanBeBind = function(instance, fieldName) {
     let impactedFieldsListWhenStart = sDocumentSubmit.impactedFieldsListWhenStart;
     // return true;
     // Nếu đã được bind dữ liệu trước đó rồi thì ko cần bind nữa
-    if (impactedFieldsList[rootChangeFieldName] !== undefined && impactedFieldsList[rootChangeFieldName][fieldName] === true) {
+    if (impactedFieldsList[rootChangeFieldName] !== undefined &&
+        impactedFieldsList[rootChangeFieldName][fieldName] === true &&
+        docStatus != 'beforeSubmit') {
         return false;
     }
 
 
-    if (docStatus == 'init') {
-        // for (var j in listInputInDocument[fieldName]['fmlData']['relateControlNames']) {
-        //     if (impactedFieldsListWhenStart[j] === false) {
-        //         // Nếu một trong các control cần thiết đóng góp giá trị chưa được bind data
-        //         return false;
-        //     }
-        // }
 
+    if (docStatus == 'init') {
         if (listInputInDocument[fieldName]['controlFormulas'].hasOwnProperty('formulas')) {
             for (var j in listInputInDocument[fieldName]['controlFormulas']['formulas']['instance']['inputControl']) {
                 if (impactedFieldsListWhenStart[j] === false) {
                     return false;
+                }
+            }
+        }
+    } else if (docStatus == 'beforeSubmit') {
+        let dataImpactedControlRefresh = sDocumentSubmit.dataImpactedControlRefresh
+        let root = findRoot(dataImpactedControlRefresh, fieldName);
+        if (root == false) return true;
+        if (listInputInDocument[fieldName]['controlFormulas'].hasOwnProperty('formulas')) {
+            for (var j in listInputInDocument[fieldName]['controlFormulas']['formulas']['instance']['inputControl']) {
+                if (dataImpactedControlRefresh[root].hasOwnProperty(j)) {
+
+                    if (dataImpactedControlRefresh[root][j] === false) {
+
+                        return false;
+                    }
                 }
             }
         }

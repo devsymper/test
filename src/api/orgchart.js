@@ -1,5 +1,7 @@
 import Api from "./api";
-import { appConfigs } from "./../configs.js";
+import {
+    appConfigs
+} from "./../configs.js";
 
 let orgchart = new Api(appConfigs.apiDomain.orgchart);
 let coreApi = new Api(appConfigs.apiDomain.core);
@@ -17,8 +19,21 @@ export const orgchartApi = {
     getAllNodes() {
         return coreApi.get("org-charts/nodes");
     },
-    getOrgchartList() {
-        return orgchart.get('orgchart');
+    getOrgchartList(filter) {
+        // filter = {
+        // 	search: 'dsdsd',
+        // 	pageSize:50,
+        // filter: [
+        // 	{
+        // 		column: 'id',
+        // 		valueFilter: {
+        // 			operation: 'IN',
+        // 			values: [1,5,5,3]						
+        // 		}
+        // 	}
+        // ]
+        // };
+        return orgchart.get('orgchart', filter);
     },
 
     getOrgchartDetail(id) {
@@ -56,4 +71,7 @@ export const orgchartApi = {
     getAllNodes() {
         return orgchart.get("orgchart/nodes");
     },
+    queryOrgchart(data) {
+        return orgchart.post("orgchart/query", data);
+    }
 };

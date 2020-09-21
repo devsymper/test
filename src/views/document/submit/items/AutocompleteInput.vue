@@ -61,6 +61,10 @@ export default {
         show(e){
             this.isShowAutoComplete = true;
             this.calculatorPositionBox(e);
+            this.setEvent();
+            // this.search = $(e.target).val();
+        },
+        setEvent(){
             let thisCpn = this;
             this.curInput.off('keydown');
             this.curInput.on('keydown',function(e){
@@ -88,9 +92,7 @@ export default {
                         thisCpn.handleClickRow(rowActive,true);
                     }
                 }
-                
-        })
-            // this.search = $(e.target).val();
+            })
         },
         hide(){
             this.isShowAutoComplete = false;
@@ -105,6 +107,10 @@ export default {
         },
         setData(data){
             this.showHeader();
+            if(data.headers == undefined){
+                this.dataTable = []
+                return
+            }
             if(data.headers.length > 0)
             this.headers = data.headers;
             this.dataTable = data.dataBody;
@@ -179,6 +185,8 @@ export default {
         left: 100px;
         z-index: 99999;
         max-width: unset !important;
+        max-height: 500px;
+        overflow: auto;
     }
     .active-row{
         background: #f0f0f0;

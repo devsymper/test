@@ -34,6 +34,7 @@
                         <control-props-config  
                         @input-value-keyup="handleKeyupInput"
                         @input-value-changed="handleChangeInput" 
+                        @input-blur="handleInputBlur"
                         :singleLine="true" 
                         :labelWidth="`100px`"  
                         :allInputs="controlPropsGroup.name"/>
@@ -44,6 +45,7 @@
                     <v-expansion-panel-content class="sym-v-expand-content">
                         <control-props-config 
                         @input-value-changed="handleChangeInput" 
+                        @input-value-keyup="handleKeyupInput"
                         :singleLine="true" 
                         :labelWidth="`100px`" 
                         :allInputs="controlPropsGroup.display"/>
@@ -57,6 +59,16 @@
                         :singleLine="true" 
                         :labelWidth="`100px`" 
                         :allInputs="controlPropsGroup.print"/>
+                    </v-expansion-panel-content>
+                </v-expansion-panel>
+                <v-expansion-panel class="m-0" >
+                    <v-expansion-panel-header class="v-expand-header">Mapping</v-expansion-panel-header>
+                    <v-expansion-panel-content class="sym-v-expand-content">
+                        <control-props-config 
+                        @input-value-changed="handleChangeInput" 
+                        :singleLine="false" 
+                        :labelWidth="`100px`" 
+                        :allInputs="controlPropsGroup.table"/>
                     </v-expansion-panel-content>
                 </v-expansion-panel>
             </v-expansion-panels>
@@ -88,6 +100,10 @@ export default {
         instance:{
             type:Number,
             default:Date.now()
+        },
+        isConfigPrint:{
+            type:Boolean,
+            default:false
         }
     },
     components:{
@@ -97,11 +113,20 @@ export default {
         sCurrentDocument(){
             return this.$store.state.document.editor[this.instance].currentSelectedControl;
         },
+        listDataFlow(){
+            return this.$store.state.document.editor[this.instance].listDataFlow
+        },
 
         controlPropsGroup(){
             return this.$store.state.document.editor[this.instance].currentSelectedControl.properties;
             // return this.sCurrentDocument.properties;
         }
+    },
+    watch:{
+        "controlPropsGroup.table.mapParamsDataflow.value":function(after){
+            // debugger    
+        }
+        
     },
     data () {
         return {
@@ -113,6 +138,7 @@ export default {
             
             ],
             listNameValueControl:{},
+            delayTimer:null
         
         }
     },
@@ -130,19 +156,43 @@ export default {
                 this.$refs.formFormulas.hideDragPanel();
         },
         handleInputBlur(inputInfo, name){
-            // let value = inputInfo.value;
-            // let elements = $('#document-editor-'+this.instance+'_ifr').contents().find('#'+this.sCurrentDocument.id);
-            // let tableId = checkInTable(elements);
-            // if( tableId == this.sCurrentDocument.id)
-            // tableId = '0';
-            //  this.$store.commit(
-            //     "document/updateProp",{id:this.sCurrentDocument.id,name:name,value:value,tableId:tableId,type:"value",instance:this.instance}
-            // );   
-        },
-        handleKeyupInput(name, input, data){
             
         },
+        handleKeyupInput(name, input, data){
+            clearTimeout(this.delayTimer);
+            this.delayTimer = setTimeout(function(self) {
+                self.handleValidateControl(name, input, data)
+            }, 100,this);
+            if(data.key == 'Tab'){
+                this.handleValidateControl(name, input, data)
+            }
+        },
+        setMappingForParamsDataFlow(id,tableId){
+            let currentDataflow = this.listDataFlow.filter(df=>{
+                return df.id == id;
+            })
+            try {
+                let params = JSON.parse(currentDataflow[0].params);
+                this.$store.commit(
+                    "document/updateCurrentControlProps",{instance:this.instance,group:'table',prop:'mapParamsDataflow',typeProp:'value',value:params}
+                );  
+                 this.$store.commit(
+                    "document/updateProp",{id:this.sCurrentDocument.id,name:'mapParamsDataflow',value:params,tableId:tableId,type:"value",instance:this.instance}
+                );   
+            } catch (error) {
+                
+            }
+        },
         handleChangeInput(name, input, data){
+            if(input.groupType == "formulas"){
+                this.handleValidateControl(name, input, data);
+            }
+            if(['numberFormat','checkbox','formatDate'].includes(input.type)){
+                input.value = data
+                this.handleValidateControl(name, input, data);
+            }
+        },
+        handleValidateControl(name, input, data){
             let value = input.value
             let elements = $('#document-editor-'+this.instance+'_ifr').contents().find('#'+this.sCurrentDocument.id);
             if(name == "width"){
@@ -154,19 +204,51 @@ export default {
             let tableId = checkInTable(elements);
             if( tableId == this.sCurrentDocument.id)
             tableId = '0';
+            if(name === "dataFlowId"){
+                this.setMappingForParamsDataFlow(data.value,tableId)
+            }
             this.$store.commit(
                 "document/updateProp",{id:this.sCurrentDocument.id,name:name,value:value,tableId:tableId,type:"value",instance:this.instance}
             );   
-
-            if(name == 'name'){
-                this.checkNameControl(name, input, data)
+            if((name == 'name' || name == 'title') && !this.isConfigPrint){
+                let currentInput = this.sCurrentDocument.properties.name;
+                this.checkNameControl('name', currentInput.name);
+                this.checkTitleControl('title', currentInput.title);
             }
+        },
+        
+        /**
+         * Hàm kiểm tra tên 1 control có bị trùng với các control khác hay không, nếu bị trùng thì thông báo lỗi
+         */
+        checkTitleControl(name, input){
+            let elements = $('#document-editor-'+this.instance+'_ifr').contents().find('#'+this.sCurrentDocument.id);
+            elements.removeClass('s-control-error');
+            if(elements.is('.page-item')){
+                elements.find('.page-item__name').text(input.value);
+            }
+            if(elements.is('[s-control-type="tab"]')){
+                elements.text(input.value);
+            }
+            let tableId = checkInTable(elements)
+            if( tableId == this.sCurrentDocument.id)
+            tableId = '0';
+            let errValue = ""
+            if(input.value == "" && input.value.length == 0){
+                errValue = "Không được bỏ trống tiêu đề control"
+                elements.addClass('s-control-error');
+            }
+            this.$store.commit(
+                    "document/updateProp",{id:this.sCurrentDocument.id,name:name,value:errValue,tableId:tableId,type:"errorMessage",instance:this.instance}
+                );
+            this.$store.commit(
+                "document/updateCurrentControlProps",{instance:this.instance,group:'name',prop:'title',typeProp:'errorMessage',value:errValue}
+            );   
         },
 
         /**
          * Hàm kiểm tra tên 1 control có bị trùng với các control khác hay không, nếu bị trùng thì thông báo lỗi
          */
-        checkNameControl(name, input, data){
+        checkNameControl(name, input){
             let elements = $('#document-editor-'+this.instance+'_ifr').contents().find('#'+this.sCurrentDocument.id);
             let tableId = checkInTable(elements)
             if( tableId == this.sCurrentDocument.id)
@@ -181,6 +263,7 @@ export default {
             else{
                  if(/^[a-zA-Z_$][a-zA-Z_$0-9]*$/.test(input.value) == false){
                         errValue = "Tên không hợp lệ";
+                        elements.addClass('s-control-error');
                     }
                     else{
                         elements.removeClass('s-control-error');
@@ -192,7 +275,7 @@ export default {
                                 ...arr,obj.id
                             ],[]);
                             dataControl.match = listContrlIdConflic;
-                            $('#document-editor-'+this.instance+'_ifr').contents().find('#'+this.sCurrentDocument.id).addClass('s-control-error');
+                            elements.addClass('s-control-error');
                             for (let index = 0; index < controlConflic.length; index++) {
                                 let control = controlConflic[index];
                                 // console.log('sa',this.listNameValueControl[control.id]);
@@ -228,6 +311,9 @@ export default {
             this.$store.commit(
                 "document/updateProp",{id:this.sCurrentDocument.id,name:name,value:errValue,tableId:tableId,type:"errorMessage",instance:this.instance}
             );  
+            this.$store.commit(
+                "document/updateCurrentControlProps",{instance:this.instance,group:'name',prop:'name',typeProp:'errorMessage',value:errValue}
+            );   
         },
  
        

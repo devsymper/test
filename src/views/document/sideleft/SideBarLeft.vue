@@ -26,7 +26,7 @@
             v-for="tab in sideLeftTabs"
             :key="tab.id"
         >
-            <control-tab v-if="tab.id == 'control'">
+            <control-tab v-if="tab.id == 'control'" :isConfigPrint="isConfigPrint">
 
             </control-tab>
             <list-control-tab :instance="instance" v-if="tab.id == 'listControl'">
@@ -52,6 +52,10 @@ export default {
         instance:{
             type:Number,
             default:Date.now()
+        },
+        isConfigPrint:{
+            type:Boolean,
+            default:false
         }
     },
     data () {

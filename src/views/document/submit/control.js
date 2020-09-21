@@ -1,9 +1,15 @@
 import Formulas from "./formulas";
 import sDocument from './../../../store/document'
-import { markBinedField } from './handlerCheckRunFormulas';
-import { SYMPER_APP } from './../../../main.js'
+import {
+    markBinedField
+} from './handlerCheckRunFormulas';
+import {
+    SYMPER_APP
+} from './../../../main.js'
 import store from './../../../store'
-import { getListInputInDocument } from './../common/common'
+import {
+    getListInputInDocument
+} from './../common/common'
 
 const AUTO_SET = 'auto_set';
 
@@ -30,53 +36,89 @@ export default class Control {
          */
         this.idField = idField;
         this.value = value;
+        this.defaultValue = "";
 
 
     }
     init() {
-            /**
-             * mảng luu giá trị các control bị ảnh hưởng, chỉ ra control này thay đổi giá trị thì sẽ thay đổi theo các control nào
-             */
-            this.effectedControl = {};
-            this.effectedHiddenControl = {};
-            this.effectedRequireControl = {};
-            this.effectedReadonlyControl = {};
-            this.effectedLinkControl = {};
-            this.effectedValidateControl = {};
-            this.inTable = (this.controlProperties.inTable != undefined) ? this.controlProperties.inTable : false;
-            this.docName = this.controlProperties.docName;
+        /**
+         * mảng luu giá trị các control bị ảnh hưởng, chỉ ra control này thay đổi giá trị thì sẽ thay đổi theo các control nào
+         */
+        this.effectedControl = {};
+        this.effectedHiddenControl = {};
+        this.effectedRequireControl = {};
+        this.effectedReadonlyControl = {};
+        this.effectedLinkControl = {};
+        this.effectedValidateControl = {};
+        this.inTable = (this.controlProperties.inTable != undefined) ? this.controlProperties.inTable : false;
+        this.docName = this.controlProperties.docName;
 
-            /**
-             * Tên của control
-             */
-            this.name = (this.controlProperties.hasOwnProperty('name')) ? this.controlProperties.name.value : "";
-            this.title = (this.controlProperties.hasOwnProperty('title')) ? this.controlProperties.title.value : "";
-            /**
-             * id của control
-             */
-            this.id = this.ele.attr('id');
+        /**
+         * Tên của control
+         */
+        this.name = (this.controlProperties.hasOwnProperty('name')) ? this.controlProperties.name.value : "";
+        this.title = (this.controlProperties.hasOwnProperty('title')) ? this.controlProperties.title.value : "";
+        /**
+         * id của control
+         */
+        this.id = this.ele.attr('id');
 
-            /**
-             * Loại control
-             */
-            this.type = this.ele.attr('s-control-type');
-
-
-            /**
-             * Danh sách các control bị thay đổi giá trị, hoặc hiển thị... khi control này thay đổi giá trị
-             */
-            this.sourceControlNames = {
-                validate: {},
-                readonly: {},
-                visibility: {},
-                require: {},
-                data: {}
-            };
-            this.initFormulas();
+        /**
+         * Loại control
+         */
+        this.type = this.ele.attr('s-control-type');
 
 
+        /**
+         * Danh sách các control bị thay đổi giá trị, hoặc hiển thị... khi control này thay đổi giá trị
+         */
+        this.sourceControlNames = {
+            validate: {},
+            readonly: {},
+            visibility: {},
+            require: {},
+            data: {}
+        };
+        this.currentDataStore = this.getDataStoreSubmit();
+        this.initFormulas();
+
+
+    }
+    getDataStoreSubmit() {
+        return sDocument.state.submit[this.curParentInstance];
+    }
+
+    /**
+     * Hàm check có tồn tại và có giá trị thuộc tính của control
+     * @param {*} props 
+     */
+    checkProps(props) {
+        if (this.controlProperties[props] !== undefined &&
+            (this.controlProperties[props].value === "1" ||
+                this.controlProperties[props].value === 1 ||
+                this.controlProperties[props].value)) {
+            return true;
         }
-        // set các mối quan hệ của các control trường hợp đã được lưu trên server
+        return false;
+    }
+    checkEmptyFormulas(type) {
+        if (this.controlFormulas.hasOwnProperty(type)) {
+            return true;
+        }
+        return false;
+    }
+
+    checkEmptyProps(props) {
+        if (this.controlProperties[props] !== undefined &&
+            (this.controlProperties[props].value !== "" &&
+                this.controlProperties[props].value !== null &&
+                this.controlProperties[props].value !== undefined)) {
+            return this.controlProperties[props].value;
+        }
+        return false;
+    }
+
+    // set các mối quan hệ của các control trường hợp đã được lưu trên server
     setEffectedData(effected) {
         if (effected == "" || effected == null) {
             return;
@@ -170,16 +212,29 @@ export default class Control {
     handlerDataAfterRunFormulasValidate(values) {
         if (this.inTable != false) {
             let tableControlInstance = getListInputInDocument(this.curParentInstance)[this.inTable];
+            let dataTable = tableControlInstance.tableInstance.tableInstance.getData();
             let colIndex = tableControlInstance.tableInstance.getColumnIndexFromControlName(this.name);
-            for (let index = 0; index < values.length; index++) {
-                let row = values[index];
-                let v = row == 1
-                tableControlInstance.tableInstance.validateValueMap[index + "_" + colIndex] = { vld: v, msg: "" };
+            for (let rowId in values) {
+                let msg = values[rowId];
+                let rowIndex = this.findIndexByRowId(dataTable, rowId)
+                tableControlInstance.tableInstance.validateValueMap[rowIndex + "_" + colIndex] = {
+                    vld: msg != null && msg != "",
+                    msg: msg
+                };
 
             }
-            // tableControlInstance.tableInstance.tableInstance.render()
+            tableControlInstance.tableInstance.tableInstance.render()
 
         }
+    }
+    findIndexByRowId(dataTable, rowId) {
+        for (let index = 0; index < dataTable.length; index++) {
+            const row = dataTable[index];
+            if (row[row.length - 1] == rowId) {
+                return index;
+            }
+        }
+        return 0
     }
     handlerDataAfterRunFormulasRequire(values) {
         if (this.inTable != false) {
@@ -188,7 +243,9 @@ export default class Control {
             for (let index = 0; index < values.length; index++) {
                 let row = values[index];
                 let v = row == 1
-                tableControlInstance.tableInstance.validateValueMap[index + "_" + colIndex] = { require: v };
+                tableControlInstance.tableInstance.validateValueMap[index + "_" + colIndex] = {
+                    require: v
+                };
             }
             // tableControlInstance.tableInstance.render()
         }
@@ -300,10 +357,16 @@ export default class Control {
             let dataAtCol = tableControl.tableInstance.tableInstance.getDataAtCol(colIndex);
             let rowIndex = dataAtCol.indexOf(dataInput[Object.keys(dataInput)[0]][0])
             if (data == 't' || data === true) {
-                tableControl.tableInstance.validateValueMap[rowIndex + "_" + colIndex] = { uniqueDB: true, msg: "Dữ liệu đã tồn tại" };
+                tableControl.tableInstance.validateValueMap[rowIndex + "_" + colIndex] = {
+                    uniqueDB: true,
+                    msg: "Dữ liệu đã tồn tại"
+                };
 
             } else {
-                tableControl.tableInstance.validateValueMap[rowIndex + "_" + colIndex] = { uniqueDB: false, msg: "" };
+                tableControl.tableInstance.validateValueMap[rowIndex + "_" + colIndex] = {
+                    uniqueDB: false,
+                    msg: ""
+                };
             }
             tableControl.tableInstance.tableInstance.render();
 
@@ -346,20 +409,28 @@ export default class Control {
             let dataAtCol = table.tableInstance.tableInstance.getDataAtCol(colIndex);
             if (rowIndex == "all") {
                 for (let index = 0; index < dataAtCol.length; index++) {
-                    table.tableInstance.validateValueMap[rowIndex + "_" + colIndex] = { validate: false }
+                    table.tableInstance.validateValueMap[rowIndex + "_" + colIndex] = {
+                        validate: false
+                    }
                     let row = dataAtCol[index];
                     if (row == null) {
                         row = "";
                     }
                     if (this.controlProperties.maxValue.value != "") {
                         if (row.length > this.controlProperties.maxValue.value) {
-                            table.tableInstance.validateValueMap[index + "_" + colIndex] = { validate: true, msg: 'Độ dài kí tự không được vượt quá ' + this.controlProperties.maxValue.value + " kí tự" };
+                            table.tableInstance.validateValueMap[index + "_" + colIndex] = {
+                                validate: true,
+                                msg: 'Độ dài kí tự không được vượt quá ' + this.controlProperties.maxValue.value + " kí tự"
+                            };
                             rs = false;
                         }
                     }
                     if (this.controlProperties.minValue.value != "") {
                         if (row.length < this.controlProperties.minValue.value) {
-                            table.tableInstance.validateValueMap[index + "_" + colIndex] = { validate: true, msg: 'Độ dài kí tự không được ít hơn ' + this.controlProperties.minValue.value + " kí tự" };
+                            table.tableInstance.validateValueMap[index + "_" + colIndex] = {
+                                validate: true,
+                                msg: 'Độ dài kí tự không được ít hơn ' + this.controlProperties.minValue.value + " kí tự"
+                            };
                             rs = false;
                         }
                     }
@@ -369,16 +440,24 @@ export default class Control {
                 if (value == null) {
                     value = "";
                 }
-                table.tableInstance.validateValueMap[rowIndex + "_" + colIndex] = { validate: false }
+                table.tableInstance.validateValueMap[rowIndex + "_" + colIndex] = {
+                    validate: false
+                }
                 if (this.controlProperties.maxValue.value != "") {
                     if (value.length > this.controlProperties.maxValue.value) {
-                        table.tableInstance.validateValueMap[rowIndex + "_" + colIndex] = { validate: true, msg: 'Độ dài kí tự không được vượt quá ' + this.controlProperties.maxValue.value + " kí tự" };
+                        table.tableInstance.validateValueMap[rowIndex + "_" + colIndex] = {
+                            validate: true,
+                            msg: 'Độ dài kí tự không được vượt quá ' + this.controlProperties.maxValue.value + " kí tự"
+                        };
                         rs = false;
                     }
                 }
                 if (this.controlProperties.minValue.value != "") {
                     if (value.length < this.controlProperties.minValue.value) {
-                        table.tableInstance.validateValueMap[rowIndex + "_" + colIndex] = { validate: true, msg: 'Độ dài kí tự không được ít hơn ' + this.controlProperties.minValue.value + " kí tự" };
+                        table.tableInstance.validateValueMap[rowIndex + "_" + colIndex] = {
+                            validate: true,
+                            msg: 'Độ dài kí tự không được ít hơn ' + this.controlProperties.minValue.value + " kí tự"
+                        };
                         rs = false;
                     }
                 }

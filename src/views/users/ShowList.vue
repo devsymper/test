@@ -2,18 +2,20 @@
     <list-items
         ref="listUser"
         @after-open-add-panel="addUser"
-
-
+        :headerPrefixKeypath="'user'"
         :useDefaultContext="false"
         :pageTitle="$t('user.title')"
         :tableContextMenu="tableContextMenu"
         :containerHeight="containerHeight"
+        :customAPIResult="customAPIResult"
         :getDataUrl="getListUrl+'users?page=1&pageSize=50'"
         :actionPanelWidth="actionPanelWidth"
+        :commonActionProps="commonActionProps"
     >
         <div slot="right-panel-content" class="h-100">
             <action-panel
             ref="panel"
+            @refresh-data="refreshListUser"
             @refresh-new-user="setNewUserItem"
             @close-panel="closePanel"
             :actionType="actionType"
@@ -30,7 +32,6 @@ import ChangePassPanel from "./../../views/users/ChangePass.vue";
 import { util } from "./../../plugins/util.js";
 import { appConfigs } from '../../configs';
 
-
 export default {
     components: {
         "list-items": ListItems,
@@ -38,19 +39,46 @@ export default {
     },
     data(){
         return {
+            customAPIResult: {
+                reformatData(res){
+                    let data = res.data;
+                    for(let col of data.columns){
+                        col.title = col.title.replace('user.','');
+                    }
+                    return data;
+                } 
+            },
+            commonActionProps: {
+                "module": "account",
+                "resource": "account",
+                "scope": "account",
+            },
             getListUrl: appConfigs.apiDomain.user,
             actionPanelWidth:800,
             containerHeight: 200,
-            tableContextMenu:[
-                {name:"passwordsetting",text:this.$t('user.table.contextMenu.passwordSetting'),
-                callback: (user, callback) => {
+            tableContextMenu:{
+                change_pass: {
+                    name:"passwordsetting",
+                    text:this.$t('user.table.contextMenu.passwordSetting'),
+                    callback: (user, callback) => {
                         this.showViewSetingPassword(user);
-                    },},
-                {name:"edit",text:this.$t('user.table.contextMenu.edit'), 
+                    }
+                },
+                update: {
+                    name:"edit",
+                    text:this.$t('user.table.contextMenu.edit'), 
                     callback: (user, callback) => {
                         this.editUser(user);
-                    },}
-            ],
+                    }
+                },
+                delete: {
+                    name:"delete",
+                    text:this.$t('user.table.contextMenu.delete'), 
+                    callback: (user, callback) => {
+                        this.deleteUser(user);
+                    }
+                }
+            },
             columns: [],
             data: [],
             totalPage: 6,
@@ -66,7 +94,9 @@ export default {
         this.$evtBus.$on('change-user-locale',(locale)=>{
              thisCpn.tableContextMenu = [
                 {name:"passwordsetting",text:this.$t('user.table.contextMenu.passwordSetting')},
-                {name:"edit",text:this.$t('user.table.contextMenu.edit')}
+                {name:"edit",text:this.$t('user.table.contextMenu.edit')},
+                {name:"xóa",text:this.$t('user.table.contextMenu.delete')}
+
             ]
 
         });
@@ -75,6 +105,10 @@ export default {
         
     },
     methods:{
+        refreshListUser(){
+            debugger
+            this.$refs.listUser.refreshList();
+        },
         openPanel(){
             this.$refs.panel.setStepper(1);
             this.$refs.panel.resetPermissionPosittionOrgChart();
@@ -104,7 +138,11 @@ export default {
             this.$refs.panel.resetData();
             this.$refs.panel.setUser(user);
         },
-       
+       deleteUser(user){
+           debugger
+           this.$refs.panel.deleteUser(user[0].id);
+
+       },
         setNewUserItem(user){
             this.data.unshift(user);
         },

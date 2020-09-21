@@ -1,4 +1,13 @@
-import { util } from "./../plugins/util.js";
+import {
+    util
+} from "./../plugins/util.js";
+
+function makeCacheHeader(headers, url, data, options) {
+    headers['Symper-Request-Name'] = options.requestName ? options.requestName : util.str.hashCode(JSON.stringify(['GET', url, data]));
+    headers['Symper-Cache-Strategy'] = options.cacheStrategy ? 'cache-first' : 'network-first';
+    return headers;
+}
+
 export default class Api {
     /**
      * Khởi tạo một class Api với base url
@@ -89,10 +98,13 @@ export default class Api {
     callApi(method, url, data, headers, options) {
 
         headers = Object.assign({
-            Authorization: `Bearer ${util.auth.getToken()}`,
-            // 'Symper-Request-Name': headers.sname ? headers.sname : `${method}: ${url}`,
-            // 'Symper-Cache-Strategy': headers.scache ? 'cache-first' : 'network-first' // hoặc network-first
+            Authorization: `Bearer ${util.auth.getToken()}`
         }, headers);
+
+        if ((method == 'GET' || (method == 'POST' && options.cacheResponse)) && !url.includes('workflow.symper.vn')) {
+            headers = makeCacheHeader(headers, url, data, options);
+        }
+
         let defaultOptions = {
             method: method,
             data: data,

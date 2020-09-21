@@ -1,33 +1,29 @@
 <template>
 	<div class="h-100">
-		<div class="h-100" v-if="!isSettingPasswordView">
+		<div class="h-100" v-if="!isSettingPasswordView" >
 			<div class="h-100">
-				<h3 class="header-title" v-if="actionType == 'add'">{{ $t('user.other.createUser')}}</h3>
+				<h3 class="header-title fs-16" style="font-weight:430!important" v-if="actionType == 'add'">{{ $t('user.other.createUser')}}</h3>
 				<h3 class="header-title" v-if="actionType == 'edit'">{{ $t('user.other.updateUser')}}</h3>
 				<v-stepper v-model="stepper" class="d-flex stepper-create-user">
-				<v-stepper-header class="stepper-header">
-					<v-stepper-step  editable step="1">{{ $t('user.general.title')}}</v-stepper-step>
-					<v-stepper-step :editable="editStep" @click="loadPermission()" step="2">{{ $t('user.permission.title')}}</v-stepper-step>
+				<v-stepper-header class="stepper-header" >
+					<v-stepper-step class="fs-13 font-normal" editable step="1">{{ $t('user.general.title')}}</v-stepper-step>
+					<!-- <v-stepper-step :editable="editStep" @click="loadPermission()" step="2">{{ $t('user.permission.title')}}</v-stepper-step> -->
 				</v-stepper-header>
-
 				<v-stepper-items class="stepper-items">
 					<v-stepper-content step="1">
 					<h4>{{ $t('user.general.personalInfo.title')}}</h4>
-
-						<v-row class="mt-2">
-						<v-col cols="3">
-							<div>
-								<v-subheader>{{ $t('user.general.personalInfo.userName')}}</v-subheader>
+						<v-row style=" height: 84px">
+						<v-col cols="3" class="mt-1">
+							<div >
+								<v-subheader class="font-normal">{{ $t('user.general.personalInfo.userName')}}</v-subheader>
 							</div>
-							<div>
-								<v-subheader>{{ $t('user.general.personalInfo.email')}}</v-subheader>
+							<div style="margin-top: -10px;" >
+								<v-subheader class="font-normal">{{ $t('user.general.personalInfo.email')}}</v-subheader>
 							</div>
-
 						</v-col>
-
-						<v-col cols="6">
+						<v-col cols="6" class="mt-2">
 							<v-row>
-									<v-col cols="9">
+									<v-col style="margin-top:-10px" cols="9">
 										<v-text-field
 										class="fs-13"
 											ref="userName"
@@ -50,30 +46,50 @@
 									</v-col>
 								</v-row>
 						</v-col>
-						<v-col cols="3">
-							<div id="preview" @click="triggerClickAddAvatar()">
+						<v-col cols="3" class="text-center">
+							<!-- <div id="preview" @click="triggerClickAddAvatar()">
 							<img :src="url" />
 							</div>
-							<input type="file" ref="btnAddAvatar" class="input-file" @change="onFileChange" />
+							<input type="file" ref="btnAddAvatar" class="input-file" @change="onFileChange" /> -->
+                              <v-avatar :size="80" v-if="actionType == 'edit' ">
+                                <img v-if="avatarUrl != ''"
+                                    :src="avatarUrl"
+                                >
+								<img v-if="avatarUrl== ''"
+                                    :src="require('./../../assets/image/avatar_default.jpg')"
+                                >
+                            </v-avatar>
+								<v-avatar :size="80" v-else>
+                                <img
+                                    :src="require('./../../assets/image/avatar_default.jpg')"
+                                >
+                            </v-avatar>
+                            <UploadFile 
+                                ref="uploadAvatar"
+                                :autoUpload="false"
+                                :fileName="avatarFileName"
+                                @uploaded-file="handleAvatarUploaded"
+                                @selected-file="handleAvatarSelected" />
 						</v-col>
 						</v-row>
-						<v-row >
+						<v-row class="mt-1" >
 							<v-col cols="3">
-								<v-subheader>{{ $t('user.general.personalInfo.firstName')}}</v-subheader>
+								<v-subheader class="font-normal">{{ $t('user.general.personalInfo.firstName')}}</v-subheader>
 							</v-col>
-							<v-col cols="3">
-								<v-text-field
-								class="fs-13"
+							<v-col cols="3" >
+								<v-text-field 
+								class="fs-13 font-normal"
+								
 								v-model="user.firstName"
 								dense
 								></v-text-field>
 							</v-col>
 							<v-col cols="2 text-center">
-								<v-subheader class="lb-last-name">{{ $t('user.general.personalInfo.lastName')}}</v-subheader>
+								<v-subheader class="lb-last-name font-normal">{{ $t('user.general.personalInfo.lastName')}}</v-subheader>
 							</v-col>	
 							<v-col cols="4">
 								<v-text-field
-								class="fs-13"
+								class="fs-13 font-normal"
 								v-model="user.lastName"
 								dense
 								></v-text-field>
@@ -81,11 +97,11 @@
 						</v-row>
 						<v-row>
 						<v-col cols="3">
-								<v-subheader>{{ $t('user.general.personalInfo.displayName')}}</v-subheader>
+								<v-subheader class="fs-13 font-normal">{{ $t('user.general.personalInfo.displayName')}}</v-subheader>
 							</v-col>
 							<v-col cols="9">
 								<v-text-field
-								class="fs-13"
+								class="fs-13 font-normal"
 									v-model="user.displayName"
 									dense
 								></v-text-field>
@@ -93,7 +109,7 @@
 						</v-row>
 						<v-row>
 							<v-col cols="3">
-								<v-subheader>{{ $t('user.general.personalInfo.phoneNumber')}}</v-subheader>
+								<v-subheader class="fs-13 font-normal">{{ $t('user.general.personalInfo.phoneNumber')}}</v-subheader>
 							</v-col>
 							<v-col cols="9">
 								<v-text-field
@@ -103,35 +119,38 @@
 								></v-text-field>
 							</v-col>
 						</v-row>
-
 						<div v-if="actionType == 'add'">
 							<h4 class="setting-password">{{ $t('user.general.passwordSetting.title')}}</h4>
 							<v-checkbox dense class="sym-small-size" v-model="autoRenPassword" @click="enabledPassword = !enabledPassword" :label="$t('user.general.passwordSetting.autoGeneratePassword')"></v-checkbox>
 							<v-row>
 								<v-col cols="4">
-									<v-checkbox dense class="sym-small-size" v-model="enabledPassword" @click="autoRenPassword = !autoRenPassword" :label="$t('user.general.passwordSetting.yourPassword')"></v-checkbox>
+									<v-checkbox 
+										dense 
+										class="sym-small-size" 
+										v-model="enabledPassword" 
+										@click="autoRenPassword = !autoRenPassword" 
+										:label="$t('user.general.passwordSetting.yourPassword')">
+									</v-checkbox>
 								</v-col>
 								<v-col cols="8 input-password">
 									<v-text-field
-									class="fs-13"
-									ref="password"
-									v-model="user.password"
-									:disabled="!enabledPassword"
-									dense
-									:append-icon="showPass ? 'mdi-eye' : 'mdi-eye-off'"
-									:rules="[rules.required, rules.min, rules.max,rules.password]"
-									:type="showPass ? 'text' : 'password'"
-									counter
-									@click:append="showPass = !showPass"
+										class="fs-13"
+										ref="password"
+										v-model="user.password"
+										:disabled="!enabledPassword"
+										dense
+										:append-icon="showPass ? 'mdi-eye' : 'mdi-eye-off'"
+										:rules="[rules.required, rules.min, rules.max,rules.password]"
+										:type="showPass ? 'text' : 'password'"
+										counter
+										@click:append="showPass = !showPass"
 									></v-text-field>
 								</v-col>
 							</v-row>
 							<v-checkbox dense class="sym-small-size" v-model="needChangePassword" :label="$t('user.general.passwordSetting.requireChangePassFirstLogin')"></v-checkbox>
 							<v-checkbox dense class="sym-small-size" v-model="sendMailAfterChange" :label="$t('user.general.passwordSetting.sendEmailAfterDone')"></v-checkbox>
 							<v-checkbox dense class="sym-small-size" v-model="user.active" :label="$t('user.general.passwordSetting.activeAccount')"></v-checkbox>
-						</div>
-
-						
+						</div>	
 					<v-btn class="btn-next-step"
 						ref="addUserBtn"
 						:loading="loading"
@@ -140,9 +159,7 @@
 					>
 						{{actionPanel}}
 					</v-btn>
-
 					</v-stepper-content>
-
 					<v-stepper-content class="sym-stepper-content" step="2">
 					<v-tabs
 						v-model="tabIndex"
@@ -165,9 +182,7 @@
 						>
 							{{$t('user.permission.orgChartPositionPermission.title')}}
 						</v-tab>
-						
 					</v-tabs>
-
 					<v-tabs-items  v-model="tabIndex">
 						<v-tab-item
 						:key="userRole.title"
@@ -205,10 +220,6 @@
 							small-chips
 							item-text="packName"
 						>
-
-							<!-- <template v-slot:selection="dataPackage">
-							{{dataPackage.item.packName}}
-							</template> -->
 							<template v-slot:item="dataPackage">
 							<v-list-item-content class="autocomplete-package-item" @click="selectPermissionPackage(dataPackage.item)">
 								<v-list-item-title >{{ dataPackage.item.packName }}</v-list-item-title>
@@ -222,7 +233,6 @@
 										v-for="permission in permissionPackage.permissionSelected"
 										:key="permission.id"
 									>
-
 									<v-list-item-content>
 										<v-list-item-title>{{ permission.packName }}</v-list-item-title>
 									</v-list-item-content>
@@ -234,36 +244,14 @@
 											<span>{{$t('common.delete')}}</span>
 										</v-tooltip>
 									</v-list-item-icon>
-
-
 								</v-list-item>
 							</v-list>
 						</div>
 						</v-tab-item>
-
 						<v-tab-item
 						:key="permissionPosittionOrgChart.title"
 						>
-						
 							<template>
-								<!-- <v-row>
-									<v-col cols="4">
-										<v-text-field
-											class="mt-2"
-											v-model="search"
-											dense
-											outlined
-											hide-details
-											clearable
-										></v-text-field>
-									</v-col>
-									<v-col cols="8">
-
-									</v-col>
-								</v-row> -->
-								
-								
-								
 								<div class="tree-orgchart-content">
 									<v-autocomplete
 										class="mt-2"
@@ -335,17 +323,12 @@
 								</vue-resizable>
 							</template>
 						</v-tab-item>
-						
 					</v-tabs-items>
-
-
-
 					<v-btn class="btn-next-step"
 						@click="resetData();closePanel()"
 					>
 						Hoàn thành
 					</v-btn>
-
 					</v-stepper-content>
 				</v-stepper-items>
 				</v-stepper>
@@ -369,13 +352,15 @@ import { permissionPositionOrgchartApi } from "./../../api/PermissionPositionOrg
 import { orgchartApi } from "./../../api/orgchart.js";
 import { str } from "./../../plugins/utilModules/str.js";
 import avatarDefault from "@/assets/image/avatar_default.jpg";
-
 import VueResizable from 'vue-resizable'
+import UploadFile from "./../../components/common/UploadFile";
+import { appConfigs } from '../../configs';
 let heighOrgchart = 0;
 export default {
 	components:{
 		"vue-resizable":VueResizable,
-		"v-change-password":ChangePassword
+        "v-change-password":ChangePassword,
+        UploadFile
 	},
 	props:{
 		actionType:{    // type là add hay update hay detail user
@@ -391,10 +376,12 @@ export default {
 	computed: {
         sapp() {
             return this.$store.state.app;
-        }
+        },
     },
 	data(){
 		return {
+            avatarFileName: '',
+            avatarUrl: '',
 			user:{id:'', firstName:'', lastName:'', displayName:'', userName:' ', email:' ', password:null, phone:'', active:true},
 			url: avatarDefault,
 			stepper: 1,
@@ -451,17 +438,32 @@ export default {
 			if(this.actionType == 'add') {
 				this.resetData();
 				this.editStep = false;
-				this.actionPanel = this.$t('user.other.createUser');
+                this.actionPanel = this.$t('user.other.createUser');
+                this.avatarUrl = '';
 			}
 			if(this.actionType == 'edit') {
 				this.formHasErr = false;
 				this.editStep = true;
-				this.actionPanel = this.$t('user.other.updateUser');
+                this.actionPanel = this.$t('user.other.updateUser');
+                this.avatarUrl = this.getAvatarUrl();
 			}
 		}
   	},
   
   	methods:{
+        getAvatarUrl(){
+              return appConfigs.apiDomain.fileManagement+'readFile/user_avatar_'+this.user.id;
+          },
+        handleAvatarUploaded(data){
+            
+        },
+        handleAvatarSelected(tempUrl){
+            this.avatarUrl = tempUrl;
+            if(this.actionType == 'edit'){
+                this.avatarFileName = 'user_avatar_' + this.user.id;
+                this.$refs.uploadAvatar.uploadFile();
+            }
+        },
 		handleResize ({ width, height }) {
 			console.log('resized', width, height)
 		},
@@ -475,7 +477,9 @@ export default {
 			this.user = user;
 			if(user.avatar != null && user.avatar != ""){
 				this.url = user.avatar;	  
-			}
+            }
+            this.avatarUrl = this.getAvatarUrl();
+            this.avatarFileName = 'user_avatar_'+this.user.id;
 		},
 		actionUser(){
 			if(this.actionType == 'add'){
@@ -557,7 +561,7 @@ export default {
 				}
 			})
 			.catch(err => {
-				console.log("error from add delete api!!!", err);
+				//console.log("error from add delete api!!!", err);
 			})
 			.always(() => {
 
@@ -586,27 +590,51 @@ export default {
 			}
 			userApi.addUser(data).then(res => {
 				if (res.status == 200) {
-					cpn.loadPermission();
-					cpn.setStepper(2);
+					//cpn.loadPermission();
+					//cpn.setStepper(2);
 					cpn.loading = false;
 					cpn.editStep = true;
 					cpn.loader = null;
-					cpn.user.id = res.data.id;
+					cpn.user.id = res.user.id;
+                    
+                    cpn.avatarFileName = 'user_avatar_'+res.user.id;
+                    setTimeout(() => {
+                        cpn.$refs.uploadAvatar.uploadFile();
+                      
+					}, 10);
 					cpn.$emit("refresh-data");
+					this.$snotify({
+					type: "success",
+					title: this.$t("notification.successTitle")});
 				}
 				else{
-					cpn.loading = false;
-					cpn.loader = null;
+					this.$snotify({
+					type: "error",
+					title: this.$t("notification.error")});
 				}
 			})
 			.catch(err => {
-				console.log("error from add user api!!!", err);
+				
 			})
 			.always(() => {
 
 			});
 		},
-
+		deleteUser(id){
+			let self = this;
+			let data = {status:-1};
+			userApi.updateUser(id, data).then(res => {
+				if (res.status == 200) {
+					self.$emit("refresh-data");
+					self.$snotify({
+						type: "success",
+						title: this.$t("notification.successTitle")});
+				}
+			})
+			.catch(err => {
+				console.log("error from add user api!!!", err);
+			});
+		},
 		/**
 		 * Hoangnd: 14/4/2020
 		 * Hàm update user
@@ -627,16 +655,22 @@ export default {
 				passwordProps: JSON.stringify(passProps),
 				avatar : avatar
 			}
-			userApi.updateUser(data).then(res => {
+			userApi.updateUser(this.user.id, data).then(res => {
 				if (res.status == 200) {
 					cpn.loading = false;
 					cpn.loader = null;
+					debugger
 					cpn.$emit("refresh-data");
+					this.$snotify({
+					type: "success",
+					title: this.$t("notification.successTitle")});
 				}
 			})
 			.catch(err => {
 				console.log("error from add user api!!!", err);
-			})
+				this.$snotify({
+					type: "error",
+					title: this.$t("notification.error")});})
 			.always(() => {
 
 			});
@@ -977,6 +1011,10 @@ export default {
 
 </script>
 <style scoped>
+	.font-normal{
+		font-family:Roboto;
+		font-size: 13px;
+	}
 	.stepper-header{
 		width: 200px;
 		height: auto;
@@ -988,7 +1026,7 @@ export default {
 		width: calc(100% - 200px);
 	}
 	.stepper-items .row .col{
-		padding: 0 12px;
+		padding: 0 3px;
 	}
 	.stepper-header .v-stepper__step{
 		height: 30px;
@@ -1002,6 +1040,7 @@ export default {
 	}
 	.v-stepper__content{
 		height: 100%;
+		padding: 10px 15px!important
 	}
 
 	.v-subheader{
@@ -1013,10 +1052,10 @@ export default {
 	.setting-password{
 		margin: 16px 0;
 	}
-	/* .sym-stepper-content .v-stepper__wrapper .row .col{
+	.v-stepper__wrapper .row .col{
 		padding: 0 12px;
 	}
-	*/
+	
 	.btn-next-step{
 		position: absolute;
 		bottom: 20px;

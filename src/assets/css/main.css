@@ -6,9 +6,21 @@ html {
     width: 100vw;
 }
 
+:root {
+    --symper-background-default: #f2f2f2;
+    --symper-background-active: rgba(0 0 0 / 0.1);
+    --symper-background-hover: rgba(0 0 0 / 0.05);
+    --symper-border: 1px solid rgb(230, 229, 229);
+}
+
 .symper-bg-orange {
     background-color: #f58634!important;
 }
+
+
+/* .symper-app .v-menu__content{
+	overflow:hidden
+}  */
 
 .sym-tab-slider {
     height: 100%;
@@ -667,4 +679,16 @@ html {
 
 .symper-tab-active {
     background-color: #f5f5f5!important;
+}
+
+.htContextMenu table.htCore {
+    border-width: 0.2px 0.2px 0.2px 0.2px !important;
+    box-shadow: 0px 3px 6px #00000029;
+}
+
+.w-auto {
+    width: 100% !important;
+}
+#symper-app .dialog-preview-image-comment{
+    overflow:hidden
 }

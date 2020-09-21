@@ -20,6 +20,7 @@
         <!-- Kiểu 1: mainAndSub -->
         <template class="w-100" v-slot:selection="{ attr, on, item, selected }">
             <v-chip
+                :title="item[textKey] ? item[textKey] : item.name"
                 style="height: 22px"
                 v-bind="attr"
                 :input-value="selected"
@@ -110,23 +111,31 @@ export default {
                 this.myValue = after;
             }
         },
-
         search(){
-            let val = this.search;
-            if(!this.onSearch){
-                this.myItems = this.myItems.filter((el, idx) => {
-                    if (
-                        String(el.id).includes(val) ||
-                        String(el.name).includes(val) ||
-                        String(el.title).includes(val)
-                    ) {
-                        return true;
+            clearTimeout(this.delayTimer);
+            let self = this;
+            this.delayTimer = setTimeout(function() {
+                let val = self.search;
+                if(!self.onSearch){
+                    if(!val){
+                        self.myItems = util.cloneDeep(self.items);
+                    }else{
+                        self.myItems = self.myItems.filter((el, idx) => {
+                            if (
+                                String(el.id).includes(val) ||
+                                String(el.name).includes(val) ||
+                                String(el.title).includes(val) ||
+                                String(el.modelName).includes(val) 
+                            ) {
+                                return true;
+                            }
+                            return false;
+                        });
                     }
-                    return false;
-                });
-            }else{
-                this.onSearch(val, this);
-            }
+                }else{
+                    self.onSearch(val, self);
+                }
+            }, 300);
         }
     },
     data() {
@@ -134,7 +143,8 @@ export default {
             isLoading: false,
             search: '',
             myItems: [],
-            myValue: ''
+            myValue: '',
+            delayTimer:null,
         };
     },
     methods: {

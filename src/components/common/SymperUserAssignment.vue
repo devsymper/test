@@ -30,11 +30,9 @@
         </div>
         <div class="symper-user-assignment-script" v-show="activeTab == 'script'">
             <formula-editor
-                :simpleMode="true"
                 :width="'100%'"
                 :height="'80px'"
                 ref="formulaEditor"
-                :formulaValue="value.formula"
                 v-model="value.formula"
             ></formula-editor>
         </div>
@@ -42,10 +40,11 @@
 </template>
 
 <script>
-import FormulaEditor from "./FormulaEditor";
+// import FormulaEditor from "./FormulaEditor";
+import FormulaEditor from "@/components/formula/editor/FormulaEditor";
 import { orgchartApi } from "./../../api/orgchart.js";
 import { util } from '../../plugins/util';
-
+ 
 export default {
     data() {
         return {

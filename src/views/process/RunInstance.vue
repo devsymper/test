@@ -1,7 +1,6 @@
 <template>
     <div class="h-100 w-100">
         <div v-if="startWorkflowStatus == 'init'" class="h-100 w-100">
-            
                  <v-skeleton-loader
                     ref="skeleton"
                     :type="'table-thead'"
@@ -15,8 +14,8 @@
                 :isInitInstance="true" 
                 @task-submited="handleTaskSubmited" 
                 :taskInfo="taskInfo"
-                :parentHeight="thisHeight">
-
+                :parentHeight="thisHeight"
+                @close-detail="closeDetail">
             </taskDetail>
             <div v-else style="text-align: center" class="mt-10">
                 <i class="mdi mdi-check mr-2 d-inline-block"  style="color: green; font-size: 25px"></i>
@@ -164,6 +163,9 @@ export default {
         },
         handleTaskSubmited(outcomeData){
             this.saveTaskOutcome(outcomeData);
+        },
+        closeDetail(){
+            this.$router.push("/workflow");
         }
     }
 }

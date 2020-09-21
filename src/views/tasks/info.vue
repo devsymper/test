@@ -5,7 +5,7 @@
             :min-height="100"
             :max-height="400"
             @resize:end="handleEndDrag"
-            :height="150"
+            :height="200"
             width="100%"
             :active="['b']"
             :style="{overflow: 'hidden'}">
@@ -27,26 +27,33 @@
                         {{$t("tasks.header.createDate")}}
                     </v-col>
                     <v-col cols="9">
-                        {{$moment(originData.createTime).fromNow()}}
+                        {{$moment(originData.createTime).format('DD/MM/YY  HH:mm:ss')}}
                     </v-col>
                     <v-col cols="3" class="pb-1">
                         <v-icon small size="18" class="mr-2 mb-1">mdi-account</v-icon>
                         {{$t("tasks.header.owner")}}
                     </v-col>
                     <v-col cols="9" class="pb-2">
-                        <user :user="originData.ownerInfo"></user>
+                        <user v-if="originData.ownerInfo.id" :user="originData.ownerInfo"></user>
+                        <user v-else :user="originData.assigneeInfo"></user>
                     </v-col>
                     <v-col cols="3" class="pt-1">
                         <v-icon small size="18" class="mr-2 mb-1">mdi-account</v-icon>
                         {{$t("tasks.header.assignee")}}
                     </v-col> 
                     <v-col cols="9" class="pt-1">
-                        <user :user="originData.assigneeInfo"></user>
+                        <user  :user="originData.assigneeInfo"></user>
+                    </v-col>
+                     <v-col cols="3" class="pt-1">
+                        <v-icon small size="18" class="mr-2 mb-1">mdi-calendar-text</v-icon>
+                        {{$t("tasks.header.description")}}
+                    </v-col> 
+                    <v-col cols="9" class="pt-1">
+                        {{taskInfo.extraLabel}}
                     </v-col>
                 </v-row>
             </VuePerfectScrollbar>
         </VueResizable>
-       
         <v-row class="border-top-1">
             <trackingProcessInstance
                 v-if="taskInfo.action.parameter.processInstanceId"
@@ -95,6 +102,9 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
+.mt-2 >>> .ps-container{
+    height: 100%!important;
+}
 
 </style>

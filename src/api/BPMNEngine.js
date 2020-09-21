@@ -1,6 +1,10 @@
 import Api from "./api"; // import class api vào để sử dụng
-import { appConfigs } from "./../configs.js"; // trong trường hợp này ta cần sử dụng domain của từng module nghiệp vụ được định nghĩa trong file config
-import { util } from "../plugins/util";
+import {
+    appConfigs
+} from "./../configs.js"; // trong trường hợp này ta cần sử dụng domain của từng module nghiệp vụ được định nghĩa trong file config
+import {
+    util
+} from "../plugins/util";
 
 var bpmneApi = new Api(appConfigs.apiDomain.bpmne.models); // Khởi tạo một đối tượng api với domain của service BPMNE
 
@@ -18,8 +22,6 @@ let testHeader = {
 let testOptions = {
 
 }
-
-
 export default {
     /** 
      * Lấy danh sách các process đã được tạo ra
@@ -43,7 +45,9 @@ export default {
         return bpmneApi.get(modelId);
     },
     getModelXML(modelId) {
-        return bpmneApi.get(`${modelId}/editor/bpmn20`, {}, testHeader, { dataType: 'text' });
+        return bpmneApi.get(`${modelId}/editor/bpmn20`, {}, testHeader, {
+            dataType: 'text'
+        });
     },
     deployProcess(params, file) {
         let subfix = [];
@@ -77,7 +81,9 @@ export default {
     },
     // Lấy data của process definition
     getDefinitionXML(url) {
-        return bpmneApi.get(url, {}, testHeader, { dataType: 'text' });
+        return bpmneApi.get(url, {}, testHeader, {
+            dataType: 'text'
+        });
     },
     // Lấy data của process definition
     getDefinitionData(id) {
@@ -93,7 +99,7 @@ export default {
     },
     // Lấy lịch sử chạy các node trong process instance
     getProcessInstanceRuntimeHistory(id) {
-        return bpmneApi.get(appConfigs.apiDomain.bpmne.history + '/historic-activity-instances?processInstanceId=' + id, {}, testHeader);
+        return bpmneApi.get(appConfigs.apiDomain.bpmne.history + '/historic-activity-instances?size=1000&processInstanceId=' + id, {}, testHeader);
     },
     getProcessInstance() {
         return bpmneApi.get(appConfigs.apiDomain.bpmne.instances, {}, testHeader);
@@ -124,17 +130,61 @@ export default {
             if (filter.nameLike) {
                 filter.taskNameLike = filter.nameLike;
             }
+            if (filter.processDefinitionId) {
+                filter.processDefinitionKey=filter.processDefinitionId;
+                delete filter['processDefinitionId']; 
+
+            }
             filter.finished = true
             return bpmneApi.get(appConfigs.apiDomain.bpmne.tasksHistory, filter, testHeader);
         } else {
+            if (filter.processDefinitionId) {
+                filter.processDefinitionKey=filter.processDefinitionId;
+                delete filter['processDefinitionId']; 
+
+            }
             return bpmneApi.get(appConfigs.apiDomain.bpmne.tasks, filter, testHeader);
         }
     },
     getSubtasks(idParent, filter) {
         return bpmneApi.get(appConfigs.apiDomain.bpmne.tasks + '/' + idParent + '/subtasks', filter, testHeader);
     },
-    getATaskInfo(taskId) {
-        return bpmneApi.get(appConfigs.apiDomain.bpmne.tasks + '/' + taskId, {}, testHeader);
+    getATaskInfo(taskId,filter='notDone') {
+        if (filter=='done') {
+            return bpmneApi.get(appConfigs.apiDomain.bpmne.tasksHistory+'/'+taskId, {}, testHeader);
+        }else{
+            return bpmneApi.get(appConfigs.apiDomain.bpmne.tasks + '/' + taskId, {}, testHeader);
+        }
+    },
+    getATaskInfoV2(taskId){
+        let result1=bpmneApi.get(appConfigs.apiDomain.bpmne.tasksHistory+'/'+taskId, {}, testHeader);
+        let result2=bpmneApi.get(appConfigs.apiDomain.bpmne.tasks+'/'+taskId, {}, testHeader);
+        let isCheck=false;
+
+        result1.then((res) => {
+            console.log("aa",res);
+                if (res.status==0) {
+                }else{
+                    console.log("ge1",res);
+                    isCheck=1;
+                }
+            }
+        );
+        result2.then((res) => {
+            console.log("bb",res);
+            if (res.status==0) {
+                }else{
+                    console.log("ge2",res);
+                    isCheck=2;
+                }
+            }
+        );
+        if (isCheck==1) {
+            return result1
+        }else{
+            return result2
+        }
+        
     },
     updateTask(taskId, data) {
         data = JSON.stringify(data);
@@ -142,7 +192,9 @@ export default {
     },
     actionOnTask(id, data) {
         data = JSON.stringify(data);
-        return bpmneApi.post(appConfigs.apiDomain.bpmne.tasks + '/' + id, data, testHeader, { dataType: 'text' });
+        return bpmneApi.post(appConfigs.apiDomain.bpmne.tasks + '/' + id, data, testHeader, {
+            dataType: 'text'
+        });
     },
 
     saveDeployHistory(data) {
@@ -152,4 +204,6 @@ export default {
     getLastestByModel() {
         return bpmneApi.get('/deploy-history/lastest-by-model');
     }
+   
+
 };

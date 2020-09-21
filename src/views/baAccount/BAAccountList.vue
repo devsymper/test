@@ -5,6 +5,7 @@
             :useDefaultContext="false"
             :pageTitle="$t('common.baAccount')"
             :tableContextMenu="tableContextMenu"
+            :commonActionProps="commonActionProps"
             :containerHeight="containerHeight"
             :getDataUrl="getListUrl"
             :useActionPanel="true"
@@ -36,6 +37,11 @@ export default {
     data() {
         let self = this;
         return {
+            commonActionProps: {
+                "module": "baAccount",
+                "resource": "ba_account",
+                "scope": "baAccount",
+            },
             containerHeight: 300,
             actionOnItem: 'create',
             getListUrl: appConfigs.apiDomain.baAccount,
@@ -73,8 +79,8 @@ export default {
                     }
                 }
             },
-            tableContextMenu: [
-                {
+            tableContextMenu: {
+                update: {
                     name: "edit",
                     text: this.$t("common.edit"),
                     callback: (row, callback) => {
@@ -82,7 +88,7 @@ export default {
                         self.applyDataToForm(row);
                     }
                 },
-                {
+                drop: {
                     name: "remove",
                     text: this.$t("common.delete"),
                     callback: async (rows, refreshList) => {
@@ -99,7 +105,7 @@ export default {
                         refreshList();
                     }
                 },
-                {
+                detail: {
                     name: "detail",
                     text: this.$t("common.detail"),
                     callback: (row, callback) => {
@@ -108,7 +114,7 @@ export default {
                         self.applyDataToForm(row);
                     }
                 },
-                {
+                update_password: {
                     name: "updatePassword",
                     text: this.$t("common.updatePassword"),
                     callback: (row, callback) => {
@@ -117,7 +123,7 @@ export default {
                         self.actionOnItem = 'updatePassword';
                     }
                 },
-            ]
+            }
         };
     },
     mounted() {

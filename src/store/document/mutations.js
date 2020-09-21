@@ -17,8 +17,7 @@ const addToListInputInDocument = (state, params) => {
     let name = params.name
     let control = params.control
     let instance = params.instance
-
-    // state.editor.allControl[id] = prop;
+        // state.editor.allControl[id] = prop;
     Vue.set(state.submit[instance].listInputInDocument, name, control);
 };
 
@@ -39,6 +38,7 @@ const addCurrentControl = (state, control) => {
     let instance = control.instance
     Vue.set(state.editor[instance].currentSelectedControl, 'formulas', control.formulas);
     Vue.set(state.editor[instance].currentSelectedControl, 'id', control.id);
+    Vue.set(state.editor[instance].currentSelectedControl, 'type', control.type);
 
     let groups = { name: {}, display: {}, print: {} };
     if (control.properties != undefined && typeof control.properties != 'undefined') {
@@ -51,17 +51,26 @@ const addCurrentControl = (state, control) => {
         let propsTypeIsName = Object.filter(control.properties, prop => prop.groupType == 'name')
         let propsTypeIsDisplay = Object.filter(control.properties, prop => prop.groupType == 'display')
         let propsTypeIsPrint = Object.filter(control.properties, prop => prop.groupType == 'print')
-        groups = { name: propsTypeIsName, display: propsTypeIsDisplay, print: propsTypeIsPrint };
+        let propsTypeIsTable = Object.filter(control.properties, prop => prop.groupType == 'table')
+        groups = { name: propsTypeIsName, display: propsTypeIsDisplay, print: propsTypeIsPrint, table: propsTypeIsTable };
     }
     Vue.set(state.editor[instance].currentSelectedControl, 'properties', groups);
 
 };
 const updateCurrentControlProps = (state, params) => {
-        let group = params.group;
-        let prop = params.prop;
+    let group = params.group;
+    let prop = params.prop;
+    let typeProp = params.typeProp;
+    let value = params.value;
+    let instance = params.instance
+    Vue.set(state.editor[instance].currentSelectedControl.properties[group][prop], typeProp, value);
+}
+const updateCurrentControlFormulas = (state, params) => {
+        let type = params.type;
         let typeProp = params.typeProp;
         let value = params.value;
-        Vue.set(state.editor.currentSelectedControl.properties[group][prop], typeProp, value);
+        let instance = params.instance
+        Vue.set(state.editor[instance].currentSelectedControl.formulas[type], typeProp, value);
     }
     // hàm xóa control đang chọn ra khỏi store
 const resetCurrentControl = (state, params) => {
@@ -72,6 +81,7 @@ const resetCurrentControl = (state, params) => {
             name: {},
             display: {},
             print: {},
+            table: {},
 
         },
         formulas: {
@@ -84,7 +94,6 @@ const resetCurrentControl = (state, params) => {
     Vue.set(state.editor[instance], 'currentSelectedControl', currentSelectedControl);
 }
 const updateProp = (state, params) => {
-    console.log("sadsafsad-set", params);
     let id = params.id
     let name = params.name
     let value = params.value
@@ -225,7 +234,6 @@ const setDefaultSubmitStore = (state, params) => {
         impactedFieldsListWhenStart: {},
         rootChangeFieldName: null,
         currentTableInteractive: null,
-        currentCellSelected: null,
         currentControlAutoComplete: null,
         submitFormulas: null,
         listUser: null,
@@ -241,7 +249,11 @@ const setDefaultSubmitStore = (state, params) => {
                     }
                 }
             }
-        }
+        },
+        orgchartTableSqlName: {},
+        tableLoaded: {},
+        readyLoaded: false,
+        listTableRootControl: {}
     }
     let instance = params.instance;
     Vue.set(state.submit, instance, value);
@@ -266,7 +278,8 @@ const setDefaultEditorStore = (state, params) => {
             id: ""
         },
         listControlTreeData: [],
-        allControlForTableOption: []
+        allControlForTableOption: [],
+        listDataFlow: []
     }
     let instance = params.instance;
     Vue.set(state.editor, instance, value);
@@ -317,21 +330,35 @@ const setAllDocuments = (state, docs) => {
     Vue.set(state, 'listAllDocument', docs);
 }
 const cacheDataAutocomplete = (state, params) => {
-    let controlName = params.controlName
-    let header = params.header
-    let cacheData = params.cacheData
-    let object = { header: header, cacheData: cacheData }
-    let instance = params.instance;
-    if (state.submit[instance]['autocompleteData'].hasOwnProperty(controlName)) {
-        Vue.set(state.submit[instance]['autocompleteData'][controlName]['cacheData'], Object.keys(cacheData)[0], Object.values(cacheData)[0]);
-        if (state.submit[instance]['autocompleteData'][controlName]['header'].length == 0) {
-            Vue.set(state.submit[instance]['autocompleteData'][controlName], 'header', header);
+        let controlName = params.controlName
+        let header = params.header
+        let cacheData = params.cacheData
+        let object = { header: header, cacheData: cacheData }
+        let instance = params.instance;
+        if (state.submit[instance]['autocompleteData'].hasOwnProperty(controlName)) {
+            Vue.set(state.submit[instance]['autocompleteData'][controlName]['cacheData'], Object.keys(cacheData)[0], Object.values(cacheData)[0]);
+            if (state.submit[instance]['autocompleteData'][controlName]['header'].length == 0) {
+                Vue.set(state.submit[instance]['autocompleteData'][controlName], 'header', header);
+            }
+        } else {
+            Vue.set(state.submit[instance]['autocompleteData'], controlName, object);
         }
-    } else {
-        Vue.set(state.submit[instance]['autocompleteData'], controlName, object);
+
     }
+    /**
+     * Hàm update dữ liệu vào danh sách các control root trong table
+     * @param {*} state 
+     * @param {*} params 
+     */
+const updateDataToTableControlRoot = (state, params) => {
+    let controlName = params.controlName;
+    let tableName = params.tableName;
+    let value = params.value;
+    let instance = params.instance;
+    Vue.set(state.submit[instance]['listTableRootControl'][tableName], controlName, value);
 
 }
+
 
 
 export {
@@ -352,11 +379,13 @@ export {
     setAllDocuments,
     resetCurrentControl,
     updateCurrentControlProps,
+    updateCurrentControlFormulas,
     addToRelatedLocalFormulas,
     setDefaultSubmitStore,
     setDefaultEditorStore,
     setDefaultDetailStore,
     updateCurrentControlEditByUser,
     cacheDataAutocomplete,
+    updateDataToTableControlRoot
 
 };

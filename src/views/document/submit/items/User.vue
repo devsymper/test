@@ -32,17 +32,24 @@ export default {
             listUser:null,
             listAllUser:null,
             element:null,
-            indexActive:-1
+            indexActive:1,
         }
     },
+    computed:{
+        allUsers(){
+            return this.$store.state.app.allUsers;
+        }
+    },
+ 
     created(){
         
         let thisCpn = this;
         this.$evtBus.$on('document-submit-user-input-change',e=>{
+            if(thisCpn._inactive == true) return;
             if( thisCpn.isShow == false){
+                thisCpn.element = $(e.curTarget)
                 thisCpn.show();
                 thisCpn.calculatorPositionBox(e);
-                thisCpn.element = $(e.target)
             }
             if(e.keyCode == 38){    //len
                 if(thisCpn.indexActive <= 0){
@@ -67,24 +74,14 @@ export default {
                 thisCpn.selectItem(user);
                 thisCpn.indexActive = -1
             }
-            thisCpn.filterUser($(e.target).val())
+            thisCpn.filterUser(thisCpn.element.val())
         })
 
-        userApi.getListUser(1,100000).then(res => {
-            if (res.status == 200) {
-                thisCpn.listAllUser = res.data.listObject;
-                thisCpn.$store.commit("document/addToDocumentSubmitStore", {
-                    key: 'listUser',
-                    value: thisCpn.listAllUser,
-                    instance:thisCpn.keyInstance
-                });
-            }
-            
-        })
-        .catch(err => {
-            
-        })
-        .always(() => {
+        this.listAllUser = this.allUsers
+        this.$store.commit("document/addToDocumentSubmitStore", {
+            key: 'listUser',
+            value: this.listAllUser,
+            instance:this.keyInstance
         });
         
     },
@@ -97,8 +94,11 @@ export default {
     methods:{
         filterUser(val){
             let list = this.listAllUser.filter(user=>{
-                return user.displayName.toLowerCase().includes(val) || user.id == val
+                return user.displayName.toLowerCase().includes(val.toLowerCase()) || user.id == val
             })
+            if(this.listUser.length > 0){
+                this.listUser[0].active = true;
+            }
             this.listUser = list;
             
         },
@@ -110,43 +110,34 @@ export default {
         },
 
         // calPosition(e){
-        //     this.positionBox = {'top':$(e.target).offset().top + 25 +'px','left':$(e.target).offset().left - $(e.target).width()/2+'px'};
+        //     this.positionBox = {'top':$(e.curTarget).offset().top + 25 +'px','left':$(e.curTarget).offset().left - $(e.curTarget).width()/2+'px'};
         // },
         calculatorPositionBox(e){
             // nếu autocomplete từ cell của handsontable  
-            if($(e.target).closest('.handsontable').length > 0 ){
+            if(this.element.closest('.handsontable').length > 0 ){
                 let autoEL = $(this.$el).detach();
-                $(e.target).closest('.wrap-table').append(autoEL);
-                let edtos = $(e.target).offset();
-                if(!$(e.target).is('.handsontableInput')){
-                    edtos = $(e.target).closest('td.htAutocomplete.current.highlight').offset();
+                this.element.closest('.wrap-table').append(autoEL);
+                let edtos = this.element.offset();
+                if(!this.element.is('.handsontableInput')){
+                    edtos = this.element.closest('td.htAutocomplete.current.highlight').offset();
                 }
-                if($(e.target).is('div.htAutocompleteArrow')){
-                    edtos = $(e.target).parent().offset();;
+                if(this.element.is('div.htAutocompleteArrow')){
+                    edtos = this.element.parent().offset();;
                 }
                 
-                let tbcos = $(e.target).closest('.wrap-table').find('[s-control-type="table"]').offset();
-                this.positionBox = {'top':edtos.top - tbcos.top + $(e.target).height() +'px','left':edtos.left - tbcos.left+'px'};
+                let tbcos = this.element.closest('.wrap-table').find('[s-control-type="table"]').offset();
+                this.positionBox = {'top':edtos.top - tbcos.top + this.element.height() +'px','left':edtos.left - tbcos.left+'px'};
             }
             //nêu là ngoài bảng
             else{
                 let autoEL = $(this.$el).detach();
-                $(e.target).parent().append(autoEL);
-                this.positionBox = {'top':'28px','left':'0px'};
+                this.element.parent().append(autoEL);
+                this.positionBox = {'top':this.element.height()+2+'px','left':'0px'};
             }
         },
         selectItem(user){
-            if(this.element.is('.s-control')){
-                this.element.attr('user-id',user.id);
-                this.element.val(user.displayName);
-                this.element.trigger('change');
-            }
-            else{
-                // this.element.blur();
-                this.$emit('after-select-user');
-                this.element.val(user.id);
-            }
             
+            this.$emit('after-select-user',{input:this.element,value:user});
             this.hide();
         }
     }
@@ -158,6 +149,8 @@ export default {
         position: absolute;
         z-index: 99999;
         max-width: unset !important;
+        max-height: 500px;
+        overflow: hidden;
     }
     .user-item{
         padding: 4px 8px;

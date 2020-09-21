@@ -32,7 +32,7 @@
                     v-if="inputInfo.isDateTime"
                 ></i>
                 <i
-                    :class="{'mdi mdi-dock-window float-right input-item-func ml-1': true,'active': inputInfo.title == largeFormulaEditor.name}"
+                    :class="{'mdi mdi-dock-window float-right input-item-func ml-1': true,'active': inputInfo.title == largeFormulaEditor.name, 'd-none':(inputInfo.activeTab && inputInfo.activeTab=='orgchart' )}"
                     @click="openLargeValueEditor(inputInfo, name)"
                     v-if="inputInfo.type == 'script' || inputInfo.type == 'userAssignment'"
                 ></i>
@@ -59,7 +59,6 @@
                 @keyup="(data) => {
                     handleKeyUpInputValue(inputInfo, name,data);
                 }"
-
                 :ref="'inputItem_'+name"
                 solo
                 :items="inputInfo.options"
@@ -90,12 +89,11 @@
                 </template>
             </component>
 
-            <div class="error-message"> 
-                {{inputInfo.errorMessage}}
+            <div class="error-message" v-if="inputInfo.validateStatus && !inputInfo.validateStatus.isValid">
+                {{inputInfo.validateStatus.message}}
             </div>
         </div>
-
-        <symper-drag-panel 
+        <symper-drag-panel
             @before-close="closeLargeFormulaEditor()"
             :showPanel="largeFormulaEditor.open"
             :actionTitle="largeFormulaEditor.data.title"
@@ -111,6 +109,7 @@
                     v-else-if="panelData.type == 'userAssignment'"
                     v-model="panelData.value.formula"
                     @blur="handleLargeFormulaEditorBlur"
+                    ref="edtFormula"
                     :width="'100%'"
                     :height="'370px'"
                 ></formula-editor>
@@ -118,6 +117,7 @@
                     v-else
                     @blur="handleLargeFormulaEditorBlur"
                     v-model="panelData.value"
+                    ref="edtFormula"
                     :width="'100%'"
                     :height="'370px'"
                 ></formula-editor>
@@ -125,8 +125,8 @@
         </symper-drag-panel>
 
         <datetime-picker ref="dateTimePicker" @apply-datetime="appendValueToSciptEditor" :position="currentPointer"></datetime-picker>
-        
-        
+
+
     </div>
 </template>
 <script>
@@ -323,6 +323,7 @@ export default {
             this.$emit('append-icon-click');
         },
         handleLargeFormulaEditorBlur(){
+            this.hideDragPanel();
             let name = this.largeFormulaEditor.name;
             let inputInfo = this.allInputs[name];
             this.handleInputBlur(inputInfo, name);
@@ -369,7 +370,7 @@ export default {
                     });
                 }
             }
-            this.largeFormulaEditor.data.value.orgchartSelectorValue = vls;  
+            this.largeFormulaEditor.data.value.orgchartSelectorValue = vls;
         },
         getDragPanelContent(panelData){
             if(panelData.type == 'userAssignment'){
@@ -389,11 +390,12 @@ export default {
         closeLargeFormulaEditor() {
             let info = this.largeFormulaEditor;
             setTimeout((self) => {
-                self.largeFormulaEditor.name = '';            
+                self.largeFormulaEditor.name = '';
             }, 500, this);
         },
         openLargeValueEditor(inputInfo, name) {
             this.$refs.dragPanel.show();
+            this.$refs.edtFormula.onFocus();
             this.largeFormulaEditor.name = name;
             this.$set(this.largeFormulaEditor, "data", inputInfo);
             if(this.getDragPanelContent(inputInfo) == 'orgchart-selector'){
@@ -419,10 +421,12 @@ export default {
              * inputInfo: chứa các thông tin về input
              */
             this.$emit("input-value", name, inputInfo, data);
+            if (inputInfo.validate && typeof inputInfo.validate == 'function') {
+                inputInfo.validate();
+            }
         },
         handleKeyUpInputValue(inputInfo, name, data){
             console.log('jj',inputInfo, name, data);
-            
             this.$emit("input-value-keyup", name, inputInfo, data);
         },
         getInputProps(inputConfigs) {
@@ -511,7 +515,7 @@ export default {
             let w = this.labelWidth;
             return this.singleLine ? `calc(100% - ${w} - 8px)` : "100%";
         },
-     
+
     },
     components: {
         VTextField,

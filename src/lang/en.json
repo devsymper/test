@@ -2,6 +2,7 @@
     "common": {
         "id": "Id",
         "select_lang": "Select language",
+        "KH": "Knowledge Management",
         "reports": "Reports",
         "workflows": "Workflows",
         "documents": "Documents",
@@ -13,6 +14,7 @@
         "users": "Users",
         "add": "Add",
         "edit": "Edit",
+        "cancel": "Cancel",
         "update": "Update",
         "delete": "Delete",
         "refresh": "Refresh",
@@ -76,7 +78,8 @@
         "fullName": "Full name",
         "email": "Email",
         "pageSize": "Page size",
-        "pendding": "Pendding"
+        "pendding": "Pendding",
+        "print": "Print"
     },
     "validate": {
         "required": "Not be empty",
@@ -234,7 +237,11 @@
             "date_created": "Date",
             "name": "Name",
             "description": "Description",
-            "type": "Type"
+            "type": "Type",
+            "createAt": "Create at",
+            "updateAt": "Update at",
+            "userCreate": "User create",
+            "userUpdate": "User update"
         },
         "title": "Permissions packages",
         "actionControlSummary": "Action pack Summary",
@@ -278,15 +285,17 @@
     },
     "document": {
         "create": "Create document",
-        "submit": "Submit document",
         "edit": "Edit document",
         "title": "List Document",
         "table": {
             "id": "Id",
             "name": "Name",
             "title": "Title",
+            "note": "Note",
+            "type": "Type",
             "menu": "menu",
             "countobject": "Count object",
+            "countPrint": "Count print",
             "workflow": "Workflow",
             "createAt": "Create at",
             "updateAt": "Update at",
@@ -306,15 +315,32 @@
                         "source": "Source",
                         "formulas": "Formulas"
                     }
+                },
+                "saveDoc": {
+                    "heading": "Save Document",
+                    "checkNameRelated": "Check formulas related"
+                },
+                "swapType": {
+                    "heading": "Swap type control",
+                    "note": "Note: The Control to be convert can lead to be lost data in system",
+                    "nameControl": "Control name",
+                    "changeFrom": "From",
+                    "changeTo": "To"
+                },
+                "quickInfoControl": {
+                    "heading": "Control Infomation"
                 }
             }
         },
         "submit": {
             "fab": {
                 "submit": "Submit",
-                "draft": "Save to Draft",
-                "toggleSize": "Toggle resize page"
-            }
+                "draft": "Draft",
+                "toggleSize": "Toggle Size"
+            },
+            "title": "Submit document",
+            "goToList": "Go to list",
+            "continueSubmit": "Submit again"
         },
         "process": {
             "header_bar": {
@@ -338,7 +364,9 @@
                         "dateCreate": "Date created",
                         "userCreate": "User created",
                         "history": "History",
-                        "comment": "Comment"
+                        "comment": "Comment",
+                        "has": "Has",
+                        "commentNotResolve": "comment Not Resolve"
                     },
                     "worflowInfo": "Workflow infomation",
                     "userRelated": {
@@ -352,6 +380,9 @@
                 "toggleSize": "Toggle Size",
                 "otherInfo": "Other information",
                 "print": "Print"
+            },
+            "comment": {
+                "heading": "COMMENT"
             }
         }
     },
@@ -429,6 +460,37 @@
             "save": "Save"
         }
     },
+    "objectType": {
+        "Document definition": "Văn bản",
+        "Document instance": "Danh sách bản ghi",
+        "Orgchart": "Sơ đồ tổ chức",
+        "Dataflow": "Luồng xử lý dữ liệu",
+        "Workflow definition": "Quy trình",
+        "Workflow instance": "Văn bản",
+        "Syql": "Công thức",
+        "Account": "Tài khoản người dùng",
+        "Report": "Báo cáo",
+        "Dashboard": "Dashboard",
+        "Job": "Job",
+        "Operation": "Operation",
+        "Action pack": "Nhóm hành động",
+        "Knowledge": "Văn bản nội bộ",
+        "File": "Quản lý tệp",
+        "Department": "Phòng ban",
+        "Timesheet": "Thời gian biểu",
+        "documentPanel": {
+            "system": "System",
+            "list": "List"
+        },
+        "documentEditor": {
+            "f_10px": "10px",
+            "f_11px": "11px",
+            "f_12px": "12px",
+            "f_13px": "13px",
+            "f_14px": "14px"
+        }
+
+    },
     "apps": {
         "header": {
             "id": "ID",
@@ -440,18 +502,34 @@
             "created_at": "Date create",
             "updated_at": "Last update"
         },
+        "emptyApp": "List application epmty",
+        "emptyFavorite": " List favorite empty",
+        "listType": {
+            "documents": "Documents",
+            "workflows": "Work flows",
+            "reports": "Reports",
+            "orgcharts": "Orgcharts"
+        },
+        "addApp": "Add application",
+        "editApp": "Edit application",
         "title": "Applications",
         "pickIcon": "Pick icon",
         "apps": "Applications",
         "commonInfo": "General",
         "listObjects": "Objects",
         "addObject": "Add object",
+        "clickToAdd": "Click to add item",
+        "search": "Search",
+        "favorite": "Favorite",
+        "listApp": "List applications",
         "objectSummary": "Objects summary",
         "contextMenu": {
             "edit": "Edit",
             "grantPermission": "Grant permission",
             "remove": "Delete"
         },
+        "active": "Active",
+        "notActive": "Not active",
         "updated": "Permission package updated",
         "added": "Permission package created",
         "deleted": "Permission package deleted",
@@ -471,12 +549,132 @@
                 "unfavorite": "Remove from favorite"
             },
             "orgchart": {
+                "create": "Create",
+                "update": "Update",
+                "drop": "Drop",
+                "list": "List",
                 "detail": "Detail",
-                "edit": "Edit",
-                "query": "Query",
-                "favorite": "Add to favorite",
-                "unfavorite": "Remove from favorite"
+                "unfavorite": "Remove favorite"
+            },
+            "document_definition": {
+                "create": "Create document",
+                "edit": "Edit document",
+                "submit": "Submit document",
+                "drop": "Delete document",
+                "restore": "Restore",
+                "list": "List",
+                "list_trash": "List trash",
+                "list_instance": "List instance",
+                "unfavorite": "Remove favorite"
+            },
+            "workflow_definition": {
+                "list": "List",
+                "create": "Create",
+                "deploy": "Deloy",
+                "drop": "Delete",
+                "update": "Update",
+                "list_instance": "List instance",
+                "start_instance": "Start instance",
+                "unfavorite": "Remove favorite"
+            },
+            "dashboard": {
+                "create": "Create dashboard",
+                "update": "Update",
+                "view": "View",
+                "list": "List",
+                "drop": "Delete",
+                "unfavorite": "Remove favorite"
             }
+        },
+        "iconListActions": {
+            "orgchart": {
+                "create": "mdi-folder-plus-outline",
+                "update": "mdi-note-plus-outline",
+                "drop": "mdi-arrow-down-drop-circle-outline",
+                "list": "mdi-clipboard-list-outline",
+                "detail": "mdi-details",
+                "unfavorite": "mdi-star-off"
+            },
+            "document_definition": {
+                "create": "mdi-folder-plus-outline",
+                "edit": "mdi-file-document-edit-outline",
+                "submit": "mdi-content-save-outline",
+                "drop": "mdi-arrow-down-drop-circle-outline",
+                "restore": "mdi-file-restore-outline",
+                "list": "mdi-clipboard-list-outline",
+                "list_trash": "mdi-playlist-remove",
+                "list_instance": "mdi-file-document-multiple-outline",
+                "unfavorite": "mdi-star-off"
+            },
+            "workflow_definition": {
+                "list": "mdi-clipboard-list-outline",
+                "create": "mdi-folder-plus-outline",
+                "deploy": "mdi-rocket",
+                "drop": "mdi-arrow-down-drop-circle-outline",
+                "update": "mdi-note-plus-outline",
+                "list_instance": "mdi-file-document-multiple-outline",
+                "start_instance": "mdi-play-outline",
+                "unfavorite": "mdi-star-off"
+            },
+            "dashboard": {
+                "create": "mdi-folder-plus-outline",
+                "update": "mdi-note-plus-outline",
+                "view": "mdi-eye-outline",
+                "list": "clipboard-list-outline",
+                "drop": "arrow-down-drop-circle-outline",
+                "unfavorite": "mdi-star-off"
+            }
+        }
+    },
+    "kh": {
+        "folder": "Folder",
+        "document": "Document",
+        "sidebar": {
+            "add": "Add",
+            "edit": "Edit",
+            "delete": "Delete",
+            "add_favorite": "Add to favorite",
+            "delete_favorite": "Remove from favorite",
+            "restore": "Restore",
+            "attach": "Attach file to",
+            "rename": "Rename"
+
+
+        },
+        "dialog": {
+            "save": "Document has not been saved?",
+            "remove": "You will delete this item?",
+            "note": "You need to press the save button to perform this action",
+            "restore": "Are you sure you want to restore?",
+            "titleRestore": "You will restore this version!",
+            "cancel": "Cancel",
+            "yes": "Yes"
+
+        },
+        "toolbox": {
+            "save": "Save",
+            "attach": "Attach",
+            "toc": "Table of content",
+            "comment": "Comment",
+            "history": "History",
+            "backup": "Backup"
+        },
+        "contextmenu": {
+            "add": "Add",
+            "move": "Move",
+            "paste": "Paste",
+            "folder": "Folder",
+            "document": "Document",
+            "open": "Open",
+            "download": "Download",
+            "rename": "Rename",
+            "delete": "Delete",
+            "addfavorite": "Add to favorite",
+            "removefavorite": "Remove from favorite",
+            "viewcontent": "View content"
+        },
+        "table": {
+            "totalDoc": "Total document"
         }
     },
     "actions": {
@@ -564,6 +762,9 @@
             "canNotCreateTask": "Can not create task"
         },
         "header": {
+            "type": "Loại",
+            "approval": "Phê duyệt",
+            "submit": "Gửi văn bản",
             "date": "Date",
             "dueDate": "Due Date",
             "createDate": "Create date",
@@ -575,7 +776,8 @@
             "participant": "Participant",
             "id": "Seri",
             "list": "List task",
-            "submitForm": "Submit form"
+            "submitForm": "Submit form",
+            "alertDescription": "No description"
         },
         "filterOptions": {
             "all": "All task",
@@ -592,7 +794,15 @@
         "created": "Task created",
         "relatedPeople": {
             "title": "Related people"
+        },
+        "table": {
+            "fileName": "File name",
+            "type": "Type",
+            "owner": "Owner",
+            "size": "Size",
+            "date": "Date"
         }
+
     },
     "orgchart": {
         "list": {
@@ -641,5 +851,13 @@
         "detail": {
             "title": "Detail dashboard "
         }
+    },
+    "comment": {
+        "title": "Comment",
+        "comment": "Comment",
+        "resolve": "Resolve",
+        "reply": "Reply",
+        "edited": "Edited",
+        "search": "Search"
     }
 }

@@ -1,5 +1,7 @@
 <template>
-    <list-items
+    
+    <div class="h-100 w-100">
+        <list-items
         :getDataUrl="'https://sdocument-management.symper.vn/documents/'+docId+'/objects'"   
         :useDefaultContext="false"
         :tableContextMenu="tableContextMenu"
@@ -8,6 +10,7 @@
         :actionPanelWidth="actionPanelWidth"
         @after-open-add-panel="submitDocument"
         @data-get="afterGetData"
+        :commonActionProps="commonActionProps"
         ref="listObject"
     >
         <div slot="right-panel-content" class="h-100">
@@ -30,10 +33,19 @@
             </div>
         </div>
     </list-items>
+        <ListPrintConfig :documentId="docId"
+        :width="'30cm'" 
+        :height="'80%'" 
+        :title="`<span class='mdi mdi-printer-settings'></span> &nbsp;Chọn mẫu in`" 
+        :actions="listActionForPrint"
+        class="view-print-config" ref="listPrintView"/>
+    </div>
 </template>
 <script>
 import ListItems from "./../../../components/common/ListItems.vue";
 import ActionPanel from "./../../../views/users/ActionPanel.vue";
+import ListPrintConfig from "./../print/ListPrintConfig";
+
 import { documentApi } from "./../../../api/Document.js";
 import { util } from "./../../../plugins/util.js";
 import Detail from './../detail/Detail.vue'
@@ -42,10 +54,17 @@ export default {
         "list-items": ListItems,
         "detail-object": Detail,
         "action-panel": ActionPanel,
+        ListPrintConfig
     },
     data(){
         return {
-            docId:this.$route.params.id,
+            commonActionProps: {
+                "module": "document",
+                "resource": "document_instance",
+                "scope": "document",
+                "parentId": this.$route.params.id
+            },
+            docId:parseInt(this.$route.params.id),
             currentDocObjectActiveIndex:'',
             panelDocTitle:"",
             docObjInfo:{},
@@ -53,8 +72,21 @@ export default {
             containerHeight: 200,
             dataTable:[],
             dataClipboard:"",
-            tableContextMenu:[
-                {name:"delete",text:'Xóa',
+            listActionForPrint:{
+                print:{
+                    title: this.$t('common.print'),
+                    icon : '',
+                    action: function(data){
+                        this.$goToPage('/documents/objects/'+data.documentObjectId+'/print/'+data.formId,"In");
+                    }.bind(this)
+
+                },
+                
+            },
+            tableContextMenu:{
+                delete: {
+                    name:"delete",
+                    text:'Xóa',
                     callback: (documentObject, callback) => {
                         let ids = documentObject.reduce((arr,obj)=>{
                             arr.push(obj.document_object_id);
@@ -83,21 +115,22 @@ export default {
                         .always(() => {});
                     },
                 },
-                {
+                detail: {
                     name: "detail",
                     text: "Xem chi tiết",
                     callback: (documentObject, callback) => {
                         this.$goToPage('/documents/objects/'+documentObject.document_object_id,"Danh sách bản ghi");
                     },
                 },
-                {
+                print: {
                     name: "print",
                     text: "In",
                     callback: (documentObject, callback) => {
-                        this.$goToPage('/documents/objects/'+documentObject.document_object_id+'/print',"In");
+                        this.$refs.listPrintView.show();
+                        this.$refs.listPrintView.setDocObjectId(documentObject.document_object_id);
                     },
                 },
-                {
+                detail_in_view: {
                     name: "detailInView",
                     text: "Xem trong trang",
                     callback: (documentObject, callback) => {
@@ -107,14 +140,14 @@ export default {
                         this.docObjInfo = {docObjId:parseInt(documentObject.document_object_id),docSize:'21cm'}
                     },
                 },
-                {
+                update: {
                     name: "edit",
                     text: "Cập nhật",
                     callback: (documentObject, callback) => {
                         this.$goToPage('/document/objects/update/'+documentObject.document_object_id,"Cập nhật");
                     },
                 },
-            ],
+            },
         }
     },
     computed:{
@@ -162,7 +195,7 @@ export default {
             }
         },
         submitDocument(){
-            this.$router.push('/document/submit/'+this.docId);
+            this.$router.push('/documents/'+this.docId+'submit');
         },
      
         calcContainerHeight() {

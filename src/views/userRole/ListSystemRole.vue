@@ -11,6 +11,7 @@
             :headerPrefixKeypath="'common'"
             :currentItemData="currentItemData"
             @after-open-add-panel="handleAddItem"
+            :commonActionProps="commonActionProps"
         >
             <template slot="right-panel-content" slot-scope="{itemData}">
                 <SystemRoleForm
@@ -37,6 +38,11 @@ export default {
     data() {
         let self = this;
         return {
+            commonActionProps: {
+                "module": "role",
+                "resource": "role",
+                "scope": "role",
+            },
             containerHeight: 300,
             actionOnItem: 'create',
             getListUrl: appConfigs.apiDomain.systemRole+'system-role',
@@ -46,8 +52,8 @@ export default {
                 users: [],
                 permissions: []
             },
-            tableContextMenu: [
-                {
+            tableContextMenu: {
+                update: {
                     name: "edit",
                     text: this.$t("common.edit"),
                     callback: (row, callback) => {
@@ -56,7 +62,7 @@ export default {
                         self.applyDataToForm(row);
                     }
                 },
-                {
+                drop: {
                     name: "remove",
                     text: this.$t("common.delete"),
                     callback: async (rows, refreshList) => {
@@ -77,7 +83,7 @@ export default {
                         refreshList();
                     }
                 },
-                {
+                detail: {
                     name: "detail",
                     text: this.$t("common.detail"),
                     callback: (row, callback) => {
@@ -87,7 +93,7 @@ export default {
                         self.applyDataToForm(row);
                     }
                 },
-            ]
+            }
         };
     },
     mounted() {
@@ -126,7 +132,7 @@ export default {
         handleAddItem(){
             this.actionOnItem = 'create';
             for(let key in this.currentItemData){
-                if(key == 'users'){
+                if(key == 'users' || key == 'permissions'){
                     this.currentItemData.users = [];
                 }else{
                     this.currentItemData[key] = '';

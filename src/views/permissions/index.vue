@@ -12,6 +12,7 @@
             @after-open-add-panel="handleAddItem"
             :currentItemData="currentItemData"
             :customAPIResult="customAPIResult"
+            :commonActionProps="commonActionProps"
         >
             <template slot="right-panel-content" slot-scope="{itemData}">
                 <PermissionForm
@@ -30,6 +31,7 @@ import ListItems from "../../components/common/ListItems";
 import grandPermission from "./grandPermission";
 import UpdatePermission from "./Update";
 import Api from "./../../api/api.js";
+import accountApi from "./../../api/account";
 import { appConfigs } from "../../configs";
 import { permissionApi } from '../../api/permissionPack';
 import PermissionForm from "@/components/permission/PermissionForm.vue";
@@ -55,14 +57,25 @@ export default {
             return appConfigs.apiDomain.permissionPacks;
         }
     },
+    created(){
+        this.$store.dispatch("app/getAllBA");
+        this.getUserName();
+    },
     data: function() {
         let self = this;
         return {
+            listUser:[],
+            nameUser:[],
+            commonActionProps: {
+                "module": "permission_pack",
+                "resource": "permission_pack",
+                "scope": "permission_pack",
+            },
             customAPIResult: {
                 reformatData(res) {
                     if (res.status == 200) {
                         return {
-                            listObject: res.data,
+                            listObject: self.setNameForUserId(res.data),
                             columns: [
                                 {
                                     name: "id",
@@ -83,6 +96,26 @@ export default {
                                     name: "type",
                                     title: "type",
                                     type: "text"
+                                },
+                                {
+                                    name: "createAt",
+                                    title: "createAt",
+                                    type: "text"
+                                },
+                                {
+                                    name: "updateAt",
+                                    title: "updateAt",
+                                    type: "text"
+                                },
+                                {
+                                    name: "userCreate",
+                                    title: "userCreate",
+                                    type: "text"
+                                },
+                                 {
+                                    name: "userUpdate",
+                                    title: "userUpdate",
+                                    type: "text"
                                 }
                             ]
                         };
@@ -94,8 +127,8 @@ export default {
             containerHeight: 300,
             actionOnItem: 'create',
             currentItemData: util.cloneDeep(defaultItemData),
-            tableContextMenu: [
-                {
+            tableContextMenu: {
+                update: {
                     name: "edit",
                     text: this.$t("permissions.contextMenu.edit"),
                     callback: async (pack, callback) => {
@@ -119,7 +152,7 @@ export default {
                         }
                     }
                 },
-                {
+                remove: {
                     name: "remove",
                     text: this.$t("permissions.contextMenu.remove"),
                     callback: async (rows, refreshList) => {
@@ -129,18 +162,18 @@ export default {
                         }
                         try {
                             let res = await permissionApi.deletePermissionPack(ids);
-                            if(res.status == 200){
+                            // if(res.status == 200){
                                 self.$snotifySuccess("Deleted "+ids.length+' items');
-                            }else{
-                                self.$snotifyError(res, "Can not delete selected items");
-                            }
+                            // }else{
+                            //     self.$snotifyError(res, "Can not delete selected items");
+                            // }
                         } catch (error) {
                             self.$snotifyError(error, "Can not delete selected items");
                         }
                         refreshList();
                     }
                 }
-            ],
+            },
             tableHeight: 0
         };
     },
@@ -148,6 +181,21 @@ export default {
         this.tableHeight = document.body.clientHeight - 0;
     },
     methods: {
+        setNameForUserId(listData){
+            let list = this.$store.state.app.allBA;
+            for(let i = 0; i<listData.length; i++){
+                listData[i].userCreate = this.getBAName(list, listData[i].userCreate);
+                listData[i].userUpdate = this.getBAName(list, listData[i].userUpdate);
+            }
+            return listData;
+        },
+        getBAName(list, id){
+            for(let i = 0; i<list.length;i++){
+                if(list[i].id==id){
+                    return list[i].name;
+                }
+            }
+        },
         async getDetailSystemRole(id){
             let res = await systemRoleApi.detail(id);
             if(res.status == 200){

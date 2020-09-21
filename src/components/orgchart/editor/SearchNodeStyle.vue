@@ -42,12 +42,12 @@
 import { SYMPER_APP } from '../../../main'
 import { orgchartApi } from '../../../api/orgchart'
 export default {
-    // data(){
-    //     return {
-    //         
-    //     }
-    // },
+	props:{
+		change:{
+			type: Number,
 
+		}
+	},
     data: () => ({
         selectedNodeStyle: null,
         activator: null,
@@ -68,24 +68,27 @@ export default {
     }),
 
     watch: {
-      model (val, prev) {
-        if (val.length === prev.length) return
+		change(val){
+			this.selectedNodeStyle = null
+		},
+		model (val, prev) {
+			if (val.length === prev.length) return
 
-        this.model = val.map(v => {
-          if (typeof v === 'string') {
-            v = {
-              text: v,
-              color: this.colors[this.nonce - 1],
-            }
+			this.model = val.map(v => {
+			if (typeof v === 'string') {
+				v = {
+				text: v,
+				color: this.colors[this.nonce - 1],
+				}
 
-            this.items.push(v)
+				this.items.push(v)
 
-            this.nonce++
-          }
+				this.nonce++
+			}
 
-          return v
-        })
-      },
+			return v
+			})
+		},
     },
 
     methods: {
