@@ -16,6 +16,7 @@
                             :placeholder="$t('common.search')"
                         ></v-text-field>
                         <v-btn
+                            v-show="showButtonAdd"
                             depressed
                             small
                             :loading="loadingRefresh"
@@ -231,6 +232,9 @@ export default {
             if (this.actionPanel == true) {
                 this.$emit("open-panel");
             }
+        },
+        getDataUrl(){
+            this.refreshList();
         }
     },
     data() {
@@ -367,6 +371,10 @@ export default {
             default() {
                 return {};
             }
+        },
+        showButtonAdd:{
+            type:Boolean,
+            default: true
         },
         /**
          * Prefix cho keypath trong file đa ngôn ngữ để hiển thị header của table
@@ -1288,7 +1296,7 @@ export default {
     white-space: nowrap !important;
 }
 .symper-custom-table.loosen-row .ht_master.handsontable .htCore td,
-.symper-custom-table.loosen-row .ht_clone_left.handsontable .htCore td {
+.symper-custom-table.loosen-row .htgetDataUrl_clone_left.handsontable .htCore td {
     height: 40px !important;
     line-height: 40px !important;
 }

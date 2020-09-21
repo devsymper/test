@@ -29,7 +29,6 @@ export default {
                     listUser.push(e.userId)
                 }
             })
-            console.log(listUser);
             this.$store.commit('orgchart/setAllUserInOrgchart',{
                 orgchartId: res.data.orgchart.id,
                 listUsers: listUser

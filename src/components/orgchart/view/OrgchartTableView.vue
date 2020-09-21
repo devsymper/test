@@ -51,25 +51,27 @@
                                 :rowData="dataTable"
                                 :editable="false"
                                 :customComponents="customAgComponents"
-                                @on-cell-db-click="onCellDbClick"
+                                @on-cell-dbl-click="onCellDblClick"
                                 :cellRendererParams="{
                                     innerRenderer:'nodeName'
                                 }">
                             </AgDataTable>
                         </VueResizable>
                        <ListItems 
-                             ref="listApp"
+                             ref="listUser"
                             :pageTitle="'Danh sách người dùng'"
                             :getDataUrl="apiUrl"
                             :containerHeight="containerHeight"
                             :tableContextMenu="tableContextMenu"
                             :useDefaultContext="false"
+                            :useActionPanel="true"
                             :customAPIResult="customAPIResult"
+                            :showButtonAdd="false"
                         >
-                         <!-- <template slot="right-panel-content" slot-scope="{}">  -->
-                         <!-- </template> -->
+                            <template slot="right-panel-content" slot-scope="{}">  
+                                <Detail :quickView="true" :docObjInfo="docObjInfo" />
+                            </template>
                        </ListItems>  
-                              <navigation-detail-user  :showNavigation="showNavigation"  style="z-index:10001" @close-navigation="showNavigation = false" />
                         
                 </div>
             </v-tab-item>
@@ -98,7 +100,7 @@ import TableSideBySildeView from './TableSideBySildeView.vue'
 import ListItems from '@/components/common/ListItems.vue'
 import VueResizable from 'vue-resizable';
 import { util } from "./../../../plugins/util.js";
-import NavigationDetailUser from './NavidationDetailUser.vue'
+import Detail from '@/views/document/detail/Detail.vue'
 export default {
     props: {
         allDepartments: {
@@ -120,12 +122,15 @@ export default {
         TableSideBySildeView,
         ListItems,
         VueResizable,
-        NavigationDetailUser
+        Detail
     },
     mounted(){
         this.containerHeight = util.getComponentSize(this).h - 50
     },
     computed: {
+        allUserInOrgchart(){
+             return  this.$store.state.orgchart.allUserInOrgChart[this.$route.params.id]
+        },    
         dataTable(){
             let data = [];
             if(this.allDepartments == null){
@@ -281,9 +286,6 @@ export default {
             this.mapNameToDynamicAttr = null;
             this.mapNameToDynamicAttr = mapNameToDynamicAttr;
 
-            // for(let key in mapNameToDynamicAttr){
-            //     this.$set(this.mapNameToDynamicAttr, key, mapNameToDynamicAttr[key]);
-            // }
         },
         getPathOfNode(node, mapNode){
             if(!node){
@@ -299,14 +301,20 @@ export default {
                 }
             }
         },
-        onCellDbClick(params){
-            console.log(params);
+        onCellDblClick(params){
             params.data.orgchartId =  this.$route.params.id;
+            this.$store.commit('orgchart/emptyListChildrenNode',this.$route.params.id)
             this.$store.dispatch('orgchart/updateUserInNode',params.data)
             this.listUserInNode = this.$store.getters['orgchart/listUserInChildrenNode'](this.$route.params.id);
+            this.$store.commit('orgchart/setAllUserInOrgchart',{
+                orgchartId:  this.$route.params.id,
+                listUsers: this.listUserInNode
+            })
+            debugger
         }
     },
     data(){
+        let self = this
         return {
             currentTab: 1,
             customAgComponents: {
@@ -315,15 +323,30 @@ export default {
             },
             showNavigation:false,
             listUserInNode:[],
+            docObjInfo:{},
+            apiUrl: '',
             mapNameToDynamicAttr: null,
             mapDpmToPos: null,
-            apiUrl: 'https://account.symper.vn/users',
             customAPIResult:{
                 reformatData(res){
+                    let lists = []
+                    for(let item in res.data){
+                        lists.push(res.data[item])
+                    }
+
                    return{
-                         listObject: res.data.listObject,
-                         columns: res.data.columns,
-                         total: res.data.total
+                       columns:[
+                            {name: "id", title: "user.table.id", type: "numeric"},
+                            {name: "firstName", title: "user.table.firstName", type: "text"},
+                            {name: "displayName", title: "user.table.displayName", type: "text"},
+                            {name: "email", title: "user.table.email", type: "text"},
+                            {name: "phone", title: "user.table.phoneNumber", type: "text"},
+                            {name: "createAt", title: "user.table.createAt", type: "text"},
+                            {name: "updateAt", title: "user.table.updateAt", type: "text"},
+                       ],
+                       listObject:lists
+                         
+
                    }
                 }
             },
@@ -333,7 +356,8 @@ export default {
                     name: "View details",
                     text: "View details",
                     callback: (app, callback) => {
-                       this.showNavigation = true
+                    this.docObjInfo = {docObjId:3986681,docSize:'21cm'}
+                       self.$refs.listUser.actionPanel = true;
                        this.$emit('view-details',app)
                     },
                 },
@@ -342,11 +366,11 @@ export default {
         }
     },
     watch:{
-        listUserInNode:{
+        allUserInOrgchart:{
             deep: true,
             immediate: true,
             handler: function(after){
-                debugger
+                this.apiUrl = 'https://account.symper.vn/users?ids=['+after+']'
             }
         }
     }

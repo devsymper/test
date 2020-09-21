@@ -4,7 +4,7 @@ import {
 } from "../configs.js";
 import {
 	util
-} from "../plugins/util";
+} from "../plugins/util";	
 
 var permissionModuleApi = new Api(appConfigs.apiDomain.permission);
 var actionModuleApi = new Api(appConfigs.apiDomain.actionPacks);

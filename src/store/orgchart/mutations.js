@@ -77,7 +77,7 @@ const deleteNode = (state,params) =>{
 	state.editor[params.instanceKey].splice(state.editor[params.instanceKey].indexOf(state.editor[params.instanceKey][params.id]),1)
 }
 const setAllUserInOrgchart = (state,params) =>{
-	state.allUserInOrgChart[params.orgchartId] = params.listUsers
+	Vue.set(state.allUserInOrgChart,params.orgchartId, params.listUsers )
 }
 const setDataOrgchartSideBySide = (state,params) =>{
 	state.orgChartData[params.orgchartId] = params.object
@@ -99,7 +99,9 @@ const updateListChildrenNode = (state , params) =>{
 		}
 	});
 }
-
+const emptyListChildrenNode = (state,param) =>{
+	state.listChildrenOfNode[param] = []
+}
 export {
 	setOrgchartData,
 	setNodeConfig,
@@ -116,5 +118,6 @@ export {
 	deleteNode,
 	setAllUserInOrgchart,
 	setDataOrgchartSideBySide,
-	updateListChildrenNode
+	updateListChildrenNode,
+	emptyListChildrenNode
 };

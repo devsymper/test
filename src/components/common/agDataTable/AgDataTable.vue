@@ -182,7 +182,7 @@ export default {
             this.$emit('on-cell-change',params)
         },
         cellDoubleClick(params){
-            this.$emit('on-cell-db-click',params)
+            this.$emit('on-cell-dbl-click',params)
         }
         
     },
