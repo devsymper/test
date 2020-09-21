@@ -93,18 +93,6 @@
 					</v-menu>
 		   </v-col>
 	   </v-row>
-		<!-- <div :v-if="isEmpty == true" class="content-list-item">
-			 <div class="empty-item-list">
-				 <div class="empty-item-list-icon"> 
-					  <v-icon >mdi-check</v-icon>
-					  <v-icon >mdi-account-box-outline</v-icon>
-					  <v-icon >mdi-check</v-icon>
-					  <v-icon >mdi-check</v-icon>
-				 </div>
-				 <h6>Chưa có chức năng nào</h6>
-			 </div>
-		</div> -->
-		<!-- <div ></div> -->
 		<AppDetailVue/>
         <v-btn
             small
@@ -185,7 +173,6 @@ export default {
         };
     },
     mounted(){
-		// this.checkEmpty()	
     },
     methods: {
         setAppObject(app) {
@@ -194,12 +181,6 @@ export default {
         clickToAdd(){
             this.$refs.searchModal.getListSearch('');
         },
-		// checkEmpty(){
-		// 	if(this.sApp.documents.item.length == 0 && this.sApp.orgcharts.item.length == 0 && this.sApp.reports.item.length == 0 && this.sApp.workflows.item.length == 0 ){
-		// 		this.isEmpty = true;
-		// 	}
-		// 	else this.isEmpty = false;
-		// },
 		updateListItem(data){
 			let self = this;
 			self.childrenApp.document_definition = []
@@ -229,8 +210,8 @@ export default {
 			self.currentApp.childrenApp = self.childrenApp
 		},
         pickIcon(data) {
-			this.currentApp.iconName = data.icon.trim();
-            this.currentApp.iconType = data.type;
+            this.$set(this.currentApp, 'iconName', data.icon.trim() )
+            this.$set(this.currentApp, 'iconType' , data.type)
 		},
 		selectedItem(data){
 			this.listSelectedItem = data;
@@ -266,7 +247,7 @@ export default {
 				delete this.currentApp.childrenApp
 			}
 			if(this.currentApp.status === null){
-				this.currentApp.status =0
+				this.currentApp.status = 0
 			}
 			this.updateListItem(this.$store.state.appConfig.listItemSelected)
 			let data = JSON.stringify(this.currentApp);
