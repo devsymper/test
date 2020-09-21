@@ -79,7 +79,10 @@
         "email": "Email",
         "pageSize": "Số bản ghi mỗi trang",
         "pendding": "Cần làm",
-        "print": "In"
+        "print": "In",
+        "display": "Hiển thị",
+        "of": "của",
+        "entries": "bản ghi"
     },
     "login": {
         "title": "Đăng nhập hệ thống",
@@ -884,9 +887,9 @@
             "unsubscribe": "Bỏ theo dõi"
         }
     },
-    "myItem":{
-        "objType":"Loại đối tượng",
-        "today":"Hôm nay"
+    "myItem": {
+        "objType": "Loại đối tượng",
+        "today": "Hôm nay"
     },
     "tasks": {
         "error": {
@@ -911,8 +914,8 @@
             "list": "Danh sách công việc",
             "submitForm": "Form nhập liệu",
             "alertDescription": "Không có mô tả",
-            "relatedTask":"CÁC TASK LIÊN QUAN",
-            "attachment":"TỆP ĐÍNH KÈM"
+            "relatedTask": "CÁC TASK LIÊN QUAN",
+            "attachment": "TỆP ĐÍNH KÈM"
         },
         "filterOptions": {
             "all": "Toàn bộ task",
