@@ -19,6 +19,7 @@ import {
 } from "./configs";
 import actionMap from './action/index'
 import VueRx from 'vue-rx'
+import iconMap from "./icon";
 //thu vien slider thumbnails
 
 //Anhtger import html2canvas
@@ -63,6 +64,19 @@ Vue.mixin({
                     params: {}
                 });
 
+            }
+        },
+
+        $i(pathToIcon) {
+            if (pathToIcon) {
+                try {
+                    let i = iconMap;
+                    return eval('i.' + pathToIcon);
+                } catch (error) {
+                    return pathToIcon;
+                }
+            } else {
+                return '';
             }
         }
     }
