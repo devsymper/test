@@ -49,13 +49,14 @@ export default {
     },
     methods: {
         async setTaskInfo(){
+            let self=this;
             if(this.$route.params.id){
-                let task = await BPMNEngine.getATaskInfo(this.$route.params.id);
+                let task = await BPMNEngine.getATaskInfo(self.$route.params.id);
                 debugger
                 let taskInfo = extractTaskInfoFromObject(task);
                 task = addMoreInfoToTask(task);
-                this.$set(this.data, 'taskInfo', taskInfo);
-                this.$set(this.data, 'originData', task);
+                self.$set(self.data, 'taskInfo', taskInfo);
+                self.$set(self.data, 'originData', task);
             }
         },
         closeDetail(){

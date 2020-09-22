@@ -97,6 +97,7 @@ export default {
             tasks=tasks.concat(this.stask.listTaskInProcessParent);
             tasks=tasks.concat(this.stask.listTaskDoneInProcessParent);
             tasks=tasks.concat(this.stask.listTaskInProcessSub);
+            tasks=tasks.concat(this.stask.listTaskInProcessSibling);
             console.log("listTaskRelated",tasks);
             return tasks;
         }

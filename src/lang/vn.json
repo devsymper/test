@@ -881,7 +881,9 @@
     },
     "myItem":{
         "objType":"Loại đối tượng",
-        "today":"Hôm nay"
+        "today":"Hôm nay",
+        "header":"Danh sách work"
+        
     },
     "tasks": {
         "error": {
