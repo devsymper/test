@@ -121,8 +121,8 @@ export default {
 					});
 			}
 			if(sideBySide == true){
-				this.$store.commit('AppConfig/updateActionDef', this.defineAction[this.type])
-				this.$store.commit('AppConfig/updateParam', {id:targetItem.id,name:targetItem.name,title:targetItem.title,appId:appId })
+				this.$store.commit('appConfig/updateActionDef', this.defineAction[this.type])
+				this.$store.commit('appConfig/updateParam', {id:targetItem.id,name:targetItem.name,title:targetItem.title,appId:appId })
 			}else{
 				this.$evtBus.$emit('symper-app-call-action-handler', this.defineAction[this.type], this, {id:targetItem.id,name:targetItem.name,title:targetItem.title,appId:appId });
 
