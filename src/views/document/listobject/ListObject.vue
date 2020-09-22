@@ -126,7 +126,13 @@ export default {
                     name: "print",
                     text: "In nhanh",
                     callback: (documentObject, callback) => {
-                        this.$goToPage('/documents/objects/'+documentObject.document_object_id+'/print/',"In");
+                        if(this.$refs.listObject.isShowCheckedRow()){
+                            let listobject = this.$refs.listObject.getAllRowChecked();
+                            console.log('listobjectlistobject',listobject);
+                        }
+                        else{
+                            this.$goToPage('/documents/objects/'+documentObject.document_object_id+'/print/',"In");
+                        }
                     },
                 },
                 list_print: {
@@ -135,6 +141,21 @@ export default {
                     callback: (documentObject, callback) => {
                         this.$refs.listPrintView.show();
                         this.$refs.listPrintView.setDocObjectId(documentObject.document_object_id);
+                    },
+                },
+                show_checkbox: {
+                    name: "showCheckBox",
+                    text: "Hiển thị checkbox",
+                    callback: (documentObject, callback) => {
+                        if(this.$refs.listObject.isShowCheckedRow()){
+                            this.$refs.listObject.removeCheckBoxColumn();
+                            this.tableContextMenu.show_checkbox.text = "Hiển thị checkbox"
+                        }
+                        else{
+                            this.$refs.listObject.addCheckBoxColumn();
+                            this.tableContextMenu.show_checkbox.text = "Ẩn checkbox"
+                        }
+                        
                     },
                 },
                 detail_in_view: {

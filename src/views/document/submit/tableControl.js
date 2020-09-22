@@ -40,6 +40,9 @@ export default class TableControl extends Control {
          * @param {*} data 
          */
     setData(data) {
+        if (data.hasOwnProperty('childObjectId') && Object.keys(data).length == 1) {
+            return;
+        }
         if (this.isPrintView) {
             let dataTablePrint = [];
             for (let controlName in this.mapControlToIndex) {
