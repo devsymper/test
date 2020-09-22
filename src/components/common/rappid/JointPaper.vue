@@ -69,6 +69,7 @@ export default {
 			background: '#ffffff',
             interactive: !this.readonly,
             sorting: joint.dia.Paper.sorting.APPROX,
+            
         });
         var paperScroller = new joint.ui.PaperScroller({
             paper: this.paper,

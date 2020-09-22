@@ -11,6 +11,7 @@ export const DEFAULT_DEPARTMENT_DISPLAY = {
 	rx: 0,
 	ry: 0,
 	'stroke-width': 0.2,
+
 	stroke: '#707070'
 };
 export const FOUCUS_DEPARTMENT_DISPLAY = {
@@ -155,7 +156,8 @@ export const DEFAULT_DEPARTMENT_ATTRS = {
 		cursor: 'pointer',
 		event: 'element:collapse',
 
-	},
+	}
+	
 };
 
 export const DEPARTMENT_NODE_DATA = {
@@ -198,39 +200,7 @@ export const departmentMarkup =
         </g>
     </g>`.replace(/\n/g, '').replace(/\s+/g, ' ');
 
-// `<g class="rotatable ">
-
-//             <rect class="stick"/>
-//             <g class="btn-collapse-expand">
-//                 <circle class="collapse-expand-circle"/>
-//             </g>
-//             <text class="expand-text collapse-expand">+</text>
-//             <text class="collapse-text collapse-expand">-</text>
-
-//             <g class="symper-orgchart-node">
-//                 <g class="scalable">
-//                     <rect class="card"/>
-//                 </g>
-//                 <image/>
-//                 <text class="name"/>
-//                 <text class="manager-name"/>
-
-//                 <g>
-//                     <rect class="border-bottom"/>
-//                 </g>
-
-//                 <g class="btn add orgchart-action">
-//                     <circle class="add"/>
-//                     <text class="add">+</text>
-//                 </g>
-
-//                 <g class="btn remove orgchart-action">
-//                     <circle class="remove"/>
-//                     <text class="remove">X</text>
-//                 </g>
-//             </g>
-//         </g>`.replace(/\n/g, '').replace(/\s+/g, ' ')
-export const defineDepartment = function () {
+	export const defineDepartment = function () {
 	SymperDepartment = joint.shapes.org.Member.define('Symper.Department', {
 		size: {
 			width: shapeSize.width,

@@ -16,7 +16,7 @@
             <v-tab 
                 :key="'tableSideBySideView'" >
                 <v-icon size="17">mdi-home</v-icon>
-                <span>Table side by side view</span>
+                <span>People view</span>
             </v-tab>
             <v-tab 
                 :key="'diagramView'" >
@@ -50,10 +50,11 @@
                                 :likeHandsonTable="true"
                                 :rowData="dataTable"
                                 :editable="false"
-                                :customComponents="customAgComponents"
+                                :customComponents="customAgComponents"  
                                 @on-cell-dbl-click="onCellDblClick"
                                 :cellRendererParams="{
-                                    innerRenderer:'nodeName'
+                                    innerRenderer:'nodeName',
+                                    suppressDoubleClickExpand: true,
                                 }">
                             </AgDataTable>
                         </VueResizable>
@@ -65,6 +66,7 @@
                             :tableContextMenu="tableContextMenu"
                             :useDefaultContext="false"
                             :useActionPanel="true"
+                            :actionPanelWidth="850"
                             :customAPIResult="customAPIResult"
                             :showButtonAdd="false"
                         >
@@ -231,12 +233,10 @@ export default {
                     self.$refs.displayTable.refreshData(colDefs);
                 }
             }, 0, this);
-            console.log(colDefs,'colDefscolDefscolDefs');
             return colDefs;
         }
     },
     methods: {
-        
         addDynamicValue(row, node){
             if(node.dynamicAttributes){
                 for(let attr of node.dynamicAttributes){
@@ -310,7 +310,6 @@ export default {
                 orgchartId:  this.$route.params.id,
                 listUsers: this.listUserInNode
             })
-            debugger
         }
     },
     data(){
@@ -321,6 +320,12 @@ export default {
                 nodeName: NodeNameInTable,
                 UserInNodeView: UserInNodeView,
             },
+            columnTree:{
+                "headerName": this.$t('common.code'),
+                "field": "code",
+                "width": 300,
+                "colId": "code"
+           },
             showNavigation:false,
             listUserInNode:[],
             docObjInfo:{},
@@ -370,6 +375,9 @@ export default {
             deep: true,
             immediate: true,
             handler: function(after){
+                if(after.length == 0){
+                    after = 131237173123717323713277
+                }
                 this.apiUrl = 'https://account.symper.vn/users?ids=['+after+']'
             }
         }

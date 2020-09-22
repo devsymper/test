@@ -151,6 +151,11 @@ export default {
                 elementView.model.remove();
                 treeLayout.layout();
             });
+            // event collapsed 
+            // paper.on('element:collapse', function(view, evt) {
+            //     evt.stopPropagation();
+            //     toggleBranch(view.model);
+            // });
 
             paper.on('cell:pointerclick', function(elementView, evt, x, y) {
                 evt.stopPropagation();

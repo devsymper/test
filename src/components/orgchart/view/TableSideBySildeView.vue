@@ -65,6 +65,10 @@ export default {
                 },
              
             },
+            customAgComponents: {
+                nodeName: NodeNameInTable,
+                UserInNodeView: UserInNodeView,
+            },
         }
     },
     mounted(){

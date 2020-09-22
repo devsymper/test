@@ -1,5 +1,5 @@
 <template>
-    <span>
+    <span style="width:500px">
         <i :class="'mdi mr-2 fs-16 '+icon"></i>
         <span style="padding-right:8px;margin-top:-2px">{{text}}</span>
     </span>
@@ -19,7 +19,6 @@ export default {
     },
     beforeMount() {},
     mounted() {
-        
         let type = this.params.data ? this.params.data.nodeType : 'none';
         this.icon = mapNodeTypeIcon[type] ;
         this.text = this.getValue();
@@ -40,3 +39,6 @@ export default {
    
 }
 </script>
+<style scoped>
+
+</style>

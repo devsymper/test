@@ -45,7 +45,7 @@
                 position: absolute;
                 width: calc(100% - 267px);
                 height: 100%;
-                background-color: white;
+                background-color: white; 
                 z-index: 99;">
                 <v-progress-circular
                     :size="50"
@@ -348,7 +348,7 @@ export default {
                             users: this.getListUserAsArr(node.users)
                         };
 
-                        if(node.content && node.content !== 'false'){
+                        if(node.content && node.content !== 'false'){ 
                             nodeData.positionDiagram = {
                                 cells: JSON.parse(node.content)
                             }         
@@ -386,8 +386,6 @@ export default {
                     this.showOrgchartConfig();
                     setTimeout((self) => {
                         self.loadingDiagramView = false;
-                    //  this.$refs.editorWorkspace.createFirstVizNode()
-
                     }, 1500, this);
                 }else{
                     this.$snotifyError(res, "Can not get orgchart data",res.message);
