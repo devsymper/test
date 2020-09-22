@@ -887,9 +887,16 @@
             "unsubscribe": "Bỏ theo dõi"
         }
     },
-    "myItem": {
-        "objType": "Loại đối tượng",
-        "today": "Hôm nay"
+    "myItem":{
+        "objType":"Loại đối tượng",
+        "today":"Hôm nay",
+        "header":"Danh sách work",
+        "work":{
+            "parentWork":"Parent work",
+            "siblingWork":"Sibling work",
+            "subWork":"Sub work"
+        }
+        
     },
     "tasks": {
         "error": {
@@ -906,6 +913,7 @@
             "app": "Ứng dụng",
             "description": "Mô tả",
             "owner": "Người sở hữu",
+            "userCreate": "Người khởi tạo",
             "name": "Tên công việc",
             "assignee": "Người được giao",
             "watcher": "Người theo dõi",

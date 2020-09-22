@@ -758,9 +758,15 @@
         "ascending": "Ascending",
         "descending": "Descending"
     },
-    "myItem": {
-        "objType": "Object type",
-        "today": "Today"
+    "myItem":{
+        "objType":"Object type",
+        "today":"Today",
+        "header":"List work",
+        "work":{
+            "parentWork":"Parent work",
+            "siblingWork":"Sibling work",
+            "subWork":"Sub work"
+        }
     },
     "tasks": {
         "error": {
@@ -777,6 +783,7 @@
             "app": "Ứng dụng",
             "description": "Task description",
             "owner": "Task Owner",
+            "userCreate": "Creator",
             "name": "Task name",
             "assignee": "Assignee",
             "watcher": "Watcher",
