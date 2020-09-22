@@ -1026,7 +1026,7 @@ export default {
                 if(currentControl.properties.name.hasOwnProperty('name')){
                     let id = currentControl.id;
                     allControlProps[id] = this.editorStore['allControl'][id];
-                    this.callApiSaveControlTemplate(title,content,allControlProps);
+                    this.callApiSaveControlTemplate(title,content,allControlProps,true);
                 }
                 else{
                     this.$snotify({
@@ -1040,9 +1040,13 @@ export default {
          * Api lưu control template
          * @input : {title : tiêu đề control template, content: html, controlProps: thông tin các control có trong đó nếu có}
          */
-        callApiSaveControlTemplate(title, content, controlProps){
+        callApiSaveControlTemplate(title, content, controlProps,isSingleControl = false){
             let self = this;
-            documentApi.saveControlTemplate({title:title,content:content,controlProps:JSON.stringify(controlProps)}).then(res=>{
+            let dataPost = {title:title,content:content,controlProps:JSON.stringify(controlProps)};
+            if(isSingleControl){
+                dataPost['isSingleControl'] = 1;
+            }
+            documentApi.saveControlTemplate(dataPost).then(res=>{
                 self.$refs.formModalView.hide()
                 if(res.status == 200){
                     this.$snotify({
@@ -2137,14 +2141,26 @@ export default {
 
         dropControlTemplate(insertionPoint, control){
             let contentEl = $(control.content);
-            let controlInEL = contentEl.find('.s-control');
+            let controlInEL = contentEl.find('.s-control:not(.s-control-table .s-control)');
             let allControlProp = JSON.parse(control.control_props);
             for (let index = 0; index < controlInEL.length; index++) {
                 let controlEl = $(controlInEL[index]);
                 let newId = Date.now();
                 let controlProp = allControlProp[controlEl.attr('id')];
-                contentEl.find('#'+controlEl.attr('id')).attr('id',newId)
-                this.addToAllControlInDoc(newId,{properties: controlProp.properties, formulas : controlProp.formulas,type:controlEl.attr('type')});
+                contentEl.find('#'+controlEl.attr('id')).attr('id',newId);
+                let controlType = controlEl.attr('s-control-type');
+                this.addToAllControlInDoc(newId,{properties: controlProp.properties, formulas : controlProp.formulas,type:controlType});
+                if(controlType == 'table'){
+                    controlEl.find(".s-control").each(function() {
+                        let childControlId = $(this).attr("id");
+                        let newChildId = Date.now();
+                        let childControlProp = allControlProp[childControlId];
+                        contentEl.find('#'+childControlId.attr('id')).attr('id',newChildId);
+                        idTable = controlEl.attr('id');
+                        this.addToAllControlInTable(newChildId,{properties: childControlProp.properties, formulas : childControlProp.formulas,type:$(this).attr('s-control-type')},newId);
+                    });
+                    
+                }
             }
             insertionPoint.after(contentEl);
             
