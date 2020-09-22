@@ -118,7 +118,10 @@
 				<v-expansion-panel>
 					<v-expansion-panel-header class="v-expand-header">{{$t('tasks.header.relatedTask')}}</v-expansion-panel-header>
 					<v-expansion-panel-content class="sym-v-expand-content">
-				   	
+						<RelatedItems
+							:taskInfo="taskInfo"
+							:tabsData="tabsData"
+						 />
 					</v-expansion-panel-content>
 				</v-expansion-panel>
 					<v-expansion-panel style="margin-bottom: 20px;">
@@ -297,7 +300,7 @@ import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import Comment from './Comment'
 import trackingProcessInstance from "@/views/process/TrackingProcessInstance.vue";
 import UploadFile from "@/components/common/UploadFile.vue";
-
+import RelatedItems from "./RelatedItems.vue";
 export default {
 	components:{
 		VuePerfectScrollbar,
@@ -305,6 +308,7 @@ export default {
 		user,
 		trackingProcessInstance,
 		UploadFile,
+		RelatedItems
 	},
 	data () {
 		return {

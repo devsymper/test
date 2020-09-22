@@ -233,7 +233,7 @@ export default {
         changeTaskDetailInfo(taskId){
             let hostname=window.location.hostname;
             let copyText = this.taskInfo.action.parameter.taskId;
-            copyText='https://'+hostname+'/#/tasks/'+copyText;
+            copyText='https://'+hostname+'/#/myitem/tasks/'+copyText;
             this.linkTask=copyText;
 
             if(!taskId){
