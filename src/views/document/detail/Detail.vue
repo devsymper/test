@@ -606,7 +606,10 @@ export default {
     .sym-form-Detail >>> table:not(.htCore):not(.table-print) th {
         border: none !important;
     }
-    .sym-form-Detail >>> .htCore td:last-child {
+    .sym-form-Detail >>> .htCore td:nth-last-child(3) {
+        border-right: 1px solid #ccc !important;
+    }
+    .sym-form-Detail >>> .htCore thead tr th:nth-last-child(3) {
         border-right: 1px solid #ccc !important;
     }
     .sym-form-Detail >>> .ht_clone_left.handsontable table.htCore {

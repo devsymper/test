@@ -62,7 +62,7 @@
 								class="list-app-item"
 								@click="clickDetails(item)"
 								>
-								<div class="app-item-icon" 
+								<div class="app-item-icon" searchKey
 								>
 									<v-icon v-if="item.iconType == 'icon'">{{item.iconName}}</v-icon>
 									<img v-else-if="item.iconType == 'img'" :src="item.iconName" class="app-item-img"/>
@@ -368,7 +368,7 @@ export default {
 					self.mapId.dashboard["dashboard:"+e.id] = e;
 				})
 				let dataRep = self.arrType.dashboard
-				this.getByAccessControl(dataW,'dashboard')
+				this.getByAccessControl(dataRep,'dashboard')
 			}
 		},
 		getByAccessControl(ids,type){

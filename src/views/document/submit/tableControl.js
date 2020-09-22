@@ -1,5 +1,4 @@
 import Control from "./control";
-import sDocument from './../../../store/document'
 
 export default class TableControl extends Control {
     constructor(idField, ele, controlProps, curParentInstance) {

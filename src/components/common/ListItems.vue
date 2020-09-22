@@ -9,7 +9,7 @@
                             @input="bindToSearchkey"
                             class="d-inline-block mr-2 sym-small-size"
                             single-line
-                            append-icon="mdi-magnify"
+                            :append-icon="$i('input.search')"
                             outlined
                             dense
                             label="Search"

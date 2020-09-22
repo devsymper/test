@@ -16,6 +16,7 @@ export default {
 	},
 	watch:{
 		objectIdentifier(after){
+			debugger
 			this.objectIdentifierCmt = after + ""
 		}
 	},

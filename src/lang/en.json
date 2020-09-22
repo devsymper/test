@@ -80,7 +80,10 @@
         "email": "Email",
         "pageSize": "Page size",
         "pendding": "Pendding",
-        "print": "Print"
+        "print": "Print",
+        "display": "Display",
+        "of": "of",
+        "entries": "Entries"
     },
     "validate": {
         "required": "Not be empty",
@@ -346,7 +349,12 @@
             },
             "title": "Submit document",
             "goToList": "Go to list",
-            "continueSubmit": "Submit again"
+            "continueSubmit": "Submit again",
+            "panel": {
+                "traceInput": "Input",
+                "traceCurrent": "Current",
+                "traceOutput": "Output"
+            }
         },
         "process": {
             "header_bar": {
@@ -778,8 +786,8 @@
             "list": "List task",
             "submitForm": "Submit form",
             "alertDescription": "No description",
-            "relatedTask":"RELATED TASK",
-            "attachment":"ATTACHMENT FILE"
+            "relatedTask": "RELATED TASK",
+            "attachment": "ATTACHMENT FILE"
 
         },
         "filterOptions": {

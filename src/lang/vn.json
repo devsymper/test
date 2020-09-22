@@ -79,7 +79,10 @@
         "email": "Email",
         "pageSize": "Số bản ghi mỗi trang",
         "pendding": "Cần làm",
-        "print": "In"
+        "print": "In",
+        "display": "Hiển thị",
+        "of": "của",
+        "entries": "bản ghi"
     },
     "login": {
         "title": "Đăng nhập hệ thống",
@@ -443,7 +446,12 @@
             },
             "title": "Submit văn bản",
             "goToList": "Đi đến danh sách",
-            "continueSubmit": "Nhập liệu tiếp"
+            "continueSubmit": "Nhập liệu tiếp",
+            "panel": {
+                "traceInput": "Control Đầu vào",
+                "traceCurrent": "Control Kiểm tra",
+                "traceOutput": "Control Đầu ra"
+            }
         },
         "process": {
             "header_bar": {
@@ -908,8 +916,8 @@
             "list": "Danh sách công việc",
             "submitForm": "Form nhập liệu",
             "alertDescription": "Không có mô tả",
-            "relatedTask":"CÁC TASK LIÊN QUAN",
-            "attachment":"TỆP ĐÍNH KÈM"
+            "relatedTask": "CÁC TASK LIÊN QUAN",
+            "attachment": "TỆP ĐÍNH KÈM"
         },
         "filterOptions": {
             "all": "Toàn bộ task",
@@ -980,7 +988,7 @@
         }
     },
     "comment": {
-        "title":"Bình luận",
+        "title": "Bình luận",
         "comment": "Chưa giải quyết",
         "resolve": "Đã giải quyết",
         "reply": "Trả lời",
