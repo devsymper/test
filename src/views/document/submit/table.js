@@ -7,6 +7,7 @@ import { checkDbOnly, getControlType, getSDocumentSubmitStore } from './../commo
 import { SYMPER_APP } from './../../../main.js'
 import { Date } from 'core-js';
 import { checkCanBeBind, resetImpactedFieldsList, markBinedField } from './handlerCheckRunFormulas';
+import { util } from '../../../plugins/util';
 class UserEditor extends Handsontable.editors.TextEditor {
     createElements() {
         super.createElements();
@@ -125,18 +126,22 @@ Handsontable.cellTypes.registerCellType('user', {
 });
 Handsontable.renderers.FileRenderer = function(instance, td, row, col, prop, value, cellProperties) {
     Handsontable.renderers.TextRenderer.apply(this, arguments);
-    td.innerHTML = listInputInDocument[prop].genFileView(row);
-    td.classList.add("upload-file-wrapper-inTb");
-    $(td).off('click', '.file-add');
-    if (sDocument.state.viewType[thisObj.keyInstance] != 'detail') {
-        $(td).on('click', '.file-add', function(e) {
-            let el = $(e.target).closest('.file-add');
-            $("#file-upload-alter-" + instance.keyInstance).attr('data-rowid', row).attr('data-control-name', el.attr('data-ctrlname'));
-            $("#file-upload-alter-" + instance.keyInstance).click();
-        })
-        $(td).off('click', '.remove-file')
-        listInputInDocument[prop].setDeleteFileEvent($(td), prop)
+    let table = store.state.document.submit[instance.keyInstance];
+    if (table != undefined && instance.tableName != undefined) {
+        td.innerHTML = table.listInputInDocument[prop].genFileView(row);
+        td.classList.add("upload-file-wrapper-inTb");
+        $(td).off('click', '.file-add');
+        if (sDocument.state.viewType[instance.keyInstance] != 'detail') {
+            $(td).on('click', '.file-add', function(e) {
+                let el = $(e.target).closest('.file-add');
+                $("#file-upload-alter-" + instance.keyInstance).attr('data-rowid', row).attr('data-control-name', el.attr('data-ctrlname'));
+                $("#file-upload-alter-" + instance.keyInstance).click();
+            })
+            $(td).off('click', '.remove-file')
+            table.listInputInDocument[prop].setDeleteFileEvent($(td), prop)
+        }
     }
+
 }
 Handsontable.cellTypes.registerCellType('file', {
     renderer: Handsontable.renderers.PercentRenderer
@@ -154,6 +159,8 @@ const makeDelay = function(ms) {
     };
 };
 var delay = makeDelay(1000);
+var delayTypingEnter = makeDelay(100);
+
 
 /**
  * Các loại cell mà handsontable hỗ trợ hiển thị
@@ -221,6 +228,7 @@ export default class Table {
             this.controlNameAfterChange = "";
             this.showPopupUser = false;
             this.showPopupTime = false;
+            this.dataInsertRows = []; // mảng lưu lại các dòng dữ liệu sau khi ấn enter
             this.currentControlSelected = null;
             this.listAutoCompleteColumns = {};
             this.event = {
@@ -240,6 +248,12 @@ export default class Table {
 
                 beforeKeyDown: function(event) {
                     let cellMeta = this.getSelected();
+                    // ấn f2 vào cell thì trace control đó
+                    if (event.key == 'F2' && store.state.app.accountType == 'ba') {
+                        let control = thisObj.getControlInstance(thisObj.currentControlSelected);
+                        SYMPER_APP.$evtBus.$emit('document-submit-show-trace-control', { control: control });
+                        return;
+                    }
                     // trường hợp ấn enter mà ở dòng cuối cùng thì đưa cell selected vào đầu cột 1 (lỗi xảy ra do có 2 cột mặc định ẩn trong table)
                     if (event.keyCode == 13 && thisObj.checkLastCell(cellMeta, this)) {
                         return;
@@ -352,6 +366,13 @@ export default class Table {
                         }
                     }
                 },
+                /**
+                 * Xử lí khi click vào cell 
+                 * với trường hợp là control time thì mở popup timepicker
+                 * @param {*} event 
+                 * @param {*} coords 
+                 * @param {*} TD 
+                 */
                 afterOnCellMouseDown: function(event, coords, TD) {
                     let columns = thisObj.columnsInfo.columns;
                     if (columns[coords.col] != undefined)
@@ -380,16 +401,23 @@ export default class Table {
                         instance: thisObj.keyInstance
                     });
                 },
-
+                /**
+                 * Hàm xử lí thêm và xóa dòng sau khi bấm shift + enter, shift + delete
+                 * @param {*} e 
+                 */
                 afterDocumentKeyDown: function(e) {
                     let cellMeta = this.getSelected();
                     if (e.key === 'Enter' && e.shiftKey === true && cellMeta != undefined) {
                         this.alter('insert_row', cellMeta[0][0] + 1, 1);
-                        let rowData = sDocument.state.submit[thisObj.keyInstance]['listTableRootControl'][thisObj.tableName]['defaultRow'];
-                        for (let index = 0; index < rowData.length; index++) {
-                            rowData[index][0] = cellMeta[0][0] + 1;
-                        }
-                        thisObj.tableInstance.setDataAtRowProp(rowData, null, null, 'auto_set');
+                        thisObj.dataInsertRows.push([]);
+                        delayTypingEnter(function(e) {
+                            let rowData = util.cloneDeep(sDocument.state.submit[thisObj.keyInstance]['listTableRootControl'][thisObj.tableName]['defaultRow']);
+                            for (let index = 0; index < thisObj.dataInsertRows.length; index++) {
+                                let newRowData = util.cloneDeep(rowData);
+                                newRowData[0][0] = cellMeta[0][0] + index + 1;
+                                thisObj.tableInstance.setDataAtRowProp(newRowData, null, null, 'auto_set');
+                            }
+                        });
                     } else if (e.key === 'Delete' && e.shiftKey == true) {
                         this.alter('remove_row', cellMeta[0][0], 1);
                     }
@@ -595,36 +623,48 @@ export default class Table {
         return false;
     }
 
+    /**
+     * Sau khi thay đổi giá trị 1 cell thì lấy các control bị ảnh hưởng và chạy công thức
+     * @param {*} controlName 
+     * @param {*} rowIndex 
+     */
     handlerCheckEffectedControlInTable(controlName, rowIndex = "") {
-        if (controlName == "") {
-            return
-        }
-        let controlInstance = this.getControlInstance(controlName);
-
-        if (controlInstance.checkValidValueLength(rowIndex)) {
-            if (controlInstance == null || controlInstance == undefined) {
-                return;
+            if (controlName == "") {
+                return
             }
+            let controlInstance = this.getControlInstance(controlName);
+            if (rowIndex == 'all' && controlName == "tb1_ca_lam") {
+                // debugger
+            }
+            if (controlInstance.checkValidValueLength(rowIndex)) {
+                if (controlInstance == null || controlInstance == undefined) {
+                    return;
+                }
 
-            let controlEffected = controlInstance.getEffectedControl();
-            let controlHiddenEffected = controlInstance.getEffectedHiddenControl();
-            let controlReadonlyEffected = controlInstance.getEffectedReadonlyControl();
-            let controlRequireEffected = controlInstance.getEffectedRequireControl();
-            let controlLinkEffected = controlInstance.getEffectedLinkControl();
-            let controlValidateEffected = controlInstance.getEffectedValidateControl();
-            this.handlerRunOtherFormulasControl(controlHiddenEffected, 'hidden');
-            this.handlerRunOtherFormulasControl(controlReadonlyEffected, 'readonly');
-            this.handlerRunOtherFormulasControl(controlRequireEffected, 'require');
-            this.handlerRunOtherFormulasControl(controlLinkEffected, 'link');
-            this.handlerRunOtherFormulasControl(controlValidateEffected, 'validate');
-            if (Object.keys(controlEffected).length > 0) {
-                for (let i in controlEffected) {
-                    this.handlerCheckCanBeRunFormulas(i);
+                let controlEffected = controlInstance.getEffectedControl();
+                let controlHiddenEffected = controlInstance.getEffectedHiddenControl();
+                let controlReadonlyEffected = controlInstance.getEffectedReadonlyControl();
+                let controlRequireEffected = controlInstance.getEffectedRequireControl();
+                let controlLinkEffected = controlInstance.getEffectedLinkControl();
+                let controlValidateEffected = controlInstance.getEffectedValidateControl();
+                this.handlerRunOtherFormulasControl(controlHiddenEffected, 'hidden');
+                this.handlerRunOtherFormulasControl(controlReadonlyEffected, 'readonly');
+                this.handlerRunOtherFormulasControl(controlRequireEffected, 'require');
+                this.handlerRunOtherFormulasControl(controlLinkEffected, 'link');
+                this.handlerRunOtherFormulasControl(controlValidateEffected, 'validate');
+                if (Object.keys(controlEffected).length > 0) {
+                    for (let i in controlEffected) {
+                        this.handlerCheckCanBeRunFormulas(i);
+                    }
                 }
             }
-        }
 
-    }
+        }
+        /**
+         * chạy các công thức khác bị ảnh hưởng trong table
+         * @param {*} controlEffected 
+         * @param {*} formulasType 
+         */
     handlerRunOtherFormulasControl(controlEffected, formulasType) {
             if (Object.keys(controlEffected).length > 0) {
                 for (let i in controlEffected) {
@@ -649,7 +689,6 @@ export default class Table {
          * @param {String} control 
          */
     handlerCheckCanBeRunFormulas(control) {
-
             if (checkCanBeBind(this.keyInstance, control)) {
                 let controlInstance = this.getControlInstance(control);
                 if (controlInstance.controlFormulas.hasOwnProperty('formulas')) {
@@ -785,7 +824,7 @@ export default class Table {
                         instance: this.keyInstance
                     });
                 } else {
-                    this.handlerDataAfterRunFormulas(res.data, controlInstance, formulasType)
+                    this.handlerDataAfterRunFormulas(res.data, controlInstance, formulasType);
                 }
             })
 
@@ -796,7 +835,7 @@ export default class Table {
          */
 
     getDataResponseQuery(rs, controlType = "") {
-            let result = ""
+            let result = "";
             if (controlType == 'table') {
                 if (!rs.server) {
                     let data = rs.data;
@@ -811,12 +850,12 @@ export default class Table {
                 if (!rs.server) {
                     let data = rs.data;
                     if (data.length > 0) {
-                        result = data[0].values[0][0]
+                        result = data[0].values[0][0];
                     }
                 } else {
                     let data = rs.data.data;
                     if (data.length > 0) {
-                        result = data[0][Object.keys(data[0])[0]]
+                        result = data[0][Object.keys(data[0])[0]];
                     }
                 }
             }
@@ -863,20 +902,23 @@ export default class Table {
      * Hàm lấy formulas của cell select -> chạy -> gán lại data cho autocomplete component
      */
     setSelectCell(event) {
-        let controlInstance = this.getControlInstance(this.currentControlSelected);
-        if (controlInstance != null && controlInstance != undefined) {
-            let controlFormulas = controlInstance.controlFormulas;
-            if (controlFormulas.hasOwnProperty('list')) {
-                let formulasInstance = controlFormulas['list'].instance;
-                event.curTarget = event.target;
-                SYMPER_APP.$evtBus.$emit('document-submit-select-input', {
-                    e: event,
-                    selectFormulasInstance: formulasInstance,
-                    alias: this.currentControlSelected
-                })
+            let controlInstance = this.getControlInstance(this.currentControlSelected);
+            if (controlInstance != null && controlInstance != undefined) {
+                let controlFormulas = controlInstance.controlFormulas;
+                if (controlFormulas.hasOwnProperty('list')) {
+                    let formulasInstance = controlFormulas['list'].instance;
+                    event.curTarget = event.target;
+                    SYMPER_APP.$evtBus.$emit('document-submit-select-input', {
+                        e: event,
+                        selectFormulasInstance: formulasInstance,
+                        alias: this.currentControlSelected
+                    })
+                }
             }
         }
-    }
+        /**
+         * Hàm lấy type của cột được select
+         */
     getCellSelectedType(col) {
         let columns = this.columnsInfo.columns;
         let column = columns[col];
@@ -888,7 +930,6 @@ export default class Table {
     }
 
     render() {
-
         let thisObj = this;
         let tableContainer = $('<div id="' + thisObj.controlObj.id + '" s-control-type="table"></div>')[0];
         thisObj.controlObj.ele.before(tableContainer);
@@ -909,31 +950,20 @@ export default class Table {
                 columns: thisObj.columnsInfo.hiddenColumns,
                 indicators: true
             },
-            // rowHeights: 29,
-            // minSpareRows: 1,
             data: defaultData,
             manualColumnMove: !thisObj.checkDetailView(),
-            // manualRowMove: true,
             colHeaders: colHeaders,
             readOnly: thisObj.checkDetailView(),
-            // viewportColumnRenderingOffset: 50,
-            manualColumnFreeze: true,
             columns: thisObj.columnsInfo.columns,
             allowInsertColumn: false,
             allowRemoveColumn: false,
-            // columnHeaderHeight: 30,
-            // viewportRowRenderingOffset: 20,
-            // viewportColRenderingOffset: 20,
             contextMenu: (thisObj.checkDetailView()) ? false : thisObj.getContextMenu(),
-            // dragToScroll: false,
             stretchH: 'all',
             autoRowSize: false,
             autoColSize: true,
-            // defaultRowHeight: 29,
             width: '100%',
             fixedRowsBottom: (thisObj.tableHasRowSum) ? 1 : 0,
             formulas: true,
-            // minSpareRows: (thisObj.checkDetailView()) ? 0 : 1,
             height: 'auto',
             afterRender: function(isForced) {
                 if (thisObj.tableHasRowSum)
@@ -965,6 +995,12 @@ export default class Table {
 
 
             },
+
+            /**
+             * Trường hợp có dòng tính tổng trong table thì cần đặt lại công thức cho dòng cuối cùng tính tổng
+             * @param {*} i 
+             * @param {*} amount 
+             */
             beforeCreateRow: function(i, amount) {
                 let hotTb = this;
                 delay(function(e) {
@@ -983,6 +1019,12 @@ export default class Table {
                     }
                 });
             },
+            /**
+             * Sau khi set data cho 1 cell thì cần insert data này vào bảng sql lite
+             * set xong chạy công thức cho control bị ảnh hưởng
+             * @param {*} changes 
+             * @param {*} source 
+             */
             afterSetDataAtCell: function(changes, source) {
                 if (changes.length == 0) {
                     return
@@ -1006,6 +1048,13 @@ export default class Table {
                 }
 
             },
+            /**
+             * Sau khi create row thì set id cho dòng đó (cột id này là cột ẩn)
+             * id ở đây là định danh trong bảng sql lite 
+             * @param {*} index 
+             * @param {*} amount 
+             * @param {*} source 
+             */
             afterCreateRow: function(index, amount, source) {
                 let id = Date.now();
                 thisObj.tableInstance.setDataAtCell(index, thisObj.tableInstance.getDataAtRow(0).length - 1, id);
@@ -1021,6 +1070,10 @@ export default class Table {
             }
         }
     }
+
+    /**
+     * Context menu cho handson table trong view nhập liệu
+     */
     getContextMenu() {
         return {
             callback: function(key, selection, clickEvent) {
@@ -1041,15 +1094,39 @@ export default class Table {
             items: {
 
                 "row_above": {
-
+                    name: "Thêm dòng phía trên"
                 },
                 "row_below": {
-
+                    name: "Thêm dòng phía dưới"
                 },
                 'remove_row': {
+                    name: "Xóa dòng",
                     callback: function(key, selection, clickEvent) { // Callback for specific option
                         setTimeout(function(hotTb) {
                             hotTb.alter(key, selection[0]['start']['row'], 1);
+                        }, 0, this);
+                    }
+                },
+                "fixedLeft": {
+                    name: "Cố định cột",
+                    callback: function(key, selection, clickEvent) { // Callback for specific option
+                        let col = selection[0]['start']['col'];
+                        setTimeout(function(hotTb) {
+                            hotTb.updateSettings({
+                                fixedColumnsLeft: col + 1
+                            })
+                            hotTb.render()
+                        }, 0, this);
+                    }
+                },
+                "unFixedLeft": {
+                    name: "Bỏ cố định cột",
+                    callback: function(key, selection, clickEvent) { // Callback for specific option
+                        setTimeout(function(hotTb) {
+                            hotTb.updateSettings({
+                                fixedColumnsLeft: null
+                            })
+                            hotTb.render()
                         }, 0, this);
                     }
                 },
@@ -1057,31 +1134,8 @@ export default class Table {
             }
         }
 
-        // ['row_above', 'row_below', 'remove_row', 'freeze_column', 'unfreeze_column']
-
     }
 
-    /**
-     * Hàm set giá tri cho bảng từ lúc load doc (cho trường hợp update bản ghi)
-     * mặc định data luôn có 1 giá trị là docObjectId chỉ ra id của dòng trên 
-     * @param {*} data 
-     */
-    // updateTable(data) {
-    //     if (Object.keys(data).length > 1) {
-    //         let dataUpdate = [];
-    //         for (let controlName in data) {
-    //             for (let index = 0; index < data[controlName].length; index++) {
-    //                 if (dataUpdate.length <= index) {
-    //                     dataUpdate.push({})
-    //                 }
-    //                 dataUpdate[index][controlName] = data[controlName][index];
-    //             }
-    //         }
-    //         this.tableInstance.updateSettings({
-    //             data: dataUpdate
-    //         })
-    //     }
-    // }
 
     // Hàm set data cho table
     setData(vls) {
@@ -1117,7 +1171,6 @@ export default class Table {
                 });
             }
             // nếu table có tính tổng thì thêm 1 dòng trống ở cuối
-            console.log("saddsadsadsad", data);
             if (this.tableHasRowSum) {
                 data.push({})
             }
@@ -1147,6 +1200,9 @@ export default class Table {
         }
     }
 
+    /**
+     * Kiểm tra xem đang ở view detail hay submit
+     */
     checkDetailView() {
         if (sDocument.state.viewType[this.keyInstance] == 'detail') {
             return true;
@@ -1159,21 +1215,24 @@ export default class Table {
      * Hàm lấy data default lúc load table
      */
     getDefaultData(isCreateSqlTable = true) {
-        if (isCreateSqlTable && !this.checkDetailView())
-            this.createSqliteTable();
-        let data = [];
-        let firstRow = {};
-        let id = Date.now();
-        firstRow['s_table_id_sql_lite'] = id;
-        data.push(firstRow);
-        if (this.tableHasRowSum) {
-            data.push([''])
+            if (isCreateSqlTable && !this.checkDetailView())
+                this.createSqliteTable();
+            let data = [];
+            let firstRow = {};
+            let id = Date.now();
+            firstRow['s_table_id_sql_lite'] = id;
+            data.push(firstRow);
+            if (this.tableHasRowSum) {
+                data.push([''])
+            }
+            if (!this.checkDetailView()) {
+                ClientSQLManager.insertRow(this.keyInstance, this.tableName, ['s_table_id_sql_lite'], [id], false);
+            }
+            return data;
         }
-        if (!this.checkDetailView()) {
-            ClientSQLManager.insertRow(this.keyInstance, this.tableName, ['s_table_id_sql_lite'], [id], false);
-        }
-        return data;
-    }
+        /**
+         * Hàm khởi tạo bảng sql lite
+         */
     async createSqliteTable() {
         let columns = this.columnsInfo.columns;
         columns = columns.reduce((str, obj) => {
@@ -1244,6 +1303,11 @@ export default class Table {
         }
     }
 
+    /**
+     * Hàm lấy type của cột (type control)
+     * @param {*} name 
+     * @param {*} control 
+     */
     getCellType(name, control) {
         let type = control.type;
         let ctrl = this.getControlInstance(name);
@@ -1272,6 +1336,17 @@ export default class Table {
 
         return rsl;
     }
+
+    /**
+     * Xử lí render validate của table
+     * @param {*} hotInstance 
+     * @param {*} td 
+     * @param {*} row 
+     * @param {*} column 
+     * @param {*} prop 
+     * @param {*} value 
+     * @param {*} cellProperties 
+     */
     validateRender(hotInstance, td, row, column, prop, value, cellProperties) {
         let tableName = "";
         for (let tbName in listTableInstance) {
@@ -1320,10 +1395,18 @@ export default class Table {
         }
     }
 
+    /**
+     * validate time đúng định dạng hay k
+     * @param {*} str 
+     */
     checkCellIsTime(str) {
-        var patt = new RegExp("^([0-1]?[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$", "g");
-        return patt.test(str)
-    }
+            var patt = new RegExp("^([0-1]?[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$", "g");
+            return patt.test(str)
+        }
+        /**
+         * lấy column index của table theo tên
+         * @param {*} name 
+         */
     getColumnIndexFromControlName(name) {
         let column = this.columnsInfo.columns.filter(col => {
             return col.data == name;
@@ -1340,8 +1423,13 @@ export default class Table {
         return getSDocumentSubmitStore(this.keyInstance).listInputInDocument;
     }
     getControlInstance(controlName) {
-        return getSDocumentSubmitStore(this.keyInstance).listInputInDocument[controlName];
-    }
+            return getSDocumentSubmitStore(this.keyInstance).listInputInDocument[controlName];
+        }
+        /**
+         * Hàm xử lí giá trị duy nhất trong table
+         * trùng sẽ thông báo lỗi
+         * @param {*} controlName 
+         */
     checkUniqueTable(controlName) {
         let controlInstance = this.getControlInstance(controlName);
         if (controlInstance.controlProperties.hasOwnProperty('isTableOnly') &&
@@ -1369,5 +1457,42 @@ export default class Table {
             }
             this.tableInstance.render()
         }
+    }
+
+    /**
+     * Hàm thêm class thay đổi backgroud cho header của table
+     * @param {*} colName tên cột 
+     * @param {*} className class cần thêm
+     * @param {*} isRemove xóa class hay ko
+     */
+    traceInputTable(colName, className, isRemove) {
+        let colIndex = this.getColumnIndexFromControlName(colName);
+        let setting = {
+            afterGetColHeader: function(col, TH) {
+                function applyClass(elem, className) {
+                    if (!Handsontable.dom.hasClass(elem, className)) {
+                        Handsontable.dom.addClass(elem, className);
+                    }
+                }
+
+                function removeClass(elem) {
+                    Handsontable.dom.removeClass(elem, 'trace-output-control');
+                    Handsontable.dom.removeClass(elem, 'trace-input-control');
+                    Handsontable.dom.removeClass(elem, 'trace-current-control');
+                }
+                if (isRemove) {
+                    if (colIndex == col) {
+                        removeClass(TH)
+                    }
+                } else {
+                    if (colIndex == col) {
+                        applyClass(TH, className)
+                    }
+                }
+
+            }
+        }
+        this.tableInstance.updateSettings(setting);
+        this.tableInstance.scrollViewportTo(0, colIndex)
     }
 }

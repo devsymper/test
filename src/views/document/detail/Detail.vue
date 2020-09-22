@@ -1,6 +1,39 @@
 <template>
-    <div class="wrap-content-detail">
-        
+    <div class="wrap-content-detail" style="overflow:hidden;">
+        <v-skeleton-loader
+            class="mx-auto"
+            max-width="auto"
+            type="article, actions"
+            v-if="loading"
+            
+        ></v-skeleton-loader>
+        <v-skeleton-loader
+            class="mx-auto"
+            max-width="auto"
+            v-if="loading"
+            type="table-heading, list-item-two-line, table-tfoot"
+        ></v-skeleton-loader>
+        <v-skeleton-loader
+            class="mx-auto"
+            max-width="auto"
+            type="article, actions,table-heading, list-item-two-line"
+            v-if="loading"
+            
+        ></v-skeleton-loader>
+        <v-skeleton-loader
+            class="mx-auto"
+            max-width="auto"
+            type="article, actions,table-heading, list-item-two-line"
+            v-if="loading"
+            
+        ></v-skeleton-loader>
+        <v-skeleton-loader
+            class="mx-auto"
+            max-width="auto"
+            type="article, actions,table-heading, list-item-two-line"
+            v-if="loading"
+            
+        ></v-skeleton-loader>
         <div class="panel-header" v-if="!quickView && !isPrint">
             <div class="right-action">
                 <v-tooltip bottom>
@@ -28,7 +61,7 @@
         <div
             class="sym-form-Detail"
             :id="'sym-Detail-'+keyInstance"
-            :style="{'width':documentSize, 'height':'100%','margin':contentMargin}">
+            :style="{'width':documentSize, 'height':'calc(100% - 30px);','margin':contentMargin}">
             <div class="content-document" v-html="contentDocument"></div>
             <div class="content-print-document" v-html="contentPrintDocument"></div>
         </div>
@@ -131,7 +164,8 @@ export default {
             left: false,
             transition: "slide-y-reverse-transition",
             isComponentActive:false,
-            printConfigActive:null
+            printConfigActive:null,
+            loading: true,
 
         };
     },
@@ -154,10 +188,9 @@ export default {
             this.docObjId = Number(this.documentObjectId);
         } else if (this.$route.name == "detailDocument" || this.$route.name == "printDocument") {
             this.docObjId = Number(this.$route.params.id);
+            this.loadDocumentObject(this.isPrint); 
         }
-        if(this.docObjId != null){
-            this.loadDocumentObject(this.isPrint);  
-        }
+        
         userApi.getListUser(1,100000).then(res => {
             if (res.status == 200) {
                 thisCpn.$store.commit("document/addToDocumentSubmitStore", {
@@ -464,6 +497,8 @@ export default {
                 }
 
             }
+            this.loading = false;
+            $('.wrap-content-detail').removeAttr('style');
             setTimeout(() => {
                 if(thisCpn.$route.name == 'printDocument' || (isPrint && this.formId == 0)){
                     thisCpn.printContent(true);
@@ -571,7 +606,10 @@ export default {
     .sym-form-Detail >>> table:not(.htCore):not(.table-print) th {
         border: none !important;
     }
-    .sym-form-Detail >>> .htCore td:last-child {
+    .sym-form-Detail >>> .htCore td:nth-last-child(3) {
+        border-right: 1px solid #ccc !important;
+    }
+    .sym-form-Detail >>> .htCore thead tr th:nth-last-child(3) {
         border-right: 1px solid #ccc !important;
     }
     .sym-form-Detail >>> .ht_clone_left.handsontable table.htCore {

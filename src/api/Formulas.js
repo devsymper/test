@@ -13,6 +13,12 @@ export const formulasApi = {
     saveFormulas(data) {
         return api.post('formulas', data);
     },
+    updateFormulas(id, data) {
+        return api.put('formulas/' + id, data);
+    },
+    detailFormulas(id) {
+        return api.get('formulas/' + id);
+    },
     execute(data) {
         return api.post('formulas/get-data', data);
     },

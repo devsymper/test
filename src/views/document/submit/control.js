@@ -482,4 +482,41 @@ export default class Control {
 
         return rs
     }
+    renderInputTraceControlColor() {
+        console.log("áddsadsad", this.name);
+        if (this.inTable) {
+            this.traceInputTable();
+        } else {
+            this.ele.addClass('trace-input-control');
+        }
+    }
+    renderOutputTraceControlColor() {
+        if (this.inTable) {
+            this.traceInputTable('trace-output-control');
+        } else {
+            this.ele.addClass('trace-output-control');
+        }
+    }
+    renderCurrentTraceControlColor() {
+        if (this.inTable) {
+            this.traceInputTable('trace-current-control');
+        } else {
+            this.ele.addClass('trace-current-control');
+        }
+    }
+    removeTraceControlColor() {
+
+        if (this.inTable) {
+            this.traceInputTable('', true);
+        } else {
+            this.ele.attr('class', function(i, c) {
+                return c.replace(/trace-.*-control/g, '');
+            });
+        }
+    }
+
+    traceInputTable(className, isRemove = false) {
+        let tableControl = getListInputInDocument(this.curParentInstance)[this.inTable];
+        tableControl.tableInstance.traceInputTable(this.name, className, isRemove)
+    }
 }

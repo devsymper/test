@@ -56,7 +56,7 @@ export default {
  data: function() {
         return {
 			
-			listItemHeight: 'calc(100vh - 380px)',
+			
 			currentSelected:null,
 			typeSelected:null,
 			objFilter:{
@@ -106,6 +106,13 @@ export default {
 				this.filterItem();
 				return this.objFilter
 			}
+		},
+		listItemHeight(){
+			if(this.isMyApplication == true){
+				return 'calc(100vh - 125px)'
+			}else{
+				return  'calc(100vh - 380px)'
+			}
 		}
 	},
 	props: {
@@ -116,6 +123,10 @@ export default {
 		searchKey:{
 			type: String,
 			default:"",
+		},
+		isMyApplication:{
+			type: Boolean,
+			default: false
 		}
     },
 	methods:{
@@ -133,28 +144,28 @@ export default {
 			self.objFilter.dashboard.item = []
 			self.objFilter.workflow_definition.item = []
 			if(listItem.document_definition.item.length > 0){
-					listItem.document_definition.item.filter(function(item){
+				listItem.document_definition.item.filter(function(item){
 						if(item.title.toLowerCase().includes(self.searchKey.toLowerCase())){
 							self.objFilter.document_definition.item.push(item)
 						}
 				})
 			}
 			if(listItem.orgchart.item.length > 0){
-					listItem.orgchart.item.filter(function(item){
+				listItem.orgchart.item.filter(function(item){
 					if(item.name.toLowerCase().includes(self.searchKey.toLowerCase())){
 						self.objFilter.orgchart.item.push(item)
 					}
 				})
 			}
 			if(listItem.dashboard.item.length > 0){
-					listItem.dashboard.item.filter(function(item){
+				listItem.dashboard.item.filter(function(item){
 					if(item.name.toLowerCase().includes(self.searchKey.toLowerCase())){
 						self.objFilter.dashboard.item.push(item)
 					}
 				})
 			}
 			if(listItem.workflow_definition.item.length > 0){
-					listItem.workflow_definition.item.filter(function(item){
+				listItem.workflow_definition.item.filter(function(item){
 					if(item.name.toLowerCase().includes(self.searchKey.toLowerCase())){
 						self.objFilter.workflow_definition.item.push(item)
 					}
@@ -228,7 +239,7 @@ export default {
 }
 .app-details >>> .app-item .title-document-enduser{
 	white-space: nowrap; 
-	width: 430px; 
+	width: 90%; 
 	overflow: hidden;
 	text-overflow: ellipsis; 
 }

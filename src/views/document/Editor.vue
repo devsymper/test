@@ -44,7 +44,7 @@
         @check-name-document="checkBeforeDocumentNameChange"
         @save-doc-action="validateControl"
         @save-form-print-action="saveFormPrint"/>
-        <QuickInfoControl :keyInstance="keyInstance" ref="quickInfoControlView"/>
+        <!-- <QuickInfoControl :keyInstance="keyInstance" ref="quickInfoControlView"/> -->
         <err-message :listErr="listMessageErr" ref="errMessage"/>
         <control-name-related v-if="!isConfigPrint" :instance="keyInstance" @after-close-panel="afterClosePanel"  ref="controlNameRelated"/>
         <all-control-option :instance="keyInstance" ref="allControlOption"/>
@@ -76,7 +76,6 @@ import SideBarRight from './sideright/SideBarRight.vue';
 import TableSetting from './items/TableSetting.vue';
 import PrintTableConfig from './print/PrintTableConfig';
 import AutoCompleteControl from './items/AutoCompleteControl.vue';
-import controlCss from  "./../../assets/css/document/control/control.css";
 import SaveDocPanel from "./../../views/document/items/SaveDocPanel.vue";
 import QuickInfoControl from "./../../views/document/items/QuickInfoControl";
 import ErrMessagePanel from "./../../views/document/items/ErrMessagePanel.vue";
@@ -150,79 +149,87 @@ export default {
     mounted(){
         let self = this;
          tinymce.init({
-                                theme: 'silver',
-                                skin: 'oxide',
-                                selector:  '#document-editor-'+self.keyInstance,
-                                forced_root_block:'div',
-                                toolbar_items_size : 'small',
-                                menubar: false,
-                                plugins: [
-                                'advlist autolink lists link image table print preview',
-                                ' fullscreen',
-                                'table paste code hr'
-                                ],
-                                contextmenu: 'inserttable table | settingtable | dragTable',
-                                toolbar:
-                                'undo redo | fontselect fontsizeselect formatselect | bold italic forecolor backcolor | \
-                                alignleft aligncenter alignright alignjustify | \
-                                bullist numlist indent hr | removeformat  table |  preview margin',
-                                fontsize_formats: '8px 10px 11px 12px 13px 14px 15px 16px 17px 18px 19px 20px 21px 22px 23px 24px 25px 26px 27px 28px 29px 30px 32px 34px 36px',
-                                font_formats: 'Roboto=Roboto,sans-serif; Andale Mono=andale mono,times;'+ 'Arial=arial,helvetica,sans-serif;'+ 'Arial Black=arial black,avant garde;'+ 'Book Antiqua=book antiqua,palatino;'+ 'Comic Sans MS=comic sans ms,sans-serif;'+ 'Courier New=courier new,courier;'+ 'Georgia=georgia,palatino;'+ 'Helvetica=helvetica;'+ 'Impact=impact,chicago;'+ 'Symbol=symbol;'+ 'Tahoma=tahoma,arial,helvetica,sans-serif;'+ 'Terminal=terminal,monaco;'+ 'Times New Roman=times new roman,times,serif;'+ 'Trebuchet MS=trebuchet ms,geneva;'+ 'Verdana=verdana,geneva;'+ 'Webdings=webdings;'+ 'Wingdings=wingdings,zapf dingbats',
-                                valid_elements: '*[*]',
-                                content_css:['https://cdn.jsdelivr.net/npm/@mdi/font@latest/css/materialdesignicons.min.css'],
-                                setup: function(ed){
-                                    ed.ui.registry.addMenuItem('settingtable', {
-                                        text: 'Setting table',
-                                        disabled : false,
-                                        onAction: function(e) {
-                                            if(self.$route.name == 'printConfigDocument'){
-                                                self.showPrintConfigTable(e);
-                                            }
-                                            else{
-                                                self.showSettingControlTable(e);
-                                            }
-                                            
-                                        }
-                                    });
-                                    ed.ui.registry.addMenuItem('dragTable', {
-                                        text: 'Drag table',
-                                        disabled : false,
-                                        onAction: function(e) {
-                                            self.showDragTable(e);
-                                        }
-                                    });
-                                
-                                    ed.ui.registry.addButton('margin', {
-                                    icon:'margin',
-                                    tooltip:'Margin',
-                                        onAction: function (_) {
-                                            self.showPaddingPageConfig(ed);
-                                        }
-                                    }); 
-                                    for(let i = 0;i < self.listIconToolbar.length;i++){
-                                        ed.ui.registry.addIcon(self.listIconToolbar[i].name,`<i class='mdi `+self.listIconToolbar[i].icon+`' style='font-size:18px;rgba(0, 0, 0, 0.54);'></i>`)
-                                    }
-                                    ed.on('click', function(e) {
-                                        self.detectClickEvent(e)
-                                    });
-                                    ed.on('contextmenu', function(e) {
-                                        self.detectClickEvent(e)
-                                    });
-                                    ed.on('blur', function(e) {
-                                        self.detectBlurEditorEvent(e)
-                                    });
-                                    ed.on('keyup', function(e) {
-                                        self.keyHandler(e)
-                                    });
-                                    ed.on('paste', function(e) {
-                                        self.handlePasteContent();
-                                    });
-                                },
-                                init_instance_callback : function(editor) {
-                                    self.editorCore = editor
-                                    self.initEditor()
-                                },
-                            });
+            theme: 'silver',
+            skin: 'oxide',
+            selector:  '#document-editor-'+self.keyInstance,
+            forced_root_block:'div',
+            toolbar_items_size : 'small',
+            menubar: false,
+            plugins: [
+            'advlist autolink lists link image table print preview',
+            ' fullscreen',
+            'table paste code hr'
+            ],
+            contextmenu: 'inserttable table | settingtable | dragTable',
+            toolbar:
+            'undo redo | fontselect fontsizeselect formatselect | bold italic forecolor backcolor | \
+            alignleft aligncenter alignright alignjustify | \
+            bullist numlist indent hr | removeformat  table |  preview margin',
+            fontsize_formats: '8px 10px 11px 12px 13px 14px 15px 16px 17px 18px 19px 20px 21px 22px 23px 24px 25px 26px 27px 28px 29px 30px 32px 34px 36px',
+            font_formats: 'Roboto=Roboto,sans-serif; Andale Mono=andale mono,times;'+ 'Arial=arial,helvetica,sans-serif;'+ 'Arial Black=arial black,avant garde;'+ 'Book Antiqua=book antiqua,palatino;'+ 'Comic Sans MS=comic sans ms,sans-serif;'+ 'Courier New=courier new,courier;'+ 'Georgia=georgia,palatino;'+ 'Helvetica=helvetica;'+ 'Impact=impact,chicago;'+ 'Symbol=symbol;'+ 'Tahoma=tahoma,arial,helvetica,sans-serif;'+ 'Terminal=terminal,monaco;'+ 'Times New Roman=times new roman,times,serif;'+ 'Trebuchet MS=trebuchet ms,geneva;'+ 'Verdana=verdana,geneva;'+ 'Webdings=webdings;'+ 'Wingdings=wingdings,zapf dingbats',
+            valid_elements: '*[*]',
+            content_css:['https://cdn.jsdelivr.net/npm/@mdi/font@latest/css/materialdesignicons.min.css'],
+            setup: function(ed){
+                ed.ui.registry.addMenuItem('settingtable', {
+                    text: 'Setting table',
+                    disabled : false,
+                    onAction: function(e) {
+                        if(self.$route.name == 'printConfigDocument'){
+                            self.showPrintConfigTable(e);
+                        }
+                        else{
+                            self.showSettingControlTable(e);
+                        }
+                        
+                    }
+                });
+                ed.ui.registry.addMenuItem('dragTable', {
+                    text: 'Drag table',
+                    disabled : false,
+                    onAction: function(e) {
+                        self.showDragTable(e);
+                    }
+                });
+                ed.ui.registry.addMenuItem('saveControlTemplate', {
+                    text: 'Lưu control template',
+                    disabled : false,
+                    onAction: function(e) {
+                        self.saveControlTemplate(ed);
+                    }
+                });
+            
+                ed.ui.registry.addButton('margin', {
+                icon:'margin',
+                tooltip:'Margin',
+                    onAction: function (_) {
+                        self.showPaddingPageConfig(ed);
+                    }
+                }); 
+                for(let i = 0;i < self.listIconToolbar.length;i++){
+                    ed.ui.registry.addIcon(self.listIconToolbar[i].name,`<i class='mdi `+self.listIconToolbar[i].icon+`' style='font-size:18px;rgba(0, 0, 0, 0.54);'></i>`)
+                }
+                ed.on('click', function(e) {
+                    self.detectClickEvent(e)
+                });
+                ed.on('contextmenu', function(e) {
+                    self.detectClickEvent(e)
+                });
+                ed.on('blur', function(e) {
+                    self.detectBlurEditorEvent(e)
+                });
+                ed.on('keyup', function(e) {
+                    self.keyHandler(e)
+                });
+                ed.on('paste', function(e) {
+                    self.handlePasteContent();
+                });
+            },
+            init_instance_callback : function(editor) {
+                self.editorCore = editor
+                console.log('self.editorCoreself.editorCore',self.editorCore);
+                self.initEditor()
+            },
+        });
                           
 
     },
@@ -241,9 +248,9 @@ export default {
          * Nhận sự kiên từ click treeview danh sách các control trong doc thì highlight control và selected control
          */
         this.$evtBus.$on("document-editor-click-treeview-list-control", locale => {
-            if(thisCpn._inactive == true) return;
-            let elControl = $("#document-editor-"+thisCpn.keyInstance+"_ifr").contents().find('body #'+locale.id);
-            thisCpn.setSelectedControlProp(locale.event,elControl,$('#document-editor-'+this.keyInstance+'_ifr').get(0).contentWindow,true);
+            if(this._inactive == true) return;
+            let elControl = $("#document-editor-"+this.keyInstance+"_ifr").contents().find('body #'+locale.id);
+            this.setSelectedControlProp(locale.event,elControl,$('#document-editor-'+this.keyInstance+'_ifr').get(0).contentWindow,true);
         });
     },
     data(){
@@ -955,6 +962,14 @@ export default {
                 }
             }
         },
+
+        /**
+         * Hàm lưu control template
+         */
+        saveControlTemplate(editor){
+            // let content = editor.selection.getContent();
+            
+        },
         //hoangnd: hàm mở modal tablesetting của control table
         showSettingControlTable(e) {
             let elements = $('#document-editor-'+this.keyInstance+'_ifr').contents().find('.on-selected').closest('.s-control-table');
@@ -1032,8 +1047,7 @@ export default {
             if (checkDiv.attr('s-control-type') != 'table') {
                 checkDiv.attr('contenteditable', false);
             }
-
-            let newContent = contentNode.replace(/\/{2}/, checkDiv[0].outerHTML);
+            let newContent = contentNode.replace(/\/{2}$/, checkDiv[0].outerHTML);
             
             $(this.editorCore.selection.getNode()).html(newContent+'&nbsp;<span id = "caret_pose_holder"> </ span>')
             let table = $(this.editorCore.selection.getNode()).closest('.s-control-table');
@@ -1207,10 +1221,6 @@ export default {
                 if($(event.target).closest('body').find('.drag-table').length > 0){
                     $(event.target).closest('body').find('.drag-table').remove()
                 }
-                
-            }
-            if(this.editorStore.currentSelectedControl.id != ""){ 
-                this.$refs.sidebarRight.hideDragPanel();
             }
             if($(event.target).is('.s-control')){
                 this.setSelectedControlProp(event,$(event.target),$('#document-editor-'+this.keyInstance+'_ifr').get(0).contentWindow);
@@ -1289,6 +1299,9 @@ export default {
         resizeEditorEnd(e){
             $('#bg-over-editor').remove();
         },
+        /**
+         * Hàm xử lí chuyển cấu trúc doc của v1 sang v2 (bao gồm các thuộc tính của control)
+         */
         setContentForDocumentV1(){
             let thisCpn = this;
             $("#document-editor-"+this.keyInstance+"_ifr").contents().find('.bkerp-input').addClass('s-control').removeClass('bkerp-input');
@@ -1298,8 +1311,6 @@ export default {
             $("#document-editor-"+this.keyInstance+"_ifr").contents().find('body meta').remove()
             $("#document-editor-"+this.keyInstance+"_ifr").contents().find('body style').remove()
             let allControl = $("#document-editor-"+this.keyInstance+"_ifr").contents().find('.s-control:not(.bkerp-input-table .s-control)');
-            console.log('safashd',allControl);
-
             $.each(allControl,function(item,value){
                 let controlProps = $(value).attr('data-property');
                 controlProps = controlProps.replace(/\"\[/gm,"[");
@@ -1341,8 +1352,6 @@ export default {
                     tableEl.find('table').append(bodyTable.find('tbody')[0].outerHTML);
                     tableEl.find('thead').attr('contenteditable',true);
                     let allControlInTable = tableEl.find('.s-control');
-                    console.log(allControlInTable);
-                    
                     $.each(allControlInTable,function(item,value){
                         let childControlProps = $(value).attr('data-property');
                         let type = $(value).attr('bkerp-type');
@@ -1415,7 +1424,7 @@ export default {
         wrapTableElement(){
             let listTable = $("#document-editor-"+this.keyInstance+"_ifr").contents().find('.s-control-table');
             if(listTable.length > 0 && !listTable.parent().is('.wrap-s-control-table')){
-                listTable.wrap('<div class="wrap-s-control-table" style="overflow:auto;"></div>')
+                listTable.wrap('<div class="wrap-s-control-table"></div>')
             }
         },
 
@@ -1962,7 +1971,8 @@ export default {
                     var e = event.originalEvent;
                 try {
                     var control = e.dataTransfer.getData('control');
-                    control = JSON.parse(control)
+                    control = JSON.parse(control);
+                    $("#document-editor-"+thisCpn.keyInstance+"_ifr").contents().find(".on-selected").removeClass('on-selected');
                     var insertionPoint = $("#document-editor-"+thisCpn.keyInstance+"_ifr").contents().find(".drop-marker");
                     var checkDiv = $(control.html);
                     let typeControl = checkDiv.attr('s-control-type');
@@ -1981,6 +1991,7 @@ export default {
                     if (checkDiv.attr('s-control-type') != 'table') {
                         checkDiv.attr('contenteditable', false);
                     }
+                    checkDiv.addClass('on-selected');
                     insertionPoint.remove();
                     if(typeControl == 'tabPage'){
                         let newPageId = 's-control-id-' + (Date.now() + 1);
@@ -1992,7 +2003,6 @@ export default {
                         thisCpn.addToAllControlInDoc(newPageId,{properties: control.properties, formulas : control.formulas,type:'page'});
                     }
                     thisCpn.selectControl(control.properties, control.formulas,inputid,typeControl);
-                    thisCpn.$refs.quickInfoControlView.show(event)
                     if(table.length > 0){   // nếu keo control vào trong table thì update dữ liệu trong table của state
                         idTable = table.attr('id');
                         thisCpn.addToAllControlInTable(inputid,{properties: control.properties, formulas : control.formulas,type:typeControl},idTable);
@@ -2000,7 +2010,6 @@ export default {
                     else{
                         thisCpn.addToAllControlInDoc(inputid,{properties: control.properties, formulas : control.formulas,type:typeControl});
                     }
-                    // set_window_property(inputid, objecttype);
                 } catch (e) {}
             });
             

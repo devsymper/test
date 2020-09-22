@@ -6,9 +6,7 @@ import Util from './util'
 var numbro = require("numbro");
 import moment from "moment-timezone";
 
-import { userApi } from "./../../../api/user.js";
 import { documentApi } from "../../../api/Document";
-let listInputInDocument = sDocument.state.submit.listInputInDocument;
 const fileTypes = {
     'xlsx': 'mdi-microsoft-excel',
     'txt': 'mdi-file-document-outline',
@@ -186,114 +184,113 @@ export default class BasicControl extends Control {
     }
     setEvent() {
 
-        let thisObj = this;
-        this.ele.on('change', function(e) {
-            let valueChange = $(e.target).val();
-            if (thisObj.type == 'label') {
-                valueChange = $(e.target).text()
-            }
-            SYMPER_APP.$evtBus.$emit('document-submit-input-change', { controlName: thisObj.controlProperties.name.value, val: valueChange })
-            if (thisObj.type == 'date') {
-                if (this.formatDate != "" && typeof this.formatDate === 'string') {
-                    thisObj.value = $(this).val();
-                    $(this).val(moment($(this).val()).format(thisObj.formatDate))
+            let thisObj = this;
+            this.ele.on('change', function(e) {
+                let valueChange = $(e.target).val();
+                if (thisObj.type == 'label') {
+                    valueChange = $(e.target).text()
                 }
-            }
-        })
-        this.ele.on('focus', function(e) {
+                SYMPER_APP.$evtBus.$emit('document-submit-input-change', { controlName: thisObj.controlProperties.name.value, val: valueChange })
+                if (thisObj.type == 'date') {
+                    if (this.formatDate != "" && typeof this.formatDate === 'string') {
+                        thisObj.value = $(this).val();
+                        $(this).val(moment($(this).val()).format(thisObj.formatDate))
+                    }
+                }
+            })
+            this.ele.on('focus', function(e) {
                 store.commit("document/addToDocumentSubmitStore", {
                     key: 'rootChangeFieldName',
                     value: thisObj.name,
                     instance: thisObj.curParentInstance
                 });
             })
-            // this.ele.on('keydown', function(e) {
-            //     if (thisObj.type == 'number') {
-            //         console.log(e.key);
 
-        //         if (['ArrowRight', 'ArrowLeft', 'Tab'].includes(e.key)) {
-        //             return;
-        //         }
-        //         if (!/\d/.test(e.key)) {
-        //             e.preventDefault();
-        //             e.stopPropagation()
-        //         }
-        //     }
-        // })
-        this.ele.on('keyup', function(e) {
-            if (thisObj.type == 'user') {
-                e.curTarget = e.target
-                SYMPER_APP.$evtBus.$emit('document-submit-user-input-change', e)
-            }
-            if (thisObj.type == 'percent') {
-                if (e.target.value > 100) {
-                    $(e.target).val(100)
+            this.ele.on('keyup', function(e) {
+                if (e.key == 'F2' && store.state.app.accountType == 'ba') {
+                    thisObj.traceControl();
                 }
-            }
-            if (thisObj.type == 'department') {
-                e['controlName'] = thisObj.name;
-                SYMPER_APP.$evtBus.$emit('document-submit-department-key-event', {
-                    e: e,
-                    formulasInstance: thisObj.controlFormulas.autocomplete.instance,
-                    controlTitle: thisObj.title,
-                    controlName: thisObj.name,
-                    val: $(e.target).val()
-                })
-            }
-            if (thisObj.checkAutoCompleteControl() && thisObj.type != 'department') {
-                let fromSelect = false;
-                let formulasInstance = (fromSelect) ? thisObj.controlFormulas.formulas.instance : thisObj.controlFormulas.autocomplete.instance;
-                e['controlName'] = thisObj.controlProperties.name.value;
-                SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-key-event', {
-                    e: e,
-                    autocompleteFormulasInstance: formulasInstance,
-                    isSelect: false,
-                    controlTitle: thisObj.title,
-                    controlName: thisObj.controlProperties.name.value,
-                    val: $(e.target).val()
-                })
-            }
+                if (thisObj.type == 'user') {
+                    e.curTarget = e.target
+                    SYMPER_APP.$evtBus.$emit('document-submit-user-input-change', e)
+                }
+                if (thisObj.type == 'percent') {
+                    if (e.target.value > 100) {
+                        $(e.target).val(100)
+                    }
+                }
+                if (thisObj.type == 'department') {
+                    e['controlName'] = thisObj.name;
+                    SYMPER_APP.$evtBus.$emit('document-submit-department-key-event', {
+                        e: e,
+                        formulasInstance: thisObj.controlFormulas.autocomplete.instance,
+                        controlTitle: thisObj.title,
+                        controlName: thisObj.name,
+                        val: $(e.target).val()
+                    })
+                }
+                if (thisObj.checkAutoCompleteControl() && thisObj.type != 'department') {
+                    let fromSelect = false;
+                    let formulasInstance = (fromSelect) ? thisObj.controlFormulas.formulas.instance : thisObj.controlFormulas.autocomplete.instance;
+                    e['controlName'] = thisObj.controlProperties.name.value;
+                    SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-key-event', {
+                        e: e,
+                        autocompleteFormulasInstance: formulasInstance,
+                        isSelect: false,
+                        controlTitle: thisObj.title,
+                        controlName: thisObj.controlProperties.name.value,
+                        val: $(e.target).val()
+                    })
+                }
 
-        })
+            })
 
-        this.ele.closest('.sym-form-submit').on('keyup', function(e) {
-            if (thisObj.checkAutoCompleteControl() && e.keyCode == 9) {
-                e.keyCode = 200;
-                SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-key-event', {
-                    e: e,
-                })
-                SYMPER_APP.$evtBus.$emit('document-submit-department-key-event', {
-                    e: e,
-                })
-            }
+            this.ele.closest('.sym-form-submit').on('keyup', function(e) {
+                if (thisObj.checkAutoCompleteControl() && e.keyCode == 9) {
+                    e.keyCode = 200;
+                    SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-key-event', {
+                        e: e,
+                    })
+                    SYMPER_APP.$evtBus.$emit('document-submit-department-key-event', {
+                        e: e,
+                    })
+                }
 
-        })
-        this.ele.on('click', function(e) {
-            store.commit("document/addToDocumentSubmitStore", {
-                key: 'docStatus',
-                value: 'input',
-                instance: thisObj.curParentInstance
+            })
+            this.ele.on('click', function(e) {
+                store.commit("document/addToDocumentSubmitStore", {
+                    key: 'docStatus',
+                    value: 'input',
+                    instance: thisObj.curParentInstance
+                });
+
+                store.commit("document/addToDocumentSubmitStore", {
+                    key: 'currentTableInteractive',
+                    value: null,
+                    instance: thisObj.curParentInstance
+                });
+                e.controlName = thisObj.name;
+                if (thisObj.type == 'date') {
+                    SYMPER_APP.$evtBus.$emit('document-submit-date-input-click', e)
+                } else if (thisObj.type == 'inputFilter') {
+                    e.formulas = thisObj.controlFormulas.formulas;
+                    SYMPER_APP.$evtBus.$emit('document-submit-filter-input-click', e)
+                } else if (thisObj.type == 'time') {
+                    e.curTarget = e.target
+                    SYMPER_APP.$evtBus.$emit('document-submit-show-time-picker', e)
+                }
+
             });
 
-            store.commit("document/addToDocumentSubmitStore", {
-                key: 'currentTableInteractive',
-                value: null,
-                instance: thisObj.curParentInstance
-            });
-            e.controlName = thisObj.name;
-            if (thisObj.type == 'date') {
-                SYMPER_APP.$evtBus.$emit('document-submit-date-input-click', e)
-            } else if (thisObj.type == 'inputFilter') {
-                e.formulas = thisObj.controlFormulas.formulas;
-                SYMPER_APP.$evtBus.$emit('document-submit-filter-input-click', e)
-            } else if (thisObj.type == 'time') {
-                e.curTarget = e.target
-                SYMPER_APP.$evtBus.$emit('document-submit-show-time-picker', e)
-            }
 
-        })
-
-
+        }
+        /**
+         * Hàm tracking xem control lấy dữ liệu từ đâu và ảnh hướng đến control nào
+         * nguồn: control màu xanh lá  cây
+         * đich: control màu xanh nước biển
+         */
+    traceControl() {
+        SYMPER_APP.$evtBus.$emit('document-submit-show-trace-control', { control: this })
     }
 
     setValue(value) {
@@ -310,7 +307,6 @@ export default class BasicControl extends Control {
             } else {
                 $('#' + this.id).val(value);
             }
-
         }
         if (sDocument.state.submit[this.curParentInstance].docStatus == 'init') {
             this.defaultValue = value;
@@ -412,7 +408,8 @@ export default class BasicControl extends Control {
         }
         let deleteFileIcon = '';
         if (this.checkDetailView()) {
-            this.value = sDocument.state.editor.allControl[listInputInDocument[this.inTable].id].value[this.name];
+            let tableInstance = sDocument.state.submit[this.curParentInstance].listInputInDocument[this.inTable]
+            this.value = sDocument.state.editor[this.curParentInstance].allControl[tableInstance.id].value[this.name];
         }
         if (this.value != '' && this.value.hasOwnProperty(rowId)) {
             for (let index = 0; index < this.value[rowId].length; index++) {
@@ -421,7 +418,6 @@ export default class BasicControl extends Control {
                 let icon = fileTypes[fileExt];
                 if (!this.checkDetailView()) {
                     deleteFileIcon = `<span data-rowid="` + rowId + `" data-file-name="` + fileName + `" title="xóa" class="remove-file"><span class="mdi mdi-close"></span></span>`;
-
                 }
                 let file = `<div  class="file-item">
                                 ` + deleteFileIcon + `
@@ -456,7 +452,7 @@ export default class BasicControl extends Control {
                             </div>`
                     thisObj.setDeleteFileEvent(thisObj.ele, thisObj.name)
                     thisObj.ele.find('.upload-file-wrapper-outtb').append(file);
-                    let curValue = listInputInDocument[thisObj.name].value;
+                    let curValue = sDocument.state.submit[this.curParentInstance].listInputInDocument[thisObj.name].value;
                     let tableName = thisObj.inTable;
                     if (tableName != false) {
                         if (!Array.isArray(curValue)) {
@@ -476,7 +472,7 @@ export default class BasicControl extends Control {
                         value: curValue
                     });
                     if (tableName != false) {
-                        listInputInDocument[tableName].tableInstance.tableInstance.render();
+                        sDocument.state.submit[this.curParentInstance].listInputInDocument[tableName].tableInstance.tableInstance.render();
                     }
 
                 }
@@ -484,6 +480,7 @@ export default class BasicControl extends Control {
         });
     }
     setDeleteFileEvent(ele, controlName) {
+        let listInputInDocument = sDocument.state.submit[this.curParentInstance].listInputInDocument
         let value = listInputInDocument[controlName].value;
         ele.off('click', '.remove-file')
         ele.on('click', '.remove-file', function(e) {
@@ -520,9 +517,19 @@ export default class BasicControl extends Control {
                 thisObj.ele.removeAttr('valid');
             } else {
                 if (/^[-0-9,.]+$/.test($(this).val())) {
-                    $(this).val(numbro($(this).val()).format(thisObj.numberFormat))
                     thisObj.ele.removeClass('error')
                     thisObj.ele.removeAttr('valid');
+                    if (this.numberFormat) {
+                        $(this).val(numbro($(this).val()).format(thisObj.numberFormat))
+                    } else {
+                        if (/,|\.$/.test($(this).val())) {
+                            thisObj.ele.addClass('error');
+                            let controlTitle = (thisObj.title == "") ? thisObj.name : thisObj.title;
+                            let valid = "Giá trị trường " + controlTitle + " không đúng định dạng số"
+                            thisObj.ele.attr('valid', valid);
+                        }
+                    }
+
                 } else {
                     thisObj.ele.addClass('error');
                     let controlTitle = (thisObj.title == "") ? thisObj.name : thisObj.title;
@@ -533,10 +540,11 @@ export default class BasicControl extends Control {
         })
         this.ele.on('focus', function(e) {
             if (/^[-0-9,.]+$/.test($(this).val())) {
-                $(this).val(numbro($(this).val()).format('0'))
+                $(this).val(thisObj.value)
             }
         })
     }
+
 
     renderFilterControl() {
         if (this.checkDetailView()) return;
@@ -577,17 +585,20 @@ export default class BasicControl extends Control {
         let thisObj = this;
         this.ele.attr('readonly', 'readonly')
         this.ele.on('click', function(e) {
-                store.commit("document/addToDocumentSubmitStore", {
-                    key: 'currentTableInteractive',
-                    value: null,
-                    instance: thisObj.curParentInstance
-                });
-                let formulasInstance = thisObj.controlFormulas.list.instance;
-                SYMPER_APP.$evtBus.$emit('document-submit-select-input', { e: e, selectFormulasInstance: formulasInstance, alias: thisObj.name, controlTitle: thisObj.title })
-            })
-            // this.ele.on('change', function(e) {
-            //     SYMPER_APP.$evtBus.$emit('document-submit-input-change', { controlName: thisObj.controlProperties.name.value, val: $(e.target).val() })
-            // })
+            store.commit("document/addToDocumentSubmitStore", {
+                key: 'currentTableInteractive',
+                value: null,
+                instance: thisObj.curParentInstance
+            });
+            if (!thisObj.controlFormulas.list) {
+                return;
+            }
+            let formulasInstance = thisObj.controlFormulas.list.instance;
+            SYMPER_APP.$evtBus.$emit('document-submit-select-input', { e: e, selectFormulasInstance: formulasInstance, alias: thisObj.name, controlTitle: thisObj.title })
+        });
+        // this.ele.on('change', function(e) {
+        //     SYMPER_APP.$evtBus.$emit('document-submit-input-change', { controlName: thisObj.controlProperties.name.value, val: $(e.target).val() })
+        // })
 
     }
 
