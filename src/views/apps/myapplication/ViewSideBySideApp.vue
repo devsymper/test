@@ -45,7 +45,7 @@
                             <div style="position:relative">
                                 <div v-if="item.type == 'document_definition'" class="title-item-favorite">{{item.title}}</div>
                                 <div v-else  class="title-item-favorite">{{item.name}}</div> 
-                                <v-icon  color="#F6BE4F" style="float:right;font-size:13px;position:absolute;top:0px;right:0px">mdi-star</v-icon>
+                                <v-icon  color="#F6BE4F" style="float:right;font-size:13px;position:absolute;top:4px;right:12px">mdi-star</v-icon>
                             </div>
                         </li>
                     </ul>
