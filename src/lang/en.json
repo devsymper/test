@@ -80,7 +80,10 @@
         "email": "Email",
         "pageSize": "Page size",
         "pendding": "Pendding",
-        "print": "Print"
+        "print": "Print",
+        "display": "Display",
+        "of": "of",
+        "entries": "Entries"
     },
     "validate": {
         "required": "Not be empty",
@@ -755,9 +758,9 @@
         "ascending": "Ascending",
         "descending": "Descending"
     },
-    "myItem":{
-        "objType":"Object type",
-        "today":"Today"
+    "myItem": {
+        "objType": "Object type",
+        "today": "Today"
     },
     "tasks": {
         "error": {
@@ -782,8 +785,8 @@
             "list": "List task",
             "submitForm": "Submit form",
             "alertDescription": "No description",
-            "relatedTask":"RELATED TASK",
-            "attachment":"ATTACHMENT FILE"
+            "relatedTask": "RELATED TASK",
+            "attachment": "ATTACHMENT FILE"
 
         },
         "filterOptions": {

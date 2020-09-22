@@ -154,6 +154,7 @@ export default {
     data(){
         return {
             loadingDiagramView: true,
+            typeView: "B",
 			positionEditor: false,
 			checkPageEmpty: false,
 			listUserIds:null,
@@ -184,7 +185,11 @@ export default {
                 home: {
                     icon: "mdi-home-outline",
                     text: ""
-				},
+                },
+                changeTypeView:{
+                    icon: "mdi-align-vertical-center",
+                    text: "change type view"
+                }
 				
             },
         }
@@ -442,7 +447,7 @@ export default {
 				this.$store.commit('orgchart/updateCurrentFatherNode',{id:nodeId,instanceKey:this.instanceKey})
 				this.positionEditor = true;
 				this.$store.commit('orgchart/updateInstanceKey', this.instanceKey)
-				this.selectNode(nodeId);
+                this.selectNode(nodeId);
                 setTimeout((self) => {
 					self.checkAndCreateOrgchartData();
                     if(self.selectingNode.positionDiagramCells.cells){
@@ -464,6 +469,8 @@ export default {
                     self.$refs.positionDiagram.centerDiagram();
                     self.$refs.positionDiagram.$refs.editorWorkspace.scrollPaperToTop(200);
                     self.$refs.positionDiagram.showOrgchartConfig();
+                    self.$refs.positionDiagram.$refs.editorWorkspace.changeTypeView(self.typeView);
+
                 }, 200, this);
             }
         },
@@ -822,6 +829,11 @@ export default {
                 if(passed){
                     this.$snotifySuccess("Validate passed!");  
                 }
+            }else if(action == "changeTypeView"){
+                let type = this.typeView == "B" ? "R" : "B"
+                this.typeView = type
+                this.$refs.editorWorkspace.changeTypeView(type);
+                // this.$refs.positionDiagram.$refs.editorWorkspace.changeTypeView(type);
             }else{
                 this.$refs.editorWorkspace.handleHeaderAction(action);
             }

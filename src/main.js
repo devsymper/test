@@ -18,7 +18,9 @@ import {
     appConfigs
 } from "./configs";
 import actionMap from './action/index'
+import uploader from 'vue-simple-uploader'
 import VueRx from 'vue-rx'
+import iconMap from "./icon";
 //thu vien slider thumbnails
 
 //Anhtger import html2canvas
@@ -64,6 +66,19 @@ Vue.mixin({
                 });
 
             }
+        },
+
+        $i(pathToIcon) {
+            if (pathToIcon) {
+                try {
+                    let i = iconMap;
+                    return eval('i.' + pathToIcon);
+                } catch (error) {
+                    return pathToIcon;
+                }
+            } else {
+                return '';
+            }
         }
     }
 })
@@ -72,6 +87,7 @@ Vue.use(Notifications);
 Vue.use(VueMoment, {
     moment,
 });
+Vue.use(uploader)
 
 /**
  * $evtBus : component chuyên chở các sự kiện giữa tất cả các component

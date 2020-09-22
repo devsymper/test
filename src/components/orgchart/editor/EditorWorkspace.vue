@@ -337,6 +337,11 @@ export default {
             firstNode.position(300,20);
             
         },
+        changeTypeView(type){
+            let treeLayout = this.$refs.jointPaper.treeLayout;
+            treeLayout.set('direction', type);
+            treeLayout.layout();
+        },
 		exampleSetupGraph(graph) {
 			
         },

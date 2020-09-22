@@ -39,7 +39,20 @@
             :originData="originData"
             :tabsData="tabsData"
             @changeUpdateAsignee="changeUpdateAsignee"
+            @showContentFile="showContentFile"
+            @showPopupTracking="showPopupTracking"
         />
+        <KHShowFile
+        @downloadOrBackupFile="downloadOrBackupFile"
+        v-bind:fileId="fileId"
+        v-bind:name="name"
+        v-bind:serverPath="serverPath"
+        v-bind:type="type"
+        />
+        <PopupProcessTracking 
+            :taskInfo="taskInfo"
+        />
+
     </div>
 </template> 
 <script>
@@ -48,11 +61,17 @@ import BPMNEngine from '@/api/BPMNEngine';
 import Detail from "@/views/document/detail/Detail";
 import SideBarDetail from "./SideBarDetail";
 import { getProcessInstanceVarsMap } from '@/components/process/processAction';
+import KHShowFile from "@/components/kh/KHShowImage";
+import { taskApi } from "@/api/task.js";
+import PopupProcessTracking from './PopupProcessTracking'
+
 export default {
     components: {
         DocumentSubmit: DocumentSubmit,
         Detail,
-        SideBarDetail
+        SideBarDetail,
+        KHShowFile,
+        PopupProcessTracking
     },
     created(){
         console.log(this,'thissthissthissthissthissthissthissthiss');
@@ -60,6 +79,10 @@ export default {
     },
     data(){
         return {
+            fileId: "",
+			serverPath: "",
+			name: "",
+			type: "",
             sidebarWidth:400,
             docId: 0,
             docObjInfo: {
@@ -162,6 +185,29 @@ export default {
         }
     },
     methods: {
+        showPopupTracking(){
+            this.$store.commit("task/setStatusPopupTracking",true)
+        },
+        showContentFile(data){
+            this.serverPath = data.serverPath;
+			this.name = data.name;
+			this.type = data.type;
+			this.fileId = data.id;
+            this.$store.commit("kh/changeStatusShowImage", true);
+            
+        },
+        downloadOrBackupFile(data) {
+			this.downLoadFile(data.fileId);
+        },
+        downLoadFile(id) {
+			taskApi
+			.downloadFile(id)
+			.then(res => {})
+			.catch(err => {
+			console.log("error download file!!!", err);
+			})
+			.always(() => {});
+		},
         changeUpdateAsignee(){
             this.$emit('changeUpdateAsignee');
         },

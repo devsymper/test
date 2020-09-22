@@ -4,6 +4,10 @@
              <h4>Ứng dụng</h4>
              <v-icon @click="changeView" style="position:absolute;top:12px;right:6px;font-size:13px" >mdi-page-previous-outline</v-icon>  
             <div style="margin:20px 0px 0px 8px">
+                <div :class="{'favorite-area': true , 'active': showFavorite == true}" @click="showListFavorite">
+                    <v-icon style="font-size:16px"> mdi-star</v-icon>
+                    <span style="font:13px roboto;padding-left:8px">Yêu thích</span>
+                </div>
                  <div  v-for="(item,i) in apps" :key="i" 
                     :class="{'list-app-item': true,'active': item.id == activeIndex}"
                     @click="clickDetails(item)"
@@ -22,16 +26,35 @@
             </div>
        </div>
        <div class="detail-app" v-show="showDetailDiv">
-           <h4>Chi tiết ứng dụng</h4>
-           <v-text-field
-                :label="$t('apps.search')"
-                single-line
-                solo
-                append-icon="mdi-magnify"
-                v-model="searchKey"
-            ></v-text-field>
-           <AppDetail ref="appDetail"  :isMyApplication="true" :isEndUserCpn="true" :searchKey="searchKey" />
-
+          <div v-if="showFavorite == false">
+               <h4>Chi tiết ứng dụng</h4>
+                <v-text-field
+                        :label="$t('apps.search')"
+                        single-line
+                        solo
+                        append-icon="mdi-magnify"
+                        v-model="searchKey"
+                    ></v-text-field>
+                <AppDetail ref="appDetail"  :isMyApplication="true" :isEndUserCpn="true" :searchKey="searchKey" :sideBySide="true" />
+          </div>
+         <div v-else class="favorite-area-item">
+              <h4>Danh sách yêu thích</h4>
+                <VuePerfectScrollbar :style="{height:heightListFavorite}"  >
+                    <ul style="margin:0px 0px;" v-if="sFavorite.length > 0">
+                        <li v-for="(item,i) in sFavorite" :key="i" v-on:click="rightClickHandler($event,item,item.type)" v-on:contextmenu="rightClickHandler($event,item,item.type)" style="cursor:pointer"> 
+                            <div style="position:relative">
+                                <div v-if="item.type == 'document_definition'" class="title-item-favorite">{{item.title}}</div>
+                                <div v-else  class="title-item-favorite">{{item.name}}</div> 
+                                <v-icon  color="#F6BE4F" style="float:right;font-size:13px;position:absolute;top:0px;right:0px">mdi-star</v-icon>
+                            </div>
+                        </li>
+                    </ul>
+                </VuePerfectScrollbar>
+         </div>
+        <ContextMenu ref="contextMenu" :sideBySide="true" />
+       </div>
+       <div class="action-area h-100 w-100">
+            <SymperActionView :actionDef="actionDef" :param="param" />
        </div>
    </div>
 </template>
@@ -39,24 +62,185 @@
 <script>
 import {appManagementApi} from '@/api/AppManagement.js';
 import AppDetail from './../AppDetail.vue'
+import VuePerfectScrollbar from "vue-perfect-scrollbar";
+import ContextMenu from './../ContextMenu.vue'
+import SymperActionView from '@/action/SymperActionView.vue'
     export default {
     created(){
         this.getActiveapps()
+        this.getFavorite()
     },
     components:{
         AppDetail,
+        VuePerfectScrollbar,
+        ContextMenu,
+        SymperActionView
     },
-    mounted(){ 
-            let self = this
-        	$(document).click(function(e){
-				if(!$(e.target).is('.context-menu')){
-                    self.$refs.appDetail.hideContextMenu()		
-				}
-			})
+    computed:{
+        sFavorite(){
+			return this.$store.state.appConfig.listFavorite
+        },
+        actionDef(){
+             return this.$store.state.appConfig.actionDef
+        },
+        param(){
+             return this.$store.state.appConfig.param
+        }
     },
     methods:{
+        rightClickHandler(event,item,type){
+			event.stopPropagation();
+			event.preventDefault();
+			if(!item.actions.includes('unfavorite')){
+				item.actions.push('unfavorite')
+			}
+			this.$refs.contextMenu.setContextItem(item.actions)
+			this.$refs.contextMenu.show(event)
+			this.$refs.contextMenu.setItem(item)
+			this.$refs.contextMenu.setType(type)
+		},
+        showListFavorite(){
+            this.showFavorite = true
+            this.activeIndex = '000'
+            this.showDetailDiv = true
+        },
+        getFavorite(){
+			this.listFavorite= []
+			let self = this 
+			let userId = this.$store.state.app.endUserInfo.id
+			appManagementApi.getItemFavorite(userId).then(res =>{
+				if (res.status == 200) {
+					res.data.listObject.forEach(function(e){
+						if(e.objectType == 'document_definition'){
+							self.mapIdFavorite.document_definition["document_definition:"+e.objectIdentifier] = e
+						}  
+						if(e.objectType == 'orgchart'){
+							self.mapIdFavorite.orgchart["orgchart:"+e.objectIdentifier] = e
+						}  
+						if(e.objectType == 'workflow_definition'){
+							self.mapIdFavorite.workflow_definition["workflow_definition:"+e.objectIdentifier] = e
+						}  
+						if(e.objectType == 'dashboard'){
+							self.mapIdFavorite.dashboard["dashboard:"+e.objectIdentifier] = e
+						}  
+                    })
+					this.checkTypeFavorite(res.data.listObject)
+                    this.$store.commit('appConfig/updateListFavorite',self.listFavorite)
+x				}
+			}).catch((err) => {
+			});
+        },
+        checkTypeFavorite(data){
+			let self = this
+			self.arrType.document_definition = []
+			self.arrType.orgchart = []
+			self.arrType.dashboard = []
+			self.arrType.workflow_definition = []
+			data.forEach(function(e){
+				if(e.objectType == 'document_definition'){
+					self.arrType.document_definition.push("document_definition:"+e.objectIdentifier)
+				}
+				if(e.objectType == 'orgchart'){
+					self.arrType.orgchart.push("orgchart:"+e.objectIdentifier)
+				}
+				if(e.objectType == 'dashboard'){
+					self.arrType.dashboard.push("dashboard:"+e.objectIdentifier)
+				}
+				if(e.objectType == 'workflow_definition'){
+					self.arrType.workflow_definition.push("workflow_definition:"+e.objectIdentifier)
+				}
+			});
+			if(self.arrType.document_definition.length > 0){
+				let dataDoc = self.arrType.document_definition
+				this.getFavoriteByAccessControl(dataDoc,'document_definition')
+			}
+			if(self.arrType.orgchart.length > 0){
+				let dataOrg = self.arrType.orgchart
+				this.getFavoriteByAccessControl(dataOrg,'orgchart')
+			}
+			if(self.arrType.dashboard.length > 0){
+				let dataRep = self.arrType.dashboard
+				this.getFavoriteByAccessControl(dataRep,'dashboard')
+			}
+			if(self.arrType.workflow_definition.length > 0){
+				let dataW = self.arrType.workflow_definition
+				this.getFavoriteByAccessControl(dataW,'workflow_definition')
+			}
+        },
+        getFavoriteByAccessControl(ids,type){
+			let self = this
+			appManagementApi.getListObjectIdentifier({
+				pageSize:50,
+				ids: ids
+			}).then(res=>{
+				if(type == 'orgchart'){
+					if(res.data.length > 0){
+						this.updateActionItem(self.mapIdFavorite.orgchart,res.data,'orgchart')
+						res.data.forEach(function(e){
+                            self.listFavorite.push(e)
+						})
+					}
+				}
+				if(type == 'document_definition'){
+						if(res.data.length > 0){
+						this.updateActionItem(self.mapIdFavorite.document_definition,res.data,'document_definition')
+						res.data.forEach(function(e){
+							self.listFavorite.push(e)
+						})
+					}
+				}
+				if(type == 'workflow_definition'){
+					if(res.data.length > 0){
+						this.updateActionItem(self.mapIdFavorite.workflow_definition,res.data,'workflow_definition')
+						res.data.forEach(function(e){
+							self.listFavorite.push(e)
+						})
+					}
+				}
+				if(type == 'dashboard'){
+					if(res.data.length > 0){
+						this.updateActionItem(self.mapIdFavorite.dashboard,res.data,'dashboard')
+						res.data.forEach(function(e){
+							self.listFavorite.push(e)
+						})
+					}
+				}
+                }).catch(err=>{
+                })
+        },
+        updateFavoriteItem(mapArray,array){
+			for( let [key,value] of Object.entries(mapArray)){
+				array.forEach(function(item){
+					if(item.objectIdentifier == key){
+						item.favorite = value.isFavorite
+						item.actions = value.actions
+					} 
+				})
+			}
+			return array
+        },
+        updateActionItem(mapArray,array,type){
+			for( let [key,value] of Object.entries(mapArray)){
+				array.forEach(function(item){
+					if(item.objectIdentifier == key){
+						item.favorite = 1
+						item.actions = value.actions
+						item.type = type
+					} 
+				})
+			}
+			return array
+		},
         changeView(){
             this.$store.commit('appConfig/changeTypeView')
+        },
+        hideContextMenu(){
+            if(this.$refs.appDetail){
+                 this.$refs.appDetail.hideContextMenu()	
+            }
+            if(this.$refs.contextMenu){
+                 this.$refs.contextMenu.hide()	
+            }
         },
         getActiveapps(){
 			appManagementApi.getActiveApp().then(res => {
@@ -68,7 +252,7 @@ import AppDetail from './../AppDetail.vue'
         },
         clickDetails(item){
             this.activeIndex = item.id
-            debugger
+            this.showFavorite = false
             this.$store.commit("appConfig/updateCurrentAppId",item.id);
             this.showDetailDiv = true
 			this.$store.commit('appConfig/emptyItemSelected')
@@ -157,14 +341,19 @@ import AppDetail from './../AppDetail.vue'
 				}
 			}).catch(err=>{
 			})
-		},
-    },
+        },
+		
+     },
     data(){
         return { 
             apps: [],
             activeIndex: '',
             showDetailDiv:false,
             searchKey: '',
+            listFavorite:[],
+            showFavorite:false,
+            activeFavorite:false,
+            heightListFavorite: 'calc(100vh - 100px)',
             arrType:{
                 document_definition:[],
                 orgchart:[],
@@ -181,6 +370,25 @@ import AppDetail from './../AppDetail.vue'
                 workflow_definition:{
                 }
             },
+            mapIdFavorite:{
+                orgchart:{
+                },
+                document_definition:{
+                },
+                dashboard:{
+                },
+                workflow_definition:{
+                }
+            },
+        }
+    },
+    watch:{
+         actionDef: {
+            deep: true,
+            immediate: true,
+            handler(newValue){
+                debugger
+            }
         }
     }
 }
@@ -190,9 +398,19 @@ import AppDetail from './../AppDetail.vue'
 .view-side-by-side-apps {
     display: flex;
 }
+.view-side-by-side-apps .favorite-area{
+   cursor: pointer;
+   display: flex;
+   align-items: center;
+   height:40px;
+}
+.view-side-by-side-apps .favorite-area .active{
+    background-color: active;
+}
+
 .view-side-by-side-apps .list-apps{
     padding-top:12px;
-    width:170px;
+    width:220px;
     border-right:1px solid lightgray;
     position: relative;
 }
@@ -257,5 +475,15 @@ import AppDetail from './../AppDetail.vue'
 }
 .view-side-by-side-apps >>> .detail-app .ps__rail-x{
     display: none;
+}
+.view-side-by-side-apps >>> .favorite-area-item li{
+    list-style: none;    
+    padding:6px;
+}
+.view-side-by-side-apps >>> .favorite-area-item .title-item-favorite{
+   	white-space: nowrap; 
+	width: 90%; 
+	overflow: hidden;
+	text-overflow: ellipsis; 
 }
 </style>

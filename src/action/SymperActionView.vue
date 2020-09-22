@@ -44,13 +44,13 @@ export default {
         }
     },
     watch: {
-        // actionDef: {
-        //     deep: true,
-        //     immediate: true,
-        //     handler(newValue){
-        //         this.displayActionView();
-        //     }
-        // }
+        actionDef: {
+            deep: true,
+            immediate: true,
+            handler(newValue){
+                this.displayActionView();
+            }
+        }
     },
     mounted(){
         this.displayActionView();
@@ -62,6 +62,7 @@ export default {
     },
     methods: {
         async displayActionView(){
+            console.warn(this.actionDef,'this.actionDefthis.actionDef');
             let key = getKeyForAction(this.actionDef);
             if(actionMap.hasOwnProperty(key)) {
                 if(actionMap[key].hasOwnProperty('$getActionLink')){

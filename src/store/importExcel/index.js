@@ -1,8 +1,8 @@
-import * as mutations from "./mutations";
 import defaultState from "./defaultState";
+import * as mutations from "./mutations";
 
 export default {
     namespaced: true,
-    state: defaultState,
     mutations,
+    state: defaultState
 };
