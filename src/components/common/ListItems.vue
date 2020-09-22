@@ -9,7 +9,7 @@
                             @input="bindToSearchkey"
                             class="d-inline-block mr-2 sym-small-size"
                             single-line
-                            append-icon="mdi-magnify"
+                            :append-icon="$i('input.search')"
                             outlined
                             dense
                             label="Search"
@@ -862,6 +862,17 @@ export default {
                 );
                 thisCpn.data = data.listObject ? data.listObject : [];
                 thisCpn.handleStopDragColumn();
+                //AnhTger config show description
+                (data.listObject).forEach(element => {
+                    let processKey=element.processKey;
+                    if (processKey) {
+                        let configVale=JSON.parse(element.configValue)[processKey];
+                        if (configVale.description) {
+                            element.description=configVale.description;
+                        }
+                    }
+                   
+                });
                 thisCpn.$emit('data-get', data.listObject);
             }
             this.prepareFilterAndCallApi(columns , cache , applyFilter, handler);

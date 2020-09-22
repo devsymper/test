@@ -1,7 +1,8 @@
 const defaultState = {
     arrFileAttach: [],
     filter:'notDone',
-    arrDocObjId:[]
+    arrDocObjId:[],
+    statusPopupTracking:false
     
 };
 

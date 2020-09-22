@@ -37,6 +37,7 @@
         "close": "Đóng",
         "virtualdocs": "Virtualdocs",
         "tasks": "Tasks",
+        "myItem": "My Item",
         "other": "Khác",
         "deploy": "Deploy",
         "start": "Bắt đầu",
@@ -79,7 +80,10 @@
         "email": "Email",
         "pageSize": "Số bản ghi mỗi trang",
         "pendding": "Cần làm",
-        "print": "In"
+        "print": "In",
+        "display": "Hiển thị",
+        "of": "của",
+        "entries": "bản ghi"
     },
     "login": {
         "title": "Đăng nhập hệ thống",
@@ -895,6 +899,10 @@
             "unsubscribe": "Bỏ theo dõi"
         }
     },
+    "myItem": {
+        "objType": "Loại đối tượng",
+        "today": "Hôm nay"
+    },
     "tasks": {
         "error": {
             "emptyAssignee": "Người nhận việc không được phép để trống",
@@ -907,6 +915,7 @@
             "date": "Ngày tạo",
             "dueDate": "Ngày đến hạn",
             "createDate": "Ngày khởi tạo",
+            "app": "Ứng dụng",
             "description": "Mô tả",
             "owner": "Người sở hữu",
             "name": "Tên công việc",
@@ -916,7 +925,9 @@
             "id": "Số đơn",
             "list": "Danh sách công việc",
             "submitForm": "Form nhập liệu",
-            "alertDescription": "Không có mô tả"
+            "alertDescription": "Không có mô tả",
+            "relatedTask": "CÁC TASK LIÊN QUAN",
+            "attachment": "TỆP ĐÍNH KÈM"
         },
         "filterOptions": {
             "all": "Toàn bộ task",

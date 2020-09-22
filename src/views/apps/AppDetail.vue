@@ -45,7 +45,7 @@
 					</ul>
 			</div>	
 		</VuePerfectScrollbar>
-		<ContextMenu ref="contextMenu" />	
+		<ContextMenu ref="contextMenu" :sideBySide="sideBySide" />	
   </div>
 </template>
 <script>
@@ -127,6 +127,10 @@ export default {
 		isMyApplication:{
 			type: Boolean,
 			default: false
+		},
+		sideBySide:{
+			type: Boolean,
+			default: false
 		}
     },
 	methods:{
@@ -144,28 +148,28 @@ export default {
 			self.objFilter.dashboard.item = []
 			self.objFilter.workflow_definition.item = []
 			if(listItem.document_definition.item.length > 0){
-					listItem.document_definition.item.filter(function(item){
+				listItem.document_definition.item.filter(function(item){
 						if(item.title.toLowerCase().includes(self.searchKey.toLowerCase())){
 							self.objFilter.document_definition.item.push(item)
 						}
 				})
 			}
 			if(listItem.orgchart.item.length > 0){
-					listItem.orgchart.item.filter(function(item){
+				listItem.orgchart.item.filter(function(item){
 					if(item.name.toLowerCase().includes(self.searchKey.toLowerCase())){
 						self.objFilter.orgchart.item.push(item)
 					}
 				})
 			}
 			if(listItem.dashboard.item.length > 0){
-					listItem.dashboard.item.filter(function(item){
+				listItem.dashboard.item.filter(function(item){
 					if(item.name.toLowerCase().includes(self.searchKey.toLowerCase())){
 						self.objFilter.dashboard.item.push(item)
 					}
 				})
 			}
 			if(listItem.workflow_definition.item.length > 0){
-					listItem.workflow_definition.item.filter(function(item){
+				listItem.workflow_definition.item.filter(function(item){
 					if(item.name.toLowerCase().includes(self.searchKey.toLowerCase())){
 						self.objFilter.workflow_definition.item.push(item)
 					}
