@@ -15,7 +15,7 @@ export const appConfigs = {
         bpmne: {
             general: 'https://workflow.symper.vn/',
             models: 'https://workflow-modeler.symper.vn',
-            subTasksHistory: 'https://workflow.symper.vn/symper-rest/service/query/historic-task-instances',
+            postTasksHistory: 'https://workflow.symper.vn/symper-rest/service/query/historic-task-instances',
             deployments: "https://workflow.symper.vn/symper-rest/service/repository/deployments",
             definitions: "https://workflow.symper.vn/symper-rest/service/repository/process-definitions",
             instances: "https://workflow.symper.vn/symper-rest/service/runtime/process-instances",

@@ -83,7 +83,7 @@
                     }"
                     style="border-bottom: 1px solid #eeeeee!important;"
                 >
-                   <span style="color:#FF8003; font-size:15px;margin-left:16px;margin-top:6px">{{ showTime(obj.date)}}</span>
+                   <span style="color:#FF8003; font-size:13px;margin-left:16px;margin-top:6px">{{ showTime(obj.date)}}</span>
                 </v-row>
                 <v-row
                     v-for="(obj, idx) in obj.tasks"
@@ -307,62 +307,62 @@ export default {
   },
   props: {
     compackMode: {
-      type: Boolean,
-      default: false
+        type: Boolean,
+        default: false
     },
     height: {
-      type: String,
-      default: "calc(100vh - 120px)"
+        type: String,
+        default: "calc(100vh - 120px)"
     },
     // component này có ở chế độ là component con của một component khác hay ko, false nếu component này là view
     smallComponentMode: {
-      type: Boolean,
-      default: false
+        type: Boolean,
+        default: false
     },
     filterFromParent: {
-      type: Object,
-      default() {
-        return {};
-      }
+        type: Object,
+        default() {
+            return {};
+        }
     },
     headerTitle: {
-      type: String,
-      default() {
-        return this.$t("process.taskList");
-      }
+        type: String,
+        default() {
+            return this.$t("process.taskList");
+        }
     },
     filterTaskAction: {
-      type: String,
-      default: "getList"
+        type: String,
+        default: "getList"
     }
   },
   data: function() {
     return {
-      index: -1,
-      dataIndex:-1,
-      loadingTaskList: false,
-      loadingMoreTask: false,
-      listTaskHeight: 300,
-      totalTask: 0,
-      selectedTask: {
-        taskInfo: {},
-        idx: -1,
-        originData: null
-      },
-      listProrcessInstances: [],
-      isSmallRow: false,
-      sideBySideMode: false,
-      openPanel: [0, 1, 2, 3, 4],
-      allFlatTasks: [],
-      myOwnFilter: {
-        size: 100,
-        sort: "createTime",
-        order: "desc",
-        page: 1,
-        assignee: this.$store.state.app.endUserInfo.id
-      },
-      defaultAvatar: appConfigs.defaultAvatar,
-      arrdocObjId: []
+        index: -1,
+        dataIndex:-1,
+        loadingTaskList: false,
+        loadingMoreTask: false,
+        listTaskHeight: 300,
+        totalTask: 0,
+        selectedTask: {
+            taskInfo: {},
+            idx: -1,
+            originData: null
+        },
+        listProrcessInstances: [],
+        isSmallRow: false,
+        sideBySideMode: false,
+        openPanel: [0, 1, 2, 3, 4],
+        allFlatTasks: [],
+        myOwnFilter: {
+            size: 100,
+            sort: "createTime",
+            order: "desc",
+            page: 1,
+            assignee: this.$store.state.app.endUserInfo.id
+        },
+        defaultAvatar: appConfigs.defaultAvatar,
+        arrdocObjId: []
     };
   },
   created() {
@@ -467,89 +467,89 @@ export default {
       this.$emit("change-height", "calc(100vh - 120px)");
     },
     getTaskData(task) {
-      let rsl = {
-        content: "",
-        extraLabel: "",
-        extraValue: ""
-      };
-      try {
-        let taskData = JSON.parse(task.description);
-        if (taskData) {
-          rsl = taskData;
+        let rsl = {
+            content: "",
+            extraLabel: "",
+            extraValue: ""
+        };
+        try {
+            let taskData = JSON.parse(task.description);
+            if (taskData) {
+            rsl = taskData;
+            }
+        } catch (error) {
+            rsl.content = task.description;
         }
-      } catch (error) {
-        rsl.content = task.description;
-      }
-      return rsl;
+        return rsl;
     },
     async getTasks(filter = {}) {
-      if (this.loadingTaskList || this.loadingMoreTask) {
-        return;
-      }
-      let self = this;
-      if (this.myOwnFilter.page == 1) {
-        this.allFlatTasks = [];
-        this.loadingTaskList = true;
-      } else {
-        this.loadingMoreTask = true;
-      }
-      this.listProrcessInstances = [];
-      filter = Object.assign(filter, this.filterFromParent);
-      filter = Object.assign(filter, this.myOwnFilter);
-      let res = {};
-      let listTasks = [];
-      if (filter.status) {
-        this.$store.commit("task/setFilter", filter.status);
-      }
-      if (this.filterTaskAction == "subtasks") {
-        res = await BPMNEngine.getSubtasks(
-          this.filterFromParent.parentTaskId,
-          filter
-        );
-        if (filter.status == "done") {
-          listTasks = res.data;
+        if (this.loadingTaskList || this.loadingMoreTask) {
+            return;
+        }
+        let self = this;
+        if (this.myOwnFilter.page == 1) {
+            this.allFlatTasks = [];
+            this.loadingTaskList = true;
         } else {
-          listTasks = res;
+            this.loadingMoreTask = true;
         }
-      } else {
-        if (!filter.assignee) {
-          filter.assignee = this.$store.state.app.endUserInfo.id;
+        this.listProrcessInstances = [];
+        filter = Object.assign(filter, this.filterFromParent);
+        filter = Object.assign(filter, this.myOwnFilter);
+        let res = {};
+        let listTasks = [];
+        if (filter.status) {
+            this.$store.commit("task/setFilter", filter.status);
         }
-        res = await BPMNEngine.getTask(filter);
-        listTasks = res.data;
-      }
-      this.totalTask = Number(res.total);
+        if (this.filterTaskAction == "subtasks") {
+            res = await BPMNEngine.getSubtasks(
+            this.filterFromParent.parentTaskId,
+            filter
+            );
+            if (filter.status == "done") {
+            listTasks = res.data;
+            } else {
+            listTasks = res;
+            }
+        } else {
+            if (!filter.assignee) {
+            filter.assignee = this.$store.state.app.endUserInfo.id;
+            }
+            res = await BPMNEngine.getTask(filter);
+            listTasks = res.data;
+        }
+        this.totalTask = Number(res.total);
       // let allDefinitions=this.$store.state.process.allDefinitions;
       // if(Object.entries(allDefinitions).length === 0){
       //     this.$store.dispatch('process/getAllDefinitions');
       // }
-      for (let task of listTasks) {
-        task.taskData = self.getTaskData(task);
-        task = addMoreInfoToTask(task);
-        self.allFlatTasks.push(task);
-      }
-      this.listProrcessInstances.forEach((process, processIndex) => {
-        process.objects.forEach((instance, instanceIndex) => {
-          this.listProrcessInstances[processIndex].objects[
-            instanceIndex
-          ].tasks = [];
-          // let index = 0;
-          for (let index in listTasks) {
-            listTasks[index].assignee = this.getUser(
-              parseInt(listTasks[index].assignee)
-            );
-            listTasks[index].owner = this.getUser(
-              parseInt(listTasks[index].owner)
-            );
-            if (listTasks[index].processInstanceId == instance.id) {
-              this.listProrcessInstances[processIndex].objects[
+        for (let task of listTasks) {
+            task.taskData = self.getTaskData(task);
+            task = addMoreInfoToTask(task);
+            self.allFlatTasks.push(task);
+        }
+        this.listProrcessInstances.forEach((process, processIndex) => {
+            process.objects.forEach((instance, instanceIndex) => {
+            this.listProrcessInstances[processIndex].objects[
                 instanceIndex
-              ].tasks.push(listTasks[index]);
-              listTasks.splice(index, 1);
+            ].tasks = [];
+            // let index = 0;
+            for (let index in listTasks) {
+                listTasks[index].assignee = this.getUser(
+                parseInt(listTasks[index].assignee)
+                );
+                listTasks[index].owner = this.getUser(
+                parseInt(listTasks[index].owner)
+                );
+                if (listTasks[index].processInstanceId == instance.id) {
+                this.listProrcessInstances[processIndex].objects[
+                    instanceIndex
+                ].tasks.push(listTasks[index]);
+                listTasks.splice(index, 1);
+                }
             }
-          }
+            });
         });
-      });
 
       console.log(listTasks, "listTassk");
       this.addOtherProcess(listTasks);

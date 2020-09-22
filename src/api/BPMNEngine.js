@@ -147,7 +147,7 @@ export default {
             filter.finished=true;
             filter.sort='endTime';
             filter= JSON.stringify(filter);
-            return bpmneApi.post(appConfigs.apiDomain.bpmne.subTasksHistory , filter, testHeader);
+            return bpmneApi.post(appConfigs.apiDomain.bpmne.postTasksHistory , filter, testHeader);
         }else{
             return bpmneApi.get(appConfigs.apiDomain.bpmne.tasks + '/' + idParent + '/subtasks', filter, testHeader);
         }
@@ -182,7 +182,10 @@ export default {
 
     getLastestByModel() {
         return bpmneApi.get('/deploy-history/lastest-by-model');
-    }
-   
+    },
+    postTaskHistory(filter) {
+        filter= JSON.stringify(filter);
+        return bpmneApi.post(appConfigs.apiDomain.bpmne.postTasksHistory , filter, testHeader);
+    },
 
 };
