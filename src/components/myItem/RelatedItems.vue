@@ -23,7 +23,7 @@
                             <v-icon style="font-size:16px">{{displayIcon(item.description)}}</v-icon>
                             <span style=" font-size:13px">{{displayContent(item.description)}}</span>
                         </div>
-                        <div    @click="goDoTask(item.id)">
+                        <div  @click="goDoTask(item.id)">
                               <v-icon v-if="item.createTime" style="font-size:11px; color:blue;margin-left: 3px;">mdi-circle</v-icon>
                               <v-icon v-else style="font-size:11px ; color:green;margin-left: 3px;">mdi-circle</v-icon>
                               {{displayDescription(item.description)}}
