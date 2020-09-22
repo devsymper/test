@@ -171,7 +171,6 @@ export default {
             bottom: true,
             left: false,
             transition: "slide-y-reverse-transition",
-            isComponentActive:false,
             printConfigActive:null,
             loading: true,
 
@@ -200,7 +199,7 @@ export default {
         }
 
         this.$evtBus.$on('symper-app-wrapper-clicked',evt=>{
-            if(thisCpn.isComponentActive == false) return;
+            if(thisCpn._inactive == true) return;
             if($(evt.target).is('.highlight-history')){
                 this.$refs.historyView.show($(evt.target))    
             }
@@ -212,14 +211,6 @@ export default {
                     }
             }
         })
-    },
-    activated() {
-        this.isComponentActive = true;
-    },
-    deactivated() {
-        this.isComponentActive = false;
-    },
-    destroyed(){
     },
     watch:{
         docObjInfo:{
