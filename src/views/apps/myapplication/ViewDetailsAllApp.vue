@@ -23,13 +23,18 @@
             </div>
         </div>
         <VuePerfectScrollbar :style="{height: menuItemsHeight}">
-        <div class="content-view-details-all-app h-100">
-           
-                <v-row no-gutters>
+        <div class="content-view-details-all-app h-100 w-100">
+                <v-skeleton-loader
+                        ref="skeleton"
+                        v-if="loadingApp"
+                        type="table-tbody"
+                        class="mx-auto w-100 h-100"
+                 ></v-skeleton-loader>
+                <v-row v-else no-gutters>
                     <template v-for="(item,i) in apps" >
                         <v-col cols="6" :key="i">
                         <v-expansion-panels
-                            v-model="panel"
+                             v-model="panel"
                             multiple
                         >
                             <v-expansion-panel
@@ -71,7 +76,7 @@
                                                                                 <span v-on:click="rightClickHandler($event,childItem,childItem.name)">{{subChildItem.title}}</span> 
                                                                                 
                                                                             </div>
-                                                                        </template>
+                                                                         </template>
                                                                         <span style="font:13px roboto">{{subChildItem.title}}</span> 
                                                                         <span style="font:8px;opacity:0.4">{{subChildItem.name}}</span>
                                                                     </v-tooltip>
@@ -144,48 +149,40 @@ export default {
                             self.checkChildrenApp(e.childrenApp,e.id)   
                         }
                     }
-				}
+                }
+                setTimeout(function(e){
+                    self.loadingApp = false
+                },1000)
 			}).catch((err) => {
 			});
         },
+        checkTypeInChildrenApp(type,idApp){
+            if(data.hasOwnProperty(type)){
+				data.orgchart.forEach(function(e){
+					self.listIds.push(type+':'+e.id);
+					self.mapId[idApp] = type+":"+e.id
+				})
+			}
+        },
         checkChildrenApp(data,idApp){
             let self = this 
-			self.arrType.orgchart = []
-			self.arrType.document_definition = []
-			self.arrType.dashboard = []
-			self.arrType.workflow_definition = []
-			if(data.hasOwnProperty('orgchart')){
-				data.orgchart.forEach(function(e){
-					self.arrType.orgchart.push("orgchart:"+e.id);
-					self.mapId.orgchart["orgchart:"+e.id] = e;
-				})
-				let dataOrg = self.arrType.orgchart;
-				this.getByAccessControl(dataOrg,'orgchart',idApp)
-			}
-			if(data.hasOwnProperty('document_definition')){
-				data.document_definition.forEach(function(e){
-					self.arrType.document_definition.push("document_definition:"+e.id);
-					self.mapId.document_definition["document_definition:"+e.id] = e;
-				})
-				let dataDoc = self.arrType.document_definition
-                this.getByAccessControl(dataDoc,'document_definition',idApp)
-			}
-			if(data.hasOwnProperty('workflow_definition')){
-				data.workflow_definition.forEach(function(e){
-					self.arrType.workflow_definition.push("workflow_definition:"+e.id);
-					self.mapId.workflow_definition["workflow_definition:"+e.id] = e;
-				})
-				let dataW = self.arrType.workflow_definition
-				this.getByAccessControl(dataW,'workflow_definition',idApp)
-			}
-			if(data.hasOwnProperty('dashboard')){
-				data.dashboard.forEach(function(e){
-					self.arrType.dashboard.push("dashboard:"+e.id);
-					self.mapId.dashboard["dashboard:"+e.id] = e;
-				})
-				let dataRep = self.arrType.dashboard
-				this.getByAccessControl(dataRep,'dashboard',idApp)
-			}
+            self.listIds = []
+            this.checkTypeInChildrenApp('orgchart')
+            this.checkTypeInChildrenApp('document_definition')
+            this.checkTypeInChildrenApp('workflow_definition')
+            this.checkTypeInChildrenApp('dashboard')
+            console.log(self.listIds);
+            console.log(self.mapId);
+            debugger
+            // this.getByAccessControl(self.listIds)
+			// if(data.hasOwnProperty('dashboard')){
+			// 	data.dashboard.forEach(function(e){
+			// 		self.arrType.dashboard.push("dashboard:"+e.id);
+			// 		self.mapId.dashboard["dashboard:"+e.id] = e;
+			// 	})
+			// 	let dataRep = self.arrType.dashboard
+			// 	this.getByAccessControl(dataRep,'dashboard',idApp)
+			// }
         },
 
         updateChidrenItem(type,data,idApp){
@@ -196,6 +193,8 @@ export default {
             })
             obj.item = data
             this.$set(this.apps[idApp].childrenAppReduce,type,obj)
+            debugger
+           
         },
         updateFavoriteItem(mapArray,array){
 			for( let [key,value] of Object.entries(mapArray)){
@@ -319,27 +318,16 @@ export default {
                 item: []
             },
              panel: [],
+             listIds: [],
+             mapId:{},
+             loadingApp: true,
              menuItemsHeight: 'calc(100vh - 125px)',
              searchItemKey: "",
              apps:{},
              appsReduce:{},
              currentAppId:0,
-             arrType:{
-                document_definition:[],
-                orgchart:[],
-                dashboard:[],
-                workflow_definition:[],
-            },
-            mapId:{
-                orgchart:{
-                },
-                document_definition:{
-                },
-                dashboard:{
-                },
-                workflow_definition:{
-                }
-            },
+            
+            
         }
     },
     created(){
@@ -370,6 +358,7 @@ export default {
     width:90%;
     margin-left:auto;
     margin-right:auto;
+    font:13px roboto
 }
 .view-details-all-app .content-view-details-all-app .app-item-img{
     width:16px;
@@ -434,14 +423,14 @@ export default {
 .view-details-all-app >>>  .icon-star{
 	display: none;
 	position:absolute;
-	top:3px;
+	top:0px;
 	right:0px;
 }
 .view-details-all-app >>> .icon-star-active{
 	color: #F6BE4F;
 	display: inline-block;
 	position:absolute;
-	top:3px;
+	top:0px;
 	right:0px;
 }
 .view-details-all-app >>>  li{

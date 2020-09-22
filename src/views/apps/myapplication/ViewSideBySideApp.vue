@@ -29,12 +29,12 @@
           <div v-if="showFavorite == false">
                <h4>Chi tiết ứng dụng</h4>
                 <v-text-field
-                        :label="$t('apps.search')"
-                        single-line
-                        solo
-                        append-icon="mdi-magnify"
-                        v-model="searchKey"
-                    ></v-text-field>
+					:label="$t('apps.search')"
+					single-line
+					solo
+					append-icon="mdi-magnify"
+					v-model="searchKey"
+				></v-text-field>
                 <AppDetail ref="appDetail"  :isMyApplication="true" :isEndUserCpn="true" :searchKey="searchKey" :sideBySide="true" />
           </div>
          <div v-else class="favorite-area-item">
