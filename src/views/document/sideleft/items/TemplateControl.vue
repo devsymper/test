@@ -1,5 +1,6 @@
 <template>
     <div class="sym-document-tab-control">
+        <Loader ref="skeletonView"/>
         <v-text-field
             @input="onSearch($event)"
             placeholder="Tìm kiếm"
@@ -13,19 +14,19 @@
         </v-text-field>
         <div class="list-control-template">
             <VuePerfectScrollbar style="height:calc(100vh - 115px);">
-                <div v-for="i in 100" :key="i" class="control-template-item sym-control" draggable="true">
+                <div v-for="(item,index) in allControlTemplate" :key="index" class="control-template-item" :control-id="item.id" draggable="true">
                     <div class="title-control">
-                        <span>Control1</span>
-                        <button>...</button>
+                        <span>{{item.title}}</span>
+                        <button><span class="mdi mdi-dots-horizontal"></span></button>
                     </div>
                     <div class="info-control">
                         <div>
-                            <span>Người tạo:</span>
-                            <span>Nguyên đình hoàng</span>
+                            <span>{{$t('common.user_create')}}: </span>
+                            <span>{{item.ba_create}}</span>
                         </div>
                         <div>
-                            <span>Thời gian tạo:</span>
-                            <span>24/02/2020</span>
+                            <span>{{$t('common.create_at')}}: </span>
+                            <span>{{item.create_at}}</span>
                         </div>
                     </div>
                 </div>
@@ -38,33 +39,46 @@
 <script>
 import Control from './../../items/Control.vue';
 import getControlElement from './../../../../components/document/controlPropsFactory.js';
+import Loader from './../../../../components/common/Loader';
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
+import { documentApi } from '../../../../api/Document';
 
 export default {
     props:{
         isConfigPrint:{
             type:Boolean,
             default:false
+        },
+        instance:{
+            type:Number,
+            default:""
         }
+    },
+    computed:{
+        allControlTemplate(){  
+            return this.$store.state.document.editor[this.instance].allControlTemplate;
+        },
     },
     components:{
         'control' : Control,
-        VuePerfectScrollbar
+        VuePerfectScrollbar,
+        Loader
     },
-    data: () => ({
-        panel: [0, 1, 2, 3, 4],
-        listControlPrint:   ['labelPrint'],
-        listControlDisplay: ['label','image','qrCode'],
-        listControlInput:   ['textInput','richText','number','date','dateTime','time','month','select','department','documentSelect','phone','email','currency','radio','checkbox','color','percent','user','inputFilter','hidden'],
-        listControlLayout:  ['table','panel','fileUpload','tabPage'],
-        listControlReport:  ['dataFlow','report','approvalHistory','trackingValue'],
-        listControlAction:  ['submit','reset','draft']
-    }),
+ 
     methods:{
         onSearch(event){
             $('.sym-control').removeClass('d-none');
             $('.sym-control:not(:Contains("' + event + '"))').addClass('d-none');
-        }
+        },
+        getAllControlTemplate(){
+            let self = this;
+            documentApi.getControlTemplate().then(res=>{
+                self.$store.commit(
+                    "document/addToDocumentEditorStore",{key:'allControlTemplate',value:res.data,instance:self.instance}
+                );
+                self.$refs.skeletonView.hide()
+            })
+        },
     },
     mounted(){
         $.expr[":"].Contains = jQuery.expr.createPseudo(function(arg) {
@@ -72,6 +86,9 @@ export default {
                 return jQuery(elem).text().toUpperCase().indexOf(arg.toUpperCase()) >= 0;
             };
         });
+    },
+    created(){
+        this.getAllControlTemplate()
     }
 }
 </script>
@@ -106,7 +123,15 @@ export default {
         border-radius: 4px;
     }
     .control-template-item .title-control{
+        display: flex;
         font-weight: 500;
+    }
+    .control-template-item .title-control button{
+        margin-left: auto;
+        padding: 0 3px;
+    }
+    .control-template-item .title-control button:focus{
+        outline: none;
     }
     .control-template-item .info-control{
         font-size: 12px;
