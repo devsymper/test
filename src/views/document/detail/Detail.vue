@@ -75,6 +75,7 @@
         :createTime="createTime"
         :documentObjectId="docObjId"
         :workflowId="workflowId"
+        :showCommentInDoc="showCommentInDoc"
         @after-hide-sidebar="afterHideSidebar"
         />
         <HistoryControl ref="historyView" />
@@ -117,6 +118,10 @@ export default {
         isPrint:{
             type:Boolean,
             default:false
+        },
+        showCommentInDoc:{
+            type:Boolean,
+            default:true
         },
         formId:{
             type:Number,

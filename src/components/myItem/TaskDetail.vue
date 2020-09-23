@@ -440,23 +440,24 @@ export default {
 
         // lấy data mới dựa theo data của task
         async changeTaskDetail(){
-            if(!this.taskInfo.action){
+            let self=this;
+            if(!self.taskInfo.action){
                 return
             }
             let varsMap = {};
-            this.taskAction = this.taskInfo.action.action;
-            if(this.taskAction == 'approval'){
-                this.showApprovalOutcomes(JSON.parse(this.taskInfo.approvalActions));
-            }else if(this.taskAction == 'submit'){
-                this.taskActionBtns = [
+            self.taskAction = self.taskInfo.action.action;
+            if(self.taskAction == 'approval'){
+                self.showApprovalOutcomes(JSON.parse(self.taskInfo.approvalActions));
+            }else if(self.taskAction == 'submit'){
+                self.taskActionBtns = [
                     {
                     text:"Submit",
                     value:"submit",
                     color:"blue"
                     }
                 ]
-            }else if(this.taskAction == 'undefined'){
-                this.taskActionBtns = [
+            }else if(self.taskAction == 'undefined'){
+                self.taskActionBtns = [
                     {
                         text:"Complete",
                         value:"complete",
@@ -464,7 +465,7 @@ export default {
                     }
                 ]
             }
-            this.changeTaskDetailInfo(this.taskInfo.action.parameter.taskId);
+            self.changeTaskDetailInfo(self.taskInfo.action.parameter.taskId);
         }
     }
 }

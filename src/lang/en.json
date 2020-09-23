@@ -760,8 +760,10 @@
     },
     "myItem":{
         "objType":"Object type",
+        "filterObj":"Filter",
         "today":"Today",
         "header":"List work",
+        "headerDoc":"List document",
         "work":{
             "parentWork":"Parent work",
             "siblingWork":"Sibling work",
