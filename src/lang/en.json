@@ -138,10 +138,10 @@
             "ends_with": "Ends with",
             "contains": "Contains",
             "not_contain": "Not contains",
-            "gt": "Greater than ( > )",
-            "gte": "Greater than or equal ( >= )",
-            "lt": "Less than ( < )",
-            "lte": "Less than or equal ( <= )",
+            "greater_than": "Greater than ( > )",
+            "greater_than_or_equal": "Greater than or equal ( >= )",
+            "less_than": "Less than ( < )",
+            "less_than_or_equal": "Less than or equal ( <= )",
             "sort_asc": "Sort ASC",
             "sort_desc": "Sort DESC",
             "clear_filter": "Clear filter",
@@ -773,9 +773,15 @@
         "ascending": "Ascending",
         "descending": "Descending"
     },
-    "myItem": {
-        "objType": "Object type",
-        "today": "Today"
+    "myItem":{
+        "objType":"Object type",
+        "today":"Today",
+        "header":"List work",
+        "work":{
+            "parentWork":"Parent work",
+            "siblingWork":"Sibling work",
+            "subWork":"Sub work"
+        }
     },
     "tasks": {
         "error": {
@@ -792,6 +798,7 @@
             "app": "Ứng dụng",
             "description": "Task description",
             "owner": "Task Owner",
+            "userCreate": "Creator",
             "name": "Task name",
             "assignee": "Assignee",
             "watcher": "Watcher",

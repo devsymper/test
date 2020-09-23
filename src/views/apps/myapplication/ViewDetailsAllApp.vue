@@ -23,13 +23,18 @@
             </div>
         </div>
         <VuePerfectScrollbar :style="{height: menuItemsHeight}">
-        <div class="content-view-details-all-app h-100">
-           
-                <v-row no-gutters>
+        <div class="content-view-details-all-app h-100 w-100">
+                <v-skeleton-loader
+                        ref="skeleton"
+                        v-if="loadingApp"
+                        type="table-tbody"
+                        class="mx-auto w-100 h-100"
+                 ></v-skeleton-loader>
+                <v-row v-else no-gutters>
                     <template v-for="(item,i) in apps" >
                         <v-col cols="6" :key="i">
                         <v-expansion-panels
-                            v-model="panel"
+                             v-model="panel"
                             multiple
                         >
                             <v-expansion-panel
@@ -50,9 +55,9 @@
                                     <template v-for="(childItem,n) in item.childrenAppReduce">
                                         <v-col cols="6" :key="n">
                                             <div style="margin-left:-5px">
-                                                 <div >
+                                                 <div style="margin-bottom:6px">
                                                      <v-icon>{{ childItem.icon }}</v-icon>
-                                                     <span style="font-weight:200;font:13px">
+                                                     <span style="font-weight:200;font:13px;">
                                                           {{ childItem.title  ? childItem.title : childItem.name}}
                                                      </span>
                                                  </div>
@@ -71,7 +76,7 @@
                                                                                 <span v-on:click="rightClickHandler($event,childItem,childItem.name)">{{subChildItem.title}}</span> 
                                                                                 
                                                                             </div>
-                                                                        </template>
+                                                                         </template>
                                                                         <span style="font:13px roboto">{{subChildItem.title}}</span> 
                                                                         <span style="font:8px;opacity:0.4">{{subChildItem.name}}</span>
                                                                     </v-tooltip>
@@ -105,12 +110,16 @@
 
 <script>
 import {appManagementApi} from '@/api/AppManagement.js';
+import {util} from './../../../plugins/util'
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import ContextMenu from './../ContextMenu.vue';
 export default {
     components:{
         VuePerfectScrollbar,
         ContextMenu
+    },
+    created(){
+        let self = this;
     },
     methods:{
         hideContextMenu(){
@@ -131,7 +140,8 @@ export default {
             this.$store.commit('appConfig/changeTypeView')
         },
         collapse(){
-            this.panel = []
+			let panels = this.panel.length == 0 ?  [0,1,2,3,4] : []
+			this.panel = panels
         },
         getActiveapps(){
             let self = this
@@ -140,72 +150,72 @@ export default {
                     for(let e of res.data.listObject){
                         e.childrenAppReduce = {}
                         self.$set( self.apps, e.id , e)
+                        self.$set( self.mapIdApp, e.id , {})
                         if(Object.keys(e.childrenApp).length > 0){
                             self.checkChildrenApp(e.childrenApp,e.id)   
                         }
                     }
-				}
+                    this.getByAccessControl(self.listIds)
+                    setTimeout(function(e){
+                        self.loadingApp = false
+                    },1000)
+                }
 			}).catch((err) => {
 			});
         },
         checkChildrenApp(data,idApp){
-            let self = this 
-			self.arrType.orgchart = []
-			self.arrType.document_definition = []
-			self.arrType.dashboard = []
-			self.arrType.workflow_definition = []
-			if(data.hasOwnProperty('orgchart')){
-				data.orgchart.forEach(function(e){
-					self.arrType.orgchart.push("orgchart:"+e.id);
-					self.mapId.orgchart["orgchart:"+e.id] = e;
-				})
-				let dataOrg = self.arrType.orgchart;
-				this.getByAccessControl(dataOrg,'orgchart',idApp)
-			}
-			if(data.hasOwnProperty('document_definition')){
-				data.document_definition.forEach(function(e){
-					self.arrType.document_definition.push("document_definition:"+e.id);
-					self.mapId.document_definition["document_definition:"+e.id] = e;
-				})
-				let dataDoc = self.arrType.document_definition
-                this.getByAccessControl(dataDoc,'document_definition',idApp)
-			}
-			if(data.hasOwnProperty('workflow_definition')){
-				data.workflow_definition.forEach(function(e){
-					self.arrType.workflow_definition.push("workflow_definition:"+e.id);
-					self.mapId.workflow_definition["workflow_definition:"+e.id] = e;
-				})
-				let dataW = self.arrType.workflow_definition
-				this.getByAccessControl(dataW,'workflow_definition',idApp)
-			}
-			if(data.hasOwnProperty('dashboard')){
-				data.dashboard.forEach(function(e){
-					self.arrType.dashboard.push("dashboard:"+e.id);
-					self.mapId.dashboard["dashboard:"+e.id] = e;
-				})
-				let dataRep = self.arrType.dashboard
-				this.getByAccessControl(dataRep,'dashboard',idApp)
-			}
+            let self = this
+            this.listType.forEach(function(k){
+                self.mapIdApp[idApp][k] = []
+                 if(data.hasOwnProperty(k)){
+                    data[k].forEach(function(e){
+                        let str = k +':'+ e.id
+                        if(self.listIds.includes(str) == false){
+                            self.listIds.push(str);
+                        }
+                        self.mapIdApp[idApp][k].push(
+                           k + ":" + e.id 
+                        )
+                        self.$set(self.mapIdItem, k+':'+e.id, e)
+                    })
+                }
+            })
         },
 
-        updateChidrenItem(type,data,idApp){
-            let obj = {}
-            obj = this[type]
+        updateChidrenItemToApp(data){
             data.forEach(function(e){
                 e.show = true
-            })
-            obj.item = data
-            this.$set(this.apps[idApp].childrenAppReduce,type,obj)
+			})
+			let self = this
+            for(let app in this.mapIdApp){
+                for(let typeT in this.mapIdApp[app]){
+                    if(this.mapIdApp[app][typeT].length > 0){
+                        let  obj = {}
+						obj = util.cloneDeep(this[typeT]);
+						obj.item = []
+                        data.forEach(function(t){
+                            if(self.mapIdApp[app][typeT].includes(t.objectIdentifier)){
+								obj.item.push(t)
+                            }
+						})
+                        self.apps[app].childrenAppReduce[typeT] = obj
+                    }
+                }
+            }
         },
-        updateFavoriteItem(mapArray,array){
-			for( let [key,value] of Object.entries(mapArray)){
-				array.forEach(function(item){
-					if(item.objectIdentifier == key){
-						item.favorite = value.isFavorite
-						item.actions = value.actions
-					} 
-				})
-			}
+      
+        updateFavoriteItem(array){
+            let self = this 
+            this.listType.forEach(function(e){
+                for( let [key,value] of Object.entries(self.mapIdItem)){
+                    array.forEach(function(item){
+                        if(item.objectIdentifier == key){
+                            item.favorite = value.isFavorite
+                            item.actions = value.actions
+                        } 
+                    })
+			    }
+            })
 			return array
         },
         changeFavorite(item,type){
@@ -247,46 +257,31 @@ export default {
                 this.filterItemInApp(e,"workflow_definition",value)
            }
         },
-        filterItemInApp(e, type,value){
-            debugger
+        filterItemInApp(e, type, value){
              let self = this
              if(self.apps[e].childrenAppReduce.hasOwnProperty(type)){
-                    self.apps[e].childrenAppReduce[type].item.forEach(function(k){
-                        if(value == ""){
-                            k.show = true
-                        }
-                        if(k.title.toLowerCase().includes(value.toLowerCase())){
-                            k.show = true
-                        }else{
-                            k.show = false
-                        }
-                    })
-			    }
-               
+                self.apps[e].childrenAppReduce[type].item.forEach(function(k){
+                    if(value == ""){
+                        k.show = true
+                    }
+                    let text = k.title ? k.title : k.name
+                    if(text.toLowerCase().includes(value.toLowerCase())){
+                        k.show = true
+                    }else{
+                        k.show = false
+                    }
+                })
+            }
         },
 
-		getByAccessControl(ids,type,idApp){
+		async getByAccessControl(ids){
 			let self = this
-			appManagementApi.getListObjectIdentifier({
-				pageSize:50,
+			await appManagementApi.getListObjectIdentifier({
+				pageSize:1000,
 				ids: ids
 			}).then(res=>{
-				if(type == 'orgchart'){
-                    this.updateFavoriteItem(self.mapId.orgchart,res.data)
-                    this.updateChidrenItem('orgchart',res.data,idApp)
-				}
-				if(type == 'document_definition'){
-					this.updateFavoriteItem(self.mapId.document_definition,res.data)
-                    this.updateChidrenItem('document_definition',res.data,idApp)
-				}
-				if(type == 'workflow_definition'){
-					this.updateFavoriteItem(self.mapId.workflow_definition,res.data)
-                    this.updateChidrenItem('workflow_definition',res.data,idApp)
-				}
-				if(type == 'dashboard'){
-					this.updateFavoriteItem(self.mapId.dashboard,res.data)
-                    this.updateChidrenItem('dashboard',res.data,idApp)
-				}
+                    self.updateFavoriteItem(res.data)
+                    self.updateChidrenItemToApp(res.data)
 			}).catch(err=>{
 			})
 		},
@@ -318,19 +313,14 @@ export default {
                 name: 'workflow_definition',
                 item: []
             },
-             panel: [],
-             menuItemsHeight: 'calc(100vh - 125px)',
-             searchItemKey: "",
-             apps:{},
-             appsReduce:{},
-             currentAppId:0,
-             arrType:{
-                document_definition:[],
-                orgchart:[],
-                dashboard:[],
-                workflow_definition:[],
-            },
-            mapId:{
+            panel: [],
+            listIds: [],
+			mapIdApp:[],
+			childItemReduce:{
+
+			},
+            listType : ['orgchart', 'document_definition', 'workflow_definition', 'dashboard'],
+            mapIdItem:{
                 orgchart:{
                 },
                 document_definition:{
@@ -339,16 +329,17 @@ export default {
                 },
                 workflow_definition:{
                 }
-            },
+             },
+             loadingApp: true,
+             menuItemsHeight: 'calc(100vh - 125px)',
+             searchItemKey: "",
+             apps:{},
         }
     },
     created(){
         this.getActiveapps()
     },
   
-    mounted(){
-      
-    },
     watch:{
         searchItemKey(val){
                 this.filterObj(val)
@@ -366,10 +357,14 @@ export default {
     display: flex;
     margin:8px 16px 8px 8px;
 }
+.view-details-all-app  >>>.header-view-details-all-app .v-icon::after{
+	display:none
+}
 .view-details-all-app .content-view-details-all-app{
     width:90%;
     margin-left:auto;
     margin-right:auto;
+    font:13px roboto
 }
 .view-details-all-app .content-view-details-all-app .app-item-img{
     width:16px;
@@ -434,14 +429,14 @@ export default {
 .view-details-all-app >>>  .icon-star{
 	display: none;
 	position:absolute;
-	top:3px;
+	top:0px;
 	right:0px;
 }
 .view-details-all-app >>> .icon-star-active{
 	color: #F6BE4F;
 	display: inline-block;
 	position:absolute;
-	top:3px;
+	top:0px;
 	right:0px;
 }
 .view-details-all-app >>>  li{

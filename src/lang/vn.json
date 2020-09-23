@@ -129,10 +129,10 @@
             "ends_with": "Kết thúc với",
             "contains": "Chứa",
             "not_contain": "Không chứa",
-            "gt": "Lớn hơn ( > )",
-            "gte": "Lớn hơn hoặc bằng ( >= )",
-            "lt": "Nhỏ hơn ( < )",
-            "lte": "Nhỏ hơn hoặc bằng ( <= )",
+            "greater_than": "Lớn hơn ( > )",
+            "greater_than_or_equal": "Lớn hơn hoặc bằng ( >= )",
+            "less_than": "Nhỏ hơn ( < )",
+            "less_than_or_equal": "Nhỏ hơn hoặc bằng ( <= )",
             "sort_asc": "Sắp xếp tăng dần",
             "sort_desc": "Sắp xếp giảm dần",
             "clear_filter": "Xóa bộ lọc",
@@ -899,9 +899,16 @@
             "unsubscribe": "Bỏ theo dõi"
         }
     },
-    "myItem": {
-        "objType": "Loại đối tượng",
-        "today": "Hôm nay"
+    "myItem":{
+        "objType":"Loại đối tượng",
+        "today":"Hôm nay",
+        "header":"Danh sách work",
+        "work":{
+            "parentWork":"Parent work",
+            "siblingWork":"Sibling work",
+            "subWork":"Sub work"
+        }
+        
     },
     "tasks": {
         "error": {
@@ -918,6 +925,7 @@
             "app": "Ứng dụng",
             "description": "Mô tả",
             "owner": "Người sở hữu",
+            "userCreate": "Người khởi tạo",
             "name": "Tên công việc",
             "assignee": "Người được giao",
             "watcher": "Người theo dõi",

@@ -167,16 +167,16 @@ import { getDefaultFilterConfig } from "./defaultFilterConfig.js";
 import Vue from "vue";
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 
-const textConditions = ["none","empty","not_empty","equal","not_equal","begins_with","ends_with","contains","not_contain","gt","gte","lt","lte"];
+const textConditions = ["none","empty","not_empty","equal","not_equal","begins_with","ends_with","contains","not_contain","greater_than","greater_than_or_equal","less_than","less_than_or_equal"];
 const numberConditions = ["none","empty","not_empty","equal","not_equal"];
 
 let conditionMap = {
     // Định nghĩa column handsontable như kiểu text cho các trường custom như image, icon
     handsontable: ["none","empty","not_empty","equal","not_equal","begins_with","ends_with","contains","not_contain"],
     text: ["none","empty","not_empty","equal","not_equal","begins_with","ends_with","contains","not_contain"],
-    numeric: ["none","empty","not_empty","equal","not_equal","gt","gte","lt","lte"],
-    date:["none","empty","not_empty","equal","not_equal","begins_with","ends_with","contains","not_contain","gt","gte","lt","lte"],
-    datetime:["none","empty","not_empty","equal","not_equal","begins_with","ends_with","contains","not_contain","gt","gte","lt","lte"]
+    numeric: ["none","empty","not_empty","equal","not_equal","greater_than","greater_than_or_equal","less_than","less_than_or_equal"],
+    date:["none","empty","not_empty","equal","not_equal","begins_with","ends_with","contains","not_contain","greater_than","greater_than_or_equal","less_than","less_than_or_equal"],
+    datetime:["none","empty","not_empty","equal","not_equal","begins_with","ends_with","contains","not_contain","greater_than","greater_than_or_equal","less_than","less_than_or_equal"]
 };
 
 export default {
@@ -321,10 +321,10 @@ export default {
                 ends_with: true,
                 contains: true,
                 not_contain: true,
-                gt: true,
-                lt: true,
-                gte: true,
-                lte: true
+                greater_than: true,
+                less_than: true,
+                greater_than_or_equal: true,
+                less_than_or_equal: true
             };
             if (
                 this.filterConfigs.conditionFilter &&
