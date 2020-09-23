@@ -62,6 +62,7 @@
         "logout": "Đăng xuất",
         "last_update_at": "Cập nhật lần cuối",
         "create_at": "Tạo lúc",
+        "user_create": "Người tạo",
         "filter": "Bộ lọc",
         "sort": "Sắp xếp",
         "status": "Trạng thái",
@@ -424,7 +425,14 @@
                         "system": "Hệ thống",
                         "list": "danh mục",
                         "business": "Nghiệp vụ"
-                    }
+                    },
+                    "name": "Tên Document",
+                    "title": "Tiêu đề Document",
+                    "fullSize": "Hiển thị toàn màn hình Form Submit",
+                    "type": "Loại văn bản",
+                    "note": "Ghi chú",
+                    "titleObject": "Tiêu đề bản ghi",
+                    "titlePrint": "Tiêu đề bản In"
                 },
                 "swapType": {
                     "heading": "Chuyển đổi kiểu control",
@@ -496,6 +504,10 @@
             "comment": {
                 "heading": "BÌNH LUẬN"
             }
+        },
+        "validate": {
+            "emptyTitle": "Không được bỏ trống tiêu đề",
+            "emptyContentControlTemplate": "Vui chọn template trước khi lưu control template"
         }
     },
     "documentObject": {

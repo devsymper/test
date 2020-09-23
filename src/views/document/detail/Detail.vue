@@ -137,6 +137,14 @@ export default {
         },
         sDocumentSubmit() {
             return this.$store.state.document.submit[this.keyInstance];
+        },
+        allUsers(){
+            let allUser = this.$store.state.app.allUsers
+            thisCpn.$store.commit("document/addToDocumentSubmitStore", {
+                key: 'listUser',
+                value: allUser,
+                instance:thisCpn.keyInstance
+            });
         }
     },
     data() {
@@ -163,7 +171,6 @@ export default {
             bottom: true,
             left: false,
             transition: "slide-y-reverse-transition",
-            isComponentActive:false,
             printConfigActive:null,
             loading: true,
 
@@ -190,26 +197,9 @@ export default {
             this.docObjId = Number(this.$route.params.id);
             this.loadDocumentObject(this.isPrint); 
         }
-        
-        userApi.getListUser(1,100000).then(res => {
-            if (res.status == 200) {
-                thisCpn.$store.commit("document/addToDocumentSubmitStore", {
-                    key: 'listUser',
-                    value: res.data.listObject,
-                    instance:thisCpn.keyInstance
-                });
-            }
-            
-        })
-        .catch(err => {
-           
-        })
-        .always(() => {
-        });
-        
 
         this.$evtBus.$on('symper-app-wrapper-clicked',evt=>{
-            if(thisCpn.isComponentActive == false) return;
+            if(thisCpn._inactive == true) return;
             if($(evt.target).is('.highlight-history')){
                 this.$refs.historyView.show($(evt.target))    
             }
@@ -221,14 +211,6 @@ export default {
                     }
             }
         })
-    },
-    activated() {
-        this.isComponentActive = true;
-    },
-    deactivated() {
-        this.isComponentActive = false;
-    },
-    destroyed(){
     },
     watch:{
         docObjInfo:{
@@ -479,11 +461,9 @@ export default {
                                 );
                                 childControl.init();
                                 childControl.inTable = controlName;
-                               
                                 let childControlName = childControlProp.properties.name.value;
                                 let colIndex = thisCpn.getColIndexControl($(this));
                                 mapControlToIndex[childControlName] = colIndex
-
                                 thisCpn.addToListInputInDocument(childControlName,childControl)
                                 listInsideControls[childControlName] = true;
                             });
@@ -495,7 +475,6 @@ export default {
                         }
                     }
                 }
-
             }
             this.loading = false;
             $('.wrap-content-detail').removeAttr('style');
