@@ -136,7 +136,10 @@ export default {
 			event.preventDefault();
 			this.$refs.contextMenu.setContextItem(item.actions)
 			this.$refs.contextMenu.show(event)
-			this.$refs.contextMenu.setItem(item)
+            this.$refs.contextMenu.setItem(item)
+            if(type == 'document_category' || type == "document_major"){
+				type = "document_definition"
+			}
 			this.$refs.contextMenu.setType(type)
 		}, 
 		hideContextMenu(){
@@ -197,11 +200,29 @@ export default {
                 for(let typeT in this.mapIdApp[app]){
                     if(this.mapIdApp[app][typeT].length > 0){
                         let  obj = {}
-						obj = util.cloneDeep(this[typeT]);
-						obj.item = []
+                        let arr = []
                         data.forEach(function(t){
                             if(self.mapIdApp[app][typeT].includes(t.objectIdentifier)){
-								obj.item.push(t)
+                                 if(t.hasOwnProperty('objectType') && t.objectIdentifier.includes('document')){
+                                    debugger
+                                    if(t.objectType == "1"){
+                                        obj =  util.cloneDeep(self.document_major);
+                                        arr.push(t)
+                                        debugger
+                                        obj.item = arr
+                                    }
+                                    if(t.objectType == "2"){
+                                        obj =  util.cloneDeep(self.document_category);
+                                        arr.push(t)
+                                        obj.item = arr
+                                    }
+                                }else{
+                                    obj = util.cloneDeep(self[typeT]);
+                                    arr.push(t)
+                                    debugger
+                                    obj.item = arr
+                                }
+								
                             }
 						})
                         self.apps[app].childrenAppReduce[typeT] = obj
@@ -288,6 +309,7 @@ export default {
 				ids: ids
 			}).then(res=>{
                     self.updateFavoriteItem(res.data)
+                    debugger
                     self.updateChidrenItemToApp(res.data)
 			}).catch(err=>{
 			})
@@ -302,23 +324,30 @@ export default {
                 name: 'document_definition',
                 item: []
             },
+            document_category:{
+                icon : 'mdi-file-document-outline',
+                title: "Danh mục",
+                name:  'document_category',
+            },
+            document_major:{
+                icon : 'mdi-file-edit-outline',
+                title: "Chứng từ",
+                name:  'document_major',
+            },
             orgchart: {
                 icon: 'mdi-widgets-outline',
                 title: 'Orgcharts',
                 name: 'orgchart',
-                item: []
             },
             dashboard: {
                 icon: 'mdi-view-dashboard',
                 title: 'Reports',
                 name: 'dashboard',
-                item: []
             },
             workflow_definition: {
                 icon: 'mdi-lan',
                 title: 'Workflows',
                 name: 'workflow_definition',
-                item: []
             },
             panel: [],
             listIds: [],

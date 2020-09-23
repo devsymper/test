@@ -154,14 +154,22 @@ export default {
 		filterItem(){
 			let self = this
 			let listItem = this.$store.state.appConfig.listItemSelected;
-			self.objFilter.document_definition.item = []
+			self.objFilter.document_major.item = []
+			self.objFilter.document_category.item = []
 			self.objFilter.orgchart.item = []
 			self.objFilter.dashboard.item = []
 			self.objFilter.workflow_definition.item = []
-			if(listItem.document_definition.item.length > 0){
-				listItem.document_definition.item.filter(function(item){
+			if(listItem.document_major.item.length > 0){
+				listItem.document_major.item.filter(function(item){
 						if(item.title.toLowerCase().includes(self.searchKey.toLowerCase())){
-							self.objFilter.document_definition.item.push(item)
+							self.objFilter.document_major.item.push(item)
+						}
+				})
+			}
+			if(listItem.document_category.item.length > 0){
+				listItem.document_category.item.filter(function(item){
+						if(item.title.toLowerCase().includes(self.searchKey.toLowerCase())){
+							self.objFilter.document_category.item.push(item)
 						}
 				})
 			}
@@ -193,6 +201,9 @@ export default {
 			this.$refs.contextMenu.setContextItem(item.actions)
 			this.$refs.contextMenu.show(event)
 			this.$refs.contextMenu.setItem(item)
+			if(type == 'document_category' || type == "document_major"){
+				type = "document_definition"
+			}
 			this.$refs.contextMenu.setType(type)
 		}, 
 		hideContextMenu(){

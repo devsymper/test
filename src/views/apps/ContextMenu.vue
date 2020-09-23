@@ -93,6 +93,7 @@ export default {
 			this.targetItem = item
 		},
 		setType(type){
+		
 			this.type = type
 		},
 		clickAction(action,sideBySide = false){
