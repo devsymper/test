@@ -1,39 +1,7 @@
 <template>
     <div class="wrap-content-detail" style="overflow:hidden;">
-        <v-skeleton-loader
-            class="mx-auto"
-            max-width="auto"
-            type="article, actions"
-            v-if="loading"
-            
-        ></v-skeleton-loader>
-        <v-skeleton-loader
-            class="mx-auto"
-            max-width="auto"
-            v-if="loading"
-            type="table-heading, list-item-two-line, table-tfoot"
-        ></v-skeleton-loader>
-        <v-skeleton-loader
-            class="mx-auto"
-            max-width="auto"
-            type="article, actions,table-heading, list-item-two-line"
-            v-if="loading"
-            
-        ></v-skeleton-loader>
-        <v-skeleton-loader
-            class="mx-auto"
-            max-width="auto"
-            type="article, actions,table-heading, list-item-two-line"
-            v-if="loading"
-            
-        ></v-skeleton-loader>
-        <v-skeleton-loader
-            class="mx-auto"
-            max-width="auto"
-            type="article, actions,table-heading, list-item-two-line"
-            v-if="loading"
-            
-        ></v-skeleton-loader>
+        
+        <Loader ref="skeletonView"/>
         <div class="panel-header" v-if="!quickView && !isPrint">
             <div class="right-action">
                 <v-tooltip bottom>
@@ -97,6 +65,7 @@ import './../submit/customControl.css'
 import { getSDocumentSubmitStore } from './../common/common'
 import SideBarDetail from './SideBarDetail'
 import HistoryControl from './HistoryControl'
+import Loader from './../../../components/common/Loader';
 import { util } from '../../../plugins/util.js';
 export default {
     props: {
@@ -129,7 +98,8 @@ export default {
     },   
     components:{
         'side-bar-detail':SideBarDetail,
-        HistoryControl
+        HistoryControl,
+        Loader
     },
     computed: {
         sDocumentEditor() {
@@ -162,24 +132,13 @@ export default {
             taskId:"",
             createTime:"",
             userId:"",
-            direction: "top",
-            fab: false,
-            hover: false,
-            tabs: null,
-            top: false,
-            right: true,
-            bottom: true,
-            left: false,
-            transition: "slide-y-reverse-transition",
             printConfigActive:null,
-            loading: true,
 
         };
     },
     beforeMount() {
         this.documentSize = "21cm";
     },
-    
     
     created(){
         this.$store.commit("document/setDefaultSubmitStore",{instance:this.keyInstance});
@@ -261,11 +220,12 @@ export default {
         },
         // Khadm: load data của document lên để hiển thị và xử lý
         loadDocumentStruct(documentId,isPrint = false) {
-            if(isPrint && this.contentPrintDocument != null){
-                $('.content-print-document').removeClass('d-none');
-                $('.content-document').addClass('d-none');
-                return
-            }
+            // if(isPrint && this.contentPrintDocument != null){
+            //     $('.content-print-document').removeClass('d-none');
+            //     $('.content-document').addClass('d-none');
+            //     debugger
+            //     return
+            // }
             if(this.$route.name == 'printDocument'){
                 isPrint = true;
             }
@@ -476,7 +436,7 @@ export default {
                     }
                 }
             }
-            this.loading = false;
+            this.$refs.skeletonView.hide();
             $('.wrap-content-detail').removeAttr('style');
             setTimeout(() => {
                 if(thisCpn.$route.name == 'printDocument' || (isPrint && this.formId == 0)){

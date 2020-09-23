@@ -4,26 +4,7 @@
     'sym-sub-form-submit':(parrentInstance == 0) ? false : true
 
     }">
-        <v-skeleton-loader
-            class="mx-auto"
-            max-width="auto"
-            type="article, actions"
-            v-if="loading"
-            
-        ></v-skeleton-loader>
-        <v-skeleton-loader
-            class="mx-auto"
-            max-width="auto"
-            v-if="loading"
-            type="table-heading, list-item-two-line, table-tfoot"
-        ></v-skeleton-loader>
-        <v-skeleton-loader
-            class="mx-auto"
-            max-width="auto"
-            type="article, actions,table-heading, list-item-two-line"
-            v-if="loading"
-            
-        ></v-skeleton-loader>
+        <Loader ref="skeletonView"/>
         <div
             :key="keyInstance"
             class="sym-form-submit"
@@ -204,7 +185,8 @@ import SidebarTraceFormulas from './SidebarTraceFormulas.vue';
 import './customControl.css';
 import ErrMessagePanel from "./../../../views/document/items/ErrMessagePanel.vue";
 import moment from "moment-timezone";
-import EmbedDataflow from "@/components/dataflow/EmbedDataflow"
+import EmbedDataflow from "@/components/dataflow/EmbedDataflow";
+import Loader from './../../../components/common/Loader';
 import {listControlNotNameProp} from "./../../../components/document/controlPropsFactory.js"
 
 
@@ -256,10 +238,22 @@ export default {
                 return {}
             }
         },
+        overrideControls:{
+            type:Object,
+            default(){
+                return {}
+            }
+        },
+        editableControls:{
+            type:Array,
+            default(){
+                return null
+            }
+        },
         parrentInstance:{
             type:Number,
             default:0
-        }
+        },
     },
     name: "submitDocument",
 
@@ -273,6 +267,7 @@ export default {
         "sym-drag-panel": SymperDragPanel,
         "err-message": ErrMessagePanel,
         EmbedDataflow,
+        Loader,
         SidebarTraceFormulas,
         VBoilerplate: {
             functional: true,
@@ -337,7 +332,6 @@ export default {
             objectIdentifier:{},
             otherInfo:{},
             listDataFlow:[],
-            loading: true,
             docSubFormId:0,
             drawer: false,
             isContinueSubmit:false,
@@ -761,7 +755,7 @@ export default {
          * Hàm ẩn loader
          */
         hidePreloader(){
-            this.loading = false;
+            this.$refs.skeletonView.hide();
             $("#sym-submit-" + this.keyInstance).find('.page-content').removeClass('d-block');
             $("#sym-submit-" + this.keyInstance).find('.list-page-content').removeClass('d-flex');
             $("#sym-submit-" + this.keyInstance).css({opacity:'1'});
@@ -1189,6 +1183,8 @@ export default {
             for (let index = 0; index < allInputControl.length; index++) {
                 let id = $(allInputControl[index]).attr('id');
                 let controlType = $(allInputControl[index]).attr('s-control-type');
+                let controlName = field.properties.name.value;
+                this.checkEditableControl(controlName,field);
                 if(this.sDocumentEditor.allControl[id] != undefined){   // ton tai id trong store
                     let field = this.sDocumentEditor.allControl[id];
                     let idField = field.id;
@@ -1214,14 +1210,12 @@ export default {
                         this.addToListInputInDocument('tabPage',control)
                     }
                     else if(controlType == 'tab'){
-                         let controlName = field.properties.name.value;
                         let control = new TabControl(idField, $(allInputControl[index]),field,thisCpn.keyInstance);
                         control.init();
                         control.render();
                         this.addToListInputInDocument(controlName,control)
                     }
                     else if(controlType == 'page'){
-                         let controlName = field.properties.name.value;
                         let control = new PageControl(idField, $(allInputControl[index]),field,thisCpn.keyInstance);
                         control.init();
                         control.render();
@@ -1229,7 +1223,6 @@ export default {
                     }
                    
                     else {
-                        let controlName = field.properties.name.value;
                         let mapColumnType = Util.mapTypeControlToTypeSQLLite(controlType); 
                         if(mapColumnType != false){
                             this.columnsSQLLiteDocument[controlName] = mapColumnType;
@@ -1257,10 +1250,6 @@ export default {
                             
                         }
                         //truong hop la control table
-                        
-                        
-                        
-                        
                         else {
                             let listInsideControls = {};
                             let tableControl = new TableControl(
@@ -2199,6 +2188,13 @@ export default {
                     );
                 }
             }
+            
+        },
+        /**
+         * Hàm kiểm tra xem có tham sô editableControls được truyền vào hay ko
+         * nếu có truyền vào thì chỉ được phép nhập liệu trên cac control đó, các control còn lại đánh dấu readonly
+         */
+        checkEditableControl(controlName, field){
             
         }
     }
