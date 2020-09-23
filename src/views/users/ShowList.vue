@@ -8,6 +8,7 @@
         :tableContextMenu="tableContextMenu"
         :containerHeight="containerHeight"
         :customAPIResult="customAPIResult"
+        :actionPanelType="'elastic'"
         :getDataUrl="getListUrl+'users?page=1&pageSize=50'"
         :actionPanelWidth="actionPanelWidth"
         :commonActionProps="commonActionProps"
