@@ -1,10 +1,11 @@
 <template>
-    <div class="w-100">
+    <div class="w-100" v-if="data.originData.id">
         <TaskDetail
             :taskInfo="data.taskInfo"
             :originData="data.originData"
             :parentHeight="taskDetailHeight" 
             @close-detail="closeDetail"
+            @task-submited="handleTaskSubmited"
             >
         </TaskDetail>
     </div>
@@ -39,7 +40,7 @@ export default {
     created(){
         let self = this;
         this.$store.dispatch('process/getAllDefinitions').then((res) => {
-            self.setTaskInfo()
+            self.setTaskInfo();
         }).catch((err) => {
 
         });
@@ -50,9 +51,13 @@ export default {
     methods: {
         async setTaskInfo(){
             let self=this;
-            if(this.$route.params.id){
+            if(self.$route.params.id){
                 let task = await BPMNEngine.getATaskInfo(self.$route.params.id);
-                debugger
+                if (task.endTime && task.endTime!=null) {
+                    self.$store.commit("task/setFilter", 'done');
+                }else{
+                    self.$store.commit("task/setFilter", 'notDone');
+                }
                 let taskInfo = extractTaskInfoFromObject(task);
                 task = addMoreInfoToTask(task);
                 self.$set(self.data, 'taskInfo', taskInfo);
@@ -61,6 +66,9 @@ export default {
         },
         closeDetail(){
             this.$router.push("/myitem");
+        },
+        handleTaskSubmited(){
+            this.$router.push('/myitem');
         }
     }
 }
