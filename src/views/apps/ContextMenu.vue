@@ -55,24 +55,24 @@ export default {
 		},
 		show(e){
 			var windowHeight = $(window).height()/1.5;
-			var windowWidth = $(window).width()/1.3;
+			var windowWidth = $(window).width()/1.1;
 			this.isShowContext = true;
 			if(e.clientY > windowHeight && e.clientX <= windowWidth) {
 				$(".context-menu").css("left", e.clientX);
 				$(".context-menu").css("bottom", $(window).height()-e.clientY);
 				$(".context-menu").css("right", "auto");
 				$(".context-menu").css("top", "auto");
-				} else if(e.clientY > windowHeight && e.clientX > windowWidth) {
+			} else if(e.clientY > windowHeight && e.clientX > windowWidth) {
 				$(".context-menu").css("right", $(window).width()-e.clientX);
 				$(".context-menu").css("bottom", $(window).height()-e.clientY);
 				$(".context-menu").css("left", "auto");
 				$(".context-menu").css("top", "auto");
-				} else if(e.clientY <= windowHeight && e.clientX <= windowWidth) {
+			} else if(e.clientY <= windowHeight && e.clientX <= windowWidth) {
 				$(".context-menu").css("left", e.clientX);
 				$(".context-menu").css("top", e.clientY);
 				$(".context-menu").css("right", "auto");
 				$(".context-menu").css("bottom", "auto");
-				} else {
+			} else {
 				$(".context-menu").css("right", $(window).width()-e.clientX);
 				$(".context-menu").css("top", e.clientY);
 				$(".context-menu").css("left", "auto");
