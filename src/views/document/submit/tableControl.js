@@ -41,6 +41,12 @@ export default class TableControl extends Control {
          */
     setData(data) {
         if (data.hasOwnProperty('childObjectId') && Object.keys(data).length == 1) {
+            this.tableInstance.tableInstance.updateSettings({
+                data: [
+                    []
+                ]
+            })
+            this.tableInstance.tableInstance.render();
             return;
         }
         if (this.isPrintView) {

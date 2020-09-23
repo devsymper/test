@@ -215,14 +215,14 @@ export default {
 			}).always({}).catch({});
 		},
 		workflowId(after){
-			bpmnApi.getDefinitionData(this.workflowId).then(res=>{ 
-                    console.log('resresres',res);
-				}).always({}).catch({});
+			// bpmnApi.getDefinitionData(this.workflowId).then(res=>{ 
+            //         console.log('resresres',res);
+			// 	}).always({}).catch({});
 		},
 		taskId(after){
-			bpmnApi.getATaskInfo(this.taskId).then(res=>{
-                    console.log('resresres',res);
-                }).always({}).catch({});
+			// bpmnApi.getATaskInfo(this.taskId).then(res=>{
+            //         console.log('resresres',res);
+            //     }).always({}).catch({});
 		},
 		createTime(after){
 			this.createdDate = after

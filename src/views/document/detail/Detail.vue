@@ -224,12 +224,6 @@ export default {
         },
         // Khadm: load data của document lên để hiển thị và xử lý
         loadDocumentStruct(documentId,isPrint = false) {
-            // if(isPrint && this.contentPrintDocument != null){
-            //     $('.content-print-document').removeClass('d-none');
-            //     $('.content-document').addClass('d-none');
-            //     debugger
-            //     return
-            // }
             if(this.$route.name == 'printDocument'){
                 isPrint = true;
             }
@@ -275,6 +269,12 @@ export default {
                 .always(() => {});
         },
         async loadDocumentObject(isPrint=false) {
+            this.contentDocument = ""
+            try {
+                 this.$refs.skeletonView.show();
+            } catch (error) {
+                
+            }
             let thisCpn = this;
             let res = await documentApi
                 .detailDocumentObject(this.docObjId);
@@ -298,6 +298,7 @@ export default {
                         });
                 }
                 
+           
         },
         togglePageSize() {
             this.contentMargin = this.documentSize == "21cm" ? "" : "auto";

@@ -8,8 +8,10 @@
         :pageTitle="$t('documentObject.title')"
         :containerHeight="containerHeight"
         :actionPanelWidth="actionPanelWidth"
+        :actionPanelType="'elastic'"
         @after-open-add-panel="submitDocument"
         @data-get="afterGetData"
+        @row-selected="afterRowSelected"
         :commonActionProps="commonActionProps"
         ref="listObject"
     >
@@ -158,16 +160,16 @@ export default {
                         
                     },
                 },
-                detail_in_view: {
-                    name: "detailInView",
-                    text: "Xem trong trang",
-                    callback: (documentObject, callback) => {
-                        this.currentDocObjectActiveIndex = this.dataTable.findIndex(obj => obj.document_object_id == documentObject.document_object_id)
-                        this.$refs.listObject.openactionPanel();
-                        this.dataClipboard = window.location.origin+ '/#/documents/objects/'+documentObject.document_object_id;
-                        this.docObjInfo = {docObjId:parseInt(documentObject.document_object_id),docSize:'21cm'}
-                    },
-                },
+                // detail_in_view: {
+                //     name: "detailInView",
+                //     text: "Xem trong trang",
+                //     callback: (documentObject, callback) => {
+                //         this.currentDocObjectActiveIndex = this.dataTable.findIndex(obj => obj.document_object_id == documentObject.document_object_id)
+                //         this.$refs.listObject.openactionPanel();
+                //         this.dataClipboard = window.location.origin+ '/#/documents/objects/'+documentObject.document_object_id;
+                //         this.docObjInfo = {docObjId:parseInt(documentObject.document_object_id),docSize:'21cm'}
+                //     },
+                // },
                 update: {
                     name: "edit",
                     text: "Cập nhật",
@@ -261,6 +263,15 @@ export default {
             inp.select();
             document.execCommand('copy',false);
             inp.remove();
+        },
+        afterRowSelected(documentObject){
+            if(this.docObjInfo.docObjId == parseInt(documentObject.document_object_id)){
+                return
+            }
+            this.currentDocObjectActiveIndex = this.dataTable.findIndex(obj => obj.document_object_id == documentObject.document_object_id);
+            this.$refs.listObject.openactionPanel();
+            this.dataClipboard = window.location.origin+ '/#/documents/objects/'+documentObject.document_object_id;
+            this.docObjInfo = {docObjId:parseInt(documentObject.document_object_id),docSize:'21cm'}
         }
     }
 }
@@ -277,6 +288,9 @@ export default {
     }
     .panel-body{
         height: calc(100vh - 55px);
+    }
+    .panel-body >>> .wrap-content-detail{
+        height: calc(100vh - 65px) !important;
     }
     .right-action{
         margin-left: auto;
