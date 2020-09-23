@@ -128,7 +128,7 @@ export default {
                     callback: (documentObject, callback) => {
                         if(this.$refs.listObject.isShowCheckedRow()){
                             let listobject = this.$refs.listObject.getAllRowChecked();
-                            console.log('listobjectlistobject',listobject);
+                            this.$goToPage('/documents/print-multiple',"In",false,true,{listObject:listobject});
                         }
                         else{
                             this.$goToPage('/documents/objects/'+documentObject.document_object_id+'/print/',"In");

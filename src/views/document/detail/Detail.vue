@@ -29,7 +29,7 @@
         <div
             class="sym-form-Detail"
             :id="'sym-Detail-'+keyInstance"
-            :style="{'width':documentSize, 'height':'calc(100% - 30px);','margin':contentMargin}">
+            :style="{'width':documentSize, 'height':contentHeight,'margin':contentMargin}">
             <div class="content-document" v-html="contentDocument"></div>
             <div class="content-print-document" v-html="contentPrintDocument"></div>
         </div>
@@ -94,6 +94,10 @@ export default {
         quickView:{
             type:Boolean,
             default:false,
+        },
+        contentHeight:{
+            type:String,
+            default:"calc(100% - 30px);"
         }
     },   
     components:{
@@ -189,7 +193,7 @@ export default {
         },
         documentObjectId(after){
             this.contentPrintDocument = null
-            this.docObjId = Number(after)
+            this.docObjId = Number(after);
             this.loadDocumentObject(this.isPrint);
         },
         documentId(after){
@@ -437,10 +441,11 @@ export default {
                 }
             }
             this.$refs.skeletonView.hide();
+            this.$emit("after-loaded-component-detail");
             $('.wrap-content-detail').removeAttr('style');
             setTimeout(() => {
                 if(thisCpn.$route.name == 'printDocument' || (isPrint && this.formId == 0)){
-                    thisCpn.printContent(true);
+                    // thisCpn.printContent(true);
                 }
             }, 200);
         },
