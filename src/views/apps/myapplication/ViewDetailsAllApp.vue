@@ -110,6 +110,7 @@
 
 <script>
 import {appManagementApi} from '@/api/AppManagement.js';
+import {util} from './../../../plugins/util'
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import ContextMenu from './../ContextMenu.vue';
 export default {
@@ -187,24 +188,22 @@ export default {
 			})
 			let self = this
             for(let app in this.mapIdApp){
-				self.childItemReduce[app] = {}
                 for(let typeT in this.mapIdApp[app]){
                     if(this.mapIdApp[app][typeT].length > 0){
                         let  obj = {}
-						obj = this[typeT]
+						obj = util.cloneDeep(this[typeT]);
 						obj.item = []
                         data.forEach(function(t){
                             if(self.mapIdApp[app][typeT].includes(t.objectIdentifier)){
 								obj.item.push(t)
                             }
 						})
-						self.childItemReduce[app][typeT] = obj
-						// self.apps[app].childrenAppReduce[typeT] = obj
-                        debugger
+                        self.apps[app].childrenAppReduce[typeT] = obj
                     }
                 }
             }
         },
+      
         updateFavoriteItem(array){
             let self = this 
             this.listType.forEach(function(e){
