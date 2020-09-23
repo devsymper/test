@@ -81,7 +81,7 @@
                                                                         <span style="font:8px;opacity:0.4">{{subChildItem.name}}</span>
                                                                     </v-tooltip>
                                                                     <div v-else v-on:click="rightClickHandler($event,subChildItem,childItem.name)">{{subChildItem.title ? subChildItem.title : subChildItem.name }}</div>
-                                                                    <v-icon  @click="changeFavorite(subChildItem,childItem.name)" :class="{'icon-star-active' : subChildItem.favorite==true, 'icon-star': true}" >mdi-star</v-icon>	
+                                                                    <v-icon  @click="changeFavorite(subChildItem,childItem.name)" :class="{'icon-star-active' : subChildItem.favorite == true, 'icon-star': true}" >mdi-star</v-icon>	
                                                                 </div>
                                                             </li>
                                                       </ul>
@@ -219,6 +219,8 @@ export default {
 			return array
         },
         changeFavorite(item,type){
+            debugger
+            let self = this
 			let userId = this.$store.state.app.endUserInfo.id
 			if(item.objectIdentifier.includes("document_definition:")){
 				item.id = item.objectIdentifier.replace("document_definition:","")
@@ -236,15 +238,17 @@ export default {
 				appManagementApi.addFavoriteItem(userId,item.id,type,1).then(res => {
 					if (res.status == 200) {
 						this.$store.commit('appConfig/insertFavorite',item)
-						item.favorite = true;
+                        // item.favorite = true;
+                        self.$set(item, 'favorite', true)
 					}
 				});
 			}else{
 				appManagementApi.addFavoriteItem(userId,item.id,type,0).then(res => {
 					if (res.status == 200) {
 						item.type = type;
-						this.$store.commit('appConfig/delFavorite',item)
-						item.favorite = false;
+                        this.$store.commit('appConfig/delFavorite',item)
+                         self.$set(item, 'favorite', false)
+						// item.favorite = false;
 					}
 				});
             }
@@ -361,7 +365,7 @@ export default {
 	display:none
 }
 .view-details-all-app .content-view-details-all-app{
-    width:90%;
+    width:100%;
     margin-left:auto;
     margin-right:auto;
     font:13px roboto
@@ -464,7 +468,7 @@ export default {
     box-shadow: unset;
 }
 .view-details-all-app >>> .v-expansion-panel-header--active .app-title {
-    border-bottom: 1px solid #FF8003;
+    border-bottom: 0.5px solid #FF8003;
     padding-bottom:4px;
 	/* display: inline-block; */
 }

@@ -114,7 +114,6 @@ import vClickOutside from 'v-click-outside';
 import SearchModal from './SearchModal.vue';
 import AppDetailVue from './AppDetail.vue';
 import {appManagementApi} from './../../api/AppManagement.js'
-
 export default {
     name: "UpdateApp",
     components: {
@@ -179,7 +178,8 @@ export default {
             this.currentApp = JSON.parse(JSON.stringify(app));
         },
         clickToAdd(){
-            this.$refs.searchModal.getListSearch('');
+            // debugger
+            // self.$refs.searchModal.getListSearch('');
         },
 		updateListItem(data){
 			let self = this;
@@ -187,8 +187,13 @@ export default {
 			self.childrenApp.orgchart = []
 			self.childrenApp.dashboard = []
 			self.childrenApp.workflow_definition = []
-			if(data.document_definition.item.length > 0){
-				data.document_definition.item.forEach(function(e){
+			if(data.document_category.item.length > 0){
+				data.document_category.item.forEach(function(e){
+					self.childrenApp.document_definition.push(e.id);
+				});
+			}
+			if(data.document_major.item.length > 0){
+				data.document_major.item.forEach(function(e){
 					self.childrenApp.document_definition.push(e.id);
 				});
 			}
@@ -232,8 +237,8 @@ export default {
         },
         createApp() {
 			this.updateListItem(this.$store.state.appConfig.listItemSelected)
-			let data = JSON.stringify(this.currentApp);
-			debugger
+            let data = JSON.stringify(this.currentApp);
+            debugger
 			appManagementApi.addApp(data).then(res => {
 				 this.$emit("add-app", res)
 			}).catch(err => {

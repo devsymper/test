@@ -3,11 +3,23 @@ const defaultState = {
 	viewSideBySide:false,
 	currentAppId: 0,
 	listItemSelected: {
-		document_definition: {
-			icon: 'mdi-file-edit-outline',
-			title: 'Documents',
-			name: 'document_definition',
-			item: []
+		document_category:{
+			icon : 'mdi-file-edit-outline',
+			title: "Danh mục",
+			// this.$t('apps.listType.documents')
+			name:  'document_category',
+			item:[
+				
+			]
+		},
+		document_major:{
+			icon : 'mdi-file-edit-outline',
+			title: "Nghiệp vụ",
+			// title: this.$t('apps.listType.documents'),
+			name:  'document_major',
+			item:[
+
+			]
 		},
 		orgchart: {
 			icon: 'mdi-widgets-outline',
