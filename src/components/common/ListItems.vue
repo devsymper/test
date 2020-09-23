@@ -953,6 +953,7 @@ export default {
                 let option = {
                     column: colName, // tên cột cần filter
                     operation: condition.conjunction,
+                    conditions: []
                 };
                 if(getDataMode == 'autocomplete' && colName == this.tableFilter.currentColumn.name){
                     option.conditions = [
@@ -986,18 +987,20 @@ export default {
                         }
                     ];
                 }
+
                 if(filter.selectAll && !$.isEmptyObject(filter.valuesNotIn)){
-                    option.valueFilter = {
-                        'operation': ' NOT IN ',
-                        'values': Object.keys(filter.valuesNotIn)
-                    };
+                    option.conditions.push({
+                        name: 'not_in',
+                        value: Object.keys(filter.valuesNotIn)
+                    });
                 }else if(!filter.selectAll && !$.isEmptyObject(filter.valuesIn)){
-                    option.valueFilter = {
-                        'operation': ' IN ',
-                        'values': Object.keys(filter.valuesIn)
-                    };
+                    option.conditions.push({
+                        name: 'in',
+                        value: Object.keys(filter.valuesIn)
+                    });
                 }
-                if(!$.isEmptyObject(option)){
+                
+                if(option.conditions.length > 0){
                     configs.push(option);
                 }
             }

@@ -42,7 +42,8 @@ const defaultState = {
             },
             listControlTreeData: [],
             allControlForTableOption: [],
-            listDataFlow: []
+            listDataFlow: [],
+            allControlTemplate: []
         }
     },
     submit: {

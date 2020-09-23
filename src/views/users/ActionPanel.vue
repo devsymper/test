@@ -7,7 +7,7 @@
 				<v-stepper v-model="stepper" class="d-flex stepper-create-user">
 				<v-stepper-header class="stepper-header" >
 					<v-stepper-step class="fs-13 font-normal" editable step="1">{{ $t('user.general.title')}}</v-stepper-step>
-					<!-- <v-stepper-step :editable="editStep" @click="loadPermission()" step="2">{{ $t('user.permission.title')}}</v-stepper-step> -->
+					<v-stepper-step :editable="editStep" @click="loadPermission()" step="2">{{ $t('user.permission.title')}}</v-stepper-step>
 				</v-stepper-header>
 				<v-stepper-items class="stepper-items">
 					<v-stepper-content step="1">

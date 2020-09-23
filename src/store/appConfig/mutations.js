@@ -78,6 +78,13 @@ const changeTypeView = (state) => {
 const updateCurrentAppId = (state, data) => {
     state.currentAppId = data
 }
+
+const updateActionDef = (state, data) => {
+    Vue.set(state, 'actionDef', data)
+}
+const updateParam = (state, data) => {
+    Vue.set(state, 'param', data)
+}
 export {
     updateListItemSelected,
     removeItemSelected,
@@ -87,5 +94,7 @@ export {
     insertFavorite,
     delFavorite,
     changeTypeView,
-    updateCurrentAppId
+    updateCurrentAppId,
+    updateActionDef,
+    updateParam
 };

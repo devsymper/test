@@ -62,6 +62,7 @@
         "logout": "Đăng xuất",
         "last_update_at": "Cập nhật lần cuối",
         "create_at": "Tạo lúc",
+        "user_create": "Người tạo",
         "filter": "Bộ lọc",
         "sort": "Sắp xếp",
         "status": "Trạng thái",
@@ -128,10 +129,10 @@
             "ends_with": "Kết thúc với",
             "contains": "Chứa",
             "not_contain": "Không chứa",
-            "gt": "Lớn hơn ( > )",
-            "gte": "Lớn hơn hoặc bằng ( >= )",
-            "lt": "Nhỏ hơn ( < )",
-            "lte": "Nhỏ hơn hoặc bằng ( <= )",
+            "greater_than": "Lớn hơn ( > )",
+            "greater_than_or_equal": "Lớn hơn hoặc bằng ( >= )",
+            "less_than": "Nhỏ hơn ( < )",
+            "less_than_or_equal": "Nhỏ hơn hoặc bằng ( <= )",
             "sort_asc": "Sắp xếp tăng dần",
             "sort_desc": "Sắp xếp giảm dần",
             "clear_filter": "Xóa bộ lọc",
@@ -424,7 +425,14 @@
                         "system": "Hệ thống",
                         "list": "danh mục",
                         "business": "Nghiệp vụ"
-                    }
+                    },
+                    "name": "Tên Document",
+                    "title": "Tiêu đề Document",
+                    "fullSize": "Hiển thị toàn màn hình Form Submit",
+                    "type": "Loại văn bản",
+                    "note": "Ghi chú",
+                    "titleObject": "Tiêu đề bản ghi",
+                    "titlePrint": "Tiêu đề bản In"
                 },
                 "swapType": {
                     "heading": "Chuyển đổi kiểu control",
@@ -496,6 +504,10 @@
             "comment": {
                 "heading": "BÌNH LUẬN"
             }
+        },
+        "validate": {
+            "emptyTitle": "Không được bỏ trống tiêu đề",
+            "emptyContentControlTemplate": "Vui chọn template trước khi lưu control template"
         }
     },
     "documentObject": {
@@ -887,9 +899,16 @@
             "unsubscribe": "Bỏ theo dõi"
         }
     },
-    "myItem": {
-        "objType": "Loại đối tượng",
-        "today": "Hôm nay"
+    "myItem":{
+        "objType":"Loại đối tượng",
+        "today":"Hôm nay",
+        "header":"Danh sách work",
+        "work":{
+            "parentWork":"Parent work",
+            "siblingWork":"Sibling work",
+            "subWork":"Sub work"
+        }
+        
     },
     "tasks": {
         "error": {
@@ -906,6 +925,7 @@
             "app": "Ứng dụng",
             "description": "Mô tả",
             "owner": "Người sở hữu",
+            "userCreate": "Người khởi tạo",
             "name": "Tên công việc",
             "assignee": "Người được giao",
             "watcher": "Người theo dõi",

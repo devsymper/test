@@ -124,7 +124,14 @@ export default {
                 },
                 print: {
                     name: "print",
-                    text: "In",
+                    text: "In nhanh",
+                    callback: (documentObject, callback) => {
+                        this.$goToPage('/documents/objects/'+documentObject.document_object_id+'/print/',"In");
+                    },
+                },
+                list_print: {
+                    name: "listPrint",
+                    text: "Danh sách mẫu in",
                     callback: (documentObject, callback) => {
                         this.$refs.listPrintView.show();
                         this.$refs.listPrintView.setDocObjectId(documentObject.document_object_id);

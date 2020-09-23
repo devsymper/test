@@ -63,6 +63,7 @@
         "logout": "Log out",
         "last_update_at": "Last updated at",
         "create_at": "Created at",
+        "user_create": "User create",
         "filter": "Filter",
         "sort": "Sort",
         "status": "Status",
@@ -137,10 +138,10 @@
             "ends_with": "Ends with",
             "contains": "Contains",
             "not_contain": "Not contains",
-            "gt": "Greater than ( > )",
-            "gte": "Greater than or equal ( >= )",
-            "lt": "Less than ( < )",
-            "lte": "Less than or equal ( <= )",
+            "greater_than": "Greater than ( > )",
+            "greater_than_or_equal": "Greater than or equal ( >= )",
+            "less_than": "Less than ( < )",
+            "less_than_or_equal": "Less than or equal ( <= )",
             "sort_asc": "Sort ASC",
             "sort_desc": "Sort DESC",
             "clear_filter": "Clear filter",
@@ -327,7 +328,14 @@
                         "system": "System",
                         "list": "List",
                         "business": "Business"
-                    }
+                    },
+                    "name": "Document name",
+                    "title": "Document title",
+                    "fullSize": "Full size Form Submit",
+                    "type": "Document type",
+                    "note": "Note",
+                    "titleObject": "Title Object",
+                    "titlePrint": "Title Form Print"
                 },
                 "swapType": {
                     "heading": "Swap type control",
@@ -339,6 +347,9 @@
                 "quickInfoControl": {
                     "heading": "Control Infomation"
                 }
+            },
+            "sidebarLeft": {
+
             }
         },
         "submit": {
@@ -398,6 +409,10 @@
             "comment": {
                 "heading": "COMMENT"
             }
+        },
+        "validate": {
+            "emptyTitle": "Title must not be blank",
+            "emptyContentControlTemplate": "Please select the template before saving the control template"
         }
     },
     "documentObject": {
@@ -758,9 +773,15 @@
         "ascending": "Ascending",
         "descending": "Descending"
     },
-    "myItem": {
-        "objType": "Object type",
-        "today": "Today"
+    "myItem":{
+        "objType":"Object type",
+        "today":"Today",
+        "header":"List work",
+        "work":{
+            "parentWork":"Parent work",
+            "siblingWork":"Sibling work",
+            "subWork":"Sub work"
+        }
     },
     "tasks": {
         "error": {
@@ -777,6 +798,7 @@
             "app": "Ứng dụng",
             "description": "Task description",
             "owner": "Task Owner",
+            "userCreate": "Creator",
             "name": "Task name",
             "assignee": "Assignee",
             "watcher": "Watcher",

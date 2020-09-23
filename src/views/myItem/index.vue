@@ -1,6 +1,7 @@
 <template>
     <div class="w-100 h-100">
        <list-task v-if="objecType==0" @changeObjectType="changeObjectType" :height="height" @change-height="changeHeight"></list-task>
+       <list-work v-if="objecType==1" @changeObjectType="changeObjectType" :height="height" @change-height="changeHeight"></list-work>
        <p v-else>NTA</p>
     </div>
 </template>
@@ -8,10 +9,12 @@
 <script>
 import Api from "./../../api/api.js";
 import list from "@/components/myItem/List";
+import listWork from "@/components/myItem/work/List";
 export default {
     name: "ListTaskContainer",
     components: {
         "list-task": list,
+        "list-work": listWork,
     },
     computed: {
         

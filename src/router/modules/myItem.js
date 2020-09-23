@@ -4,12 +4,12 @@ export default [{
     component: () =>
         import ('../../views/myItem/index.vue'),
 },
-// {
-//     path: "/tasks/:id",
-//     name: "doTask",
-//     component: () =>
-//         import ('../../views/tasks/DoTask.vue')
-// },
+{
+    path: "/myitem/tasks/:id",
+    name: "doTask",
+    component: () =>
+        import ('@/components/myItem/DoTask.vue')
+},
 // {
 //     path: "/works",
 //     name: "workList",

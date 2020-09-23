@@ -279,7 +279,8 @@ const setDefaultEditorStore = (state, params) => {
         },
         listControlTreeData: [],
         allControlForTableOption: [],
-        listDataFlow: []
+        listDataFlow: [],
+        allControlTemplate: []
     }
     let instance = params.instance;
     Vue.set(state.editor, instance, value);
