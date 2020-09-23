@@ -49,7 +49,7 @@ export default {
 			menuItemsHeight: '450px',
             listItems:{
 			   document_category:{
-				   icon : 'mdi-file-edit-outline',
+				   icon : 'mdi-file-document-outline',
 				   title: "Danh mục",
 				//    title: this.$t('apps.listType.documents'),
 				   name:  'document_category',
@@ -59,7 +59,7 @@ export default {
 			   },
 			   document_major:{
 				   icon : 'mdi-file-edit-outline',
-				   title: "Nghiệp vụ",
+				   title: "Chứng từ",
 				//    title: this.$t('apps.listType.documents'),
 				   name:  'document_major',
 				   item:[
@@ -124,7 +124,6 @@ export default {
 						storeData.forEach(function(f){
 							if(e.id == f.id){
 								e.active = true
-								debugger
 							}
 						})
 					}
@@ -144,15 +143,20 @@ export default {
 				this.listItems.orgchart.item = res.data.listObject;
 			});
 			documentApi.searchListDocuments({search:value,pageSize:1000}).then(res => {
+				let arrCategory = []
+				let arrMajor = []
 				res.data.listObject.forEach(function(e){
 					if(e.type == "Nghiệp vụ"){
-						self.checkChildrenItem(res.data.listObject,self.sAppManagement.document_category.item)
-						self.listItems.document_category.item.push(e)
+						arrMajor.push(e)
 					}else if(e.type == "Danh mục"){
-						self.checkChildrenItem(res.data.listObject,self.sAppManagement.document_major.item)
-						self.listItems.document_major.item.push(e)
+						arrCategory.push(e)
+
 					}
 				})
+				self.checkChildrenItem(arrCategory,self.sAppManagement.document_category.item)
+				self.checkChildrenItem(arrMajor,self.sAppManagement.document_major.item)
+				this.listItems.document_category.item = arrCategory
+				this.listItems.document_major.item = arrMajor
 			});
 			BpmnEngine.getListModels({search:value,pageSize:50}).then(res => {
 				this.checkChildrenItem(res.data.listObject,self.sAppManagement.workflow_definition.item)

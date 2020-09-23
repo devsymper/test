@@ -4,7 +4,7 @@ const defaultState = {
 	currentAppId: 0,
 	listItemSelected: {
 		document_category:{
-			icon : 'mdi-file-edit-outline',
+			icon : 'mdi-file-document-outline',
 			title: "Danh mục",
 			// this.$t('apps.listType.documents')
 			name:  'document_category',
@@ -14,7 +14,7 @@ const defaultState = {
 		},
 		document_major:{
 			icon : 'mdi-file-edit-outline',
-			title: "Nghiệp vụ",
+			title: "Chứng từ",
 			// title: this.$t('apps.listType.documents'),
 			name:  'document_major',
 			item:[

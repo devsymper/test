@@ -8,7 +8,7 @@
 								v-on:contextmenu="rightClickHandler($event,childItem,itemT.name)"
 							>
 								<div style="position:relative">
-									<v-tooltip bottom v-if="itemT.name == 'document_definition'">
+									<v-tooltip bottom v-if="itemT.name == 'document_category' || itemT.name == 'document_major'">
 										<template v-slot:activator="{ on, attrs }">
 											<div class="title-document-enduser" 	
 												v-bind="attrs"
@@ -26,7 +26,7 @@
 							</li>
 							<li v-else>
 								<div style="position:relative">
-									<v-tooltip bottom v-if="itemT.name == 'document_definition'">
+									<v-tooltip bottom v-if="itemT.name == 'document_category' || itemT.name == 'document_major'">
 									<template v-slot:activator="{ on, attrs }">
 										<div class="title-document" 	
 											v-bind="attrs"
@@ -60,11 +60,22 @@ export default {
 			currentSelected:null,
 			typeSelected:null,
 			objFilter:{
-				document_definition: {
-					icon: 'mdi-file-edit-outline',
-					title: 'Documents',
-					name: 'document_definition',
-					item: [
+				document_category:{
+					icon : 'mdi-file-document-outline',
+					title: "Danh mục",
+					// this.$t('apps.listType.documents')
+					name:  'document_category',
+					item:[
+						
+					]
+				},
+				document_major:{
+					icon : 'mdi-file-edit-outline',
+					title: "Chứng từ",
+					// title: this.$t('apps.listType.documents'),
+					name:  'document_major',
+					item:[
+
 					]
 				},
 				orgchart: {

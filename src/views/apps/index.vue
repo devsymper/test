@@ -256,7 +256,6 @@ export default {
 		},
 		checkChildrenApp(data){
 			let self = this
-			console.log(self.arrType);
 			if(data.hasOwnProperty('orgchart')){
 				data.orgchart.forEach(function(e){
 					self.arrType.orgchart.push(e.id)
@@ -291,7 +290,6 @@ export default {
 									}
 								}
 				]}).then(resOrg => {
-					console.log(resOrg.data.listObject);
 					this.$store.commit('appConfig/updateChildrenApps',{obj:resOrg.data.listObject,type:'orgchart'});
 				});
 			}
@@ -300,7 +298,7 @@ export default {
 						documentApi.searchListDocuments(
 							{
 								search:'',
-								pageSize:50,
+								pageSize:400,
 								filter: [
 								{
 									column: 'id',
@@ -312,7 +310,17 @@ export default {
 								]
 							}
 						).then(resDoc => {
-							this.$store.commit('appConfig/updateChildrenApps',{obj:resDoc.data.listObject,type:'document_definition'});
+							let arrCategory = []
+							let arrMajor = []
+							resDoc.data.listObject.forEach(function(e){
+								if(e.type == "Nghiệp vụ"){
+									arrMajor.push(e)
+								}else if( e.type == "Danh mục"){
+									arrCategory.push(e)
+								}
+							})
+							this.$store.commit('appConfig/updateChildrenApps',{obj:arrMajor,type:'document_major'});
+							this.$store.commit('appConfig/updateChildrenApps',{obj:arrCategory,type:'document_category'});
 						});
 			}
 			if(self.arrType.workflow_definition.length > 0){
