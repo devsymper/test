@@ -93,10 +93,7 @@ export default class Control {
      * @param {*} props 
      */
     checkProps(props) {
-        if (this.controlProperties[props] !== undefined &&
-            (this.controlProperties[props].value === "1" ||
-                this.controlProperties[props].value === 1 ||
-                this.controlProperties[props].value)) {
+        if (this.controlProperties[props] && this.controlProperties[props].value == true) {
             return true;
         }
         return false;

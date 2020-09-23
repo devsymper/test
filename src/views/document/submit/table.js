@@ -1321,7 +1321,7 @@ export default class Table {
             rsl.numericFormat = {
                 pattern: ctrl.controlProperties.formatNumber.value
             };
-        } else if (type == 'label' || ctrl.controlProperties.isReadOnly == 1) {
+        } else if (type == 'label') {
             rsl.readOnly = true;
 
         } else if (type == 'time') {
@@ -1331,6 +1331,10 @@ export default class Table {
         } else if (type == 'date') {
             rsl.dateFormat = ctrl.controlProperties.formatDate.value;
             rsl.correctFormat = true;
+        }
+
+        if (ctrl.controlProperties.isReadOnly && ctrl.controlProperties.isReadOnly.value == true) {
+            rsl.readOnly = true;
         }
         rsl.type = Util.toLowerCaseFirstCharacter(supportCellsType[type].replace('Renderer', ''));
 

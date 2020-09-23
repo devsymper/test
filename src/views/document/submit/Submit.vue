@@ -238,12 +238,20 @@ export default {
                 return {}
             }
         },
+        /**
+         * Tham số truyền các formulas thay thế cho các control
+         * vd: {ma_pl:{formulas:'SELECT "nnn"'},tb1_ma_hang:{formulas:'SELECT "aaaaa"'}}
+         */
         overrideControls:{
             type:Object,
             default(){
                 return {}
             }
         },
+        /**
+         * Tham số truyên vào chỉ ra control nào được nhập liệu
+         * vd:['mct','tb1_ma_hang']
+         */
         editableControls:{
             type:Array,
             default(){
@@ -1183,10 +1191,11 @@ export default {
             for (let index = 0; index < allInputControl.length; index++) {
                 let id = $(allInputControl[index]).attr('id');
                 let controlType = $(allInputControl[index]).attr('s-control-type');
-                let controlName = field.properties.name.value;
-                this.checkEditableControl(controlName,field);
                 if(this.sDocumentEditor.allControl[id] != undefined){   // ton tai id trong store
                     let field = this.sDocumentEditor.allControl[id];
+                    let controlName = allControlNotSetData.includes(controlType) ? field.type : field.properties.name.value;
+                    this.checkEditableControl(controlName,field);
+                    this.checkOverrideFormulas(controlName,field);
                     let idField = field.id;
                     let valueInput = field.value
                     let prepareData = field.prepareData
@@ -1270,10 +1279,12 @@ export default {
                             tableEle.find(".s-control").each(function() {
                                 let childControlId = $(this).attr("id");
                                 let childControlProp = thisCpn.sDocumentEditor.allControl[id].listFields[childControlId];
+                                let childControlName = childControlProp.properties.name.value;
                                 childControlProp.properties.inTable = controlName;
                                 childControlProp.properties.docName = thisCpn.documentName;
+                                thisCpn.checkEditableControl(childControlName,childControlProp);
+                                thisCpn.checkOverrideFormulas(childControlName,childControlProp);
                                 let childValue = childControlProp.value;
-                                console.log('childControlProp',childControlProp);
                                 let childPrepareData = childControlProp.prepareData
                                 if(childPrepareData != null && childPrepareData != ""){
                                     isSetEffectedControl = true;
@@ -1288,7 +1299,6 @@ export default {
                                 );
                                 childControl.init();
                                 childControl.setEffectedData(childPrepareData);
-                                let childControlName = childControlProp.properties.name.value;
                                 thisCpn.addToListInputInDocument(childControlName,childControl)
                                 listInsideControls[childControlName] = true;
                             });
@@ -2195,7 +2205,18 @@ export default {
          * nếu có truyền vào thì chỉ được phép nhập liệu trên cac control đó, các control còn lại đánh dấu readonly
          */
         checkEditableControl(controlName, field){
-            
+            if(this.editableControls && !this.editableControls.includes(controlName) && field.properties.hasOwnProperty('isReadOnly')){
+                field.properties.isReadOnly.value = true;
+            }
+        },
+        /**
+         * Hàm kiểm tra có các công thức giá trị được truyền vào để ghi đè hay ko
+         * nếu có thì thay thế formulas hiện tại
+         */
+        checkOverrideFormulas(controlName, field){
+            if(Object.keys(this.overrideControls).length > 0 && Object.keys(this.overrideControls).includes(controlName)){
+                field.formulas.formulas.value[Object.keys(field.formulas.formulas.value)[0]] = this.overrideControls[controlName]['formulas'];
+            }
         }
     }
     
