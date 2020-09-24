@@ -146,6 +146,8 @@ export default {
 			this.$refs.contextMenu.hide()
 		},	
         changeView(){
+            this.hideContextMenu()
+            debugger
             this.$store.commit('appConfig/changeTypeView')
         },
         collapse(){
@@ -286,13 +288,15 @@ export default {
         },
         filterObj(value){
            for(let e in this.apps){
-                this.filterItemInApp(e,"document_definition",value)
+                this.filterItemInApp(e,"document_category",value)
+                this.filterItemInApp(e,"document_major",value)
                 this.filterItemInApp(e,"orgchart",value)
                 this.filterItemInApp(e,"dashboard",value)
                 this.filterItemInApp(e,"workflow_definition",value)
            }
         },
         filterItemInApp(e, type, value){
+            debugger
              let self = this
              if(self.apps[e].childrenAppReduce.hasOwnProperty(type)){
                 self.apps[e].childrenAppReduce[type].item.forEach(function(k){
@@ -300,7 +304,7 @@ export default {
                         k.show = true
                     }
                     let text = k.title ? k.title : k.name
-                    if(text.toLowerCase().includes(value.toLowerCase())){
+                    if(text.toLowerCv-expansion-panel-header__iconase().includes(value.toLowerCase())){
                         k.show = true
                     }else{
                         k.show = false
@@ -454,7 +458,8 @@ export default {
 }
 .view-details-all-app >>> .v-input__control .v-input__slot label{
     font:13px roboto;
-    padding-top:3px
+    margin-top:auto;
+    margin-bottom:auto
 }
 .view-details-all-app >>> .v-input__control #input-110{
     font:13px roboto
@@ -508,7 +513,10 @@ export default {
 .view-details-all-app >>> .v-expansion-panel-header--active .app-title {
     border-bottom: 0.5px solid #FF8003;
     padding-bottom:4px;
-	/* display: inline-block; */
+}
+.view-details-all-app >>> .v-expansion-panel-header--active .v-expansion-panel-header__icon {
+    border-bottom: 0.5px solid #FF8003;
+    padding-bottom:9px;
 }
 .view-details-all-app >>> .v-expansion-panel-header::before .app-title {
     border-bottom: 0.5px solid #ffffff;

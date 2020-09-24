@@ -467,7 +467,6 @@ export default {
 						let allNodes = self.$refs.positionDiagram.getAllNode()
 						let firstNode = allNodes[0]
 						self.$refs.positionDiagram.$refs.editorWorkspace.changeUserDisplayInNode(this.listUserIds);
-						debugger
 						self.$store.commit('orgchart/updateFirstChildNodeId', firstNode.id)
                         self.$store.commit('orgchart/updateCurrentChildrenNodeId',firstNode.id)
                     }else{
@@ -675,7 +674,6 @@ export default {
             }      
 
             if(passed){
-				debugger
                 let orgchartData = this.getDataToSave();
                 this.$emit('save-orgchart-data', orgchartData);    
             }
@@ -889,13 +887,11 @@ export default {
          * Chọn một node và hiển thị lên cấu hình ở bên tay phải
          */
         selectNode(nodeId){
-			debugger
             this.$refs.editorWorkspace.unHighlightCurrentNode();
             this.$store.commit('orgchart/changeSelectingNode', {
                 instanceKey: this.instanceKey,
                 nodeId: nodeId,
             });
-            // debugger
             // let dataLink = this.$refs.positionDiagram.getAllLink()
             // let allNodes = this.$refs.positionDiagram.getAllNode()
             // let firstNode = this.getFirstNode(dataLink,allNodes)
