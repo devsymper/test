@@ -105,7 +105,6 @@ export default {
             type: Number,
             default: 0
         },
-
         docObjInfo: {
             type: Object,
             default(){

@@ -16,7 +16,6 @@ export default {
 	},
 	watch:{
 		objectIdentifier(after){
-			debugger
 			this.objectIdentifierCmt = after + ""
 		}
 	},
@@ -25,13 +24,13 @@ export default {
 	},
     data () { 
         return {
-			style:'transform:translateX(300px)',
+			style:'transform:translateX(400px)',
 			objectIdentifierCmt:""
         }
     },
     methods:{
         hide(){
-			this.style = 'transform:translateX(300px)'
+			this.style = 'transform:translateX(400px)'
 			this.$emit('close-comment')
 		},
 		show(){

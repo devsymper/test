@@ -100,7 +100,7 @@
 			</v-expansion-panels>
 		</VuePerfectScrollbar>
 	</div>
-	<div class="history-info" style="transform:translateX(300px)">
+	<div class="history-info" style="transform:translateX(400px)">
 		<div style="display:flex;">
 			<span class="mdi mdi-keyboard-backspace" @click="hideHistory"></span>
 			<span style="font-size:15px;">LỊCH SỬ CHỈNH SỬA</span>
@@ -282,7 +282,7 @@ export default {
 			
 		},
 		hideHistory(){
-			$('.history-info').css({transform:'translateX(300px)'})
+			$('.history-info').css({transform:'translateX(400px)'})
 		},
 		showHistory(){
 			$('.history-info').css({transform:'translateX(0px)'})

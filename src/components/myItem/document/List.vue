@@ -11,7 +11,6 @@
           :headerTitle="headerTitle"
           :sideBySideMode="sideBySideMode"
           :compackMode="compackMode"
-          :parentTaskId="filterFromParent.parentTaskId"
           @change-density="isSmallRow = !isSmallRow"
           @changeObjectType="changeObjectType"
           @filter-change-value="handleChangeFilterValue"
@@ -30,23 +29,23 @@
               <v-col
                 cols="2"
                 v-if="!sideBySideMode"
-                class="fs-13 font-weight-medium"
+                class="pl-3 fs-13 font-weight-medium"
               >{{$t("tasks.header.userCreate")}}</v-col>
               <v-col
                 cols="2"
                 v-if="!sideBySideMode"
-                class="fs-13 font-weight-medium"
+                class="pl-3 fs-13 font-weight-medium"
               >{{$t("tasks.header.createDate")}}</v-col>
 
               <v-col
                 cols="2"
                 v-if="!sideBySideMode && !compackMode && !smallComponentMode"
-                class="fs-13 font-weight-medium"
+                class="pl-3 fs-13 font-weight-medium"
               >{{$t("tasks.header.app")}}</v-col>
             <v-col
                 cols="2"
                 v-if="!sideBySideMode && !compackMode && !smallComponentMode"
-                class="fs-13 font-weight-medium"
+                class="pl-3 fs-13 font-weight-medium"
               >{{$t("common.add")}}</v-col>
             </v-row>
           </v-col>
@@ -66,12 +65,88 @@
                     minHeight: '30px'
                 }"
                 :class="{
-                        'd-active':indexObj==idx
+                        'd-active':indexObj==idx||index==idx
                 }"
-              
+                @mouseover="indexObj=idx"
+                @mouseout="indexObj = null"
+                @click="selectObject(obj,idx)"
                 style="border-bottom: 1px solid #eeeeee!important;margin-left:0px!important"
             >
-            
+                <v-col :cols="sideBySideMode ? 10 : compackMode ? 6: 4"  class="pl-3 pr-1 pb-1 pt-2">
+                    <div>
+                        <v-tooltip bottom>
+                        <template v-slot:activator="{ on }">
+                            <div v-on="on" class="text-left fs-13  text-ellipsis w-100">
+                                <v-icon 
+                                class="fs-14" >
+                               mdi-file-document-edit-outline
+                            </v-icon>  {{obj.title? obj.title : obj.titleObject}}
+                            </div>
+                        </template>
+                        <span> {{obj.title? obj.title : obj.titleObject}}</span>
+                        </v-tooltip>
+                        <div class="pa-0 grey--text mt-1 lighten-2 d-flex justify-space-between">
+                        <div
+                            class="fs-11  text-ellipsis"
+                        >
+                            <v-icon  style="font-size:11px ; color:green;margin-left: 1px;padding-bottom: 3px;">mdi-circle</v-icon>
+                            {{obj.documentInfo?obj.documentInfo.title:""}}
+                        </div>
+
+                        <div class="fs-11 py-0  text-ellipsis">
+                            {{obj.createAt ? $moment(obj.createAt).format('DD/MM/YY HH:mm:ss'):$moment(obj.createat).format('DD/MM/YY HH:mm:ss')}}
+                            <v-icon class="grey--text lighten-2 ml-1" x-small>mdi-clock-time-nine-outline</v-icon>
+                        </div>
+                        </div>
+                    </div>
+                </v-col>
+                <v-col
+                    style="line-height: 42px"
+                    cols="2"
+                    class="pl-3 fs-12 px-1 py-0"
+                    v-if="!sideBySideMode"
+                >
+                    <symperAvatar v-if="obj.userId &&obj.userId >0" :size="20" :userId="obj.userId" />
+                    {{obj.displayName}}
+                </v-col>
+               
+                <v-col
+                    style="line-height: 42px"
+                    cols="2"
+                    class="pl-3 fs-13 px-1 py-0"
+                    v-if="!sideBySideMode"
+                >
+                    <span class="mt-1">{{obj.createAt ? $moment(obj.createAt).fromNow():''}}</span>
+                </v-col>
+                <v-col
+                    class="pl-3 py-0"
+                    cols="2"
+                    v-if="!sideBySideMode"
+                >
+                    <div class="pl-1">
+                        <v-tooltip bottom>
+                            <template v-slot:activator="{ on }">
+                            <span v-on="on"  class="text-left fs-13text-ellipsis w-80 title-quytrinh"></span>
+                            </template>
+                            <span>aaa</span>
+                        </v-tooltip>
+                        <div class="pa-0 grey--text mt-1 lighten-2 d-flex justify-space-between">
+                        <!-- <div
+                            class="fs-11  text-ellipsis"
+                        >App</div> -->
+                        </div>
+                    </div>
+                </v-col>
+                <v-col
+                    cols="2"
+                    class="pl-3 fs-13 px-1 py-0"
+                    v-if="!sideBySideMode"
+                >
+                    <div class="pl-1">
+                        <div style="width:55px">10 <v-icon class="fs-14" style="float:right;margin-top:4px;margin-right:12px">mdi-comment-processing-outline</v-icon> </div>
+                        <div style="width:55px"> 2 <v-icon class="fs-14" style="float:right;margin-top:4px;margin-right:12px">mdi-attachment</v-icon></div>
+                    </div>
+                </v-col>
             </v-row>
         </VuePerfectScrollbar>
         <v-skeleton-loader v-else ref="skeleton" :type="'table-tbody'" class="mx-auto"></v-skeleton-loader>
@@ -88,13 +163,29 @@
         v-if="sideBySideMode"
         class="pa-0 ma-0"
         height="30"
-        style="border-left: 1px solid #e0e0e0;"
+        style="border-left: 1px solid #e0e0e0; "
       >
-        <!-- <workDetail
-          :parentHeight="listTaskHeight"
-          :workInfo="selectedWork.workInfo"
-          @close-detail="closeDetail"
-        ></workDetail> -->
+          
+        <v-row class="ml-0 mr-0 justify-space-between" style="line-height: 36px; border-bottom:1px solid #dedede; display:flex">
+            <div class="fs-13 pl-2 pt-1 float-left">
+                {{titleDocument}}
+            </div>
+            <div class="text-right pt-1 pb-1 pr-0" style="margin-left: auto;margin-right: 12px;">
+                <v-tooltip bottom>
+                    <template v-slot:activator="{ on }">
+                        <v-btn v-on="on" small text  @click="sideBySideMode=!sideBySideMode">
+                            <v-icon small>mdi-close</v-icon>
+                        </v-btn>
+                    </template>
+                    <span>Back</span>
+                </v-tooltip>
+            </div>
+        </v-row>
+        <detailDocument 
+            :showCommentInDoc="true"
+            :docObjInfo="docObjInfo">
+        </detailDocument>
+
       </v-col>
     </v-row>
   </div>
@@ -113,14 +204,38 @@ import {
   addMoreInfoToTask
 } from "@/components/process/processAction";
 import symperAvatar from "@/components/common/SymperAvatar.vue";
-
+import detailDocument from '@/views/document/detail/Detail';
 export default {
   computed: {
     listAllDocumentObjectId() {
         let listObjRelated=this.stask.listDocumentObjId;
         let listObjUserSubmit=this.stask.listDocumentObjIdWithUserSubmit;
+        let arrDocument=listObjRelated.concat(listObjUserSubmit);
+        arrDocument.sort(function(a, b) {
+            var keyA = new Date(a.createAt),
+            keyB = new Date(b.createAt);
+            if (keyA > keyB) return -1;
+            if (keyA < keyB) return 1;
+            return 0;
+        });
+        arrDocument.forEach(element => {
+            if (element.userCreate && element.userCreate!= null) {
+                let arrUser = this.sapp.allUsers;
+                let user = arrUser.find(data => data.email === element.userCreate);
+                if (user) {
+                   element.displayName=user.displayName;
+                   element.userId=user.id;
+                } else {
+                    element.displayName="";
+                }
+              
+            }else{
+                element.displayName="";
+            }
+        });
+        console.log("aaaaaad",arrDocument);
 
-        return listObjUserSubmit;
+        return arrDocument;
     },
     stask() {
       return this.$store.state.task;
@@ -136,6 +251,7 @@ export default {
         userSelector: userSelector,
         VuePerfectScrollbar: VuePerfectScrollbar,
         symperAvatar: symperAvatar,
+        detailDocument
     },
     props: {
         compackMode: {
@@ -169,8 +285,12 @@ export default {
     },
     data: function() {
         return {
+            docObjInfo: {
+                docObjId: 0,
+            },
+            indexObj: -1,
             index: -1,
-            dataIndex:-1,
+            titleDocument:'',
             loadingTaskList: false,
             loadingMoreTask: false,
             listTaskHeight: 300,
@@ -210,6 +330,9 @@ export default {
         self.reCalcListTaskHeight();
     },
     methods: {
+        goBack(){
+            alert("aa");
+        },
         changeUpdateAsignee(){
         this.handleTaskSubmited();
         },
@@ -227,15 +350,15 @@ export default {
         },
    
         handleReachEndList() {
-        if (
-            this.allFlatTasks.length < this.totalTask &&
-            this.allFlatTasks.length > 0
-        ) {
-            this.myOwnFilter.page += 1;
-            this.myOwnFilter.size = 50;
+            if (
+                this.allFlatTasks.length < this.totalTask &&
+                this.allFlatTasks.length > 0
+            ) {
+                this.myOwnFilter.page += 1;
+                this.myOwnFilter.size = 50;
 
-            this.getTasks();
-        }
+                this.getTasks();
+            }
         },
         handleTaskSubmited() {
             this.sideBySideMode = false;
@@ -254,11 +377,11 @@ export default {
         getUser(id) {
             this.$refs.user.getUser(id);
         },
-        selectObject(obj, idx,idex) {
+        selectObject(obj, idx) {
+            this.indexObj = idx;
             this.index = idx;
-            this.dataIndex = idex;
-            this.$set(this.selectedWork, "workInfo", obj);
-            this.selectedWork.idx = idx;
+            this.docObjInfo.docObjId = obj.id;
+            this.titleDocument = obj.titleObject;
             if (!this.compackMode) {
                 this.sideBySideMode = true;
                 this.$emit("change-height", "calc(100vh - 88px)");
@@ -420,5 +543,11 @@ export default {
 }
 .d-active {
   background: #f5f5f5;
+}
+.btn-back{
+    position: absolute;
+    top:8px;
+    left: 8px;
+    z-index: 100;
 }
 </style>

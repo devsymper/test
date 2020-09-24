@@ -6,7 +6,7 @@
             class="mx-auto"
             width="100%" height="100%" 
         ></v-skeleton-loader>
-        <v-row class="ml-0 mr-0 justify-space-between" style="    line-height: 36px;">
+        <v-row class="ml-0 mr-0 justify-space-between" style="line-height: 36px;">
             <div class="fs-13 pl-2 pt-1 float-left">
                 <v-icon v-if="statusDetailWork" @click="backToListWork">mdi-chevron-left</v-icon> 
                 {{taskBreadcrumb}}
