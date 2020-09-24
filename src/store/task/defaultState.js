@@ -9,6 +9,7 @@ const defaultState = {
     listTaskDoneInProcessParent:[],
     listTaskInProcessSub:[],
     listTaskInProcessSibling:[],
+    isStatusSubmit:false,
 
 
 };

@@ -2,15 +2,6 @@
   <div class="w-100 d-flex justify-space-between py-2">
     <div class="pl-3 symper-title" v-if="!sideBySideMode">
       {{headerTitle}}
-      <v-chip
-        v-if="workStatus == 'notDone'"
-        class="ma-2"
-        color="amber"
-        text-color="white"
-        x-small
-      >{{$t('common.pendding')}}</v-chip>
-
-      <v-chip v-else class="ml-1" color="green" text-color="white" x-small>{{$t('common.done')}}</v-chip>
     </div>
     <div
       :class="{
@@ -77,49 +68,49 @@
       </v-menu> -->
 
       <!-- Bộ lọc loại đối tượng -->
-      <v-menu
-        offset-y
-        light
-        :close-on-content-click="false"
-        :min-width="200"
-        class="mr-2"
-        style="z-index:1000!important"
-      >
-        <template v-slot:activator="{ on }">
-          <v-btn small class="mr-2" v-on="on" depressed>
-            <v-icon size="18">mdi-swap-vertical</v-icon>
-            <span v-show="!sideBySideMode" class="ml-2">{{$t('common.sort')}}</span>
-          </v-btn>
-        </template>
-        <v-list dense light nav>
-          <v-subheader class="font-weight-bold fs-14" style="height: 25px">{{this.$t("sortBy")}}</v-subheader>
-          <v-list-item-group v-model="sortBy">
-            <v-list-item dense flat v-for="(item, i) in sortOption" :key="i">
-              <template v-slot:default="{ active }">
-                <v-list-item-content class="pt-0 pb-0">
-                  <v-list-item-title class="font-weight-regular ml-4 fs-14" v-text="item.label"></v-list-item-title>
-                </v-list-item-content>
-                <v-list-item-action class="mt-0 mb-0">
-                  <v-icon v-if="active" color="success" small>mdi-check</v-icon>
-                </v-list-item-action>
-              </template>
-            </v-list-item>
-          </v-list-item-group>
-          <v-subheader class="font-weight-bold fs-14" style="height: 25px">{{this.$t("orderBy")}}</v-subheader>
-          <v-list-item-group v-model="orderBy">
-            <v-list-item v-for="(item, i) in orderOption" :key="i">
-              <template v-slot:default="{ active }">
-                <v-list-item-content class="pt-0 pb-0">
-                  <v-list-item-title class="font-weight-regular fs-14 ml-4" v-text="item.label"></v-list-item-title>
-                </v-list-item-content>
-                <v-list-item-action class="mt-0 mb-0">
-                  <v-icon v-if="active" color="success" small>mdi-check</v-icon>
-                </v-list-item-action>
-              </template>
-            </v-list-item>
-          </v-list-item-group>
-        </v-list>
-      </v-menu>
+        <v-menu
+            offset-y
+            light
+            :close-on-content-click="false"
+            :min-width="200"
+            class="mr-2"
+            style="z-index:1000!important"
+        >
+            <template v-slot:activator="{ on }">
+            <v-btn small class="mr-2" v-on="on" depressed>
+                <v-icon size="18">mdi-swap-vertical</v-icon>
+                <span v-show="!sideBySideMode" class="ml-2">{{$t('common.sort')}}</span>
+            </v-btn>
+            </template>
+            <v-list dense light nav>
+            <v-subheader class="font-weight-bold fs-14" style="height: 25px">{{this.$t("sortBy")}}</v-subheader>
+            <v-list-item-group v-model="sortBy">
+                <v-list-item dense flat v-for="(item, i) in sortOption" :key="i">
+                <template v-slot:default="{ active }">
+                    <v-list-item-content class="pt-0 pb-0">
+                    <v-list-item-title class="font-weight-regular ml-4 fs-14" v-text="item.label"></v-list-item-title>
+                    </v-list-item-content>
+                    <v-list-item-action class="mt-0 mb-0">
+                    <v-icon v-if="active" color="success" small>mdi-check</v-icon>
+                    </v-list-item-action>
+                </template>
+                </v-list-item>
+            </v-list-item-group>
+            <v-subheader class="font-weight-bold fs-14" style="height: 25px">{{this.$t("orderBy")}}</v-subheader>
+            <v-list-item-group v-model="orderBy">
+                <v-list-item v-for="(item, i) in orderOption" :key="i">
+                <template v-slot:default="{ active }">
+                    <v-list-item-content class="pt-0 pb-0">
+                    <v-list-item-title class="font-weight-regular fs-14 ml-4" v-text="item.label"></v-list-item-title>
+                    </v-list-item-content>
+                    <v-list-item-action class="mt-0 mb-0">
+                    <v-icon v-if="active" color="success" small>mdi-check</v-icon>
+                    </v-list-item-action>
+                </template>
+                </v-list-item>
+            </v-list-item-group>
+            </v-list>
+        </v-menu>
 
       <!-- Dãn nở dòng -->
       <v-btn small solo depressed class="mr-2" @click="refreshTaskList" v-show="!sideBySideMode">
@@ -184,8 +175,8 @@
             text
             small
             :disabled="taskObject.name.length == 0 ||
-                                    taskObject.dueDate.length == 0 ||
-                                    taskObject.assignee.length == 0"
+                        taskObject.dueDate.length == 0 ||
+                        taskObject.assignee.length == 0"
             @click="saveTask"
           >{{$t('common.add')}}</v-btn>
           <v-btn text small @click="dialog = false" class="mr-2">{{$t('common.close')}}</v-btn>
@@ -211,7 +202,7 @@ export default {
   created() {
     this.$store.dispatch("process/getAllDefinitions");
   },
-  name: "listHeader",
+  name: "listHeaderDoc",
   watch: {
     sortBy: {
       deep: true,
@@ -254,7 +245,7 @@ export default {
     headerTitle: {
       type: String,
       default() {
-        return this.$t("myItem.header");
+        return this.$t("myItem.headerDoc");
       }
     },
     parentTaskId: {
@@ -262,71 +253,71 @@ export default {
       default: ""
     }
   },
-  data: function() {
-    return {
-      closeOnClick: true,
-      workStatus: "notDone",
-      searchTaskKey: "",
-      sortOption: [
-        {
-          label: this.$t("tasks.header.date"),
-          value: "createTime",
-          callback: e => {}
-        },
-        {
-          label: this.$t("tasks.header.dueDate"),
-          value: "dueDate",
-          callback: e => {}
-        },
-        {
-          label: this.$t("tasks.header.description"),
-          value: "description",
-          callback: e => {}
-        }
-      ],
-      orderOption: [
-        {
-          label: this.$t("order.ascending"),
-          value: "asc",
-          callback: e => {}
-        },
-        {
-          label: this.$t("order.descending"),
-          value: "desc",
-          callback: e => {}
-        }
-      ],
-      sortBy: null,
-      orderBy: null,
-      apiUrl: "https://v2.symper.vn/symper-rest/service/",
-      queryProcessInstance: "runtime/process-instances",
-      listProrcessInstances: [],
-      dialog: false,
-      selectedProcess: null,
-      taskObject: {
-        name: "",
-        assignee: "",
-        dueDate: "",
-        description: "",
-        docId: ""
-      },
-      filterList: {},
-      listObjectType: [
-        {
-          title: "Task",
-          icon: "mdi-check-all"
-        },
-        {
-          title: "Work",
-          icon: "mdi-briefcase-check-outline"
-        },
-        {
-          title: "Document",
-          icon: "mdi-file-document-outline"
-        }
-      ]
-    };
-  },
+    data: function() {
+        return {
+            closeOnClick: true,
+            workStatus: "notDone",
+            searchTaskKey: "",
+            sortOption: [
+                {
+                    label: this.$t("tasks.header.date"),
+                    value: "createTime",
+                    callback: e => {}
+                },
+                {
+                    label: this.$t("tasks.header.dueDate"),
+                    value: "dueDate",
+                    callback: e => {}
+                },
+                {
+                    label: this.$t("tasks.header.description"),
+                    value: "description",
+                    callback: e => {}
+                }
+            ],
+            orderOption: [
+                {
+                    label: this.$t("order.ascending"),
+                    value: "asc",
+                    callback: e => {}
+                },
+                {
+                    label: this.$t("order.descending"),
+                    value: "desc",
+                    callback: e => {}
+                }
+            ],
+            sortBy: null,
+            orderBy: null,
+            apiUrl: "https://v2.symper.vn/symper-rest/service/",
+            queryProcessInstance: "runtime/process-instances",
+            listProrcessInstances: [],
+            dialog: false,
+            selectedProcess: null,
+            taskObject: {
+                name: "",
+                assignee: "",
+                dueDate: "",
+                description: "",
+                docId: ""
+            },
+            filterList: {},
+            listObjectType: [
+                {
+                title: "Task",
+                icon: "mdi-check-all"
+                },
+                {
+                title: "Work",
+                icon: "mdi-briefcase-check-outline"
+                },
+                {
+                title: "Document",
+                icon: "mdi-file-document-outline"
+                }
+            ]
+        };
+    },
   directives: {
     clickOutside: vClickOutside.directive
   },
@@ -407,46 +398,46 @@ export default {
       });
     },
     async saveTask() {
-      if (!this.taskObject.assignee) {
-        this.$snotifyError(
-          {},
-          this.$t("tasks.error.canNotCreateTask"),
-          this.$t("tasks.error.emptyAssignee")
-        );
-        return;
-      }
-      let data = {
-        ...this.taskObject,
-        assignee: this.taskObject.assignee,
-        parentTaskId: this.parentTaskId ? this.parentTaskId : "",
-        owner: this.$store.state.app.endUserInfo.id
-      };
-      let description = util.cloneDeep(defaultTaskDescription);
-      if (this.taskObject.docId) {
-        description.action.action = "submit";
-        description.action.parameter.documentId = this.taskObject.docId;
-      }
+        if (!this.taskObject.assignee) {
+            this.$snotifyError(
+            {},
+            this.$t("tasks.error.canNotCreateTask"),
+            this.$t("tasks.error.emptyAssignee")
+            );
+            return;
+        }
+        let data = {
+            ...this.taskObject,
+            assignee: this.taskObject.assignee,
+            parentTaskId: this.parentTaskId ? this.parentTaskId : "",
+            owner: this.$store.state.app.endUserInfo.id
+        };
+        let description = util.cloneDeep(defaultTaskDescription);
+        if (this.taskObject.docId) {
+            description.action.action = "submit";
+            description.action.parameter.documentId = this.taskObject.docId;
+        }
 
-      description.content = this.taskObject.name;
+        description.content = this.taskObject.name;
 
-      if (
-        this.taskObject.description == "" ||
-        this.taskObject.description == null
-      ) {
-        description.extraLabel = this.$t("tasks.header.alertDescription");
-      } else {
-        description.extraLabel = this.taskObject.description;
-      }
-      data.description = JSON.stringify(description);
-      let res = await BPMNEngine.addTask(JSON.stringify(data));
-      if (res.id != undefined) {
-        this.selectedProcess = null;
-        this.dialog = false;
-        this.$emit("create-task", res);
-        this.$snotifySuccess(this.$t("tasks.created"));
-      } else {
-        this.showError();
-      }
+        if (
+            this.taskObject.description == "" ||
+            this.taskObject.description == null
+        ) {
+            description.extraLabel = this.$t("tasks.header.alertDescription");
+        } else {
+            description.extraLabel = this.taskObject.description;
+        }
+        data.description = JSON.stringify(description);
+        let res = await BPMNEngine.addTask(JSON.stringify(data));
+        if (res.id != undefined) {
+            this.selectedProcess = null;
+            this.dialog = false;
+            this.$emit("create-task", res);
+            this.$snotifySuccess(this.$t("tasks.created"));
+        } else {
+            this.showError();
+        }
     }
   }
 };
