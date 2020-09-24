@@ -6,7 +6,7 @@
         :isPrint="true"
         :contentHeight="'100%'"
         :formId="0" 
-        :docObjInfo="{docObjId:Number(value.document_object_id),docSize : '595px'}" 
+        :docObjInfo="{docObjId:value.document_object_id,docSize : '595px'}" 
         @after-loaded-component-detail="afterLoaded"
         />
     </VuePerfectScrollbar>

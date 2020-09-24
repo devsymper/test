@@ -324,6 +324,13 @@ export default {
                 afterChange: function (change, source) {
                      
                     self.handleAfterChangeDataTable(change, source) 
+                },
+                beforeKeyDown:function(change, source){
+                    let cellMeta = this.getSelected();
+                    self.$emit('before-keydown',{event:event,row:self.data[cellMeta[0][0]]});
+                },
+                afterOnCellMouseDown:function(event, coords, TD){
+                    self.$emit('after-cell-mouse-down',{event:event,row:self.data[coords.row]});
                 }
             },
             tableFilter: {

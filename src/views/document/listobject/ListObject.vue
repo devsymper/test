@@ -11,7 +11,8 @@
         :actionPanelType="'elastic'"
         @after-open-add-panel="submitDocument"
         @data-get="afterGetData"
-        @row-selected="afterRowSelected"
+        @before-keydown="afterRowSelected"
+        @after-cell-mouse-down="afterRowSelected"
         :commonActionProps="commonActionProps"
         ref="listObject"
     >
@@ -79,7 +80,7 @@ export default {
                     title: this.$t('common.print'),
                     icon : '',
                     action: function(data){
-                        this.$goToPage('/documents/objects/'+data.documentObjectId+'/print/'+data.formId,"In");
+                        this.$goToPage('/documents/print-multiple',"In",false,true,{listObject:[{document_object_id:data.documentObjectId}]});
                     }.bind(this)
 
                 },
@@ -264,14 +265,19 @@ export default {
             document.execCommand('copy',false);
             inp.remove();
         },
-        afterRowSelected(documentObject){
-            if(this.docObjInfo.docObjId == parseInt(documentObject.document_object_id)){
-                return
+        afterRowSelected(data){
+            let documentObject = data.row;
+            let event = data.event;
+            if(['ArrowDown','ArrowUp'].includes(event.key) || event.buttons == 1){
+                if(this.docObjInfo.docObjId == parseInt(documentObject.document_object_id)){
+                    return
+                }
+                this.currentDocObjectActiveIndex = this.dataTable.findIndex(obj => obj.document_object_id == documentObject.document_object_id);
+                this.$refs.listObject.openactionPanel();
+                this.dataClipboard = window.location.origin+ '/#/documents/objects/'+documentObject.document_object_id;
+                this.docObjInfo = {docObjId:parseInt(documentObject.document_object_id),docSize:'21cm'}
             }
-            this.currentDocObjectActiveIndex = this.dataTable.findIndex(obj => obj.document_object_id == documentObject.document_object_id);
-            this.$refs.listObject.openactionPanel();
-            this.dataClipboard = window.location.origin+ '/#/documents/objects/'+documentObject.document_object_id;
-            this.docObjInfo = {docObjId:parseInt(documentObject.document_object_id),docSize:'21cm'}
+           
         }
     }
 }

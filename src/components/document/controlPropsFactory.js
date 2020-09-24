@@ -163,6 +163,12 @@ const commonProps = {
         value: "",
         groupType: "display"
     },
+    isSingleSelect: {
+        title: "Cho phép chọn nhiều",
+        type: "checkbox",
+        value: "",
+        groupType: "display"
+    },
     // thuộc tính chọn control đổ dữ liệu vào sau khi submit từ form sub submit
     // mapControlFromSubForm: {
     //     title: "Chọn control",
@@ -520,6 +526,13 @@ const controlTypes = {
         icon: "/icon/ic_select.png",
         html: `<input class="s-control s-control-select" readonly="readonly" contenteditable="false" title="Select" s-control-type="select" type="select">&nbsp;&nbsp;`,
         title: "Select",
+        notInProps: ['autoHeight', 'dataFlowId', 'isPrimaryKey', 'minValue', 'maxValue', 'formatNumber', 'isSumTable', 'formatDate', 'isAllowUpdate', 'isDisplayCompact', 'isMultipleValue'],
+        formulas: ['formulas', 'list', 'hidden', 'readOnly', 'link', 'require']
+    },
+    combobox: {
+        icon: "/icon/ic_select.png",
+        html: `<input class="s-control s-control-combobox" readonly="readonly" contenteditable="false" title="Combobox" s-control-type="combobox">&nbsp;&nbsp;`,
+        title: "Combobox",
         notInProps: ['autoHeight', 'dataFlowId', 'isPrimaryKey', 'minValue', 'maxValue', 'formatNumber', 'isSumTable', 'formatDate', 'isAllowUpdate', 'isDisplayCompact', 'isMultipleValue'],
         formulas: ['formulas', 'list', 'hidden', 'readOnly', 'link', 'require']
     },
