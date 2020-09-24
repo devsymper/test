@@ -255,7 +255,7 @@ export default {
             let self = this;
             let docProps = {
                 name : { 
-                    title: "Tên document",
+                    title: this.$t('document.editor.dialog.saveDoc.name'),
                     type: "text",
                     value: (props.name != undefined) ? props.name : '',
                     appendIcon:"mdi-checkbox-multiple-marked-circle-outline",
@@ -269,7 +269,7 @@ export default {
                     }
                 },
                 title : {
-                    title: "Tiêu đề document",
+                    title: this.$t('document.editor.dialog.saveDoc.title'),
                     type: "text",
                     value: (props.title != undefined) ? props.title : '',
                     validateStatus:{
@@ -280,18 +280,13 @@ export default {
                         self.checkTitleDocument(this.value)
                     }
                 },
-                recentName : {
-                    title: "Tên trường hiển thị thông tin trong mục gần đây",
-                    type: "text",
-                    value: (props.title_for_rencent != undefined) ? props.title_for_rencent : '',
-                },
                 fullSize : {
-                    title: "Toàn màn hình",
+                    title: this.$t('document.editor.dialog.saveDoc.fullSize'),
                     type: "checkbox",
                     value: (parseInt(props.isFullSize) === 0) ? false : true,
                 },
                 type : {
-                    title: "Loại Văn bản",
+                    title: this.$t('document.editor.dialog.saveDoc.type'),
                     type: "select",
                     value: 1,
                     options: [{
@@ -310,12 +305,12 @@ export default {
                 },
             
                 note : {
-                    title: "Ghi chú",
+                    title: this.$t('document.editor.dialog.saveDoc.note'),
                     type: "textarea",
                     value: (props.note != undefined) ? props.note : '',
                 },
                 titleObjectFormulas: {
-                    title: "Tiêu đề bản ghi",
+                    title: this.$t('document.editor.dialog.saveDoc.titleObject'),
                     value: "",
                     formulasId: (props.titleObjectFormulasId != undefined) ? props.titleObjectFormulasId : 0,
                     type: "script",
@@ -325,7 +320,7 @@ export default {
             if(this.isConfigPrint){
                 docProps = {
                     title : {
-                        title: "Tiêu đề bản in",
+                        title: this.$t('document.editor.dialog.saveDoc.titlePrint'),
                         type: "text",
                         value: (props.title != undefined) ? props.title : '',
                     },

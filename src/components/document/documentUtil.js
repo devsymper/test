@@ -179,6 +179,9 @@ const getInsertionCSS = function() {
         overflow-y:hidden !important;
         border: 1px solid #e9ecef;
       }
+      .selection-highlight{
+        background: #3297FD !important;
+      }
       `;
     return styles;
 }
