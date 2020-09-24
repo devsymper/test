@@ -173,6 +173,15 @@ const getInsertionCSS = function() {
       .page-item:hover .delete-page-icon{
         opacity:1;
       }
+
+      .wrap-s-control-table:not(.s-control){
+        overflow-x:auto !important;
+        overflow-y:hidden !important;
+        border: 1px solid #e9ecef;
+      }
+      .selection-highlight{
+        background: #3297FD !important;
+      }
       `;
     return styles;
 }

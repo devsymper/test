@@ -30,7 +30,6 @@ const systemRoutes = [{
         component: () =>
             import ('../views/Login.vue'),
     },
-    // một link để redirect khi chọn một tab mà trùng name với tab hiện tại
     {
         path: "/symper-hidden-redirect-component",
         name: "symperHiddenRedirectComponent",
@@ -48,48 +47,10 @@ const systemRoutes = [{
         name: "page",
         redirect: "/page-not-found",
     },
-    // phần search
-    {
-        path: "/search/general",
-        name: "generalSearchInfo",
-        component: () =>
-            import ('../views/search/general.vue'),
-    },
-    //phần timesheet
-    {
-        path: "/timesheet",
-        name: "timesheet",
-        component: () =>
-            import ('../views/timesheet/ShowLogTime.vue'),
-    },
-
-    {
-        path: "/timesheet",
-        name: "Report timesheet",
-        component: () =>
-            import ('../views/timesheet/ReportTimesheet.vue'),
-    },
-
-    {
-        path: "/timesheet/submit",
-        name: "Submit Timesheet",
-        component: () =>
-            import ('../views/timesheet/SubmitTimesheet.vue'),
-    },
-    {
-        path: "/timesheet/report",
-        name: "Timesheet Report",
-        component: () =>
-            import ('../views/timesheet/ReportTimesheet.vue'),
-    },
-
-    {
-        path: "/timesheet/manage",
-        name: "Manage Timesheet",
-        component: () =>
-            import ('../views/timesheet/ManageTimeSheet.vue'),
-    },
+    // Không viết thêm các route vào đây, viết vào một file riêng tương ứng với module của mình vào trong thư mục module
 ];
+
+let mapUrlToComponents = {};
 
 function autoImportRouteModules() {
     var context = require.context('./modules', true, /\.(js)$/);
@@ -107,6 +68,10 @@ function autoImportRouteModules() {
 }
 
 let routes = autoImportRouteModules();
+for (let item of routes) {
+    mapUrlToComponents[item.path] = item.component;
+}
+console.log(mapUrlToComponents, 'mapUrlToComponentsmapUrlToComponentsmapUrlToComponentsmapUrlToComponentsmapUrlToComponents');
 routes = routes.concat(systemRoutes);
 
 

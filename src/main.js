@@ -19,6 +19,7 @@ import {
 } from "./configs";
 import actionMap from './action/index'
 import VueRx from 'vue-rx'
+import iconMap from "./icon";
 //thu vien slider thumbnails
 
 //Anhtger import html2canvas
@@ -64,6 +65,19 @@ Vue.mixin({
                 });
 
             }
+        },
+
+        $i(pathToIcon) {
+            if (pathToIcon) {
+                try {
+                    let i = iconMap;
+                    return eval('i.' + pathToIcon);
+                } catch (error) {
+                    return pathToIcon;
+                }
+            } else {
+                return '';
+            }
         }
     }
 })
@@ -94,6 +108,7 @@ Vue.prototype.$evtBus.$on('symper-app-call-action-handler', (action, context, ex
     action.parameter = Object.assign(action.parameter, extraParams);
     let key = action.module + '_' + action.resource + '_' + action.scope + '_' + action.action;
     if (actionMap[key]) {
+        context.$getActionLink = actionMap[key].$getActionLink;
         actionMap[key].handler.apply(context, [action.parameter]);
     } else {
         console.error('[Symper action find failed]: can not find action with key :' + key, action);

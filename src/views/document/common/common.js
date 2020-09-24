@@ -54,16 +54,28 @@ const getSDocumentEditorStore = function(instance) {
 const getListInputInDocument = function(instance) {
     return getSDocumentSubmitStore(instance).listInputInDocument;
 }
-
+const mapTypeToEffectedControl = {
+    link: "effectedLinkControl",
+    formulas: "effectedControl",
+    readOnly: "effectedReadonlyControl",
+    hidden: "effectedHiddenControl",
+    require: "effectedRequireControl",
+    validate: "effectedValidateControl",
+}
 const currentSelectedControl = function(instance) {
     return getSDocumentEditorStore(instance).currentSelectedControl;
-}
-const getControlEditor = function(instance, id) {
-        return getSDocumentEditorStore(instance).allControl[id];
+};
+const getControlEditor = function(instance, id, tableId = '0') {
+    let allControl = getSDocumentEditorStore(instance).allControl;
+    if (tableId != '0') {
+        return allControl[tableId]['listFields'][id]
+    } else {
+        return allControl[id];
     }
-    /**
-     * Hàm kiểm tra tên 1 control có bị trùng với các control khác hay không, nếu bị trùng thì thông báo lỗi
-     */
+};
+/**
+ * Hàm kiểm tra tên 1 control có bị trùng với các control khác hay không, nếu bị trùng thì thông báo lỗi
+ */
 const checkNameControl = function(instance) {
         let isValid = true;
         let curControl = currentSelectedControl(instance);
@@ -102,7 +114,11 @@ const checkNameControl = function(instance) {
                         newList.push(curControl.id);
                         listNameValueControl[control.id].match = newList;
                         $('#document-editor-' + instance + '_ifr').contents().find('#' + control.id).addClass('s-control-error');
-                        let controlEditor = getControlEditor(instance, control.id);
+                        let tableId = checkInTable($('#document-editor-' + instance + '_ifr').contents().find('#' + control.id));
+                        if (tableId == control.id) {
+                            tableId = '0'
+                        }
+                        let controlEditor = getControlEditor(instance, control.id, tableId);
                         controlEditor.properties.name.validateStatus = {
                             isValid: false,
                             message: "Trùng tên control"
@@ -185,5 +201,6 @@ export {
     getSDocumentSubmitStore,
     getListInputInDocument,
     checkNameControl,
-    checkTitleControl
+    checkTitleControl,
+    mapTypeToEffectedControl
 }

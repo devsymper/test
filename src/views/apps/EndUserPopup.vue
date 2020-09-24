@@ -62,7 +62,7 @@
 								class="list-app-item"
 								@click="clickDetails(item)"
 								>
-								<div class="app-item-icon" 
+								<div class="app-item-icon" searchKey
 								>
 									<v-icon v-if="item.iconType == 'icon'">{{item.iconName}}</v-icon>
 									<img v-else-if="item.iconType == 'img'" :src="item.iconName" class="app-item-img"/>
@@ -203,9 +203,9 @@ export default {
 	methods:{
 		getActiveapps(){
 			appManagementApi.getActiveApp().then(res => {
+				this.loadingApp = false
 				if (res.status == 200) {
 					this.apps = res.data.listObject
-					this.loadingApp = false
 				}
 			}).catch((err) => {
 			});
@@ -243,6 +243,7 @@ export default {
 			this.title.iconName = item.iconName;
 			this.title.iconType = item.iconType;
 			this.title.name = item.name;
+			this.$store.commit("appConfig/updateCurrentAppId",item.id);
 			appManagementApi.getAppDetails(item.id).then(res => {
 				if (res.status == 200) {
 					if(Object.keys(res.data.listObject.childrenApp).length > 0){
@@ -296,7 +297,6 @@ export default {
 			this.tab = 'tab-1'
 			this.$refs.contextMenu.hide()
 			this.getActiveapps()
-			// this.getFavorite()
 		},
 		updateFavoriteItem(mapArray,array){
 			for( let [key,value] of Object.entries(mapArray)){
@@ -368,7 +368,7 @@ export default {
 					self.mapId.dashboard["dashboard:"+e.id] = e;
 				})
 				let dataRep = self.arrType.dashboard
-				this.getByAccessControl(dataW,'dashboard')
+				this.getByAccessControl(dataRep,'dashboard')
 			}
 		},
 		getByAccessControl(ids,type){
@@ -383,7 +383,17 @@ export default {
 				}
 				if(type == 'document_definition'){
 					this.updateFavoriteItem(self.mapId.document_definition,res.data)
-					this.$store.commit('appConfig/updateChildrenApps',{obj:res.data,type:'document_definition'});
+					let arrCategory = []
+					let arrMajor = []
+					res.data.forEach(function(e){
+						if(e.objectType == "1"){
+							arrMajor.push(e)
+						}else if(e.objectType == "2"){
+							arrCategory.push(e)
+						}
+					})
+					this.$store.commit('appConfig/updateChildrenApps',{obj:arrMajor,type:'document_major'});
+					this.$store.commit('appConfig/updateChildrenApps',{obj:arrCategory,type:'document_category'});
 				}
 				if(type == 'workflow_definition'){
 					this.updateFavoriteItem(self.mapId.workflow_definition,res.data)

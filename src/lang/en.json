@@ -37,6 +37,7 @@
         "close": "Close",
         "virtualdocs": "Virtualdocs",
         "tasks": "Tasks",
+        "myItem": "My Item",
         "other": "Other",
         "deploy": "Deploy",
         "start": "Start",
@@ -62,6 +63,7 @@
         "logout": "Log out",
         "last_update_at": "Last updated at",
         "create_at": "Created at",
+        "user_create": "User create",
         "filter": "Filter",
         "sort": "Sort",
         "status": "Status",
@@ -79,7 +81,10 @@
         "email": "Email",
         "pageSize": "Page size",
         "pendding": "Pendding",
-        "print": "Print"
+        "print": "Print",
+        "display": "Display",
+        "of": "of",
+        "entries": "Entries"
     },
     "validate": {
         "required": "Not be empty",
@@ -133,10 +138,10 @@
             "ends_with": "Ends with",
             "contains": "Contains",
             "not_contain": "Not contains",
-            "gt": "Greater than ( > )",
-            "gte": "Greater than or equal ( >= )",
-            "lt": "Less than ( < )",
-            "lte": "Less than or equal ( <= )",
+            "greater_than": "Greater than ( > )",
+            "greater_than_or_equal": "Greater than or equal ( >= )",
+            "less_than": "Less than ( < )",
+            "less_than_or_equal": "Less than or equal ( <= )",
             "sort_asc": "Sort ASC",
             "sort_desc": "Sort DESC",
             "clear_filter": "Clear filter",
@@ -323,7 +328,14 @@
                         "system": "System",
                         "list": "List",
                         "business": "Business"
-                    }
+                    },
+                    "name": "Document name",
+                    "title": "Document title",
+                    "fullSize": "Full size Form Submit",
+                    "type": "Document type",
+                    "note": "Note",
+                    "titleObject": "Title Object",
+                    "titlePrint": "Title Form Print"
                 },
                 "swapType": {
                     "heading": "Swap type control",
@@ -335,6 +347,9 @@
                 "quickInfoControl": {
                     "heading": "Control Infomation"
                 }
+            },
+            "sidebarLeft": {
+
             }
         },
         "submit": {
@@ -345,7 +360,12 @@
             },
             "title": "Submit document",
             "goToList": "Go to list",
-            "continueSubmit": "Submit again"
+            "continueSubmit": "Submit again",
+            "panel": {
+                "traceInput": "Input",
+                "traceCurrent": "Current",
+                "traceOutput": "Output"
+            }
         },
         "process": {
             "header_bar": {
@@ -389,6 +409,10 @@
             "comment": {
                 "heading": "COMMENT"
             }
+        },
+        "validate": {
+            "emptyTitle": "Title must not be blank",
+            "emptyContentControlTemplate": "Please select the template before saving the control template"
         }
     },
     "documentObject": {
@@ -749,6 +773,18 @@
         "ascending": "Ascending",
         "descending": "Descending"
     },
+    "myItem":{
+        "objType":"Object type",
+        "filterObj":"Filter",
+        "today":"Today",
+        "header":"List work",
+        "headerDoc":"List document",
+        "work":{
+            "parentWork":"Parent work",
+            "siblingWork":"Sibling work",
+            "subWork":"Sub work"
+        }
+    },
     "tasks": {
         "error": {
             "emptyAssignee": "Assignee can not be empty",
@@ -761,8 +797,10 @@
             "date": "Date",
             "dueDate": "Due Date",
             "createDate": "Create date",
+            "app": "Ứng dụng",
             "description": "Task description",
             "owner": "Task Owner",
+            "userCreate": "Creator",
             "name": "Task name",
             "assignee": "Assignee",
             "watcher": "Watcher",
@@ -770,7 +808,10 @@
             "id": "Seri",
             "list": "List task",
             "submitForm": "Submit form",
-            "alertDescription": "No description"
+            "alertDescription": "No description",
+            "relatedTask": "RELATED TASK",
+            "attachment": "ATTACHMENT FILE"
+
         },
         "filterOptions": {
             "all": "All task",

@@ -8,7 +8,7 @@
 								v-on:contextmenu="rightClickHandler($event,childItem,itemT.name)"
 							>
 								<div style="position:relative">
-									<v-tooltip bottom v-if="itemT.name == 'document_definition'">
+									<v-tooltip bottom v-if="itemT.name == 'document_category' || itemT.name == 'document_major'">
 										<template v-slot:activator="{ on, attrs }">
 											<div class="title-document-enduser" 	
 												v-bind="attrs"
@@ -26,7 +26,7 @@
 							</li>
 							<li v-else>
 								<div style="position:relative">
-									<v-tooltip bottom v-if="itemT.name == 'document_definition'">
+									<v-tooltip bottom v-if="itemT.name == 'document_category' || itemT.name == 'document_major'">
 									<template v-slot:activator="{ on, attrs }">
 										<div class="title-document" 	
 											v-bind="attrs"
@@ -45,7 +45,7 @@
 					</ul>
 			</div>	
 		</VuePerfectScrollbar>
-		<ContextMenu ref="contextMenu" />	
+		<ContextMenu ref="contextMenu" :sideBySide="sideBySide" />	
   </div>
 </template>
 <script>
@@ -56,15 +56,26 @@ export default {
  data: function() {
         return {
 			
-			listItemHeight: 'calc(100vh - 380px)',
+			
 			currentSelected:null,
 			typeSelected:null,
 			objFilter:{
-				document_definition: {
-					icon: 'mdi-file-edit-outline',
-					title: 'Documents',
-					name: 'document_definition',
-					item: [
+				document_category:{
+					icon : 'mdi-file-document-outline',
+					title: "Danh mục",
+					// this.$t('apps.listType.documents')
+					name:  'document_category',
+					item:[
+						
+					]
+				},
+				document_major:{
+					icon : 'mdi-file-edit-outline',
+					title: "Chứng từ",
+					// title: this.$t('apps.listType.documents'),
+					name:  'document_major',
+					item:[
+
 					]
 				},
 				orgchart: {
@@ -106,6 +117,13 @@ export default {
 				this.filterItem();
 				return this.objFilter
 			}
+		},
+		listItemHeight(){
+			if(this.isMyApplication == true){
+				return 'calc(100vh - 125px)'
+			}else{
+				return  'calc(100vh - 380px)'
+			}
 		}
 	},
 	props: {
@@ -116,6 +134,14 @@ export default {
 		searchKey:{
 			type: String,
 			default:"",
+		},
+		isMyApplication:{
+			type: Boolean,
+			default: false
+		},
+		sideBySide:{
+			type: Boolean,
+			default: false
 		}
     },
 	methods:{
@@ -128,33 +154,41 @@ export default {
 		filterItem(){
 			let self = this
 			let listItem = this.$store.state.appConfig.listItemSelected;
-			self.objFilter.document_definition.item = []
+			self.objFilter.document_major.item = []
+			self.objFilter.document_category.item = []
 			self.objFilter.orgchart.item = []
 			self.objFilter.dashboard.item = []
 			self.objFilter.workflow_definition.item = []
-			if(listItem.document_definition.item.length > 0){
-					listItem.document_definition.item.filter(function(item){
+			if(listItem.document_major.item.length > 0){
+				listItem.document_major.item.filter(function(item){
 						if(item.title.toLowerCase().includes(self.searchKey.toLowerCase())){
-							self.objFilter.document_definition.item.push(item)
+							self.objFilter.document_major.item.push(item)
+						}
+				})
+			}
+			if(listItem.document_category.item.length > 0){
+				listItem.document_category.item.filter(function(item){
+						if(item.title.toLowerCase().includes(self.searchKey.toLowerCase())){
+							self.objFilter.document_category.item.push(item)
 						}
 				})
 			}
 			if(listItem.orgchart.item.length > 0){
-					listItem.orgchart.item.filter(function(item){
+				listItem.orgchart.item.filter(function(item){
 					if(item.name.toLowerCase().includes(self.searchKey.toLowerCase())){
 						self.objFilter.orgchart.item.push(item)
 					}
 				})
 			}
 			if(listItem.dashboard.item.length > 0){
-					listItem.dashboard.item.filter(function(item){
+				listItem.dashboard.item.filter(function(item){
 					if(item.name.toLowerCase().includes(self.searchKey.toLowerCase())){
 						self.objFilter.dashboard.item.push(item)
 					}
 				})
 			}
 			if(listItem.workflow_definition.item.length > 0){
-					listItem.workflow_definition.item.filter(function(item){
+				listItem.workflow_definition.item.filter(function(item){
 					if(item.name.toLowerCase().includes(self.searchKey.toLowerCase())){
 						self.objFilter.workflow_definition.item.push(item)
 					}
@@ -167,6 +201,9 @@ export default {
 			this.$refs.contextMenu.setContextItem(item.actions)
 			this.$refs.contextMenu.show(event)
 			this.$refs.contextMenu.setItem(item)
+			if(type == 'document_category' || type == "document_major"){
+				type = "document_definition"
+			}
 			this.$refs.contextMenu.setType(type)
 		}, 
 		hideContextMenu(){
@@ -228,7 +265,7 @@ export default {
 }
 .app-details >>> .app-item .title-document-enduser{
 	white-space: nowrap; 
-	width: 430px; 
+	width: 90%; 
 	overflow: hidden;
 	text-overflow: ellipsis; 
 }

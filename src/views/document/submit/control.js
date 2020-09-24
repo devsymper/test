@@ -93,10 +93,7 @@ export default class Control {
      * @param {*} props 
      */
     checkProps(props) {
-        if (this.controlProperties[props] !== undefined &&
-            (this.controlProperties[props].value === "1" ||
-                this.controlProperties[props].value === 1 ||
-                this.controlProperties[props].value)) {
+        if (this.controlProperties[props] && this.controlProperties[props].value == true) {
             return true;
         }
         return false;
@@ -178,7 +175,16 @@ export default class Control {
                 this.controlProperties['isDBOnly'].value == 1)) {
             let fromTable = (this.inTable == false) ? "document_" + this.docName : "document_child_" + this.docName + "_" + this.inTable;
             let formulas = "ref(SELECT count(" + this.name + ") > 0 AS " + this.name + " from " + fromTable + " where " + this.name + " = '{" + this.name + "}')"
-            this.controlFormulas.uniqueDB = new Formulas(this.curParentInstance, formulas, 'uniqueDB');
+                // this.controlFormulas.uniqueDB = new Formulas(this.curParentInstance, formulas, 'uniqueDB');
+            this.controlFormulas.uniqueDB = {
+                title: "Duy nhất trong DataBase",
+                value: formulas,
+                instance: new Formulas(this.curParentInstance, formulas, 'uniqueDB'),
+                formulasId: 0,
+                type: "script",
+                groupType: "formulas"
+            }
+
         }
     }
     getEffectedControl() {
@@ -481,5 +487,42 @@ export default class Control {
         }
 
         return rs
+    }
+    renderInputTraceControlColor() {
+        console.log("áddsadsad", this.name);
+        if (this.inTable) {
+            this.traceInputTable();
+        } else {
+            this.ele.addClass('trace-input-control');
+        }
+    }
+    renderOutputTraceControlColor() {
+        if (this.inTable) {
+            this.traceInputTable('trace-output-control');
+        } else {
+            this.ele.addClass('trace-output-control');
+        }
+    }
+    renderCurrentTraceControlColor() {
+        if (this.inTable) {
+            this.traceInputTable('trace-current-control');
+        } else {
+            this.ele.addClass('trace-current-control');
+        }
+    }
+    removeTraceControlColor() {
+
+        if (this.inTable) {
+            this.traceInputTable('', true);
+        } else {
+            this.ele.attr('class', function(i, c) {
+                return c.replace(/trace-.*-control/g, '');
+            });
+        }
+    }
+
+    traceInputTable(className, isRemove = false) {
+        let tableControl = getListInputInDocument(this.curParentInstance)[this.inTable];
+        tableControl.tableInstance.traceInputTable(this.name, className, isRemove)
     }
 }

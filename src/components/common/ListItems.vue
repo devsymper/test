@@ -9,7 +9,7 @@
                             @input="bindToSearchkey"
                             class="d-inline-block mr-2 sym-small-size"
                             single-line
-                            append-icon="mdi-magnify"
+                            :append-icon="$i('input.search')"
                             outlined
                             dense
                             label="Search"
@@ -278,10 +278,16 @@ export default {
                 stretchH: "all",
                 licenseKey: "non-commercial-and-evaluation",
                 afterRender: isForced => {
-                    console.log(
-                        "after render handsontablelllllllllllllllllllllllllll",
-                        Date.now()
-                    );
+                    
+                },
+                afterSelection: (row, column, row2, column2, preventScrolling, selectionLayerLevel) => {
+                    if(self.debounceEmitRowSelectEvt){
+                        clearTimeout(self.debounceEmitRowSelectEvt);
+                    }
+                    let time = self.debounceRowSelectTime;
+                    self.debounceEmitRowSelectEvt = setTimeout(() => {
+                        self.$emit('row-selected', self.data[row]);
+                    }, time);
                 },
                 beforeContextMenuSetItems: () => {
                 },
@@ -293,6 +299,10 @@ export default {
                     this.debounceRelistContextmenu = setTimeout((self) => {
                         self.relistContextmenu();
                     }, 200, this);
+                },
+                afterChange: function (change, source) {
+                     
+                    self.handleAfterChangeDataTable(change, source) 
                 }
             },
             tableFilter: {
@@ -344,7 +354,9 @@ export default {
             data: [],
             filteredColumns: {}, // tên các cột đã có filter, dạng {tên cột : true},
             savedTableDisplayConfig: [], // cấu hình hiển thị của table đã được lueu trong db
-            hotTableContextMenuItems: []
+            hotTableContextMenuItems: [],
+            allRowChecked:{},   // hoangnd: lưu lại các dòng được checked sau sự kiện after change
+            hasColumnsChecked:false,
         };
     },
     activated(){
@@ -362,6 +374,10 @@ export default {
         this.restoreTableDisplayConfig();
     },
     props: {
+        debounceRowSelectTime: {
+            type: Number,
+            default: 100
+        },
         currentItemData: {
             type: Object,
             default() {
@@ -862,6 +878,17 @@ export default {
                 );
                 thisCpn.data = data.listObject ? data.listObject : [];
                 thisCpn.handleStopDragColumn();
+                //AnhTger config show description
+                (data.listObject).forEach(element => {
+                    let processKey=element.processKey;
+                    if (processKey) {
+                        let configVale=JSON.parse(element.configValue)[processKey];
+                        if (configVale.description) {
+                            element.description=configVale.description;
+                        }
+                    }
+                   
+                });
                 thisCpn.$emit('data-get', data.listObject);
             }
             this.prepareFilterAndCallApi(columns , cache , applyFilter, handler);
@@ -934,6 +961,7 @@ export default {
                 let option = {
                     column: colName, // tên cột cần filter
                     operation: condition.conjunction,
+                    conditions: []
                 };
                 if(getDataMode == 'autocomplete' && colName == this.tableFilter.currentColumn.name){
                     option.conditions = [
@@ -967,18 +995,20 @@ export default {
                         }
                     ];
                 }
+
                 if(filter.selectAll && !$.isEmptyObject(filter.valuesNotIn)){
-                    option.valueFilter = {
-                        'operation': ' NOT IN ',
-                        'values': Object.keys(filter.valuesNotIn)
-                    };
+                    option.conditions.push({
+                        name: 'not_in',
+                        value: Object.keys(filter.valuesNotIn)
+                    });
                 }else if(!filter.selectAll && !$.isEmptyObject(filter.valuesIn)){
-                    option.valueFilter = {
-                        'operation': ' IN ',
-                        'values': Object.keys(filter.valuesIn)
-                    };
+                    option.conditions.push({
+                        name: 'in',
+                        value: Object.keys(filter.valuesIn)
+                    });
                 }
-                if(!$.isEmptyObject(option)){
+                
+                if(option.conditions.length > 0){
                     configs.push(option);
                 }
             }
@@ -1260,6 +1290,35 @@ export default {
             this.page -= 1
             this.getData();
             this.$emit("change-page", this.page);
+        },
+        // hoangnd: thêm cột checkbox
+        addCheckBoxColumn(){
+            this.hasColumnsChecked = true;
+            this.tableColumns.unshift({name:"checkbox_select_item",title:"Chọn",type:"checkbox"});
+        },
+        removeCheckBoxColumn(){
+            this.hasColumnsChecked = false;
+            this.tableColumns.shift();
+        },
+        // Hàm trả về các dòng được selected
+        getAllRowChecked(){
+            return this.allRowChecked;
+        },
+        isShowCheckedRow(){
+            return this.hasColumnsChecked
+        },
+        /**
+         * Đưa dòng được checked vào biến allRowChecked
+         * nêu uncheck thì xóa đi
+         */
+        handleAfterChangeDataTable(change, source) {
+            if(source == 'edit' && this.hasColumnsChecked){
+                if(change[0][3] == true){
+                    this.allRowChecked[change[0][0]] = this.data[change[0][0]]
+                }else{
+                    delete this.allRowChecked[change[0][0]];
+                }
+            }
         }
     },
     components: {

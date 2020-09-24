@@ -128,11 +128,12 @@ const checkCanBeBind = function(instance, fieldName) {
     let impactedFieldsListWhenStart = sDocumentSubmit.impactedFieldsListWhenStart;
     // return true;
     // Nếu đã được bind dữ liệu trước đó rồi thì ko cần bind nữa
-    if (impactedFieldsList[rootChangeFieldName] !== undefined &&
-        impactedFieldsList[rootChangeFieldName][fieldName] === true &&
-        docStatus != 'beforeSubmit') {
-        return false;
-    }
+
+    // if (impactedFieldsList[rootChangeFieldName] !== undefined &&
+    //     impactedFieldsList[rootChangeFieldName][fieldName] === true &&
+    //     docStatus != 'beforeSubmit') {
+    //     return false;
+    // }
 
 
 
@@ -160,6 +161,7 @@ const checkCanBeBind = function(instance, fieldName) {
             }
         }
     } else if (impactedFieldsList.hasOwnProperty(rootChangeFieldName)) {
+
         if (listInputInDocument[fieldName]['controlFormulas'].hasOwnProperty('formulas')) {
             for (var j in listInputInDocument[fieldName]['controlFormulas']['formulas']['instance']['inputControl']) {
                 if (impactedFieldsList[rootChangeFieldName].hasOwnProperty(j)) {

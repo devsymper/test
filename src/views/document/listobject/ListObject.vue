@@ -8,8 +8,10 @@
         :pageTitle="$t('documentObject.title')"
         :containerHeight="containerHeight"
         :actionPanelWidth="actionPanelWidth"
+        :actionPanelType="'elastic'"
         @after-open-add-panel="submitDocument"
         @data-get="afterGetData"
+        @row-selected="afterRowSelected"
         :commonActionProps="commonActionProps"
         ref="listObject"
     >
@@ -124,22 +126,50 @@ export default {
                 },
                 print: {
                     name: "print",
-                    text: "In",
+                    text: "In nhanh",
+                    callback: (documentObject, callback) => {
+                        if(this.$refs.listObject.isShowCheckedRow()){
+                            let listobject = this.$refs.listObject.getAllRowChecked();
+                            this.$goToPage('/documents/print-multiple',"In",false,true,{listObject:listobject});
+                        }
+                        else{
+                            this.$goToPage('/documents/objects/'+documentObject.document_object_id+'/print/',"In");
+                        }
+                    },
+                },
+                list_print: {
+                    name: "listPrint",
+                    text: "Danh sách mẫu in",
                     callback: (documentObject, callback) => {
                         this.$refs.listPrintView.show();
                         this.$refs.listPrintView.setDocObjectId(documentObject.document_object_id);
                     },
                 },
-                detail_in_view: {
-                    name: "detailInView",
-                    text: "Xem trong trang",
+                show_checkbox: {
+                    name: "showCheckBox",
+                    text: "Hiển thị checkbox",
                     callback: (documentObject, callback) => {
-                        this.currentDocObjectActiveIndex = this.dataTable.findIndex(obj => obj.document_object_id == documentObject.document_object_id)
-                        this.$refs.listObject.openactionPanel();
-                        this.dataClipboard = window.location.origin+ '/#/documents/objects/'+documentObject.document_object_id;
-                        this.docObjInfo = {docObjId:parseInt(documentObject.document_object_id),docSize:'21cm'}
+                        if(this.$refs.listObject.isShowCheckedRow()){
+                            this.$refs.listObject.removeCheckBoxColumn();
+                            this.tableContextMenu.show_checkbox.text = "Hiển thị checkbox"
+                        }
+                        else{
+                            this.$refs.listObject.addCheckBoxColumn();
+                            this.tableContextMenu.show_checkbox.text = "Ẩn checkbox"
+                        }
+                        
                     },
                 },
+                // detail_in_view: {
+                //     name: "detailInView",
+                //     text: "Xem trong trang",
+                //     callback: (documentObject, callback) => {
+                //         this.currentDocObjectActiveIndex = this.dataTable.findIndex(obj => obj.document_object_id == documentObject.document_object_id)
+                //         this.$refs.listObject.openactionPanel();
+                //         this.dataClipboard = window.location.origin+ '/#/documents/objects/'+documentObject.document_object_id;
+                //         this.docObjInfo = {docObjId:parseInt(documentObject.document_object_id),docSize:'21cm'}
+                //     },
+                // },
                 update: {
                     name: "edit",
                     text: "Cập nhật",
@@ -233,6 +263,15 @@ export default {
             inp.select();
             document.execCommand('copy',false);
             inp.remove();
+        },
+        afterRowSelected(documentObject){
+            if(this.docObjInfo.docObjId == parseInt(documentObject.document_object_id)){
+                return
+            }
+            this.currentDocObjectActiveIndex = this.dataTable.findIndex(obj => obj.document_object_id == documentObject.document_object_id);
+            this.$refs.listObject.openactionPanel();
+            this.dataClipboard = window.location.origin+ '/#/documents/objects/'+documentObject.document_object_id;
+            this.docObjInfo = {docObjId:parseInt(documentObject.document_object_id),docSize:'21cm'}
         }
     }
 }
@@ -249,6 +288,9 @@ export default {
     }
     .panel-body{
         height: calc(100vh - 55px);
+    }
+    .panel-body >>> .wrap-content-detail{
+        height: calc(100vh - 65px) !important;
     }
     .right-action{
         margin-left: auto;

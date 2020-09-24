@@ -101,8 +101,12 @@ export default {
     getProcessInstanceRuntimeHistory(id) {
         return bpmneApi.get(appConfigs.apiDomain.bpmne.history + '/historic-activity-instances?size=1000&processInstanceId=' + id, {}, testHeader);
     },
-    getProcessInstance() {
-        return bpmneApi.get(appConfigs.apiDomain.bpmne.instances, {}, testHeader);
+    getProcessInstance(filter={}) {
+        return bpmneApi.get(appConfigs.apiDomain.bpmne.instances, filter, testHeader);
+    },
+    getProcessInstanceHistory(filter={}) {
+        filter= JSON.stringify(filter);
+        return bpmneApi.post(appConfigs.apiDomain.bpmne.historyInstances, filter, testHeader);
     },
     addTask(data) {
         return bpmneApi.post(appConfigs.apiDomain.bpmne.tasks, data, testHeader);
@@ -143,7 +147,7 @@ export default {
             filter.finished=true;
             filter.sort='endTime';
             filter= JSON.stringify(filter);
-            return bpmneApi.post(appConfigs.apiDomain.bpmne.subTasksHistory , filter, testHeader);
+            return bpmneApi.post(appConfigs.apiDomain.bpmne.postTasksHistory , filter, testHeader);
         }else{
             return bpmneApi.get(appConfigs.apiDomain.bpmne.tasks + '/' + idParent + '/subtasks', filter, testHeader);
         }
@@ -178,7 +182,14 @@ export default {
 
     getLastestByModel() {
         return bpmneApi.get('/deploy-history/lastest-by-model');
-    }
-   
+    },
+    postTaskHistory(filter) {
+        if (filter.assignee) {
+            filter.taskAssignee = filter.assignee;
+            delete filter.assignee;
+        }
+        filter= JSON.stringify(filter);
+        return bpmneApi.post(appConfigs.apiDomain.bpmne.postTasksHistory , filter, testHeader);
+    },
 
 };

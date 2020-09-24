@@ -10,6 +10,9 @@ const setFilter = (state, item) => {
     Vue.set(state, 'filter', item);
 }
 
+const setStatusPopupTracking= (state, item) => {
+    Vue.set(state, 'statusPopupTracking', item);
+}
 const setArrDocObjId = (state, arrDocObjId) => {
     Vue.set(state, 'arrDocObjId', arrDocObjId);
 }
@@ -22,11 +25,43 @@ const removeFileAttachToStore = (state, id) => {
     }
     Vue.set(state, 'arrFileAttach', currentArrFileAttach);
 }
+const setListTaskInProcessInstance = (state, listTaskInProcessInstance) => {
+    Vue.set(state, 'listTaskInProcessInstance', listTaskInProcessInstance);
+}
+const setListTaskInProcessParent = (state, listTaskInProcessParent) => {
+    Vue.set(state, 'listTaskInProcessParent', listTaskInProcessParent);
+}
+const setListTaskInProcessSub = (state, listTaskInProcessSub) => {
+    Vue.set(state, 'listTaskInProcessSub', listTaskInProcessSub);
+}
+
+const setListTaskDoneInProcessInstance = (state, listTaskDoneInProcessInstance) => {
+    Vue.set(state, 'listTaskDoneInProcessInstance', listTaskDoneInProcessInstance);
+}
+const setListTaskDoneInProcessParent = (state, listTaskDoneInProcessParent) => {
+    Vue.set(state, 'listTaskDoneInProcessParent', listTaskDoneInProcessParent);
+}
+const setListTaskInProcessSibling = (state, listTaskInProcessSibling) => {
+    Vue.set(state, 'listTaskInProcessSibling', listTaskInProcessSibling);
+}
+const setIsStatusSubmit = (state, isStatusSubmit) => {
+    Vue.set(state, 'isStatusSubmit', isStatusSubmit);
+}
+
 export {
     setArrFileAttach,
     addToListAttachStore,
     setFilter,
     removeFileAttachToStore,
-    setArrDocObjId
+    setArrDocObjId,
+    setStatusPopupTracking,
+    setListTaskInProcessInstance,
+    setListTaskInProcessParent,
+    setListTaskInProcessSub,
+    setListTaskDoneInProcessInstance,
+    setListTaskDoneInProcessParent,
+    setListTaskInProcessSibling,
+    setIsStatusSubmit
+
 
 };

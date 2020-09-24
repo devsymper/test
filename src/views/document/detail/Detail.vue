@@ -1,6 +1,7 @@
 <template>
-    <div class="wrap-content-detail">
+    <div class="wrap-content-detail" style="overflow:hidden;">
         
+        <Loader ref="skeletonView"/>
         <div class="panel-header" v-if="!quickView && !isPrint">
             <div class="right-action">
                 <v-tooltip bottom>
@@ -28,7 +29,7 @@
         <div
             class="sym-form-Detail"
             :id="'sym-Detail-'+keyInstance"
-            :style="{'width':documentSize, 'height':'100%','margin':contentMargin}">
+            :style="{'width':documentSize, 'height':contentHeight,'margin':contentMargin}">
             <div class="content-document" v-html="contentDocument"></div>
             <div class="content-print-document" v-html="contentPrintDocument"></div>
         </div>
@@ -42,6 +43,7 @@
         :createTime="createTime"
         :documentObjectId="docObjId"
         :workflowId="workflowId"
+        :showCommentInDoc="showCommentInDoc"
         @after-hide-sidebar="afterHideSidebar"
         />
         <HistoryControl ref="historyView" />
@@ -64,6 +66,7 @@ import './../submit/customControl.css'
 import { getSDocumentSubmitStore } from './../common/common'
 import SideBarDetail from './SideBarDetail'
 import HistoryControl from './HistoryControl'
+import Loader from './../../../components/common/Loader';
 import { util } from '../../../plugins/util.js';
 export default {
     props: {
@@ -85,6 +88,10 @@ export default {
             type:Boolean,
             default:false
         },
+        showCommentInDoc:{
+            type:Boolean,
+            default:true
+        },
         formId:{
             type:Number,
             default:0
@@ -92,11 +99,16 @@ export default {
         quickView:{
             type:Boolean,
             default:false,
+        },
+        contentHeight:{
+            type:String,
+            default:"calc(100% - 30px);"
         }
     },   
     components:{
         'side-bar-detail':SideBarDetail,
-        HistoryControl
+        HistoryControl,
+        Loader
     },
     computed: {
         sDocumentEditor() {
@@ -104,6 +116,14 @@ export default {
         },
         sDocumentSubmit() {
             return this.$store.state.document.submit[this.keyInstance];
+        },
+        allUsers(){
+            let allUser = this.$store.state.app.allUsers
+            thisCpn.$store.commit("document/addToDocumentSubmitStore", {
+                key: 'listUser',
+                value: allUser,
+                instance:thisCpn.keyInstance
+            });
         }
     },
     data() {
@@ -121,24 +141,13 @@ export default {
             taskId:"",
             createTime:"",
             userId:"",
-            direction: "top",
-            fab: false,
-            hover: false,
-            tabs: null,
-            top: false,
-            right: true,
-            bottom: true,
-            left: false,
-            transition: "slide-y-reverse-transition",
-            isComponentActive:false,
-            printConfigActive:null
+            printConfigActive:null,
 
         };
     },
     beforeMount() {
         this.documentSize = "21cm";
     },
-    
     
     created(){
         this.$store.commit("document/setDefaultSubmitStore",{instance:this.keyInstance});
@@ -154,29 +163,11 @@ export default {
             this.docObjId = Number(this.documentObjectId);
         } else if (this.$route.name == "detailDocument" || this.$route.name == "printDocument") {
             this.docObjId = Number(this.$route.params.id);
+            this.loadDocumentObject(this.isPrint); 
         }
-        if(this.docObjId != null){
-            this.loadDocumentObject(this.isPrint);  
-        }
-        userApi.getListUser(1,100000).then(res => {
-            if (res.status == 200) {
-                thisCpn.$store.commit("document/addToDocumentSubmitStore", {
-                    key: 'listUser',
-                    value: res.data.listObject,
-                    instance:thisCpn.keyInstance
-                });
-            }
-            
-        })
-        .catch(err => {
-           
-        })
-        .always(() => {
-        });
-        
 
         this.$evtBus.$on('symper-app-wrapper-clicked',evt=>{
-            if(thisCpn.isComponentActive == false) return;
+            if(thisCpn._inactive == true) return;
             if($(evt.target).is('.highlight-history')){
                 this.$refs.historyView.show($(evt.target))    
             }
@@ -188,14 +179,6 @@ export default {
                     }
             }
         })
-    },
-    activated() {
-        this.isComponentActive = true;
-    },
-    deactivated() {
-        this.isComponentActive = false;
-    },
-    destroyed(){
     },
     watch:{
         docObjInfo:{
@@ -215,7 +198,7 @@ export default {
         },
         documentObjectId(after){
             this.contentPrintDocument = null
-            this.docObjId = Number(after)
+            this.docObjId = Number(after);
             this.loadDocumentObject(this.isPrint);
         },
         documentId(after){
@@ -246,11 +229,6 @@ export default {
         },
         // Khadm: load data của document lên để hiển thị và xử lý
         loadDocumentStruct(documentId,isPrint = false) {
-            if(isPrint && this.contentPrintDocument != null){
-                $('.content-print-document').removeClass('d-none');
-                $('.content-document').addClass('d-none');
-                return
-            }
             if(this.$route.name == 'printDocument'){
                 isPrint = true;
             }
@@ -296,6 +274,12 @@ export default {
                 .always(() => {});
         },
         async loadDocumentObject(isPrint=false) {
+            this.contentDocument = ""
+            try {
+                 this.$refs.skeletonView.show();
+            } catch (error) {
+                
+            }
             let thisCpn = this;
             let res = await documentApi
                 .detailDocumentObject(this.docObjId);
@@ -319,6 +303,7 @@ export default {
                         });
                 }
                 
+           
         },
         togglePageSize() {
             this.contentMargin = this.documentSize == "21cm" ? "" : "auto";
@@ -446,11 +431,9 @@ export default {
                                 );
                                 childControl.init();
                                 childControl.inTable = controlName;
-                               
                                 let childControlName = childControlProp.properties.name.value;
                                 let colIndex = thisCpn.getColIndexControl($(this));
                                 mapControlToIndex[childControlName] = colIndex
-
                                 thisCpn.addToListInputInDocument(childControlName,childControl)
                                 listInsideControls[childControlName] = true;
                             });
@@ -462,11 +445,13 @@ export default {
                         }
                     }
                 }
-
             }
+            this.$refs.skeletonView.hide();
+            this.$emit("after-loaded-component-detail");
+            $('.wrap-content-detail').removeAttr('style');
             setTimeout(() => {
                 if(thisCpn.$route.name == 'printDocument' || (isPrint && this.formId == 0)){
-                    thisCpn.printContent(true);
+                    // thisCpn.printContent(true);
                 }
             }, 200);
         },
@@ -571,7 +556,10 @@ export default {
     .sym-form-Detail >>> table:not(.htCore):not(.table-print) th {
         border: none !important;
     }
-    .sym-form-Detail >>> .htCore td:last-child {
+    .sym-form-Detail >>> .htCore td:nth-last-child(3) {
+        border-right: 1px solid #ccc !important;
+    }
+    .sym-form-Detail >>> .htCore thead tr th:nth-last-child(3) {
         border-right: 1px solid #ccc !important;
     }
     .sym-form-Detail >>> .ht_clone_left.handsontable table.htCore {
