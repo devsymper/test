@@ -197,35 +197,42 @@ export default {
 			})
 			let self = this
             for(let app in this.mapIdApp){
+                debugger
                 for(let typeT in this.mapIdApp[app]){
+
                     if(this.mapIdApp[app][typeT].length > 0){
                         let  obj = {}
                         let arr = []
+                        let arrCategory = []
+                        let arrMajor = []
                         data.forEach(function(t){
                             if(self.mapIdApp[app][typeT].includes(t.objectIdentifier)){
                                  if(t.hasOwnProperty('objectType') && t.objectIdentifier.includes('document')){
-                                    debugger
-                                    if(t.objectType == "1"){
-                                        obj =  util.cloneDeep(self.document_major);
-                                        arr.push(t)
-                                        debugger
-                                        obj.item = arr
-                                    }
                                     if(t.objectType == "2"){
                                         obj =  util.cloneDeep(self.document_category);
-                                        arr.push(t)
-                                        obj.item = arr
+                                        arrCategory.push(t)
+                                        obj.item = arrCategory
+                                        let types = "document_category"
+                                        self.apps[app].childrenAppReduce[types] = obj
                                     }
+                                    if(t.objectType == "1"){
+                                        obj =  util.cloneDeep(self.document_major);
+                                        arrMajor.push(t)
+                                        obj.item = arrMajor
+                                        let types = "document_major"
+                                        self.apps[app].childrenAppReduce[types] = obj
+                                    }
+                                  
                                 }else{
                                     obj = util.cloneDeep(self[typeT]);
                                     arr.push(t)
-                                    debugger
                                     obj.item = arr
+                                    self.apps[app].childrenAppReduce[typeT] = obj
                                 }
 								
                             }
 						})
-                        self.apps[app].childrenAppReduce[typeT] = obj
+                        
                     }
                 }
             }
@@ -309,7 +316,6 @@ export default {
 				ids: ids
 			}).then(res=>{
                     self.updateFavoriteItem(res.data)
-                    debugger
                     self.updateChidrenItemToApp(res.data)
 			}).catch(err=>{
 			})
@@ -349,7 +355,7 @@ export default {
                 title: 'Workflows',
                 name: 'workflow_definition',
             },
-            panel: [],
+            panel: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25],
             listIds: [],
 			mapIdApp:[],
 			childItemReduce:{
@@ -484,7 +490,7 @@ export default {
 .view-details-all-app >>> li:hover {
 	background-color:#f7f7f7;
 	border-radius: 5px;
-}
+}v-expansion-panel-header
 .view-details-all-app >>>  li:hover .icon-remove{
 	background-color:#f7f7f7;
 	border-radius: 10px;
@@ -503,5 +509,8 @@ export default {
     border-bottom: 0.5px solid #FF8003;
     padding-bottom:4px;
 	/* display: inline-block; */
+}
+.view-details-all-app >>> .v-expansion-panel-header::before .app-title {
+    border-bottom: 0.5px solid #ffffff;
 }
 </style>
