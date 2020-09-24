@@ -1,34 +1,35 @@
 <template>
    <div style="display:flex">
-        <VueResizable :width="500" :max-width="600" :min-width="300" :active ="['r']">
+       <VueResizable :width="500" :max-width="600" :min-width="300" :active ="['r']">
             <AgDataTable
                 :tableHeight="'calc(100% - 100px)'"
                 :likeHandsonTable="true"
                 :rowData="dataTable"
                 :editable="false"
-                :customComponents="customAgComponents"
+                :customComponents="customAgComponents"  
                 @on-cell-dbl-click="onCellDblClick"
                 :cellRendererParams="{
-                    innerRenderer:'nodeName'
+                    innerRenderer:'nodeName',
+                    suppressDoubleClickExpand: true,
                 }">
             </AgDataTable>
         </VueResizable>
         <ListItems 
-            ref="listUser"
+                ref="listUser"
             :pageTitle="'Danh sách người dùng'"
             :getDataUrl="apiUrl"
             :containerHeight="containerHeight"
             :tableContextMenu="tableContextMenu"
             :useDefaultContext="false"
             :useActionPanel="true"
-            :currentItemData="currentItemData"
+            :actionPanelWidth="850"
             :customAPIResult="customAPIResult"
+            :showButtonAdd="false"
         >
-            <template slot="right-panel-content" slot-scope="{itemData}">  
-                <navigation-detail-user  :itemData="itemData" style="z-index:10001"  />
+            <template slot="right-panel-content" slot-scope="{}">  
+                <Detail :quickView="true" :docObjInfo="docObjInfo" />
             </template>
         </ListItems>  
-                        
    </div>
 </template>
 
@@ -80,6 +81,11 @@ export default {
             this.$store.dispatch('orgchart/updateUserInNode',params.data)
             this.listUserInNode = this.$store.getters['orgchart/listUserInChildrenNode'](this.$route.params.id);
         }
+    },
+    computed:{
+        allUserInOrgchart(){
+             return  this.$store.state.orgchart.allUserInOrgChart[this.$route.params.id]
+        }, 
     },
      watch:{
         listUserInNode:{

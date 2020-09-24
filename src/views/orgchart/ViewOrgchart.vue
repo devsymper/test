@@ -24,6 +24,7 @@ export default {
             let id = this.$route.params.id;
             let res = await orgchartApi.getOrgchartDetail(id)
             let listUser = []
+            debugger
             res.data.userInPostion.forEach(function(e){
                 if(listUser.includes(e.userId) == false){
                     listUser.push(e.userId)
@@ -34,8 +35,8 @@ export default {
                 listUsers: listUser
             })
             this.$store.commit('orgchart/setDataOrgchartSideBySide',{
-                 orgchartId: res.data.orgchart.id,
-                   object:res.data
+                orgchartId: res.data.orgchart.id,
+                object:res.data
             })
             this.allDepartments = res.data.departments;
             this.allPositions = res.data.positions;

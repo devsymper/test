@@ -44,6 +44,7 @@
             </v-tab-item>
               <v-tab-item :key="'tableSideBySideView'" class="px-2 pt-2 h-100">
                 <div class="h-100 symper-orgchart-table-side-by-side-view">
+                    <!-- <TableSideBySildeView /> -->
                         <VueResizable :width="500" :max-width="600" :min-width="300" :active ="['r']">
                             <AgDataTable
                                 :tableHeight="'calc(100% - 100px)'"

@@ -192,11 +192,15 @@ export const departmentMarkup =
                 <circle class="add"/>
                 <text class="add">+</text>
             </g>
-
+			<g class="btn-collapse-expand">
+				<circle class="collapse-expand-circle"/>
+				<text class="expand-text">+</text>
+			</g>
             <g class="btn remove orgchart-action">
                 <circle class="remove"/>
                 <text class="remove">X</text>
             </g>
+           
         </g>
     </g>`.replace(/\n/g, '').replace(/\s+/g, ' ');
 

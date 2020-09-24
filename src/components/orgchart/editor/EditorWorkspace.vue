@@ -10,7 +10,8 @@
 import JointPaper from "@/components/common/rappid/JointPaper";
 import { createDepartmentNode, defineDepartment, DEFAULT_DEPARTMENT_DISPLAY, FOUCUS_DEPARTMENT_DISPLAY } from "./../nodeDefinition/departmentDefinition";
 import { createPositionNode, definePosition, DEFAULT_POSITION_DISPLAY, FOUCUS_POSITION_DISPLAY } from "./../nodeDefinition/positionDefinition";
-import { SYMPER_HOME_ORGCHART, getDefaultConfigNodeData, jointLinkNode } from './nodeAttrFactory';
+import { SYMPER_HOME_ORGCHART, getDefaultConfigNodeData, jointLinkNode } from './nodeAttrFactory';  
+import shapesDefination from "./shapesDefination.js"
 import avatarDefault from "@/assets/image/avatar_default.jpg";
 require('@/plugins/rappid/rappid.css');
 export default {
@@ -56,7 +57,8 @@ export default {
 			gridSize: 30,
 			drawGrid: {
 				name: 'mesh'
-			}
+            },
+            viewportRect:null,
         }
     },
 	methods: {
@@ -111,6 +113,7 @@ export default {
             let graph = this.$refs.jointPaper.graph;
             let treeLayout = this.$refs.jointPaper.treeLayout;
             let self = this;
+
             paper.on('element:remove', function(elementView, evt, x, y) {
                 evt.stopPropagation();
                 let allChildIds = self.getAllChildIdOfNode(elementView.model.id);
@@ -151,11 +154,7 @@ export default {
                 elementView.model.remove();
                 treeLayout.layout();
             });
-            // event collapsed 
-            // paper.on('element:collapse', function(view, evt) {
-            //     evt.stopPropagation();
-            //     toggleBranch(view.model);
-            // });
+          
 
             paper.on('cell:pointerclick', function(elementView, evt, x, y) {
                 evt.stopPropagation();
@@ -177,10 +176,11 @@ export default {
             paper.on('element:collapse', function(view, evt) {
                 evt.stopPropagation();
                 self.toggleBranch(view.model);
-                treeLayout.layout();
             });
         },
         toggleBranch(root){
+            
+            let self = this
             var shouldHide = !root.isCollapsed();
             root.set({ collapsed: shouldHide });
             this.$refs.jointPaper.graph.getSuccessors(root).forEach(function(successor) {
@@ -189,6 +189,16 @@ export default {
                     collapsed: false
                 });
             });
+            this.layoutAndFocus(self.viewportRect.center());
+        },
+        layoutAndFocus(focusPoint) {
+            let treeLayout = this.$refs.jointPaper.treeLayout;
+            treeLayout.layout();
+            var center = focusPoint || treeLayout.getLayoutBBox().center();
+            resizePaper();
+            debugger
+            paperScroller.center(center.x, center.y);
+            
         },
         getAllElementModel(){
             return this.$refs.jointPaper.graph.getCells();
@@ -286,7 +296,9 @@ export default {
                 }
             }
         },
-        setupGraph(graph, paper, paperScroller){
+        setupGraph(graph, paper, paperScroller,viewportRect){
+            //dung them dong nay 
+            this.viewportRect = viewportRect
             this.graph = graph;
             let self = this;
             let nodeName = this.context == 'department' ? this.$t('orgchart.editor.department') : this.$t('orgchart.editor.position');

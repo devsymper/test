@@ -69,19 +69,38 @@ export default {
 			background: '#ffffff',
             interactive: !this.readonly,
             sorting: joint.dia.Paper.sorting.APPROX,
-            
+            //dung na them 
+            viewport(view) {
+                var model = view.model;
+                // Hide elements and links which are currently collapsed
+                // if (model.isHidden()) return false;
+                // Hide elements and links which are not in the viewport
+                var bbox = model.getBBox();
+                if (model.isLink()) {
+                    // vertical/horizontal links have zero width/height
+                    bbox.inflate(1);
+                }
+                return viewportRect.intersect(bbox);
+            }
         });
         var paperScroller = new joint.ui.PaperScroller({
             paper: this.paper,
             autoResizePaper: true
         });
+        
+        //dung na create 
+        var viewportOverlap = 50;
 
+        var viewportRect = paperScroller.getVisibleArea().inflate(viewportOverlap);
+        paperScroller.el.onscroll = function() {
+            viewportRect = paperScroller.getVisibleArea().inflate(viewportOverlap);
+        };
         paperScroller.$el.css({ width: '100%', height: '100%' }).appendTo(this.$refs.jointWrapper);
         paperScroller.zoom(-0.2);
         paperScroller.centerContent();
         this.paper.on('blank:pointerdown', paperScroller.startPanning);
         this.addToolbar(paperScroller);
-		this.$emit('init', this.graph, this.paper, paperScroller);
+		this.$emit('init', this.graph, this.paper, paperScroller, viewportRect);
 		
     },
     methods: {
