@@ -2,6 +2,8 @@ const defaultState = {
     arrFileAttach: [],
     filter:'notDone',
     arrDocObjId:[],
+    listDocumentObjId:[],
+    listDocumentObjIdWithUserSubmit:[],
     statusPopupTracking:false,
     listTaskInProcessInstance:[],
     listTaskDoneInProcessInstance:[],

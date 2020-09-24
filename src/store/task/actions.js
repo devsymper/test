@@ -37,9 +37,47 @@ const getArrDocObjId = async(context, data) => {
         console.log("Can not get list documentObjId!");
     }
 }
+
+
+const getListDocumentObjId = async(context, data) => {
+    try {
+        let res = await taskApi.getDocumentObjIds({ ids: JSON.stringify(data) });
+        if (res.status == 200) {
+            if (res.data != null) {
+                context.commit('setListDocumentObjId', res.data);
+                console.log("listObjRelated",res.data);
+
+            }
+        } else {
+            context.commit('setListDocumentObjId', []);
+        }
+    } catch (error) {
+        context.commit('setListDocumentObjId', []);
+        console.log("Can not get list documentObjId!");
+    }
+}
+
+const getListDocumentObjIdWithUserSubmit = async(context, data) => {
+    try {
+        let res = await taskApi.getListDocumentWithUserSubmit(data);
+        if (res.status == 200) {
+            if (res.data != null) {
+                context.commit('setListDocumentObjIdWithUserSubmit', res.data);
+                console.log("listObjUserSumbit",res.data);
+            }
+        } else {
+            context.commit('setListDocumentObjIdWithUserSubmit', []);
+        }
+    } catch (error) {
+        context.commit('setListDocumentObjIdWithUserSubmit', []);
+        console.log("Can not get list documentObjIdWithUserSubmit!");
+    }
+}
 export {
     getArrFileAttachment,
     removeFileAttachToStore,
     getArrDocObjId,
+    getListDocumentObjId,
+    getListDocumentObjIdWithUserSubmit
 
 };

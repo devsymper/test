@@ -58,7 +58,21 @@
           @ps-y-reach-end="handleReachEndList"
           :style="{height: listTaskHeight+'px'}"
         >
-   
+            <v-row
+                class="item-task"
+                v-for="(obj, idx) in listAllDocumentObjectId"
+                :key="idx"
+                :style="{
+                    minHeight: '30px'
+                }"
+                :class="{
+                        'd-active':indexObj==idx
+                }"
+              
+                style="border-bottom: 1px solid #eeeeee!important;margin-left:0px!important"
+            >
+            
+            </v-row>
         </VuePerfectScrollbar>
         <v-skeleton-loader v-else ref="skeleton" :type="'table-tbody'" class="mx-auto"></v-skeleton-loader>
         <v-skeleton-loader
@@ -102,30 +116,11 @@ import symperAvatar from "@/components/common/SymperAvatar.vue";
 
 export default {
   computed: {
-    groupAllProcessInstance() {
-        let allPrcess = this.listProrcessInstances;
-        const groups = allPrcess.reduce((groups, work) => {
-            let date;
-            if ( work.startTime) {
-                date = work.startTime.split("T")[0];
-            }else{
-                date = work.endTime.split("T")[0];
-            }
-            if (!groups[date]) {
-            groups[date] = [];
-            }
-            groups[date].push(work);
-            return groups;
-        }, {});
-        // Edit: to add it in the array format instead
-        const groupArrayWork = Object.keys(groups).map(date => {
-            return {
-            date,
-            works: groups[date]
-            };
-        });
-        console.log("addd",groupArrayWork);
-        return groupArrayWork;
+    listAllDocumentObjectId() {
+        let listObjRelated=this.stask.listDocumentObjId;
+        let listObjUserSubmit=this.stask.listDocumentObjIdWithUserSubmit;
+
+        return listObjUserSubmit;
     },
     stask() {
       return this.$store.state.task;
@@ -144,17 +139,16 @@ export default {
     },
     props: {
         compackMode: {
-        type: Boolean,
-        default: false
+            type: Boolean,
+            default: false
         },
         height: {
-        type: String,
-        default: "calc(100vh - 120px)"
-    },
-    // component này có ở chế độ là component con của một component khác hay ko, false nếu component này là view
+            type: String,
+            default: "calc(100vh - 120px)"
+        },
         smallComponentMode: {
-        type: Boolean,
-        default: false
+            type: Boolean,
+            default: false
         },
         filterFromParent: {
             type: Object,
@@ -169,39 +163,40 @@ export default {
             }
         },
         filterTaskAction: {
-        type: String,
-        default: "getList"
+            type: String,
+            default: "getList"
         }
     },
     data: function() {
-    return {
-        index: -1,
-        dataIndex:-1,
-        loadingTaskList: false,
-        loadingMoreTask: false,
-        listTaskHeight: 300,
-        totalTask: 0,
-        selectedTask: {
-            taskInfo: {},
-            idx: -1,
-            originData: null
-        },
-        listProrcessInstances: [],
-        isSmallRow: false,
-        sideBySideMode: false,
-        allFlatTasks: [],
-        myOwnFilter: {
-            size: 100,
-            sort: "startTime",
-            order: "desc",
-            page: 1,
-            assignee: this.$store.state.app.endUserInfo.id
-        },
-        defaultAvatar: appConfigs.defaultAvatar,
-        listIdProcessInstance:[],
-        listTaskDone:[],
-    };
-  },
+        return {
+            index: -1,
+            dataIndex:-1,
+            loadingTaskList: false,
+            loadingMoreTask: false,
+            listTaskHeight: 300,
+            totalTask: 0,
+            selectedTask: {
+                taskInfo: {},
+                idx: -1,
+                originData: null
+            },
+            listProrcessInstances: [],
+            isSmallRow: false,
+            sideBySideMode: false,
+            allFlatTasks: [],
+            myOwnFilter: {
+                size: 100,
+                sort: "startTime",
+                order: "desc",
+                page: 1,
+                assignee: this.$store.state.app.endUserInfo.id
+            },
+            defaultAvatar: appConfigs.defaultAvatar,
+            listIdProcessInstance:[],
+            listTaskDone:[],
+            listDocumentObjectId:[]
+        };
+    },
     created() {
     },
     mounted() {
@@ -316,7 +311,8 @@ export default {
                 }
             }
             self.listIdProrcessInstances=allProcess;
-            await this.getListTaskDoneInArrProcess(self.listIdProrcessInstances);
+            await self.getListTaskDoneInArrProcess(self.listIdProrcessInstances);
+            await self.getListDocumentObjectId(this.$store.state.app.endUserInfo.id);
             self.loadingTaskList = false;
             self.loadingMoreTask = false;
         },
@@ -329,14 +325,24 @@ export default {
                     filter.finished=true;
                     let res = await BPMNEngine.postTaskHistory(filter);
                     if (res.total>0) {
-                        self.listTaskDone.push(res.data);
+                        res.data.forEach(element => {
+                            let description=JSON.parse(element.description);
+                            if (description.action.parameter.documentObjectId &&description.action.parameter.documentObjectId!=null ) {
+                                self.listDocumentObjectId.push(description.action.parameter.documentObjectId);
+                            }
+                        });
                     }
                 }
-                console.log("listTaskDone",self.listTaskDone);
+                this.$store.dispatch("task/getListDocumentObjId", self.listDocumentObjectId);
+                console.log("listObjId",self.listDocumentObjectId);
             } catch (error) {
-                self.listTaskDone=[];
+               // self.listTaskDone=[];
                 self.$snotifyError(error, "Get Process failed");
             }
+        },
+        async getListDocumentObjectId(userId){
+            let self =this;
+            self.$store.dispatch("task/getListDocumentObjIdWithUserSubmit",userId);
         }
     }
 };
