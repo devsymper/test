@@ -84,7 +84,8 @@
         "display": "Hiển thị",
         "of": "của",
         "entries": "bản ghi",
-        "always_show_sidebar": "Luôn hiển thị sidebar"
+        "always_show_sidebar": "Luôn hiển thị sidebar",
+        "import_excel": "Nhập bằng excel"
     },
     "login": {
         "title": "Đăng nhập hệ thống",

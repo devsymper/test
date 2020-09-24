@@ -39,17 +39,31 @@
                             <v-icon left dark>mdi-refresh</v-icon>
                             {{$t('common.refresh')}}
                         </v-btn>
-                        <!-- <v-btn
+                        <v-btn
                             depressed
                             small
+                            @click="exportExcel()"
                             :loading="loadingExportExcel"
                             class="mr-2"
                             :disabled="loadingExportExcel"
-                            v-if="!isCompactMode"
+                            v-if="!isCompactMode && showExportButton"
                         >
                             <v-icon left dark>mdi-microsoft-excel</v-icon>
                             {{$t('common.export_excel')}}
-                        </v-btn> -->
+                        </v-btn>
+
+                        
+                        <v-btn
+                            depressed
+                            small
+                            @click="importExcel()"
+                            class="mr-2"
+                            v-if="showImportButton"
+                        >
+                            <v-icon left dark>mdi-database-import</v-icon>
+                            {{$t('common.import_excel')}}
+                        </v-btn>
+
                         <component
                             :is="'span'"
                         >
@@ -381,6 +395,18 @@ export default {
         this.restoreTableDisplayConfig();
     },
     props: {
+        showImportButton: {
+            type: Boolean,
+            default: true
+        },
+        exportLink: {
+            type: String,
+            default: ''
+        },
+        showExportButton: {
+            type: Boolean,
+            default: true
+        },
         widgetIdentifier: {
             type: String,
             default: ''
@@ -584,6 +610,23 @@ export default {
         }
     },
     methods: {
+        importExcel(){
+            this.$emit('import-excel');
+        },
+        async exportExcel(){
+            let exportUrl = this.exportLink
+            if(!exportUrl){
+                if(this.getDataUrl[this.getDataUrl.length - 1] == '/'){
+                    exportUrl = this.getDataUrl+'export';
+                }else{
+                    exportUrl = this.getDataUrl+'/export';
+                }
+            }
+            
+            this.loadingExportExcel = true;
+            await apiObj.get(exportUrl);
+            this.loadingExportExcel = false;
+        },
         checkShowCreateButton(){
             let rsl = !this.isCompactMode;
             let objectType = this.commonActionProps.resource;
@@ -927,6 +970,17 @@ export default {
             }
             this.prepareFilterAndCallApi(columns , cache , applyFilter, handler);
         },
+        getOptionForGetList(configs, columns){
+            return {
+                filter: this.getFilterConfigs(configs.getDataMode),
+                sort: this.getSortConfigs(),
+                search: this.searchKey,
+                page: this.page,
+                pageSize: configs.pageSize ? configs.pageSize : this.pageSize,
+                columns: columns ? columns : [],
+                distinct: configs.distinct ? configs.distinct : false
+            };
+        },
         /**
          * Lấy ra cấu hình cho việc sort
          */
@@ -936,15 +990,7 @@ export default {
             if (url != "") {
                 let thisCpn = this;
                 thisCpn.loadingData = true;
-                let options = {
-                    filter: this.getFilterConfigs(configs.getDataMode),
-                    sort: this.getSortConfigs(),
-                    search: this.searchKey,
-                    page: this.page,
-                    pageSize: configs.pageSize ? configs.pageSize : this.pageSize,
-                    columns: columns ? columns : [],
-                    distinct: configs.distinct ? configs.distinct : false
-                };
+                let options = this.getOptionForGetList(configs, columns);
                 let header = {};
                 if(thisCpn.$route.name == "deployHistory" || thisCpn.$route.name == "listProcessInstances"){
                     header = {
