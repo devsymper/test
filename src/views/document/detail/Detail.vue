@@ -31,7 +31,7 @@
             :id="'sym-Detail-'+keyInstance"
             :style="{'width':documentSize, 'height':contentHeight,'margin':contentMargin}">
             <div class="content-document" v-html="contentDocument"></div>
-            <div class="content-print-document" v-html="contentPrintDocument"></div>
+            <div class="content-print-document" :style="formSize" v-html="contentPrintDocument"></div>
         </div>
       
         <side-bar-detail 
@@ -142,6 +142,7 @@ export default {
             createTime:"",
             userId:"",
             printConfigActive:null,
+            formSize:{}
 
         };
     },
@@ -251,6 +252,19 @@ export default {
                             $('.content-print-document').removeClass('d-none');
                             $('.content-document').addClass('d-none');
                             thisCpn.contentPrintDocument = content;
+                        }
+                        try {
+                            thisCpn.formSize = JSON.parse(res.data.document.formSize);
+                            if(thisCpn.formSize.type == 'A3'){
+                                $('.content-print-document').css({'transform':'scale(0.84)','transform-origin':'top left'});
+                                $('.sym-form-Detail').css({'width':'auto'});
+                            }
+                            if(thisCpn.formSize.type == 'A5'){
+                                $('.sym-form-Detail').css({'width':'auto'});
+                                $('.content-print-document').css({'transform':'scale(0.84)','transform-origin':'top left','margin':'auto'});
+                            }
+                        } catch (error) {
+                            
                         }
                         thisCpn.$emit('after-load-document',res.data.document)
                         setDataForPropsControl(res.data.fields, thisCpn.keyInstance,'detail'); // ddang chay bat dong bo
