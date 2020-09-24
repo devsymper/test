@@ -1,5 +1,5 @@
 <template>
-    <list-items
+     <list-items
         ref="listUser"
         @after-open-add-panel="addUser"
         :headerPrefixKeypath="'user'"
@@ -8,11 +8,9 @@
         :tableContextMenu="tableContextMenu"
         :containerHeight="containerHeight"
         :customAPIResult="customAPIResult"
-        :actionPanelType="'elastic'"
         :getDataUrl="getListUrl+'users?page=1&pageSize=50'"
         :actionPanelWidth="actionPanelWidth"
-        :commonActionProps="commonActionProps"
-    >
+        :commonActionProps="commonActionProps">
         <div slot="right-panel-content" class="h-100">
             <action-panel
             ref="panel"
@@ -22,6 +20,7 @@
             :actionType="actionType"
             :isSettingPasswordView="isSettingPasswordView"
             />
+           
         </div>
     </list-items>
 </template>
@@ -139,7 +138,7 @@ export default {
             this.$refs.panel.setUser(user);
         },
        deleteUser(user){
-           this.$refs.panel.deleteUser(user[0].id);
+           this.$refs.panel.deleteUser(user);
 
        },
         setNewUserItem(user){
