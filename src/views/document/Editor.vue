@@ -175,14 +175,15 @@ export default {
             ],
             contextmenu: 'inserttable table | settingtable | dragTable',
             toolbar:
-            'undo redo | fontselect fontsizeselect formatselect | bold italic forecolor backcolor | \
+            'undo redo | fontselect fontsizeselect formatselect pageSize| bold italic forecolor backcolor | \
             alignleft aligncenter alignright alignjustify | \
-            bullist numlist indent hr | removeformat  table |  preview margin',
+            bullist numlist indent hr | removeformat  table |  preview margin rotatePage',
             fontsize_formats: '8px 10px 11px 12px 13px 14px 15px 16px 17px 18px 19px 20px 21px 22px 23px 24px 25px 26px 27px 28px 29px 30px 32px 34px 36px',
             font_formats: 'Roboto=Roboto,sans-serif; Andale Mono=andale mono,times;'+ 'Arial=arial,helvetica,sans-serif;'+ 'Arial Black=arial black,avant garde;'+ 'Book Antiqua=book antiqua,palatino;'+ 'Comic Sans MS=comic sans ms,sans-serif;'+ 'Courier New=courier new,courier;'+ 'Georgia=georgia,palatino;'+ 'Helvetica=helvetica;'+ 'Impact=impact,chicago;'+ 'Symbol=symbol;'+ 'Tahoma=tahoma,arial,helvetica,sans-serif;'+ 'Terminal=terminal,monaco;'+ 'Times New Roman=times new roman,times,serif;'+ 'Trebuchet MS=trebuchet ms,geneva;'+ 'Verdana=verdana,geneva;'+ 'Webdings=webdings;'+ 'Wingdings=wingdings,zapf dingbats',
             valid_elements: '*[*]',
             content_css:['https://cdn.jsdelivr.net/npm/@mdi/font@latest/css/materialdesignicons.min.css'],
             setup: function(ed){
+                var toggleState = false;
                 ed.ui.registry.addMenuItem('settingtable', {
                     text: 'Setting table',
                     disabled : false,
@@ -196,6 +197,39 @@ export default {
                         
                     }
                 });
+                if(self.$route.name == 'printConfigDocument'){
+                    ed.ui.registry.addMenuButton('pageSize', {
+                        text: 'Kích thước',
+                        fetch: function (callback) {
+                            var items = [
+                                {
+                                    type: 'menuitem',
+                                    text: 'A3',
+                                    onAction: function () {
+                                        self.setPageSize('29.7cm','42cm','A3')
+                                    }
+                                },
+                                {
+                                    type: 'menuitem',
+                                    text: 'A4',
+                                    onAction: function () {
+                                        self.setPageSize('21cm','29.7cm','A4')
+                                    }
+                                },
+                                {
+                                    type: 'menuitem',
+                                    text: 'A5',
+                                    onAction: function () {
+                                        self.setPageSize('14.8cm','21cm','A5')
+                                    }
+                                },
+                                
+                            
+                            ];
+                            callback(items);
+                        }
+                    });
+                }
                 ed.ui.registry.addMenuItem('dragTable', {
                     text: 'Drag table',
                     disabled : false,
@@ -210,6 +244,13 @@ export default {
                 tooltip:'Margin',
                     onAction: function (_) {
                         self.showPaddingPageConfig(ed);
+                    }
+                }); 
+                ed.ui.registry.addButton('rotatePage', {
+                icon:'rotate',
+                tooltip:'Xoay',
+                    onAction: function (_) {
+                        self.rotatePage(ed);
                     }
                 }); 
                 for(let i = 0;i < self.listIconToolbar.length;i++){
@@ -285,6 +326,7 @@ export default {
             isConfigPrint:false,
             listDocument:[],
             inputSaveControlTemplate:{},
+            sizePrint:{}
 
         }
     },
@@ -1070,7 +1112,26 @@ export default {
                 }
             })
         },
-       
+
+        /**
+         * Hàm xoay trang
+         */
+        rotatePage(){
+            let h = $('#document-editor-'+this.keyInstance+'_ifr').width();
+            let w = $('#document-editor-'+this.keyInstance+'_ifr').height();
+            $('#document-editor-'+this.keyInstance+'_ifr').css({width:w ,height:h});
+            $('.tox-sidebar-wrap').css({width:w ,height:h});
+            this.sizePrint.width = w;
+            this.sizePrint.height = h;
+        },
+        /**
+         * Hàm đặt kích thước cho trang A3 A4 A5
+         */
+        setPageSize(w,h,type){
+            $('#document-editor-'+this.keyInstance+'_ifr').css({width:w ,height:h});
+            $('.tox-sidebar-wrap').css({width:w ,height:h});
+            this.sizePrint = {width:w ,height:h,type:type};
+        },
         
         //hoangnd: hàm mở modal tablesetting của control table
         showSettingControlTable(e) {
@@ -1607,6 +1668,7 @@ export default {
         },
         // sự kiện xảy ra khi khởi tạo xong editor , sự kiện do tinymce cung cấp
         initEditor(){
+            // $('.sym-document-editor .tox .tox-edit-area').css({'overflow':'auto'})
             let thisCpn = this;
             if(this.documentId != 0 && this.documentId != undefined)    // trường họp edit doc thì gọi api lấy dữ liệu
             thisCpn.getContentDocument();
@@ -2244,7 +2306,8 @@ export default {
         // mở modal lưu , edit doc
         saveFormPrint(docProps){
             if(this.printConfigId != 0 && this.printConfigId != undefined && this.printConfigId != null){
-                let dataPost = {documentId:this.documentId,title:docProps.title.value,content:this.editorCore.getContent(),printConfigId:this.printConfigId}
+                let dataPost = {documentId:this.documentId,title:docProps.title.value,
+                                content:this.editorCore.getContent(),printConfigId:this.printConfigId, size:JSON.stringify(this.sizePrint)}
                 let thisCpn = this;
                 documentApi.updatePrintConfig(dataPost).then(res => {
                     if (res.status == 200) {
@@ -2273,7 +2336,7 @@ export default {
                 });
             }
             else{
-                let dataPost = {documentId:this.documentId,title:docProps.title.value,content:this.editorCore.getContent()}
+                let dataPost = {documentId:this.documentId,title:docProps.title.value,content:this.editorCore.getContent(),size:JSON.stringify(this.sizePrint)}
                 let thisCpn = this;
                 documentApi.savePrintConfig(dataPost).then(res => {
                     if (res.status == 200) {
@@ -2356,7 +2419,7 @@ export default {
         margin: auto;
     }
     .sym-document-editor .tox-tinymce{
-        height: 100% !important;
+        height: calc(100% - 10px) !important;
     }
     .container {
         padding: 0;
@@ -2401,8 +2464,10 @@ export default {
             80px 80px,
             80px 80px;
     }
+    .sym-document-editor .tox .tox-edit-area{
+        overflow: auto;
+    }
     /* end editor */
-
     /* end body */
 
     
