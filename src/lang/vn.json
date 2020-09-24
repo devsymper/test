@@ -83,7 +83,8 @@
         "print": "In",
         "display": "Hiển thị",
         "of": "của",
-        "entries": "bản ghi"
+        "entries": "bản ghi",
+        "always_show_sidebar": "Luôn hiển thị sidebar"
     },
     "login": {
         "title": "Đăng nhập hệ thống",
@@ -118,6 +119,9 @@
         },
         "error": {
             "cannot_get_data": "Không thể lấy dữ liệu từ máy chủ"
+        },
+        "success": {
+            "save_config": "Lưu cấu hình hiển thị thành công!"
         },
         "filter": {
             "none": "Không chọn",
@@ -899,18 +903,18 @@
             "unsubscribe": "Bỏ theo dõi"
         }
     },
-    "myItem":{
-        "objType":"Loại đối tượng",
-        "filterObj":"Bộ lọc",
-        "today":"Hôm nay",
-        "header":"Danh sách work",
-        "headerDoc":"Danh sách document",
-        "work":{
-            "parentWork":"Parent work",
-            "siblingWork":"Sibling work",
-            "subWork":"Sub work"
+    "myItem": {
+        "objType": "Loại đối tượng",
+        "filterObj": "Bộ lọc",
+        "today": "Hôm nay",
+        "header": "Danh sách work",
+        "headerDoc": "Danh sách document",
+        "work": {
+            "parentWork": "Parent work",
+            "siblingWork": "Sibling work",
+            "subWork": "Sub work"
         }
-        
+
     },
     "tasks": {
         "error": {

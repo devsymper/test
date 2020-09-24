@@ -14,12 +14,17 @@
                     @click="tableDisplayConfig.show = false"
                 >mdi-close</v-icon>
             </div>
+            
+            <div class="pb-2 justify-space-between d-flex mt-2">
+                <div class="subtitle-2">{{$t('common.always_show_sidebar')}}</div>
+                <v-switch style="height: 25px" v-model="tableDisplayConfig.value.alwaysShowSidebar" class="float-right pt-0 mt-0" ></v-switch>
+            </div>
             <div class="pb-2">
                 <div class="subtitle-2">{{$t('table.wrap_text_mode')}}</div>
                 <div>
                     <v-btn-toggle
                         dense
-                        v-model="tableDisplayConfig.wrapTextMode"
+                        v-model="tableDisplayConfig.value.wrapTextMode"
                         mandatory
                         tile
                         color="amber darken-4"
@@ -35,7 +40,7 @@
                 <div>
                     <v-btn-toggle
                         dense
-                        v-model="tableDisplayConfig.densityMode"
+                        v-model="tableDisplayConfig.value.densityMode"
                         mandatory
                         tile
                         color="amber darken-4"
@@ -171,13 +176,16 @@ export default {
         }
     },
     methods: {
+        saveTableDisplayConfig(){
+            this.$emit('save-list-display-config');
+        },
         resetTableColumnsData(){
             // this.tableColumnsClone = util.cloneDeep(this.tableColumns);
         },
         handleStopDragColumn(){
             this.$emit('drag-columns-stopped', this.tableColumnsClone);
         },
-        configColumnDisplay(type,idx){
+        configColumnDisplay(type, column, idx){
             this.$emit('change-colmn-display-config',type,idx);
         },
         getDataTypeIcon(type) {

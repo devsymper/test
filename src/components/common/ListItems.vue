@@ -75,10 +75,10 @@
                 <v-col
                     :class="{
                             'fs-13 symper-custom-table symper-list-item': true,
-                            'clip-text' : tableDisplayConfig.wrapTextMode == 1,
-                            'loosen-row':  tableDisplayConfig.densityMode == 0,
-                            'medium-row':  tableDisplayConfig.densityMode == 1,
-                            'compact-row':  tableDisplayConfig.densityMode == 2,
+                            'clip-text' : tableDisplayConfig.value.wrapTextMode == 1,
+                            'loosen-row':  tableDisplayConfig.value.densityMode == 0,
+                            'medium-row':  tableDisplayConfig.value.densityMode == 1,
+                            'compact-row':  tableDisplayConfig.value.densityMode == 2,
                         }"
                 >
                     <hot-table
@@ -91,7 +91,7 @@
                         :contextMenu="hotTableContextMenuItems"
                         :colHeaders="colHeaders"
                         :hiddenColumns="{
-                            columns: tableDisplayConfig.hiddenColumns
+                            columns: tableDisplayConfig.value.hiddenColumns
                         }"
                         ref="dataTable"
                         :fixedColumnsLeft="fixedColumnsCount"
@@ -154,6 +154,7 @@
             ref="tableDisplayConfig"
             @drag-columns-stopped="handleStopDragColumn"
             @change-colmn-display-config="configColumnDisplay"
+            @save-list-display-config="saveTableDisplayConfig"
             :tableDisplayConfig="tableDisplayConfig"
             :tableColumns="tableColumns"
             :headerPrefixKeypath="headerPrefixKeypath"
@@ -212,6 +213,9 @@ import SymperDragPanel from "./SymperDragPanel.vue";
 import DisplayConfig from "./../common/listItemComponents/DisplayConfig";
 import Pagination from './../common/Pagination'
 import { actionHelper } from "./../../action/actionHelper";
+import {uiConfigApi} from "./../../api/uiConfig";
+
+
 var apiObj = new Api("");
 var testSelectData = [ ];
 window.tableDropdownClickHandle = function(el, event) {
@@ -242,17 +246,20 @@ export default {
             // các cấu hình cho việc hiển thị và giá trị của panel cấu hình hiển thị của bảng
             tableDisplayConfig: {
                 show: false, // có hiển thị panel cấu hình ko
-                width: 300, // Chiều rộng của panel cấu hình,
-                wrapTextMode: 0,
-                densityMode: 2,
-                hiddenColumns: [],
+                width: 300, // Chiều rộng của panel cấu hình
+                value: {
+                    wrapTextMode: 0,
+                    densityMode: 2,
+                    alwaysShowSidebar: false,
+                    hiddenColumns: [],
+                },
                 dragOptions: {
                     animation: 200,
                     group: "display-column-drag",
                     disabled: false,
                     ghostClass: "ghost-item"
                 },
-                drag: false
+                drag: false,
             },
             fixedColumnsCount: 0, // Số lượng cột fix ở bên trái
             tableColumns: [],
@@ -374,6 +381,10 @@ export default {
         this.restoreTableDisplayConfig();
     },
     props: {
+        widgetIdentifier: {
+            type: String,
+            default: ''
+        },
         debounceRowSelectTime: {
             type: Number,
             default: 100
@@ -759,17 +770,25 @@ export default {
         handleCloseDragPanel() {
             this.actionPanel = false;
         },
-        /**
-         * Lưu lại cấu hình hiển thị của table
-         */
-        saveTableDisplayConfig() {
-            this.savingConfigs = true;
-            let thisCpn = this;
-            let configs = {
-                wrapTextMode: this.tableDisplayConfig.wrapTextMode,
-                densityMode: this.tableDisplayConfig.densityMode,
-                columns: []
+        getWidgetIdentifier(){
+            let widgetIdentifier = '';
+            if(this.widgetIdentifier){
+                widgetIdentifier =  this.widgetIdentifier;
+            }else{
+                widgetIdentifier =  this.$route.path;
+            }
+            widgetIdentifier = widgetIdentifier.replace(/(\/|\?|=)/g,'');
+            return widgetIdentifier;
+        },
+        getTableDisplayConfigData(){
+            let configs = util.cloneDeep(this.tableDisplayConfig.value);
+            configs.columns = [];
+            let rsl = {
+                widgetIdentifier: this.getWidgetIdentifier(),
+                detail: '{}',
             };
+
+
             for (let col of this.tableColumns) {
                 configs.columns.push({
                     data: col.data,
@@ -777,43 +796,58 @@ export default {
                     symperHide: col.symperHide
                 });
             }
-            configs = JSON.stringify(configs);
-            userApi
-                .saveUserViewConfig("showList", this.$route.name, configs)
-                .then(() => {
-                    thisCpn.savingConfigs = false;
-                    thisCpn.$snotify({
-                        type: "success",
-                        title: thisCpn.$t("table.success.save_config")
-                    });
-                })
-                .catch(err => {
-                    console.warn(err, "error when save config");
-                    thisCpn.$snotify({
-                        type: "error",
-                        title: thisCpn.$t("table.error.save_config")
-                    });
+            rsl.detail = JSON.stringify(configs);
+            return rsl;
+        },
+        /**
+         * Lưu lại cấu hình hiển thị của table
+         */
+        saveTableDisplayConfig() {
+            this.savingConfigs = true;
+            let thisCpn = this;
+            let dataToSave = this.getTableDisplayConfigData();
+            uiConfigApi
+            .saveUiConfig(dataToSave)
+            .then(() => {
+                thisCpn.savingConfigs = false;
+                thisCpn.$snotify({
+                    type: "success",
+                    title: thisCpn.$t("table.success.save_config")
                 });
+            })
+            .catch(err => {
+                console.warn(err, "error when save config");
+                thisCpn.$snotify({
+                    type: "error",
+                    title: thisCpn.$t("table.error.save_config")
+                });
+            });
         },
         /**
          * Khôi phục lại cấu hình của hiển thị của table từ dữ liệu được lưu
          */
         restoreTableDisplayConfig() {
-            // userApi.getUserViewConfig(this.$route.name, 'showList').then(()=>{
-            //     this.tableDisplayConfig.wrapTextMode =  savedConfigs.wrapTextMode;
-            //     this.tableDisplayConfig.densityMode =  savedConfigs.densityMode;
-            //     this.savedTableDisplayConfig = savedConfigs.columns;
-            //     if(this.tableColumns.length > 0){
-            //         this.tableColumns = this.getTableColumns(this.tableColumns, true);
-            //         this.handleStopDragColumn();
-            //     }
-            // }).catch((err) => {
-            //     console.warn(err, 'error when get user view config');
-            //     thisCpn.$snotify({
-            //         type: 'error',
-            //         'title': thisCpn.$t('table.error.get_config'),
-            //     });
-            // });
+            let widgetIdentifier = this.getWidgetIdentifier();
+            uiConfigApi.getUiConfig(widgetIdentifier).then((res)=>{
+                if(res.status == 200){
+                    let savedConfigs = JSON.parse(res.data.detail);
+                    this.tableDisplayConfig.value.wrapTextMode =  savedConfigs.wrapTextMode;
+                    this.tableDisplayConfig.value.densityMode =  savedConfigs.densityMode;
+                    this.tableDisplayConfig.value.alwaysShowSidebar =  savedConfigs.alwaysShowSidebar;
+                    
+                    this.savedTableDisplayConfig = savedConfigs.columns;
+                    if(this.tableColumns.length > 0){
+                        this.tableColumns = this.getTableColumns(this.tableColumns, true);
+                        this.handleStopDragColumn();
+                    }
+                }
+            }).catch((err) => {
+                console.warn(err, 'error when get user view config');
+                thisCpn.$snotify({
+                    type: 'error',
+                    'title': thisCpn.$t('table.error.get_config'),
+                });
+            });
         },
         /**
          * Kiểm tra xem một cột trong table có đang áp dụng filter hay ko
@@ -1037,7 +1071,7 @@ export default {
                 newArr.push(Number(el));
                 return newArr;
             }, []);
-            this.$set(this.tableDisplayConfig, "hiddenColumns", hiddenColumns);
+            this.$set(this.tableDisplayConfig.value, "hiddenColumns", hiddenColumns);
         },
         /**
          * Lấy cấu hình các cột của table
@@ -1388,6 +1422,14 @@ i.applied-filter {
 }
 .symper-list-item .ht_clone_left.handsontable table.htCore {
     border-right: 4px solid #f0f0f0;
+}
+
+.symper-list-item .handsontable th:nth-child(2) {
+    border-left-width: 0px !important;
+}
+
+.symper-list-item .ht_clone_top_left_corner thead tr th:nth-last-child(2)  {
+    border-right-width: 0px !important;
 }
 .handsontable td,
 .handsontable th {
