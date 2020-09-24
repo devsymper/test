@@ -5,7 +5,7 @@
         :key="index" 
         :isPrint="true"
         :contentHeight="'100%'"
-        :formId="0" 
+        :formId="(value.formId) ? value.formId : 0" 
         :docObjInfo="{docObjId:value.document_object_id,docSize : '595px'}" 
         @after-loaded-component-detail="afterLoaded"
         />
@@ -23,15 +23,41 @@ export default {
     },
     data(){
         return {
-            listObject:{},
+            listObject:[],
             countComponentDetail:0
         }
     },
+    props:{
+        allObject:{
+            type:Array,
+            default(){
+                return []
+            }
+        },
+        isAlwaysPrint:{
+            type:Boolean,
+            default:true
+        }
+    },
     created(){
+        if(this.$route.params.extraData)
         this.listObject = this.$route.params.extraData.listObject;
     },
+    watch:{
+        allObject:{
+             deep: true,
+            immediate: true,
+            handler(newVl){
+                this.listObject = newVl
+            }
+        }
+    },
     methods:{
+
         afterLoaded(){
+            if(!this.isAlwaysPrint){
+                return;
+            }
             this.countComponentDetail += 1;
             if(this.countComponentDetail == Object.keys(this.listObject).length){
                 setTimeout((self) => {

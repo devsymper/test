@@ -3,9 +3,13 @@
     :id="'autocomplete-control-'+key"
     v-show="isShowAutoComplete" 
     class="card-autocomplete" :style="positionBox">
+        <div class="search-data-input">
+            <input v-model="search" type="text">
+        </div>
         <v-data-table
         :headers="headers"
         :items="dataTable"
+        :search="search"
         disable-pagination
         fixed-header
         hide-default-footer
@@ -25,7 +29,7 @@
         </template>
         <template v-slot:no-results v-if="$parent.$options.name == 'submitDocument'">
             <div>
-                <v-btn text small @click="openSubForm">Thêm</v-btn>
+                <v-btn text small @click="openSubForm">{{$t('common.add')}}</v-btn>
             </div>
         </template>
         </v-data-table>
@@ -49,15 +53,14 @@ export default {
             dataTable: [],
             alias:'',
             curInput:null,
-            isHideHeader:false
+            isHideHeader:false,
+            search: '',
+            inputType:false
         }
     },
-    created(){
-        
-    
-    },
-    
+   
     methods:{
+       
         show(e){
             this.isShowAutoComplete = true;
             this.calculatorPositionBox(e);
@@ -138,8 +141,6 @@ export default {
                 if($(e.curTarget).is('div.select-cell .select-chervon-bottom')){
                     edtos = $(e.curTarget).parent().parent().offset();
                 }
-                console.log(e); 
-                
                 let tbcos = $(e.curTarget).closest('.wrap-table').find('[s-control-type="table"]').offset();
                 this.positionBox = {'top':edtos.top - tbcos.top + $(e.curTarget).height() +'px','left':edtos.left - tbcos.left+'px'};
             }
@@ -157,6 +158,9 @@ export default {
         setAliasControl(aliasControl){
             this.alias = aliasControl;
         },
+        setTypeInput(controlType=false){
+            this.inputType = controlType;
+        },
         handleClickRow(item,fromEnterKey = false){
             this.curInput.off('keydown');
             let value = ""
@@ -166,9 +170,16 @@ export default {
             else if(item.hasOwnProperty('column1')){
                 value = item['column1'];
             }
+            
+            if(!this.inputType){
+                this.dataTable = [];
+                this.hide();
+            }
+            else{
+                value = this.curInput.val()+","+value
+            }
             this.$emit('after-select-row',{value:value,fromEnterKey:fromEnterKey});
-            this.dataTable = []
-            this.hide();
+
         },
         openSubForm(){
             this.hide();
@@ -200,5 +211,18 @@ export default {
         /* display: flex!important; */
         white-space: nowrap;
     }
-
+    .search-data-input{
+        width: 150px;
+        padding: 8px;
+    }
+    .search-data-input input{
+        padding: 0 4px;
+        width: 100%;
+        background: var(--symper-background-default);
+        height: 25px;
+        border-radius: 4px;
+    }
+    .search-data-input input:focus{
+        outline: none;
+    }
 </style>

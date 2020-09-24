@@ -80,7 +80,7 @@ export default {
                     title: this.$t('common.print'),
                     icon : '',
                     action: function(data){
-                        this.$goToPage('/documents/print-multiple',"In",false,true,{listObject:[{document_object_id:data.documentObjectId}]});
+                        this.$goToPage('/documents/print-multiple',"In",false,true,{listObject:[{document_object_id:data.documentObjectId,formId:data.formId}]});
                     }.bind(this)
 
                 },

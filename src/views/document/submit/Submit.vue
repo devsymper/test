@@ -604,7 +604,7 @@ export default {
                             value: e.alias,
                             instance: thisCpn.keyInstance
                         });
-                thisCpn.getDataForAutocomplete(e,'select',e.alias);
+                thisCpn.getDataForAutocomplete(e,e.type,e.alias);
             } catch (error) {
                 
             }
@@ -618,9 +618,9 @@ export default {
             if(thisCpn._inactive == true) return;
             try {
                 if (
+                    !$(evt.target).hasClass("s-control-combobox") &&
                     !$(evt.target).hasClass("s-control-select") &&
-                    !$(evt.target).hasClass("v-data-table") &&
-                    $(evt.target).closest(".v-data-table").length == 0
+                    $(evt.target).closest(".card-autocomplete").length == 0
                 ) {
                     thisCpn.$refs.autocompleteInput.hide();
                     let currentTableInteractive = thisCpn.sDocumentSubmit.currentTableInteractive
@@ -839,7 +839,8 @@ export default {
          */
         getDataForAutocomplete(e,type,aliasControl=""){ 
             let thisCpn = this
-            if(type == 'select'){
+            if(['select','combobox'].includes(type)){
+                this.$refs.autocompleteInput.setTypeInput(type);
                 let dataInput = this.getDataInputFormulas(e.selectFormulasInstance);  
                 e.selectFormulasInstance.handleRunAutoCompleteFormulas(dataInput).then(res=>{
                     thisCpn.setDataForControlAutocomplete(res,aliasControl,e.controlTitle,"",false)

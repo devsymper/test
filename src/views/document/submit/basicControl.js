@@ -593,7 +593,7 @@ export default class BasicControl extends Control {
                 return;
             }
             let formulasInstance = thisObj.controlFormulas.list.instance;
-            SYMPER_APP.$evtBus.$emit('document-submit-select-input', { e: e, selectFormulasInstance: formulasInstance, alias: thisObj.name, controlTitle: thisObj.title })
+            SYMPER_APP.$evtBus.$emit('document-submit-select-input', { e: e, selectFormulasInstance: formulasInstance, alias: thisObj.name, controlTitle: thisObj.title, type: thisObj.type })
         });
     }
 

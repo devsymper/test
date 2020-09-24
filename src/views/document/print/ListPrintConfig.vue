@@ -15,7 +15,7 @@
 
                 </div>
                 <VuePerfectScrollbar>
-                    <Print v-if="formId != 0" :formId="formId" :docObjectId="docObjectId"/>
+                    <PrintView :isAlwaysPrint="false" :allObject="allObject" v-if="formId != 0"/>
                 </VuePerfectScrollbar>
             </div>
         </div>
@@ -30,14 +30,14 @@
 </template>
 
 <script>
-import Print from "./Print";
+import PrintView from "./PrintView";
 import { documentApi } from "./../../../api/Document.js";
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 
 export default {
     components:{
-        Print,
-        VuePerfectScrollbar
+        VuePerfectScrollbar,
+        PrintView
     },
     props:{
         documentId: {
@@ -81,7 +81,8 @@ export default {
             isShow:false,
             docObjectId:0,
             formId:0,
-            listPrintConfig:[]
+            listPrintConfig:[],
+            allObject:{}
         }
     },
     methods:{
@@ -98,6 +99,7 @@ export default {
             $(event.target).siblings().removeClass('active-sb');
             $(event.target).addClass('active-sb');
             this.formId = parseInt(printConfig.formId);
+            this.allObject = [{document_object_id:this.docObjectId,formId:this.formId}]
         }
     }
 }
