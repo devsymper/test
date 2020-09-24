@@ -68,6 +68,7 @@ export default {
             this.$router.push("/myitem");
         },
         handleTaskSubmited(){
+            this.$store.commit("task/setIsStatusSubmit",true);
             this.$router.push('/myitem');
         }
     }

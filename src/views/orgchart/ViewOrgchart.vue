@@ -22,7 +22,22 @@ export default {
     methods: {
         async getOrgchartDetail(){
             let id = this.$route.params.id;
-            let res = await orgchartApi.getOrgchartDetail(id);
+            let res = await orgchartApi.getOrgchartDetail(id)
+            let listUser = []
+            res.data.userInPostion.forEach(function(e){
+                if(listUser.includes(e.userId) == false){
+                    listUser.push(e.userId)
+                }
+            })
+            console.log(listUser);
+            this.$store.commit('orgchart/setAllUserInOrgchart',{
+                orgchartId: res.data.orgchart.id,
+                listUsers: listUser
+            })
+            this.$store.commit('orgchart/setDataOrgchartSideBySide',{
+                 orgchartId: res.data.orgchart.id,
+                   object:res.data
+            })
             this.allDepartments = res.data.departments;
             this.allPositions = res.data.positions;
         }

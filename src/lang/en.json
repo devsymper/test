@@ -84,7 +84,8 @@
         "print": "Print",
         "display": "Display",
         "of": "of",
-        "entries": "Entries"
+        "entries": "Entries",
+        "always_show_sidebar": "Always show sidebar"
     },
     "validate": {
         "required": "Not be empty",
@@ -127,6 +128,9 @@
         },
         "error": {
             "cannot_get_data": "Can not get data from server"
+        },
+        "success": {
+            "save_config": "Save config successfully!"
         },
         "filter": {
             "none": "None",
@@ -773,14 +777,16 @@
         "ascending": "Ascending",
         "descending": "Descending"
     },
-    "myItem":{
-        "objType":"Object type",
-        "today":"Today",
-        "header":"List work",
-        "work":{
-            "parentWork":"Parent work",
-            "siblingWork":"Sibling work",
-            "subWork":"Sub work"
+    "myItem": {
+        "objType": "Object type",
+        "filterObj": "Filter",
+        "today": "Today",
+        "header": "List work",
+        "headerDoc": "List document",
+        "work": {
+            "parentWork": "Parent work",
+            "siblingWork": "Sibling work",
+            "subWork": "Sub work"
         }
     },
     "tasks": {

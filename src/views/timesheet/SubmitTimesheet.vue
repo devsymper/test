@@ -105,7 +105,6 @@ export default {
             }
         },
         load() {
-            //debugger
             const self = this;
             timesheetApi.sendStartEnd({
                     startEnd: this.startEndDate
