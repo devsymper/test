@@ -481,7 +481,7 @@ export default class Table {
                         if (controlUnique != false) {
                             let dataInput = {}
                             dataInput[controlName] = [changes[0][3]]
-                            thisObj.handlerRunFormulasForControlInTable('uniqueDB', controlUnique, dataInput, controlUnique.controlFormulas.uniqueDB);
+                            thisObj.handlerRunFormulasForControlInTable('uniqueDB', controlUnique, dataInput, controlUnique.controlFormulas.uniqueDB.instance);
                         }
                     }
 
@@ -723,7 +723,8 @@ export default class Table {
             let dataInput = {};
             let listInputInDocument = this.getListInputInDocument();
             for (let inputControlName in inputControl) {
-                dataInput[inputControlName] = listInputInDocument[inputControlName].value;
+                if (listInputInDocument.hasOwnProperty('inputControlName'))
+                    dataInput[inputControlName] = listInputInDocument[inputControlName].value;
             }
             return dataInput;
         }
@@ -802,31 +803,35 @@ export default class Table {
             }
             let dataForStore = [];
 
-            await formulasInstance.getDataMultiple(dataPost).then(res => {
-                if (res == undefined || !res.hasOwnProperty('data')) {
-                    return;
-                }
-                if (formulasType == 'formulas') {
-                    let data = res.data;
-                    dataForStore = Object.values(data);
-                    let vls = [];
-                    for (let index = 0; index < listIdRow.length; index++) {
-                        const element = listIdRow[index];
-                        vls.push([index, controlInstance.name, data[element]]);
+            try {
+                await formulasInstance.getDataMultiple(dataPost).then(res => {
+                    if (res == undefined || !res.hasOwnProperty('data')) {
+                        return;
                     }
+                    if (formulasType == 'formulas') {
+                        let data = res.data;
+                        dataForStore = Object.values(data);
+                        let vls = [];
+                        for (let index = 0; index < listIdRow.length; index++) {
+                            const element = listIdRow[index];
+                            vls.push([index, controlInstance.name, data[element]]);
+                        }
 
-                    thisObj.tableInstance.setDataAtRowProp(vls, null, null, 'auto_set');
-                    markBinedField(thisObj.keyInstance, controlInstance.name);
-                    store.commit("document/updateListInputInDocument", {
-                        controlName: controlInstance.name,
-                        key: 'value',
-                        value: dataForStore,
-                        instance: this.keyInstance
-                    });
-                } else {
-                    this.handlerDataAfterRunFormulas(res.data, controlInstance, formulasType);
-                }
-            })
+                        thisObj.tableInstance.setDataAtRowProp(vls, null, null, 'auto_set');
+                        markBinedField(thisObj.keyInstance, controlInstance.name);
+                        store.commit("document/updateListInputInDocument", {
+                            controlName: controlInstance.name,
+                            key: 'value',
+                            value: dataForStore,
+                            instance: this.keyInstance
+                        });
+                    } else {
+                        this.handlerDataAfterRunFormulas(res.data, controlInstance, formulasType);
+                    }
+                })
+            } catch (error) {
+
+            }
 
 
         }
@@ -1321,7 +1326,7 @@ export default class Table {
             rsl.numericFormat = {
                 pattern: ctrl.controlProperties.formatNumber.value
             };
-        } else if (type == 'label' || ctrl.controlProperties.isReadOnly == 1) {
+        } else if (type == 'label') {
             rsl.readOnly = true;
 
         } else if (type == 'time') {
@@ -1331,6 +1336,10 @@ export default class Table {
         } else if (type == 'date') {
             rsl.dateFormat = ctrl.controlProperties.formatDate.value;
             rsl.correctFormat = true;
+        }
+
+        if (ctrl.controlProperties.isReadOnly && ctrl.controlProperties.isReadOnly.value == true) {
+            rsl.readOnly = true;
         }
         rsl.type = Util.toLowerCaseFirstCharacter(supportCellsType[type].replace('Renderer', ''));
 
