@@ -287,6 +287,15 @@ export default {
                         Date.now()
                     );
                 },
+                afterSelection: (row, column, row2, column2, preventScrolling, selectionLayerLevel) => {
+                    if(self.debounceEmitRowSelectEvt){
+                        clearTimeout(self.debounceEmitRowSelectEvt);
+                    }
+                    let time = self.debounceRowSelectTime;
+                    self.debounceEmitRowSelectEvt = setTimeout(() => {
+                        self.$emit('row-selected', self.data[row]);
+                    }, time);
+                },
                 beforeContextMenuSetItems: () => {
                 },
                 beforeOnCellMouseOver: (event, coords, TD, controller) => {
@@ -366,6 +375,10 @@ export default {
         this.restoreTableDisplayConfig();
     },
     props: {
+        debounceRowSelectTime: {
+            type: Number,
+            default: 100
+        },
         currentItemData: {
             type: Object,
             default() {
