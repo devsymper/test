@@ -63,12 +63,8 @@ export default {
             timesheetApi.getListUser({page:1,pageSize: 2000})
             .then(res => {
             if (res.status === 200){
-                debugger
                 self.listUser=res.data.listObject;
                   for(let i = 0; i<self.listUser.length;i++){
-                    debugger 
-                    console.log('ádádád');
-                     console.log(self.listUser[i].userName);
                     self.nameUser.push(self.listUser[i].userName);
                     console.log(self.nameUser);
                 }
@@ -95,10 +91,8 @@ export default {
                 });
         },
         getName(id){
-            debugger
             for(let i = 0; i<this.listUser.length;i++){
                 if(this.listUser[i].id==id){
-                    debugger
                     this.nameUser.push(this.listUser[i].userName);
                     return this.listUser[i].userName;
                 }
@@ -125,9 +119,7 @@ export default {
                         const ranges = self.allColumns.slice(2, self.allColumns.length).map(c => c.colId);
                         const logTimeList = _.groupBy(res.data.listLogTime, 'id');
                         const dateList = _.groupBy(res.data.listLogTime, 'date');
-                        debugger
                         const userName = _.groupBy(res.data.listLogTime, 'account_id');
-                        debugger
                          let nameUser = self.nameUser;
                         //console.log(dateList);
                         const rows = Object.keys(logTimeList).map(k => {

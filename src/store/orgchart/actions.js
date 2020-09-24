@@ -20,5 +20,16 @@ const getAllStyleNode = async(context) => {
         }
     }
 }
+const updateUserInNode = (context,params) =>{
+    let data = context.state.orgChartData[params.orgchartId]
+    params.list = []
+	if(params.nodeType = 'department'){
+        params.data = data.departments.concat(data.positions)
+	}else{
+        params.data =  data.positions
+    }
+    context.commit('updateListChildrenNode', params)
+}
 
-export { getAllStyleNode };
+
+export { getAllStyleNode ,updateUserInNode};

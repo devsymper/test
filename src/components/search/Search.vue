@@ -178,7 +178,6 @@ export default {
 
         },
         setMenu(){
-            debugger
             let menu = [];
             for (let i = 0; i < this.menu.length; i++) {
                 // console.log(this.newSearch[i].group);
@@ -187,7 +186,6 @@ export default {
                     menu.push(this.menu[i].group);
                 }
             };
-            debugger
             this.$store.commit('search/setMenu', menu);
         },
         gotoPage(action, type,id, name) {
@@ -203,7 +201,6 @@ export default {
         },
         //hiển thị tên của thuộc tính
          getValueSearch() {
-        //debugger
             let newVal = this.value;
            // this.debouncedGetAnswer();
             this.searchItems = [];
@@ -233,12 +230,10 @@ export default {
     
                                      returnObjSearch.description = data.note?data.note:'Chưa điền mô tả';
                                 }else if(data.type=='syql'){
-                    debugger
                                     let name = self.getNameSyql(self.getInfoSyql(data.id));
                         
                     
                                      returnObjSearch.displayName = data.lastContent?data.lastContent:"Không có công thức";
-                                   //  debugger
                                      returnObjSearch.nameSql = name.content;
                                      returnObjSearch.objectType = name.objectType;
                                      // lấy api của tên
@@ -303,15 +298,12 @@ export default {
           id =  this.syqlIdInfo;
            let name = this.getInfoSyql(this.syqlIdInfo);
            if(JSON.stringify(name) === '{}'){
-               debugger
             // this.getNameSyql(id);
            }
-            debugger
            return name;
        },
        // lấy API hiển thì nguồn công thức
          getInfoSyql(syqlId){
-             debugger
            const self = this;
            this.syqlIdInfo = syqlId;
            searchApi.getInfoSyql(syqlId)

@@ -11,12 +11,13 @@
                  @first-data-rendered="firstDataRendered"
                  @cell-editing-started="cellEditingStarted"
                  @cell-value-changed="cellValueChanged"
+                 @cell-double-clicked="cellDoubleClick"
                  :rowData="rowDataTable"
                  :treeData="true"
-                :animateRows="true"
-                :groupDefaultExpanded="groupDefaultExpanded"
-                :frameworkComponents="frameworkComponents"
-                :modules="modules"
+                 :animateRows="true"
+                 :groupDefaultExpanded="groupDefaultExpanded"
+                 :frameworkComponents="frameworkComponents"
+                 :modules="modules"
                  :getDataPath="getDataPath"
                  >
     </ag-grid-vue>
@@ -180,6 +181,9 @@ export default {
         cellValueChanged(params){
             this.$emit('on-cell-change',params)
         },
+        cellDoubleClick(params){
+            this.$emit('on-cell-db-click',params)
+        }
         
     },
 }
@@ -198,5 +202,8 @@ export default {
     }
     .like-handson-table >>> .ag-row:hover{
         background-color:unset;
+    }
+    .like-handson-table >>> .ag-cell-wrapper span{
+        margin-left:0px
     }
 </style>

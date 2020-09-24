@@ -236,7 +236,7 @@ export default {
         },
         createApp() {
 			this.updateListItem(this.$store.state.appConfig.listItemSelected)
-            let data = JSON.stringify(this.currentApp);
+			let data = JSON.stringify(this.currentApp);
 			appManagementApi.addApp(data).then(res => {
 				 this.$emit("add-app", res)
 			}).catch(err => {
