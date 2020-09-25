@@ -604,7 +604,11 @@ export default {
                             value: e.alias,
                             instance: thisCpn.keyInstance
                         });
-                thisCpn.getDataForAutocomplete(e,'select',e.alias);
+                thisCpn.$refs.autocompleteInput.setTypeInput(e.type);
+                if(e.type == 'combobox'){
+                    thisCpn.$refs.autocompleteInput.setSingleSelectCombobox(e.isSingleSelect);
+                }
+                thisCpn.getDataForAutocomplete(e,e.type,e.alias);
             } catch (error) {
                 
             }
@@ -618,9 +622,9 @@ export default {
             if(thisCpn._inactive == true) return;
             try {
                 if (
+                    !$(evt.target).hasClass("s-control-combobox") &&
                     !$(evt.target).hasClass("s-control-select") &&
-                    !$(evt.target).hasClass("v-data-table") &&
-                    $(evt.target).closest(".v-data-table").length == 0
+                    $(evt.target).closest(".card-autocomplete").length == 0
                 ) {
                     thisCpn.$refs.autocompleteInput.hide();
                     let currentTableInteractive = thisCpn.sDocumentSubmit.currentTableInteractive
@@ -839,7 +843,7 @@ export default {
          */
         getDataForAutocomplete(e,type,aliasControl=""){ 
             let thisCpn = this
-            if(type == 'select'){
+            if(['select','combobox'].includes(type)){
                 let dataInput = this.getDataInputFormulas(e.selectFormulasInstance);  
                 e.selectFormulasInstance.handleRunAutoCompleteFormulas(dataInput).then(res=>{
                     thisCpn.setDataForControlAutocomplete(res,aliasControl,e.controlTitle,"",false)
@@ -1241,6 +1245,7 @@ export default {
                             if(controlType == 'dataFlow'){
                                 let id = field.properties.dataFlowId.value;
                                 let mapParamsDataflow = field.properties.mapParamsDataflow.value;
+                                $(allInputControl[index]).find('.run-dataflow').removeClass('d-none')
                                 listDataFlow.push({id:id,controlName:controlName,el:$(allInputControl[index]),mapParamsDataflow:mapParamsDataflow});
                             }
                             else{
@@ -1465,7 +1470,7 @@ export default {
         },
         handlerSubmitDocumentClick(isContinueSubmit = false){
             this.isContinueSubmit = isContinueSubmit;
-            if($('.validate-icon').length == 0 && $('.error').length == 0){
+            if($('.wrap-content-submit .validate-icon').length == 0 && $('.wrap-content-submit .error').length == 0){
                 if(this.viewType == 'submit'){
                     this.handleRefreshDataBeforeSubmit();
                 }
@@ -1474,8 +1479,8 @@ export default {
                 }
             }
             else{
-                let controlNotValid = $('.validate-icon');
-                let controlError = $('.error');
+                let controlNotValid = $('.wrap-content-submit .validate-icon');
+                let controlError = $('.wrap-content-submit .error');
                 let listErr = []
                 $.each(controlNotValid,function(k,v){
                     let message = $(v).attr('title');

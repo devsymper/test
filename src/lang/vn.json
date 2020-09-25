@@ -391,6 +391,23 @@
         "Timesheet": "Thời gian biểu"
     },
     "document": {
+        "instance": {
+            "showlist": {
+                "select": "Đã chọn",
+                "record": "Bản ghi",
+                "printRecord": "In bản ghi",
+                "selectPrintConfig": "Chọn mẫu in",
+                "printMultiple": "In nhiều bản ghi",
+                "listPrintConfig": "Danh sách mẫu in",
+                "print": "In nhanh",
+                "copied": "Đã sao chép",
+                "next": "Tiếp theo",
+                "prev": "Trước đó",
+                "copyLink": "Sao chép đường dẫn",
+                "download": "Tải xuống",
+                "info": "Thông tin bản ghi"
+            }
+        },
         "create": "Tạo mới văn bản",
         "edit": "Chỉnh sửa văn bản",
         "title": "Danh sách văn bản",

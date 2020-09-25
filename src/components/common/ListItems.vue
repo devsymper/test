@@ -121,7 +121,7 @@
                 ></Pagination>
             </v-row>
         </div>
-
+    
         <component
             :is="actionPanelWrapper"
             :width="actionPanelWidth"
@@ -334,10 +334,10 @@ export default {
                 },
                 beforeKeyDown:function(change, source){
                     let cellMeta = this.getSelected();
-                    self.$emit('before-keydown',{event:event,row:self.data[cellMeta[0][0]]});
+                    self.$emit('before-keydown',{event:event,cell:{col:cellMeta[0][1],row:cellMeta[0][0]},rowData:self.data[cellMeta[0][0]]});
                 },
                 afterOnCellMouseDown:function(event, coords, TD){
-                    self.$emit('after-cell-mouse-down',{event:event,row:self.data[coords.row]});
+                    self.$emit('after-cell-mouse-down',{event:event,cell:coords,rowData:self.data[coords.row]});
                 }
             },
             tableFilter: {
@@ -1397,7 +1397,7 @@ export default {
         // hoangnd: thêm cột checkbox
         addCheckBoxColumn(){
             this.hasColumnsChecked = true;
-            this.tableColumns.unshift({name:"checkbox_select_item",title:"Chọn",type:"checkbox"});
+            this.tableColumns.unshift({name:"checkbox_select_item",data:"checkbox_select_item",title:"Chọn",type:"checkbox"});
         },
         removeCheckBoxColumn(){
             this.hasColumnsChecked = false;
@@ -1421,8 +1421,10 @@ export default {
                 }else{
                     delete this.allRowChecked[change[0][0]];
                 }
+                this.$emit('after-selected-row',this.allRowChecked)
             }
-        }
+        },
+        
     },
     components: {
         HotTable,

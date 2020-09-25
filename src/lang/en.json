@@ -294,6 +294,24 @@
         }
     },
     "document": {
+
+        "instance": {
+            "showlist": {
+                "select": "Selected",
+                "record": "Record",
+                "printRecord": "Print record",
+                "selectPrintConfig": "Select print config",
+                "printMultiple": "Print Multiple",
+                "listPrintConfig": "List print config",
+                "print": "Print",
+                "copied": "copied",
+                "next": "Next record",
+                "prev": "Previous record",
+                "copyLink": "Copy link",
+                "download": "Download",
+                "info": "Information"
+            }
+        },
         "create": "Create document",
         "edit": "Edit document",
         "title": "List Document",
