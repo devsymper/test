@@ -452,6 +452,7 @@ export default {
 			type:String,
 			default:""
 		}
+	
 	},
 	watch:{
 		isShowSidebar(after){
