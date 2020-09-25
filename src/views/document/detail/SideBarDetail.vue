@@ -138,7 +138,7 @@
 			</div>
 		</VuePerfectScrollbar>
 	</div>
-	<Comment style="height:100%" ref="commentView" :objectIdentifier="documentObjectId" @close-comment="hide" />
+	<Comment v-if="showCommentInDoc" style="height:100%" ref="commentView" :objectIdentifier="documentObjectId" @close-comment="hide" />
 
 	</v-navigation-drawer>
 </template>
@@ -182,6 +182,10 @@ export default {
 			type:Boolean,
 			default:true
 		},
+		showCommentInDoc:{
+			type:Boolean,
+			default:true
+		},
 		userId:{
 			type:String, 
 			default:"0"
@@ -215,14 +219,14 @@ export default {
 			}).always({}).catch({});
 		},
 		workflowId(after){
-			bpmnApi.getDefinitionData(this.workflowId).then(res=>{ 
-                    console.log('resresres',res);
-				}).always({}).catch({});
+			// bpmnApi.getDefinitionData(this.workflowId).then(res=>{ 
+            //         console.log('resresres',res);
+			// 	}).always({}).catch({});
 		},
 		taskId(after){
-			bpmnApi.getATaskInfo(this.taskId).then(res=>{
-                    console.log('resresres',res);
-                }).always({}).catch({});
+			// bpmnApi.getATaskInfo(this.taskId).then(res=>{
+            //         console.log('resresres',res);
+            //     }).always({}).catch({});
 		},
 		createTime(after){
 			this.createdDate = after

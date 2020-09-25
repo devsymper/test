@@ -184,6 +184,10 @@ export default {
         return bpmneApi.get('/deploy-history/lastest-by-model');
     },
     postTaskHistory(filter) {
+        if (filter.assignee) {
+            filter.taskAssignee = filter.assignee;
+            delete filter.assignee;
+        }
         filter= JSON.stringify(filter);
         return bpmneApi.post(appConfigs.apiDomain.bpmne.postTasksHistory , filter, testHeader);
     },

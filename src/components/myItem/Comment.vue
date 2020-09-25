@@ -14,6 +14,9 @@ export default {
 		}
 	},
 	watch:{
+		"objectIdentifier":function(newVl){
+			this.objectIdentifier=newVl
+		}
 	},
 	components:{
 		Comment

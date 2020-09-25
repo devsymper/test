@@ -1,4 +1,5 @@
 <template>
+<div style="width:100%">
     <list-items
         ref="listDocument"
         :getDataUrl="'https://sdocument-management.symper.vn/documents'"   
@@ -15,8 +16,24 @@
             <submit-view ref="submitView" :isQickSubmit="true" :action="'submit'" @submit-document-success="aftersubmitDocument" :docId="documentId"/>
         </div> 
     </list-items>
+      <v-navigation-drawer 
+        v-model="drawerImportExelPanel" 
+        absolute
+        class="d-none d-sm-none d-md-flex"
+        temporary
+        style="height: 100vh"
+        v-bind:class="[showValidate==true?'manage-timesheet-800':'manage-timesheet-500']" 
+        right>
+         <ImportExcelPanel 
+            @cancel="closeImportExcelPanel" 
+            :documentId="documentId" 
+            @showValidate="showValidateComponent"
+            :drawerImportExelPanel="drawerImportExelPanel" />
+    </v-navigation-drawer>
+</div>
 </template>
 <script>
+import ImportExcelPanel from "./../../components/document/ImportExelPanel";
 import { documentApi } from "./../../api/Document.js";
 import ListItems from "./../../components/common/ListItems.vue";
 import ActionPanel from "./../../views/users/ActionPanel.vue";
@@ -25,12 +42,15 @@ import Submit from './submit/Submit'
 import { util } from "./../../plugins/util.js";
 export default {
     components: {
+        ImportExcelPanel: ImportExcelPanel,
         "list-items": ListItems,
         "action-panel": ActionPanel,
         'submit-view':Submit
     },
     data(){
         return {
+            showValidate:false,
+            drawerImportExelPanel: null,
             commonActionProps: {
                 "module": "document",
                 "resource": "document_definition",
@@ -87,7 +107,6 @@ export default {
                         this.$goToPage('/documents/'+document.id+'/objects',"Danh sách bản ghi");
                     },
                 },
-                
                 list_draft: {
                     name: "listDraftObject",
                     text: function() {
@@ -183,6 +202,17 @@ export default {
                         .always(() => {});
                     },
                 },
+                importExcel:{
+                    name: "importExcel",
+                    text: function() {
+                        return " <i class= 'mdi mdi-file-upload-outline' > </i>&nbsp; Import Excel";
+                    },
+                    callback: (document, callback) => {
+                        this.drawerImportExelPanel = true; 
+                        this.documentId = Number(document.id);
+                       // this.documentId = 1729;
+                    },
+                },
             },
         }
     },
@@ -202,6 +232,12 @@ export default {
         
     },
     methods:{
+        closeImportExcelPanel(){
+            this.drawerImportExelPanel = false;
+        },
+        showValidateComponent(data){
+            this.showValidate = data;
+        },
         addDocument(){
             this.$router.push('/document/editor');
         },
@@ -215,3 +251,62 @@ export default {
     }
 }
 </script>
+<style lang="scss" scoped>
+.manage-timesheet-500{
+    width: 470px!important;
+}
+.manage-timesheet-800{
+    width: 800px!important  ;
+}
+.manage-timesheet ::v-deep .v-card {
+    box-shadow: none !important;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.manage-timesheet ::v-deep .v-window {
+    display: flex;
+    flex-direction: column;
+}
+
+.manage-timesheet ::v-deep .v-window__container {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+.fw-500 {
+    font-weight: 500;
+}
+.fw-400{
+    font-weight: 400;
+}
+
+.fw-300 {
+    font-weight: 300;
+}
+.font-normal {
+    font-size: 13px!important;
+    font-family: Roboto!important;
+    font-weight: normal!important;
+}
+.font{
+    font-size: 13px!important;
+    font-family: Roboto!important;
+}
+
+.color-normal {
+    color: #707070
+}
+</style>
+<style>
+.v-list-item__title{
+    font-size:13px!important;
+}
+.v-select__slot{
+    padding-left:7px;
+    font-size:13px!important;
+    font-family: Roboto;
+}
+
+</style>

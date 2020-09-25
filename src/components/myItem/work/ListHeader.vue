@@ -57,7 +57,7 @@
         </v-list>
       </v-menu>
       <!-- Bộ lọc cho  task -->
-      <v-menu
+      <!-- <v-menu
         offset-y
         light
         :close-on-content-click="false"
@@ -74,7 +74,7 @@
         <div>
           <TaskListFilter @filter-change-value="handleChangeFilterValue"></TaskListFilter>
         </div>
-      </v-menu>
+      </v-menu> -->
 
       <!-- Bộ lọc loại đối tượng -->
       <v-menu
@@ -146,7 +146,7 @@
           </div>
           <div class="label pt-2">{{$t("tasks.header.assignee")}}</div>
           <div>
-            <!-- <userSelector
+            <userSelector
               ref="userSelector"
               :isMulti="false"
               :compactChip="true"
@@ -154,7 +154,7 @@
               :textColor="''"
               :flat="true"
               @input="inputAssignee"
-            ></userSelector> -->
+            ></userSelector>
           </div>
           <div class="label pt-2">{{$t("tasks.header.dueDate")}}</div>
           <div>
@@ -201,7 +201,7 @@ import BPMNEngine from "@/api/BPMNEngine";
 import icon from "@/components/common/SymperIcon";
 import datePicker from "@/components/common/datePicker";
 import vClickOutside from "v-click-outside";
-// import userSelector from "./UserSelector";
+import userSelector from "./UserSelector";
 import TaskListFilter from "@/components/tasks/list/TaskListFilter.vue";
 import SymperDocSelect from "@/components/common/symperInputs/SymperDocumentSelect.vue";
 import { defaultTaskDescription } from "@/components/process/elementDefinitions/customExtToModel";
@@ -233,7 +233,7 @@ export default {
   },
   components: {
     icon: icon,
-    // userSelector: userSelector,
+    userSelector: userSelector,
     datePicker: datePicker,
     TaskListFilter: TaskListFilter,
     "symper-document-selec": SymperDocSelect

@@ -1,3 +1,5 @@
+import { param } from "jquery";
+import vueHtml2canvas from "vue-html2canvas";
 import {
 	SYMPER_HOME_ORGCHART
 } from "../../components/orgchart/editor/nodeAttrFactory";
@@ -71,6 +73,33 @@ const updateUserFatherNode = (state, data) => {
 const updateFirstChildNodeId = (state, data) => {
 	state.firstChildNodeId = data
 }
+const deleteNode = (state,params) =>{
+	state.editor[params.instanceKey].splice(state.editor[params.instanceKey].indexOf(state.editor[params.instanceKey][params.id]),1)
+}
+const setAllUserInOrgchart = (state,params) =>{
+	state.allUserInOrgChart[params.orgchartId] = params.listUsers
+}
+const setDataOrgchartSideBySide = (state,params) =>{
+	state.orgChartData[params.orgchartId] = params.object
+}
+const updateListChildrenNode = (state , params) =>{
+	params.data.forEach(e => {
+		if(e.vizParentId == params.vizId){
+			params.list.push(e)
+			e.orgchartId = params.orgchartId
+			e.data = params.data
+			e.list = params.list
+			updateListChildrenNode(state , e)
+			if(typeof(state.listChildrenOfNode[params.orgchartId]) == 'undefined'){
+				state.listChildrenOfNode[params.orgchartId] = [	]
+			}
+			if(state.listChildrenOfNode[params.orgchartId].includes(e) == false){
+				state.listChildrenOfNode[params.orgchartId].push(e)
+			}
+		}
+	});
+}
+
 export {
 	setOrgchartData,
 	setNodeConfig,
@@ -83,5 +112,9 @@ export {
 	updateCurrentChildrenNodeId,
 	updateCurrentFatherNode,
 	updateUserFatherNode,
-	updateFirstChildNodeId
+	updateFirstChildNodeId,
+	deleteNode,
+	setAllUserInOrgchart,
+	setDataOrgchartSideBySide,
+	updateListChildrenNode
 };
