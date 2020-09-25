@@ -5,7 +5,7 @@
              <v-icon @click="changeView" style="position:absolute;top:12px;right:6px;font-size:13px" >mdi-page-previous-outline</v-icon>  
             <div style="margin:20px 0px 0px 8px">
                 <div :class="{'favorite-area': true , 'active': showFavorite == true}" @click="showListFavorite">
-                    <v-icon style="font-size:16px"> mdi-star</v-icon>
+                    <v-icon style="font-size:16px" color="yellow"> mdi-star</v-icon>
                     <span style="font:13px roboto;padding-left:8px">Yêu thích</span>
                 </div>
                  <div  v-for="(item,i) in apps" :key="i" 
@@ -232,6 +232,8 @@ x				}
 			return array
 		},
         changeView(){
+			this.$refs.appDetail.hideContextMenu()
+			debugger
             this.$store.commit('appConfig/changeTypeView')
         },
         hideContextMenu(){
@@ -397,7 +399,6 @@ x				}
             deep: true,
             immediate: true,
             handler(newValue){
-                debugger
             }
         }
     }

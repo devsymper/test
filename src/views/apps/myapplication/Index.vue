@@ -24,16 +24,29 @@ export default {
 				if(!$(e.target).is('.context-menu')){
                     if(self.viewSideBySide == true){
                         if(self.$refs.ViewSideBySideApp){
-                            self.$refs.ViewSideBySideApp.hideContextMenu()		
+                            self.$refs.ViewSideBySideApp.hideContextMenu()
                         }
                     }else{
                         if(self.$refs.ViewDetailsAllApp){
-                            self.$refs.ViewDetailsAllApp.hideContextMenu()		
+                            self.$refs.ViewDetailsAllApp.hideContextMenu()	
                         }
-                        //  self.$refs.ViewDetailsAllApp.hideContextMenu()		
                     }
 				}
 			})
+    },
+    watch:{
+        // viewSideBySide(val){
+        //     if(val == true ){
+        //          if(this.$refs.ViewDetailsAllApp){
+        //                     this.$refs.ViewDetailsAllApp.hideContextMenu()		
+        //         }
+        //     }else{
+        //          if(this.$refs.ViewSideBySideApp){
+        //                     this.$refs.ViewSideBySideApp.hideContextMenu()		
+        //         }
+        //     }
+        //     debugger
+        // }
     }
 }
 </script>
