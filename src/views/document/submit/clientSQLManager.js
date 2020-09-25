@@ -51,9 +51,9 @@ export default class ClientSQLManager {
     static run(keyInstance, sql, isWithoutReturn = false) {
         let db = this.getInstanceDB(keyInstance);
         if (isWithoutReturn) {
-            console.log(sql);
             return db.run(sql);
         } else {
+            debugger
             return db.exec(sql);
         }
     }

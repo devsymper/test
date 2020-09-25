@@ -294,6 +294,19 @@
         }
     },
     "document": {
+
+        "instance": {
+            "showlist": {
+                "select": "Selected",
+                "record": "Record",
+                "printRecord": "Print record",
+                "selectPrintConfig": "Select print config",
+                "printMultiple": "Print Multiple",
+                "listPrintConfig": "List print config",
+                "print": "Print",
+                "copied": "copied"
+            }
+        },
         "create": "Create document",
         "edit": "Edit document",
         "title": "List Document",

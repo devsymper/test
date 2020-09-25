@@ -673,7 +673,7 @@ const controlTypes = {
     },
     dataFlow: {
         icon: "/icon/ic_report.png",
-        html: `<div class="s-control s-control-data-flow" contenteditable="false" title="Data Flow" s-control-type="dataFlow" style="display: inline-block;font-size: 11px;width: 100%;max-width: 100%;position:relative;" >
+        html: `<div class="s-control s-control-data-flow" contenteditable="false" title="Data Flow" s-control-type="dataFlow" >
                     <button class="run-dataflow d-none"><span class="mdi mdi-play-outline"></span></button>
                     <div>
                         <span class="panel-title2" style="background: #f2f2f2;color: gray;height: 30px;font-weight: bold;width: 100%;text-align: center;display: inline-block;line-height: 2.5;">Data Flow</span>

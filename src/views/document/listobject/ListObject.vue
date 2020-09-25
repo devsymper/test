@@ -13,6 +13,8 @@
         @data-get="afterGetData"
         @before-keydown="afterRowSelected"
         @after-cell-mouse-down="afterRowSelected"
+        @after-selected-row="afterSelectedRow"
+        @row-selected="afterCellSelection"
         :commonActionProps="commonActionProps"
         ref="listObject"
     >
@@ -25,7 +27,7 @@
                     <span class="document-title">{{panelDocTitle}}</span>
                 </div>
                 <div class="right-action">
-                    <span class="copyed d-none" transition="scroll-y-reverse-transition">Đã sao chép</span>
+                    <span class="copyed d-none" transition="scroll-y-reverse-transition">{{$t('document.instance.showlist.copied')}}</span>
                     <span @click="addToClipboard($event)" :clipboard="dataClipboard" class="mdi mdi-page-next-outline"></span>
                     <span class="mdi mdi-download-outline"></span>
                     <span @click="showDetailInfoDocument" class="mdi mdi-information-outline"></span>
@@ -36,18 +38,48 @@
             </div>
         </div>
     </list-items>
-        <ListPrintConfig :documentId="docId"
+        <Tablet 
+        :listobject="recordPreview"
+        :listItem="listTabletItem"
         :width="'30cm'" 
         :height="'80%'" 
         :title="`<span class='mdi mdi-printer-settings'></span> &nbsp;Chọn mẫu in`" 
-        :actions="listActionForPrint"
-        class="view-print-config" ref="listPrintView"/>
+        @after-selected-item-tablet="afterSelectedItem"
+        class="view-print-config" ref="listPrintView">
+            <template slot="contentBinding">
+                <PrintView :isAlwaysPrint="false" :allObject="allObjectPrint"/>
+            </template>
+            <template slot="actionBinding">
+                <button v-for="(action,index) in listActionForPrint" :key="index" @click="action.action()">
+                    {{action.title}}
+                </button>
+            </template>
+        </Tablet>
+        <BottomSheet ref="bottomSheetView" class="h-100">
+            <div slot="content" class="sheet-content d-flex">
+                <div class="count-selection">
+                    <span>{{$t('document.instance.showlist.select')}} {{countRecordSelected}} {{$t('document.instance.showlist.record')}}</span>
+                </div>
+                <div class="sheet-action">
+                    <v-btn tile small @click="printSelected" >
+                        <v-icon left>mdi-printer</v-icon> {{$t('document.instance.showlist.printRecord')}}
+                    </v-btn>
+                    <v-btn @click="selectPrintConfig" tile small>
+                        <v-icon left>mdi-printer-pos</v-icon> {{$t('document.instance.showlist.selectPrintConfig')}}
+                    </v-btn>
+                    <v-btn @click="hideBottomSheet" tile small> {{$t('common.close')}}
+                    </v-btn>
+                </div>
+            </div>
+        </BottomSheet>
     </div>
 </template>
 <script>
 import ListItems from "./../../../components/common/ListItems.vue";
+import BottomSheet from './../../../components/common/BottomSheet'
+import PrintView from "./../print/PrintView";
 import ActionPanel from "./../../../views/users/ActionPanel.vue";
-import ListPrintConfig from "./../print/ListPrintConfig";
+import Tablet from "./../../../components/common/Tablet";
 
 import { documentApi } from "./../../../api/Document.js";
 import { util } from "./../../../plugins/util.js";
@@ -57,7 +89,10 @@ export default {
         "list-items": ListItems,
         "detail-object": Detail,
         "action-panel": ActionPanel,
-        ListPrintConfig
+        Tablet,
+        BottomSheet,
+        PrintView
+
     },
     data(){
         return {
@@ -74,13 +109,27 @@ export default {
             actionPanelWidth:800,
             containerHeight: 200,
             dataTable:[],
+            countRecordSelected:0,
+            recordSelected:{},
+            recordPreview:{},
+            curentFormActive:0,
+            listTabletItem:[],
+            currentRowData:{},
+            allObjectPrint:[],
+            totalRecord:0,
             dataClipboard:"",
-            listActionForPrint:{
+            listActionForPrint:{    // data truyền vào cho slot action view table
                 print:{
                     title: this.$t('common.print'),
                     icon : '',
-                    action: function(data){
-                        this.$goToPage('/documents/print-multiple',"In",false,true,{listObject:[{document_object_id:data.documentObjectId,formId:data.formId}]});
+                    action: function(){
+                        let listObj = []
+                        for(let rowId in this.recordPreview){
+                            let rowData = this.recordPreview[rowId];
+                            let item = {document_object_id:rowData.document_object_id,formId:this.curentFormActive};
+                            listObj.push(item);
+                        }
+                        this.$goToPage('/documents/print-multiple',"In",false,true,{listObject:listObj});
                     }.bind(this)
 
                 },
@@ -89,7 +138,7 @@ export default {
             tableContextMenu:{
                 delete: {
                     name:"delete",
-                    text:'Xóa',
+                    text:this.$t('common.delete'),
                     callback: (documentObject, callback) => {
                         let ids = documentObject.reduce((arr,obj)=>{
                             arr.push(obj.document_object_id);
@@ -120,45 +169,33 @@ export default {
                 },
                 detail: {
                     name: "detail",
-                    text: "Xem chi tiết",
+                    text: this.$t('common.detail'),
                     callback: (documentObject, callback) => {
                         this.$goToPage('/documents/objects/'+documentObject.document_object_id,"Danh sách bản ghi");
                     },
                 },
-                print: {
-                    name: "print",
-                    text: "In nhanh",
-                    callback: (documentObject, callback) => {
-                        if(this.$refs.listObject.isShowCheckedRow()){
-                            let listobject = this.$refs.listObject.getAllRowChecked();
-                            this.$goToPage('/documents/print-multiple',"In",false,true,{listObject:listobject});
-                        }
-                        else{
-                            this.$goToPage('/documents/objects/'+documentObject.document_object_id+'/print/',"In");
-                        }
-                    },
-                },
+                
                 list_print: {
                     name: "listPrint",
-                    text: "Danh sách mẫu in",
+                    text: this.$t('document.instance.showlist.listPrintConfig'),
                     callback: (documentObject, callback) => {
                         this.$refs.listPrintView.show();
-                        this.$refs.listPrintView.setDocObjectId(documentObject.document_object_id);
+                        this.recordPreview = {record:{document_object_id:documentObject.document_object_id}}
+                    },
+                },
+                print: {
+                    name: "print",
+                    text: this.$t('document.instance.showlist.print'),
+                    callback: (documentObject, callback) => {
+                        this.$goToPage('/documents/print-multiple',"In",false,true,{listObject:[{document_object_id:documentObject.document_object_id}]});
                     },
                 },
                 show_checkbox: {
                     name: "showCheckBox",
-                    text: "Hiển thị checkbox",
+                    text: this.$t('document.instance.showlist.printMultiple'),
                     callback: (documentObject, callback) => {
-                        if(this.$refs.listObject.isShowCheckedRow()){
-                            this.$refs.listObject.removeCheckBoxColumn();
-                            this.tableContextMenu.show_checkbox.text = "Hiển thị checkbox"
-                        }
-                        else{
-                            this.$refs.listObject.addCheckBoxColumn();
-                            this.tableContextMenu.show_checkbox.text = "Ẩn checkbox"
-                        }
-                        
+                        this.toggleCheckBoxListItem()
+                    
                     },
                 },
                 // detail_in_view: {
@@ -173,7 +210,7 @@ export default {
                 // },
                 update: {
                     name: "edit",
-                    text: "Cập nhật",
+                    text: this.$t('common.update'),
                     callback: (documentObject, callback) => {
                         this.$goToPage('/document/objects/update/'+documentObject.document_object_id,"Cập nhật");
                     },
@@ -181,25 +218,24 @@ export default {
             },
         }
     },
-    computed:{
-      
-    },
     mounted() {
         this.calcContainerHeight();
     },
     created(){
         let thisCpn = this;
-        this.$evtBus.$on('change-user-locale',(locale)=>{
-            
-        });
+        documentApi.getListPrintConfig(this.docId).then(res=>{
+            thisCpn.listTabletItem = res.data.listObject;
+            thisCpn.listTabletItem[0].activeSb = true;
+        }).catch(err => {}).always(() => {});
     },
-    watch:{
-        
+    activated(){
+        if(this.$refs.listObject.isShowCheckedRow()){
+            this.showBottomSheet();
+        }
     },
     methods:{
         afterGetData(data){
             this.dataTable = data
-            console.log("dsdasd",data);
         },
         nextRecord(){
             if(this.dataTable.length > this.currentDocObjectActiveIndex+1){
@@ -266,8 +302,12 @@ export default {
             inp.remove();
         },
         afterRowSelected(data){
-            let documentObject = data.row;
+            let documentObject = data.rowData;
+            let cell = data.cell;
             let event = data.event;
+            if(cell.col == 0 && this.$refs.listObject.isShowCheckedRow()){
+                return;
+            }
             if(['ArrowDown','ArrowUp'].includes(event.key) || event.buttons == 1){
                 if(this.docObjInfo.docObjId == parseInt(documentObject.document_object_id)){
                     return
@@ -278,6 +318,63 @@ export default {
                 this.docObjInfo = {docObjId:parseInt(documentObject.document_object_id),docSize:'21cm'}
             }
            
+        },
+        /**
+         * Hàm gọi sang compon bottom sheet để hiển thị
+         */
+        showBottomSheet(){
+            this.$refs.bottomSheetView.toggle();
+        },
+        hideBottomSheet(){
+            this.$refs.bottomSheetView.toggle();
+            this.$refs.listObject.removeCheckBoxColumn();
+        },
+        /**
+         * Hàm hiển thị cột checkbox trong compon listItem
+         */
+        toggleCheckBoxListItem(){
+            if(!this.$refs.listObject.isShowCheckedRow()){
+                this.showBottomSheet();
+                this.$refs.listObject.addCheckBoxColumn();
+            }
+        },
+        afterSelectedRow(dataSelected){
+            this.countRecordSelected = Object.keys(dataSelected).length;
+            this.recordSelected = dataSelected; 
+        },
+        /**
+         * Ấn để in các bản ghi đã chọn
+         */
+        printSelected(){
+            if(Object.keys(this.recordSelected).length == 0){
+                this.$snotify({
+                            type: "info",
+                            title: "Vui lòng chọn bản ghi để in"
+                        }); 
+                return;
+            }
+            this.$goToPage('/documents/print-multiple',"In",false,true,{listObject:this.recordSelected});
+        },
+        // chọn mẫu trước khi in
+        selectPrintConfig(){
+            this.$refs.listPrintView.show();
+            this.recordPreview = this.recordSelected
+
+        },
+        /**
+         * xử lí sau khi click vào 1 item bên sidebar của view table
+         */
+        afterSelectedItem(item){
+            if(item){
+                this.curentFormActive = parseInt(item.formId);
+                this.allObjectPrint = [{document_object_id:parseInt(this.currentRowData.document_object_id),formId:parseInt(item.formId)}]
+            }
+        },
+        /**
+         * Sự kiện khi selection vào cell
+         */
+        afterCellSelection(rowData){
+            this.currentRowData = rowData;
         }
     }
 }
@@ -320,6 +417,22 @@ export default {
         margin-right: 12px;
         font-size: 12px;
     }
+    .sheet-action{
+        margin-left: auto;
+    }
     
+    .sheet-action >>> button{
+        margin: 6px 8px !important;
+        border-radius: 4px;
+        box-shadow: none;
+    }
+    .sheet-action >>> button:last-child{
+        color: red;
+    }
+    .count-selection span{
+        display: inline-block;
+        padding: 12px;
+        height: 100%;
+    }
 
 </style>

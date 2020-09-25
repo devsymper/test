@@ -45,7 +45,7 @@ export default {
     },
     watch:{
         allObject:{
-             deep: true,
+            deep: true,
             immediate: true,
             handler(newVl){
                 this.listObject = newVl

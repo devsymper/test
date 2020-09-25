@@ -1242,6 +1242,7 @@ export default {
                             if(controlType == 'dataFlow'){
                                 let id = field.properties.dataFlowId.value;
                                 let mapParamsDataflow = field.properties.mapParamsDataflow.value;
+                                $(allInputControl[index]).find('.run-dataflow').removeClass('d-none')
                                 listDataFlow.push({id:id,controlName:controlName,el:$(allInputControl[index]),mapParamsDataflow:mapParamsDataflow});
                             }
                             else{
