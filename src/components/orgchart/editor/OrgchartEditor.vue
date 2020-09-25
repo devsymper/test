@@ -886,7 +886,6 @@ export default {
                 instanceKey: this.instanceKey,
                 nodeId: nodeId,
             });
-         
             this.$refs.editorWorkspace.highlightNode(); 
             if(this.context == 'position'){
                 this.showPermissionsOfNode();
