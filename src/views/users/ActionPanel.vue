@@ -15,36 +15,75 @@
 					<v-stepper-step class="fs-13 font-normal" editable step="1">
 						{{ $t('user.general.title')}}
 					</v-stepper-step>
-					<!-- <v-stepper-step :editable="editStep" @click="loadPermission()" step="2">{{ $t('user.permission.title')}}</v-stepper-step> -->
+					<v-stepper-step :editable="editStep" @click="loadPermission()" step="2">{{ $t('user.permission.title')}}</v-stepper-step>
 				</v-stepper-header>
 				<v-stepper-items class="stepper-items">
 					<v-stepper-content step="1">
 					<h4>{{ $t('user.general.personalInfo.title')}}</h4>
-						<v-row style=" height: 84px">
-						<v-col cols="3" class="mt-1">
-							<div >
-								<v-subheader class="font-normal">{{ $t('user.general.personalInfo.userName')}}</v-subheader>
-							</div>
-							<div >
-								<v-subheader class="font-normal">{{ $t('user.general.personalInfo.email')}}</v-subheader>
-							</div>
-						</v-col>
-						<v-col cols="6" class="mt-2">
+					<v-row class="mt-1" >
+						<!-- thong tin -->
+						<v-col cols="8">
 							<v-row>
-								<v-col  cols="9">
+								<v-col cols="6">
+									<span class="fs-13 st-icon-pandora">
+												Họ & đệm
+									</span>
+								</v-col>
+								<v-col  cols="6">
+									<span class="fs-13 st-icon-pandora">
+												{{ $t('user.general.personalInfo.firstName')}}
+											</span>
+								</v-col>
+							</v-row>
+							<v-row>
+								<v-col cols="6">
 									<v-text-field
-									class="fs-13"
+										outlined	
+										class="fs-13 font-normal"
+										v-model="user.lastName"
+										dense
+									></v-text-field>
+								</v-col>
+								<v-col cols="6" >
+									<v-text-field
+										outlined	
+										class="fs-13 font-normal"
+										v-model="user.firstName"
+										dense
+									></v-text-field>
+								</v-col>	
+							</v-row>
+							<v-row>
+								<v-col >
+									<span class="fs-13 st-icon-pandora">
+										{{ $t('user.general.personalInfo.displayName')}}
+									</span>
+								</v-col>
+							</v-row>
+							<v-row >
+								<v-col cols="12">
+									<v-text-field
+										outlined	
+										class="fs-13"
 										ref="userName"
 										required
 										:rules="[rules.required]"
 										v-model="user.userName"
 										dense
 									></v-text-field>
+							</v-col>
+						</v-row>
+							<v-row>
+								<v-col >
+									<span class="fs-13 st-icon-pandora">
+										{{ $t('user.general.personalInfo.email')}}
+									</span>
 								</v-col>
 							</v-row>
-							<v-row>
-								<v-col cols="9">
+							<v-row >
+								<v-col cols="12">
 									<v-text-field
+									outlined	
 									class="fs-13"
 									ref="email"
 									v-model="user.email"
@@ -53,77 +92,53 @@
 									></v-text-field>
 								</v-col>
 							</v-row>
-						</v-col>
-						<v-col cols="3" class="text-center ">
-                              <v-avatar :size="80" v-if="actionType == 'edit' ">
-                                <img v-if="avatarUrl != ''"
-                                    :src="avatarUrl"
-                                >
-								<img v-if="avatarUrl== ''"
-                                    :src="require('./../../assets/image/avatar_default.jpg')"
-                                >
-                            </v-avatar>
-								<v-avatar :size="80" v-else>
-                                <img
-                                    :src="require('./../../assets/image/avatar_default.jpg')"
-                                >
-                            </v-avatar>
-                            <UploadFile 
-								style="margin-top:-30px"
-                                ref="uploadAvatar"
-                                :autoUpload="false"
-                                :fileName="avatarFileName"
-                                @uploaded-file="handleAvatarUploaded"
-                                @selected-file="handleAvatarSelected" />
-						</v-col>
+							<v-row>
+								<v-col >
+									<span class="fs-13 st-icon-pandora">
+										{{ $t('user.general.personalInfo.phoneNumber')}}
+									</span>
+								</v-col>
+							</v-row>	
+							<v-row>
+								<v-col cols="12">
+									<v-text-field
+										outlined
+										class="fs-13"
+										v-model="user.phone"
+										dense
+									></v-text-field>
+								</v-col>
 						</v-row>
-						<v-row class="mt-5" >
-							<v-col cols="3" style="margin-top:-5px">
-								<v-subheader class="font-normal">{{ $t('user.general.personalInfo.firstName')}}</v-subheader>
-							</v-col>
-							<v-col cols="3" >
-								<v-text-field 
-								class="fs-13 font-normal"
+						</v-col>
+						<!-- kt thong tin -->
+						<!-- ảnh -->
+						<v-col cols="4">
+								<v-col cols="3" class="text-center ">
+								<v-avatar :size="80" v-if="actionType == 'edit' ">
+									<img v-if="avatarUrl != ''"
+										:src="avatarUrl"
+									>
+									<img v-if="avatarUrl== ''"
+										:src="require('./../../assets/image/avatar_default.jpg')"
+									>
+								</v-avatar>
+									<v-avatar :size="80" v-else>
+									<img
+										:src="require('./../../assets/image/avatar_default.jpg')"
+									>
+								</v-avatar>
+								<UploadFile 
+									style="margin-top:-30px; margin-left:50px"
+									ref="uploadAvatar"
 								
-								v-model="user.firstName"
-								dense
-								></v-text-field>
+									:autoUpload="false"
+									:fileName="avatarFileName"
+									@uploaded-file="handleAvatarUploaded"
+									@selected-file="handleAvatarSelected" />
 							</v-col>
-							<v-col cols="2 text-center">
-								<v-subheader class="lb-last-name font-normal">{{ $t('user.general.personalInfo.lastName')}}</v-subheader>
-							</v-col>	
-							<v-col cols="4">
-								<v-text-field
-								class="fs-13 font-normal"
-								v-model="user.lastName"
-								dense
-								></v-text-field>
-							</v-col>
-						</v-row>
-						<v-row>
-						<v-col cols="3" style="margin-top:-5px">
-								<v-subheader class="fs-13 font-normal">{{ $t('user.general.personalInfo.displayName')}}</v-subheader>
-							</v-col>
-							<v-col cols="9">
-								<v-text-field
-								class="fs-13 font-normal"
-									v-model="user.displayName"
-									dense
-								></v-text-field>
-							</v-col>
-						</v-row>
-						<v-row>
-							<v-col cols="3" style="margin-top:-5px">
-								<v-subheader class="fs-13 font-normal">{{ $t('user.general.personalInfo.phoneNumber')}}</v-subheader>
-							</v-col>
-							<v-col cols="9">
-								<v-text-field
-								class="fs-13"
-								v-model="user.phone"
-								dense
-								></v-text-field>
-							</v-col>
-						</v-row>
+						</v-col>	
+						<!-- ket thuc anh -->
+					</v-row>
 						<div v-if="actionType == 'edit'">
 							<v-checkbox dense 
 								class="sym-small-size" 
