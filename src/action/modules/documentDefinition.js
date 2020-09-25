@@ -29,7 +29,7 @@ export default [{
         "action": "submit",
         "handler": function(param) {
             let tabName = param.title ? param.title : (param.name ? param.name : '');
-            tabName = this.$t('document.submit') + ' ' + tabName;
+            tabName = this.$t('document.submit.title') + ' ' + tabName;
             let url = this.$getActionLink(param);
             this.$goToPage(url, tabName);
         },
