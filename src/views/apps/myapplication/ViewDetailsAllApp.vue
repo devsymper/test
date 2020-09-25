@@ -33,9 +33,12 @@
                 <v-row v-else no-gutters>
                     <template v-for="(item,i) in apps" >
                         <v-col cols="6" :key="i">
+               
+                    <template v-else  >
                         <v-expansion-panels
                              v-model="panel"
                             multiple
+                            style="display:flex"
                         >
                             <v-expansion-panel
                             >
@@ -98,10 +101,77 @@
                                  </v-row>
                             </v-expansion-panel-content>
                             </v-expansion-panel>
+                                <div
+                                     v-for="(item,i) in apps"
+                                    :key="i"
+                                    style="width:50%"
+                                >
+                                     <v-expansion-panel
+                                      
+                                    >
+                                    <v-expansion-panel-header>
+                                    <div class="app-title">
+                                            <v-icon v-if="item.iconType == 'icon'" style="font-size:16px;flex:unset;margin-left:0px;margin-right:0px;padding-top:2px">{{item.iconName}}</v-icon>
+                                            <img v-else-if="item.iconType == 'img'" :src="item.iconName" class="app-item-img"/>
+                                            <span style="padding-left:8px">
+                                                {{item.name}}
+                                            </span>
+                                    </div>
+                                        </v-expansion-panel-header>
+                                    <v-expansion-panel-content>
+                                        <!-- chi tiet tung app  -->
+                                        <v-row no-gutters>
+                                            <template v-for="(childItem,n) in item.childrenAppReduce">
+                                                <v-col cols="6" :key="n">
+                                                    <div style="margin-left:-5px">
+                                                        <div style="margin-bottom:6px">
+                                                            <v-icon>{{ childItem.icon }}</v-icon>
+                                                            <span style="font-weight:200;font:13px;">
+                                                                {{ childItem.title  ? childItem.title : childItem.name}}
+                                                            </span>
+                                                        </div>
+                                                        <div>
+                                                            <ul v-for="(subChildItem,k) in childItem.item" :key="k"  class="app-child-item">
+                                                                    <li
+                                                                        v-if="subChildItem.show == true"
+                                                                        v-on:contextmenu="rightClickHandler($event,subChildItem,childItem.name)"
+                                                                    >
+                                                                        <div style="position:relative">
+                                                                            <v-tooltip bottom v-if="childItem.name == 'document_definition'">
+                                                                                <template v-slot:activator="{ on, attrs }">
+                                                                                    <div class="title-document-enduser" 	
+                                                                                        v-bind="attrs"
+                                                                                        v-on="on" >
+                                                                                        <span v-on:click="rightClickHandler($event,childItem,childItem.name)">{{subChildItem.title}}</span> 
+                                                                                        
+                                                                                    </div>
+                                                                                </template>
+                                                                                <span style="font:13px roboto">{{subChildItem.title}}</span> 
+                                                                                <span style="font:8px;opacity:0.4">{{subChildItem.name}}</span>
+                                                                            </v-tooltip>
+                                                                            <div v-else v-on:click="rightClickHandler($event,subChildItem,childItem.name)">{{subChildItem.title ? subChildItem.title : subChildItem.name }}</div>
+                                                                            <v-icon  @click="changeFavorite(subChildItem,childItem.name)" :class="{'icon-star-active' : subChildItem.favorite == true, 'icon-star': true}" >mdi-star</v-icon>	
+                                                                        </div>
+                                                                    </li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                
+                                                </v-col>
+                                                <v-responsive
+                                                v-if="n === 2"
+                                                :key="`width-${n}`"
+                                                width="100%"
+                                                ></v-responsive>
+                                            </template>
+                                        </v-row>
+                                    </v-expansion-panel-content>
+                                  </v-expansion-panel>
+                                </div>
+                                   
+
                         </v-expansion-panels>
-                        </v-col>
                     </template>
-                </v-row>
         </div>
         </VuePerfectScrollbar>
         <ContextMenu ref="contextMenu"  />
@@ -130,17 +200,23 @@ export default {
 			event.preventDefault();
 			this.$refs.contextMenu.setContextItem(item.actions)
 			this.$refs.contextMenu.show(event)
-			this.$refs.contextMenu.setItem(item)
+            this.$refs.contextMenu.setItem(item)
+            if(type == 'document_category' || type == "document_major"){
+				type = "document_definition"
+			}
 			this.$refs.contextMenu.setType(type)
 		}, 
 		hideContextMenu(){
 			this.$refs.contextMenu.hide()
 		},	
         changeView(){
+            this.hideContextMenu()
+            debugger
             this.$store.commit('appConfig/changeTypeView')
         },
         collapse(){
 			let panels = this.panel.length == 0 ?  [0,1,2,3,4] : []
+			let panels = this.panel.length == 0 ?  [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25] : []
 			this.panel = panels
         },
         getActiveapps(){
@@ -199,6 +275,42 @@ export default {
                             }
 						})
                         self.apps[app].childrenAppReduce[typeT] = obj
+                debugger
+                for(let typeT in this.mapIdApp[app]){
+
+                    if(this.mapIdApp[app][typeT].length > 0){
+                        let  obj = {}
+                        let arr = []
+                        let arrCategory = []
+                        let arrMajor = []
+                        data.forEach(function(t){
+                            if(self.mapIdApp[app][typeT].includes(t.objectIdentifier)){
+                                 if(t.hasOwnProperty('objectType') && t.objectIdentifier.includes('document')){
+                                    if(t.objectType == "2"){
+                                        obj =  util.cloneDeep(self.document_category);
+                                        arrCategory.push(t)
+                                        obj.item = arrCategory
+                                        let types = "document_category"
+                                        self.apps[app].childrenAppReduce[types] = obj
+                                    }
+                                    if(t.objectType == "1"){
+                                        obj =  util.cloneDeep(self.document_major);
+                                        arrMajor.push(t)
+                                        obj.item = arrMajor
+                                        let types = "document_major"
+                                        self.apps[app].childrenAppReduce[types] = obj
+                                    }
+                                  
+                                }else{
+                                    obj = util.cloneDeep(self[typeT]);
+                                    arr.push(t)
+                                    obj.item = arr
+                                    self.apps[app].childrenAppReduce[typeT] = obj
+                                }
+								
+                            }
+						})
+                        
                     }
                 }
             }
@@ -219,6 +331,7 @@ export default {
 			return array
         },
         changeFavorite(item,type){
+            let self = this
 			let userId = this.$store.state.app.endUserInfo.id
 			if(item.objectIdentifier.includes("document_definition:")){
 				item.id = item.objectIdentifier.replace("document_definition:","")
@@ -235,29 +348,31 @@ export default {
 			if(item.favorite == false){
 				appManagementApi.addFavoriteItem(userId,item.id,type,1).then(res => {
 					if (res.status == 200) {
-						this.$store.commit('appConfig/insertFavorite',item)
-						item.favorite = true;
+						// self.$store.commit('appConfig/insertFavorite',item)
+                        self.$set(item, 'favorite', true)
 					}
 				});
 			}else{
 				appManagementApi.addFavoriteItem(userId,item.id,type,0).then(res => {
 					if (res.status == 200) {
 						item.type = type;
-						this.$store.commit('appConfig/delFavorite',item)
-						item.favorite = false;
+                        // self.$store.commit('appConfig/delFavorite',item)
+                         self.$set(item, 'favorite', false)
 					}
 				});
             }
         },
         filterObj(value){
            for(let e in this.apps){
-                this.filterItemInApp(e,"document_definition",value)
+                this.filterItemInApp(e,"document_category",value)
+                this.filterItemInApp(e,"document_major",value)
                 this.filterItemInApp(e,"orgchart",value)
                 this.filterItemInApp(e,"dashboard",value)
                 this.filterItemInApp(e,"workflow_definition",value)
            }
         },
         filterItemInApp(e, type, value){
+            debugger
              let self = this
              if(self.apps[e].childrenAppReduce.hasOwnProperty(type)){
                 self.apps[e].childrenAppReduce[type].item.forEach(function(k){
@@ -266,6 +381,7 @@ export default {
                     }
                     let text = k.title ? k.title : k.name
                     if(text.toLowerCase().includes(value.toLowerCase())){
+                    if(text.toLowerCv-expansion-panel-header__iconase().includes(value.toLowerCase())){
                         k.show = true
                     }else{
                         k.show = false
@@ -295,17 +411,25 @@ export default {
                 name: 'document_definition',
                 item: []
             },
+            document_category:{
+                icon : 'mdi-file-document-outline',
+                title: "Danh mục",
+                name:  'document_category',
+            },
+            document_major:{
+                icon : 'mdi-file-edit-outline',
+                title: "Chứng từ",
+                name:  'document_major',
+            },
             orgchart: {
                 icon: 'mdi-widgets-outline',
                 title: 'Orgcharts',
                 name: 'orgchart',
-                item: []
             },
             dashboard: {
                 icon: 'mdi-view-dashboard',
                 title: 'Reports',
                 name: 'dashboard',
-                item: []
             },
             workflow_definition: {
                 icon: 'mdi-lan',
@@ -314,6 +438,8 @@ export default {
                 item: []
             },
             panel: [],
+            },
+            panel: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25],
             listIds: [],
 			mapIdApp:[],
 			childItemReduce:{
@@ -361,7 +487,7 @@ export default {
 	display:none
 }
 .view-details-all-app .content-view-details-all-app{
-    width:90%;
+    width:95%;
     margin-left:auto;
     margin-right:auto;
     font:13px roboto
@@ -412,7 +538,8 @@ export default {
 }
 .view-details-all-app >>> .v-input__control .v-input__slot label{
     font:13px roboto;
-    padding-top:3px
+    margin-top:auto;
+    margin-bottom:auto
 }
 .view-details-all-app >>> .v-input__control #input-110{
     font:13px roboto
@@ -448,7 +575,7 @@ export default {
 .view-details-all-app >>> li:hover {
 	background-color:#f7f7f7;
 	border-radius: 5px;
-}
+}v-expansion-panel-header
 .view-details-all-app >>>  li:hover .icon-remove{
 	background-color:#f7f7f7;
 	border-radius: 10px;
@@ -464,8 +591,14 @@ export default {
     box-shadow: unset;
 }
 .view-details-all-app >>> .v-expansion-panel-header--active .app-title {
-    border-bottom: 1px solid #FF8003;
+    border-bottom: 0.5px solid #FF8003;
     padding-bottom:4px;
-	/* display: inline-block; */
+}
+.view-details-all-app >>> .v-expansion-panel-header--active .v-expansion-panel-header__icon {
+    border-bottom: 0.5px solid #FF8003;
+    padding-bottom:9px;
+}
+.view-details-all-app >>> .v-expansion-panel-header::before .app-title {
+    border-bottom: 0.5px solid #ffffff;
 }
 </style>

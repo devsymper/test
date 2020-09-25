@@ -65,11 +65,8 @@ export default class BasicControl extends Control {
                 this.controlProperties['isRequired'].value === 1)) {
             this.renderValidateIcon("Không được bỏ trống trường thông tin " + this.title);
         }
-        if (!this.checkDetailView() &&
-            this.controlProperties['isReadOnly'] != undefined &&
-            (this.controlProperties['isReadOnly'].value === "1" ||
-                this.controlProperties['isReadOnly'].value === 1)) {
-            this.ele.attr('disabled', 'disabled')
+        if (!this.checkDetailView() && this.checkProps('isReadOnly')) {
+            this.ele.attr('disabled', 'disabled');
         }
 
         if (this.controlProperties['isHidden'] != undefined &&
@@ -117,6 +114,8 @@ export default class BasicControl extends Control {
 
         } else if (this.ele.hasClass('s-control-select')) {
             this.renderSelectControl();
+        } else if (this.ele.hasClass('s-control-combobox')) {
+            this.renderSelectControl(false);
         } else if (this.ele.hasClass('s-control-label')) {
             this.renderLabelControl();
         }
@@ -321,8 +320,8 @@ export default class BasicControl extends Control {
 
     setValueControl() {
         let value = this.value
-        if (value == null) {
-            return;
+        if (!value) {
+            value = "";
         }
         if (this.type == 'percent') {
             value *= 100
@@ -581,9 +580,9 @@ export default class BasicControl extends Control {
         this.ele = $('#' + id);
         this.ele.text('').css({ border: 'none' })
     }
-    renderSelectControl() {
+    renderSelectControl(isReadOnly = true) {
         let thisObj = this;
-        this.ele.attr('readonly', 'readonly')
+        this.ele.attr('readonly', isReadOnly)
         this.ele.on('click', function(e) {
             store.commit("document/addToDocumentSubmitStore", {
                 key: 'currentTableInteractive',
@@ -596,10 +595,6 @@ export default class BasicControl extends Control {
             let formulasInstance = thisObj.controlFormulas.list.instance;
             SYMPER_APP.$evtBus.$emit('document-submit-select-input', { e: e, selectFormulasInstance: formulasInstance, alias: thisObj.name, controlTitle: thisObj.title })
         });
-        // this.ele.on('change', function(e) {
-        //     SYMPER_APP.$evtBus.$emit('document-submit-input-change', { controlName: thisObj.controlProperties.name.value, val: $(e.target).val() })
-        // })
-
     }
 
     renderPercentControl() {

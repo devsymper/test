@@ -359,7 +359,6 @@ export default {
                     self.categoryTask=[];
                     self.listCategory = res.data.category;
                      console.log(self.listCategory); 
-                     // debugger
                      for(let i=0; i<self.listCategory.length; i++){
                          self.categoryTask.push({
                             name: self.listCategory[i].name,

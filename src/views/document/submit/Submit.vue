@@ -4,26 +4,7 @@
     'sym-sub-form-submit':(parrentInstance == 0) ? false : true
 
     }">
-        <v-skeleton-loader
-            class="mx-auto"
-            max-width="auto"
-            type="article, actions"
-            v-if="loading"
-            
-        ></v-skeleton-loader>
-        <v-skeleton-loader
-            class="mx-auto"
-            max-width="auto"
-            v-if="loading"
-            type="table-heading, list-item-two-line, table-tfoot"
-        ></v-skeleton-loader>
-        <v-skeleton-loader
-            class="mx-auto"
-            max-width="auto"
-            type="article, actions,table-heading, list-item-two-line"
-            v-if="loading"
-            
-        ></v-skeleton-loader>
+        <Loader ref="skeletonView"/>
         <div
             :key="keyInstance"
             class="sym-form-submit"
@@ -204,7 +185,8 @@ import SidebarTraceFormulas from './SidebarTraceFormulas.vue';
 import './customControl.css';
 import ErrMessagePanel from "./../../../views/document/items/ErrMessagePanel.vue";
 import moment from "moment-timezone";
-import EmbedDataflow from "@/components/dataflow/EmbedDataflow"
+import EmbedDataflow from "@/components/dataflow/EmbedDataflow";
+import Loader from './../../../components/common/Loader';
 import {listControlNotNameProp} from "./../../../components/document/controlPropsFactory.js"
 
 
@@ -256,10 +238,30 @@ export default {
                 return {}
             }
         },
+        /**
+         * Tham số truyền các formulas thay thế cho các control
+         * vd: {ma_pl:{formulas:'SELECT "nnn"'},tb1_ma_hang:{formulas:'SELECT "aaaaa"'}}
+         */
+        overrideControls:{
+            type:Object,
+            default(){
+                return {}
+            }
+        },
+        /**
+         * Tham số truyên vào chỉ ra control nào được nhập liệu
+         * vd:['mct','tb1_ma_hang']
+         */
+        editableControls:{
+            type:Array,
+            default(){
+                return null
+            }
+        },
         parrentInstance:{
             type:Number,
             default:0
-        }
+        },
     },
     name: "submitDocument",
 
@@ -273,6 +275,7 @@ export default {
         "sym-drag-panel": SymperDragPanel,
         "err-message": ErrMessagePanel,
         EmbedDataflow,
+        Loader,
         SidebarTraceFormulas,
         VBoilerplate: {
             functional: true,
@@ -337,7 +340,6 @@ export default {
             objectIdentifier:{},
             otherInfo:{},
             listDataFlow:[],
-            loading: true,
             docSubFormId:0,
             drawer: false,
             isContinueSubmit:false,
@@ -390,13 +392,13 @@ export default {
         let thisCpn = this;
         if (this.docId != 0) {
             this.documentId = this.docId;
-        } else if (this.$route.name == "submitDocument") {
+        } else if (this.$getRouteName() == "submitDocument") {
             this.$store.commit("document/changeViewType", {
                 key: this.keyInstance,
                 value: 'submit',
             });
             this.documentId = this.$route.params.id;
-        } else if (this.$route.name == "updateDocumentObject") {
+        } else if (this.$getRouteName() == "updateDocumentObject") {
             this.$store.commit("document/changeViewType", {
                 key: this.keyInstance,
                 value: 'update',
@@ -761,7 +763,7 @@ export default {
          * Hàm ẩn loader
          */
         hidePreloader(){
-            this.loading = false;
+            this.$refs.skeletonView.hide();
             $("#sym-submit-" + this.keyInstance).find('.page-content').removeClass('d-block');
             $("#sym-submit-" + this.keyInstance).find('.list-page-content').removeClass('d-flex');
             $("#sym-submit-" + this.keyInstance).css({opacity:'1'});
@@ -1191,6 +1193,9 @@ export default {
                 let controlType = $(allInputControl[index]).attr('s-control-type');
                 if(this.sDocumentEditor.allControl[id] != undefined){   // ton tai id trong store
                     let field = this.sDocumentEditor.allControl[id];
+                    let controlName = allControlNotSetData.includes(controlType) ? field.type : field.properties.name.value;
+                    this.checkEditableControl(controlName,field);
+                    this.checkOverrideFormulas(controlName,field);
                     let idField = field.id;
                     let valueInput = field.value
                     let prepareData = field.prepareData
@@ -1214,14 +1219,12 @@ export default {
                         this.addToListInputInDocument('tabPage',control)
                     }
                     else if(controlType == 'tab'){
-                         let controlName = field.properties.name.value;
                         let control = new TabControl(idField, $(allInputControl[index]),field,thisCpn.keyInstance);
                         control.init();
                         control.render();
                         this.addToListInputInDocument(controlName,control)
                     }
                     else if(controlType == 'page'){
-                         let controlName = field.properties.name.value;
                         let control = new PageControl(idField, $(allInputControl[index]),field,thisCpn.keyInstance);
                         control.init();
                         control.render();
@@ -1229,7 +1232,6 @@ export default {
                     }
                    
                     else {
-                        let controlName = field.properties.name.value;
                         let mapColumnType = Util.mapTypeControlToTypeSQLLite(controlType); 
                         if(mapColumnType != false){
                             this.columnsSQLLiteDocument[controlName] = mapColumnType;
@@ -1257,10 +1259,6 @@ export default {
                             
                         }
                         //truong hop la control table
-                        
-                        
-                        
-                        
                         else {
                             let listInsideControls = {};
                             let tableControl = new TableControl(
@@ -1281,10 +1279,12 @@ export default {
                             tableEle.find(".s-control").each(function() {
                                 let childControlId = $(this).attr("id");
                                 let childControlProp = thisCpn.sDocumentEditor.allControl[id].listFields[childControlId];
+                                let childControlName = childControlProp.properties.name.value;
                                 childControlProp.properties.inTable = controlName;
                                 childControlProp.properties.docName = thisCpn.documentName;
+                                thisCpn.checkEditableControl(childControlName,childControlProp);
+                                thisCpn.checkOverrideFormulas(childControlName,childControlProp);
                                 let childValue = childControlProp.value;
-                                console.log('childControlProp',childControlProp);
                                 let childPrepareData = childControlProp.prepareData
                                 if(childPrepareData != null && childPrepareData != ""){
                                     isSetEffectedControl = true;
@@ -1299,7 +1299,6 @@ export default {
                                 );
                                 childControl.init();
                                 childControl.setEffectedData(childPrepareData);
-                                let childControlName = childControlProp.properties.name.value;
                                 thisCpn.addToListInputInDocument(childControlName,childControl)
                                 listInsideControls[childControlName] = true;
                             });
@@ -1598,7 +1597,7 @@ export default {
                     // nếu submit từ form sub submit thì ko rediect trang
                     // mà tìm giá trị của control cần được bind lại giá trị từ emit dataResponSubmit
                     thisCpn.resetDataSubmit();
-                    if(this.$route.name == 'submitDocument' && this.$route.params.id == this.documentId){
+                    if(this.$getRouteName() == 'submitDocument' && this.$route.params.id == this.documentId){
                         thisCpn.$router.push('/documents/'+thisCpn.documentId+"/objects");
                     }
                 
@@ -1637,7 +1636,7 @@ export default {
                         type: "success",
                         title: "update document success!"
                     });        
-                    if(thisCpn.$route.name == 'updateDocumentObject')
+                    if(thisCpn.$getRouteName() == 'updateDocumentObject')
                      thisCpn.$router.push('/documents/'+thisCpn.documentId+"/objects");
                 }
                 else{
@@ -1823,7 +1822,7 @@ export default {
             if(controlInstance.checkValidValueLength()){
                 let controlUnique = checkDbOnly(this.keyInstance,controlName);
                 if(controlUnique != false){
-                    this.handlerBeforeRunFormulasValue(controlUnique.controlFormulas.uniqueDB,controlUnique.id,controlUnique.name,'uniqueDB');
+                    this.handlerBeforeRunFormulasValue(controlUnique.controlFormulas.uniqueDB.instance,controlUnique.id,controlUnique.name,'uniqueDB');
                 }
                 
                 let controlEffected = controlInstance.getEffectedControl();
@@ -2200,6 +2199,24 @@ export default {
                 }
             }
             
+        },
+        /**
+         * Hàm kiểm tra xem có tham sô editableControls được truyền vào hay ko
+         * nếu có truyền vào thì chỉ được phép nhập liệu trên cac control đó, các control còn lại đánh dấu readonly
+         */
+        checkEditableControl(controlName, field){
+            if(this.editableControls && !this.editableControls.includes(controlName) && field.properties.hasOwnProperty('isReadOnly')){
+                field.properties.isReadOnly.value = true;
+            }
+        },
+        /**
+         * Hàm kiểm tra có các công thức giá trị được truyền vào để ghi đè hay ko
+         * nếu có thì thay thế formulas hiện tại
+         */
+        checkOverrideFormulas(controlName, field){
+            if(Object.keys(this.overrideControls).length > 0 && Object.keys(this.overrideControls).includes(controlName)){
+                field.formulas.formulas.value[Object.keys(field.formulas.formulas.value)[0]] = this.overrideControls[controlName]['formulas'];
+            }
         }
     }
     

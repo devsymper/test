@@ -1,39 +1,7 @@
 <template>
     <div class="wrap-content-detail" style="overflow:hidden;">
-        <v-skeleton-loader
-            class="mx-auto"
-            max-width="auto"
-            type="article, actions"
-            v-if="loading"
-            
-        ></v-skeleton-loader>
-        <v-skeleton-loader
-            class="mx-auto"
-            max-width="auto"
-            v-if="loading"
-            type="table-heading, list-item-two-line, table-tfoot"
-        ></v-skeleton-loader>
-        <v-skeleton-loader
-            class="mx-auto"
-            max-width="auto"
-            type="article, actions,table-heading, list-item-two-line"
-            v-if="loading"
-            
-        ></v-skeleton-loader>
-        <v-skeleton-loader
-            class="mx-auto"
-            max-width="auto"
-            type="article, actions,table-heading, list-item-two-line"
-            v-if="loading"
-            
-        ></v-skeleton-loader>
-        <v-skeleton-loader
-            class="mx-auto"
-            max-width="auto"
-            type="article, actions,table-heading, list-item-two-line"
-            v-if="loading"
-            
-        ></v-skeleton-loader>
+        
+        <Loader ref="skeletonView"/>
         <div class="panel-header" v-if="!quickView && !isPrint">
             <div class="right-action">
                 <v-tooltip bottom>
@@ -61,9 +29,9 @@
         <div
             class="sym-form-Detail"
             :id="'sym-Detail-'+keyInstance"
-            :style="{'width':documentSize, 'height':'calc(100% - 30px);','margin':contentMargin}">
+            :style="{'width':documentSize, 'height':contentHeight,'margin':contentMargin}">
             <div class="content-document" v-html="contentDocument"></div>
-            <div class="content-print-document" v-html="contentPrintDocument"></div>
+            <div class="content-print-document" :style="formSize" v-html="contentPrintDocument"></div>
         </div>
       
         <side-bar-detail 
@@ -98,6 +66,7 @@ import './../submit/customControl.css'
 import { getSDocumentSubmitStore } from './../common/common'
 import SideBarDetail from './SideBarDetail'
 import HistoryControl from './HistoryControl'
+import Loader from './../../../components/common/Loader';
 import { util } from '../../../plugins/util.js';
 export default {
     props: {
@@ -129,13 +98,21 @@ export default {
         quickView:{
             type:Boolean,
             default:false,
+        },
+        contentHeight:{
+            type:String,
+            default:"calc(100% - 30px);"
         }
     },   
     components:{
         'side-bar-detail':SideBarDetail,
-        HistoryControl
+        HistoryControl,
+        Loader
     },
     computed: {
+        routeName(){
+            return this.$getRouteName();
+        },
         sDocumentEditor() {
             return this.$store.state.document.editor[this.keyInstance];
         },
@@ -176,13 +153,14 @@ export default {
             left: false,
             transition: "slide-y-reverse-transition",
             printConfigActive:null,
-            loading: true,
+            formSize:{}
 
         };
     },
     beforeMount() {
         this.documentSize = "21cm";
     },
+    
     created(){
         this.$store.commit("document/setDefaultSubmitStore",{instance:this.keyInstance});
         this.$store.commit("document/setDefaultDetailStore",{instance:this.keyInstance});
@@ -195,7 +173,7 @@ export default {
         });
         if (this.documentObjectId != 0) {
             this.docObjId = Number(this.documentObjectId);
-        } else if (this.$route.name == "detailDocument" || this.$route.name == "printDocument") {
+        } else if (this.routeName == "detailDocument" || this.routeName == "printDocument") {
             this.docObjId = Number(this.$route.params.id);
             this.loadDocumentObject(this.isPrint); 
         }
@@ -232,7 +210,7 @@ export default {
         },
         documentObjectId(after){
             this.contentPrintDocument = null
-            this.docObjId = Number(after)
+            this.docObjId = Number(after);
             this.loadDocumentObject(this.isPrint);
         },
         documentId(after){
@@ -263,12 +241,7 @@ export default {
         },
         // Khadm: load data của document lên để hiển thị và xử lý
         loadDocumentStruct(documentId,isPrint = false) {
-            if(isPrint && this.contentPrintDocument != null){
-                $('.content-print-document').removeClass('d-none');
-                $('.content-document').addClass('d-none');
-                return
-            }
-            if(this.$route.name == 'printDocument'){
+            if(this.routeName == 'printDocument'){
                 isPrint = true;
             }
             let thisCpn = this;
@@ -290,6 +263,19 @@ export default {
                             $('.content-print-document').removeClass('d-none');
                             $('.content-document').addClass('d-none');
                             thisCpn.contentPrintDocument = content;
+                        }
+                        try {
+                            thisCpn.formSize = JSON.parse(res.data.document.formSize);
+                            if(thisCpn.formSize.type == 'A3'){
+                                $('.content-print-document').css({'transform':'scale(0.84)','transform-origin':'top left'});
+                                $('.sym-form-Detail').css({'width':'auto'});
+                            }
+                            if(thisCpn.formSize.type == 'A5'){
+                                $('.sym-form-Detail').css({'width':'auto'});
+                                $('.content-print-document').css({'transform':'scale(0.84)','transform-origin':'top left','margin':'auto'});
+                            }
+                        } catch (error) {
+                            
                         }
                         thisCpn.$emit('after-load-document',res.data.document)
                         setDataForPropsControl(res.data.fields, thisCpn.keyInstance,'detail'); // ddang chay bat dong bo
@@ -313,6 +299,12 @@ export default {
                 .always(() => {});
         },
         async loadDocumentObject(isPrint=false) {
+            this.contentDocument = ""
+            try {
+                 this.$refs.skeletonView.show();
+            } catch (error) {
+                
+            }
             let thisCpn = this;
             let res = await documentApi
                 .detailDocumentObject(this.docObjId);
@@ -336,6 +328,7 @@ export default {
                         });
                 }
                 
+           
         },
         togglePageSize() {
             this.contentMargin = this.documentSize == "21cm" ? "" : "auto";
@@ -478,11 +471,12 @@ export default {
                     }
                 }
             }
-            this.loading = false;
+            this.$refs.skeletonView.hide();
+            this.$emit("after-loaded-component-detail");
             $('.wrap-content-detail').removeAttr('style');
             setTimeout(() => {
-                if(thisCpn.$route.name == 'printDocument' || (isPrint && this.formId == 0)){
-                    thisCpn.printContent(true);
+                if(thisCpn.routeName == 'printDocument' || (isPrint && this.formId == 0)){
+                    // thisCpn.printContent(true);
                 }
             }, 200);
         },

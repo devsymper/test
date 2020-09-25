@@ -30,7 +30,7 @@ export default {
         }
     },
     created(){
-        if(this.$route.name == 'printDocument'){
+        if(this.$getRouteName() == 'printDocument'){
             this.formPrintId = this.$route.params.formId
         }
     }

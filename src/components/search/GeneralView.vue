@@ -361,7 +361,6 @@ export default {
             return this.$store.state.search.menu;
         },
         countResult() {
-            //debugger
             return this.$store.state.search.countResult;
         },
         showGeneral() {
@@ -451,15 +450,12 @@ export default {
             this.newSearch[id].enable = false;
         },
         showDotButtonAll(id,type) {
-          //  debugger
             this.newSearchAll.filter(x => x.type== type )[id].enable = true;
         },
         hideDotButtonAll(id,type) {
-          //  debugger
             this.newSearchAll.filter(x => x.type== type )[id].enable = false;
         },
         setMenu(){
-          //  debugger
             let menu = ['Tất cả'];
             for (let i = 0; i < this.newSearch.length; i++) {
                 // console.log(this.newSearch[i].group);
@@ -479,7 +475,6 @@ export default {
             this.type = type;
             this.nameResult = this.formatGroupName(type);
             this.$store.commit('search/setCountResult', this.newSearchAll.filter(x => x.type== type ).length);
-           // debugger
             if(type=='user'){this.checkUser==true};
             this.$store.commit('search/setType', type);}
            // this.$router.push('/search/detail');
@@ -505,7 +500,6 @@ export default {
         },
         wordSearch() {
             if(this.wordSearch==''||this.wordSearch==null){
-               // debugger
                 this.$store.commit('search/setMenu', []);
                 this.$store.commit('search/setCountResult', 0);
                 this.$store.commit('search/setSearch', []);

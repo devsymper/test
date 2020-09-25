@@ -77,6 +77,13 @@ export default {
 				$(".context-menu").css("top", e.clientY);
 				$(".context-menu").css("left", "auto");
 				$(".context-menu").css("bottom", "auto");
+				$(".context-menu").css("left", e.clientX).css("bottom", $(window).height()-e.clientY).css("right", "auto").css("top", "auto")
+			} else if(e.clientY > windowHeight && e.clientX > windowWidth) {
+				$(".context-menu").css("right", $(window).width()-e.clientX).css("bottom", $(window).height()-e.clientY).css("left", "auto").css("top", "auto");
+			} else if(e.clientY <= windowHeight && e.clientX <= windowWidth) {
+				$(".context-menu").css("left", e.clientX).css("top", e.clientY).css("right", "auto").css("bottom", "auto");
+			} else {
+				$(".context-menu").css("right", $(window).width()-e.clientX).css("top", e.clientY).css("left", "auto").css("bottom", "auto");
 			}
 			$('#symper-app').append(this.$el);
 		},
