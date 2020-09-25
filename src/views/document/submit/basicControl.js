@@ -127,9 +127,7 @@ export default class BasicControl extends Control {
         if (sDocument.state.viewType[this.curParentInstance] != 'submit') {
             this.setValueControl();
         }
-        if (sDocument.state.viewType[this.curParentInstance] == 'submit') {
-            this.setDefaultValue();
-        }
+        this.setDefaultValue();
         this.setEvent();
         if (this.checkProps('isQuickSubmit') && this.checkEmptyFormulas('autocomplete')) {
             let allTable = this.controlFormulas.autocomplete.instance.autocompleteDetectTableQuery();
@@ -155,8 +153,11 @@ export default class BasicControl extends Control {
      * Trường hợp có điền vào giá trị defaul trong editor thì gọi hàm này để set giá trị
      */
     setDefaultValue() {
-        if (['submit', 'update'].includes(sDocument.state.viewType[this.curParentInstance]) &&
+        if (['submit'].includes(sDocument.state.viewType[this.curParentInstance]) &&
             this.controlProperties['defaultValue'] != undefined) {
+            if (typeof this.controlProperties['defaultValue'].value == 'object') {
+                return;
+            }
             this.value = this.controlProperties['defaultValue'].value;
             this.setValueControl();
         }
