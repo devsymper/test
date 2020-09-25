@@ -604,6 +604,10 @@ export default {
                             value: e.alias,
                             instance: thisCpn.keyInstance
                         });
+                thisCpn.$refs.autocompleteInput.setTypeInput(e.type);
+                if(e.type == 'combobox'){
+                    thisCpn.$refs.autocompleteInput.setSingleSelectCombobox(e.isSingleSelect);
+                }
                 thisCpn.getDataForAutocomplete(e,e.type,e.alias);
             } catch (error) {
                 
@@ -840,7 +844,6 @@ export default {
         getDataForAutocomplete(e,type,aliasControl=""){ 
             let thisCpn = this
             if(['select','combobox'].includes(type)){
-                this.$refs.autocompleteInput.setTypeInput(type);
                 let dataInput = this.getDataInputFormulas(e.selectFormulasInstance);  
                 e.selectFormulasInstance.handleRunAutoCompleteFormulas(dataInput).then(res=>{
                     thisCpn.setDataForControlAutocomplete(res,aliasControl,e.controlTitle,"",false)

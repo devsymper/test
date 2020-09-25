@@ -593,7 +593,11 @@ export default class BasicControl extends Control {
                 return;
             }
             let formulasInstance = thisObj.controlFormulas.list.instance;
-            SYMPER_APP.$evtBus.$emit('document-submit-select-input', { e: e, selectFormulasInstance: formulasInstance, alias: thisObj.name, controlTitle: thisObj.title, type: thisObj.type })
+            let isSingleSelect = false;
+            if (thisObj.type == 'combobox') {
+                isSingleSelect = thisObj.checkProps('isSingleSelect');
+            }
+            SYMPER_APP.$evtBus.$emit('document-submit-select-input', { e: e, selectFormulasInstance: formulasInstance, alias: thisObj.name, controlTitle: thisObj.title, type: thisObj.type, isSingleSelect: isSingleSelect })
         });
     }
 

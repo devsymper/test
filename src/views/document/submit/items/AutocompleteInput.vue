@@ -3,8 +3,8 @@
     :id="'autocomplete-control-'+key"
     v-show="isShowAutoComplete" 
     class="card-autocomplete" :style="positionBox">
-        <div v-if="inputType" class="search-data-input">
-            <input v-model="search" type="text">
+        <div v-if="inputType == 'combobox'" class="search-data-input">
+            <input v-model="search" type="text" :placeholder="$t('common.search')">
         </div>
         <v-data-table 
         :headers="headers"
@@ -21,10 +21,11 @@
         >
         <template v-slot:item="{ item }">
             <tr @click="handleClickRow(item)" class="active-row" v-if="item.active" style="background: #f0f0f0">
-                <td v-for="(key,value) in item" :key="key+value" :class="{'d-none':(value == 'active')}">{{ (value != 'active') ? key : '' }}</td>
+                <td v-for="(key,value) in item" :key="key+value" :class="{'row-item':true,'d-none':(value == 'active')}">{{ (value != 'active') ? key : '' }}</td>
             </tr>
-            <tr @click="handleClickRow(item)" v-else>
-                <td v-for="(key,value) in item" :key="key+value" :class="{'d-none':(value == 'active')}">{{ key }}</td>
+            <tr @click="handleClickRow(item)" v-else class="row-item">
+                <td v-for="(key,value) in item" :key="key+value" :class="{'d-none':(value == 'active' || value == 'checked')}">{{ key }}</td>
+                <span class="mdi mdi-check icon-checked" v-if="item.checked"></span>
             </tr>
         </template>
         <template v-slot:no-results v-if="$parent.$options.name == 'submitDocument'">
@@ -55,7 +56,9 @@ export default {
             curInput:null,
             isHideHeader:false,
             search: '',
-            inputType:false
+            inputType:false,
+            isSingleSelectCombobox:true,
+            dataSelected:{}
         }
     },
    
@@ -117,6 +120,16 @@ export default {
             if(data.headers.length > 0)
             this.headers = data.headers;
             this.dataTable = data.dataBody;
+            for (let index = 0; index < this.dataTable.length; index++) {
+                let rowData = this.dataTable[index];
+                for (let i = 0; i < Object.values(rowData).length; i++) {
+                    const cellValue = Object.values(rowData)[i];
+                    if(this.dataSelected[this.alias].includes(cellValue)){
+                        this.$set(this.dataTable[index],'checked',true)
+                    }
+                }
+               
+            }
             this.indexActive = 0;
         },
         showHeader(){
@@ -157,9 +170,15 @@ export default {
         },
         setAliasControl(aliasControl){
             this.alias = aliasControl;
+            if(!this.dataSelected.hasOwnProperty(this.alias)){
+                this.dataSelected[this.alias] = []
+            }
         },
         setTypeInput(controlType=false){
             this.inputType = controlType;
+        },
+        setSingleSelectCombobox(isSingleSelectCombobox=false){
+            this.isSingleSelectCombobox = isSingleSelectCombobox;
         },
         handleClickRow(item,fromEnterKey = false){
             this.curInput.off('keydown');
@@ -171,12 +190,41 @@ export default {
                 value = item['column1'];
             }
             
-            if(!this.inputType){
-                this.dataTable = [];
-                this.hide();
+            if(this.inputType =='combobox'){
+                if(this.isSingleSelectCombobox){
+                    for (let index = 0; index < this.dataTable.length; index++) {
+                        let row = this.dataTable[index];
+                        this.$set(row,'checked',false);
+                    }
+                    if(this.dataSelected[this.alias].indexOf(value) === -1){
+                        this.dataSelected[this.alias] = [value];
+                        this.$set(item,'checked',true);
+                    }
+                    else{
+                        this.dataSelected[this.alias] = [];
+                    }
+                }
+                else{
+                    if(this.dataSelected[this.alias].indexOf(value) !== -1){
+                        this.dataSelected[this.alias].splice(this.dataSelected[this.alias].indexOf(value), 1);
+                        this.$set(item,'checked',false);
+                    }
+                    else{
+                        this.dataSelected[this.alias].push(value);
+                        this.$set(item,'checked',true);
+                    }
+                }
+                
+                let dataValue = []
+                for (let index = 0; index < this.dataSelected[this.alias].length; index++) {
+                    const element = this.dataSelected[this.alias][index];
+                    dataValue.push(element)
+                }
+                value = dataValue.join(",");
             }
             else{
-                value = this.curInput.val()+","+value
+                this.dataTable = [];
+                this.hide();
             }
             this.$emit('after-select-row',{value:value,fromEnterKey:fromEnterKey});
 
@@ -211,6 +259,9 @@ export default {
         /* display: flex!important; */
         white-space: nowrap;
     }
+    .card-autocomplete >>> tr{
+        position: relative;
+    }
     .search-data-input{
         width: 150px;
         padding: 8px;
@@ -224,5 +275,13 @@ export default {
     }
     .search-data-input input:focus{
         outline: none;
+    }
+    .icon-checked{
+        position: absolute;
+        color: green;
+        right: 6px;
+    }
+    .row-item{
+        position: relative;
     }
 </style>

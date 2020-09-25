@@ -53,7 +53,6 @@ export default class ClientSQLManager {
         if (isWithoutReturn) {
             return db.run(sql);
         } else {
-            debugger
             return db.exec(sql);
         }
     }
