@@ -633,9 +633,6 @@ export default class Table {
                 return
             }
             let controlInstance = this.getControlInstance(controlName);
-            if (rowIndex == 'all' && controlName == "tb1_ca_lam") {
-                // debugger
-            }
             if (controlInstance.checkValidValueLength(rowIndex)) {
                 if (controlInstance == null || controlInstance == undefined) {
                     return;
@@ -735,7 +732,7 @@ export default class Table {
          * @param {*} formulasInstance  Object cua formulas giá trị của control bị ảnh hưởng
          */
     async handlerRunFormulasForControlInTable(formulasType, controlInstance, dataInput, formulasInstance) {
-            debugger
+
             let listIdRow = this.tableInstance.getDataAtCol(this.tableInstance.getDataAtRow(0).length - 1);
             if (this.tableHasRowSum) {
                 listIdRow.pop();

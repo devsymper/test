@@ -3,10 +3,10 @@
     :id="'autocomplete-control-'+key"
     v-show="isShowAutoComplete" 
     class="card-autocomplete" :style="positionBox">
-        <div class="search-data-input">
+        <div v-if="inputType" class="search-data-input">
             <input v-model="search" type="text">
         </div>
-        <v-data-table
+        <v-data-table 
         :headers="headers"
         :items="dataTable"
         :search="search"
