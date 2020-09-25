@@ -216,6 +216,7 @@ export default {
     watch: {
         newImport(val) {
             if (val) {
+                
                 this.processing = {
                     preprocessing: {
                     processed: 0,
@@ -239,7 +240,18 @@ export default {
                 clearInterval(this.loopCheckProcess)
            };
            if(this.processing.importing.processed/this.processing.importing.total==1){
-                setTimeout(()=>this.$emit('showNotification'), 1000);
+               if(this.objType=="document"){
+                     setTimeout(()=>this.$emit('showNotification'), 1000);
+               }
+               else{
+                   if(JSON.parse(this.processing.dataUserError).length>0){
+                       this.$emit('error','Lỗi xử lý');
+                        clearInterval(this.loopCheckProcess);
+                   }else{
+                        setTimeout(()=>this.$emit('showNotification'), 1000);
+                   }
+               }
+              
                 clearInterval(this.loopCheckProcess)
            };
            if(this.processing.importing.processed/this.processing.importing.total>1){

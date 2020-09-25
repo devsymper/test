@@ -18,6 +18,7 @@
     </list-items>
          <ImportExcelPanel
             :objType="'document'"
+            :nameDocument="nameDocument"
             :nameRows="listRowDocument"
             :objId="documentId"
             :open="showImportPanel" />
@@ -25,6 +26,7 @@
 </div>
 </template>
 <script>
+
 import ImportExcelPanel from "./../../components/document/ImportExelPanel";
 import { documentApi } from "./../../api/Document.js";
 import ListItems from "./../../components/common/ListItems.vue";
@@ -41,6 +43,8 @@ export default {
     },
     data(){
         return {
+            nameDocument:'',
+            propertyDocument:[],
             listRowDocument:[],
             commonActionProps: {
                 "module": "document",
@@ -200,7 +204,6 @@ export default {
                         return " <i class= 'mdi mdi-file-upload-outline' > </i>&nbsp; Import Excel";
                     },
                     callback: (document, callback) => {
-                        debugger
                         const self = this;
                         self.showImportPanel = !self.showImportPanel; 
                         self.documentId = Number(document.id);
@@ -223,10 +226,104 @@ export default {
         });
     },
     watch:{
-        
+        documentId(){
+            this.getApiDocument();
+        }
     },
     methods:{
-
+        getApiDocument(){
+            documentApi.detailDocument(this.documentId)
+            .then(res => {
+                if (res.status === 200) {
+                    this.nameDocument = res.data.document.title;
+                    this.propertyDocument = Object.values(res.data.fields);
+                    // lưu tên của các property từ API document vào mảng  
+                    let tableNames = [];
+                    let tableTitle = [];
+                    for (let i = 0; i <  this.propertyDocument.length; i++) {
+                        if (this.propertyDocument[i].type === 'table') {
+                            tableNames.push( this.propertyDocument[i].properties.name);
+                            tableTitle.push( this.propertyDocument[i].properties.title);
+                        };
+                    };
+                    // khởi tạo mảng lưu các giá trị của table document
+                        this.createTable(tableNames, tableTitle);
+                }
+            })
+            .catch(err => {
+                console.log(err)
+            })
+        },
+        getDataType(controlType) {
+            let typeMap = {
+                number: 'number',
+                month: 'number',
+                percent: 'number',
+                date: 'date',
+                time: 'time',
+                datetime: 'datetime',
+                table: 'table'
+            }
+            if (typeMap[controlType]) {
+                return typeMap[controlType];
+            } else {
+                return 'text';
+            }
+        },
+         createTable(tableNames,tableTitle) {
+            // general
+            let controls = [];
+            for (let i = 0; i < this.propertyDocument.length; i++) {
+                if(['submit','approvalHistory','reset','draft'].includes(this.propertyDocument[i].type)){
+                    continue
+                }
+                controls.push({
+                    name: this.propertyDocument[i].properties.name,
+                    title: this.propertyDocument[i].properties.title,
+                    isKeyControl: false,
+                    dataColumn: null,
+                    dataType: this.getDataType(this.propertyDocument[i].type)
+                });
+             
+            };
+            let tables = [{
+                sheetMap: '',
+                name: 'Thông tin chung',
+                title: 'Thông tin chung',
+                controls,
+            }]
+            // tables
+            for (let i = 0; i < tableNames.length; i++) {
+                tables.push({
+                    sheetMap: '',
+                   title:tableTitle[i],
+                    keyColumn: {
+                        index: -1,
+                        name: ''
+                    },
+                    name: tableNames[i],
+                    controls: this.findControlsForTable(tableNames[i]),
+                 })
+            }
+            this.listRowDocument = tables;
+        },
+         findControlsForTable(nameTable) {
+            let controls = [];
+            let property = this.propertyDocument.filter(p => p.listFields && p.properties.name == nameTable);
+            for (let i = 0; i < property.length; i++) {
+                let list = Object.values(property[i].listFields);
+                for (let j = 0; j < list.length; j++) {
+                    controls.push({
+                        name: list[j].properties.name,
+                        title:list[j].properties.title,
+                        isKeyControl: false,
+                        dataColumn: null,
+                        dataType: this.getDataType(list[j].type)
+                    });
+                }
+            }
+            return controls;
+        },
         addDocument(){
             this.$router.push('/document/editor');
         },

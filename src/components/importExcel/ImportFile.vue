@@ -15,7 +15,7 @@
     <v-list dense>
         <v-row class="ml-5 mt-1 mr-6">
             <span class="font "><b class="color-grey fw-500 fs-13">
-                Import dữ liệu cho chứng từ: {{nameDocument}}</b>
+                Import dữ liệu cho: {{nameDocument}}</b>
             </span>
         </v-row>
         <v-row class="ml-0 mt-1" style="height:32px">
@@ -47,7 +47,7 @@
             <span style="color:red" class="fs-12">{{errorType}}</span>
         </v-row>
         <v-row class="ml-5">
-            <span><b class="color-grey fs-13 fw-500">Khớp dữ liệu chứng từ và tệp</b></span>
+            <span><b class="color-grey fs-13 fw-500">Lưu ý về việc khớp dữ liệu: </b></span>
         </v-row>
         <v-row class="ml-5 mt-1 mr-5 color-grey fs-12">
             Các trường dữ liệu tại cột đích có ký hiệu * là các trường bắt buộc phải import
@@ -89,8 +89,8 @@
                 </v-col>
                 <!-- khoá ngoai -->
             </v-row>
-            <v-row class=" mr-1 mb-3" style="margin-top: -27px">
-                <v-col class="col-md-5 ml-1 pl-4 pb-5 d-flex justify-content">
+            <v-row v-if="objType!='user'" class=" mr-1 mb-3" style="margin-top: -27px">
+                <v-col  class="col-md-5 ml-1 pl-4 pb-5 d-flex justify-content">
                     <v-icon style=" margin-top:-19px; font-size:13px " class="pr-3" size="18">mdi mdi-key</v-icon>
                     <div class="color-normal" style="float:left; margin-top:-13px">Khoá<span v-if="tables[tableIdx]==tables[0]" style="color:red"> *</span></div>
                 </v-col>
@@ -168,17 +168,14 @@ export default {
     components: {
         UploadFile
     },
-    props: ['deleteFileName', 'objId','objType'],
+    props: ['deleteFileName', 'objId','objType',"nameDocument","tables"],
     data() {
         return {
             newLastKeyTables:[],
             lastKeyTables:[],
             lastKeyGeneral:{},
             selectType:'',
-            drawer: null,
             isSelecting: false,
-            propertyDocument: [],
-            nameDocument: '',
             nameSheets: [],
             lastTable:[],
             nameColumnDetail: {},
@@ -188,7 +185,6 @@ export default {
             import:false,
             errorType:'',
             dataExel: {},
-            tables: [],
             showCancelBtn: true,
             errorMessage: '',
             key:'',
@@ -199,7 +195,11 @@ export default {
     computed: {
       newImport() {
         return this.$store.state.importExcel.newImport;
-      }
+      },
+    },
+    created(){
+       
+          
     },
     methods: {
         sumCount(a,b){
@@ -312,18 +312,26 @@ export default {
                 })
                 .catch(err => {
                 });
+                debugger    
+                let a= this.objType;
                 // kiểm tra key rỗng của table chung
                    let check = true;
                     if (this.tables[0].keyColumn==undefined||this.tables[0].keyColumn.index==-1) {
-                        this.errorMessage = '* Bạn chưa chọn khóa cho thông tin chung';
+                        if(this.objType=='document'){
+                            debugger
+                            this.errorMessage = '* Bạn chưa chọn khóa cho thông tin chung';
                         check = false;
+                        }
+                        
                     };
                     if (this.tables[0].sheetMap == '') {
                         this.errorMessage = '* Điền thiếu trường thông tin chung';
                         check = false;
                     };
                    // kiểm tra bảng con
+                     if(this.objType=='document'){
                     for (let i = 0; i < this.tables.length; i++) {
+                        debugger
                         if(this.tables[i].sheetMap!='')
                         {
                             if(this.tables[i].keyColumn==undefined||this.tables[i].keyColumn.index==-1){
@@ -332,6 +340,7 @@ export default {
                             }
                         }
                     };
+                     }
                     if(check)
                      {
                         this.errorMessage = '';
@@ -373,66 +382,9 @@ export default {
             }
         },
         // Lấy tên cột trong db theo từng bảng
-        findControlsForTable(nameTable) {
-            let controls = [];
-            let property = this.propertyDocument.filter(p => p.listFields && p.properties.name == nameTable);
-            for (let i = 0; i < property.length; i++) {
-                let list = Object.values(property[i].listFields);
-                for (let j = 0; j < list.length; j++) {
-                    controls.push({
-                        name: list[j].properties.name,
-                        title:list[j].properties.title,
-                        isKeyControl: false,
-                        dataColumn: null,
-                        dataType: this.getDataType(list[j].type)
-                    });
-                }
-            }
-            return controls;
-        },
+       
         // Khởi tạo giá trị của các bảng
-        createTable(tableNames,tableTitle) {
-            // general
-            debugger
-            let controls = [];
-            for (let i = 0; i < this.propertyDocument.length; i++) {
-                if(['submit','approvalHistory','reset','draft'].includes(this.propertyDocument[i].type)){
-                    continue
-                }
-                controls.push({
-                    name: this.propertyDocument[i].properties.name,
-                    title: this.propertyDocument[i].properties.title,
-                    isKeyControl: false,
-                    dataColumn: null,
-                    dataType: this.getDataType(this.propertyDocument[i].type)
-                });
-             
-            };
-            let a = controls;
-            debugger
-            let tables = [{
-                sheetMap: '',
-                name: 'Thông tin chung',
-                title: 'Thông tin chung',
-                controls,
-            }]
-            // tables
-            for (let i = 0; i < tableNames.length; i++) {
-                tables.push({
-                    sheetMap: '',
-                   title:tableTitle[i],
-                    keyColumn: {
-                        index: -1,
-                        name: ''
-                    },
-                    name: tableNames[i],
-                    controls: this.findControlsForTable(tableNames[i]),
-                 })
-            }
-            this.tables = tables;
-             debugger
-            
-        },
+       
         //Lấy ra tên các sheet trong excel
         getSheetAndColumnName() {
             let sheets = [];
@@ -718,33 +670,6 @@ export default {
                 this.selectType='';
             }
         },
-        objId(val) {
-            if (val) {
-                  // lấy API của documnent
-                documentApi.detailDocument(this.objId)
-                    .then(res => {
-                        if (res.status === 200) {
-                            this.nameDocument = res.data.document.title;
-                            this.propertyDocument = Object.values(res.data.fields);
-                            // lưu tên của các property từ API document vào mảng  
-                            let tableNames = [];
-                            let tableTitle = [];
-                            for (let i = 0; i < this.propertyDocument.length; i++) {
-                                if (this.propertyDocument[i].type === 'table') {
-                                  tableNames.push(this.propertyDocument[i].properties.name);
-                                  tableTitle.push(this.propertyDocument[i].properties.title);
-                                };
-                            };
-                            // khởi tạo mảng lưu các giá trị của table document
-                            this.createTable(tableNames, tableTitle);
-                            debugger
-                        }
-                    })
-                    .catch(err => {
-                        console.log(err)
-                    })
-            }
-        }
     },
 };
 </script>

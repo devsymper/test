@@ -25,10 +25,11 @@
            
         </div>
     </list-items>
-         <ImportExcelPanel 
-               :documentId="1787" 
-                :open="showImportUser"
-            />
+          <ImportExcelPanel
+            :objType="'user'"
+            :nameDocument="'Import User'"
+            :nameRows="listRowUser"
+            :open="showImportUser" />
     </div>
 </template>
 <script>
@@ -48,6 +49,7 @@ export default {
     },
     data(){
         return {
+            listRowUser:[],
             showImportUser:false,
             customAPIResult: {
                 reformatData(res){
@@ -124,8 +126,76 @@ export default {
         
     },
     methods:{
+         getListFieldUser(){
+             debugger
+             this.listRowUser =  [{
+                sheetMap: '',
+                name: 'Thông tin chung',
+                title: 'Thông tin chung',
+                controls:[
+                    {
+                        dataColumn:null,
+                        dataType:"text",
+                        isKeyControl:false,
+                        name:"firstName",
+                        title:"Tên ",
+                         isNull:true
+                    },
+                     {
+                        dataColumn:null,
+                        dataType:"text",
+                        isKeyControl:false,
+                        name:"lastName",
+                        title:"Họ",
+                        isNull:true
+                    },
+                     {
+                        dataColumn:null,
+                        dataType:"text",
+                        isKeyControl:false,
+                        name:"userName",
+                        title:"Tên tên khoản",
+                         isNull:false
+                    },
+                    {
+                        dataColumn:null,
+                        dataType:"text",
+                        isKeyControl:false,
+                        name:"displayName",
+                        title:"Tên hiển thị",
+                        isNull:false
+                    },
+                     {
+                        dataColumn:null,
+                        dataType:"text",
+                        isKeyControl:false,
+                        name:"email",
+                        title:"Email",
+                         isNull:false
+                    },
+                    {
+                        dataColumn:null,
+                        dataType:"text",
+                        isKeyControl:false,
+                        name:"phone",
+                        title:"Điện thoại",
+                         isNull:true
+                    },
+                    {
+                        dataColumn:null,
+                        dataType:"numeric",
+                        isKeyControl:false,
+                        name:"avatar",
+                        title:"Ảnh đại diện",
+                        isNull:true
+                    }
+                ]
+            }]
+
+         },
         importExcel(){
-            this.showImportUser = true;
+            this.showImportUser = !this.showImportUser;
+            this.getListFieldUser();
         },
         refreshListUser(){
             this.$refs.listUser.refreshList();

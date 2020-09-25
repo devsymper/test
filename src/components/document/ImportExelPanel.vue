@@ -51,6 +51,8 @@
             <v-col class="col-md-7">
                 <ImportFile 
                     :objId="objId"
+                    :tables="nameRows"
+                    :nameDocument="nameDocument"
                     :objType="objType"
                     @stopSetInterval ="setInterval=false"
                     :deleteFileName="deleteFileName" 
@@ -101,11 +103,17 @@ export default {
         objId: {
             default: 0
         },
+        nameRows:{
+             default: []
+        },
         open: {
             default: false
         },
         objType:{
             default:'document'
+        },
+        nameDocument:{
+            default:''
         }
     },
     methods: {
@@ -138,11 +146,8 @@ export default {
     watch: {
         open(val) {
             if (val) {
-                debugger
-                
                 this.$store.commit('importExcel/setNewImport', false);
             } else {
-                debugger
                 this.$store.commit('importExcel/setNewImport', true);
                 this.fileName = '';
             }

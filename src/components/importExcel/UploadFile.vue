@@ -102,7 +102,9 @@ export default {
             this.options.query.total = event.dataTransfer.items.length;
             this.options.query.key = util.str.randomString(6)+Date.now();
             this.options.query.typeImport = this.selectType;
-            this.options.query.documentId = this.objId;
+            if(this.objType=='document'){
+                this.options.query.documentId = this.objId;
+            }
             this.options.query.objType = this.objType;
             this.$emit('clearFiles');
         },
@@ -112,8 +114,10 @@ export default {
             this.dem = event.currentTarget.files.length;
             this.options.query.key = util.str.randomString(6)+Date.now();
             this.options.query.typeImport = this.selectType;
-            this.options.query.documentId = this.objId;
             this.options.query.objType = this.objType;
+             if(this.objType=='document'){
+                this.options.query.documentId = this.objId;
+            }
 
             this.$emit('clearFiles');
         },
