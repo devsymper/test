@@ -25,7 +25,7 @@
 <script>
 export default {
     created(){
-        if(this.$route.name == 'editDocument'){
+        if(this.$getRouteName() == 'editDocument'){
             let checkControlItem = { text: 'Kiểm tra Control', icon: 'mdi-puzzle-check' ,action:'check-control'};
             this.items.splice(5,0,checkControlItem);
         }
