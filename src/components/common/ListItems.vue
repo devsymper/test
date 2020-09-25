@@ -999,7 +999,8 @@ export default {
                 thisCpn.loadingData = true;
                 let options = this.getOptionForGetList(configs, columns);
                 let header = {};
-                if(thisCpn.$route.name == "deployHistory" || thisCpn.$route.name == "listProcessInstances"){
+                let routeName = this.$getRouteName();
+                if(routeName == "deployHistory" || routeName == "listProcessInstances"){
                     header = {
                         Authorization: 'Basic cmVzdC1hZG1pbjp0ZXN0'
                     };
