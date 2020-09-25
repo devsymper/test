@@ -183,8 +183,6 @@ export default {
     beforeMount() {
         this.documentSize = "21cm";
     },
-    
-    
     created(){
         this.$store.commit("document/setDefaultSubmitStore",{instance:this.keyInstance});
         this.$store.commit("document/setDefaultDetailStore",{instance:this.keyInstance});

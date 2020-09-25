@@ -94,9 +94,6 @@
 					<!-- mdi-briefcase-variant-outline -->
 					</v-expansion-panel-content>
 				</v-expansion-panel>
-
-				
-				
 			</v-expansion-panels>
 		</VuePerfectScrollbar>
 	</div>

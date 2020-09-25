@@ -43,7 +43,7 @@
                 <v-col cols="12" class="list-tasks pt-0 pb-0">
                     <v-row>
                         <v-col
-                            cols="5"
+                            cols=4
                             class="pl-3 fs-13 font-weight-medium"
                         >{{$t("tasks.header.name")}}</v-col>
                         <v-col
@@ -56,7 +56,7 @@
                         >{{$t("tasks.header.createDate")}}</v-col>
 
                         <v-col
-                            cols="3"
+                            cols="4"
                             class="fs-13 font-weight-medium"
                         >{{$t("tasks.header.app")}}</v-col>
                     </v-row>
@@ -86,7 +86,7 @@
                                 @dblclick="selectedWork(processParent)"
                             >
                                 <v-col
-                                    cols="5"
+                                    cols="4"
                                     class="pl-3 fs-13 "
                                 >
                                     <div class="pa-0 lighten-2 d-flex justify-space-between">
@@ -118,10 +118,10 @@
                                 </v-col>
 
                                 <v-col
-                                    cols="3"
+                                    cols="4"
                                     class="fs-13 "
                                 >
-                                    <span class="mt-1">{{processParent.processDefinitionName}}</span>
+                                    <span class="mt-1 title-quytrinh">{{processParent.processDefinitionName}}</span>
                                 </v-col>
                             </v-row>
                         </v-expansion-panel-content>
@@ -143,7 +143,7 @@
                                     }"
                                     >
                                     <v-col
-                                        cols="5"
+                                        cols="4"
                                         class="pl-3 fs-13 "
                                     >
                                         <div class="pa-0 lighten-2 d-flex justify-space-between">
@@ -176,10 +176,10 @@
                                     </v-col>
 
                                     <v-col
-                                        cols="3"
+                                        cols="4"
                                         class="fs-13 "
                                     >
-                                        <span class="mt-1">{{processParent.processDefinitionName}}</span>
+                                        <span class="mt-1 title-quytrinh">{{processParent.processDefinitionName}}</span>
                                     </v-col>
                                 </v-row>
                             </div>
@@ -202,7 +202,7 @@
                                     }"
                                 >
                                     <v-col
-                                        cols="5"
+                                        cols="4"
                                         class="pl-3 fs-13 "
                                     >
                                         <div class="pa-0 lighten-2 d-flex justify-space-between">
@@ -234,10 +234,10 @@
                                         <span class="mt-1">{{processParent.startTime ==null? '':$moment(processParent.startTime).fromNow()}}</span>
                                     </v-col>
                                     <v-col
-                                        cols="3"
+                                        cols="4"
                                         class="fs-13 "
                                     >
-                                        <span class="mt-1">{{processParent.processDefinitionName}}</span>
+                                        <span class="mt-1 title-quytrinh">{{processParent.processDefinitionName}}</span>
                                     </v-col>
                                 </v-row>
                             </div>
@@ -615,6 +615,13 @@ export default {
 }
 .d-active {
   background: #f5f5f5;
+}
+.title-quytrinh {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box !important;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
 }
 
 </style>
