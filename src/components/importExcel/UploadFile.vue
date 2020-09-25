@@ -40,7 +40,7 @@ import { util } from '../../plugins/util';
 import uploader from 'vue-simple-uploader'
 
 export default {
-    props: ["selectType","documentId"],
+    props: ["selectType","objId","objType"],
     computed: {
         newImport() {
             return this.$store.state.importExcel.newImport;
@@ -72,6 +72,7 @@ export default {
             key: "",
             total: 0,
             documentId:0,
+            objType: ''
           },
             headers:{
             'Authorization': `Bearer ${util.auth.getToken()}`,
@@ -101,7 +102,8 @@ export default {
             this.options.query.total = event.dataTransfer.items.length;
             this.options.query.key = util.str.randomString(6)+Date.now();
             this.options.query.typeImport = this.selectType;
-            this.options.query.documentId = this.documentId;
+            this.options.query.documentId = this.objId;
+            this.options.query.objType = this.objType;
             this.$emit('clearFiles');
         },
         handleChange(event) {
@@ -110,7 +112,9 @@ export default {
             this.dem = event.currentTarget.files.length;
             this.options.query.key = util.str.randomString(6)+Date.now();
             this.options.query.typeImport = this.selectType;
-            this.options.query.documentId = this.documentId;
+            this.options.query.documentId = this.objId;
+            this.options.query.objType = this.objType;
+
             this.$emit('clearFiles');
         },
     }

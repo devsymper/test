@@ -15,6 +15,16 @@
                             label="Search"
                             :placeholder="$t('common.search')"
                         ></v-text-field>
+                         <v-btn
+                            depressed
+                            small
+                            @click="importExcel()"
+                            class="mr-2"
+                            v-if="showImportButton"
+                        >
+                            <v-icon left dark>mdi-database-import</v-icon>
+                            {{$t('common.import_excel')}}
+                        </v-btn>
                         <v-btn
                             depressed
                             small
@@ -385,6 +395,14 @@ export default {
             type: String,
             default: ''
         },
+        showImportButton: {
+            type: Boolean,
+            default: true
+        },
+        showExportButton: {
+            type: Boolean,
+            default: true
+        },
         debounceRowSelectTime: {
             type: Number,
             default: 100
@@ -584,6 +602,9 @@ export default {
         }
     },
     methods: {
+         importExcel(){
+            this.$emit('import-excel');
+        },
         checkShowCreateButton(){
             let rsl = !this.isCompactMode;
             let objectType = this.commonActionProps.resource;

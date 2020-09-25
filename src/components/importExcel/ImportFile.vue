@@ -20,7 +20,7 @@
         </v-row>
         <v-row class="ml-0 mt-1" style="height:32px">
             <v-col class="col-md-4" style="margin-left:-5px; margin-top:-5px">
-           <span class="font ml-3 "> Chọn kiểu import:</span>
+           <span class="font ml-3 fs-13 "> Chọn kiểu import:</span>
             </v-col>
              <v-col class="col-md-4 ml-9" style="margin-top:-25px">
                   <v-select 
@@ -37,7 +37,8 @@
             <v-row class="ml-2 mt-1">
                 <UploadFile 
                     @dataExcel="getDataExcel" 
-                    :documentId="documentId" 
+                    :objId="objId"
+                    :objType="objType"
                     :selectType="selectType" 
                     @clearFiles="clearFiles" 
                     @keyUpload="setKey"/>
@@ -167,7 +168,7 @@ export default {
     components: {
         UploadFile
     },
-    props: ['deleteFileName', 'documentId'],
+    props: ['deleteFileName', 'objId','objType'],
     data() {
         return {
             newLastKeyTables:[],
@@ -216,8 +217,9 @@ export default {
 
         },
         cancel() {
+            debugger
             this.$emit('cancel');
-             this.$emit('stopSetInterval');
+            this.$emit('stopSetInterval');
             this.$store.commit('importExcel/setNewImport', true);  
         },
         // xoá dữ liệu trở về mặc định
@@ -293,9 +295,9 @@ export default {
                 fileName: this.data.fileName,
                 documentName: this.nameDocument,
                 key: this.key,
-                documentId: this.documentId,
+                documentId: this.objId,
                 typeImport: this.selectType,
-                objType: 'documnent',
+                objType: this.objType,
                 mode: 'full',
                 mapping: {
                     general: general[0],
@@ -391,6 +393,7 @@ export default {
         // Khởi tạo giá trị của các bảng
         createTable(tableNames,tableTitle) {
             // general
+            debugger
             let controls = [];
             for (let i = 0; i < this.propertyDocument.length; i++) {
                 if(['submit','approvalHistory','reset','draft'].includes(this.propertyDocument[i].type)){
@@ -405,6 +408,8 @@ export default {
                 });
              
             };
+            let a = controls;
+            debugger
             let tables = [{
                 sheetMap: '',
                 name: 'Thông tin chung',
@@ -425,6 +430,8 @@ export default {
                  })
             }
             this.tables = tables;
+             debugger
+            
         },
         //Lấy ra tên các sheet trong excel
         getSheetAndColumnName() {
@@ -528,7 +535,7 @@ export default {
 
         getLastData(){
             const self = this;
-            importApi.getMapping(this.documentId)
+            importApi.getMapping(this.objId)
             .then(res => {
                 if (res.status === 200) {
                     let mapping = JSON.parse(res.data[0].mapping);    
@@ -711,10 +718,10 @@ export default {
                 this.selectType='';
             }
         },
-        documentId(val) {
+        objId(val) {
             if (val) {
                   // lấy API của documnent
-                documentApi.detailDocument(this.documentId)
+                documentApi.detailDocument(this.objId)
                     .then(res => {
                         if (res.status === 200) {
                             this.nameDocument = res.data.document.title;
@@ -730,6 +737,7 @@ export default {
                             };
                             // khởi tạo mảng lưu các giá trị của table document
                             this.createTable(tableNames, tableTitle);
+                            debugger
                         }
                     })
                     .catch(err => {
