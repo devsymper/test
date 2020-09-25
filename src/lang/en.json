@@ -85,7 +85,8 @@
         "display": "Display",
         "of": "of",
         "entries": "Entries",
-        "always_show_sidebar": "Always show sidebar"
+        "always_show_sidebar": "Always show sidebar",
+        "import_excel": "Import excel"
     },
     "validate": {
         "required": "Not be empty",

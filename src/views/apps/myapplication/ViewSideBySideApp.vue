@@ -1,8 +1,10 @@
 <template>
    <div class="view-side-by-side-apps h-100">
        <div class="list-apps h-100">
-             <h4>Ứng dụng</h4>
-             <v-icon @click="changeView" style="position:absolute;top:12px;right:6px;font-size:13px" >mdi-page-previous-outline</v-icon>  
+				 <h4>Ứng dụng</h4>
+				<v-btn icon style="position:absolute;top:2px;right:6px;font-size:13px" >
+					<v-icon @click="changeView" style="font-size:13px" >mdi-page-previous-outline</v-icon>  
+				</v-btn>
             <div style="margin:20px 0px 0px 8px">
                 <div :class="{'favorite-area': true , 'active': showFavorite == true}" @click="showListFavorite">
                     <v-icon style="font-size:16px" color="yellow"> mdi-star</v-icon>
@@ -45,7 +47,7 @@
                             <div style="position:relative">
                                 <div v-if="item.type == 'document_definition'" class="title-item-favorite">{{item.title}}</div>
                                 <div v-else  class="title-item-favorite">{{item.name}}</div> 
-                                <v-icon  color="#F6BE4F" style="float:right;font-size:13px;position:absolute;top:4px;right:12px">mdi-star</v-icon>
+                                <v-icon  color="#F6BE4F" style="float:right;font-size:13px;position:absolute;top:0px;right:12px">mdi-star</v-icon>
                             </div>
                         </li>
                     </ul>
@@ -493,6 +495,7 @@ x				}
 }
 .view-side-by-side-apps >>> .favorite-area-item .title-item-favorite{
    	white-space: nowrap; 
+	font:13px roboto;
 	width: 90%; 
 	overflow: hidden;
 	text-overflow: ellipsis; 

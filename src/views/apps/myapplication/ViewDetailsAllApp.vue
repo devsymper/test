@@ -19,8 +19,12 @@
                         append-icon="mdi-magnify"
                         v-model="searchItemKey"
                     ></v-text-field>
-                <v-icon @click="collapse" style="padding-top:1px">mdi-arrow-collapse-up</v-icon>  
-                <v-icon @click="changeView">mdi-page-previous-outline</v-icon>  
+                    <v-btn icon>
+                         <v-icon @click="collapse" style="padding-top:1px">mdi-arrow-collapse-up</v-icon>  
+                    </v-btn>
+                    <v-btn icon>
+                          <v-icon @click="changeView">mdi-page-previous-outline</v-icon>  
+                    </v-btn>
             </div>
         </div>
         <VuePerfectScrollbar :style="{height: menuItemsHeight}">
@@ -418,11 +422,19 @@ export default {
     display: flex;
     margin:8px 16px 8px 8px;
 }
+.view-details-all-app >>> .header-view-details-all-app .v-btn {
+    margin:unset;
+}
 .view-details-all-app  >>>.header-view-details-all-app .v-icon::after{
 	display:none
 }
+.view-details-all-app  >>> button{
+    margin:8px
+}
 .view-details-all-app  >>> button:hover{
-    background:unset !important;
+    /* background:unset !important; */
+    /* padding:12px; */
+
 }
 .view-details-all-app .content-view-details-all-app{
     width:95%;
@@ -539,7 +551,7 @@ export default {
     padding-bottom:4px;
 }
 .view-details-all-app >>> .v-expansion-panel-header--active .v-expansion-panel-header__icon {
-    /* border-bottom: 0.5px solid #FF8003; */
+    border-bottom: 0.5px solid #FF8003;
     padding-bottom:9px;
 }
 .view-details-all-app >>> .v-expansion-panel-header::before .app-title {
