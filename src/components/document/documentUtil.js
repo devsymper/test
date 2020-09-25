@@ -27,7 +27,9 @@ const getInsertionCSS = function() {
     styles += '.ephox-snooker-resizer-bar {background-color: #b4d7ff;opacity: 0;-webkit-user-select: none;-moz-user-select: none;-ms-user-select: none;user-select: none;}';
 
     styles += `
-      
+      .s-control-table{
+        border: 1px solid #ffffff;
+      }
       /* Style the buttons inside the tab */
       .tab button {
         background:transparent;

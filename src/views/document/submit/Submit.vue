@@ -1470,7 +1470,7 @@ export default {
         },
         handlerSubmitDocumentClick(isContinueSubmit = false){
             this.isContinueSubmit = isContinueSubmit;
-            if($('.validate-icon').length == 0 && $('.error').length == 0){
+            if($('.wrap-content-submit .validate-icon').length == 0 && $('.wrap-content-submit .error').length == 0){
                 if(this.viewType == 'submit'){
                     this.handleRefreshDataBeforeSubmit();
                 }
@@ -1479,8 +1479,8 @@ export default {
                 }
             }
             else{
-                let controlNotValid = $('.validate-icon');
-                let controlError = $('.error');
+                let controlNotValid = $('.wrap-content-submit .validate-icon');
+                let controlError = $('.wrap-content-submit .error');
                 let listErr = []
                 $.each(controlNotValid,function(k,v){
                     let message = $(v).attr('title');
