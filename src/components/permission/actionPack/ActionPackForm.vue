@@ -148,7 +148,6 @@ export default {
             this.caculateTableDataForAllInstancesDocDef(initDocObjDataTable);
         },
         objectTypeToDocumentDefinition(){
-            // debugger
             // this.itemData.objectType = 'document_definition'
             // this.allInputs.objectType.value = 'document_definition'
         },

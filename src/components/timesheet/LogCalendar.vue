@@ -254,7 +254,6 @@ export default {
             this.$emit('showLog',date);   
         },
         copyLogTime(event){
-            //debugger
               timesheetApi.createLogTime({
                         start:dayjs(event.start).add(1, 'h').format("YYYY-MM-DD HH:mm"),
                         end: dayjs(event.end).add(1, 'h').format("YYYY-MM-DD HH:mm"),
@@ -337,7 +336,6 @@ export default {
             return this.changeDuration(duration);
         },
         openLogTimeDialog(event, update = false) {
-           // debugger
             this.$emit('create-time', {
                 update: update,
                 logtimeEvent: event,
@@ -556,7 +554,6 @@ export default {
             this.dragEvent = null
         },
         roundTime(time, down = true) {
-            //  debugger
             const roundTo = 5 // minutes
             const roundDownTime = roundTo * 60 * 1000
 
@@ -573,7 +570,6 @@ export default {
             }
         },
         rnd(a, b) {
-            // debugger
             return Math.floor((b - a + 1) * Math.random()) + a
         },
         rndElement(arr) {

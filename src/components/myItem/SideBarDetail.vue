@@ -245,10 +245,10 @@
 			</div>
 		</VuePerfectScrollbar>
 	</div>
-	<Comment style="height:100%" 
-		:objectIdentifier="originData.id"
-		ref="commentTaskView"
-		@close-comment="hide" />
+		<Comment style="height:100%" 
+			:objectIdentifier="originData.id"
+			ref="commentTaskView"
+			@close-comment="hide" />
 	
 	<div class="w-100 h-100 symper-select-user-autocomplete " style="z-index:1010" v-show="statusChange" ref="selectUserAutocomplete">
 			<v-autocomplete

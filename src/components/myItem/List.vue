@@ -109,7 +109,7 @@
                     >
                     <v-icon class="fs-14"
                         v-if="obj.taskData.action"
-                    >{{(obj.taskData.action.action=='submit' || obj.taskData.action.action=='') ? 'mdi-file-document-edit-outline': 'mdi-seal-variant'}}</v-icon>
+                    >{{obj.taskData.action.action=='approval' ? 'mdi-seal-variant ': 'mdi-file-document-edit-outline'}}</v-icon>
                     <v-icon class="fs-14" v-else>mdi-checkbox-marked-circle-outline</v-icon>
                     </v-col>
                     <v-col :cols="sideBySideMode ? 10 : compackMode ? 5: 3" class="pl-3 pr-1 pb-1 pt-2">
@@ -252,138 +252,146 @@ import symperAvatar from "@/components/common/SymperAvatar.vue";
 export default {
   computed: {
     // Liệt kê danh sách các task dưới dạng phẳng - ko phân cấp
-    flatTasks() {
-      let tasks = [];
-      for (let def of this.listProrcessInstances) {
-        for (let instances of def.objects) {
-          for (let task of instances.tasks) {
-            task.bizKey = ""; // Business key của process instance
-            tasks.push(task);
-          }
+        flatTasks() {
+        let tasks = [];
+        for (let def of this.listProrcessInstances) {
+            for (let instances of def.objects) {
+            for (let task of instances.tasks) {
+                task.bizKey = ""; // Business key của process instance
+                tasks.push(task);
+            }
+            }
         }
-      }
-      return tasks;
+        return tasks;
+        },
+        groupFlatTasks() {
+            let allTask = this.allFlatTasks;
+            const groups = allTask.reduce((groups, task) => {
+                let date;
+                if ( task.createTime) {
+                    date = task.createTime.split("T")[0];
+                }else{
+                    date = task.endTime.split("T")[0];
+                }
+                if (!groups[date]) {
+                groups[date] = [];
+                }
+                groups[date].push(task);
+                return groups;
+            }, {});
+            // Edit: to add it in the array format instead
+            const groupArraysTask = Object.keys(groups).map(date => {
+                return {
+                date,
+                tasks: groups[date]
+                };
+            });
+            console.log("addd",groupArraysTask);
+            return groupArraysTask;
+        },
+        stask() {
+        return this.$store.state.task;
+        },
+        sapp() {
+        return this.$store.state.app;
+        }
     },
-    groupFlatTasks() {
-        let allTask = this.allFlatTasks;
-        const groups = allTask.reduce((groups, task) => {
-            let date;
-            if ( task.createTime) {
-                date = task.createTime.split("T")[0];
-            }else{
-                date = task.endTime.split("T")[0];
+    watch:{
+        "stask.isStatusSubmit": function(newVl) {
+            if (newVl==true) {
+                this.getTasks();
+                this.$store.commit("task/setIsStatusSubmit",false);
             }
-            if (!groups[date]) {
-            groups[date] = [];
+        }
+    },
+    name: "listTask",
+    components: {
+        icon: icon,
+        taskDetail: taskDetail,
+        listHeader: listHeader,
+        userSelector: userSelector,
+        VuePerfectScrollbar: VuePerfectScrollbar,
+        symperAvatar: symperAvatar
+    },
+    props: {
+        compackMode: {
+            type: Boolean,
+            default: false
+        },
+        height: {
+            type: String,
+            default: "calc(100vh - 120px)"
+        },
+        // component này có ở chế độ là component con của một component khác hay ko, false nếu component này là view
+        smallComponentMode: {
+            type: Boolean,
+            default: false
+        },
+        filterFromParent: {
+            type: Object,
+            default() {
+                return {};
             }
-            groups[date].push(task);
-            return groups;
-        }, {});
-        // Edit: to add it in the array format instead
-        const groupArraysTask = Object.keys(groups).map(date => {
-            return {
-            date,
-            tasks: groups[date]
-            };
+        },
+        headerTitle: {
+            type: String,
+            default() {
+                return this.$t("process.taskList");
+            }
+        },
+        filterTaskAction: {
+            type: String,
+            default: "getList"
+        }
+    },
+    data: function() {
+        return {
+            index: -1,
+            dataIndex:-1,
+            loadingTaskList: false,
+            loadingMoreTask: false,
+            listTaskHeight: 300,
+            totalTask: 0,
+            selectedTask: {
+                taskInfo: {},
+                idx: -1,
+                originData: null
+            },
+            listProrcessInstances: [],
+            isSmallRow: false,
+            sideBySideMode: false,
+            openPanel: [0, 1, 2, 3, 4],
+            allFlatTasks: [],
+            myOwnFilter: {
+                size: 100,
+                sort: "createTime",
+                order: "desc",
+                page: 1,
+                assignee: this.$store.state.app.endUserInfo.id
+            },
+            defaultAvatar: appConfigs.defaultAvatar,
+            arrdocObjId: []
+        };
+    },
+    created() {
+        let self = this;
+        this.$evtBus.$on("symper-update-task-assignment", updatedTask => {
+        updatedTask.taskData = self.getTaskData(updatedTask);
+        self.selectObject(updatedTask, self.selectedTask.idx);
+        self.$set(self.allFlatTasks, self.selectedTask.idx, updatedTask);
         });
-        console.log("addd",groupArraysTask);
-        return groupArraysTask;
     },
-    stask() {
-      return this.$store.state.task;
+    mounted() {
+        let self = this;
+        this.$store
+        .dispatch("process/getAllDefinitions")
+        .then(res => {
+            self.getTasks();
+        })
+        .catch(err => {});
+        self.reCalcListTaskHeight();
     },
-    sapp() {
-      return this.$store.state.app;
-    }
-  },
-  name: "listTask",
-  components: {
-    icon: icon,
-    taskDetail: taskDetail,
-    listHeader: listHeader,
-    userSelector: userSelector,
-    VuePerfectScrollbar: VuePerfectScrollbar,
-    symperAvatar: symperAvatar
-  },
-  props: {
-    compackMode: {
-        type: Boolean,
-        default: false
-    },
-    height: {
-        type: String,
-        default: "calc(100vh - 120px)"
-    },
-    // component này có ở chế độ là component con của một component khác hay ko, false nếu component này là view
-    smallComponentMode: {
-        type: Boolean,
-        default: false
-    },
-    filterFromParent: {
-        type: Object,
-        default() {
-            return {};
-        }
-    },
-    headerTitle: {
-        type: String,
-        default() {
-            return this.$t("process.taskList");
-        }
-    },
-    filterTaskAction: {
-        type: String,
-        default: "getList"
-    }
-  },
-  data: function() {
-    return {
-        index: -1,
-        dataIndex:-1,
-        loadingTaskList: false,
-        loadingMoreTask: false,
-        listTaskHeight: 300,
-        totalTask: 0,
-        selectedTask: {
-            taskInfo: {},
-            idx: -1,
-            originData: null
-        },
-        listProrcessInstances: [],
-        isSmallRow: false,
-        sideBySideMode: false,
-        openPanel: [0, 1, 2, 3, 4],
-        allFlatTasks: [],
-        myOwnFilter: {
-            size: 100,
-            sort: "createTime",
-            order: "desc",
-            page: 1,
-            assignee: this.$store.state.app.endUserInfo.id
-        },
-        defaultAvatar: appConfigs.defaultAvatar,
-        arrdocObjId: []
-    };
-  },
-  created() {
-    let self = this;
-    this.$evtBus.$on("symper-update-task-assignment", updatedTask => {
-      updatedTask.taskData = self.getTaskData(updatedTask);
-      self.selectObject(updatedTask, self.selectedTask.idx);
-      self.$set(self.allFlatTasks, self.selectedTask.idx, updatedTask);
-    });
-  },
-  mounted() {
-    let self = this;
-    this.$store
-      .dispatch("process/getAllDefinitions")
-      .then(res => {
-        self.getTasks();
-      })
-      .catch(err => {});
-    self.reCalcListTaskHeight();
-  },
-  methods: {
+    methods: {
     changeUpdateAsignee(){
       this.handleTaskSubmited();
     },

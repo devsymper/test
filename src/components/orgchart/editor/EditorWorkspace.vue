@@ -276,8 +276,8 @@ export default {
                 }else{
                     if(!lastUserInfo) return;
                     this.updateCellAttrs( this.selectingNode.id, 'userInPositionAvartar', lastUserInfo.avatar ? lastUserInfo.avatar : avatarDefault );
-                    let plusUser = userIdList.length == 1 ? '' : ('+' + (userIdList.length - 1));
-					this.updateCellAttrs( this.selectingNode.id, 'accountNumberPlus', plusUser);
+                    let plusUser = userIdList.length == 1 ? '' : ('+' + (userIdList.length - 1))
+                    this.updateCellAttrs( this.selectingNode.id, 'accountNumberPlus', plusUser);
                 }
             }
         },
