@@ -1,4 +1,5 @@
 <template>
+<div class="w-100">
      <list-items
         ref="listUser"
         @after-open-add-panel="addUser"
@@ -10,6 +11,7 @@
         :customAPIResult="customAPIResult"
         :getDataUrl="getListUrl+'users?page=1&pageSize=50'"
         :actionPanelWidth="actionPanelWidth"
+        @import-excel="importExcel()"
         :commonActionProps="commonActionProps">
         <div slot="right-panel-content" class="h-100">
             <action-panel
@@ -23,8 +25,14 @@
            
         </div>
     </list-items>
+         <ImportExcelPanel 
+               :documentId="1787" 
+                :open="showImportUser"
+            />
+    </div>
 </template>
 <script>
+import ImportExcelPanel from "./../../components/document/ImportExelPanel";
 import { userApi } from "./../../api/user.js";
 import ListItems from "./../../components/common/ListItems.vue";
 import ActionPanel from "./../../views/users/ActionPanel.vue";
@@ -36,9 +44,11 @@ export default {
     components: {
         "list-items": ListItems,
         "action-panel": ActionPanel,
+        ImportExcelPanel: ImportExcelPanel,
     },
     data(){
         return {
+            showImportUser:false,
             customAPIResult: {
                 reformatData(res){
                     let data = res.data;
@@ -77,6 +87,13 @@ export default {
                     callback: (user, callback) => {
                         this.deleteUser(user);
                     }
+                },
+                view: {
+                    name:"view",
+                    text:this.$t('user.table.contextMenu.view'), 
+                    callback: (user, callback) => {
+                        this.deleteUser(user);
+                    }
                 }
             },
             columns: [],
@@ -95,7 +112,9 @@ export default {
              thisCpn.tableContextMenu = [
                 {name:"passwordsetting",text:this.$t('user.table.contextMenu.passwordSetting')},
                 {name:"edit",text:this.$t('user.table.contextMenu.edit')},
-                {name:"xóa",text:this.$t('user.table.contextMenu.delete')}
+                {name:"xóa",text:this.$t('user.table.contextMenu.delete')},
+                {name:"xem chi tiết",text:this.$t('user.table.contextMenu.view')}
+             
 
             ]
 
@@ -105,6 +124,9 @@ export default {
         
     },
     methods:{
+        importExcel(){
+            this.showImportUser = true;
+        },
         refreshListUser(){
             this.$refs.listUser.refreshList();
         },
@@ -150,3 +172,4 @@ export default {
     }
 }
 </script>
+
