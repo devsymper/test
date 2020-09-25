@@ -304,7 +304,12 @@
                 "printMultiple": "Print Multiple",
                 "listPrintConfig": "List print config",
                 "print": "Print",
-                "copied": "copied"
+                "copied": "copied",
+                "next": "Next record",
+                "prev": "Previous record",
+                "copyLink": "Copy link",
+                "download": "Download",
+                "info": "Information"
             }
         },
         "create": "Create document",

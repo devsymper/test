@@ -400,7 +400,12 @@
                 "printMultiple": "In nhiều bản ghi",
                 "listPrintConfig": "Danh sách mẫu in",
                 "print": "In nhanh",
-                "copied": "Đã sao chép"
+                "copied": "Đã sao chép",
+                "next": "Tiếp theo",
+                "prev": "Trước đó",
+                "copyLink": "Sao chép đường dẫn",
+                "download": "Tải xuống",
+                "info": "Thông tin bản ghi"
             }
         },
         "create": "Tạo mới văn bản",

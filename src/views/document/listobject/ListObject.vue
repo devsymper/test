@@ -22,15 +22,48 @@
             
             <div class="panel-header">
                 <div class="left-action">
-                    <span @click="prevRecord" class="mdi mdi-chevron-left"></span>
-                    <span @click="nextRecord" class="mdi mdi-chevron-right"></span>
+                    <v-tooltip bottom>
+                        <template v-slot:activator="{ on }">
+                            <v-icon  @click="hidePanel" v-on="on">mdi-close</v-icon>
+                        </template>
+                        <span>{{$t('common.close')}}</span>
+                    </v-tooltip>
+                    <v-tooltip bottom>
+                        <template v-slot:activator="{ on }">
+                            <v-icon  @click="prevRecord" v-on="on">mdi-chevron-left</v-icon>
+                        </template>
+                        <span>{{$t('document.instance.showlist.prev')}}</span>
+                    </v-tooltip>
+                    <v-tooltip bottom>
+                        <template v-slot:activator="{ on }">
+                            <v-icon  @click="nextRecord" v-on="on">mdi-chevron-right</v-icon>
+                        </template>
+                        <span>{{$t('document.instance.showlist.next')}}</span>
+                    </v-tooltip>
                     <span class="document-title">{{panelDocTitle}}</span>
                 </div>
                 <div class="right-action">
+                    
                     <span class="copyed d-none" transition="scroll-y-reverse-transition">{{$t('document.instance.showlist.copied')}}</span>
-                    <span @click="addToClipboard($event)" :clipboard="dataClipboard" class="mdi mdi-page-next-outline"></span>
-                    <span class="mdi mdi-download-outline"></span>
-                    <span @click="showDetailInfoDocument" class="mdi mdi-information-outline"></span>
+                    <v-tooltip bottom>
+                        <template v-slot:activator="{ on }">
+                            <v-icon  @click="addToClipboard($event)" :clipboard="dataClipboard" v-on="on">mdi-page-next-outline</v-icon>
+                        </template>
+                        <span>{{$t('document.instance.showlist.copyLink')}}</span>
+                    </v-tooltip>
+                    <v-tooltip bottom>
+                        <template v-slot:activator="{ on }">
+                            <v-icon  v-on="on">mdi-download-outline</v-icon>
+                        </template>
+                        <span>{{$t('document.instance.showlist.download')}}</span>
+                    </v-tooltip>
+                    <v-tooltip bottom>
+                        <template v-slot:activator="{ on }">
+                            <v-icon  @click="showDetailInfoDocument" v-on="on">mdi-information-outline</v-icon>
+                        </template>
+                        <span>{{$t('document.instance.showlist.info')}}</span>
+                    </v-tooltip>
+                    
                 </div>
             </div>
             <div class="panel-body">
@@ -301,6 +334,12 @@ export default {
             document.execCommand('copy',false);
             inp.remove();
         },
+        /**
+         * Ẩn view side by side
+         */
+        hidePanel(){
+            this.$refs.listObject.closeactionPanel();
+        },
         afterRowSelected(data){
             let documentObject = data.rowData;
             let cell = data.cell;
@@ -385,6 +424,7 @@ export default {
         height: 30px;
         display: flex;
         color: #757575;
+        margin-top: -3px;
     }
     .panel-header .mdi:hover{
         color: rgba(0,0,0 / 0.6);
@@ -402,15 +442,21 @@ export default {
     .panel-header .mdi {
         cursor: pointer;
         margin-right: 12px;
+        font-size: 16px;
         transition: all ease-in-out 250ms;
     }
-    .left-action .mdi{
+    .left-action .mdi:not(.mdi-close){
         font-size: 24px;
+        line-height: 1;
+    }
+    .left-action .mdi-close{
+        font-size: 20px;
         line-height: 1;
     }
     .document-title{
         font-size: 13px;
-        vertical-align: super;
+        display: inline-block;
+        vertical-align: middle;
     }
 
     .copyed {
