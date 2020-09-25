@@ -557,6 +557,9 @@ export default {
     },
     mounted() {},
     computed: {
+        alwaysShowActionPanel(){
+            return this.tableDisplayConfig.value.alwaysShowSidebar;
+        },
         reComputeActionPanelType(){
             return this.tableDisplayConfig.value.alwaysShowSidebar ? 'elastic' : this.actionPanelType;
         },
