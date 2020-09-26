@@ -1115,43 +1115,6 @@ export default {
                 }
             })
         },
-       
-        },
-        /**
-         * Api lưu control template
-         * @input : {title : tiêu đề control template, content: html, controlProps: thông tin các control có trong đó nếu có}
-         */
-        callApiSaveControlTemplate(title, content, controlProps,isSingleControl = false){
-            let self = this;
-            let dataPost = {title:title,content:content,controlProps:JSON.stringify(controlProps)};
-            if(isSingleControl){
-                dataPost['isSingleControl'] = 1;
-            }
-            documentApi.saveControlTemplate(dataPost).then(res=>{
-                self.$refs.formModalView.hide()
-                if(res.status == 200){
-                    this.$snotify({
-                        type: "success",
-                        title: "Lưu Control Template thành công"
-                    });  
-                    let allControlTemplate = self.editorStore.allControlTemplate;
-                    let control = res.data;
-                    control.ba_create = control.baCreate;
-                    control.create_at = control.createAt;
-                    allControlTemplate.push(control);
-                    self.$store.commit(
-                        "document/addToDocumentEditorStore",{key:'allControlTemplate',value:allControlTemplate,instance:self.keyInstance}
-                    );
-                }
-                else{
-                    this.$snotify({
-                        type: "error",
-                        title: res.message
-                    });  
-                }
-            })
-        },
-
         /**
          * Hàm xoay trang
          */
