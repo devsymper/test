@@ -86,7 +86,39 @@
         "of": "of",
         "entries": "Entries",
         "always_show_sidebar": "Always show sidebar",
-        "import_excel": "Import excel"
+        "import_excel": "Import excel",
+        "sidebar": {
+            "My work": "My work",
+            "tasks": "Tasks",
+            "Lists trash": "Lists trash",
+            "works": "Works",
+            "App": "Applications",
+            "permissions": "Permissions",
+            "userRoleSetting": "User Role Setting",
+            "actionPack": "actionPack",
+            "users": "User account",
+            "baAccount": "BA account",
+            "Manage timesheet": "Manage timesheet",
+            "Timesheet": "Timesheet",
+            "List workflows": "List workflows",
+            "List documents": "List documents",
+            "myWork": "Calendar",
+            "Timesheet report": "Timesheet reports",
+            "Administrator": "Administrator",
+            "apps": "My apps",
+            "Account management": "Account manager",
+            "Access Management": "Access management",
+            "Applications": "Applications",
+            "Lists to do": "Lists to do",
+            "My application": "My application",
+            "KH": "Knowledge Hub",
+            "Report": "Report",
+            "File": "File",
+            "workflows": "Workflows",
+            "documents": "Documents",
+            "orgchart": "Organization chart"
+
+        }
     },
     "validate": {
         "required": "Not be empty",
@@ -760,7 +792,9 @@
     "notification": {
         "error": "Error occurred. Please try again later",
         "errorTitle": "Error",
-        "successTitle": "Success"
+        "successTitle": "Success",
+        "older": "Older",
+        "today": "Today"
     },
     "virtualdoc": {
         "header": {

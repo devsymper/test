@@ -74,7 +74,6 @@ export default {
             type: Number,
             default: 0
         },
-
         docObjInfo: {
             type: Object,
             default(){
@@ -144,6 +143,15 @@ export default {
             taskId:"",
             createTime:"",
             userId:"",
+            direction: "top",
+            fab: false,
+            hover: false,
+            tabs: null,
+            top: false,
+            right: true,
+            bottom: true,
+            left: false,
+            transition: "slide-y-reverse-transition",
             printConfigActive:null,
             formSize:{},
             wrapFormCss:{},

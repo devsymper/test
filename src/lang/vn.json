@@ -85,7 +85,38 @@
         "of": "của",
         "entries": "bản ghi",
         "always_show_sidebar": "Luôn hiển thị sidebar",
-        "import_excel": "Nhập bằng excel"
+        "import_excel": "Nhập bằng excel",
+        "sidebar": {
+            "Lists trash": "Danh sách bản xóa",
+            "tasks": "Tasks",
+            "works": "Works",
+            "My work": "Công việc của tôi",
+            "myWork": "Lịch làm việc",
+            "Manage timesheet": "Quản lý  thời gian biểu",
+            "Timesheet report": "Báo cáo thời gian biểu",
+            "Timesheet": "Thời gian biểu",
+            "App": "Ứng dụng",
+            "Administrator": "Quản trị viên",
+            "Account management": "Quản lý tài khoản",
+            "Access Management": "Quản lý truy cập",
+            "users": "Tài khoản người dùng",
+            "baAccount": "Tài khoản BA",
+            "actionPack": "Action Pack",
+            "permissions": "Phân quyền",
+            "userRoleSetting": "Vai trò người dùng",
+            "KH": "Tri thức nội bộ",
+            "apps": "Cài đặt ứng dụng",
+            "Applications": "Ứng dụng",
+            "Lists to do": "Việc cần làm",
+            "My application": "Ứng dụng",
+            "Report": "Báo cáo",
+            "List workflows": "Danh sách quy trình",
+            "List documents": "Danh sách văn bản",
+            "File": "Quản lý tệp",
+            "workflows": "Quy trình",
+            "documents": "Văn bản",
+            "orgchart": "Sơ đồ tổ chức"
+        }
     },
     "login": {
         "title": "Đăng nhập hệ thống",
@@ -515,7 +546,6 @@
                         "subTitle1": "Người phê duyệt",
                         "subTitle2": "Người tham gia"
                     }
-
                 }
             },
             "fab": {
@@ -775,11 +805,6 @@
                 "remove operation": "Xoá",
                 "add action pack": "Thêm",
                 "remove action pack": "Xoá"
-
-
-
-
-
             },
             "dataflow": {
                 "detail": "Chi tiết",
@@ -878,7 +903,9 @@
     "notification": {
         "error": "Đã có lỗi xảy ra. Vui lòng thử lại sau",
         "errorTitle": "Lỗi",
-        "successTitle": "Thành công"
+        "successTitle": "Thành công",
+        "older": "Cũ hơn",
+        "today": "Hôm nay"
     },
     "virtualdoc": {
         "header": {

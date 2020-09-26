@@ -1,6 +1,7 @@
 <template>
     <div class="h-100 w-100">
         <div class="action-diagram-bpmn" style="text-align:right;margin-top:3px">
+            <span class="fs-13" style="float:left">{{definitionName}}</span>
             <v-icon class="action-btn"  @click="handleZoomOut">mdi-plus-circle-outline</v-icon>
             <v-icon class="action-btn"  @click="handleZoomIn">mdi-minus-circle-outline</v-icon>
             <v-icon class="action-btn"  @click="handleFocus">mdi-image-filter-center-focus</v-icon>
@@ -66,6 +67,10 @@ export default {
         elementId: {
             type: String,
             default: ''
+        },
+        definitionName:{
+            type:String,
+            default:'',
         },
     },
     watch:{
