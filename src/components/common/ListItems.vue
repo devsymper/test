@@ -1,5 +1,5 @@
 <template>
-    <div class="ml-2 w-100 pr-3 pt-3">
+    <div class="ml-2 w-100 pr-3 pt-3" >
         <div :style="{width:contentWidth, display: 'inline-block'}">
             <v-row no-gutters class="pb-2" ref="topBar">
                 <v-col>
@@ -121,7 +121,7 @@
                 ></Pagination>
             </v-row>
         </div>
-
+    
         <component
             :is="actionPanelWrapper"
             :width="actionPanelWidth"
@@ -130,8 +130,8 @@
             class="pa-3"
             absolute
             right
-            v-if="actionPanelType != 'drag'"
-            :temporary="actionPanelType == 'temporary'"
+            v-if="reComputeActionPanelType != 'drag'"
+            :temporary="reComputeActionPanelType == 'temporary'"
         >
             <slot name="right-panel-content" :itemData="currentItemDataClone">
                 <v-card flat>
@@ -249,6 +249,13 @@ export default {
             if (this.actionPanel == true) {
                 this.$emit("open-panel");
             }
+        },
+        'tableDisplayConfig.value.alwaysShowSidebar'(value) {
+            if(value){
+                this.openactionPanel();
+            }else{
+                this.closeactionPanel();
+            }
         }
     },
     data() {
@@ -336,10 +343,10 @@ export default {
                 },
                 beforeKeyDown:function(change, source){
                     let cellMeta = this.getSelected();
-                    self.$emit('before-keydown',{event:event,row:self.data[cellMeta[0][0]]});
+                    self.$emit('before-keydown',{event:event,cell:{col:cellMeta[0][1],row:cellMeta[0][0]},rowData:self.data[cellMeta[0][0]]});
                 },
                 afterOnCellMouseDown:function(event, coords, TD){
-                    self.$emit('after-cell-mouse-down',{event:event,row:self.data[coords.row]});
+                    self.$emit('after-cell-mouse-down',{event:event,cell:coords,rowData:self.data[coords.row]});
                 }
             },
             tableFilter: {
@@ -409,6 +416,11 @@ export default {
         // });
         this.getData();
         this.restoreTableDisplayConfig();
+        document.addEventListener('keyup', function (evt) {
+            if (evt.keyCode === 27) {
+                thisCpn.closeactionPanel();
+            }
+        });
     },
     props: {
         showImportButton: {
@@ -554,12 +566,15 @@ export default {
     },
     mounted() {},
     computed: {
+        reComputeActionPanelType(){
+            return this.tableDisplayConfig.value.alwaysShowSidebar ? 'elastic' : this.actionPanelType;
+        },
         currentItemDataClone() {
             return util.cloneDeep(this.currentItemData);
         },
         actionTitle() {},
         contentWidth() {
-            if (this.actionPanel && this.actionPanelType == "elastic") {
+            if (this.actionPanel && this.reComputeActionPanelType == "elastic") {
                 return "calc(100% - " + this.actionPanelWidth + "px)";
             } else if (this.tableDisplayConfig.show) {
                 return "calc(100% - " + this.tableDisplayConfig.width + "px)";
@@ -620,8 +635,8 @@ export default {
                 temporary: "v-navigation-drawer",
                 elastic: "v-navigation-drawer"
             };
-            return mapType[this.actionPanelType]
-                ? mapType[this.actionPanelType]
+            return mapType[this.reComputeActionPanelType]
+                ? mapType[this.reComputeActionPanelType]
                 : mapType["temporary"];
         }
     },
@@ -1391,7 +1406,7 @@ export default {
         // hoangnd: thêm cột checkbox
         addCheckBoxColumn(){
             this.hasColumnsChecked = true;
-            this.tableColumns.unshift({name:"checkbox_select_item",title:"Chọn",type:"checkbox"});
+            this.tableColumns.unshift({name:"checkbox_select_item",data:"checkbox_select_item",title:"Chọn",type:"checkbox"});
         },
         removeCheckBoxColumn(){
             this.hasColumnsChecked = false;
@@ -1415,8 +1430,10 @@ export default {
                 }else{
                     delete this.allRowChecked[change[0][0]];
                 }
+                this.$emit('after-selected-row',this.allRowChecked)
             }
-        }
+        },
+        
     },
     components: {
         HotTable,
