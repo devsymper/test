@@ -1115,7 +1115,6 @@ export default {
                 }
             })
         },
-
         /**
          * Hàm xoay trang
          */

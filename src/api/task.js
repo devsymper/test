@@ -16,6 +16,10 @@ export const taskApi = {
     },
     getDocumentObjIds(data) {
         return document.post('documents/object/batch', data);
+    },
+    getListDocumentWithUserSubmit(userId){
+        return document.get('documents/objects-out-workflow/'+ userId);
     }
+    
 
 }

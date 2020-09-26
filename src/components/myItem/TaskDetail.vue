@@ -62,6 +62,7 @@
                     :originData="originData"
                     :tabsData="tabsData['people']"
                     @changeUpdateAsignee="changeUpdateAsignee"
+                    :definitionName="breadcrumb.definitionName"
                     :ref="`task`"
                   >
                 </task>

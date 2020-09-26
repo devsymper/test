@@ -95,10 +95,8 @@ export default {
 			let appId
 			if(allAppMode == true){
 				appId = this.appId
-				debugger
 			}else{
 				appId = this.$store.state.appConfig.currentAppId
-				debugger
 			}
 			
 			this.defineAction[this.type].action = action;

@@ -196,8 +196,14 @@
                         class="fs-13 px-1 py-0"
                     >
                         <div class="pl-1">
-                            <div style="width:55px">10 <v-icon class="fs-14" style="float:right;margin-top:4px;margin-right:12px">mdi-comment-processing-outline</v-icon> </div>
-                            <div style="width:55px"> 2 <v-icon class="fs-14" style="float:right;margin-top:4px;margin-right:12px">mdi-attachment</v-icon></div>
+                            <div style="width:55px">
+                                10 
+                                <v-icon class="fs-14" style="float:right;margin-top:4px;margin-right:12px">mdi-comment-processing-outline</v-icon> 
+                            </div>
+                            <div style="width:55px"> 
+                                2 
+                                <v-icon class="fs-14" style="float:right;margin-top:4px;margin-right:12px">mdi-attachment</v-icon>
+                            </div>
                         </div>
                     </v-col>
                 </v-row>
@@ -367,7 +373,8 @@ export default {
                 sort: "createTime",
                 order: "desc",
                 page: 1,
-                assignee: this.$store.state.app.endUserInfo.id
+                involvedUser: this.$store.state.app.endUserInfo.id
+                // assignee: this.$store.state.app.endUserInfo.id
             },
             defaultAvatar: appConfigs.defaultAvatar,
             arrdocObjId: []
@@ -520,9 +527,9 @@ export default {
             listTasks = res;
             }
         } else {
-            if (!filter.assignee) {
-            filter.assignee = this.$store.state.app.endUserInfo.id;
-            }
+            // if (!filter.assignee) {
+            // filter.assignee = this.$store.state.app.endUserInfo.id;
+            // }
             res = await BPMNEngine.getTask(filter);
             listTasks = res.data;
         }
