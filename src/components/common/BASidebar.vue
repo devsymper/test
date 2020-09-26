@@ -77,12 +77,10 @@
                                         <v-icon class="ml-3 fs-16">mdi mdi-account-check-outline</v-icon>
                                         <span class="fs-13 mt-3 mb-2 ml-4"> Chọn user thay mặt</span>
                                        </div>
-                                    
-    
                              <!-- <VuePerfectScrollbar style="height:400px" > -->
                                     <v-autocomplete
                                         ref="selectDelegateUser"
-                                         :menu-props="{ maxHeight:300, minWidth:250,maxWidth:250,nudgeLeft:10, nudgeBottom:3}"
+                                         :menu-props="{ maxHeight:300, minWidth:251,maxWidth:251,nudgeLeft:8, nudgeBottom:3}"
                                         return-object
                                         class="mr-2 ml-2"
                                         full-width
