@@ -94,6 +94,26 @@ const updateActionDef = (state, data) => {
 const updateParam = (state, data) => {
     Vue.set(state, 'param', data)
 }
+const showDetailAppArea = (state) => {
+    Vue.set(state, 'showDetailArea', true)
+}
+const setListApps =  (state , data) =>{
+    Vue.set(state, "listApps", data);
+}
+const updateFavoriteMyAppItem = (state, data) =>{
+    state.listApps[data.appId].childrenAppReduce[state.selectingItemType].item.forEach(function(e){
+        if(e.objectIdentifier == data.itemId){
+            Vue.set(e, "favorite" , data.value)
+            debugger
+            // e.favorite = data.value
+            // Vue.set(e)
+        }
+    })
+    
+}
+const updateSelectingItemType = (state, data) =>{
+    state.selectingItemType = data
+}
 export {
     updateListItemSelected,
     removeItemSelected,
@@ -105,5 +125,9 @@ export {
     changeTypeView,
     updateCurrentAppId,
     updateActionDef,
-    updateParam
+    updateParam,
+    showDetailAppArea,
+    setListApps,
+    updateFavoriteMyAppItem,
+    updateSelectingItemType
 };

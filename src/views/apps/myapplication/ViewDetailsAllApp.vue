@@ -2,7 +2,7 @@
    <div class="view-details-all-app h-100" style="display:flex">
        <div class="header-view-details-all-app">
             <h4 style="flex-grow:1;font:15px roboto"> Danh sách công việc của tôi </h4>
-            <div style="width:440px;display:flex">
+            <div style="width:470px;display:flex">
                 <v-btn
                     class="button-add-task"
                     style="backgound-color:#F7F7F7;margin-8px"
@@ -20,10 +20,10 @@
                         v-model="searchItemKey"
                     ></v-text-field>
                    <div class="button-header">
-                        <v-btn icon>
-                         <v-icon @click="collapse" style="padding-top:1px">mdi-arrow-collapse-up</v-icon>  
+                        <v-btn icon tile style="width:32px;height:32px;margin:0px 4px" >
+                         <v-icon @click="collapse" >mdi-arrow-collapse-up</v-icon>  
                         </v-btn>
-                        <v-btn icon>
+                        <v-btn icon tile  style="width:32px;height:32px;margin:0px 4px">
                             <v-icon @click="changeView">mdi-page-previous-outline</v-icon>  
                         </v-btn>
                    </div>
@@ -45,13 +45,12 @@
                             style="display:flex"
                         >
                                 <div
-                                     v-for="(item,i) in apps"
+                                     v-for="(item,i) in listApp"
                                     :key="i"
                                     style="width:50%"
                                 >
                                      <v-expansion-panel
-                                      
-                                    >
+                                     >
                                     <v-expansion-panel-header>
                                     <div class="app-title">
                                             <v-icon v-if="item.iconType == 'icon'" style="font-size:16px;flex:unset;margin-left:0px;margin-right:0px;padding-top:2px">{{item.iconName}}</v-icon>
@@ -66,7 +65,7 @@
                                         <v-row no-gutters>
                                             <template v-for="(childItem,n) in item.childrenAppReduce">
                                                 <v-col cols="6" :key="n">
-                                                    <div style="margin-left:-5px">
+                                                    <div style="margin-left:9px;margin-top:6px">
                                                         <div style="margin-bottom:6px">
                                                             <v-icon style="margin-top:-2px">{{ childItem.icon }}</v-icon>
                                                             <span style="font-weight:300;font:13px;margin-top:1px">
@@ -79,6 +78,7 @@
                                                                     <li
                                                                         v-if="subChildItem.show == true"
                                                                         v-on:contextmenu="rightClickHandler($event,subChildItem,childItem.name,item)"
+                                                                        v-on:click="rightClickHandler($event,subChildItem,childItem.name,item)"
                                                                     >
                                                                         <div style="position:relative">
                                                                             <v-tooltip bottom v-if="childItem.name == 'document_definition'">
@@ -86,15 +86,15 @@
                                                                                     <div class="title-document-enduser" 	
                                                                                         v-bind="attrs"
                                                                                         v-on="on" >
-                                                                                        <span v-on:click="rightClickHandler($event,childItem,childItem.name)">{{subChildItem.title}}</span> 
+                                                                                        <span v>{{subChildItem.title}}</span> 
                                                                                         
                                                                                     </div>
                                                                                 </template>
                                                                                 <span style="font:13px roboto">{{subChildItem.title}}</span> 
                                                                                 <span style="font:8px;opacity:0.4">{{subChildItem.name}}</span>
                                                                             </v-tooltip>
-                                                                            <div v-else v-on:click="rightClickHandler($event,subChildItem,childItem.name)">{{subChildItem.title ? subChildItem.title : subChildItem.name }}</div>
-                                                                            <v-icon  @click="changeFavorite(subChildItem,childItem.name,childItem)" :class="{'icon-star-active' : subChildItem.favorite == true, 'icon-star': true}" >mdi-star</v-icon>	
+                                                                            <div v-else >{{subChildItem.title ? subChildItem.title : subChildItem.name }}</div>
+                                                                            <v-icon  @click="changeFavorite(subChildItem,childItem.name,item)" :class="{'icon-star-active' : subChildItem.favorite , 'icon-star': true}" >mdi-star</v-icon>	
                                                                         </div>
                                                                     </li>
                                                             </ul>
@@ -135,8 +135,10 @@ export default {
         ContextMenu,
         DialogCreateTask
     },
-    created(){
-        let self = this;
+    computed:{
+        listApp(){
+            return this.$store.state.appConfig.listApps
+        }
     },
     methods:{
         createTask(){
@@ -177,7 +179,7 @@ export default {
             })
             return i
         },
-        getActiveapps(){
+         getActiveapps(){
             let self = this
 			appManagementApi.getActiveApp().then(res => {
 				if (res.status == 200) {
@@ -189,7 +191,8 @@ export default {
                             self.checkChildrenApp(e.childrenApp,e.id)   
                         }
                     }
-                    this.getByAccessControl(self.listIds)
+                     this.getByAccessControl(self.listIds)
+                    this.$store.commit('appConfig/setListApps', this.apps)
                     setTimeout(function(e){
                         self.loadingApp = false
                     },1000)
@@ -277,7 +280,9 @@ export default {
 			return array
         },
         changeFavorite(item,type,app){
+            event.stopPropagation()
             let self = this
+            self.$store.commit('appConfig/updateSelectingItemType',type)
             if(type == "document_major" || type == "document_category"){
 				type = "document_definition"
 			}
@@ -296,15 +301,9 @@ export default {
 			}
 			if(item.favorite == false){
 				appManagementApi.addFavoriteItem(userId,item.id,type,1).then(res => {
-					if (res.status == 200) {
-                        app.item.forEach(function(e){
-                            if(e.objectIdentifier == item.objectIdentifier){
-                                self.$set(e,"favorite" , true)
-                            }
-                        })
+					if (res.status == 200){
                         self.$store.commit('appConfig/insertFavorite',item)
-                        console.log(app);
-                        debugger
+                        self.$store.commit('appConfig/updateFavoriteMyAppItem',{appId:app.id,itemId:item.objectIdentifier,value:true})
 					}
 				});
 			}else{
@@ -312,13 +311,7 @@ export default {
 					if (res.status == 200) {
 						item.type = type;
                         self.$store.commit('appConfig/delFavorite',item)
-                        app.item.forEach(function(e){
-                            if(e.objectIdentifier == item.objectIdentifier){
-                                self.$set(e,"favorite", false)
-                            }
-                        })
-                        console.log(app);
-                        debugger
+                         self.$store.commit('appConfig/updateFavoriteMyAppItem',{appId:app.id,itemId:item.objectIdentifier,value:false})
 					}
 				});
             }
@@ -442,6 +435,7 @@ export default {
 }
 .view-details-all-app >>> .header-view-details-all-app .button-header {
     display:flex;
+    margin-left:4px;
 }
 .view-details-all-app >>> .header-view-details-all-app .button-header .v-btn {
     margin:unset;
@@ -450,17 +444,28 @@ export default {
 .view-details-all-app  >>>.header-view-details-all-app .v-icon::after{
 	display:none
 }
+.view-details-all-app  >>>.header-view-details-all-app .v-icon:hover{
+    background-color:unset !important;
+}
 .view-details-all-app  >>> button{
     margin:8px
-}
-.view-details-all-app  >>> button:hover{
-
 }
 .view-details-all-app .content-view-details-all-app{
     width:95%;
     margin-left:auto;
     margin-right:auto;
     font:13px roboto
+}
+.view-details-all-app >>> .content-view-details-all-app .v-expansion-panel-header{
+    margin:0px 32px 0px 16px;
+    min-height:unset;
+    height:50px;
+}
+.view-details-all-app >>> .content-view-details-all-app .v-expansion-panel-header.v-expansion-panel-header--active{
+    /* border-bottom: 1px solid #FF8003; */
+}
+.view-details-all-app >>> .content-view-details-all-app .v-expansion-panel-header__icon{
+    margin-right:12px;
 }
 .view-details-all-app .content-view-details-all-app .app-item-img{
     width:16px;
@@ -496,7 +501,7 @@ export default {
     min-height:unset;
     width:250px !important;
     min-width:unset;
-    height: 30px;
+    height: 50px;
     flex-grow:unset
 
 }
@@ -572,7 +577,7 @@ export default {
 }
 .view-details-all-app >>> .v-expansion-panel-header--active .v-expansion-panel-header__icon {
     border-bottom: 0.5px solid #FF8003;
-    padding-bottom:9px;
+    padding-bottom:10px;
 }
 .view-details-all-app >>> .v-expansion-panel-header::before .app-title {
     border-bottom: 0.5px solid #ffffff;

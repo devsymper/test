@@ -6,6 +6,7 @@
 					<ul v-for="(childItem,i) in itemT.item" :key="i"  class="app-child-item">
 							<li  v-if="isEndUserCpn == true" 
 								v-on:contextmenu="rightClickHandler($event,childItem,itemT.name)"
+								v-on:click="rightClickHandler($event,childItem,itemT.name)"
 							>
 								<div style="position:relative">
 									<v-tooltip bottom v-if="itemT.name == 'document_category' || itemT.name == 'document_major'">
@@ -13,13 +14,13 @@
 											<div class="title-document-enduser" 	
 												v-bind="attrs"
 												v-on="on" >
-												<span v-on:click="rightClickHandler($event,childItem,itemT.name)">{{childItem.title}}</span> 
+												<span >{{childItem.title}}</span> 
 											</div>
 										</template>
 										<span style="font:13px roboto">{{childItem.title}}</span> 
 										<span style="font:8px;opacity:0.4">{{childItem.name}}</span>
 									</v-tooltip>
-									<div v-else v-on:click="rightClickHandler($event,childItem,itemT.name)">{{childItem.name}}</div>
+									<div v-else >{{childItem.name}}</div>
 									<v-icon  @click="changeFavorite(childItem,itemT.name)" :class="{'icon-star-active' : childItem.favorite==true, 'icon-star': true}" >mdi-star</v-icon>	
 								</div>
 							</li>
@@ -203,6 +204,7 @@ export default {
 			this.$refs.contextMenu.hide()
 		},	
 		changeFavorite(item,type){
+			 event.stopPropagation()
 			if(type == "document_major" || type == "document_category"){
 				type = "document_definition"
 			}

@@ -2,10 +2,10 @@
    <div class="view-side-by-side-apps h-100">
        <div class="list-apps h-100">
 				 <h4>Ứng dụng</h4>
-				<v-btn icon style="position:absolute;top:2px;right:6px;font-size:13px" >
+				<v-btn icon tile style="position:absolute;top:2px;right:6px;font-size:13px" >
 					<v-icon @click="changeView" style="font-size:13px" >mdi-page-previous-outline</v-icon>  
 				</v-btn>
-            <div style="margin:20px 0px 0px 8px">
+            <div style="margin:20px 0px 0px 0px">
                 <div :class="{'favorite-area': true , 'active': showFavorite == true}" @click="showListFavorite">
                     <v-icon style="font-size:16px" color="yellow"> mdi-star</v-icon>
                     <span style="font:13px roboto;padding-left:8px">Yêu thích</span>
@@ -13,21 +13,20 @@
                  <div  v-for="(item,i) in apps" :key="i" 
                     :class="{'list-app-item': true,'active': item.id == activeIndex}"
                     @click="clickDetails(item)"
-
                     >
                         <v-icon v-if="item.iconType == 'icon'" style="font-size:16px">{{item.iconName}}</v-icon>
                         <img v-else-if="item.iconType == 'img'" :src="item.iconName" class="app-item-img"/>
                     <v-tooltip bottom>
                         <template v-slot:activator="{ on, attrs }">
-                            <h5 v-bind="attrs"
-                            v-on="on">{{item.name}}</h5>
+                            <div v-bind="attrs" class="title-app-sbs"
+                            v-on="on">{{item.name}}</div>
                         </template>
                         <span>{{item.name}}</span>
                     </v-tooltip>
                 </div>
             </div>
        </div>
-       <div class="detail-app" v-show="showDetailDiv">
+       <div class="detail-app" v-show="showDetailArea">
           <div v-if="showFavorite == false">
                <h4>Chi tiết ứng dụng</h4>
                 <v-text-field
@@ -67,6 +66,7 @@ import AppDetail from './../AppDetail.vue'
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import ContextMenu from './../ContextMenu.vue'
 import SymperActionView from '@/action/SymperActionView.vue'
+import {util} from './../../../plugins/util'
     export default {
     created(){
         this.getActiveapps()
@@ -77,7 +77,9 @@ import SymperActionView from '@/action/SymperActionView.vue'
         VuePerfectScrollbar,
         ContextMenu,
         SymperActionView
-    },
+	},
+	mounted(){
+	},
     computed:{
         sFavorite(){
 			return this.$store.state.appConfig.listFavorite
@@ -87,7 +89,11 @@ import SymperActionView from '@/action/SymperActionView.vue'
         },
         param(){
              return this.$store.state.appConfig.param
-        }
+		},
+		showDetailArea(){
+			return this.$store.state.appConfig.showDetailArea
+		}
+		
     },
     methods:{
         rightClickHandler(event,item,type){
@@ -104,7 +110,7 @@ import SymperActionView from '@/action/SymperActionView.vue'
         showListFavorite(){
             this.showFavorite = true
             this.activeIndex = '000'
-            this.showDetailDiv = true
+			this.$store.commit('appConfig/showDetailAppArea')
         },
         getFavorite(){
 			this.listFavorite= []
@@ -234,8 +240,6 @@ x				}
 			return array
 		},
         changeView(){
-			// this.$refs.appDetail.hideContextMenu()
-			// debugger
             this.$store.commit('appConfig/changeTypeView')
         },
         hideContextMenu(){
@@ -258,7 +262,8 @@ x				}
             this.activeIndex = item.id
             this.showFavorite = false
             this.$store.commit("appConfig/updateCurrentAppId",item.id);
-            this.showDetailDiv = true
+			// this.showDetailDiv = true
+			this.$store.commit('appConfig/showDetailAppArea')
 			this.$store.commit('appConfig/emptyItemSelected')
 			appManagementApi.getAppDetails(item.id).then(res => {
 				if (res.status == 200) {
@@ -367,7 +372,8 @@ x				}
             listFavorite:[],
             showFavorite:false,
             activeFavorite:false,
-            heightListFavorite: 'calc(100vh - 100px)',
+			heightListFavorite: 'calc(100vh - 100px)',
+			widthActionArea:null,
             arrType:{
                 document_definition:[],
                 orgchart:[],
@@ -416,6 +422,7 @@ x				}
    display: flex;
    align-items: center;
    height:40px;
+   padding-left:10px
 }
 .view-side-by-side-apps .favorite-area .active{
     background-color: active;
@@ -426,6 +433,17 @@ x				}
     width:220px;
     border-right:1px solid lightgray;
     position: relative;
+}
+.view-side-by-side-apps >>> .list-apps .v-icon{
+	background-color:unset !important;
+}
+.view-side-by-side-apps .list-apps .title-app-sbs{
+    white-space: nowrap; 
+	width: 200px; 
+	overflow: hidden;
+	text-overflow: ellipsis; 
+	font:13px roboto;
+	padding-left:8px;
 }
 
 .view-side-by-side-apps .list-apps h4{
@@ -447,7 +465,7 @@ x				}
 .view-side-by-side-apps .list-apps .list-app-item {
     display:flex;
     width: inherit;
-    padding:12px 0px;
+    padding:12px 0px 12px 10px;
 }
 .view-side-by-side-apps .list-apps .list-app-item  h5{
     font:13px roboto;
@@ -503,4 +521,5 @@ x				}
 	text-overflow: ellipsis; 
 	padding:4px 0px;
 }
+
 </style>
