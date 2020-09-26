@@ -701,7 +701,7 @@ export default {
         },
         "sDocumentSubmit.readySubmit":function(data){
             if(data == true){
-                this.submitDocument()
+                this.submitDocument();
             }
         },
         /**
@@ -1579,6 +1579,13 @@ export default {
             }
             
         },
+        resetCheckRefreshData(){
+            this.$store.commit("document/addToDocumentSubmitStore", {
+                key: 'readySubmit',
+                value: false,
+                instance: this.keyInstance
+            });
+        },
         async callApiSubmit(dataPost){
             let thisCpn = this;
             let titleObject = "";
@@ -1612,6 +1619,7 @@ export default {
                         type: "error",
                         title: res.message
                     });
+                    thisCpn.resetCheckRefreshData();
                 }
             })
             .catch(err => {
@@ -1620,6 +1628,8 @@ export default {
                         type: "error",
                         title: "error from submit document api!!!"
                     });
+                thisCpn.resetCheckRefreshData();
+                thisCpn.isSubmitting = false;
             })
             .always(() => {
             });
