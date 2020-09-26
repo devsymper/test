@@ -47,7 +47,7 @@
                             <div style="position:relative">
                                 <div v-if="item.type == 'document_definition'" class="title-item-favorite">{{item.title}}</div>
                                 <div v-else  class="title-item-favorite">{{item.name}}</div> 
-                                <v-icon  color="#F6BE4F" style="float:right;font-size:13px;position:absolute;top:0px;right:12px">mdi-star</v-icon>
+                                <v-icon  color="#F6BE4F" style="float:right;font-size:13px;position:absolute;top:4px;right:14px">mdi-star</v-icon>
                             </div>
                         </li>
                     </ul>
@@ -234,8 +234,8 @@ x				}
 			return array
 		},
         changeView(){
-			this.$refs.appDetail.hideContextMenu()
-			debugger
+			// this.$refs.appDetail.hideContextMenu()
+			// debugger
             this.$store.commit('appConfig/changeTypeView')
         },
         hideContextMenu(){
@@ -493,11 +493,14 @@ x				}
     list-style: none;    
     padding:6px;
 }
+.view-side-by-side-apps >>> .favorite-area-item li:hover{
+}
 .view-side-by-side-apps >>> .favorite-area-item .title-item-favorite{
    	white-space: nowrap; 
 	font:13px roboto;
 	width: 90%; 
 	overflow: hidden;
 	text-overflow: ellipsis; 
+	padding:4px 0px;
 }
 </style>

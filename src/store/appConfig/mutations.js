@@ -32,8 +32,7 @@ const emptyItemSelected = (state) => {
     state.listItemSelected = {
         document_category:{
 			icon : 'mdi-file-document-outline',
-			title: "Danh mục",
-			// this.$t('apps.listType.documents')
+			title: "apps.listType.documentCategory",
 			name:  'document_category',
 			item:[
 				
@@ -41,27 +40,26 @@ const emptyItemSelected = (state) => {
 		},
 		document_major:{
 			icon : 'mdi-file-edit-outline',
-			title: "Chứng từ",
-			// title: this.$t('apps.listType.documents'),
+            title: "apps.listType.documentMajor",
 			name:  'document_major',
 			item:[
 			]
 		},
         orgchart: {
             icon: 'mdi-widgets-outline',
-            title: 'Orgcharts',
+            title: "apps.listType.orgchart",
             name: 'orgchart',
             item: []
         },
         dashboard: {
             icon: 'mdi-view-dashboard',
-            title: 'Reports',
+            title: "apps.listType.dashboard",
             name: 'dashboard',
             item: []
         },
         workflow_definition: {
             icon: 'mdi-lan',
-            title: 'Workflows',
+            title: "apps.listType.workflow",
             name: 'workflow_definition',
             item: []
         },

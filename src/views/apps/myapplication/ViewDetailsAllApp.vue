@@ -19,12 +19,14 @@
                         append-icon="mdi-magnify"
                         v-model="searchItemKey"
                     ></v-text-field>
-                    <v-btn icon>
+                   <div class="button-header">
+                        <v-btn icon>
                          <v-icon @click="collapse" style="padding-top:1px">mdi-arrow-collapse-up</v-icon>  
-                    </v-btn>
-                    <v-btn icon>
-                          <v-icon @click="changeView">mdi-page-previous-outline</v-icon>  
-                    </v-btn>
+                        </v-btn>
+                        <v-btn icon>
+                            <v-icon @click="changeView">mdi-page-previous-outline</v-icon>  
+                        </v-btn>
+                   </div>
             </div>
         </div>
         <VuePerfectScrollbar :style="{height: menuItemsHeight}">
@@ -76,7 +78,7 @@
                                                             <ul v-for="(subChildItem,k) in childItem.item" :key="k"  class="app-child-item">
                                                                     <li
                                                                         v-if="subChildItem.show == true"
-                                                                        v-on:contextmenu="rightClickHandler($event,subChildItem,childItem.name)"
+                                                                        v-on:contextmenu="rightClickHandler($event,subChildItem,childItem.name,item)"
                                                                     >
                                                                         <div style="position:relative">
                                                                             <v-tooltip bottom v-if="childItem.name == 'document_definition'">
@@ -92,7 +94,7 @@
                                                                                 <span style="font:8px;opacity:0.4">{{subChildItem.name}}</span>
                                                                             </v-tooltip>
                                                                             <div v-else v-on:click="rightClickHandler($event,subChildItem,childItem.name)">{{subChildItem.title ? subChildItem.title : subChildItem.name }}</div>
-                                                                            <v-icon  @click="changeFavorite(subChildItem,childItem.name)" :class="{'icon-star-active' : subChildItem.favorite == true, 'icon-star': true}" >mdi-star</v-icon>	
+                                                                            <v-icon  @click="changeFavorite(subChildItem,childItem.name,childItem)" :class="{'icon-star-active' : subChildItem.favorite == true, 'icon-star': true}" >mdi-star</v-icon>	
                                                                         </div>
                                                                     </li>
                                                             </ul>
@@ -116,7 +118,7 @@
                     </template>
         </div>
         </VuePerfectScrollbar>
-        <ContextMenu ref="contextMenu"  />
+        <ContextMenu ref="contextMenu"  :allAppMode="true" />
         <DialogCreateTask :showCreateTask="showCreateTask" @close-dialog="showCreateTask = false" />
     </div>
 </template>
@@ -143,12 +145,13 @@ export default {
         hideContextMenu(){
             this.$refs.contextMenu.hide()	
         },
-        rightClickHandler(event,item,type){
+        rightClickHandler(event,item,type,app){
 			event.stopPropagation();
 			event.preventDefault();
 			this.$refs.contextMenu.setContextItem(item.actions)
 			this.$refs.contextMenu.show(event)
             this.$refs.contextMenu.setItem(item)
+            this.$refs.contextMenu.setAppId(app.id)
             if(type == 'document_category' || type == "document_major"){
 				type = "document_definition"
 			}
@@ -273,7 +276,7 @@ export default {
             })
 			return array
         },
-        changeFavorite(item,type){
+        changeFavorite(item,type,app){
             let self = this
             if(type == "document_major" || type == "document_category"){
 				type = "document_definition"
@@ -294,8 +297,14 @@ export default {
 			if(item.favorite == false){
 				appManagementApi.addFavoriteItem(userId,item.id,type,1).then(res => {
 					if (res.status == 200) {
-						self.$store.commit('appConfig/insertFavorite',item)
-                        self.$set(item, 'favorite', true)
+                        app.item.forEach(function(e){
+                            if(e.objectIdentifier == item.objectIdentifier){
+                                self.$set(e,"favorite" , true)
+                            }
+                        })
+                        self.$store.commit('appConfig/insertFavorite',item)
+                        console.log(app);
+                        debugger
 					}
 				});
 			}else{
@@ -303,7 +312,13 @@ export default {
 					if (res.status == 200) {
 						item.type = type;
                         self.$store.commit('appConfig/delFavorite',item)
-                         self.$set(item, 'favorite', false)
+                        app.item.forEach(function(e){
+                            if(e.objectIdentifier == item.objectIdentifier){
+                                self.$set(e,"favorite", false)
+                            }
+                        })
+                        console.log(app);
+                        debugger
 					}
 				});
             }
@@ -357,27 +372,27 @@ export default {
             },
             document_category:{
                 icon : 'mdi-file-document-outline',
-                title: "Danh mục",
+                title: this.$t('apps.listType.documentCategory'),
                 name:  'document_category',
             },
             document_major:{
                 icon : 'mdi-file-edit-outline',
-                title: "Chứng từ",
+                title:  this.$t('apps.listType.documentMajor'),
                 name:  'document_major',
             },
             orgchart: {
                 icon: 'mdi-widgets-outline',
-                title: 'Orgcharts',
+                title:  this.$t('apps.listType.orgchart'),
                 name: 'orgchart',
             },
             dashboard: {
                 icon: 'mdi-view-dashboard',
-                title: 'Reports',
+                title: this.$t('apps.listType.dashboard'),
                 name: 'dashboard',
             },
             workflow_definition: {
                 icon: 'mdi-lan',
-                title: 'Workflows',
+                title:  this.$t('apps.listType.workflow'),
                 name: 'workflow_definition',
             },
             panel: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25],
@@ -425,8 +440,12 @@ export default {
     display: flex;
     margin:8px 16px 8px 8px;
 }
-.view-details-all-app >>> .header-view-details-all-app .v-btn {
+.view-details-all-app >>> .header-view-details-all-app .button-header {
+    display:flex;
+}
+.view-details-all-app >>> .header-view-details-all-app .button-header .v-btn {
     margin:unset;
+    margin-top: -2px;
 }
 .view-details-all-app  >>>.header-view-details-all-app .v-icon::after{
 	display:none
@@ -435,8 +454,6 @@ export default {
     margin:8px
 }
 .view-details-all-app  >>> button:hover{
-    /* background:unset !important; */
-    /* padding:12px; */
 
 }
 .view-details-all-app .content-view-details-all-app{
@@ -463,7 +480,7 @@ export default {
     padding:unset;
     width: 110px;
 
-}
+}  
 .view-details-all-app >>> .button-add-task .v-icon{
      margin:0px 0px 0px 8px;
 }

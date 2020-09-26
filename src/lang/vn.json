@@ -38,6 +38,7 @@
         "virtualdocs": "Virtualdocs",
         "tasks": "Tasks",
         "myItem": "My Item",
+        "myApplication": "My Application",
         "other": "Khác",
         "deploy": "Deploy",
         "start": "Bắt đầu",
@@ -616,6 +617,7 @@
         }
     },
     "apps": {
+        "titleMyApplication": "Danh sách công việc của tôi",
         "header": {
             "id": "ID",
             "name": "Tên",
@@ -628,10 +630,11 @@
         },
 
         "listType": {
-            "documents": "Văn bản",
-            "workflows": "Quy trình làm việc",
-            "reports": "Báo cáo",
-            "orgcharts": "Sơ đồ tổ chức"
+            "documentMajor": "Chứng từ",
+            "documentCategory": "Danh mục",
+            "workflow": "Quy trình làm việc",
+            "dashboard": "Báo cáo",
+            "orgchart": "Sơ đồ tổ chức"
         },
         "addApp": "Thêm ứng dụng",
         "editApp": "Sửa ứng dụng",

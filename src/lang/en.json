@@ -38,6 +38,7 @@
         "virtualdocs": "Virtualdocs",
         "tasks": "Tasks",
         "myItem": "My Item",
+        "myApplication": "My Application",
         "other": "Other",
         "deploy": "Deploy",
         "start": "Start",
@@ -532,6 +533,7 @@
         "Timesheet": "Thời gian biểu"
     },
     "apps": {
+        "titleMyApplication": "Danh sách công việc của tôi",
         "header": {
             "id": "ID",
             "name": "Name",
@@ -545,10 +547,11 @@
         "emptyApp": "List application epmty",
         "emptyFavorite": " List favorite empty",
         "listType": {
-            "documents": "Documents",
-            "workflows": "Work flows",
-            "reports": "Reports",
-            "orgcharts": "Orgcharts"
+            "documentMajor": "Business Document",
+            "documentCategory": "Category Document",
+            "workflow": "Work flows",
+            "dashboard": "Dashboard",
+            "orgchart": "Orgcharts"
         },
         "addApp": "Add application",
         "editApp": "Edit application",
