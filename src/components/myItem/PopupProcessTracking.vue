@@ -5,6 +5,7 @@
                 v-if="taskInfo.action.parameter.processInstanceId"
                 :instanceId="taskInfo.action.parameter.processInstanceId"
                 :elementId="taskInfo.action.parameter.activityId"
+				:definitionName="definitionName"
                 >
             </trackingProcessInstance>
         </div>
@@ -27,6 +28,10 @@ export default {
 			type: Object,
 			default: () => {}
 		},
+		definitionName:{
+            type:String,
+            default:'',
+        },
     },
     methods:{
 	},
@@ -41,7 +46,7 @@ export default {
 <style scoped>
     .wraper-tracking{
 		position: absolute;
-		right:50px;
+		right:150px;
 		width: 70%;
 		height: 60%;
 		background: white;
@@ -49,7 +54,8 @@ export default {
 		padding: 12px 6px 6px 11px;
 		transition: all ease-in-out 250ms;
 		border: 1px solid #dedede;
-    	box-shadow: 1px 1px #e0d9d9;
+    	box-shadow: 1px 1px  #e0d9d9;
+		border-radius: 4px;
 	}
 
 

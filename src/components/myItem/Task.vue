@@ -52,6 +52,7 @@
         />
         <PopupProcessTracking 
             :taskInfo="taskInfo"
+            :definitionName="definitionName"
         />
 
     </div>
@@ -109,6 +110,10 @@ export default {
                     docId: 0
                 }
             }
+        },
+        definitionName:{
+            type:String,
+            default:'',
         },
         originData:  {
             type: Object,
