@@ -129,6 +129,9 @@ const CODUMENT_PROPS = "documentProperties"
 export default { 
     name: 'DocumentEditor',
     computed: {
+        routeName(){
+            return this.$getRouteName();
+        },
         editorStore(){  
             return this.$store.state.document.editor[this.keyInstance];
         },
@@ -188,7 +191,7 @@ export default {
                     text: 'Setting table',
                     disabled : false,
                     onAction: function(e) {
-                        if(self.$route.name == 'printConfigDocument'){
+                        if(self.routeName == 'printConfigDocument'){
                             self.showPrintConfigTable(e);
                         }
                         else{
@@ -197,7 +200,7 @@ export default {
                         
                     }
                 });
-                if(self.$route.name == 'printConfigDocument'){
+                if(self.routeName == 'printConfigDocument'){
                     ed.ui.registry.addMenuButton('pageSize', {
                         text: 'Kích thước',
                         fetch: function (callback) {
@@ -287,7 +290,7 @@ export default {
     },
     created() {
         this.$store.commit("document/setDefaultEditorStore",{instance:this.keyInstance});
-        if(this.$route.name == 'printConfigDocument'){
+        if(this.routeName == 'printConfigDocument'){
             this.isConfigPrint = true;
             this.printConfigId = this.$route.params.printConfigId;
         }
@@ -870,7 +873,7 @@ export default {
                                 );   
                             }
                         } 
-                        if(this.$route.name == "editDocument"){   //edit doc
+                        if(this.routeName == "editDocument"){   //edit doc
                             this.editDocument({documentProperty:documentProperties,fields:JSON.stringify(allControl),content:htmlContent,id:this.documentId})
                         } 
                         else{
@@ -886,7 +889,7 @@ export default {
                     }
                 }
                 else{
-                    if(this.$route.name == "editDocument"){   //edit doc
+                    if(this.routeName == "editDocument"){   //edit doc
                         this.editDocument({documentProperty:documentProperties,fields:JSON.stringify(allControl),content:htmlContent,id:this.documentId})
                     }
                     else{
@@ -1556,7 +1559,7 @@ export default {
             if(this.documentId != 0){
                 let res = await documentApi.detailDocument(this.documentId)
                 if (res.status == 200) {
-                    if(this.$route.name == "editDocument"){
+                    if(this.routeName == "editDocument"){
                         this.setDocumentProperties(res.data.document);
                     }
                     let content = res.data.document.content;

@@ -392,13 +392,13 @@ export default {
         let thisCpn = this;
         if (this.docId != 0) {
             this.documentId = this.docId;
-        } else if (this.$route.name == "submitDocument") {
+        } else if (this.$getRouteName() == "submitDocument") {
             this.$store.commit("document/changeViewType", {
                 key: this.keyInstance,
                 value: 'submit',
             });
             this.documentId = this.$route.params.id;
-        } else if (this.$route.name == "updateDocumentObject") {
+        } else if (this.$getRouteName() == "updateDocumentObject") {
             this.$store.commit("document/changeViewType", {
                 key: this.keyInstance,
                 value: 'update',
@@ -1602,7 +1602,7 @@ export default {
                     // nếu submit từ form sub submit thì ko rediect trang
                     // mà tìm giá trị của control cần được bind lại giá trị từ emit dataResponSubmit
                     thisCpn.resetDataSubmit();
-                    if(this.$route.name == 'submitDocument' && this.$route.params.id == this.documentId){
+                    if(this.$getRouteName() == 'submitDocument' && this.$route.params.id == this.documentId){
                         thisCpn.$router.push('/documents/'+thisCpn.documentId+"/objects");
                     }
                 
@@ -1641,7 +1641,7 @@ export default {
                         type: "success",
                         title: "update document success!"
                     });        
-                    if(thisCpn.$route.name == 'updateDocumentObject')
+                    if(thisCpn.$getRouteName() == 'updateDocumentObject')
                      thisCpn.$router.push('/documents/'+thisCpn.documentId+"/objects");
                 }
                 else{

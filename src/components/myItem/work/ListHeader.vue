@@ -129,7 +129,7 @@
         <v-icon size="18">{{isSmallRow ? 'mdi-view-headline' : 'mdi-menu'}}</v-icon>
       </v-btn>
     </div>
-    <v-dialog v-model="dialog" width="400">
+    <!-- <v-dialog v-model="dialog" width="400">
       <v-card>
         <v-card-title>{{$t("tasks.createTask.title")}}</v-card-title>
         <div class="mr-0 ml-0 pl-6 pr-6">
@@ -191,8 +191,8 @@
           <v-btn text small @click="dialog = false" class="mr-2">{{$t('common.close')}}</v-btn>
         </v-card-actions>
       </v-card>
-    </v-dialog>
- 
+    </v-dialog> -->
+    <DialogCreateTask :showCreateTask="showCreateTask" @create-task="createdTask" />
   </div>
 </template>
 
@@ -205,6 +205,7 @@ import userSelector from "./UserSelector";
 import TaskListFilter from "@/components/tasks/list/TaskListFilter.vue";
 import SymperDocSelect from "@/components/common/symperInputs/SymperDocumentSelect.vue";
 import { defaultTaskDescription } from "@/components/process/elementDefinitions/customExtToModel";
+import DialogCreateTask from './DialogCreateTask.vue'
 import { util } from "@/plugins/util";
 
 export default {
@@ -236,7 +237,8 @@ export default {
     userSelector: userSelector,
     datePicker: datePicker,
     TaskListFilter: TaskListFilter,
-    "symper-document-selec": SymperDocSelect
+    "symper-document-selec": SymperDocSelect,
+    DialogCreateTask
   },
   props: {
     isSmallRow: {
@@ -267,6 +269,7 @@ export default {
       closeOnClick: true,
       workStatus: "notDone",
       searchTaskKey: "",
+      showCreateTask: false,
       sortOption: [
         {
           label: this.$t("tasks.header.date"),
@@ -362,10 +365,13 @@ export default {
       }
     },
     openCreateTaskDialog() {
-      this.dialog = true;
+      this.showCreateTask = true;
     },
     changeDensity() {
       this.$emit("change-density");
+    },
+    createdTask(){
+       this.$emit('create-task')
     },
     getProcessInstance() {
       BPMNEngine.getProcessInstance()

@@ -1,5 +1,5 @@
 <template>
-    <div class="ml-2 w-100 pr-3 pt-3">
+    <div class="ml-2 w-100 pr-3 pt-3" >
         <div :style="{width:contentWidth, display: 'inline-block'}">
             <v-row no-gutters class="pb-2" ref="topBar">
                 <v-col>
@@ -130,8 +130,8 @@
             class="pa-3"
             absolute
             right
-            v-if="actionPanelType != 'drag'"
-            :temporary="actionPanelType == 'temporary'"
+            v-if="reComputeActionPanelType != 'drag'"
+            :temporary="reComputeActionPanelType == 'temporary'"
         >
             <slot name="right-panel-content" :itemData="currentItemDataClone">
                 <v-card flat>
@@ -248,6 +248,13 @@ export default {
         actionPanel() {
             if (this.actionPanel == true) {
                 this.$emit("open-panel");
+            }
+        },
+        'tableDisplayConfig.value.alwaysShowSidebar'(value) {
+            if(value){
+                this.openactionPanel();
+            }else{
+                this.closeactionPanel();
             }
         }
     },
@@ -400,6 +407,11 @@ export default {
         // });
         this.getData();
         this.restoreTableDisplayConfig();
+        document.addEventListener('keyup', function (evt) {
+            if (evt.keyCode === 27) {
+                thisCpn.closeactionPanel();
+            }
+        });
     },
     props: {
         showImportButton: {
@@ -545,12 +557,15 @@ export default {
     },
     mounted() {},
     computed: {
+        reComputeActionPanelType(){
+            return this.tableDisplayConfig.value.alwaysShowSidebar ? 'elastic' : this.actionPanelType;
+        },
         currentItemDataClone() {
             return util.cloneDeep(this.currentItemData);
         },
         actionTitle() {},
         contentWidth() {
-            if (this.actionPanel && this.actionPanelType == "elastic") {
+            if (this.actionPanel && this.reComputeActionPanelType == "elastic") {
                 return "calc(100% - " + this.actionPanelWidth + "px)";
             } else if (this.tableDisplayConfig.show) {
                 return "calc(100% - " + this.tableDisplayConfig.width + "px)";
@@ -611,8 +626,8 @@ export default {
                 temporary: "v-navigation-drawer",
                 elastic: "v-navigation-drawer"
             };
-            return mapType[this.actionPanelType]
-                ? mapType[this.actionPanelType]
+            return mapType[this.reComputeActionPanelType]
+                ? mapType[this.reComputeActionPanelType]
                 : mapType["temporary"];
         }
     },
@@ -999,7 +1014,8 @@ export default {
                 thisCpn.loadingData = true;
                 let options = this.getOptionForGetList(configs, columns);
                 let header = {};
-                if(thisCpn.$route.name == "deployHistory" || thisCpn.$route.name == "listProcessInstances"){
+                let routeName = this.$getRouteName();
+                if(routeName == "deployHistory" || routeName == "listProcessInstances"){
                     header = {
                         Authorization: 'Basic cmVzdC1hZG1pbjp0ZXN0'
                     };

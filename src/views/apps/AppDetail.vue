@@ -14,7 +14,6 @@
 												v-bind="attrs"
 												v-on="on" >
 												<span v-on:click="rightClickHandler($event,childItem,itemT.name)">{{childItem.title}}</span> 
-												
 											</div>
 										</template>
 										<span style="font:13px roboto">{{childItem.title}}</span> 

@@ -111,6 +111,9 @@ export default {
         Loader
     },
     computed: {
+        routeName(){
+            return this.$getRouteName();
+        },
         sDocumentEditor() {
             return this.$store.state.document.editor[this.keyInstance];
         },
@@ -163,7 +166,7 @@ export default {
         });
         if (this.documentObjectId != 0) {
             this.docObjId = Number(this.documentObjectId);
-        } else if (this.$route.name == "detailDocument" || this.$route.name == "printDocument") {
+        } else if (this.routeName == "detailDocument" || this.routeName == "printDocument") {
             this.docObjId = Number(this.$route.params.id);
             this.loadDocumentObject(this.isPrint); 
         }
@@ -231,7 +234,7 @@ export default {
         },
         // Khadm: load data của document lên để hiển thị và xử lý
         loadDocumentStruct(documentId,isPrint = false) {
-            if(this.$route.name == 'printDocument'){
+            if(this.routeName == 'printDocument'){
                 isPrint = true;
             }
             let thisCpn = this;

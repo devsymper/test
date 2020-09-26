@@ -6,6 +6,7 @@
                 <v-btn
                     class="button-add-task"
                     style="backgound-color:#F7F7F7;margin-8px"
+                    @click="createTask"
                     >
                     <v-icon left dark style="padding-right:8px">mdi-plus</v-icon>
                     <span style="font:13px roboto"> Tạo task </span>
@@ -18,8 +19,12 @@
                         append-icon="mdi-magnify"
                         v-model="searchItemKey"
                     ></v-text-field>
-                <v-icon @click="collapse">mdi-arrow-collapse-up</v-icon>  
-                <v-icon @click="changeView">mdi-page-previous-outline</v-icon>  
+                    <v-btn icon>
+                         <v-icon @click="collapse" style="padding-top:1px">mdi-arrow-collapse-up</v-icon>  
+                    </v-btn>
+                    <v-btn icon>
+                          <v-icon @click="changeView">mdi-page-previous-outline</v-icon>  
+                    </v-btn>
             </div>
         </div>
         <VuePerfectScrollbar :style="{height: menuItemsHeight}">
@@ -61,10 +66,11 @@
                                                 <v-col cols="6" :key="n">
                                                     <div style="margin-left:-5px">
                                                         <div style="margin-bottom:6px">
-                                                            <v-icon>{{ childItem.icon }}</v-icon>
-                                                            <span style="font-weight:200;font:13px;">
+                                                            <v-icon style="margin-top:-2px">{{ childItem.icon }}</v-icon>
+                                                            <span style="font-weight:300;font:13px;margin-top:1px">
                                                                 {{ childItem.title  ? childItem.title : childItem.name}}
                                                             </span>
+                                                             <span  style="font-weight:300;font:13px;padding-left:2px;margin-top:1px"> {{'('+ reduce(childItem.item) +')' }}</span>
                                                         </div>
                                                         <div>
                                                             <ul v-for="(subChildItem,k) in childItem.item" :key="k"  class="app-child-item">
@@ -111,6 +117,7 @@
         </div>
         </VuePerfectScrollbar>
         <ContextMenu ref="contextMenu"  />
+        <DialogCreateTask :showCreateTask="showCreateTask" @close-dialog="showCreateTask = false" />
     </div>
 </template>
 
@@ -119,15 +126,20 @@ import {appManagementApi} from '@/api/AppManagement.js';
 import {util} from './../../../plugins/util'
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import ContextMenu from './../ContextMenu.vue';
+import DialogCreateTask from '@/components/myItem/work/DialogCreateTask.vue'
 export default {
     components:{
         VuePerfectScrollbar,
-        ContextMenu
+        ContextMenu,
+        DialogCreateTask
     },
     created(){
         let self = this;
     },
     methods:{
+        createTask(){
+            this.showCreateTask = true
+        },
         hideContextMenu(){
             this.$refs.contextMenu.hide()	
         },
@@ -147,12 +159,20 @@ export default {
 		},	
         changeView(){
             this.hideContextMenu()
-            debugger
             this.$store.commit('appConfig/changeTypeView')
         },
         collapse(){
 			let panels = this.panel.length == 0 ?  [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25] : []
 			this.panel = panels
+        },
+        reduce(item){
+            let i = 0
+            item.forEach(function(e){
+                if(e.show == true){
+                    i++
+                }
+            })
+            return i
         },
         getActiveapps(){
             let self = this
@@ -199,7 +219,6 @@ export default {
 			})
 			let self = this
             for(let app in this.mapIdApp){
-                debugger
                 for(let typeT in this.mapIdApp[app]){
 
                     if(this.mapIdApp[app][typeT].length > 0){
@@ -272,7 +291,7 @@ export default {
 			if(item.favorite == false){
 				appManagementApi.addFavoriteItem(userId,item.id,type,1).then(res => {
 					if (res.status == 200) {
-						// self.$store.commit('appConfig/insertFavorite',item)
+						self.$store.commit('appConfig/insertFavorite',item)
                         self.$set(item, 'favorite', true)
 					}
 				});
@@ -280,7 +299,7 @@ export default {
 				appManagementApi.addFavoriteItem(userId,item.id,type,0).then(res => {
 					if (res.status == 200) {
 						item.type = type;
-                        // self.$store.commit('appConfig/delFavorite',item)
+                        self.$store.commit('appConfig/delFavorite',item)
                          self.$set(item, 'favorite', false)
 					}
 				});
@@ -292,11 +311,10 @@ export default {
                 this.filterItemInApp(e,"document_major",value)
                 this.filterItemInApp(e,"orgchart",value)
                 this.filterItemInApp(e,"dashboard",value)
-                this.filterItemInApp(e,"workflow_definition",value)
+                this.filterItemInApp(e,"workflow_definition",value) 
            }
         },
         filterItemInApp(e, type, value){
-            debugger
              let self = this
              if(self.apps[e].childrenAppReduce.hasOwnProperty(type)){
                 self.apps[e].childrenAppReduce[type].item.forEach(function(k){
@@ -304,7 +322,7 @@ export default {
                         k.show = true
                     }
                     let text = k.title ? k.title : k.name
-                    if(text.toLowerCv-expansion-panel-header__iconase().includes(value.toLowerCase())){
+                    if(text.toLowerCase().includes(value.toLowerCase())){
                         k.show = true
                     }else{
                         k.show = false
@@ -380,6 +398,7 @@ export default {
              menuItemsHeight: 'calc(100vh - 125px)',
              searchItemKey: "",
              apps:{},
+             showCreateTask:false,
         }
     },
     created(){
@@ -403,8 +422,19 @@ export default {
     display: flex;
     margin:8px 16px 8px 8px;
 }
+.view-details-all-app >>> .header-view-details-all-app .v-btn {
+    margin:unset;
+}
 .view-details-all-app  >>>.header-view-details-all-app .v-icon::after{
 	display:none
+}
+.view-details-all-app  >>> button{
+    margin:8px
+}
+.view-details-all-app  >>> button:hover{
+    /* background:unset !important; */
+    /* padding:12px; */
+
 }
 .view-details-all-app .content-view-details-all-app{
     width:95%;
@@ -454,18 +484,24 @@ export default {
     box-shadow: unset !important;
     width:250px;
     background-color: #f7f7f7;
-    margin-right:20px
+    margin-right:20px;
+}
+.view-details-all-app >>> .v-input__control .v-input__slot .v-text-field__slot{
+    font:13px roboto;
 }
 .view-details-all-app >>> .v-input__control .v-input__slot label{
     font:13px roboto;
-    margin-top:auto;
-    margin-bottom:auto
+    padding-top:2px
+
 }
 .view-details-all-app >>> .v-input__control #input-110{
     font:13px roboto
 }
 .view-details-all-app >>> .v-input__control .v-text-field__details{
     display: none;
+}
+.view-details-all-app >>> .app-child-item{
+    margin-left:-4px
 }
 .view-details-all-app >>> .title-document-enduser{
 	white-space: nowrap; 
