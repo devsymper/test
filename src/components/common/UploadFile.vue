@@ -190,7 +190,10 @@ export default {
 			}).then(res => {
 				let resObj = JSON.parse(res);
 				if(resObj.status == 200){
-						this.$emit('uploaded-file',resObj.data)
+                        this.$emit('uploaded-file',resObj.data)
+                        if(this.objectType && this.objectIdentifier){
+                            this.$store.commit('file/setWaitingFileCountPerObj', this.objectType+':' + this.objectIdentifier);
+                        }
 					}
 					else{
 						this.$emit('upload-error',resObj.message)
