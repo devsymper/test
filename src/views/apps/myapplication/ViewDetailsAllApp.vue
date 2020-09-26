@@ -275,6 +275,9 @@ export default {
         },
         changeFavorite(item,type){
             let self = this
+            if(type == "document_major" || type == "document_category"){
+				type = "document_definition"
+			}
 			let userId = this.$store.state.app.endUserInfo.id
 			if(item.objectIdentifier.includes("document_definition:")){
 				item.id = item.objectIdentifier.replace("document_definition:","")

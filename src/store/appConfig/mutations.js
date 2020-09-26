@@ -45,7 +45,6 @@ const emptyItemSelected = (state) => {
 			// title: this.$t('apps.listType.documents'),
 			name:  'document_major',
 			item:[
-
 			]
 		},
         orgchart: {
