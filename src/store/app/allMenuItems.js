@@ -78,6 +78,11 @@ export default {
                 icon: "mdi-briefcase-check-outline",
                 link: "/works"
             },
+            myItem: {
+                title: "myItem",
+                icon: "mdi-format-list-checkbox",
+                link: "/myitem"
+            },
         }
     },
     timeTable: {

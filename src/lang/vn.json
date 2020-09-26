@@ -115,7 +115,8 @@
             "File": "Quản lý tệp",
             "workflows": "Quy trình",
             "documents": "Văn bản",
-            "orgchart": "Sơ đồ tổ chức"
+            "orgchart": "Sơ đồ tổ chức",
+            "myItem": "My item"
         }
     },
     "login": {

@@ -116,7 +116,8 @@
             "File": "File",
             "workflows": "Workflows",
             "documents": "Documents",
-            "orgchart": "Organization chart"
+            "orgchart": "Organization chart",
+            "myItem": "My item"
 
         }
     },
