@@ -9,7 +9,7 @@
                         style="flex:0!important"
                     >{{$t("tasks.header.type")}}</v-col>
                     <v-col
-                        cols="3"
+                        cols="2"
                         class="pl-3 fs-13 font-weight-medium"
                     >{{$t("tasks.header.name")}}</v-col>
                     <v-col
@@ -21,8 +21,7 @@
                         class=" fs-13 font-weight-medium"
                     >{{$t("tasks.header.owner")}}</v-col>
                     <v-col
-                        cols="1"
-                        
+                        cols="2"
                         class="fs-13 font-weight-medium"
                     >{{$t("tasks.header.dueDate")}}</v-col>
 
@@ -79,7 +78,7 @@
                                 </div>
                             </div>
                         </v-col>
-                        <v-col   cols="3" class="pl-3 pr-1 pb-1 pt-2">
+                        <v-col   cols="2" class="pl-3 pr-1 pb-1 pt-2">
                             <div class="pl-3">
                                 <v-tooltip bottom>
                                 <template v-slot:activator="{ on }">
@@ -121,7 +120,7 @@
                         </v-col>
                         <v-col
                             style="line-height: 42px"
-                            cols="1"
+                            cols="2"
                             class="pl-3 fs-13 px-1 py-0"
                         >
                             <span class="mt-1">{{obj.dueDate ==null? '':$moment(obj.dueDate).fromNow()}}</span>
@@ -238,5 +237,12 @@ export default {
 }
 .d-active {
   background: #f5f5f5;
+}
+.title-quytrinh {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box !important;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
 }
 </style>

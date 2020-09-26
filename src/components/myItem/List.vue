@@ -367,7 +367,8 @@ export default {
                 sort: "createTime",
                 order: "desc",
                 page: 1,
-                assignee: this.$store.state.app.endUserInfo.id
+                involvedUser: this.$store.state.app.endUserInfo.id
+                // assignee: this.$store.state.app.endUserInfo.id
             },
             defaultAvatar: appConfigs.defaultAvatar,
             arrdocObjId: []
@@ -520,9 +521,9 @@ export default {
             listTasks = res;
             }
         } else {
-            if (!filter.assignee) {
-            filter.assignee = this.$store.state.app.endUserInfo.id;
-            }
+            // if (!filter.assignee) {
+            // filter.assignee = this.$store.state.app.endUserInfo.id;
+            // }
             res = await BPMNEngine.getTask(filter);
             listTasks = res.data;
         }

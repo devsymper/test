@@ -40,7 +40,7 @@
                     :class="{'mdi mdi-function float-right input-item-func': true, 'active':inputInfo.activeTab == 'script'}"
                     @click="changeAssignmentType(inputInfo, name, 'script')"
                     style="border-right: 1px solid #cccccc; "
-                    v-if="inputInfo.type == 'userAssignment'"
+                    v-if="inputInfo.type == 'userAssignment' "
                 ></i>
                 <i
                     :class="{'mdi mdi-sitemap float-right input-item-func': true, 'active':inputInfo.activeTab == 'orgchart'}"

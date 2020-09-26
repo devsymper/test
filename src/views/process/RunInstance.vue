@@ -26,7 +26,8 @@
 
 <script>
 import BPMNEApi from "./../../api/BPMNEngine";
-import taskDetail from "./../../views/tasks/taskDetail.vue";
+// import taskDetail from "./../../views/tasks/taskDetail.vue";
+import taskDetail from "@/components/myItem/TaskDetail.vue";
 import { runProcessDefinition, getVarsFromSubmitedDoc } from '../../components/process/processAction';
 import { documentApi } from '../../api/Document';
 import { formulasApi } from '../../api/Formulas';
