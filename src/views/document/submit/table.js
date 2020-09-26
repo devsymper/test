@@ -179,6 +179,7 @@ const supportCellsType = {
     percent: 'PercentRenderer',
     user: 'UserRenderer',
     select: 'SelectRenderer',
+    combobox: 'SelectRenderer',
     checkbox: 'CheckboxRenderer',
 };
 
@@ -633,9 +634,6 @@ export default class Table {
                 return
             }
             let controlInstance = this.getControlInstance(controlName);
-            if (rowIndex == 'all' && controlName == "tb1_ca_lam") {
-                // debugger
-            }
             if (controlInstance.checkValidValueLength(rowIndex)) {
                 if (controlInstance == null || controlInstance == undefined) {
                     return;
@@ -735,7 +733,7 @@ export default class Table {
          * @param {*} formulasInstance  Object cua formulas giá trị của control bị ảnh hưởng
          */
     async handlerRunFormulasForControlInTable(formulasType, controlInstance, dataInput, formulasInstance) {
-            debugger
+
             let listIdRow = this.tableInstance.getDataAtCol(this.tableInstance.getDataAtRow(0).length - 1);
             if (this.tableHasRowSum) {
                 listIdRow.pop();
@@ -916,7 +914,10 @@ export default class Table {
                     SYMPER_APP.$evtBus.$emit('document-submit-select-input', {
                         e: event,
                         selectFormulasInstance: formulasInstance,
-                        alias: this.currentControlSelected
+                        alias: this.currentControlSelected,
+                        controlTitle: controlInstance.title,
+                        type: controlInstance.type,
+                        isSingleSelect: controlInstance.checkProps('isSingleSelect')
                     })
                 }
             }

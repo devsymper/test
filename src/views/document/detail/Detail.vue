@@ -145,7 +145,8 @@ export default {
             createTime:"",
             userId:"",
             printConfigActive:null,
-            formSize:{}
+            formSize:{},
+            wrapFormCss:{},
 
         };
     },
@@ -257,15 +258,20 @@ export default {
                             thisCpn.contentPrintDocument = content;
                         }
                         try {
+                            thisCpn.documentSize = '21cm';
+                            contentPrintCss = {'margin':'auto'}
                             thisCpn.formSize = JSON.parse(res.data.document.formSize);
+                            let contentPrintCss = {};
                             if(thisCpn.formSize.type == 'A3'){
-                                $('.content-print-document').css({'transform':'scale(0.84)','transform-origin':'top left'});
-                                $('.sym-form-Detail').css({'width':'auto'});
+                                thisCpn.documentSize = 'auto';
+                                contentPrintCss = {'transform':'scale(0.84)','transform-origin':'top left'};
                             }
-                            if(thisCpn.formSize.type == 'A5'){
-                                $('.sym-form-Detail').css({'width':'auto'});
-                                $('.content-print-document').css({'transform':'scale(0.84)','transform-origin':'top left','margin':'auto'});
+                            else if(thisCpn.formSize.type == 'A5'){
+                                thisCpn.documentSize = 'auto';
+                                contentPrintCss = {'transform':'scale(0.84)','transform-origin':'top left','margin':'auto'}
                             }
+                            Object.assign(thisCpn.formSize,contentPrintCss)
+
                         } catch (error) {
                             
                         }
@@ -466,11 +472,6 @@ export default {
             this.$refs.skeletonView.hide();
             this.$emit("after-loaded-component-detail");
             $('.wrap-content-detail').removeAttr('style');
-            setTimeout(() => {
-                if(thisCpn.routeName == 'printDocument' || (isPrint && this.formId == 0)){
-                    // thisCpn.printContent(true);
-                }
-            }, 200);
         },
 
         getColIndexControl(controlEl){
@@ -480,74 +481,8 @@ export default {
             return tdIndex;
         },
         async handleClickPrint(){
-            // await this.loadDocumentStruct(this.documentId,true);
-            if(this.printConfigActive){
-                let content = this.printConfigActive.content
-                this.contentPrintDocument = content;
-                setTimeout((self) => {
-                    self.processHtml(content,true);
-                }, 100,this);
-                
-            }
-            else{
-                this.$snotify({
-                    type: "error",
-                    title: "Vui lòng cấu hình trước khi in"
-                });
-            }
-            
-        },
-        
-        printContent(fromContext = false){
-            
-            // Get HTML to print from element
-            
-            let prtHtml = $('#sym-Detail-'+this.keyInstance).closest('.wrap-content-detail').clone();
-            prtHtml.find('.content-print-document').removeClass('d-none');
-            prtHtml.find('.sym-form-Detail').css({width:'auto'})
-            prtHtml.find('.panel-header').remove();
-            prtHtml.find('.content-document').remove();
-            prtHtml = prtHtml.html();
-
-            // Get all stylesheets HTML
-            let stylesHtml = '';
-            for (const node of [...document.querySelectorAll('link, style')]) {
-            stylesHtml += node.outerHTML;
-            }
-           
-
-            let cstyle = `<style type="text/css">
-                         @media print {
-                                html, body{
-                                height:100%;
-                                width:100%;
-                                }
-                            }
-                    </style>`
-                     stylesHtml += cstyle;
-            // Open the print window
-            const WinPrint = window.open('', 'Print', 'width=800,height=900,toolbar=0,scrollbars=0,status=0');
-
-            WinPrint.document.write(`<!DOCTYPE html>
-            <html>
-            <head>
-                ${stylesHtml}
-            </head>
-            <body>
-                ${prtHtml}
-            </body>
-            </html>`);
-
-            WinPrint.document.close(); // necessary for IE >= 10
-            WinPrint.focus(); // necessary for IE >= 10*/
-
-            setTimeout(() => {
-                WinPrint.print();
-                WinPrint.close();
-            }, 1000);
-           
-            
-        },
+            this.$goToPage('/documents/print-multiple',"In",false,true,{listObject:[{document_object_id:this.docObjId}]});
+        }
        
     }
 }
