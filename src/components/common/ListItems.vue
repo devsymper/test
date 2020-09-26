@@ -1440,6 +1440,9 @@ export default {
                 this.$emit('after-selected-row',this.allRowChecked)
             }
         },
+        isShowSidebar(){
+            return this.alwaysShowActionPanel
+        }
         
     },
     components: {

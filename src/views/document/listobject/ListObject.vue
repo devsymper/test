@@ -162,6 +162,7 @@ export default {
                             let item = {document_object_id:rowData.document_object_id,formId:this.curentFormActive};
                             listObj.push(item);
                         }
+                        this.hideBottomSheet();
                         this.$goToPage('/documents/print-multiple',"In",false,true,{listObject:listObj});
                     }.bind(this)
 
@@ -341,21 +342,24 @@ export default {
             this.$refs.listObject.closeactionPanel();
         },
         afterRowSelected(data){
-            let documentObject = data.rowData;
-            let cell = data.cell;
-            let event = data.event;
-            if(cell.col == 0 && this.$refs.listObject.isShowCheckedRow()){
-                return;
-            }
-            if(['ArrowDown','ArrowUp'].includes(event.key) || event.buttons == 1){
-                if(this.docObjInfo.docObjId == parseInt(documentObject.document_object_id)){
-                    return
+            if(this.$refs.listObject.isShowSidebar()){
+                let documentObject = data.rowData;
+                let cell = data.cell;
+                let event = data.event;
+                if(cell.col == 0 && this.$refs.listObject.isShowCheckedRow()){
+                    return;
                 }
-                this.currentDocObjectActiveIndex = this.dataTable.findIndex(obj => obj.document_object_id == documentObject.document_object_id);
-                this.$refs.listObject.openactionPanel();
-                this.dataClipboard = window.location.origin+ '/#/documents/objects/'+documentObject.document_object_id;
-                this.docObjInfo = {docObjId:parseInt(documentObject.document_object_id),docSize:'21cm'}
+                if(['ArrowDown','ArrowUp'].includes(event.key) || event.buttons == 1){
+                    if(this.docObjInfo.docObjId == parseInt(documentObject.document_object_id)){
+                        return
+                    }
+                    this.currentDocObjectActiveIndex = this.dataTable.findIndex(obj => obj.document_object_id == documentObject.document_object_id);
+                    this.$refs.listObject.openactionPanel();
+                    this.dataClipboard = window.location.origin+ '/#/documents/objects/'+documentObject.document_object_id;
+                    this.docObjInfo = {docObjId:parseInt(documentObject.document_object_id),docSize:'21cm'}
+                }
             }
+            
            
         },
         /**
@@ -392,6 +396,7 @@ export default {
                         }); 
                 return;
             }
+            this.hideBottomSheet();
             this.$goToPage('/documents/print-multiple',"In",false,true,{listObject:this.recordSelected});
         },
         // chọn mẫu trước khi in

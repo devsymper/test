@@ -371,7 +371,8 @@ export default {
             thisCpn.$refs.validate.show(e);
 
         });
-        $(document).on('click','.run-dataflow',function(e){
+        $(document).find('#sym-submit-'+this.keyInstance).off('click','.run-dataflow')
+        $(document).find('#sym-submit-'+this.keyInstance).on('click','.run-dataflow',function(e){
             let idControl = $(this).closest('.s-control-data-flow').attr('id');
             let control = thisCpn.sDocumentEditor.allControl[idControl];
             let dataParams = thisCpn.getParamsForRunDataFlow(control.properties);
@@ -803,19 +804,19 @@ export default {
             if(this._inactive == false) return;
             this.runInputFilterFormulas(data.controlName,data.search);
         },
+        /**
+         * Sau khi compon dataflow load xong thì cần gán lại html vào control tương ứng
+         */
         afterDataFlowMounted(id){
             for (let index = 0; index < this.listDataFlow.length; index++) {
                 const controlDataFlow = this.listDataFlow[index];
                 let dataFlowActionEl = controlDataFlow.el.find('.run-dataflow').detach();
-                controlDataFlow.el.empty();
+                controlDataFlow.el.find('div').first().addClass('d-none')
                 let element = $(this.$refs['dataFlow'+controlDataFlow.id][0].$el);
                 
                 controlDataFlow.el.append(dataFlowActionEl);
                 controlDataFlow.el.append(element.detach());
                 controlDataFlow.el.find('.run-dataflow').css({display:'block'})
-                // var iframe = controlDataFlow.el.find('iframe') // or some other selector to get the iframe
-                // $('.joint-paper-scroller', iframe.contents()).css({overflow:'hidden'});
-                // $(this.$refs['dataFlow'+controlDataFlow.id].$el).append(controlDataFlow.el);
                 
             }
         },
