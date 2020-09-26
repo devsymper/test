@@ -296,34 +296,32 @@ export default {
         async loadDocumentObject(isPrint=false) {
             this.contentDocument = ""
             try {
-                 this.$refs.skeletonView.show();
+                this.$refs.skeletonView.show();
+                let thisCpn = this;
+                let res = await documentApi
+                    .detailDocumentObject(this.docObjId);
+                    if (res.status == 200) {
+                        thisCpn.userId = res.data.document_object_user_created_id;
+                        thisCpn.taskId = res.data.document_object_task_id;
+                        thisCpn.createTime = res.data.document_object_create_time
+                        thisCpn.workflowId = res.data.document_object_workflow_id;
+                        thisCpn.documentId = res.data.documentId;
+                        thisCpn.$store.commit('document/addToDocumentDetailStore',{
+                            key: 'allData',
+                            value: res.data,
+                            instance:thisCpn.keyInstance
+                        }) 
+                        thisCpn.loadDocumentStruct(res.data.documentId,isPrint);
+                    }
+                    else{
+                            this.$snotify({
+                                type: "error",
+                                title: res.message,
+                            });
+                    }
             } catch (error) {
                 
             }
-            let thisCpn = this;
-            let res = await documentApi
-                .detailDocumentObject(this.docObjId);
-                if (res.status == 200) {
-                    thisCpn.userId = res.data.document_object_user_created_id;
-                    thisCpn.taskId = res.data.document_object_task_id;
-                    thisCpn.createTime = res.data.document_object_create_time
-                    thisCpn.workflowId = res.data.document_object_workflow_id;
-                    thisCpn.documentId = res.data.documentId;
-                    thisCpn.$store.commit('document/addToDocumentDetailStore',{
-                        key: 'allData',
-                        value: res.data,
-                        instance:thisCpn.keyInstance
-                    }) 
-                    thisCpn.loadDocumentStruct(res.data.documentId,isPrint);
-                }
-                else{
-                        this.$snotify({
-                            type: "error",
-                            title: "Can not load document object",
-                        });
-                }
-                
-           
         },
         togglePageSize() {
             this.contentMargin = this.documentSize == "21cm" ? "" : "auto";
