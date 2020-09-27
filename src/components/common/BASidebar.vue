@@ -80,7 +80,7 @@
                              <!-- <VuePerfectScrollbar style="height:400px" > -->
                                     <v-autocomplete
                                         ref="selectDelegateUser"
-                                         :menu-props="{ maxHeight:300, minWidth:251,maxWidth:251,nudgeLeft:8, nudgeBottom:3}"
+                                         :menu-props="{ maxHeight:300, minWidth:251,maxWidth:251, nudgeLeft:8, nudgeBottom:3}"
                                         return-object
                                         class="mr-2 ml-2"
                                         full-width
@@ -100,15 +100,20 @@
                                         <template v-slot:label>
                                             <span class="fs-13">{{$t('common.search')}}</span>
                                         </template>
+                                             <!-- <VuePerfectScrollbar style="height:400px" > -->
                                         <template v-slot:item="data">
-                                            <div class="fs-13 py-1">
+                                        
+                                            <div class="fs-13 py-1" >
                                                  <SymperAvatar
-                                                     style="height:25px!important; width:25px!important; margin-left:-5px"  
+                                                    style="height:25px!important; width:25px!important; margin-left:-5px"  
                                                     :userId="data.item.id"/>
                                                 <span  class="fs-13 ml-1"> {{data.item.displayName}}</span>
                                             </div>
+                                             
                                         </template>
+                                          <!-- </VuePerfectScrollbar> -->
                                     </v-autocomplete>
+                                  
                                      <!-- </VuePerfectScrollbar> -->
                                  </div>
                             </v-menu>
@@ -454,7 +459,7 @@ export default {
         
     }
     .icon-group{
-        font-size:14px; 
+        font-size:16px; 
         color:rgb(0,0,0,0.8); 
         margin-top:-8px
     }
@@ -469,4 +474,20 @@ export default {
        margin-bottom:-10px;
    }
    
+</style>
+<style>
+    .v-menu__content::-webkit-scrollbar {
+        width: 6px;
+        background-color: black;
+}
+.v-menu__content::-webkit-scrollbar-thumb {
+	border-radius: 50px;
+	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+	background-color: grey;
+}
+ .v-menu__content::-webkit-scrollbar-track {
+	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+	border-radius: 50px;
+	background-color: #F5F5F5;
+}
 </style>
