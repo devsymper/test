@@ -16,6 +16,13 @@ const setStatusPopupTracking= (state, item) => {
 const setArrDocObjId = (state, arrDocObjId) => {
     Vue.set(state, 'arrDocObjId', arrDocObjId);
 }
+const setListDocumentObjId = (state, listDocumentObjId) => {
+    Vue.set(state, 'listDocumentObjId', listDocumentObjId);
+}
+const setListDocumentObjIdWithUserSubmit = (state, listDocumentObjIdWithUserSubmit) => {
+    Vue.set(state, 'listDocumentObjIdWithUserSubmit', listDocumentObjIdWithUserSubmit);
+}
+
 const removeFileAttachToStore = (state, id) => {
     let currentArrFileAttach = state.arrFileAttach;
     let obj = currentArrFileAttach.find(data => data.id === id)
@@ -61,7 +68,9 @@ export {
     setListTaskDoneInProcessInstance,
     setListTaskDoneInProcessParent,
     setListTaskInProcessSibling,
-    setIsStatusSubmit
+    setIsStatusSubmit,
+    setListDocumentObjId,
+    setListDocumentObjIdWithUserSubmit
 
 
 };

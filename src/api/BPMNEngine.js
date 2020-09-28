@@ -120,7 +120,6 @@ export default {
         if (filter.nameLike == '%%') {
             delete filter.nameLike;
         }
-        //ss
         if (filter.status == 'done') {
             filter.sort = filter.sort == 'createTime' ? 'startTime' : filter.sort;
             if (filter.assignee) {
@@ -133,6 +132,10 @@ export default {
 
             if (filter.nameLike) {
                 filter.taskNameLike = filter.nameLike;
+            }
+            if (filter.involvedUser) {
+                filter.taskInvolvedUser=filter.involvedUser;
+                delete filter.involvedUser;
             }
           
             filter.finished = true

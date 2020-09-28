@@ -213,7 +213,6 @@
 			<span style="font-size:15px;">LỊCH SỬ CHỈNH SỬA</span>
 			<!-- <span class="mdi mdi-close" @click="hide"></span> -->
 		</div>
-
 		<v-divider></v-divider>
 
 		<VuePerfectScrollbar style="calc(100% - 62px);">
@@ -248,7 +247,7 @@
 		<Comment style="height:100%" 
 			:objectIdentifier="originData.id"
 			ref="commentTaskView"
-			@close-comment="hide" />
+			/>
 	
 	<div class="w-100 h-100 symper-select-user-autocomplete " style="z-index:1010" v-show="statusChange" ref="selectUserAutocomplete">
 			<v-autocomplete
@@ -453,6 +452,7 @@ export default {
 			type:String,
 			default:""
 		}
+	
 	},
 	watch:{
 		isShowSidebar(after){
@@ -536,7 +536,9 @@ export default {
 			.deleteFile(data)
 			.then(res => {
 			if (res.status == 200) {
-				this.$store.dispatch("task/removeFileAttachToStore", this.fileId);
+                this.$store.dispatch("task/removeFileAttachToStore", this.fileId);
+                this.$store.commit("file/setWaitingFileCountPerObj", 'task:'+taskInfo.action.parameter.taskId);
+                this.$store.commit("comment/setWaitingCommentCountPerObj", 'task:'+taskInfo.action.parameter.taskId);
 			} else if (res.status == 403) {
 				this.$snotifyError("Error", res.message);
 			} else {

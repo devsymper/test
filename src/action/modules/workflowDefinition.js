@@ -12,7 +12,10 @@ export default [{
         "action": "list",
         "handler": function(param) {
             let tabName = this.$t('process.list.title');
-            this.$goToPage('/workflow', tabName, false, false);
+            this.$goToPage(this.$getActionLink(param), tabName, false, false);
+        },
+        $getActionLink(param) {
+            return '/workflow';
         }
     },
     {
@@ -20,7 +23,10 @@ export default [{
         "action": "create",
         "handler": function(param) {
             let tabName = this.$t('process.action.create');
-            this.$goToPage('/workflow/create', tabName);
+            this.$goToPage(this.$getActionLink(param), tabName);
+        },
+        $getActionLink(param) {
+            return '/workflow/create';
         }
     },
     {
@@ -42,9 +48,12 @@ export default [{
         "action": "update",
         "handler": function(param) {
             self.$goToPage(
-                "/workflow/" + param.id + "/edit",
+                $getActionLink(param),
                 this.$t("common.edit") + " " + (param.name ? param.name : param.key)
             );
+        },
+        $getActionLink(param) {
+            return "/workflow/" + param.id + "/edit";
         }
     },
     {
@@ -55,22 +64,35 @@ export default [{
                 let res = await BPMNEngine.getModelData(param.id);
                 param.processKey = res.data.processKey;
             }
-            this.$goToPage('/workflow/process-key/' + param.processKey + '/instances', this.$t('process.instance.listModelInstance') + param.name)
+            this.$goToPage(this.$getActionLink(param), this.$t('process.instance.listModelInstance') + param.name)
+        },
+        $getActionLink(param) {
+            return '/workflow/process-key/' + param.processKey + '/instances';
         }
     },
     {
         ...commonProps,
         "action": "start_instance",
         "handler": async function(param) {
-            let defData = await getLastestDefinition(param, true);
-            if (defData.data[0]) {
+            let url = this.$getActionLink(param);
+            if (url) {
                 let extraData = {};
                 if (param.appId) {
                     extraData.appId = param.appId;
                 }
-                this.$goToPage(`/workflow/process-definition/${defData.data[0].id}/run`, 'Start process instance', false, true, extraData);
+                this.$goToPage(url, 'Start process instance', false, true, extraData);
             } else {
                 this.$snotifyError({}, "Can not find process definition having deployment id " + deploymentId);
+            }
+        },
+        async $getActionLink(param) {
+            debugger
+
+            let defData = await getLastestDefinition(param, true);
+            if (defData.data[0]) {
+                return `/workflow/process-definition/${defData.data[0].id}/run`;
+            } else {
+                return '';
             }
         }
     }

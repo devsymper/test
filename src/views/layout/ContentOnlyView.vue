@@ -1,13 +1,13 @@
 <template>
     <div id="symper-platform-web-app">
         <v-app id="symper-platform-app">
-            <v-content>
+            <v-main>
                 <v-container fluid fill-height>
                     <v-layout justify-center>
                         <slot />
                     </v-layout>
                 </v-container>
-            </v-content>
+            </v-main>
         </v-app>
     </div>
 </template>

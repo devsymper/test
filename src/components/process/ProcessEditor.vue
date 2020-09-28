@@ -17,7 +17,7 @@
                 </v-tooltip>
 
                 <v-btn
-                    v-if="$route.name != 'viewProcess'"
+                    v-if="routeName != 'viewProcess'"
                     class="float-right mr-1"
                     @click="saveProcess"
                     small
@@ -375,7 +375,7 @@ export default {
         },
         // Lưu lại data của process model hiện tại
         saveProcess() {
-            if(this.$route.name == 'viewProcess'){
+            if(this.routeName == 'viewProcess'){
                 return;
             }
             let self = this;
@@ -1252,17 +1252,17 @@ export default {
         
         this.$store.dispatch('process/getAllDefinitions');
         
-        if (this.$route.name == "editProcess") {
+        if (this.routeName == "editProcess") {
             this.modelAction = "edit";
             this.modelId = this.$route.params.id;
-        } else if (this.$route.name == "cloneProcess") {
+        } else if (this.routeName == "cloneProcess") {
             this.modelAction = "clone";
         }
 
         if (
-            this.$route.name == "editProcess" ||
-            this.$route.name == "cloneProcess" ||
-            this.$route.name == "viewProcess"
+            this.routeName == "editProcess" ||
+            this.routeName == "cloneProcess" ||
+            this.routeName == "viewProcess"
         ) {
             this.applySavedData(this.$route.params.id);
         }
@@ -1342,6 +1342,9 @@ export default {
         }
     },
     computed: {
+        routeName(){
+            return this.$getRouteName();
+        },
         selectingNode() {
             return this.$store.state.process.editor[this.instanceKey].selectingNode;
         },
