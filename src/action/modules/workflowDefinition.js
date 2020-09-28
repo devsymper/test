@@ -74,7 +74,7 @@ export default [{
         ...commonProps,
         "action": "start_instance",
         "handler": async function(param) {
-            let url = this.$getActionLink(param);
+            let url = await this.$getActionLink(param);
             if (url) {
                 let extraData = {};
                 if (param.appId) {
@@ -86,13 +86,11 @@ export default [{
             }
         },
         async $getActionLink(param) {
-            debugger
-
             let defData = await getLastestDefinition(param, true);
             if (defData.data[0]) {
                 return `/workflow/process-definition/${defData.data[0].id}/run`;
             } else {
-                return '';
+                return 'xxxxxxxxxxxx';
             }
         }
     }

@@ -91,4 +91,7 @@ export const store = {
             }, 200);
         }
     },
+    isPromise(value) {
+        return value && value.then && typeof value.then === 'function';
+    }
 }

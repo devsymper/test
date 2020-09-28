@@ -4,7 +4,7 @@
     'sym-sub-form-submit':(parrentInstance == 0) ? false : true
 
     }">
-        <Loader ref="skeletonView"/>
+        <Preloader ref="preLoaderView"/>
         <div
             :key="keyInstance"
             class="sym-form-submit"
@@ -186,7 +186,8 @@ import './customControl.css';
 import ErrMessagePanel from "./../../../views/document/items/ErrMessagePanel.vue";
 import moment from "moment-timezone";
 import EmbedDataflow from "@/components/dataflow/EmbedDataflow";
-import Loader from './../../../components/common/Loader';
+// import Loader from './../../../components/common/Loader';
+import Preloader from './../../../components/common/Preloader';
 import {listControlNotNameProp} from "./../../../components/document/controlPropsFactory.js"
 
 
@@ -275,7 +276,7 @@ export default {
         "sym-drag-panel": SymperDragPanel,
         "err-message": ErrMessagePanel,
         EmbedDataflow,
-        Loader,
+        Preloader,
         SidebarTraceFormulas,
         VBoilerplate: {
             functional: true,
@@ -371,7 +372,8 @@ export default {
             thisCpn.$refs.validate.show(e);
 
         });
-        $(document).on('click','.run-dataflow',function(e){
+        $(document).find('#sym-submit-'+this.keyInstance).off('click','.run-dataflow')
+        $(document).find('#sym-submit-'+this.keyInstance).on('click','.run-dataflow',function(e){
             let idControl = $(this).closest('.s-control-data-flow').attr('id');
             let control = thisCpn.sDocumentEditor.allControl[idControl];
             let dataParams = thisCpn.getParamsForRunDataFlow(control.properties);
@@ -767,7 +769,8 @@ export default {
          * Hàm ẩn loader
          */
         hidePreloader(){
-            this.$refs.skeletonView.hide();
+            
+            this.$refs.preLoaderView.hide();
             $("#sym-submit-" + this.keyInstance).find('.page-content').removeClass('d-block');
             $("#sym-submit-" + this.keyInstance).find('.list-page-content').removeClass('d-flex');
             $("#sym-submit-" + this.keyInstance).css({opacity:'1'});
@@ -803,19 +806,19 @@ export default {
             if(this._inactive == false) return;
             this.runInputFilterFormulas(data.controlName,data.search);
         },
+        /**
+         * Sau khi compon dataflow load xong thì cần gán lại html vào control tương ứng
+         */
         afterDataFlowMounted(id){
             for (let index = 0; index < this.listDataFlow.length; index++) {
                 const controlDataFlow = this.listDataFlow[index];
                 let dataFlowActionEl = controlDataFlow.el.find('.run-dataflow').detach();
-                controlDataFlow.el.empty();
+                controlDataFlow.el.find('div').first().addClass('d-none')
                 let element = $(this.$refs['dataFlow'+controlDataFlow.id][0].$el);
                 
                 controlDataFlow.el.append(dataFlowActionEl);
                 controlDataFlow.el.append(element.detach());
                 controlDataFlow.el.find('.run-dataflow').css({display:'block'})
-                // var iframe = controlDataFlow.el.find('iframe') // or some other selector to get the iframe
-                // $('.joint-paper-scroller', iframe.contents()).css({overflow:'hidden'});
-                // $(this.$refs['dataFlow'+controlDataFlow.id].$el).append(controlDataFlow.el);
                 
             }
         },
@@ -1324,7 +1327,7 @@ export default {
             if(this.docObjId == null){
                 thisCpn.findRootControl();
             }
-            else{
+            else{   // trường hơp đã lưu cấu trúc root trên server
                 if(this.preDataSubmit != null && Object.keys(this.preDataSubmit).length > 0){
                     impactedFieldsList = this.preDataSubmit.impactedFieldsList;
                     let impactedFieldsListWhenStart = this.preDataSubmit.impactedFieldsListWhenStart;
@@ -1335,8 +1338,11 @@ export default {
                         for(let controlInTable in tableRootControl){
                             let controlInstance = getControlInstanceFromStore(this.keyInstance,controlInTable);
                             let controlFormulas = controlInstance.controlFormulas;
-                            let formulasInstance = controlFormulas['formulas'].instance;
-                            this.handlerBeforeRunFormulasValue(formulasInstance,controlInstance.id,controlInTable,'formulasDefaulRow','root');
+                            if(controlFormulas.hasOwnProperty('formulas')){
+                                let formulasInstance = controlFormulas['formulas'].instance;
+                                this.handlerBeforeRunFormulasValue(formulasInstance,controlInstance.id,controlInTable,'formulasDefaulRow','root');
+                            }
+                            
                         }
                     }
                    
@@ -1719,6 +1725,8 @@ export default {
             let dataColObjectId = tableControl.tableInstance.tableInstance.getDataAtCol(
                     columnObjectIdIndex
                 );
+            if(tableControl.tableInstance.tableHasRowSum == true)
+                dataColObjectId.pop();
             dataControlInTable['child_object_id'] = dataColObjectId;
             for (let i in indexCol) {
                 let dataCol = tableControl.tableInstance.tableInstance.getDataAtCol(

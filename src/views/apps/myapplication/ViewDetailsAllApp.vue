@@ -94,7 +94,14 @@
                                                                                 <span style="font:8px;opacity:0.4">{{subChildItem.name}}</span>
                                                                             </v-tooltip>
                                                                             <div v-else >{{subChildItem.title ? subChildItem.title : subChildItem.name }}</div>
-                                                                            <v-icon  @click="changeFavorite(subChildItem,childItem.name,item)" :class="{'icon-star-active' : subChildItem.favorite , 'icon-star': true}" >mdi-star</v-icon>	
+                                                                            <v-icon  
+																				@click="changeFavorite(subChildItem, childItem.name, item)" 
+																				:class="{
+																					'icon-star-active' : subChildItem.favorite, 
+																					'icon-star': true
+																				}" >
+																				mdi-star
+																			</v-icon>
                                                                         </div>
                                                                     </li>
                                                             </ul>
@@ -150,7 +157,7 @@ export default {
         rightClickHandler(event,item,type,app){
 			event.stopPropagation();
 			event.preventDefault();
-			this.$refs.contextMenu.setContextItem(item.actions)
+			this.$refs.contextMenu.setContextItem([...new Set(item.actions)])
 			this.$refs.contextMenu.show(event)
             this.$refs.contextMenu.setItem(item)
             this.$refs.contextMenu.setAppId(app.id)
@@ -239,22 +246,22 @@ export default {
                                         obj =  util.cloneDeep(self.document_category);
                                         arrCategory.push(t)
                                         obj.item = arrCategory
-                                        let types = "document_category"
-                                        self.apps[app].childrenAppReduce[types] = obj
+										let types = "document_category"
+										self.$set(self.apps[app].childrenAppReduce, types ,obj)
                                     }
                                     if(t.objectType == "1"){
                                         obj =  util.cloneDeep(self.document_major);
                                         arrMajor.push(t)
                                         obj.item = arrMajor
                                         let types = "document_major"
-                                        self.apps[app].childrenAppReduce[types] = obj
+										self.$set(self.apps[app].childrenAppReduce, types ,obj)
                                     }
                                   
                                 }else{
                                     obj = util.cloneDeep(self[typeT]);
                                     arr.push(t)
                                     obj.item = arr
-                                    self.apps[app].childrenAppReduce[typeT] = obj
+									self.$set(self.apps[app].childrenAppReduce, typeT ,obj)
                                 }
 								
                             }

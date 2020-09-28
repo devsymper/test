@@ -378,11 +378,9 @@ export const getLastestDefinition = function(row, needDeploy = false) {
             key: processKey,
             latest: true
         });
-
-
         if (lastestDefinition.data.length > 0) {
             resolve(lastestDefinition);
-        } else if (needDeploy) {
+        } else {
             let deploymentData = await deployProcess(self, row);
             deploymentId = deploymentData.id;
 
@@ -390,8 +388,6 @@ export const getLastestDefinition = function(row, needDeploy = false) {
                 deploymentId: deploymentId
             });
             resolve(defData);
-        } else {
-            reject("this model have no deployment");
         }
 
     });
