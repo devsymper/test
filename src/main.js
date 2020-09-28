@@ -50,7 +50,9 @@ Vue.mixin({
                 }
             } else {
                 isValidAction = false;
-                console.warn("[SYMPER-BIND-ACTION-FAILED]  action definition is not valid, first param expected Object, but receive: ", actionDef);
+                if (actionDef) {
+                    console.warn("[SYMPER-BIND-ACTION-FAILED]  action definition is not valid, first param expected Object, but receive: ", actionDef);
+                }
             }
 
             if (isValidAction) {

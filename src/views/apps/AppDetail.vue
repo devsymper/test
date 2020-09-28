@@ -192,7 +192,7 @@ export default {
 		rightClickHandler(event,item,type){
 			event.stopPropagation();
 			event.preventDefault();
-			this.$refs.contextMenu.setContextItem(item.actions)
+			this.$refs.contextMenu.setContextItem([...new Set(item.actions)])
 			this.$refs.contextMenu.show(event)
 			this.$refs.contextMenu.setItem(item)
 			if(type == 'document_category' || type == "document_major"){

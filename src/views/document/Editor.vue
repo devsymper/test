@@ -171,6 +171,9 @@ export default {
             forced_root_block:'div',
             toolbar_items_size : 'small',
             menubar: false,
+            branding: false,
+            draggable_modal: true,
+            toolbar_mode: 'sliding',
             plugins: [
             'advlist autolink lists link image table print preview',
             ' fullscreen',
@@ -232,6 +235,13 @@ export default {
                             callback(items);
                         }
                     });
+                    ed.ui.registry.addButton('rotatePage', {
+                    icon:'rotate',
+                    tooltip:'Xoay',
+                        onAction: function (_) {
+                            self.rotatePage(ed);
+                        }
+                    }); 
                 }
                 ed.ui.registry.addMenuItem('dragTable', {
                     text: 'Drag table',
@@ -241,7 +251,39 @@ export default {
                     }
                 });
              
-            
+                // ed.ui.registry.addMenuButton('pageSize', {
+                //         text: 'Kích thước',
+                //         fetch: function (callback) {
+                //             var items = [
+                //                 {
+                //                     type: 'menuitem',
+                //                     text: 'A3',
+                //                     onAction: function () {
+                                        
+                //                     }
+                //                 },
+                //                 {
+                //                     type: 'menuitem',
+                //                     text: 'A4',
+                //                     onAction: function () {
+                                        
+                //                     }
+                //                 },
+                //                 {
+                //                     type: 'menuitem',
+                //                     text: 'A5',
+                //                     onAction: function () {
+                                        
+                //                     }
+                //                 },
+                                
+                            
+                //             ];
+                //             callback(items);
+                //         }
+                //     });
+
+                    
                 ed.ui.registry.addButton('margin', {
                 icon:'margin',
                 tooltip:'Margin',
@@ -249,13 +291,7 @@ export default {
                         self.showPaddingPageConfig(ed);
                     }
                 }); 
-                ed.ui.registry.addButton('rotatePage', {
-                icon:'rotate',
-                tooltip:'Xoay',
-                    onAction: function (_) {
-                        self.rotatePage(ed);
-                    }
-                }); 
+                
                 for(let i = 0;i < self.listIconToolbar.length;i++){
                     ed.ui.registry.addIcon(self.listIconToolbar[i].name,`<i class='mdi `+self.listIconToolbar[i].icon+`' style='font-size:18px;rgba(0, 0, 0, 0.54);'></i>`)
                 }
@@ -274,6 +310,9 @@ export default {
                 ed.on('paste', function(e) {
                     self.handlePasteContent();
                 });
+                ed.on('ExecCommand', function(e) {
+                    self.handleExecCommand(e);
+                });
                 ed.on('SelectionChange',function (e) {
                     self.handleHighlightControlSelection(e)
                 });
@@ -281,7 +320,7 @@ export default {
                 
             },
             init_instance_callback : function(editor) {
-                self.editorCore = editor
+                self.editorCore = editor;
                 self.initEditor()
             },
         });
@@ -2397,9 +2436,35 @@ export default {
             }
             
            
+        },
+        /**
+     * Xử li sau khi thy đổi font size , font family thì thêm style cho control
+     */
+    handleExecCommand(e){
+        let mapCommandToStyle = {FontSize:'font-size',FontName:'font-family'}
+        try {
+            let value = e.value;
+            if(Object.keys(mapCommandToStyle).includes(e.command)){
+                let contentSelection = this.editorCore.selection.getContent();
+                let allControlInForm = $(contentSelection).find('.s-control');
+                for (let index = 0; index < allControlInForm.length; index++) {
+                    let element = allControlInForm[index];
+                    let id = $(element).attr('id');
+                    $("#document-editor-"+this.keyInstance+"_ifr").contents().find("#"+id).css(mapCommandToStyle[e.command],value);
+                    let curStyle = $("#document-editor-"+this.keyInstance+"_ifr").contents().find("#"+id).attr('style');
+                    
+                    $("#document-editor-"+this.keyInstance+"_ifr").contents().find("#"+id).attr('data-mce-style',curStyle)
+                }
+            }
+            
+            
+        } catch (error) {
+            
         }
+    }
 
     },
+    
 }
 </script>
 <style>

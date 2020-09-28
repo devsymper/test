@@ -167,12 +167,8 @@ export default {
 		 }
 	},
 	created(){
-		if(Object.keys(this.listApp).length == 0 ){
             this.getActiveapps()
-        }else{
-			this.loadingApp = false
-		}
-		this.getFavorite()
+			this.getFavorite()
 	},
 	mounted(){
 		 let thisCpn = this;

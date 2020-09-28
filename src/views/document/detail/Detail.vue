@@ -1,7 +1,7 @@
 <template>
     <div class="wrap-content-detail" style="overflow:hidden;">
         
-        <Loader ref="skeletonView"/>
+        <Preloader ref="preLoaderView"/>
         <div class="panel-header" v-if="!quickView && !isPrint">
             <div class="right-action">
                 <v-tooltip bottom>
@@ -66,7 +66,8 @@ import './../submit/customControl.css'
 import { getSDocumentSubmitStore } from './../common/common'
 import SideBarDetail from './SideBarDetail'
 import HistoryControl from './HistoryControl'
-import Loader from './../../../components/common/Loader';
+import Preloader from './../../../components/common/Preloader';
+
 import { util } from '../../../plugins/util.js';
 export default {
     props: {
@@ -107,7 +108,7 @@ export default {
     components:{
         'side-bar-detail':SideBarDetail,
         HistoryControl,
-        Loader
+        Preloader
     },
     computed: {
         routeName(){
@@ -307,7 +308,7 @@ export default {
         async loadDocumentObject(isPrint=false) {
             this.contentDocument = ""
             try {
-                this.$refs.skeletonView.show();
+                this.$refs.preLoaderView.show();
                 
             } catch (error) {
                 
@@ -429,6 +430,7 @@ export default {
                         //truong hop la control table
                         else {
                             let listInsideControls = {};
+                            let controlInTable = {};
                             let mapControlToIndex = {};
                             let tableControl = new TableControl(
                                 idField,
@@ -466,8 +468,10 @@ export default {
                                 mapControlToIndex[childControlName] = colIndex
                                 thisCpn.addToListInputInDocument(childControlName,childControl)
                                 listInsideControls[childControlName] = true;
+                                controlInTable[childControlName] = childControl;
                             });
                             tableControl.listInsideControls = listInsideControls;
+                            tableControl.controlInTable = controlInTable;
                             tableControl.mapControlToIndex = mapControlToIndex;
                             this.addToListInputInDocument(controlName,tableControl)
                             tableControl.renderTable();
@@ -476,7 +480,7 @@ export default {
                     }
                 }
             }
-            this.$refs.skeletonView.hide();
+            this.$refs.preLoaderView.hide();
             this.$emit("after-loaded-component-detail");
             $('.wrap-content-detail').removeAttr('style');
         },
