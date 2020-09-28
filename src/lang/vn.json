@@ -559,7 +559,8 @@
         },
         "validate": {
             "emptyTitle": "Không được bỏ trống tiêu đề",
-            "emptyContentControlTemplate": "Vui chọn template trước khi lưu control template"
+            "emptyContentControlTemplate": "Vui chọn template trước khi lưu control template",
+            "controlNotExist": "Control Không tồn tại, vui lòng tạo control mới"
         }
     },
     "documentObject": {
