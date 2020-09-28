@@ -188,17 +188,17 @@ export const positionMarkup = `<g class="rotatable symper-orgchart-node">
         <circle class="add"/>
         <text class="add">+</text>
     </g>
-    <g class="btn-collapse-expand">
-        <circle class="collapse-expand-circle"/>
-        <text class="expand-text">+</text>
-    </g>
+   
     <g class="btn remove orgchart-action">
         <circle class="remove"/>
         <text class="remove">X</text>
     </g>
 
 </g>`.replace(/\n/g, '').replace(/\s+/g, ' ');
-
+{/* <g class="btn-collapse-expand">
+<circle class="collapse-expand-circle"/>
+<text class="expand-text">+</text>
+</g> */}
 export const definePosition = function() {
     SymperPosition = joint.shapes.org.Member.define('Symper.Position', {
         size: {
