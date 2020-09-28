@@ -1325,7 +1325,7 @@ export default {
             if(this.docObjId == null){
                 thisCpn.findRootControl();
             }
-            else{
+            else{   // trường hơp đã lưu cấu trúc root trên server
                 if(this.preDataSubmit != null && Object.keys(this.preDataSubmit).length > 0){
                     impactedFieldsList = this.preDataSubmit.impactedFieldsList;
                     let impactedFieldsListWhenStart = this.preDataSubmit.impactedFieldsListWhenStart;
@@ -1336,8 +1336,11 @@ export default {
                         for(let controlInTable in tableRootControl){
                             let controlInstance = getControlInstanceFromStore(this.keyInstance,controlInTable);
                             let controlFormulas = controlInstance.controlFormulas;
-                            let formulasInstance = controlFormulas['formulas'].instance;
-                            this.handlerBeforeRunFormulasValue(formulasInstance,controlInstance.id,controlInTable,'formulasDefaulRow','root');
+                            if(controlFormulas.hasOwnProperty('formulas')){
+                                let formulasInstance = controlFormulas['formulas'].instance;
+                                this.handlerBeforeRunFormulasValue(formulasInstance,controlInstance.id,controlInTable,'formulasDefaulRow','root');
+                            }
+                            
                         }
                     }
                    
@@ -1720,6 +1723,8 @@ export default {
             let dataColObjectId = tableControl.tableInstance.tableInstance.getDataAtCol(
                     columnObjectIdIndex
                 );
+            if(tableControl.tableInstance.tableHasRowSum == true)
+                dataColObjectId.pop();
             dataControlInTable['child_object_id'] = dataColObjectId;
             for (let i in indexCol) {
                 let dataCol = tableControl.tableInstance.tableInstance.getDataAtCol(
