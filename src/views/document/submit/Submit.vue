@@ -4,7 +4,7 @@
     'sym-sub-form-submit':(parrentInstance == 0) ? false : true
 
     }">
-        <Loader ref="skeletonView"/>
+        <Preloader ref="skeletonView"/>
         <div
             :key="keyInstance"
             class="sym-form-submit"
@@ -186,7 +186,8 @@ import './customControl.css';
 import ErrMessagePanel from "./../../../views/document/items/ErrMessagePanel.vue";
 import moment from "moment-timezone";
 import EmbedDataflow from "@/components/dataflow/EmbedDataflow";
-import Loader from './../../../components/common/Loader';
+// import Loader from './../../../components/common/Loader';
+import Preloader from './../../../components/common/Preloader';
 import {listControlNotNameProp} from "./../../../components/document/controlPropsFactory.js"
 
 
@@ -275,7 +276,7 @@ export default {
         "sym-drag-panel": SymperDragPanel,
         "err-message": ErrMessagePanel,
         EmbedDataflow,
-        Loader,
+        Preloader,
         SidebarTraceFormulas,
         VBoilerplate: {
             functional: true,
@@ -768,6 +769,7 @@ export default {
          * Hàm ẩn loader
          */
         hidePreloader(){
+            
             this.$refs.skeletonView.hide();
             $("#sym-submit-" + this.keyInstance).find('.page-content').removeClass('d-block');
             $("#sym-submit-" + this.keyInstance).find('.list-page-content').removeClass('d-flex');
@@ -1325,7 +1327,7 @@ export default {
             if(this.docObjId == null){
                 thisCpn.findRootControl();
             }
-            else{
+            else{   // trường hơp đã lưu cấu trúc root trên server
                 if(this.preDataSubmit != null && Object.keys(this.preDataSubmit).length > 0){
                     impactedFieldsList = this.preDataSubmit.impactedFieldsList;
                     let impactedFieldsListWhenStart = this.preDataSubmit.impactedFieldsListWhenStart;
@@ -1336,8 +1338,11 @@ export default {
                         for(let controlInTable in tableRootControl){
                             let controlInstance = getControlInstanceFromStore(this.keyInstance,controlInTable);
                             let controlFormulas = controlInstance.controlFormulas;
-                            let formulasInstance = controlFormulas['formulas'].instance;
-                            this.handlerBeforeRunFormulasValue(formulasInstance,controlInstance.id,controlInTable,'formulasDefaulRow','root');
+                            if(controlFormulas.hasOwnProperty('formulas')){
+                                let formulasInstance = controlFormulas['formulas'].instance;
+                                this.handlerBeforeRunFormulasValue(formulasInstance,controlInstance.id,controlInTable,'formulasDefaulRow','root');
+                            }
+                            
                         }
                     }
                    
@@ -1720,6 +1725,8 @@ export default {
             let dataColObjectId = tableControl.tableInstance.tableInstance.getDataAtCol(
                     columnObjectIdIndex
                 );
+            if(tableControl.tableInstance.tableHasRowSum == true)
+                dataColObjectId.pop();
             dataControlInTable['child_object_id'] = dataColObjectId;
             for (let i in indexCol) {
                 let dataCol = tableControl.tableInstance.tableInstance.getDataAtCol(
