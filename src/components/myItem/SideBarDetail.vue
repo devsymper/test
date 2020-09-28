@@ -561,7 +561,9 @@ export default {
 			.deleteFile(data)
 			.then(res => {
 			if (res.status == 200) {
-				this.$store.dispatch("task/removeFileAttachToStore", this.fileId);
+                this.$store.dispatch("task/removeFileAttachToStore", this.fileId);
+                this.$store.commit("file/setWaitingFileCountPerObj", 'task:'+taskInfo.action.parameter.taskId);
+                this.$store.commit("comment/setWaitingCommentCountPerObj", 'task:'+taskInfo.action.parameter.taskId);
 			} else if (res.status == 403) {
 				this.$snotifyError("Error", res.message);
 			} else {

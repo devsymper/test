@@ -1,7 +1,10 @@
 const defaultState = {
 	listFavorite: [],
 	viewSideBySide:false,
+	showDetailArea: false,
 	currentAppId: 0,
+	listApps:{},
+	selectingItemType: '',
 	listItemSelected: {
 		document_category:{
 			icon : 'mdi-file-document-outline',

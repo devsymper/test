@@ -49,47 +49,35 @@ export default {
 			menuItemsHeight: '450px',
             listItems:{
 			   document_category:{
-				   icon : 'mdi-file-document-outline',
-				   title: "Danh mục",
-				//    title: this.$t('apps.listType.documents'),
-				   name:  'document_category',
-				   item:[
-					   
-				   ]
-			   },
-			   document_major:{
-				   icon : 'mdi-file-edit-outline',
-				   title: "Chứng từ",
-				//    title: this.$t('apps.listType.documents'),
-				   name:  'document_major',
-				   item:[
-
-				   ]
-			   },
-			   orgchart:{
- 				   icon : 'mdi-widgets-outline',
-				   title: this.$t('apps.listType.orgcharts'),
-				   name: 'orgchart',
-				   item:[
-
-				   ]
-			   },
-			   dashboard:{
-				   icon : 'mdi-view-dashboard',
-				   title: this.$t('apps.listType.reports'),
-				   name: 'dashboard',
-				   item:[
-				   ]
-			   },
-			   workflow_definition:
-			   {
-			       icon : 'mdi-lan',
-				   title:  this.$t('apps.listType.workflows'),
-				   name: 'workflow_definition',
-				   item:[
-
-				   ]
-			   },
+					icon : 'mdi-file-document-outline',
+					title: this.$t('apps.listType.documentCategory'),
+					name:  'document_category',
+					item:[]
+				},
+				document_major:{
+					icon : 'mdi-file-edit-outline',
+					title:  this.$t('apps.listType.documentMajor'),
+					name:  'document_major',
+					item:[]
+				},
+				orgchart: {
+					icon: 'mdi-widgets-outline',
+					title:  this.$t('apps.listType.orgchart'),
+					name: 'orgchart',
+					item: []
+				},
+				dashboard: {
+					icon: 'mdi-view-dashboard',
+					title: this.$t('apps.listType.dashboard'),
+					name: 'dashboard',
+					item: []
+				},
+				workflow_definition: {
+					icon: 'mdi-lan',
+					title:  this.$t('apps.listType.workflow'),
+					name: 'workflow_definition',
+					item: []
+				},
 			},  
     	};
 	},
