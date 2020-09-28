@@ -1537,6 +1537,7 @@ export default {
         },
         //hoangnd: hàm set các giá trị của thuộc tính và formulas vào từng contrl trong doc lúc load dữ liệu và đưa vào state
         setDataForPropsControl(fields){
+            console.log("ádsadasd",fields);
             for(let controlId in fields){
                 if(!fields[controlId].hasOwnProperty('type')){
                     continue;
@@ -1547,12 +1548,7 @@ export default {
                 let type = fields[controlId].type
                 $.each(properties,function(k,v){
                     if(properties[k].type == 'checkbox'){
-                        console.log(k,fields[controlId]['properties'][k]);
-                        properties[k].value = (fields[controlId]['properties'][k] == 0 || 
-                                                fields[controlId]['properties'][k] == '0' || 
-                                                fields[controlId]['properties'][k] == '' ||
-                                                fields[controlId]['properties'][k] == undefined 
-                                                ) ? false : true
+                        properties[k].value = fields[controlId]['properties'][k] == true
                     }
                     else{
                         if(typeof fields[controlId]['properties'][k] != "object")
@@ -1565,7 +1561,7 @@ export default {
                 }) 
                 if(fields[controlId]['formulas'] != false){
                     $.each(formulas,function(k,v){
-                        if(fields[controlId]['formulas'][k] !== "" && fields[controlId]['formulas'][k] !== undefined){
+                        if(fields[controlId]['formulas'][k]){
                             formulas[k].value = Object.values(fields[controlId]['formulas'][k])[0];
                             formulas[k].formulasId = Object.keys(fields[controlId]['formulas'][k])[0]
                         }
@@ -1585,7 +1581,7 @@ export default {
                         
                         $.each(childProperties,function(k,v){
                             if(childProperties[k].type == 'checkbox'){
-                                childProperties[k].value = (listField[childFieldId]['properties'][k] == 0 || listField[childFieldId]['properties'][k] == '0' || listField[childFieldId]['properties'][k] == '') ? false : true
+                                childProperties[k].value = listField[childFieldId]['properties'][k] == true;
                             }
                             else{
                                 if(typeof listField[childFieldId]['properties'][k] != "object")
@@ -1597,8 +1593,7 @@ export default {
                         })
                         if(listField[childFieldId]['formulas'] != false){
                             $.each(childFormulas,function(k,v){
-                                if(listField[childFieldId]['formulas'][k] != ""){
-                                    if(listField[childFieldId]['formulas'][k] != undefined)
+                                if(listField[childFieldId]['formulas'][k]){
                                     childFormulas[k].value = Object.values(listField[childFieldId]['formulas'][k])[0]
                                     childFormulas[k].formulasId = Object.keys(listField[childFieldId]['formulas'][k])[0]
                                 }

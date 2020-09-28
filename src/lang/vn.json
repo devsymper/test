@@ -901,8 +901,10 @@
     },
     "myItem":{
         "objType":"Loại đối tượng",
+        "filterObj":"Bộ lọc",
         "today":"Hôm nay",
         "header":"Danh sách work",
+        "headerDoc":"Danh sách document",
         "work":{
             "parentWork":"Parent work",
             "siblingWork":"Sibling work",

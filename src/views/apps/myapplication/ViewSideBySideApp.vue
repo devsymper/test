@@ -329,7 +329,17 @@ x				}
 				}
 				if(type == 'document_definition'){
 					this.updateFavoriteItem(self.mapId.document_definition,res.data)
-					this.$store.commit('appConfig/updateChildrenApps',{obj:res.data,type:'document_definition'});
+					let arrCategory = []
+					let arrMajor = []
+					res.data.forEach(function(e){
+						if(e.objectType == "1"){
+							arrMajor.push(e)
+						}else if(e.objectType == "2"){
+							arrCategory.push(e)
+						}
+					})
+					this.$store.commit('appConfig/updateChildrenApps',{obj:arrMajor,type:'document_major'});
+					this.$store.commit('appConfig/updateChildrenApps',{obj:arrCategory,type:'document_category'});
 				}
 				if(type == 'workflow_definition'){
 					this.updateFavoriteItem(self.mapId.workflow_definition,res.data)

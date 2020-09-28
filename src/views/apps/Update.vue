@@ -114,7 +114,6 @@ import vClickOutside from 'v-click-outside';
 import SearchModal from './SearchModal.vue';
 import AppDetailVue from './AppDetail.vue';
 import {appManagementApi} from './../../api/AppManagement.js'
-
 export default {
     name: "UpdateApp",
     components: {
@@ -187,8 +186,13 @@ export default {
 			self.childrenApp.orgchart = []
 			self.childrenApp.dashboard = []
 			self.childrenApp.workflow_definition = []
-			if(data.document_definition.item.length > 0){
-				data.document_definition.item.forEach(function(e){
+			if(data.document_category.item.length > 0){
+				data.document_category.item.forEach(function(e){
+					self.childrenApp.document_definition.push(e.id);
+				});
+			}
+			if(data.document_major.item.length > 0){
+				data.document_major.item.forEach(function(e){
 					self.childrenApp.document_definition.push(e.id);
 				});
 			}

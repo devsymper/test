@@ -53,6 +53,7 @@
                                 :editable="false"
                                 :customComponents="customAgComponents"  
                                 @on-cell-dbl-click="onCellDblClick"
+                                :minWidth="500"
                                 :cellRendererParams="{
                                     innerRenderer:'nodeName',
                                     suppressDoubleClickExpand: true,
@@ -335,11 +336,7 @@ export default {
             mapDpmToPos: null,
             customAPIResult:{
                 reformatData(res){
-                    let lists = []
-                    for(let item in res.data){
-                        lists.push(res.data[item])
-                    }
-
+                  
                    return{
                        columns:[
                             {name: "id", title: "user.table.id", type: "numeric"},
@@ -350,7 +347,7 @@ export default {
                             {name: "createAt", title: "user.table.createAt", type: "text"},
                             {name: "updateAt", title: "user.table.updateAt", type: "text"},
                        ],
-                       listObject:lists
+                       listObject:res.data.listObject
                          
 
                    }
@@ -379,7 +376,7 @@ export default {
                 if(after.length == 0){
                     after = 131237173123717323713277
                 }
-                this.apiUrl = 'https://account.symper.vn/users?ids=['+after+']'
+                this.apiUrl = 'https://account.symper.vn/users?limitIds=['+after+']'
             }
         }
     }

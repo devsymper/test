@@ -149,7 +149,11 @@ export const jointLinkNode = function(source, target) {
             },
             '.marker-arrowheads': {
                 display: 'none'
+            },
+            label: {
+                text: 'Hello',
             }
+            
         },
     }, {
         isHidden: function() {

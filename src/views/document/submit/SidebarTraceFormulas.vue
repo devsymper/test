@@ -152,6 +152,9 @@ export default {
             let index = 0;
             this.panel = [];
             for(let formulasType in after){
+                if(!after[formulasType].instance){
+                    continue;
+                }
                 let formItem = {};
                 let input = {};
                 formItem[formulasType] = {

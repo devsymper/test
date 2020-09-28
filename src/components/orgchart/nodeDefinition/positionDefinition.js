@@ -4,6 +4,12 @@ let shapeSize = {
 };
 let avatarSize = shapeSize.height / 2 - 5;
 let borderBottomHeight = 2;
+let CEConfig = {
+	stickHeight: 20,
+	stickWidth: 1,
+	radius: 7,
+	fontSize: 12
+};
 export const DEFAULT_POSITION_DISPLAY = {
     fill: 'white',
     rx: 0,
@@ -73,7 +79,11 @@ export const DEFAULT_POSITION_ATTRS = {
         'font-weight': 300,
         'font-family': 'Roboto',
     },
-    '.btn.add': { 'ref-dx': -shapeSize.width / 2, 'ref-y': shapeSize.height, 'ref': '.card', event: 'element:add', cursor: 'pointer' },
+    '.btn.add': { 'ref-dx': 0,
+                  'ref-y': 0,
+                   'ref': '.card',
+                    event: 'element:add',
+                     cursor: 'pointer' },
     '.btn.add>circle': { r: 7, fill: 'green', stroke: 'green', 'stroke-width': 0 },
     '.btn>rect': { height: 20, width: 45, rx: 2, ry: 2, fill: 'transparent', 'stroke-width': 1 },
     '.btn.add>text': { fill: 'white', 'font-size': 15, 'font-weight': 400, stroke: 'white', x: -4, y: 5, 'font-family': 'Roboto' },
@@ -86,7 +96,7 @@ export const DEFAULT_POSITION_ATTRS = {
         'stroke-width': 0
     },
     '.btn.remove': {
-        'ref-dx': 0,
+        'ref-dx': -210,
         'ref-y': 0,
         'ref': '.card',
         event: 'element:remove',
@@ -105,6 +115,41 @@ export const DEFAULT_POSITION_ATTRS = {
         y: 4,
         'font-family': 'Roboto'
     },
+    '.btn-collapse-expand': {
+		'ref-dx': -shapeSize.width / 2 ,
+		'ref-y': shapeSize.height + CEConfig.stickHeight - 20,
+		'ref': '.card',
+		event: 'element:collapse',
+		cursor: 'pointer'
+	},
+	'.collapse-expand-circle': {
+		r: CEConfig.radius,
+		fill: '#848484',
+		event: 'element:collapse',
+
+		// x: shapeSize.width / 2,
+		// y: shapeSize.height + CEConfig.stickHeight
+	},
+	'.expand-text': {
+		x: shapeSize.width / 2 - CEConfig.fontSize / 2 + 2,
+		y: shapeSize.height + CEConfig.stickHeight + CEConfig.fontSize / 2 - 1,
+		fill: 'white',
+		cursor: 'pointer',
+		'stroke-width': 1,
+		display: 'none',
+		event: 'element:collapse',
+
+	},
+	'.collapse-text': {
+		x: shapeSize.width / 2 - CEConfig.radius / 2,
+		y: shapeSize.height + CEConfig.stickHeight + CEConfig.radius,
+		fill: 'white',
+		'stroke-width': 1,
+		'font-size': CEConfig.fontSize * 2,
+		cursor: 'pointer',
+		event: 'element:collapse',
+
+	}
 
 };
 
@@ -143,7 +188,10 @@ export const positionMarkup = `<g class="rotatable symper-orgchart-node">
         <circle class="add"/>
         <text class="add">+</text>
     </g>
-
+    <g class="btn-collapse-expand">
+        <circle class="collapse-expand-circle"/>
+        <text class="expand-text">+</text>
+    </g>
     <g class="btn remove orgchart-action">
         <circle class="remove"/>
         <text class="remove">X</text>

@@ -59,6 +59,8 @@ export default {
 				name: 'mesh'
             },
             viewportRect:null,
+            paper: null,
+            paperScroller: null,
         }
     },
 	methods: {
@@ -195,10 +197,17 @@ export default {
             let treeLayout = this.$refs.jointPaper.treeLayout;
             treeLayout.layout();
             var center = focusPoint || treeLayout.getLayoutBBox().center();
-            resizePaper();
-            debugger
-            paperScroller.center(center.x, center.y);
-            
+            this.resizePaper();
+            this.paperScroller.center(center.x, center.y);
+        },
+        resizePaper() {
+            let treeLayout = this.$refs.jointPaper.treeLayout;
+            this.paper.fitToContent({
+                useModelGeometry: true,
+                allowNewOrigin: 'any',
+                padding: 30,
+                contentArea: treeLayout.getLayoutBBox()
+            });
         },
         getAllElementModel(){
             return this.$refs.jointPaper.graph.getCells();
@@ -299,6 +308,8 @@ export default {
         setupGraph(graph, paper, paperScroller,viewportRect){
             //dung them dong nay 
             this.viewportRect = viewportRect
+            this.paper = paper
+            this.paperScroller = paperScroller
             this.graph = graph;
             let self = this;
             let nodeName = this.context == 'department' ? this.$t('orgchart.editor.department') : this.$t('orgchart.editor.position');

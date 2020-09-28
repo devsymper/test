@@ -63,6 +63,10 @@ export default {
                 return {}
             }
         },
+        minWidth:{
+            type: Number,
+            default:400
+        },
 
         // tìm keyword trong https://www.ag-grid.com/javascript-grid-provided-renderer-group/ để biết thêm thông tin chi tiết
         cellRendererParams: {
@@ -121,7 +125,8 @@ export default {
             editable:this.editable,
             field:'name',
             headerName: 'Tên',
-            minWidth: 200,
+            minWidth: this.minWidth,
+
             cellRendererParams: this.cellRendererParams,
             valueSetter: function(params){
                 let x = util.cloneDeep(params.newValue)
@@ -205,5 +210,8 @@ export default {
     }
     .like-handson-table >>> .ag-cell-wrapper span{
         margin-left:0px
+    }
+    .like-handson-table >>> .ag-cell-wrapper .ag-row-group .ag-row-group-indent-3 {
+        padding-left: 0px !important;
     }
 </style>

@@ -76,7 +76,7 @@ export default {
                 self.$store.commit(
                     "document/addToDocumentEditorStore",{key:'allControlTemplate',value:res.data,instance:self.instance}
                 );
-                self.$refs.skeletonView.hide()
+                self.$refs.skeletonView.hide();
             })
         },
     },

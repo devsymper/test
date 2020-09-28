@@ -1,5 +1,5 @@
 <template>
-    <span style="width:500px">
+    <span margin-left:-2px>
         <i :class="'mdi mr-2 fs-16 '+icon"></i>
         <span style="padding-right:8px;margin-top:-2px">{{text}}</span>
     </span>

@@ -65,11 +65,8 @@ export default class BasicControl extends Control {
                 this.controlProperties['isRequired'].value === 1)) {
             this.renderValidateIcon("Không được bỏ trống trường thông tin " + this.title);
         }
-        if (!this.checkDetailView() &&
-            this.controlProperties['isReadOnly'] != undefined &&
-            (this.controlProperties['isReadOnly'].value === "1" ||
-                this.controlProperties['isReadOnly'].value === 1)) {
-            this.ele.attr('disabled', 'disabled')
+        if (!this.checkDetailView() && this.checkProps('isReadOnly')) {
+            this.ele.attr('disabled', 'disabled');
         }
 
         if (this.controlProperties['isHidden'] != undefined &&
@@ -321,8 +318,8 @@ export default class BasicControl extends Control {
 
     setValueControl() {
         let value = this.value
-        if (value == null) {
-            return;
+        if (!value) {
+            value = "";
         }
         if (this.type == 'percent') {
             value *= 100

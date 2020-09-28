@@ -53,8 +53,8 @@ export const DEFAULT_DEPARTMENT_ATTRS = {
 		'font-family': 'Roboto',
 	},
 	'.btn.add': {
-		'ref-dx': -shapeSize.width / 2,
-		'ref-y': shapeSize.height,
+		'ref-dx': 0,
+		'ref-y': 0,
 		'ref': '.card',
 		event: 'element:add',
 		cursor: 'pointer'
@@ -92,7 +92,7 @@ export const DEFAULT_DEPARTMENT_ATTRS = {
 		'stroke-width': 0
 	},
 	'.btn.remove': {
-		'ref-dx': 0,
+		'ref-dx': -200,
 		'ref-y': 0,
 		'ref': '.card',
 		event: 'element:remove',
@@ -123,12 +123,13 @@ export const DEFAULT_DEPARTMENT_ATTRS = {
 	},
 
 	'.btn-collapse-expand': {
-		'ref-dx': -shapeSize.width / 2,
-		'ref-y': shapeSize.height + CEConfig.stickHeight,
+		'ref-dx': -shapeSize.width / 2 ,
+		'ref-y': shapeSize.height + CEConfig.stickHeight - 20,
 		'ref': '.card',
 		event: 'element:collapse',
 		cursor: 'pointer'
 	},
+	
 	'.collapse-expand-circle': {
 		r: CEConfig.radius,
 		fill: '#848484',

@@ -70,18 +70,19 @@ export default {
             interactive: !this.readonly,
             sorting: joint.dia.Paper.sorting.APPROX,
             //dung na them 
-            viewport(view) {
-                var model = view.model;
-                // Hide elements and links which are currently collapsed
-                // if (model.isHidden()) return false;
-                // Hide elements and links which are not in the viewport
-                var bbox = model.getBBox();
-                if (model.isLink()) {
-                    // vertical/horizontal links have zero width/height
-                    bbox.inflate(1);
-                }
-                return viewportRect.intersect(bbox);
-            }
+            // viewport(view) {
+            //     var model = view.model;
+            //     // Hide elements and links which are currently collapsed
+            //     // if (model.isHidden()) return false;
+            //     // Hide elements and links which are not in the viewport
+            //     var bbox = model.getBBox();
+            //     if (model.isLink()) {
+            //         // vertical/horizontal links have zero width/height
+            //         bbox.inflate(1);
+            //     }
+            //     debugger
+            //     return viewportRect.intersect(bbox);
+            // }
         });
         var paperScroller = new joint.ui.PaperScroller({
             paper: this.paper,
