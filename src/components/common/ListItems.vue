@@ -347,6 +347,9 @@ export default {
                 },
                 afterOnCellMouseDown:function(event, coords, TD){
                     self.$emit('after-cell-mouse-down',{event:event,cell:coords,rowData:self.data[coords.row]});
+                },
+                afterColumnMove(movedColumns, finalIndex, dropIndex, movePossible, orderChanged){
+
                 }
             },
             tableFilter: {
