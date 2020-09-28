@@ -77,12 +77,13 @@
             </v-row>
             <VuePerfectScrollbar
             @ps-y-reach-end="handleReachEndList"
+            style="height:calc(100% - 10px);"
             >
                 <v-expansion-panels
                     v-model="panel"
                     multiple
                     class="listWork"
-                    style="margin-bottom:30px"
+                    style="overflow-x: hidden;margin-bottom:30px"
                 >
                     <v-expansion-panel>
                         <v-expansion-panel-header class="v-expand-header">{{$t('myItem.work.parentWork')}}</v-expansion-panel-header>
