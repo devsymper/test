@@ -1,10 +1,4 @@
 export default {
-    my_application: {
-        title: 'myApplication',
-        icon: 'mdi-briefcase-edit-outline',
-        link: "/my-applications",
-        group: "My work",
-    },
     workflow_definition: {
         title: "workflows",
         icon: "mdi-lan",
@@ -68,6 +62,11 @@ export default {
         icon: "mdi-sticker-check-outline",
         group: "My work",
         children: {
+            my_application: {
+                title: 'myApplication',
+                icon: 'mdi-briefcase-edit-outline',
+                link: "/my-applications",
+            },
             tasks: {
                 title: "tasks",
                 icon: "mdi-check-all",
