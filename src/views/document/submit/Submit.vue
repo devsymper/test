@@ -4,7 +4,7 @@
     'sym-sub-form-submit':(parrentInstance == 0) ? false : true
 
     }">
-        <Loader ref="skeletonView"/>
+        <Preloader ref="skeletonView"/>
         <div
             :key="keyInstance"
             class="sym-form-submit"
@@ -186,7 +186,8 @@ import './customControl.css';
 import ErrMessagePanel from "./../../../views/document/items/ErrMessagePanel.vue";
 import moment from "moment-timezone";
 import EmbedDataflow from "@/components/dataflow/EmbedDataflow";
-import Loader from './../../../components/common/Loader';
+// import Loader from './../../../components/common/Loader';
+import Preloader from './../../../components/common/Preloader';
 import {listControlNotNameProp} from "./../../../components/document/controlPropsFactory.js"
 
 
@@ -275,7 +276,7 @@ export default {
         "sym-drag-panel": SymperDragPanel,
         "err-message": ErrMessagePanel,
         EmbedDataflow,
-        Loader,
+        Preloader,
         SidebarTraceFormulas,
         VBoilerplate: {
             functional: true,
@@ -768,6 +769,7 @@ export default {
          * Hàm ẩn loader
          */
         hidePreloader(){
+            
             this.$refs.skeletonView.hide();
             $("#sym-submit-" + this.keyInstance).find('.page-content').removeClass('d-block');
             $("#sym-submit-" + this.keyInstance).find('.list-page-content').removeClass('d-flex');
