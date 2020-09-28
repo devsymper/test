@@ -31,6 +31,18 @@
                     </v-list-item>
                     </v-list>
                 </v-menu>
+                <v-tooltip bottom>
+                    <template v-slot:activator="{ on }">
+                        <v-btn  
+                            style="color:green"
+                            v-on="on" text small
+                            @click="toggleSidebar"
+                            >
+                                Xem chi tiết
+                        </v-btn>
+                    </template>
+                    <span>Xem chi tiết</span>
+                </v-tooltip>
                 <v-btn small text  @click="closeDetail">
                     <v-icon small>mdi-close</v-icon>
                 </v-btn>
@@ -256,6 +268,26 @@
                 :workId="idWorkSelected"
             />
         </div>
+        <SideBarDetail
+            :sidebarWidth="sidebarWidth"  
+            :isShowSidebar="isShowSidebar"
+            :objSideBar="`work`"
+            :workInfo="workInfo"
+            @showContentFile="showContentFile"
+            @showPopupTracking="showPopupTracking"
+        />
+        <KHShowFile
+            @downloadOrBackupFile="downloadOrBackupFile"
+            v-bind:fileId="fileId"
+            v-bind:name="name"
+            v-bind:serverPath="serverPath"
+            v-bind:type="type"
+        />
+        <PopupProcessTracking 
+            :workInfo="workInfo"
+            :definitionName="breadcrumb.definitionName"
+            :showType="`work`"
+        />
        
     </div>
 </template>
@@ -268,6 +300,11 @@ import { appManagementApi } from '@/api/AppManagement';
 import symperAvatar from "@/components/common/SymperAvatar.vue";
 import listTask from "./ListTask";
 import workDetailSub from "./WorkDetailSub";
+import SideBarDetail from "./SideBarDetail";
+import KHShowFile from "@/components/kh/KHShowImage";
+import { taskApi } from "@/api/task.js";
+import PopupProcessTracking from '../PopupProcessTracking'
+
 import {
   extractTaskInfoFromObject,
   addMoreInfoToTask
@@ -307,10 +344,18 @@ export default {
         listTask,
         VuePerfectScrollbar,
         symperAvatar,
-        workDetailSub
+        workDetailSub,
+        SideBarDetail,
+        KHShowFile,
+        PopupProcessTracking
     },
     data: function() {
         return {
+            fileId: "",
+			serverPath: "",
+			name: "",
+			type: "",
+            sidebarWidth:400,
             filterObject:0,
             indexObj:null,
             indexSub:null,
@@ -411,6 +456,31 @@ export default {
     created(){
     },
     methods: {
+        showContentFile(data){
+            this.serverPath = data.serverPath;
+			this.name = data.name;
+			this.type = data.type;
+			this.fileId = data.id;
+            this.$store.commit("kh/changeStatusShowImage", true);
+        },
+        downloadOrBackupFile(data) {
+			this.downLoadFile(data.fileId);
+        },
+        downLoadFile(id) {
+			taskApi
+			.downloadFile(id)
+			.then(res => {})
+			.catch(err => {
+			console.log("error download file!!!", err);
+			})
+			.always(() => {});
+		},
+        showPopupTracking(){
+            this.$store.commit("task/setStatusPopupTracking",true)
+        },
+        toggleSidebar(){
+            this.isShowSidebar = !this.isShowSidebar;
+        },
         backToListWork(){
             this.statusDetailWork=false;
             this.setTaskBreadcrumb({},'');

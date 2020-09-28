@@ -157,8 +157,12 @@
                         class="fs-13 px-1 py-0"
                     >
                         <div class="pl-1">
-                            <div style="width:55px">10 <v-icon class="fs-14" style="float:right;margin-top:4px;margin-right:12px">mdi-comment-processing-outline</v-icon> </div>
-                            <div style="width:55px"> 2 <v-icon class="fs-14" style="float:right;margin-top:4px;margin-right:12px">mdi-attachment</v-icon></div>
+                            <div style="width:55px">
+                                {{commentCountPerTask['work:' + obj.id]}}
+                                <v-icon class="fs-14" style="float:right;margin-top:4px;margin-right:12px">mdi-comment-processing-outline</v-icon> </div>
+                            <div style="width:55px">
+                                  {{fileCountPerTask['work:' + obj.id]}}
+                                <v-icon class="fs-14" style="float:right;margin-top:4px;margin-right:12px">mdi-attachment</v-icon></div>
                         </div>
                     </v-col>
                 </v-row>
@@ -208,6 +212,12 @@ import symperAvatar from "@/components/common/SymperAvatar.vue";
 
 export default {
   computed: {
+    fileCountPerTask(){
+        return this.$store.state.file.fileCountPerObj.list;
+    },
+    commentCountPerTask(){
+        return this.$store.state.comment.commentCountPerObj.list;
+    },
     groupAllProcessInstance() {
         let allPrcess = this.listProrcessInstances;
         const groups = allPrcess.reduce((groups, work) => {
@@ -230,7 +240,6 @@ export default {
             works: groups[date]
             };
         });
-        console.log("addd",groupArrayWork);
         return groupArrayWork;
     },
     stask() {
@@ -248,6 +257,14 @@ export default {
     VuePerfectScrollbar: VuePerfectScrollbar,
     symperAvatar: symperAvatar,
     workDetail
+  },
+  watch:{
+       sideBySideMode(vl){
+            if(!vl){
+                this.$store.dispatch('file/getWaitingFileCountPerObj');
+                this.$store.dispatch('comment/getWaitingCommentCountPerObj');
+            }
+        }
   },
   props: {
     compackMode: {
@@ -421,13 +438,21 @@ export default {
         }
         this.totalTask = Number(res.total);
         let allProcess=[];
+        let processIden = [];
         for (let task of listTasks) {
             if (task.processInstanceId && task.processInstanceId!=null) {
                 if(allProcess.indexOf(task.processInstanceId) === -1) {
                     allProcess.push(task.processInstanceId);
+                    processIden.push('work:'+task.processInstanceId);
                 }
             }
         }
+
+        this.$store.commit('file/setWaitingFileCountPerObj', processIden);
+        this.$store.commit('comment/setWaitingCommentCountPerObj', processIden);
+        this.$store.dispatch('file/getWaitingFileCountPerObj');
+        this.$store.dispatch('comment/getWaitingCommentCountPerObj');
+
         self.listIdProrcessInstances=allProcess;
         await this.getListProcessInstance(self.listIdProrcessInstances);
         self.loadingTaskList = false;

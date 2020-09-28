@@ -20,7 +20,6 @@
 			v-model="panel"
 			multiple
 			class="s-detail-sidebar"
-			style="overflow-x: hidden;"
 			>
 				<v-expansion-panel>
 					<v-expansion-panel-header class="v-expand-header">{{$t('document.detail.sidebar.body.general.title')}}</v-expansion-panel-header>
@@ -29,17 +28,12 @@
 							<table class="general-info">
 								<tr>
 									<td>{{$t('document.detail.sidebar.body.general.dateCreate')}}</td>
-									<td>{{originData.createTime ? $moment(originData.createTime).format('DD/MM/YY HH:mm:ss'):$moment(originData.endTime).format('DD/MM/YY HH:mm:ss')}}</td>
-								</tr>
-								<tr>
-									<td>{{$t('document.detail.sidebar.body.general.history')}}</td>
-									<td @click="showHistory" style="text-decoration: underline;cursor:pointer;color:#F1853B;">Đã sửa 2 lần</td>
+									<td>{{workInfo.startTime ? $moment(workInfo.startTime).format('DD/MM/YY HH:mm:ss'):''}}</td>
 								</tr>
 								<tr>
 									<td>{{$t('document.detail.sidebar.body.general.comment')}}</td>
 									<td style="text-decoration: underline;cursor:pointer;color:#F1853B;" @click="showComment">
 										{{$t('document.detail.sidebar.body.general.has')}} 
-										<!-- {{countCommentNotResolve}}  -->
 										{{$t('document.detail.sidebar.body.general.commentNotResolve')}}
 									</td>
 								</tr>
@@ -53,9 +47,8 @@
 					<v-expansion-panel-content class="sym-v-expand-content" style="height:200px">
 						<v-row class="border-top-1" style="height:200px">
 							<trackingProcessInstance
-								v-if="taskInfo.action.parameter.processInstanceId"
-								:instanceId="taskInfo.action.parameter.processInstanceId"
-								:elementId="taskInfo.action.parameter.activityId"
+								v-if="workInfo.id"
+								:instanceId="workInfo.id"
 								@showPopupDiagram="showPopupDiagram"
 								>
 							</trackingProcessInstance>
@@ -65,77 +58,29 @@
 				<v-expansion-panel>
 					<v-expansion-panel-header class="v-expand-header">{{$t('document.detail.sidebar.body.userRelated.title')}}</v-expansion-panel-header>
 					<v-expansion-panel-content class="sym-v-expand-content">
-				   		<div class="w-100 pl-2" v-for="(users, role) in dataTask" :key="role" >
-							<div v-if="users.length>0 " style="height: 30px" class=" fs-13 font-weight-medium symper-user-role-in-task d-flex">
+						<!-- trường hợp cho work -->
+
+						<div v-if="objSideBar=='work'"  class="w-100 pl-2" >
+							<div style="height: 30px" class=" fs-13 font-weight-medium symper-user-role-in-task d-flex">
 								<span>
 									<v-icon class="mr-3" size="18">mdi-account</v-icon> 
-									<span mt-1>{{$t("tasks.header."+role)}}</span>
+									<span mt-1>{{$t("tasks.header.userCreate")}}</span>
 								</span>
-								<!-- <v-btn small icon @click="addUserForRole(role)" class="ml-3 symper-add-user-btn" style="display: none" v-if="roleCanAddUser[role]">
-									<v-icon>mdi-plus</v-icon>
-								</v-btn> -->
-							</div>
-							<div class="pl-7 d-flex justify-space-between user-show" v-for="userItem in tabsData[role]" :key="userItem.id" >
-								<user :user="userItem" class="float-left"></user>
-								<div class="float-right action-for-role d-flex"  >
-									<div v-for="(btn, idx) in actionsForRole[role]" :key="idx" class="d-flex" >
-										<v-menu v-if="btn.showUserSelect==true" 
-											v-model="showDelegatedUser[role+'_'+idx]"
-											:offset-y="true"
-											class="symper-select-user-autocomplete"
-											:close-on-content-click="false"
-											:close-on-click="false"
-											>
-											<template  v-slot:activator="{ on: menu, attrs }">
-												<v-tooltip bottom>
-													<template v-slot:activator="{ on: tooltip }">
-														<v-btn 
-															text
-															v-bind="attrs"
-															depressed
-															v-on="{ ...tooltip, ...menu }"
-															class="mr-3" 
-															small 
-															@click="handleAction(btn.name, role, idx)" >
-															<v-icon left>{{btn.icon}}</v-icon> {{btn.text}}
-														</v-btn>
-													</template>
-													<span >{{btn.text}}</span>
-												</v-tooltip>
-											</template>
-											<div class="bg-white" style="width: 200px; z-index: 1002" :ref="'selectUserWrapper_'+role+'_'+idx">
-											</div>
-										</v-menu>
+								<div class="pl-7 d-flex justify-space-between user-show">
 
-										<!-- <v-btn v-else depressed class="mr-3" small @click="handleAction(btn.name, role, idx)" >
-											<v-icon left>{{btn.icon}}</v-icon> {{btn.text}}
-										</v-btn> -->
-									</div>
 								</div>
 							</div>
 						</div>
 					</v-expansion-panel-content>
 				</v-expansion-panel>
-				<v-expansion-panel>
-					<v-expansion-panel-header class="v-expand-header">{{$t('tasks.header.relatedTask')}}</v-expansion-panel-header>
-					<v-expansion-panel-content class="sym-v-expand-content">
-						<RelatedItems
-							:taskInfo="taskInfo"
-							:tabsData="tabsData"
-							:showMoreTask="showMoreTask"
-						 />
-						 <span class="showMoreRelated" @click="handleShowMoreTask" v-if="!showMoreTask" >{{$t('myItem.sidebar.showMoreTask')}}</span>
-						 <span class="showMoreRelated" @click="handleShowMoreTask" v-else >{{$t('myItem.sidebar.showLess')}}</span>
-					</v-expansion-panel-content>
-				</v-expansion-panel>
-					<v-expansion-panel style="margin-bottom: 20px;">
+				<v-expansion-panel style="margin-bottom: 20px;">
 					<v-expansion-panel-header style="padding:0px" class="v-expand-header">{{$t('tasks.header.attachment')}}
-						  <UploadFile
+						<UploadFile
 							@uploaded-file="uploaded"
-							:objectIdentifier="taskInfo.action.parameter.taskId"
-							:objectType="`task`"
+							:objectIdentifier="workInfo.id"
+							:objectType="`work`"
 							:iconName="`mdi-upload-outline`"
-							/>
+						/>
 				</v-expansion-panel-header>
 					<v-expansion-panel-content class="sym-v-expand-content">
 						<div
@@ -214,73 +159,13 @@
 			</v-expansion-panels>
 		</VuePerfectScrollbar>
 	</div>
-	<div class="history-info" style="transform:translateX(400px)">
-		<div style="display:flex;">
-			<span class="mdi mdi-keyboard-backspace" @click="hideHistory"></span>
-			<span style="font-size:15px;">LỊCH SỬ CHỈNH SỬA</span>
-			<!-- <span class="mdi mdi-close" @click="hide"></span> -->
-		</div>
-		<v-divider></v-divider>
-
-		<VuePerfectScrollbar style="calc(100% - 62px);">
-			<div v-for="history in listHistoryControl" 
-			:key="history.id" 
-			@click="showHistoryControl(history)"
-			class="history-item">
-				<div class="history-item__info">
-					<div class="date-update">
-						{{history.date}}
-					</div>
-					<div>
-						<img src="https://randomuser.me/api/portraits/men/81.jpg" height="14px" alt="">
-						<span>{{history.userUpdate}}</span>
-					</div>
-				</div>
-				<div class="history-item__action">
-					<v-tooltip left>
-						<template v-slot:activator="{ on }">
-							<div v-on="on">
-								<v-btn small>
-									<v-icon>mdi-backup-restore</v-icon>
-								</v-btn>
-							</div>
-						</template>
-						<span>Khôi phục</span>
-					</v-tooltip>
-				</div>
-			</div>
-		</VuePerfectScrollbar>
-	</div>
-		<Comment style="height:100%" 
-			:objectIdentifier="originData.id"
-			ref="commentTaskView"
-			/>
+	<Comment 
+	style="height:100%" 
+	:objectIdentifier="workInfo.id"
+	:objectType="'work'"
+	ref="commentTaskView"
+	/>
 	
-	<div class="w-100 h-100 symper-select-user-autocomplete " style="z-index:1010" v-show="statusChange" ref="selectUserAutocomplete">
-			<v-autocomplete
-				ref="selectDelegateUser"
-				return-object
-				full-width
-				solo
-				append-icon=""
-				:items="sapp.allUsers"
-				background-color="grey lighten-4"
-				flat
-				v-model="selectedUserForAssignment"
-				dense
-				color="blue-grey lighten-2"
-				:label="$t('common.search')"
-				item-text="displayName"
-				@change="changeUserSelect"
-				item-value="name"
-				:filter="filterUser">
-				<template v-slot:item="data">
-					<div class="fs-13 py-1">
-						<i class="mdi mdi-account mr-2 fs-16"> </i> <span> {{data.item.displayName}}</span>
-					</div>
-				</template>
-			</v-autocomplete>
-	</div>
  	<v-dialog v-model="dialogAlert" max-width="450">
       <v-card>
         <v-card-title class="headline">{{headerDialog}}</v-card-title>
@@ -295,7 +180,7 @@
 	</v-navigation-drawer>
 </template>
 <script>
-import user from "./User";
+import user from "../User";
 import { taskApi } from "@/api/task.js";
 import { userApi } from "@/api/user.js";
 import { documentApi } from "@/api/Document";
@@ -303,10 +188,9 @@ import BPMNEngine from "@/api/BPMNEngine.js";
 import { util } from "@/plugins/util.js";
 import { data } from 'jquery'
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
-import Comment from './Comment'
+import Comment from '../Comment'
 import trackingProcessInstance from "@/views/process/TrackingProcessInstance.vue";
 import UploadFile from "@/components/common/UploadFile.vue";
-import RelatedItems from "./RelatedItems.vue";
 export default {
 	components:{
 		VuePerfectScrollbar,
@@ -314,13 +198,11 @@ export default {
 		user,
 		trackingProcessInstance,
 		UploadFile,
-		RelatedItems
 	},
 	data () {
 		return {
 			x:0,
 			y:0,
-			showMoreTask:false,
 			showMoreFile:false,
 			headerDialog:'',
       		titleDialog:'',
@@ -421,7 +303,15 @@ export default {
 		}
 	},
 	props:{
+		objSideBar:{
+			type:String,
+			default:""
+		},
 		taskInfo: {
+			type: Object,
+			default: () => {}
+		},
+		workInfo: {
 			type: Object,
 			default: () => {}
 		},
@@ -435,7 +325,7 @@ export default {
         },
 		sidebarWidth:{
 			type:Number,
-			default:300
+			default:400
 		},
 		isShowSidebar:{
 			type:Boolean,
@@ -445,29 +335,16 @@ export default {
 			type:String, 
 			default:"0"
 		},
-		taskId:{
-			type:String,
-			default:""
-		},
-		workflowId:{
-			type:String,
-			default:""
-		},
-		createTime:{
-			type:String,
-			default:""
-		},
-		documentObjectId:{
-			type:String,
-			default:""
-		}
+
+
+	
 	
 	},
 	watch:{
 		isShowSidebar(after){
 			this.isShow = !this.isShow
 		},
-		taskInfo:function(newVl){
+		workInfo:function(newVl){
 			this.getData();
 		}
 		
@@ -476,24 +353,6 @@ export default {
 		sapp(){
             return this.$store.state.app;
         },
-		roleCanAddUser() {
-            let canAddAssignee = false;
-            let assignee = this.tabsData.assignee[0];
-            if(!assignee && this.tabsData.owner[0]){
-                canAddAssignee = this.$store.state.app.endUserInfo.id == this.tabsData.owner[0].id;
-            }
-            return {
-                participant: true,
-                watcher: true,
-                assignee: canAddAssignee
-            }
-		},
-		dataTask(){
-			if (this.tabsData.owner.length==0) {
-				this.tabsData.owner=this.tabsData.assignee;
-			}
-			return this.tabsData;
-		},
 		stask() {
 			return this.$store.state.task;
 		},
@@ -505,39 +364,8 @@ export default {
 	created(){
 		let thisCpn = this;
 		this.getData();
-		documentApi.getListApprovalHistory(this.documentObjectId).then(res => {
-				if (res.status == 200) {
-					let listUser = []
-					for (let index = 0; index < res.data.length; index++) {
-						let user = res.data[index];
-						let userId = user.userId;
-						let userInfo = thisCpn.allUsers.filter(user=>{
-							return user.id == userId;
-						})
-						if(userInfo.length > 0){
-							user.displayName = userInfo[0].displayName
-							thisCpn.listApprovalUser.push(user);
-						}
-					}
-				}
-			})
-			.catch(err => {
-
-			})
-			.always(() => {});
-
-		this.$evtBus.$on('symper-app-wrapper-clicked', (evt) => {
-            if(!($(evt.target).hasClass('symper-select-user-autocomplete') || $(evt.target).parents('.symper-select-user-autocomplete').length > 0)){
-                for(let key in  this.showDelegatedUser){
-                    this.showDelegatedUser[key] = false;
-                }
-            }
-		});
 	},
 	methods:{
-		handleShowMoreTask(){
-			this.showMoreTask=!this.showMoreTask;
-		},
 		handleShowMoreFile(){
 			this.showMoreFile=!this.showMoreFile;
 		},
@@ -616,37 +444,6 @@ export default {
 		uploaded(dataObj) {
 			this.$store.commit("task/addToListAttachStore", dataObj);
 		},
-		async changeUserSelect(value){
-            let updateData = {};
-            for(let role in this.tabsData){
-                let userIds = this.tabsData[role].reduce((arr, user) => {
-                    arr.push(user.id);
-                    return arr;
-                }, []);
-
-                if(role == this.selectingPosition.role){
-                    userIds[this.selectingPosition.idx] = value.id;
-                }
-                if(userIds.length > 0){
-                    updateData[role] = userIds.join(',');
-                }
-            }
-            this.selectedUserForAssignment = {};
-            try {
-                let res = await BPMNEngine.updateTask(this.taskInfo.action.parameter.taskId ,updateData);
-                this.$evtBus.$emit('symper-update-task-assignment', res);
-				this.$snotifySuccess("Update task assignment successfully");
-                this.$emit('changeUpdateAsignee');
-				
-            } catch (error) {
-                this.$snotifyError(error, "Update task assignment failed");
-            }
-            this.statusChange=false;
-        },
-        filterUser(item, queryText, itemText){
-            let lowcaseText = queryText.toLowerCase();
-            return item.displayName.toLowerCase().includes(lowcaseText);
-        },
 		hide(){
 			this.isShow = false;
 			this.$emit('after-hide-sidebar')
@@ -654,51 +451,14 @@ export default {
 		show(){
 			this.isShow = true;
 		},
-		showHistoryControl(history){
-			$('.highlight-history').removeClass('highlight-history');
-			for (let index = 0; index < history.controls.length; index++) {
-				const control = history.controls[index];
-				$("#"+control.id).addClass('highlight-history');
-			}
-			
-		},
-		hideHistory(){
-			$('.history-info').css({transform:'translateX(400px)'})
-		},
-		showHistory(){
-			$('.history-info').css({transform:'translateX(0px)'})
-		},
+	
 		showComment(){
 			this.$refs.commentTaskView.show();
 		},
-		handleAction(actionName, role, idx){
-            this.statusChange=true;
-            this.selectingPosition.role  = role;
-            this.selectingPosition.idx  = idx;
-            
-            let self = this;
-            let refKey = 'selectUserWrapper_'+role+'_'+idx;
-            if(!this.$refs[refKey]){
-                setTimeout(() => {
-                    self.showSelectUser(role, idx, refKey);
-                }, 200);
-            }else{
-                self.showSelectUser(role, idx, refKey);
-            }
-        },
-        showSelectUser(role, idx, refKey){
-            if(this.actionsForRole[role][idx].showUserSelect){
-                $(this.$refs[refKey]).html('');
-                $(this.$refs[refKey]).append(this.$refs.selectUserAutocomplete);
-                setTimeout((self) => {
-                    $(self.$refs[refKey]).find('.v-select__slot').click();
-                }, 200, this);
-            }
-		},
 		getData(){
 			let data = {};
-			data.objectIdentifier = this.taskInfo.action.parameter.taskId;
-			data.objectType = "task";
+			data.objectIdentifier = this.workInfo.id;
+			data.objectType = "work";
 			this.$store.dispatch("task/getArrFileAttachment", data);
     	}
 	},
@@ -867,8 +627,5 @@ export default {
 		cursor:pointer;
 		margin-right: 20px;
 		margin-bottom: 20px;
-	}
-	.v-expansion-panel::before{
-		box-shadow: none;
 	}
 </style>

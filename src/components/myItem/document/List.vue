@@ -143,8 +143,12 @@
                     v-if="!sideBySideMode"
                 >
                     <div class="pl-1">
-                        <div style="width:55px">10 <v-icon class="fs-14" style="float:right;margin-top:4px;margin-right:12px">mdi-comment-processing-outline</v-icon> </div>
-                        <div style="width:55px"> 2 <v-icon class="fs-14" style="float:right;margin-top:4px;margin-right:12px">mdi-attachment</v-icon></div>
+                        <div style="width:55px">
+                            {{commentCountPerTask['document:' + obj.id]}}
+                            <v-icon class="fs-14" style="float:right;margin-top:4px;margin-right:12px">mdi-comment-processing-outline</v-icon> </div>
+                        <div style="width:55px"> 
+                             {{fileCountPerTask['document:' + obj.id]}}
+                            <v-icon class="fs-14" style="float:right;margin-top:4px;margin-right:12px">mdi-attachment</v-icon></div>
                     </div>
                 </v-col>
             </v-row>
@@ -207,6 +211,12 @@ import symperAvatar from "@/components/common/SymperAvatar.vue";
 import detailDocument from '@/views/document/detail/Detail';
 export default {
   computed: {
+    fileCountPerTask(){
+        return this.$store.state.file.fileCountPerObj.list;
+    },
+    commentCountPerTask(){
+        return this.$store.state.comment.commentCountPerObj.list;
+    },
     listAllDocumentObjectId() {
         let listObjRelated=this.stask.listDocumentObjId;
         let listObjUserSubmit=this.stask.listDocumentObjIdWithUserSubmit;
@@ -233,7 +243,6 @@ export default {
                 element.displayName="";
             }
         });
-        console.log("aaaaaad",arrDocument);
 
         return arrDocument;
     },
@@ -252,6 +261,14 @@ export default {
         VuePerfectScrollbar: VuePerfectScrollbar,
         symperAvatar: symperAvatar,
         detailDocument
+    },
+    watch:{
+       sideBySideMode(vl){
+            if(!vl){
+                this.$store.dispatch('file/getWaitingFileCountPerObj');
+                this.$store.dispatch('comment/getWaitingCommentCountPerObj');
+            }
+        }
     },
     props: {
         compackMode: {
@@ -330,9 +347,6 @@ export default {
         self.reCalcListTaskHeight();
     },
     methods: {
-        goBack(){
-            alert("aa");
-        },
         changeUpdateAsignee(){
         this.handleTaskSubmited();
         },
@@ -436,6 +450,7 @@ export default {
             self.listIdProrcessInstances=allProcess;
             await self.getListTaskDoneInArrProcess(self.listIdProrcessInstances);
             await self.getListDocumentObjectId(this.$store.state.app.endUserInfo.id);
+            this.getCountCommentAndFile();
             self.loadingTaskList = false;
             self.loadingMoreTask = false;
         },
@@ -457,7 +472,6 @@ export default {
                     }
                 }
                 this.$store.dispatch("task/getListDocumentObjId", self.listDocumentObjectId);
-                console.log("listObjId",self.listDocumentObjectId);
             } catch (error) {
                // self.listTaskDone=[];
                 self.$snotifyError(error, "Get Process failed");
@@ -466,6 +480,19 @@ export default {
         async getListDocumentObjectId(userId){
             let self =this;
             self.$store.dispatch("task/getListDocumentObjIdWithUserSubmit",userId);
+        },
+        getCountCommentAndFile(){
+            let listObjRelated=this.stask.listDocumentObjId;
+            let listObjUserSubmit=this.stask.listDocumentObjIdWithUserSubmit;
+            let arrDocument=listObjRelated.concat(listObjUserSubmit);
+            let documentIden = [];
+            arrDocument.forEach(element => {
+                documentIden.push('document:'+element.id);
+            });
+            this.$store.commit('file/setWaitingFileCountPerObj', documentIden);
+            this.$store.commit('comment/setWaitingCommentCountPerObj', documentIden);
+            this.$store.dispatch('file/getWaitingFileCountPerObj');
+            this.$store.dispatch('comment/getWaitingCommentCountPerObj');
         }
     }
 };

@@ -117,10 +117,6 @@
                         <v-tooltip bottom>
                         <template v-slot:activator="{ on }">
                             <div v-on="on" class="text-left fs-13 pr-6 text-ellipsis w-100">
-                            <span
-                                v-if="obj.taskData.action && obj.taskData.action.action=='approval'"
-                                style="color:#ffc107"
-                            >{{obj.taskData.action.parameter.documentObjectId ? checkData(obj.taskData.action.parameter.documentObjectId): ''}}</span>
                             {{obj.taskData.content}}
                             </div>
                         </template>
@@ -428,25 +424,25 @@ export default {
     changeObjectType(index) {
       this.$emit("changeObjectType", index);
     },
-    checkData(documentObjectId) {
-      if (documentObjectId != "" || documentObjectId != undefined) {
-        let arr = this.stask.arrDocObjId;
-        let obj = arr.find(data => data.id === documentObjectId);
-        if (obj) {
-          let arrUser = this.sapp.allUsers;
-          let user = arrUser.find(data => data.email === obj.userCreate);
-          if (user) {
-            return user.displayName;
-          } else {
-            return "";
-          }
-        } else {
-          return "";
-        }
-      } else {
-        return "";
-      }
-    },
+    // checkData(documentObjectId) {
+    //   if (documentObjectId != "" || documentObjectId != undefined) {
+    //     let arr = this.stask.arrDocObjId;
+    //     let obj = arr.find(data => data.id === documentObjectId);
+    //     if (obj) {
+    //       let arrUser = this.sapp.allUsers;
+    //       let user = arrUser.find(data => data.email === obj.userCreate);
+    //       if (user) {
+    //         return user.displayName;
+    //       } else {
+    //         return "";
+    //       }
+    //     } else {
+    //       return "";
+    //     }
+    //   } else {
+    //     return "";
+    //   }
+    // },
     handleReachEndList() {
       if (
         this.allFlatTasks.length < this.totalTask &&
@@ -548,10 +544,6 @@ export default {
             listTasks = res.data;
         }
         this.totalTask = Number(res.total);
-      // let allDefinitions=this.$store.state.process.allDefinitions;
-      // if(Object.entries(allDefinitions).length === 0){
-      //     this.$store.dispatch('process/getAllDefinitions');
-      // }
 
         //Khadm: danh sách các task cần lấy tổng số comment và file đính kèm
         let taskIden = [];
@@ -600,19 +592,19 @@ export default {
           parseInt(listTasks[index].assignee)
         );
         listTasks[index].owner = this.getUser(parseInt(listTasks[index].owner));
-        if (listTasks[index].description) {
-          let description = JSON.parse(listTasks[index].description);
-          if (
-            description.action.action == "approval" &&
-            description.action.parameter.documentObjectId != undefined
-          ) {
-            this.arrdocObjId.push(
-              description.action.parameter.documentObjectId
-            );
-          }
-        }
+        // if (listTasks[index].description) {
+        //   let description = JSON.parse(listTasks[index].description);
+        //   if (
+        //     description.action.action == "approval" &&
+        //     description.action.parameter.documentObjectId != undefined
+        //   ) {
+        //     this.arrdocObjId.push(
+        //       description.action.parameter.documentObjectId
+        //     );
+        //   }
+        // }
       }
-      this.$store.dispatch("task/getArrDocObjId", this.arrdocObjId);
+     // this.$store.dispatch("task/getArrDocObjId", this.arrdocObjId);
       this.listProrcessInstances.push({
         processDefinitionId: null,
         processDefinitionName: this.$t("common.other"),
