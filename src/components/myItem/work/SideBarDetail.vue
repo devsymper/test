@@ -20,6 +20,7 @@
 			v-model="panel"
 			multiple
 			class="s-detail-sidebar"
+			style="overflow-x: hidden;"
 			>
 				<v-expansion-panel>
 					<v-expansion-panel-header class="v-expand-header">{{$t('document.detail.sidebar.body.general.title')}}</v-expansion-panel-header>
@@ -627,5 +628,8 @@ export default {
 		cursor:pointer;
 		margin-right: 20px;
 		margin-bottom: 20px;
+	}
+	.v-expansion-panel::before{
+		box-shadow: none;
 	}
 </style>

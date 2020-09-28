@@ -82,6 +82,7 @@ export default {
     created() {
         this.setInstanceXML();
         this.getInstanceRuntimeData();
+ 
     },
     data() {
         return {

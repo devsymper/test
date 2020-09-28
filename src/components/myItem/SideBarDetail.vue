@@ -128,8 +128,8 @@
 						 <span class="showMoreRelated" @click="handleShowMoreTask" v-else >{{$t('myItem.sidebar.showLess')}}</span>
 					</v-expansion-panel-content>
 				</v-expansion-panel>
-					<v-expansion-panel style="margin-bottom: 20px;">
-					<v-expansion-panel-header style="padding:0px" class="v-expand-header">{{$t('tasks.header.attachment')}}
+				<v-expansion-panel style="margin-bottom: 20px;">
+				<v-expansion-panel-header style="padding:0px" class="v-expand-header">{{$t('tasks.header.attachment')}}
 						  <UploadFile
 							@uploaded-file="uploaded"
 							:objectIdentifier="taskInfo.action.parameter.taskId"

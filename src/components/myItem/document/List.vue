@@ -79,7 +79,7 @@
                             <div v-on="on" class="text-left fs-13  text-ellipsis w-100">
                                 <v-icon 
                                 class="fs-14" >
-                               mdi-file-document-edit-outline
+                                mdi-file-document-edit-outline
                             </v-icon>  {{obj.title? obj.title : obj.titleObject}}
                             </div>
                         </template>

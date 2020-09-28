@@ -75,7 +75,6 @@
                 <v-row
                    :class="{
                         'mr-0 ml-0 single-row': true ,
-                        'py-1': !isSmallRow,
                         'py-0': isSmallRow,
                     }"
                     :style="{
@@ -91,7 +90,6 @@
                     :index="obj.id"
                     :class="{
                                     'mr-0 ml-0 single-row': true ,
-                                    'py-1': !isSmallRow,
                                     'py-0': isSmallRow,
                                     'd-active':index==idx && dataIndex==idex
                                 }"
