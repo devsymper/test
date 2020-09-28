@@ -28,6 +28,9 @@ export default {
             setTimeout((self) => {
                 this.isShow = false
             }, 300,this);
+        },
+        show(){
+            this.isShow = true
         }
     }
 }
@@ -38,6 +41,7 @@ export default {
         justify-content: center;
         align-items: center;
         z-index: 99999;
+        background: white;
         /* backdrop-filter: blur(5px); */
     }
 
