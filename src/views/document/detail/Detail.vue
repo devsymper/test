@@ -429,6 +429,7 @@ export default {
                         //truong hop la control table
                         else {
                             let listInsideControls = {};
+                            let controlInTable = {};
                             let mapControlToIndex = {};
                             let tableControl = new TableControl(
                                 idField,
@@ -466,8 +467,10 @@ export default {
                                 mapControlToIndex[childControlName] = colIndex
                                 thisCpn.addToListInputInDocument(childControlName,childControl)
                                 listInsideControls[childControlName] = true;
+                                controlInTable[childControlName] = childControl;
                             });
                             tableControl.listInsideControls = listInsideControls;
+                            tableControl.controlInTable = controlInTable;
                             tableControl.mapControlToIndex = mapControlToIndex;
                             this.addToListInputInDocument(controlName,tableControl)
                             tableControl.renderTable();

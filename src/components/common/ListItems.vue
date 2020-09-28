@@ -1428,14 +1428,21 @@ export default {
          */
         handleAfterChangeDataTable(change, source) {
             if(source == 'edit' && this.hasColumnsChecked){
-                if(change[0][3] == true){
-                    this.allRowChecked[change[0][0]] = this.data[change[0][0]]
-                }else{
-                    delete this.allRowChecked[change[0][0]];
+                for (let index = 0; index < change.length; index++) {
+                    let rowChange = change[index];
+                    if(change[index][3] == true){
+                        this.allRowChecked[change[index][0]] = this.data[change[index][0]]
+                    }else{
+                        delete this.allRowChecked[change[index][0]];
+                    }
                 }
+                
                 this.$emit('after-selected-row',this.allRowChecked)
             }
         },
+        isShowSidebar(){
+            return this.alwaysShowActionPanel
+        }
         
     },
     components: {
