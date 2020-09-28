@@ -841,6 +841,11 @@
             "parentWork": "Parent work",
             "siblingWork": "Sibling work",
             "subWork": "Sub work"
+        },
+        "sidebar":{
+            "showMoreTask":"Show more task related",
+            "showLess":"Show less task related",
+            "showMoreFile":"Show more file"
         }
     },
     "tasks": {

@@ -64,7 +64,7 @@
 				<v-expansion-panel>
 					<v-expansion-panel-header class="v-expand-header">{{$t('document.detail.sidebar.body.userRelated.title')}}</v-expansion-panel-header>
 					<v-expansion-panel-content class="sym-v-expand-content">
-				   		<div class="w-100 mb-2 pl-3" v-for="(users, role) in dataTask" :key="role" >
+				   		<div class="w-100 pl-2" v-for="(users, role) in dataTask" :key="role" >
 							<div v-if="users.length>0 " style="height: 30px" class=" fs-13 font-weight-medium symper-user-role-in-task d-flex">
 								<span>
 									<v-icon class="mr-3" size="18">mdi-account</v-icon> 
@@ -74,7 +74,7 @@
 									<v-icon>mdi-plus</v-icon>
 								</v-btn> -->
 							</div>
-							<div class="pl-10 py-2 d-flex justify-space-between user-show" v-for="userItem in tabsData[role]" :key="userItem.id" >
+							<div class="pl-7 d-flex justify-space-between user-show" v-for="userItem in tabsData[role]" :key="userItem.id" >
 								<user :user="userItem" class="float-left"></user>
 								<div class="float-right action-for-role d-flex"  >
 									<div v-for="(btn, idx) in actionsForRole[role]" :key="idx" class="d-flex" >
@@ -121,7 +121,10 @@
 						<RelatedItems
 							:taskInfo="taskInfo"
 							:tabsData="tabsData"
+							:showMoreTask="showMoreTask"
 						 />
+						 <span class="showMoreRelated" @click="handleShowMoreTask" v-if="!showMoreTask" >{{$t('myItem.sidebar.showMoreTask')}}</span>
+						 <span class="showMoreRelated" @click="handleShowMoreTask" v-else >{{$t('myItem.sidebar.showLess')}}</span>
 					</v-expansion-panel-content>
 				</v-expansion-panel>
 					<v-expansion-panel style="margin-bottom: 20px;">
@@ -132,7 +135,7 @@
 							:objectType="`task`"
 							:iconName="`mdi-upload-outline`"
 							/>
-					</v-expansion-panel-header>
+				</v-expansion-panel-header>
 					<v-expansion-panel-content class="sym-v-expand-content">
 						<div
 							v-for="(item, idex) in listFileAttachment"
@@ -146,6 +149,7 @@
 								:style="{
 									minHeight: '25px'
 								}"
+								v-if="checkShowMoreFile(idex)"
 								@mouseover="showByIndex = idex"
                     			@mouseout="showByIndex = null"
 							>
@@ -202,6 +206,8 @@
 								</v-list>
 							</v-menu>
 						</div>
+						<span class="showMoreRelated" @click="handleShowMoreFile" v-if="!showMoreFile" >{{$t('myItem.sidebar.showMoreFile')}}</span>
+						<span class="showMoreRelated" @click="handleShowMoreFile" v-else >{{$t('myItem.sidebar.showLess')}}</span>
 					</v-expansion-panel-content>
 				</v-expansion-panel>
 			</v-expansion-panels>
@@ -313,6 +319,8 @@ export default {
 		return {
 			x:0,
 			y:0,
+			showMoreTask:false,
+			showMoreFile:false,
 			headerDialog:'',
       		titleDialog:'',
 			dialogAlert: false,
@@ -526,6 +534,23 @@ export default {
 		});
 	},
 	methods:{
+		handleShowMoreTask(){
+			this.showMoreTask=!this.showMoreTask;
+		},
+		handleShowMoreFile(){
+			this.showMoreFile=!this.showMoreFile;
+		},
+		checkShowMoreFile(idex){
+            if (this.showMoreFile==false) {
+                if (idex<=2) {
+                    return true
+                }else{
+                    return false
+                }
+            }else{
+                return true;
+            }
+        },
 		showPopupDiagram(){
 			this.$emit("showPopupTracking");
 		},
@@ -833,5 +858,10 @@ export default {
 	}
 	.main-info{
 		height: 100%;
+	}
+	.showMoreRelated{
+		float: right;
+		cursor:pointer;
+		margin-right: 20px;
 	}
 </style>

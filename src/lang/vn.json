@@ -959,6 +959,12 @@
             "parentWork": "Parent work",
             "siblingWork": "Sibling work",
             "subWork": "Sub work"
+        },
+        "sidebar":{
+            "showMoreTask":"Xem thêm các task liên quan",
+            "showLess":"Thu gọn",
+            "showMoreFile":"Xem thêm các tệp"
+
         }
 
     },
