@@ -57,8 +57,8 @@
 								class="mx-auto"
 								height="200"
 						></v-skeleton-loader>
-						<VuePerfectScrollbar v-else-if="loadingApp == false && Object.keys(listApp).length > 0" style="max-height:330px"  class="d-flex flex-wrap" >
-							<div  v-for="(item,i) in listApp" :key="i" 
+						<VuePerfectScrollbar v-else-if="loadingApp == false && apps.length > 0" style="max-height:330px"  class="d-flex flex-wrap" >
+							<div  v-for="(item,i) in apps" :key="i" 
 								class="list-app-item"
 								@click="clickDetails(item)"
 								>
@@ -213,6 +213,7 @@ export default {
 				this.loadingApp = false
 				if (res.status == 200) {
 					this.apps = res.data.listObject
+					// this.$store.commit('appConfig/setListApps', res.data.listObject)
 				}
 			}).catch((err) => {
 			});
