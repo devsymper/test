@@ -221,7 +221,8 @@
             "contextMenu": {
                 "passwordSetting": "Tùy chọn mật khẩu",
                 "edit": "Sửa",
-                "delete": "Xóa"
+                "delete": "Xóa",
+                "view": "Xem chi tiết"
             }
         }
     },

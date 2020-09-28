@@ -21,8 +21,8 @@
             @close-panel="closePanel"
             :actionType="actionType"
             :isSettingPasswordView="isSettingPasswordView"
+            :showViewInfo="showViewInfo"
             />
-           
         </div>
     </list-items>
           <ImportExcelPanel
@@ -94,7 +94,7 @@ export default {
                     name:"view",
                     text:this.$t('user.table.contextMenu.view'), 
                     callback: (user, callback) => {
-                        this.deleteUser(user);
+                        this.showViewDetailInfo(user);
                     }
                 }
             },
@@ -102,7 +102,8 @@ export default {
             data: [],
             totalPage: 6,
             actionType:'',
-            isSettingPasswordView : false
+            isSettingPasswordView : false,
+            showViewInfo: false
         }
     },
     mounted() {
@@ -116,8 +117,6 @@ export default {
                 {name:"edit",text:this.$t('user.table.contextMenu.edit')},
                 {name:"xóa",text:this.$t('user.table.contextMenu.delete')},
                 {name:"xem chi tiết",text:this.$t('user.table.contextMenu.view')}
-             
-
             ]
 
         });
@@ -127,7 +126,6 @@ export default {
     },
     methods:{
          getListFieldUser(){
-             debugger
              this.listRowUser =  [{
                 sheetMap: '',
                 name: 'Thông tin chung',
@@ -139,7 +137,7 @@ export default {
                         isKeyControl:false,
                         name:"firstName",
                         title:"Tên ",
-                         isNull:true
+                        isNull:true
                     },
                      {
                         dataColumn:null,
@@ -181,12 +179,12 @@ export default {
                         title:"Điện thoại",
                          isNull:true
                     },
-                    {
+                     {
                         dataColumn:null,
-                        dataType:"numeric",
+                        dataType:"text",
                         isKeyControl:false,
-                        name:"avatar",
-                        title:"Ảnh đại diện",
+                        name:"password",
+                        title:"Mật khẩu",
                         isNull:true
                     }
                 ]
@@ -206,8 +204,16 @@ export default {
         },
         showViewSetingPassword(user){
             this.isSettingPasswordView = true;
-            this.$refs.panel.setUser(user);
+            debugger
+            this.$refs.panel.setDetailInfo(user);
             this.$refs.listUser.openactionPanel();
+        },
+        showViewDetailInfo(user){
+            this.showViewInfo= true;
+            debugger
+            this.$refs.panel.setDetailInfo(user);
+            this.$refs.listUser.openactionPanel();
+
         },
         changePage(page){
             alert('ok');

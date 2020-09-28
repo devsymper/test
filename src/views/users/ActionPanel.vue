@@ -1,6 +1,6 @@
 <template>
 	<div class="h-100">
-		<div class="h-100" v-if="!isSettingPasswordView" >
+		<div class="h-100" v-if="!isSettingPasswordView&&!showViewInfo" >
 			<div class="h-100">
 				<h3 class="header-title fs-16" 
 					style="font-weight:430!important" 
@@ -372,20 +372,24 @@
 				</v-stepper>
 			</div>
 		</div>
-		<div class="h-100" v-else>
+		<div class="h-100" v-if="isSettingPasswordView&&!showViewInfo">
 			<v-change-password
 				:user="user"
 				ref="changePass"
 				:resetPass="showPassPanel"
 			>
 			</v-change-password>
-			
 		</div>
+			<DetailUserInfo class="h-100" 
+				v-if="showViewInfo"
+				:detailInfo="detailInfoUser"
+			/>
 	</div>
 	
 </template>
 <script>
 import ChangePassword from "./../../views/users/ChangePass.vue";
+import DetailUserInfo from "./../../views/users/DetailUserInfo.vue";
 import { userApi } from "./../../api/user.js";
 import { permissionPackageApi } from "./../../api/PermissionPackage.js";
 import { permissionPositionOrgchartApi } from "./../../api/PermissionPositionOrgchart.js";
@@ -400,7 +404,8 @@ export default {
 	components:{
 		"vue-resizable":VueResizable,
         "v-change-password":ChangePassword,
-        UploadFile
+		UploadFile, 
+		DetailUserInfo
 	},
 	props:{
 		actionType:{    // type là add hay update hay detail user
@@ -410,6 +415,10 @@ export default {
 		isSettingPasswordView:{
 			type: Boolean,
 			default: false
+		},
+		showViewInfo:{
+			type:Boolean,
+			default:false
 		}
 
 	},
@@ -421,6 +430,7 @@ export default {
 	data(){
 		return {
 			showPassPanel:false,
+			detailInfoUser:{},
 			test:true,
             avatarFileName: '',
             avatarUrl: '',
@@ -486,16 +496,10 @@ export default {
 		}
  	},
   	watch: {
-		  	
 		showPassPanel(){
 			debugger
 			if(this.showPassPanel){
-				
-				
-				
 			}
-			
-			
 		},
 		user(){
 			if(this.user.status=="Đang mở"){
@@ -564,6 +568,11 @@ export default {
             }
             this.avatarUrl = this.getAvatarUrl();
             this.avatarFileName = 'user_avatar_'+this.user.id;
+		},
+		setDetailInfo(user){
+			debugger
+			this.detailInfoUser = user;
+
 		},
 		actionUser(){
 			if(this.actionType == 'add'){
