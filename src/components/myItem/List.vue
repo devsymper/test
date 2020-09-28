@@ -197,11 +197,11 @@
                     >
                         <div class="pl-1">
                             <div style="width:55px">
-                                10 
+                                {{commentCountPerTask['task:' + obj.id]}}
                                 <v-icon class="fs-14" style="float:right;margin-top:4px;margin-right:12px">mdi-comment-processing-outline</v-icon> 
                             </div>
                             <div style="width:55px"> 
-                                2 
+                                {{fileCountPerTask['task:' + obj.id]}}
                                 <v-icon class="fs-14" style="float:right;margin-top:4px;margin-right:12px">mdi-attachment</v-icon>
                             </div>
                         </div>
@@ -249,6 +249,7 @@ import userSelector from "./UserSelector";
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import { util } from "../../plugins/util";
 import { appConfigs } from "../../configs";
+
 import {
   extractTaskInfoFromObject,
   addMoreInfoToTask
@@ -257,18 +258,24 @@ import symperAvatar from "@/components/common/SymperAvatar.vue";
 
 export default {
   computed: {
-    // Liệt kê danh sách các task dưới dạng phẳng - ko phân cấp
+        fileCountPerTask(){
+            return this.$store.state.file.fileCountPerObj.list;
+        },
+        commentCountPerTask(){
+            return this.$store.state.comment.commentCountPerObj.list;
+        },
+        // Liệt kê danh sách các task dưới dạng phẳng - ko phân cấp
         flatTasks() {
-        let tasks = [];
-        for (let def of this.listProrcessInstances) {
-            for (let instances of def.objects) {
-            for (let task of instances.tasks) {
-                task.bizKey = ""; // Business key của process instance
-                tasks.push(task);
+            let tasks = [];
+            for (let def of this.listProrcessInstances) {
+                for (let instances of def.objects) {
+                for (let task of instances.tasks) {
+                    task.bizKey = ""; // Business key của process instance
+                    tasks.push(task);
+                }
+                }
             }
-            }
-        }
-        return tasks;
+            return tasks;
         },
         groupFlatTasks() {
             let allTask = this.allFlatTasks;
@@ -307,6 +314,12 @@ export default {
             if (newVl==true) {
                 this.getTasks();
                 this.$store.commit("task/setIsStatusSubmit",false);
+            }
+        },
+        sideBySideMode(vl){
+            if(!vl){
+                this.$store.dispatch('file/getWaitingFileCountPerObj');
+                this.$store.dispatch('comment/getWaitingCommentCountPerObj');
             }
         }
     },
@@ -383,19 +396,20 @@ export default {
     created() {
         let self = this;
         this.$evtBus.$on("symper-update-task-assignment", updatedTask => {
-        updatedTask.taskData = self.getTaskData(updatedTask);
-        self.selectObject(updatedTask, self.selectedTask.idx);
-        self.$set(self.allFlatTasks, self.selectedTask.idx, updatedTask);
+            updatedTask.taskData = self.getTaskData(updatedTask);
+            self.selectObject(updatedTask, self.selectedTask.idx);
+            self.$set(self.allFlatTasks, self.selectedTask.idx, updatedTask);
         });
     },
     mounted() {
         let self = this;
         this.$store
-        .dispatch("process/getAllDefinitions")
-        .then(res => {
-            self.getTasks();
-        })
-        .catch(err => {});
+            .dispatch("process/getAllDefinitions")
+            .then(res => {
+                self.getTasks();
+            })
+            .catch(err => {});
+
         self.reCalcListTaskHeight();
     },
     methods: {
@@ -518,13 +532,13 @@ export default {
         }
         if (this.filterTaskAction == "subtasks") {
             res = await BPMNEngine.getSubtasks(
-            this.filterFromParent.parentTaskId,
-            filter
+                this.filterFromParent.parentTaskId,
+                filter
             );
             if (filter.status == "done") {
-            listTasks = res.data;
+                listTasks = res.data;
             } else {
-            listTasks = res;
+                listTasks = res;
             }
         } else {
             // if (!filter.assignee) {
@@ -538,11 +552,20 @@ export default {
       // if(Object.entries(allDefinitions).length === 0){
       //     this.$store.dispatch('process/getAllDefinitions');
       // }
+
+        //Khadm: danh sách các task cần lấy tổng số comment và file đính kèm
+        let taskIden = [];
         for (let task of listTasks) {
             task.taskData = self.getTaskData(task);
             task = addMoreInfoToTask(task);
             self.allFlatTasks.push(task);
+            taskIden.push('task:'+task.id);
         }
+        this.$store.commit('file/setWaitingFileCountPerObj', taskIden);
+        this.$store.commit('comment/setWaitingCommentCountPerObj', taskIden);
+        this.$store.dispatch('file/getWaitingFileCountPerObj');
+        this.$store.dispatch('comment/getWaitingCommentCountPerObj');
+
         this.listProrcessInstances.forEach((process, processIndex) => {
             process.objects.forEach((instance, instanceIndex) => {
             this.listProrcessInstances[processIndex].objects[
