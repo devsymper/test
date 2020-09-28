@@ -32,8 +32,7 @@ const emptyItemSelected = (state) => {
     state.listItemSelected = {
         document_category:{
 			icon : 'mdi-file-document-outline',
-			title: "Danh mục",
-			// this.$t('apps.listType.documents')
+			title: "apps.listType.documentCategory",
 			name:  'document_category',
 			item:[
 				
@@ -41,28 +40,26 @@ const emptyItemSelected = (state) => {
 		},
 		document_major:{
 			icon : 'mdi-file-edit-outline',
-			title: "Chứng từ",
-			// title: this.$t('apps.listType.documents'),
+            title: "apps.listType.documentMajor",
 			name:  'document_major',
 			item:[
-
 			]
 		},
         orgchart: {
             icon: 'mdi-widgets-outline',
-            title: 'Orgcharts',
+            title: "apps.listType.orgchart",
             name: 'orgchart',
             item: []
         },
         dashboard: {
             icon: 'mdi-view-dashboard',
-            title: 'Reports',
+            title: "apps.listType.dashboard",
             name: 'dashboard',
             item: []
         },
         workflow_definition: {
             icon: 'mdi-lan',
-            title: 'Workflows',
+            title: "apps.listType.workflow",
             name: 'workflow_definition',
             item: []
         },
@@ -97,6 +94,26 @@ const updateActionDef = (state, data) => {
 const updateParam = (state, data) => {
     Vue.set(state, 'param', data)
 }
+const showDetailAppArea = (state) => {
+    Vue.set(state, 'showDetailArea', true)
+}
+const setListApps =  (state , data) =>{
+    Vue.set(state, "listApps", data);
+}
+const updateFavoriteMyAppItem = (state, data) =>{
+    state.listApps[data.appId].childrenAppReduce[state.selectingItemType].item.forEach(function(e){
+        if(e.objectIdentifier == data.itemId){
+            Vue.set(e, "favorite" , data.value)
+            debugger
+            // e.favorite = data.value
+            // Vue.set(e)
+        }
+    })
+    
+}
+const updateSelectingItemType = (state, data) =>{
+    state.selectingItemType = data
+}
 export {
     updateListItemSelected,
     removeItemSelected,
@@ -108,5 +125,9 @@ export {
     changeTypeView,
     updateCurrentAppId,
     updateActionDef,
-    updateParam
+    updateParam,
+    showDetailAppArea,
+    setListApps,
+    updateFavoriteMyAppItem,
+    updateSelectingItemType
 };

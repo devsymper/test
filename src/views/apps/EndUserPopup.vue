@@ -167,7 +167,11 @@ export default {
 		 }
 	},
 	created(){
-		this.getActiveapps()
+		if(Object.keys(this.listApp).length == 0 ){
+            this.getActiveapps()
+        }else{
+			this.loadingApp = false
+		}
 		this.getFavorite()
 	},
 	mounted(){
@@ -198,7 +202,10 @@ export default {
 		},
 		sFavorite(){
 			return this.$store.state.appConfig.listFavorite
-		}
+		},
+		listApp(){
+            return this.$store.state.appConfig.listApps
+        }
 	},
 	methods:{
 		getActiveapps(){
@@ -206,6 +213,7 @@ export default {
 				this.loadingApp = false
 				if (res.status == 200) {
 					this.apps = res.data.listObject
+					// this.$store.commit('appConfig/setListApps', res.data.listObject)
 				}
 			}).catch((err) => {
 			});
