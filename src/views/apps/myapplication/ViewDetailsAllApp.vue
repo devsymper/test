@@ -413,7 +413,12 @@ export default {
         }
     },
     created(){
-        this.getActiveapps()
+        debugger
+        if(Object.keys(this.listApp).length == 0 ){
+           this.getActiveapps()
+        }else{
+            this.loadingApp = false
+        }
     },
   
     watch:{

@@ -89,6 +89,7 @@
         "always_show_sidebar": "Always show sidebar",
         "import_excel": "Import excel",
         "sidebar": {
+            "myApplication": "My Application",
             "My work": "My work",
             "tasks": "Tasks",
             "Lists trash": "Lists trash",

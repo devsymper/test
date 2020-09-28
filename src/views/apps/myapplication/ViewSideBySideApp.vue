@@ -10,7 +10,7 @@
                     <v-icon style="font-size:16px" color="yellow"> mdi-star</v-icon>
                     <span style="font:13px roboto;padding-left:8px">Yêu thích</span>
                 </div>
-                 <div  v-for="(item,i) in apps" :key="i" 
+                 <div  v-for="(item,i) in listApp" :key="i" 
                     :class="{'list-app-item': true,'active': item.id == activeIndex}"
                     @click="clickDetails(item)"
                     >
@@ -69,7 +69,7 @@ import SymperActionView from '@/action/SymperActionView.vue'
 import {util} from './../../../plugins/util'
     export default {
     created(){
-        this.getActiveapps()
+        // this.getActiveapps()
         this.getFavorite()
     },
     components:{
@@ -92,7 +92,10 @@ import {util} from './../../../plugins/util'
 		},
 		showDetailArea(){
 			return this.$store.state.appConfig.showDetailArea
-		}
+		},
+		listApp(){
+            return this.$store.state.appConfig.listApps
+        }
 		
     },
     methods:{

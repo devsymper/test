@@ -57,8 +57,8 @@
 								class="mx-auto"
 								height="200"
 						></v-skeleton-loader>
-						<VuePerfectScrollbar v-else-if="loadingApp == false && apps.length > 0" style="max-height:330px"  class="d-flex flex-wrap" >
-							<div  v-for="(item,i) in apps" :key="i" 
+						<VuePerfectScrollbar v-else-if="loadingApp == false && Object.keys(listApp).length > 0" style="max-height:330px"  class="d-flex flex-wrap" >
+							<div  v-for="(item,i) in listApp" :key="i" 
 								class="list-app-item"
 								@click="clickDetails(item)"
 								>
@@ -167,7 +167,11 @@ export default {
 		 }
 	},
 	created(){
-		this.getActiveapps()
+		if(Object.keys(this.listApp).length == 0 ){
+            this.getActiveapps()
+        }else{
+			this.loadingApp = false
+		}
 		this.getFavorite()
 	},
 	mounted(){
@@ -198,7 +202,10 @@ export default {
 		},
 		sFavorite(){
 			return this.$store.state.appConfig.listFavorite
-		}
+		},
+		listApp(){
+            return this.$store.state.appConfig.listApps
+        }
 	},
 	methods:{
 		getActiveapps(){
