@@ -2,13 +2,13 @@
     <div id="symper-platform-web-app">
         <v-app id="symper-platform-app">
             <ba-sidebar />
-            <v-main>
+            <v-content>
                 <v-container fluid fill-height class="body-2">
                     <v-layout justify-center >
                             <slot/>
                     </v-layout>
                 </v-container>
-            </v-main>
+            </v-content>
         </v-app>
     </div>
 </template>
