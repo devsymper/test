@@ -255,15 +255,14 @@ export default {
 			if(this.isAdd == true){
 				let data = JSON.stringify(this.dataPostComment)
 				commentApi.addComment(data).then(res => {
-					setTimeout(function(){}, 1000);
 					this.$store.commit('comment/updateParentCommentTarget',0)
 					this.updateComment()
 					this.inputComment = ''
 					this.attachments = []
-					this.tags = []
+                    this.tags = []
+                    this.$store.commit('comment/setWaitingCommentCountPerObj', this.sComment.objectType+':'+this.sComment.objectIdentifier);
 				});
-			}
-			else{
+			} else {
 				this.dataPostComment.id = this.item.id
 				let dataEdit = JSON.stringify(this.dataPostComment)
 				commentApi.editComment(dataEdit).then(res => {

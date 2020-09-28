@@ -114,6 +114,8 @@ export default class BasicControl extends Control {
 
         } else if (this.ele.hasClass('s-control-select')) {
             this.renderSelectControl();
+        } else if (this.ele.hasClass('s-control-combobox')) {
+            this.renderSelectControl(false);
         } else if (this.ele.hasClass('s-control-label')) {
             this.renderLabelControl();
         }
@@ -125,9 +127,7 @@ export default class BasicControl extends Control {
         if (sDocument.state.viewType[this.curParentInstance] != 'submit') {
             this.setValueControl();
         }
-        if (sDocument.state.viewType[this.curParentInstance] == 'submit') {
-            this.setDefaultValue();
-        }
+        this.setDefaultValue();
         this.setEvent();
         if (this.checkProps('isQuickSubmit') && this.checkEmptyFormulas('autocomplete')) {
             let allTable = this.controlFormulas.autocomplete.instance.autocompleteDetectTableQuery();
@@ -153,8 +153,11 @@ export default class BasicControl extends Control {
      * Trường hợp có điền vào giá trị defaul trong editor thì gọi hàm này để set giá trị
      */
     setDefaultValue() {
-        if (['submit', 'update'].includes(sDocument.state.viewType[this.curParentInstance]) &&
+        if (['submit'].includes(sDocument.state.viewType[this.curParentInstance]) &&
             this.controlProperties['defaultValue'] != undefined) {
+            if (typeof this.controlProperties['defaultValue'].value == 'object') {
+                return;
+            }
             this.value = this.controlProperties['defaultValue'].value;
             this.setValueControl();
         }
@@ -324,8 +327,8 @@ export default class BasicControl extends Control {
         if (this.type == 'percent') {
             value *= 100
         } else if (this.type == 'number') {
-            if (typeof value == 'number')
-                value = numbro(value).format(this.numberFormat)
+            if (!isNaN(Number(value)))
+                value = numbro(Number(value)).format(this.numberFormat)
 
         } else if (this.type == 'date') {
             value = moment(value).format(this.formatDate);
@@ -339,6 +342,13 @@ export default class BasicControl extends Control {
         if (sDocument.state.submit[this.curParentInstance].docStatus == 'init') {
             this.defaultValue = value;
         }
+    }
+    formatNumberValue(data) {
+        let value = data;
+        let formatPt = this.getNumberFormat();
+        if (!isNaN(Number(value)) && formatPt)
+            value = numbro(Number(value)).format(formatPt);
+        return value;
     }
 
     /**
@@ -503,11 +513,14 @@ export default class BasicControl extends Control {
             });
         })
     }
+    getNumberFormat() {
+        return (this.controlProperties.hasOwnProperty('formatNumber')) ? this.controlProperties.formatNumber.value : "";
+    }
     renderNumberControl() {
         let thisObj = this;
         this.ele.css('text-align', 'right');
         this.ele.attr('type', 'text');
-        this.numberFormat = (this.controlProperties.hasOwnProperty('formatNumber')) ? this.controlProperties.formatNumber.value : "";
+        this.numberFormat = this.getNumberFormat();
         this.ele.on('blur', function(e) {
             if ($(this).val() == "") {
                 thisObj.ele.removeClass('error');
@@ -516,7 +529,7 @@ export default class BasicControl extends Control {
                 if (/^[-0-9,.]+$/.test($(this).val())) {
                     thisObj.ele.removeClass('error')
                     thisObj.ele.removeAttr('valid');
-                    if (this.numberFormat) {
+                    if (thisObj.numberFormat) {
                         $(this).val(numbro($(this).val()).format(thisObj.numberFormat))
                     } else {
                         if (/,|\.$/.test($(this).val())) {
@@ -578,9 +591,9 @@ export default class BasicControl extends Control {
         this.ele = $('#' + id);
         this.ele.text('').css({ border: 'none' })
     }
-    renderSelectControl() {
+    renderSelectControl(isReadOnly = true) {
         let thisObj = this;
-        this.ele.attr('readonly', 'readonly')
+        this.ele.attr('readonly', isReadOnly)
         this.ele.on('click', function(e) {
             store.commit("document/addToDocumentSubmitStore", {
                 key: 'currentTableInteractive',
@@ -591,12 +604,12 @@ export default class BasicControl extends Control {
                 return;
             }
             let formulasInstance = thisObj.controlFormulas.list.instance;
-            SYMPER_APP.$evtBus.$emit('document-submit-select-input', { e: e, selectFormulasInstance: formulasInstance, alias: thisObj.name, controlTitle: thisObj.title })
+            let isSingleSelect = false;
+            if (thisObj.type == 'combobox') {
+                isSingleSelect = thisObj.checkProps('isSingleSelect');
+            }
+            SYMPER_APP.$evtBus.$emit('document-submit-select-input', { e: e, selectFormulasInstance: formulasInstance, alias: thisObj.name, controlTitle: thisObj.title, type: thisObj.type, isSingleSelect: isSingleSelect })
         });
-        // this.ele.on('change', function(e) {
-        //     SYMPER_APP.$evtBus.$emit('document-submit-input-change', { controlName: thisObj.controlProperties.name.value, val: $(e.target).val() })
-        // })
-
     }
 
     renderPercentControl() {

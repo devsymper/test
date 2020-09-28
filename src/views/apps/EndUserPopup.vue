@@ -167,8 +167,8 @@ export default {
 		 }
 	},
 	created(){
-		this.getActiveapps()
-		this.getFavorite()
+            this.getActiveapps()
+			this.getFavorite()
 	},
 	mounted(){
 		 let thisCpn = this;
@@ -198,7 +198,10 @@ export default {
 		},
 		sFavorite(){
 			return this.$store.state.appConfig.listFavorite
-		}
+		},
+		listApp(){
+            return this.$store.state.appConfig.listApps
+        }
 	},
 	methods:{
 		getActiveapps(){
@@ -206,6 +209,7 @@ export default {
 				this.loadingApp = false
 				if (res.status == 200) {
 					this.apps = res.data.listObject
+					// this.$store.commit('appConfig/setListApps', res.data.listObject)
 				}
 			}).catch((err) => {
 			});

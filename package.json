@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {
     "name": "frontend",
     "version": "0.1.0",
@@ -205,3 +206,212 @@
         }
     }
 }
+=======
+{
+    "name": "frontend",
+    "version": "0.1.0",
+    "private": true,
+    "scripts": {
+        "serve": "vue-cli-service serve",
+        "build": "vue-cli-service build",
+        "lint": "vue-cli-service lint",
+        "dev": "vue-cli-service build --mode development",
+        "watch": "vue-cli-service build --watch --mode development"
+    },
+    "dependencies": {
+        "@ag-grid-community/client-side-row-model": "^23.1.0",
+        "@ag-grid-community/vue": "^23.1.0",
+        "@ag-grid-enterprise/row-grouping": "^23.1.0",
+        "@handsontable/vue": "^4.1.1",
+        "@saeris/vue-spinners": "^1.0.8",
+        "@tinymce/tinymce-vue": "^3.2.2",
+        "@types/rappid": "^1.5.32",
+        "ace-builds": "^1.4.11",
+        "ag-grid-community": "^23.1.0",
+        "ag-grid-react": "^23.1.0",
+        "ag-grid-vue": "^23.1.0",
+        "backbone": "^1.4.0",
+        "bpmn-js": "^6.4.2",
+        "bpmn-js-properties-panel": "^0.33.2",
+        "bpmn-moddle": "^6.0.5",
+        "core-js": "^3.6.4",
+        "dayjs": "^1.8.35",
+        "debounce": "^1.2.0",
+        "firebase": "^7.13.2",
+        "handsontable": "^7.4.2",
+        "html2canvas": "^1.0.0-rc.5",
+        "jointjs": "^3.2.0",
+        "jquery": "^3.4.1",
+        "jquery-ajax": "^2.1.4",
+        "lodash": "^4.17.15",
+        "lodash.clonedeep": "^4.5.0",
+        "module": "^1.2.5",
+        "moment": "^2.25.3",
+        "moment-timezone": "^0.5.28",
+        "node-sass": "^4.14.0",
+        "npm-install": "^1.4.0",
+        "numeral": "^2.0.6",
+        "promise-worker": "^2.0.1",
+        "rxjs": "^6.6.2",
+        "sortablejs": "^1.10.2",
+        "sql.js": "^1.3.0",
+        "tinymce": "^5.4.1",
+        "v-click-outside": "^3.0.1",
+        "vue": "^2.6.11",
+        "vue-clipboard2": "^0.3.1",
+        "vue-drag-drop": "^1.1.4",
+        "vue-html-to-paper": "^1.3.1",
+        "vue-html2canvas": "0.0.4",
+        "vue-i18n": "^8.17.6",
+        "vue-moment": "^4.1.0",
+        "vue-moment-lib": "^1.2.2",
+        "vue-notification": "^1.3.20",
+        "vue-numerals": "^3.0.8",
+        "vue-perfect-scrollbar": "^0.2.1",
+        "vue-property-decorator": "^8.4.2",
+        "vue-resizable": "^1.1.4",
+        "vue-router": "^3.1.5",
+        "vue-router-multiguard": "^1.0.3",
+        "vue-rx": "^6.2.0",
+        "vue-simple-uploader": "^0.7.5",
+        "vue-split-grid": "^0.8.0",
+        "vue-tinymce-editor": "^1.6.2",
+        "vue2-perfect-scrollbar": "^1.5.0",
+        "vuedraggable": "^2.23.2",
+        "vuejs-clipper": "^3.0.1",
+        "vuejs-sqljs-boilerplate": "^0.1.0",
+        "vuetify": "^2.2.11",
+        "vuex": "^3.1.2",
+        "xlsx": "^0.16.0"
+    },
+    "devDependencies": {
+        "@vue/cli-plugin-babel": "~4.2.0",
+        "@vue/cli-plugin-router": "~4.2.0",
+        "@vue/cli-plugin-vuex": "~4.2.0",
+        "@vue/cli-service": "^4.2.3",
+        "@vue/eslint-config-prettier": "^6.0.0",
+        "babel-eslint": "^10.0.3",
+        "eslint": "^6.7.2",
+        "eslint-plugin-prettier": "^3.1.1",
+        "eslint-plugin-vue": "^6.1.2",
+        "prettier": "^1.19.1",
+        "sass": "^1.19.0",
+        "sass-loader": "^8.0.2",
+        "vue-cli-plugin-vuetify": "^2.0.5",
+        "vue-loader": "^15.9.1",
+        "vue-template-compiler": "^2.6.11",
+        "vue2-ace-editor": "0.0.15",
+        "vuetify-loader": "^1.4.3",
+        "worker-loader": "^2.0.0"
+    },
+    "eslintConfig": {
+        "root": true,
+        "env": {
+            "node": true
+        },
+        "dependencies": {
+            "@handsontable/vue": "^4.1.1",
+            "@tinymce/tinymce-vue": "^3.2.0",
+            "core-js": "^3.6.4",
+            "firebase": "^7.13.2",
+            "handsontable": "^7.4.2",
+            "jquery": "^3.4.1",
+            "jquery-ajax": "^2.1.4",
+            "lodash.clonedeep": "^4.5.0",
+            "promise-worker": "^2.0.1",
+            "vue": "^2.6.11",
+            "vue-i18n": "^8.17.0",
+            "vue-notification": "^1.3.20",
+            "vue-resizable": "^1.1.4",
+            "vue-router": "^3.1.5",
+            "vue-router-multiguard": "^1.0.3",
+            "vue2-perfect-scrollbar": "^1.5.0",
+            "vuetify": "^2.2.11",
+            "vuex": "^3.1.2"
+        },
+        "devDependencies": {
+            "@vue/cli-plugin-babel": "~4.2.0",
+            "@vue/cli-plugin-router": "~4.2.0",
+            "@vue/cli-plugin-vuex": "~4.2.0",
+            "@vue/cli-service": "~4.2.0",
+            "@vue/eslint-config-prettier": "^6.0.0",
+            "babel-eslint": "^10.0.3",
+            "eslint": "^6.7.2",
+            "eslint-plugin-prettier": "^3.1.1",
+            "eslint-plugin-vue": "^6.1.2",
+            "prettier": "^1.19.1",
+            "sass": "^1.19.0",
+            "sass-loader": "^8.0.0",
+            "vue-cli-plugin-vuetify": "~2.0.5",
+            "vue-template-compiler": "^2.6.11",
+            "vuetify-loader": "^1.3.0",
+            "worker-loader": "^2.0.0"
+        },
+        "eslintConfig": {
+            "root": true,
+            "env": {
+                "node": true
+            },
+            "dependencies": {
+                "@handsontable/vue": "^4.1.1",
+                "@tinymce/tinymce-vue": "^3.2.0",
+                "core-js": "^3.6.4",
+                "firebase": "^7.13.2",
+                "handsontable": "^7.4.2",
+                "jquery": "^3.4.1",
+                "jquery-ajax": "^2.1.4",
+                "lodash.clonedeep": "^4.5.0",
+                "promise-worker": "^2.0.1",
+                "vee-validate": "^3.2.5",
+                "vue": "^2.6.11",
+                "vue-i18n": "^8.17.0",
+                "vue-resizable": "^1.1.4",
+                "vue-resize": "^0.5.0",
+                "vue-router": "^3.1.5",
+                "vue-router-multiguard": "^1.0.3",
+                "vue2-perfect-scrollbar": "^1.5.0",
+                "vuetify": "^2.2.11",
+                "vuex": "^3.1.2"
+            },
+            "devDependencies": {
+                "@vue/cli-plugin-babel": "~4.2.0",
+                "@vue/cli-plugin-router": "~4.2.0",
+                "@vue/cli-plugin-vuex": "~4.2.0",
+                "@vue/cli-service": "~4.2.0",
+                "@vue/eslint-config-prettier": "^6.0.0",
+                "babel-eslint": "^10.0.3",
+                "eslint": "^6.7.2",
+                "eslint-plugin-prettier": "^3.1.1",
+                "eslint-plugin-vue": "^6.1.2",
+                "html-webpack-plugin": "^4.0.4",
+                "prettier": "^1.19.1",
+                "sass": "^1.19.0",
+                "sass-loader": "^8.0.0",
+                "vue-cli-plugin-vuetify": "~2.0.5",
+                "vue-template-compiler": "^2.6.11",
+                "vuetify-loader": "^1.3.0",
+                "worker-loader": "^2.0.0"
+            },
+            "eslintConfig": {
+                "root": true,
+                "env": {
+                    "node": true
+                },
+                "extends": [
+                    "plugin:vue/essential",
+                    "eslint:recommended",
+                    "@vue/prettier"
+                ],
+                "parserOptions": {
+                    "parser": "babel-eslint"
+                },
+                "rules": {}
+            },
+            "browserslist": [
+                "> 1%",
+                "last 2 versions"
+            ]
+        }
+    }
+}
+>>>>>>> de2956bdacf1bfc2967db80fd50dc6eefefeb50a

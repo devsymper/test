@@ -1,7 +1,7 @@
 <template>
     <div class="wrap-content-detail" style="overflow:hidden;">
         
-        <Loader ref="skeletonView"/>
+        <Preloader ref="preLoaderView"/>
         <div class="panel-header" v-if="!quickView && !isPrint">
             <div class="right-action">
                 <v-tooltip bottom>
@@ -31,7 +31,7 @@
             :id="'sym-Detail-'+keyInstance"
             :style="{'width':documentSize, 'height':contentHeight,'margin':contentMargin}">
             <div class="content-document" v-html="contentDocument"></div>
-            <div class="content-print-document" v-html="contentPrintDocument"></div>
+            <div class="content-print-document" :style="formSize" v-html="contentPrintDocument"></div>
         </div>
       
         <side-bar-detail 
@@ -66,7 +66,8 @@ import './../submit/customControl.css'
 import { getSDocumentSubmitStore } from './../common/common'
 import SideBarDetail from './SideBarDetail'
 import HistoryControl from './HistoryControl'
-import Loader from './../../../components/common/Loader';
+import Preloader from './../../../components/common/Preloader';
+
 import { util } from '../../../plugins/util.js';
 export default {
     props: {
@@ -74,7 +75,6 @@ export default {
             type: Number,
             default: 0
         },
-
         docObjInfo: {
             type: Object,
             default(){
@@ -108,9 +108,12 @@ export default {
     components:{
         'side-bar-detail':SideBarDetail,
         HistoryControl,
-        Loader
+        Preloader
     },
     computed: {
+        routeName(){
+            return this.$getRouteName();
+        },
         sDocumentEditor() {
             return this.$store.state.document.editor[this.keyInstance];
         },
@@ -141,7 +144,18 @@ export default {
             taskId:"",
             createTime:"",
             userId:"",
+            direction: "top",
+            fab: false,
+            hover: false,
+            tabs: null,
+            top: false,
+            right: true,
+            bottom: true,
+            left: false,
+            transition: "slide-y-reverse-transition",
             printConfigActive:null,
+            formSize:{},
+            wrapFormCss:{},
 
         };
     },
@@ -161,7 +175,7 @@ export default {
         });
         if (this.documentObjectId != 0) {
             this.docObjId = Number(this.documentObjectId);
-        } else if (this.$route.name == "detailDocument" || this.$route.name == "printDocument") {
+        } else if (this.routeName == "detailDocument" || this.routeName == "printDocument") {
             this.docObjId = Number(this.$route.params.id);
             this.loadDocumentObject(this.isPrint); 
         }
@@ -229,7 +243,7 @@ export default {
         },
         // Khadm: load data của document lên để hiển thị và xử lý
         loadDocumentStruct(documentId,isPrint = false) {
-            if(this.$route.name == 'printDocument'){
+            if(this.routeName == 'printDocument'){
                 isPrint = true;
             }
             let thisCpn = this;
@@ -251,6 +265,24 @@ export default {
                             $('.content-print-document').removeClass('d-none');
                             $('.content-document').addClass('d-none');
                             thisCpn.contentPrintDocument = content;
+                        }
+                        try {
+                            thisCpn.documentSize = '21cm';
+                            contentPrintCss = {'margin':'auto'}
+                            thisCpn.formSize = JSON.parse(res.data.document.formSize);
+                            let contentPrintCss = {};
+                            if(thisCpn.formSize.type == 'A3'){
+                                thisCpn.documentSize = 'auto';
+                                contentPrintCss = {'transform':'scale(0.84)','transform-origin':'top left'};
+                            }
+                            else if(thisCpn.formSize.type == 'A5'){
+                                thisCpn.documentSize = 'auto';
+                                contentPrintCss = {'transform':'scale(0.84)','transform-origin':'top left','margin':'auto'}
+                            }
+                            Object.assign(thisCpn.formSize,contentPrintCss)
+
+                        } catch (error) {
+                            
                         }
                         thisCpn.$emit('after-load-document',res.data.document)
                         setDataForPropsControl(res.data.fields, thisCpn.keyInstance,'detail'); // ddang chay bat dong bo
@@ -276,34 +308,33 @@ export default {
         async loadDocumentObject(isPrint=false) {
             this.contentDocument = ""
             try {
-                 this.$refs.skeletonView.show();
+                this.$refs.preLoaderView.show();
+                
             } catch (error) {
                 
             }
             let thisCpn = this;
             let res = await documentApi
                 .detailDocumentObject(this.docObjId);
-                if (res.status == 200) {
-                    thisCpn.userId = res.data.document_object_user_created_id;
-                    thisCpn.taskId = res.data.document_object_task_id;
-                    thisCpn.createTime = res.data.document_object_create_time
-                    thisCpn.workflowId = res.data.document_object_workflow_id;
-                    thisCpn.documentId = res.data.documentId;
-                    thisCpn.$store.commit('document/addToDocumentDetailStore',{
-                        key: 'allData',
-                        value: res.data,
-                        instance:thisCpn.keyInstance
-                    }) 
-                    thisCpn.loadDocumentStruct(res.data.documentId,isPrint);
-                }
-                else{
-                        this.$snotify({
-                            type: "error",
-                            title: "Can not load document object",
-                        });
-                }
-                
-           
+            if (res.status == 200) {
+                thisCpn.userId = res.data.document_object_user_created_id;
+                thisCpn.taskId = res.data.document_object_task_id;
+                thisCpn.createTime = res.data.document_object_create_time
+                thisCpn.workflowId = res.data.document_object_workflow_id;
+                thisCpn.documentId = res.data.documentId;
+                thisCpn.$store.commit('document/addToDocumentDetailStore',{
+                    key: 'allData',
+                    value: res.data,
+                    instance:thisCpn.keyInstance
+                }) 
+                thisCpn.loadDocumentStruct(res.data.documentId,isPrint);
+            }
+            else{
+                    this.$snotify({
+                        type: "error",
+                        title: res.message,
+                    });
+            }
         },
         togglePageSize() {
             this.contentMargin = this.documentSize == "21cm" ? "" : "auto";
@@ -399,6 +430,7 @@ export default {
                         //truong hop la control table
                         else {
                             let listInsideControls = {};
+                            let controlInTable = {};
                             let mapControlToIndex = {};
                             let tableControl = new TableControl(
                                 idField,
@@ -436,8 +468,10 @@ export default {
                                 mapControlToIndex[childControlName] = colIndex
                                 thisCpn.addToListInputInDocument(childControlName,childControl)
                                 listInsideControls[childControlName] = true;
+                                controlInTable[childControlName] = childControl;
                             });
                             tableControl.listInsideControls = listInsideControls;
+                            tableControl.controlInTable = controlInTable;
                             tableControl.mapControlToIndex = mapControlToIndex;
                             this.addToListInputInDocument(controlName,tableControl)
                             tableControl.renderTable();
@@ -446,14 +480,9 @@ export default {
                     }
                 }
             }
-            this.$refs.skeletonView.hide();
+            this.$refs.preLoaderView.hide();
             this.$emit("after-loaded-component-detail");
             $('.wrap-content-detail').removeAttr('style');
-            setTimeout(() => {
-                if(thisCpn.$route.name == 'printDocument' || (isPrint && this.formId == 0)){
-                    // thisCpn.printContent(true);
-                }
-            }, 200);
         },
 
         getColIndexControl(controlEl){
@@ -463,74 +492,8 @@ export default {
             return tdIndex;
         },
         async handleClickPrint(){
-            // await this.loadDocumentStruct(this.documentId,true);
-            if(this.printConfigActive){
-                let content = this.printConfigActive.content
-                this.contentPrintDocument = content;
-                setTimeout((self) => {
-                    self.processHtml(content,true);
-                }, 100,this);
-                
-            }
-            else{
-                this.$snotify({
-                    type: "error",
-                    title: "Vui lòng cấu hình trước khi in"
-                });
-            }
-            
-        },
-        
-        printContent(fromContext = false){
-            
-            // Get HTML to print from element
-            
-            let prtHtml = $('#sym-Detail-'+this.keyInstance).closest('.wrap-content-detail').clone();
-            prtHtml.find('.content-print-document').removeClass('d-none');
-            prtHtml.find('.sym-form-Detail').css({width:'auto'})
-            prtHtml.find('.panel-header').remove();
-            prtHtml.find('.content-document').remove();
-            prtHtml = prtHtml.html();
-
-            // Get all stylesheets HTML
-            let stylesHtml = '';
-            for (const node of [...document.querySelectorAll('link, style')]) {
-            stylesHtml += node.outerHTML;
-            }
-           
-
-            let cstyle = `<style type="text/css">
-                         @media print {
-                                html, body{
-                                height:100%;
-                                width:100%;
-                                }
-                            }
-                    </style>`
-                     stylesHtml += cstyle;
-            // Open the print window
-            const WinPrint = window.open('', 'Print', 'width=800,height=900,toolbar=0,scrollbars=0,status=0');
-
-            WinPrint.document.write(`<!DOCTYPE html>
-            <html>
-            <head>
-                ${stylesHtml}
-            </head>
-            <body>
-                ${prtHtml}
-            </body>
-            </html>`);
-
-            WinPrint.document.close(); // necessary for IE >= 10
-            WinPrint.focus(); // necessary for IE >= 10*/
-
-            setTimeout(() => {
-                WinPrint.print();
-                WinPrint.close();
-            }, 1000);
-           
-            
-        },
+            this.$goToPage('/documents/print-multiple',"In",false,true,{listObject:[{document_object_id:this.docObjId}]});
+        }
        
     }
 }

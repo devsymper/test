@@ -38,6 +38,7 @@
         "virtualdocs": "Virtualdocs",
         "tasks": "Tasks",
         "myItem": "My Item",
+        "myApplication": "My Application",
         "other": "Other",
         "deploy": "Deploy",
         "start": "Start",
@@ -84,7 +85,43 @@
         "print": "Print",
         "display": "Display",
         "of": "of",
-        "entries": "Entries"
+        "entries": "Entries",
+        "always_show_sidebar": "Always show sidebar",
+        "import_excel": "Import excel",
+        "sidebar": {
+            "myApplication": "My Application",
+            "My work": "My work",
+            "tasks": "Tasks",
+            "Lists trash": "Lists trash",
+            "works": "Works",
+            "App": "Applications",
+            "permissions": "Permissions",
+            "userRoleSetting": "User Role Setting",
+            "actionPack": "actionPack",
+            "users": "User account",
+            "baAccount": "BA account",
+            "Manage timesheet": "Manage timesheet",
+            "Timesheet": "Timesheet",
+            "List workflows": "List workflows",
+            "List documents": "List documents",
+            "myWork": "Calendar",
+            "Timesheet report": "Timesheet reports",
+            "Administrator": "Administrator",
+            "apps": "My apps",
+            "Account management": "Account manager",
+            "Access Management": "Access management",
+            "Applications": "Applications",
+            "Lists to do": "Lists to do",
+            "My application": "My application",
+            "KH": "Knowledge Hub",
+            "Report": "Report",
+            "File": "File",
+            "workflows": "Workflows",
+            "documents": "Documents",
+            "orgchart": "Organization chart",
+            "myItem": "My item"
+
+        }
     },
     "validate": {
         "required": "Not be empty",
@@ -127,6 +164,9 @@
         },
         "error": {
             "cannot_get_data": "Can not get data from server"
+        },
+        "success": {
+            "save_config": "Save config successfully!"
         },
         "filter": {
             "none": "None",
@@ -289,6 +329,24 @@
         }
     },
     "document": {
+
+        "instance": {
+            "showlist": {
+                "select": "Selected",
+                "record": "Record",
+                "printRecord": "Print record",
+                "selectPrintConfig": "Select print config",
+                "printMultiple": "Print Multiple",
+                "listPrintConfig": "List print config",
+                "print": "Print",
+                "copied": "copied",
+                "next": "Next record",
+                "prev": "Previous record",
+                "copyLink": "Copy link",
+                "download": "Download",
+                "info": "Information"
+            }
+        },
         "create": "Create document",
         "edit": "Edit document",
         "title": "List Document",
@@ -509,6 +567,7 @@
         "Timesheet": "Thời gian biểu"
     },
     "apps": {
+        "titleMyApplication": "Danh sách công việc của tôi",
         "header": {
             "id": "ID",
             "name": "Name",
@@ -522,10 +581,11 @@
         "emptyApp": "List application epmty",
         "emptyFavorite": " List favorite empty",
         "listType": {
-            "documents": "Documents",
-            "workflows": "Work flows",
-            "reports": "Reports",
-            "orgcharts": "Orgcharts"
+            "documentMajor": "Business Document",
+            "documentCategory": "Category Document",
+            "workflow": "Work flows",
+            "dashboard": "Dashboard",
+            "orgchart": "Orgcharts"
         },
         "addApp": "Add application",
         "editApp": "Edit application",
@@ -737,7 +797,9 @@
     "notification": {
         "error": "Error occurred. Please try again later",
         "errorTitle": "Error",
-        "successTitle": "Success"
+        "successTitle": "Success",
+        "older": "Older",
+        "today": "Today"
     },
     "virtualdoc": {
         "header": {
@@ -773,16 +835,16 @@
         "ascending": "Ascending",
         "descending": "Descending"
     },
-    "myItem":{
-        "objType":"Object type",
-        "filterObj":"Filter",
-        "today":"Today",
-        "header":"List work",
-        "headerDoc":"List document",
-        "work":{
-            "parentWork":"Parent work",
-            "siblingWork":"Sibling work",
-            "subWork":"Sub work"
+    "myItem": {
+        "objType": "Object type",
+        "filterObj": "Filter",
+        "today": "Today",
+        "header": "List work",
+        "headerDoc": "List document",
+        "work": {
+            "parentWork": "Parent work",
+            "siblingWork": "Sibling work",
+            "subWork": "Sub work"
         }
     },
     "tasks": {

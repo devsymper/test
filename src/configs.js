@@ -48,6 +48,8 @@ export const appConfigs = {
         knowledge: 'https://kh-service.dev.symper.vn/',
         timesheet: 'https://timesheet-service.dev.symper.vn/',
         search: "https://search.symper.vn/",
+        importExcel: 'https://io.dev.symper.vn/',
+        uiConfig: "https://ui.symper.vn"
     },
     notificationTimeout: {
         success: 10000,

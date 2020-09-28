@@ -51,7 +51,9 @@ Vue.mixin({
                 }
             } else {
                 isValidAction = false;
-                console.warn("[SYMPER-BIND-ACTION-FAILED]  action definition is not valid, first param expected Object, but receive: ", actionDef);
+                if (actionDef) {
+                    console.warn("[SYMPER-BIND-ACTION-FAILED]  action definition is not valid, first param expected Object, but receive: ", actionDef);
+                }
             }
 
             if (isValidAction) {
@@ -79,6 +81,15 @@ Vue.mixin({
             } else {
                 return '';
             }
+        },
+
+        /**
+         * Hàm lấy ra tên của view component hiện tại theo rule của Symper:
+         * Check trong meta của $route trước, nếu có tham số sRouteName thì lấy giá trị của nó
+         * Nếu không thì lấy giá trị của $route.name
+         */
+        $getRouteName() {
+            return this.$route.meta.sRouteName ? this.$route.meta.sRouteName : this.$route.name;
         }
     }
 })

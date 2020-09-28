@@ -14,7 +14,15 @@ export const fileManagementApi = {
     uploadFileSymper(data, options) {
         return coreApi.post('uploadS', data, {}, options);
     },
-    download(id){
-        window.open('https://file.symper.vn/downloadS/'+id,'_blank');
+    download(id) {
+        window.open('https://file.symper.vn/downloadS/' + id, '_blank');
+    },
+
+    /**
+     * 
+     * @param {array} ids danh sách các id của các object cần lấy tổng số file đã gắn 
+     */
+    getFileCountPerObj(ids) {
+        return coreApi.get('countAttackment?ids=' + JSON.stringify(ids))
     }
 };

@@ -17,7 +17,25 @@
                 <div v-for="(item,index) in allControlTemplate" :key="index" class="control-template-item" :control-id="item.id" draggable="true">
                     <div class="title-control">
                         <span>{{item.title}}</span>
-                        <button><span class="mdi mdi-dots-horizontal"></span></button>
+                            <v-menu offset-y>
+                            <template v-slot:activator="{ on, attrs }">
+                                <v-btn
+                                class="btn-action"
+                                dark
+                                v-bind="attrs"
+                                v-on="on"
+                                >
+                                <v-icon>mdi-dots-horizontal</v-icon>
+                                </v-btn>
+                            </template>
+                            <v-list class="menu-list">
+                                <v-list-item
+                                v-for="(action, index) in actions"
+                                :key="index+action.title"  @click="action.action(item.id)">
+                                    <v-list-item-title>{{ action.title }}</v-list-item-title>
+                                </v-list-item>
+                            </v-list>
+                        </v-menu>
                     </div>
                     <div class="info-control">
                         <div>
@@ -52,6 +70,33 @@ export default {
         instance:{
             type:Number,
             default:""
+        }
+    },
+    data(){
+        return {
+            actions: [
+                { 
+                    title: 'Xóa',action:function(id){
+                        let thisCpn = this;
+                        documentApi.deleteControlTemplate(id).then(res=>{
+                            // let allControlTemplate = thisCpn.allControlTemplate;
+                            // let controlTemplate = allControlTemplate.filter(c=>{
+                            //     return c.id == id
+                            // });
+                            // delete allControlTemplate[allControlTemplate.indexOf(controlTemplate[0])]
+                            // thisCpn.$store.commit(
+                            //     "document/addToDocumentEditorStore",{key:'allControlTemplate',value:allControlTemplate,instance:thisCpn.instance}
+                            // );
+                        }).catch(err => {
+                        })
+                        .always(() => {});
+                    } 
+                    },
+                    { title: 'Sửa' ,action:function(){
+                        
+                    }
+                }
+            ],
         }
     },
     computed:{
@@ -126,14 +171,29 @@ export default {
         display: flex;
         font-weight: 500;
     }
-    .control-template-item .title-control button{
+    .control-template-item .title-control .btn-action{
+        height: 18px;
+        width: 20px;
+        min-width: 20px;
+        background-color:var(--symper-background-default) !important;
+        box-shadow: none;
+        color: #344750;
         margin-left: auto;
-        padding: 0 3px;
     }
-    .control-template-item .title-control button:focus{
+    .control-template-item .title-control .btn-action:focus{
         outline: none;
+    }
+    .control-template-item .title-control .btn-action >>> .mdi{
+        font-size: 16px;
     }
     .control-template-item .info-control{
         font-size: 12px;
+    }
+    .menu-list >>> .v-list-item{
+        min-height: 28px;
+        
+    }
+    .menu-list >>> .v-list-item .v-list-item__title{
+        font-size: 13px;
     }
 </style>

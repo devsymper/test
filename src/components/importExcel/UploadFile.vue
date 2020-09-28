@@ -37,6 +37,7 @@
 </template>
 <script>
 import { util } from '../../plugins/util';
+import uploader from 'vue-simple-uploader'
 
 export default {
     props: ["selectType","documentId"],
