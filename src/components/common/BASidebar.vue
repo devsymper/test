@@ -210,7 +210,6 @@
                 <div class="pr-2">
                     <v-list :expand="true" style="margin-top:-40px">
                     <v-list-group  
-                
                         class="menu-group"
                         dense
                         v-for="item in menu"
@@ -275,7 +274,7 @@
                     </v-list-item-icon>
                       <v-menu  top nudge-top='40' nudge-left='60'>
                         <template v-slot:activator="{ on: menu }">
-                            <v-btn style="margin-left:140px" icon v-on="menu">
+                            <v-btn style="margin-left:140px" tile icon v-on="menu">
                                 <v-icon style="font-size:18px">mdi-cog-outline</v-icon>
                             </v-btn>
                         </template>
@@ -283,7 +282,7 @@
                             <v-list-item  class="v-list-item--link" style="background-color:white!important" dense>
                                 <v-menu  right nudge-top="10" nudge-right='80'>
                                     <template v-slot:activator="{ on: menu1 }">
-                                        <v-list-item-title class="fs-13 fm" v-on="menu1">
+                                        <v-list-item-title class="fs-13 fm" style="padding-left:4px" v-on="menu1">
                                             Ngôn ngữ
                                         </v-list-item-title>
                                     </template>
@@ -461,6 +460,18 @@ export default {
     .menu-group ::v-deep .v-list-group__header {
        height: 32px!important;
 
+   }
+   .v-navigation-drawer >>> .ps__rail-x{
+       display:none;
+   }
+   .v-navigation-drawer >>> .v-list-group .v-icon:focus{
+       background:unset;
+   }
+   .v-navigation-drawer >>> .v-list-group button:hover{
+       background:unset !important;
+   }
+   .v-navigation-drawer >>> .v-list-group .v-icon::after{
+       background:unset;
    }
    .title-group{
        margin-left:-50px;
