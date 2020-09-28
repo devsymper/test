@@ -1,7 +1,7 @@
 <template>
     <v-navigation-drawer 
         v-resize="reCalcSidebarHeight" 
-        mobile-break-point="0" 
+        mobile-breakpoint="0" 
         :mini-variant="sapp.collapseSideBar"
         :v-model="true" app>
         <v-list dense nav class="py-0 pr-0">

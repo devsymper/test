@@ -145,7 +145,6 @@ export default {
         tableColumns: {
             deep: true,
             handler(){
-                console.log(this.tableColumns,'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx');
                 this.tableColumnsClone = util.cloneDeep(this.tableColumns);
             }
         }
