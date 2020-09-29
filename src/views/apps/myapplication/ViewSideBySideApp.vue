@@ -54,8 +54,8 @@
          </div>
         <ContextMenu ref="contextMenu" :sideBySide="true" />
        </div>
-       <div class="action-area h-100 w-100">
-            <SymperActionView :actionDef="actionDef" :param="param" />
+       <div class="action-area h-100 " style="width:calc(100% - 520px)" >
+            <SymperActionView :actionDef="actionDef"  :param="param" />
        </div>
    </div>
 </template>
@@ -79,6 +79,7 @@ import {util} from './../../../plugins/util'
         SymperActionView
 	},
 	mounted(){
+		this.widthActionArea = "calc(100% - 520px)"
 	},
     computed:{
         sFavorite(){
@@ -377,6 +378,7 @@ x				}
             activeFavorite:false,
 			heightListFavorite: 'calc(100vh - 100px)',
 			widthActionArea:null,
+			widthActionArea: '',
             arrType:{
                 document_definition:[],
                 orgchart:[],
