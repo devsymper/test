@@ -78,6 +78,10 @@ export default {
                     }
                 });
             }, 100);
+
+            setTimeout((self) => {
+                self.focus();
+            }, 200,this);
         }
     },
     methods: {

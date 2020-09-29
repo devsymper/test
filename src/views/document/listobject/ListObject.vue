@@ -296,7 +296,7 @@ export default {
             }
         },
         submitDocument(){
-            this.$router.push('/documents/'+this.docId+'submit');
+            this.$router.push('/documents/'+this.docId+'/submit');
         },
      
         calcContainerHeight() {

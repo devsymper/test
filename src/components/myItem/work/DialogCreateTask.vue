@@ -1,6 +1,5 @@
 <template>
-    <div>
-         <v-dialog v-model="showCreateTask" width="400">
+    <v-dialog v-model="showCreateTask" width="400">
       <v-card>
         <v-card-title>{{$t("tasks.createTask.title")}}</v-card-title>
         <div class="mr-0 ml-0 pl-6 pr-6">
@@ -63,8 +62,6 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-    </div>
-    
 </template>
 
 <script>

@@ -3,7 +3,7 @@ export default {
         title: 'myApplication',
         icon: 'mdi-briefcase-edit-outline',
         link: "/my-applications",
-        group: "myApplication",
+        group: "My work",
     },
     workflow_definition: {
         title: "workflows",

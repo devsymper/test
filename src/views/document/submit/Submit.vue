@@ -4,7 +4,7 @@
     'sym-sub-form-submit':(parrentInstance == 0) ? false : true
 
     }">
-        <Preloader ref="skeletonView"/>
+        <Preloader ref="preLoaderView"/>
         <div
             :key="keyInstance"
             class="sym-form-submit"
@@ -770,7 +770,7 @@ export default {
          */
         hidePreloader(){
             
-            this.$refs.skeletonView.hide();
+            this.$refs.preLoaderView.hide();
             $("#sym-submit-" + this.keyInstance).find('.page-content').removeClass('d-block');
             $("#sym-submit-" + this.keyInstance).find('.list-page-content').removeClass('d-flex');
             $("#sym-submit-" + this.keyInstance).css({opacity:'1'});

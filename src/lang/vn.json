@@ -513,7 +513,8 @@
         },
         "validate": {
             "emptyTitle": "Không được bỏ trống tiêu đề",
-            "emptyContentControlTemplate": "Vui chọn template trước khi lưu control template"
+            "emptyContentControlTemplate": "Vui chọn template trước khi lưu control template",
+            "controlNotExist": "Control Không tồn tại, vui lòng tạo control mới"
         }
     },
     "documentObject": {
@@ -915,6 +916,12 @@
             "parentWork": "Parent work",
             "siblingWork": "Sibling work",
             "subWork": "Sub work"
+        },
+        "sidebar":{
+            "showMoreTask":"Xem thêm các task liên quan",
+            "showLess":"Thu gọn",
+            "showMoreFile":"Xem thêm các tệp"
+
         }
 
     },
