@@ -741,7 +741,7 @@ export default {
 		margin-top: 0px !important;
 	}
 	.s-drawer{
-		z-index: 1000;
+		z-index: 160;
 		padding: 12px 6px 6px 12px;
 		top:86px!important;
 	}

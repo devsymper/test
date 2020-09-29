@@ -56,7 +56,9 @@
           v-if="!loadingTaskList"
           @ps-y-reach-end="handleReachEndList"
           :style="{height: listTaskHeight+'px'}"
+          class="list-document"
         >
+            <div style="overflow: hidden;">
             <v-row
                 class="item-task"
                 v-for="(obj, idx) in listAllDocumentObjectId"
@@ -65,7 +67,7 @@
                     minHeight: '30px'
                 }"
                 :class="{
-                        'd-active':indexObj==idx||index==idx
+                    'd-active':indexObj==idx||index==idx
                 }"
                 @mouseover="indexObj=idx"
                 @mouseout="indexObj = null"
@@ -152,6 +154,8 @@
                     </div>
                 </v-col>
             </v-row>
+            </div>
+         
         </VuePerfectScrollbar>
         <v-skeleton-loader v-else ref="skeleton" :type="'table-tbody'" class="mx-auto"></v-skeleton-loader>
         <v-skeleton-loader
@@ -331,10 +335,12 @@ export default {
             defaultAvatar: appConfigs.defaultAvatar,
             listIdProcessInstance:[],
             listTaskDone:[],
-            listDocumentObjectId:[]
+            listDocumentObjectId:[],
+
         };
     },
     created() {
+        this.getTasks();
     },
     mounted() {
         let self = this;
@@ -450,7 +456,7 @@ export default {
             self.listIdProrcessInstances=allProcess;
             await self.getListTaskDoneInArrProcess(self.listIdProrcessInstances);
             await self.getListDocumentObjectId(this.$store.state.app.endUserInfo.id);
-            this.getCountCommentAndFile();
+            await self.getCountCommentAndFile();
             self.loadingTaskList = false;
             self.loadingMoreTask = false;
         },
@@ -471,7 +477,7 @@ export default {
                         });
                     }
                 }
-                this.$store.dispatch("task/getListDocumentObjId", self.listDocumentObjectId);
+                await self.$store.dispatch("task/getListDocumentObjId", self.listDocumentObjectId);
             } catch (error) {
                // self.listTaskDone=[];
                 self.$snotifyError(error, "Get Process failed");
@@ -479,20 +485,21 @@ export default {
         },
         async getListDocumentObjectId(userId){
             let self =this;
-            self.$store.dispatch("task/getListDocumentObjIdWithUserSubmit",userId);
+            await self.$store.dispatch("task/getListDocumentObjIdWithUserSubmit",userId);
         },
-        getCountCommentAndFile(){
-            let listObjRelated=this.stask.listDocumentObjId;
-            let listObjUserSubmit=this.stask.listDocumentObjIdWithUserSubmit;
+        async getCountCommentAndFile(){
+            let self=this;
+            let listObjRelated=self.stask.listDocumentObjId;
+            let listObjUserSubmit=self.stask.listDocumentObjIdWithUserSubmit;
             let arrDocument=listObjRelated.concat(listObjUserSubmit);
             let documentIden = [];
             arrDocument.forEach(element => {
                 documentIden.push('document:'+element.id);
             });
-            this.$store.commit('file/setWaitingFileCountPerObj', documentIden);
-            this.$store.commit('comment/setWaitingCommentCountPerObj', documentIden);
-            this.$store.dispatch('file/getWaitingFileCountPerObj');
-            this.$store.dispatch('comment/getWaitingCommentCountPerObj');
+            self.$store.commit('file/setWaitingFileCountPerObj', documentIden);
+            self.$store.commit('comment/setWaitingCommentCountPerObj', documentIden);
+            self.$store.dispatch('file/getWaitingFileCountPerObj');
+            self.$store.dispatch('comment/getWaitingCommentCountPerObj');
         }
     }
 };
