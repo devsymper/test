@@ -373,11 +373,12 @@ export default {
             deep: true,
             immediate: true,
             handler: function(after){
-                if(!typeof(after) == 'undefined'){
-                     if(after.length == 0){
+                debugger
+                if (typeof after !== 'undefined'){
+                    if(after.length == 0){
                         after = 131237173123717323713277
                     }
-                  this.apiUrl = 'https://account.symper.vn/users?limitIds=['+after+']'
+                    this.apiUrl = 'https://account.symper.vn/users?limitIds=['+after+']'
                 }
                
             }

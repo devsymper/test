@@ -251,6 +251,9 @@ export default {
                 this.$emit("open-panel");
             }
         },
+        getDataUrl(){   
+           this.refreshList();
+        },
         'tableDisplayConfig.value.alwaysShowSidebar'(value) {
             if(value){
                 this.openactionPanel();
