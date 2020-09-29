@@ -3,7 +3,7 @@
 		<div class="h-100" >
 			<div class="h-100">
 				<v-stepper class="d-flex stepper-create-user">
-				<v-stepper-items class="stepper-items">
+				<v-stepper-items class="stepper-items" v-if="!isViewUserRole">
 					<v-stepper-content step="1">
 					<h4>{{ $t('user.general.personalInfo.title')}}</h4>
 					<v-row class="mt-1" >
@@ -95,18 +95,28 @@
 					</v-row>
 				<h4 class="mt-2">Phân quyền</h4>
 				<v-row  v-if="rolesOgchart" class="ml-1 fs-13" style="font-weight:430">Vị trí</v-row>
-				
 				<v-row class="ml-3 fs-13" v-for="(roles,index) in rolesOgchart" :key='index'>
 					{{roles.name}} 
-
 				</v-row>
-				<v-row v-if="roles" class="ml-1 fs-13" style="font-weight:430">Vai trò người dùng</v-row>
+				<v-row v-if="roles" class="fs-13" style="font-weight:430">
+					<!-- @click="viewUserRole()" -->
+					<v-btn class=" fs-13" text >
+						Vai trò người dùng
+					</v-btn>
+				</v-row>
 					<v-row class="ml-3 fs-13" v-for="(roles,index) in roles" :key='index'>
 					{{roles.name}} 
-
 				</v-row>
 					</v-stepper-content>
 				</v-stepper-items>
+				<!-- user roles -->
+					<v-stepper-items class="stepper-items" v-if="isViewUserRole">
+					<v-stepper-content step="1">
+					<h4>Danh sách phân quyền cho user</h4>
+						{{detailInfo}}
+				</v-stepper-content>
+				</v-stepper-items>
+				<!-- user roles -->
 				</v-stepper>
 			</div>
 		</div>
@@ -120,7 +130,6 @@ import { permissionPackageApi } from "./../../api/PermissionPackage.js";
 import { permissionPositionOrgchartApi } from "./../../api/PermissionPositionOrgchart.js";
 import { orgchartApi } from "./../../api/orgchart.js";
 import { systemRoleApi } from "./../../api/systemRole.js";
-
 import { str } from "./../../plugins/utilModules/str.js";
 import avatarDefault from "@/assets/image/avatar_default.jpg";
 import VueResizable from 'vue-resizable'
@@ -141,6 +150,9 @@ export default {
         },
     },
     methods:{
+		viewUserRole(){
+			this.isViewUserRole =! this.isViewUserRole;
+		},
 		async getRoleOrgchartByUser(id){
 			const self = this;
 			let res = await orgchartApi.getRolesByUser([{idUser: id}])
@@ -159,18 +171,14 @@ export default {
           
     },
     created(){
-		debugger
 		 this.getRoleOrgchartByUser(this.detailInfo.id);
 		 this.getRolesByUser(this.detailInfo.id);
 
     },
     watch:{
         detailInfo(){
-            debugger
 			this.getRoleOrgchartByUser(this.detailInfo.id);
 		 	this.getRolesByUser(this.detailInfo.id);
-			
-           
     
      }
     },
@@ -180,7 +188,8 @@ export default {
 			actionPanel : this.$t('user.other.createUser'),
 			roles:[],
 			id:[],
-			rolesOgchart:[]
+			rolesOgchart:[],
+			isViewUserRole:false
 			
 		}
  	},

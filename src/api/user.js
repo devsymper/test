@@ -15,6 +15,13 @@ export const userApi = {
         };
         return api.post(appConfigs.apiDomain.account + "auth/login", data);
     },
+    changePassUser(pass) {
+        let data = {
+            oldPassword: pass,
+            newPassword: pass
+        };
+        return api.post('user/change-password', data)
+    },
     getListUser(page, pageSize) {
         return api.get("users?page=" + page + "&pageSize=" + pageSize);
     },

@@ -129,7 +129,7 @@ export default {
             this.changeDuedate = this.checkChangeDuedate;
         },
         submit(){
-            debugger
+           
             let data = {id:this.user.id};
             this.passProps.dueDate = {};
             this.passProps.dueDate['active'] = (this.checkChangeDuedate) ? 1 : 0;
@@ -143,7 +143,7 @@ export default {
             userApi.updateUser(this.user.id, data).then(res => {
 				if (res.status == 200) {
                     this.loader = "";
-                    debugger
+        
                     this.loading = false;
                     this.$snotify({
 					type: "success",

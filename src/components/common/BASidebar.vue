@@ -28,7 +28,7 @@
                 </v-list-item-avatar>
                 <v-list-item-content>
                     <v-list-item-title class=" mb-2">
-                        <span class="mt-1 position-relative" style="top: 0px; position: relative;">
+                        <span @click="showChangeInfoUser()" class="mt-1 position-relative" style="top: 0px; position: relative;">
                             {{ sapp.baInfo.name ? sapp.baInfo.name : sapp.endUserInfo.displayName }}
                         </span> 
                         <!-- <v-tooltip top>
@@ -367,6 +367,9 @@ export default {
     },
     methods: {
         // thêm nhóm cho Menu
+        showChangeInfoUser(){
+            alert('Hello')
+        },
         addGroupInMenu(){
              this.menu = this.userMenuItems;
              let menuItem = [];

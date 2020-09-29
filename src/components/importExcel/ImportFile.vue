@@ -312,13 +312,13 @@ export default {
                 })
                 .catch(err => {
                 });
-                debugger    
+                    
                 let a= this.objType;
                 // kiểm tra key rỗng của table chung
                    let check = true;
                     if (this.tables[0].keyColumn==undefined||this.tables[0].keyColumn.index==-1) {
                         if(this.objType=='document'){
-                            debugger
+                            
                             this.errorMessage = '* Bạn chưa chọn khóa cho thông tin chung';
                         check = false;
                         }
@@ -331,7 +331,7 @@ export default {
                    // kiểm tra bảng con
                      if(this.objType=='document'){
                     for (let i = 0; i < this.tables.length; i++) {
-                        debugger
+                        
                         if(this.tables[i].sheetMap!='')
                         {
                             if(this.tables[i].keyColumn==undefined||this.tables[i].keyColumn.index==-1){
@@ -627,7 +627,7 @@ export default {
             let columnAr = this.nameColumnDetail;
             columnAr = Object.values(columnAr);
             if(column.length>2){
-                //debugger
+                //
                 for(let m = 0; m<this.lastNameSheet.length;m++){
                     for(let k = 0; k<this.nameSheets.length;k++){
                         if(this.lastNameSheet[m]==this.nameSheets[k].name){

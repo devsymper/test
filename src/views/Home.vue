@@ -1,7 +1,12 @@
 <template>
     <div class="home h-100 w-100">
         <!-- <v-btn @click="runDataflow" color="primary">Primary</v-btn> -->
-
+         <v-dialog
+            v-model="dialog"
+            width="397"
+        >
+         <NotificationChangePass @cancel="cancelDialog()"/>
+      </v-dialog>
         <Dashboard></Dashboard>
         <!-- <EmbedDataflow 
         ref="dataflow"
@@ -33,6 +38,7 @@ import SymperColorPicker from "@/components/common/symperInputs/SymperColorPicke
 import PermissionSelector from "@/components/permission/PermissionSelector.vue";
 import Dashboard from "@/views/dashboard/Dashboard.vue";
 import EmbedDataflow from "./../components/dataflow/EmbedDataflow";
+import NotificationChangePass from "./../components/notification/notificationChangeFirstPass";
 
 import SymperActionView from "./../action/SymperActionView";
 export default {
@@ -43,12 +49,30 @@ export default {
         },
         addNum() {
             this.num += 1;
+        },
+        cancelDialog(){
+            this.dialog = false;
+        },
+        checkStatus(){
+           debugger
+            if(this.sapp.endUserInfo.status==2){
+                 debugger
+                this.dialog = true;
+            }
+        }
+    },
+    created(){
+        this.checkStatus()
+    },
+     computed:{
+         sapp() {
+            return this.$store.state.app;
         }
     },
     data() {
         return {
+            dialog:false,
             selectedPermission: [
-                
                     {
                         id: 'xxx',
                         name: 'Permission 1',
@@ -102,6 +126,7 @@ export default {
         "form-tpl": FormTpl,
         'orgchart-selector': OrgchartSelector,
         TimelineTreeview,
+        NotificationChangePass,
         FormulaEditor: FormulaEditor,
         SymperColorPicker: SymperColorPicker,
         PermissionSelector,

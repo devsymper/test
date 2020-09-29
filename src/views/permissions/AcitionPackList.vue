@@ -128,7 +128,6 @@ export default {
                     name: "detail",
                     text: this.$t("common.detail"),
                     callback: (row, callback) => {
-                        debugger
                         self.$refs.listActionPack.actionPanel = true;
                         self.getActionPackOperations(row.id);
                         self.actionOnItem = "detail";
