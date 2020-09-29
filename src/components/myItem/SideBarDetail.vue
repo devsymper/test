@@ -31,10 +31,10 @@
 									<td>{{$t('document.detail.sidebar.body.general.dateCreate')}}</td>
 									<td>{{originData.createTime ? $moment(originData.createTime).format('DD/MM/YY HH:mm:ss'):$moment(originData.endTime).format('DD/MM/YY HH:mm:ss')}}</td>
 								</tr>
-								<tr>
+								<!-- <tr>
 									<td>{{$t('document.detail.sidebar.body.general.history')}}</td>
 									<td @click="showHistory" style="text-decoration: underline;cursor:pointer;color:#F1853B;">Đã sửa 2 lần</td>
-								</tr>
+								</tr> -->
 								<tr>
 									<td>{{$t('document.detail.sidebar.body.general.comment')}}</td>
 									<td style="text-decoration: underline;cursor:pointer;color:#F1853B;" @click="showComment">
@@ -212,43 +212,6 @@
 					</v-expansion-panel-content>
 				</v-expansion-panel>
 			</v-expansion-panels>
-		</VuePerfectScrollbar>
-	</div>
-	<div class="history-info" style="transform:translateX(400px)">
-		<div style="display:flex;">
-			<span class="mdi mdi-keyboard-backspace" @click="hideHistory"></span>
-			<span style="font-size:15px;">LỊCH SỬ CHỈNH SỬA</span>
-			<!-- <span class="mdi mdi-close" @click="hide"></span> -->
-		</div>
-		<v-divider></v-divider>
-
-		<VuePerfectScrollbar style="calc(100% - 62px);">
-			<div v-for="history in listHistoryControl" 
-			:key="history.id" 
-			@click="showHistoryControl(history)"
-			class="history-item">
-				<div class="history-item__info">
-					<div class="date-update">
-						{{history.date}}
-					</div>
-					<div>
-						<img src="https://randomuser.me/api/portraits/men/81.jpg" height="14px" alt="">
-						<span>{{history.userUpdate}}</span>
-					</div>
-				</div>
-				<div class="history-item__action">
-					<v-tooltip left>
-						<template v-slot:activator="{ on }">
-							<div v-on="on">
-								<v-btn small>
-									<v-icon>mdi-backup-restore</v-icon>
-								</v-btn>
-							</div>
-						</template>
-						<span>Khôi phục</span>
-					</v-tooltip>
-				</div>
-			</div>
 		</VuePerfectScrollbar>
 	</div>
 		<Comment style="height:100%" 
