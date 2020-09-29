@@ -330,6 +330,7 @@ export default {
                 let dayListNotification = dayjs.unix(this.listNotification[i].createTime).format('DD/MM/YYYY') ;
                 let today = dayjs().format('DD/MM/YYYY') ;
                 if(today==dayListNotification){
+                    debugger
                     this.checkToday = true;
                 }   
             }
