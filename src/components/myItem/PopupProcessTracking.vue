@@ -8,7 +8,7 @@
                 >
             </trackingProcessInstance>
         </div>
-		<div class="tracking-process" style="height:100%" v-else>
+		<div class="tracking-process" style="height:100%" v-else-if="showType==''">
             <trackingProcessInstance
                 v-if="taskInfo.action.parameter.processInstanceId"
                 :instanceId="taskInfo.action.parameter.processInstanceId"
@@ -61,9 +61,10 @@ export default {
 
 <style scoped>
     .wraper-tracking{
-		position: absolute;
-		top:100px;
-		right:150px;
+		position: fixed;
+		top:50%;
+		left:50%;
+		transform: translate(-50%,-50%);
 		width: 70%;
 		height: 60%;
 		background: white;
@@ -74,6 +75,4 @@ export default {
     	box-shadow: 1px 1px  #e0d9d9;
 		border-radius: 4px;
 	}
-
-
 </style>>

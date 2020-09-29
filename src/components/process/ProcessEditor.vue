@@ -254,7 +254,12 @@ export default {
                         type: "emptyModelKey",
                         title: "Process identifier shoud not empty!"
                     });
-                } else {
+                } else if (modelAttr.name==modelAttr.key ||modelAttr.name==null) { // khi không điền tên quy trình thì name đc gán bằng key -> bắn lôĩ
+                    reject({
+                        type: "emptyModelName",
+                        title: "Process name shoud not empty!"
+                    });
+                } {
                     resolve();
                 }
             });
