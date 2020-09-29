@@ -293,7 +293,6 @@ export default class BasicControl extends Control {
             if (this.type == 'label') {
                 $('#' + this.id).text(value);
             } else if (this.type == 'date') {
-                debugger
                 $('#' + this.id).val(moment(value).format(this.formatDate));
             } else if (this.type == 'number') {
                 let v = parseInt(value);
