@@ -4,7 +4,6 @@
         <div
             v-for="(item, idex) in listTaskRelated"
                 :key="idex"
-                
             >
                 <v-row  :class="{
                     'mr-0 ml-0 single-row': true ,
@@ -13,6 +12,7 @@
                     :style="{
                         minHeight: '25px'
                     }"
+                    v-if="checkShowTotalTask(idex)"
 	                @mouseover="showByIndex = idex"
                     @mouseout="showByIndex = null"
                 >
@@ -74,6 +74,10 @@ export default {
             type: Object,
             default: () => {}
         },
+        showMoreTask:{
+            type:Boolean,
+            default:false
+        }
     },
     watch:{
 		taskInfo:function(newVl){
@@ -103,6 +107,17 @@ export default {
         }
     },
     methods:{
+        checkShowTotalTask(idex){
+            if (this.showMoreTask==false) {
+                if (idex<=2) {
+                    return true
+                }else{
+                    return false
+                }
+            }else{
+                return true;
+            }
+        },
         goDoTask(id){
             this.$router.push("/myitem/tasks/"+id);
         },

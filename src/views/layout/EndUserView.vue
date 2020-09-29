@@ -1,7 +1,7 @@
 <template>
     <v-app id="symper-platform-app">
         <ba-sidebar />
-        <v-main>
+        <v-content>
             <v-container fluid fill-height class="pa-0">
                 <div class="w-100 app-header-bg-color" style="border-bottom:1px solid #e6e5e5">
                     <div style="width:calc(100% - 500px)" class="float-left">
@@ -94,7 +94,7 @@
 					</slot>
                 </v-layout>
             </v-container>
-        </v-main>
+        </v-content>
     </v-app>
 </template>
 
