@@ -80,6 +80,11 @@ export default {
             },
         }
     },
+    tasks: {
+        title: "tasks",
+        icon: "mdi-check-all",
+        link: "/tasks"
+    },
     timeTable: {
         icon: "mdi-calendar-month-outline",
         title: "myWork",

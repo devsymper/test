@@ -40,33 +40,46 @@ function hasShowListPermission(opsMap, objectType) {
 }
 
 const userMenuItems = function(state) {
-    let opsMap = state.userOperations;
-    let userInfo = util.auth.getSavedUserInfo();
-    let userType = userInfo.profile.type;
+        let opsMap = state.userOperations;
+        let userInfo = util.auth.getSavedUserInfo();
+        let userType = userInfo.profile.type;
 
-    if (userType == 'ba') {
-        return Object.values(mapObjectTypeAndMenu);
-    } else {
-        let allwaysHave = ['tasks'];
-        let items = [];
-        for (let objectType in opsMap) {
-            if (hasShowListPermission(opsMap, objectType)) {
-                items.push(mapObjectTypeAndMenu[objectType]);
+        if (userType == 'ba') {
+            return Object.values(mapObjectTypeAndMenu);
+        } else {
+            //let allwaysHave = ['tasks'];
+            let allwaysHave = ['Lists to do'];
+            let allwayHaveSubChildren = ['task']
+            let items = [];
+            for (let objectType in opsMap) {
+                if (hasShowListPermission(opsMap, objectType)) {
+
+                    items.push(mapObjectTypeAndMenu[objectType]);
+
+                }
             }
-        }
 
-        for (let objectType of allwaysHave) {
-            if (mapObjectTypeAndMenu[objectType]) {
-                items.push(mapObjectTypeAndMenu[objectType]);
+            for (let objectType of allwaysHave) {
+                if (mapObjectTypeAndMenu[objectType]) {
+                    for (let subMenu of Object.keys(mapObjectTypeAndMenu[objectType])) {
+                        for (let i = 0; i < allwayHaveSubChildren.length; i++) {
+                            if (subMenu[title] == allwayHaveSubChildren[i]) {
+                                items.push(mapObjectTypeAndMenu[objectType]);
+
+
+                            }
+                        }
+
+                    }
+
+
+                }
+                return items;
             }
-        }
-        return items;
-    }
-}
 
 
-export {
-    listOrgcNodeAsFlat,
-    mapIdToUser,
-    userMenuItems
-};
+            export {
+                listOrgcNodeAsFlat,
+                mapIdToUser,
+                userMenuItems
+            }

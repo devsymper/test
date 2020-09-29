@@ -77,7 +77,6 @@
                                         <v-icon class="ml-3 fs-16">mdi mdi-account-check-outline</v-icon>
                                         <span class="fs-13 mt-3 mb-2 ml-4"> Chọn user thay mặt</span>
                                        </div>
-                             <!-- <VuePerfectScrollbar style="height:400px" > -->
                                     <v-autocomplete
                                         ref="selectDelegateUser"
                                          :menu-props="{ maxHeight:300, minWidth:251,maxWidth:251, nudgeLeft:8, nudgeBottom:3}"
@@ -100,7 +99,6 @@
                                         <template v-slot:label>
                                             <span class="fs-13">{{$t('common.search')}}</span>
                                         </template>
-                                             <!-- <VuePerfectScrollbar style="height:400px" > -->
                                         <template v-slot:item="data">
                                         
                                             <div class="fs-13 py-1" >
@@ -109,12 +107,8 @@
                                                     :userId="data.item.id"/>
                                                 <span  class="fs-13 ml-1"> {{data.item.displayName}}</span>
                                             </div>
-                                             
                                         </template>
-                                          <!-- </VuePerfectScrollbar> -->
                                     </v-autocomplete>
-                                  
-                                     <!-- </VuePerfectScrollbar> -->
                                  </div>
                             </v-menu>
                         </div>
@@ -166,100 +160,99 @@
             <VuePerfectScrollbar :style="{height: menuItemsHeight} " v-show="!sapp.collapseSideBar">
                 <div class="pr-2">
                     <v-list :expand="true">
-                    <v-list-group
-                        class="menu-group"
-                        dense
-                        v-for="item in menu"
-                        :key="item.title" 
-                        link
-                        no-action
-                        :symper-action="$bindAction(item.action?item.action:'')"
-                        @click="gotoPage(item)">
-                       <template v-slot:prependIcon>
-                            <v-icon class="ml-1 icon-group">
-                                {{ item.icon }}
+                        <v-list-group
+                            class="menu-group"
+                            dense
+                            v-for="item in userMenuItems"
+                            :key="item.title" 
+                            link
+                            no-action
+                            :symper-action="$bindAction(item.action?item.action:'')"
+                            @click="gotoPage(item)">
+                            <template v-slot:prependIcon>
+                                <v-icon class="ml-1 icon-group">
+                                    {{ item.icon }}
+                                </v-icon>
+                            </template>
+                            <v-icon slot="appendIcon" style="font-size:18px" 
+                                :symper-action="$bindAction(item.action)" >
                             </v-icon>
-                        </template>
-                        <v-icon slot="appendIcon" style="font-size:18px" 
-                            :symper-action="$bindAction(item.action)" >
-                        </v-icon>
-                        <template v-slot:activator v-if="item.title">
-                            <v-list-item-title style="margin-left:-25px;" :symper-action="$bindAction(item.action)">
-                                <v-list-item-title 
-                                    class="fm" 
-                                    style="color:rgb(0,0,0,0.8)" 
-                                    :symper-action="$bindAction(item.action)">
-                                    {{ $t('common.sidebar.'+item.title) }}
+                            <template v-slot:activator v-if="item.title">
+                                <v-list-item-title style="margin-left:-25px;" :symper-action="$bindAction(item.action)">
+                                    <v-list-item-title 
+                                        class="fm" 
+                                        style="color:rgb(0,0,0,0.8)" 
+                                        :symper-action="$bindAction(item.action)">
+                                        {{ $t('common.sidebar.'+item.title) }}
+                                    </v-list-item-title>
                                 </v-list-item-title>
-                            </v-list-item-title>
-                        </template>
-                        <template v-slot:activator v-else>  
-                            <v-list-item-title class="fm title-group" :symper-action="$bindAction(item.action)" >
-                                  <span class="fs-11"> {{ $t('common.sidebar.'+item.titleGroup) }}</span>
-                            </v-list-item-title>
-                        </template>
-                        <v-list-item
-                            style="margin-left:-25px; height:32px!important"
-                            v-for="(subMenu, objectType) in item.children"
-                            :key="objectType"
-                            @click="gotoPage(subMenu)">
-                            <v-list-item-title class="fm" style=" color:rgb(0,0,0,0.8)" >
-                                {{$t('common.sidebar.'+subMenu.title)}}
-                            </v-list-item-title>
-                        </v-list-item>
-                    </v-list-group>
+                            </template>
+                            <template v-slot:activator v-else>  
+                                <v-list-item-title class="fm title-group" :symper-action="$bindAction(item.action)" >
+                                    <span class="fs-11"> {{ $t('common.sidebar.'+item.titleGroup) }}</span>
+                                </v-list-item-title>
+                            </template>
+                            <v-list-item
+                                style="margin-left:-25px; height:32px!important"
+                                v-for="(subMenu, objectType) in item.children"
+                                :key="objectType"
+                                @click="gotoPage(subMenu)">
+                                <v-list-item-title class="fm" style=" color:rgb(0,0,0,0.8)" >
+                                    {{$t('common.sidebar.'+subMenu.title)}}
+                                </v-list-item-title>
+                            </v-list-item>
+                        </v-list-group>
                     </v-list>
                 </div>
             </VuePerfectScrollbar>
              <VuePerfectScrollbar :style="{height: menuItemsHeight} " v-show="sapp.collapseSideBar">
                 <div class="pr-2">
                     <v-list :expand="true" style="margin-top:-40px">
-                    <v-list-group  
-                
-                        class="menu-group"
-                        dense
-                        v-for="item in menu"
-                        :key="item.title" 
-                        :style="{'border-bottom': item.titleGroup=='Administrator'||item.titleGroup=='Applications'? '1px solid lightgrey':'','height':item.titleGroup=='Administrator'||item.titleGroup=='Applications'?'10px':''}"
-                        link
-                        no-action
-                        :symper-action="$bindAction(item.action?item.action:'')"
-                        @click="gotoPage(item)">
-                       <template v-slot:prependIcon>
-                           <v-menu 
-                                right offset-y
-                                nudge-right='40'
-                                nudge-top='30'>
-                                <template v-slot:activator="{ on: menu }">
-                                    <v-tooltip bottom>
-                                        <template v-slot:activator="{ on: tooltip }">
-                                            <v-icon class="ml-1 icon-group" v-on="{ ...tooltip, ...menu }">
-                                            {{ item.icon }}
-                                            </v-icon>
-                                        </template>
-                                    <span class="fs-13">{{ $t('common.sidebar.'+item.title) }}</span>
-                                    </v-tooltip>
-                                </template>
-                                <v-list dense v-if="item.children">
-                                    <v-list-item 
-                                        dense
-                                        style="height:32px!important"
-                                        v-for="(subMenuHover, objectType) in item.children"
-                                        :key="objectType"
-                                        @click="gotoPage(subMenuHover)">
-                                        <v-list-item-title 
-                                            style=" color:rgb(0,0,0,0.8)" 
-                                            class="fm fs-13">
-                                            {{ $t('common.sidebar.'+subMenuHover.title)}}
-                                        </v-list-item-title>
-                                    </v-list-item>
-                                </v-list>
-                            </v-menu>
-                        </template>
-                        <v-icon slot="appendIcon" style="font-size:18px" 
-                            :symper-action="$bindAction(item.action)" >
-                        </v-icon>
-                    </v-list-group>
+                        <v-list-group  
+                            class="menu-group"
+                            dense
+                            v-for="item in userMenuItems"
+                            :key="item.title" 
+                            :style="{'border-bottom': item.titleGroup=='Administrator'||item.titleGroup=='Applications'? '1px solid lightgrey':'','height':item.titleGroup=='Administrator'||item.titleGroup=='Applications'?'10px':''}"
+                            link
+                            no-action
+                            :symper-action="$bindAction(item.action?item.action:'')"
+                            @click="gotoPage(item)">
+                        <template v-slot:prependIcon>
+                            <v-menu 
+                                    right offset-y
+                                    nudge-right='40'
+                                    nudge-top='30'>
+                                    <template v-slot:activator="{ on: menu }">
+                                        <v-tooltip bottom>
+                                            <template v-slot:activator="{ on: tooltip }">
+                                                <v-icon class="ml-1 icon-group" v-on="{ ...tooltip, ...menu }">
+                                                {{ item.icon }}
+                                                </v-icon>
+                                            </template>
+                                        <span class="fs-13">{{ $t('common.sidebar.'+item.title) }}</span>
+                                        </v-tooltip>
+                                    </template>
+                                    <v-list dense v-if="item.children">
+                                        <v-list-item 
+                                            dense
+                                            style="height:32px!important"
+                                            v-for="(subMenuHover, objectType) in item.children"
+                                            :key="objectType"
+                                            @click="gotoPage(subMenuHover)">
+                                            <v-list-item-title 
+                                                style=" color:rgb(0,0,0,0.8)" 
+                                                class="fm fs-13">
+                                                {{ $t('common.sidebar.'+subMenuHover.title)}}
+                                            </v-list-item-title>
+                                        </v-list-item>
+                                    </v-list>
+                                </v-menu>
+                            </template>
+                            <v-icon slot="appendIcon" style="font-size:18px" 
+                                :symper-action="$bindAction(item.action)" >
+                            </v-icon>
+                        </v-list-group>
                     </v-list>
                 </div>
             </VuePerfectScrollbar>
@@ -285,7 +278,7 @@
                             </v-btn>
                         </template>
                         <v-list dense>
-                            <v-list-item  class="v-list-item--link" style="background-color:white!important" dense>
+                            <v-list-item class="v-list-item--link" style="background-color:white!important" dense>
                                 <v-menu  right nudge-top="10" nudge-right='80'>
                                     <template v-slot:activator="{ on: menu1 }">
                                         <v-list-item-title class="fs-13 fm" v-on="menu1">
@@ -359,6 +352,7 @@ export default {
             return this.$store.state.app;
         },
         userMenuItems(){
+            debugger
             return this.$store.getters['app/userMenuItems'];
         }
     },
@@ -373,16 +367,20 @@ export default {
         // thêm nhóm cho Menu
         addGroupInMenu(){
              this.menu = this.userMenuItems;
+             debugger
              let menuItem = [];
              let allMenuItem = [];
+            debugger
              this.menu =  _.groupBy(this.menu, 'group');
             Object.keys(this.menu).forEach(type => {
                 let name = type;
                 menuItem.push({titleGroup: name });
                 menuItem.push(...this.menu[type]);
             })
+            debugger
 
             this.menu = menuItem;
+            debugger
         },
         filterUser(item, queryText, itemText){
             let lowcaseText = queryText.toLowerCase();
@@ -476,7 +474,7 @@ export default {
    
 </style>
 <style>
-    .v-menu__content::-webkit-scrollbar {
+.v-menu__content::-webkit-scrollbar {
         width: 6px;
         background-color: black;
 }
