@@ -96,7 +96,11 @@ export default {
                         cell.attr(mapName[attrName]+'/'+key, value[key]);
                     }
                 }else{
-                     let newValue =   joint.util.breakText(
+                    if(value.includes('https://file.symper.vn/readFileSvg/user_avatar')){
+                          cell.attr(mapName[attrName], value,
+                        );
+                    }else{
+                           let newValue =   joint.util.breakText(
                             value, 
                             {
                                 width: 130,
@@ -105,8 +109,10 @@ export default {
                             { 'font-size': 13 },
                             { ellipsis: true  }
                         )
-                    cell.attr(mapName[attrName], newValue,
-                    );
+                        cell.attr(mapName[attrName], newValue,
+                        );
+                    }
+                  
                    
                 }
             }
@@ -289,18 +295,18 @@ export default {
         },
         changeUserDisplayInNode(userIdList){
             let lastUserInfo = this.mapUserById[userIdList[userIdList.length - 1]];
-            debugger
+            let avatarUser = "https://file.symper.vn/readFileSvg/user_avatar_"+lastUserInfo.id
             if(this.context == 'department'){
                 if(!lastUserInfo) return;
                 this.updateCellAttrs(this.selectingNode.id, 'managerName', lastUserInfo.displayName );
-                this.updateCellAttrs( this.selectingNode.id, 'managerAvartar', lastUserInfo.avatar ? lastUserInfo.avatar : avatarDefault );
-            }else if(this.context == 'position' && this.selectingNode.id != 'SYMPER_HOME_ORGCHART'){
+                this.updateCellAttrs( this.selectingNode.id, 'managerAvartar', avatarUser);
+            }else if(this.context == 'position' && this.selectingNode.id != 'SYMPER_HOME_ORGCHART' ){
                 if(userIdList.length == 0){
-                    this.updateCellAttrs( this.selectingNode.id, 'userInPositionAvartar', '/img/empty_avatar.PNG');
+                    this.updateCellAttrs( this.selectingNode.id, 'userInPositionAvartar', avatarUser);
                     this.updateCellAttrs( this.selectingNode.id, 'accountNumberPlus', '');
                 }else{
                     if(!lastUserInfo) return;
-                    this.updateCellAttrs( this.selectingNode.id, 'userInPositionAvartar', lastUserInfo.avatar ? lastUserInfo.avatar : avatarDefault );
+                    this.updateCellAttrs( this.selectingNode.id, 'userInPositionAvartar', avatarUser );
                     let plusUser = userIdList.length == 1 ? '' : ('+' + (userIdList.length - 1));
                     this.updateCellAttrs( this.selectingNode.id, 'accountNumberPlus', plusUser);
                 }

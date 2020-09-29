@@ -87,7 +87,6 @@
                         
                 </div>
             </v-tab-item>
-
             <v-tab-item :key="'diagramView'" class="px-2 pt-2 h-100">
                
                 <OrgchartEditor
@@ -202,7 +201,6 @@ export default {
             setTimeout((self) => {
                 self.$refs.orgStructureView.reDrawDiagram();
             }, 1000, this);
-            debugger
             return data;
         },
         allColumns(){
@@ -352,7 +350,7 @@ export default {
                             {name: "firstName", title: "firstName", type: "text"},
                             {name: "displayName", title: "displayName", type: "text"},
                             {name: "email", title: "email", type: "text"},
-                            {name: "phone", title: "phoneNumber", type: "text"},
+                            {name: "phone", title: "phone", type: "text"},
                             {name: "createAt", title: "createAt", type: "text"},
                             {name: "updateAt", title: "updateAt", type: "text"},
                        ],
