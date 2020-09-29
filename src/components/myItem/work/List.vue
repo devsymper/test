@@ -37,7 +37,6 @@
                 v-if="!sideBySideMode"
                 class="fs-13 font-weight-medium"
               >{{$t("tasks.header.createDate")}}</v-col>
-
               <v-col
                 cols="2"
                 v-if="!sideBySideMode && !compackMode && !smallComponentMode"
@@ -131,7 +130,7 @@
                         cols="2"
                         v-if="!sideBySideMode && !smallComponentMode"
                     >
-                       <div class="">
+                       <div class="mt-1">
                             <v-tooltip bottom>
                                 <template v-slot:activator="{ on }">
                                 <span
@@ -144,7 +143,7 @@
                                 <span>{{ obj.processDefinitionName?  obj.processDefinitionName : `ad hoc` }}</span>
                             </v-tooltip>
                             <div class="pa-0 grey--text mt-1 lighten-2 d-flex justify-space-between">
-                      
+                              {{selectNameApp(obj.variables)}}
                             </div>
                         </div>
                         
@@ -355,7 +354,21 @@ export default {
     changeObjectType(index) {
       this.$emit("changeObjectType", index);
     },
-   
+    selectNameApp(variables){
+        const symperAppId = variables.find(element => element.name=='symper_application_id');
+        if (symperAppId) {
+            let appId=symperAppId.value;
+            let allApp = this.$store.state.task.allAppActive;
+            let app=allApp.find(element => element.id==appId);
+            if (app) {
+                return app.name;
+            }else{
+                return "";
+            }
+        }else{
+            return "";
+        }
+    },
     handleReachEndList() {
       if (
         this.allFlatTasks.length < this.totalTask &&
@@ -465,6 +478,7 @@ export default {
                 filter.size=100;
                 filter.sort='startTime';
                 filter.order='desc';
+                filter.includeProcessVariables=true;
                 let res = await BPMNEngine.getProcessInstanceHistory(filter);
                 self.listProrcessInstances=res.data;
             }else if(status=='done'){ 
