@@ -46,19 +46,24 @@
                 <div class="h-100 symper-orgchart-table-side-by-side-view">
                     <!-- <TableSideBySildeView /> -->
                         <VueResizable :width="500" :max-width="600" :min-width="300" :active ="['r']">
-                            <AgDataTable
-                                :tableHeight="'calc(100% - 100px)'"
-                                :likeHandsonTable="true"
-                                :rowData="dataTable"
-                                :editable="false"
-                                :customComponents="customAgComponents"  
-                                @on-cell-dbl-click="onCellDblClick"
-                                :minWidth="500"
-                                :cellRendererParams="{
-                                    innerRenderer:'nodeName',
-                                    suppressDoubleClickExpand: true,
-                                }">
-                            </AgDataTable>
+                           <div style="display:flex;flex-direction:column" class="h-100 w-100">
+                               <div style="height:50px;display:flex;align-items:center">
+                                     <h2 style="font:17px roboto ;font-weight:500" >Sơ đồ tổ chức</h2>
+                               </div>
+                                <AgDataTable
+                                    :tableHeight="'calc(100% - 100px)'"
+                                    :likeHandsonTable="true"
+                                    :rowData="dataTable"
+                                    :editable="false"
+                                    :customComponents="customAgComponents"  
+                                    @on-cell-dbl-click="onCellDblClick"
+                                    :minWidth="500"
+                                    :cellRendererParams="{
+                                        innerRenderer:'nodeName',
+                                        suppressDoubleClickExpand: true,
+                                    }">
+                                </AgDataTable>
+                           </div>
                         </VueResizable>
                        <ListItems 
                              ref="listUser"
@@ -69,8 +74,11 @@
                             :useDefaultContext="false"
                             :useActionPanel="true"
                             :actionPanelWidth="850"
+                            :headerPrefixKeypath="'user.table'"
                             :customAPIResult="customAPIResult"
                             :showButtonAdd="false"
+                            :showExportButton="false"
+                            :showImportButton="false"
                         >
                             <template slot="right-panel-content" slot-scope="{}">  
                                 <Detail :quickView="true" :docObjInfo="docObjInfo" />
@@ -194,6 +202,7 @@ export default {
             setTimeout((self) => {
                 self.$refs.orgStructureView.reDrawDiagram();
             }, 1000, this);
+            debugger
             return data;
         },
         allColumns(){
@@ -339,13 +348,13 @@ export default {
                   
                    return{
                        columns:[
-                            {name: "id", title: "user.table.id", type: "numeric"},
-                            {name: "firstName", title: "user.table.firstName", type: "text"},
-                            {name: "displayName", title: "user.table.displayName", type: "text"},
-                            {name: "email", title: "user.table.email", type: "text"},
-                            {name: "phone", title: "user.table.phoneNumber", type: "text"},
-                            {name: "createAt", title: "user.table.createAt", type: "text"},
-                            {name: "updateAt", title: "user.table.updateAt", type: "text"},
+                            {name: "id", title: "id", type: "numeric"},
+                            {name: "firstName", title: "firstName", type: "text"},
+                            {name: "displayName", title: "displayName", type: "text"},
+                            {name: "email", title: "email", type: "text"},
+                            {name: "phone", title: "phoneNumber", type: "text"},
+                            {name: "createAt", title: "createAt", type: "text"},
+                            {name: "updateAt", title: "updateAt", type: "text"},
                        ],
                        listObject:res.data.listObject
                          
@@ -357,7 +366,7 @@ export default {
             tableContextMenu: {
                viewDetails: {
                     name: "View details",
-                    text: "View details",
+                    text: "Xem chi tiết",
                     callback: (app, callback) => {
                     this.docObjInfo = {docObjId:3986681,docSize:'21cm'}
                        self.$refs.listUser.actionPanel = true;
@@ -373,7 +382,6 @@ export default {
             deep: true,
             immediate: true,
             handler: function(after){
-                debugger
                 if (typeof after !== 'undefined'){
                     if(after.length == 0){
                         after = 131237173123717323713277

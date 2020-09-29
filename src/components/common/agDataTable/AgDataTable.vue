@@ -214,4 +214,10 @@ export default {
     .like-handson-table >>> .ag-cell-wrapper .ag-row-group .ag-row-group-indent-3 {
         padding-left: 0px !important;
     }
+    /* .like-handson-table >>> .ag-row{
+        height:20px !important;
+    }
+    .like-handson-table >>> .ag-header-cell-label .ag-focus-managed .ag-pivot-off{
+        height:20px !important; 
+    } */
 </style>

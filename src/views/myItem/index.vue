@@ -2,7 +2,7 @@
     <div class="w-100 h-100">
        <list-task v-if="objecType==0" @changeObjectType="changeObjectType" :height="height" @change-height="changeHeight"></list-task>
        <list-work v-if="objecType==1" @changeObjectType="changeObjectType" :height="height" @change-height="changeHeight"></list-work>
-       <list-document v-else @changeObjectType="changeObjectType" :height="height" @change-height="changeHeight"></list-document>
+       <list-document v-if="objecType==2" @changeObjectType="changeObjectType" :height="height" @change-height="changeHeight"></list-document>
     </div>
 </template>
 

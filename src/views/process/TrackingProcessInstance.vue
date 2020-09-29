@@ -82,6 +82,7 @@ export default {
     created() {
         this.setInstanceXML();
         this.getInstanceRuntimeData();
+ 
     },
     data() {
         return {
@@ -236,7 +237,7 @@ export default {
             let self = this;
             this.getInstanceData()
                 .then(res => {
-                    return self.getDefinitionData(res.processDefinitionId);
+                    return self.getDefinitionData(res.data[0].processDefinitionId);
                 })
                 .then(res => {
                     

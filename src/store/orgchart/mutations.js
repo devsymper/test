@@ -84,6 +84,19 @@ const setDataOrgchartSideBySide = (state,params) =>{
 }
 const updateListChildrenNode = (state , params) =>{
 	params.data.forEach(e => {
+		if(e.vizId == params.vizId && params.list.includes(e) == false){
+			params.list.push(e)
+			e.orgchartId = params.orgchartId
+			e.data = params.data
+			e.list = params.list
+			updateListChildrenNode(state , e)
+			if(typeof(state.listChildrenOfNode[params.orgchartId]) == 'undefined'){
+				state.listChildrenOfNode[params.orgchartId] = [	]
+			}
+			if(state.listChildrenOfNode[params.orgchartId].includes(e) == false){
+				state.listChildrenOfNode[params.orgchartId].push(e)
+			}
+		}
 		if(e.vizParentId == params.vizId){
 			params.list.push(e)
 			e.orgchartId = params.orgchartId
@@ -97,6 +110,7 @@ const updateListChildrenNode = (state , params) =>{
 				state.listChildrenOfNode[params.orgchartId].push(e)
 			}
 		}
+		
 	});
 }
 const emptyListChildrenNode = (state,param) =>{

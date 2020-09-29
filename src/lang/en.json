@@ -249,9 +249,12 @@
         "table": {
             "id": "Id",
             "firstName": "First name",
+            "lastName": "Last name",
+            "userName": "User name",
             "displayName": "Display name",
             "email": "email",
-            "phoneNumber": "Phone number",
+            "phone": "Phone number",
+            "avatar": "Avatar",
             "status": "Status",
             "createAt": "Create at",
             "updateAt": "Update at",
@@ -845,6 +848,11 @@
             "parentWork": "Parent work",
             "siblingWork": "Sibling work",
             "subWork": "Sub work"
+        },
+        "sidebar":{
+            "showMoreTask":"Show more task related",
+            "showLess":"Show less task related",
+            "showMoreFile":"Show more file"
         }
     },
     "tasks": {

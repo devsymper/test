@@ -285,7 +285,7 @@
                                 <v-menu  right nudge-top="10" nudge-right='80'>
                                     <template v-slot:activator="{ on: menu1 }">
                                         <v-list-item-title class="fs-13 fm" style="padding-left:4px" v-on="menu1">
-                                            Ngôn ngữ 
+                                            Ngôn ngữ ss
                                         </v-list-item-title>
                                     </template>
                                     <v-list-item dense

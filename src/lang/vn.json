@@ -246,10 +246,13 @@
         },
         "table": {
             "id": "Id",
-            "firstName": "Tên",
+            "firstName": "Họ",
+            "lastName": "Tên",
+            "userName": "Tên đầy đủ",
             "displayName": "Tên hiển thị",
             "email": "Địa chỉ email",
-            "phoneNumber": "Số điện thoại",
+            "phone": "Số điện thoại",
+            "avatar": "Ảnh đại diện",
             "status": "Trạng thái",
             "createAt": "Thời gian tạo",
             "updateAt": "Thời gian cập nhật",
@@ -963,6 +966,12 @@
             "parentWork": "Parent work",
             "siblingWork": "Sibling work",
             "subWork": "Sub work"
+        },
+        "sidebar":{
+            "showMoreTask":"Xem thêm các task liên quan",
+            "showLess":"Thu gọn",
+            "showMoreFile":"Xem thêm các tệp"
+
         }
 
     },

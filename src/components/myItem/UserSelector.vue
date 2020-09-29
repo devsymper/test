@@ -164,5 +164,10 @@ div#symper-app >>> .v-application >>> .v-list-item--active::before{
     overflow: auto;
     max-height: calc(100vh - 185px);
 }
+.sym-style-input >>>.v-input__control>>>.v-input__slot >>>.v-select__slot>>>.v-select__selections >>>input{
+    padding-top: 11px!important;
+    padding-bottom: 10px!important;
+}
+
 
 </style>
