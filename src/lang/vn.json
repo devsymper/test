@@ -64,6 +64,7 @@
         "last_update_at": "Cập nhật lần cuối",
         "create_at": "Tạo lúc",
         "user_create": "Người tạo",
+        "last_user_update": "Người cập nhật cuối",
         "filter": "Bộ lọc",
         "sort": "Sắp xếp",
         "status": "Trạng thái",

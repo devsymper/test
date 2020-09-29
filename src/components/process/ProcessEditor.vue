@@ -249,6 +249,15 @@ export default {
             let self = this;
             return new Promise((resolve, reject) => {
                 let modelAttr = self.getModelData();
+                if (!modelAttr.name) {
+                    reject({
+                        type: "emptyModelName",
+                        title: "Process name shoud not empty!"
+                    });
+                } else {
+                    resolve();
+                }
+
                 if (!modelAttr.key) {
                     reject({
                         type: "emptyModelKey",
@@ -275,9 +284,9 @@ export default {
                 isExecutable: modelAttr.attrs.isexecutable.value
             });
             modelAttr = modelAttr.attrs;
-            if (!modelAttr.name.value) {
-                modelAttr.name.value = modelAttr.process_id.value;
-            }
+            // if (!modelAttr.name.value) {
+            //     modelAttr.name.value = modelAttr.process_id.value;
+            // }
             return {
                 name: modelAttr.name.value,
                 key: modelAttr.process_id.value,
