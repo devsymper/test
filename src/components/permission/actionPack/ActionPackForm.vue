@@ -1,6 +1,7 @@
 <template>
     <div class="pa-2 h-100">
         <FormTpl
+         
             ref="comonAttr"
             :viewOnly="action == 'detail'"
             :singleLine="false"
@@ -19,7 +20,7 @@
                 :height="55"
                 :columns="tableColumnsForObjectType"
                 :colHeaders="colHeadersForObjectType"
-                class="fs-13"
+                class="fs-13 action-form"
                 ref="dataTableForObjectType">
 
             </hot-table>
@@ -851,5 +852,11 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
+.action-form ::v-deep .wtHolder{
+    height: 88px!important
+}
+.action-form ::v-deep .ht_clone_left{
+    height: 58px!important
+}
 </style>

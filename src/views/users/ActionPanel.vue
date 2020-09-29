@@ -374,7 +374,7 @@
 		</div>
 		<div class="h-100" v-if="isSettingPasswordView&&!showViewInfo">
 			<v-change-password
-				:user="user"
+				:user="detailInfoUser"
 				ref="changePass"
 				:resetPass="showPassPanel"
 			>
@@ -533,7 +533,6 @@ export default {
                 this.actionPanel = this.$t('user.other.updateUser');
 				this.avatarUrl = this.getAvatarUrl();
 			}
-			
 		}
   	},
   

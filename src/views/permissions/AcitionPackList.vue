@@ -128,8 +128,9 @@ export default {
                     name: "detail",
                     text: this.$t("common.detail"),
                     callback: (row, callback) => {
+                        debugger
                         self.$refs.listActionPack.actionPanel = true;
-                        self.getDetailActionPack(row.id);
+                        self.getActionPackOperations(row.id);
                         self.actionOnItem = "detail";
                         self.applyDataToForm(row);
                         self.$refs.actionPackForm.objectTypeToDocumentDefinition();

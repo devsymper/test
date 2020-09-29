@@ -268,7 +268,8 @@ export default {
             if(this.context == 'department'){
                 if(!lastUserInfo) return;
                 this.updateCellAttrs(this.selectingNode.id, 'managerName', lastUserInfo.displayName );
-                this.updateCellAttrs( this.selectingNode.id, 'managerAvartar', lastUserInfo.avatar ? lastUserInfo.avatar : avatarDefault );
+                this.updateCellAttrs( this.selectingNode.id, 'managerAvartar', "https://file.symper.vn/readFile/user_avatar_967");
+                debugger
             }else if(this.context == 'position' && this.selectingNode.id != 'SYMPER_HOME_ORGCHART' ){
                 if(userIdList.length == 0){
                     this.updateCellAttrs( this.selectingNode.id, 'userInPositionAvartar', '/img/empty_avatar.PNG');

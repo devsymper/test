@@ -9,19 +9,19 @@
         :tableContextMenu="tableContextMenu"
         :containerHeight="containerHeight"
         :customAPIResult="customAPIResult"
-        :getDataUrl="getListUrl+'users?page=1&pageSize=50'"
+        :getDataUrl="getListUrl"
         :actionPanelWidth="actionPanelWidth"
         @import-excel="importExcel()"
         :commonActionProps="commonActionProps">
         <div slot="right-panel-content" class="h-100">
             <action-panel
-            ref="panel"
-            @refresh-data="refreshListUser"
-            @refresh-new-user="setNewUserItem"
-            @close-panel="closePanel"
-            :actionType="actionType"
-            :isSettingPasswordView="isSettingPasswordView"
-            :showViewInfo="showViewInfo"
+                ref="panel"
+                @refresh-data="refreshListUser"
+                @refresh-new-user="setNewUserItem"
+                @close-panel="closePanel"
+                :actionType="actionType"
+                :isSettingPasswordView="isSettingPasswordView"
+                :showViewInfo="showViewInfo"
             />
         </div>
     </list-items>
@@ -53,6 +53,7 @@ export default {
             showImportUser:false,
             customAPIResult: {
                 reformatData(res){
+                    debugger
                     let data = res.data;
                     for(let col of data.columns){
                         col.title = col.title.replace('user.','');
@@ -65,7 +66,7 @@ export default {
                 "resource": "account",
                 "scope": "account",
             },
-            getListUrl: appConfigs.apiDomain.user,
+            getListUrl: {},
             actionPanelWidth:800,
             containerHeight: 200,
             tableContextMenu:{
@@ -74,6 +75,7 @@ export default {
                     text:this.$t('user.table.contextMenu.passwordSetting'),
                     callback: (user, callback) => {
                         this.showViewSetingPassword(user);
+                        debugger
                     }
                 },
                 update: {
@@ -110,6 +112,8 @@ export default {
         this.calcContainerHeight();
     },
     created(){
+        this.getListUrl = appConfigs.apiDomain.user+'users?page=1&pageSize=50';
+        debugger
         let thisCpn = this;
         this.$evtBus.$on('change-user-locale',(locale)=>{
              thisCpn.tableContextMenu = [
