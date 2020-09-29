@@ -50,7 +50,7 @@
             </div>
         </v-row>
         <v-divider style="border-color: #bebebe;"></v-divider>
-        <div v-if="filterObject==0 && statusDetailWork==false">
+        <div class="detail-work" style="height:100%" v-if="filterObject==0 && statusDetailWork==false">
             <v-row class="ma-0">
                 <v-col cols="12" class="list-tasks pt-0 pb-0">
                     <v-row>
@@ -77,13 +77,13 @@
             </v-row>
             <VuePerfectScrollbar
             @ps-y-reach-end="handleReachEndList"
-            style="height:calc(100% - 10px);"
+            style="height:calc(100% - 160px);"
             >
                 <v-expansion-panels
                     v-model="panel"
                     multiple
                     class="listWork"
-                    style="overflow-x: hidden;margin-bottom:30px"
+                    style="overflow: hidden;"
                 >
                     <v-expansion-panel>
                         <v-expansion-panel-header class="v-expand-header">{{$t('myItem.work.parentWork')}}</v-expansion-panel-header>

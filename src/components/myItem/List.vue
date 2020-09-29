@@ -380,6 +380,7 @@ export default {
                 sort: "createTime",
                 order: "desc",
                 page: 1,
+                includeProcessVariables:true,
                 involvedUser: this.$store.state.app.endUserInfo.id
                 // assignee: this.$store.state.app.endUserInfo.id
             },
