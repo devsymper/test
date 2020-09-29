@@ -38,6 +38,7 @@
         "virtualdocs": "Virtualdocs",
         "tasks": "Tasks",
         "myItem": "My Item",
+        "myApplication": "My Application",
         "other": "Khác",
         "deploy": "Deploy",
         "start": "Bắt đầu",
@@ -84,8 +85,11 @@
         "display": "Hiển thị",
         "of": "của",
         "entries": "bản ghi",
+        "always_show_sidebar": "Luôn hiển thị sidebar",
+        "import_excel": "Nhập bằng excel",
         "sidebar": {
             "Lists trash": "Danh sách bản xóa",
+            "myApplication": "My Application",
             "tasks": "Tasks",
             "works": "Works",
             "My work": "Công việc của tôi",
@@ -113,7 +117,8 @@
             "File": "Quản lý tệp",
             "workflows": "Quy trình",
             "documents": "Văn bản",
-            "orgchart": "Sơ đồ tổ chức"
+            "orgchart": "Sơ đồ tổ chức",
+            "myItem": "My item"
         }
     },
     "login": {
@@ -149,6 +154,9 @@
         },
         "error": {
             "cannot_get_data": "Không thể lấy dữ liệu từ máy chủ"
+        },
+        "success": {
+            "save_config": "Lưu cấu hình hiển thị thành công!"
         },
         "filter": {
             "none": "Không chọn",
@@ -417,6 +425,23 @@
         "Timesheet": "Thời gian biểu"
     },
     "document": {
+        "instance": {
+            "showlist": {
+                "select": "Đã chọn",
+                "record": "Bản ghi",
+                "printRecord": "In bản ghi",
+                "selectPrintConfig": "Chọn mẫu in",
+                "printMultiple": "In nhiều bản ghi",
+                "listPrintConfig": "Danh sách mẫu in",
+                "print": "In nhanh",
+                "copied": "Đã sao chép",
+                "next": "Tiếp theo",
+                "prev": "Trước đó",
+                "copyLink": "Sao chép đường dẫn",
+                "download": "Tải xuống",
+                "info": "Thông tin bản ghi"
+            }
+        },
         "create": "Tạo mới văn bản",
         "edit": "Chỉnh sửa văn bản",
         "title": "Danh sách văn bản",
@@ -537,7 +562,8 @@
         },
         "validate": {
             "emptyTitle": "Không được bỏ trống tiêu đề",
-            "emptyContentControlTemplate": "Vui chọn template trước khi lưu control template"
+            "emptyContentControlTemplate": "Vui chọn template trước khi lưu control template",
+            "controlNotExist": "Control Không tồn tại, vui lòng tạo control mới"
         }
     },
     "documentObject": {
@@ -624,6 +650,7 @@
         }
     },
     "apps": {
+        "titleMyApplication": "Danh sách công việc của tôi",
         "header": {
             "id": "ID",
             "name": "Tên",
@@ -636,10 +663,11 @@
         },
 
         "listType": {
-            "documents": "Văn bản",
-            "workflows": "Quy trình làm việc",
-            "reports": "Báo cáo",
-            "orgcharts": "Sơ đồ tổ chức"
+            "documentMajor": "Chứng từ",
+            "documentCategory": "Danh mục",
+            "workflow": "Quy trình làm việc",
+            "dashboard": "Báo cáo",
+            "orgchart": "Sơ đồ tổ chức"
         },
         "addApp": "Thêm ứng dụng",
         "editApp": "Sửa ứng dụng",
@@ -936,6 +964,12 @@
             "parentWork": "Parent work",
             "siblingWork": "Sibling work",
             "subWork": "Sub work"
+        },
+        "sidebar": {
+            "showMoreTask": "Xem thêm các task liên quan",
+            "showLess": "Thu gọn",
+            "showMoreFile": "Xem thêm các tệp"
+
         }
 
     },
@@ -1032,6 +1066,11 @@
         "overMaxOpen": {
             "title": "Không thể tạo thêm tab mới",
             "detail": "Số lượng tab vượt quá giới hạn, hãy xóa một vài tab"
+        }
+    },
+    "dashboard": {
+        "detail": {
+            "title": "Detail dashboard "
         }
     },
     "comment": {

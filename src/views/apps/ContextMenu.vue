@@ -1,6 +1,6 @@
 <template>
    <v-card class="context-menu" v-show="isShowContext" >
-		<div class="item" v-for="(action,i) in listAction" :key="i" @click="clickAction(action,sideBySide)">
+		<div class="item" v-for="(action,i) in listAction" :key="i" @click="clickAction(action,sideBySide, allAppMode)">
 				<span v-html="reduce(action)"></span>
 		</div>
    </v-card>
@@ -16,6 +16,7 @@ export default {
 		listAction:[],
 		targetItem:{},
 		type:'',
+		appId:null,
 		defineAction:{
 			document_definition:{
 				 "module": "document",
@@ -46,6 +47,10 @@ export default {
 		sideBySide:{
 			type: Boolean,
 			default: false
+		},
+		allAppMode:{
+			type: Boolean,
+			default: false,
 		}
 	},
 	methods:{
@@ -81,11 +86,19 @@ export default {
 			this.targetItem = item
 		},
 		setType(type){
-		
 			this.type = type
 		},
-		clickAction(action,sideBySide = false){
-			let appId = this.$store.state.appConfig.currentAppId
+		setAppId(appId){
+			this.appId = appId
+		},
+		clickAction(action,sideBySide = false,allAppMode = false){
+			let appId
+			if(allAppMode == true){
+				appId = this.appId
+			}else{
+				appId = this.$store.state.appConfig.currentAppId
+			}
+			
 			this.defineAction[this.type].action = action;
 			this.hide()
 			if(this.targetItem.objectIdentifier.includes("document_definition:")){
@@ -113,6 +126,7 @@ export default {
 				this.$store.commit('appConfig/updateActionDef', this.defineAction[this.type])
 				this.$store.commit('appConfig/updateParam', {id:targetItem.id,name:targetItem.name,title:targetItem.title,appId:appId })
 			}else{
+                debugger
 				this.$evtBus.$emit('symper-app-call-action-handler', this.defineAction[this.type], this, {id:targetItem.id,name:targetItem.name,title:targetItem.title,appId:appId });
 
 			}

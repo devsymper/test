@@ -180,7 +180,7 @@ export default {
                 this.$emit("save-form-print-action",this.documentProps);
             }
             else{
-                if(this.showValidate && this.showNoteChangeName && this.$route.name == 'editDocument'){
+                if(this.showValidate && this.showNoteChangeName && this.$getRouteName() == 'editDocument'){
                     this.showValidate = false;
                     this.messageValidate = "Tên của văn bản này có thể được sử dụng trong công thức ở các đối tượng trong hệ thống. Chọn kiểm tra để kiểm tra lại các đối tượng";
                     this.$refs.validate.show(false)

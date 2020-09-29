@@ -1,9 +1,9 @@
 export default {
     my_application: {
-        title: 'My application',
-        icon: 'mdi mdi-format-list-checkbox',
+        title: 'My Application',
+        icon: 'mdi-briefcase-edit-outline',
         link: "/my-applications",
-        group: "My work"
+        group: "My work",
     },
     workflow_definition: {
         title: "workflows",
@@ -77,6 +77,11 @@ export default {
                 title: "works",
                 icon: "mdi-briefcase-check-outline",
                 link: "/works"
+            },
+            myItem: {
+                title: "myItem",
+                icon: "mdi-format-list-checkbox",
+                link: "/myitem"
             },
         }
     },

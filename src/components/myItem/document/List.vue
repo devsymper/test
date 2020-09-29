@@ -11,7 +11,6 @@
           :headerTitle="headerTitle"
           :sideBySideMode="sideBySideMode"
           :compackMode="compackMode"
-          :parentTaskId="filterFromParent.parentTaskId"
           @change-density="isSmallRow = !isSmallRow"
           @changeObjectType="changeObjectType"
           @filter-change-value="handleChangeFilterValue"
@@ -30,23 +29,23 @@
               <v-col
                 cols="2"
                 v-if="!sideBySideMode"
-                class="fs-13 font-weight-medium"
+                class="pl-3 fs-13 font-weight-medium"
               >{{$t("tasks.header.userCreate")}}</v-col>
               <v-col
                 cols="2"
                 v-if="!sideBySideMode"
-                class="fs-13 font-weight-medium"
+                class="pl-3 fs-13 font-weight-medium"
               >{{$t("tasks.header.createDate")}}</v-col>
 
               <v-col
                 cols="2"
                 v-if="!sideBySideMode && !compackMode && !smallComponentMode"
-                class="fs-13 font-weight-medium"
+                class="pl-3 fs-13 font-weight-medium"
               >{{$t("tasks.header.app")}}</v-col>
             <v-col
                 cols="2"
                 v-if="!sideBySideMode && !compackMode && !smallComponentMode"
-                class="fs-13 font-weight-medium"
+                class="pl-3 fs-13 font-weight-medium"
               >{{$t("common.add")}}</v-col>
             </v-row>
           </v-col>
@@ -58,7 +57,101 @@
           @ps-y-reach-end="handleReachEndList"
           :style="{height: listTaskHeight+'px'}"
         >
-   
+            <v-row
+                class="item-task"
+                v-for="(obj, idx) in listAllDocumentObjectId"
+                :key="idx"
+                :style="{
+                    minHeight: '30px'
+                }"
+                :class="{
+                        'd-active':indexObj==idx||index==idx
+                }"
+                @mouseover="indexObj=idx"
+                @mouseout="indexObj = null"
+                @click="selectObject(obj,idx)"
+                style="border-bottom: 1px solid #eeeeee!important;margin-left:0px!important"
+            >
+                <v-col :cols="sideBySideMode ? 10 : compackMode ? 6: 4"  class="pl-3 pr-1 pb-1 pt-2">
+                    <div>
+                        <v-tooltip bottom>
+                        <template v-slot:activator="{ on }">
+                            <div v-on="on" class="text-left fs-13  text-ellipsis w-100">
+                                <v-icon 
+                                class="fs-14" >
+                                mdi-file-document-edit-outline
+                            </v-icon>  {{obj.title? obj.title : obj.titleObject}}
+                            </div>
+                        </template>
+                        <span> {{obj.title? obj.title : obj.titleObject}}</span>
+                        </v-tooltip>
+                        <div class="pa-0 grey--text mt-1 lighten-2 d-flex justify-space-between">
+                        <div
+                            class="fs-11  text-ellipsis"
+                        >
+                            <v-icon  style="font-size:11px ; color:green;margin-left: 1px;padding-bottom: 3px;">mdi-circle</v-icon>
+                            {{obj.documentInfo?obj.documentInfo.title:""}}
+                        </div>
+
+                        <div class="fs-11 py-0  text-ellipsis">
+                            {{obj.createAt ? $moment(obj.createAt).format('DD/MM/YY HH:mm:ss'):$moment(obj.createat).format('DD/MM/YY HH:mm:ss')}}
+                            <v-icon class="grey--text lighten-2 ml-1" x-small>mdi-clock-time-nine-outline</v-icon>
+                        </div>
+                        </div>
+                    </div>
+                </v-col>
+                <v-col
+                    style="line-height: 42px"
+                    cols="2"
+                    class="pl-3 fs-12 px-1 py-0"
+                    v-if="!sideBySideMode"
+                >
+                    <symperAvatar v-if="obj.userId &&obj.userId >0" :size="20" :userId="obj.userId" />
+                    {{obj.displayName}}
+                </v-col>
+               
+                <v-col
+                    style="line-height: 42px"
+                    cols="2"
+                    class="pl-3 fs-13 px-1 py-0"
+                    v-if="!sideBySideMode"
+                >
+                    <span class="mt-1">{{obj.createAt ? $moment(obj.createAt).fromNow():''}}</span>
+                </v-col>
+                <v-col
+                    class="pl-3 py-0"
+                    cols="2"
+                    v-if="!sideBySideMode"
+                >
+                    <div class="pl-1">
+                        <v-tooltip bottom>
+                            <template v-slot:activator="{ on }">
+                            <span v-on="on"  class="text-left fs-13text-ellipsis w-80 title-quytrinh"></span>
+                            </template>
+                            <span>aaa</span>
+                        </v-tooltip>
+                        <div class="pa-0 grey--text mt-1 lighten-2 d-flex justify-space-between">
+                        <!-- <div
+                            class="fs-11  text-ellipsis"
+                        >App</div> -->
+                        </div>
+                    </div>
+                </v-col>
+                <v-col
+                    cols="2"
+                    class="pl-3 fs-13 px-1 py-0"
+                    v-if="!sideBySideMode"
+                >
+                    <div class="pl-1">
+                        <div style="width:55px">
+                            {{commentCountPerTask['document:' + obj.id]}}
+                            <v-icon class="fs-14" style="float:right;margin-top:4px;margin-right:12px">mdi-comment-processing-outline</v-icon> </div>
+                        <div style="width:55px"> 
+                             {{fileCountPerTask['document:' + obj.id]}}
+                            <v-icon class="fs-14" style="float:right;margin-top:4px;margin-right:12px">mdi-attachment</v-icon></div>
+                    </div>
+                </v-col>
+            </v-row>
         </VuePerfectScrollbar>
         <v-skeleton-loader v-else ref="skeleton" :type="'table-tbody'" class="mx-auto"></v-skeleton-loader>
         <v-skeleton-loader
@@ -74,13 +167,29 @@
         v-if="sideBySideMode"
         class="pa-0 ma-0"
         height="30"
-        style="border-left: 1px solid #e0e0e0;"
+        style="border-left: 1px solid #e0e0e0; "
       >
-        <!-- <workDetail
-          :parentHeight="listTaskHeight"
-          :workInfo="selectedWork.workInfo"
-          @close-detail="closeDetail"
-        ></workDetail> -->
+          
+        <v-row class="ml-0 mr-0 justify-space-between" style="line-height: 36px; border-bottom:1px solid #dedede; display:flex">
+            <div class="fs-13 pl-2 pt-1 float-left">
+                {{titleDocument}}
+            </div>
+            <div class="text-right pt-1 pb-1 pr-0" style="margin-left: auto;margin-right: 12px;">
+                <v-tooltip bottom>
+                    <template v-slot:activator="{ on }">
+                        <v-btn v-on="on" small text  @click="sideBySideMode=!sideBySideMode">
+                            <v-icon small>mdi-close</v-icon>
+                        </v-btn>
+                    </template>
+                    <span>Back</span>
+                </v-tooltip>
+            </div>
+        </v-row>
+        <detailDocument 
+            :showCommentInDoc="true"
+            :docObjInfo="docObjInfo">
+        </detailDocument>
+
       </v-col>
     </v-row>
   </div>
@@ -99,33 +208,43 @@ import {
   addMoreInfoToTask
 } from "@/components/process/processAction";
 import symperAvatar from "@/components/common/SymperAvatar.vue";
-
+import detailDocument from '@/views/document/detail/Detail';
 export default {
   computed: {
-    groupAllProcessInstance() {
-        let allPrcess = this.listProrcessInstances;
-        const groups = allPrcess.reduce((groups, work) => {
-            let date;
-            if ( work.startTime) {
-                date = work.startTime.split("T")[0];
-            }else{
-                date = work.endTime.split("T")[0];
-            }
-            if (!groups[date]) {
-            groups[date] = [];
-            }
-            groups[date].push(work);
-            return groups;
-        }, {});
-        // Edit: to add it in the array format instead
-        const groupArrayWork = Object.keys(groups).map(date => {
-            return {
-            date,
-            works: groups[date]
-            };
+    fileCountPerTask(){
+        return this.$store.state.file.fileCountPerObj.list;
+    },
+    commentCountPerTask(){
+        return this.$store.state.comment.commentCountPerObj.list;
+    },
+    listAllDocumentObjectId() {
+        let listObjRelated=this.stask.listDocumentObjId;
+        let listObjUserSubmit=this.stask.listDocumentObjIdWithUserSubmit;
+        let arrDocument=listObjRelated.concat(listObjUserSubmit);
+        arrDocument.sort(function(a, b) {
+            var keyA = new Date(a.createAt),
+            keyB = new Date(b.createAt);
+            if (keyA > keyB) return -1;
+            if (keyA < keyB) return 1;
+            return 0;
         });
-        console.log("addd",groupArrayWork);
-        return groupArrayWork;
+        arrDocument.forEach(element => {
+            if (element.userCreate && element.userCreate!= null) {
+                let arrUser = this.sapp.allUsers;
+                let user = arrUser.find(data => data.email === element.userCreate);
+                if (user) {
+                   element.displayName=user.displayName;
+                   element.userId=user.id;
+                } else {
+                    element.displayName="";
+                }
+              
+            }else{
+                element.displayName="";
+            }
+        });
+
+        return arrDocument;
     },
     stask() {
       return this.$store.state.task;
@@ -141,20 +260,28 @@ export default {
         userSelector: userSelector,
         VuePerfectScrollbar: VuePerfectScrollbar,
         symperAvatar: symperAvatar,
+        detailDocument
+    },
+    watch:{
+       sideBySideMode(vl){
+            if(!vl){
+                this.$store.dispatch('file/getWaitingFileCountPerObj');
+                this.$store.dispatch('comment/getWaitingCommentCountPerObj');
+            }
+        }
     },
     props: {
         compackMode: {
-        type: Boolean,
-        default: false
+            type: Boolean,
+            default: false
         },
         height: {
-        type: String,
-        default: "calc(100vh - 120px)"
-    },
-    // component này có ở chế độ là component con của một component khác hay ko, false nếu component này là view
+            type: String,
+            default: "calc(100vh - 120px)"
+        },
         smallComponentMode: {
-        type: Boolean,
-        default: false
+            type: Boolean,
+            default: false
         },
         filterFromParent: {
             type: Object,
@@ -169,39 +296,44 @@ export default {
             }
         },
         filterTaskAction: {
-        type: String,
-        default: "getList"
+            type: String,
+            default: "getList"
         }
     },
     data: function() {
-    return {
-        index: -1,
-        dataIndex:-1,
-        loadingTaskList: false,
-        loadingMoreTask: false,
-        listTaskHeight: 300,
-        totalTask: 0,
-        selectedTask: {
-            taskInfo: {},
-            idx: -1,
-            originData: null
-        },
-        listProrcessInstances: [],
-        isSmallRow: false,
-        sideBySideMode: false,
-        allFlatTasks: [],
-        myOwnFilter: {
-            size: 100,
-            sort: "startTime",
-            order: "desc",
-            page: 1,
-            assignee: this.$store.state.app.endUserInfo.id
-        },
-        defaultAvatar: appConfigs.defaultAvatar,
-        listIdProcessInstance:[],
-        listTaskDone:[],
-    };
-  },
+        return {
+            docObjInfo: {
+                docObjId: 0,
+            },
+            indexObj: -1,
+            index: -1,
+            titleDocument:'',
+            loadingTaskList: false,
+            loadingMoreTask: false,
+            listTaskHeight: 300,
+            totalTask: 0,
+            selectedTask: {
+                taskInfo: {},
+                idx: -1,
+                originData: null
+            },
+            listProrcessInstances: [],
+            isSmallRow: false,
+            sideBySideMode: false,
+            allFlatTasks: [],
+            myOwnFilter: {
+                size: 100,
+                sort: "startTime",
+                order: "desc",
+                page: 1,
+                assignee: this.$store.state.app.endUserInfo.id
+            },
+            defaultAvatar: appConfigs.defaultAvatar,
+            listIdProcessInstance:[],
+            listTaskDone:[],
+            listDocumentObjectId:[]
+        };
+    },
     created() {
     },
     mounted() {
@@ -232,15 +364,15 @@ export default {
         },
    
         handleReachEndList() {
-        if (
-            this.allFlatTasks.length < this.totalTask &&
-            this.allFlatTasks.length > 0
-        ) {
-            this.myOwnFilter.page += 1;
-            this.myOwnFilter.size = 50;
+            if (
+                this.allFlatTasks.length < this.totalTask &&
+                this.allFlatTasks.length > 0
+            ) {
+                this.myOwnFilter.page += 1;
+                this.myOwnFilter.size = 50;
 
-            this.getTasks();
-        }
+                this.getTasks();
+            }
         },
         handleTaskSubmited() {
             this.sideBySideMode = false;
@@ -259,11 +391,11 @@ export default {
         getUser(id) {
             this.$refs.user.getUser(id);
         },
-        selectObject(obj, idx,idex) {
+        selectObject(obj, idx) {
+            this.indexObj = idx;
             this.index = idx;
-            this.dataIndex = idex;
-            this.$set(this.selectedWork, "workInfo", obj);
-            this.selectedWork.idx = idx;
+            this.docObjInfo.docObjId = obj.id;
+            this.titleDocument = obj.titleObject;
             if (!this.compackMode) {
                 this.sideBySideMode = true;
                 this.$emit("change-height", "calc(100vh - 88px)");
@@ -316,7 +448,9 @@ export default {
                 }
             }
             self.listIdProrcessInstances=allProcess;
-            await this.getListTaskDoneInArrProcess(self.listIdProrcessInstances);
+            await self.getListTaskDoneInArrProcess(self.listIdProrcessInstances);
+            await self.getListDocumentObjectId(this.$store.state.app.endUserInfo.id);
+            this.getCountCommentAndFile();
             self.loadingTaskList = false;
             self.loadingMoreTask = false;
         },
@@ -329,14 +463,36 @@ export default {
                     filter.finished=true;
                     let res = await BPMNEngine.postTaskHistory(filter);
                     if (res.total>0) {
-                        self.listTaskDone.push(res.data);
+                        res.data.forEach(element => {
+                            let description=JSON.parse(element.description);
+                            if (description.action.parameter.documentObjectId &&description.action.parameter.documentObjectId!=null ) {
+                                self.listDocumentObjectId.push(description.action.parameter.documentObjectId);
+                            }
+                        });
                     }
                 }
-                console.log("listTaskDone",self.listTaskDone);
+                this.$store.dispatch("task/getListDocumentObjId", self.listDocumentObjectId);
             } catch (error) {
-                self.listTaskDone=[];
+               // self.listTaskDone=[];
                 self.$snotifyError(error, "Get Process failed");
             }
+        },
+        async getListDocumentObjectId(userId){
+            let self =this;
+            self.$store.dispatch("task/getListDocumentObjIdWithUserSubmit",userId);
+        },
+        getCountCommentAndFile(){
+            let listObjRelated=this.stask.listDocumentObjId;
+            let listObjUserSubmit=this.stask.listDocumentObjIdWithUserSubmit;
+            let arrDocument=listObjRelated.concat(listObjUserSubmit);
+            let documentIden = [];
+            arrDocument.forEach(element => {
+                documentIden.push('document:'+element.id);
+            });
+            this.$store.commit('file/setWaitingFileCountPerObj', documentIden);
+            this.$store.commit('comment/setWaitingCommentCountPerObj', documentIden);
+            this.$store.dispatch('file/getWaitingFileCountPerObj');
+            this.$store.dispatch('comment/getWaitingCommentCountPerObj');
         }
     }
 };
@@ -414,5 +570,11 @@ export default {
 }
 .d-active {
   background: #f5f5f5;
+}
+.btn-back{
+    position: absolute;
+    top:8px;
+    left: 8px;
+    z-index: 100;
 }
 </style>

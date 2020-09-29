@@ -1,10 +1,19 @@
 <template>
     <div class="wraper-tracking" :class="{'d-none':stask.statusPopupTracking==false}" >
-        <div class="tracking-process" style="height:100%">
+        <div class="tracking-process" style="height:100%" v-if="showType=='work'">
+            <trackingProcessInstance
+                v-if="workInfo.id"
+				:instanceId="workInfo.id"
+				:definitionName="definitionName"
+                >
+            </trackingProcessInstance>
+        </div>
+		<div class="tracking-process" style="height:100%" v-else>
             <trackingProcessInstance
                 v-if="taskInfo.action.parameter.processInstanceId"
                 :instanceId="taskInfo.action.parameter.processInstanceId"
                 :elementId="taskInfo.action.parameter.activityId"
+				:definitionName="definitionName"
                 >
             </trackingProcessInstance>
         </div>
@@ -27,6 +36,18 @@ export default {
 			type: Object,
 			default: () => {}
 		},
+		workInfo: {
+			type: Object,
+			default: () => {}
+		},
+		definitionName:{
+            type:String,
+            default:'',
+		},
+		showType:{
+			type:String,
+            default:'',
+		}
     },
     methods:{
 	},
@@ -41,7 +62,8 @@ export default {
 <style scoped>
     .wraper-tracking{
 		position: absolute;
-		right:50px;
+		top:100px;
+		right:150px;
 		width: 70%;
 		height: 60%;
 		background: white;
@@ -49,7 +71,8 @@ export default {
 		padding: 12px 6px 6px 11px;
 		transition: all ease-in-out 250ms;
 		border: 1px solid #dedede;
-    	box-shadow: 1px 1px #e0d9d9;
+    	box-shadow: 1px 1px  #e0d9d9;
+		border-radius: 4px;
 	}
 
 

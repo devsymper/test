@@ -8,6 +8,7 @@
             :containerHeight="containerHeight"
             :getDataUrl="getListUrl"
             :useActionPanel="false"
+            :exportLink="exportLink"
             :headerPrefixKeypath="'common'"
             :commonActionProps="commonActionProps"
             @on-add-item-clicked="goToCreatePage()"
@@ -21,6 +22,7 @@ import { appConfigs } from "./../../configs.js";
 import ListItems from "./../../components/common/ListItems.vue";
 import bpmnApi from "./../../api/BPMNEngine.js";
 import { deployProcess, deployProcessFromXML, getLastestDefinition } from "./../../components/process/processAction.js";
+import { config } from 'rxjs';
 
 
 export default {
@@ -32,6 +34,7 @@ export default {
                 "resource": "workflow_definition",
                 "scope": "workflow",
             },
+            exportLink: appConfigs.apiDomain.bpmne.models+'/export',
             containerHeight: 300,
             deployProcessFromXML: deployProcessFromXML,
             listItemOptions: {},

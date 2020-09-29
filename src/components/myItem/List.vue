@@ -75,7 +75,6 @@
                 <v-row
                    :class="{
                         'mr-0 ml-0 single-row': true ,
-                        'py-1': !isSmallRow,
                         'py-0': isSmallRow,
                     }"
                     :style="{
@@ -91,7 +90,6 @@
                     :index="obj.id"
                     :class="{
                                     'mr-0 ml-0 single-row': true ,
-                                    'py-1': !isSmallRow,
                                     'py-0': isSmallRow,
                                     'd-active':index==idx && dataIndex==idex
                                 }"
@@ -117,10 +115,6 @@
                         <v-tooltip bottom>
                         <template v-slot:activator="{ on }">
                             <div v-on="on" class="text-left fs-13 pr-6 text-ellipsis w-100">
-                            <span
-                                v-if="obj.taskData.action && obj.taskData.action.action=='approval'"
-                                style="color:#ffc107"
-                            >{{obj.taskData.action.parameter.documentObjectId ? checkData(obj.taskData.action.parameter.documentObjectId): ''}}</span>
                             {{obj.taskData.content}}
                             </div>
                         </template>
@@ -196,8 +190,14 @@
                         class="fs-13 px-1 py-0"
                     >
                         <div class="pl-1">
-                            <div style="width:55px">10 <v-icon class="fs-14" style="float:right;margin-top:4px;margin-right:12px">mdi-comment-processing-outline</v-icon> </div>
-                            <div style="width:55px"> 2 <v-icon class="fs-14" style="float:right;margin-top:4px;margin-right:12px">mdi-attachment</v-icon></div>
+                            <div style="width:55px">
+                                {{commentCountPerTask['task:' + obj.id]}}
+                                <v-icon class="fs-14" style="float:right;margin-top:4px;margin-right:12px">mdi-comment-processing-outline</v-icon> 
+                            </div>
+                            <div style="width:55px"> 
+                                {{fileCountPerTask['task:' + obj.id]}}
+                                <v-icon class="fs-14" style="float:right;margin-top:4px;margin-right:12px">mdi-attachment</v-icon>
+                            </div>
                         </div>
                     </v-col>
                 </v-row>
@@ -243,6 +243,7 @@ import userSelector from "./UserSelector";
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import { util } from "../../plugins/util";
 import { appConfigs } from "../../configs";
+
 import {
   extractTaskInfoFromObject,
   addMoreInfoToTask
@@ -251,18 +252,24 @@ import symperAvatar from "@/components/common/SymperAvatar.vue";
 
 export default {
   computed: {
-    // Liệt kê danh sách các task dưới dạng phẳng - ko phân cấp
+        fileCountPerTask(){
+            return this.$store.state.file.fileCountPerObj.list;
+        },
+        commentCountPerTask(){
+            return this.$store.state.comment.commentCountPerObj.list;
+        },
+        // Liệt kê danh sách các task dưới dạng phẳng - ko phân cấp
         flatTasks() {
-        let tasks = [];
-        for (let def of this.listProrcessInstances) {
-            for (let instances of def.objects) {
-            for (let task of instances.tasks) {
-                task.bizKey = ""; // Business key của process instance
-                tasks.push(task);
+            let tasks = [];
+            for (let def of this.listProrcessInstances) {
+                for (let instances of def.objects) {
+                for (let task of instances.tasks) {
+                    task.bizKey = ""; // Business key của process instance
+                    tasks.push(task);
+                }
+                }
             }
-            }
-        }
-        return tasks;
+            return tasks;
         },
         groupFlatTasks() {
             let allTask = this.allFlatTasks;
@@ -301,6 +308,12 @@ export default {
             if (newVl==true) {
                 this.getTasks();
                 this.$store.commit("task/setIsStatusSubmit",false);
+            }
+        },
+        sideBySideMode(vl){
+            if(!vl){
+                this.$store.dispatch('file/getWaitingFileCountPerObj');
+                this.$store.dispatch('comment/getWaitingCommentCountPerObj');
             }
         }
     },
@@ -367,7 +380,8 @@ export default {
                 sort: "createTime",
                 order: "desc",
                 page: 1,
-                assignee: this.$store.state.app.endUserInfo.id
+                involvedUser: this.$store.state.app.endUserInfo.id
+                // assignee: this.$store.state.app.endUserInfo.id
             },
             defaultAvatar: appConfigs.defaultAvatar,
             arrdocObjId: []
@@ -376,19 +390,20 @@ export default {
     created() {
         let self = this;
         this.$evtBus.$on("symper-update-task-assignment", updatedTask => {
-        updatedTask.taskData = self.getTaskData(updatedTask);
-        self.selectObject(updatedTask, self.selectedTask.idx);
-        self.$set(self.allFlatTasks, self.selectedTask.idx, updatedTask);
+            updatedTask.taskData = self.getTaskData(updatedTask);
+            self.selectObject(updatedTask, self.selectedTask.idx);
+            self.$set(self.allFlatTasks, self.selectedTask.idx, updatedTask);
         });
     },
     mounted() {
         let self = this;
         this.$store
-        .dispatch("process/getAllDefinitions")
-        .then(res => {
-            self.getTasks();
-        })
-        .catch(err => {});
+            .dispatch("process/getAllDefinitions")
+            .then(res => {
+                self.getTasks();
+            })
+            .catch(err => {});
+
         self.reCalcListTaskHeight();
     },
     methods: {
@@ -407,25 +422,25 @@ export default {
     changeObjectType(index) {
       this.$emit("changeObjectType", index);
     },
-    checkData(documentObjectId) {
-      if (documentObjectId != "" || documentObjectId != undefined) {
-        let arr = this.stask.arrDocObjId;
-        let obj = arr.find(data => data.id === documentObjectId);
-        if (obj) {
-          let arrUser = this.sapp.allUsers;
-          let user = arrUser.find(data => data.email === obj.userCreate);
-          if (user) {
-            return user.displayName;
-          } else {
-            return "";
-          }
-        } else {
-          return "";
-        }
-      } else {
-        return "";
-      }
-    },
+    // checkData(documentObjectId) {
+    //   if (documentObjectId != "" || documentObjectId != undefined) {
+    //     let arr = this.stask.arrDocObjId;
+    //     let obj = arr.find(data => data.id === documentObjectId);
+    //     if (obj) {
+    //       let arrUser = this.sapp.allUsers;
+    //       let user = arrUser.find(data => data.email === obj.userCreate);
+    //       if (user) {
+    //         return user.displayName;
+    //       } else {
+    //         return "";
+    //       }
+    //     } else {
+    //       return "";
+    //     }
+    //   } else {
+    //     return "";
+    //   }
+    // },
     handleReachEndList() {
       if (
         this.allFlatTasks.length < this.totalTask &&
@@ -511,31 +526,36 @@ export default {
         }
         if (this.filterTaskAction == "subtasks") {
             res = await BPMNEngine.getSubtasks(
-            this.filterFromParent.parentTaskId,
-            filter
+                this.filterFromParent.parentTaskId,
+                filter
             );
             if (filter.status == "done") {
-            listTasks = res.data;
+                listTasks = res.data;
             } else {
-            listTasks = res;
+                listTasks = res;
             }
         } else {
-            if (!filter.assignee) {
-            filter.assignee = this.$store.state.app.endUserInfo.id;
-            }
+            // if (!filter.assignee) {
+            // filter.assignee = this.$store.state.app.endUserInfo.id;
+            // }
             res = await BPMNEngine.getTask(filter);
             listTasks = res.data;
         }
         this.totalTask = Number(res.total);
-      // let allDefinitions=this.$store.state.process.allDefinitions;
-      // if(Object.entries(allDefinitions).length === 0){
-      //     this.$store.dispatch('process/getAllDefinitions');
-      // }
+
+        //Khadm: danh sách các task cần lấy tổng số comment và file đính kèm
+        let taskIden = [];
         for (let task of listTasks) {
             task.taskData = self.getTaskData(task);
             task = addMoreInfoToTask(task);
             self.allFlatTasks.push(task);
+            taskIden.push('task:'+task.id);
         }
+        this.$store.commit('file/setWaitingFileCountPerObj', taskIden);
+        this.$store.commit('comment/setWaitingCommentCountPerObj', taskIden);
+        this.$store.dispatch('file/getWaitingFileCountPerObj');
+        this.$store.dispatch('comment/getWaitingCommentCountPerObj');
+
         this.listProrcessInstances.forEach((process, processIndex) => {
             process.objects.forEach((instance, instanceIndex) => {
             this.listProrcessInstances[processIndex].objects[
@@ -570,19 +590,19 @@ export default {
           parseInt(listTasks[index].assignee)
         );
         listTasks[index].owner = this.getUser(parseInt(listTasks[index].owner));
-        if (listTasks[index].description) {
-          let description = JSON.parse(listTasks[index].description);
-          if (
-            description.action.action == "approval" &&
-            description.action.parameter.documentObjectId != undefined
-          ) {
-            this.arrdocObjId.push(
-              description.action.parameter.documentObjectId
-            );
-          }
-        }
+        // if (listTasks[index].description) {
+        //   let description = JSON.parse(listTasks[index].description);
+        //   if (
+        //     description.action.action == "approval" &&
+        //     description.action.parameter.documentObjectId != undefined
+        //   ) {
+        //     this.arrdocObjId.push(
+        //       description.action.parameter.documentObjectId
+        //     );
+        //   }
+        // }
       }
-      this.$store.dispatch("task/getArrDocObjId", this.arrdocObjId);
+     // this.$store.dispatch("task/getArrDocObjId", this.arrdocObjId);
       this.listProrcessInstances.push({
         processDefinitionId: null,
         processDefinitionName: this.$t("common.other"),

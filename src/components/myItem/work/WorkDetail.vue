@@ -6,7 +6,7 @@
             class="mx-auto"
             width="100%" height="100%" 
         ></v-skeleton-loader>
-        <v-row class="ml-0 mr-0 justify-space-between" style="    line-height: 36px;">
+        <v-row class="ml-0 mr-0 justify-space-between" style="line-height: 36px;">
             <div class="fs-13 pl-2 pt-1 float-left">
                 <v-icon v-if="statusDetailWork" @click="backToListWork">mdi-chevron-left</v-icon> 
                 {{taskBreadcrumb}}
@@ -31,6 +31,18 @@
                     </v-list-item>
                     </v-list>
                 </v-menu>
+                <v-tooltip bottom>
+                    <template v-slot:activator="{ on }">
+                        <v-btn  
+                            style="color:green"
+                            v-on="on" text small
+                            @click="toggleSidebar"
+                            >
+                                Xem chi tiết
+                        </v-btn>
+                    </template>
+                    <span>Xem chi tiết</span>
+                </v-tooltip>
                 <v-btn small text  @click="closeDetail">
                     <v-icon small>mdi-close</v-icon>
                 </v-btn>
@@ -43,7 +55,7 @@
                 <v-col cols="12" class="list-tasks pt-0 pb-0">
                     <v-row>
                         <v-col
-                            cols="5"
+                            cols=4
                             class="pl-3 fs-13 font-weight-medium"
                         >{{$t("tasks.header.name")}}</v-col>
                         <v-col
@@ -56,7 +68,7 @@
                         >{{$t("tasks.header.createDate")}}</v-col>
 
                         <v-col
-                            cols="3"
+                            cols="4"
                             class="fs-13 font-weight-medium"
                         >{{$t("tasks.header.app")}}</v-col>
                     </v-row>
@@ -65,12 +77,13 @@
             </v-row>
             <VuePerfectScrollbar
             @ps-y-reach-end="handleReachEndList"
+            style="height:calc(100% - 10px);"
             >
                 <v-expansion-panels
                     v-model="panel"
                     multiple
                     class="listWork"
-                    style="margin-bottom:30px"
+                    style="overflow-x: hidden;margin-bottom:30px"
                 >
                     <v-expansion-panel>
                         <v-expansion-panel-header class="v-expand-header">{{$t('myItem.work.parentWork')}}</v-expansion-panel-header>
@@ -86,7 +99,7 @@
                                 @dblclick="selectedWork(processParent)"
                             >
                                 <v-col
-                                    cols="5"
+                                    cols="4"
                                     class="pl-3 fs-13 "
                                 >
                                     <div class="pa-0 lighten-2 d-flex justify-space-between">
@@ -118,10 +131,10 @@
                                 </v-col>
 
                                 <v-col
-                                    cols="3"
+                                    cols="4"
                                     class="fs-13 "
                                 >
-                                    <span class="mt-1">{{processParent.processDefinitionName}}</span>
+                                    <span class="mt-1 title-quytrinh">{{processParent.processDefinitionName}}</span>
                                 </v-col>
                             </v-row>
                         </v-expansion-panel-content>
@@ -143,7 +156,7 @@
                                     }"
                                     >
                                     <v-col
-                                        cols="5"
+                                        cols="4"
                                         class="pl-3 fs-13 "
                                     >
                                         <div class="pa-0 lighten-2 d-flex justify-space-between">
@@ -176,10 +189,10 @@
                                     </v-col>
 
                                     <v-col
-                                        cols="3"
+                                        cols="4"
                                         class="fs-13 "
                                     >
-                                        <span class="mt-1">{{processParent.processDefinitionName}}</span>
+                                        <span class="mt-1 title-quytrinh">{{processParent.processDefinitionName}}</span>
                                     </v-col>
                                 </v-row>
                             </div>
@@ -202,7 +215,7 @@
                                     }"
                                 >
                                     <v-col
-                                        cols="5"
+                                        cols="4"
                                         class="pl-3 fs-13 "
                                     >
                                         <div class="pa-0 lighten-2 d-flex justify-space-between">
@@ -234,10 +247,10 @@
                                         <span class="mt-1">{{processParent.startTime ==null? '':$moment(processParent.startTime).fromNow()}}</span>
                                     </v-col>
                                     <v-col
-                                        cols="3"
+                                        cols="4"
                                         class="fs-13 "
                                     >
-                                        <span class="mt-1">{{processParent.processDefinitionName}}</span>
+                                        <span class="mt-1 title-quytrinh">{{processParent.processDefinitionName}}</span>
                                     </v-col>
                                 </v-row>
                             </div>
@@ -256,6 +269,26 @@
                 :workId="idWorkSelected"
             />
         </div>
+        <SideBarDetail
+            :sidebarWidth="sidebarWidth"  
+            :isShowSidebar="isShowSidebar"
+            :objSideBar="`work`"
+            :workInfo="workInfo"
+            @showContentFile="showContentFile"
+            @showPopupTracking="showPopupTracking"
+        />
+        <KHShowFile
+            @downloadOrBackupFile="downloadOrBackupFile"
+            v-bind:fileId="fileId"
+            v-bind:name="name"
+            v-bind:serverPath="serverPath"
+            v-bind:type="type"
+        />
+        <PopupProcessTracking 
+            :workInfo="workInfo"
+            :definitionName="breadcrumb.definitionName"
+            :showType="`work`"
+        />
        
     </div>
 </template>
@@ -268,6 +301,11 @@ import { appManagementApi } from '@/api/AppManagement';
 import symperAvatar from "@/components/common/SymperAvatar.vue";
 import listTask from "./ListTask";
 import workDetailSub from "./WorkDetailSub";
+import SideBarDetail from "./SideBarDetail";
+import KHShowFile from "@/components/kh/KHShowImage";
+import { taskApi } from "@/api/task.js";
+import PopupProcessTracking from '../PopupProcessTracking'
+
 import {
   extractTaskInfoFromObject,
   addMoreInfoToTask
@@ -307,10 +345,18 @@ export default {
         listTask,
         VuePerfectScrollbar,
         symperAvatar,
-        workDetailSub
+        workDetailSub,
+        SideBarDetail,
+        KHShowFile,
+        PopupProcessTracking
     },
     data: function() {
         return {
+            fileId: "",
+			serverPath: "",
+			name: "",
+			type: "",
+            sidebarWidth:400,
             filterObject:0,
             indexObj:null,
             indexSub:null,
@@ -411,6 +457,31 @@ export default {
     created(){
     },
     methods: {
+        showContentFile(data){
+            this.serverPath = data.serverPath;
+			this.name = data.name;
+			this.type = data.type;
+			this.fileId = data.id;
+            this.$store.commit("kh/changeStatusShowImage", true);
+        },
+        downloadOrBackupFile(data) {
+			this.downLoadFile(data.fileId);
+        },
+        downLoadFile(id) {
+			taskApi
+			.downloadFile(id)
+			.then(res => {})
+			.catch(err => {
+			console.log("error download file!!!", err);
+			})
+			.always(() => {});
+		},
+        showPopupTracking(){
+            this.$store.commit("task/setStatusPopupTracking",true)
+        },
+        toggleSidebar(){
+            this.isShowSidebar = !this.isShowSidebar;
+        },
         backToListWork(){
             this.statusDetailWork=false;
             this.setTaskBreadcrumb({},'');
@@ -615,6 +686,13 @@ export default {
 }
 .d-active {
   background: #f5f5f5;
+}
+.title-quytrinh {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box !important;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
 }
 
 </style>
