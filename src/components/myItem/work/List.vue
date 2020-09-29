@@ -465,7 +465,9 @@ export default {
         this.$store.dispatch('comment/getWaitingCommentCountPerObj');
 
         self.listIdProrcessInstances=allProcess;
-        await this.getListProcessInstance(self.listIdProrcessInstances);
+        if (allProcess.length>0) {
+            await this.getListProcessInstance(self.listIdProrcessInstances);
+        }
         self.loadingTaskList = false;
         self.loadingMoreTask = false;
     },
