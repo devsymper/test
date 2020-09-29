@@ -191,12 +191,6 @@ export default class BasicControl extends Control {
                     valueChange = $(e.target).text()
                 }
                 SYMPER_APP.$evtBus.$emit('document-submit-input-change', { controlName: thisObj.controlProperties.name.value, val: valueChange })
-                if (thisObj.type == 'date') {
-                    if (this.formatDate != "" && typeof this.formatDate === 'string') {
-                        thisObj.value = $(this).val();
-                        $(this).val(moment($(this).val()).format(thisObj.formatDate))
-                    }
-                }
             })
             this.ele.on('focus', function(e) {
                 store.commit("document/addToDocumentSubmitStore", {
@@ -299,6 +293,7 @@ export default class BasicControl extends Control {
             if (this.type == 'label') {
                 $('#' + this.id).text(value);
             } else if (this.type == 'date') {
+                debugger
                 $('#' + this.id).val(moment(value).format(this.formatDate));
             } else if (this.type == 'number') {
                 let v = parseInt(value);
@@ -626,6 +621,7 @@ export default class BasicControl extends Control {
     renderDateControl() {
         this.ele.attr('type', 'text');
         this.formatDate = (this.controlProperties.hasOwnProperty('formatDate')) ? this.controlProperties.formatDate.value : "";
+        console.log('this.formatDatethis.formatDate', this.formatDate);
         if (this.checkDetailView()) return;
     }
     renderTimeControl() {
