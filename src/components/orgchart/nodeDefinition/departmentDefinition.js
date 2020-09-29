@@ -181,7 +181,7 @@ export const departmentMarkup =
             <g class="scalable">
                 <rect class="card"/>
             </g>
-            <image/>
+            <image />
             <text class="name"/>
             <text class="manager-name"/>
 

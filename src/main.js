@@ -98,8 +98,8 @@ Vue.use(Notifications);
 Vue.use(VueMoment, {
     moment,
 });
-Vue.use(uploader)
-
+let curLocale = util.getSavedLocale();
+moment.locale(util.str.mapLanguageToMoment()[curLocale]);
 /**
  * $evtBus : component chuyên chở các sự kiện giữa tất cả các component
  */

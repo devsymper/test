@@ -473,7 +473,8 @@
         },
         "validate": {
             "emptyTitle": "Title must not be blank",
-            "emptyContentControlTemplate": "Please select the template before saving the control template"
+            "emptyContentControlTemplate": "Please select the template before saving the control template",
+            "controlNotExist": "Control does not exist, please create new control"
         }
     },
     "documentObject": {
@@ -849,10 +850,10 @@
             "siblingWork": "Sibling work",
             "subWork": "Sub work"
         },
-        "sidebar":{
-            "showMoreTask":"Show more task related",
-            "showLess":"Show less task related",
-            "showMoreFile":"Show more file"
+        "sidebar": {
+            "showMoreTask": "Show more task related",
+            "showLess": "Show less task related",
+            "showMoreFile": "Show more file"
         }
     },
     "tasks": {

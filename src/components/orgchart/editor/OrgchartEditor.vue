@@ -1,6 +1,5 @@
 <template>
     <div class="d-flex w-100 h-100">
-        <!-- <NodeSelector class="border-right-1"></NodeSelector> -->
         <div class="h-100 flex-grow-1">
             <div class="border-bottom-1 pt-1 pl-2">
                 <v-tooltip bottom v-for="(item, key) in headerActions" :key="key">
@@ -27,7 +26,7 @@
                             <v-icon size="21" v-on="on">mdi-plus-thick</v-icon>
                         </v-btn>
                     </template>
-                    <span>them node moi </span>
+                    <span>thêm node moi </span>
                 </v-tooltip>
                 <v-btn
                     v-if="action != 'view' && context == 'department'"

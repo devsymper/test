@@ -77,6 +77,7 @@ export default {
             return this.$refs.jointPaper.graph.toJSON();
         },
         updateCellAttrs(cellId, attrName, value){
+            
             let mapName = {
                 name: '.name/text',
                 border: '.card',
@@ -288,12 +289,12 @@ export default {
         },
         changeUserDisplayInNode(userIdList){
             let lastUserInfo = this.mapUserById[userIdList[userIdList.length - 1]];
-            
+            debugger
             if(this.context == 'department'){
                 if(!lastUserInfo) return;
                 this.updateCellAttrs(this.selectingNode.id, 'managerName', lastUserInfo.displayName );
                 this.updateCellAttrs( this.selectingNode.id, 'managerAvartar', lastUserInfo.avatar ? lastUserInfo.avatar : avatarDefault );
-            }else if(this.context == 'position' && this.selectingNode.id != 'SYMPER_HOME_ORGCHART' ){
+            }else if(this.context == 'position' && this.selectingNode.id != 'SYMPER_HOME_ORGCHART'){
                 if(userIdList.length == 0){
                     this.updateCellAttrs( this.selectingNode.id, 'userInPositionAvartar', '/img/empty_avatar.PNG');
                     this.updateCellAttrs( this.selectingNode.id, 'accountNumberPlus', '');

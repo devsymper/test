@@ -408,6 +408,7 @@ export default {
             let currentLocale = util.getSavedLocale();
             if (currentLocale != locale) {
                 this.$i18n.locale = locale;
+                this.$moment.locale(util.str.mapLanguageToMoment[locale])
                 util.setSavedLocale(locale);
                 userApi.setUserLocale(locale);
                 this.$evtBus.$emit("change-user-locale", locale);

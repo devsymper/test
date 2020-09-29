@@ -24,7 +24,6 @@ export default {
             let id = this.$route.params.id;
             let res = await orgchartApi.getOrgchartDetail(id)
             let listUser = []
-            debugger
             res.data.userInPostion.forEach(function(e){
                 if(listUser.includes(e.userId) == false){
                     listUser.push(e.userId)
