@@ -65,6 +65,7 @@
         "last_update_at": "Last updated at",
         "create_at": "Created at",
         "user_create": "User create",
+        "last_user_update": "Last update by",
         "filter": "Filter",
         "sort": "Sort",
         "status": "Status",
