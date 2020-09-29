@@ -38,7 +38,6 @@
         "virtualdocs": "Virtualdocs",
         "tasks": "Tasks",
         "myItem": "My Item",
-        "myApplication": "My Application",
         "other": "Khác",
         "deploy": "Deploy",
         "start": "Bắt đầu",
@@ -85,41 +84,7 @@
         "display": "Hiển thị",
         "of": "của",
         "entries": "bản ghi",
-        "always_show_sidebar": "Luôn hiển thị sidebar",
-        "import_excel": "Nhập bằng excel",
-        "sidebar": {
-            "Lists trash": "Danh sách bản xóa",
-            "myApplication": "My Application",
-            "tasks": "Tasks",
-            "works": "Works",
-            "My work": "Công việc của tôi",
-            "myWork": "Lịch làm việc",
-            "Manage timesheet": "Quản lý  thời gian biểu",
-            "Timesheet report": "Báo cáo thời gian biểu",
-            "Timesheet": "Thời gian biểu",
-            "App": "Ứng dụng",
-            "Administrator": "Quản trị viên",
-            "Account management": "Quản lý tài khoản",
-            "Access Management": "Quản lý truy cập",
-            "users": "Tài khoản người dùng",
-            "baAccount": "Tài khoản BA",
-            "actionPack": "Action Pack",
-            "permissions": "Phân quyền",
-            "userRoleSetting": "Vai trò người dùng",
-            "KH": "Tri thức nội bộ",
-            "apps": "Cài đặt ứng dụng",
-            "Applications": "Ứng dụng",
-            "Lists to do": "Việc cần làm",
-            "My application": "Ứng dụng",
-            "Report": "Báo cáo",
-            "List workflows": "Danh sách quy trình",
-            "List documents": "Danh sách văn bản",
-            "File": "Quản lý tệp",
-            "workflows": "Quy trình",
-            "documents": "Văn bản",
-            "orgchart": "Sơ đồ tổ chức",
-            "myItem": "My item"
-        }
+        "always_show_sidebar": "Luôn hiển thị sidebar"
     },
     "login": {
         "title": "Đăng nhập hệ thống",
@@ -192,6 +157,7 @@
         "general": {
             "title": "Thông tin cơ bản",
             "personalInfo": {
+                "status": "Trạng thái",
                 "title": "Thông tin cá nhân",
                 "userName": "Tên tài khoản",
                 "email": "Email",
@@ -426,23 +392,6 @@
         "Timesheet": "Thời gian biểu"
     },
     "document": {
-        "instance": {
-            "showlist": {
-                "select": "Đã chọn",
-                "record": "Bản ghi",
-                "printRecord": "In bản ghi",
-                "selectPrintConfig": "Chọn mẫu in",
-                "printMultiple": "In nhiều bản ghi",
-                "listPrintConfig": "Danh sách mẫu in",
-                "print": "In nhanh",
-                "copied": "Đã sao chép",
-                "next": "Tiếp theo",
-                "prev": "Trước đó",
-                "copyLink": "Sao chép đường dẫn",
-                "download": "Tải xuống",
-                "info": "Thông tin bản ghi"
-            }
-        },
         "create": "Tạo mới văn bản",
         "edit": "Chỉnh sửa văn bản",
         "title": "Danh sách văn bản",
@@ -550,6 +499,7 @@
                         "subTitle1": "Người phê duyệt",
                         "subTitle2": "Người tham gia"
                     }
+
                 }
             },
             "fab": {
@@ -650,7 +600,6 @@
         }
     },
     "apps": {
-        "titleMyApplication": "Danh sách công việc của tôi",
         "header": {
             "id": "ID",
             "name": "Tên",
@@ -663,11 +612,10 @@
         },
 
         "listType": {
-            "documentMajor": "Chứng từ",
-            "documentCategory": "Danh mục",
-            "workflow": "Quy trình làm việc",
-            "dashboard": "Báo cáo",
-            "orgchart": "Sơ đồ tổ chức"
+            "documents": "Văn bản",
+            "workflows": "Quy trình làm việc",
+            "reports": "Báo cáo",
+            "orgcharts": "Sơ đồ tổ chức"
         },
         "addApp": "Thêm ứng dụng",
         "editApp": "Sửa ứng dụng",
@@ -811,6 +759,11 @@
                 "remove operation": "Xoá",
                 "add action pack": "Thêm",
                 "remove action pack": "Xoá"
+
+
+
+
+
             },
             "dataflow": {
                 "detail": "Chi tiết",
@@ -909,9 +862,7 @@
     "notification": {
         "error": "Đã có lỗi xảy ra. Vui lòng thử lại sau",
         "errorTitle": "Lỗi",
-        "successTitle": "Thành công",
-        "older": "Cũ hơn",
-        "today": "Hôm nay"
+        "successTitle": "Thành công"
     },
     "virtualdoc": {
         "header": {

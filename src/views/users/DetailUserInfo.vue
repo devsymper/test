@@ -2,7 +2,7 @@
 	<div class="h-100">
 		<div class="h-100" >
 			<div class="h-100">
-				<v-stepper v-model="stepper" class="d-flex stepper-create-user">
+				<v-stepper class="d-flex stepper-create-user">
 				<v-stepper-items class="stepper-items">
 					<v-stepper-content step="1">
 					<h4>{{ $t('user.general.personalInfo.title')}}</h4>
@@ -66,7 +66,7 @@
 								</v-col>
 								<v-col cols="6">
                                     <span class="fs-13">
-									    {{detailInfo.status}}
+									    {{detailInfo.status==1?'Hoạt động':"Khóa"}}
                                     </span>
 								</v-col>
 						    </v-row>
@@ -76,26 +76,35 @@
 						<v-col cols="4">
 								<v-col cols="3" class="text-center ">
 								<v-avatar :size="80" >
-									<img v-if="avatarUrl != ''"
-										:src="avatarUrl"
+									<img v-if="detailInfo.avatarUrl != ''"
+										:src="detailInfo.avatarUrl+detailInfo.id"
 									>
-									<img v-if="avatarUrl== ''"
+									<img v-if="detailInfo.avatarUrl== ''"
 										:src="require('./../../assets/image/avatar_default.jpg')"
 									>
 								</v-avatar>
-				
 								<UploadFile 
 									style="margin-top:-30px; margin-left:50px"
 									ref="uploadAvatar"
-								
 									:autoUpload="false"
-									:fileName="avatarFileName"
+									:fileName="detailInfo.avatarFileName"
 								 />
 							</v-col>
 						</v-col>	
 						<!-- ket thuc anh -->
 					</v-row>
-			
+				<h4 class="mt-2">Phân quyền</h4>
+				<v-row  v-if="rolesOgchart" class="ml-1 fs-13" style="font-weight:430">Vị trí</v-row>
+				
+				<v-row class="ml-3 fs-13" v-for="(roles,index) in rolesOgchart" :key='index'>
+					{{roles.name}} 
+
+				</v-row>
+				<v-row v-if="roles" class="ml-1 fs-13" style="font-weight:430">Vai trò người dùng</v-row>
+					<v-row class="ml-3 fs-13" v-for="(roles,index) in roles" :key='index'>
+					{{roles.name}} 
+
+				</v-row>
 					</v-stepper-content>
 				</v-stepper-items>
 				</v-stepper>
@@ -110,6 +119,8 @@ import { userApi } from "./../../api/user.js";
 import { permissionPackageApi } from "./../../api/PermissionPackage.js";
 import { permissionPositionOrgchartApi } from "./../../api/PermissionPositionOrgchart.js";
 import { orgchartApi } from "./../../api/orgchart.js";
+import { systemRoleApi } from "./../../api/systemRole.js";
+
 import { str } from "./../../plugins/utilModules/str.js";
 import avatarDefault from "@/assets/image/avatar_default.jpg";
 import VueResizable from 'vue-resizable'
@@ -129,70 +140,48 @@ export default {
             return this.$store.state.app;
         },
     },
+    methods:{
+		async getRoleOrgchartByUser(id){
+			const self = this;
+			let res = await orgchartApi.getRolesByUser([{idUser: id}])
+				if (res.status === 200) {
+					self.rolesOgchart = res.data[0].roles
+				}
+			
+		},
+		async getRolesByUser(id){
+			const self = this;
+			let res = await  systemRoleApi.getRolesByUser([id])
+				if (res.status === 200) {
+					self.roles = res.data[0].roles
+				}
+		}
+          
+    },
+    created(){
+		debugger
+		 this.getRoleOrgchartByUser(this.detailInfo.id);
+		 this.getRolesByUser(this.detailInfo.id);
+
+    },
+    watch:{
+        detailInfo(){
+            debugger
+			this.getRoleOrgchartByUser(this.detailInfo.id);
+		 	this.getRolesByUser(this.detailInfo.id);
+			
+           
+    
+     }
+    },
 	data(){
 		return {
 			showPassPanel:false,
-			test:true,
-            avatarFileName: '',
-            avatarUrl: '',
-			user:{	
-				id:'', 
-				firstName:'', 
-				lastName:'', 
-				displayName:'', 
-				userName:' ', 
-				email:' ', 
-				password:null, 
-				phone:'', 
-				active:true
-			},
-			url: avatarDefault,
-			stepper: 1,
-			editStep: false,
-			loader: null,
-			loading: false,
 			actionPanel : this.$t('user.other.createUser'),
-			enabledPassword:false,
-			autoRenPassword:true,
-			needChangePassword : true,
-			sendMailAfterChange : true,
-			tabIndex:0,
-			permissionPackage: {
-				title:'package',
-				listPermission:[],
-				permissionSelected:[]
-			},
-			permissionSelected : [],
-			permissionPosittionOrgChart : {
-				title:'vị trí orgchart',
-				listNode:[],
-				noteSelected:[]
-			},
-			listNodesOrgChart : [],
-			positionOrgchartSelected : [],
-			userRole : {
-				title:'Loại User',
-				listUserRole:['User','Business'],
-				userRoleSelected:''
-			},
-			showPass: false,
-			rules: {
-				required: value => !!value || this.$t('validate.required'),
-				min: v => (typeof v != 'undefined' && v != undefined && v.length >= 8) || this.$t('validate.min_8'),
-				max: v => (typeof v != 'undefined' && v != undefined && v.length < 25) || this.$t('validate.max_24'),
-				email: value => {
-					const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-					return pattern.test(value) || this.$t('validate.email');
-				},
-				password:value => {
-					const pattern = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?).{8,}$/
-					return pattern.test(value) || this.$t('validate.notValid');
-				},
-			},
-			formHasErr : true,
-			search: {
-				name:''
-			},
+			roles:[],
+			id:[],
+			rolesOgchart:[]
+			
 		}
  	},
 }

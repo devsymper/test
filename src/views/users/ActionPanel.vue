@@ -497,7 +497,6 @@ export default {
  	},
   	watch: {
 		showPassPanel(){
-			debugger
 			if(this.showPassPanel){
 			}
 		},
@@ -570,8 +569,9 @@ export default {
             this.avatarFileName = 'user_avatar_'+this.user.id;
 		},
 		setDetailInfo(user){
-			debugger
 			this.detailInfoUser = user;
+            this.detailInfoUser.avatarUrl = this.getAvatarUrl();
+            this.detailInfoUser.avatarFileName = 'user_avatar_'+ user.id;
 
 		},
 		actionUser(){

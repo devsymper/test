@@ -204,13 +204,11 @@ export default {
         },
         showViewSetingPassword(user){
             this.isSettingPasswordView = true;
-            debugger
             this.$refs.panel.setDetailInfo(user);
             this.$refs.listUser.openactionPanel();
         },
         showViewDetailInfo(user){
             this.showViewInfo= true;
-            debugger
             this.$refs.panel.setDetailInfo(user);
             this.$refs.listUser.openactionPanel();
 

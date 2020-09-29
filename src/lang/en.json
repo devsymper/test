@@ -194,6 +194,7 @@
         "general": {
             "title": "Basic info",
             "personalInfo": {
+                "status": "Status",
                 "title": "personal information",
                 "userName": "User name",
                 "email": "Email",
