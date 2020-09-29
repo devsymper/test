@@ -2,7 +2,7 @@
 <div style="width:100%">
     <list-items
         ref="listDocument"
-        :getDataUrl="'https://sdocument-management.symper.vn/documents'"   
+        :getDataUrl="'https://sdocument-management.symper.vn/documents'"  
         :useDefaultContext="false"
         :tableContextMenu="tableContextMenu"
         :pageTitle="$t('document.title')"
