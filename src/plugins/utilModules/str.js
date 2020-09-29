@@ -87,6 +87,10 @@ export const str = {
             }
             return hash;
         }
+    },
+    mapLanguageToMoment() {
+        return { 'en': 'en', 'vn': 'vi' } // biến chuyển định dạng ngôn ngữ sang thư viện moment js hiểu được
     }
+
 
 }

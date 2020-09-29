@@ -30,6 +30,7 @@ export default class ActionControl extends Control {
             console.log(this.value);
             let thisCpn = this;
             let listUser = store.state.app.allUsers;
+            thisCpn.ele.empty();
             documentApi.getListApprovalHistory(this.value).then(res => {
                     if (res.status == 200) {
                         let data = res.data;
@@ -50,6 +51,7 @@ export default class ActionControl extends Control {
                                                             width: 18px;
                                                             margin-bottom: -4px;"> <strong>` + user.displayName + `</strong> <span>đã duyệt ` + moment(approvalHistory.createAt).fromNow() + ` ( ` + approvalHistory.createAt + ` )</span>
                                                         </div>`
+                                console.log("asdsadsad#D", thisCpn);
                                 thisCpn.ele.append(item)
                             }
                         }

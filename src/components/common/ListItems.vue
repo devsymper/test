@@ -25,7 +25,7 @@
                             v-if="checkShowCreateButton()"
                         >
                             <v-icon left dark>mdi-plus</v-icon>
-                            {{$t('common.add')}}
+                            <span v-show="!actionPanel">{{$t('common.add')}}</span>
                         </v-btn>
                         <v-btn
                             depressed
@@ -37,7 +37,7 @@
                             @click="refreshList"
                         >
                             <v-icon left dark>mdi-refresh</v-icon>
-                            {{$t('common.refresh')}}
+                            <span v-show="!actionPanel">{{$t('common.refresh')}}</span>
                         </v-btn>
                         <v-btn
                             depressed
@@ -49,7 +49,7 @@
                             v-if="!isCompactMode && showExportButton"
                         >
                             <v-icon left dark>mdi-microsoft-excel</v-icon>
-                            {{$t('common.export_excel')}}
+                            <span v-show="!actionPanel">{{$t('common.export_excel')}}</span>
                         </v-btn>
 
                         
@@ -61,7 +61,7 @@
                             v-if="showImportButton"
                         >
                             <v-icon left dark>mdi-database-import</v-icon>
-                            {{$t('common.import_excel')}}
+                            <span v-show="!actionPanel">{{$t('common.import_excel')}}</span>
                         </v-btn>
 
                         <component
@@ -302,6 +302,7 @@ export default {
                 manualColumnResize: true,
                 renderAllRows: true,
                 manualRowResize: true,
+                readOnly: true,
                 rowHeights: 21,
                 stretchH: "all",
                 licenseKey: "non-commercial-and-evaluation",
