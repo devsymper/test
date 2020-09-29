@@ -192,7 +192,7 @@
         </v-card-actions>
       </v-card>
     </v-dialog> -->
-    <DialogCreateTask :showCreateTask="showCreateTask" @create-task="createdTask" />
+    <DialogCreateTask :showCreateTask="showCreateTask" @create-task="createdTask" @close-dialog="closeDialog"/>
   </div>
 </template>
 
@@ -337,6 +337,9 @@ export default {
     //this.getProcessInstance();
   },
   methods: {
+    closeDialog(){
+      this.showCreateTask=!this.showCreateTask;
+    },
     changeObjectType(index) {
         this.$emit("changeObjectType", index);
     },

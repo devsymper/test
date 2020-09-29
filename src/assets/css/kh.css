@@ -560,3 +560,7 @@
 .kh-handson-border .ht_master .wtHolder .wtHider .wtSpreader .htCore {
     width: 100%!important;
 }
+
+.v-autocomplete:not(.v-input--is-focused).v-select--chips input {
+    max-height: unset!important;
+}
