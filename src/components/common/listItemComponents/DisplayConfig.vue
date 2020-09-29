@@ -4,7 +4,7 @@
         absolute
         class="pa-2 pl-4"
         right
-        :style="{width: tableDisplayConfig.width+'px'}"
+        :style="{width: tableDisplayConfig.width+'px','z-index':'7'}"
     >
         <div class="title">
             <div>

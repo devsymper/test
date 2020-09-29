@@ -64,6 +64,7 @@
         "last_update_at": "Cập nhật lần cuối",
         "create_at": "Tạo lúc",
         "user_create": "Người tạo",
+        "last_user_update": "Người cập nhật cuối",
         "filter": "Bộ lọc",
         "sort": "Sắp xếp",
         "status": "Trạng thái",
@@ -89,7 +90,7 @@
         "import_excel": "Nhập bằng excel",
         "sidebar": {
             "Lists trash": "Danh sách bản xóa",
-            "myApplication": "My Application",
+            "myApplication": "Ứng dụng của tôi",
             "tasks": "Tasks",
             "works": "Works",
             "My work": "Công việc của tôi",
@@ -562,7 +563,8 @@
         },
         "validate": {
             "emptyTitle": "Không được bỏ trống tiêu đề",
-            "emptyContentControlTemplate": "Vui chọn template trước khi lưu control template"
+            "emptyContentControlTemplate": "Vui chọn template trước khi lưu control template",
+            "controlNotExist": "Control Không tồn tại, vui lòng tạo control mới"
         }
     },
     "documentObject": {
@@ -964,10 +966,10 @@
             "siblingWork": "Sibling work",
             "subWork": "Sub work"
         },
-        "sidebar":{
-            "showMoreTask":"Xem thêm các task liên quan",
-            "showLess":"Thu gọn",
-            "showMoreFile":"Xem thêm các tệp"
+        "sidebar": {
+            "showMoreTask": "Xem thêm các task liên quan",
+            "showLess": "Thu gọn",
+            "showMoreFile": "Xem thêm các tệp"
 
         }
 
@@ -1065,6 +1067,11 @@
         "overMaxOpen": {
             "title": "Không thể tạo thêm tab mới",
             "detail": "Số lượng tab vượt quá giới hạn, hãy xóa một vài tab"
+        }
+    },
+    "dashboard": {
+        "detail": {
+            "title": "Detail dashboard "
         }
     },
     "comment": {

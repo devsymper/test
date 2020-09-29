@@ -65,7 +65,7 @@
 
         <v-dialog v-model="dialog" persistent max-width="290">
             <v-card>
-                <v-card-title class="headline">{{titleDialog}}</v-card-title>
+                <v-card-title class="notice-title">{{titleDialog}}</v-card-title>
                 <v-card-actions>
                 <v-spacer></v-spacer>
                 <v-btn color="green darken-1" text @click="dialog = false">Hủy bỏ</v-btn>
@@ -250,39 +250,6 @@ export default {
                         self.showDragTable(e);
                     }
                 });
-             
-                // ed.ui.registry.addMenuButton('pageSize', {
-                //         text: 'Kích thước',
-                //         fetch: function (callback) {
-                //             var items = [
-                //                 {
-                //                     type: 'menuitem',
-                //                     text: 'A3',
-                //                     onAction: function () {
-                                        
-                //                     }
-                //                 },
-                //                 {
-                //                     type: 'menuitem',
-                //                     text: 'A4',
-                //                     onAction: function () {
-                                        
-                //                     }
-                //                 },
-                //                 {
-                //                     type: 'menuitem',
-                //                     text: 'A5',
-                //                     onAction: function () {
-                                        
-                //                     }
-                //                 },
-                                
-                            
-                //             ];
-                //             callback(items);
-                //         }
-                //     });
-
                     
                 ed.ui.registry.addButton('margin', {
                 icon:'margin',
@@ -308,7 +275,7 @@ export default {
                     self.keyHandler(e)
                 });
                 ed.on('paste', function(e) {
-                    self.handlePasteContent();
+                    self.handlePasteContent(e);
                 });
                 ed.on('ExecCommand', function(e) {
                     self.handleExecCommand(e);
@@ -458,10 +425,45 @@ export default {
                 this.handleClickDeletePageInControlTab(this.currentPageActive)
             }
         },
-        handlePasteContent(){
-            setTimeout((self) => {
-                self.setContentForDocumentV1();
-            }, 300,this);
+        handlePasteContent(e){
+            var content = ((e.originalEvent || e).clipboardData || window.clipboardData).getData("text/html");
+            content = content.replace(/((<|(<\/))html>)|((<|(<\/))body>)/g,"");
+            let contentEl = $(content);
+            let listControls = contentEl.find('.s-control:not(.s-control-table .s-control)');
+            if(listControls.length > 0){
+                setTimeout((self) => {
+                    for (let index = 0; index < listControls.length; index++) {
+                        const controlEl = listControls[index];
+                        let controlId = $(controlEl).attr('id');
+                        var inputId = 's-control-id-' + Date.now();
+                        let controlType = $(controlEl).attr('s-control-type');
+                        let elements = $('#document-editor-'+this.keyInstance+'_ifr').contents().find('#'+controlId);
+                        elements.attr('id',inputId);
+                        let control = GetControlProps(controlType);
+                        this.addToAllControlInDoc(inputId,{properties: control.properties, formulas : control.formulas,type:controlType});
+                        if(controlType == 'table'){ // nếu là table thì xử lí các control trong table
+                            let allControlInTable = elements.find('.s-control');
+                            for (let i = 0; i < allControlInTable.length; i++) {
+                                const childControlEl = allControlInTable[i];
+                                let childControlId = $(childControlEl).attr('id');
+                                var childInputId = 's-control-id-' + Date.now();
+                                let childControlType = $(childControlEl).attr('s-control-type');
+                                let childElements = $('#document-editor-'+this.keyInstance+'_ifr').contents().find('#'+childControlId);
+                                childElements.attr('id',childInputId);
+                                let childControl = GetControlProps(childControlType);
+                                this.addToAllControlInTable(childInputId,{properties: childControl.properties, formulas : childControl.formulas,type:childControlType},inputId);
+                            }
+                        }
+                    }
+                }, 300,this);
+                
+            }
+            else{   // trường hợp copy từ dekko
+                setTimeout((self) => {
+                    self.setContentForDocumentV1();
+                }, 300,this);
+            }
+            
         },
         px2cm(px) {
             return (Math.round((px / 37.7952) * 100) / 100).toFixed(1);
@@ -1517,6 +1519,7 @@ export default {
             $("#document-editor-"+this.keyInstance+"_ifr").contents().find('body meta').remove()
             $("#document-editor-"+this.keyInstance+"_ifr").contents().find('body style').remove()
             let allControl = $("#document-editor-"+this.keyInstance+"_ifr").contents().find('.s-control:not(.bkerp-input-table .s-control)');
+            // debugger
             $.each(allControl,function(item,value){
                 let controlProps = $(value).attr('data-property');
                 controlProps = controlProps.replace(/\"\[/gm,"[");
@@ -1534,7 +1537,6 @@ export default {
                     controlProps = JSON.parse(controlProps);
                     let controlProp = {};
                     let controlFormulas = {};
-                    console.log('safashd',controlProps);
                     $.each(controlProps,function(k,v){
                         if(mappingOldVersionControlProps[k] != undefined && controlV2.properties[mappingOldVersionControlProps[k]] != undefined){
                             controlV2.properties[mappingOldVersionControlProps[k]].value = v;
@@ -2286,13 +2288,25 @@ export default {
                 tinyMCE.activeEditor.selection.setNode($(e.target).parent());
                 let tableId = table.attr('id');
                 let control = this.editorStore.allControl[tableId]['listFields'][controlId];
+                if(!control){
+                    this.showDialogEditor("",this.$t('document.validate.controlNotExist'));
+                    return;
+                }
                 this.selectControl(control.properties, control.formulas,controlId,type);
             }
             else{
                 let control = this.editorStore.allControl[controlId];
+                if(!control){
+                    this.showDialogEditor("",this.$t('document.validate.controlNotExist'));
+                    return;
+                }
                 this.selectControl(control.properties, control.formulas,controlId,type);
             }
         },
+
+        
+
+
         checkSelectedTabPageControl(e,control,controlId){
             if($(e.target).closest('.page-item').length > 0){
                 let pageId = $(e.target).closest('.page-item').attr('id');
@@ -2551,6 +2565,11 @@ export default {
     }
     .tox-toolbar__group .tox-tbtn__select-label{
         font-size: 11px !important;
+    }
+    .notice-title{
+        word-break: break-word;
+        font-size: 15px !important;
+        padding: 12px !important;
     }
 
 </style>

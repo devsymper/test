@@ -262,19 +262,39 @@
         </v-list>
         <template v-slot:append>
             <v-list-item>
-                <v-list-item-icon class="collapse-action-icon d-flex justify-start">
-                <v-icon v-if="showChevIcon" 
-                    @click.stop="invertSidebarShow()" 
-                    style="font-size: 20px">
-                    mdi mdi-chevron-left
-                </v-icon>
-                <v-icon v-else 
-                    @click.stop="invertSidebarShow()" 
-                    style="font-size: 20px">
-                    mdi mdi-chevron-right
-                </v-icon>
-                    </v-list-item-icon>
-                      <v-menu  top nudge-top='40' nudge-left='60'>
+                <!-- <v-list-item-icon class="collapse-action-icon d-flex justify-start"> -->
+                    <div style="margin-left:-8px">
+                        <v-btn
+                            icon
+                            tile 
+                            v-if="showChevIcon"
+                            @click.stop="invertSidebarShow()" 
+                        >
+                            <v-icon
+                                style="font-size: 20px">
+                                mdi mdi-chevron-left
+                            </v-icon>
+                        </v-btn>
+                        <v-btn
+                            icon
+                            tile 
+                            v-else 
+                            @click.stop="invertSidebarShow()" 
+                        >
+                            <v-icon
+                                style="font-size: 20px">
+                                mdi mdi-chevron-right
+                            </v-icon>
+                        </v-btn>
+                    </div>
+                    
+                    <!-- <v-icon v-else 
+                        @click.stop="invertSidebarShow()" 
+                        style="font-size: 20px">
+                        mdi mdi-chevron-right
+                    </v-icon> -->
+                <!-- </v-list-item-icon> -->
+                      <v-menu top nudge-top='40' nudge-left='60'>
                         <template v-slot:activator="{ on: menu }">
                             <v-btn style="margin-left:140px" icon tile v-on="menu">
                                 <v-icon style="font-size:18px">mdi-cog-outline</v-icon>
@@ -408,6 +428,7 @@ export default {
             let currentLocale = util.getSavedLocale();
             if (currentLocale != locale) {
                 this.$i18n.locale = locale;
+                this.$moment.locale(util.str.mapLanguageToMoment[locale])
                 util.setSavedLocale(locale);
                 userApi.setUserLocale(locale);
                 this.$evtBus.$emit("change-user-locale", locale);
@@ -427,7 +448,10 @@ export default {
             if(item.action){
                  this.$evtBus.$emit('symper-app-call-action-handler', item.action, this, {});
             }else{
-                this.$goToPage(item.link, item.title, false, false);
+                let path = 'common.sidebar.'+item.title;
+                let title = this.$t(path);
+                
+                this.$goToPage(item.link, title, false, false);
             }
             this.$set(this, 'indexActive', item.title)
             
@@ -488,6 +512,9 @@ export default {
 }
 .v-navigation-drawer  >>> .v-list-group--active .v-list-group__header .v-list-group__header__prepend-icon .v-icon {    
     color:rgb(0,0,0,0.8); 
+}
+.v-navigation-drawer  >>> .v-list{    
+    overflow-x:hidden;
 }
 .v-navigation-drawer  >>> .collapse-action-icon .v-icon:hover,
 .v-navigation-drawer  >>> .collapse-action-icon .v-icon:focus

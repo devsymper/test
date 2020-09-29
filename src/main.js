@@ -97,7 +97,8 @@ Vue.use(Notifications);
 Vue.use(VueMoment, {
     moment,
 });
-
+let curLocale = util.getSavedLocale();
+moment.locale(util.str.mapLanguageToMoment()[curLocale]);
 /**
  * $evtBus : component chuyên chở các sự kiện giữa tất cả các component
  */

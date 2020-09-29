@@ -38,9 +38,9 @@ const systemRoutes = [{
         path: "/page-not-found",
         name: "pageNotFound",
         component: PageNotFound, //Vue component,
-        meta: {
-            layout: "content-only"
-        },
+        // meta: {
+        //     layout: "content-only"
+        // },
     },
     {
         path: "*",
