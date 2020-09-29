@@ -429,7 +429,7 @@ export default {
     props: {
         showImportButton: {
             type: Boolean,
-            default: true
+            default: false
         },
         exportLink: {
             type: String,
@@ -437,7 +437,7 @@ export default {
         },
         showExportButton: {
             type: Boolean,
-            default: true
+            default: false
         },
         widgetIdentifier: {
             type: String,
@@ -625,7 +625,7 @@ export default {
                     markFilter = "applied-filter";
                 }
                 let headerName = prefix ? thisCpn.$t(prefix + colTitles[col]) : colTitles[col];
-                return `<span>
+                return `<span class="d-flex justify-space-between">
                             <span class="font-weight-medium">
                                 ${headerName}
                             </span>
