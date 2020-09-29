@@ -30,8 +30,8 @@
                         color="amber darken-4"
                         group
                     >
-                        <v-btn small>{{$t('table.wrap_tex_mode.clip')}}</v-btn>
                         <v-btn small>{{$t('table.wrap_tex_mode.wrap')}}</v-btn>
+                        <v-btn small>{{$t('table.wrap_tex_mode.clip')}}</v-btn>
                     </v-btn-toggle>
                 </div>
             </div>
