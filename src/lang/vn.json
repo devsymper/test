@@ -965,10 +965,10 @@
             "siblingWork": "Sibling work",
             "subWork": "Sub work"
         },
-        "sidebar":{
-            "showMoreTask":"Xem thêm các task liên quan",
-            "showLess":"Thu gọn",
-            "showMoreFile":"Xem thêm các tệp"
+        "sidebar": {
+            "showMoreTask": "Xem thêm các task liên quan",
+            "showLess": "Thu gọn",
+            "showMoreFile": "Xem thêm các tệp"
 
         }
 
@@ -1066,6 +1066,11 @@
         "overMaxOpen": {
             "title": "Không thể tạo thêm tab mới",
             "detail": "Số lượng tab vượt quá giới hạn, hãy xóa một vài tab"
+        }
+    },
+    "dashboard": {
+        "detail": {
+            "title": "Detail dashboard "
         }
     },
     "comment": {
