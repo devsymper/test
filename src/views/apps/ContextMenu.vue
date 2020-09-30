@@ -74,7 +74,6 @@ export default {
 			$('#symper-app').append(this.$el);
 		},
 		hide(){
-			debugger
 			this.isShowContext = false;
 		},
 		calPosition(event){
