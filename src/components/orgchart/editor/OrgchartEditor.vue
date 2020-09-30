@@ -1,6 +1,5 @@
 <template>
     <div class="d-flex w-100 h-100">
-        <!-- <NodeSelector class="border-right-1"></NodeSelector> -->
         <div class="h-100 flex-grow-1">
             <div class="border-bottom-1 pt-1 pl-2">
                 <v-tooltip bottom v-for="(item, key) in headerActions" :key="key">
@@ -27,7 +26,7 @@
                             <v-icon size="21" v-on="on">mdi-plus-thick</v-icon>
                         </v-btn>
                     </template>
-                    <span>them node moi </span>
+                    <span>thêm node moi </span>
                 </v-tooltip>
                 <v-btn
                     v-if="action != 'view' && context == 'department'"
@@ -45,7 +44,7 @@
                 position: absolute;
                 width: calc(100% - 267px);
                 height: 100%;
-                background-color: white;
+                background-color: white; 
                 z-index: 99;">
                 <v-progress-circular
                     :size="50"
@@ -154,6 +153,7 @@ export default {
     data(){
         return {
             loadingDiagramView: true,
+            typeView: "B",
 			positionEditor: false,
 			checkPageEmpty: false,
 			listUserIds:null,
@@ -184,7 +184,11 @@ export default {
                 home: {
                     icon: "mdi-home-outline",
                     text: ""
-				},
+                },
+                changeTypeView:{
+                    icon: "mdi-align-vertical-center",
+                    text: "change type view"
+                }
 				
             },
         }
@@ -343,7 +347,7 @@ export default {
                             users: this.getListUserAsArr(node.users)
                         };
 
-                        if(node.content && node.content !== 'false'){
+                        if(node.content && node.content !== 'false'){ 
                             nodeData.positionDiagram = {
                                 cells: JSON.parse(node.content)
                             }         
@@ -381,8 +385,6 @@ export default {
                     this.showOrgchartConfig();
                     setTimeout((self) => {
                         self.loadingDiagramView = false;
-                    //  this.$refs.editorWorkspace.createFirstVizNode()
-
                     }, 1500, this);
                 }else{
                     this.$snotifyError(res, "Can not get orgchart data",res.message);
@@ -442,7 +444,7 @@ export default {
 				this.$store.commit('orgchart/updateCurrentFatherNode',{id:nodeId,instanceKey:this.instanceKey})
 				this.positionEditor = true;
 				this.$store.commit('orgchart/updateInstanceKey', this.instanceKey)
-				this.selectNode(nodeId);
+                this.selectNode(nodeId);
                 setTimeout((self) => {
 					self.checkAndCreateOrgchartData();
                     if(self.selectingNode.positionDiagramCells.cells){
@@ -464,6 +466,8 @@ export default {
                     self.$refs.positionDiagram.centerDiagram();
                     self.$refs.positionDiagram.$refs.editorWorkspace.scrollPaperToTop(200);
                     self.$refs.positionDiagram.showOrgchartConfig();
+                    self.$refs.positionDiagram.$refs.editorWorkspace.changeTypeView(self.typeView);
+
                 }, 200, this);
             }
         },
@@ -822,6 +826,11 @@ export default {
                 if(passed){
                     this.$snotifySuccess("Validate passed!");  
                 }
+            }else if(action == "changeTypeView"){
+                let type = this.typeView == "B" ? "R" : "B"
+                this.typeView = type
+                this.$refs.editorWorkspace.changeTypeView(type);
+                // this.$refs.positionDiagram.$refs.editorWorkspace.changeTypeView(type);
             }else{
                 this.$refs.editorWorkspace.handleHeaderAction(action);
             }
@@ -886,6 +895,7 @@ export default {
                 instanceKey: this.instanceKey,
                 nodeId: nodeId,
             });
+         
             this.$refs.editorWorkspace.highlightNode(); 
             if(this.context == 'position'){
                 this.showPermissionsOfNode();

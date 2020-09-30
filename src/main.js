@@ -18,6 +18,7 @@ import {
     appConfigs
 } from "./configs";
 import actionMap from './action/index'
+import uploader from 'vue-simple-uploader'
 import VueRx from 'vue-rx'
 import iconMap from "./icon";
 //thu vien slider thumbnails
