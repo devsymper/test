@@ -1,5 +1,5 @@
 <template>
-    <div class="mt-1">
+    <div class="mt-1 symper-form-input">
         <div
             v-for="(inputInfo, name) in allInputs"
             :key="name"
@@ -247,10 +247,16 @@ const inputTypeConfigs = {
                 columns: config.columns,
                 data: config.value,
                 multipleSelection: config.multipleSelection,
-                showId: config.hasOwnProperty('showId') ? config.showId : true
+                showId: config.hasOwnProperty('showId') ? config.showId : true,
+                isSelectionChip:(config.isSelectionChip == false) ? false : true,
+                value: config.value
+                
             };
             if(config.onSearch){
                 props.onSearch  = config.onSearch;
+            }
+            if(config.properties){
+                props.properties = config.properties
             }
 
             if(config.textKey){
