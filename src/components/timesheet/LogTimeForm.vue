@@ -293,7 +293,6 @@ export default {
             }
         },
         // displayDate() {
-        //   debugger
         //     if(this.eventLog.startTime!=undefined){this.getEventLog();};
            
         // }
@@ -367,18 +366,15 @@ export default {
             else this.tab = null
         },
         newEvent(val) {
-           // debugger
             this.getAllTask();
             this.inputs.startTime = val ? dayjs(val.start).format('HH:mm') : "08:00";
             this.inputs.endTime = val ? dayjs(val.end).format('HH:mm') : "08:40";
-         //   debugger
             this.inputs.date = val ? dayjs(val.date).format('YYYY-MM-DD') : dayjs().format('YYYY-MM-DD');
             this.displayDate = this.inputs.date;
             this.inputs.description = val.desc;
             this.categoryTask = val.category;
             this.task = val.task;
             this.items.push({name:val.task});
-         //   debugger
             // hiển thị nút plan và log theo từng giờ
             let now = dayjs();
             let dateLog = dayjs(this.newEvent.start).format('DD/MMM/YYYY h:mm A');
@@ -389,7 +385,6 @@ export default {
     },
     created(){
         // load lại trang ở màn month
-     //  debugger
         let date = this.dateMonth;
         this.getDateMonth(date);
         this.getAllTask();
@@ -398,9 +393,8 @@ export default {
     methods: {
         filterTaskByCategory(){
             if(this.categoryTask){
-                debugger
-            let categoryId = this.getIdCategory(this.categoryTask);
-            this.items = this.items.filter(x=>x.categoryId==categoryId||x.categoryId==null);
+                let categoryId = this.getIdCategory(this.categoryTask);
+                this.items = this.items.filter(x=>x.categoryId==categoryId||x.categoryId==null);
             }
         },
          async getAllTask(nameTask){

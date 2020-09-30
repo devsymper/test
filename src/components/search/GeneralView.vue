@@ -376,7 +376,6 @@ export default {
             //console.log(this.defineAction[type]);
 
             this.$evtBus.$emit('symper-app-call-action-handler', this.defineAction[type], this, {id:id,name:name, title:name});
-            debugger
         },
     },
     watch: {

@@ -123,7 +123,6 @@ export default {
     },
      watch: {
         value(){
-            debugger
             this.debouncedGetValueSearch();
             //this.getValueSearch();
         }
@@ -163,7 +162,6 @@ export default {
 
         },
         setMenu(){
-            debugger
             let menu = [];
             for (let i = 0; i < this.menu.length; i++) {
                 // console.log(this.newSearch[i].group);
@@ -201,7 +199,6 @@ export default {
             return name;
         },
          getValueSearch() {
-        debugger
             let newVal = this.value;
            // this.debouncedGetAnswer();
             this.searchItems = [];
@@ -224,7 +221,6 @@ export default {
                                 }
                                 if(data.type=== 'account'){
                                     returnObjSearch.displayName = data.displayName? data.displayName:"Không có tên";
-                                    debugger
                                     returnObjSearch.userId = data.id;
                                 }else if(data.type=='document_definition'){
                                      returnObjSearch.displayName = data.title?data.title:"Không có tên";
