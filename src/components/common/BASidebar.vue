@@ -454,7 +454,10 @@ export default {
             if(item.action){
                  this.$evtBus.$emit('symper-app-call-action-handler', item.action, this, {});
             }else{
-                this.$goToPage(item.link, item.title, false, false);
+                let path = 'common.sidebar.'+item.title;
+                let title = this.$t(path);
+                
+                this.$goToPage(item.link, title, false, false);
             }
             this.$set(this, 'indexActive', item.title)
             

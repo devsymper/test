@@ -429,7 +429,7 @@ export default {
     props: {
         showImportButton: {
             type: Boolean,
-            default: true
+            default: false
         },
         exportLink: {
             type: String,
@@ -437,7 +437,7 @@ export default {
         },
         showExportButton: {
             type: Boolean,
-            default: true
+            default: false
         },
         widgetIdentifier: {
             type: String,
@@ -625,7 +625,7 @@ export default {
                     markFilter = "applied-filter";
                 }
                 let headerName = prefix ? thisCpn.$t(prefix + colTitles[col]) : colTitles[col];
-                return `<span>
+                return `<span class="d-flex justify-space-between">
                             <span class="font-weight-medium">
                                 ${headerName}
                             </span>
@@ -1211,12 +1211,19 @@ export default {
                 let orderedCols = [];
                 let noneOrderedCols = [];
                 for (let col of savedOrderCols) {
+                    colMap[col.data].checkedOrder = true;
                     if (colMap[col.data]) {
                         colMap[col.data].symperFixed = col.symperFixed;
                         colMap[col.data].symperHide = col.symperHide;
                         orderedCols.push(colMap[col.data]);
                     } else {
                         noneOrderedCols.push(colMap[col.data]);
+                    }
+                }
+
+                for(let colName in colMap){
+                    if(!colMap[colName].checkedOrder){
+                        noneOrderedCols.push(colMap[colName]);
                     }
                 }
                 return orderedCols.concat(noneOrderedCols);

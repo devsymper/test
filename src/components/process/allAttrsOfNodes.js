@@ -111,6 +111,22 @@ let allAttrs = {
         //     "isAttr": true,
         //     "type": "String"
         // }
+        validate(){
+            let vl=this.value;
+            if (vl==null || vl =='') {
+                let item={
+                    'isValid':false,
+                    'message':"Please enter name"
+                }
+                Vue.set(this,'validateStatus',item);
+            }else{
+                let item={
+                    'isValid':true,
+                    'message':"success"
+                }
+                Vue.set(this,'validateStatus',item);
+            }
+        },
     },
     "documentation": {
         "title": "Documentation",
