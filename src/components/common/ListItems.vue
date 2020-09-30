@@ -1,10 +1,10 @@
 <template>
-    <div class="ml-2 w-100 pr-3 pt-3" >
+    <div class="ml-2 w-100 pr-3 pt-3 list-item-common-symper" >
         <div :style="{width:contentWidth, display: 'inline-block'}">
             <v-row no-gutters class="pb-2" ref="topBar">
                 <v-col>
                     <span class="symper-title float-left">{{pageTitle}}</span>
-                    <div class="float-right overline">
+                    <div :class="{'float-right': true, 'overline' : true , 'show-panel-mode': actionPanel } ">
                         <v-text-field
                             @input="bindToSearchkey"
                             class="d-inline-block mr-2 sym-small-size"
@@ -16,7 +16,7 @@
                             :placeholder="$t('common.search')"
                         ></v-text-field>
                         <v-btn
-                            v-show="showButtonAdd"
+                            v-show="showButtonAdd && !actionPanel"
                             depressed
                             small
                             :loading="loadingRefresh"
@@ -26,7 +26,7 @@
                             v-if="checkShowCreateButton()"
                         >
                             <v-icon left dark>mdi-plus</v-icon>
-                            <span v-show="!actionPanel">{{$t('common.add')}}</span>
+                            <span >{{$t('common.add')}}</span>
                         </v-btn>
                         <v-btn
                             depressed
@@ -34,12 +34,14 @@
                             :loading="loadingRefresh"
                             :disabled="loadingRefresh"
                             class="mr-2"
-                            v-if="!isCompactMode"
+                            v-if="!isCompactMode && !actionPanel "
                             @click="refreshList"
                         >
                             <v-icon left dark>mdi-refresh</v-icon>
-                            <span v-show="!actionPanel">{{$t('common.refresh')}}</span>
+                            <span >{{$t('common.refresh')}}</span>
                         </v-btn>
+                     
+                      
                         <v-btn
                             depressed
                             small
@@ -59,11 +61,69 @@
                             small
                             @click="importExcel()"
                             class="mr-2"
-                            v-if="showImportButton"
+                            v-if="showImportButton "
                         >
                             <v-icon left dark>mdi-database-import</v-icon>
-                            <span v-show="!actionPanel">{{$t('common.import_excel')}}</span>
+                            <span>{{$t('common.import_excel')}}</span>
                         </v-btn>
+                          <!-- show menu khi hien sidebar -->
+                         <v-menu
+                            bottom
+                            left
+                            >
+                            <template v-slot:activator="{ on, attrs }">
+                                 <v-btn 
+                                    icon
+                                    tile 
+                                    v-show="actionPanel"
+                                    v-bind="attrs"
+                                    v-on="on"
+                                    style="width:29px;height:29px;margin:0px 4px"    
+                                >
+                                        <v-icon>
+                                            mdi-dots-vertical
+                                        </v-icon>
+                                </v-btn>
+                            </template>
+                            <v-list>
+                                <v-list-item  v-show="showButtonAdd"  @click="addItem">
+                                    <v-list-item-icon>
+                                         <v-icon>mdi-plus</v-icon>
+                                    </v-list-item-icon>
+                                    <v-list-item-content>
+                                         <v-list-item-title> {{$t('common.add')}}</v-list-item-title>
+                                    </v-list-item-content>
+                                </v-list-item>
+                                <v-list-item  v-show="!isCompactMode"  @click="refreshList">
+                                    <v-list-item-icon>
+                                         <v-icon>mdi-refresh</v-icon>
+                                    </v-list-item-icon>
+                                    <v-list-item-content>
+                                         <v-list-item-title> {{$t('common.refresh')}}</v-list-item-title>
+                                    </v-list-item-content>
+                                </v-list-item>
+                                <v-list-item  v-show="!isCompactMode && showExportButton"  @click="exportExcel()">
+                                    <v-list-item-icon>
+                                         <v-icon>mdi-microsoft-excel</v-icon>
+                                    </v-list-item-icon>
+                                    <v-list-item-content>
+                                         <v-list-item-title>{{$t('common.export_excel')}}</v-list-item-title>
+                                    </v-list-item-content>
+                                </v-list-item>
+                                <v-list-item  v-show="showImportButton"  @click="importExcel()">
+                                    <v-list-item-icon>
+                                         <v-icon>
+                                             mdi-database-import
+                                         </v-icon>
+                                    </v-list-item-icon>
+                                    <v-list-item-content>
+                                         <v-list-item-title> 
+                                             {{$t('common.import_excel')}}
+                                        </v-list-item-title>
+                                    </v-list-item-content>
+                                </v-list-item>
+                            </v-list>
+                        </v-menu>
 
                         <component
                             :is="'span'"
@@ -173,6 +233,7 @@
             :tableDisplayConfig="tableDisplayConfig"
             :tableColumns="tableColumns"
             :headerPrefixKeypath="headerPrefixKeypath"
+            :showActionPanelInDisplayConfig="showActionPanelInDisplayConfig"
         ></display-config>
 
         <table-filter
@@ -255,7 +316,7 @@ export default {
            this.refreshList();
         },
         'tableDisplayConfig.value.alwaysShowSidebar'(value) {
-            if(value){
+            if(value && Object.keys(this.currentItemDataClone).length > 0){
                 this.openactionPanel();
             }else{
                 this.closeactionPanel();
@@ -460,6 +521,10 @@ export default {
         showButtonAdd:{
             type:Boolean,
             default: true
+        },
+        showActionPanelInDisplayConfig:{
+            type: Boolean,
+            default: false,
         },
         /**
          * Prefix cho keypath trong file đa ngôn ngữ để hiển thị header của table
@@ -1275,6 +1340,10 @@ export default {
             this.tableDisplayConfig.show = !this.tableDisplayConfig.show;
         },
         showTableDropdownMenu(x, y, colName) {
+            var windowWidth = $(window).width()/1.1;
+            if(x > windowWidth){
+                x -= 190;
+            }
             let filterDom = $(this.$refs.tableFilter.$el);
             filterDom.css("left", x + "px").css("top", y + 10 + "px");
             this.$refs.dataTable.hotInstance.deselectCell();
@@ -1545,5 +1614,8 @@ i.applied-filter {
     color: #212529 !important;
     border-color: #bbb;
     border-right: 0;
+}
+.list-item-common-symper .v-menu__content .v-list-item{
+    height:30px
 }
 </style>
