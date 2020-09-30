@@ -142,7 +142,6 @@ export default {
 					let thisCpn = this
 					thisCpn.files = []
 					thisCpn.images = []
-				debugger
 				if(newValue.attachments.length > 0){
 					fileManagementApi.getFileByList(newValue.attachments).then(res => {
 						res.data.forEach(function(e){
@@ -206,8 +205,8 @@ export default {
 			return moment(date).fromNow();
 		},
 		resolveComment(item){
-			this.images = []
-			this.files = []
+			// this.images = []
+			// this.files = []
 			commentApi.changeStatus(item.id).then(res => {
 				item.status = 1
 				// this.$store.commit('comment/updateResolve',item)
@@ -222,7 +221,7 @@ export default {
 			this.images = []
 			this.files = []
 			commentApi.changeStatus(item.id).then(res => {
-				item.status = 0	
+				// item.status = 0	
 				// this.$store.commit('comment/updateUnResolve',item)
 				if(this.sComment.uuid == "0"){
 					this.getCommentId()

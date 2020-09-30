@@ -1519,7 +1519,6 @@ export default {
             $("#document-editor-"+this.keyInstance+"_ifr").contents().find('body meta').remove()
             $("#document-editor-"+this.keyInstance+"_ifr").contents().find('body style').remove()
             let allControl = $("#document-editor-"+this.keyInstance+"_ifr").contents().find('.s-control:not(.bkerp-input-table .s-control)');
-            // debugger
             $.each(allControl,function(item,value){
                 let controlProps = $(value).attr('data-property');
                 controlProps = controlProps.replace(/\"\[/gm,"[");

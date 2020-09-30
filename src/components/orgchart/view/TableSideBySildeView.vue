@@ -92,7 +92,6 @@ export default {
             deep: true,
             immediate: true,
             handler: function(after){
-                debugger
             }
         }
     }
