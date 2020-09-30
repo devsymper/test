@@ -384,15 +384,7 @@ export default {
                         self.$emit('row-selected', self.data[row]);
                     }, time);
                 },
-                afterSelection: (row, column, row2, column2, preventScrolling, selectionLayerLevel) => {
-                    if(self.debounceEmitRowSelectEvt){
-                        clearTimeout(self.debounceEmitRowSelectEvt);
-                    }
-                    let time = self.debounceRowSelectTime;
-                    self.debounceEmitRowSelectEvt = setTimeout(() => {
-                        self.$emit('row-selected', self.data[row]);
-                    }, time);
-                },
+               
                 beforeContextMenuSetItems: () => {
                 },
                 beforeOnCellMouseOver: (event, coords, TD, controller) => {
@@ -735,10 +727,9 @@ export default {
                 }
             }
             
-            this.loadingExportExcel = true;
-            await apiObj.get(exportUrl);
-            this.loadingExportExcel = false;
+            window.open(exportUrl,'_blank');
         },
+       
         checkShowCreateButton(){
             let rsl = !this.isCompactMode;
             let objectType = this.commonActionProps.resource;

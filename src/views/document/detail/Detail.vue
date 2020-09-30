@@ -250,24 +250,27 @@ export default {
                     this.documentSize = '21cm';
                     let contentPrintCss = {};
                     contentPrintCss = {'margin':'auto'}
-                    this.formSize = JSON.parse(docDetailRes.data.document.formSize);
-                    if(this.formSize){
-                        this.documentSize = 'auto';
-                        if(this.formSize.type == 'A3'){
-                            contentPrintCss = {'transform':'scale(0.84)','transform-origin':'top left'};
+                    if(docDetailRes.data.document.formSize){
+                        this.formSize = JSON.parse(docDetailRes.data.document.formSize);
+                        if(this.formSize){
+                            this.documentSize = 'auto';
+                            if(this.formSize.type == 'A3'){
+                                contentPrintCss = {'transform':'scale(0.84)','transform-origin':'top left'};
+                            }
+                            else if(this.formSize.type == 'A5'){
+                                contentPrintCss = {'transform':'scale(0.84)','transform-origin':'top left','margin':'auto'}
+                            }
+                            Object.assign(this.formSize,contentPrintCss);
                         }
-                        else if(this.formSize.type == 'A5'){
-                            contentPrintCss = {'transform':'scale(0.84)','transform-origin':'top left','margin':'auto'}
-                        }
-                        Object.assign(this.formSize,contentPrintCss);
                     }
+                    
                     setDataForPropsControl(docDetailRes.data.fields, this.keyInstance,'detail'); // ddang chay bat dong bo
                     setTimeout((self) => {
                         self.processHtml(content,isPrint); 
                     }, 100,this);
                         
                 }
-                this.$emit('after-load-document',docDetailRes.data.document);
+                this.$emit('after-load-document',docDetailRes.data.document);  
 
             } catch (error) {
                 
