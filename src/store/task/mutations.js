@@ -54,6 +54,9 @@ const setListTaskInProcessSibling = (state, listTaskInProcessSibling) => {
 const setIsStatusSubmit = (state, isStatusSubmit) => {
     Vue.set(state, 'isStatusSubmit', isStatusSubmit);
 }
+const setAllAppActive = (state, allAppActive) => {
+    Vue.set(state, 'allAppActive', allAppActive);
+}
 
 export {
     setArrFileAttach,
@@ -70,7 +73,8 @@ export {
     setListTaskInProcessSibling,
     setIsStatusSubmit,
     setListDocumentObjId,
-    setListDocumentObjIdWithUserSubmit
+    setListDocumentObjIdWithUserSubmit,
+    setAllAppActive
 
 
 };

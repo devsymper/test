@@ -22,7 +22,7 @@
                     <template v-slot:activator="{ on }">
                         <v-btn v-on="on"  depressed class="mr-2" small>
                             <v-icon size="18">mdi-filter-menu-outline</v-icon>
-                            <span class="ml-2">{{$t('myItem.filterObj')}}</span>
+                            <span class="ml-2">{{$t('myItem.objType')}}</span>
                         </v-btn>
                     </template>
                     <v-list>
