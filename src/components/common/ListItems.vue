@@ -660,10 +660,9 @@ export default {
                 }
             }
             
-            this.loadingExportExcel = true;
-            await apiObj.get(exportUrl);
-            this.loadingExportExcel = false;
+            window.open(exportUrl,'_blank');
         },
+       
         checkShowCreateButton(){
             let rsl = !this.isCompactMode;
             let objectType = this.commonActionProps.resource;
