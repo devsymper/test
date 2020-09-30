@@ -69,7 +69,7 @@ export default {
     .card-history-control{
         position: absolute;
         top: 0;
-        left: 100px;
+        left: 400px;
         z-index: 99999;
         max-width: unset !important;
     }

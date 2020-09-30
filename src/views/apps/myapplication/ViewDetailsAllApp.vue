@@ -198,11 +198,9 @@ export default {
                             self.checkChildrenApp(e.childrenApp,e.id)   
                         }
                     }
-                     this.getByAccessControl(self.listIds)
+                    this.getByAccessControl(self.listIds)
                     this.$store.commit('appConfig/setListApps', this.apps)
-                    setTimeout(function(e){
-                        self.loadingApp = false
-                    },1000)
+                    self.loadingApp = false
                 }
 			}).catch((err) => {
 			});
@@ -420,7 +418,6 @@ export default {
         }
     },
     created(){
-        debugger
         if(Object.keys(this.listApp).length == 0 ){
            this.getActiveapps()
         }else{

@@ -79,7 +79,7 @@
                                     </div>
                                     <v-autocomplete
                                         ref="selectDelegateUser"
-                                         :menu-props="{ maxHeight:300, minWidth:251,maxWidth:251,nudgeLeft:8, nudgeBottom:3}"
+                                         :menu-props="{ maxHeight:300, minWidth:251,maxWidth:251, nudgeLeft:8, nudgeBottom:3}"
                                         return-object
                                         class="mr-2 ml-2"
                                         full-width
@@ -100,9 +100,10 @@
                                             <span class="fs-13">{{$t('common.search')}}</span>
                                         </template>
                                         <template v-slot:item="data">
-                                            <div class="fs-13 py-1">
+                                        
+                                            <div class="fs-13 py-1" >
                                                  <SymperAvatar
-                                                     style="height:25px!important; width:25px!important; margin-left:-5px"  
+                                                    style="height:25px!important; width:25px!important; margin-left:-5px"  
                                                     :userId="data.item.id"/>
                                                 <span  class="fs-13 ml-1"> {{data.item.displayName}}</span>
                                             </div>
@@ -301,7 +302,7 @@
                             </v-btn>
                         </template>
                         <v-list dense>
-                            <v-list-item  class="v-list-item--link" style="background-color:white!important" dense>
+                            <v-list-item class="v-list-item--link" style="background-color:white!important" dense>
                                 <v-menu  right nudge-top="10" nudge-right='80'>
                                     <template v-slot:activator="{ on: menu1 }">
                                         <v-list-item-title class="fs-13 fm" style="padding-left:4px" v-on="menu1">
@@ -397,7 +398,6 @@ export default {
                 menuItem.push({titleGroup: name });
                 menuItem.push(...this.menu[type]);
             })
-
             this.menu = menuItem;
         },
         filterUser(item, queryText, itemText){
@@ -533,5 +533,21 @@ export default {
 }
 .title-group:focus{
     background:unset
+}
+</style>
+<style>
+.v-menu__content::-webkit-scrollbar {
+        width: 6px;
+        background-color: black;
+}
+.v-menu__content::-webkit-scrollbar-thumb {
+	border-radius: 50px;
+	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+	background-color: grey;
+}
+ .v-menu__content::-webkit-scrollbar-track {
+	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+	border-radius: 50px;
+	background-color: #F5F5F5;
 }
 </style>

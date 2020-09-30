@@ -55,6 +55,52 @@
             :definitionName="definitionName"
         />
 
+        <!-- Phần này cần tách thành component riêng -->
+        
+        <v-dialog
+            class="bg-white "
+            v-model="showUpdateSubmitedDocument"
+            width="80%">
+            <div class="w-100 py-2 px-4 bg-white justify-space-between d-flex border-bottom-1">
+                <span class="float-left title">
+                    {{$t('common.update')}} {{$t('common.documents')}}
+                </span>
+                <div class="float-right">
+                     <v-btn
+                        depressed
+                        color="primary" 
+                        small
+                        @click="updateDocumentData"
+                        class="mr-2">
+                        Submit
+                    </v-btn>
+                    
+                    <v-tooltip bottom>
+                        <template v-slot:activator="{ on }">
+                            <v-btn  
+                                @click="closeUpdatePanel()"
+                                icon
+                                tile
+                                v-on="on" text small>
+                                    <v-icon  small>mdi-close</v-icon>
+                            </v-btn>
+                        </template>
+                        <span>{{$t('common.close')}}</span>
+                    </v-tooltip>
+                </div>
+            </div>
+            <DocumentSubmit 
+                class="bg-white"
+                :docId="Number(docId)"
+                :workflowVariable="workflowVariable"
+                :showSubmitButton="false"
+                :documentObjectTaskId="workflowInfo.documentObjectTaskId"
+                :documentObjectWorkflowId="workflowInfo.documentObjectWorkflowId"
+                :documentObjectWorkflowObjectId="workflowInfo.documentObjectWorkflowObjectId"
+                :action="'update'"
+                :documentObjectId="converstNumber(documentObjectId)"
+                @submit-document-success="onSubmitDone"/>
+        </v-dialog>
     </div>
 </template> 
 <script>
@@ -99,7 +145,8 @@ export default {
             },
             showDoTaskComponent: false,
             documentObjectId: 0,
-            filter:'notDone'
+            filter:'notDone',
+            showUpdateSubmitedDocument: false
         }
     },
     props: {
@@ -191,6 +238,12 @@ export default {
         }
     },
     methods: {
+        updateDocumentData(){
+
+        },
+        closeUpdatePanel(){
+            this.showUpdateSubmitedDocument = false;
+        },
         showPopupTracking(){
             this.$store.commit("task/setStatusPopupTracking",true)
         },

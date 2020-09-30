@@ -169,6 +169,7 @@ export const defaultTaskDescription = {
     extraValue: '',
     approvalActions: '',
     targetElement: '',
+    editableControlOnApproval: []
 }
 
 function filterValue(rows) {
@@ -201,6 +202,7 @@ export const collectInfoForTaskDescription = function(allVizEls, allSymEls, bpmn
             elDocumentation.content = el.attrs.notificationContent.value;
             elDocumentation.extraLabel = el.attrs.extraInfoLabel.value;
             elDocumentation.extraValue = el.attrs.extraInfoValue.value;
+            elDocumentation.approvalEditableControls = el.attrs.approvalEditableControls.value;
 
             if (el.attrs.taskAction.value == 'submit') {
                 elDocumentation.action.parameter.documentId = el.attrs.formreference.value;

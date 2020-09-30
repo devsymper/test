@@ -2,7 +2,7 @@
 <div style="width:100%">
     <list-items
         ref="listDocument"
-        :getDataUrl="'https://sdocument-management.symper.vn/documents'"   
+        :getDataUrl="'https://sdocument-management.symper.vn/documents'"  
         :useDefaultContext="false"
         :tableContextMenu="tableContextMenu"
         :pageTitle="$t('document.title')"
@@ -299,14 +299,4 @@ export default {
     color: #707070
 }
 </style>
-<style>
-.v-list-item__title{
-    font-size:13px!important;
-}
-.v-select__slot{
-    padding-left:7px;
-    font-size:13px!important;
-    font-family: Roboto;
-}
 
-</style>

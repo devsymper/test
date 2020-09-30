@@ -3,12 +3,16 @@
     <div class="h-100 w-100">
         <list-items
         :getDataUrl="'https://sdocument-management.symper.vn/documents/'+docId+'/objects'"   
+        :exportLink="'https://sdocument-management.symper.vn/documents/'+docId+'/export-excel'" 
         :useDefaultContext="false"
         :tableContextMenu="tableContextMenu"
         :pageTitle="$t('documentObject.title')"
         :containerHeight="containerHeight"
         :actionPanelWidth="actionPanelWidth"
         :actionPanelType="'elastic'"
+        :showActionPanelInDisplayConfig="true"
+        :showExportButton="true"
+        :showImportButton="true"
         @after-open-add-panel="submitDocument"
         @data-get="afterGetData"
         @before-keydown="afterRowSelected"

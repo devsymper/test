@@ -11,6 +11,7 @@ export const DEFAULT_DEPARTMENT_DISPLAY = {
 	rx: 0,
 	ry: 0,
 	'stroke-width': 0.2,
+
 	stroke: '#707070'
 };
 export const FOUCUS_DEPARTMENT_DISPLAY = {
@@ -52,8 +53,8 @@ export const DEFAULT_DEPARTMENT_ATTRS = {
 		'font-family': 'Roboto',
 	},
 	'.btn.add': {
-		'ref-dx': -shapeSize.width / 2,
-		'ref-y': shapeSize.height,
+		'ref-dx': 0,
+		'ref-y': 0,
 		'ref': '.card',
 		event: 'element:add',
 		cursor: 'pointer'
@@ -91,7 +92,7 @@ export const DEFAULT_DEPARTMENT_ATTRS = {
 		'stroke-width': 0
 	},
 	'.btn.remove': {
-		'ref-dx': 0,
+		'ref-dx': -200,
 		'ref-y': 0,
 		'ref': '.card',
 		event: 'element:remove',
@@ -122,12 +123,13 @@ export const DEFAULT_DEPARTMENT_ATTRS = {
 	},
 
 	'.btn-collapse-expand': {
-		'ref-dx': -shapeSize.width / 2,
-		'ref-y': shapeSize.height + CEConfig.stickHeight,
+		'ref-dx': -shapeSize.width / 2 ,
+		'ref-y': shapeSize.height + CEConfig.stickHeight - 20,
 		'ref': '.card',
 		event: 'element:collapse',
 		cursor: 'pointer'
 	},
+	
 	'.collapse-expand-circle': {
 		r: CEConfig.radius,
 		fill: '#848484',
@@ -155,7 +157,8 @@ export const DEFAULT_DEPARTMENT_ATTRS = {
 		cursor: 'pointer',
 		event: 'element:collapse',
 
-	},
+	}
+	
 };
 
 export const DEPARTMENT_NODE_DATA = {
@@ -178,7 +181,7 @@ export const departmentMarkup =
             <g class="scalable">
                 <rect class="card"/>
             </g>
-            <image/>
+            <image />
             <text class="name"/>
             <text class="manager-name"/>
 
@@ -190,47 +193,19 @@ export const departmentMarkup =
                 <circle class="add"/>
                 <text class="add">+</text>
             </g>
-
+		
             <g class="btn remove orgchart-action">
                 <circle class="remove"/>
                 <text class="remove">X</text>
             </g>
+           
         </g>
     </g>`.replace(/\n/g, '').replace(/\s+/g, ' ');
-
-// `<g class="rotatable ">
-
-//             <rect class="stick"/>
-//             <g class="btn-collapse-expand">
-//                 <circle class="collapse-expand-circle"/>
-//             </g>
-//             <text class="expand-text collapse-expand">+</text>
-//             <text class="collapse-text collapse-expand">-</text>
-
-//             <g class="symper-orgchart-node">
-//                 <g class="scalable">
-//                     <rect class="card"/>
-//                 </g>
-//                 <image/>
-//                 <text class="name"/>
-//                 <text class="manager-name"/>
-
-//                 <g>
-//                     <rect class="border-bottom"/>
-//                 </g>
-
-//                 <g class="btn add orgchart-action">
-//                     <circle class="add"/>
-//                     <text class="add">+</text>
-//                 </g>
-
-//                 <g class="btn remove orgchart-action">
-//                     <circle class="remove"/>
-//                     <text class="remove">X</text>
-//                 </g>
-//             </g>
-//         </g>`.replace(/\n/g, '').replace(/\s+/g, ' ')
-export const defineDepartment = function () {
+	// <g class="btn-collapse-expand">
+			// 	<circle class="collapse-expand-circle"/>
+			// 	<text class="expand-text">+</text>
+			// </g>
+	export const defineDepartment = function () {
 	SymperDepartment = joint.shapes.org.Member.define('Symper.Department', {
 		size: {
 			width: shapeSize.width,

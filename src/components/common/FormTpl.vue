@@ -246,6 +246,7 @@ const inputTypeConfigs = {
             let props = {
                 columns: config.columns,
                 data: config.value,
+                multipleSelection: config.multipleSelection,
                 showId: config.hasOwnProperty('showId') ? config.showId : true
             };
             if(config.onSearch){
@@ -303,8 +304,21 @@ const inputTypeConfigs = {
     },
 };
 export default {
+    created(){
+        this.setActiveTabForUserAssignment();
+    },
+    watch: {
+        allInputs: {
+            immediate: true,
+            deep: true,
+            handler(){
+                this.setActiveTabForUserAssignment();
+            }
+        }
+    },
     data() {
         return {
+            markAllInputChangeByInternal: false, // đánh dấu một key trong allInput thay đổi là do trong component thay đổi ko phải do compoennt cha thay đổi
             alwaysSingleLine: {
                 checkbox: true,
                 switch: true,
@@ -319,6 +333,16 @@ export default {
         };
     },
     methods: {
+        setActiveTabForUserAssignment(){
+            if(!this.markAllInputChangeByInternal){
+                for(let inputName in this.allInputs){
+                    let input = this.allInputs[inputName];
+                    if(input.type == 'userAssignment' && input.value.formula){
+                        this.allInputs[inputName].activeTab = 'script';
+                    }
+                }
+            }
+        },
         handleClickAppend(){
             this.$emit('append-icon-click');
         },
@@ -385,7 +409,12 @@ export default {
         },
         changeAssignmentType(inputInfo, name, type) {
             this.$refs["inputItem_" + name][0].switchToTab(type);
+            this.markAllInputChangeByInternal = true;
             inputInfo.activeTab = type;
+
+            setTimeout((self) => {
+                self.markAllInputChangeByInternal = false;
+            }, 50, this);
         },
         closeLargeFormulaEditor() {
             let info = this.largeFormulaEditor;

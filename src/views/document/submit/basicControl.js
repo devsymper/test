@@ -453,7 +453,7 @@ export default class BasicControl extends Control {
                             </div>`
                     thisObj.setDeleteFileEvent(thisObj.ele, thisObj.name)
                     thisObj.ele.find('.upload-file-wrapper-outtb').append(file);
-                    let curValue = sDocument.state.submit[this.curParentInstance].listInputInDocument[thisObj.name].value;
+                    let curValue = sDocument.state.submit[thisObj.curParentInstance].listInputInDocument[thisObj.name].value;
                     let tableName = thisObj.inTable;
                     if (tableName != false) {
                         if (!Array.isArray(curValue)) {
@@ -465,15 +465,16 @@ export default class BasicControl extends Control {
                         curValue[rowId].push(response.data.name);
                     } else {
                         curValue += "," + response.data.name;
-                        this.value = curValue;
+                        thisObj.value = curValue;
                     }
                     store.commit("document/updateListInputInDocument", {
                         controlName: thisObj.name,
                         key: 'value',
-                        value: curValue
+                        value: curValue,
+                        instance: thisObj.curParentInstance
                     });
                     if (tableName != false) {
-                        sDocument.state.submit[this.curParentInstance].listInputInDocument[tableName].tableInstance.tableInstance.render();
+                        sDocument.state.submit[thisObj.curParentInstance].listInputInDocument[tableName].tableInstance.tableInstance.render();
                     }
 
                 }
@@ -483,6 +484,7 @@ export default class BasicControl extends Control {
     setDeleteFileEvent(ele, controlName) {
         let listInputInDocument = sDocument.state.submit[this.curParentInstance].listInputInDocument
         let value = listInputInDocument[controlName].value;
+        let thisObj = this;
         ele.off('click', '.remove-file')
         ele.on('click', '.remove-file', function(e) {
             let rowId = $(this).attr('data-rowid');
@@ -503,7 +505,8 @@ export default class BasicControl extends Control {
             store.commit("document/updateListInputInDocument", {
                 controlName: controlName,
                 key: 'value',
-                value: newValue
+                value: newValue,
+                instance: thisObj.curParentInstance
             });
         })
     }
@@ -566,8 +569,12 @@ export default class BasicControl extends Control {
                 let user = listUser.filter(u => {
                     return u.id == this.value
                 })
-                this.value = user[0].displayName;
-                this.ele.val(this.value)
+                if (user[0]) {
+                    this.value = user[0].displayName;
+                    this.ele.val(this.value)
+                } else {
+                    this.ele.val(this.value)
+                }
             }
 
         } else {
