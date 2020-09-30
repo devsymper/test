@@ -80,7 +80,6 @@ export default {
             //         // vertical/horizontal links have zero width/height
             //         bbox.inflate(1);
             //     }
-            //     debugger
             //     return viewportRect.intersect(bbox);
             // }
         });

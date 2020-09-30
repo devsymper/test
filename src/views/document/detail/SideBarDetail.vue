@@ -4,7 +4,7 @@
 	absolute
 	permanent
 	right
-	:width="sidebarWidth"
+	:width="400"
 	:style="{'transform':(isShow) ? 'translateX(0%)' : 'translateX(100%)'}"
 	>
 	<div class="main-info">
@@ -82,16 +82,12 @@
 
 						<table class="workflow-info" v-if="workflowId !='' ">
 							<tr>
-								<!-- <td><span class="mdi mdi-share-variant"></span></td> -->
 								<td>{{workflowName}}</td>
 							<tr>
-								<!-- <td><span class="mdi mdi-briefcase-variant-outline"></span></td> -->
-								<td>{{workflowOtherName}}</td>
+									<td>{{workflowOtherName}}</td>
 							</tr>
 							
 						</table>
-					<!-- mdi-share-variant -->
-					<!-- mdi-briefcase-variant-outline -->
 					</v-expansion-panel-content>
 				</v-expansion-panel>
 			</v-expansion-panels>
@@ -101,7 +97,6 @@
 		<div style="display:flex;">
 			<span class="mdi mdi-keyboard-backspace" @click="hideHistory"></span>
 			<span style="font-size:15px;">LỊCH SỬ CHỈNH SỬA</span>
-			<!-- <span class="mdi mdi-close" @click="hide"></span> -->
 		</div>
 
 		<v-divider></v-divider>
@@ -175,7 +170,7 @@ export default {
 	props:{
 		sidebarWidth:{
 			type:Number,
-			default:300
+			default:400
 		},
 		isShowSidebar:{
 			type:Boolean,
@@ -314,6 +309,7 @@ export default {
     }
     .s-detail-sidebar{
         overflow: hidden;
+		width:400px;
         max-height: 100%;
     }
 	
