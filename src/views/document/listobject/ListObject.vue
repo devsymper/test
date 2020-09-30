@@ -11,6 +11,8 @@
         :actionPanelWidth="actionPanelWidth"
         :actionPanelType="'elastic'"
         :showActionPanelInDisplayConfig="true"
+        :showExportButton="true"
+        :showImportButton="true"
         @after-open-add-panel="submitDocument"
         @data-get="afterGetData"
         @before-keydown="afterRowSelected"

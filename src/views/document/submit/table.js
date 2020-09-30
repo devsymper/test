@@ -127,7 +127,7 @@ Handsontable.cellTypes.registerCellType('user', {
 Handsontable.renderers.FileRenderer = function(instance, td, row, col, prop, value, cellProperties) {
     Handsontable.renderers.TextRenderer.apply(this, arguments);
     let table = store.state.document.submit[instance.keyInstance];
-    if (table != undefined && instance.tableName != undefined) {
+    if (table && instance.tableName) {
         td.innerHTML = table.listInputInDocument[prop].genFileView(row);
         td.classList.add("upload-file-wrapper-inTb");
         $(td).off('click', '.file-add');
