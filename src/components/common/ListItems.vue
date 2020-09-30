@@ -1538,4 +1538,7 @@ i.applied-filter {
     border-color: #bbb;
     border-right: 0;
 }
+.ht_clone_left {
+    z-index: 8;
+}
 </style>
