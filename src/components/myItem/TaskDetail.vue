@@ -34,6 +34,8 @@
                 <v-tooltip bottom>
                     <template v-slot:activator="{ on }">
                         <v-btn  
+                            icon
+                            tile
                             v-clipboard:copy="linkTask"  
                             v-clipboard:success="onCopySuccess" 
                             v-on="on" text small>
@@ -43,9 +45,25 @@
                     <span>Sao chép đường dẫn</span>
                 </v-tooltip>
 
+                
+                <v-tooltip bottom>
+                    <template v-slot:activator="{ on }">
+                        <v-btn  
+                            @click="showUpdateSubmitedDocument()"
+                            icon
+                            tile
+                            v-on="on" text small>
+                                <v-icon  small>mdi-pencil-circle-outline</v-icon>
+                        </v-btn>
+                    </template>
+                    <span>Sửa nội dung văn bản</span>
+                </v-tooltip>
+
+
+
                 <!-- <button @click="getTaskTest">Click</button> -->
 
-                <v-btn small text  @click="closeDetail">
+                <v-btn small tile icon text  @click="closeDetail">
                     <v-icon small>mdi-close</v-icon>
                 </v-btn>
 
@@ -68,7 +86,6 @@
                 </task>
             <!-- </VuePerfectScrollbar> -->
         </v-row>
-   
     </div>
 </template>
 
@@ -204,6 +221,9 @@ export default {
         this.checkAndSwitchToTab();
     },
     methods: {
+        showUpdateSubmitedDocument(){
+            this.$refs.task.showUpdateSubmitedDocument = true;
+        },
         changeUpdateAsignee(){
             this.$emit('changeUpdateAsignee');
         },

@@ -398,7 +398,6 @@ export default {
                 menuItem.push({titleGroup: name });
                 menuItem.push(...this.menu[type]);
             })
-
             this.menu = menuItem;
         },
         filterUser(item, queryText, itemText){

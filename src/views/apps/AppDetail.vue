@@ -55,8 +55,6 @@ import {appManagementApi} from './../../api/AppManagement.js'
 export default {
  data: function() {
         return {
-			
-			
 			currentSelected:null,
 			typeSelected:null,
 			objFilter:{

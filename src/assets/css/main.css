@@ -640,7 +640,7 @@ html {
 }
 
 .border-bottom-1 {
-    border-bottom: 1px solid rgb(224, 224, 224);
+    border-bottom: 1px solid rgb(224, 224, 224)!important;
 }
 
 .border-right-1 {
@@ -694,4 +694,8 @@ html {
 
 #symper-app .dialog-preview-image-comment {
     overflow: hidden
+}
+
+.v-btn--tile {
+    border-radius: 4px;
 }
