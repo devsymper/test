@@ -317,15 +317,7 @@ export default {
                         self.$emit('row-selected', self.data[row]);
                     }, time);
                 },
-                afterSelection: (row, column, row2, column2, preventScrolling, selectionLayerLevel) => {
-                    if(self.debounceEmitRowSelectEvt){
-                        clearTimeout(self.debounceEmitRowSelectEvt);
-                    }
-                    let time = self.debounceRowSelectTime;
-                    self.debounceEmitRowSelectEvt = setTimeout(() => {
-                        self.$emit('row-selected', self.data[row]);
-                    }, time);
-                },
+               
                 beforeContextMenuSetItems: () => {
                 },
                 beforeOnCellMouseOver: (event, coords, TD, controller) => {
