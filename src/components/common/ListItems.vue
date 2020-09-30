@@ -1616,6 +1616,9 @@ i.applied-filter {
     border-color: #bbb;
     border-right: 0;
 }
+.ht_clone_left {
+    z-index: 8;
+}
 .v-list-item {
     min-height:unset;
     height:30px;
@@ -1625,8 +1628,8 @@ i.applied-filter {
     margin-right:12px !important;
     min-height:unset;
 }
-.v-list-item i  {
-    margin-top:4px;
+.v-list-item i{
+    margin-top:-12px;
 }
 </style>
 
