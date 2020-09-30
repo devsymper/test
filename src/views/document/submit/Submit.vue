@@ -4,6 +4,7 @@
     'sym-sub-form-submit':(parrentInstance == 0) ? false : true
 
     }">
+    <VuePerfectScrollbar class="scroll-content h-100">
         <Preloader ref="preLoaderView"/>
         <div
             :key="keyInstance"
@@ -128,7 +129,14 @@
         :ref="'dataFlow'+dataFlow.id"/>
         <!-- v-for="dataFlow in listDataFlow" :key="dataFlow.id"  -->
         
-         <v-navigation-drawer
+         
+        <div class="sub-form-action" v-if="parrentInstance != 0">
+            <button @click="goToListDocument()" class=subfom-action__item>{{$t('document.submit.goToList')}}</button>
+            <button @click="handlerSubmitDocumentClick(true);" class=subfom-action__item><span class="mdi mdi-content-save-move-outline"></span>{{$t('document.submit.continueSubmit')}}</button>
+            <button @click="handlerSubmitDocumentClick" class=subfom-action__item><span class="mdi mdi-content-save-settings-outline"></span>{{$t('document.submit.fab.submit')}}</button>
+        </div>
+        </VuePerfectScrollbar>
+        <v-navigation-drawer
             v-if="parrentInstance == 0" 
             :width="(isShowTraceControlSidebar) ? 300 : 830"
             v-model="drawer"
@@ -150,11 +158,6 @@
             :listFormulasTrace="listFormulasTrace"
             ref="traceControlView" v-show="isShowTraceControlSidebar" />
         </v-navigation-drawer>
-        <div class="sub-form-action" v-if="parrentInstance != 0">
-            <button @click="goToListDocument()" class=subfom-action__item>{{$t('document.submit.goToList')}}</button>
-            <button @click="handlerSubmitDocumentClick(true);" class=subfom-action__item><span class="mdi mdi-content-save-move-outline"></span>{{$t('document.submit.continueSubmit')}}</button>
-            <button @click="handlerSubmitDocumentClick" class=subfom-action__item><span class="mdi mdi-content-save-settings-outline"></span>{{$t('document.submit.fab.submit')}}</button>
-        </div>
     </div>
      
 </template>
@@ -189,6 +192,7 @@ import EmbedDataflow from "@/components/dataflow/EmbedDataflow";
 // import Loader from './../../../components/common/Loader';
 import Preloader from './../../../components/common/Preloader';
 import {listControlNotNameProp} from "./../../../components/document/controlPropsFactory.js"
+import VuePerfectScrollbar from "vue-perfect-scrollbar";
 
 
 
@@ -278,6 +282,7 @@ export default {
         EmbedDataflow,
         Preloader,
         SidebarTraceFormulas,
+        VuePerfectScrollbar,
         VBoilerplate: {
             functional: true,
             render (h, { data, props, children }) {
@@ -1281,6 +1286,7 @@ export default {
                             tableControl.tableInstance = new Table(
                                 tableControl,
                                 controlName,
+                                id,
                                 thisCpn.keyInstance
                             );
                             let tableEle = $(allInputControl[index]);
@@ -2303,7 +2309,9 @@ export default {
 .wrap-content-submit{
     width: 100%;
     height: calc(100vh - 100px);
-    overflow-y: auto;
+    overflow: hidden;
+}
+.wrap-content-submit .scroll-content{
     overflow-x: hidden;
 }
 .wrap-content-submit .icon{

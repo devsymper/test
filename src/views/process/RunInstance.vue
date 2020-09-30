@@ -66,6 +66,7 @@ export default {
     },
     methods: {
         async getFirstNodeData(){
+            let self=this;
             let idDefinition = this.$route.params.id;
             
             let definitionModel = await BPMNEApi.getDefinitionModel(idDefinition);
@@ -78,6 +79,17 @@ export default {
                 try {
                     let instanceName = await this.getInstanceName([]);
                     let newProcessInstance = await runProcessDefinition(this, processDef, [], instanceName);
+                    let filter={};
+                    filter.processInstanceId=newProcessInstance.id;
+                    let dataTaskNew=await BPMNEApi.getTask(filter);
+                    if (dataTaskNew.total>0) {
+                        let arrTask=dataTaskNew.data;
+                        arrTask.forEach(task => {
+                            if (task.assignee==self.$store.state.app.endUserInfo.id) {
+                                self.$router.push("/myitem/tasks/"+task.id);
+                            }
+                        });
+                    }
                     this.$snotifySuccess("Workfow started successfully!");
                 } catch (error) {
                     this.$snotifyError(error ,"Error on run process definition ");

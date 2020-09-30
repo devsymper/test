@@ -148,7 +148,6 @@ Handsontable.cellTypes.registerCellType('file', {
 });
 let listKeyCodeNotChange = [18, 17, 9, 20, 27, 16, 192, 91, 37, 38, 39, 40]
 let listTableInstance = {}
-let columnHasSum = {}
 const MAX_TABLE_HEIGHT = 300;
 
 const makeDelay = function(ms) {
@@ -186,7 +185,7 @@ const supportCellsType = {
 /** Đánh dấu set cell value là tự động điền chứ ko phải do user thay đổi  */
 const AUTO_SET = 'auto_set';
 export default class Table {
-    constructor(control, tableName, keyInstance) {
+    constructor(control, tableName, controlId, keyInstance) {
             /**
              * Chứa object của Control tương ứng
              */
@@ -195,7 +194,12 @@ export default class Table {
              * Tên table tương ứng
              */
             this.tableName = tableName;
+            /**
+             * Biến lưu id element của control table
+             */
+            this.tableControlId = controlId
 
+            let thisObj = this;
 
             /**
              * Lưu tên cột tương ứng với số thứ tự của cột trong bảng
@@ -211,8 +215,14 @@ export default class Table {
              * }
              */
             this.validateValueMap = {};
+            /**
+             * Biến lưu lại các cột được tích tính tổng
+             */
+            this.columnHasSum = {}
 
-            let thisObj = this;
+            /**
+             * Biến đánh dấu table có dòng tính tổng hay không
+             */
             this.tableHasRowSum = false;
 
             /**Tổng số dòng trong table */
@@ -412,12 +422,16 @@ export default class Table {
                         this.alter('insert_row', cellMeta[0][0] + 1, 1);
                         thisObj.dataInsertRows.push([]);
                         delayTypingEnter(function(e) {
-                            let rowData = util.cloneDeep(sDocument.state.submit[thisObj.keyInstance]['listTableRootControl'][thisObj.tableName]['defaultRow']);
-                            for (let index = 0; index < thisObj.dataInsertRows.length; index++) {
-                                let newRowData = util.cloneDeep(rowData);
-                                newRowData[0][0] = cellMeta[0][0] + index + 1;
-                                thisObj.tableInstance.setDataAtRowProp(newRowData, null, null, 'auto_set');
+                            let listRootTable = sDocument.state.submit[thisObj.keyInstance]['listTableRootControl'];
+                            if (listRootTable.hasOwnProperty(thisObj.tableName)) {
+                                let rowData = util.cloneDeep(listRootTable[thisObj.tableName]['defaultRow']);
+                                for (let index = 0; index < thisObj.dataInsertRows.length; index++) {
+                                    let newRowData = util.cloneDeep(rowData);
+                                    newRowData[0][0] = cellMeta[0][0] + index + 1;
+                                    thisObj.tableInstance.setDataAtRowProp(newRowData, null, null, 'auto_set');
+                                }
                             }
+
                         });
                     } else if (e.key === 'Delete' && e.shiftKey == true) {
                         this.alter('remove_row', cellMeta[0][0], 1);
@@ -972,8 +986,9 @@ export default class Table {
             formulas: true,
             height: 'auto',
             afterRender: function(isForced) {
-                if (thisObj.tableHasRowSum)
-                    $('.handsontable span.rowHeader').last().text('Tổng').css({ 'font-weight': 'bold' })
+                if (thisObj.tableHasRowSum) {
+                    $('#' + thisObj.tableControlId + ' span.rowHeader').last().text('Tổng').css({ 'font-weight': 'bold' });
+                }
                 let tbHeight = this.container.getElementsByClassName('htCore')[0].getBoundingClientRect().height;
                 if (tbHeight < MAX_TABLE_HEIGHT) {} else {
                     $(this.rootElement).css('height', MAX_TABLE_HEIGHT);
@@ -992,6 +1007,7 @@ export default class Table {
                 if (!this.reRendered && thisObj.tableHasRowSum) {
                     this.reRendered = true;
                     setTimeout((hotTb) => {
+                        thisObj.setDataForSumRow();
                         for (let index = 0; index < hotTb.getDataAtRow(0).length; index++) {
                             hotTb.setCellMeta(hotTb.countRows() - 1, index, 'readOnly', true);
                         }
@@ -1011,13 +1027,7 @@ export default class Table {
                 let hotTb = this;
                 delay(function(e) {
                     if (thisObj.tableHasRowSum) {
-                        for (let controlName in columnHasSum) {
-                            let colIndex = thisObj.getColumnIndexFromControlName(controlName);
-                            let CharAt = String.fromCharCode(65 + columnHasSum[controlName]);
-                            let sumValue = '=SUM(' + CharAt + '1:' + CharAt + '' + (hotTb.countRows() - 1) + ')'
-                            hotTb.setDataAtCell(hotTb.countRows() - 1, colIndex, sumValue, AUTO_SET);
-
-                        }
+                        thisObj.setDataForSumRow()
                         for (let index = 0; index < hotTb.getDataAtRow(0).length; index++) {
                             hotTb.setCellMeta(hotTb.countRows() - 1, index, 'readOnly', true);
                             hotTb.setCellMeta(hotTb.countRows() - 2, index, 'readOnly', false);
@@ -1145,70 +1155,78 @@ export default class Table {
 
     // Hàm set data cho table
     setData(vls) {
-        if (vls != false) {
-            ClientSQLManager.delete(this.keyInstance, this.tableName, false)
-            let data = vls;
-            let controlBinding = Object.keys(data[0]);
-            let dataToStore = {};
-            for (let index = 0; index < data.length; index++) {
-                let rowId = Date.now() + index;
-                data[index]['s_table_id_sql_lite'] = rowId;
+            ClientSQLManager.delete(this.keyInstance, this.tableName, false);
+            if (vls != false) {
+                let data = vls;
+                let controlBinding = Object.keys(data[0]);
+                let dataToStore = {};
+                for (let index = 0; index < data.length; index++) {
+                    let rowId = Date.now() + index;
+                    data[index]['s_table_id_sql_lite'] = rowId;
 
-                let listKey = Object.keys(data[index]);
-                for (let j = 0; j < listKey.length; j++) {
-                    let controlName = listKey[j];
-                    if (controlName == 's_table_id_sql_lite') {
-                        continue;
+                    let listKey = Object.keys(data[index]);
+                    for (let j = 0; j < listKey.length; j++) {
+                        let controlName = listKey[j];
+                        if (controlName == 's_table_id_sql_lite') {
+                            continue;
+                        }
+                        if (!dataToStore.hasOwnProperty(controlName)) {
+                            dataToStore[controlName] = [];
+                        }
+                        if (data[index] != undefined)
+                            dataToStore[controlName].push(data[index][controlName]);
                     }
-                    if (!dataToStore.hasOwnProperty(controlName)) {
-                        dataToStore[controlName] = [];
-                    }
-                    if (data[index] != undefined)
-                        dataToStore[controlName].push(data[index][controlName]);
+
+                }
+                for (let controlName in dataToStore) {
+                    store.commit("document/updateListInputInDocument", {
+                        controlName: controlName,
+                        key: 'value',
+                        value: dataToStore[controlName],
+                        instance: this.keyInstance
+                    });
+                }
+                // nếu table có tính tổng thì thêm 1 dòng trống ở cuối
+                if (this.tableHasRowSum) {
+                    data.push({})
                 }
 
-            }
-            for (let controlName in dataToStore) {
-                store.commit("document/updateListInputInDocument", {
-                    controlName: controlName,
-                    key: 'value',
-                    value: dataToStore[controlName],
-                    instance: this.keyInstance
-                });
-            }
-            // nếu table có tính tổng thì thêm 1 dòng trống ở cuối
-            if (this.tableHasRowSum) {
-                data.push({})
-            }
-
-            this.tableInstance.updateSettings({
-                    data: data
-                })
-                // sau khi đổ dữ liệu vào table thì ko chạy các sự kiện của table nên cần chạy công thức cho các control liên quan sau khi đỏ dữ liệu
-            if (!this.checkDetailView())
-                setTimeout((thisObj) => {
-                    for (let index = 0; index < controlBinding.length; index++) {
-                        thisObj.handlerCheckEffectedControlInTable(controlBinding[index], 'all');
-                    }
-                    if (this.tableHasRowSum) {
-                        for (let controlName in columnHasSum) {
-                            let colIndex = thisObj.getColumnIndexFromControlName(controlName);
-                            let CharAt = String.fromCharCode(65 + columnHasSum[controlName]);
-                            let sumValue = '=SUM(' + CharAt + '1:' + CharAt + '' + (this.tableInstance.countRows() - 1) + ')'
-                            this.tableInstance.setDataAtCell(this.tableInstance.countRows() - 1, colIndex, sumValue, AUTO_SET);
+                this.tableInstance.updateSettings({
+                        data: data
+                    })
+                    // sau khi đổ dữ liệu vào table thì ko chạy các sự kiện của table nên cần chạy công thức cho các control liên quan sau khi đỏ dữ liệu
+                if (!this.checkDetailView())
+                    setTimeout((thisObj) => {
+                        for (let index = 0; index < controlBinding.length; index++) {
+                            thisObj.handlerCheckEffectedControlInTable(controlBinding[index], 'all');
                         }
-                    }
+                        thisObj.setDataForSumRow();
+                    }, 50, this);
+
+            } else {
+                let defaultRow = this.getDefaultData(false);
+                this.tableInstance.loadData(defaultRow);
+                setTimeout((thisObj) => {
+                    thisObj.setDataForSumRow();
                 }, 50, this);
-
-        } else {
-            let defaultRow = this.getDefaultData(false);
-            this.tableInstance.loadData(defaultRow);
+            }
         }
-    }
-
-    /**
-     * Kiểm tra xem đang ở view detail hay submit
-     */
+        /**
+         * Hàm đặt lại giá trị cho hàm tính tổng khi có thay đổi về giá trị cũng như số row của table
+         */
+    setDataForSumRow() {
+            if (this.tableHasRowSum) {
+                for (let controlName in this.columnHasSum) {
+                    let colIndex = this.getColumnIndexFromControlName(controlName);
+                    let CharAt = String.fromCharCode(65 + this.columnHasSum[controlName]);
+                    let sumValue = '=SUM(' + CharAt + '1:' + CharAt + '' + (this.tableInstance.countRows() - 1) + ')';
+                    this.tableInstance.setDataAtCell(this.tableInstance.countRows() - 1, colIndex, sumValue, AUTO_SET);
+                }
+            }
+        }
+        /**
+         * Kiểm tra xem đang ở view detail hay submit
+         */
     checkDetailView() {
         if (sDocument.state.viewType[this.keyInstance] == 'detail') {
             return true;
@@ -1291,7 +1309,7 @@ export default class Table {
                 (controlProp.isSumTable.value == 1 ||
                     controlProp.isSumTable.value === true ||
                     controlProp.isSumTable.value == "1")) {
-                columnHasSum[controlName] = num;
+                thisObj.columnHasSum[controlName] = num;
                 thisObj.tableHasRowSum = true;
             }
             num += 1;

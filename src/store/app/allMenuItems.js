@@ -1,6 +1,6 @@
 export default {
     my_application: {
-        title: 'My Application',
+        title: 'myApplication',
         icon: 'mdi-briefcase-edit-outline',
         link: "/my-applications",
         group: "My work",

@@ -206,31 +206,11 @@ export default {
                 }
             }
         },
-        formId(after){
-            this.contentPrintDocument = null
-            this.loadDocumentObject(this.isPrint);
-        },
         documentObjectId(after){
             this.contentPrintDocument = null
             this.docObjId = Number(after);
             this.loadDocumentObject(this.isPrint);
         },
-        documentId(after){
-            if(after){
-                let self = this;
-                documentApi.getPrintConfigActive(this.documentId).then(res => {
-                    if (res.status == 200) {
-                       self.printConfigActive = res.data
-                    }
-                    
-                })
-                .catch(err => {
-                
-                })
-                .always(() => {
-                });
-            }
-        }
     },
     methods: {
         afterHideSidebar(){
@@ -242,68 +222,57 @@ export default {
             this.contentMargin = margin;
         },
         // Khadm: load data của document lên để hiển thị và xử lý
-        loadDocumentStruct(documentId,isPrint = false) {
-            if(this.routeName == 'printDocument'){
-                isPrint = true;
-            }
-            let thisCpn = this;
-            let dataPost = {};
-            if(isPrint){
-                dataPost = {formId:this.formId};
-            }
-            documentApi
-                .detailDocument(documentId,dataPost)
-                .then(res => {
-                    if (res.status == 200) {
-                        let content = res.data.document.content;
-                        if(!isPrint){
-                            $('.content-print-document').addClass('d-none');
-                            $('.content-document').removeClass('d-none');
-                            thisCpn.contentDocument = content;
-                        }
-                        else{
-                            $('.content-print-document').removeClass('d-none');
-                            $('.content-document').addClass('d-none');
-                            thisCpn.contentPrintDocument = content;
-                        }
-                        try {
-                            thisCpn.documentSize = '21cm';
-                            contentPrintCss = {'margin':'auto'}
-                            thisCpn.formSize = JSON.parse(res.data.document.formSize);
-                            let contentPrintCss = {};
-                            if(thisCpn.formSize.type == 'A3'){
-                                thisCpn.documentSize = 'auto';
-                                contentPrintCss = {'transform':'scale(0.84)','transform-origin':'top left'};
-                            }
-                            else if(thisCpn.formSize.type == 'A5'){
-                                thisCpn.documentSize = 'auto';
-                                contentPrintCss = {'transform':'scale(0.84)','transform-origin':'top left','margin':'auto'}
-                            }
-                            Object.assign(thisCpn.formSize,contentPrintCss)
-
-                        } catch (error) {
-                            
-                        }
-                        thisCpn.$emit('after-load-document',res.data.document)
-                        setDataForPropsControl(res.data.fields, thisCpn.keyInstance,'detail'); // ddang chay bat dong bo
-                        setTimeout(() => {
-                            thisCpn.processHtml(content,isPrint);
-                        }, 100);
+        async loadDocumentStruct(documentId,isPrint = false) {
+            try {
+                if(this.routeName == 'printDocument'){
+                    isPrint = true;
+                }
+                let dataPost = {};
+                if(isPrint){
+                    dataPost = {formId:this.formId};
+                    if(this.formId == 0){
+                        dataPost.formId = 'active';
+                    }
+                }
+                let docDetailRes = await documentApi.detailDocument(documentId,dataPost);
+                if (docDetailRes.status == 200) {
+                    let content = docDetailRes.data.document.content;
+                    if(!isPrint){
+                        $('.content-print-document').addClass('d-none');
+                        $('.content-document').removeClass('d-none');
+                        this.contentDocument = content;
                     }
                     else{
-                        this.$snotify({
-                                type: "error",
-                                title: res.message,
-                            });
+                        $('.content-print-document').removeClass('d-none');
+                        $('.content-document').addClass('d-none');
+                        this.contentPrintDocument = content;
                     }
-                })
-                .catch(err => {
-                     this.$snotify({
-                                type: "error",
-                                title: "Can not load document struct",
-                            });
-                })
-                .always(() => {});
+                    this.documentSize = '21cm';
+                    let contentPrintCss = {};
+                    contentPrintCss = {'margin':'auto'}
+                    this.formSize = JSON.parse(docDetailRes.data.document.formSize);
+                    if(this.formSize){
+                        this.documentSize = 'auto';
+                        if(this.formSize.type == 'A3'){
+                            contentPrintCss = {'transform':'scale(0.84)','transform-origin':'top left'};
+                        }
+                        else if(this.formSize.type == 'A5'){
+                            contentPrintCss = {'transform':'scale(0.84)','transform-origin':'top left','margin':'auto'}
+                        }
+                        Object.assign(this.formSize,contentPrintCss);
+                    }
+                    setDataForPropsControl(docDetailRes.data.fields, this.keyInstance,'detail'); // ddang chay bat dong bo
+                    setTimeout((self) => {
+                        self.processHtml(content,isPrint); 
+                    }, 100,this);
+                        
+                }
+                this.$emit('after-load-document',docDetailRes.data.document);
+
+            } catch (error) {
+                
+            }
+
         },
         async loadDocumentObject(isPrint=false) {
             this.contentDocument = ""
@@ -442,6 +411,7 @@ export default {
                             tableControl.tableInstance = new Table(
                                 tableControl,
                                 controlName,
+                                id,
                                 thisCpn.keyInstance
                             );
                             tableControl.tablePrint = new TablePrint(
