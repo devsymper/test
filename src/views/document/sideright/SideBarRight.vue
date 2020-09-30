@@ -127,7 +127,6 @@ export default {
     },
     watch:{
         "controlPropsGroup.table.mapParamsDataflow.value":function(after){
-            // debugger    
         },
         /**
          * Tự động focus vào input name sau khi chọn control
