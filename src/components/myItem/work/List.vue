@@ -320,7 +320,7 @@ export default {
         sort: "createTime",
         order: "desc",
         page: 1,
-        assignee: this.$store.state.app.endUserInfo.id
+        involvedUser: this.$store.state.app.endUserInfo.id
       },
       defaultAvatar: appConfigs.defaultAvatar,
       listIdProcessInstance:[],
@@ -444,7 +444,7 @@ export default {
             if (!filter.assignee) {
             filter.assignee = this.$store.state.app.endUserInfo.id;
             }
-            res = await BPMNEngine.getTask(filter);
+            res = await BPMNEngine.postTaskHistory(filter);
             listTasks = res.data;
         }
         this.totalTask = Number(res.total);
