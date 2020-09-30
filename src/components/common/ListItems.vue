@@ -384,7 +384,6 @@ export default {
                         self.$emit('row-selected', self.data[row]);
                     }, time);
                 },
-               
                 beforeContextMenuSetItems: () => {
                 },
                 beforeOnCellMouseOver: (event, coords, TD, controller) => {

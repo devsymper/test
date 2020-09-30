@@ -68,16 +68,16 @@ export default {
         icon: "mdi-sticker-check-outline",
         group: "My work",
         children: {
-            tasks: {
-                title: "tasks",
-                icon: "mdi-check-all",
-                link: "/tasks"
-            },
-            works: {
-                title: "works",
-                icon: "mdi-briefcase-check-outline",
-                link: "/works"
-            },
+            // tasks: {
+            //     title: "tasks",
+            //     icon: "mdi-check-all",
+            //     link: "/tasks"
+            // },
+            // works: {
+            //     title: "works",
+            //     icon: "mdi-briefcase-check-outline",
+            //     link: "/works"
+            // },
             myItem: {
                 title: "myItem",
                 icon: "mdi-format-list-checkbox",

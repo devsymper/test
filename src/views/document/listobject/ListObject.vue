@@ -10,6 +10,7 @@
         :containerHeight="containerHeight"
         :actionPanelWidth="actionPanelWidth"
         :actionPanelType="'elastic'"
+        :showActionPanelInDisplayConfig="true"
         @after-open-add-panel="submitDocument"
         @data-get="afterGetData"
         @before-keydown="afterRowSelected"
