@@ -188,7 +188,7 @@ export default {
             this.$set(this.apps[idApp].childrenAppReduce,type,obj)
             // this.apps[idApp].childrenAppReduce[type] = obj
             console.log(this.apps[idApp].childrenAppReduce,'this.apps[idApp].childrenAppReduce');
-            debugger
+            
         },
         updateFavoriteItem(mapArray,array){
 			for( let [key,value] of Object.entries(mapArray)){
@@ -250,7 +250,7 @@ export default {
 				pageSize:50,
 				ids: ids
 			}).then(res=>{
-                debugger
+                
 				if(type == 'orgchart'){
                     this.updateFavoriteItem(self.mapId.orgchart,res.data)
                     this.updateChidrenItem('orgchart',res.data,idApp)
@@ -336,7 +336,7 @@ export default {
         searchItemKey(val){
             console.log(val);
 
-            debugger    
+                
         }
     }
 }

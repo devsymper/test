@@ -1,6 +1,6 @@
 <template>
-<div style="width:100%;" class= "mb-10 d-flex justify-start "  >
-    <v-col cols="md-2 sm-2 lg-2" style="border-right:1px solid rgba(0,0,0,0.1); height:100%!important">
+<div class= "w-100 mb-10 d-flex justify-start"  >
+    <v-col cols="md-2 sm-2 lg-2 h-100" style="border-right:1px solid rgba(0,0,0,0.1)">
     <v-list-item-group >
         <v-list-item-content>
             <v-list-item-title class="fs-15 ml-5 fm">
@@ -10,11 +10,11 @@
         <v-list dense>
             <v-list-item v-for="(item,menuIdx) in menu" :key="menuIdx">
                 <v-list-item-icon>
-                    <v-icon     v-bind:class="getIcon(item)=='mdi mdi-alpha-f'?'fs-30 ml-1': 'fs-16 ml-2'" 
-                   >{{getIcon(item)}}</v-icon>
+                    <v-icon v-bind:class="$i('input.'+item)=='mdi mdi-alpha-f'?'fs-30 ml-1': 'fs-16 ml-2'" 
+                   > {{item!="Tất cả"?$i('input.'+item):"mdi-all-inclusive"}}</v-icon>
                 </v-list-item-icon>
                 <v-list-item-content style="margin-left:-20px" @click="detailView(item)">
-                    <v-list-item-title >{{formatGroupName(item)}}</v-list-item-title>
+                    <v-list-item-title > {{item!="Tất cả"?$t('objects.'+item):"Tất cả"}}  </v-list-item-title>
                 </v-list-item-content>
             </v-list-item>
         </v-list>
@@ -41,7 +41,7 @@
                 <v-row v-if="item.group" style="magrin-left:2px" class="ml-2 mt-1 mr-2">
                     <v-list-item class=" mr-3 pl-1 " >
                         <v-list-item-content class="ml-1"  >
-                            <v-list-item-title class="item-header">{{formatGroupName(item.group)}}</v-list-item-title>
+                            <v-list-item-title class="item-header">{{$t('objects.'+item.group)}}</v-list-item-title>
                         </v-list-item-content>
                         <v-list-item-action class="mr-2">
                             <button @click="detailView(item.group)" class="fs-11 color-blue fm">Xem tất cả</button>
@@ -54,9 +54,9 @@
                         @mousemove="showDotButton(generalOthersIdx)" 
                     class="mt-2 mr-2 mb-1" style="margin-left:2px">
                     <!-- không gồm công thức -->
-                    <v-list-item class="ml-2 mr-3" v-if="item.type != 'syql'">
+                    <v-list-item class="ml-2 mr-3">
                         <v-list-item-content class="ml-2">
-                            <v-list-item-title style="margin-left: 0.5rem" class="item-title fs-13 mb-2">{{formatName(item.displayName,230)}}
+                            <v-list-item-title style="margin-left: 0.5rem" class="item-title fs-13 mb-2 ellipsis">{{item.displayName}}
                             </v-list-item-title>
                             <v-list-item-subtitle style="margin-left: 0.5rem" class="fs-12 sub-title">{{item.description}}
                             </v-list-item-subtitle>
@@ -77,7 +77,7 @@
                                             class="fm fs-13 mt-1 action-button ml-4 mr-6" 
                                             @click="gotoPage(itemsAction,item.type,item.id,item.displayName)"
                                             :key="itemActionIdx">
-                                            <span class="ml-2">{{formatAction(itemsAction)}}</span>
+                                            <span class="ml-2">{{$t('objects.listAction.'+itemsAction)}}</span>
                                         </v-list-item-title>
                                     </v-row>
                                 </v-list>
@@ -85,41 +85,11 @@
                         </v-list-item-action>
                     </v-list-item>
                     <!-- gồm công thức -->
-                     <v-list-item v-else class="ml-2 mr-3">
-                        <v-list-item-content class="ml-2">
-                            <v-list-item-title style="margin-left: 0.5rem" class="item-title fs-13 mb-2">Nguồn: {{item.objectType}} - Tên:{{item.nameSql}}
-                            </v-list-item-title>
-                            <v-list-item-subtitle style="margin-left: 0.5rem" class="fs-12 sub-title">{{formatName(item.displayName,230)}}
-                            </v-list-item-subtitle>
-                        </v-list-item-content>
-                        <v-list-item-action v-show="item.enable&&item.actions.length>0" >
-                            <v-menu  max-height="180" max-width="120" offset-y 
-                                style="background-color:white" nudge-left="100">
-                                <template v-slot:activator="{ on }">
-                                    <button v-on="on">
-                                        <i style="height:20px!important;width:20px!important" 
-                                        class="dot mdi mdi-dots-horizontal"></i>
-                                    </button>
-                                </template>
-                                <v-list>
-                                    <v-row>
-                                        <v-list-item-title 
-                                            v-for="(itemsAction, itemActionIdx) in item.actions"
-                                            class="fm fs-13 mt-1 action-button ml-4 mr-6" 
-                                            @click="gotoPage(itemsAction,item.type,item.id,item.displayName)"
-                                            :key="itemActionIdx">
-                                            <span class="ml-2">{{formatAction(itemsAction)}}</span>
-                                        </v-list-item-title>
-                                    </v-row>
-                                </v-list>
-                            </v-menu>
-                        </v-list-item-action>
-                    </v-list-item>
+                     
                 </v-row>
             </v-row>
         </div>
         <!-- danh sách kết quả màn hình chung- nhân viên    -->
-        
         <div v-if="showGeneral"  >
             <v-row  
                 v-for="(item, itemIndex) in newSearch.filter(x => x.group == 'user' )"  
@@ -128,16 +98,18 @@
                 <v-row v-if="item.group"  style="magrin-left:2px" class="ml-2 mt-2 mr-2 mb-1">
                     <v-list-item class="pl-1 mr-3">
                         <v-list-item-content class="ml-1">
-                            <v-list-item-title  class="item-header">{{formatGroupName(item.group)}}</v-list-item-title>
+                            <v-list-item-title  class="item-header">{{$t('objects.'+item.group)}}</v-list-item-title>
                         </v-list-item-content>
                         <v-list-item-action class="" >
-                            <button @click="detailView(item.group)" style="margin-right:-9px" class="fs-11 color-blue fm ">Xem tất cả</button>
+                            <button 
+                                @click="detailView(item.group)" 
+                                style="margin-right:-9px" 
+                                class="fs-11 color-blue fm ">Xem tất cả</button>
                         </v-list-item-action>
                     </v-list-item>
                 </v-row>
             </v-row>
         </div>
-        
         <v-row  v-if="showGeneral" >
             <!-- kết thúc danh sách tìm  -->
             <v-sheet max-width="93%">
@@ -178,7 +150,7 @@
                 <v-row v-if="item.group" style="magrin-left:2px" class="ml-2 mr-2">
                     <v-list-item class="pl-1 mr-3"> 
                         <v-list-item-content class="ml-1">
-                            <v-list-item-title class="item-header">{{formatGroupName(item.group)}}</v-list-item-title>
+                            <v-list-item-title class="item-header">{{$t('objects.'+item.group)}}</v-list-item-title>
                         </v-list-item-content>
                         <v-list-item-action>
                             <button @click="detailView(item.group)" style="margin-right:-9px" class="fs-11 color-blue fm">Xem tất cả</button>
@@ -212,7 +184,6 @@
         <!-- danh sách tìm kiếm chi tiết -->
         <!-- kết thúc tìm kiếm chi tiết -->
         <!-- trang dành cho user -->
-
         <div v-if="showDetail && type != 'application_definition' && type!='user'">
             <v-row  v-for="(item,ind) in newSearchAll.filter(x => x.type== type )" :key="ind" >
                 <v-row v-if="item.type!='syql'"
@@ -222,7 +193,7 @@
                     <!-- danh sách tìm thấy không bao gồm user -->
                     <v-list-item>
                         <v-list-item-content>
-                            <v-list-item-title style="margin-left: 0.5rem" class="item-title fs-13 mb-2">{{formatName(item.displayName,230)}}
+                            <v-list-item-title style="margin-left: 0.5rem" class="item-title fs-13 mb-2 ellipsis">{{item.displayName}}
                             </v-list-item-title>
                             <v-list-item-subtitle style="margin-left: 0.5rem" class="fs-12 sub-title">{{item.description}}
                             </v-list-item-subtitle>
@@ -245,7 +216,7 @@
                                             :key="itemsActionIdx"
                                             @click="gotoPage(itemsAction,item.type,item.id,item.displayName)"
                                             class="fm fs-13 ml-6 action-button" style="width:50px!important" >
-                                                {{formatAction(itemsAction)}}
+                                                 {{$t('objects.listAction.'+itemsAction)}}
                                         </v-list-item-title>
                                     </v-row>
                                 </v-list>
@@ -262,13 +233,13 @@
                         <v-list-item-content>
                             <v-list-item-title style="margin-left: 0.5rem" class="item-title fs-13 mb-2">Nguồn: {{item.objectType}} - Tên: {{item.nameSql}}
                             </v-list-item-title>
-                            <v-list-item-subtitle style="margin-left: 0.5rem" class="fs-12 sub-title">{{formatName(item.displayName,230)}}
+                            <v-list-item-subtitle style="margin-left: 0.5rem" class="fs-12 sub-title ellipsis">{{item.displayName}}
                             </v-list-item-subtitle>
                         </v-list-item-content>
                         <v-list-item-action v-show="item.enable&&item.actions.length>0" >
                             <v-menu offset-y transition="scale-transition" 
                                 nudge-left="100"
-                                max-height="180" max-width="120"
+                                max-height="180" max-width="180"
                                 style="width:50px!important; margin-bottom:40px">
                                 <template v-slot:activator="{ on }">
                                     <button v-on="on">
@@ -283,7 +254,7 @@
                                             :key="itemsActionIdx"
                                             @click="gotoPage(itemsAction,item.type,item.id,item.displayName)"
                                             class="fm fs-13 ml-6 action-button" style="width:50px!important" >
-                                                {{formatAction(itemsAction)}}
+                                                {{$t('objects.listAction.'+itemsAction)}}
                                         </v-list-item-title>
                                     </v-row>
                                 </v-list>
@@ -293,15 +264,13 @@
                 </v-row>
             </v-row>
         </div>
-
-
         <v-row  v-if="showDetail&&type=='user'" class="d-flex mb-3" >
             <v-col 
                 cols="12" 
                 md="4" 
                 v-for="(item, newSearchAllIdx) in newSearchAll.filter(x => x.type== 'user' )"
                 :key="newSearchAllIdx">
-                <div class="d-flex justify-start mr-3 " style="width: 100%!important; border:1px solid rgba(0,0,0,0.2">
+                <div class="d-flex justify-start mr-3 w-100" style="border:1px solid rgba(0,0,0,0.2">
                     <SymperAvatar class="mt-2 mr-2 ml-2" v-if="item.type === 'user'" style ="height: 40px!important; width: 40px!important; min-width:40px" :userId="item.userId"/>
                     <v-list-item-content>
                         <v-list-item-title style="margin-left: 0.5" class="item-title fs-13 fm" v-html="item.displayName">
@@ -314,8 +283,6 @@
                 </div>
             </v-col>
         </v-row>
-
-
         <v-row  v-if="showDetail&&type=='application_definition'">
             <v-col 
                 cols="12" 
@@ -369,81 +336,6 @@ export default {
         }
     },
     methods: {
-        formatAction(value){
-            if(value== 'create'){
-                return "thêm";
-            }else if (value == 'edit'){
-                return "sửa"
-            }else if (value == 'submit'){
-                return "submit"
-            }else if (value == 'list'){
-                return "danh sách"
-             }else if (value == 'list_trash'){
-                return "danh sách nháp"
-             }else if (value == 'list_instance'){
-                return "list instance"
-            }else{
-                return value;
-            }
-        },
-        getIcon(value){
-             let icon = 'mdi-star-outline';
-            if (value == 'document_instance') {
-                icon = 'mdi mdi-file-document-outline';
-            } else if (value == 'user') {
-                icon = 'mdi-account-multiple-outline';
-            } else if (value == 'Tất cả') {
-                icon = 'mdi-all-inclusive';
-            } else if (value == 'document_definition') {
-                 icon = 'mdi mdi-file-outline';
-            } else if (value == 'workflow_definition') {
-                icon = 'mdi mdi-lan';
-            } else if (value == 'orgchart') {
-                 icon = 'mdi mdi-sitemap';
-            } else if (value == 'process_definition') {
-                 icon = 'mdi mdi-sitemap';          
-            } else if (value == 'application_definition') {
-                 icon = 'mdi mdi-apps';         
-            } else if (value == 'syql') {
-                 icon = 'mdi mdi-alpha-f';          
-            } else if (value == 'dataflow') {
-                 icon = 'mdi mdi-arrange-send-to-back';          
-            } else {
-                 icon = 'mdi mdi-sitemap';     }
-            return icon
-
-        },
-        formatGroupName(value) {
-            let name = '';
-            if (value == 'document_instance') {
-                name = 'Bản ghi dữ liệu';
-            } else if (value == 'user') {
-                name = 'Nhân viên'
-            } else if (value == 'document_definition') {
-                name = 'Loại văn bản'
-            } else if (value == 'workflow_definition') {
-                name = 'Workflow'
-            } else if (value == 'orgchart') {
-                name = 'Sơ đồ tổ chức'
-            } else if (value == 'process_definition') {
-                name = 'Quy trình'
-            } else if (value == 'application_definition') {
-                name = 'Ứng dụng'
-            } else if (value == 'syql') {
-                name = 'Công thức'
-            } else if (value == 'dataflow') {
-                name = 'Data flow'
-             }else if(value == 'file'){
-                name =  'Tệp'
-            }else if(value == 'knowledge'){
-                name =  'Knowledge'
-            }else if(value == 'comment'){
-                name =  'Bình luận'
-            } else {
-                name = value;
-            }
-            return name
-        },
         showDotButton(id) {
             this.newSearch[id].enable = true;
         },
@@ -451,15 +343,12 @@ export default {
             this.newSearch[id].enable = false;
         },
         showDotButtonAll(id,type) {
-          //  debugger
             this.newSearchAll.filter(x => x.type== type )[id].enable = true;
         },
         hideDotButtonAll(id,type) {
-          //  debugger
             this.newSearchAll.filter(x => x.type== type )[id].enable = false;
         },
         setMenu(){
-          //  debugger
             let menu = ['Tất cả'];
             for (let i = 0; i < this.newSearch.length; i++) {
                 // console.log(this.newSearch[i].group);
@@ -477,25 +366,19 @@ export default {
              this.$store.commit('search/setShowGeneral', false);
             this.showDetail = true;
             this.type = type;
-            this.nameResult = this.formatGroupName(type);
+            this.nameResult = this.$t('objects.'+type);
             this.$store.commit('search/setCountResult', this.newSearchAll.filter(x => x.type== type ).length);
            // debugger
             if(type=='user'){this.checkUser==true};
             this.$store.commit('search/setType', type);}
            // this.$router.push('/search/detail');
         },
-         formatName(name,number){
-            if(name.length>number){
-                return name.slice(0,number)+"...";
-            }
-            else{
-                return name
-            }
-        },
          gotoPage(action, type,id, name) {
             this.defineAction[type].action = action;
             //console.log(this.defineAction[type]);
+
             this.$evtBus.$emit('symper-app-call-action-handler', this.defineAction[type], this, {id:id,name:name, title:name});
+            debugger
         },
     },
     watch: {
@@ -632,6 +515,11 @@ export default {
     margin-top:15px;
      z-index:1!important; position: absolute!important;
     min-width: -1px!important;
+}
+.ellipsis {
+ white-space: nowrap;
+ text-overflow: ellipsis;
+ overflow: hidden;
 }
 </style>
 <style >
