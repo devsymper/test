@@ -56,7 +56,7 @@ export default {
 </script>
 
 <style>
-.symper-dashboard-item . .v-window__container{
+.symper-dashboard-item .v-window__container{
     height: 100%!important;
 }
 </style>

@@ -14,6 +14,11 @@
                 <span>Table view</span>
             </v-tab>
             <v-tab 
+                :key="'tableSideBySideView'" >
+                <v-icon size="17">mdi-home</v-icon>
+                <span>People view</span>
+            </v-tab>
+            <v-tab 
                 :key="'diagramView'" >
                 <v-icon size="17">mdi-home</v-icon>
                 <span>Diagram view</span>
@@ -37,16 +42,54 @@
                     </AgDataTable>
                 </div>
             </v-tab-item>
-
-
+              <v-tab-item :key="'tableSideBySideView'" class="px-2 pt-2 h-100">
+                <div class="h-100 symper-orgchart-table-side-by-side-view">
+                    <!-- <TableSideBySildeView /> -->
+                        <VueResizable :width="500" :max-width="600" :min-width="300" :active ="['r']">
+                           <div style="display:flex;flex-direction:column" class="h-100 w-100">
+                               <div style="height:50px;display:flex;align-items:center">
+                                     <h2 style="font:17px roboto ;font-weight:500" >Sơ đồ tổ chức</h2>
+                               </div>
+                                <AgDataTable
+                                    :tableHeight="'calc(100% - 100px)'"
+                                    :likeHandsonTable="true"
+                                    :rowData="dataTable"
+                                    :editable="false"
+                                    :customComponents="customAgComponents"  
+                                    @on-cell-dbl-click="onCellDblClick"
+                                    :minWidth="500"
+                                    :cellRendererParams="{
+                                        innerRenderer:'nodeName',
+                                        suppressDoubleClickExpand: true,
+                                    }">
+                                </AgDataTable>
+                           </div>
+                        </VueResizable>
+                       <ListItems 
+                             ref="listUser"
+                            :pageTitle="'Danh sách người dùng'"
+                            :getDataUrl="apiUrl"
+                            :containerHeight="containerHeight"
+                            :tableContextMenu="tableContextMenu"
+                            :useDefaultContext="false"
+                            :useActionPanel="true"
+                            :actionPanelWidth="850"
+                            :headerPrefixKeypath="'user.table'"
+                            :customAPIResult="customAPIResult"
+                            :showButtonAdd="false"
+                            :showExportButton="false"
+                            :showImportButton="false"
+                            :showActionPanelInDisplayConfig="true"
+                        >
+                            <template slot="right-panel-content" slot-scope="{}">  
+                                <Detail :quickView="true" :docObjInfo="docObjInfo" />
+                            </template>
+                       </ListItems>  
+                        
+                </div>
+            </v-tab-item>
             <v-tab-item :key="'diagramView'" class="px-2 pt-2 h-100">
-                <!-- <OrgStructureView
-                ref="orgStructureView"
-                :mapDpmToPos="mapDpmToPos"
-                :allDepartments="allDepartments"
-                :allPositions="allPositions">
-                    
-                </OrgStructureView> -->
+               
                 <OrgchartEditor
                     :action="'view'"
                     :id="$route.params.id">
@@ -65,7 +108,11 @@ import NodeNameInTable  from "./NodeNameInTable.vue";
 import UserInNodeView  from "./UserInNodeView.vue";
 import OrgStructureView from './OrgStructureView.vue';
 import OrgchartEditor from "@/components/orgchart/editor/OrgchartEditor.vue";
-
+import TableSideBySildeView from './TableSideBySildeView.vue'
+import ListItems from '@/components/common/ListItems.vue'
+import VueResizable from 'vue-resizable';
+import { util } from "./../../../plugins/util.js";
+import Detail from '@/views/document/detail/Detail.vue'
 export default {
     props: {
         allDepartments: {
@@ -83,9 +130,19 @@ export default {
     components: {
         'AgDataTable' : AgDataTable,
         'OrgStructureView': OrgStructureView,
-        OrgchartEditor
+        OrgchartEditor,
+        TableSideBySildeView,
+        ListItems,
+        VueResizable,
+        Detail
+    },
+    mounted(){
+        this.containerHeight = util.getComponentSize(this).h - 50
     },
     computed: {
+        allUserInOrgchart(){
+             return  this.$store.state.orgchart.allUserInOrgChart[this.$route.params.id]
+        },    
         dataTable(){
             let data = [];
             if(this.allDepartments == null){
@@ -114,6 +171,7 @@ export default {
                 let dpm = mapDepartments[dpmId];
                 let row = {
                     name: dpm.path,
+                    vizId: dpm.vizId,
                     code: dpm.code,
                     managers: typeof dpm.users == 'string' ? JSON.parse(dpm.users) : dpm.users,
                     users: [],
@@ -130,7 +188,7 @@ export default {
                     let pos = mapPos[posId];
                     let row = {
                         name: dpm.path.concat(pos.path),
-                        // name: dpm.path.concat(['Positions']).concat(pos.path),
+                        vizId: pos.vizId,
                         code: pos.code,
                         users: typeof pos.users == 'string' ? JSON.parse(pos.users) : pos.users,
                         managers: [],
@@ -238,9 +296,6 @@ export default {
             this.mapNameToDynamicAttr = null;
             this.mapNameToDynamicAttr = mapNameToDynamicAttr;
 
-            // for(let key in mapNameToDynamicAttr){
-            //     this.$set(this.mapNameToDynamicAttr, key, mapNameToDynamicAttr[key]);
-            // }
         },
         getPathOfNode(node, mapNode){
             if(!node){
@@ -255,17 +310,85 @@ export default {
                     return this.getPathOfNode(mapNode[node.vizParentId], mapNode).concat([node.name]);
                 }
             }
+        },
+        onCellDblClick(params){
+            params.data.orgchartId =  this.$route.params.id;
+            this.$store.commit('orgchart/emptyListChildrenNode',this.$route.params.id)
+            this.$store.dispatch('orgchart/updateUserInNode',params.data)
+            this.listUserInNode = this.$store.getters['orgchart/listUserInChildrenNode'](this.$route.params.id);
+            this.$store.commit('orgchart/setAllUserInOrgchart',{
+                orgchartId:  this.$route.params.id,
+                listUsers: this.listUserInNode
+            })
         }
     },
     data(){
+        let self = this
         return {
             currentTab: 1,
             customAgComponents: {
                 nodeName: NodeNameInTable,
                 UserInNodeView: UserInNodeView,
             },
+            columnTree:{
+                "headerName": this.$t('common.code'),
+                "field": "code",
+                "width": 300,
+                "colId": "code"
+           },
+            showNavigation:false,
+            listUserInNode:[],
+            docObjInfo:{},
+            apiUrl: '',
             mapNameToDynamicAttr: null,
-            mapDpmToPos: null
+            mapDpmToPos: null,
+            customAPIResult:{
+                reformatData(res){
+                  
+                   return{
+                       columns:[
+                            {name: "id", title: "id", type: "numeric"},
+                            {name: "firstName", title: "firstName", type: "text"},
+                            {name: "displayName", title: "displayName", type: "text"},
+                            {name: "email", title: "email", type: "text"},
+                            {name: "phone", title: "phone", type: "text"},
+                            {name: "createAt", title: "createAt", type: "text"},
+                            {name: "updateAt", title: "updateAt", type: "text"},
+                       ],
+                       listObject:res.data.listObject
+                         
+
+                   }
+                }
+            },
+            containerHeight:null,
+            tableContextMenu: {
+               viewDetails: {
+                    name: "View details",
+                    text: "Xem chi tiết",
+                    callback: (app, callback) => {
+                    this.docObjInfo = {docObjId:3986681,docSize:'21cm'}
+                       self.$refs.listUser.actionPanel = true;
+                       this.$emit('view-details',app)
+                    },
+                },
+             
+            },
+        }
+    },
+    watch:{
+        allUserInOrgchart:{
+            deep: true,
+            immediate: true,
+            handler: function(after){
+                if (typeof after !== 'undefined'){
+                    if(after.length == 0){
+                        after = 131237173123717323713277
+                    }
+                    this.apiUrl = 'https://account.symper.vn/users?limitIds=['+after+']'
+                }
+               
+            }
         }
     }
 }
@@ -275,6 +398,9 @@ export default {
 .symper-orgchart-table-view .ag-group-child-count{
     position: absolute;
     right: 5px;
+}
+.symper-orgchart-table-side-by-side-view{
+    display:flex
 }
 </style>
 

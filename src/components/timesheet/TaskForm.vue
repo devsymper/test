@@ -211,7 +211,6 @@ export default {
                 })
                 .then(res => {
                     if (res.status === 200) {
-                        debugger
                         self.$emit('loadTask');
                          self.cancel();
 

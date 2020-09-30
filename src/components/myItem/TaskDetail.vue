@@ -62,6 +62,7 @@
                     :originData="originData"
                     :tabsData="tabsData['people']"
                     @changeUpdateAsignee="changeUpdateAsignee"
+                    :definitionName="breadcrumb.definitionName"
                     :ref="`task`"
                   >
                 </task>
@@ -233,7 +234,7 @@ export default {
         changeTaskDetailInfo(taskId){
             let hostname=window.location.hostname;
             let copyText = this.taskInfo.action.parameter.taskId;
-            copyText='https://'+hostname+'/#/tasks/'+copyText;
+            copyText='https://'+hostname+'/#/myitem/tasks/'+copyText;
             this.linkTask=copyText;
 
             if(!taskId){
@@ -246,7 +247,11 @@ export default {
                 for(let role in self.tabsData.people){
                     if(res[role]){
                         self.tabsData.people[role] = res[role].split(',').reduce((arr, el) => {
-                            arr.push(self.usersMap[el]);
+                            if(self.usersMap[el]){
+                                arr.push(self.usersMap[el]);
+                            }else{
+                                console.warn('user id not found : ', el);
+                            }
                             return arr;
                         }, []);
                     }
@@ -440,23 +445,24 @@ export default {
 
         // lấy data mới dựa theo data của task
         async changeTaskDetail(){
-            if(!this.taskInfo.action){
+            let self=this;
+            if(!self.taskInfo.action){
                 return
             }
             let varsMap = {};
-            this.taskAction = this.taskInfo.action.action;
-            if(this.taskAction == 'approval'){
-                this.showApprovalOutcomes(JSON.parse(this.taskInfo.approvalActions));
-            }else if(this.taskAction == 'submit'){
-                this.taskActionBtns = [
+            self.taskAction = self.taskInfo.action.action;
+            if(self.taskAction == 'approval'){
+                self.showApprovalOutcomes(JSON.parse(self.taskInfo.approvalActions));
+            }else if(self.taskAction == 'submit'){
+                self.taskActionBtns = [
                     {
                     text:"Submit",
                     value:"submit",
                     color:"blue"
                     }
                 ]
-            }else if(this.taskAction == 'undefined'){
-                this.taskActionBtns = [
+            }else if(self.taskAction == 'undefined'){
+                self.taskActionBtns = [
                     {
                         text:"Complete",
                         value:"complete",
@@ -464,7 +470,7 @@ export default {
                     }
                 ]
             }
-            this.changeTaskDetailInfo(this.taskInfo.action.parameter.taskId);
+            self.changeTaskDetailInfo(self.taskInfo.action.parameter.taskId);
         }
     }
 }

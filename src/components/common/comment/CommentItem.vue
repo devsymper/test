@@ -63,7 +63,6 @@
 				</div>
 			</div>
 		</div>
-		<!-- <DialogDelete :showDialog="showDialog" @confirm-delete="deleteComment" /> -->
 		<SymperDialogConfirm 
 			:showDialog="showDialog"
 			:title="'Xóa bình luận'"
@@ -133,18 +132,31 @@ export default {
 	created(){
 	},
 	mounted(){
-		if(this.item.attachments.length > 0){
-			let thisCpn = this
-			fileManagementApi.getFileByList(this.item.attachments).then(res => {
-				res.data.forEach(function(e){
-					if(e.type == "png" || e.type == "jpg" || e.type == "jpeg"){
-						thisCpn.images.push(e)
-					}
-					else{
-						thisCpn.files.push(e)
-					}
-				})
-			});
+		
+	},
+	watch:{
+		item:{
+			deep: true,
+			immediate: true,
+			handler(newValue){
+					let thisCpn = this
+					thisCpn.files = []
+					thisCpn.images = []
+				debugger
+				if(newValue.attachments.length > 0){
+					fileManagementApi.getFileByList(newValue.attachments).then(res => {
+						res.data.forEach(function(e){
+							if(e.type == "png" || e.type == "jpg" || e.type == "jpeg"){
+								thisCpn.images.push(e)
+							}
+							else{
+								thisCpn.files.push(e)
+							}
+						})
+					});
+				}
+					
+			}
 		}
 	},
 	methods:{
@@ -158,6 +170,8 @@ export default {
 		},
 		deleteComment(){
 			this.showDialog = false
+			this.images = []
+			this.files = []
 			commentApi.deleteComment(this.itemDeleting.id).then(res => {
 				if(this.sComment.uuid == "0"){
 					this.getCommentId()
@@ -192,25 +206,29 @@ export default {
 			return moment(date).fromNow();
 		},
 		resolveComment(item){
+			this.images = []
+			this.files = []
 			commentApi.changeStatus(item.id).then(res => {
 				item.status = 1
-				this.$store.commit('comment/updateResolve',item)
-				// if(this.sComment.uuid == "0"){
-				// 	this.getCommentId()
-				// }else{
-				// 	this.getCommentUuid()
-				// }
+				// this.$store.commit('comment/updateResolve',item)
+				if(this.sComment.uuid == "0"){
+					this.getCommentId()
+				}else{
+					this.getCommentUuid()
+				}
             })
 		},
 		unresolveComment(item){
+			this.images = []
+			this.files = []
 			commentApi.changeStatus(item.id).then(res => {
 				item.status = 0	
-				this.$store.commit('comment/updateUnResolve',item)
-				// if(this.sComment.uuid == "0"){
-				// 	this.getCommentId()
-				// }else{
-				// 	this.getCommentUuid()
-				// }
+				// this.$store.commit('comment/updateUnResolve',item)
+				if(this.sComment.uuid == "0"){
+					this.getCommentId()
+				}else{
+					this.getCommentUuid()
+				}
             })
 		},
 		cancelReply(){

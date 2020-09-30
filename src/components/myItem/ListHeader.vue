@@ -37,10 +37,6 @@
         <span class="ml-2">{{$t('tasks.createTask.title')}}</span>
       </v-btn>
       <!-- Bo loc cho  loai doi tuong -->
-      <!-- <v-btn v-show="!sideBySideMode" small class="mr-2" depressed @click="openShowMenuObjType">
-        <v-icon size="18">mdi-filter-menu</v-icon>
-        <span class="ml-2">{{$t('myItem.objType')}}</span>
-      </v-btn>-->
       <v-menu
         :close-on-content-click="false"
         :close-on-click="closeOnClick"
@@ -51,7 +47,7 @@
         <template v-slot:activator="{ on }">
          <v-btn v-on="on"  depressed class="mr-2" small>
             <v-icon size="18">mdi-filter-menu</v-icon>
-            <span class="ml-2">{{$t('myItem.objType')}}</span>
+            <span v-if="!sideBySideMode" class="ml-2">{{$t('myItem.objType')}}</span>
           </v-btn>
         </template>
         <v-list>
@@ -480,5 +476,8 @@ export default {
 }
 .v-list-item:hover {
   background-color: #f5f5f5 !important                                                                                ;
+}
+.v-text-field>>>.v-input--dense:not(.v-text-field--outlined) >>>input {
+    padding: 10px 0 11px!important;
 }
 </style>

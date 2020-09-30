@@ -38,6 +38,7 @@
         "virtualdocs": "Virtualdocs",
         "tasks": "Tasks",
         "myItem": "My Item",
+        "myApplication": "My Application",
         "other": "Khác",
         "deploy": "Deploy",
         "start": "Bắt đầu",
@@ -62,6 +63,8 @@
         "logout": "Đăng xuất",
         "last_update_at": "Cập nhật lần cuối",
         "create_at": "Tạo lúc",
+        "user_create": "Người tạo",
+        "last_user_update": "Người cập nhật cuối",
         "filter": "Bộ lọc",
         "sort": "Sắp xếp",
         "status": "Trạng thái",
@@ -79,7 +82,45 @@
         "email": "Email",
         "pageSize": "Số bản ghi mỗi trang",
         "pendding": "Cần làm",
-        "print": "In"
+        "print": "In",
+        "display": "Hiển thị",
+        "of": "của",
+        "entries": "bản ghi",
+        "always_show_sidebar": "Luôn hiển thị sidebar",
+        "import_excel": "Nhập bằng excel",
+        "sidebar": {
+            "Lists trash": "Danh sách bản xóa",
+            "myApplication": "Ứng dụng của tôi",
+            "tasks": "Tasks",
+            "works": "Works",
+            "My work": "Công việc của tôi",
+            "myWork": "Lịch làm việc",
+            "Manage timesheet": "Quản lý  thời gian biểu",
+            "Timesheet report": "Báo cáo thời gian biểu",
+            "Timesheet": "Thời gian biểu",
+            "App": "Ứng dụng",
+            "Administrator": "Quản trị viên",
+            "Account management": "Quản lý tài khoản",
+            "Access Management": "Quản lý truy cập",
+            "users": "Tài khoản người dùng",
+            "baAccount": "Tài khoản BA",
+            "actionPack": "Action Pack",
+            "permissions": "Phân quyền",
+            "userRoleSetting": "Vai trò người dùng",
+            "KH": "Tri thức nội bộ",
+            "apps": "Cài đặt ứng dụng",
+            "Applications": "Ứng dụng",
+            "Lists to do": "Việc cần làm",
+            "My application": "Ứng dụng",
+            "Report": "Báo cáo",
+            "List workflows": "Danh sách quy trình",
+            "List documents": "Danh sách văn bản",
+            "File": "Quản lý tệp",
+            "workflows": "Quy trình",
+            "documents": "Văn bản",
+            "orgchart": "Sơ đồ tổ chức",
+            "myItem": "My item"
+        }
     },
     "login": {
         "title": "Đăng nhập hệ thống",
@@ -115,6 +156,9 @@
         "error": {
             "cannot_get_data": "Không thể lấy dữ liệu từ máy chủ"
         },
+        "success": {
+            "save_config": "Lưu cấu hình hiển thị thành công!"
+        },
         "filter": {
             "none": "Không chọn",
             "empty": "Rỗng",
@@ -125,10 +169,10 @@
             "ends_with": "Kết thúc với",
             "contains": "Chứa",
             "not_contain": "Không chứa",
-            "gt": "Lớn hơn ( > )",
-            "gte": "Lớn hơn hoặc bằng ( >= )",
-            "lt": "Nhỏ hơn ( < )",
-            "lte": "Nhỏ hơn hoặc bằng ( <= )",
+            "greater_than": "Lớn hơn ( > )",
+            "greater_than_or_equal": "Lớn hơn hoặc bằng ( >= )",
+            "less_than": "Nhỏ hơn ( < )",
+            "less_than_or_equal": "Nhỏ hơn hoặc bằng ( <= )",
             "sort_asc": "Sắp xếp tăng dần",
             "sort_desc": "Sắp xếp giảm dần",
             "clear_filter": "Xóa bộ lọc",
@@ -203,10 +247,13 @@
         },
         "table": {
             "id": "Id",
-            "firstName": "Tên",
+            "firstName": "Họ",
+            "lastName": "Tên",
+            "userName": "Tên đầy đủ",
             "displayName": "Tên hiển thị",
             "email": "Địa chỉ email",
-            "phoneNumber": "Số điện thoại",
+            "phone": "Số điện thoại",
+            "avatar": "Ảnh đại diện",
             "status": "Trạng thái",
             "createAt": "Thời gian tạo",
             "updateAt": "Thời gian cập nhật",
@@ -382,6 +429,23 @@
         "Timesheet": "Thời gian biểu"
     },
     "document": {
+        "instance": {
+            "showlist": {
+                "select": "Đã chọn",
+                "record": "Bản ghi",
+                "printRecord": "In bản ghi",
+                "selectPrintConfig": "Chọn mẫu in",
+                "printMultiple": "In nhiều bản ghi",
+                "listPrintConfig": "Danh sách mẫu in",
+                "print": "In nhanh",
+                "copied": "Đã sao chép",
+                "next": "Tiếp theo",
+                "prev": "Trước đó",
+                "copyLink": "Sao chép đường dẫn",
+                "download": "Tải xuống",
+                "info": "Thông tin bản ghi"
+            }
+        },
         "create": "Tạo mới văn bản",
         "edit": "Chỉnh sửa văn bản",
         "title": "Danh sách văn bản",
@@ -421,7 +485,14 @@
                         "system": "Hệ thống",
                         "list": "danh mục",
                         "business": "Nghiệp vụ"
-                    }
+                    },
+                    "name": "Tên Document",
+                    "title": "Tiêu đề Document",
+                    "fullSize": "Hiển thị toàn màn hình Form Submit",
+                    "type": "Loại văn bản",
+                    "note": "Ghi chú",
+                    "titleObject": "Tiêu đề bản ghi",
+                    "titlePrint": "Tiêu đề bản In"
                 },
                 "swapType": {
                     "heading": "Chuyển đổi kiểu control",
@@ -482,7 +553,6 @@
                         "subTitle1": "Người phê duyệt",
                         "subTitle2": "Người tham gia"
                     }
-
                 }
             },
             "fab": {
@@ -493,6 +563,11 @@
             "comment": {
                 "heading": "BÌNH LUẬN"
             }
+        },
+        "validate": {
+            "emptyTitle": "Không được bỏ trống tiêu đề",
+            "emptyContentControlTemplate": "Vui chọn template trước khi lưu control template",
+            "controlNotExist": "Control Không tồn tại, vui lòng tạo control mới"
         }
     },
     "documentObject": {
@@ -579,6 +654,7 @@
         }
     },
     "apps": {
+        "titleMyApplication": "Danh sách công việc của tôi",
         "header": {
             "id": "ID",
             "name": "Tên",
@@ -591,10 +667,11 @@
         },
 
         "listType": {
-            "documents": "Văn bản",
-            "workflows": "Quy trình làm việc",
-            "reports": "Báo cáo",
-            "orgcharts": "Sơ đồ tổ chức"
+            "documentMajor": "Chứng từ",
+            "documentCategory": "Danh mục",
+            "workflow": "Quy trình làm việc",
+            "dashboard": "Báo cáo",
+            "orgchart": "Sơ đồ tổ chức"
         },
         "addApp": "Thêm ứng dụng",
         "editApp": "Sửa ứng dụng",
@@ -738,11 +815,6 @@
                 "remove operation": "Xoá",
                 "add action pack": "Thêm",
                 "remove action pack": "Xoá"
-
-
-
-
-
             },
             "dataflow": {
                 "detail": "Chi tiết",
@@ -841,7 +913,9 @@
     "notification": {
         "error": "Đã có lỗi xảy ra. Vui lòng thử lại sau",
         "errorTitle": "Lỗi",
-        "successTitle": "Thành công"
+        "successTitle": "Thành công",
+        "older": "Cũ hơn",
+        "today": "Hôm nay"
     },
     "virtualdoc": {
         "header": {
@@ -884,9 +958,24 @@
             "unsubscribe": "Bỏ theo dõi"
         }
     },
-    "myItem":{
-        "objType":"Loại đối tượng",
-        "today":"Hôm nay"
+    "myItem": {
+        "objType": "Loại đối tượng",
+        "filterObj": "Bộ lọc",
+        "today": "Hôm nay",
+        "header": "Danh sách work",
+        "headerDoc": "Danh sách document",
+        "work": {
+            "parentWork": "Parent work",
+            "siblingWork": "Sibling work",
+            "subWork": "Sub work"
+        },
+        "sidebar": {
+            "showMoreTask": "Xem thêm các task liên quan",
+            "showLess": "Thu gọn",
+            "showMoreFile": "Xem thêm các tệp"
+
+        }
+
     },
     "tasks": {
         "error": {
@@ -903,6 +992,7 @@
             "app": "Ứng dụng",
             "description": "Mô tả",
             "owner": "Người sở hữu",
+            "userCreate": "Người khởi tạo",
             "name": "Tên công việc",
             "assignee": "Người được giao",
             "watcher": "Người theo dõi",
@@ -911,8 +1001,8 @@
             "list": "Danh sách công việc",
             "submitForm": "Form nhập liệu",
             "alertDescription": "Không có mô tả",
-            "relatedTask":"CÁC TASK LIÊN QUAN",
-            "attachment":"TỆP ĐÍNH KÈM"
+            "relatedTask": "CÁC TASK LIÊN QUAN",
+            "attachment": "TỆP ĐÍNH KÈM"
         },
         "filterOptions": {
             "all": "Toàn bộ task",
@@ -980,6 +1070,11 @@
         "overMaxOpen": {
             "title": "Không thể tạo thêm tab mới",
             "detail": "Số lượng tab vượt quá giới hạn, hãy xóa một vài tab"
+        }
+    },
+    "dashboard": {
+        "detail": {
+            "title": "Detail dashboard "
         }
     },
     "comment": {

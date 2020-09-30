@@ -16,7 +16,7 @@
             <hot-table
                 :settings="tableSettingsForObjectType"
                 :data="tableDataForObjectType"
-                :height="55"
+                :height="70"
                 :columns="tableColumnsForObjectType"
                 :colHeaders="colHeadersForObjectType"
                 class="fs-13"
@@ -107,8 +107,33 @@ export default {
         this.reCaculateTableHeight();
     },
     created(){
+        this.genAllInputForFormTpl();
     },
     methods: { 
+        genAllInputForFormTpl(){
+            this.allInputs = null;
+            this.allInputs = {
+                name: {
+                    "title": this.$t('common.name'),
+                    "type": "text",
+                    "value": this.itemData.name,
+                    "info": "",
+                },
+                description: {
+                    "title": this.$t('common.description'),
+                    "type": "text",
+                    "value": this.itemData.description,
+                    "info": "",
+                },
+                objectType: {
+                    "title": this.$t('permissions.actionPack.objectType'),
+                    "type": 'select',
+                    "value": this.itemData.objectType,
+                    "info": "",
+                    options: this.getObjectTypeSelections()
+                }
+            };
+        },
         caculateTableDataForAllInstancesDocDef(rowsOfDocDefs){
             let operationForInstancesOfDocDef = this.multipleLevelObjects.document_definition.savedOpsForAllInstancesDocDef;
             operationForInstancesOfDocDef = operationForInstancesOfDocDef ? operationForInstancesOfDocDef : [];
@@ -148,7 +173,6 @@ export default {
             this.caculateTableDataForAllInstancesDocDef(initDocObjDataTable);
         },
         objectTypeToDocumentDefinition(){
-            // debugger
             // this.itemData.objectType = 'document_definition'
             // this.allInputs.objectType.value = 'document_definition'
         },
@@ -386,7 +410,7 @@ export default {
             this.reCaculateTableHeight();
         },
         reCaculateTableHeight(){
-            let h = util.getComponentSize(this).h - util.getComponentSize(this.$refs.comonAttr).h - 180;
+            let h = util.getComponentSize(this).h - util.getComponentSize(this.$refs.comonAttr).h - 200;
             if(this.allInputs.objectType.value == 'application_definition'){
                 h = h*2/3;
             }else if(this.allInputs.objectType.value == 'document_definition'){
@@ -770,6 +794,7 @@ export default {
             // Tiêu đề của các cột  cần hiển thị
             colHeaders: [],
             colHeadersForObjectType: [],
+            allInputs: null
         }
     },
     components: {
@@ -811,31 +836,38 @@ export default {
             }
             return rsl;
         },
-        allInputs(){
-            return {
-                name: {
-                    "title": this.$t('common.name'),
-                    "type": "text",
-                    "value": this.itemData.name,
-                    "info": "",
-                },
-                description: {
-                    "title": this.$t('common.description'),
-                    "type": "text",
-                    "value": this.itemData.description,
-                    "info": "",
-                },
-                objectType: {
-                    "title": this.$t('permissions.actionPack.objectType'),
-                    "type": 'select',
-                    "value": this.itemData.objectType,
-                    "info": "",
-                    options: this.getObjectTypeSelections()
-                }
-            };
-        }, 
+        // allInputs(){
+        //     return {
+        //         name: {
+        //             "title": this.$t('common.name'),
+        //             "type": "text",
+        //             "value": this.itemData.name,
+        //             "info": "",
+        //         },
+        //         description: {
+        //             "title": this.$t('common.description'),
+        //             "type": "text",
+        //             "value": this.itemData.description,
+        //             "info": "",
+        //         },
+        //         objectType: {
+        //             "title": this.$t('permissions.actionPack.objectType'),
+        //             "type": 'select',
+        //             "value": this.itemData.objectType,
+        //             "info": "",
+        //             options: this.getObjectTypeSelections()
+        //         }
+        //     };
+        // }, 
     },
     watch: {
+        itemData: {
+            deep: true,
+            immediate: true,
+            handler(vl){
+                this.genAllInputForFormTpl();
+            }
+        },
         listAction: {
             immediate: true,
             deep: true,

@@ -1,21 +1,22 @@
 <template>
-    <div class="ml-2 w-100 pr-3 pt-3">
+    <div class="ml-2 w-100 pr-3 pt-3 list-item-common-symper" >
         <div :style="{width:contentWidth, display: 'inline-block'}">
             <v-row no-gutters class="pb-2" ref="topBar">
                 <v-col>
                     <span class="symper-title float-left">{{pageTitle}}</span>
-                    <div class="float-right overline">
+                    <div :class="{'float-right': true, 'overline' : true , 'show-panel-mode': actionPanel } ">
                         <v-text-field
                             @input="bindToSearchkey"
                             class="d-inline-block mr-2 sym-small-size"
                             single-line
-                            append-icon="mdi-magnify"
+                            :append-icon="$i('input.search')"
                             outlined
                             dense
                             label="Search"
                             :placeholder="$t('common.search')"
                         ></v-text-field>
                         <v-btn
+                            v-show="showButtonAdd && !actionPanel"
                             depressed
                             small
                             :loading="loadingRefresh"
@@ -25,7 +26,7 @@
                             v-if="checkShowCreateButton()"
                         >
                             <v-icon left dark>mdi-plus</v-icon>
-                            {{$t('common.add')}}
+                            <span >{{$t('common.add')}}</span>
                         </v-btn>
                         <v-btn
                             depressed
@@ -33,23 +34,97 @@
                             :loading="loadingRefresh"
                             :disabled="loadingRefresh"
                             class="mr-2"
-                            v-if="!isCompactMode"
+                            v-if="!isCompactMode && !actionPanel "
                             @click="refreshList"
                         >
                             <v-icon left dark>mdi-refresh</v-icon>
-                            {{$t('common.refresh')}}
+                            <span >{{$t('common.refresh')}}</span>
                         </v-btn>
-                        <!-- <v-btn
+                     
+                      
+                        <v-btn
                             depressed
                             small
+                            @click="exportExcel()"
                             :loading="loadingExportExcel"
                             class="mr-2"
                             :disabled="loadingExportExcel"
-                            v-if="!isCompactMode"
+                            v-if="!isCompactMode && showExportButton"
                         >
                             <v-icon left dark>mdi-microsoft-excel</v-icon>
-                            {{$t('common.export_excel')}}
-                        </v-btn> -->
+                            <span v-show="!actionPanel">{{$t('common.export_excel')}}</span>
+                        </v-btn>
+
+                        
+                        <v-btn
+                            depressed
+                            small
+                            @click="importExcel()"
+                            class="mr-2"
+                            v-if="showImportButton "
+                        >
+                            <v-icon left dark>mdi-database-import</v-icon>
+                            <span>{{$t('common.import_excel')}}</span>
+                        </v-btn>
+                          <!-- show menu khi hien sidebar -->
+                         <v-menu
+                            bottom
+                            left
+                            >
+                            <template v-slot:activator="{ on, attrs }">
+                                 <v-btn 
+                                    icon
+                                    tile 
+                                    v-show="actionPanel"
+                                    v-bind="attrs"
+                                    v-on="on"
+                                    style="width:29px;height:29px;margin:0px 4px"    
+                                >
+                                        <v-icon>
+                                            mdi-dots-vertical
+                                        </v-icon>
+                                </v-btn>
+                            </template>
+                            <v-list>
+                                <v-list-item  v-show="showButtonAdd"  @click="addItem">
+                                    <v-list-item-icon>
+                                         <v-icon>mdi-plus</v-icon>
+                                    </v-list-item-icon>
+                                    <v-list-item-content>
+                                         <v-list-item-title> {{$t('common.add')}}</v-list-item-title>
+                                    </v-list-item-content>
+                                </v-list-item>
+                                <v-list-item  v-show="!isCompactMode"  @click="refreshList">
+                                    <v-list-item-icon>
+                                         <v-icon>mdi-refresh</v-icon>
+                                    </v-list-item-icon>
+                                    <v-list-item-content>
+                                         <v-list-item-title> {{$t('common.refresh')}}</v-list-item-title>
+                                    </v-list-item-content>
+                                </v-list-item>
+                                <v-list-item  v-show="!isCompactMode && showExportButton"  @click="exportExcel()">
+                                    <v-list-item-icon>
+                                         <v-icon>mdi-microsoft-excel</v-icon>
+                                    </v-list-item-icon>
+                                    <v-list-item-content>
+                                         <v-list-item-title>{{$t('common.export_excel')}}</v-list-item-title>
+                                    </v-list-item-content>
+                                </v-list-item>
+                                <v-list-item  v-show="showImportButton"  @click="importExcel()">
+                                    <v-list-item-icon>
+                                         <v-icon>
+                                             mdi-database-import
+                                         </v-icon>
+                                    </v-list-item-icon>
+                                    <v-list-item-content>
+                                         <v-list-item-title> 
+                                             {{$t('common.import_excel')}}
+                                        </v-list-item-title>
+                                    </v-list-item-content>
+                                </v-list-item>
+                            </v-list>
+                        </v-menu>
+
                         <component
                             :is="'span'"
                         >
@@ -75,10 +150,10 @@
                 <v-col
                     :class="{
                             'fs-13 symper-custom-table symper-list-item': true,
-                            'clip-text' : tableDisplayConfig.wrapTextMode == 1,
-                            'loosen-row':  tableDisplayConfig.densityMode == 0,
-                            'medium-row':  tableDisplayConfig.densityMode == 1,
-                            'compact-row':  tableDisplayConfig.densityMode == 2,
+                            'clip-text' : tableDisplayConfig.value.wrapTextMode == 1,
+                            'loosen-row':  tableDisplayConfig.value.densityMode == 0,
+                            'medium-row':  tableDisplayConfig.value.densityMode == 1,
+                            'compact-row':  tableDisplayConfig.value.densityMode == 2,
                         }"
                 >
                     <hot-table
@@ -91,7 +166,7 @@
                         :contextMenu="hotTableContextMenuItems"
                         :colHeaders="colHeaders"
                         :hiddenColumns="{
-                            columns: tableDisplayConfig.hiddenColumns
+                            columns: tableDisplayConfig.value.hiddenColumns
                         }"
                         ref="dataTable"
                         :fixedColumnsLeft="fixedColumnsCount"
@@ -107,7 +182,7 @@
                 ></Pagination>
             </v-row>
         </div>
-
+    
         <component
             :is="actionPanelWrapper"
             :width="actionPanelWidth"
@@ -116,8 +191,8 @@
             class="pa-3"
             absolute
             right
-            v-if="actionPanelType != 'drag'"
-            :temporary="actionPanelType == 'temporary'"
+            v-if="reComputeActionPanelType != 'drag'"
+            :temporary="reComputeActionPanelType == 'temporary'"
         >
             <slot name="right-panel-content" :itemData="currentItemDataClone">
                 <v-card flat>
@@ -154,9 +229,11 @@
             ref="tableDisplayConfig"
             @drag-columns-stopped="handleStopDragColumn"
             @change-colmn-display-config="configColumnDisplay"
+            @save-list-display-config="saveTableDisplayConfig"
             :tableDisplayConfig="tableDisplayConfig"
             :tableColumns="tableColumns"
             :headerPrefixKeypath="headerPrefixKeypath"
+            :showActionPanelInDisplayConfig="showActionPanelInDisplayConfig"
         ></display-config>
 
         <table-filter
@@ -212,6 +289,9 @@ import SymperDragPanel from "./SymperDragPanel.vue";
 import DisplayConfig from "./../common/listItemComponents/DisplayConfig";
 import Pagination from './../common/Pagination'
 import { actionHelper } from "./../../action/actionHelper";
+import {uiConfigApi} from "./../../api/uiConfig";
+
+
 var apiObj = new Api("");
 var testSelectData = [ ];
 window.tableDropdownClickHandle = function(el, event) {
@@ -231,6 +311,16 @@ export default {
             if (this.actionPanel == true) {
                 this.$emit("open-panel");
             }
+        },
+        getDataUrl(){   
+           this.refreshList();
+        },
+        'tableDisplayConfig.value.alwaysShowSidebar'(value) {
+            if(value && Object.keys(this.currentItemDataClone).length > 0){
+                this.openactionPanel();
+            }else{
+                this.closeactionPanel();
+            }
         }
     },
     data() {
@@ -242,17 +332,20 @@ export default {
             // các cấu hình cho việc hiển thị và giá trị của panel cấu hình hiển thị của bảng
             tableDisplayConfig: {
                 show: false, // có hiển thị panel cấu hình ko
-                width: 300, // Chiều rộng của panel cấu hình,
-                wrapTextMode: 0,
-                densityMode: 2,
-                hiddenColumns: [],
+                width: 300, // Chiều rộng của panel cấu hình
+                value: {
+                    wrapTextMode: 0,
+                    densityMode: 2,
+                    alwaysShowSidebar: false,
+                    hiddenColumns: [],
+                },
                 dragOptions: {
                     animation: 200,
                     group: "display-column-drag",
                     disabled: false,
                     ghostClass: "ghost-item"
                 },
-                drag: false
+                drag: false,
             },
             fixedColumnsCount: 0, // Số lượng cột fix ở bên trái
             tableColumns: [],
@@ -274,14 +367,30 @@ export default {
                 manualColumnResize: true,
                 renderAllRows: true,
                 manualRowResize: true,
+                readOnly: true,
                 rowHeights: 21,
                 stretchH: "all",
                 licenseKey: "non-commercial-and-evaluation",
                 afterRender: isForced => {
-                    console.log(
-                        "after render handsontablelllllllllllllllllllllllllll",
-                        Date.now()
-                    );
+                    
+                },
+                afterSelection: (row, column, row2, column2, preventScrolling, selectionLayerLevel) => {
+                    if(self.debounceEmitRowSelectEvt){
+                        clearTimeout(self.debounceEmitRowSelectEvt);
+                    }
+                    let time = self.debounceRowSelectTime;
+                    self.debounceEmitRowSelectEvt = setTimeout(() => {
+                        self.$emit('row-selected', self.data[row]);
+                    }, time);
+                },
+                afterSelection: (row, column, row2, column2, preventScrolling, selectionLayerLevel) => {
+                    if(self.debounceEmitRowSelectEvt){
+                        clearTimeout(self.debounceEmitRowSelectEvt);
+                    }
+                    let time = self.debounceRowSelectTime;
+                    self.debounceEmitRowSelectEvt = setTimeout(() => {
+                        self.$emit('row-selected', self.data[row]);
+                    }, time);
                 },
                 beforeContextMenuSetItems: () => {
                 },
@@ -293,6 +402,20 @@ export default {
                     this.debounceRelistContextmenu = setTimeout((self) => {
                         self.relistContextmenu();
                     }, 200, this);
+                },
+                afterChange: function (change, source) {
+                     
+                    self.handleAfterChangeDataTable(change, source) 
+                },
+                beforeKeyDown:function(change, source){
+                    let cellMeta = this.getSelected();
+                    self.$emit('before-keydown',{event:event,cell:{col:cellMeta[0][1],row:cellMeta[0][0]},rowData:self.data[cellMeta[0][0]]});
+                },
+                afterOnCellMouseDown:function(event, coords, TD){
+                    self.$emit('after-cell-mouse-down',{event:event,cell:coords,rowData:self.data[coords.row]});
+                },
+                afterColumnMove(movedColumns, finalIndex, dropIndex, movePossible, orderChanged){
+
                 }
             },
             tableFilter: {
@@ -344,7 +467,9 @@ export default {
             data: [],
             filteredColumns: {}, // tên các cột đã có filter, dạng {tên cột : true},
             savedTableDisplayConfig: [], // cấu hình hiển thị của table đã được lueu trong db
-            hotTableContextMenuItems: []
+            hotTableContextMenuItems: [],
+            allRowChecked:{},   // hoangnd: lưu lại các dòng được checked sau sự kiện after change
+            hasColumnsChecked:false,
         };
     },
     activated(){
@@ -360,13 +485,46 @@ export default {
         // });
         this.getData();
         this.restoreTableDisplayConfig();
+        document.addEventListener('keyup', function (evt) {
+            if (evt.keyCode === 27) {
+                thisCpn.closeactionPanel();
+            }
+        });
     },
     props: {
+        showImportButton: {
+            type: Boolean,
+            default: false
+        },
+        exportLink: {
+            type: String,
+            default: ''
+        },
+        showExportButton: {
+            type: Boolean,
+            default: false
+        },
+        widgetIdentifier: {
+            type: String,
+            default: ''
+        },
+        debounceRowSelectTime: {
+            type: Number,
+            default: 100
+        },
         currentItemData: {
             type: Object,
             default() {
                 return {};
             }
+        },
+        showButtonAdd:{
+            type:Boolean,
+            default: true
+        },
+        showActionPanelInDisplayConfig:{
+            type: Boolean,
+            default: false,
         },
         /**
          * Prefix cho keypath trong file đa ngôn ngữ để hiển thị header của table
@@ -485,12 +643,18 @@ export default {
     },
     mounted() {},
     computed: {
+        alwaysShowActionPanel(){
+            return this.tableDisplayConfig.value.alwaysShowSidebar;
+        },
+        reComputeActionPanelType(){
+            return this.tableDisplayConfig.value.alwaysShowSidebar ? 'elastic' : this.actionPanelType;
+        },
         currentItemDataClone() {
             return util.cloneDeep(this.currentItemData);
         },
         actionTitle() {},
         contentWidth() {
-            if (this.actionPanel && this.actionPanelType == "elastic") {
+            if (this.actionPanel && this.reComputeActionPanelType == "elastic") {
                 return "calc(100% - " + this.actionPanelWidth + "px)";
             } else if (this.tableDisplayConfig.show) {
                 return "calc(100% - " + this.tableDisplayConfig.width + "px)";
@@ -534,7 +698,7 @@ export default {
                     markFilter = "applied-filter";
                 }
                 let headerName = prefix ? thisCpn.$t(prefix + colTitles[col]) : colTitles[col];
-                return `<span>
+                return `<span class="d-flex justify-space-between">
                             <span class="font-weight-medium">
                                 ${headerName}
                             </span>
@@ -551,12 +715,29 @@ export default {
                 temporary: "v-navigation-drawer",
                 elastic: "v-navigation-drawer"
             };
-            return mapType[this.actionPanelType]
-                ? mapType[this.actionPanelType]
+            return mapType[this.reComputeActionPanelType]
+                ? mapType[this.reComputeActionPanelType]
                 : mapType["temporary"];
         }
     },
     methods: {
+        importExcel(){
+            this.$emit('import-excel');
+        },
+        async exportExcel(){
+            let exportUrl = this.exportLink
+            if(!exportUrl){
+                if(this.getDataUrl[this.getDataUrl.length - 1] == '/'){
+                    exportUrl = this.getDataUrl+'export';
+                }else{
+                    exportUrl = this.getDataUrl+'/export';
+                }
+            }
+            
+            this.loadingExportExcel = true;
+            await apiObj.get(exportUrl);
+            this.loadingExportExcel = false;
+        },
         checkShowCreateButton(){
             let rsl = !this.isCompactMode;
             let objectType = this.commonActionProps.resource;
@@ -743,17 +924,25 @@ export default {
         handleCloseDragPanel() {
             this.actionPanel = false;
         },
-        /**
-         * Lưu lại cấu hình hiển thị của table
-         */
-        saveTableDisplayConfig() {
-            this.savingConfigs = true;
-            let thisCpn = this;
-            let configs = {
-                wrapTextMode: this.tableDisplayConfig.wrapTextMode,
-                densityMode: this.tableDisplayConfig.densityMode,
-                columns: []
+        getWidgetIdentifier(){
+            let widgetIdentifier = '';
+            if(this.widgetIdentifier){
+                widgetIdentifier =  this.widgetIdentifier;
+            }else{
+                widgetIdentifier =  this.$route.path;
+            }
+            widgetIdentifier = widgetIdentifier.replace(/(\/|\?|=)/g,'');
+            return widgetIdentifier;
+        },
+        getTableDisplayConfigData(){
+            let configs = util.cloneDeep(this.tableDisplayConfig.value);
+            configs.columns = [];
+            let rsl = {
+                widgetIdentifier: this.getWidgetIdentifier(),
+                detail: '{}',
             };
+
+
             for (let col of this.tableColumns) {
                 configs.columns.push({
                     data: col.data,
@@ -761,43 +950,58 @@ export default {
                     symperHide: col.symperHide
                 });
             }
-            configs = JSON.stringify(configs);
-            userApi
-                .saveUserViewConfig("showList", this.$route.name, configs)
-                .then(() => {
-                    thisCpn.savingConfigs = false;
-                    thisCpn.$snotify({
-                        type: "success",
-                        title: thisCpn.$t("table.success.save_config")
-                    });
-                })
-                .catch(err => {
-                    console.warn(err, "error when save config");
-                    thisCpn.$snotify({
-                        type: "error",
-                        title: thisCpn.$t("table.error.save_config")
-                    });
+            rsl.detail = JSON.stringify(configs);
+            return rsl;
+        },
+        /**
+         * Lưu lại cấu hình hiển thị của table
+         */
+        saveTableDisplayConfig() {
+            this.savingConfigs = true;
+            let thisCpn = this;
+            let dataToSave = this.getTableDisplayConfigData();
+            uiConfigApi
+            .saveUiConfig(dataToSave)
+            .then(() => {
+                thisCpn.savingConfigs = false;
+                thisCpn.$snotify({
+                    type: "success",
+                    title: thisCpn.$t("table.success.save_config")
                 });
+            })
+            .catch(err => {
+                console.warn(err, "error when save config");
+                thisCpn.$snotify({
+                    type: "error",
+                    title: thisCpn.$t("table.error.save_config")
+                });
+            });
         },
         /**
          * Khôi phục lại cấu hình của hiển thị của table từ dữ liệu được lưu
          */
         restoreTableDisplayConfig() {
-            // userApi.getUserViewConfig(this.$route.name, 'showList').then(()=>{
-            //     this.tableDisplayConfig.wrapTextMode =  savedConfigs.wrapTextMode;
-            //     this.tableDisplayConfig.densityMode =  savedConfigs.densityMode;
-            //     this.savedTableDisplayConfig = savedConfigs.columns;
-            //     if(this.tableColumns.length > 0){
-            //         this.tableColumns = this.getTableColumns(this.tableColumns, true);
-            //         this.handleStopDragColumn();
-            //     }
-            // }).catch((err) => {
-            //     console.warn(err, 'error when get user view config');
-            //     thisCpn.$snotify({
-            //         type: 'error',
-            //         'title': thisCpn.$t('table.error.get_config'),
-            //     });
-            // });
+            let widgetIdentifier = this.getWidgetIdentifier();
+            uiConfigApi.getUiConfig(widgetIdentifier).then((res)=>{
+                if(res.status == 200){
+                    let savedConfigs = JSON.parse(res.data.detail);
+                    this.tableDisplayConfig.value.wrapTextMode =  savedConfigs.wrapTextMode;
+                    this.tableDisplayConfig.value.densityMode =  savedConfigs.densityMode;
+                    this.tableDisplayConfig.value.alwaysShowSidebar =  savedConfigs.alwaysShowSidebar;
+                    
+                    this.savedTableDisplayConfig = savedConfigs.columns;
+                    if(this.tableColumns.length > 0){
+                        this.tableColumns = this.getTableColumns(this.tableColumns, true);
+                        this.handleStopDragColumn();
+                    }
+                }
+            }).catch((err) => {
+                console.warn(err, 'error when get user view config');
+                thisCpn.$snotify({
+                    type: 'error',
+                    'title': thisCpn.$t('table.error.get_config'),
+                });
+            });
         },
         /**
          * Kiểm tra xem một cột trong table có đang áp dụng filter hay ko
@@ -862,9 +1066,31 @@ export default {
                 );
                 thisCpn.data = data.listObject ? data.listObject : [];
                 thisCpn.handleStopDragColumn();
+                //AnhTger config show description
+                (data.listObject).forEach(element => {
+                    let processKey=element.processKey;
+                    if (processKey) {
+                        let configVale=JSON.parse(element.configValue)[processKey];
+                        if (configVale.description) {
+                            element.description=configVale.description;
+                        }
+                    }
+                   
+                });
                 thisCpn.$emit('data-get', data.listObject);
             }
             this.prepareFilterAndCallApi(columns , cache , applyFilter, handler);
+        },
+        getOptionForGetList(configs, columns){
+            return {
+                filter: this.getFilterConfigs(configs.getDataMode),
+                sort: this.getSortConfigs(),
+                search: this.searchKey,
+                page: this.page,
+                pageSize: configs.pageSize ? configs.pageSize : this.pageSize,
+                columns: columns ? columns : [],
+                distinct: configs.distinct ? configs.distinct : false
+            };
         },
         /**
          * Lấy ra cấu hình cho việc sort
@@ -875,17 +1101,10 @@ export default {
             if (url != "") {
                 let thisCpn = this;
                 thisCpn.loadingData = true;
-                let options = {
-                    filter: this.getFilterConfigs(configs.getDataMode),
-                    sort: this.getSortConfigs(),
-                    search: this.searchKey,
-                    page: this.page,
-                    pageSize: configs.pageSize ? configs.pageSize : this.pageSize,
-                    columns: columns ? columns : [],
-                    distinct: configs.distinct ? configs.distinct : false
-                };
+                let options = this.getOptionForGetList(configs, columns);
                 let header = {};
-                if(thisCpn.$route.name == "deployHistory" || thisCpn.$route.name == "listProcessInstances"){
+                let routeName = this.$getRouteName();
+                if(routeName == "deployHistory" || routeName == "listProcessInstances"){
                     header = {
                         Authorization: 'Basic cmVzdC1hZG1pbjp0ZXN0'
                     };
@@ -934,6 +1153,7 @@ export default {
                 let option = {
                     column: colName, // tên cột cần filter
                     operation: condition.conjunction,
+                    conditions: []
                 };
                 if(getDataMode == 'autocomplete' && colName == this.tableFilter.currentColumn.name){
                     option.conditions = [
@@ -967,18 +1187,20 @@ export default {
                         }
                     ];
                 }
+
                 if(filter.selectAll && !$.isEmptyObject(filter.valuesNotIn)){
-                    option.valueFilter = {
-                        'operation': ' NOT IN ',
-                        'values': Object.keys(filter.valuesNotIn)
-                    };
+                    option.conditions.push({
+                        name: 'not_in',
+                        value: Object.keys(filter.valuesNotIn)
+                    });
                 }else if(!filter.selectAll && !$.isEmptyObject(filter.valuesIn)){
-                    option.valueFilter = {
-                        'operation': ' IN ',
-                        'values': Object.keys(filter.valuesIn)
-                    };
+                    option.conditions.push({
+                        name: 'in',
+                        value: Object.keys(filter.valuesIn)
+                    });
                 }
-                if(!$.isEmptyObject(option)){
+                
+                if(option.conditions.length > 0){
                     configs.push(option);
                 }
             }
@@ -1007,7 +1229,7 @@ export default {
                 newArr.push(Number(el));
                 return newArr;
             }, []);
-            this.$set(this.tableDisplayConfig, "hiddenColumns", hiddenColumns);
+            this.$set(this.tableDisplayConfig.value, "hiddenColumns", hiddenColumns);
         },
         /**
          * Lấy cấu hình các cột của table
@@ -1062,12 +1284,19 @@ export default {
                 let orderedCols = [];
                 let noneOrderedCols = [];
                 for (let col of savedOrderCols) {
+                    colMap[col.data].checkedOrder = true;
                     if (colMap[col.data]) {
                         colMap[col.data].symperFixed = col.symperFixed;
                         colMap[col.data].symperHide = col.symperHide;
                         orderedCols.push(colMap[col.data]);
                     } else {
                         noneOrderedCols.push(colMap[col.data]);
+                    }
+                }
+
+                for(let colName in colMap){
+                    if(!colMap[colName].checkedOrder){
+                        noneOrderedCols.push(colMap[colName]);
                     }
                 }
                 return orderedCols.concat(noneOrderedCols);
@@ -1111,6 +1340,10 @@ export default {
             this.tableDisplayConfig.show = !this.tableDisplayConfig.show;
         },
         showTableDropdownMenu(x, y, colName) {
+            var windowWidth = $(window).width()/1.1;
+            if(x > windowWidth){
+                x -= 190;
+            }
             let filterDom = $(this.$refs.tableFilter.$el);
             filterDom.css("left", x + "px").css("top", y + 10 + "px");
             this.$refs.dataTable.hotInstance.deselectCell();
@@ -1260,7 +1493,45 @@ export default {
             this.page -= 1
             this.getData();
             this.$emit("change-page", this.page);
+        },
+        // hoangnd: thêm cột checkbox
+        addCheckBoxColumn(){
+            this.hasColumnsChecked = true;
+            this.tableColumns.unshift({name:"checkbox_select_item",data:"checkbox_select_item",title:"Chọn",type:"checkbox"});
+        },
+        removeCheckBoxColumn(){
+            this.hasColumnsChecked = false;
+            this.tableColumns.shift();
+        },
+        // Hàm trả về các dòng được selected
+        getAllRowChecked(){
+            return this.allRowChecked;
+        },
+        isShowCheckedRow(){
+            return this.hasColumnsChecked
+        },
+        /**
+         * Đưa dòng được checked vào biến allRowChecked
+         * nêu uncheck thì xóa đi
+         */
+        handleAfterChangeDataTable(change, source) {
+            if(source == 'edit' && this.hasColumnsChecked){
+                for (let index = 0; index < change.length; index++) {
+                    let rowChange = change[index];
+                    if(change[index][3] == true){
+                        this.allRowChecked[change[index][0]] = this.data[change[index][0]]
+                    }else{
+                        delete this.allRowChecked[change[index][0]];
+                    }
+                }
+                
+                this.$emit('after-selected-row',this.allRowChecked)
+            }
+        },
+        isShowSidebar(){
+            return this.alwaysShowActionPanel
         }
+        
     },
     components: {
         HotTable,
@@ -1288,7 +1559,7 @@ export default {
     white-space: nowrap !important;
 }
 .symper-custom-table.loosen-row .ht_master.handsontable .htCore td,
-.symper-custom-table.loosen-row .ht_clone_left.handsontable .htCore td {
+.symper-custom-table.loosen-row .htgetDataUrl_clone_left.handsontable .htCore td {
     height: 40px !important;
     line-height: 40px !important;
 }
@@ -1330,10 +1601,25 @@ i.applied-filter {
 .symper-list-item .ht_clone_left.handsontable table.htCore {
     border-right: 4px solid #f0f0f0;
 }
+
+.symper-list-item .handsontable th:nth-child(2) {
+    border-left-width: 0px !important;
+}
+
+.symper-list-item .ht_clone_top_left_corner thead tr th:nth-last-child(2)  {
+    border-right-width: 0px !important;
+}
 .handsontable td,
 .handsontable th {
     color: #212529 !important;
     border-color: #bbb;
     border-right: 0;
+}
+.ht_clone_left {
+    z-index: 8;
+}
+
+.list-item-common-symper .v-menu__content .v-list-item{
+    height:30px
 }
 </style>

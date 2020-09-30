@@ -54,7 +54,7 @@ export const getDefaultConfigNodeData = function(nodeId, isDepartment = false) {
         customAttributes: [],
         id: nodeId,
         style: getNodeStyleConfig(),
-        collapseExpandStatus: 'expand' // expand | collapse
+        collapseExpandStatus: 'collapse' // expand | collapse
     };
 
     if (isDepartment) {
@@ -149,7 +149,11 @@ export const jointLinkNode = function(source, target) {
             },
             '.marker-arrowheads': {
                 display: 'none'
+            },
+            label: {
+                text: 'Hello',
             }
+            
         },
     }, {
         isHidden: function() {

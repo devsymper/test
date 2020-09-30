@@ -5,7 +5,14 @@
             height: myHeight,
         }"
     >
-        <component :is="actionViewCompon" class="h-100 w-100"></component>
+        <v-progress-circular
+            :size="50"
+            color="amber"
+            style="top: 300px; left: 50%"
+            indeterminate
+            v-if="loadingComponent"
+        ></v-progress-circular>
+        <component v-else :is="actionViewCompon" class="h-100 w-100"></component>
     </div>
 </template>
 
@@ -44,36 +51,49 @@ export default {
         }
     },
     watch: {
-        // actionDef: {
-        //     deep: true,
-        //     immediate: true,
-        //     handler(newValue){
-        //         this.displayActionView();
-        //     }
-        // }
+        actionDef: {
+            deep: true,
+            immediate: true,
+            handler(newValue){
+                this.displayActionView();
+            }
+        },
+        param: {
+            deep: true,
+            immediate: true,
+            handler(newValue){
+                this.displayActionView();
+            }
+        },
     },
     mounted(){
         this.displayActionView();
     },
     data(){
         return {
-            actionViewCompon: null
+            actionViewCompon: null,
+            loadingComponent: false
         }
     },
     methods: {
         async displayActionView(){
+            console.log(this.actionDef,'this.actionDefthis.actionDef');
             let key = getKeyForAction(this.actionDef);
             if(actionMap.hasOwnProperty(key)) {
+                this.loadingComponent = true;
                 if(actionMap[key].hasOwnProperty('$getActionLink')){
                     let link = actionMap[key].$getActionLink(this.param);
                     let matchRoute = this.$router.match(link);
                     if(matchRoute && matchRoute.matched && matchRoute.matched[0]){
                         let matchedRoute = matchRoute.matched[0];
+                        this.$route.meta.sRouteName = matchRoute.name;
                         for(let key in matchRoute.params){
                             this.$route.params[key] = matchRoute.params[key];
                         }
-
                         let componentData = await matchedRoute.components.default();
+                        setTimeout((self) => {
+                            self.loadingComponent = false;
+                        }, 500, this);
                         this.actionViewCompon = componentData.default ;
                     }
                 }else{

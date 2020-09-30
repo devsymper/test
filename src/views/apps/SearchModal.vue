@@ -13,7 +13,7 @@
 				<ul class="app-child-item" v-for="(childItem,i) in itemT.item" :key="i" @click="clickItem(childItem,itemT.name)">
 					<li>
 						<div style="position:relative">
-							<v-tooltip bottom v-if="itemT.name == 'document_definition'">
+							<v-tooltip bottom v-if="itemT.name == 'document_category' || itemT.name == 'document_major'">
 								<template v-slot:activator="{ on, attrs }">
 								<div class="title-document" 	
 									v-bind="attrs"
@@ -48,36 +48,36 @@ export default {
 			myValue: '',
 			menuItemsHeight: '450px',
             listItems:{
-			   document_definition:{
-				   icon : 'mdi-file-edit-outline',
-				   title: this.$t('apps.listType.documents'),
-				   name:  'document_definition',
-				   item:[
-
-				   ]
-			   },
-			   orgchart:{
- 				   icon : 'mdi-widgets-outline',
-				   title: this.$t('apps.listType.orgcharts'),
-				   name: 'orgchart',
-				   item:[
-				   ]
-			   },
-			   dashboard:{
-				   icon : 'mdi-view-dashboard',
-				   title: this.$t('apps.listType.reports'),
-				   name: 'dashboard',
-				   item:[
-				   ]
-			   },
-			   workflow_definition:
-			   {
-			       icon : 'mdi-lan',
-				   title:  this.$t('apps.listType.workflows'),
-				   name: 'workflow_definition',
-				   item:[
-				   ]
-			   },
+			   document_category:{
+					icon : 'mdi-file-document-outline',
+					title: this.$t('apps.listType.documentCategory'),
+					name:  'document_category',
+					item:[]
+				},
+				document_major:{
+					icon : 'mdi-file-edit-outline',
+					title:  this.$t('apps.listType.documentMajor'),
+					name:  'document_major',
+					item:[]
+				},
+				orgchart: {
+					icon: 'mdi-widgets-outline',
+					title:  this.$t('apps.listType.orgchart'),
+					name: 'orgchart',
+					item: []
+				},
+				dashboard: {
+					icon: 'mdi-view-dashboard',
+					title: this.$t('apps.listType.dashboard'),
+					name: 'dashboard',
+					item: []
+				},
+				workflow_definition: {
+					icon: 'mdi-lan',
+					title:  this.$t('apps.listType.workflow'),
+					name: 'workflow_definition',
+					item: []
+				},
 			},  
     	};
 	},
@@ -112,7 +112,6 @@ export default {
 						storeData.forEach(function(f){
 							if(e.id == f.id){
 								e.active = true
-								debugger
 							}
 						})
 					}
@@ -120,26 +119,10 @@ export default {
 			}
 			return resData	
 		},
-		// checkActive(obj,type){
-		// 	debugger
-		// 	// if(this.sAppManagement[type].item.includes(obj) === true){
-		// 	// 	return true
-		// 	// }else{
-		// 	// 	return false
-		// 	// }
-		// 	let check = false
-		// 	this.sAppManagement[type].item.forEach(function(e){
-		// 		if(e.id == obj.id){
-		// 			check =  true
-		// 		}else{
-		// 			check = false
-		// 		}
-		// 	})
-		// 	return check
-		// },
 		getListSearch(value){
  			let self = this
-			this.listItems.document_definition.item = []
+			this.listItems.document_category.item = []
+			this.listItems.document_major.item = []
 			this.listItems.orgchart.item = []
 			this.listItems.workflow_definition.item = []
 			this.listItems.dashboard.item = []
@@ -147,9 +130,21 @@ export default {
 				this.checkChildrenItem(res.data.listObject,self.sAppManagement.orgchart.item)
 				this.listItems.orgchart.item = res.data.listObject;
 			});
-			documentApi.searchListDocuments({search:value,pageSize:50}).then(res => {
-				this.checkChildrenItem(res.data.listObject,self.sAppManagement.document_definition.item)
-				this.listItems.document_definition.item = res.data.listObject;
+			documentApi.searchListDocuments({search:value,pageSize:1000}).then(res => {
+				let arrCategory = []
+				let arrMajor = []
+				res.data.listObject.forEach(function(e){
+					if(e.type == "Nghiệp vụ"){
+						arrMajor.push(e)
+					}else if(e.type == "Danh mục"){
+						arrCategory.push(e)
+
+					}
+				})
+				self.checkChildrenItem(arrCategory,self.sAppManagement.document_category.item)
+				self.checkChildrenItem(arrMajor,self.sAppManagement.document_major.item)
+				this.listItems.document_category.item = arrCategory
+				this.listItems.document_major.item = arrMajor
 			});
 			BpmnEngine.getListModels({search:value,pageSize:50}).then(res => {
 				this.checkChildrenItem(res.data.listObject,self.sAppManagement.workflow_definition.item)

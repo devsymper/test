@@ -73,11 +73,13 @@ export default {
                 val = val.replace(/\n/g, "");
                 self.bpmnModeler.importXML(val, function(err) {
                     if (err) {
-                        self.$emit('after-render-diagram-from-xml', {})
                         console.error(err, "errror on import XML");
+                    }else{
+                        self.$emit('after-render-diagram-from-xml', {})
                     }
                 });
             }, 100);
+     
         }
     },
     methods: {
@@ -205,6 +207,7 @@ export default {
             this.moddle = this.bpmnModeler.get("moddle");
             this.modeling = this.bpmnModeler.get("modeling");
             this.listenModellerEvts();
+          
         },
         saveSVG(done) {
             if (!done) {

@@ -17,7 +17,7 @@
                 </v-tooltip>
 
                 <v-btn
-                    v-if="$route.name != 'viewProcess'"
+                    v-if="routeName != 'viewProcess'"
                     class="float-right mr-1"
                     @click="saveProcess"
                     small
@@ -249,12 +249,26 @@ export default {
             let self = this;
             return new Promise((resolve, reject) => {
                 let modelAttr = self.getModelData();
+                if (!modelAttr.name) {
+                    reject({
+                        type: "emptyModelName",
+                        title: "Process name shoud not empty!"
+                    });
+                } else {
+                    resolve();
+                }
+
                 if (!modelAttr.key) {
                     reject({
                         type: "emptyModelKey",
                         title: "Process identifier shoud not empty!"
                     });
-                } else {
+                } else if (modelAttr.name==modelAttr.key ||modelAttr.name==null) { // khi không điền tên quy trình thì name đc gán bằng key -> bắn lôĩ
+                    reject({
+                        type: "emptyModelName",
+                        title: "Process name shoud not empty!"
+                    });
+                } {
                     resolve();
                 }
             });
@@ -275,9 +289,9 @@ export default {
                 isExecutable: modelAttr.attrs.isexecutable.value
             });
             modelAttr = modelAttr.attrs;
-            if (!modelAttr.name.value) {
-                modelAttr.name.value = modelAttr.process_id.value;
-            }
+            // if (!modelAttr.name.value) {
+            //     modelAttr.name.value = modelAttr.process_id.value;
+            // }
             return {
                 name: modelAttr.name.value,
                 key: modelAttr.process_id.value,
@@ -375,7 +389,7 @@ export default {
         },
         // Lưu lại data của process model hiện tại
         saveProcess() {
-            if(this.$route.name == 'viewProcess'){
+            if(this.routeName == 'viewProcess'){
                 return;
             }
             let self = this;
@@ -524,7 +538,6 @@ export default {
                     bnodeRoot = bnode;
                 }else if(nodeType == "SequenceFlow"){
                     if(!mapSaveNodes[bnode.id]){
-                        // debugger;
                     }
                     di.childShapes.push(mapSaveNodes[bnode.id]); // theo quy tắc 1 của flowable về lưu SequenceFlow
                 }
@@ -534,7 +547,6 @@ export default {
                 for(let pool of bnodeRoot.participants){
                     let poolToSave = mapSaveNodes[pool.id];
                     if(!poolToSave){
-                        // debugger;
                     }
                     di.childShapes.push(poolToSave);
                     poolToSave.properties.process_id = poolToSave.properties.process_id ? poolToSave.properties.process_id : poolToSave.properties.overrideid;
@@ -542,7 +554,6 @@ export default {
                         // thêm các con cho các lane
                         for(let lane of pool.processRef.laneSets[0].lanes){
                             if(!mapSaveNodes[lane.id]){
-                                // debugger;
                             }
                             poolToSave.childShapes.push(mapSaveNodes[lane.id]);
                             this.addChildrenForProcess(mapSaveNodes[lane.id], lane.flowNodeRef, mapSaveNodes);
@@ -1255,17 +1266,17 @@ export default {
         
         this.$store.dispatch('process/getAllDefinitions');
         
-        if (this.$route.name == "editProcess") {
+        if (this.routeName == "editProcess") {
             this.modelAction = "edit";
             this.modelId = this.$route.params.id;
-        } else if (this.$route.name == "cloneProcess") {
+        } else if (this.routeName == "cloneProcess") {
             this.modelAction = "clone";
         }
 
         if (
-            this.$route.name == "editProcess" ||
-            this.$route.name == "cloneProcess" ||
-            this.$route.name == "viewProcess"
+            this.routeName == "editProcess" ||
+            this.routeName == "cloneProcess" ||
+            this.routeName == "viewProcess"
         ) {
             this.applySavedData(this.$route.params.id);
         }
@@ -1345,6 +1356,9 @@ export default {
         }
     },
     computed: {
+        routeName(){
+            return this.$getRouteName();
+        },
         selectingNode() {
             return this.$store.state.process.editor[this.instanceKey].selectingNode;
         },

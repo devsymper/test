@@ -1,7 +1,8 @@
 <template>
-    <div>
+    <div  class="w-100">
+        
         <v-select
-            class="d-inline-block s-select-page-size"
+            class="s-select-page-size  float-left"
             style="width:70px"
             v-model="size"
             :items="pageSizeOptions"
@@ -11,7 +12,7 @@
             flat
             @change="changePageSize"
         ></v-select>
-        <div class="d-inline-block" style="vertical-align: middle;">
+        <div style="vertical-align: middle;" class="  float-left">
             <v-pagination
                 class="s-pagination"
                 v-model="page"
@@ -25,10 +26,37 @@
                 @input="onInputPage"
             ></v-pagination>
         </div>
+        <div class="mr-2 fs-13  float-right" style="line-height: 25px">
+            {{$t('common.display')}} 
+            <span class="font-weight-medium">{{rowRange}}</span> 
+            {{$t('common.of')}} 
+            <span class="font-weight-medium">{{total}}</span> 
+            {{$t('common.entries')}}
+        </div>
     </div>
 </template>
 <script>
 export default {
+    computed: {
+        rowRange(){
+            let start = (this.page - 1) * this.size;
+            let end = 0;
+
+            if(this.page * this.size >= this.total){
+                end = this.total;
+            }else{
+                end = this.page * this.size;
+            }
+            return `${start} - ${end}`;
+        },
+        pageLength(){
+            if(this.total % this.size == 0){
+                return this.total/this.size;
+            }else{
+                return Math.floor(this.total/this.size) + 1;
+            }
+        }
+    },
     props:{
         total:{
             type:Number,
@@ -46,20 +74,15 @@ export default {
         }
     },
     watch:{
-        total(after){
-            this.pageLength = Math.floor(this.total/this.size);
-        }
     },
     data:()=>{
         return {
             page:null,
             size:50,
-            pageLength:0,
         }
     },
     beforeMount(){
         this.page = 1;
-        this.pageLength = Math.floor(this.total/this.size);
     },
     methods:{
         onNextPage(page){
@@ -98,7 +121,6 @@ export default {
     }
     .s-pagination{
         margin-left: 8px;
-        width: 500px !important;
         justify-content: start !important;
     }
     .s-pagination ::v-deep li > button{

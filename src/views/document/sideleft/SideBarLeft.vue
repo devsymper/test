@@ -32,7 +32,7 @@
             <list-control-tab :instance="instance" v-if="tab.id == 'listControl'">
 
             </list-control-tab>
-            <template-control v-if="tab.id == 'templateControl'">
+            <template-control :instance="instance"   v-if="tab.id == 'templateControl'">
 
             </template-control>
 

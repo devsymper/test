@@ -11,6 +11,8 @@ html {
     --symper-background-active: rgba(0 0 0 / 0.1);
     --symper-background-hover: rgba(0 0 0 / 0.05);
     --symper-border: 1px solid rgb(230, 229, 229);
+    --symper-box-shadow-top: 0px -1px 6px #00000029;
+    --symper-box-shadow-bottom: 0px 3px 6px #00000029;
 }
 
 .symper-bg-orange {
@@ -689,6 +691,7 @@ html {
 .w-auto {
     width: 100% !important;
 }
-#symper-app .dialog-preview-image-comment{
-    overflow:hidden
+
+#symper-app .dialog-preview-image-comment {
+    overflow: hidden
 }

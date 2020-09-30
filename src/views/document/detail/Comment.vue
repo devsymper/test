@@ -1,22 +1,34 @@
 <template>
     <div class="wraper-comment" :style="style">
         <div class="comment-content " style="height:100%">
-				<!-- <span class="mdi mdi-keyboard-backspace" @click="hide"></span> -->
-			<Comment style="margin-left:-12px;margin-right:8px" :showComment="true" :objectIdentifier="objectIdentifierCmt" :objectType="'document'" :height="'100%'" :buttonClose="true" @close-comment="hide" />
+			<Comment style="margin-left:-12px;margin-right:8px" 
+				:showComment="true" 
+				:objectIdentifier="objectIdentifierCmt" 
+				:objectType="'document'" 
+				:height="'100%'"
+				:buttonClose="true" 
+				@close-comment="hide"
+			/>
         </div>
 	</div>
 </template>
 <script>
 import Comment from '@/components/common/comment/Comment.vue'
+import { parseJSON } from 'jquery'
 export default {
 	props:{
 		objectIdentifier:{
 			type: Number,
 		}
 	},
-	watch:{
-		objectIdentifier(after){
-			this.objectIdentifierCmt = after + ""
+	// watch:{
+	// 	objectIdentifier(after){
+	// 		this.objectIdentifierCmt = after + ""
+	// 	}
+	// },
+	computed:{
+		objectIdentifierCmt(){
+			return parseInt(this.objectIdentifier)
 		}
 	},
 	components:{
@@ -24,7 +36,7 @@ export default {
 	},
     data () { 
         return {
-            style:'transform:translateX(400px)'
+			style:'transform:translateX(400px)',
         }
     },
     methods:{

@@ -823,7 +823,7 @@ export default {
             if(this.documentId != 0){
                 documentApi.detailDocument(this.documentId).then(res => {
                     if (res.status == 200) {
-                        if(this.$route.name == "editDocument"){
+                        if(this.$getRouteName() == "editDocument"){
                             thisCpn.setDocumentProperties(res.data.document);
                         }
                         let content = res.data.document.content;

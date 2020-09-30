@@ -1,11 +1,20 @@
 <template>
     <div class="h-100 w-100">
+        <div class="action-diagram-bpmn" style="text-align:right;margin-top:3px">
+            <span class="fs-13" style="float:left">{{definitionName}}</span>
+            <v-icon class="action-btn"  @click="handleZoomOut">mdi-plus-circle-outline</v-icon>
+            <v-icon class="action-btn"  @click="handleZoomIn">mdi-minus-circle-outline</v-icon>
+            <v-icon class="action-btn"  @click="handleFocus">mdi-image-filter-center-focus</v-icon>
+            <v-icon v-if="stask.statusPopupTracking==false" class="action-btn"  @click="handleShowPopup">mdi-fullscreen</v-icon>
+            <v-icon v-else class="action-btn"  @click="handleClosePopup">mdi-close</v-icon>
+        </div>
         <symper-bpmn
             @node-clicked="handleNodeSelected"
             ref="symperBpmn"
             :readOnly="true"
             :diagramXML="diagramXML"
             :customModules="customRender"
+            @after-render-diagram-from-xml="eventAfterRender"
         ></symper-bpmn>
         <symper-drag-panel 
             @before-close="closeDetailPanel()"
@@ -13,10 +22,8 @@
             :actionTitle="nodeDetailPanel.title"
             :panelData="nodeDetailPanel.data"
             :titleIcon="nodeDetailPanel.titleIcon"
-
             :topPosition="nodeDetailPanel.position.top"
             :leftPosition="nodeDetailPanel.position.left"
-
             :dragPanelWidth="300"
             :dragPanelHeight="400">
         </symper-drag-panel>
@@ -60,6 +67,10 @@ export default {
             type: String,
             default: ''
         },
+        definitionName:{
+            type:String,
+            default:'',
+        },
     },
     watch:{
         instanceId(){
@@ -70,6 +81,7 @@ export default {
     created() {
         this.setInstanceXML();
         this.getInstanceRuntimeData();
+ 
     },
     data() {
         return {
@@ -96,14 +108,39 @@ export default {
         "symper-bpmn": SymperBpmn,
         "symper-drag-panel": SymperDragPanel
     },
+    computed:{
+        stask() {
+			return this.$store.state.task;
+		},
+    },
     methods: {
+        eventAfterRender(){
+            setTimeout((self) => {
+                self.$refs.symperBpmn.focus();
+            }, 100,this);
+        },
+        handleClosePopup(){
+            this.$store.commit("task/setStatusPopupTracking",false);
+        },
+        handleShowPopup(){
+            this.$emit("showPopupDiagram");
+        },
+        handleFocus(){
+            this.$refs.symperBpmn.focus();
+        },
+        handleZoomIn(){
+            this.$refs.symperBpmn.zoomIn();
+        },
+        handleZoomOut(){
+            this.$refs.symperBpmn.zoomOut();
+        },
         closeDetailPanel(){
             this.nodeDetailPanel.show = false;
         },
         // Lấy ra thông tin chạy của các node của instance
         getInstanceRuntimeData() {
             let self = this;
-            let idInstance = this.$route.params.idInstance;
+            let idInstance = this.$route.params.idInstance ? this.$route.params.idInstance :this.instanceId;
             bpmneApi
                 .getProcessInstanceRuntimeHistory(idInstance)
                 .then(res => {
@@ -154,11 +191,13 @@ export default {
         setTasksStatus(){
             for(let eleId in this.runtimeNodeMap){
                 let nodeInfo = this.runtimeNodeMap[eleId];
-                if(nodeInfo.activityType.includes('Task')){
-                    let symBpmn = this.$refs.symperBpmn;
-                    symBpmn.updateElementProperties(eleId, {
-                        statusCount: nodeInfo.instancesStatusCount
-                    });
+                if (nodeInfo.activityType) {
+                    if(nodeInfo.activityType.includes('Task')){
+                        let symBpmn = this.$refs.symperBpmn;
+                        symBpmn.updateElementProperties(eleId, {
+                            statusCount: nodeInfo.instancesStatusCount
+                        });
+                    }
                 }
             }
         },
@@ -202,7 +241,7 @@ export default {
             let self = this;
             this.getInstanceData()
                 .then(res => {
-                    return self.getDefinitionData(res.processDefinitionId);
+                    return self.getDefinitionData(res.data[0].processDefinitionId);
                 })
                 .then(res => {
                     
@@ -288,5 +327,14 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
+.action-diagram-bpmn{
+    width:98%;
+    margin-right: 20px;
+}
+.action-btn{
+    cursor: pointer;
+    font-size: 20px;
+    margin-right:5px ;
+}
 </style>
