@@ -29,14 +29,13 @@ export default {
                     listUser.push(e.userId)
                 }
             })
-            console.log(listUser);
             this.$store.commit('orgchart/setAllUserInOrgchart',{
                 orgchartId: res.data.orgchart.id,
                 listUsers: listUser
             })
             this.$store.commit('orgchart/setDataOrgchartSideBySide',{
-                 orgchartId: res.data.orgchart.id,
-                   object:res.data
+                orgchartId: res.data.orgchart.id,
+                object:res.data
             })
             this.allDepartments = res.data.departments;
             this.allPositions = res.data.positions;

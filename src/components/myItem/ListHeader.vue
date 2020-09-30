@@ -477,4 +477,7 @@ export default {
 .v-list-item:hover {
   background-color: #f5f5f5 !important                                                                                ;
 }
+.v-text-field>>>.v-input--dense:not(.v-text-field--outlined) >>>input {
+    padding: 10px 0 11px!important;
+}
 </style>

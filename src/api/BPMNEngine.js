@@ -91,7 +91,11 @@ export default {
     },
     // Lấy data của một process instance
     getProcessInstanceData(id) {
-        return bpmneApi.get(appConfigs.apiDomain.bpmne.instances + '/' + id, {}, testHeader);
+        let filter={};
+        filter.processInstanceId= id;
+       
+        return bpmneApi.post(appConfigs.apiDomain.bpmne.historyInstances, JSON.stringify(filter), testHeader);
+        //return bpmneApi.get(appConfigs.apiDomain.bpmne.instances + '/' + id, {}, testHeader);
     },
     // Lấy các viriable của một process instance
     getProcessInstanceVars(id) {
@@ -191,6 +195,11 @@ export default {
             filter.taskAssignee = filter.assignee;
             delete filter.assignee;
         }
+        if (filter.involvedUser) {
+            filter.taskInvolvedUser=filter.involvedUser;
+            delete filter.involvedUser;
+        }
+        filter.sort = filter.sort == 'createTime' ? 'startTime' : filter.sort;
         filter= JSON.stringify(filter);
         return bpmneApi.post(appConfigs.apiDomain.bpmne.postTasksHistory , filter, testHeader);
     },

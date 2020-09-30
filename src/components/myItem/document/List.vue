@@ -56,7 +56,9 @@
           v-if="!loadingTaskList"
           @ps-y-reach-end="handleReachEndList"
           :style="{height: listTaskHeight+'px'}"
+          class="list-document"
         >
+            <div style="overflow: hidden;">
             <v-row
                 class="item-task"
                 v-for="(obj, idx) in listAllDocumentObjectId"
@@ -65,7 +67,7 @@
                     minHeight: '30px'
                 }"
                 :class="{
-                        'd-active':indexObj==idx||index==idx
+                    'd-active':indexObj==idx||index==idx
                 }"
                 @mouseover="indexObj=idx"
                 @mouseout="indexObj = null"
@@ -79,7 +81,7 @@
                             <div v-on="on" class="text-left fs-13  text-ellipsis w-100">
                                 <v-icon 
                                 class="fs-14" >
-                               mdi-file-document-edit-outline
+                                mdi-file-document-edit-outline
                             </v-icon>  {{obj.title? obj.title : obj.titleObject}}
                             </div>
                         </template>
@@ -143,11 +145,17 @@
                     v-if="!sideBySideMode"
                 >
                     <div class="pl-1">
-                        <div style="width:55px">10 <v-icon class="fs-14" style="float:right;margin-top:4px;margin-right:12px">mdi-comment-processing-outline</v-icon> </div>
-                        <div style="width:55px"> 2 <v-icon class="fs-14" style="float:right;margin-top:4px;margin-right:12px">mdi-attachment</v-icon></div>
+                        <div style="width:55px">
+                            {{commentCountPerTask['document:' + obj.id]}}
+                            <v-icon class="fs-14" style="float:right;margin-top:4px;margin-right:12px">mdi-comment-processing-outline</v-icon> </div>
+                        <div style="width:55px"> 
+                             {{fileCountPerTask['document:' + obj.id]}}
+                            <v-icon class="fs-14" style="float:right;margin-top:4px;margin-right:12px">mdi-attachment</v-icon></div>
                     </div>
                 </v-col>
             </v-row>
+            </div>
+         
         </VuePerfectScrollbar>
         <v-skeleton-loader v-else ref="skeleton" :type="'table-tbody'" class="mx-auto"></v-skeleton-loader>
         <v-skeleton-loader
@@ -207,6 +215,12 @@ import symperAvatar from "@/components/common/SymperAvatar.vue";
 import detailDocument from '@/views/document/detail/Detail';
 export default {
   computed: {
+    fileCountPerTask(){
+        return this.$store.state.file.fileCountPerObj.list;
+    },
+    commentCountPerTask(){
+        return this.$store.state.comment.commentCountPerObj.list;
+    },
     listAllDocumentObjectId() {
         let listObjRelated=this.stask.listDocumentObjId;
         let listObjUserSubmit=this.stask.listDocumentObjIdWithUserSubmit;
@@ -233,7 +247,6 @@ export default {
                 element.displayName="";
             }
         });
-        console.log("aaaaaad",arrDocument);
 
         return arrDocument;
     },
@@ -252,6 +265,14 @@ export default {
         VuePerfectScrollbar: VuePerfectScrollbar,
         symperAvatar: symperAvatar,
         detailDocument
+    },
+    watch:{
+       sideBySideMode(vl){
+            if(!vl){
+                this.$store.dispatch('file/getWaitingFileCountPerObj');
+                this.$store.dispatch('comment/getWaitingCommentCountPerObj');
+            }
+        }
     },
     props: {
         compackMode: {
@@ -314,10 +335,12 @@ export default {
             defaultAvatar: appConfigs.defaultAvatar,
             listIdProcessInstance:[],
             listTaskDone:[],
-            listDocumentObjectId:[]
+            listDocumentObjectId:[],
+
         };
     },
     created() {
+        this.getTasks();
     },
     mounted() {
         let self = this;
@@ -330,9 +353,6 @@ export default {
         self.reCalcListTaskHeight();
     },
     methods: {
-        goBack(){
-            alert("aa");
-        },
         changeUpdateAsignee(){
         this.handleTaskSubmited();
         },
@@ -436,6 +456,7 @@ export default {
             self.listIdProrcessInstances=allProcess;
             await self.getListTaskDoneInArrProcess(self.listIdProrcessInstances);
             await self.getListDocumentObjectId(this.$store.state.app.endUserInfo.id);
+            await self.getCountCommentAndFile();
             self.loadingTaskList = false;
             self.loadingMoreTask = false;
         },
@@ -456,8 +477,7 @@ export default {
                         });
                     }
                 }
-                this.$store.dispatch("task/getListDocumentObjId", self.listDocumentObjectId);
-                console.log("listObjId",self.listDocumentObjectId);
+                await self.$store.dispatch("task/getListDocumentObjId", self.listDocumentObjectId);
             } catch (error) {
                // self.listTaskDone=[];
                 self.$snotifyError(error, "Get Process failed");
@@ -465,7 +485,21 @@ export default {
         },
         async getListDocumentObjectId(userId){
             let self =this;
-            self.$store.dispatch("task/getListDocumentObjIdWithUserSubmit",userId);
+            await self.$store.dispatch("task/getListDocumentObjIdWithUserSubmit",userId);
+        },
+        async getCountCommentAndFile(){
+            let self=this;
+            let listObjRelated=self.stask.listDocumentObjId;
+            let listObjUserSubmit=self.stask.listDocumentObjIdWithUserSubmit;
+            let arrDocument=listObjRelated.concat(listObjUserSubmit);
+            let documentIden = [];
+            arrDocument.forEach(element => {
+                documentIden.push('document:'+element.id);
+            });
+            self.$store.commit('file/setWaitingFileCountPerObj', documentIden);
+            self.$store.commit('comment/setWaitingCommentCountPerObj', documentIden);
+            self.$store.dispatch('file/getWaitingFileCountPerObj');
+            self.$store.dispatch('comment/getWaitingCommentCountPerObj');
         }
     }
 };

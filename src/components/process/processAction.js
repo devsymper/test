@@ -11,18 +11,18 @@ import {
 } from "@/main.js";
 
 function moveTaskTitleToNameAttr(content, configValue) {
-    for (let idEl in configValue) {
-        if (configValue[idEl].hasOwnProperty('notificationTitle')) {
-            let pattern = new RegExp('bpmn:userTask(.*?)id="' + idEl + '"(.*?)name="(.*?)"', 'g');
-            let matchPatt = content.match(pattern);
-            if (matchPatt) {
-                for (let item of matchPatt) {
-                    let replacedItem = item.replace(/name="(.*?)"/g, 'name="' + configValue[idEl].notificationTitle + '"');
-                    content = content.replace(item, replacedItem);
-                }
-            }
-        }
-    }
+    // for (let idEl in configValue) {
+    //     if (configValue[idEl].hasOwnProperty('notificationTitle')) {
+    //         let pattern = new RegExp('bpmn:userTask(.*?)id="' + idEl + '"(.*?)name="(.*?)"', 'g');
+    //         let matchPatt = content.match(pattern);
+    //         if (matchPatt) {
+    //             for (let item of matchPatt) {
+    //                 let replacedItem = item.replace(/name="(.*?)"/g, 'name="' + configValue[idEl].notificationTitle + '"');
+    //                 content = content.replace(item, replacedItem);
+    //             }
+    //         }
+    //     }
+    // }
     return content;
 }
 

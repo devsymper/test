@@ -64,6 +64,7 @@
         "last_update_at": "Cập nhật lần cuối",
         "create_at": "Tạo lúc",
         "user_create": "Người tạo",
+        "last_user_update": "Người cập nhật cuối",
         "filter": "Bộ lọc",
         "sort": "Sắp xếp",
         "status": "Trạng thái",
@@ -89,7 +90,7 @@
         "import_excel": "Nhập bằng excel",
         "sidebar": {
             "Lists trash": "Danh sách bản xóa",
-            "myApplication": "My Application",
+            "myApplication": "Ứng dụng của tôi",
             "tasks": "Tasks",
             "works": "Works",
             "My work": "Công việc của tôi",
@@ -246,10 +247,13 @@
         },
         "table": {
             "id": "Id",
-            "firstName": "Tên",
+            "firstName": "Họ",
+            "lastName": "Tên",
+            "userName": "Tên đầy đủ",
             "displayName": "Tên hiển thị",
             "email": "Địa chỉ email",
-            "phoneNumber": "Số điện thoại",
+            "phone": "Số điện thoại",
+            "avatar": "Ảnh đại diện",
             "status": "Trạng thái",
             "createAt": "Thời gian tạo",
             "updateAt": "Thời gian cập nhật",
@@ -964,6 +968,12 @@
             "parentWork": "Parent work",
             "siblingWork": "Sibling work",
             "subWork": "Sub work"
+        },
+        "sidebar": {
+            "showMoreTask": "Xem thêm các task liên quan",
+            "showLess": "Thu gọn",
+            "showMoreFile": "Xem thêm các tệp"
+
         }
 
     },
@@ -1060,6 +1070,11 @@
         "overMaxOpen": {
             "title": "Không thể tạo thêm tab mới",
             "detail": "Số lượng tab vượt quá giới hạn, hãy xóa một vài tab"
+        }
+    },
+    "dashboard": {
+        "detail": {
+            "title": "Detail dashboard "
         }
     },
     "comment": {

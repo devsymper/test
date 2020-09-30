@@ -1,10 +1,10 @@
 <template>
-    <div class="ml-2 w-100 pr-3 pt-3" >
+    <div class="ml-2 w-100 pr-3 pt-3 list-item-common-symper" >
         <div :style="{width:contentWidth, display: 'inline-block'}">
             <v-row no-gutters class="pb-2" ref="topBar">
                 <v-col>
                     <span class="symper-title float-left">{{pageTitle}}</span>
-                    <div class="float-right overline">
+                    <div :class="{'float-right': true, 'overline' : true , 'show-panel-mode': actionPanel } ">
                         <v-text-field
                             @input="bindToSearchkey"
                             class="d-inline-block mr-2 sym-small-size"
@@ -16,6 +16,7 @@
                             :placeholder="$t('common.search')"
                         ></v-text-field>
                         <v-btn
+                            v-show="showButtonAdd && !actionPanel"
                             depressed
                             small
                             :loading="loadingRefresh"
@@ -25,7 +26,7 @@
                             v-if="checkShowCreateButton()"
                         >
                             <v-icon left dark>mdi-plus</v-icon>
-                            {{$t('common.add')}}
+                            <span >{{$t('common.add')}}</span>
                         </v-btn>
                         <v-btn
                             depressed
@@ -33,12 +34,14 @@
                             :loading="loadingRefresh"
                             :disabled="loadingRefresh"
                             class="mr-2"
-                            v-if="!isCompactMode"
+                            v-if="!isCompactMode && !actionPanel "
                             @click="refreshList"
                         >
                             <v-icon left dark>mdi-refresh</v-icon>
-                            {{$t('common.refresh')}}
+                            <span >{{$t('common.refresh')}}</span>
                         </v-btn>
+                     
+                      
                         <v-btn
                             depressed
                             small
@@ -49,7 +52,7 @@
                             v-if="!isCompactMode && showExportButton"
                         >
                             <v-icon left dark>mdi-microsoft-excel</v-icon>
-                            {{$t('common.export_excel')}}
+                            <span v-show="!actionPanel">{{$t('common.export_excel')}}</span>
                         </v-btn>
 
                         
@@ -58,11 +61,69 @@
                             small
                             @click="importExcel()"
                             class="mr-2"
-                            v-if="showImportButton"
+                            v-if="showImportButton "
                         >
                             <v-icon left dark>mdi-database-import</v-icon>
-                            {{$t('common.import_excel')}}
+                            <span>{{$t('common.import_excel')}}</span>
                         </v-btn>
+                          <!-- show menu khi hien sidebar -->
+                         <v-menu
+                            bottom
+                            left
+                            >
+                            <template v-slot:activator="{ on, attrs }">
+                                 <v-btn 
+                                    icon
+                                    tile 
+                                    v-show="actionPanel"
+                                    v-bind="attrs"
+                                    v-on="on"
+                                    style="width:29px;height:29px;margin:0px 4px"    
+                                >
+                                        <v-icon>
+                                            mdi-dots-vertical
+                                        </v-icon>
+                                </v-btn>
+                            </template>
+                            <v-list>
+                                <v-list-item  v-show="showButtonAdd"  @click="addItem">
+                                    <v-list-item-icon>
+                                         <v-icon>mdi-plus</v-icon>
+                                    </v-list-item-icon>
+                                    <v-list-item-content>
+                                         <v-list-item-title> {{$t('common.add')}}</v-list-item-title>
+                                    </v-list-item-content>
+                                </v-list-item>
+                                <v-list-item  v-show="!isCompactMode"  @click="refreshList">
+                                    <v-list-item-icon>
+                                         <v-icon>mdi-refresh</v-icon>
+                                    </v-list-item-icon>
+                                    <v-list-item-content>
+                                         <v-list-item-title> {{$t('common.refresh')}}</v-list-item-title>
+                                    </v-list-item-content>
+                                </v-list-item>
+                                <v-list-item  v-show="!isCompactMode && showExportButton"  @click="exportExcel()">
+                                    <v-list-item-icon>
+                                         <v-icon>mdi-microsoft-excel</v-icon>
+                                    </v-list-item-icon>
+                                    <v-list-item-content>
+                                         <v-list-item-title>{{$t('common.export_excel')}}</v-list-item-title>
+                                    </v-list-item-content>
+                                </v-list-item>
+                                <v-list-item  v-show="showImportButton"  @click="importExcel()">
+                                    <v-list-item-icon>
+                                         <v-icon>
+                                             mdi-database-import
+                                         </v-icon>
+                                    </v-list-item-icon>
+                                    <v-list-item-content>
+                                         <v-list-item-title> 
+                                             {{$t('common.import_excel')}}
+                                        </v-list-item-title>
+                                    </v-list-item-content>
+                                </v-list-item>
+                            </v-list>
+                        </v-menu>
 
                         <component
                             :is="'span'"
@@ -172,6 +233,7 @@
             :tableDisplayConfig="tableDisplayConfig"
             :tableColumns="tableColumns"
             :headerPrefixKeypath="headerPrefixKeypath"
+            :showActionPanelInDisplayConfig="showActionPanelInDisplayConfig"
         ></display-config>
 
         <table-filter
@@ -250,8 +312,12 @@ export default {
                 this.$emit("open-panel");
             }
         },
+        getDataUrl(){   
+           this.refreshList();
+        },
         'tableDisplayConfig.value.alwaysShowSidebar'(value) {
             if(value){
+            // if(value && Object.keys(this.currentItemDataClone).length > 0){
                 this.openactionPanel();
             }else{
                 this.closeactionPanel();
@@ -302,6 +368,7 @@ export default {
                 manualColumnResize: true,
                 renderAllRows: true,
                 manualRowResize: true,
+                readOnly: true,
                 rowHeights: 21,
                 stretchH: "all",
                 licenseKey: "non-commercial-and-evaluation",
@@ -420,7 +487,7 @@ export default {
     props: {
         showImportButton: {
             type: Boolean,
-            default: true
+            default: false
         },
         exportLink: {
             type: String,
@@ -428,7 +495,7 @@ export default {
         },
         showExportButton: {
             type: Boolean,
-            default: true
+            default: false
         },
         widgetIdentifier: {
             type: String,
@@ -443,6 +510,14 @@ export default {
             default() {
                 return {};
             }
+        },
+        showButtonAdd:{
+            type:Boolean,
+            default: true
+        },
+        showActionPanelInDisplayConfig:{
+            type: Boolean,
+            default: false,
         },
         /**
          * Prefix cho keypath trong file đa ngôn ngữ để hiển thị header của table
@@ -616,7 +691,7 @@ export default {
                     markFilter = "applied-filter";
                 }
                 let headerName = prefix ? thisCpn.$t(prefix + colTitles[col]) : colTitles[col];
-                return `<span>
+                return `<span class="d-flex justify-space-between">
                             <span class="font-weight-medium">
                                 ${headerName}
                             </span>
@@ -1201,12 +1276,19 @@ export default {
                 let orderedCols = [];
                 let noneOrderedCols = [];
                 for (let col of savedOrderCols) {
+                    colMap[col.data].checkedOrder = true;
                     if (colMap[col.data]) {
                         colMap[col.data].symperFixed = col.symperFixed;
                         colMap[col.data].symperHide = col.symperHide;
                         orderedCols.push(colMap[col.data]);
                     } else {
                         noneOrderedCols.push(colMap[col.data]);
+                    }
+                }
+
+                for(let colName in colMap){
+                    if(!colMap[colName].checkedOrder){
+                        noneOrderedCols.push(colMap[colName]);
                     }
                 }
                 return orderedCols.concat(noneOrderedCols);
@@ -1250,6 +1332,10 @@ export default {
             this.tableDisplayConfig.show = !this.tableDisplayConfig.show;
         },
         showTableDropdownMenu(x, y, colName) {
+            var windowWidth = $(window).width()/1.1;
+            if(x > windowWidth){
+                x -= 190;
+            }
             let filterDom = $(this.$refs.tableFilter.$el);
             filterDom.css("left", x + "px").css("top", y + 10 + "px");
             this.$refs.dataTable.hotInstance.deselectCell();
@@ -1465,7 +1551,7 @@ export default {
     white-space: nowrap !important;
 }
 .symper-custom-table.loosen-row .ht_master.handsontable .htCore td,
-.symper-custom-table.loosen-row .ht_clone_left.handsontable .htCore td {
+.symper-custom-table.loosen-row .htgetDataUrl_clone_left.handsontable .htCore td {
     height: 40px !important;
     line-height: 40px !important;
 }
@@ -1521,4 +1607,20 @@ i.applied-filter {
     border-color: #bbb;
     border-right: 0;
 }
+.ht_clone_left {
+    z-index: 8;
+}
+.v-list-item {
+    min-height:unset;
+    height:30px;
+    margin:2px 8px;
+}
+.v-list-item__icon  {
+    margin-right:12px !important;
+    min-height:unset;
+}
+.v-list-item i{
+    margin-top:-12px;
+}
 </style>
+

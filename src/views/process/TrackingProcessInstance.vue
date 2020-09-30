@@ -14,6 +14,7 @@
             :readOnly="true"
             :diagramXML="diagramXML"
             :customModules="customRender"
+            @after-render-diagram-from-xml="eventAfterRender"
         ></symper-bpmn>
         <symper-drag-panel 
             @before-close="closeDetailPanel()"
@@ -21,10 +22,8 @@
             :actionTitle="nodeDetailPanel.title"
             :panelData="nodeDetailPanel.data"
             :titleIcon="nodeDetailPanel.titleIcon"
-
             :topPosition="nodeDetailPanel.position.top"
             :leftPosition="nodeDetailPanel.position.left"
-
             :dragPanelWidth="300"
             :dragPanelHeight="400">
         </symper-drag-panel>
@@ -82,6 +81,7 @@ export default {
     created() {
         this.setInstanceXML();
         this.getInstanceRuntimeData();
+ 
     },
     data() {
         return {
@@ -114,6 +114,11 @@ export default {
 		},
     },
     methods: {
+        eventAfterRender(){
+            setTimeout((self) => {
+                self.$refs.symperBpmn.focus();
+            }, 100,this);
+        },
         handleClosePopup(){
             this.$store.commit("task/setStatusPopupTracking",false);
         },
@@ -135,7 +140,7 @@ export default {
         // Lấy ra thông tin chạy của các node của instance
         getInstanceRuntimeData() {
             let self = this;
-            let idInstance = this.$route.params.idInstance;
+            let idInstance = this.$route.params.idInstance ? this.$route.params.idInstance :this.instanceId;
             bpmneApi
                 .getProcessInstanceRuntimeHistory(idInstance)
                 .then(res => {
@@ -236,7 +241,7 @@ export default {
             let self = this;
             this.getInstanceData()
                 .then(res => {
-                    return self.getDefinitionData(res.processDefinitionId);
+                    return self.getDefinitionData(res.data[0].processDefinitionId);
                 })
                 .then(res => {
                     

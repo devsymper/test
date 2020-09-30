@@ -37,7 +37,6 @@
                 v-if="!sideBySideMode"
                 class="fs-13 font-weight-medium"
               >{{$t("tasks.header.createDate")}}</v-col>
-
               <v-col
                 cols="2"
                 v-if="!sideBySideMode && !compackMode && !smallComponentMode"
@@ -65,7 +64,6 @@
                 <v-row
                    :class="{
                         'mr-0 ml-0 single-row': true ,
-                        'py-1': !isSmallRow,
                         'py-0': isSmallRow,
                     }"
                     :style="{
@@ -81,7 +79,6 @@
                     :index="obj.id"
                     :class="{
                                     'mr-0 ml-0 single-row': true ,
-                                    'py-1': !isSmallRow,
                                     'py-0': isSmallRow,
                                     'd-active':index==idx && dataIndex==idex
                                 }"
@@ -133,7 +130,7 @@
                         cols="2"
                         v-if="!sideBySideMode && !smallComponentMode"
                     >
-                       <div class="">
+                       <div class="mt-1">
                             <v-tooltip bottom>
                                 <template v-slot:activator="{ on }">
                                 <span
@@ -146,7 +143,7 @@
                                 <span>{{ obj.processDefinitionName?  obj.processDefinitionName : `ad hoc` }}</span>
                             </v-tooltip>
                             <div class="pa-0 grey--text mt-1 lighten-2 d-flex justify-space-between">
-                      
+                              {{selectNameApp(obj.variables)}}
                             </div>
                         </div>
                         
@@ -157,8 +154,12 @@
                         class="fs-13 px-1 py-0"
                     >
                         <div class="pl-1">
-                            <div style="width:55px">10 <v-icon class="fs-14" style="float:right;margin-top:4px;margin-right:12px">mdi-comment-processing-outline</v-icon> </div>
-                            <div style="width:55px"> 2 <v-icon class="fs-14" style="float:right;margin-top:4px;margin-right:12px">mdi-attachment</v-icon></div>
+                            <div style="width:55px">
+                                {{commentCountPerTask['work:' + obj.id]}}
+                                <v-icon class="fs-14" style="float:right;margin-top:4px;margin-right:12px">mdi-comment-processing-outline</v-icon> </div>
+                            <div style="width:55px">
+                                  {{fileCountPerTask['work:' + obj.id]}}
+                                <v-icon class="fs-14" style="float:right;margin-top:4px;margin-right:12px">mdi-attachment</v-icon></div>
                         </div>
                     </v-col>
                 </v-row>
@@ -208,6 +209,12 @@ import symperAvatar from "@/components/common/SymperAvatar.vue";
 
 export default {
   computed: {
+    fileCountPerTask(){
+        return this.$store.state.file.fileCountPerObj.list;
+    },
+    commentCountPerTask(){
+        return this.$store.state.comment.commentCountPerObj.list;
+    },
     groupAllProcessInstance() {
         let allPrcess = this.listProrcessInstances;
         const groups = allPrcess.reduce((groups, work) => {
@@ -230,7 +237,6 @@ export default {
             works: groups[date]
             };
         });
-        console.log("addd",groupArrayWork);
         return groupArrayWork;
     },
     stask() {
@@ -248,6 +254,14 @@ export default {
     VuePerfectScrollbar: VuePerfectScrollbar,
     symperAvatar: symperAvatar,
     workDetail
+  },
+  watch:{
+       sideBySideMode(vl){
+            if(!vl){
+                this.$store.dispatch('file/getWaitingFileCountPerObj');
+                this.$store.dispatch('comment/getWaitingCommentCountPerObj');
+            }
+        }
   },
   props: {
     compackMode: {
@@ -306,7 +320,7 @@ export default {
         sort: "createTime",
         order: "desc",
         page: 1,
-        assignee: this.$store.state.app.endUserInfo.id
+        involvedUser: this.$store.state.app.endUserInfo.id
       },
       defaultAvatar: appConfigs.defaultAvatar,
       listIdProcessInstance:[],
@@ -340,7 +354,21 @@ export default {
     changeObjectType(index) {
       this.$emit("changeObjectType", index);
     },
-   
+    selectNameApp(variables){
+        const symperAppId = variables.find(element => element.name=='symper_application_id');
+        if (symperAppId) {
+            let appId=symperAppId.value;
+            let allApp = this.$store.state.task.allAppActive;
+            let app=allApp.find(element => element.id==appId);
+            if (app) {
+                return app.name;
+            }else{
+                return "";
+            }
+        }else{
+            return "";
+        }
+    },
     handleReachEndList() {
       if (
         this.allFlatTasks.length < this.totalTask &&
@@ -416,20 +444,30 @@ export default {
             if (!filter.assignee) {
             filter.assignee = this.$store.state.app.endUserInfo.id;
             }
-            res = await BPMNEngine.getTask(filter);
+            res = await BPMNEngine.postTaskHistory(filter);
             listTasks = res.data;
         }
         this.totalTask = Number(res.total);
         let allProcess=[];
+        let processIden = [];
         for (let task of listTasks) {
             if (task.processInstanceId && task.processInstanceId!=null) {
                 if(allProcess.indexOf(task.processInstanceId) === -1) {
                     allProcess.push(task.processInstanceId);
+                    processIden.push('work:'+task.processInstanceId);
                 }
             }
         }
+
+        this.$store.commit('file/setWaitingFileCountPerObj', processIden);
+        this.$store.commit('comment/setWaitingCommentCountPerObj', processIden);
+        this.$store.dispatch('file/getWaitingFileCountPerObj');
+        this.$store.dispatch('comment/getWaitingCommentCountPerObj');
+
         self.listIdProrcessInstances=allProcess;
-        await this.getListProcessInstance(self.listIdProrcessInstances);
+        if (allProcess.length>0) {
+            await this.getListProcessInstance(self.listIdProrcessInstances);
+        }
         self.loadingTaskList = false;
         self.loadingMoreTask = false;
     },
@@ -442,6 +480,7 @@ export default {
                 filter.size=100;
                 filter.sort='startTime';
                 filter.order='desc';
+                filter.includeProcessVariables=true;
                 let res = await BPMNEngine.getProcessInstanceHistory(filter);
                 self.listProrcessInstances=res.data;
             }else if(status=='done'){ 

@@ -75,7 +75,6 @@
                 <v-row
                    :class="{
                         'mr-0 ml-0 single-row': true ,
-                        'py-1': !isSmallRow,
                         'py-0': isSmallRow,
                     }"
                     :style="{
@@ -91,7 +90,6 @@
                     :index="obj.id"
                     :class="{
                                     'mr-0 ml-0 single-row': true ,
-                                    'py-1': !isSmallRow,
                                     'py-0': isSmallRow,
                                     'd-active':index==idx && dataIndex==idex
                                 }"
@@ -117,10 +115,6 @@
                         <v-tooltip bottom>
                         <template v-slot:activator="{ on }">
                             <div v-on="on" class="text-left fs-13 pr-6 text-ellipsis w-100">
-                            <span
-                                v-if="obj.taskData.action && obj.taskData.action.action=='approval'"
-                                style="color:#ffc107"
-                            >{{obj.taskData.action.parameter.documentObjectId ? checkData(obj.taskData.action.parameter.documentObjectId): ''}}</span>
                             {{obj.taskData.content}}
                             </div>
                         </template>
@@ -170,7 +164,7 @@
                         cols="2"
                         v-if="!sideBySideMode && !smallComponentMode"
                     >
-                       <div class="pl-1">
+                       <div class="pl-1 mt-1">
                             <v-tooltip bottom>
                                 <template v-slot:activator="{ on }">
                                 <span
@@ -183,9 +177,9 @@
                                 <span>{{ obj.processDefinitionName?  obj.processDefinitionName : `ad hoc` }}</span>
                             </v-tooltip>
                             <div class="pa-0 grey--text mt-1 lighten-2 d-flex justify-space-between">
-                            <!-- <div
-                                class="fs-11 pr-6 text-ellipsis"
-                            >App</div> -->
+                                <div
+                                    class="fs-11 pr-6 text-ellipsis"
+                                >{{selectNameApp(obj.variables)}}</div>
                             </div>
                         </div>
                         
@@ -208,7 +202,6 @@
                     </v-col>
                 </v-row>
             </div>
-           
         </VuePerfectScrollbar>
         <v-skeleton-loader v-else ref="skeleton" :type="'table-tbody'" class="mx-auto"></v-skeleton-loader>
         <v-skeleton-loader
@@ -264,6 +257,7 @@ export default {
         commentCountPerTask(){
             return this.$store.state.comment.commentCountPerObj.list;
         },
+       
         // Liệt kê danh sách các task dưới dạng phẳng - ko phân cấp
         flatTasks() {
             let tasks = [];
@@ -386,6 +380,7 @@ export default {
                 sort: "createTime",
                 order: "desc",
                 page: 1,
+                includeProcessVariables:true,
                 involvedUser: this.$store.state.app.endUserInfo.id
                 // assignee: this.$store.state.app.endUserInfo.id
             },
@@ -425,28 +420,43 @@ export default {
             return this.$moment(time).fromNow();
         }
     },
+    selectNameApp(variables){
+        const symperAppId = variables.find(element => element.name=='symper_application_id');
+        if (symperAppId) {
+            let appId=symperAppId.value;
+            let allApp = this.$store.state.task.allAppActive;
+            let app=allApp.find(element => element.id==appId);
+            if (app) {
+                return app.name;
+            }else{
+                return "";
+            }
+        }else{
+            return "";
+        }
+    },
     changeObjectType(index) {
       this.$emit("changeObjectType", index);
     },
-    checkData(documentObjectId) {
-      if (documentObjectId != "" || documentObjectId != undefined) {
-        let arr = this.stask.arrDocObjId;
-        let obj = arr.find(data => data.id === documentObjectId);
-        if (obj) {
-          let arrUser = this.sapp.allUsers;
-          let user = arrUser.find(data => data.email === obj.userCreate);
-          if (user) {
-            return user.displayName;
-          } else {
-            return "";
-          }
-        } else {
-          return "";
-        }
-      } else {
-        return "";
-      }
-    },
+    // checkData(documentObjectId) {
+    //   if (documentObjectId != "" || documentObjectId != undefined) {
+    //     let arr = this.stask.arrDocObjId;
+    //     let obj = arr.find(data => data.id === documentObjectId);
+    //     if (obj) {
+    //       let arrUser = this.sapp.allUsers;
+    //       let user = arrUser.find(data => data.email === obj.userCreate);
+    //       if (user) {
+    //         return user.displayName;
+    //       } else {
+    //         return "";
+    //       }
+    //     } else {
+    //       return "";
+    //     }
+    //   } else {
+    //     return "";
+    //   }
+    // },
     handleReachEndList() {
       if (
         this.allFlatTasks.length < this.totalTask &&
@@ -548,11 +558,7 @@ export default {
             listTasks = res.data;
         }
         this.totalTask = Number(res.total);
-      // let allDefinitions=this.$store.state.process.allDefinitions;
-      // if(Object.entries(allDefinitions).length === 0){
-      //     this.$store.dispatch('process/getAllDefinitions');
-      // }
-
+        this.$store.dispatch('task/getAllAppActive');
         //Khadm: danh sách các task cần lấy tổng số comment và file đính kèm
         let taskIden = [];
         for (let task of listTasks) {
@@ -600,19 +606,19 @@ export default {
           parseInt(listTasks[index].assignee)
         );
         listTasks[index].owner = this.getUser(parseInt(listTasks[index].owner));
-        if (listTasks[index].description) {
-          let description = JSON.parse(listTasks[index].description);
-          if (
-            description.action.action == "approval" &&
-            description.action.parameter.documentObjectId != undefined
-          ) {
-            this.arrdocObjId.push(
-              description.action.parameter.documentObjectId
-            );
-          }
-        }
+        // if (listTasks[index].description) {
+        //   let description = JSON.parse(listTasks[index].description);
+        //   if (
+        //     description.action.action == "approval" &&
+        //     description.action.parameter.documentObjectId != undefined
+        //   ) {
+        //     this.arrdocObjId.push(
+        //       description.action.parameter.documentObjectId
+        //     );
+        //   }
+        // }
       }
-      this.$store.dispatch("task/getArrDocObjId", this.arrdocObjId);
+     // this.$store.dispatch("task/getArrDocObjId", this.arrdocObjId);
       this.listProrcessInstances.push({
         processDefinitionId: null,
         processDefinitionName: this.$t("common.other"),

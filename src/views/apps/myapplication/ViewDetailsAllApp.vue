@@ -93,7 +93,7 @@
                                                                                 <span style="font:13px roboto">{{subChildItem.title}}</span> 
                                                                                 <span style="font:8px;opacity:0.4">{{subChildItem.name}}</span>
                                                                             </v-tooltip>
-                                                                            <div v-else >{{subChildItem.title ? subChildItem.title : subChildItem.name }}</div>
+                                                                            <div v-else  class="title-document-enduser" >{{subChildItem.title ? subChildItem.title : subChildItem.name }}</div>
                                                                             <v-icon  
 																				@click="changeFavorite(subChildItem, childItem.name, item)" 
 																				:class="{
@@ -420,7 +420,6 @@ export default {
         }
     },
     created(){
-        debugger
         if(Object.keys(this.listApp).length == 0 ){
            this.getActiveapps()
         }else{
@@ -542,7 +541,7 @@ export default {
 }
 .view-details-all-app >>> .title-document-enduser{
 	white-space: nowrap; 
-	width: 90%; 
+	width: 80%; 
 	overflow: hidden;
 	text-overflow: ellipsis; 
 }

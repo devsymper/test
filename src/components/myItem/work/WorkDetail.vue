@@ -22,7 +22,7 @@
                     <template v-slot:activator="{ on }">
                         <v-btn v-on="on"  depressed class="mr-2" small>
                             <v-icon size="18">mdi-filter-menu-outline</v-icon>
-                            <span class="ml-2">{{$t('myItem.filterObj')}}</span>
+                            <span class="ml-2">{{$t('myItem.objType')}}</span>
                         </v-btn>
                     </template>
                     <v-list>
@@ -31,6 +31,18 @@
                     </v-list-item>
                     </v-list>
                 </v-menu>
+                <v-tooltip bottom>
+                    <template v-slot:activator="{ on }">
+                        <v-btn  
+                            style="color:green"
+                            v-on="on" text small
+                            @click="toggleSidebar"
+                            >
+                                Xem chi tiết
+                        </v-btn>
+                    </template>
+                    <span>Xem chi tiết</span>
+                </v-tooltip>
                 <v-btn small text  @click="closeDetail">
                     <v-icon small>mdi-close</v-icon>
                 </v-btn>
@@ -38,7 +50,7 @@
             </div>
         </v-row>
         <v-divider style="border-color: #bebebe;"></v-divider>
-        <div v-if="filterObject==0 && statusDetailWork==false">
+        <div class="detail-work" style="height:100%" v-if="filterObject==0 && statusDetailWork==false">
             <v-row class="ma-0">
                 <v-col cols="12" class="list-tasks pt-0 pb-0">
                     <v-row>
@@ -65,12 +77,13 @@
             </v-row>
             <VuePerfectScrollbar
             @ps-y-reach-end="handleReachEndList"
+            style="height:calc(100% - 160px);"
             >
                 <v-expansion-panels
                     v-model="panel"
                     multiple
                     class="listWork"
-                    style="margin-bottom:30px"
+                    style="overflow: hidden;"
                 >
                     <v-expansion-panel>
                         <v-expansion-panel-header class="v-expand-header">{{$t('myItem.work.parentWork')}}</v-expansion-panel-header>
@@ -256,6 +269,26 @@
                 :workId="idWorkSelected"
             />
         </div>
+        <SideBarDetail
+            :sidebarWidth="sidebarWidth"  
+            :isShowSidebar="isShowSidebar"
+            :objSideBar="`work`"
+            :workInfo="workInfo"
+            @showContentFile="showContentFile"
+            @showPopupTracking="showPopupTracking"
+        />
+        <KHShowFile
+            @downloadOrBackupFile="downloadOrBackupFile"
+            v-bind:fileId="fileId"
+            v-bind:name="name"
+            v-bind:serverPath="serverPath"
+            v-bind:type="type"
+        />
+        <PopupProcessTracking 
+            :workInfo="workInfo"
+            :definitionName="breadcrumb.definitionName"
+            :showType="`work`"
+        />
        
     </div>
 </template>
@@ -268,6 +301,11 @@ import { appManagementApi } from '@/api/AppManagement';
 import symperAvatar from "@/components/common/SymperAvatar.vue";
 import listTask from "./ListTask";
 import workDetailSub from "./WorkDetailSub";
+import SideBarDetail from "./SideBarDetail";
+import KHShowFile from "@/components/kh/KHShowImage";
+import { taskApi } from "@/api/task.js";
+import PopupProcessTracking from '../PopupProcessTracking'
+
 import {
   extractTaskInfoFromObject,
   addMoreInfoToTask
@@ -307,10 +345,18 @@ export default {
         listTask,
         VuePerfectScrollbar,
         symperAvatar,
-        workDetailSub
+        workDetailSub,
+        SideBarDetail,
+        KHShowFile,
+        PopupProcessTracking
     },
     data: function() {
         return {
+            fileId: "",
+			serverPath: "",
+			name: "",
+			type: "",
+            sidebarWidth:400,
             filterObject:0,
             indexObj:null,
             indexSub:null,
@@ -411,6 +457,31 @@ export default {
     created(){
     },
     methods: {
+        showContentFile(data){
+            this.serverPath = data.serverPath;
+			this.name = data.name;
+			this.type = data.type;
+			this.fileId = data.id;
+            this.$store.commit("kh/changeStatusShowImage", true);
+        },
+        downloadOrBackupFile(data) {
+			this.downLoadFile(data.fileId);
+        },
+        downLoadFile(id) {
+			taskApi
+			.downloadFile(id)
+			.then(res => {})
+			.catch(err => {
+			console.log("error download file!!!", err);
+			})
+			.always(() => {});
+		},
+        showPopupTracking(){
+            this.$store.commit("task/setStatusPopupTracking",true)
+        },
+        toggleSidebar(){
+            this.isShowSidebar = !this.isShowSidebar;
+        },
         backToListWork(){
             this.statusDetailWork=false;
             this.setTaskBreadcrumb({},'');

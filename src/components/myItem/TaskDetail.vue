@@ -247,7 +247,11 @@ export default {
                 for(let role in self.tabsData.people){
                     if(res[role]){
                         self.tabsData.people[role] = res[role].split(',').reduce((arr, el) => {
-                            arr.push(self.usersMap[el]);
+                            if(self.usersMap[el]){
+                                arr.push(self.usersMap[el]);
+                            }else{
+                                console.warn('user id not found : ', el);
+                            }
                             return arr;
                         }, []);
                     }

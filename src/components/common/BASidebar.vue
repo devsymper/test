@@ -79,7 +79,7 @@
                                     </div>
                                     <v-autocomplete
                                         ref="selectDelegateUser"
-                                         :menu-props="{ maxHeight:300, minWidth:251,maxWidth:251,nudgeLeft:8, nudgeBottom:3}"
+                                         :menu-props="{ maxHeight:300, minWidth:251,maxWidth:251, nudgeLeft:8, nudgeBottom:3}"
                                         return-object
                                         class="mr-2 ml-2"
                                         full-width
@@ -100,9 +100,10 @@
                                             <span class="fs-13">{{$t('common.search')}}</span>
                                         </template>
                                         <template v-slot:item="data">
-                                            <div class="fs-13 py-1">
+                                        
+                                            <div class="fs-13 py-1" >
                                                  <SymperAvatar
-                                                     style="height:25px!important; width:25px!important; margin-left:-5px"  
+                                                    style="height:25px!important; width:25px!important; margin-left:-5px"  
                                                     :userId="data.item.id"/>
                                                 <span  class="fs-13 ml-1"> {{data.item.displayName}}</span>
                                             </div>
@@ -262,26 +263,46 @@
         </v-list>
         <template v-slot:append>
             <v-list-item>
-                <v-list-item-icon class="collapse-action-icon d-flex justify-start">
-                <v-icon v-if="showChevIcon" 
-                    @click.stop="invertSidebarShow()" 
-                    style="font-size: 20px">
-                    mdi mdi-chevron-left
-                </v-icon>
-                <v-icon v-else 
-                    @click.stop="invertSidebarShow()" 
-                    style="font-size: 20px">
-                    mdi mdi-chevron-right
-                </v-icon>
-                    </v-list-item-icon>
-                      <v-menu  top nudge-top='40' nudge-left='60'>
+                <!-- <v-list-item-icon class="collapse-action-icon d-flex justify-start"> -->
+                    <div style="margin-left:-8px">
+                        <v-btn
+                            icon
+                            tile 
+                            v-if="showChevIcon"
+                            @click.stop="invertSidebarShow()" 
+                        >
+                            <v-icon
+                                style="font-size: 20px">
+                                mdi mdi-chevron-left
+                            </v-icon>
+                        </v-btn>
+                        <v-btn
+                            icon
+                            tile 
+                            v-else 
+                            @click.stop="invertSidebarShow()" 
+                        >
+                            <v-icon
+                                style="font-size: 20px">
+                                mdi mdi-chevron-right
+                            </v-icon>
+                        </v-btn>
+                    </div>
+                    
+                    <!-- <v-icon v-else 
+                        @click.stop="invertSidebarShow()" 
+                        style="font-size: 20px">
+                        mdi mdi-chevron-right
+                    </v-icon> -->
+                <!-- </v-list-item-icon> -->
+                      <v-menu top nudge-top='40' nudge-left='60'>
                         <template v-slot:activator="{ on: menu }">
                             <v-btn style="margin-left:140px" icon tile v-on="menu">
                                 <v-icon style="font-size:18px">mdi-cog-outline</v-icon>
                             </v-btn>
                         </template>
                         <v-list dense>
-                            <v-list-item  class="v-list-item--link" style="background-color:white!important" dense>
+                            <v-list-item class="v-list-item--link" style="background-color:white!important" dense>
                                 <v-menu  right nudge-top="10" nudge-right='80'>
                                     <template v-slot:activator="{ on: menu1 }">
                                         <v-list-item-title class="fs-13 fm" style="padding-left:4px" v-on="menu1">
@@ -428,7 +449,10 @@ export default {
             if(item.action){
                  this.$evtBus.$emit('symper-app-call-action-handler', item.action, this, {});
             }else{
-                this.$goToPage(item.link, item.title, false, false);
+                let path = 'common.sidebar.'+item.title;
+                let title = this.$t(path);
+                
+                this.$goToPage(item.link, title, false, false);
             }
             this.$set(this, 'indexActive', item.title)
             
@@ -490,6 +514,9 @@ export default {
 .v-navigation-drawer  >>> .v-list-group--active .v-list-group__header .v-list-group__header__prepend-icon .v-icon {    
     color:rgb(0,0,0,0.8); 
 }
+.v-navigation-drawer  >>> .v-list{    
+    overflow-x:hidden;
+}
 .v-navigation-drawer  >>> .collapse-action-icon .v-icon:hover,
 .v-navigation-drawer  >>> .collapse-action-icon .v-icon:focus
 {    
@@ -507,5 +534,21 @@ export default {
 }
 .title-group:focus{
     background:unset
+}
+</style>
+<style>
+.v-menu__content::-webkit-scrollbar {
+        width: 6px;
+        background-color: black;
+}
+.v-menu__content::-webkit-scrollbar-thumb {
+	border-radius: 50px;
+	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+	background-color: grey;
+}
+ .v-menu__content::-webkit-scrollbar-track {
+	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+	border-radius: 50px;
+	background-color: #F5F5F5;
 }
 </style>

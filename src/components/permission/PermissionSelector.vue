@@ -58,7 +58,7 @@
                 </span>
             </v-tooltip>
         </div>
-        
+<!--         
         <v-list dense  >
             <v-list-item-group class="mt-1">
                 <v-list-item
@@ -83,7 +83,7 @@
                     </v-btn>
                 </v-list-item>
             </v-list-item-group>
-        </v-list>
+        </v-list> -->
     </div>
 </template>
 
