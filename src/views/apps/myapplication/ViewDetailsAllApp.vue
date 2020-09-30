@@ -420,7 +420,6 @@ export default {
         }
     },
     created(){
-        debugger
         if(Object.keys(this.listApp).length == 0 ){
            this.getActiveapps()
         }else{
