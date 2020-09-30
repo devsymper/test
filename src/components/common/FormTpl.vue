@@ -246,6 +246,7 @@ const inputTypeConfigs = {
             let props = {
                 columns: config.columns,
                 data: config.value,
+                multipleSelection: config.multipleSelection,
                 showId: config.hasOwnProperty('showId') ? config.showId : true
             };
             if(config.onSearch){

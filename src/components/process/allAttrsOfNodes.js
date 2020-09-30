@@ -111,20 +111,20 @@ let allAttrs = {
         //     "isAttr": true,
         //     "type": "String"
         // }
-        validate(){
-            let vl=this.value;
-            if (vl==null || vl =='') {
-                let item={
-                    'isValid':false,
-                    'message':"Please enter name"
+        validate() {
+            let vl = this.value;
+            if (vl == null || vl == '') {
+                let item = {
+                    'isValid': false,
+                    'message': "Please enter name"
                 }
-                Vue.set(this,'validateStatus',item);
-            }else{
-                let item={
-                    'isValid':true,
-                    'message':"success"
+                Vue.set(this, 'validateStatus', item);
+            } else {
+                let item = {
+                    'isValid': true,
+                    'message': "success"
                 }
-                Vue.set(this,'validateStatus',item);
+                Vue.set(this, 'validateStatus', item);
             }
         },
     },
@@ -1569,20 +1569,20 @@ let allAttrs = {
                 "type": "String"
             }]
         },
-        validate(){
-            let vl=this.value;
-            if (Number(vl) <=0) {
-                let item={
-                    'isValid':false,
-                    'message':"Please enter a number greater than 0"
+        validate() {
+            let vl = this.value;
+            if (Number(vl) <= 0) {
+                let item = {
+                    'isValid': false,
+                    'message': "Please enter a number greater than 0"
                 }
-                Vue.set(this,'validateStatus',item);
-            }else{
-                let item={
-                    'isValid':true,
-                    'message':"success"
+                Vue.set(this, 'validateStatus', item);
+            } else {
+                let item = {
+                    'isValid': true,
+                    'message': "success"
                 }
-                Vue.set(this,'validateStatus',item);
+                Vue.set(this, 'validateStatus', item);
             }
         },
         pushToXML: attrToXMLMethods.subLoopCharMethod,
@@ -2142,6 +2142,18 @@ let allAttrs = {
         info: '',
         options: [],
         dg: 'taskAction',
+        showId: false,
+        isSymperProp: true,
+        pushToXML: attrToXMLMethods.notPushToXML
+    },
+    approvalEditableControls: {
+        title: 'Editable controls on approval',
+        type: 'autocomplete',
+        value: '',
+        info: '',
+        options: [],
+        dg: 'taskAction',
+        multipleSelection: true,
         showId: false,
         isSymperProp: true,
         pushToXML: attrToXMLMethods.notPushToXML

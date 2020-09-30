@@ -376,7 +376,6 @@ export default {
             return this.$store.state.app;
         },
         userMenuItems(){
-            debugger
             return this.$store.getters['app/userMenuItems'];
         }
     },
@@ -391,20 +390,15 @@ export default {
         // thêm nhóm cho Menu
         addGroupInMenu(){
              this.menu = this.userMenuItems;
-             debugger
              let menuItem = [];
              let allMenuItem = [];
-            debugger
              this.menu =  _.groupBy(this.menu, 'group');
             Object.keys(this.menu).forEach(type => {
                 let name = type;
                 menuItem.push({titleGroup: name });
                 menuItem.push(...this.menu[type]);
             })
-            debugger
-
             this.menu = menuItem;
-            debugger
         },
         filterUser(item, queryText, itemText){
             let lowcaseText = queryText.toLowerCase();

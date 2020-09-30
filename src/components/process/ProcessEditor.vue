@@ -134,6 +134,55 @@ const mapLibNameToFlowableName = {
 
 export default {
     methods: {
+        /**
+         * Tìm và đặt các control cho việc lựa chọn cho phép edit trong lúc duyệt
+         */
+        async setEditableControlsForNode(approvalNodeData, submitNodeData){
+            let docId = submitNodeData.attrs.formreference.value;
+            let docDetail = await documentApi.detailDocument(docId);
+            
+            let fieldsMap = docDetail.data.fields;
+            let ctrls = [
+                {
+                    name: 'SYMPER_NONE_CONTROLS',
+                    title: 'NOT SELECT',
+                    id: 'SYMPER_NONE_CONTROLS',
+                },
+                {
+                    name: 'SYMPER_ALL_CONTROLS',
+                    title: 'ALL CONTROLS',
+                    id: 'SYMPER_ALL_CONTROLS',
+                }
+            ];
+
+            let tbs = [];
+            for(let ctrlName in fieldsMap){
+                let ctrl = fieldsMap[ctrlName];
+                if(ctrl.properties.name){
+                    ctrls.push({
+                        name: ctrl.properties.name,
+                        title: ctrl.properties.title,
+                        id: ctrl.properties.name
+                    });
+                }
+
+                if(ctrl.type == 'table'){
+                    for(let childName in ctrl.listFields){
+                        let childCtrl = ctrl.listFields[childName];
+                        if(childCtrl.properties.name){
+                            ctrls.push({
+                                name: childCtrl.properties.name,
+                                title: childCtrl.properties.title,
+                                id: childCtrl.properties.name
+                            });
+                        }
+                    }
+                }
+            }
+
+            approvalNodeData.attrs.approvalEditableControls.options = null;
+            approvalNodeData.attrs.approvalEditableControls.options = ctrls;
+        },
         resetAttrPanelHeight(){
             this.attrPannelHeight = (util.getComponentSize(this).h - 50)+'px';
         },
@@ -860,6 +909,10 @@ export default {
                 );
             }
 
+            if(name == 'approvalForElement'){
+                this.setEditableControlsForNode(this.selectingNode, this.stateAllElements[data.value]);
+            }
+
             
             if (name == "overrideid" || name == "process_id") {
                 let oldId = this.selectingNode.id;
@@ -1056,12 +1109,12 @@ export default {
                 nodeData.attrs[attrName].value = '';
             }else if(!nodeData.attrs[attrName].value ){ // Tự động chọn phần tử đầu tiên làm giá trị
                 nodeData.attrs[attrName].value = submitTasks[0].id;
+                this.setEditableControlsForNode(nodeData, submitTasks[0].nodeData);
             }
         },
         // Tìm từ node hiện tại về node đầu để ra các node là submit task 
         findSubmitTasksFromNode(result, currBizNode, searchedNodeMap){
             let nodeData = this.stateAllElements[currBizNode.id];
-            console.log(currBizNode.id, result, searchedNodeMap);
             
             if(searchedNodeMap[currBizNode.id] || !nodeData){
                 return;
@@ -1071,7 +1124,8 @@ export default {
                 (nodeData.type == 'StartNoneEvent' && nodeData.attrs.formreference.value)){
                     result.push({
                         id: nodeData.id,
-                        title: currBizNode.name
+                        title: currBizNode.name,
+                        nodeData: nodeData
                     });
                     searchedNodeMap[nodeData.id] = true;
             }else{
@@ -1164,8 +1218,12 @@ export default {
                 }
 
                 if(el.type.includes('StartNoneEvent') && el.attrs.formreference.value){
-                    
                     this.setControlsForBizKey(el.attrs.formreference.value);
+                }
+
+                if(el.type.includes('UserTask') 
+                    && el.attrs.taskAction.value == 'approval'){
+                    this.setEditableControlsForNode(el, this.stateAllElements[el.attrs.approvalForElement.value]);
                 }
             }
             this.setInitItemsForFormReferences(formKeyToNodeIdMap);
