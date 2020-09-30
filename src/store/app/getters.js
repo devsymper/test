@@ -40,41 +40,33 @@ function hasShowListPermission(opsMap, objectType) {
 }
 
 const userMenuItems = function(state) {
-        let opsMap = state.userOperations;
-        let userInfo = util.auth.getSavedUserInfo();
-        let userType = userInfo.profile.type;
-        if (userType == 'ba') {
-            return Object.values(mapObjectTypeAndMenu);
-        } else {
-            // let allwaysHave = ['tasks', 'myItem', 'works', 'my_application'];
-            let allwaysHave = ['my_application', 'lisTaskToDo'];
-            let items = [];
-            for (let objectType in opsMap) {
-                if (hasShowListPermission(opsMap, objectType)) {
-                    items.push(mapObjectTypeAndMenu[objectType]);
-                }
+    let opsMap = state.userOperations;
+    let userInfo = util.auth.getSavedUserInfo();
+    let userType = userInfo.profile.type;
+    if (userType == 'ba') {
+        return Object.values(mapObjectTypeAndMenu);
+    } else {
+        // let allwaysHave = ['tasks', 'myItem', 'works', 'my_application'];
+        let allwaysHave = ['my_application', 'lisTaskToDo'];
+        let items = [];
+        for (let objectType in opsMap) {
+            if (hasShowListPermission(opsMap, objectType)) {
+                items.push(mapObjectTypeAndMenu[objectType]);
+            }
+        }
 
-                for (let objectType of allwaysHave) {
-                    if (mapObjectTypeAndMenu[objectType]) {
-                        for (let subMenu of Object.keys(mapObjectTypeAndMenu[objectType])) {
-                            for (let i = 0; i < allwayHaveSubChildren.length; i++) {
-                                if (subMenu[title] == allwayHaveSubChildren[i]) {
-                                    items.push(mapObjectTypeAndMenu[objectType]);
-
-
-                                }
-                            }
-
-                        }
+        for (let objectType of allwaysHave) {
+            if (mapObjectTypeAndMenu[objectType]) {
+                items.push(mapObjectTypeAndMenu[objectType]);
+            }
+        }
+        return items;
+    }
+}
 
 
-                    }
-                    return items;
-                }
-
-
-                export {
-                    listOrgcNodeAsFlat,
-                    mapIdToUser,
-                    userMenuItems
-                }
+export {
+    listOrgcNodeAsFlat,
+    mapIdToUser,
+    userMenuItems
+};

@@ -301,6 +301,7 @@ export default {
     created() {
         this.$store.dispatch("app/getAllUsers");
         this.getListNoticication();
+      
     },
     mounted(){
         this.$evtBus.$on("app-receive-remote-msg", data => {
@@ -329,8 +330,9 @@ export default {
             for (let i = 0;i<this.listNotification.length;i++){
                 let dayListNotification = dayjs.unix(this.listNotification[i].createTime).format('DD/MM/YYYY') ;
                 let today = dayjs().format('DD/MM/YYYY') ;
+
                 if(today==dayListNotification){
-                    debugger
+    
                     this.checkToday = true;
                 }   
             }
@@ -344,6 +346,7 @@ export default {
                     this.overlay = false;
                     let tmp = res.data;
                     this.listNotification = tmp;
+                    this.checkListToday();
                 } else {
                     this.showError();
                 }
