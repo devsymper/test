@@ -195,6 +195,11 @@ export default {
             filter.taskAssignee = filter.assignee;
             delete filter.assignee;
         }
+        if (filter.involvedUser) {
+            filter.taskInvolvedUser=filter.involvedUser;
+            delete filter.involvedUser;
+        }
+        filter.sort = filter.sort == 'createTime' ? 'startTime' : filter.sort;
         filter= JSON.stringify(filter);
         return bpmneApi.post(appConfigs.apiDomain.bpmne.postTasksHistory , filter, testHeader);
     },

@@ -1,4 +1,5 @@
 import { taskApi } from "./../../api/task.js";
+import { appManagementApi } from "./../../api/AppManagement.js";
 import { SYMPER_APP } from "./../../main.js";
 
 
@@ -73,11 +74,26 @@ const getListDocumentObjIdWithUserSubmit = async(context, data) => {
         console.log("Can not get list documentObjIdWithUserSubmit!");
     }
 }
+const getAllAppActive = async(context) => {
+    if (context.state.allAppActive.length==0) {
+        try {
+            let res = await appManagementApi.getActiveApp();
+            if (res.status == 200) {
+                context.commit('setAllAppActive', res.data.listObject);
+                console.log("allapp",res.data.listObject);
+            } 
+        } catch (error) {
+            console.log("Can not get list app!");
+        }
+    }
+}
+
 export {
     getArrFileAttachment,
     removeFileAttachToStore,
     getArrDocObjId,
     getListDocumentObjId,
-    getListDocumentObjIdWithUserSubmit
+    getListDocumentObjIdWithUserSubmit,
+    getAllAppActive
 
 };

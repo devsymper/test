@@ -11,7 +11,6 @@ import JointPaper from "@/components/common/rappid/JointPaper";
 import { createDepartmentNode, defineDepartment, DEFAULT_DEPARTMENT_DISPLAY, FOUCUS_DEPARTMENT_DISPLAY } from "./../nodeDefinition/departmentDefinition";
 import { createPositionNode, definePosition, DEFAULT_POSITION_DISPLAY, FOUCUS_POSITION_DISPLAY } from "./../nodeDefinition/positionDefinition";
 import { SYMPER_HOME_ORGCHART, getDefaultConfigNodeData, jointLinkNode } from './nodeAttrFactory';  
-import shapesDefination from "./shapesDefination.js"
 import avatarDefault from "@/assets/image/avatar_default.jpg";
 require('@/plugins/rappid/rappid.css');
 export default {

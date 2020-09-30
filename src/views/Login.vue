@@ -1,6 +1,8 @@
-<template>
+ <template>
     <v-flex xs12 sm8 md4>
-        <v-card class="elevation-6">
+        <v-card class="elevation-6" style="top: 50%;
+                                            left: 50%;
+                                            transform: translate(-50%,-50%);">
             <v-toolbar flat>
                 <v-toolbar-title class="w-100 text-center mt-6">
                     <img height="40px" :src="require('./../assets/image/symper-full-logo.png')" />
@@ -13,7 +15,8 @@
                         :rules="emailRules"
                         v-model="email"
                         color="orange darken"
-                        label="Account"
+                        label="Tài khoản"
+                        @keyup.enter="checkAndLogin"
                         name="login"
                         type="text"
                     >
@@ -24,8 +27,9 @@
                         :rules="passwordRules"
                         color="orange darken"
                         id="password"
-                        label="Password"
+                        label="Mật khẩu"
                         name="password"
+                        @keyup.enter="checkAndLogin"
                         prepend-icon="lock"
                         type="password"
                     >
@@ -41,7 +45,7 @@
                     text
                     class="symper-bg-orange w-100"
                     dark
-                >Login</v-btn>
+                >Đăng nhập</v-btn>
             </v-card-actions>
         </v-card>
     </v-flex>
@@ -53,26 +57,44 @@ import { util } from "./../plugins/util.js";
 
 export default {
     methods: {
+        checkAndLogin(){
+            let canLogin = true;
+            if(!this.email.trim()){
+                canLogin = false;
+                this.$snotifyWarning({}, "Email không được để trống");
+            }
+
+            if(!this.password.trim()){
+                canLogin = false;
+                this.$snotifyWarning({}, "Mật khẩu không được để trống");
+            }
+
+            if(canLogin){
+                this.login();
+            }
+        },
         login() {
             this.$refs.form.validate();
             let thisCpn = this;
             if (this.valid) {
                 thisCpn.checkingUser = true;
                 userApi
-                    .login(this.email, this.password)
+                    .login(this.email.trim(), this.password.trim())
                     .then(res => {
                         if (res.status == 200) {
                             this.$store.dispatch('app/setUserInfo', res.data);
                             thisCpn.$router.push('/');
                         } else {
-                            alert("Tài khoản hoặc mật khẩu không đúng!");
+                            thisCpn.$snotifyError( {}, "Không thể đăng nhập","Tài khoản hoặc mật khẩu không chính xác!");
                         }
                     })
                     .catch(err => {
                         console.log("error from login api!!!", err);
                     })
                     .always(() => {
-                        thisCpn.checkingUser = false;
+                        setTimeout(() => {
+                            thisCpn.checkingUser = false;
+                        }, 1000);
                     });
             } else {
                 console.log("Login info is not valide!!!!");
@@ -84,12 +106,15 @@ export default {
             checkingUser: false,
             valid: true,
             email: "",
+            // dinhnv@symper.vn
             password: "",
+            // email: "dinhnv@symper.vn",
+            // password: "Damthatbai@2010",
             emailRules: [
-                v => !!v || "E-mail is required",
-                v => /.+@.+\..+/.test(v) || "E-mail must be valid"
+                v => !!v || "Email không được để trống",
+                v => /.+@.+\..+/.test(v) || "Email không hợp lệ"
             ],
-            passwordRules: [v => !!v || "Password is required"]
+            passwordRules: [v => !!v || "Mật khẩu không được để trống"]
         };
     }
 };

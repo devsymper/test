@@ -9,4 +9,7 @@ export default {
             keyword: value
         })
     },
+    getInfoSyql(id) {	
+        return apiSyql.get('formulas/' + id + '/source')	
+    }
 }
