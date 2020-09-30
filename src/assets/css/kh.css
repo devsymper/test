@@ -564,3 +564,10 @@
 .v-autocomplete:not(.v-input--is-focused).v-select--chips input {
     max-height: unset!important;
 }
+.checkBoxTask{
+    font-size: 13px;
+    height: 22px;
+}
+.checkBoxTask .v-input__control .v-input__slot{
+    margin-top: 8px!important;
+}

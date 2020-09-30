@@ -56,7 +56,10 @@
           </v-list-item>
         </v-list>
       </v-menu>
+
+    
       <!-- Bộ lọc cho  task -->
+
       <v-menu
         offset-y
         light
@@ -75,7 +78,8 @@
           <TaskListFilter @filter-change-value="handleChangeFilterValue"></TaskListFilter>
         </div>
       </v-menu>
-
+      
+    
       <!-- Bộ lọc loại đối tượng -->
       <v-menu
         offset-y
@@ -120,7 +124,10 @@
           </v-list-item-group>
         </v-list>
       </v-menu>
-
+      <!-- duyệt theo lô -->
+      <v-btn v-show="!sideBySideMode" small class="mr-2" depressed @click="handleMoreApproval">
+        <v-icon size="18">mdi-format-list-checks</v-icon>
+      </v-btn>
       <!-- Dãn nở dòng -->
       <v-btn small solo depressed class="mr-2" @click="refreshTaskList" v-show="!sideBySideMode">
         <v-icon size="18">mdi-refresh</v-icon>
@@ -355,12 +362,15 @@ export default {
     changeObjectType(index) {
         this.$emit("changeObjectType", index);
     },
+    handleMoreApproval(){
+        this.$emit("goToPageApproval");
+    },
     inputAssignee(data) {
-      console.log("userId", data);
-      this.taskObject.assignee = data;
+        console.log("userId", data);
+        this.taskObject.assignee = data;
     },
     refreshTaskList() {
-      this.$emit("refresh-task-list");
+        this.$emit("refresh-task-list");
     },
     handleChangeFilterValue(data = {}) {
       if ($.isEmptyObject(data)) {

@@ -860,13 +860,14 @@
             "canNotCreateTask": "Can not create task"
         },
         "header": {
-            "type": "Loại",
-            "approval": "Phê duyệt",
-            "submit": "Gửi văn bản",
+            "type": "Type",
+            "approval": "Approval",
+            "groupApproval":"Approval Group",
+            "submit": "Submit",
             "date": "Date",
             "dueDate": "Due Date",
             "createDate": "Create date",
-            "app": "Ứng dụng",
+            "app": "Application",
             "description": "Task description",
             "owner": "Task Owner",
             "userCreate": "Creator",
