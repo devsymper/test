@@ -4,6 +4,7 @@ import { util } from "../plugins/util";
 
 var api = new Api(appConfigs.apiDomain.user);
 var coreApi = new Api(appConfigs.apiDomain.user);
+var permissionApi = new Api(appConfigs.apiDomain.permission)
 export const userApi = {
     /** 
      * Kiểm tra username và password của user
@@ -103,5 +104,9 @@ export const userApi = {
     getCurrentRoleOperations() {
         let roleIden = util.auth.getCurrentUserRole();
         return api.get(`https://accesscontrol.symper.vn/roles/${roleIden}/accesscontrol`);
+    },
+    getActionAndObject(role) {
+        return permissionApi.get('roles/' + role + '/accesscontrol')
     }
+
 };
