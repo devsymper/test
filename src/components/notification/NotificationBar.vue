@@ -1,6 +1,7 @@
 <template>
     <v-row>
         <v-app-bar dense flat color="white" class="notification-list-bar" fixed>
+
             <v-col :cols="4"> <v-toolbar-title class="nofitication-title-bar" style="font-weight:400">
                 Notifications
             </v-toolbar-title>
@@ -252,6 +253,7 @@
                                 <span class="notification-topic-description">{{item.description}}</span>
                             </v-row>
                         </v-col>
+                
                         <v-col cols="2">
                             <v-row class="float-right">
                                 <v-switch

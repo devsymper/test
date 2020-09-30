@@ -406,6 +406,7 @@
         "department": "Phòng ban"
     },
     "objectType": {
+
         "Document definition": "Văn bản",
         "Document instance": "Danh sách bản ghi",
         "Orgchart": "Sơ đồ tổ chức",
@@ -427,6 +428,45 @@
         "File": "Quản lý tệp",
         "Department": "Phòng ban",
         "Timesheet": "Thời gian biểu"
+    },
+    "objects": {
+        "document_instance": "Bản ghi dữ liệu",
+        "account": "Nhân viên",
+        "document_definition": "Loại văn bản",
+        "document": "Văn bản",
+        "workflow_definition": "Workflow",
+        "orgchart": "Sơ đồ tổ chức",
+        "process_definition": "Quy trình",
+        "application_definition": "Ứng dụng",
+        "syql": "Công thức",
+        "dataflow": "Data flow",
+        "file": "Tệp",
+        "knowledge": "Văn bản nội bộ",
+        "comment": "Bình luận",
+        "dashboard": "Dashboard",
+        "listAction": {
+            "create": "thêm",
+            "edit": "sửa",
+            "submit": "hiển thị",
+            "list": "danh sách",
+            "list_trash": "danh sách nháp",
+            "list_instance": "danh sách bản ghi",
+            "deploy": "triển khai",
+            "drop": "xóa",
+            "start_instance": "bắt đầu quy trình"
+        },
+        "icon": {
+            "document_instance": "mdi mdi-file-document-outline",
+            "account": "mdi-account-multiple-outline",
+            "Tất cả": "mdi-all-inclusive",
+            "document_definition": "mdi mdi-file-outline",
+            "workflow_definition": "mdi mdi-lan",
+            "orgchart": "mdi mdi-sitemap",
+            "process_definition": "mdi mdi-sitemap",
+            "application_definition": "mdi mdi-apps",
+            "syql": "mdi mdi-alpha-f",
+            "dataflow": "mdi mdi-arrange-send-to-back"
+        }
     },
     "document": {
         "instance": {
