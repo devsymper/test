@@ -316,7 +316,8 @@ export default {
            this.refreshList();
         },
         'tableDisplayConfig.value.alwaysShowSidebar'(value) {
-            if(value && Object.keys(this.currentItemDataClone).length > 0){
+            if(value){
+            // if(value && Object.keys(this.currentItemDataClone).length > 0){
                 this.openactionPanel();
             }else{
                 this.closeactionPanel();
@@ -1618,8 +1619,17 @@ i.applied-filter {
 .ht_clone_left {
     z-index: 8;
 }
-
-.list-item-common-symper .v-menu__content .v-list-item{
-    height:30px
+.v-list-item {
+    min-height:unset;
+    height:30px;
+    margin:2px 8px;
+}
+.v-list-item__icon  {
+    margin-right:12px !important;
+    min-height:unset;
+}
+.v-list-item i{
+    margin-top:-12px;
 }
 </style>
+
