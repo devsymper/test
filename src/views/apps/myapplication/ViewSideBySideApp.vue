@@ -10,20 +10,23 @@
                     <v-icon style="font-size:16px" color="yellow"> mdi-star</v-icon>
                     <span style="font:13px roboto;padding-left:8px">Yêu thích</span>
                 </div>
-                 <div  v-for="(item,i) in listApp" :key="i" 
-                    :class="{'list-app-item': true,'active': item.id == activeIndex}"
-                    @click="clickDetails(item)"
-                    >
-                        <v-icon v-if="item.iconType == 'icon'" style="font-size:16px">{{item.iconName}}</v-icon>
-                        <img v-else-if="item.iconType == 'img'" :src="item.iconName" class="app-item-img"/>
-                    <v-tooltip bottom>
-                        <template v-slot:activator="{ on, attrs }">
-                            <div v-bind="attrs" class="title-app-sbs"
-                            v-on="on">{{item.name}}</div>
-                        </template>
-                        <span>{{item.name}}</span>
-                    </v-tooltip>
-                </div>
+				<VuePerfectScrollbar :style="{height:heightListApp}"  >
+					<div  v-for="(item,i) in listApp" :key="i" 
+						:class="{'list-app-item': true,'active': item.id == activeIndex}"
+						@click="clickDetails(item)"
+						>
+							<v-icon v-if="item.iconType == 'icon'" style="font-size:16px">{{item.iconName}}</v-icon>
+							<img v-else-if="item.iconType == 'img'" :src="item.iconName" class="app-item-img"/>
+						<v-tooltip bottom>
+							<template v-slot:activator="{ on, attrs }">
+								<div v-bind="attrs" class="title-app-sbs"
+								v-on="on">{{item.name}}</div>
+							</template>
+							<span>{{item.name}}</span>
+						</v-tooltip>
+					</div>
+				</VuePerfectScrollbar>
+
             </div>
        </div>
        <div class="detail-app" v-show="showDetailArea">
@@ -40,17 +43,17 @@
           </div>
          <div v-else class="favorite-area-item">
               <h4>Danh sách yêu thích</h4>
-                <VuePerfectScrollbar :style="{height:heightListFavorite}"  >
-                    <ul style="margin:0px 0px;" v-if="sFavorite.length > 0">
-                        <li v-for="(item,i) in sFavorite" :key="i" v-on:click="rightClickHandler($event,item,item.type)" v-on:contextmenu="rightClickHandler($event,item,item.type)" style="cursor:pointer"> 
-                            <div style="position:relative">
-                                <div v-if="item.type == 'document_definition'" class="title-item-favorite">{{item.title}}</div>
-                                <div v-else  class="title-item-favorite">{{item.name}}</div> 
-                                <v-icon  color="#F6BE4F" style="float:right;font-size:13px;position:absolute;top:4px;right:14px">mdi-star</v-icon>
-                            </div>
-                        </li>
-                    </ul>
-                </VuePerfectScrollbar>
+					<VuePerfectScrollbar :style="{height:heightListFavorite}"  >
+						<ul style="margin:0px 0px;" v-if="sFavorite.length > 0">
+							<li v-for="(item,i) in sFavorite" :key="i" v-on:click="rightClickHandler($event,item,item.type)" v-on:contextmenu="rightClickHandler($event,item,item.type)" style="cursor:pointer"> 
+								<div style="position:relative">
+									<div v-if="item.type == 'document_definition'" class="title-item-favorite">{{item.title}}</div>
+									<div v-else  class="title-item-favorite">{{item.name}}</div> 
+									<v-icon  color="#F6BE4F" style="float:right;font-size:13px;position:absolute;top:4px;right:14px">mdi-star</v-icon>
+								</div>
+							</li>
+						</ul>
+					</VuePerfectScrollbar>
          </div>
         <ContextMenu ref="contextMenu" :sideBySide="true" />
        </div>
@@ -376,7 +379,8 @@ x				}
             listFavorite:[],
             showFavorite:false,
             activeFavorite:false,
-			heightListFavorite: 'calc(100vh - 100px)',
+			heightListFavorite: 'calc(100vh - 110px)',
+			heightListApp: 'calc(100vh - 130px)',
 			widthActionArea:null,
 			widthActionArea: '',
             arrType:{
