@@ -106,7 +106,7 @@ import {util} from './../../../plugins/util'
 			if(!item.actions.includes('unfavorite')){
 				item.actions.push('unfavorite')
 			}
-			this.$refs.contextMenu.setContextItem(item.actions)
+			this.$refs.contextMenu.setContextItem([...new Set(item.actions)])
 			this.$refs.contextMenu.show(event)
 			this.$refs.contextMenu.setItem(item)
 			this.$refs.contextMenu.setType(type)
