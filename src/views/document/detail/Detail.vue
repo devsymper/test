@@ -1,39 +1,7 @@
 <template>
     <div class="wrap-content-detail" style="overflow:hidden;">
-        <v-skeleton-loader
-            class="mx-auto"
-            max-width="auto"
-            type="article, actions"
-            v-if="loading"
-            
-        ></v-skeleton-loader>
-        <v-skeleton-loader
-            class="mx-auto"
-            max-width="auto"
-            v-if="loading"
-            type="table-heading, list-item-two-line, table-tfoot"
-        ></v-skeleton-loader>
-        <v-skeleton-loader
-            class="mx-auto"
-            max-width="auto"
-            type="article, actions,table-heading, list-item-two-line"
-            v-if="loading"
-            
-        ></v-skeleton-loader>
-        <v-skeleton-loader
-            class="mx-auto"
-            max-width="auto"
-            type="article, actions,table-heading, list-item-two-line"
-            v-if="loading"
-            
-        ></v-skeleton-loader>
-        <v-skeleton-loader
-            class="mx-auto"
-            max-width="auto"
-            type="article, actions,table-heading, list-item-two-line"
-            v-if="loading"
-            
-        ></v-skeleton-loader>
+        
+        <Preloader ref="preLoaderView"/>
         <div class="panel-header" v-if="!quickView && !isPrint">
             <div class="right-action">
                 <v-tooltip bottom>
@@ -61,9 +29,9 @@
         <div
             class="sym-form-Detail"
             :id="'sym-Detail-'+keyInstance"
-            :style="{'width':documentSize, 'height':'calc(100% - 30px);','margin':contentMargin}">
+            :style="{'width':documentSize, 'height':contentHeight,'margin':contentMargin}">
             <div class="content-document" v-html="contentDocument"></div>
-            <div class="content-print-document" v-html="contentPrintDocument"></div>
+            <div class="content-print-document" :style="formSize" v-html="contentPrintDocument"></div>
         </div>
       
         <side-bar-detail 
@@ -75,6 +43,7 @@
         :createTime="createTime"
         :documentObjectId="docObjId"
         :workflowId="workflowId"
+        :showCommentInDoc="showCommentInDoc"
         @after-hide-sidebar="afterHideSidebar"
         />
         <HistoryControl ref="historyView" />
@@ -97,6 +66,8 @@ import './../submit/customControl.css'
 import { getSDocumentSubmitStore } from './../common/common'
 import SideBarDetail from './SideBarDetail'
 import HistoryControl from './HistoryControl'
+import Preloader from './../../../components/common/Preloader';
+
 import { util } from '../../../plugins/util.js';
 export default {
     props: {
@@ -104,7 +75,6 @@ export default {
             type: Number,
             default: 0
         },
-
         docObjInfo: {
             type: Object,
             default(){
@@ -118,6 +88,10 @@ export default {
             type:Boolean,
             default:false
         },
+        showCommentInDoc:{
+            type:Boolean,
+            default:true
+        },
         formId:{
             type:Number,
             default:0
@@ -125,18 +99,34 @@ export default {
         quickView:{
             type:Boolean,
             default:false,
+        },
+        contentHeight:{
+            type:String,
+            default:"calc(100% - 30px);"
         }
     },   
     components:{
         'side-bar-detail':SideBarDetail,
-        HistoryControl
+        HistoryControl,
+        Preloader
     },
     computed: {
+        routeName(){
+            return this.$getRouteName();
+        },
         sDocumentEditor() {
             return this.$store.state.document.editor[this.keyInstance];
         },
         sDocumentSubmit() {
             return this.$store.state.document.submit[this.keyInstance];
+        },
+        allUsers(){
+            let allUser = this.$store.state.app.allUsers
+            thisCpn.$store.commit("document/addToDocumentSubmitStore", {
+                key: 'listUser',
+                value: allUser,
+                instance:thisCpn.keyInstance
+            });
         }
     },
     data() {
@@ -163,16 +153,15 @@ export default {
             bottom: true,
             left: false,
             transition: "slide-y-reverse-transition",
-            isComponentActive:false,
             printConfigActive:null,
-            loading: true,
+            formSize:{},
+            wrapFormCss:{},
 
         };
     },
     beforeMount() {
         this.documentSize = "21cm";
     },
-    
     
     created(){
         this.$store.commit("document/setDefaultSubmitStore",{instance:this.keyInstance});
@@ -186,30 +175,13 @@ export default {
         });
         if (this.documentObjectId != 0) {
             this.docObjId = Number(this.documentObjectId);
-        } else if (this.$route.name == "detailDocument" || this.$route.name == "printDocument") {
+        } else if (this.routeName == "detailDocument" || this.routeName == "printDocument") {
             this.docObjId = Number(this.$route.params.id);
             this.loadDocumentObject(this.isPrint); 
         }
-        
-        userApi.getListUser(1,100000).then(res => {
-            if (res.status == 200) {
-                thisCpn.$store.commit("document/addToDocumentSubmitStore", {
-                    key: 'listUser',
-                    value: res.data.listObject,
-                    instance:thisCpn.keyInstance
-                });
-            }
-            
-        })
-        .catch(err => {
-           
-        })
-        .always(() => {
-        });
-        
 
         this.$evtBus.$on('symper-app-wrapper-clicked',evt=>{
-            if(thisCpn.isComponentActive == false) return;
+            if(thisCpn._inactive == true) return;
             if($(evt.target).is('.highlight-history')){
                 this.$refs.historyView.show($(evt.target))    
             }
@@ -221,14 +193,6 @@ export default {
                     }
             }
         })
-    },
-    activated() {
-        this.isComponentActive = true;
-    },
-    deactivated() {
-        this.isComponentActive = false;
-    },
-    destroyed(){
     },
     watch:{
         docObjInfo:{
@@ -242,31 +206,11 @@ export default {
                 }
             }
         },
-        formId(after){
-            this.contentPrintDocument = null
-            this.loadDocumentObject(this.isPrint);
-        },
         documentObjectId(after){
             this.contentPrintDocument = null
-            this.docObjId = Number(after)
+            this.docObjId = Number(after);
             this.loadDocumentObject(this.isPrint);
         },
-        documentId(after){
-            if(after){
-                let self = this;
-                documentApi.getPrintConfigActive(this.documentId).then(res => {
-                    if (res.status == 200) {
-                       self.printConfigActive = res.data
-                    }
-                    
-                })
-                .catch(err => {
-                
-                })
-                .always(() => {
-                });
-            }
-        }
     },
     methods: {
         afterHideSidebar(){
@@ -278,80 +222,91 @@ export default {
             this.contentMargin = margin;
         },
         // Khadm: load data của document lên để hiển thị và xử lý
-        loadDocumentStruct(documentId,isPrint = false) {
-            if(isPrint && this.contentPrintDocument != null){
-                $('.content-print-document').removeClass('d-none');
-                $('.content-document').addClass('d-none');
-                return
-            }
-            if(this.$route.name == 'printDocument'){
-                isPrint = true;
-            }
-            let thisCpn = this;
-            let dataPost = {};
-            if(isPrint){
-                dataPost = {formId:this.formId};
-            }
-            documentApi
-                .detailDocument(documentId,dataPost)
-                .then(res => {
-                    if (res.status == 200) {
-                        let content = res.data.document.content;
-                        if(!isPrint){
-                            $('.content-print-document').addClass('d-none');
-                            $('.content-document').removeClass('d-none');
-                            thisCpn.contentDocument = content;
-                        }
-                        else{
-                            $('.content-print-document').removeClass('d-none');
-                            $('.content-document').addClass('d-none');
-                            thisCpn.contentPrintDocument = content;
-                        }
-                        thisCpn.$emit('after-load-document',res.data.document)
-                        setDataForPropsControl(res.data.fields, thisCpn.keyInstance,'detail'); // ddang chay bat dong bo
-                        setTimeout(() => {
-                            thisCpn.processHtml(content,isPrint);
-                        }, 100);
+        async loadDocumentStruct(documentId,isPrint = false) {
+            try {
+                if(this.routeName == 'printDocument'){
+                    isPrint = true;
+                }
+                let dataPost = {};
+                if(isPrint){
+                    dataPost = {formId:this.formId};
+                    if(this.formId == 0){
+                        dataPost.formId = 'active';
+                    }
+                }
+                let docDetailRes = await documentApi.detailDocument(documentId,dataPost);
+                if (docDetailRes.status == 200) {
+                    let content = docDetailRes.data.document.content;
+                    if(!isPrint){
+                        $('.content-print-document').addClass('d-none');
+                        $('.content-document').removeClass('d-none');
+                        this.contentDocument = content;
                     }
                     else{
-                        this.$snotify({
-                                type: "error",
-                                title: res.message,
-                            });
+                        $('.content-print-document').removeClass('d-none');
+                        $('.content-document').addClass('d-none');
+                        this.contentPrintDocument = content;
                     }
-                })
-                .catch(err => {
-                     this.$snotify({
-                                type: "error",
-                                title: "Can not load document struct",
-                            });
-                })
-                .always(() => {});
+                    this.documentSize = '21cm';
+                    let contentPrintCss = {};
+                    contentPrintCss = {'margin':'auto'}
+                    if(docDetailRes.data.document.formSize){
+                        this.formSize = JSON.parse(docDetailRes.data.document.formSize);
+                        if(this.formSize){
+                            this.documentSize = 'auto';
+                            if(this.formSize.type == 'A3'){
+                                contentPrintCss = {'transform':'scale(0.84)','transform-origin':'top left'};
+                            }
+                            else if(this.formSize.type == 'A5'){
+                                contentPrintCss = {'transform':'scale(0.84)','transform-origin':'top left','margin':'auto'}
+                            }
+                            Object.assign(this.formSize,contentPrintCss);
+                        }
+                    }
+                    
+                    setDataForPropsControl(docDetailRes.data.fields, this.keyInstance,'detail'); // ddang chay bat dong bo
+                    setTimeout((self) => {
+                        self.processHtml(content,isPrint); 
+                    }, 100,this);
+                        
+                }
+                this.$emit('after-load-document',docDetailRes.data.document);  
+
+            } catch (error) {
+                
+            }
+
         },
         async loadDocumentObject(isPrint=false) {
+            this.contentDocument = ""
+            try {
+                this.$refs.preLoaderView.show();
+                
+            } catch (error) {
+                
+            }
             let thisCpn = this;
             let res = await documentApi
                 .detailDocumentObject(this.docObjId);
-                if (res.status == 200) {
-                    thisCpn.userId = res.data.document_object_user_created_id;
-                    thisCpn.taskId = res.data.document_object_task_id;
-                    thisCpn.createTime = res.data.document_object_create_time
-                    thisCpn.workflowId = res.data.document_object_workflow_id;
-                    thisCpn.documentId = res.data.documentId;
-                    thisCpn.$store.commit('document/addToDocumentDetailStore',{
-                        key: 'allData',
-                        value: res.data,
-                        instance:thisCpn.keyInstance
-                    }) 
-                    thisCpn.loadDocumentStruct(res.data.documentId,isPrint);
-                }
-                else{
-                        this.$snotify({
-                            type: "error",
-                            title: "Can not load document object",
-                        });
-                }
-                
+            if (res.status == 200) {
+                thisCpn.userId = res.data.document_object_user_created_id;
+                thisCpn.taskId = res.data.document_object_task_id;
+                thisCpn.createTime = res.data.document_object_create_time
+                thisCpn.workflowId = res.data.document_object_workflow_id;
+                thisCpn.documentId = res.data.documentId;
+                thisCpn.$store.commit('document/addToDocumentDetailStore',{
+                    key: 'allData',
+                    value: res.data,
+                    instance:thisCpn.keyInstance
+                }) 
+                thisCpn.loadDocumentStruct(res.data.documentId,isPrint);
+            }
+            else{
+                    this.$snotify({
+                        type: "error",
+                        title: res.message,
+                    });
+            }
         },
         togglePageSize() {
             this.contentMargin = this.documentSize == "21cm" ? "" : "auto";
@@ -447,6 +402,7 @@ export default {
                         //truong hop la control table
                         else {
                             let listInsideControls = {};
+                            let controlInTable = {};
                             let mapControlToIndex = {};
                             let tableControl = new TableControl(
                                 idField,
@@ -458,6 +414,7 @@ export default {
                             tableControl.tableInstance = new Table(
                                 tableControl,
                                 controlName,
+                                id,
                                 thisCpn.keyInstance
                             );
                             tableControl.tablePrint = new TablePrint(
@@ -479,15 +436,15 @@ export default {
                                 );
                                 childControl.init();
                                 childControl.inTable = controlName;
-                               
                                 let childControlName = childControlProp.properties.name.value;
                                 let colIndex = thisCpn.getColIndexControl($(this));
                                 mapControlToIndex[childControlName] = colIndex
-
                                 thisCpn.addToListInputInDocument(childControlName,childControl)
                                 listInsideControls[childControlName] = true;
+                                controlInTable[childControlName] = childControl;
                             });
                             tableControl.listInsideControls = listInsideControls;
+                            tableControl.controlInTable = controlInTable;
                             tableControl.mapControlToIndex = mapControlToIndex;
                             this.addToListInputInDocument(controlName,tableControl)
                             tableControl.renderTable();
@@ -495,15 +452,10 @@ export default {
                         }
                     }
                 }
-
             }
-            this.loading = false;
+            this.$refs.preLoaderView.hide();
+            this.$emit("after-loaded-component-detail");
             $('.wrap-content-detail').removeAttr('style');
-            setTimeout(() => {
-                if(thisCpn.$route.name == 'printDocument' || (isPrint && this.formId == 0)){
-                    thisCpn.printContent(true);
-                }
-            }, 200);
         },
 
         getColIndexControl(controlEl){
@@ -513,74 +465,8 @@ export default {
             return tdIndex;
         },
         async handleClickPrint(){
-            // await this.loadDocumentStruct(this.documentId,true);
-            if(this.printConfigActive){
-                let content = this.printConfigActive.content
-                this.contentPrintDocument = content;
-                setTimeout((self) => {
-                    self.processHtml(content,true);
-                }, 100,this);
-                
-            }
-            else{
-                this.$snotify({
-                    type: "error",
-                    title: "Vui lòng cấu hình trước khi in"
-                });
-            }
-            
-        },
-        
-        printContent(fromContext = false){
-            
-            // Get HTML to print from element
-            
-            let prtHtml = $('#sym-Detail-'+this.keyInstance).closest('.wrap-content-detail').clone();
-            prtHtml.find('.content-print-document').removeClass('d-none');
-            prtHtml.find('.sym-form-Detail').css({width:'auto'})
-            prtHtml.find('.panel-header').remove();
-            prtHtml.find('.content-document').remove();
-            prtHtml = prtHtml.html();
-
-            // Get all stylesheets HTML
-            let stylesHtml = '';
-            for (const node of [...document.querySelectorAll('link, style')]) {
-            stylesHtml += node.outerHTML;
-            }
-           
-
-            let cstyle = `<style type="text/css">
-                         @media print {
-                                html, body{
-                                height:100%;
-                                width:100%;
-                                }
-                            }
-                    </style>`
-                     stylesHtml += cstyle;
-            // Open the print window
-            const WinPrint = window.open('', 'Print', 'width=800,height=900,toolbar=0,scrollbars=0,status=0');
-
-            WinPrint.document.write(`<!DOCTYPE html>
-            <html>
-            <head>
-                ${stylesHtml}
-            </head>
-            <body>
-                ${prtHtml}
-            </body>
-            </html>`);
-
-            WinPrint.document.close(); // necessary for IE >= 10
-            WinPrint.focus(); // necessary for IE >= 10*/
-
-            setTimeout(() => {
-                WinPrint.print();
-                WinPrint.close();
-            }, 1000);
-           
-            
-        },
+            this.$goToPage('/documents/print-multiple',"In",false,true,{listObject:[{document_object_id:this.docObjId}]});
+        }
        
     }
 }

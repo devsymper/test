@@ -283,13 +283,11 @@ export default {
 				this.getCommentByUuid()
 				this.floatComment = true
 				 var x = util.getComponentSize(this);
-				 debugger
 				 let item =  $('.symper-comment-float .comment-item')
 				 let height = 0
 				 $.each(item,function(k,v){
 					 height += $(v).height()
 				 })
-				 debugger
 				 let targetArea = $(".symper-comment-float .target-area-comment").height()
 				 if(height + targetArea + 70 > 500){
 					this.heightListComment = 500
@@ -418,7 +416,5 @@ export default {
 .symper-comment >>> .content-comment-img .v-slide-group__prev{
 	padding-top:12px
 }
-.symper-comment >>> .v-dialog {
-	overflow:hidden;
-}
+
 </style>

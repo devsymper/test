@@ -98,25 +98,37 @@ export default {
 										Handsontable.dom.empty(td);
 										span = document.createElement('span')
 										if(value === "1"){
-											// icon = document.createElement('i');
-											// icon.classList.add('mdi');
-											// icon.classList.add('mdi-check');
-											// $(icon).css('color','green')
-											// $(icon).css('font-size','16px')
-											// td.appendChild(icon);
-											// return td;
+											
 											$(span).text('Kích hoạt')
-											// $(span).text(self.$t('apps.active'))
 										}else{
 												$(span).text('Không kich hoạt')
-												// $(span).text(self.$t('apps.notActive'))
 										}
 										td.appendChild(span);
 										return td
 									},
 								},
-                                {name: "createdAt", title: "created_at", type: "text"},
-                                {name: "updatedAt", title: "updated_at", type: "text"},
+								{name: "createdAt", title: "created_at", type: "text",
+									renderer:  function(instance, td, row, col, prop, value, cellProperties) {
+										let span;
+										Handsontable.dom.empty(td);
+										span = document.createElement('span')
+										let newValue = value.slice(0,value.length-3)
+											$(span).text(newValue)
+										td.appendChild(span);
+										return td
+									},
+								},
+								{name: "updatedAt", title: "updated_at", type: "text",
+									renderer:  function(instance, td, row, col, prop, value, cellProperties) {
+											let span;
+											Handsontable.dom.empty(td);
+											span = document.createElement('span')
+											let newValue = value.slice(0,value.length-3)
+												$(span).text(newValue)
+											td.appendChild(span);
+											return td
+										},
+								},
                          ],
                    }
                 }
@@ -244,7 +256,6 @@ export default {
 		},
 		checkChildrenApp(data){
 			let self = this
-			console.log(self.arrType);
 			if(data.hasOwnProperty('orgchart')){
 				data.orgchart.forEach(function(e){
 					self.arrType.orgchart.push(e.id)
@@ -279,7 +290,6 @@ export default {
 									}
 								}
 				]}).then(resOrg => {
-					console.log(resOrg.data.listObject);
 					this.$store.commit('appConfig/updateChildrenApps',{obj:resOrg.data.listObject,type:'orgchart'});
 				});
 			}
@@ -288,7 +298,7 @@ export default {
 						documentApi.searchListDocuments(
 							{
 								search:'',
-								pageSize:50,
+								pageSize:400,
 								filter: [
 								{
 									column: 'id',
@@ -300,7 +310,17 @@ export default {
 								]
 							}
 						).then(resDoc => {
-							this.$store.commit('appConfig/updateChildrenApps',{obj:resDoc.data.listObject,type:'document_definition'});
+							let arrCategory = []
+							let arrMajor = []
+							resDoc.data.listObject.forEach(function(e){
+								if(e.type == "Nghiệp vụ"){
+									arrMajor.push(e)
+								}else if( e.type == "Danh mục"){
+									arrCategory.push(e)
+								}
+							})
+							this.$store.commit('appConfig/updateChildrenApps',{obj:arrMajor,type:'document_major'});
+							this.$store.commit('appConfig/updateChildrenApps',{obj:arrCategory,type:'document_category'});
 						});
 			}
 			if(self.arrType.workflow_definition.length > 0){

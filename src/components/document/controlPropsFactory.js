@@ -129,7 +129,7 @@ const commonProps = {
     formatNumber: {
         title: "Định dạng số",
         type: "numberFormat",
-        value: "",
+        value: ".00",
         groupType: "display"
     },
     // formatDateTime: {
@@ -159,6 +159,12 @@ const commonProps = {
     // },
     isQuickSubmit: {
         title: "Nhập liệu nhanh",
+        type: "checkbox",
+        value: "",
+        groupType: "display"
+    },
+    isSingleSelect: {
+        title: "Cho phép chọn nhiều",
         type: "checkbox",
         value: "",
         groupType: "display"
@@ -523,6 +529,13 @@ const controlTypes = {
         notInProps: ['autoHeight', 'dataFlowId', 'isPrimaryKey', 'minValue', 'maxValue', 'formatNumber', 'isSumTable', 'formatDate', 'isAllowUpdate', 'isDisplayCompact', 'isMultipleValue'],
         formulas: ['formulas', 'list', 'hidden', 'readOnly', 'link', 'require']
     },
+    combobox: {
+        icon: "/icon/ic_select.png",
+        html: `<input class="s-control s-control-combobox" readonly="readonly" contenteditable="false" title="Combobox" s-control-type="combobox">&nbsp;&nbsp;`,
+        title: "Combobox",
+        notInProps: ['autoHeight', 'dataFlowId', 'isPrimaryKey', 'minValue', 'maxValue', 'formatNumber', 'isSumTable', 'formatDate', 'isAllowUpdate', 'isDisplayCompact', 'isMultipleValue'],
+        formulas: ['formulas', 'list', 'hidden', 'readOnly', 'link', 'require']
+    },
     documentSelect: {
         icon: "/icon/ic_document_select.png",
         html: `<input class="s-control s-control-document" readonly="readonly" contenteditable="false" title="Document Select" s-control-type="documentSelect">&nbsp;&nbsp;`,
@@ -660,7 +673,7 @@ const controlTypes = {
     },
     dataFlow: {
         icon: "/icon/ic_report.png",
-        html: `<div class="s-control s-control-data-flow" contenteditable="false" title="Data Flow" s-control-type="dataFlow" style="display: inline-block;font-size: 11px;width: 100%;max-width: 100%;position:relative;" >
+        html: `<div class="s-control s-control-data-flow" contenteditable="false" title="Data Flow" s-control-type="dataFlow" >
                     <button class="run-dataflow d-none"><span class="mdi mdi-play-outline"></span></button>
                     <div>
                         <span class="panel-title2" style="background: #f2f2f2;color: gray;height: 30px;font-weight: bold;width: 100%;text-align: center;display: inline-block;line-height: 2.5;">Data Flow</span>

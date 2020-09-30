@@ -38,6 +38,7 @@
         "virtualdocs": "Virtualdocs",
         "tasks": "Tasks",
         "myItem": "My Item",
+        "myApplication": "My Application",
         "other": "Other",
         "deploy": "Deploy",
         "start": "Start",
@@ -63,6 +64,8 @@
         "logout": "Log out",
         "last_update_at": "Last updated at",
         "create_at": "Created at",
+        "user_create": "User create",
+        "last_user_update": "Last update by",
         "filter": "Filter",
         "sort": "Sort",
         "status": "Status",
@@ -83,7 +86,43 @@
         "print": "Print",
         "display": "Display",
         "of": "of",
-        "entries": "Entries"
+        "entries": "Entries",
+        "always_show_sidebar": "Always show sidebar",
+        "import_excel": "Import excel",
+        "sidebar": {
+            "myApplication": "My Application",
+            "My work": "My work",
+            "tasks": "Tasks",
+            "Lists trash": "Lists trash",
+            "works": "Works",
+            "App": "Applications",
+            "permissions": "Permissions",
+            "userRoleSetting": "User Role Setting",
+            "actionPack": "actionPack",
+            "users": "User account",
+            "baAccount": "BA account",
+            "Manage timesheet": "Manage timesheet",
+            "Timesheet": "Timesheet",
+            "List workflows": "List workflows",
+            "List documents": "List documents",
+            "myWork": "Calendar",
+            "Timesheet report": "Timesheet reports",
+            "Administrator": "Administrator",
+            "apps": "My apps",
+            "Account management": "Account manager",
+            "Access Management": "Access management",
+            "Applications": "Applications",
+            "Lists to do": "Lists to do",
+            "My application": "My application",
+            "KH": "Knowledge Hub",
+            "Report": "Report",
+            "File": "File",
+            "workflows": "Workflows",
+            "documents": "Documents",
+            "orgchart": "Organization chart",
+            "myItem": "My item"
+
+        }
     },
     "validate": {
         "required": "Not be empty",
@@ -127,6 +166,9 @@
         "error": {
             "cannot_get_data": "Can not get data from server"
         },
+        "success": {
+            "save_config": "Save config successfully!"
+        },
         "filter": {
             "none": "None",
             "empty": "Empty",
@@ -137,10 +179,10 @@
             "ends_with": "Ends with",
             "contains": "Contains",
             "not_contain": "Not contains",
-            "gt": "Greater than ( > )",
-            "gte": "Greater than or equal ( >= )",
-            "lt": "Less than ( < )",
-            "lte": "Less than or equal ( <= )",
+            "greater_than": "Greater than ( > )",
+            "greater_than_or_equal": "Greater than or equal ( >= )",
+            "less_than": "Less than ( < )",
+            "less_than_or_equal": "Less than or equal ( <= )",
             "sort_asc": "Sort ASC",
             "sort_desc": "Sort DESC",
             "clear_filter": "Clear filter",
@@ -208,9 +250,12 @@
         "table": {
             "id": "Id",
             "firstName": "First name",
+            "lastName": "Last name",
+            "userName": "User name",
             "displayName": "Display name",
             "email": "email",
-            "phoneNumber": "Phone number",
+            "phone": "Phone number",
+            "avatar": "Avatar",
             "status": "Status",
             "createAt": "Create at",
             "updateAt": "Update at",
@@ -288,6 +333,24 @@
         }
     },
     "document": {
+
+        "instance": {
+            "showlist": {
+                "select": "Selected",
+                "record": "Record",
+                "printRecord": "Print record",
+                "selectPrintConfig": "Select print config",
+                "printMultiple": "Print Multiple",
+                "listPrintConfig": "List print config",
+                "print": "Print",
+                "copied": "copied",
+                "next": "Next record",
+                "prev": "Previous record",
+                "copyLink": "Copy link",
+                "download": "Download",
+                "info": "Information"
+            }
+        },
         "create": "Create document",
         "edit": "Edit document",
         "title": "List Document",
@@ -327,7 +390,14 @@
                         "system": "System",
                         "list": "List",
                         "business": "Business"
-                    }
+                    },
+                    "name": "Document name",
+                    "title": "Document title",
+                    "fullSize": "Full size Form Submit",
+                    "type": "Document type",
+                    "note": "Note",
+                    "titleObject": "Title Object",
+                    "titlePrint": "Title Form Print"
                 },
                 "swapType": {
                     "heading": "Swap type control",
@@ -339,6 +409,9 @@
                 "quickInfoControl": {
                     "heading": "Control Infomation"
                 }
+            },
+            "sidebarLeft": {
+
             }
         },
         "submit": {
@@ -398,6 +471,11 @@
             "comment": {
                 "heading": "COMMENT"
             }
+        },
+        "validate": {
+            "emptyTitle": "Title must not be blank",
+            "emptyContentControlTemplate": "Please select the template before saving the control template",
+            "controlNotExist": "Control does not exist, please create new control"
         }
     },
     "documentObject": {
@@ -533,6 +611,7 @@
         }
     },
     "apps": {
+        "titleMyApplication": "Danh sách công việc của tôi",
         "header": {
             "id": "ID",
             "name": "Name",
@@ -546,10 +625,11 @@
         "emptyApp": "List application epmty",
         "emptyFavorite": " List favorite empty",
         "listType": {
-            "documents": "Documents",
-            "workflows": "Work flows",
-            "reports": "Reports",
-            "orgcharts": "Orgcharts"
+            "documentMajor": "Business Document",
+            "documentCategory": "Category Document",
+            "workflow": "Work flows",
+            "dashboard": "Dashboard",
+            "orgchart": "Orgcharts"
         },
         "addApp": "Add application",
         "editApp": "Edit application",
@@ -761,7 +841,9 @@
     "notification": {
         "error": "Error occurred. Please try again later",
         "errorTitle": "Error",
-        "successTitle": "Success"
+        "successTitle": "Success",
+        "older": "Older",
+        "today": "Today"
     },
     "virtualdoc": {
         "header": {
@@ -799,7 +881,20 @@
     },
     "myItem": {
         "objType": "Object type",
-        "today": "Today"
+        "filterObj": "Filter",
+        "today": "Today",
+        "header": "List work",
+        "headerDoc": "List document",
+        "work": {
+            "parentWork": "Parent work",
+            "siblingWork": "Sibling work",
+            "subWork": "Sub work"
+        },
+        "sidebar": {
+            "showMoreTask": "Show more task related",
+            "showLess": "Show less task related",
+            "showMoreFile": "Show more file"
+        }
     },
     "tasks": {
         "error": {
@@ -816,6 +911,7 @@
             "app": "Ứng dụng",
             "description": "Task description",
             "owner": "Task Owner",
+            "userCreate": "Creator",
             "name": "Task name",
             "assignee": "Assignee",
             "watcher": "Watcher",

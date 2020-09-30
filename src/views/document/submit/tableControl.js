@@ -17,7 +17,8 @@ export default class TableControl extends Control {
          * tên các control nằm trong control này, mặc định là null, nếu control là table thì mới có giá trị là {'tên control':true}
          */
         this.listInsideControls = null;
-        this.mapControlToIndex = {}
+        this.controlInTable = {};
+        this.mapControlToIndex = {};
         this.ele.wrap('<span style="position:relative;display: block;" class="wrap-table">');
 
     }
@@ -40,17 +41,32 @@ export default class TableControl extends Control {
          * @param {*} data 
          */
     setData(data) {
+        if (data.hasOwnProperty('childObjectId') && Object.keys(data).length == 1) {
+            if (this.tableInstance.tableInstance) {
+                this.tableInstance.tableInstance.updateSettings({
+                    data: [
+                        []
+                    ]
+                })
+                this.tableInstance.tableInstance.render();
+            }
+
+            return;
+        }
         if (this.isPrintView) {
             let dataTablePrint = [];
             for (let controlName in this.mapControlToIndex) {
                 let dataControl = data[controlName];
+                let controlIns = this.controlInTable[controlName];
                 for (let index = 0; index < dataControl.length; index++) {
                     if (dataTablePrint.length <= index) {
                         dataTablePrint.push([])
                     }
                     let row = dataControl[index];
+                    if (controlIns.type == 'number') {
+                        row = controlIns.formatNumberValue(row);
+                    }
                     dataTablePrint[index].push(row);
-
                 }
             }
 

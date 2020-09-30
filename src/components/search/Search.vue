@@ -207,6 +207,13 @@ export default {
                                 }else if(data.type=='document_definition'){
                                      returnObjSearch.displayName = data.title?data.title:"Không có tên";
                                      returnObjSearch.description = data.note?data.note:'Chưa điền mô tả';
+                                }else if(data.type=='syql'){
+                                    let name = self.getNameSyql(self.getInfoSyql(data.id));
+                        
+                    
+                                     returnObjSearch.displayName = data.lastContent?data.lastContent:"Không có công thức";
+                                     returnObjSearch.nameSql = name.content;
+                                     returnObjSearch.objectType = name.objectType;
                                      // lấy api của tên
                                 }else{
                                      returnObjSearch.displayName = data.name? data.name:"Không có tên";
@@ -285,8 +292,18 @@ export default {
         }
        },
        getNameSyql(id){
-         const self = this;
-           searchApi.getInfoSyql(id)
+          id =  this.syqlIdInfo;
+           let name = this.getInfoSyql(this.syqlIdInfo);
+           if(JSON.stringify(name) === '{}'){
+            // this.getNameSyql(id);
+           }
+           return name;
+       },
+       // lấy API hiển thì nguồn công thức
+         getInfoSyql(syqlId){
+           const self = this;
+           this.syqlIdInfo = syqlId;
+           searchApi.getInfoSyql(syqlId)
             .then(res => {
                  if (res.status === 200) {
                      self.syqlId.content= res.data[0].context;

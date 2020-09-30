@@ -1,7 +1,7 @@
 <template>
     <div class="wraper-comment" :style="style">
         <div class="comment-task" style="height:100%">
-			<Comment style="margin-left:-12px;margin-right:8px" :showComment="true"  :objectIdentifier="objectIdentifier" :objectType="'task'" :height="'90%'" :buttonClose="true" @close-comment="hide" />
+			<Comment style="margin-left:-12px;margin-right:8px" :showComment="true"  :objectIdentifier="objectIdentifier" :objectType="objectType!=''?objectType:'task'" :height="'90%'" :buttonClose="true" @close-comment="hide" />
         </div>
 	</div>
 </template>
@@ -11,9 +11,16 @@ export default {
 	props:{
 		objectIdentifier:{
 			type: String,
+		},
+		objectType:{
+			type:String,
+			default:""
 		}
 	},
 	watch:{
+		"objectIdentifier":function(newVl){
+			this.objectIdentifier=newVl
+		}
 	},
 	components:{
 		Comment

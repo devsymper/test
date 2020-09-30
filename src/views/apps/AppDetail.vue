@@ -2,31 +2,31 @@
   <div class="app-details">
 	  	 <VuePerfectScrollbar :style="{height: listItemHeight}">
 			<div v-for="(itemT,i) in sAppModule" :key="i" class="app-item">
-					<div class="title-app" v-if="itemT.item.length >0"><v-icon style="font-size:13px">{{itemT.icon}}</v-icon> <h4> {{ itemT.title }} <span> {{'('+itemT.item.length +')' }}</span> </h4></div>
+					<div class="title-app" v-if="itemT.item.length >0"><v-icon style="font-size:13px">{{itemT.icon}}</v-icon> <h4> {{$t(itemT.title) }} <span> {{'('+itemT.item.length +')' }}</span> </h4></div>
 					<ul v-for="(childItem,i) in itemT.item" :key="i"  class="app-child-item">
 							<li  v-if="isEndUserCpn == true" 
 								v-on:contextmenu="rightClickHandler($event,childItem,itemT.name)"
+								v-on:click="rightClickHandler($event,childItem,itemT.name)"
 							>
 								<div style="position:relative">
-									<v-tooltip bottom v-if="itemT.name == 'document_definition'">
+									<v-tooltip bottom v-if="itemT.name == 'document_category' || itemT.name == 'document_major'">
 										<template v-slot:activator="{ on, attrs }">
 											<div class="title-document-enduser" 	
 												v-bind="attrs"
 												v-on="on" >
-												<span v-on:click="rightClickHandler($event,childItem,itemT.name)">{{childItem.title}}</span> 
-												
+												<span >{{childItem.title}}</span> 
 											</div>
 										</template>
 										<span style="font:13px roboto">{{childItem.title}}</span> 
 										<span style="font:8px;opacity:0.4">{{childItem.name}}</span>
 									</v-tooltip>
-									<div v-else v-on:click="rightClickHandler($event,childItem,itemT.name)">{{childItem.name}}</div>
+									<div v-else >{{childItem.name}}</div>
 									<v-icon  @click="changeFavorite(childItem,itemT.name)" :class="{'icon-star-active' : childItem.favorite==true, 'icon-star': true}" >mdi-star</v-icon>	
 								</div>
 							</li>
 							<li v-else>
 								<div style="position:relative">
-									<v-tooltip bottom v-if="itemT.name == 'document_definition'">
+									<v-tooltip bottom v-if="itemT.name == 'document_category' || itemT.name == 'document_major'">
 									<template v-slot:activator="{ on, attrs }">
 										<div class="title-document" 	
 											v-bind="attrs"
@@ -45,7 +45,7 @@
 					</ul>
 			</div>	
 		</VuePerfectScrollbar>
-		<ContextMenu ref="contextMenu" />	
+		<ContextMenu ref="contextMenu" :sideBySide="sideBySide" />	
   </div>
 </template>
 <script>
@@ -60,28 +60,33 @@ export default {
 			currentSelected:null,
 			typeSelected:null,
 			objFilter:{
-				document_definition: {
-					icon: 'mdi-file-edit-outline',
-					title: 'Documents',
-					name: 'document_definition',
-					item: [
-					]
+				document_category:{
+					icon : 'mdi-file-document-outline',
+					title: this.$t('apps.listType.documentCategory'),
+					name:  'document_category',
+					item:[]
+				},
+				document_major:{
+					icon : 'mdi-file-edit-outline',
+					title:  this.$t('apps.listType.documentMajor'),
+					name:  'document_major',
+					item:[]
 				},
 				orgchart: {
 					icon: 'mdi-widgets-outline',
-					title: 'Orgcharts',
+					title:  this.$t('apps.listType.orgchart'),
 					name: 'orgchart',
 					item: []
 				},
 				dashboard: {
 					icon: 'mdi-view-dashboard',
-					title: 'Reports',
+					title: this.$t('apps.listType.dashboard'),
 					name: 'dashboard',
 					item: []
 				},
 				workflow_definition: {
 					icon: 'mdi-lan',
-					title: 'Workflows',
+					title:  this.$t('apps.listType.workflow'),
 					name: 'workflow_definition',
 					item: []
 				},
@@ -127,6 +132,10 @@ export default {
 		isMyApplication:{
 			type: Boolean,
 			default: false
+		},
+		sideBySide:{
+			type: Boolean,
+			default: false
 		}
     },
 	methods:{
@@ -139,14 +148,22 @@ export default {
 		filterItem(){
 			let self = this
 			let listItem = this.$store.state.appConfig.listItemSelected;
-			self.objFilter.document_definition.item = []
+			self.objFilter.document_major.item = []
+			self.objFilter.document_category.item = []
 			self.objFilter.orgchart.item = []
 			self.objFilter.dashboard.item = []
 			self.objFilter.workflow_definition.item = []
-			if(listItem.document_definition.item.length > 0){
-				listItem.document_definition.item.filter(function(item){
+			if(listItem.document_major.item.length > 0){
+				listItem.document_major.item.filter(function(item){
 						if(item.title.toLowerCase().includes(self.searchKey.toLowerCase())){
-							self.objFilter.document_definition.item.push(item)
+							self.objFilter.document_major.item.push(item)
+						}
+				})
+			}
+			if(listItem.document_category.item.length > 0){
+				listItem.document_category.item.filter(function(item){
+						if(item.title.toLowerCase().includes(self.searchKey.toLowerCase())){
+							self.objFilter.document_category.item.push(item)
 						}
 				})
 			}
@@ -175,15 +192,22 @@ export default {
 		rightClickHandler(event,item,type){
 			event.stopPropagation();
 			event.preventDefault();
-			this.$refs.contextMenu.setContextItem(item.actions)
+			this.$refs.contextMenu.setContextItem([...new Set(item.actions)])
 			this.$refs.contextMenu.show(event)
 			this.$refs.contextMenu.setItem(item)
+			if(type == 'document_category' || type == "document_major"){
+				type = "document_definition"
+			}
 			this.$refs.contextMenu.setType(type)
 		}, 
 		hideContextMenu(){
 			this.$refs.contextMenu.hide()
 		},	
 		changeFavorite(item,type){
+			 event.stopPropagation()
+			if(type == "document_major" || type == "document_category"){
+				type = "document_definition"
+			}
 			let userId = this.$store.state.app.endUserInfo.id
 			if(item.objectIdentifier.includes("document_definition:")){
 				item.id = item.objectIdentifier.replace("document_definition:","")

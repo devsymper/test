@@ -53,6 +53,12 @@ export default [
 
     },
     {
+        path: "/documents/print-multiple",
+        name: "printMultiple",
+        component: () =>
+            import ('../../views/document/print/PrintView.vue'),
+    },
+    {
         path: "/documents/objects/:id?",
         name: "detailDocument",
         component: () =>
@@ -64,6 +70,7 @@ export default [
         component: () =>
             import ('../../views/document/print/Print.vue'),
     },
+
     {
         path: "/document/objects/update/:id?",
         name: "updateDocumentObject",

@@ -17,7 +17,6 @@
                     v-model="txtSearch"
                     :placeholder="$t('common.search')"
                 ></v-text-field>
-               
                 <v-menu
                     z-index="162"
                     :max-width="200"
@@ -32,7 +31,6 @@
                             solo
                             class="bg-grey h-30"
                             text
-                            
                         >
                             <v-icon size="18">mdi-dots-horizontal</v-icon>
                         </v-btn>
@@ -52,7 +50,9 @@
             </v-col>
         </v-app-bar>
         <v-row class="ml-0 mr-0 pl-5 pr-5 list-notification bg-white" :z-index="99999">
-            <v-row v-if="checkToday" class="w-100 fs-13 ml-3 mt-1" style="margin-bottom:-2px"><span style="color:orange; font-weight:430">Hôm nay</span></v-row>
+            <v-row v-if="checkToday" class="w-100 fs-13 ml-3 mt-1" style="margin-bottom:-2px">
+                <span style="color:orange; font-weight:430">{{$t('notification.today')}}</span>
+            </v-row>
             <v-row v-if="checkToday" 
                 v-for="item in listNotification.filter(x=>changeDate(x.createTime)==today)" 
                 :key="item.id"
@@ -113,7 +113,7 @@
                 </v-menu>
             </v-row>
             <!-- older -->
-            <v-row class="w-100 fs-13 ml-3 mt-1" style="margin-bottom:-3px"><span style="color:orange; font-weight:430">Cũ hơn</span></v-row>
+            <v-row class="w-100 fs-13 ml-3 mt-1" style="margin-bottom:-3px"><span style="color:orange; font-weight:430">{{$t('notification.older')}}</span></v-row>
             <v-row
                 v-for="item in listNotification.filter(x=>changeDate(x.createTime)!=today)" 
                 :key="item.id"
@@ -264,7 +264,6 @@
                                     ></v-switch>
                             </v-row>
                         </v-col>
-                        
                     </v-row>
                 </slot>
             </v-row>
@@ -304,6 +303,7 @@ export default {
     created() {
         this.$store.dispatch("app/getAllUsers");
         this.getListNoticication();
+      
     },
     mounted(){
         this.$evtBus.$on("app-receive-remote-msg", data => {
@@ -324,23 +324,22 @@ export default {
         },
         getScope(action){
             return JSON.parse(action).scope
-
         },
         changeDate(value){
             return dayjs.unix(value).format('DD/MM/YYYY')
-
         },
         checkListToday(){
             for (let i = 0;i<this.listNotification.length;i++){
                 let dayListNotification = dayjs.unix(this.listNotification[i].createTime).format('DD/MM/YYYY') ;
                 let today = dayjs().format('DD/MM/YYYY') ;
+
                 if(today==dayListNotification){
-                 debugger
-                     this.checkToday = true;
+    
+                    this.checkToday = true;
+                }   
             }
             return this.checkToday
-        }}
-        ,
+        },
         getListNoticication() { 
             let req = new Api(appConfigs.apiDomain.nofitication);
             req.get("/notifications",{'keyword':this.txtSearch})
@@ -349,6 +348,7 @@ export default {
                     this.overlay = false;
                     let tmp = res.data;
                     this.listNotification = tmp;
+                    this.checkListToday();
                 } else {
                     this.showError();
                 }
@@ -363,7 +363,6 @@ export default {
             };
             this.$evtBus.$emit('symper-app-call-action-handler', notificationItem.action, this, extraParams)
             this.markRead(notificationItem);
-            
         },
         actionNotification(notificationItem,action){
             switch(action){
@@ -421,7 +420,6 @@ export default {
              let req = new Api(appConfigs.apiDomain.nofitication);
                 req.post("/notifications/read")
                 .then(res => {
-                    
                     if (res.status == 200) {
                         this.listNotification.map(function(item){
                             item.state = '1';
@@ -490,7 +488,6 @@ export default {
             .catch(err => {
                 this.showError();
             })
-            
         }
     }
 }

@@ -4,7 +4,7 @@
         absolute
         class="pa-2 pl-4"
         right
-        :style="{width: tableDisplayConfig.width+'px'}"
+        :style="{width: tableDisplayConfig.width+'px','z-index':'7'}"
     >
         <div class="title">
             <div>
@@ -14,19 +14,24 @@
                     @click="tableDisplayConfig.show = false"
                 >mdi-close</v-icon>
             </div>
+            
+            <div class="pb-2 justify-space-between d-flex mt-2" v-if="showActionPanelInDisplayConfig">
+                <div class="subtitle-2">{{$t('common.always_show_sidebar')}}</div>
+                <v-switch style="height: 25px" v-model="tableDisplayConfig.value.alwaysShowSidebar" class="float-right pt-0 mt-0" ></v-switch>
+            </div>
             <div class="pb-2">
                 <div class="subtitle-2">{{$t('table.wrap_text_mode')}}</div>
                 <div>
                     <v-btn-toggle
                         dense
-                        v-model="tableDisplayConfig.wrapTextMode"
+                        v-model="tableDisplayConfig.value.wrapTextMode"
                         mandatory
                         tile
                         color="amber darken-4"
                         group
                     >
-                        <v-btn small>{{$t('table.wrap_tex_mode.clip')}}</v-btn>
                         <v-btn small>{{$t('table.wrap_tex_mode.wrap')}}</v-btn>
+                        <v-btn small>{{$t('table.wrap_tex_mode.clip')}}</v-btn>
                     </v-btn-toggle>
                 </div>
             </div>
@@ -35,7 +40,7 @@
                 <div>
                     <v-btn-toggle
                         dense
-                        v-model="tableDisplayConfig.densityMode"
+                        v-model="tableDisplayConfig.value.densityMode"
                         mandatory
                         tile
                         color="amber darken-4"
@@ -140,7 +145,6 @@ export default {
         tableColumns: {
             deep: true,
             handler(){
-                console.log(this.tableColumns,'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx');
                 this.tableColumnsClone = util.cloneDeep(this.tableColumns);
             }
         }
@@ -159,6 +163,10 @@ export default {
                 return {}
             }
         },
+        showActionPanelInDisplayConfig:{
+            type: Boolean,
+            default: true,
+        },
         tableColumns: {
             type: Array,
             default(){
@@ -171,13 +179,16 @@ export default {
         }
     },
     methods: {
+        saveTableDisplayConfig(){
+            this.$emit('save-list-display-config');
+        },
         resetTableColumnsData(){
             // this.tableColumnsClone = util.cloneDeep(this.tableColumns);
         },
         handleStopDragColumn(){
             this.$emit('drag-columns-stopped', this.tableColumnsClone);
         },
-        configColumnDisplay(type,idx){
+        configColumnDisplay(type, column, idx){
             this.$emit('change-colmn-display-config',type,idx);
         },
         getDataTypeIcon(type) {

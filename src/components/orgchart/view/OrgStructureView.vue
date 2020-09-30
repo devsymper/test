@@ -153,7 +153,6 @@ export default {
                 ];
                 link.prop('vertices', vertices);
             }
-            debugger
             this.$refs.editorWorkspace.graph.addCells(lazyCells);
         },
         getCellSizeAndPosition(cellId){

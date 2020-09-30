@@ -167,8 +167,8 @@ export default {
 		 }
 	},
 	created(){
-		this.getActiveapps()
-		this.getFavorite()
+            this.getActiveapps()
+			this.getFavorite()
 	},
 	mounted(){
 		 let thisCpn = this;
@@ -198,7 +198,10 @@ export default {
 		},
 		sFavorite(){
 			return this.$store.state.appConfig.listFavorite
-		}
+		},
+		listApp(){
+            return this.$store.state.appConfig.listApps
+        }
 	},
 	methods:{
 		getActiveapps(){
@@ -206,6 +209,7 @@ export default {
 				this.loadingApp = false
 				if (res.status == 200) {
 					this.apps = res.data.listObject
+					// this.$store.commit('appConfig/setListApps', res.data.listObject)
 				}
 			}).catch((err) => {
 			});
@@ -327,7 +331,7 @@ export default {
 			if(!item.actions.includes('unfavorite')){
 				item.actions.push('unfavorite')
 			}
-			this.$refs.contextMenu.setContextItem(item.actions)
+			this.$refs.contextMenu.setContextItem([...new Set(item.actions)])
 			this.$refs.contextMenu.show(event)
 			this.$refs.contextMenu.setItem(item)
 			this.$refs.contextMenu.setType(type)
@@ -383,7 +387,17 @@ export default {
 				}
 				if(type == 'document_definition'){
 					this.updateFavoriteItem(self.mapId.document_definition,res.data)
-					this.$store.commit('appConfig/updateChildrenApps',{obj:res.data,type:'document_definition'});
+					let arrCategory = []
+					let arrMajor = []
+					res.data.forEach(function(e){
+						if(e.objectType == "1"){
+							arrMajor.push(e)
+						}else if(e.objectType == "2"){
+							arrCategory.push(e)
+						}
+					})
+					this.$store.commit('appConfig/updateChildrenApps',{obj:arrMajor,type:'document_major'});
+					this.$store.commit('appConfig/updateChildrenApps',{obj:arrCategory,type:'document_category'});
 				}
 				if(type == 'workflow_definition'){
 					this.updateFavoriteItem(self.mapId.workflow_definition,res.data)

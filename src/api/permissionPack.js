@@ -48,7 +48,6 @@ export const permissionApi = {
     deleteActionPack(idPacks) {
         if ($.isArray(idPacks)) {
             idPacks = idPacks.join(',');
-            debugger
         }
         return actionModuleApi.delete('/' + idPacks, idPacks);
     },

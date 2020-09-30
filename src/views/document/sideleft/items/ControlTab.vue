@@ -1,5 +1,6 @@
 <template>
     <div class="sym-document-tab-control">
+        
         <v-text-field
             @input="onSearch($event)"
             placeholder="Tìm kiếm"
@@ -12,86 +13,88 @@
             >
         </v-text-field>
         <div>
-            <v-expansion-panels
-            v-model="panel"
-            multiple
-            class="sym-list-control"
-            >
-                <v-expansion-panel v-if="isConfigPrint">
-                    <v-expansion-panel-header class="v-expand-header">In</v-expansion-panel-header>
-                    <v-expansion-panel-content class="sym-v-expand-content">
+            <VuePerfectScrollbar 
+                class="sym-list-control">
+                <v-expansion-panels
+                v-model="panel"
+                multiple
+                >
+                    <v-expansion-panel v-if="isConfigPrint">
+                        <v-expansion-panel-header class="v-expand-header">In</v-expansion-panel-header>
+                        <v-expansion-panel-content class="sym-v-expand-content">
+                            <v-list>
+                                <control
+                                v-for="control in listControlPrint"
+                                :key="control"
+                                :type="control"
+                                />
+                            </v-list>
+                        </v-expansion-panel-content>
+                    </v-expansion-panel>
+                    <v-expansion-panel v-if="!isConfigPrint">
+                        <v-expansion-panel-header class="v-expand-header">Hiển thị</v-expansion-panel-header>
+                        <v-expansion-panel-content class="sym-v-expand-content">
+                            <v-list>
+                                <control
+                                v-for="control in listControlDisplay"
+                                :key="control"
+                                :type="control"
+                                />
+                            </v-list>
+                        </v-expansion-panel-content>
+                    </v-expansion-panel>
+                    <v-expansion-panel v-if="!isConfigPrint">
+                        <v-expansion-panel-header class="v-expand-header">Input</v-expansion-panel-header>
+                        <v-expansion-panel-content class="sym-v-expand-content">
+                            <v-list>
+                                <control
+                                v-for="control in listControlInput"
+                                :key="control"
+                                :type="control"
+                                />
+                            </v-list>
+                        </v-expansion-panel-content>
+                    </v-expansion-panel>
+                    <v-expansion-panel v-if="!isConfigPrint">
+                        <v-expansion-panel-header class="v-expand-header">Layout</v-expansion-panel-header>
+                        <v-expansion-panel-content class="sym-v-expand-content">
                         <v-list>
-                            <control
-                            v-for="control in listControlPrint"
-                            :key="control"
-                            :type="control"
-                            />
-                        </v-list>
-                    </v-expansion-panel-content>
-                </v-expansion-panel>
-                <v-expansion-panel v-if="!isConfigPrint">
-                    <v-expansion-panel-header class="v-expand-header">Hiển thị</v-expansion-panel-header>
-                    <v-expansion-panel-content class="sym-v-expand-content">
-                        <v-list>
-                            <control
-                            v-for="control in listControlDisplay"
-                            :key="control"
-                            :type="control"
-                            />
-                        </v-list>
-                    </v-expansion-panel-content>
-                </v-expansion-panel>
-                <v-expansion-panel v-if="!isConfigPrint">
-                    <v-expansion-panel-header class="v-expand-header">Input</v-expansion-panel-header>
-                    <v-expansion-panel-content class="sym-v-expand-content">
-                        <v-list>
-                            <control
-                            v-for="control in listControlInput"
-                            :key="control"
-                            :type="control"
-                            />
-                        </v-list>
-                    </v-expansion-panel-content>
-                </v-expansion-panel>
-                <v-expansion-panel v-if="!isConfigPrint">
-                    <v-expansion-panel-header class="v-expand-header">Layout</v-expansion-panel-header>
-                    <v-expansion-panel-content class="sym-v-expand-content">
-                    <v-list>
-                            <control
-                            v-for="control in listControlLayout"
-                            :key="control"
-                            :type="control"
-                            />
-                        </v-list>
-                    </v-expansion-panel-content>
-                </v-expansion-panel>
+                                <control
+                                v-for="control in listControlLayout"
+                                :key="control"
+                                :type="control"
+                                />
+                            </v-list>
+                        </v-expansion-panel-content>
+                    </v-expansion-panel>
 
-                <v-expansion-panel v-if="!isConfigPrint">
-                    <v-expansion-panel-header class="v-expand-header">Report</v-expansion-panel-header>
-                    <v-expansion-panel-content class="sym-v-expand-content">
-                    <v-list>
-                            <control
-                            v-for="control in listControlReport"
-                            :key="control"
-                            :type="control"
-                            />
-                        </v-list>
-                    </v-expansion-panel-content>
-                </v-expansion-panel>
-                <v-expansion-panel v-if="!isConfigPrint">
-                    <v-expansion-panel-header class="v-expand-header">Action</v-expansion-panel-header>
-                    <v-expansion-panel-content class="sym-v-expand-content">
-                    <v-list>
-                            <control
-                            v-for="control in listControlAction"
-                            :key="control"
-                            :type="control"
-                            />
-                        </v-list>
-                    </v-expansion-panel-content>
-                </v-expansion-panel>
-                
-            </v-expansion-panels>
+                    <v-expansion-panel v-if="!isConfigPrint">
+                        <v-expansion-panel-header class="v-expand-header">Report</v-expansion-panel-header>
+                        <v-expansion-panel-content class="sym-v-expand-content">
+                        <v-list>
+                                <control
+                                v-for="control in listControlReport"
+                                :key="control"
+                                :type="control"
+                                />
+                            </v-list>
+                        </v-expansion-panel-content>
+                    </v-expansion-panel>
+                    <v-expansion-panel v-if="!isConfigPrint">
+                        <v-expansion-panel-header class="v-expand-header">Action</v-expansion-panel-header>
+                        <v-expansion-panel-content class="sym-v-expand-content">
+                        <v-list>
+                                <control
+                                v-for="control in listControlAction"
+                                :key="control"
+                                :type="control"
+                                />
+                            </v-list>
+                        </v-expansion-panel-content>
+                    </v-expansion-panel>
+                    
+                </v-expansion-panels>
+            </VuePerfectScrollbar>
         </div>
         
     </div>
@@ -99,6 +102,7 @@
 <script>
 import Control from './../../items/Control.vue';
 import getControlElement from './../../../../components/document/controlPropsFactory.js';
+import VuePerfectScrollbar from "vue-perfect-scrollbar";
 export default {
     props:{
         isConfigPrint:{
@@ -108,12 +112,13 @@ export default {
     },
     components:{
         'control' : Control,
+        VuePerfectScrollbar
     },
     data: () => ({
         panel: [0, 1, 2, 3, 4],
         listControlPrint:   ['labelPrint'],
         listControlDisplay: ['label','image','qrCode'],
-        listControlInput:   ['textInput','richText','number','date','dateTime','time','month','select','department','documentSelect','phone','email','currency','radio','checkbox','color','percent','user','inputFilter','hidden'],
+        listControlInput:   ['textInput','richText','number','date','dateTime','time','month','select','combobox','department','documentSelect','phone','email','currency','radio','checkbox','color','percent','user','inputFilter','hidden'],
         listControlLayout:  ['table','panel','fileUpload','tabPage'],
         listControlReport:  ['dataFlow','report','approvalHistory','trackingValue'],
         listControlAction:  ['submit','reset','draft']
@@ -152,7 +157,6 @@ export default {
         margin: 0;
     }
     .sym-list-control{
-        overflow: auto;
         max-height: calc(100vh - 110px);
     }
     

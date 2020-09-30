@@ -43,11 +43,11 @@ const userMenuItems = function(state) {
     let opsMap = state.userOperations;
     let userInfo = util.auth.getSavedUserInfo();
     let userType = userInfo.profile.type;
-
     if (userType == 'ba') {
         return Object.values(mapObjectTypeAndMenu);
     } else {
-        let allwaysHave = ['tasks'];
+        // let allwaysHave = ['tasks', 'myItem', 'works', 'my_application'];
+        let allwaysHave = ['my_application', 'lisTaskToDo'];
         let items = [];
         for (let objectType in opsMap) {
             if (hasShowListPermission(opsMap, objectType)) {

@@ -145,30 +145,25 @@ export default {
 
         },
         loadTask(){
-            debugger
             this.load = true;
         },
         cancelTaskForm(){
-            debugger
             this.showTask=false;
             this.showCategory=false;
             this.cancelTask != this.cancelTask;
         },
         
         cancelCateForm(){
-            debugger
             this.showTask=false;
             this.showCategory=false;
             this.cancelCate != this.cancelCate;
         },
         showTaskForm(value){
-            debugger
             this.eventLog = value;
             this.showTask=true; 
           
         },
          showCategoryForm(value){
-            debugger
             this.eventLog = value;
             this.showCategory=true;
             this.showTask =true;
@@ -181,7 +176,6 @@ export default {
             }
          },
          showLog(date){
-            debugger
             this.dateMonth = date;
             this.logtimeDialog = true;
               //this.update=true;

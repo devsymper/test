@@ -127,7 +127,6 @@ export default {
     },
     watch:{
         "controlPropsGroup.table.mapParamsDataflow.value":function(after){
-            // debugger    
         },
         /**
          * Tự động focus vào input name sau khi chọn control
@@ -186,7 +185,7 @@ export default {
             if(input.groupType == "formulas"){
                 this.handleValidateControl(name, input, data);
             }
-            if(['numberFormat','checkbox','formatDate'].includes(input.type)){
+            if(['numberFormat','checkbox','dateFormat'].includes(input.type)){
                 input.value = data
                 this.handleValidateControl(name, input, data);
             }

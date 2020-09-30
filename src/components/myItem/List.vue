@@ -75,7 +75,6 @@
                 <v-row
                    :class="{
                         'mr-0 ml-0 single-row': true ,
-                        'py-1': !isSmallRow,
                         'py-0': isSmallRow,
                     }"
                     :style="{
@@ -83,7 +82,7 @@
                     }"
                     style="border-bottom: 1px solid #eeeeee!important;"
                 >
-                   <span style="color:#FF8003; font-size:15px;margin-left:16px;margin-top:6px">{{ showTime(obj.date)}}</span>
+                   <span style="color:#FF8003; font-size:13px;margin-left:16px;margin-top:6px">{{ showTime(obj.date)}}</span>
                 </v-row>
                 <v-row
                     v-for="(obj, idx) in obj.tasks"
@@ -91,7 +90,6 @@
                     :index="obj.id"
                     :class="{
                                     'mr-0 ml-0 single-row': true ,
-                                    'py-1': !isSmallRow,
                                     'py-0': isSmallRow,
                                     'd-active':index==idx && dataIndex==idex
                                 }"
@@ -109,7 +107,7 @@
                     >
                     <v-icon class="fs-14"
                         v-if="obj.taskData.action"
-                    >{{(obj.taskData.action.action=='submit' || obj.taskData.action.action=='') ? 'mdi-file-document-edit-outline': 'mdi-seal-variant'}}</v-icon>
+                    >{{obj.taskData.action.action=='approval' ? 'mdi-seal-variant ': 'mdi-file-document-edit-outline'}}</v-icon>
                     <v-icon class="fs-14" v-else>mdi-checkbox-marked-circle-outline</v-icon>
                     </v-col>
                     <v-col :cols="sideBySideMode ? 10 : compackMode ? 5: 3" class="pl-3 pr-1 pb-1 pt-2">
@@ -117,10 +115,6 @@
                         <v-tooltip bottom>
                         <template v-slot:activator="{ on }">
                             <div v-on="on" class="text-left fs-13 pr-6 text-ellipsis w-100">
-                            <span
-                                v-if="obj.taskData.action && obj.taskData.action.action=='approval'"
-                                style="color:#ffc107"
-                            >{{obj.taskData.action.parameter.documentObjectId ? checkData(obj.taskData.action.parameter.documentObjectId): ''}}</span>
                             {{obj.taskData.content}}
                             </div>
                         </template>
@@ -170,7 +164,7 @@
                         cols="2"
                         v-if="!sideBySideMode && !smallComponentMode"
                     >
-                       <div class="pl-1">
+                       <div class="pl-1 mt-1">
                             <v-tooltip bottom>
                                 <template v-slot:activator="{ on }">
                                 <span
@@ -183,9 +177,9 @@
                                 <span>{{ obj.processDefinitionName?  obj.processDefinitionName : `ad hoc` }}</span>
                             </v-tooltip>
                             <div class="pa-0 grey--text mt-1 lighten-2 d-flex justify-space-between">
-                            <!-- <div
-                                class="fs-11 pr-6 text-ellipsis"
-                            >App</div> -->
+                                <div
+                                    class="fs-11 pr-6 text-ellipsis"
+                                >{{selectNameApp(obj.variables)}}</div>
                             </div>
                         </div>
                         
@@ -196,13 +190,18 @@
                         class="fs-13 px-1 py-0"
                     >
                         <div class="pl-1">
-                            <div style="width:55px">10 <v-icon class="fs-14" style="float:right;margin-top:4px;margin-right:12px">mdi-comment-processing-outline</v-icon> </div>
-                            <div style="width:55px"> 2 <v-icon class="fs-14" style="float:right;margin-top:4px;margin-right:12px">mdi-attachment</v-icon></div>
+                            <div style="width:55px">
+                                {{commentCountPerTask['task:' + obj.id]}}
+                                <v-icon class="fs-14" style="float:right;margin-top:4px;margin-right:12px">mdi-comment-processing-outline</v-icon> 
+                            </div>
+                            <div style="width:55px"> 
+                                {{fileCountPerTask['task:' + obj.id]}}
+                                <v-icon class="fs-14" style="float:right;margin-top:4px;margin-right:12px">mdi-attachment</v-icon>
+                            </div>
                         </div>
                     </v-col>
                 </v-row>
             </div>
-           
         </VuePerfectScrollbar>
         <v-skeleton-loader v-else ref="skeleton" :type="'table-tbody'" class="mx-auto"></v-skeleton-loader>
         <v-skeleton-loader
@@ -243,6 +242,7 @@ import userSelector from "./UserSelector";
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import { util } from "../../plugins/util";
 import { appConfigs } from "../../configs";
+
 import {
   extractTaskInfoFromObject,
   addMoreInfoToTask
@@ -251,139 +251,163 @@ import symperAvatar from "@/components/common/SymperAvatar.vue";
 
 export default {
   computed: {
-    // Liệt kê danh sách các task dưới dạng phẳng - ko phân cấp
-    flatTasks() {
-      let tasks = [];
-      for (let def of this.listProrcessInstances) {
-        for (let instances of def.objects) {
-          for (let task of instances.tasks) {
-            task.bizKey = ""; // Business key của process instance
-            tasks.push(task);
-          }
+        fileCountPerTask(){
+            return this.$store.state.file.fileCountPerObj.list;
+        },
+        commentCountPerTask(){
+            return this.$store.state.comment.commentCountPerObj.list;
+        },
+       
+        // Liệt kê danh sách các task dưới dạng phẳng - ko phân cấp
+        flatTasks() {
+            let tasks = [];
+            for (let def of this.listProrcessInstances) {
+                for (let instances of def.objects) {
+                for (let task of instances.tasks) {
+                    task.bizKey = ""; // Business key của process instance
+                    tasks.push(task);
+                }
+                }
+            }
+            return tasks;
+        },
+        groupFlatTasks() {
+            let allTask = this.allFlatTasks;
+            const groups = allTask.reduce((groups, task) => {
+                let date;
+                if ( task.createTime) {
+                    date = task.createTime.split("T")[0];
+                }else{
+                    date = task.endTime.split("T")[0];
+                }
+                if (!groups[date]) {
+                groups[date] = [];
+                }
+                groups[date].push(task);
+                return groups;
+            }, {});
+            // Edit: to add it in the array format instead
+            const groupArraysTask = Object.keys(groups).map(date => {
+                return {
+                date,
+                tasks: groups[date]
+                };
+            });
+            console.log("addd",groupArraysTask);
+            return groupArraysTask;
+        },
+        stask() {
+        return this.$store.state.task;
+        },
+        sapp() {
+        return this.$store.state.app;
         }
-      }
-      return tasks;
     },
-    groupFlatTasks() {
-        let allTask = this.allFlatTasks;
-        const groups = allTask.reduce((groups, task) => {
-            let date;
-            if ( task.createTime) {
-                date = task.createTime.split("T")[0];
-            }else{
-                date = task.endTime.split("T")[0];
+    watch:{
+        "stask.isStatusSubmit": function(newVl) {
+            if (newVl==true) {
+                this.getTasks();
+                this.$store.commit("task/setIsStatusSubmit",false);
             }
-            if (!groups[date]) {
-            groups[date] = [];
+        },
+        sideBySideMode(vl){
+            if(!vl){
+                this.$store.dispatch('file/getWaitingFileCountPerObj');
+                this.$store.dispatch('comment/getWaitingCommentCountPerObj');
             }
-            groups[date].push(task);
-            return groups;
-        }, {});
-        // Edit: to add it in the array format instead
-        const groupArraysTask = Object.keys(groups).map(date => {
-            return {
-            date,
-            tasks: groups[date]
-            };
+        }
+    },
+    name: "listTask",
+    components: {
+        icon: icon,
+        taskDetail: taskDetail,
+        listHeader: listHeader,
+        userSelector: userSelector,
+        VuePerfectScrollbar: VuePerfectScrollbar,
+        symperAvatar: symperAvatar
+    },
+    props: {
+        compackMode: {
+            type: Boolean,
+            default: false
+        },
+        height: {
+            type: String,
+            default: "calc(100vh - 120px)"
+        },
+        // component này có ở chế độ là component con của một component khác hay ko, false nếu component này là view
+        smallComponentMode: {
+            type: Boolean,
+            default: false
+        },
+        filterFromParent: {
+            type: Object,
+            default() {
+                return {};
+            }
+        },
+        headerTitle: {
+            type: String,
+            default() {
+                return this.$t("process.taskList");
+            }
+        },
+        filterTaskAction: {
+            type: String,
+            default: "getList"
+        }
+    },
+    data: function() {
+        return {
+            index: -1,
+            dataIndex:-1,
+            loadingTaskList: false,
+            loadingMoreTask: false,
+            listTaskHeight: 300,
+            totalTask: 0,
+            selectedTask: {
+                taskInfo: {},
+                idx: -1,
+                originData: null
+            },
+            listProrcessInstances: [],
+            isSmallRow: false,
+            sideBySideMode: false,
+            openPanel: [0, 1, 2, 3, 4],
+            allFlatTasks: [],
+            myOwnFilter: {
+                size: 100,
+                sort: "createTime",
+                order: "desc",
+                page: 1,
+                includeProcessVariables:true,
+                involvedUser: this.$store.state.app.endUserInfo.id
+                // assignee: this.$store.state.app.endUserInfo.id
+            },
+            defaultAvatar: appConfigs.defaultAvatar,
+            arrdocObjId: []
+        };
+    },
+    created() {
+        let self = this;
+        this.$evtBus.$on("symper-update-task-assignment", updatedTask => {
+            updatedTask.taskData = self.getTaskData(updatedTask);
+            self.selectObject(updatedTask, self.selectedTask.idx);
+            self.$set(self.allFlatTasks, self.selectedTask.idx, updatedTask);
         });
-        console.log("addd",groupArraysTask);
-        return groupArraysTask;
     },
-    stask() {
-      return this.$store.state.task;
+    mounted() {
+        let self = this;
+        this.$store
+            .dispatch("process/getAllDefinitions")
+            .then(res => {
+                self.getTasks();
+            })
+            .catch(err => {});
+
+        self.reCalcListTaskHeight();
     },
-    sapp() {
-      return this.$store.state.app;
-    }
-  },
-  name: "listTask",
-  components: {
-    icon: icon,
-    taskDetail: taskDetail,
-    listHeader: listHeader,
-    userSelector: userSelector,
-    VuePerfectScrollbar: VuePerfectScrollbar,
-    symperAvatar: symperAvatar
-  },
-  props: {
-    compackMode: {
-      type: Boolean,
-      default: false
-    },
-    height: {
-      type: String,
-      default: "calc(100vh - 120px)"
-    },
-    // component này có ở chế độ là component con của một component khác hay ko, false nếu component này là view
-    smallComponentMode: {
-      type: Boolean,
-      default: false
-    },
-    filterFromParent: {
-      type: Object,
-      default() {
-        return {};
-      }
-    },
-    headerTitle: {
-      type: String,
-      default() {
-        return this.$t("process.taskList");
-      }
-    },
-    filterTaskAction: {
-      type: String,
-      default: "getList"
-    }
-  },
-  data: function() {
-    return {
-      index: -1,
-      dataIndex:-1,
-      loadingTaskList: false,
-      loadingMoreTask: false,
-      listTaskHeight: 300,
-      totalTask: 0,
-      selectedTask: {
-        taskInfo: {},
-        idx: -1,
-        originData: null
-      },
-      listProrcessInstances: [],
-      isSmallRow: false,
-      sideBySideMode: false,
-      openPanel: [0, 1, 2, 3, 4],
-      allFlatTasks: [],
-      myOwnFilter: {
-        size: 100,
-        sort: "createTime",
-        order: "desc",
-        page: 1,
-        assignee: this.$store.state.app.endUserInfo.id
-      },
-      defaultAvatar: appConfigs.defaultAvatar,
-      arrdocObjId: []
-    };
-  },
-  created() {
-    let self = this;
-    this.$evtBus.$on("symper-update-task-assignment", updatedTask => {
-      updatedTask.taskData = self.getTaskData(updatedTask);
-      self.selectObject(updatedTask, self.selectedTask.idx);
-      self.$set(self.allFlatTasks, self.selectedTask.idx, updatedTask);
-    });
-  },
-  mounted() {
-    let self = this;
-    this.$store
-      .dispatch("process/getAllDefinitions")
-      .then(res => {
-        self.getTasks();
-      })
-      .catch(err => {});
-    self.reCalcListTaskHeight();
-  },
-  methods: {
+    methods: {
     changeUpdateAsignee(){
       this.handleTaskSubmited();
     },
@@ -396,28 +420,43 @@ export default {
             return this.$moment(time).fromNow();
         }
     },
+    selectNameApp(variables){
+        const symperAppId = variables.find(element => element.name=='symper_application_id');
+        if (symperAppId) {
+            let appId=symperAppId.value;
+            let allApp = this.$store.state.task.allAppActive;
+            let app=allApp.find(element => element.id==appId);
+            if (app) {
+                return app.name;
+            }else{
+                return "";
+            }
+        }else{
+            return "";
+        }
+    },
     changeObjectType(index) {
       this.$emit("changeObjectType", index);
     },
-    checkData(documentObjectId) {
-      if (documentObjectId != "" || documentObjectId != undefined) {
-        let arr = this.stask.arrDocObjId;
-        let obj = arr.find(data => data.id === documentObjectId);
-        if (obj) {
-          let arrUser = this.sapp.allUsers;
-          let user = arrUser.find(data => data.email === obj.userCreate);
-          if (user) {
-            return user.displayName;
-          } else {
-            return "";
-          }
-        } else {
-          return "";
-        }
-      } else {
-        return "";
-      }
-    },
+    // checkData(documentObjectId) {
+    //   if (documentObjectId != "" || documentObjectId != undefined) {
+    //     let arr = this.stask.arrDocObjId;
+    //     let obj = arr.find(data => data.id === documentObjectId);
+    //     if (obj) {
+    //       let arrUser = this.sapp.allUsers;
+    //       let user = arrUser.find(data => data.email === obj.userCreate);
+    //       if (user) {
+    //         return user.displayName;
+    //       } else {
+    //         return "";
+    //       }
+    //     } else {
+    //       return "";
+    //     }
+    //   } else {
+    //     return "";
+    //   }
+    // },
     handleReachEndList() {
       if (
         this.allFlatTasks.length < this.totalTask &&
@@ -467,89 +506,94 @@ export default {
       this.$emit("change-height", "calc(100vh - 120px)");
     },
     getTaskData(task) {
-      let rsl = {
-        content: "",
-        extraLabel: "",
-        extraValue: ""
-      };
-      try {
-        let taskData = JSON.parse(task.description);
-        if (taskData) {
-          rsl = taskData;
+        let rsl = {
+            content: "",
+            extraLabel: "",
+            extraValue: ""
+        };
+        try {
+            let taskData = JSON.parse(task.description);
+            if (taskData) {
+            rsl = taskData;
+            }
+        } catch (error) {
+            rsl.content = task.description;
         }
-      } catch (error) {
-        rsl.content = task.description;
-      }
-      return rsl;
+        return rsl;
     },
     async getTasks(filter = {}) {
-      if (this.loadingTaskList || this.loadingMoreTask) {
-        return;
-      }
-      let self = this;
-      if (this.myOwnFilter.page == 1) {
-        this.allFlatTasks = [];
-        this.loadingTaskList = true;
-      } else {
-        this.loadingMoreTask = true;
-      }
-      this.listProrcessInstances = [];
-      filter = Object.assign(filter, this.filterFromParent);
-      filter = Object.assign(filter, this.myOwnFilter);
-      let res = {};
-      let listTasks = [];
-      if (filter.status) {
-        this.$store.commit("task/setFilter", filter.status);
-      }
-      if (this.filterTaskAction == "subtasks") {
-        res = await BPMNEngine.getSubtasks(
-          this.filterFromParent.parentTaskId,
-          filter
-        );
-        if (filter.status == "done") {
-          listTasks = res.data;
+        if (this.loadingTaskList || this.loadingMoreTask) {
+            return;
+        }
+        let self = this;
+        if (this.myOwnFilter.page == 1) {
+            this.allFlatTasks = [];
+            this.loadingTaskList = true;
         } else {
-          listTasks = res;
+            this.loadingMoreTask = true;
         }
-      } else {
-        if (!filter.assignee) {
-          filter.assignee = this.$store.state.app.endUserInfo.id;
+        this.listProrcessInstances = [];
+        filter = Object.assign(filter, this.filterFromParent);
+        filter = Object.assign(filter, this.myOwnFilter);
+        let res = {};
+        let listTasks = [];
+        if (filter.status) {
+            this.$store.commit("task/setFilter", filter.status);
         }
-        res = await BPMNEngine.getTask(filter);
-        listTasks = res.data;
-      }
-      this.totalTask = Number(res.total);
-      // let allDefinitions=this.$store.state.process.allDefinitions;
-      // if(Object.entries(allDefinitions).length === 0){
-      //     this.$store.dispatch('process/getAllDefinitions');
-      // }
-      for (let task of listTasks) {
-        task.taskData = self.getTaskData(task);
-        task = addMoreInfoToTask(task);
-        self.allFlatTasks.push(task);
-      }
-      this.listProrcessInstances.forEach((process, processIndex) => {
-        process.objects.forEach((instance, instanceIndex) => {
-          this.listProrcessInstances[processIndex].objects[
-            instanceIndex
-          ].tasks = [];
-          // let index = 0;
-          for (let index in listTasks) {
-            listTasks[index].assignee = this.getUser(
-              parseInt(listTasks[index].assignee)
+        if (this.filterTaskAction == "subtasks") {
+            res = await BPMNEngine.getSubtasks(
+                this.filterFromParent.parentTaskId,
+                filter
             );
-            listTasks[index].owner = this.getUser(
-              parseInt(listTasks[index].owner)
-            );
-            if (listTasks[index].processInstanceId == instance.id) {
-              this.listProrcessInstances[processIndex].objects[
-                instanceIndex
-              ].tasks.push(listTasks[index]);
-              listTasks.splice(index, 1);
+            if (filter.status == "done") {
+                listTasks = res.data;
+            } else {
+                listTasks = res;
             }
-          }
+        } else {
+            // if (!filter.assignee) {
+            // filter.assignee = this.$store.state.app.endUserInfo.id;
+            // }
+            res = await BPMNEngine.getTask(filter);
+            listTasks = res.data;
+        }
+        this.totalTask = Number(res.total);
+        this.$store.dispatch('task/getAllAppActive');
+        //Khadm: danh sách các task cần lấy tổng số comment và file đính kèm
+        let taskIden = [];
+        for (let task of listTasks) {
+            task.taskData = self.getTaskData(task);
+            task = addMoreInfoToTask(task);
+            self.allFlatTasks.push(task);
+            taskIden.push('task:'+task.id);
+        }
+        this.$store.commit('file/setWaitingFileCountPerObj', taskIden);
+        this.$store.commit('comment/setWaitingCommentCountPerObj', taskIden);
+        this.$store.dispatch('file/getWaitingFileCountPerObj');
+        this.$store.dispatch('comment/getWaitingCommentCountPerObj');
+
+        this.listProrcessInstances.forEach((process, processIndex) => {
+            process.objects.forEach((instance, instanceIndex) => {
+            this.listProrcessInstances[processIndex].objects[
+                instanceIndex
+            ].tasks = [];
+            // let index = 0;
+            for (let index in listTasks) {
+                listTasks[index].assignee = this.getUser(
+                parseInt(listTasks[index].assignee)
+                );
+                listTasks[index].owner = this.getUser(
+                parseInt(listTasks[index].owner)
+                );
+                if (listTasks[index].processInstanceId == instance.id) {
+                this.listProrcessInstances[processIndex].objects[
+                    instanceIndex
+                ].tasks.push(listTasks[index]);
+                listTasks.splice(index, 1);
+                }
+            }
+            });
         });
-      });
 
       console.log(listTasks, "listTassk");
       this.addOtherProcess(listTasks);
@@ -562,19 +606,19 @@ export default {
           parseInt(listTasks[index].assignee)
         );
         listTasks[index].owner = this.getUser(parseInt(listTasks[index].owner));
-        if (listTasks[index].description) {
-          let description = JSON.parse(listTasks[index].description);
-          if (
-            description.action.action == "approval" &&
-            description.action.parameter.documentObjectId != undefined
-          ) {
-            this.arrdocObjId.push(
-              description.action.parameter.documentObjectId
-            );
-          }
-        }
+        // if (listTasks[index].description) {
+        //   let description = JSON.parse(listTasks[index].description);
+        //   if (
+        //     description.action.action == "approval" &&
+        //     description.action.parameter.documentObjectId != undefined
+        //   ) {
+        //     this.arrdocObjId.push(
+        //       description.action.parameter.documentObjectId
+        //     );
+        //   }
+        // }
       }
-      this.$store.dispatch("task/getArrDocObjId", this.arrdocObjId);
+     // this.$store.dispatch("task/getArrDocObjId", this.arrdocObjId);
       this.listProrcessInstances.push({
         processDefinitionId: null,
         processDefinitionName: this.$t("common.other"),

@@ -9,7 +9,7 @@ const getInsertionCSS = function() {
     styles += '@page { margin: 0; }';
     styles += 'table td, table th{ border: 1px dotted #ccc !important;padding: 2px !important;height:25px !important}';
     styles += '.on-selected{border:1px dashed #2196f3 !important;cursor: pointer !important;}';
-    styles += '.s-control-tracking-value,.s-control-approval-history,.s-control-report,.s-control-file-upload,.s-control-reset,.s-control-draf,.s-control-submit,.s-control-text,.s-control-select,.s-control-document,.s-control-phone,.s-control-email,.s-control-currency,.s-control-radio,.s-control-color,.s-control-percent,.s-control-hidden,.s-control-user,.s-control-filter,.s-control-date,.s-control-datetime,.s-control-month,.s-control-time,.s-control-number{width: auto;height: 25px;border-radius: 3px;font-size: 11px;border:1px solid #e9ecef;font-family:Roboto,sans-serif;color:gray;padding: 0 5px;outline: 0!important;    background: rgba(0 0 0 / 0.05);}'
+    styles += '.s-control-tracking-value,.s-control-combobox,.s-control-approval-history,.s-control-report,.s-control-file-upload,.s-control-reset,.s-control-draf,.s-control-submit,.s-control-text,.s-control-select,.s-control-document,.s-control-phone,.s-control-email,.s-control-currency,.s-control-radio,.s-control-color,.s-control-percent,.s-control-hidden,.s-control-user,.s-control-filter,.s-control-date,.s-control-datetime,.s-control-month,.s-control-time,.s-control-number{width: auto;height: 25px;border-radius: 3px;font-size: 11px;border:1px solid #e9ecef;font-family:Roboto,sans-serif;color:gray;padding: 0 5px;outline: 0!important;    background: rgba(0 0 0 / 0.05);}'
     styles += '.s-control:not(.s-control-table):not(s-control-type="tab"):not(s-control-type="page") {display: inline-block;background: rgb(233, 236, 239);min-width: 50px;outline: none !important;margin:1px}';
     styles += '.s-control-rich-text {border:none;}';
     styles += '.s-control-reset,.s-control-draft,.s-control-submit{padding: 5px 8px;}';
@@ -27,7 +27,9 @@ const getInsertionCSS = function() {
     styles += '.ephox-snooker-resizer-bar {background-color: #b4d7ff;opacity: 0;-webkit-user-select: none;-moz-user-select: none;-ms-user-select: none;user-select: none;}';
 
     styles += `
-      
+      .s-control-table{
+        border: 1px solid #ffffff;
+      }
       /* Style the buttons inside the tab */
       .tab button {
         background:transparent;
@@ -178,6 +180,9 @@ const getInsertionCSS = function() {
         overflow-x:auto !important;
         overflow-y:hidden !important;
         border: 1px solid #e9ecef;
+      }
+      .selection-highlight{
+        background: #3297FD !important;
       }
       `;
     return styles;

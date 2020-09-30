@@ -14,6 +14,7 @@
             @submit-document-success="onSubmitDone">
         </DocumentSubmit>
         <Detail 
+            :showCommentInDoc="false"
             v-else-if="(showDoTaskComponent && (action == 'approval')) || filter=='done'"
             :docObjInfo="docObjInfo">
         </Detail>
@@ -51,6 +52,7 @@
         />
         <PopupProcessTracking 
             :taskInfo="taskInfo"
+            :definitionName="definitionName"
         />
 
     </div>
@@ -108,6 +110,10 @@ export default {
                     docId: 0
                 }
             }
+        },
+        definitionName:{
+            type:String,
+            default:'',
         },
         originData:  {
             type: Object,

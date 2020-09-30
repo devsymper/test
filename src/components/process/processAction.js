@@ -11,18 +11,18 @@ import {
 } from "@/main.js";
 
 function moveTaskTitleToNameAttr(content, configValue) {
-    for (let idEl in configValue) {
-        if (configValue[idEl].hasOwnProperty('notificationTitle')) {
-            let pattern = new RegExp('bpmn:userTask(.*?)id="' + idEl + '"(.*?)name="(.*?)"', 'g');
-            let matchPatt = content.match(pattern);
-            if (matchPatt) {
-                for (let item of matchPatt) {
-                    let replacedItem = item.replace(/name="(.*?)"/g, 'name="' + configValue[idEl].notificationTitle + '"');
-                    content = content.replace(item, replacedItem);
-                }
-            }
-        }
-    }
+    // for (let idEl in configValue) {
+    //     if (configValue[idEl].hasOwnProperty('notificationTitle')) {
+    //         let pattern = new RegExp('bpmn:userTask(.*?)id="' + idEl + '"(.*?)name="(.*?)"', 'g');
+    //         let matchPatt = content.match(pattern);
+    //         if (matchPatt) {
+    //             for (let item of matchPatt) {
+    //                 let replacedItem = item.replace(/name="(.*?)"/g, 'name="' + configValue[idEl].notificationTitle + '"');
+    //                 content = content.replace(item, replacedItem);
+    //             }
+    //         }
+    //     }
+    // }
     return content;
 }
 
@@ -368,27 +368,27 @@ export const addMoreInfoToTask = function(task) {
 
 export const getLastestDefinition = function(row, needDeploy = false) {
     return new Promise(async(resolve, reject) => {
-        let lastestDeployment = await bpmnApi.getDeployments({
-            name: row.name,
-            sort: 'deployTime',
-            size: 1,
-            order: 'desc'
-        });
-        let deploymentId = '';
-
-        if (lastestDeployment.data.length > 0) {
-            lastestDeployment = lastestDeployment.data[0];
-            deploymentId = lastestDeployment.id;
-        } else if (needDeploy) {
-            let deploymentData = await deployProcess(self, row);
-            deploymentId = deploymentData.id;
-        } else {
-            reject("this model have no deployment");
+        let processKey = row.processKey;
+        if (!processKey) {
+            let res = await bpmnApi.getModelData(row.id);
+            processKey = res.data.processKey;
         }
 
-        let defData = await bpmnApi.getDefinitions({
-            deploymentId: deploymentId
+        let lastestDefinition = await bpmnApi.getDefinitions({
+            key: processKey,
+            latest: true
         });
-        resolve(defData);
+        if (lastestDefinition.data.length > 0) {
+            resolve(lastestDefinition);
+        } else {
+            let deploymentData = await deployProcess(self, row);
+            deploymentId = deploymentData.id;
+
+            let defData = await bpmnApi.getDefinitions({
+                deploymentId: deploymentId
+            });
+            resolve(defData);
+        }
+
     });
 }
