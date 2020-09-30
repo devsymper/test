@@ -35,7 +35,7 @@
         <div v-if="showGeneral">
             <v-row 
                 class="general"  
-                v-for="(item,generalOthersIdx) in newSearch.filter(x => x.group!= 'user'&&x.type!= 'user'&&x.group!= 'application_definition'&&x.type!= 'application_definition')"  
+                v-for="(item,generalOthersIdx) in newSearch.filter(x => x.group!= 'account'&&x.type!= 'account'&&x.group!= 'application_definition'&&x.type!= 'application_definition')"  
                 :key="generalOthersIdx"
                 style="margin-top:-18px">
                 <v-row v-if="item.group" style="magrin-left:2px" class="ml-2 mt-1 mr-2">
@@ -49,7 +49,7 @@
                     </v-list-item>
                 </v-row>
                     <!-- danh sách kết quả màn hình chung- danh sách    -->
-                <v-row v-else-if="item.type != 'user'" 
+                <v-row v-else-if="item.type != 'account'" 
                     @mouseleave="hideDotButton(generalOthersIdx)" 
                         @mousemove="showDotButton(generalOthersIdx)" 
                     class="mt-2 mr-2 mb-1" style="margin-left:2px">
@@ -92,7 +92,7 @@
         <!-- danh sách kết quả màn hình chung- nhân viên    -->
         <div v-if="showGeneral"  >
             <v-row  
-                v-for="(item, itemIndex) in newSearch.filter(x => x.group == 'user' )"  
+                v-for="(item, itemIndex) in newSearch.filter(x => x.group == 'account' )"  
                 :key="itemIndex"
                 style="margin-top:-18px">
                 <v-row v-if="item.group"  style="magrin-left:2px" class="ml-2 mt-2 mr-2 mb-1">
@@ -125,7 +125,7 @@
                         </div>
                     </template>
                     <v-slide-item class="item-user"
-                        v-for="(item, newSearchAllIdx) in  newSearchAll.filter(x => x.type== 'user' ).slice(0, 10)"  
+                        v-for="(item, newSearchAllIdx) in  newSearchAll.filter(x => x.type== 'account' ).slice(0, 10)"  
                         :key="newSearchAllIdx">
                         <div class="d-flex justify-start ml-3 mr-3 slider-user ">
                              <SymperAvatar style ="height: 40px!important; width: 40px!important; min-width:40px" :userId="item.userId"/>
@@ -184,7 +184,7 @@
         <!-- danh sách tìm kiếm chi tiết -->
         <!-- kết thúc tìm kiếm chi tiết -->
         <!-- trang dành cho user -->
-        <div v-if="showDetail && type != 'application_definition' && type!='user'">
+        <div v-if="showDetail && type != 'application_definition' && type!='account'">
             <v-row  v-for="(item,ind) in newSearchAll.filter(x => x.type== type )" :key="ind" >
                 <v-row v-if="item.type!='syql'"
                     @mouseleave="hideDotButtonAll(ind,type)" 
@@ -264,14 +264,14 @@
                 </v-row>
             </v-row>
         </div>
-        <v-row  v-if="showDetail&&type=='user'" class="d-flex mb-3" >
+        <v-row  v-if="showDetail&&type=='account'" class="d-flex mb-3" >
             <v-col 
                 cols="12" 
                 md="4" 
-                v-for="(item, newSearchAllIdx) in newSearchAll.filter(x => x.type== 'user' )"
+                v-for="(item, newSearchAllIdx) in newSearchAll.filter(x => x.type== 'account' )"
                 :key="newSearchAllIdx">
                 <div class="d-flex justify-start mr-3 w-100" style="border:1px solid rgba(0,0,0,0.2">
-                    <SymperAvatar class="mt-2 mr-2 ml-2" v-if="item.type === 'user'" style ="height: 40px!important; width: 40px!important; min-width:40px" :userId="item.userId"/>
+                    <SymperAvatar class="mt-2 mr-2 ml-2" v-if="item.type === 'account'" style ="height: 40px!important; width: 40px!important; min-width:40px" :userId="item.userId"/>
                     <v-list-item-content>
                         <v-list-item-title style="margin-left: 0.5" class="item-title fs-13 fm" v-html="item.displayName">
                         </v-list-item-title>
@@ -367,7 +367,7 @@ export default {
             this.type = type;
             this.nameResult = this.$t('objects.'+type);
             this.$store.commit('search/setCountResult', this.newSearchAll.filter(x => x.type== type ).length);
-            if(type=='user'){this.checkUser==true};
+            if(type=='account'){this.checkUser==true};
             this.$store.commit('search/setType', type);}
            // this.$router.push('/search/detail');
         },

@@ -406,6 +406,7 @@
         "department": "Phòng ban"
     },
     "objectType": {
+
         "Document definition": "Văn bản",
         "Document instance": "Danh sách bản ghi",
         "Orgchart": "Sơ đồ tổ chức",
@@ -430,7 +431,7 @@
     },
     "objects": {
         "document_instance": "Bản ghi dữ liệu",
-        "user": "Nhân viên",
+        "account": "Nhân viên",
         "document_definition": "Loại văn bản",
         "document": "Văn bản",
         "workflow_definition": "Workflow",
@@ -456,7 +457,7 @@
         },
         "icon": {
             "document_instance": "mdi mdi-file-document-outline",
-            "user": "mdi-account-multiple-outline",
+            "account": "mdi-account-multiple-outline",
             "Tất cả": "mdi-all-inclusive",
             "document_definition": "mdi mdi-file-outline",
             "workflow_definition": "mdi mdi-lan",
