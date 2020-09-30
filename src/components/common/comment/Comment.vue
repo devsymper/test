@@ -416,7 +416,5 @@ export default {
 .symper-comment >>> .content-comment-img .v-slide-group__prev{
 	padding-top:12px
 }
-.symper-comment >>> .v-dialog {
-	overflow:hidden;
-}
+
 </style>

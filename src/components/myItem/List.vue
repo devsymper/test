@@ -164,7 +164,7 @@
                         cols="2"
                         v-if="!sideBySideMode && !smallComponentMode"
                     >
-                       <div class="pl-1">
+                       <div class="pl-1 mt-1">
                             <v-tooltip bottom>
                                 <template v-slot:activator="{ on }">
                                 <span
@@ -177,9 +177,9 @@
                                 <span>{{ obj.processDefinitionName?  obj.processDefinitionName : `ad hoc` }}</span>
                             </v-tooltip>
                             <div class="pa-0 grey--text mt-1 lighten-2 d-flex justify-space-between">
-                            <!-- <div
-                                class="fs-11 pr-6 text-ellipsis"
-                            >App</div> -->
+                                <div
+                                    class="fs-11 pr-6 text-ellipsis"
+                                >{{selectNameApp(obj.variables)}}</div>
                             </div>
                         </div>
                         
@@ -202,7 +202,6 @@
                     </v-col>
                 </v-row>
             </div>
-           
         </VuePerfectScrollbar>
         <v-skeleton-loader v-else ref="skeleton" :type="'table-tbody'" class="mx-auto"></v-skeleton-loader>
         <v-skeleton-loader
@@ -258,6 +257,7 @@ export default {
         commentCountPerTask(){
             return this.$store.state.comment.commentCountPerObj.list;
         },
+       
         // Liệt kê danh sách các task dưới dạng phẳng - ko phân cấp
         flatTasks() {
             let tasks = [];
@@ -420,6 +420,21 @@ export default {
             return this.$moment(time).fromNow();
         }
     },
+    selectNameApp(variables){
+        const symperAppId = variables.find(element => element.name=='symper_application_id');
+        if (symperAppId) {
+            let appId=symperAppId.value;
+            let allApp = this.$store.state.task.allAppActive;
+            let app=allApp.find(element => element.id==appId);
+            if (app) {
+                return app.name;
+            }else{
+                return "";
+            }
+        }else{
+            return "";
+        }
+    },
     changeObjectType(index) {
       this.$emit("changeObjectType", index);
     },
@@ -543,7 +558,7 @@ export default {
             listTasks = res.data;
         }
         this.totalTask = Number(res.total);
-
+        this.$store.dispatch('task/getAllAppActive');
         //Khadm: danh sách các task cần lấy tổng số comment và file đính kèm
         let taskIden = [];
         for (let task of listTasks) {

@@ -22,6 +22,7 @@ export default {
         let self = this 
             $(document).click(function(e){
 				if(!$(e.target).is('.context-menu')){
+                    $('.context-menu').css('display', 'none')
                     if(self.viewSideBySide == true){
                         if(self.$refs.ViewSideBySideApp){
                             self.$refs.ViewSideBySideApp.hideContextMenu()

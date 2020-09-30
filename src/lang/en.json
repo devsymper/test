@@ -251,9 +251,12 @@
         "table": {
             "id": "Id",
             "firstName": "First name",
+            "lastName": "Last name",
+            "userName": "User name",
             "displayName": "Display name",
             "email": "email",
-            "phoneNumber": "Phone number",
+            "phone": "Phone number",
+            "avatar": "Avatar",
             "status": "Status",
             "createAt": "Create at",
             "updateAt": "Update at",

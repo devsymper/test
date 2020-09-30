@@ -12,6 +12,7 @@ const defaultState = {
     listTaskInProcessSub:[],
     listTaskInProcessSibling:[],
     isStatusSubmit:false,
+    allAppActive:[],
 
 
 };

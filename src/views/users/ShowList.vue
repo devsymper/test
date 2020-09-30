@@ -3,13 +3,14 @@
      <list-items
         ref="listUser"
         @after-open-add-panel="addUser"
-        :headerPrefixKeypath="'user'"
+        :headerPrefixKeypath="'user.table'"
         :useDefaultContext="false"
         :pageTitle="$t('user.title')"
         :tableContextMenu="tableContextMenu"
         :containerHeight="containerHeight"
         :customAPIResult="customAPIResult"
-        :getDataUrl="getListUrl"
+        :actionPanelType="'elastic'"
+        :getDataUrl="getListUrl+'users?page=1&pageSize=50'"
         :actionPanelWidth="actionPanelWidth"
         @import-excel="importExcel()"
         :commonActionProps="commonActionProps">
@@ -55,9 +56,9 @@ export default {
                 reformatData(res){
                 
                     let data = res.data;
-                    for(let col of data.columns){
-                        col.title = col.title.replace('user.','');
-                    }
+                    // for(let col of data.columns){
+                    //     col.title = col.title.replace('user.','');
+                    // }
                     return data;
                 } 
             },

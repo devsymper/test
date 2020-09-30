@@ -77,13 +77,26 @@ const deleteNode = (state,params) =>{
 	state.editor[params.instanceKey].splice(state.editor[params.instanceKey].indexOf(state.editor[params.instanceKey][params.id]),1)
 }
 const setAllUserInOrgchart = (state,params) =>{
-	state.allUserInOrgChart[params.orgchartId] = params.listUsers
+	Vue.set(state.allUserInOrgChart,params.orgchartId, params.listUsers )
 }
 const setDataOrgchartSideBySide = (state,params) =>{
 	state.orgChartData[params.orgchartId] = params.object
 }
 const updateListChildrenNode = (state , params) =>{
 	params.data.forEach(e => {
+		if(e.vizId == params.vizId && params.list.includes(e) == false){
+			params.list.push(e)
+			e.orgchartId = params.orgchartId
+			e.data = params.data
+			e.list = params.list
+			updateListChildrenNode(state , e)
+			if(typeof(state.listChildrenOfNode[params.orgchartId]) == 'undefined'){
+				state.listChildrenOfNode[params.orgchartId] = [	]
+			}
+			if(state.listChildrenOfNode[params.orgchartId].includes(e) == false){
+				state.listChildrenOfNode[params.orgchartId].push(e)
+			}
+		}
 		if(e.vizParentId == params.vizId){
 			params.list.push(e)
 			e.orgchartId = params.orgchartId
@@ -97,9 +110,12 @@ const updateListChildrenNode = (state , params) =>{
 				state.listChildrenOfNode[params.orgchartId].push(e)
 			}
 		}
+		
 	});
 }
-
+const emptyListChildrenNode = (state,param) =>{
+	state.listChildrenOfNode[param] = []
+}
 export {
 	setOrgchartData,
 	setNodeConfig,
@@ -116,5 +132,6 @@ export {
 	deleteNode,
 	setAllUserInOrgchart,
 	setDataOrgchartSideBySide,
-	updateListChildrenNode
+	updateListChildrenNode,
+	emptyListChildrenNode
 };
