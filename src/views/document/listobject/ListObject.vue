@@ -3,6 +3,7 @@
     <div class="h-100 w-100">
         <list-items
         :getDataUrl="'https://sdocument-management.symper.vn/documents/'+docId+'/objects'"   
+        :exportLink="'https://sdocument-management.symper.vn/documents/'+docId+'/export-excel'" 
         :useDefaultContext="false"
         :tableContextMenu="tableContextMenu"
         :pageTitle="$t('documentObject.title')"
