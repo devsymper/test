@@ -1,19 +1,19 @@
 <template>
-    <div class="list-objects w-100" style="height: calc(100vh - 135px);">
-        <v-row style="border-bottom: 1px solid #dedede;margin:0px">
+    <div class="list-objects w-100" style="height: calc(100vh - 90px);">
+        <v-row style="border-bottom: 1px solid #dedede;margin:0px; height:30px">
             <v-col
                 v-if="!sideBySideMode"
                 cols="3"
-                class="fs-13 pt-3 pl-3 font-weight-medium"
-                style="padding:0px"
+                class="fs-13 pt-1 pl-3 font-weight-medium"
+                style="padding:0px; height:30px"
             >{{$t("tasks.header.groupApproval")}}</v-col>
             <v-col 
                 :cols="!sideBySideMode ? 9 : 12"
-                style="padding:0px">
-                <v-row style="margin:0px;position: relative;" >
+                style="padding:0px; height:30px">
+                <v-row style="margin:0px;position: relative; height:30px" >
                     <v-col
                         :cols="!sideBySideMode ? 1 : 1"
-                        class="fs-13 pl-1 pr-0 font-weight-medium"
+                        class="fs-13 pl-1 pt-1 pt-0 pb-0 pr-0 font-weight-medium"
                         style="flex:0!important"
                     >
                         <v-checkbox
@@ -23,42 +23,44 @@
                     </v-col>
                     <v-col
                         :cols="!sideBySideMode ? 2 : 2"
-                        class="fs-13 pl-0 font-weight-medium"
+                        class="fs-13  pt-1 pb-0 pl-0 font-weight-medium"
+                        style="flex: 0 0 25.6667%;max-width: 25.6667%;"
                     >{{$t("tasks.header.name")}}</v-col>
                     <v-col
                         cols="2"
                         v-if="!sideBySideMode"
-                        class="fs-13 font-weight-medium"
+                        class="fs-13  pt-1 pb-0 font-weight-medium"
                     >{{$t("tasks.header.assignee")}}</v-col>
                     <v-col
                         v-if="!sideBySideMode"
                         cols="2"
-                        class="fs-13 font-weight-medium"
+                        class="fs-13  pt-1 pb-0 font-weight-medium"
                     >{{$t("tasks.header.owner")}}</v-col>
                     <v-col
                         v-if="!sideBySideMode"
                         cols="2"
-                        class="fs-13 font-weight-medium"
+                        class="fs-13  pt-1 pb-0 font-weight-medium"
+                        style="flex: 0 0 10.666667%;"
                     >{{$t("tasks.header.dueDate")}}</v-col>
                     <v-col
                         v-if="!sideBySideMode"
                         cols="2"
-                        class="fs-13 font-weight-medium"
+                        class="fs-13 pt-1 pb-0 font-weight-medium"
                     >{{$t("tasks.header.app")}}</v-col>
                     <v-col
                         v-if="!sideBySideMode"
                         cols="1"
-                        class="fs-13 font-weight-medium"
+                        class="fs-13 pt-1 pb-0 font-weight-medium"
                     >{{$t("common.add")}}</v-col>
                     
-                    <v-btn style="position: absolute;right: 20px;top: 10px;" 
+                    <!-- <v-btn style="position: absolute;right: 20px;top: 1px;" 
                         v-if="sideBySideMode" small tile icon text  @click="closeDetail">
                         <v-icon small>mdi-close</v-icon>
-                    </v-btn>
+                    </v-btn> -->
                 </v-row>
             </v-col>
         </v-row>
-        <v-row  style="margin:0px;height:100%" >
+        <v-row class="listDetail" style="margin:0px;height:100%;" >
             <v-col
                 v-if="!sideBySideMode"
                 cols="3"
@@ -124,6 +126,7 @@
                     :sideBySideMode="sideBySideMode"
                     @changeValueCheckBox="changeValueCheckBox"
                     @changeSideBySide="changeSideBySide"
+                    @closeDetail="closeDetail"
                 />
             </v-col>
         </v-row>
@@ -140,18 +143,12 @@
             </v-card>
         </v-dialog>
 
-        <BottomSheet ref="bottomSheetView" class="h-100">
+        <BottomSheet :isShadow="false" ref="bottomSheetView" class="h-100">
             <div slot="content" class="sheet-content d-flex">
-                <div class="count-selection">
-                    <span>{{$t('document.instance.showlist.select')}} {{countRecordSelected}}/{{totalRecord}} {{$t('document.instance.showlist.record')}}</span>
+                <div class="count-selection" style="padding-top: 15px;">
+                    <span style="margin-left: 50px;">{{$t('document.instance.showlist.select')}} {{countRecordSelected}}/{{totalRecord}} {{$t('document.instance.showlist.record')}}</span>
                 </div>
                 <div class="sheet-action">
-                    <!-- <v-btn tile small @click="printSelected" >
-                        <v-icon left>mdi-printer</v-icon> {{$t('document.instance.showlist.printRecord')}}
-                    </v-btn>
-                    <v-btn @click="selectPrintConfig" tile small>
-                        <v-icon left>mdi-printer-pos</v-icon> {{$t('document.instance.showlist.selectPrintConfig')}}
-                    </v-btn> -->
                     <v-btn small depressed v-for="(action, idx) in taskActionBtns" dark :key="idx" :color="action.color" @click="saveTaskOutcome(action.value)" class="mr-2">
                         {{action.text}}
                     </v-btn>
@@ -218,6 +215,7 @@ export default {
             taskAction: undefined,
             listTaskChecked:[],
             action:"",
+            isShowBottom:true,
         }
     },
     methods:{
@@ -231,6 +229,8 @@ export default {
             this.$store.dispatch("task/getListNodeInProcess");
         },
         selectObject(obj, idx){
+            this.countRecordSelected=0;
+            this.isShowBottom=true;
             this.selectAll=false;
             this.selectedNode=idx;
             this.selectObj=idx;
@@ -243,20 +243,22 @@ export default {
         },
         hideBottomSheet(){
             this.$refs.bottomSheetView.toggle();
-          //  this.$refs.listObject.removeCheckBoxColumn();
         },
         changeValueCheckBox(data){
-            this.$refs.bottomSheetView.show();
-            this.listTaskInNode=data;
-            let listTaskChecked=[];
-            for (var key in data) {
-                if (data[key].checked==true) {
-                    listTaskChecked.push(data[key]);
+            if (this.isShowBottom) {
+                this.$refs.bottomSheetView.show();
+                this.listTaskInNode=data;
+                let listTaskChecked=[];
+                for (var key in data) {
+                    if (data[key].checked==true) {
+                        listTaskChecked.push(data[key]);
+                    }
                 }
+                this.listTaskChecked=listTaskChecked;
+                this.countRecordSelected=listTaskChecked.length;
+                this.getActionNode(data[0]);
             }
-            this.listTaskChecked=listTaskChecked;
-            this.countRecordSelected=listTaskChecked.length;
-            this.getActionNode(data[0]);
+          
         },
         getActionNode(task){
             let self=this;
@@ -275,6 +277,7 @@ export default {
             approvalActions = approvalActions.filter(el => {
                 return Boolean(el.value)
             });
+           
             this.taskActionBtns = approvalActions;
         },
         saveTaskOutcome(value){
@@ -363,7 +366,6 @@ export default {
             };
             documentApi.saveApprovalHistory(dataToSave);
         },
-
     },
     created(){
         this.getData();
@@ -377,8 +379,12 @@ export default {
         })
         .catch(err => {});
         self.reCalcListTaskHeight();
-        self.$refs.bottomSheetView.show();
+        self.$refs.bottomSheetView.toggle();
     },
+    activated(){
+        this.selectAll=false;
+        this.isShowBottom=false;
+    }
 }
 </script>
 

@@ -28,7 +28,9 @@ export default {
             this.sheet = !this.sheet
         },
         show(){
-            this.sheet = true;
+            if ( this.sheet == false) {
+                this.sheet = true;
+            }
         }
     }
 }

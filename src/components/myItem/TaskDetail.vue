@@ -11,7 +11,7 @@
                 {{taskBreadcrumb}}
             </div>
             <div class="text-right pt-1 pb-1 pr-0 float-right">
-                <span v-if="!originData.endTime">
+                <span v-if="!originData.endTime && !hideActionTask">
                     <v-btn small depressed v-for="(action, idx) in taskActionBtns" dark :key="idx" :color="action.color" @click="saveTaskOutcome(action.value)" class="mr-2">
                         {{action.text}}
                     </v-btn>
@@ -70,7 +70,7 @@
             </div>
         </v-row>
         <v-divider style="border-color: #bebebe;"></v-divider>
-        <v-row class="ma-0">
+        <v-row class="ma-0 detail-task">
             <!-- <VuePerfectScrollbar :style="{height: parentHeight +'px'}" > -->
                 <task 
                     @task-submited="handleTaskSubmited" 
@@ -133,6 +133,10 @@ export default {
             type: Number,
             default: 300
         },
+        hideActionTask:{
+            type: Boolean,
+            default: false
+        }
     },
     watch: {
         taskInfo: {

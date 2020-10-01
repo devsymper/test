@@ -1,6 +1,7 @@
 <template>
     <div class="w-100 h-100">
         <VuePerfectScrollbar
+            class="vuePerfect"
             v-if="!loadingTaskList"
             style="height:100%"
         >
@@ -33,6 +34,7 @@
                     <v-col    
                         :cols="!sideBySideMode ? 2 : 2" 
                         class="pl-0 pr-1 pb-1 pt-0"
+                        style="flex: 0 0 25.6667%;max-width: 25.6667%;"
                         @click="selectObject(obj, idx)"
                         >
                         
@@ -87,7 +89,7 @@
                     <v-col
                        @click="selectObject(obj, idx)"
                         v-if="!sideBySideMode"
-                        style="line-height: 42px"
+                        style="line-height: 42px;flex: 0 0 10.666667%;"
                         cols="2"
                         class="fs-13  pl-3 px-1 py-0"
                     >
@@ -122,14 +124,14 @@
                        @click="selectObject(obj, idx)"
                         v-if="!sideBySideMode"
                         cols="1"
-                        class="fs-13 px-1 py-0"
+                        class="fs-13 px-1 pl-2 py-0"
                     >
                         <div class="pl-1">
-                            <div style="width:55px">
+                            <div style="width:40px">
                                 {{commentCountPerTask['task:' + obj.id]}}
                                 <v-icon class="fs-14" style="float:right;margin-top:4px;margin-right:12px">mdi-comment-processing-outline</v-icon> 
                             </div>
-                            <div style="width:55px"> 
+                            <div style="width:40px"> 
                                 {{fileCountPerTask['task:' + obj.id]}}
                                 <v-icon class="fs-14" style="float:right;margin-top:4px;margin-right:12px">mdi-attachment</v-icon>
                             </div>
@@ -152,7 +154,7 @@
                                 }"
                             @mouseover="index=idx"
                             @mouseout="index = null"
-                            style="border-bottom: 1px solid #eeeeee!important;max-height:40px"
+                            style="border-bottom: 1px solid #eeeeee!important;max-height:45px"
                             >
                                 <v-col
                                     cols="3"
@@ -176,7 +178,7 @@
                                     <div>
                                             <v-tooltip bottom>
                                             <template v-slot:activator="{ on }">
-                                                <div v-on="on" class="text-left fs-13  text-ellipsis w-100"
+                                                <div v-on="on" class="text-left fs-13 pt-1  text-ellipsis w-100"
                                                     style="width: 250px;"
                                                 >
                                                     <v-icon class="fs-14"
@@ -205,10 +207,17 @@
                         </v-row>
                     </v-col>
                     <v-col class="detailDoc" cols="9" style="padding:0px!important;height:100%">
-                        <detailDocument 
+                        <!-- <detailDocument 
                             :showCommentInDoc="true"
                             :docObjInfo="docObjInfo">
-                        </detailDocument>
+                        </detailDocument> -->
+                           <taskDetail
+                                class="approval-taskDetail"
+                                :taskInfo="selectedTask.taskInfo"
+                                :originData="selectedTask.originData"
+                                @close-detail="closeDetail"
+                                :hideActionTask="true"
+                            ></taskDetail>
                     </v-col>
                 </v-row>
            
@@ -222,6 +231,7 @@ import BPMNEngine from "@/api/BPMNEngine";
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import symperAvatar from "@/components/common/SymperAvatar.vue";
 import detailDocument from '@/views/document/detail/Detail';
+import taskDetail from "../TaskDetail";
 
 import {
   extractTaskInfoFromObject,
@@ -247,7 +257,8 @@ export default {
     components: {
         VuePerfectScrollbar: VuePerfectScrollbar,
         symperAvatar: symperAvatar,
-        detailDocument
+        detailDocument,
+        taskDetail
 
     },
     watch:{
@@ -292,9 +303,17 @@ export default {
             docObjInfo: {
                 docObjId: "",
             },
+            selectedTask: {
+                taskInfo: {},
+                idx: -1,
+                originData: null
+            },
         }
     },
     methods:{
+        closeDetail(){
+            this.$emit("closeDetail");
+        },
         selectNameApp(variables){
             const symperAppId = variables.find(element => element.name=='symper_application_id');
             if (symperAppId) {
@@ -331,8 +350,13 @@ export default {
         selectObject(obj, idx){
             this.selectObj=idx;
             let desc=JSON.parse(obj.description);
-            this.docObjInfo.docObjId= String(desc.action.parameter.documentObjectId);
+            //this.docObjInfo.docObjId= String(desc.action.parameter.documentObjectId);
+            this.$set(this.selectedTask, "originData", obj);
+            let taskInfo = extractTaskInfoFromObject(obj);
+            this.$set(this.selectedTask, "taskInfo", taskInfo);
+
             this.$emit("changeSideBySide",true);
+
         },
         selectedAllTask(value){
             let allTask=this.listTaskApproval;
@@ -349,7 +373,8 @@ export default {
     },
     created(){
        this.getData();
-    }
+    },
+
 }
 </script>
 
@@ -359,5 +384,11 @@ export default {
 }
 .detailDoc >>>.wrap-content-detail{
     height: calc(100%)!important;
+}
+.approval-taskDetail >>>.justify-space-between{
+    margin-right: 20px!important;
+}
+.approval-taskDetail >>>.detail-task .s-drawer{
+    top:45px!important;
 }
 </style>
