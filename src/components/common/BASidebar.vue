@@ -482,13 +482,9 @@ export default {
                     this.$set(item, 'active', true)
                 }
             }else{
+                this.selectingChildItem = {}
                 this.$set(item, 'active', true)
             }
-            // if(self.sapp.collapseSideBar == true && subItem == true){
-            //    this.$set(parent, 'active', true)
-            // }else{
-              
-            // }
             if(subItem == true){   
                 this.selectingItem = parent
             }
