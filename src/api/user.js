@@ -4,7 +4,8 @@ import { util } from "../plugins/util";
 
 var api = new Api(appConfigs.apiDomain.user);
 var coreApi = new Api(appConfigs.apiDomain.user);
-var permissionApi = new Api(appConfigs.apiDomain.permission)
+var permissionApi = new Api(appConfigs.apiDomain.permission);
+var operationsApi = new Api(appConfigs.apiDomain.operations);
 export const userApi = {
     /** 
      * Kiểm tra username và password của user
@@ -109,6 +110,10 @@ export const userApi = {
     },
     getActionAndObject(role) {
         return permissionApi.get('roles/' + role + '/accesscontrol')
+    },
+    getOperationsObject(data) {
+        return operationsApi.post('objects', data);
+
     }
 
 };

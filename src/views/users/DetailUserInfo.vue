@@ -244,12 +244,12 @@
 									{{menuTitle.length==0?"Chưa chọn đối tượng":menuTitle}}
 								</v-col>
 								<v-col v-for="(action,actionIdx) in action" class="fs-13">
-									{{action}} 
+									{{action}}
 								</v-col>
 							</v-row>
-							<v-row v-for="(nameObj,nameObjIdx) in nameObject"  style="margin-top:-10px">
+							<v-row v-for="(nameObj,nameObjIdx) in titleNameObject"  style="margin-top:-10px">
 								<v-col style="font-weight:400;" class="fs-13">
-									{{nameObj.name}}
+									1{{nameObj}}
 								</v-col>
 								<v-col v-for="(action2,actionIdx2) in action" >
 									<span v-if="nameObj.action==action2"><v-icon style="color:green">mdi mdi-check</v-icon></span>
@@ -316,7 +316,6 @@ export default {
            
 		},
 		changeLastName(){
-			debugger
 			const self = this;
 			this.checkChangeLastName = false;
 			let data = {
@@ -324,7 +323,6 @@ export default {
 			}
 			userApi.changeUserProfile(data).then(res => {
 				if (res.status == 200) {
-					debugger
 					self.detailUser.lastName =res.user.lastName;
 					this.$snotify({
 					type: "success",
@@ -417,15 +415,24 @@ export default {
         },
 		
 		getNameByAction(action){
+		},
+		getListObjectIdentifier(object){
+			let objIdentifier =[];
+			// for(let j=0; j<this.listActionAndObj[object].length;j++){
+				 objIdentifier = _.groupBy(this.listActionAndObj[object],'objectIdentifier' );
+			// }
+			 let formatObjIdentifier = Object.keys(objIdentifier);
+			this.listRoleObj = formatObjIdentifier.filter(x=>x.indexOf(':')>0);
 
-
+			this.getNameObjByRoles(this.listRoleObj);
 		},
 		detailView(object){
+			this.titleNameObject =[];
 			this.action=[];
 			this.nameObject =[];
 			this.menuTitle = object;
 			let listObject = Object.keys(this.listActionAndObj)
-            for (let i = 0; i < listObject.length; i++) {
+            for (let i = 0; i < listObject.length; i++){
                  if(listObject[i]==object){
 					 for(let j=0; j<this.listActionAndObj[object].length;j++){
 						 this.action.push(this.listActionAndObj[object][j].action);
@@ -435,11 +442,31 @@ export default {
 							 });
 					 }
 				 }
-            };
+			};
+			this.getListObjectIdentifier(object);
 		},
 		getMenuTitle(object){
 			return object;
-
+		},
+		async getNameObjByRoles(role){
+			const self = this;
+			let res = await userApi.getOperationsObject({ids:role});
+	
+			if(res.status ==200){
+	
+				let titleNameObject = res.data;
+				if(titleNameObject.length==0){
+					alert("Không có quyền")
+				}else{
+			
+					for(let i = 0; i<titleNameObject.length;i++){
+					self.titleNameObject.push(titleNameObject[i].title?titleNameObject[i].title:titleNameObject[i].name);
+				
+				}
+				
+				}
+				
+			}
 		},
 		async getRoleOrgchartByUser(id){
 			const self = this;
@@ -459,24 +486,22 @@ export default {
           
     },
     created(){
-			this.detailUser = this.detailInfo;
-			debugger
+		this.detailUser = this.detailInfo;
 		 this.getRoleOrgchartByUser(this.detailInfo.id);
 		 this.getRolesByUser(this.detailInfo.id);
 
     },
     watch:{
         detailInfo(){
-		
 			this.getRoleOrgchartByUser(this.detailInfo.id);
-			 this.getRolesByUser(this.detailInfo.id);
-			 
-    
-	 }
-	 
+			this.getRolesByUser(this.detailInfo.id);
+	 	}
     },
 	data(){
 		return {
+			titleNameObject:[],
+			listRoleObj:[],
+			listObj:[],
 			detailUser:'',
 			newPassword:'',
 			reNewPassword: "",
@@ -502,6 +527,7 @@ export default {
 			menu:[],
 			action:[],
 			menuTitle:[],
+			
 			nameObject:[]
 			
 		}
