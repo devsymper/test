@@ -71,6 +71,10 @@ export default {
             type:String,
             default:'',
         },
+        needFocus: {
+            type: Boolean,
+            default: true
+        }
     },
     watch:{
         instanceId(){
@@ -115,9 +119,11 @@ export default {
     },
     methods: {
         eventAfterRender(){
-            setTimeout((self) => {
-                self.$refs.symperBpmn.focus();
-            }, 100,this);
+            if(this.needFocus){
+                setTimeout((self) => {
+                    self.$refs.symperBpmn.focus();
+                }, 100,this);
+            }
         },
         handleClosePopup(){
             this.$store.commit("task/setStatusPopupTracking",false);
