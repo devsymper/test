@@ -20,6 +20,7 @@
 import {getKeyForAction} from "./index";
 import actionMap from "./index";
 import Vue from 'vue'
+import { util } from '../plugins/util';
 
 export default {
     props: {
@@ -83,6 +84,9 @@ export default {
                 this.loadingComponent = true;
                 if(actionMap[key].hasOwnProperty('$getActionLink')){
                     let link = actionMap[key].$getActionLink(this.param);
+                    if(util.isPromise(link)){
+                        link = await link;
+                    }
                     let matchRoute = this.$router.match(link);
                     if(matchRoute && matchRoute.matched && matchRoute.matched[0]){
                         let matchedRoute = matchRoute.matched[0];
