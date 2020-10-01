@@ -121,8 +121,9 @@
             "documents": "Documents",
             "orgchart": "Organization chart",
             "myItem": "My item"
-
-        }
+        },
+        "system": "System",
+        "copy": "Copy"
     },
     "validate": {
         "required": "Not be empty",
@@ -201,7 +202,7 @@
                 "firstName": "First name",
                 "lastName": "Last name",
                 "displayName": "Display name",
-                "phoneNumber": "Phone number"
+                "phone": "Phone number"
             },
             "passwordSetting": {
                 "title": "Password setting",
@@ -263,6 +264,11 @@
                 "passwordSetting": "Password setting",
                 "edit": "Edit"
             }
+        },
+        "myInfo": {
+            "title": "My infomation",
+            "generalInfo": "General infomation",
+            "myPosition": "My position"
         }
     },
     "snippet": {
@@ -895,8 +901,8 @@
             "showLess": "Show less task related",
             "showMoreFile": "Show more file"
         },
-        "alert":{
-            "title_aproval":"Action work"
+        "alert": {
+            "title_aproval": "Action work"
         }
 
     },
@@ -908,7 +914,7 @@
         "header": {
             "type": "Type",
             "approval": "Approval",
-            "groupApproval":"Approval Group",
+            "groupApproval": "Approval Group",
             "submit": "Submit",
             "date": "Date",
             "dueDate": "Due Date",

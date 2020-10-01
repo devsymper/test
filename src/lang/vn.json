@@ -120,7 +120,9 @@
             "documents": "Văn bản",
             "orgchart": "Sơ đồ tổ chức",
             "myItem": "My item"
-        }
+        },
+        "system": "Hệ thống",
+        "copy": "Sao chép"
     },
     "login": {
         "title": "Đăng nhập hệ thống",
@@ -199,7 +201,7 @@
                 "firstName": "Tên",
                 "lastName": "Họ",
                 "displayName": "Tên hiển thị",
-                "phoneNumber": "Số điện thoại"
+                "phone": "Số điện thoại"
             },
             "passwordSetting": {
                 "title": "Tùy chọn mật khẩu",
@@ -262,6 +264,11 @@
                 "edit": "Sửa",
                 "delete": "Xóa"
             }
+        },
+        "myInfo": {
+            "title": "Thông tin của tôi",
+            "generalInfo": "Thông tin chung",
+            "myPosition": "Vị trí của tôi"
         }
     },
     "snippet": {
@@ -1015,8 +1022,8 @@
             "showMoreFile": "Xem thêm các tệp"
 
         },
-        "alert":{
-            "title_aproval":"Thực thi công việc"
+        "alert": {
+            "title_aproval": "Thực thi công việc"
         }
 
     },
@@ -1028,7 +1035,7 @@
         "header": {
             "type": "Loại",
             "approval": "Phê duyệt",
-            "groupApproval":"Nhóm phê duyệt",
+            "groupApproval": "Nhóm phê duyệt",
             "submit": "Gửi văn bản",
             "date": "Ngày tạo",
             "dueDate": "Ngày đến hạn",
