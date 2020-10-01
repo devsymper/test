@@ -130,20 +130,21 @@ export default {
             }
         },
         displayDescription(description){
-            let data=JSON.parse(description);
-            let des='',value='';
-            if (data.extraLabel=="" ||data.extraLabel==null) {
-                des='Mô tả';
+            let data = JSON.parse(description);
+            debugger
+            let des = '',value = '';
+            if (data.extraLabel == "" ||data.extraLabel == null) {
+                des ='Mô tả';
             }else{
-                des=data.extraLabel;
+                des = data.extraLabel;
             }
 
-            if (data.extraValue=="" ||data.extraValue==null) {
-                value='Không có mô tả';
+            if (data.extraValue == "" && data.extraLabel == "") {
+                value = 'Không có mô tả';
             }else{
-                value=data.extraValue;
-            }
-
+                value = data.extraValue;
+            }    
+            
             return des +' '+ value;
 
         },
