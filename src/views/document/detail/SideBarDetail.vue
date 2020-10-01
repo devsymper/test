@@ -84,7 +84,7 @@
 							<tr>
 								<td>{{workflowName}}</td>
 							<tr>
-									<td>{{workflowOtherName}}</td>
+								<td>{{workflowOtherName}}</td>
 							</tr>
 							
 						</table>
@@ -213,9 +213,10 @@ export default {
 			}).always({}).catch({});
 		},
 		workflowId(after){
-			// bpmnApi.getDefinitionData(this.workflowId).then(res=>{ 
-            //         console.log('resresres',res);
-			// 	}).always({}).catch({});
+				debugger
+			bpmnApi.getDefinitionData(this.workflowId).then(res=>{
+                    console.log('resresres',res);
+				}).always({}).catch({});
 		},
 		taskId(after){
 			// bpmnApi.getATaskInfo(this.taskId).then(res=>{
