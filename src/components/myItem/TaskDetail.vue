@@ -46,7 +46,7 @@
                 </v-tooltip>
 
                 
-                <v-tooltip bottom>
+                <v-tooltip bottom v-if="taskInfo.action.action == 'approval' && (!taskInfo.approvalEditableControls || (taskInfo.approvalEditableControls && taskInfo.approvalEditableControls.length))">
                     <template v-slot:activator="{ on }">
                         <v-btn  
                             @click="showUpdateSubmitedDocument()"
@@ -140,6 +140,7 @@ export default {
             immediate:true,
             handler(valueAfter){
                 this.changeTaskDetail();
+                this.setCustomDocControls();
             }
         },
 
@@ -221,6 +222,21 @@ export default {
         this.checkAndSwitchToTab();
     },
     methods: {
+        setCustomDocControls(){
+            let editableControls = this.taskInfo.approvalEditableControls;
+            if(editableControls && $.isArray(editableControls)){
+                for(let ctrl of editableControls){
+                    if(ctrl == 'SYMPER_NONE_CONTROLS'){
+                        editableControls = [];
+                        break;
+                    }else if(ctrl == 'SYMPER_ALL_CONTROLS'){
+                        editableControls = null;
+                        break;
+                    }
+                }
+            }
+            this.taskInfo.approvalEditableControls = editableControls;
+        },
         showUpdateSubmitedDocument(){
             this.$refs.task.showUpdateSubmitedDocument = true;
         },
