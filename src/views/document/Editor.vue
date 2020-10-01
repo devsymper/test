@@ -859,7 +859,10 @@ export default {
                     isCheck = true;
                 }
                 else{
-                    if(allControl[controlId].type == 'table'){
+                    if(allControl[controlId].type == 'dataFlow'){
+                        allControl[controlId].properties.dataFlowId.value = allControl[controlId].properties.dataFlowId.value.id;
+                    }
+                    else if(allControl[controlId].type == 'table'){
                         if(allId.indexOf(controlId) === -1){
                             for(let childControlId in allControl[controlId].listFields){
                                 let childControl = allControl[controlId].listFields[childControlId]
@@ -1214,13 +1217,13 @@ export default {
         },
         // set config cho phần sidebar phải các thuộc tính control đang được click
         selectControl(properties,formulas,id,type){
-            if(type == 'dataFlow'){
-                // console.log(this.listDataFlow,'listDataFlowlistDataFlow');
-                // let curDataFlow = this.listDataFlow.filter(df=>{
-                //     return df.id == properties['dataFlowId'].value
-                // })
-                // console.log(curDataFlow,'listDataFlowlistDataFlow');
-                // properties[k].value = this.listDataFlow
+            if(type == 'dataFlow' && properties['dataFlowId'].value.id){
+                let curDataFlow = this.listDataFlow.filter(df=>{
+                    return df.id == properties['dataFlowId'].value.id;
+                })
+                if(curDataFlow && curDataFlow.length > 0)
+                properties['dataFlowId'].value = curDataFlow[0];
+                properties['dataFlowId'].options = this.listDataFlow;
             }
             this.$store.commit(
                 "document/addCurrentControl",
@@ -1654,8 +1657,14 @@ export default {
                         properties[k].value = fields[controlId]['properties'][k] == true
                     }
                     else{
-                        if(typeof fields[controlId]['properties'][k] != "object")
-                        properties[k].value = fields[controlId]['properties'][k];
+                        if(type == 'dataFlow' && k == 'dataFlowId'){
+                            properties[k].value = {id:fields[controlId]['properties'][k]};
+                        }
+                        else{
+                            if(typeof fields[controlId]['properties'][k] != "object"){
+                                properties[k].value = fields[controlId]['properties'][k];
+                            }
+                        }
                     }
                     if(k =='name'){
                         properties[k].oldName =  properties[k].value

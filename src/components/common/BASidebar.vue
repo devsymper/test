@@ -229,7 +229,7 @@
                                 <template v-slot:activator="{ on: menu }">
                                     <v-tooltip bottom>
                                         <template v-slot:activator="{ on: tooltip }">
-                                            <v-icon class="icon-group" @click="gotoPage(item)" v-on="{ ...tooltip, ...menu }">
+                                            <v-icon class="collapse icon-group" @click="gotoPage(item)" v-on="{ ...tooltip, ...menu }">
                                             {{ item.icon }}
                                             </v-icon>
                                         </template>
@@ -381,10 +381,11 @@ export default {
     watch: {
         "sapp.collapseSideBar": function(newVl){
             if(newVl == true){
-                debugger
                 this.$set(this.selectingItem, "active", true)
             }else{
                 this.$set(this.selectingItem, "active", false)
+                this.$set(this.selectingChildItem, "active", true)
+                
             }
         }
     },
@@ -467,18 +468,27 @@ export default {
                 if(e.hasOwnProperty('active')){
                     e.active = false
                 }
-                
                 if(e.hasOwnProperty('children')){
                     for(let child in e.children){
                        self.$set( e.children[child], "active", false)
                     }
                 }
             })
-            if(self.sapp.collapseSideBar == true && subItem == true){
-               this.$set(parent, 'active', true)
+            if(self.sapp.collapseSideBar == true){
+                this.selectingChildItem = item
+                if(subItem == true){
+                    this.$set(parent, 'active', true)
+                }else{
+                    this.$set(item, 'active', true)
+                }
             }else{
-               this.$set(item, 'active', true)
+                this.$set(item, 'active', true)
             }
+            // if(self.sapp.collapseSideBar == true && subItem == true){
+            //    this.$set(parent, 'active', true)
+            // }else{
+              
+            // }
             if(subItem == true){   
                 this.selectingItem = parent
             }
@@ -498,6 +508,7 @@ export default {
             menuItemsHeight: '200px',
             indexActive: "sdsd",
             selectingItem: {},
+            selectingChildItem: {},
         };
     }
 };
@@ -513,8 +524,13 @@ export default {
 .icon-group{
     font-size:17px; 
     color:rgb(0,0,0,0.8); 
-    margin-top:-8px;
+    margin-top:-10px;
     margin-left:4px;
+}
+
+.collapse.icon-group{
+    padding: 10px;
+    margin-left: -7px !important;
 }
 
 .menu-group ::v-deep .v-list-group__header {
@@ -556,12 +572,32 @@ export default {
     height:15px!important; 
     margin-bottom: auto;
     margin-top:auto;
+    pointer-events:none
 }
-.title-group:hover{
-    background:unset
+.menu-not-interact{
+    pointer-events:none;
 }
-.title-group:focus{
-    background:unset
+.menu-not-interact >>> .v-list-group__header{ 
+    cursor: unset;
+    pointer-events:none;
+    
+}
+.menu-not-interact >>> .v-list-group__header:hover::before{
+    background: white !important;
+}
+.menu-not-interact >>> .v-list-group__header::before{
+    transition: unset;
+}
+.menu-not-interact >>> .v-list-group__header:hover::before{
+    background: white !important;
+}
+.menu-not-interact >>> .v-list-group__header:focus::before{
+    background: white !important;
+}
+
+
+.menu-group >>> .v-list-item:first-child{
+    margin-bottom: 0 !important;
 }
 </style>
 <style>

@@ -77,7 +77,6 @@ const defaultState = {
                 }
             },
             orgchartTableSqlName: {}, // biến lưu lại tên các bảng sqlite được tạo ra sau khi chạy công thức orgchart  
-            tableLoaded: {},
             readyLoaded: false, // biến đánh dấu công thức đã chạy xong mỗi lần thực thi hay chưa
             listTableRootControl: {}, // biến lưu lại các controk được coi là root trong trong table (trường hợp công thức ko có đầu vào thì là root)
         }

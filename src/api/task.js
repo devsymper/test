@@ -2,6 +2,7 @@ import Api from "./api";
 import { appConfigs } from "./../configs.js";
 let fileManagement = new Api(appConfigs.apiDomain.fileManagement);
 let document = new Api(appConfigs.apiDomain.sdocumentManagement);
+let workfloweExtend = new Api(appConfigs.apiDomain.workflowExtend);
 
 export const taskApi = {
     getFileByList(data) {
@@ -19,7 +20,11 @@ export const taskApi = {
     },
     getListDocumentWithUserSubmit(userId){
         return document.get('documents/objects-out-workflow/'+ userId);
+    },
+    getListNodeInProcess(){
+        return workfloweExtend.get("activitys");
     }
+
     
 
 }

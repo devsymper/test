@@ -4,23 +4,19 @@
         :items="myItems"
         :loading="isLoading"
         :search-input.sync="search"
-        chips
-        clearable
-        hide-details
-        flat
-        small-chips
+        v-bind="properties"
         :no-filter="true"
         :height="multipleSelection ? '' : 28"
         :item-text="textKey"
-        dense
         :item-value="valueKey"
-        solo
         :multiple="multipleSelection"
         @change="applyChangeValue"
-        @click="reAssignItems()">
+        @click="reAssignItems()"
+        class="symper-autocomplete-input"
+        >
         <!-- Kiểu 1: mainAndSub -->
         <template class="w-100" v-slot:selection="{ attr, on, item, selected }">
-            <v-chip
+            <v-chip v-if="isSelectionChip"
                 :title="item[textKey] ? item[textKey] : item.name"
                 style="height: 22px"
                 v-bind="attr"
@@ -34,10 +30,14 @@
                     <span v-text="item[textKey] ? item[textKey] : item.name" class="fs-12"></span>
                 </div>
             </v-chip>
+            <div v-else class="text-ellipsis w-100">
+                <span v-text="item[valueKey] " v-if="showId" class="mr-2 font-weight-medium fs-12"></span>
+                <span v-text="item[textKey] ? item[textKey] : item.name" class="fs-12"></span>
+            </div>
         </template>
         <template v-slot:item="{ item }" class="w-100">
             <div class="pa-2 w-100">
-                <div class="d-flex fs-13 font-weight-medium w-100" >
+                <div class="d-flex fs-13 font-weight-medium w-100 autocomplete-item" >
                     <span v-text="item[valueKey]" class="mr-2" v-if="showId"></span>
                     <span v-text="item[nameKey]"></span>
                 </div>
@@ -86,6 +86,23 @@ export default {
         },
         multipleSelection: {
             default: false
+        },
+        properties:{
+            type: Object,
+            default(){
+                return {
+                    chips:true,
+                    clearable:true,
+                    flat:true,
+                    'small-chips':true,
+                    'hide-details':true,
+                    dense:true,
+                    solo:true
+                }
+            }
+        },
+        isSelectionChip:{
+            default:true
         }
     },
     created(){
@@ -170,6 +187,17 @@ export default {
 };
 </script>
 
+<style scoped>
+    .symper-autocomplete-input >>> .v-select__slot .v-input__append-inner{
+        display: none;
+    }
+    .text-ellipsis{
+        color: var(--symper-text-color-default);
+    }
+    ::v-deep .v-list-item--active .autocomplete-item{
+        color: var(--symper-text-color-default);
+    }
+</style>
 <style>
 .column-drag-pos[draggable="true"] {
     background-color: #ffe6d2;
