@@ -1280,7 +1280,6 @@ export default {
                                 field,
                                 thisCpn.keyInstance
                             );
-                            this.addToTableLoadedStore(controlName)
                             tableControl.initTableControl();
                             tableControl.setEffectedData(prepareData);
                             tableControl.tableInstance = new Table(
@@ -1378,16 +1377,6 @@ export default {
         },
 
 
-        addToTableLoadedStore(controlName){
-            let curTableLoaded = this.sDocumentSubmit.tableLoaded;
-            curTableLoaded[controlName] = false;
-            console.log('curTableLoaded',controlName,curTableLoaded);
-            this.$store.commit("document/addToDocumentSubmitStore", {
-                key: 'tableLoaded',
-                value: curTableLoaded,
-                instance: this.keyInstance
-            });
-        },
         /**
          * Sự kiện phát ra khi click vào date của date picker
          */

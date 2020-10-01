@@ -166,7 +166,7 @@
                         :key="item.title" 
                         link
                         no-action
-                        :class="{'menu-group': true , 'menu-group-active': item.title == indexActive }"
+                        :class="{'menu-group': true , 'menu-group-active': item.active == true }"
                         :symper-action="$bindAction(item.action?item.action:'')"
                         @click="gotoPage(item)">
                        <template v-slot:prependIcon>
@@ -180,7 +180,6 @@
                         <template v-slot:activator v-if="item.title">
                             <v-list-item-title 
                                  style="margin-left:-25px;"
-                                
                                  :symper-action="$bindAction(item.action)">
                                 <v-list-item-title 
                                     class="fm" 
@@ -199,8 +198,8 @@
                             style="margin-left:-25px; height:32px!important"
                             v-for="(subMenu, objectType) in item.children"
                             :key="objectType"
-                             :class="{'menu-group-active': subMenu.title == indexActive }"
-                            @click="gotoPage(subMenu)">
+                             :class="{'menu-group-active': subMenu.active == true }"
+                            @click="gotoPage(subMenu,true,item)">
                             <v-list-item-title class="fm" style=" color:rgb(0,0,0,0.8)" >
                                 {{$t('common.sidebar.'+subMenu.title)}}
                             </v-list-item-title>
@@ -213,7 +212,7 @@
                 <div class="pr-2">
                     <v-list :expand="true" style="margin-top:-40px">
                     <v-list-group  
-                        class="menu-group"
+                        :class="{'menu-group': true, 'menu-group-active': item.active == true  }"
                         dense
                         v-for="item in menu"
                         :key="item.title" 
@@ -230,7 +229,7 @@
                                 <template v-slot:activator="{ on: menu }">
                                     <v-tooltip bottom>
                                         <template v-slot:activator="{ on: tooltip }">
-                                            <v-icon class="icon-group" @click="gotoPage(item)" v-on="{ ...tooltip, ...menu }">
+                                            <v-icon class="collapse icon-group" @click="gotoPage(item)" v-on="{ ...tooltip, ...menu }">
                                             {{ item.icon }}
                                             </v-icon>
                                         </template>
@@ -243,7 +242,7 @@
                                         style="height:32px!important"
                                         v-for="(subMenuHover, objectType) in item.children"
                                         :key="objectType"
-                                        @click="gotoPage(subMenuHover)">
+                                        @click="gotoPage(subMenuHover,true, item)">
                                         <v-list-item-title 
                                             style=" color:rgb(0,0,0,0.8)" 
                                             class="fm fs-13">
@@ -383,7 +382,14 @@ export default {
         }
     },
     watch: {
-        "sapp.collapseSideBar": function(newVl) {
+        "sapp.collapseSideBar": function(newVl){
+            if(newVl == true){
+                this.$set(this.selectingItem, "active", true)
+            }else{
+                this.$set(this.selectingItem, "active", false)
+                this.$set(this.selectingChildItem, "active", true)
+                
+            }
         }
     },
     mounted(){
@@ -455,7 +461,7 @@ export default {
                 !this.sapp.collapseSideBar
             );
         },
-        gotoPage(item){
+        gotoPage(item, subItem = false , parent){
             if(item.action){
                  this.$evtBus.$emit('symper-app-call-action-handler', item.action, this, {});
             }else{
@@ -464,9 +470,39 @@ export default {
                 
                 this.$goToPage(item.link, title, false, false);
             }
-            this.$set(this, 'indexActive', item.title)
+            this.setActive(item,subItem, parent)
             
-        }
+        },
+        setActive(item, subItem, parent){
+            let self = this
+             this.menu.forEach(function(e){
+                if(e.hasOwnProperty('active')){
+                    e.active = false
+                }
+                if(e.hasOwnProperty('children')){
+                    for(let child in e.children){
+                       self.$set( e.children[child], "active", false)
+                    }
+                }
+            })
+            if(self.sapp.collapseSideBar == true){
+                this.selectingChildItem = item
+                if(subItem == true){
+                    this.$set(parent, 'active', true)
+                }else{
+                    this.$set(item, 'active', true)
+                }
+            }else{
+                this.selectingChildItem = {}
+                this.$set(item, 'active', true)
+            }
+            if(subItem == true){   
+                this.selectingItem = parent
+            }else{
+                this.selectingItem = {}
+            }
+           
+        },
     },
     data() {
         return {
@@ -480,6 +516,8 @@ export default {
             listUserForDelegate: [],
             menuItemsHeight: '200px',
             indexActive: "sdsd",
+            selectingItem: {},
+            selectingChildItem: {},
         };
     }
 };
@@ -495,8 +533,13 @@ export default {
 .icon-group{
     font-size:17px; 
     color:rgb(0,0,0,0.8); 
-    margin-top:-8px;
+    margin-top:-10px;
     margin-left:4px;
+}
+
+.collapse.icon-group{
+    padding: 10px;
+    margin-left: -7px !important;
 }
 
 .menu-group ::v-deep .v-list-group__header {
@@ -538,12 +581,32 @@ export default {
     height:15px!important; 
     margin-bottom: auto;
     margin-top:auto;
+    pointer-events:none
 }
-.title-group:hover{
-    background:unset
+.menu-not-interact{
+    pointer-events:none;
 }
-.title-group:focus{
-    background:unset
+.menu-not-interact >>> .v-list-group__header{ 
+    cursor: unset;
+    pointer-events:none;
+    
+}
+.menu-not-interact >>> .v-list-group__header:hover::before{
+    background: white !important;
+}
+.menu-not-interact >>> .v-list-group__header::before{
+    transition: unset;
+}
+.menu-not-interact >>> .v-list-group__header:hover::before{
+    background: white !important;
+}
+.menu-not-interact >>> .v-list-group__header:focus::before{
+    background: white !important;
+}
+
+
+.menu-group >>> .v-list-item:first-child{
+    margin-bottom: 0 !important;
 }
 </style>
 <style>

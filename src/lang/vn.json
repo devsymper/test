@@ -1000,6 +1000,9 @@
             "showLess": "Thu gọn",
             "showMoreFile": "Xem thêm các tệp"
 
+        },
+        "alert":{
+            "title_aproval":"Thực thi công việc"
         }
 
     },
@@ -1011,6 +1014,7 @@
         "header": {
             "type": "Loại",
             "approval": "Phê duyệt",
+            "groupApproval":"Nhóm phê duyệt",
             "submit": "Gửi văn bản",
             "date": "Ngày tạo",
             "dueDate": "Ngày đến hạn",

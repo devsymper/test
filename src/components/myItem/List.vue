@@ -1,215 +1,223 @@
 <template>
   <div class="list-objects">
     <v-row class="mr-0 ml-0">
-      <v-col
-        :cols="!sideBySideMode ? 12 : 4"
-        :md="!sideBySideMode ? 12 : 3"
-        class="pt-0 pl-0 pr-0 pb-0"
-      >
-        <listHeader
-          :isSmallRow="isSmallRow"
-          :headerTitle="headerTitle"
-          :sideBySideMode="sideBySideMode"
-          :compackMode="compackMode"
-          :parentTaskId="filterFromParent.parentTaskId"
-          @change-density="isSmallRow = !isSmallRow"
-          @changeObjectType="changeObjectType"
-          @filter-change-value="handleChangeFilterValue"
-          @create-task="getTasks({})"
-          @refresh-task-list="getTasks()"
-          @get-list-process-instance="listProrcessInstances = $event"
-        ></listHeader>
-        <v-divider v-if="!sideBySideMode"></v-divider>
-        <v-row class="ml-0 mr-0" v-if="!sideBySideMode">
-          <v-col cols="12" class="list-tasks pt-0 pb-0">
-            <v-row>
-              <v-col
-                cols="1"
-                class="pl-3 fs-13 font-weight-medium"
-                style="flex:0!important"
-              >{{$t("tasks.header.type")}}</v-col>
-              <v-col
-                :cols="sideBySideMode ? 12 : compackMode ? 5 : 3"
-                class="pl-3 fs-13 font-weight-medium"
-              >{{$t("tasks.header.name")}}</v-col>
-              <v-col
-                cols="2"
-                v-if="!sideBySideMode"
-                class="fs-13 font-weight-medium"
-              >{{$t("tasks.header.assignee")}}</v-col>
-              <v-col
-                cols="2"
-                v-if="!sideBySideMode"
-                class="fs-13 font-weight-medium"
-              >{{$t("tasks.header.owner")}}</v-col>
-              <v-col
-                cols="1"
-                v-if="!sideBySideMode"
-                class="fs-13 font-weight-medium"
-              >{{$t("tasks.header.dueDate")}}</v-col>
-
-              <v-col
-                cols="2"
-                v-if="!sideBySideMode && !compackMode && !smallComponentMode"
-                class="fs-13 font-weight-medium"
-              >{{$t("tasks.header.app")}}</v-col>
-            <v-col
-                cols="1"
-                v-if="!sideBySideMode && !compackMode && !smallComponentMode"
-                class="fs-13 font-weight-medium"
-              >{{$t("common.add")}}</v-col>
-            </v-row>
-          </v-col>
-        </v-row>
-        <v-divider></v-divider>
-
-        <VuePerfectScrollbar
-          v-if="!loadingTaskList"
-          @ps-y-reach-end="handleReachEndList"
-          :style="{height: listTaskHeight+'px'}"
+        <v-col
+            :cols="!sideBySideMode ? 12 : 4"
+            :md="!sideBySideMode ? 12 : 3"
+            class="pt-0 pl-0 pr-0 pb-0"
         >
-            <div
-                v-for="(obj, idex) in groupFlatTasks"
-                :key="idex"
-            >
-                <v-row
-                   :class="{
-                        'mr-0 ml-0 single-row': true ,
-                        'py-0': isSmallRow,
-                    }"
-                    :style="{
-                        minHeight: '30px'
-                    }"
-                    style="border-bottom: 1px solid #eeeeee!important;"
-                >
-                   <span style="color:#FF8003; font-size:13px;margin-left:16px;margin-top:6px">{{ showTime(obj.date)}}</span>
-                </v-row>
-                <v-row
-                    v-for="(obj, idx) in obj.tasks"
-                    :key="idx"
-                    :index="obj.id"
-                    :class="{
-                                    'mr-0 ml-0 single-row': true ,
-                                    'py-0': isSmallRow,
-                                    'd-active':index==idx && dataIndex==idex
-                                }"
-                    :style="{
-                        minHeight: '50px'
-                    }"
-                    @click="selectObject(obj, idx,idex)"
-                    style="border-bottom: 1px solid #eeeeee!important;"
-                          
-                >
-                    <v-col
-                    style="line-height: 42px; flex:0!important"
-                    cols="1"
-                    class="fs-12 px-1 py-0 pl-3"
-                    >
-                    <v-icon class="fs-14"
-                        v-if="obj.taskData.action"
-                    >{{obj.taskData.action.action=='approval' ? 'mdi-seal-variant ': 'mdi-file-document-edit-outline'}}</v-icon>
-                    <v-icon class="fs-14" v-else>mdi-checkbox-marked-circle-outline</v-icon>
-                    </v-col>
-                    <v-col :cols="sideBySideMode ? 10 : compackMode ? 5: 3" class="pl-3 pr-1 pb-1 pt-2">
-                    <div class="pl-1">
-                        <v-tooltip bottom>
-                        <template v-slot:activator="{ on }">
-                            <div v-on="on" class="text-left fs-13 pr-6 text-ellipsis w-100">
-                            {{obj.taskData.content}}
-                            </div>
-                        </template>
-                        <span>{{ obj.taskData.content }}</span>
-                        </v-tooltip>
-                        <div class="pa-0 grey--text mt-1 lighten-2 d-flex justify-space-between">
-                        <div
-                            class="fs-11 pr-6 text-ellipsis"
-                        >{{obj.taskData.extraLabel}} {{obj.taskData.extraValue}}</div>
+            <listHeader
+            :isSmallRow="isSmallRow"
+            :headerTitle="headerTitle"
+            :sideBySideMode="sideBySideMode"
+            :compackMode="compackMode"
+            :parentTaskId="filterFromParent.parentTaskId"
+            @change-density="isSmallRow = !isSmallRow"
+            @changeObjectType="changeObjectType"
+            @filter-change-value="handleChangeFilterValue"
+            @create-task="getTasks({})"
+            @refresh-task-list="getTasks()"
+            @get-list-process-instance="listProrcessInstances = $event"
+            @goToPageApproval="goToPageApproval"
+            ></listHeader>
+            <v-divider v-if="!sideBySideMode"></v-divider>
+            <div v-if="!changeStatusMoreApproval">
+                <v-row class="ml-0 mr-0" v-if="!sideBySideMode">
+                        <v-col cols="12" class="list-tasks pt-0 pb-0">
+                            <v-row>
+                            <v-col
+                                cols="1"
+                                class="pl-3 fs-13 font-weight-medium"
+                                style="flex:0!important"
+                            >{{$t("tasks.header.type")}}</v-col>
+                            <v-col
+                                :cols="sideBySideMode ? 12 : compackMode ? 5 : 3"
+                                class="pl-3 fs-13 font-weight-medium"
+                            >{{$t("tasks.header.name")}}</v-col>
+                            <v-col
+                                cols="2"
+                                v-if="!sideBySideMode"
+                                class="fs-13 font-weight-medium"
+                            >{{$t("tasks.header.assignee")}}</v-col>
+                            <v-col
+                                cols="2"
+                                v-if="!sideBySideMode"
+                                class="fs-13 font-weight-medium"
+                            >{{$t("tasks.header.owner")}}</v-col>
+                            <v-col
+                                cols="1"
+                                v-if="!sideBySideMode"
+                                class="fs-13 font-weight-medium"
+                            >{{$t("tasks.header.dueDate")}}</v-col>
 
-                        <div class="fs-11 py-0 pr-2 text-ellipsis">
-                            {{obj.createTime ? $moment(obj.createTime).format('DD/MM/YY HH:mm:ss'):$moment(obj.endTime).format('DD/MM/YY HH:mm:ss')}}
-                            <v-icon class="grey--text lighten-2 ml-1" x-small>mdi-clock-time-nine-outline</v-icon>
-                        </div>
-                        </div>
-                    </div>
-                    </v-col>
-                    <v-col
-                    v-if="!sideBySideMode"
-                    style="line-height: 42px"
-                    cols="2"
-                    class="fs-12 px-1 py-0"
-                    >
-                    <symperAvatar :size="20" :userId="obj.assigneeInfo.id" />
-                    {{obj.assigneeInfo.displayName}}
-                    </v-col>
-                    <v-col
-                    v-if="!sideBySideMode"
-                    style="line-height: 42px"
-                    cols="2"
-                    class="fs-12 px-1 py-0"
-                    >
-                    <symperAvatar v-if="obj.ownerInfo.id" :size="20" :userId="obj.ownerInfo.id" />
-                    <symperAvatar v-else :size="20" :userId="obj.assigneeInfo.id" />
-                        {{obj.ownerInfo.id ? obj.ownerInfo.displayName: obj.assigneeInfo.displayName }}
-                    </v-col>
-                    <v-col
-                        v-if="!sideBySideMode"
-                        style="line-height: 42px"
-                        cols="1"
-                        class="fs-13 px-1 py-0"
-                    >
-                    <span class="mt-1">{{obj.dueDate ==null? '':$moment(obj.dueDate).fromNow()}}</span>
-                    </v-col>
-                    <v-col
-                        class="py-0"
-                        cols="2"
-                        v-if="!sideBySideMode && !smallComponentMode"
-                    >
-                       <div class="pl-1 mt-1">
-                            <v-tooltip bottom>
-                                <template v-slot:activator="{ on }">
-                                <span
-                                    v-on="on"
-                                    v-if="obj.processDefinitionName"
-                                    class=" text-left fs-13 pr-6 text-ellipsis w-80 title-quytrinh"
-                                >{{obj.processDefinitionName}}</span>
-                                <span v-on="on" v-else class="text-left fs-13 pr-6 text-ellipsis w-80 title-quytrinh">ad hoc</span>
-                                </template>
-                                <span>{{ obj.processDefinitionName?  obj.processDefinitionName : `ad hoc` }}</span>
-                            </v-tooltip>
-                            <div class="pa-0 grey--text mt-1 lighten-2 d-flex justify-space-between">
-                                <div
-                                    class="fs-11 pr-6 text-ellipsis"
-                                >{{selectNameApp(obj.variables)}}</div>
+                            <v-col
+                                cols="2"
+                                v-if="!sideBySideMode && !compackMode && !smallComponentMode"
+                                class="fs-13 font-weight-medium"
+                            >{{$t("tasks.header.app")}}</v-col>
+                            <v-col
+                                cols="1"
+                                v-if="!sideBySideMode && !compackMode && !smallComponentMode"
+                                class="fs-13 font-weight-medium"
+                            >{{$t("common.add")}}</v-col>
+                            </v-row>
+                        </v-col>
+                        </v-row>
+                        <v-divider></v-divider>
+
+                        <VuePerfectScrollbar
+                        v-if="!loadingTaskList"
+                        @ps-y-reach-end="handleReachEndList"
+                        :style="{height: listTaskHeight+'px'}"
+                        >
+                            <div
+                                v-for="(obj, idex) in groupFlatTasks"
+                                :key="idex"
+                            >
+                                <v-row
+                                :class="{
+                                        'mr-0 ml-0 single-row': true ,
+                                        'py-0': isSmallRow,
+                                    }"
+                                    :style="{
+                                        minHeight: '30px'
+                                    }"
+                                    style="border-bottom: 1px solid #eeeeee!important;"
+                                >
+                                <span style="color:#FF8003; font-size:13px;margin-left:16px;margin-top:6px">{{ obj.fromNow}}</span>
+                                </v-row>
+                                <v-row
+                                    v-for="(obj, idx) in obj.tasks"
+                                    :key="idx"
+                                    :index="obj.id"
+                                    :class="{
+                                                    'mr-0 ml-0 single-row': true ,
+                                                    'py-0': isSmallRow,
+                                                    'd-active':index==idx && dataIndex==idex
+                                                }"
+                                    :style="{
+                                        minHeight: '50px'
+                                    }"
+                                    @click="selectObject(obj, idx,idex)"
+                                    style="border-bottom: 1px solid #eeeeee!important;"
+                                        
+                                >
+                                    <v-col
+                                    style="line-height: 42px; flex:0!important"
+                                    cols="1"
+                                    class="fs-12 px-1 py-0 pl-3"
+                                    >
+                                    <v-icon class="fs-14"
+                                        v-if="obj.taskData.action"
+                                    >{{obj.taskData.action.action=='approval' ? 'mdi-seal-variant ': 'mdi-file-document-edit-outline'}}</v-icon>
+                                    <v-icon class="fs-14" v-else>mdi-checkbox-marked-circle-outline</v-icon>
+                                    </v-col>
+                                    <v-col :cols="sideBySideMode ? 10 : compackMode ? 5: 3" class="pl-3 pr-1 pb-1 pt-2">
+                                    <div class="pl-1">
+                                        <v-tooltip bottom>
+                                        <template v-slot:activator="{ on }">
+                                            <div v-on="on" class="text-left fs-13 pr-6 text-ellipsis w-100">
+                                            {{obj.taskData.content}}
+                                            </div>
+                                        </template>
+                                        <span>{{ obj.taskData.content }}</span>
+                                        </v-tooltip>
+                                        <div class="pa-0 grey--text mt-1 lighten-2 d-flex justify-space-between">
+                                        <div
+                                            class="fs-11 pr-6 text-ellipsis"
+                                        >{{obj.taskData.extraLabel}} {{obj.taskData.extraValue}}</div>
+
+                                        <div class="fs-11 py-0 pr-2 text-ellipsis">
+                                            {{obj.createTime ? $moment(obj.createTime).format('DD/MM/YY HH:mm:ss'):$moment(obj.endTime).format('DD/MM/YY HH:mm:ss')}}
+                                            <v-icon class="grey--text lighten-2 ml-1" x-small>mdi-clock-time-nine-outline</v-icon>
+                                        </div>
+                                        </div>
+                                    </div>
+                                    </v-col>
+                                    <v-col
+                                    v-if="!sideBySideMode"
+                                    style="line-height: 42px"
+                                    cols="2"
+                                    class="fs-12 px-1 py-0"
+                                    >
+                                    <symperAvatar :size="20" :userId="obj.assigneeInfo.id" />
+                                    {{obj.assigneeInfo.displayName}}
+                                    </v-col>
+                                    <v-col
+                                    v-if="!sideBySideMode"
+                                    style="line-height: 42px"
+                                    cols="2"
+                                    class="fs-12 px-1 py-0"
+                                    >
+                                    <symperAvatar v-if="obj.ownerInfo.id" :size="20" :userId="obj.ownerInfo.id" />
+                                    <symperAvatar v-else :size="20" :userId="obj.assigneeInfo.id" />
+                                        {{obj.ownerInfo.id ? obj.ownerInfo.displayName: obj.assigneeInfo.displayName }}
+                                    </v-col>
+                                    <v-col
+                                        v-if="!sideBySideMode"
+                                        style="line-height: 42px"
+                                        cols="1"
+                                        class="fs-13 px-1 py-0"
+                                    >
+                                    <span class="mt-1">{{obj.dueDate ==null? '':$moment(obj.dueDate).fromNow()}}</span>
+                                    </v-col>
+                                    <v-col
+                                        class="py-0"
+                                        cols="2"
+                                        v-if="!sideBySideMode && !smallComponentMode"
+                                    >
+                                    <div class="pl-1 mt-1">
+                                            <v-tooltip bottom>
+                                                <template v-slot:activator="{ on }">
+                                                <span
+                                                    v-on="on"
+                                                    v-if="obj.processDefinitionName"
+                                                    class=" text-left fs-13 pr-6 text-ellipsis w-80 title-quytrinh"
+                                                >{{obj.processDefinitionName}}</span>
+                                                <span v-on="on" v-else class="text-left fs-13 pr-6 text-ellipsis w-80 title-quytrinh">ad hoc</span>
+                                                </template>
+                                                <span>{{ obj.processDefinitionName?  obj.processDefinitionName : `ad hoc` }}</span>
+                                            </v-tooltip>
+                                            <div class="pa-0 grey--text mt-1 lighten-2 d-flex justify-space-between">
+                                                <div
+                                                    class="fs-11 pr-6 text-ellipsis"
+                                                >{{selectNameApp(obj.variables)}}</div>
+                                            </div>
+                                        </div>
+                                        
+                                    </v-col>
+                                    <v-col
+                                        v-if="!sideBySideMode"
+                                        cols="1"
+                                        class="fs-13 px-1 py-0"
+                                    >
+                                        <div class="pl-1">
+                                            <div style="width:55px">
+                                                {{commentCountPerTask['task:' + obj.id]}}
+                                                <v-icon class="fs-14" style="float:right;margin-top:4px;margin-right:12px">mdi-comment-processing-outline</v-icon> 
+                                            </div>
+                                            <div style="width:55px"> 
+                                                {{fileCountPerTask['task:' + obj.id]}}
+                                                <v-icon class="fs-14" style="float:right;margin-top:4px;margin-right:12px">mdi-attachment</v-icon>
+                                            </div>
+                                        </div>
+                                    </v-col>
+                                </v-row>
                             </div>
-                        </div>
-                        
-                    </v-col>
-                     <v-col
-                        v-if="!sideBySideMode"
-                        cols="1"
-                        class="fs-13 px-1 py-0"
-                    >
-                        <div class="pl-1">
-                            <div style="width:55px">
-                                {{commentCountPerTask['task:' + obj.id]}}
-                                <v-icon class="fs-14" style="float:right;margin-top:4px;margin-right:12px">mdi-comment-processing-outline</v-icon> 
-                            </div>
-                            <div style="width:55px"> 
-                                {{fileCountPerTask['task:' + obj.id]}}
-                                <v-icon class="fs-14" style="float:right;margin-top:4px;margin-right:12px">mdi-attachment</v-icon>
-                            </div>
-                        </div>
-                    </v-col>
-                </v-row>
+                        </VuePerfectScrollbar>
+                        <v-skeleton-loader v-else ref="skeleton" :type="'table-tbody'" class="mx-auto"></v-skeleton-loader>
+                        <v-skeleton-loader
+                        v-if="loadingMoreTask"
+                        ref="skeleton"
+                        :type="'table-tbody'"
+                        class="mx-auto"
+                        ></v-skeleton-loader>
             </div>
-        </VuePerfectScrollbar>
-        <v-skeleton-loader v-else ref="skeleton" :type="'table-tbody'" class="mx-auto"></v-skeleton-loader>
-        <v-skeleton-loader
-          v-if="loadingMoreTask"
-          ref="skeleton"
-          :type="'table-tbody'"
-          class="mx-auto"
-        ></v-skeleton-loader>
+            <div v-else>
+                <listTaskApproval
+                    :changeStatusMoreApproval="changeStatusMoreApproval"
+                 />
+            </div>
       </v-col>
       <v-col
         :cols="!sideBySideMode ? 0 : 8"
@@ -220,12 +228,12 @@
         style="border-left: 1px solid #e0e0e0;"
       >
         <taskDetail
-          :parentHeight="listTaskHeight"
-          :taskInfo="selectedTask.taskInfo"
-          :originData="selectedTask.originData"
-          @close-detail="closeDetail"
-          @task-submited="handleTaskSubmited"
-          @changeUpdateAsignee="changeUpdateAsignee"
+        :parentHeight="listTaskHeight"
+        :taskInfo="selectedTask.taskInfo"
+        :originData="selectedTask.originData"
+        @close-detail="closeDetail"
+        @task-submited="handleTaskSubmited"
+        @changeUpdateAsignee="changeUpdateAsignee"
         ></taskDetail>
       </v-col>
       <userSelector ref="user" class="d-none"></userSelector>
@@ -242,6 +250,7 @@ import userSelector from "./UserSelector";
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import { util } from "../../plugins/util";
 import { appConfigs } from "../../configs";
+import listTaskApproval from "./featureApproval/List";
 
 import {
   extractTaskInfoFromObject,
@@ -250,7 +259,7 @@ import {
 import symperAvatar from "@/components/common/SymperAvatar.vue";
 
 export default {
-  computed: {
+    computed: {
         fileCountPerTask(){
             return this.$store.state.file.fileCountPerObj.list;
         },
@@ -280,17 +289,18 @@ export default {
                 }else{
                     date = task.endTime.split("T")[0];
                 }
-                if (!groups[date]) {
-                groups[date] = [];
+                let fromNow = this.getDateFormNow(date);
+                if (!groups[fromNow]) {
+                  groups[fromNow] = [];
                 }
-                groups[date].push(task);
+                groups[fromNow].push(task);
                 return groups;
             }, {});
             // Edit: to add it in the array format instead
-            const groupArraysTask = Object.keys(groups).map(date => {
+            const groupArraysTask = Object.keys(groups).map(fromNow => {
                 return {
-                date,
-                tasks: groups[date]
+                  fromNow,
+                  tasks: groups[fromNow]
                 };
             });
             console.log("addd",groupArraysTask);
@@ -324,7 +334,8 @@ export default {
         listHeader: listHeader,
         userSelector: userSelector,
         VuePerfectScrollbar: VuePerfectScrollbar,
-        symperAvatar: symperAvatar
+        symperAvatar: symperAvatar,
+        listTaskApproval
     },
     props: {
         compackMode: {
@@ -361,6 +372,7 @@ export default {
         return {
             index: -1,
             dataIndex:-1,
+            changeStatusMoreApproval:false,
             loadingTaskList: false,
             loadingMoreTask: false,
             listTaskHeight: 300,
@@ -408,10 +420,13 @@ export default {
         self.reCalcListTaskHeight();
     },
     methods: {
+    goToPageApproval(){
+        this.changeStatusMoreApproval=!this.changeStatusMoreApproval;
+    },
     changeUpdateAsignee(){
       this.handleTaskSubmited();
     },
-    showTime(time){
+    getDateFormNow(time){
         var today = this.$moment().format('YYYY-MM-DD');
         if (time===today) {
             return this.$t('myItem.today');

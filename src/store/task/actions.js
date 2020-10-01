@@ -87,6 +87,21 @@ const getAllAppActive = async(context) => {
         }
     }
 }
+const getListNodeInProcess = async(context) => {
+    if (context.state.listNodeInProcess.length==0) {
+        try {
+            let res = await taskApi.getListNodeInProcess();
+            if (res.status == 200) {
+                if (res.data!=false) {
+                    context.commit('setListNodeInProcess', res.data);
+                }
+                console.log("allNode",res.data);
+            } 
+        } catch (error) {
+            console.log("Can not get list app!");
+        }
+    }
+}
 
 export {
     getArrFileAttachment,
@@ -94,6 +109,7 @@ export {
     getArrDocObjId,
     getListDocumentObjId,
     getListDocumentObjIdWithUserSubmit,
-    getAllAppActive
+    getAllAppActive,
+    getListNodeInProcess
 
 };
