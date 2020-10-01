@@ -1604,7 +1604,11 @@ export default {
                 dataPost['titleObject'] = value
             }
             if(this.appId){
-                dataPost['appId'] = this.appId
+                dataPost['appId'] = this.appId;
+            } else {
+                if(this.$route.params.extraData && this.$route.params.extraData.appId){
+                    dataPost['appId'] = this.$route.params.extraData.appId
+                }
             }
             documentApi.submitDocument(dataPost).then(res => {
                 let dataResponSubmit = res.data;
