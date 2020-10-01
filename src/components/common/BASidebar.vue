@@ -409,7 +409,6 @@ export default {
                 menuItem.push({titleGroup: name });
                 menuItem.push(...this.menu[type]);
             })
-
             this.menu = menuItem;
         },
         filterUser(item, queryText, itemText){
@@ -494,7 +493,7 @@ export default {
     
 }
 .icon-group{
-    font-size:14px; 
+    font-size:17px; 
     color:rgb(0,0,0,0.8); 
     margin-top:-8px;
     margin-left:4px;

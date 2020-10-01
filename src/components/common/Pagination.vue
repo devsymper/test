@@ -3,7 +3,7 @@
         
         <v-select
             class="s-select-page-size  float-left"
-            style="width:70px"
+            style="width:75px"
             v-model="size"
             :items="pageSizeOptions"
             hide-details

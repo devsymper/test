@@ -10,11 +10,12 @@
         flat
         small-chips
         :no-filter="true"
-        height="28"
+        :height="multipleSelection ? '' : 28"
         :item-text="textKey"
         dense
         :item-value="valueKey"
         solo
+        :multiple="multipleSelection"
         @change="applyChangeValue"
         @click="reAssignItems()">
         <!-- Kiểu 1: mainAndSub -->
@@ -25,7 +26,7 @@
                 v-bind="attr"
                 :input-value="selected"
                 color="grey lighten-3"
-                class="fs-13 w-100"
+                class="fs-13 w-100 mt-1 symper-selected-item-autocomplete"
                 v-on="on"
             >
                 <div class="d-inline-block text-ellipsis" style="width: calc(100% - 4px)">
@@ -53,7 +54,6 @@ import { util } from "../../../plugins/util";
 export default {
     props: {
         value: {
-            type: String,
             default: ""
         },
         items: {
@@ -83,6 +83,9 @@ export default {
         },
         showId:{
             default: true
+        },
+        multipleSelection: {
+            default: false
         }
     },
     created(){
@@ -170,5 +173,9 @@ export default {
 <style>
 .column-drag-pos[draggable="true"] {
     background-color: #ffe6d2;
+}
+
+.symper-selected-item-autocomplete .v-chip__content{
+    width: 100%
 }
 </style>

@@ -5,7 +5,7 @@
           :options="options" 
           :autoStart="true"
           @dragover="handleDrop"
-           @file-success="handleFileUploaded"
+          @file-success="handleFileUploaded"
           @change="handleChange" 
           ref="upload">
             <uploader-unsupport></uploader-unsupport>

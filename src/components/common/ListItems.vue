@@ -59,7 +59,7 @@
                             :loading="loadingExportExcel"
                             class="mr-2"
                             :disabled="loadingExportExcel"
-                            v-if="!isCompactMode && showExportButton"
+                            v-if="!isCompactMode && showExportButton && !actionPanel"
                         >
                             <v-icon left dark>mdi-microsoft-excel</v-icon>
                             <span v-show="!actionPanel">{{$t('common.export_excel')}}</span>
@@ -71,13 +71,14 @@
                             small
                             @click="importExcel()"
                             class="mr-2"
-                            v-if="showImportButton "
+                            v-if="showImportButton && !actionPanel"
                         >
                             <v-icon left dark>mdi-database-import</v-icon>
                             <span>{{$t('common.import_excel')}}</span>
                         </v-btn>
                           <!-- show menu khi hien sidebar -->
                          <v-menu
+                            
                             bottom
                             left
                             >
@@ -95,7 +96,7 @@
                                         </v-icon>
                                 </v-btn>
                             </template>
-                            <v-list>
+                            <v-list class="group-action-list">
                                 <v-list-item  v-show="showButtonAdd"  @click="addItem">
                                     <v-list-item-icon>
                                          <v-icon>mdi-plus</v-icon>
@@ -326,8 +327,7 @@ export default {
            this.refreshList();
         },
         'tableDisplayConfig.value.alwaysShowSidebar'(value) {
-            if(value){
-            // if(value && Object.keys(this.currentItemDataClone).length > 0){
+            if(value && !$.isEmptyObject(this.currentItemDataClone)){
                 this.openactionPanel();
             }else{
                 this.closeactionPanel();
@@ -384,15 +384,6 @@ export default {
                 licenseKey: "non-commercial-and-evaluation",
                 afterRender: isForced => {
                     
-                },
-                afterSelection: (row, column, row2, column2, preventScrolling, selectionLayerLevel) => {
-                    if(self.debounceEmitRowSelectEvt){
-                        clearTimeout(self.debounceEmitRowSelectEvt);
-                    }
-                    let time = self.debounceRowSelectTime;
-                    self.debounceEmitRowSelectEvt = setTimeout(() => {
-                        self.$emit('row-selected', self.data[row]);
-                    }, time);
                 },
                 afterSelection: (row, column, row2, column2, preventScrolling, selectionLayerLevel) => {
                     if(self.debounceEmitRowSelectEvt){
@@ -753,10 +744,9 @@ export default {
                 }
             }
             
-            this.loadingExportExcel = true;
-            await apiObj.get(exportUrl);
-            this.loadingExportExcel = false;
+            window.open(exportUrl,'_blank');
         },
+       
         checkShowCreateButton(){
             let rsl = !this.isCompactMode;
             let objectType = this.commonActionProps.resource;
@@ -1564,7 +1554,29 @@ export default {
     }
 };
 </script>
-
+<style scoped>
+    .group-action-list >>> .v-list-item {
+        min-height:unset;
+        height:30px;
+        margin:2px 8px;
+        padding: 0;
+        overflow: hidden;
+    }
+    .group-action-list >>> .v-list-item .v-list-item__title{
+        font-size: 13px;
+    }
+    .group-action-list >>> .v-list-item__icon  {
+        margin: 18px 2px 0 0;
+        font-size: 13px;
+        min-height:unset;
+    }
+    .group-action-list >>> .v-list-item__icon i{
+        font-size: 20px;
+    }
+    .group-action-list >>> .v-list-item i{
+        margin-top:-12px;
+    }
+</style>
 <style>
 .ht_clone_top.handsontable {
     z-index: 6;
@@ -1637,17 +1649,6 @@ i.applied-filter {
 .ht_clone_left {
     z-index: 8;
 }
-.v-list-item {
-    min-height:unset;
-    height:30px;
-    margin:2px 8px;
-}
-.v-list-item__icon  {
-    margin-right:12px !important;
-    min-height:unset;
-}
-.v-list-item i{
-    margin-top:-12px;
-}
+
 </style>
 
