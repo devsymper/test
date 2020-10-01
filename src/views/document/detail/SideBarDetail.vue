@@ -213,10 +213,10 @@ export default {
 			}).always({}).catch({});
 		},
 		workflowId(after){
-				debugger
-			bpmnApi.getDefinitionData(this.workflowId).then(res=>{
-                    console.log('resresres',res);
-				}).always({}).catch({});
+			// 	debugger
+			// bpmnApi.getDefinitionData(this.workflowId).then(res=>{
+            //         console.log('resresres',res);
+			// 	}).always({}).catch({});
 		},
 		taskId(after){
 			// bpmnApi.getATaskInfo(this.taskId).then(res=>{
