@@ -394,13 +394,14 @@ export default {
             arrObj.push(object)
             let arrr = {}
             arrr.permissions = JSON.stringify(arrObj)
+            arrr.replace_all = "1"
             orgchartApi.updatePermissionInRole(arrr).then(res=>{}).catch(err=>{})
             this.$store.commit('orgchart/updatePermissionsSelectingNode', {instanceKey: this.instanceKey, data:data} )
         },
         changeNodeStyle(styleData) {
             try {
                 let style = styleData.content;
-                for (let key in style) {
+                for (let key in style){
                     this.nodeStyleConfig[key].value = style[key];
                 }
             } catch (error) {
