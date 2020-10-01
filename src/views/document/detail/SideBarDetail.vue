@@ -76,7 +76,7 @@
 						</div>
 					</v-expansion-panel-content>
 				</v-expansion-panel>
-				<v-expansion-panel>
+				<v-expansion-panel v-show="showPanelWorkflow">
 					<v-expansion-panel-header class="v-expand-header">{{$t('document.detail.sidebar.body.worflowInfo')}}</v-expansion-panel-header>
 					<v-expansion-panel-content class="sym-v-expand-content">
 
@@ -157,6 +157,7 @@ export default {
 			userCreate:"",
 			createdDate:"",
 			workflowName:"",
+			showPanelWorkflow:false,
 			workflowOtherName:"",
 			listApprovalUser:[],
 			listRelatedUser:[],
@@ -213,10 +214,17 @@ export default {
 			}).always({}).catch({});
 		},
 		workflowId(after){
-			// 	debugger
-			// bpmnApi.getDefinitionData(this.workflowId).then(res=>{
-            //         console.log('resresres',res);
-			// 	}).always({}).catch({});
+			let self = this
+			debugger
+			if(after != ""){
+				self.showPanelWorkflow = true
+				bpmnApi.getProcessInstanceData(this.workflowId).then(res=>{
+					self.workflowName = res.data[0].name
+					self.workflowOtherName = res.data[0].processDefinitionName
+					debugger
+				}).always({}).catch({});
+			}
+			
 		},
 		taskId(after){
 			// bpmnApi.getATaskInfo(this.taskId).then(res=>{
