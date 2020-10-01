@@ -43,6 +43,11 @@ const userMenuItems = function(state) {
     let opsMap = state.userOperations;
     let userInfo = util.auth.getSavedUserInfo();
     let userType = userInfo.profile.type;
+
+    for (let objectType in mapObjectTypeAndMenu) {
+        mapObjectTypeAndMenu[objectType].active = false;
+    }
+
     if (userType == 'ba') {
         return Object.values(mapObjectTypeAndMenu);
     } else {
