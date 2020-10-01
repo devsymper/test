@@ -11,12 +11,12 @@
                     :key="obj.id"
                     :index="obj.id"
                     :class="{
-                            'mr-0 ml-0 single-row': true ,
+                            'mr-0 py-1 ml-0 single-row': true ,
                             'd-active':index==idx 
                         }"
                     @mouseover="index=idx"
                     @mouseout="index = null"
-                    style="border-bottom: 1px solid #eeeeee!important;max-height:40px"
+                    style="border-bottom: 1px solid #eeeeee!important;"
                 >
                     <v-col
                         :cols="!sideBySideMode ? 1 : 1"
@@ -33,12 +33,12 @@
 
                     <v-col    
                         :cols="!sideBySideMode ? 2 : 2" 
-                        class="pl-0 pr-1 pb-1 pt-0"
+                        class="pl-0 pa-0 "
                         style="flex: 0 0 25.6667%;max-width: 25.6667%;"
                         @click="selectObject(obj, idx)"
                         >
                         
-                        <div >
+                        <div class="mt-1" >
                                 <v-tooltip bottom>
                                 <template v-slot:activator="{ on }">
                                     <div v-on="on" class="text-left fs-13  text-ellipsis w-100">
@@ -51,7 +51,7 @@
                                 </template>
                                 <span>{{ obj.taskData.content }}</span>
                                 </v-tooltip>
-                                <div class="pa-0 grey--text mt-1 lighten-2 d-flex justify-space-between">
+                                <div class="pa-0 grey--text lighten-2 d-flex justify-space-between">
                                 <div
                                     class="fs-11  text-ellipsis"
                                 >
@@ -59,7 +59,7 @@
                                 {{obj.taskData.extraLabel}} {{obj.taskData.extraValue}}</div>
 
                                 <div class="fs-11 py-0  text-ellipsis">
-                                    {{obj.endTime==null ? $moment(obj.startTime).format('DD/MM/YY HH:mm:ss'):$moment(obj.endTime).format('DD/MM/YY HH:mm:ss')}}
+                                    {{$moment(obj.createTime).format('DD/MM/YY HH:mm:ss')}}
                                     <v-icon class="grey--text lighten-2 ml-1" x-small>mdi-clock-time-nine-outline</v-icon>
                                 </div>
                             </div>
@@ -113,7 +113,7 @@
                                 </template>
                                 <span>{{ obj.processDefinitionName?  obj.processDefinitionName : `ad hoc` }}</span>
                             </v-tooltip>
-                            <div class="pa-0 grey--text mt-1 lighten-2 d-flex justify-space-between">
+                            <div class="pa-0 grey--text lighten-2 d-flex justify-space-between">
                                 <div
                                     class="fs-11 pr-6 text-ellipsis"
                                 >{{selectNameApp(obj.variables)}}</div>
@@ -149,12 +149,12 @@
                             :key="obj.id"
                             :index="obj.id"
                             :class="{
-                                    'mr-0 ml-0 single-row': true ,
+                                    'mr-0 ml-0 single-row py-1': true ,
                                     'd-active':index==idx || selectObj==idx
                                 }"
                             @mouseover="index=idx"
                             @mouseout="index = null"
-                            style="border-bottom: 1px solid #eeeeee!important;max-height:45px"
+                            style="border-bottom: 1px solid #eeeeee!important;"
                             >
                                 <v-col
                                     cols="3"
@@ -190,7 +190,7 @@
                                             </template>
                                             <span>{{ obj.taskData.content }}</span>
                                             </v-tooltip>
-                                            <div class="pa-0 grey--text mt-1 lighten-2 d-flex justify-space-between">
+                                            <div class="pa-0 grey--text lighten-2 d-flex justify-space-between">
                                             <div
                                                 class="fs-11  text-ellipsis"
                                                 style="width: 155px;"
@@ -198,8 +198,8 @@
                                                 <v-icon style="font-size:10px; color:green;padding-left:2px">mdi-circle</v-icon>
                                             {{obj.taskData.extraLabel}} {{obj.taskData.extraValue}}</div>
 
-                                            <div class="fs-11 py-0  text-ellipsis">
-                                                {{obj.endTime==null ? $moment(obj.startTime).format('DD/MM/YY HH:mm:ss'):$moment(obj.endTime).format('DD/MM/YY HH:mm:ss')}}
+                                            <div class="fs-11 py-0  text-ellipsis mr-2">
+                                                {{ $moment(obj.createTime).format('DD/MM/YY HH:mm:ss')}}
                                                 <v-icon class="grey--text lighten-2 ml-1" x-small>mdi-clock-time-nine-outline</v-icon>
                                             </div>
                                         </div>
@@ -246,13 +246,13 @@ export default {
                 return {}
             }
         },
-        selectAll:{
-            type:Boolean,
-            default:false
-        },
         sideBySideMode:{
             type:Boolean,
             default:false
+        },
+        countRecordSelected:{
+            type:Number,
+            default:0
         }
     },
     components: {
@@ -266,7 +266,7 @@ export default {
         nodeInfo(newVl) {
            this.getData();
         },
-        selectAll(newVl){
+        countRecordSelected(newVl){
             this.selectedAllTask(newVl);
         }
     },
@@ -360,10 +360,15 @@ export default {
 
         },
         selectedAllTask(value){
-            let allTask=this.listTaskApproval;
-            //let allTask=this.allTaskInNode;
-            for (var key in allTask) {
-                this.$set(this.listTaskApproval[key],'checked',value);
+             let allTask=this.listTaskApproval;
+            if (value==0) {
+                for (var key in allTask) {
+                    this.$set(this.listTaskApproval[key],'checked',false);
+                }
+            }else if(value==this.listTaskApproval.length){
+                for (var key in allTask) {
+                    this.$set(this.listTaskApproval[key],'checked',true);
+                }
             }
             this.$emit("changeValueCheckBox",this.listTaskApproval);
         },
@@ -392,7 +397,8 @@ export default {
 .approval-taskDetail >>>.detail-task .s-drawer{
     top:45px!important;
 }
-.approval-taskDetail >>>.detail-task .task-style .wrap-content-detail{
-    position: unset;
+
+.approval-taskDetail >>>.task-header{
+    line-height: 39px!important;
 }
 </style>

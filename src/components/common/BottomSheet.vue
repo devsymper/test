@@ -35,6 +35,9 @@ export default {
             if ( this.sheet == false) {
                 this.sheet = true;
             }
+        },
+        hide(){
+            this.sheet = false;
         }
     }
 }

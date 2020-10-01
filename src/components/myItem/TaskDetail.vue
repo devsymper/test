@@ -6,7 +6,7 @@
             class="mx-auto"
             width="100%" height="100%" 
         ></v-skeleton-loader>
-        <v-row class="ml-0 mr-0 justify-space-between" style="    line-height: 36px;">
+        <v-row class="ml-0 mr-0 justify-space-between task-header" style="    line-height: 36px;">
             <div class="fs-13 pl-2 pt-1 float-left">
                 {{taskBreadcrumb}}
             </div>
@@ -69,7 +69,7 @@
 
             </div>
         </v-row>
-        <v-divider style="border-color: #bebebe;"></v-divider>
+        <v-divider style="border-color: #dedede;"></v-divider>
         <v-row class="ma-0 detail-task">
             <!-- <VuePerfectScrollbar :style="{height: parentHeight +'px'}" > -->
                 <task 

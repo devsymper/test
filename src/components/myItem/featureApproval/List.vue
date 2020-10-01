@@ -17,7 +17,10 @@
                         style="flex:0!important"
                     >
                         <v-checkbox
-                            v-model="selectAll"
+                            @click="handleCheckAll"
+                            ref="checkBoxAll"
+                            :input-value="countRecordSelected == nodeSelected.number_of_task"
+                            :indeterminate="countRecordSelected > 0 && countRecordSelected < nodeSelected.number_of_task"
                             class="pa-0 ma-0 checkBox"
                         ></v-checkbox>
                     </v-col>
@@ -64,7 +67,7 @@
             <v-col
                 v-if="!sideBySideMode"
                 cols="3"
-                class="pt-0 pl-1 pr-0 pb-0 "
+                class="pa-0"
                 style="height: 100%;"
             >
                 <VuePerfectScrollbar
@@ -76,13 +79,13 @@
                         v-for="(obj, idx) in listNode"
                         :key="idx"
                         :class="{
-                            'mr-0 ml-0 single-row': true ,
+                            'mr-0 ml-0 py-2 single-row': true ,
                             'd-active':index==idx || selectObj==idx
                         }"
+
                         @mouseover="index=idx"
                         @mouseout="index = null"
                         @click="selectObject(obj, idx)"
-                        class="mt-1"
                     >
                         <div class="pl-2 w-100">
                             <div class="d-flex">
@@ -97,7 +100,7 @@
                                 <span style="margin-right:15px; padding-top:3px">{{obj.number_of_task}}</span>
                             </div>
                        
-                            <div class="pa-0 grey--text mt-1 lighten-2 d-flex justify-space-between">
+                            <div class="pa-0 grey--text  lighten-2 d-flex justify-space-between">
                                 <div class="fs-11 pr-6 text-ellipsis">
                                     {{obj.process_definition_name}}
                                 </div>
@@ -122,7 +125,7 @@
                 <detailNode 
                     :selectedNode="selectedNode"
                     :nodeInfo="listNode[selectedNode]"
-                    :selectAll="selectAll"
+                    :countRecordSelected="Number(countRecordSelected)"
                     :sideBySideMode="sideBySideMode"
                     @changeValueCheckBox="changeValueCheckBox"
                     @changeSideBySide="changeSideBySide"
@@ -146,7 +149,7 @@
         <BottomSheet :persistent="true" :isShadow="false" ref="bottomSheetView" class="h-100">
             <div slot="content" class="sheet-content d-flex">
                 <div class="count-selection" style="padding-top: 15px;">
-                    <span style="margin-left: 50px;">{{$t('document.instance.showlist.select')}} {{countRecordSelected}}/{{totalRecord}} {{$t('document.instance.showlist.record')}}</span>
+                    <span style="margin-left: 50px;">{{$t('document.instance.showlist.select')}} {{countRecordSelected}}/{{nodeSelected.number_of_task}} {{$t('document.instance.showlist.record')}}</span>
                 </div>
                 <div class="sheet-action">
                     <v-btn small depressed v-for="(action, idx) in taskActionBtns" dark :key="idx" :color="action.color" @click="saveTaskOutcome(action.value)" class="mr-2">
@@ -188,6 +191,24 @@ export default {
                 this.getData();
             }
         },
+        listNode: {
+            immediate: true,
+            deep: true,
+            handler(){
+                if(this.listNode[0]){
+                    this.selectObject(this.listNode[0],0);
+                }
+            }
+        },
+        countRecordSelected(vl){
+            if (vl==0) {
+                this.$refs.bottomSheetView.hide(); 
+            }else{
+                this.$refs.bottomSheetView.show(); 
+            }
+        }
+
+
     },
     computed:{
         stask() {
@@ -216,9 +237,19 @@ export default {
             listTaskChecked:[],
             action:"",
             isShowBottom:true,
+            nodeSelected:{},
         }
     },
     methods:{
+        handleCheckAll(){
+            if (this.countRecordSelected==this.nodeSelected.number_of_task) {
+                this.countRecordSelected=0;
+            }else{
+                this.countRecordSelected=this.nodeSelected.number_of_task;
+
+            }
+
+        },
         closeDetail(){
             this.sideBySideMode=false;
         },
@@ -235,6 +266,9 @@ export default {
             this.selectedNode=idx;
             this.selectObj=idx;
             this.totalRecord=obj.number_of_task;
+            this.nodeSelected=null;
+            this.nodeSelected=obj;
+            //this.nodeSelected=obj;
             this.taskActionBtns=[];
         },
         handleReachEndList(){},
@@ -379,7 +413,7 @@ export default {
         })
         .catch(err => {});
         self.reCalcListTaskHeight();
-        self.$refs.bottomSheetView.toggle();
+       // self.$refs.bottomSheetView.toggle();
     },
     activated(){
         this.selectAll=false;
