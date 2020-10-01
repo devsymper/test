@@ -210,14 +210,14 @@
 				<h4 class="mt-2">Phân quyền</h4>
 				<v-row  v-if="rolesOgchart" class="ml-1 fs-13" style="font-weight:430">Vị trí</v-row>
 				<v-row class="ml-3 fs-13" v-for="(rolesOg,index) in rolesOgchart" :key='index'>
-					{{rolesOg.name}} 
+					 <v-btn  text class=" fs-13" style="font-family:Roboto" @click="viewUserRole(rolesOg.id)">{{rolesOg.name}}</v-btn>
 				</v-row>
 				<v-row v-if="roles" class="fs-13 ml-1" style="font-weight:430">
 					<!-- @click="viewUserRole()" -->
 						Vai trò người dùng
 				</v-row>
 					<v-row class="ml-3 fs-13" v-for="(roles,indexRole) in roles" :key='indexRole'>
-					<v-btn style="font-weight:400; margin-bottom:-8px" class=" fs-13" text @click="viewUserRole(roles.id)" >{{roles.name}} </v-btn>
+					<v-btn style="font-weight:400; margin-bottom:-8px; font-family:Roboto" text @click="viewUserRole(roles.id)" >{{roles.name}} </v-btn>
 				</v-row>
 					</v-stepper-content>
 				<!-- user roles -->
@@ -252,7 +252,7 @@
 									1{{nameObj}}
 								</v-col>
 								<v-col v-for="(action2,actionIdx2) in action" >
-									<span v-if="nameObj.action==action2"><v-icon style="color:green">mdi mdi-check</v-icon></span>
+									<span ><v-icon style="color:green">mdi mdi-check</v-icon></span>
 								</v-col>
 							</v-row>
 						</v-col>
@@ -430,12 +430,15 @@ export default {
 			this.titleNameObject =[];
 			this.action=[];
 			this.nameObject =[];
+			let action = [];
 			this.menuTitle = object;
 			let listObject = Object.keys(this.listActionAndObj)
             for (let i = 0; i < listObject.length; i++){
                  if(listObject[i]==object){
 					 for(let j=0; j<this.listActionAndObj[object].length;j++){
-						 this.action.push(this.listActionAndObj[object][j].action);
+						 	action.push(this.listActionAndObj[object][j].action);
+						 debugger
+					
 						 this.nameObject.push({
 							 name:this.listActionAndObj[object][j].name,
 							 action: this.listActionAndObj[object][j].action,
@@ -443,6 +446,7 @@ export default {
 					 }
 				 }
 			};
+				 this.action= action.filter((item, index) => action.indexOf(item) === index);
 			this.getListObjectIdentifier(object);
 		},
 		getMenuTitle(object){
