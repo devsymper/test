@@ -129,18 +129,18 @@ export const deployProcessFromXML = function(xml, key = 14, name = 'test', tenan
 
 
 function moreInfoForInstanceVars() {
-    let rsl = [];
+    let rsl = [{
+        "name": 'symper_user_id_start_workflow',
+        "type": 'string',
+        "value": SYMPER_APP.$store.state.app.endUserInfo.id,
+        "valueUrl": "",
+        "scope": "global"
+    }];
     if (SYMPER_APP.$route.params.extraData && SYMPER_APP.$route.params.extraData.appId) {
         rsl.push({
             "name": 'symper_application_id',
             "type": 'string',
             "value": SYMPER_APP.$route.params.extraData.appId,
-            "valueUrl": "",
-            "scope": "global"
-        }, {
-            "name": 'symper_user_id_start_workflow',
-            "type": 'string',
-            "value": SYMPER_APP.$store.state.app.endUserInfo.id,
             "valueUrl": "",
             "scope": "global"
         });
