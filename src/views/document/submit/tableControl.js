@@ -98,6 +98,9 @@ export default class TableControl extends Control {
                 }
                 this.tableInstance.tableInstance.setDataAtRowProp(vls, null, null, 'auto_set');
             }
+            if (this.tableInstance.tableHasRowSum) { // trường hợp có dòng tính tổng thì thêm dòng ở cuối hiển thị tổng cột
+                this.tableInstance.tableInstance.alter('insert_row', Object.keys(data).length, 1);
+            }
             if (this.currentDataStore.docStatus == 'init') {
                 this.defaultValue = data;
                 this.getDefaultRowInTable();
