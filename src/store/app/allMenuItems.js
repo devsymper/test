@@ -63,28 +63,34 @@ export default {
             "action": "list"
         }
     },
-    lisTaskToDo: {
-        title: "Lists to do",
-        icon: "mdi-sticker-check-outline",
+    myItem: {
+        title: "myItem",
+        icon: "mdi-format-list-checkbox",
+        link: "/myitem",
         group: "My work",
-        children: {
-            // tasks: {
-            //     title: "tasks",
-            //     icon: "mdi-check-all",
-            //     link: "/tasks"
-            // },
-            // works: {
-            //     title: "works",
-            //     icon: "mdi-briefcase-check-outline",
-            //     link: "/works"
-            // },
-            myItem: {
-                title: "myItem",
-                icon: "mdi-format-list-checkbox",
-                link: "/myitem"
-            },
-        }
     },
+    // lisTaskToDo: {
+    //     title: "Lists to do",
+    //     icon: "mdi-sticker-check-outline",
+    //     group: "My work",
+    //     children: {
+    //         tasks: {
+    //             title: "tasks",
+    //             icon: "mdi-check-all",
+    //             link: "/tasks"
+    //         },
+    //         works: {
+    //             title: "works",
+    //             icon: "mdi-briefcase-check-outline",
+    //             link: "/works"
+    //         },
+    //         myItem: {
+    //             title: "myItem",
+    //             icon: "mdi-format-list-checkbox",
+    //             link: "/myitem"
+    //         },
+    //     }
+    // },
     timeTable: {
         icon: "mdi-calendar-month-outline",
         title: "myWork",

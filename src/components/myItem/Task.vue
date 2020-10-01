@@ -15,7 +15,7 @@
         </DocumentSubmit>
         <Detail 
             :showCommentInDoc="false"
-            v-else-if="(showDoTaskComponent && (action == 'approval')) || filter=='done'"
+            v-else-if="(showDetailDocument && showDoTaskComponent && (action == 'approval')) || filter=='done'"
             :docObjInfo="docObjInfo">
         </Detail>
         <div style="width:100%" v-else-if="filter=='done-noneObj'">
@@ -70,9 +70,9 @@
                         depressed
                         color="primary" 
                         small
-                        @click="updateDocumentData"
+                        @click="updateSubmitedDocument"
                         class="mr-2">
-                        Submit
+                        {{$t('tasks.header.submit')}}
                     </v-btn>
                     
                     <v-tooltip bottom>
@@ -90,7 +90,9 @@
                 </div>
             </div>
             <DocumentSubmit 
+                v-if="showUpdateSubmitedDocument"
                 class="bg-white"
+                ref="panelUpdateSubmitedDocument"
                 :docId="Number(docId)"
                 :workflowVariable="workflowVariable"
                 :showSubmitButton="false"
@@ -98,8 +100,9 @@
                 :documentObjectWorkflowId="workflowInfo.documentObjectWorkflowId"
                 :documentObjectWorkflowObjectId="workflowInfo.documentObjectWorkflowObjectId"
                 :action="'update'"
+                :editableControls="taskInfo.approvalEditableControls"
                 :documentObjectId="converstNumber(documentObjectId)"
-                @submit-document-success="onSubmitDone"/>
+                @submit-document-success="onDocumentUpdateSuccess"/>
         </v-dialog>
     </div>
 </template> 
@@ -146,7 +149,8 @@ export default {
             showDoTaskComponent: false,
             documentObjectId: 0,
             filter:'notDone',
-            showUpdateSubmitedDocument: false
+            showUpdateSubmitedDocument: false,
+            showDetailDocument: true,
         }
     },
     props: {
@@ -238,8 +242,15 @@ export default {
         }
     },
     methods: {
-        updateDocumentData(){
-
+        onDocumentUpdateSuccess(){
+            this.showDetailDocument = false;
+            setTimeout((self) => {
+                self.showDetailDocument = true;            
+            }, 50, this);
+            this.closeUpdatePanel();
+        },
+        updateSubmitedDocument(){
+            this.$refs.panelUpdateSubmitedDocument.handlerSubmitDocumentClick();
         },
         closeUpdatePanel(){
             this.showUpdateSubmitedDocument = false;

@@ -27,5 +27,13 @@ export const formulasApi = {
     },
     getRelated(data) {
         return api.post('formulas/query-related', data);
+    },
+    getDataByAllScriptType(formula, dataInput) {
+        return api.post('formulas/compileClient', {
+            formulas: formula,
+            variables: typeof dataInput == 'string' ? dataInput : JSON.stringify(dataInput)
+        }, {}, {
+            dataType: 'text'
+        });
     }
 };

@@ -57,8 +57,8 @@
           @ps-y-reach-end="handleReachEndList"
           :style="{height: listTaskHeight+'px'}"
         >
-         <div
-                v-for="(obj, idex) in groupAllProcessInstance"
+            <div
+                v-for="(workGroup, idex) in groupAllProcessInstance"
                 :key="idex"
             >
                 <v-row
@@ -71,17 +71,17 @@
                     }"
                     style="border-bottom: 1px solid #eeeeee!important;"
                 >
-                   <span style="color:#FF8003; font-size:13px;margin-left:16px;margin-top:6px">{{ showTime(obj.date)}}</span>
+                   <span style="color:#FF8003; font-size:13px;margin-left:16px;margin-top:6px">{{ showTime(workGroup.date)}}</span>
                 </v-row>
                 <v-row
-                    v-for="(obj, idx) in obj.works"
+                    v-for="(obj, idx) in workGroup.works"
                     :key="idx"
                     :index="obj.id"
                     :class="{
-                                    'mr-0 ml-0 single-row': true ,
-                                    'py-0': isSmallRow,
-                                    'd-active':index==idx && dataIndex==idex
-                                }"
+                        'mr-0 ml-0 single-row': true ,
+                        'py-0': isSmallRow,
+                        'd-active':index==idx && dataIndex==idex
+                    }"
                     :style="{
                         minHeight: '50px'
                     }"
@@ -114,9 +114,9 @@
                         cols="2"
                         class="fs-12 px-1 py-0"
                     >
-                        <symperAvatar :size="20"  />
-                        {{obj.startUserId}}
-                    </v-col>
+                        <symperAvatar :size="20"  :userId="obj.startUserId" />
+                        <span class="ml-1">{{obj.startUserName}}</span>
+                    </v-col> 
                     <v-col
                         v-if="!sideBySideMode"
                         style="line-height: 42px"
@@ -216,16 +216,28 @@ export default {
         return this.$store.state.comment.commentCountPerObj.list;
     },
     groupAllProcessInstance() {
+        let allUserById = this.$store.getters['app/mapIdToUser'];
         let allPrcess = this.listProrcessInstances;
         const groups = allPrcess.reduce((groups, work) => {
             let date;
+            work.startUserId = 0;
+            work.startUserName = '';
+
+
+            for(let vari of work.variables){
+                if(vari.name == 'symper_user_id_start_workflow'){
+                    work.startUserId = vari.value;
+                    work.startUserName = allUserById[work.startUserId] ? allUserById[work.startUserId].displayName : '';
+                    break;
+                }
+            }
             if ( work.startTime) {
                 date = work.startTime.split("T")[0];
             }else{
                 date = work.endTime.split("T")[0];
             }
             if (!groups[date]) {
-            groups[date] = [];
+                groups[date] = [];
             }
             groups[date].push(work);
             return groups;
