@@ -1605,9 +1605,8 @@ export default {
             }
             if(this.appId){
                 dataPost['appId'] = this.appId;
-            }
-            else{
-                if(this.$route.params.extraData.appId){
+            } else {
+                if(this.$route.params.extraData && this.$route.params.extraData.appId){
                     dataPost['appId'] = this.$route.params.extraData.appId
                 }
             }
