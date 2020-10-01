@@ -5,6 +5,7 @@ import {
 
 let orgchart = new Api(appConfigs.apiDomain.orgchart);
 let coreApi = new Api(appConfigs.apiDomain.core);
+let accessControlApi = new Api(appConfigs.apiDomain.permission);
 import Vue from "vue";
 
 
@@ -73,5 +74,11 @@ export const orgchartApi = {
     },
     queryOrgchart(data) {
         return orgchart.post("orgchart/query", data);
+    },
+    updatePermissionInRole(data){
+        return accessControlApi.post(
+            "roles/set-permissions",
+            data
+        )
     }
 };
