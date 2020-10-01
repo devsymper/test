@@ -487,6 +487,8 @@ export default {
             }
             if(subItem == true){   
                 this.selectingItem = parent
+            }else{
+                this.selectingItem = {}
             }
            
         },
