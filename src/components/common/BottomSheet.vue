@@ -26,6 +26,9 @@ export default {
      
         toggle(){
             this.sheet = !this.sheet
+        },
+        show(){
+            this.sheet = true;
         }
     }
 }

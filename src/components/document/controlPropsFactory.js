@@ -5,14 +5,18 @@ import {
 // đầu ra: tất cả các thuộc tính của control đó
 const commonProps = {
     dataFlowId: {
-        title: "dataflow id",
+        title: "Dataflow",
         type: "autocomplete",
         groupType: "name",
-        // items: function() {
-        //     debugger
-        //     return [];
-        // },
         options: [],
+        properties: {
+            dense: true,
+            solo: true,
+            'hide-details': true,
+            flat: true,
+        },
+        isSelectionChip: false,
+        value: {}
     },
     name: {
         title: "Tên",
@@ -690,7 +694,7 @@ const controlTypes = {
                     </div>
                 </div>&nbsp;`,
         title: "Data Flow",
-        inProps: ['dataFlowId', 'mapParamsDataflow', 'name', 'title', 'width', 'height', 'isAllowPrint'],
+        inProps: ['mapParamsDataflow', 'name', 'title', 'dataFlowId', 'width', 'height', 'isAllowPrint'],
         formulas: []
     },
     approvalHistory: {

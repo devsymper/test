@@ -1,6 +1,6 @@
 <template>
     <div class="wraper-comment" :style="style">
-        <div class="comment-content " style="height:100%">
+        <div class="comment-content " style="height:97%">
 			<Comment style="margin-left:-12px;margin-right:8px" 
 				:showComment="true" 
 				:objectIdentifier="objectIdentifierCmt" 

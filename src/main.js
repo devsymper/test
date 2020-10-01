@@ -30,7 +30,7 @@ Vue.component('ba-view', BaView);
 Vue.component('end-user-view', EndUserView);
 Vue.component('content-only-view', ContentOnlyView);
 Vue.use(VueRx)
-
+Vue.use(uploader)
 Vue.mixin({
     methods: {
         $bindAction(actionDef, param = {}) {

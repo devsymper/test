@@ -2,6 +2,7 @@
     <div class="wraper-tracking" :class="{'d-none':stask.statusPopupTracking==false}" >
         <div class="tracking-process" style="height:100%" v-if="showType=='work'">
             <trackingProcessInstance
+                :needFocus="false"
                 v-if="workInfo.id"
 				:instanceId="workInfo.id"
 				:definitionName="definitionName"
@@ -10,6 +11,7 @@
         </div>
 		<div class="tracking-process" style="height:100%" v-else-if="showType==''">
             <trackingProcessInstance
+                :needFocus="false"
                 v-if="taskInfo.action.parameter.processInstanceId"
                 :instanceId="taskInfo.action.parameter.processInstanceId"
                 :elementId="taskInfo.action.parameter.activityId"

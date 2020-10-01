@@ -58,8 +58,8 @@
                 </span>
             </v-tooltip>
         </div>
-<!--         
-        <v-list dense  >
+        
+        <v-list dense>
             <v-list-item-group class="mt-1">
                 <v-list-item
                     v-for="(item, i) in filterLazyValue"
@@ -83,7 +83,7 @@
                     </v-btn>
                 </v-list-item>
             </v-list-item-group>
-        </v-list> -->
+        </v-list>
     </div>
 </template>
 
@@ -166,6 +166,9 @@ export default {
             deep: true,
             immediate: true,
             handler: function(after){
+                // debugger
+                 this.lazyValue = []
+                 this.selectedPermission = []
                 this.lazyValue = after;
                 this.selectedPermission = after;
             }
