@@ -32,7 +32,9 @@ export const userApi = {
     addUser(data) {
         return api.post('users', data);
     },
-
+    changeUserProfile(data) {
+        return api.put('user/profile', data)
+    },
     updateUser(id, data) {
         return api.put('users/' + id, data);
     },

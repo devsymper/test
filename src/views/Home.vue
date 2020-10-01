@@ -73,16 +73,14 @@ export default {
             }
         },
         setDetailInfo(){
-            debugger
             this.detailInfoUser.lastName =this.sapp.endUserInfo.lastName;
-            this.detailInfoUser.displayName =this.sapp.endUserInfo.lastName;
+            this.detailInfoUser.displayName =this.sapp.endUserInfo.displayName;
 			this.detailInfoUser.firstName =this.sapp.endUserInfo.firstName;
 			this.detailInfoUser.email =this.sapp.endUserInfo.email;
 			this.detailInfoUser.phone =this.sapp.endUserInfo.phone;
 			this.detailInfoUser.status =this.sapp.endUserInfo.status;
             this.detailInfoUser.avatarUrl =this.sapp.endUserInfo.avatar;
             this.detailInfoUser.id = this.sapp.endUserInfo.id
-            debugger
             
 		},
         getUserInfo(){
@@ -104,12 +102,9 @@ export default {
     },
     watch:{
         showUserInfo(){
-            debugger
             this.setDetailInfo();
-            let b = this.showUserInfo;
             if(this.showUserInfo==false){
-                debugger
-                   this.$store.commit('user/setShowUser', false);
+                this.$store.commit('user/setShowUser', false);
             }
         }
     },

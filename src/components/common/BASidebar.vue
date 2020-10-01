@@ -392,9 +392,12 @@ export default {
     methods: {
         // thêm nhóm cho Menu
         showChangeInfoUser(){
-            debugger
-            this.$store.commit('user/setShowUser', !this.showUserInfo);
-            this.$router.push("/");
+            if(this.sapp.baInfo.id==0){
+                debugger
+                 this.$store.commit('user/setShowUser', !this.showUserInfo);
+                this.$router.push("/");
+            }
+           
         },
         addGroupInMenu(){
              this.menu = this.userMenuItems;

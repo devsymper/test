@@ -1,10 +1,9 @@
 <template>
-	<div class="h-100">
-		<div class="h-100" >
-			<div class="h-100">
-				<v-stepper class="d-flex stepper-create-user">
-				<v-stepper-items class="stepper-items" v-if="isViewUserRole==false">
-					<v-stepper-content step="1">
+	<div class="h-100 w-100">
+		<div class="h-100 w-100" >
+			<div class="h-100 w-100">
+				<v-stepper class="w-100 d-flex stepper-create-user">
+					<v-stepper-content class="w-100" step="1"  v-if="isViewUserRole==false">
 					<h4>{{ $t('user.general.personalInfo.title')}}</h4>
 					<v-row class="mt-1" >
 						<!-- thong tin -->
@@ -29,7 +28,8 @@
 								</v-col>
 								<v-col  cols="6">
 									<span v-if="!checkChangeLastName" class="fs-13 st-icon-pandora">
-											{{detailInfo.lastName}} <span v-if="changeDetail"><v-icon @click="checkChangeLastName=true" style="font-size: 14px">mdi mdi-pencil</v-icon></span>
+											{{detailUser.lastName}} <span v-if="changeDetail">
+												<v-icon @click="checkChangeLastName=true" style="font-size: 14px">mdi mdi-pencil</v-icon></span>
 									</span>
 									<span v-else class="fs-13 st-icon-pandora">
 									<v-text-field
@@ -42,6 +42,7 @@
 							
 								</v-col>
 							</v-row>
+							<!-- Endusser đổi thông tin cá nhân  -->
 							<v-row  v-if="changeDetail">
 								<v-col cols="6">
 									<span style="font-weight:430" class="fs-13 st-icon-pandora">
@@ -49,10 +50,18 @@
 									</span>
 								</v-col>
 								<v-col  cols="6">
-									<span  class="fs-13 st-icon-pandora">
-												{{detailInfo.firstName}} <span v-if="changeDetail"><v-icon style="font-size: 14px" @click="changeFirstName()">mdi mdi-pencil</v-icon></span>
+									<span v-if="!checkChangeFirstName" class="fs-13 st-icon-pandora">
+										{{detailUser.firstName}} <span v-if="changeDetail">
+											<v-icon style="font-size: 14px" @click="checkChangeFirstName=true">mdi mdi-pencil</v-icon></span>
 									</span>
-							
+									<span v-else class="fs-13 st-icon-pandora">
+									<v-text-field
+											class="fs-13 font-normal"
+											v-model="firstName"
+											dense
+									></v-text-field>
+									<v-icon @click="changeFirstName()" style="color:green; font-size: 14px">mdi mdi-check</v-icon>
+									</span>
 								</v-col>
 						</v-row>
 							<v-row>
@@ -62,8 +71,18 @@
 									</span>
 								</v-col>
 								<v-col  cols="6">
-									<span  class="fs-13 st-icon-pandora">
-											{{detailInfo.displayName}} <span v-if="changeDetail"><v-icon style="font-size: 14px" @click="changeDisplayName()">mdi mdi-pencil</v-icon></span>
+									<span  v-if="!checkChangeDisplayName" class="fs-13 st-icon-pandora">
+											{{detailUser.displayName}} <span v-if="changeDetail">
+												<v-icon style="font-size: 14px" @click="checkChangeDisplayName=true">mdi mdi-pencil</v-icon>
+									</span>
+									</span>
+									<span v-else class="fs-13 st-icon-pandora">
+									<v-text-field
+											class="fs-13 font-normal"
+											v-model="displayName"
+											dense
+									></v-text-field>
+									<v-icon @click="changeDisplayName()" style="color:green; font-size: 14px">mdi mdi-check</v-icon>
 									</span>
 								</v-col>
 							</v-row>
@@ -75,21 +94,30 @@
 								</v-col>
 								<v-col  cols="6">
 									<span  class="fs-13 st-icon-pandora">
-												{{detailInfo.email}} 
+												{{detailUser.email}} 
 									</span>
+						
 								</v-col>
 							</v-row>
 							<v-row>
 								<v-col cols="6">
-									<span style="font-weight:430" class="fs-13 st-icon-pandora">
+									<span  style="font-weight:430" class="fs-13 st-icon-pandora">
 										{{ $t('user.general.personalInfo.phoneNumber')}}
 									</span>
 								</v-col>
 							
 								<v-col cols="6">
-                                    <span class="fs-13">
-									    {{detailInfo.phone}} <span v-if="changeDetail"><v-icon style="font-size: 14px" @click="changePhone()">mdi mdi-pencil</v-icon></span>
+                                    <span  v-if="!checkPhone" class="fs-13">
+									    {{detailUser.phone}} <span v-if="changeDetail"><v-icon style="font-size: 14px" @click="checkPhone=true">mdi mdi-pencil</v-icon></span>
                                     </span>
+										<span v-else class="fs-13 st-icon-pandora">
+									<v-text-field
+											class="fs-13 font-normal"
+											v-model="phone"
+											dense
+									></v-text-field>
+									<v-icon @click="changePhone()" style="color:green; font-size: 14px">mdi mdi-check</v-icon>
+									</span>
 								</v-col>
 						    </v-row>
                             <v-row>
@@ -99,9 +127,12 @@
 									</span>
 								</v-col>
 								<v-col cols="6">
-                                    <span class="fs-13">
-									    {{detailInfo.status==1?'Hoạt động':"Khóa"}}
+                                    <span style="color:green" v-if="detailUser.status==1" class="fs-13">
+									    Hoạt động
                                     </span>
+									<span style="color:orange" class="fs-13" v-else>
+										Khóa
+									</span>
 								</v-col>
 								
 						    </v-row>
@@ -113,33 +144,66 @@
 								</v-col>
 								<v-col  cols="6">
 									<span  class="fs-13 st-icon-pandora">
-										<span v-if="changeDetail"><v-icon @click="changePass()" style="font-size: 14px">mdi mdi-pencil</v-icon></span>
+										<span v-if="changeDetail"><v-icon @click="checkPass=true" style="font-size: 14px">mdi mdi-pencil</v-icon></span>
 									</span>
 							
 								</v-col>
 							</v-row>
+							<v-row  v-if="changeDetail&&checkPass">
+								<v-col  cols="12">
+									<span  class="fs-12 st-icon-pandora" style="color:grey">
+										Mật khẩu ít nhất 8 kí tự, 1 chữ viết hoa, 1 số và 1 ký tự thường
+									</span>
+								</v-col>
+							</v-row>
+							 <v-row v-if="checkPass" class="mt-1">
+								 	<v-col cols="10">
+							<v-text-field class="fs-13 ml-3"
+								 v-model="newPassword" 
+								ref="newPass" dense
+								placeholder="Mật khẩu cũ"
+								outlined
+								prepend-inner-icon="mdi-lock-outline"
+								:rules="[rules.required, rules.min, rules.max]" 
+								:type="showPass ? 'text' : 'password'" 
+								@click:prepend-inner="showPass = !showPass">
+							</v-text-field>
+							</v-col>
+						</v-row>
+						<v-row v-if="checkPass" style="margin-top:-10px" >
+							<v-col cols="10">
+							  <v-text-field
+									class="fs-13 ml-3" 
+									prepend-inner-icon="mdi-lock-open-outline"
+									v-model="reNewPassword" 
+									ref="reNewPass" 
+									dense 
+									placeholder="Mật khẩu mới"
+									outlined
+									:rules="[rules.required, rules.min, rules.max, rules.match]" 
+									:type="showPass ? 'text' : 'password'"
+									@click:prepend-inner="showPass = !showPass">
+							</v-text-field>
+							</v-col>
+								<v-col cols="2">
+								<v-icon @click="changePass()" style="color:green; font-size: 14px">mdi mdi-check</v-icon>
+								</v-col>
+						</v-row>
+						
 						</v-col>
 						<!-- kt thong tin -->
 						<!-- ảnh -->
 						<v-col cols="4">
 								<v-col cols="3" class="text-center ">
-								<v-avatar :size="80" >
-									<img v-if="detailInfo.avatarUrl != ''"
-										:src="detailInfo.avatarUrl+detailInfo.id"
-									>
-									<img v-if="detailInfo.avatarUrl== ''"
-										:src="require('./../../assets/image/avatar_default.jpg')"
-									>
-								</v-avatar>
+								<SymperAvatar :userId="sapp.endUserInfo.id" style="height: 135px; min-width: 135px; width: 135px;"/>
 								<UploadFile 
 									style="margin-top:-30px; margin-left:50px"
-									ref="uploadAvatar"
 									:autoUpload="false"
-									:fileName="detailInfo.avatarFileName"
+									:fileName="detailUser.avatarFileName"
 								 />
 									
 							</v-col>
-							<span class="fs-13 ml-7">ID: {{detailInfo.id}}</span>
+							<span style="border:1px solid lightgrey" class="fs-13 ml-15">ID: {{detailUser.id}}</span>
 						</v-col>	
 						<!-- ket thuc anh -->
 					</v-row>
@@ -156,7 +220,6 @@
 					<v-btn style="font-weight:400; margin-bottom:-8px" class=" fs-13" text @click="viewUserRole(roles.id)" >{{roles.name}} </v-btn>
 				</v-row>
 					</v-stepper-content>
-				</v-stepper-items>
 				<!-- user roles -->
 					<div class="w-100 ml-3" v-if="isViewUserRole">
 					
@@ -203,6 +266,7 @@
 	
 </template>
 <script>
+import SymperAvatar from "../../components/common/SymperAvatar";
 import ChangePassword from "./../../views/users/ChangePass.vue";
 import { userApi } from "./../../api/user.js";
 import { permissionPackageApi } from "./../../api/PermissionPackage.js";
@@ -221,7 +285,7 @@ export default {
 	components:{
 		"vue-resizable":VueResizable,
         "v-change-password":ChangePassword,
-        UploadFile
+        UploadFile,SymperAvatar
 	},
 	props:
         ['detailInfo','changeDetail'],
@@ -252,13 +316,16 @@ export default {
            
 		},
 		changeLastName(){
+			debugger
+			const self = this;
 			this.checkChangeLastName = false;
 			let data = {
-				id:this.detailInfo.id,
 				lastName:this.lastName,
 			}
-			userApi.updateUser(this.detailInfo.id, data).then(res => {
+			userApi.changeUserProfile(data).then(res => {
 				if (res.status == 200) {
+					debugger
+					self.detailUser.lastName =res.user.lastName;
 					this.$snotify({
 					type: "success",
 					title: this.$t("notification.successTitle")});
@@ -270,14 +337,14 @@ export default {
 					type: "error",
 					title: this.$t("notification.error")});})
 		},
-			changeFirstName(){
+		changeFirstName(){
 			this.checkChangeFirstName = false;
 			let data = {
-				id:this.detailInfo.id,
 				firstName:this.firstName,
 			}
-			userApi.updateUser(this.detailInfo.id, data).then(res => {
+			userApi.changeUserProfile(data).then(res => {
 				if (res.status == 200) {
+					this.detailUser.firstName =res.user.firstName;
 					this.$snotify({
 					type: "success",
 					title: this.$t("notification.successTitle")});
@@ -292,11 +359,11 @@ export default {
 		changeDisplayName(){
 			this.checkChangeDisplayName = false;
 			let data = {
-				id:this.detailInfo.id,
 				displayName:this.displayName,
 			}
-			userApi.updateUser(this.detailInfo.id, data).then(res => {
+			userApi.changeUserProfile( data).then(res => {
 				if (res.status == 200) {
+					this.detailUser.displayName =res.user.displayName;
 					this.$snotify({
 					type: "success",
 					title: this.$t("notification.successTitle")});
@@ -311,11 +378,11 @@ export default {
 		changePhone(){
 			this.checkPhone = false;
 			let data = {
-				id:this.detailInfo.id,
 				phone:this.phone,
 			}
-			userApi.updateUser(this.detailInfo.id, data).then(res => {
+			userApi.changeUserProfile(data).then(res => {
 				if (res.status == 200) {
+					this.detailUser.phone =res.user.phone;
 					this.$snotify({
 					type: "success",
 					title: this.$t("notification.successTitle")});
@@ -327,25 +394,28 @@ export default {
 					type: "error",
 					title: this.$t("notification.error")});})
 		},
-		changePass(){
+		 changePass(){
 			this.checkPass = false;
-			let data = {
-				id:this.detailInfo.id,
-				password:this.password,
-			}
-			userApi.updateUser(this.detailInfo.id, data).then(res => {
-				if (res.status == 200) {
-					this.$snotify({
-					type: "success",
-					title: this.$t("notification.successTitle")});
-				}
-			})
-			.catch(err => {
-				console.log("error from add user api!!!", err);
-				this.$snotify({
-					type: "error",
-					title: this.$t("notification.error")});})
-		},
+			let pass=this.newPassword;
+            userApi.changePassUser(pass).then(res => {
+                if (res.status == 200) {
+                    this.$snotify({
+                        type: "success",
+                        title: this.$t("notification.successTitle")
+                    });
+                    this.$emit('cancel');
+                } else {
+                    this.$snotify({
+                        type: "error",
+                        title: res.message
+                    });
+                }
+            })
+            .catch(err => {
+                console.log("error from change pass user api!!!", err);
+            })
+        },
+		
 		getNameByAction(action){
 
 
@@ -389,13 +459,15 @@ export default {
           
     },
     created(){
-		
+			this.detailUser = this.detailInfo;
+			debugger
 		 this.getRoleOrgchartByUser(this.detailInfo.id);
 		 this.getRolesByUser(this.detailInfo.id);
 
     },
     watch:{
         detailInfo(){
+		
 			this.getRoleOrgchartByUser(this.detailInfo.id);
 			 this.getRolesByUser(this.detailInfo.id);
 			 
@@ -405,6 +477,15 @@ export default {
     },
 	data(){
 		return {
+			detailUser:'',
+			newPassword:'',
+			reNewPassword: "",
+			 showPass: false,
+			 rules: {
+                required: value => !!value || 'Không được bỏ trống.',
+                min: v => (typeof v != 'undefined' && v != undefined && v.length >= 8) || 'Yêu cầu mật khẩu lớn hơn 8 kí tự',
+                max: v => (typeof v != 'undefined' && v != undefined && v.length < 25) || 'Yêu cầu mật khẩu ít hơn 24 kí tự',
+            },
 			checkChangeLastName:false,
 			lastName:'',
 			checkPass:false,
