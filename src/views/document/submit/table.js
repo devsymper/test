@@ -128,7 +128,9 @@ Handsontable.renderers.FileRenderer = function(instance, td, row, col, prop, val
     Handsontable.renderers.TextRenderer.apply(this, arguments);
     let table = store.state.document.submit[instance.keyInstance];
     if (table && instance.tableName) {
-        td.innerHTML = table.listInputInDocument[prop].genFileView(row);
+        let btnAdd = table.listInputInDocument[prop].genFileView(row);
+        console.log("adadsadsa", btnAdd);
+        td.innerHTML = btnAdd;
         td.classList.add("upload-file-wrapper-inTb");
         $(td).off('click', '.file-add');
         if (sDocument.state.viewType[instance.keyInstance] != 'detail') {
@@ -994,28 +996,17 @@ export default class Table {
                     $(this.rootElement).css('height', MAX_TABLE_HEIGHT);
                 }
                 if (!this.reRendered) {
-                    setTimeout((hotTb) => {
-                        let curTableLoaded = sDocument.state.submit[thisObj.keyInstance].tableLoaded;
-                        curTableLoaded[thisObj.tableName] = true;
-                        store.commit("document/addToDocumentSubmitStore", {
-                            key: 'tableLoaded',
-                            value: curTableLoaded,
-                            instance: thisObj.keyInstance
-                        });
-                    }, 500, this);
-                }
-                if (!this.reRendered && thisObj.tableHasRowSum) {
                     this.reRendered = true;
                     setTimeout((hotTb) => {
-                        thisObj.setDataForSumRow();
-                        for (let index = 0; index < hotTb.getDataAtRow(0).length; index++) {
-                            hotTb.setCellMeta(hotTb.countRows() - 1, index, 'readOnly', true);
+                        if (thisObj.tableHasRowSum) {
+                            thisObj.setDataForSumRow();
+                            for (let index = 0; index < hotTb.getDataAtRow(0).length; index++) {
+                                hotTb.setCellMeta(hotTb.countRows() - 1, index, 'readOnly', true);
+                            }
                         }
                         hotTb.render();
                     }, 500, this);
                 }
-
-
             },
 
             /**

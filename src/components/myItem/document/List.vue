@@ -222,30 +222,40 @@ export default {
         let listObjRelated=this.stask.listDocumentObjId;
         let listObjUserSubmit=this.stask.listDocumentObjIdWithUserSubmit;
         let arrDocument=listObjRelated.concat(listObjUserSubmit);
-        arrDocument.sort(function(a, b) {
+        let mapIdToDocObj = {};
+        let rsl = [];
+
+        
+        arrDocument.forEach(element => {
+            if(!mapIdToDocObj[element.id]){
+                mapIdToDocObj[element.id] = true;
+                if (element.userCreate && element.userCreate!= null) {
+                    let arrUser = this.sapp.allUsers;
+                    let user = arrUser.find(data => data.email === element.userCreate);
+                    if (user) {
+                    element.displayName=user.displayName;
+                    element.userId=user.id;
+                    } else {
+                        element.displayName="";
+                    }
+                
+                }else{
+                    element.displayName="";
+                }
+                rsl.push(element);
+            }
+        });
+
+        
+        rsl.sort(function(a, b) {
             var keyA = new Date(a.createAt),
             keyB = new Date(b.createAt);
             if (keyA > keyB) return -1;
             if (keyA < keyB) return 1;
             return 0;
         });
-        arrDocument.forEach(element => {
-            if (element.userCreate && element.userCreate!= null) {
-                let arrUser = this.sapp.allUsers;
-                let user = arrUser.find(data => data.email === element.userCreate);
-                if (user) {
-                   element.displayName=user.displayName;
-                   element.userId=user.id;
-                } else {
-                    element.displayName="";
-                }
-              
-            }else{
-                element.displayName="";
-            }
-        });
 
-        return arrDocument;
+        return rsl;
     },
     stask() {
       return this.$store.state.task;

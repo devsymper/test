@@ -116,6 +116,9 @@ const updateListChildrenNode = (state , params) =>{
 const emptyListChildrenNode = (state,param) =>{
 	state.listChildrenOfNode[param] = []
 }
+const updatePermissionsSelectingNode = (state, params) =>{
+	Vue.set(state.editor[params.instanceKey].selectingNode, 'permissions', params.data )
+}
 export {
 	setOrgchartData,
 	setNodeConfig,
@@ -133,5 +136,6 @@ export {
 	setAllUserInOrgchart,
 	setDataOrgchartSideBySide,
 	updateListChildrenNode,
-	emptyListChildrenNode
+	emptyListChildrenNode,
+	updatePermissionsSelectingNode
 };

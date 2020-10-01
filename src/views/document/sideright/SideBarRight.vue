@@ -76,7 +76,7 @@
             </VuePerfectScrollbar>
         </v-tab-item>
         <v-tab-item
-            class="p-2 h-100 formulas-control-tab"
+            class="h-100 formulas-control-tab"
         >
         <VuePerfectScrollbar style="height:calc(100vh - 90px);">
             <control-props-config 
@@ -189,6 +189,10 @@ export default {
                 input.value = data
                 this.handleValidateControl(name, input, data);
             }
+            else if(name == 'dataFlowId'){
+                input.value = {id:input.value}
+                this.handleValidateControl(name, input, data);
+            }
         },
         handleValidateControl(name, input, data){
             let value = input.value
@@ -237,5 +241,11 @@ export default {
     }
     .sym-v-expand-content{
         padding-left: 8px;
+    }
+    .formulas-control-tab ::v-deep .symper-form-input{
+        margin-right: 10px;
+    }
+    .formulas-control-tab{
+        padding: 0.5rem 0 0.5rem 0.5rem !important;
     }
 </style>

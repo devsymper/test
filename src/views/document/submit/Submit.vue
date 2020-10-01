@@ -236,6 +236,13 @@ export default {
             type: String,
             default: ''
         },
+        /**
+         * Biến chỉ ra bản ghi nằm trong app nào
+         */
+        appId:{
+            type:Number,
+            default:0
+        },
         
         workflowVariable:{
             type:Object,
@@ -1280,7 +1287,6 @@ export default {
                                 field,
                                 thisCpn.keyInstance
                             );
-                            this.addToTableLoadedStore(controlName)
                             tableControl.initTableControl();
                             tableControl.setEffectedData(prepareData);
                             tableControl.tableInstance = new Table(
@@ -1378,16 +1384,6 @@ export default {
         },
 
 
-        addToTableLoadedStore(controlName){
-            let curTableLoaded = this.sDocumentSubmit.tableLoaded;
-            curTableLoaded[controlName] = false;
-            console.log('curTableLoaded',controlName,curTableLoaded);
-            this.$store.commit("document/addToDocumentSubmitStore", {
-                key: 'tableLoaded',
-                value: curTableLoaded,
-                instance: this.keyInstance
-            });
-        },
         /**
          * Sự kiện phát ra khi click vào date của date picker
          */
@@ -1606,6 +1602,9 @@ export default {
                 let res = await this.titleObjectFormulas.handleBeforeRunFormulas(dataInputTitle);
                 let value = this.getValueFromDataResponse(res);
                 dataPost['titleObject'] = value
+            }
+            if(this.appId){
+                dataPost['appId'] = this.appId
             }
             documentApi.submitDocument(dataPost).then(res => {
                 let dataResponSubmit = res.data;

@@ -599,7 +599,7 @@
         },
         "icon": {
             "document_instance": "mdi mdi-file-document-outline",
-            "user": "mdi-account-multiple-outline",
+            "account": "mdi-account-multiple-outline",
             "Tất cả": "mdi-all-inclusive",
             "document_definition": "mdi mdi-file-outline",
             "workflow_definition": "mdi mdi-lan",
