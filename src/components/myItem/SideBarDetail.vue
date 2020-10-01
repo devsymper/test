@@ -39,7 +39,7 @@
 									<td>{{$t('document.detail.sidebar.body.general.comment')}}</td>
 									<td style="text-decoration: underline;cursor:pointer;color:#F1853B;" @click="showComment">
 										{{$t('document.detail.sidebar.body.general.has')}} 
-										<!-- {{countCommentNotResolve}}  -->
+										{{countCommentNotResolve}} 
 										{{$t('document.detail.sidebar.body.general.commentNotResolve')}}
 									</td>
 								</tr>
@@ -436,6 +436,9 @@ export default {
 		
 	},
 	computed:{
+		countCommentNotResolve(){
+			return this.$store.state.comment.listComment.length
+		},
 		sapp(){
             return this.$store.state.app;
         },

@@ -571,3 +571,17 @@
 .checkBoxTask .v-input__control .v-input__slot{
     margin-top: 8px!important;
 }
+.checkBox .v-input__control .v-input__slot .v-input--selection-controls__input i{
+    font-size: 18px;
+}
+.v-input--selection-controls__ripple {
+    border-radius: 50%;
+    cursor: pointer;
+    height: 25px;
+    position: absolute;
+    transition: inherit;
+    width: 25px;
+    left: -8px;
+    top: calc(50% - 20px);
+    margin: 7px;
+}

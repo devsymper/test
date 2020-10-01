@@ -894,7 +894,11 @@
             "showMoreTask": "Show more task related",
             "showLess": "Show less task related",
             "showMoreFile": "Show more file"
+        },
+        "alert":{
+            "title_aproval":"Action work"
         }
+
     },
     "tasks": {
         "error": {

@@ -2,51 +2,65 @@
     <div class="list-objects w-100" style="height: calc(100vh - 135px);">
         <v-row style="border-bottom: 1px solid #dedede;margin:0px">
             <v-col
+                v-if="!sideBySideMode"
                 cols="3"
                 class="fs-13 pt-3 pl-3 font-weight-medium"
                 style="padding:0px"
             >{{$t("tasks.header.groupApproval")}}</v-col>
-            <v-col cols="9" style="padding:0px">
-                <v-row style="margin:0px">
+            <v-col 
+                :cols="!sideBySideMode ? 9 : 12"
+                style="padding:0px">
+                <v-row style="margin:0px;position: relative;" >
                     <v-col
-                        cols="1"
-                        class="fs-13 font-weight-medium"
+                        :cols="!sideBySideMode ? 1 : 1"
+                        class="fs-13 pl-1 pr-0 font-weight-medium"
+                        style="flex:0!important"
                     >
                         <v-checkbox
-                            v-model="selectedItem"
-                            value=""
+                            v-model="selectAll"
                             class="pa-0 ma-0 checkBox"
                         ></v-checkbox>
                     </v-col>
                     <v-col
-                        cols="2"
-                        class="fs-13 font-weight-medium"
+                        :cols="!sideBySideMode ? 2 : 2"
+                        class="fs-13 pl-0 font-weight-medium"
                     >{{$t("tasks.header.name")}}</v-col>
                     <v-col
                         cols="2"
+                        v-if="!sideBySideMode"
                         class="fs-13 font-weight-medium"
                     >{{$t("tasks.header.assignee")}}</v-col>
                     <v-col
+                        v-if="!sideBySideMode"
                         cols="2"
                         class="fs-13 font-weight-medium"
                     >{{$t("tasks.header.owner")}}</v-col>
                     <v-col
+                        v-if="!sideBySideMode"
                         cols="2"
                         class="fs-13 font-weight-medium"
                     >{{$t("tasks.header.dueDate")}}</v-col>
                     <v-col
+                        v-if="!sideBySideMode"
                         cols="2"
                         class="fs-13 font-weight-medium"
                     >{{$t("tasks.header.app")}}</v-col>
                     <v-col
+                        v-if="!sideBySideMode"
                         cols="1"
                         class="fs-13 font-weight-medium"
                     >{{$t("common.add")}}</v-col>
+                    
+                    <v-btn style="position: absolute;right: 20px;top: 10px;" 
+                        v-if="sideBySideMode" small tile icon text  @click="closeDetail">
+                        <v-icon small>mdi-close</v-icon>
+                    </v-btn>
                 </v-row>
             </v-col>
         </v-row>
         <v-row  style="margin:0px;height:100%" >
             <v-col
+                v-if="!sideBySideMode"
                 cols="3"
                 class="pt-0 pl-1 pr-0 pb-0 "
                 style="height: 100%;"
@@ -61,7 +75,7 @@
                         :key="idx"
                         :class="{
                             'mr-0 ml-0 single-row': true ,
-                            'd-active':index==idx
+                            'd-active':index==idx || selectObj==idx
                         }"
                         @mouseover="index=idx"
                         @mouseout="index = null"
@@ -98,7 +112,7 @@
                 ></v-skeleton-loader> -->
             </v-col>
             <v-col
-                cols="9"
+                :cols="!sideBySideMode ? 9 : 12"
                 class="pa-0 ma-0"
                 height="30"
                 style="border-left: 1px solid #e0e0e0;"
@@ -106,10 +120,26 @@
                 <detailNode 
                     :selectedNode="selectedNode"
                     :nodeInfo="listNode[selectedNode]"
+                    :selectAll="selectAll"
+                    :sideBySideMode="sideBySideMode"
                     @changeValueCheckBox="changeValueCheckBox"
+                    @changeSideBySide="changeSideBySide"
                 />
             </v-col>
         </v-row>
+        
+        <v-dialog class="dialog-approval" v-model="dialogApproval" max-width="350">
+            <v-card>
+            <v-card-title class="headline">{{$t("myItem.alert.title_aproval")}}</v-card-title>
+            <v-card-text>Bạn có muốn {{action}} cho {{countRecordSelected}}/{{totalRecord}} bản ghi đã chọn </v-card-text>
+            <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn color="red darken-1" text @click="dialogApproval=false">Hủy</v-btn>
+                <v-btn color="green darken-1" text @click="approvalMoreTask">Thực thi</v-btn>
+            </v-card-actions>
+            </v-card>
+        </v-dialog>
+
         <BottomSheet ref="bottomSheetView" class="h-100">
             <div slot="content" class="sheet-content d-flex">
                 <div class="count-selection">
@@ -125,12 +155,13 @@
                     <v-btn small depressed v-for="(action, idx) in taskActionBtns" dark :key="idx" :color="action.color" @click="saveTaskOutcome(action.value)" class="mr-2">
                         {{action.text}}
                     </v-btn>
-                    <v-btn  tile small> {{$t('common.close')}}
+                    <v-btn @click="hideBottomSheet" tile small> {{$t('common.close')}}
                     </v-btn>
                 </div>
             </div>
         </BottomSheet>
-    </div>
+
+        </div>
 </template>
 
 <script>
@@ -171,9 +202,12 @@ export default {
     },
     data(){
         return{
+            dialogApproval:false,
+            sideBySideMode:false,
             index:0,
+            selectObj:-1,
             selectedNode:0,
-            selectedItem:[],
+            selectAll:false,
             listTaskHeight: 500,
             countRecordSelected:0,
             totalRecord:0,
@@ -183,27 +217,36 @@ export default {
             ],
             taskAction: undefined,
             listTaskChecked:[],
+            action:"",
         }
     },
     methods:{
+        closeDetail(){
+            this.sideBySideMode=false;
+        },
+        changeSideBySide(value){
+            this.sideBySideMode=value;
+        },
         getData(){
             this.$store.dispatch("task/getListNodeInProcess");
         },
         selectObject(obj, idx){
+            this.selectAll=false;
             this.selectedNode=idx;
+            this.selectObj=idx;
             this.totalRecord=obj.number_of_task;
             this.taskActionBtns=[];
         },
         handleReachEndList(){},
         reCalcListTaskHeight() {
-            this.listTaskHeight =
-                util.getComponentSize(this.$el.parentElement).h - 125;
+            this.listTaskHeight =util.getComponentSize(this.$el.parentElement).h - 125;
         },
         hideBottomSheet(){
             this.$refs.bottomSheetView.toggle();
-            this.$refs.listObject.removeCheckBoxColumn();
+          //  this.$refs.listObject.removeCheckBoxColumn();
         },
         changeValueCheckBox(data){
+            this.$refs.bottomSheetView.show();
             this.listTaskInNode=data;
             let listTaskChecked=[];
             for (var key in data) {
@@ -216,7 +259,6 @@ export default {
             this.getActionNode(data[0]);
         },
         getActionNode(task){
-            console.log("taskbbb",task);
             let self=this;
             let taskInfo=JSON.parse(task.description);
          
@@ -235,17 +277,14 @@ export default {
             });
             this.taskActionBtns = approvalActions;
         },
-        // saveTaskOutcome(value){
-        //     if (this.listTaskChecked.length>0) {
-        //         let data={};
-        //         data.value=value;
-        //         data.listTask=this.listTaskChecked;
-        //         this.$emit("actionMoreApproval",data)
-        //     }
-         
-        // },
-        async saveTaskOutcome(value){
+        saveTaskOutcome(value){
+            this.action=value;
+            this.dialogApproval=true;
+        },
+        async approvalMoreTask(){
+            this.dialogApproval=false;
             let self=this;
+            let value=self.action;
             if (self.listTaskChecked.length>0) {
                 for (var key in self.listTaskChecked) {
                     let originData=self.listTaskChecked[key];
@@ -282,6 +321,8 @@ export default {
                 }
                 self.$store.commit("task/setListNodeInProcess",[]);
                 self.getData();
+                self.selectedNode=0;
+                self.sideBySideMode=false;
             }
          
         },
@@ -336,7 +377,7 @@ export default {
         })
         .catch(err => {});
         self.reCalcListTaskHeight();
-        self.$refs.bottomSheetView.toggle()
+        self.$refs.bottomSheetView.show();
     },
 }
 </script>
@@ -347,9 +388,9 @@ export default {
   background: #f5f5f5;
 }
 .checkBox{
-    font-size: 13px;
     height: 22px;
 }
+
 .sheet-action{
     margin-left: auto;
 }

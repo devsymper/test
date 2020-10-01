@@ -1014,6 +1014,9 @@
             "showLess": "Thu gọn",
             "showMoreFile": "Xem thêm các tệp"
 
+        },
+        "alert":{
+            "title_aproval":"Thực thi công việc"
         }
 
     },
