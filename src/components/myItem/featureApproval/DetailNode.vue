@@ -3,7 +3,7 @@
         <VuePerfectScrollbar
             class="vuePerfect"
             v-if="!loadingTaskList"
-            style="height:100%"
+            style="height:100%;position: unset!important;"
         >
             <div v-if="!sideBySideMode" style="overflow: hidden;">
                 <v-row
@@ -141,7 +141,7 @@
                 </v-row>
             </div>
 
-            <div v-else style="height:100%">
+            <div v-else style="height:100%;overflow: hidden;">
                 <v-row style="height:100%">
                     <v-col cols="3" style="border-right:1px solid #dedede; padding-top:0px!important;padding-right:0px" >
                         <v-row
@@ -193,6 +193,7 @@
                                             <div class="pa-0 grey--text mt-1 lighten-2 d-flex justify-space-between">
                                             <div
                                                 class="fs-11  text-ellipsis"
+                                                style="width: 155px;"
                                             >
                                                 <v-icon style="font-size:10px; color:green;padding-left:2px">mdi-circle</v-icon>
                                             {{obj.taskData.extraLabel}} {{obj.taskData.extraValue}}</div>
@@ -390,5 +391,8 @@ export default {
 }
 .approval-taskDetail >>>.detail-task .s-drawer{
     top:45px!important;
+}
+.approval-taskDetail >>>.detail-task .task-style .wrap-content-detail{
+    position: unset;
 }
 </style>
