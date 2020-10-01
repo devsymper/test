@@ -236,6 +236,13 @@ export default {
             type: String,
             default: ''
         },
+        /**
+         * Biến chỉ ra bản ghi nằm trong app nào
+         */
+        appId:{
+            type:Number,
+            default:0
+        },
         
         workflowVariable:{
             type:Object,
@@ -1595,6 +1602,9 @@ export default {
                 let res = await this.titleObjectFormulas.handleBeforeRunFormulas(dataInputTitle);
                 let value = this.getValueFromDataResponse(res);
                 dataPost['titleObject'] = value
+            }
+            if(this.appId){
+                dataPost['appId'] = this.appId
             }
             documentApi.submitDocument(dataPost).then(res => {
                 let dataResponSubmit = res.data;
