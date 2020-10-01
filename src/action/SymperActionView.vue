@@ -23,6 +23,12 @@ import Vue from 'vue'
 import { util } from '../plugins/util';
 
 export default {
+    created(){
+        let self = this;
+        this.$evtBus.$on('symper-change-action-view-url', (data) =>{
+            self.displayViewFromLink(data.link);
+        });
+    },
     props: {
         width: {
             default: '100%'
@@ -87,24 +93,27 @@ export default {
                     if(util.isPromise(link)){
                         link = await link;
                     }
-                    let matchRoute = this.$router.match(link);
-                    if(matchRoute && matchRoute.matched && matchRoute.matched[0]){
-                        let matchedRoute = matchRoute.matched[0];
-                        this.$route.meta.sRouteName = matchRoute.name;
-                        for(let key in matchRoute.params){
-                            this.$route.params[key] = matchRoute.params[key];
-                        }
-                        let componentData = await matchedRoute.components.default();
-                        setTimeout((self) => {
-                            self.loadingComponent = false;
-                        }, 500, this);
-                        this.actionViewCompon = componentData.default ;
-                    }
+                    this.displayViewFromLink(link);
                 }else{
                     console.warn('[SYMPER ACTION VIEW]: $getActionLink method not found in action definition', this.action, this.param);
                 }
             } else {
                 console.error('[SYMPER ACTION VIEW]: action key not found', this.action);
+            }
+        },
+        async displayViewFromLink(link){
+            let matchRoute = this.$router.match(link);
+            if(matchRoute && matchRoute.matched && matchRoute.matched[0]){
+                let matchedRoute = matchRoute.matched[0];
+                this.$route.meta.sRouteName = matchRoute.name;
+                for(let key in matchRoute.params){
+                    this.$route.params[key] = matchRoute.params[key];
+                }
+                let componentData = await matchedRoute.components.default();
+                setTimeout((self) => {
+                    self.loadingComponent = false;
+                }, 500, this);
+                this.actionViewCompon = componentData.default ;
             }
         }
     },

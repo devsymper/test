@@ -113,12 +113,20 @@ export default {
                     }
                 }
             }
-
-            arrTask.forEach(task => {
+            
+            for(let task of arrTask){
                 if (task.assignee == this.$store.state.app.endUserInfo.id) {
-                    this.$router.push("/myitem/tasks/"+task.id);
+                    if(this.$route.name == 'my-applications'){
+                        this.$evtBus.$emit('symper-change-action-view-url', {
+                            link: "/myitem/tasks/"+task.id
+                        });
+                    }else{
+                        this.$router.push("/myitem/tasks/"+task.id);
+                    }
+                    break;
                 }
-            });
+            }
+            
         },
         getStartDocId(definitionModel){
             return Number(definitionModel.mainProcess.initialFlowElement.formKey);
