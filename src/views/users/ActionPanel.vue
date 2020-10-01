@@ -15,7 +15,7 @@
 					<v-stepper-step class="fs-13 font-normal" editable step="1">
 						{{ $t('user.general.title')}}
 					</v-stepper-step>
-					<v-stepper-step :editable="editStep" @click="loadPermission()" step="2">{{ $t('user.permission.title')}}</v-stepper-step>
+					<!-- <v-stepper-step :editable="editStep" @click="loadPermission()" step="2">{{ $t('user.permission.title')}}</v-stepper-step> -->
 				</v-stepper-header>
 				<v-stepper-items class="stepper-items">
 					<v-stepper-content step="1">
@@ -114,7 +114,7 @@
 						<!-- ảnh -->
 						<v-col cols="4">
 								<v-col cols="3" class="text-center ">
-								<v-avatar :size="80" v-if="actionType == 'edit' ">
+								<v-avatar :size="80">
 									<img v-if="avatarUrl != ''"
 										:src="avatarUrl"
 									>
@@ -122,18 +122,11 @@
 										:src="require('./../../assets/image/avatar_default.jpg')"
 									>
 								</v-avatar>
-									<v-avatar :size="80" v-else>
-									<img
-										:src="require('./../../assets/image/avatar_default.jpg')"
-									>
-								</v-avatar>
 								<UploadFile 
 									style="margin-top:-30px; margin-left:50px"
 									ref="uploadAvatar"
-								
 									:autoUpload="false"
 									:fileName="avatarFileName"
-									@uploaded-file="handleAvatarUploaded"
 									@selected-file="handleAvatarSelected" />
 							</v-col>
 						</v-col>	
@@ -147,12 +140,12 @@
 							</v-checkbox>
 						</div>
 						<div v-if="actionType == 'add'">
-							<h4 class="setting-password">{{ $t('user.general.passwordSetting.title')}}</h4>
+							<!-- <h4 class="setting-password">{{ $t('user.general.passwordSetting.title')}}</h4>
 							<v-checkbox dense class="sym-small-size" 
 								v-model="autoRenPassword" 
 								@click="enabledPassword = !enabledPassword" 
 								:label="$t('user.general.passwordSetting.autoGeneratePassword')">
-							</v-checkbox>
+							</v-checkbox> -->
 							<v-row>
 								<v-col cols="4">
 									<v-checkbox 
@@ -197,175 +190,6 @@
 						:disabled="loading"
 						@click="loader = 'loading'">
 						{{actionType=='add'?actionPanel="Tạo tài khoản":"Cập nhật tài khoản"}}
-					</v-btn>
-					</v-stepper-content>
-					<v-stepper-content class="sym-stepper-content" step="2">
-					<v-tabs
-						v-model="tabIndex"
-						background-color="transparent"
-						color="basil"
-						:grow="true">
-						<v-tab
-							:key="userRole.title"
-						>
-						{{$t('user.permission.userType.title')}}
-						</v-tab>
-						<v-tab
-							:key="permissionPackage.title"
-						>
-							{{$t('user.permission.packagePermission.title')}}
-						</v-tab>
-						<v-tab
-							:key="permissionPosittionOrgChart.title"
-						>
-							{{$t('user.permission.orgChartPositionPermission.title')}}
-						</v-tab>
-					</v-tabs>
-					<v-tabs-items  v-model="tabIndex">
-						<v-tab-item
-						:key="userRole.title"
-						>
-							<template>
-								<v-combobox
-									class="mt-4"
-									v-model="userRole.userRoleSelected"
-									:items="userRole.listUserRole"
-									:label="$t('user.permission.userType.selected')"
-									outlined
-									multiple
-									dense
-									hide-selected
-									chips
-									small-chips
-									>
-								</v-combobox>
-							</template>
-						</v-tab-item>
-						<v-tab-item
-						:key="permissionPackage.title"
-						>
-						<v-autocomplete
-							class="mt-2"
-							:items="permissionPackage.listPermission"
-							v-model="permissionSelected"
-							dense
-							outlined
-							multiple
-							hide-selected
-							hide-details
-							clearable
-							chips
-							small-chips
-							item-text="packName"
-						>
-							<template v-slot:item="dataPackage">
-							<v-list-item-content class="autocomplete-package-item" @click="selectPermissionPackage(dataPackage.item)">
-								<v-list-item-title >{{ dataPackage.item.packName }}</v-list-item-title>
-							</v-list-item-content>
-							</template>
-						</v-autocomplete>
-						<div>
-								<v-list dense>
-									<v-list-item
-										class="permission-item"
-										v-for="permission in permissionPackage.permissionSelected"
-										:key="permission.id"
-									>
-									<v-list-item-content>
-										<v-list-item-title>{{ permission.packName }}</v-list-item-title>
-									</v-list-item-content>
-									<v-list-item-icon @click="deletePackage(permission.id)">
-										<v-tooltip top>
-											<template v-slot:activator="{ on }">
-												<v-icon v-on="on" small>mdi-delete</v-icon>
-											</template>
-											<span>{{$t('common.delete')}}</span>
-										</v-tooltip>
-									</v-list-item-icon>
-								</v-list-item>
-							</v-list>
-						</div>
-						</v-tab-item>
-						<v-tab-item
-						:key="permissionPosittionOrgChart.title"
-						>
-							<template>
-								<div class="tree-orgchart-content">
-									<v-autocomplete
-										class="mt-2"
-										v-model="search"
-										dense
-										:items="listNodesOrgChart"
-										item-value="name"
-										item-text="name"
-										return-object
-										outlined
-										hide-details
-										clearable
-										@input="addOrgchartPosition(search,'input')"
-									>
-										<template v-slot:item="position">
-											<v-list-item-content @click="addOrgchartPosition(position.item,'autocomplete')">
-												<v-list-item-title >{{ position.item.name }}</v-list-item-title>
-												<v-list-item-subtitle>{{ position.item.source }}</v-list-item-subtitle>
-											</v-list-item-content>
-										</template>
-									</v-autocomplete>
-									<v-treeview 
-									:items="permissionPosittionOrgChart.listNode" 
-									dense
-									open-all
-									:search="search.name"
-									class="sym-small-size mt-2">
-										<template v-slot:label="props">
-											<div class="treeCheckBox" @click="addOrgchartPosition(props.item,'treeview')">
-												<label v-if="props.item.id_node == 'general'" class="treeCheckBox label-root-org"
-													>{{props.item.name}}
-												</label> 
-												<v-checkbox v-else class="treeCheckBox"
-													v-model="props.item.selected"
-													:label="props.item.name">
-												</v-checkbox> 
-											</div>
-										</template>
-									</v-treeview>
-								</div>
-								<vue-resizable class="content-orgchart-resize mt-2" 
-									:min-height="100" 
-									:height="100"
-									:max-height="400" 
-									:width="530" 
-									:active="['t']">
-									<div class="content-orgchart-selected">
-										<v-list dense>
-											<v-list-item
-												class="permission-item"
-												v-for="org in positionOrgchartSelected"
-												:key="org.id"
-												>
-												<v-list-item-content>
-													<v-list-item-title>{{ org.name }}</v-list-item-title>
-													<v-list-item-subtitle>{{ org.source }}</v-list-item-subtitle>
-												</v-list-item-content>
-												<v-list-item-icon @click="deletePosition(org)">
-													<v-tooltip top>
-														<template v-slot:activator="{ on }">
-															<v-icon v-on="on" small>mdi-delete</v-icon>
-														</template>
-														<span>{{$t('common.delete')}}</span>
-													</v-tooltip>
-												</v-list-item-icon>
-											</v-list-item>
-										</v-list>
-									</div>
-								</vue-resizable>
-							</template>
-						</v-tab-item>
-					</v-tabs-items>
-					<v-btn class="btn-next-step"
-						@click="resetData();closePanel()"
-					>
-						Hoàn thành
 					</v-btn>
 					</v-stepper-content>
 				</v-stepper-items>
@@ -485,7 +309,7 @@ export default {
 				},
 				password:value => {
 					const pattern = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?).{8,}$/
-					return pattern.test(value) || this.$t('validate.notValid');
+					return pattern.test(value) || 'Mật khẩu phải bao gồm ít nhất 1 số, 1 chữ cái thường và 1 chữ cái ';
 				},
 			},
 			formHasErr : true,
@@ -674,6 +498,7 @@ export default {
 					value:0
 				}
 			}
+			debugger
 			let password = (this.autoRenPassword) ? this.generatePassword() : this.user.password;
 			let avatar = (this.url != avatarDefault) ? this.url : '';
 			let data = {
@@ -690,11 +515,13 @@ export default {
 				sendMail:this.sendMailAfterChange
 			}
 			userApi.addUser(data).then(res => {
+				debugger
 				if (res.status == 200) {
 					//cpn.loadPermission();
 					//cpn.setStepper(2);
 					cpn.loading = false;
 					cpn.editStep = true;
+					debugger
 					cpn.loader = null;
 					cpn.user.id = res.user.id;
                     cpn.avatarFileName = 'user_avatar_'+res.user.id;
