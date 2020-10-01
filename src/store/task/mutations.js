@@ -57,6 +57,9 @@ const setIsStatusSubmit = (state, isStatusSubmit) => {
 const setAllAppActive = (state, allAppActive) => {
     Vue.set(state, 'allAppActive', allAppActive);
 }
+const setListNodeInProcess = (state, listNodeInProcess) => {
+    Vue.set(state, 'listNodeInProcess', listNodeInProcess);
+}
 
 export {
     setArrFileAttach,
@@ -74,7 +77,8 @@ export {
     setIsStatusSubmit,
     setListDocumentObjId,
     setListDocumentObjIdWithUserSubmit,
-    setAllAppActive
+    setAllAppActive,
+    setListNodeInProcess
 
 
 };
