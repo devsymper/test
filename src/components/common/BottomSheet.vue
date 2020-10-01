@@ -1,5 +1,5 @@
 <template>
-    <v-bottom-sheet hide-overlay  v-model="sheet" persistent :class="{'shadow-sheet':isShadow}">
+    <v-bottom-sheet hide-overlay  v-model="sheet" no-click-animation :persistent="persistent" :class="{'shadow-sheet':isShadow}">
       <v-sheet class="sym-sheet" :height="height" >
         <slot name="content"></slot>
       </v-sheet>
@@ -13,6 +13,10 @@ export default {
             default:40
         },
         isShadow:{
+            type:Boolean,
+            default:true
+        },
+        persistent:{
             type:Boolean,
             default:true
         },

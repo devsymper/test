@@ -143,7 +143,7 @@
             </v-card>
         </v-dialog>
 
-        <BottomSheet :isShadow="false" ref="bottomSheetView" class="h-100">
+        <BottomSheet :persistent="true" :isShadow="false" ref="bottomSheetView" class="h-100">
             <div slot="content" class="sheet-content d-flex">
                 <div class="count-selection" style="padding-top: 15px;">
                     <span style="margin-left: 50px;">{{$t('document.instance.showlist.select')}} {{countRecordSelected}}/{{totalRecord}} {{$t('document.instance.showlist.record')}}</span>

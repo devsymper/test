@@ -76,6 +76,7 @@
                     @task-submited="handleTaskSubmited" 
                     :is="`task`"
                     :taskInfo="taskInfo"
+                    :appId="appId"
                     :isShowSidebar="isShowSidebar"
                     :originData="originData"
                     :tabsData="tabsData['people']"
