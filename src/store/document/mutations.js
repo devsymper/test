@@ -251,7 +251,6 @@ const setDefaultSubmitStore = (state, params) => {
             }
         },
         orgchartTableSqlName: {},
-        tableLoaded: {},
         readyLoaded: false,
         listTableRootControl: {}
     }

@@ -166,7 +166,7 @@
                         :key="item.title" 
                         link
                         no-action
-                        :class="{'menu-group': true , 'menu-group-active': item.title == indexActive }"
+                        :class="{'menu-group': true , 'menu-group-active': item.title == indexActive ,'menu-not-interact':(item.titleGroup) ? true : false}"
                         :symper-action="$bindAction(item.action?item.action:'')"
                         @click="gotoPage(item)">
                        <template v-slot:prependIcon>
@@ -230,7 +230,7 @@
                                 <template v-slot:activator="{ on: menu }">
                                     <v-tooltip bottom>
                                         <template v-slot:activator="{ on: tooltip }">
-                                            <v-icon class="icon-group" @click="gotoPage(item)" v-on="{ ...tooltip, ...menu }">
+                                            <v-icon class="collapse icon-group" @click="gotoPage(item)" v-on="{ ...tooltip, ...menu }">
                                             {{ item.icon }}
                                             </v-icon>
                                         </template>
@@ -484,8 +484,13 @@ export default {
 .icon-group{
     font-size:17px; 
     color:rgb(0,0,0,0.8); 
-    margin-top:-8px;
+    margin-top:-10px;
     margin-left:4px;
+}
+
+.collapse.icon-group{
+    padding: 10px;
+    margin-left: -7px !important;
 }
 
 .menu-group ::v-deep .v-list-group__header {
@@ -527,12 +532,32 @@ export default {
     height:15px!important; 
     margin-bottom: auto;
     margin-top:auto;
+    pointer-events:none
 }
-.title-group:hover{
-    background:unset
+.menu-not-interact{
+    pointer-events:none;
 }
-.title-group:focus{
-    background:unset
+.menu-not-interact >>> .v-list-group__header{ 
+    cursor: unset;
+    pointer-events:none;
+    
+}
+.menu-not-interact >>> .v-list-group__header:hover::before{
+    background: white !important;
+}
+.menu-not-interact >>> .v-list-group__header::before{
+    transition: unset;
+}
+.menu-not-interact >>> .v-list-group__header:hover::before{
+    background: white !important;
+}
+.menu-not-interact >>> .v-list-group__header:focus::before{
+    background: white !important;
+}
+
+
+.menu-group >>> .v-list-item:first-child{
+    margin-bottom: 0 !important;
 }
 </style>
 <style>

@@ -11,6 +11,7 @@ html {
     --symper-background-active: rgba(0 0 0 / 0.1);
     --symper-background-hover: rgba(0 0 0 / 0.05);
     --symper-border: 1px solid rgb(230, 229, 229);
+    --symper-text-color-default: rgb(0 0 0 / 0.8);
     --symper-box-shadow-top: 0px -1px 6px #00000029;
     --symper-box-shadow-bottom: 0px 3px 6px #00000029;
 }
