@@ -570,6 +570,7 @@ export default {
         }); 
         // hàm nhận sự thay đổi của input autocomplete gọi api để chạy công thức lấy dữ liệu
         this.$evtBus.$on("document-submit-autocomplete-key-event", e => {
+            console.log("ádsadsad",e);
             if(thisCpn._inactive == true) return;
             try {
                 if((e.e.keyCode >= 97 && e.e.keyCode <= 105) ||
