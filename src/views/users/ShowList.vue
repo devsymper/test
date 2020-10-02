@@ -9,7 +9,6 @@
         :tableContextMenu="tableContextMenu"
         :containerHeight="containerHeight"
         :customAPIResult="customAPIResult"
-        :actionPanelType="'elastic'"
         :getDataUrl="getListUrl+'users?page=1&pageSize=50'"
         :actionPanelWidth="actionPanelWidth"
         @import-excel="importExcel()"
@@ -251,4 +250,8 @@ export default {
     }
 }
 </script>
-
+<style >
+    /* .v-navigation-drawer{
+        width: 1200px!important
+    } */
+</style>

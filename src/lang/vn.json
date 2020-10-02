@@ -263,7 +263,8 @@
             "contextMenu": {
                 "passwordSetting": "Tùy chọn mật khẩu",
                 "edit": "Sửa",
-                "delete": "Xóa"
+                "delete": "Xóa",
+                "view": "Xem"
             }
         },
         "myInfo": {
@@ -726,14 +727,11 @@
             "updated_at": "Cập nhật lần cuối"
         },
 
-        "listType": { <<
-            << << < HEAD ===
-            === =
+        "listType": {
             "documents": "Văn bản",
             "workflows": "Quy trình làm việc",
             "reports": "Báo cáo",
-            >>>
-            >>> > 3 fdf4c523f4e9fbe42ecd305c2248e0c67f2caeb "documentMajor": "Chứng từ",
+            "documentMajor": "Chứng từ",
             "documentCategory": "Danh mục",
             "workflow": "Quy trình làm việc",
             "dashboard": "Báo cáo",

@@ -1086,3 +1086,8 @@ export default {
 		min-height: 40px;
 	}
 </style>
+<style >
+	/* .v-navigation-drawer{
+		 width: 1200px!important
+	} */
+</style>

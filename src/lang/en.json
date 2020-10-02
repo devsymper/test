@@ -264,7 +264,9 @@
             "updateAt": "Update at",
             "contextMenu": {
                 "passwordSetting": "Password setting",
-                "edit": "Edit"
+                "edit": "Edit",
+                "delete": "Delete",
+                "view": "View"
             }
         },
         "myInfo": {
