@@ -471,7 +471,7 @@ export default class Table {
                  */
                 afterChange: function(changes, source) {
 
-                    if (!changes && !changes[0][1]) {
+                    if (!changes) {
                         return
                     }
                     // check nếu ko có thay đổi trong cell thì return
@@ -1236,9 +1236,12 @@ export default class Table {
                 }
 
                 this.tableInstance.updateSettings({
-                        data: data
-                    })
-                    // sau khi đổ dữ liệu vào table thì ko chạy các sự kiện của table nên cần chạy công thức cho các control liên quan sau khi đỏ dữ liệu
+                    data: data
+                })
+                setTimeout((self) => {
+                    self.tableInstance.render()
+                }, 50, this);
+                // sau khi đổ dữ liệu vào table thì ko chạy các sự kiện của table nên cần chạy công thức cho các control liên quan sau khi đỏ dữ liệu
                 if (!this.checkDetailView())
                     setTimeout((thisObj) => {
                         for (let index = 0; index < controlBinding.length; index++) {
