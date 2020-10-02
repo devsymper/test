@@ -28,15 +28,9 @@
                 </v-list-item-avatar>
                 <v-list-item-content>
                     <v-list-item-title class=" mb-2">
-                        <span class="mt-1 position-relative" style="top: 0px; position: relative;">
+                        <span class="mt-1 position-relative cursor-pointer" style="top: 0px; position: relative;" @click="$emit('show-user-detail')">
                             {{ sapp.baInfo.name ? sapp.baInfo.name : sapp.endUserInfo.displayName }}
-                        </span> 
-                        <!-- <v-tooltip top>
-                            <template v-slot:activator="{ on }">
-                                <i @click="logout" v-on="on" class="float-right py-1 pl-1 cursor-pointer mdi mdi-exit-to-app fs-15"></i>
-                            </template>
-                            <span>{{$t('common.logout')}}</span>
-                        </v-tooltip> -->
+                        </span>
                     </v-list-item-title>
                     <div class="w-100 mb-1 ">
                         <div class="w-100 d-flex" v-if="sapp.baInfo.name"  style="color: rgba(0, 0, 0, 0.54)">
@@ -364,9 +358,12 @@ export default {
     components: {
         VuePerfectScrollbar,
         UserRoleSelector,
-        SymperAvatar
+        SymperAvatar,
     },
     computed: {
+        showUserInfo(){
+            return this.$store.state.user.showUserInfo;
+        },
         currentUserAvatar(){
             let userId = this.$store.state.app.endUserInfo.id;
             return appConfigs.apiDomain.fileManagement+'readFile/user_avatar_' + userId;
@@ -394,6 +391,14 @@ export default {
     },
     methods: {
         // thêm nhóm cho Menu
+        showChangeInfoUser(){
+            if(this.sapp.baInfo.id==0){
+                debugger
+                 this.$store.commit('user/setShowUser', !this.showUserInfo);
+                this.$router.push("/");
+            }
+           
+        },
         addGroupInMenu(){
              this.menu = this.userMenuItems;
              let menuItem = [];
@@ -507,6 +512,7 @@ export default {
             indexActive: "sdsd",
             selectingItem: {},
             selectingChildItem: {},
+            showMyInfo: false
         };
     }
 };

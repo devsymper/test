@@ -20,6 +20,7 @@ export const authUtil = {
         } else {
             return false;
         }
+
     },
 
     isSupportter() {
@@ -33,8 +34,6 @@ export const authUtil = {
             return false;
         }
     },
-
-
     logout() {
         window.localStorage.removeItem('symper-login-info');
     },
@@ -49,12 +48,14 @@ export const authUtil = {
     },
 
     setSavedUserInfo(data) {
+
         let loginInfo = this.getSavedUserInfo();
         loginInfo = Object.assign(loginInfo, data);
         this.saveLoginInfo(loginInfo);
     },
 
     getCurrentUserRole() {
+
         let data = this.getSavedUserInfo();
         let role = '';
         if (data.profile.userDelegate &&

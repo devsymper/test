@@ -89,14 +89,21 @@ export default class TableControl extends Control {
         } else {
             for (let controlName in data) {
                 let dataControl = data[controlName];
+
                 let vls = [];
                 for (let index = 0; index < dataControl.length; index++) {
                     let row = dataControl[index];
                     if (row == null || row == 'null')
                         row = '';
+                    if (!isNaN(row)) {
+                        row = Number(row);
+                    }
                     vls.push([index, controlName, row]);
                 }
                 this.tableInstance.tableInstance.setDataAtRowProp(vls, null, null, 'auto_set');
+            }
+            if (this.tableInstance.tableHasRowSum) { // trường hợp có dòng tính tổng thì thêm dòng ở cuối hiển thị tổng cột
+                this.tableInstance.tableInstance.alter('insert_row', Object.keys(data).length, 1);
             }
             if (this.currentDataStore.docStatus == 'init') {
                 this.defaultValue = data;

@@ -120,7 +120,9 @@
             "documents": "Văn bản",
             "orgchart": "Sơ đồ tổ chức",
             "myItem": "My item"
-        }
+        },
+        "system": "Hệ thống",
+        "copy": "Sao chép"
     },
     "login": {
         "title": "Đăng nhập hệ thống",
@@ -193,13 +195,14 @@
         "general": {
             "title": "Thông tin cơ bản",
             "personalInfo": {
+                "status": "Trạng thái",
                 "title": "Thông tin cá nhân",
                 "userName": "Tên tài khoản",
                 "email": "Email",
                 "firstName": "Tên",
                 "lastName": "Họ",
                 "displayName": "Tên hiển thị",
-                "phoneNumber": "Số điện thoại"
+                "phone": "Số điện thoại"
             },
             "passwordSetting": {
                 "title": "Tùy chọn mật khẩu",
@@ -260,8 +263,14 @@
             "contextMenu": {
                 "passwordSetting": "Tùy chọn mật khẩu",
                 "edit": "Sửa",
-                "delete": "Xóa"
+                "delete": "Xóa",
+                "view": "Xem chi tiết"
             }
+        },
+        "myInfo": {
+            "title": "Thông tin của tôi",
+            "generalInfo": "Thông tin chung",
+            "myPosition": "Vị trí của tôi"
         }
     },
     "snippet": {
@@ -593,6 +602,7 @@
                         "subTitle1": "Người phê duyệt",
                         "subTitle2": "Người tham gia"
                     }
+
                 }
             },
             "fab": {
@@ -707,6 +717,9 @@
         },
 
         "listType": {
+            "documents": "Văn bản",
+            "workflows": "Quy trình làm việc",
+            "reports": "Báo cáo",
             "documentMajor": "Chứng từ",
             "documentCategory": "Danh mục",
             "workflow": "Quy trình làm việc",
@@ -855,6 +868,11 @@
                 "remove operation": "Xoá",
                 "add action pack": "Thêm",
                 "remove action pack": "Xoá"
+
+
+
+
+
             },
             "dataflow": {
                 "detail": "Chi tiết",
@@ -1015,8 +1033,8 @@
             "showMoreFile": "Xem thêm các tệp"
 
         },
-        "alert":{
-            "title_aproval":"Thực thi công việc"
+        "alert": {
+            "title_aproval": "Thực thi công việc"
         }
 
     },
@@ -1028,7 +1046,7 @@
         "header": {
             "type": "Loại",
             "approval": "Phê duyệt",
-            "groupApproval":"Nhóm phê duyệt",
+            "groupApproval": "Nhóm phê duyệt",
             "submit": "Gửi văn bản",
             "date": "Ngày tạo",
             "dueDate": "Ngày đến hạn",

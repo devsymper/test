@@ -1178,7 +1178,7 @@ export default class Table {
                     });
                 }
                 // nếu table có tính tổng thì thêm 1 dòng trống ở cuối
-                if (this.tableHasRowSum) {
+                if (this.tableHasRowSum && sDocument.state.viewType[this.keyInstance] == 'submit') {
                     data.push({})
                 }
 
@@ -1237,7 +1237,7 @@ export default class Table {
             let id = Date.now();
             firstRow['s_table_id_sql_lite'] = id;
             data.push(firstRow);
-            if (this.tableHasRowSum) {
+            if (this.tableHasRowSum && sDocument.state.viewType[this.keyInstance] == 'submit') {
                 data.push([''])
             }
             if (!this.checkDetailView()) {

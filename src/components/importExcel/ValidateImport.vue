@@ -160,6 +160,41 @@
             </v-row>
         
         </v-list>
+        <!-- showErrorUser -->
+        <v-list v-if="processing.preprocessing.isDone&&processing.validating.errors.length==0&&processing.importing.processed>1&&processing.dataUserError.length>0" class="ml-6 fs-13">
+           Danh sách tài khoản import không thành công
+           <v-row> Lỗi trùng email</v-row>
+           <v-row style="background-color:#F5F5F5; height: 30px" class="ml-0 mr-5">
+                <v-col class="col-md-6">
+                    Tên tài khoản
+                </v-col>
+                <v-col class="col-md-6"  >
+                    Email
+                </v-col>
+            </v-row>
+           <div class="ml-0 mr-4" v-for="(error, errorIdxUser) in processing.dataUserError.filter(x=>x.result=='Email already exist')" :key="errorIdxUser"  >
+                        <!-- xử lý trường hợp không đúng định dạng dữ liệu -->
+                <div>
+                    <v-row class="ml-0 mr-1" style="background-color:#F5F5F5 ">
+                        <v-col class="col-md-6" v-if="errorIdxUser<10">
+                            {{processing.dataUserError[errorIdxUser].displayName}}
+                        </v-col>
+                            <v-col class="col-md-6" v-if="errorIdxUser<10">
+                            
+                            {{processing.dataUserError[errorIdxUser].email}}
+                        </v-col>
+                    </v-row>
+                    <v-row v-if=" processing.dataUserError.length>10 " class="ml-0 mr-4" style="background-color:#F5F5F5 ">
+                        <v-col  class="col-md-4">
+                            ...
+                        </v-col>
+                        <v-col class="col-md-8">
+                            ...
+                        </v-col>
+                    </v-row>
+                </div>
+        </div>
+        </v-list>
     </div>
 </template>
 
@@ -216,6 +251,7 @@ export default {
     watch: {
         newImport(val) {
             if (val) {
+                
                 this.processing = {
                     preprocessing: {
                     processed: 0,
@@ -231,6 +267,7 @@ export default {
                         processed: 0
                     },      
                 };
+
                 clearInterval(this.loopCheckProcess);
             }
         },
@@ -239,7 +276,19 @@ export default {
                 clearInterval(this.loopCheckProcess)
            };
            if(this.processing.importing.processed/this.processing.importing.total==1){
-                setTimeout(()=>this.$emit('showNotification'), 1000);
+               if(this.objType=="document"){
+                     setTimeout(()=>this.$emit('showNotification'), 1000);
+               }
+               else{
+    
+                   if(this.processing.dataUserError.length>0){
+                        setTimeout(()=>this.$emit('showNotification'), 1000);
+                       this.showErrorImportUser = ! this.showErrorImportUser;
+                   }else{
+                        setTimeout(()=>this.$emit('showNotification'), 1000);
+                   }
+               }
+
                 clearInterval(this.loopCheckProcess)
            };
            if(this.processing.importing.processed/this.processing.importing.total>1){
@@ -251,6 +300,7 @@ export default {
             if (this.importFile>=0) {
                 const self = this;
                 if(this.setInterval){
+    
                     this.loopCheckProcess = setInterval(()=>{
                             self.getApiProcessingImport();
                     }, 500);
@@ -260,6 +310,7 @@ export default {
     },
     data() {
         return {
+            showErrorImportUser:false,
             processing:{
                 preprocessing: {
                 processed: 0,
