@@ -46,7 +46,6 @@ export default {
         //                     this.$refs.ViewSideBySideApp.hideContextMenu()		
         //         }
         //     }
-        //     debugger
         // }
     }
 }

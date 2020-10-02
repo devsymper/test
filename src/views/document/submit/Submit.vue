@@ -1599,7 +1599,6 @@ export default {
             if(Object.keys(controlIdentifier).length>0){
                 dataPost['dataRefreshControl'] = JSON.stringify(controlIdentifier);
             }
-            debugger
             if(thisCpn.sDocumentSubmit.submitFormulas != undefined){
                 let dataInput = thisCpn.getDataInputFormulas(thisCpn.sDocumentSubmit.submitFormulas);
                 await thisCpn.sDocumentSubmit.submitFormulas.handleBeforeRunFormulas(dataInput);
