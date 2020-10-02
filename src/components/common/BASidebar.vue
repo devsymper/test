@@ -393,7 +393,6 @@ export default {
         // thêm nhóm cho Menu
         showChangeInfoUser(){
             if(this.sapp.baInfo.id==0){
-                debugger
                  this.$store.commit('user/setShowUser', !this.showUserInfo);
                 this.$router.push("/");
             }

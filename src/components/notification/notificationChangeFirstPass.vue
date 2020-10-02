@@ -65,7 +65,6 @@ export default {
     },
     computed: {
         sapp() {
-            debugger
             return this.$store.state.app;
         }
     },
@@ -73,7 +72,6 @@ export default {
         updateBaPass(id,data){
             userApi.updateUser(id, data).then(res => {
                 if (res.status == 200) {
-                    debugger
                     this.$snotify({
                         type: "success",
                         title: this.$t("notification.changePass") + " " + this.$t("notification.successTitle")
@@ -122,7 +120,6 @@ export default {
                 if(this.$store.state.app.allBA.length>0){
                     this.updateBaPass(this.sapp.endUserInfo.id);
                 }else{
-                    debugger
                      this.changePassUser(this.newPassword);
                 }
             }

@@ -259,7 +259,6 @@ export default {
         },
         // Sự kiện được gọi khi ấn import
         importFile() {
-          //  debugger
             let cleanedTables = this.tables.map((t, idx) => ({
                 ...idx !== 0 && {
                     name: t.name
@@ -668,7 +667,6 @@ export default {
             let columnAr = this.nameColumnDetail;
             columnAr = Object.values(columnAr);
             if(column.length>2){
-                //debugger
                 for(let m = 0; m<this.lastNameSheet.length;m++){
                     for(let k = 0; k<this.nameSheets.length;k++){
                         if(this.lastNameSheet[m]==this.nameSheets[k].name){
