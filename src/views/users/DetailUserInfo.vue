@@ -436,8 +436,7 @@ export default {
             for (let i = 0; i < listObject.length; i++){
                  if(listObject[i]==object){
 					 for(let j=0; j<this.listActionAndObj[object].length;j++){
-						 	action.push(this.listActionAndObj[object][j].action);
-						 debugger
+                        action.push(this.listActionAndObj[object][j].action);
 					
 						 this.nameObject.push({
 							 name:this.listActionAndObj[object][j].name,

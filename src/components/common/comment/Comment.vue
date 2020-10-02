@@ -118,7 +118,6 @@ export default {
 	mounted(){
 		 let windowHeight = $(window).height();
 		 this.heightListComment = windowHeight - 250
-		
 	},
 	
 	 props: {

@@ -166,7 +166,6 @@ export default {
             deep: true,
             immediate: true,
             handler: function(after){
-                // debugger
                  this.lazyValue = []
                  this.selectedPermission = []
                 this.lazyValue = after;

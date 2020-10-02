@@ -495,7 +495,6 @@ export default {
                     self.listCategory = res.data.category;
                     self.category.category_name=[];
                     let category = res.data.category;
-                     // debugger
                     for(let i=0; i<category.length; i++){
                         self.category.category_name.push(
                             category[i].key+"-"+category[i].name
@@ -513,7 +512,6 @@ export default {
         },
         // type= 0 là plan, 1 là log
         log(type) {
-            // debugger
             this.checkNullTask = true;
             let start = null;
             let end = null;
@@ -528,10 +526,8 @@ export default {
                 end  = dayjs(this.newEvent.start).hour(+this.inputs.endTime.split(":")[0]).minute(+this.inputs.endTime.split(":")[1]).format("YYYY-MM-DD HH:mm");
 
             }
-            //debugger
             if (!check){}
             else{
-               // debugger
                 timesheetApi.createLogTime({
                     start: start,
                     end: end,
@@ -544,7 +540,6 @@ export default {
                 })
                 .then(res => {
                     if (res.status === 200) {
-                     //   debugger
                         this.onSave();
                         this.$emit('loadMonthView')
                      
@@ -602,7 +597,6 @@ export default {
                     })
                     .then(res => {
                         if (res.status === 200) {
-                          //  debugger
                             this.onSave()
                         }
                     })
