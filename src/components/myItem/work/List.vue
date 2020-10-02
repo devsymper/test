@@ -222,8 +222,6 @@ export default {
             let date;
             work.startUserId = 0;
             work.startUserName = '';
-
-
             for(let vari of work.variables){
                 if(vari.name == 'symper_user_id_start_workflow'){
                     work.startUserId = vari.value;
@@ -413,6 +411,7 @@ export default {
         this.index = idx;
         this.dataIndex = idex;
         this.$set(this.selectedWork, "workInfo", obj);
+        this.selectedWork.workInfo.appName=this.selectNameApp(obj.variables);
         this.selectedWork.idx = idx;
         if (!this.compackMode) {
             this.sideBySideMode = true;
