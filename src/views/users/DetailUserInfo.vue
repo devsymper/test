@@ -230,7 +230,7 @@
 							<v-list-item-group >
 								<v-list dense>
 									<v-row class="fs-13 fm fw-430" style=" border-bottom:1px solid rgba(0,0,0,0.1); margin-top:-1px" >
-										<span class="ml-3 mb-3">	Đối tượng</span> </v-row>
+										<span class="ml-3 mb-3">Đối tượng</span> </v-row>
 									<v-list-item v-for="(item,menuIdx) in menu" :key="'D'+menuIdx">
 										<v-list-item-content style="margin-left:-20px" @click="detailView(item)">
 											<v-list-item-title class="ml-2 fw-400">{{$t('objects.'+item)}}</v-list-item-title>
@@ -248,12 +248,12 @@
 									{{action}}
 								</v-col>
 							</v-row>
-								<v-row v-for="(nameObj,nameObjIdx) in Object.keys(objAndAction)"  style="margin-top:-10px">
+								<v-row v-for="(nameObj,nameObjIdx) in titleAllNameObject"  style="margin-top:-10px">
 									<v-col style="font-weight:400;" class="fs-13">
-										{{nameObj}}
+										{{nameObj.title}}
 									</v-col>
 									<v-col v-for="(action2,actionIdx2) in action" >
-										<span v-if="checkRole(nameObj,action2)"><v-icon style="color:green">mdi mdi-check</v-icon></span>
+										<span v-if="checkRole(nameObj.objectIdentifier,action2)"><v-icon style="color:green">mdi mdi-check</v-icon></span>
 									</v-col>
 							</v-row>
 						</v-col>
@@ -397,18 +397,38 @@ export default {
 		// lấy ra nhưng danh sách tên title 
 		async getNameObjByRoles(role){
 			const self = this;
+			let listObj = [];
+			let newListObj = [];
+			debugger
+			let arrObj = Object.keys(self.objAndAction);
+			for(let i= 0;i<arrObj.length;i++){
+				listObj.push(arrObj[i]);
+			};
 			let res = await userApi.getOperationsObject({ids:role});
 			if(res.status ==200){
 				let titleNameObject = res.data;
-				// if(titleNameObject.length==0){
-				// 	alert("Không có quyền")
-				// }else{
+					debugger
 					for(let i = 0; i<titleNameObject.length;i++){
-					self.titleNameObject.push(titleNameObject[i].title?titleNameObject[i].title:titleNameObject[i].name);
+						for(let j= 0;j<listObj.length;j++){
+							if(listObj[j]==titleNameObject[i].objectIdentifier){
+								newListObj.push({
+									title:titleNameObject[i].title?titleNameObject[i].title:titleNameObject[i].name,
+									objectIdentifier: listObj[j]
+
+								});
+							}
+						}
+				
+					//self.objAndAction[titleNameObject[i].objectIdentifier]=="test";
+					//self.titleNameObject.push(titleNameObject[i].title?titleNameObject[i].title:titleNameObject[i].name);
 					// }
 				}
 			}
+					debugger
+			self.titleAllNameObject = newListObj;
 		},
+		// xử lý chuyển tên object
+
 		async getRoleOrgchartByUser(id){
 			const self = this;
 			let res = await orgchartApi.getRolesByUser([{idUser: id}])
@@ -542,6 +562,7 @@ export default {
     },
 	data(){
 		return {
+			titleAllNameObject:[],
 			titleNameObject:[],
 			listRoleObj:[],
 			objAndAction:{},
