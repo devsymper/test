@@ -80,7 +80,7 @@
 					<v-expansion-panel-header class="v-expand-header">{{$t('document.detail.sidebar.body.worflowInfo')}}</v-expansion-panel-header>
 					<v-expansion-panel-content class="sym-v-expand-content">
 
-						<table class="workflow-info" v-if="workflowId !='' ">
+						<table class="workflow-info" 	-if="workflowId !='' ">
 							<tr>
 								<td><v-icon style="font-size:15px ; padding-right:6px">mdi-lan</v-icon> {{workflowName}}</td>
 							<tr>
@@ -345,6 +345,9 @@ export default {
 	.workflow-info,
 	.general-info{
 		font-size: 13px;
+	}
+	.workflow-info td{
+		padding:5px 0px;
 	}
 	.related-user-info img, .approval-info img{
 		height: 24px;
