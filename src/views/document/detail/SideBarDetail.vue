@@ -82,9 +82,9 @@
 
 						<table class="workflow-info" v-if="workflowId !='' ">
 							<tr>
-								<td>{{workflowName}}</td>
+								<td><v-icon style="font-size:15px ; padding-right:6px">mdi-lan</v-icon> {{workflowName}}</td>
 							<tr>
-								<td>{{workflowOtherName}}</td>
+								<td v-if="taskName != ''"> <v-icon style="font-size:15px ; padding-right:6px">mdi-format-list-checkbox</v-icon>{{taskName}}</td>
 							</tr>
 							
 						</table>
@@ -157,8 +157,8 @@ export default {
 			userCreate:"",
 			createdDate:"",
 			workflowName:"",
-			showPanelWorkflow:false,
-			workflowOtherName:"",
+			showPanelWorkflow:true,
+			taskName:"",
 			listApprovalUser:[],
 			listRelatedUser:[],
 			listHistoryControl:[
@@ -215,21 +215,21 @@ export default {
 		},
 		workflowId(after){
 			let self = this
-			debugger
 			if(after != ""){
-				self.showPanelWorkflow = true
 				bpmnApi.getProcessInstanceData(this.workflowId).then(res=>{
-					self.workflowName = res.data[0].name
-					self.workflowOtherName = res.data[0].processDefinitionName
-					debugger
+					self.workflowName = res.data[0].processDefinitionName
 				}).always({}).catch({});
 			}
 			
 		},
 		taskId(after){
-			// bpmnApi.getATaskInfo(this.taskId).then(res=>{
-            //         console.log('resresres',res);
-            //     }).always({}).catch({});
+			let self = this
+			if(after != ""){
+				bpmnApi.getATaskInfo(this.taskId).then(res=>{
+                   self.taskName = res.name == null ? "" : res.name
+                }).always({}).catch({});
+			}
+			
 		},
 		createTime(after){
 			this.createdDate = after

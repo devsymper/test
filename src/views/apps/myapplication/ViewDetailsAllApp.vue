@@ -389,7 +389,7 @@ export default {
                 name: 'dashboard',
             },
             workflow_definition: {
-                icon: 'mdi-lan',
+                icon: ' ',
                 title:  this.$t('apps.listType.workflow'),
                 name: 'workflow_definition',
             },
