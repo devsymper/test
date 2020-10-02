@@ -97,12 +97,15 @@
         </v-content>
         
         <v-navigation-drawer
-            width="500"
+            v-bind:class="[isExpand==true?'width-1100':'width-500']"
             right
             v-model="showMyInfo"
             absolute
             temporary>
-            <DetailUser :userInfo="sapp.endUserInfo"/>
+            <DetailUser 
+                :userInfo="sapp.endUserInfo"
+                @expand-panel="isExpand=true"
+            />
         </v-navigation-drawer>
     </v-app>
 </template>
@@ -119,6 +122,14 @@ import Search from "@/components/search/Search";
 import DetailUser from "@/components/common/user/DetailUser.vue";
 
 export default {
+    watch:{
+        showMyInfo(){
+            if(!showMyInfo){
+                this.isExpand = false;
+            }
+        }
+
+    },
     methods: {
         /**
          * Xử lý các tab
@@ -209,6 +220,7 @@ export default {
     },
     data: function() {
         return {
+            isExpand:false,
             showSearchInput: false,
             isShowDialog: false,
             isShowDialogNotification: false,
@@ -225,5 +237,12 @@ export default {
 .nofitication-title-bar{
     font-size: 13px;
     font-weight: bold;
+}
+.width-1100{
+    width:1100px!important
+
+}
+.width-500{
+    width:500px!important
 }
 </style>
