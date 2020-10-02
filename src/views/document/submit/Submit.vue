@@ -1598,6 +1598,7 @@ export default {
             if(Object.keys(controlIdentifier).length>0){
                 dataPost['dataRefreshControl'] = JSON.stringify(controlIdentifier);
             }
+            debugger
             if(thisCpn.sDocumentSubmit.submitFormulas != undefined){
                 let dataInput = thisCpn.getDataInputFormulas(thisCpn.sDocumentSubmit.submitFormulas);
                 await thisCpn.sDocumentSubmit.submitFormulas.handleBeforeRunFormulas(dataInput);
@@ -1620,9 +1621,13 @@ export default {
             let titleObject = "";
             if(this.titleObjectFormulas != null){
                 let dataInputTitle = thisCpn.getDataInputFormulas(this.titleObjectFormulas);
-                let res = await this.titleObjectFormulas.handleBeforeRunFormulas(dataInputTitle);
-                let value = this.getValueFromDataResponse(res);
-                dataPost['titleObject'] = value
+                try {
+                    let res = await this.titleObjectFormulas.handleBeforeRunFormulas(dataInputTitle);
+                    let value = this.getValueFromDataResponse(res);
+                    dataPost['titleObject'] = value
+                } catch (error) {
+                    
+                }
             }
             if(this.appId){
                 dataPost['appId'] = this.appId;
