@@ -260,6 +260,7 @@ export default class Table {
 
 
                 beforeKeyDown: function(event) {
+                    console.log("sadsadasd", event);
                     let cellMeta = this.getSelected();
                     // ấn f2 vào cell thì trace control đó
                     if (event.key == 'F2' && store.state.app.accountType == 'ba') {
@@ -298,7 +299,7 @@ export default class Table {
                             event.stopImmediatePropagation();
                         }
                     }
-                    if (thisObj.checkControlType('user', columnIndex)) {
+                    if (thisObj.checkControlType('user', columnIndex)) { // nếu gõ vào control user thì autocomplete chọn user
                         if (event.keyCode == 13 && thisObj.showPopupUser) {
                             thisObj.showPopupUser = false;
                             event.curTarget = this.getActiveEditor().TEXTAREA;
@@ -328,9 +329,18 @@ export default class Table {
                             return;
                         }
                         if (thisObj.listAutoCompleteColumns[thisObj.currentControlSelected] != false) {
+                            // nếu đang auto complete mà gõ các kí tư lên xuống hay sang trái phải thì chặn sự kiện mặc định của handson
+                            // để có thể di chuyển lên xuống trong poup
                             if ((event.keyCode == 40 || event.keyCode == 38 ||
                                     event.keyCode == 37 || event.keyCode == 39) && thisObj.isAutoCompleting) {
                                 event.stopImmediatePropagation();
+                            }
+                            if (event.key == 'Tab') { // trường hợp ấn tab trong table thì đóng popup
+                                let e = util.cloneDeep(event);
+                                e.keyCode = 200;
+                                SYMPER_APP.$evtBus.$emit('document-submit-department-key-event', {
+                                    e: e,
+                                })
                             }
                             if (listKeyCodeNotChange.includes(event.keyCode)) {
                                 return;
@@ -356,9 +366,19 @@ export default class Table {
                             return;
                         }
                         if (thisObj.listAutoCompleteColumns[thisObj.currentControlSelected] != false) {
+
+                            // nếu đang auto complete mà gõ các kí tư lên xuống hay sang trái phải thì chặn sự kiện mặc định của handson
+                            // để có thể di chuyển lên xuống trong poup
                             if ((event.keyCode == 40 || event.keyCode == 38 ||
                                     event.keyCode == 37 || event.keyCode == 39) && thisObj.isAutoCompleting) {
                                 event.stopImmediatePropagation();
+                            }
+                            if (event.key == 'Tab') { // trường hợp ấn tab trong table thì đóng popup
+                                let e = util.cloneDeep(event);
+                                e.keyCode = 200;
+                                SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-key-event', {
+                                    e: e,
+                                })
                             }
                             if (listKeyCodeNotChange.includes(event.keyCode)) {
                                 return;
@@ -407,6 +427,11 @@ export default class Table {
                     SYMPER_APP.$evtBus.$emit("symper-app-wrapper-clicked", event);
 
                 },
+                /**
+                 * Sau khi chọn vào bảng thì đánh dấu doc chuyển qua chế độ input(phục vụ cho việc check process công thức)
+                 * @param {*} row 
+                 * @param {*} col 
+                 */
                 afterSelectionEnd: function(row, col) {
                     store.commit("document/addToDocumentSubmitStore", {
                         key: 'docStatus',
@@ -439,6 +464,11 @@ export default class Table {
                         this.alter('remove_row', cellMeta[0][0], 1);
                     }
                 },
+                /**
+                 * Sau khi thay đổi giá trị trong bảng thì cần update hoặc insert lại vào bảng sql lite
+                 * @param {*} changes 
+                 * @param {*} source 
+                 */
                 afterChange: function(changes, source) {
                     if (changes == null || changes[0][1] == undefined) {
                         return
@@ -606,7 +636,11 @@ export default class Table {
     }
 
 
-
+    /**
+     * Hàm kiểm tra cột của bảng ứng với kiểu control nào
+     * @param {*} type 
+     * @param {*} col 
+     */
     checkControlType(type, col) {
             let columns = this.columnsInfo.columns;
             if (columns[col] == undefined) {
@@ -756,6 +790,9 @@ export default class Table {
             }
             let dataPost = {};
             let thisObj = this;
+            /***
+             * Chuẩn bị data để gọi api thực thi công thức cho các control trong table
+             */
             if (Object.keys(dataInput).length > 0) {
                 let allRowDataInput = [];
                 for (let control in dataInput) {
@@ -832,6 +869,9 @@ export default class Table {
                         }
 
                         thisObj.tableInstance.setDataAtRowProp(vls, null, null, 'auto_set');
+                        /**
+                         * Sau khi chạy xong công thức thì đánh dấu là control đã bind giá trị
+                         */
                         markBinedField(thisObj.keyInstance, controlInstance.name);
                         store.commit("document/updateListInputInDocument", {
                             controlName: controlInstance.name,
