@@ -172,7 +172,7 @@
                                                 <template v-slot:activator="{ on }">
                                                 <span
                                                     v-on="on"
-                                                    v-if="obj.processDefinitionName"
+                                                    v-if="obj.processInstanceId"
                                                     class=" text-left fs-13 pr-6 text-ellipsis w-80 title-quytrinh"
                                                 >{{obj.processDefinitionName}}</span>
                                                 <span v-on="on" v-else class="text-left fs-13 pr-6 text-ellipsis w-80 title-quytrinh">ad hoc</span>

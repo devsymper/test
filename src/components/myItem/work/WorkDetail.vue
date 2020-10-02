@@ -120,8 +120,8 @@
                                     cols="2"
                                     class="fs-13 "
                                 >  
-                                    <symperAvatar :size="20"  />
-                                    {{processParent.startUserId}}
+                                    <symperAvatar :size="20" :userId="getUserIdStartWork(processParent.variables,'id')" />
+                                    {{getUserIdStartWork(processParent.variables,"name")}}
                                 </v-col>
                                 <v-col
                                     cols="2"
@@ -132,9 +132,12 @@
 
                                 <v-col
                                     cols="4"
-                                    class="fs-13 "
+                                    class="fs-13 py-0 "
                                 >
                                     <span class="mt-1 title-quytrinh">{{processParent.processDefinitionName}}</span>
+                                    <div class="pa-0 grey--text justify-space-between">
+                                        {{workInfo.appName}}
+                                    </div>
                                 </v-col>
                             </v-row>
                         </v-expansion-panel-content>
@@ -178,8 +181,8 @@
                                         cols="2"
                                         class="fs-13 "
                                     >  
-                                        <symperAvatar :size="20"  />
-                                        {{obj.startUserId}}
+                                        <symperAvatar :size="20" :userId="getUserIdStartWork(obj.variables,'id')" />
+                                        {{getUserIdStartWork(obj.variables,"name")}}
                                     </v-col>
                                     <v-col
                                         cols="2"
@@ -190,9 +193,12 @@
 
                                     <v-col
                                         cols="4"
-                                        class="fs-13 "
+                                        class="fs-13 py-0"
                                     >
                                         <span class="mt-1 title-quytrinh">{{processParent.processDefinitionName}}</span>
+                                        <div class="pa-0 grey--text justify-space-between">
+                                            {{workInfo.appName}}
+                                        </div>
                                     </v-col>
                                 </v-row>
                             </div>
@@ -216,7 +222,7 @@
                                 >
                                     <v-col
                                         cols="4"
-                                        class="pl-3 fs-13 "
+                                        class="pl-3 fs-13"
                                     >
                                         <div class="pa-0 lighten-2 d-flex justify-space-between">
                                             <div
@@ -237,8 +243,8 @@
                                         cols="2"
                                         class="fs-13 "
                                     >  
-                                        <symperAvatar :size="20"  />
-                                        {{obj.startUserId}}
+                                        <symperAvatar :size="20" :userId="getUserIdStartWork(obj.variables,'id')" />
+                                        {{getUserIdStartWork(obj.variables,"name")}}
                                     </v-col>
                                     <v-col
                                         cols="2"
@@ -248,9 +254,12 @@
                                     </v-col>
                                     <v-col
                                         cols="4"
-                                        class="fs-13 "
+                                        class="fs-13 py-0"
                                     >
                                         <span class="mt-1 title-quytrinh">{{processParent.processDefinitionName}}</span>
+                                        <div class="pa-0 grey--text justify-space-between">
+                                            {{workInfo.appName}}
+                                        </div>
                                     </v-col>
                                 </v-row>
                             </div>
@@ -457,6 +466,22 @@ export default {
     created(){
     },
     methods: {
+        getUserIdStartWork(variables,isCheck='id'){
+            let allUserById = this.$store.getters['app/mapIdToUser'];
+            let startUserId='';
+            let startUserName='';
+            for(let vari of variables){
+                if(vari.name == 'symper_user_id_start_workflow'){
+                    startUserId = vari.value;
+                    startUserName = allUserById[startUserId] ? allUserById[startUserId].displayName : '';
+                }
+            }
+            if (isCheck=="id") {
+                return startUserId;
+            }else{
+                return startUserName;
+            }
+        },
         showContentFile(data){
             this.serverPath = data.serverPath;
 			this.name = data.name;
@@ -596,6 +621,7 @@ export default {
             try {
                 let filter={};
                 filter.processInstanceId=superProcessInstanceId;
+                filter.includeProcessVariables=true;
                 let res = await BPMNEngine.getProcessInstanceHistory(filter);
                 self.processParent=res.data[0];
                 console.log("ProcessParent", res.data[0]);
@@ -609,6 +635,9 @@ export default {
             try {
                 let filter={};
                 filter.processInstanceId=processInstanceId;
+                filter.includeProcessVariables=true;
+                filter.sort= "startTime";
+                filter.order= "desc";
                 let res = await BPMNEngine.postTaskHistory(filter);
                 if (res.total>0) {
                     self.listTaskCurrent=res.data;
@@ -627,6 +656,7 @@ export default {
                 try {
                     let filter={};
                     filter.superProcessInstanceId=superProcessInstanceId;
+                    filter.includeProcessVariables=true;
                     let res = await BPMNEngine.getProcessInstanceHistory(filter);
                     if (isCheck=='siblingWork') {
                         if (res.total>0) {
