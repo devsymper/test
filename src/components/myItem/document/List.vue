@@ -125,10 +125,10 @@
                     cols="2"
                     v-if="!sideBySideMode"
                 >
-                    <div class="pl-1">
+                    <div class="pl-1 pa-3">
                         <v-tooltip bottom>
                             <template v-slot:activator="{ on }">
-                            <span v-on="on"  class="text-left fs-13text-ellipsis w-80 title-quytrinh">
+                            <span v-on="on"  class="text-left fs-13 text-ellipsis w-80 title-quytrinh">
                                 {{showNameApp(obj.appId)}}
                             </span>
                             </template>
@@ -141,7 +141,7 @@
                     class="pl-3 fs-13 px-1 py-0"
                     v-if="!sideBySideMode"
                 >
-                    <div class="pl-1">
+                    <div class="pl-1 pt-1">
                         <div style="width:55px">
                             {{commentCountPerTask['document:' + obj.id]}}
                             <v-icon class="fs-14" style="float:right;margin-top:4px;margin-right:12px">mdi-comment-processing-outline</v-icon> </div>
@@ -603,5 +603,9 @@ export default {
     top:8px;
     left: 8px;
     z-index: 100;
+}
+.col-10 {
+    flex: 0 0 94.333333%;
+    max-width: 94.333333%;
 }
 </style>

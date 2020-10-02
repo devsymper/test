@@ -132,7 +132,7 @@
 	</div>
 	<Comment v-if="showCommentInDoc" 
 	style="height:100%" ref="commentView" 
-	:objectIdentifier="documentObjectId" />
+	:objectIdentifier="String(documentObjectId)" />
 
 	</v-navigation-drawer>
 </template>

@@ -56,6 +56,7 @@ export default {
             try {
                 let filter={};
                 filter.processInstanceId=processInstanceId;
+                filter.includeProcessVariables=true;
                 let res = await BPMNEngine.postTaskHistory(filter);
                 if (res.total>0) {
                     self.listTask=res.data;

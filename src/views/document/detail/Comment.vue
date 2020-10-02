@@ -3,7 +3,7 @@
         <div class="comment-content " style="height:97%">
 			<Comment style="margin-left:-12px;margin-right:8px" 
 				:showComment="true" 
-				:objectIdentifier="objectIdentifierCmt" 
+				:objectIdentifier="String(objectIdentifierCmt)" 
 				:objectType="'document'" 
 				:height="'100%'"
 				:buttonClose="true" 
@@ -18,7 +18,7 @@ import { parseJSON } from 'jquery'
 export default {
 	props:{
 		objectIdentifier:{
-			type: Number,
+			type: String,
 		}
 	},
 	// watch:{
