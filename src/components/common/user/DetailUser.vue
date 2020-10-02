@@ -60,7 +60,7 @@
                     <div class="detail-user-label">
                         {{$t('user.general.personalInfo.'+key)}}
                     </div>
-                    <div v-if="isEditing" class="detail-user-value editable-value">
+                    <div v-if="isEditing && (key != 'email' && key != 'displayName')" class="detail-user-value editable-value">
                         <v-text-field
                             solo
                             flat
@@ -74,7 +74,7 @@
                         {{showableUserInfo[key]}}
                     </div>
                     <v-btn 
-                        icon tile class="float-right" v-if=" !isEditing && (key == 'email' || key == 'phone')" small style="position: relative; bottom: 5px">
+                        icon tile class="float-right" v-if=" !isEditing && (key == 'email' || key == 'phone')" small style="position: relative; bottom: 2px">
                         <v-tooltip top>
                             <template v-slot:activator="{ on }">
                                 <v-icon
@@ -110,7 +110,7 @@
                 <div class="detail-user-value">
                     <div v-for="role in lazyUserInfo.roles.orgchart" :key="role.id">
                         <div >
-                            <i class="fs-16 mdi mdi-check text--blue mr-1"></i> 
+                            <i class="fs-16 mdi mdi-check  indigo--text text--darken-4 mr-1"></i> 
                             {{role.name}}
                         </div>
                         <div class="text--lighten-2 grey-text pl-6">
@@ -127,7 +127,7 @@
                 <div class="detail-user-value">
                     <div v-for="role in lazyUserInfo.roles.systemRole" :key="role.id">
                         <div class="">
-                            <i class="fs-16 mdi mdi-check text--blue mr-1"></i> 
+                            <i class="fs-16 mdi mdi-check  indigo--text text--darken-4 mr-1"></i> 
                             {{role.name}}
                         </div>
                     </div>
@@ -142,6 +142,7 @@ import SymperAvatar from "@/components/common/SymperAvatar";
 import { util } from '../../../plugins/util';
 import VueClipboard from 'vue-clipboard2';
 import Vue from "vue";
+import { userApi } from '../../../api/user';
 Vue.use(VueClipboard)
 export default {
     components: {
@@ -153,9 +154,9 @@ export default {
                 id: 0,
                 firstName: '',
                 lastName: '',
+                phone: '',
                 displayName: '',
                 email: '',
-                phone: '',
                 roles: {
                     orgchart: [],
                     system: []
@@ -177,7 +178,13 @@ export default {
     },
     methods: {
         saveUserInfo(){
-            this.isEditing = false;
+            let self = this;
+            userApi.updateUser(this.lazyUserInfo.id, this.showableUserInfo).then(res => {
+                self.$snotifySuccess("Lưu thông tin thành công");
+                this.isEditing = false;
+            }).catch((err) => {
+                self.$snotifySuccess(err, "Không thể lưu thông tin người dùng");
+            });
         },
         closePanel(){
 
@@ -185,7 +192,7 @@ export default {
         reAssignUserInfo(){
             let rsl = {};
             for(let key in this.lazyUserInfo){
-                if(this.userInfo[key]){
+                if(this.userInfo[key] !== null && this.userInfo[key] !== undefined){
                     rsl[key] = this.userInfo[key];
                 }
             }
