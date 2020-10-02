@@ -108,7 +108,6 @@ export default class BasicControl extends Control {
             this.renderDateTimeControl();
         } else if (this.ele.hasClass('s-control-file-upload')) {
             this.renderFileControl();
-
         } else if (this.ele.hasClass('s-control-user')) {
             this.renderUserControl();
 
@@ -272,6 +271,8 @@ export default class BasicControl extends Control {
                 } else if (thisObj.type == 'time') {
                     e.curTarget = e.target
                     SYMPER_APP.$evtBus.$emit('document-submit-show-time-picker', e)
+                } else if (thisObj.type == 'image') {
+                    SYMPER_APP.$evtBus.$emit('document-submit-image-click', e)
                 }
 
             });

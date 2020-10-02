@@ -53,7 +53,7 @@
     <validate 
     @after-click-confirm="checkNameDocument" 
     @after-click-ignore="showNoteChangeName = false" 
-    :title="'Chú ý'" 
+    :title="$t('common.note')" 
     :message="messageValidate" 
     :isShowAction="true"
      ref="validate" />
@@ -132,7 +132,7 @@ export default {
                     if (res.status == 200) {
                         let message = ""
                         if(res.data === true){
-                            message = "Tên document đã tồn tại"
+                            message = this.$t('document.validate.docNameExist');
                             thisCpn.isValidName = false;
                         }
                         else{
@@ -160,12 +160,12 @@ export default {
         checkValidateNameDocument(value){
             let message = "";
             if(value.length == 0){
-                message = "Không được bỏ trống";
+                message = this.$t('document.validate.emptyName');
                 this.isValidName = false;
             }
             else{
                 if(/^[a-zA-Z_$][a-zA-Z_$0-9]*$/.test(value) == false){
-                    message = "Tên không hợp lệ";
+                    message = this.$t('document.validate.nameNotValid');
                     this.isValidName = false;
                 }
                 else{
@@ -182,8 +182,8 @@ export default {
             else{
                 if(this.showValidate && this.showNoteChangeName && this.$getRouteName() == 'editDocument'){
                     this.showValidate = false;
-                    this.messageValidate = "Tên của văn bản này có thể được sử dụng trong công thức ở các đối tượng trong hệ thống. Chọn kiểm tra để kiểm tra lại các đối tượng";
-                    this.$refs.validate.show(false)
+                    this.messageValidate = this.$t('document.validate.checkNameRelate');
+                    this.$refs.validate.show(false);
                 }
                 else{
                     if(this.isValidName && this.isValidTitle){
@@ -229,7 +229,7 @@ export default {
             let message = ""
             if(!this.documentProps.title.value){
                 this.isValidTitle = false;
-                message = "Vui lòng nhập tiêu đề document"
+                message = this.$t('document.validate.emptyTitle');
             }
             else{
                 this.isValidTitle = true;

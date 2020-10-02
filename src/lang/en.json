@@ -21,6 +21,7 @@
         "export_excel": "Export Excel",
         "list": "List",
         "search": "Search",
+        "note": "Note",
         "quickSearch": "Quick search",
         "list_config": "List config",
         "save": "Save",
@@ -402,8 +403,8 @@
                     "title": "Document title",
                     "fullSize": "Full size Form Submit",
                     "type": "Document type",
-                    "note": "Note",
-                    "titleObject": "Title Object",
+                    "note": "Note (Serve for searching)",
+                    "titleObject": "Title Object (Serve for display on MyItem)",
                     "titlePrint": "Title Form Print"
                 },
                 "swapType": {
@@ -481,8 +482,12 @@
         },
         "validate": {
             "emptyTitle": "Title must not be blank",
+            "emptyName": "Name must not be blank",
+            "nameNotValid": "Name not valid",
             "emptyContentControlTemplate": "Please select the template before saving the control template",
-            "controlNotExist": "Control does not exist, please create new control"
+            "controlNotExist": "Control does not exist, please create new control",
+            "docNameExist": "Document name exist",
+            "checkNameRelate": "The name of this document can be used in formulas on objects in the system. Select Test to re-check the object"
         }
     },
     "documentObject": {
