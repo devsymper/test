@@ -1,5 +1,5 @@
 <template>
-  <div class="list-objects">
+  <div class="list-objects" style="overflow: hidden;">
     <v-row class="mr-0 ml-0">
         <v-col
             :cols="!sideBySideMode ? 12 : 4"
@@ -12,6 +12,7 @@
             :sideBySideMode="sideBySideMode"
             :compackMode="compackMode"
             :parentTaskId="filterFromParent.parentTaskId"
+            :changeStatusMoreApproval="changeStatusMoreApproval"
             @change-density="isSmallRow = !isSmallRow"
             @changeObjectType="changeObjectType"
             @filter-change-value="handleChangeFilterValue"
@@ -112,11 +113,11 @@
                                     >{{obj.taskData.action.action=='approval' ? 'mdi-seal-variant ': 'mdi-file-document-edit-outline'}}</v-icon>
                                     <v-icon class="fs-14" v-else>mdi-checkbox-marked-circle-outline</v-icon>
                                     </v-col>
-                                    <v-col :cols="sideBySideMode ? 10 : compackMode ? 5: 3" class="pl-3 pr-1 pb-1 pt-2">
+                                    <v-col :cols="sideBySideMode ? 10 : compackMode ? 5: 3" :class="{'colName':sideBySideMode==true}" class=" pl-3 pr-1 pb-1 pt-2">
                                     <div class="pl-1">
                                         <v-tooltip bottom>
                                         <template v-slot:activator="{ on }">
-                                            <div v-on="on" class="text-left fs-13 pr-6 text-ellipsis w-100">
+                                            <div v-on="on" class="text-left fs-13 text-ellipsis w-100">
                                             {{obj.taskData.content}}
                                             </div>
                                         </template>
@@ -722,5 +723,9 @@ export default {
 }
 .d-active {
   background: #f5f5f5;
+}
+.colName{
+    flex: 0 0 90%;
+    max-width: 90%;
 }
 </style>

@@ -1,6 +1,6 @@
 <template>
     <v-app id="symper-platform-app">
-        <ba-sidebar />
+        <ba-sidebar @show-user-detail="showMyInfo = true" />
         <v-content>
             <v-container fluid fill-height class="pa-0">
                 <div class="w-100 app-header-bg-color" style="border-bottom:1px solid #e6e5e5">
@@ -95,6 +95,15 @@
                 </v-layout>
             </v-container>
         </v-content>
+        
+        <v-navigation-drawer
+            width="500"
+            right
+            v-model="showMyInfo"
+            absolute
+            temporary>
+            <DetailUser :userInfo="sapp.endUserInfo"/>
+        </v-navigation-drawer>
     </v-app>
 </template>
 
@@ -102,10 +111,12 @@
 import Api from "../../api/api.js";
 import { appConfigs } from '../../configs';
 import BASidebar from "@/components/common/BASidebar.vue";
+
 import listApp from "@/components/common/listApp";
 import EndUserPopup from './../apps/EndUserPopup.vue';
 import NotificationBar from "@/components/notification/NotificationBar.vue";
 import Search from "@/components/search/Search";
+import DetailUser from "@/components/common/user/DetailUser.vue";
 
 export default {
     methods: {
@@ -161,7 +172,8 @@ export default {
         "list-app": listApp,
         "list-notification": NotificationBar,
         EndUserPopup,
-        SearchInput: Search
+        SearchInput: Search,
+        DetailUser
     },
     created() {
         let self = this;
@@ -199,7 +211,8 @@ export default {
         return {
             showSearchInput: false,
             isShowDialog: false,
-			isShowDialogNotification: false,
+            isShowDialogNotification: false,
+            showMyInfo: false
         };
     }
 };

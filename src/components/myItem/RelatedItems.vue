@@ -131,7 +131,6 @@ export default {
         },
         displayDescription(description){
             let data = JSON.parse(description);
-            debugger
             let des = '',value = '';
             if (data.extraLabel == "" ||data.extraLabel == null) {
                 des ='Mô tả';
