@@ -76,15 +76,15 @@
 						</div>
 					</v-expansion-panel-content>
 				</v-expansion-panel>
-				<v-expansion-panel>
+				<v-expansion-panel v-show="showPanelWorkflow">
 					<v-expansion-panel-header class="v-expand-header">{{$t('document.detail.sidebar.body.worflowInfo')}}</v-expansion-panel-header>
 					<v-expansion-panel-content class="sym-v-expand-content">
 
-						<table class="workflow-info" v-if="workflowId !='' ">
+						<table class="workflow-info" 	-if="workflowId !='' ">
 							<tr>
-								<td>{{workflowName}}</td>
+								<td><v-icon style="font-size:15px ; padding-right:6px">mdi-lan</v-icon> {{workflowName}}</td>
 							<tr>
-								<td>{{workflowOtherName}}</td>
+								<td v-if="taskName != ''"> <v-icon style="font-size:15px ; padding-right:6px">mdi-format-list-checkbox</v-icon>{{taskName}}</td>
 							</tr>
 							
 						</table>
@@ -157,7 +157,8 @@ export default {
 			userCreate:"",
 			createdDate:"",
 			workflowName:"",
-			workflowOtherName:"",
+			showPanelWorkflow:true,
+			taskName:"",
 			listApprovalUser:[],
 			listRelatedUser:[],
 			listHistoryControl:[
@@ -213,15 +214,22 @@ export default {
 			}).always({}).catch({});
 		},
 		workflowId(after){
-			// 	debugger
-			// bpmnApi.getDefinitionData(this.workflowId).then(res=>{
-            //         console.log('resresres',res);
-			// 	}).always({}).catch({});
+			let self = this
+			if(after != ""){
+				bpmnApi.getProcessInstanceData(this.workflowId).then(res=>{
+					self.workflowName = res.data[0].processDefinitionName
+				}).always({}).catch({});
+			}
+			
 		},
 		taskId(after){
-			// bpmnApi.getATaskInfo(this.taskId).then(res=>{
-            //         console.log('resresres',res);
-            //     }).always({}).catch({});
+			let self = this
+			if(after != ""){
+				bpmnApi.getATaskInfo(this.taskId).then(res=>{
+                   self.taskName = res.name == null ? "" : res.name
+                }).always({}).catch({});
+			}
+			
 		},
 		createTime(after){
 			this.createdDate = after
@@ -337,6 +345,9 @@ export default {
 	.workflow-info,
 	.general-info{
 		font-size: 13px;
+	}
+	.workflow-info td{
+		padding:5px 0px;
 	}
 	.related-user-info img, .approval-info img{
 		height: 24px;
