@@ -116,8 +116,6 @@ export default {
 		},
 	},
 	mounted(){
-		 debugger
-		//  var x = util.getComponentSize(this);
 		 let windowHeight = $(window).height();
 		 this.heightListComment = windowHeight - 250
 		

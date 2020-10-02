@@ -253,24 +253,31 @@ export default {
 			this.dataPostComment.attachments = this.attachments
 			this.dataPostComment.tags = this.tags
 			if(this.isAdd == true){
-				let data = JSON.stringify(this.dataPostComment)
-				commentApi.addComment(data).then(res => {
-					this.$store.commit('comment/updateParentCommentTarget',0)
-					this.updateComment()
-					this.inputComment = ''
-					this.attachments = []
-                    this.tags = []
-                    this.$store.commit('comment/setWaitingCommentCountPerObj', this.sComment.objectType+':'+this.sComment.objectIdentifier);
-				});
+				if(this.dataPostComment.content.trim().length == 0 &&  this.dataPostComment.attachments.length == 0){
+				}else{
+					let data = JSON.stringify(this.dataPostComment)
+					commentApi.addComment(data).then(res => {
+						this.$store.commit('comment/updateParentCommentTarget',0)
+						this.updateComment()
+						this.inputComment = ''
+						this.attachments = []
+						this.tags = []
+						this.$store.commit('comment/setWaitingCommentCountPerObj', this.sComment.objectType+':'+this.sComment.objectIdentifier);
+					});
+				}
+				
 			} else {
-				this.dataPostComment.id = this.item.id
-				let dataEdit = JSON.stringify(this.dataPostComment)
-				commentApi.editComment(dataEdit).then(res => {
-					this.$store.commit('comment/updateParentCommentTarget',0)
-					this.updateComment()
-					this.attachments = []
-					this.tags = []
-				});
+				if(this.dataPostComment.content.trim().length == 0 &&  this.dataPostComment.attachments.length == 0){
+				}else{
+					this.dataPostComment.id = this.item.id
+					let dataEdit = JSON.stringify(this.dataPostComment)
+					commentApi.editComment(dataEdit).then(res => {
+						this.$store.commit('comment/updateParentCommentTarget',0)
+						this.updateComment()
+						this.attachments = []
+						this.tags = []
+					});
+				}
 			}
 			this.$store.commit('comment/updateReplyStatus',false)
 		},
