@@ -248,13 +248,13 @@
 									{{$t('objects.listAction.'+action)}}
 								</v-col>
 							</v-row>
-								<v-row v-for="(nameObj,nameObjIdx) in nameObject"  style="margin-top:-10px">
-								<v-col style="font-weight:400;" class="fs-13">
-									{{nameObj.name}}
-								</v-col>
-								<v-col v-for="(action2,actionIdx2) in action" >
-									<span v-if="nameObj.action==action2"><v-icon style="color:green">mdi mdi-check</v-icon></span>
-								</v-col>
+								<v-row v-for="(nameObj,nameObjIdx) in Object.keys(objAndAction)"  style="margin-top:-10px">
+									<v-col style="font-weight:400;" class="fs-13">
+										{{nameObj}}
+									</v-col>
+									<v-col v-for="(action2,actionIdx2) in action" >
+										<span v-if="checkRole(nameObj,action2)"><v-icon style="color:green">mdi mdi-check</v-icon></span>
+									</v-col>
 							</v-row>
 						</v-col>
 					</v-row>
@@ -296,6 +296,20 @@ export default {
         },
     },
     methods:{
+		findNameObj(obj){
+
+
+		},
+		checkRole(nameObj,action){
+			debugger
+			for(let i = 0; i<this.objAndAction[nameObj].length;i++){
+				if(this.objAndAction[nameObj][i].action==action){
+					return true
+				}else{
+					return false
+				}
+			}
+		},
 		viewUserRole(role){
 			this.isViewUserRole =! this.isViewUserRole;
 			this.getActionAndObject(role);
@@ -414,9 +428,6 @@ export default {
                 console.log("error from change pass user api!!!", err);
             })
         },
-		
-		getNameByAction(action){
-		},
 		getListObjectIdentifier(object){
 			let objIdentifier =[];
 			// for(let j=0; j<this.listActionAndObj[object].length;j++){
@@ -448,25 +459,22 @@ export default {
 					 for(let j=0; j<this.listActionAndObj[object].length;j++){
 						 if(this.formatAction(this.listActionAndObj[object][j].objectIdentifier)){
 							 action.push(this.listActionAndObj[object][j].action);
-							// this.listActionAndName.push({this.listActionAndObj[object][j].action);
-							 //this.listActionAndName.name.push(this.listActionAndObj[object][j].objectIdentifier);
 						 	this.nameObject.push({
 							 name:this.listActionAndObj[object][j].objectIdentifier,
 							 action: this.listActionAndObj[object][j].action,
 							 });
-
-						 }
-							 
+						 }	 
 					 }
 				 }
 			};
-			// this.groupNameObj();
+			this.groupNameObj();
 			this.action= action.filter((item, index) => action.indexOf(item) === index);
 			this.getListObjectIdentifier(object);
 		},
 		groupNameObj(){
-			debugger
-			let group = _.groupBy(this.nameObject,'objectIdentifier');
+			this.nameObject;
+			let group = _.groupBy(this.nameObject,'name');
+			this.objAndAction = group;
 		},
 		getMenuTitle(object){
 			return object;
@@ -474,14 +482,11 @@ export default {
 		async getNameObjByRoles(role){
 			const self = this;
 			let res = await userApi.getOperationsObject({ids:role});
-	
 			if(res.status ==200){
-	
 				let titleNameObject = res.data;
 				if(titleNameObject.length==0){
 					alert("Không có quyền")
 				}else{
-			
 					for(let i = 0; i<titleNameObject.length;i++){
 					self.titleNameObject.push(titleNameObject[i].title?titleNameObject[i].title:titleNameObject[i].name);
 				
@@ -524,6 +529,7 @@ export default {
 		return {
 			titleNameObject:[],
 			listRoleObj:[],
+			objAndAction:{},
 			listObj:[],
 			listActionAndName:[],
 			detailUser:'',
