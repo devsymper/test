@@ -245,7 +245,7 @@
 									{{menuTitle.length==0?"Chưa chọn đối tượng":$t('objects.'+menuTitle)}}
 								</v-col>
 								<v-col v-for="(action,actionIdx) in action" class="fs-13">
-									{{$t('objects.listAction.'+action)}}
+									{{action}}
 								</v-col>
 							</v-row>
 								<v-row v-for="(nameObj,nameObjIdx) in Object.keys(objAndAction)"  style="margin-top:-10px">
@@ -297,23 +297,21 @@ export default {
     },
     methods:{
 		findNameObj(obj){
-
-
+		
+			let test = this.titleNameObject;
 		},
+		// kiểm tra trùng action thì tích
 		checkRole(nameObj,action){
-			debugger
+		
+			let check = false;
 			for(let i = 0; i<this.objAndAction[nameObj].length;i++){
 				if(this.objAndAction[nameObj][i].action==action){
-					return true
-				}else{
-					return false
+					check =  true
 				}
 			}
+			return check
 		},
-		viewUserRole(role){
-			this.isViewUserRole =! this.isViewUserRole;
-			this.getActionAndObject(role);
-		},
+		// lấy ra tất cả action và object 
 		async getActionAndObject(role){
 			let res = await userApi.getActionAndObject(role);
 			if (res.status === 200) {
@@ -322,13 +320,113 @@ export default {
 				this.setMenu();
 			}
 		},
+		// lấy ra object làm menu 
 		setMenu(){
 			let listObject = Object.keys(this.listActionAndObj)
             for (let i = 0; i < listObject.length; i++) {
-                // console.log(this.newSearch[i].group);
                  this.menu.push(listObject[i]);
             };
-           
+		},
+		getListObjectIdentifier(object){
+		
+			let objIdentifier =[];
+			objIdentifier = _.groupBy(this.listActionAndObj[object],'objectIdentifier' );
+			let formatObjIdentifier = Object.keys(objIdentifier);
+			this.listRoleObj = formatObjIdentifier.filter(x=>x.indexOf(':')>0);
+			this.getNameObjByRoles(this.listRoleObj);
+		},
+		// lọc object identify đúng chuẩn : và có số ở cuối 
+		formatAction(obj){
+			let checkDot = obj.indexOf(':')>0?true:false;
+			let checkInt = obj.split(':').length==2?true:false; 
+			if(checkDot&&checkInt){
+				return true
+			}else{
+				return false
+			}
+		},
+		// view theo từng đối tượng 
+		detailView(object){
+			this.titleNameObject =[];
+			this.action=[];
+			this.nameObject =[];
+			let action = [];
+			this.menuTitle = object;
+			let listObject = Object.keys(this.listActionAndObj)
+            for (let i = 0; i < listObject.length; i++){
+                 if(listObject[i]==object){
+					 for(let j=0; j<this.listActionAndObj[object].length;j++){
+						 if(this.formatAction(this.listActionAndObj[object][j].objectIdentifier)){
+							 action.push(this.listActionAndObj[object][j].action);
+						 	this.nameObject.push({
+							 	name:this.listActionAndObj[object][j].objectIdentifier,
+							 	action: this.listActionAndObj[object][j].action,
+							 });
+						 }	 
+					 }
+				 }
+			};
+			this.groupNameObj();
+			this.filterAction();
+			//this.action = action.filter((item, index) => action.indexOf(item) === index);
+			this.getListObjectIdentifier(object);
+		},
+		//loc những action k dùng đến 
+		filterAction(){
+		
+
+			let action =_.groupBy(this.nameObject,'action');
+			let arrAction = Object.keys(action);
+			for(let i= 0; i<arrAction.length;i++){
+				this.action.push(arrAction[i]);
+
+			}
+			let b = this.action;
+			
+		 },
+		//group những loại đối tượng dạng document_de:123123 trùng tên với nhau 
+		groupNameObj(){
+			this.nameObject;
+			let group = _.groupBy(this.nameObject,'name');
+			this.objAndAction = group;
+			
+		},
+		getMenuTitle(object){
+			return object;
+		},
+		// lấy ra nhưng danh sách tên title 
+		async getNameObjByRoles(role){
+			const self = this;
+			let res = await userApi.getOperationsObject({ids:role});
+			if(res.status ==200){
+				let titleNameObject = res.data;
+				// if(titleNameObject.length==0){
+				// 	alert("Không có quyền")
+				// }else{
+					for(let i = 0; i<titleNameObject.length;i++){
+					self.titleNameObject.push(titleNameObject[i].title?titleNameObject[i].title:titleNameObject[i].name);
+					// }
+				}
+			}
+		},
+		async getRoleOrgchartByUser(id){
+			const self = this;
+			let res = await orgchartApi.getRolesByUser([{idUser: id}])
+			if (res.status === 200) {
+				self.rolesOgchart = res.data[0].roles
+			}
+			
+		},
+		async getRolesByUser(id){
+			const self = this;
+			let res = await  systemRoleApi.getRolesByUser([id])
+				if (res.status === 200) {
+					self.roles = res.data[0].roles
+				}
+		},
+		viewUserRole(role){
+			this.isViewUserRole =! this.isViewUserRole;
+			this.getActionAndObject(role);
 		},
 		changeLastName(){
 			const self = this;
@@ -428,89 +526,6 @@ export default {
                 console.log("error from change pass user api!!!", err);
             })
         },
-		getListObjectIdentifier(object){
-			let objIdentifier =[];
-			// for(let j=0; j<this.listActionAndObj[object].length;j++){
-				 objIdentifier = _.groupBy(this.listActionAndObj[object],'objectIdentifier' );
-			// }
-			 let formatObjIdentifier = Object.keys(objIdentifier);
-			this.listRoleObj = formatObjIdentifier.filter(x=>x.indexOf(':')>0);
-			this.getNameObjByRoles(this.listRoleObj);
-		},
-		// lọc object identify đúng chuẩn : và có số ở cuối 
-		formatAction(obj){
-			let checkDot = obj.indexOf(':')>0?true:false;
-			let checkInt = obj.split(':').length==2?true:false; 
-			if(checkDot&&checkInt){
-				return true
-			}else{
-				return false
-			}
-		},
-		detailView(object){
-			this.titleNameObject =[];
-			this.action=[];
-			this.nameObject =[];
-			let action = [];
-			this.menuTitle = object;
-			let listObject = Object.keys(this.listActionAndObj)
-            for (let i = 0; i < listObject.length; i++){
-                 if(listObject[i]==object){
-					 for(let j=0; j<this.listActionAndObj[object].length;j++){
-						 if(this.formatAction(this.listActionAndObj[object][j].objectIdentifier)){
-							 action.push(this.listActionAndObj[object][j].action);
-						 	this.nameObject.push({
-							 name:this.listActionAndObj[object][j].objectIdentifier,
-							 action: this.listActionAndObj[object][j].action,
-							 });
-						 }	 
-					 }
-				 }
-			};
-			this.groupNameObj();
-			this.action= action.filter((item, index) => action.indexOf(item) === index);
-			this.getListObjectIdentifier(object);
-		},
-		groupNameObj(){
-			this.nameObject;
-			let group = _.groupBy(this.nameObject,'name');
-			this.objAndAction = group;
-		},
-		getMenuTitle(object){
-			return object;
-		},
-		async getNameObjByRoles(role){
-			const self = this;
-			let res = await userApi.getOperationsObject({ids:role});
-			if(res.status ==200){
-				let titleNameObject = res.data;
-				if(titleNameObject.length==0){
-					alert("Không có quyền")
-				}else{
-					for(let i = 0; i<titleNameObject.length;i++){
-					self.titleNameObject.push(titleNameObject[i].title?titleNameObject[i].title:titleNameObject[i].name);
-				
-				}
-				
-				}
-				
-			}
-		},
-		async getRoleOrgchartByUser(id){
-			const self = this;
-			let res = await orgchartApi.getRolesByUser([{idUser: id}])
-			if (res.status === 200) {
-				self.rolesOgchart = res.data[0].roles
-			}
-			
-		},
-		async getRolesByUser(id){
-			const self = this;
-			let res = await  systemRoleApi.getRolesByUser([id])
-				if (res.status === 200) {
-					self.roles = res.data[0].roles
-				}
-		}
           
     },
     created(){
