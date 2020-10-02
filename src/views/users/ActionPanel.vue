@@ -301,7 +301,7 @@ export default {
 			showPass: false,
 			rules: {
 				required: value => !!value || this.$t('validate.required'),
-				min: v => (typeof v != 'undefined' && v != undefined && v.length >= 8) || this.$t('validate.min_8'),
+				min: v => (typeof v != 'undefined' && v != undefined && v.length >= 8) || 'Mật khẩu ít nhất 8 kí tự và có chữ cái in hoa ',
 				max: v => (typeof v != 'undefined' && v != undefined && v.length < 25) || this.$t('validate.max_24'),
 				email: value => {
 					const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
@@ -309,7 +309,7 @@ export default {
 				},
 				password:value => {
 					const pattern = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?).{8,}$/
-					return pattern.test(value) || 'Mật khẩu phải bao gồm ít nhất 1 số, 1 chữ cái thường và 1 chữ cái ';
+					return pattern.test(value) || 'Mật khẩu phải có chữ thường, chữ hoa và số';
 				},
 			},
 			formHasErr : true,

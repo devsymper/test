@@ -10,7 +10,7 @@
 						<v-col cols="8">
 							<v-row  v-if="!changeDetail">
 								<v-col cols="6">
-									<span style="font-weight:430" class="fs-13 st-icon-pandora">
+									<span  class="fw-430 fs-13 st-icon-pandora">
 												Họ tên
 									</span>
 								</v-col>
@@ -22,7 +22,7 @@
 							</v-row>
 							<v-row  v-if="changeDetail">
 								<v-col cols="6">
-									<span style="font-weight:430" class="fs-13 st-icon-pandora">
+									<span class="fw-430 fs-13 st-icon-pandora">
 												Họ
 									</span>
 								</v-col>
@@ -45,7 +45,7 @@
 							<!-- Endusser đổi thông tin cá nhân  -->
 							<v-row  v-if="changeDetail">
 								<v-col cols="6">
-									<span style="font-weight:430" class="fs-13 st-icon-pandora">
+									<span  class="fs-13 st-icon-pandora">
 											Tên
 									</span>
 								</v-col>
@@ -66,7 +66,7 @@
 						</v-row>
 							<v-row>
 								<v-col cols="6">
-									<span style="font-weight:430" class="fs-13 st-icon-pandora">
+									<span  class="fw-430 fs-13 st-icon-pandora">
 												{{ $t('user.general.personalInfo.displayName')}}
 									</span>
 								</v-col>
@@ -88,7 +88,7 @@
 							</v-row>
 							<v-row>
 								<v-col cols="6">
-									<span style="font-weight:430" class="fs-13 st-icon-pandora">
+									<span  class="fw-430 fs-13 st-icon-pandora">
 												{{ $t('user.general.personalInfo.email')}}
 									</span>
 								</v-col>
@@ -101,7 +101,7 @@
 							</v-row>
 							<v-row>
 								<v-col cols="6">
-									<span  style="font-weight:430" class="fs-13 st-icon-pandora">
+									<span   class="fw-430 fs-13 st-icon-pandora">
 										{{ $t('user.general.personalInfo.phoneNumber')}}
 									</span>
 								</v-col>
@@ -122,7 +122,7 @@
 						    </v-row>
                             <v-row>
 								<v-col cols="6">
-									<span style="font-weight:430" class="fs-13 st-icon-pandora">
+									<span  class="fw-430 fs-13 st-icon-pandora">
 										{{ $t('user.general.personalInfo.status')}}
 									</span>
 								</v-col>
@@ -138,15 +138,15 @@
 						    </v-row>
 							<v-row  v-if="changeDetail">
 								<v-col cols="6">
-									<span style="font-weight:430" class="fs-13 st-icon-pandora">
+									<span  class="fw-430 fs-13 st-icon-pandora">
 											Mật khẩu
 									</span>
 								</v-col>
 								<v-col  cols="6">
 									<span  class="fs-13 st-icon-pandora">
-										<span v-if="changeDetail"><v-icon @click="checkPass=true" style="font-size: 14px">mdi mdi-pencil</v-icon></span>
+										<span v-if="changeDetail">
+											<v-icon @click="checkPass=true" style="font-size: 14px">mdi mdi-pencil</v-icon></span>
 									</span>
-							
 								</v-col>
 							</v-row>
 							<v-row  v-if="changeDetail&&checkPass">
@@ -208,11 +208,11 @@
 						<!-- ket thuc anh -->
 					</v-row>
 				<h4 class="mt-2">Phân quyền</h4>
-				<v-row  v-if="rolesOgchart" class="ml-1 fs-13" style="font-weight:430">Vị trí</v-row>
+				<v-row  v-if="rolesOgchart" class="ml-1 fs-13 fw-430" >Vị trí</v-row>
 				<v-row class="ml-3 fs-13" v-for="(rolesOg,index) in rolesOgchart" :key='index'>
 					 <v-btn  text class=" fs-13" style="font-family:Roboto" @click="viewUserRole(rolesOg.id)">{{rolesOg.name}}</v-btn>
 				</v-row>
-				<v-row v-if="roles" class="fs-13 ml-1" style="font-weight:430">
+				<v-row v-if="roles" class="fs-13 ml-1 fw-430">
 					<!-- @click="viewUserRole()" -->
 						Vai trò người dùng
 				</v-row>
@@ -229,30 +229,31 @@
 						<v-col cols="md-3" >
 							<v-list-item-group >
 								<v-list dense>
-									<v-row class="fs-13 fm" style="font-weight:430; border-bottom:1px solid rgba(0,0,0,0.1); margin-top:-1px" ><span class="ml-3 mb-3">	Đối tượng</span> </v-row>
+									<v-row class="fs-13 fm fw-430" style=" border-bottom:1px solid rgba(0,0,0,0.1); margin-top:-1px" >
+										<span class="ml-3 mb-3">	Đối tượng</span> </v-row>
 									<v-list-item v-for="(item,menuIdx) in menu" :key="'D'+menuIdx">
 										<v-list-item-content style="margin-left:-20px" @click="detailView(item)">
-											<v-list-item-title style="font-weight:400" class="ml-2">{{item}}</v-list-item-title>
+											<v-list-item-title class="ml-2 fw-400">{{$t('objects.'+item)}}</v-list-item-title>
 										</v-list-item-content>
 									</v-list-item>
 								</v-list>
 							</v-list-item-group >
 						</v-col>
-						<v-col cols="md-9" style="border-left:1px solid rgba(0,0,0,0.1); height:100%!important">
+						<v-col cols="md-9" style="overflow:scroll; border-left:1px solid rgba(0,0,0,0.1); height:100%!important">
 							<v-row style="border-bottom:1px solid rgba(0,0,0,0.1); margin-top:-5px">
-								<v-col style="font-weight:430;" class="fs-13">
-									{{menuTitle.length==0?"Chưa chọn đối tượng":menuTitle}}
+								<v-col class="fw-430 fs-13">
+									{{menuTitle.length==0?"Chưa chọn đối tượng":$t('objects.'+menuTitle)}}
 								</v-col>
 								<v-col v-for="(action,actionIdx) in action" class="fs-13">
-									{{action}}
+									{{$t('objects.listAction.'+action)}}
 								</v-col>
 							</v-row>
-							<v-row v-for="(nameObj,nameObjIdx) in titleNameObject"  style="margin-top:-10px">
+								<v-row v-for="(nameObj,nameObjIdx) in nameObject"  style="margin-top:-10px">
 								<v-col style="font-weight:400;" class="fs-13">
-									1{{nameObj}}
+									{{nameObj.name}}
 								</v-col>
 								<v-col v-for="(action2,actionIdx2) in action" >
-									<span ><v-icon style="color:green">mdi mdi-check</v-icon></span>
+									<span v-if="nameObj.action==action2"><v-icon style="color:green">mdi mdi-check</v-icon></span>
 								</v-col>
 							</v-row>
 						</v-col>
@@ -423,8 +424,17 @@ export default {
 			// }
 			 let formatObjIdentifier = Object.keys(objIdentifier);
 			this.listRoleObj = formatObjIdentifier.filter(x=>x.indexOf(':')>0);
-
 			this.getNameObjByRoles(this.listRoleObj);
+		},
+		// lọc object identify đúng chuẩn : và có số ở cuối 
+		formatAction(obj){
+			let checkDot = obj.indexOf(':')>0?true:false;
+			let checkInt = obj.split(':').length==2?true:false; 
+			if(checkDot&&checkInt){
+				return true
+			}else{
+				return false
+			}
 		},
 		detailView(object){
 			this.titleNameObject =[];
@@ -436,18 +446,27 @@ export default {
             for (let i = 0; i < listObject.length; i++){
                  if(listObject[i]==object){
 					 for(let j=0; j<this.listActionAndObj[object].length;j++){
-						 	action.push(this.listActionAndObj[object][j].action);
-						 debugger
-					
-						 this.nameObject.push({
-							 name:this.listActionAndObj[object][j].name,
+						 if(this.formatAction(this.listActionAndObj[object][j].objectIdentifier)){
+							 action.push(this.listActionAndObj[object][j].action);
+							// this.listActionAndName.push({this.listActionAndObj[object][j].action);
+							 //this.listActionAndName.name.push(this.listActionAndObj[object][j].objectIdentifier);
+						 	this.nameObject.push({
+							 name:this.listActionAndObj[object][j].objectIdentifier,
 							 action: this.listActionAndObj[object][j].action,
 							 });
+
+						 }
+							 
 					 }
 				 }
 			};
-				 this.action= action.filter((item, index) => action.indexOf(item) === index);
+			// this.groupNameObj();
+			this.action= action.filter((item, index) => action.indexOf(item) === index);
 			this.getListObjectIdentifier(object);
+		},
+		groupNameObj(){
+			debugger
+			let group = _.groupBy(this.nameObject,'objectIdentifier');
 		},
 		getMenuTitle(object){
 			return object;
@@ -506,6 +525,7 @@ export default {
 			titleNameObject:[],
 			listRoleObj:[],
 			listObj:[],
+			listActionAndName:[],
 			detailUser:'',
 			newPassword:'',
 			reNewPassword: "",
@@ -540,6 +560,12 @@ export default {
 
 </script>
 <style scoped>
+	.fw-400{
+		font-weight:400
+	}
+	.fw-430{
+		font-weight:430
+	}
 	.font-normal{
 		font-family:Roboto;
 		font-size: 13px;
@@ -634,47 +660,6 @@ export default {
 		margin-top: 0px;
 		max-height: 30px;
 	}
-	.sym-stepper-content .v-tab{
-		font-size: 13px;
-	}
 
-	.sym-stepper-content{
-		padding-top: 0;
-	}
-	.content-orgchart-selected{
-		background: white;
-		height: 100%;
-		overflow-x: hidden;
-		overflow-y: auto;
-		/* padding-bottom: 8px; */
-	}
-	.content-orgchart-resize{
-		overflow: hidden;
-		border-top: 2px solid #888;
-		margin: 8px 0;
-	}
-	.tree-orgchart-content{
-	    height: 100%;
-	}
-	.tree-orgchart-content .sym-small-size{
-	    height: calc(100% - 50px);
-		overflow: auto;
-	}
-	.label-root-org{
-		font-size: 14px;
-		color: #797979;
-		font-weight: 600;
-	}
-	.lb-last-name{
-		display: inline-flex;
-	}
-	.input-password{
-		height: 30px;
-		margin-top: -8px;
-	}
-
-	.autocomplete-package-item{
-		padding: 0;
-		min-height: 40px;
-	}
+	
 </style>
