@@ -160,7 +160,7 @@ const makeDelay = function(ms) {
     };
 };
 var delay = makeDelay(1000);
-var delayTypingEnter = makeDelay(100);
+var delayTypingEnter = makeDelay(500);
 
 
 /**
@@ -446,7 +446,7 @@ export default class Table {
                 afterDocumentKeyDown: function(e) {
                     let cellMeta = this.getSelected();
                     if (e.key === 'Enter' && e.shiftKey === true && cellMeta != undefined) {
-                        this.alter('insert_row', cellMeta[0][0] + 1, 1);
+                        this.alter('insert_row', cellMeta[0][0] + 1, 1, 'auto_set');
                         thisObj.dataInsertRows.push([]);
                         delayTypingEnter(function(e) {
                             let listRootTable = sDocument.state.submit[thisObj.keyInstance]['listTableRootControl'];
@@ -470,11 +470,23 @@ export default class Table {
                  * @param {*} source 
                  */
                 afterChange: function(changes, source) {
-                    if (changes == null || changes[0][1] == undefined) {
+
+                    if (!changes && !changes[0][1]) {
                         return
+                    }
+                    // check nếu ko có thay đổi trong cell thì return
+                    if (changes[0][2] == changes[0][3]) {
+                        return;
+                    }
+                    if (!changes[0][2] && !changes[0][3]) {
+                        return;
                     }
                     if (getSDocumentSubmitStore(thisObj.keyInstance).docStatus == 'init' &&
                         sDocument.state.viewType[thisObj.keyInstance] == 'update') {
+                        return;
+                    }
+
+                    if (/=SUM(.*)/.test(changes[0][2]) || /=SUM(.*)/.test(changes[0][3])) {
                         return;
                     }
 
@@ -519,6 +531,7 @@ export default class Table {
                             });
 
                         }
+                        console.log("sadsadsadf", source, changes);
                         if (source == "edit") {
                             thisObj.handlerAfterChangeCellByUser(changes, currentRowData, columns, controlName);
                         } else {
@@ -612,7 +625,6 @@ export default class Table {
          * Hàm xử lí dữ liệu thay đổi ở cell bởi User edit (hàm set data của handson)
          */
     async handlerAfterChangeCellByUser(changes, currentRowData, columns, controlName) {
-        console.log("asdasda", changes);
         let thisObj = this;
         for (let index = 0; index < currentRowData.length; index++) {
             let cell = currentRowData[index];
@@ -695,6 +707,8 @@ export default class Table {
                 let controlRequireEffected = controlInstance.getEffectedRequireControl();
                 let controlLinkEffected = controlInstance.getEffectedLinkControl();
                 let controlValidateEffected = controlInstance.getEffectedValidateControl();
+                console.trace("sadasdsadsa");
+
                 this.handlerRunOtherFormulasControl(controlHiddenEffected, 'hidden');
                 this.handlerRunOtherFormulasControl(controlReadonlyEffected, 'readonly');
                 this.handlerRunOtherFormulasControl(controlRequireEffected, 'require');
