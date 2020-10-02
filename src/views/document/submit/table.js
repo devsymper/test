@@ -160,7 +160,7 @@ const makeDelay = function(ms) {
     };
 };
 var delay = makeDelay(1000);
-var delayTypingEnter = makeDelay(100);
+var delayTypingEnter = makeDelay(500);
 
 
 /**
@@ -260,6 +260,7 @@ export default class Table {
 
 
                 beforeKeyDown: function(event) {
+                    console.log("sadsadasd", event);
                     let cellMeta = this.getSelected();
                     // ấn f2 vào cell thì trace control đó
                     if (event.key == 'F2' && store.state.app.accountType == 'ba') {
@@ -298,7 +299,7 @@ export default class Table {
                             event.stopImmediatePropagation();
                         }
                     }
-                    if (thisObj.checkControlType('user', columnIndex)) {
+                    if (thisObj.checkControlType('user', columnIndex)) { // nếu gõ vào control user thì autocomplete chọn user
                         if (event.keyCode == 13 && thisObj.showPopupUser) {
                             thisObj.showPopupUser = false;
                             event.curTarget = this.getActiveEditor().TEXTAREA;
@@ -328,9 +329,18 @@ export default class Table {
                             return;
                         }
                         if (thisObj.listAutoCompleteColumns[thisObj.currentControlSelected] != false) {
+                            // nếu đang auto complete mà gõ các kí tư lên xuống hay sang trái phải thì chặn sự kiện mặc định của handson
+                            // để có thể di chuyển lên xuống trong poup
                             if ((event.keyCode == 40 || event.keyCode == 38 ||
                                     event.keyCode == 37 || event.keyCode == 39) && thisObj.isAutoCompleting) {
                                 event.stopImmediatePropagation();
+                            }
+                            if (event.key == 'Tab') { // trường hợp ấn tab trong table thì đóng popup
+                                let e = util.cloneDeep(event);
+                                e.keyCode = 200;
+                                SYMPER_APP.$evtBus.$emit('document-submit-department-key-event', {
+                                    e: e,
+                                })
                             }
                             if (listKeyCodeNotChange.includes(event.keyCode)) {
                                 return;
@@ -356,9 +366,19 @@ export default class Table {
                             return;
                         }
                         if (thisObj.listAutoCompleteColumns[thisObj.currentControlSelected] != false) {
+
+                            // nếu đang auto complete mà gõ các kí tư lên xuống hay sang trái phải thì chặn sự kiện mặc định của handson
+                            // để có thể di chuyển lên xuống trong poup
                             if ((event.keyCode == 40 || event.keyCode == 38 ||
                                     event.keyCode == 37 || event.keyCode == 39) && thisObj.isAutoCompleting) {
                                 event.stopImmediatePropagation();
+                            }
+                            if (event.key == 'Tab') { // trường hợp ấn tab trong table thì đóng popup
+                                let e = util.cloneDeep(event);
+                                e.keyCode = 200;
+                                SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-key-event', {
+                                    e: e,
+                                })
                             }
                             if (listKeyCodeNotChange.includes(event.keyCode)) {
                                 return;
@@ -407,6 +427,11 @@ export default class Table {
                     SYMPER_APP.$evtBus.$emit("symper-app-wrapper-clicked", event);
 
                 },
+                /**
+                 * Sau khi chọn vào bảng thì đánh dấu doc chuyển qua chế độ input(phục vụ cho việc check process công thức)
+                 * @param {*} row 
+                 * @param {*} col 
+                 */
                 afterSelectionEnd: function(row, col) {
                     store.commit("document/addToDocumentSubmitStore", {
                         key: 'docStatus',
@@ -421,7 +446,7 @@ export default class Table {
                 afterDocumentKeyDown: function(e) {
                     let cellMeta = this.getSelected();
                     if (e.key === 'Enter' && e.shiftKey === true && cellMeta != undefined) {
-                        this.alter('insert_row', cellMeta[0][0] + 1, 1);
+                        this.alter('insert_row', cellMeta[0][0] + 1, 1, 'auto_set');
                         thisObj.dataInsertRows.push([]);
                         delayTypingEnter(function(e) {
                             let listRootTable = sDocument.state.submit[thisObj.keyInstance]['listTableRootControl'];
@@ -439,12 +464,29 @@ export default class Table {
                         this.alter('remove_row', cellMeta[0][0], 1);
                     }
                 },
+                /**
+                 * Sau khi thay đổi giá trị trong bảng thì cần update hoặc insert lại vào bảng sql lite
+                 * @param {*} changes 
+                 * @param {*} source 
+                 */
                 afterChange: function(changes, source) {
-                    if (changes == null || changes[0][1] == undefined) {
+
+                    if (!changes && !changes[0][1]) {
                         return
+                    }
+                    // check nếu ko có thay đổi trong cell thì return
+                    if (changes[0][2] == changes[0][3]) {
+                        return;
+                    }
+                    if (!changes[0][2] && !changes[0][3]) {
+                        return;
                     }
                     if (getSDocumentSubmitStore(thisObj.keyInstance).docStatus == 'init' &&
                         sDocument.state.viewType[thisObj.keyInstance] == 'update') {
+                        return;
+                    }
+
+                    if (/=SUM(.*)/.test(changes[0][2]) || /=SUM(.*)/.test(changes[0][3])) {
                         return;
                     }
 
@@ -489,6 +531,7 @@ export default class Table {
                             });
 
                         }
+                        console.log("sadsadsadf", source, changes);
                         if (source == "edit") {
                             thisObj.handlerAfterChangeCellByUser(changes, currentRowData, columns, controlName);
                         } else {
@@ -582,7 +625,6 @@ export default class Table {
          * Hàm xử lí dữ liệu thay đổi ở cell bởi User edit (hàm set data của handson)
          */
     async handlerAfterChangeCellByUser(changes, currentRowData, columns, controlName) {
-        console.log("asdasda", changes);
         let thisObj = this;
         for (let index = 0; index < currentRowData.length; index++) {
             let cell = currentRowData[index];
@@ -606,7 +648,11 @@ export default class Table {
     }
 
 
-
+    /**
+     * Hàm kiểm tra cột của bảng ứng với kiểu control nào
+     * @param {*} type 
+     * @param {*} col 
+     */
     checkControlType(type, col) {
             let columns = this.columnsInfo.columns;
             if (columns[col] == undefined) {
@@ -661,6 +707,8 @@ export default class Table {
                 let controlRequireEffected = controlInstance.getEffectedRequireControl();
                 let controlLinkEffected = controlInstance.getEffectedLinkControl();
                 let controlValidateEffected = controlInstance.getEffectedValidateControl();
+                console.trace("sadasdsadsa");
+
                 this.handlerRunOtherFormulasControl(controlHiddenEffected, 'hidden');
                 this.handlerRunOtherFormulasControl(controlReadonlyEffected, 'readonly');
                 this.handlerRunOtherFormulasControl(controlRequireEffected, 'require');
@@ -756,6 +804,9 @@ export default class Table {
             }
             let dataPost = {};
             let thisObj = this;
+            /***
+             * Chuẩn bị data để gọi api thực thi công thức cho các control trong table
+             */
             if (Object.keys(dataInput).length > 0) {
                 let allRowDataInput = [];
                 for (let control in dataInput) {
@@ -832,6 +883,9 @@ export default class Table {
                         }
 
                         thisObj.tableInstance.setDataAtRowProp(vls, null, null, 'auto_set');
+                        /**
+                         * Sau khi chạy xong công thức thì đánh dấu là control đã bind giá trị
+                         */
                         markBinedField(thisObj.keyInstance, controlInstance.name);
                         store.commit("document/updateListInputInDocument", {
                             controlName: controlInstance.name,
@@ -1084,8 +1138,6 @@ export default class Table {
     getContextMenu() {
         return {
             callback: function(key, selection, clickEvent) {
-                // Common callback for all options
-
                 if (key == 'row_below') {
                     var indexArr = this.getSelected();
                     var selectedData = this.getDataAtRow(indexArr[0]);
@@ -1145,6 +1197,7 @@ export default class Table {
 
 
     // Hàm set data cho table
+    // hàm gọi sau khi chạy công thức 
     setData(vls) {
             ClientSQLManager.delete(this.keyInstance, this.tableName, false);
             if (vls != false) {
@@ -1178,7 +1231,7 @@ export default class Table {
                     });
                 }
                 // nếu table có tính tổng thì thêm 1 dòng trống ở cuối
-                if (this.tableHasRowSum) {
+                if (this.tableHasRowSum && sDocument.state.viewType[this.keyInstance] == 'submit') {
                     data.push({})
                 }
 
@@ -1237,7 +1290,7 @@ export default class Table {
             let id = Date.now();
             firstRow['s_table_id_sql_lite'] = id;
             data.push(firstRow);
-            if (this.tableHasRowSum) {
+            if (this.tableHasRowSum && sDocument.state.viewType[this.keyInstance] == 'submit') {
                 data.push([''])
             }
             if (!this.checkDetailView()) {

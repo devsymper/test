@@ -129,12 +129,12 @@
                             class="pl-3 py-0"
                             cols="2"
                         >
-                            <div class="pl-1">
+                            <div class="pl-1 mt-1">
                                 <v-tooltip bottom>
                                     <template v-slot:activator="{ on }">
                                     <span
                                         v-on="on"
-                                        v-if="obj.processDefinitionName"
+                                        v-if="obj.processDefinitionId"
                                         class=" text-left fs-13 text-ellipsis w-80 title-quytrinh"
                                     >{{obj.processDefinitionName}}</span>
                                     <span v-on="on" v-else class="text-left fs-13text-ellipsis w-80 title-quytrinh">ad hoc</span>
@@ -142,9 +142,7 @@
                                     <span>{{ obj.processDefinitionName?  obj.processDefinitionName : `ad hoc` }}</span>
                                 </v-tooltip>
                                 <div class="pa-0 grey--text mt-1 lighten-2 d-flex justify-space-between">
-                                <!-- <div
-                                    class="fs-11  text-ellipsis"
-                                >App</div> -->
+                                    {{selectNameApp(obj.variables)}}
                                 </div>
                             </div>
                         </v-col>
@@ -152,9 +150,13 @@
                             cols="1"
                             class="pl-3 fs-13 px-1 py-0"
                         >
-                            <div class="pl-1">
-                                <div style="width:55px">10 <v-icon class="fs-14" style="float:right;margin-top:4px;margin-right:12px">mdi-comment-processing-outline</v-icon> </div>
-                                <div style="width:55px"> 2 <v-icon class="fs-14" style="float:right;margin-top:4px;margin-right:12px">mdi-attachment</v-icon></div>
+                            <div class="pl-1 mt-1">
+                                <div style="width:55px">
+                                    {{commentCountPerTask['task:' + obj.id]}}
+                                    <v-icon class="fs-14" style="float:right;margin-top:4px;margin-right:12px">mdi-comment-processing-outline</v-icon> </div>
+                                <div style="width:55px">
+                                      {{fileCountPerTask['task:' + obj.id]}}
+                                    <v-icon class="fs-14" style="float:right;margin-top:4px;margin-right:12px">mdi-attachment</v-icon></div>
                             </div>
                         </v-col>
                     </v-row>
@@ -178,7 +180,13 @@ export default {
         },
     },
     watch: {
-
+        listTask(newVl){
+            this.getData();
+            if(!newVl){
+                this.$store.dispatch('file/getWaitingFileCountPerObj');
+                this.$store.dispatch('comment/getWaitingCommentCountPerObj');
+            }
+        }
     },
     components: {
         icon: icon,
@@ -187,10 +195,16 @@ export default {
     },
     data: function() {
         return {
-            indexObj:null
+            indexObj:null,
         }
     },
     computed:{
+        fileCountPerTask(){
+            return this.$store.state.file.fileCountPerObj.list;
+        },
+        commentCountPerTask(){
+            return this.$store.state.comment.commentCountPerObj.list;
+        },
         listTaskComputed(){
             let self=this;
             let arrListTask=this.listTask;
@@ -199,6 +213,7 @@ export default {
                     task.taskData = self.getTaskData(task);
                     task = addMoreInfoToTask(task);
                 });
+
                 return arrListTask;
             }else{
                 return [];
@@ -208,6 +223,21 @@ export default {
     },
     methods:{
         handleReachEndList(){},
+        selectNameApp(variables){
+            const symperAppId = variables.find(element => element.name=='symper_application_id');
+            if (symperAppId) {
+                let appId=symperAppId.value;
+                let allApp = this.$store.state.task.allAppActive;
+                let app=allApp.find(element => element.id==appId);
+                if (app) {
+                    return app.name;
+                }else{
+                    return "";
+                }
+            }else{
+                return "";
+            }
+        },
         getTaskData(task) {
             let rsl = {
                 content: "",
@@ -226,7 +256,24 @@ export default {
         },
         selectObject(obj){
             this.$router.push("/myitem/tasks/"+obj.id);
+        },
+        getData(){
+            if (this.listTask && this.listTask.length>0) {
+                let arrListTask=this.listTask;
+                let taskIden = [];
+                arrListTask.forEach(task => {
+                    taskIden.push('task:'+task.id);
+                })
+                this.$store.commit('file/setWaitingFileCountPerObj', taskIden);
+                this.$store.commit('comment/setWaitingCommentCountPerObj', taskIden);
+                this.$store.dispatch('file/getWaitingFileCountPerObj');
+                this.$store.dispatch('comment/getWaitingCommentCountPerObj');
+            
+            }
         }
+    },
+    created(){
+        this.getData();
     }
 }
 </script>

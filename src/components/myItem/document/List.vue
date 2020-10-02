@@ -125,18 +125,15 @@
                     cols="2"
                     v-if="!sideBySideMode"
                 >
-                    <div class="pl-1">
+                    <div class="pl-1 pa-3">
                         <v-tooltip bottom>
                             <template v-slot:activator="{ on }">
-                            <span v-on="on"  class="text-left fs-13text-ellipsis w-80 title-quytrinh"></span>
+                            <span v-on="on"  class="text-left fs-13 text-ellipsis w-80 title-quytrinh">
+                                {{showNameApp(obj.appId)}}
+                            </span>
                             </template>
                             <span>aaa</span>
                         </v-tooltip>
-                        <div class="pa-0 grey--text mt-1 lighten-2 d-flex justify-space-between">
-                        <!-- <div
-                            class="fs-11  text-ellipsis"
-                        >App</div> -->
-                        </div>
                     </div>
                 </v-col>
                 <v-col
@@ -144,7 +141,7 @@
                     class="pl-3 fs-13 px-1 py-0"
                     v-if="!sideBySideMode"
                 >
-                    <div class="pl-1">
+                    <div class="pl-1 pt-1">
                         <div style="width:55px">
                             {{commentCountPerTask['document:' + obj.id]}}
                             <v-icon class="fs-14" style="float:right;margin-top:4px;margin-right:12px">mdi-comment-processing-outline</v-icon> </div>
@@ -225,30 +222,40 @@ export default {
         let listObjRelated=this.stask.listDocumentObjId;
         let listObjUserSubmit=this.stask.listDocumentObjIdWithUserSubmit;
         let arrDocument=listObjRelated.concat(listObjUserSubmit);
-        arrDocument.sort(function(a, b) {
+        let mapIdToDocObj = {};
+        let rsl = [];
+
+        
+        arrDocument.forEach(element => {
+            if(!mapIdToDocObj[element.id]){
+                mapIdToDocObj[element.id] = true;
+                if (element.userCreate && element.userCreate!= null) {
+                    let arrUser = this.sapp.allUsers;
+                    let user = arrUser.find(data => data.email === element.userCreate);
+                    if (user) {
+                    element.displayName=user.displayName;
+                    element.userId=user.id;
+                    } else {
+                        element.displayName="";
+                    }
+                
+                }else{
+                    element.displayName="";
+                }
+                rsl.push(element);
+            }
+        });
+
+        
+        rsl.sort(function(a, b) {
             var keyA = new Date(a.createAt),
             keyB = new Date(b.createAt);
             if (keyA > keyB) return -1;
             if (keyA < keyB) return 1;
             return 0;
         });
-        arrDocument.forEach(element => {
-            if (element.userCreate && element.userCreate!= null) {
-                let arrUser = this.sapp.allUsers;
-                let user = arrUser.find(data => data.email === element.userCreate);
-                if (user) {
-                   element.displayName=user.displayName;
-                   element.userId=user.id;
-                } else {
-                    element.displayName="";
-                }
-              
-            }else{
-                element.displayName="";
-            }
-        });
 
-        return arrDocument;
+        return rsl;
     },
     stask() {
       return this.$store.state.task;
@@ -353,8 +360,21 @@ export default {
         self.reCalcListTaskHeight();
     },
     methods: {
+        showNameApp(appId){
+            if (appId!=null) {
+                let allApp = this.$store.state.task.allAppActive;
+                let app=allApp.find(element => element.id==appId);
+                if (app) {
+                    return app.name;
+                }else{
+                    return "";
+                }
+            }else{
+                return "";
+            }
+        },
         changeUpdateAsignee(){
-        this.handleTaskSubmited();
+            this.handleTaskSubmited();
         },
         showTime(time){
             var today = this.$moment().format('YYYY-MM-DD');
@@ -583,5 +603,9 @@ export default {
     top:8px;
     left: 8px;
     z-index: 100;
+}
+.col-10 {
+    flex: 0 0 94.333333%;
+    max-width: 94.333333%;
 }
 </style>

@@ -127,6 +127,14 @@
         :dataflowId="dataFlow.id" 
         :width="'100%'"
         :ref="'dataFlow'+dataFlow.id"/>
+        <UploadFile 
+        :objectType="'document'"
+        :iconName="`mdi-upload-outline`"
+        ref="fileUploadView"
+        class="d-none"
+        @uploaded-file="afterFileUpload"
+        :objectIdentifier="docId+''" />
+        
         <!-- v-for="dataFlow in listDataFlow" :key="dataFlow.id"  -->
         
          
@@ -158,6 +166,7 @@
             :listFormulasTrace="listFormulasTrace"
             ref="traceControlView" v-show="isShowTraceControlSidebar" />
         </v-navigation-drawer>
+
     </div>
      
 </template>
@@ -175,6 +184,7 @@ import PageControl from "./pageControl";
 import TabControl from "./tabControl";
 import DatePicker from "./../../../components/common/DateTimePicker";
 import TimeInput from "./../../../components/common/TimeInput";
+import UploadFile from "@/components/common/UploadFile.vue";
 import Table from "./table.js";
 import SymperDragPanel from "./../../../components/common/SymperDragPanel.vue";
 import { util } from "./../../../plugins/util.js";
@@ -236,6 +246,13 @@ export default {
             type: String,
             default: ''
         },
+        /**
+         * Biến chỉ ra bản ghi nằm trong app nào
+         */
+        appId:{
+            type:Number,
+            default:0
+        },
         
         workflowVariable:{
             type:Object,
@@ -281,6 +298,7 @@ export default {
         "err-message": ErrMessagePanel,
         EmbedDataflow,
         Preloader,
+        UploadFile,
         SidebarTraceFormulas,
         VuePerfectScrollbar,
         VBoilerplate: {
@@ -352,7 +370,9 @@ export default {
             titleObjectFormulas:null,
             isShowTraceControlSidebar:false,
             listFormulasTrace:{},
-            controlTrace:null
+            controlTrace:null,
+            listFileControl:[],
+            currentImageControl:null
         };
 
     },
@@ -459,6 +479,14 @@ export default {
             }
             
         });
+        /**
+         * Hàm gọi mở sub form submit
+         */
+        this.$evtBus.$on("document-submit-image-click", data => {
+            this.currentImageControl = $(data.target).closest('.s-control-image')
+            this.$refs.fileUploadView.onButtonClick();
+            
+        });
 
         // hàm nhận sự kiện thay đổi của input
         this.$evtBus.$on("document-submit-input-change", locale => {
@@ -542,6 +570,7 @@ export default {
         }); 
         // hàm nhận sự thay đổi của input autocomplete gọi api để chạy công thức lấy dữ liệu
         this.$evtBus.$on("document-submit-autocomplete-key-event", e => {
+            console.log("ádsadsad",e);
             if(thisCpn._inactive == true) return;
             try {
                 if((e.e.keyCode >= 97 && e.e.keyCode <= 105) ||
@@ -1592,9 +1621,21 @@ export default {
             let titleObject = "";
             if(this.titleObjectFormulas != null){
                 let dataInputTitle = thisCpn.getDataInputFormulas(this.titleObjectFormulas);
-                let res = await this.titleObjectFormulas.handleBeforeRunFormulas(dataInputTitle);
-                let value = this.getValueFromDataResponse(res);
-                dataPost['titleObject'] = value
+                try {
+                    let res = await this.titleObjectFormulas.handleBeforeRunFormulas(dataInputTitle);
+                    let value = this.getValueFromDataResponse(res);
+                    dataPost['titleObject'] = value
+                } catch (error) {
+                    
+                }
+            }
+            if(this.appId){
+                dataPost['appId'] = this.appId;
+            }
+            else{
+                if(this.$route.params.extraData && this.$route.params.extraData.appId){
+                    dataPost['appId'] = this.$route.params.extraData.appId
+                }
             }
             documentApi.submitDocument(dataPost).then(res => {
                 let dataResponSubmit = res.data;
@@ -2235,6 +2276,11 @@ export default {
             if(Object.keys(this.overrideControls).length > 0 && Object.keys(this.overrideControls).includes(controlName)){
                 field.formulas.formulas.value[Object.keys(field.formulas.formulas.value)[0]] = this.overrideControls[controlName]['formulas'];
             }
+        },
+        afterFileUpload(data){
+            let url = data.serverPath;
+            let image = '<img height="70" src="'+url+'">';
+            this.currentImageControl.html(image);
         }
     }
     

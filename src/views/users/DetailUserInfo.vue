@@ -538,6 +538,79 @@ export default {
                 console.log("error from change pass user api!!!", err);
             })
         },
+		
+		getNameByAction(action){
+		},
+		getListObjectIdentifier(object){
+			let objIdentifier =[];
+			// for(let j=0; j<this.listActionAndObj[object].length;j++){
+				 objIdentifier = _.groupBy(this.listActionAndObj[object],'objectIdentifier' );
+			// }
+			 let formatObjIdentifier = Object.keys(objIdentifier);
+			this.listRoleObj = formatObjIdentifier.filter(x=>x.indexOf(':')>0);
+
+			this.getNameObjByRoles(this.listRoleObj);
+		},
+		detailView(object){
+			this.titleNameObject =[];
+			this.action=[];
+			this.nameObject =[];
+			let action = [];
+			this.menuTitle = object;
+			let listObject = Object.keys(this.listActionAndObj)
+            for (let i = 0; i < listObject.length; i++){
+                 if(listObject[i]==object){
+					 for(let j=0; j<this.listActionAndObj[object].length;j++){
+                        action.push(this.listActionAndObj[object][j].action);
+					
+						 this.nameObject.push({
+							 name:this.listActionAndObj[object][j].name,
+							 action: this.listActionAndObj[object][j].action,
+							 });
+					 }
+				 }
+			};
+				 this.action= action.filter((item, index) => action.indexOf(item) === index);
+			this.getListObjectIdentifier(object);
+		},
+		getMenuTitle(object){
+			return object;
+		},
+		async getNameObjByRoles(role){
+			const self = this;
+			let res = await userApi.getOperationsObject({ids:role});
+	
+			if(res.status ==200){
+	
+				let titleNameObject = res.data;
+				if(titleNameObject.length==0){
+					alert("Không có quyền")
+				}else{
+			
+					for(let i = 0; i<titleNameObject.length;i++){
+					self.titleNameObject.push(titleNameObject[i].title?titleNameObject[i].title:titleNameObject[i].name);
+				
+				}
+				
+				}
+				
+			}
+		},
+		async getRoleOrgchartByUser(id){
+			const self = this;
+			let res = await orgchartApi.getRolesByUser([{idUser: id}])
+			if (res.status === 200) {
+				self.rolesOgchart = res.data[0].roles
+			}
+			
+		},
+		async getRolesByUser(id){
+			const self = this;
+			let res = await  systemRoleApi.getRolesByUser([id])
+				if (res.status === 200) {
+					self.roles = res.data[0].roles
+				}
+		}
           
     },
     created(){

@@ -31,98 +31,98 @@
         </div>
         <VuePerfectScrollbar :style="{height: menuItemsHeight}">
         <div class="content-view-details-all-app h-100 w-100">
-                <v-skeleton-loader
-                        ref="skeleton"
-                        v-if="loadingApp"
-                        type="table-tbody"
-                        class="mx-auto w-100 h-100"
-                 ></v-skeleton-loader>
+            <v-skeleton-loader
+                    ref="skeleton"
+                    v-if="loadingApp"
+                    type="table-tbody"
+                    class="mx-auto w-100 h-100"
+            ></v-skeleton-loader>
                
-                    <template v-else  >
-                        <v-expansion-panels
-                             v-model="panel"
-                            multiple
-                            style="display:flex"
-                        >
-                                <div
-                                     v-for="(item,i) in listApp"
-                                    :key="i"
-                                    style="width:50%"
-                                >
-                                     <v-expansion-panel
-                                     >
-                                    <v-expansion-panel-header>
-                                    <div class="app-title">
-                                            <v-icon v-if="item.iconType == 'icon'" style="font-size:16px;flex:unset;margin-left:0px;margin-right:0px;padding-top:2px">{{item.iconName}}</v-icon>
-                                            <img v-else-if="item.iconType == 'img'" :src="item.iconName" class="app-item-img"/>
-                                            <span style="padding-left:8px">
-                                                {{item.name}}
-                                            </span>
-                                    </div>
-                                        </v-expansion-panel-header>
-                                    <v-expansion-panel-content>
-                                        <!-- chi tiet tung app  -->
-                                        <v-row no-gutters>
-                                            <template v-for="(childItem,n) in item.childrenAppReduce">
-                                                <v-col cols="6" :key="n">
-                                                    <div style="margin-left:9px;margin-top:6px">
-                                                        <div style="margin-bottom:6px">
-                                                            <v-icon style="margin-top:-2px">{{ childItem.icon }}</v-icon>
-                                                            <span style="font-weight:300;font:13px;margin-top:1px">
-                                                                {{ childItem.title  ? childItem.title : childItem.name}}
-                                                            </span>
-                                                             <span  style="font-weight:300;font:13px;padding-left:2px;margin-top:1px"> {{'('+ reduce(childItem.item) +')' }}</span>
-                                                        </div>
-                                                        <div>
-                                                            <ul v-for="(subChildItem,k) in childItem.item" :key="k"  class="app-child-item">
-                                                                    <li
-                                                                        v-if="subChildItem.show == true"
-                                                                        v-on:contextmenu="rightClickHandler($event,subChildItem,childItem.name,item)"
-                                                                        v-on:click="rightClickHandler($event,subChildItem,childItem.name,item)"
-                                                                    >
-                                                                        <div style="position:relative">
-                                                                            <v-tooltip bottom v-if="childItem.name == 'document_definition'">
-                                                                                <template v-slot:activator="{ on, attrs }">
-                                                                                    <div class="title-document-enduser" 	
-                                                                                        v-bind="attrs"
-                                                                                        v-on="on" >
-                                                                                        <span v>{{subChildItem.title}}</span> 
-                                                                                        
-                                                                                    </div>
-                                                                                </template>
-                                                                                <span style="font:13px roboto">{{subChildItem.title}}</span> 
-                                                                                <span style="font:8px;opacity:0.4">{{subChildItem.name}}</span>
-                                                                            </v-tooltip>
-                                                                            <div v-else  class="title-document-enduser" >{{subChildItem.title ? subChildItem.title : subChildItem.name }}</div>
-                                                                            <v-icon  
-																				@click="changeFavorite(subChildItem, childItem.name, item)" 
-																				:class="{
-																					'icon-star-active' : subChildItem.favorite, 
-																					'icon-star': true
-																				}" >
-																				mdi-star
-																			</v-icon>
-                                                                        </div>
-                                                                    </li>
-                                                            </ul>
-                                                        </div>
-                                                    </div>
-                                                
-                                                </v-col>
-                                                <v-responsive
-                                                v-if="n === 2"
-                                                :key="`width-${n}`"
-                                                width="100%"
-                                                ></v-responsive>
-                                            </template>
-                                        </v-row>
-                                    </v-expansion-panel-content>
-                                  </v-expansion-panel>
+            <template v-else  >
+                <v-expansion-panels
+                    v-model="panel"
+                    multiple
+                    style="display:flex"
+                >
+                <div class="d-inline-block" style="width: 50%" v-for="(apps, idx) in listApp" :key="idx">
+                    <div
+                        class="w-100"
+                        v-for="(item,i) in listApp[idx]"
+                        :key="i"
+                    >
+                        <v-expansion-panel>
+                            <v-expansion-panel-header>
+                                <div class="app-title">
+                                    <v-icon v-if="item.iconType == 'icon'" style="font-size:16px;flex:unset;margin-left:0px;margin-right:0px;padding-top:2px">{{item.iconName}}</v-icon>
+                                    <img v-else-if="item.iconType == 'img'" :src="item.iconName" class="app-item-img"/>
+                                    <span style="padding-left:8px">
+                                        {{item.name}}
+                                    </span>
                                 </div>
-                                   
-
-                        </v-expansion-panels>
-                    </template>
+                            </v-expansion-panel-header>
+                            
+                            <v-expansion-panel-content>
+                                <!-- chi tiet tung app  -->
+                                <v-row no-gutters>
+                                    <template v-for="(childItem,n) in item.childrenAppReduce">
+                                        <v-col cols="6" :key="n">
+                                            <div style="margin-left:9px;margin-top:6px">
+                                                <div style="margin-bottom:6px">
+                                                    <v-icon style="margin-top:-2px">{{ childItem.icon }}</v-icon>
+                                                    <span style="font-weight:300;font:13px;margin-top:1px">
+                                                        {{ childItem.title  ? childItem.title : childItem.name}}
+                                                    </span>
+                                                    <span  style="font-weight:300;font:13px;padding-left:2px;margin-top:1px"> {{'('+ reduce(childItem.item) +')' }}</span>
+                                                </div>
+                                                <div>
+                                                    <ul v-for="(subChildItem,k) in childItem.item" :key="k"  class="app-child-item">
+                                                            <li
+                                                                v-if="subChildItem.show == true"
+                                                                v-on:contextmenu="rightClickHandler($event,subChildItem,childItem.name,item)"
+                                                                v-on:click="rightClickHandler($event,subChildItem,childItem.name,item)"
+                                                            >
+                                                                <div style="position:relative">
+                                                                    <v-tooltip bottom v-if="childItem.name == 'document_definition'">
+                                                                        <template v-slot:activator="{ on, attrs }">
+                                                                            <div class="title-document-enduser" 	
+                                                                                v-bind="attrs"
+                                                                                v-on="on" >
+                                                                                <span v>{{subChildItem.title}}</span> 
+                                                                                
+                                                                            </div>
+                                                                        </template>
+                                                                        <span style="font:13px roboto">{{subChildItem.title}}</span> 
+                                                                        <span style="font:8px;opacity:0.4">{{subChildItem.name}}</span>
+                                                                    </v-tooltip>
+                                                                    <div v-else  class="title-document-enduser" >{{subChildItem.title ? subChildItem.title : subChildItem.name }}</div>
+                                                                    <v-icon  
+                                                                        @click="changeFavorite(subChildItem, childItem.name, item)" 
+                                                                        :class="{
+                                                                            'icon-star-active' : subChildItem.favorite, 
+                                                                            'icon-star': true
+                                                                        }" >
+                                                                        mdi-star
+                                                                    </v-icon>
+                                                                </div>
+                                                            </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        
+                                        </v-col>
+                                        <v-responsive
+                                        v-if="n === 2"
+                                        :key="`width-${n}`"
+                                        width="100%"
+                                        ></v-responsive>
+                                    </template>
+                                </v-row>
+                            </v-expansion-panel-content>
+                        </v-expansion-panel>
+                    </div>
+                </div>
+                </v-expansion-panels>
+            </template>
         </div>
         </VuePerfectScrollbar>
         <ContextMenu ref="contextMenu"  :allAppMode="true" />
@@ -144,7 +144,15 @@ export default {
     },
     computed:{
         listApp(){
-            return this.$store.state.appConfig.listApps
+            let apps = this.$store.state.appConfig.listApps;
+            let rsl = [{},{}];
+            let appArr = Object.values(apps);
+
+            for(let i = 0; i < appArr.length; i++){
+                rsl[i%2][appArr[i].id] = appArr[i];
+            }
+            
+            return rsl;
         }
     },
     methods:{
@@ -418,7 +426,7 @@ export default {
         }
     },
     created(){
-        if(Object.keys(this.listApp).length == 0 ){
+        if(!this.listApp[0].length && !this.listApp[1].length){
            this.getActiveapps()
         }else{
             this.loadingApp = false

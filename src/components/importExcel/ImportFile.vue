@@ -225,7 +225,6 @@ export default {
 
         },
         cancel() {
-            debugger
             this.$emit('cancel');
             this.$emit('stopSetInterval');
             this.$store.commit('importExcel/setNewImport', true);  
@@ -269,7 +268,6 @@ export default {
         },
         // Sự kiện được gọi khi ấn import
         importFile() {
-          //  debugger
             let cleanedTables = this.tables.map((t, idx) => ({
                 ...idx !== 0 && {
                     name: t.name

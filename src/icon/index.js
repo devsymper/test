@@ -20,7 +20,7 @@ export default {
         syql: "mdi mdi-alpha-f",
         dataflow: "mdi mdi-arrange-send-to-back",
         comment: "mdi-comment-outline",
-        file: "file-upload-outline",
+        file: "mdi mdi-file-upload-outline",
         dashboard: "mdi mdi-view-dashboard"
 
 

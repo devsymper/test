@@ -1,25 +1,12 @@
 <template>
     <div class="home h-100 w-100">
-        <v-navigation-drawer
-            v-model="showUserInfo"
-            absolute
-            right
-            style="width:600px"
-            temporary
-            >
-        <DetailUserInfo class="h-100" 
-            v-if="showUserInfo"
-            :detailInfo="detailInfoUser"
-            :changeDetail="true"
-        />
-        </v-navigation-drawer>
         <!-- <v-btn @click="runDataflow" color="primary">Primary</v-btn> -->
          <v-dialog
             v-model="dialog"
             width="397"
-        >
-         <NotificationChangePass @cancel="cancelDialog()"/>
-      </v-dialog>
+            >
+            <NotificationChangePass @cancel="cancelDialog()"/>
+        </v-dialog>
         <Dashboard></Dashboard>
      
         <!-- <EmbedDataflow 
@@ -42,7 +29,6 @@
     </div>
 </template>
 <script>
-import DetailUserInfo from "./../views/users/DetailUserInfo";
 import FormTpl from "./../components/common/FormTpl.vue";
 import OrgchartSelector from "./../components/user/OrgchartSelector.vue";
 import TimelineTreeview from "./../components/common/TimelineTreeview";
@@ -181,8 +167,7 @@ export default {
         PermissionSelector,
         Dashboard,
         EmbedDataflow,
-        SymperActionView,
-        DetailUserInfo
+        SymperActionView
     }
 };
 </script>

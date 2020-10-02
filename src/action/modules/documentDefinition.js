@@ -31,7 +31,12 @@ export default [{
             let tabName = param.title ? param.title : (param.name ? param.name : '');
             tabName = this.$t('document.submit.title') + ' ' + tabName;
             let url = this.$getActionLink(param);
-            this.$goToPage(url, tabName);
+
+            let extraData = {};
+            if (param.appId) {
+                extraData.appId = param.appId;
+            }
+            this.$goToPage(url, tabName, false, true, extraData);
         },
         $getActionLink(param) {
             return `/documents/${param.id}/submit`;

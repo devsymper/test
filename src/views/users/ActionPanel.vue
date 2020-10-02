@@ -498,7 +498,6 @@ export default {
 					value:0
 				}
 			}
-			debugger
 			let password = (this.autoRenPassword) ? this.generatePassword() : this.user.password;
 			let avatar = (this.url != avatarDefault) ? this.url : '';
 			let data = {
@@ -515,13 +514,11 @@ export default {
 				sendMail:this.sendMailAfterChange
 			}
 			userApi.addUser(data).then(res => {
-				debugger
 				if (res.status == 200) {
 					//cpn.loadPermission();
 					//cpn.setStepper(2);
 					cpn.loading = false;
 					cpn.editStep = true;
-					debugger
 					cpn.loader = null;
 					cpn.user.id = res.user.id;
                     cpn.avatarFileName = 'user_avatar_'+res.user.id;
