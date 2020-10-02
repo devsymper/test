@@ -78,7 +78,6 @@ export default {
 		searchItem(val){
 		},
 		heightListComment(val){
-			debugger
 		}
 
 	}

@@ -144,7 +144,6 @@ export default {
     },
     computed:{
         listApp(){
-            debugger
             let apps = this.$store.state.appConfig.listApps;
             let rsl = [{},{}];
             let appArr = Object.values(apps);

@@ -150,7 +150,6 @@ export default {
             this.$store.commit('search/setSearch',  this.searchItems);
             this.$store.commit('search/setSearchAll',  this.searchItemsAll);
             this.$store.commit('search/setShowGeneral', true);
-           // debugger
             this.$store.commit('search/setCountResult', this.searchItems.filter(x=>x.type).length);
             this.$router.push('/search/general');
             };
@@ -233,7 +232,6 @@ export default {
                                       returnObjSearch.description = data.description?data.description:(data.description==null||data.description==''?"Mô tả đang để trống":"Symper");
                                 }
                                 if(data.type=='file'){
-                                    debugger                                   
                                    !data.source?data.source="Chưa có nguồn":'Document';
                                      returnObjSearch.searchField="Nguồn: "+(data.objectType?data.objectType:"Để trống");
                                       returnObjSearch.description ="Nguồn: "+(data.objectType?data.objectType:"Để trống");
@@ -245,7 +243,6 @@ export default {
                                       returnObjSearch.description = "Nguồn: "+data.objectType+ " -Ngày bình luận: " + (data.updatedAt?data.updatedAt:data.createdAt);
                                 }
                                 if(data.type=='syql'){
-                                    debugger
                                     self.getNameSyql(data.id);
                                     //returnObjSearch.displayName ="Nguồn:" + self.syqlId.content;
                                    returnObjSearch.displayName = "Nguồn: "+ (name.objectType?name.objectType:'')+ " -"+ (name.objectIdentifier?name.objectIdentifier:"") + "- Tên văn bản: " + (name.content?name.content:'');
@@ -256,7 +253,6 @@ export default {
                                 return returnObjSearch;
                             })
                             const groupByType = _.groupBy(normalizedData, 'type');
-                            debugger
                             const searchData = [];
                             const allData = [];
                             Object.keys(groupByType).forEach(type => {

@@ -370,7 +370,6 @@ export default class Formulas {
          * @param {String} formulas 
          */
     replaceParamsToData(dataInput, formulas) {
-        // debugger
 
         // thay thế các tham số của workflow 
         formulas = this.replaceWorkflowParams(formulas);

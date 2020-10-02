@@ -80,7 +80,7 @@
 					<v-expansion-panel-header class="v-expand-header">{{$t('document.detail.sidebar.body.worflowInfo')}}</v-expansion-panel-header>
 					<v-expansion-panel-content class="sym-v-expand-content">
 
-						<table class="workflow-info" 	-if="workflowId !='' ">
+						<table class="workflow-info" v-if="workflowId !='' ">
 							<tr>
 								<td><v-icon style="font-size:15px ; padding-right:6px">mdi-lan</v-icon> {{workflowName}}</td>
 							<tr>
