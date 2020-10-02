@@ -15,7 +15,7 @@
                             label="Search"
                             :placeholder="$t('common.search')"
                         ></v-text-field>
-                        <v-btn
+                         <v-btn
                             v-show="showButtonAdd && !actionPanel"
                             depressed
                             small
@@ -500,6 +500,14 @@ export default {
             type: String,
             default: ''
         },
+        showImportButton: {
+            type: Boolean,
+            default: true
+        },
+        showExportButton: {
+            type: Boolean,
+            default: true
+        },
         debounceRowSelectTime: {
             type: Number,
             default: 100
@@ -690,12 +698,16 @@ export default {
                     markFilter = "applied-filter";
                 }
                 let headerName = prefix ? thisCpn.$t(prefix + colTitles[col]) : colTitles[col];
+                let filterIcon =  '';
+                if(!thisCpn.tableColumns[col].noFilter){
+                    filterIcon = `<i col-name="${colName}" onclick="tableDropdownClickHandle(this, event)" class="grey-hover mdi mdi-filter-variant symper-table-dropdown-button ${markFilter}"></i>`;
+                }
                 return `<span class="d-flex justify-space-between">
                             <span class="font-weight-medium">
                                 ${headerName}
                             </span>
                             <span class="float-right symper-filter-button">
-                                <i col-name="${colName}" onclick="tableDropdownClickHandle(this, event)" class="grey-hover mdi mdi-filter-variant symper-table-dropdown-button ${markFilter}"></i>
+                                ${filterIcon}
                             </span>
                         </span>`;
                 //.replace(/\n|\r\n/g,'')
@@ -1243,6 +1255,7 @@ export default {
                         symperFixed: false,
                         symperHide: false,
                         columnTitle: item.title,
+                        noFilter: item.noFilter ? item.noFilter : false
                     };
                     // Render image - icon
                     if (item.type === 'image') {

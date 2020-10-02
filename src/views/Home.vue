@@ -1,8 +1,14 @@
 <template>
     <div class="home h-100 w-100">
         <!-- <v-btn @click="runDataflow" color="primary">Primary</v-btn> -->
-
+         <v-dialog
+            v-model="dialog"
+            width="397"
+            >
+            <NotificationChangePass @cancel="cancelDialog()"/>
+        </v-dialog>
         <Dashboard></Dashboard>
+     
         <!-- <EmbedDataflow 
         ref="dataflow"
         :dataflowId="124"
@@ -22,7 +28,6 @@
             }" /> -->
     </div>
 </template>
-
 <script>
 import FormTpl from "./../components/common/FormTpl.vue";
 import OrgchartSelector from "./../components/user/OrgchartSelector.vue";
@@ -33,7 +38,8 @@ import SymperColorPicker from "@/components/common/symperInputs/SymperColorPicke
 import PermissionSelector from "@/components/permission/PermissionSelector.vue";
 import Dashboard from "@/views/dashboard/Dashboard.vue";
 import EmbedDataflow from "./../components/dataflow/EmbedDataflow";
-
+import NotificationChangePass from "./../components/notification/notificationChangeFirstPass";
+import { userApi } from "./../../src/api/user";
 import SymperActionView from "./../action/SymperActionView";
 export default {
     name: "Home",
@@ -43,12 +49,65 @@ export default {
         },
         addNum() {
             this.num += 1;
+        },
+        cancelDialog(){
+            this.dialog = false;
+        },
+        checkStatus(){
+            if(this.sapp.endUserInfo.status==2){
+                this.dialog = true;
+            }
+        },
+        setDetailInfo(){
+            this.detailInfoUser.lastName =this.sapp.endUserInfo.lastName;
+            this.detailInfoUser.displayName =this.sapp.endUserInfo.displayName;
+			this.detailInfoUser.firstName =this.sapp.endUserInfo.firstName;
+			this.detailInfoUser.email =this.sapp.endUserInfo.email;
+			this.detailInfoUser.phone =this.sapp.endUserInfo.phone;
+			this.detailInfoUser.status =this.sapp.endUserInfo.status;
+            this.detailInfoUser.avatarUrl =this.sapp.endUserInfo.avatar;
+            this.detailInfoUser.id = this.sapp.endUserInfo.id
+            
+		},
+        getUserInfo(){
+            userApi.getDetailUser(this.sapp.endUserInfo.id).then(res => {
+                if (res.status == 200) {
+                  if(res.status){
+                      this.isShowChangePassFirstLogin = true
+                  } 
+                }
+            })
+            .catch(err => {
+                console.log("error from change pass user api!!!", err);
+            })
+        }
+    },
+    created(){
+        this.getUserInfo();
+        this.checkStatus();
+    },
+    watch:{
+        showUserInfo(){
+            this.setDetailInfo();
+            if(this.showUserInfo==false){
+                this.$store.commit('user/setShowUser', false);
+            }
+        }
+    },
+     computed:{
+         sapp() {
+            return this.$store.state.app;
+        },
+        showUserInfo(){
+            return this.$store.state.user.showUserInfo;
         }
     },
     data() {
         return {
+            detailInfoUser:{},
+            dialog:false,
+            isShowChangePassFirstLogin:false,
             selectedPermission: [
-                
                     {
                         id: 'xxx',
                         name: 'Permission 1',
@@ -102,6 +161,7 @@ export default {
         "form-tpl": FormTpl,
         'orgchart-selector': OrgchartSelector,
         TimelineTreeview,
+        NotificationChangePass,
         FormulaEditor: FormulaEditor,
         SymperColorPicker: SymperColorPicker,
         PermissionSelector,

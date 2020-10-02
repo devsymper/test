@@ -128,15 +128,12 @@
                     <div class="pl-1">
                         <v-tooltip bottom>
                             <template v-slot:activator="{ on }">
-                            <span v-on="on"  class="text-left fs-13text-ellipsis w-80 title-quytrinh"></span>
+                            <span v-on="on"  class="text-left fs-13text-ellipsis w-80 title-quytrinh">
+                                {{showNameApp(obj.appId)}}
+                            </span>
                             </template>
                             <span>aaa</span>
                         </v-tooltip>
-                        <div class="pa-0 grey--text mt-1 lighten-2 d-flex justify-space-between">
-                        <!-- <div
-                            class="fs-11  text-ellipsis"
-                        >App</div> -->
-                        </div>
                     </div>
                 </v-col>
                 <v-col
@@ -363,8 +360,21 @@ export default {
         self.reCalcListTaskHeight();
     },
     methods: {
+        showNameApp(appId){
+            if (appId!=null) {
+                let allApp = this.$store.state.task.allAppActive;
+                let app=allApp.find(element => element.id==appId);
+                if (app) {
+                    return app.name;
+                }else{
+                    return "";
+                }
+            }else{
+                return "";
+            }
+        },
         changeUpdateAsignee(){
-        this.handleTaskSubmited();
+            this.handleTaskSubmited();
         },
         showTime(time){
             var today = this.$moment().format('YYYY-MM-DD');

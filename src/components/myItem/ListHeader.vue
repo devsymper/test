@@ -125,7 +125,7 @@
         </v-list>
       </v-menu>
       <!-- duyệt theo lô -->
-      <v-btn v-show="!sideBySideMode" small class="mr-2" depressed @click="handleMoreApproval">
+      <v-btn v-show="!sideBySideMode" small class="mr-2" :class="{'color-orange':changeStatusMoreApproval==true}" depressed @click="handleMoreApproval">
         <v-icon size="18">mdi-format-list-checks</v-icon>
       </v-btn>
       <!-- Dãn nở dòng -->
@@ -246,6 +246,10 @@ export default {
     "symper-document-selec": SymperDocSelect
   },
   props: {
+    changeStatusMoreApproval:{
+      type:Boolean,
+      default:false,
+    },
     isSmallRow: {
       type: Boolean,
       default: true
@@ -489,5 +493,8 @@ export default {
 }
 .v-text-field>>>.v-input--dense:not(.v-text-field--outlined) >>>input {
     padding: 10px 0 11px!important;
+}
+.color-orange{
+    background-color: orange!important;
 }
 </style>

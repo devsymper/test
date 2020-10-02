@@ -50,13 +50,13 @@ export const appConfigs = {
         search: "https://search.symper.vn/",
         importExcel: 'https://io.dev.symper.vn/',
         uiConfig: "https://ui.symper.vn",
-        workflowExtend:"https://workflow-extend.symper.vn/"
+        workflowExtend: "https://workflow-extend.symper.vn/"
     },
     notificationTimeout: {
-        success: 10000,
-        warning: 20000,
-        info: 20000,
-        error: 30000,
+        success: 3000,
+        warning: 5000,
+        info: 3000,
+        error: 6000,
     },
     firebaseConfig: {
         apiKey: "AIzaSyBW8O6OeIUpaNbEYwyihGF7QsuVrwtOM4w",
