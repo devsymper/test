@@ -8,119 +8,56 @@
 					<v-row class="mt-1" >
 						<!-- thong tin -->
 						<v-col cols="8">
-							<v-row  v-if="!changeDetail">
+							<v-row class="ml-1">
 								<v-col cols="6">
 									<span  class="fw-430 fs-13 st-icon-pandora">
-												Họ tên
+										Họ & tên
 									</span>
 								</v-col>
 								<v-col  cols="6">
 									<span  class="fs-13 st-icon-pandora">
-												{{detailInfo.lastName}} {{' '+ detailInfo.firstName}} 
+										{{detailInfo.lastName}} {{' '+ detailInfo.firstName}} 
 									</span>
 								</v-col>
 							</v-row>
-							<v-row  v-if="changeDetail">
-								<v-col cols="6">
-									<span class="fw-430 fs-13 st-icon-pandora">
-												Họ
-									</span>
-								</v-col>
-								<v-col  cols="6">
-									<span v-if="!checkChangeLastName" class="fs-13 st-icon-pandora">
-											{{detailUser.lastName}} <span v-if="changeDetail">
-												<v-icon @click="checkChangeLastName=true" style="font-size: 14px">mdi mdi-pencil</v-icon></span>
-									</span>
-									<span v-else class="fs-13 st-icon-pandora">
-									<v-text-field
-											class="fs-13 font-normal"
-											v-model="lastName"
-											dense
-									></v-text-field>
-									<v-icon @click="changeLastName()" style="color:green; font-size: 14px">mdi mdi-check</v-icon>
-									</span>
-							
-								</v-col>
-							</v-row>
-							<!-- Endusser đổi thông tin cá nhân  -->
-							<v-row  v-if="changeDetail">
-								<v-col cols="6">
-									<span  class="fs-13 st-icon-pandora">
-											Tên
-									</span>
-								</v-col>
-								<v-col  cols="6">
-									<span v-if="!checkChangeFirstName" class="fs-13 st-icon-pandora">
-										{{detailUser.firstName}} <span v-if="changeDetail">
-											<v-icon style="font-size: 14px" @click="checkChangeFirstName=true">mdi mdi-pencil</v-icon></span>
-									</span>
-									<span v-else class="fs-13 st-icon-pandora">
-									<v-text-field
-											class="fs-13 font-normal"
-											v-model="firstName"
-											dense
-									></v-text-field>
-									<v-icon @click="changeFirstName()" style="color:green; font-size: 14px">mdi mdi-check</v-icon>
-									</span>
-								</v-col>
-						</v-row>
-							<v-row>
+							<v-row class="ml-1">
 								<v-col cols="6">
 									<span  class="fw-430 fs-13 st-icon-pandora">
-												{{ $t('user.general.personalInfo.displayName')}}
+										{{ $t('user.general.personalInfo.displayName')}}
 									</span>
 								</v-col>
 								<v-col  cols="6">
-									<span  v-if="!checkChangeDisplayName" class="fs-13 st-icon-pandora">
-											{{detailUser.displayName}} <span v-if="changeDetail">
-												<v-icon style="font-size: 14px" @click="checkChangeDisplayName=true">mdi mdi-pencil</v-icon>
-									</span>
-									</span>
-									<span v-else class="fs-13 st-icon-pandora">
-									<v-text-field
-											class="fs-13 font-normal"
-											v-model="displayName"
-											dense
-									></v-text-field>
-									<v-icon @click="changeDisplayName()" style="color:green; font-size: 14px">mdi mdi-check</v-icon>
+									<span class="fs-13 st-icon-pandora">
+										{{detailUser.displayName}} 
 									</span>
 								</v-col>
 							</v-row>
-							<v-row>
+							<v-row class="ml-1">
 								<v-col cols="6">
 									<span  class="fw-430 fs-13 st-icon-pandora">
-												{{ $t('user.general.personalInfo.email')}}
+										{{ $t('user.general.personalInfo.email')}}
 									</span>
 								</v-col>
 								<v-col  cols="6">
 									<span  class="fs-13 st-icon-pandora">
-												{{detailUser.email}} 
+										{{detailUser.email}} 
 									</span>
 						
 								</v-col>
 							</v-row>
-							<v-row>
+							<v-row class="ml-1">
 								<v-col cols="6">
 									<span   class="fw-430 fs-13 st-icon-pandora">
 										{{ $t('user.general.personalInfo.phoneNumber')}}
 									</span>
 								</v-col>
-							
 								<v-col cols="6">
-                                    <span  v-if="!checkPhone" class="fs-13">
-									    {{detailUser.phone}} <span v-if="changeDetail"><v-icon style="font-size: 14px" @click="checkPhone=true">mdi mdi-pencil</v-icon></span>
+                                    <span  class="fs-13">
+									    {{detailUser.phone}} 
                                     </span>
-										<span v-else class="fs-13 st-icon-pandora">
-									<v-text-field
-											class="fs-13 font-normal"
-											v-model="phone"
-											dense
-									></v-text-field>
-									<v-icon @click="changePhone()" style="color:green; font-size: 14px">mdi mdi-check</v-icon>
-									</span>
 								</v-col>
 						    </v-row>
-                            <v-row>
+                            <v-row class="ml-1">
 								<v-col cols="6">
 									<span  class="fw-430 fs-13 st-icon-pandora">
 										{{ $t('user.general.personalInfo.status')}}
@@ -134,104 +71,61 @@
 										Khóa
 									</span>
 								</v-col>
-								
 						    </v-row>
-							<v-row  v-if="changeDetail">
-								<v-col cols="6">
-									<span  class="fw-430 fs-13 st-icon-pandora">
-											Mật khẩu
-									</span>
-								</v-col>
-								<v-col  cols="6">
-									<span  class="fs-13 st-icon-pandora">
-										<span v-if="changeDetail">
-											<v-icon @click="checkPass=true" style="font-size: 14px">mdi mdi-pencil</v-icon></span>
-									</span>
-								</v-col>
-							</v-row>
-							<v-row  v-if="changeDetail&&checkPass">
-								<v-col  cols="12">
-									<span  class="fs-12 st-icon-pandora" style="color:grey">
-										Mật khẩu ít nhất 8 kí tự, 1 chữ viết hoa, 1 số và 1 ký tự thường
-									</span>
-								</v-col>
-							</v-row>
-							 <v-row v-if="checkPass" class="mt-1">
-								 	<v-col cols="10">
-							<v-text-field class="fs-13 ml-3"
-								 v-model="newPassword" 
-								ref="newPass" dense
-								placeholder="Mật khẩu cũ"
-								outlined
-								prepend-inner-icon="mdi-lock-outline"
-								:rules="[rules.required, rules.min, rules.max]" 
-								:type="showPass ? 'text' : 'password'" 
-								@click:prepend-inner="showPass = !showPass">
-							</v-text-field>
-							</v-col>
-						</v-row>
-						<v-row v-if="checkPass" style="margin-top:-10px" >
-							<v-col cols="10">
-							  <v-text-field
-									class="fs-13 ml-3" 
-									prepend-inner-icon="mdi-lock-open-outline"
-									v-model="reNewPassword" 
-									ref="reNewPass" 
-									dense 
-									placeholder="Mật khẩu mới"
-									outlined
-									:rules="[rules.required, rules.min, rules.max, rules.match]" 
-									:type="showPass ? 'text' : 'password'"
-									@click:prepend-inner="showPass = !showPass">
-							</v-text-field>
-							</v-col>
-								<v-col cols="2">
-								<v-icon @click="changePass()" style="color:green; font-size: 14px">mdi mdi-check</v-icon>
-								</v-col>
-						</v-row>
-						
 						</v-col>
-						<!-- kt thong tin -->
 						<!-- ảnh -->
 						<v-col cols="4">
-								<v-col cols="3" class="text-center ">
-								<SymperAvatar :userId="sapp.endUserInfo.id" style="height: 135px; min-width: 135px; width: 135px;"/>
-								<UploadFile 
-									style="margin-top:-30px; margin-left:50px"
-									:autoUpload="false"
-									:fileName="detailUser.avatarFileName"
-								 />
-									
+							<v-col cols="3" class="text-center ">
+							<SymperAvatar :userId="sapp.endUserInfo.id" style="height: 135px; min-width: 135px; width: 135px;"/>
+							<UploadFile 
+								style="margin-top:-30px; margin-left:50px"
+								:autoUpload="false"
+								:fileName="detailUser.avatarFileName"
+								/>	
 							</v-col>
-							<span style="border:1px solid lightgrey" class="fs-13 ml-15">ID: {{detailUser.id}}</span>
+							<span class="fs-13 ml-15 border">ID: {{detailUser.id}}</span>
 						</v-col>	
 						<!-- ket thuc anh -->
 					</v-row>
-				<h4 class="mt-2">Phân quyền</h4>
-				<v-row  v-if="rolesOgchart" class="ml-1 fs-13 fw-430" >Vị trí</v-row>
-				<v-row class="ml-3 fs-13" v-for="(rolesOg,index) in rolesOgchart" :key='index'>
-					 <v-btn  text class=" fs-13" style="font-family:Roboto" @click="viewUserRole(rolesOg.id)">{{rolesOg.name}}</v-btn>
+				<h4 class="mb-2">Phân quyền</h4>
+				<v-row  v-if="rolesOgchart.length>0" class="ml-5 fs-13 fw-430" >Vị trí</v-row>
+				<v-row class="ml-6" v-for="(rolesOg,index) in rolesOgchart" :key='index'>
+					<v-icon  class="icon-check mr-0">mdi mdi-check</v-icon>
+					 <v-btn  
+					 	small
+					 	text 
+						class="fs-13 fm fw-400" 
+						@click="viewUserRole(rolesOg.id)">
+						 <span class='fm fw-400'>
+							 {{rolesOg.name}}
+						</span>
+					</v-btn>
 				</v-row>
-				<v-row v-if="roles" class="fs-13 ml-1 fw-430">
-					<!-- @click="viewUserRole()" -->
+				<v-row v-if="roles.length>0" class="ml-5 fs-13 fw-430">
 						Vai trò người dùng
 				</v-row>
-					<v-row class="ml-3 fs-13" v-for="(roles,indexRole) in roles" :key='indexRole'>
-					<v-btn style="font-weight:400; margin-bottom:-8px; font-family:Roboto" text @click="viewUserRole(roles.id)" >{{roles.name}} </v-btn>
+				<v-row class="ml-6 fs-13" v-for="(roles,indexRole) in roles" :key='indexRole'>
+					<v-icon  class="icon-check mr-0">mdi mdi-check</v-icon>
+					<v-btn class="fm fw-400" 
+						style="margin-bottom:-8px"
+						text 
+						@click="viewUserRole(roles.id)" >
+						<span class='fm'>
+							{{roles.name}}
+						</span>
+					</v-btn>
 				</v-row>
 					</v-stepper-content>
 				<!-- user roles -->
-					<div class="w-100 ml-3" v-if="isViewUserRole">
-					
+				<div class="w-100 ml-3" v-if="isViewUserRole">
 					<h4>Danh sách phân quyền cho user</h4>
-						<!-- menu -->
 					<v-row class="w-100 h-100" style="border:1px solid rgba(0,0,0,0.1)" >
 						<v-col cols="md-3" >
 							<v-list-item-group >
 								<v-list dense>
 									<v-row class="fs-13 fm fw-430" style=" border-bottom:1px solid rgba(0,0,0,0.1); margin-top:-1px" >
 										<span class="ml-3 mb-3">Đối tượng</span> </v-row>
-									<v-list-item v-for="(item,menuIdx) in menu" :key="'D'+menuIdx">
+									<v-list-item v-for="(item,menuIdx) in menu" :key="menuIdx">
 										<v-list-item-content style="margin-left:-20px" @click="detailView(item)">
 											<v-list-item-title class="ml-2 fw-400">{{$t('objects.'+item)}}</v-list-item-title>
 										</v-list-item-content>
@@ -239,21 +133,32 @@
 								</v-list>
 							</v-list-item-group >
 						</v-col>
-						<v-col cols="md-9" style="overflow:scroll; border-left:1px solid rgba(0,0,0,0.1); height:100%!important">
+						<v-col cols="md-9" class="h-100" style="overflow:scroll; border-left:1px solid rgba(0,0,0,0.1)">
 							<v-row style="border-bottom:1px solid rgba(0,0,0,0.1); margin-top:-5px">
 								<v-col cols="md-3" class="fw-430 fs-13">
 									{{menuTitle.length==0?"Chọn":$t('objects.'+menuTitle)}}
 								</v-col>
-								<v-col style="width: 40px!important" v-for="(action,actionIdx) in action" :key="actionIdx" class="fs-13 ml-2 mr-2">
+								<v-col 
+									style="width: 40px!important" 
+									v-for="(action,actionIdx) in action" 
+									:key="actionIdx" 
+									class="fs-13 ml-2 mr-2">
 									{{action}}
 								</v-col>
 							</v-row>
-								<v-row v-for="(nameObj,nameObjIdx) in titleAllNameObject" :key="nameObjIdx" style="margin-top:-10px">
-									<v-col cols="md-3" style="font-weight:400;" class="fs-13">
+								<v-row v-for="(nameObj,nameObjIdx) in titleAllNameObject" 
+									:key="nameObjIdx"
+									style="margin-top:-10px">
+									<v-col cols="md-3" class="fw-400 fs-13">
 										{{nameObj.title}}
 									</v-col>
-									<v-col style="width: 40px!important" v-for="(action2,actionIdx2) in action" :key="actionIdx2" class="fs-13 ml-2 mr-2" >
-										<span v-if="checkRole(nameObj.objectIdentifier,action2)"><v-icon style="color:green">mdi mdi-check</v-icon></span>
+									<v-col style="width: 40px!important"
+										v-for="(action2,actionIdx2) in action" 
+										:key="actionIdx2" 
+										class="fs-13 ml-2 mr-2" >
+										<span v-if="checkRole(nameObj.objectIdentifier,action2)">
+											<v-icon style="color:green">mdi mdi-check</v-icon>
+										</span>
 									</v-col>
 							</v-row>
 						</v-col>
@@ -264,29 +169,21 @@
 			</div>
 		</div>
 	</div>
-	
 </template>
 <script>
 import SymperAvatar from "../../components/common/SymperAvatar";
-import ChangePassword from "./../../views/users/ChangePass.vue";
 import { userApi } from "./../../api/user.js";
-import { permissionPackageApi } from "./../../api/PermissionPackage.js";
-import { permissionPositionOrgchartApi } from "./../../api/PermissionPositionOrgchart.js";
 import { orgchartApi } from "./../../api/orgchart.js";
 import { systemRoleApi } from "./../../api/systemRole.js";
-import { str } from "./../../plugins/utilModules/str.js";
 import avatarDefault from "@/assets/image/avatar_default.jpg";
-import VueResizable from 'vue-resizable'
 import UploadFile from "./../../components/common/UploadFile";
-import { appConfigs } from '../../configs';
 import _ from 'lodash';
 
 let heighOrgchart = 0;
 export default {
 	components:{
-		"vue-resizable":VueResizable,
-        "v-change-password":ChangePassword,
-        UploadFile,SymperAvatar
+		UploadFile,
+		SymperAvatar
 	},
 	props:
         ['detailInfo','changeDetail'],
@@ -296,13 +193,8 @@ export default {
         },
     },
     methods:{
-		findNameObj(obj){
-		
-			let test = this.titleNameObject;
-		},
 		// kiểm tra trùng action thì tích
 		checkRole(nameObj,action){
-		
 			let check = false;
 			for(let i = 0; i<this.objAndAction[nameObj].length;i++){
 				if(this.objAndAction[nameObj][i].action==action){
@@ -328,7 +220,6 @@ export default {
             };
 		},
 		getListObjectIdentifier(object){
-		
 			let objIdentifier =[];
 			objIdentifier = _.groupBy(this.listActionAndObj[object],'objectIdentifier' );
 			let formatObjIdentifier = Object.keys(objIdentifier);
@@ -373,23 +264,17 @@ export default {
 		},
 		//loc những action k dùng đến 
 		filterAction(){
-		
-
 			let action =_.groupBy(this.nameObject,'action');
 			let arrAction = Object.keys(action);
 			for(let i= 0; i<arrAction.length;i++){
 				this.action.push(arrAction[i]);
-
 			}
-			let b = this.action;
-			
 		 },
 		//group những loại đối tượng dạng document_de:123123 trùng tên với nhau 
 		groupNameObj(){
 			this.nameObject;
 			let group = _.groupBy(this.nameObject,'name');
 			this.objAndAction = group;
-			
 		},
 		getMenuTitle(object){
 			return object;
@@ -406,19 +291,17 @@ export default {
 			let res = await userApi.getOperationsObject({ids:role});
 			if(res.status ==200){
 				let titleNameObject = res.data;
-					for(let i = 0; i<titleNameObject.length;i++){
-						for(let j= 0;j<listObj.length;j++){
-							if(listObj[j]==titleNameObject[i].objectIdentifier){
-								newListObj.push({
-									title:titleNameObject[i].title?titleNameObject[i].title:titleNameObject[i].name,
-									objectIdentifier: listObj[j]
-
-								});
-							}
+				for(let i = 0; i<titleNameObject.length;i++){
+					for(let j= 0;j<listObj.length;j++){
+						if(listObj[j]==titleNameObject[i].objectIdentifier){
+							newListObj.push({
+								title:titleNameObject[i].title?titleNameObject[i].title:titleNameObject[i].name,
+								objectIdentifier: listObj[j]
+							});
 						}
+					}
 				}
 			}
-		
 			self.titleAllNameObject = newListObj;
 		},
 		// xử lý chuyển tên object
@@ -439,106 +322,7 @@ export default {
 		viewUserRole(role){
 			this.isViewUserRole =! this.isViewUserRole;
 			this.getActionAndObject(role);
-		},
-		changeLastName(){
-			const self = this;
-			this.checkChangeLastName = false;
-			let data = {
-				lastName:this.lastName,
-			}
-			userApi.changeUserProfile(data).then(res => {
-				if (res.status == 200) {
-					self.detailUser.lastName =res.user.lastName;
-					this.$snotify({
-					type: "success",
-					title: this.$t("notification.successTitle")});
-				}
-			})
-			.catch(err => {
-				console.log("error from add user api!!!", err);
-				this.$snotify({
-					type: "error",
-					title: this.$t("notification.error")});})
-		},
-		changeFirstName(){
-			this.checkChangeFirstName = false;
-			let data = {
-				firstName:this.firstName,
-			}
-			userApi.changeUserProfile(data).then(res => {
-				if (res.status == 200) {
-					this.detailUser.firstName =res.user.firstName;
-					this.$snotify({
-					type: "success",
-					title: this.$t("notification.successTitle")});
-				}
-			})
-			.catch(err => {
-				console.log("error from add user api!!!", err);
-				this.$snotify({
-					type: "error",
-					title: this.$t("notification.error")});})
-		},
-		changeDisplayName(){
-			this.checkChangeDisplayName = false;
-			let data = {
-				displayName:this.displayName,
-			}
-			userApi.changeUserProfile( data).then(res => {
-				if (res.status == 200) {
-					this.detailUser.displayName =res.user.displayName;
-					this.$snotify({
-					type: "success",
-					title: this.$t("notification.successTitle")});
-				}
-			})
-			.catch(err => {
-				console.log("error from add user api!!!", err);
-				this.$snotify({
-					type: "error",
-					title: this.$t("notification.error")});})
-		},
-		changePhone(){
-			this.checkPhone = false;
-			let data = {
-				phone:this.phone,
-			}
-			userApi.changeUserProfile(data).then(res => {
-				if (res.status == 200) {
-					this.detailUser.phone =res.user.phone;
-					this.$snotify({
-					type: "success",
-					title: this.$t("notification.successTitle")});
-				}
-			})
-			.catch(err => {
-				console.log("error from add user api!!!", err);
-				this.$snotify({
-					type: "error",
-					title: this.$t("notification.error")});})
-		},
-		 changePass(){
-			this.checkPass = false;
-			let pass=this.newPassword;
-            userApi.changePassUser(pass).then(res => {
-                if (res.status == 200) {
-                    this.$snotify({
-                        type: "success",
-                        title: this.$t("notification.successTitle")
-                    });
-                    this.$emit('cancel');
-                } else {
-                    this.$snotify({
-                        type: "error",
-                        title: res.message
-                    });
-                }
-            })
-            .catch(err => {
-                console.log("error from change pass user api!!!", err);
-            })
-        },
-          
+		},    
     },
     created(){
 		this.detailUser = this.detailInfo;
@@ -561,21 +345,7 @@ export default {
 			listObj:[],
 			listActionAndName:[],
 			detailUser:'',
-			newPassword:'',
-			reNewPassword: "",
-			 showPass: false,
-			 rules: {
-                required: value => !!value || 'Không được bỏ trống.',
-                min: v => (typeof v != 'undefined' && v != undefined && v.length >= 8) || 'Yêu cầu mật khẩu lớn hơn 8 kí tự',
-                max: v => (typeof v != 'undefined' && v != undefined && v.length < 25) || 'Yêu cầu mật khẩu ít hơn 24 kí tự',
-            },
-			checkChangeLastName:false,
 			lastName:'',
-			checkPass:false,
-			checkPhone:false,
-			checkChangeDisplayName:false,
-			checkChangeFirstName:false,
-			showPassPanel:false,
 			actionPanel : this.$t('user.other.createUser'),
 			roles:[],
 			id:[],
@@ -585,15 +355,17 @@ export default {
 			menu:[],
 			action:[],
 			menuTitle:[],
-			
 			nameObject:[]
-			
 		}
  	},
 }
 
 </script>
 <style scoped>
+	.fm{
+		font-family:Roboto!important;
+		font-size:13px!important
+	}
 	.fw-400{
 		font-weight:400
 	}
@@ -635,12 +407,7 @@ export default {
 	.v-subheader{
 		padding: 0;
 	}
-	.v-input--checkbox{
-		margin-top: 0;
-	}
-	.setting-password{
-		margin: 16px 0;
-	}
+
 	.v-stepper__wrapper .row .col{
 		padding: 0 12px;
 	}
@@ -653,14 +420,6 @@ export default {
 		background: white ;
 		color: green ;
 	}
-	.permission-item{
-		background: #f2f2f2;
-		margin: 4px 0;
-		border-radius: 4px;
-	}
-	.permission-item .mdi{
-		cursor: pointer;
-	}
 	.stepper-create-user{
 		box-shadow: none;
 		height: calc(100% - 50px);
@@ -669,31 +428,16 @@ export default {
 		padding: 0 0 12px 0;
 		border-bottom: 1px solid #eaeaea;
 	}
-	.tree-permissionPosition{
-		height: 500px;
-		overflow-y: auto;
-	}
 
 	.input-file{
 		width: 0;
 		height: 0;
 	}
-	#preview {
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		width: 80px;
-		height: 75px;
+	.border{
+		border:1px solid lightgrey
 	}
-
-  #preview img {
-	max-width: 100%;
-	max-height: 500px;
-  }
-  	.treeCheckBox{
-		margin-top: 0px;
-		max-height: 30px;
+	.icon-check{
+		color:green; 
+		font-size:14px
 	}
-
-	
 </style>

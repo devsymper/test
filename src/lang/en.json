@@ -200,6 +200,7 @@
                 "status": "Status",
                 "title": "personal information",
                 "userName": "User name",
+                "phoneNumber": "Phone",
                 "email": "Email",
                 "firstName": "First name",
                 "lastName": "Last name",

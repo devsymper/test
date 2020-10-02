@@ -196,6 +196,8 @@
         "general": {
             "title": "Thông tin cơ bản",
             "personalInfo": {
+                "phoneNumber": "Điện thoại",
+                "status": "Trạng thái",
                 "title": "Thông tin cá nhân",
                 "userName": "Tên tài khoản",
                 "email": "Email",
