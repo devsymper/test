@@ -1084,8 +1084,6 @@ export default class Table {
     getContextMenu() {
         return {
             callback: function(key, selection, clickEvent) {
-                // Common callback for all options
-
                 if (key == 'row_below') {
                     var indexArr = this.getSelected();
                     var selectedData = this.getDataAtRow(indexArr[0]);
@@ -1145,6 +1143,7 @@ export default class Table {
 
 
     // Hàm set data cho table
+    // hàm gọi sau khi chạy công thức 
     setData(vls) {
             ClientSQLManager.delete(this.keyInstance, this.tableName, false);
             if (vls != false) {
