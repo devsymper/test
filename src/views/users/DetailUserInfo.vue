@@ -8,10 +8,10 @@
 					<v-row class="mt-1" >
 						<!-- thong tin -->
 						<v-col cols="8">
-							<v-row  >
+							<v-row  v-if="!changeDetail">
 								<v-col cols="6">
 									<span  class="fw-430 fs-13 st-icon-pandora">
-											Họ tên
+												Họ tên
 									</span>
 								</v-col>
 								<v-col  cols="6">
@@ -20,6 +20,177 @@
 									</span>
 								</v-col>
 							</v-row>
+							<v-row  v-if="changeDetail">
+								<v-col cols="6">
+									<span class="fw-430 fs-13 st-icon-pandora">
+												Họ
+									</span>
+								</v-col>
+								<v-col  cols="6">
+									<span v-if="!checkChangeLastName" class="fs-13 st-icon-pandora">
+											{{detailUser.lastName}} <span v-if="changeDetail">
+												<v-icon @click="checkChangeLastName=true" style="font-size: 14px">mdi mdi-pencil</v-icon></span>
+									</span>
+									<span v-else class="fs-13 st-icon-pandora">
+									<v-text-field
+											class="fs-13 font-normal"
+											v-model="lastName"
+											dense
+									></v-text-field>
+									<v-icon @click="changeLastName()" style="color:green; font-size: 14px">mdi mdi-check</v-icon>
+									</span>
+							
+								</v-col>
+							</v-row>
+							<!-- Endusser đổi thông tin cá nhân  -->
+							<v-row  v-if="changeDetail">
+								<v-col cols="6">
+									<span  class="fs-13 st-icon-pandora">
+											Tên
+									</span>
+								</v-col>
+								<v-col  cols="6">
+									<span v-if="!checkChangeFirstName" class="fs-13 st-icon-pandora">
+										{{detailUser.firstName}} <span v-if="changeDetail">
+											<v-icon style="font-size: 14px" @click="checkChangeFirstName=true">mdi mdi-pencil</v-icon></span>
+									</span>
+									<span v-else class="fs-13 st-icon-pandora">
+									<v-text-field
+											class="fs-13 font-normal"
+											v-model="firstName"
+											dense
+									></v-text-field>
+									<v-icon @click="changeFirstName()" style="color:green; font-size: 14px">mdi mdi-check</v-icon>
+									</span>
+								</v-col>
+						</v-row>
+							<v-row>
+								<v-col cols="6">
+									<span  class="fw-430 fs-13 st-icon-pandora">
+												{{ $t('user.general.personalInfo.displayName')}}
+									</span>
+								</v-col>
+								<v-col  cols="6">
+									<span  v-if="!checkChangeDisplayName" class="fs-13 st-icon-pandora">
+											{{detailUser.displayName}} <span v-if="changeDetail">
+												<v-icon style="font-size: 14px" @click="checkChangeDisplayName=true">mdi mdi-pencil</v-icon>
+									</span>
+									</span>
+									<span v-else class="fs-13 st-icon-pandora">
+									<v-text-field
+											class="fs-13 font-normal"
+											v-model="displayName"
+											dense
+									></v-text-field>
+									<v-icon @click="changeDisplayName()" style="color:green; font-size: 14px">mdi mdi-check</v-icon>
+									</span>
+								</v-col>
+							</v-row>
+							<v-row>
+								<v-col cols="6">
+									<span  class="fw-430 fs-13 st-icon-pandora">
+												{{ $t('user.general.personalInfo.email')}}
+									</span>
+								</v-col>
+								<v-col  cols="6">
+									<span  class="fs-13 st-icon-pandora">
+												{{detailUser.email}} 
+									</span>
+						
+								</v-col>
+							</v-row>
+							<v-row>
+								<v-col cols="6">
+									<span   class="fw-430 fs-13 st-icon-pandora">
+										{{ $t('user.general.personalInfo.phoneNumber')}}
+									</span>
+								</v-col>
+							
+								<v-col cols="6">
+                                    <span  v-if="!checkPhone" class="fs-13">
+									    {{detailUser.phone}} <span v-if="changeDetail"><v-icon style="font-size: 14px" @click="checkPhone=true">mdi mdi-pencil</v-icon></span>
+                                    </span>
+										<span v-else class="fs-13 st-icon-pandora">
+									<v-text-field
+											class="fs-13 font-normal"
+											v-model="phone"
+											dense
+									></v-text-field>
+									<v-icon @click="changePhone()" style="color:green; font-size: 14px">mdi mdi-check</v-icon>
+									</span>
+								</v-col>
+						    </v-row>
+                            <v-row>
+								<v-col cols="6">
+									<span  class="fw-430 fs-13 st-icon-pandora">
+										{{ $t('user.general.personalInfo.status')}}
+									</span>
+								</v-col>
+								<v-col cols="6">
+                                    <span style="color:green" v-if="detailUser.status==1" class="fs-13">
+									    Hoạt động
+                                    </span>
+									<span style="color:orange" class="fs-13" v-else>
+										Khóa
+									</span>
+								</v-col>
+								
+						    </v-row>
+							<v-row  v-if="changeDetail">
+								<v-col cols="6">
+									<span  class="fw-430 fs-13 st-icon-pandora">
+											Mật khẩu
+									</span>
+								</v-col>
+								<v-col  cols="6">
+									<span  class="fs-13 st-icon-pandora">
+										<span v-if="changeDetail">
+											<v-icon @click="checkPass=true" style="font-size: 14px">mdi mdi-pencil</v-icon></span>
+									</span>
+								</v-col>
+							</v-row>
+							<v-row  v-if="changeDetail&&checkPass">
+								<v-col  cols="12">
+									<span  class="fs-12 st-icon-pandora" style="color:grey">
+										Mật khẩu ít nhất 8 kí tự, 1 chữ viết hoa, 1 số và 1 ký tự thường
+									</span>
+								</v-col>
+							</v-row>
+							 <v-row v-if="checkPass" class="mt-1">
+								 	<v-col cols="10">
+							<v-text-field class="fs-13 ml-3"
+								 v-model="newPassword" 
+								ref="newPass" dense
+								placeholder="Mật khẩu cũ"
+								outlined
+								prepend-inner-icon="mdi-lock-outline"
+								:rules="[rules.required, rules.min, rules.max]" 
+								:type="showPass ? 'text' : 'password'" 
+								@click:prepend-inner="showPass = !showPass">
+							</v-text-field>
+							</v-col>
+						</v-row>
+						<v-row v-if="checkPass" style="margin-top:-10px" >
+							<v-col cols="10">
+							  <v-text-field
+									class="fs-13 ml-3" 
+									prepend-inner-icon="mdi-lock-open-outline"
+									v-model="reNewPassword" 
+									ref="reNewPass" 
+									dense 
+									placeholder="Mật khẩu mới"
+									outlined
+									:rules="[rules.required, rules.min, rules.max, rules.match]" 
+									:type="showPass ? 'text' : 'password'"
+									@click:prepend-inner="showPass = !showPass">
+							</v-text-field>
+							</v-col>
+								<v-col cols="2">
+								<v-icon @click="changePass()" style="color:green; font-size: 14px">mdi mdi-check</v-icon>
+								</v-col>
+						</v-row>
+						
+						</v-col>
 						<!-- kt thong tin -->
 						<!-- ảnh -->
 						<v-col cols="4">
@@ -30,6 +201,7 @@
 									:autoUpload="false"
 									:fileName="detailUser.avatarFileName"
 								 />
+									
 							</v-col>
 							<span style="border:1px solid lightgrey" class="fs-13 ml-15">ID: {{detailUser.id}}</span>
 						</v-col>	
