@@ -113,27 +113,27 @@
                                     >{{obj.taskData.action.action=='approval' ? 'mdi-seal-variant ': 'mdi-file-document-edit-outline'}}</v-icon>
                                     <v-icon class="fs-14" v-else>mdi-checkbox-marked-circle-outline</v-icon>
                                     </v-col>
-                                    <v-col :cols="sideBySideMode ? 10 : compackMode ? 5: 3" :class="{'colName':sideBySideMode==true}" class=" pl-3 pr-1 pb-1 pt-2">
-                                    <div class="pl-1">
-                                        <v-tooltip bottom>
-                                        <template v-slot:activator="{ on }">
-                                            <div v-on="on" class="text-left fs-13 text-ellipsis w-100">
-                                            {{obj.taskData.content}}
-                                            </div>
-                                        </template>
-                                        <span>{{ obj.taskData.content }}</span>
-                                        </v-tooltip>
-                                        <div class="pa-0 grey--text mt-1 lighten-2 d-flex justify-space-between">
-                                        <div
-                                            class="fs-11 pr-6 text-ellipsis"
-                                        >{{obj.taskData.extraLabel}} {{obj.taskData.extraValue}}</div>
+                                    <v-col :cols="sideBySideMode ? 10 : compackMode ? 5: 3" :class="{'colName':sideBySideMode==true}" class="pa-1">
+                                        <div class="pl-1">
+                                            <v-tooltip bottom>
+                                                <template v-slot:activator="{ on }">
+                                                    <div v-on="on" class="text-left fs-13 text-ellipsis w-100">
+                                                    {{obj.taskData.content}}
+                                                    </div>
+                                                </template>
+                                                <span>{{ obj.taskData.content }}</span>
+                                            </v-tooltip>
+                                            <div class="pa-0 grey--text mt-1 lighten-2 d-flex justify-space-between">
+                                                <div
+                                                    class="fs-11 pr-6 text-ellipsis"
+                                                >{{obj.taskData.extraLabel}} {{obj.taskData.extraValue}}</div>
 
-                                        <div class="fs-11 py-0 pr-2 text-ellipsis">
-                                            {{obj.createTime ? $moment(obj.createTime).format('DD/MM/YY HH:mm:ss'):$moment(obj.endTime).format('DD/MM/YY HH:mm:ss')}}
-                                            <v-icon class="grey--text lighten-2 ml-1" x-small>mdi-clock-time-nine-outline</v-icon>
+                                                <div class="fs-11 py-0 pr-2 text-ellipsis">
+                                                    {{obj.createTime ? $moment(obj.createTime).format('DD/MM/YY HH:mm:ss'):$moment(obj.endTime).format('DD/MM/YY HH:mm:ss')}}
+                                                    <v-icon class="grey--text lighten-2 ml-1" x-small>mdi-clock-time-nine-outline</v-icon>
+                                                </div>
+                                            </div>
                                         </div>
-                                        </div>
-                                    </div>
                                     </v-col>
                                     <v-col
                                     v-if="!sideBySideMode"
@@ -172,7 +172,7 @@
                                                 <template v-slot:activator="{ on }">
                                                 <span
                                                     v-on="on"
-                                                    v-if="obj.processDefinitionName"
+                                                    v-if="obj.processInstanceId"
                                                     class=" text-left fs-13 pr-6 text-ellipsis w-80 title-quytrinh"
                                                 >{{obj.processDefinitionName}}</span>
                                                 <span v-on="on" v-else class="text-left fs-13 pr-6 text-ellipsis w-80 title-quytrinh">ad hoc</span>
@@ -192,7 +192,7 @@
                                         cols="1"
                                         class="fs-13 px-1 py-0"
                                     >
-                                        <div class="pl-1">
+                                        <div class="pl-1 pt-1">
                                             <div style="width:55px">
                                                 {{commentCountPerTask['task:' + obj.id]}}
                                                 <v-icon class="fs-14" style="float:right;margin-top:4px;margin-right:12px">mdi-comment-processing-outline</v-icon> 
@@ -454,25 +454,6 @@ export default {
     changeObjectType(index) {
       this.$emit("changeObjectType", index);
     },
-    // checkData(documentObjectId) {
-    //   if (documentObjectId != "" || documentObjectId != undefined) {
-    //     let arr = this.stask.arrDocObjId;
-    //     let obj = arr.find(data => data.id === documentObjectId);
-    //     if (obj) {
-    //       let arrUser = this.sapp.allUsers;
-    //       let user = arrUser.find(data => data.email === obj.userCreate);
-    //       if (user) {
-    //         return user.displayName;
-    //       } else {
-    //         return "";
-    //       }
-    //     } else {
-    //       return "";
-    //     }
-    //   } else {
-    //     return "";
-    //   }
-    // },
     handleReachEndList() {
       if (
         this.allFlatTasks.length < this.totalTask &&

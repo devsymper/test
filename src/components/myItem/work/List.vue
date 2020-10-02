@@ -89,23 +89,23 @@
                     style="border-bottom: 1px solid #eeeeee!important;"
                           
                 >
-                    <v-col :cols="sideBySideMode ? 10 : compackMode ? 6: 4" class="pl-3 pr-1 pb-1 pt-2">
-                    <div class="pl-1">
-                        <div class="pa-0 mt-1 lighten-2 d-flex justify-space-between">
-                            <div
-                                class="fs-13 text-ellipsis w-100"
-                            >
-                                <v-icon v-if="obj.endTime && obj.endTime!=null" style="font-size:11px; color:green;margin-left: 3px;">mdi-circle</v-icon>
-                                <v-icon v-else style="font-size:11px ; color:blue;margin-left: 3px;">mdi-circle</v-icon>
-                            {{ obj.name}}
-                            </div>
-
-                            <div class="fs-11 py-0 " style="width:200px">
-                                <v-icon class="grey--text lighten-2 ml-1" x-small>mdi-clock-time-nine-outline</v-icon>
-                                {{obj.startTime ? $moment(obj.startTime).format('DD/MM/YY HH:mm:ss'):$moment(obj.endTime).format('DD/MM/YY HH:mm:ss')}}
+                    <v-col :cols="sideBySideMode ? 10 : compackMode ? 6: 4" class="pl-3 pr-1 py1">
+                        <div class="pl-1">
+                            <div class="pa-0 d-flex justify-space-between">
+                                <div
+                                    class="fs-13 text-ellipsis w-100"
+                                >
+                                    <v-icon v-if="obj.endTime && obj.endTime!=null" style="font-size:11px; color:green;margin-left: 3px;">mdi-circle</v-icon>
+                                    <v-icon v-else style="font-size:11px ; color:blue;margin-left: 3px;">mdi-circle</v-icon>
+                                {{ obj.name}}
+                                </div>
+                                <div class="fs-11 py-0 " style="width:200px;margin-top:3px">
+                                    {{obj.startTime ? $moment(obj.startTime).format('DD/MM/YY HH:mm:ss'):$moment(obj.endTime).format('DD/MM/YY HH:mm:ss')}}
+                                    <v-icon class="grey--text " x-small>mdi-clock-time-nine-outline</v-icon>
+                                
+                                </div>
                             </div>
                         </div>
-                    </div>
                     </v-col>
                    
                     <v-col
@@ -133,11 +133,11 @@
                        <div class="mt-1">
                             <v-tooltip bottom>
                                 <template v-slot:activator="{ on }">
-                                <span
+                                <div
                                     v-on="on"
                                     v-if="obj.processDefinitionName"
                                     class=" text-left fs-13 pr-6 text-ellipsis w-80 title-quytrinh"
-                                >{{obj.processDefinitionName}}</span>
+                                >{{obj.processDefinitionName}}</div>
                                 <span v-on="on" v-else class="text-left fs-13 pr-6 text-ellipsis w-80 title-quytrinh">ad hoc</span>
                                 </template>
                                 <span>{{ obj.processDefinitionName?  obj.processDefinitionName : `ad hoc` }}</span>
@@ -153,7 +153,7 @@
                         cols="2"
                         class="fs-13 px-1 py-0"
                     >
-                        <div class="pl-1">
+                        <div class="pl-1 pt-1">
                             <div style="width:55px">
                                 {{commentCountPerTask['work:' + obj.id]}}
                                 <v-icon class="fs-14" style="float:right;margin-top:4px;margin-right:12px">mdi-comment-processing-outline</v-icon> </div>
@@ -222,8 +222,6 @@ export default {
             let date;
             work.startUserId = 0;
             work.startUserName = '';
-
-
             for(let vari of work.variables){
                 if(vari.name == 'symper_user_id_start_workflow'){
                     work.startUserId = vari.value;
@@ -413,6 +411,7 @@ export default {
         this.index = idx;
         this.dataIndex = idex;
         this.$set(this.selectedWork, "workInfo", obj);
+        this.selectedWork.workInfo.appName=this.selectNameApp(obj.variables);
         this.selectedWork.idx = idx;
         if (!this.compackMode) {
             this.sideBySideMode = true;
@@ -579,5 +578,9 @@ export default {
 }
 .d-active {
   background: #f5f5f5;
+}
+.col-10 {
+    flex: 0 0 97%;
+    max-width: 97%;
 }
 </style>
