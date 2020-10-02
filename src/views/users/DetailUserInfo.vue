@@ -241,18 +241,18 @@
 						</v-col>
 						<v-col cols="md-9" style="overflow:scroll; border-left:1px solid rgba(0,0,0,0.1); height:100%!important">
 							<v-row style="border-bottom:1px solid rgba(0,0,0,0.1); margin-top:-5px">
-								<v-col class="fw-430 fs-13">
-									{{menuTitle.length==0?"Chưa chọn đối tượng":$t('objects.'+menuTitle)}}
+								<v-col cols="md-3" class="fw-430 fs-13">
+									{{menuTitle.length==0?"Chọn":$t('objects.'+menuTitle)}}
 								</v-col>
-								<v-col v-for="(action,actionIdx) in action" class="fs-13">
+								<v-col style="width: 40px!important" v-for="(action,actionIdx) in action" class="fs-13 ml-2 mr-2">
 									{{action}}
 								</v-col>
 							</v-row>
 								<v-row v-for="(nameObj,nameObjIdx) in titleAllNameObject"  style="margin-top:-10px">
-									<v-col style="font-weight:400;" class="fs-13">
+									<v-col cols="md-3" style="font-weight:400;" class="fs-13">
 										{{nameObj.title}}
 									</v-col>
-									<v-col v-for="(action2,actionIdx2) in action" >
+									<v-col style="width: 40px!important" v-for="(action2,actionIdx2) in action" class="fs-13 ml-2 mr-2" >
 										<span v-if="checkRole(nameObj.objectIdentifier,action2)"><v-icon style="color:green">mdi mdi-check</v-icon></span>
 									</v-col>
 							</v-row>
@@ -399,7 +399,6 @@ export default {
 			const self = this;
 			let listObj = [];
 			let newListObj = [];
-			debugger
 			let arrObj = Object.keys(self.objAndAction);
 			for(let i= 0;i<arrObj.length;i++){
 				listObj.push(arrObj[i]);
@@ -407,7 +406,6 @@ export default {
 			let res = await userApi.getOperationsObject({ids:role});
 			if(res.status ==200){
 				let titleNameObject = res.data;
-					debugger
 					for(let i = 0; i<titleNameObject.length;i++){
 						for(let j= 0;j<listObj.length;j++){
 							if(listObj[j]==titleNameObject[i].objectIdentifier){
@@ -418,24 +416,18 @@ export default {
 								});
 							}
 						}
-				
-					//self.objAndAction[titleNameObject[i].objectIdentifier]=="test";
-					//self.titleNameObject.push(titleNameObject[i].title?titleNameObject[i].title:titleNameObject[i].name);
-					// }
 				}
 			}
-					debugger
+		
 			self.titleAllNameObject = newListObj;
 		},
 		// xử lý chuyển tên object
-
 		async getRoleOrgchartByUser(id){
 			const self = this;
 			let res = await orgchartApi.getRolesByUser([{idUser: id}])
 			if (res.status === 200) {
 				self.rolesOgchart = res.data[0].roles
-			}
-			
+			}	
 		},
 		async getRolesByUser(id){
 			const self = this;
