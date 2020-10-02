@@ -195,6 +195,7 @@
         "general": {
             "title": "Thông tin cơ bản",
             "personalInfo": {
+                "status": "Trạng thái",
                 "title": "Thông tin cá nhân",
                 "userName": "Tên tài khoản",
                 "email": "Email",
@@ -262,7 +263,8 @@
             "contextMenu": {
                 "passwordSetting": "Tùy chọn mật khẩu",
                 "edit": "Sửa",
-                "delete": "Xóa"
+                "delete": "Xóa",
+                "view": "Xem chi tiết"
             }
         },
         "myInfo": {
@@ -600,6 +602,7 @@
                         "subTitle1": "Người phê duyệt",
                         "subTitle2": "Người tham gia"
                     }
+
                 }
             },
             "fab": {
@@ -714,6 +717,9 @@
         },
 
         "listType": {
+            "documents": "Văn bản",
+            "workflows": "Quy trình làm việc",
+            "reports": "Báo cáo",
             "documentMajor": "Chứng từ",
             "documentCategory": "Danh mục",
             "workflow": "Quy trình làm việc",
@@ -862,6 +868,11 @@
                 "remove operation": "Xoá",
                 "add action pack": "Thêm",
                 "remove action pack": "Xoá"
+
+
+
+
+
             },
             "dataflow": {
                 "detail": "Chi tiết",

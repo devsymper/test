@@ -15,7 +15,7 @@
                             label="Search"
                             :placeholder="$t('common.search')"
                         ></v-text-field>
-                        <v-btn
+                         <v-btn
                             v-show="showButtonAdd && !actionPanel"
                             depressed
                             small
@@ -499,6 +499,14 @@ export default {
         widgetIdentifier: {
             type: String,
             default: ''
+        },
+        showImportButton: {
+            type: Boolean,
+            default: true
+        },
+        showExportButton: {
+            type: Boolean,
+            default: true
         },
         debounceRowSelectTime: {
             type: Number,

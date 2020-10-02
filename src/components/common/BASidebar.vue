@@ -361,6 +361,9 @@ export default {
         SymperAvatar,
     },
     computed: {
+        showUserInfo(){
+            return this.$store.state.user.showUserInfo;
+        },
         currentUserAvatar(){
             let userId = this.$store.state.app.endUserInfo.id;
             return appConfigs.apiDomain.fileManagement+'readFile/user_avatar_' + userId;
@@ -388,6 +391,14 @@ export default {
     },
     methods: {
         // thêm nhóm cho Menu
+        showChangeInfoUser(){
+            if(this.sapp.baInfo.id==0){
+                debugger
+                 this.$store.commit('user/setShowUser', !this.showUserInfo);
+                this.$router.push("/");
+            }
+           
+        },
         addGroupInMenu(){
              this.menu = this.userMenuItems;
              let menuItem = [];
