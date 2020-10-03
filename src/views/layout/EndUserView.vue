@@ -105,6 +105,7 @@
             <DetailUser 
                 :userInfo="sapp.endUserInfo"
                 @expand-panel="isExpand=true"
+                :close="isExpand"
             />
         </v-navigation-drawer>
     </v-app>

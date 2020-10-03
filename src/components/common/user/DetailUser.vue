@@ -150,7 +150,8 @@
             </div>
         </div>
         <div  class="w-100 h-100" v-if="isViewUserRole">
-            <ViewRoles class="w-100 h-100" :rolesList="role"/>
+            <ViewRoles 
+                :rolesList="role"/>
         </div>
     </div>
 </template>

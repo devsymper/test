@@ -2,7 +2,7 @@
     <div class="w-100 h-100">
         <h4>Danh sách phân quyền cho user</h4>
         <v-row class="w-100 h-100" style="border:1px solid rgba(0,0,0,0.1)" >
-            <v-col cols="md-3" >
+            <v-col cols="md-2" >
                 <v-list-item-group >
                     <v-list dense>
                         <v-row class="fs-13 fm fw-430" style=" border-bottom:1px solid rgba(0,0,0,0.1); margin-top:-1px" >
@@ -15,16 +15,16 @@
                     </v-list>
                 </v-list-item-group >
             </v-col>
-            <v-col cols="md-9" class=" left-table">
+            <v-col cols="md-10" class=" left-table">
                 <v-row style="border-bottom:1px solid rgba(0,0,0,0.1); margin-top:-5px">
                     <v-col cols="md-3" class="fw-430 fs-13">
                         {{menuTitle.length==0?"Chọn":$t('objects.'+menuTitle)}}
                     </v-col>
                     <v-col 
-                        style="width: 40px!important" 
+                        style="width: 40px!important;" 
                         v-for="(action,actionIdx) in action" 
                         :key="actionIdx" 
-                        class="fs-13 ml-2 mr-2">
+                        class="fs-13 ">
                         {{action}}
                     </v-col>
                 </v-row>
@@ -35,10 +35,10 @@
                         <v-col cols="md-3" class="fw-400 fs-13">
                             {{nameObj.title}}
                         </v-col>
-                        <v-col style="width:40px!important"
+                        <v-col style="width:40px!important; " 
                             v-for="(action2,actionIdx2) in action" 
                             :key="actionIdx2" 
-                            class="fs-13 ml-2 mr-2" >
+                            class="fs-13 " >
                             <span v-if="checkRole(nameObj.objectIdentifier,action2)">
                                 <v-icon style="color:green">mdi mdi-check</v-icon>
                             </span>
@@ -53,7 +53,7 @@ import { userApi } from "./../../api/user.js";
 export default {
   watch: {
   },
-    props:['rolesList'],
+    props:['rolesList','close'],
     methods:{
 		// kiểm tra trùng action thì tích
 		checkRole(nameObj,action){
