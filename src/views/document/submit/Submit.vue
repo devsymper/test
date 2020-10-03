@@ -1547,7 +1547,7 @@ export default {
 
 
         // Hàm chỉ ra control được đánh định danh trong document (sct...)
-        getColumnIdentifier(){
+        getDataRefreshControl(){
             if(this.objectIdentifier == undefined){
                 return {}
             }
@@ -1556,9 +1556,7 @@ export default {
             let controlInstance = getControlInstanceFromStore(this.keyInstance,controlNameIdentifier);
             if(controlInstance != false && controlInstance.controlFormulas.hasOwnProperty('formulas')){
                 let dataInput = this.getDataInputFormulas(controlInstance.controlFormulas['formulas']['instance'])
-                controlIdentifier['dataInput'] = dataInput;
-                // controlIdentifier['dataInput'] = 
-                // return controlIdentifier;
+                controlIdentifier['dataInputIdentifier'] = dataInput;
             }
             return controlIdentifier;
             
@@ -1614,18 +1612,15 @@ export default {
             let thisCpn = this;
             let dataPost = this.getDataPostSubmit();
             dataPost['documentId'] = this.documentId;
-            let controlIdentifier = this.getColumnIdentifier();
-            if(Object.keys(controlIdentifier).length>0){
-                dataPost['dataRefreshControl'] = JSON.stringify(controlIdentifier);
-            }
+            let dataInputFormulas = this.getDataRefreshControl();
             if(thisCpn.sDocumentSubmit.submitFormulas != undefined){
                 let dataInput = thisCpn.getDataInputFormulas(thisCpn.sDocumentSubmit.submitFormulas);
-                await thisCpn.sDocumentSubmit.submitFormulas.handleBeforeRunFormulas(dataInput);
-                this.callApiSubmit(dataPost);
+                dataInputFormulas['dataInputSubmit'] = dataInput;
             }
-            else{
-                this.callApiSubmit(dataPost);
+            if(Object.keys(dataInputFormulas).length>0){
+                dataPost['dataInputFormulas'] = dataInputFormulas;
             }
+            this.callApiSubmit(dataPost);
             
         },
         resetCheckRefreshData(){
@@ -1637,16 +1632,9 @@ export default {
         },
         async callApiSubmit(dataPost){
             let thisCpn = this;
-            let titleObject = "";
             if(this.titleObjectFormulas != null){
                 let dataInputTitle = thisCpn.getDataInputFormulas(this.titleObjectFormulas);
-                try {
-                    let res = await this.titleObjectFormulas.handleBeforeRunFormulas(dataInputTitle);
-                    let value = this.getValueFromDataResponse(res);
-                    dataPost['titleObject'] = value
-                } catch (error) {
-                    
-                }
+                dataPost['dataInputFormulas']['dataInputTitle'] = dataInputTitle;
             }
             if(this.appId){
                 dataPost['appId'] = this.appId;
@@ -1656,6 +1644,7 @@ export default {
                     dataPost['appId'] = this.$route.params.extraData.appId
                 }
             }
+            dataPost['dataInputFormulas'] = JSON.stringify(dataPost['dataInputFormulas']);
             documentApi.submitDocument(dataPost).then(res => {
                 let dataResponSubmit = res.data;
                 dataResponSubmit['document_object_user_created_fullname'] = thisCpn.endUserInfo.id;

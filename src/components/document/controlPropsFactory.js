@@ -411,7 +411,7 @@ let commonFormulas = {
         groupType: "formulas"
     },
     submit: {
-        title: "Công thức submit",
+        title: "Công thức sau submit",
         value: "",
         formulasId: 0,
         type: "script",

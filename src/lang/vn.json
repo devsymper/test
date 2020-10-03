@@ -541,7 +541,7 @@
                     "fullSize": "Hiển thị toàn màn hình Form Submit",
                     "type": "Loại văn bản",
                     "note": "Ghi chú (Phục vụ cho việc tìm kiếm)",
-                    "titleObject": "Tiêu đề bản ghi (Phục vụ cho việc hiển thị trên MyItem)",
+                    "titleObject": "Tiêu đề bản ghi (Phục vụ cho việc hiển thị trên MyItem, công thức chạy trên server)",
                     "titlePrint": "Tiêu đề bản In"
                 },
                 "swapType": {

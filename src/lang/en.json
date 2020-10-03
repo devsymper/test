@@ -404,7 +404,7 @@
                     "fullSize": "Full size Form Submit",
                     "type": "Document type",
                     "note": "Note (Serve for searching)",
-                    "titleObject": "Title Object (Serve for display on MyItem)",
+                    "titleObject": "Title Object (Serve for display on MyItem, formulas execute on server)",
                     "titlePrint": "Title Form Print"
                 },
                 "swapType": {

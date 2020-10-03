@@ -260,8 +260,8 @@ export default class Table {
 
 
                 beforeKeyDown: function(event) {
-                    console.log("sadsadasd", event);
                     let cellMeta = this.getSelected();
+                    thisObj.checkEnterInsertRowEvent(event, cellMeta);
                     // ấn f2 vào cell thì trace control đó
                     if (event.key == 'F2' && store.state.app.accountType == 'ba') {
                         let control = thisObj.getControlInstance(thisObj.currentControlSelected);
@@ -439,31 +439,7 @@ export default class Table {
                         instance: thisObj.keyInstance
                     });
                 },
-                /**
-                 * Hàm xử lí thêm và xóa dòng sau khi bấm shift + enter, shift + delete
-                 * @param {*} e 
-                 */
-                afterDocumentKeyDown: function(e) {
-                    let cellMeta = this.getSelected();
-                    if (e.key === 'Enter' && e.shiftKey === true && cellMeta != undefined) {
-                        this.alter('insert_row', cellMeta[0][0] + 1, 1, 'auto_set');
-                        thisObj.dataInsertRows.push([]);
-                        delayTypingEnter(function(e) {
-                            let listRootTable = sDocument.state.submit[thisObj.keyInstance]['listTableRootControl'];
-                            if (listRootTable.hasOwnProperty(thisObj.tableName)) {
-                                let rowData = util.cloneDeep(listRootTable[thisObj.tableName]['defaultRow']);
-                                for (let index = 0; index < thisObj.dataInsertRows.length; index++) {
-                                    let newRowData = util.cloneDeep(rowData);
-                                    newRowData[0][0] = cellMeta[0][0] + index + 1;
-                                    thisObj.tableInstance.setDataAtRowProp(newRowData, null, null, 'auto_set');
-                                }
-                            }
 
-                        });
-                    } else if (e.key === 'Delete' && e.shiftKey == true) {
-                        this.alter('remove_row', cellMeta[0][0], 1);
-                    }
-                },
                 /**
                  * Sau khi thay đổi giá trị trong bảng thì cần update hoặc insert lại vào bảng sql lite
                  * @param {*} changes 
@@ -548,6 +524,41 @@ export default class Table {
                 }
             }
             listTableInstance[this.tableName] = this;
+        }
+        /**
+         * Hàm xử lí thêm và xóa dòng sau khi bấm shift + enter, shift + delete
+         * @param {*} e 
+         */
+
+    checkEnterInsertRowEvent(e, cellMeta) {
+            if (!e) {
+                return;
+            }
+            // nếu shift + enter ở dòng tính tổng thì ko làm gì cả
+            if (this.tableHasRowSum && cellMeta[0][0] == this.tableInstance.countRows() - 1) {
+                return;
+            }
+            if (e.key === 'Enter' && e.shiftKey === true && cellMeta != undefined) {
+                this.tableInstance.alter('insert_row', cellMeta[0][0] + 1, 1, 'auto_set');
+                this.dataInsertRows.push([]);
+                let thisObj = this;
+                delayTypingEnter(function() {
+                    let listRootTable = sDocument.state.submit[thisObj.keyInstance]['listTableRootControl'];
+                    if (listRootTable.hasOwnProperty(thisObj.tableName)) {
+                        let rowData = util.cloneDeep(listRootTable[thisObj.tableName]['defaultRow']);
+                        for (let index = 0; index < thisObj.dataInsertRows.length; index++) {
+                            let newRowData = util.cloneDeep(rowData);
+                            for (let i = 0; i < newRowData.length; i++) {
+                                newRowData[i][0] = cellMeta[0][0] + index + 1;
+                            }
+                            thisObj.tableInstance.setDataAtRowProp(newRowData, null, null, 'auto_set');
+                        }
+                    }
+
+                });
+            } else if (e.key === 'Delete' && e.shiftKey == true) {
+                this.tableInstance.alter('remove_row', cellMeta[0][0], 1);
+            }
         }
         // kiểm tra nếu đang edit ở cell cuối cùng mà ấn enter thì cho cell selected về dòng đầu tiên (lỗi do control hidden)
     checkLastCell(cellMeta, hotTb) {
