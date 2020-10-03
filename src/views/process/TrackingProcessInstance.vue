@@ -55,6 +55,7 @@ const nodeStatusColors = {
         fill: "#f3f3f3",
         stroke: "#797979"
     }
+  
 };
 
 export default {
@@ -164,14 +165,13 @@ export default {
         },
         setElementMap(els){
             let map = {};
-            let nodeStatus = ''
+            let nodeStatus = '';
             for (let item of els) {
                 if (item.endTime) {
                     nodeStatus = "done";
                 } else {
                     nodeStatus = "todo";
                 } // chưa có overdue, server cần trả về thêm thông tin của deadline
-
                 if(!map[item.activityId]){
                     map[item.activityId] = {
                         activityId: item.activityId,
@@ -184,7 +184,7 @@ export default {
                             done: 0,
                             todo: 0,
                             overdue: 0
-                        }
+                        },
                     };
                 }
                 map[item.activityId].instancesStatusCount[nodeStatus] += 1;
@@ -201,10 +201,12 @@ export default {
                     if(nodeInfo.activityType.includes('Task')){
                         let symBpmn = this.$refs.symperBpmn;
                         symBpmn.updateElementProperties(eleId, {
-                            statusCount: nodeInfo.instancesStatusCount
+                            statusCount: nodeInfo.instancesStatusCount,
                         });
                     }
                 }
+
+
             }
         },
         // Đặt màu cho các node trong diagram
@@ -220,9 +222,7 @@ export default {
                         let allNode = symBpmn.getAllNodes();
                         let nodeStatus = "";
                         if(self.elementId){
-                            self.runtimeNodeMap[self.elementId] = {
-                                nodeStatus: 'todo'
-                            };
+                            self.runtimeNodeMap[self.elementId].currentNode = true;
                         }
                         for (let node of allNode) {
                             if (node.$type != "bpmn:Process") {
@@ -231,9 +231,15 @@ export default {
                                 } else {
                                     nodeStatus = "notStart";
                                 }
+                                let nodeCurr=false;
+                                let dataRuntimeNode=self.runtimeNodeMap[node.id];
+                                if (dataRuntimeNode !=null && dataRuntimeNode['currentNode']) {
+                                    nodeCurr=true;
+                                }
                                 symBpmn.changeElementColor(
                                     node.id,
-                                    nodeStatusColors[nodeStatus]
+                                    nodeStatusColors[nodeStatus],
+                                    nodeCurr
                                 );
                             }
                         }

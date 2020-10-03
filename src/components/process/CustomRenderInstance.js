@@ -87,7 +87,6 @@ CustomRenderer.$inject = ['eventBus', 'bpmnRenderer'];
 // copied from https://github.com/bpmn-io/bpmn-js/blob/master/lib/draw/BpmnRenderer.js
 function drawRect(parentNode, width, height, borderRadius, color) {
     const rect = svgCreate('rect');
-
     svgAttr(rect, {
         width: width,
         height: height,

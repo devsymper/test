@@ -48,7 +48,7 @@
                             <v-col
                                 cols="1"
                                 v-if="!sideBySideMode"
-                                class="fs-13 font-weight-medium"
+                                class="fs-13 font-weight-medium dateTime"
                             >{{$t("tasks.header.dueDate")}}</v-col>
 
                             <v-col
@@ -158,7 +158,7 @@
                                         v-if="!sideBySideMode"
                                         style="line-height: 42px"
                                         cols="1"
-                                        class="fs-13 pl-3 py-0"
+                                        class="fs-13 pl-3 py-0 dateTime"
                                     >
                                     <span class="mt-1">{{obj.dueDate ==null? '':$moment(obj.dueDate).fromNow()}}</span>
                                     </v-col>
@@ -304,7 +304,6 @@ export default {
                   tasks: groups[fromNow]
                 };
             });
-            console.log("addd",groupArraysTask);
             return groupArraysTask;
         },
         stask() {
@@ -389,7 +388,7 @@ export default {
             openPanel: [0, 1, 2, 3, 4],
             allFlatTasks: [],
             myOwnFilter: {
-                size: 100,
+                size: 50,
                 sort: "createTime",
                 order: "desc",
                 page: 1,
@@ -603,17 +602,6 @@ export default {
           parseInt(listTasks[index].assignee)
         );
         listTasks[index].owner = this.getUser(parseInt(listTasks[index].owner));
-        // if (listTasks[index].description) {
-        //   let description = JSON.parse(listTasks[index].description);
-        //   if (
-        //     description.action.action == "approval" &&
-        //     description.action.parameter.documentObjectId != undefined
-        //   ) {
-        //     this.arrdocObjId.push(
-        //       description.action.parameter.documentObjectId
-        //     );
-        //   }
-        // }
       }
      // this.$store.dispatch("task/getArrDocObjId", this.arrdocObjId);
       this.listProrcessInstances.push({
@@ -708,5 +696,9 @@ export default {
 .colName{
     flex: 0 0 90%;
     max-width: 90%;
+}
+.dateTime{
+    flex: 0 0 11.333333%;
+    max-width: 11.333333%;
 }
 </style>

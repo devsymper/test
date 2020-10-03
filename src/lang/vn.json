@@ -1040,7 +1040,9 @@
 
         },
         "alert": {
-            "title_aproval": "Thực thi công việc"
+            "title_aproval": "Thực thi công việc",
+            "titlePermissionDenied":"Từ chối thực thi!",
+            "contentPermissionDenied":"Bạn không có quyền thực hiện công việc này!"
         }
 
     },

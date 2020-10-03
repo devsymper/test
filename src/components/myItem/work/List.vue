@@ -92,13 +92,19 @@
                     <v-col :cols="sideBySideMode ? 10 : compackMode ? 6: 4" class="pl-3 pr-1 py1">
                         <div class="pl-1">
                             <div class="pa-0 d-flex justify-space-between">
-                                <div
-                                    class="fs-13 text-ellipsis w-100"
-                                >
-                                    <v-icon v-if="obj.endTime && obj.endTime!=null" style="font-size:11px; color:green;margin-left: 3px;">mdi-circle</v-icon>
-                                    <v-icon v-else style="font-size:11px ; color:blue;margin-left: 3px;">mdi-circle</v-icon>
-                                {{ obj.name}}
-                                </div>
+                               <v-tooltip bottom>
+                                    <template v-slot:activator="{ on }">
+                                        <div
+                                            class="fs-13 text-ellipsis w-100"
+                                            v-on="on"
+                                        >
+                                            <v-icon v-if="obj.endTime && obj.endTime!=null" style="font-size:11px; color:green;margin-left: 3px;">mdi-circle</v-icon>
+                                            <v-icon v-else style="font-size:11px ; color:blue;margin-left: 3px;">mdi-circle</v-icon>
+                                        {{ obj.name}}
+                                        </div>
+                                    </template>
+                                    <span>{{ obj.name }}</span>
+                                </v-tooltip>
                                 <div class="fs-11 py-0 " style="width:200px;margin-top:3px">
                                     {{obj.startTime ? $moment(obj.startTime).format('DD/MM/YY HH:mm:ss'):$moment(obj.endTime).format('DD/MM/YY HH:mm:ss')}}
                                     <v-icon class="grey--text " x-small>mdi-clock-time-nine-outline</v-icon>
