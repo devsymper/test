@@ -158,7 +158,7 @@
                                         v-if="!sideBySideMode"
                                         style="line-height: 42px"
                                         cols="1"
-                                        class="fs-13 px-1 py-0"
+                                        class="fs-13 pl-3 py-0"
                                     >
                                     <span class="mt-1">{{obj.dueDate ==null? '':$moment(obj.dueDate).fromNow()}}</span>
                                     </v-col>
