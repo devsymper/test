@@ -93,7 +93,21 @@
 
                 <!-- Avatar -->
                 <div class="user-avatar d-inline-block pa-2" style="width: 35%" >
-                    <SymperAvatar :userId="lazyUserInfo.id" :size="100" />
+                    <v-avatar :size="80">
+                        <img v-if="avatarUrl != ''"
+                            :src="avatarUrl"
+                        >
+                        <img v-if="avatarUrl== ''"
+                            :src="require('./../../../assets/image/avatar_default.jpg')"
+                        >
+                     </v-avatar>
+                    <!-- <SymperAvatar :userId="lazyUserInfo.id" :size="100" /> -->
+                    <UploadFile 
+                        :fileName="avatarFileName"
+						@selected-file="handleAvatarSelected"
+                        ref="uploadAvatar"
+                        :autoUpload="false"
+                            />
                 </div>
             </div>
             
@@ -151,6 +165,7 @@
         </div>
         <div  class="w-100 h-100" v-if="isViewUserRole">
             <ViewRoles 
+                @show-userInfo="showUserInfo()"
                 :rolesList="role"/>
         </div>
     </div>
@@ -158,6 +173,8 @@
 
 <script>
 import SymperAvatar from "@/components/common/SymperAvatar";
+import { appConfigs } from '../../../configs';
+import UploadFile from "./../../../components/common/UploadFile";
 import { util } from '../../../plugins/util';
 import VueClipboard from 'vue-clipboard2';
 import ViewRoles from "../../../views/users/ViewRoles";
@@ -167,11 +184,14 @@ Vue.use(VueClipboard)
 export default {
     components: {
         SymperAvatar,
-        ViewRoles
+        ViewRoles,
+        UploadFile
     },
     data(){
         return {
             role:[],
+            avatarUrl:'',
+            avatarFileName:'',
             isViewUserRole:false,
             lazyUserInfo: {
                 id: 0,
@@ -190,6 +210,8 @@ export default {
     },
     created(){
         this.reAssignUserInfo();
+        this.getAvatarUrl();
+              
     },
     computed: {
         showableUserInfo(){
@@ -200,6 +222,35 @@ export default {
         }
     },
     methods: {
+        getAvatarUrl(){
+            this.avatarUrl= appConfigs.apiDomain.fileManagement+'readFile/user_avatar_'+ this.lazyUserInfo.id;
+        },
+        handleAvatarSelected(tempUrl){
+            debugger
+            this.avatarUrl = tempUrl;
+            this.avatarFileName = 'user_avatar_' + this.lazyUserInfo.id;
+            this.$refs.uploadAvatar.uploadFile();
+        },
+        // updateAvatar(){
+        //     let avatar = (this.url != avatarDefault) ? this.url : '';
+        //     let data = {
+        //         avatar : avatar,
+        //     };
+        //     userApi.updateUser(this.lazyUserInfo.id, data).then(res => {
+		// 		if (res.status == 200) {
+		// 			self.$snotify({
+		// 				type: "success",
+		// 				title: this.$t("notification.delete")+ this.$t("notification.successTitle")});
+		// 		}
+		// 	})
+		// 	.catch(err => {
+		// 		console.log("error from add user api!!!", err);
+		// 	});
+        // },
+        showUserInfo(){
+            this.isViewUserRole=false;
+            this.$emit('make-small-panel')
+        },
         viewUserRole(role){
 			this.isViewUserRole =! this.isViewUserRole;
             this.role = role;
@@ -234,9 +285,17 @@ export default {
         },
         userInfo: {
             default: {}
+        },
+        close:{
+            default:true
         }
     },
     watch: {
+        close(){
+            if(this.close==false){
+                this.isViewUserRole=false
+            }
+        },
         userInfo: {
             deep: true,
             immediate: true,

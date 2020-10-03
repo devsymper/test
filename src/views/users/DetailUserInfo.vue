@@ -1,12 +1,12 @@
 <template>
 	<div class="h-100 w-100">
 		<v-stepper class="w-100 d-flex stepper-create-user">
-			<v-stepper-content class="w-100" step="1"  v-if="isViewUserRole==false">
+			<div class="w-100 ml-4" v-if="!isViewUserRole">
 				<h4>{{ $t('user.general.personalInfo.title')}}</h4>
 				<v-row class="mt-1" >
 					<!-- thong tin -->
 					<v-col cols="8">
-						<v-row class="ml-1 mb-1">
+						<v-row class="ml-1 " style="margin-top:-15px">
 							<v-col cols="6">
 								<span  class="fw-430 fs-13 st-icon-pandora">
 									Họ & tên
@@ -18,7 +18,7 @@
 								</span>
 							</v-col>
 						</v-row>
-						<v-row class="ml-1 mb-1">
+						<v-row class="ml-1 " style="margin-top:-15px">
 							<v-col cols="6">
 								<span  class="fw-430 fs-13 st-icon-pandora">
 									{{ $t('user.general.personalInfo.displayName')}}
@@ -26,11 +26,11 @@
 							</v-col>
 							<v-col  cols="6">
 								<span class="fs-13 st-icon-pandora">
-									{{detailUser.displayName}} 
+									{{detailInfo.displayName}} 
 								</span>
 							</v-col>
 						</v-row>
-						<v-row class="ml-1 mb-1">
+						<v-row class="ml-1 " style="margin-top:-15px">
 							<v-col cols="6">
 								<span  class="fw-430 fs-13 st-icon-pandora">
 									{{ $t('user.general.personalInfo.email')}}
@@ -38,12 +38,12 @@
 							</v-col>
 							<v-col  cols="6">
 								<span  class="fs-13 st-icon-pandora">
-									{{detailUser.email}} 
+									{{detailInfo.email}} 
 								</span>
 					
 							</v-col>
 						</v-row>
-						<v-row class="ml-1 mb-1">
+						<v-row class="ml-1 " style="margin-top:-15px">
 							<v-col cols="6">
 								<span   class="fw-430 fs-13 st-icon-pandora">
 									{{ $t('user.general.personalInfo.phoneNumber')}}
@@ -51,18 +51,18 @@
 							</v-col>
 							<v-col cols="6">
 								<span  class="fs-13">
-									{{detailUser.phone}} 
+									{{detailInfo.phone}} 
 								</span>
 							</v-col>
 						</v-row>
-						<v-row class="ml-1 mb-1">
+						<v-row class="ml-1 " style="margin-top:-15px">
 							<v-col cols="6">
 								<span  class="fw-430 fs-13 st-icon-pandora">
 									{{ $t('user.general.personalInfo.status')}}
 								</span>
 							</v-col>
 							<v-col cols="6">
-								<span style="color:green" v-if="detailUser.status==1" class="fs-13">
+								<span style="color:green" v-if="detailInfo.status==1" class="fs-13">
 									Hoạt động
 								</span>
 								<span style="color:orange" class="fs-13" v-else>
@@ -75,10 +75,10 @@
 					<v-col cols="4">
 						<v-col cols="3" class="text-center ">
 						<SymperAvatar 
-							:userId="sapp.endUserInfo.id" 
+							:userId="detailInfo.id" 
 							style="height: 135px; min-width: 135px; width: 135px;"/>
 						</v-col>
-						<span class="fs-13 ml-15 border">ID: {{detailUser.id}}</span>
+						<span class="fs-13 ml-15 border">ID: {{detailInfo.id}}</span>
 					</v-col>	
 					<!-- ket thuc anh -->
 				</v-row>
@@ -110,10 +110,12 @@
 						</span>
 					</v-btn>
 				</v-row>
-			</v-stepper-content>
+			</div>
 			<!-- user roles -->
-			<div class="w-100 ml-3" v-if="isViewUserRole">
-				<ViewRoles :rolesList="role"/>
+			<div class="w-100 ml-3" v-else>
+				<ViewRoles 
+				@show-userInfo="isViewUserRole=false"
+				:rolesList="role"/>
 			</div>
 			<!-- user roles -->
 		</v-stepper>
@@ -134,7 +136,7 @@ export default {
 		ViewRoles
 	},
 	props:
-        ['detailInfo','changeDetail'],
+        ['detailInfo','changeDetail','showDetailView'],
 	computed: {
         sapp() {
             return this.$store.state.app;
@@ -162,7 +164,6 @@ export default {
 		},    
     },
     created(){
-		this.detailUser = this.detailInfo;
 		 this.getRoleOrgchartByUser(this.detailInfo.id);
 		 this.getRolesByUser(this.detailInfo.id);
 
@@ -171,11 +172,14 @@ export default {
         detailInfo(){
 			this.getRoleOrgchartByUser(this.detailInfo.id);
 			this.getRolesByUser(this.detailInfo.id);
-	 	}
+		 },
+		 showDetailView(){
+			 debugger
+			 this.isViewUserRole=false
+		 }
     },
 	data(){
 		return {
-			detailUser:'',
 			roles:[],
 			id:[],
 			rolesOgchart:[],

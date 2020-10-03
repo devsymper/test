@@ -204,8 +204,10 @@
 			>
 			</v-change-password>
 		</div>
-			<DetailUserInfo class="h-100" 
+			<DetailUserInfo 
+				class="h-100" 
 				v-if="showViewInfo"
+				:showDetailView="showDetailView"
 				:detailInfo="detailInfoUser"
 			/>
 	</div>
@@ -232,6 +234,9 @@ export default {
 		DetailUserInfo
 	},
 	props:{
+		showDetailView:{
+			default:false
+		},
 		actionType:{    // type là add hay update hay detail user
 			type: String,
 			default: "add"

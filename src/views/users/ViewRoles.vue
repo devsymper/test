@@ -1,6 +1,14 @@
 <template>
     <div class="w-100 h-100">
-        <h4>Danh sách phân quyền cho user</h4>
+        <v-row>
+            <v-col cols="md-11">
+                  <h4>Danh sách phân quyền cho user</h4>
+            </v-col>
+            <v-col cols="md-1">
+                <i @click="showUserInfo()" class="mdi mdi-arrow-right"></i>
+            </v-col>
+        </v-row>
+      
         <v-row class="w-100 h-100" style="border:1px solid rgba(0,0,0,0.1)" >
             <v-col cols="md-2" >
                 <v-list-item-group >
@@ -51,10 +59,12 @@
 <script>
 import { userApi } from "./../../api/user.js";
 export default {
-  watch: {
-  },
-    props:['rolesList','close'],
+
+    props:['rolesList'],
     methods:{
+        showUserInfo(){
+            this.$emit("show-userInfo")
+        },
 		// kiểm tra trùng action thì tích
 		checkRole(nameObj,action){
 			let check = false;

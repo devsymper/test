@@ -106,6 +106,7 @@
                 :userInfo="sapp.endUserInfo"
                 @expand-panel="isExpand=true"
                 :close="isExpand"
+                @make-small-panel="isExpand=false"
             />
         </v-navigation-drawer>
     </v-app>
@@ -125,7 +126,7 @@ import DetailUser from "@/components/common/user/DetailUser.vue";
 export default {
     watch:{
         showMyInfo(){
-            if(!showMyInfo){
+            if(!this.showMyInfo){
                 this.isExpand = false;
             }
         }
