@@ -84,7 +84,7 @@ Handsontable.renderers.UserRenderer = function(instance, td, row, col, prop, val
 Handsontable.renderers.SelectRenderer = function(instance, td, row, col, prop, value, cellProperties) {
     Handsontable.renderers.TextRenderer.apply(this, arguments);
     if (value == null) value = ""
-    let div = `<div class="select-cell" style="position:relative;height:24px;width:100%;">` + value + `
+    let div = `<div class="select-cell" style="position:relative;height:22px;width:100%;">` + value + `
                     <span class="select-chervon-bottom" style="position: absolute;right:8px;top:2px;font-size: 10px;color: #eee;">▼</span>
                 </div>`
     $(td).off('click')
