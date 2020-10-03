@@ -126,6 +126,7 @@ export default {
         }
         if (filter.status == 'done') {
             filter.sort = filter.sort == 'createTime' ? 'startTime' : filter.sort;
+            filter.size=30;
             if (filter.assignee) {
                 filter.taskAssignee = filter.assignee;
             }

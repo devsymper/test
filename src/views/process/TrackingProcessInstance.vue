@@ -45,7 +45,7 @@ const nodeStatusColors = {
     },
     todo: {
         fill: "#ffffff",
-        stroke: "#f5bb00"
+        stroke: "#0760D9"
     },
     done: {
         fill: "#edffee",
@@ -200,8 +200,13 @@ export default {
                 if (nodeInfo.activityType) {
                     if(nodeInfo.activityType.includes('Task')){
                         let symBpmn = this.$refs.symperBpmn;
+                        let currentNode=false;
+                        if (nodeInfo.currentNode) {
+                            currentNode=true;
+                        }
                         symBpmn.updateElementProperties(eleId, {
                             statusCount: nodeInfo.instancesStatusCount,
+                            currentNode: currentNode
                         });
                     }
                 }
