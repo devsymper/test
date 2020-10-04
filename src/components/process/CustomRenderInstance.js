@@ -26,7 +26,6 @@ const STATUS_COLORS = {
     overdue: '#cc0000'
 };
 import imgPosition from "@/assets/image/imagePosition.png";
-console.log("adfdf",imgPosition);
 export default class CustomRenderer extends BaseRenderer {
     constructor(eventBus, bpmnRenderer) {
         super(eventBus, HIGH_PRIORITY);
@@ -120,8 +119,6 @@ function insertImage(parentNode,href, width, height) {
         x:75,
         y:-25
     });
-
     svgAppend(parentNode, img);
-
-    return rect;
+    return img;
 }

@@ -160,6 +160,10 @@ export default {
         hideActionTask:{
             type: Boolean,
             default: false
+        },
+        allVariableProcess:{
+            type:Array,
+            default:[]
         }
     },
     watch: {
@@ -357,32 +361,23 @@ export default {
                 this.breadcrumb.instanceName = '';
             }
             if (task.processInstanceId && task.processInstanceId!=null) {
-                this.getProcessInstance(task.processInstanceId);
+                this.getAppName(task.processInstanceId);
             }
         },
-        async getProcessInstance(processInstanceId){
+        async getAppName(processInstanceId){
             let self=this;
-            await BPMNEngine.getProcessInstanceVars(processInstanceId).then((res) => {
-                const symperAppId = res.find(element => element.name=='symper_application_id');
-                    if (symperAppId) {
-                        self.appId=symperAppId.value;
-                        console.log(res,"symperApp");
-                    }else{
-                        self.appId='';
-                    }
-            }).catch(()=>{
-                self.appId='';
-            });
-
-            if (this.appId!=-1 && this.appId!="") {
-                await appManagementApi.getAppDetails(Number(this.appId)).then((res) => {
-                    console.log(res,"Appdetail");
-                    self.breadcrumb.appName=res.data.listObject.name;
-                }).catch(()=>{
-                    self.breadcrumb.appName=null;
-                });
+            const dataVariable = this.allVariableProcess.find(element => element.processInstanceId===processInstanceId);
+            if (dataVariable) {
+                let appId=dataVariable.value;
+                let allApp = this.$store.state.task.allAppActive;
+                let app=allApp.find(element => element.id==appId);
+                if (app) {
+                    self.breadcrumb.appName=app.name;
+                }else{
+                    self.breadcrumb.appName= "";
+                }
             }else{
-                self.breadcrumb.appName=null;
+                self.breadcrumb.appName="";
             }
         },
         closeDetail() {

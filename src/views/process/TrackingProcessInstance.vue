@@ -80,12 +80,12 @@ export default {
     watch:{
         instanceId(){
             this.setInstanceXML();
-            this.getInstanceRuntimeData();
+           // this.getInstanceRuntimeData();
         }
     },
     created() {
         this.setInstanceXML();
-        this.getInstanceRuntimeData();
+        //this.getInstanceRuntimeData();
  
     },
     data() {
@@ -204,6 +204,7 @@ export default {
                         if (nodeInfo.currentNode) {
                             currentNode=true;
                         }
+                        console.log(eleId,"aaaaaxx");
                         symBpmn.updateElementProperties(eleId, {
                             statusCount: nodeInfo.instancesStatusCount,
                             currentNode: currentNode
@@ -236,15 +237,9 @@ export default {
                                 } else {
                                     nodeStatus = "notStart";
                                 }
-                                let nodeCurr=false;
-                                let dataRuntimeNode=self.runtimeNodeMap[node.id];
-                                if (dataRuntimeNode !=null && dataRuntimeNode['currentNode']) {
-                                    nodeCurr=true;
-                                }
                                 symBpmn.changeElementColor(
                                     node.id,
                                     nodeStatusColors[nodeStatus],
-                                    nodeCurr
                                 );
                             }
                         }
@@ -261,12 +256,12 @@ export default {
                     return self.getDefinitionData(res.data[0].processDefinitionId);
                 })
                 .then(res => {
-                    
                     let resourceDataUrl = appConfigs.apiDomain.bpmne.general + 'symper-rest/service/repository/deployments/'+res.deploymentId+'/resourcedata/process_draft.bpmn';
                     return self.getDefinitionXML(resourceDataUrl);
                 })
                 .then(res => {
                     self.diagramXML = res;
+                    self.getInstanceRuntimeData();
                     self.setColorForNodes().then(() => {
                         self.setTasksStatus();
                     });

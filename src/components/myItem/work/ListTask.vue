@@ -39,8 +39,10 @@
             <v-divider></v-divider>
             <VuePerfectScrollbar
                 @ps-y-reach-end="handleReachEndList"
+                style="height: calc(100vh - 135px);"
                 >
-                    <v-row
+                    <div style="overflow: hidden;">
+                        <v-row
                         class="item-task"
                         v-for="(obj, idx) in listTaskComputed"
                         :key="idx"
@@ -142,7 +144,7 @@
                                     <span>{{ obj.processDefinitionName?  obj.processDefinitionName : `ad hoc` }}</span>
                                 </v-tooltip>
                                 <div class="pa-0 grey--text mt-1 lighten-2 d-flex justify-space-between">
-                                    {{selectNameApp(obj.variables)}}
+                                    {{appName}}
                                 </div>
                             </div>
                         </v-col>
@@ -160,6 +162,7 @@
                             </div>
                         </v-col>
                     </v-row>
+                </div>
             </VuePerfectScrollbar>
         </div>
 </template>
@@ -178,6 +181,10 @@ export default {
             type: Array,
             default: []
         },
+        appName:{
+            type: String,
+            default: null
+        }
     },
     watch: {
         listTask(newVl){

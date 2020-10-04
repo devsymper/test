@@ -110,12 +110,6 @@ export default {
             });
         },
         changeElementColor(ele,data,isCurrentNode=false){
-            // if (isCurrentNode) {
-            //     data={
-            //             fill:"#9EDEF7",
-            //             stroke:"5ABEE5"
-            //     }
-            // }
             if(typeof ele == 'string'){ // Nếu truyền vào id
                 ele = this.bpmnModeler.get("elementRegistry").get(ele);
             }
