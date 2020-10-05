@@ -163,8 +163,8 @@
         <!-- showErrorUser -->
         <v-list v-if="processing.preprocessing.isDone&&processing.validating.errors.length==0&&processing.importing.processed>1&&processing.dataUserError.length>0" class="ml-6 fs-13">
            Danh sách tài khoản import không thành công
-           <v-row> Lỗi trùng email</v-row>
-           <v-row style="background-color:#F5F5F5; height: 30px" class="ml-0 mr-5">
+           <v-row v-if="existEmail.length>0"> Lỗi trùng email</v-row>
+           <v-row v-if="existEmail.length>0" style="background-color:#F5F5F5; height: 30px" class="ml-0 mr-5">
                 <v-col class="col-md-6">
                     Tên tài khoản
                 </v-col>
@@ -172,7 +172,7 @@
                     Email
                 </v-col>
             </v-row>
-           <div class="ml-0 mr-4" v-for="(error, errorIdxUser) in processing.dataUserError.filter(x=>x.result=='Email already exist')" :key="errorIdxUser"  >
+           <div v-if="existEmail.length>0" class="ml-0 mr-4" v-for="(error, errorIdxUser) in existEmail" :key="errorIdxUser"  >
                         <!-- xử lý trường hợp không đúng định dạng dữ liệu -->
                 <div>
                     <v-row class="ml-0 mr-1" style="background-color:#F5F5F5 ">
@@ -182,6 +182,60 @@
                             <v-col class="col-md-6" v-if="errorIdxUser<10">
                             
                             {{processing.dataUserError[errorIdxUser].email}}
+                        </v-col>
+                    </v-row>
+                    <v-row v-if=" processing.dataUserError.length>10 " class="ml-0 mr-4" style="background-color:#F5F5F5 ">
+                        <v-col  class="col-md-4">
+                            ...
+                        </v-col>
+                        <v-col class="col-md-8">
+                            ...
+                        </v-col>
+                    </v-row>
+                </div>
+        </div>
+        <!-- invalid Email -->
+         <v-row v-if="invalidEmail.length>0" class="ml-0" style="color:red"> Lỗi email không đúng định dạng</v-row>
+           <v-row v-if="invalidEmail.length>0" style="background-color:#F5F5F5; height: 30px" class="ml-0 mr-5">
+                <v-col class="col-md-12"  >
+                    Email
+                </v-col>
+            </v-row>
+           <div v-if="invalidEmail.length>0" class="ml-0 mr-4" v-for="(error, errorIdxUser) in invalidEmail" :key="errorIdxUser"  >
+                        <!-- xử lý trường hợp không đúng định dạng dữ liệu -->
+                <div>
+                    <v-row class="ml-0 mr-1" style="background-color:#F5F5F5 ">
+                            <v-col class="col-md-12" v-if="errorIdxUser<10">
+                            
+                            {{processing.dataUserError[errorIdxUser].email}}
+                        </v-col>
+                    </v-row>
+                    <v-row v-if=" processing.dataUserError.length>10 " class="ml-0 mr-4" style="background-color:#F5F5F5 ">
+                        <v-col  class="col-md-4">
+                            ...
+                        </v-col>
+                        <v-col class="col-md-8">
+                            ...
+                        </v-col>
+                    </v-row>
+                </div>
+        </div>
+        <!-- invalidPass -->
+         <v-row v-if="invalidPass.length>0" class="ml-0" style="color:red"> Lỗi mật khẩu không đúng định dạng </v-row>
+         <v-row v-if="invalidPass.length>0" class="fs-12 ml-0 mr-3" style="color:grey">(Mật khẩu gồm tối thiểu 8 ký tự, 1 chữ cái thường, 1 chữ cái hoa và số)
+        </v-row>
+           <v-row v-if="invalidPass.length>0" style="background-color:#F5F5F5; height: 30px" class="ml-0 mr-5">
+                <v-col class="col-md-12">
+                   Password
+                </v-col>
+            </v-row>
+           <div v-if="invalidPass.length>0" class="ml-0 mr-4" v-for="(error, errorIdxUser) in invalidPass" :key="errorIdxUser"  >
+                        <!-- xử lý trường hợp không đúng định dạng dữ liệu -->
+                <div>
+                    <v-row class="ml-0 mr-1" style="background-color:#F5F5F5 ">
+                            <v-col class="col-md-6" v-if="errorIdxUser<10">
+                            
+                            {{processing.dataUserError[errorIdxUser].password}}
                         </v-col>
                     </v-row>
                     <v-row v-if=" processing.dataUserError.length>10 " class="ml-0 mr-4" style="background-color:#F5F5F5 ">
@@ -282,6 +336,10 @@ export default {
                else{
     
                    if(this.processing.dataUserError.length>0){
+                       debugger
+                       this.existEmail = this.processing.dataUserError.filter(x=>x.result=='Email already exist');
+                       this.invalidEmail= this.processing.dataUserError.filter(x=>x.result=='Email invalid');
+                       this.invalidPass = this.processing.dataUserError.filter(x=>x.result=='Password invalid');
                         setTimeout(()=>this.$emit('showNotification'), 1000);
                        this.showErrorImportUser = ! this.showErrorImportUser;
                    }else{
@@ -311,6 +369,9 @@ export default {
     data() {
         return {
             showErrorImportUser:false,
+            existEmail:[],
+            invalidEmail:[],
+            invalidPass:[],
             processing:{
                 preprocessing: {
                 processed: 0,
