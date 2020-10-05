@@ -382,20 +382,6 @@ export default {
     },
     methods: {
         selectedPermissions(data){
-            let ids = []
-            data.forEach(function(e){
-                ids.push(e.id)
-            })
-            let object = {}
-            object.role_identifier = "orgchart:"+this.$route.params.id+":"+this.selectingNode.id
-            object.role_type = "orgchart"
-            object.permission_id = ids
-            let arrObj = []
-            arrObj.push(object)
-            let arrr = {}
-            arrr.permissions = JSON.stringify(arrObj)
-            arrr.replace_all = "1"
-            orgchartApi.updatePermissionInRole(arrr).then(res=>{}).catch(err=>{})
             this.$store.commit('orgchart/updatePermissionsSelectingNode', {instanceKey: this.instanceKey, data:data} )
         },
         changeNodeStyle(styleData) {

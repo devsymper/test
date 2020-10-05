@@ -2,6 +2,7 @@
     <div class="w-100 h-100">
         <listTask 
             :listTask="listTask"
+            :appName="appName"
         />
     </div>
 </template>
@@ -16,6 +17,10 @@ export default {
             type: String,
             default: null
         },
+        appName:{
+            type: String,
+            default: null
+        }
     },
     components: {
         listTask,
