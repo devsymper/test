@@ -53,6 +53,26 @@
 									></v-text-field>
 								</v-col>	
 							</v-row>
+								<v-row>
+								<v-col >
+									<span class="fs-13 st-icon-pandora">
+										{{ $t('user.general.personalInfo.userName')}}
+									</span>
+								</v-col>
+							</v-row>
+							<v-row >
+								<v-col cols="12">
+									<v-text-field
+										outlined	
+										class="fs-13"
+										ref="userName"
+										required
+										:rules="[rules.required]"
+										v-model="user.userName"
+										dense
+									></v-text-field>
+								</v-col>
+							</v-row>
 							<v-row>
 								<v-col >
 									<span class="fs-13 st-icon-pandora">
@@ -65,14 +85,14 @@
 									<v-text-field
 										outlined	
 										class="fs-13"
-										ref="userName"
+										ref="displayName"
 										required
 										:rules="[rules.required]"
 										v-model="user.displayName"
 										dense
 									></v-text-field>
-							</v-col>
-						</v-row>
+								</v-col>
+							</v-row>
 							<v-row>
 								<v-col >
 									<span class="fs-13 st-icon-pandora">

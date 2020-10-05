@@ -28,8 +28,13 @@
                 </v-list-item-avatar>
                 <v-list-item-content>
                     <v-list-item-title class=" mb-2">
-                        <span class="mt-1 position-relative cursor-pointer" style="top: 0px; position: relative;" @click="$emit('show-user-detail')">
+                        <span 
+                            class="mt-1 position-relative cursor-pointer" 
+                            style="top: 0px; position: relative;" 
+                            @click="$emit('show-user-detail')"
+                        >
                             {{ sapp.baInfo.name ? sapp.baInfo.name : sapp.endUserInfo.displayName }}
+                            <v-icon  @click="$emit('show-user-detail')"></v-icon>
                         </span>
                     </v-list-item-title>
                     <div class="w-100 mb-1 ">
