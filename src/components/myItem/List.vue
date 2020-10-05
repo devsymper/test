@@ -269,19 +269,6 @@ export default {
             return this.$store.state.comment.commentCountPerObj.list;
         },
        
-        // Liệt kê danh sách các task dưới dạng phẳng - ko phân cấp
-        flatTasks() {
-            let tasks = [];
-            for (let def of this.listProrcessInstances) {
-                for (let instances of def.objects) {
-                for (let task of instances.tasks) {
-                    task.bizKey = ""; // Business key của process instance
-                    tasks.push(task);
-                }
-                }
-            }
-            return tasks;
-        },
         groupFlatTasks() {
             let allTask = this.allFlatTasks;
             const groups = allTask.reduce((groups, task) => {
@@ -383,10 +370,8 @@ export default {
                 idx: -1,
                 originData: null
             },
-            listProrcessInstances: [],
             isSmallRow: false,
             sideBySideMode: false,
-            openPanel: [0, 1, 2, 3, 4],
             allFlatTasks: [],
             allVariableProcess: [],
             myOwnFilter: {
@@ -399,7 +384,6 @@ export default {
             filterVariables:{
                 names:"symper_application_id",
                 page:1,
-                pageSize:50,
                 processInstanceIds:[]
             },
             defaultAvatar: appConfigs.defaultAvatar,
@@ -466,12 +450,12 @@ export default {
     handleReachEndList() {
       if (
         this.allFlatTasks.length < this.totalTask &&
-        this.allFlatTasks.length > 0
+        this.allFlatTasks.length > 0 && !this.loadingTaskList && !this.loadingMoreTask
       ) {
         this.myOwnFilter.page += 1;
-        this.myOwnFilter.size = 50;
-
-        this.getTasks();
+        if ((this.myOwnFilter.page-1)*this.myOwnFilter.size <this.totalTask) {
+            this.getTasks();
+        }
       }
     },
     handleTaskSubmited() {
@@ -538,7 +522,6 @@ export default {
         } else {
             this.loadingMoreTask = true;
         }
-      //  this.listProrcessInstances = [];
         filter = Object.assign(filter, this.filterFromParent);
         filter = Object.assign(filter, this.myOwnFilter);
         let res = {};
@@ -557,9 +540,6 @@ export default {
                 listTasks = res;
             }
         } else {
-            // if (!filter.assignee) {
-            // filter.assignee = this.$store.state.app.endUserInfo.id;
-            // }
             res = await BPMNEngine.getTask(filter);
             listTasks = res.data;
         }
@@ -580,7 +560,6 @@ export default {
             }
         }
         self.filterVariables.pageSize=self.myOwnFilter.size;
-        self.filterVariables.page=self.myOwnFilter.page;
         self.filterVariables.processInstanceIds=JSON.stringify(allProcessId);
         let resVariable = {};
         resVariable = await taskApi.getVariableWorkflow(self.filterVariables);
@@ -593,34 +572,11 @@ export default {
         this.$store.commit('comment/setWaitingCommentCountPerObj', taskIden);
         this.$store.dispatch('file/getWaitingFileCountPerObj');
         this.$store.dispatch('comment/getWaitingCommentCountPerObj');
-        
-        // this.listProrcessInstances.forEach((process, processIndex) => {
-        //     process.objects.forEach((instance, instanceIndex) => {
-        //     this.listProrcessInstances[processIndex].objects[
-        //         instanceIndex
-        //     ].tasks = [];
-        //     // let index = 0;
-        //     for (let index in listTasks) {
-        //         listTasks[index].assignee = this.getUser(
-        //         parseInt(listTasks[index].assignee)
-        //         );
-        //         listTasks[index].owner = this.getUser(
-        //         parseInt(listTasks[index].owner)
-        //         );
-        //         if (listTasks[index].processInstanceId == instance.id) {
-        //         this.listProrcessInstances[processIndex].objects[
-        //             instanceIndex
-        //         ].tasks.push(listTasks[index]);
-        //         listTasks.splice(index, 1);
-        //         }
-        //     }
-        //     });
-        // });
-
-      console.log(listTasks, "listTassk");
-      this.addOtherProcess(listTasks);
-      this.loadingTaskList = false;
-      this.loadingMoreTask = false;
+     
+        console.log(listTasks, "listTassk");
+        this.addOtherProcess(listTasks);
+        this.loadingTaskList = false;
+        this.loadingMoreTask = false;
     },
     addOtherProcess(listTasks) {
       for (let index in listTasks) {
@@ -629,18 +585,6 @@ export default {
         );
         listTasks[index].owner = this.getUser(parseInt(listTasks[index].owner));
       }
-     // this.$store.dispatch("task/getArrDocObjId", this.arrdocObjId);
-    //   this.listProrcessInstances.push({
-    //     processDefinitionId: null,
-    //     processDefinitionName: this.$t("common.other"),
-    //     objects: [
-    //       {
-    //         id: null,
-    //         name: null,
-    //         tasks: listTasks
-    //       }
-    //     ]
-    //   });
     }
   }
 };
