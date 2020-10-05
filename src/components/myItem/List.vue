@@ -466,12 +466,12 @@ export default {
     handleReachEndList() {
       if (
         this.allFlatTasks.length < this.totalTask &&
-        this.allFlatTasks.length > 0
+        this.allFlatTasks.length > 0 && !this.loadingTaskList && !this.loadingMoreTask
       ) {
         this.myOwnFilter.page += 1;
-        this.myOwnFilter.size = 50;
-
-        this.getTasks();
+        if ((this.myOwnFilter.page-1)*this.myOwnFilter.size <this.totalTask) {
+            this.getTasks();
+        }
       }
     },
     handleTaskSubmited() {
@@ -538,7 +538,6 @@ export default {
         } else {
             this.loadingMoreTask = true;
         }
-      //  this.listProrcessInstances = [];
         filter = Object.assign(filter, this.filterFromParent);
         filter = Object.assign(filter, this.myOwnFilter);
         let res = {};
@@ -557,9 +556,6 @@ export default {
                 listTasks = res;
             }
         } else {
-            // if (!filter.assignee) {
-            // filter.assignee = this.$store.state.app.endUserInfo.id;
-            // }
             res = await BPMNEngine.getTask(filter);
             listTasks = res.data;
         }
@@ -593,34 +589,11 @@ export default {
         this.$store.commit('comment/setWaitingCommentCountPerObj', taskIden);
         this.$store.dispatch('file/getWaitingFileCountPerObj');
         this.$store.dispatch('comment/getWaitingCommentCountPerObj');
-        
-        // this.listProrcessInstances.forEach((process, processIndex) => {
-        //     process.objects.forEach((instance, instanceIndex) => {
-        //     this.listProrcessInstances[processIndex].objects[
-        //         instanceIndex
-        //     ].tasks = [];
-        //     // let index = 0;
-        //     for (let index in listTasks) {
-        //         listTasks[index].assignee = this.getUser(
-        //         parseInt(listTasks[index].assignee)
-        //         );
-        //         listTasks[index].owner = this.getUser(
-        //         parseInt(listTasks[index].owner)
-        //         );
-        //         if (listTasks[index].processInstanceId == instance.id) {
-        //         this.listProrcessInstances[processIndex].objects[
-        //             instanceIndex
-        //         ].tasks.push(listTasks[index]);
-        //         listTasks.splice(index, 1);
-        //         }
-        //     }
-        //     });
-        // });
-
-      console.log(listTasks, "listTassk");
-      this.addOtherProcess(listTasks);
-      this.loadingTaskList = false;
-      this.loadingMoreTask = false;
+     
+        console.log(listTasks, "listTassk");
+        this.addOtherProcess(listTasks);
+        this.loadingTaskList = false;
+        this.loadingMoreTask = false;
     },
     addOtherProcess(listTasks) {
       for (let index in listTasks) {
@@ -629,18 +602,6 @@ export default {
         );
         listTasks[index].owner = this.getUser(parseInt(listTasks[index].owner));
       }
-     // this.$store.dispatch("task/getArrDocObjId", this.arrdocObjId);
-    //   this.listProrcessInstances.push({
-    //     processDefinitionId: null,
-    //     processDefinitionName: this.$t("common.other"),
-    //     objects: [
-    //       {
-    //         id: null,
-    //         name: null,
-    //         tasks: listTasks
-    //       }
-    //     ]
-    //   });
     }
   }
 };

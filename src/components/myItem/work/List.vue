@@ -17,7 +17,6 @@
           @filter-change-value="handleChangeFilterValue"
           @create-task="getTasks({})"
           @refresh-task-list="getTasks()"
-          @get-list-process-instance="listProrcessInstances = $event"
         ></listHeader>
         <v-divider v-if="!sideBySideMode"></v-divider>
         <v-row class="ml-0 mr-0" v-if="!sideBySideMode">
@@ -335,7 +334,7 @@ export default {
         allFlatTasks: [],
         allVariableProcess:[],
         myOwnFilter: {
-            size: 100,
+            size: 30,
             sort: "createTime",
             order: "desc",
             page: 1,
@@ -344,7 +343,7 @@ export default {
         filterVariables:{
             names:"symper_application_id,symper_user_id_start_workflow",
             page:1,
-            pageSize:100,
+            pageSize:30,
             processInstanceIds:[]
         },
       defaultAvatar: appConfigs.defaultAvatar,
@@ -399,32 +398,31 @@ export default {
         }
     },
     handleReachEndList() {
-      if (
-        this.allFlatTasks.length < this.totalTask &&
-        this.allFlatTasks.length > 0
-      ) {
-        this.myOwnFilter.page += 1;
-        this.myOwnFilter.size = 50;
-
-        this.getTasks();
-      }
+        if (
+            this.allFlatTasks.length < this.totalTask &&
+            this.allFlatTasks.length > 0  && !this.loadingTaskList && !this.loadingMoreTask
+        ) {
+            this.myOwnFilter.page += 1;
+            if ((this.myOwnFilter.page-1)*this.myOwnFilter.size <this.totalTask) {
+                this.getTasks();
+            }
+        }
     },
     handleTaskSubmited() {
-      this.sideBySideMode = false;
-      this.getTasks();
+        this.sideBySideMode = false;
+        this.getTasks();
     },
     handleChangeFilterValue(data) {
-      for (let key in data) {
-        this.$set(this.myOwnFilter, key, data[key]);
-      }
-      this.getTasks();
+        for (let key in data) {
+            this.$set(this.myOwnFilter, key, data[key]);
+        }
+        this.getTasks();
     },
     reCalcListTaskHeight() {
-      this.listTaskHeight =
-        util.getComponentSize(this.$el.parentElement).h - 125;
+        this.listTaskHeight =util.getComponentSize(this.$el.parentElement).h - 125;
     },
     getUser(id) {
-      this.$refs.user.getUser(id);
+        this.$refs.user.getUser(id);
     },
     selectObject(obj, idx,idex) {
         this.index = idx;
@@ -484,6 +482,7 @@ export default {
             if (task.processInstanceId && task.processInstanceId!=null) {
                 if(allProcess.indexOf(task.processInstanceId) === -1) {
                     allProcess.push(task.processInstanceId);
+                    self.allFlatTasks.push(task);
                     processIden.push('work:'+task.processInstanceId);
                 }
             }
@@ -517,13 +516,13 @@ export default {
             let filter={};
             if (status=='') { // get process 
                 filter.processInstanceIds=listIdProrcessInstances;
-                filter.size=100;
                 filter.sort='startTime';
                 filter.order='desc';
+                filter.size=self.myOwnFilter.size;
                 let res = await BPMNEngine.getProcessInstanceHistory(filter);
-                self.listProrcessInstances=res.data;
-            }else if(status=='done'){ 
-               
+                res.data.forEach(element => {
+                    self.listProrcessInstances.push(element);
+                });
             }
         } catch (error) {
             self.$snotifyError(error, "Get Process failed");
