@@ -120,8 +120,8 @@
                                     cols="2"
                                     class="fs-13 "
                                 >  
-                                    <symperAvatar :size="20" :userId="getUserIdStartWork(processParent.variables,'id')" />
-                                    {{getUserIdStartWork(processParent.variables,"name")}}
+                                    <symperAvatar :size="20" :userId="workInfo.startUserId" />
+                                    {{workInfo.startUserName}}
                                 </v-col>
                                 <v-col
                                     cols="2"
@@ -181,8 +181,8 @@
                                         cols="2"
                                         class="fs-13 "
                                     >  
-                                        <symperAvatar :size="20" :userId="getUserIdStartWork(obj.variables,'id')" />
-                                        {{getUserIdStartWork(obj.variables,"name")}}
+                                        <symperAvatar :size="20" :userId="workInfo.startUserId" />
+                                         {{workInfo.startUserName}}
                                     </v-col>
                                     <v-col
                                         cols="2"
@@ -243,8 +243,8 @@
                                         cols="2"
                                         class="fs-13 "
                                     >  
-                                        <symperAvatar :size="20" :userId="getUserIdStartWork(obj.variables,'id')" />
-                                        {{getUserIdStartWork(obj.variables,"name")}}
+                                        <symperAvatar :size="20" :userId="workInfo.startUserId" />
+                                        {{workInfo.startUserName}}
                                     </v-col>
                                     <v-col
                                         cols="2"
@@ -383,22 +383,6 @@ export default {
                 instanceName: '',
                 name: ''
             },
-            descriptionTask:'',
-            tabsData: {
-                people: {
-                    assignee: [],
-                    owner: [],
-                    participant: [],
-                    watcher: []
-                },
-                task: {},
-                'sub-task': {},
-                attachment: {},
-                comment: {},
-                info: {},
-                'related-items': {}
-            },
-            linkTask:'',
             taskActionBtns: [
                 {
                     text:"Submit",
@@ -469,22 +453,6 @@ export default {
     created(){
     },
     methods: {
-        getUserIdStartWork(variables,isCheck='id'){
-            let allUserById = this.$store.getters['app/mapIdToUser'];
-            let startUserId='';
-            let startUserName='';
-            for(let vari of variables){
-                if(vari.name == 'symper_user_id_start_workflow'){
-                    startUserId = vari.value;
-                    startUserName = allUserById[startUserId] ? allUserById[startUserId].displayName : '';
-                }
-            }
-            if (isCheck=="id") {
-                return startUserId;
-            }else{
-                return startUserName;
-            }
-        },
         showContentFile(data){
             this.serverPath = data.serverPath;
 			this.name = data.name;
@@ -599,10 +567,8 @@ export default {
             try {
                 let filter={};
                 filter.processInstanceId=superProcessInstanceId;
-                filter.includeProcessVariables=true;
                 let res = await BPMNEngine.getProcessInstanceHistory(filter);
                 self.processParent=res.data[0];
-                console.log("ProcessParent", res.data[0]);
             } catch (error) {
                 self.processParent=[];
                 self.$snotifyError(error, "Get Process Parent failed");
@@ -621,7 +587,6 @@ export default {
                 }else{
                     self.listTaskCurrent=[];
                 }
-                console.log("listTaskCurrent", res.data);
             } catch (error) {
                 self.listTaskCurrent=[];
                 self.$snotifyError(error, "Get task process current failed");
@@ -633,7 +598,6 @@ export default {
                 try {
                     let filter={};
                     filter.superProcessInstanceId=superProcessInstanceId;
-                    filter.includeProcessVariables=true;
                     let res = await BPMNEngine.getProcessInstanceHistory(filter);
                     if (isCheck=='siblingWork') {
                         if (res.total>0) {
@@ -641,14 +605,12 @@ export default {
                         }else{
                             self.processSibling=[];
                         }
-                        console.log("ProcessSibling", res.data);
                     }else if(isCheck=='subWork'){
                         if (res.total>0) {
                             self.processSub=res.data;
                         }else{
                             self.processSub=[];
                         }
-                        console.log("ProcessSub", res.data);
                     }
                 } catch (error) {
                     if (isCheck=='siblingWork') {
