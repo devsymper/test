@@ -269,19 +269,6 @@ export default {
             return this.$store.state.comment.commentCountPerObj.list;
         },
        
-        // Liệt kê danh sách các task dưới dạng phẳng - ko phân cấp
-        flatTasks() {
-            let tasks = [];
-            for (let def of this.listProrcessInstances) {
-                for (let instances of def.objects) {
-                for (let task of instances.tasks) {
-                    task.bizKey = ""; // Business key của process instance
-                    tasks.push(task);
-                }
-                }
-            }
-            return tasks;
-        },
         groupFlatTasks() {
             let allTask = this.allFlatTasks;
             const groups = allTask.reduce((groups, task) => {
@@ -383,10 +370,8 @@ export default {
                 idx: -1,
                 originData: null
             },
-            listProrcessInstances: [],
             isSmallRow: false,
             sideBySideMode: false,
-            openPanel: [0, 1, 2, 3, 4],
             allFlatTasks: [],
             allVariableProcess: [],
             myOwnFilter: {
@@ -399,7 +384,6 @@ export default {
             filterVariables:{
                 names:"symper_application_id",
                 page:1,
-                pageSize:50,
                 processInstanceIds:[]
             },
             defaultAvatar: appConfigs.defaultAvatar,
@@ -576,7 +560,6 @@ export default {
             }
         }
         self.filterVariables.pageSize=self.myOwnFilter.size;
-        self.filterVariables.page=self.myOwnFilter.page;
         self.filterVariables.processInstanceIds=JSON.stringify(allProcessId);
         let resVariable = {};
         resVariable = await taskApi.getVariableWorkflow(self.filterVariables);

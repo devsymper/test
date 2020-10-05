@@ -110,6 +110,10 @@ export default {
         return bpmneApi.get(appConfigs.apiDomain.bpmne.instances, filter, testHeader);
     },
     getProcessInstanceHistory(filter={}) {
+        if (filter.page && filter.size) {
+            filter.start=(filter.page-1)*filter.size;
+            delete filter.page;
+        }
         filter= JSON.stringify(filter);
         return bpmneApi.post(appConfigs.apiDomain.bpmne.historyInstances, filter, testHeader);
     },
