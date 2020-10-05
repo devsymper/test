@@ -30,6 +30,9 @@ export const taskApi = {
             delete filter.size;
         }
         return workfloweExtend.post("variables/query",filter);
+    },
+    getDocumentInVariables(filter){
+        return workfloweExtend.get("variables/documents",{page:filter.page,pageSize:filter.pageSize});
     }
 
     

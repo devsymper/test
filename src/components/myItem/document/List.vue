@@ -67,10 +67,9 @@
                     minHeight: '30px'
                 }"
                 :class="{
-                    'd-active':indexObj==idx||index==idx
+                    'single-row': true ,
+                    'd-active':index==idx
                 }"
-                @mouseover="indexObj=idx"
-                @mouseout="indexObj = null"
                 @click="selectObject(obj,idx)"
                 style="border-bottom: 1px solid #eeeeee!important;margin-left:0px!important"
             >
@@ -210,6 +209,7 @@ import {
 } from "@/components/process/processAction";
 import symperAvatar from "@/components/common/SymperAvatar.vue";
 import detailDocument from '@/views/document/detail/Detail';
+import { taskApi } from '@/api/task';
 export default {
   computed: {
     fileCountPerTask(){
@@ -224,8 +224,6 @@ export default {
         let arrDocument=listObjRelated.concat(listObjUserSubmit);
         let mapIdToDocObj = {};
         let rsl = [];
-
-        
         arrDocument.forEach(element => {
             if(!mapIdToDocObj[element.id]){
                 mapIdToDocObj[element.id] = true;
@@ -245,8 +243,6 @@ export default {
                 rsl.push(element);
             }
         });
-
-        
         rsl.sort(function(a, b) {
             var keyA = new Date(a.createAt),
             keyB = new Date(b.createAt);
@@ -264,7 +260,7 @@ export default {
       return this.$store.state.app;
     }
   },
-    name: "listWork",
+    name: "listDocument",
     components: {
         icon: icon,
         listHeader: listHeader,
@@ -316,13 +312,12 @@ export default {
             docObjInfo: {
                 docObjId: 0,
             },
-            indexObj: -1,
             index: -1,
             titleDocument:'',
             loadingTaskList: false,
             loadingMoreTask: false,
             listTaskHeight: 300,
-            totalTask: 0,
+            totalDoc: 0,
             selectedTask: {
                 taskInfo: {},
                 idx: -1,
@@ -331,17 +326,12 @@ export default {
             listProrcessInstances: [],
             isSmallRow: false,
             sideBySideMode: false,
-            allFlatTasks: [],
+            allFlatDocumentObjId: [],
             myOwnFilter: {
-                size: 100,
-                sort: "startTime",
-                order: "desc",
+                pageSize:50,
                 page: 1,
-                assignee: this.$store.state.app.endUserInfo.id
             },
             defaultAvatar: appConfigs.defaultAvatar,
-            listIdProcessInstance:[],
-            listTaskDone:[],
             listDocumentObjectId:[],
 
         };
@@ -391,13 +381,13 @@ export default {
    
         handleReachEndList() {
             if (
-                this.allFlatTasks.length < this.totalTask &&
-                this.allFlatTasks.length > 0
+                this.allFlatDocumentObjId.length < this.totalDoc &&
+                this.allFlatDocumentObjId.length > 0 && !this.loadingTaskList && !this.loadingMoreTask
             ) {
                 this.myOwnFilter.page += 1;
-                this.myOwnFilter.size = 50;
-
-                this.getTasks();
+                if ((this.myOwnFilter.page-1)*this.myOwnFilter.pageSize <this.totalDoc) {
+                    this.getTasks();
+                }
             }
         },
         handleTaskSubmited() {
@@ -418,7 +408,6 @@ export default {
             this.$refs.user.getUser(id);
         },
         selectObject(obj, idx) {
-            this.indexObj = idx;
             this.index = idx;
             this.docObjInfo.docObjId = obj.id;
             this.titleDocument = obj.titleObject;
@@ -438,7 +427,7 @@ export default {
             }
             let self = this;
             if (this.myOwnFilter.page == 1) {
-                this.allFlatTasks = [];
+                this.allFlatDocumentObjId = [];
                 this.loadingTaskList = true;
             } else {
                 this.loadingMoreTask = true;
@@ -446,63 +435,31 @@ export default {
             filter = Object.assign(filter, this.filterFromParent);
             filter = Object.assign(filter, this.myOwnFilter);
             let res = {};
-            let listTasks = [];
-            if (filter.status) {
-                    this.$store.commit("task/setFilter", filter.status);
-            }
-            if (this.filterTaskAction == "subtasks") {
-                res = await BPMNEngine.getSubtasks(this.filterFromParent.parentTaskId,filter);
-                if (filter.status == "done") {
-                    listTasks = res.data;
-                } else {
-                    listTasks = res;
-                }
-            } else {
-                if (!filter.assignee) {
-                    filter.assignee = this.$store.state.app.endUserInfo.id;
-                }
-                res = await BPMNEngine.postTaskHistory(filter);// get danh sách task done and notDone
-                listTasks = res.data;
-            }
-            this.totalTask = Number(res.total);
-            let allProcess=[];
-            for (let task of listTasks) {
-                if (task.processInstanceId && task.processInstanceId!=null) {
-                    if(allProcess.indexOf(task.processInstanceId) === -1) {
-                        allProcess.push(task.processInstanceId);
-                    }
-                }
-            }
-            self.listIdProrcessInstances=allProcess;
-            await self.getListTaskDoneInArrProcess(self.listIdProrcessInstances);
+            let listVariablesDocumentObj = [];
+
+            res = await taskApi.getDocumentInVariables(filter);// get danh sách variable chứa document_object_id
+            listVariablesDocumentObj = res.data;
+            this.totalDoc = Number(res.total);
+            
+            await self.getListDocumentObjIdInVariables(listVariablesDocumentObj);
             await self.getListDocumentObjectId(this.$store.state.app.endUserInfo.id);
             await self.getCountCommentAndFile();
             self.loadingTaskList = false;
             self.loadingMoreTask = false;
         },
-        async getListTaskDoneInArrProcess(listIdProrcessInstances){
+        async getListDocumentObjIdInVariables(listVariablesDocumentObj){
             let self=this;
-            try {
-                for (let index = 0; index < listIdProrcessInstances.length; index++) {
-                    let filter={};
-                    filter.processInstanceId=listIdProrcessInstances[index];
-                    filter.finished=true;
-                    let res = await BPMNEngine.postTaskHistory(filter);
-                    if (res.total>0) {
-                        res.data.forEach(element => {
-                            let description=JSON.parse(element.description);
-                            if (description.action.parameter.documentObjectId &&description.action.parameter.documentObjectId!=null ) {
-                                self.listDocumentObjectId.push(description.action.parameter.documentObjectId);
-                            }
-                        });
+            if (listVariablesDocumentObj.length>0) {
+                for (let element of listVariablesDocumentObj) {
+                    if(this.allFlatDocumentObjId.indexOf(element.value) === -1) {
+                        this.allFlatDocumentObjId.push(element.value);
                     }
-                }
-                await self.$store.dispatch("task/getListDocumentObjId", self.listDocumentObjectId);
-            } catch (error) {
-               // self.listTaskDone=[];
-                self.$snotifyError(error, "Get Process failed");
+                };
+                await self.$store.dispatch("task/getListDocumentObjId", self.allFlatDocumentObjId);
             }
+
         },
+        
         async getListDocumentObjectId(userId){
             let self =this;
             await self.$store.dispatch("task/getListDocumentObjIdWithUserSubmit",userId);
