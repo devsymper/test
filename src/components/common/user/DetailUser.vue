@@ -1,7 +1,7 @@
 <template>
-    <div class="symper-detail-user pl-4 pt-2">
+    <div class="symper-detail-user pl-4 pt-2 h-100">
         <!-- panel title -->
-        <div class="w-100 h-100" v-if="isViewUserRole==false">
+        <div class="w-100 h-100 d-flex flex-column flex-grow-1" style="min-height:700px!important" v-if="isViewUserRole==false">
             <div class="symper-title">
                 {{$t('user.myInfo.title')}}
                 <v-tooltip bottom>
@@ -161,13 +161,20 @@
                             </div>
                         </div>
                     </div>
-                </div>
+                </div>  
             </div>
-        </div>
+           
         <div  class="w-100 h-100" v-if="isViewUserRole">
             <ViewRoles 
                 @show-userInfo="showUserInfo()"
                 :rolesList="role"/>
+        </div>
+         <div class=" mr-4 d-flex align-end" 
+            style=" height: 330px!important; align-self: flex-end">
+                <v-btn @click="logout" text class="mt-10" style="align-self: flex-end">
+                    <span class="fm fw-400  mr-5 " 
+                    >Đăng xuất</span>
+                </v-btn></div>
         </div>
     </div>
 </template>
@@ -223,6 +230,10 @@ export default {
         }
     },
     methods: {
+         logout(){
+            util.auth.logout();
+            location.reload();
+        },
         getAvatarUrl(){
             this.avatarUrl= appConfigs.apiDomain.fileManagement+'readFile/user_avatar_'+ this.lazyUserInfo.id;
         },
