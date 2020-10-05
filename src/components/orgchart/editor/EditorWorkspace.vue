@@ -145,6 +145,7 @@ export default {
                 let newNode ;
                 if(self.context == 'department'){
                     newNode = createDepartmentNode(name);
+                    newNode = createPositionNode(name);
                 }else{
                     newNode = createPositionNode(name);
                 }
