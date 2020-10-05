@@ -164,7 +164,6 @@
                         :rowHeights="21"
                         :renderAllRows="true"
                         :columns="tableColumns"
-                        :contextMenu="hotTableContextMenuItems"
                         :colHeaders="colHeaders"
                         :hiddenColumns="{
                             columns: tableDisplayConfig.value.hiddenColumns
@@ -327,6 +326,7 @@ export default {
     data() {
         let self = this;
         return {
+            tmpTableContextMenu: null,
             deleteDialogShow: false, // có hiển thị cảnh báo xóa hay không
             deleteItems: [], // danh sách các row cần xóa
             savingConfigs: false, // có đang lưu cấu hình của showlist hay không
@@ -366,14 +366,17 @@ export default {
                 filters: true,
                 manualColumnMove: true,
                 manualColumnResize: true,
-                renderAllRows: true,
+                renderAllRows: false,
                 manualRowResize: true,
                 readOnly: true,
+                contextMenu: {},
+                viewportRowRenderingOffset: 20,
+                viewportColumnRenderingOffset: 20,
                 rowHeights: 21,
                 stretchH: "all",
                 licenseKey: "non-commercial-and-evaluation",
                 afterRender: isForced => {
-                    
+                    console.count('list item render table');
                 },
                 afterSelection: (row, column, row2, column2, preventScrolling, selectionLayerLevel) => {
                     if(self.debounceEmitRowSelectEvt){
@@ -393,7 +396,7 @@ export default {
                     }
                     this.debounceRelistContextmenu = setTimeout((self) => {
                         self.relistContextmenu();
-                    }, 200, this);
+                    }, 100, this);
                 },
                 afterChange: function (change, source) {
                      
@@ -408,6 +411,13 @@ export default {
                 },
                 afterColumnMove(movedColumns, finalIndex, dropIndex, movePossible, orderChanged){
 
+                },
+                beforeOnCellMouseDown(){
+                    if(event.which == 3){ // nếu select bằng context menu thì mới set lại các option
+                        self.$refs.dataTable.hotInstance.updateSettings({
+                            contextMenu: util.cloneDeep(self.tmpTableContextMenu)
+                        });
+                    }
                 }
             },
             tableFilter: {
@@ -764,7 +774,7 @@ export default {
                 let parentId = this.commonActionProps.parentId ? this.commonActionProps.parentId : id;
                 items = actionHelper.filterAdmittedActions(items, objectType, parentId ,id);
             }
-            this.hotTableContextMenuItems =  this.getItemContextMenu(items);
+            this.tmpTableContextMenu = this.getItemContextMenu(items);
         },
         getItemContextMenu(rawItems) {
             let thisCpn = this;
