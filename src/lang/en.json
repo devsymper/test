@@ -200,6 +200,7 @@
                 "status": "Status",
                 "title": "personal information",
                 "userName": "User name",
+                "phoneNumber": "Phone",
                 "email": "Email",
                 "firstName": "First name",
                 "lastName": "Last name",
@@ -264,7 +265,9 @@
             "updateAt": "Update at",
             "contextMenu": {
                 "passwordSetting": "Password setting",
-                "edit": "Edit"
+                "edit": "Edit",
+                "delete": "Delete",
+                "view": "View"
             }
         },
         "myInfo": {
@@ -404,7 +407,7 @@
                     "fullSize": "Full size Form Submit",
                     "type": "Document type",
                     "note": "Note (Serve for searching)",
-                    "titleObject": "Title Object (Serve for display on MyItem)",
+                    "titleObject": "Title Object (Serve for display on MyItem, formulas execute on server)",
                     "titlePrint": "Title Form Print"
                 },
                 "swapType": {

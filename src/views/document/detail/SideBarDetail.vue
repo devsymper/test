@@ -211,7 +211,7 @@ export default {
 			userApi.getDetailUser(after).then(res=>{
 				if(res.status == 200)
 				this.userCreate = res.data.user.displayName
-			}).always({}).catch({});
+			});
 		},
 		workflowId(after){
 			let self = this

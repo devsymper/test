@@ -116,10 +116,8 @@ export default {
 		},
 	},
 	mounted(){
-		//  var x = util.getComponentSize(this);
 		 let windowHeight = $(window).height();
 		 this.heightListComment = windowHeight - 250
-		
 	},
 	
 	 props: {
