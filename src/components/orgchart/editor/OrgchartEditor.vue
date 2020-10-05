@@ -771,10 +771,12 @@ export default {
                 }
             }else{
                 data.users = typeof node.users == 'string' ? JSON.parse(node.users) : node.users;
-                data.permissions = node.permissions.reduce((arr, el) => {
-                    arr.push(el.id);
-                    return arr;
-                }, []);
+                if(node.isSetPermissions){
+                    data.permissions = node.permissions.reduce((arr, el) => {
+                        arr.push(el.id);
+                        return arr;
+                    }, []);
+                }
             }
             return data;
         },
@@ -905,6 +907,7 @@ export default {
          
             this.$refs.editorWorkspace.highlightNode(); 
             if(this.context == 'position'){
+                this.selectingNode.isSetPermissions = true;
                 this.showPermissionsOfNode();
             }       
         },
