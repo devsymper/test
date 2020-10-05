@@ -2349,6 +2349,7 @@ export default {
 
         //hoangnd: hàm mở modal tablesetting của control table
         showPrintConfigTable(e) {
+            $('.tox-pop').css({display:'none'})
             let elements = $('#document-editor-'+this.keyInstance+'_ifr').contents().find('.on-selected').closest('.s-control-table');
             if(elements.is('.s-control-table')){
                 let thead = elements.find('thead tr th');
