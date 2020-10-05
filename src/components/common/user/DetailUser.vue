@@ -8,11 +8,12 @@
                     <template v-slot:activator="{ on }">
                         <v-icon
                             v-on="on"
-                            class="close-btn float-right"
+                            style="font-size:18px"
+                            class="close-btn float-right mr-4"
                             @click="closePanel"
                         >mdi-close</v-icon>
                     </template>
-                    <span>{{$t('common.close')}}</span>
+                    <span >{{$t('common.close')}}</span>
                 </v-tooltip>
             </div>
 
@@ -231,22 +232,6 @@ export default {
             this.avatarFileName = 'user_avatar_' + this.lazyUserInfo.id;
             this.$refs.uploadAvatar.uploadFile();
         },
-        // updateAvatar(){
-        //     let avatar = (this.url != avatarDefault) ? this.url : '';
-        //     let data = {
-        //         avatar : avatar,
-        //     };
-        //     userApi.updateUser(this.lazyUserInfo.id, data).then(res => {
-		// 		if (res.status == 200) {
-		// 			self.$snotify({
-		// 				type: "success",
-		// 				title: this.$t("notification.delete")+ this.$t("notification.successTitle")});
-		// 		}
-		// 	})
-		// 	.catch(err => {
-		// 		console.log("error from add user api!!!", err);
-		// 	});
-        // },
         showUserInfo(){
             this.isViewUserRole=false;
             this.$emit('make-small-panel')
@@ -266,7 +251,7 @@ export default {
             });
         },
         closePanel(){
-
+            this.$emit('closePanel')
         }, 
         reAssignUserInfo(){
             let rsl = {};

@@ -1,21 +1,26 @@
 <template>
     <div class="w-100 h-100">
-        <v-row>
-            <v-col cols="md-11">
-                  <h4>Danh sách phân quyền cho user</h4>
-            </v-col>
-            <v-col cols="md-1">
-                <i @click="showUserInfo()" class="mdi mdi-arrow-right"></i>
+        <v-row style="margin-top:-13px; margin-left:-20px">
+            <v-col >
+                <v-btn  @click="showUserInfo()"  small text  fab>
+                    <i style="font-size:15px!important" class="mdi mdi-arrow-left"></i>
+                </v-btn>
+                    <span class="fw-430">Danh sách phân quyền cho user</span>
             </v-col>
         </v-row>
-      
-        <v-row class="w-100 h-100" style="border:1px solid rgba(0,0,0,0.1)" >
+        <v-row class="w-100 h-100" style="border:1px solid rgba(0,0,0,0.1); margin-top:-10px" >
             <v-col cols="md-2" >
                 <v-list-item-group >
                     <v-list dense>
-                        <v-row class="fs-13 fm fw-430" style=" border-bottom:1px solid rgba(0,0,0,0.1); margin-top:-1px" >
+                        <v-row 
+                            class="fs-13 fm fw-430" 
+                            style=" border-bottom:1px solid rgba(0,0,0,0.1); margin-top:-12px" >
                             <span class="ml-3 mb-3">Đối tượng</span> </v-row>
-                        <v-list-item v-for="(item,menuIdx) in menu" :key="menuIdx">
+                        <v-list-item 
+                            class="mt-1" 
+                            v-for="(item,menuIdx) in menu" 
+                            :key="menuIdx" 
+                            style="margin-left:-8px; margin-right:-8px">
                             <v-list-item-content style="margin-left:-20px" @click="detailView(item)">
                                 <v-list-item-title class="ml-2 fw-400">{{$t('objects.'+item)}}</v-list-item-title>
                             </v-list-item-content>
@@ -24,7 +29,7 @@
                 </v-list-item-group >
             </v-col>
             <v-col cols="md-10" class=" left-table">
-                <v-row style="border-bottom:1px solid rgba(0,0,0,0.1); margin-top:-5px">
+                <v-row style="border-bottom:1px solid rgba(0,0,0,0.1); margin-top:-7px; padding-top:3px">
                     <v-col cols="md-3" class="fw-430 fs-13">
                         {{menuTitle.length==0?"Chọn":$t('objects.'+menuTitle)}}
                     </v-col>
@@ -33,25 +38,27 @@
                         v-for="(action,actionIdx) in action" 
                         :key="actionIdx" 
                         class="fs-13 ">
-                        {{action}}
+                        {{$t('actions.listActions.'+menuTitle+"."+action)}}
                     </v-col>
                 </v-row>
+				<div style="height:650px;overflow:scroll;margin-right:-12px">
                     <v-row 
                         v-for="(nameObj,nameObjIdx) in titleAllNameObject" 
                         :key="nameObjIdx"
-                        style="margin-top:-10px">
+                     >
                         <v-col cols="md-3" class="fw-400 fs-13">
-                            {{nameObj.title}}
+                           {{nameObj.objectIdentifier.split(':')[1]}}- {{nameObj.title}}
                         </v-col>
                         <v-col style="width:40px!important; " 
                             v-for="(action2,actionIdx2) in action" 
                             :key="actionIdx2" 
                             class="fs-13 " >
                             <span v-if="checkRole(nameObj.objectIdentifier,action2)">
-                                <v-icon style="color:green">mdi mdi-check</v-icon>
+                                <v-icon style="color:green; font-size:16px">mdi mdi-check</v-icon>
                             </span>
                         </v-col>
                 </v-row>
+				</div>
             </v-col>
         </v-row>
     </div>
@@ -78,18 +85,22 @@ export default {
 		// lấy ra tất cả action và object 
 		async getActionAndObject(){
             let res = await userApi.getActionAndObject(this.rolesList);
-            debugger
+			debugger
+			const self = this;
 			if (res.status === 200) {
-				this.listActionAndObj = res.data;	
-				this.listActionAndObj =  _.groupBy(this.listActionAndObj, 'objectType');
-				this.setMenu();
+				self.listActionAndObj = res.data;	
+				self.listActionAndObj =  _.groupBy(self.listActionAndObj, 'objectType');
+				self.setMenu();
 			}
 		},
 		// lấy ra object làm menu 
 		setMenu(){
 			let listObject = Object.keys(this.listActionAndObj)
             for (let i = 0; i < listObject.length; i++) {
-                 this.menu.push(listObject[i]);
+				if(listObject[i]!='syql'){
+					 this.menu.push(listObject[i]);
+				}
+                
             };
 		},
 		getListObjectIdentifier(object){
@@ -108,6 +119,7 @@ export default {
 			}else{
 				return false
 			}
+			debugger
 		},
 		// view theo từng đối tượng 
 		detailView(object){
@@ -133,13 +145,31 @@ export default {
 			this.filterAction();
 			this.getListObjectIdentifier(object);
 		},
-		//loc những action k dùng đến 
+		// lấy danh sách action chuẩn 
+		async getListActionAllObj(){
+			const self = this;
+			let res = await userApi.getAllListObj();
+			if(res.status==200){
+				self.allListAction = res.data
+			}
+
+		},
+		//loc những action k dùng đến và k đúng chuẩn 
 		filterAction(){
 			let action =_.groupBy(this.nameObject,'action');
 			let arrAction = Object.keys(action);
 			for(let i= 0; i<arrAction.length;i++){
-				this.action.push(arrAction[i]);
+				for(let j = 0; j<this.allListAction[this.menuTitle].action.length;j++){
+					if(arrAction[i]==this.allListAction[this.menuTitle].action[j]){
+							this.action.push(arrAction[i]);
+							debugger// if(this.allListAction[arrA])
+					}
+				}
+				
+			
 			}
+			debugger
+			let a = action
 		 },
 		//group những loại đối tượng dạng document_de:123123 trùng tên với nhau 
 		groupNameObj(){
@@ -175,10 +205,12 @@ export default {
 		// xử lý chuyển tên object    
     },
     created(){
-        this.getActionAndObject();
+		this.getActionAndObject();
+		this.getListActionAllObj();
     },
 	data(){
 		return {
+			allListAction:{},
 			titleAllNameObject:[],
 			listRoleObj:[],
 			objAndAction:{},
@@ -191,10 +223,12 @@ export default {
  	},
 }
 </script>
-<style >
+<style scoped>
     .left-table{
-        height:650px!important;
-        overflow:scroll; 
-        border-left:1px solid rgba(0,0,0,0.1)
+        border-left: 1px solid rgba(0,0,0,0.1);
+        padding-top:0px
+    }
+    .fw-430{
+        font-weight:430
     }
 </style>

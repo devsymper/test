@@ -97,7 +97,7 @@
         </v-content>
         
         <v-navigation-drawer
-            v-bind:class="[isExpand==true?'width-1100':'width-500']"
+            v-bind:class="[isExpand==true?'width-1200':'width-500']"
             right
             v-model="showMyInfo"
             absolute
@@ -107,6 +107,7 @@
                 @expand-panel="isExpand=true"
                 :close="isExpand"
                 @make-small-panel="isExpand=false"
+                @closePanel="showMyInfo=false"
             />
         </v-navigation-drawer>
     </v-app>
@@ -240,8 +241,8 @@ export default {
     font-size: 13px;
     font-weight: bold;
 }
-.width-1100{
-    width:1100px!important
+.width-1200{
+    width:1200px!important
 
 }
 .width-500{
