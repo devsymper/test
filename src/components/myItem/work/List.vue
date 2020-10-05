@@ -92,13 +92,19 @@
                     <v-col :cols="sideBySideMode ? 10 : compackMode ? 6: 4" class="pl-3 pr-1 py1">
                         <div class="pl-1">
                             <div class="pa-0 d-flex justify-space-between">
-                                <div
-                                    class="fs-13 text-ellipsis w-100"
-                                >
-                                    <v-icon v-if="obj.endTime && obj.endTime!=null" style="font-size:11px; color:green;margin-left: 3px;">mdi-circle</v-icon>
-                                    <v-icon v-else style="font-size:11px ; color:blue;margin-left: 3px;">mdi-circle</v-icon>
-                                {{ obj.name}}
-                                </div>
+                               <v-tooltip bottom>
+                                    <template v-slot:activator="{ on }">
+                                        <div
+                                            class="fs-13 text-ellipsis w-100"
+                                            v-on="on"
+                                        >
+                                            <v-icon v-if="obj.endTime && obj.endTime!=null" style="font-size:11px; color:green;margin-left: 3px;">mdi-circle</v-icon>
+                                            <v-icon v-else style="font-size:11px ; color:blue;margin-left: 3px;">mdi-circle</v-icon>
+                                        {{ obj.name}}
+                                        </div>
+                                    </template>
+                                    <span>{{ obj.name }}</span>
+                                </v-tooltip>
                                 <div class="fs-11 py-0 " style="width:200px;margin-top:3px">
                                     {{obj.startTime ? $moment(obj.startTime).format('DD/MM/YY HH:mm:ss'):$moment(obj.endTime).format('DD/MM/YY HH:mm:ss')}}
                                     <v-icon class="grey--text " x-small>mdi-clock-time-nine-outline</v-icon>
@@ -143,7 +149,7 @@
                                 <span>{{ obj.processDefinitionName?  obj.processDefinitionName : `ad hoc` }}</span>
                             </v-tooltip>
                             <div class="pa-0 grey--text mt-1 lighten-2 d-flex justify-space-between">
-                              {{selectNameApp(obj.variables)}}
+                              {{selectValueInVariables(obj.id)}}
                             </div>
                         </div>
                         
@@ -201,6 +207,8 @@ import userSelector from "./UserSelector";
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import { util } from "../../../plugins/util";
 import { appConfigs } from "../../../configs";
+import { taskApi } from "@/api/task.js";
+
 import {
   extractTaskInfoFromObject,
   addMoreInfoToTask
@@ -222,13 +230,13 @@ export default {
             let date;
             work.startUserId = 0;
             work.startUserName = '';
-            for(let vari of work.variables){
-                if(vari.name == 'symper_user_id_start_workflow'){
-                    work.startUserId = vari.value;
-                    work.startUserName = allUserById[work.startUserId] ? allUserById[work.startUserId].displayName : '';
-                    break;
-                }
+            const dataVariable = this.allVariableProcess.find(element => element.processInstanceId===work.id && element.name==="symper_user_id_start_workflow" );
+            if (dataVariable) {
+                let appId=dataVariable.value;
+                work.startUserId = dataVariable.value;
+                work.startUserName = allUserById[work.startUserId] ? allUserById[work.startUserId].displayName : '';
             }
+
             if ( work.startTime) {
                 date = work.startTime.split("T")[0];
             }else{
@@ -306,32 +314,39 @@ export default {
   },
   data: function() {
     return {
-      index: -1,
-      dataIndex:-1,
-      loadingTaskList: false,
-      loadingMoreTask: false,
-      listTaskHeight: 300,
-      totalTask: 0,
-      selectedTask: {
-        taskInfo: {},
-        idx: -1,
-        originData: null
-      },
-      selectedWork:{
-        workInfo: {},
-        idx: -1,
-      },
-      listProrcessInstances: [],
-      isSmallRow: false,
-      sideBySideMode: false,
-      allFlatTasks: [],
-      myOwnFilter: {
-        size: 100,
-        sort: "createTime",
-        order: "desc",
-        page: 1,
-        involvedUser: this.$store.state.app.endUserInfo.id
-      },
+        index: -1,
+        dataIndex:-1,
+        loadingTaskList: false,
+        loadingMoreTask: false,
+        listTaskHeight: 300,
+        totalTask: 0,
+        selectedTask: {
+            taskInfo: {},
+            idx: -1,
+            originData: null
+        },
+        selectedWork:{
+            workInfo: {},
+            idx: -1,
+        },
+        listProrcessInstances: [],
+        isSmallRow: false,
+        sideBySideMode: false,
+        allFlatTasks: [],
+        allVariableProcess:[],
+        myOwnFilter: {
+            size: 100,
+            sort: "createTime",
+            order: "desc",
+            page: 1,
+            involvedUser: this.$store.state.app.endUserInfo.id
+        },
+        filterVariables:{
+            names:"symper_application_id,symper_user_id_start_workflow",
+            page:1,
+            pageSize:100,
+            processInstanceIds:[]
+        },
       defaultAvatar: appConfigs.defaultAvatar,
       listIdProcessInstance:[],
     };
@@ -364,14 +379,18 @@ export default {
     changeObjectType(index) {
       this.$emit("changeObjectType", index);
     },
-    selectNameApp(variables){
-        const symperAppId = variables.find(element => element.name=='symper_application_id');
-        if (symperAppId) {
-            let appId=symperAppId.value;
-            let allApp = this.$store.state.task.allAppActive;
-            let app=allApp.find(element => element.id==appId);
-            if (app) {
-                return app.name;
+    selectValueInVariables(processInstanceId){
+        if (processInstanceId!=null) {
+            const dataVariable = this.allVariableProcess.find(element => element.processInstanceId===processInstanceId && element.name=="symper_application_id");
+            if (dataVariable) {
+                let appId=dataVariable.value;
+                let allApp = this.$store.state.task.allAppActive;
+                let app=allApp.find(element => element.id==appId);
+                if (app) {
+                    return app.name;
+                }else{
+                    return "";
+                }
             }else{
                 return "";
             }
@@ -411,7 +430,7 @@ export default {
         this.index = idx;
         this.dataIndex = idex;
         this.$set(this.selectedWork, "workInfo", obj);
-        this.selectedWork.workInfo.appName=this.selectNameApp(obj.variables);
+        this.selectedWork.workInfo.appName=this.selectValueInVariables(obj.id);
         this.selectedWork.idx = idx;
         if (!this.compackMode) {
             this.sideBySideMode = true;
@@ -424,23 +443,23 @@ export default {
     },
 
     async getTasks(filter = {}) {
-      if (this.loadingTaskList || this.loadingMoreTask) {
-        return;
-      }
-      let self = this;
-      if (this.myOwnFilter.page == 1) {
-        this.allFlatTasks = [];
-        this.loadingTaskList = true;
-      } else {
-        this.loadingMoreTask = true;
-      }
-      filter = Object.assign(filter, this.filterFromParent);
-      filter = Object.assign(filter, this.myOwnFilter);
-      let res = {};
-      let listTasks = [];
-      if (filter.status) {
-            this.$store.commit("task/setFilter", filter.status);
+        if (this.loadingTaskList || this.loadingMoreTask) {
+            return;
         }
+        let self = this;
+        if (this.myOwnFilter.page == 1) {
+            this.allFlatTasks = [];
+            this.loadingTaskList = true;
+        } else {
+            this.loadingMoreTask = true;
+        }
+        filter = Object.assign(filter, this.filterFromParent);
+        filter = Object.assign(filter, this.myOwnFilter);
+        let res = {};
+        let listTasks = [];
+        if (filter.status) {
+                this.$store.commit("task/setFilter", filter.status);
+            }
         if (this.filterTaskAction == "subtasks") {
             res = await BPMNEngine.getSubtasks(
             this.filterFromParent.parentTaskId,
@@ -469,6 +488,16 @@ export default {
                 }
             }
         }
+        self.filterVariables.pageSize=self.myOwnFilter.size*2;
+        self.filterVariables.page=self.myOwnFilter.page;
+        self.filterVariables.processInstanceIds=JSON.stringify(allProcess);
+        let resVariable = {};
+        resVariable = await taskApi.getVariableWorkflow(self.filterVariables);
+        for (let item of resVariable.data) {
+            if (self.allVariableProcess.indexOf(item.id) === -1) {
+                self.allVariableProcess.push(item);
+            }
+        }
 
         this.$store.commit('file/setWaitingFileCountPerObj', processIden);
         this.$store.commit('comment/setWaitingCommentCountPerObj', processIden);
@@ -491,7 +520,6 @@ export default {
                 filter.size=100;
                 filter.sort='startTime';
                 filter.order='desc';
-                filter.includeProcessVariables=true;
                 let res = await BPMNEngine.getProcessInstanceHistory(filter);
                 self.listProrcessInstances=res.data;
             }else if(status=='done'){ 
@@ -501,7 +529,6 @@ export default {
             self.$snotifyError(error, "Get Process failed");
         }
     }
-  
   }
 };
 </script>

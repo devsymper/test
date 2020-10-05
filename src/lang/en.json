@@ -200,6 +200,7 @@
                 "status": "Status",
                 "title": "personal information",
                 "userName": "User name",
+                "phoneNumber": "Phone",
                 "email": "Email",
                 "firstName": "First name",
                 "lastName": "Last name",
@@ -264,7 +265,9 @@
             "updateAt": "Update at",
             "contextMenu": {
                 "passwordSetting": "Password setting",
-                "edit": "Edit"
+                "edit": "Edit",
+                "delete": "Delete",
+                "view": "View"
             }
         },
         "myInfo": {
@@ -908,7 +911,9 @@
             "showMoreFile": "Show more file"
         },
         "alert": {
-            "title_aproval": "Action work"
+            "title_aproval": "Action work",
+            "titlePermissionDenied":"Permission denied!",
+            "contentPermissionDenied":"You are not authorized to do this!"
         }
 
     },

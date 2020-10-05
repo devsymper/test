@@ -271,11 +271,14 @@
         <div v-else-if="filterObject==1 && statusDetailWork==false">
             <listTask 
                 :listTask="listTaskCurrent"
+                :appName="workInfo.appName"
+
             />
         </div>
         <div v-if="statusDetailWork">
             <workDetailSub 
                 :workId="idWorkSelected"
+                :appName="workInfo.appName"
             />
         </div>
         <SideBarDetail
@@ -551,38 +554,13 @@ export default {
             if (isCheck=="") { // set for work
                 this.breadcrumb.name = this.workInfo.name;
                 this.breadcrumb.definitionName=this.workInfo.processDefinitionName;
-                await this.getProcessInstanceVars(this.workInfo.id);
             }else{
                 this.breadcrumb.name = processInstance.name;
                 this.breadcrumb.definitionName=processInstance.processDefinitionName;
-                await this.getProcessInstanceVars(processInstance.id);
             }
+            this.breadcrumb.appName=this.workInfo.appName;
         },
-        async getProcessInstanceVars(processInstanceId){
-            let self=this;
-            await BPMNEngine.getProcessInstanceVars(processInstanceId).then((res) => {
-                const symperAppId = res.find(element => element.name=='symper_application_id');
-                    if (symperAppId) {
-                        self.appId=symperAppId.value;
-                        console.log(res,"symperApp");
-                    }else{
-                        self.appId='';
-                    }
-            }).catch(()=>{
-                self.appId='';
-            });
 
-            if (this.appId!=-1 && this.appId!="") {
-                await appManagementApi.getAppDetails(Number(this.appId)).then((res) => {
-                    console.log(res,"Appdetail");
-                    self.breadcrumb.appName=res.data.listObject.name;
-                }).catch(()=>{
-                    self.breadcrumb.appName=null;
-                });
-            }else{
-                self.breadcrumb.appName=null;
-            }
-        },
         closeDetail() {
             this.$emit("close-detail", {});
         },
@@ -635,7 +613,6 @@ export default {
             try {
                 let filter={};
                 filter.processInstanceId=processInstanceId;
-                filter.includeProcessVariables=true;
                 filter.sort= "startTime";
                 filter.order= "desc";
                 let res = await BPMNEngine.postTaskHistory(filter);

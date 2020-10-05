@@ -360,7 +360,6 @@ export default {
     clickOutside: vClickOutside.directive
   },
   mounted() {
-    //this.getProcessInstance();
   },
   methods: {
     changeObjectType(index) {
@@ -377,21 +376,21 @@ export default {
         this.$emit("refresh-task-list");
     },
     handleChangeFilterValue(data = {}) {
-      if ($.isEmptyObject(data)) {
-        if (this.orderBy !== null) {
-          this.filterList.order = this.orderOption[this.orderBy].value;
+        if ($.isEmptyObject(data)) {
+            if (this.orderBy !== null) {
+            this.filterList.order = this.orderOption[this.orderBy].value;
+            }
+            if (this.sortBy !== null) {
+            this.filterList.sort = this.sortOption[this.sortBy].value;
+            }
+        } else {
+            this.filterList = Object.assign(this.filterList, data);
         }
-        if (this.sortBy !== null) {
-          this.filterList.sort = this.sortOption[this.sortBy].value;
+        this.filterList.nameLike = `%${this.searchTaskKey}%`;
+        this.$emit("filter-change-value", this.filterList);
+        if (data.status) {
+            this.taskStatus = data.status;
         }
-      } else {
-        this.filterList = Object.assign(this.filterList, data);
-      }
-      this.filterList.nameLike = `%${this.searchTaskKey}%`;
-      this.$emit("filter-change-value", this.filterList);
-      if (data.status) {
-        this.taskStatus = data.status;
-      }
     },
     openCreateTaskDialog() {
       this.dialog = true;
@@ -399,54 +398,26 @@ export default {
     changeDensity() {
       this.$emit("change-density");
     },
-    getProcessInstance() {
-      BPMNEngine.getProcessInstance()
-        .then(res => {
-          if (res.total > 0) {
-            let listProccess = [];
-            let objects = [];
-            res.data.forEach(item => {
-              if (listProccess.indexOf(item.processDefinitionId) < 0) {
-                listProccess.push(item.processDefinitionId);
-              }
-              let index = listProccess.indexOf(item.processDefinitionId);
-              item.tasks = [];
-              if (objects[index] != undefined) {
-                objects[index].objects.push(item);
-              } else {
-                objects.push({
-                  processDefinitionId: item.processDefinitionId,
-                  processDefinitionName: item.processDefinitionName,
-                  objects: [item]
-                });
-              }
-            });
-            this.listProrcessInstances = objects;
-            this.$emit("get-list-process-instance", objects);
-          }
-        })
-        .catch(err => {});
-    },
     selectProcess(process) {
-      this.selectedProcess = process;
-      this.openCreateTaskDialog();
+        this.selectedProcess = process;
+        this.openCreateTaskDialog();
     },
     showError() {
-      this.$snotify({
-        type: "error",
-        title: this.$t("notification.errorTitle"),
-        text: this.$t("notification.error")
-      });
+        this.$snotify({
+            type: "error",
+            title: this.$t("notification.errorTitle"),
+            text: this.$t("notification.error")
+        });
     },
     async saveTask() {
-      if (!this.taskObject.assignee) {
-        this.$snotifyError(
-          {},
-          this.$t("tasks.error.canNotCreateTask"),
-          this.$t("tasks.error.emptyAssignee")
-        );
-        return;
-      }
+        if (!this.taskObject.assignee) {
+            this.$snotifyError(
+            {},
+            this.$t("tasks.error.canNotCreateTask"),
+            this.$t("tasks.error.emptyAssignee")
+            );
+            return;
+        }
       let data = {
         ...this.taskObject,
         assignee: this.taskObject.assignee,

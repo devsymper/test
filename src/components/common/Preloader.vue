@@ -40,7 +40,7 @@ export default {
         display: flex;
         justify-content: center;
         align-items: center;
-        z-index: 99999;
+        z-index: 200;
         background: white;
         /* backdrop-filter: blur(5px); */
     }
