@@ -252,9 +252,9 @@ export default {
 			this.dataPostComment.content = this.inputComment
 			this.dataPostComment.attachments = this.attachments
 			this.dataPostComment.tags = this.tags
+			let emptyCheck = this.dataPostComment.content.trim().length == 0 &&  this.dataPostComment.attachments.length == 0
 			if(this.isAdd == true){
-				if(this.dataPostComment.content.trim().length == 0 &&  this.dataPostComment.attachments.length == 0){
-				}else{
+				if(emptyCheck == false){
 					let data = JSON.stringify(this.dataPostComment)
 					commentApi.addComment(data).then(res => {
 						this.$store.commit('comment/updateParentCommentTarget',0)
@@ -267,8 +267,7 @@ export default {
 				}
 				
 			} else {
-				if(this.dataPostComment.content.trim().length == 0 &&  this.dataPostComment.attachments.length == 0){
-				}else{
+				if(emptyCheck == false){
 					this.dataPostComment.id = this.item.id
 					let dataEdit = JSON.stringify(this.dataPostComment)
 					commentApi.editComment(dataEdit).then(res => {
