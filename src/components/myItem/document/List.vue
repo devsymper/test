@@ -457,7 +457,6 @@ export default {
                 };
                 await self.$store.dispatch("task/getListDocumentObjId", self.allFlatDocumentObjId);
             }
-
         },
         
         async getListDocumentObjectId(userId){
