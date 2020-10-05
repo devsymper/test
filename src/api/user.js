@@ -113,7 +113,9 @@ export const userApi = {
     },
     getOperationsObject(data) {
         return operationsApi.post('objects', data);
-
+    },
+    getAllListObj() {
+        return operationsApi.get('/actions')
     }
 
 };

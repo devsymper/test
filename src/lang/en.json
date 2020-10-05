@@ -720,6 +720,24 @@
                 "list": "List",
                 "drop": "Delete",
                 "unfavorite": "Remove favorite"
+            },
+            "document_instance": {
+                "update": "Update",
+                "delete": "Delete",
+                "restore": "Restore",
+                "detail": "Detail",
+                "print": "Print",
+                "list_trash": "List trash"
+            },
+            "syql": {
+                "update": "Update",
+                "create": "Create",
+                "execute": "Execute"
+            },
+            "application_definition": {
+                "update": "Update",
+                "view": "View",
+                "remove": "Remove"
             }
         },
         "iconListActions": {

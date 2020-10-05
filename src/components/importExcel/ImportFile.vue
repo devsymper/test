@@ -231,7 +231,12 @@ export default {
         },
              //Sự kiện xảy ra khi thay đổi Key
         onChangeKey(tableIdx,value){
-            this.tables[tableIdx].keyColumn.enable=true;
+            if(value){
+                 this.tables[tableIdx].keyColumn.enable=true;
+            }else{
+                 this.tables[tableIdx].keyColumn.enable = false;
+            }
+           
         },
         //Chọn key cho bảng
         selectKeyControl(control, allControls) {
