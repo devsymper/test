@@ -335,6 +335,10 @@ export default {
                     let departments = this.correctDiagramDisplay(savedData.orgchart.content);
                     this.$refs.editorWorkspace.loadDiagramFromJson(departments);
                     this.centerDiagram();
+                    if(this.action == "clone"){
+                        savedData.orgchart.code = ""
+                        savedData.orgchart.name = ""
+                    }
                     this.restoreMainOrgchartConfig(savedData.orgchart);
                     let mapIdToDpm = {};
 
@@ -606,11 +610,14 @@ export default {
                     }
                     let dpm = allDpmns[dpmId];
                     let posNodeIds = []
-                    dpm.positionDiagramCells.cells.cells.forEach(function(e){
-                        if(e.type == "Symper.Position"){
-                            posNodeIds.push(e.id)
-                        }
-                    })
+                    if(dpm.positionDiagramCells.cells != false){
+                          dpm.positionDiagramCells.cells.cells.forEach(function(e){
+                            if(e.type == "Symper.Position"){
+                                posNodeIds.push(e.id)
+                                }
+                            })
+                    }
+                  
                     let allPos = self.$store.state.orgchart.editor[dpm.positionDiagramCells.instanceKey].allNode;
                     let resAllPos = []
                     posNodeIds.forEach(function(e){
