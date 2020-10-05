@@ -68,7 +68,7 @@
 										ref="userName"
 										required
 										:rules="[rules.required]"
-										v-model="user.userName"
+										v-model="user.displayName"
 										dense
 									></v-text-field>
 							</v-col>

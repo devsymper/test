@@ -531,7 +531,8 @@ export default {
     height: 32px!important;
 }
  .menu-group-active{
-    background-color:#f7f7f7; 
+    background-color:#eaeaea;
+    border-radius: 4px; 
  }  
 .v-navigation-drawer  >>> .ps__rail-x{    
     display:none
