@@ -488,10 +488,7 @@ export default {
 				}
 			})
 			.catch(err => {
-
 			})
-			.always(() => {});
-
 		this.$evtBus.$on('symper-app-wrapper-clicked', (evt) => {
             if(!($(evt.target).hasClass('symper-select-user-autocomplete') || $(evt.target).parents('.symper-select-user-autocomplete').length > 0)){
                 for(let key in  this.showDelegatedUser){

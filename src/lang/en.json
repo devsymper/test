@@ -908,7 +908,9 @@
             "showMoreFile": "Show more file"
         },
         "alert": {
-            "title_aproval": "Action work"
+            "title_aproval": "Action work",
+            "titlePermissionDenied":"Permission denied!",
+            "contentPermissionDenied":"You are not authorized to do this!"
         }
 
     },

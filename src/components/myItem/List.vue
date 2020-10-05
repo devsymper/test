@@ -18,7 +18,6 @@
             @filter-change-value="handleChangeFilterValue"
             @create-task="getTasks({})"
             @refresh-task-list="getTasks()"
-            @get-list-process-instance="listProrcessInstances = $event"
             @goToPageApproval="goToPageApproval"
             ></listHeader>
             <v-divider v-if="!sideBySideMode"></v-divider>
@@ -48,7 +47,7 @@
                             <v-col
                                 cols="1"
                                 v-if="!sideBySideMode"
-                                class="fs-13 font-weight-medium"
+                                class="fs-13 font-weight-medium dateTime"
                             >{{$t("tasks.header.dueDate")}}</v-col>
 
                             <v-col
@@ -158,7 +157,7 @@
                                         v-if="!sideBySideMode"
                                         style="line-height: 42px"
                                         cols="1"
-                                        class="fs-13 pl-3 py-0"
+                                        class="fs-13 pl-3 py-0 dateTime"
                                     >
                                     <span class="mt-1">{{obj.dueDate ==null? '':$moment(obj.dueDate).fromNow()}}</span>
                                     </v-col>
@@ -182,7 +181,7 @@
                                             <div class="pa-0 grey--text mt-1 lighten-2 d-flex justify-space-between">
                                                 <div
                                                     class="fs-11 pr-6 text-ellipsis"
-                                                >{{selectNameApp(obj.variables)}}</div>
+                                                >{{selectNameApp(obj.processInstanceId)}}</div>
                                             </div>
                                         </div>
                                         
@@ -232,6 +231,7 @@
         :parentHeight="listTaskHeight"
         :taskInfo="selectedTask.taskInfo"
         :originData="selectedTask.originData"
+        :allVariableProcess="allVariableProcess"
         @close-detail="closeDetail"
         @task-submited="handleTaskSubmited"
         @changeUpdateAsignee="changeUpdateAsignee"
@@ -252,6 +252,7 @@ import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import { util } from "../../plugins/util";
 import { appConfigs } from "../../configs";
 import listTaskApproval from "./featureApproval/List";
+import { taskApi } from "./../../api/task.js";
 
 import {
   extractTaskInfoFromObject,
@@ -304,7 +305,6 @@ export default {
                   tasks: groups[fromNow]
                 };
             });
-            console.log("addd",groupArraysTask);
             return groupArraysTask;
         },
         stask() {
@@ -388,14 +388,19 @@ export default {
             sideBySideMode: false,
             openPanel: [0, 1, 2, 3, 4],
             allFlatTasks: [],
+            allVariableProcess: [],
             myOwnFilter: {
-                size: 100,
+                size: 50,
                 sort: "createTime",
                 order: "desc",
                 page: 1,
-                includeProcessVariables:true,
                 involvedUser: this.$store.state.app.endUserInfo.id
-                // assignee: this.$store.state.app.endUserInfo.id
+            },
+            filterVariables:{
+                names:"symper_application_id",
+                page:1,
+                pageSize:50,
+                processInstanceIds:[]
             },
             defaultAvatar: appConfigs.defaultAvatar,
             arrdocObjId: []
@@ -436,14 +441,18 @@ export default {
             return this.$moment(time).fromNow();
         }
     },
-    selectNameApp(variables){
-        const symperAppId = variables.find(element => element.name=='symper_application_id');
-        if (symperAppId) {
-            let appId=symperAppId.value;
-            let allApp = this.$store.state.task.allAppActive;
-            let app=allApp.find(element => element.id==appId);
-            if (app) {
-                return app.name;
+    selectNameApp(processInstanceId){
+        if (processInstanceId!=null) {
+            const dataVariable = this.allVariableProcess.find(element => element.processInstanceId===processInstanceId);
+            if (dataVariable) {
+                let appId=dataVariable.value;
+                let allApp = this.$store.state.task.allAppActive;
+                let app=allApp.find(element => element.id==appId);
+                if (app) {
+                    return app.name;
+                }else{
+                    return "";
+                }
             }else{
                 return "";
             }
@@ -529,7 +538,7 @@ export default {
         } else {
             this.loadingMoreTask = true;
         }
-        this.listProrcessInstances = [];
+      //  this.listProrcessInstances = [];
         filter = Object.assign(filter, this.filterFromParent);
         filter = Object.assign(filter, this.myOwnFilter);
         let res = {};
@@ -558,39 +567,55 @@ export default {
         this.$store.dispatch('task/getAllAppActive');
         //Khadm: danh sách các task cần lấy tổng số comment và file đính kèm
         let taskIden = [];
+        let allProcessId=[];
         for (let task of listTasks) {
             task.taskData = self.getTaskData(task);
             task = addMoreInfoToTask(task);
             self.allFlatTasks.push(task);
             taskIden.push('task:'+task.id);
+            if (task.processInstanceId && task.processInstanceId!=null) {
+                if(allProcessId.indexOf(task.processInstanceId) === -1) {
+                    allProcessId.push(task.processInstanceId);
+                }
+            }
+        }
+        self.filterVariables.pageSize=self.myOwnFilter.size;
+        self.filterVariables.page=self.myOwnFilter.page;
+        self.filterVariables.processInstanceIds=JSON.stringify(allProcessId);
+        let resVariable = {};
+        resVariable = await taskApi.getVariableWorkflow(self.filterVariables);
+        for (let item of resVariable.data) {
+            if (self.allVariableProcess.indexOf(item.id) === -1) {
+                self.allVariableProcess.push(item);
+            }
         }
         this.$store.commit('file/setWaitingFileCountPerObj', taskIden);
         this.$store.commit('comment/setWaitingCommentCountPerObj', taskIden);
         this.$store.dispatch('file/getWaitingFileCountPerObj');
         this.$store.dispatch('comment/getWaitingCommentCountPerObj');
-
-        this.listProrcessInstances.forEach((process, processIndex) => {
-            process.objects.forEach((instance, instanceIndex) => {
-            this.listProrcessInstances[processIndex].objects[
-                instanceIndex
-            ].tasks = [];
-            // let index = 0;
-            for (let index in listTasks) {
-                listTasks[index].assignee = this.getUser(
-                parseInt(listTasks[index].assignee)
-                );
-                listTasks[index].owner = this.getUser(
-                parseInt(listTasks[index].owner)
-                );
-                if (listTasks[index].processInstanceId == instance.id) {
-                this.listProrcessInstances[processIndex].objects[
-                    instanceIndex
-                ].tasks.push(listTasks[index]);
-                listTasks.splice(index, 1);
-                }
-            }
-            });
-        });
+        
+        // this.listProrcessInstances.forEach((process, processIndex) => {
+        //     process.objects.forEach((instance, instanceIndex) => {
+        //     this.listProrcessInstances[processIndex].objects[
+        //         instanceIndex
+        //     ].tasks = [];
+        //     // let index = 0;
+        //     for (let index in listTasks) {
+        //         listTasks[index].assignee = this.getUser(
+        //         parseInt(listTasks[index].assignee)
+        //         );
+        //         listTasks[index].owner = this.getUser(
+        //         parseInt(listTasks[index].owner)
+        //         );
+        //         if (listTasks[index].processInstanceId == instance.id) {
+        //         this.listProrcessInstances[processIndex].objects[
+        //             instanceIndex
+        //         ].tasks.push(listTasks[index]);
+        //         listTasks.splice(index, 1);
+        //         }
+        //     }
+        //     });
+        // });
 
       console.log(listTasks, "listTassk");
       this.addOtherProcess(listTasks);
@@ -603,30 +628,19 @@ export default {
           parseInt(listTasks[index].assignee)
         );
         listTasks[index].owner = this.getUser(parseInt(listTasks[index].owner));
-        // if (listTasks[index].description) {
-        //   let description = JSON.parse(listTasks[index].description);
-        //   if (
-        //     description.action.action == "approval" &&
-        //     description.action.parameter.documentObjectId != undefined
-        //   ) {
-        //     this.arrdocObjId.push(
-        //       description.action.parameter.documentObjectId
-        //     );
-        //   }
-        // }
       }
      // this.$store.dispatch("task/getArrDocObjId", this.arrdocObjId);
-      this.listProrcessInstances.push({
-        processDefinitionId: null,
-        processDefinitionName: this.$t("common.other"),
-        objects: [
-          {
-            id: null,
-            name: null,
-            tasks: listTasks
-          }
-        ]
-      });
+    //   this.listProrcessInstances.push({
+    //     processDefinitionId: null,
+    //     processDefinitionName: this.$t("common.other"),
+    //     objects: [
+    //       {
+    //         id: null,
+    //         name: null,
+    //         tasks: listTasks
+    //       }
+    //     ]
+    //   });
     }
   }
 };
@@ -708,5 +722,9 @@ export default {
 .colName{
     flex: 0 0 90%;
     max-width: 90%;
+}
+.dateTime{
+    flex: 0 0 11.333333%;
+    max-width: 11.333333%;
 }
 </style>

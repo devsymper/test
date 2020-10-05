@@ -95,13 +95,25 @@ const getListNodeInProcess = async(context) => {
                 if (res.data!=false) {
                     context.commit('setListNodeInProcess', res.data);
                 }
-                console.log("allNode",res.data);
             } 
         } catch (error) {
             console.log("Can not get list app!");
         }
     }
 }
+const getVariableOfProcess = async(context,data) => {
+    try {
+        let res = await taskApi.getVariableWorkflow(data);
+        if (res.status == 200) {
+            context.commit('setVariableOfProcess', res.data);
+            console.log("variablesProcess",res.data);
+        } 
+    } catch (error) {
+        console.log("Can not get variable of process!");
+    }
+}
+
+
 
 export {
     getArrFileAttachment,
@@ -110,6 +122,7 @@ export {
     getListDocumentObjId,
     getListDocumentObjIdWithUserSubmit,
     getAllAppActive,
-    getListNodeInProcess
+    getListNodeInProcess,
+    getVariableOfProcess
 
 };

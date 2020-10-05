@@ -109,7 +109,7 @@ export default {
                 });
             });
         },
-        changeElementColor(ele,data){
+        changeElementColor(ele,data,isCurrentNode=false){
             if(typeof ele == 'string'){ // Nếu truyền vào id
                 ele = this.bpmnModeler.get("elementRegistry").get(ele);
             }

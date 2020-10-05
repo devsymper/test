@@ -218,7 +218,7 @@ export default {
 			if(after != ""){
 				bpmnApi.getProcessInstanceData(this.workflowId).then(res=>{
 					self.workflowName = res.data[0].processDefinitionName
-				}).always({}).catch({});
+				});
 			}
 			
 		},
@@ -227,7 +227,7 @@ export default {
 			if(after != ""){
 				bpmnApi.getATaskInfo(this.taskId).then(res=>{
                    self.taskName = res.name == null ? "" : res.name
-                }).always({}).catch({});
+                });
 			}
 			
 		},
