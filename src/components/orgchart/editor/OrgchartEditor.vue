@@ -335,10 +335,10 @@ export default {
                     let departments = this.correctDiagramDisplay(savedData.orgchart.content);
                     this.$refs.editorWorkspace.loadDiagramFromJson(departments);
                     this.centerDiagram();
-                    // if(this.action == "clone"){
-                    //     savedData.orgchart.code = ""
-                    //     savedData.orgchart.name = ""
-                    // }
+                    if(this.action == "clone"){
+                        savedData.orgchart.code = ""
+                        savedData.orgchart.name = ""
+                    }
                     this.restoreMainOrgchartConfig(savedData.orgchart);
                     let mapIdToDpm = {};
 
