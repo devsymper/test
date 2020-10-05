@@ -55,11 +55,7 @@ export default {
             showImportUser:false,
             customAPIResult: {
                 reformatData(res){
-                
                     let data = res.data;
-                    // for(let col of data.columns){
-                    //     col.title = col.title.replace('user.','');
-                    // }
                     return data;
                 } 
             },
@@ -225,12 +221,10 @@ export default {
             alert('ok');
         },
         closePanel(){
-            debugger
             this.isSettingPasswordView = false;
             this.$refs.listUser.closeactionPanel();
         },
         addUser(){
-            debugger
             this.isSettingPasswordView = false;
             this.showViewInfo = false;
             this.actionType = 'add';
@@ -239,7 +233,6 @@ export default {
             // this.$router.push('/users/add');
         },
         editUser(user){
-            debugger
             this.isSettingPasswordView = false;
             this.showViewInfo = false;
             this.actionType = 'edit';
