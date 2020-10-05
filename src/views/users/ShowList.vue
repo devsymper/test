@@ -9,7 +9,6 @@
         :tableContextMenu="tableContextMenu"
         :containerHeight="containerHeight"
         :customAPIResult="customAPIResult"
-        :actionPanelType="'elastic'"
         :getDataUrl="getListUrl+'users?page=1&pageSize=50'"
         :actionPanelWidth="actionPanelWidth"
         @import-excel="importExcel()"
@@ -17,6 +16,7 @@
         <div slot="right-panel-content" class="h-100">
             <action-panel
                 ref="panel"
+                :showDetailView="showDetailView"
                 @refresh-data="refreshListUser"
                 @refresh-new-user="setNewUserItem"
                 @close-panel="closePanel"
@@ -50,6 +50,7 @@ export default {
     },
     data(){
         return {
+            showDetailView:false,
             listRowUser:[],
             showImportUser:false,
             customAPIResult: {
@@ -209,11 +210,13 @@ export default {
         },
         showViewSetingPassword(user){
             this.isSettingPasswordView = true;
+            this.showViewInfo = false;
             this.$refs.panel.setDetailInfo(user);
             this.$refs.listUser.openactionPanel();
         },
         showViewDetailInfo(user){
-            this.showViewInfo= true;
+            this.showDetailView=!this.showDetailView;
+            this.showViewInfo = true;
             this.$refs.panel.setDetailInfo(user);
             this.$refs.listUser.openactionPanel();
 
@@ -222,18 +225,23 @@ export default {
             alert('ok');
         },
         closePanel(){
+            debugger
             this.isSettingPasswordView = false;
             this.$refs.listUser.closeactionPanel();
         },
         addUser(){
+            debugger
             this.isSettingPasswordView = false;
+            this.showViewInfo = false;
             this.actionType = 'add';
             this.$refs.listUser.openactionPanel();
             // chỗ này, muốn sửa giá trị của no chỗ này
             // this.$router.push('/users/add');
         },
         editUser(user){
+            debugger
             this.isSettingPasswordView = false;
+            this.showViewInfo = false;
             this.actionType = 'edit';
             this.$refs.panel.resetData();
             this.$refs.panel.setUser(user);
@@ -246,9 +254,14 @@ export default {
             this.data.unshift(user);
         },
         calcContainerHeight() {
+            debugger
             this.containerHeight = util.getComponentSize(this).h;
         }
     }
 }
 </script>
-
+<style >
+    /* .v-navigation-drawer{
+        width: 1200px!important
+    } */
+</style>

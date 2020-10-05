@@ -50,7 +50,10 @@
             <span><b class="color-grey fs-13 fw-500">Lưu ý về việc khớp dữ liệu: </b></span>
         </v-row>
         <v-row class="ml-5 mt-1 mr-5 color-grey fs-12">
-            Các trường dữ liệu tại cột đích có ký hiệu * là các trường bắt buộc phải import
+            - Các trường dữ liệu tại cột đích có ký hiệu * là các trường bắt buộc phải import
+        </v-row>
+        <v-row v-if="objType=='user'" class="ml-5 mt-1 mr-7 color-grey fs-12">
+           - Mật khẩu gồm tối thiểu 8 ký tự, không quá 24 kí tự, bao gồm ít nhất 1 chữ cái thường, 1 chữ cái hoa và số
         </v-row>
     </v-list>
     <!-- Thông tin chung -->
@@ -62,9 +65,14 @@
                     <v-icon v-else size="18" class='ml-3'>mdi-table</v-icon>
                     <span class="color-grey fs-13 pl-1">
                         <b class="fw-500">{{table.title}}
-                            <span v-if="tables[tableIdx]==tables[0]" style="color:red">*
+                        <span v-if="tables[tableIdx]==tables[0]" style="color:red">*</span>
+                               <span v-if="objType!='user'"> ({{sumCount(table.controls.filter(p => p.dataColumn!=null).length, table.keyColumn?(table.keyColumn.enable?1:0):0)}}/{{table.controls.filter(p => p.dataType!='table').length+1}})
                             </span>
-                           ({{sumCount(table.controls.filter(p => p.dataColumn!=null).length, table.keyColumn?(table.keyColumn.enable?1:0):0)}}/{{table.controls.filter(p => p.dataType!='table').length+1}})</b></span>
+                            <span v-else>
+                                 ({{sumCount(table.controls.filter(p => p.dataColumn!=null).length, table.keyColumn?(table.keyColumn.enable?1:0):0)}}/{{table.controls.filter(p => p.dataType!='table').length}})
+                            </span>   
+                        </b>
+                        </span>
                 </v-col>
                 <v-col class="col-md-6 py-0" style="margin-top: -13px">
                     <v-autocomplete :value="table.sheetMap" 

@@ -104,12 +104,12 @@
                         <div class="pl-1 mt-1">
                             <v-tooltip bottom>
                                 <template v-slot:activator="{ on }">
-                                <span
+                                <div
                                     v-on="on"
-                                    v-if="obj.processDefinitionName"
+                                    v-if="obj.processDefinitionId"
                                     class=" text-left fs-13 pr-6 text-ellipsis w-80 title-quytrinh"
-                                >{{obj.processDefinitionName}}</span>
-                                <span v-on="on" v-else class="text-left fs-13 pr-6 text-ellipsis w-80 title-quytrinh">ad hoc</span>
+                                >{{obj.processDefinitionName}}</div>
+                                <div v-on="on" v-else class="text-left fs-13 pr-6 text-ellipsis w-80 title-quytrinh">ad hoc</div>
                                 </template>
                                 <span>{{ obj.processDefinitionName?  obj.processDefinitionName : `ad hoc` }}</span>
                             </v-tooltip>

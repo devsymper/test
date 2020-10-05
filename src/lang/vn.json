@@ -196,6 +196,7 @@
         "general": {
             "title": "Thông tin cơ bản",
             "personalInfo": {
+                "phoneNumber": "Điện thoại",
                 "status": "Trạng thái",
                 "title": "Thông tin cá nhân",
                 "userName": "Tên tài khoản",
@@ -265,7 +266,7 @@
                 "passwordSetting": "Tùy chọn mật khẩu",
                 "edit": "Sửa",
                 "delete": "Xóa",
-                "view": "Xem chi tiết"
+                "view": "Xem"
             }
         },
         "myInfo": {
@@ -457,12 +458,19 @@
         "listAction": {
             "create": "thêm",
             "edit": "sửa",
-            "submit": "hiển thị",
+            "submit": "xem",
             "list": "danh sách",
             "list_trash": "danh sách nháp",
             "list_instance": "danh sách bản ghi",
             "deploy": "triển khai",
             "drop": "xóa",
+            "view": "xem",
+            "remove": "xóa",
+            "update": "sửa",
+            "execute": "thực thi",
+            "restore": "khôi phục",
+            "detail": "xem",
+            "print": "in",
             "start_instance": "bắt đầu quy trình"
         },
         "icon": {
@@ -603,7 +611,6 @@
                         "subTitle1": "Người phê duyệt",
                         "subTitle2": "Người tham gia"
                     }
-
                 }
             },
             "fab": {
@@ -874,11 +881,6 @@
                 "remove operation": "Xoá",
                 "add action pack": "Thêm",
                 "remove action pack": "Xoá"
-
-
-
-
-
             },
             "dataflow": {
                 "detail": "Chi tiết",
@@ -1040,7 +1042,9 @@
 
         },
         "alert": {
-            "title_aproval": "Thực thi công việc"
+            "title_aproval": "Thực thi công việc",
+            "titlePermissionDenied":"Từ chối thực thi!",
+            "contentPermissionDenied":"Bạn không có quyền thực hiện công việc này!"
         }
 
     },
