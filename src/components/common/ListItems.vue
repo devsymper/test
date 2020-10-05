@@ -1288,16 +1288,15 @@ export default {
                 let orderedCols = [];
                 let noneOrderedCols = [];
                 for (let col of savedOrderCols) {
-                    if(!colMap[col.data]){
-                        debugger
-                    }
-                    colMap[col.data].checkedOrder = true;
-                    if (colMap[col.data]) {
-                        colMap[col.data].symperFixed = col.symperFixed;
-                        colMap[col.data].symperHide = col.symperHide;
-                        orderedCols.push(colMap[col.data]);
-                    } else {
-                        noneOrderedCols.push(colMap[col.data]);
+                    if(colMap[col.data]){
+                        colMap[col.data].checkedOrder = true;
+                        if (colMap[col.data]) {
+                            colMap[col.data].symperFixed = col.symperFixed;
+                            colMap[col.data].symperHide = col.symperHide;
+                            orderedCols.push(colMap[col.data]);
+                        } else {
+                            noneOrderedCols.push(colMap[col.data]);
+                        }
                     }
                 }
 
