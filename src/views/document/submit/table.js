@@ -261,6 +261,9 @@ export default class Table {
 
                 beforeKeyDown: function(event) {
                     let cellMeta = this.getSelected();
+                    if (!cellMeta) {
+                        return;
+                    }
                     thisObj.checkEnterInsertRowEvent(event, cellMeta);
                     // ấn f2 vào cell thì trace control đó
                     if (event.key == 'F2' && store.state.app.accountType == 'ba') {
@@ -543,6 +546,7 @@ export default class Table {
                 this.dataInsertRows.push([]);
                 let thisObj = this;
                 delayTypingEnter(function() {
+                    console.log("dataInsertRowsdataInsertRows", thisObj.dataInsertRows);
                     let listRootTable = sDocument.state.submit[thisObj.keyInstance]['listTableRootControl'];
                     if (listRootTable.hasOwnProperty(thisObj.tableName)) {
                         let rowData = util.cloneDeep(listRootTable[thisObj.tableName]['defaultRow']);
@@ -554,9 +558,12 @@ export default class Table {
                             thisObj.tableInstance.setDataAtRowProp(newRowData, null, null, 'auto_set');
                         }
                     }
-
+                    thisObj.dataInsertRows = []
                 });
             } else if (e.key === 'Delete' && e.shiftKey == true) {
+                e.stopImmediatePropagation();
+                e.preventDefault();
+                e.stopPropagation();
                 this.tableInstance.alter('remove_row', cellMeta[0][0], 1);
             }
         }
@@ -808,7 +815,6 @@ export default class Table {
          * @param {*} formulasInstance  Object cua formulas giá trị của control bị ảnh hưởng
          */
     async handlerRunFormulasForControlInTable(formulasType, controlInstance, dataInput, formulasInstance) {
-
             let listIdRow = this.tableInstance.getDataAtCol(this.tableInstance.getDataAtRow(0).length - 1);
             if (this.tableHasRowSum) {
                 listIdRow.pop();
@@ -1131,6 +1137,36 @@ export default class Table {
                 let id = Date.now();
                 thisObj.tableInstance.setDataAtCell(index, thisObj.tableInstance.getDataAtRow(0).length - 1, id);
             },
+            afterRemoveRow: function(index, amount, physicalRows, source) {
+                let listInput = thisObj.getListInputInDocument();
+                let rowData = this.getDataAtRow(index);
+                console.log(rowData, 'rowDatarowData');
+                let rowId = rowData[rowData.length - 1]
+                for (let controlName in thisObj.controlObj.listInsideControls) {
+                    let controlInstance = listInput[controlName];
+                    let controlValue = util.cloneDeep(controlInstance.value);
+                    if (Array.isArray(controlValue)) {
+                        controlValue.splice(index, 1);
+                        store.commit("document/updateListInputInDocument", {
+                            controlName: controlName,
+                            key: 'value',
+                            value: controlValue,
+                            instance: thisObj.keyInstance
+                        });
+
+                    }
+                }
+                ClientSQLManager.deleteRow(thisObj.keyInstance, thisObj.tableName, 'where s_table_id_sql_lite = ' + rowId);
+                let pattern = index + '_\\d';
+                let reg = new RegExp(pattern, 'g');
+                for (let key in thisObj.validateValueMap) {
+                    if (reg.test(key)) {
+                        delete thisObj.validateValueMap[key]
+                    }
+                }
+                this.render();
+
+            },
 
         });
 
@@ -1215,13 +1251,18 @@ export default class Table {
                 let data = vls;
                 let controlBinding = Object.keys(data[0]);
                 let dataToStore = {};
+                let dataToSqlLite = [];
+                let columnInsert = [];
                 for (let index = 0; index < data.length; index++) {
                     let rowId = Date.now() + index;
                     data[index]['s_table_id_sql_lite'] = rowId;
 
                     let listKey = Object.keys(data[index]);
+                    columnInsert = listKey;
+                    let rowData = [];
                     for (let j = 0; j < listKey.length; j++) {
                         let controlName = listKey[j];
+                        rowData.push("'" + data[index][controlName] + "'");
                         if (controlName == 's_table_id_sql_lite') {
                             continue;
                         }
@@ -1231,8 +1272,10 @@ export default class Table {
                         if (data[index] != undefined)
                             dataToStore[controlName].push(data[index][controlName]);
                     }
+                    dataToSqlLite.push('(' + rowData.join() + ')');
 
                 }
+                ClientSQLManager.insertDataToTable(this.keyInstance, this.tableName, columnInsert.join(), dataToSqlLite.join())
                 for (let controlName in dataToStore) {
                     store.commit("document/updateListInputInDocument", {
                         controlName: controlName,
