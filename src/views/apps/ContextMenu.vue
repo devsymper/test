@@ -92,6 +92,7 @@ export default {
 			this.appId = appId
 		},
 		clickAction(action,sideBySide = false,allAppMode = false){
+			$(".v-menu__content").css("display", "none")
 			let appId
 			if(allAppMode == true){
 				appId = this.appId

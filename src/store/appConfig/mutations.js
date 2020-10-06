@@ -134,5 +134,5 @@ export {
     showDetailAppArea,
     setListApps,
     updateFavoriteMyAppItem,
-    updateSelectingItemType
+    updateSelectingItemType,    
 };
