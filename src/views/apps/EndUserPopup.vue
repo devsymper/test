@@ -203,9 +203,7 @@ export default {
 		listApp(){
             return this.$store.state.appConfig.listApps
 		},
-		showPopup(){
-			 return this.$store.state.appConfig.showPopup
-		}
+		
 		
 	},
 	

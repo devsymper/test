@@ -132,9 +132,6 @@ export default {
 
     },
     methods: {
-        showPopup(){
-            // $(".v-menu__content").css("display", "inline-block")
-        },
         /**
          * Xử lý các tab
          */
