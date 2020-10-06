@@ -16,7 +16,7 @@
                 </v-col>
             </v-row>
         </v-container>
-        <div style="width: 100%; max-height: 300px; overflow:auto;">
+        <VuePerfectScrollbar style="width: 100%; height: 300px">
             <v-container>
                 <v-row class="ml-0 mr-0">
                     <v-col 
@@ -29,13 +29,18 @@
                     </v-col>
                 </v-row>
             </v-container>
-        </div>
+        </VuePerfectScrollbar>
     </v-card>
 </template>
 
 <script>
+import VuePerfectScrollbar from "vue-perfect-scrollbar";
+
 export default {
     name: "MaterialIcon",
+    components:{
+        VuePerfectScrollbar
+    },
     props: {
         defaultIcon: {
             type: String,

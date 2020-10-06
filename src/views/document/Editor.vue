@@ -475,19 +475,6 @@ export default {
                         self.setContentForDocumentV1();
                     }, 300,this);
                 }
-                else{
-                    content = content.match(/<span .*>.*<\/span>/gm);
-                    this.editorCore.insertContent('&nbsp;<em>You clicked menu item 1!</em>');
-                    //  this.editorCore.execCommand('mceInsertRawHTML', false,content);
-                    //  var parentEditor = parent.tinyMCE.activeEditor;
-                    // // parentEditor.execCommand('mceInsertRawHTML', false, html);
-                    // let preTag = $(this.editorCore.selection.getNode()).closest('pre');
-                    // debugger
-                    // let parent = preTag.parent();
-                    // preTag.remove();
-                    // parent.prepend(content[0]);
-                }
-                
             }
             
         },
@@ -1502,6 +1489,9 @@ export default {
                 this.hideAutocompletaControl();
             }
         },
+        /**
+         * Hàm nhận sự kiện ném ra từ compon material icon sau khi chọn icon
+         */
         selectedIcon(data){
             let context = data.context
             if(context == 'toolbar'){
