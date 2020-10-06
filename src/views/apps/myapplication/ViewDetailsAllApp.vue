@@ -201,7 +201,12 @@ export default {
                     for(let e of res.data.listObject){
                         e.childrenAppReduce = {}
                         self.$set( self.apps, e.id , e)
-                        self.$set( self.mapIdApp, e.id , {})
+                        self.$set( self.mapIdApp, e.id , {
+                            workflow_definition:{},
+                            document_definition:{},
+                            orgchart:{},
+                            dashboard:{},
+                        })
                         if(Object.keys(e.childrenApp).length > 0){
                             self.checkChildrenApp(e.childrenApp,e.id)   
                         }
@@ -220,6 +225,7 @@ export default {
                  if(data.hasOwnProperty(k)){
                     data[k].forEach(function(e){
                         let str = k +':'+ e.id
+                        
                         if(self.listIds.includes(str) == false){
                             self.listIds.push(str);
                         }
@@ -269,10 +275,8 @@ export default {
                                     obj.item = arr
 									self.$set(self.apps[app].childrenAppReduce, typeT ,obj)
                                 }
-								
                             }
-						})
-                        
+                        })
                     }
                 }
             }

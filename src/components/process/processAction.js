@@ -91,9 +91,10 @@ export const deployProcess = function(self, processData) {
             console.log(content, 'contentcontentcontentcontentcontentcontent');
 
             let file = util.makeStringAsFile(content, "process_draft.bpmn");
+            let processName=processData.name.replace(/\]|\[/g," ");
             bpmnApi.deployProcess({
                 deploymentKey: processData.id,
-                deploymentName: processData.name,
+                deploymentName: processName,
                 tenantId: processData.tenantId ? processData.tenantId : '1',
             }, file).then((res) => {
                 self.$snotifySuccess('Deploy process successfully');
