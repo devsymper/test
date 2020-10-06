@@ -233,8 +233,11 @@ export default {
         onChangeKey(tableIdx,value){
             if(value){
                  this.tables[tableIdx].keyColumn.enable=true;
+                 this.tables[tableIdx].keyColumn.index=1;
             }else{
                  this.tables[tableIdx].keyColumn.enable = false;
+                 this.tables[tableIdx].keyColumn.index=-1;
+
             }
            
         },
@@ -343,10 +346,9 @@ export default {
                 })
                 .catch(err => {
                 });
-                    
-                let a= this.objType;
                 // kiểm tra key rỗng của table chung
                    let check = true;
+                   debugger
                     if (this.tables[0].keyColumn==undefined||this.tables[0].keyColumn.index==-1) {
                         if(this.objType=='document'){
                             

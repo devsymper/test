@@ -67,7 +67,6 @@
 										class="fs-13"
 										ref="userName"
 										required
-										:rules="[rules.required]"
 										v-model="user.userName"
 										dense
 									></v-text-field>
