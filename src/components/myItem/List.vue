@@ -548,7 +548,7 @@ export default {
         //Khadm: danh sách các task cần lấy tổng số comment và file đính kèm
         let taskIden = [];
         let allProcessId=[];
-        if (Object.keys(this.$store.state.process.allDefinitions).length === 0) {
+        if (Object.keys(this.$store.state.process.allDefinitions).length === 0) { //ktra xem store đã có thông tin của các processDefinition chưa
             await this.$store.dispatch("process/getAllDefinitions");
         }
         for (let task of listTasks) {
