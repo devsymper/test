@@ -2,6 +2,7 @@ const defaultState = {
 	listFavorite: [],
 	viewSideBySide:false,
 	showDetailArea: false,
+	showPopup: false,
 	currentAppId: 0,
 	listApps:{},
 	selectingItemType: '',

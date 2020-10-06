@@ -120,6 +120,9 @@ const updateFavoriteMyAppItem = (state, data) => {
 const updateSelectingItemType = (state, data) => {
 	state.selectingItemType = data
 }
+const showPopup = (state) => {
+	state.showPopup = !state.showPopup
+}
 export {
 	updateListItemSelected,
 	removeItemSelected,
@@ -135,5 +138,6 @@ export {
 	showDetailAppArea,
 	setListApps,
 	updateFavoriteMyAppItem,
-	updateSelectingItemType
+	updateSelectingItemType,
+	showPopup
 };

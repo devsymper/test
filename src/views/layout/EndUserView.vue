@@ -38,7 +38,6 @@
                             <SearchInput v-show="showSearchInput" class="mr-2" style="width:330px"/>
                         </transition>
                     </div>
-                    <!--kết thúc search--->
                         <v-menu
                             v-model="isShowDialog"
                             :close-on-content-click="false"
@@ -49,12 +48,11 @@
                             style="z-index:1000"
                             >
                             <template v-slot:activator="{ on }">
-                                <v-btn icon v-on="on">
+                                <v-btn icon v-on="on" @click="showPopup">
                                     <v-icon>mdi-apps</v-icon>
                                 </v-btn>
                             </template>
-                            <EndUserPopup style="z-index:1000 !important"  />
-							<!-- <div>hello</div> -->
+                            <EndUserPopup style="z-index:1000 !important"   />
                         </v-menu>
                         <v-btn icon @click="showSearchInput = !showSearchInput">
                             <v-icon>mdi-magnify</v-icon>
@@ -109,6 +107,9 @@ import Search from "@/components/search/Search";
 
 export default {
     methods: {
+        showPopup(){
+            this.$store.commit('appConfig/showPopup')
+        },
         /**
          * Xử lý các tab
          */

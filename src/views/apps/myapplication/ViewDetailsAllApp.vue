@@ -52,13 +52,13 @@
                                      <v-expansion-panel
                                      >
                                     <v-expansion-panel-header>
-                                    <div class="app-title">
+                                        <div class="app-title">
                                             <v-icon v-if="item.iconType == 'icon'" style="font-size:16px;flex:unset;margin-left:0px;margin-right:0px;padding-top:2px">{{item.iconName}}</v-icon>
                                             <img v-else-if="item.iconType == 'img'" :src="item.iconName" class="app-item-img"/>
                                             <span style="padding-left:8px">
                                                 {{item.name}}
                                             </span>
-                                    </div>
+                                        </div>
                                         </v-expansion-panel-header>
                                     <v-expansion-panel-content>
                                         <!-- chi tiet tung app  -->

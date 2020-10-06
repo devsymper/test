@@ -92,6 +92,8 @@ export default {
 			this.appId = appId
 		},
 		clickAction(action,sideBySide = false,allAppMode = false){
+			$(".context-menu").css("display", "none")
+			this.$store.commit('appConfig/showPopup')
 			let appId
 			if(allAppMode == true){
 				appId = this.appId

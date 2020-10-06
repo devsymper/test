@@ -1,5 +1,5 @@
 <template>
-  <div class="end-user-popup"> 
+  <div class="end-user-popup" v-if="showPopup"> 
 	<v-card> 
 		<v-tabs
 			v-model="tab"
@@ -179,6 +179,7 @@ export default {
 			});
 			$(document).click(function(e){
 				if(!$(e.target).is('.context-menu')){
+					$(".context-menu").css("display", "none")
 					if(thisCpn.tab == 'tab-1'){
 						thisCpn.$refs.contextMenu.hide()
 					}else{
@@ -201,8 +202,13 @@ export default {
 		},
 		listApp(){
             return this.$store.state.appConfig.listApps
-        }
+		},
+		showPopup(){
+			 return this.$store.state.appConfig.showPopup
+		}
+		
 	},
+	
 	methods:{
 		getActiveapps(){
 			appManagementApi.getActiveApp().then(res => {
