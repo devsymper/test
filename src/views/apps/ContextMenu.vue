@@ -93,8 +93,6 @@ export default {
 		},
 		clickAction(action,sideBySide = false,allAppMode = false){
 			$(".v-menu__content").css("display", "none")
-			debugger
-			this.$store.commit('appConfig/showPopup')
 			let appId
 			if(allAppMode == true){
 				appId = this.appId
