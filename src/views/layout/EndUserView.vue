@@ -38,7 +38,6 @@
                             <SearchInput v-show="showSearchInput" class="mr-2" style="width:330px"/>
                         </transition>
                     </div>
-                    <!--kết thúc search--->
                         <v-menu
                             v-model="isShowDialog"
                             :close-on-content-click="false"
@@ -53,8 +52,7 @@
                                     <v-icon>mdi-apps</v-icon>
                                 </v-btn>
                             </template>
-                            <EndUserPopup style="z-index:1000 !important"  />
-							<!-- <div>hello</div> -->
+                            <EndUserPopup style="z-index:1000 !important"   />
                         </v-menu>
                         <v-btn icon @click="showSearchInput = !showSearchInput">
                             <v-icon>mdi-magnify</v-icon>
@@ -97,7 +95,7 @@
         </v-content>
         
         <v-navigation-drawer
-            v-bind:class="[isExpand==true?'width-1100':'width-500']"
+            v-bind:class="[isExpand==true?'width-1200':'width-500']"
             right
             v-model="showMyInfo"
             absolute
@@ -107,6 +105,7 @@
                 @expand-panel="isExpand=true"
                 :close="isExpand"
                 @make-small-panel="isExpand=false"
+                @closePanel="showMyInfo=false"
             />
         </v-navigation-drawer>
     </v-app>
@@ -240,8 +239,8 @@ export default {
     font-size: 13px;
     font-weight: bold;
 }
-.width-1100{
-    width:1100px!important
+.width-1200{
+    width:1200px!important
 
 }
 .width-500{

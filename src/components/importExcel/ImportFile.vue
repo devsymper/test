@@ -66,18 +66,20 @@
                     <span class="color-grey fs-13 pl-1">
                         <b class="fw-500">{{table.title}}
                         <span v-if="tables[tableIdx]==tables[0]" style="color:red">*</span>
-                               <span v-if="objType!='user'"> ({{sumCount(table.controls.filter(p => p.dataColumn!=null).length, table.keyColumn?(table.keyColumn.enable?1:0):0)}}/{{table.controls.filter(p => p.dataType!='table').length+1}})
+                               <span v-if="objType!='user'"> 
+                                   ({{sumCount(tableIdx,'document')}})
                             </span>
                             <span v-else>
-                                 ({{sumCount(table.controls.filter(p => p.dataColumn!=null).length, table.keyColumn?(table.keyColumn.enable?1:0):0)}}/{{table.controls.filter(p => p.dataType!='table').length}})
+                                 ({{sumCount(tableIdx,'user')}})
                             </span>   
                         </b>
                         </span>
                 </v-col>
                 <v-col class="col-md-6 py-0" style="margin-top: -13px">
-                    <v-autocomplete :value="table.sheetMap" 
-                    @input="value => onChangeSheet(tableIdx, value)" 
-                    class="auto-complete color-normal mt-4 mb-3 fs-13 " 
+                    <v-autocomplete 
+                        :value="table.sheetMap" 
+                        @input="value => onChangeSheet(tableIdx, value)" 
+                        class="auto-complete color-normal mt-4 mb-3 fs-13 " 
                         :items="nameSheets" 
                         item-text="name" 
                         return-object 
@@ -100,23 +102,29 @@
             <v-row v-if="objType!='user'" class=" mr-1 mb-3" style="margin-top: -27px">
                 <v-col  class="col-md-5 ml-1 pl-4 pb-5 d-flex justify-content">
                     <v-icon style=" margin-top:-19px; font-size:13px " class="pr-3" size="18">mdi mdi-key</v-icon>
-                    <div class="color-normal" style="float:left; margin-top:-13px">Khoá<span v-if="tables[tableIdx]==tables[0]" style="color:red"> *</span></div>
+                    <div class="color-normal" style="float:left; margin-top:-13px">Khoá
+                        <span v-if="tables[tableIdx]==tables[0]" style="color:red"> *</span>
+                    </div>
                 </v-col>
                 <v-col class="col-md-6 py-0" style="margin-left:2px">
                     <v-autocomplete class=" color-normal auto-complete" 
-                    style="width: 215px"
-                     :items="nameColumnDetail[table.sheetMap.name] ? nameColumnDetail[table.sheetMap.name] : []" item-text="name" 
-                     return-object 
-                     v-model="table.keyColumn" clearable :menu-props="{'nudge-top':-10, 'max-width': 300}">
-                        <template v-slot:item="{ item, on, attrs }">
-                            <v-list-item v-on="on" v-bind="attrs">
-                                <v-list-item-content>
-                                    <v-list-item-title>
-                                        {{item.name}}
-                                    </v-list-item-title>
-                                </v-list-item-content>
-                            </v-list-item>
-                        </template>
+                        style="width: 215px"
+                        :value="table.keyColumn" 
+                        @input="value => onChangeKey(tableIdx, value)" 
+                        :items="nameColumnDetail[table.sheetMap.name] ? nameColumnDetail[table.sheetMap.name] : []" 
+                        item-text="name" 
+                        return-object 
+                        clearable 
+                        :menu-props="{'nudge-top':-10, 'max-width': 300}">
+                            <template v-slot:item="{ item, on, attrs }">
+                                <v-list-item v-on="on" v-bind="attrs">
+                                    <v-list-item-content>
+                                        <v-list-item-title>
+                                            {{item.name}}
+                                        </v-list-item-title>
+                                    </v-list-item-content>
+                                </v-list-item>
+                            </template>
                     </v-autocomplete>
                 </v-col>
             </v-row>
@@ -210,8 +218,25 @@ export default {
           
     },
     methods: {
-        sumCount(a,b){
-            return a + b;
+        sumCount(tableIdx,type){
+            let totalAllRow = 0;
+            let totalFilledRow = this.tables[tableIdx].controls.filter(p => p.dataColumn!=null).length;
+            let isFilledKey =  this.tables[tableIdx].keyColumn?(this.tables[tableIdx].keyColumn.enable?1:0):0;
+            if(type!='user'){
+                totalAllRow = this.tables[tableIdx].controls.filter(p => p.dataType!='table').length+1;
+            }else{
+                 totalAllRow = this.tables[tableIdx].controls.filter(p => p.dataType!='table').length;
+            }
+            return totalFilledRow + isFilledKey + '/'+ totalAllRow;
+        },
+             //Sự kiện xảy ra khi thay đổi Key
+        onChangeKey(tableIdx,value){
+            if(value){
+                 this.tables[tableIdx].keyColumn.enable=true;
+            }else{
+                 this.tables[tableIdx].keyColumn.enable = false;
+            }
+           
         },
         //Chọn key cho bảng
         selectKeyControl(control, allControls) {
@@ -417,6 +442,7 @@ export default {
             this.getMappingTable();
               
         },
+   
         //Sự kiện xảy ra khi thay đổi tên Sheet
         onChangeSheet(tableIdx, value) {
             // 1. Khi select sheet 

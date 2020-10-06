@@ -73,6 +73,16 @@ export default {
                             self.$t("common.detail") + "  " + (row.name ? row.name : row.key)
                         );
                     }
+                },
+                  clone:{
+                    name:"clone",
+                    text: this.$t("common.clone"),
+                    callback:(row, callback) => {
+                        self.$goToPage(
+                            "/orgchart/"+row.id+"/clone",
+                            "Clone " + (row.name ? row.name : row.key)
+                        );
+                    }
                 }
             }
         };

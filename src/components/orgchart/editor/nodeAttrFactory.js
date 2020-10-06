@@ -65,6 +65,7 @@ export const getDefaultConfigNodeData = function(nodeId, isDepartment = false) {
     } else {
         config.users = [];
         config.permissions = [];
+        config.isSetPermissions = false;
     }
     return config;
 }
@@ -153,7 +154,7 @@ export const jointLinkNode = function(source, target) {
             label: {
                 text: 'Hello',
             }
-            
+
         },
     }, {
         isHidden: function() {

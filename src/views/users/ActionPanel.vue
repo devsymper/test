@@ -53,10 +53,10 @@
 									></v-text-field>
 								</v-col>	
 							</v-row>
-							<v-row>
+								<v-row>
 								<v-col >
 									<span class="fs-13 st-icon-pandora">
-										{{ $t('user.general.personalInfo.displayName')}}
+										{{ $t('user.general.personalInfo.userName')}}
 									</span>
 								</v-col>
 							</v-row>
@@ -71,8 +71,28 @@
 										v-model="user.userName"
 										dense
 									></v-text-field>
-							</v-col>
-						</v-row>
+								</v-col>
+							</v-row>
+							<v-row>
+								<v-col >
+									<span class="fs-13 st-icon-pandora">
+										{{ $t('user.general.personalInfo.displayName')}}
+									</span>
+								</v-col>
+							</v-row>
+							<v-row >
+								<v-col cols="12">
+									<v-text-field
+										outlined	
+										class="fs-13"
+										ref="displayName"
+										required
+										:rules="[rules.required]"
+										v-model="user.displayName"
+										dense
+									></v-text-field>
+								</v-col>
+							</v-row>
 							<v-row>
 								<v-col >
 									<span class="fs-13 st-icon-pandora">

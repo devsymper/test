@@ -898,25 +898,25 @@
                 "unfavorite": "Loại bỏ yêu thích"
             },
             "document_definition": {
-                "create": "Tạo mới văn bản ",
-                "edit": "Chỉnh sửa văn bản",
-                "submit": "Gửi văn bản",
-                "drop": "Xóa văn bản",
+                "create": "Tạo ",
+                "edit": "Sửa",
+                "submit": "Gửi",
+                "drop": "Xóa",
                 "restore": "Khôi phục",
-                "list": "Danh sách văn bản",
+                "list": "Danh sách",
                 "list_trash": "Thùng rác",
-                "list_instance": "Danh sách bản ghi",
-                "unfavorite": "Loại bỏ yêu thích"
+                "list_instance": "Ds bản ghi",
+                "unfavorite": "Bỏ yêu thích"
             },
             "workflow_definition": {
-                "list": "Danh sách quy trình ",
-                "create": "Tạo mới quy trình ",
+                "list": "Danh sách",
+                "create": "Tạo mới",
                 "deploy": "Triển khai",
-                "drop": "Xóa quy trình ",
-                "update": "Cập nhật quy trình ",
-                "list_instance": "Danh sách bản ghi",
-                "start_instance": "Bắt đầu quy trình",
-                "unfavorite": "Loại bỏ yêu thích"
+                "drop": "Xóa",
+                "update": "Sửa",
+                "list_instance": "Ds bản ghi",
+                "start_instance": "Bắt đầu",
+                "unfavorite": "Bỏ yêu thích"
             },
             "dashboard": {
                 "create": "Tạo mới",
@@ -925,6 +925,24 @@
                 "list": "Danh sách",
                 "drop": "Xóa",
                 "unfavorite": "Loại bỏ yêu thích"
+            },
+            "document_instance": {
+                "update": "Sửa",
+                "delete": "Xóa",
+                "restore": "Khôi phục",
+                "detail": "Chi tiết",
+                "print": "In",
+                "list_trash": "Thùng rác"
+            },
+            "syql": {
+                "update": "Sửa",
+                "create": "Tạo ",
+                "execute": "Thực thi"
+            },
+            "application_definition": {
+                "update": "Sửa",
+                "view": "Xem",
+                "remove": "Xóa"
             }
         },
         "iconListActions": {

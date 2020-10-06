@@ -28,8 +28,13 @@
                 </v-list-item-avatar>
                 <v-list-item-content>
                     <v-list-item-title class=" mb-2">
-                        <span class="mt-1 position-relative cursor-pointer" style="top: 0px; position: relative;" @click="$emit('show-user-detail')">
+                        <span 
+                            class="mt-1 position-relative cursor-pointer" 
+                            style="top: 0px; position: relative;" 
+                            @click="$emit('show-user-detail')"
+                        >
                             {{ sapp.baInfo.name ? sapp.baInfo.name : sapp.endUserInfo.displayName }}
+                            <v-icon  @click="$emit('show-user-detail')"></v-icon>
                         </span>
                     </v-list-item-title>
                     <div class="w-100 mb-1 ">
@@ -531,7 +536,8 @@ export default {
     height: 32px!important;
 }
  .menu-group-active{
-    background-color:#f7f7f7; 
+    background-color:#eaeaea;
+    border-radius: 4px; 
  }  
 .v-navigation-drawer  >>> .ps__rail-x{    
     display:none
