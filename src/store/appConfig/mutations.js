@@ -30,6 +30,12 @@ const removeItemSelected = (state, data) => {
 }
 const emptyItemSelected = (state) => {
     state.listItemSelected = {
+        workflow_definition: {
+            icon: 'mdi-lan',
+            title: "apps.listType.workflow",
+            name: 'workflow_definition',
+            item: []
+        },
         document_category: {
             icon: 'mdi-file-document-outline',
             title: "apps.listType.documentCategory",
@@ -56,12 +62,7 @@ const emptyItemSelected = (state) => {
             name: 'dashboard',
             item: []
         },
-        workflow_definition: {
-            icon: 'mdi-lan',
-            title: "apps.listType.workflow",
-            name: 'workflow_definition',
-            item: []
-        },
+       
     }
 }
 const updateChildrenApps = (state, data) => {
