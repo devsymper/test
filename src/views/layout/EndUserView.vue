@@ -38,7 +38,6 @@
                             <SearchInput v-show="showSearchInput" class="mr-2" style="width:330px"/>
                         </transition>
                     </div>
-                    <!--kết thúc search--->
                         <v-menu
                             v-model="isShowDialog"
                             :close-on-content-click="false"
@@ -53,8 +52,7 @@
                                     <v-icon>mdi-apps</v-icon>
                                 </v-btn>
                             </template>
-                            <EndUserPopup style="z-index:1000 !important"  />
-							<!-- <div>hello</div> -->
+                            <EndUserPopup style="z-index:1000 !important"   />
                         </v-menu>
                         <v-btn icon @click="showSearchInput = !showSearchInput">
                             <v-icon>mdi-magnify</v-icon>
