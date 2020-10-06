@@ -5,6 +5,8 @@
         :tableContextMenu="tableContextMenu"
         :pageTitle="$t('draft.title')"
         :containerHeight="containerHeight"
+        :headerPrefixKeypath="'document'"
+
         :actionPanelWidth="actionPanelWidth"
         ref="listObject"
     >

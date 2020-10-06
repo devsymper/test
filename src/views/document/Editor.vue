@@ -2339,10 +2339,21 @@ export default {
         configColumnTablePrint(listRowData){
             let elements = $('#document-editor-'+this.keyInstance+'_ifr').contents().find('.s-control-table.on-selected');
             let thead = elements.find('thead th');
+            let tbody = elements.find('tbody tr td');
             for (let index = 0; index < thead.length; index++) {
                 let th = thead[index];
-                $(th).css({width:listRowData[index].colWidth})
-                $(th).attr('data-mce-style',$(th).attr('style'))
+                let newCell = listRowData.filter(row=>{
+                    return row.colIndex == index;
+                })
+                if(newCell.length == 0){
+                    $(th).remove();
+                    $(tbody[index]).remove();
+                }
+                else{
+                    $(th).css({width:newCell[0].colWidth})
+                    $(th).attr('data-mce-style',$(th).attr('style'))
+                }
+                
                 
             }
         },
@@ -2360,9 +2371,8 @@ export default {
                 if($(tbody[0].innerHTML).length > 0){
                     for(let i = 0; i< thead.length; i++){
                         let style = $(thead[i]).attr('style');
-                        console.log("sadsadasdasda",style);
                         let width = style.match(/(?<=width:\s)\s*([^;"]*)(?=\;)/gmi);
-                        let row = {title: $(thead[i]).text(),colWidth:width[0]}
+                        let row = {title: $(thead[i]).text(),colWidth:width[0],colIndex:i}
                         listData.push(row)
                     }
                 }

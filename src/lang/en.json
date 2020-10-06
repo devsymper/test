@@ -912,8 +912,8 @@
         },
         "alert": {
             "title_aproval": "Action work",
-            "titlePermissionDenied":"Permission denied!",
-            "contentPermissionDenied":"You are not authorized to do this!"
+            "titlePermissionDenied": "Permission denied!",
+            "contentPermissionDenied": "You are not authorized to do this!"
         }
 
     },
