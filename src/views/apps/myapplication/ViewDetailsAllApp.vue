@@ -277,16 +277,6 @@ export default {
                                 }
                             }
                         })
-                        
-                        if(self.apps[app].childrenAppReduce.hasOwnProperty('workflow_definition')){
-                            let dataWF = util.cloneDeep(self.apps[app].childrenAppReduce.workflow_definition)
-                            // delete self.apps[app].childrenAppReduce.workflow_definition
-                            // Object.keys(self.apps[app].childrenAppReduce).unshift('workflow_definition')
-                            // self.apps[app].childrenAppReduce.workflow_definition = dataWF
-                            // self.apps[app].childrenAppReduce.workflow_definition = dataWF
-                            debugger
-                        }
-                        
                     }
                 }
             }
